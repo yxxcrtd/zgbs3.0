@@ -114,7 +114,7 @@ public class DemandDepositTransBookNewService {
         // 2.1.现金类科目余额
         // 账务类共通方法:科目余额查询-期待方向
         SubjectBalance subjectBalance = this.getSubjectBalance(readerEntity, expBalanceDirect,
-            DictCodeBaseSubjectNatrueNew.活期存款.getValue(), null, taskPri, readerEntity.getHappenDate());
+            DictCodeBaseSubjectNatrueNew.活期存款_本金.getValue(), null, taskPri, readerEntity.getHappenDate());
         cashBalance = subjectBalance.getBalance() == null ? BigDecimal.ZERO : subjectBalance.getBalance();
 
         // 2.2.应收利息类科目余额

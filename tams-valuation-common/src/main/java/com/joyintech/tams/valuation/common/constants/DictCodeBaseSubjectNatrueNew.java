@@ -22,18 +22,7 @@ import com.joyintech.framework.util.StringUtil;
  * @since 1.0
  */
 public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
-    /**
-     * 摊余成本类成本
-     */
-    摊余成本类成本(
-        "TYCBLCB"
-    ),
-    /**
-     * 摊余成本类利息调整
-     */
-    摊余成本类利息调整(
-        "TYCBLLXTZ"
-    ),
+
     /**
      * 公允价值损益类_成本
      */
@@ -49,13 +38,13 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
     /**
      * 综合收益类成本
      */
-    综合收益类成本(
+    综合收益类_成本(
         "ZHSYLCB"
     ),
     /**
      * 综合收益类利息调整
      */
-    综合收益类利息调整(
+    综合收益类_利息调整(
         "ZHSYLLXTZ"
     ),
     /**
@@ -100,24 +89,7 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
     非上市债券成本(
         "FSSZQCB"
     ),
-    /**
-     * 摊余成本类债券应计利息
-     */
-    摊余成本类债券应计利息(
-        "TYCBLZQYJLX"
-    ),
-    /**
-     * 公允价值损益类应计利息
-     */
-    公允价值损益类应计利息(
-        "GYJZSYLYJLX"
-    ),
-    /**
-     * 综合收益类应计利息
-     */
-    综合收益类应计利息(
-        "ZHSYLYJLX"
-    ),
+
     /**
      * 应收债券借贷费用
      */
@@ -228,12 +200,6 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
         "YFXSFWF"
     ),
     /**
-     * 应付交易费用
-     */
-    应付交易费用(
-        "YFJYFY"
-    ),
-    /**
      * 应付印花税
      */
     应付印花税(
@@ -256,12 +222,6 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
      */
     应付结算费(
         "YFJSF1"
-    ),
-    /**
-     * 应付佣金
-     */
-    应付佣金(
-        "YFYJ"
     ),
     /**
      * 应付交易手续费
@@ -370,12 +330,6 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
      */
     预提费用(
         "YTFY"
-    ),
-    /**
-     * 清算款
-     */
-    清算资金往来(
-        "QSK"
     ),
     /**
      * 外汇远期头寸
@@ -514,12 +468,6 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
      */
     利息收入(
         "LXSR"
-    ),
-    /**
-     * 摊余成本类利息收入
-     */
-    摊余成本类利息收入(
-        "TYCBLLXSR"
     ),
     /**
      * 公允价值损益类利息收入
@@ -1039,14 +987,8 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
     合作方水利基金支出(
         "HZFSLJJZC"
     ),
-    摊余成本类资产减值(
-            "TYCBLJZZB"
-    ),
     拆放同业减值准备(
             "CFTYJZZB"
-    ),
-    其它综合收益_减值(
-            "QTZHSY_JZ"
     ),
 
     /**add by wujie on 20201015 start remark:计划类收益型资产改造**/
@@ -1093,20 +1035,20 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
     /**
      * 活期存款（现金）
      */
-    活期存款(
-            "XJ"
+    活期存款_本金(
+            "HQCK_BJ"
     ),
     /**
      * 活期存款_应计利息
      */
     活期存款_应计利息(
-            "YJLX"
+            "HQCK_YJLX"
     ),
     /**
      * 定期存款_本金（成本）
      */
     定期存款_本金(
-            "CB"
+            "DQCK_BJ"
     ),
     /**
      * 定期存款-减值准备(存放同业减值准备)
@@ -1131,6 +1073,66 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
      */
     其他应收款_利息(
             "YSYQKLX"
+    ),
+    /**
+     * 摊余成本类成本
+     */
+    摊余成本类_成本(
+            "TYCBLCB"
+    ),
+    /**
+     * 摊余成本类利息调整
+     */
+    摊余成本类_利息调整(
+            "TYCBLLXTZ"
+    ),
+    /**
+     * 利息收入-AC类-证券
+     */
+    利息收入_AC类_证券(
+            "LXSR_AC_ZQ"
+    ),
+    摊余成本类_资产减值(
+            "TYCBLTZ_JZZB_Z"
+    ),
+    其他综合收益_资产减值(
+            "QTZHSYJZ"
+    ),
+    /**
+     * 摊余成本类_应计利息
+     */
+    摊余成本类_应计利息(
+            "TYCBLZQYJLX"
+    ),
+    /**
+     * 公允价值损益类_应计利息
+     */
+    公允价值损益类_应计利息(
+            "GYJZSYLYJLX"
+    ),
+    /**
+     * 综合收益类_应计利息
+     */
+    综合收益类_应计利息(
+            "ZHSYLYJLX"
+    ),
+    /**
+     * 应付交易费用_费用
+     */
+    应付交易费用_费用(
+            "YFJYFY"
+    ),
+    /**
+     * 应付交易费用_佣金
+     */
+    应付交易费用_佣金(
+            "YFYJ"
+    ),
+    /**
+     * 清算资金往来
+     */
+    清算资金往来(
+            "QSKZJWL_Z"
     ),
     /** ==========原科目性质修改======== end**/
     /** ==========新增科目性质======== start**/

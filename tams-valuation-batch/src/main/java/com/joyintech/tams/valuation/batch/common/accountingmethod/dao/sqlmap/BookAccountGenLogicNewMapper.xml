@@ -29,7 +29,6 @@
             AND A.CCY = #{ccy}
             /** 查询底层科目，且科目配置项不为空**/
             AND A.IS_BOTTOM = 'Y'
-            AND A.SUBJECT_HAND_FEL_CODE IS NOT NULL
             <if test="listSubjectInternalCode != null and listSubjectInternalCode.size >0">
                 AND A.SUBJECT_INTERNAL_CODE IN
                 <foreach collection="listSubjectInternalCode" item="item" open="(" close=")" separator=",">

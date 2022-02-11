@@ -5,24 +5,20 @@
 
 package com.joyintech.tams.valuation.batch.common.accountingmethod.accounting;
 
-import java.util.*;
-
-import com.joyintech.tams.constant.DictCodeListExt1;
-import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.joyintech.batch.core.dto.DimensionDto;
 import com.joyintech.batch.core.dto.SysBatchExecInfoDto;
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.valuation.batch.assetimpairmentprovision.dto.AssetImpairmentProvisionReaderResult;
 import com.joyintech.tams.valuation.batch.assetintdatecarryover.dao.AssetIntdateCarryoverMapper;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.PrdCashEntity;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.dao.AccountingMethodMapper;
+import com.joyintech.tams.valuation.batch.common.accountingmethod.dao.AccountingMethodNewMapper;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.definiton.NodeType;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.AccountEntry;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.SceneConfigEntry;
@@ -34,23 +30,18 @@ import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto.DrawB
 import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto.DrawBaseInfoSelectComResult;
 import com.joyintech.tams.valuation.batch.vatdraw.dto.PrdCashDto;
 import com.joyintech.tams.valuation.common.constants.BookConstant;
-import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.common.constants.ValDictCodeList;
 import com.joyintech.tams.valuation.common.service.BookAccountCommonService;
 import com.joyintech.tams.valuation.common.utils.DataHandleUtil;
 import com.joyintech.tools.collectors.JoyinCollectors;
-import com.joyintech.tams.common.base.entity.BokBatchTaskTodo;
-import com.joyintech.tams.common.base.entity.BokBookset;
-import com.joyintech.tams.common.base.entity.BokDealAccounting;
-import com.joyintech.tams.common.base.entity.BokDealAccountingDetail;
-import com.joyintech.tams.common.base.entity.BokDetailId;
-import com.joyintech.tams.common.base.entity.BokMatchRlat;
-import com.joyintech.tams.common.base.entity.BokTradeOrder;
-import com.joyintech.tams.common.base.entity.FinTradeProduct;
-import com.joyintech.tams.common.base.entity.PaTrdProductDeal;
-import com.joyintech.tams.common.base.entity.TrdProductDeal;
-import com.joyintech.tams.common.base.entity.TrdProductDealAdd;
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 /**
  * 记账公共类
@@ -68,6 +59,12 @@ public class BookCommonLogic {
      */
     @Autowired
     private AccountingMethodMapper accountingMethodMapper;
+
+    /**
+     * AccountingMethodMapper
+     */
+    @Autowired
+    private AccountingMethodNewMapper accountingMethodNewMapper;
 
     @Autowired
     private AssetIntdateCarryoverMapper assetIntdateCarryoverMapper;
@@ -238,9 +235,20 @@ public class BookCommonLogic {
             || StringUtil.isEmpty(booksetId)) {
             return null;
         }
+        // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑，保持原有逻辑不动 start
+        // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录 start
+        String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+        // 若按照内部科目编码分录，则需要映射分录对应科目信息
+        if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
+            return accountingMethodNewMapper.getSceneSubjectConfigByNodeId(booksetId, accountSceneCodes,
+                    GlobalConstant.ACCOUNTEVENTS);
+        }
+        else{
+            return accountingMethodMapper.getSceneSubjectConfigByNodeId(booksetId, accountSceneCodes,
+                    GlobalConstant.ACCOUNTEVENTS);
+        }
+        // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑，保持原有逻辑不动 end
 
-        return accountingMethodMapper.getSceneSubjectConfigByNodeId(booksetId, accountSceneCodes,
-            GlobalConstant.ACCOUNTEVENTS);
     }
 
     /**
