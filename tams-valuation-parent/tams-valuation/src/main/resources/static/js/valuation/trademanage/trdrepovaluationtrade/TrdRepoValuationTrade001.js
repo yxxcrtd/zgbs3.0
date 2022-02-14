@@ -113,7 +113,29 @@
         $('#TrdRepoValuationTrade001_btn_search').click(function() {
             table.load();
         });
-        
+        // 绑定批量删除事件
+        $('#TrdRepoValuationTrade001_btn_delete').click(function() {
+            if(table!=null && table!=''){
+                var selArr = table.getAllCheckedRows();
+            }
+            if (!selArr || selArr.length == 0) {
+                Joyin.error(JoyinUtil.getMessage("COMMON_E_0002"));
+                return;
+            }
+            // 启动删除流程
+            var object = {selectedItem: selArr, operateType:"delete"};
+            Joyin.confirm(JoyinUtil.getMessage("COMMON_C_0001",JoyinUtil.getLabel("SysCommon.delete")), function(){
+                WorkFlow.doDeleteList(
+                    basePath + 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade001/delete',
+                    object,
+                    "TrdRepoValuationTrade001_btn_delete",
+                    "TrdRepoValuationTrade002",
+                    function() {
+                        table.reload();
+                    }
+                );
+            });
+        });
         $('#TrdRepoValuationTrade001_btn_export').click(function() {
             exportExcel();
         });

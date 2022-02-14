@@ -143,6 +143,7 @@ public class TrdIntoValuationDuration001Dto extends BaseEntity implements Proces
      */
     private List<TrdIntoValuationDuration001Dto> selectedItem;
 
+    @PrimaryKey(PrimaryKey.Field.PK_1)
     public String getTradeId() {
         return tradeId;
     }
