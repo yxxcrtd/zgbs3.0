@@ -1,7 +1,7 @@
 /*在存续期管理下添加【基金存续期】菜单*/
 delete from sys_menu where MENU_ID='DEAL_001_003_003';
 insert into sys_menu (MENU_ID, SYSTEM_CODE, ICON, PARENT_MENU_ID, PAGE_ID, ORDER_NO, IS_SPREAD, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-values ('DEAL_001_003_003', 'VAL', null, 'DEAL_001_003', 'TrdFundBonusValuationTrade001', 16, '2', '基金存续期', 'system', null,sysdate, 'system', sysdate);
+values ('DEAL_001_003_003', 'VAL', null, 'DEAL_001_003', 'TrdFundBonusValuationTrade001', 3, '2', '基金存续期', 'system', null,sysdate, 'system', sysdate);
 
 
 /*基金存续期-查询及新建页面*/
