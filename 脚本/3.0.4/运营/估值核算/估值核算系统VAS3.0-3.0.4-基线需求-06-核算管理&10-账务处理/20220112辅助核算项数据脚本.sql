@@ -120,7 +120,10 @@ values ('TAX_FEE_TYPE', 'VAL', '税费类型', null, '01', 'system', null, sysda
 delete from sys_datadict_list d where d.dict_code in('TYPE_2','TRD_PROP','TAX_FEE_TYPE');
 
 
-
+/**增加辅助核算项默认账套**/
+delete from bok_bookset b where b.bookset_id='SUBJECT_INTERNAL_001';
+insert into bok_bookset (BOOKSET_ID, BOOKSET_NAME, BOOKSET_FULLNAME, BOOKSET_TYPE, ACCT_MODE, BOK_SPEC_MODE, ACCT_SUBJECT_ID, ACCT_SUBJECT_TYPE, STANDARD_CCY, BOOKSET_ID_TMPL, ACCT_STANDARD, START_DATE, END_DATE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+values ('SUBJECT_INTERNAL_001', '辅助核算默认账套模板', '辅助核算默认账套模板', '01', null, null, null, null, 'CNY', null, 'QY', sysdate, sysdate, 'system', null, sysdate, 'system',sysdate);
 
 
 
