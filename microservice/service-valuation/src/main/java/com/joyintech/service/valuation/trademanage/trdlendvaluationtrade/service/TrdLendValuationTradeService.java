@@ -89,9 +89,9 @@ public class TrdLendValuationTradeService extends CommonExportService<TrdLendVal
         }
         pageParam.put("portfolioIdArr", portfolioIdArr);
 
-        // 获取交易方向
+        // 获取交易类型
         String ps = (String)pageParam.get("ps");
-        // 交易方向多选，转为数组
+        // 交易类型多选，转为数组
         String[] psArr = null;
         if (StringUtil.isNotEmpty(ps)) {
             psArr = ps.split(",");
@@ -100,19 +100,22 @@ public class TrdLendValuationTradeService extends CommonExportService<TrdLendVal
 
         List<String> finprodTypeList  = new ArrayList();
         List<String> psArr01List  = new ArrayList();
-        for (String psStr : psArr) {
-            if(StringUtil.equals(psStr,"01")){
-                finprodTypeList.add("F01");
-                psArr01List.add("T01");
-            }else if(StringUtil.equals(psStr,"02")){
-                finprodTypeList.add("F01");
-                psArr01List.add("T02");
-            }else if(StringUtil.equals(psStr,"03")){
-                finprodTypeList.add("F08");
-                psArr01List.add("T07");
-            }else{
-                finprodTypeList.add("F09");
-                psArr01List.add("T07");
+        //判断传入的交易类型是否为空
+        if(psArr!=null){
+            for (String psStr : psArr) {
+                if(StringUtil.equals(psStr,"01")){
+                    finprodTypeList.add("F01");
+                    psArr01List.add("T01");
+                }else if(StringUtil.equals(psStr,"02")){
+                    finprodTypeList.add("F01");
+                    psArr01List.add("T02");
+                }else if(StringUtil.equals(psStr,"03")){
+                    finprodTypeList.add("F08");
+                    psArr01List.add("T07");
+                }else{
+                    finprodTypeList.add("F09");
+                    psArr01List.add("T07");
+                }
             }
         }
         String[] finprodTypeArr=finprodTypeList.toArray(new String[finprodTypeList.size()]);

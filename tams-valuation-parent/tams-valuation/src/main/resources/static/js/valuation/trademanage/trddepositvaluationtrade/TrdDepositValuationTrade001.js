@@ -109,6 +109,32 @@ $(function(){
                 basePath + "valuation/trademanage/trddepositvaluationtrade/TrdDepositValuationTrade002/init",
                 "98%", "98%", {pageModel: PAGE_MODEL_NEW});
         });
+
+
+        // 绑定批量删除事件
+        $('#TrdDepositValuationTrade001_btn_delete').click(function() {
+            if(table!=null && table!=''){
+                var selArr = table.getAllCheckedRows();
+            }
+            if (!selArr || selArr.length == 0) {
+                Joyin.error(JoyinUtil.getMessage("COMMON_E_0002"));
+                return;
+            }
+            // 启动删除流程
+            var object = {selectedItem: selArr, operateType:"delete"};
+                Joyin.confirm(JoyinUtil.getMessage("COMMON_C_0001",JoyinUtil.getLabel("SysCommon.delete")), function(){
+                    WorkFlow.doDeleteList(
+                        basePath + 'valuation/trademanage/trddepositvaluationtrade/TrdDepositValuationTrade001/delete',
+                        object,
+                        "TrdDepositValuationTrade001_btn_delete",
+                        "TrdDepositValuationTrade002",
+                        function() {
+                            table.reload();
+                        }
+                    );
+                });
+
+        });
         //导出
         $('#TrdDepositValuationTrade001_btn_export').click(function () {
             exportExcel();
