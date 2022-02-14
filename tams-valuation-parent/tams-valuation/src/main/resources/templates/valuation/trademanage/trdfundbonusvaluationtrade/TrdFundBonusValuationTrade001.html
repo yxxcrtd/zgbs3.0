@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="~{layout/default}">
+
+<head>
+    <title data-th-text="#{TrdFundBonusValuationTrade001}">基金存续期查询</title>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <div class="form-button-area">
+            <a id="TrdFundBonusValuationTrade001_btn_add" class="layui-btn layui-btn-sm btn-create" data-th-text="#{SysCommon.create}">新建</a>
+            <!--<a id="TrdFundBonusValuationTrade001_btn_revoke" class="layui-btn layui-btn-sm btn-revoke" ><i class="iconfont icon-revoke"></i><span data-th-text="#{SysCommon.revoke}"></a>-->
+        </div>
+        <div class="joyin-form-wrap joyin-filter-form condition-area">
+            <form class="layui-form" id="searchForm">
+                <div class="layui-form-item">
+                    <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
+                        <label class="layui-form-label form-lable" data-th-text="#{TrdFundBonusValuationTrade002.tradeId}">交易编号</label>
+                        <div class="layui-input-inline input-inline">
+                            <input type="text" id="tradeId" name="tradeId" class="layui-input form-input"
+                                   data-th-value="${tradeId}">
+                        </div>
+                    </div>
+
+                    <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
+                        <label class="layui-form-label form-lable" data-th-text="#{TrdFundBonusValuationTrade002.portfolioId}">产品名称</label>
+                        <div class="layui-input-inline input-inline">
+                            <select type="text" id="portfolioId" name="portfolioId"
+                                    class="layui-input form-input input-select" placeholder="请输入内容"
+                                    data-th-placeholder="#{SysCommon.placeholder}" multiple="true"
+                                    data-th-data-url="@{/valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade002/findPortfolioId}">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
+                        <label class="layui-form-label form-lable" data-th-text="#{TrdFundBonusValuationTrade002.finprodId}">资产代码</label>
+                        <div class="layui-input-inline input-inline">
+                            <select type="text" id="finprodId" name="finprodId"
+                                    class="layui-input form-input input-select" placeholder="请输入内容"
+                                    data-th-placeholder="#{SysCommon.placeholder}" multiple="true"
+                                    data-th-data-url="@{/valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade002/findFinprodId}">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
+                        <label class="layui-form-label form-lable" data-th-text="#{TrdFundBonusValuationTrade002.tradeDate}">交易日期</label>
+                        <div class="layui-input-inline input-inline">
+                            <input id="tradeDate" name="tradeDate"
+                                   class="layui-input form-input input-dateSelect hidden"
+                                   data-th-value='${#dates.format(entity?.tradeDate,"yyyy-MM-dd")}'>
+                        </div>
+                    </div>
+                    <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
+                        <label class="layui-form-label form-lable" data-th-text="#{TrdFundBonusValuationTrade002.ps}">交易类型</label>
+                        <div class="layui-input-inline input-inline">
+                            <select type="text" id="ps" name="ps"
+                                    class="layui-input form-input input-select"
+                                    data-th-data-result='${PS}' allowClear="true"
+                                    placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"
+                                    formatoption="true"
+                                    data-th-initValue="${entity?.ps}">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
+                        <label class="layui-form-label form-lable" data-th-text="#{TrdFundBonusValuationTrade002.tradeMarket}">交易场所</label>
+                        <div class="layui-input-inline input-inline">
+                            <select type="text" id="tradeMarket" name="tradeMarket"
+                                    class="layui-input form-input input-select"
+                                    data-th-data-result='${TRADE_PLACE}' allowClear="true"
+                                    placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"
+                                    formatoption="true"
+                                    data-th-initValue="${entity?.tradeMarket}">
+                            </select>
+                        </div>
+                    </div>
+
+                    <!--<div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
+                        <label class="layui-form-label form-lable" data-th-text="#{TrdFundBonusValuationTrade002.tradeMarket>交易场所</label>
+                        <div class="layui-input-inline input-inline">
+                            <select type="text" id="tradeMarket" name="tradeMarket"
+                                    class="layui-input form-input input-select"
+                                    data-th-data-result='${TRADE_PLACE}' allowClear="true"
+                                    placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"
+                                    formatoption="true"
+                                    data-th-initValue="${entity?.tradeMarket}">
+                            </select>
+                        </div>
+                    </div>-->
+                </div>
+
+            </form>
+        </div>
+        <div>
+            <table class="layui-table" id="dataTable"></table>
+        </div>
+    </div>
+    <div layout:fragment="script">
+        <script data-th-src="@{/js/valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade001.js}" type="text/javascript"></script>
+    </div>
+</body>
+
+</html>
