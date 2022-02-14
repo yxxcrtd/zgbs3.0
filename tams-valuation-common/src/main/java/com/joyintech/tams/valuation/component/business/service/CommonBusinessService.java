@@ -118,6 +118,17 @@ public class CommonBusinessService {
     }
 
     /**
+     * 资产名称下拉框
+     *
+     * @param search 界面查询参数 ,assetType 资产类型
+     * @return
+     */
+    public List<SelectOptionDto> getAssetName( Map<String, Object> param) {
+
+        return commonBusinessMapper.getAssetId(param);
+    }
+
+    /**
      * 产品代码下拉框
      * @param search 界面查询参数 ,finprodType 产品类型
      * @return
