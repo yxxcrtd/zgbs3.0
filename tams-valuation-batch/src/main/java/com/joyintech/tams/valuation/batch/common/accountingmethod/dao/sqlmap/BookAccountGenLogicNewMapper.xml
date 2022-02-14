@@ -47,7 +47,7 @@
             E.TYPE_2 as secDetailType,   /**证券细分类 **/
             nvl(B.TRADE_MARKET,C.TRADE_MARKET) as tradeMarket, /** 交易市场 **/
             B.ISSUE_TYPE as issueType, /** 发行方式 **/
-            CASE WHEN A.BUSI_DETAIL_TYPE = 'F07'
+            CASE WHEN A.BUSI_DETAIL_TYPE = #{finprodTypeCk}
             THEN B.ISSUER   /** 存款类资产对应市场机构 **/
             ELSE C.COUNTER_ID END as counterId, /** 交易对手 **/
             A.BUSI_DETAIL_TYPE as accountType,   /** 账户类型 **/
@@ -62,8 +62,8 @@
             AND A.BUSI_DETAIL_TYPE = C.FINPROD_TYPE
             AND C.BRANCH = 0
         LEFT JOIN FIN_TRADE_PRODUCT_ADD D
-            ON D.FINPROD_ID = C.FINPROD_ID
-            AND D.BRANCH = C.BRANCH
+            ON D.FINPROD_ID = A.BUSI_ID
+            AND D.BRANCH = 0
         LEFT JOIN FIN_PRODUCT_TYPE E
             ON A.BUSI_ID = E.FINPROD_ID
         WHERE A.BOOKSET_ID = #{booksetId}

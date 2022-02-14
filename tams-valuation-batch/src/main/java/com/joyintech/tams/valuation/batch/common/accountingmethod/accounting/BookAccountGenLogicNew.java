@@ -8,6 +8,7 @@ package com.joyintech.tams.valuation.batch.common.accountingmethod.accounting;
 import com.joyintech.calculation.config.NumberEnum;
 import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
+import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
@@ -17,6 +18,7 @@ import com.joyintech.tams.common.base.entity.BokDetailId;
 import com.joyintech.tams.common.base.entity.BokSubject;
 import com.joyintech.tams.common.base.entity.BokSubjectDetail;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalance;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalanceSearchDto;
@@ -82,6 +84,7 @@ public class BookAccountGenLogicNew {
 
     @Autowired
     private BookAccountGenLogicNewMapper bookAccountGenLogicNewMapper;
+
 
     /**
      * 记账凭证生成
@@ -1486,9 +1489,9 @@ public class BookAccountGenLogicNew {
         }
         // 定义 变量.科目Map = 科目按照内部科目编码进行分组
         Map<String, List<BokSubject>> subjectMap= subjectList.stream().collect(Collectors.groupingBy(BokSubject :: getSubjectInternalCode));
-        // 3. 根据账务明细代码和账套代码，查询对应科目基础配置项
-        List<SubjectMappingConfig> subjectMappingConfigList= bookAccountGenLogicNewMapper.getSubjectMappingConfig(booksetId, listBokDetailId);
-        // 将科目基础配置项按账务明细代码分组
+        // 3. 根据账务明细代码和账套代码，查询对应科目辅助核算项
+        List<SubjectMappingConfig> subjectMappingConfigList= bookAccountGenLogicNewMapper.getSubjectMappingConfig(booksetId, listBokDetailId, DictCodeListExt1.金融产品类型_存款.getValue());
+        // 将科目辅助核算项按账务明细代码分组
         Map<String, SubjectMappingConfig> subjectMappingConfigMap= subjectMappingConfigList.stream().collect(Collectors.toMap(SubjectMappingConfig :: getBokDetailId, item -> item));
         // 循环遍历会计分录
         for(AccountEntry accountEntry : accountEntries){
@@ -1499,18 +1502,28 @@ public class BookAccountGenLogicNew {
             }
             // 获取账务明细代码
             BokDetailId bokDetailId =(BokDetailId)accountSceneMap.get(accountEntry.getBokDetailId());
-            // 根据账务明细代码获取对应基础配置项
+            // 根据账务明细代码获取对应辅助核算项
             SubjectMappingConfig mappingConfig = subjectMappingConfigMap.get(bokDetailId.getBokDetailId());
             // 判断对应内部科目编码是否为应付交易费用,
             if(DictCodeBaseSubjectNatrueNew.应付交易费用_费用.getValue().equals(accountEntry.getSubjectId())){
                 // 对应费用类型为会计分录对应金额元素
                 mappingConfig.setFeeType(accountEntry.getFormElement());
             }
+            // 定义 变量.资产辅助核算项 封装辅助核算项为map对象
             Map<String, Object> params = initMappingParams(mappingConfig);
+            // 定义 变量.默认辅助核算项 封装辅助核算项为map对象
+            Map<String, Object> paramsDefualt = initMappingParams(mappingConfig);
+            // 增加辅助核算项默认（DEFAULT) = 是(Y)
+            paramsDefualt.put(SubjectConfigCode.默认.getValue(), DictCodeList.是否_是.getValue());
+            // 定义 变量.是否匹配成功标志位
+            boolean mappingFlag = false;
+            // 定义 变量.默认科目
+            BokSubject bokSubjectDefault = null;
             for(BokSubject bokSubject : entrySubjectList){
-                // 根据配置项表达式匹配
+                // 根据变量.资产辅助核算项通过辅助核算项表达式匹配
                 if(StringUtil.isNotEmpty(bokSubject.getSubjectHandFelCode()) &&
-                        ExpressionUtil.booleanValue(bokSubject.getSubjectHandFelCode(), params)){
+                        ExpressionUtil.booleanValue(bokSubject.getSubjectHandFelCode(), params)
+                        ){
                     // 匹配成功，相关科目信息录入
                     accountEntry.setSubjectId(bokSubject.getSubjectNo());
                     accountEntry.setSubjectName(bokSubject.getSubjectName());
@@ -1522,8 +1535,31 @@ public class BookAccountGenLogicNew {
                     accountEntry.setOverdrawnFlag(bokSubject.getOverdrawnFlag());
                     accountEntry.setGenDetsubFlag(bokSubject.getGenDetsubFlag());
                     accountEntry.setBalFlag(bokSubject.getBalFlag());
+                    // 变量.是否匹配成功标志位更新为 true
+                    mappingFlag = true;
                     break;
                 }
+                // 比较科目与默认辅助核算项，获取默认DEFAULT=='Y'的科目,即默认科目
+                if(StringUtil.isNotEmpty(bokSubject.getSubjectHandFelCode()) &&
+                        ExpressionUtil.booleanValue(bokSubject.getSubjectHandFelCode(), paramsDefualt)
+                ){
+                    // 默认科目 = 匹配科目
+                    bokSubjectDefault = bokSubject;
+                }
+            }
+            // 若循环科目后未匹配成功，且默认科目不为空，则取默认科目
+            if(!mappingFlag && bokSubjectDefault != null){
+                // 相关科目信息录入
+                accountEntry.setSubjectId(bokSubjectDefault.getSubjectNo());
+                accountEntry.setSubjectName(bokSubjectDefault.getSubjectName());
+                accountEntry.setFsubjectId(bokSubjectDefault.getFsubjectId());
+                accountEntry.setBaseSubjectNature(bokSubjectDefault.getSubjectInternalCode());
+                accountEntry.setSubjectType(bokSubjectDefault.getSubjectType());
+                accountEntry.setAccQuaFlag(bokSubjectDefault.getAccQuaFlag());
+                accountEntry.setAccIntFlag(bokSubjectDefault.getAccIntFlag());
+                accountEntry.setOverdrawnFlag(bokSubjectDefault.getOverdrawnFlag());
+                accountEntry.setGenDetsubFlag(bokSubjectDefault.getGenDetsubFlag());
+                accountEntry.setBalFlag(bokSubjectDefault.getBalFlag());
             }
         }
     }

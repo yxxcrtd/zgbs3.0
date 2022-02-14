@@ -39,8 +39,10 @@ public interface BookAccountGenLogicNewMapper {
      * 查询科目映射关系配置项
      * @param booksetId 账套代码
      * @param listBokDetailId 账务明细代码
+     * @param finprodTypeCk 金融产品类型_存款类资产
      * @return
      */
     List<SubjectMappingConfig> getSubjectMappingConfig(@Param("booksetId") String booksetId,
-                                                 @Param("listBokDetailId") List<String> listBokDetailId);
+                                                                    @Param("listBokDetailId") List<String> listBokDetailId,
+                                                                    @Param("finprodTypeCk") String finprodTypeCk);
 }
