@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dao.TrdBondValuationDurationMapper" >
+
+    <select id="selectDeal" resultType="com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDuration001Dto">
+        SELECT
+            t.TRADE_ID tradeId,/**交易编号**/
+            deal.BOOKSET_ID finprodId,/**金融产品代码**/
+            bok.BOOKSET_NAME finprodName,/**金融产品名称**/
+            zc.FINPROD_MARKET_ID  assetId, /**资产代码**/
+            zc.FINPROD_ABBR  assetAbbr,/**资产简称**/
+            t.PS ps,/**交易方向**/
+            to_char(t.TRADE_DATE,'yyyy-mm-dd') tradeDate,/**交易日**/
+            t.INV_AIM invAim,/**会计分类**/
+            t.INT_AMT intAmtReal,  /**实收利息**/
+            t.PRIN_AMT actCapi, /**实收本金**/
+            to_char(stl.SETTLE_DATE,'yyyy-mm-dd') fundSettleDate,/**资金交收日**/
+            null plandate,/**计划支付日**/
+            t.CCY ccy,/**币种**/
+            stl.SETTLE_AMT settleAmt,/**结算金额**/
+            t.TRADE_AMT bTradeAmt,/**本币交易金额**/
+            stl.MY_ACCT_NO acctNo/**资金账户**/
+        FROM TRD_PRODUCT_DEAL t
+        LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
+        LEFT JOIN BOK_DEAL_ACCOUNTING deal on deal.BUSI_NO = t.TRADE_ID
+        LEFT JOIN BOK_BOOKSET bok on bok.BOOKSET_ID = deal.BOOKSET_ID
+        LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID
+        where
+            t.BUSI_TYPE ='02'
+            <if test="psArr ==null or psArr.length == 0">
+                and t.PS IN('T07','T08','T09')
+            </if>
+            <if test="tradeId !=null and tradeId !='' ">
+                and t.TRADE_ID like  concat(concat('%',#{tradeId}),'%')
+            </if>
+            <if test="finprodIdArr != null and finprodIdArr.length > 0">
+                and deal.BOOKSET_ID IN
+                <foreach collection="finprodIdArr" item="finprodId" open="( " close=" )" separator=",">
+                    #{finprodId}
+                </foreach>
+            </if>
+            <if test="assetIdArr != null and assetIdArr.length > 0">
+                and zc.FINPROD_MARKET_ID IN
+                <foreach collection="assetIdArr" item="asset" open="( " close=" )" separator=",">
+                    #{asset}
+                </foreach>
+            </if>
+            <if test="tradeDateBegin !=null and tradeDateBegin !='' ">
+                and t.TRADE_DATE <![CDATA[>=]]> to_date(#{tradeDateBegin},'yyyy-mm-dd')
+            </if>
+            <if test="tradeDateEnd !=null and tradeDateEnd !='' ">
+                and t.TRADE_DATE <![CDATA[<=]]> to_date(#{tradeDateEnd},'yyyy-mm-dd')
+            </if>
+            <if test="psArr != null and psArr.length > 0">
+                AND t.PS IN
+                <foreach collection="psArr" item="ps" open="( " close=" )" separator=",">
+                    #{ps}
+                </foreach>
+            </if>
+
+        order by t.TRADE_ID desc
+    </select>
+
+    <delete id="delBokDetailIdByTradeId">
+        DELETE FROM BOK_DETAIL_ID
+        WHERE BOOKSET_ID = #{booksetId}
+          and TRADE_ID = #{tradeId}
+    </delete>
+
+    <select id="querySequences" resultType="Integer" useCache="false"
+            flushCache="true">
+        SELECT JYBOND_SEQUENCE.nextval from dual
+    </select>
+
+    <select id="queryTradeInfoByTradeId" resultType="com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDuration002Dto">
+        SELECT
+            t.TRADE_ID tradeId,/**交易编号**/
+            null outTradeId,    /*外部成交编号*/
+            deal.BOOKSET_ID prodId,/**金融产品代码**/
+            bok.BOOKSET_NAME prodName,/**金融产品名称**/
+            zc.FINPROD_MARKET_ID  assetId, /**资产代码**/
+            zc.FINPROD_ABBR  assetAbbr,/**资产简称**/
+            t.PS ps,/**交易方向**/
+            to_char(t.TRADE_DATE,'yyyy-mm-dd') tradeDate,/**交易日**/
+            null paymentDate,/**缴款日**/
+            to_char(t.SETTLE_DATE,'yyyy-mm-dd') settdateDate,/**交割日**/
+            to_char(stl.SETTLE_DATE,'yyyy-mm-dd') settleDate,/**交收日**/
+            null isLock,
+            null endDate,/**锁定期截止日**/
+            t.SHARE_AMT dealNum,/**成交数量**/
+            t.UNIT_CPRICE tradeAmt,/**交易价格**/
+            CASE WHEN ttfd.FEE_TYPE = 'B05' THEN ttfd.FEE_AMT ELSE 0 END as commission,/**佣金**/
+            null stampDutyAmt,/**印花税**/
+            CASE WHEN ttfd.FEE_TYPE = 'B99' THEN ttfd.FEE_AMT ELSE 0 END as otherAmt,/**其他应付费用**/
+            stl.SETTLE_AMT settleAmt,/**结算金额**/
+            stl.MY_ACCT_NO myAcctNo/**资金账户**/
+            FROM TRD_PRODUCT_DEAL t
+            LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
+            LEFT JOIN BOK_DEAL_ACCOUNTING deal on deal.BUSI_NO = t.TRADE_ID
+            LEFT JOIN BOK_BOOKSET bok on bok.BOOKSET_ID = deal.BOOKSET_ID
+            LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE ='32'
+            LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd ON ttfd.TRADE_ID = t.TRADE_ID
+        where
+            t.BUSI_TYPE ='32'
+            and t.TRADE_ID = #{tradeId}
+    </select>
+
+</mapper>

@@ -125,7 +125,7 @@ public class CommonBusinessService {
      */
     public List<SelectOptionDto> getAssetName( Map<String, Object> param) {
 
-        return commonBusinessMapper.getAssetId(param);
+        return commonBusinessMapper.getAssetName(param);
     }
 
     /**
