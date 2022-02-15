@@ -26,7 +26,7 @@
         },
         dblclick:function(table, data) {
             Joyin.dialog(JoyinUtil.getLabel("债券存续期管理查看："),
-                JoyinUtil.getRealPath("/valuation/trademanage/trdbondvaluationduration/TrdBondValuationDuration001/init"),
+                JoyinUtil.getRealPath("/valuation/trademanage/trdbondvaluationduration/TrdBondValuationDuration002/init"),
                 "90%", "90%", {pageModel:PAGE_MODEL_REFERENCE,tradeId:data.tradeId,prodId:data.finprodId,ps:data.ps},
                 function(){
                     //table.reload();

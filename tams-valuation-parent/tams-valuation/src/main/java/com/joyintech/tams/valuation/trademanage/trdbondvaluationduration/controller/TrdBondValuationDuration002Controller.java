@@ -74,6 +74,9 @@ public class TrdBondValuationDuration002Controller extends BaseController {
 
         if(StringUtil.isNotEmpty(workflowId)){
             TrdBondValuationDuration002Dto entity= trdBondValuationDuration002Service.getBussinessEntityByWorkflowId(workflowId);
+            if(StringUtil.isNotEmpty(entity.getTradeId())) {
+                entity = trdBondValuationDuration002Service.queryTradeInfoByTradeId(entity.getTradeId());
+            }
             model.addAttribute("entity", entity);
             model.addAttribute("workflowId", workflowId);
 

@@ -95,16 +95,6 @@ public class TrdBondValuationDuration001Service extends BaseService {
             psArr = ps.split(",");
         }
         params.put("psArr", psArr);
-
-        // 获取交易方向
-        String tradeMarket = (String)params.get("tradeMarket");
-        // 交易方向多选，转为数组
-        String[] tradeMarketArr = null;
-        if (StringUtil.isNotEmpty(tradeMarket)) {
-            tradeMarketArr = tradeMarket.split(",");
-        }
-        params.put("tradeMarketArr", tradeMarketArr);
-
         return trdBondValuationDurationMapper.selectDeal(params);
     }
 
@@ -121,22 +111,18 @@ public class TrdBondValuationDuration001Service extends BaseService {
         listDeal.add(entity);
         // 1.估值核算交易扩展表 TRD_PRODUCT_DEAL_ADD
         count += valCommonBatchMapper.delProductDealExtByTradeId(listDeal);
-        // 2.交易费用明细表 TRD_TRADE_FEE_DETAIL
-        count += valCommonBatchMapper.delTradeFeeDetailByTradeId(listDeal);
-        // 3.入账账务明细表 BOK_DEAL_ACCOUNTING_DETAIL
+        // 2.入账账务明细表 BOK_DEAL_ACCOUNTING_DETAIL
         count += valCommonBatchMapper.delDealAccountingDetailByTradeId(listDeal);
-        // 4.入账信息表 BOK_DEAL_ACCOUNTING
+        // 3.入账信息表 BOK_DEAL_ACCOUNTING
         count += valCommonBatchMapper.delDealAccountingByTradeId(listDeal);
-        // 5.结算指令扩展表 STL_ORDERS_EXT
+        // 4.结算指令扩展表 STL_ORDERS_EXT
         count += valCommonBatchMapper.delOrdersExtByTradeId(listDeal);
-        // 6.结算指令表 STL_ORDERS
+        // 5.结算指令表 STL_ORDERS
         count += valCommonBatchMapper.delOrdersByTradeId(listDeal);
-        // 7.金融产品交易 TRD_PRODUCT_DEAL
+        // 6.金融产品交易 TRD_PRODUCT_DEAL
         count += valCommonBatchMapper.delProductDealByTradeId(listDeal);
-        // 8.金融产品实物交易 TRD_FIN_PRODUCT_BARTER
-        count += valCommonBatchMapper.delTrdFinProductBarterByTradeId(listDeal);
-        // 9.账务明细代码表 BOK_DETAIL_ID
-       // count += trdStockTradeMapper.delBokDetailIdByTradeId(params);
+        // 7.账务明细代码表 BOK_DETAIL_ID
+        count += trdBondValuationDurationMapper.delBokDetailIdByTradeId(params);
 
         return count;
     }

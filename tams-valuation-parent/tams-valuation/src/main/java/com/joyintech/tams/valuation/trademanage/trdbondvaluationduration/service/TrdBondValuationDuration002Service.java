@@ -116,6 +116,7 @@ public class TrdBondValuationDuration002Service extends CommonExportService<TrdB
         List<StlOrdersExt> valOrdersExtList=(List<StlOrdersExt>)map.get("valOrdersExtList");
         result.setListValOrdersExt(valOrdersExtList);
         TrdBondValuationDurationResult rst = new TrdBondValuationDurationResult(result);
+        rst.setTrdBondValuationDuration002Dto(dto);
         return rst;
      }
 
