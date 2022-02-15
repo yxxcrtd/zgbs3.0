@@ -1464,8 +1464,6 @@ public class BookAccountGenLogicNew {
     public void generateEntrySubjectInfo(List<AccountEntry> accountEntries, Map<String, Object> accountSceneMap, String tableId){
         String booksetId = (String)accountSceneMap.get(BookConstant.BOOKSET_ID);
         String ccy = (String)accountSceneMap.get(BookConstant.CCY);
-        // 定义 变量.内部科目编码集合
-        List<String> listSubjectInternalCode = new ArrayList<>();
         // 定义 变量.账务明细代码集合
         List<String> listBokDetailId = new ArrayList<>();
         // 1. 循环会计分录，初始化内部科目编码集合
@@ -1474,21 +1472,16 @@ public class BookAccountGenLogicNew {
             if(StringUtil.isNotEmpty(accountEntry.getBaseSubjectNature())){
                 return;
             }
-            listSubjectInternalCode.add(accountEntry.getSubjectId());
             // 获取账务明细代码
             BokDetailId bokDetailId =(BokDetailId)accountSceneMap.get(accountEntry.getBokDetailId());
             if(bokDetailId != null){
                 listBokDetailId.add(bokDetailId.getBokDetailId());
             }
         }
-        // 2. 根据内部编码集合查询相关科目信息
-        List<BokSubject> subjectList =  bookAccountGenLogicNewMapper.getSubjectByInternalCode(booksetId, listSubjectInternalCode, ccy);
         // 若科目信息或者账务明细代码为空，直接返回
-        if(!CollectionUtils.isNotEmpty(subjectList) || !CollectionUtils.isNotEmpty(listBokDetailId)){
+        if(CollectionUtils.isEmpty(listBokDetailId)){
             return;
         }
-        // 定义 变量.科目Map = 科目按照内部科目编码进行分组
-        Map<String, List<BokSubject>> subjectMap= subjectList.stream().collect(Collectors.groupingBy(BokSubject :: getSubjectInternalCode));
         // 3. 根据账务明细代码和账套代码，查询对应科目辅助核算项
         List<SubjectMappingConfig> subjectMappingConfigList= bookAccountGenLogicNewMapper.getSubjectMappingConfig(booksetId, listBokDetailId, DictCodeListExt1.金融产品类型_存款.getValue());
         // 将科目辅助核算项按账务明细代码分组
@@ -1496,7 +1489,7 @@ public class BookAccountGenLogicNew {
         // 循环遍历会计分录
         for(AccountEntry accountEntry : accountEntries){
             // 根据内部科目编码获取所有对应科目
-            List<BokSubject> entrySubjectList = subjectMap.get(accountEntry.getSubjectId());
+            List<BokSubject> entrySubjectList = accountEntry.getBokSubjectList();
             if(CollectionUtils.isEmpty(entrySubjectList)){
                 continue;
             }

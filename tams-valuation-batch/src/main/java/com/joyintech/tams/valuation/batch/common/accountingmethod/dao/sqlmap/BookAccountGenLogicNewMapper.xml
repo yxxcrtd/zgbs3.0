@@ -1,43 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.joyintech.tams.valuation.batch.common.accountingmethod.dao.BookAccountGenLogicNewMapper">
-    <!-- 根据内部编码查询对应科目信息-->
-    <select id="getSubjectByInternalCode" resultType="com.joyintech.tams.common.base.entity.BokSubject"
-            parameterType="java.util.Map">
-        SELECT
-            A.BOOKSET_ID,
-            A.SUBJECT_NO,
-            A.SUBJECT_NAME,
-            A.FSUBJECT_ID,
-            A.BAL_FLAG,
-            A.SUBJECT_TYPE,
-            A.SUBJECT_LEVEL,
-            A.ACC_QUA_FLAG,
-            A.ACC_INT_FLAG,
-            A.OVERDRAWN_FLAG,
-            A.GEN_DETSUB_FLAG,
-            A.BASE_SUBJECT_NATURE,
-            A.INV_AIM,
-            A.SEC_MANAGE_ACCT_ID,
-            A.SUBJECT_INTERNAL_CODE,
-            A.SUBJECT_HAND_FEL_CODE,
-            A.CCY
-        FROM BOK_SUBJECT A
-        INNER JOIN BOK_BOOKSET B
-            ON A.BOOKSET_ID = B.BOOKSET_ID_TMPL
-        WHERE B.BOOKSET_ID = #{booksetId}
-            AND A.CCY = #{ccy}
-            /** 查询底层科目，且科目配置项不为空**/
-            AND A.IS_BOTTOM = 'Y'
-            <if test="listSubjectInternalCode != null and listSubjectInternalCode.size >0">
-                AND A.SUBJECT_INTERNAL_CODE IN
-                <foreach collection="listSubjectInternalCode" item="item" open="(" close=")" separator=",">
-                     #{item}
-                </foreach>
-            </if>
-
-    </select>
-
     <!-- 查询资产对应科目配置项 -->
     <select id="getSubjectMappingConfig" resultType="com.joyintech.tams.valuation.batch.common.accountingmethod.entity.SubjectMappingConfig"
             parameterType="java.util.Map">

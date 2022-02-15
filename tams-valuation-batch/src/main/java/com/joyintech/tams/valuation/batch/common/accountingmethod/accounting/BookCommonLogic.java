@@ -71,6 +71,9 @@ public class BookCommonLogic {
     
     @Autowired
     private BookAccountCommonService bookAccountCommonService;
+
+    @Autowired
+    private BookCommonLogicNew bookCommonLogicNew;
 //    /**
 //     * 1
 //     */
@@ -231,24 +234,23 @@ public class BookCommonLogic {
      */
     public List<AccountEntry> getSceneSubjectConfigByNodeId(List<String> accountSceneCodes,
                                                             String booksetId) {
-        if (accountSceneCodes == null || accountSceneCodes.isEmpty()
-            || StringUtil.isEmpty(booksetId)) {
-            return null;
-        }
         // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑，保持原有逻辑不动 start
         // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录 start
         String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
         // 若按照内部科目编码分录，则需要映射分录对应科目信息
         if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
-            return accountingMethodNewMapper.getSceneSubjectConfigByNodeId(booksetId, accountSceneCodes,
-                    GlobalConstant.ACCOUNTEVENTS);
+            // 调用新的service查询会计分录
+            return bookCommonLogicNew.getSceneSubjectConfigByNodeId(accountSceneCodes, booksetId);
         }
         else{
+            if (accountSceneCodes == null || accountSceneCodes.isEmpty()
+                    || StringUtil.isEmpty(booksetId)) {
+                return null;
+            }
             return accountingMethodMapper.getSceneSubjectConfigByNodeId(booksetId, accountSceneCodes,
                     GlobalConstant.ACCOUNTEVENTS);
         }
         // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑，保持原有逻辑不动 end
-
     }
 
     /**

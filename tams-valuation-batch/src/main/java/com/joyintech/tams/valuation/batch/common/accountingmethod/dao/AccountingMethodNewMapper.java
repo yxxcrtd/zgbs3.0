@@ -5,6 +5,7 @@
 
 package com.joyintech.tams.valuation.batch.common.accountingmethod.dao;
 
+import com.joyintech.tams.common.base.entity.BokSubject;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.AccountEntry;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -37,4 +38,15 @@ public interface AccountingMethodNewMapper {
         value = "booksetId") String booksetId, @Param(
             value = "accountSceneCodes") List<String> accountSceneCodes, @Param(
                 value = "ACCOUNTEVENTS") String accountevents);
+
+    /**
+     * 根据内部编码查询对应科目信息
+     * @param booksetId 账套代码
+     * @param listSubjectInternalCode 内部科目编码
+     * @param isBottom 是否底层科目
+     * @return
+     */
+    List<BokSubject> getSubjectByInternalCode(@Param("booksetId") String booksetId,
+                                              @Param("listSubjectInternalCode") List<String> listSubjectInternalCode,
+                                                @Param("isBottom") String isBottom);
 }

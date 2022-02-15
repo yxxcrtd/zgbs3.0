@@ -5,6 +5,10 @@
 
 package com.joyintech.tams.valuation.batch.common.accountingmethod.entity;
 
+import com.joyintech.tams.common.base.entity.BokSubject;
+
+import java.util.List;
+
 /**
  * 会计分录配置信息
  * 
@@ -94,6 +98,11 @@ public class AccountEntry {
      * 账套代码
      */
     private String booksetId;
+
+    /**
+     * 科目信息列表
+     */
+    private List<BokSubject> bokSubjectList;
 
     /**
      * 获取 sceneNodeId
@@ -355,4 +364,19 @@ public class AccountEntry {
         this.genDetsubFlag = genDetsubFlag;
     }
 
+    /**
+     * 返回 科目信息列表
+     * @return 科目信息列表
+     */
+    public List<BokSubject> getBokSubjectList() {
+        return bokSubjectList;
+    }
+
+    /**
+     * 设置 科目信息列表
+     * @param bokSubjectList 科目信息列表
+     */
+    public void setBokSubjectList(List<BokSubject> bokSubjectList) {
+        this.bokSubjectList = bokSubjectList;
+    }
 }
