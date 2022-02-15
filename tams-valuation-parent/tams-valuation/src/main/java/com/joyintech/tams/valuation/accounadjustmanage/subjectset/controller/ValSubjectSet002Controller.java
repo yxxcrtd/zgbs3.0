@@ -18,7 +18,6 @@ import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.systemtools.util.CommonUtil;
 import com.joyintech.tams.valuation.accounadjustmanage.assistaccout.dto.ValAssistHandDto;
 import com.joyintech.tams.valuation.accounadjustmanage.assistaccout.service.ValAssistAccounting001Service;
 import com.joyintech.tams.valuation.accounadjustmanage.subjectset.dto.ValBokSubjectDto;
@@ -68,7 +67,7 @@ public class ValSubjectSet002Controller extends BaseController {
     @Override
     public String init(Model model) {
         this.setSelectOptionToModel(model, DictCode.余额方向, DictCode.是否, DictCode.科目类型, DictCode.币种,
-                SubjectConfigCode.证券品种, SubjectConfigCode.证券分类, SubjectConfigCode.交易市场, SubjectConfigCode.发行方式, SubjectConfigCode.账户类型,
+                SubjectConfigCode.证券品种, SubjectConfigCode.债券核算分类, SubjectConfigCode.交易市场, SubjectConfigCode.发行方式, SubjectConfigCode.账户类型,
                 SubjectConfigCode.费用类型, SubjectConfigCode.交易对手类型, SubjectConfigCode.税费类型, SubjectConfigCode.渠道, SubjectConfigCode.交易属性
         );
         String booksetId = getParam("booksetId");

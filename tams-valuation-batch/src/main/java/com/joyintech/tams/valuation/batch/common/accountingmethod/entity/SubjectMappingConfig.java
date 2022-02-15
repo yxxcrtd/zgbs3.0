@@ -18,7 +18,7 @@ public class SubjectMappingConfig {
     /**
      * 证券分类
      */
-    private String secDetailType;
+    private String type2;
 
     /**
      * 交易市场
@@ -100,17 +100,17 @@ public class SubjectMappingConfig {
     /**
      * @return 证券分类
      */
-    public String getSecDetailType() {
-        return secDetailType;
+    public String getType2() {
+        return type2;
     }
 
     /**
      * 设置 证券分类
      *
-     * @param secDetailType 证券分类
+     * @param type2 证券分类
      */
-    public void setSecDetailType(String secDetailType) {
-        this.secDetailType = secDetailType;
+    public void setType2(String type2) {
+        this.type2 = type2;
     }
 
     /**

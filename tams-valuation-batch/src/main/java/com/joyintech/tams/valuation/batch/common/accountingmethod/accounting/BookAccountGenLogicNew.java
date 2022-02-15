@@ -8,7 +8,6 @@ package com.joyintech.tams.valuation.batch.common.accountingmethod.accounting;
 import com.joyintech.calculation.config.NumberEnum;
 import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
-import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
@@ -1566,7 +1565,7 @@ public class BookAccountGenLogicNew {
     public Map<String,Object> initMappingParams(SubjectMappingConfig mappingConfig){
         Map<String, Object> params = new HashMap<>();
         params.put(SubjectConfigCode.证券品种.getValue(), mappingConfig.getSecType());
-        params.put(SubjectConfigCode.证券分类.getValue(), mappingConfig.getSecDetailType());
+        params.put(SubjectConfigCode.债券核算分类.getValue(), mappingConfig.getType2());
         params.put(SubjectConfigCode.交易市场.getValue(), mappingConfig.getTradeMarket());
         params.put(SubjectConfigCode.发行方式.getValue(), mappingConfig.getIssueType());
         params.put(SubjectConfigCode.账户类型.getValue(), mappingConfig.getAccountType());
