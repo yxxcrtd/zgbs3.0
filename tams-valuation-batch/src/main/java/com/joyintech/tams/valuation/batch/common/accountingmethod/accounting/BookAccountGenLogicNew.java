@@ -1462,6 +1462,7 @@ public class BookAccountGenLogicNew {
      */
     public void generateEntrySubjectInfo(List<AccountEntry> accountEntries, Map<String, Object> accountSceneMap, String tableId){
         String booksetId = (String)accountSceneMap.get(BookConstant.BOOKSET_ID);
+        // 定义 变量.币种 = 会计场景元素.币种
         String ccy = (String)accountSceneMap.get(BookConstant.CCY);
         // 定义 变量.账务明细代码集合
         List<String> listBokDetailId = new ArrayList<>();
@@ -1513,30 +1514,34 @@ public class BookAccountGenLogicNew {
             BokSubject bokSubjectDefault = null;
             for(BokSubject bokSubject : entrySubjectList){
                 // 根据变量.资产辅助核算项通过辅助核算项表达式匹配
-                if(StringUtil.isNotEmpty(bokSubject.getSubjectHandFelCode()) &&
-                        ExpressionUtil.booleanValue(bokSubject.getSubjectHandFelCode(), params)
-                        ){
-                    // 匹配成功，相关科目信息录入
-                    accountEntry.setSubjectId(bokSubject.getSubjectNo());
-                    accountEntry.setSubjectName(bokSubject.getSubjectName());
-                    accountEntry.setFsubjectId(bokSubject.getFsubjectId());
-                    accountEntry.setBaseSubjectNature(bokSubject.getSubjectInternalCode());
-                    accountEntry.setSubjectType(bokSubject.getSubjectType());
-                    accountEntry.setAccQuaFlag(bokSubject.getAccQuaFlag());
-                    accountEntry.setAccIntFlag(bokSubject.getAccIntFlag());
-                    accountEntry.setOverdrawnFlag(bokSubject.getOverdrawnFlag());
-                    accountEntry.setGenDetsubFlag(bokSubject.getGenDetsubFlag());
-                    accountEntry.setBalFlag(bokSubject.getBalFlag());
-                    // 变量.是否匹配成功标志位更新为 true
-                    mappingFlag = true;
-                    break;
-                }
-                // 比较科目与默认辅助核算项，获取默认DEFAULT=='Y'的科目,即默认科目
-                if(StringUtil.isNotEmpty(bokSubject.getSubjectHandFelCode()) &&
-                        ExpressionUtil.booleanValue(bokSubject.getSubjectHandFelCode(), paramsDefualt)
-                ){
-                    // 默认科目 = 匹配科目
-                    bokSubjectDefault = bokSubject;
+                // 科目币种=变量.币种
+                if(bokSubject.getCcy().equals(ccy)) {
+                    //  科目内部科目编码不为空 且 科目内部科目编码匹配辅助核算项
+                    if (StringUtil.isNotEmpty(bokSubject.getSubjectHandFelCode()) &&
+                            ExpressionUtil.booleanValue(bokSubject.getSubjectHandFelCode(), params)
+                    ) {
+                        // 匹配成功，相关科目信息录入
+                        accountEntry.setSubjectId(bokSubject.getSubjectNo());
+                        accountEntry.setSubjectName(bokSubject.getSubjectName());
+                        accountEntry.setFsubjectId(bokSubject.getFsubjectId());
+                        accountEntry.setBaseSubjectNature(bokSubject.getSubjectInternalCode());
+                        accountEntry.setSubjectType(bokSubject.getSubjectType());
+                        accountEntry.setAccQuaFlag(bokSubject.getAccQuaFlag());
+                        accountEntry.setAccIntFlag(bokSubject.getAccIntFlag());
+                        accountEntry.setOverdrawnFlag(bokSubject.getOverdrawnFlag());
+                        accountEntry.setGenDetsubFlag(bokSubject.getGenDetsubFlag());
+                        accountEntry.setBalFlag(bokSubject.getBalFlag());
+                        // 变量.是否匹配成功标志位更新为 true
+                        mappingFlag = true;
+                        break;
+                    }
+                    // 比较科目与默认辅助核算项，获取默认DEFAULT=='Y'的科目,即默认科目
+                    if (StringUtil.isNotEmpty(bokSubject.getSubjectHandFelCode()) &&
+                            ExpressionUtil.booleanValue(bokSubject.getSubjectHandFelCode(), paramsDefualt)
+                    ) {
+                        // 默认科目 = 匹配科目
+                        bokSubjectDefault = bokSubject;
+                    }
                 }
             }
             // 若循环科目后未匹配成功，且默认科目不为空，则取默认科目
@@ -1567,6 +1572,7 @@ public class BookAccountGenLogicNew {
         params.put(SubjectConfigCode.证券品种.getValue(), mappingConfig.getSecType());
         params.put(SubjectConfigCode.债券核算分类.getValue(), mappingConfig.getType2());
         params.put(SubjectConfigCode.交易市场.getValue(), mappingConfig.getTradeMarket());
+        params.put(SubjectConfigCode.交易对手.getValue(), mappingConfig.getTradeMarket());
         params.put(SubjectConfigCode.发行方式.getValue(), mappingConfig.getIssueType());
         params.put(SubjectConfigCode.账户类型.getValue(), mappingConfig.getAccountType());
         params.put(SubjectConfigCode.费用类型.getValue(), mappingConfig.getFeeType());
