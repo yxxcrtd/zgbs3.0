@@ -15,8 +15,11 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.framework.validation.annotation.NotEmpty;
+import com.joyintech.framework.validation.annotation.ValidLogic;
+import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.valuation.trademanage.trdrepovaluationtrade.validator.TrdRepoValuationTrade003DtoValidator;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
@@ -26,6 +29,7 @@ import java.util.Date;
 import java.util.List;
 
 @PageId("TrdRepoValuationTrade003")
+@ValidLogic(targetClass = TrdRepoValuationTrade003DtoValidator.class, groups = {ValidateGroupEdit.class, ValidateGroupDelete.class})
 public class TrdRepoValuationTrade003Dto extends BaseEntity implements ProcessEntity {
 
     /**
