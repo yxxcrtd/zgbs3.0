@@ -15,6 +15,7 @@ import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.service.valuation.trademanage.trddepovaluationduration.dto.TrdDepoValuationDuration001Dto;
+import com.joyintech.service.valuation.trademanage.trddepovaluationduration.dto.TrdDepoValuationDurationResult;
 import com.joyintech.service.valuation.trademanage.trddepovaluationduration.service.TrdDepoValuationDuration001Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -133,6 +134,36 @@ public class TrdDepoValuationDuration001Controller extends BaseController {
     @PostMapping("delete")
     public int delete(@RequestBody TrdDepoValuationDuration001Dto dto){
         return trdDepoValuationDuration001Service.delete(dto);
+    }
+
+    /**
+     * 插入
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("insert")
+    public int insert(@RequestBody TrdDepoValuationDurationResult dto)
+            throws Exception {
+        return trdDepoValuationDuration001Service.insert(dto);
+    }
+
+    /**
+     * 修改
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("update")
+    public int update(@RequestBody TrdDepoValuationDurationResult dto)
+            throws Exception {
+        return trdDepoValuationDuration001Service.update(dto);
     }
 
 }

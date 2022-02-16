@@ -13,6 +13,8 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.SpringContextUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
@@ -22,6 +24,8 @@ import com.joyintech.tams.valuation.component.business.service.CommonBusinessSer
 
 import com.joyintech.tams.valuation.trademanage.trddepovaluationduration.dto.TrdDepoValuationDuration001Dto;
 import com.joyintech.tams.valuation.trademanage.trddepovaluationduration.service.TrdDepoValuationDuration002Service;
+import com.joyintech.workflow.engine.dto.ProcessParameter;
+import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,6 +35,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.Date;
 
 
 /**
@@ -102,6 +108,43 @@ public class TrdDepoValuationDuration002Controller extends BaseController {
     }
 
 
+    /**
+     * @Description:保存
+     * @date: 2021/12/30
+     * @param:
+     * @return:
+     */
+    @ResponseBody
+    @RequestMapping("save")
+    public AjaxResult save(@RequestBody @Validated({
+            ValidateGroupEdit.class}) TrdDepoValuationDuration001Dto dto, BindingResult br) throws Exception {
+        if (br.hasErrors()) {
+            return new AjaxResult(br);
+        }
+        WorkFlowParameter<TrdDepoValuationDuration001Dto> params = new WorkFlowParameter<TrdDepoValuationDuration001Dto>();
+        params.setPageId(this.getPageId());
+        params.setElementId(dto.getElementId());
+
+        //设置主键
+        if(!StringUtil.isNotEmpty(dto.getTradeId())){
+            Date sysDate= DateUtil.platDateFromCache();
+            //新建初始化交易编号
+            dto.setTradeId(trdDepoValuationDuration002Service.createPlanTradeId());
+        }
+
+        params.setBusinessCode(dto.getTradeId());
+        params.setBusinessType(DictCodeList.共通业务类型_基金类资产交易.getValue());
+        // 设置流程业务说明, entity即传入的dto
+        params.setComment(
+                entity -> SpringContextUtil.getTextValue("TrdDepositValuationTrade001.tradeId")+"("+ entity.getTradeId() +")"+"-"+SpringContextUtil.getTextValue("TrdDepositValuationTrade002.tradeDate") + "(" + DateUtil.format(entity.getTradeDate()) + ")"
+        );
+        //给参数变成ProcessParameter而非WorkFlowParameter
+        ProcessParameter<TrdDepoValuationDuration001Dto> parameter = new ProcessParameter<TrdDepoValuationDuration001Dto>();
+        parameter.setWorkFlowParameter(params);
+        //系统页面表IS_NEED_WORKFLOW 是否走流程，01-是，02-否
+        String msg = trdDepoValuationDuration002Service.start(parameter, dto);
+        return new AjaxResult(msg);
+    }
 
 
 
