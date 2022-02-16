@@ -15,6 +15,7 @@ import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.service.valuation.trademanage.trdfixincomevaluduration.dto.TrdFixIncomeValuDuration001Dto;
+import com.joyintech.service.valuation.trademanage.trdfixincomevaluduration.dto.TrdFixIncomeValuDurationResult;
 import com.joyintech.service.valuation.trademanage.trdfixincomevaluduration.service.TrdFixIncomeValuDuration001Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -135,4 +136,34 @@ public class TrdFixIncomeValuDuration001Controller extends BaseController {
         return trdFixIncomeValuDuration001Service.delete(dto);
     }
 
+
+    /**
+     * 插入
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("insert")
+    public int insert(@RequestBody TrdFixIncomeValuDurationResult dto)
+            throws Exception {
+        return trdFixIncomeValuDuration001Service.insert(dto);
+    }
+
+    /**
+     * 修改
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("update")
+    public int update(@RequestBody TrdFixIncomeValuDurationResult dto)
+            throws Exception {
+        return trdFixIncomeValuDuration001Service.update(dto);
+    }
 }
