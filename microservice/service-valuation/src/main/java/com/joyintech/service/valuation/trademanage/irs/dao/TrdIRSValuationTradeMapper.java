@@ -34,9 +34,6 @@ public interface TrdIRSValuationTradeMapper {
 
     int delBokDetailIdByTradeId(Map<String, Object> map);
 
-    List<Map<String,String>> selectList();
-
-
     int querySequences();
 
     TrdBondLendTrade002Dto queryTradeInfoByTradeId(String tradeId);

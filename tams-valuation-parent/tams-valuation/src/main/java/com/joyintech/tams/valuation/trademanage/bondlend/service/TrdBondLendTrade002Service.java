@@ -5,10 +5,12 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
-import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.sec.SecVestAssetDealTemplateRecService;
+import com.joyintech.tams.valuation.common.interf.base.dto.AssetDealInfoValCommonResult;
+import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.secdl.SecblTranDealTemplateRecService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValSeclendDeal;
 import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTrade002Dto;
 import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTrade003Dto;
@@ -18,19 +20,13 @@ import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class TrdBondLendTrade002Service extends CommonExportService<TrdBondLendTrade002Dto> implements BaseProcessService<TrdBondLendTrade002Dto> {
 
     @Autowired
-    private SecVestAssetDealTemplateRecService secVestAssetDealTemplateRecService;
-
-    @Autowired
-    private TrdBondLendTradeBServer trdBondLendTradeBServer;
-
+    private SecblTranDealTemplateRecService secblTranDealTemplateRecService;
 
     /**
      * 通过交易编号查询交易信息（修改）
@@ -77,7 +73,6 @@ public class TrdBondLendTrade002Service extends CommonExportService<TrdBondLendT
         return restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdBondLendTrade002/querySequences", null,Integer.class);
     }
 
-
     @Override
     public void doComplete(TrdBondLendTrade002Dto TrdBondLendTrade002Dto, OperationType operationType) {
         TrdBondLendTradeResult trdBondLendTradeResult = generateEntity(TrdBondLendTrade002Dto);
@@ -96,6 +91,16 @@ public class TrdBondLendTrade002Service extends CommonExportService<TrdBondLendT
 
     //封装实体类
     public TrdBondLendTradeResult generateEntity(TrdBondLendTrade002Dto dto){
+        //设置接口参数
+        Map<String,Object> params = new HashMap<>();
+        List<String> prodIds = new ArrayList<>();
+        prodIds.add(dto.getProdId());
+        params.put("INTERF_BOOKSETID",prodIds);
+        params.put("VAL_MODEL","INTERF_MODEL_SINGLE");
+
+        // 定义返回变量
+        AssetDealInfoValCommonResult result = new AssetDealInfoValCommonResult();
+
         //将页面输入值赋值给接口实体类
         List<ValSeclendDeal> listValSeclendDeal=new ArrayList<>();
         ValSeclendDeal entity = new ValSeclendDeal();
@@ -120,7 +125,7 @@ public class TrdBondLendTrade002Service extends CommonExportService<TrdBondLendT
         entity.setPrinAmt(dto.getPrinAmt());//券面总额
         entity.setStlFeeAmt(dto.getStlFeeAmt());//结算服务费
         //比较界面和接口字段差异，并手动给接口字段赋值
-        entity.setFinprodId(dto.getTradeId());//金融产品代码
+        entity.setFinprodId("F01_"+ dto.getSecId());//金融产品代码
         entity.setDataActionSign("01");//数据动作标志
         entity.setPs("T01");//交易方向
         entity.setBasis("A/365");//计息基础
@@ -133,7 +138,37 @@ public class TrdBondLendTrade002Service extends CommonExportService<TrdBondLendT
         entity.setMyAcctNo("201907300001:jixu0001");
         listValSeclendDeal.add(entity);
 
-        return trdBondLendTradeBServer.generateEntity(dto,listValSeclendDeal);
+        Map<String, Object> map = secblTranDealTemplateRecService.handleValSeclendDeal(listValSeclendDeal,new Date(),params,null);
+        // 金融产品交易List
+        List<TrdProductDeal> listValFinProductDeal=(List<TrdProductDeal>)map.get("listValFinProductDeal");
+        result.setListValFinProductDeal(listValFinProductDeal);
+
+        // 费用明细表
+        List<TrdTradeFeeDetail> listValTrdTradeFeeDetail=(List<TrdTradeFeeDetail>) map.get("listValTrdTradeFeeDetail");
+        result.setListValTradeFeeDetail(listValTrdTradeFeeDetail);
+        // 估值核算交易扩展表List
+        List<TrdProductDealAdd> listValFinProductDealExt=(List<TrdProductDealAdd>)map.get("listValFinProductDealExt");
+        result.setListValFinProductDealExt(listValFinProductDealExt);
+        // 入账信息表List
+        List<BokDealAccounting> listValDealAccounting=(List<BokDealAccounting>)map.get("listValDealAccounting");
+        result.setListValDealAccounting(listValDealAccounting);
+        //账务明细list
+        List<BokDealAccountingDetail> listValDealAccountingDetail=(List<BokDealAccountingDetail>)map.get("listValDealAccountingDetail");
+        result.setListValDealAccountingDetail(listValDealAccountingDetail);
+        //账务明细代码表
+        List<BokDetailId> listValBokDetailId=(List<BokDetailId>)map.get("listValBokDetailId");
+        result.setListValBokDetailId(listValBokDetailId);
+
+        List<StlOrders> valOrdersList=(List<StlOrders>)map.get("listValOrders");
+        result.setListValOrders(valOrdersList);
+        //结算指令拓展表list
+        List<StlOrdersExt> valOrdersExtList=(List<StlOrdersExt>)map.get("listValOrdersExt");
+        result.setListValOrdersExt(valOrdersExtList);
+
+        TrdBondLendTradeResult rst = new TrdBondLendTradeResult(result);
+        rst.setTrdBondLendTrade002Dto(dto);
+
+        return rst;
 
     }
 

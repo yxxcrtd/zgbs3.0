@@ -152,7 +152,6 @@ public class TrdBondLendTrade002Dto extends BaseEntity implements ProcessEntity 
     /**
      * 现金交割金额
      */
-    @NotEmpty(fieldName = "现金交割金额")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal settAmt;
 

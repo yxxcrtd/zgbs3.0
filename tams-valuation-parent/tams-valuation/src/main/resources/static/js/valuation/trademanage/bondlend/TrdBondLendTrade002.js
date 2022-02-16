@@ -84,6 +84,27 @@
         }
     }
 
+    //借贷费用=券面总额（万元）×10000×借贷费率%×（到期日-起息日）/365
+    var feeChange = function () {
+        var vdate = $('#vdate').val();
+        var mdate = $('#mdate').val();
+        var prinAmt = $('#prinAmt').val();
+        var feeRate = $('#feeRate').val();
+        if(vdate != null && vdate != ''
+            && mdate != null && mdate != ''
+            && prinAmt != null && prinAmt != ''
+            && feeRate != null && feeRate != ''){
+            var days = (Date.ofDate(mdate) - Date.ofDate(vdate))/ (1000 * 60 * 60 * 24);
+            var fee = JoyinMath.doMul(prinAmt,10000,2,JoyinMath.ROUND_HALF_UP);
+            var fee1 = JoyinMath.doDiv(feeRate,100,2,JoyinMath.ROUND_HALF_UP);
+            var fee2 = JoyinMath.doMul(fee,fee1,2,JoyinMath.ROUND_HALF_UP);
+            var fee3 = JoyinMath.doDiv(JoyinMath.doMul(fee2,days,2,JoyinMath.ROUND_HALF_UP),365,2,JoyinMath.ROUND_HALF_UP);
+            $('#fee').val(fee3);
+        }else{
+            $('#fee').val('');
+        }
+    }
+
     //结算金额  结算金额=借贷费用+交易手续费+结算服务费+其他费用
     var settleAmtChange = function(){
         var fee = $('#fee').val();
@@ -120,6 +141,24 @@
         //资产代码联动事件
         $('#secId').change(function(){
             secIdChange();
+        });
+
+        //借贷费用联动事件
+        //起息日
+        $('#vdate').change(function(){
+            feeChange();
+        });
+        //到期日
+        $('#mdate').change(function(){
+            feeChange();
+        });
+        //券面总额
+        $('#prinAmt').change(function(){
+            feeChange();
+        });
+        //借贷费率
+        $('#feeRate').change(function(){
+            feeChange();
         });
 
         //结算金额联动事件

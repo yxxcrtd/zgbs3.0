@@ -70,8 +70,4 @@
           and TRADE_ID = #{tradeId}
     </delete>
 
-    <select id="selectList" resultType="map">
-        select seqno,bookset_id from BOK_BOOKDETAIL_CURRENT_BAK
-    </select>
-
 </mapper>

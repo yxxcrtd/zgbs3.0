@@ -147,6 +147,35 @@
             settleAmtChange();
         });
 
+        //交易类型联动
+        $('#ps').change(function () {
+            var ps = $('#ps').val();
+            if(ps == 'T01' || ps == 'T02'){
+                $('#settdateDateDiv').show();
+                $('#paymentDateDiv').hide();
+                $('#settleDateDiv').hide();
+            }else if(ps == 'T46' || ps == 'T47' || ps == 'T48'){
+                $('#settdateDateDiv').hide();
+                $('#paymentDateDiv').show();
+                $('#settleDateDiv').show();
+            }else{
+                $('#settdateDateDiv').show();
+                $('#paymentDateDiv').show();
+                $('#settleDateDiv').show();
+            }
+        });
+
+        //是否锁定联动
+        $('#isLock').change(function () {
+           var isLock = $('#isLock').val();
+           if(isLock == 'Y'){
+               $('#endDate').attr("required",true).trigger('change');
+           }else{
+               $('#endDate').attr("required",false).trigger('change');
+           }
+           star();
+        });
+
         // 绑定按钮事件
         $('#TrdStockTrade002_btn_save').click(function() {
             saveOrSubmit('save');

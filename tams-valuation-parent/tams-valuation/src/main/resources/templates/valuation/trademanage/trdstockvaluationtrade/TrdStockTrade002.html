@@ -118,7 +118,7 @@
                                                data-th-value="${entity?.tradeDate}">
                                     </div>
                                 </div>
-                                <div class="form-inline-wrap">
+                                <div id="paymentDateDiv" class="form-inline-wrap">
                                     <label class="layui-form-label form-lable" >缴款日</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" id="paymentDate" name="paymentDate" required
@@ -129,7 +129,7 @@
                                 </div>
                             </div>
                             <div class="layui-form-item">
-                                <div class="form-inline-wrap">
+                                <div id="settleDateDiv" class="form-inline-wrap">
                                     <label class="layui-form-label form-lable" >交收日</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" id="settleDate" name="settleDate" required
@@ -138,7 +138,7 @@
                                                data-th-value="${entity?.settleDate}">
                                     </div>
                                 </div>
-                                <div class="form-inline-wrap">
+                                <div id="settdateDateDiv" class="form-inline-wrap" >
                                     <label class="layui-form-label form-lable" >交割日</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" id="settdateDate" name="settdateDate" required
@@ -163,7 +163,7 @@
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-lable" >锁定期截止日</label>
                                     <div class="layui-input-inline input-inline">
-                                        <input type="text" id="endDate" name="endDate" required
+                                        <input type="text" id="endDate" name="endDate"
                                                class="layui-input form-input input-dateSelect" placeholder="请输入内容"
                                                data-th-placeholder="#{SysCommon.placeholder}"
                                                data-th-value="${entity?.endDate}">
@@ -186,6 +186,7 @@
                                 <div class="layui-input-inline input-inline">
                                     <input type="text" id="tradeAmt" name="tradeAmt" required
                                            class="layui-input form-input text-number"
+                                           maxLength="28" data-textrange="2" data-fixtype="2"
                                            th:value="${entity?.tradeAmt}"
                                            placeholder="请输入内容">
                                 </div>
@@ -195,6 +196,7 @@
                                 <div class="layui-input-inline input-inline">
                                     <input type="text" id="dealNum" name="dealNum" required
                                            class="layui-input form-input text-number"
+                                           maxLength="28" data-textrange="2" data-fixtype="2"
                                            th:value="${entity?.dealNum}"
                                            placeholder="请输入内容">
                                 </div>
@@ -227,6 +229,7 @@
                                     <div class="layui-input-inline input-inline">
                                         <input  type="text" id="commission" name="commission" required
                                                 class="layui-input form-input text-number" placeholder="请输入内容"
+                                                maxLength="28" data-textrange="2" data-fixtype="2"
                                                 th:placeholder="#{SysCommon.placeholder}"
                                                 th:value="${entity?.commission?:0}" />
                                     </div>
@@ -236,6 +239,7 @@
                                     <div class="layui-input-inline input-inline">
                                         <input  type="text" id="stampDutyAmt" name="stampDutyAmt" required
                                                 class="layui-input form-input text-number" placeholder="请输入内容"
+                                                maxLength="28" data-textrange="2" data-fixtype="2"
                                                 th:placeholder="#{SysCommon.placeholder}"
                                                 th:value="${entity?.stampDutyAmt?:0}" />
                                     </div>
@@ -245,6 +249,7 @@
                                     <div class="layui-input-inline input-inline">
                                         <input  type="text" id="otherAmt" name="otherAmt" required
                                                 class="layui-input form-input text-number" placeholder="请输入内容"
+                                                maxLength="28" data-textrange="2" data-fixtype="2"
                                                 th:placeholder="#{SysCommon.placeholder}"
                                                 th:value="${entity?.otherAmt?:0}" />
                                     </div>
@@ -265,6 +270,7 @@
                                 <div class="layui-input-inline input-inline">
                                     <input  type="text" id="settleAmt" name="settleAmt" required
                                             class="layui-input form-input text-number" placeholder="请输入内容"
+                                            maxLength="28" data-textrange="2" data-fixtype="2"
                                             th:placeholder="#{SysCommon.placeholder}"
                                             th:value="${entity?.settleAmt}" />
                                 </div>
@@ -272,7 +278,7 @@
                             <div class="form-inline-wrap" >
                                 <label class="layui-form-label form-label-wrap">资金账户</label>
                                 <div class="layui-input-inline input-inline" >
-                                    <select id="myAcctNo" name="myAcctNo" required parentIds="prodId"
+                                    <select id="myAcctNo" name="myAcctNo"
                                             class="layui-input form-input input-select"
                                             data-th-data-url="@{/valuation/trademanage/trdstockvaluationtrade/TrdStockTrade002/getTrdAcctId}"
                                             allowClear="true" placeholder="请输入内容"

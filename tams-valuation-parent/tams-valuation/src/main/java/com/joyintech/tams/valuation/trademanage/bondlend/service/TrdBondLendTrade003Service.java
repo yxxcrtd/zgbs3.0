@@ -5,9 +5,12 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
+import com.joyintech.tams.valuation.common.interf.base.dto.AssetDealInfoValCommonResult;
+import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.secdl.SecblTranDealTemplateRecService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValSeclendDeal;
 import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTrade002Dto;
 import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTrade003Dto;
@@ -17,19 +20,16 @@ import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class TrdBondLendTrade003Service extends CommonExportService<TrdBondLendTrade003Dto> implements BaseProcessService<TrdBondLendTrade003Dto> {
 
     @Autowired
-    private TrdBondLendTradeBServer trdBondLendTradeBServer;
+    private SecblTranDealTemplateRecService secblTranDealTemplateRecService;
 
     @Autowired
     private TrdBondLendTrade002Service trdBondLendTrade002Service;
-
 
     /**
      * 通过交易编号查询交易信息（修改）
@@ -96,6 +96,17 @@ public class TrdBondLendTrade003Service extends CommonExportService<TrdBondLendT
     //封装实体类
     public TrdBondLendTradeResult generateEntity(TrdBondLendTrade003Dto trdBondLendTrade003Dto){
         TrdBondLendTrade002Dto dto = trdBondLendTrade002Service.queryTradeInfoByTradeId(trdBondLendTrade003Dto.getTradeId());
+
+        //设置接口参数
+        Map<String,Object> params = new HashMap<>();
+        List<String> prodIds = new ArrayList<>();
+        prodIds.add(dto.getProdId());
+        params.put("INTERF_BOOKSETID",prodIds);
+        params.put("VAL_MODEL","INTERF_MODEL_SINGLE");
+
+        // 定义返回变量
+        AssetDealInfoValCommonResult result = new AssetDealInfoValCommonResult();
+
         //将页面输入值赋值给接口实体类
         List<ValSeclendDeal> listValSeclendDeal=new ArrayList<>();
         ValSeclendDeal entity = new ValSeclendDeal();
@@ -134,7 +145,37 @@ public class TrdBondLendTrade003Service extends CommonExportService<TrdBondLendT
         entity.setMyAcctNo("201907300001:jixu0001");
         listValSeclendDeal.add(entity);
 
-        return trdBondLendTradeBServer.generateEntity(dto,listValSeclendDeal);
+        Map<String, Object> map = secblTranDealTemplateRecService.handleValSeclendDeal(listValSeclendDeal,new Date(),params,null);
+        // 金融产品交易List
+        List<TrdProductDeal> listValFinProductDeal=(List<TrdProductDeal>)map.get("listValFinProductDeal");
+        result.setListValFinProductDeal(listValFinProductDeal);
+
+        // 费用明细表
+        List<TrdTradeFeeDetail> listValTrdTradeFeeDetail=(List<TrdTradeFeeDetail>) map.get("listValTrdTradeFeeDetail");
+        result.setListValTradeFeeDetail(listValTrdTradeFeeDetail);
+        // 估值核算交易扩展表List
+        List<TrdProductDealAdd> listValFinProductDealExt=(List<TrdProductDealAdd>)map.get("listValFinProductDealExt");
+        result.setListValFinProductDealExt(listValFinProductDealExt);
+        // 入账信息表List
+        List<BokDealAccounting> listValDealAccounting=(List<BokDealAccounting>)map.get("listValDealAccounting");
+        result.setListValDealAccounting(listValDealAccounting);
+        //账务明细list
+        List<BokDealAccountingDetail> listValDealAccountingDetail=(List<BokDealAccountingDetail>)map.get("listValDealAccountingDetail");
+        result.setListValDealAccountingDetail(listValDealAccountingDetail);
+        //账务明细代码表
+        List<BokDetailId> listValBokDetailId=(List<BokDetailId>)map.get("listValBokDetailId");
+        result.setListValBokDetailId(listValBokDetailId);
+
+        List<StlOrders> valOrdersList=(List<StlOrders>)map.get("listValOrders");
+        result.setListValOrders(valOrdersList);
+        //结算指令拓展表list
+        List<StlOrdersExt> valOrdersExtList=(List<StlOrdersExt>)map.get("listValOrdersExt");
+        result.setListValOrdersExt(valOrdersExtList);
+
+        TrdBondLendTradeResult rst = new TrdBondLendTradeResult(result);
+        rst.setTrdBondLendTrade002Dto(dto);
+
+        return rst;
 
     }
 
