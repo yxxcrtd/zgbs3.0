@@ -15,6 +15,7 @@ import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.service.valuation.trademanage.trdintovaluationduration.dto.TrdIntoValuationDuration001Dto;
+import com.joyintech.service.valuation.trademanage.trdintovaluationduration.dto.TrdIntoValuationDurationResult;
 import com.joyintech.service.valuation.trademanage.trdintovaluationduration.service.TrdIntoValuationDuration001Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * service 存款类存续期
+ * service 融入券存续期
  * 
  * @author yuzj
  * @version 1.0 2021年12月29日
@@ -135,4 +136,33 @@ public class TrdIntoValuationDuration001Controller extends BaseController {
         return trdIntoValuationDuration001Service.delete(dto);
     }
 
+    /**
+     * 插入
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("insert")
+    public int insert(@RequestBody TrdIntoValuationDurationResult dto)
+            throws Exception {
+        return trdIntoValuationDuration001Service.insert(dto);
+    }
+
+    /**
+     * 修改
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("update")
+    public int update(@RequestBody TrdIntoValuationDurationResult dto)
+            throws Exception {
+        return trdIntoValuationDuration001Service.update(dto);
+    }
 }
