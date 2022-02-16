@@ -830,7 +830,7 @@ public class ChbAssetInfoInterf  extends BaseInterfService {
                 }
                 String rivalPartyType = chbAssetInfo.getRivalPartyType();
                 // 根据配置映射项判别是否带相应属性
-                if (!StringUtils.isEmpty(blnarea) && chbTypeMappingExService.getMappingBySrcField(InterfMappingConstants.PBCASSETTYPE_DSFLX,
+                if (!StringUtils.isEmpty(rivalPartyType) && chbTypeMappingExService.getMappingBySrcField(InterfMappingConstants.PBCASSETTYPE_DSFLX,
                         chbAssetInfo.getPbcAssetType1(),chbAssetInfo.getPbcAssetType2(),chbAssetInfo.getPbcAssetType3()) == null){
                     rivalPartyType = null;
                 }
