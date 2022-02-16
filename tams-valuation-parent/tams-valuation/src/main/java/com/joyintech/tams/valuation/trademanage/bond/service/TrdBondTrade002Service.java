@@ -11,11 +11,10 @@ import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 import com.joyintech.tams.valuation.common.interf.base.dto.AssetDealInfoValCommonResult;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.sec.SecVestAssetDealTemplateRecService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValSecVestAssetDeal;
-import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTradeResult;
 import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTrade002Dto;
+import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTradeResult;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
-import org.h2.mvstore.DataUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,9 +26,6 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTrade002D
 
     @Autowired
     private SecVestAssetDealTemplateRecService secVestAssetDealTemplateRecService;
-
-    @Autowired
-    private TrdBondTradeCommonServer trdBondTradeCommonServer;
 
     /**
      * 通过资产代码查询资产简称和交易场所
@@ -98,25 +94,18 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTrade002D
 
     }
 
-//    public int insert(SecDealInfoProcessorResult1 dto){
-//        List<SecDealInfoProcessorResult1> item = new ArrayList<>();
-//        item.add(dto);
-////        try {
-////            secDealInfoRecWriter.write(item);
-////        } catch (Exception e) {
-////            e.printStackTrace();
-////        }
-//        return 1;
-//    }
-//
-//    public int update(SecDealInfoProcessorResult1 dto){
-//      return  insert(dto);
-//    }
-
-
-
     //封装实体类
     public TrdBondTradeResult generateEntity(TrdBondTrade002Dto trdBondTrade002Dto){
+        //设置接口参数
+        Map<String,Object> params = new HashMap<>();
+        List<String> prodIds = new ArrayList<>();
+        prodIds.add(trdBondTrade002Dto.getProdId());
+        params.put("INTERF_BOOKSETID",prodIds);
+        params.put("VAL_MODEL","INTERF_MODEL_SINGLE");
+
+        // 定义返回变量
+        AssetDealInfoValCommonResult result = new AssetDealInfoValCommonResult();
+
         //将页面输入值赋值给接口实体类
         List<ValSecVestAssetDeal> listValSecVestAssetDeal = new ArrayList<ValSecVestAssetDeal>();
         ValSecVestAssetDeal valSecVestAssetDeal = new ValSecVestAssetDeal();
@@ -152,8 +141,52 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTrade002D
 
         listValSecVestAssetDeal.add(valSecVestAssetDeal);
 
-        return trdBondTradeCommonServer.generateEntity(trdBondTrade002Dto,listValSecVestAssetDeal);
+        //调用接口处理方法
+        Map<String, Object> map = secVestAssetDealTemplateRecService.handleValSecVestAssetDeal(listValSecVestAssetDeal,new Date(),params,null);
 
+        // 金融产品交易List
+        List<TrdProductDeal> listValFinProductDeal = (List<TrdProductDeal>)map.get(
+                "ValFinProductDeal");
+        result.setListValFinProductDeal(listValFinProductDeal);
+        // 估值核算交易扩展表List
+        List<TrdProductDealAdd> listValFinProductDealExt = (List<TrdProductDealAdd>)map.get(
+                "ValFinProductDealExt");
+        result.setListValFinProductDealExt(listValFinProductDealExt);
+        //金融产品实物交易
+        List<TrdFinProductBarter> listTrdFinProductBarter = (List<TrdFinProductBarter>)map.get(
+                "ValFinProductBarter");
+        result.setListValFinProductBarter(listTrdFinProductBarter);
+        // 入账信息表List
+        List<BokDealAccounting> listValDealAccounting = (List<BokDealAccounting>)map.get(
+                "ValDealAccounting");
+        result.setListValDealAccounting(listValDealAccounting);
+        // 账务明细表List
+        List<BokDealAccountingDetail> listValDealAccountingDetail = (List<BokDealAccountingDetail>)map.get(
+                "ValDealAccountingDetail");
+        result.setListValDealAccountingDetail(listValDealAccountingDetail);
+        /**add by wujie on 20180712 start**/
+        // 账务明细代码表List
+        List<BokDetailId> listValBokDetailId = (List<BokDetailId>)map.get(
+                "ValBokDetailId");
+        result.setListValBokDetailId(listValBokDetailId);
+        /**add by wujie on 20180712 end**/
+
+        // 交易费用明细表List
+        List<TrdTradeFeeDetail> listValTradeFeeDetail = (List<TrdTradeFeeDetail>)map.get(
+                "ValTradeFeeDetail");
+        result.setListValTradeFeeDetail(listValTradeFeeDetail);
+        //结算指令表List
+        List<StlOrders> valOrdersList=(List<StlOrders>)map.get("valOrdersList");
+        result.setListValOrders(valOrdersList);
+        //结算指令拓展表list
+        List<StlOrdersExt> valOrdersExtList=(List<StlOrdersExt>)map.get("valOrdersExtList");
+        result.setListValOrdersExt(valOrdersExtList);
+        // 添加日志
+        result.setValInterflog((List<ValInterflog>)map.get("valInterflogList"));
+
+        TrdBondTradeResult entity = new TrdBondTradeResult(result);
+        entity.setTrdBondTrade002Dto(trdBondTrade002Dto);
+        return entity;
     }
 
 }

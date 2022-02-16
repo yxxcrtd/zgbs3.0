@@ -46,10 +46,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 债券交易新建
+ * 证券转换交易新建
  *
- * @author Zane.Y
- * @version 1.0 2018年9月7日
+ * @author sunshuaishuai
+ * @version 1.0 2021年01月04日
  * @see TrdBondChangeTrade002Controller
  * @since 1.0
  */

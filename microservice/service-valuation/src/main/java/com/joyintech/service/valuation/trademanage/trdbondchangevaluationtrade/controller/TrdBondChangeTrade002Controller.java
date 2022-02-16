@@ -15,6 +15,7 @@ import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTrade002Dto;
+import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeFundResult;
 import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeResult;
 import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.service.TrdBondChangeTrade002Service;
 import com.joyintech.tams.common.base.entity.FinProduct;
@@ -25,10 +26,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 /**
- * 债券交易微服务
+ * 证券转换交易微服务
  *
- * @author Zane.Y
- * @version 1.0 2018年9月7日
+ * @author sunshuaishuai
+ * @version 1.0 2022年01月04日
  * @see TrdBondChangeTrade002Controller
  * @since 1.0
  */
@@ -108,7 +109,7 @@ public class TrdBondChangeTrade002Controller {
     }
 
     /**
-     * 插入
+     * 插入（债转股）
      *
      * @param dto 页面选中的数据
      * @return 结果
@@ -123,7 +124,7 @@ public class TrdBondChangeTrade002Controller {
     }
 
     /**
-     * 修改
+     * 修改（债转股）
      *
      * @param dto 页面选中的数据
      * @return 结果
@@ -135,6 +136,36 @@ public class TrdBondChangeTrade002Controller {
     public int update(@RequestBody TrdBondChangeTradeResult dto)
             throws Exception {
         return trdBondChangeTrade002Service.update(dto);
+    }
+
+    /**
+     * 插入（基金）
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("insertFund")
+    public int insertFund(@RequestBody TrdBondChangeTradeFundResult dto)
+            throws Exception {
+        return trdBondChangeTrade002Service.insertFund(dto);
+    }
+
+    /**
+     * 修改（基金）
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("updateFund")
+    public int updateFund(@RequestBody TrdBondChangeTradeFundResult dto)
+            throws Exception {
+        return trdBondChangeTrade002Service.updateFund(dto);
     }
 
 }

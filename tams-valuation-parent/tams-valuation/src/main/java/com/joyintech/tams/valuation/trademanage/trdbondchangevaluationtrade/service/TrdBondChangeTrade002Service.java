@@ -5,15 +5,19 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.common.base.entity.FinProduct;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
+import com.joyintech.tams.valuation.common.interf.base.dto.AssetDealInfoValCommonResult;
+import com.joyintech.tams.valuation.common.interf.base.dto.FundDealInfoForInterfRecCommonResult;
+import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.fund.FundChangeDealRecService;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.sec.SecVestAssetDealTemplateRecService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValFundChangeDeal;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValSecVestAssetDeal;
 import com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTrade002Dto;
+import com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeFundResult;
 import com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeResult;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
@@ -21,9 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class TrdBondChangeTrade002Service extends CommonExportService<TrdBondChangeTrade002Dto> implements BaseProcessService<TrdBondChangeTrade002Dto> {
@@ -32,11 +34,7 @@ public class TrdBondChangeTrade002Service extends CommonExportService<TrdBondCha
     private SecVestAssetDealTemplateRecService secVestAssetDealTemplateRecService;
 
     @Autowired
-    private TrdBondChangeTradeCommonServer trdBondChangeTradeCommonServer;
-
-    @Autowired
-    private TrdBondChangeTradeFundServer trdBondChangeTradeFundServer;
-
+    private FundChangeDealRecService fundChangeDealRecService;
 
     /**
      * 通过资产代码查询资产简称和交易场所
@@ -112,35 +110,52 @@ public class TrdBondChangeTrade002Service extends CommonExportService<TrdBondCha
         return restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdBondChangeTrade002/querySequences", null,Integer.class);
     }
 
-
     @Override
     public void doComplete(TrdBondChangeTrade002Dto trdBondChangeTrade002Dto, OperationType operationType) {
         String action = StringUtil.EMPTY;
-         if (OperationType.NEW.equals(operationType)) {
-             action = "insert";
-        }
-        else {
-            action = "update";
-        }
 
         TrdBondChangeTradeResult result = null;
+        TrdBondChangeTradeFundResult rst = null;
 
         if(DictCodeListExt1.交易方向_债转股.getValue().equals(trdBondChangeTrade002Dto.getPs())){
+            if (OperationType.NEW.equals(operationType)) {
+                action = "insert";
+            }
+            else {
+                action = "update";
+            }
             result = generateEntity(trdBondChangeTrade002Dto);
+            restTemplate.postForObject(
+                    ServiceApplication.VALUATION_SERVICE_NAME + "/TrdBondChangeTrade002/" + action, result,
+                    Integer.class);
         }else if(DictCodeList.交易方向_上市流通.getValue().equals(trdBondChangeTrade002Dto.getPs())){
 
         }else if(DictCodeListExt3.交易方向_转换申购确认.getValue().equals(trdBondChangeTrade002Dto.getPs())){
-            result = generateEntity1(trdBondChangeTrade002Dto);
+            if (OperationType.NEW.equals(operationType)) {
+                action = "insertFund";
+            }
+            else {
+                action = "updateFund";
+            }
+            rst = generateEntity1(trdBondChangeTrade002Dto);
+            restTemplate.postForObject(
+                    ServiceApplication.VALUATION_SERVICE_NAME + "/TrdBondChangeTrade002/" + action, rst,
+                    Integer.class);
         }
-
-        restTemplate.postForObject(
-                ServiceApplication.VALUATION_SERVICE_NAME + "/TrdBondChangeTrade002/" + action, result,
-                Integer.class);
-
     }
 
     //封装实体类(债转股)
     public TrdBondChangeTradeResult generateEntity(TrdBondChangeTrade002Dto dto){
+        //设置接口参数
+        Map<String,Object> params = new HashMap<>();
+        List<String> prodIds = new ArrayList<>();
+        prodIds.add(dto.getProdId());
+        params.put("INTERF_BOOKSETID",prodIds);
+        params.put("VAL_MODEL","INTERF_MODEL_SINGLE");
+
+        // 定义返回变量
+        AssetDealInfoValCommonResult result = new AssetDealInfoValCommonResult();
+
         //将页面输入值赋值给接口实体类
         List<ValSecVestAssetDeal> listValSecVestAssetDeal = new ArrayList<ValSecVestAssetDeal>();
         ValSecVestAssetDeal entity = new ValSecVestAssetDeal();
@@ -192,12 +207,64 @@ public class TrdBondChangeTrade002Service extends CommonExportService<TrdBondCha
 
         listValSecVestAssetDeal.add(entity);
 
-        return trdBondChangeTradeCommonServer.generateEntity(dto,listValSecVestAssetDeal);
+        //调用接口处理方法
+        Map<String, Object> map = secVestAssetDealTemplateRecService.handleValSecVestAssetDeal(listValSecVestAssetDeal,new Date(),params,null);
+
+        // 金融产品交易List
+        List<TrdProductDeal> listValFinProductDeal = (List<TrdProductDeal>)map.get(
+                "ValFinProductDeal");
+        result.setListValFinProductDeal(listValFinProductDeal);
+        // 估值核算交易扩展表List
+        List<TrdProductDealAdd> listValFinProductDealExt = (List<TrdProductDealAdd>)map.get(
+                "ValFinProductDealExt");
+        result.setListValFinProductDealExt(listValFinProductDealExt);
+        //金融产品实物交易
+        List<TrdFinProductBarter> listTrdFinProductBarter = (List<TrdFinProductBarter>)map.get(
+                "ValFinProductBarter");
+        result.setListValFinProductBarter(listTrdFinProductBarter);
+        // 入账信息表List
+        List<BokDealAccounting> listValDealAccounting = (List<BokDealAccounting>)map.get(
+                "ValDealAccounting");
+        result.setListValDealAccounting(listValDealAccounting);
+        // 账务明细表List
+        List<BokDealAccountingDetail> listValDealAccountingDetail = (List<BokDealAccountingDetail>)map.get(
+                "ValDealAccountingDetail");
+        result.setListValDealAccountingDetail(listValDealAccountingDetail);
+        /**add by wujie on 20180712 start**/
+        // 账务明细代码表List
+        List<BokDetailId> listValBokDetailId = (List<BokDetailId>)map.get(
+                "ValBokDetailId");
+        result.setListValBokDetailId(listValBokDetailId);
+        /**add by wujie on 20180712 end**/
+
+        // 交易费用明细表List
+        List<TrdTradeFeeDetail> listValTradeFeeDetail = (List<TrdTradeFeeDetail>)map.get(
+                "ValTradeFeeDetail");
+        result.setListValTradeFeeDetail(listValTradeFeeDetail);
+        //结算指令表List
+        List<StlOrders> valOrdersList=(List<StlOrders>)map.get("valOrdersList");
+        result.setListValOrders(valOrdersList);
+        //结算指令拓展表list
+        List<StlOrdersExt> valOrdersExtList=(List<StlOrdersExt>)map.get("valOrdersExtList");
+        result.setListValOrdersExt(valOrdersExtList);
+
+        TrdBondChangeTradeResult rst = new TrdBondChangeTradeResult(result);
+        rst.setTrdBondChangeTrade002Dto(dto);
+        return rst;
 
     }
 
     //封装实体类(基金转换)
-    public TrdBondChangeTradeResult generateEntity1(TrdBondChangeTrade002Dto dto){
+    public TrdBondChangeTradeFundResult generateEntity1(TrdBondChangeTrade002Dto dto){
+        //设置接口参数
+        Map<String,Object> params = new HashMap<>();
+        List<String> prodIds = new ArrayList<>();
+        prodIds.add(dto.getProdId());
+        params.put("INTERF_BOOKSETID",prodIds);
+        params.put("VAL_MODEL","INTERF_MODEL_SINGLE");
+
+        FundDealInfoForInterfRecCommonResult result = new FundDealInfoForInterfRecCommonResult();
+
         List<ValFundChangeDeal> listValFundChangeDeal = new ArrayList<ValFundChangeDeal>();
         ValFundChangeDeal entity = new ValFundChangeDeal();
        //BeanUtil.copyPropertiesIgnoreNull(valFundChangeDeal,dto);
@@ -219,7 +286,35 @@ public class TrdBondChangeTrade002Service extends CommonExportService<TrdBondCha
         entity.setIntAmt(new BigDecimal(100));
 
         listValFundChangeDeal.add(entity);
-        return trdBondChangeTradeFundServer.generateEntity(dto,listValFundChangeDeal);
+
+        // 3、更具有效数据，进行数据的编辑，并生成进入业务表的数据结构
+        Map<String, Object> map = fundChangeDealRecService.handleValFundChangeDeal(listValFundChangeDeal,new Date(),params,null);
+        if (!map.isEmpty()) {
+            // 金融产品交易List
+            result.setListValFinProductDeal( (List<TrdProductDeal>)map.get("ValFinProductDeal"));
+            // 估值核算交易扩展表List
+            result.setListValFinProductDealExt((List<TrdProductDealAdd>)map.get("ValFinProductDealExt"));
+            // 入账信息表List
+            List<BokDealAccounting> listValDealAccounting = (List<BokDealAccounting>)map.get("ValDealAccounting");
+            result.setListValDealAccounting(listValDealAccounting);
+            // 账务明细表List
+            List<BokDealAccountingDetail> listValDealAccountingDetail = (List<BokDealAccountingDetail>)map.get("ValDealAccountingDetail");
+            result.setListValDealAccountingDetail(listValDealAccountingDetail);
+            // 账务明细代码表List
+            List<BokDetailId> listValBokDetailId = (List<BokDetailId>)map.get( "ValBokDetailId");
+            result.setListValBokDetailId(listValBokDetailId);
+            //结算指令
+            List<StlOrders> listValOrders = (List<StlOrders>)map.get("listValOrders");
+            List<StlOrdersExt> listValOrdersExt = (List<StlOrdersExt>)map.get("listValOrdersExt");
+            result.setListValOrders(listValOrders);
+            result.setListValOrdersExt(listValOrdersExt);
+            //交易费用明细表
+            result.setListValTradeFeeDetail((List<TrdTradeFeeDetail>)map.get("ValTradeFeeDetail"));
+        }
+
+        TrdBondChangeTradeFundResult rst = new TrdBondChangeTradeFundResult(result);
+        rst.setTrdBondChangeTrade002Dto(dto);
+        return rst;
     }
 
 }

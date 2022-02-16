@@ -4,7 +4,10 @@ import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
+import com.joyintech.tams.valuation.common.interf.base.dto.ValOtcOptTradeCommonResult;
+import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.opt.ValOtcOptTradeTemplateRecService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValOtcOptTrade;
 import com.joyintech.tams.valuation.trademanage.option.dto.TrdOptionValuationTrade002Dto;
 import com.joyintech.tams.valuation.trademanage.option.dto.TrdOptionValuationTradeResult;
@@ -13,16 +16,13 @@ import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class TrdOptionValuationTrade002Service extends CommonExportService<TrdOptionValuationTrade002Dto> implements BaseProcessService<TrdOptionValuationTrade002Dto> {
 
     @Autowired
-    private TrdOptionValuationTradeServer trdOptionValuationTradeServer;
-
+    private ValOtcOptTradeTemplateRecService valOtcOptTradeTemplateRecService;
 
     /**
      * 通过交易编号查询交易信息（修改）
@@ -87,6 +87,16 @@ public class TrdOptionValuationTrade002Service extends CommonExportService<TrdOp
 
     //封装实体类
     public TrdOptionValuationTradeResult generateEntity(TrdOptionValuationTrade002Dto dto){
+        //设置接口参数
+        Map<String,Object> params = new HashMap<>();
+        List<String> prodIds = new ArrayList<>();
+        prodIds.add(dto.getProdId());
+        params.put("INTERF_BOOKSETID",prodIds);
+        params.put("VAL_MODEL","INTERF_MODEL_SINGLE");
+
+        // 定义返回变量
+        ValOtcOptTradeCommonResult result = new ValOtcOptTradeCommonResult();
+
         //将页面输入值赋值给接口实体类
         List<ValOtcOptTrade> listValOtcOptTrade = new ArrayList<ValOtcOptTrade>();
         ValOtcOptTrade entity = new ValOtcOptTrade();
@@ -108,7 +118,39 @@ public class TrdOptionValuationTrade002Service extends CommonExportService<TrdOp
 
         listValOtcOptTrade.add(entity);
 
-        return trdOptionValuationTradeServer.generateEntity(dto,listValOtcOptTrade);
+        //调用接口处理方法
+        Map<String, Object> map = valOtcOptTradeTemplateRecService.handleValOtcOptTrade(listValOtcOptTrade,new Date(),params,null);
+
+        // 金融产品交易List
+        List<TrdProductDeal> listValFinProductDeal = (List<TrdProductDeal>)map.get(
+                "ValFinProductDeal");
+        result.setListValFinProductDeal(listValFinProductDeal);
+        // 估值核算交易扩展表List
+        List<TrdProductDealAdd> listValFinProductDealExt = (List<TrdProductDealAdd>)map.get(
+                "ValFinProductDealExt");
+        result.setListValFinProductDealExt(listValFinProductDealExt);
+        // 入账信息表List
+        List<BokDealAccounting> listValDealAccounting = (List<BokDealAccounting>)map.get(
+                "ValDealAccounting");
+        result.setListValDealAccounting(listValDealAccounting);
+        // 账务明细表List
+        List<BokDealAccountingDetail> listValDealAccountingDetail = (List<BokDealAccountingDetail>)map.get(
+                "ValDealAccountingDetail");
+        result.setListValDealAccountingDetail(listValDealAccountingDetail);
+        // 账务明细代码表List
+        List<BokDetailId> listValBokDetailId = (List<BokDetailId>)map.get(
+                "ValBokDetailId");
+        result.setListValBokDetailId(listValBokDetailId);
+        //结算指令表List
+        List<StlOrders> valOrdersList=(List<StlOrders>)map.get("valOrdersList");
+        result.setListValOrders(valOrdersList);
+        //结算指令拓展表list
+        List<StlOrdersExt> valOrdersExtList=(List<StlOrdersExt>)map.get("valOrdersExtList");
+        result.setListValOrdersExt(valOrdersExtList);
+
+        TrdOptionValuationTradeResult rst = new TrdOptionValuationTradeResult(result);
+        rst.setTrdOptionValuationTrade002Dto(dto);
+        return rst;
 
     }
 

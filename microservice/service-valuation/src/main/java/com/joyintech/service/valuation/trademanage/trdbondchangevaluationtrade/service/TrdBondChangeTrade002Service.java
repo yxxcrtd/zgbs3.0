@@ -7,6 +7,7 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dao.TrdBondChangeTradeMapper;
 import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTrade001Dto;
 import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTrade002Dto;
+import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeFundResult;
 import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeResult;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
@@ -277,6 +278,114 @@ public class TrdBondChangeTrade002Service extends BaseService {
         dto1.setTradeId(dto.getTrdBondChangeTrade002Dto().getTradeId());
         trdBondChangeTrade001Service.delete(dto1);
        return insert(dto);
+    }
+
+    public int insertFund(TrdBondChangeTradeFundResult dto){
+        // 金融产品交易
+        List<TrdProductDeal> listValFinProductDeal = dto.getListValFinProductDeal();
+        // 入库
+        if (CollectionUtils.isNotEmpty(listValFinProductDeal)) {
+            // 定义一个固定大小插入存放集合
+            List<TrdProductDeal> listInsert = new ArrayList<TrdProductDeal>();
+            for (TrdProductDeal e : listValFinProductDeal) {
+                    listInsert.add(e);
+                    valFinProductDealBatchMapper.insertBatch(listInsert);
+            }
+        }
+        // 估值核算交易扩展表
+        List<TrdProductDealAdd> listValFinProductDealExt = dto.getListValFinProductDealExt();
+        // 入库
+        if (CollectionUtils.isNotEmpty(listValFinProductDealExt)) {
+            // 定义一个固定大小插入存放集合
+            List<TrdProductDealAdd> listInsert = new ArrayList<TrdProductDealAdd>();
+            for (TrdProductDealAdd e : listValFinProductDealExt) {
+                    listInsert.add(e);
+                valTrdProductDealAddBatchMapper.insertBatch(listInsert);
+            }
+        }
+
+        // 入账信息表
+        List<BokDealAccounting> listValDealAccounting = dto.getListValDealAccounting();
+        // 入库
+        if (CollectionUtils.isNotEmpty(listValDealAccounting)) {
+            // 定义一个固定大小插入存放集合
+            List<BokDealAccounting> listInsert = new ArrayList<BokDealAccounting>();
+            for (BokDealAccounting e : listValDealAccounting) {
+                listInsert.add(e);
+                valDealAccountingBatchMapper.insertBatch(listInsert);
+            }
+        }
+
+        // 账务明细表
+        List<BokDealAccountingDetail> listValDealAccountingDetail = dto.getListValDealAccountingDetail();
+        // 入库
+        if (CollectionUtils.isNotEmpty(listValDealAccountingDetail)) {
+            // 定义一个固定大小插入存放集合
+            List<BokDealAccountingDetail> listInsert = new ArrayList<BokDealAccountingDetail>();
+            for (BokDealAccountingDetail e : listValDealAccountingDetail) {
+                listInsert.add(e);
+                valDealAccountingDetailBatchMapper.insertBatch(listInsert);
+            }
+        }
+
+        //  账务明细代码表
+        List<BokDetailId> listValBokDetailId = dto.getListValBokDetailId();
+        listValBokDetailId = interfCommonService.toRepeatBokDetailId(listValBokDetailId);
+        // 入库
+        if (CollectionUtils.isNotEmpty(listValBokDetailId)) {
+            // 定义一个固定大小插入存放集合
+            List<BokDetailId> listInsert = new ArrayList<BokDetailId>();
+            for (BokDetailId e : listValBokDetailId) {
+                listInsert.add(e);
+                valBokDetailIdBatchMapper.deleteBatch(listInsert);
+                valBokDetailIdBatchMapper.insertBatch(listInsert);
+            }
+        }
+
+        // 交易费用明细表
+        List<TrdTradeFeeDetail> listValTradeFeeDetail = dto.getListValTradeFeeDetail();
+        // 入库
+        if (CollectionUtils.isNotEmpty(listValTradeFeeDetail)) {
+            // 定义一个固定大小插入存放集合
+            List<TrdTradeFeeDetail> listInsert = new ArrayList<TrdTradeFeeDetail>();
+            for (TrdTradeFeeDetail e : listValTradeFeeDetail) {
+                listInsert.add(e);
+                valTradeFeeDetailBatchMapper.insertBatch(listInsert);
+            }
+        }
+
+        //指令
+        List<StlOrders> listValOrders = dto.getListValOrders();
+        // 入库
+        if (CollectionUtils.isNotEmpty(listValOrders)) {
+            // 定义一个固定大小插入存放集合
+            List<StlOrders> listInsert = new ArrayList<StlOrders>();
+            for (StlOrders e : listValOrders) {
+                listInsert.add(e);
+                valOrdersBatchMapper.insertBatch(listInsert);
+            }
+        }
+
+        List<StlOrdersExt> listValOrdersExt = dto.getListValOrdersExt();
+        // 入库
+        if (CollectionUtils.isNotEmpty(listValOrdersExt)) {
+            // 定义一个固定大小插入存放集合
+            List<StlOrdersExt> listInsert = new ArrayList<StlOrdersExt>();
+            for (StlOrdersExt e : listValOrdersExt) {
+                listInsert.add(e);
+                valOrdersExtBatchMapper.insertBatch(listInsert);
+            }
+        }
+
+        return 1;
+    }
+
+    public int updateFund(TrdBondChangeTradeFundResult dto){
+        TrdBondChangeTrade001Dto dto1 = new TrdBondChangeTrade001Dto();
+        dto1.setFinprodId(dto.getTrdBondChangeTrade002Dto().getProdId());
+        dto1.setTradeId(dto.getTrdBondChangeTrade002Dto().getTradeId());
+        trdBondChangeTrade001Service.delete(dto1);
+        return insertFund(dto);
     }
 
 }

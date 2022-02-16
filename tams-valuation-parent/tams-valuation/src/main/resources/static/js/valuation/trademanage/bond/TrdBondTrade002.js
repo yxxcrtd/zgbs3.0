@@ -208,6 +208,17 @@
             }
         });
 
+        //交易类型联动
+        $('#ps').change(function () {
+            var ps = $('#ps').val();
+            if(ps == 'T04'){
+                $('#bondAmt').attr("required",true).trigger('change');
+            }else{
+                $('#bondAmt').attr("required",false).trigger('change');
+            }
+            star();
+        });
+
         //结算金额联动事件
         //经手费
         $('#brokerage').change(function(){
