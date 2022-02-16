@@ -73,7 +73,7 @@
             ,{field:'tradeDateStr', width:150,  title: '交易日',sortField:'tradeDate'}
             ,{field:'tradeDate',title: '交易日',visible:false}
             ,{field:'settleDateStr', width:150,  title: '交割日',sortField:'settleDate'}
-            ,{field:'settleDate',title: '交易日',visible:false}
+            ,{field:'settleDate',title: '交割日',visible:false}
             ,{field:'actInt', width:150, title: '实收利息',type:'number',sortField:'actInt'}
             ,{field:'actCapi', width:150, title: '实收本金',type:'number',sortField:'actCapi'}
             ,{field:'settleAmt', width:150, title: '结算金额',type:'number',sortField:'settleAmt'}
