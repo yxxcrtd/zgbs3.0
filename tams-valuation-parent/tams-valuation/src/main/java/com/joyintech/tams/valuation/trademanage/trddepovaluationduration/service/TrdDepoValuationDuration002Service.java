@@ -73,8 +73,8 @@ public class TrdDepoValuationDuration002Service extends BaseService<TrdDepoValua
     @Override
     public void doComplete(TrdDepoValuationDuration001Dto entity, OperationType operationType) {
         String action = StringUtil.EMPTY;
-        TrdDepoValuationDurationResult trdDepositValuationTradeResult = new TrdDepoValuationDurationResult();
-        trdDepositValuationTradeResult = generateEntity(entity);
+        TrdDepoValuationDurationResult trdDepoValuationDurationResult = new TrdDepoValuationDurationResult();
+        trdDepoValuationDurationResult = generateEntity(entity);
         if (OperationType.NEW.equals(operationType)) {
             action = "insert";
         }
@@ -82,7 +82,7 @@ public class TrdDepoValuationDuration002Service extends BaseService<TrdDepoValua
             action = "update";
         }
 
-        restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdDepositValuationTrade001/" + action, trdDepositValuationTradeResult, Integer.class);
+        restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdDepositValuationTrade001/" + action, trdDepoValuationDurationResult, Integer.class);
     }
 
     //封装实体类

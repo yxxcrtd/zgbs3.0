@@ -22,6 +22,7 @@ import com.joyintech.framework.select.SuggestDto;
 //import com.joyintech.tams.invest.common.component.base.trade.BaseTradeProductDealService;
 //import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
 import com.joyintech.service.valuation.trademanage.trddepositvaluationtrade.dto.TrdDepositValuationTrade001Dto;
+import com.joyintech.service.valuation.trademanage.trddepositvaluationtrade.dto.TrdDepositValuationTradeResult;
 import com.joyintech.service.valuation.trademanage.trddepositvaluationtrade.service.TrdDepositValuationTrade001Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -158,4 +159,33 @@ public class TrdDepositValuationTrade001Controller {
     }
 
 
+    /**
+     * 插入
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("insert")
+    public int insert(@RequestBody TrdDepositValuationTradeResult dto)
+            throws Exception {
+        return trdDepositValuationTrade001Service.insert(dto);
+    }
+
+    /**
+     * 修改
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("update")
+    public int update(@RequestBody TrdDepositValuationTradeResult dto)
+            throws Exception {
+        return trdDepositValuationTrade001Service.update(dto);
+    }
 }

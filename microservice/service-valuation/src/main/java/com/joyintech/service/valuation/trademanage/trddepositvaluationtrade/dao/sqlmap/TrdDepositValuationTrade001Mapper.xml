@@ -121,7 +121,7 @@
 		LEFT JOIN MST_COUNTER_PARTY mst on mst.COUNTER_ID = t.COUNTER_ID
 		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE ='02'
 		where
-		t.BUSI_TYPE ='02'
+		t.BUSI_TYPE ='TRD04'
 		<if test="tradeId !=null and tradeId !='' ">
 			and t.TRADE_ID like  concat(concat('%',#{tradeId}),'%')
 		</if>

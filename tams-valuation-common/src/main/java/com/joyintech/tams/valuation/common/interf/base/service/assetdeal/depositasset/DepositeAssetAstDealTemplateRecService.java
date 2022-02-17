@@ -151,7 +151,7 @@ public class DepositeAssetAstDealTemplateRecService {
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-	private Map<String, Object> handleValBotAstTrade(List<ValBotAstTrade> listValBotAstTrade,TemplateOrderInfoReaderResult acctEntity,Map<String,Object> params,
+	public Map<String, Object> handleValBotAstTrade(List<ValBotAstTrade> listValBotAstTrade,TemplateOrderInfoReaderResult acctEntity,Map<String,Object> params,
 			List<ValInterflog> valInterflog) {
         List<String> bookSetIds = (List<String>)params.get(InterfCommonConstant.接口_运行接口账套ID);
     	String valModel = (String)params.get(InterfCommonConstant.接口模式);

@@ -183,7 +183,7 @@ public class TrdDepositValuationTrade001Dto extends BaseEntity implements Proces
     }
 
     @PrimaryKey(PrimaryKey.Field.PK_1)
-    @NotEmpty(fieldName = "TrdDepositValuation001.tradeId", groups = {ValidateGroupEdit.class})
+//    @NotEmpty(fieldName = "TrdDepositValuation001.tradeId", groups = {ValidateGroupEdit.class})
     public String getTradeId() {
         return tradeId;
     }
