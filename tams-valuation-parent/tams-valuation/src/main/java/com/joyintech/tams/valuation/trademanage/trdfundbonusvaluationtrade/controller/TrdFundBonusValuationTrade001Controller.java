@@ -136,7 +136,7 @@ public class TrdFundBonusValuationTrade001Controller extends BaseController {
         // 业务类型
         params.setBusinessType(DictCodeList.业务类型_银行间债券交易.getValue());
         // 页面id
-        params.setPageId("BondTradeQuery001");
+        params.setPageId("TrdFundBonusValuationTrade001");
         // 元素id
         params.setElementId(dto.getElementId());
 

@@ -116,12 +116,16 @@
 		<result column="text" property="text" jdbcType="VARCHAR"/>
 		<association property="object" javaType="java.util.Map">
 			<result column="id" property="finprodId" jdbcType="VARCHAR" />
+			<result column="finprodType" property="finprodType" jdbcType="VARCHAR" />
+			<result column="profitType" property="profitType" jdbcType="VARCHAR" />
 		</association>
 	</resultMap>
 	<select id="findPortfolioId" resultMap="portfolioIdMap">
 		select
 		p.FINPROD_ID id,
-		p.FINPROD_ABBR text
+		p.FINPROD_ABBR text,
+		p.FINPROD_TYPE as finprodType,
+		p.PROFIT_TYPE as profitType
 		from
 		FIN_PRODUCT p
 		<where>

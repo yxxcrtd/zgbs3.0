@@ -139,7 +139,7 @@ public class CPlannedCashBonusDealTemplateRecService {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> handleValMngMnfCashBonusTrade(List<ValMngMnfCashBonusTrade> listValMngMnfCashBonusTrade,Date resovleDate,
+    public Map<String, Object> handleValMngMnfCashBonusTrade(List<ValMngMnfCashBonusTrade> listValMngMnfCashBonusTrade,Date resovleDate,
     		Map<String,Object> params, List<ValInterflog> valInterflog) {
         Map<String, Object> resultMap = new HashMap<>();
         // 金融产品交易

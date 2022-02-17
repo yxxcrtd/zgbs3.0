@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 债券交易信息Processor返回共通结果
+ * 计划类资产存续期信息Processor返回共通结果
  * 
  * @author weipeng
  * @version 1.0 2018年6月28日
@@ -37,7 +37,7 @@ public class TrdJihuaBonusTradeResult extends BaseEntity {
     private TrdJihuaBonusValuationTradeDto trdJihuaBonusValuationTradeDto;
 
     /**
-     *
+     *计划类资产（货币型）
      */
     public TrdJihuaBonusTradeResult(PlanAssetCurrencyDealCommonResult result) {
         this.datanum = result.getDatanum();
@@ -55,25 +55,6 @@ public class TrdJihuaBonusTradeResult extends BaseEntity {
         this.paramMap = result.getParamMap();
     }
 
-    /**
-     *净值型
-     */
-    public TrdJihuaBonusTradeResult(FundDealInfoForInterfRecCommonResult result, String str) {
-        this.datanum = result.getDataNum();
-        this.listBokDealAccounting = result.getListValDealAccounting();
-        this.listBokDealAccountingDetail = result.getListValDealAccountingDetail();
-        this.listBokDetailId = result.getListValBokDetailId();
-        this.listStlOrders = result.getListValOrders();
-        this.listStlOrdersExt = result.getListValOrdersExt();
-        this.listTrdProductDeal = result.getListValFinProductDeal();
-        this.listTrdProductDealExt = result.getListValFinProductDealExt();
-        this.valInterflog = result.getListValInterflog();
-        /**ADD BY WUJIE ON 20210501 START**/
-        this.listValTradeFeeDetail = result.getListValTradeFeeDetail();
-        this.listInterfProductDealBookCommonDto =result.getListInterfProductDealBookCommonDto();
-        /**ADD BY WUJIE ON 20210501 END**/
-        this.paramMap = result.getParamMap();
-    }
 
     /**
      *

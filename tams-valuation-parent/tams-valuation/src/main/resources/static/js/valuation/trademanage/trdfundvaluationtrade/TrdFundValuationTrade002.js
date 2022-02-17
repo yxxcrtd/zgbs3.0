@@ -148,19 +148,16 @@
          * 获取列表参数
          */
         var object = $.serializeToObject('#basicInfoForm',true);
+        object.operateType=operateType;
+        object.pageId=pageId;
         Joyin.ajaxJson(basePath + 'valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/check', object, function(result) {
             Joyin.confirm(result.data, function () {
                 if(operateType === 'save') {
-                    Joyin.confirm(message, function() {
-                        WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/save', object, "TrdFundValuationTrade002_btn_save");
-                    });
+                    WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/save', object, "TrdFundValuationTrade002_btn_save");
                 }else{
-                    Joyin.confirm(message, function() {
-                        WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/save', object, "TrdFundValuationTrade002_btn_sbumit");
-                    });
+                    WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/save', object, "TrdFundValuationTrade002_btn_submit");
                 }
             });
-
         });
     }
     /**

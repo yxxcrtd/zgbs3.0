@@ -123,11 +123,8 @@ public class TrdPlanValuationTrade001Controller extends BaseController {
 
     @ResponseBody
     @RequestMapping(ACTION_DELETE)
-    public AjaxResult delete(@RequestBody @Valid TrdPlanValuationTradeDto dto, BindingResult br)
+    public AjaxResult delete(@RequestBody  TrdPlanValuationTradeDto dto)
     {
-        if (br.hasErrors()) {
-            return new AjaxResult(br);
-        }
         // 启动流程
         ProcessParameter<TrdPlanValuationTradeDto> proParam = new ProcessParameter<>();
         WorkFlowParameter<TrdPlanValuationTradeDto> params = new WorkFlowParameter<>();
@@ -137,7 +134,7 @@ public class TrdPlanValuationTrade001Controller extends BaseController {
         // 业务类型
         params.setBusinessType(DictCodeList.业务类型_银行间债券交易.getValue());
         // 页面id
-        params.setPageId("BondTradeQuery001");
+        params.setPageId("TrdPlanValuationTrade001");
         // 元素id
         params.setElementId(dto.getElementId());
 

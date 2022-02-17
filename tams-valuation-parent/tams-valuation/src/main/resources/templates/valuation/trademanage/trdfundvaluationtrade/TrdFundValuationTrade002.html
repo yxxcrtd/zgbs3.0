@@ -124,8 +124,8 @@
 										<label class="layui-form-label form-label-wrap"
 											   data-th-text="#{TrdFundValuationTrade002.todayArriveFlag}">是否当日到账</label>
 										<div class="layui-input-inline input-inline">
-											<select th:id="|${entityName}_todayArriveFlag|" th:name="|${entityName}.todayArriveFlag|"
-													th:initValue="${entity?.todayArriveFlag}"
+											<select type="text" id="todayArriveFlag" name="todayArriveFlag"
+													data-th-initValue="${entity?.todayArriveFlag}"
 													class="layui-input form-input input-select" placeholder="请输入内容" required
 													data-th-placeholder="#{SysCommon.placeholder}" data-th-data-result="${YES_OR_NO}">
 											</select>

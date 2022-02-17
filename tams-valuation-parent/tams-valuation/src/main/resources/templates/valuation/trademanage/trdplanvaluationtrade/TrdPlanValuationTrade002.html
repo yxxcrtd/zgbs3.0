@@ -10,6 +10,10 @@
         <div class="pro-module-container">
             <div class="pro-module-wrapper pro-module-base">
 				<form id="basicInfoForm" class="layui-form joyin-form-wrap pro-module-form">
+					<div style="display: none">
+						<input id="finprodType" name="finprodType" type="hidden" th:value="${entity?.finprodType}">
+						<input id="profitType" name="profitType" type="hidden" th:value="${entity?.profitType}">
+					</div>
 					<div class="pro-module-wrap">
 						<div class="pro-module">
 							<h3 class="pro-module-title"><span class="title-des">基本信息</span>（<span class="star-sign">*</span>必填）<i class="iconfont icon-arrow-down pro-down-icon"></i></h3>
@@ -112,8 +116,7 @@
 										<label class="layui-form-label form-label-wrap"
 											   data-th-text="#{TrdPlanValuationTrade002.todayArriveFlag}">是否当日到账</label>
 										<div class="layui-input-inline input-inline">
-											<select th:id="|${entityName}_todayArriveFlag|" th:name="|${entityName}.todayArriveFlag|"
-													th:initValue="${entity?.todayArriveFlag}"
+											<select id="todayArriveFlag" name="todayArriveFlag" data-th-initValue="${entity?.ps}"
 													class="layui-input form-input input-select" placeholder="请输入内容" required
 													data-th-placeholder="#{SysCommon.placeholder}" data-th-data-result="${YES_OR_NO}">
 											</select>

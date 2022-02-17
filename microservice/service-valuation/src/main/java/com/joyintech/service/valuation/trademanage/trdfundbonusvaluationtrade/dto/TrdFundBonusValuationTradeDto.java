@@ -364,16 +364,6 @@ public class TrdFundBonusValuationTradeDto extends WflTrdProductDeal implements 
         this.mdateSettleAmt = mdateSettleAmt;
     }
 
-    //交易金额
-    @Override
-    public BigDecimal getTradeAmt() {
-        return super.getTradeAmt();
-    }
-    //交易费用
-    @Override
-    public BigDecimal getFeeAmt() {
-        return super.getFeeAmt();
-    }
 
     //资产代码
     @Override

@@ -114,7 +114,7 @@
 									</div>
 
 									<div class="form-inline-wrap">
-										<label class="layui-form-label form-label-wrap" data-th-text="#{TrdJihuaBonusValuationTrade002.nums}">交易份额</label>
+										<label class="layui-form-label form-label-wrap" data-th-text="#{TrdJihuaBonusValuationTrade002.nums}">分红份额</label>
 										<div class="layui-input-inline input-inline">
 											<input type="text" th:id="nums" name="nums" maxLength="16" required
 												    th:value="${entity?.nums}" class="layui-input form-input text-number rateCal"
@@ -125,7 +125,7 @@
 									<div class="form-inline-wrap">
 										<label class="layui-form-label form-label-wrap" data-th-text="#{TrdJihuaBonusValuationTrade002.unitCprice}">单位分红净值</label>
 										<div class="layui-input-inline input-inline">
-											<input type="text" th:id="unitCprice" name="unitCprice" maxLength="16" required
+											<input type="text" th:id="unitCprice" name="unitCprice" maxLength="16" required disabled
 												   th:value="${entity?.unitCprice}" class="layui-input form-input text-number rateCal"
 												   data-textrange="4" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
 										</div>
@@ -182,7 +182,7 @@
 									<div class="form-inline-wrap" >
 										<label class="layui-form-label form-lable" >资金账户</label>
 										<div class="layui-input-inline input-inline">
-											<select type="text" id="trdAcctId" name="trdAcctId" class="layui-input form-input input-select" parentIds="portfolioId"
+											<select type="text" id="trdAcctId" name="trdAcctId" class="layui-input form-input input-select" parentIds="portfolioId" required
 													th:data-url="@{/valuation/trademanage/trdjihuabonusvaluationtrade/TrdJihuaBonusValuationTrade002/getTrdAcctId}"
 													allowClear="true" placeholder="请输入内容"
 													data-th-placeholder="#{SysCommon.placeholder}">

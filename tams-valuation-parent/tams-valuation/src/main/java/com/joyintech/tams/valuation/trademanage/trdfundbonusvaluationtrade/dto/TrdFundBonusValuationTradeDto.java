@@ -172,7 +172,7 @@ public class TrdFundBonusValuationTradeDto extends WflTrdProductDeal implements 
     }
 
     @Override
-    @NotEmpty(fieldName="TrdFundBonusValuationTrade001.tradeDate",groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName="TrdFundBonusValuationTrade002.tradeDate",groups = {ValidateGroupEdit.class})
     public Date getTradeDate(){
         return super.getTradeDate();
     }
@@ -203,7 +203,7 @@ public class TrdFundBonusValuationTradeDto extends WflTrdProductDeal implements 
      */
     @Override
     @PrimaryKey(Field.PK_1)
-    @NotEmpty(fieldName="TrdFundBonusValuationTrade001.tradeId",groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName="TrdFundBonusValuationTrade002.tradeId",groups = {ValidateGroupEdit.class})
     public String getTradeId(){
         return super.getTradeId();
     }
@@ -233,6 +233,7 @@ public class TrdFundBonusValuationTradeDto extends WflTrdProductDeal implements 
         this.elementId = elementId;
     }
 
+    @NotEmpty(fieldName="TrdFundBonusValuationTrade002.trdAcctId",groups = {ValidateGroupEdit.class})
     public String getTrdAcctId() {
         return trdAcctId;
     }
@@ -312,7 +313,7 @@ public class TrdFundBonusValuationTradeDto extends WflTrdProductDeal implements 
      * 获取 portfolioId
      * @return portfolioId.
      */
-    @NotEmpty(fieldName="TrdFundBonusValuationTrade001.portfolioId",groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName="TrdFundBonusValuationTrade002.portfolioId",groups = {ValidateGroupEdit.class})
     public String getPortfolioId() {
         return portfolioId;
     }
@@ -329,7 +330,7 @@ public class TrdFundBonusValuationTradeDto extends WflTrdProductDeal implements 
      * 获取 portfolioName
      * @return portfolioName.
      */
-    @NotEmpty(fieldName="TrdFundBonusValuationTrade001.portfolioName",groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName="TrdFundBonusValuationTrade002.portfolioName",groups = {ValidateGroupEdit.class})
     public String getPortfolioName() {
         return portfolioName;
     }
@@ -361,9 +362,6 @@ public class TrdFundBonusValuationTradeDto extends WflTrdProductDeal implements 
     }
 
 
-
-
-    @NotEmpty(fieldName="TrdFundBonusValuationTrade002.nums",groups = {ValidateGroupEdit.class})
     public BigDecimal getNums() {
         return nums;
     }
@@ -390,19 +388,6 @@ public class TrdFundBonusValuationTradeDto extends WflTrdProductDeal implements 
         this.mdateSettleAmt = mdateSettleAmt;
     }
 
-    //交易金额
-    @Override
-    @NotEmpty(fieldName="TrdFundBonusValuationTrade002.tradeAmt",groups = {ValidateGroupEdit.class})
-    public BigDecimal getTradeAmt() {
-        return super.getTradeAmt();
-    }
-    //交易费用
-    @Override
-    @NotEmpty(fieldName="TrdFundBonusValuationTrade002.feeAmt",groups = {ValidateGroupEdit.class})
-    public BigDecimal getFeeAmt() {
-        return super.getFeeAmt();
-    }
-
     //资产代码
     @Override
     @NotEmpty(fieldName="TrdFundBonusValuationTrade002.finprodId",groups = {ValidateGroupEdit.class})
@@ -411,6 +396,7 @@ public class TrdFundBonusValuationTradeDto extends WflTrdProductDeal implements 
     }
 
     @Override
+    @NotEmpty(fieldName="TrdFundBonusValuationTrade002.tradeMarket",groups = {ValidateGroupEdit.class})
     public String getTradeMarket() {
         return tradeMarket;
     }

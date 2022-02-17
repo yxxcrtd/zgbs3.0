@@ -584,7 +584,7 @@ public class TrdPlanValuationTradeService extends CommonExportService<TrdPlanVal
         dto1.setFinprodId(dto.getTrdPlanValuationTradeDto().getPortfolioId());
         dto1.setTradeId(dto.getTrdPlanValuationTradeDto().getTradeId());
         delete(dto1);
-        return insert(dto);
+        return insertNet(dto);
     }
 
     /**

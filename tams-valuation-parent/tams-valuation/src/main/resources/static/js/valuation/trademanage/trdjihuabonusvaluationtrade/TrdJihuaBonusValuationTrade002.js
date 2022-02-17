@@ -53,8 +53,8 @@
     var unitValueCalculate = function(){
         if($('#bonusAmt').val() && $('#bonusAmt').val() != null && $('#bonusAmt').val() != ''
                 && $('#nums').val() && $('#nums').val() != null && $('#nums').val() != '' && $('#confirmNums').val() !=0){
-            var unitValue = JoyinMath.doDiv($('#bonusAmt').val(), $('#nums').val(), 2);
-            $('#unitValue').val(unitValue)
+            var unitCprice = JoyinMath.doDiv($('#bonusAmt').val(), $('#nums').val(), 2);
+            $('#unitCprice').val(unitCprice)
         }else{
             $('#unitValue').val('')
         }
@@ -62,7 +62,7 @@
 
     //结算金额计算=分红金额+其他费用，可修改
     var mdateSettleAmtCalculate = function(){
-        var mdateSettleAmtTotal = JoyinMath.doAdd($('#bonusAmt').val(''),$('#feeAmtQT').val(''),2);
+        var mdateSettleAmtTotal = JoyinMath.doAdd($('#bonusAmt').val(),$('#feeAmtQT').val(),2);
         $('#mdateSettleAmt').val(mdateSettleAmtTotal);
     }
 
@@ -76,6 +76,7 @@
          * 获取列表参数
          */
         var object = $.serializeToObject('#basicInfoForm',true);
+        object.operateType=operateType;
         Joyin.ajaxJson(basePath + 'valuation/trademanage/trdjihuabonusvaluationtrade/TrdJihuaBonusValuationTrade002/check', object, function(result) {
             Joyin.confirm(result.data, function () {
                 if(operateType === 'save') {

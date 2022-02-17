@@ -48,10 +48,10 @@
     var unitValueCalculate = function(){
         if($('#bonusAmt').val() && $('#bonusAmt').val() != null && $('#bonusAmt').val() != ''
                 && $('#nums').val() && $('#nums').val() != null && $('#nums').val() != '' && $('#confirmNums').val() !=0){
-            var unitValue = JoyinMath.doDiv($('#bonusAmt').val(), $('#nums').val(), 2);
-            $('#unitValue').val(unitValue)
+            var unitCprice = JoyinMath.doDiv($('#bonusAmt').val(), $('#nums').val(), 2);
+            $('#unitCprice').val(unitCprice)
         }else{
-            $('#unitValue').val('')
+            $('#unitCprice').val('')
         }
     }
 
@@ -67,6 +67,7 @@
          * 获取列表参数
          */
         var object = $.serializeToObject('#basicInfoForm',true);
+        object.operateType=operateType;
         Joyin.ajaxJson(basePath + 'valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade002/check', object, function(result) {
             Joyin.confirm(result.data, function () {
                 if(operateType === 'save') {

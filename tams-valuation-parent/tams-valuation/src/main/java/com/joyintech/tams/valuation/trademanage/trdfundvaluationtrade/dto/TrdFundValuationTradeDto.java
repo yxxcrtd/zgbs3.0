@@ -19,7 +19,7 @@ import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.valuation.trademanage.trdplanvaluationtrade.validate.TrdPlanValuationTradeDtoValidator;
+import com.joyintech.tams.valuation.trademanage.trdfundvaluationtrade.validate.TrdFundValuationTradeDtoValidator;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.annotation.PrimaryKey.Field;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
@@ -36,7 +36,7 @@ import java.util.List;
  * @since 1.0
  */
 @PageId("TrdPlanValuationTrade002")
-@ValidLogic(targetClass = TrdPlanValuationTradeDtoValidator.class, groups = {ValidateGroupEdit.class,
+@ValidLogic(targetClass = TrdFundValuationTradeDtoValidator.class, groups = {ValidateGroupEdit.class,
     ValidateGroupDelete.class})
 public class TrdFundValuationTradeDto extends WflTrdProductDeal implements ProcessEntity {
 
@@ -107,7 +107,7 @@ public class TrdFundValuationTradeDto extends WflTrdProductDeal implements Proce
     private String trdAcctId;
 
     /**
-     * 外部交易编号
+     * 外部
      */
     private String outTradeId;
 
@@ -235,7 +235,6 @@ public class TrdFundValuationTradeDto extends WflTrdProductDeal implements Proce
      */
     @Override
     @PrimaryKey(Field.PK_1)
-    @NotEmpty(fieldName="TrdFundValuationTrade001.tradeId",groups = {ValidateGroupEdit.class})
     public String getTradeId(){
         return super.getTradeId();
     }
@@ -410,7 +409,6 @@ public class TrdFundValuationTradeDto extends WflTrdProductDeal implements Proce
         this.todayArriveFlag = todayArriveFlag;
     }
 
-    @NotEmpty(fieldName="TrdFundValuationTrade002.nums",groups = {ValidateGroupEdit.class})
     public BigDecimal getNums() {
         return nums;
     }
@@ -419,7 +417,6 @@ public class TrdFundValuationTradeDto extends WflTrdProductDeal implements Proce
         this.nums = nums;
     }
 
-    @NotEmpty(fieldName="TrdFundValuationTrade002.confirmTradeAmt",groups = {ValidateGroupEdit.class})
     public BigDecimal getConfirmTradeAmt() {
         return confirmTradeAmt;
     }
@@ -428,7 +425,6 @@ public class TrdFundValuationTradeDto extends WflTrdProductDeal implements Proce
         this.confirmTradeAmt = confirmTradeAmt;
     }
 
-    @NotEmpty(fieldName="TrdFundValuationTrade002.confirmNums",groups = {ValidateGroupEdit.class})
     public BigDecimal getConfirmNums() {
         return confirmNums;
     }
@@ -437,7 +433,6 @@ public class TrdFundValuationTradeDto extends WflTrdProductDeal implements Proce
         this.confirmNums = confirmNums;
     }
 
-    @NotEmpty(fieldName="TrdFundValuationTrade002.carryAmt",groups = {ValidateGroupEdit.class})
     public BigDecimal getCarryAmt() {
         return carryAmt;
     }
@@ -446,7 +441,6 @@ public class TrdFundValuationTradeDto extends WflTrdProductDeal implements Proce
         this.carryAmt = carryAmt;
     }
 
-    @NotEmpty(fieldName="TrdFundValuationTrade002.unitValue",groups = {ValidateGroupEdit.class})
     public BigDecimal getUnitValue() {
         return unitValue;
     }
@@ -465,7 +459,6 @@ public class TrdFundValuationTradeDto extends WflTrdProductDeal implements Proce
         this.feeAmtQT = feeAmtQT;
     }
 
-    @NotEmpty(fieldName="TrdFundValuationTrade002.mdateSettleAmt",groups = {ValidateGroupEdit.class})
     public BigDecimal getMdateSettleAmt() {
         return mdateSettleAmt;
     }
@@ -485,7 +478,6 @@ public class TrdFundValuationTradeDto extends WflTrdProductDeal implements Proce
 
     //交易金额
     @Override
-    @NotEmpty(fieldName="TrdFundValuationTrade001.tradeAmt",groups = {ValidateGroupEdit.class})
     public BigDecimal getTradeAmt() {
         return super.getTradeAmt();
     }
@@ -512,7 +504,6 @@ public class TrdFundValuationTradeDto extends WflTrdProductDeal implements Proce
         this.commissionFee = commissionFee;
     }
 
-    @NotEmpty(fieldName="TrdFundValuationTrade002.receivableBonus",groups = {ValidateGroupEdit.class})
     public BigDecimal getReceivableBonus() {
         return receivableBonus;
     }

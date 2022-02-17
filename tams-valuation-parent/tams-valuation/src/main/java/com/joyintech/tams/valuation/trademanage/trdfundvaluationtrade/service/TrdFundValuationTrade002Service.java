@@ -19,9 +19,13 @@ import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
+import com.joyintech.tams.valuation.common.interf.base.dto.FundDealInfoForInterfRecCommonResult;
+import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.fund.FundBuyAndSellDealRecService;
+import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValFundTrade;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValMngMnfTade;
 import com.joyintech.tams.valuation.trademanage.trdfundvaluationtrade.dto.TrdFundTradeResult;
 import com.joyintech.tams.valuation.trademanage.trdfundvaluationtrade.dto.TrdFundValuationTradeDto;
+import com.joyintech.tams.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanTradeResult;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.slf4j.Logger;
@@ -49,40 +53,8 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
 
     @Autowired(required = false)
     private IPlatformDate iPlatformDate;
-
-
-
     @Autowired
-    private FinProductMapper finProductMapper;
-    @Autowired
-    private WflStlPayOrdersMapper wflStlPayOrdersMapper;
-
-    @Autowired
-    private WflPaTrdProductDealMapper wflPaTrdProductDealMapper;
-    @Autowired
-    private WflTrdProductDealMapper wflTrdProductDealMapper;
-    @Autowired
-    private WflTrdProductDealAddMapper wflTrdProductDealAddMapper;
-    @Autowired
-    private RepTradeMapper repTradeMapper;
-    @Autowired
-    private RepAssetDeptMapper repAssetDeptMapper;
-
-    @Autowired
-    private TrdAsynHandleStatusMapper trdAsynHandleStatusMapper;
-
-    @Autowired
-    private FinProductTypeMapper finProductTypeMapper;
-
-
-    @Autowired
-    private PtlPortfolioMapper ptlPortfolioMapper;
-
-    @Autowired
-    private FinRateInfoMapper finRateInfoMapper;
-
-    @Autowired
-    private TrdFundTradeCommonServer trdFundTradeCommonServer;
+    private FundBuyAndSellDealRecService fundBuyAndSellDealRecService;
 
 
     /**
@@ -180,20 +152,60 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
 
     //封装实体类
     public TrdFundTradeResult generateEntity(TrdFundValuationTradeDto trdFundValuationTradeDto){
-        List<ValMngMnfTade> listValValMngMnfTade = new ArrayList<ValMngMnfTade>();
-        ValMngMnfTade valMngMnfTade = new ValMngMnfTade();
-        BeanUtil.copyPropertiesIgnoreNull(valMngMnfTade,trdFundValuationTradeDto);
-        valMngMnfTade.setTradeDate(trdFundValuationTradeDto.getTradeDate());
-        //比较界面和接口字段差异，并手动给接口字段赋值
-        valMngMnfTade.setAssetId("F06_"+trdFundValuationTradeDto.getFinprodId());//资产代码  F06基金
-        valMngMnfTade.setDataActionSign("01");
-        valMngMnfTade.setCounterId("FYDLCA365001");
-        valMngMnfTade.setCounterType("01");
-        valMngMnfTade.setIsChlFeeAmt("Y");
-        valMngMnfTade.setIsClean("N");
+        //设置接口参数
+        Map<String,Object> params = new HashMap<>();
+        List<String> prodIds = new ArrayList<>();
+        prodIds.add(trdFundValuationTradeDto.getPortfolioId());
+        params.put("INTERF_BOOKSETID",prodIds);
+        params.put("VAL_MODEL","INTERF_MODEL_SINGLE");
 
-        listValValMngMnfTade.add(valMngMnfTade);
-        return trdFundTradeCommonServer.generateNetEntity(trdFundValuationTradeDto,listValValMngMnfTade);
+        List<ValFundTrade> listValFundTrade = new ArrayList<ValFundTrade>();
+        ValFundTrade valFundTrade = new ValFundTrade();
+        BeanUtil.copyPropertiesIgnoreNull(valFundTrade,trdFundValuationTradeDto);
+        valFundTrade.setTradeDate(trdFundValuationTradeDto.getTradeDate());
+        //比较界面和接口字段差异，并手动给接口字段赋值
+        valFundTrade.setAssetId("F06_"+trdFundValuationTradeDto.getFinprodId());//资产代码  F06基金
+        valFundTrade.setDataActionSign("01");
+        valFundTrade.setCounterId("FYDLCA365001");
+        valFundTrade.setCounterType("01");
+        valFundTrade.setIsChlFeeAmt("Y");
+        valFundTrade.setIsClean("N");
+
+        listValFundTrade.add(valFundTrade);
+        Map<String, Object>  map = fundBuyAndSellDealRecService.handleValFundTrade(listValFundTrade,new Date(),params,null);
+        // 定义返回变量
+        FundDealInfoForInterfRecCommonResult result = new FundDealInfoForInterfRecCommonResult();
+        if (!map.isEmpty()) {
+            result.setListValFinProductDeal(
+                    (List<TrdProductDeal>)map.get("ValFinProductDeal"));
+            result.setListValFinProductDealExt(
+                    (List<TrdProductDealAdd>)map.get("ValFinProductDealExt"));
+            List<BokDealAccounting> listValDealAccounting = (List<BokDealAccounting>)map.get(
+                    "ValDealAccounting");
+            result.setListValDealAccounting(listValDealAccounting);
+
+            List<BokDealAccountingDetail> listValDealAccountingDetail = (List<BokDealAccountingDetail>)map.get(
+                    "ValDealAccountingDetail");
+            result.setListValDealAccountingDetail(listValDealAccountingDetail);
+
+            List<BokDetailId> listValBokDetailId = (List<BokDetailId>)map.get(
+                    "ValBokDetailId");
+            result.setListValBokDetailId(listValBokDetailId);
+
+            result.setListValTradeFeeDetail((List<TrdTradeFeeDetail>)map.get("ValTradeFeeDetail"));
+
+            //结算指令
+            List<StlOrders> listValOrders = (List<StlOrders>)map.get(
+                    "listValOrders");
+            List<StlOrdersExt> listValOrdersExt = (List<StlOrdersExt>)map.get(
+                    "listValOrdersExt");
+            result.setListValOrders(listValOrders);
+            result.setListValOrdersExt(listValOrdersExt);
+            // 日志
+            result.setListValInterflog((List<ValInterflog>)map.get("valInterflogList"));
+        }
+        TrdFundTradeResult rst = new TrdFundTradeResult(result);
+        return rst;
 
     }
 

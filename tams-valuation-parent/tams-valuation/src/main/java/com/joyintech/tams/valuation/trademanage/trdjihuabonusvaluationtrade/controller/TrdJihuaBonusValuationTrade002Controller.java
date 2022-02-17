@@ -86,7 +86,7 @@ public class TrdJihuaBonusValuationTrade002Controller extends BaseController {
         }else{
             //初始化值
             TrdJihuaBonusValuationTradeDto entity = new TrdJihuaBonusValuationTradeDto();
-            entity.setFeeAmt(new BigDecimal("0.00"));            //交易费用
+            entity.setBonusAmt(new BigDecimal("0.00"));//分红金额
             entity.setFeeAmtQT(new BigDecimal("0.00"));
             entity.setCcy(DictCodeList.币种_人民币_CNY.getValue());
             model.addAttribute("entity", entity);

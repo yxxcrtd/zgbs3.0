@@ -19,13 +19,13 @@ import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
+import com.joyintech.tams.valuation.common.interf.base.dto.PlanAssetCurrencyDealCommonResult;
+import com.joyintech.tams.valuation.common.interf.base.dto.PlannedAssetDealCommonResult;
+import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.mngasset.PlannedBuyTradeTemplateRecService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValMngBuyTrade;
-import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValMngMnfTade;
 import com.joyintech.tams.valuation.trademanage.trdfixincomevaluationtrade.dto.TrdFixIncomeTradeResult;
 import com.joyintech.tams.valuation.trademanage.trdfixincomevaluationtrade.dto.TrdFixIncomeValuationTradeDto;
 import com.joyintech.tams.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanTradeResult;
-import com.joyintech.tams.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanValuationTradeDto;
-import com.joyintech.tams.valuation.trademanage.trdplanvaluationtrade.service.TrdPlanNetTradeCommonServer;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.slf4j.Logger;
@@ -35,8 +35,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-
-import static org.openxmlformats.schemas.wordprocessingml.x2006.main.STShd.type;
 
 /**
  * 计划类资产投资交易新建
@@ -56,39 +54,8 @@ public class TrdFixIncomeValuationTrade002Service extends CommonExportService<Tr
     @Autowired(required = false)
     private IPlatformDate iPlatformDate;
 
-
-
     @Autowired
-    private FinProductMapper finProductMapper;
-    @Autowired
-    private WflStlPayOrdersMapper wflStlPayOrdersMapper;
-
-    @Autowired
-    private WflPaTrdProductDealMapper wflPaTrdProductDealMapper;
-    @Autowired
-    private WflTrdProductDealMapper wflTrdProductDealMapper;
-    @Autowired
-    private WflTrdProductDealAddMapper wflTrdProductDealAddMapper;
-    @Autowired
-    private RepTradeMapper repTradeMapper;
-    @Autowired
-    private RepAssetDeptMapper repAssetDeptMapper;
-
-    @Autowired
-    private TrdAsynHandleStatusMapper trdAsynHandleStatusMapper;
-
-    @Autowired
-    private FinProductTypeMapper finProductTypeMapper;
-
-
-    @Autowired
-    private PtlPortfolioMapper ptlPortfolioMapper;
-
-    @Autowired
-    private FinRateInfoMapper finRateInfoMapper;
-
-    @Autowired
-    private TrdFixIncomeTradeCommonServer trdFixIncomeTradeCommonServer;
+    private PlannedBuyTradeTemplateRecService plannedBuyTradeTemplateRecService;
 
 
     /**
@@ -184,6 +151,13 @@ public class TrdFixIncomeValuationTrade002Service extends CommonExportService<Tr
 
     //封装实体类
     public TrdFixIncomeTradeResult generateEntity(TrdFixIncomeValuationTradeDto trdFixIncomeValuationTradeDto){
+        //设置接口参数
+        Map<String,Object> params = new HashMap<>();
+        List<String> prodIds = new ArrayList<>();
+        prodIds.add(trdFixIncomeValuationTradeDto.getPortfolioId());
+        params.put("INTERF_BOOKSETID",prodIds);
+        params.put("VAL_MODEL","INTERF_MODEL_SINGLE");
+
         List<ValMngBuyTrade> listValMngBuyTrade = new ArrayList<ValMngBuyTrade>();
         ValMngBuyTrade valMngBuyTrade = new ValMngBuyTrade();
         BeanUtil.copyPropertiesIgnoreNull(valMngBuyTrade,trdFixIncomeValuationTradeDto);
@@ -197,14 +171,27 @@ public class TrdFixIncomeValuationTrade002Service extends CommonExportService<Tr
         valMngBuyTrade.setIsClean("N");
 
         listValMngBuyTrade.add(valMngBuyTrade);
-        return trdFixIncomeTradeCommonServer.generateEntity(trdFixIncomeValuationTradeDto,listValMngBuyTrade);
+
+        Map<String, Object>  map = plannedBuyTradeTemplateRecService.handleListValMngBuyTrade(listValMngBuyTrade,new Date(),params,null);
+        // 定义返回变量
+        PlannedAssetDealCommonResult result = new PlannedAssetDealCommonResult();
+        // 判断返回结果不为空
+        if (map != null) {
+            result.setListValBokDetailId((List<BokDetailId>)map.get("ValBokDetailId"));
+            result.setListValFinProductDeal((List<TrdProductDeal>)map.get("ValFinProductDeal"));
+            result.setListValFinProductDealExt((List<TrdProductDealAdd>)map.get("ValFinProductDealExt"));
+            result.setValTradeFeeDetailList((List<TrdTradeFeeDetail>)map.get("ValTradeFeeDetail"));
+            result.setValOrdersList((List<StlOrders>)map.get("ValOrders"));
+            result.setValOrdersExtList((List<StlOrdersExt>)map.get("ValOrdersExt"));
+            result.setListValDealAccounting((List<BokDealAccounting>)map.get("ValDealAccounting"));
+            result.setListValDealAccountingDetail((List<BokDealAccountingDetail>)map.get("ValDealAccountingDetail"));
+            // 添加日志
+            result.setValInterflog((List<ValInterflog>)map.get("valInterflogList"));
+        }
+        TrdFixIncomeTradeResult rst = new TrdFixIncomeTradeResult(result);
+        return rst;
+
     }
 
-    public TrdFixIncomeTradeCommonServer getTrdFixIncomeTradeCommonServer() {
-        return trdFixIncomeTradeCommonServer;
-    }
 
-    public void setTrdFixIncomeTradeCommonServer(TrdFixIncomeTradeCommonServer trdFixIncomeTradeCommonServer) {
-        this.trdFixIncomeTradeCommonServer = trdFixIncomeTradeCommonServer;
-    }
 }

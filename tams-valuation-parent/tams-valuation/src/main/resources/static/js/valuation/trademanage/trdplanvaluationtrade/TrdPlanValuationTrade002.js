@@ -6,6 +6,8 @@
         if(portfolioId){
             var dataPort = $('#portfolioId').select2('data')[0].object;
             var finprodId = dataPort.finprodId;
+            var finprodType =dataPort.finprodType;
+            var profitType =dataPort.profitType;
             $('#portfolioName').val(finprodId).trigger('change');
 
         }else {
@@ -144,16 +146,14 @@
          * 获取列表参数
          */
         var object = $.serializeToObject('#basicInfoForm',true);
+        object.operateType=operateType;
+        object.pageId = pageId;
         Joyin.ajaxJson(basePath + 'valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade002/check', object, function(result) {
             Joyin.confirm(result.data, function () {
                 if(operateType === 'save') {
-                    Joyin.confirm(message, function() {
-                        WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade002/save', object, "TrdPlanValuationTrade002_btn_save");
-                    });
+                    WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade002/save', object, "TrdPlanValuationTrade002_btn_save");
                 }else{
-                    Joyin.confirm(message, function() {
-                        WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade002/save', object, "TrdPlanValuationTrade002_btn_sbumit");
-                    });
+                    WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade002/save', object, "TrdPlanValuationTrade002_btn_submit");
                 }
             });
 

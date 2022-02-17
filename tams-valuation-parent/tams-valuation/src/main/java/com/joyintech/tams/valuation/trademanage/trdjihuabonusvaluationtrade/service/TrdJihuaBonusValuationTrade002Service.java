@@ -19,10 +19,11 @@ import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
-import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValMngMnfTade;
+import com.joyintech.tams.valuation.common.interf.base.dto.PlanAssetCurrencyDealCommonResult;
+import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.pacd.CPlannedCashBonusDealTemplateRecService;
+import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValMngMnfCashBonusTrade;
 import com.joyintech.tams.valuation.trademanage.trdjihuabonusvaluationtrade.dto.TrdJihuaBonusTradeResult;
 import com.joyintech.tams.valuation.trademanage.trdjihuabonusvaluationtrade.dto.TrdJihuaBonusValuationTradeDto;
-import com.joyintech.tams.valuation.trademanage.trdjihuabonusvaluationtrade.service.TrdJihuaBonusTradeCommonServer;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.slf4j.Logger;
@@ -83,7 +84,7 @@ public class TrdJihuaBonusValuationTrade002Service extends CommonExportService<T
     private FinRateInfoMapper finRateInfoMapper;
 
     @Autowired
-    private TrdJihuaBonusTradeCommonServer trdJihuaBonusTradeCommonServer;
+    private CPlannedCashBonusDealTemplateRecService cPlannedCashBonusDealTemplateRecService;
 
 
     /**
@@ -181,20 +182,59 @@ public class TrdJihuaBonusValuationTrade002Service extends CommonExportService<T
 
     //封装实体类
     public TrdJihuaBonusTradeResult generateEntity(TrdJihuaBonusValuationTradeDto trdJihuaBonusValuationTradeDto){
-        List<ValMngMnfTade> listValValMngMnfTade = new ArrayList<ValMngMnfTade>();
-        ValMngMnfTade valMngMnfTade = new ValMngMnfTade();
-        BeanUtil.copyPropertiesIgnoreNull(valMngMnfTade,trdJihuaBonusValuationTradeDto);
-        valMngMnfTade.setTradeDate(trdJihuaBonusValuationTradeDto.getTradeDate());
-        //比较界面和接口字段差异，并手动给接口字段赋值
-        valMngMnfTade.setAssetId("F06_"+trdJihuaBonusValuationTradeDto.getFinprodId());//资产代码  F06基金
-        valMngMnfTade.setDataActionSign("01");
-        valMngMnfTade.setCounterId("FYDLCA365001");
-        valMngMnfTade.setCounterType("01");
-        valMngMnfTade.setIsChlFeeAmt("Y");
-        valMngMnfTade.setIsClean("N");
+        //设置接口参数
+        Map<String,Object> params = new HashMap<>();
+        List<String> prodIds = new ArrayList<>();
+        prodIds.add(trdJihuaBonusValuationTradeDto.getPortfolioId());
+        params.put("INTERF_BOOKSETID",prodIds);
+        params.put("VAL_MODEL","INTERF_MODEL_SINGLE");
 
-        listValValMngMnfTade.add(valMngMnfTade);
-        return trdJihuaBonusTradeCommonServer.generateNetEntity(trdJihuaBonusValuationTradeDto,listValValMngMnfTade);
+        List<ValMngMnfCashBonusTrade> listValMngMnfCashBonusTrade = new ArrayList<ValMngMnfCashBonusTrade>();
+        ValMngMnfCashBonusTrade valMngMnfCashBonusTrade = new ValMngMnfCashBonusTrade();
+        BeanUtil.copyPropertiesIgnoreNull(valMngMnfCashBonusTrade,trdJihuaBonusValuationTradeDto);
+        //比较界面和接口字段差异，并手动给接口字段赋值
+        valMngMnfCashBonusTrade.setAssetId("F06_"+trdJihuaBonusValuationTradeDto.getFinprodId());//资产代码  F06基金
+        valMngMnfCashBonusTrade.setDataActionSign("01");
+        valMngMnfCashBonusTrade.setIsChlFeeAmt("Y");
+        valMngMnfCashBonusTrade.setIsClean("N");
+
+        listValMngMnfCashBonusTrade.add(valMngMnfCashBonusTrade);
+        Map<String, Object>  map = cPlannedCashBonusDealTemplateRecService.handleValMngMnfCashBonusTrade(listValMngMnfCashBonusTrade,new Date(),params,null);
+        // 定义返回变量
+        PlanAssetCurrencyDealCommonResult result = new PlanAssetCurrencyDealCommonResult();
+        if (map != null) {
+            // 金融产品交易
+            List<TrdProductDeal> listTrdProductDeal = (List<TrdProductDeal>)map.get(
+                    "TrdProductDeal");
+            result.setListTrdProductDeal(listTrdProductDeal);
+            // 估值核算交易扩展表
+            List<TrdProductDealAdd> listTrdProductDealExt = (List<TrdProductDealAdd>)map.get(
+                    "TrdProductDealExt");
+            result.setListTrdProductDealExt(listTrdProductDealExt);
+            // 入账信息表
+            List<BokDealAccounting> listBokDealAccounting = (List<BokDealAccounting>)map.get(
+                    "BokDealAccounting");
+            result.setListBokDealAccounting(listBokDealAccounting);
+            // 账务明细表
+            List<BokDealAccountingDetail> listBokDealAccountingDetail = (List<BokDealAccountingDetail>)map.get(
+                    "BokDealAccountingDetail");
+            result.setListBokDealAccountingDetail(listBokDealAccountingDetail);
+            // 账务明细代码表
+            List<BokDetailId> listBokDetailId = (List<BokDetailId>)map.get("BokDetailId");
+            result.setListBokDetailId(listBokDetailId);
+            // 结算指令表
+            List<StlOrders> listStlOrders = (List<StlOrders>)map.get("StlOrders");
+            result.setListStlOrders(listStlOrders);
+            // 结算指令扩展表
+            List<StlOrdersExt> listStlOrdersExt = (List<StlOrdersExt>)map.get("StlOrdersExt");
+            result.setListStlOrdersExt(listStlOrdersExt);
+            // 添加日志
+            result.setValInterflog((List<ValInterflog>)map.get("valInterflogList"));
+        }
+        TrdJihuaBonusTradeResult rst = new TrdJihuaBonusTradeResult(result);
+        return rst;
+
+
 
     }
 

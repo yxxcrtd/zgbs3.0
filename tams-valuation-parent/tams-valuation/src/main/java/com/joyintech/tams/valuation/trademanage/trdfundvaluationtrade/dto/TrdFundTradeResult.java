@@ -36,29 +36,11 @@ public class TrdFundTradeResult extends BaseEntity {
 
     private TrdFundValuationTradeDto trdFundValuationTradeDto;
 
-    /**
-     *
-     */
-    public TrdFundTradeResult(PlanAssetCurrencyDealCommonResult result) {
-        this.datanum = result.getDatanum();
-        this.listBokDealAccounting = result.getListBokDealAccounting();
-        this.listBokDealAccountingDetail = result.getListBokDealAccountingDetail();
-        this.listBokDetailId = result.getListBokDetailId();
-        this.listStlOrders = result.getListStlOrders();
-        this.listStlOrdersExt = result.getListStlOrdersExt();
-        this.listTrdProductDeal = result.getListTrdProductDeal();
-        this.listTrdProductDealExt = result.getListTrdProductDealExt();
-        this.valInterflog = result.getValInterflog();
-        /**ADD BY WUJIE ON 20210501 START**/
-        this.listValTradeFeeDetail = result.getListValTradeFeeDetail();
-        /**ADD BY WUJIE ON 20210501 END**/
-        this.paramMap = result.getParamMap();
-    }
 
     /**
-     *净值型
+     *基金型/净值型
      */
-    public TrdFundTradeResult(FundDealInfoForInterfRecCommonResult result, String str) {
+    public TrdFundTradeResult(FundDealInfoForInterfRecCommonResult result) {
         this.datanum = result.getDataNum();
         this.listBokDealAccounting = result.getListValDealAccounting();
         this.listBokDealAccountingDetail = result.getListValDealAccountingDetail();
