@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workbook filePath="trademanage/trdsecovertransfervaluationduration/TrdSecOverTransferValuationDuration001.xlsx" name="应收款转让管理信息一览">
+    <Worksheet javaBean="com.joyintech.tams.valuation.trademanage.trdsecovertransfervaluationduration.dto.TrdSecOverTransferValuationDuration001Dto">
+        <Row>
+            <Cell order="1" name="交易编号">tradeId</Cell>
+            <Cell order="2" name="产品代码">finprodId</Cell>
+            <Cell order="3" name="产品名称">finprodName</Cell>
+            <Cell order="4" name="资产代码">assetId</Cell>
+            <Cell order="5" name="资产名称">assetAbbr</Cell>
+            <Cell order="6" name="交易类型">psStr</Cell>
+            <Cell order="7" name="币种">ccyFmt</Cell>
+            <Cell order="8" name="交易日">tradeDate</Cell>
+            <Cell order="9" name="交割日">settleDate</Cell>
+            <Cell order="10" name="本金金额">prinAmtStr</Cell>
+            <Cell order="11" name="应收利息总额">intAmtStr</Cell>
+            <Cell order="12" name="罚息">theoryPenaltyIntStr</Cell>
+            <Cell order="13" name="结算金额">settleAmtStr</Cell>
+            <Cell order="14" name="资金账户">acctNo</Cell>
+        </Row>
+    </Worksheet>
+</Workbook>
