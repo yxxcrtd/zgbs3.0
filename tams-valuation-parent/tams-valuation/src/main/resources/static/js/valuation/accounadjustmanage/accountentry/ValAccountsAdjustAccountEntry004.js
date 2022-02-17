@@ -1,5 +1,4 @@
 $(function () {
-    
     /**
      * 定义数据表格
      */
@@ -15,8 +14,8 @@ $(function () {
         searchOnInit: true,
         checkbox: false,
         cols: [
-            {field:'subjectNo', title: '科目号'},
-            {field:'subjectName', title: '科目名称'},
+            {field:'subjectNo', title: $("#booksetId").val()=='SUBJECT_INTERNAL_001'?'科目性质': '科目号'},
+            {field:'subjectName',title: $("#booksetId").val()=='SUBJECT_INTERNAL_001'?'科目性质名称': '科目名称'},
             {field:'cdFlag', title: '借贷'},
             {field:'dictName',sortField:'formEle', title: '金额元素'},
             {field:'dictCode',sortField:'formEle', title: '金额元素代码'},
