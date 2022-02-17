@@ -71,8 +71,21 @@ public class ValAccountsAdjustAccountEntry004Dto extends BaseEntity{
     private String dictCode;
     
     private String fsceneNodeid;
-    
-    
+
+    /**
+     * @author  殷亚
+     * @description  元素数据来源
+     * @date 2022-2-17 15:54
+     */
+    private String dictSource;
+
+    public String getDictSource() {
+        return dictSource;
+    }
+
+    public void setDictSource(String dictSource) {
+        this.dictSource = dictSource;
+    }
     /**
      * 取得 账套代码
      * @return 账套代码

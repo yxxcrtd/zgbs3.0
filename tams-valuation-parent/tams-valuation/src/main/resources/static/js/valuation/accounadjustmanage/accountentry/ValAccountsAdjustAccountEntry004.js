@@ -19,6 +19,7 @@ $(function () {
             {field:'cdFlag', title: '借贷'},
             {field:'dictName',sortField:'formEle', title: '金额元素'},
             {field:'dictCode',sortField:'formEle', title: '金额元素代码'},
+            {field:'dictSource',sortField:'formEle', title: '元素数据来源'},
             {field:'bokDetailId', title: '账务明细元素'},
             {field:'accountNet', title: '记账网点',visible:false}
         ],

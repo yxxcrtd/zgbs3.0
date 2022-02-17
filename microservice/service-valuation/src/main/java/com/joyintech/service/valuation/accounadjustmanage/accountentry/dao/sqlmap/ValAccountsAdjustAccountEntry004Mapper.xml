@@ -11,7 +11,8 @@
             bsc.FORM_ELE as formEle,
             bsc.BOK_DETAIL_ID as bokDetailId,
             bok.dict_name as dictName,
-            bok.dict_code as dictCode
+            bok.dict_code as dictCode,
+            bok.DICT_SOURCE as dictSource
         FROM BOK_SCENESUBJECT bsc
         LEFT JOIN BOK_SUBJECT bs
             ON bs.BOOKSET_ID = bsc.BOOKSET_ID
