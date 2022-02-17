@@ -27,7 +27,7 @@
         },
         dblclick:function(table, data) {
             Joyin.dialog(JoyinUtil.getLabel("债券交易查看："),
-                JoyinUtil.getRealPath("/valuation/trademanage/investtradequery/bandtrade/BondTradeQuery001/init"),
+                JoyinUtil.getRealPath("/valuation/trademanage/bond/TrdBondTrade002/init"),
                 "90%", "90%", {pageModel:PAGE_MODEL_REFERENCE,tradeId:data.tradeId,prodId:data.finprodId,ps:data.ps},
                 function(){
                     //table.reload();
@@ -44,9 +44,12 @@
             {field:'tradeMarket', title: '交易场所',visible:false},
             {field:'psStr', title: '交易类型',sortField:"ps",width:150},
             {field:'ps', title: '交易类型',visible:false},
-            {field:'tradeDate', title: '交易日',width:120},
-            {field:'settleDate', title: '交割日',width:120},
-            {field:'fundSettleDate', title: '资金交收日',width:120},
+            {field:'tradeDateStr', width:120,  title: '交易日',sortField:'tradeDate'},
+            {field:'tradeDate',title: '交易日',visible:false},
+            {field:'settleDateStr', width:120,  title: '交割日',sortField:'settleDate'},
+            {field:'settleDate', title: '交割日',visible:false},
+            {field:'fundSettleDateStr', width:120,  title: '资金交收日',sortField:'fundSettleDate'},
+            {field:'fundSettleDate', title: '资金交收日',visible:false},
             {field:'invAimStr', title: '会计分类',sortField:"invAim",width:240},
             {field:'invAim', title: '会计分类',visible:false},
             {field:'chlFinprodId', title: '交易通道代码',width:180},

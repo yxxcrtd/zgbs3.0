@@ -6,6 +6,7 @@ import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 public class TrdBondTrade002Dto extends BaseEntity implements ProcessEntity {
@@ -76,17 +77,17 @@ public class TrdBondTrade002Dto extends BaseEntity implements ProcessEntity {
     /**
      * 交易日
      */
-    private String tradeDate;
+    private Date tradeDate;
 
     /**
      * 交割日期
      */
-    private String settdateDate;
+    private Date settdateDate;
 
     /**
      * 资金交收日
      */
-    private String fundSettleDate;
+    private Date fundSettleDate;
 
     /**
      * 结算方式
@@ -304,27 +305,27 @@ public class TrdBondTrade002Dto extends BaseEntity implements ProcessEntity {
         this.tradeId = tradeId;
     }
 
-    public String getTradeDate() {
+    public Date getTradeDate() {
         return tradeDate;
     }
 
-    public void setTradeDate(String tradeDate) {
+    public void setTradeDate(Date tradeDate) {
         this.tradeDate = tradeDate;
     }
 
-    public String getSettdateDate() {
+    public Date getSettdateDate() {
         return settdateDate;
     }
 
-    public void setSettdateDate(String settdateDate) {
+    public void setSettdateDate(Date settdateDate) {
         this.settdateDate = settdateDate;
     }
 
-    public String getFundSettleDate() {
+    public Date getFundSettleDate() {
         return fundSettleDate;
     }
 
-    public void setFundSettleDate(String fundSettleDate) {
+    public void setFundSettleDate(Date fundSettleDate) {
         this.fundSettleDate = fundSettleDate;
     }
 

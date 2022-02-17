@@ -12,9 +12,9 @@
             t.TRADE_MARKET tradeMarket,/**交易场所**/
             t.PS ps,/**交易方向**/
             t.TRADE_ID tradeId,/**交易编号**/
-            to_char(t.TRADE_DATE,'yyyy-mm-dd') tradeDate,/**交易日**/
-            to_char(t.SETTLE_DATE,'yyyy-mm-dd') settleDate,/**交割日期**/
-            to_char(stl.SETTLE_DATE,'yyyy-mm-dd') fundSettleDate,/**资金交收日**/
+            t.TRADE_DATE tradeDate,/**交易日**/
+            t.SETTLE_DATE settleDate,/**交割日期**/
+            stl.SETTLE_DATE fundSettleDate,/**资金交收日**/
             t.INV_AIM invAim,/**会计分类**/
             t.CHL_ID chlFinprodId,/**通道代码**/
             t.SHARE_AMT tradeNum,/**成交数量**/
@@ -127,9 +127,9 @@
             t.TRADE_MARKET tradeMarket,/**交易场所**/
             null secManageAcctId,/**证券账户**/
             t.PS ps,/**交易方向**/
-            to_char(t.TRADE_DATE,'yyyy-mm-dd') tradeDate,/**交易日**/
-            to_char(t.SETTLE_DATE,'yyyy-mm-dd') settdateDate,/**交割日期**/
-            to_char(stl.SETTLE_DATE,'yyyy-mm-dd') fundSettleDate,/**资金交收日**/
+            t.TRADE_DATE tradeDate,/**交易日**/
+            t.SETTLE_DATE settdateDate,/**交割日期**/
+            stl.SETTLE_DATE fundSettleDate,/**资金交收日**/
             t.INV_AIM invAim,/**会计分类**/
             t.CHL_ID chlId,/**通道代码**/
             t.SHARE_AMT dealNum,/**成交数量**/

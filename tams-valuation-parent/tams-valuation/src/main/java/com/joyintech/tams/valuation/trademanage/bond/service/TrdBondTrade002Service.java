@@ -4,7 +4,6 @@ import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
@@ -110,9 +109,9 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTrade002D
         List<ValSecVestAssetDeal> listValSecVestAssetDeal = new ArrayList<ValSecVestAssetDeal>();
         ValSecVestAssetDeal valSecVestAssetDeal = new ValSecVestAssetDeal();
         BeanUtil.copyPropertiesIgnoreNull(valSecVestAssetDeal,trdBondTrade002Dto);
-        valSecVestAssetDeal.setDealDate(DateUtil.parse(trdBondTrade002Dto.getTradeDate()));
-        valSecVestAssetDeal.setSettdateDate(DateUtil.parse(trdBondTrade002Dto.getSettdateDate()));
-        valSecVestAssetDeal.setFundSettleDate(DateUtil.parse(trdBondTrade002Dto.getFundSettleDate()));
+        valSecVestAssetDeal.setDealDate(trdBondTrade002Dto.getTradeDate());
+//        valSecVestAssetDeal.setSettdateDate(trdBondTrade002Dto.getSettdateDate());
+//        valSecVestAssetDeal.setFundSettleDate(trdBondTrade002Dto.getFundSettleDate());
         //比较界面和接口字段差异，并手动给接口字段赋值
         valSecVestAssetDeal.setAssetId("F01_"+trdBondTrade002Dto.getSecId());//资产代码
         valSecVestAssetDeal.setDataActionSign("01");

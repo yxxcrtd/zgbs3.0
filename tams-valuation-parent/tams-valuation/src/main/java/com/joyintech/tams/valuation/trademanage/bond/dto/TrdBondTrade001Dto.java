@@ -3,10 +3,10 @@ package com.joyintech.tams.valuation.trademanage.bond.dto;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.valuation.accounadjustmanage.manualvoucher.dto.ValManualVoucher001Dto;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
@@ -62,17 +62,17 @@ public class TrdBondTrade001Dto extends BaseEntity implements ProcessEntity {
     /**
      * 交易日
      */
-    private String tradeDate;
+    private Date tradeDate;
 
     /**
      * 交割日期
      */
-    private String settleDate;
+    private Date settleDate;
 
     /**
      * 资金交收日
      */
-    private String fundSettleDate;
+    private Date fundSettleDate;
 
     /**
      * 会计分类
@@ -210,28 +210,40 @@ public class TrdBondTrade001Dto extends BaseEntity implements ProcessEntity {
         this.tradeId = tradeId;
     }
 
-    public String getTradeDate() {
+    public Date getTradeDate() {
         return tradeDate;
     }
 
-    public void setTradeDate(String tradeDate) {
+    public void setTradeDate(Date tradeDate) {
         this.tradeDate = tradeDate;
     }
 
-    public String getSettleDate() {
+    public String getTradeDateStr() {
+        return DateUtil.format(this.getTradeDate());
+    }
+
+    public Date getSettleDate() {
         return settleDate;
     }
 
-    public void setSettleDate(String settleDate) {
+    public void setSettleDate(Date settleDate) {
         this.settleDate = settleDate;
     }
 
-    public String getFundSettleDate() {
+    public String getSettleDateStr() {
+        return DateUtil.format(this.getSettleDate());
+    }
+
+    public Date getFundSettleDate() {
         return fundSettleDate;
     }
 
-    public void setFundSettleDate(String fundSettleDate) {
+    public void setFundSettleDate(Date fundSettleDate) {
         this.fundSettleDate = fundSettleDate;
+    }
+
+    public String getFundSettleDateStr() {
+        return DateUtil.format(this.getFundSettleDate());
     }
 
     public String getInvAim() {
@@ -390,7 +402,7 @@ public class TrdBondTrade001Dto extends BaseEntity implements ProcessEntity {
     }
 
 
-    public String getBTradeAmtStr() {
+    public String getbTradeAmtStr() {
         DecimalFormat decimalFormat = new DecimalFormat("0.00#");
         return this.getbTradeAmt()==null?"0.00":decimalFormat.format(this.getbTradeAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
     }
