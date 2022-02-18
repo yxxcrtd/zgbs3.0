@@ -49,12 +49,12 @@
         object.operateType = operateType;
         object.pageId = pageId;
 
-        Joyin.ajaxJson(basePath + 'valuation/trademanage/bondlend/TrdBondLendTrade002/check', object, function(result) {
+        Joyin.ajaxJson(basePath + 'valuation/trademanage/irs/TrdIRSValuationTrade002/check', object, function(result) {
                 Joyin.confirm(result.data, function() {
                         if (operateType === 'save') {
-                            WorkFlow.doSaveList(basePath + 'valuation/trademanage/bondlend/TrdBondLendTrade002/save', object, "TrdBondLendTrade002_btn_save");
+                            WorkFlow.doSaveList(basePath + 'valuation/trademanage/irs/TrdIRSValuationTrade002/save', object, "TrdIRSValuationTrade002_btn_save");
                         } else {
-                            WorkFlow.doSubmitList(basePath + 'valuation/trademanage/bondlend/TrdBondLendTrade002/save', object, "TrdBondLendTrade002_btn_submit");
+                            WorkFlow.doSubmitList(basePath + 'valuation/trademanage/irs/TrdIRSValuationTrade002/save', object, "TrdIRSValuationTrade002_btn_submit");
                         }
                     });
             })
@@ -141,10 +141,10 @@
         });
 
         // 绑定按钮事件
-        $('#TrdBondLendTrade002_btn_save').click(function() {
+        $('#TrdIRSValuationTrade002_btn_save').click(function() {
             saveOrSubmit('save');
         });
-        $('#TrdBondLendTrade002_btn_submit').click(function() {
+        $('#TrdIRSValuationTrade002_btn_submit').click(function() {
             saveOrSubmit('submit');
         });
 

@@ -1,25 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Workbook filePath="trademanage/bondlend/TrdBondLendTrade001.xlsx" name="债券借贷交易信息一览">
-    <Worksheet javaBean="com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTrade001Dto">
+<Workbook filePath="trademanage/irs/TrdIRSValuationTrade001.xlsx" name="利率互换交易信息一览">
+    <Worksheet javaBean="com.joyintech.tams.valuation.trademanage.irs.dto.TrdIRSValuationTrade001Dto">
         <Row>
-            <Cell order="1" name="交易编号">tradeId</Cell>
-            <Cell order="2" name="外部成交编号">outTradeId</Cell>
-            <Cell order="3" name="产品代码">finprodId</Cell>
-            <Cell order="4" name="产品名称">finprodName</Cell>
-            <Cell order="5" name="标的债券代码">secId</Cell>
-            <Cell order="6" name="标的债券简称">secAbbr</Cell>
-            <Cell order="7" name="交易类型">psStr</Cell>
-            <Cell order="8" name="交易日">tradeDate</Cell>
-            <Cell order="9" name="交割日">settleDate</Cell>
-            <Cell order="10" name="起息日">vdate</Cell>
-            <Cell order="11" name="到期日">mdate</Cell>
-            <Cell order="12" name="借贷期限">term</Cell>
-            <Cell order="13" name="券面总额（万元）">prinAmt</Cell>
-            <Cell order="14" name="借贷费率%">feeRate</Cell>
-            <Cell order="15" name="借贷费用">fee</Cell>
-            <Cell order="16" name="结算金额">settleAmt</Cell>
-            <Cell order="17" name="币种">ccyFmt</Cell>
-            <Cell order="18" name="资金账户">acctNo</Cell>
+            <Cell order="1" name="产品代码">finprodId</Cell>
+            <Cell order="2" name="产品名称">finprodName</Cell>
+            <Cell order="3" name="交易类型">psStr</Cell>
+            <Cell order="4" name="交易编号">tradeId</Cell>
+            <Cell order="5" name="外部成交编号">outTradeId</Cell>
+            <Cell order="6" name="交易日">tradeDateStr</Cell>
+            <Cell order="7" name="起息日">vdateStr</Cell>
+            <Cell order="8" name="到期日">mdateStr</Cell>
+            <Cell order="9" name="币种">ccyFmt</Cell>
+            <Cell order="10" name="名义本金">prin</Cell>
+            <Cell order="11" name="固定利率%">yield</Cell>
+            <Cell order="12" name="固定利率付息频率">fixPayCycle</Cell>
+            <Cell order="13" name="固定利率首期起息日">firstPayDateRStr</Cell>
+            <Cell order="14" name="浮动挂钩利率">intType</Cell>
+            <Cell order="15" name="利差（BP）">spreadRate</Cell>
+            <Cell order="16" name="浮动利率付息频率">floatPayCycle</Cell>
+            <Cell order="17" name="浮动利率首期起息日">firstPayDateFStr</Cell>
+            <Cell order="18" name="交易对手">counterId</Cell>
+            <Cell order="19" name="结算金额">settleAmt</Cell>
+            <Cell order="20" name="资金账户">acctNo</Cell>
         </Row>
     </Worksheet>
 </Workbook>

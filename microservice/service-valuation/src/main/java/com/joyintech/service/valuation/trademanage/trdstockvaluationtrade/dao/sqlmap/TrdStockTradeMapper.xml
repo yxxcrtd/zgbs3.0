@@ -11,8 +11,8 @@
             zc.FINPROD_ABBR  assetAbbr,/**资产简称**/
             t.PS ps,/**交易方向**/
             t.TRADE_ID tradeId,/**交易编号**/
-            to_char(t.TRADE_DATE,'yyyy-mm-dd') tradeDate,/**交易日**/
-            to_char(t.SETTLE_DATE,'yyyy-mm-dd') settleDate,/**交割日期**/
+            t.TRADE_DATE tradeDate,/**交易日**/
+            t.SETTLE_DATE settleDate,/**交割日期**/
             t.SHARE_AMT tradeNum,/**成交数量**/
             t.TRADE_AMT tradeAmt,/**交易金额**/
             t.CCY ccy,/**币种**/
@@ -76,10 +76,10 @@
             zc.FINPROD_MARKET_ID  assetId, /**资产代码**/
             zc.FINPROD_ABBR  assetAbbr,/**资产简称**/
             t.PS ps,/**交易方向**/
-            to_char(t.TRADE_DATE,'yyyy-mm-dd') tradeDate,/**交易日**/
+            t.TRADE_DATE tradeDate,/**交易日**/
             null paymentDate,/**缴款日**/
-            to_char(t.SETTLE_DATE,'yyyy-mm-dd') settdateDate,/**交割日**/
-            to_char(stl.SETTLE_DATE,'yyyy-mm-dd') settleDate,/**交收日**/
+            t.SETTLE_DATE settdateDate,/**交割日**/
+            stl.SETTLE_DATE settleDate,/**交收日**/
             null isLock,
             null endDate,/**锁定期截止日**/
             t.SHARE_AMT dealNum,/**成交数量**/
