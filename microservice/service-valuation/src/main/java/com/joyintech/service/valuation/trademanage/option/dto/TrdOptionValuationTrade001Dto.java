@@ -10,6 +10,7 @@ import com.joyintech.workflow.engine.annotation.PrimaryKey;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.List;
 
 public class TrdOptionValuationTrade001Dto extends BaseEntity {
@@ -54,7 +55,7 @@ public class TrdOptionValuationTrade001Dto extends BaseEntity {
     /**
      * 交易日
      */
-    private String tradeDate;
+    private Date tradeDate;
 
     /**
      * 借贷期限
@@ -64,12 +65,12 @@ public class TrdOptionValuationTrade001Dto extends BaseEntity {
     /**
      * 起息日
      */
-    private String vdate;
+    private Date vdate;
 
     /**
      * 到期日
      */
-    private String mdate;
+    private Date mdate;
 
     /**
      * 交易对手
@@ -142,11 +143,11 @@ public class TrdOptionValuationTrade001Dto extends BaseEntity {
         this.tradeId = tradeId;
     }
 
-    public String getTradeDate() {
+    public Date getTradeDate() {
         return tradeDate;
     }
 
-    public void setTradeDate(String tradeDate) {
+    public void setTradeDate(Date tradeDate) {
         this.tradeDate = tradeDate;
     }
 
@@ -239,19 +240,19 @@ public class TrdOptionValuationTrade001Dto extends BaseEntity {
         return this.getSettleAmt()==null?"0.00":decimalFormat.format(this.getSettleAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
     }
 
-    public String getVdate() {
+    public Date getVdate() {
         return vdate;
     }
 
-    public void setVdate(String vdate) {
+    public void setVdate(Date vdate) {
         this.vdate = vdate;
     }
 
-    public String getMdate() {
+    public Date getMdate() {
         return mdate;
     }
 
-    public void setMdate(String mdate) {
+    public void setMdate(Date mdate) {
         this.mdate = mdate;
     }
 

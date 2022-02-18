@@ -3,13 +3,10 @@ package com.joyintech.service.valuation.trademanage.bondlend.dto;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
-import com.joyintech.framework.util.StringUtil;
-import com.joyintech.framework.util.SysDataUtil;
-import com.joyintech.tams.constant.DictCode;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.List;
 
 public class TrdBondLendTrade001Dto extends BaseEntity {
@@ -54,22 +51,22 @@ public class TrdBondLendTrade001Dto extends BaseEntity {
     /**
      * 交易日
      */
-    private String tradeDate;
+    private Date tradeDate;
 
     /**
      * 交割日期
      */
-    private String settdateDate;
+    private Date settdateDate;
 
     /**
      * 起息日
      */
-    private String vdate;
+    private Date vdate;
 
     /**
      * 到期日
      */
-    private String mdate;
+    private Date mdate;
 
     /**
      * 借贷期限
@@ -164,19 +161,19 @@ public class TrdBondLendTrade001Dto extends BaseEntity {
         this.tradeId = tradeId;
     }
 
-    public String getTradeDate() {
+    public Date getTradeDate() {
         return tradeDate;
     }
 
-    public void setTradeDate(String tradeDate) {
+    public void setTradeDate(Date tradeDate) {
         this.tradeDate = tradeDate;
     }
 
-    public String getSettdateDate() {
+    public Date getSettdateDate() {
         return settdateDate;
     }
 
-    public void setSettdateDate(String settdateDate) {
+    public void setSettdateDate(Date settdateDate) {
         this.settdateDate = settdateDate;
     }
 
@@ -186,16 +183,6 @@ public class TrdBondLendTrade001Dto extends BaseEntity {
 
     public void setCcy(String ccy) {
         this.ccy = ccy;
-    }
-
-    /**
-     * 取得 币种Fmt
-     *
-     * @return 币种
-     */
-    public String getCcyFmt() {
-        return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.币种, ccy))?
-                SysDataUtil.getNameFromDataDict(DictCode.币种, ccy):ccy;
     }
 
     public String getAcctNo() {
@@ -254,34 +241,19 @@ public class TrdBondLendTrade001Dto extends BaseEntity {
         this.elementId = elementId;
     }
 
-    public String getPrinAmtStr() {
-        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
-        return this.getPrinAmt()==null?"0.00":decimalFormat.format(this.getPrinAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
-    }
-
-    public String getFeeStr() {
-        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
-        return this.getFee()==null?"0.00":decimalFormat.format(this.getFee().setScale(2,BigDecimal.ROUND_HALF_UP));
-    }
-
-    public String getSettleAmtStr() {
-        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
-        return this.getSettleAmt()==null?"0.00":decimalFormat.format(this.getSettleAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
-    }
-
-    public String getVdate() {
+    public Date getVdate() {
         return vdate;
     }
 
-    public void setVdate(String vdate) {
+    public void setVdate(Date vdate) {
         this.vdate = vdate;
     }
 
-    public String getMdate() {
+    public Date getMdate() {
         return mdate;
     }
 
-    public void setMdate(String mdate) {
+    public void setMdate(Date mdate) {
         this.mdate = mdate;
     }
 

@@ -1,19 +1,27 @@
 package com.joyintech.tams.valuation.trademanage.option.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.validation.annotation.NotEmpty;
+import com.joyintech.framework.validation.annotation.ValidLogic;
+import com.joyintech.framework.validation.groups.ValidateGroupDelete;
+import com.joyintech.framework.validation.groups.ValidateGroupEdit;
+import com.joyintech.tams.valuation.trademanage.option.validator.TrdOptionValuationTrade001Validator;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
  * 期权交易新增dto
  */
-//@ValidLogic(targetClass = TrdOptionTrade002DtoValidator.class)
+@PageId("TrdOptionValuationTrade002")
+@ValidLogic(targetClass = TrdOptionValuationTrade001Validator.class, groups = { ValidateGroupEdit.class,
+        ValidateGroupDelete.class })
 public class TrdOptionValuationTrade002Dto extends BaseEntity implements ProcessEntity {
     /**
      * 操作类型
@@ -43,33 +51,27 @@ public class TrdOptionValuationTrade002Dto extends BaseEntity implements Process
     /**
      * 金融产品代码
      */
-    @NotEmpty(fieldName = "产品代码")
     private String prodId;
     /**
      * 金融产品名称
      */
-    @NotEmpty(fieldName = "产品名称")
     private String prodName;
     /**
      * 合约标的
      */
-    @NotEmpty(fieldName = "合约标的")
     private String targetId;
     /**
      * 合约类型
      */
-    @NotEmpty(fieldName = "合约类型")
     private String contractType;
     /**
      * 交易方向
      */
-    @NotEmpty(fieldName = "交易类型")
     private String ps;
     /**
      * 交易日期
      */
-    @NotEmpty(fieldName = "交易日")
-    private String tradeDate;
+    private Date tradeDate;
     /**
      * 借贷期限
      */
@@ -77,109 +79,90 @@ public class TrdOptionValuationTrade002Dto extends BaseEntity implements Process
     /**
      * 起息日
      */
-    @NotEmpty(fieldName = "起息日")
-    private String vdate;
+    private Date vdate;
     /**
      * 到期日
      */
-    @NotEmpty(fieldName = "到期日")
-    private String mdate;
+    private Date mdate;
     /**
      * 名义本金
      */
-    @NotEmpty(fieldName = "名义本金")
     @JsonSerialize(using=BigDecimalSerializer.class)
     private BigDecimal nomCapi;
     /**
      * 行权日基准日
      */
-    @NotEmpty(fieldName = "行权日基准日")
-    private String exerciseDate;
+    private Date exerciseDate;
     /**
      * 执行价格
      */
-    @NotEmpty(fieldName = "执行价格")
     @JsonSerialize(using=BigDecimalSerializer.class)
     private BigDecimal exePrice;
 
     /**
      * 敲出价格
      */
-    //@NotEmpty(fieldName = "敲出价格")
     @JsonSerialize(using=BigDecimalSerializer.class)
     private BigDecimal knockPrice;
     /**
      * 低障碍价
      */
-    //@NotEmpty(fieldName = "低障碍价")
     @JsonSerialize(using= BigDecimalSerializer.class)
     private BigDecimal lowHindPrice;
     /**
      * 低行权价
      */
-    //@NotEmpty(fieldName = "低行权价")
     @JsonSerialize(using=BigDecimalSerializer.class)
     private BigDecimal lowExercPrice;
     /**
      * 高障碍价
      */
-    //@NotEmpty(fieldName = "高障碍价")
     @JsonSerialize(using=BigDecimalSerializer.class)
     private BigDecimal highHindPrice;
     /**
      * 高行权价
      */
-    //@NotEmpty(fieldName = "高行权价")
     @JsonSerialize(using=BigDecimalSerializer.class)
     private BigDecimal highExercPrice;
     /**
      * 行权方式
      */
-    @NotEmpty(fieldName = "行权方式")
     private String exerciseType;
     /**
      * 期权费类型
      */
-    @NotEmpty(fieldName = "期权费类型")
     private String optFeePayType;
     /**
      * 期权费
      */
-    @NotEmpty(fieldName = "期权费")
     @JsonSerialize(using=BigDecimalSerializer.class)
     private BigDecimal optFee;
     /**
      * 期权费率
      */
-    @NotEmpty(fieldName = "期权费率")
     @JsonSerialize(using=BigDecimalSerializer.class)
     private BigDecimal optFeeRate;
     /**
      * 币种
      */
-    @NotEmpty(fieldName = "币种")
     private String ccy;
     /**
      * 交易对手
      */
-    @NotEmpty(fieldName = "交易对手")
     private String counterId;
     /**
      * 其他应付费用
      */
-    @NotEmpty(fieldName = "其他费用")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal otherAmt;
     /**
      * 结算金额
      */
-    @NotEmpty(fieldName = "结算金额")
     private BigDecimal settleAmt;
 
     /**
      * 资金账户
      */
-    @NotEmpty(fieldName = "资金账户")
     private String acctNo;
 
 
@@ -231,6 +214,7 @@ public class TrdOptionValuationTrade002Dto extends BaseEntity implements Process
         this.outTradeId = outTradeId;
     }
 
+    @NotEmpty(fieldName = "TrdOptionValuationTrade002.prodId", groups = { ValidateGroupEdit.class })
     public String getProdId() {
         return prodId;
     }
@@ -239,6 +223,7 @@ public class TrdOptionValuationTrade002Dto extends BaseEntity implements Process
         this.prodId = prodId;
     }
 
+    @NotEmpty(fieldName = "TrdOptionValuationTrade002.prodName", groups = { ValidateGroupEdit.class })
     public String getProdName() {
         return prodName;
     }
@@ -247,6 +232,7 @@ public class TrdOptionValuationTrade002Dto extends BaseEntity implements Process
         this.prodName = prodName;
     }
 
+    @NotEmpty(fieldName = "TrdOptionValuationTrade002.targetId", groups = { ValidateGroupEdit.class })
     public String getTargetId() {
         return targetId;
     }
@@ -255,6 +241,7 @@ public class TrdOptionValuationTrade002Dto extends BaseEntity implements Process
         this.targetId = targetId;
     }
 
+    @NotEmpty(fieldName = "TrdOptionValuationTrade002.contractType", groups = { ValidateGroupEdit.class })
     public String getContractType() {
         return contractType;
     }
@@ -263,6 +250,7 @@ public class TrdOptionValuationTrade002Dto extends BaseEntity implements Process
         this.contractType = contractType;
     }
 
+    @NotEmpty(fieldName = "TrdOptionValuationTrade002.ps", groups = { ValidateGroupEdit.class })
     public String getPs() {
         return ps;
     }
@@ -271,14 +259,16 @@ public class TrdOptionValuationTrade002Dto extends BaseEntity implements Process
         this.ps = ps;
     }
 
-    public String getTradeDate() {
+    @NotEmpty(fieldName = "TrdOptionValuationTrade002.tradeDate", groups = { ValidateGroupEdit.class })
+    public Date getTradeDate() {
         return tradeDate;
     }
 
-    public void setTradeDate(String tradeDate) {
+    public void setTradeDate(Date tradeDate) {
         this.tradeDate = tradeDate;
     }
 
+    @NotEmpty(fieldName = "TrdOptionValuationTrade002.term", groups = { ValidateGroupEdit.class })
     public Long getTerm() {
         return term;
     }
@@ -287,22 +277,25 @@ public class TrdOptionValuationTrade002Dto extends BaseEntity implements Process
         this.term = term;
     }
 
-    public String getVdate() {
+    @NotEmpty(fieldName = "TrdOptionValuationTrade002.vdate", groups = { ValidateGroupEdit.class })
+    public Date getVdate() {
         return vdate;
     }
 
-    public void setVdate(String vdate) {
+    public void setVdate(Date vdate) {
         this.vdate = vdate;
     }
 
-    public String getMdate() {
+    @NotEmpty(fieldName = "TrdOptionValuationTrade002.mdate", groups = { ValidateGroupEdit.class })
+    public Date getMdate() {
         return mdate;
     }
 
-    public void setMdate(String mdate) {
+    public void setMdate(Date mdate) {
         this.mdate = mdate;
     }
 
+    @NotEmpty(fieldName = "TrdOptionValuationTrade002.nomCapi", groups = { ValidateGroupEdit.class })
     public BigDecimal getNomCapi() {
         return nomCapi;
     }
@@ -311,14 +304,16 @@ public class TrdOptionValuationTrade002Dto extends BaseEntity implements Process
         this.nomCapi = nomCapi;
     }
 
-    public String getExerciseDate() {
+    @NotEmpty(fieldName = "TrdOptionValuationTrade002.exerciseDate", groups = { ValidateGroupEdit.class })
+    public Date getExerciseDate() {
         return exerciseDate;
     }
 
-    public void setExerciseDate(String exerciseDate) {
+    public void setExerciseDate(Date exerciseDate) {
         this.exerciseDate = exerciseDate;
     }
 
+    @NotEmpty(fieldName = "TrdOptionValuationTrade002.exePrice", groups = { ValidateGroupEdit.class })
     public BigDecimal getExePrice() {
         return exePrice;
     }
@@ -367,6 +362,7 @@ public class TrdOptionValuationTrade002Dto extends BaseEntity implements Process
         this.highExercPrice = highExercPrice;
     }
 
+    @NotEmpty(fieldName = "TrdOptionValuationTrade002.exerciseType", groups = { ValidateGroupEdit.class })
     public String getExerciseType() {
         return exerciseType;
     }
@@ -375,6 +371,7 @@ public class TrdOptionValuationTrade002Dto extends BaseEntity implements Process
         this.exerciseType = exerciseType;
     }
 
+    @NotEmpty(fieldName = "TrdOptionValuationTrade002.optFeePayType", groups = { ValidateGroupEdit.class })
     public String getOptFeePayType() {
         return optFeePayType;
     }
@@ -391,6 +388,7 @@ public class TrdOptionValuationTrade002Dto extends BaseEntity implements Process
         this.optFee = optFee;
     }
 
+    @NotEmpty(fieldName = "TrdOptionValuationTrade002.optFeeRate", groups = { ValidateGroupEdit.class })
     public BigDecimal getOptFeeRate() {
         return optFeeRate;
     }
@@ -399,6 +397,7 @@ public class TrdOptionValuationTrade002Dto extends BaseEntity implements Process
         this.optFeeRate = optFeeRate;
     }
 
+    @NotEmpty(fieldName = "TrdOptionValuationTrade002.ccy", groups = { ValidateGroupEdit.class })
     public String getCcy() {
         return ccy;
     }
@@ -407,6 +406,7 @@ public class TrdOptionValuationTrade002Dto extends BaseEntity implements Process
         this.ccy = ccy;
     }
 
+    @NotEmpty(fieldName = "TrdOptionValuationTrade002.counterId", groups = { ValidateGroupEdit.class })
     public String getCounterId() {
         return counterId;
     }
@@ -415,6 +415,7 @@ public class TrdOptionValuationTrade002Dto extends BaseEntity implements Process
         this.counterId = counterId;
     }
 
+    @NotEmpty(fieldName = "TrdOptionValuationTrade002.otherAmt", groups = { ValidateGroupEdit.class })
     public BigDecimal getOtherAmt() {
         return otherAmt;
     }
@@ -423,6 +424,7 @@ public class TrdOptionValuationTrade002Dto extends BaseEntity implements Process
         this.otherAmt = otherAmt;
     }
 
+    @NotEmpty(fieldName = "TrdOptionValuationTrade002.settleAmt", groups = { ValidateGroupEdit.class })
     public BigDecimal getSettleAmt() {
         return settleAmt;
     }
@@ -431,6 +433,7 @@ public class TrdOptionValuationTrade002Dto extends BaseEntity implements Process
         this.settleAmt = settleAmt;
     }
 
+    @NotEmpty(fieldName = "TrdOptionValuationTrade002.acctNo", groups = { ValidateGroupEdit.class })
     public String getAcctNo() {
         return acctNo;
     }

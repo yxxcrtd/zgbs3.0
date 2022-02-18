@@ -3,7 +3,7 @@ package com.joyintech.tams.valuation.trademanage.bondlend.service;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
@@ -20,6 +20,7 @@ import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -114,15 +115,15 @@ public class TrdBondLendTrade002Service extends CommonExportService<TrdBondLendT
         }else if("03".equals(dto.getPs())){
             entity.setPs(DictCodeList.交易方向_到期.getValue());
         }
-        entity.setTradeDate(DateUtil.parse(dto.getTradeDate()));//交易日
-        entity.setVdate(DateUtil.parse(dto.getVdate()));//起息日
-        entity.setMdate(DateUtil.parse(dto.getMdate()));//到期日
+        entity.setTradeDate(dto.getTradeDate());//交易日
+        entity.setVdate(dto.getVdate());//起息日
+        entity.setMdate(dto.getMdate());//到期日
         entity.setTerm(dto.getTerm());//借贷期限
         entity.setFeeRate(dto.getFeeRate());//借贷费率
         entity.setFee(dto.getFee());//借贷费用
         entity.setCcy(dto.getCcy());//币种
         entity.setSecId("F01_"+dto.getSecId());//标的债券代码
-        entity.setPrinAmt(dto.getPrinAmt());//券面总额
+        entity.setPrinAmt(ArithmeticUtil.multiply(dto.getPrinAmt(), new BigDecimal(10000)));//券面总额
         entity.setStlFeeAmt(dto.getStlFeeAmt());//结算服务费
         //比较界面和接口字段差异，并手动给接口字段赋值
         entity.setFinprodId("F01_"+ dto.getSecId());//金融产品代码

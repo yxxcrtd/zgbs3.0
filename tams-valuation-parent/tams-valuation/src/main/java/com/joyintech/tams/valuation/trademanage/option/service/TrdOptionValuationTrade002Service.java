@@ -2,7 +2,6 @@ package com.joyintech.tams.valuation.trademanage.option.service;
 
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
@@ -104,13 +103,13 @@ public class TrdOptionValuationTrade002Service extends CommonExportService<TrdOp
         entity.setProdId(dto.getProdId());//产品代码
         entity.setAssetId(dto.getTradeId());//资产代码
         entity.setPs(dto.getPs());//交易方向
-        entity.setDealDate(DateUtil.parse(dto.getTradeDate()));//交易日
+        entity.setDealDate(dto.getTradeDate());//交易日
         entity.setCcy(dto.getCcy());//币种
 
         //比较界面和接口字段差异，并手动给接口字段赋值
         entity.setBranch((long) 0);//分支序号
         entity.setDataActionSign("01");//数据动作标志
-        entity.setEffDate(DateUtil.parse(dto.getTradeDate()));//交割日
+        entity.setEffDate(dto.getTradeDate());//交割日
         entity.setDealNum(dto.getSettleAmt());//交易份额
         entity.setTradeAmt(dto.getSettleAmt());//交易金额
         entity.setFpriceAmt(dto.getSettleAmt());//全价总额

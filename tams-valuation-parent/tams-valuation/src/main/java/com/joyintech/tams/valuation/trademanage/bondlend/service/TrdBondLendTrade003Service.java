@@ -3,7 +3,6 @@ package com.joyintech.tams.valuation.trademanage.bondlend.service;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
@@ -120,10 +119,10 @@ public class TrdBondLendTrade003Service extends CommonExportService<TrdBondLendT
         }
         entity.setPs(DictCodeList.交易方向_到期.getValue());
 
-        entity.setTradeDate(DateUtil.parse(trdBondLendTrade003Dto.getTradeDate()));//交易日
+        entity.setTradeDate(trdBondLendTrade003Dto.getTradeDate());//交易日
         //日期。。。
-        entity.setVdate(DateUtil.parse(dto.getTradeDate()));//起息日
-        entity.setMdate(DateUtil.parse(dto.getTradeDate()));//到期日
+        entity.setVdate(dto.getTradeDate());//起息日
+        entity.setMdate(dto.getTradeDate());//到期日
         entity.setTerm(trdBondLendTrade003Dto.getTerm());//借贷期限
         entity.setFeeRate(dto.getFeeRate());//借贷费率
         entity.setFee(dto.getFee());//借贷费用

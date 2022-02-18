@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="~{layout/default}">
 
 <head>
-    <title data-th-text="#{TrdOptionValuationTrade001}">债券交易</title>
+    <title data-th-text="#{TrdOptionValuationTrade001}">场外期权交易</title>
 </head>
 
 <body>
@@ -15,7 +15,8 @@
             <form class="layui-form" id="searchForm">
                 <div class="layui-form-item">
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
-                        <label class="layui-form-label form-lable" >交易编号</label>
+                        <label class="layui-form-label form-lable"
+                               data-th-text="#{TrdOptionValuationTrade001.tradeId}">交易编号</label>
                         <div class="layui-input-inline input-inline">
                             <input type="text" id="tradeId" name="tradeId"
                                 class="layui-input form-input " placeholder="请输入内容"
@@ -24,7 +25,8 @@
                         </div>
                     </div>
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
-                        <label class="layui-form-label form-lable" >产品代码</label>
+                        <label class="layui-form-label form-lable"
+                               data-th-text="#{TrdOptionValuationTrade001.finprodId}">产品代码</label>
                         <div class="layui-input-inline input-inline">
                             <select id="finprodId" name="finprodId"
                                     class="layui-input form-input input-select"
@@ -34,7 +36,8 @@
                         </div>
                     </div>
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
-                        <label class="layui-form-label form-lable" >合约标的</label>
+                        <label class="layui-form-label form-lable"
+                               data-th-text="#{TrdOptionValuationTrade001.targetId}">合约标的</label>
                         <div class="layui-input-inline input-inline">
                             <select type="text" id="targetId" name="targetId"
                                     multiple="true"
@@ -48,7 +51,8 @@
                 </div>
                 <div class="layui-form-item">
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
-                        <label class="layui-form-label form-lable" >合约类型</label>
+                        <label class="layui-form-label form-lable"
+                               data-th-text="#{TrdOptionValuationTrade001.contractType}">合约类型</label>
                         <div class="layui-input-inline input-inline">
                             <select type="text" id="contractType" name="contractType"
                                     class="layui-input form-input input-select"
@@ -60,7 +64,8 @@
                         </div>
                     </div>
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
-                        <label class="layui-form-label form-lable" >交易日期</label>
+                        <label class="layui-form-label form-lable"
+                               data-th-text="#{TrdOptionValuationTrade001.tradeDate}">交易日期</label>
                         <div class="layui-input-inline input-inline">
                             <input type="text" id="tradeDate" name="tradeDate"
                                    class="layui-input form-input input-dateRangeSelect" placeholder="请输入内容"
@@ -69,7 +74,8 @@
                         </div>
                     </div>
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
-                        <label class="layui-form-label form-lable" >交易方向</label>
+                        <label class="layui-form-label form-lable"
+                               data-th-text="#{TrdOptionValuationTrade001.ps}">交易方向</label>
                         <div class="layui-input-inline input-inline">
                             <input id="ps" name="ps" class="input-select"
                                    placeholder="请选择"

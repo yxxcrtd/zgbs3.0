@@ -3,6 +3,7 @@ package com.joyintech.tams.valuation.trademanage.bondlend.dto;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
@@ -11,6 +12,7 @@ import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.List;
 
 public class TrdBondLendTrade001Dto extends BaseEntity implements ProcessEntity {
@@ -55,22 +57,22 @@ public class TrdBondLendTrade001Dto extends BaseEntity implements ProcessEntity 
     /**
      * 交易日
      */
-    private String tradeDate;
+    private Date tradeDate;
 
     /**
      * 交割日期
      */
-    private String settleDate;
+    private Date settleDate;
 
     /**
      * 起息日
      */
-    private String vdate;
+    private Date vdate;
 
     /**
      * 到期日
      */
-    private String mdate;
+    private Date mdate;
 
     /**
      * 借贷期限
@@ -184,20 +186,28 @@ public class TrdBondLendTrade001Dto extends BaseEntity implements ProcessEntity 
         this.tradeId = tradeId;
     }
 
-    public String getTradeDate() {
+    public Date getTradeDate() {
         return tradeDate;
     }
 
-    public void setTradeDate(String tradeDate) {
+    public void setTradeDate(Date tradeDate) {
         this.tradeDate = tradeDate;
     }
 
-    public String getSettleDate() {
+    public String getTradeDateStr() {
+        return DateUtil.format(this.getTradeDate());
+    }
+
+    public Date getSettleDate() {
         return settleDate;
     }
 
-    public void setSettleDate(String settleDate) {
+    public void setSettleDate(Date settleDate) {
         this.settleDate = settleDate;
+    }
+
+    public String getSettleDateStr() {
+        return DateUtil.format(this.getSettleDate());
     }
 
     public String getCcy() {
@@ -289,20 +299,33 @@ public class TrdBondLendTrade001Dto extends BaseEntity implements ProcessEntity 
         return this.getSettleAmt()==null?"0.00":decimalFormat.format(this.getSettleAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
     }
 
-    public String getVdate() {
+    public String getFeeRateStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getFeeRate()==null?"0.00":decimalFormat.format(this.getFeeRate().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public Date getVdate() {
         return vdate;
     }
 
-    public void setVdate(String vdate) {
+    public void setVdate(Date vdate) {
         this.vdate = vdate;
     }
 
-    public String getMdate() {
+    public String getVdateStr() {
+        return DateUtil.format(this.getVdate());
+    }
+
+    public Date getMdate() {
         return mdate;
     }
 
-    public void setMdate(String mdate) {
+    public void setMdate(Date mdate) {
         this.mdate = mdate;
+    }
+
+    public String getMdateStr() {
+        return DateUtil.format(this.getMdate());
     }
 
     public Long getTerm() {

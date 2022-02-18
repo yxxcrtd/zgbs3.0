@@ -9,17 +9,17 @@
             deal.BOOKSET_ID finprodId,/**金融产品代码**/
             bok.BOOKSET_NAME finprodName,/**金融产品名称**/
             ftp.IRS_TYPE ps,/**交易类型**/
-            to_char(t.TRADE_DATE,'yyyy-mm-dd') tradeDate,/**交易日**/
-            to_char(t.VDATE,'yyyy-mm-dd') vdate,/**起息日**/
-            to_char(t.MDATE,'yyyy-mm-dd') mdate,/**到期日**/
+            t.TRADE_DATE tradeDate,/**交易日**/
+            t.VDATE vdate,/**起息日**/
+            t.MDATE mdate,/**到期日**/
             t.PRIN_AMT prin,/**名义本金**/
             FCCR_R.Yield*100 yield,/**固定利率%**/
             FCPR_R.PAY_CYCLE fixPayCycle,/**固定利率付息频率**/
-            to_char(FCPR_R.FIRST_PAY_DATE,'yyyy-mm-dd') firstPayDateR,/**固定利率首期起息日**/
+            FCPR_R.FIRST_PAY_DATE firstPayDateR,/**固定利率首期起息日**/
             FRI_F.BENCHMARK_ID intType,/**浮动挂钩利率**/
             FRI_F.SPREAD_RATE spreadRate,/**利差（BP）**/
             FCPR_F.PAY_CYCLE floatPayCycle,/**浮动利率付息频率**/
-            to_char(FCPR_F.FIRST_PAY_DATE,'yyyy-mm-dd') firstPayDateF,/**浮动利率首期起息日**/
+            FCPR_F.FIRST_PAY_DATE firstPayDateF,/**浮动利率首期起息日**/
             party.counter_name counterId,/**交易对手**/
             t.CCY ccy,/**币种**/
             stl.SETTLE_AMT settleAmt,/**结算金额**/

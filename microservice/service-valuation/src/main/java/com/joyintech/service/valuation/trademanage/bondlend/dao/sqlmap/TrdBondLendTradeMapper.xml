@@ -14,12 +14,12 @@
                 when t.PS != 'T07' and t.FINPROD_TYPE = 'F23' THEN '01'
                 when t.PS != 'T07' and t.FINPROD_TYPE = 'F24' THEN '02'
                 ELSE '03' END AS ps,/**交易方向**/
-            to_char(t.TRADE_DATE,'yyyy-mm-dd') tradeDate,/**交易日**/
-            to_char(t.SETTLE_DATE,'yyyy-mm-dd') settdateDate,/**交割日期**/
-            to_char(t.VDATE,'yyyy-mm-dd') vdate,/**起息日**/
-            to_char(t.MDATE,'yyyy-mm-dd') mdate,/**到期日**/
+            t.TRADE_DATE tradeDate,/**交易日**/
+            t.SETTLE_DATE settdateDate,/**交割日期**/
+            t.VDATE vdate,/**起息日**/
+            t.MDATE mdate,/**到期日**/
             null term,
-            t.PRIN_AMT prinAmt,
+            t.PRIN_AMT/10000 prinAmt,
             t.YIELD feeRate,/**借贷费率%**/
             t.TRADE_AMT fee,
             t.CCY ccy,/**币种**/
@@ -90,10 +90,10 @@
                 when t.PS != 'T07' and t.FINPROD_TYPE = 'F23' THEN '01'
                 when t.PS != 'T07' and t.FINPROD_TYPE = 'F24' THEN '02'
                 ELSE '03' END AS ps,/**交易方向**/
-            to_char(t.TRADE_DATE,'yyyy-mm-dd') tradeDate,/**交易日**/
-            to_char(t.SETTLE_DATE,'yyyy-mm-dd') settdateDate,/**交割日期**/
-            to_char(t.VDATE,'yyyy-mm-dd') vdate,/**起息日**/
-            to_char(t.MDATE,'yyyy-mm-dd') mdate,/**到期日**/
+            t.TRADE_DATE tradeDate,/**交易日**/
+            t.SETTLE_DATE settdateDate,/**交割日期**/
+            t.VDATE vdate,/**起息日**/
+            t.MDATE mdate,/**到期日**/
             null term,/**期限**/
             t.PRIN_AMT prinAmt,/**券面总额**/
             t.YIELD feeRate,/**借贷费率%**/
@@ -108,8 +108,7 @@
         LEFT JOIN BOK_DEAL_ACCOUNTING deal on deal.BUSI_NO = t.TRADE_ID
         LEFT JOIN BOK_BOOKSET bok on bok.BOOKSET_ID = deal.BOOKSET_ID
         LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE ='14'
-        LEFT JOIN FIN_DEAL_TARGET fdt on fdt.FINPROD_ID = t.finprod_id
-        LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = fdt.PLEDGE_FINPROD_ID
+        LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
         LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd ON ttfd.TRADE_ID = t.TRADE_ID
         where
             t.BUSI_TYPE ='14'
@@ -152,7 +151,7 @@
             zc.FINPROD_MARKET_ID  secId, /**资产代码**/
             zc.FINPROD_ABBR  secAbbr,/**资产简称**/
             '03' ps,/**交易方向**/
-            to_char(t.MDATE,'yyyy-mm-dd') tradeDate,/**交易日**/
+            t.MDATE tradeDate,/**交易日**/
             null term,/**期限**/
             t.PRIN_AMT prinAmt,/**券面总额**/
             t.YIELD feeRate,/**借贷费率%**/

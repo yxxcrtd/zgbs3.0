@@ -3,6 +3,7 @@ package com.joyintech.tams.valuation.trademanage.option.dto;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
@@ -11,6 +12,7 @@ import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.List;
 
 public class TrdOptionValuationTrade001Dto extends BaseEntity implements ProcessEntity {
@@ -55,7 +57,7 @@ public class TrdOptionValuationTrade001Dto extends BaseEntity implements Process
     /**
      * 交易日
      */
-    private String tradeDate;
+    private Date tradeDate;
 
     /**
      * 借贷期限
@@ -65,12 +67,12 @@ public class TrdOptionValuationTrade001Dto extends BaseEntity implements Process
     /**
      * 起息日
      */
-    private String vdate;
+    private Date vdate;
 
     /**
      * 到期日
      */
-    private String mdate;
+    private Date mdate;
 
     /**
      * 交易对手
@@ -143,12 +145,16 @@ public class TrdOptionValuationTrade001Dto extends BaseEntity implements Process
         this.tradeId = tradeId;
     }
 
-    public String getTradeDate() {
+    public Date getTradeDate() {
         return tradeDate;
     }
 
-    public void setTradeDate(String tradeDate) {
+    public void setTradeDate(Date tradeDate) {
         this.tradeDate = tradeDate;
+    }
+
+    public String getTradeDateStr() {
+        return DateUtil.format(this.getTradeDate());
     }
 
     public String getCcy() {
@@ -225,20 +231,28 @@ public class TrdOptionValuationTrade001Dto extends BaseEntity implements Process
         this.elementId = elementId;
     }
 
-    public String getVdate() {
+    public Date getVdate() {
         return vdate;
     }
 
-    public void setVdate(String vdate) {
+    public void setVdate(Date vdate) {
         this.vdate = vdate;
     }
 
-    public String getMdate() {
+    public String getVdateStr() {
+        return DateUtil.format(this.getVdate());
+    }
+
+    public Date getMdate() {
         return mdate;
     }
 
-    public void setMdate(String mdate) {
+    public void setMdate(Date mdate) {
         this.mdate = mdate;
+    }
+
+    public String getMdateStr() {
+        return DateUtil.format(this.getMdate());
     }
 
     public Long getTerm() {

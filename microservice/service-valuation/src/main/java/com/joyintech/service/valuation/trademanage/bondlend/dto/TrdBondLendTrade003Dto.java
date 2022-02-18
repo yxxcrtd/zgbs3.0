@@ -3,11 +3,11 @@ package com.joyintech.service.valuation.trademanage.bondlend.dto;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
-import com.joyintech.framework.validation.annotation.NotEmpty;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 public class TrdBondLendTrade003Dto extends BaseEntity implements ProcessEntity {
@@ -43,31 +43,26 @@ public class TrdBondLendTrade003Dto extends BaseEntity implements ProcessEntity 
     /**
      * 金融产品代码
      */
-    @NotEmpty(fieldName = "产品代码")
     private String prodId;
 
     /**
      * 金融产品名称
      */
-    @NotEmpty(fieldName = "产品名称")
     private String prodName;
 
     /**
      * 债券代码
      */
-    @NotEmpty(fieldName = "标的债券代码")
     private String secId;
 
     /**
      * 债券简称
      */
-    @NotEmpty(fieldName = "标的债券简称")
     private String secAbbr;
 
     /**
      * 交易方向
      */
-    @NotEmpty(fieldName = "交易类型")
     private String ps;
 
     /**
@@ -79,72 +74,34 @@ public class TrdBondLendTrade003Dto extends BaseEntity implements ProcessEntity 
     /**
      * 交易日
      */
-    @NotEmpty(fieldName = "交易日")
-    private String tradeDate;
-
-//    /**
-//     * 交割日期
-//     */
-//    @NotEmpty(fieldName = "交割日")
-//    private String settdateDate;
-//
-//    /**
-//     * 起息日
-//     */
-//    @NotEmpty(fieldName = "起息日")
-//    private String vdate;
-//
-//    /**
-//     * 到期日
-//     */
-//    @NotEmpty(fieldName = "到期日")
-//    private String mdate;
+    private Date tradeDate;
 
     /**
      * 券面总额
      */
-    @NotEmpty(fieldName = "券面总额")
     @JsonSerialize(using= BigDecimalSerializer.class)
     private BigDecimal prinAmt;
 
     /**
      * 借贷费率
      */
-    @NotEmpty(fieldName = "借贷费率")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal feeRate;
 
     /**
      * 借贷费用
      */
-    @NotEmpty(fieldName = "借贷费用")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal fee;
 
     /**
      * 币种
      */
-    @NotEmpty(fieldName = "币种")
     private String ccy;
-
-//    /**
-//     * 交易手续费
-//     */
-//    @NotEmpty(fieldName = "交易手续费")
-//    @JsonSerialize(using = BigDecimalSerializer.class)
-//    private BigDecimal dealFeeAmt;
-//
-//    /**
-//     * 结算手续费
-//     */
-//    @NotEmpty(fieldName = "结算服务费")
-//    @JsonSerialize(using = BigDecimalSerializer.class)
-//    private BigDecimal stlFeeAmt;
 
     /**
      * 其他应付费用
      */
-    @NotEmpty(fieldName = "其他费用")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal otherAmt;
 
@@ -152,20 +109,17 @@ public class TrdBondLendTrade003Dto extends BaseEntity implements ProcessEntity 
     /**
      * 现金交割金额
      */
-    @NotEmpty(fieldName = "现金交割金额")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal settAmt;
 
     /**
      * 结算金额
      */
-    @NotEmpty(fieldName = "结算金额")
     private BigDecimal settleAmt;
 
     /**
      * 资金账户
      */
-    @NotEmpty(fieldName = "资金账户")
     private String acctNo;
 
     public String getProdId() {
@@ -208,21 +162,13 @@ public class TrdBondLendTrade003Dto extends BaseEntity implements ProcessEntity 
         this.tradeId = tradeId;
     }
 
-    public String getTradeDate() {
+    public Date getTradeDate() {
         return tradeDate;
     }
 
-    public void setTradeDate(String tradeDate) {
+    public void setTradeDate(Date tradeDate) {
         this.tradeDate = tradeDate;
     }
-
-//    public String getSettdateDate() {
-//        return settdateDate;
-//    }
-//
-//    public void setSettdateDate(String settdateDate) {
-//        this.settdateDate = settdateDate;
-//    }
 
     public String getCcy() {
         return ccy;
@@ -231,22 +177,6 @@ public class TrdBondLendTrade003Dto extends BaseEntity implements ProcessEntity 
     public void setCcy(String ccy) {
         this.ccy = ccy;
     }
-
-//    public BigDecimal getDealFeeAmt() {
-//        return dealFeeAmt;
-//    }
-//
-//    public void setDealFeeAmt(BigDecimal dealFeeAmt) {
-//        this.dealFeeAmt = dealFeeAmt;
-//    }
-//
-//    public BigDecimal getStlFeeAmt() {
-//        return stlFeeAmt;
-//    }
-//
-//    public void setStlFeeAmt(BigDecimal stlFeeAmt) {
-//        this.stlFeeAmt = stlFeeAmt;
-//    }
 
     public BigDecimal getOtherAmt() {
         return otherAmt;
@@ -311,22 +241,6 @@ public class TrdBondLendTrade003Dto extends BaseEntity implements ProcessEntity 
     public void setSettleAmt(BigDecimal settleAmt) {
         this.settleAmt = settleAmt;
     }
-
-//    public String getVdate() {
-//        return vdate;
-//    }
-//
-//    public void setVdate(String vdate) {
-//        this.vdate = vdate;
-//    }
-//
-//    public String getMdate() {
-//        return mdate;
-//    }
-//
-//    public void setMdate(String mdate) {
-//        this.mdate = mdate;
-//    }
 
     public BigDecimal getPrinAmt() {
         return prinAmt;
