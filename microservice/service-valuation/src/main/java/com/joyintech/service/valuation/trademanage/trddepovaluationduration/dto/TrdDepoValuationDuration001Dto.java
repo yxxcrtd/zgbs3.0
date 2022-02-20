@@ -147,7 +147,7 @@ public class TrdDepoValuationDuration001Dto extends WflTrdProductDeal implements
     }
 
     @PrimaryKey(PrimaryKey.Field.PK_1)
-    @NotEmpty(fieldName = "TrdDepoValuationDuration002.tradeId", groups = {ValidateGroupEdit.class})
+//    @NotEmpty(fieldName = "TrdDepoValuationDuration002.tradeId", groups = {ValidateGroupEdit.class})
     public String getTradeId() {
         return tradeId;
     }

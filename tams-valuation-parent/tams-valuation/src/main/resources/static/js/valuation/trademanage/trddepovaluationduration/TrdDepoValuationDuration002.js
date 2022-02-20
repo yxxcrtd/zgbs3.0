@@ -26,9 +26,9 @@ $(function() {
         Joyin.ajaxJson(basePath + 'valuation/trademanage/trddepovaluationduration/TrdDepoValuationDuration002/check', object, function(result) {
             Joyin.confirm(result.data, function() {
                 if (operateType === 'save') {
-                    WorkFlow.doSaveList(basePath + 'valuation/trademanage/trddepovaluationduration/TrdDepoValuationDuration002/save', object, "TrdLendValuationTrade002_btn_save");
+                    WorkFlow.doSaveList(basePath + 'valuation/trademanage/trddepovaluationduration/TrdDepoValuationDuration002/save', object, "TrdDepoValuationDuration002_btn_save");
                 } else {
-                    WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trddepovaluationduration/TrdDepoValuationDuration002/save', object, "TrdLendValuationTrade002_btn_submit");
+                    WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trddepovaluationduration/TrdDepoValuationDuration002/save', object, "TrdDepoValuationDuration002_btn_submit");
                 }
             });
         })

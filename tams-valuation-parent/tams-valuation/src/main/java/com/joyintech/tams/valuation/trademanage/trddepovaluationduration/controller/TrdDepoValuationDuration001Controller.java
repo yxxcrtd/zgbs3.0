@@ -85,7 +85,7 @@ public class TrdDepoValuationDuration001Controller extends BaseController {
     public Page<SelectOptionDto> findPortfolioId(HttpServletRequest request) {
         Map<String, Object> param =RequestUtil.getPageParam();
         //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-//        param.put("finprodType", "F01"); //测试
+        param.put("finprodType", "F16"); //测试
         return trdDepoValuationDuration001Service.findPortfolioId(param);
     }
 
@@ -102,35 +102,6 @@ public class TrdDepoValuationDuration001Controller extends BaseController {
         return trdDepoValuationDuration001Service.findFinprodId(param);
     }
 
-
-//    /**
-//     * 导出数据
-//     */
-//    @RequestMapping(ACTION_EXPORT)
-//    public ResponseEntity<byte[]> export()
-//            throws ParseException, IOException {
-//
-//        String datas = this.getParam("datas");
-//        Map<String, Object> params = RequestUtil.getPageParam();
-//        List<TrdRepoValuationTrade001Dto> listdto;
-//        if (datas != null) {
-//            listdto = JsonUtils.json2List(datas, TrdRepoValuationTrade001Dto.class);
-//        } else {
-//            listdto = trdRepoValuationTrade001Service.queryPageList(params);
-//        }
-//        File outFile = trdRepoValuationTrade001Service.makeFile(
-//                "/com/joyintech/tams/valuation/trademanage/trdrepovaluationtrade/conf/export_conf.xml",
-//                listdto);
-//        return ExportUtil.export(
-//                this.getMessage(this.getPageId()) + SystemGlobalConstant.OPEN_PARENTHESIS
-//                        + DateUtil.format(new Date())
-//                        + SystemGlobalConstant.CLOSE_PARENTHESIS
-//                        + SystemGlobalConstant.POINT
-//                        + FileNameUtil.getFileExtName(outFile),
-//                outFile, true);
-//    }
-//
-//
     //删除
     @ResponseBody
     @RequestMapping(ACTION_DELETE)
@@ -146,9 +117,9 @@ public class TrdDepoValuationDuration001Controller extends BaseController {
         // 业务代码（凭证流水号）
         params.setBusinessCode(item -> item.getTradeId());
         // 业务类型
-        params.setBusinessType(DictCodeList.业务类型_银行间债券交易.getValue());
+        params.setBusinessType(DictCodeList.共通业务类型_存款类资产存续期.getValue());
         // 页面id
-        params.setPageId("BondTradeQuery001");
+        params.setPageId("TrdDepoValuationDuration002");
         // 元素id
         params.setElementId(dto.getElementId());
 
