@@ -37,8 +37,7 @@ import java.util.Map;
 @Service(value="serviceTrdDepoValuationDuration001Service")
 public class TrdDepoValuationDuration001Service extends CommonExportService<TrdDepoValuationDuration001Dto>{
 
-    @Value("${interf.properties.maxSqlNum}")
-    private int maxSqlNum;
+
 
     @Autowired
     private TrdDepoValuationDuration001Mapper trdDepoValuationDuration001Mapper;
