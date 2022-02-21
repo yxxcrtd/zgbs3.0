@@ -7,6 +7,7 @@ import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 public class TrdStockValuationDuration002Dto extends BaseEntity implements ProcessEntity {
@@ -56,41 +57,36 @@ public class TrdStockValuationDuration002Dto extends BaseEntity implements Proce
     private String assetAbbr;
 
     /**
-     * 证券账户
-     */
-    private String secManageAcctId;
-
-    /**
      * 交易类型
      */
     private String ps;
 
     /**
-     * 计划支付日
+     * 权益登记日
      */
-    private String planPayDate;
+    private Date regDate;
 
     /**
-     * 资金交收日
+     * 除权（除息）日
      */
-    private String fundSettleDate;
+    private Date exRightsDate;
 
     /**
-     * 投资目的
+     * 派息日
      */
-    private String invAim;
+    private Date dividDate;
 
     /**
-     * 实收利息
+     * 权益登记日股本
      */
     @JsonSerialize(using= BigDecimalSerializer.class)
-    private BigDecimal actInt;
+    private BigDecimal amount;
 
     /**
-     * 实收本金
+     * 分红金额
      */
     @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal actCapi;
+    private BigDecimal bonusAmt;
 
     /**
      * 币种
@@ -98,20 +94,10 @@ public class TrdStockValuationDuration002Dto extends BaseEntity implements Proce
     private String ccy;
 
     /**
-     * 其他费用
+     * 分红股本
      */
     @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal otherAmt;
-
-    /**
-     * 是否结清
-     */
-    private String isClean2;
-
-    /**
-     * 本币交易金额
-     */
-    private BigDecimal tardeAmt;
+    private BigDecimal devidentAmt;
 
     /**
      * 结算金额
@@ -123,6 +109,14 @@ public class TrdStockValuationDuration002Dto extends BaseEntity implements Proce
      */
     private String myAcctNo;
 
+    public String getTradeId() {
+        return tradeId;
+    }
+
+    public void setTradeId(String tradeId) {
+        this.tradeId = tradeId;
+    }
+
     public String getProdId() {
         return prodId;
     }
@@ -131,12 +125,28 @@ public class TrdStockValuationDuration002Dto extends BaseEntity implements Proce
         this.prodId = prodId;
     }
 
-    public String getSecManageAcctId() {
-        return secManageAcctId;
+    public String getProdName() {
+        return prodName;
     }
 
-    public void setSecManageAcctId(String secManageAcctId) {
-        this.secManageAcctId = secManageAcctId;
+    public void setProdName(String prodName) {
+        this.prodName = prodName;
+    }
+
+    public String getAssetId() {
+        return assetId;
+    }
+
+    public void setAssetId(String assetId) {
+        this.assetId = assetId;
+    }
+
+    public String getAssetAbbr() {
+        return assetAbbr;
+    }
+
+    public void setAssetAbbr(String assetAbbr) {
+        this.assetAbbr = assetAbbr;
     }
 
     public String getPs() {
@@ -147,28 +157,44 @@ public class TrdStockValuationDuration002Dto extends BaseEntity implements Proce
         this.ps = ps;
     }
 
-    public String getTradeId() {
-        return tradeId;
+    public Date getRegDate() {
+        return regDate;
     }
 
-    public void setTradeId(String tradeId) {
-        this.tradeId = tradeId;
+    public void setRegDate(Date regDate) {
+        this.regDate = regDate;
     }
 
-    public String getFundSettleDate() {
-        return fundSettleDate;
+    public Date getExRightsDate() {
+        return exRightsDate;
     }
 
-    public void setFundSettleDate(String fundSettleDate) {
-        this.fundSettleDate = fundSettleDate;
+    public void setExRightsDate(Date exRightsDate) {
+        this.exRightsDate = exRightsDate;
     }
 
-    public String getInvAim() {
-        return invAim;
+    public Date getDividDate() {
+        return dividDate;
     }
 
-    public void setInvAim(String invAim) {
-        this.invAim = invAim;
+    public void setDividDate(Date dividDate) {
+        this.dividDate = dividDate;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public BigDecimal getBonusAmt() {
+        return bonusAmt;
+    }
+
+    public void setBonusAmt(BigDecimal bonusAmt) {
+        this.bonusAmt = bonusAmt;
     }
 
     public String getCcy() {
@@ -179,12 +205,20 @@ public class TrdStockValuationDuration002Dto extends BaseEntity implements Proce
         this.ccy = ccy;
     }
 
-    public BigDecimal getOtherAmt() {
-        return otherAmt;
+    public BigDecimal getDevidentAmt() {
+        return devidentAmt;
     }
 
-    public void setOtherAmt(BigDecimal otherAmt) {
-        this.otherAmt = otherAmt;
+    public void setDevidentAmt(BigDecimal devidentAmt) {
+        this.devidentAmt = devidentAmt;
+    }
+
+    public BigDecimal getSettleAmt() {
+        return settleAmt;
+    }
+
+    public void setSettleAmt(BigDecimal settleAmt) {
+        this.settleAmt = settleAmt;
     }
 
     public String getMyAcctNo() {
@@ -225,77 +259,5 @@ public class TrdStockValuationDuration002Dto extends BaseEntity implements Proce
 
     public void setElementId(String elementId) {
         this.elementId = elementId;
-    }
-
-    public String getProdName() {
-        return prodName;
-    }
-
-    public void setProdName(String prodName) {
-        this.prodName = prodName;
-    }
-
-    public BigDecimal getSettleAmt() {
-        return settleAmt;
-    }
-
-    public void setSettleAmt(BigDecimal settleAmt) {
-        this.settleAmt = settleAmt;
-    }
-
-    public String getAssetId() {
-        return assetId;
-    }
-
-    public void setAssetId(String assetId) {
-        this.assetId = assetId;
-    }
-
-    public String getAssetAbbr() {
-        return assetAbbr;
-    }
-
-    public void setAssetAbbr(String assetAbbr) {
-        this.assetAbbr = assetAbbr;
-    }
-
-    public String getPlanPayDate() {
-        return planPayDate;
-    }
-
-    public void setPlanPayDate(String planPayDate) {
-        this.planPayDate = planPayDate;
-    }
-
-    public BigDecimal getActInt() {
-        return actInt;
-    }
-
-    public void setActInt(BigDecimal actInt) {
-        this.actInt = actInt;
-    }
-
-    public BigDecimal getActCapi() {
-        return actCapi;
-    }
-
-    public void setActCapi(BigDecimal actCapi) {
-        this.actCapi = actCapi;
-    }
-
-    public String getIsClean2() {
-        return isClean2;
-    }
-
-    public void setIsClean2(String isClean2) {
-        this.isClean2 = isClean2;
-    }
-
-    public BigDecimal getTardeAmt() {
-        return tardeAmt;
-    }
-
-    public void setTardeAmt(BigDecimal tardeAmt) {
-        this.tardeAmt = tardeAmt;
     }
 }

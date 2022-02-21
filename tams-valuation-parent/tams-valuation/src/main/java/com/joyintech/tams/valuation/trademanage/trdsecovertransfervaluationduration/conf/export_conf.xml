@@ -9,8 +9,8 @@
             <Cell order="5" name="资产名称">assetAbbr</Cell>
             <Cell order="6" name="交易类型">psStr</Cell>
             <Cell order="7" name="币种">ccyFmt</Cell>
-            <Cell order="8" name="交易日">tradeDate</Cell>
-            <Cell order="9" name="交割日">settleDate</Cell>
+            <Cell order="8" name="交易日">tradeDateStr</Cell>
+            <Cell order="9" name="交割日">settleDateStr</Cell>
             <Cell order="10" name="本金金额">prinAmtStr</Cell>
             <Cell order="11" name="应收利息总额">intAmtStr</Cell>
             <Cell order="12" name="罚息">theoryPenaltyIntStr</Cell>

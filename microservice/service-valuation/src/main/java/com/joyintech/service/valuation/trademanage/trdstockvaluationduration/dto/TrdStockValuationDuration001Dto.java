@@ -10,6 +10,7 @@ import com.joyintech.workflow.engine.annotation.PrimaryKey;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.List;
 
 public class TrdStockValuationDuration001Dto extends BaseEntity {
@@ -49,17 +50,17 @@ public class TrdStockValuationDuration001Dto extends BaseEntity {
     /**
      * 权益登记日
      */
-    private String regDate;
+    private Date regDate;
 
     /**
      * 除权（除息）日
      */
-    private String exRightsDate;
+    private Date exRightsDate;
 
     /**
      * 派息日
      */
-    private String dividDate;
+    private Date dividDate;
 
     /**
      * 权益登记日股本
@@ -226,27 +227,27 @@ public class TrdStockValuationDuration001Dto extends BaseEntity {
         this.finprodName = finprodName;
     }
 
-    public String getRegDate() {
+    public Date getRegDate() {
         return regDate;
     }
 
-    public void setRegDate(String regDate) {
+    public void setRegDate(Date regDate) {
         this.regDate = regDate;
     }
 
-    public String getExRightsDate() {
+    public Date getExRightsDate() {
         return exRightsDate;
     }
 
-    public void setExRightsDate(String exRightsDate) {
+    public void setExRightsDate(Date exRightsDate) {
         this.exRightsDate = exRightsDate;
     }
 
-    public String getDividDate() {
+    public Date getDividDate() {
         return dividDate;
     }
 
-    public void setDividDate(String dividDate) {
+    public void setDividDate(Date dividDate) {
         this.dividDate = dividDate;
     }
 

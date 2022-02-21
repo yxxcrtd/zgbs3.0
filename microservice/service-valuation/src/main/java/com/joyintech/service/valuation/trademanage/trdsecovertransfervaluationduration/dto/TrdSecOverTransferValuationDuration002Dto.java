@@ -3,11 +3,11 @@ package com.joyintech.service.valuation.trademanage.trdsecovertransfervaluationd
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
-import com.joyintech.framework.validation.annotation.NotEmpty;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 public class TrdSecOverTransferValuationDuration002Dto extends BaseEntity implements ProcessEntity {
@@ -39,47 +39,41 @@ public class TrdSecOverTransferValuationDuration002Dto extends BaseEntity implem
     /**
      * 金融产品代码
      */
-    @NotEmpty(fieldName = "产品代码")
     private String prodId;
 
     /**
      * 金融产品名称
      */
-    @NotEmpty(fieldName = "产品名称")
     private String prodName;
 
     /**
      * 资产代码
      */
-    @NotEmpty(fieldName = "资产代码")
     private String assetId;
 
     /**
      * 资产简称
      */
-    @NotEmpty(fieldName = "资产简称")
     private String assetAbbr;
 
     /**
      * 交易类型
      */
-    @NotEmpty(fieldName = "交易类型")
     private String ps;
 
     /**
      * 交易日
      */
-    private String tradeDate;
+    private Date tradeDate;
 
     /**
      * 交割日
      */
-    private String settleDate;
+    private Date settleDate;
 
     /**
      * 币种
      */
-    @NotEmpty(fieldName = "币种")
     private String ccy;
 
     /**
@@ -103,20 +97,17 @@ public class TrdSecOverTransferValuationDuration002Dto extends BaseEntity implem
     /**
      * 其他费用
      */
-    @NotEmpty(fieldName = "其他费用")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal otherAmt;
 
     /**
      * 结算金额
      */
-    @NotEmpty(fieldName = "结算金额")
     private BigDecimal settleAmt;
 
     /**
      * 资金账户
      */
-    @NotEmpty(fieldName = "资金账户")
     private String myAcctNo;
 
     public String getProdId() {
@@ -231,19 +222,19 @@ public class TrdSecOverTransferValuationDuration002Dto extends BaseEntity implem
         this.assetAbbr = assetAbbr;
     }
 
-    public String getTradeDate() {
+    public Date getTradeDate() {
         return tradeDate;
     }
 
-    public void setTradeDate(String tradeDate) {
+    public void setTradeDate(Date tradeDate) {
         this.tradeDate = tradeDate;
     }
 
-    public String getSettleDate() {
+    public Date getSettleDate() {
         return settleDate;
     }
 
-    public void setSettleDate(String settleDate) {
+    public void setSettleDate(Date settleDate) {
         this.settleDate = settleDate;
     }
 

@@ -9,7 +9,7 @@
             deal.BOOKSET_ID finprodId,/**产品代码**/
             bok.BOOKSET_NAME finprodName,/**产品名称**/
             null ps,/**交易类型**/
-            to_char(t.TRADE_DATE,'yyyy-mm-dd') tradeDate,/**交易日**/
+            t.TRADE_DATE tradeDate,/**交易日**/
             null irsPsIntType,/**收付息类型**/
             null fixPayDate,/**固定利息支付日**/
             null fixIntAmt,  /**固定利息**/
@@ -74,7 +74,7 @@
             null secManageAcctId,/**证券账户**/
             t.PS ps,/**交易方向**/
             null planPayDate,/**计划支付日**/
-            to_char(stl.SETTLE_DATE,'yyyy-mm-dd') fundSettleDate,/**资金交收日**/
+            stl.SETTLE_DATE fundSettleDate,/**资金交收日**/
             t.INV_AIM invAim,/**投资目的**/
             t.INT_AMT intAmtReal,/**实收利息**/
             t.PRIN_AMT actCapi, /**实收本金**/

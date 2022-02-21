@@ -3,6 +3,7 @@ package com.joyintech.tams.valuation.trademanage.trdsecovertransfervaluationdura
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
@@ -11,6 +12,7 @@ import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.List;
 
 public class TrdSecOverTransferValuationDuration001Dto extends BaseEntity implements ProcessEntity {
@@ -55,12 +57,12 @@ public class TrdSecOverTransferValuationDuration001Dto extends BaseEntity implem
     /**
      * 交易日
      */
-    private String tradeDate;
+    private Date tradeDate;
 
     /**
      * 交割日
      */
-    private String settleDate;
+    private Date settleDate;
 
     /**
      * 本金金额
@@ -222,20 +224,28 @@ public class TrdSecOverTransferValuationDuration001Dto extends BaseEntity implem
         this.finprodName = finprodName;
     }
 
-    public String getTradeDate() {
+    public Date getTradeDate() {
         return tradeDate;
     }
 
-    public void setTradeDate(String tradeDate) {
+    public void setTradeDate(Date tradeDate) {
         this.tradeDate = tradeDate;
     }
 
-    public String getSettleDate() {
+    public String getTradeDateStr() {
+        return DateUtil.format(this.getTradeDate());
+    }
+
+    public Date getSettleDate() {
         return settleDate;
     }
 
-    public void setSettleDate(String settleDate) {
+    public void setSettleDate(Date settleDate) {
         this.settleDate = settleDate;
+    }
+
+    public String getSettleDateStr() {
+        return DateUtil.format(this.getSettleDate());
     }
 
     public BigDecimal getPrinAmt() {

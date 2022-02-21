@@ -10,6 +10,7 @@ import com.joyintech.workflow.engine.annotation.PrimaryKey;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.List;
 
 public class TrdSecOverTransferValuationDuration001Dto extends BaseEntity {
@@ -54,12 +55,12 @@ public class TrdSecOverTransferValuationDuration001Dto extends BaseEntity {
     /**
      * 交易日
      */
-    private String tradeDate;
+    private Date tradeDate;
 
     /**
      * 交割日
      */
-    private String settleDate;
+    private Date settleDate;
 
     /**
      * 本金金额
@@ -221,19 +222,19 @@ public class TrdSecOverTransferValuationDuration001Dto extends BaseEntity {
         this.finprodName = finprodName;
     }
 
-    public String getTradeDate() {
+    public Date getTradeDate() {
         return tradeDate;
     }
 
-    public void setTradeDate(String tradeDate) {
+    public void setTradeDate(Date tradeDate) {
         this.tradeDate = tradeDate;
     }
 
-    public String getSettleDate() {
+    public Date getSettleDate() {
         return settleDate;
     }
 
-    public void setSettleDate(String settleDate) {
+    public void setSettleDate(Date settleDate) {
         this.settleDate = settleDate;
     }
 

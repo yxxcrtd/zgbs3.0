@@ -8,6 +8,7 @@ import com.joyintech.workflow.engine.annotation.PrimaryKey;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.List;
 
 public class TrdIrsValuationDuration001Dto extends BaseEntity {
@@ -42,7 +43,7 @@ public class TrdIrsValuationDuration001Dto extends BaseEntity {
     /**
      * 交易日
      */
-    private String tradeDate;
+    private Date tradeDate;
 
     /**
      * 收付息类型
@@ -52,7 +53,7 @@ public class TrdIrsValuationDuration001Dto extends BaseEntity {
     /**
      * 固定利息支付日
      */
-    private String fixPayDate;
+    private Date fixPayDate;
 
     /**
      * 固定利息
@@ -62,7 +63,7 @@ public class TrdIrsValuationDuration001Dto extends BaseEntity {
     /**
      * 浮动利息支付日
      */
-    private String floatPayDate;
+    private Date floatPayDate;
 
     /**
      * 浮动利息
@@ -148,11 +149,11 @@ public class TrdIrsValuationDuration001Dto extends BaseEntity {
         this.tradeId = tradeId;
     }
 
-    public String getTradeDate() {
+    public Date getTradeDate() {
         return tradeDate;
     }
 
-    public void setTradeDate(String tradeDate) {
+    public void setTradeDate(Date tradeDate) {
         this.tradeDate = tradeDate;
     }
 
@@ -238,11 +239,11 @@ public class TrdIrsValuationDuration001Dto extends BaseEntity {
         this.irsPsIntType = irsPsIntType;
     }
 
-    public String getFixPayDate() {
+    public Date getFixPayDate() {
         return fixPayDate;
     }
 
-    public void setFixPayDate(String fixPayDate) {
+    public void setFixPayDate(Date fixPayDate) {
         this.fixPayDate = fixPayDate;
     }
 
@@ -254,11 +255,11 @@ public class TrdIrsValuationDuration001Dto extends BaseEntity {
         this.fixIntAmt = fixIntAmt;
     }
 
-    public String getFloatPayDate() {
+    public Date getFloatPayDate() {
         return floatPayDate;
     }
 
-    public void setFloatPayDate(String floatPayDate) {
+    public void setFloatPayDate(Date floatPayDate) {
         this.floatPayDate = floatPayDate;
     }
 

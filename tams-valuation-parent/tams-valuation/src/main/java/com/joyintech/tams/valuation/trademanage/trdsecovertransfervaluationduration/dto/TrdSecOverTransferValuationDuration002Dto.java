@@ -1,15 +1,24 @@
 package com.joyintech.tams.valuation.trademanage.trdsecovertransfervaluationduration.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.validation.annotation.NotEmpty;
+import com.joyintech.framework.validation.annotation.ValidLogic;
+import com.joyintech.framework.validation.groups.ValidateGroupDelete;
+import com.joyintech.framework.validation.groups.ValidateGroupEdit;
+import com.joyintech.tams.valuation.trademanage.trdsecovertransfervaluationduration.validator.TrdSecOverTransferValuationDurationValidator;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
+@PageId("TrdSecOverTransferValuationDuration002")
+@ValidLogic(targetClass = TrdSecOverTransferValuationDurationValidator.class, groups = { ValidateGroupEdit.class,
+        ValidateGroupDelete.class })
 public class TrdSecOverTransferValuationDuration002Dto extends BaseEntity implements ProcessEntity {
     private static final long serialVersionUID = 1L;
 
@@ -39,47 +48,41 @@ public class TrdSecOverTransferValuationDuration002Dto extends BaseEntity implem
     /**
      * 金融产品代码
      */
-    @NotEmpty(fieldName = "产品代码")
     private String prodId;
 
     /**
      * 金融产品名称
      */
-    @NotEmpty(fieldName = "产品名称")
     private String prodName;
 
     /**
      * 资产代码
      */
-    @NotEmpty(fieldName = "资产代码")
     private String assetId;
 
     /**
      * 资产简称
      */
-    @NotEmpty(fieldName = "资产简称")
     private String assetAbbr;
 
     /**
      * 交易类型
      */
-    @NotEmpty(fieldName = "交易类型")
     private String ps;
 
     /**
      * 交易日
      */
-    private String tradeDate;
+    private Date tradeDate;
 
     /**
      * 交割日
      */
-    private String settleDate;
+    private Date settleDate;
 
     /**
      * 币种
      */
-    @NotEmpty(fieldName = "币种")
     private String ccy;
 
     /**
@@ -103,22 +106,20 @@ public class TrdSecOverTransferValuationDuration002Dto extends BaseEntity implem
     /**
      * 其他费用
      */
-    @NotEmpty(fieldName = "其他费用")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal otherAmt;
 
     /**
      * 结算金额
      */
-    @NotEmpty(fieldName = "结算金额")
     private BigDecimal settleAmt;
 
     /**
      * 资金账户
      */
-    @NotEmpty(fieldName = "资金账户")
     private String myAcctNo;
 
+    @NotEmpty(fieldName = "TrdSecOverTransferValuationDuration002.prodId", groups = { ValidateGroupEdit.class })
     public String getProdId() {
         return prodId;
     }
@@ -127,6 +128,7 @@ public class TrdSecOverTransferValuationDuration002Dto extends BaseEntity implem
         this.prodId = prodId;
     }
 
+    @NotEmpty(fieldName = "TrdSecOverTransferValuationDuration002.ps", groups = { ValidateGroupEdit.class })
     public String getPs() {
         return ps;
     }
@@ -143,6 +145,7 @@ public class TrdSecOverTransferValuationDuration002Dto extends BaseEntity implem
         this.tradeId = tradeId;
     }
 
+    @NotEmpty(fieldName = "TrdSecOverTransferValuationDuration002.ccy", groups = { ValidateGroupEdit.class })
     public String getCcy() {
         return ccy;
     }
@@ -159,6 +162,7 @@ public class TrdSecOverTransferValuationDuration002Dto extends BaseEntity implem
         this.otherAmt = otherAmt;
     }
 
+    @NotEmpty(fieldName = "TrdSecOverTransferValuationDuration002.myAcctNo", groups = { ValidateGroupEdit.class })
     public String getMyAcctNo() {
         return myAcctNo;
     }
@@ -199,6 +203,7 @@ public class TrdSecOverTransferValuationDuration002Dto extends BaseEntity implem
         this.elementId = elementId;
     }
 
+    @NotEmpty(fieldName = "TrdSecOverTransferValuationDuration002.prodName", groups = { ValidateGroupEdit.class })
     public String getProdName() {
         return prodName;
     }
@@ -207,6 +212,7 @@ public class TrdSecOverTransferValuationDuration002Dto extends BaseEntity implem
         this.prodName = prodName;
     }
 
+    @NotEmpty(fieldName = "TrdSecOverTransferValuationDuration002.settleAmt", groups = { ValidateGroupEdit.class })
     public BigDecimal getSettleAmt() {
         return settleAmt;
     }
@@ -215,6 +221,7 @@ public class TrdSecOverTransferValuationDuration002Dto extends BaseEntity implem
         this.settleAmt = settleAmt;
     }
 
+    @NotEmpty(fieldName = "TrdSecOverTransferValuationDuration002.assetId", groups = { ValidateGroupEdit.class })
     public String getAssetId() {
         return assetId;
     }
@@ -223,6 +230,7 @@ public class TrdSecOverTransferValuationDuration002Dto extends BaseEntity implem
         this.assetId = assetId;
     }
 
+    @NotEmpty(fieldName = "TrdSecOverTransferValuationDuration002.assetAbbr", groups = { ValidateGroupEdit.class })
     public String getAssetAbbr() {
         return assetAbbr;
     }
@@ -231,22 +239,25 @@ public class TrdSecOverTransferValuationDuration002Dto extends BaseEntity implem
         this.assetAbbr = assetAbbr;
     }
 
-    public String getTradeDate() {
+    @NotEmpty(fieldName = "TrdSecOverTransferValuationDuration002.tradeDate", groups = { ValidateGroupEdit.class })
+    public Date getTradeDate() {
         return tradeDate;
     }
 
-    public void setTradeDate(String tradeDate) {
+    public void setTradeDate(Date tradeDate) {
         this.tradeDate = tradeDate;
     }
 
-    public String getSettleDate() {
+    @NotEmpty(fieldName = "TrdSecOverTransferValuationDuration002.settleDate", groups = { ValidateGroupEdit.class })
+    public Date getSettleDate() {
         return settleDate;
     }
 
-    public void setSettleDate(String settleDate) {
+    public void setSettleDate(Date settleDate) {
         this.settleDate = settleDate;
     }
 
+    @NotEmpty(fieldName = "TrdSecOverTransferValuationDuration002.prinAmt", groups = { ValidateGroupEdit.class })
     public BigDecimal getPrinAmt() {
         return prinAmt;
     }
@@ -255,6 +266,7 @@ public class TrdSecOverTransferValuationDuration002Dto extends BaseEntity implem
         this.prinAmt = prinAmt;
     }
 
+    @NotEmpty(fieldName = "TrdSecOverTransferValuationDuration002.intAmt", groups = { ValidateGroupEdit.class })
     public BigDecimal getIntAmt() {
         return intAmt;
     }
@@ -263,6 +275,7 @@ public class TrdSecOverTransferValuationDuration002Dto extends BaseEntity implem
         this.intAmt = intAmt;
     }
 
+    @NotEmpty(fieldName = "TrdSecOverTransferValuationDuration002.theoryPenaltyInt", groups = { ValidateGroupEdit.class })
     public BigDecimal getTheoryPenaltyInt() {
         return theoryPenaltyInt;
     }

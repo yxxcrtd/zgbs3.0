@@ -3,11 +3,11 @@ package com.joyintech.service.valuation.trademanage.trdirsvaluationduration.dto;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
-import com.joyintech.framework.validation.annotation.NotEmpty;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 public class TrdIrsValuationDuration002Dto extends BaseEntity implements ProcessEntity {
@@ -44,19 +44,16 @@ public class TrdIrsValuationDuration002Dto extends BaseEntity implements Process
     /**
      * 金融产品代码
      */
-    @NotEmpty(fieldName = "产品代码")
     private String prodId;
 
     /**
      * 金融产品名称
      */
-    @NotEmpty(fieldName = "产品名称")
     private String prodName;
 
     /**
      * 交易类型
      */
-    @NotEmpty(fieldName = "交易类型")
     private String ps;
 
     /**
@@ -72,22 +69,22 @@ public class TrdIrsValuationDuration002Dto extends BaseEntity implements Process
     /**
      * 交易日
      */
-    private String tradeDate;
+    private Date tradeDate;
 
     /**
      * 固定利息支付日
      */
-    private String fixPayDate;
+    private Date fixPayDate;
 
     /**
      * 浮动利息支付日
      */
-    private String floatPayDate;
+    private Date floatPayDate;
 
     /**
      * 提前终止支付日
      */
-    private String beforeEndPayDate;
+    private Date beforeEndPayDate;
 
     /**
      * 提前终止收付方向
@@ -109,7 +106,6 @@ public class TrdIrsValuationDuration002Dto extends BaseEntity implements Process
     /**
      * 币种
      */
-    @NotEmpty(fieldName = "币种")
     private String ccy;
 
     /**
@@ -135,20 +131,17 @@ public class TrdIrsValuationDuration002Dto extends BaseEntity implements Process
     /**
      * 其他费用
      */
-    @NotEmpty(fieldName = "其他费用")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal otherAmt;
 
     /**
      * 结算金额
      */
-    @NotEmpty(fieldName = "结算金额")
     private BigDecimal settleAmt;
 
     /**
      * 资金账户
      */
-    //@NotEmpty(fieldName = "资金账户")
     private String myAcctNo;
 
     public String getProdId() {
@@ -271,35 +264,35 @@ public class TrdIrsValuationDuration002Dto extends BaseEntity implements Process
         this.irsPsIntType = irsPsIntType;
     }
 
-    public String getTradeDate() {
+    public Date getTradeDate() {
         return tradeDate;
     }
 
-    public void setTradeDate(String tradeDate) {
+    public void setTradeDate(Date tradeDate) {
         this.tradeDate = tradeDate;
     }
 
-    public String getFixPayDate() {
+    public Date getFixPayDate() {
         return fixPayDate;
     }
 
-    public void setFixPayDate(String fixPayDate) {
+    public void setFixPayDate(Date fixPayDate) {
         this.fixPayDate = fixPayDate;
     }
 
-    public String getFloatPayDate() {
+    public Date getFloatPayDate() {
         return floatPayDate;
     }
 
-    public void setFloatPayDate(String floatPayDate) {
+    public void setFloatPayDate(Date floatPayDate) {
         this.floatPayDate = floatPayDate;
     }
 
-    public String getBeforeEndPayDate() {
+    public Date getBeforeEndPayDate() {
         return beforeEndPayDate;
     }
 
-    public void setBeforeEndPayDate(String beforeEndPayDate) {
+    public void setBeforeEndPayDate(Date beforeEndPayDate) {
         this.beforeEndPayDate = beforeEndPayDate;
     }
 

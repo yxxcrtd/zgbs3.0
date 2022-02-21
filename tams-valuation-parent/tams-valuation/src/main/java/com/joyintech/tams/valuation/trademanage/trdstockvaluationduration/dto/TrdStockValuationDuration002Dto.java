@@ -1,15 +1,24 @@
 package com.joyintech.tams.valuation.trademanage.trdstockvaluationduration.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.validation.annotation.NotEmpty;
+import com.joyintech.framework.validation.annotation.ValidLogic;
+import com.joyintech.framework.validation.groups.ValidateGroupDelete;
+import com.joyintech.framework.validation.groups.ValidateGroupEdit;
+import com.joyintech.tams.valuation.trademanage.trdstockvaluationduration.validator.TrdStockValuationDurationValidator;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
+@PageId("TrdStockValuationDuration002")
+@ValidLogic(targetClass = TrdStockValuationDurationValidator.class, groups = { ValidateGroupEdit.class,
+        ValidateGroupDelete.class })
 public class TrdStockValuationDuration002Dto extends BaseEntity implements ProcessEntity {
     private static final long serialVersionUID = 1L;
 
@@ -39,107 +48,77 @@ public class TrdStockValuationDuration002Dto extends BaseEntity implements Proce
     /**
      * 金融产品代码
      */
-    @NotEmpty(fieldName = "产品代码")
     private String prodId;
 
     /**
      * 金融产品名称
      */
-    @NotEmpty(fieldName = "产品名称")
     private String prodName;
 
     /**
      * 资产代码
      */
-    @NotEmpty(fieldName = "资产代码")
     private String assetId;
 
     /**
      * 资产简称
      */
-    @NotEmpty(fieldName = "资产简称")
     private String assetAbbr;
-
-    /**
-     * 证券账户
-     */
-   // @NotEmpty(fieldName = "证券账户")
-    private String secManageAcctId;
 
     /**
      * 交易类型
      */
-    @NotEmpty(fieldName = "交易类型")
     private String ps;
 
     /**
-     * 计划支付日
+     * 权益登记日
      */
-    @NotEmpty(fieldName = "计划支付日")
-    private String planPayDate;
+    private Date regDate;
 
     /**
-     * 资金交收日
+     * 除权（除息）日
      */
-    @NotEmpty(fieldName = "资金交收日")
-    private String fundSettleDate;
+    private Date exRightsDate;
 
     /**
-     * 投资目的
+     * 派息日
      */
-    @NotEmpty(fieldName = "会计分类")
-    private String invAim;
+    private Date dividDate;
 
     /**
-     * 实收利息
+     * 权益登记日股本
      */
-    @NotEmpty(fieldName = "实收利息")
     @JsonSerialize(using= BigDecimalSerializer.class)
-    private BigDecimal actInt;
+    private BigDecimal amount;
 
     /**
-     * 实收本金
+     * 分红金额
      */
-    @NotEmpty(fieldName = "实收本金")
     @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal actCapi;
+    private BigDecimal bonusAmt;
 
     /**
      * 币种
      */
-    @NotEmpty(fieldName = "币种")
     private String ccy;
 
     /**
-     * 其他费用
+     * 分红股本
      */
-    @NotEmpty(fieldName = "其他费用")
     @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal otherAmt;
-
-    /**
-     * 是否结清
-     */
-    private String isClean2;
-
-    /**
-     * 本币交易金额
-     */
-    @NotEmpty(fieldName = "本币交易金额")
-    private BigDecimal tardeAmt;
+    private BigDecimal devidentAmt;
 
     /**
      * 结算金额
      */
-    @NotEmpty(fieldName = "结算金额")
     private BigDecimal settleAmt;
 
     /**
      * 资金账户
      */
-    //@NotEmpty(fieldName = "资金账户")
     private String myAcctNo;
 
+    @NotEmpty(fieldName = "TrdStockValuationDuration002.prodId", groups = { ValidateGroupEdit.class })
     public String getProdId() {
         return prodId;
     }
@@ -148,14 +127,7 @@ public class TrdStockValuationDuration002Dto extends BaseEntity implements Proce
         this.prodId = prodId;
     }
 
-    public String getSecManageAcctId() {
-        return secManageAcctId;
-    }
-
-    public void setSecManageAcctId(String secManageAcctId) {
-        this.secManageAcctId = secManageAcctId;
-    }
-
+    @NotEmpty(fieldName = "TrdStockValuationDuration002.ps", groups = { ValidateGroupEdit.class })
     public String getPs() {
         return ps;
     }
@@ -172,22 +144,59 @@ public class TrdStockValuationDuration002Dto extends BaseEntity implements Proce
         this.tradeId = tradeId;
     }
 
-    public String getFundSettleDate() {
-        return fundSettleDate;
+    @NotEmpty(fieldName = "TrdStockValuationDuration002.regDate", groups = { ValidateGroupEdit.class })
+    public Date getRegDate() {
+        return regDate;
     }
 
-    public void setFundSettleDate(String fundSettleDate) {
-        this.fundSettleDate = fundSettleDate;
+    public void setRegDate(Date regDate) {
+        this.regDate = regDate;
     }
 
-    public String getInvAim() {
-        return invAim;
+    @NotEmpty(fieldName = "TrdStockValuationDuration002.exRightsDate", groups = { ValidateGroupEdit.class })
+    public Date getExRightsDate() {
+        return exRightsDate;
     }
 
-    public void setInvAim(String invAim) {
-        this.invAim = invAim;
+    public void setExRightsDate(Date exRightsDate) {
+        this.exRightsDate = exRightsDate;
     }
 
+    @NotEmpty(fieldName = "TrdStockValuationDuration002.dividDate", groups = { ValidateGroupEdit.class })
+    public Date getDividDate() {
+        return dividDate;
+    }
+
+    public void setDividDate(Date dividDate) {
+        this.dividDate = dividDate;
+    }
+
+    @NotEmpty(fieldName = "TrdStockValuationDuration002.amount", groups = { ValidateGroupEdit.class })
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public BigDecimal getBonusAmt() {
+        return bonusAmt;
+    }
+
+    public void setBonusAmt(BigDecimal bonusAmt) {
+        this.bonusAmt = bonusAmt;
+    }
+
+    public BigDecimal getDevidentAmt() {
+        return devidentAmt;
+    }
+
+    public void setDevidentAmt(BigDecimal devidentAmt) {
+        this.devidentAmt = devidentAmt;
+    }
+
+    @NotEmpty(fieldName = "TrdStockValuationDuration002.ccy", groups = { ValidateGroupEdit.class })
     public String getCcy() {
         return ccy;
     }
@@ -196,14 +205,7 @@ public class TrdStockValuationDuration002Dto extends BaseEntity implements Proce
         this.ccy = ccy;
     }
 
-    public BigDecimal getOtherAmt() {
-        return otherAmt;
-    }
-
-    public void setOtherAmt(BigDecimal otherAmt) {
-        this.otherAmt = otherAmt;
-    }
-
+    @NotEmpty(fieldName = "TrdStockValuationDuration002.myAcctNo", groups = { ValidateGroupEdit.class })
     public String getMyAcctNo() {
         return myAcctNo;
     }
@@ -244,6 +246,7 @@ public class TrdStockValuationDuration002Dto extends BaseEntity implements Proce
         this.elementId = elementId;
     }
 
+    @NotEmpty(fieldName = "TrdStockValuationDuration002.prodName", groups = { ValidateGroupEdit.class })
     public String getProdName() {
         return prodName;
     }
@@ -252,6 +255,7 @@ public class TrdStockValuationDuration002Dto extends BaseEntity implements Proce
         this.prodName = prodName;
     }
 
+    @NotEmpty(fieldName = "TrdStockValuationDuration002.settleAmt", groups = { ValidateGroupEdit.class })
     public BigDecimal getSettleAmt() {
         return settleAmt;
     }
@@ -260,6 +264,7 @@ public class TrdStockValuationDuration002Dto extends BaseEntity implements Proce
         this.settleAmt = settleAmt;
     }
 
+    @NotEmpty(fieldName = "TrdStockValuationDuration002.assetId", groups = { ValidateGroupEdit.class })
     public String getAssetId() {
         return assetId;
     }
@@ -268,6 +273,7 @@ public class TrdStockValuationDuration002Dto extends BaseEntity implements Proce
         this.assetId = assetId;
     }
 
+    @NotEmpty(fieldName = "TrdStockValuationDuration002.assetAbbr", groups = { ValidateGroupEdit.class })
     public String getAssetAbbr() {
         return assetAbbr;
     }
@@ -276,43 +282,4 @@ public class TrdStockValuationDuration002Dto extends BaseEntity implements Proce
         this.assetAbbr = assetAbbr;
     }
 
-    public String getPlanPayDate() {
-        return planPayDate;
-    }
-
-    public void setPlanPayDate(String planPayDate) {
-        this.planPayDate = planPayDate;
-    }
-
-    public BigDecimal getActInt() {
-        return actInt;
-    }
-
-    public void setActInt(BigDecimal actInt) {
-        this.actInt = actInt;
-    }
-
-    public BigDecimal getActCapi() {
-        return actCapi;
-    }
-
-    public void setActCapi(BigDecimal actCapi) {
-        this.actCapi = actCapi;
-    }
-
-    public String getIsClean2() {
-        return isClean2;
-    }
-
-    public void setIsClean2(String isClean2) {
-        this.isClean2 = isClean2;
-    }
-
-    public BigDecimal getTardeAmt() {
-        return tardeAmt;
-    }
-
-    public void setTardeAmt(BigDecimal tardeAmt) {
-        this.tardeAmt = tardeAmt;
-    }
 }

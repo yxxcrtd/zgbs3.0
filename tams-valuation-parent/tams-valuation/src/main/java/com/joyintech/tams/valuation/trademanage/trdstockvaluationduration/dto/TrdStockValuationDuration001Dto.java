@@ -3,6 +3,7 @@ package com.joyintech.tams.valuation.trademanage.trdstockvaluationduration.dto;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
@@ -11,6 +12,7 @@ import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.List;
 
 public class TrdStockValuationDuration001Dto extends BaseEntity implements ProcessEntity {
@@ -50,17 +52,17 @@ public class TrdStockValuationDuration001Dto extends BaseEntity implements Proce
     /**
      * 权益登记日
      */
-    private String regDate;
+    private Date regDate;
 
     /**
      * 除权（除息）日
      */
-    private String exRightsDate;
+    private Date exRightsDate;
 
     /**
      * 派息日
      */
-    private String dividDate;
+    private Date dividDate;
 
     /**
      * 权益登记日股本
@@ -227,28 +229,40 @@ public class TrdStockValuationDuration001Dto extends BaseEntity implements Proce
         this.finprodName = finprodName;
     }
 
-    public String getRegDate() {
+    public Date getRegDate() {
         return regDate;
     }
 
-    public void setRegDate(String regDate) {
+    public void setRegDate(Date regDate) {
         this.regDate = regDate;
     }
 
-    public String getExRightsDate() {
+    public String getRegDateStr() {
+        return DateUtil.format(this.getRegDate());
+    }
+
+    public Date getExRightsDate() {
         return exRightsDate;
     }
 
-    public void setExRightsDate(String exRightsDate) {
+    public void setExRightsDate(Date exRightsDate) {
         this.exRightsDate = exRightsDate;
     }
 
-    public String getDividDate() {
+    public String getExRightsDateStr() {
+        return DateUtil.format(this.getExRightsDate());
+    }
+
+    public Date getDividDate() {
         return dividDate;
     }
 
-    public void setDividDate(String dividDate) {
+    public void setDividDate(Date dividDate) {
         this.dividDate = dividDate;
+    }
+
+    public String getDividDateStr() {
+        return DateUtil.format(this.getDividDate());
     }
 
     public BigDecimal getAmount() {

@@ -1,6 +1,7 @@
 package com.joyintech.tams.valuation.trademanage.trdirsvaluationduration.dto;
 
 import com.joyintech.framework.base.BaseEntity;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
@@ -9,6 +10,7 @@ import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.List;
 
 public class TrdIrsValuationDuration001Dto extends BaseEntity implements ProcessEntity {
@@ -43,7 +45,7 @@ public class TrdIrsValuationDuration001Dto extends BaseEntity implements Process
     /**
      * 交易日
      */
-    private String tradeDate;
+    private Date tradeDate;
 
     /**
      * 收付息类型
@@ -53,7 +55,7 @@ public class TrdIrsValuationDuration001Dto extends BaseEntity implements Process
     /**
      * 固定利息支付日
      */
-    private String fixPayDate;
+    private Date fixPayDate;
 
     /**
      * 固定利息
@@ -63,7 +65,7 @@ public class TrdIrsValuationDuration001Dto extends BaseEntity implements Process
     /**
      * 浮动利息支付日
      */
-    private String floatPayDate;
+    private Date floatPayDate;
 
     /**
      * 浮动利息
@@ -149,12 +151,16 @@ public class TrdIrsValuationDuration001Dto extends BaseEntity implements Process
         this.tradeId = tradeId;
     }
 
-    public String getTradeDate() {
+    public Date getTradeDate() {
         return tradeDate;
     }
 
-    public void setTradeDate(String tradeDate) {
+    public void setTradeDate(Date tradeDate) {
         this.tradeDate = tradeDate;
+    }
+
+    public String getTradeDateStr() {
+        return DateUtil.format(this.getTradeDate());
     }
 
     public String getCcy() {
@@ -239,12 +245,16 @@ public class TrdIrsValuationDuration001Dto extends BaseEntity implements Process
         this.irsPsIntType = irsPsIntType;
     }
 
-    public String getFixPayDate() {
+    public Date getFixPayDate() {
         return fixPayDate;
     }
 
-    public void setFixPayDate(String fixPayDate) {
+    public void setFixPayDate(Date fixPayDate) {
         this.fixPayDate = fixPayDate;
+    }
+
+    public String getFixPayDateStr() {
+        return DateUtil.format(this.getFixPayDate());
     }
 
     public BigDecimal getFixIntAmt() {
@@ -255,12 +265,16 @@ public class TrdIrsValuationDuration001Dto extends BaseEntity implements Process
         this.fixIntAmt = fixIntAmt;
     }
 
-    public String getFloatPayDate() {
+    public Date getFloatPayDate() {
         return floatPayDate;
     }
 
-    public void setFloatPayDate(String floatPayDate) {
+    public void setFloatPayDate(Date floatPayDate) {
         this.floatPayDate = floatPayDate;
+    }
+
+    public String getFloatPayDateStr() {
+        return DateUtil.format(this.getFloatPayDate());
     }
 
     public BigDecimal getFloatIntAmt() {
@@ -293,6 +307,26 @@ public class TrdIrsValuationDuration001Dto extends BaseEntity implements Process
 
     public void setBeforeEndAmt(BigDecimal beforeEndAmt) {
         this.beforeEndAmt = beforeEndAmt;
+    }
+
+    public String getFixIntAmtStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getFixIntAmt()==null?"0.00":decimalFormat.format(this.getFixIntAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getFloatIntAmtStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getFloatIntAmt()==null?"0.00":decimalFormat.format(this.getFloatIntAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getBeforeEndPrinStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getBeforeEndPrin()==null?"0.00":decimalFormat.format(this.getBeforeEndPrin().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getBeforeEndAmtStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getBeforeEndAmt()==null?"0.00":decimalFormat.format(this.getBeforeEndAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
     }
 
     public String getSettleAmtStr() {

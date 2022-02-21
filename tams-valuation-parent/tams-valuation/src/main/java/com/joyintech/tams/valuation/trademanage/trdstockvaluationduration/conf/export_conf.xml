@@ -8,9 +8,9 @@
             <Cell order="4" name="资产代码">assetId</Cell>
             <Cell order="5" name="资产名称">assetAbbr</Cell>
             <Cell order="6" name="交易类型">psStr</Cell>
-            <Cell order="7" name="权益登记日">regDate</Cell>
-            <Cell order="8" name="除权（除息）日">exRightsDate</Cell>
-            <Cell order="9" name="派息日">dividDate</Cell>
+            <Cell order="7" name="权益登记日">regDateStr</Cell>
+            <Cell order="8" name="除权（除息）日">exRightsDateStr</Cell>
+            <Cell order="9" name="派息日">dividDateStr</Cell>
             <Cell order="10" name="权益登记日股本">amount</Cell>
             <Cell order="11" name="分红金额">bonusAmt</Cell>
             <Cell order="12" name="分红股本">devidentAmt</Cell>
