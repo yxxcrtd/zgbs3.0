@@ -34,7 +34,8 @@
                BOK_SUBJECT.BAL_FLAG "balFlag",
                SCIDS.NODE_VALUE "nodeValue",
                NVL(scenExt.BOK_DETAIL_ID,BOK_SCENESUBJECT.BOK_DETAIL_ID) "bokDetailId",
-               BOK_SCENESUBJECT.BOOKSET_ID booksetId
+               BOK_SCENESUBJECT.BOOKSET_ID booksetId,
+               BOK_TABLEDICT.DICT_SOURCE as dictSource
         FROM BOK_SCENESUBJECT BOK_SCENESUBJECT
         INNER JOIN SCIDS 
             ON SCIDS.BOOKSET_ID = BOK_SCENESUBJECT.BOOKSET_ID

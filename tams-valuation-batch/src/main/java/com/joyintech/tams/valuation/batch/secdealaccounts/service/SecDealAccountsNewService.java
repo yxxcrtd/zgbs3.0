@@ -746,6 +746,19 @@ public class SecDealAccountsNewService {
         // 交易金额 <- 交易明细.交易金额
         accountAmountMap.put(BookConstant.DEALAMT,
             ArithmeticUtil.round(dealNow.getTradeAmt(), NumberEnum.MONEY));
+        // add by weipeng on 20220221 区分资金账户金额元素 start
+        // 本方资金账户类型 或 对方资金账户类型对应资金账户类型，赋值对应金额元素
+        if(DictCodeListExt1.资金账户类型_产品托管户.getValue().equals(dealNow.getAcctType())){
+            accountAmountMap.put(BookConstant.DEALAMT_HQ, dealNow.getTradeAmt());
+        }
+        else if(DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(dealNow.getAcctType())){
+            accountAmountMap.put(BookConstant.DEALAMT_JS, dealNow.getTradeAmt());
+        }
+        // 券商资金账户现划分在结算备付金科目性质下
+        else if(DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(dealNow.getAcctType())){
+            accountAmountMap.put(BookConstant.DEALAMT_JS, dealNow.getTradeAmt());
+        }
+        // add by weipeng on 20220221 区分资金账户金额元素 end
 
         /** modify by yanya on 20210301 存续期增加提前交收处理 start**/
         //定义 变量.交易本金 = 交易明细.全价总额
@@ -1059,6 +1072,19 @@ public class SecDealAccountsNewService {
         // 实收金额 <- 交易明细.交易金额
         accountAmountMap.put(BookConstant.DEALAMT,
             ArithmeticUtil.round(dealNow.getTradeAmt(), NumberEnum.MONEY));
+        // add by weipeng on 20220221 区分资金账户金额元素 start
+        // 本方资金账户类型 或 对方资金账户类型对应资金账户类型，赋值对应金额元素
+        if(DictCodeListExt1.资金账户类型_产品托管户.getValue().equals(dealNow.getAcctType())){
+            accountAmountMap.put(BookConstant.DEALAMT_HQ, dealNow.getTradeAmt());
+        }
+        else if(DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(dealNow.getAcctType())){
+            accountAmountMap.put(BookConstant.DEALAMT_JS, dealNow.getTradeAmt());
+        }
+        // 券商资金账户现划分在结算备付金科目性质下
+        else if(DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(dealNow.getAcctType())){
+            accountAmountMap.put(BookConstant.DEALAMT_JS, dealNow.getTradeAmt());
+        }
+        // add by weipeng on 20220221 区分资金账户金额元素 end
 
         /** modify by yanya on 20210301 存续期增加提前交收处理 start**/
         //定义 变量.交易金额_清算款 = 0

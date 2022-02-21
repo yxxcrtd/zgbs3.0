@@ -283,7 +283,14 @@ public class SettlementInstructionNewService {
             //金额要素 和 金额元素 对应的币种 塞值
             accountAmountMap.put(BookConstant.DEALAMT, dto.getSettleAmt());//结算金额         
             accountCurrencyMap.put(BookConstant.DEALAMT, dto.getCcy());
-            
+
+            // add by weipeng on 20220221 区分资金账户金额元素 start
+            // 定义 资金账户对应金额
+            BigDecimal 资金账户金额 = dto.getSettleAmt();
+            // 定义 变量.资金账户币种
+            String 资金账户币种 = dto.getCcy();
+            // add by weipeng on 20220221 区分资金账户金额元素 end
+
             /**针对2740 业务场景特殊处理**/
             if(DictCodeListTableId.会计场景代码_资金划款_债券类资产申购确认.getValue().equals(dto.getOrderType())){
             	TrdProductDealDTO deal = this.getTrdProductDealDto(booksetId, dto.getTradeId());
@@ -300,6 +307,11 @@ public class SettlementInstructionNewService {
 	            	//补缴款金额
 	                accountAmountMap.put(BookConstant.SUPAMT, deal.getTradeAmt());
 	                accountCurrencyMap.put(BookConstant.SUPAMT, deal.getCcy());
+                    // add by weipeng on 20220221 区分资金账户金额元素 start
+	                // 资金账户交易金额 = 补缴款金额
+                    资金账户金额 = deal.getTradeAmt();
+                    资金账户币种 = deal.getCcy();
+                    // add by weipeng on 20220221 区分资金账户金额元素 end
 	                
 	                //账务明细代码3
 	                accountSceneMap.put(BookConstant.BOK_DETAIL_ID3,deal.getBokDetailId3());
@@ -363,7 +375,36 @@ public class SettlementInstructionNewService {
             }
             /**针对【2903】业务场景特殊处理 by yanya on 20201217 end **/
 
-
+            // add by weipeng on 20220221 区分资金账户金额元素 start
+            // 定义 变量.本方资金账户类型
+            String myAcctType= valBokDetailIdForMy.getBusiDetailType();
+            // 定义 变量.对方资金账户类型
+            String counterAcctType = valBokDetailIdForOther.getBusiDetailType();
+            // 本方资金账户类型 或 对方资金账户类型对应资金账户类型，赋值对应金额元素
+            if(DictCodeListExt1.资金账户类型_产品托管户.getValue().equals(myAcctType)
+                    || DictCodeListExt1.资金账户类型_产品托管户.getValue().equals(counterAcctType)){
+                accountAmountMap.put(BookConstant.DEALAMT_HQ, 资金账户金额);
+                accountCurrencyMap.put(BookConstant.DEALAMT_HQ, 资金账户币种);
+            }
+            else if(DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(myAcctType)
+                    || DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(counterAcctType)){
+                accountAmountMap.put(BookConstant.DEALAMT_JS, 资金账户金额);
+                accountCurrencyMap.put(BookConstant.DEALAMT_JS, 资金账户币种);
+            }
+            // 券商资金账户现划分在结算备付金科目性质下
+            else if(DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(myAcctType)
+                    || DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(counterAcctType)){
+                accountAmountMap.put(BookConstant.DEALAMT_JS, 资金账户金额);
+                accountCurrencyMap.put(BookConstant.DEALAMT_JS, 资金账户币种);
+            }
+            // 券商资金账户现划分在结算备付金科目性质下
+            else if(DictCodeListExt1.资金账户类型_交易保证金账户.getValue().equals(myAcctType)
+                    || DictCodeListExt1.资金账户类型_交易保证金账户.getValue().equals(counterAcctType)){
+                accountAmountMap.put(BookConstant.DEALAMT_CC, 资金账户金额);
+                accountCurrencyMap.put(BookConstant.DEALAMT_CC, 资金账户币种);
+            }
+            // add by weipeng on 20220221 区分资金账户金额元素 end
+            
             // map塞入场景要素管理中
             ad.setAccountSceneMap(accountSceneMap);// 记账场景要素
             ad.setAccountAmountMap(accountAmountMap);// 记账金额要素

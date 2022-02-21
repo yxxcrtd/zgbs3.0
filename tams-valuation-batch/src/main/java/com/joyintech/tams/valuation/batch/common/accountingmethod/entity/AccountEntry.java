@@ -100,6 +100,11 @@ public class AccountEntry {
     private String booksetId;
 
     /**
+     * 元素数据来源
+     */
+    private String dictSource;
+
+    /**
      * 科目信息列表
      */
     private List<BokSubject> bokSubjectList;
@@ -365,7 +370,7 @@ public class AccountEntry {
     }
 
     /**
-     * 返回 科目信息列表
+     * 获取 科目信息列表
      * @return 科目信息列表
      */
     public List<BokSubject> getBokSubjectList() {
@@ -378,5 +383,21 @@ public class AccountEntry {
      */
     public void setBokSubjectList(List<BokSubject> bokSubjectList) {
         this.bokSubjectList = bokSubjectList;
+    }
+
+    /**
+     * 获取 元素数据来源
+     * @return 元素数据来源
+     */
+    public String getDictSource() {
+        return dictSource;
+    }
+
+    /**
+     * 设置 元素数据来源
+     * @param dictSource 元素数据来源
+     */
+    public void setDictSource(String dictSource) {
+        this.dictSource = dictSource;
     }
 }

@@ -120,7 +120,7 @@ public class BookAccountGenLogicNew {
 
         // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑 start
         // 按照内部科目编码分录，则需要映射分录对应科目信息
-        generateEntrySubjectInfo(accountEntrys, accountSceneMap, accountDriver.getTableId());
+        generateEntrySubjectInfo(accountEntrys, accountSceneMap, accountAmountMap, accountDriver.getTableId());
         // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑 end
 
         // 遍历步骤获取的列表，循环生成明细凭证信息
@@ -1460,7 +1460,7 @@ public class BookAccountGenLogicNew {
      * @param accountEntries 会计分录
      * @param accountSceneMap 会计场景元素
      */
-    public void generateEntrySubjectInfo(List<AccountEntry> accountEntries, Map<String, Object> accountSceneMap, String tableId){
+    public void generateEntrySubjectInfo(List<AccountEntry> accountEntries, Map<String, Object> accountSceneMap, Map<String, BigDecimal> accountAmountMap, String tableId){
         String booksetId = (String)accountSceneMap.get(BookConstant.BOOKSET_ID);
         // 定义 变量.币种 = 会计场景元素.币种
         String ccy = (String)accountSceneMap.get(BookConstant.CCY);
@@ -1493,15 +1493,35 @@ public class BookAccountGenLogicNew {
             if(CollectionUtils.isEmpty(entrySubjectList)){
                 continue;
             }
+            // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑 end
+            // 若对应记账金额元素为空或为非0入账且金额为0，则不记账，跳过
+            if(accountAmountMap.get(accountEntry.getFormElement() + BookConstant.BCCYAMT)== null){
+                if (accountAmountMap.get(accountEntry.getFormElement()) == null
+                        || (!DictCodeList.是否_是.getValue().equals(
+                        accountSceneMap.get(
+                                BookConstant.IS_ZERO_ACCOUNT))
+                        && BigDecimal.ZERO.compareTo(
+                        accountAmountMap.get(accountEntry.getFormElement())) == 0)) {
+                    continue;
+                }
+            }else{
+                if (accountAmountMap.get(accountEntry.getFormElement()) == null
+                        || (!DictCodeList.是否_是.getValue().equals(
+                        accountSceneMap.get(
+                                BookConstant.IS_ZERO_ACCOUNT))
+                        && BigDecimal.ZERO.compareTo(
+                        accountAmountMap.get(accountEntry.getFormElement())) == 0
+                        && BigDecimal.ZERO.compareTo(
+                        accountAmountMap.get(accountEntry.getFormElement() + BookConstant.BCCYAMT)) == 0)) {
+                    continue;
+                }
+            }
             // 获取账务明细代码
             BokDetailId bokDetailId =(BokDetailId)accountSceneMap.get(accountEntry.getBokDetailId());
             // 根据账务明细代码获取对应辅助核算项
             SubjectMappingConfig mappingConfig = subjectMappingConfigMap.get(bokDetailId.getBokDetailId());
-            // 判断对应内部科目编码是否为应付交易费用,
-            if(DictCodeBaseSubjectNatrueNew.应付交易费用_费用.getValue().equals(accountEntry.getSubjectId())){
-                // 对应费用类型为会计分录对应金额元素
-                mappingConfig.setFeeType(accountEntry.getFormElement());
-            }
+            // 此处可直接赋值，分录中费用类型对应的会计元素，数据来源会设置为对应费用类型，可直接赋值费用类型，非费用类型的用不到，赋值也不会有问题
+            mappingConfig.setFeeType(accountEntry.getDictSource());
             // 定义 变量.资产辅助核算项 封装辅助核算项为map对象
             Map<String, Object> params = initMappingParams(mappingConfig);
             // 定义 变量.默认辅助核算项 封装辅助核算项为map对象
@@ -1570,7 +1590,7 @@ public class BookAccountGenLogicNew {
     public Map<String,Object> initMappingParams(SubjectMappingConfig mappingConfig){
         Map<String, Object> params = new HashMap<>();
         params.put(SubjectConfigCode.证券品种.getValue(), mappingConfig.getSecType());
-        params.put(SubjectConfigCode.债券核算分类.getValue(), mappingConfig.getType2());
+        params.put(SubjectConfigCode.债券类型.getValue(), mappingConfig.getType2());
         params.put(SubjectConfigCode.交易市场.getValue(), mappingConfig.getTradeMarket());
         params.put(SubjectConfigCode.交易对手.getValue(), mappingConfig.getTradeMarket());
         params.put(SubjectConfigCode.发行方式.getValue(), mappingConfig.getIssueType());
