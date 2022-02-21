@@ -8,6 +8,7 @@ import com.joyintech.service.valuation.trademanage.trdsecovertransfervaluationdu
 import com.joyintech.service.valuation.trademanage.trdsecovertransfervaluationduration.dto.TrdSecOverTransferValuationDuration001Dto;
 import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.valuation.common.interf.base.batch.dao.ValCommonBatchMapper;
+import com.joyintech.tams.valuation.common.interf.base.batch.dao.ValFinTradeProductBatchMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,9 @@ public class TrdSecOverTransferValuationDuration001Service extends BaseService {
 
     @Autowired
     private ValCommonBatchMapper valCommonBatchMapper;
+
+    @Autowired
+    private ValFinTradeProductBatchMapper valFinTradeProductBatchMapper;
 
     /**
      * 分页查询
@@ -123,6 +127,7 @@ public class TrdSecOverTransferValuationDuration001Service extends BaseService {
         count += valCommonBatchMapper.delProductDealByTradeId(listDeal);
         // 7.账务明细代码表 BOK_DETAIL_ID
         count += trdSecOverTransferValuationDurationMapper.delBokDetailIdByTradeId(params);
+        //8.FinTradeProduct
 
         return count;
     }

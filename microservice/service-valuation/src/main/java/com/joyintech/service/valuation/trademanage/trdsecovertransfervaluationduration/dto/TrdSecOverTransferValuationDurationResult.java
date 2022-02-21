@@ -11,7 +11,6 @@
 package com.joyintech.service.valuation.trademanage.trdsecovertransfervaluationduration.dto;
 
 import com.joyintech.framework.base.BaseEntity;
-import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDuration002Dto;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.valuation.common.interf.base.dto.AssetDealInfoValCommonResult;
 
@@ -45,7 +44,7 @@ public class TrdSecOverTransferValuationDurationResult extends BaseEntity {
      * 金融产品实物交易表
      */
     private List<TrdFinProductBarter> listValFinProductBarter = new ArrayList<TrdFinProductBarter>();
-    
+
     /**
      * 交易类金融产品
      */
@@ -60,7 +59,7 @@ public class TrdSecOverTransferValuationDurationResult extends BaseEntity {
      * 账务明细表
      */
     private List<BokDealAccountingDetail> listValDealAccountingDetail = new ArrayList<BokDealAccountingDetail>();
-    
+
     /**
      * 账务明细代码表 add by wujie on 20180712
      */
@@ -73,31 +72,31 @@ public class TrdSecOverTransferValuationDurationResult extends BaseEntity {
     /**
      * 结算指令表
      */
-   private List<StlOrders> valOrdersList = new ArrayList<StlOrders>();
+    private List<StlOrders> valOrdersList = new ArrayList<StlOrders>();
     /**
      * 结算指令拓展表
      */
-   private List<StlOrdersExt> valOrdersExtList = new ArrayList<StlOrdersExt>();
+    private List<StlOrdersExt> valOrdersExtList = new ArrayList<StlOrdersExt>();
     /**
      * 日志
      */
     private List<ValInterflog> valInterflog = new ArrayList<ValInterflog>();
-    
+
+    private TrdSecOverTransferValuationDuration002Dto trdSecOverTransferValuationDuration002Dto;
+
     /**
      * 读取数据数量
      */
     private int dataNum;
 
-    private TrdBondValuationDuration002Dto trdBondValuationDuration002Dto;
-    
-    
+
     public TrdSecOverTransferValuationDurationResult() {
 
     }
 
     /**
      * 重载构造方法 从valuation-common中返回的result重新赋值
-     * 
+     *
      * @param rtnResult 共通结果
      */
     public TrdSecOverTransferValuationDurationResult(AssetDealInfoValCommonResult result) {
@@ -122,7 +121,7 @@ public class TrdSecOverTransferValuationDurationResult extends BaseEntity {
 
     /**
      * 获取 金融产品交易
-     * 
+     *
      * @return 金融产品交易.
      */
     public List<TrdProductDeal> getListValFinProductDeal() {
@@ -131,7 +130,7 @@ public class TrdSecOverTransferValuationDurationResult extends BaseEntity {
 
     /**
      * 设置 金融产品交易
-     * 
+     *
      * @param listValFinProductDeal 金融产品交易
      */
     public void setListValFinProductDeal(List<TrdProductDeal> listValFinProductDeal) {
@@ -140,7 +139,7 @@ public class TrdSecOverTransferValuationDurationResult extends BaseEntity {
 
     /**
      * 获取 估值核算交易扩展表
-     * 
+     *
      * @return 估值核算交易扩展表.
      */
     public List<TrdProductDealAdd> getListValFinProductDealExt() {
@@ -149,7 +148,7 @@ public class TrdSecOverTransferValuationDurationResult extends BaseEntity {
 
     /**
      * 设置 估值核算交易扩展表
-     * 
+     *
      * @param listValFinProductDealExt 估值核算交易扩展表
      */
     public void setListValFinProductDealExt(List<TrdProductDealAdd> listValFinProductDealExt) {
@@ -158,7 +157,7 @@ public class TrdSecOverTransferValuationDurationResult extends BaseEntity {
 
     /**
      * 获取 入账信息表
-     * 
+     *
      * @return 入账信息表.
      */
     public List<BokDealAccounting> getListValDealAccounting() {
@@ -167,7 +166,7 @@ public class TrdSecOverTransferValuationDurationResult extends BaseEntity {
 
     /**
      * 设置 入账信息表
-     * 
+     *
      * @param listValDealAccounting 入账信息表
      */
     public void setListValDealAccounting(List<BokDealAccounting> listValDealAccounting) {
@@ -176,7 +175,7 @@ public class TrdSecOverTransferValuationDurationResult extends BaseEntity {
 
     /**
      * 获取 账务明细表
-     * 
+     *
      * @return 账务明细表.
      */
     public List<BokDealAccountingDetail> getListValDealAccountingDetail() {
@@ -185,36 +184,36 @@ public class TrdSecOverTransferValuationDurationResult extends BaseEntity {
 
     /**
      * 设置 账务明细表
-     * 
+     *
      * @param listValDealAccountingDetail 账务明细表
      */
     public void setListValDealAccountingDetail(List<BokDealAccountingDetail> listValDealAccountingDetail) {
         this.listValDealAccountingDetail = listValDealAccountingDetail;
     }
-    
+
     /**add by wujie on 20180712 start**/
     /**
      * 获取 账务明细代码表
-     * 
+     *
      * @return 账务明细代码表.
      */
     public List<BokDetailId> getListValBokDetailId() {
-		return listValBokDetailId;
-	}
+        return listValBokDetailId;
+    }
 
     /**
      * 设置 账务明细代码表
-     * 
+     *
      * @param listValBokDetailId 账务明细代码表
      */
-	public void setListValBokDetailId(List<BokDetailId> listValBokDetailId) {
-		this.listValBokDetailId = listValBokDetailId;
-	}
-	/**add by wujie on 20180712 end**/
+    public void setListValBokDetailId(List<BokDetailId> listValBokDetailId) {
+        this.listValBokDetailId = listValBokDetailId;
+    }
+    /**add by wujie on 20180712 end**/
 
     /**
      * 获取 交易费用明细表
-     * 
+     *
      * @return 交易费用明细表.
      */
     public List<TrdTradeFeeDetail> getListValTradeFeeDetail() {
@@ -222,9 +221,9 @@ public class TrdSecOverTransferValuationDurationResult extends BaseEntity {
     }
 
 
-	/**
+    /**
      * 设置 交易费用明细表
-     * 
+     *
      * @param listValTradeFeeDetail 交易费用明细表
      */
     public void setListValTradeFeeDetail(List<TrdTradeFeeDetail> listValTradeFeeDetail) {
@@ -233,7 +232,7 @@ public class TrdSecOverTransferValuationDurationResult extends BaseEntity {
 
     /**
      * 获取 日志
-     * 
+     *
      * @return 日志.
      */
     public List<ValInterflog> getValInterflog() {
@@ -242,29 +241,29 @@ public class TrdSecOverTransferValuationDurationResult extends BaseEntity {
 
     /**
      * 设置 日志
-     * 
+     *
      * @param valInterflog 日志
      */
     public void setValInterflog(List<ValInterflog> valInterflog) {
         this.valInterflog = valInterflog;
     }
 
-	public List<StlOrders> getValOrdersList() {
-		return valOrdersList;
-	}
+    public List<StlOrders> getValOrdersList() {
+        return valOrdersList;
+    }
 
-	public void setValOrdersList(List<StlOrders> valOrdersList) {
-		this.valOrdersList = valOrdersList;
-	}
+    public void setValOrdersList(List<StlOrders> valOrdersList) {
+        this.valOrdersList = valOrdersList;
+    }
 
-	public List<StlOrdersExt> getValOrdersExtList() {
-		return valOrdersExtList;
-	}
+    public List<StlOrdersExt> getValOrdersExtList() {
+        return valOrdersExtList;
+    }
 
-	public void setValOrdersExtList(List<StlOrdersExt> valOrdersExtList) {
-		this.valOrdersExtList = valOrdersExtList;
-	}
-	
+    public void setValOrdersExtList(List<StlOrdersExt> valOrdersExtList) {
+        this.valOrdersExtList = valOrdersExtList;
+    }
+
     /**
      * 用于存放去重数据筛选条件
      */
@@ -307,7 +306,7 @@ public class TrdSecOverTransferValuationDurationResult extends BaseEntity {
     public void setListValFinProductBarter(List<TrdFinProductBarter> listValFinProductBarter) {
         this.listValFinProductBarter = listValFinProductBarter;
     }
-    
+
     /**
      * 获取 listValFinTradeProduct
      * @return listValFinTradeProduct.
@@ -324,11 +323,11 @@ public class TrdSecOverTransferValuationDurationResult extends BaseEntity {
         this.listValFinTradeProduct = listValFinTradeProduct;
     }
 
-    public TrdBondValuationDuration002Dto getTrdBondValuationDuration002Dto() {
-        return trdBondValuationDuration002Dto;
+    public TrdSecOverTransferValuationDuration002Dto getTrdSecOverTransferValuationDuration002Dto() {
+        return trdSecOverTransferValuationDuration002Dto;
     }
 
-    public void setTrdBondValuationDuration002Dto(TrdBondValuationDuration002Dto trdBondValuationDuration002Dto) {
-        this.trdBondValuationDuration002Dto = trdBondValuationDuration002Dto;
+    public void setTrdSecOverTransferValuationDuration002Dto(TrdSecOverTransferValuationDuration002Dto trdSecOverTransferValuationDuration002Dto) {
+        this.trdSecOverTransferValuationDuration002Dto = trdSecOverTransferValuationDuration002Dto;
     }
 }
