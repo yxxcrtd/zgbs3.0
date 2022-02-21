@@ -53,18 +53,18 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
     综合收益类_公允价值变动(
         "ZHSYL_GYJZBD"
     ),
-    /**
-     * 基金投资_成本
-     */
-    基金投资_成本(
-        "JJTZ_CB"
-    ),
-    /**
-     * 基金投资_估值增值
-     */
-    基金投资_估值增值(
-        "JJTZ_GZZZ"
-    ),
+//    /**
+//     * 基金投资_成本
+//     */
+//    基金投资_成本(
+//        "JJTZ_CB"
+//    ),
+//    /**
+//     * 基金投资_估值增值
+//     */
+//    基金投资_估值增值(
+//        "JJTZ_GZZZ"
+//    ),
     /**
      * 计划类资产_成本
      */
@@ -775,12 +775,12 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
     公允价值损益类_计划类资产_公允价值变动(
         "GYJZSYL_JHLZC_LXTZ"
     ),
-    /**
-     * 应收红利
-     */
-    应收红利(
-        "YSHL"
-    ),
+//    /**
+//     * 应收红利
+//     */
+//    应收红利(
+//        "YSHL"
+//    ),
     /**
      * 表外科目
      */
@@ -855,12 +855,12 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
         "QTYFK_BJ"
         ),
 
-    /**
-     * 计划类（货币型）资产-成本
-     */
-    计划类_货币型资产_成本(
-        "JHLHBX_CB"
-        ),
+//    /**
+//     * 计划类（货币型）资产-成本
+//     */
+//    计划类_货币型资产_成本(
+//        "JHLHBX_CB"
+//        ),
     /**
      * 计划类（净值型）资产-成本
      */
@@ -1133,6 +1133,12 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
      */
     清算资金往来(
             "QSKZJWL_Z"
+    ),
+    /**
+     * 应收股利(应收红利)
+     */
+    应收股利(
+            "YSGL_Z"
     ),
     /** ==========原科目性质修改======== end**/
     /** ==========新增科目性质======== start**/
