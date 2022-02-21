@@ -3,11 +3,11 @@ package com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
-import com.joyintech.framework.validation.annotation.NotEmpty;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntity {
@@ -38,43 +38,36 @@ public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntit
     /**
      * 金融产品代码
      */
-    @NotEmpty(fieldName = "产品代码")
     private String prodId;
 
     /**
      * 金融产品名称
      */
-    @NotEmpty(fieldName = "产品名称")
     private String prodName;
 
     /**
      * 债券代码
      */
-    @NotEmpty(fieldName = "转出证券代码")
     private String oAssetId;
 
     /**
      * 债券简称
      */
-    @NotEmpty(fieldName = "转出证券名称")
     private String oAssetAbbr;
 
     /**
      * 转入证券代码
      */
-    @NotEmpty(fieldName = "转入证券代码")
     private String cAssetId;
 
     /**
      * 转入证券名称
      */
-    @NotEmpty(fieldName = "转入证券名称")
     private String cAssetAbbr;
 
     /**
      * 交易方向
      */
-    @NotEmpty(fieldName = "交易类型")
     private String ps;
 
     /**
@@ -86,80 +79,68 @@ public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntit
     /**
      * 交易日
      */
-    @NotEmpty(fieldName = "交易日")
-    private String tradeDate;
+    private Date tradeDate;
 
     /**
      * 交割日期
      */
-    @NotEmpty(fieldName = "交割日")
-    private String settdateDate;
+    private Date settdateDate;
 
     /**
      * 投资目的
      */
-    @NotEmpty(fieldName = "会计分类")
     private String invAim;
 
     /**
      * 转出证券数量
      */
-    @NotEmpty(fieldName = "转出证券数量")
     @JsonSerialize(using= BigDecimalSerializer.class)
     private BigDecimal oTradeNum;
 
     /**
      * 转出证券金额
      */
-    @NotEmpty(fieldName = "转出证券金额")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal oTradeAmt;
 
     /**
      * 转入证券数量
      */
-    @NotEmpty(fieldName = "转入证券数量")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal cTradeNum;
 
     /**
      * 转入证券金额
      */
-    @NotEmpty(fieldName = "转入证券金额")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal cTradeAmt;
 
     /**
      * 币种
      */
-    @NotEmpty(fieldName = "币种")
     private String ccy;
 
 
     /**
      * 交易费用
      */
-    @NotEmpty(fieldName = "交易费用")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal tradeAmt;
 
     /**
      * 其他费用
      */
-    @NotEmpty(fieldName = "其他费用")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal otherAmt;
 
     /**
      * 结算金额
      */
-    @NotEmpty(fieldName = "结算金额")
     private BigDecimal settleAmt;
 
     /**
      * 资金账户
      */
-    @NotEmpty(fieldName = "资金账户")
     private String acctNo;
 
     public String getProdId() {
@@ -186,19 +167,19 @@ public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntit
         this.tradeId = tradeId;
     }
 
-    public String getTradeDate() {
+    public Date getTradeDate() {
         return tradeDate;
     }
 
-    public void setTradeDate(String tradeDate) {
+    public void setTradeDate(Date tradeDate) {
         this.tradeDate = tradeDate;
     }
 
-    public String getSettdateDate() {
+    public Date getSettdateDate() {
         return settdateDate;
     }
 
-    public void setSettdateDate(String settdateDate) {
+    public void setSettdateDate(Date settdateDate) {
         this.settdateDate = settdateDate;
     }
 

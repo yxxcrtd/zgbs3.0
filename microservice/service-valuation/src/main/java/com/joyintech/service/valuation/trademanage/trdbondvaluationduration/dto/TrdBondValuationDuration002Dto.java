@@ -7,6 +7,7 @@ import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 public class TrdBondValuationDuration002Dto extends BaseEntity implements ProcessEntity {
@@ -68,12 +69,12 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
     /**
      * 计划支付日
      */
-    private String planPayDate;
+    private Date planPayDate;
 
     /**
      * 资金交收日
      */
-    private String fundSettleDate;
+    private Date fundSettleDate;
 
     /**
      * 投资目的
@@ -155,11 +156,11 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
         this.tradeId = tradeId;
     }
 
-    public String getFundSettleDate() {
+    public Date getFundSettleDate() {
         return fundSettleDate;
     }
 
-    public void setFundSettleDate(String fundSettleDate) {
+    public void setFundSettleDate(Date fundSettleDate) {
         this.fundSettleDate = fundSettleDate;
     }
 
@@ -259,11 +260,11 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
         this.assetAbbr = assetAbbr;
     }
 
-    public String getPlanPayDate() {
+    public Date getPlanPayDate() {
         return planPayDate;
     }
 
-    public void setPlanPayDate(String planPayDate) {
+    public void setPlanPayDate(Date planPayDate) {
         this.planPayDate = planPayDate;
     }
 

@@ -45,7 +45,7 @@ public class TrdBondValuationDuration001Dto extends BaseEntity {
     /**
      * 交易日
      */
-    private String tradeDate;
+    private Date tradeDate;
 
     /**
      * 会计分类
@@ -71,7 +71,7 @@ public class TrdBondValuationDuration001Dto extends BaseEntity {
     /**
      * 资金交收日
      */
-    private String fundSettleDate;
+    private Date fundSettleDate;
 
     /**
      * 币种
@@ -158,19 +158,19 @@ public class TrdBondValuationDuration001Dto extends BaseEntity {
         this.tradeId = tradeId;
     }
 
-    public String getTradeDate() {
+    public Date getTradeDate() {
         return tradeDate;
     }
 
-    public void setTradeDate(String tradeDate) {
+    public void setTradeDate(Date tradeDate) {
         this.tradeDate = tradeDate;
     }
 
-    public String getFundSettleDate() {
+    public Date getFundSettleDate() {
         return fundSettleDate;
     }
 
-    public void setFundSettleDate(String fundSettleDate) {
+    public void setFundSettleDate(Date fundSettleDate) {
         this.fundSettleDate = fundSettleDate;
     }
 

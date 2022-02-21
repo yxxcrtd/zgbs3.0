@@ -114,8 +114,8 @@ public class TrdBondValuationDuration002Service extends BaseService {
             List<TrdProductDeal> listInsert = new ArrayList<TrdProductDeal>();
             for (TrdProductDeal e : listValFinProductDeal) {
                     listInsert.add(e);
-                    valFinProductDealBatchMapper.insertBatch(listInsert);
                 }
+            valFinProductDealBatchMapper.insertBatch(listInsert);
         }
 
         // 金融产品实物交易
@@ -126,8 +126,8 @@ public class TrdBondValuationDuration002Service extends BaseService {
             List<TrdFinProductBarter> listInsert = new ArrayList<TrdFinProductBarter>();
             for (TrdFinProductBarter e : listTrdFinProductBarter) {
                     listInsert.add(e);
-                    valTrdFinProductBarterBatchMapper.insertBatch(listInsert);
                 }
+            valTrdFinProductBarterBatchMapper.insertBatch(listInsert);
         }
 
         // 估值核算交易扩展表
@@ -138,8 +138,8 @@ public class TrdBondValuationDuration002Service extends BaseService {
             List<TrdProductDealAdd> listInsert = new ArrayList<TrdProductDealAdd>();
             for (TrdProductDealAdd e : listValFinProductDealExt) {
                 listInsert.add(e);
-                valTrdProductDealAddBatchMapper.insertBatch(listInsert);
             }
+            valTrdProductDealAddBatchMapper.insertBatch(listInsert);
         }
 
         // 交易类金融产品
@@ -150,8 +150,8 @@ public class TrdBondValuationDuration002Service extends BaseService {
             List<FinTradeProduct> listInsert = new ArrayList<FinTradeProduct>();
             for (FinTradeProduct e : listValFinTradeProduct) {
                 listInsert.add(e);
-                valFinTradeProductBatchMapper.insertBatch(listInsert);
             }
+            valFinTradeProductBatchMapper.insertBatch(listInsert);
         }
 
         // 入账信息表
@@ -161,9 +161,9 @@ public class TrdBondValuationDuration002Service extends BaseService {
             // 定义一个固定大小插入存放集合
             List<BokDealAccounting> listInsert = new ArrayList<BokDealAccounting>();
             for (BokDealAccounting e : listValDealAccounting) {
-                    listInsert.add(e);
-                    valDealAccountingBatchMapper.insertBatch(listInsert);
+                listInsert.add(e);
             }
+            valDealAccountingBatchMapper.insertBatch(listInsert);
         }
 
         // 账务明细表
@@ -174,8 +174,8 @@ public class TrdBondValuationDuration002Service extends BaseService {
             List<BokDealAccountingDetail> listInsert = new ArrayList<BokDealAccountingDetail>();
             for (BokDealAccountingDetail e : listValDealAccountingDetail) {
                 listInsert.add(e);
-                valDealAccountingDetailBatchMapper.insertBatch(listInsert);
             }
+            valDealAccountingDetailBatchMapper.insertBatch(listInsert);
         }
 
         //账务明细代码表
@@ -187,8 +187,8 @@ public class TrdBondValuationDuration002Service extends BaseService {
             List<BokDetailId> listInsert = new ArrayList<BokDetailId>();
             for (BokDetailId e : listValBokDetailId) {
                 listInsert.add(e);
-                valBokDetailIdBatchMapper.insertBatch(listInsert);
             }
+            valBokDetailIdBatchMapper.insertBatch(listInsert);
         }
 
         // 交易费用明细表
@@ -198,9 +198,9 @@ public class TrdBondValuationDuration002Service extends BaseService {
             // 定义一个固定大小插入存放集合
             List<TrdTradeFeeDetail> listInsert = new ArrayList<TrdTradeFeeDetail>();
             for (TrdTradeFeeDetail e : listValTradeFeeDetail) {
-                    listInsert.add(e);
-                    valTradeFeeDetailBatchMapper.insertBatch(listInsert);
+                listInsert.add(e);
             }
+            valTradeFeeDetailBatchMapper.insertBatch(listInsert);
         }
         //结算指令表
         List<StlOrders>  ValOrdersList=result.getValOrdersList();
@@ -209,9 +209,9 @@ public class TrdBondValuationDuration002Service extends BaseService {
             // 定义一个固定大小插入存放集合
             List<StlOrders> listInsert = new ArrayList<StlOrders>();
             for (StlOrders e : ValOrdersList) {
-                    listInsert.add(e);
-                    valOrdersBatchMapper.insertBatch(listInsert);
+                listInsert.add(e);
             }
+            valOrdersBatchMapper.insertBatch(listInsert);
         }
         //结算指令拓展表
         List<StlOrdersExt> ValOrdersExtList=result.getValOrdersExtList();
@@ -220,9 +220,9 @@ public class TrdBondValuationDuration002Service extends BaseService {
             // 定义一个固定大小插入存放集合
             List<StlOrdersExt> listInsert = new ArrayList<StlOrdersExt>();
             for (StlOrdersExt e : ValOrdersExtList) {
-                    listInsert.add(e);
-                    valOrdersExtBatchMapper.insertBatch(listInsert);
+                listInsert.add(e);
             }
+            valOrdersExtBatchMapper.insertBatch(listInsert);
         }
         return 1;
     }

@@ -31,7 +31,8 @@
                         <div class="pro-module-item">
                             <div class="layui-form-item">
                                 <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-lable">交易编号</label>
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdBondChangeTrade002.tradeId}">交易编号</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" id="tradeId" name="tradeId"
                                                required disabled
@@ -41,7 +42,8 @@
                                     </div>
                                 </div>
                                 <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-lable">外部成交编号</label>
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdBondChangeTrade002.outTradeId}">外部成交编号</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" id="outTradeId" name="outTradeId"
                                                class="layui-input form-input"
@@ -49,7 +51,8 @@
                                     </div>
                                 </div>
                                 <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-lable">产品代码</label>
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdBondChangeTrade002.prodId}">产品代码</label>
                                         <div class="layui-input-inline input-inline" >
                                             <select id="prodId" name="prodId" required
                                                     class="layui-input form-input input-select"
@@ -63,7 +66,8 @@
                             </div>
                             <div class="layui-form-item">
                                 <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-label-wrap">产品名称</label>
+                                    <label class="layui-form-label form-label-wrap"
+                                           data-th-text="#{TrdBondChangeTrade002.prodName}">产品名称</label>
                                     <div class="layui-input-inline input-inline">
                                         <input  type="text" id="prodName" name="prodName" required
                                                class="layui-input form-input" placeholder="请输入内容"
@@ -73,7 +77,8 @@
                                 </div>
                                 <!--默认展示可转债和基金-->
                                 <div class="form-inline-wrap" id="oAssetIdDiv1" >
-                                    <label class="layui-form-label form-lable" >转出证券代码</label>
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdBondChangeTrade002.oAssetId}">转出证券代码</label>
                                     <div class="layui-input-inline input-inline">
                                         <select id="oAssetId" name="oAssetId" required
                                                 class="layui-input form-input input-select"
@@ -86,7 +91,8 @@
                                 </div>
                                 <!--展示可转债-->
                                 <div class="form-inline-wrap" id="oAssetIdDiv2" style="display: none;">
-                                    <label class="layui-form-label form-lable" >转出证券代码</label>
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdBondChangeTrade002.oAssetIdSec}">转出证券代码</label>
                                     <div class="layui-input-inline input-inline">
                                         <select id="oAssetIdSec" name="oAssetIdSec" required
                                                 class="layui-input form-input input-select"
@@ -99,7 +105,8 @@
                                 </div>
                                 <!--展示基金-->
                                 <div class="form-inline-wrap" id="oAssetIdDiv3" style="display: none;">
-                                    <label class="layui-form-label form-lable" >转出证券代码</label>
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdBondChangeTrade002.oAssetIdFund}">转出证券代码</label>
                                     <div class="layui-input-inline input-inline">
                                         <select id="oAssetIdFund" name="oAssetIdFund" required
                                                 class="layui-input form-input input-select"
@@ -111,7 +118,8 @@
                                     </div>
                                 </div>
                                 <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-lable">转出证券名称</label>
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdBondChangeTrade002.oAssetAbbr}">转出证券名称</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" id="oAssetAbbr" name="oAssetAbbr"
                                                class="layui-input form-input"
@@ -123,7 +131,8 @@
                             </div>
                             <div class="layui-form-item">
                                 <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-lable">会计分类</label>
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdBondChangeTrade002.invAim}">会计分类</label>
                                     <div class="layui-input-inline input-inline">
                                         <select type="text" id="invAim" name="invAim" required
                                                 class="layui-input form-input input-select"
@@ -136,7 +145,8 @@
                                 </div>
                                 <!--默认展示股票代码和基金-->
                                 <div class="form-inline-wrap" id="cAssetIdDiv1">
-                                    <label class="layui-form-label form-lable" >转入证券代码</label>
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdBondChangeTrade002.cAssetId}">转入证券代码</label>
                                     <div class="layui-input-inline input-inline">
                                         <select id="cAssetId" name="cAssetId" required
                                                 class="layui-input form-input input-select"
@@ -149,7 +159,8 @@
                                 </div>
                                 <!--展示股票代码-->
                                 <div class="form-inline-wrap" id="cAssetIdDiv2" style="display: none;">
-                                    <label class="layui-form-label form-lable" >转入证券代码</label>
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdBondChangeTrade002.cAssetIdSec}">转入证券代码</label>
                                     <div class="layui-input-inline input-inline">
                                         <select id="cAssetIdSec" name="cAssetIdSec" required
                                                 class="layui-input form-input input-select"
@@ -162,7 +173,8 @@
                                 </div>
                                 <!--展示基金-->
                                 <div class="form-inline-wrap" id="cAssetIdDiv3" style="display: none;">
-                                    <label class="layui-form-label form-lable" >转入证券代码</label>
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdBondChangeTrade002.cAssetIdFund}">转入证券代码</label>
                                     <div class="layui-input-inline input-inline">
                                         <select id="cAssetIdFund" name="cAssetIdFund" required
                                                 class="layui-input form-input input-select"
@@ -174,7 +186,8 @@
                                     </div>
                                 </div>
                                 <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-lable">转入证券名称</label>
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdBondChangeTrade002.cAssetAbbr}">转入证券名称</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" id="cAssetAbbr" name="cAssetAbbr"
                                                class="layui-input form-input"
@@ -186,7 +199,8 @@
                             </div>
                             <div class="layui-form-item">
                                 <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-lable" >交易类型</label>
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdBondChangeTrade002.ps}">交易类型</label>
                                     <div class="layui-input-inline input-inline">
                                         <select type="text" id="ps" name="ps" required
                                                 class="layui-input form-input input-select"
@@ -199,21 +213,23 @@
                                     </div>
                                 </div>
                                 <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-lable" >交易日</label>
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdBondChangeTrade002.tradeDate}">交易日</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" id="tradeDate" name="tradeDate" required
                                                class="layui-input form-input input-dateSelect" placeholder="请输入内容"
                                                data-th-placeholder="#{SysCommon.placeholder}"
-                                               data-th-value="${entity?.tradeDate}">
+                                               data-th-value='${#dates.format(entity?.tradeDate,"yyyy-MM-dd")}'>
                                     </div>
                                 </div>
                                 <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-lable" >交割日</label>
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdBondChangeTrade002.settdateDate}">交割日</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" id="settdateDate" name="settdateDate" required
                                                class="layui-input form-input input-dateSelect" placeholder="请输入内容"
                                                data-th-placeholder="#{SysCommon.placeholder}"
-                                               data-th-value="${entity?.settdateDate}">
+                                               data-th-value='${#dates.format(entity?.settdateDate,"yyyy-MM-dd")}'>
                                     </div>
                                 </div>
                             </div>
@@ -228,7 +244,8 @@
                     <div class="pro-module-item">
                         <div class="layui-form-item">
                             <div class="form-inline-wrap">
-                                <label class="layui-form-label form-lable">转出证券数量</label>
+                                <label class="layui-form-label form-lable"
+                                       data-th-text="#{TrdBondChangeTrade002.oTradeNum}">转出证券数量</label>
                                 <div class="layui-input-inline input-inline">
                                     <input type="text" id="oTradeNum" name="oTradeNum" required
                                            class="layui-input form-input text-number"
@@ -237,7 +254,8 @@
                                 </div>
                             </div>
                             <div class="form-inline-wrap">
-                                <label class="layui-form-label form-lable">转出证券金额</label>
+                                <label class="layui-form-label form-lable"
+                                       data-th-text="#{TrdBondChangeTrade002.oTradeAmt}">转出证券金额</label>
                                 <div class="layui-input-inline input-inline">
                                     <input type="text" id="oTradeAmt" name="oTradeAmt" required
                                            class="layui-input form-input text-number"
@@ -246,7 +264,8 @@
                                 </div>
                             </div>
                             <div class="form-inline-wrap">
-                                <label class="layui-form-label form-label-wrap">转入证券数量</label>
+                                <label class="layui-form-label form-label-wrap"
+                                       data-th-text="#{TrdBondChangeTrade002.cTradeNum}">转入证券数量</label>
                                 <div class="layui-input-inline input-inline">
                                     <input type="text" id="cTradeNum" name="cTradeNum" required
                                            class="layui-input form-input text-number"
@@ -257,7 +276,8 @@
                         </div>
                         <div class="layui-form-item">
                             <div class="form-inline-wrap">
-                                <label class="layui-form-label form-label-wrap">转入证券金额</label>
+                                <label class="layui-form-label form-label-wrap"
+                                       data-th-text="#{TrdBondChangeTrade002.cTradeAmt}">转入证券金额</label>
                                 <div class="layui-input-inline input-inline">
                                     <input type="text" id="cTradeAmt" name="cTradeAmt" required
                                            class="layui-input form-input text-number" placeholder="请输入内容"
@@ -266,7 +286,8 @@
                                 </div>
                             </div>
                             <div class="form-inline-wrap">
-                                <label class="layui-form-label form-label-wrap">币种</label>
+                                <label class="layui-form-label form-label-wrap"
+                                       data-th-text="#{TrdBondChangeTrade002.ccy}">币种</label>
                                 <div class="layui-input-inline input-inline">
                                     <select  type="text" id="ccy" name="ccy" required
                                             class="layui-input form-input input-select"
@@ -289,7 +310,8 @@
                         <div class="pro-module-item">
                             <div class="layui-form-item">
                                 <div class="form-inline-wrap" >
-                                    <label class="layui-form-label form-label-wrap">交易费用</label>
+                                    <label class="layui-form-label form-label-wrap"
+                                           data-th-text="#{TrdBondChangeTrade002.tradeAmt}">交易费用</label>
                                     <div class="layui-input-inline input-inline">
                                         <input  type="text" id="tradeAmt" name="tradeAmt" required
                                                 class="layui-input form-input text-number" placeholder="请输入内容"
@@ -298,7 +320,8 @@
                                     </div>
                                 </div>
                                 <div class="form-inline-wrap" >
-                                    <label class="layui-form-label form-label-wrap">其他费用</label>
+                                    <label class="layui-form-label form-label-wrap"
+                                           data-th-text="#{TrdBondChangeTrade002.otherAmt}">其他费用</label>
                                     <div class="layui-input-inline input-inline">
                                         <input  type="text" id="otherAmt" name="otherAmt" required
                                                 class="layui-input form-input text-number" placeholder="请输入内容"
@@ -318,7 +341,8 @@
                     <div class="pro-module-item">
                         <div class="layui-form-item">
                             <div class="form-inline-wrap" >
-                                <label class="layui-form-label form-label-wrap">结算金额</label>
+                                <label class="layui-form-label form-label-wrap"
+                                       data-th-text="#{TrdBondChangeTrade002.settleAmt}">结算金额</label>
                                 <div class="layui-input-inline input-inline">
                                     <input  type="text" id="settleAmt" name="settleAmt" required
                                             class="layui-input form-input text-number" placeholder="请输入内容"
@@ -327,9 +351,10 @@
                                 </div>
                             </div>
                             <div class="form-inline-wrap" >
-                                <label class="layui-form-label form-label-wrap">资金账户</label>
+                                <label class="layui-form-label form-label-wrap"
+                                       data-th-text="#{TrdBondChangeTrade002.acctNo}">资金账户</label>
                                 <div class="layui-input-inline input-inline" >
-                                    <select id="acctNo" name="acctNo" required parentIds="prodId"
+                                    <select id="acctNo" name="acctNo"
                                             class="layui-input form-input input-select"
                                             data-th-data-url="@{/valuation/trademanage/trdbondchangevaluationtrade/TrdBondChangeTrade001/getTrdAcctId}"
                                             allowClear="true" placeholder="请输入内容"

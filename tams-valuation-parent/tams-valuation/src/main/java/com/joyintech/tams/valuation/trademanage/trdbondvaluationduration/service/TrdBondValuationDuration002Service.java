@@ -2,7 +2,6 @@ package com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.servic
 
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
@@ -71,7 +70,7 @@ public class TrdBondValuationDuration002Service extends CommonExportService<TrdB
         List<ValSecVestPeriod> listValSecVestPeriod = new ArrayList<>();
         ValSecVestPeriod entity = new ValSecVestPeriod();
         BeanUtil.copyPropertiesIgnoreNull(entity,dto);
-        entity.setFundSettleDate(DateUtil.parse(dto.getFundSettleDate()));
+        entity.setFundSettleDate(dto.getFundSettleDate());
         //比较界面和接口字段差异，并手动给接口字段赋值
         entity.setAssetId("F01_"+dto.getAssetId());
         entity.setSecId(dto.getAssetId());

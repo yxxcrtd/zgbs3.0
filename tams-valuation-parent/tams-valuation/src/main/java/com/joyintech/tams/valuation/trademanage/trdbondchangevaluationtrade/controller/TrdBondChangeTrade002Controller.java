@@ -19,6 +19,7 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeListExt2;
@@ -35,11 +36,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -249,7 +250,8 @@ public class TrdBondChangeTrade002Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("check")
-    public AjaxResult check(@Valid @RequestBody TrdBondChangeTrade002Dto trdBondChangeTrade002Dto,
+    public AjaxResult check(@RequestBody @Validated({
+            ValidateGroupEdit.class}) TrdBondChangeTrade002Dto trdBondChangeTrade002Dto,
                               BindingResult result) {
         return commonCheck(result, trdBondChangeTrade002Dto.getOperateType());
     }
@@ -266,7 +268,8 @@ public class TrdBondChangeTrade002Controller extends BaseController {
      */
     @RequestMapping("save")
     @ResponseBody
-    AjaxResult save(@RequestBody @Valid TrdBondChangeTrade002Dto dto, BindingResult br)
+    AjaxResult save(@RequestBody @Validated({
+            ValidateGroupEdit.class}) TrdBondChangeTrade002Dto dto, BindingResult br)
         throws Exception {
 
         if (br.hasErrors()) {
@@ -290,7 +293,7 @@ public class TrdBondChangeTrade002Controller extends BaseController {
         workFlowParameter.setBusinessType(DictCodeListExt2.业务类型_证券转换交易.getValue());
         workFlowParameter.setComment((entity) -> WorkFlowUtil.concatComment(
             getMessage("交易编号") + GlobalConstant.COLON + entity.getTradeId(),
-            getMessage("交易日") + GlobalConstant.COLON + entity.getTradeDate()));
+            getMessage("交易日") + GlobalConstant.COLON + DateUtil.format(entity.getTradeDate())));
 
         String msg = trdBondChangeTrade002Service.start(processParameter, dto);
 

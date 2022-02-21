@@ -3,6 +3,7 @@ package com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.dto;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
@@ -46,7 +47,7 @@ public class TrdBondValuationDuration001Dto extends BaseEntity implements Proces
     /**
      * 交易日
      */
-    private String tradeDate;
+    private Date tradeDate;
 
     /**
      * 会计分类
@@ -72,7 +73,7 @@ public class TrdBondValuationDuration001Dto extends BaseEntity implements Proces
     /**
      * 资金交收日
      */
-    private String fundSettleDate;
+    private Date fundSettleDate;
 
     /**
      * 币种
@@ -159,20 +160,28 @@ public class TrdBondValuationDuration001Dto extends BaseEntity implements Proces
         this.tradeId = tradeId;
     }
 
-    public String getTradeDate() {
+    public Date getTradeDate() {
         return tradeDate;
     }
 
-    public void setTradeDate(String tradeDate) {
+    public void setTradeDate(Date tradeDate) {
         this.tradeDate = tradeDate;
     }
 
-    public String getFundSettleDate() {
+    public String getTradeDateStr() {
+        return DateUtil.format(this.getTradeDate());
+    }
+
+    public Date getFundSettleDate() {
         return fundSettleDate;
     }
 
-    public void setFundSettleDate(String fundSettleDate) {
+    public void setFundSettleDate(Date fundSettleDate) {
         this.fundSettleDate = fundSettleDate;
+    }
+
+    public String getFundSettleDateStr() {
+        return DateUtil.format(this.getFundSettleDate());
     }
 
     public String getInvAim() {
@@ -276,6 +285,10 @@ public class TrdBondValuationDuration001Dto extends BaseEntity implements Proces
 
     public void setPlandate(Date plandate) {
         this.plandate = plandate;
+    }
+
+    public String getPlandateStr() {
+        return DateUtil.format(this.getPlandate());
     }
 
     public String getSettleAmtStr() {

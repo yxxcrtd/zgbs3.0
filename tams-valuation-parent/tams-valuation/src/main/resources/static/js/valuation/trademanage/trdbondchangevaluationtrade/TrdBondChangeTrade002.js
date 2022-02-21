@@ -243,10 +243,10 @@
         });
 
         // 绑定按钮事件
-        $('#TrdBondTrade002_btn_save').click(function() {
+        $('#TrdBondChangeTrade002_btn_save').click(function() {
             saveOrSubmit('save');
         });
-        $('#TrdBondTrade002_btn_submit').click(function() {
+        $('#TrdBondChangeTrade002_btn_submit').click(function() {
             saveOrSubmit('submit');
         });
 

@@ -3,7 +3,6 @@ package com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.ser
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
@@ -164,8 +163,8 @@ public class TrdBondChangeTrade002Service extends CommonExportService<TrdBondCha
         entity.setProdId(dto.getProdId());
         entity.setSecId(dto.getoAssetId());
         entity.setSecAbbr(dto.getoAssetAbbr());
-        entity.setDealDate(DateUtil.parse(dto.getTradeDate()));
-        entity.setSettdateDate(DateUtil.parse(dto.getSettdateDate()));
+        entity.setDealDate(dto.getTradeDate());
+        entity.setSettdateDate(dto.getSettdateDate());
         entity.setPs(dto.getPs());
         entity.setDealNum(dto.getoTradeNum());
         entity.setCcy(dto.getCcy());
@@ -274,7 +273,7 @@ public class TrdBondChangeTrade002Service extends CommonExportService<TrdBondCha
         entity.setAssetName(dto.getoAssetAbbr());
         entity.setCcy(dto.getCcy());
         entity.setPs(dto.getPs());
-        entity.setTradeDate(DateUtil.parse(dto.getTradeDate()));
+        entity.setTradeDate(dto.getTradeDate());
         entity.setShareAmt(dto.getoTradeNum());
         entity.setPrinAmt(dto.getoTradeAmt());
         entity.setTradeAmt(dto.getoTradeAmt());

@@ -18,6 +18,7 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
@@ -32,11 +33,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -146,7 +147,8 @@ public class TrdBondValuationDuration002Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("check")
-    public AjaxResult check(@Valid @RequestBody TrdBondValuationDuration002Dto trdBondValuationDuration002Dto,
+    public AjaxResult check(@RequestBody @Validated({
+            ValidateGroupEdit.class}) TrdBondValuationDuration002Dto trdBondValuationDuration002Dto,
                             BindingResult result) {
         return commonCheck(result, trdBondValuationDuration002Dto.getOperateType());
     }
@@ -163,7 +165,8 @@ public class TrdBondValuationDuration002Controller extends BaseController {
      */
     @RequestMapping("save")
     @ResponseBody
-    AjaxResult save(@RequestBody @Valid TrdBondValuationDuration002Dto dto, BindingResult br)
+    AjaxResult save(@RequestBody @Validated({
+            ValidateGroupEdit.class}) TrdBondValuationDuration002Dto dto, BindingResult br)
             throws Exception {
 
         if (br.hasErrors()) {

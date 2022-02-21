@@ -208,7 +208,7 @@ public class TrdBondChangeTrade001Controller extends BaseController {
 
         // 设置流程业务说明, entity即传入的dto
         params.setComment(entity -> WorkFlowUtil.concatComment("证券转换交易删除：", entity.getTradeId(),
-                entity.getTradeDate()
+                DateUtil.format(entity.getTradeDate())
         ));
 
         // 塞入流程参数

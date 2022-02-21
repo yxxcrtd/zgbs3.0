@@ -13,8 +13,8 @@
             tfpb.FINPROD_ID cAssetId,/**转入证券代码**/
             fp.FINPROD_ABBR cAssetAbbr,/**转入证券名称**/
             t.PS ps,/**交易方向**/
-            to_char(t.TRADE_DATE,'yyyy-mm-dd') tradeDate,/**交易日**/
-            to_char(t.SETTLE_DATE,'yyyy-mm-dd') settleDate,/**交割日期**/
+            t.TRADE_DATE tradeDate,/**交易日**/
+            t.SETTLE_DATE settleDate,/**交割日期**/
             t.INV_AIM invAim,/**会计分类**/
             t.SHARE_AMT oTradeNum,/**成交数量**/
             t.trade_amt oTradeAmt,/**全价总额**/
@@ -101,8 +101,8 @@
             fp.FINPROD_MARKET_ID cAssetId,/**转入证券代码**/
             fp.FINPROD_ABBR cAssetAbbr,/**转入证券名称**/
             t.PS ps,/**交易方向**/
-            to_char(t.TRADE_DATE,'yyyy-mm-dd') tradeDate,/**交易日**/
-            to_char(t.SETTLE_DATE,'yyyy-mm-dd') settdateDate,/**交割日期**/
+            t.TRADE_DATE tradeDate,/**交易日**/
+            t.SETTLE_DATE settdateDate,/**交割日期**/
             t.INV_AIM invAim,/**会计分类**/
             t.SHARE_AMT oTradeNum,/**转出证券数量**/
             t.trade_amt oTradeAmt,/**转出证券金额**/
