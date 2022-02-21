@@ -20,6 +20,7 @@ import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.trdintovaluationduration.dto.TrdIntoValuationDuration001Dto;
 import com.joyintech.tams.valuation.trademanage.trdintovaluationduration.service.TrdIntoValuationDuration002Service;
@@ -133,10 +134,10 @@ public class TrdIntoValuationDuration002Controller extends BaseController {
         }
 
         params.setBusinessCode(dto.getTradeId());
-        params.setBusinessType(DictCodeList.共通业务类型_基金类资产交易.getValue());
+        params.setBusinessType(DictCodeListExt2.共通业务类型_债券借贷存续期.getValue());
         // 设置流程业务说明, entity即传入的dto
         params.setComment(
-                entity -> SpringContextUtil.getTextValue("TrdDepositValuationTrade001.tradeId")+"("+ entity.getTradeId() +")"+"-"+SpringContextUtil.getTextValue("TrdDepositValuationTrade002.tradeDate") + "(" + DateUtil.format(entity.getTradeDate()) + ")"
+                entity -> SpringContextUtil.getTextValue("交易id")+"("+ entity.getTradeId() +")"+"-"+SpringContextUtil.getTextValue("交易日期") + "(" + DateUtil.format(entity.getTradeDate()) + ")"
         );
         //给参数变成ProcessParameter而非WorkFlowParameter
         ProcessParameter<TrdIntoValuationDuration001Dto> parameter = new ProcessParameter<TrdIntoValuationDuration001Dto>();

@@ -83,7 +83,7 @@ public class TrdDepoValuationDuration002Service extends BaseService<TrdDepoValua
             action = "update";
         }
 
-        restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdDepositValuationTrade001/" + action, trdDepoValuationDurationResult, Integer.class);
+        restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdDepoValuationDuration001/" + action, trdDepoValuationDurationResult, Integer.class);
     }
 
     //封装实体类

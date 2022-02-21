@@ -20,6 +20,8 @@ import com.joyintech.system.constant.SystemGlobalConstant;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 
+import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.valuation.trademanage.trdintovaluationduration.dto.TrdIntoValuationDuration001Dto;
 import com.joyintech.tams.valuation.trademanage.trdintovaluationduration.service.TrdIntoValuationDuration001Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -85,7 +87,7 @@ public class TrdIntoValuationDuration001Controller extends BaseController {
     public Page<SelectOptionDto> findPortfolioId(HttpServletRequest request) {
         Map<String, Object> param =RequestUtil.getPageParam();
         //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-//        param.put("finprodType", "F01"); //测试
+        param.put("finprodType", "F16"); //测试
         return trdIntoValuationDuration001Service.findPortfolioId(param);
     }
 
@@ -98,7 +100,7 @@ public class TrdIntoValuationDuration001Controller extends BaseController {
     public Page<SelectOptionDto> findFinprodId(HttpServletRequest request) {
         Map<String, Object> param =RequestUtil.getPageParam();
         //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-        param.put("finprodType", "F01"); //测试
+//        param.put("finprodType", "F16"); //测试
         return trdIntoValuationDuration001Service.findFinprodId(param);
     }
 
@@ -119,14 +121,14 @@ public class TrdIntoValuationDuration001Controller extends BaseController {
         // 业务代码（凭证流水号）
         params.setBusinessCode(item -> item.getTradeId());
         // 业务类型
-        params.setBusinessType(DictCodeList.业务类型_银行间债券交易.getValue());
+        params.setBusinessType(DictCodeListExt2.共通业务类型_债券借贷存续期.getValue());
         // 页面id
-        params.setPageId("BondTradeQuery001");
+        params.setPageId("TrdIntoValuationDuration002");
         // 元素id
         params.setElementId(dto.getElementId());
 
         // 设置流程业务说明, entity即传入的dto
-        params.setComment(entity -> WorkFlowUtil.concatComment("存款类存续期删除：", entity.getTradeId(),
+        params.setComment(entity -> WorkFlowUtil.concatComment("融入券存续期删除：", entity.getTradeId(),
                 DateUtil.format(entity.getTradeDate(),DateUtil.DEFAULT_DATETIME_FORMAT)
         ));
 
