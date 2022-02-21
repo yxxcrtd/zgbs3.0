@@ -84,7 +84,7 @@ public class TrdFixIncomeValuDuration001Controller extends BaseController {
     public Page<SelectOptionDto> findPortfolioId(HttpServletRequest request) {
         Map<String, Object> param =RequestUtil.getPageParam();
         //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-//        param.put("finprodType", "F01"); //测试
+        param.put("finprodType", "F16"); //测试
         return trdFixIncomeValuDuration001Service.findPortfolioId(param);
     }
 
@@ -118,9 +118,9 @@ public class TrdFixIncomeValuDuration001Controller extends BaseController {
         // 业务代码（凭证流水号）
         params.setBusinessCode(item -> item.getTradeId());
         // 业务类型
-        params.setBusinessType(DictCodeList.业务类型_银行间债券交易.getValue());
+        params.setBusinessType(DictCodeList.共通业务类型_计划类资产_净值型_存续期.getValue());
         // 页面id
-        params.setPageId("BondTradeQuery001");
+        params.setPageId("TrdFixIncomeValuDuration002");
         // 元素id
         params.setElementId(dto.getElementId());
 

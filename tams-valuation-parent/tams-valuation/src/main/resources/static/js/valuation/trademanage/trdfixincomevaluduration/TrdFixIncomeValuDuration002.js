@@ -26,9 +26,9 @@ $(function() {
         Joyin.ajaxJson(basePath + 'valuation/trademanage/trdfixincomevaluduration/TrdFixIncomeValuDuration002/check', object, function(result) {
             Joyin.confirm(result.data, function() {
                 if (operateType === 'save') {
-                    WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdfixincomevaluduration/TrdFixIncomeValuDuration002/save', object, "TrdIntoValuationDuration002_btn_save");
+                    WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdfixincomevaluduration/TrdFixIncomeValuDuration002/save', object, "TrdFixIncomeValuDuration002_btn_save");
                 } else {
-                    WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdfixincomevaluduration/TrdFixIncomeValuDuration002/save', object, "TrdIntoValuationDuration002_btn_submit");
+                    WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdfixincomevaluduration/TrdFixIncomeValuDuration002/save', object, "TrdFixIncomeValuDuration002_btn_submit");
                 }
             });
         })

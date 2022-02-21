@@ -9,8 +9,9 @@ import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
-import com.joyintech.tams.valuation.common.interf.base.dto.AssetDealInfoValCommonResult;
-import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.sec.SecVestPeriodTemplateRecService;
+import com.joyintech.tams.valuation.common.interf.base.dto.PlannedAssetDealCommonResult;
+import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.mngasset.PlannedPeriodTradeTemplateRecService;
+import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValMngPeriodTrade;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValSecVestPeriod;
 import com.joyintech.tams.valuation.trademanage.trdfixincomevaluduration.dto.TrdFixIncomeValuDuration001Dto;
 import com.joyintech.tams.valuation.trademanage.trdfixincomevaluduration.dto.TrdFixIncomeValuDurationResult;
@@ -19,6 +20,7 @@ import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 
@@ -26,7 +28,7 @@ import java.util.*;
 public class TrdFixIncomeValuDuration002Service extends BaseService<TrdFixIncomeValuDuration001Dto> implements BaseProcessService<TrdFixIncomeValuDuration001Dto> {
 
     @Autowired
-    private SecVestPeriodTemplateRecService secVestPeriodTemplateRecService;
+    private PlannedPeriodTradeTemplateRecService plannedPeriodTradeTemplateRecService;
 
     /**
      * 根据交易编号查询详情
@@ -77,54 +79,58 @@ public class TrdFixIncomeValuDuration002Service extends BaseService<TrdFixIncome
         params.put("INTERF_BOOKSETID",prodIds);
         params.put("VAL_MODEL","INTERF_MODEL_SINGLE");
 
-        List<ValSecVestPeriod> listValSecVestPeriod = new ArrayList<>();
-        ValSecVestPeriod entity = new ValSecVestPeriod();
+        List<ValMngPeriodTrade> listValMngPeriodTrade = new ArrayList<>();
+        ValMngPeriodTrade entity = new ValMngPeriodTrade();
         BeanUtil.copyPropertiesIgnoreNull(entity,dto);
 //        entity.setFundSettleDate(DateUtil.parse(dto.getFundSettleDate()));
         //比较界面和接口字段差异，并手动给接口字段赋值
-//        entity.setAssetId("F01_"+dto.getAssetId());
-//        entity.setSecId(dto.getAssetId());
-//        entity.setSecAbbr(dto.getAssetAbbr());
-//        entity.setDataActionSign("01");//数据动作标志
-//        entity.setIsAmt("N");//是否还本带息
-//        entity.setVdate(new Date());//计息开始日
-//        entity.setMdate(new Date());//计息结束日
-//        entity.setParValue(new BigDecimal(100));//单位面值
-//        entity.setSettleDate(new Date());//交割日
-//        entity.setTradeDate(new Date());//交易日
-//        entity.setIsClean("N");//有无清算指令
-//        entity.setDealNum(new BigDecimal(0));//成交数量
+        entity.setProdId(dto.getPortfolioId());
+        entity.setTradeId(dto.getTradeId());  //交易编号
+        entity.setAssetId("F01_"+dto.getFinprodMarketId());  //资产代码
+        entity.setAssetName(dto.getFinprodName()); //资产名称
+        entity.setDataActionSign("01");//数据动作标志
+        entity.setDealType(dto.getPs());//交易类型
+        entity.setIsInt("Y"); //是否还本带息
+        entity.setVdate(new Date()); //计息开始日
+        entity.setMdate(new Date()); //计息结束日
+        entity.setPlanPayDate(new Date()); //计划
+        entity.setPayDate(new Date()); //实际支付日
+        entity.setActInt(dto.getActInt()); //实收利息
+        entity.setActCapi(dto.getActCapi()); //实收本金
+        entity.setDealAmt(dto.getActInt().add(dto.getActCapi())); //交易金额=实收本金+实收利息
+        entity.setInvAim(dto.getInvAim()); //投资目的=会计分类
+        entity.setParValue(new BigDecimal(100.00)); //单位面值
+        entity.setSettleDate(dto.getSettleDate()); //交割日 =settleDate
+        entity.setIsClean2("Y");//是否结清
+        entity.setCcy(dto.getCcy());//币种
+        entity.setTradeId(dto.getTradeId());  //交易编号
+        entity.setIsClean("Y");//有无清算指令
 
-        listValSecVestPeriod.add(entity);
-        Map<String, Object> map = secVestPeriodTemplateRecService.handleValSecVestPeriod(listValSecVestPeriod,new Date(),params,null);
-        AssetDealInfoValCommonResult result = new AssetDealInfoValCommonResult();
-        // 金融产品交易List
-        List<TrdProductDeal> listValFinProductDeal = (List<TrdProductDeal>)map.get(
-                "ValFinProductDeal");
-        result.setListValFinProductDeal(listValFinProductDeal);
-        // 估值核算交易扩展表List
-        List<TrdProductDealAdd> listValFinProductDealExt = (List<TrdProductDealAdd>)map.get(
-                "ValFinProductDealExt");
-        result.setListValFinProductDealExt(listValFinProductDealExt);
-        // 入账信息表List
-        List<BokDealAccounting> listValDealAccounting = (List<BokDealAccounting>)map.get(
-                "ValDealAccounting");
-        result.setListValDealAccounting(listValDealAccounting);
-        // 账务明细表List
-        List<BokDealAccountingDetail> listValDealAccountingDetail = (List<BokDealAccountingDetail>)map.get(
-                "ValDealAccountingDetail");
-        result.setListValDealAccountingDetail(listValDealAccountingDetail);
-        // 账务明细代码表List
-        List<BokDetailId> listValBokDetailId = (List<BokDetailId>)map.get(
-                "ValBokDetailId");
+        listValMngPeriodTrade.add(entity);
+        Map<String, Object> map = plannedPeriodTradeTemplateRecService.handleListValMngPeriodTrade(listValMngPeriodTrade,new Date(),params,null);
+        // 定义返回变量
+        PlannedAssetDealCommonResult result = new PlannedAssetDealCommonResult();
+        List<TrdProductDeal> listValFinProductDeal = (List<TrdProductDeal>)map.get("ValFinProductDeal");
+        List<TrdProductDealAdd> listValFinProductDealExt = (List<TrdProductDealAdd>)map.get("ValFinProductDealExt");
+        // 账务明细代码表
+        List<BokDetailId> listValBokDetailId = (List<BokDetailId>)map.get("ValBokDetailId");
+
+        List<TrdTradeFeeDetail> valTradeFeeDetailList = (List<TrdTradeFeeDetail>)map.get("ValTradeFeeDetail");
+        List<StlOrders> lsitValOrders = (List<StlOrders>)map.get("ValOrders");
+        List<StlOrdersExt> lsitValOrdersExt = (List<StlOrdersExt>)map.get("ValOrdersExt");
+
+        result.setListValDealAccounting((List<BokDealAccounting>)map.get("ValDealAccounting"));
+        result.setListValDealAccountingDetail((List<BokDealAccountingDetail>)map.get("ValDealAccountingDetail"));
+
         result.setListValBokDetailId(listValBokDetailId);
-        //结算指令表List
-        List<StlOrders> valOrdersList=(List<StlOrders>)map.get("valOrdersList");
-        result.setListValOrders(valOrdersList);
-        //结算指令拓展表list
-        List<StlOrdersExt> valOrdersExtList=(List<StlOrdersExt>)map.get("valOrdersExtList");
-        result.setListValOrdersExt(valOrdersExtList);
+
+        result.setListValFinProductDeal(listValFinProductDeal);
+        result.setListValFinProductDealExt(listValFinProductDealExt);
+        result.setValTradeFeeDetailList(valTradeFeeDetailList);
+        result.setValOrdersList(lsitValOrders);
+        result.setValOrdersExtList(lsitValOrdersExt);
         TrdFixIncomeValuDurationResult rst = new TrdFixIncomeValuDurationResult(result);
+        rst.setTrdFixIncomeValuDuration001Dto(dto);
         return rst;
     }
 

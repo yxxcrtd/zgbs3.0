@@ -13,6 +13,7 @@ package com.joyintech.tams.valuation.trademanage.trdfixincomevaluduration.dto;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.valuation.common.interf.base.dto.AssetDealInfoValCommonResult;
+import com.joyintech.tams.valuation.common.interf.base.dto.PlannedAssetDealCommonResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +31,16 @@ public class TrdFixIncomeValuDurationResult extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
+
+    private TrdFixIncomeValuDuration001Dto trdFixIncomeValuDuration001Dto;
+
+    public TrdFixIncomeValuDurationResult() {
+
+    }
+
+
     /**
-     * 金融产品交易
+     * 金融产品交易表
      */
     private List<TrdProductDeal> listValFinProductDeal = new ArrayList<TrdProductDeal>();
 
@@ -39,16 +48,6 @@ public class TrdFixIncomeValuDurationResult extends BaseEntity {
      * 估值核算交易扩展表
      */
     private List<TrdProductDealAdd> listValFinProductDealExt = new ArrayList<TrdProductDealAdd>();
-
-    /**
-     * 金融产品实物交易表
-     */
-    private List<TrdFinProductBarter> listValFinProductBarter = new ArrayList<TrdFinProductBarter>();
-
-    /**
-     * 交易类金融产品
-     */
-    private List<FinTradeProduct> listValFinTradeProduct = new ArrayList<FinTradeProduct>();
 
     /**
      * 入账信息表
@@ -60,94 +59,88 @@ public class TrdFixIncomeValuDurationResult extends BaseEntity {
      */
     private List<BokDealAccountingDetail> listValDealAccountingDetail = new ArrayList<BokDealAccountingDetail>();
 
-    /**
-     * 账务明细代码表 add by wujie on 20180712
-     */
-    private List<BokDetailId> listValBokDetailId = new ArrayList<BokDetailId>();
-
-    /**
-     * 交易费用明细表
-     */
-    private List<TrdTradeFeeDetail> listValTradeFeeDetail = new ArrayList<TrdTradeFeeDetail>();
-    /**
-     * 结算指令表
-     */
-   private List<StlOrders> valOrdersList = new ArrayList<StlOrders>();
-    /**
-     * 结算指令拓展表
-     */
-   private List<StlOrdersExt> valOrdersExtList = new ArrayList<StlOrdersExt>();
+    private List<BokDetailId> listValBokDetailId=new ArrayList<BokDetailId>();
     /**
      * 日志
      */
     private List<ValInterflog> valInterflog = new ArrayList<ValInterflog>();
+
+
+    /**
+     * 交易费用明细
+     */
+    private List<TrdTradeFeeDetail> valTradeFeeDetailList = new ArrayList<TrdTradeFeeDetail>();
+    /**
+     *
+     */
+    private List<StlOrders> valOrdersList = new ArrayList<StlOrders>();
+    /**
+     *
+     */
+    private List<StlOrdersExt> valOrdersExtList = new ArrayList<StlOrdersExt>();
+
+    /**
+     * 交易类金融产品
+     */
+    private List<FinTradeProduct> listValTradeFinProduct = new ArrayList<FinTradeProduct>();
 
     /**
      * 读取数据数量
      */
     private int dataNum;
 
-    private TrdFixIncomeValuDuration001Dto trdDepositValuationTrade001Dto;
-
-    public TrdFixIncomeValuDurationResult() {
-
-    }
 
     /**
      * 重载构造方法 从valuation-common中返回的result重新赋值
      *
      * @param rtnResult 共通结果
      */
-    public TrdFixIncomeValuDurationResult(AssetDealInfoValCommonResult result) {
-        this.setListValDealAccounting(result.getListValDealAccounting());
-        this.setListValDealAccountingDetail(result.getListValDealAccountingDetail());
-        this.setListValTradeFeeDetail(result.getListValTradeFeeDetail());
+    public TrdFixIncomeValuDurationResult(PlannedAssetDealCommonResult result) {
         this.setListValFinProductDeal(result.getListValFinProductDeal());
         this.setListValFinProductDealExt(result.getListValFinProductDealExt());
-        this.setListValFinProductBarter(result.getListValFinProductBarter());
+        this.setListValDealAccounting(result.getListValDealAccounting());
+        this.setListValDealAccountingDetail(result.getListValDealAccountingDetail());
         this.setValInterflog(result.getValInterflog());
-        /***add by wujie on 20180712 start*/
         this.setListValBokDetailId(result.getListValBokDetailId());
-        /***add by wujie on 20180712 end*/
-        this.setValOrdersList(result.getListValOrders());
-        this.setValOrdersExtList(result.getListValOrdersExt());
+        this.setValOrdersExtList(result.getValOrdersExtList());
+        this.setValOrdersList(result.getValOrdersList());
+        this.setValTradeFeeDetailList(result.getValTradeFeeDetailList());
+        this.setListValTradeFinProduct(result.getListValTradeFinProduct());
         this.setDataNum(result.getDataNum());
-        /***add by tanxuan on 20191227 start*/
-        this.setListValFinTradeProduct(result.getListValFinTradeProduct());
-        /***add by tanxuan on 20191227 end*/
         this.paramMap = result.getParamMap();
     }
 
+
     /**
-     * 获取 金融产品交易
-     * 
-     * @return 金融产品交易.
+     * 取得 金融产品交易
+     *
+     * @return 金融产品交易表
      */
     public List<TrdProductDeal> getListValFinProductDeal() {
         return listValFinProductDeal;
     }
 
     /**
-     * 设置 金融产品交易
-     * 
-     * @param listValFinProductDeal 金融产品交易
+     * 设置 金融产品交易表
+     *
+     * @param listValFinProductDeal 金融产品交易表
      */
     public void setListValFinProductDeal(List<TrdProductDeal> listValFinProductDeal) {
         this.listValFinProductDeal = listValFinProductDeal;
     }
 
     /**
-     * 获取 估值核算交易扩展表
-     * 
-     * @return 估值核算交易扩展表.
+     * 取得  估值核算交易扩展表
+     *
+     * @return 估值核算交易扩展表
      */
     public List<TrdProductDealAdd> getListValFinProductDealExt() {
         return listValFinProductDealExt;
     }
 
     /**
-     * 设置 估值核算交易扩展表
-     * 
+     * 设置  估值核算交易扩展表
+     *
      * @param listValFinProductDealExt 估值核算交易扩展表
      */
     public void setListValFinProductDealExt(List<TrdProductDealAdd> listValFinProductDealExt) {
@@ -155,9 +148,9 @@ public class TrdFixIncomeValuDurationResult extends BaseEntity {
     }
 
     /**
-     * 获取 入账信息表
-     * 
-     * @return 入账信息表.
+     * 取得 入账信息表
+     *
+     * @return 入账信息表
      */
     public List<BokDealAccounting> getListValDealAccounting() {
         return listValDealAccounting;
@@ -165,7 +158,7 @@ public class TrdFixIncomeValuDurationResult extends BaseEntity {
 
     /**
      * 设置 入账信息表
-     * 
+     *
      * @param listValDealAccounting 入账信息表
      */
     public void setListValDealAccounting(List<BokDealAccounting> listValDealAccounting) {
@@ -173,9 +166,9 @@ public class TrdFixIncomeValuDurationResult extends BaseEntity {
     }
 
     /**
-     * 获取 账务明细表
-     * 
-     * @return 账务明细表.
+     * 取得 账务明细表
+     *
+     * @return 账务明细表
      */
     public List<BokDealAccountingDetail> getListValDealAccountingDetail() {
         return listValDealAccountingDetail;
@@ -183,55 +176,17 @@ public class TrdFixIncomeValuDurationResult extends BaseEntity {
 
     /**
      * 设置 账务明细表
-     * 
-     * @param listValDealAccountingDetail 账务明细表
+     *
+     * @param listValCashPayRule 账务明细表
      */
     public void setListValDealAccountingDetail(List<BokDealAccountingDetail> listValDealAccountingDetail) {
         this.listValDealAccountingDetail = listValDealAccountingDetail;
     }
-    
-    /**add by wujie on 20180712 start**/
-    /**
-     * 获取 账务明细代码表
-     * 
-     * @return 账务明细代码表.
-     */
-    public List<BokDetailId> getListValBokDetailId() {
-		return listValBokDetailId;
-	}
 
-    /**
-     * 设置 账务明细代码表
-     * 
-     * @param listValBokDetailId 账务明细代码表
-     */
-	public void setListValBokDetailId(List<BokDetailId> listValBokDetailId) {
-		this.listValBokDetailId = listValBokDetailId;
-	}
-	/**add by wujie on 20180712 end**/
-
-    /**
-     * 获取 交易费用明细表
-     * 
-     * @return 交易费用明细表.
-     */
-    public List<TrdTradeFeeDetail> getListValTradeFeeDetail() {
-        return listValTradeFeeDetail;
-    }
-
-
-	/**
-     * 设置 交易费用明细表
-     * 
-     * @param listValTradeFeeDetail 交易费用明细表
-     */
-    public void setListValTradeFeeDetail(List<TrdTradeFeeDetail> listValTradeFeeDetail) {
-        this.listValTradeFeeDetail = listValTradeFeeDetail;
-    }
 
     /**
      * 获取 日志
-     * 
+     *
      * @return 日志.
      */
     public List<ValInterflog> getValInterflog() {
@@ -240,29 +195,85 @@ public class TrdFixIncomeValuDurationResult extends BaseEntity {
 
     /**
      * 设置 日志
-     * 
+     *
      * @param valInterflog 日志
      */
     public void setValInterflog(List<ValInterflog> valInterflog) {
         this.valInterflog = valInterflog;
     }
 
-	public List<StlOrders> getValOrdersList() {
-		return valOrdersList;
-	}
 
-	public void setValOrdersList(List<StlOrders> valOrdersList) {
-		this.valOrdersList = valOrdersList;
-	}
+    /**
+     * 获取 listValBokDetailId
+     * @return listValBokDetailId.
+     */
+    public List<BokDetailId> getListValBokDetailId() {
+        return listValBokDetailId;
+    }
 
-	public List<StlOrdersExt> getValOrdersExtList() {
-		return valOrdersExtList;
-	}
 
-	public void setValOrdersExtList(List<StlOrdersExt> valOrdersExtList) {
-		this.valOrdersExtList = valOrdersExtList;
-	}
-	
+    /**
+     * 设置 listValBokDetailId
+     * @param listValBokDetailId listValBokDetailId
+     */
+    public void setListValBokDetailId(List<BokDetailId> listValBokDetailId) {
+        this.listValBokDetailId = listValBokDetailId;
+    }
+
+
+    /**
+     * 获取 valTradeFeeDetailList
+     * @return valTradeFeeDetailList.
+     */
+    public List<TrdTradeFeeDetail> getValTradeFeeDetailList() {
+        return valTradeFeeDetailList;
+    }
+
+
+    /**
+     * 设置 valTradeFeeDetailList
+     * @param valTradeFeeDetailList valTradeFeeDetailList
+     */
+    public void setValTradeFeeDetailList(List<TrdTradeFeeDetail> valTradeFeeDetailList) {
+        this.valTradeFeeDetailList = valTradeFeeDetailList;
+    }
+
+
+    /**
+     * 获取 valOrdersList
+     * @return valOrdersList.
+     */
+    public List<StlOrders> getValOrdersList() {
+        return valOrdersList;
+    }
+
+
+    /**
+     * 设置 valOrdersList
+     * @param valOrdersList valOrdersList
+     */
+    public void setValOrdersList(List<StlOrders> valOrdersList) {
+        this.valOrdersList = valOrdersList;
+    }
+
+
+    /**
+     * 获取 valOrdersExtList
+     * @return valOrdersExtList.
+     */
+    public List<StlOrdersExt> getValOrdersExtList() {
+        return valOrdersExtList;
+    }
+
+
+    /**
+     * 设置 valOrdersExtList
+     * @param valOrdersExtList valOrdersExtList
+     */
+    public void setValOrdersExtList(List<StlOrdersExt> valOrdersExtList) {
+        this.valOrdersExtList = valOrdersExtList;
+    }
+
     /**
      * 用于存放去重数据筛选条件
      */
@@ -276,6 +287,25 @@ public class TrdFixIncomeValuDurationResult extends BaseEntity {
         this.paramMap = paramMap;
     }
 
+
+    /**
+     * 获取 listValTradeFinProduct
+     * @return listValTradeFinProduct.
+     */
+    public List<FinTradeProduct> getListValTradeFinProduct() {
+        return listValTradeFinProduct;
+    }
+
+
+    /**
+     * 设置 listValTradeFinProduct
+     * @param listValTradeFinProduct listValTradeFinProduct
+     */
+    public void setListValTradeFinProduct(List<FinTradeProduct> listValTradeFinProduct) {
+        this.listValTradeFinProduct = listValTradeFinProduct;
+    }
+
+
     /**
      * 获取 dataNum
      * @return dataNum.
@@ -283,6 +313,7 @@ public class TrdFixIncomeValuDurationResult extends BaseEntity {
     public int getDataNum() {
         return dataNum;
     }
+
 
     /**
      * 设置 dataNum
@@ -292,41 +323,11 @@ public class TrdFixIncomeValuDurationResult extends BaseEntity {
         this.dataNum = dataNum;
     }
 
-    /**
-     * 获取 listTrdFinProductBarter
-     */
-    public List<TrdFinProductBarter> getListValFinProductBarter() {
-        return listValFinProductBarter;
-    }
-    /**
-     * 设置 listTrdFinProductBarter
-     * @param listValFinProductBarter
-     */
-    public void setListValFinProductBarter(List<TrdFinProductBarter> listValFinProductBarter) {
-        this.listValFinProductBarter = listValFinProductBarter;
-    }
-    
-    /**
-     * 获取 listValFinTradeProduct
-     * @return listValFinTradeProduct.
-     */
-    public List<FinTradeProduct> getListValFinTradeProduct() {
-        return listValFinTradeProduct;
+    public TrdFixIncomeValuDuration001Dto getTrdFixIncomeValuDuration001Dto() {
+        return trdFixIncomeValuDuration001Dto;
     }
 
-    /**
-     * 设置 listValFinTradeProduct
-     * @param listValFinTradeProduct listValFinTradeProduct
-     */
-    public void setListValFinTradeProduct(List<FinTradeProduct> listValFinTradeProduct) {
-        this.listValFinTradeProduct = listValFinTradeProduct;
-    }
-
-    public TrdFixIncomeValuDuration001Dto getTrdDepositValuationTrade001Dto() {
-        return trdDepositValuationTrade001Dto;
-    }
-
-    public void setTrdDepositValuationTrade001Dto(TrdFixIncomeValuDuration001Dto trdDepositValuationTrade001Dto) {
-        this.trdDepositValuationTrade001Dto = trdDepositValuationTrade001Dto;
+    public void setTrdFixIncomeValuDuration001Dto(TrdFixIncomeValuDuration001Dto trdFixIncomeValuDuration001Dto) {
+        this.trdFixIncomeValuDuration001Dto = trdFixIncomeValuDuration001Dto;
     }
 }
