@@ -189,6 +189,7 @@ public class TrdPlanValuationTrade002Service extends CommonExportService<TrdPlan
         valMngMnfTade.setProdId(trdPlanValuationTradeDto.getPortfolioId());
         valMngMnfTade.setTradeDate(trdPlanValuationTradeDto.getTradeDate());
         //比较界面和接口字段差异，并手动给接口字段赋值
+        valMngMnfTade.setProdId(trdPlanValuationTradeDto.getPortfolioId());//产品代码
         valMngMnfTade.setAssetId("F17_"+trdPlanValuationTradeDto.getFinprodId());//资产代码
         valMngMnfTade.setAssetName(trdPlanValuationTradeDto.getFinprodName());   //资产名称
         valMngMnfTade.setShareAmt(trdPlanValuationTradeDto.getNums());           //交易份额
@@ -253,6 +254,7 @@ public class TrdPlanValuationTrade002Service extends CommonExportService<TrdPlan
         BeanUtil.copyPropertiesIgnoreNull(valFundTrade,trdPlanValuationTradeDto);
         //相同字段： 交易日、交易金额、币种
         //比较界面和接口字段差异，并手动给接口字段赋值
+        valFundTrade.setProdId(trdPlanValuationTradeDto.getPortfolioId());//产品代码
         valFundTrade.setAssetId("F17_"+trdPlanValuationTradeDto.getFinprodId());//资产代码
         valFundTrade.setAssetName(trdPlanValuationTradeDto.getFinprodName()); //资产名称
         valFundTrade.setTradeMarket(null); //交易场所

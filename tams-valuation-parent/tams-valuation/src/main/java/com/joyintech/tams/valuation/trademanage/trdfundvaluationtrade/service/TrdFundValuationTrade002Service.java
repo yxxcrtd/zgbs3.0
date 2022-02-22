@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -162,14 +163,23 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
         List<ValFundTrade> listValFundTrade = new ArrayList<ValFundTrade>();
         ValFundTrade valFundTrade = new ValFundTrade();
         BeanUtil.copyPropertiesIgnoreNull(valFundTrade,trdFundValuationTradeDto);
-        valFundTrade.setTradeDate(trdFundValuationTradeDto.getTradeDate());
+        //相同字段名： 成交编号、交易方向、交易场所、交易日、交易金额、币种
+        valFundTrade.setProdId(trdFundValuationTradeDto.getPortfolioId());//产品代码
         //比较界面和接口字段差异，并手动给接口字段赋值
         valFundTrade.setAssetId("F06_"+trdFundValuationTradeDto.getFinprodId());//资产代码  F06基金
-        valFundTrade.setDataActionSign("01");
-        valFundTrade.setCounterId("FYDLCA365001");
-        valFundTrade.setCounterType("01");
-        valFundTrade.setIsChlFeeAmt("Y");
-        valFundTrade.setIsClean("N");
+        valFundTrade.setAssetName(trdFundValuationTradeDto.getFinprodName());//资产名称
+        valFundTrade.setBusiType("06");//业务类型
+        valFundTrade.setDataActionSign("01");//数据动作标志
+        valFundTrade.setPrinAmt(new BigDecimal("0.00"));//交易本金
+        valFundTrade.setShareAmt(trdFundValuationTradeDto.getNums());//交易份额
+        valFundTrade.setIntAmt(trdFundValuationTradeDto.getReceivableBonus());//应收红利
+        valFundTrade.setUnitCprice(trdFundValuationTradeDto.getUnitValue());//单位净值
+        valFundTrade.setIsClean("N"); //有无清算指令
+
+        valFundTrade.setCounterId("FYDLCA365001");//非必填 交易对手
+        valFundTrade.setCounterType("01");//非必填 交易对手类型
+        valFundTrade.setIsChlFeeAmt("Y");//非必填 通道费是否随交易支付
+
 
         listValFundTrade.add(valFundTrade);
         Map<String, Object>  map = fundBuyAndSellDealRecService.handleValFundTrade(listValFundTrade,new Date(),params,null);

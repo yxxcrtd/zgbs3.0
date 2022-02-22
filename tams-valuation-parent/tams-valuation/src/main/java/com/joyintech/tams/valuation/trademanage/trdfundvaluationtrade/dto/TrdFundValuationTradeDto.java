@@ -29,13 +29,13 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 计划类投资交易
- * @author fanshuanghu
+ * 基金交易
+ * @author yuzj
  * @version 1.0 2018年11月22日
  * @see
  * @since 1.0
  */
-@PageId("TrdPlanValuationTrade002")
+@PageId("TrdFundValuationTrade002")
 @ValidLogic(targetClass = TrdFundValuationTradeDtoValidator.class, groups = {ValidateGroupEdit.class,
     ValidateGroupDelete.class})
 public class TrdFundValuationTradeDto extends WflTrdProductDeal implements ProcessEntity {
@@ -467,7 +467,6 @@ public class TrdFundValuationTradeDto extends WflTrdProductDeal implements Proce
         this.mdateSettleAmt = mdateSettleAmt;
     }
 
-    @NotEmpty(fieldName="TrdFundValuationTrade002.settleAmt",groups = {ValidateGroupEdit.class})
     public BigDecimal getSettleAmt() {
         return settleAmt;
     }

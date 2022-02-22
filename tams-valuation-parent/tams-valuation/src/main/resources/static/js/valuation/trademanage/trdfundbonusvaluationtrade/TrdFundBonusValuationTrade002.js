@@ -68,6 +68,7 @@
          */
         var object = $.serializeToObject('#basicInfoForm',true);
         object.operateType=operateType;
+        object.pageId=pageId;
         Joyin.ajaxJson(basePath + 'valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade002/check', object, function(result) {
             Joyin.confirm(result.data, function () {
                 if(operateType === 'save') {
@@ -76,7 +77,7 @@
                     });
                 }else{
                     Joyin.confirm(message, function() {
-                        WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade002/save', object, "TrdFundValuationTrade002_btn_sbumit");
+                        WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade002/save', object, "TrdFundValuationTrade002_btn_submit");
                     });
                 }
             });
