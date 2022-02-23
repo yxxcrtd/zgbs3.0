@@ -72,7 +72,7 @@ public class TrdFixIncomeValuationTrade002Controller extends BaseController {
     @Override
     public String init(Model model) {
         this.setSelectOptionToModel(model, DictCode.交易方向,
-                DictCode.是否, DictCode.币种);
+                DictCode.是否, DictCode.币种,DictCode.投资目的);
 
         // 一体化对应etliu start
         model.addAttribute("PS_T01", DictCodeList.交易方向_买入.getValue());
@@ -149,7 +149,7 @@ public class TrdFixIncomeValuationTrade002Controller extends BaseController {
     public Page<SelectOptionDto> findPortfolioId(HttpServletRequest request) {
         Map<String, Object> param =RequestUtil.getPageParam();
         //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-        param.put("finprodType", "F01"); //测试
+//        param.put("finprodType", "F01"); //测试
         return trdFixIncomeValuationTrade002Service.findPortfolioId(param);
     }
 
@@ -218,7 +218,6 @@ public class TrdFixIncomeValuationTrade002Controller extends BaseController {
         WorkFlowParameter<TrdFixIncomeValuationTradeDto> params = new WorkFlowParameter<TrdFixIncomeValuationTradeDto>();
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
-        params.setBusinessCode(dto.getTradeId());
         params.setBusinessType(DictCodeListExt3.共通业务类型_固收类资产交易.getValue());
 
         //设置主键
@@ -227,6 +226,7 @@ public class TrdFixIncomeValuationTrade002Controller extends BaseController {
             //新建初始化交易编号
             dto.setTradeId(trdFixIncomeValuationTrade002Service.createPlanTradeId());
         }
+        params.setBusinessCode(dto.getTradeId());
 
         // 设置流程业务说明, entity即传入的dto
         params.setComment(

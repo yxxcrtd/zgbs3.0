@@ -206,7 +206,6 @@ public class TrdFixIncomeValuationTradeDto extends WflTrdProductDeal implements 
      */
     @Override
     @PrimaryKey(Field.PK_1)
-    @NotEmpty(fieldName="TrdFixIncomeValuationTrade001.tradeId",groups = {ValidateGroupEdit.class})
     public String getTradeId(){
         return super.getTradeId();
     }
@@ -395,7 +394,6 @@ public class TrdFixIncomeValuationTradeDto extends WflTrdProductDeal implements 
     }
     //交易费用
     @Override
-    @NotEmpty(fieldName="TrdFixIncomeValuationTrade002.feeAmt",groups = {ValidateGroupEdit.class})
     public BigDecimal getFeeAmt() {
         return super.getFeeAmt();
     }

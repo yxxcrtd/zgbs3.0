@@ -32,7 +32,7 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 
 /**
- * service 计划类利率型交易
+ * service 固收型交易
  * 
  * @author yuzj
  * @version 1.0 2021年12月29日

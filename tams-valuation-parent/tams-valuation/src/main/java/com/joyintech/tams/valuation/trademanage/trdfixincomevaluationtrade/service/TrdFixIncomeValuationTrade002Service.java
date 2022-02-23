@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -81,7 +82,7 @@ public class TrdFixIncomeValuationTrade002Service extends CommonExportService<Tr
     @Override
     public void doComplete(TrdFixIncomeValuationTradeDto entity, OperationType operationType) {
         String action = StringUtil.EMPTY;
-        TrdFixIncomeTradeResult trdFixIncomeTradeResult = trdFixIncomeTradeResult = generateEntity(entity);
+        TrdFixIncomeTradeResult trdFixIncomeTradeResult  = generateEntity(entity);
         if (OperationType.NEW.equals(operationType)) {
             action = "insert";
         }
@@ -161,14 +162,30 @@ public class TrdFixIncomeValuationTrade002Service extends CommonExportService<Tr
         List<ValMngBuyTrade> listValMngBuyTrade = new ArrayList<ValMngBuyTrade>();
         ValMngBuyTrade valMngBuyTrade = new ValMngBuyTrade();
         BeanUtil.copyPropertiesIgnoreNull(valMngBuyTrade,trdFixIncomeValuationTradeDto);
-        valMngBuyTrade.setTradeDate(trdFixIncomeValuationTradeDto.getTradeDate());
+        //相同字段有：交易日期、交易方向、应收利息总额、净价总额、全价总额、币种、成交编号、会计分类
+        valMngBuyTrade.setProdId(trdFixIncomeValuationTradeDto.getPortfolioId());//prodId 产品代码
         //比较界面和接口字段差异，并手动给接口字段赋值
-        valMngBuyTrade.setAssetId("F17_"+trdFixIncomeValuationTradeDto.getFinprodId());//资产代码
-        valMngBuyTrade.setDataActionSign("01");
-        valMngBuyTrade.setCounterId("FYDLCA365001");
-        valMngBuyTrade.setCounterType("01");
-        valMngBuyTrade.setIsChlFeeAmt("Y");
-        valMngBuyTrade.setIsClean("N");
+        valMngBuyTrade.setAssetId("F09_"+trdFixIncomeValuationTradeDto.getFinprodId());//资产代码
+        valMngBuyTrade.setAssetName(trdFixIncomeValuationTradeDto.getFinprodName()); //资产名称
+        valMngBuyTrade.setEffDate(trdFixIncomeValuationTradeDto.getSettleDate());//交割日
+        valMngBuyTrade.setCapital(trdFixIncomeValuationTradeDto.getTradeAmt());//本金金额
+        valMngBuyTrade.setNums(new BigDecimal("1.00")); //数量
+        valMngBuyTrade.setParValue(new BigDecimal("100.00"));//单位面值
+        valMngBuyTrade.setFeeAmtUnpay(new BigDecimal("1.00"));//未随交易支付费用
+        valMngBuyTrade.setYield(new BigDecimal("0.05"));//到期收益率
+        valMngBuyTrade.setCounterId("FYDLCA365001");//必填 交易对手
+        valMngBuyTrade.setCounterType("01");//必填 交易对手类型
+        valMngBuyTrade.setTrader("system");//交易员
+        valMngBuyTrade.setChlId("2214312412");//非必填 通道代码
+        valMngBuyTrade.setCprice(trdFixIncomeValuationTradeDto.getCpriceAmt());//净价
+        valMngBuyTrade.setFprice(new BigDecimal("1.00"));//全价
+        valMngBuyTrade.setUnitInt(new BigDecimal("1.00"));//应收利息
+        valMngBuyTrade.setFee(new BigDecimal("1.00"));//费用
+        valMngBuyTrade.setDataActionSign("01");//数据动作标志
+        valMngBuyTrade.setIsClean("N"); //有无清算指令
+
+        valMngBuyTrade.setIsChlFeeAmt("Y");//非必填 通道费是否随交易支付
+        valMngBuyTrade.setChlFeeAmt(new BigDecimal("1.00"));//非必填 通道费
 
         listValMngBuyTrade.add(valMngBuyTrade);
 

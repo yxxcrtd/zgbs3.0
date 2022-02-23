@@ -225,7 +225,6 @@ public class TrdPlanValuationTrade002Controller extends BaseController {
         WorkFlowParameter<TrdPlanValuationTradeDto> params = new WorkFlowParameter<TrdPlanValuationTradeDto>();
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
-        params.setBusinessCode(dto.getTradeId());
         params.setBusinessType(DictCodeList.共通业务类型_计划类资产_利率型_交易.getValue());
 
         //设置主键
@@ -234,6 +233,7 @@ public class TrdPlanValuationTrade002Controller extends BaseController {
             //新建初始化交易编号
             dto.setTradeId(trdPlanValuationTrade002Service.createPlanTradeId());
         }
+        params.setBusinessCode(dto.getTradeId());
 
         // 设置流程业务说明, entity即传入的dto
         params.setComment(
