@@ -5,25 +5,14 @@
 
 package com.joyintech.tams.valuation.batch.tadealaccounts.service;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.joyintech.tams.common.base.entity.BokStatBokPosition;
-import com.joyintech.tams.valuation.batch.common.accounting.entity.StayDrawSubprdEntity;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListTableId;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
-
 import com.joyintech.calculation.config.NumberEnum;
 import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
+import com.joyintech.tams.common.base.entity.BokStatBokPosition;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListNatureGroup;
+import com.joyintech.tams.constant.DictCodeListTableId;
+import com.joyintech.tams.valuation.batch.common.accounting.entity.StayDrawSubprdEntity;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalance;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalanceSearchDto;
 import com.joyintech.tams.valuation.batch.common.accounting.service.AccountingCommonService;
@@ -41,10 +30,15 @@ import com.joyintech.tams.valuation.common.batch.finproduct.entity.TargetFinProd
 import com.joyintech.tams.valuation.common.batch.finproduct.entity.TargetSearchDto;
 import com.joyintech.tams.valuation.common.constants.BookConstant;
 import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrue;
-import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.common.constants.ValDictCodeList;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * 净值型产品TA交易入账 process相关业务处理
@@ -167,6 +161,11 @@ public class TaDealAccountsProcessorService {
             // 全价总额
             BigDecimal fpriceAmt = dealNow.getFpriceAmt() == null ? BigDecimal.ZERO : dealNow.getFpriceAmt();
 
+            // modify by weipeng on 20220223：增加赎回费（产品留存）处理 start
+            // 赎回费（产品留存）
+            BigDecimal feeAmtPay = dealNow.getFeeAmtPay() == null ? BigDecimal.ZERO : dealNow.getFeeAmtPay();
+            // modify by weipeng on 20220223：增加赎回费（产品留存）处理 end
+
             // 初始化定义 - 记账场景要素管理
             AccountDriver ad = new AccountDriver();
             // 初始化定义 - 存放该笔记账的场景要素 map定义
@@ -273,16 +272,19 @@ public class TaDealAccountsProcessorService {
                 // 记账金额元素map塞值
                 accountAmountMap.put("ACCQUA", null); // 核算数量
                 accountAmountMap.put("REDEEM_QTY", shareAmt); // 赎回份额 - 取交易份额
-                accountAmountMap.put("OTHER_INTAMT", BigDecimal.ZERO);// 赎回费中留存产品部分
+                // modify by weipeng on 20220223：增加赎回费（产品留存）处理 start
+                accountAmountMap.put("OTHER_INTAMT", feeAmtPay);// 赎回费中留存产品部分
+                // modify by weipeng on 20220223：增加赎回费（产品留存）处理 end
                 accountAmountMap.put("REDEEM_NETAMT", tradeAmt);// 赎回净金额 - 取交易金额
 
                 // 获取 未实现损益平准金 = 变量.净值日未实现损益 * 交易金额 / 变量.净值日资产净值
                 BigDecimal wsxsypzjNow = ArithmeticUtil.round(
                     ArithmeticUtil.divide(ArithmeticUtil.multiply(jzrwsxsy, tradeAmt), jzrzcjz), NumberEnum.MONEY);
-                // 获取 已实现损益平准金 = 交易金额 - 交易份额 - 变量.未实现损益平准金
-                BigDecimal ysxsypzjNow = ArithmeticUtil.round(ArithmeticUtil.doSub(tradeAmt, shareAmt, wsxsypzjNow),
+                // modify by weipeng on 20220223：增加赎回费（产品留存）处理 start
+                // 获取 已实现损益平准金 = 交易金额 + 赎回费（产品留存） - 交易份额 - 变量.未实现损益平准金
+                BigDecimal ysxsypzjNow = ArithmeticUtil.round(ArithmeticUtil.doSub(ArithmeticUtil.doAdd(tradeAmt, feeAmtPay), shareAmt, wsxsypzjNow),
                     NumberEnum.MONEY);
-
+                // modify by weipeng on 20220223：增加赎回费（产品留存）处理 end
                 // 金额元素.已实现损益平准金
                 if (ysxsypzjNow.compareTo(BigDecimal.ZERO) > 0) {
                     // 金额元素.已实现损益平准金_借 = 变量.已实现损益平准金
