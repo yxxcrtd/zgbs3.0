@@ -15,7 +15,9 @@ import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.RequestUtil;
+import com.joyintech.framework.util.SpringContextUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
@@ -24,6 +26,8 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.trademanage.trdbuyoutrepovaluation.dto.TrdOutRightRepoValuationTrade001Dto;
 
 import com.joyintech.tams.valuation.trademanage.trdbuyoutrepovaluation.service.TrdOutRightRepoValuationTrade002Service;
+import com.joyintech.workflow.engine.dto.ProcessParameter;
+import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -36,6 +40,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Map;
 
 
@@ -111,7 +116,7 @@ public class TrdOutRightRepoValuationTrade002Controller extends BaseController {
     public Page<SelectOptionDto> findPortfolioId(HttpServletRequest request) {
         Map<String, Object> param = RequestUtil.getPageParam();
         //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-//        param.put("finprodType", "F01"); //测试
+        param.put("finprodType", "F16"); //测试
         return trdOutRightRepoValuationTrade002Service.findPortfolioId(param);
     }
 
@@ -129,6 +134,46 @@ public class TrdOutRightRepoValuationTrade002Controller extends BaseController {
         param.put("finprodType", "F01"); //测试
         return trdOutRightRepoValuationTrade002Service.findFinprodId(param);
     }
+
+
+    /**
+     * @Description:保存
+     * @date: 2021/12/30
+     * @param:
+     * @return:
+     */
+    @ResponseBody
+    @RequestMapping("save")
+    public AjaxResult save(@RequestBody @Validated({
+            ValidateGroupEdit.class}) TrdOutRightRepoValuationTrade001Dto dto, BindingResult br) throws Exception {
+        if (br.hasErrors()) {
+            return new AjaxResult(br);
+        }
+        WorkFlowParameter<TrdOutRightRepoValuationTrade001Dto> params = new WorkFlowParameter<TrdOutRightRepoValuationTrade001Dto>();
+        params.setPageId(this.getPageId());
+        params.setElementId(dto.getElementId());
+
+        //设置主键
+        if(!StringUtil.isNotEmpty(dto.getTradeId())){
+            Date sysDate= DateUtil.platDateFromCache();
+            //新建初始化交易编号
+            dto.setTradeId(trdOutRightRepoValuationTrade002Service.createPlanTradeId());
+        }
+
+        params.setBusinessCode(dto.getTradeId());
+        params.setBusinessType(DictCodeList.共通业务类型_买断式回购交易.getValue());
+        // 设置流程业务说明, entity即传入的dto
+        params.setComment(
+                entity -> SpringContextUtil.getTextValue("交易编号")+"("+ entity.getTradeId() +")"+"-"+SpringContextUtil.getTextValue("交易日") + "(" + DateUtil.format(entity.getTradeDate()) + ")"
+        );
+        //给参数变成ProcessParameter而非WorkFlowParameter
+        ProcessParameter<TrdOutRightRepoValuationTrade001Dto> parameter = new ProcessParameter<TrdOutRightRepoValuationTrade001Dto>();
+        parameter.setWorkFlowParameter(params);
+        //系统页面表IS_NEED_WORKFLOW 是否走流程，01-是，02-否
+        String msg = trdOutRightRepoValuationTrade002Service.start(parameter, dto);
+        return new AjaxResult(msg);
+    }
+
 
 
 }

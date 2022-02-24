@@ -166,9 +166,6 @@ public class TrdDepositValuationTrade002Service extends CommonExportService<TrdD
         prodIds.add(dto.getPortfolioId());
         params.put("INTERF_BOOKSETID",prodIds);
         params.put("VAL_MODEL","INTERF_MODEL_SINGLE");
-        TemplateOrderInfoReaderResult acctEntity= new TemplateOrderInfoReaderResult();
-        // 定义返回变量
-        AssetDealInfoValCommonResult result = new AssetDealInfoValCommonResult();
 
         //将页面输入值赋值给接口实体类
         List<ValBotAstTrade> listValBotAstTrade=new ArrayList<>();
@@ -212,6 +209,7 @@ public class TrdDepositValuationTrade002Service extends CommonExportService<TrdD
 //        entity.setIsStlFeeAmt("Y");//结算手续费是否随交易支付
 //        entity.setMyAcctNo("201907300001:jixu0001");
         listValBotAstTrade.add(entity);
+        TemplateOrderInfoReaderResult acctEntity= new TemplateOrderInfoReaderResult();
         Date date = new Date();
         acctEntity.setResovleDate(date);
         acctEntity.setFourLevelSubjectKg("Y");

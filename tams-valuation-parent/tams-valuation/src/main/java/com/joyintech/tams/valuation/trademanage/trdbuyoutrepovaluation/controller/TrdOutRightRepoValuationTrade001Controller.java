@@ -122,9 +122,9 @@ public class TrdOutRightRepoValuationTrade001Controller extends BaseController {
         // 业务代码（凭证流水号）
         params.setBusinessCode(item -> item.getTradeId());
         // 业务类型
-        params.setBusinessType(DictCodeList.业务类型_银行间债券交易.getValue());
+        params.setBusinessType(DictCodeList.共通业务类型_买断式回购交易.getValue());
         // 页面id
-        params.setPageId("BondTradeQuery001");
+        params.setPageId("TrdOutRightRepoValuationTrade002");
         // 元素id
         params.setElementId(dto.getElementId());
 
