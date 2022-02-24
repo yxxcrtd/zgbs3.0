@@ -1073,11 +1073,29 @@ public class MoneyFundDealAccountingProcessorNewService {
                     }
                 }
                 // 记账金额要素 map塞值
-                // 记账金额要素 map塞值
-                accountAmountMap.put("BONUSAMT", dealDto.getTradeAmt());// 分红金额 - 交易明细.交易金额
-                //分红金额 _本币
-                accountAmountMap.put("BONUSAMT" + BookConstant.BCCYAMT 
-                		,calculationCommonService.doMultiply(NumberEnum.MONEY.getCode(), null, accountAmountMap.get("BONUSAMT"), changeRate));
+                // add by weipeng on 20220221 区分资金账户金额元素 start
+//                // 记账金额要素 map塞值
+//                accountAmountMap.put("BONUSAMT", dealDto.getTradeAmt());// 分红金额 - 交易明细.交易金额
+//                //分红金额 _本币
+//                accountAmountMap.put("BONUSAMT" + BookConstant.BCCYAMT
+//                		,calculationCommonService.doMultiply(NumberEnum.MONEY.getCode(), null, accountAmountMap.get("BONUSAMT"), changeRate));
+                // 定义 本位币金额
+                BigDecimal bonusAmtBccy = calculationCommonService.doMultiply(NumberEnum.MONEY.getCode(), null, accountAmountMap.get("BONUSAMT"), changeRate);
+                // 本方资金账户类型 或 对方资金账户类型对应资金账户类型，赋值对应金额元素
+                if(DictCodeListExt1.资金账户类型_产品托管户.getValue().equals(dealDto.getAcctType())){
+                    accountAmountMap.put(BookConstant.DEALAMT_HQ, dealDto.getTradeAmt());
+                    accountAmountMap.put(BookConstant.DEALAMT_HQ + BookConstant.BCCYAMT, bonusAmtBccy);
+                }
+                else if(DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(dealDto.getAcctType())){
+                    accountAmountMap.put(BookConstant.DEALAMT_JS, dealDto.getTradeAmt());
+                    accountAmountMap.put(BookConstant.DEALAMT_JS + BookConstant.BCCYAMT, bonusAmtBccy);
+                }
+                // 券商资金账户现划分在结算备付金科目性质下
+                else if(DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(dealDto.getAcctType())){
+                    accountAmountMap.put(BookConstant.DEALAMT_JS, dealDto.getTradeAmt());
+                    accountAmountMap.put(BookConstant.DEALAMT_JS + BookConstant.BCCYAMT, bonusAmtBccy);
+                }
+                // add by weipeng on 20220221 区分资金账户金额元素 end
                 // accountAmountMap.put("NETAMT_D", null);// 轧差金额（借）
                 // accountAmountMap.put("NETAMT_C", null);// 轧差金额（贷）
                 accountAmountMap.put("ACCQUA", dealDto.getShareAmt());// 核算数量 - 交易明细.交易份额
@@ -1563,6 +1581,22 @@ public class MoneyFundDealAccountingProcessorNewService {
                 //成本金额_本位币<-	成本金额 * 变量.汇率
                 accountAmountMap.put("IN_DEALAMT" + BookConstant.BCCYAMT, calculationCommonService.doMultiply(NumberEnum.MONEY.getCode(), null, prinamt, changeRate));
                 accountAmountMap.put("DEALAMT" + BookConstant.BCCYAMT, accountAmountMap.get("IN_DEALAMT" + BookConstant.BCCYAMT));
+                // add by weipeng on 20220221 区分资金账户金额元素 start
+                // 本方资金账户类型 或 对方资金账户类型对应资金账户类型，赋值对应金额元素
+                if(DictCodeListExt1.资金账户类型_产品托管户.getValue().equals(dealDto.getAcctType())){
+                    accountAmountMap.put(BookConstant.DEALAMT_HQ, prinamt);
+                    accountAmountMap.put(BookConstant.DEALAMT_HQ + BookConstant.BCCYAMT, accountAmountMap.get("IN_DEALAMT" + BookConstant.BCCYAMT));
+                }
+                else if(DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(dealDto.getAcctType())){
+                    accountAmountMap.put(BookConstant.DEALAMT_JS, prinamt);
+                    accountAmountMap.put(BookConstant.DEALAMT_JS + BookConstant.BCCYAMT, accountAmountMap.get("IN_DEALAMT" + BookConstant.BCCYAMT));
+                }
+                // 券商资金账户现划分在结算备付金科目性质下
+                else if(DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(dealDto.getAcctType())){
+                    accountAmountMap.put(BookConstant.DEALAMT_JS, prinamt);
+                    accountAmountMap.put(BookConstant.DEALAMT_JS + BookConstant.BCCYAMT, accountAmountMap.get("IN_DEALAMT" + BookConstant.BCCYAMT));
+                }
+                // add by weipeng on 20220221 区分资金账户金额元素 end
                 /**20200102 taoran add end**/
                 // 全局变量的更新
                 glb_subjectAmt = ArithmeticUtil.doAdd(glb_subjectAmt, prinamt);// 变量.成本科目余额
@@ -1587,6 +1621,22 @@ public class MoneyFundDealAccountingProcessorNewService {
                 
                 accountAmountMap.put("OUT_DEALAMT", prinamt);// 调减金额 - 交易明细.交易本金
                 accountAmountMap.put("ACCQUA", dealDto.getShareAmt()==null?BigDecimal.ZERO:dealDto.getShareAmt());// 核算数量 - 交易明细.交易份额
+                // add by weipeng on 20220221 区分资金账户金额元素 start
+                // 本方资金账户类型 或 对方资金账户类型对应资金账户类型，赋值对应金额元素
+                if(DictCodeListExt1.资金账户类型_产品托管户.getValue().equals(dealDto.getAcctType())){
+                    accountAmountMap.put(BookConstant.DEALAMT_HQ, prinamt);
+                    accountAmountMap.put(BookConstant.DEALAMT_HQ + BookConstant.BCCYAMT, calculationCommonService.doMultiply(NumberEnum.MONEY.getCode(), null, prinamt, changeRate));
+                }
+                else if(DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(dealDto.getAcctType())){
+                    accountAmountMap.put(BookConstant.DEALAMT_JS, prinamt);
+                    accountAmountMap.put(BookConstant.DEALAMT_JS + BookConstant.BCCYAMT, calculationCommonService.doMultiply(NumberEnum.MONEY.getCode(), null, prinamt, changeRate));
+                }
+                // 券商资金账户现划分在结算备付金科目性质下
+                else if(DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(dealDto.getAcctType())){
+                    accountAmountMap.put(BookConstant.DEALAMT_JS, prinamt);
+                    accountAmountMap.put(BookConstant.DEALAMT_JS + BookConstant.BCCYAMT, calculationCommonService.doMultiply(NumberEnum.MONEY.getCode(), null, prinamt, changeRate));
+                }
+                // add by weipeng on 20220221 区分资金账户金额元素 end
                 
                 accountSceneMap.put(BookConstant.ACCT_TYPE,dealDto.getAcctType());
                 

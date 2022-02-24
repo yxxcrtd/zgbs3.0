@@ -386,19 +386,19 @@ public class SettlementInstructionNewService {
                 accountAmountMap.put(BookConstant.DEALAMT_HQ, 资金账户金额);
                 accountCurrencyMap.put(BookConstant.DEALAMT_HQ, 资金账户币种);
             }
-            else if(DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(myAcctType)
+            if(DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(myAcctType)
                     || DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(counterAcctType)){
                 accountAmountMap.put(BookConstant.DEALAMT_JS, 资金账户金额);
                 accountCurrencyMap.put(BookConstant.DEALAMT_JS, 资金账户币种);
             }
             // 券商资金账户现划分在结算备付金科目性质下
-            else if(DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(myAcctType)
+            if(DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(myAcctType)
                     || DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(counterAcctType)){
                 accountAmountMap.put(BookConstant.DEALAMT_JS, 资金账户金额);
                 accountCurrencyMap.put(BookConstant.DEALAMT_JS, 资金账户币种);
             }
             // 券商资金账户现划分在结算备付金科目性质下
-            else if(DictCodeListExt1.资金账户类型_交易保证金账户.getValue().equals(myAcctType)
+            if(DictCodeListExt1.资金账户类型_交易保证金账户.getValue().equals(myAcctType)
                     || DictCodeListExt1.资金账户类型_交易保证金账户.getValue().equals(counterAcctType)){
                 accountAmountMap.put(BookConstant.DEALAMT_CC, 资金账户金额);
                 accountCurrencyMap.put(BookConstant.DEALAMT_CC, 资金账户币种);

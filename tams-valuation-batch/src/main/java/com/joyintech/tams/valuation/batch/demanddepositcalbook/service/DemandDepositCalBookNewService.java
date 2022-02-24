@@ -22,7 +22,6 @@ import com.joyintech.tams.constant.DictCodeListTableId;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalance;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalanceSearchDto;
 import com.joyintech.tams.valuation.batch.common.accounting.service.AccountingCommonService;
-import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookAccountGenLogic;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookAccountGenLogicNew;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookCommonLogic;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.AccountDriver;
@@ -284,15 +283,36 @@ public class DemandDepositCalBookNewService {
             //资金账户类型
             accountSceneMap.put(BookConstant.ACCT_TYPE, drawBaseInfoSelectComDTO.getBusiDetailType());
             // accountAmountMap设置如下：
+            // add by weipeng on 20220221 区分资金账户金额元素 start
+//            // 应收利息 <-变量.应计利息
+//            accountAmountMap.put(BookConstant.INTAMT, interest);
+//            //应收利息_本位币
+//            accountAmountMap.put(BookConstant.INTAMT+BookConstant.BCCYAMT, interest_bccy);
+            // 本方资金账户类型 或 对方资金账户类型对应资金账户类型，赋值对应金额元素
+            // 定义 变量.资金账户类型
+            String acctType=drawBaseInfoSelectComDTO.getBusiDetailType();
+            // 定义 变量.记账金额元素 = 默认.托管户
+            String 记账金额元素 = BookConstant.INTAMT_HQ;
+            // 券商资金账户现划分在结算备付金科目性质下
+            if(DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(acctType)
+              || DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(acctType)){
+                记账金额元素 = BookConstant.INTAMT_JS;
+            }
+            // 券商资金账户现划分在结算备付金科目性质下
+            if(DictCodeListExt1.资金账户类型_交易保证金账户.getValue().equals(acctType)){
+                记账金额元素 = BookConstant.INTAMT_CC;
+            }
             // 应收利息 <-变量.应计利息
-            accountAmountMap.put(BookConstant.INTAMT, interest);
+            accountAmountMap.put(记账金额元素, interest);
             //应收利息_本位币
-            accountAmountMap.put(BookConstant.INTAMT+BookConstant.BCCYAMT, interest_bccy);
+            accountAmountMap.put(记账金额元素+BookConstant.BCCYAMT, interest_bccy);
+            accountCurrencyMap.put(记账金额元素, drawBaseInfoSelectComDTO.getoCcy());
+            // add by weipeng on 20220221 区分资金账户金额元素 end
 
             // accountCurrencyMap设置如下：
-            // 应收利息 <-计提明细.交易币种
-            accountCurrencyMap.put(BookConstant.INTAMT, drawBaseInfoSelectComDTO.getoCcy());
-            
+//            // 应收利息 <-计提明细.交易币种
+//            accountCurrencyMap.put(BookConstant.INTAMT, drawBaseInfoSelectComDTO.getoCcy());
+
             
             ad.setAccountCurrencyMap(accountCurrencyMap);
             ad.setAccountAmountMap(accountAmountMap);

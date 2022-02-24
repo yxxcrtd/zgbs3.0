@@ -591,8 +591,6 @@ public class DepositeAssetTransBookNewService {
                         accountAmountMap.get(BookConstant.IMPAMT), 汇率), NumberEnum.MONEY);
                     accountAmountBCCYAMTMap.put(BookConstant.IMPAMT + BookConstant.BCCYAMT,
                         减值准备本币);
-                   
-
                 }
                 else {
                     // 本币实收金额/本币实收成本（COST）<- 实收金额/实收成本（COST）
@@ -608,6 +606,18 @@ public class DepositeAssetTransBookNewService {
                 for (String key : accountAmountBCCYAMTMap.keySet()) {
                     accountCurrencyMap.put(key, standardCcyNow);
                 }
+                // add by weipeng on 20220222:会计引擎升级，收息到账场景增加对存款类活期类资产的利息金额元素特殊处理 start
+                if (DictCodeList.存款类资产类型_GZ_活期类资产.getValue().equals(
+                        targetFinProduct.getType1())) {
+                    // 金额元素替换为INTAMT_HQ
+                    accountAmountMap.put(BookConstant.INTAMT_HQ, accountAmountMap.get(BookConstant.INTAMT));
+                    accountAmountMap.put(BookConstant.INTAMT_HQ + BookConstant.BCCYAMT,
+                            accountAmountMap.get(BookConstant.INTAMT + BookConstant.BCCYAMT));
+                    // 清除原金额元素
+                    accountAmountMap.remove(BookConstant.INTAMT);
+                    accountAmountMap.remove(BookConstant.INTAMT + BookConstant.BCCYAMT);
+                }
+                // add by weipeng on 20220222:会计引擎升级，收息到账场景增加对存款类活期类资产的利息金额元素特殊处理 end
                 /** 本位币 币种 **/
                 accountCurrencyMap.put(BookConstant.B_CCY, standardCcyNow);
                 // 记账金额元素 putALl 随记账本位币金额map
