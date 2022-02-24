@@ -3,7 +3,6 @@ package com.joyintech.service.valuation.trademanage.bondlend.dto;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
-import com.joyintech.framework.validation.annotation.NotEmpty;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
@@ -11,7 +10,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-public class TrdBondLendTrade002Dto extends BaseEntity implements ProcessEntity {
+public class TrdBondLendTradeDto extends BaseEntity implements ProcessEntity {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -24,7 +23,7 @@ public class TrdBondLendTrade002Dto extends BaseEntity implements ProcessEntity 
     /**
      * 选择数据
      */
-    private List<TrdBondLendTrade002Dto> selectedItem;
+    private List<TrdBondLendTradeDto> selectedItem;
 
     /**
      * 要素id
@@ -254,11 +253,11 @@ public class TrdBondLendTrade002Dto extends BaseEntity implements ProcessEntity 
         this.pageModel = pageModel;
     }
 
-    public List<TrdBondLendTrade002Dto> getSelectedItem() {
+    public List<TrdBondLendTradeDto> getSelectedItem() {
         return selectedItem;
     }
 
-    public void setSelectedItem(List<TrdBondLendTrade002Dto> selectedItem) {
+    public void setSelectedItem(List<TrdBondLendTradeDto> selectedItem) {
         this.selectedItem = selectedItem;
     }
 

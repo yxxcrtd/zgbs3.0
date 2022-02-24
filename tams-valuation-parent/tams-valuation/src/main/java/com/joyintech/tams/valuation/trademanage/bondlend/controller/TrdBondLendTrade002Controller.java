@@ -21,10 +21,10 @@ import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
-import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTrade002Dto;
+import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTradeDto;
 import com.joyintech.tams.valuation.trademanage.bondlend.service.TrdBondLendTrade002Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -76,12 +76,12 @@ public class TrdBondLendTrade002Controller extends BaseController {
 
         //工作流
         if(StringUtil.isNotEmpty(workflowId)){
-            TrdBondLendTrade002Dto entity= trdBondLendTrade002Service.getBussinessEntityByWorkflowId(workflowId);
+            TrdBondLendTradeDto entity= trdBondLendTrade002Service.getBussinessEntityByWorkflowId(workflowId);
             model.addAttribute("entity", entity);
             model.addAttribute("workflowId", workflowId);
 
         }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){//编辑页面
-            TrdBondLendTrade002Dto entity = trdBondLendTrade002Service.queryTradeInfoByTradeId(tradeId);
+            TrdBondLendTradeDto entity = trdBondLendTrade002Service.queryTradeInfoByTradeId(tradeId);
             model.addAttribute("entity", entity);
         }
 
@@ -152,7 +152,7 @@ public class TrdBondLendTrade002Controller extends BaseController {
     /**
      * 确认校验
      *
-     * @param trdBondLendTrade002Dto 参数
+     * @param trdBondLendTradeDto 参数
      * @param result 校验结果
      * @return AjaxResult
      * @see
@@ -161,9 +161,9 @@ public class TrdBondLendTrade002Controller extends BaseController {
     @ResponseBody
     @RequestMapping("check")
     public AjaxResult check(@RequestBody @Validated({
-            ValidateGroupEdit.class}) TrdBondLendTrade002Dto trdBondLendTrade002Dto,
+            ValidateGroupEdit.class}) TrdBondLendTradeDto trdBondLendTradeDto,
                               BindingResult result) {
-        return commonCheck(result, trdBondLendTrade002Dto.getOperateType());
+        return commonCheck(result, trdBondLendTradeDto.getOperateType());
     }
 
 
@@ -179,15 +179,15 @@ public class TrdBondLendTrade002Controller extends BaseController {
     @RequestMapping("save")
     @ResponseBody
     AjaxResult save(@RequestBody @Validated({
-            ValidateGroupEdit.class}) TrdBondLendTrade002Dto dto, BindingResult br)
+            ValidateGroupEdit.class}) TrdBondLendTradeDto dto, BindingResult br)
         throws Exception {
 
         if (br.hasErrors()) {
             return new AjaxResult(br);
         }
 
-        ProcessParameter<TrdBondLendTrade002Dto> processParameter = new ProcessParameter<>();
-        WorkFlowParameter<TrdBondLendTrade002Dto> workFlowParameter = new WorkFlowParameter<>();
+        ProcessParameter<TrdBondLendTradeDto> processParameter = new ProcessParameter<>();
+        WorkFlowParameter<TrdBondLendTradeDto> workFlowParameter = new WorkFlowParameter<>();
         processParameter.setWorkFlowParameter(workFlowParameter);
         processParameter.setPageId(this.getPageId());
 
@@ -200,7 +200,7 @@ public class TrdBondLendTrade002Controller extends BaseController {
         workFlowParameter.setPageId(this.getPageId());
         workFlowParameter.setElementId(this.getParam("elementId"));
         workFlowParameter.setBusinessCode(dto.getTradeId());
-        workFlowParameter.setBusinessType(DictCodeList.业务类型_债券借贷交易.getValue());
+        workFlowParameter.setBusinessType(DictCodeListExt2.共通业务类型_债券借贷交易.getValue());
         workFlowParameter.setComment((entity) -> WorkFlowUtil.concatComment(
             getMessage("交易编号") + GlobalConstant.COLON + entity.getTradeId(),
             getMessage("交易日") + GlobalConstant.COLON + DateUtil.format(entity.getTradeDate())));

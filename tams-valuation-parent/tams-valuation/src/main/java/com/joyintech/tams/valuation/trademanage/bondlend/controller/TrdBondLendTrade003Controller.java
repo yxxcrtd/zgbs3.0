@@ -20,8 +20,8 @@ import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
-import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTrade002Dto;
-import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTrade003Dto;
+import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTradeDto;
+import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTrade001Dto;
 import com.joyintech.tams.valuation.trademanage.bondlend.service.TrdBondLendTrade002Service;
 import com.joyintech.tams.valuation.trademanage.bondlend.service.TrdBondLendTrade003Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -75,12 +75,12 @@ public class TrdBondLendTrade003Controller extends BaseController {
 
         //工作流
         if(StringUtil.isNotEmpty(workflowId)){
-            TrdBondLendTrade002Dto entity= trdBondLendTrade002Service.getBussinessEntityByWorkflowId(workflowId);
+            TrdBondLendTradeDto entity= trdBondLendTrade002Service.getBussinessEntityByWorkflowId(workflowId);
             model.addAttribute("entity", entity);
             model.addAttribute("workflowId", workflowId);
 
         }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){//编辑页面
-            TrdBondLendTrade003Dto entity = trdBondLendTrade002Service.queryInfoByTradeId(tradeId);
+            TrdBondLendTrade001Dto entity = trdBondLendTrade002Service.queryInfoByTradeId(tradeId);
             model.addAttribute("entity", entity);
         }
 
@@ -91,7 +91,7 @@ public class TrdBondLendTrade003Controller extends BaseController {
     /**
      * 确认校验
      *
-     * @param trdBondLendTrade003Dto 参数
+     * @param trdBondLendTrade001Dto 参数
      * @param result 校验结果
      * @return AjaxResult
      * @see
@@ -99,9 +99,9 @@ public class TrdBondLendTrade003Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("check")
-    public AjaxResult check(@Valid @RequestBody TrdBondLendTrade003Dto trdBondLendTrade003Dto,
+    public AjaxResult check(@Valid @RequestBody TrdBondLendTrade001Dto trdBondLendTrade001Dto,
                               BindingResult result) {
-        return commonCheck(result, trdBondLendTrade003Dto.getOperateType());
+        return commonCheck(result, trdBondLendTrade001Dto.getOperateType());
     }
 
 
@@ -116,15 +116,15 @@ public class TrdBondLendTrade003Controller extends BaseController {
      */
     @RequestMapping("save")
     @ResponseBody
-    AjaxResult save(@RequestBody @Valid TrdBondLendTrade003Dto dto, BindingResult br)
+    AjaxResult save(@RequestBody @Valid TrdBondLendTrade001Dto dto, BindingResult br)
         throws Exception {
 
         if (br.hasErrors()) {
             return new AjaxResult(br);
         }
 
-        ProcessParameter<TrdBondLendTrade003Dto> processParameter = new ProcessParameter<>();
-        WorkFlowParameter<TrdBondLendTrade003Dto> workFlowParameter = new WorkFlowParameter<>();
+        ProcessParameter<TrdBondLendTrade001Dto> processParameter = new ProcessParameter<>();
+        WorkFlowParameter<TrdBondLendTrade001Dto> workFlowParameter = new WorkFlowParameter<>();
         processParameter.setWorkFlowParameter(workFlowParameter);
         processParameter.setPageId(this.getPageId());
 

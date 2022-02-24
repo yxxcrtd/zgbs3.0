@@ -2,12 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.joyintech.service.valuation.trademanage.bondlend.dao.TrdBondLendTradeMapper" >
 
-    <select id="selectDeal" resultType="com.joyintech.service.valuation.trademanage.bondlend.dto.TrdBondLendTrade001Dto">
+    <select id="selectDeal" resultType="com.joyintech.service.valuation.trademanage.bondlend.dto.TrdBondLendTradeDto">
         SELECT
             t.TRADE_ID tradeId,/**交易编号**/
             null outTradeId,    /*外部成交编号*/
-            deal.BOOKSET_ID finprodId,/**金融产品代码**/
-            bok.BOOKSET_NAME finprodName,/**金融产品名称**/
+            deal.BOOKSET_ID prodId,/**金融产品代码**/
+            bok.BOOKSET_NAME prodName,/**金融产品名称**/
             zc.FINPROD_MARKET_ID  secId, /**资产代码**/
             zc.FINPROD_ABBR  secAbbr,/**资产简称**/
             case
@@ -78,7 +78,7 @@
         order by t.TRADE_ID desc
     </select>
 
-    <select id="queryTradeInfoByTradeId" resultType="com.joyintech.service.valuation.trademanage.bondlend.dto.TrdBondLendTrade002Dto">
+    <select id="queryTradeInfoByTradeId" resultType="com.joyintech.service.valuation.trademanage.bondlend.dto.TrdBondLendTradeDto">
         SELECT
             t.TRADE_ID tradeId,/**交易编号**/
             null outTradeId,    /*外部成交编号*/
@@ -142,7 +142,7 @@
           and TRADE_ID = #{tradeId}
     </delete>
 
-    <select id="queryInfoByTradeId" resultType="com.joyintech.service.valuation.trademanage.bondlend.dto.TrdBondLendTrade003Dto">
+    <select id="queryInfoByTradeId" resultType="com.joyintech.service.valuation.trademanage.bondlend.dto.TrdBondLendTrade001Dto">
         SELECT
             t.TRADE_ID tradeId,/**交易编号**/
             null outTradeId,    /*外部成交编号*/

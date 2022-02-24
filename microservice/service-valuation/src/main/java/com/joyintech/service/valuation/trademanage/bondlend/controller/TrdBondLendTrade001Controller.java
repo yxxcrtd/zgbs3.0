@@ -13,7 +13,7 @@ package com.joyintech.service.valuation.trademanage.bondlend.controller;
 
 import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.grid.Page;
-import com.joyintech.service.valuation.trademanage.bondlend.dto.TrdBondLendTrade001Dto;
+import com.joyintech.service.valuation.trademanage.bondlend.dto.TrdBondLendTradeDto;
 import com.joyintech.service.valuation.trademanage.bondlend.service.TrdBondLendTrade001Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +46,7 @@ public class TrdBondLendTrade001Controller {
      * @since 1.0
      */
     @RequestMapping("findPage/{page}/{length}")
-    public Page<TrdBondLendTrade001Dto> queryForPage(@RequestBody Map<String, Object> param,
+    public Page<TrdBondLendTradeDto> queryForPage(@RequestBody Map<String, Object> param,
                                                      @PathVariable("page") int page, @PathVariable("length") int length)
             throws Exception {
         return trdBondLendTrade001Service.selectForPage(page, length, param);
@@ -60,14 +60,14 @@ public class TrdBondLendTrade001Controller {
      * @throws Exception
      */
     @PostMapping("/queryPageList")
-    public List<TrdBondLendTrade001Dto> queryPageList(@RequestBody Map<String, Object> param){
+    public List<TrdBondLendTradeDto> queryPageList(@RequestBody Map<String, Object> param){
         return trdBondLendTrade001Service.queryPageList(param);
     }
 
     @Transactional
     @DTXTransaction
     @PostMapping("delete")
-    public int delete(@RequestBody TrdBondLendTrade001Dto dto){
+    public int delete(@RequestBody TrdBondLendTradeDto dto){
         return trdBondLendTrade001Service.delete(dto);
     }
 

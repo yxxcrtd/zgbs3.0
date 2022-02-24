@@ -1,28 +1,43 @@
 package com.joyintech.tams.valuation.trademanage.bondlend.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.StringUtil;
-import com.joyintech.framework.util.SysDataUtil;
-import com.joyintech.tams.constant.DictCode;
+import com.joyintech.framework.validation.annotation.NotEmpty;
+import com.joyintech.framework.validation.annotation.ValidLogic;
+import com.joyintech.framework.validation.groups.ValidateGroupDelete;
+import com.joyintech.framework.validation.groups.ValidateGroupEdit;
+import com.joyintech.tams.valuation.trademanage.bondlend.validator.TrdBondLendTrade002Validator;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 
+@PageId("TrdBondLendTrade003")
+@ValidLogic(targetClass = TrdBondLendTrade002Validator.class, groups = { ValidateGroupEdit.class,
+        ValidateGroupDelete.class })
 public class TrdBondLendTrade001Dto extends BaseEntity implements ProcessEntity {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 交易编号
+     * 操作类型
      */
-    @PrimaryKey(value= PrimaryKey.Field.PK_1)
-    private String tradeId;
+    private String operateType;
+
+    private String pageModel;
+
+    /**
+     * 选择数据
+     */
+    private List<TrdBondLendTrade001Dto> selectedItem;
+
+    /**
+     * 要素id
+     */
+    private String elementId;
 
     /**
      * 外部成交编号
@@ -30,14 +45,19 @@ public class TrdBondLendTrade001Dto extends BaseEntity implements ProcessEntity 
     private String outTradeId;
 
     /**
-     * 金融产品代码
+     * 借贷期限
      */
-    private String finprodId;
+    private Long term;
 
     /**
-     * 产品名称
+     * 金融产品代码
      */
-    private String finprodName;
+    private String prodId;
+
+    /**
+     * 金融产品名称
+     */
+    private String prodName;
 
     /**
      * 债券代码
@@ -55,38 +75,24 @@ public class TrdBondLendTrade001Dto extends BaseEntity implements ProcessEntity 
     private String ps;
 
     /**
+     * 交易编号
+     */
+    @PrimaryKey(value= PrimaryKey.Field.PK_1)
+    private String tradeId;
+
+    /**
      * 交易日
      */
     private Date tradeDate;
 
     /**
-     * 交割日期
+     * 券面总额
      */
-    private Date settleDate;
-
-    /**
-     * 起息日
-     */
-    private Date vdate;
-
-    /**
-     * 到期日
-     */
-    private Date mdate;
-
-    /**
-     * 借贷期限
-     */
-    private Long term;
-
-    /**
-     * 券面总额（万元）
-     */
-    @JsonSerialize(using = BigDecimalSerializer.class)
+    @JsonSerialize(using= BigDecimalSerializer.class)
     private BigDecimal prinAmt;
 
     /**
-     * 借贷费率%
+     * 借贷费率
      */
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal feeRate;
@@ -103,6 +109,19 @@ public class TrdBondLendTrade001Dto extends BaseEntity implements ProcessEntity 
     private String ccy;
 
     /**
+     * 其他应付费用
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal otherAmt;
+
+
+    /**
+     * 现金交割金额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal settAmt;
+
+    /**
      * 结算金额
      */
     private BigDecimal settleAmt;
@@ -112,29 +131,16 @@ public class TrdBondLendTrade001Dto extends BaseEntity implements ProcessEntity 
      */
     private String acctNo;
 
-    /**
-     * 选中的数据
-     */
-    private transient List<TrdBondLendTrade001Dto> selectedItem;
-
-    /**
-     * 操作类型
-     */
-    private String operateType;
-
-    /**
-     * 要素id
-     */
-    private String elementId;
-
-    public String getFinprodId() {
-        return finprodId;
+    @NotEmpty(fieldName = "TrdBondLendTrade.prodId", groups = { ValidateGroupEdit.class })
+    public String getProdId() {
+        return prodId;
     }
 
-    public void setFinprodId(String finprodId) {
-        this.finprodId = finprodId;
+    public void setProdId(String prodId) {
+        this.prodId = prodId;
     }
 
+    @NotEmpty(fieldName = "TrdBondLendTrade.secId", groups = { ValidateGroupEdit.class })
     public String getSecId() {
         return secId;
     }
@@ -143,6 +149,7 @@ public class TrdBondLendTrade001Dto extends BaseEntity implements ProcessEntity 
         this.secId = secId;
     }
 
+    @NotEmpty(fieldName = "TrdBondLendTrade.secAbbr", groups = { ValidateGroupEdit.class })
     public String getSecAbbr() {
         return secAbbr;
     }
@@ -151,31 +158,13 @@ public class TrdBondLendTrade001Dto extends BaseEntity implements ProcessEntity 
         this.secAbbr = secAbbr;
     }
 
+    @NotEmpty(fieldName = "TrdBondLendTrade.ps", groups = { ValidateGroupEdit.class })
     public String getPs() {
         return ps;
     }
 
     public void setPs(String ps) {
         this.ps = ps;
-    }
-
-    /**
-     * 取得 交易方向str
-     *
-     * @return 交易方向
-     */
-    public String getPsStr() {
-        String psName="";
-        if(StringUtil.isNotEmpty(ps)){
-            if(ps.equals("01")){
-                psName = "融入";
-            }else if(ps.equals("02")){
-                psName = "融出";
-            }else if(ps.equals("03")){
-                psName = "到期";
-            }
-        }
-        return psName;
     }
 
     public String getTradeId() {
@@ -186,6 +175,7 @@ public class TrdBondLendTrade001Dto extends BaseEntity implements ProcessEntity 
         this.tradeId = tradeId;
     }
 
+    @NotEmpty(fieldName = "TrdBondLendTrade.tradeDate", groups = { ValidateGroupEdit.class })
     public Date getTradeDate() {
         return tradeDate;
     }
@@ -194,22 +184,7 @@ public class TrdBondLendTrade001Dto extends BaseEntity implements ProcessEntity 
         this.tradeDate = tradeDate;
     }
 
-    public String getTradeDateStr() {
-        return DateUtil.format(this.getTradeDate());
-    }
-
-    public Date getSettleDate() {
-        return settleDate;
-    }
-
-    public void setSettleDate(Date settleDate) {
-        this.settleDate = settleDate;
-    }
-
-    public String getSettleDateStr() {
-        return DateUtil.format(this.getSettleDate());
-    }
-
+    @NotEmpty(fieldName = "TrdBondLendTrade.ccy", groups = { ValidateGroupEdit.class })
     public String getCcy() {
         return ccy;
     }
@@ -218,22 +193,12 @@ public class TrdBondLendTrade001Dto extends BaseEntity implements ProcessEntity 
         this.ccy = ccy;
     }
 
-    /**
-     * 取得 币种Fmt
-     *
-     * @return 币种
-     */
-    public String getCcyFmt() {
-        return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.币种, ccy))?
-                SysDataUtil.getNameFromDataDict(DictCode.币种, ccy):ccy;
+    public BigDecimal getOtherAmt() {
+        return otherAmt;
     }
 
-    public String getAcctNo() {
-        return acctNo;
-    }
-
-    public void setAcctNo(String acctNo) {
-        this.acctNo = acctNo;
+    public void setOtherAmt(BigDecimal otherAmt) {
+        this.otherAmt = otherAmt;
     }
 
     public String getOperateType() {
@@ -244,36 +209,20 @@ public class TrdBondLendTrade001Dto extends BaseEntity implements ProcessEntity 
         this.operateType = operateType;
     }
 
+    public String getPageModel() {
+        return pageModel;
+    }
+
+    public void setPageModel(String pageModel) {
+        this.pageModel = pageModel;
+    }
+
     public List<TrdBondLendTrade001Dto> getSelectedItem() {
         return selectedItem;
     }
 
     public void setSelectedItem(List<TrdBondLendTrade001Dto> selectedItem) {
         this.selectedItem = selectedItem;
-    }
-
-    public String getOutTradeId() {
-        return outTradeId;
-    }
-
-    public void setOutTradeId(String outTradeId) {
-        this.outTradeId = outTradeId;
-    }
-
-    public String getFinprodName() {
-        return finprodName;
-    }
-
-    public void setFinprodName(String finprodName) {
-        this.finprodName = finprodName;
-    }
-
-    public BigDecimal getSettleAmt() {
-        return settleAmt;
-    }
-
-    public void setSettleAmt(BigDecimal settleAmt) {
-        this.settleAmt = settleAmt;
     }
 
     public String getElementId() {
@@ -284,58 +233,33 @@ public class TrdBondLendTrade001Dto extends BaseEntity implements ProcessEntity 
         this.elementId = elementId;
     }
 
-    public String getPrinAmtStr() {
-        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
-        return this.getPrinAmt()==null?"0.00":decimalFormat.format(this.getPrinAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
+    public String getOutTradeId() {
+        return outTradeId;
     }
 
-    public String getFeeStr() {
-        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
-        return this.getFee()==null?"0.00":decimalFormat.format(this.getFee().setScale(2,BigDecimal.ROUND_HALF_UP));
+    public void setOutTradeId(String outTradeId) {
+        this.outTradeId = outTradeId;
     }
 
-    public String getSettleAmtStr() {
-        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
-        return this.getSettleAmt()==null?"0.00":decimalFormat.format(this.getSettleAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
+    @NotEmpty(fieldName = "TrdBondLendTrade.prodName", groups = { ValidateGroupEdit.class })
+    public String getProdName() {
+        return prodName;
     }
 
-    public String getFeeRateStr() {
-        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
-        return this.getFeeRate()==null?"0.00":decimalFormat.format(this.getFeeRate().setScale(2,BigDecimal.ROUND_HALF_UP));
+    public void setProdName(String prodName) {
+        this.prodName = prodName;
     }
 
-    public Date getVdate() {
-        return vdate;
+    @NotEmpty(fieldName = "TrdBondLendTrade.settleAmt", groups = { ValidateGroupEdit.class })
+    public BigDecimal getSettleAmt() {
+        return settleAmt;
     }
 
-    public void setVdate(Date vdate) {
-        this.vdate = vdate;
+    public void setSettleAmt(BigDecimal settleAmt) {
+        this.settleAmt = settleAmt;
     }
 
-    public String getVdateStr() {
-        return DateUtil.format(this.getVdate());
-    }
-
-    public Date getMdate() {
-        return mdate;
-    }
-
-    public void setMdate(Date mdate) {
-        this.mdate = mdate;
-    }
-
-    public String getMdateStr() {
-        return DateUtil.format(this.getMdate());
-    }
-
-    public Long getTerm() {
-        return term;
-    }
-
-    public void setTerm(Long term) {
-        this.term = term;
-    }
-
+    @NotEmpty(fieldName = "TrdBondLendTrade.prinAmt", groups = { ValidateGroupEdit.class })
     public BigDecimal getPrinAmt() {
         return prinAmt;
     }
@@ -344,6 +268,7 @@ public class TrdBondLendTrade001Dto extends BaseEntity implements ProcessEntity 
         this.prinAmt = prinAmt;
     }
 
+    @NotEmpty(fieldName = "TrdBondLendTrade.feeRate", groups = { ValidateGroupEdit.class })
     public BigDecimal getFeeRate() {
         return feeRate;
     }
@@ -352,11 +277,39 @@ public class TrdBondLendTrade001Dto extends BaseEntity implements ProcessEntity 
         this.feeRate = feeRate;
     }
 
+    @NotEmpty(fieldName = "TrdBondLendTrade.fee", groups = { ValidateGroupEdit.class })
     public BigDecimal getFee() {
         return fee;
     }
 
     public void setFee(BigDecimal fee) {
         this.fee = fee;
+    }
+
+    @NotEmpty(fieldName = "TrdBondLendTrade.acctNo", groups = { ValidateGroupEdit.class })
+    public String getAcctNo() {
+        return acctNo;
+    }
+
+    public void setAcctNo(String acctNo) {
+        this.acctNo = acctNo;
+    }
+
+    @NotEmpty(fieldName = "TrdBondLendTrade.term", groups = { ValidateGroupEdit.class })
+    public Long getTerm() {
+        return term;
+    }
+
+    public void setTerm(Long term) {
+        this.term = term;
+    }
+
+    @NotEmpty(fieldName = "TrdBondLendTrade003.settAmt", groups = { ValidateGroupEdit.class })
+    public BigDecimal getSettAmt() {
+        return settAmt;
+    }
+
+    public void setSettAmt(BigDecimal settAmt) {
+        this.settAmt = settAmt;
     }
 }

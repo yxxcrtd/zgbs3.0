@@ -11,8 +11,8 @@ import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 import com.joyintech.tams.valuation.common.interf.base.dto.AssetDealInfoValCommonResult;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.secdl.SecblTranDealTemplateRecService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValSeclendDeal;
-import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTrade002Dto;
-import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTrade003Dto;
+import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTradeDto;
+import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTrade001Dto;
 import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTradeResult;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class TrdBondLendTrade003Service extends CommonExportService<TrdBondLendTrade003Dto> implements BaseProcessService<TrdBondLendTrade003Dto> {
+public class TrdBondLendTrade003Service extends CommonExportService<TrdBondLendTrade001Dto> implements BaseProcessService<TrdBondLendTrade001Dto> {
 
     @Autowired
     private SecblTranDealTemplateRecService secblTranDealTemplateRecService;
@@ -37,10 +37,10 @@ public class TrdBondLendTrade003Service extends CommonExportService<TrdBondLendT
      * @see
      * @since 1.0
      */
-    public TrdBondLendTrade002Dto queryTradeInfoByTradeId(String tradeId) {
+    public TrdBondLendTradeDto queryTradeInfoByTradeId(String tradeId) {
         return restTemplate.postForObject(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdBondLendTrade002/queryTradeInfoByTradeId", tradeId,
-                TrdBondLendTrade002Dto.class);
+                TrdBondLendTradeDto.class);
     }
 
     /**
@@ -50,10 +50,10 @@ public class TrdBondLendTrade003Service extends CommonExportService<TrdBondLendT
      * @see
      * @since 1.0
      */
-    public TrdBondLendTrade002Dto queryInfoByTradeId(String tradeId) {
+    public TrdBondLendTradeDto queryInfoByTradeId(String tradeId) {
         return restTemplate.postForObject(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdBondLendTrade002/queryInfoByTradeId", tradeId,
-                TrdBondLendTrade002Dto.class);
+                TrdBondLendTradeDto.class);
     }
 
     /**
@@ -77,8 +77,8 @@ public class TrdBondLendTrade003Service extends CommonExportService<TrdBondLendT
 
 
     @Override
-    public void doComplete(TrdBondLendTrade003Dto trdBondLendTrade003Dto, OperationType operationType) {
-        TrdBondLendTradeResult trdBondLendTradeResult = generateEntity(trdBondLendTrade003Dto);
+    public void doComplete(TrdBondLendTrade001Dto trdBondLendTrade001Dto, OperationType operationType) {
+        TrdBondLendTradeResult trdBondLendTradeResult = generateEntity(trdBondLendTrade001Dto);
         String action = StringUtil.EMPTY;
          if (OperationType.NEW.equals(operationType)) {
              action = "insert";
@@ -93,8 +93,8 @@ public class TrdBondLendTrade003Service extends CommonExportService<TrdBondLendT
     }
 
     //封装实体类
-    public TrdBondLendTradeResult generateEntity(TrdBondLendTrade003Dto trdBondLendTrade003Dto){
-        TrdBondLendTrade002Dto dto = trdBondLendTrade002Service.queryTradeInfoByTradeId(trdBondLendTrade003Dto.getTradeId());
+    public TrdBondLendTradeResult generateEntity(TrdBondLendTrade001Dto trdBondLendTrade001Dto){
+        TrdBondLendTradeDto dto = trdBondLendTrade002Service.queryTradeInfoByTradeId(trdBondLendTrade001Dto.getTradeId());
 
         //设置接口参数
         Map<String,Object> params = new HashMap<>();
@@ -119,11 +119,11 @@ public class TrdBondLendTrade003Service extends CommonExportService<TrdBondLendT
         }
         entity.setPs(DictCodeList.交易方向_到期.getValue());
 
-        entity.setTradeDate(trdBondLendTrade003Dto.getTradeDate());//交易日
+        entity.setTradeDate(trdBondLendTrade001Dto.getTradeDate());//交易日
         //日期。。。
         entity.setVdate(dto.getTradeDate());//起息日
         entity.setMdate(dto.getTradeDate());//到期日
-        entity.setTerm(trdBondLendTrade003Dto.getTerm());//借贷期限
+        entity.setTerm(trdBondLendTrade001Dto.getTerm());//借贷期限
         entity.setFeeRate(dto.getFeeRate());//借贷费率
         entity.setFee(dto.getFee());//借贷费用
         entity.setCcy(dto.getCcy());//币种
@@ -172,7 +172,7 @@ public class TrdBondLendTrade003Service extends CommonExportService<TrdBondLendT
         result.setListValOrdersExt(valOrdersExtList);
 
         TrdBondLendTradeResult rst = new TrdBondLendTradeResult(result);
-        rst.setTrdBondLendTrade002Dto(dto);
+        rst.setTrdBondLendTradeDto(dto);
 
         return rst;
 

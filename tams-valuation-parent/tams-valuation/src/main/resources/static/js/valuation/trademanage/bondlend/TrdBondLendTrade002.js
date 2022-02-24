@@ -99,9 +99,9 @@
             var fee1 = JoyinMath.doDiv(feeRate,100,2,JoyinMath.ROUND_HALF_UP);
             var fee2 = JoyinMath.doMul(fee,fee1,2,JoyinMath.ROUND_HALF_UP);
             var fee3 = JoyinMath.doDiv(JoyinMath.doMul(fee2,days,2,JoyinMath.ROUND_HALF_UP),365,2,JoyinMath.ROUND_HALF_UP);
-            $('#fee').val(fee3);
+            $('#fee').val(fee3).trigger('change');
         }else{
-            $('#fee').val('');
+            $('#fee').val('').trigger('change');
         }
     }
 

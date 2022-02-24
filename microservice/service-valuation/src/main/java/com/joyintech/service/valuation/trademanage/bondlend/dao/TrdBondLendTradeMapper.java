@@ -13,8 +13,7 @@ package com.joyintech.service.valuation.trademanage.bondlend.dao;
 
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.service.valuation.trademanage.bondlend.dto.TrdBondLendTrade001Dto;
-import com.joyintech.service.valuation.trademanage.bondlend.dto.TrdBondLendTrade002Dto;
-import com.joyintech.service.valuation.trademanage.bondlend.dto.TrdBondLendTrade003Dto;
+import com.joyintech.service.valuation.trademanage.bondlend.dto.TrdBondLendTradeDto;
 import com.joyintech.tams.common.base.entity.FinProduct;
 import org.springframework.stereotype.Repository;
 
@@ -40,7 +39,7 @@ public interface TrdBondLendTradeMapper {
      * @see
      * @since 1.0
      */
-    List<TrdBondLendTrade001Dto> selectDeal(Map<String, Object> paraMap);
+    List<TrdBondLendTradeDto> selectDeal(Map<String, Object> paraMap);
 
 
     FinProduct selectInfoBySecId(Map<String, Object> map);
@@ -53,10 +52,10 @@ public interface TrdBondLendTradeMapper {
 
     int querySequences();
 
-    TrdBondLendTrade002Dto queryTradeInfoByTradeId(String tradeId);
+    TrdBondLendTradeDto queryTradeInfoByTradeId(String tradeId);
 
     List<SelectOptionDto> getTrdAcctId(Map<String, Object> map);
 
-    TrdBondLendTrade003Dto queryInfoByTradeId(String tradeId);
+    TrdBondLendTrade001Dto queryInfoByTradeId(String tradeId);
 
 }

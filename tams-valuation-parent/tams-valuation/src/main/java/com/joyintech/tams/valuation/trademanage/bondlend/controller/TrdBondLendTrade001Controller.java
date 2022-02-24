@@ -23,7 +23,7 @@ import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.valuation.common.service.BaseCommonService;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
-import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTrade001Dto;
+import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTradeDto;
 import com.joyintech.tams.valuation.trademanage.bondlend.service.TrdBondLendTrade001Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -69,11 +69,7 @@ public class TrdBondLendTrade001Controller extends BaseController {
 
     @Override
     public String init(Model model) {
-
         this.setSelectOptionToModel(model, DictCode.交易方向, DictCode.交易场所);
-
-
-
         return super.init(model);
     }
     /**
@@ -86,7 +82,7 @@ public class TrdBondLendTrade001Controller extends BaseController {
      */
     @RequestMapping("findPage")
     @ResponseBody
-    public Page<TrdBondLendTrade001Dto> findPage()
+    public Page<TrdBondLendTradeDto> findPage()
         throws Exception {
         return trdBondLendTrade001Service.findPage(RequestUtil.getPageParam());
     }
@@ -131,16 +127,16 @@ public class TrdBondLendTrade001Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("check")
-    public AjaxResult check(@RequestBody @Valid TrdBondLendTrade001Dto dto,
+    public AjaxResult check(@RequestBody @Valid TrdBondLendTradeDto dto,
                                   BindingResult result) throws ParseException {
 
-        List<TrdBondLendTrade001Dto> list = dto.getSelectedItem();
+        List<TrdBondLendTradeDto> list = dto.getSelectedItem();
         if(list==null||list.size()<=0){
             return new AjaxResult("请选择数据", MessageType.错误消息);
         }
         //删除时的校验
         if(StringUtil.isNotEmpty(list) && "delete".equals(dto.getOperateType())) {
-            for (TrdBondLendTrade001Dto item : list) {
+            for (TrdBondLendTradeDto item : list) {
                 //1.判断是否在流程中
                 //判断当前流程是否存在
                 if (trdBondLendTrade001Service.checkBusinessDataInFlow(item)) {
@@ -150,7 +146,7 @@ public class TrdBondLendTrade001Controller extends BaseController {
 
             }
         }else if("edit".equals(dto.getOperateType())){
-                for (TrdBondLendTrade001Dto item : list) {
+                for (TrdBondLendTradeDto item : list) {
                     //1.判断是否在流程中
                     //判断当前流程是否存在
                     if(trdBondLendTrade001Service.checkBusinessDataInFlow(item)){
@@ -164,7 +160,7 @@ public class TrdBondLendTrade001Controller extends BaseController {
 
     @ResponseBody
     @RequestMapping(ACTION_DELETE)
-    public AjaxResult delete(@RequestBody @Valid TrdBondLendTrade001Dto dto, BindingResult br)
+    public AjaxResult delete(@RequestBody @Valid TrdBondLendTradeDto dto, BindingResult br)
     {
 
         if (br.hasErrors()) {
@@ -172,8 +168,8 @@ public class TrdBondLendTrade001Controller extends BaseController {
         }
 
         // 启动流程
-        ProcessParameter<TrdBondLendTrade001Dto> proParam = new ProcessParameter<>();
-        WorkFlowParameter<TrdBondLendTrade001Dto> params = new WorkFlowParameter<>();
+        ProcessParameter<TrdBondLendTradeDto> proParam = new ProcessParameter<>();
+        WorkFlowParameter<TrdBondLendTradeDto> params = new WorkFlowParameter<>();
 
         // 业务代码（凭证流水号）
         params.setBusinessCode(item -> item.getTradeId());
@@ -195,7 +191,7 @@ public class TrdBondLendTrade001Controller extends BaseController {
         String msg = getMessage("COMMON_I_0001");
         try {
             msg = trdBondLendTrade001Service.start(proParam, dto.getSelectedItem().toArray(
-                    new TrdBondLendTrade001Dto[dto.getSelectedItem().size()]));
+                    new TrdBondLendTradeDto[dto.getSelectedItem().size()]));
         }
         catch (Exception e) {
             getLogger().error("启动流程失败：", e);
@@ -217,9 +213,9 @@ public class TrdBondLendTrade001Controller extends BaseController {
 
         String datas = this.getParam("datas");
         Map<String, Object> params = RequestUtil.getPageParam();
-        List<TrdBondLendTrade001Dto> listdto;
+        List<TrdBondLendTradeDto> listdto;
         if (datas != null) {
-            listdto = JsonUtils.json2List(datas, TrdBondLendTrade001Dto.class);
+            listdto = JsonUtils.json2List(datas, TrdBondLendTradeDto.class);
         }
         else {
             listdto = trdBondLendTrade001Service.queryPageList(params);

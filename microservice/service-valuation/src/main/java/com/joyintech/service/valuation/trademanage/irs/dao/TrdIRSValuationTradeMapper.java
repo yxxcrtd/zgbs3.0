@@ -12,7 +12,7 @@ package com.joyintech.service.valuation.trademanage.irs.dao;
 
 
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.service.valuation.trademanage.bondlend.dto.TrdBondLendTrade002Dto;
+import com.joyintech.service.valuation.trademanage.bondlend.dto.TrdBondLendTradeDto;
 import com.joyintech.service.valuation.trademanage.irs.dto.TrdIRSValuationTrade001Dto;
 import org.springframework.stereotype.Repository;
 
@@ -36,7 +36,7 @@ public interface TrdIRSValuationTradeMapper {
 
     int querySequences();
 
-    TrdBondLendTrade002Dto queryTradeInfoByTradeId(String tradeId);
+    TrdBondLendTradeDto queryTradeInfoByTradeId(String tradeId);
 
     List<SelectOptionDto> getTrdAcctId(Map<String, Object> map);
 
