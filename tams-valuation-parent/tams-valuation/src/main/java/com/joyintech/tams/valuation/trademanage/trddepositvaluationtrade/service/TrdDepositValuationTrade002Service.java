@@ -64,8 +64,7 @@ public class TrdDepositValuationTrade002Service extends CommonExportService<TrdD
     @Autowired
     private DepositeAssetAstDealTemplateRecService depositeAssetAstDealTemplateRecService;
 
-    @Autowired
-    private TemplateOrderInfoReaderResult acctEntity;
+
 
 
     /**
@@ -170,78 +169,61 @@ public class TrdDepositValuationTrade002Service extends CommonExportService<TrdD
         //将页面输入值赋值给接口实体类
         List<ValBotAstTrade> listValBotAstTrade=new ArrayList<>();
         ValBotAstTrade entity = new ValBotAstTrade();
-        entity.setTradeId(dto.getTradeId());
-        entity.setProdId(dto.getPortfolioId());
-        entity.setAssetId(dto.getFinprodMarketId());
-//        //金融产品类型
-//        if("01".equals(dto.getPs())){
-//            entity.setFinprodType(DictCodeListExt1.金融产品类型_债券借贷融入.getValue());
-//        }else if("02".equals(dto.getPs())){
-//            entity.setFinprodType(DictCodeListExt1.金融产品类型_债券借贷融出.getValue());
-//        }else if("03".equals(dto.getPs())){
-//            entity.setPs(DictCodeList.交易方向_到期.getValue());
-//        }
+        BeanUtil.copyPropertiesIgnoreNull(entity,dto);
+        //比较界面和接口字段差异，并手动给接口字段赋值
+        entity.setTradeId(dto.getTradeId());  //交易编号
+        entity.setProdId(dto.getPortfolioId()); //产品代码
+        entity.setAssetId("F01_"+dto.getFinprodMarketId());  //资产代码
+        entity.setDataActionSign("01");//数据动作标志
         entity.setDealDate(dto.getTradeDate());//交易日
         entity.setSettDate(dto.getSettDate()); //交割日
+        entity.setPs(dto.getPs());//交易方向
         entity.setTradeCapi(dto.getPrinAmt()); //交易本金
         entity.setIntAmt(dto.getIntAmt()); //应收利息
         entity.setDealAmt(dto.getDealAmt());//交易金额
         entity.setCcy(dto.getCcy());//币种
-//        entity.setVdate(DateUtil.parse(dto.getVdate()));//起息日
-//        entity.setMdate(DateUtil.parse(dto.getMdate()));//到期日
-//        entity.setTerm(dto.getTerm());//借贷期限
-//        entity.setFeeRate(dto.getFeeRate());//借贷费率
-//        entity.setFee(dto.getFee());//借贷费用
-
-//        entity.setSecId("F01_"+dto.getSecId());//标的债券代码
-//        entity.setPrinAmt(dto.getPrinAmt());//券面总额
-//        entity.setStlFeeAmt(dto.getStlFeeAmt());//结算服务费
-        //比较界面和接口字段差异，并手动给接口字段赋值
-//        entity.setFinprodId("F01_"+ dto.getSecId());//金融产品代码
-        entity.setDataActionSign("01");//数据动作标志
-        entity.setPs("T01");//交易方向
-
-        entity.setCounterId("JYDS000000000424");//交易对手
-
-
+//        entity.setCounterId("JYDS000000000424");//交易对手
+//        entity.setCounterId("JYDSJYS000000002");//交易对手
+        entity.setCounterId(dto.getCounterId());//交易对手
         entity.setIsClean("Y");//有无清算指令
-//        entity.setRegistAgency("01");//登记结算机构
-//        entity.setIsStlFeeAmt("Y");//结算手续费是否随交易支付
-//        entity.setMyAcctNo("201907300001:jixu0001");
+//        entity.setChlFeeAmt(new BigDecimal(1.22));
+//        entity.setIsChlFeeAmt("N");
+//        entity.setChannelId("2222");
+//        entity.setTrdFee(new BigDecimal(222.1));
+
+
         listValBotAstTrade.add(entity);
         TemplateOrderInfoReaderResult acctEntity= new TemplateOrderInfoReaderResult();
         Date date = new Date();
         acctEntity.setResovleDate(date);
         acctEntity.setFourLevelSubjectKg("Y");
         Map<String, Object> map = depositeAssetAstDealTemplateRecService.handleValBotAstTrade(listValBotAstTrade,acctEntity,params,null);
+        // 定义返回变量
+        AssetDealInfoValCommonResult result = new AssetDealInfoValCommonResult();
         // 金融产品交易List
-        List<TrdProductDeal> listValFinProductDeal=(List<TrdProductDeal>)map.get("listValFinProductDeal");
+        List<TrdProductDeal> listValFinProductDeal = (List<TrdProductDeal>)map.get("ValFinProductDeal");
         result.setListValFinProductDeal(listValFinProductDeal);
-
-        // 费用明细表
-//        List<TrdTradeFeeDetail> listValTrdTradeFeeDetail=(List<TrdTradeFeeDetail>) map.get("listValTrdTradeFeeDetail");
-//        result.setListValTradeFeeDetail(listValTrdTradeFeeDetail);
         // 估值核算交易扩展表List
-        List<TrdProductDealAdd> listValFinProductDealExt=(List<TrdProductDealAdd>)map.get("listValFinProductDealExt");
+        List<TrdProductDealAdd> listValFinProductDealExt = (List<TrdProductDealAdd>)map.get("ValFinProductDealExt");
         result.setListValFinProductDealExt(listValFinProductDealExt);
         // 入账信息表List
-        List<BokDealAccounting> listValDealAccounting=(List<BokDealAccounting>)map.get("listValDealAccounting");
+        List<BokDealAccounting> listValDealAccounting = (List<BokDealAccounting>)map.get("ValDealAccounting");
         result.setListValDealAccounting(listValDealAccounting);
-        //账务明细list
-        List<BokDealAccountingDetail> listValDealAccountingDetail=(List<BokDealAccountingDetail>)map.get("listValDealAccountingDetail");
+        // 账务明细表List
+        List<BokDealAccountingDetail> listValDealAccountingDetail = (List<BokDealAccountingDetail>)map.get("ValDealAccountingDetail");
         result.setListValDealAccountingDetail(listValDealAccountingDetail);
         // 交易费用明细表List
-        List<TrdTradeFeeDetail> listValTradeFeeDetail =(List<TrdTradeFeeDetail>)map.get("listValTradeFeeDetail");
+        List<TrdTradeFeeDetail> listValTradeFeeDetail = (List<TrdTradeFeeDetail>)map.get("ValTradeFeeDetail");
         result.setListValTradeFeeDetail(listValTradeFeeDetail);
         //账务明细代码表
-        List<BokDetailId> listValBokDetailId=(List<BokDetailId>)map.get("listValBokDetailId");
+        List<BokDetailId> listValBokDetailId = (List<BokDetailId>)map.get("ValBokDetailId");
         result.setListValBokDetailId(listValBokDetailId);
+
         //结算指令
-        List<StlOrders> valOrdersList=(List<StlOrders>)map.get("listValOrders");
-        result.setListValOrders(valOrdersList);
-        //结算指令拓展表list
-        List<StlOrdersExt> valOrdersExtList=(List<StlOrdersExt>)map.get("listValOrdersExt");
-        result.setListValOrdersExt(valOrdersExtList);
+        List<StlOrders> listValOrders = (List<StlOrders>)map.get("listValOrders");
+        List<StlOrdersExt> listValOrdersExt = (List<StlOrdersExt>)map.get("listValOrdersExt");
+        result.setListValOrders(listValOrders);
+        result.setListValOrdersExt(listValOrdersExt);
 
         TrdDepositValuationTradeResult rst = new TrdDepositValuationTradeResult(result);
         rst.setTrdDepositValuationTrade001Dto(dto);

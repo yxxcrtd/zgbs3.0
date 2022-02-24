@@ -146,7 +146,7 @@ public class TrdDepositValuationTrade002Controller extends BaseController {
     public Page<SelectOptionDto> findPortfolioId(HttpServletRequest request) {
         Map<String, Object> param =RequestUtil.getPageParam();
         //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-//        param.put("finprodType", "F01"); //测试
+        param.put("finprodType", "F16"); //测试
         return trdDepositValuationTrade002Service.findPortfolioId(param);
     }
 
@@ -248,7 +248,7 @@ public class TrdDepositValuationTrade002Controller extends BaseController {
         params.setBusinessType(DictCodeList.共通业务类型_存款类资产交易.getValue());
         // 设置流程业务说明, entity即传入的dto
         params.setComment(
-                entity -> SpringContextUtil.getTextValue("TrdDepositValuationTrade001.tradeId")+"("+ entity.getTradeId() +")"+"-"+SpringContextUtil.getTextValue("TrdDepositValuationTrade002.tradeDate") + "(" + DateUtil.format(entity.getTradeDate()) + ")"
+                entity -> SpringContextUtil.getTextValue("交易编号")+"("+ entity.getTradeId() +")"+"-"+SpringContextUtil.getTextValue("交易日") + "(" + DateUtil.format(entity.getTradeDate()) + ")"
         );
         //给参数变成ProcessParameter而非WorkFlowParameter
         ProcessParameter<TrdDepositValuationTrade001Dto> parameter = new ProcessParameter<TrdDepositValuationTrade001Dto>();
