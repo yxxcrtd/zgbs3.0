@@ -1516,67 +1516,65 @@ public class BookAccountGenLogicNew {
                     continue;
                 }
             }
-            // 获取账务明细代码
-            BokDetailId bokDetailId =(BokDetailId)accountSceneMap.get(accountEntry.getBokDetailId());
-            // 根据账务明细代码获取对应辅助核算项
-            SubjectMappingConfig mappingConfig = subjectMappingConfigMap.get(bokDetailId.getBokDetailId());
-            // 此处可直接赋值，分录中费用类型对应的会计元素，数据来源会设置为对应费用类型，可直接赋值费用类型，非费用类型的用不到，赋值也不会有问题
-            mappingConfig.setFeeType(accountEntry.getDictSource());
-            // 定义 变量.资产辅助核算项 封装辅助核算项为map对象
-            Map<String, Object> params = initMappingParams(mappingConfig);
-            // 定义 变量.默认辅助核算项 封装辅助核算项为map对象
-            Map<String, Object> paramsDefualt = initMappingParams(mappingConfig);
-            // 增加辅助核算项默认（DEFAULT) = 是(Y)
-            paramsDefualt.put(SubjectConfigCode.默认.getValue(), DictCodeList.是否_是.getValue());
-            // 定义 变量.是否匹配成功标志位
-            boolean mappingFlag = false;
-            // 定义 变量.默认科目
-            BokSubject bokSubjectDefault = null;
-            for(BokSubject bokSubject : entrySubjectList){
-                // 根据变量.资产辅助核算项通过辅助核算项表达式匹配
-                // 科目币种=变量.币种
-                if(bokSubject.getCcy().equals(ccy)) {
-                    //  科目内部科目编码不为空 且 科目内部科目编码匹配辅助核算项
-                    if (StringUtil.isNotEmpty(bokSubject.getSubjectHandFelCode()) &&
-                            ExpressionUtil.booleanValue(bokSubject.getSubjectHandFelCode(), params)
-                    ) {
-                        // 匹配成功，相关科目信息录入
-                        accountEntry.setSubjectId(bokSubject.getSubjectNo());
-                        accountEntry.setSubjectName(bokSubject.getSubjectName());
-                        accountEntry.setFsubjectId(bokSubject.getFsubjectId());
-                        accountEntry.setBaseSubjectNature(bokSubject.getSubjectInternalCode());
-                        accountEntry.setSubjectType(bokSubject.getSubjectType());
-                        accountEntry.setAccQuaFlag(bokSubject.getAccQuaFlag());
-                        accountEntry.setAccIntFlag(bokSubject.getAccIntFlag());
-                        accountEntry.setOverdrawnFlag(bokSubject.getOverdrawnFlag());
-                        accountEntry.setGenDetsubFlag(bokSubject.getGenDetsubFlag());
-                        accountEntry.setBalFlag(bokSubject.getBalFlag());
-                        // 变量.是否匹配成功标志位更新为 true
-                        mappingFlag = true;
-                        break;
-                    }
-                    // 比较科目与默认辅助核算项，获取默认DEFAULT=='Y'的科目,即默认科目
-                    if (StringUtil.isNotEmpty(bokSubject.getSubjectHandFelCode()) &&
-                            ExpressionUtil.booleanValue(bokSubject.getSubjectHandFelCode(), paramsDefualt)
-                    ) {
-                        // 默认科目 = 匹配科目
-                        bokSubjectDefault = bokSubject;
+            // 定义 变量.科目信息
+            BokSubject bokSubject = null;
+            if(entrySubjectList.size() == 1){
+                bokSubject = entrySubjectList.get(0);
+            }
+            else{
+                // 获取账务明细代码
+                BokDetailId bokDetailId =(BokDetailId)accountSceneMap.get(accountEntry.getBokDetailId());
+                // 根据账务明细代码获取对应辅助核算项
+                SubjectMappingConfig mappingConfig = subjectMappingConfigMap.get(bokDetailId.getBokDetailId());
+                // 此处可直接赋值，分录中费用类型对应的会计元素，数据来源会设置为对应费用类型，可直接赋值费用类型，非费用类型的用不到，赋值也不会有问题
+                mappingConfig.setFeeType(accountEntry.getDictSource());
+                // 定义 变量.资产辅助核算项 封装辅助核算项为map对象
+                Map<String, Object> params = initMappingParams(mappingConfig);
+                // 定义 变量.默认辅助核算项 封装辅助核算项为map对象
+                Map<String, Object> paramsDefualt = initMappingParams(mappingConfig);
+                // 增加辅助核算项默认（DEFAULT) = 是(Y)
+                paramsDefualt.put(SubjectConfigCode.默认.getValue(), DictCodeList.是否_是.getValue());
+                // 定义 变量.默认科目
+                BokSubject bokSubjectDefault = null;
+                for(BokSubject item : entrySubjectList){
+                    // 根据变量.资产辅助核算
+                    // 项通过辅助核算项表达式匹配
+                    // 科目币种=变量.币种
+                    if(item.getCcy().equals(ccy)) {
+                        //  科目内部科目编码不为空 且 科目内部科目编码匹配辅助核算项
+                        if (StringUtil.isNotEmpty(item.getSubjectHandFelCode()) &&
+                                ExpressionUtil.booleanValue(item.getSubjectHandFelCode(), params)
+                        ) {
+                            bokSubject = item;
+                            break;
+                        }
+                        // 比较科目与默认辅助核算项，获取默认DEFAULT=='Y'的科目,即默认科目
+                        if (StringUtil.isNotEmpty(item.getSubjectHandFelCode()) &&
+                                ExpressionUtil.booleanValue(item.getSubjectHandFelCode(), paramsDefualt)
+                        ) {
+                            // 默认科目 = 匹配科目
+                            bokSubjectDefault = item;
+                        }
                     }
                 }
+                // 若科目信息为空，则说明未匹配对应科目信息，取默认科目
+                if(bokSubject ==null){
+                    bokSubject = bokSubjectDefault;
+                }
             }
-            // 若循环科目后未匹配成功，且默认科目不为空，则取默认科目
-            if(!mappingFlag && bokSubjectDefault != null){
+            // 若变量.科目信息不为空，则分录对应赋值科目相关信息
+            if(bokSubject != null){
                 // 相关科目信息录入
-                accountEntry.setSubjectId(bokSubjectDefault.getSubjectNo());
-                accountEntry.setSubjectName(bokSubjectDefault.getSubjectName());
-                accountEntry.setFsubjectId(bokSubjectDefault.getFsubjectId());
-                accountEntry.setBaseSubjectNature(bokSubjectDefault.getSubjectInternalCode());
-                accountEntry.setSubjectType(bokSubjectDefault.getSubjectType());
-                accountEntry.setAccQuaFlag(bokSubjectDefault.getAccQuaFlag());
-                accountEntry.setAccIntFlag(bokSubjectDefault.getAccIntFlag());
-                accountEntry.setOverdrawnFlag(bokSubjectDefault.getOverdrawnFlag());
-                accountEntry.setGenDetsubFlag(bokSubjectDefault.getGenDetsubFlag());
-                accountEntry.setBalFlag(bokSubjectDefault.getBalFlag());
+                accountEntry.setSubjectId(bokSubject.getSubjectNo());
+                accountEntry.setSubjectName(bokSubject.getSubjectName());
+                accountEntry.setFsubjectId(bokSubject.getFsubjectId());
+                accountEntry.setBaseSubjectNature(bokSubject.getSubjectInternalCode());
+                accountEntry.setSubjectType(bokSubject.getSubjectType());
+                accountEntry.setAccQuaFlag(bokSubject.getAccQuaFlag());
+                accountEntry.setAccIntFlag(bokSubject.getAccIntFlag());
+                accountEntry.setOverdrawnFlag(bokSubject.getOverdrawnFlag());
+                accountEntry.setGenDetsubFlag(bokSubject.getGenDetsubFlag());
+                accountEntry.setBalFlag(bokSubject.getBalFlag());
             }
         }
     }
