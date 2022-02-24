@@ -25,7 +25,7 @@ import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
-import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTrade002Dto;
+import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTradeDto;
 import com.joyintech.tams.valuation.trademanage.bond.service.TrdBondTrade002Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -72,25 +72,50 @@ public class TrdBondTrade002Controller extends BaseController {
         // 工作流ID
         String workflowId = this.getParam(GlobalConstant.WORKFLOW_ID);
 
-        String operateType = getParam("operateType");
-
         String tradeId = getParam("tradeId");
 
-        if(StringUtil.isNotEmpty(workflowId)){
-            TrdBondTrade002Dto entity= trdBondTrade002Service.getBussinessEntityByWorkflowId(workflowId);
-            if(StringUtil.isNotEmpty(entity.getTradeId())){
-                entity = trdBondTrade002Service.queryTradeInfoByTradeId(entity.getTradeId());
-            }
+        if(!WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotEmpty(workflowId)){
+            TrdBondTradeDto entity= trdBondTrade002Service.getBussinessEntityByWorkflowId(workflowId);
             model.addAttribute("entity", entity);
             model.addAttribute("workflowId", workflowId);
 
-        }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){
-            TrdBondTrade002Dto entity = trdBondTrade002Service.queryTradeInfoByTradeId(tradeId);
+        }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){//明细页面
+            TrdBondTradeDto entity = trdBondTrade002Service.queryTradeInfoByTradeId(tradeId);
             model.addAttribute("entity", entity);
         }
 
 
         return super.init(model);
+    }
+
+    /**
+     * 产品代码下拉框
+     *
+     * @return 产品代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getFinprodId")
+    public List<SelectOptionDto> getFinprodId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("finprodType","F16");
+        return commonBusinessService.getProdId(param);
+    }
+
+    /**
+     * 资产代码下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getAssetId")
+    public List<SelectOptionDto> getAssetId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("assetType","F01");
+        return commonBusinessService.getAssetId(param);
     }
 
     /**
@@ -178,7 +203,7 @@ public class TrdBondTrade002Controller extends BaseController {
     @ResponseBody
     @RequestMapping("check")
     public AjaxResult check(@RequestBody @Validated({
-            ValidateGroupEdit.class}) TrdBondTrade002Dto dto, BindingResult result) {
+            ValidateGroupEdit.class}) TrdBondTradeDto dto, BindingResult result) {
         return commonCheck(result, dto.getOperateType());
     }
 
@@ -195,15 +220,15 @@ public class TrdBondTrade002Controller extends BaseController {
     @RequestMapping("save")
     @ResponseBody
     AjaxResult save(@RequestBody @Validated({
-            ValidateGroupEdit.class}) TrdBondTrade002Dto dto, BindingResult br)
+            ValidateGroupEdit.class}) TrdBondTradeDto dto, BindingResult br)
         throws Exception {
 
         if (br.hasErrors()) {
             return new AjaxResult(br);
         }
 
-        ProcessParameter<TrdBondTrade002Dto> processParameter = new ProcessParameter<>();
-        WorkFlowParameter<TrdBondTrade002Dto> workFlowParameter = new WorkFlowParameter<>();
+        ProcessParameter<TrdBondTradeDto> processParameter = new ProcessParameter<>();
+        WorkFlowParameter<TrdBondTradeDto> workFlowParameter = new WorkFlowParameter<>();
         processParameter.setWorkFlowParameter(workFlowParameter);
         processParameter.setPageId(this.getPageId());
 

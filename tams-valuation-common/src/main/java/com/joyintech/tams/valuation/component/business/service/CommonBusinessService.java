@@ -161,6 +161,17 @@ public class CommonBusinessService {
     }
 
     /**
+     * 资金账户信息
+     * @param param 画面参数
+     * @return 组合代码：下拉框
+     * @see
+     * @since 1.0
+     */
+    public String getTrdAcctId1(Map<String, Object> param) {
+        String resultList = commonBusinessMapper.getTrdAcctId1(param);
+        return resultList;
+    }
+    /**
      * @author  殷亚
      * @description 获取内部科目编码定义
      * @date 2022-1-12 15:09

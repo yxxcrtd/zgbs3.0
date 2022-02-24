@@ -123,10 +123,10 @@ public class TrdSecOverTransferValuationDuration002Controller extends BaseContro
      */
     @ResponseBody
     @RequestMapping("/getTrdAcctId")
-    public List<SelectOptionDto> getTrdAcctId() {
+    public String getTrdAcctId() {
         Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("portfolioId",param.get("finprodId"));
-        return commonBusinessService.getTrdAcctId(param);
+        param.put("finprodId",param.get("prodId"));
+        return commonBusinessService.getTrdAcctId1(param);
     }
 
     /**

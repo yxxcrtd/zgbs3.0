@@ -36,8 +36,8 @@
         cols:[
             {field:'tradeId', title: '交易编号',width:220},
             {field:'outTradeId', title: '外部成交编号',width:220},
-            {field:'finprodId', title: '产品代码',width:180},
-            {field:'finprodName', title: '产品名称',width:180},
+            {field:'prodId', title: '产品代码',width:180},
+            {field:'prodName', title: '产品名称',width:180},
             {field:'secId', title: '债券代码',width:180},
             {field:'secAbbr', title: '债券简称',width:180},
             {field:'tradeMarketStr', title: '交易场所',sortField:"tradeMarket",width:180},
@@ -46,21 +46,20 @@
             {field:'ps', title: '交易类型',visible:false},
             {field:'tradeDateStr', width:120,  title: '交易日',sortField:'tradeDate'},
             {field:'tradeDate',title: '交易日',visible:false},
-            {field:'settleDateStr', width:120,  title: '交割日',sortField:'settleDate'},
-            {field:'settleDate', title: '交割日',visible:false},
+            {field:'settdateDateStr', width:120,  title: '交割日',sortField:'settdateDate'},
+            {field:'settdateDate', title: '交割日',visible:false},
             {field:'fundSettleDateStr', width:120,  title: '资金交收日',sortField:'fundSettleDate'},
             {field:'fundSettleDate', title: '资金交收日',visible:false},
             {field:'invAimStr', title: '会计分类',sortField:"invAim",width:240},
             {field:'invAim', title: '会计分类',visible:false},
-            {field:'chlFinprodId', title: '交易通道代码',width:180},
-            {field:'tradeNum', type:"money",title: '成交数量',width:180},
+            {field:'dealNum', type:"money",title: '成交数量',width:180},
             {field:'fpriceAmt',type:"money", title: '全价总额',width:180},
             {field:'intAmt', type:"money",title: '应收利息总额',width:180},
             {field:'ccyFmt', title: '币种',sortField:"ccy",width:180},
             {field:'ccy', title: '币种',visible:false},
             {field:'settleAmt',type:"money", title: '结算金额',width:180},
-            {field:'bTradeAmt', type:"money",title: '本币交易金额',width:180},
-            {field:'acctNo', title: '资金账户',width:180},
+            {field:'bTradeAmt', type:"money",title: '交易金额',width:180},
+            {field:'myAcctNo', title: '资金账户',width:180},
             {field:'operation', title:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操 作', type:'action', fixed: 'right',width:120,
                 buttons:['edit', 'delt']},
         ],
@@ -95,7 +94,7 @@
                     basePath + 'valuation/trademanage/bond/TrdBondTrade001/delete',
                     object,
                     "TrdBondTrade001_btn_delete",
-                    "BondTradeQuery001",
+                    "TrdBondTrade002",
                     function() {
                         table.reload();
                     }
@@ -162,7 +161,7 @@
                         basePath + 'valuation/trademanage/bond/TrdBondTrade001/delete',
                         object,
                         "TrdBondTrade001_btn_delete",
-                        "BondTradeQuery001",
+                        "TrdBondTrade002",
                         function() {
                             table.reload();
                         }

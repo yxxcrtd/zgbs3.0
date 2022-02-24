@@ -7,9 +7,8 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.valuation.trademanage.bond.dao.TrdBondTradeMapper;
-import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTrade001Dto;
+import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTradeDto;
 import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTradeResult;
-import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTrade002Dto;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -116,7 +115,7 @@ public class TrdBondTrade002Service extends BaseService {
      * @see
      * @since 1.0
      */
-    public TrdBondTrade002Dto queryTradeInfoByTradeId(String tradeId){
+    public TrdBondTradeDto queryTradeInfoByTradeId(String tradeId){
         return  trdBondTradeMapper.queryTradeInfoByTradeId(tradeId);
     }
 
@@ -231,6 +230,7 @@ public class TrdBondTrade002Service extends BaseService {
             for (BokDetailId e : listValBokDetailId) {
                 listInsert.add(e);
             }
+            valBokDetailIdBatchMapper.deleteBatch(listInsert);
             valBokDetailIdBatchMapper.insertBatch(listInsert);
         }
 
@@ -272,9 +272,9 @@ public class TrdBondTrade002Service extends BaseService {
     }
 
     public int update(TrdBondTradeResult dto){
-        TrdBondTrade001Dto dto1 = new TrdBondTrade001Dto();
-        dto1.setFinprodId(dto.getTrdBondTrade002Dto().getProdId());
-        dto1.setTradeId(dto.getTrdBondTrade002Dto().getTradeId());
+        TrdBondTradeDto dto1 = new TrdBondTradeDto();
+        dto1.setProdId(dto.getTrdBondTradeDto().getProdId());
+        dto1.setTradeId(dto.getTrdBondTradeDto().getTradeId());
        trdBondTrade001Service.delete(dto1);
        return insert(dto);
     }

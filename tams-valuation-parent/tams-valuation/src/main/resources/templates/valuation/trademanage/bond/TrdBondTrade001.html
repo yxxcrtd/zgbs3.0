@@ -16,7 +16,7 @@
                 <div class="layui-form-item">
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
                         <label class="layui-form-label form-lable"
-                               data-th-text="#{TrdBondTrade001.tradeId}">交易编号</label>
+                               data-th-text="#{TrdBondTrade.tradeId}">交易编号</label>
                         <div class="layui-input-inline input-inline">
                             <input type="text" id="tradeId" name="tradeId"
                                 class="layui-input form-input input-lenovoselect" placeholder="请输入内容"
@@ -26,9 +26,9 @@
                     </div>
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
                         <label class="layui-form-label form-lable"
-                               data-th-text="#{TrdBondTrade001.finprodId}">产品代码</label>
+                               data-th-text="#{TrdBondTrade.prodId}">产品代码</label>
                         <div class="layui-input-inline input-inline">
-                            <select id="finprodId" name="finprodId"
+                            <select id="prodId" name="prodId"
                                     class="layui-input form-input input-select"
                                     data-th-data-url="@{/valuation/trademanage/bond/TrdBondTrade001/getFinprodId}"
                                     multiple="true" allowClear="true" placeholder="请输入内容">
@@ -37,7 +37,7 @@
                     </div>
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
                         <label class="layui-form-label form-lable"
-                               data-th-text="#{TrdBondTrade001.asset}">资产代码</label>
+                               data-th-text="#{TrdBondTrade.asset}">资产代码</label>
                         <div class="layui-input-inline input-inline">
                             <select id="asset" name="asset"
                                     class="layui-input form-input input-select"
@@ -50,7 +50,7 @@
                 <div class="layui-form-item">
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
                         <label class="layui-form-label form-lable"
-                               data-th-text="#{TrdBondTrade001.tradeDate}">交易日期</label>
+                               data-th-text="#{TrdBondTrade.tradeDate}">交易日期</label>
                         <div class="layui-input-inline input-inline">
                             <input type="text" id="tradeDate" name="tradeDate"
                                    class="layui-input form-input input-dateRangeSelect" placeholder="请输入内容"
@@ -60,7 +60,7 @@
                     </div>
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
                         <label class="layui-form-label form-lable"
-                               data-th-text="#{TrdBondTrade001.ps}">交易方向</label>
+                               data-th-text="#{TrdBondTrade.ps}">交易方向</label>
                         <div class="layui-input-inline input-inline">
                             <input id="ps" name="ps" class="input-select"
                                    placeholder="请选择"
@@ -72,7 +72,7 @@
                     </div>
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
                         <label class="layui-form-label form-lable"
-                               data-th-text="#{TrdBondTrade001.tradeMarket}">交易场所</label>
+                               data-th-text="#{TrdBondTrade.tradeMarket}">交易场所</label>
                         <div class="layui-input-inline input-inline">
                             <input id="tradeMarket" name="tradeMarket" class="input-select"
                                    placeholder="请选择"

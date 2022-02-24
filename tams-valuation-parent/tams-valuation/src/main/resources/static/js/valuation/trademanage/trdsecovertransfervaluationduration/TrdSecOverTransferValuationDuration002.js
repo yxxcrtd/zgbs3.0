@@ -70,6 +70,12 @@
         } else {
             $('#prodName').val($('#prodId').select2('data')[0].object).trigger('change');
         }
+        Joyin.ajax(basePath + 'valuation/trademanage/trdsecovertransfervaluationduration/TrdSecOverTransferValuationDuration002/getTrdAcctId',
+            {prodId: prodId,acctType:'A01'}, function (result) {
+                if (result) {
+                        $('#myAcctNo').textSelect('setValue',result);
+                    }
+            })
     }
 
     /**

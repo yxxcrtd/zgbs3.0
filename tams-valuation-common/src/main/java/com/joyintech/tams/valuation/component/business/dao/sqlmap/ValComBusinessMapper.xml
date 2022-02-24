@@ -132,6 +132,21 @@
 		</where>
 	</select>
 
+	<!--资金账户下拉框-->
+	<select id="getTrdAcctId1" resultType="java.lang.String">
+		select
+		distinct acct.ACCT_NO as acctno
+		FROM STL_FIN_PRODUCT_ACCT acct
+		where
+		acct.ACCT_TYPE = 'A01'
+		<if test="finprodId != null and finprodId != ''">
+			AND acct.FINPROD_ID =#{finprodId}
+		</if>
+		<if test=" initValue != null and initValue != ''">
+			AND acct.ACCT_NO = #{initValue}
+		</if>
+	</select>
+
 	<!--内部科目定义下拉框-->
 	<select id="getSubjectInteral" resultType="com.joyintech.framework.select.SelectOptionDto">
 		select bsi.SUBJECT_INTERNAL_CODE as id,bsi.SUBJECT_INTERNAL_NAME as text

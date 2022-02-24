@@ -4,10 +4,9 @@ package com.joyintech.service.valuation.trademanage.bondlend.service;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTrade001Dto;
 import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTradeResult;
-import com.joyintech.service.valuation.trademanage.bond.service.TrdBondTrade001Service;
 import com.joyintech.service.valuation.trademanage.bondlend.dao.TrdBondLendTradeMapper;
+import com.joyintech.service.valuation.trademanage.bondlend.dto.TrdBondLendTrade001Dto;
 import com.joyintech.service.valuation.trademanage.bondlend.dto.TrdBondLendTrade002Dto;
 import com.joyintech.service.valuation.trademanage.bondlend.dto.TrdBondLendTrade003Dto;
 import com.joyintech.tams.common.base.entity.*;
@@ -91,7 +90,7 @@ public class TrdBondLendTrade002Service extends BaseService {
     private InterfCommonService interfCommonService;
 
     @Autowired
-    private TrdBondTrade001Service trdBondTrade001Service;
+    private TrdBondLendTrade001Service trdBondLendTrade001Service;
 
     /**
      * 通过交易编号查询交易信息（修改）
@@ -216,6 +215,7 @@ public class TrdBondLendTrade002Service extends BaseService {
             for (BokDetailId e : listValBokDetailId) {
                 listInsert.add(e);
             }
+            valBokDetailIdBatchMapper.deleteBatch(listInsert);
             valBokDetailIdBatchMapper.insertBatch(listInsert);
         }
 
@@ -257,10 +257,10 @@ public class TrdBondLendTrade002Service extends BaseService {
     }
 
     public int update(TrdBondTradeResult dto){
-        TrdBondTrade001Dto dto1 = new TrdBondTrade001Dto();
-        dto1.setFinprodId(dto.getTrdBondTrade002Dto().getProdId());
-        dto1.setTradeId(dto.getTrdBondTrade002Dto().getTradeId());
-       trdBondTrade001Service.delete(dto1);
+        TrdBondLendTrade001Dto dto1 = new TrdBondLendTrade001Dto();
+        dto1.setFinprodId(dto.getTrdBondTradeDto().getProdId());
+        dto1.setTradeId(dto.getTrdBondTradeDto().getTradeId());
+        trdBondLendTrade001Service.delete(dto1);
        return insert(dto);
     }
 

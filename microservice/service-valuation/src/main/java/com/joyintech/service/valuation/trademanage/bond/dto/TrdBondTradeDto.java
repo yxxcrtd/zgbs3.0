@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-public class TrdBondTrade002Dto extends BaseEntity implements ProcessEntity {
+public class TrdBondTradeDto extends BaseEntity implements ProcessEntity {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -22,7 +22,7 @@ public class TrdBondTrade002Dto extends BaseEntity implements ProcessEntity {
     /**
      * 选择数据
      */
-    private List<TrdBondTrade002Dto> selectedItem;
+    private List<TrdBondTradeDto> selectedItem;
 
     /**
      * 要素id
@@ -561,11 +561,11 @@ public class TrdBondTrade002Dto extends BaseEntity implements ProcessEntity {
         this.pageModel = pageModel;
     }
 
-    public List<TrdBondTrade002Dto> getSelectedItem() {
+    public List<TrdBondTradeDto> getSelectedItem() {
         return selectedItem;
     }
 
-    public void setSelectedItem(List<TrdBondTrade002Dto> selectedItem) {
+    public void setSelectedItem(List<TrdBondTradeDto> selectedItem) {
         this.selectedItem = selectedItem;
     }
 

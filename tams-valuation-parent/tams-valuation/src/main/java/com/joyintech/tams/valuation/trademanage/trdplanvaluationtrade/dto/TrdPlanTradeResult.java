@@ -15,7 +15,6 @@ import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.valuation.common.interf.base.dto.FundDealInfoForInterfRecCommonResult;
 import com.joyintech.tams.valuation.common.interf.base.dto.InterfProductDealBookCommonDto;
 import com.joyintech.tams.valuation.common.interf.base.dto.PlanAssetCurrencyDealCommonResult;
-import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTrade002Dto;
 import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTradeResult;
 
 import java.util.ArrayList;

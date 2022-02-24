@@ -10,7 +10,7 @@ import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 import com.joyintech.tams.valuation.common.interf.base.dto.AssetDealInfoValCommonResult;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.sec.SecVestAssetDealTemplateRecService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValSecVestAssetDeal;
-import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTrade002Dto;
+import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTradeDto;
 import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTradeResult;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 @Service
-public class TrdBondTrade002Service extends CommonExportService<TrdBondTrade002Dto> implements BaseProcessService<TrdBondTrade002Dto> {
+public class TrdBondTrade002Service extends CommonExportService<TrdBondTradeDto> implements BaseProcessService<TrdBondTradeDto> {
 
     @Autowired
     private SecVestAssetDealTemplateRecService secVestAssetDealTemplateRecService;
@@ -46,10 +46,10 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTrade002D
      * @see
      * @since 1.0
      */
-    public TrdBondTrade002Dto queryTradeInfoByTradeId(String tradeId) {
+    public TrdBondTradeDto queryTradeInfoByTradeId(String tradeId) {
         return restTemplate.postForObject(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdBondTrade002/queryTradeInfoByTradeId", tradeId,
-                TrdBondTrade002Dto.class);
+                TrdBondTradeDto.class);
     }
 
     /**
@@ -77,8 +77,8 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTrade002D
 
 
     @Override
-    public void doComplete(TrdBondTrade002Dto trdBondTrade002Dto, OperationType operationType) {
-        TrdBondTradeResult trdBondTradeResult = generateEntity(trdBondTrade002Dto);
+    public void doComplete(TrdBondTradeDto trdBondTradeDto, OperationType operationType) {
+        TrdBondTradeResult trdBondTradeResult = generateEntity(trdBondTradeDto);
         String action = StringUtil.EMPTY;
          if (OperationType.NEW.equals(operationType)) {
             //insert(secDealInfoProcessorResult);
@@ -94,11 +94,11 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTrade002D
     }
 
     //封装实体类
-    public TrdBondTradeResult generateEntity(TrdBondTrade002Dto trdBondTrade002Dto){
+    public TrdBondTradeResult generateEntity(TrdBondTradeDto trdBondTradeDto){
         //设置接口参数
         Map<String,Object> params = new HashMap<>();
         List<String> prodIds = new ArrayList<>();
-        prodIds.add(trdBondTrade002Dto.getProdId());
+        prodIds.add(trdBondTradeDto.getProdId());
         params.put("INTERF_BOOKSETID",prodIds);
         params.put("VAL_MODEL","INTERF_MODEL_SINGLE");
 
@@ -108,35 +108,36 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTrade002D
         //将页面输入值赋值给接口实体类
         List<ValSecVestAssetDeal> listValSecVestAssetDeal = new ArrayList<ValSecVestAssetDeal>();
         ValSecVestAssetDeal valSecVestAssetDeal = new ValSecVestAssetDeal();
-        BeanUtil.copyPropertiesIgnoreNull(valSecVestAssetDeal,trdBondTrade002Dto);
-        valSecVestAssetDeal.setDealDate(trdBondTrade002Dto.getTradeDate());
+        BeanUtil.copyPropertiesIgnoreNull(valSecVestAssetDeal, trdBondTradeDto);
+        valSecVestAssetDeal.setDealDate(trdBondTradeDto.getTradeDate());
 //        valSecVestAssetDeal.setSettdateDate(trdBondTrade002Dto.getSettdateDate());
 //        valSecVestAssetDeal.setFundSettleDate(trdBondTrade002Dto.getFundSettleDate());
         //比较界面和接口字段差异，并手动给接口字段赋值
-        valSecVestAssetDeal.setAssetId("F01_"+trdBondTrade002Dto.getSecId());//资产代码
-        valSecVestAssetDeal.setDataActionSign("01");
-        valSecVestAssetDeal.setStlForm("03");
-        valSecVestAssetDeal.setParValue(new BigDecimal(100));
-        valSecVestAssetDeal.setFeeAmtUnpay(new BigDecimal(0));
-        valSecVestAssetDeal.setYield(new BigDecimal(1));
-        valSecVestAssetDeal.setCounterId("FYDLCA365001");
-        valSecVestAssetDeal.setCounterType("01");
-        valSecVestAssetDeal.setTrader("wujiankang");
-        valSecVestAssetDeal.setFprice(new BigDecimal(101.4383));
-        valSecVestAssetDeal.setUnitInt(new BigDecimal(2.264547945205));
-        valSecVestAssetDeal.setInvestAim(trdBondTrade002Dto.getInvAim());
-        valSecVestAssetDeal.setIsStampDuty("Y");
-        valSecVestAssetDeal.setIsBrokerage("Y");
-        valSecVestAssetDeal.setIsCertfFee("Y");
-        valSecVestAssetDeal.setIsStlAmt("Y");
-        valSecVestAssetDeal.setIsCommission("Y");
-        valSecVestAssetDeal.setIsDealFeeAmt("Y");
-        valSecVestAssetDeal.setIsStlFeeAmt("Y");
-        valSecVestAssetDeal.setIsChlFeeAmt("Y");
-        valSecVestAssetDeal.setRegistAgency("01");
-        valSecVestAssetDeal.setIsClean("N");
-        valSecVestAssetDeal.setExeYield(new BigDecimal(0.0395000820535));
-        valSecVestAssetDeal.setSharesTradeMarket("02");
+        valSecVestAssetDeal.setAssetId("F01_"+ trdBondTradeDto.getSecId());//资产代码
+        valSecVestAssetDeal.setDataActionSign("01");//数据动作标志
+        valSecVestAssetDeal.setStlForm(null);//结算方式
+        valSecVestAssetDeal.setParValue(new BigDecimal(0));//单位面值
+        valSecVestAssetDeal.setFeeAmtUnpay(new BigDecimal(0));//未随交易支付费用
+        valSecVestAssetDeal.setYield(new BigDecimal(0));//到期收益率
+        valSecVestAssetDeal.setCounterId(null);//交易对手
+        valSecVestAssetDeal.setCounterType(null);//交易对手类型
+        valSecVestAssetDeal.setTrader(null);//交易员
+        valSecVestAssetDeal.setFprice(new BigDecimal(0));//全价
+        valSecVestAssetDeal.setUnitInt(new BigDecimal(0));//应收利息
+        valSecVestAssetDeal.setInvestAim(trdBondTradeDto.getInvAim());//投资目的
+        valSecVestAssetDeal.setIsStampDuty("Y");//印花税是否随交易支付
+        valSecVestAssetDeal.setIsBrokerage("Y");//经手费是否随交易支付
+        valSecVestAssetDeal.setIsCertfFee("Y");//证管费是否随交易支付
+        valSecVestAssetDeal.setIsStlAmt("Y");//结算费是否随交易支付
+        valSecVestAssetDeal.setIsCommission("Y");//佣金是否随交易支付
+        valSecVestAssetDeal.setIsDealFeeAmt("N");//交易手续费是否随交易支付
+        valSecVestAssetDeal.setIsStlFeeAmt("N");//结算手续费是否随交易支付
+        valSecVestAssetDeal.setIsChlFeeAmt("Y");//通道费是否随交易支付
+        valSecVestAssetDeal.setRegistAgency(null);//登记结算机构
+        valSecVestAssetDeal.setIsClean("N");//有无清算指令
+        valSecVestAssetDeal.setExeYield(new BigDecimal(0));//行权收益率
+        valSecVestAssetDeal.setSharesTradeMarket("02");//流通市场
+        valSecVestAssetDeal.setCounterAcctNo(trdBondTradeDto.getMyAcctNo());
 
         listValSecVestAssetDeal.add(valSecVestAssetDeal);
 
@@ -184,7 +185,7 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTrade002D
         result.setValInterflog((List<ValInterflog>)map.get("valInterflogList"));
 
         TrdBondTradeResult entity = new TrdBondTradeResult(result);
-        entity.setTrdBondTrade002Dto(trdBondTrade002Dto);
+        entity.setTrdBondTradeDto(trdBondTradeDto);
         return entity;
     }
 
