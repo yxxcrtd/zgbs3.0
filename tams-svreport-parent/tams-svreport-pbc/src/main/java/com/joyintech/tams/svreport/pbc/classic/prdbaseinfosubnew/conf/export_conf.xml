@@ -33,16 +33,15 @@
 			<Cell order="29" name="分级产品标识">isConstracte</Cell>
 			<Cell order="30" name="收益权转让产品标识">transferType</Cell>
 			<Cell order="31" name="货币市场基金或现金管理类产品">isMarketFundStr</Cell>
-			<Cell order="32" name="其他产品标识1"></Cell>
-			<Cell order="33" name="其他产品标识2"></Cell>
+			<Cell order="32" name="跨境理财通">crossBorderFlag</Cell>
+			<Cell order="33" name="以财产权信托名义开展的资金信托标识">zjxtFlag</Cell>
 			<Cell order="34" name="其他产品标识3"></Cell>
 			<Cell order="35" name="募集币种">raiseCcy</Cell>
 			<Cell order="36" name="兑付本金币种">cashPrinCcy</Cell>
 			<Cell order="37" name="兑付收益币种">cashProfCcy</Cell>
 			<Cell order="38" name="产品增信机构类型">creditType</Cell>
 			<Cell order="39" name="增信形式">creditMode</Cell>
-			<Cell order="40" name="跨境理财通">crossBorderFlag</Cell>
-			<Cell order="41" name="以财产权信托名义开展的资金信托标识">zjxtFlag</Cell>
+
 		</Row>
 	</Worksheet>
 </Workbook>
