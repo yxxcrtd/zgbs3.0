@@ -4,22 +4,27 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.framework.validation.annotation.NotEmpty;
 import com.joyintech.framework.validation.annotation.ValidLogic;
 import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
+import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.validator.TrdBondValuationDurationValidator;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 
 @PageId("TrdBondValuationDuration002")
 @ValidLogic(targetClass = TrdBondValuationDurationValidator.class, groups = { ValidateGroupEdit.class,
         ValidateGroupDelete.class })
-public class TrdBondValuationDuration002Dto extends BaseEntity implements ProcessEntity {
+public class TrdBondValuationDurationDto extends BaseEntity implements ProcessEntity {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -32,7 +37,7 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
     /**
      * 选择数据
      */
-    private List<TrdBondValuationDuration002Dto> selectedItem;
+    private List<TrdBondValuationDurationDto> selectedItem;
 
     /**
      * 要素id
@@ -76,9 +81,14 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
     private String ps;
 
     /**
-     * 计划支付日
+     * 交易日
      */
-    private Date planPayDate;
+    private Date tradeDate;
+
+    /**
+     * 计息结束日
+     */
+    private Date mdate;
 
     /**
      * 资金交收日
@@ -95,6 +105,12 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
      */
     @JsonSerialize(using= BigDecimalSerializer.class)
     private BigDecimal actInt;
+
+    /**
+     * 实收利息总额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal intAmtReal;
 
     /**
      * 实收本金
@@ -133,7 +149,7 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
      */
     private String myAcctNo;
 
-    @NotEmpty(fieldName = "TrdBondValuationDuration002.prodId", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondValuationDuration.prodId", groups = { ValidateGroupEdit.class })
     public String getProdId() {
         return prodId;
     }
@@ -142,7 +158,7 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
         this.prodId = prodId;
     }
 
-    @NotEmpty(fieldName = "TrdBondValuationDuration002.secManageAcctId", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondValuationDuration.secManageAcctId", groups = { ValidateGroupEdit.class })
     public String getSecManageAcctId() {
         return secManageAcctId;
     }
@@ -151,7 +167,7 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
         this.secManageAcctId = secManageAcctId;
     }
 
-    @NotEmpty(fieldName = "TrdBondValuationDuration002.ps", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondValuationDuration.ps", groups = { ValidateGroupEdit.class })
     public String getPs() {
         return ps;
     }
@@ -176,7 +192,7 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
         this.fundSettleDate = fundSettleDate;
     }
 
-    @NotEmpty(fieldName = "TrdBondValuationDuration002.invAim", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondValuationDuration.invAim", groups = { ValidateGroupEdit.class })
     public String getInvAim() {
         return invAim;
     }
@@ -185,7 +201,7 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
         this.invAim = invAim;
     }
 
-    @NotEmpty(fieldName = "TrdBondValuationDuration002.ccy", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondValuationDuration.ccy", groups = { ValidateGroupEdit.class })
     public String getCcy() {
         return ccy;
     }
@@ -194,7 +210,7 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
         this.ccy = ccy;
     }
 
-    @NotEmpty(fieldName = "TrdBondValuationDuration002.otherAmt", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondValuationDuration.otherAmt", groups = { ValidateGroupEdit.class })
     public BigDecimal getOtherAmt() {
         return otherAmt;
     }
@@ -203,7 +219,7 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
         this.otherAmt = otherAmt;
     }
 
-    @NotEmpty(fieldName = "TrdBondValuationDuration002.myAcctNo", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondValuationDuration.myAcctNo", groups = { ValidateGroupEdit.class })
     public String getMyAcctNo() {
         return myAcctNo;
     }
@@ -228,11 +244,11 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
         this.pageModel = pageModel;
     }
 
-    public List<TrdBondValuationDuration002Dto> getSelectedItem() {
+    public List<TrdBondValuationDurationDto> getSelectedItem() {
         return selectedItem;
     }
 
-    public void setSelectedItem(List<TrdBondValuationDuration002Dto> selectedItem) {
+    public void setSelectedItem(List<TrdBondValuationDurationDto> selectedItem) {
         this.selectedItem = selectedItem;
     }
 
@@ -244,7 +260,7 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
         this.elementId = elementId;
     }
 
-    @NotEmpty(fieldName = "TrdBondValuationDuration002.prodName", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondValuationDuration.prodName", groups = { ValidateGroupEdit.class })
     public String getProdName() {
         return prodName;
     }
@@ -253,7 +269,7 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
         this.prodName = prodName;
     }
 
-    @NotEmpty(fieldName = "TrdBondValuationDuration002.settleAmt", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondValuationDuration.settleAmt", groups = { ValidateGroupEdit.class })
     public BigDecimal getSettleAmt() {
         return settleAmt;
     }
@@ -262,7 +278,7 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
         this.settleAmt = settleAmt;
     }
 
-    @NotEmpty(fieldName = "TrdBondValuationDuration002.assetId", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondValuationDuration.assetId", groups = { ValidateGroupEdit.class })
     public String getAssetId() {
         return assetId;
     }
@@ -271,7 +287,7 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
         this.assetId = assetId;
     }
 
-    @NotEmpty(fieldName = "TrdBondValuationDuration002.assetAbbr", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondValuationDuration.assetAbbr", groups = { ValidateGroupEdit.class })
     public String getAssetAbbr() {
         return assetAbbr;
     }
@@ -280,16 +296,16 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
         this.assetAbbr = assetAbbr;
     }
 
-    @NotEmpty(fieldName = "TrdBondValuationDuration002.planPayDate", groups = { ValidateGroupEdit.class })
-    public Date getPlanPayDate() {
-        return planPayDate;
+    @NotEmpty(fieldName = "TrdBondValuationDuration.mdate", groups = { ValidateGroupEdit.class })
+    public Date getMdate() {
+        return mdate;
     }
 
-    public void setPlanPayDate(Date planPayDate) {
-        this.planPayDate = planPayDate;
+    public void setMdate(Date mdate) {
+        this.mdate = mdate;
     }
 
-    @NotEmpty(fieldName = "TrdBondValuationDuration002.actInt", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondValuationDuration.actInt", groups = { ValidateGroupEdit.class })
     public BigDecimal getActInt() {
         return actInt;
     }
@@ -298,7 +314,7 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
         this.actInt = actInt;
     }
 
-    @NotEmpty(fieldName = "TrdBondValuationDuration002.actCapi", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondValuationDuration.actCapi", groups = { ValidateGroupEdit.class })
     public BigDecimal getActCapi() {
         return actCapi;
     }
@@ -307,7 +323,7 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
         this.actCapi = actCapi;
     }
 
-    @NotEmpty(fieldName = "TrdBondValuationDuration002.isClean2", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondValuationDuration.isClean2", groups = { ValidateGroupEdit.class })
     public String getIsClean2() {
         return isClean2;
     }
@@ -316,7 +332,7 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
         this.isClean2 = isClean2;
     }
 
-    @NotEmpty(fieldName = "TrdBondValuationDuration002.tardeAmt", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondValuationDuration.tardeAmt", groups = { ValidateGroupEdit.class })
     public BigDecimal getTardeAmt() {
         return tardeAmt;
     }
@@ -324,4 +340,83 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
     public void setTardeAmt(BigDecimal tardeAmt) {
         this.tardeAmt = tardeAmt;
     }
+
+    public Date getTradeDate() {
+        return tradeDate;
+    }
+
+    public void setTradeDate(Date tradeDate) {
+        this.tradeDate = tradeDate;
+    }
+
+    public BigDecimal getIntAmtReal() {
+        return intAmtReal;
+    }
+
+    public void setIntAmtReal(BigDecimal intAmtReal) {
+        this.intAmtReal = intAmtReal;
+    }
+
+    /**
+     * 取得 交易方向str
+     *
+     * @return 交易方向
+     */
+    public String getPsStr() {
+        return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.交易方向, ps))?
+                SysDataUtil.getNameFromDataDict(DictCode.交易方向, ps):ps;
+    }
+
+    public String getTradeDateStr() {
+        return DateUtil.format(this.getTradeDate());
+    }
+
+    public String getFundSettleDateStr() {
+        return DateUtil.format(this.getFundSettleDate());
+    }
+
+    public String getInvAimStr() {
+        return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.投资目的, invAim))?
+                SysDataUtil.getNameFromDataDict(DictCode.投资目的, invAim):invAim;
+    }
+
+    /**
+     * 取得 币种Fmt
+     *
+     * @return 币种
+     */
+    public String getCcyFmt() {
+        return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.币种, ccy))?
+                SysDataUtil.getNameFromDataDict(DictCode.币种, ccy):ccy;
+    }
+
+    public String getMdateStr() {
+        return DateUtil.format(this.getMdate());
+    }
+
+    public String getSettleAmtStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getSettleAmt()==null?"0.00":decimalFormat.format(this.getSettleAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getActIntStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getActInt()==null?"0.00":decimalFormat.format(this.getActInt().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getActCapiStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getActCapi()==null?"0.00":decimalFormat.format(this.getActCapi().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getTardeAmtStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getTardeAmt()==null?"0.00":decimalFormat.format(this.getTardeAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getIntAmtRealStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getIntAmtReal()==null?"0.00":decimalFormat.format(this.getIntAmtReal().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
 }

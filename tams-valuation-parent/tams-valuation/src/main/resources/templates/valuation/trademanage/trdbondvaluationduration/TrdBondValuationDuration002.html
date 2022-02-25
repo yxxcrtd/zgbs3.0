@@ -32,7 +32,7 @@
                             <div class="layui-form-item">
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-lable"
-                                           data-th-text="#{TrdBondValuationDuration002.tradeId}">交易编号</label>
+                                           data-th-text="#{TrdBondValuationDuration.tradeId}">交易编号</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" id="tradeId" name="tradeId"
                                                required disabled
@@ -43,7 +43,7 @@
                                 </div>
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-lable"
-                                           data-th-text="#{TrdBondValuationDuration002.prodId}">产品代码</label>
+                                           data-th-text="#{TrdBondValuationDuration.prodId}">产品代码</label>
                                         <div class="layui-input-inline input-inline" >
                                             <select id="prodId" name="prodId" required
                                                     class="layui-input form-input input-select"
@@ -56,7 +56,7 @@
                                 </div>
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
-                                           data-th-text="#{TrdBondValuationDuration002.prodName}">产品名称</label>
+                                           data-th-text="#{TrdBondValuationDuration.prodName}">产品名称</label>
                                     <div class="layui-input-inline input-inline">
                                         <input  type="text" id="prodName" name="prodName" required disabled
                                                 class="layui-input form-input" placeholder="请输入内容"
@@ -68,7 +68,7 @@
                             <div class="layui-form-item">
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-lable"
-                                           data-th-text="#{TrdBondValuationDuration002.assetId}">资产代码</label>
+                                           data-th-text="#{TrdBondValuationDuration.assetId}">资产代码</label>
                                     <div class="layui-input-inline input-inline">
                                         <select id="assetId" name="assetId" required
                                                 class="layui-input form-input input-select"
@@ -82,7 +82,7 @@
                                 </div>
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-lable"
-                                           data-th-text="#{TrdBondValuationDuration002.assetAbbr}">资产简称</label>
+                                           data-th-text="#{TrdBondValuationDuration.assetAbbr}">资产简称</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" id="assetAbbr" name="assetAbbr"
                                                class="layui-input form-input"
@@ -91,22 +91,32 @@
                                                placeholder="请输入内容">
                                     </div>
                                 </div>
+<!--                                <div class="form-inline-wrap">-->
+<!--                                    <label class="layui-form-label form-label-wrap"-->
+<!--                                           data-th-text="#{TrdBondValuationDuration.secManageAcctId}">证券账户</label>-->
+<!--                                    <div class="layui-input-inline input-inline">-->
+<!--                                        <select  type="text" id="secManageAcctId" name="secManageAcctId"-->
+<!--                                                 class="layui-input form-input input-select" placeholder="请输入内容"-->
+<!--                                                 data-th-placeholder="#{SysCommon.placeholder}"-->
+<!--                                                 data-th-data-url="@{/valuation/trademanage/bond/TrdBondTrade002/getSecManageAcctId}"-->
+<!--                                                 allowClear="true" data-th-initvalue="${entity?.secManageAcctId}"></select>-->
+<!--                                    </div>-->
+<!--                                </div>-->
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
-                                           data-th-text="#{TrdBondValuationDuration002.secManageAcctId}">证券账户</label>
+                                           data-th-text="#{TrdBondValuationDuration.secManageAcctId}">证券账户</label>
                                     <div class="layui-input-inline input-inline">
-                                        <select  type="text" id="secManageAcctId" name="secManageAcctId"
-                                                 class="layui-input form-input input-select" placeholder="请输入内容"
-                                                 data-th-placeholder="#{SysCommon.placeholder}"
-                                                 data-th-data-url="@{/valuation/trademanage/bond/TrdBondTrade002/getSecManageAcctId}"
-                                                 allowClear="true" data-th-initvalue="${entity?.secManageAcctId}"></select>
+                                        <input  type="text" id="secManageAcctId" name="secManageAcctId" required
+                                                class="layui-input form-input " placeholder="请输入内容"
+                                                data-th-placeholder="#{SysCommon.placeholder}"
+                                                data-th-value="${entity?.secManageAcctId}" />
                                     </div>
                                 </div>
                             </div>
                             <div class="layui-form-item">
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-lable"
-                                           data-th-text="#{TrdBondValuationDuration002.ps}">交易类型</label>
+                                           data-th-text="#{TrdBondValuationDuration.ps}">交易类型</label>
                                     <div class="layui-input-inline input-inline">
                                         <select type="text" id="ps" name="ps" required
                                                 class="layui-input form-input input-select"
@@ -120,7 +130,7 @@
                                 </div>
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-lable"
-                                           data-th-text="#{TrdBondValuationDuration002.invAim}">会计分类</label>
+                                           data-th-text="#{TrdBondValuationDuration.invAim}">会计分类</label>
                                     <div class="layui-input-inline input-inline">
                                         <select type="text" id="invAim" name="invAim" required
                                                 class="layui-input form-input input-select"
@@ -133,20 +143,20 @@
                                 </div>
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-lable"
-                                           data-th-text="#{TrdBondValuationDuration002.planPayDate}">计划支付日</label>
+                                           data-th-text="#{TrdBondValuationDuration.mdate}">计息结束日</label>
                                     <div class="layui-input-inline input-inline">
-                                        <input type="text" id="planPayDate" name="planPayDate" required
+                                        <input type="text" id="mdate" name="mdate" required
                                                class="layui-input form-input input-dateSelect"
                                                placeholder="请输入内容"
                                                data-th-placeholder="#{SysCommon.placeholder}"
-                                               data-th-value='${#dates.format(entity?.planPayDate,"yyyy-MM-dd")}'>
+                                               data-th-value='${#dates.format(entity?.mdate,"yyyy-MM-dd")}'>
                                     </div>
                                 </div>
                             </div>
                             <div class="layui-form-item">
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-lable"
-                                           data-th-text="#{TrdBondValuationDuration002.fundSettleDate}">资金交收日</label>
+                                           data-th-text="#{TrdBondValuationDuration.fundSettleDate}">资金交收日</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" id="fundSettleDate" name="fundSettleDate"
                                                class="layui-input form-input input-dateSelect" placeholder="请输入内容"
@@ -168,7 +178,7 @@
                         <div class="layui-form-item">
                             <div class="form-inline-wrap">
                                 <label class="layui-form-label form-lable"
-                                       data-th-text="#{TrdBondValuationDuration002.actInt}">实收利息</label>
+                                       data-th-text="#{TrdBondValuationDuration.actInt}">实收利息</label>
                                 <div class="layui-input-inline input-inline">
                                     <input type="text" id="actInt" name="actInt" required maxLength="28"
                                            class="layui-input form-input text-number"
@@ -179,7 +189,7 @@
                             </div>
                             <div class="form-inline-wrap">
                                 <label class="layui-form-label form-lable"
-                                       data-th-text="#{TrdBondValuationDuration002.actCapi}">实收本金</label>
+                                       data-th-text="#{TrdBondValuationDuration.actCapi}">实收本金</label>
                                 <div class="layui-input-inline input-inline">
                                     <input type="text" id="actCapi" name="actCapi" required maxLength="28"
                                            class="layui-input form-input text-number"
@@ -190,7 +200,7 @@
                             </div>
                             <div class="form-inline-wrap">
                                 <label class="layui-form-label form-label-wrap"
-                                       data-th-text="#{TrdBondValuationDuration002.ccy}">币种</label>
+                                       data-th-text="#{TrdBondValuationDuration.ccy}">币种</label>
                                 <div class="layui-input-inline input-inline">
                                     <select  type="text" id="ccy" name="ccy" required
                                              class="layui-input form-input input-select"
@@ -214,7 +224,7 @@
                             <div class="layui-form-item">
                                 <div class="form-inline-wrap" >
                                     <label class="layui-form-label form-label-wrap"
-                                           data-th-text="#{TrdBondValuationDuration002.otherAmt}">其他费用</label>
+                                           data-th-text="#{TrdBondValuationDuration.otherAmt}">其他费用</label>
                                     <div class="layui-input-inline input-inline">
                                         <input  type="text" id="otherAmt" name="otherAmt" required
                                                 class="layui-input form-input text-number" placeholder="请输入内容"
@@ -235,7 +245,7 @@
                         <div class="layui-form-item">
                             <div  class="form-inline-wrap">
                                 <label class="layui-form-label form-label-wrap"
-                                       data-th-text="#{TrdBondValuationDuration002.isClean2}">是否结清</label>
+                                       data-th-text="#{TrdBondValuationDuration.isClean2}">是否结清</label>
                                 <div class="layui-input-inline input-inline" required>
                                     <select id="isClean2" name="isClean2"
                                             class="layui-input form-input input-select"
@@ -247,7 +257,7 @@
                             </div>
                             <div class="form-inline-wrap" >
                                 <label class="layui-form-label form-label-wrap"
-                                       data-th-text="#{TrdBondValuationDuration002.settleAmt}">结算金额</label>
+                                       data-th-text="#{TrdBondValuationDuration.settleAmt}">结算金额</label>
                                 <div class="layui-input-inline input-inline">
                                     <input  type="text" id="settleAmt" name="settleAmt" required
                                             class="layui-input form-input text-number" placeholder="请输入内容"
@@ -257,7 +267,7 @@
                             </div>
                             <div class="form-inline-wrap">
                                 <label class="layui-form-label form-label-wrap"
-                                       data-th-text="#{TrdBondValuationDuration002.tardeAmt}">本币交易金额</label>
+                                       data-th-text="#{TrdBondValuationDuration.tardeAmt}">交易金额</label>
                                 <div class="layui-input-inline input-inline">
                                     <input type="text" th:id="tardeAmt" th:name="tardeAmt" required th:value="${entity?.tardeAmt}" maxlength="28"
                                            data-textrange="2" data-fixtype="2" class="layui-input form-input text-number"
@@ -268,11 +278,11 @@
                         <div class="layui-form-item">
                             <div class="form-inline-wrap" >
                                 <label class="layui-form-label form-label-wrap"
-                                       data-th-text="#{TrdBondValuationDuration002.myAcctNo}">资金账户</label>
+                                       data-th-text="#{TrdBondValuationDuration.myAcctNo}">资金账户</label>
                                 <div class="layui-input-inline input-inline" >
-                                    <select id="myAcctNo" name="myAcctNo"
+                                    <select id="myAcctNo" name="myAcctNo" required
                                             class="layui-input form-input input-select"
-                                            data-th-data-url="@{/valuation/trademanage/trdbondvaluationduration/TrdBondValuationDuration002/getTrdAcctId}"
+                                            data-th-data-url="@{/valuation/trademanage/bondlend/TrdBondLendTrade002/getTrdAcctId}"
                                             allowClear="true" placeholder="请输入内容"
                                             data-th-initValue="${entity?.myAcctNo}">
                                     </select>

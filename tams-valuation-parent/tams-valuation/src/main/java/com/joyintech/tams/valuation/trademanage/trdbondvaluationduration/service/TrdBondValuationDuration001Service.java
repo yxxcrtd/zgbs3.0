@@ -3,7 +3,7 @@ package com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.servic
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
-import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDuration001Dto;
+import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationDto;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class TrdBondValuationDuration001Service extends CommonExportService<TrdBondValuationDuration001Dto> implements BaseProcessService<TrdBondValuationDuration001Dto> {
+public class TrdBondValuationDuration001Service extends CommonExportService<TrdBondValuationDurationDto> implements BaseProcessService<TrdBondValuationDurationDto> {
 
     /**
      * 检索债券信息
@@ -22,10 +22,10 @@ public class TrdBondValuationDuration001Service extends CommonExportService<TrdB
      * @see
      * @since 1.0
      */
-    public Page<TrdBondValuationDuration001Dto> findPage(Map<String, Object> pageParam) {
+    public Page<TrdBondValuationDurationDto> findPage(Map<String, Object> pageParam) {
 
         return restTemplate.postForPage(ServiceApplication.VALUATION_SERVICE_NAME + "/TrdBondValuationDuration001/findPage",
-                pageParam,TrdBondValuationDuration001Dto.class);
+                pageParam,TrdBondValuationDurationDto.class);
     }
 
     /**
@@ -34,17 +34,17 @@ public class TrdBondValuationDuration001Service extends CommonExportService<TrdB
      * @param params
      * @return
      */
-    public List<TrdBondValuationDuration001Dto> queryPageList(Map<String, Object> params) {
+    public List<TrdBondValuationDurationDto> queryPageList(Map<String, Object> params) {
         return restTemplate.postForList(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdBondValuationDuration001/queryPageList", params,
-                TrdBondValuationDuration001Dto.class);
+                TrdBondValuationDurationDto.class);
     }
 
     @Override
-    public void doComplete(TrdBondValuationDuration001Dto trdBondValuationDuration001Dto, OperationType operationType) {
+    public void doComplete(TrdBondValuationDurationDto trdBondValuationDurationDto, OperationType operationType) {
         // 删除操作
         if(OperationType.DELETE.equals(operationType)) {
-            restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdBondValuationDuration001/delete", trdBondValuationDuration001Dto, Integer.class);
+            restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdBondValuationDuration001/delete", trdBondValuationDurationDto, Integer.class);
         }
     }
 }

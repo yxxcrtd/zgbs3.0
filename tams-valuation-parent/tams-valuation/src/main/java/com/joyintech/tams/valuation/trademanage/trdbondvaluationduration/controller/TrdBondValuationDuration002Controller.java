@@ -23,7 +23,7 @@ import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
-import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDuration002Dto;
+import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationDto;
 import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.service.TrdBondValuationDuration002Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -69,20 +69,15 @@ public class TrdBondValuationDuration002Controller extends BaseController {
         // 工作流ID
         String workflowId = this.getParam(GlobalConstant.WORKFLOW_ID);
 
-        String operateType = getParam("operateType");
-
         String tradeId = getParam("tradeId");
 
         if(StringUtil.isNotEmpty(workflowId)){
-            TrdBondValuationDuration002Dto entity= trdBondValuationDuration002Service.getBussinessEntityByWorkflowId(workflowId);
-            if(StringUtil.isNotEmpty(entity.getTradeId())) {
-                entity = trdBondValuationDuration002Service.queryTradeInfoByTradeId(entity.getTradeId());
-            }
+            TrdBondValuationDurationDto entity= trdBondValuationDuration002Service.getBussinessEntityByWorkflowId(workflowId);
             model.addAttribute("entity", entity);
             model.addAttribute("workflowId", workflowId);
 
         }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){
-            TrdBondValuationDuration002Dto entity = trdBondValuationDuration002Service.queryTradeInfoByTradeId(tradeId);
+            TrdBondValuationDurationDto entity = trdBondValuationDuration002Service.queryTradeInfoByTradeId(tradeId);
             model.addAttribute("entity", entity);
         }
 
@@ -139,7 +134,7 @@ public class TrdBondValuationDuration002Controller extends BaseController {
     /**
      * 确认校验
      *
-     * @param trdBondValuationDuration002Dto 参数
+     * @param trdBondValuationDurationDto 参数
      * @param result 校验结果
      * @return AjaxResult
      * @see
@@ -148,9 +143,9 @@ public class TrdBondValuationDuration002Controller extends BaseController {
     @ResponseBody
     @RequestMapping("check")
     public AjaxResult check(@RequestBody @Validated({
-            ValidateGroupEdit.class}) TrdBondValuationDuration002Dto trdBondValuationDuration002Dto,
+            ValidateGroupEdit.class}) TrdBondValuationDurationDto trdBondValuationDurationDto,
                             BindingResult result) {
-        return commonCheck(result, trdBondValuationDuration002Dto.getOperateType());
+        return commonCheck(result, trdBondValuationDurationDto.getOperateType());
     }
 
 
@@ -166,15 +161,15 @@ public class TrdBondValuationDuration002Controller extends BaseController {
     @RequestMapping("save")
     @ResponseBody
     AjaxResult save(@RequestBody @Validated({
-            ValidateGroupEdit.class}) TrdBondValuationDuration002Dto dto, BindingResult br)
+            ValidateGroupEdit.class}) TrdBondValuationDurationDto dto, BindingResult br)
             throws Exception {
 
         if (br.hasErrors()) {
             return new AjaxResult(br);
         }
 
-        ProcessParameter<TrdBondValuationDuration002Dto> processParameter = new ProcessParameter<>();
-        WorkFlowParameter<TrdBondValuationDuration002Dto> workFlowParameter = new WorkFlowParameter<>();
+        ProcessParameter<TrdBondValuationDurationDto> processParameter = new ProcessParameter<>();
+        WorkFlowParameter<TrdBondValuationDurationDto> workFlowParameter = new WorkFlowParameter<>();
         processParameter.setWorkFlowParameter(workFlowParameter);
         processParameter.setPageId(this.getPageId());
 
@@ -187,7 +182,7 @@ public class TrdBondValuationDuration002Controller extends BaseController {
         workFlowParameter.setPageId(this.getPageId());
         workFlowParameter.setElementId(this.getParam("elementId"));
         workFlowParameter.setBusinessCode(dto.getTradeId());
-        workFlowParameter.setBusinessType(DictCodeList.共通业务类型_债券类资产交易.getValue());
+        workFlowParameter.setBusinessType(DictCodeList.共通业务类型_债券类资产存续期.getValue());
         workFlowParameter.setComment((entity) -> WorkFlowUtil.concatComment(
                 getMessage("交易编号") + GlobalConstant.COLON + entity.getTradeId() ));
 

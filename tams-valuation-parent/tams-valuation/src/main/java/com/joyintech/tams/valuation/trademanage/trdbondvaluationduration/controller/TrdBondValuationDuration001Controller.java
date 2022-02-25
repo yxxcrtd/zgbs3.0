@@ -22,7 +22,7 @@ import com.joyintech.system.constant.SystemGlobalConstant;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
-import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDuration001Dto;
+import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationDto;
 import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.service.TrdBondValuationDuration001Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -65,7 +65,6 @@ public class TrdBondValuationDuration001Controller extends BaseController {
 
     @Override
     public String init(Model model) {
-
         this.setSelectOptionToModel(model, DictCode.交易方向);
         return super.init(model);
     }
@@ -79,7 +78,7 @@ public class TrdBondValuationDuration001Controller extends BaseController {
      */
     @RequestMapping("findPage")
     @ResponseBody
-    public Page<TrdBondValuationDuration001Dto> findPage()
+    public Page<TrdBondValuationDurationDto> findPage()
             throws Exception {
         return trdBondValuationDuration001Service.findPage(RequestUtil.getPageParam());
     }
@@ -124,16 +123,16 @@ public class TrdBondValuationDuration001Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("check")
-    public AjaxResult check(@RequestBody @Valid TrdBondValuationDuration001Dto dto,
+    public AjaxResult check(@RequestBody @Valid TrdBondValuationDurationDto dto,
                             BindingResult result) throws ParseException {
 
-        List<TrdBondValuationDuration001Dto> list = dto.getSelectedItem();
+        List<TrdBondValuationDurationDto> list = dto.getSelectedItem();
         if(list==null||list.size()<=0){
             return new AjaxResult("请选择数据", MessageType.错误消息);
         }
         //删除时的校验
         if(StringUtil.isNotEmpty(list) && "delete".equals(dto.getOperateType())) {
-            for (TrdBondValuationDuration001Dto item : list) {
+            for (TrdBondValuationDurationDto item : list) {
                 //1.判断是否在流程中
                 //判断当前流程是否存在
                 if (trdBondValuationDuration001Service.checkBusinessDataInFlow(item)) {
@@ -155,7 +154,7 @@ public class TrdBondValuationDuration001Controller extends BaseController {
 
             }
         }else if("edit".equals(dto.getOperateType())){
-            for (TrdBondValuationDuration001Dto item : list) {
+            for (TrdBondValuationDurationDto item : list) {
                 //1.判断是否在流程中
                 //判断当前流程是否存在
                 if(trdBondValuationDuration001Service.checkBusinessDataInFlow(item)){
@@ -169,7 +168,7 @@ public class TrdBondValuationDuration001Controller extends BaseController {
 
     @ResponseBody
     @RequestMapping(ACTION_DELETE)
-    public AjaxResult delete(@RequestBody @Valid TrdBondValuationDuration001Dto dto, BindingResult br)
+    public AjaxResult delete(@RequestBody @Valid TrdBondValuationDurationDto dto, BindingResult br)
     {
 
         if (br.hasErrors()) {
@@ -177,13 +176,13 @@ public class TrdBondValuationDuration001Controller extends BaseController {
         }
 
         // 启动流程
-        ProcessParameter<TrdBondValuationDuration001Dto> proParam = new ProcessParameter<>();
-        WorkFlowParameter<TrdBondValuationDuration001Dto> params = new WorkFlowParameter<>();
+        ProcessParameter<TrdBondValuationDurationDto> proParam = new ProcessParameter<>();
+        WorkFlowParameter<TrdBondValuationDurationDto> params = new WorkFlowParameter<>();
 
         // 业务代码（凭证流水号）
         params.setBusinessCode(item -> item.getTradeId());
         // 业务类型
-        params.setBusinessType(DictCodeList.业务类型_银行间债券交易.getValue());
+        params.setBusinessType(DictCodeList.共通业务类型_债券类资产存续期.getValue());
         // 页面id
         params.setPageId("TrdBondValuationDuration002");
         // 元素id
@@ -200,7 +199,7 @@ public class TrdBondValuationDuration001Controller extends BaseController {
         String msg = getMessage("COMMON_I_0001");
         try {
             msg = trdBondValuationDuration001Service.start(proParam, dto.getSelectedItem().toArray(
-                    new TrdBondValuationDuration001Dto[dto.getSelectedItem().size()]));
+                    new TrdBondValuationDurationDto[dto.getSelectedItem().size()]));
         }
         catch (Exception e) {
             getLogger().error("启动流程失败：", e);
@@ -209,21 +208,6 @@ public class TrdBondValuationDuration001Controller extends BaseController {
 
         return new AjaxResult(msg);
     }
-
-
-    /**
-     * 导出信息excel
-     *
-     * @return excel
-     * @throws Exception 异常
-     * @see
-     * @since 1.0
-     */
-//    @RequestMapping(ACTION_EXPORT)
-//    public ResponseEntity<byte[]> export()
-//        throws Exception {
-//        return trdBondValuationDuration001Service.export(this.getPageId(), RequestUtil.getPageParam());
-//    }
 
     /**
      * 导出数据 <一句话功能简述> <功能详细描述>
@@ -237,9 +221,9 @@ public class TrdBondValuationDuration001Controller extends BaseController {
 
         String datas = this.getParam("datas");
         Map<String, Object> params = RequestUtil.getPageParam();
-        List<TrdBondValuationDuration001Dto> listdto;
+        List<TrdBondValuationDurationDto> listdto;
         if (datas != null) {
-            listdto = JsonUtils.json2List(datas, TrdBondValuationDuration001Dto.class);
+            listdto = JsonUtils.json2List(datas, TrdBondValuationDurationDto.class);
         }
         else {
             listdto = trdBondValuationDuration001Service.queryPageList(params);

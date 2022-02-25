@@ -3,8 +3,7 @@ package com.joyintech.service.valuation.trademanage.trdbondvaluationduration.ser
 
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dao.TrdBondValuationDurationMapper;
-import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDuration001Dto;
-import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDuration002Dto;
+import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationDto;
 import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationResult;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.valuation.common.interf.base.batch.dao.*;
@@ -96,7 +95,7 @@ public class TrdBondValuationDuration002Service extends BaseService {
      * @see
      * @since 1.0
      */
-    public TrdBondValuationDuration002Dto queryTradeInfoByTradeId(String tradeId){
+    public TrdBondValuationDurationDto queryTradeInfoByTradeId(String tradeId){
         return  trdBondValuationDurationMapper.queryTradeInfoByTradeId(tradeId);
     }
 
@@ -228,9 +227,9 @@ public class TrdBondValuationDuration002Service extends BaseService {
     }
 
     public int update(TrdBondValuationDurationResult dto){
-        TrdBondValuationDuration001Dto dto1 = new TrdBondValuationDuration001Dto();
-        dto1.setFinprodId(dto.getTrdBondValuationDuration002Dto().getProdId());
-        dto1.setTradeId(dto.getTrdBondValuationDuration002Dto().getTradeId());
+        TrdBondValuationDurationDto dto1 = new TrdBondValuationDurationDto();
+        dto1.setProdId(dto.getTrdBondValuationDurationDto().getProdId());
+        dto1.setTradeId(dto.getTrdBondValuationDurationDto().getTradeId());
         trdBondValuationDuration001Service.delete(dto1);
        return insert(dto);
     }

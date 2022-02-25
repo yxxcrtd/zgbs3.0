@@ -11,7 +11,7 @@
 package com.joyintech.service.valuation.trademanage.trdirsvaluationduration.dto;
 
 import com.joyintech.framework.base.BaseEntity;
-import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDuration002Dto;
+import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationDto;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.valuation.common.interf.base.dto.AssetDealInfoValCommonResult;
 
@@ -88,7 +88,7 @@ public class TrdIrsValuationDurationResult extends BaseEntity {
      */
     private int dataNum;
 
-    private com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDuration002Dto trdBondValuationDuration002Dto;
+    private TrdBondValuationDurationDto trdBondValuationDurationDto;
     
     
     public TrdIrsValuationDurationResult() {
@@ -324,11 +324,11 @@ public class TrdIrsValuationDurationResult extends BaseEntity {
         this.listValFinTradeProduct = listValFinTradeProduct;
     }
 
-    public com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDuration002Dto getTrdBondValuationDuration002Dto() {
-        return trdBondValuationDuration002Dto;
+    public TrdBondValuationDurationDto getTrdBondValuationDurationDto() {
+        return trdBondValuationDurationDto;
     }
 
-    public void setTrdBondValuationDuration002Dto(TrdBondValuationDuration002Dto trdBondValuationDuration002Dto) {
-        this.trdBondValuationDuration002Dto = trdBondValuationDuration002Dto;
+    public void setTrdBondValuationDurationDto(TrdBondValuationDurationDto trdBondValuationDurationDto) {
+        this.trdBondValuationDurationDto = trdBondValuationDurationDto;
     }
 }

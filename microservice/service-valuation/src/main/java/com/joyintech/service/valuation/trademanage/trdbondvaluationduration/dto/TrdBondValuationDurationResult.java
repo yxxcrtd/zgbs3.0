@@ -87,7 +87,7 @@ public class TrdBondValuationDurationResult extends BaseEntity {
      */
     private int dataNum;
 
-    private TrdBondValuationDuration002Dto trdBondValuationDuration002Dto;
+    private TrdBondValuationDurationDto trdBondValuationDurationDto;
     
     
     public TrdBondValuationDurationResult() {
@@ -323,11 +323,11 @@ public class TrdBondValuationDurationResult extends BaseEntity {
         this.listValFinTradeProduct = listValFinTradeProduct;
     }
 
-    public TrdBondValuationDuration002Dto getTrdBondValuationDuration002Dto() {
-        return trdBondValuationDuration002Dto;
+    public TrdBondValuationDurationDto getTrdBondValuationDurationDto() {
+        return trdBondValuationDurationDto;
     }
 
-    public void setTrdBondValuationDuration002Dto(TrdBondValuationDuration002Dto trdBondValuationDuration002Dto) {
-        this.trdBondValuationDuration002Dto = trdBondValuationDuration002Dto;
+    public void setTrdBondValuationDurationDto(TrdBondValuationDurationDto trdBondValuationDurationDto) {
+        this.trdBondValuationDurationDto = trdBondValuationDurationDto;
     }
 }

@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-public class TrdBondValuationDuration002Dto extends BaseEntity implements ProcessEntity {
+public class TrdBondValuationDurationDto extends BaseEntity implements ProcessEntity {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -23,7 +23,7 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
     /**
      * 选择数据
      */
-    private List<TrdBondValuationDuration002Dto> selectedItem;
+    private List<TrdBondValuationDurationDto> selectedItem;
 
     /**
      * 要素id
@@ -67,9 +67,14 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
     private String ps;
 
     /**
-     * 计划支付日
+     * 交易日
      */
-    private Date planPayDate;
+    private Date tradeDate;
+
+    /**
+     * 计息结束日
+     */
+    private Date mdate;
 
     /**
      * 资金交收日
@@ -86,6 +91,12 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
      */
     @JsonSerialize(using= BigDecimalSerializer.class)
     private BigDecimal actInt;
+
+    /**
+     * 实收利息总额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal intAmtReal;
 
     /**
      * 实收本金
@@ -212,11 +223,11 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
         this.pageModel = pageModel;
     }
 
-    public List<TrdBondValuationDuration002Dto> getSelectedItem() {
+    public List<TrdBondValuationDurationDto> getSelectedItem() {
         return selectedItem;
     }
 
-    public void setSelectedItem(List<TrdBondValuationDuration002Dto> selectedItem) {
+    public void setSelectedItem(List<TrdBondValuationDurationDto> selectedItem) {
         this.selectedItem = selectedItem;
     }
 
@@ -260,12 +271,28 @@ public class TrdBondValuationDuration002Dto extends BaseEntity implements Proces
         this.assetAbbr = assetAbbr;
     }
 
-    public Date getPlanPayDate() {
-        return planPayDate;
+    public Date getTradeDate() {
+        return tradeDate;
     }
 
-    public void setPlanPayDate(Date planPayDate) {
-        this.planPayDate = planPayDate;
+    public void setTradeDate(Date tradeDate) {
+        this.tradeDate = tradeDate;
+    }
+
+    public Date getMdate() {
+        return mdate;
+    }
+
+    public void setMdate(Date mdate) {
+        this.mdate = mdate;
+    }
+
+    public BigDecimal getIntAmtReal() {
+        return intAmtReal;
+    }
+
+    public void setIntAmtReal(BigDecimal intAmtReal) {
+        this.intAmtReal = intAmtReal;
     }
 
     public BigDecimal getActInt() {

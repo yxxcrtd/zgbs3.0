@@ -13,7 +13,7 @@ package com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.valida
 
 import com.joyintech.framework.validation.BeanValidator;
 import com.joyintech.framework.validation.ValidMessage;
-import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDuration002Dto;
+import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationDto;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class TrdBondValuationDurationValidator implements BeanValidator {
      */
     @Override
     public List<ValidMessage> valid(Object value) {
-        TrdBondValuationDuration002Dto dto = (TrdBondValuationDuration002Dto)value;
+        TrdBondValuationDurationDto dto = (TrdBondValuationDurationDto)value;
         List<ValidMessage> resultList = new ArrayList<ValidMessage>();
         if("delete".equals(dto.getOperateType())){
 
