@@ -4,22 +4,27 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.framework.validation.annotation.NotEmpty;
 import com.joyintech.framework.validation.annotation.ValidLogic;
 import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
+import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.validator.TrdBondChangeTradeValidator;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 
 @PageId("TrdBondChangeTrade002")
 @ValidLogic(targetClass = TrdBondChangeTradeValidator.class, groups = { ValidateGroupEdit.class,
         ValidateGroupDelete.class })
-public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntity {
+public class TrdBondChangeTradeDto extends BaseEntity implements ProcessEntity {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -32,12 +37,18 @@ public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntit
     /**
      * 选择数据
      */
-    private List<TrdBondChangeTrade002Dto> selectedItem;
+    private List<TrdBondChangeTradeDto> selectedItem;
 
     /**
      * 要素id
      */
     private String elementId;
+
+    /**
+     * 交易编号
+     */
+    @PrimaryKey(value= PrimaryKey.Field.PK_1)
+    private String tradeId;
 
     /**
      * 外部成交编号
@@ -78,12 +89,6 @@ public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntit
      * 交易方向
      */
     private String ps;
-
-    /**
-     * 交易编号
-     */
-    @PrimaryKey(value= PrimaryKey.Field.PK_1)
-    private String tradeId;
 
     /**
      * 交易日
@@ -152,7 +157,7 @@ public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntit
      */
     private String acctNo;
 
-    @NotEmpty(fieldName = "TrdBondChangeTrade002.prodId", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondChangeTrade.prodId", groups = { ValidateGroupEdit.class })
     public String getProdId() {
         return prodId;
     }
@@ -161,7 +166,7 @@ public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntit
         this.prodId = prodId;
     }
 
-    @NotEmpty(fieldName = "TrdBondChangeTrade002.ps", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondChangeTrade.ps", groups = { ValidateGroupEdit.class })
     public String getPs() {
         return ps;
     }
@@ -178,7 +183,7 @@ public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntit
         this.tradeId = tradeId;
     }
 
-    @NotEmpty(fieldName = "TrdBondChangeTrade002.tradeDate", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondChangeTrade.tradeDate", groups = { ValidateGroupEdit.class })
     public Date getTradeDate() {
         return tradeDate;
     }
@@ -187,7 +192,7 @@ public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntit
         this.tradeDate = tradeDate;
     }
 
-    @NotEmpty(fieldName = "TrdBondChangeTrade002.settdateDate", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondChangeTrade.settdateDate", groups = { ValidateGroupEdit.class })
     public Date getSettdateDate() {
         return settdateDate;
     }
@@ -196,7 +201,7 @@ public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntit
         this.settdateDate = settdateDate;
     }
 
-    @NotEmpty(fieldName = "TrdBondChangeTrade002.invAim", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondChangeTrade.invAim", groups = { ValidateGroupEdit.class })
     public String getInvAim() {
         return invAim;
     }
@@ -205,7 +210,7 @@ public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntit
         this.invAim = invAim;
     }
 
-    @NotEmpty(fieldName = "TrdBondChangeTrade002.ccy", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondChangeTrade.ccy", groups = { ValidateGroupEdit.class })
     public String getCcy() {
         return ccy;
     }
@@ -214,7 +219,7 @@ public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntit
         this.ccy = ccy;
     }
 
-    @NotEmpty(fieldName = "TrdBondChangeTrade002.otherAmt", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondChangeTrade.otherAmt", groups = { ValidateGroupEdit.class })
     public BigDecimal getOtherAmt() {
         return otherAmt;
     }
@@ -223,7 +228,7 @@ public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntit
         this.otherAmt = otherAmt;
     }
 
-    @NotEmpty(fieldName = "TrdBondChangeTrade002.tradeAmt", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondChangeTrade.tradeAmt", groups = { ValidateGroupEdit.class })
     public BigDecimal getTradeAmt() {
         return tradeAmt;
     }
@@ -256,11 +261,11 @@ public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntit
         this.pageModel = pageModel;
     }
 
-    public List<TrdBondChangeTrade002Dto> getSelectedItem() {
+    public List<TrdBondChangeTradeDto> getSelectedItem() {
         return selectedItem;
     }
 
-    public void setSelectedItem(List<TrdBondChangeTrade002Dto> selectedItem) {
+    public void setSelectedItem(List<TrdBondChangeTradeDto> selectedItem) {
         this.selectedItem = selectedItem;
     }
 
@@ -280,7 +285,7 @@ public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntit
         this.outTradeId = outTradeId;
     }
 
-    @NotEmpty(fieldName = "TrdBondChangeTrade002.prodName", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondChangeTrade.prodName", groups = { ValidateGroupEdit.class })
     public String getProdName() {
         return prodName;
     }
@@ -289,7 +294,7 @@ public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntit
         this.prodName = prodName;
     }
 
-    @NotEmpty(fieldName = "TrdBondChangeTrade002.settleAmt", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondChangeTrade.settleAmt", groups = { ValidateGroupEdit.class })
     public BigDecimal getSettleAmt() {
         return settleAmt;
     }
@@ -298,7 +303,7 @@ public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntit
         this.settleAmt = settleAmt;
     }
 
-    @NotEmpty(fieldName = "TrdBondChangeTrade002.oAssetId", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondChangeTrade.oAssetId", groups = { ValidateGroupEdit.class })
     public String getoAssetId() {
         return oAssetId;
     }
@@ -307,7 +312,7 @@ public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntit
         this.oAssetId = oAssetId;
     }
 
-    @NotEmpty(fieldName = "TrdBondChangeTrade002.oAssetAbbr", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondChangeTrade.oAssetAbbr", groups = { ValidateGroupEdit.class })
     public String getoAssetAbbr() {
         return oAssetAbbr;
     }
@@ -316,7 +321,7 @@ public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntit
         this.oAssetAbbr = oAssetAbbr;
     }
 
-    @NotEmpty(fieldName = "TrdBondChangeTrade002.cAssetId", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondChangeTrade.cAssetId", groups = { ValidateGroupEdit.class })
     public String getcAssetId() {
         return cAssetId;
     }
@@ -325,7 +330,7 @@ public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntit
         this.cAssetId = cAssetId;
     }
 
-    @NotEmpty(fieldName = "TrdBondChangeTrade002.cAssetAbbr", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondChangeTrade.cAssetAbbr", groups = { ValidateGroupEdit.class })
     public String getcAssetAbbr() {
         return cAssetAbbr;
     }
@@ -334,7 +339,7 @@ public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntit
         this.cAssetAbbr = cAssetAbbr;
     }
 
-    @NotEmpty(fieldName = "TrdBondChangeTrade002.oTradeNum", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondChangeTrade.oTradeNum", groups = { ValidateGroupEdit.class })
     public BigDecimal getoTradeNum() {
         return oTradeNum;
     }
@@ -343,7 +348,7 @@ public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntit
         this.oTradeNum = oTradeNum;
     }
 
-    @NotEmpty(fieldName = "TrdBondChangeTrade002.oTradeAmt", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondChangeTrade.oTradeAmt", groups = { ValidateGroupEdit.class })
     public BigDecimal getoTradeAmt() {
         return oTradeAmt;
     }
@@ -352,7 +357,7 @@ public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntit
         this.oTradeAmt = oTradeAmt;
     }
 
-    @NotEmpty(fieldName = "TrdBondChangeTrade002.cTradeNum", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondChangeTrade.cTradeNum", groups = { ValidateGroupEdit.class })
     public BigDecimal getcTradeNum() {
         return cTradeNum;
     }
@@ -361,12 +366,70 @@ public class TrdBondChangeTrade002Dto extends BaseEntity implements ProcessEntit
         this.cTradeNum = cTradeNum;
     }
 
-    @NotEmpty(fieldName = "TrdBondChangeTrade002.cTradeAmt", groups = { ValidateGroupEdit.class })
+    @NotEmpty(fieldName = "TrdBondChangeTrade.cTradeAmt", groups = { ValidateGroupEdit.class })
     public BigDecimal getcTradeAmt() {
         return cTradeAmt;
     }
 
     public void setcTradeAmt(BigDecimal cTradeAmt) {
         this.cTradeAmt = cTradeAmt;
+    }
+
+    /**
+     * 取得 交易方向str
+     *
+     * @return 交易方向
+     */
+    public String getPsStr() {
+        return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.交易方向, ps))?
+                SysDataUtil.getNameFromDataDict(DictCode.交易方向, ps):ps;
+    }
+
+    public String getTradeDateStr() {
+        return DateUtil.format(this.getTradeDate());
+    }
+
+    public String getSettdateDateStr() {
+        return DateUtil.format(this.getSettdateDate());
+    }
+
+    public String getInvAimStr() {
+        return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.投资目的, invAim))?
+                SysDataUtil.getNameFromDataDict(DictCode.投资目的, invAim):invAim;
+    }
+
+    /**
+     * 取得 币种Fmt
+     *
+     * @return 币种
+     */
+    public String getCcyFmt() {
+        return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.币种, ccy))?
+                SysDataUtil.getNameFromDataDict(DictCode.币种, ccy):ccy;
+    }
+
+    public String getoTradeNumStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getoTradeNum()==null?"0.00":decimalFormat.format(this.getoTradeNum().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getoTradeAmtStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getoTradeAmt()==null?"0.00":decimalFormat.format(this.getoTradeAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getcTradeNumStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getcTradeNum()==null?"0.00":decimalFormat.format(this.getcTradeNum().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getcTradeAmtStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getcTradeAmt()==null?"0.00":decimalFormat.format(this.getcTradeAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getSettleAmtStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getSettleAmt()==null?"0.00":decimalFormat.format(this.getSettleAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
     }
 }

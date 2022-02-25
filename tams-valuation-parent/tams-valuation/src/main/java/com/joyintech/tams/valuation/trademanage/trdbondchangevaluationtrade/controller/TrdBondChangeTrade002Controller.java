@@ -25,7 +25,7 @@ import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
-import com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTrade002Dto;
+import com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeDto;
 import com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.service.TrdBondChangeTrade001Service;
 import com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.service.TrdBondChangeTrade002Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -80,12 +80,12 @@ public class TrdBondChangeTrade002Controller extends BaseController {
         String tradeId = getParam("tradeId");
 
         if(StringUtil.isNotEmpty(workflowId)){
-            TrdBondChangeTrade002Dto entity= trdBondChangeTrade002Service.getBussinessEntityByWorkflowId(workflowId);
+            TrdBondChangeTradeDto entity= trdBondChangeTrade002Service.getBussinessEntityByWorkflowId(workflowId);
             model.addAttribute("entity", entity);
             model.addAttribute("workflowId", workflowId);
 
         }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){
-            TrdBondChangeTrade002Dto entity = trdBondChangeTrade002Service.queryTradeInfoByTradeId(tradeId);
+            TrdBondChangeTradeDto entity = trdBondChangeTrade002Service.queryTradeInfoByTradeId(tradeId);
             model.addAttribute("entity", entity);
         }
 
@@ -242,7 +242,7 @@ public class TrdBondChangeTrade002Controller extends BaseController {
     /**
      * 确认校验
      *
-     * @param trdBondChangeTrade002Dto 参数
+     * @param trdBondChangeTradeDto 参数
      * @param result 校验结果
      * @return AjaxResult
      * @see
@@ -251,9 +251,9 @@ public class TrdBondChangeTrade002Controller extends BaseController {
     @ResponseBody
     @RequestMapping("check")
     public AjaxResult check(@RequestBody @Validated({
-            ValidateGroupEdit.class}) TrdBondChangeTrade002Dto trdBondChangeTrade002Dto,
+            ValidateGroupEdit.class}) TrdBondChangeTradeDto trdBondChangeTradeDto,
                               BindingResult result) {
-        return commonCheck(result, trdBondChangeTrade002Dto.getOperateType());
+        return commonCheck(result, trdBondChangeTradeDto.getOperateType());
     }
 
 
@@ -269,15 +269,15 @@ public class TrdBondChangeTrade002Controller extends BaseController {
     @RequestMapping("save")
     @ResponseBody
     AjaxResult save(@RequestBody @Validated({
-            ValidateGroupEdit.class}) TrdBondChangeTrade002Dto dto, BindingResult br)
+            ValidateGroupEdit.class}) TrdBondChangeTradeDto dto, BindingResult br)
         throws Exception {
 
         if (br.hasErrors()) {
             return new AjaxResult(br);
         }
 
-        ProcessParameter<TrdBondChangeTrade002Dto> processParameter = new ProcessParameter<>();
-        WorkFlowParameter<TrdBondChangeTrade002Dto> workFlowParameter = new WorkFlowParameter<>();
+        ProcessParameter<TrdBondChangeTradeDto> processParameter = new ProcessParameter<>();
+        WorkFlowParameter<TrdBondChangeTradeDto> workFlowParameter = new WorkFlowParameter<>();
         processParameter.setWorkFlowParameter(workFlowParameter);
         processParameter.setPageId(this.getPageId());
 

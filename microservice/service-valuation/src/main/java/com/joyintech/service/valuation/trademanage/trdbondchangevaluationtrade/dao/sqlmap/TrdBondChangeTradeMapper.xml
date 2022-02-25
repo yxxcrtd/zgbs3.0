@@ -2,19 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dao.TrdBondChangeTradeMapper" >
 
-    <select id="selectDeal" resultType="com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTrade001Dto">
+    <select id="selectDeal" resultType="com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeDto">
         SELECT
             t.TRADE_ID tradeId,/**交易编号**/
             null outTradeId,    /*外部成交编号*/
-            deal.BOOKSET_ID finprodId,/**金融产品代码**/
-            bok.BOOKSET_NAME finprodName,/**金融产品名称**/
+            deal.BOOKSET_ID prodId,/**金融产品代码**/
+            bok.BOOKSET_NAME prodName,/**金融产品名称**/
             zc.FINPROD_MARKET_ID oAssetId,/**转出证券代码**/
             zc.FINPROD_ABBR oAssetAbbr,/**转出证券代码**/
             tfpb.FINPROD_ID cAssetId,/**转入证券代码**/
             fp.FINPROD_ABBR cAssetAbbr,/**转入证券名称**/
             t.PS ps,/**交易方向**/
             t.TRADE_DATE tradeDate,/**交易日**/
-            t.SETTLE_DATE settleDate,/**交割日期**/
+            t.SETTLE_DATE settdateDate,/**交割日期**/
             t.INV_AIM invAim,/**会计分类**/
             t.SHARE_AMT oTradeNum,/**成交数量**/
             t.trade_amt oTradeAmt,/**全价总额**/
@@ -90,7 +90,7 @@
         SELECT JYZQZH_SEQUENCE.nextval from dual
     </select>
 
-    <select id="queryTradeInfoByTradeId" resultType="com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTrade002Dto">
+    <select id="queryTradeInfoByTradeId" resultType="com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeDto">
         SELECT
             t.TRADE_ID tradeId,/**交易编号**/
             null outTradeId,    /*外部成交编号*/
@@ -136,8 +136,8 @@
             FIN_PRODUCT a
         inner join fin_product_type b on a.finprod_id=b.finprod_id
         where
-            b.TYPE_6 = #{Bond_Type1}
-            OR b.TYPE_6 = #{Bond_Type2}
+            b.TYPE_1 = '028'
+            OR b.TYPE_1 = '029'
             <if test="search !=null and search != ''">
                 AND	(a.FINPROD_MARKET_ID like concat('%',concat(#{search},'%'))
                 OR a.FINPROD_ABBR like concat('%',concat(#{search},'%')))
@@ -184,8 +184,8 @@
             FIN_PRODUCT a
         inner join fin_product_type b on a.finprod_id=b.finprod_id
         where
-            b.TYPE_6 = #{Bond_Type1}
-            OR b.TYPE_6 = #{Bond_Type2}
+            b.TYPE_1 = '028'
+            OR b.TYPE_1 = '029'
             <if test="search !=null and search != ''">
                 AND	(a.FINPROD_MARKET_ID like concat('%',concat(#{search},'%'))
                 OR a.FINPROD_ABBR like concat('%',concat(#{search},'%')))

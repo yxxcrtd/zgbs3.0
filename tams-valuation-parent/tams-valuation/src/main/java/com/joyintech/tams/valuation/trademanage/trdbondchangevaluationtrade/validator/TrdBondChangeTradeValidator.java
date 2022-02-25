@@ -13,14 +13,14 @@ package com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.val
 
 import com.joyintech.framework.validation.BeanValidator;
 import com.joyintech.framework.validation.ValidMessage;
-import com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTrade002Dto;
+import com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeDto;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *  利率互换交易--业务验证
+ *  证券转换交易--业务验证
  * 〈功能详细描述〉
  * @author sunshuaishaui
  * @version 1.0 2022年02月17日
@@ -35,7 +35,7 @@ public class TrdBondChangeTradeValidator implements BeanValidator {
      */
     @Override
     public List<ValidMessage> valid(Object value) {
-        TrdBondChangeTrade002Dto dto = (TrdBondChangeTrade002Dto)value;
+        TrdBondChangeTradeDto dto = (TrdBondChangeTradeDto)value;
         List<ValidMessage> resultList = new ArrayList<ValidMessage>();
         if("delete".equals(dto.getOperateType())){
 

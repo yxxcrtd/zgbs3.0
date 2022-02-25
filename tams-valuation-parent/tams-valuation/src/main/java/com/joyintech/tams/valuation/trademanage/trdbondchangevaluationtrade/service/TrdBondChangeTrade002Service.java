@@ -15,7 +15,7 @@ import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.fund.Fu
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.sec.SecVestAssetDealTemplateRecService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValFundChangeDeal;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValSecVestAssetDeal;
-import com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTrade002Dto;
+import com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeDto;
 import com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeFundResult;
 import com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeResult;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -27,7 +27,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 @Service
-public class TrdBondChangeTrade002Service extends CommonExportService<TrdBondChangeTrade002Dto> implements BaseProcessService<TrdBondChangeTrade002Dto> {
+public class TrdBondChangeTrade002Service extends CommonExportService<TrdBondChangeTradeDto> implements BaseProcessService<TrdBondChangeTradeDto> {
 
     @Autowired
     private SecVestAssetDealTemplateRecService secVestAssetDealTemplateRecService;
@@ -55,10 +55,10 @@ public class TrdBondChangeTrade002Service extends CommonExportService<TrdBondCha
      * @see
      * @since 1.0
      */
-    public TrdBondChangeTrade002Dto queryTradeInfoByTradeId(String tradeId) {
+    public TrdBondChangeTradeDto queryTradeInfoByTradeId(String tradeId) {
         return restTemplate.postForObject(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdBondChangeTrade002/queryTradeInfoByTradeId", tradeId,
-                TrdBondChangeTrade002Dto.class);
+                TrdBondChangeTradeDto.class);
     }
 
     /**
@@ -110,33 +110,33 @@ public class TrdBondChangeTrade002Service extends CommonExportService<TrdBondCha
     }
 
     @Override
-    public void doComplete(TrdBondChangeTrade002Dto trdBondChangeTrade002Dto, OperationType operationType) {
+    public void doComplete(TrdBondChangeTradeDto trdBondChangeTradeDto, OperationType operationType) {
         String action = StringUtil.EMPTY;
 
         TrdBondChangeTradeResult result = null;
         TrdBondChangeTradeFundResult rst = null;
 
-        if(DictCodeListExt1.交易方向_债转股.getValue().equals(trdBondChangeTrade002Dto.getPs())){
+        if(DictCodeListExt1.交易方向_债转股.getValue().equals(trdBondChangeTradeDto.getPs())){
             if (OperationType.NEW.equals(operationType)) {
                 action = "insert";
             }
             else {
                 action = "update";
             }
-            result = generateEntity(trdBondChangeTrade002Dto);
+            result = generateEntity(trdBondChangeTradeDto);
             restTemplate.postForObject(
                     ServiceApplication.VALUATION_SERVICE_NAME + "/TrdBondChangeTrade002/" + action, result,
                     Integer.class);
-        }else if(DictCodeList.交易方向_上市流通.getValue().equals(trdBondChangeTrade002Dto.getPs())){
+        }else if(DictCodeList.交易方向_上市流通.getValue().equals(trdBondChangeTradeDto.getPs())){
 
-        }else if(DictCodeListExt3.交易方向_转换申购确认.getValue().equals(trdBondChangeTrade002Dto.getPs())){
+        }else if(DictCodeListExt3.交易方向_转换申购确认.getValue().equals(trdBondChangeTradeDto.getPs())){
             if (OperationType.NEW.equals(operationType)) {
                 action = "insertFund";
             }
             else {
                 action = "updateFund";
             }
-            rst = generateEntity1(trdBondChangeTrade002Dto);
+            rst = generateEntity1(trdBondChangeTradeDto);
             restTemplate.postForObject(
                     ServiceApplication.VALUATION_SERVICE_NAME + "/TrdBondChangeTrade002/" + action, rst,
                     Integer.class);
@@ -144,7 +144,7 @@ public class TrdBondChangeTrade002Service extends CommonExportService<TrdBondCha
     }
 
     //封装实体类(债转股)
-    public TrdBondChangeTradeResult generateEntity(TrdBondChangeTrade002Dto dto){
+    public TrdBondChangeTradeResult generateEntity(TrdBondChangeTradeDto dto){
         //设置接口参数
         Map<String,Object> params = new HashMap<>();
         List<String> prodIds = new ArrayList<>();
@@ -177,32 +177,33 @@ public class TrdBondChangeTrade002Service extends CommonExportService<TrdBondCha
         entity.setAssetId("F01_"+dto.getoAssetId());//资产代码
         entity.setDataActionSign("01");
         entity.setTradeMarket("01");
-        entity.setStlForm("03");
-        entity.setParValue(new BigDecimal(100));
+        entity.setStlForm(null);
+        entity.setParValue(new BigDecimal(0));
         entity.setFeeAmtUnpay(new BigDecimal(0));
-        entity.setYield(new BigDecimal(1));
-        entity.setCounterId("FYDLCA365001");
-        entity.setCounterType("01");
-        entity.setTrader("wujiankang");
-        entity.setSecManageAcctId("111111111");
-        entity.setCprice(new BigDecimal(101.4383));
-        entity.setFprice(new BigDecimal(101.4383));
-        entity.setUnitInt(new BigDecimal(2.264547945205));
-        entity.setIntAmt(new BigDecimal(100));
-        entity.setCpriceAmt(new BigDecimal(100));
-        entity.setFpriceAmt(new BigDecimal(100));
+        entity.setYield(new BigDecimal(0));
+        entity.setCounterId(null);
+        entity.setCounterType(null);
+        entity.setTrader(null);
+        entity.setSecManageAcctId(null);
+        entity.setCprice(new BigDecimal(0));
+        entity.setFprice(new BigDecimal(0));
+        entity.setUnitInt(new BigDecimal(0));
+        entity.setIntAmt(new BigDecimal(0));
+        entity.setCpriceAmt(new BigDecimal(0));
+        entity.setFpriceAmt(new BigDecimal(0));
         entity.setIsStampDuty("Y");
         entity.setIsBrokerage("Y");
         entity.setIsCertfFee("Y");
         entity.setIsStlAmt("Y");
         entity.setIsCommission("Y");
-        entity.setIsDealFeeAmt("Y");
-        entity.setIsStlFeeAmt("Y");
+        entity.setIsDealFeeAmt("N");
+        entity.setIsStlFeeAmt("N");
         entity.setIsChlFeeAmt("Y");
-        entity.setRegistAgency("01");
+        entity.setRegistAgency(null);
         entity.setIsClean("N");
-        entity.setExeYield(new BigDecimal(0.0395000820535));
-        entity.setSharesTradeMarket("02");
+        entity.setExeYield(new BigDecimal(0));
+        entity.setSharesTradeMarket(null);
+        entity.setSharesType("F10");
 
         listValSecVestAssetDeal.add(entity);
 
@@ -248,13 +249,13 @@ public class TrdBondChangeTrade002Service extends CommonExportService<TrdBondCha
         result.setListValOrdersExt(valOrdersExtList);
 
         TrdBondChangeTradeResult rst = new TrdBondChangeTradeResult(result);
-        rst.setTrdBondChangeTrade002Dto(dto);
+        rst.setTrdBondChangeTradeDto(dto);
         return rst;
 
     }
 
     //封装实体类(基金转换)
-    public TrdBondChangeTradeFundResult generateEntity1(TrdBondChangeTrade002Dto dto){
+    public TrdBondChangeTradeFundResult generateEntity1(TrdBondChangeTradeDto dto){
         //设置接口参数
         Map<String,Object> params = new HashMap<>();
         List<String> prodIds = new ArrayList<>();
@@ -312,7 +313,7 @@ public class TrdBondChangeTrade002Service extends CommonExportService<TrdBondCha
         }
 
         TrdBondChangeTradeFundResult rst = new TrdBondChangeTradeFundResult(result);
-        rst.setTrdBondChangeTrade002Dto(dto);
+        rst.setTrdBondChangeTradeDto(dto);
         return rst;
     }
 

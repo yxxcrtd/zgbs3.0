@@ -22,7 +22,7 @@ import com.joyintech.system.constant.SystemGlobalConstant;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
-import com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTrade001Dto;
+import com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeDto;
 import com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.service.TrdBondChangeTrade001Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -80,7 +80,7 @@ public class TrdBondChangeTrade001Controller extends BaseController {
      */
     @RequestMapping("findPage")
     @ResponseBody
-    public Page<TrdBondChangeTrade001Dto> findPage()
+    public Page<TrdBondChangeTradeDto> findPage()
         throws Exception {
         return trdBondChangeTrade001Service.findPage(RequestUtil.getPageParam());
     }
@@ -141,16 +141,16 @@ public class TrdBondChangeTrade001Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("check")
-    public AjaxResult check(@RequestBody @Valid TrdBondChangeTrade001Dto dto,
+    public AjaxResult check(@RequestBody @Valid TrdBondChangeTradeDto dto,
                                   BindingResult result) throws ParseException {
 
-        List<TrdBondChangeTrade001Dto> list = dto.getSelectedItem();
+        List<TrdBondChangeTradeDto> list = dto.getSelectedItem();
         if(list==null||list.size()<=0){
             return new AjaxResult("请选择数据", MessageType.错误消息);
         }
         //删除时的校验
         if(StringUtil.isNotEmpty(list) && "delete".equals(dto.getOperateType())) {
-            for (TrdBondChangeTrade001Dto item : list) {
+            for (TrdBondChangeTradeDto item : list) {
                 //1.判断是否在流程中
                 //判断当前流程是否存在
                 if (trdBondChangeTrade001Service.checkBusinessDataInFlow(item)) {
@@ -172,7 +172,7 @@ public class TrdBondChangeTrade001Controller extends BaseController {
 
             }
         }else if("edit".equals(dto.getOperateType())){
-                for (TrdBondChangeTrade001Dto item : list) {
+                for (TrdBondChangeTradeDto item : list) {
                     //1.判断是否在流程中
                     //判断当前流程是否存在
                     if(trdBondChangeTrade001Service.checkBusinessDataInFlow(item)){
@@ -186,7 +186,7 @@ public class TrdBondChangeTrade001Controller extends BaseController {
 
     @ResponseBody
     @RequestMapping(ACTION_DELETE)
-    public AjaxResult delete(@RequestBody @Valid TrdBondChangeTrade001Dto dto, BindingResult br)
+    public AjaxResult delete(@RequestBody @Valid TrdBondChangeTradeDto dto, BindingResult br)
     {
 
         if (br.hasErrors()) {
@@ -194,8 +194,8 @@ public class TrdBondChangeTrade001Controller extends BaseController {
         }
 
         // 启动流程
-        ProcessParameter<TrdBondChangeTrade001Dto> proParam = new ProcessParameter<>();
-        WorkFlowParameter<TrdBondChangeTrade001Dto> params = new WorkFlowParameter<>();
+        ProcessParameter<TrdBondChangeTradeDto> proParam = new ProcessParameter<>();
+        WorkFlowParameter<TrdBondChangeTradeDto> params = new WorkFlowParameter<>();
 
         // 业务代码（凭证流水号）
         params.setBusinessCode(item -> item.getTradeId());
@@ -207,8 +207,8 @@ public class TrdBondChangeTrade001Controller extends BaseController {
         params.setElementId(dto.getElementId());
 
         // 设置流程业务说明, entity即传入的dto
-        params.setComment(entity -> WorkFlowUtil.concatComment("证券转换交易删除：", entity.getTradeId(),
-                DateUtil.format(entity.getTradeDate())
+        params.setComment(entity -> WorkFlowUtil.concatComment("证券转换交易删除：交易编号", entity.getTradeId(),
+                "交易日期",DateUtil.format(entity.getTradeDate())
         ));
 
         // 塞入流程参数
@@ -217,7 +217,7 @@ public class TrdBondChangeTrade001Controller extends BaseController {
         String msg = getMessage("COMMON_I_0001");
         try {
             msg = trdBondChangeTrade001Service.start(proParam, dto.getSelectedItem().toArray(
-                    new TrdBondChangeTrade001Dto[dto.getSelectedItem().size()]));
+                    new TrdBondChangeTradeDto[dto.getSelectedItem().size()]));
         }
         catch (Exception e) {
             getLogger().error("启动流程失败：", e);
@@ -239,9 +239,9 @@ public class TrdBondChangeTrade001Controller extends BaseController {
 
         String datas = this.getParam("datas");
         Map<String, Object> params = RequestUtil.getPageParam();
-        List<TrdBondChangeTrade001Dto> listdto;
+        List<TrdBondChangeTradeDto> listdto;
         if (datas != null) {
-            listdto = JsonUtils.json2List(datas, TrdBondChangeTrade001Dto.class);
+            listdto = JsonUtils.json2List(datas, TrdBondChangeTradeDto.class);
         }
         else {
             listdto = trdBondChangeTrade001Service.queryPageList(params);

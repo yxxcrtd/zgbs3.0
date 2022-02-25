@@ -14,7 +14,7 @@ package com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.
 import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTrade001Dto;
+import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeDto;
 import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.service.TrdBondChangeTrade001Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,8 +47,8 @@ public class TrdBondChangeTrade001Controller {
      * @since 1.0
      */
     @RequestMapping("findPage/{page}/{length}")
-    public Page<TrdBondChangeTrade001Dto> queryForPage(@RequestBody Map<String, Object> param,
-                                                       @PathVariable("page") int page, @PathVariable("length") int length)
+    public Page<TrdBondChangeTradeDto> queryForPage(@RequestBody Map<String, Object> param,
+                                                    @PathVariable("page") int page, @PathVariable("length") int length)
             throws Exception {
         return trdBondChangTrade001Service.selectForPage(page, length, param);
     }
@@ -61,7 +61,7 @@ public class TrdBondChangeTrade001Controller {
      * @throws Exception
      */
     @PostMapping("/queryPageList")
-    public List<TrdBondChangeTrade001Dto> queryPageList(@RequestBody Map<String, Object> param){
+    public List<TrdBondChangeTradeDto> queryPageList(@RequestBody Map<String, Object> param){
         return trdBondChangTrade001Service.queryPageList(param);
     }
 
@@ -98,7 +98,7 @@ public class TrdBondChangeTrade001Controller {
     @Transactional
     @DTXTransaction
     @PostMapping("delete")
-    public int delete(@RequestBody TrdBondChangeTrade001Dto dto){
+    public int delete(@RequestBody TrdBondChangeTradeDto dto){
         return trdBondChangTrade001Service.delete(dto);
     }
 

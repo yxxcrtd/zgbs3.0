@@ -84,7 +84,7 @@ public class TrdBondChangeTradeResult extends BaseEntity {
     private List<ValInterflog> valInterflog = new ArrayList<ValInterflog>();
 
 
-    private TrdBondChangeTrade002Dto trdBondChangeTrade002Dto;
+    private TrdBondChangeTradeDto trdBondChangeTradeDto;
 
     /**
      * 交易入账
@@ -331,12 +331,12 @@ public class TrdBondChangeTradeResult extends BaseEntity {
         this.listValFinTradeProduct = listValFinTradeProduct;
     }
 
-    public TrdBondChangeTrade002Dto getTrdBondChangeTrade002Dto() {
-        return trdBondChangeTrade002Dto;
+    public TrdBondChangeTradeDto getTrdBondChangeTradeDto() {
+        return trdBondChangeTradeDto;
     }
 
-    public void setTrdBondChangeTrade002Dto(TrdBondChangeTrade002Dto trdBondChangeTrade002Dto) {
-        this.trdBondChangeTrade002Dto = trdBondChangeTrade002Dto;
+    public void setTrdBondChangeTradeDto(TrdBondChangeTradeDto trdBondChangeTradeDto) {
+        this.trdBondChangeTradeDto = trdBondChangeTradeDto;
     }
 
     public List<InterfProductDealBookCommonDto> getListInterfProductDealBookCommonDto() {

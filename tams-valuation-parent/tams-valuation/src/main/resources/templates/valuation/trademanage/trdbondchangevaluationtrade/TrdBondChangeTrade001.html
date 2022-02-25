@@ -16,7 +16,7 @@
                 <div class="layui-form-item">
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
                         <label class="layui-form-label form-lable"
-                               data-th-text="#{TrdBondChangeTrade001.tradeId}">交易编号</label>
+                               data-th-text="#{TrdBondChangeTrade.tradeId}">交易编号</label>
                         <div class="layui-input-inline input-inline">
                             <input type="text" id="tradeId" name="tradeId"
                                 class="layui-input form-input " placeholder="请输入内容"
@@ -26,9 +26,9 @@
                     </div>
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
                         <label class="layui-form-label form-lable"
-                               data-th-text="#{TrdBondChangeTrade001.finprodId}">产品名称</label>
+                               data-th-text="#{TrdBondChangeTrade.prodId}">产品名称</label>
                         <div class="layui-input-inline input-inline">
-                            <select id="finprodId" name="finprodId"
+                            <select id="prodId" name="prodId"
                                     class="layui-input form-input input-select"
                                     data-th-data-url="@{/valuation/trademanage/trdbondchangevaluationtrade/TrdBondChangeTrade001/getFinprodName}"
                                     multiple="true" allowClear="true" placeholder="请输入内容">
@@ -37,7 +37,7 @@
                     </div>
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
                         <label class="layui-form-label form-lable"
-                               data-th-text="#{TrdBondChangeTrade001.oAssetId}">转出证券名称</label>
+                               data-th-text="#{TrdBondChangeTrade.oAssetId}">转出证券名称</label>
                         <div class="layui-input-inline input-inline">
                             <select id="oAssetId" name="oAssetId"
                                     class="layui-input form-input input-select"
@@ -50,7 +50,7 @@
                 <div class="layui-form-item">
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
                         <label class="layui-form-label form-lable"
-                               data-th-text="#{TrdBondChangeTrade001.cAssetId}">转入证券名称</label>
+                               data-th-text="#{TrdBondChangeTrade.cAssetId}">转入证券名称</label>
                         <div class="layui-input-inline input-inline">
                             <select id="cAssetId" name="cAssetId"
                                     class="layui-input form-input input-select"
@@ -61,7 +61,7 @@
                     </div>
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
                         <label class="layui-form-label form-lable"
-                               data-th-text="#{TrdBondChangeTrade001.tradeDate}">交易日期</label>
+                               data-th-text="#{TrdBondChangeTrade.tradeDate}">交易日期</label>
                         <div class="layui-input-inline input-inline">
                             <input type="text" id="tradeDate" name="tradeDate"
                                    class="layui-input form-input input-dateRangeSelect" placeholder="请输入内容"
@@ -71,7 +71,7 @@
                     </div>
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
                         <label class="layui-form-label form-lable"
-                               data-th-text="#{TrdBondChangeTrade001.ps}">交易类型</label>
+                               data-th-text="#{TrdBondChangeTrade.ps}">交易类型</label>
                         <div class="layui-input-inline input-inline">
                             <input id="ps" name="ps" class="input-select"
                                    placeholder="请选择"

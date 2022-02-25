@@ -5,8 +5,7 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dao.TrdBondChangeTradeMapper;
-import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTrade001Dto;
-import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTrade002Dto;
+import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeDto;
 import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeFundResult;
 import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeResult;
 import com.joyintech.tams.common.base.entity.*;
@@ -140,7 +139,7 @@ public class TrdBondChangeTrade002Service extends BaseService {
      * @see
      * @since 1.0
      */
-    public TrdBondChangeTrade002Dto queryTradeInfoByTradeId(String tradeId){
+    public TrdBondChangeTradeDto queryTradeInfoByTradeId(String tradeId){
         return  trdBondChangeTradeMapper.queryTradeInfoByTradeId(tradeId);
     }
 
@@ -272,9 +271,9 @@ public class TrdBondChangeTrade002Service extends BaseService {
     }
 
     public int update(TrdBondChangeTradeResult dto){
-        TrdBondChangeTrade001Dto dto1 = new TrdBondChangeTrade001Dto();
-        dto1.setFinprodId(dto.getTrdBondChangeTrade002Dto().getProdId());
-        dto1.setTradeId(dto.getTrdBondChangeTrade002Dto().getTradeId());
+        TrdBondChangeTradeDto dto1 = new TrdBondChangeTradeDto();
+        dto1.setProdId(dto.getTrdBondChangeTradeDto().getProdId());
+        dto1.setTradeId(dto.getTrdBondChangeTradeDto().getTradeId());
         trdBondChangeTrade001Service.delete(dto1);
        return insert(dto);
     }
@@ -380,9 +379,9 @@ public class TrdBondChangeTrade002Service extends BaseService {
     }
 
     public int updateFund(TrdBondChangeTradeFundResult dto){
-        TrdBondChangeTrade001Dto dto1 = new TrdBondChangeTrade001Dto();
-        dto1.setFinprodId(dto.getTrdBondChangeTrade002Dto().getProdId());
-        dto1.setTradeId(dto.getTrdBondChangeTrade002Dto().getTradeId());
+        TrdBondChangeTradeDto dto1 = new TrdBondChangeTradeDto();
+        dto1.setProdId(dto.getTrdBondChangeTradeDto().getProdId());
+        dto1.setTradeId(dto.getTrdBondChangeTradeDto().getTradeId());
         trdBondChangeTrade001Service.delete(dto1);
         return insertFund(dto);
     }

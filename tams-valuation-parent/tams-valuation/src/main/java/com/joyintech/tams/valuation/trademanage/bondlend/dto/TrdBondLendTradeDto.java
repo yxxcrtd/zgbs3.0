@@ -70,6 +70,8 @@ public class TrdBondLendTradeDto extends BaseEntity implements ProcessEntity {
      */
     private String prodName;
 
+    private String finprodType;
+
     /**
      * 债券代码
      */
@@ -170,6 +172,14 @@ public class TrdBondLendTradeDto extends BaseEntity implements ProcessEntity {
 
     public void setProdId(String prodId) {
         this.prodId = prodId;
+    }
+
+    public String getFinprodType() {
+        return finprodType;
+    }
+
+    public void setFinprodType(String finprodType) {
+        this.finprodType = finprodType;
     }
 
     @NotEmpty(fieldName = "TrdBondLendTrade.secId", groups = { ValidateGroupEdit.class })

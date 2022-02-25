@@ -16,12 +16,13 @@ import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
-import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTradeDto;
 import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTrade001Dto;
+import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTradeDto;
 import com.joyintech.tams.valuation.trademanage.bondlend.service.TrdBondLendTrade002Service;
 import com.joyintech.tams.valuation.trademanage.bondlend.service.TrdBondLendTrade003Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -32,11 +33,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -99,7 +100,8 @@ public class TrdBondLendTrade003Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("check")
-    public AjaxResult check(@Valid @RequestBody TrdBondLendTrade001Dto trdBondLendTrade001Dto,
+    public AjaxResult check(@RequestBody @Validated({
+            ValidateGroupEdit.class}) TrdBondLendTrade001Dto trdBondLendTrade001Dto,
                               BindingResult result) {
         return commonCheck(result, trdBondLendTrade001Dto.getOperateType());
     }
@@ -116,7 +118,8 @@ public class TrdBondLendTrade003Controller extends BaseController {
      */
     @RequestMapping("save")
     @ResponseBody
-    AjaxResult save(@RequestBody @Valid TrdBondLendTrade001Dto dto, BindingResult br)
+    AjaxResult save(@RequestBody @Validated({
+            ValidateGroupEdit.class}) TrdBondLendTrade001Dto dto, BindingResult br)
         throws Exception {
 
         if (br.hasErrors()) {
@@ -140,7 +143,7 @@ public class TrdBondLendTrade003Controller extends BaseController {
         workFlowParameter.setBusinessType(DictCodeList.共通业务类型_债券类资产交易.getValue());
         workFlowParameter.setComment((entity) -> WorkFlowUtil.concatComment(
             getMessage("交易编号") + GlobalConstant.COLON + entity.getTradeId(),
-            getMessage("交易日") + GlobalConstant.COLON + entity.getTradeDate()));
+            getMessage("交易日") + GlobalConstant.COLON + DateUtil.format(entity.getTradeDate())));
 
         String msg = trdBondLendTrade003Service.start(processParameter, dto);
 

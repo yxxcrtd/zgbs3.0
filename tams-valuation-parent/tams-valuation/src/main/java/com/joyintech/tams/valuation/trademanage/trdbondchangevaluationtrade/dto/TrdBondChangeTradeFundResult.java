@@ -95,7 +95,7 @@ public class TrdBondChangeTradeFundResult extends BaseEntity {
      */
     private List<InterfProductDealBookCommonDto> listInterfProductDealBookCommonDto = new ArrayList<InterfProductDealBookCommonDto>();
 
-    private TrdBondChangeTrade002Dto trdBondChangeTrade002Dto;
+    private TrdBondChangeTradeDto trdBondChangeTradeDto;
 
     /**
      * 读取数据数量
@@ -282,11 +282,11 @@ public class TrdBondChangeTradeFundResult extends BaseEntity {
         this.dataNum = dataNum;
     }
 
-    public TrdBondChangeTrade002Dto getTrdBondChangeTrade002Dto() {
-        return trdBondChangeTrade002Dto;
+    public TrdBondChangeTradeDto getTrdBondChangeTradeDto() {
+        return trdBondChangeTradeDto;
     }
 
-    public void setTrdBondChangeTrade002Dto(TrdBondChangeTrade002Dto trdBondChangeTrade002Dto) {
-        this.trdBondChangeTrade002Dto = trdBondChangeTrade002Dto;
+    public void setTrdBondChangeTradeDto(TrdBondChangeTradeDto trdBondChangeTradeDto) {
+        this.trdBondChangeTradeDto = trdBondChangeTradeDto;
     }
 }

@@ -14,7 +14,7 @@ package com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.
 import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTrade002Dto;
+import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeDto;
 import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeFundResult;
 import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeResult;
 import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.service.TrdBondChangeTrade002Service;
@@ -90,7 +90,7 @@ public class TrdBondChangeTrade002Controller {
      *             异常
      */
     @PostMapping("queryTradeInfoByTradeId")
-    public TrdBondChangeTrade002Dto queryTradeInfoByTradeId(@RequestBody String tradeId) {
+    public TrdBondChangeTradeDto queryTradeInfoByTradeId(@RequestBody String tradeId) {
         return trdBondChangeTrade002Service.queryTradeInfoByTradeId(tradeId);
     }
 

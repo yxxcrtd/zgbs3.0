@@ -84,6 +84,7 @@
             null outTradeId,    /*外部成交编号*/
             deal.BOOKSET_ID prodId,/**金融产品代码**/
             bok.BOOKSET_NAME prodName,/**金融产品名称**/
+            t.FINPROD_TYPE finprodType,
             zc.FINPROD_MARKET_ID  secId, /**资产代码**/
             zc.FINPROD_ABBR  secAbbr,/**资产简称**/
             case
