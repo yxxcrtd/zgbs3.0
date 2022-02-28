@@ -207,7 +207,7 @@ public class AssetImpairmentProvisionProcessorNewService {
 
 		// 1.4.其他应收款-本金
 		searchDto.setBaseSubjectNatureList(
-				new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue())));
+				new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
 		Map<String, BigDecimal> receivableMap = accountingCommonService
 				.getSubjectBalanceCollection(searchDto, DictCodeList.余额方向_借方.getValue(),null);
 		// 变量.其他应收本金 = 科目余额
@@ -517,10 +517,10 @@ public class AssetImpairmentProvisionProcessorNewService {
 		List<ValBokBookdetailBatch> valBokBookdetailBatch = resultNowNow.getValBokBookdetailBatch();
 		List<ValBokBookdetailBatch> valBokBookdetailBatchResult = new ArrayList<ValBokBookdetailBatch>();
 		for (ValBokBookdetailBatch dto : valBokBookdetailBatch) {
-			if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.摊余成本类资产减值.getValue())
+			if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.摊余成本类_资产减值.getValue())
 					|| dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.定期存款_减值准备.getValue())
 					|| dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.拆放同业减值准备.getValue())
-					|| dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.其它综合收益_减值.getValue())) {
+					|| dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.其他综合收益_资产减值.getValue())) {
 				valBokBookdetailBatchResult.add(dto);
 			}
 		}

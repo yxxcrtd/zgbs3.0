@@ -120,12 +120,6 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
     其他应收款(
         "QTYSK"
     ),
-    /**
-     * 其他应收款_本金
-     */
-    其他应收款_本金(
-        "QTYSK_BJ"
-    ),
 
     /**
      * 资产减值

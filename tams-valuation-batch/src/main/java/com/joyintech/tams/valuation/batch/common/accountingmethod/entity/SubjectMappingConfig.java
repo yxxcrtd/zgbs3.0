@@ -16,9 +16,9 @@ public class SubjectMappingConfig {
     private String secType;
 
     /**
-     * 证券分类
+     * 资产类型
      */
-    private String type2;
+    private String assetType;
 
     /**
      * 交易市场
@@ -51,9 +51,9 @@ public class SubjectMappingConfig {
     private String tradeAttribute;
 
     /**
-     *  税费类型
+     *  增值税类型
      */
-    private String taxFeeType;
+    private String taxType;
 
     /**
      * 币种
@@ -98,19 +98,19 @@ public class SubjectMappingConfig {
     }
 
     /**
-     * @return 证券分类
+     * @return 资产类型
      */
-    public String getType2() {
-        return type2;
+    public String getAssetType() {
+        return assetType;
     }
 
     /**
-     * 设置 证券分类
+     * 设置 资产类型
      *
-     * @param type2 证券分类
+     * @param assetType 资产类型
      */
-    public void setType2(String type2) {
-        this.type2 = type2;
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
     }
 
     /**
@@ -210,19 +210,19 @@ public class SubjectMappingConfig {
     }
 
     /**
-     * @return 税费类型
+     * @return 增值税类型
      */
-    public String getTaxFeeType() {
-        return taxFeeType;
+    public String getTaxType() {
+        return taxType;
     }
 
     /**
-     * 设置 税费类型
+     * 设置 增值税类型
      *
-     * @param taxFeeType 税费类型
+     * @param taxType 增值税类型
      */
-    public void setTaxFeeType(String taxFeeType) {
-        this.taxFeeType = taxFeeType;
+    public void setTaxType(String taxType) {
+        this.taxType = taxType;
     }
 
     /**

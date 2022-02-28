@@ -204,7 +204,7 @@ public class DepositeAssetTransBookNewService {
         searchDao.setHappenDate(acctEntity.getHappenDate());
         searchDao.setBookDate(acctEntity.getBookDate());
         //2.4.其他应收款本金余额
-        searchDao.setBaseSubjectNatureList(new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue())));
+        searchDao.setBaseSubjectNatureList(new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
         glb_qtyskbjsum = this.getSubjectBalanceSum(searchDao, DictCodeList.余额方向_借方.getValue());
         
         //2.5.其他应收款利息余额
@@ -469,7 +469,7 @@ public class DepositeAssetTransBookNewService {
                     dealNow.getPortfolioId(), dealNow.getFinprodId());
                 // 实付通道费 <- 变量.交易各种费用.通道费
                 BigDecimal 实付通道费 = dealTypesFeeDto.getChlFee();
-                accountAmountMap.put(DictCodeListExt1.一次性费用类型_通道费.getValue(),
+                accountAmountMap.put(BookConstant.REAL_CHLAMT,
                     ArithmeticUtil.round(实付通道费, NumberEnum.MONEY));
                 // 通道费账务明细代码 <- 变量.交易各种费用.通道费账务明细代码
                 // 通道费业务明细代码 <- 变量.交易各种费用.通道费业务明细代码
@@ -566,8 +566,8 @@ public class DepositeAssetTransBookNewService {
                         本币应收利息);
                     // 本币实付通道费 <- 实付通道费 * 汇率
                     BigDecimal 本币实付通道费 = ArithmeticUtil.round(ArithmeticUtil.multiply(
-                        accountAmountMap.get(DictCodeListExt1.一次性费用类型_通道费.getValue()), 汇率), NumberEnum.MONEY);
-                    accountAmountBCCYAMTMap.put(DictCodeListExt1.一次性费用类型_通道费.getValue() + BookConstant.BCCYAMT,
+                        accountAmountMap.get(BookConstant.REAL_CHLAMT), 汇率), NumberEnum.MONEY);
+                    accountAmountBCCYAMTMap.put(BookConstant.REAL_CHLAMT + BookConstant.BCCYAMT,
                         本币实付通道费);
                     // if 交易明细.利息总额 - 变量.冲减应收利息 - 实付通道费 >0
                     BigDecimal subVal = ArithmeticUtil.doSub(本币实收金额, 本币应收利息, 本币实付通道费);
@@ -742,7 +742,7 @@ public class DepositeAssetTransBookNewService {
                     dealNow.getPortfolioId(), dealNow.getFinprodId());
                 // 实付通道费 <- 变量.交易各种费用.通道费
                 BigDecimal 实付通道费 = dealTypesFeeDto.getChlFee();
-                accountAmountMap.put(DictCodeListExt1.一次性费用类型_通道费.getValue(),
+                accountAmountMap.put(BookConstant.REAL_CHLAMT,
                     ArithmeticUtil.round(实付通道费, NumberEnum.MONEY));
                 // 通道费账务明细代码 <- 变量.交易各种费用.通道费账务明细代码
                 // 通道费业务明细代码 <- 变量.交易各种费用.通道费业务明细代码
@@ -802,7 +802,7 @@ public class DepositeAssetTransBookNewService {
                         accountAmountBCCYAMTMap.get(BookConstant.COST + BookConstant.BCCYAMT),
                         accountAmountBCCYAMTMap.get(BookConstant.INTAMT + BookConstant.BCCYAMT),
                         accountAmountBCCYAMTMap.get(
-                            DictCodeListExt1.一次性费用类型_通道费.getValue() + BookConstant.BCCYAMT),
+                            BookConstant.REAL_CHLAMT + BookConstant.BCCYAMT),
                         accountAmountBCCYAMTMap.get(
                             BookConstant.INCOMEAMT_C + BookConstant.BCCYAMT));
                     accountAmountMap.put(BookConstant.DEALAMT + BookConstant.BCCYAMT,
@@ -816,7 +816,7 @@ public class DepositeAssetTransBookNewService {
                         accountAmountBCCYAMTMap.get(BookConstant.COST + BookConstant.BCCYAMT),
                         accountAmountBCCYAMTMap.get(BookConstant.INTAMT + BookConstant.BCCYAMT),
                         accountAmountBCCYAMTMap.get(
-                            DictCodeListExt1.一次性费用类型_通道费.getValue() + BookConstant.BCCYAMT)),
+                            BookConstant.REAL_CHLAMT + BookConstant.BCCYAMT)),
                         accountAmountBCCYAMTMap.get(
                             BookConstant.INCOMEAMT_D + BookConstant.BCCYAMT));
                     accountAmountMap.put(BookConstant.DEALAMT + BookConstant.BCCYAMT,
@@ -866,7 +866,7 @@ public class DepositeAssetTransBookNewService {
                     SubjectBalance otherBjBalance = this.getSubjectBalance(booksetIdNow,
                         bokDetailId, dealNow.getHappenDate(), dealNow.getBooksetDate(),
                         DictCodeList.余额方向_借方.getValue(),
-                        DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue(), dealNow.getBranch(),
+                        DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(), dealNow.getBranch(),
                         taskPri);
                     // 非空判断
                     if (otherBjBalance != null) {
@@ -939,7 +939,7 @@ public class DepositeAssetTransBookNewService {
                 Map<String, Map<String, Object>> accountNatrueMap = new HashMap<String, Map<String, Object>>();
                 Map<String, Object> accountNatrueBranchMap = new HashMap<String, Object>();
                 accountNatrueBranchMap.put(BookConstant.BRANCH, dealNow.getBranch());
-                accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue(),
+                accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(),
                     accountNatrueBranchMap);
                 ad.setAccountNatrueMap(accountNatrueMap);
                 
@@ -1073,7 +1073,7 @@ public class DepositeAssetTransBookNewService {
                 accountNatrueBranchMap.put(BookConstant.BRANCH, dealNow.getBranch());
                 accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.应收利息_证券.getValue(),
                     accountNatrueBranchMap);
-                accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue(),
+                accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(),
                     accountNatrueBranchMap);
                 ad.setAccountNatrueMap(accountNatrueMap);
                 
@@ -1086,7 +1086,7 @@ public class DepositeAssetTransBookNewService {
                     SubjectBalance otherBjBalance = this.getSubjectBalance(booksetIdNow,
                         bokDetailId, dealNow.getHappenDate(), dealNow.getBooksetDate(),
                         DictCodeList.余额方向_借方.getValue(),
-                        DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue(), dealNow.getBranch(),
+                        DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(), dealNow.getBranch(),
                         taskPri);
                     // 非空判断
                     if (otherBjBalance != null) {
@@ -1197,7 +1197,7 @@ public class DepositeAssetTransBookNewService {
                     SubjectBalance otherBjBalance = this.getSubjectBalance(booksetIdNow,
                         bokDetailId, dealNow.getHappenDate(), dealNow.getBooksetDate(),
                         DictCodeList.余额方向_借方.getValue(),
-                        DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue(), dealNow.getBranch(),
+                        DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(), dealNow.getBranch(),
                         taskPri);
                     // 非空判断
                     if (otherBjBalance != null) {
@@ -1327,7 +1327,7 @@ public class DepositeAssetTransBookNewService {
                 Map<String, Map<String, Object>> accountNatrueMap = new HashMap<String, Map<String, Object>>();
                 Map<String, Object> accountNatrueBranchMap = new HashMap<String, Object>();
                 accountNatrueBranchMap.put(BookConstant.BRANCH, dealNow.getBranch());
-                accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue(),
+                accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(),
                     accountNatrueBranchMap);
                 accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.应收利息_证券.getValue(),
                     accountNatrueBranchMap);
@@ -1665,7 +1665,7 @@ public class DepositeAssetTransBookNewService {
                 Map<String, Map<String, Object>> accountNatrueMap = new HashMap<>();
                 Map<String, Object> accountNatrueBranchMap = new HashMap<>();
                 accountNatrueBranchMap.put(BookConstant.BRANCH, dealNow.getBranch());
-                accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue(),
+                accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(),
                     accountNatrueBranchMap);
                 accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.其他应收款_利息.getValue(),
                         accountNatrueBranchMap);
@@ -1776,7 +1776,7 @@ public class DepositeAssetTransBookNewService {
             SubjectBalance otherBjBalance = this.getSubjectBalance(booksetIdNow,
                 bokDetailId, dealNow.getHappenDate(), dealNow.getBooksetDate(),
                 DictCodeList.余额方向_借方.getValue(),
-                DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue(), dealNow.getBranch(),
+                DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(), dealNow.getBranch(),
                 taskPri);
             if (otherBjBalance != null) {
                 // 变量.其他应收款-本金科目余额 = 上述共通返回的科目余额

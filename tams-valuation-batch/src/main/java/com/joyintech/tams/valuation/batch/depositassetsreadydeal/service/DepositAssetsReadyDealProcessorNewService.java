@@ -201,7 +201,7 @@ public class DepositAssetsReadyDealProcessorNewService {
         searchDao.setBookDate(acctEntity.getBookDate());
         List<SubjectBalance> listSubjectBalance = null;
         //2.4.其他应收款本金余额
-        searchDao.setBaseSubjectNatureList(new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue())));
+        searchDao.setBaseSubjectNatureList(new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
         glb_qtyskbjsum = this.getSubjectBalanceSum(searchDao, DictCodeList.余额方向_借方.getValue());
         
         //2.5.其他应收款利息余额
@@ -532,7 +532,7 @@ public class DepositAssetsReadyDealProcessorNewService {
                 Map<String, Map<String, Object>> accountNatrueMap = new HashMap<>();
                 Map<String, Object> accountNatrueBranchMap = new HashMap<>();
                 accountNatrueBranchMap.put(BookConstant.BRANCH, dealNow.getBranch());
-                accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue(), accountNatrueBranchMap);
+                accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(), accountNatrueBranchMap);
                 ad.setAccountNatrueMap(accountNatrueMap);
                 // 发生数量->冲减数量
                 accountSceneMap.put(BookConstant.HAPPEN_NUMBER, cjNum);
@@ -552,7 +552,7 @@ public class DepositAssetsReadyDealProcessorNewService {
                     searchDao.setBookDate(acctEntity.getBookDate());
                     searchDao.setTaskPri(dealNow.getTaskPri());
                     searchDao.setBaseSubjectNatureList(new ArrayList<String>(
-                        Arrays.asList(DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue())));
+                        Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
                     searchDao.setBranch(dealNow.getBranch());
                     listSubjectBalance = accountingCommonService.getSubjectBalanceExpectDirection(
                         searchDao, DictCodeList.余额方向_借方.getValue());

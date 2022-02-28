@@ -293,7 +293,18 @@ public class SecLendFinDealBookDetailService {
                     accountNatrueBranchMap.put(BookConstant.BRANCH, dealDto.getBranch());
                     accountNatrueMap.put(DictCodeBaseSubjectNatrue.其他应收款_利息.getValue(), accountNatrueBranchMap);
                     // 实收金额 <-交易明细.交易金额
-                    putAccountAmountMap(accountAmountMap,BookConstant.DEALAMT,dealDto.getTradeAmt());
+                    // add by weipeng on 20220225 区分资金账户金额元素 start
+//                    putAccountAmountMap(accountAmountMap,BookConstant.DEALAMT,dealDto.getTradeAmt());
+                    // 定义 变量.金额元素, 默认 = 活期存款-托管户
+                    String 交易金额记账元素 =  BookConstant.DEALAMT_HQ;
+                    // 本方资金账户类型 或 对方资金账户类型对应资金账户类型，赋值对应金额元素
+                    // 券商资金账户现划分在结算备付金科目性质下
+                    if (DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(dealDto.getAcctType())
+                            || DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(dealDto.getAcctType())){
+                        交易金额记账元素 = BookConstant.DEALAMT_JS;
+                    }
+                    putAccountAmountMap(accountAmountMap,交易金额记账元素,dealDto.getTradeAmt());
+                    // add by weipeng on 20220225 区分资金账户金额元素 end
                 }
                 // 变量.应付融出方利息 = 变量.应付融出方利息 + 实收金额
                 yfrcflx = ArithmeticUtil.doAdd(yfrcflx, dealDto.getTradeAmt());
@@ -396,7 +407,7 @@ public class SecLendFinDealBookDetailService {
                 tableId = DictCodeListTableId.会计场景代码_债券借贷_融入期间标的券本金支付.getValue();
                 // 备注 <- "债券借贷-融入期间标的券本金支付交易登账"
                 book_remark = "债券借贷-融入期间标的券本金支付交易登账";
-                // 交易金额 <- 交易信息.交易金额  
+                // 交易金额 <- 交易信息.交易金额
                 putAccountAmountMap(accountAmountMap,BookConstant.DEALAMT,dealDto.getTradeAmt());
                 // 变量.应付融出方本金 = 变量.应付融出方本金 - 实收金额
                 yfrcfbj = ArithmeticUtil.doAdd(yfrcfbj, dealDto.getTradeAmt());

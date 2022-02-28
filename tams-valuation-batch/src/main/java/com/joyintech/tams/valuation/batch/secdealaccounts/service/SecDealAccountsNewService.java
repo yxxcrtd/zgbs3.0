@@ -800,7 +800,7 @@ public class SecDealAccountsNewService {
                 searchDao.setBookDate(dealNow.getBookDate());
                 searchDao.setTaskPri(dealNow.getTaskPri());
                 searchDao.setBaseSubjectNatureList(new ArrayList<String>(
-                        Arrays.asList(DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue())));
+                        Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
                 searchDao.setBranch(dealNow.getBranch());
                 List<SubjectBalance> listSubjectBalance = accountingCommonService.getSubjectBalanceExpectDirection(
                         searchDao, DictCodeList.余额方向_借方.getValue());
@@ -895,7 +895,7 @@ public class SecDealAccountsNewService {
         Map<String, Map<String, Object>> accountNatrueMap = new HashMap<>();
         Map<String, Object> accountNatrueBranchMap = new HashMap<>();
         accountNatrueBranchMap.put(BookConstant.BRANCH, dealNow.getBranch());
-        accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue(),
+        accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(),
             accountNatrueBranchMap);
         ad.setAccountNatrueMap(accountNatrueMap);
         // 记账凭证生成
@@ -2461,7 +2461,7 @@ public class SecDealAccountsNewService {
         
         // 2.6.其他应收款本金汇总余额
         searchDao.setBaseSubjectNatureList(
-            new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue())));
+            new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
         // 变量.其他应收款本金汇总余额 = 科目余额
         param.setVarQtyskBjSubjectSumAmt(
             this.getSubjectBalanceSum(searchDao, DictCodeList.余额方向_借方.getValue()));
@@ -7110,7 +7110,7 @@ public class SecDealAccountsNewService {
         if(qtyskBjBalAmt == null) {
             SubjectBalance subjectBalance = getQtysk(dealNow,
                 new ArrayList<String>(
-                    Arrays.asList(DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue())));
+                    Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
             qtyskBjBalAmt = subjectBalance.getBalance();
         }
         //变量.其他应收款-本金科目余额                                   =   变量.其他应收款-本金科目余额 + 金额元素.逾期款项-本金                                                                                              
@@ -7130,7 +7130,7 @@ public class SecDealAccountsNewService {
         Map<String, Object> accountNatrueBranchMap = new HashMap<>();
         accountNatrueBranchMap.put(BookConstant.BRANCH, dealNow.getBranch());
         // accountNatrueMap.put(基础科目性质.其他应收款_本金, accountNatrueBranchMap);
-        accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue(), accountNatrueBranchMap);
+        accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(), accountNatrueBranchMap);
         //accountNatrueMap.put(基础科目性质.其他应收款_利息, accountNatrueBranchMap);
         accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.应收利息_证券.getValue(), accountNatrueBranchMap);
         ad.setAccountNatrueMap(accountNatrueMap);
@@ -7399,7 +7399,7 @@ public class SecDealAccountsNewService {
         if (qtyskBjBalAmt == null) {
             SubjectBalance subjectBalance = getQtysk(dealNow,
                 new ArrayList<String>(
-                    Arrays.asList(DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue())));
+                    Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
             qtyskBjBalAmt = subjectBalance.getBalance();
         }
         // 变量.其他应收款-本金科目余额                                   =   变量.其他应收款-本金科目余额 - 金额元素.逾期款项-本金                                                                                              
@@ -7420,7 +7420,7 @@ public class SecDealAccountsNewService {
         Map<String, Object> accountNatrueBranchMap = new HashMap<>();
         accountNatrueBranchMap.put(BookConstant.BRANCH, dealNow.getBranch());
         // accountNatrueMap.put(基础科目性质.其他应收款_本金, accountNatrueBranchMap);
-        accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue(), accountNatrueBranchMap);
+        accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(), accountNatrueBranchMap);
         //accountNatrueMap.put(基础科目性质.其他应收款_利息, accountNatrueBranchMap);
         accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.应收利息_证券.getValue(), accountNatrueBranchMap);
         ad.setAccountNatrueMap(accountNatrueMap);
@@ -7771,7 +7771,7 @@ public class SecDealAccountsNewService {
             // 查询交易的到期日对应的本金
             SubjectBalance subjectBalance = getQtysk(dealNow,
                 new ArrayList<String>(
-                    Arrays.asList(DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue())));
+                    Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
             yskbjYe = subjectBalance.getBalance();
             // 变量.其他应收款-本金科目余额MAP.put(交易明细.分支序号，变量.其他应收款-利息科目余额)
             param.getVarQtyskxBJSubjectAmt().put(String.valueOf(dealNow.getBranch()), yskbjYe);
@@ -7873,7 +7873,7 @@ public class SecDealAccountsNewService {
         Map<String, Map<String, Object>> accountNatrueMap = new HashMap<>();
         Map<String, Object> accountNatrueBranchMap = new HashMap<>();
         accountNatrueBranchMap.put(BookConstant.BRANCH, dealNow.getBranch());
-        accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.其他应收款_本金.getValue(),
+        accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(),
             accountNatrueBranchMap);
         accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.其他应收款_利息.getValue(),
             accountNatrueBranchMap);

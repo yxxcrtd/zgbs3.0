@@ -19,6 +19,7 @@ import com.joyintech.tams.common.base.entity.BokSubjectDetail;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.DictCodeListTableId;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalance;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalanceSearchDto;
 import com.joyintech.tams.valuation.batch.common.accounting.service.AccountingCommonService;
@@ -1527,7 +1528,16 @@ public class BookAccountGenLogicNew {
                 // 根据账务明细代码获取对应辅助核算项
                 SubjectMappingConfig mappingConfig = subjectMappingConfigMap.get(bokDetailId.getBokDetailId());
                 // 此处可直接赋值，分录中费用类型对应的会计元素，数据来源会设置为对应费用类型，可直接赋值费用类型，非费用类型的用不到，赋值也不会有问题
-                mappingConfig.setFeeType(accountEntry.getDictSource());
+                // 产品-费用摊销场景对应的费用类型特殊处理，从会计场景元素中传过来的TYPE_1字段取值
+                if(DictCodeListTableId.会计场景代码_费用摊销.getValue().equals(tableId)){
+                    mappingConfig.setFeeType((String)accountSceneMap.get(BookConstant.TYPE_1));
+                }
+                else{
+                    // 从会计元素对应的数据来源中获取
+                    mappingConfig.setFeeType(accountEntry.getDictSource());
+                }
+                // 税类型同样取数据来源字段
+                mappingConfig.setTaxType(accountEntry.getDictSource());
                 // 定义 变量.资产辅助核算项 封装辅助核算项为map对象
                 Map<String, Object> params = initMappingParams(mappingConfig);
                 // 定义 变量.默认辅助核算项 封装辅助核算项为map对象
@@ -1588,12 +1598,15 @@ public class BookAccountGenLogicNew {
     public Map<String,Object> initMappingParams(SubjectMappingConfig mappingConfig){
         Map<String, Object> params = new HashMap<>();
         params.put(SubjectConfigCode.证券品种.getValue(), mappingConfig.getSecType());
-        params.put(SubjectConfigCode.债券类型.getValue(), mappingConfig.getType2());
+        params.put(SubjectConfigCode.债券类型.getValue(), mappingConfig.getAssetType());
+        params.put(SubjectConfigCode.存款类资产类型.getValue(), mappingConfig.getAssetType());
+        params.put(SubjectConfigCode.基金类型.getValue(), mappingConfig.getAssetType());
         params.put(SubjectConfigCode.交易市场.getValue(), mappingConfig.getTradeMarket());
         params.put(SubjectConfigCode.交易对手.getValue(), mappingConfig.getTradeMarket());
         params.put(SubjectConfigCode.发行方式.getValue(), mappingConfig.getIssueType());
         params.put(SubjectConfigCode.账户类型.getValue(), mappingConfig.getAccountType());
         params.put(SubjectConfigCode.费用类型.getValue(), mappingConfig.getFeeType());
+        params.put(SubjectConfigCode.税类型.getValue(), mappingConfig.getTaxType());
         return params;
     }
 }
