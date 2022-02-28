@@ -38,7 +38,7 @@ import java.util.List;
  * @see TrdDepositValuationTrade001Dto
  * @since 1.0
  */
-@PageId("TrdDepositInvestTrade002")
+@PageId("TrdDepositValuationTrade002")
 @ValidLogic(targetClass = TrdDepositValuationTrade001Validator.class, groups = {ValidateGroupEdit.class,
     ValidateGroupDelete.class})
 public class TrdDepositValuationTrade001Dto extends BaseEntity implements ProcessEntity {
