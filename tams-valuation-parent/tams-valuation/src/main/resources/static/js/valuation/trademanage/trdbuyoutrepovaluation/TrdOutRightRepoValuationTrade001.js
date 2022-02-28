@@ -118,16 +118,19 @@
             }
             // 启动删除流程
             var object = {selectedItem: selArr, operateType:"delete"};
-            Joyin.confirm(JoyinUtil.getMessage("COMMON_C_0001",JoyinUtil.getLabel("SysCommon.delete")), function(){
-                WorkFlow.doDeleteList(
-                    basePath + 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade001/delete',
-                    object,
-                    "TrdRepoValuationTrade001_btn_delete",
-                    "TrdRepoValuationTrade002",
-                    function() {
-                        table.reload();
-                    }
-                );
+            Joyin.ajaxJson(basePath + 'valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade001/check', object, function(result) {//请求路径，请求参数回调函数
+
+                Joyin.confirm(JoyinUtil.getMessage("COMMON_C_0001", JoyinUtil.getLabel("SysCommon.delete")), function () {
+                    WorkFlow.doDeleteList(
+                        basePath + 'valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade001/delete',
+                        object,
+                        "TrdOutRightRepoValuationTrade001_btn_delete",
+                        "TrdOutRightRepoValuationTrade002",
+                        function () {
+                            table.reload();
+                        }
+                    );
+                });
             });
         });
         
@@ -150,13 +153,17 @@
         table.bind('click', '.edit', function(data, index) {
             data.pageModel = PAGE_MODEL_EDIT;
             var object = {selectedItem: [data], operateType:"edit"};//请求参数
-            Joyin.dialog(JoyinUtil.getLabel("买断式回购交易-修改"),
-                basePath + "valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade002/init",//打开新界面
-                "98%", "98%", {pageModel:PAGE_MODEL_EDIT,//请求的page_model
-                    tradeId:data.tradeId  //金融产品代码
-                },function(){
-                    table.reload();//回调函数，表格刷新
+            Joyin.ajaxJson(basePath + 'valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade001/check', object, function(result) {//请求路径，请求参数回调函数
+
+                Joyin.dialog(JoyinUtil.getLabel("买断式回购交易-修改"),
+                    basePath + "valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade002/init",//打开新界面
+                    "98%", "98%", {
+                        pageModel: PAGE_MODEL_EDIT,//请求的page_model
+                        tradeId: data.tradeId  //金融产品代码
+                    }, function () {
+                        table.reload();//回调函数，表格刷新
                 });
+            });
         });
 
         /**
@@ -164,16 +171,19 @@
          */
         table.bind('click', '.delt', function(data, index) {
             var object = {selectedItem: [data], operateType:"delete"};
-            Joyin.confirm(JoyinUtil.getMessage("COMMON_C_0001",JoyinUtil.getLabel("SysCommon.delete")), function(){
-                WorkFlow.doDeleteList(
-                    basePath + 'valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade001/delete',
-                    object,
-                    "TrdOutRightRepoValuationTrade001_btn_delete",
-                    "TrdOutRightRepoValuationTrade002",
-                    function() {
-                        table.reload();
-                    }
-                );
+            Joyin.ajaxJson(basePath + 'valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade001/check', object, function(result) {//请求路径，请求参数回调函数
+
+                Joyin.confirm(JoyinUtil.getMessage("COMMON_C_0001", JoyinUtil.getLabel("SysCommon.delete")), function () {
+                    WorkFlow.doDeleteList(
+                        basePath + 'valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade001/delete',
+                        object,
+                        "TrdOutRightRepoValuationTrade001_btn_delete",
+                        "TrdOutRightRepoValuationTrade002",
+                        function () {
+                            table.reload();
+                        }
+                    );
+                });
             });
         });
 

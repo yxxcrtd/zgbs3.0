@@ -11,6 +11,7 @@
 package com.joyintech.tams.valuation.trademanage.trdfixincomevaluduration.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
@@ -101,6 +102,48 @@ public class TrdFixIncomeValuDuration001Controller extends BaseController {
         return trdFixIncomeValuDuration001Service.findFinprodId(param);
     }
 
+
+
+    /**
+     * 删除前判断
+     *
+     * @param dto
+     * @param result
+     * @return
+     * @throws Exception
+     */
+    @ResponseBody
+    @RequestMapping("check")
+    public AjaxResult check(@RequestBody @Valid TrdFixIncomeValuDuration001Dto dto,
+                            BindingResult result) throws ParseException {
+
+        List<TrdFixIncomeValuDuration001Dto> list = dto.getSelectedItem();
+        if(list==null||list.size()<=0){
+            return new AjaxResult("请选择数据", MessageType.错误消息);
+        }
+        //删除时的校验
+        if(StringUtil.isNotEmpty(list) && "delete".equals(dto.getOperateType())) {
+            for (TrdFixIncomeValuDuration001Dto item : list) {
+                //1.判断是否在流程中
+                //判断当前流程是否存在
+                if (trdFixIncomeValuDuration001Service.checkBusinessDataInFlow(item)) {
+                    //流程存在情况
+                    return new AjaxResult("交易编号：" + item.getTradeId() + "已存在流程中", MessageType.错误消息);
+                }
+
+            }
+        }else if("edit".equals(dto.getOperateType())){
+            for (TrdFixIncomeValuDuration001Dto item : list) {
+                //1.判断是否在流程中
+                //判断当前流程是否存在
+                if(trdFixIncomeValuDuration001Service.checkBusinessDataInFlow(item)){
+                    //流程存在情况
+                    return new AjaxResult("交易编号："+item.getTradeId()+"已存在流程中", MessageType.错误消息);
+                }
+            }
+        }
+        return new AjaxResult();
+    }
 
 
     //删除

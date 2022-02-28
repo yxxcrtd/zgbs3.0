@@ -102,7 +102,7 @@ public class TrdDepoValuationDuration002Service extends BaseService<TrdDepoValua
 //        entity.setFundSettleDate(DateUtil.parse(dto.getFundSettleDate()));
         //比较界面和接口字段差异，并手动给接口字段赋值
         entity.setProdId(dto.getPortfolioId()); //资产代码
-        entity.setAssetId("F01"+dto.getFinprodMarketId());  //资产代码
+        entity.setAssetId("F01_"+dto.getFinprodMarketId());  //资产代码
         entity.setDataActionSign("01");//数据动作标志
         entity.setDealType(dto.getPs()); //交易类型
         entity.setVdate(new Date());//计息开始日
