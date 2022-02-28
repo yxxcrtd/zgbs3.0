@@ -6,8 +6,8 @@
         SELECT
             t.TRADE_ID tradeId,/**交易编号**/
             null outTradeId,    /*外部成交编号*/
-            deal.BOOKSET_ID finprodId,/**金融产品代码**/
-            bok.BOOKSET_NAME finprodName,/**金融产品名称**/
+            deal.BOOKSET_ID prodId,/**金融产品代码**/
+            bok.BOOKSET_NAME prodName,/**金融产品名称**/
             fpt.TYPE_6 contractType, /**合约类型**/
             ftr.finprod_id  targetId, /**合约标的**/
             t.PS ps,/**交易方向**/
@@ -66,7 +66,7 @@
         order by t.TRADE_ID desc
     </select>
 
-    <select id="queryTradeInfoByTradeId" resultType="com.joyintech.service.valuation.trademanage.option.dto.TrdOptionValuationTrade002Dto">
+    <select id="queryTradeInfoByTradeId" resultType="com.joyintech.service.valuation.trademanage.option.dto.TrdOptionValuationTrade001Dto">
         SELECT
             t.TRADE_ID tradeId,/**交易编号**/
             null outTradeId,    /*外部成交编号*/
@@ -108,7 +108,7 @@
         order by t.TRADE_ID desc
     </select>
 
-    <select id="queryInfoByTradeId" resultType="com.joyintech.service.valuation.trademanage.option.dto.TrdOptionValuationTrade003Dto">
+    <select id="queryInfoByTradeId" resultType="com.joyintech.service.valuation.trademanage.option.dto.TrdOptionValuationTrade002Dto">
         SELECT
             t.TRADE_ID tradeId,/**交易编号**/
             deal.BOOKSET_ID prodId,/**金融产品代码**/

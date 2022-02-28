@@ -13,7 +13,7 @@ package com.joyintech.service.valuation.trademanage.trdstockvaluationtrade.contr
 
 import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.grid.Page;
-import com.joyintech.service.valuation.trademanage.trdstockvaluationtrade.dto.TrdStockTrade001Dto;
+import com.joyintech.service.valuation.trademanage.trdstockvaluationtrade.dto.TrdStockTradeDto;
 import com.joyintech.service.valuation.trademanage.trdstockvaluationtrade.service.TrdStockTrade001Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +46,7 @@ public class TrdStockTrade001Controller {
      * @since 1.0
      */
     @RequestMapping("findPage/{page}/{length}")
-    public Page<TrdStockTrade001Dto> queryForPage(@RequestBody Map<String, Object> param,
+    public Page<TrdStockTradeDto> queryForPage(@RequestBody Map<String, Object> param,
                                                   @PathVariable("page") int page, @PathVariable("length") int length)
             throws Exception {
         return trdStockTrade001Service.selectForPage(page, length, param);
@@ -60,14 +60,14 @@ public class TrdStockTrade001Controller {
      * @throws Exception
      */
     @PostMapping("/queryPageList")
-    public List<TrdStockTrade001Dto> queryPageList(@RequestBody Map<String, Object> param){
+    public List<TrdStockTradeDto> queryPageList(@RequestBody Map<String, Object> param){
         return trdStockTrade001Service.queryPageList(param);
     }
 
     @Transactional
     @DTXTransaction
     @PostMapping("delete")
-    public int delete(@RequestBody TrdStockTrade001Dto dto){
+    public int delete(@RequestBody TrdStockTradeDto dto){
         return trdStockTrade001Service.delete(dto);
     }
 

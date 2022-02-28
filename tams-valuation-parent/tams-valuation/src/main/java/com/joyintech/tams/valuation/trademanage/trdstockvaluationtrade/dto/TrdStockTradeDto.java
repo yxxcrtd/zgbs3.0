@@ -1,16 +1,30 @@
-package com.joyintech.service.valuation.trademanage.trdstockvaluationtrade.dto;
+package com.joyintech.tams.valuation.trademanage.trdstockvaluationtrade.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.framework.validation.annotation.NotEmpty;
+import com.joyintech.framework.validation.annotation.ValidLogic;
+import com.joyintech.framework.validation.groups.ValidateGroupDelete;
+import com.joyintech.framework.validation.groups.ValidateGroupEdit;
+import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.valuation.trademanage.trdstockvaluationtrade.validator.TrdStockTradeValidator;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.List;
 
-public class TrdStockTrade002Dto extends BaseEntity implements ProcessEntity {
+@PageId("TrdStockTrade002")
+@ValidLogic(targetClass = TrdStockTradeValidator.class, groups = { ValidateGroupEdit.class,
+        ValidateGroupDelete.class })
+public class TrdStockTradeDto extends BaseEntity implements ProcessEntity {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -23,7 +37,7 @@ public class TrdStockTrade002Dto extends BaseEntity implements ProcessEntity {
     /**
      * 选择数据
      */
-    private List<TrdStockTrade002Dto> selectedItem;
+    private List<TrdStockTradeDto> selectedItem;
 
     /**
      * 要素id
@@ -44,56 +58,47 @@ public class TrdStockTrade002Dto extends BaseEntity implements ProcessEntity {
     /**
      * 金融产品代码
      */
-    @NotEmpty(fieldName = "产品代码")
     private String prodId;
 
     /**
      * 金融产品名称
      */
-    @NotEmpty(fieldName = "产品名称")
     private String prodName;
 
     /**
      * 债券代码
      */
-    @NotEmpty(fieldName = "资产代码")
     private String assetId;
 
     /**
      * 债券简称
      */
-    @NotEmpty(fieldName = "资产简称")
     private String assetAbbr;
 
     /**
      * 交易方向
      */
-    @NotEmpty(fieldName = "交易类型")
     private String ps;
 
     /**
      * 交易日
      */
-    @NotEmpty(fieldName = "交易日")
-    private String tradeDate;
+    private Date tradeDate;
 
     /**
      * 缴款日
      */
-    @NotEmpty(fieldName = "缴款日")
-    private String paymentDate;
+    private Date paymentDate;
 
     /**
      * 交割日期
      */
-    @NotEmpty(fieldName = "交割日")
-    private String settdateDate;
+    private Date settdateDate;
 
     /**
      * 交收日
      */
-    @NotEmpty(fieldName = "交收日")
-    private String settleDate;
+    private Date settleDate;
 
     /**
      * 是否锁定
@@ -103,27 +108,23 @@ public class TrdStockTrade002Dto extends BaseEntity implements ProcessEntity {
     /**
      * 锁定期截止日
      */
-    @NotEmpty(fieldName = "锁定期截止日")
-    private String endDate;
+    private Date endDate;
 
     /**
      * 交易数量
      */
-    @NotEmpty(fieldName = "交易数量")
     @JsonSerialize(using= BigDecimalSerializer.class)
     private BigDecimal dealNum;
 
     /**
      * 交易价格
      */
-    @NotEmpty(fieldName = "交易价格")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal tradeAmt;
 
     /**
      * 币种
      */
-    @NotEmpty(fieldName = "币种")
     private String ccy;
 
     /**
@@ -135,29 +136,26 @@ public class TrdStockTrade002Dto extends BaseEntity implements ProcessEntity {
     /**
      * 佣金
      */
-    @NotEmpty(fieldName = "佣金")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal commission;
 
     /**
      * 其他应付费用
      */
-    @NotEmpty(fieldName = "其他费用")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal otherAmt;
 
     /**
      * 结算金额
      */
-    @NotEmpty(fieldName = "结算金额")
     private BigDecimal settleAmt;
 
     /**
      * 资金账户
      */
-    @NotEmpty(fieldName = "资金账户")
     private String myAcctNo;
 
+    @NotEmpty(fieldName = "TrdStockTrade002.prodId" , groups = { ValidateGroupEdit.class })
     public String getProdId() {
         return prodId;
     }
@@ -166,6 +164,7 @@ public class TrdStockTrade002Dto extends BaseEntity implements ProcessEntity {
         this.prodId = prodId;
     }
 
+    @NotEmpty(fieldName = "TrdStockTrade002.assetId" , groups = { ValidateGroupEdit.class })
     public String getAssetId() {
         return assetId;
     }
@@ -174,6 +173,7 @@ public class TrdStockTrade002Dto extends BaseEntity implements ProcessEntity {
         this.assetId = assetId;
     }
 
+    @NotEmpty(fieldName = "TrdStockTrade002.assetAbbr" , groups = { ValidateGroupEdit.class })
     public String getAssetAbbr() {
         return assetAbbr;
     }
@@ -182,27 +182,29 @@ public class TrdStockTrade002Dto extends BaseEntity implements ProcessEntity {
         this.assetAbbr = assetAbbr;
     }
 
-    public String getPaymentDate() {
+    @NotEmpty(fieldName = "TrdStockTrade002.paymentDate", groups = { ValidateGroupEdit.class })
+    public Date getPaymentDate() {
         return paymentDate;
     }
 
-    public void setPaymentDate(String paymentDate) {
+    public void setPaymentDate(Date paymentDate) {
         this.paymentDate = paymentDate;
     }
 
-    public String getSettleDate() {
+    @NotEmpty(fieldName = "TrdStockTrade002.settleDate", groups = { ValidateGroupEdit.class })
+    public Date getSettleDate() {
         return settleDate;
     }
 
-    public void setSettleDate(String settleDate) {
+    public void setSettleDate(Date settleDate) {
         this.settleDate = settleDate;
     }
 
-    public String getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(String endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 
@@ -214,12 +216,23 @@ public class TrdStockTrade002Dto extends BaseEntity implements ProcessEntity {
         this.stampDutyAmt = stampDutyAmt;
     }
 
+    @NotEmpty(fieldName = "TrdStockTrade002.ps" , groups = { ValidateGroupEdit.class })
     public String getPs() {
         return ps;
     }
 
     public void setPs(String ps) {
         this.ps = ps;
+    }
+
+    /**
+     * 取得 交易方向str
+     *
+     * @return 交易方向
+     */
+    public String getPsStr() {
+        return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.交易方向, ps))?
+                SysDataUtil.getNameFromDataDict(DictCode.交易方向, ps):ps;
     }
 
     public String getTradeId() {
@@ -230,22 +243,33 @@ public class TrdStockTrade002Dto extends BaseEntity implements ProcessEntity {
         this.tradeId = tradeId;
     }
 
-    public String getTradeDate() {
+    @NotEmpty(fieldName = "TrdStockTrade002.tradeDate" , groups = { ValidateGroupEdit.class })
+    public Date getTradeDate() {
         return tradeDate;
     }
 
-    public void setTradeDate(String tradeDate) {
+    public void setTradeDate(Date tradeDate) {
         this.tradeDate = tradeDate;
     }
 
-    public String getSettdateDate() {
+    public String getTradeDateStr() {
+        return DateUtil.format(this.getTradeDate());
+    }
+
+    @NotEmpty(fieldName = "TrdStockTrade002.settdateDate", groups = { ValidateGroupEdit.class })
+    public Date getSettdateDate() {
         return settdateDate;
     }
 
-    public void setSettdateDate(String settdateDate) {
+    public void setSettdateDate(Date settdateDate) {
         this.settdateDate = settdateDate;
     }
 
+    public String getSettleDateStr() {
+        return DateUtil.format(this.getSettleDate());
+    }
+
+    @NotEmpty(fieldName = "TrdStockTrade002.dealNum", groups = { ValidateGroupEdit.class })
     public BigDecimal getDealNum() {
         return dealNum;
     }
@@ -254,6 +278,7 @@ public class TrdStockTrade002Dto extends BaseEntity implements ProcessEntity {
         this.dealNum = dealNum;
     }
 
+    @NotEmpty(fieldName = "TrdStockTrade002.ccy", groups = { ValidateGroupEdit.class })
     public String getCcy() {
         return ccy;
     }
@@ -262,6 +287,17 @@ public class TrdStockTrade002Dto extends BaseEntity implements ProcessEntity {
         this.ccy = ccy;
     }
 
+    /**
+     * 取得 币种Fmt
+     *
+     * @return 币种
+     */
+    public String getCcyFmt() {
+        return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.币种, ccy))?
+                SysDataUtil.getNameFromDataDict(DictCode.币种, ccy):ccy;
+    }
+
+    @NotEmpty(fieldName = "TrdStockTrade002.commission", groups = { ValidateGroupEdit.class })
     public BigDecimal getCommission() {
         return commission;
     }
@@ -270,6 +306,7 @@ public class TrdStockTrade002Dto extends BaseEntity implements ProcessEntity {
         this.commission = commission;
     }
 
+    @NotEmpty(fieldName = "TrdStockTrade002.otherAmt", groups = { ValidateGroupEdit.class })
     public BigDecimal getOtherAmt() {
         return otherAmt;
     }
@@ -278,6 +315,7 @@ public class TrdStockTrade002Dto extends BaseEntity implements ProcessEntity {
         this.otherAmt = otherAmt;
     }
 
+    @NotEmpty(fieldName = "TrdStockTrade002.tradeAmt" , groups = { ValidateGroupEdit.class })
     public BigDecimal getTradeAmt() {
         return tradeAmt;
     }
@@ -286,6 +324,7 @@ public class TrdStockTrade002Dto extends BaseEntity implements ProcessEntity {
         this.tradeAmt = tradeAmt;
     }
 
+    @NotEmpty(fieldName = "TrdStockTrade002.myAcctNo" , groups = { ValidateGroupEdit.class })
     public String getMyAcctNo() {
         return myAcctNo;
     }
@@ -310,11 +349,11 @@ public class TrdStockTrade002Dto extends BaseEntity implements ProcessEntity {
         this.pageModel = pageModel;
     }
 
-    public List<TrdStockTrade002Dto> getSelectedItem() {
+    public List<TrdStockTradeDto> getSelectedItem() {
         return selectedItem;
     }
 
-    public void setSelectedItem(List<TrdStockTrade002Dto> selectedItem) {
+    public void setSelectedItem(List<TrdStockTradeDto> selectedItem) {
         this.selectedItem = selectedItem;
     }
 
@@ -334,6 +373,7 @@ public class TrdStockTrade002Dto extends BaseEntity implements ProcessEntity {
         this.outTradeId = outTradeId;
     }
 
+    @NotEmpty(fieldName = "TrdStockTrade002.prodName" , groups = { ValidateGroupEdit.class })
     public String getProdName() {
         return prodName;
     }
@@ -342,6 +382,7 @@ public class TrdStockTrade002Dto extends BaseEntity implements ProcessEntity {
         this.prodName = prodName;
     }
 
+    @NotEmpty(fieldName = "TrdStockTrade002.settleAmt", groups = { ValidateGroupEdit.class })
     public BigDecimal getSettleAmt() {
         return settleAmt;
     }
@@ -356,5 +397,15 @@ public class TrdStockTrade002Dto extends BaseEntity implements ProcessEntity {
 
     public void setIsLock(String isLock) {
         this.isLock = isLock;
+    }
+
+    public String getDealNumStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getDealNum()==null?"0.00":decimalFormat.format(this.getDealNum().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getSettleAmtStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getSettleAmt()==null?"0.00":decimalFormat.format(this.getSettleAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
     }
 }

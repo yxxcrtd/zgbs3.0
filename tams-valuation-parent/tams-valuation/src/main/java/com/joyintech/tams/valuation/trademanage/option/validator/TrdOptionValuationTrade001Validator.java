@@ -13,7 +13,7 @@ package com.joyintech.tams.valuation.trademanage.option.validator;
 
 import com.joyintech.framework.validation.BeanValidator;
 import com.joyintech.framework.validation.ValidMessage;
-import com.joyintech.tams.valuation.trademanage.option.dto.TrdOptionValuationTrade002Dto;
+import com.joyintech.tams.valuation.trademanage.option.dto.TrdOptionValuationTrade001Dto;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class TrdOptionValuationTrade001Validator implements BeanValidator {
      */
     @Override
     public List<ValidMessage> valid(Object value) {
-        TrdOptionValuationTrade002Dto dto = (TrdOptionValuationTrade002Dto)value;
+        TrdOptionValuationTrade001Dto dto = (TrdOptionValuationTrade001Dto)value;
         List<ValidMessage> resultList = new ArrayList<ValidMessage>();
         if("delete".equals(dto.getOperateType())){
 

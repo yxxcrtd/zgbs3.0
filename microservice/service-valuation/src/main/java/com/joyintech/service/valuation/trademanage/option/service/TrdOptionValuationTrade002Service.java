@@ -6,7 +6,6 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.service.valuation.trademanage.option.dao.TrdOptionValuationTradeMapper;
 import com.joyintech.service.valuation.trademanage.option.dto.TrdOptionValuationTrade001Dto;
 import com.joyintech.service.valuation.trademanage.option.dto.TrdOptionValuationTrade002Dto;
-import com.joyintech.service.valuation.trademanage.option.dto.TrdOptionValuationTrade003Dto;
 import com.joyintech.service.valuation.trademanage.option.dto.TrdOptionValuationTradeResult;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.valuation.common.interf.base.batch.dao.*;
@@ -87,7 +86,7 @@ public class TrdOptionValuationTrade002Service extends BaseService {
      * @see
      * @since 1.0
      */
-    public TrdOptionValuationTrade002Dto queryTradeInfoByTradeId(String tradeId){
+    public TrdOptionValuationTrade001Dto queryTradeInfoByTradeId(String tradeId){
         return  trdOptionValuationTradeMapper.queryTradeInfoByTradeId(tradeId);
     }
 
@@ -99,7 +98,7 @@ public class TrdOptionValuationTrade002Service extends BaseService {
      * @see
      * @since 1.0
      */
-    public TrdOptionValuationTrade003Dto queryInfoByTradeId(String tradeId){
+    public TrdOptionValuationTrade002Dto queryInfoByTradeId(String tradeId){
         return  trdOptionValuationTradeMapper.queryInfoByTradeId(tradeId);
     }
 
@@ -221,8 +220,8 @@ public class TrdOptionValuationTrade002Service extends BaseService {
 
     public int update(TrdOptionValuationTradeResult dto){
         TrdOptionValuationTrade001Dto dto1 = new TrdOptionValuationTrade001Dto();
-        dto1.setFinprodId(dto.getTrdOptionValuationTrade002Dto().getProdId());
-        dto1.setTradeId(dto.getTrdOptionValuationTrade002Dto().getTradeId());
+        dto1.setProdId(dto.getTrdOptionValuationTrade001Dto().getProdId());
+        dto1.setTradeId(dto.getTrdOptionValuationTrade001Dto().getTradeId());
         trdOptionValuationTrade001Service.delete(dto1);
        return insert(dto);
     }

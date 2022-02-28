@@ -15,7 +15,7 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.BeanValidator;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.valuation.trademanage.trdstockvaluationtrade.dto.TrdStockTrade002Dto;
+import com.joyintech.tams.valuation.trademanage.trdstockvaluationtrade.dto.TrdStockTradeDto;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ public class TrdStockTradeValidator implements BeanValidator {
      */
     @Override
     public List<ValidMessage> valid(Object value) {
-        TrdStockTrade002Dto dto = (TrdStockTrade002Dto)value;
+        TrdStockTradeDto dto = (TrdStockTradeDto)value;
         List<ValidMessage> resultList = new ArrayList<ValidMessage>();
         if("delete".equals(dto.getOperateType())){
 

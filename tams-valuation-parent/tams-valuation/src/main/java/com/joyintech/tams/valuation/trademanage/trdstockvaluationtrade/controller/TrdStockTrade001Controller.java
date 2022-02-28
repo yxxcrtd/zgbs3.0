@@ -22,7 +22,7 @@ import com.joyintech.system.constant.SystemGlobalConstant;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
-import com.joyintech.tams.valuation.trademanage.trdstockvaluationtrade.dto.TrdStockTrade001Dto;
+import com.joyintech.tams.valuation.trademanage.trdstockvaluationtrade.dto.TrdStockTradeDto;
 import com.joyintech.tams.valuation.trademanage.trdstockvaluationtrade.service.TrdStockTrade001Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -79,7 +79,7 @@ public class TrdStockTrade001Controller extends BaseController {
      */
     @RequestMapping("findPage")
     @ResponseBody
-    public Page<TrdStockTrade001Dto> findPage()
+    public Page<TrdStockTradeDto> findPage()
         throws Exception {
         return trdStockTrade001Service.findPage(RequestUtil.getPageParam());
     }
@@ -124,16 +124,16 @@ public class TrdStockTrade001Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("check")
-    public AjaxResult check(@RequestBody @Valid TrdStockTrade001Dto dto,
+    public AjaxResult check(@RequestBody @Valid TrdStockTradeDto dto,
                                   BindingResult result) throws ParseException {
 
-        List<TrdStockTrade001Dto> list = dto.getSelectedItem();
+        List<TrdStockTradeDto> list = dto.getSelectedItem();
         if(list==null||list.size()<=0){
             return new AjaxResult("请选择数据", MessageType.错误消息);
         }
         //删除时的校验
         if(StringUtil.isNotEmpty(list) && "delete".equals(dto.getOperateType())) {
-            for (TrdStockTrade001Dto item : list) {
+            for (TrdStockTradeDto item : list) {
                 //1.判断是否在流程中
                 //判断当前流程是否存在
                 if (trdStockTrade001Service.checkBusinessDataInFlow(item)) {
@@ -155,7 +155,7 @@ public class TrdStockTrade001Controller extends BaseController {
 
             }
         }else if("edit".equals(dto.getOperateType())){
-                for (TrdStockTrade001Dto item : list) {
+                for (TrdStockTradeDto item : list) {
                     //1.判断是否在流程中
                     //判断当前流程是否存在
                     if(trdStockTrade001Service.checkBusinessDataInFlow(item)){
@@ -169,7 +169,7 @@ public class TrdStockTrade001Controller extends BaseController {
 
     @ResponseBody
     @RequestMapping(ACTION_DELETE)
-    public AjaxResult delete(@RequestBody @Valid TrdStockTrade001Dto dto, BindingResult br)
+    public AjaxResult delete(@RequestBody @Valid TrdStockTradeDto dto, BindingResult br)
     {
 
         if (br.hasErrors()) {
@@ -177,8 +177,8 @@ public class TrdStockTrade001Controller extends BaseController {
         }
 
         // 启动流程
-        ProcessParameter<TrdStockTrade001Dto> proParam = new ProcessParameter<>();
-        WorkFlowParameter<TrdStockTrade001Dto> params = new WorkFlowParameter<>();
+        ProcessParameter<TrdStockTradeDto> proParam = new ProcessParameter<>();
+        WorkFlowParameter<TrdStockTradeDto> params = new WorkFlowParameter<>();
 
         // 业务代码（凭证流水号）
         params.setBusinessCode(item -> item.getTradeId());
@@ -200,7 +200,7 @@ public class TrdStockTrade001Controller extends BaseController {
         String msg = getMessage("COMMON_I_0001");
         try {
             msg = trdStockTrade001Service.start(proParam, dto.getSelectedItem().toArray(
-                    new TrdStockTrade001Dto[dto.getSelectedItem().size()]));
+                    new TrdStockTradeDto[dto.getSelectedItem().size()]));
         }
         catch (Exception e) {
             getLogger().error("启动流程失败：", e);
@@ -237,9 +237,9 @@ public class TrdStockTrade001Controller extends BaseController {
 
         String datas = this.getParam("datas");
         Map<String, Object> params = RequestUtil.getPageParam();
-        List<TrdStockTrade001Dto> listdto;
+        List<TrdStockTradeDto> listdto;
         if (datas != null) {
-            listdto = JsonUtils.json2List(datas, TrdStockTrade001Dto.class);
+            listdto = JsonUtils.json2List(datas, TrdStockTradeDto.class);
         }
         else {
             listdto = trdStockTrade001Service.queryPageList(params);

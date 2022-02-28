@@ -63,26 +63,18 @@ public class TrdOptionValuationTrade002Dto extends BaseEntity implements Process
      */
     private Date tradeDate;
     /**
-     * 借贷期限
+     * 支付日
      */
-    private Long term;
+    private Date payDate;
     /**
-     * 起息日
+     * 收付方向
      */
-    private Date vdate;
-    /**
-     * 到期日
-     */
-    private Date mdate;
+    private String payment;
     /**
      * 名义本金
      */
     @JsonSerialize(using=BigDecimalSerializer.class)
     private BigDecimal nomCapi;
-    /**
-     * 行权日基准日
-     */
-    private Date exerciseDate;
     /**
      * 执行价格
      */
@@ -90,61 +82,18 @@ public class TrdOptionValuationTrade002Dto extends BaseEntity implements Process
     private BigDecimal exePrice;
 
     /**
-     * 敲出价格
-     */
-    @JsonSerialize(using=BigDecimalSerializer.class)
-    private BigDecimal knockPrice;
-    /**
-     * 低障碍价
-     */
-    @JsonSerialize(using= BigDecimalSerializer.class)
-    private BigDecimal lowHindPrice;
-    /**
-     * 低行权价
-     */
-    @JsonSerialize(using=BigDecimalSerializer.class)
-    private BigDecimal lowExercPrice;
-    /**
-     * 高障碍价
-     */
-    @JsonSerialize(using=BigDecimalSerializer.class)
-    private BigDecimal highHindPrice;
-    /**
-     * 高行权价
-     */
-    @JsonSerialize(using=BigDecimalSerializer.class)
-    private BigDecimal highExercPrice;
-    /**
      * 行权方式
      */
     private String exerciseType;
-    /**
-     * 期权费类型
-     */
-    private String optFeePayType;
     /**
      * 期权费
      */
     @JsonSerialize(using=BigDecimalSerializer.class)
     private BigDecimal optFee;
     /**
-     * 期权费率
-     */
-    @JsonSerialize(using=BigDecimalSerializer.class)
-    private BigDecimal optFeeRate;
-    /**
      * 币种
      */
     private String ccy;
-    /**
-     * 交易对手
-     */
-    private String counterId;
-    /**
-     * 其他应付费用
-     */
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal otherAmt;
     /**
      * 结算金额
      */
@@ -252,44 +201,12 @@ public class TrdOptionValuationTrade002Dto extends BaseEntity implements Process
         this.tradeDate = tradeDate;
     }
 
-    public Long getTerm() {
-        return term;
-    }
-
-    public void setTerm(Long term) {
-        this.term = term;
-    }
-
-    public Date getVdate() {
-        return vdate;
-    }
-
-    public void setVdate(Date vdate) {
-        this.vdate = vdate;
-    }
-
-    public Date getMdate() {
-        return mdate;
-    }
-
-    public void setMdate(Date mdate) {
-        this.mdate = mdate;
-    }
-
     public BigDecimal getNomCapi() {
         return nomCapi;
     }
 
     public void setNomCapi(BigDecimal nomCapi) {
         this.nomCapi = nomCapi;
-    }
-
-    public Date getExerciseDate() {
-        return exerciseDate;
-    }
-
-    public void setExerciseDate(Date exerciseDate) {
-        this.exerciseDate = exerciseDate;
     }
 
     public BigDecimal getExePrice() {
@@ -300,60 +217,12 @@ public class TrdOptionValuationTrade002Dto extends BaseEntity implements Process
         this.exePrice = exePrice;
     }
 
-    public BigDecimal getKnockPrice() {
-        return knockPrice;
-    }
-
-    public void setKnockPrice(BigDecimal knockPrice) {
-        this.knockPrice = knockPrice;
-    }
-
-    public BigDecimal getLowHindPrice() {
-        return lowHindPrice;
-    }
-
-    public void setLowHindPrice(BigDecimal lowHindPrice) {
-        this.lowHindPrice = lowHindPrice;
-    }
-
-    public BigDecimal getLowExercPrice() {
-        return lowExercPrice;
-    }
-
-    public void setLowExercPrice(BigDecimal lowExercPrice) {
-        this.lowExercPrice = lowExercPrice;
-    }
-
-    public BigDecimal getHighHindPrice() {
-        return highHindPrice;
-    }
-
-    public void setHighHindPrice(BigDecimal highHindPrice) {
-        this.highHindPrice = highHindPrice;
-    }
-
-    public BigDecimal getHighExercPrice() {
-        return highExercPrice;
-    }
-
-    public void setHighExercPrice(BigDecimal highExercPrice) {
-        this.highExercPrice = highExercPrice;
-    }
-
     public String getExerciseType() {
         return exerciseType;
     }
 
     public void setExerciseType(String exerciseType) {
         this.exerciseType = exerciseType;
-    }
-
-    public String getOptFeePayType() {
-        return optFeePayType;
-    }
-
-    public void setOptFeePayType(String optFeePayType) {
-        this.optFeePayType = optFeePayType;
     }
 
     public BigDecimal getOptFee() {
@@ -364,36 +233,12 @@ public class TrdOptionValuationTrade002Dto extends BaseEntity implements Process
         this.optFee = optFee;
     }
 
-    public BigDecimal getOptFeeRate() {
-        return optFeeRate;
-    }
-
-    public void setOptFeeRate(BigDecimal optFeeRate) {
-        this.optFeeRate = optFeeRate;
-    }
-
     public String getCcy() {
         return ccy;
     }
 
     public void setCcy(String ccy) {
         this.ccy = ccy;
-    }
-
-    public String getCounterId() {
-        return counterId;
-    }
-
-    public void setCounterId(String counterId) {
-        this.counterId = counterId;
-    }
-
-    public BigDecimal getOtherAmt() {
-        return otherAmt;
-    }
-
-    public void setOtherAmt(BigDecimal otherAmt) {
-        this.otherAmt = otherAmt;
     }
 
     public BigDecimal getSettleAmt() {
@@ -410,5 +255,21 @@ public class TrdOptionValuationTrade002Dto extends BaseEntity implements Process
 
     public void setAcctNo(String acctNo) {
         this.acctNo = acctNo;
+    }
+
+    public Date getPayDate() {
+        return payDate;
+    }
+
+    public void setPayDate(Date payDate) {
+        this.payDate = payDate;
+    }
+
+    public String getPayment() {
+        return payment;
+    }
+
+    public void setPayment(String payment) {
+        this.payment = payment;
     }
 }

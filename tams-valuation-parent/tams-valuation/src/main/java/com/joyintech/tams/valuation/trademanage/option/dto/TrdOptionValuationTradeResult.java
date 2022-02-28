@@ -72,7 +72,7 @@ public class TrdOptionValuationTradeResult extends BaseEntity {
      */
     private List<ValInterflog> valInterflog = new ArrayList<ValInterflog>();
 
-    private TrdOptionValuationTrade002Dto trdOptionValuationTrade002Dto;
+    private TrdOptionValuationTrade001Dto trdOptionValuationTrade001Dto;
 
     /**
      * 读取数据数量
@@ -277,11 +277,11 @@ public class TrdOptionValuationTradeResult extends BaseEntity {
         this.dataNum = dataNum;
     }
 
-    public TrdOptionValuationTrade002Dto getTrdOptionValuationTrade002Dto() {
-        return trdOptionValuationTrade002Dto;
+    public TrdOptionValuationTrade001Dto getTrdOptionValuationTrade001Dto() {
+        return trdOptionValuationTrade001Dto;
     }
 
-    public void setTrdOptionValuationTrade002Dto(TrdOptionValuationTrade002Dto trdOptionValuationTrade002Dto) {
-        this.trdOptionValuationTrade002Dto = trdOptionValuationTrade002Dto;
+    public void setTrdOptionValuationTrade001Dto(TrdOptionValuationTrade001Dto trdOptionValuationTrade001Dto) {
+        this.trdOptionValuationTrade001Dto = trdOptionValuationTrade001Dto;
     }
 }

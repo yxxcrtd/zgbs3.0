@@ -139,7 +139,7 @@ public class TrdOptionValuationTrade001Service extends BaseService {
     public int delete(TrdOptionValuationTrade001Dto dto) {
         int count=0;
         Map<String, Object> params = new HashMap<>();
-        params.put("booksetId",dto.getFinprodId());
+        params.put("booksetId",dto.getProdId());
         params.put("tradeId",dto.getTradeId());
 
         List<TrdProductDeal> listDeal = new ArrayList<>();

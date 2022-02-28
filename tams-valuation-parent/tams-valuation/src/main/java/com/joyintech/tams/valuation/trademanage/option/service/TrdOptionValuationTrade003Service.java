@@ -2,14 +2,14 @@ package com.joyintech.tams.valuation.trademanage.option.service;
 
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
-import com.joyintech.tams.valuation.trademanage.option.dto.TrdOptionValuationTrade003Dto;
+import com.joyintech.tams.valuation.trademanage.option.dto.TrdOptionValuationTrade002Dto;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TrdOptionValuationTrade003Service extends CommonExportService<TrdOptionValuationTrade003Dto> implements BaseProcessService<TrdOptionValuationTrade003Dto> {
+public class TrdOptionValuationTrade003Service extends CommonExportService<TrdOptionValuationTrade002Dto> implements BaseProcessService<TrdOptionValuationTrade002Dto> {
 
     @Autowired
     private TrdOptionValuationTrade002Service trdOptionValuationTrade002Service;
@@ -21,10 +21,10 @@ public class TrdOptionValuationTrade003Service extends CommonExportService<TrdOp
      * @see
      * @since 1.0
      */
-    public TrdOptionValuationTrade003Dto queryInfoByTradeId(String tradeId) {
+    public TrdOptionValuationTrade002Dto queryInfoByTradeId(String tradeId) {
         return restTemplate.postForObject(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdOptionValuationTrade002/queryInfoByTradeId", tradeId,
-                TrdOptionValuationTrade003Dto.class);
+                TrdOptionValuationTrade002Dto.class);
     }
 
     //自增序列号
@@ -34,7 +34,7 @@ public class TrdOptionValuationTrade003Service extends CommonExportService<TrdOp
 
 
     @Override
-    public void doComplete(TrdOptionValuationTrade003Dto trdOptionValuationTrade003Dto, OperationType operationType) {
+    public void doComplete(TrdOptionValuationTrade002Dto trdOptionValuationTrade002Dto, OperationType operationType) {
 //        TrdOptionValuationTradeResult trdOptionValuationTradeResult = generateEntity(trdOptionValuationTrade003Dto);
 //        String action = StringUtil.EMPTY;
 //         if (OperationType.NEW.equals(operationType)) {

@@ -8,7 +8,7 @@ import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 import com.joyintech.tams.valuation.common.interf.base.dto.ValOtcOptTradeCommonResult;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.opt.ValOtcOptTradeTemplateRecService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValOtcOptTrade;
-import com.joyintech.tams.valuation.trademanage.option.dto.TrdOptionValuationTrade002Dto;
+import com.joyintech.tams.valuation.trademanage.option.dto.TrdOptionValuationTrade001Dto;
 import com.joyintech.tams.valuation.trademanage.option.dto.TrdOptionValuationTradeResult;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class TrdOptionValuationTrade002Service extends CommonExportService<TrdOptionValuationTrade002Dto> implements BaseProcessService<TrdOptionValuationTrade002Dto> {
+public class TrdOptionValuationTrade002Service extends CommonExportService<TrdOptionValuationTrade001Dto> implements BaseProcessService<TrdOptionValuationTrade001Dto> {
 
     @Autowired
     private ValOtcOptTradeTemplateRecService valOtcOptTradeTemplateRecService;
@@ -30,10 +30,10 @@ public class TrdOptionValuationTrade002Service extends CommonExportService<TrdOp
      * @see
      * @since 1.0
      */
-    public TrdOptionValuationTrade002Dto queryTradeInfoByTradeId(String tradeId) {
+    public TrdOptionValuationTrade001Dto queryTradeInfoByTradeId(String tradeId) {
         return restTemplate.postForObject(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdOptionValuationTrade002/queryTradeInfoByTradeId", tradeId,
-                TrdOptionValuationTrade002Dto.class);
+                TrdOptionValuationTrade001Dto.class);
     }
 
     /**
@@ -69,8 +69,8 @@ public class TrdOptionValuationTrade002Service extends CommonExportService<TrdOp
 
 
     @Override
-    public void doComplete(TrdOptionValuationTrade002Dto trdOptionValuationTrade002Dto, OperationType operationType) {
-        TrdOptionValuationTradeResult trdOptionValuationTradeResult = generateEntity(trdOptionValuationTrade002Dto);
+    public void doComplete(TrdOptionValuationTrade001Dto trdOptionValuationTrade001Dto, OperationType operationType) {
+        TrdOptionValuationTradeResult trdOptionValuationTradeResult = generateEntity(trdOptionValuationTrade001Dto);
         String action = StringUtil.EMPTY;
          if (OperationType.NEW.equals(operationType)) {
              action = "insert";
@@ -85,7 +85,7 @@ public class TrdOptionValuationTrade002Service extends CommonExportService<TrdOp
     }
 
     //封装实体类
-    public TrdOptionValuationTradeResult generateEntity(TrdOptionValuationTrade002Dto dto){
+    public TrdOptionValuationTradeResult generateEntity(TrdOptionValuationTrade001Dto dto){
         //设置接口参数
         Map<String,Object> params = new HashMap<>();
         List<String> prodIds = new ArrayList<>();
@@ -148,7 +148,7 @@ public class TrdOptionValuationTrade002Service extends CommonExportService<TrdOp
         result.setListValOrdersExt(valOrdersExtList);
 
         TrdOptionValuationTradeResult rst = new TrdOptionValuationTradeResult(result);
-        rst.setTrdOptionValuationTrade002Dto(dto);
+        rst.setTrdOptionValuationTrade001Dto(dto);
         return rst;
 
     }

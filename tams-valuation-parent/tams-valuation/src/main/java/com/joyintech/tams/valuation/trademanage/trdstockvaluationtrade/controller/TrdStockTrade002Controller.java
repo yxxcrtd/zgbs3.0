@@ -23,7 +23,7 @@ import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
-import com.joyintech.tams.valuation.trademanage.trdstockvaluationtrade.dto.TrdStockTrade002Dto;
+import com.joyintech.tams.valuation.trademanage.trdstockvaluationtrade.dto.TrdStockTradeDto;
 import com.joyintech.tams.valuation.trademanage.trdstockvaluationtrade.service.TrdStockTrade002Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -74,12 +74,12 @@ public class TrdStockTrade002Controller extends BaseController {
         String tradeId = getParam("tradeId");
 
         if(StringUtil.isNotEmpty(workflowId)){
-            TrdStockTrade002Dto entity= trdStockTrade002Service.getBussinessEntityByWorkflowId(workflowId);
+            TrdStockTradeDto entity= trdStockTrade002Service.getBussinessEntityByWorkflowId(workflowId);
             model.addAttribute("entity", entity);
             model.addAttribute("workflowId", workflowId);
 
         }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){
-            TrdStockTrade002Dto entity = trdStockTrade002Service.queryTradeInfoByTradeId(tradeId);
+            TrdStockTradeDto entity = trdStockTrade002Service.queryTradeInfoByTradeId(tradeId);
             model.addAttribute("entity", entity);
         }
 
@@ -136,7 +136,7 @@ public class TrdStockTrade002Controller extends BaseController {
     /**
      * 确认校验
      *
-     * @param TrdStockTrade002Dto 参数
+     * @param TrdStockTradeDto 参数
      * @param result 校验结果
      * @return AjaxResult
      * @see
@@ -145,9 +145,9 @@ public class TrdStockTrade002Controller extends BaseController {
     @ResponseBody
     @RequestMapping("check")
     public AjaxResult check(@RequestBody @Validated({
-            ValidateGroupEdit.class}) TrdStockTrade002Dto TrdStockTrade002Dto,
+            ValidateGroupEdit.class}) TrdStockTradeDto TrdStockTradeDto,
                               BindingResult result) {
-        return commonCheck(result, TrdStockTrade002Dto.getOperateType());
+        return commonCheck(result, TrdStockTradeDto.getOperateType());
     }
 
 
@@ -163,15 +163,15 @@ public class TrdStockTrade002Controller extends BaseController {
     @RequestMapping("save")
     @ResponseBody
     AjaxResult save(@RequestBody @Validated({
-            ValidateGroupEdit.class}) TrdStockTrade002Dto dto, BindingResult br)
+            ValidateGroupEdit.class}) TrdStockTradeDto dto, BindingResult br)
         throws Exception {
 
         if (br.hasErrors()) {
             return new AjaxResult(br);
         }
 
-        ProcessParameter<TrdStockTrade002Dto> processParameter = new ProcessParameter<>();
-        WorkFlowParameter<TrdStockTrade002Dto> workFlowParameter = new WorkFlowParameter<>();
+        ProcessParameter<TrdStockTradeDto> processParameter = new ProcessParameter<>();
+        WorkFlowParameter<TrdStockTradeDto> workFlowParameter = new WorkFlowParameter<>();
         processParameter.setWorkFlowParameter(workFlowParameter);
         processParameter.setPageId(this.getPageId());
 

@@ -4,8 +4,8 @@
         <Row>
             <Cell order="1" name="交易编号">tradeId</Cell>
             <Cell order="2" name="外部成交编号">outTradeId</Cell>
-            <Cell order="3" name="产品代码">finprodId</Cell>
-            <Cell order="4" name="产品名称">finprodName</Cell>
+            <Cell order="3" name="产品代码">prodId</Cell>
+            <Cell order="4" name="产品名称">prodName</Cell>
             <Cell order="5" name="合约类型">contractTypeFmt</Cell>
             <Cell order="6" name="合约标的">targetId</Cell>
             <Cell order="7" name="交易类型">psStr</Cell>
