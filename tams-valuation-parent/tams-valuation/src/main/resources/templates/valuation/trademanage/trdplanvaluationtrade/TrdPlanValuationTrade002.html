@@ -81,7 +81,7 @@
 											   data-th-text="#{TrdPlanValuationTrade001.finprodName}">资产名称</label>
 										<div class="layui-input-inline input-inline">
 											<select type="text" id="finprodId" name="finprodId" class="layui-input form-input input-select" required
-													placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}" th:initValue="${entity?.finprodId}"
+													placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}" data-th-value="${entity?.finprodId}"
 													data-th-data-url="@{/valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade002/findFinprodId}" allowClear="true" showField="id" formatoption="true"></select>
 										</div>
 									</div>

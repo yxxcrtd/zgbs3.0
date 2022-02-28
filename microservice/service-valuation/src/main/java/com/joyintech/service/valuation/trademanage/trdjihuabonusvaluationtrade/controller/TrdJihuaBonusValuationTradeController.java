@@ -126,7 +126,7 @@ public class TrdJihuaBonusValuationTradeController extends BaseController {
     @Transactional
     @DTXTransaction
     @PostMapping("insert")
-    public void insertNet(@RequestBody TrdJihuaBonusTradeResult dto) {
+    public void insert(@RequestBody TrdJihuaBonusTradeResult dto) {
         trdJihuaBonusValuationTradeService.insert(dto);
     }
 
@@ -139,7 +139,7 @@ public class TrdJihuaBonusValuationTradeController extends BaseController {
     @Transactional
     @DTXTransaction
     @PostMapping("update")
-    public void updateNet(@RequestBody TrdJihuaBonusTradeResult dto) {
+    public void update(@RequestBody TrdJihuaBonusTradeResult dto) {
         trdJihuaBonusValuationTradeService.update(dto);
     }
 

@@ -54,25 +54,6 @@ public class TrdPlanTradeResult extends BaseEntity {
         this.paramMap = result.getParamMap();
     }
 
-    /**
-     *净值型
-     */
-    public TrdPlanTradeResult(FundDealInfoForInterfRecCommonResult result,String str) {
-        this.datanum = result.getDataNum();
-        this.listBokDealAccounting = result.getListValDealAccounting();
-        this.listBokDealAccountingDetail = result.getListValDealAccountingDetail();
-        this.listBokDetailId = result.getListValBokDetailId();
-        this.listStlOrders = result.getListValOrders();
-        this.listStlOrdersExt = result.getListValOrdersExt();
-        this.listTrdProductDeal = result.getListValFinProductDeal();
-        this.listTrdProductDealExt = result.getListValFinProductDealExt();
-        this.valInterflog = result.getListValInterflog();
-        /**ADD BY WUJIE ON 20210501 START**/
-        this.listValTradeFeeDetail = result.getListValTradeFeeDetail();
-        this.listInterfProductDealBookCommonDto =result.getListInterfProductDealBookCommonDto();
-        /**ADD BY WUJIE ON 20210501 END**/
-        this.paramMap = result.getParamMap();
-    }
 
     /**
      *

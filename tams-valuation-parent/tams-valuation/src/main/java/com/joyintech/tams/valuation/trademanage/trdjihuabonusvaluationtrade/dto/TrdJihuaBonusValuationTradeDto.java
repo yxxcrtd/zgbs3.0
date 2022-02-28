@@ -183,7 +183,6 @@ public class TrdJihuaBonusValuationTradeDto extends WflTrdProductDeal implements
      */
     @Override
     @PrimaryKey(Field.PK_1)
-    @NotEmpty(fieldName="TrdJihuaBonusValuationTrade002.tradeId",groups = {ValidateGroupEdit.class})
     public String getTradeId(){
         return super.getTradeId();
     }

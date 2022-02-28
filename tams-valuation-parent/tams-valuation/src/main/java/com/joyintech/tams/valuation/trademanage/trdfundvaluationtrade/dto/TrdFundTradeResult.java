@@ -37,23 +37,22 @@ public class TrdFundTradeResult extends BaseEntity {
     private TrdFundValuationTradeDto trdFundValuationTradeDto;
 
 
+
     /**
-     *基金型/净值型
+     * @param result
      */
     public TrdFundTradeResult(FundDealInfoForInterfRecCommonResult result) {
-        this.datanum = result.getDataNum();
-        this.listBokDealAccounting = result.getListValDealAccounting();
-        this.listBokDealAccountingDetail = result.getListValDealAccountingDetail();
-        this.listBokDetailId = result.getListValBokDetailId();
-        this.listStlOrders = result.getListValOrders();
-        this.listStlOrdersExt = result.getListValOrdersExt();
-        this.listTrdProductDeal = result.getListValFinProductDeal();
-        this.listTrdProductDealExt = result.getListValFinProductDealExt();
-        this.valInterflog = result.getListValInterflog();
-        /**ADD BY WUJIE ON 20210501 START**/
+        this.listValDealAccounting = result.getListValDealAccounting();
+        this.listValDealAccountingDetail = result.getListValDealAccountingDetail();
+        this.listValFinProductDeal = result.getListValFinProductDeal();
+        this.listValFinProductDealExt = result.getListValFinProductDealExt();
         this.listValTradeFeeDetail = result.getListValTradeFeeDetail();
-        this.listInterfProductDealBookCommonDto =result.getListInterfProductDealBookCommonDto();
-        /**ADD BY WUJIE ON 20210501 END**/
+        this.listValInterflog = result.getListValInterflog();
+        this.listInterfProductDealBookCommonDto = result.getListInterfProductDealBookCommonDto();
+        this.listValBokDetailId = result.getListValBokDetailId();
+        this.setListValOrders(result.getListValOrders());
+        this.setListValOrdersExt(result.getListValOrdersExt());
+        this.setDataNum(result.getDataNum());
         this.paramMap = result.getParamMap();
     }
 
@@ -65,46 +64,45 @@ public class TrdFundTradeResult extends BaseEntity {
     }
 
     /**
-     * 金融产品交易
+     * 金融产品交易表
      */
-    private List<TrdProductDeal> listTrdProductDeal = new ArrayList<TrdProductDeal>();
+    private List<TrdProductDeal> listValFinProductDeal = new ArrayList<TrdProductDeal>();;
 
     /**
-     * 估值核算交易扩展表
+     * 估值核算交易扩展
      */
-    private List<TrdProductDealAdd> listTrdProductDealExt = new ArrayList<TrdProductDealAdd>();
-
-    /**
-     * 入账信息表
-     */
-    private List<BokDealAccounting> listBokDealAccounting = new ArrayList<BokDealAccounting>();
-
-    /**
-     * 账务明细表
-     */
-    private List<BokDealAccountingDetail> listBokDealAccountingDetail = new ArrayList<BokDealAccountingDetail>();
+    private List<TrdProductDealAdd> listValFinProductDealExt = new ArrayList<TrdProductDealAdd>();
 
     /**
      * 账务明细代码表
      */
-    private List<BokDetailId> listBokDetailId = new ArrayList<BokDetailId>();
+    private List<BokDetailId> listValBokDetailId=new ArrayList<BokDetailId>();
 
     /**
-     * 结算指令表
+     * 入账信息表
      */
-    private List<StlOrders> listStlOrders = new ArrayList<StlOrders>();
+    private List<BokDealAccounting> listValDealAccounting = new ArrayList<BokDealAccounting>();
 
     /**
-     * 结算指令扩展表
+     * 账务明细表
      */
-    private List<StlOrdersExt> listStlOrdersExt = new ArrayList<StlOrdersExt>();
+    private List<BokDealAccountingDetail> listValDealAccountingDetail = new ArrayList<BokDealAccountingDetail>();
 
     /**
      * 交易费用明细表
-     * ADD BY WUJIE ON 20210501
      */
     private List<TrdTradeFeeDetail> listValTradeFeeDetail = new ArrayList<TrdTradeFeeDetail>();
 
+    /**
+     * 日志
+     */
+    private List<ValInterflog> listValInterflog = new ArrayList<ValInterflog>();
+
+    /**
+     * 结算指令
+     */
+    private List<StlOrders> listValOrders = new ArrayList<StlOrders>();
+    private List<StlOrdersExt> listValOrdersExt = new ArrayList<StlOrdersExt>();
 
     /**
      * 交易入账
@@ -112,183 +110,81 @@ public class TrdFundTradeResult extends BaseEntity {
     private List<InterfProductDealBookCommonDto> listInterfProductDealBookCommonDto = new ArrayList<InterfProductDealBookCommonDto>();
 
 
+    /**
+     * 读取数据数量
+     */
+    private int dataNum;
 
     /**
-     * 获取 listTrdProductDeal
+     * 获取 listValFinProductDeal
      *
-     * @return listTrdProductDeal.
+     * @return listValFinProductDeal.
      */
-    public List<TrdProductDeal> getListTrdProductDeal() {
-        return listTrdProductDeal;
+    public List<TrdProductDeal> getListValFinProductDeal() {
+        return listValFinProductDeal;
     }
 
     /**
-     * 设置 listTrdProductDeal
+     * 设置 listValFinProductDeal
      *
-     * @param listTrdProductDeal listTrdProductDeal
+     * @param listValFinProductDeal listValFinProductDeal
      */
-    public void setListTrdProductDeal(List<TrdProductDeal> listTrdProductDeal) {
-        this.listTrdProductDeal = listTrdProductDeal;
+    public void setListValFinProductDeal(List<TrdProductDeal> listValFinProductDeal) {
+        this.listValFinProductDeal = listValFinProductDeal;
     }
 
     /**
-     * 获取 listTrdProductDealExt
+     * 获取 listValFinProductDealExt
      *
-     * @return listTrdProductDealExt.
+     * @return listValFinProductDealExt.
      */
-    public List<TrdProductDealAdd> getListTrdProductDealExt() {
-        return listTrdProductDealExt;
+    public List<TrdProductDealAdd> getListValFinProductDealExt() {
+        return listValFinProductDealExt;
     }
 
     /**
-     * 设置 listTrdProductDealExt
+     * 设置 listValFinProductDealExt
      *
-     * @param listTrdProductDealExt listTrdProductDealExt
+     * @param listValFinProductDealExt listValFinProductDealExt
      */
-    public void setListTrdProductDealExt(List<TrdProductDealAdd> listTrdProductDealExt) {
-        this.listTrdProductDealExt = listTrdProductDealExt;
+    public void setListValFinProductDealExt(List<TrdProductDealAdd> listValFinProductDealExt) {
+        this.listValFinProductDealExt = listValFinProductDealExt;
     }
 
     /**
-     * 获取 listBokDealAccounting
+     * 获取 listValDealAccounting
      *
-     * @return listBokDealAccounting.
+     * @return listValDealAccounting.
      */
-    public List<BokDealAccounting> getListBokDealAccounting() {
-        return listBokDealAccounting;
+    public List<BokDealAccounting> getListValDealAccounting() {
+        return listValDealAccounting;
     }
 
     /**
-     * 设置 listBokDealAccounting
+     * 设置 listValDealAccounting
      *
-     * @param listBokDealAccounting listBokDealAccounting
+     * @param listValDealAccounting listValDealAccounting
      */
-    public void setListBokDealAccounting(List<BokDealAccounting> listBokDealAccounting) {
-        this.listBokDealAccounting = listBokDealAccounting;
+    public void setListValDealAccounting(List<BokDealAccounting> listValDealAccounting) {
+        this.listValDealAccounting = listValDealAccounting;
     }
 
     /**
-     * 获取 listBokDealAccountingDetail
+     * 获取 listValDealAccountingDetail
      *
-     * @return listBokDealAccountingDetail.
+     * @return listValDealAccountingDetail.
      */
-    public List<BokDealAccountingDetail> getListBokDealAccountingDetail() {
-        return listBokDealAccountingDetail;
+    public List<BokDealAccountingDetail> getListValDealAccountingDetail() {
+        return listValDealAccountingDetail;
     }
 
     /**
-     * 设置 listBokDealAccountingDetail
+     * 设置 listValDealAccountingDetail
      *
-     * @param listBokDealAccountingDetail listBokDealAccountingDetail
+     * @param listValDealAccountingDetail listValDealAccountingDetail
      */
-    public void setListBokDealAccountingDetail(List<BokDealAccountingDetail> listBokDealAccountingDetail) {
-        this.listBokDealAccountingDetail = listBokDealAccountingDetail;
-    }
-
-    /**
-     * 获取 listBokDetailId
-     *
-     * @return listBokDetailId.
-     */
-    public List<BokDetailId> getListBokDetailId() {
-        return listBokDetailId;
-    }
-
-    /**
-     * 设置 listBokDetailId
-     *
-     * @param listBokDetailId listBokDetailId
-     */
-    public void setListBokDetailId(List<BokDetailId> listBokDetailId) {
-        this.listBokDetailId = listBokDetailId;
-    }
-
-    /**
-     * 获取 listStlOrders
-     *
-     * @return listStlOrders.
-     */
-    public List<StlOrders> getListStlOrders() {
-        return listStlOrders;
-    }
-
-    /**
-     * 设置 listStlOrders
-     *
-     * @param listStlOrders listStlOrders
-     */
-    public void setListStlOrders(List<StlOrders> listStlOrders) {
-        this.listStlOrders = listStlOrders;
-    }
-
-    /**
-     * 获取 listStlOrdersExt
-     *
-     * @return listStlOrdersExt.
-     */
-    public List<StlOrdersExt> getListStlOrdersExt() {
-        return listStlOrdersExt;
-    }
-
-    /**
-     * 设置 listStlOrdersExt
-     *
-     * @param listStlOrdersExt listStlOrdersExt
-     */
-    public void setListStlOrdersExt(List<StlOrdersExt> listStlOrdersExt) {
-        this.listStlOrdersExt = listStlOrdersExt;
-    }
-
-    /**
-     * 日志
-     */
-    private List<ValInterflog> valInterflog = new ArrayList<ValInterflog>();
-
-    /**
-     * 获取 valInterflog
-     *
-     * @return valInterflog.
-     */
-    public List<ValInterflog> getValInterflog() {
-        return valInterflog;
-    }
-
-    /**
-     * 设置 valInterflog
-     *
-     * @param valInterflog valInterflog
-     */
-    public void setValInterflog(List<ValInterflog> valInterflog) {
-        this.valInterflog = valInterflog;
-    }
-
-    private int datanum;// 读取数据数
-
-    /**
-     * @return the datanum
-     */
-    public int getDatanum() {
-        return datanum;
-    }
-
-    /**
-     * @param datanum the datanum to set
-     */
-    public void setDatanum(int datanum) {
-        this.datanum = datanum;
-    }
-
-    /**
-     * 用于存放去重数据筛选条件
-     */
-    private Map<String, Object> paramMap;
-
-    public Map<String, Object> getParamMap() {
-        return paramMap;
-    }
-
-    public void setParamMap(Map<String, Object> paramMap) {
-        this.paramMap = paramMap;
+    public void setListValDealAccountingDetail(List<BokDealAccountingDetail> listValDealAccountingDetail) {
+        this.listValDealAccountingDetail = listValDealAccountingDetail;
     }
 
     /**
@@ -309,12 +205,94 @@ public class TrdFundTradeResult extends BaseEntity {
         this.listValTradeFeeDetail = listValTradeFeeDetail;
     }
 
+    /**
+     * 获取 listValInterflog
+     *
+     * @return listValInterflog.
+     */
+    public List<ValInterflog> getListValInterflog() {
+        return listValInterflog;
+    }
+
+    /**
+     * 设置 listValInterflog
+     *
+     * @param listValInterflog listValInterflog
+     */
+    public void setListValInterflog(List<ValInterflog> listValInterflog) {
+        this.listValInterflog = listValInterflog;
+    }
+
+
+    /**
+     * 获取 listInterfProductDealBookCommonDto
+     * @return listInterfProductDealBookCommonDto.
+     */
     public List<InterfProductDealBookCommonDto> getListInterfProductDealBookCommonDto() {
         return listInterfProductDealBookCommonDto;
     }
 
+
+    /**
+     * 设置 listInterfProductDealBookCommonDto
+     * @param listInterfProductDealBookCommonDto listInterfProductDealBookCommonDto
+     */
     public void setListInterfProductDealBookCommonDto(List<InterfProductDealBookCommonDto> listInterfProductDealBookCommonDto) {
         this.listInterfProductDealBookCommonDto = listInterfProductDealBookCommonDto;
+    }
+
+    public List<BokDetailId> getListValBokDetailId() {
+        return listValBokDetailId;
+    }
+
+    public void setListValBokDetailId(List<BokDetailId> listValBokDetailId) {
+        this.listValBokDetailId = listValBokDetailId;
+    }
+
+    public List<StlOrders> getListValOrders() {
+        return listValOrders;
+    }
+
+    public void setListValOrders(List<StlOrders> listValOrders) {
+        this.listValOrders = listValOrders;
+    }
+
+    public List<StlOrdersExt> getListValOrdersExt() {
+        return listValOrdersExt;
+    }
+
+    public void setListValOrdersExt(List<StlOrdersExt> listValOrdersExt) {
+        this.listValOrdersExt = listValOrdersExt;
+    }
+
+
+    /**
+     * 用于存放去重数据筛选条件
+     */
+    private Map<String,Object> paramMap;
+
+    public Map<String, Object> getParamMap() {
+        return paramMap;
+    }
+
+    public void setParamMap(Map<String, Object> paramMap) {
+        this.paramMap = paramMap;
+    }
+
+    /**
+     * 获取 dataNum
+     * @return dataNum.
+     */
+    public int getDataNum() {
+        return dataNum;
+    }
+
+    /**
+     * 设置 dataNum
+     * @param dataNum dataNum
+     */
+    public void setDataNum(int dataNum) {
+        this.dataNum = dataNum;
     }
 
     public TrdFundValuationTradeDto getTrdFundValuationTradeDto() {

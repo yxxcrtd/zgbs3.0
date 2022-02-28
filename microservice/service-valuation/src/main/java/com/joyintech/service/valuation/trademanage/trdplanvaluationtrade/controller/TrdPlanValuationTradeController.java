@@ -31,10 +31,10 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 
 /**
- * service 计划类利率型交易
+ * service 计划类资产交易
  * 
  * @author yuzj
- * @version 1.0 2021年12月29日
+ * @version 1.0 2022年02月24日
  * @see TrdPlanValuationTradeController
  * @since 1.0
  */
@@ -95,31 +95,6 @@ public class TrdPlanValuationTradeController extends BaseController {
         trdPlanValuationTradeService.update(dto);
     }
 
-    /**
-     * 回调函数 操作具体 new
-     *
-     * @see
-     * @since 1.0
-     */
-    @Transactional
-    @DTXTransaction
-    @PostMapping("insertNet")
-    public void insertNet(@RequestBody TrdPlanTradeResult dto) {
-        trdPlanValuationTradeService.insertNet(dto);
-    }
-
-    /**
-     * 回调函数 操作具体 update <功能详细描述>
-     *
-     * @see
-     * @since 1.0
-     */
-    @Transactional
-    @DTXTransaction
-    @PostMapping("updateNet")
-    public void updateNet(@RequestBody TrdPlanTradeResult dto) {
-        trdPlanValuationTradeService.updateNet(dto);
-    }
 
 
     /**

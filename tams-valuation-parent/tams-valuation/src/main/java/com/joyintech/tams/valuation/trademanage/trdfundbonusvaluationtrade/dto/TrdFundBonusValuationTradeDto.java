@@ -89,10 +89,7 @@ public class TrdFundBonusValuationTradeDto extends WflTrdProductDeal implements 
     private String trdAcctId;
 
 
-    /**
-     * 交易场所
-     */
-    private String tradeMarket;
+
     /**
      * 交易场所String
      */
@@ -203,7 +200,6 @@ public class TrdFundBonusValuationTradeDto extends WflTrdProductDeal implements 
      */
     @Override
     @PrimaryKey(Field.PK_1)
-    @NotEmpty(fieldName="TrdFundBonusValuationTrade002.tradeId",groups = {ValidateGroupEdit.class})
     public String getTradeId(){
         return super.getTradeId();
     }
@@ -398,7 +394,7 @@ public class TrdFundBonusValuationTradeDto extends WflTrdProductDeal implements 
     @Override
     @NotEmpty(fieldName="TrdFundBonusValuationTrade002.tradeMarket",groups = {ValidateGroupEdit.class})
     public String getTradeMarket() {
-        return tradeMarket;
+        return super.getTradeMarket();
     }
 
     public String getTradeDateStr() {

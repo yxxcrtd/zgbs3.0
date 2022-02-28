@@ -133,7 +133,7 @@ public class CPlannedRedAccoutDealTemplateRecService {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> handleValMngMnfRedAccoutTrade(List<ValMngMnfRedAccoutTrade> listValMngMnfRedAccoutTrade,Date resovleDate,
+    public Map<String, Object> handleValMngMnfRedAccoutTrade(List<ValMngMnfRedAccoutTrade> listValMngMnfRedAccoutTrade,Date resovleDate,
     		Map<String,Object> params, List<ValInterflog> valInterflog) {
         Map<String, Object> resultMap = new HashMap<>();
         // 金融产品交易

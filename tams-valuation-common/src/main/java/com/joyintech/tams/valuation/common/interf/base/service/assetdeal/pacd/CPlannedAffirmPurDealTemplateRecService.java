@@ -138,7 +138,7 @@ public class CPlannedAffirmPurDealTemplateRecService {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> handleValMngMnfAffirmPurTrade(List<ValMngMnfAffirmPurTrade> listValMngMnfAffirmPurTrade,Date resovleDate,
+    public Map<String, Object> handleValMngMnfAffirmPurTrade(List<ValMngMnfAffirmPurTrade> listValMngMnfAffirmPurTrade,Date resovleDate,
     		Map<String,Object> params, List<ValInterflog> valInterflog) {
         Map<String, Object> resultMap = new HashMap<>();
         // 金融产品交易

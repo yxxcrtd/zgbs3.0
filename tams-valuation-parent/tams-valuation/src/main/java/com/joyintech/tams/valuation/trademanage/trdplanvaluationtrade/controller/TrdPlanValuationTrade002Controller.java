@@ -170,7 +170,7 @@ public class TrdPlanValuationTrade002Controller extends BaseController {
     public Page<SelectOptionDto> findFinprodId(HttpServletRequest request) {
         Map<String, Object> param =RequestUtil.getPageParam();
         //param.put("assetType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-        param.put("assetType", "F01"); //测试
+        //param.put("assetType", "F01"); //测试
         return trdPlanValuationTrade002Service.findFinprodId(param);
     }
 

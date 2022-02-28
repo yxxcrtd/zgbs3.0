@@ -216,7 +216,7 @@ public class TrdFundValuationTradeService extends CommonExportService<TrdFundVal
     public int insert(TrdFundTradeResult result) {
         int maxSqlNum =100;
         // 金融产品交易
-        List<TrdProductDeal> listValFinProductDeal = result.getListTrdProductDeal();
+        List<TrdProductDeal> listValFinProductDeal = result.getListValFinProductDeal();
         // 入库
         if (CollectionUtils.isNotEmpty(listValFinProductDeal)) {
             // 定义一个固定大小插入存放集合
@@ -238,7 +238,7 @@ public class TrdFundValuationTradeService extends CommonExportService<TrdFundVal
             }
         }
         // 估值核算交易扩展表
-        List<TrdProductDealAdd> listValFinProductDealExt = result.getListTrdProductDealExt();
+        List<TrdProductDealAdd> listValFinProductDealExt = result.getListValFinProductDealExt();
         // 入库
         if (CollectionUtils.isNotEmpty(listValFinProductDealExt)) {
             // 定义一个固定大小插入存放集合
@@ -260,7 +260,7 @@ public class TrdFundValuationTradeService extends CommonExportService<TrdFundVal
             }
         }
 
-        List<InterfProductDealBookCommonDto> productDealBookCommonDtos =  result.getListInterfProductDealBookCommonDto();//getListInterfProductDealBookCommonDto
+        List<InterfProductDealBookCommonDto> productDealBookCommonDtos =  result.getListInterfProductDealBookCommonDto();
         List<BokDealAccounting> listValDealAccountingCommon = new ArrayList<BokDealAccounting>();
         List<BokDealAccountingDetail> listValDealAccountingDetailCommon = new ArrayList<BokDealAccountingDetail>();
         List<BokDetailId> listValBokDetailIdCommon = new ArrayList<BokDetailId>();
@@ -271,7 +271,7 @@ public class TrdFundValuationTradeService extends CommonExportService<TrdFundVal
         }
 
         // 入账信息表
-        List<BokDealAccounting> listValDealAccounting = result.getListBokDealAccounting();
+        List<BokDealAccounting> listValDealAccounting = result.getListValDealAccounting();
         // 入库
         if (CollectionUtils.isNotEmpty(listValDealAccounting)) {
             // 定义一个固定大小插入存放集合
@@ -311,7 +311,7 @@ public class TrdFundValuationTradeService extends CommonExportService<TrdFundVal
             }
         }
         // 账务明细表
-        List<BokDealAccountingDetail> listValDealAccountingDetail = result.getListBokDealAccountingDetail();
+        List<BokDealAccountingDetail> listValDealAccountingDetail = result.getListValDealAccountingDetail();
         // 入库
         if (CollectionUtils.isNotEmpty(listValDealAccountingDetail)) {
             // 定义一个固定大小插入存放集合
@@ -355,7 +355,7 @@ public class TrdFundValuationTradeService extends CommonExportService<TrdFundVal
         }
 
         //  账务明细代码表
-        List<BokDetailId> listValBokDetailId = result.getListBokDetailId();
+        List<BokDetailId> listValBokDetailId = result.getListValBokDetailId();
         if (CollectionUtils.isEmpty(listValBokDetailId)) {
             listValBokDetailId = listValBokDetailIdCommon;
         }
@@ -408,7 +408,7 @@ public class TrdFundValuationTradeService extends CommonExportService<TrdFundVal
         }
 
         //指令
-        List<StlOrders> listValOrders = result.getListStlOrders();
+        List<StlOrders> listValOrders = result.getListValOrders();
         // 入库
         if (CollectionUtils.isNotEmpty(listValOrders)) {
             // 定义一个固定大小插入存放集合
@@ -430,7 +430,7 @@ public class TrdFundValuationTradeService extends CommonExportService<TrdFundVal
             }
         }
 
-        List<StlOrdersExt> listValOrdersExt = result.getListStlOrdersExt();
+        List<StlOrdersExt> listValOrdersExt = result.getListValOrdersExt();
         // 入库
         if (CollectionUtils.isNotEmpty(listValOrdersExt)) {
             // 定义一个固定大小插入存放集合

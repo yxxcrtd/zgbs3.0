@@ -72,13 +72,9 @@
         Joyin.ajaxJson(basePath + 'valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade002/check', object, function(result) {
             Joyin.confirm(result.data, function () {
                 if(operateType === 'save') {
-                    Joyin.confirm(message, function() {
-                        WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade002/save', object, "TrdFundValuationTrade002_btn_save");
-                    });
+                        WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade002/save', object, "TrdFundBonusValuationTrade002_btn_save");
                 }else{
-                    Joyin.confirm(message, function() {
-                        WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade002/save', object, "TrdFundValuationTrade002_btn_submit");
-                    });
+                        WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade002/save', object, "TrdFundBonusValuationTrade002_btn_submit");
                 }
             });
 

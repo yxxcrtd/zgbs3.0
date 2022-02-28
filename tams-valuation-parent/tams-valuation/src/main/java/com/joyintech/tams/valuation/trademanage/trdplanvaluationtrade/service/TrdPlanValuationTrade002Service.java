@@ -16,14 +16,20 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
+import com.joyintech.tams.valuation.common.interf.base.constant.TempConstant;
 import com.joyintech.tams.valuation.common.interf.base.dto.FundDealInfoForInterfRecCommonResult;
 import com.joyintech.tams.valuation.common.interf.base.dto.PlanAssetCurrencyDealCommonResult;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.fund.FundBuyAndSellDealRecService;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.pacd.CPlannedBuyAndSellDealTemplateRecService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValFundTrade;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValMngMnfTade;
+import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.pacd.*;
+import com.joyintech.tams.valuation.common.interf.tempTables.entity.*;
+import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTradeResult;
+import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationResult;
 import com.joyintech.tams.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanTradeResult;
 import com.joyintech.tams.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanValuationTradeDto;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -59,7 +65,16 @@ public class TrdPlanValuationTrade002Service extends CommonExportService<TrdPlan
     private CPlannedBuyAndSellDealTemplateRecService pacdBuyAndSellDealTemplateRecService;
 
     @Autowired
+    private CPlannedApplyPurDealTemplateRecService pacdApplyPurDealTemplateRecService;
+    @Autowired
+    private CPlannedAffirmPurDealTemplateRecService cPlannedAffirmPurDealTemplateRecService;
+
+    @Autowired
     private FundBuyAndSellDealRecService fundBuyAndSellDealRecService;
+    @Autowired
+    private CPlannedRedAffirmDealTemplateRecService cPlannedRedAffirmDealTemplateRecService;
+    @Autowired
+    private CPlannedRedAccoutDealTemplateRecService cPlannedRedAccoutDealTemplateRecService;
 
     /**
      * 合成初始化实体类
@@ -85,25 +100,14 @@ public class TrdPlanValuationTrade002Service extends CommonExportService<TrdPlan
     public void doComplete(TrdPlanValuationTradeDto entity, OperationType operationType) {
         String action = StringUtil.EMPTY;
         TrdPlanTradeResult trdPlanTradeResult = new TrdPlanTradeResult();
-        //计划类资产分为净值型和货币型  profitType:01净值型，02预期收益型,03货币型
-        entity.setFinprodType("F17");
-        entity.setProfitType("01");
-        if(entity.getFinprodType().equals("F17") && entity.getProfitType().equals("01")){
-            trdPlanTradeResult = generateNetEntity(entity);
-            if (OperationType.NEW.equals(operationType)) {
-                action = "insertNet";
-            }
-            else {
-                action = "updateNet";
-            }
-        }else if(entity.getFinprodType().equals("F17") && entity.getProfitType().equals("03")){
-            trdPlanTradeResult = generateEntity(entity);
-            if (OperationType.NEW.equals(operationType)) {
-                action = "insert";
-            }
-            else {
-                action = "update";
-            }
+
+        //20220224改为根据交易类型判断
+        trdPlanTradeResult = generateEntity(entity);
+        if (OperationType.NEW.equals(operationType)) {
+            action = "insert";
+        }
+        else {
+            action = "update";
         }
 
         restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdPlanValuationTrade/" + action, trdPlanTradeResult, Integer.class);
@@ -171,124 +175,320 @@ public class TrdPlanValuationTrade002Service extends CommonExportService<TrdPlan
 
     //封装实体类  计划类资产货币型买入卖出交易
     public TrdPlanTradeResult generateEntity(TrdPlanValuationTradeDto trdPlanValuationTradeDto){
-        //设置接口参数
-        Map<String,Object> params = new HashMap<>();
-        List<String> prodIds = new ArrayList<>();
-        prodIds.add(trdPlanValuationTradeDto.getPortfolioId());
-        params.put("INTERF_BOOKSETID",prodIds);
-        params.put("VAL_MODEL","INTERF_MODEL_SINGLE");
+        TrdPlanTradeResult trdPlanTradeResult = new TrdPlanTradeResult();
+        if(StringUtil.isNotEmpty(trdPlanValuationTradeDto.getPs())){
+            if (trdPlanValuationTradeDto.getPs().equals(DictCodeList.交易方向_买入.getValue())
+                || trdPlanValuationTradeDto.getPs().equals(DictCodeList.交易方向_卖出.getValue())) {
+                    //设置接口参数
+                    Map<String,Object> params = new HashMap<>();
+                    List<String> prodIds = new ArrayList<>();
+                    prodIds.add(trdPlanValuationTradeDto.getPortfolioId());
+                    params.put("INTERF_BOOKSETID",prodIds);
+                    params.put("VAL_MODEL","INTERF_MODEL_SINGLE");
 
-        List<ValMngMnfTade> listValValMngMnfTade = new ArrayList<ValMngMnfTade>();
-        ValMngMnfTade valMngMnfTade = new ValMngMnfTade();
-        BeanUtil.copyPropertiesIgnoreNull(valMngMnfTade,trdPlanValuationTradeDto);
-        valMngMnfTade.setProdId(trdPlanValuationTradeDto.getPortfolioId());
-        valMngMnfTade.setTradeDate(trdPlanValuationTradeDto.getTradeDate());
-        //比较界面和接口字段差异，并手动给接口字段赋值
-        valMngMnfTade.setProdId(trdPlanValuationTradeDto.getPortfolioId());//产品代码
-        valMngMnfTade.setAssetId("F17_"+trdPlanValuationTradeDto.getFinprodId());//资产代码
-        valMngMnfTade.setAssetName(trdPlanValuationTradeDto.getFinprodName());   //资产名称
-        valMngMnfTade.setShareAmt(trdPlanValuationTradeDto.getNums());           //交易份额
-        valMngMnfTade.setIntAmt(trdPlanValuationTradeDto.getConfirmIntAmt());//应收红利-利息确认金额
-        valMngMnfTade.setUnitCprice(trdPlanValuationTradeDto.getUnitValue());//单位净价
-        valMngMnfTade.setDataActionSign("01");//数据动作标志
-        valMngMnfTade.setCounterId("FYDLCA365001");
-//        valMngMnfTade.setCounterType("01");
-//        valMngMnfTade.setIsChlFeeAmt("Y");
-//        valMngMnfTade.setIsClean("N");
+                    List<ValMngMnfTade> listValValMngMnfTade = new ArrayList<ValMngMnfTade>();
+                    ValMngMnfTade valMngMnfTade = new ValMngMnfTade();
+                    BeanUtil.copyPropertiesIgnoreNull(valMngMnfTade,trdPlanValuationTradeDto);
+                    valMngMnfTade.setProdId(trdPlanValuationTradeDto.getPortfolioId());
+                    valMngMnfTade.setTradeDate(trdPlanValuationTradeDto.getTradeDate());
+                    //比较界面和接口字段差异，并手动给接口字段赋值
+                    valMngMnfTade.setProdId(trdPlanValuationTradeDto.getPortfolioId());//产品代码
+                    valMngMnfTade.setAssetId("F17_"+trdPlanValuationTradeDto.getFinprodId());//资产代码
+                    valMngMnfTade.setAssetName(trdPlanValuationTradeDto.getFinprodName());   //资产名称
+                    valMngMnfTade.setShareAmt(trdPlanValuationTradeDto.getNums());           //交易份额
+                    valMngMnfTade.setIntAmt(trdPlanValuationTradeDto.getConfirmIntAmt());//应收红利-利息确认金额
+                    valMngMnfTade.setUnitCprice(trdPlanValuationTradeDto.getUnitValue());//单位净价
+                    valMngMnfTade.setDataActionSign("01");//数据动作标志
+                    valMngMnfTade.setCounterId("FYDLCA365001");
+                    valMngMnfTade.setCounterType("01");
+                    valMngMnfTade.setIsChlFeeAmt("Y");
+                    valMngMnfTade.setIsClean("N");
 
-        listValValMngMnfTade.add(valMngMnfTade);
+                    listValValMngMnfTade.add(valMngMnfTade);
 
-        Map<String, Object>  map = pacdBuyAndSellDealTemplateRecService.handleValMngMnfTade(listValValMngMnfTade,new Date(),params,null);
-        // 定义返回变量
-        PlanAssetCurrencyDealCommonResult result = new PlanAssetCurrencyDealCommonResult();
-        if (map != null) {
-            // 金融产品交易
-            List<TrdProductDeal> listTrdProductDeal = (List<TrdProductDeal>)map.get(
-                    "TrdProductDeal");
-            result.setListTrdProductDeal(listTrdProductDeal);
-            // 估值核算交易扩展表
-            List<TrdProductDealAdd> listTrdProductDealExt = (List<TrdProductDealAdd>)map.get(
-                    "TrdProductDealExt");
-            result.setListTrdProductDealExt(listTrdProductDealExt);
-            // 入账信息表
-            List<BokDealAccounting> listBokDealAccounting = (List<BokDealAccounting>)map.get(
-                    "BokDealAccounting");
-            result.setListBokDealAccounting(listBokDealAccounting);
-            // 账务明细表
-            List<BokDealAccountingDetail> listBokDealAccountingDetail = (List<BokDealAccountingDetail>)map.get(
-                    "BokDealAccountingDetail");
-            result.setListBokDealAccountingDetail(listBokDealAccountingDetail);
-            // 账务明细代码表
-            List<BokDetailId> listBokDetailId = (List<BokDetailId>)map.get("BokDetailId");
-            result.setListBokDetailId(listBokDetailId);
-            // 结算指令表
-            List<StlOrders> listStlOrders = (List<StlOrders>)map.get("StlOrders");
-            result.setListStlOrders(listStlOrders);
-            // 结算指令扩展表
-            List<StlOrdersExt> listStlOrdersExt = (List<StlOrdersExt>)map.get("StlOrdersExt");
-            result.setListStlOrdersExt(listStlOrdersExt);
-            // 添加日志
-            result.setValInterflog((List<ValInterflog>)map.get("valInterflogList"));
+                    Map<String, Object> map = pacdBuyAndSellDealTemplateRecService.handleValMngMnfTade(listValValMngMnfTade, new Date(), params, null);
+                    // 定义返回变量
+                    PlanAssetCurrencyDealCommonResult result = new PlanAssetCurrencyDealCommonResult();
+                    if (map != null) {
+                        // 金融产品交易
+                        List<TrdProductDeal> listTrdProductDeal = (List<TrdProductDeal>) map.get(
+                                "TrdProductDeal");
+                        result.setListTrdProductDeal(listTrdProductDeal);
+                        // 估值核算交易扩展表
+                        List<TrdProductDealAdd> listTrdProductDealExt = (List<TrdProductDealAdd>) map.get(
+                                "TrdProductDealExt");
+                        result.setListTrdProductDealExt(listTrdProductDealExt);
+                        // 入账信息表
+                        List<BokDealAccounting> listBokDealAccounting = (List<BokDealAccounting>) map.get(
+                                "BokDealAccounting");
+                        result.setListBokDealAccounting(listBokDealAccounting);
+                        // 账务明细表
+                        List<BokDealAccountingDetail> listBokDealAccountingDetail = (List<BokDealAccountingDetail>) map.get(
+                                "BokDealAccountingDetail");
+                        result.setListBokDealAccountingDetail(listBokDealAccountingDetail);
+                        // 账务明细代码表
+                        List<BokDetailId> listBokDetailId = (List<BokDetailId>) map.get("BokDetailId");
+                        result.setListBokDetailId(listBokDetailId);
+                        // 结算指令表
+                        List<StlOrders> listStlOrders = (List<StlOrders>) map.get("StlOrders");
+                        result.setListStlOrders(listStlOrders);
+                        // 结算指令扩展表
+                        List<StlOrdersExt> listStlOrdersExt = (List<StlOrdersExt>) map.get("StlOrdersExt");
+                        result.setListStlOrdersExt(listStlOrdersExt);
+                        // 添加日志
+                        result.setValInterflog((List<ValInterflog>) map.get("valInterflogList"));
+                    }
+                    TrdPlanTradeResult rst = new TrdPlanTradeResult(result);
+                    return rst;
+            } else if (trdPlanValuationTradeDto.getPs().equals(DictCodeList.交易方向_申购.getValue())
+                    || trdPlanValuationTradeDto.getPs().equals(DictCodeList.交易方向_认购.getValue())) {
+                //申购、认购 ==>对应接口【计划类资产(货币型)申购申请交易】
+                //设置接口参数
+                Map<String, Object> params = new HashMap<>();
+                List<String> prodIds = new ArrayList<>();
+                prodIds.add(trdPlanValuationTradeDto.getPortfolioId());
+                params.put("INTERF_BOOKSETID", prodIds);
+                params.put("VAL_MODEL", "INTERF_MODEL_SINGLE");
+
+                List<ValMngMnfApplyPurTade> listValMngMnfApplyPurTade = new ArrayList<ValMngMnfApplyPurTade>();
+                ValMngMnfApplyPurTade valMngMnfApplyPurTade = new ValMngMnfApplyPurTade();
+                BeanUtil.copyPropertiesIgnoreNull(valMngMnfApplyPurTade, trdPlanValuationTradeDto);
+                valMngMnfApplyPurTade.setProdId(trdPlanValuationTradeDto.getPortfolioId());
+                valMngMnfApplyPurTade.setTradeDate(trdPlanValuationTradeDto.getTradeDate());
+                //比较界面和接口字段差异，并手动给接口字段赋值
+                valMngMnfApplyPurTade.setProdId(trdPlanValuationTradeDto.getPortfolioId());//产品代码
+                valMngMnfApplyPurTade.setAssetId("F17_" + trdPlanValuationTradeDto.getFinprodId());//资产代码
+                valMngMnfApplyPurTade.setAssetName(trdPlanValuationTradeDto.getFinprodName());   //资产名称
+                valMngMnfApplyPurTade.setDataActionSign("01");//数据动作标志
+                valMngMnfApplyPurTade.setCounterId("FYDLCA365001");
+                valMngMnfApplyPurTade.setCounterType("01");
+                valMngMnfApplyPurTade.setIsClean("N");
+
+                listValMngMnfApplyPurTade.add(valMngMnfApplyPurTade);
+                Map<String, Object> map = pacdApplyPurDealTemplateRecService.handleValMngMnfApplyPurTade(listValMngMnfApplyPurTade, new Date(), params, null);
+                // 定义返回变量
+                PlanAssetCurrencyDealCommonResult result = new PlanAssetCurrencyDealCommonResult();
+                if (map != null) {
+                    // 金融产品交易
+                    List<TrdProductDeal> listTrdProductDeal = (List<TrdProductDeal>)map.get(
+                            "TrdProductDeal");
+                    result.setListTrdProductDeal(listTrdProductDeal);
+                    // 估值核算交易扩展表
+                    List<TrdProductDealAdd> listTrdProductDealExt = (List<TrdProductDealAdd>)map.get(
+                            "TrdProductDealExt");
+                    result.setListTrdProductDealExt(listTrdProductDealExt);
+                    // 入账信息表
+                    List<BokDealAccounting> listBokDealAccounting = (List<BokDealAccounting>)map.get(
+                            "BokDealAccounting");
+                    result.setListBokDealAccounting(listBokDealAccounting);
+                    // 账务明细表
+                    List<BokDealAccountingDetail> listBokDealAccountingDetail = (List<BokDealAccountingDetail>)map.get(
+                            "BokDealAccountingDetail");
+                    result.setListBokDealAccountingDetail(listBokDealAccountingDetail);
+                    // 账务明细代码表
+                    List<BokDetailId> listBokDetailId = (List<BokDetailId>)map.get("BokDetailId");
+                    result.setListBokDetailId(listBokDetailId);
+                    // 结算指令表
+                    List<StlOrders> listStlOrders = (List<StlOrders>)map.get("StlOrders");
+                    result.setListStlOrders(listStlOrders);
+                    // 结算指令扩展表
+                    List<StlOrdersExt> listStlOrdersExt = (List<StlOrdersExt>)map.get("StlOrdersExt");
+                    result.setListStlOrdersExt(listStlOrdersExt);
+                    // 添加日志
+                    result.setValInterflog((List<ValInterflog>)map.get("valInterflogList"));
+                }
+                TrdPlanTradeResult rst = new TrdPlanTradeResult(result);
+                return rst;
+            } else if(trdPlanValuationTradeDto.getPs().equals(DictCodeList.交易方向_申购确认.getValue())
+                    || trdPlanValuationTradeDto.getPs().equals(DictCodeList.交易方向_认购确认.getValue()) ){
+                //申购确认、认购确认 ==>对应接口【计划类资产(货币型)申购确认交易】
+                //设置接口参数
+                Map<String, Object> params = new HashMap<>();
+                List<String> prodIds = new ArrayList<>();
+                prodIds.add(trdPlanValuationTradeDto.getPortfolioId());
+                params.put("INTERF_BOOKSETID", prodIds);
+                params.put("VAL_MODEL", "INTERF_MODEL_SINGLE");
+
+                List<ValMngMnfAffirmPurTrade> listValMngMnfAffirmPurTrade = new ArrayList<ValMngMnfAffirmPurTrade>();
+                ValMngMnfAffirmPurTrade valMngMnfAffirmPurTrade = new ValMngMnfAffirmPurTrade();
+                BeanUtil.copyPropertiesIgnoreNull(valMngMnfAffirmPurTrade, trdPlanValuationTradeDto);
+                valMngMnfAffirmPurTrade.setProdId(trdPlanValuationTradeDto.getPortfolioId());
+                valMngMnfAffirmPurTrade.setTradeDate(trdPlanValuationTradeDto.getTradeDate());
+                //比较界面和接口字段差异，并手动给接口字段赋值
+                valMngMnfAffirmPurTrade.setProdId(trdPlanValuationTradeDto.getPortfolioId());//产品代码
+                valMngMnfAffirmPurTrade.setAssetId("F17_" + trdPlanValuationTradeDto.getFinprodId());//资产代码
+                valMngMnfAffirmPurTrade.setAssetName(trdPlanValuationTradeDto.getFinprodName());   //资产名称
+                valMngMnfAffirmPurTrade.setDataActionSign("01");//数据动作标志
+                valMngMnfAffirmPurTrade.setIsClean("N");
+
+                listValMngMnfAffirmPurTrade.add(valMngMnfAffirmPurTrade);
+                Map<String, Object> map = cPlannedAffirmPurDealTemplateRecService.handleValMngMnfAffirmPurTrade(listValMngMnfAffirmPurTrade, new Date(), params, null);
+                // 定义返回变量
+                PlanAssetCurrencyDealCommonResult result = new PlanAssetCurrencyDealCommonResult();
+                if (map != null) {
+                    // 金融产品交易
+                    List<TrdProductDeal> listTrdProductDeal = (List<TrdProductDeal>)map.get(
+                            "TrdProductDeal");
+                    result.setListTrdProductDeal(listTrdProductDeal);
+                    // 估值核算交易扩展表
+                    List<TrdProductDealAdd> listTrdProductDealExt = (List<TrdProductDealAdd>)map.get(
+                            "TrdProductDealExt");
+                    result.setListTrdProductDealExt(listTrdProductDealExt);
+                    // 入账信息表
+                    List<BokDealAccounting> listBokDealAccounting = (List<BokDealAccounting>)map.get(
+                            "BokDealAccounting");
+                    result.setListBokDealAccounting(listBokDealAccounting);
+                    // 账务明细表
+                    List<BokDealAccountingDetail> listBokDealAccountingDetail = (List<BokDealAccountingDetail>)map.get(
+                            "BokDealAccountingDetail");
+                    result.setListBokDealAccountingDetail(listBokDealAccountingDetail);
+                    // 账务明细代码表
+                    List<BokDetailId> listBokDetailId = (List<BokDetailId>)map.get("BokDetailId");
+                    result.setListBokDetailId(listBokDetailId);
+                    // 结算指令表
+                    List<StlOrders> listStlOrders = (List<StlOrders>)map.get("StlOrders");
+                    result.setListStlOrders(listStlOrders);
+                    // 结算指令扩展表
+                    List<StlOrdersExt> listStlOrdersExt = (List<StlOrdersExt>)map.get("StlOrdersExt");
+                    result.setListStlOrdersExt(listStlOrdersExt);
+
+                    /**add by wujie on 20210501 START**/
+                    result.setListValTradeFeeDetail((List<TrdTradeFeeDetail>)map.get("ValTradeFeeDetail"));
+                    /**add by wujie on 20210501 END**/
+
+                    // 添加日志
+                    result.setValInterflog((List<ValInterflog>)map.get("valInterflogList"));
+                }
+                TrdPlanTradeResult rst = new TrdPlanTradeResult(result);
+                return rst;
+            }else if(trdPlanValuationTradeDto.getPs().equals(DictCodeList.交易方向_赎回确认.getValue()) ){
+                //赎回确认 ==>对应接口【计划类资产(货币型)赎回确认交易】
+                //设置接口参数
+                Map<String, Object> params = new HashMap<>();
+                List<String> prodIds = new ArrayList<>();
+                prodIds.add(trdPlanValuationTradeDto.getPortfolioId());
+                params.put("INTERF_BOOKSETID", prodIds);
+                params.put("VAL_MODEL", "INTERF_MODEL_SINGLE");
+
+                List<ValMngMnfRedAffirm> listValMngMnfRedAffirm = new ArrayList<ValMngMnfRedAffirm>();
+                ValMngMnfRedAffirm valMngMnfRedAffirm = new ValMngMnfRedAffirm();
+                BeanUtil.copyPropertiesIgnoreNull(valMngMnfRedAffirm, trdPlanValuationTradeDto);
+                valMngMnfRedAffirm.setProdId(trdPlanValuationTradeDto.getPortfolioId());
+                valMngMnfRedAffirm.setTradeDate(trdPlanValuationTradeDto.getTradeDate());
+                //比较界面和接口字段差异，并手动给接口字段赋值
+                valMngMnfRedAffirm.setProdId(trdPlanValuationTradeDto.getPortfolioId());//产品代码
+                valMngMnfRedAffirm.setAssetId("F17_" + trdPlanValuationTradeDto.getFinprodId());//资产代码
+                valMngMnfRedAffirm.setAssetName(trdPlanValuationTradeDto.getFinprodName());   //资产名称
+                valMngMnfRedAffirm.setDataActionSign("01");//数据动作标志
+                valMngMnfRedAffirm.setIsClean("N");
+
+                listValMngMnfRedAffirm.add(valMngMnfRedAffirm);
+                Map<String, Object> map = cPlannedRedAffirmDealTemplateRecService.handleValMngMnfRedAffirm(listValMngMnfRedAffirm, new Date(), params, null);
+                // 定义返回变量
+                PlanAssetCurrencyDealCommonResult result = new PlanAssetCurrencyDealCommonResult();
+                if (map != null) {
+                    // 金融产品交易
+                    List<TrdProductDeal> listTrdProductDeal = (List<TrdProductDeal>) map.get(
+                            "TrdProductDeal");
+                    result.setListTrdProductDeal(listTrdProductDeal);
+                    // 估值核算交易扩展表
+                    List<TrdProductDealAdd> listTrdProductDealExt = (List<TrdProductDealAdd>) map.get(
+                            "TrdProductDealExt");
+                    result.setListTrdProductDealExt(listTrdProductDealExt);
+                    // 入账信息表
+                    List<BokDealAccounting> listBokDealAccounting = (List<BokDealAccounting>) map.get(
+                            "BokDealAccounting");
+                    result.setListBokDealAccounting(listBokDealAccounting);
+                    // 账务明细表
+                    List<BokDealAccountingDetail> listBokDealAccountingDetail = (List<BokDealAccountingDetail>) map.get(
+                            "BokDealAccountingDetail");
+                    result.setListBokDealAccountingDetail(listBokDealAccountingDetail);
+                    // 账务明细代码表
+                    List<BokDetailId> listBokDetailId = (List<BokDetailId>) map.get("BokDetailId");
+                    result.setListBokDetailId(listBokDetailId);
+                    // 结算指令表
+                    List<StlOrders> listStlOrders = (List<StlOrders>) map.get("StlOrders");
+                    result.setListStlOrders(listStlOrders);
+                    // 结算指令扩展表
+                    List<StlOrdersExt> listStlOrdersExt = (List<StlOrdersExt>) map.get("StlOrdersExt");
+                    result.setListStlOrdersExt(listStlOrdersExt);
+
+                    /**add by wujie on 20210501 START**/
+                    result.setListValTradeFeeDetail((List<TrdTradeFeeDetail>) map.get("ValTradeFeeDetail"));
+                    /**add by wujie on 20210501 END**/
+
+                    // 添加日志
+                    result.setValInterflog((List<ValInterflog>) map.get("valInterflogList"));
+                }
+                TrdPlanTradeResult rst = new TrdPlanTradeResult(result);
+                return rst;
+            }else if(trdPlanValuationTradeDto.getPs().equals(DictCodeList.交易方向_赎回到账.getValue()) ){
+                //赎回到账 ==>对应接口【计划类资产(货币型)赎回到账交易】
+                //赎回确认 ==>对应接口【计划类资产(货币型)赎回确认交易】
+                //设置接口参数
+                Map<String, Object> params = new HashMap<>();
+                List<String> prodIds = new ArrayList<>();
+                prodIds.add(trdPlanValuationTradeDto.getPortfolioId());
+                params.put("INTERF_BOOKSETID", prodIds);
+                params.put("VAL_MODEL", "INTERF_MODEL_SINGLE");
+
+                List<ValMngMnfRedAccoutTrade> listValMngMnfRedAccoutTrade = new ArrayList<ValMngMnfRedAccoutTrade>();
+                ValMngMnfRedAccoutTrade valMngMnfRedAccoutTrade = new ValMngMnfRedAccoutTrade();
+                BeanUtil.copyPropertiesIgnoreNull(valMngMnfRedAccoutTrade, trdPlanValuationTradeDto);
+                valMngMnfRedAccoutTrade.setProdId(trdPlanValuationTradeDto.getPortfolioId());
+                valMngMnfRedAccoutTrade.setTradeDate(trdPlanValuationTradeDto.getTradeDate());
+                //比较界面和接口字段差异，并手动给接口字段赋值
+                valMngMnfRedAccoutTrade.setProdId(trdPlanValuationTradeDto.getPortfolioId());//产品代码
+                valMngMnfRedAccoutTrade.setAssetId("F17_" + trdPlanValuationTradeDto.getFinprodId());//资产代码
+                valMngMnfRedAccoutTrade.setAssetName(trdPlanValuationTradeDto.getFinprodName());   //资产名称
+                valMngMnfRedAccoutTrade.setDataActionSign("01");//数据动作标志
+                valMngMnfRedAccoutTrade.setIsClean("N");
+
+                listValMngMnfRedAccoutTrade.add(valMngMnfRedAccoutTrade);
+                Map<String, Object> map = cPlannedRedAccoutDealTemplateRecService.handleValMngMnfRedAccoutTrade(listValMngMnfRedAccoutTrade, new Date(), params, null);
+                // 定义返回变量
+                PlanAssetCurrencyDealCommonResult result = new PlanAssetCurrencyDealCommonResult();
+                if (map != null) {
+                    // 金融产品交易
+                    List<TrdProductDeal> listTrdProductDeal = (List<TrdProductDeal>)map.get(
+                            "TrdProductDeal");
+                    result.setListTrdProductDeal(listTrdProductDeal);
+                    // 估值核算交易扩展表
+                    List<TrdProductDealAdd> listTrdProductDealExt = (List<TrdProductDealAdd>)map.get(
+                            "TrdProductDealExt");
+                    result.setListTrdProductDealExt(listTrdProductDealExt);
+                    // 入账信息表
+                    List<BokDealAccounting> listBokDealAccounting = (List<BokDealAccounting>)map.get(
+                            "BokDealAccounting");
+                    result.setListBokDealAccounting(listBokDealAccounting);
+                    // 账务明细表
+                    List<BokDealAccountingDetail> listBokDealAccountingDetail = (List<BokDealAccountingDetail>)map.get(
+                            "BokDealAccountingDetail");
+                    result.setListBokDealAccountingDetail(listBokDealAccountingDetail);
+                    // 账务明细代码表
+                    List<BokDetailId> listBokDetailId = (List<BokDetailId>)map.get("BokDetailId");
+                    result.setListBokDetailId(listBokDetailId);
+                    // 结算指令表
+                    List<StlOrders> listStlOrders = (List<StlOrders>)map.get("StlOrders");
+                    result.setListStlOrders(listStlOrders);
+                    // 结算指令扩展表
+                    List<StlOrdersExt> listStlOrdersExt = (List<StlOrdersExt>)map.get("StlOrdersExt");
+                    result.setListStlOrdersExt(listStlOrdersExt);
+                    // 添加日志
+                    result.setValInterflog((List<ValInterflog>)map.get("valInterflogList"));
+                }
+                TrdPlanTradeResult rst = new TrdPlanTradeResult(result);
+                return rst;
+            }else{
+                //返回初始化
+                return trdPlanTradeResult;
+            }
+
+        }else{
+        //返回初始化
+        return trdPlanTradeResult;
         }
-        TrdPlanTradeResult rst = new TrdPlanTradeResult(result);
-        return rst;
 
     }
-
-    //封装实体类
-    public TrdPlanTradeResult generateNetEntity(TrdPlanValuationTradeDto trdPlanValuationTradeDto){
-        //设置接口参数
-        Map<String,Object> params = new HashMap<>();
-        List<String> prodIds = new ArrayList<>();
-        prodIds.add(trdPlanValuationTradeDto.getPortfolioId());
-        params.put("INTERF_BOOKSETID",prodIds);
-        params.put("VAL_MODEL","INTERF_MODEL_SINGLE");
-
-        List<ValFundTrade> listValFundTrade = new ArrayList<ValFundTrade>();
-        ValFundTrade valFundTrade = new ValFundTrade();
-        BeanUtil.copyPropertiesIgnoreNull(valFundTrade,trdPlanValuationTradeDto);
-        //相同字段： 交易日、交易金额、币种
-        //比较界面和接口字段差异，并手动给接口字段赋值
-        valFundTrade.setProdId(trdPlanValuationTradeDto.getPortfolioId());//产品代码
-        valFundTrade.setAssetId("F17_"+trdPlanValuationTradeDto.getFinprodId());//资产代码
-        valFundTrade.setAssetName(trdPlanValuationTradeDto.getFinprodName()); //资产名称
-        valFundTrade.setTradeMarket(null); //交易场所
-        valFundTrade.setPrinAmt(new BigDecimal("0.00"));//交易本金
-        valFundTrade.setShareAmt(trdPlanValuationTradeDto.getNums()); //交易份额
-        valFundTrade.setUnitCprice(trdPlanValuationTradeDto.getUnitValue()); //单位净价
-        valFundTrade.setIsClean("N");//有无清算指令
-        valFundTrade.setDataActionSign("01");//数据动作标志
-
-        listValFundTrade.add(valFundTrade);
-
-        Map<String, Object>  map = fundBuyAndSellDealRecService.handleValFundTrade(listValFundTrade,new Date(),params,null);
-        // 定义返回变量
-        FundDealInfoForInterfRecCommonResult result = new FundDealInfoForInterfRecCommonResult();
-        if (!map.isEmpty()) {
-            result.setListValFinProductDeal( (List<TrdProductDeal>)map.get("ValFinProductDeal"));
-            result.setListValFinProductDealExt( (List<TrdProductDealAdd>)map.get("ValFinProductDealExt"));
-            List<BokDealAccounting> listValDealAccounting = (List<BokDealAccounting>)map.get("ValDealAccounting");
-            result.setListValDealAccounting(listValDealAccounting);
-
-            List<BokDealAccountingDetail> listValDealAccountingDetail = (List<BokDealAccountingDetail>)map.get("ValDealAccountingDetail");
-            result.setListValDealAccountingDetail(listValDealAccountingDetail);
-
-            List<BokDetailId> listValBokDetailId = (List<BokDetailId>)map.get("ValBokDetailId");
-            result.setListValBokDetailId(listValBokDetailId);
-
-            result.setListValTradeFeeDetail((List<TrdTradeFeeDetail>)map.get("ValTradeFeeDetail"));
-
-            //结算指令
-            List<StlOrders> listValOrders = (List<StlOrders>)map.get("listValOrders");
-            List<StlOrdersExt> listValOrdersExt = (List<StlOrdersExt>)map.get("listValOrdersExt");
-            result.setListValOrders(listValOrders);
-            result.setListValOrdersExt(listValOrdersExt);
-            // 日志
-            result.setListValInterflog((List<ValInterflog>)map.get("valInterflogList"));
-        }
-        TrdPlanTradeResult rst = new TrdPlanTradeResult(result,null);
-        return rst;
-    }
-
 
 }

@@ -81,9 +81,9 @@
         Joyin.ajaxJson(basePath + 'valuation/trademanage/trdjihuabonusvaluationtrade/TrdJihuaBonusValuationTrade002/check', object, function(result) {
             Joyin.confirm(result.data, function () {
                 if(operateType === 'save') {
-                     WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdjihuabonusvaluationtrade/TrdJihuaBonusValuationTrade002/save', object, "TrdJihuaValuationTrade002_btn_save");
+                     WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdjihuabonusvaluationtrade/TrdJihuaBonusValuationTrade002/save', object, "TrdJihuaBonusValuationTrade002_btn_save");
                 }else{
-                     WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdjihuabonusvaluationtrade/TrdJihuaBonusValuationTrade002/save', object, "TrdJihuaValuationTrade002_btn_submit");
+                     WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdjihuabonusvaluationtrade/TrdJihuaBonusValuationTrade002/save', object, "TrdJihuaBonusValuationTrade002_btn_submit");
                 }
             });
 

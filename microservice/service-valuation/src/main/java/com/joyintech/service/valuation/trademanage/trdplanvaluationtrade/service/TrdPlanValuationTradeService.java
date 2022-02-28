@@ -122,10 +122,10 @@ public class TrdPlanValuationTradeService extends CommonExportService<TrdPlanVal
      * @see
      * @since 1.0
      */
-    public int insert(TrdPlanTradeResult dto) {
+    public int insert(TrdPlanTradeResult result) {
         int maxSqlNum =100;
         // 金融产品交易
-        List<TrdProductDeal> listValFinProductDeal = dto.getListTrdProductDeal();
+        List<TrdProductDeal> listValFinProductDeal = result.getListTrdProductDeal();
         if (CollectionUtils.isNotEmpty(listValFinProductDeal)) {
             // 定义一个固定大小插入存放集合
             List<TrdProductDeal> listInsert = new ArrayList<TrdProductDeal>();
@@ -148,7 +148,7 @@ public class TrdPlanValuationTradeService extends CommonExportService<TrdPlanVal
         }
 
         // 估值核算交易扩展表
-        List<TrdProductDealAdd> listValFinProductDealExt = dto.getListTrdProductDealExt();
+        List<TrdProductDealAdd> listValFinProductDealExt = result.getListTrdProductDealExt();
         // 入库
         if (CollectionUtils.isNotEmpty(listValFinProductDealExt)) {
             // 定义一个固定大小插入存放集合
@@ -172,7 +172,7 @@ public class TrdPlanValuationTradeService extends CommonExportService<TrdPlanVal
         }
 
         // 入账信息表
-        List<BokDealAccounting> listValDealAccounting = dto.getListBokDealAccounting();
+        List<BokDealAccounting> listValDealAccounting = result.getListBokDealAccounting();
         // 入库
         if (CollectionUtils.isNotEmpty(listValDealAccounting)) {
             // 定义一个固定大小插入存放集合
@@ -196,7 +196,7 @@ public class TrdPlanValuationTradeService extends CommonExportService<TrdPlanVal
         }
 
         // 账务明细表
-        List<BokDealAccountingDetail> listValDealAccountingDetail = dto.getListBokDealAccountingDetail();
+        List<BokDealAccountingDetail> listValDealAccountingDetail = result.getListBokDealAccountingDetail();
         // 入库
         if (CollectionUtils.isNotEmpty(listValDealAccountingDetail)) {
             // 定义一个固定大小插入存放集合
@@ -220,7 +220,7 @@ public class TrdPlanValuationTradeService extends CommonExportService<TrdPlanVal
         }
         // 账务明细代码表
         List<BokDetailId> listValBokDetailId =
-                interfCommonService.toRepeatBokDetailId(dto.getListBokDetailId());
+                interfCommonService.toRepeatBokDetailId(result.getListBokDetailId());
         // 入库
         if (CollectionUtils.isNotEmpty(listValBokDetailId)) {
             // 定义一个固定大小插入存放集合
@@ -246,7 +246,7 @@ public class TrdPlanValuationTradeService extends CommonExportService<TrdPlanVal
         }
         /**add by wujie on 20210501 start**/
         // 交易费用明细表
-        List<TrdTradeFeeDetail> listValTradeFeeDetail = dto.getListValTradeFeeDetail();
+        List<TrdTradeFeeDetail> listValTradeFeeDetail = result.getListValTradeFeeDetail();
         // 入库
         if (CollectionUtils.isNotEmpty(listValTradeFeeDetail)) {
             // 定义一个固定大小插入存放集合
@@ -270,7 +270,7 @@ public class TrdPlanValuationTradeService extends CommonExportService<TrdPlanVal
         /**add by wujie on 20210501 end**/
 
         //指令
-        List<StlOrders> listValOrders = dto.getListStlOrders();
+        List<StlOrders> listValOrders = result.getListStlOrders();
         // 入库
         if (CollectionUtils.isNotEmpty(listValOrders)) {
             // 定义一个固定大小插入存放集合
@@ -293,7 +293,7 @@ public class TrdPlanValuationTradeService extends CommonExportService<TrdPlanVal
             }
         }
 
-        List<StlOrdersExt> listValOrdersExt = dto.getListStlOrdersExt();
+        List<StlOrdersExt> listValOrdersExt = result.getListStlOrdersExt();
         // 入库
         if (CollectionUtils.isNotEmpty(listValOrdersExt)) {
             // 定义一个固定大小插入存放集合
@@ -326,262 +326,6 @@ public class TrdPlanValuationTradeService extends CommonExportService<TrdPlanVal
         return insert(dto);
     }
 
-    /**
-     *
-     * 工作流完结之后的操作
-     * <功能详细描述>
-     * @param result 实体
-     * @see
-     * @since 1.0
-     */
-    public int insertNet(TrdPlanTradeResult result) {
-        int maxSqlNum =100;
-        // 金融产品交易
-        List<TrdProductDeal> listValFinProductDeal = result.getListTrdProductDeal();
-        // 入库
-        if (CollectionUtils.isNotEmpty(listValFinProductDeal)) {
-            // 定义一个固定大小插入存放集合
-            List<TrdProductDeal> listInsert = new ArrayList<TrdProductDeal>();
-            for (TrdProductDeal e : listValFinProductDeal) {
-                // 小于最大值
-                if (listInsert.size() < maxSqlNum) {
-                    listInsert.add(e);
-                }
-                else if (listInsert.size() >= maxSqlNum) {
-                    valFinProductDealBatchMapper.insertBatch(listInsert);
-                    listInsert.clear();
-                    listInsert.add(e);
-                }
-            }
-            // 如果循环结束，小于最大值
-            if (CollectionUtils.isNotEmpty(listInsert)) {
-                valFinProductDealBatchMapper.insertBatch(listInsert);
-            }
-        }
-        // 估值核算交易扩展表
-        List<TrdProductDealAdd> listValFinProductDealExt = result.getListTrdProductDealExt();
-        // 入库
-        if (CollectionUtils.isNotEmpty(listValFinProductDealExt)) {
-            // 定义一个固定大小插入存放集合
-            List<TrdProductDealAdd> listInsert = new ArrayList<TrdProductDealAdd>();
-            for (TrdProductDealAdd e : listValFinProductDealExt) {
-                // 小于最大值
-                if (listInsert.size() < maxSqlNum) {
-                    listInsert.add(e);
-                }
-                else if (listInsert.size() >= maxSqlNum) {
-                    valTrdProductDealAddBatchMapper.insertBatch(listInsert);
-                    listInsert.clear();
-                    listInsert.add(e);
-                }
-            }
-            // 如果循环结束，小于最大值
-            if (CollectionUtils.isNotEmpty(listInsert)) {
-                valTrdProductDealAddBatchMapper.insertBatch(listInsert);
-            }
-        }
-
-        List<InterfProductDealBookCommonDto> productDealBookCommonDtos =  result.getListInterfProductDealBookCommonDto();//getListInterfProductDealBookCommonDto
-        List<BokDealAccounting> listValDealAccountingCommon = new ArrayList<BokDealAccounting>();
-        List<BokDealAccountingDetail> listValDealAccountingDetailCommon = new ArrayList<BokDealAccountingDetail>();
-        List<BokDetailId> listValBokDetailIdCommon = new ArrayList<BokDetailId>();
-        for (InterfProductDealBookCommonDto interfProductDealBookCommonDto : productDealBookCommonDtos) {
-            listValDealAccountingCommon.add(interfProductDealBookCommonDto.getBokDealAccounting());
-            listValDealAccountingDetailCommon.add(interfProductDealBookCommonDto.getBokDealAccountingDetail());
-            listValBokDetailIdCommon.add(interfProductDealBookCommonDto.getBokDetailId());
-        }
-
-        // 入账信息表
-        List<BokDealAccounting> listValDealAccounting = result.getListBokDealAccounting();
-        // 入库
-        if (CollectionUtils.isNotEmpty(listValDealAccounting)) {
-            // 定义一个固定大小插入存放集合
-            List<BokDealAccounting> listInsert = new ArrayList<BokDealAccounting>();
-            for (BokDealAccounting e : listValDealAccounting) {
-                // 小于最大值
-                if (listInsert.size() < maxSqlNum) {
-                    listInsert.add(e);
-                }
-                else if (listInsert.size() >= maxSqlNum) {
-                    valDealAccountingBatchMapper.insertBatch(listInsert);
-                    listInsert.clear();
-                    listInsert.add(e);
-                }
-            }
-            // 如果循环结束，小于最大值
-            if (CollectionUtils.isNotEmpty(listInsert)) {
-                valDealAccountingBatchMapper.insertBatch(listInsert);
-            }
-        }else if(CollectionUtils.isNotEmpty(listValDealAccountingCommon)){
-            // 定义一个固定大小插入存放集合
-            List<BokDealAccounting> listInsert = new ArrayList<BokDealAccounting>();
-            for (BokDealAccounting e : listValDealAccountingCommon) {
-                // 小于最大值
-                if (listInsert.size() < maxSqlNum) {
-                    listInsert.add(e);
-                }
-                else if (listInsert.size() >= maxSqlNum) {
-                    valDealAccountingBatchMapper.insertBatch(listInsert);
-                    listInsert.clear();
-                    listInsert.add(e);
-                }
-            }
-            // 如果循环结束，小于最大值
-            if (CollectionUtils.isNotEmpty(listInsert)) {
-                valDealAccountingBatchMapper.insertBatch(listInsert);
-            }
-        }
-        // 账务明细表
-        List<BokDealAccountingDetail> listValDealAccountingDetail = result.getListBokDealAccountingDetail();
-        // 入库
-        if (CollectionUtils.isNotEmpty(listValDealAccountingDetail)) {
-            // 定义一个固定大小插入存放集合
-            List<BokDealAccountingDetail> listInsert = new ArrayList<BokDealAccountingDetail>();
-            for (BokDealAccountingDetail e : listValDealAccountingDetail) {
-                // 小于最大值
-                if (listInsert.size() < maxSqlNum) {
-                    listInsert.add(e);
-                }
-                else if (listInsert.size() >= maxSqlNum) {
-                    valDealAccountingDetailBatchMapper.insertBatch(listInsert);
-                    listInsert.clear();
-                    listInsert.add(e);
-                }
-            }
-            // 如果循环结束，小于最大值
-            if (CollectionUtils.isNotEmpty(listInsert)) {
-                valDealAccountingDetailBatchMapper.insertBatch(listInsert);
-            }
-
-        }else if(CollectionUtils.isNotEmpty(listValDealAccountingDetailCommon)){
-            // 定义一个固定大小插入存放集合
-            List<BokDealAccountingDetail> listInsert = new ArrayList<BokDealAccountingDetail>();
-            for (BokDealAccountingDetail e : listValDealAccountingDetailCommon) {
-                // 小于最大值
-                if (listInsert.size() < maxSqlNum) {
-                    listInsert.add(e);
-                }
-                else if (listInsert.size() >= maxSqlNum) {
-                    valDealAccountingDetailBatchMapper.insertBatch(listInsert);
-                    listInsert.clear();
-                    listInsert.add(e);
-                }
-            }
-            // 如果循环结束，小于最大值
-            if (CollectionUtils.isNotEmpty(listInsert)) {
-                valDealAccountingDetailBatchMapper.insertBatch(listInsert);
-            }
-
-
-        }
-
-        //  账务明细代码表
-        List<BokDetailId> listValBokDetailId = result.getListBokDetailId();
-        if (CollectionUtils.isEmpty(listValBokDetailId)) {
-            listValBokDetailId = listValBokDetailIdCommon;
-        }
-        listValBokDetailId =
-                interfCommonService.toRepeatBokDetailId(listValBokDetailId);
-        // 入库
-        if (CollectionUtils.isNotEmpty(listValBokDetailId)) {
-            // 定义一个固定大小插入存放集合
-            List<BokDetailId> listInsert = new ArrayList<BokDetailId>();
-            for (BokDetailId e : listValBokDetailId) {
-                // 小于最大值
-                if (listInsert.size() < maxSqlNum) {
-                    listInsert.add(e);
-                }
-                else if (listInsert.size() >= maxSqlNum) {
-                    valBokDetailIdBatchMapper.deleteBatch(listInsert);
-                    valBokDetailIdBatchMapper.insertBatch(listInsert);
-                    listInsert.clear();
-                    listInsert.add(e);
-                }
-            }
-            // 如果循环结束，小于最大值
-            if (CollectionUtils.isNotEmpty(listInsert)) {
-                valBokDetailIdBatchMapper.deleteBatch(listInsert);
-                valBokDetailIdBatchMapper.insertBatch(listInsert);
-            }
-        }
-
-        // 交易费用明细表
-        List<TrdTradeFeeDetail> listValTradeFeeDetail = result.getListValTradeFeeDetail();
-        // 入库
-        if (CollectionUtils.isNotEmpty(listValTradeFeeDetail)) {
-            // 定义一个固定大小插入存放集合
-            List<TrdTradeFeeDetail> listInsert = new ArrayList<TrdTradeFeeDetail>();
-            for (TrdTradeFeeDetail e : listValTradeFeeDetail) {
-                // 小于最大值
-                if (listInsert.size() < maxSqlNum) {
-                    listInsert.add(e);
-                }
-                else if (listInsert.size() >= maxSqlNum) {
-                    valTradeFeeDetailBatchMapper.insertBatch(listInsert);
-                    listInsert.clear();
-                    listInsert.add(e);
-                }
-            }
-            // 如果循环结束，小于最大值
-            if (CollectionUtils.isNotEmpty(listInsert)) {
-                valTradeFeeDetailBatchMapper.insertBatch(listInsert);
-            }
-        }
-
-        //指令
-        List<StlOrders> listValOrders = result.getListStlOrders();
-        // 入库
-        if (CollectionUtils.isNotEmpty(listValOrders)) {
-            // 定义一个固定大小插入存放集合
-            List<StlOrders> listInsert = new ArrayList<StlOrders>();
-            for (StlOrders e : listValOrders) {
-                // 小于最大值
-                if (listInsert.size() < maxSqlNum) {
-                    listInsert.add(e);
-                }
-                else if (listInsert.size() >= maxSqlNum) {
-                    valOrdersBatchMapper.insertBatch(listInsert);
-                    listInsert.clear();
-                    listInsert.add(e);
-                }
-            }
-            // 如果循环结束，小于最大值
-            if (CollectionUtils.isNotEmpty(listInsert)) {
-                valOrdersBatchMapper.insertBatch(listInsert);
-            }
-        }
-
-        List<StlOrdersExt> listValOrdersExt = result.getListStlOrdersExt();
-        // 入库
-        if (CollectionUtils.isNotEmpty(listValOrdersExt)) {
-            // 定义一个固定大小插入存放集合
-            List<StlOrdersExt> listInsert = new ArrayList<StlOrdersExt>();
-            for (StlOrdersExt e : listValOrdersExt) {
-                // 小于最大值
-                if (listInsert.size() < maxSqlNum) {
-                    listInsert.add(e);
-                }
-                else if (listInsert.size() >= maxSqlNum) {
-                    valOrdersExtBatchMapper.insertBatch(listInsert);
-                    listInsert.clear();
-                    listInsert.add(e);
-                }
-            }
-            // 如果循环结束，小于最大值
-            if (CollectionUtils.isNotEmpty(listInsert)) {
-                valOrdersExtBatchMapper.insertBatch(listInsert);
-            }
-        }
-        return 1;
-    }
-
-    public int updateNet(TrdPlanTradeResult dto){
-        TrdPlanValuationTradeDto dto1 = new TrdPlanValuationTradeDto();
-        dto1.setFinprodId(dto.getTrdPlanValuationTradeDto().getPortfolioId());
-        dto1.setTradeId(dto.getTrdPlanValuationTradeDto().getTradeId());
-        delete(dto1);
-        return insertNet(dto);
-    }
 
     /**
      *
