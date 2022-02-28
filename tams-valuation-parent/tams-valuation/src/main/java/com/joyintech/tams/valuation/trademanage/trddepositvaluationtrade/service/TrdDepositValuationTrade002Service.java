@@ -182,13 +182,11 @@ public class TrdDepositValuationTrade002Service extends CommonExportService<TrdD
         entity.setIntAmt(dto.getIntAmt()); //应收利息
         entity.setDealAmt(dto.getDealAmt());//交易金额
         entity.setCcy(dto.getCcy());//币种
-//        entity.setCounterId("JYDS000000000424");//交易对手
-//        entity.setCounterId("JYDSJYS000000002");//交易对手
         entity.setCounterId(dto.getCounterId());//交易对手
         entity.setIsClean("Y");//有无清算指令
-//        entity.setChlFeeAmt(new BigDecimal(1.22));
-//        entity.setIsChlFeeAmt("N");
-//        entity.setChannelId("2222");
+        entity.setChlFeeAmt(null);
+        entity.setIsChlFeeAmt("N");
+        entity.setChannelId(null);
 //        entity.setTrdFee(new BigDecimal(222.1));
 
 

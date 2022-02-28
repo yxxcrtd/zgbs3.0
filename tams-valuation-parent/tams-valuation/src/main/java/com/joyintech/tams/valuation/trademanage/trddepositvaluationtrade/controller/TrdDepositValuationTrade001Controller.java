@@ -11,6 +11,7 @@
 package com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
@@ -101,15 +102,6 @@ public class TrdDepositValuationTrade001Controller extends BaseController {
      * @Description:页面查询，表格分页
      * @return:
      */
-//    @ResponseBody
-//    @RequestMapping("findPage")
-//    public Page<TrdDepositValuationTrade001Dto> findPage()
-//            throws Exception {
-//        Page<TrdDepositValuationTrade001Dto> page = trdDepositValuationTrade001Service.findPage(
-//                RequestUtil.getParameters(getRequest()));
-//        return page;
-//    }
-
 
     @RequestMapping("findPage")
     @ResponseBody
@@ -121,19 +113,6 @@ public class TrdDepositValuationTrade001Controller extends BaseController {
     }
 
 
-        
-        /**
-         * 删除按钮点击时的check
-         * @param dto 验证的实体类
-         * @param result 验证的结果
-         * @return 错误信息
-         */
-        @ResponseBody
-        @RequestMapping("check")
-        public AjaxResult check(@RequestBody @Validated({
-            ValidateGroupDelete.class}) TrdDepositValuationTrade001Dto dto, BindingResult result) {
-            return commonCheck(result, dto.getOperateType());
-        }
 
     /**
      * 导出数据
@@ -162,6 +141,46 @@ public class TrdDepositValuationTrade001Controller extends BaseController {
                 outFile, true);
     }
 
+    /**
+     * 删除前判断
+     *
+     * @param dto
+     * @param result
+     * @return
+     * @throws Exception
+     */
+    @ResponseBody
+    @RequestMapping("check")
+    public AjaxResult check(@RequestBody @Valid TrdDepositValuationTrade001Dto dto,
+                            BindingResult result) throws ParseException {
+
+        List<TrdDepositValuationTrade001Dto> list = dto.getSelectedItem();
+        if(list==null||list.size()<=0){
+            return new AjaxResult("请选择数据", MessageType.错误消息);
+        }
+        //删除时的校验
+        if(StringUtil.isNotEmpty(list) && "delete".equals(dto.getOperateType())) {
+            for (TrdDepositValuationTrade001Dto item : list) {
+                //1.判断是否在流程中
+                //判断当前流程是否存在
+                if (trdDepositValuationTrade001Service.checkBusinessDataInFlow(item)) {
+                    //流程存在情况
+                    return new AjaxResult("交易编号：" + item.getTradeId() + "已存在流程中", MessageType.错误消息);
+                }
+
+            }
+        }else if("edit".equals(dto.getOperateType())){
+            for (TrdDepositValuationTrade001Dto item : list) {
+                //1.判断是否在流程中
+                //判断当前流程是否存在
+                if(trdDepositValuationTrade001Service.checkBusinessDataInFlow(item)){
+                    //流程存在情况
+                    return new AjaxResult("交易编号："+item.getTradeId()+"已存在流程中", MessageType.错误消息);
+                }
+            }
+        }
+        return new AjaxResult();
+    }
 
 
     //删除
