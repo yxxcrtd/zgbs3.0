@@ -122,7 +122,7 @@
        ttfd1.FEE_AMT  stlAmt,/**结算费**/
        ttfd2.FEE_AMT  commission,/**佣金**/
        ttfd3.FEE_AMT  dealFeeAmt,/**交易手续费**/
-       ttfd4.FEE_AMT  stlFeeAmt,/**结算手续费**/
+       ttfd4.FEE_AMT  settFeeAmt,/**结算手续费**/
        CASE WHEN ttfd.FEE_TYPE = 'B99' THEN ttfd.FEE_AMT ELSE 0 END as otherAmt,/**其他应付费用**/
        null              rebackPrice, /**回购利率**/
        t.INT_AMT         intAmt,/**应计利息**/
@@ -165,7 +165,7 @@
        ttfd1.FEE_AMT  stlAmt,/**结算费**/
        ttfd2.FEE_AMT  commission,/**佣金**/
        ttfd3.FEE_AMT  dealFeeAmt,/**交易手续费**/
-       ttfd4.FEE_AMT  stlFeeAmt,/**结算手续费**/
+       ttfd4.FEE_AMT  settFeeAmt,/**结算手续费**/
        CASE WHEN ttfd.FEE_TYPE = 'B99' THEN ttfd.FEE_AMT ELSE 0 END as otherAmt,/**其他应付费用**/
        null              rebackPrice, /**回购利率**/
        t.INT_AMT         intAmt,/**应计利息**/

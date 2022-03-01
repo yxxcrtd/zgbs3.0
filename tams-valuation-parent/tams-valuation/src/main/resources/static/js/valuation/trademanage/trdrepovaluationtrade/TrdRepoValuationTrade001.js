@@ -56,7 +56,7 @@
                     tradeId:data.tradeId});
         },
         cols:[
-            {field:'tradeId', width:150, sortField:'tradeId',title: '交易编号'}
+            {field:'tradeId', width:200, sortField:'tradeId',title: '交易编号'}
             ,{field:'outTradeId', width:150, sortField:'outTradeId',title: '外部交易编号'}
             ,{field:'portfolioId', width:150, title: '产品代码',sortField:'portfolioId'}
             ,{field:'portfolioName', width:150, title: '产品名称',sortField:'portfolioName'}
