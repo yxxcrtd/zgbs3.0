@@ -26,9 +26,9 @@ $(function() {
         Joyin.ajaxJson(basePath + 'valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade003/check', object, function(result) {
             Joyin.confirm(result.data, function() {
                 if (operateType === 'save') {
-                    WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade003/save', object, "TrdOutRightRepoValuationTrade002_btn_save");
+                    WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade003/save', object, "TrdOutRightRepoValuationTrade003_btn_save");
                 } else {
-                    WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade003/save', object, "TrdOutRightRepoValuationTrade002_btn_submit");
+                    WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade003/save', object, "TrdOutRightRepoValuationTrade003_btn_submit");
                 }
             });
         })

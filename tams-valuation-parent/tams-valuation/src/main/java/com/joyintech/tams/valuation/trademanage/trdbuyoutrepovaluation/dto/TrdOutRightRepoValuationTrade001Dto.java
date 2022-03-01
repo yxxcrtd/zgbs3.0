@@ -101,6 +101,20 @@ public class TrdOutRightRepoValuationTrade001Dto extends BaseEntity implements P
      */
     private Date mdate;
 
+
+    /**
+     * 资金到账日
+     */
+    private Date settleDate;
+
+    public Date getSettleDate() {
+        return settleDate;
+    }
+
+    public void setSettleDate(Date settleDate) {
+        this.settleDate = settleDate;
+    }
+
     /**
      * 券面总额  万元
      */

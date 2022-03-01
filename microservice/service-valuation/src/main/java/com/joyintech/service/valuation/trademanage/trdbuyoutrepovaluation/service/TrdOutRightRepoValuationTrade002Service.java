@@ -94,7 +94,7 @@ public class TrdOutRightRepoValuationTrade002Service extends CommonExportService
             //平台日
             String dateStr= DateUtil.format(iPlatformDate.getSysDate(),DateUtil.DEFAULT_OTHER_FORMAT);//yyyyMMdd
             // 拼接
-            tradeId = "JY"+"PLAN"+dateStr+ nextId;
+            tradeId = "JY"+"OREND"+dateStr+ nextId;
             // 查询是否重复
             int num = trdOutRightRepoValuationTrade001Mapper.selectCountByTradeId(tradeId);
             // 如果自增的策略代码不存在，则跳出循环
