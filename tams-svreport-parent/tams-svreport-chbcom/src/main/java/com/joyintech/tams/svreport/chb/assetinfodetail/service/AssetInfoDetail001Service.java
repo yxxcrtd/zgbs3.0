@@ -209,6 +209,11 @@ public class AssetInfoDetail001Service extends CommonExportService<AssetInfoDeta
 			}*/
 			List<ChbAssetInfo> assetInfo = new ArrayList<>();
 			dataList.forEach(assetInfoDetailDto -> {
+				if(DictCodeListExt2.资产_负债类别_资产管理产品.getValue().equals(assetInfoDetailDto.getAssetType())
+						||DictCodeListExt2.资产_负债类别_委外投资_协议方式.getValue().equals(assetInfoDetailDto.getAssetType())){
+					assetInfoDetailDto.setPlanSdate(assetInfoDetailDto.getVdate());
+					assetInfoDetailDto.setPlanEdate(assetInfoDetailDto.getMdate());
+				}
 				assetInfo.add(assetInfoDetailDto);				
 			});
 			assetInfoDetailMapper.mergeInfoListEx(assetInfo);
