@@ -28,8 +28,6 @@ insert into sys_page_dictlist (PAGE_ID, SUB_PAGE_ID, DICT_ID, DICT_ITEM_VAL, DIC
 values ('TrdFundValuationTrade002', '999999', 'PS', 'T05', null, null, 'system', null, sysdate, 'system', sysdate, null);
 insert into sys_page_dictlist (PAGE_ID, SUB_PAGE_ID, DICT_ID, DICT_ITEM_VAL, DICT_ITEM_VAL_CNNAME, DICT_ITEM_VAL_DEFAULT, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE)
 values ('TrdFundValuationTrade002', '999999', 'PS', 'T19', null, null, 'system', null, sysdate, 'system', sysdate, null);
-insert into sys_page_dictlist (PAGE_ID, SUB_PAGE_ID, DICT_ID, DICT_ITEM_VAL, DICT_ITEM_VAL_CNNAME, DICT_ITEM_VAL_DEFAULT, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE)
-values ('TrdFundValuationTrade002', '999999', 'PS', 'T24', null, null, 'system', null, sysdate, 'system', sysdate, null);
 
 /*基金交易-查询页面-交易类型下拉框*/
 delete from  sys_page_dictlist where page_id='TrdFundValuationTrade001' and DICT_ID='PS';
@@ -49,6 +47,7 @@ insert into sys_page_dictlist (PAGE_ID, SUB_PAGE_ID, DICT_ID, DICT_ITEM_VAL, DIC
 values ('TrdFundValuationTrade001', '999999', 'PS', 'T19', null, null, 'system', null, sysdate, 'system', sysdate, null);
 insert into sys_page_dictlist (PAGE_ID, SUB_PAGE_ID, DICT_ID, DICT_ITEM_VAL, DICT_ITEM_VAL_CNNAME, DICT_ITEM_VAL_DEFAULT, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE)
 values ('TrdFundValuationTrade001', '999999', 'PS', 'T24', null, null, 'system', null, sysdate, 'system', sysdate, null);
+
 
 /*基金交易-新建页面-交易场所下拉框*/
 delete from  sys_page_dictlist where page_id='TrdFundValuationTrade002' and DICT_ID='TRADE_PLACE';
@@ -85,7 +84,13 @@ values ('TrdFundValuationTrade002', 'TrdFundValuationTrade002_btn_submit', 'oneA
 insert into sys_wfl_business_module (PAGE_ID, ELEMENT_ID, MODULE_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE, IS_SEND_UORG)
 values ('TrdFundValuationTrade002', 'TrdFundValuationTrade001_btn_delete', 'oneApproval', 'system', null, sysdate, 'system', sysdate, 'ALL', '02');
 
+/*基金交易（赎回到账）-工作流配置*/
+delete from sys_wfl_business_module where page_id='TrdFundValuationTrade003';
+insert into sys_wfl_business_module (PAGE_ID, ELEMENT_ID, MODULE_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE, IS_SEND_UORG)
+values ('TrdFundValuationTrade003', 'TrdFundValuationTrade003_btn_save', 'oneApproval', 'system', null, sysdate, 'system', sysdate, 'ALL', '02');
 
+insert into sys_wfl_business_module (PAGE_ID, ELEMENT_ID, MODULE_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE, IS_SEND_UORG)
+values ('TrdFundValuationTrade003', 'TrdFundValuationTrade003_btn_submit', 'oneApproval', 'system', null, sysdate, 'system', sysdate, 'ALL', '02');
 
 
 /*基金交易-4位数的交易编号，序列*/

@@ -1,332 +1,568 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-    layout:decorator="~{layout/default}">
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorator="~{layout/default}">
 <head>
-<title data-th-text="#{TrdFundValuationTrade002}">基金交易新建</title>
+	<title data-th-text="#{TrdFundValuationTrade002}">基金交易新建</title>
 </head>
 <body>
-    <div layout:fragment="content">
-        <div class="pro-module-container">
-            <div class="pro-module-wrapper pro-module-base">
-				<form id="basicInfoForm" class="layui-form joyin-form-wrap pro-module-form">
-					<div class="pro-module-wrap">
-						<div class="pro-module">
-							<h3 class="pro-module-title"><span class="title-des">基本信息</span>（<span class="star-sign">*</span>必填）<i class="iconfont icon-arrow-down pro-down-icon"></i></h3>
-							<div class="pro-module-item">
-								<div class="layui-form-item">
-									<div class="form-inline-wrap">
-										<label class="layui-form-label form-label-wrap"
-											   data-th-text="#{TrdFundValuationTrade001.tradeId}">交易编号</label>
-										<div class="layui-input-inline input-inline">
-											<input type="text" name="tradeId"
-												   data-th-value="${entity?.tradeId}"
-												   class="layui-input form-input" placeholder="请输入内容" disabled
-												   data-th-placeholder="#{SysCommon.placeholder}" >
-										</div>
-									</div>
-
-									<div class="form-inline-wrap">
-										<label class="layui-form-label form-label-wrap"
-											   data-th-text="#{TrdFundValuationTrade001.outTradeId}">外部交易编号</label>
-										<div class="layui-input-inline input-inline">
-											<input type="text" name="outTradeId"
-												   data-th-value="${entity?.outTradeId}"
-												   class="layui-input form-input" placeholder="请输入内容"
-												   data-th-placeholder="#{SysCommon.placeholder}" >
-										</div>
-									</div>
-
-									<div class="form-inline-wrap">
-										<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade001.portfolioName}">产品名称</label>
-										<div class="layui-input-inline input-inline">
-											<select id="portfolioId" name="portfolioId" th:initValue="${entity?.portfolioId}"
-													class="layui-input form-input input-select available" required
-													data-th-placeholder="#{SysCommon.placeholder}"
-													data-th-data-url="@{/valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/findPortfolioId}">
-											</select>
-										</div>
+<div layout:fragment="content">
+	<div class="pro-module-container">
+		<div class="pro-module-wrapper pro-module-base">
+			<form id="basicInfoForm" class="layui-form joyin-form-wrap pro-module-form">
+				<div class="pro-module-wrap">
+					<div class="pro-module">
+						<h3 class="pro-module-title"><span class="title-des">基本信息</span>（<span class="star-sign">*</span>必填）<i class="iconfont icon-arrow-down pro-down-icon"></i></h3>
+						<div class="pro-module-item">
+							<div class="layui-form-item">
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap"
+										   data-th-text="#{TrdFundValuationTrade002.tradeId}">交易编号</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" name="tradeId"
+											   data-th-value="${entity?.tradeId}"
+											   class="layui-input form-input" placeholder="请输入内容" disabled
+											   data-th-placeholder="#{SysCommon.placeholder}" >
 									</div>
 								</div>
 
-								<div class="layui-form-item">
-									<div class="form-inline-wrap">
-										<label class="layui-form-label form-label-wrap"
-											   data-th-text="#{TrdFundValuationTrade001.portfolioId}">产品代码</label>
-										<div class="layui-input-inline input-inline">
-											<input type="text" id="portfolioName" name="portfolioName"
-												   data-th-value="${entity?.portfolioName}" required
-												   class="layui-input form-input" placeholder="请输入内容"
-												   data-th-placeholder="#{SysCommon.placeholder}" disabled>
-										</div>
-									</div>
-
-									<div class="form-inline-wrap">
-										<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.tradeDate}">交易日期</label>
-										<div class="layui-input-inline input-inline">
-											<input id="tradeDate" name="tradeDate" required
-												   class="layui-input form-input input-dateSelect hidden"
-												   data-th-value='${#dates.format(entity?.tradeDate,"yyyy-MM-dd")}'>
-										</div>
-									</div>
-
-									<div class="form-inline-wrap">
-										<label class="layui-form-label form-label-wrap"
-											   data-th-text="#{TrdFundValuationTrade001.finprodName}">资产名称</label>
-										<div class="layui-input-inline input-inline">
-											<select type="text" id="finprodId" name="finprodId" class="layui-input form-input input-select" required
-													placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}" th:initValue="${entity?.finprodId}"
-													data-th-data-url="@{/valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/findFinprodId}" allowClear="true" showField="id" formatoption="true"></select>
-										</div>
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap"
+										   data-th-text="#{TrdFundValuationTrade002.outTradeId}">外部交易编号</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" name="outTradeId"
+											   data-th-value="${entity?.outTradeId}"
+											   class="layui-input form-input" placeholder="请输入内容"
+											   data-th-placeholder="#{SysCommon.placeholder}" >
 									</div>
 								</div>
 
-								<div class="layui-form-item">
-
-									<div class="form-inline-wrap">
-										<label class="layui-form-label form-label-wrap"
-											   data-th-text="#{TrdFundValuationTrade001.finprodId}">资产代码</label>
-										<div class="layui-input-inline input-inline">
-											<input type="text" name="finprodName"  id="finprodName"
-												   data-th-value="${entity?.finprodName}" required
-												   class="layui-input form-input" placeholder="请输入内容"
-												   data-th-placeholder="#{SysCommon.placeholder}" disabled>
-										</div>
-									</div>
-
-									<div class="form-inline-wrap">
-										<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade001.ps}">交易类型</label>
-										<div class="layui-input-inline input-inline">
-											<select type="text" id="ps" name="ps"
-													class="layui-input form-input input-select"
-													data-th-data-result='${PS}' allowClear="true"
-													placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"
-													required="required" formatoption="true"
-													data-th-initValue="${entity?.ps}">
-											</select>
-										</div>
-									</div>
-									<div class="form-inline-wrap">
-										<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.tradeMarket}">交易场所</label>
-										<div class="layui-input-inline input-inline">
-											<select type="text" id="tradeMarket" name="tradeMarket"
-													class="layui-input form-input input-select"
-													data-th-data-result='${TRADE_PLACE}' allowClear="true"
-													placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"
-													required="required" formatoption="true"
-													data-th-initValue="${entity?.tradeMarket}">
-											</select>
-										</div>
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.portfolioName}">产品名称</label>
+									<div class="layui-input-inline input-inline">
+										<select id="portfolioId" name="portfolioId" th:initValue="${entity?.portfolioId}"
+												class="layui-input form-input input-select available" required
+												data-th-placeholder="#{SysCommon.placeholder}"
+												data-th-data-url="@{/valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/findPortfolioId}">
+										</select>
 									</div>
 								</div>
-								<div class="layui-form-item">
-									<div class="form-inline-wrap">
-										<label class="layui-form-label form-label-wrap"
-											   data-th-text="#{TrdFundValuationTrade002.todayArriveFlag}">是否当日到账</label>
-										<div class="layui-input-inline input-inline">
-											<select type="text" id="todayArriveFlag" name="todayArriveFlag"
-													data-th-initValue="${entity?.todayArriveFlag}"
-													class="layui-input form-input input-select" placeholder="请输入内容" required
-													data-th-placeholder="#{SysCommon.placeholder}" data-th-data-result="${YES_OR_NO}">
-											</select>
-										</div>
+							</div>
+
+							<div class="layui-form-item">
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap"
+										   data-th-text="#{TrdFundValuationTrade002.portfolioId}">产品代码</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" id="portfolioName" name="portfolioName"
+											   data-th-value="${entity?.portfolioName}" required
+											   class="layui-input form-input" placeholder="请输入内容"
+											   data-th-placeholder="#{SysCommon.placeholder}" disabled>
+									</div>
+								</div>
+
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap"
+										   data-th-text="#{TrdFundValuationTrade002.finprodName}">资产名称</label>
+									<div class="layui-input-inline input-inline">
+										<select type="text" id="finprodId" name="finprodId" class="layui-input form-input input-select" required
+												placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}" th:initValue="${entity?.finprodId}"
+												data-th-data-url="@{/valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/findFinprodId}" allowClear="true" showField="id" formatoption="true"></select>
+									</div>
+								</div>
+
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap"
+										   data-th-text="#{TrdFundValuationTrade002.finprodId}">资产代码</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" name="finprodName"  id="finprodName"
+											   data-th-value="${entity?.finprodName}" required
+											   class="layui-input form-input" placeholder="请输入内容"
+											   data-th-placeholder="#{SysCommon.placeholder}" disabled>
+									</div>
+								</div>
+							</div>
+
+							<div class="layui-form-item">
+
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.ps}">交易类型</label>
+									<div class="layui-input-inline input-inline">
+										<select type="text" id="ps" name="ps"
+												class="layui-input form-input input-select"
+												data-th-data-result='${PS}' allowClear="true"
+												placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"
+												required="required" formatoption="true"
+												data-th-initValue="${entity?.ps}">
+										</select>
+									</div>
+								</div>
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.tradeMarket}">交易场所</label>
+									<div class="layui-input-inline input-inline">
+										<select type="text" id="tradeMarket" name="tradeMarket"
+												class="layui-input form-input input-select"
+												data-th-data-result='${TRADE_PLACE}' allowClear="true"
+												placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"
+												required="required" formatoption="true"
+												data-th-initValue="${entity?.tradeMarket}">
+										</select>
+									</div>
+								</div>
+
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.ccy}">币种</label>
+									<div class="layui-input-inline input-inline">
+										<select id="ccy" name="ccy"
+												data-th-data-result="${CCY}"
+												th:initvalue="*{entity?.ccy?:CCY_default}" class="layui-input form-input input-select"
+												data-th-placeholder="#{SysCommon.placeholder}" required>
+										</select>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+
+				<div class="pro-module-wrap" id="value_div_jy">
+					<div class="pro-module">
+						<h3 class="pro-module-title"><span class="title-des">交易信息</span><i class="iconfont icon-arrow-down pro-down-icon"></i></h3>
+						<div class="pro-module-item">
+							<div class="layui-form-item">
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.tradeDate}">交易日期</label>
+									<div class="layui-input-inline input-inline">
+										<input id="tradeDate" name="tradeDate" required
+											   class="layui-input form-input input-dateSelect hidden"
+											   data-th-value='${#dates.format(entity?.tradeDate,"yyyy-MM-dd")}'>
+									</div>
+								</div>
+
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.settleDate}">结算日期</label>
+									<div class="layui-input-inline input-inline">
+										<input id="settleDate" name="settleDate" required
+											   class="layui-input form-input input-dateSelect hidden"
+											   data-th-value='${#dates.format(entity?.settleDate,"yyyy-MM-dd")}'>
+									</div>
+								</div>
+
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.nums}">成交数量</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" th:id="nums" name="nums" maxLength="16" required
+											   th:value="${entity?.nums}" class="layui-input form-input text-number rateCal"
+											   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
+									</div>
+								</div>
+							</div>
+
+							<div class="layui-form-item">
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.tradeAmt}">成交金额</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" th:id="tradeAmt" name="tradeAmt" maxLength="16" required
+											   th:value="${entity?.tradeAmt}" class="layui-input form-input text-number rateCal"
+											   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
+									</div>
+								</div>
+
+								<div class="form-inline-wrap" >
+									<label class="layui-form-label form-lable" >资金账户</label>
+									<div class="layui-input-inline input-inline">
+										<select type="text" id="trdAcctId" name="trdAcctId" class="layui-input form-input input-select"
+												parentIds="portfolioId" required  data-th-initValue="${entity?.trdAcctId}"
+												th:data-url="@{/valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/getTrdAcctId}"
+												allowClear="true" placeholder="请输入内容"
+												data-th-placeholder="#{SysCommon.placeholder}">
+										</select>
+									</div>
+								</div>
+
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.exchangeAmt}">经手费</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" th:id="exchangeAmt" name="exchangeAmt" maxLength="16" required
+											   th:value="${entity?.exchangeAmt}" class="layui-input form-input text-number rateCal"
+											   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
+									</div>
+								</div>
+							</div>
+
+							<div class="layui-form-item">
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.commissionFee}">净佣金</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" th:id="commissionFee" name="commissionFee" maxLength="16" required
+											   th:value="${entity?.commissionFee}" class="layui-input form-input text-number rateCal"
+											   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
+									</div>
+								</div>
+
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.mdateSettleAmt}">结算金额</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" th:id="mdateSettleAmt" name="mdateSettleAmt" maxLength="16"
+											   required th:value="${entity?.mdateSettleAmt}" class="layui-input form-input text-number rateCal"
+											   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
+				</div>
 
-					<div class="pro-module-wrap" id="value_div_sq">
-						<div class="pro-module">
-							<h3 class="pro-module-title"><span class="title-des">申请信息</span><i class="iconfont icon-arrow-down pro-down-icon"></i></h3>
-							<div class="pro-module-item">
-								<div class="layui-form-item">
-									<div class="form-inline-wrap">
-										<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.tradeAmt}">交易金额</label>
-										<div class="layui-input-inline input-inline">
-											<input type="text" th:id="tradeAmt" name="tradeAmt" maxLength="16" required
-												    th:value="${entity?.tradeAmt}" class="layui-input form-input text-number rateCal"
-												   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
-										</div>
+				<div class="pro-module-wrap" th:id="value_div_rg">
+					<div class="pro-module">
+						<h3 class="pro-module-title"><span class="title-des">认购信息</span><i class="iconfont icon-arrow-down pro-down-icon"></i></h3>
+						<div class="pro-module-item">
+							<div class="layui-form-item">
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.rgTradeDate}">申请日期</label>
+									<div class="layui-input-inline input-inline">
+										<input id="rgTradeDate" name="rgTradeDate" required
+											   class="layui-input form-input input-dateSelect hidden"
+											   data-th-value='${#dates.format(entity?.rgTradeDate,"yyyy-MM-dd")}'>
 									</div>
-
-									<div class="form-inline-wrap">
-										<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.nums}">交易份额</label>
-										<div class="layui-input-inline input-inline">
-											<input type="text" th:id="nums" name="nums" maxLength="16" required
-												    th:value="${entity?.nums}" class="layui-input form-input text-number rateCal"
-												   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
-										</div>
-									</div>
-
-									<div class="form-inline-wrap">
-										<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.carryAmt}">待结转份额</label>
-										<div class="layui-input-inline input-inline">
-											<input type="text" th:id="carryAmt" name="carryAmt" maxLength="16" required
-												   th:value="${entity?.carryAmt}" class="layui-input form-input text-number rateCal"
-												   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
-										</div>
-									</div>
-
 								</div>
-							</div>
-						</div>
-					</div>
 
-					<div class="pro-module-wrap" th:id="value_div_qr">
-						<div class="pro-module">
-							<h3 class="pro-module-title"><span class="title-des">确认信息</span><i class="iconfont icon-arrow-down pro-down-icon"></i></h3>
-							<div class="pro-module-item">
-								<div class="layui-form-item">
-									<div class="form-inline-wrap">
-										<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.confirmTradeAmt}">确认金额</label>
-										<div class="layui-input-inline input-inline">
-											<input type="text" th:id="confirmTradeAmt" name="confirmTradeAmt" maxLength="16"
-												   required th:value="${entity?.confirmTradeAmt}" class="layui-input form-input text-number rateCal"
-												   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
-										</div>
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.rgSettleDate}">结算日期</label>
+									<div class="layui-input-inline input-inline">
+										<input id="rgSettleDate" name="rgSettleDate" required
+											   class="layui-input form-input input-dateSelect hidden"
+											   data-th-value='${#dates.format(entity?.rgSettleDate,"yyyy-MM-dd")}'>
 									</div>
+								</div>
 
-									<div class="form-inline-wrap">
-										<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.receivableBonus}">应收红利</label>
-										<div class="layui-input-inline input-inline">
-											<input type="text" th:id="receivableBonus" name="receivableBonus" maxLength="16"
-												   required th:value="${entity?.receivableBonus}" class="layui-input form-input text-number"
-												   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
-										</div>
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.rgTradeAmt}">申请金额</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" th:id="rgTradeAmt" name="rgTradeAmt" maxLength="16"
+											   required th:value="${entity?.rgTradeAmt}" class="layui-input form-input text-number"
+											   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
 									</div>
+								</div>
 
 
-									<div class="form-inline-wrap">
-										<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.unitValue}">单位净值</label>
-										<div class="layui-input-inline input-inline">
-											<input type="text" th:id="unitValue" name="unitValue" maxLength="16"
-												   required th:value="${entity?.unitValue}" class="layui-input form-input text-number rateCal" disabled
-												   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
-										</div>
+								<div class="form-inline-wrap" >
+									<label class="layui-form-label form-lable" data-th-text="#{TrdFundValuationTrade002.rgTrdAcctId}">资金账户</label>
+									<div class="layui-input-inline input-inline">
+										<select type="text" id="rgTrdAcctId" name="rgTrdAcctId" class="layui-input form-input input-select"
+												parentIds="portfolioId" required  data-th-initValue="${entity?.rgTrdAcctId}"
+												th:data-url="@{/valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/getTrdAcctId}"
+												allowClear="true" placeholder="请输入内容"
+												data-th-placeholder="#{SysCommon.placeholder}">
+										</select>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
+				</div>
 
-					<div class="pro-module-wrap" th:id="value_div_dz">
-						<div class="pro-module">
-							<h3 class="pro-module-title"><span class="title-des">到账信息</span><i class="iconfont icon-arrow-down pro-down-icon"></i></h3>
-							<div class="pro-module-item">
-								<div class="layui-form-item">
-									<div class="form-inline-wrap">
-										<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.settleAmt}">到账金额</label>
-										<div class="layui-input-inline input-inline">
-											<input type="text" th:id="settleAmt" name="settleAmt" maxLength="16"
-												   required th:value="${entity?.settleAmt}" class="layui-input form-input text-number rateCal"
-												   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
-										</div>
+				<div class="pro-module-wrap" th:id="value_div_sq">
+					<div class="pro-module">
+						<h3 class="pro-module-title"><span class="title-des">申请信息</span><i class="iconfont icon-arrow-down pro-down-icon"></i></h3>
+						<div class="pro-module-item">
+							<div class="layui-form-item">
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.sqTradeDate}">申请日期</label>
+									<div class="layui-input-inline input-inline">
+										<input id="sqTradeDate" name="sqTradeDate" required
+											   class="layui-input form-input input-dateSelect hidden"
+											   data-th-value='${#dates.format(entity?.sqTradeDate,"yyyy-MM-dd")}'>
+									</div>
+								</div>
+
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.sqSettleDate}">结算日期</label>
+									<div class="layui-input-inline input-inline">
+										<input id="sqSettleDate" name="sqSettleDate" required
+											   class="layui-input form-input input-dateSelect hidden"
+											   data-th-value='${#dates.format(entity?.sqSettleDate,"yyyy-MM-dd")}'>
+									</div>
+								</div>
+
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.sqTradeAmt}">申请金额</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" th:id="sqTradeAmt" name="sqTradeAmt" maxLength="16"
+											   required th:value="${entity?.sqTradeAmt}" class="layui-input form-input text-number"
+											   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
+									</div>
+								</div>
+
+
+								<div class="form-inline-wrap" >
+									<label class="layui-form-label form-lable" data-th-text="#{TrdFundValuationTrade002.sqTrdAcctId}">资金账户</label>
+									<div class="layui-input-inline input-inline">
+										<select type="text" id="sqTrdAcctId" name="sqTrdAcctId" class="layui-input form-input input-select"
+												parentIds="portfolioId" required  data-th-initValue="${entity?.sqTrdAcctId}"
+												th:data-url="@{/valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/getTrdAcctId}"
+												allowClear="true" placeholder="请输入内容"
+												data-th-placeholder="#{SysCommon.placeholder}">
+										</select>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
+				</div>
 
-					<div class="pro-module-wrap" th:id="value_div">
-						<div class="pro-module">
-							<h3 class="pro-module-title"><span class="title-des">费用信息</span><i class="iconfont icon-arrow-down pro-down-icon"></i></h3>
-							<div class="pro-module-item">
-								<div class="layui-form-item">
-									<div class="form-inline-wrap">
-										<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.feeAmt}">交易费用</label>
-										<div class="layui-input-inline input-inline">
-											<input type="text" th:id="feeAmt" name="feeAmt" maxLength="16"
-												   required th:value="${entity?.feeAmt}" class="layui-input form-input text-number rateCal"
-												   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
-										</div>
+				<div class="pro-module-wrap" th:id="value_div_rgqr">
+					<div class="pro-module">
+						<h3 class="pro-module-title"><span class="title-des">确认信息</span><i class="iconfont icon-arrow-down pro-down-icon"></i></h3>
+						<div class="pro-module-item">
+							<div class="layui-form-item">
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.rgqrTradeDate}">确认日期</label>
+									<div class="layui-input-inline input-inline">
+										<input id="rgqrTradeDate" name="rgqrTradeDate" required
+											   class="layui-input form-input input-dateSelect hidden"
+											   data-th-value='${#dates.format(entity?.rgqrTradeDate,"yyyy-MM-dd")}'>
 									</div>
-									<div class="form-inline-wrap">
-										<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.commissionFee}">佣金</label>
-										<div class="layui-input-inline input-inline">
-											<input type="text" th:id="commissionFee" name="commissionFee" maxLength="16"
-												   required th:value="${entity?.commissionFee}" class="layui-input form-input text-number rateCal"
-												   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
-										</div>
+								</div>
+
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.rgqrNums}">确认数量</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" th:id="rgqrNums" name="rgqrNums" maxLength="16"
+											   required th:value="${entity?.rgqrNums}" class="layui-input form-input text-number"
+											   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
 									</div>
-									<div class="form-inline-wrap">
-										<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.feeAmtQT}">其他费用</label>
-										<div class="layui-input-inline input-inline">
-											<input type="text" th:id="feeAmtQT" name="feeAmtQT" maxLength="16"
-												   required th:value="${entity?.feeAmtQT}" class="layui-input form-input text-number rateCal"
-												   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
-										</div>
+								</div>
+
+
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.rgqrTradeAmt}" >确认金额</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" th:id="rgqrTradeAmt" name="rgqrTradeAmt" maxLength="16"
+											   th:value="${entity?.rgqrTradeAmt}" class="layui-input form-input text-number"
+											   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
+									</div>
+								</div>
+							</div>
+
+							<div class="layui-form-item">
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.raiseInterest}">募集期利息</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" th:id="raiseInterest" name="raiseInterest" maxLength="16"
+											   th:value="${entity?.raiseInterest}" class="layui-input form-input text-number"
+											   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
+									</div>
+								</div>
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.subscribeFee}">认购费</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" th:id="subscribeFee" name="subscribeFee" maxLength="16"
+											   required th:value="${entity?.subscribeFee}" class="layui-input form-input text-number"
+											   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
+									</div>
+								</div>
+
+								<div class="form-inline-wrap" >
+									<label class="layui-form-label form-lable" data-th-text="#{TrdFundValuationTrade002.rgqrTrdAcctId}">资金账户</label>
+									<div class="layui-input-inline input-inline">
+										<select type="text" id="rgqrTrdAcctId" name="rgqrTrdAcctId" class="layui-input form-input input-select"
+												parentIds="portfolioId" required  data-th-initValue="${entity?.rgqrTrdAcctId}"
+												th:data-url="@{/valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/getTrdAcctId}"
+												allowClear="true" placeholder="请输入内容"
+												data-th-placeholder="#{SysCommon.placeholder}">
+										</select>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
+				</div>
 
-					<div class="pro-module-wrap" th:id="value_div">
-						<div class="pro-module">
-							<h3 class="pro-module-title"><span class="title-des">汇总信息</span><i class="iconfont icon-arrow-down pro-down-icon"></i></h3>
-							<div class="pro-module-item">
-								<div class="layui-form-item">
-									<div class="form-inline-wrap">
-										<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.ccy}">币种</label>
-										<div class="layui-input-inline input-inline">
-											<select id="ccy" name="ccy"
-													data-th-data-result="${CCY}"
-													th:initvalue="*{entity?.ccy?:CCY_default}" class="layui-input form-input input-select"
-													data-th-placeholder="#{SysCommon.placeholder}" required>
-											</select>
-										</div>
+				<div class="pro-module-wrap" th:id="value_div_sgqr">
+					<div class="pro-module">
+						<h3 class="pro-module-title"><span class="title-des">确认信息</span><i class="iconfont icon-arrow-down pro-down-icon"></i></h3>
+						<div class="pro-module-item">
+							<div class="layui-form-item">
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.sgqrTradeDate}">确认日期</label>
+									<div class="layui-input-inline input-inline">
+										<input id="sgqrTradeDate" name="sgqrTradeDate" required
+											   class="layui-input form-input input-dateSelect hidden"
+											   data-th-value='${#dates.format(entity?.sgqrTradeDate,"yyyy-MM-dd")}'>
 									</div>
-									<div class="form-inline-wrap">
-										<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.mdateSettleAmt}">结算金额</label>
-										<div class="layui-input-inline input-inline">
-											<input type="text" th:id="mdateSettleAmt" name="mdateSettleAmt" maxLength="16"
-												   required th:value="${entity?.mdateSettleAmt}" class="layui-input form-input text-number rateCal"
-												   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
-										</div>
+								</div>
+
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.sgqrNums}">确认数量</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" th:id="sgqrNums" name="sgqrNums" maxLength="16"
+											   required th:value="${entity?.sgqrNums}" class="layui-input form-input text-number"
+											   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
 									</div>
-									<div class="form-inline-wrap" >
-										<label class="layui-form-label form-lable" >资金账户</label>
-										<div class="layui-input-inline input-inline">
-											<select type="text" id="trdAcctId" name="trdAcctId" class="layui-input form-input input-select" parentIds="portfolioId"
-													th:data-url="@{/valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/getTrdAcctId}"
-													allowClear="true" placeholder="请输入内容"
-													data-th-placeholder="#{SysCommon.placeholder}">
-											</select>
-										</div>
+								</div>
+
+
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.sgqrTradeAmt}" >确认金额</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" th:id="sgqrTradeAmt" name="sgqrTradeAmt" maxLength="16"
+											   th:value="${entity?.sgqrTradeAmt}" class="layui-input form-input text-number"
+											   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
+									</div>
+								</div>
+							</div>
+
+							<div class="layui-form-item">
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.sgqrUnitValue}">单位净值</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" th:id="sgqrUnitValue" name="sgqrUnitValue" maxLength="16"
+											   th:value="${entity?.sgqrUnitValue}" class="layui-input form-input text-number"
+											   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
+									</div>
+								</div>
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.interestIncome}">利息收入</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" th:id="interestIncome" name="interestIncome" maxLength="16"
+											   th:value="${entity?.interestIncome}" class="layui-input form-input text-number"
+											   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
+									</div>
+								</div>
+
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.purchaseFee}">申购费</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" th:id="purchaseFee" name="purchaseFee" maxLength="16"
+											   required th:value="${entity?.purchaseFee}" class="layui-input form-input text-number"
+											   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
+									</div>
+								</div>
+							</div>
+
+							<div class="layui-form-item">
+								<div class="form-inline-wrap" >
+									<label class="layui-form-label form-lable" data-th-text="#{TrdFundValuationTrade002.sgqrTrdAcctId}">资金账户</label>
+									<div class="layui-input-inline input-inline">
+										<select type="text" id="sgqrTrdAcctId" name="sgqrTrdAcctId" class="layui-input form-input input-select"
+												parentIds="portfolioId" required  data-th-initValue="${entity?.sgqrTrdAcctId}"
+												th:data-url="@{/valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/getTrdAcctId}"
+												allowClear="true" placeholder="请输入内容"
+												data-th-placeholder="#{SysCommon.placeholder}">
+										</select>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-					<!-- 人员信息 -->
-					<!--<div class="page-component" th:data-path="@{/component/trade/TrdInvestPersonInfo002/init}" th:data-params="|{entity: '${trdInvestPersonInfo002Dto}',entityName:'trdInvestPersonInfo002Dto', psId : 'ps'}|"></div>-->
+				</div>
 
-				</form>
-                <div class="layui-form-item">
-                    <div align="center" style="height:50px;padding-top: 10px;">
+				<div class="pro-module-wrap" th:id="value_div_shqr">
+					<div class="pro-module">
+						<h3 class="pro-module-title"><span class="title-des">赎回信息</span><i class="iconfont icon-arrow-down pro-down-icon"></i></h3>
+						<div class="pro-module-item">
+							<div class="layui-form-item">
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.shqrTradeDate}">确认日期</label>
+									<div class="layui-input-inline input-inline">
+										<input id="shqrTradeDate" name="shqrTradeDate" required
+											   class="layui-input form-input input-dateSelect hidden"
+											   data-th-value='${#dates.format(entity?.shqrTradeDate,"yyyy-MM-dd")}'>
+									</div>
+								</div>
 
-                        <a id="TrdFundValuationTrade002_btn_save" class="layui-btn layui-btn-sm btn-save" data-th-text="#{SysCommon.save}">保存</a>
-                        <a id="TrdFundValuationTrade002_btn_submit" class="layui-btn layui-btn-sm btn-submit" data-th-text="#{SysCommon.submit}">提交</a>
-                        <a id="TrdFundValuationTrade002_btn_cancel" class="layui-btn layui-btn-sm btn-cancel" data-th-text="#{SysCommon.cancel}">取消</a>
-                    </div>
-                </div>
-         </div>
-    </div>
-    </div>
-    <div layout:fragment="script">
-    	<script data-th-inline="javascript" type="text/javascript">
-    			var PS_T01 = /*[[${PS_T01}]]*/'';
-    			var YES = /*[[${YES}]]*/'';
-    			var YES_OR_NO_N = /*[[${YES_OR_NO_N}]]*/'';
-    			var finprodId = /*[[${finprodId}]]*/'';
-    			var CCY = /*[[${CCY}]]*/'';
-    			var FINPROD_TYPE_F17 = /*[[${FINPROD_TYPE_F17}]]*/'';
-                var tradeId = /*[[${tradeId}]]*/'';
-                var PS_T02 = /*[[${PS_T02}]]*/'';
-		</script>
-    	<script data-th-src="@{/js/valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002.js}">
-    	</script>
-    </div>
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.shqrNums}">确认数量</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" th:id="shqrNums" name="shqrNums" maxLength="16"
+											   required th:value="${entity?.shqrNums}" class="layui-input form-input text-number"
+											   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
+									</div>
+								</div>
+
+
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.shqrTradeAmt}">确认金额</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" th:id="shqrTradeAmt" name="shqrTradeAmt" maxLength="16"
+											   required th:value="${entity?.shqrTradeAmt}" class="layui-input form-input text-number"
+											   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
+									</div>
+								</div>
+							</div>
+
+							<div class="layui-form-item">
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.shqrUnitValue}">单位净值</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" th:id="shqrUnitValue" name="shqrUnitValue" maxLength="16"
+											   th:value="${entity?.shqrUnitValue}" class="layui-input form-input text-number"
+											   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
+									</div>
+								</div>
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.redemptionFee}" >赎回费</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" th:id="redemptionFee" name="redemptionFee" maxLength="16"
+											   required th:value="${entity?.redemptionFee}" class="layui-input form-input text-number"
+											   data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
+									</div>
+								</div>
+
+								<div class="form-inline-wrap">
+									<label class="layui-form-label form-label-wrap" data-th-text="#{TrdFundValuationTrade002.shqrSettleDate}">到账日期</label>
+									<div class="layui-input-inline input-inline">
+										<input id="shqrSettleDate" name="shqrSettleDate" required
+											   class="layui-input form-input input-dateSelect hidden"
+											   data-th-value='${#dates.format(entity?.shqrSettleDate,"yyyy-MM-dd")}'>
+									</div>
+								</div>
+							</div>
+
+							<div class="layui-form-item">
+								<div class="form-inline-wrap" >
+									<label class="layui-form-label form-lable" data-th-text="#{TrdFundValuationTrade002.shqrTrdAcctId}">资金账户</label>
+									<div class="layui-input-inline input-inline">
+										<select type="text" id="shqrTrdAcctId" name="shqrTrdAcctId" class="layui-input form-input input-select"
+												parentIds="portfolioId" required  data-th-initValue="${entity?.shqrTrdAcctId}"
+												th:data-url="@{/valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/getTrdAcctId}"
+												allowClear="true" placeholder="请输入内容"
+												data-th-placeholder="#{SysCommon.placeholder}">
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</form>
+			<div class="layui-form-item">
+				<div align="center" style="height:50px;padding-top: 10px;">
+
+					<a id="TrdFundValuationTrade002_btn_save" class="layui-btn layui-btn-sm btn-save" data-th-text="#{SysCommon.save}">保存</a>
+					<a id="TrdFundValuationTrade002_btn_submit" class="layui-btn layui-btn-sm btn-submit" data-th-text="#{SysCommon.submit}">提交</a>
+					<a id="TrdFundValuationTrade002_btn_cancel" class="layui-btn layui-btn-sm btn-cancel" data-th-text="#{SysCommon.cancel}">取消</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div layout:fragment="script">
+	<script data-th-inline="javascript" type="text/javascript">
+		var PS_T01 = /*[[${PS_T01}]]*/'';
+		var YES = /*[[${YES}]]*/'';
+		var YES_OR_NO_N = /*[[${YES_OR_NO_N}]]*/'';
+		var finprodId = /*[[${finprodId}]]*/'';
+		var CCY = /*[[${CCY}]]*/'';
+		var FINPROD_TYPE_F17 = /*[[${FINPROD_TYPE_F17}]]*/'';
+		var tradeId = /*[[${tradeId}]]*/'';
+		var PS_T02 = /*[[${PS_T02}]]*/'';
+	</script>
+	<script data-th-src="@{/js/valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002.js}">
+	</script>
+</div>
 </body>
 </html>

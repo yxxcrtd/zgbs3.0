@@ -109,7 +109,7 @@
 
 	<!--资金账户下拉框-->
 	<select id="getTrdAcctId" resultType="com.joyintech.framework.select.SelectOptionDto">
-		select ssai.TRD_ACCT_ID as id,sci.ACCT_NAME as text
+		<!--select ssai.TRD_ACCT_ID as id,sci.ACCT_NAME as text
 		from STL_FIN_PRODUCT_ACCT psa
 		inner join STL_SEC_ACCT_INFO ssai on psa.ACCT_NO=ssai.SEC_ACCT_ID
 		inner join STL_CAPACCT_INFO sci on ssai.TRD_ACCT_ID=sci.ACCT_NO
@@ -128,6 +128,18 @@
 					</if>
 					#{item}
 				</foreach>)
+			</if>
+		</where>-->
+
+		select
+		distinct acct.ACCT_NO as id,acct.ACCT_NO as text
+		FROM STL_FIN_PRODUCT_ACCT acct
+		<where>
+			<!--<if test="portfolioId != null and portfolioId != ''">
+				AND acct.FINPROD_ID =#{portfolioId}
+			</if>-->
+			<if test=" initValue != null and initValue != ''">
+				AND acct.ACCT_NO = #{initValue}
 			</if>
 		</where>
 	</select>
