@@ -120,8 +120,8 @@ public class TrdOutRightRepoValuationTrade002Service extends BaseService<TrdOutR
         entity.setTermKind("R007"); //期限品种
         //DictCodeList.回购期限品种_R007.getValue()
         entity.setTradeMarket("01"); //交易市场 银行间
-        entity.setPs(dto.getPs()); //交易类型
-//        entity.setBusiType(dto.getPs()); //交易类型
+
+        entity.setBusiType(dto.getPs()); //交易类型
         entity.setTrader("yc"); //交易员
         entity.setTradeDate(dto.getTradeDate());//交易日
         entity.setSettleDate(dto.getTradeDate()); //交割日
@@ -169,6 +169,8 @@ public class TrdOutRightRepoValuationTrade002Service extends BaseService<TrdOutR
 //        entity.setIsChlFeeAmt("N");
 //        entity.setChannelId("2222");
 //        entity.setTrdFee(new BigDecimal(222.1));
+
+
         listValBotAstTrade.add(entity);
 
         Map<String, Object> map = repurchaseDealTemplateRecService.handleValBotAstTrade(listValBotAstTrade,new Date(),params,null);
