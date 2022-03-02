@@ -97,6 +97,68 @@ public class BookAccountGenLogicNew {
      */
     public BookGenerateResult genAccount(AccountDriver accountDriver, SysBatchExecInfo batchinfo) {
         // 根据驱动信息，生成一条记账凭证主表信息
+        BookGenerateResult result = new BookGenerateResult();
+        // step1. 获取分录信息
+        // 根据驱动信息，生成记账凭证明细信息。
+        // 定义分录信息变量 = 获取节点对应分录信息
+        List<AccountEntry> accountEntrys = genAccountEntrys(accountDriver);
+
+        // step2. 根据内部科目编码映射
+        // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑 start
+        // 按照内部科目编码分录，则需要映射分录对应科目信息
+        generateEntrySubjectInfo(accountDriver, accountEntrys);
+        // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑 end
+
+        // step3. 根据映射后的分录信息生成账务明细信息
+        // 遍历步骤获取的列表，循环生成明细凭证信息
+        result = genBookDetails(accountDriver, accountEntrys);
+        return result;
+    }
+
+    /**
+     * 获取节点对应分录信息
+     *
+     * @param accountDriver 记账驱动信息，包含该笔记账所需使用的所有信息。
+     * @see
+     * @since 1.0
+     */
+    public List<AccountEntry> genAccountEntrys(AccountDriver accountDriver) {
+        // step1. 获取分录信息
+        // 根据驱动信息，生成一条记账凭证主表信息
+        // 获取记账场景要素信息
+        Map<String, Object> accountSceneMap = accountDriver.getAccountSceneMap();
+        // 获取记账金额要素信息
+        Map<String, BigDecimal> accountAmountMap = accountDriver.getAccountAmountMap();
+        // 获取金额元素币种信息
+        Map<String, Object> accountCurrencyMap = accountDriver.getAccountCurrencyMap();
+        // 获取基础科目性质信息
+        Map<String, Map<String, Object>> accountNatrueMap = accountDriver.getAccountNatrueMap();
+        BookGenerateResult result = new BookGenerateResult();
+        List<ValBokBookdetailBatch> bookDetailList = new ArrayList<>();
+        result.setValBokBookdetailBatch(bookDetailList);
+        // 根据驱动信息，生成记账凭证明细信息。
+        // 获取记账场景树节点
+        TreeNode treeNode = accountDriver.getTreeNode();
+        // 定义分录信息变量
+        List<AccountEntry> accountEntrys = new ArrayList<AccountEntry>();
+        // 获取分录信息
+        accountSceneMap.put("ACCOUNTEVENTS", accountDriver.getTableId());
+        getAccountEntryFromTreeNode(treeNode, accountSceneMap, accountEntrys);
+        return accountEntrys;
+    }
+
+    /**
+     * 记账凭证生成
+     *
+     * @param accountDriver 记账驱动信息，包含该笔记账所需使用的所有信息。
+     * @param batchinfo 批的相关信息
+     * @return BookGenerateResult
+     * @see
+     * @since 1.0
+     */
+    public BookGenerateResult genBookDetails(AccountDriver accountDriver, List<AccountEntry> accountEntrys) {
+        // step1. 获取分录信息
+        // 根据驱动信息，生成一条记账凭证主表信息
         // 获取记账场景要素信息
         Map<String, Object> accountSceneMap = accountDriver.getAccountSceneMap();
         // 获取记账金额要素信息
@@ -110,20 +172,6 @@ public class BookAccountGenLogicNew {
 
         List<ValBokBookdetailBatch> bookDetailList = new ArrayList<>();
         result.setValBokBookdetailBatch(bookDetailList);
-        // 根据驱动信息，生成记账凭证明细信息。
-        // 获取记账场景树节点
-        TreeNode treeNode = accountDriver.getTreeNode();
-        // 定义分录信息变量
-        List<AccountEntry> accountEntrys = new ArrayList<AccountEntry>();
-        // 获取分录信息
-        accountSceneMap.put("ACCOUNTEVENTS", accountDriver.getTableId());
-        getAccountEntryFromTreeNode(treeNode, accountSceneMap, accountEntrys);
-
-        // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑 start
-        // 按照内部科目编码分录，则需要映射分录对应科目信息
-        generateEntrySubjectInfo(accountEntrys, accountSceneMap, accountAmountMap, accountDriver.getTableId());
-        // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑 end
-
         // 遍历步骤获取的列表，循环生成明细凭证信息
         // 先借后贷
         Collections.sort(accountEntrys, new Comparator<AccountEntry>() {
@@ -1459,12 +1507,19 @@ public class BookAccountGenLogicNew {
     /**
      * 映射生成分录对应科目信息
      * @param accountEntries 会计分录
-     * @param accountSceneMap 会计场景元素
+     * @param accountDriver 会计场景
      */
-    public void generateEntrySubjectInfo(List<AccountEntry> accountEntries, Map<String, Object> accountSceneMap, Map<String, BigDecimal> accountAmountMap, String tableId){
+    public void generateEntrySubjectInfo(AccountDriver accountDriver, List<AccountEntry> accountEntries){
+        // 获取记账场景要素信息
+        Map<String, Object> accountSceneMap = accountDriver.getAccountSceneMap();
+        // 获取记账金额要素信息
+        Map<String, BigDecimal> accountAmountMap = accountDriver.getAccountAmountMap();
+        // 定义 变量.账套信息
         String booksetId = (String)accountSceneMap.get(BookConstant.BOOKSET_ID);
         // 定义 变量.币种 = 会计场景元素.币种
         String ccy = (String)accountSceneMap.get(BookConstant.CCY);
+        // 定义 变量.场景代码 = accountDriver.tableId
+        String tableId = accountDriver.getTableId();
         // 定义 变量.账务明细代码集合
         List<String> listBokDetailId = new ArrayList<>();
         // 1. 循环会计分录，初始化内部科目编码集合
@@ -1483,10 +1538,14 @@ public class BookAccountGenLogicNew {
         if(CollectionUtils.isEmpty(listBokDetailId)){
             return;
         }
-        // 3. 根据账务明细代码和账套代码，查询对应科目辅助核算项
-        List<SubjectMappingConfig> subjectMappingConfigList= bookAccountGenLogicNewMapper.getSubjectMappingConfig(booksetId, listBokDetailId, DictCodeListExt1.金融产品类型_存款.getValue());
-        // 将科目辅助核算项按账务明细代码分组
-        Map<String, SubjectMappingConfig> subjectMappingConfigMap= subjectMappingConfigList.stream().collect(Collectors.toMap(SubjectMappingConfig :: getBokDetailId, item -> item));
+//        // 3. 根据账务明细代码和账套代码，查询对应科目辅助核算项
+//        List<SubjectMappingConfig> subjectMappingConfigList= bookAccountGenLogicNewMapper.getSubjectMappingConfig(booksetId, listBokDetailId, DictCodeListExt1.金融产品类型_存款.getValue());
+//        // 将科目辅助核算项按账务明细代码分组
+//        Map<String, SubjectMappingConfig> subjectMappingConfigMap= subjectMappingConfigList.stream().collect(Collectors.toMap(SubjectMappingConfig :: getBokDetailId, item -> item));
+        // 定义 变量.辅助核算项配置Map = 记账场景.辅助核算项配置Map
+        Map<String, SubjectMappingConfig> subjectMappingConfigMap = accountDriver.getSubjectMappingConfigMap();
+        // 定义 变量.默认辅助核算项配置
+        SubjectMappingConfig subjectMappingConfigDefault = accountDriver.getSubjectMappingConfigDefault();
         // 循环遍历会计分录
         for(AccountEntry accountEntry : accountEntries){
             // 根据内部科目编码获取所有对应科目
@@ -1525,8 +1584,15 @@ public class BookAccountGenLogicNew {
             else{
                 // 获取账务明细代码
                 BokDetailId bokDetailId =(BokDetailId)accountSceneMap.get(accountEntry.getBokDetailId());
-                // 根据账务明细代码获取对应辅助核算项
-                SubjectMappingConfig mappingConfig = subjectMappingConfigMap.get(bokDetailId.getBokDetailId());
+                // 定义 变量.辅助核算项 = 会计场景.默认辅助核算项
+                SubjectMappingConfig mappingConfig = subjectMappingConfigDefault;
+                // 若场景中辅助核算项map不为空，且匹配上，则根据内部科目编码获取对应辅助核算项
+                if(subjectMappingConfigMap != null && subjectMappingConfigMap.get(accountEntry.getSubjectId()) != null){
+                    mappingConfig = subjectMappingConfigMap.get(accountEntry.getSubjectId());
+                }
+                if(mappingConfig == null){
+
+                }
                 // 此处可直接赋值，分录中费用类型对应的会计元素，数据来源会设置为对应费用类型，可直接赋值费用类型，非费用类型的用不到，赋值也不会有问题
                 // 产品-费用摊销场景对应的费用类型特殊处理，从会计场景元素中传过来的TYPE_1字段取值
                 if(DictCodeListTableId.会计场景代码_费用摊销.getValue().equals(tableId)){
@@ -1602,11 +1668,30 @@ public class BookAccountGenLogicNew {
         params.put(SubjectConfigCode.存款类资产类型.getValue(), mappingConfig.getAssetType());
         params.put(SubjectConfigCode.基金类型.getValue(), mappingConfig.getAssetType());
         params.put(SubjectConfigCode.交易市场.getValue(), mappingConfig.getTradeMarket());
-        params.put(SubjectConfigCode.交易对手.getValue(), mappingConfig.getTradeMarket());
+//        params.put(SubjectConfigCode.交易对手.getValue(), mappingConfig.getTradeMarket());
         params.put(SubjectConfigCode.发行方式.getValue(), mappingConfig.getIssueType());
         params.put(SubjectConfigCode.账户类型.getValue(), mappingConfig.getAccountType());
         params.put(SubjectConfigCode.费用类型.getValue(), mappingConfig.getFeeType());
         params.put(SubjectConfigCode.税类型.getValue(), mappingConfig.getTaxType());
         return params;
+    }
+
+    /**
+     * 查询辅助核算项配置信息
+     * @param booksetId 账套代码
+     * @param listBokDetailId 账务明细代码List
+     * @return Map 账套代码+ 账务明细代码，辅助核算项配置
+     */
+    public Map<String, SubjectMappingConfig> getSubjectMappingConfigList(String booksetId, List<String> listBokDetailId){
+        // 定义 变量.辅助核算项Map<账套代码+账务明细代码, 辅助核算项配置>
+        Map<String, SubjectMappingConfig> mappingConfigMap = new HashMap<>();
+        List<SubjectMappingConfig> listConfigInfo = bookAccountGenLogicNewMapper.getSubjectMappingConfig(booksetId, listBokDetailId);
+        // 遍历 变量.辅助核算项配置信息，按账套+账务明细代码进行分组
+        if(CollectionUtils.isNotEmpty(listConfigInfo)){
+            listConfigInfo.forEach(item ->{
+                mappingConfigMap.put(item.getBooksetId().trim() + item.getBokDetailId().trim(), item);
+            });
+        }
+        return mappingConfigMap;
     }
 }

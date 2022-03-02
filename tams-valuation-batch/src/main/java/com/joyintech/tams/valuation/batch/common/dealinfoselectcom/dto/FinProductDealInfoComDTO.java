@@ -1,11 +1,12 @@
 package com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dto;
 
+import com.joyintech.tams.common.base.entity.TrdTradeFeeDetail;
+import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.SubjectMappingConfig;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import com.joyintech.tams.common.base.entity.TrdTradeFeeDetail;
 
 /**
  * 金融产品交易信息DTO 〈功能详细描述〉
@@ -354,7 +355,12 @@ public class FinProductDealInfoComDTO {
     private String totleTradeId;
     // ADD BY CAOGUO ON 20201015 END
 
-   
+    // add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 start
+    /**
+     *  辅助核算项配置信息
+     */
+    private SubjectMappingConfig subjectMappingConfig;
+    // add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 end
 
     /**
      * 取得 交易市场，一级市场、二级市场
@@ -1551,4 +1557,22 @@ public class FinProductDealInfoComDTO {
     public void setTotleTradeId(String totleTradeId) {
         this.totleTradeId = totleTradeId;
     }
+
+    // add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 start
+    /**
+     * 获取 辅助核算项配置信息
+     * @return 辅助核算项配置信息.
+     */
+    public SubjectMappingConfig getSubjectMappingConfig() {
+        return subjectMappingConfig;
+    }
+
+    /**
+     * 设置 辅助核算项配置信息
+     * @param subjectMappingConfig 辅助核算项配置信息
+     */
+    public void setSubjectMappingConfig(SubjectMappingConfig subjectMappingConfig) {
+        this.subjectMappingConfig = subjectMappingConfig;
+    }
+    // add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 end
 }

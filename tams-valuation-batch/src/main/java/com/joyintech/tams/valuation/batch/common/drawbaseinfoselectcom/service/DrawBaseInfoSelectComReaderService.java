@@ -5,37 +5,29 @@
 
 package com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import com.joyintech.tams.common.base.entity.BokMatchRlat;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt3;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.valuation.batch.common.accountingmethod.dao.AccountingMethodMapper;
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
-
-import com.joyintech.framework.base.entity.SysBatchExecInfo;
 import com.joyintech.framework.base.entity.SysBatchTask;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.entity.BokMatchRlat;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookAccountGenLogicNew;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookCommonLogic;
+import com.joyintech.tams.valuation.batch.common.accountingmethod.dao.AccountingMethodMapper;
+import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.SubjectMappingConfig;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.TreeNode;
 import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dao.DrawBaseInfoSelectComMapper;
 import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto.DrawBaseInfoSelectComDTO;
 import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto.DrawBaseInfoSelectComResult;
 import com.joyintech.tams.valuation.common.constants.BookConstant;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt1;
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 /**
  * 计提批处理基础信息读入service
@@ -66,6 +58,9 @@ public class DrawBaseInfoSelectComReaderService {
      */
     @Autowired
     private AccountingMethodMapper accountingMethodMapper;
+
+    @Autowired
+    private BookAccountGenLogicNew bookAccountGenLogicNew;
 
     /**
      * {@inheritDoc}
@@ -118,11 +113,51 @@ public class DrawBaseInfoSelectComReaderService {
 
         // 获取分录信息
         Set<String> bookSetIds = new HashSet<String>();
+        // add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 start
+        // 定义 变量.辅助核算项Map<账套代码+账务明细代码, 辅助核算项配置>
+        Map<String, SubjectMappingConfig> mappingConfigMap = new HashMap<>();
+        // 定义 变量.账务明细代码分组Map
+//        Map<String,List<String>> bokdetailIdMap = new HashMap<>();
+        List<String> listBokdetailId = new ArrayList<>();
+        // add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 end
         listHisDrawBaseInfoSelectComDTO.forEach(item -> {
             if (StringUtil.isNotEmpty(item.getBooksetId())) {
                 bookSetIds.add(item.getBooksetId());
+                // add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 start
+//                // 按账套对账务明细代码进行分组
+//                List<String> bokdetailIds = new ArrayList<>();
+//                if(bokdetailIdMap.get(item.getBooksetId()) != null){
+//                    bokdetailIds = bokdetailIdMap.get(item.getBooksetId());
+//                }
+//                bokdetailIds.add(item.getBokDetailId());
+//                bokdetailIdMap.put(item.getBooksetId(), bokdetailIds);
+                if(!listBokdetailId.contains(item.getBokDetailId())){
+                    listBokdetailId.add(item.getBokDetailId());
+                }
+                // add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 end
             }
         });
+
+        // add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 start
+            // 查询辅助核算项配置信息
+            // 定义 变量.辅助核算项配置信息
+//            List<SubjectMappingConfig> listConfigInfo = new ArrayList<>();
+//            for(String key : bokdetailIdMap.keySet()){
+//                List<SubjectMappingConfig> listConfig= bookAccountGenLogicNew.getSubjectMappingConfigList(key, bokdetailIdMap.get(key));
+//                if(CollectionUtils.isNotEmpty(listConfig)){
+//                    listConfigInfo.addAll(listConfig);
+//                }
+//            }
+//            List<SubjectMappingConfig> listConfigInfo = bookAccountGenLogicNew.getSubjectMappingConfigList(null, listBokdetailId);
+//            // 遍历 变量.辅助核算项配置信息，按账套+账务明细代码进行分组
+//            if(CollectionUtils.isNotEmpty(listConfigInfo)){
+//                listConfigInfo.forEach(item ->{
+//                    mappingConfigMap.put(item.getBooksetId().trim() + item.getBokDetailId().trim(), item);
+//                });
+//            }
+        mappingConfigMap = bookAccountGenLogicNew.getSubjectMappingConfigList(null, listBokdetailId);
+        // add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 end
+
         Map<String, TreeNode> booksetTreeNodeMap = bookCommonLogic.commonForGetTreeNodeMap(bookSetIds, batchTask.getTaskId());
 
         // 2.3、去重处理
@@ -153,6 +188,9 @@ public class DrawBaseInfoSelectComReaderService {
         for (DrawBaseInfoSelectComDTO currDTO : mergeList) {
             strKey = currDTO.getBooksetId().trim() + currDTO.getBokDetailId().trim();
             currDTO.setTaskPri(batchTask.getTaskPri());
+            // add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 start
+            currDTO.setSubjectMappingConfig(mappingConfigMap.get(strKey));
+            // add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 end
             if (resultMap.get(strKey) == null) {
                 DrawBaseInfoSelectComResult drawBaseInfoSelectComResult = new DrawBaseInfoSelectComResult();
                 drawBaseInfoSelectComResult.setBooksetId(currDTO.getBooksetId());

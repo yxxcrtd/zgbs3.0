@@ -1278,7 +1278,8 @@ public class SecAbsCalBookNewService {
             ad.setAccountAmountMap(accountAmountMap);
             // 记账金额币种要素
             ad.setAccountCurrencyMap(accountCurrencyMap);
-
+            // 默认辅助核算项配置
+            ad.setSubjectMappingConfigDefault(acctEntityEx.getSubjectMappingConfig());
             // 记账凭证生成
             BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
             // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中

@@ -10,6 +10,8 @@
 
 package com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto;
 
+import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.SubjectMappingConfig;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -118,6 +120,11 @@ public class DrawBaseInfoSelectComDTO {
      * add by caoguo on 20201031
      */
     private Long numP3;
+
+    /**
+     *  辅助核算项配置信息
+     */
+    private SubjectMappingConfig subjectMappingConfig;
 
     /**
      * 获取 taskId
@@ -461,5 +468,21 @@ public class DrawBaseInfoSelectComDTO {
         this.numP3 = numP3;
     }
 
+    // add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 start
+    /**
+     * 获取 辅助核算项配置信息
+     * @return 辅助核算项配置信息.
+     */
+    public SubjectMappingConfig getSubjectMappingConfig() {
+        return subjectMappingConfig;
+    }
 
+    /**
+     * 设置 辅助核算项配置信息
+     * @param subjectMappingConfig 辅助核算项配置信息
+     */
+    public void setSubjectMappingConfig(SubjectMappingConfig subjectMappingConfig) {
+        this.subjectMappingConfig = subjectMappingConfig;
+    }
+    // add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 end
 }

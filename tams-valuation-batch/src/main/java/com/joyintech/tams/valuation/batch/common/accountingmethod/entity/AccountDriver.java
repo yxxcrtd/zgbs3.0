@@ -55,12 +55,20 @@ public class AccountDriver {
      */
     private Map<String,String> accountNatrueBalanceMap;
     
-    
-    
     /**
      * 记账场景树节点
      */
     private TreeNode treeNode;
+
+    /**
+     *  辅助核算项配置Map(bokDetailId,SubjectMappingConfig)
+     */
+    private SubjectMappingConfig subjectMappingConfigDefault;
+
+    /**
+     *  辅助核算项配置Map(科目性质,SubjectMappingConfig)
+     */
+    private Map<String,SubjectMappingConfig> subjectMappingConfigMap;
 
     /**
      * 获取 tableId
@@ -177,7 +185,36 @@ public class AccountDriver {
 	public void setAccountNatrueBalanceMap(Map<String, String> accountNatrueBalanceMap) {
 		this.accountNatrueBalanceMap = accountNatrueBalanceMap;
 	}
-    
-    
-    
+
+    /**
+     *  获取 辅助核算项配置Map
+     * @return 辅助核算项配置Map
+     */
+    public Map<String, SubjectMappingConfig> getSubjectMappingConfigMap() {
+        return subjectMappingConfigMap;
+    }
+
+    /**
+     * 设置 辅助核算项配置Map
+     * @param subjectMappingConfig 辅助核算项配置Map
+     */
+    public void setSubjectMappingConfigMap(Map<String, SubjectMappingConfig> subjectMappingConfigMap) {
+        this.subjectMappingConfigMap = subjectMappingConfigMap;
+    }
+
+    /**
+     * 获取 默认辅助核算项配置
+     * @return 默认辅助核算项配置
+     */
+    public SubjectMappingConfig getSubjectMappingConfigDefault() {
+        return subjectMappingConfigDefault;
+    }
+
+    /**
+     * 设置 默认辅助核算项配置
+     * @param subjectMappingConfigDefault 默认辅助核算项配置
+     */
+    public void setSubjectMappingConfigDefault(SubjectMappingConfig subjectMappingConfigDefault) {
+        this.subjectMappingConfigDefault = subjectMappingConfigDefault;
+    }
 }

@@ -6,6 +6,11 @@ package com.joyintech.tams.valuation.batch.common.accountingmethod.entity;
 public class SubjectMappingConfig {
 
     /**
+     * 账套代码
+     */
+    private String booksetId;
+
+    /**
      * 账务明细代码
      */
     private String bokDetailId;
@@ -64,6 +69,47 @@ public class SubjectMappingConfig {
      * 交易对手
      */
     private String counterId;
+
+    /**
+     * 金融机构简称
+     */
+    private String financeOrgAbbr;
+
+    /**
+     * 账户细分类
+     */
+    private String acctDetailType;
+
+    /**
+     * 投资目的
+     */
+    private String invAim;
+
+    /**
+     * 登记托管机构
+     */
+    private String registOrg;
+
+    /**
+     * 发行人
+     */
+    private String issuer;
+
+    /**
+     * 获取 账套代码
+     * @return 账套代码
+     */
+    public String getBooksetId() {
+        return booksetId;
+    }
+
+    /**
+     * 设置 账套代码
+     * @param booksetId 账套代码
+     */
+    public void setBooksetId(String booksetId) {
+        this.booksetId = booksetId;
+    }
 
     /**
      * 返回 账务明细代码
@@ -255,5 +301,45 @@ public class SubjectMappingConfig {
      */
     public void setCounterId(String counterId) {
         this.counterId = counterId;
+    }
+
+    public String getFinanceOrgAbbr() {
+        return financeOrgAbbr;
+    }
+
+    public void setFinanceOrgAbbr(String financeOrgAbbr) {
+        this.financeOrgAbbr = financeOrgAbbr;
+    }
+
+    public String getAcctDetailType() {
+        return acctDetailType;
+    }
+
+    public void setAcctDetailType(String acctDetailType) {
+        this.acctDetailType = acctDetailType;
+    }
+
+    public String getInvAim() {
+        return invAim;
+    }
+
+    public void setInvAim(String invAim) {
+        this.invAim = invAim;
+    }
+
+    public String getRegistOrg() {
+        return registOrg;
+    }
+
+    public void setRegistOrg(String registOrg) {
+        this.registOrg = registOrg;
+    }
+
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
     }
 }
