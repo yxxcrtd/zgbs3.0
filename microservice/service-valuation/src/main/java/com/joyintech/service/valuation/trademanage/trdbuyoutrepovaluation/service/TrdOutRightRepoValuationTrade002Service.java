@@ -90,7 +90,7 @@ public class TrdOutRightRepoValuationTrade002Service extends CommonExportService
         String tradeId = null;
         while (true) {
             // 获取自增数
-            String nextId = this.getNextId("PLANTRADEID_SEQUENCE");
+            String nextId = this.getNextId("ORTRADEID_SEQUENCE");
             //平台日
             String dateStr= DateUtil.format(iPlatformDate.getSysDate(),DateUtil.DEFAULT_OTHER_FORMAT);//yyyyMMdd
             // 拼接
