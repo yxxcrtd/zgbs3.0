@@ -358,7 +358,7 @@ public class TrdDepoValuationDuration001Dto extends BaseEntity implements Proces
     public String getPayDateStr() {
         String payDateStr=" ";
         if(getPayDate() !=null){
-            planPayDateStr=DateUtil.format(getPayDate());
+            payDateStr=DateUtil.format(getPayDate());
         }
         return payDateStr;
     }

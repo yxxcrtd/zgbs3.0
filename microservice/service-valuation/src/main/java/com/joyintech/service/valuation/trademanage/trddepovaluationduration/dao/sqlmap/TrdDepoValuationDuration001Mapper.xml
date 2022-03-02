@@ -84,7 +84,7 @@
 		t.PS ps,/**交易类型**/
 		t.TRADE_DATE tradeDate,/**交易日**/
 		null planPayDate,  /**计划支付日**/
-		t.PAY_DATE payDate,  /**实际支付日**/
+		t.TRADE_DATE payDate,  /**实际支付日 = 交易日**/
 		t.INT_AMT actInt,  /**实收利息**/
 		t.PRIN_AMT actCapi, /**实收本金**/
 		stl.SETTLE_AMT settleAmt,/**结算金额**/
@@ -96,7 +96,7 @@
 		LEFT JOIN BOK_BOOKSET bok on bok.BOOKSET_ID = deal.BOOKSET_ID
 		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE ='03'
 		where
-		t.BUSI_TYPE ='03'
+		t.BUSI_TYPE ='03' and t.PS in ('T22','T23') or t.PS is null
 		<if test="tradeId !=null and tradeId !='' ">
 			and t.TRADE_ID like  concat(concat('%',#{tradeId}),'%')
 		</if>
@@ -138,7 +138,7 @@
 		t.PS ps,/**交易类型**/
 		t.TRADE_DATE tradeDate,/**交易日**/
 		null planPayDate,  /**计划支付日**/
-		t.PAY_DATE payDate,  /**实际支付日**/
+		t.TRADE_DATE payDate,  /**实际支付日 =交易日**/
 		t.INT_AMT actInt,  /**实收利息**/
 		t.PRIN_AMT actCapi, /**实收本金**/
 		stl.SETTLE_AMT settleAmt,/**结算金额**/
