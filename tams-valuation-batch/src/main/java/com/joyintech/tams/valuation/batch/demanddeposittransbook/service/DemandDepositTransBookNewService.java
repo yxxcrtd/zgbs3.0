@@ -284,7 +284,9 @@ public class DemandDepositTransBookNewService {
             ad.setAccountSceneMap(accountSceneMap);
             ad.setAccountAmountMap(accountAmountMap);
             ad.setAccountCurrencyMap(accountCurrencyMap);
-
+            // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+            ad.setSubjectMappingConfigDefault(dealInfo.getSubjectMappingConfig());
+            // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
             // 记账凭证生成
             BookGenerateResult result = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
 

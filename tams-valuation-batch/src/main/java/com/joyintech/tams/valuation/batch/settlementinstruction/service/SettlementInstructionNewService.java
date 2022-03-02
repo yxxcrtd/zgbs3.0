@@ -24,6 +24,7 @@ import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.Boo
 import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookCommonLogic;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.AccountDriver;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGenerateResult;
+import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.SubjectMappingConfig;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.TreeNode;
 import com.joyintech.tams.valuation.batch.common.base.entity.extcommon.ValBokBookdetailBatch;
 import com.joyintech.tams.valuation.batch.common.finproduct.service.FinProductCommonService;
@@ -34,9 +35,7 @@ import com.joyintech.tams.valuation.batch.settlementinstruction.dto.TrdProductDe
 import com.joyintech.tams.valuation.batch.vatdraw.service.VatDrawCommonService;
 import com.joyintech.tams.valuation.common.batch.finproduct.entity.TargetFinProduct;
 import com.joyintech.tams.valuation.common.batch.finproduct.entity.TargetSearchDto;
-import com.joyintech.tams.valuation.common.constants.BookConstant;
-import com.joyintech.tams.valuation.common.constants.GlobalConstant;
-import com.joyintech.tams.valuation.common.constants.ValDictCodeList;
+import com.joyintech.tams.valuation.common.constants.*;
 import com.joyintech.tams.valuation.common.interf.base.service.common.InterfCommonService;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -375,6 +374,11 @@ public class SettlementInstructionNewService {
             }
             /**针对【2903】业务场景特殊处理 by yanya on 20201217 end **/
 
+            // add by weipeng on 20220302：增加辅助核算项配置 start
+            // 定义 变量.辅助核算项Map，用于会计分录对应辅助核算项
+            Map<String, SubjectMappingConfig> configMap = new HashMap<>();
+            // 定义 变量.辅助核算项
+            SubjectMappingConfig config = new SubjectMappingConfig();
             // add by weipeng on 20220221 区分资金账户金额元素 start
             // 定义 变量.本方资金账户类型
             String myAcctType= valBokDetailIdForMy.getBusiDetailType();
@@ -385,30 +389,54 @@ public class SettlementInstructionNewService {
                     || DictCodeListExt1.资金账户类型_产品托管户.getValue().equals(counterAcctType)){
                 accountAmountMap.put(BookConstant.DEALAMT_HQ, 资金账户金额);
                 accountCurrencyMap.put(BookConstant.DEALAMT_HQ, 资金账户币种);
+                // 增加辅助核算项配置
+                config = new SubjectMappingConfig();
+                config.setAccountType(DictCodeListExt1.资金账户类型_产品托管户.getValue());
+                configMap.put(DictCodeBaseSubjectNatrueNew.活期存款_本金.getValue(), config);
             }
             if(DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(myAcctType)
                     || DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(counterAcctType)){
                 accountAmountMap.put(BookConstant.DEALAMT_JS, 资金账户金额);
                 accountCurrencyMap.put(BookConstant.DEALAMT_JS, 资金账户币种);
+                // 增加辅助核算项配置
+                config = new SubjectMappingConfig();
+                config.setAccountType(DictCodeListExt1.资金账户类型_结算备付金账户.getValue());
+                configMap.put(DictCodeBaseSubjectNatrueNew.结算备付金_本金.getValue(), config);
             }
             // 券商资金账户现划分在结算备付金科目性质下
             if(DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(myAcctType)
                     || DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(counterAcctType)){
                 accountAmountMap.put(BookConstant.DEALAMT_JS, 资金账户金额);
                 accountCurrencyMap.put(BookConstant.DEALAMT_JS, 资金账户币种);
+                // 增加辅助核算项配置
+                config = new SubjectMappingConfig();
+                config.setAccountType(DictCodeListExt1.资金账户类型_券商资金账户.getValue());
+                configMap.put(DictCodeBaseSubjectNatrueNew.结算备付金_本金.getValue(), config);
             }
             // 券商资金账户现划分在结算备付金科目性质下
             if(DictCodeListExt1.资金账户类型_交易保证金账户.getValue().equals(myAcctType)
                     || DictCodeListExt1.资金账户类型_交易保证金账户.getValue().equals(counterAcctType)){
                 accountAmountMap.put(BookConstant.DEALAMT_CC, 资金账户金额);
                 accountCurrencyMap.put(BookConstant.DEALAMT_CC, 资金账户币种);
+                // 增加辅助核算项配置
+                config = new SubjectMappingConfig();
+                config.setAccountType(DictCodeListExt1.资金账户类型_交易保证金账户.getValue());
+                configMap.put(DictCodeBaseSubjectNatrueNew.存出保证金_本金.getValue(), config);
             }
             // add by weipeng on 20220221 区分资金账户金额元素 end
-            
+            // 增加清算款对应的辅助核算项
+            config = new SubjectMappingConfig();
+            config.setTradeMarket(dto.getTradeMarket());
+            configMap.put(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(), config);
+            // add by weipeng on 20220302：增加辅助核算项配置 end
             // map塞入场景要素管理中
             ad.setAccountSceneMap(accountSceneMap);// 记账场景要素
             ad.setAccountAmountMap(accountAmountMap);// 记账金额要素
             ad.setAccountCurrencyMap(accountCurrencyMap);// 记账金额币种要素
+            // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+            // 增加活期存款对应的辅助核算项
+//            ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+            // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
             // 记账凭证生成
             BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
             // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中

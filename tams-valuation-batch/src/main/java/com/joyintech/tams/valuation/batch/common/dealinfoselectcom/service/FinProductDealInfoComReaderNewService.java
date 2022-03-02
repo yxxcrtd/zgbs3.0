@@ -133,7 +133,10 @@ public class FinProductDealInfoComReaderNewService {
         for (FinProductDealInfoComDTO finDTO : listFinProductDealInfoComDTO) {
             // add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 start
             if(mappingConfigMap != null){
-                finDTO.setSubjectMappingConfig(mappingConfigMap.get(finDTO.getBooksetId().trim() + finDTO.getBokDetailId().trim()));
+                SubjectMappingConfig config = mappingConfigMap.get(finDTO.getBooksetId().trim() + finDTO.getBokDetailId().trim());
+                // 资金账户类型
+                config.setAccountType(finDTO.getAcctType());
+                finDTO.setSubjectMappingConfig(config);
             }
             // add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 end
             // 组装费用明细

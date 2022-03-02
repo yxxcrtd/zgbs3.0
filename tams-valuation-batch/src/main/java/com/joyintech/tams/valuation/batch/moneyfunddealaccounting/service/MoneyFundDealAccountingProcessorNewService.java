@@ -1673,7 +1673,9 @@ public class MoneyFundDealAccountingProcessorNewService {
             ad.setAccountSceneMap(accountSceneMap);// 记账场景要素
             ad.setAccountAmountMap(accountAmountMap);// 记账金额要素
             ad.setAccountCurrencyMap(accountCurrencyMap);// 记账金额币种要素
-
+            // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+            ad.setSubjectMappingConfigDefault(dealDto.getSubjectMappingConfig());
+            // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
             // 记账凭证生成
             BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, batchExecuteInfo);
             // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中

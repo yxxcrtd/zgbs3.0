@@ -317,7 +317,9 @@ public class DemandDepositCalBookNewService {
             ad.setAccountCurrencyMap(accountCurrencyMap);
             ad.setAccountAmountMap(accountAmountMap);
             ad.setAccountSceneMap(accountSceneMap);
-
+            // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+            ad.setSubjectMappingConfigDefault(drawBaseInfoSelectComDTO.getSubjectMappingConfig());
+            // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
             // 记账凭证生成
             BookGenerateResult resultNowNow = bookAccountGenLogicNew.genAccount(ad,
                 new SysBatchExecInfo());

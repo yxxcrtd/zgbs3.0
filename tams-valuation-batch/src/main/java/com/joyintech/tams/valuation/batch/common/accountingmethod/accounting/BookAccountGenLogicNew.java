@@ -1667,9 +1667,13 @@ public class BookAccountGenLogicNew {
         params.put(SubjectConfigCode.债券类型.getValue(), mappingConfig.getAssetType());
         params.put(SubjectConfigCode.存款类资产类型.getValue(), mappingConfig.getAssetType());
         params.put(SubjectConfigCode.基金类型.getValue(), mappingConfig.getAssetType());
-        params.put(SubjectConfigCode.交易市场.getValue(), mappingConfig.getTradeMarket());
+        if(DictCodeListExt1.证券品种_基金.getValue().equals(mappingConfig.getSecType())){
+            params.put(SubjectConfigCode.估值交易市场.getValue(), mappingConfig.getTradeMarket());
+        }
+        else{
+            params.put(SubjectConfigCode.交易市场.getValue(), mappingConfig.getTradeMarket());
+        }
 //        params.put(SubjectConfigCode.交易对手.getValue(), mappingConfig.getTradeMarket());
-        params.put(SubjectConfigCode.发行方式.getValue(), mappingConfig.getIssueType());
         params.put(SubjectConfigCode.账户类型.getValue(), mappingConfig.getAccountType());
         params.put(SubjectConfigCode.费用类型.getValue(), mappingConfig.getFeeType());
         params.put(SubjectConfigCode.税类型.getValue(), mappingConfig.getTaxType());

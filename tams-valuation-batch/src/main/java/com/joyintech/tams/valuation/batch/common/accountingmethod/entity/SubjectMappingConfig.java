@@ -71,9 +71,9 @@ public class SubjectMappingConfig {
     private String counterId;
 
     /**
-     * 金融机构简称
+     * 金融机构名称
      */
-    private String financeOrgAbbr;
+    private String financeOrgName;
 
     /**
      * 账户细分类
@@ -303,12 +303,12 @@ public class SubjectMappingConfig {
         this.counterId = counterId;
     }
 
-    public String getFinanceOrgAbbr() {
-        return financeOrgAbbr;
+    public String getFinanceOrgName() {
+        return financeOrgName;
     }
 
-    public void setFinanceOrgAbbr(String financeOrgAbbr) {
-        this.financeOrgAbbr = financeOrgAbbr;
+    public void setFinanceOrgName(String financeOrgName) {
+        this.financeOrgName = financeOrgName;
     }
 
     public String getAcctDetailType() {

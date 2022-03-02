@@ -1692,7 +1692,9 @@ public class DepositeAssetTransBookNewService {
             ad.setAccountSceneMap(accountSceneMap);// 记账场景要素
             ad.setAccountAmountMap(accountAmountMap);// 记账金额要素
             ad.setAccountCurrencyMap(accountCurrencyMap);// 记账金额币种要素
-
+            // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+            ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+            // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
             // 记账凭证生成
             BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
             returnResult.getValBokBookdetailBatch().addAll(

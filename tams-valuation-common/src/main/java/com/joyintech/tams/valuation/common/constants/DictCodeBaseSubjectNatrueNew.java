@@ -1039,6 +1039,30 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
             "HQCK_YJLX"
     ),
     /**
+     * 结算备付金_本金（现金）
+     */
+    结算备付金_本金(
+            "JSBFJ_BJ"
+    ),
+    /**
+     * 结算备付金_应计利息
+     */
+    结算备付金_应计利息(
+            "JSBFJ_YJLX"
+    ),
+    /**
+     * 存出保证金_本金（现金）
+     */
+    存出保证金_本金(
+            "CCBZJ_BJ"
+    ),
+    /**
+     * 存出保证金_应计利息
+     */
+    存出保证金_应计利息(
+            "CCBZJ_YJLX"
+    ),
+    /**
      * 定期存款_本金（成本）
      */
     定期存款_本金(

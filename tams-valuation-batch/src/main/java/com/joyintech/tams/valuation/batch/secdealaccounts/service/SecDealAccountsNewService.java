@@ -550,7 +550,9 @@ public class SecDealAccountsNewService {
         ad.setAccountAmountMap(accountAmountMap);
         // 记账金额币种要素
         ad.setAccountCurrencyMap(accountCurrencyMap);
-
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -668,7 +670,9 @@ public class SecDealAccountsNewService {
         ad.setAccountAmountMap(accountAmountMap);
         // 记账金额币种要素
         ad.setAccountCurrencyMap(accountCurrencyMap);
-
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -898,6 +902,9 @@ public class SecDealAccountsNewService {
         accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(),
             accountNatrueBranchMap);
         ad.setAccountNatrueMap(accountNatrueMap);
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -1286,6 +1293,9 @@ public class SecDealAccountsNewService {
         accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.应收利息_证券.getValue(),
             accountNatrueBranchMap);
         ad.setAccountNatrueMap(accountNatrueMap);
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -1707,7 +1717,9 @@ public class SecDealAccountsNewService {
         ad.setAccountAmountMap(accountAmountMap);
         // 记账金额币种要素
         ad.setAccountCurrencyMap(accountCurrencyMap);
-
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -1969,7 +1981,9 @@ public class SecDealAccountsNewService {
         ad.setAccountAmountMap(accountAmountMap);
         // 记账金额币种要素
         ad.setAccountCurrencyMap(accountCurrencyMap);
-
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -2224,7 +2238,9 @@ public class SecDealAccountsNewService {
         ad.setAccountAmountMap(accountAmountMap);
         // 记账金额币种要素
         ad.setAccountCurrencyMap(accountCurrencyMap);
-
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -2808,8 +2824,10 @@ public class SecDealAccountsNewService {
         ad.setAccountAmountMap(accountAmountMap);
         // 记账金额币种要素
         ad.setAccountCurrencyMap(accountCurrencyMap);
-        
-       
+
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -2977,7 +2995,9 @@ public class SecDealAccountsNewService {
         ad.setAccountAmountMap(accountAmountMap);
         // 记账金额币种要素
         ad.setAccountCurrencyMap(accountCurrencyMap);
-
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -3253,7 +3273,9 @@ public class SecDealAccountsNewService {
         ad.setAccountAmountMap(accountAmountMap);
         // 记账金额币种要素
         ad.setAccountCurrencyMap(accountCurrencyMap);
-
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -3549,7 +3571,9 @@ public class SecDealAccountsNewService {
         ad.setAccountAmountMap(accountAmountMap);
         // 记账金额币种要素
         ad.setAccountCurrencyMap(accountCurrencyMap);
-
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -3910,7 +3934,9 @@ public class SecDealAccountsNewService {
         ad.setAccountAmountMap(accountAmountMap);
         // 记账金额币种要素
         ad.setAccountCurrencyMap(accountCurrencyMap);
-
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -4351,7 +4377,9 @@ public class SecDealAccountsNewService {
         ad.setAccountAmountMap(accountAmountMap);
         // 记账金额币种要素
         ad.setAccountCurrencyMap(accountCurrencyMap);
-
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -4482,7 +4510,9 @@ public class SecDealAccountsNewService {
         ad.setAccountAmountMap(accountAmountMap);
         // 记账金额币种要素
         ad.setAccountCurrencyMap(accountCurrencyMap);
-
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -4754,7 +4784,9 @@ public class SecDealAccountsNewService {
         ad.setAccountAmountMap(accountAmountMap);
         // 记账金额币种要素
         ad.setAccountCurrencyMap(accountCurrencyMap);
-
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -5048,7 +5080,9 @@ public class SecDealAccountsNewService {
         ad.setAccountAmountMap(accountAmountMap);
         // 记账金额币种要素
         ad.setAccountCurrencyMap(accountCurrencyMap);
-
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -5446,7 +5480,9 @@ public class SecDealAccountsNewService {
         ad.setAccountAmountMap(accountAmountMap);
         // 记账金额币种要素
         ad.setAccountCurrencyMap(accountCurrencyMap);
-
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -5974,7 +6010,9 @@ public class SecDealAccountsNewService {
         ad.setAccountAmountMap(accountAmountMap);
         // 记账金额币种要素
         ad.setAccountCurrencyMap(accountCurrencyMap);
-
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -6331,7 +6369,9 @@ public class SecDealAccountsNewService {
         ad.setAccountAmountMap(accountAmountMap);
         // 记账金额币种要素
         ad.setAccountCurrencyMap(accountCurrencyMap);
-
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -6777,7 +6817,9 @@ public class SecDealAccountsNewService {
         ad.setAccountAmountMap(accountAmountMap);
         // 记账金额币种要素
         ad.setAccountCurrencyMap(accountCurrencyMap);
-
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -7134,6 +7176,9 @@ public class SecDealAccountsNewService {
         //accountNatrueMap.put(基础科目性质.其他应收款_利息, accountNatrueBranchMap);
         accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.应收利息_证券.getValue(), accountNatrueBranchMap);
         ad.setAccountNatrueMap(accountNatrueMap);
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -7424,6 +7469,9 @@ public class SecDealAccountsNewService {
         //accountNatrueMap.put(基础科目性质.其他应收款_利息, accountNatrueBranchMap);
         accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.应收利息_证券.getValue(), accountNatrueBranchMap);
         ad.setAccountNatrueMap(accountNatrueMap);
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -7667,7 +7715,9 @@ public class SecDealAccountsNewService {
         ad.setAccountAmountMap(accountAmountMap);
         // 记账金额币种要素
         ad.setAccountCurrencyMap(accountCurrencyMap);
-
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -7885,7 +7935,9 @@ public class SecDealAccountsNewService {
         ad.setAccountAmountMap(accountAmountMap);
         // 记账金额币种要素
         ad.setAccountCurrencyMap(accountCurrencyMap);
-
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -8077,6 +8129,9 @@ public class SecDealAccountsNewService {
         ad.setAccountAmountMap(accountAmountMap);
         // 记账金额币种要素
         ad.setAccountCurrencyMap(accountCurrencyMap);
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
@@ -8433,7 +8488,9 @@ public class SecDealAccountsNewService {
         ad.setAccountAmountMap(accountAmountMap);
         // 记账金额币种要素
         ad.setAccountCurrencyMap(accountCurrencyMap);
-
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+        ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
+        // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
