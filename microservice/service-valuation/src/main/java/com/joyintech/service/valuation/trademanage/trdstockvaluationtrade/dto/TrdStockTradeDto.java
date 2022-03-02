@@ -7,6 +7,7 @@ import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 public class TrdStockTradeDto extends BaseEntity implements ProcessEntity {
@@ -139,6 +140,138 @@ public class TrdStockTradeDto extends BaseEntity implements ProcessEntity {
      * 资金账户
      */
     private String myAcctNo;
+
+    /**
+     * 成交日期
+     */
+    private Date dealDate;
+
+    /**
+     * 资金交收日期
+     */
+    private Date fundSettleDate;
+
+    /**
+     * 经手费
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal brokerage;
+
+    /**
+     * 证管费
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal certfFee;
+
+    /**
+     * 过户费
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal ghfAmt;
+
+    /**
+     * 结算费
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal stlAmt;
+
+    /**
+     * 汇率日期
+     */
+    private Date exchangeDate;
+
+    /**
+     * 配售代码
+     */
+    private String saleCode;
+
+    /**
+     * 结算日期
+     */
+    private Date settleDate_pg;
+
+    /**
+     * 资金交收日期
+     */
+    private Date fundSettleDate_pg;
+
+    /**
+     * 成交数量
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal dealNum_pg;
+
+    /**
+     * 成交价格
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal tradedPrice;
+
+    /**
+     * 缴款金额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal paymentAmt_pg;
+
+    /**
+     * 资金账户
+     */
+    private String myAcctNo_pg;
+
+    /**
+     * 申购日期
+     */
+    private Date purchDate;
+
+    /**
+     * 结算日期
+     */
+    private Date settleDate_sg;
+
+    /**
+     * 申购金额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal entrustAmt;
+
+    /**
+     * 资金账户
+     */
+    private String myAcctNo_sg;
+
+    /**
+     * 确认日期
+     */
+    private Date confirmDate;
+
+    /**
+     * 中签数量
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal confirmNum;
+
+    /**
+     * 中签价格
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal confirmPrice;
+
+    /**
+     * 中签金额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal confirmAmt;
+
+    /**
+     * 资金账户
+     */
+    private String myAcctNo_qr;
+
+    /**
+     * 缴款金额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal paymentAmt;
 
     public String getProdId() {
         return prodId;
@@ -338,5 +471,197 @@ public class TrdStockTradeDto extends BaseEntity implements ProcessEntity {
 
     public void setIsLock(String isLock) {
         this.isLock = isLock;
+    }
+
+    public Date getDealDate() {
+        return dealDate;
+    }
+
+    public void setDealDate(Date dealDate) {
+        this.dealDate = dealDate;
+    }
+
+    public Date getFundSettleDate() {
+        return fundSettleDate;
+    }
+
+    public void setFundSettleDate(Date fundSettleDate) {
+        this.fundSettleDate = fundSettleDate;
+    }
+
+    public BigDecimal getBrokerage() {
+        return brokerage;
+    }
+
+    public void setBrokerage(BigDecimal brokerage) {
+        this.brokerage = brokerage;
+    }
+
+    public BigDecimal getCertfFee() {
+        return certfFee;
+    }
+
+    public void setCertfFee(BigDecimal certfFee) {
+        this.certfFee = certfFee;
+    }
+
+    public BigDecimal getGhfAmt() {
+        return ghfAmt;
+    }
+
+    public void setGhfAmt(BigDecimal ghfAmt) {
+        this.ghfAmt = ghfAmt;
+    }
+
+    public BigDecimal getStlAmt() {
+        return stlAmt;
+    }
+
+    public void setStlAmt(BigDecimal stlAmt) {
+        this.stlAmt = stlAmt;
+    }
+
+    public Date getExchangeDate() {
+        return exchangeDate;
+    }
+
+    public void setExchangeDate(Date exchangeDate) {
+        this.exchangeDate = exchangeDate;
+    }
+
+    public String getSaleCode() {
+        return saleCode;
+    }
+
+    public void setSaleCode(String saleCode) {
+        this.saleCode = saleCode;
+    }
+
+    public Date getSettleDate_pg() {
+        return settleDate_pg;
+    }
+
+    public void setSettleDate_pg(Date settleDate_pg) {
+        this.settleDate_pg = settleDate_pg;
+    }
+
+    public Date getFundSettleDate_pg() {
+        return fundSettleDate_pg;
+    }
+
+    public void setFundSettleDate_pg(Date fundSettleDate_pg) {
+        this.fundSettleDate_pg = fundSettleDate_pg;
+    }
+
+    public BigDecimal getDealNum_pg() {
+        return dealNum_pg;
+    }
+
+    public void setDealNum_pg(BigDecimal dealNum_pg) {
+        this.dealNum_pg = dealNum_pg;
+    }
+
+    public BigDecimal getTradedPrice() {
+        return tradedPrice;
+    }
+
+    public void setTradedPrice(BigDecimal tradedPrice) {
+        this.tradedPrice = tradedPrice;
+    }
+
+    public BigDecimal getPaymentAmt_pg() {
+        return paymentAmt_pg;
+    }
+
+    public void setPaymentAmt_pg(BigDecimal paymentAmt_pg) {
+        this.paymentAmt_pg = paymentAmt_pg;
+    }
+
+    public String getMyAcctNo_pg() {
+        return myAcctNo_pg;
+    }
+
+    public void setMyAcctNo_pg(String myAcctNo_pg) {
+        this.myAcctNo_pg = myAcctNo_pg;
+    }
+
+    public Date getPurchDate() {
+        return purchDate;
+    }
+
+    public void setPurchDate(Date purchDate) {
+        this.purchDate = purchDate;
+    }
+
+    public Date getSettleDate_sg() {
+        return settleDate_sg;
+    }
+
+    public void setSettleDate_sg(Date settleDate_sg) {
+        this.settleDate_sg = settleDate_sg;
+    }
+
+    public BigDecimal getEntrustAmt() {
+        return entrustAmt;
+    }
+
+    public void setEntrustAmt(BigDecimal entrustAmt) {
+        this.entrustAmt = entrustAmt;
+    }
+
+    public String getMyAcctNo_sg() {
+        return myAcctNo_sg;
+    }
+
+    public void setMyAcctNo_sg(String myAcctNo_sg) {
+        this.myAcctNo_sg = myAcctNo_sg;
+    }
+
+    public Date getConfirmDate() {
+        return confirmDate;
+    }
+
+    public void setConfirmDate(Date confirmDate) {
+        this.confirmDate = confirmDate;
+    }
+
+    public BigDecimal getConfirmNum() {
+        return confirmNum;
+    }
+
+    public void setConfirmNum(BigDecimal confirmNum) {
+        this.confirmNum = confirmNum;
+    }
+
+    public BigDecimal getConfirmPrice() {
+        return confirmPrice;
+    }
+
+    public void setConfirmPrice(BigDecimal confirmPrice) {
+        this.confirmPrice = confirmPrice;
+    }
+
+    public BigDecimal getConfirmAmt() {
+        return confirmAmt;
+    }
+
+    public void setConfirmAmt(BigDecimal confirmAmt) {
+        this.confirmAmt = confirmAmt;
+    }
+
+    public String getMyAcctNo_qr() {
+        return myAcctNo_qr;
+    }
+
+    public void setMyAcctNo_qr(String myAcctNo_qr) {
+        this.myAcctNo_qr = myAcctNo_qr;
+    }
+
+    public BigDecimal getPaymentAmt() {
+        return paymentAmt;
+    }
+
+    public void setPaymentAmt(BigDecimal paymentAmt) {
+        this.paymentAmt = paymentAmt;
     }
 }

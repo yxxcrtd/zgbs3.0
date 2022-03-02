@@ -84,24 +84,46 @@
         }
     }
 
-    //结算金额  结算金额=交易价格*交易数量+佣金+印花税+其他费用
+    //结算金额  买入时：结算金额=成交金额+净佣金+印花税+经手费+证管费+过户费+结算费+其他费用
+    //卖出时：结算金额=成交金额-净佣金-印花税-经手费-证管费-过户费-结算费-其他费用
     var settleAmtChange = function(){
         var tradeAmt = $('#tradeAmt').val();
-        var dealNum = $('#dealNum').val();
-        var stampDutyAmt = $('#stampDutyAmt').val();
         var commission = $('#commission').val();
+        var stampDutyAmt = $('#stampDutyAmt').val();
+        var brokerage = $('#brokerage').val();
+        var certfFee = $('#certfFee').val();
+        var ghfAmt = $('#ghfAmt').val();
+        var stlAmt = $('#stlAmt').val();
         var otherAmt = $('#otherAmt').val();
-        if(tradeAmt != null && tradeAmt != ''
-            && dealNum != null && dealNum != ''
-            && stampDutyAmt != null && stampDutyAmt != ''
-            && commission != null && commission != ''
-            && otherAmt != null && otherAmt != ''){
-            var settleAmt1 = JoyinMath.doMul(tradeAmt, dealNum,2,JoyinMath.ROUND_HALF_UP);
-            var settleAmt2 = JoyinMath.doAdd(JoyinMath.doAdd(settleAmt1, commission,2),stampDutyAmt,2);
-            var settleAmt3 = JoyinMath.doAdd(settleAmt2, otherAmt,2);
+        var ps = $('#ps').val();
+        if(tradeAmt != null && tradeAmt != '' && commission != null && commission != ''
+            && stampDutyAmt != null && stampDutyAmt != '' && brokerage != null && brokerage != ''
+            && certfFee != null && certfFee != '' && ghfAmt != null && ghfAmt != ''
+            && stlAmt != null && stlAmt != ''&& otherAmt != null && otherAmt != '' ){
+            if(ps != '' && ps == 'T01'){
+                var settleAmt1 = JoyinMath.doAdd(JoyinMath.doAdd(JoyinMath.doAdd(tradeAmt, commission,2),stampDutyAmt,2),brokerage,2);
+                var settleAmt2 = JoyinMath.doAdd(JoyinMath.doAdd(JoyinMath.doAdd(settleAmt1, certfFee,2),ghfAmt,2),stlAmt,2);
+                var settleAmt3 = JoyinMath.doAdd(settleAmt2, otherAmt,2);
+            }else if(ps != '' && ps == 'T02'){
+                var settleAmt1 = JoyinMath.doMinus(JoyinMath.doMinus(JoyinMath.doMinus(tradeAmt, commission,2),stampDutyAmt,2),brokerage,2);
+                var settleAmt2 = JoyinMath.doMinus(JoyinMath.doMinus(JoyinMath.doMinus(settleAmt1, certfFee,2),ghfAmt,2),stlAmt,2);
+                var settleAmt3 = JoyinMath.doMinus(settleAmt2, otherAmt,2);
+            }
             $('#settleAmt').val(settleAmt3);
         }else{
             $('#settleAmt').val('');
+        }
+    }
+
+    //缴款金额=成交数量*成交价格
+    var paymentAmt_pgChange = function(){
+        var dealNum_pg = $('#dealNum_pg').val();
+        var tradedPrice = $('#tradedPrice').val();
+        if(dealNum_pg != null && dealNum_pg != '' && tradedPrice != null && tradedPrice != ''){
+            var paymentAmt_pg = JoyinMath.doMul(dealNum_pg,tradedPrice,2,JoyinMath.ROUND_HALF_UP);
+            $('#paymentAmt_pg').val(paymentAmt_pg);
+        }else{
+            $('#paymentAmt_pg').val('');
         }
     }
 
@@ -125,25 +147,51 @@
             secIdChange();
         });
 
+        //缴款金额联动
+        //成交数量
+        $('#dealNum_pg').change(function(){
+            paymentAmt_pgChange();
+        });
+        //成交价格
+        $('#tradedPrice').change(function(){
+            paymentAmt_pgChange();
+        });
+
         //结算金额联动事件
         //交易价格
         $('#tradeAmt').change(function(){
-            settleAmtChange();
-        });
-        //交易数量
-        $('#dealNum').change(function(){
-            settleAmtChange();
-        });
-        //印花税
-        $('#stampDutyAmt').change(function(){
             settleAmtChange();
         });
         //佣金
         $('#commission').change(function(){
             settleAmtChange();
         });
+        //印花税
+        $('#stampDutyAmt').change(function(){
+            settleAmtChange();
+        });
+        //经手费
+        $('#brokerage').change(function(){
+            settleAmtChange();
+        });
+        //证管费
+        $('#certfFee').change(function(){
+            settleAmtChange();
+        });
+        //过户费
+        $('#ghfAmt').change(function(){
+            settleAmtChange();
+        });
+        //结算费
+        $('#stlAmt').change(function(){
+            settleAmtChange();
+        });
         //其他费用
         $('#otherAmt').change(function(){
+            settleAmtChange();
+        });
+        //交易方向
+        $('#ps').change(function(){
             settleAmtChange();
         });
 
@@ -151,17 +199,30 @@
         $('#ps').change(function () {
             var ps = $('#ps').val();
             if(ps == 'T01' || ps == 'T02'){
-                $('#settdateDateDiv').show();
-                $('#paymentDateDiv').hide();
-                $('#settleDateDiv').hide();
-            }else if(ps == 'T46' || ps == 'T47' || ps == 'T48'){
-                $('#settdateDateDiv').hide();
-                $('#paymentDateDiv').show();
-                $('#settleDateDiv').show();
+                $('#qsxx').show();
+                $('#pgxx').hide();
+                $('#sgxx').hide();
+                $('#qrxx').hide();
+            }else if(ps == 'T46' || ps == 'T47' ){
+                $('#qsxx').hide();
+                $('#pgxx').show();
+                $('#sgxx').hide();
+                $('#qrxx').hide();
+            }else if(ps == '105'){
+                $('#qsxx').hide();
+                $('#pgxx').hide();
+                $('#sgxx').show();
+                $('#qrxx').hide();
+            }else if(ps == 'T48'){
+                $('#qsxx').hide();
+                $('#pgxx').hide();
+                $('#sgxx').hide();
+                $('#qrxx').show();
             }else{
-                $('#settdateDateDiv').show();
-                $('#paymentDateDiv').show();
-                $('#settleDateDiv').show();
+                $('#qsxx').show();
+                $('#pgxx').show();
+                $('#sgxx').show();
+                $('#qrxx').show();
             }
         });
 

@@ -99,10 +99,10 @@
 
     /*净价 = 净价总额/数量计算 */
     $('#dealNum').change(function () {
-        var cpriceAmt = $('#cpriceAmt').val();
+        var tradeAmt = $('#tradeAmt').val();
         var dealNum = $("#dealNum").val();
-        if (cpriceAmt && dealNum ) {
-            var cprice = JoyinMath.doDiv(cpriceAmt, dealNum, 4, JoyinMath.ROUND_HALF_UP);
+        if (tradeAmt && dealNum ) {
+            var cprice = JoyinMath.doDiv(tradeAmt, dealNum, 4, JoyinMath.ROUND_HALF_UP);
             $("#cprice").val(cprice).trigger("blur");
         }
     });
@@ -110,30 +110,38 @@
     //申购时必填
     $('#ps').change(function () {
         var ps = $('#ps').val();
-        if (ps == "T04"){
-            $('#bondAmt').attr("required", true).trigger('change');
+        if(ps == "T04"){
+            $('#purchInfo').show();
+            $('#confirmInfo').hide();
+        }else if(ps == "T05"){
+            $('#purchInfo').hide();
+            $('#confirmInfo').show();
+        }else if(ps == "T01" || ps == "T02" || ps == "T03" || ps == "T39"){
+            $('#purchInfo').hide();
+            $('#confirmInfo').hide();
         }else{
-            $('#bondAmt').attr("required", false).trigger('change');
+            $('#purchInfo').show();
+            $('#confirmInfo').show();
         }
     });
 
     //结算金额  结算金额=全价总额+经手费+结算费+佣金+交易手续费+结算服务费+其他费用+保证金
     var settleAmtChange = function(){
-        var fpriceAmt = $('#fpriceAmt').val();
+        var tradeAmt = $('#tradeAmt').val();
         var brokerage = $('#brokerage').val();
         var stlAmt = $('#stlAmt').val();
         var commission = $('#commission').val();
         var dealFeeAmt = $('#dealFeeAmt').val();
         var stlFeeAmt = $('#stlFeeAmt').val();
         var otherAmt = $('#otherAmt').val();
-        if(fpriceAmt != null && fpriceAmt != ''
+        if(tradeAmt != null && tradeAmt != ''
             && brokerage != null && brokerage != ''
             && stlAmt != null && stlAmt != ''
             && commission != null && commission != ''
             && dealFeeAmt != null && dealFeeAmt != ''
             && stlFeeAmt != null && stlFeeAmt != ''
             && otherAmt != null && otherAmt != ''){
-            var settleAmt1 = JoyinMath.doAdd(JoyinMath.doAdd(fpriceAmt, brokerage,2),stlAmt,2);
+            var settleAmt1 = JoyinMath.doAdd(JoyinMath.doAdd(tradeAmt, brokerage,2),stlAmt,2);
             var settleAmt2 = JoyinMath.doAdd(JoyinMath.doAdd(settleAmt1, commission,2),dealFeeAmt,2);
             var settleAmt3 = JoyinMath.doAdd(JoyinMath.doAdd(settleAmt2, stlFeeAmt,2),otherAmt,2);
             $('#settleAmt').val(settleAmt3);
@@ -165,15 +173,15 @@
         });
 
         /*全价总额变动计算净价总额*/
-        $('#fpriceAmt').change(function () {
-            var fpriceAmt = $('#fpriceAmt').val();
+        $('#tradeAmt').change(function () {
+            var tradeAmt = $('#tradeAmt').val();
             var intAmt = $("#intAmt").val();
             if (!intAmt) {
                 $("#intAmt").val('0.00')
                 intAmt = 0;
             }
 
-            var cpriceAmt = JoyinMath.doMinus(fpriceAmt, intAmt, 4, JoyinMath.ROUND_HALF_UP);
+            var cpriceAmt = JoyinMath.doMinus(tradeAmt, intAmt, 4, JoyinMath.ROUND_HALF_UP);
             // if (cpriceAmt < 0) {
             //     $("#cpriceAmt").val(tradeAmt).trigger("blur");
             //     $("#intAmt").val(0).trigger("blur");
@@ -191,14 +199,14 @@
 
         /*应收利息总额变动计算净价总额*/
         $('#intAmt').change(function () {
-            var fpriceAmt = $('#fpriceAmt').val();
+            var tradeAmt = $('#tradeAmt').val();
             var intAmt = $("#intAmt").val();
-            if (!fpriceAmt) {
-                $("#fpriceAmt").val('0.00')
-                fpriceAmt = 0;
+            if (!tradeAmt) {
+                $("#tradeAmt").val('0.00')
+                tradeAmt = 0;
             }
 
-            var cpriceAmt = JoyinMath.doMinus(fpriceAmt, intAmt, 4, JoyinMath.ROUND_HALF_UP);
+            var cpriceAmt = JoyinMath.doMinus(tradeAmt, intAmt, 4, JoyinMath.ROUND_HALF_UP);
             $("#cpriceAmt").val(cpriceAmt).trigger("blur");
 
             var dealNum = $("#dealNum").val();

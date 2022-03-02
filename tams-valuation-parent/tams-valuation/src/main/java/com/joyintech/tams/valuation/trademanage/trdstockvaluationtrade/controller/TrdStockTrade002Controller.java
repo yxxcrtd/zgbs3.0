@@ -22,6 +22,7 @@ import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
+import com.joyintech.tams.valuation.common.service.BaseCommonService;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.trdstockvaluationtrade.dto.TrdStockTradeDto;
 import com.joyintech.tams.valuation.trademanage.trdstockvaluationtrade.service.TrdStockTrade002Service;
@@ -61,6 +62,9 @@ public class TrdStockTrade002Controller extends BaseController {
 
     @Autowired
     private CommonBusinessService commonBusinessService;
+
+    @Autowired
+    private BaseCommonService baseCommonService;
     
     @Override
     public String init(Model model) {
@@ -69,21 +73,19 @@ public class TrdStockTrade002Controller extends BaseController {
         // 工作流ID
         String workflowId = this.getParam(GlobalConstant.WORKFLOW_ID);
 
-        String operateType = getParam("operateType");
-
         String tradeId = getParam("tradeId");
+
+        //平台日
+        model.addAttribute("iPlatformDate", DateUtil.parse(DateUtil.getSysDate()));
 
         if(StringUtil.isNotEmpty(workflowId)){
             TrdStockTradeDto entity= trdStockTrade002Service.getBussinessEntityByWorkflowId(workflowId);
             model.addAttribute("entity", entity);
             model.addAttribute("workflowId", workflowId);
-
         }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){
             TrdStockTradeDto entity = trdStockTrade002Service.queryTradeInfoByTradeId(tradeId);
             model.addAttribute("entity", entity);
         }
-
-
         return super.init(model);
     }
 

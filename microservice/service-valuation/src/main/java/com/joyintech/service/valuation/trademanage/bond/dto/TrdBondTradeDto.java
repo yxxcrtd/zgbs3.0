@@ -237,17 +237,82 @@ public class TrdBondTradeDto extends BaseEntity implements ProcessEntity {
     /**
      * 本币交易金额
      */
-    private BigDecimal bTradeAmt;
-
-    /**
-     * 本币交易金额
-     */
     private BigDecimal settleAmt;
 
     /**
      * 资金账户
      */
     private String myAcctNo;
+
+    /**
+     * 交易日
+     */
+    private Date exchangeDate;
+
+    /**
+     * 申购日期
+     */
+    private Date purchDate;
+
+    /**
+     * 结算日期
+     */
+    private Date settleDate;
+
+    /**
+     * 结算金额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal entrustAmt;
+
+    /**
+     * 资金账户
+     */
+    private String myAcctNo_sq;
+
+    /**
+     * 确认日期
+     */
+    private Date confirmDate;
+
+    /**
+     * 中签数量
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal confirmNum;
+
+    /**
+     * 中签金额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal confirmAmt;
+
+    /**
+     * 补款到账日期
+     */
+    private Date receiptArriveDate;
+
+    /**
+     * 补款金额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal receiptAmt;
+
+    /**
+     * 返款到账日期
+     */
+    private Date refundArriveDate;
+
+    /**
+     * 返款金额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal refundAmt;
+
+    /**
+     * 资金账户
+     */
+    private String myAcctNo_qr;
 
     public String getProdId() {
         return prodId;
@@ -529,14 +594,6 @@ public class TrdBondTradeDto extends BaseEntity implements ProcessEntity {
         this.rate = rate;
     }
 
-    public BigDecimal getbTradeAmt() {
-        return bTradeAmt;
-    }
-
-    public void setbTradeAmt(BigDecimal bTradeAmt) {
-        this.bTradeAmt = bTradeAmt;
-    }
-
     public String getMyAcctNo() {
         return myAcctNo;
     }
@@ -599,5 +656,109 @@ public class TrdBondTradeDto extends BaseEntity implements ProcessEntity {
 
     public void setSettleAmt(BigDecimal settleAmt) {
         this.settleAmt = settleAmt;
+    }
+
+    public Date getExchangeDate() {
+        return exchangeDate;
+    }
+
+    public void setExchangeDate(Date exchangeDate) {
+        this.exchangeDate = exchangeDate;
+    }
+
+    public Date getPurchDate() {
+        return purchDate;
+    }
+
+    public void setPurchDate(Date purchDate) {
+        this.purchDate = purchDate;
+    }
+
+    public Date getSettleDate() {
+        return settleDate;
+    }
+
+    public void setSettleDate(Date settleDate) {
+        this.settleDate = settleDate;
+    }
+
+    public BigDecimal getEntrustAmt() {
+        return entrustAmt;
+    }
+
+    public void setEntrustAmt(BigDecimal entrustAmt) {
+        this.entrustAmt = entrustAmt;
+    }
+
+    public String getMyAcctNo_sq() {
+        return myAcctNo_sq;
+    }
+
+    public void setMyAcctNo_sq(String myAcctNo_sq) {
+        this.myAcctNo_sq = myAcctNo_sq;
+    }
+
+    public Date getConfirmDate() {
+        return confirmDate;
+    }
+
+    public void setConfirmDate(Date confirmDate) {
+        this.confirmDate = confirmDate;
+    }
+
+    public BigDecimal getConfirmNum() {
+        return confirmNum;
+    }
+
+    public void setConfirmNum(BigDecimal confirmNum) {
+        this.confirmNum = confirmNum;
+    }
+
+    public BigDecimal getConfirmAmt() {
+        return confirmAmt;
+    }
+
+    public void setConfirmAmt(BigDecimal confirmAmt) {
+        this.confirmAmt = confirmAmt;
+    }
+
+    public Date getReceiptArriveDate() {
+        return receiptArriveDate;
+    }
+
+    public void setReceiptArriveDate(Date receiptArriveDate) {
+        this.receiptArriveDate = receiptArriveDate;
+    }
+
+    public BigDecimal getReceiptAmt() {
+        return receiptAmt;
+    }
+
+    public void setReceiptAmt(BigDecimal receiptAmt) {
+        this.receiptAmt = receiptAmt;
+    }
+
+    public Date getRefundArriveDate() {
+        return refundArriveDate;
+    }
+
+    public void setRefundArriveDate(Date refundArriveDate) {
+        this.refundArriveDate = refundArriveDate;
+    }
+
+    public BigDecimal getRefundAmt() {
+        return refundAmt;
+    }
+
+    public void setRefundAmt(BigDecimal refundAmt) {
+        this.refundAmt = refundAmt;
+    }
+
+    public String getMyAcctNo_qr() {
+        return myAcctNo_qr;
+    }
+
+    public void setMyAcctNo_qr(String myAcctNo_qr) {
+        this.myAcctNo_qr = myAcctNo_qr;
     }
 }

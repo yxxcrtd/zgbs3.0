@@ -6,6 +6,7 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 import com.joyintech.tams.valuation.common.interf.base.dto.AssetDealInfoValCommonResult;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.sec.SecVestAssetDealTemplateRecService;
@@ -110,6 +111,9 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTradeDto>
         ValSecVestAssetDeal valSecVestAssetDeal = new ValSecVestAssetDeal();
         BeanUtil.copyPropertiesIgnoreNull(valSecVestAssetDeal, trdBondTradeDto);
         valSecVestAssetDeal.setDealDate(trdBondTradeDto.getTradeDate());
+        valSecVestAssetDeal.setInvestAim(trdBondTradeDto.getInvAim());//投资目的
+        valSecVestAssetDeal.setFpriceAmt(trdBondTradeDto.getSettleAmt());
+        valSecVestAssetDeal.setCpriceAmt(trdBondTradeDto.getTradeAmt());
 //        valSecVestAssetDeal.setSettdateDate(trdBondTrade002Dto.getSettdateDate());
 //        valSecVestAssetDeal.setFundSettleDate(trdBondTrade002Dto.getFundSettleDate());
         //比较界面和接口字段差异，并手动给接口字段赋值
@@ -124,7 +128,6 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTradeDto>
         valSecVestAssetDeal.setTrader(null);//交易员
         valSecVestAssetDeal.setFprice(new BigDecimal(0));//全价
         valSecVestAssetDeal.setUnitInt(new BigDecimal(0));//应收利息
-        valSecVestAssetDeal.setInvestAim(trdBondTradeDto.getInvAim());//投资目的
         valSecVestAssetDeal.setIsStampDuty("Y");//印花税是否随交易支付
         valSecVestAssetDeal.setIsBrokerage("Y");//经手费是否随交易支付
         valSecVestAssetDeal.setIsCertfFee("Y");//证管费是否随交易支付
@@ -137,7 +140,14 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTradeDto>
         valSecVestAssetDeal.setIsClean("N");//有无清算指令
         valSecVestAssetDeal.setExeYield(new BigDecimal(0));//行权收益率
         valSecVestAssetDeal.setSharesTradeMarket("02");//流通市场
-        valSecVestAssetDeal.setCounterAcctNo(trdBondTradeDto.getMyAcctNo());
+        if(DictCodeList.交易方向_申购.getValue().equals(trdBondTradeDto.getPs())){
+            valSecVestAssetDeal.setMyAcctNo(trdBondTradeDto.getMyAcctNo_sq());
+        }else if(DictCodeList.交易方向_申购确认.getValue().equals(trdBondTradeDto.getPs())){
+            valSecVestAssetDeal.setMyAcctNo(trdBondTradeDto.getMyAcctNo_qr());
+        }else{
+            valSecVestAssetDeal.setMyAcctNo(trdBondTradeDto.getMyAcctNo());
+        }
+
 
         listValSecVestAssetDeal.add(valSecVestAssetDeal);
 

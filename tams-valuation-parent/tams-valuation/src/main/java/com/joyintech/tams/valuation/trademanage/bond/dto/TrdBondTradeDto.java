@@ -251,11 +251,6 @@ public class TrdBondTradeDto extends BaseEntity implements ProcessEntity {
     private BigDecimal rate;
 
     /**
-     * 本币交易金额
-     */
-    private BigDecimal bTradeAmt;
-
-    /**
      * 结算金额
      */
     private BigDecimal settleAmt;
@@ -264,6 +259,77 @@ public class TrdBondTradeDto extends BaseEntity implements ProcessEntity {
      * 资金账户
      */
     private String myAcctNo;
+
+    /**
+     * 交易日
+     */
+    private Date exchangeDate;
+
+    /**
+     * 申购日期
+     */
+    private Date purchDate;
+
+    /**
+     * 结算日期
+     */
+    private Date settleDate;
+
+    /**
+     * 申购金额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal entrustAmt;
+
+    /**
+     * 资金账户
+     */
+    private String myAcctNo_sq;
+
+    /**
+     * 确认日期
+     */
+    private Date confirmDate;
+
+    /**
+     * 中签数量
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal confirmNum;
+
+    /**
+     * 中签金额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal confirmAmt;
+
+    /**
+     * 补款到账日期
+     */
+    private Date receiptArriveDate;
+
+    /**
+     * 补款金额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal receiptAmt;
+
+    /**
+     * 返款到账日期
+     */
+    private Date refundArriveDate;
+
+    /**
+     * 返款金额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal refundAmt;
+
+    /**
+     * 资金账户
+     */
+    private String myAcctNo_qr;
+
 
     @NotEmpty(fieldName = "TrdBondTrade.prodId", groups = { ValidateGroupEdit.class })
     public String getProdId() {
@@ -400,7 +466,6 @@ public class TrdBondTradeDto extends BaseEntity implements ProcessEntity {
         this.dealNum = dealNum;
     }
 
-    @NotEmpty(fieldName = "TrdBondTrade.fpriceAmt" , groups = { ValidateGroupEdit.class })
     public BigDecimal getFpriceAmt() {
         return fpriceAmt;
     }
@@ -418,7 +483,6 @@ public class TrdBondTradeDto extends BaseEntity implements ProcessEntity {
         this.intAmt = intAmt;
     }
 
-    @NotEmpty(fieldName = "TrdBondTrade.cpriceAmt" , groups = { ValidateGroupEdit.class })
     public BigDecimal getCpriceAmt() {
         return cpriceAmt;
     }
@@ -563,6 +627,7 @@ public class TrdBondTradeDto extends BaseEntity implements ProcessEntity {
         this.bondAmt = bondAmt;
     }
 
+    @NotEmpty(fieldName = "TrdBondTrade.tradeAmt" , groups = { ValidateGroupEdit.class })
     public BigDecimal getTradeAmt() {
         return tradeAmt;
     }
@@ -577,15 +642,6 @@ public class TrdBondTradeDto extends BaseEntity implements ProcessEntity {
 
     public void setRate(BigDecimal rate) {
         this.rate = rate;
-    }
-
-    @NotEmpty(fieldName = "TrdBondTrade.bTradeAmt" , groups = { ValidateGroupEdit.class })
-    public BigDecimal getbTradeAmt() {
-        return bTradeAmt;
-    }
-
-    public void setbTradeAmt(BigDecimal bTradeAmt) {
-        this.bTradeAmt = bTradeAmt;
     }
 
     @NotEmpty(fieldName = "TrdBondTrade.myAcctNo" , groups = { ValidateGroupEdit.class })
@@ -637,7 +693,6 @@ public class TrdBondTradeDto extends BaseEntity implements ProcessEntity {
         this.outTradeId = outTradeId;
     }
 
-    @NotEmpty(fieldName = "TrdBondTrade.prodName", groups = { ValidateGroupEdit.class })
     public String getProdName() {
         return prodName;
     }
@@ -653,6 +708,111 @@ public class TrdBondTradeDto extends BaseEntity implements ProcessEntity {
 
     public void setSettleAmt(BigDecimal settleAmt) {
         this.settleAmt = settleAmt;
+    }
+
+    @NotEmpty(fieldName = "TrdBondTrade.exchangeDate" , groups = { ValidateGroupEdit.class })
+    public Date getExchangeDate() {
+        return exchangeDate;
+    }
+
+    public void setExchangeDate(Date exchangeDate) {
+        this.exchangeDate = exchangeDate;
+    }
+
+    public Date getPurchDate() {
+        return purchDate;
+    }
+
+    public void setPurchDate(Date purchDate) {
+        this.purchDate = purchDate;
+    }
+
+    public Date getSettleDate() {
+        return settleDate;
+    }
+
+    public void setSettleDate(Date settleDate) {
+        this.settleDate = settleDate;
+    }
+
+    public BigDecimal getEntrustAmt() {
+        return entrustAmt;
+    }
+
+    public void setEntrustAmt(BigDecimal entrustAmt) {
+        this.entrustAmt = entrustAmt;
+    }
+
+    public String getMyAcctNo_sq() {
+        return myAcctNo_sq;
+    }
+
+    public void setMyAcctNo_sq(String myAcctNo_sq) {
+        this.myAcctNo_sq = myAcctNo_sq;
+    }
+
+    public Date getConfirmDate() {
+        return confirmDate;
+    }
+
+    public void setConfirmDate(Date confirmDate) {
+        this.confirmDate = confirmDate;
+    }
+
+    public BigDecimal getConfirmNum() {
+        return confirmNum;
+    }
+
+    public void setConfirmNum(BigDecimal confirmNum) {
+        this.confirmNum = confirmNum;
+    }
+
+    public BigDecimal getConfirmAmt() {
+        return confirmAmt;
+    }
+
+    public void setConfirmAmt(BigDecimal confirmAmt) {
+        this.confirmAmt = confirmAmt;
+    }
+
+    public Date getReceiptArriveDate() {
+        return receiptArriveDate;
+    }
+
+    public void setReceiptArriveDate(Date receiptArriveDate) {
+        this.receiptArriveDate = receiptArriveDate;
+    }
+
+    public BigDecimal getReceiptAmt() {
+        return receiptAmt;
+    }
+
+    public void setReceiptAmt(BigDecimal receiptAmt) {
+        this.receiptAmt = receiptAmt;
+    }
+
+    public Date getRefundArriveDate() {
+        return refundArriveDate;
+    }
+
+    public void setRefundArriveDate(Date refundArriveDate) {
+        this.refundArriveDate = refundArriveDate;
+    }
+
+    public BigDecimal getRefundAmt() {
+        return refundAmt;
+    }
+
+    public void setRefundAmt(BigDecimal refundAmt) {
+        this.refundAmt = refundAmt;
+    }
+
+    public String getMyAcctNo_qr() {
+        return myAcctNo_qr;
+    }
+
+    public void setMyAcctNo_qr(String myAcctNo_qr) {
+        this.myAcctNo_qr = myAcctNo_qr;
     }
 
     /**
@@ -711,8 +871,8 @@ public class TrdBondTradeDto extends BaseEntity implements ProcessEntity {
     }
 
 
-    public String getbTradeAmtStr() {
+    public String getTradeAmtStr() {
         DecimalFormat decimalFormat = new DecimalFormat("0.00#");
-        return this.getbTradeAmt()==null?"0.00":decimalFormat.format(this.getbTradeAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
+        return this.getTradeAmt()==null?"0.00":decimalFormat.format(this.getTradeAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
     }
 }
