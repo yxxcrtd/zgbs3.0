@@ -121,7 +121,7 @@ public class TrdFundValuationTrade002Controller extends BaseController {
         Map<String, Object> param = RequestUtil.getPageParam();
         // 查询组合添加权限限制
         //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-        param.put("finprodType", "F01"); //测试
+//        param.put("finprodType", "F01"); //测试
         return commonBusinessService.getProdId(param);
     }
 

@@ -424,7 +424,6 @@ public class TrdFundValuationTradeDto extends WflTrdProductDeal implements Proce
      * {@inheritDoc}
      */
     @Override
-    @NotEmpty(fieldName="TrdFundValuationTrade002.ccy",groups = {ValidateGroupEdit.class})
     public String getCcy(){
         return super.getCcy();
     }
@@ -432,7 +431,6 @@ public class TrdFundValuationTradeDto extends WflTrdProductDeal implements Proce
      * 交易方向
      * {@inheritDoc}
      */
-    @NotEmpty(fieldName="TrdFundValuationTrade002.ps",groups = {ValidateGroupEdit.class})
     public String getPs(){
         return super.getPs();
     }
@@ -455,7 +453,6 @@ public class TrdFundValuationTradeDto extends WflTrdProductDeal implements Proce
      * 获取 portfolioId
      * @return portfolioId.
      */
-    @NotEmpty(fieldName="TrdFundValuationTrade002.portfolioId",groups = {ValidateGroupEdit.class})
     public String getPortfolioId() {
         return portfolioId;
     }
@@ -472,7 +469,6 @@ public class TrdFundValuationTradeDto extends WflTrdProductDeal implements Proce
      * 获取 portfolioName
      * @return portfolioName.
      */
-    @NotEmpty(fieldName="TrdFundValuationTrade002.portfolioName",groups = {ValidateGroupEdit.class})
     public String getPortfolioName() {
         return portfolioName;
     }
@@ -490,7 +486,6 @@ public class TrdFundValuationTradeDto extends WflTrdProductDeal implements Proce
      * 获取 finprodName
      * @return finprodName.
      */
-    @NotEmpty(fieldName="TrdFundValuationTrade002.finprodName",groups = {ValidateGroupEdit.class})
     public String getFinprodName() {
         return finprodName;
     }
@@ -562,7 +557,6 @@ public class TrdFundValuationTradeDto extends WflTrdProductDeal implements Proce
 
     //资产代码
     @Override
-    @NotEmpty(fieldName="TrdFundValuationTrade002.finprodId",groups = {ValidateGroupEdit.class})
     public String getFinprodId() {
         return super.getFinprodId();
     }

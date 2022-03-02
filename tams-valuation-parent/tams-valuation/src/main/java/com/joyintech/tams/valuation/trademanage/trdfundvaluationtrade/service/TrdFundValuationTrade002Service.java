@@ -429,7 +429,7 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
         //相同字段名： 成交编号、交易方向、交易场所、交易日、交易金额、币种
         //实体类字段映射处理
         valFundTrade.setProdId(trdFundValuationTradeDto.getPortfolioId());//产品代码
-        valFundTrade.setAssetId("F06_"+trdFundValuationTradeDto.getFinprodId());//资产代码  F06基金
+        valFundTrade.setAssetId("F01_"+trdFundValuationTradeDto.getFinprodId());//资产代码  F06基金
         valFundTrade.setAssetName(trdFundValuationTradeDto.getFinprodName());//资产名称
         valFundTrade.setBusiType("06");//业务类型
         valFundTrade.setDataActionSign("01");//数据动作标志
@@ -456,7 +456,7 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
         //相同字段名： 成交编号、交易方向、交易场所、币种
         valApplyPurTade.setProdId(trdFundValuationTradeDto.getPortfolioId());//产品代码
         //比较界面和接口字段差异，并手动给接口字段赋值
-        valApplyPurTade.setAssetId("F06_"+trdFundValuationTradeDto.getFinprodId());//资产代码  F06基金
+        valApplyPurTade.setAssetId("F01_"+trdFundValuationTradeDto.getFinprodId());//资产代码  F06基金
         valApplyPurTade.setAssetName(trdFundValuationTradeDto.getFinprodName());//资产名称
         valApplyPurTade.setBusiType("06");//业务类型
         valApplyPurTade.setDataActionSign("01");//数据动作标志
@@ -490,7 +490,7 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
         //相同字段名： 成交编号、交易方向、交易场所、币种
         valAffirmPurTrade.setProdId(trdFundValuationTradeDto.getPortfolioId());//产品代码
         //比较界面和接口字段差异，并手动给接口字段赋值
-        valAffirmPurTrade.setAssetId("F06_"+trdFundValuationTradeDto.getFinprodId());//资产代码  F06基金
+        valAffirmPurTrade.setAssetId("F01_"+trdFundValuationTradeDto.getFinprodId());//资产代码  F06基金
         valAffirmPurTrade.setAssetName(trdFundValuationTradeDto.getFinprodName());//资产名称
         valAffirmPurTrade.setApplyTradeId(trdFundValuationTradeDto.getOutTradeId());//认购申请成交编号
         valAffirmPurTrade.setDataActionSign("01");//数据动作标志
@@ -520,7 +520,7 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
         //相同字段名： 成交编号、交易方向、交易场所、币种
         valFundMnfRedAffirm.setProdId(trdFundValuationTradeDto.getPortfolioId());//产品代码
         //比较界面和接口字段差异，并手动给接口字段赋值
-        valFundMnfRedAffirm.setAssetId("F06_"+trdFundValuationTradeDto.getFinprodId());//资产代码  F06基金
+        valFundMnfRedAffirm.setAssetId("F01_"+trdFundValuationTradeDto.getFinprodId());//资产代码  F06基金
         valFundMnfRedAffirm.setAssetName(trdFundValuationTradeDto.getFinprodName());//资产名称
         valFundMnfRedAffirm.setTradeDate(trdFundValuationTradeDto.getShqrTradeDate());//交易日
         valFundMnfRedAffirm.setPreDate(trdFundValuationTradeDto.getShqrSettleDate());//预计到账日
@@ -544,7 +544,7 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
         //相同字段名： 成交编号、交易方向、交易场所、币种
         valRedAccoutTrade.setProdId(trdFundValuationTradeDto.getPortfolioId());//产品代码
         //比较界面和接口字段差异，并手动给接口字段赋值
-        valRedAccoutTrade.setAssetId("F06_"+trdFundValuationTradeDto.getFinprodId());//资产代码  F06基金
+        valRedAccoutTrade.setAssetId("F01_"+trdFundValuationTradeDto.getFinprodId());//资产代码  F06基金
         valRedAccoutTrade.setTradeDate(trdFundValuationTradeDto.getShqrSettleDate());//交易日
         valRedAccoutTrade.setTradeAmt(trdFundValuationTradeDto.getRedemptionFee());//赎回费
         valRedAccoutTrade.setMyAcctNo(trdFundValuationTradeDto.getShqrTrdAcctId());//资金账户
