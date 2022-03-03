@@ -159,51 +159,52 @@ public class TrdBondChangeTrade002Service extends CommonExportService<TrdBondCha
         List<ValSecVestAssetDeal> listValSecVestAssetDeal = new ArrayList<ValSecVestAssetDeal>();
         ValSecVestAssetDeal entity = new ValSecVestAssetDeal();
         //BeanUtil.copyPropertiesIgnoreNull(entity,dto);
-        entity.setTradeId(dto.getTradeId());
-        entity.setProdId(dto.getProdId());
-        entity.setSecId(dto.getoAssetId());
-        entity.setSecAbbr(dto.getoAssetAbbr());
-        entity.setDealDate(dto.getTradeDate());
-        entity.setSettdateDate(dto.getSettdateDate());
-        entity.setPs(dto.getPs());
-        entity.setDealNum(dto.getoTradeNum());
-        entity.setCcy(dto.getCcy());
-        entity.setInvestAim(dto.getInvAim());
-        entity.setTradeAmt(dto.getoTradeAmt());
-        entity.setSharesCode(dto.getcAssetId());
-        entity.setSharesNum(dto.getcTradeNum());
-        entity.setExpConValue(dto.getcTradeAmt());
+        entity.setTradeId(dto.getTradeId());//交易编号
+        entity.setProdId(dto.getProdId());//产品代码
+        entity.setSecId(dto.getoAssetId());//债券代码
+        entity.setSecAbbr(dto.getoAssetAbbr());//债券简称
+        entity.setDealDate(dto.getTradeDate());//交易日
+        entity.setSettdateDate(dto.getTradeDate());//todo
+        entity.setPs(dto.getPs());//交易方向
+        entity.setDealNum(dto.getoTradeNum());//成交数量
+        entity.setCcy(dto.getCcy());//币种
+        entity.setInvestAim(dto.getInvAim());//投资目的
+        entity.setTradeAmt(dto.getoTradeAmt());//交易金额 todo
+        entity.setSharesCode(dto.getcAssetId());//转入证券代码
+        entity.setSharesNum(dto.getcTradeNum());//转入数量
+        entity.setExpConValue(dto.getcTradeAmt());//转入金额
+        entity.setMyAcctNo(dto.getAcctNo());//资金账户
         //比较界面和接口字段差异，并手动给接口字段赋值
         entity.setAssetId("F01_"+dto.getoAssetId());//资产代码
-        entity.setDataActionSign("01");
-        entity.setTradeMarket("01");
-        entity.setStlForm(null);
-        entity.setParValue(new BigDecimal(0));
-        entity.setFeeAmtUnpay(new BigDecimal(0));
-        entity.setYield(new BigDecimal(0));
-        entity.setCounterId(null);
-        entity.setCounterType(null);
-        entity.setTrader(null);
-        entity.setSecManageAcctId(null);
-        entity.setCprice(new BigDecimal(0));
-        entity.setFprice(new BigDecimal(0));
-        entity.setUnitInt(new BigDecimal(0));
-        entity.setIntAmt(new BigDecimal(0));
-        entity.setCpriceAmt(new BigDecimal(0));
-        entity.setFpriceAmt(new BigDecimal(0));
-        entity.setIsStampDuty("Y");
-        entity.setIsBrokerage("Y");
-        entity.setIsCertfFee("Y");
-        entity.setIsStlAmt("Y");
-        entity.setIsCommission("Y");
-        entity.setIsDealFeeAmt("N");
-        entity.setIsStlFeeAmt("N");
-        entity.setIsChlFeeAmt("Y");
-        entity.setRegistAgency(null);
-        entity.setIsClean("N");
-        entity.setExeYield(new BigDecimal(0));
-        entity.setSharesTradeMarket(null);
-        entity.setSharesType("F10");
+        entity.setDataActionSign("01");//数据动作标志
+        entity.setTradeMarket("01");//交易场所
+        entity.setStlForm(null);//结算方式
+        entity.setParValue(new BigDecimal(0));//单位面值
+        entity.setFeeAmtUnpay(new BigDecimal(0));//未随交易支付费用
+        entity.setYield(new BigDecimal(0));//到期收益率
+        entity.setCounterId(null);//交易对手
+        entity.setCounterType(null);//交易对手类型
+        entity.setTrader(null);//交易员
+        entity.setSecManageAcctId(null);//证券托管户
+        entity.setCprice(new BigDecimal(0));//净价
+        entity.setFprice(new BigDecimal(0));//全价
+        entity.setUnitInt(new BigDecimal(0));//应收利息
+        entity.setIntAmt(new BigDecimal(0));//应收利息总额 todo
+        entity.setCpriceAmt(new BigDecimal(0));//净价总额 todo
+        entity.setFpriceAmt(new BigDecimal(0));//全价总额 todo
+        entity.setIsStampDuty("Y");//印花税是否随交易支付
+        entity.setIsBrokerage("Y");//经手费是否随交易支付
+        entity.setIsCertfFee("Y");//证管费是否随交易支付
+        entity.setIsStlAmt("Y");//结算费是否随交易支付
+        entity.setIsCommission("Y");//佣金是否随交易支付
+        entity.setIsDealFeeAmt("N");//交易手续费是否随交易支付
+        entity.setIsStlFeeAmt("N");//结算手续费是否随交易支付
+        entity.setIsChlFeeAmt("Y");//通道费是否随交易支付
+        entity.setRegistAgency(null);//登记结算机构
+        entity.setIsClean("N");//有无清算指令
+        entity.setExeYield(new BigDecimal(0));//行权收益率
+        entity.setSharesTradeMarket(null);//流通市场
+        entity.setSharesType("F10");//正股类型
 
         listValSecVestAssetDeal.add(entity);
 

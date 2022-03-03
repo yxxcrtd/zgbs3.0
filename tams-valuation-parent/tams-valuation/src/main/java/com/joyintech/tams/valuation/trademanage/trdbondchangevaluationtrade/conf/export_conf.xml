@@ -11,8 +11,8 @@
             <Cell order="7" name="转入证券代码">cAssetId</Cell>
             <Cell order="8" name="转入证券名称">cAssetAbbr</Cell>
             <Cell order="9" name="交易类型">psStr</Cell>
-            <Cell order="10" name="交易日">tradeDateStr</Cell>
-            <Cell order="11" name="交割日">settdateDateStr</Cell>
+            <Cell order="10" name="交易日期">tradeDateStr</Cell>
+            <Cell order="11" name="交割日期">settdateDateStr</Cell>
             <Cell order="12" name="会计分类">invAimStr</Cell>
             <Cell order="13" name="转出数量">oTradeNumStr</Cell>
             <Cell order="15" name="转出金额">oTradeAmtStr</Cell>

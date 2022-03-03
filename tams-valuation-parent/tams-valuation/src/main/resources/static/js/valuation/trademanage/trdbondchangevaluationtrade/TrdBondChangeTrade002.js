@@ -132,7 +132,7 @@
             && (cAssetId == '' || cAssetId == undefined)
             &&(cAssetIdFund == '' || cAssetIdFund == undefined)){
 
-            $('#cAssetAbbr').val($('#cAssetIdFund').select2('data')[0].object).trigger('change');
+            $('#cAssetAbbr').val($('#cAssetIdSec').select2('data')[0].object).trigger('change');
         } else if(cAssetIdFund != '' || cAssetIdFund != undefined
             && (cAssetIdSec == '' || cAssetIdSec == undefined)
             &&(cAssetId == '' || cAssetId == undefined)){
@@ -177,7 +177,6 @@
                 $('#cAssetIdDiv2').hide();
                 $('#cAssetIdDiv3').hide();
             }
-
         }
 
     });

@@ -157,6 +157,29 @@ public class TrdBondChangeTradeDto extends BaseEntity implements ProcessEntity {
      */
     private String acctNo;
 
+    /**
+     * 转入补差款
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal cDifferenceAmt;
+
+    /**
+     * 转出费用
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal feeAmt;
+
+    /**
+     * 结算日期
+     */
+    private Date settleDate;
+
+    /**
+     * 转出补差款
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal oDifferenceAmt;
+
     @NotEmpty(fieldName = "TrdBondChangeTrade.prodId", groups = { ValidateGroupEdit.class })
     public String getProdId() {
         return prodId;
@@ -192,7 +215,6 @@ public class TrdBondChangeTradeDto extends BaseEntity implements ProcessEntity {
         this.tradeDate = tradeDate;
     }
 
-    @NotEmpty(fieldName = "TrdBondChangeTrade.settdateDate", groups = { ValidateGroupEdit.class })
     public Date getSettdateDate() {
         return settdateDate;
     }
@@ -228,7 +250,6 @@ public class TrdBondChangeTradeDto extends BaseEntity implements ProcessEntity {
         this.otherAmt = otherAmt;
     }
 
-    @NotEmpty(fieldName = "TrdBondChangeTrade.tradeAmt", groups = { ValidateGroupEdit.class })
     public BigDecimal getTradeAmt() {
         return tradeAmt;
     }
@@ -294,7 +315,6 @@ public class TrdBondChangeTradeDto extends BaseEntity implements ProcessEntity {
         this.prodName = prodName;
     }
 
-    @NotEmpty(fieldName = "TrdBondChangeTrade.settleAmt", groups = { ValidateGroupEdit.class })
     public BigDecimal getSettleAmt() {
         return settleAmt;
     }
@@ -373,6 +393,41 @@ public class TrdBondChangeTradeDto extends BaseEntity implements ProcessEntity {
 
     public void setcTradeAmt(BigDecimal cTradeAmt) {
         this.cTradeAmt = cTradeAmt;
+    }
+
+    public BigDecimal getcDifferenceAmt() {
+        return cDifferenceAmt;
+    }
+
+    public void setcDifferenceAmt(BigDecimal cDifferenceAmt) {
+        this.cDifferenceAmt = cDifferenceAmt;
+    }
+
+    @NotEmpty(fieldName = "TrdBondChangeTrade.feeAmt", groups = { ValidateGroupEdit.class })
+    public BigDecimal getFeeAmt() {
+        return feeAmt;
+    }
+
+    public void setFeeAmt(BigDecimal feeAmt) {
+        this.feeAmt = feeAmt;
+    }
+
+    @NotEmpty(fieldName = "TrdBondChangeTrade.settleDate", groups = { ValidateGroupEdit.class })
+    public Date getSettleDate() {
+        return settleDate;
+    }
+
+    public void setSettleDate(Date settleDate) {
+        this.settleDate = settleDate;
+    }
+
+    @NotEmpty(fieldName = "TrdBondChangeTrade.oDifferenceAmt", groups = { ValidateGroupEdit.class })
+    public BigDecimal getoDifferenceAmt() {
+        return oDifferenceAmt;
+    }
+
+    public void setoDifferenceAmt(BigDecimal oDifferenceAmt) {
+        this.oDifferenceAmt = oDifferenceAmt;
     }
 
     /**

@@ -113,15 +113,19 @@
         if(ps == "T04"){
             $('#purchInfo').show();
             $('#confirmInfo').hide();
+            $('#settleInfo').hide();
         }else if(ps == "T05"){
             $('#purchInfo').hide();
             $('#confirmInfo').show();
+            $('#settleInfo').hide();
         }else if(ps == "T01" || ps == "T02" || ps == "T03" || ps == "T39"){
             $('#purchInfo').hide();
             $('#confirmInfo').hide();
+            $('#settleInfo').show();
         }else{
             $('#purchInfo').show();
             $('#confirmInfo').show();
+            $('#settleInfo').show();
         }
     });
 
