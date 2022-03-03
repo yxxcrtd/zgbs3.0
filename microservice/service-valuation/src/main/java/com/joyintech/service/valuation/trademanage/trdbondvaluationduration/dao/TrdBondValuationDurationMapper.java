@@ -11,6 +11,7 @@
 package com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dao;
 
 
+import com.joyintech.service.valuation.component.common.dto.FinCashPlanDto;
 import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationDto;
 import org.springframework.stereotype.Repository;
 
@@ -36,4 +37,5 @@ public interface TrdBondValuationDurationMapper {
 
     TrdBondValuationDurationDto queryTradeInfoByTradeId(String tradeId);
 
+    List<FinCashPlanDto> getFinCashPlanByProductId(Map<String, Object> paraMap);
 }

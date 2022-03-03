@@ -15,8 +15,7 @@
             <Cell order="11" name="资金交收日">fundSettleDateStr</Cell>
             <Cell order="12" name="结算金额">settleAmtStr</Cell>
             <Cell order="13" name="币种">ccyFmt</Cell>
-            <Cell order="14" name="本币交易金额">tradeAmtStr</Cell>
-            <Cell order="15" name="资金账户">myAcctNo</Cell>
+            <Cell order="14" name="资金账户">myAcctNo</Cell>
         </Row>
     </Worksheet>
 </Workbook>

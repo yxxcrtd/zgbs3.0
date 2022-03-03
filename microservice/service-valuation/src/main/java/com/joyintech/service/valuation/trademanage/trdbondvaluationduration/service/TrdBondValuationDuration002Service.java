@@ -2,10 +2,12 @@ package com.joyintech.service.valuation.trademanage.trdbondvaluationduration.ser
 
 
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.service.valuation.component.common.dto.FinCashPlanDto;
 import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dao.TrdBondValuationDurationMapper;
 import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationDto;
 import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationResult;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.interf.base.batch.dao.*;
 import com.joyintech.tams.valuation.common.interf.base.service.common.InterfCommonService;
 import org.apache.commons.collections.CollectionUtils;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service(value="serviceTrdBondValuationDuration002Service")
 public class TrdBondValuationDuration002Service extends BaseService {
@@ -102,6 +105,20 @@ public class TrdBondValuationDuration002Service extends BaseService {
     public int querySequences(){
         int i=trdBondValuationDurationMapper.querySequences();
         return i;
+    }
+
+    /**
+     *
+     * 查询债券付息计划
+     *
+     * @return
+     * @see
+     * @since 1.0
+     */
+    public  List<FinCashPlanDto> getFinCashPlanByProductId(Map<String, Object> param){
+        param.put("cashType", DictCodeListExt1.现金流二级类型_利息.getValue());
+        param.put("finprodType", DictCodeListExt1.金融产品类型_债券.getValue());
+        return trdBondValuationDurationMapper.getFinCashPlanByProductId(param);
     }
 
     public int insert(TrdBondValuationDurationResult result){

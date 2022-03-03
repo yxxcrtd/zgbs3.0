@@ -332,7 +332,6 @@ public class TrdBondValuationDurationDto extends BaseEntity implements ProcessEn
         this.isClean2 = isClean2;
     }
 
-    @NotEmpty(fieldName = "TrdBondValuationDuration.tardeAmt", groups = { ValidateGroupEdit.class })
     public BigDecimal getTardeAmt() {
         return tardeAmt;
     }

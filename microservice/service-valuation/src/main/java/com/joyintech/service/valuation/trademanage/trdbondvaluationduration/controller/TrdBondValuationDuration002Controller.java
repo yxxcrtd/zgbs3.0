@@ -12,6 +12,7 @@ package com.joyintech.service.valuation.trademanage.trdbondvaluationduration.con
 
 
 import com.joyintech.framework.annotation.DTXTransaction;
+import com.joyintech.service.valuation.component.common.dto.FinCashPlanDto;
 import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationDto;
 import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationResult;
 import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.service.TrdBondValuationDuration002Service;
@@ -21,6 +22,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * 股票交易微服务
@@ -61,6 +65,19 @@ public class TrdBondValuationDuration002Controller {
     public int querySequences(){
         int  count = trdBondValuationDuration002Service.querySequences();
         return count;
+    }
+
+    /**
+     *
+     * 查询债券付息计划
+     *
+     * @return
+     * @see
+     * @since 1.0
+     */
+    @PostMapping("/getFinCashPlanByProductId")
+    public List<FinCashPlanDto> getFinCashPlanByProductId(@RequestBody Map<String, Object> param){
+        return trdBondValuationDuration002Service.getFinCashPlanByProductId(param);
     }
 
     /**

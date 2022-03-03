@@ -10,6 +10,7 @@ import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 import com.joyintech.tams.valuation.common.interf.base.dto.AssetDealInfoValCommonResult;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.sec.SecVestPeriodTemplateRecService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValSecVestPeriod;
+import com.joyintech.tams.valuation.component.common.dto.FinCashPlanDto;
 import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationDto;
 import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationResult;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -42,6 +43,17 @@ public class TrdBondValuationDuration002Service extends CommonExportService<TrdB
     //自增序列号
     public int querySequences(){
         return restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdBondValuationDuration002/querySequences", null,Integer.class);
+    }
+
+    /**
+     * 查询债券付息计划
+     *
+     * @return 产品代码列表
+     * @see
+     * @since 1.0
+     */
+    public List<FinCashPlanDto> getFinCashPlanByProductId(Map<String,Object> param){
+        return restTemplate.postForList(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdBondValuationDuration002/getFinCashPlanByProductId",param,FinCashPlanDto.class);
     }
 
 
@@ -83,13 +95,21 @@ public class TrdBondValuationDuration002Service extends CommonExportService<TrdB
         }else{
             entity.setIsAmt("N");//是否还本带息 交易方向为还本，应收利息是否为0，不为0，isAmt为Y
         }
-        //todo
-        entity.setVdate(new Date());//计息开始日 根据标的信息查询
+        //查询债券的付息计划
+        Map<String,Object> hashMap = new HashMap<>();
+        hashMap.put("finprodId",entity.getAssetId());
+        List<FinCashPlanDto> list = getFinCashPlanByProductId(hashMap);
+        if(!StringUtil.isEmptyList(list)){
+            entity.setVdate(list.get(0).getVdate());//计息开始日 根据标的信息查询
+        }else{
+            entity.setVdate(DateUtil.parse(DateUtil.getSysDate()));//计息开始日 根据标的信息查询
+        }
         entity.setParValue(new BigDecimal(0));//单位面值
         entity.setSettleDate(dto.getFundSettleDate());//交割日
         entity.setTradeDate(DateUtil.parse(DateUtil.getSysDate()));//交易日 默认系统日期
         entity.setIsClean("N");//有无清算指令
         entity.setDealNum(dto.getActCapi());//成交数量
+        entity.setTardeAmt(dto.getSettleAmt());//交易金额
 
         listValSecVestPeriod.add(entity);
         Map<String, Object> map = secVestPeriodTemplateRecService.handleValSecVestPeriod(listValSecVestPeriod,new Date(),params,null);
