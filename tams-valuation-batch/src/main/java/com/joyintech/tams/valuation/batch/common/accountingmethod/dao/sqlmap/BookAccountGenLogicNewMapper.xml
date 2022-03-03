@@ -32,7 +32,10 @@
             ON A.BUSI_ID = E.FINPROD_ID
         LEFT JOIN MST_CUSTOMER_INFO F  /**存款类资产需要查询存借款机构名称**/
         ON F.CUSTOMER_ID =B.ISSUE_ID
-        WHERE A.BOOKSET_ID = #{booksetId}
+        WHERE 1=1
+        <if test="booksetId != null and booksetId != ''">
+            AND  A.BOOKSET_ID = #{booksetId}
+        </if>
         <if test="listBokDetailId != null and listBokDetailId.size >0">
             AND A.BOK_DETAIL_ID IN
             <foreach collection="listBokDetailId" index="index" item="item" open="(" separator="," close=")">

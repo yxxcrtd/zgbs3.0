@@ -85,8 +85,10 @@
         INNER JOIN BOK_BOOKSET B
         ON A.BOOKSET_ID = B.BOOKSET_ID_TMPL
         WHERE B.BOOKSET_ID = #{booksetId}
-        /** 查询底层科目，且科目配置项不为空**/
-        AND A.IS_BOTTOM = #{isBottom}
+        <if test="isAcc != null and isAcc != ''">
+            /** 查询核算科目，且科目配置项不为空**/
+            AND A.IS_ACC = #{isAcc}
+        </if>
         <if test="listSubjectInternalCode != null and listSubjectInternalCode.size >0">
             AND A.SUBJECT_INTERNAL_CODE IN
             <foreach collection="listSubjectInternalCode" item="item" open="(" close=")" separator=",">
