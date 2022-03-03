@@ -128,7 +128,10 @@ public class DrawBaseInfoSelectComReaderNewService {
 //                }
 //                bokdetailIds.add(item.getBokDetailId());
 //                bokdetailIdMap.put(item.getBooksetId(), bokdetailIds);
-                listBokdetailId.add(item.getBokDetailId());
+                // 去重，判断是否已存在
+                if(!listBokdetailId.contains(item.getBokDetailId())){
+                    listBokdetailId.add(item.getBokDetailId());
+                }
                 // add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 end
             }
         });

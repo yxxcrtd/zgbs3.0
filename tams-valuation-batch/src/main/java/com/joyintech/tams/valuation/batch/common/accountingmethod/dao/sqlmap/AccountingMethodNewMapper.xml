@@ -84,7 +84,10 @@
         FROM BOK_SUBJECT A
         INNER JOIN BOK_BOOKSET B
         ON A.BOOKSET_ID = B.BOOKSET_ID_TMPL
-        WHERE B.BOOKSET_ID = #{booksetId}
+        WHERE 1=1
+        <if test="booksetId != null and booksetId != ''">
+            AND B.BOOKSET_ID = #{booksetId}
+        </if>
         <if test="isAcc != null and isAcc != ''">
             /** 查询核算科目，且科目配置项不为空**/
             AND A.IS_ACC = #{isAcc}

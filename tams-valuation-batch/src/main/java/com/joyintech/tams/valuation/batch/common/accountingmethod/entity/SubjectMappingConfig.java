@@ -96,6 +96,11 @@ public class SubjectMappingConfig {
     private String issuer;
 
     /**
+     * 现金流二级类型
+     */
+    private String cashType2;
+
+    /**
      * 获取 账套代码
      * @return 账套代码
      */
@@ -341,5 +346,13 @@ public class SubjectMappingConfig {
 
     public void setIssuer(String issuer) {
         this.issuer = issuer;
+    }
+
+    public String getCashType2() {
+        return cashType2;
+    }
+
+    public void setCashType2(String cashType2) {
+        this.cashType2 = cashType2;
     }
 }

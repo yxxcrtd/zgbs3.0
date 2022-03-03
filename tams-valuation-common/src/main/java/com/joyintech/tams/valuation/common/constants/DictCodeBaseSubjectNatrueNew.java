@@ -158,18 +158,6 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
         "YFTGF"
     ),
     /**
-     * 应付管理人报酬
-     */
-    应付管理人报酬(
-        "YFGLRBC"
-    ),
-    /**
-     * 应付超额管理费
-     */
-    应付超额管理费(
-        "YFCEGLF"
-    ),
-    /**
      * 应付代销费
      */
     应付代销费(
@@ -1039,30 +1027,6 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
             "HQCK_YJLX"
     ),
     /**
-     * 结算备付金_本金（现金）
-     */
-    结算备付金_本金(
-            "JSBFJ_BJ"
-    ),
-    /**
-     * 结算备付金_应计利息
-     */
-    结算备付金_应计利息(
-            "JSBFJ_YJLX"
-    ),
-    /**
-     * 存出保证金_本金（现金）
-     */
-    存出保证金_本金(
-            "CCBZJ_BJ"
-    ),
-    /**
-     * 存出保证金_应计利息
-     */
-    存出保证金_应计利息(
-            "CCBZJ_YJLX"
-    ),
-    /**
      * 定期存款_本金（成本）
      */
     定期存款_本金(
@@ -1158,6 +1122,18 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
     应收股利(
             "YSGL_Z"
     ),
+    /**
+     * 运营费用
+     */
+    运营费用(
+            "YYFY"
+    ),
+    /**
+     * 应付运营费
+     */
+    应付运营费(
+            "YFYYF Z"
+    ),
     /** ==========原科目性质修改======== end**/
     /** ==========新增科目性质======== start**/
     /**
@@ -1165,6 +1141,30 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
      */
     定期存款_应计利息(
             "DQCK_YJLX"
+    ),
+    /**
+     * 结算备付金_本金（现金）
+     */
+    结算备付金_本金(
+            "JSBFJ_BJ"
+    ),
+    /**
+     * 结算备付金_应计利息
+     */
+    结算备付金_应计利息(
+            "JSBFJ_YJLX"
+    ),
+    /**
+     * 存出保证金_本金（现金）
+     */
+    存出保证金_本金(
+            "CCBZJ_BJ"
+    ),
+    /**
+     * 存出保证金_应计利息
+     */
+    存出保证金_应计利息(
+            "CCBZJ_YJLX"
     ),
     /** ==========新增科目性质======== end**/
     /** add by weipeng on 20220113 估值系统产品3.0.4批处理科目性质改造 end **/
