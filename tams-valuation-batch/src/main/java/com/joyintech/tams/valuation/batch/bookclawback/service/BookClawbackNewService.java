@@ -244,14 +244,14 @@ public class BookClawbackNewService {
 
             if (theoryFlag) {
                 // add by weipeng on 20220303：由于浮动管理费和固定管理费对应基础科目性质为一个，查询余额需要按照科目查询
-                List<BokSubject> bokSubjectList = bookAccountGenLogicNew.getFeeSubjectByCode(DictCodeBaseSubjectNatrueNew.运营费用.getValue(), booksetId);
+                List<BokSubject> bokSubjectList = bookAccountGenLogicNew.getFeeSubjectByCode(DictCodeBaseSubjectNatrueNew.运营费用.getValue(), booksetId, standardCcy);
                 SubjectMappingConfig mappingConfig = new SubjectMappingConfig();
                 mappingConfig.setCashType2(DictCodeListExt1.现金流二级类型_固定管理费.getValue());
                 // 定义 变量.固定管理费科目信息
-                BokSubject fixedFeeSubject = bookAccountGenLogicNew.getSubjectByInnerCode(bokSubjectList, mappingConfig, standardCcy);
+                BokSubject fixedFeeSubject = bookAccountGenLogicNew.getSubjectByInnerCode(bokSubjectList, mappingConfig);
                 // 定义 变量.浮动管理费科目信息
                 mappingConfig.setCashType2(DictCodeListExt1.现金流二级类型_浮动管理费.getValue());
-                BokSubject floatFeeSubject = bookAccountGenLogicNew.getSubjectByInnerCode(bokSubjectList, mappingConfig, standardCcy);
+                BokSubject floatFeeSubject = bookAccountGenLogicNew.getSubjectByInnerCode(bokSubjectList, mappingConfig);
                 // 定义变量：计息基础 = 回补规则.计算基础
                 String basis = targetFinClawbackCalcRule.getBasis();
 

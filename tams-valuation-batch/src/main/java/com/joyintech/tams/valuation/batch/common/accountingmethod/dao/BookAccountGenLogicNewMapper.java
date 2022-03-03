@@ -11,6 +11,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -25,17 +26,6 @@ import java.util.List;
 public interface BookAccountGenLogicNewMapper {
 
     /**
-     * 根据内部编码查询对应科目信息
-     * @param booksetId 账套代码
-     * @param listSubjectInternalCode 内部科目编码
-     * @param ccy 币种
-     * @return
-     */
-    List<BokSubject> getSubjectByInternalCode(@Param("booksetId") String booksetId,
-                                              @Param("listSubjectInternalCode") List<String> listSubjectInternalCode,
-                                              @Param("ccy") String ccy);
-
-    /**
      * 查询科目映射关系配置项
      * @param booksetId 账套代码
      * @param listBokDetailId 账务明细代码
@@ -43,4 +33,13 @@ public interface BookAccountGenLogicNewMapper {
      */
     List<SubjectMappingConfig> getSubjectMappingConfig(@Param("booksetId") String booksetId,
                                                                     @Param("listBokDetailId") List<String> listBokDetailId);
+
+    /**
+     * 根据内部编码查询对应科目信息
+     * @param booksetId 账套代码
+     * @param listSubjectInternalCode 内部科目编码
+     * @param isAcc 是否核算科目
+     * @return
+     */
+    List<BokSubject> getSubjectByInternalCode(Map<String,Object> params);
 }

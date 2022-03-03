@@ -1556,9 +1556,17 @@ public class BookAccountGenLogicNew {
         // 循环遍历会计分录
         for(AccountEntry accountEntry : accountEntries){
             // 根据内部科目编码获取所有对应科目
-            List<BokSubject> entrySubjectList = accountEntry.getBokSubjectList();
-            if(CollectionUtils.isEmpty(entrySubjectList)){
+            List<BokSubject> entrySubjectList = new ArrayList<>();
+            if(CollectionUtils.isEmpty(accountEntry.getBokSubjectList())){
                 continue;
+            }
+            else{
+                // 按照币种筛选科目
+                for(BokSubject item : accountEntry.getBokSubjectList()){
+                    if(StringUtil.equals(ccy, item.getCcy())){
+                        entrySubjectList.add(item);
+                    }
+                }
             }
             // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑 end
             // 若对应记账金额元素为空或为非0入账且金额为0，则不记账，跳过
@@ -1585,32 +1593,30 @@ public class BookAccountGenLogicNew {
             }
             // 定义 变量.科目信息
             BokSubject bokSubject = null;
-            if(entrySubjectList.size() == 1){
-                bokSubject = entrySubjectList.get(0);
+            // 获取账务明细代码
+            BokDetailId bokDetailId =(BokDetailId)accountSceneMap.get(accountEntry.getBokDetailId());
+            // 定义 变量.辅助核算项 = 会计场景.默认辅助核算项
+            SubjectMappingConfig mappingConfig = new SubjectMappingConfig();
+            if(subjectMappingConfigDefault != null){
+                mappingConfig = subjectMappingConfigDefault;
             }
-            else{
-                // 获取账务明细代码
-                BokDetailId bokDetailId =(BokDetailId)accountSceneMap.get(accountEntry.getBokDetailId());
-                // 定义 变量.辅助核算项 = 会计场景.默认辅助核算项
-                SubjectMappingConfig mappingConfig = subjectMappingConfigDefault;
-                // 若场景中辅助核算项map不为空，且匹配上，则根据内部科目编码获取对应辅助核算项
-                if(subjectMappingConfigMap != null && subjectMappingConfigMap.get(accountEntry.getSubjectId()) != null){
-                    mappingConfig = subjectMappingConfigMap.get(accountEntry.getSubjectId());
-                }
+            // 若场景中辅助核算项map不为空，且匹配上，则根据内部科目编码获取对应辅助核算项
+            if(subjectMappingConfigMap != null && subjectMappingConfigMap.get(accountEntry.getSubjectId()) != null){
+                mappingConfig = subjectMappingConfigMap.get(accountEntry.getSubjectId());
+            }
+            // 若费用类型字段为空值，则初始化赋值
+            if(mappingConfig.getFeeType() == null){
                 // 此处可直接赋值，分录中费用类型对应的会计元素，数据来源会设置为对应费用类型，可直接赋值费用类型，非费用类型的用不到，赋值也不会有问题
-                // 产品-费用摊销场景对应的费用类型特殊处理，从会计场景元素中传过来的TYPE_1字段取值
-                if(DictCodeListTableId.会计场景代码_费用摊销.getValue().equals(tableId)){
-                    mappingConfig.setFeeType((String)accountSceneMap.get(BookConstant.TYPE_1));
-                }
-                else{
-                    // 从会计元素对应的数据来源中获取
-                    mappingConfig.setFeeType(accountEntry.getDictSource());
-                }
-                // 税类型同样取数据来源字段
-                mappingConfig.setTaxType(accountEntry.getDictSource());
-                // 根据辅助核算项匹配查找对应科目
-                bokSubject = this.getSubjectByInnerCode(entrySubjectList, mappingConfig, ccy);
+                // 从会计元素对应的数据来源中获取
+                mappingConfig.setFeeType(accountEntry.getDictSource());
             }
+            // 税类型同样取数据来源字段
+            if(mappingConfig.getTaxType() == null){
+                mappingConfig.setTaxType(accountEntry.getDictSource());
+            }
+
+            // 根据辅助核算项匹配查找对应科目
+            bokSubject = this.getSubjectByInnerCode(entrySubjectList, mappingConfig);
             // 若变量.科目信息不为空，则分录对应赋值科目相关信息
             if(bokSubject != null){
                 // 相关科目信息录入
@@ -1636,6 +1642,9 @@ public class BookAccountGenLogicNew {
      */
     public Map<String,Object> initMappingParams(SubjectMappingConfig mappingConfig){
         Map<String, Object> params = new HashMap<>();
+        if(mappingConfig == null){
+            return params;
+        }
         params.put(SubjectConfigCode.证券品种.getValue(), mappingConfig.getSecType());
         params.put(SubjectConfigCode.债券类型.getValue(), mappingConfig.getAssetType());
         params.put(SubjectConfigCode.存款类资产类型.getValue(), mappingConfig.getAssetType());
@@ -1679,12 +1688,18 @@ public class BookAccountGenLogicNew {
      * @param booksetId 账套信息
      * @return
      */
-    public List<BokSubject> getFeeSubjectByCode(String subjectInternalCode, String booksetId){
+    public List<BokSubject> getFeeSubjectByCode(String subjectInternalCode, String booksetId, String ccy){
         // 定义 变量.内部科目编码集合
         List<String> listSubjectInternalCode = new ArrayList<>();
         listSubjectInternalCode.add(subjectInternalCode);
+        // 定义 变量.查询map
+        Map<String,Object> params = new HashMap<>();
+        params.put("booksetId",booksetId);//账套代码
+        params.put("listSubjectInternalCode",listSubjectInternalCode); //内部科目编码集合
+        params.put("isAcc",DictCodeList.是否_是.getValue()); // 是否核算科目
+        params.put("ccy",ccy); // 是否核算科目
         // 2. 根据内部编码集合查询相关底层科目信息
-        return accountingMethodNewMapper.getSubjectByInternalCode(booksetId, listSubjectInternalCode, DictCodeList.是否_是.getValue());
+        return bookAccountGenLogicNewMapper.getSubjectByInternalCode(params);
     }
 
     /**
@@ -1694,8 +1709,11 @@ public class BookAccountGenLogicNew {
      * @param ccy 币种
      * @return
      */
-    public BokSubject getSubjectByInnerCode(List<BokSubject> listBokSubject, SubjectMappingConfig subjectMappingConfig, String ccy){
+    public BokSubject getSubjectByInnerCode(List<BokSubject> listBokSubject, SubjectMappingConfig subjectMappingConfig){
         BokSubject bokSubject = null;
+        if(CollectionUtils.isEmpty(listBokSubject)){
+            return bokSubject;
+        }
         // 定义 变量.资产辅助核算项 封装辅助核算项为map对象
         Map<String, Object> params = initMappingParams(subjectMappingConfig);
         // 定义 变量.默认辅助核算项 封装辅助核算项为map对象
@@ -1704,11 +1722,14 @@ public class BookAccountGenLogicNew {
         paramsDefualt.put(SubjectConfigCode.默认.getValue(), DictCodeList.是否_是.getValue());
         // 定义 变量.默认科目
         BokSubject bokSubjectDefault = null;
-        for(BokSubject item : listBokSubject){
-            // 根据变量.资产辅助核算
-            // 项通过辅助核算项表达式匹配
-            // 科目币种=变量.币种
-            if(item.getCcy().equals(ccy)) {
+        // 若只有一条记录，则直接取值
+        if(listBokSubject.size() == 1){
+            bokSubject = listBokSubject.get(0);
+        }
+        else{
+            for(BokSubject item : listBokSubject){
+                // 根据变量.资产辅助核算
+                // 项通过辅助核算项表达式匹配
                 //  科目内部科目编码不为空 且 科目内部科目编码匹配辅助核算项
                 if (StringUtil.isNotEmpty(item.getSubjectHandFelCode()) &&
                         ExpressionUtil.booleanValue(item.getSubjectHandFelCode(), params)

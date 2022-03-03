@@ -67,6 +67,18 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
     逾期资产利息收入 (
             "YQZCLXSR"
     ),
+    /**
+     * 实收资本
+     */
+    实收资本 (
+            "SSZB_Z"
+    ),
+    /**
+     * 应付利润
+     */
+    应付利润(
+            "YFLR_Z"
+    ),
 
     /** add by weipeng on 20220113 估值系统产品3.0.4批处理科目性质改造新增科目性质 start **/
     /** ==========原科目性质修改======== start**/

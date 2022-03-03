@@ -46,7 +46,7 @@ import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto.DrawB
 import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto.DrawBaseInfoSelectComResult;
 import com.joyintech.tams.valuation.batch.common.finproduct.service.FinProductCommonService;
 import com.joyintech.tams.valuation.common.batch.finproduct.entity.*;
-import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrue;
+import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrueNew;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.common.constants.ValDictCodeList;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -345,7 +345,7 @@ public class CalculationCommonService {
 
                     // 基础科目性质
                     List<String> baseSubjectNatureList = new ArrayList<>();
-                    baseSubjectNatureList.add(DictCodeBaseSubjectNatrue.实收资本.getValue());
+                    baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.实收资本.getValue());
                     searchDto.setBaseSubjectNatureList(baseSubjectNatureList);
                     // 期待方向
                     String expectedBalFalg = DictCodeList.余额方向_贷方.getValue();
@@ -382,7 +382,7 @@ public class CalculationCommonService {
 
                         // 基础科目性质
                         List<String> baseSubjectNatureList = new ArrayList<>();
-                        baseSubjectNatureList.add(DictCodeBaseSubjectNatrue.实收资本.getValue());
+                        baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.实收资本.getValue());
                         searchDto.setBaseSubjectNatureList(baseSubjectNatureList);
                         // 期待方向
                         String expectedBalFalg = DictCodeList.余额方向_贷方.getValue();

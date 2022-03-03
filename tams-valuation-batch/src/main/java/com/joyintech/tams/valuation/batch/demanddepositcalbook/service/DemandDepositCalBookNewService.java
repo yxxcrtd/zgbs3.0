@@ -160,33 +160,56 @@ public class DemandDepositCalBookNewService {
         BigDecimal yield = BigDecimal.ZERO;
         // 计息基础
         String basis = null;
-
-        // 1.4 现金科目余额查询(基础科目性质:现金)
-
         Long taskPri = listFinProductDealInfoComDTONow.get(0).getTaskPri();// 任务优先级（信息列表的任务优先级都是一致的，故取第一个）
-        SubjectBalance subjectBalance = this.getSubjectBalance(readerEntity,
-            DictCodeList.余额方向_借方.getValue(), DictCodeBaseSubjectNatrue.现金.getValue(), taskPri);
-        cashBalance = subjectBalance.getBalance() == null ? BigDecimal.ZERO : subjectBalance.getBalance();
-
-        // 变量.现金类科目余额_本位币 = 返回值.科目余额.本位币余额
-        cashBalanceBccy = subjectBalance.getbAmt() == null ? BigDecimal.ZERO : subjectBalance.getbAmt();
-
-
-        // 成本数量
-//        @SuppressWarnings("unused")
-//        BigDecimal cashNum = subjectBalance.getBalance() == null ? BigDecimal.ZERO : subjectBalance.getNum();
-
-        // 查询 前一日科目余额：应计利息类科目余额
-        SubjectBalance subjectBalanceYst = this.getSubjectBalance(readerEntity,
-            DictCodeList.余额方向_借方.getValue(), DictCodeBaseSubjectNatrue.应计利息.getValue(), taskPri);
-//        cashBalance = subjectBalance.getBalance() == null ? BigDecimal.ZERO : subjectBalance.getBalance();
-        // 定义 变量.应计利息前一日余额 = 科目余额
-        BigDecimal ystInterestBalance = subjectBalanceYst.getBalance();
-        // 变量.应计利息前一日余额_本位币 = 科目余额.本位币余额
-        BigDecimal ystInterestBalanceB = subjectBalanceYst.getbAmt();
 
         // 处理交易
         for (DrawBaseInfoSelectComDTO drawBaseInfoSelectComDTO : listFinProductDealInfoComDTONow) {
+
+            // modify by weipeng on 20220303 ：会计引擎升级，资金账户科目性质拆分 start
+            // 本方资金账户类型 或 对方资金账户类型对应资金账户类型，赋值对应金额元素
+            // 定义 变量.资金账户类型
+            String acctType=drawBaseInfoSelectComDTO.getBusiDetailType();
+            // 定义 变量.本金基础科目性质
+            String subjectNature_BJ = DictCodeBaseSubjectNatrueNew.活期存款_本金.getValue();
+            // 定义 变量.应计利息基础科目性质
+            String subjectNature_YJLX = DictCodeBaseSubjectNatrueNew.活期存款_应计利息.getValue();
+            // 定义 变量.记账金额元素 = 默认.托管户
+            String 记账金额元素 = BookConstant.INTAMT_HQ;
+            // 券商资金账户现划分在结算备付金科目性质下
+            if(DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(acctType)
+                    || DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(acctType)){
+                记账金额元素 = BookConstant.INTAMT_JS;
+                subjectNature_BJ = DictCodeBaseSubjectNatrueNew.结算备付金_本金.getValue();
+                subjectNature_YJLX = DictCodeBaseSubjectNatrueNew.结算备付金_应计利息.getValue();
+            }
+            // 券商资金账户现划分在结算备付金科目性质下
+            if(DictCodeListExt1.资金账户类型_交易保证金账户.getValue().equals(acctType)){
+                记账金额元素 = BookConstant.INTAMT_CC;
+                subjectNature_BJ = DictCodeBaseSubjectNatrueNew.存出保证金_本金.getValue();
+                subjectNature_YJLX = DictCodeBaseSubjectNatrueNew.存出保证金_应计利息.getValue();
+            }
+            // 1.4 现金科目余额查询(基础科目性质:现金)
+            SubjectBalance subjectBalance = this.getSubjectBalance(readerEntity,
+                    DictCodeList.余额方向_借方.getValue(), subjectNature_BJ, taskPri, drawBaseInfoSelectComDTO.getBokDetailId());
+            cashBalance = subjectBalance.getBalance() == null ? BigDecimal.ZERO : subjectBalance.getBalance();
+
+            // 变量.现金类科目余额_本位币 = 返回值.科目余额.本位币余额
+            cashBalanceBccy = subjectBalance.getbAmt() == null ? BigDecimal.ZERO : subjectBalance.getbAmt();
+
+
+            // 成本数量
+//        @SuppressWarnings("unused")
+//        BigDecimal cashNum = subjectBalance.getBalance() == null ? BigDecimal.ZERO : subjectBalance.getNum();
+
+            // 查询 前一日科目余额：应计利息类科目余额
+            SubjectBalance subjectBalanceYst = this.getSubjectBalance(readerEntity,
+                    DictCodeList.余额方向_借方.getValue(), subjectNature_YJLX, taskPri, drawBaseInfoSelectComDTO.getBokDetailId());
+//        cashBalance = subjectBalance.getBalance() == null ? BigDecimal.ZERO : subjectBalance.getBalance();
+            // 定义 变量.应计利息前一日余额 = 科目余额
+            BigDecimal ystInterestBalance = subjectBalanceYst.getBalance();
+            // 变量.应计利息前一日余额_本位币 = 科目余额.本位币余额
+            BigDecimal ystInterestBalanceB = subjectBalanceYst.getbAmt();
+            // modify by weipeng on 20220303 ：会计引擎升级，资金账户科目性质拆分 end
             // // 获取标的交易信息 交易DTO
             // TradeInfoDto tradeInfoDto = this.getTargetInfo(drawBaseInfoSelectComDTO.getBusiId(),
             // drawBaseInfoSelectComDTO.getBusiDetailType(),
@@ -288,20 +311,7 @@ public class DemandDepositCalBookNewService {
 //            accountAmountMap.put(BookConstant.INTAMT, interest);
 //            //应收利息_本位币
 //            accountAmountMap.put(BookConstant.INTAMT+BookConstant.BCCYAMT, interest_bccy);
-            // 本方资金账户类型 或 对方资金账户类型对应资金账户类型，赋值对应金额元素
-            // 定义 变量.资金账户类型
-            String acctType=drawBaseInfoSelectComDTO.getBusiDetailType();
-            // 定义 变量.记账金额元素 = 默认.托管户
-            String 记账金额元素 = BookConstant.INTAMT_HQ;
-            // 券商资金账户现划分在结算备付金科目性质下
-            if(DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(acctType)
-              || DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(acctType)){
-                记账金额元素 = BookConstant.INTAMT_JS;
-            }
-            // 券商资金账户现划分在结算备付金科目性质下
-            if(DictCodeListExt1.资金账户类型_交易保证金账户.getValue().equals(acctType)){
-                记账金额元素 = BookConstant.INTAMT_CC;
-            }
+
             // 应收利息 <-变量.应计利息
             accountAmountMap.put(记账金额元素, interest);
             //应收利息_本位币
@@ -450,7 +460,7 @@ public class DemandDepositCalBookNewService {
 
     private SubjectBalance getSubjectBalance(DrawBaseInfoSelectComResult readerEntity,
                                              String expBalanceDirect, String baseSubjectNature,
-                                             Long taskPri) {
+                                             Long taskPri, String bokDetailId) {
         // 初始化返回结果
         SubjectBalance balance = new SubjectBalance();
 
@@ -464,7 +474,7 @@ public class DemandDepositCalBookNewService {
         // 设值科目余额查询参数Dto
         SubjectBalanceSearchDto searchDto = new SubjectBalanceSearchDto();
         searchDto.setBooksetId(readerEntity.getBooksetId());
-        searchDto.setBokDetailId(readerEntity.getBokDetailId());
+        searchDto.setBokDetailId(bokDetailId);
         searchDto.setHappenDate(readerEntity.getHappenDate());
         searchDto.setBookDate(readerEntity.getBookDate());
         searchDto.setTaskPri(taskPri);

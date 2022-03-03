@@ -10,19 +10,21 @@
 
 package com.joyintech.tams.valuation.batch.expparprdtacusincdrawbook.processor;
 
-import java.util.Map;
-
+import com.google.common.collect.Maps;
+import com.joyintech.batch.batchbase.baseclass.BaseProcessor;
+import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
+import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.valuation.batch.common.accounting.entity.StayDrawSubprdEntity;
+import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGenerateResult;
+import com.joyintech.tams.valuation.batch.expparprdtacusincdrawbook.service.ExpParPrdTaCusIncDrawBookNewService;
+import com.joyintech.tams.valuation.batch.expparprdtacusincdrawbook.service.ExpParPrdTaCusIncDrawBookService;
+import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.google.common.collect.Maps;
-import com.joyintech.batch.batchbase.baseclass.BaseProcessor;
-import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
-import com.joyintech.tams.valuation.batch.common.accounting.entity.StayDrawSubprdEntity;
-import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGenerateResult;
-import com.joyintech.tams.valuation.batch.expparprdtacusincdrawbook.service.ExpParPrdTaCusIncDrawBookService;
-import com.joyintech.tams.valuation.common.constants.GlobalConstant;
+import java.util.Map;
 
 /**
  * 预期收益型母产品TA客户收益计提入账 Processor
@@ -43,6 +45,11 @@ public class ExpParPrdTaCusIncDrawBookProcessor extends BaseProcessor<NeedOperat
     private ExpParPrdTaCusIncDrawBookService expectService;
 
     /**
+     * processor方法的 Service
+     */
+    @Autowired
+    private ExpParPrdTaCusIncDrawBookNewService expectNewService;
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -55,7 +62,19 @@ public class ExpParPrdTaCusIncDrawBookProcessor extends BaseProcessor<NeedOperat
         params.putAll(this.getParams());
         params.put(GlobalConstant.READER_RESULT, acctEntity); // 将reader返回值塞入参数中
 
-        BookGenerateResult result = expectService.execute(params); // 业务逻辑处理
+        // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑，保持原有逻辑不动 start
+        BookGenerateResult result = new BookGenerateResult();
+        // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录 start
+        String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+        // 若按照内部科目编码分录，则需要映射分录对应科目信息
+        if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
+            //调用service方法进行逻辑逻辑
+            result = expectNewService.execute(params);
+        }
+        else{
+            result = expectService.execute(params);
+        }
+        // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑，保持原有逻辑不动 end
 
         if (result == null) {// 当为null时候，给予初始化
             result = new BookGenerateResult();
