@@ -178,7 +178,7 @@ public class TrdDepoValuationDuration001Dto extends BaseEntity implements Proces
         this.outTradeId = outTradeId;
     }
 
-    @NotEmpty(fieldName = "TrdDepoValuationDuration002.portfolioName", groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName = "TrdDepoValuationDuration002.portfolioId", groups = {ValidateGroupEdit.class})
     public String getPortfolioId() {
         return portfolioId;
     }
@@ -187,7 +187,7 @@ public class TrdDepoValuationDuration001Dto extends BaseEntity implements Proces
         this.portfolioId = portfolioId;
     }
 
-    @NotEmpty(fieldName = "TrdDepoValuationDuration002.portfolioId", groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName = "TrdDepoValuationDuration002.portfolioName", groups = {ValidateGroupEdit.class})
     public String getPortfolioName() {
         return portfolioName;
     }
@@ -196,7 +196,7 @@ public class TrdDepoValuationDuration001Dto extends BaseEntity implements Proces
         this.portfolioName = portfolioName;
     }
 
-    @NotEmpty(fieldName = "TrdDepoValuationDuration002.finprodName", groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName = "TrdDepoValuationDuration002.finprodMarketId", groups = {ValidateGroupEdit.class})
     public String getFinprodMarketId() {
         return finprodMarketId;
     }
@@ -205,7 +205,7 @@ public class TrdDepoValuationDuration001Dto extends BaseEntity implements Proces
         this.finprodMarketId = finprodMarketId;
     }
 
-    @NotEmpty(fieldName = "TrdDepoValuationDuration002.finprodMarketId", groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName = "TrdDepoValuationDuration002.finprodName", groups = {ValidateGroupEdit.class})
     public String getFinprodName() {
         return finprodName;
     }
@@ -304,7 +304,7 @@ public class TrdDepoValuationDuration001Dto extends BaseEntity implements Proces
         this.trdAcctId = trdAcctId;
     }
 
-    @NotEmpty(fieldName = "TrdDepoValuationDuration002.dealAmt", groups = {ValidateGroupEdit.class})
+//    @NotEmpty(fieldName = "TrdDepoValuationDuration002.dealAmt", groups = {ValidateGroupEdit.class})
     public BigDecimal getDealAmt() {
         return dealAmt;
     }

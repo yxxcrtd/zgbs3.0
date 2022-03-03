@@ -111,7 +111,7 @@ public class TrdDepoValuationDuration002Service extends BaseService<TrdDepoValua
         entity.setPayDate(dto.getPayDate()); //实际支付日
         entity.setActInt(dto.getActInt()); //实收利息
         entity.setActCapi(dto.getActCapi());//实收本金
-        entity.setDealAmt(dto.getDealAmt()); //交易金额
+        entity.setDealAmt(dto.getSettleAmt()); //交易金额  =结算
         entity.setIsClean2("Y");//是否结清
         entity.setCcy(dto.getCcy());//币种
         entity.setTradeId(dto.getTradeId());  //交易编号
