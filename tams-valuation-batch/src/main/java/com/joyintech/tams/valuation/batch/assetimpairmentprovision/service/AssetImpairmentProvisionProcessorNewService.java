@@ -509,6 +509,9 @@ public class AssetImpairmentProvisionProcessorNewService {
 		ad.setAccountSceneMap(accountSceneMap);// 记账场景要素
 		ad.setAccountAmountMap(accountAmountMap);// 记账金额要素
 		ad.setAccountCurrencyMap(accountCurrencyMap);// 记账金额币种要素
+		// add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 start
+		ad.setSubjectMappingConfigDefault(acctEntity.getSubjectMappingConfig());// 辅助核算项
+		// add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 end
 
 		// 记账凭证生成
 		BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, batchExecuteInfo);
