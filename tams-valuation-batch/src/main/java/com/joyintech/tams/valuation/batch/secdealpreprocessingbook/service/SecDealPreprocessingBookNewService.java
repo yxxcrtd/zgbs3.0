@@ -1143,12 +1143,12 @@ public class SecDealPreprocessingBookNewService {
         	List<ValBokBookdetailBatch> valBokBookdetailBatchResult = new ArrayList<ValBokBookdetailBatch>();
     		for (ValBokBookdetailBatch dto : valBokBookdetailBatch) {
     			if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(dealNow.getInvAim())) {
-    				 if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.摊余成本类_资产减值.getValue())) {
+    				 if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.摊余成本类_减值准备.getValue())) {
     	    			valBokBookdetailBatchResult.add(dto);
     	    		 }
     			}
     			else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(dealNow.getInvAim())) {
-	   				 if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.其他综合收益_资产减值.getValue())) {
+	   				 if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.其他综合收益_减值准备.getValue())) {
 	   	    			valBokBookdetailBatchResult.add(dto);
 	   	    		 }
     			}
@@ -1348,14 +1348,14 @@ public class SecDealPreprocessingBookNewService {
         List<SubjectBalance> listSubjectBalanceJZ = new ArrayList<SubjectBalance>();
         if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(acctEntity.getInvAim())) {
             searchDao.setBaseSubjectNatureList(new ArrayList<String>(
-                Arrays.asList(DictCodeBaseSubjectNatrueNew.摊余成本类_资产减值.getValue())));
+                Arrays.asList(DictCodeBaseSubjectNatrueNew.摊余成本类_减值准备.getValue())));
             listSubjectBalanceJZ = accountingCommonService.getSubjectBalanceExpectDirection(
                 searchDao, DictCodeList.余额方向_借方.getValue());
         }
         else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(
             acctEntity.getInvAim())) {
             searchDao.setBaseSubjectNatureList(new ArrayList<String>(
-                Arrays.asList(DictCodeBaseSubjectNatrueNew.其他综合收益_资产减值.getValue())));
+                Arrays.asList(DictCodeBaseSubjectNatrueNew.其他综合收益_减值准备.getValue())));
             listSubjectBalanceJZ = accountingCommonService.getSubjectBalanceExpectDirection(
                 searchDao, DictCodeList.余额方向_借方.getValue());
         }
@@ -1974,7 +1974,7 @@ public class SecDealPreprocessingBookNewService {
         	List<ValBokBookdetailBatch> valBokBookdetailBatch = resultNowNow.getValBokBookdetailBatch();
         	List<ValBokBookdetailBatch> valBokBookdetailBatchResult = new ArrayList<ValBokBookdetailBatch>();
     		for (ValBokBookdetailBatch dto : valBokBookdetailBatch) {
-    			if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.摊余成本类_资产减值.getValue())) {
+    			if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.摊余成本类_减值准备.getValue())) {
 	    			valBokBookdetailBatchResult.add(dto);
 	    		}
     		}
@@ -2696,7 +2696,7 @@ public class SecDealPreprocessingBookNewService {
         	List<ValBokBookdetailBatch> valBokBookdetailBatch = resultNowNow.getValBokBookdetailBatch();
         	List<ValBokBookdetailBatch> valBokBookdetailBatchResult = new ArrayList<ValBokBookdetailBatch>();
     		for (ValBokBookdetailBatch dto : valBokBookdetailBatch) {
-    			if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.其他综合收益_资产减值.getValue())) {
+    			if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.其他综合收益_减值准备.getValue())) {
 	    			valBokBookdetailBatchResult.add(dto);
 	    		}
     		}

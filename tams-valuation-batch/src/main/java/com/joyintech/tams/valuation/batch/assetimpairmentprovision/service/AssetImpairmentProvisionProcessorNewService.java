@@ -520,10 +520,10 @@ public class AssetImpairmentProvisionProcessorNewService {
 		List<ValBokBookdetailBatch> valBokBookdetailBatch = resultNowNow.getValBokBookdetailBatch();
 		List<ValBokBookdetailBatch> valBokBookdetailBatchResult = new ArrayList<ValBokBookdetailBatch>();
 		for (ValBokBookdetailBatch dto : valBokBookdetailBatch) {
-			if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.摊余成本类_资产减值.getValue())
+			if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.摊余成本类_减值准备.getValue())
 					|| dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.定期存款_减值准备.getValue())
-					|| dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.拆放同业减值准备.getValue())
-					|| dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.其他综合收益_资产减值.getValue())) {
+					|| dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.买入返售金融资产_减值准备.getValue())
+					|| dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.其他综合收益_减值准备.getValue())) {
 				valBokBookdetailBatchResult.add(dto);
 			}
 		}

@@ -273,14 +273,14 @@ public class SecAbsCalBookNewService {
             List<SubjectBalance> listSubjectBalanceJZ = new ArrayList<SubjectBalance>();
             if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(acctEntityEx.getInvAim())) {
                 searchDao.setBaseSubjectNatureList(new ArrayList<String>(
-                    Arrays.asList(DictCodeBaseSubjectNatrueNew.摊余成本类_资产减值.getValue())));
+                    Arrays.asList(DictCodeBaseSubjectNatrueNew.摊余成本类_减值准备.getValue())));
                 listSubjectBalanceJZ = accountingCommonService.getSubjectBalanceExpectDirection(
                     searchDao, DictCodeList.余额方向_借方.getValue());
             }
             else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(
                 acctEntityEx.getInvAim())) {
                 searchDao.setBaseSubjectNatureList(new ArrayList<String>(
-                    Arrays.asList(DictCodeBaseSubjectNatrueNew.其他综合收益_资产减值.getValue())));
+                    Arrays.asList(DictCodeBaseSubjectNatrueNew.其他综合收益_减值准备.getValue())));
                 listSubjectBalanceJZ = accountingCommonService.getSubjectBalanceExpectDirection(
                     searchDao, DictCodeList.余额方向_借方.getValue());
             }
@@ -397,7 +397,7 @@ public class SecAbsCalBookNewService {
                 baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.摊余成本类_利息调整.getValue());
                 baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.摊余成本类_应计利息.getValue());
                 /**ADD BY CAOGUO ON 20201019 减值相关修改 START **/
-                baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.摊余成本类_资产减值.getValue());
+                baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.摊余成本类_减值准备.getValue());
                 /**ADD BY CAOGUO ON 20201019 END**/
             }
             else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(
@@ -407,7 +407,7 @@ public class SecAbsCalBookNewService {
                 baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.综合收益类_利息调整.getValue());
                 baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.综合收益类_应计利息.getValue());
                 /**ADD BY CAOGUO ON 20201019 减值相关修改 START **/
-                baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.其他综合收益_资产减值.getValue());
+                baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.其他综合收益_减值准备.getValue());
                 /**ADD BY CAOGUO ON 20201019 END**/
             }
             // 调用账务共通设计->【凭证最新账务查询】
@@ -483,9 +483,9 @@ public class SecAbsCalBookNewService {
                     }
                     /**ADD BY CAOGUO ON 20201019 减值相关修改 START **/
                     // if(变量.账务明细.基础科目性质 = XX减值准备的账务明细 )
-                    if (DictCodeBaseSubjectNatrueNew.摊余成本类_资产减值.getValue().equals(
+                    if (DictCodeBaseSubjectNatrueNew.摊余成本类_减值准备.getValue().equals(
                         var.getBaseSubjectNature())
-                        || DictCodeBaseSubjectNatrueNew.其他综合收益_资产减值.getValue().equals(
+                        || DictCodeBaseSubjectNatrueNew.其他综合收益_减值准备.getValue().equals(
                             var.getBaseSubjectNature())) {
                         // 变量.账务明细.借贷方向为借时
                         if (DictCodeList.借贷方向_借.getValue().equals(var.getCdFlag())) {
@@ -571,9 +571,9 @@ public class SecAbsCalBookNewService {
                     }
                     /**ADD BY CAOGUO ON 20201019 减值相关修改 START **/
                     // if(变量.账务明细.基础科目性质 = XX减值准备的账务明细 )
-                    if (DictCodeBaseSubjectNatrueNew.摊余成本类_资产减值.getValue().equals(
+                    if (DictCodeBaseSubjectNatrueNew.摊余成本类_减值准备.getValue().equals(
                         var.getBaseSubjectNature())
-                        || DictCodeBaseSubjectNatrueNew.其他综合收益_资产减值.getValue().equals(
+                        || DictCodeBaseSubjectNatrueNew.其他综合收益_减值准备.getValue().equals(
                             var.getBaseSubjectNature())) {
                         // 变量.账务明细.借贷方向为借时
                         if (DictCodeList.借贷方向_借.getValue().equals(var.getCdFlag())) {
@@ -1439,8 +1439,8 @@ public class SecAbsCalBookNewService {
                 BokStatLossPosiiton statLoss = null;
                 for (ValBokBookdetailBatch detail : resultNowNow.getValBokBookdetailBatch()) {
                     // 变量.账务明细 = 调用账务明细生成共通返回结果中 基础科目性质 ="摊余成本类资产减值"的第一条数据
-                    if (DictCodeBaseSubjectNatrueNew.摊余成本类_资产减值.getValue().equals(
-                        detail.getBaseSubjectNature()) || DictCodeBaseSubjectNatrueNew.其他综合收益_资产减值.getValue().equals(
+                    if (DictCodeBaseSubjectNatrueNew.摊余成本类_减值准备.getValue().equals(
+                        detail.getBaseSubjectNature()) || DictCodeBaseSubjectNatrueNew.其他综合收益_减值准备.getValue().equals(
                             detail.getBaseSubjectNature())) {
                         // 调用【减值相关共通-减值计提明细数据生成】
                         statLoss = lossCommonService.setLossInfoAccr(detail, jzzb.negate(),

@@ -943,12 +943,12 @@ public class SecDealAccountsNewService {
             List<ValBokBookdetailBatch> valBokBookdetailBatchResult = new ArrayList<ValBokBookdetailBatch>();
             for (ValBokBookdetailBatch dto : valBokBookdetailBatch) {
                 if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(dealNow.getInvAim())) {
-                     if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.摊余成本类_资产减值.getValue())) {
+                     if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.摊余成本类_减值准备.getValue())) {
                         valBokBookdetailBatchResult.add(dto);
                      }
                 }
                 else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(dealNow.getInvAim())) {
-                     if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.其他综合收益_资产减值.getValue())) {
+                     if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.其他综合收益_减值准备.getValue())) {
                         valBokBookdetailBatchResult.add(dto);
                      }
                 }
@@ -1321,12 +1321,12 @@ public class SecDealAccountsNewService {
             List<ValBokBookdetailBatch> valBokBookdetailBatchResult = new ArrayList<ValBokBookdetailBatch>();
             for (ValBokBookdetailBatch dto : valBokBookdetailBatch) {
                 if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(dealNow.getInvAim())) {
-                     if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.摊余成本类_资产减值.getValue())) {
+                     if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.摊余成本类_减值准备.getValue())) {
                         valBokBookdetailBatchResult.add(dto);
                      }
                 }
                 else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(dealNow.getInvAim())) {
-                     if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.其他综合收益_资产减值.getValue())) {
+                     if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.其他综合收益_减值准备.getValue())) {
                         valBokBookdetailBatchResult.add(dto);
                      }
                 }
@@ -2459,14 +2459,14 @@ public class SecDealAccountsNewService {
         List<SubjectBalance> listSubjectBalanceLS = new ArrayList<SubjectBalance>();
         if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(acctEntity.getInvAim())) {
             searchDao.setBaseSubjectNatureList(new ArrayList<String>(
-                Arrays.asList(DictCodeBaseSubjectNatrueNew.摊余成本类_资产减值.getValue())));
+                Arrays.asList(DictCodeBaseSubjectNatrueNew.摊余成本类_减值准备.getValue())));
             listSubjectBalanceLS = accountingCommonService.getSubjectBalanceExpectDirection(
                 searchDao, DictCodeList.余额方向_借方.getValue());
         }
         else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(
             acctEntity.getInvAim())) {
             searchDao.setBaseSubjectNatureList(new ArrayList<String>(
-                Arrays.asList(DictCodeBaseSubjectNatrueNew.其他综合收益_资产减值.getValue())));
+                Arrays.asList(DictCodeBaseSubjectNatrueNew.其他综合收益_减值准备.getValue())));
             listSubjectBalanceLS = accountingCommonService.getSubjectBalanceExpectDirection(
                 searchDao, DictCodeList.余额方向_借方.getValue());
         }
@@ -2855,7 +2855,7 @@ public class SecDealAccountsNewService {
             BokStatLossPosiiton statLoss = null;
             for (ValBokBookdetailBatch detail : resultNowNow.getValBokBookdetailBatch()) {
                 // 变量.账务明细 = 调用账务明细生成共通返回结果中 基础科目性质 ="摊余成本类资产减值"的第一条数据
-                if (DictCodeBaseSubjectNatrueNew.摊余成本类_资产减值.getValue().equals(
+                if (DictCodeBaseSubjectNatrueNew.摊余成本类_减值准备.getValue().equals(
                     detail.getBaseSubjectNature())) {
                     // 调用【减值相关共通-减值使用明细数据生成】
                     statLoss = lossCommonService.setLossInfoUsed(detail, varJzzb.negate(),
@@ -3357,7 +3357,7 @@ public class SecDealAccountsNewService {
             BokStatLossPosiiton statLoss = null;
             for (ValBokBookdetailBatch detail : resultNowNow.getValBokBookdetailBatch()) {
                 // 变量.账务明细 = 调用账务明细生成共通返回结果中 基础科目性质 ="摊余成本类资产减值"的第一条数据
-                if (DictCodeBaseSubjectNatrueNew.摊余成本类_资产减值.getValue().equals(
+                if (DictCodeBaseSubjectNatrueNew.摊余成本类_减值准备.getValue().equals(
                     detail.getBaseSubjectNature())) {
                     // 调用【减值相关共通-减值计提明细数据生成】
                     statLoss = lossCommonService.setLossInfoAccr(detail, varJzzb,
@@ -4012,7 +4012,7 @@ public class SecDealAccountsNewService {
             BokStatLossPosiiton statLoss = null;
             for (ValBokBookdetailBatch detail : resultNowNow.getValBokBookdetailBatch()) {
                 // 变量.账务明细 = 调用账务明细生成共通返回结果中 基础科目性质 ="摊余成本类资产减值"的第一条数据
-                if (DictCodeBaseSubjectNatrueNew.摊余成本类_资产减值.getValue().equals(
+                if (DictCodeBaseSubjectNatrueNew.摊余成本类_减值准备.getValue().equals(
                     detail.getBaseSubjectNature())) {
                     // 调用【减值相关共通-减值使用明细数据生成】
                     statLoss = lossCommonService.setLossInfoUsed(detail, accountAmountMap.get(BookConstant.IMPAMT),
@@ -4409,7 +4409,7 @@ public class SecDealAccountsNewService {
             BokStatLossPosiiton statLoss = null;
             for (ValBokBookdetailBatch detail : resultNowNow.getValBokBookdetailBatch()) {
                 // 变量.账务明细 = 调用账务明细生成共通返回结果中 基础科目性质 ="其它综合收益_减值"的第一条数据
-                if (DictCodeBaseSubjectNatrueNew.其他综合收益_资产减值.getValue().equals(
+                if (DictCodeBaseSubjectNatrueNew.其他综合收益_减值准备.getValue().equals(
                     detail.getBaseSubjectNature())) {
                     // 调用【减值相关共通-减值使用明细数据生成】
                     statLoss = lossCommonService.setLossInfoUsed(detail, varJzzb.negate(),
@@ -4866,7 +4866,7 @@ public class SecDealAccountsNewService {
             BokStatLossPosiiton statLoss = null;
             for (ValBokBookdetailBatch detail : resultNowNow.getValBokBookdetailBatch()) {
                 // 变量.账务明细 = 调用账务明细生成共通返回结果中 基础科目性质 ="其它综合收益_减值"的第一条数据
-                if (DictCodeBaseSubjectNatrueNew.其他综合收益_资产减值.getValue().equals(
+                if (DictCodeBaseSubjectNatrueNew.其他综合收益_减值准备.getValue().equals(
                     detail.getBaseSubjectNature())) {
                     // 调用【减值相关共通-减值计提明细数据生成】
                     statLoss = lossCommonService.setLossInfoAccr(detail, varJzzb,
@@ -5565,7 +5565,7 @@ public class SecDealAccountsNewService {
             BokStatLossPosiiton statLoss = null;
             for (ValBokBookdetailBatch detail : resultNowNow.getValBokBookdetailBatch()) {
                 // 变量.账务明细 = 调用账务明细生成共通返回结果中 基础科目性质 ="其它综合收益_减值"的第一条数据
-                if (DictCodeBaseSubjectNatrueNew.其他综合收益_资产减值.getValue().equals(
+                if (DictCodeBaseSubjectNatrueNew.其他综合收益_减值准备.getValue().equals(
                     detail.getBaseSubjectNature())) {
                     // 调用【减值相关共通-减值使用明细数据生成】
                     statLoss = lossCommonService.setLossInfoUsed(detail, varJzzb.negate(),
@@ -6394,7 +6394,7 @@ public class SecDealAccountsNewService {
             BokStatLossPosiiton statLoss = null;
             for (ValBokBookdetailBatch detail : resultNowNow.getValBokBookdetailBatch()) {
                 // 变量.账务明细 = 调用账务明细生成共通返回结果中 基础科目性质 ="摊余成本类资产减值"的第一条数据
-                if (DictCodeBaseSubjectNatrueNew.摊余成本类_资产减值.getValue().equals(
+                if (DictCodeBaseSubjectNatrueNew.摊余成本类_减值准备.getValue().equals(
                     detail.getBaseSubjectNature())) {
                     // 调用【减值相关共通-减值使用明细数据生成】
                     statLoss = lossCommonService.setLossInfoUsed(detail, varJzzb.negate(),
@@ -6844,7 +6844,7 @@ public class SecDealAccountsNewService {
             BokStatLossPosiiton statLoss = null;
             for (ValBokBookdetailBatch detail : resultNowNow.getValBokBookdetailBatch()) {
                 // 变量.账务明细 = 调用账务明细生成共通返回结果中 基础科目性质 ="其它综合收益_减值"的第一条数据
-                if (DictCodeBaseSubjectNatrueNew.其他综合收益_资产减值.getValue().equals(
+                if (DictCodeBaseSubjectNatrueNew.其他综合收益_减值准备.getValue().equals(
                     detail.getBaseSubjectNature())) {
                     // 调用【减值相关共通-减值使用明细数据生成】
                     statLoss = lossCommonService.setLossInfoUsed(detail, varJzzb.negate(),
@@ -7492,12 +7492,12 @@ public class SecDealAccountsNewService {
             List<ValBokBookdetailBatch> valBokBookdetailBatchResult = new ArrayList<ValBokBookdetailBatch>();
             for (ValBokBookdetailBatch dto : valBokBookdetailBatch) {
                 if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(dealNow.getInvAim())) {
-                     if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.摊余成本类_资产减值.getValue())) {
+                     if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.摊余成本类_减值准备.getValue())) {
                         valBokBookdetailBatchResult.add(dto);
                      }
                 }
                 else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(dealNow.getInvAim())) {
-                     if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.其他综合收益_资产减值.getValue())) {
+                     if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.其他综合收益_减值准备.getValue())) {
                         valBokBookdetailBatchResult.add(dto);
                      }
                 }
@@ -7739,8 +7739,8 @@ public class SecDealAccountsNewService {
             BokStatLossPosiiton statLoss = null;
             for (ValBokBookdetailBatch detail : resultNowNow.getValBokBookdetailBatch()) {
                 // 变量.账务明细 = 调用账务明细生成共通返回结果中 基础科目性质 ="摊余成本类资产减值"的第一条数据
-                if (DictCodeBaseSubjectNatrueNew.摊余成本类_资产减值.getValue().equals(
-                    detail.getBaseSubjectNature()) || DictCodeBaseSubjectNatrueNew.其他综合收益_资产减值.getValue().equals(
+                if (DictCodeBaseSubjectNatrueNew.摊余成本类_减值准备.getValue().equals(
+                    detail.getBaseSubjectNature()) || DictCodeBaseSubjectNatrueNew.其他综合收益_减值准备.getValue().equals(
                         detail.getBaseSubjectNature())) {
                     // 调用【减值相关共通-减值使用明细数据生成】
                     statLoss = lossCommonService.setLossInfoClean(detail, jzzb.negate(),
