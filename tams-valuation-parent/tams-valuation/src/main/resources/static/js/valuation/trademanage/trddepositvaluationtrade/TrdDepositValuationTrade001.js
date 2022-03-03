@@ -65,16 +65,16 @@ $(function(){
             ,{field:'psStr', width:100, title: 'TrdDepositValuation001.ps',sortField:'ps'}
             ,{field:'ps', title: '交易类型',visible:false}
             ,{field:'tradeDateStr', width:120,  title: '交易日',sortField:'tradeDate'}
-            ,{field:'tradeDate',title: '交易日',visible:false}
+            ,{field:'tradeDate',title: '交易日期',visible:false}
             ,{field:'settDateStr', width:120,  title: '交割日',sortField:'settDate'}
-            ,{field:'settDate', title: '交割日',visible:false}
+            ,{field:'settDate', title: '交割日期',visible:false}
             ,{field:'prinAmt', width:120, title: '交易本金',type:'number',sortField:'prinAmt'}
-            ,{field:'intAmt', width:120, title: '应记利息',type:'number',sortField:'intAmt'}
+            ,{field:'intAmt', width:120, title: '应记利息总额',type:'number',sortField:'intAmt'}
             ,{field:'counterId', title: '交易对手',width:100}
             ,{field:'ccyFmt', width:120, title: '币种',sortField:'ccy'}
             ,{field:'ccy', title: '币种',visible:false}
             ,{field:'settleAmt', width:120, title: '结算金额',type:'number',sortField:'settleAmt'}
-            ,{field:'dealAmt', width:120, title: '本币交易金额',type:'number',sortField:'dealAmt'}
+            // ,{field:'dealAmt', width:120, title: '本币交易金额',type:'number',sortField:'dealAmt'}
             ,{field:'trdAcctId', title: '资金账户',width:100}
             ,{field:'action', title: '操作' , type:'action',buttons: ['edit', 'delt'] , width:'10%'}
         ]

@@ -74,21 +74,32 @@
     });
 
 
+
     //计算结算金额  结算金额=交易本金+应计利息+其他费用
     var mdateSettleAmtCalculate = function(){
-        if($('#prinAmt').val() != null && $('#prinAmt').val() != ''
-            && $('#intAmt').val() != null && $('#intAmt').val() != '' && $('#otherAmt').val() != null && $('#otherAmt').val() != ''){
-            var unitValue = JoyinMath.doAdd($('#prinAmt').val(), $('#intAmt').val(),2);
-            var settleAmt = JoyinMath.doAdd(unitValue, $('#otherAmt').val(),2);
-            $('#settleAmt').val(settleAmt);
-            $('#dealAmt').val(settleAmt);
-        }else{
-            $('#settleAmt').val('');
-            $('#dealAmt').val('');
 
-        }
+            if($('#prinAmt').val() && $('#intAmt').val() && $('#otherAmt').val()&& $('#otherAmt').val().replace(/(^s*)|(s*$)/g, "").length !==0
+                &&$('#prinAmt').val() !=='' && $('#intAmt').val()!==''&& $('#otherAmt').val()!==''){
+                if($('#ps').val()=="T01"){ //交易方向为买入时 结算金额=交易本金+应计利息+其他费用
+                    var unitValue = JoyinMath.doAdd($('#prinAmt').val(), $('#intAmt').val(),2);
+                    var settleAmt = JoyinMath.doAdd(unitValue, $('#otherAmt').val(),2);
+                }else if($('#ps').val()=="T02"){ //交易方向为卖出时 结算金额=交易本金+应计利息-其他费用
+                    var unitValue = JoyinMath.doAdd($('#prinAmt').val(), $('#intAmt').val(),2);
+                    var settleAmt = JoyinMath.doMinus(unitValue, $('#otherAmt').val(),2);
+                }
+                $('#settleAmt').val(settleAmt);
+                // $('#dealAmt').val(settleAmt);
+            }else{
+                $('#settleAmt').val('');
+                // $('#dealAmt').val('');
+            }
     }
 
+
+    //交易本金 联动
+    $('#ps').change(function(){
+        mdateSettleAmtCalculate();
+    });
 
     //交易本金 联动
     $('#prinAmt').change(function(){

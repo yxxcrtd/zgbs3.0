@@ -180,7 +180,7 @@ public class TrdDepositValuationTrade002Service extends CommonExportService<TrdD
         entity.setPs(dto.getPs());//交易方向
         entity.setTradeCapi(dto.getPrinAmt()); //交易本金
         entity.setIntAmt(dto.getIntAmt()); //应收利息
-        entity.setDealAmt(dto.getDealAmt());//交易金额
+        entity.setDealAmt(dto.getSettleAmt());//交易金额
         entity.setCcy(dto.getCcy());//币种
         entity.setCounterId(dto.getCounterId());//交易对手
         entity.setIsClean("Y");//有无清算指令
