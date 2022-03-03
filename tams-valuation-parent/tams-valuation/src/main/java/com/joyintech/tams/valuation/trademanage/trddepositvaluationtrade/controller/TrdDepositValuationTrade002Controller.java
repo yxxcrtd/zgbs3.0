@@ -31,6 +31,7 @@ import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
 
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.valuation.basicdata.business.dto.BussinessCodeParameter;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.component.common.constant.BussinessConstant;
@@ -85,6 +86,9 @@ public class TrdDepositValuationTrade002Controller extends BaseController {
     @Autowired(required = false)
     private CommonBusinessService commonBusinessService;
 
+    @Autowired
+    private IPlatformDate iPlatformDate;
+
 
     /**
      * 初始化方法
@@ -121,6 +125,7 @@ public class TrdDepositValuationTrade002Controller extends BaseController {
             model.addAttribute("entity", entity);
         }
         model.addAttribute("YES_OR_NO_N", DictCodeList.是否_否.getValue());
+
         return super.init(model);
 
     }
@@ -165,6 +170,8 @@ public class TrdDepositValuationTrade002Controller extends BaseController {
         return trdDepositValuationTrade002Service.findFinprodId(param);
     }
 
+
+
     @ResponseBody
     @RequestMapping("/getCounterId")
     public Page<SelectOptionDto> getCounterId(){
@@ -172,26 +179,36 @@ public class TrdDepositValuationTrade002Controller extends BaseController {
     }
 
     /**
-     * 获取产品代码
-     * @return 联想下拉框实体类集合
+     * 产品代码下拉框
+     *
+     * @return 产品代码
+     * @see
+     * @since 1.0
      */
     @ResponseBody
-    @RequestMapping("getProdId")
-    public List<SelectOptionDto> getProdId(){
-        Map<String,Object> map = RequestUtil.getPageParam();
-        return commonBusinessService.getProdId(map);
+    @RequestMapping("/getFinprodId")
+    public List<SelectOptionDto> getFinprodId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("finprodType","F16");
+        return commonBusinessService.getProdId(param);
     }
 
     /**
-     * 获取资产代码
-     * @return 联想下拉框实体类集合
+     * 资产代码下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
      */
     @ResponseBody
-    @RequestMapping("getAssetId")
-    public List<SelectOptionDto> getAssetId(){
-        Map<String,Object> map = RequestUtil.getPageParam();
-        return commonBusinessService.getAssetId(map);
+    @RequestMapping("/getAssetId")
+    public List<SelectOptionDto> getAssetId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("assetType","F01");
+        return commonBusinessService.getAssetId(param);
     }
+
+
     /**
      * 获取资金账户
      * @return 联想下拉框实体类集合

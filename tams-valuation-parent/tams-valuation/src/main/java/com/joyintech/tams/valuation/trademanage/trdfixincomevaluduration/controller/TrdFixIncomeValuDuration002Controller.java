@@ -13,13 +13,16 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.SpringContextUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.trdfixincomevaluduration.dto.TrdFixIncomeValuDuration001Dto;
 import com.joyintech.tams.valuation.trademanage.trdfixincomevaluduration.service.TrdFixIncomeValuDuration002Service;
@@ -36,6 +39,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -56,6 +61,8 @@ public class TrdFixIncomeValuDuration002Controller extends BaseController {
     @Autowired(required = false)
     private CommonBusinessService commonBusinessService;
 
+    @Autowired
+    private IPlatformDate iPlatformDate;
 
 
     public String init(Model model) {
@@ -65,7 +72,8 @@ public class TrdFixIncomeValuDuration002Controller extends BaseController {
         model.addAttribute("PS_T01", DictCodeList.交易方向_买入.getValue());
         model.addAttribute("PS_T02", DictCodeList.交易方向_卖出.getValue());
         // 一体化对应etliu end
-
+        //平台日
+        model.addAttribute("iPlatformDate", DateUtil.parse(DateUtil.getSysDate()));
         model.addAttribute("YES_OR_NO_N", DictCodeList.是否_否.getValue());
         model.addAttribute("FINPROD_TYPE_F17", DictCodeListExt1.金融产品类型_计划类资产.getValue());
         String portfolioId = getParam("portfolioId");
@@ -146,4 +154,34 @@ public class TrdFixIncomeValuDuration002Controller extends BaseController {
     }
 
 
+
+    /**
+     * 产品代码下拉框
+     *
+     * @return 产品代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getFinprodId")
+    public List<SelectOptionDto> getFinprodId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("finprodType","F16");
+        return commonBusinessService.getProdId(param);
+    }
+
+    /**
+     * 资产代码下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getAssetId")
+    public List<SelectOptionDto> getAssetId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("assetType","F01");
+        return commonBusinessService.getAssetId(param);
+    }
 }

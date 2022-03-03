@@ -151,7 +151,7 @@ public class TrdFixIncomeValuDuration001Dto extends BaseEntity implements Proces
         this.tradeId = tradeId;
     }
 
-    @NotEmpty(fieldName = "TrdFixIncomeValuDuration002.portfolioName", groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName = "TrdFixIncomeValuDuration002.portfolioId", groups = {ValidateGroupEdit.class})
     public String getPortfolioId() {
         return portfolioId;
     }
@@ -161,7 +161,7 @@ public class TrdFixIncomeValuDuration001Dto extends BaseEntity implements Proces
         this.portfolioId = portfolioId;
     }
 
-    @NotEmpty(fieldName = "TrdFixIncomeValuDuration002.portfolioId", groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName = "TrdFixIncomeValuDuration002.portfolioName", groups = {ValidateGroupEdit.class})
     public String getPortfolioName() {
         return portfolioName;
     }
@@ -170,7 +170,7 @@ public class TrdFixIncomeValuDuration001Dto extends BaseEntity implements Proces
         this.portfolioName = portfolioName;
     }
 
-    @NotEmpty(fieldName = "TrdFixIncomeValuDuration002.finprodName", groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName = "TrdFixIncomeValuDuration002.finprodMarketId", groups = {ValidateGroupEdit.class})
     public String getFinprodMarketId() {
         return finprodMarketId;
     }
@@ -179,7 +179,7 @@ public class TrdFixIncomeValuDuration001Dto extends BaseEntity implements Proces
         this.finprodMarketId = finprodMarketId;
     }
 
-    @NotEmpty(fieldName = "TrdFixIncomeValuDuration002.finprodMarketId", groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName = "TrdFixIncomeValuDuration002.finprodName", groups = {ValidateGroupEdit.class})
     public String getFinprodName() {
         return finprodName;
     }
