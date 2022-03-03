@@ -209,12 +209,7 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
 
                 List<ValCashBonusTrade> listValCashBonusTrade = new ArrayList<ValCashBonusTrade>();
                 ValCashBonusTrade valCashBonusTrade = new ValCashBonusTrade();
-                BeanUtil.copyPropertiesIgnoreNull(valCashBonusTrade, trdFundBonusValuationTradeDto);
-                //比较界面和接口字段差异，并手动给接口字段赋值
-                valCashBonusTrade.setAssetId("F06_" + trdFundBonusValuationTradeDto.getFinprodId());//资产代码  F06基金
-                valCashBonusTrade.setDataActionSign("01");
-                valCashBonusTrade.setIsChlFeeAmt("Y");
-                valCashBonusTrade.setIsClean("N");
+                valCashBonusTrade = dealBean(valCashBonusTrade,trdFundBonusValuationTradeDto);
 
                 listValCashBonusTrade.add(valCashBonusTrade);
 
@@ -260,11 +255,7 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
 
                 List<ValBonusResTrade> listValBonusResTrade = new ArrayList<ValBonusResTrade>();
                 ValBonusResTrade valBonusResTrade = new ValBonusResTrade();
-                BeanUtil.copyPropertiesIgnoreNull(valBonusResTrade, trdFundBonusValuationTradeDto);
-                //比较界面和接口字段差异，并手动给接口字段赋值
-                valBonusResTrade.setAssetId("F06_" + trdFundBonusValuationTradeDto.getFinprodId());//资产代码  F06基金
-                valBonusResTrade.setDataActionSign("01");
-                valBonusResTrade.setIsClean("N");
+                valBonusResTrade = dealBean(valBonusResTrade,trdFundBonusValuationTradeDto);
 
                 listValBonusResTrade.add(valBonusResTrade);
 
@@ -311,11 +302,7 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
 
                 List<ValFundShareConvert> listValFundTrade = new ArrayList<ValFundShareConvert>();
                 ValFundShareConvert valFundShareConvert = new ValFundShareConvert();
-                BeanUtil.copyPropertiesIgnoreNull(valFundShareConvert, trdFundBonusValuationTradeDto);
-                //比较界面和接口字段差异，并手动给接口字段赋值
-                valFundShareConvert.setAssetId("F06_" + trdFundBonusValuationTradeDto.getFinprodId());//资产代码  F06基金
-                valFundShareConvert.setDataActionSign("01");
-                valFundShareConvert.setIsClean("N");
+                valFundShareConvert = dealBean(valFundShareConvert,trdFundBonusValuationTradeDto);
 
                 listValFundTrade.add(valFundShareConvert);
 
@@ -366,6 +353,59 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
             return trdFundBonusTradeResult;
         }
     }
+
+
+    /**
+     * @auther: 属性转换处理-现金分红
+     * @date: 2022/3/2
+     * @param:
+     * @return:
+     */
+    public ValCashBonusTrade dealBean(ValCashBonusTrade valCashBonusTrade,TrdFundBonusValuationTradeDto dto){
+        //相同字段名： 成交编号、交易方向、交易场所、币种
+        BeanUtil.copyPropertiesIgnoreNull(valCashBonusTrade, dto);
+        //比较界面和接口字段差异，并手动给接口字段赋值
+        valCashBonusTrade.setAssetId("F01_" + dto.getFinprodId());//资产代码
+        valCashBonusTrade.setDataActionSign("01");
+        valCashBonusTrade.setIsChlFeeAmt("Y");
+        valCashBonusTrade.setIsClean("N");
+
+        return valCashBonusTrade;
+    }
+
+    /**
+     * @auther: 属性转换处理-红利再投
+     * @date: 2022/3/2
+     * @param:
+     * @return:
+     */
+    public ValBonusResTrade dealBean(ValBonusResTrade valBonusResTrade,TrdFundBonusValuationTradeDto dto){
+        //相同字段名： 成交编号、交易方向、交易场所、币种
+        BeanUtil.copyPropertiesIgnoreNull(valBonusResTrade, dto);
+        valBonusResTrade.setAssetId("F01_" + dto.getFinprodId());//资产代码
+        valBonusResTrade.setDataActionSign("01");
+        valBonusResTrade.setIsClean("N");
+
+        return valBonusResTrade;
+    }
+
+    /**
+     * @auther: 属性转换处理-份额强增、份额强减
+     * @date: 2022/3/2
+     * @param:
+     * @return:
+     */
+    public ValFundShareConvert dealBean(ValFundShareConvert valFundShareConvert,TrdFundBonusValuationTradeDto dto){
+        //相同字段名： 成交编号、交易方向、交易场所、币种
+        BeanUtil.copyPropertiesIgnoreNull(valFundShareConvert, dto);
+        valFundShareConvert.setAssetId("F01_" + dto.getFinprodId());//资产代码
+        valFundShareConvert.setDataActionSign("01");
+        valFundShareConvert.setIsClean("N");
+
+        return valFundShareConvert;
+    }
+
+
 
 
 }

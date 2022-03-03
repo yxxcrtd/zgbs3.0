@@ -73,7 +73,9 @@ $(function(){
             ,{field:'ccy', width:150, title: '币种',sortField:'ccy'}
             ,{field:'mdateSettleAmt', width:150, title: '结算金额',type:'number'}
             ,{field:'trdAcctId', width:150, title: '资金账户'}
-            ,{field:'operation', title: 'SysCommon.operation', type:'action', buttons: ['edit', 'delt']}
+            ,{field:'operation', title: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操 作', fixed:'right',width : 120,
+                align : 'center',type : 'action', buttons : [ 'edit', 'delt' ,
+                    {text: '<i class="iconfont icon-submit"></i>', clas: 'confirm', title: '赎回到账'}]}
         ]
     });
     /**
@@ -145,6 +147,21 @@ $(function(){
                     }
                 );
             });
+        });
+
+        /**
+         * 绑定确认事件
+         */
+        table.bind('click', '.confirm', function(data, index) {
+            var object = {selectedItem: [data], operateType:"confirm"};//请求参数
+            Joyin.dialog(JoyinUtil.getLabel("计划类资产交易-赎回到账"),
+                basePath + "valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade003/init",//打开新界面
+                "98%", "98%", {//请求的page_model
+                    tradeId:data.tradeId,  //金融产品代码
+                    operateType:"confirm"
+                },function(){
+                    table.reload();//回调函数，表格刷新
+                });
         });
 
     });

@@ -9,7 +9,6 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
-import com.joyintech.tams.common.base.entity.WflTrdProductDeal;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -18,7 +17,6 @@ import com.joyintech.tams.valuation.trademanage.trdfundbonusvaluationtrade.dto.T
 import com.joyintech.tams.valuation.trademanage.trdfundbonusvaluationtrade.service.TrdFundBonusValuationTrade002Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
-import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +87,7 @@ public class TrdFundBonusValuationTrade002Controller extends BaseController {
             entity.setFeeAmt(new BigDecimal("0.00"));            //交易费用
             entity.setFeeAmtQT(new BigDecimal("0.00"));
             entity.setCcy(DictCodeList.币种_人民币_CNY.getValue());
+            entity.setPs(DictCodeList.交易方向_现金分红.getValue());
             model.addAttribute("entity", entity);
         }
 

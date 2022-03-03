@@ -38,48 +38,138 @@ public class TrdPlanValuationTradeDtoValidator implements BeanValidator {
         TrdPlanValuationTradeDto dto = (TrdPlanValuationTradeDto)value;
         if(dto.getOperateType().equals("submit") || dto.getOperateType().equals("save")) {
             if(StringUtil.isNotEmpty(dto.getPs())){
-                if( StringUtil.equals(dto.getPs(),DictCodeList.交易方向_买入.getValue())
-                    || StringUtil.equals(dto.getPs(),DictCodeList.交易方向_卖出.getValue())
-                    || StringUtil.equals(dto.getPs(),DictCodeList.交易方向_认购.getValue())
-                    || StringUtil.equals(dto.getPs(),DictCodeList.交易方向_申购.getValue())
+                if( StringUtil.equals(dto.getPs(), DictCodeList.交易方向_买入.getValue())
+                        || StringUtil.equals(dto.getPs(),DictCodeList.交易方向_卖出.getValue())
                 ){
-                    if(dto.getTradeAmt() ==null){
-                        String msg = this.getMessage("请输入交易金额。");
+                    if(dto.getTradeDate() ==null){
+                        String msg = this.getMessage("请输入交易日期。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+                    if(dto.getSettleDate() ==null){
+                        String msg = this.getMessage("请输入结算日期。");
                         validMessageList.add(new ValidMessage(msg));
                     }
                     if(dto.getNums() ==null){
-                        String msg = this.getMessage("请输入交易份额。");
+                        String msg = this.getMessage("请输入成交数量。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+                    if(dto.getTradeAmt() ==null){
+                        String msg = this.getMessage("请输入成交金额。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+                    if(dto.getTrdAcctId() ==null){
+                        String msg = this.getMessage("请输入资金账户。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+                    if(dto.getAdvFeeOut() ==null){
+                        String msg = this.getMessage("请输入投资顾问费。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+                    if(dto.getFeeAmtQT() ==null){
+                        String msg = this.getMessage("请输入其他费用。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+                    if(dto.getMdateSettleAmt() ==null){
+                        String msg = this.getMessage("请输入结算金额。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+                    if(dto.getTrdAcctId() ==null){
+                        String msg = this.getMessage("请输入资金账户。");
                         validMessageList.add(new ValidMessage(msg));
                     }
 
-                }else if(StringUtil.equals(dto.getPs(),DictCodeList.交易方向_认购确认.getValue())
-                        || StringUtil.equals(dto.getPs(),DictCodeList.交易方向_申购确认.getValue())
-                        || StringUtil.equals(dto.getPs(),DictCodeList.交易方向_赎回确认.getValue())
-                ){
-                    if(dto.getConfirmTradeAmt() ==null){
+                }else if(StringUtil.equals(dto.getPs(),DictCodeList.交易方向_认购.getValue())  ){
+                    if(dto.getRgTradeDate() ==null){
+                        String msg = this.getMessage("请输入申请日期。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+                    if(dto.getRgSettleDate() ==null){
+                        String msg = this.getMessage("请输入结算日期。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+                    if(dto.getRgTradeAmt() ==null){
+                        String msg = this.getMessage("请输入申请金额。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+                    if(dto.getRgTrdAcctId() ==null){
+                        String msg = this.getMessage("请输入资金账户。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+
+                }else if(StringUtil.equals(dto.getPs(),DictCodeList.交易方向_申购.getValue())){
+                    if(dto.getSqTradeDate() ==null){
+                        String msg = this.getMessage("请输入申请日期。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+                    if(dto.getSqSettleDate() ==null){
+                        String msg = this.getMessage("请输入结算日期。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+                    if(dto.getSqTradeAmt() ==null){
+                        String msg = this.getMessage("请输入申请金额。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+                    if(dto.getSqTrdAcctId() ==null){
+                        String msg = this.getMessage("请输入资金账户。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+                }else if(StringUtil.equals(dto.getPs(),DictCodeList.交易方向_认购确认.getValue())){
+                    if(dto.getRgqrTradeDate() ==null){
+                        String msg = this.getMessage("请输入确认日期。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+                    if(dto.getRgqrNums() ==null){
+                        String msg = this.getMessage("请输入确认数量。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+                    if(dto.getSubscribeFee() ==null){
+                        String msg = this.getMessage("请输入认购费。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+                    if(dto.getRgqrTrdAcctId() ==null){
+                        String msg = this.getMessage("请输入资金账户。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+                }else if(StringUtil.equals(dto.getPs(),DictCodeList.交易方向_申购确认.getValue()) ){
+                    if(dto.getSgqrTradeDate() ==null){
+                        String msg = this.getMessage("请输入确认日期。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+                    if(dto.getSgqrNums() ==null){
+                        String msg = this.getMessage("请输入确认数量。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+                    if(dto.getPurchaseFee() ==null){
+                        String msg = this.getMessage("请输入申购费。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+                    if(dto.getSgqrTrdAcctId() ==null){
+                        String msg = this.getMessage("请输入资金账户。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+                }else if(StringUtil.equals(dto.getPs(),DictCodeList.交易方向_赎回确认.getValue()) ){
+                    if(dto.getShqrTradeDate() ==null){
+                        String msg = this.getMessage("请输入确认日期。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+                    if(dto.getShqrNums() ==null){
+                        String msg = this.getMessage("请输入确认数量。");
+                        validMessageList.add(new ValidMessage(msg));
+                    }
+                    if(dto.getShqrTradeAmt() ==null){
                         String msg = this.getMessage("请输入确认金额。");
                         validMessageList.add(new ValidMessage(msg));
                     }
-                    if(dto.getConfirmNums() ==null){
-                        String msg = this.getMessage("请输入交易份额。");
+                    if(dto.getRedemptionFee() ==null){
+                        String msg = this.getMessage("请输入赎回费。");
                         validMessageList.add(new ValidMessage(msg));
                     }
-                    if(dto.getConfirmIntAmt() ==null){
-                        String msg = this.getMessage("请输入利息确认金额。");
+                    if(dto.getShqrSettleDate() ==null){
+                        String msg = this.getMessage("请输入到账日期。");
                         validMessageList.add(new ValidMessage(msg));
                     }
-                    if(dto.getRefundAmount() ==null){
-                        String msg = this.getMessage("请输入返款金额。");
-                        validMessageList.add(new ValidMessage(msg));
-                    }
-                    if(dto.getUnitValue() ==null){
-                        String msg = this.getMessage("请输入单位净值。");
-                        validMessageList.add(new ValidMessage(msg));
-                    }
-                }else if(StringUtil.equals(dto.getPs(),DictCodeList.交易方向_赎回到账.getValue())
-                ){
-                    if(dto.getSettleAmt() ==null){
-                        String msg = this.getMessage("请输入到账金额。");
+                    if(dto.getShqrTrdAcctId() ==null){
+                        String msg = this.getMessage("请输入资金账户。");
                         validMessageList.add(new ValidMessage(msg));
                     }
                 }

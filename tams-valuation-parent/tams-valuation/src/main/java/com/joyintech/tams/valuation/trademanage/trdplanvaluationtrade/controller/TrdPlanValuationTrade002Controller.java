@@ -95,15 +95,9 @@ public class TrdPlanValuationTrade002Controller extends BaseController {
         }else{
             //初始化值
             TrdPlanValuationTradeDto entity = new TrdPlanValuationTradeDto();
-            entity.setConfirmIntAmt(new BigDecimal("0.00"));     //利息确认金额
-            entity.setRefundAmount(new BigDecimal("0.00"));      //返款金额
-            entity.setRateRefundAmount(new BigDecimal("0.00"));  //利息返还金额
             entity.setFeeAmt(new BigDecimal("0.00"));            //交易费用
-            entity.setAdvFeeOut(new BigDecimal("0.00"));         //投资顾问费
-            entity.setFeeAmtQT(new BigDecimal("0.00"));          //其他费用
-            entity.setTodayArriveFlag(DictCodeList.是否_否.getValue()); //初始默认否
             entity.setCcy(DictCodeList.币种_人民币_CNY.getValue());
-
+            entity.setPs(DictCodeList.交易方向_买入.getValue());
             model.addAttribute("entity", entity);
         }
         model.addAttribute("YES_OR_NO_N", DictCodeList.是否_否.getValue());

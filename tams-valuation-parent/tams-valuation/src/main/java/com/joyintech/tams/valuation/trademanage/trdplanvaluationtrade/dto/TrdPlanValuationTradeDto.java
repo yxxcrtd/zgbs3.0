@@ -19,6 +19,7 @@ import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.valuation.trademanage.trdfundvaluationtrade.dto.TrdFundValuationTradeDto;
 import com.joyintech.tams.valuation.trademanage.trdplanvaluationtrade.validate.TrdPlanValuationTradeDtoValidator;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.annotation.PrimaryKey.Field;
@@ -55,21 +56,16 @@ public class TrdPlanValuationTradeDto extends WflTrdProductDeal implements Proce
      */
     private String portfolioName;
 
-    /**
-     * 是否当日到账
-     */
-    private String  todayArriveFlag;
 
     /**
      * 交易份额
      */
     private BigDecimal nums;
 
-
     /**
-     * 确认金额
+     * 结算日期
      */
-    private BigDecimal confirmTradeAmt;
+    private Date settleDate;
 
     /**
      * (确认)交易份额
@@ -77,33 +73,9 @@ public class TrdPlanValuationTradeDto extends WflTrdProductDeal implements Proce
     private BigDecimal confirmNums;
 
     /**
-     * 利息确认金额
+     * 待结转份额
      */
-    private BigDecimal confirmIntAmt;
-
-    /**
-     * 返款金额
-     */
-    private BigDecimal refundAmount;
-
-    /**
-     * 利息返还金额
-     */
-    private BigDecimal rateRefundAmount;
-
-    /**
-     * 单位净值
-     */
-    private BigDecimal unitValue;
-
-    /**
-     * 投资顾问费
-     */
-    private BigDecimal advFeeOut;
-    /**
-     * 其他费用
-     */
-    private BigDecimal feeAmtQT;
+    private BigDecimal carryAmt;
 
     /**
      * 结算金额
@@ -111,25 +83,181 @@ public class TrdPlanValuationTradeDto extends WflTrdProductDeal implements Proce
     private BigDecimal mdateSettleAmt;
 
     /**
-     * 到账金额
-     */
-    private BigDecimal settleAmt;
-
-    /**
      * 资金账户
      */
     private String trdAcctId;
 
     /**
-     * 外部交易编号
+     * 外部
      */
     private String outTradeId;
+
+
+    /**
+     * 交易场所
+     */
+    private String tradeMarket;
+    /**
+     * 交易场所String
+     */
+    private String tradeMarketStr;
+
+    /**
+     * 交易信息-投资顾问费
+     */
+    private BigDecimal advFeeOut;
+
+    /**
+     * 交易信息-其他费用
+     */
+    private BigDecimal feeAmtQT;
 
 
     /**
      * 金融产品名称
      */
     private String finprodName;
+
+
+    /**
+     * 认购信息-申请日期
+     */
+    private Date rgTradeDate;
+
+    /**
+     * 认购信息-结算日期
+     */
+    private Date rgSettleDate;
+
+    /**
+     * 认购信息-申请金额
+     */
+    private BigDecimal rgTradeAmt;
+
+    /**
+     * 认购信息-资金账户
+     */
+    private String rgTrdAcctId;
+
+    /**
+     * 申请信息-申请日期
+     */
+    private Date sqTradeDate;
+
+    /**
+     * 申请信息-结算日期
+     */
+    private Date sqSettleDate;
+    /**
+     * 申请信息-申请金额
+     */
+    private BigDecimal sqTradeAmt;
+
+    /**
+     * 申请信息-资金账户
+     */
+    private String sqTrdAcctId;
+
+    /**
+     * （认购）确认信息-确认日期
+     */
+    private Date rgqrTradeDate;
+    /**
+     * （认购）确认信息-确认数量
+     */
+    private BigDecimal rgqrNums;
+    /**
+     * （认购）确认信息-确认金额
+     */
+    private BigDecimal rgqrTradeAmt;
+    /**
+     * （认购）确认信息-募集期利息
+     */
+    private BigDecimal raiseInterest;
+    /**
+     * （认购）确认信息-认购费
+     */
+    private BigDecimal subscribeFee;
+    /**
+     * （认购）确认信息-资金账户
+     */
+    private String rgqrTrdAcctId;
+
+    /**
+     * （申购）确认信息-确认日期
+     */
+    private Date sgqrTradeDate;
+    /**
+     * （申购）确认信息-确认数量
+     */
+    private BigDecimal sgqrNums;
+    /**
+     * （申购）确认信息-确认金额
+     */
+    private BigDecimal sgqrTradeAmt;
+    /**
+     * （申购）确认信息-单位净值
+     */
+    private BigDecimal sgqrUnitValue;
+    /**
+     * （申购）确认信息-利息收入
+     */
+    private BigDecimal interestIncome;
+    /**
+     * （申购）确认信息-申购费
+     */
+    private BigDecimal purchaseFee;
+    /**
+     * （申购）确认信息-资金账户
+     */
+    private String sgqrTrdAcctId;
+
+
+    /**
+     * 赎回信息-确认日期
+     */
+    private Date shqrTradeDate;
+    /**
+     * 赎回信息-确认数量
+     */
+    private BigDecimal shqrNums;
+    /**
+     * 赎回信息-确认金额
+     */
+    private BigDecimal shqrTradeAmt;
+    /**
+     * 赎回信息-单位净值
+     */
+    private BigDecimal shqrUnitValue;
+    /**
+     * 赎回信息-赎回费
+     */
+    private BigDecimal redemptionFee;
+    /**
+     * 赎回信息-到账日期
+     */
+    private Date shqrSettleDate;
+    /**
+     * 赎回信息-资金账户
+     */
+    private String shqrTrdAcctId;
+
+    /**
+     * 赎回到账-到账日期
+     */
+    private Date shdzSettleDate ;
+    /**
+     * 赎回到账-到账金额
+     */
+    private BigDecimal shdzTradeAmt;
+    /**
+     * 赎回到账-到账账户
+     */
+    private String shdzTrdAcctId;
+
+
+
+
     /**
      * 操作类型
      */
@@ -146,13 +274,6 @@ public class TrdPlanValuationTradeDto extends WflTrdProductDeal implements Proce
      * 计划类实体类
      */
     private List<TrdPlanValuationTradeDto> selectedItem;
-
-    /**
-     * 收益类型
-     */
-    private String profitType;//01净值型，02预期收益型,03货币型
-
-
 
     /**
      * 撤销原因
@@ -205,7 +326,6 @@ public class TrdPlanValuationTradeDto extends WflTrdProductDeal implements Proce
     }
 
     @Override
-    @NotEmpty(fieldName="TrdPlanValuationTrade001.tradeDate",groups = {ValidateGroupEdit.class})
     public Date getTradeDate(){
         return super.getTradeDate();
     }
@@ -313,7 +433,7 @@ public class TrdPlanValuationTradeDto extends WflTrdProductDeal implements Proce
      * {@inheritDoc}
      */
     @Override
-    @NotEmpty(fieldName="TrdPlanValuationTrade001.ccy",groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName="TrdPlanValuationTrade002.ccy",groups = {ValidateGroupEdit.class})
     public String getCcy(){
         return super.getCcy();
     }
@@ -321,7 +441,7 @@ public class TrdPlanValuationTradeDto extends WflTrdProductDeal implements Proce
      * 交易方向
      * {@inheritDoc}
      */
-    @NotEmpty(fieldName="TrdPlanValuationTrade001.ps",groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName="TrdPlanValuationTrade002.ps",groups = {ValidateGroupEdit.class})
     public String getPs(){
         return super.getPs();
     }
@@ -335,12 +455,16 @@ public class TrdPlanValuationTradeDto extends WflTrdProductDeal implements Proce
         return SysDataUtil.getNameFromDataDict(DictCode.交易方向, super.getPs());
     }
 
+    public String getTradeMarketStr(){
+        return SysDataUtil.getNameFromDataDict(DictCode.交易场所, super.getTradeMarket());
+    }
+
 
     /**
      * 获取 portfolioId
      * @return portfolioId.
      */
-    @NotEmpty(fieldName="TrdPlanValuationTrade001.portfolioId",groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName="TrdPlanValuationTrade002.portfolioId",groups = {ValidateGroupEdit.class})
     public String getPortfolioId() {
         return portfolioId;
     }
@@ -357,7 +481,7 @@ public class TrdPlanValuationTradeDto extends WflTrdProductDeal implements Proce
      * 获取 portfolioName
      * @return portfolioName.
      */
-    @NotEmpty(fieldName="TrdPlanValuationTrade001.portfolioName",groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName="TrdPlanValuationTrade002.portfolioName",groups = {ValidateGroupEdit.class})
     public String getPortfolioName() {
         return portfolioName;
     }
@@ -375,7 +499,7 @@ public class TrdPlanValuationTradeDto extends WflTrdProductDeal implements Proce
      * 获取 finprodName
      * @return finprodName.
      */
-    @NotEmpty(fieldName="TrdPlanValuationTrade001.finprodName",groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName="TrdPlanValuationTrade002.finprodName",groups = {ValidateGroupEdit.class})
     public String getFinprodName() {
         return finprodName;
     }
@@ -397,16 +521,6 @@ public class TrdPlanValuationTradeDto extends WflTrdProductDeal implements Proce
         this.outTradeId = outTradeId;
     }
 
-    @NotEmpty(fieldName="TrdPlanValuationTrade002.todayArriveFlag",groups = {ValidateGroupEdit.class})
-    public String getTodayArriveFlag() {
-        return todayArriveFlag;
-    }
-
-    public void setTodayArriveFlag(String todayArriveFlag) {
-        this.todayArriveFlag = todayArriveFlag;
-    }
-
-//    @NotEmpty(fieldName="TrdPlanValuationTrade002.nums",groups = {ValidateGroupEdit.class})
     public BigDecimal getNums() {
         return nums;
     }
@@ -415,16 +529,7 @@ public class TrdPlanValuationTradeDto extends WflTrdProductDeal implements Proce
         this.nums = nums;
     }
 
-//    @NotEmpty(fieldName="TrdPlanValuationTrade002.confirmTradeAmt",groups = {ValidateGroupEdit.class})
-    public BigDecimal getConfirmTradeAmt() {
-        return confirmTradeAmt;
-    }
 
-    public void setConfirmTradeAmt(BigDecimal confirmTradeAmt) {
-        this.confirmTradeAmt = confirmTradeAmt;
-    }
-
-//    @NotEmpty(fieldName="TrdPlanValuationTrade002.confirmNums",groups = {ValidateGroupEdit.class})
     public BigDecimal getConfirmNums() {
         return confirmNums;
     }
@@ -433,61 +538,17 @@ public class TrdPlanValuationTradeDto extends WflTrdProductDeal implements Proce
         this.confirmNums = confirmNums;
     }
 
-    @NotEmpty(fieldName="TrdPlanValuationTrade002.confirmIntAmt",groups = {ValidateGroupEdit.class})
-    public BigDecimal getConfirmIntAmt() {
-        return confirmIntAmt;
+    public BigDecimal getCarryAmt() {
+        return carryAmt;
     }
 
-    public void setConfirmIntAmt(BigDecimal confirmIntAmt) {
-        this.confirmIntAmt = confirmIntAmt;
-    }
-    @NotEmpty(fieldName="TrdPlanValuationTrade002.refundAmount",groups = {ValidateGroupEdit.class})
-    public BigDecimal getRefundAmount() {
-        return refundAmount;
+    public void setCarryAmt(BigDecimal carryAmt) {
+        this.carryAmt = carryAmt;
     }
 
 
-    public void setRefundAmount(BigDecimal refundAmount) {
-        this.refundAmount = refundAmount;
-    }
 
-    @NotEmpty(fieldName="TrdPlanValuationTrade002.rateRefundAmount",groups = {ValidateGroupEdit.class})
-    public BigDecimal getRateRefundAmount() {
-        return rateRefundAmount;
-    }
 
-    public void setRateRefundAmount(BigDecimal rateRefundAmount) {
-        this.rateRefundAmount = rateRefundAmount;
-    }
-
-//    @NotEmpty(fieldName="TrdPlanValuationTrade002.unitValue",groups = {ValidateGroupEdit.class})
-    public BigDecimal getUnitValue() {
-        return unitValue;
-    }
-
-    public void setUnitValue(BigDecimal unitValue) {
-        this.unitValue = unitValue;
-    }
-
-    @NotEmpty(fieldName="TrdPlanValuationTrade002.advFeeOut",groups = {ValidateGroupEdit.class})
-    public BigDecimal getAdvFeeOut() {
-        return advFeeOut;
-    }
-
-    public void setAdvFeeOut(BigDecimal advFeeOut) {
-        this.advFeeOut = advFeeOut;
-    }
-
-    @NotEmpty(fieldName="TrdPlanValuationTrade002.feeAmtQT",groups = {ValidateGroupEdit.class})
-    public BigDecimal getFeeAmtQT() {
-        return feeAmtQT;
-    }
-
-    public void setFeeAmtQT(BigDecimal feeAmtQT) {
-        this.feeAmtQT = feeAmtQT;
-    }
-
-    @NotEmpty(fieldName="TrdPlanValuationTrade002.mdateSettleAmt",groups = {ValidateGroupEdit.class})
     public BigDecimal getMdateSettleAmt() {
         return mdateSettleAmt;
     }
@@ -496,43 +557,30 @@ public class TrdPlanValuationTradeDto extends WflTrdProductDeal implements Proce
         this.mdateSettleAmt = mdateSettleAmt;
     }
 
-//    @NotEmpty(fieldName="TrdPlanValuationTrade002.settleAmt",groups = {ValidateGroupEdit.class})
-    public BigDecimal getSettleAmt() {
-        return settleAmt;
-    }
-
-    public void setSettleAmt(BigDecimal settleAmt) {
-        this.settleAmt = settleAmt;
-    }
 
     //交易金额
     @Override
-    @NotEmpty(fieldName="TrdPlanValuationTrade001.tradeAmt",groups = {ValidateGroupEdit.class})
     public BigDecimal getTradeAmt() {
         return super.getTradeAmt();
     }
     //交易费用
     @Override
-    @NotEmpty(fieldName="TrdPlanValuationTrade002.feeAmt",groups = {ValidateGroupEdit.class})
     public BigDecimal getFeeAmt() {
         return super.getFeeAmt();
     }
 
     //资产代码
     @Override
-    @NotEmpty(fieldName="TrdPlanValuationTrade001.finprodId",groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName="TrdPlanValuationTrade002.finprodId",groups = {ValidateGroupEdit.class})
     public String getFinprodId() {
         return super.getFinprodId();
     }
 
-    public String getProfitType() {
-        return profitType;
+    @Override
+    public String getTradeMarket() {
+        return tradeMarket;
     }
 
-
-    public void setProfitType(String profitType) {
-        this.profitType = profitType;
-    }
     public String getTradeDateStr() {
         String tradeDateStr="";
         if(super.getTradeDate() !=null){
@@ -541,7 +589,277 @@ public class TrdPlanValuationTradeDto extends WflTrdProductDeal implements Proce
         return tradeDateStr;
     }
 
+    @Override
+    public Date getSettleDate() {
+        return settleDate;
+    }
 
+    @Override
+    public void setSettleDate(Date settleDate) {
+        this.settleDate = settleDate;
+    }
 
+    public BigDecimal getRaiseInterest() {
+        return raiseInterest;
+    }
+
+    public void setRaiseInterest(BigDecimal raiseInterest) {
+        this.raiseInterest = raiseInterest;
+    }
+
+    public BigDecimal getSubscribeFee() {
+        return subscribeFee;
+    }
+
+    public void setSubscribeFee(BigDecimal subscribeFee) {
+        this.subscribeFee = subscribeFee;
+    }
+
+    public BigDecimal getInterestIncome() {
+        return interestIncome;
+    }
+
+    public void setInterestIncome(BigDecimal interestIncome) {
+        this.interestIncome = interestIncome;
+    }
+
+    public BigDecimal getPurchaseFee() {
+        return purchaseFee;
+    }
+
+    public void setPurchaseFee(BigDecimal purchaseFee) {
+        this.purchaseFee = purchaseFee;
+    }
+
+    public BigDecimal getRedemptionFee() {
+        return redemptionFee;
+    }
+
+    public void setRedemptionFee(BigDecimal redemptionFee) {
+        this.redemptionFee = redemptionFee;
+    }
+
+    public Date getRgTradeDate() {
+        return rgTradeDate;
+    }
+
+    public void setRgTradeDate(Date rgTradeDate) {
+        this.rgTradeDate = rgTradeDate;
+    }
+
+    public Date getRgSettleDate() {
+        return rgSettleDate;
+    }
+
+    public void setRgSettleDate(Date rgSettleDate) {
+        this.rgSettleDate = rgSettleDate;
+    }
+
+    public BigDecimal getRgTradeAmt() {
+        return rgTradeAmt;
+    }
+
+    public void setRgTradeAmt(BigDecimal rgTradeAmt) {
+        this.rgTradeAmt = rgTradeAmt;
+    }
+
+    public String getRgTrdAcctId() {
+        return rgTrdAcctId;
+    }
+
+    public void setRgTrdAcctId(String rgTrdAcctId) {
+        this.rgTrdAcctId = rgTrdAcctId;
+    }
+
+    public Date getSqTradeDate() {
+        return sqTradeDate;
+    }
+
+    public void setSqTradeDate(Date sqTradeDate) {
+        this.sqTradeDate = sqTradeDate;
+    }
+
+    public Date getSqSettleDate() {
+        return sqSettleDate;
+    }
+
+    public void setSqSettleDate(Date sqSettleDate) {
+        this.sqSettleDate = sqSettleDate;
+    }
+
+    public BigDecimal getSqTradeAmt() {
+        return sqTradeAmt;
+    }
+
+    public void setSqTradeAmt(BigDecimal sqTradeAmt) {
+        this.sqTradeAmt = sqTradeAmt;
+    }
+
+    public String getSqTrdAcctId() {
+        return sqTrdAcctId;
+    }
+
+    public void setSqTrdAcctId(String sqTrdAcctId) {
+        this.sqTrdAcctId = sqTrdAcctId;
+    }
+
+    public Date getRgqrTradeDate() {
+        return rgqrTradeDate;
+    }
+
+    public void setRgqrTradeDate(Date rgqrTradeDate) {
+        this.rgqrTradeDate = rgqrTradeDate;
+    }
+
+    public BigDecimal getRgqrNums() {
+        return rgqrNums;
+    }
+
+    public void setRgqrNums(BigDecimal rgqrNums) {
+        this.rgqrNums = rgqrNums;
+    }
+
+    public BigDecimal getRgqrTradeAmt() {
+        return rgqrTradeAmt;
+    }
+
+    public void setRgqrTradeAmt(BigDecimal rgqrTradeAmt) {
+        this.rgqrTradeAmt = rgqrTradeAmt;
+    }
+
+    public String getRgqrTrdAcctId() {
+        return rgqrTrdAcctId;
+    }
+
+    public void setRgqrTrdAcctId(String rgqrTrdAcctId) {
+        this.rgqrTrdAcctId = rgqrTrdAcctId;
+    }
+
+    public Date getSgqrTradeDate() {
+        return sgqrTradeDate;
+    }
+
+    public void setSgqrTradeDate(Date sgqrTradeDate) {
+        this.sgqrTradeDate = sgqrTradeDate;
+    }
+
+    public BigDecimal getSgqrNums() {
+        return sgqrNums;
+    }
+
+    public void setSgqrNums(BigDecimal sgqrNums) {
+        this.sgqrNums = sgqrNums;
+    }
+
+    public BigDecimal getSgqrTradeAmt() {
+        return sgqrTradeAmt;
+    }
+
+    public void setSgqrTradeAmt(BigDecimal sgqrTradeAmt) {
+        this.sgqrTradeAmt = sgqrTradeAmt;
+    }
+
+    public BigDecimal getSgqrUnitValue() {
+        return sgqrUnitValue;
+    }
+
+    public void setSgqrUnitValue(BigDecimal sgqrUnitValue) {
+        this.sgqrUnitValue = sgqrUnitValue;
+    }
+
+    public String getSgqrTrdAcctId() {
+        return sgqrTrdAcctId;
+    }
+
+    public void setSgqrTrdAcctId(String sgqrTrdAcctId) {
+        this.sgqrTrdAcctId = sgqrTrdAcctId;
+    }
+
+    public Date getShqrTradeDate() {
+        return shqrTradeDate;
+    }
+
+    public void setShqrTradeDate(Date shqrTradeDate) {
+        this.shqrTradeDate = shqrTradeDate;
+    }
+
+    public BigDecimal getShqrNums() {
+        return shqrNums;
+    }
+
+    public void setShqrNums(BigDecimal shqrNums) {
+        this.shqrNums = shqrNums;
+    }
+
+    public BigDecimal getShqrTradeAmt() {
+        return shqrTradeAmt;
+    }
+
+    public void setShqrTradeAmt(BigDecimal shqrTradeAmt) {
+        this.shqrTradeAmt = shqrTradeAmt;
+    }
+
+    public BigDecimal getShqrUnitValue() {
+        return shqrUnitValue;
+    }
+
+    public void setShqrUnitValue(BigDecimal shqrUnitValue) {
+        this.shqrUnitValue = shqrUnitValue;
+    }
+
+    public Date getShqrSettleDate() {
+        return shqrSettleDate;
+    }
+
+    public void setShqrSettleDate(Date shqrSettleDate) {
+        this.shqrSettleDate = shqrSettleDate;
+    }
+
+    public String getShqrTrdAcctId() {
+        return shqrTrdAcctId;
+    }
+
+    public void setShqrTrdAcctId(String shqrTrdAcctId) {
+        this.shqrTrdAcctId = shqrTrdAcctId;
+    }
+
+    public Date getShdzSettleDate() {
+        return shdzSettleDate;
+    }
+
+    public void setShdzSettleDate(Date shdzSettleDate) {
+        this.shdzSettleDate = shdzSettleDate;
+    }
+
+    public BigDecimal getShdzTradeAmt() {
+        return shdzTradeAmt;
+    }
+
+    public void setShdzTradeAmt(BigDecimal shdzTradeAmt) {
+        this.shdzTradeAmt = shdzTradeAmt;
+    }
+
+    public String getShdzTrdAcctId() {
+        return shdzTrdAcctId;
+    }
+
+    public void setShdzTrdAcctId(String shdzTrdAcctId) {
+        this.shdzTrdAcctId = shdzTrdAcctId;
+    }
+
+    public BigDecimal getAdvFeeOut() {
+        return advFeeOut;
+    }
+
+    public void setAdvFeeOut(BigDecimal advFeeOut) {
+        this.advFeeOut = advFeeOut;
+    }
+
+    public BigDecimal getFeeAmtQT() {
+        return feeAmtQT;
+    }
+
+    public void setFeeAmtQT(BigDecimal feeAmtQT) {
+        this.feeAmtQT = feeAmtQT;
+    }
 }
-

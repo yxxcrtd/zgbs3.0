@@ -27,6 +27,34 @@
         }
     });
 
+    $('#ps').change(function(){
+        if($('#ps').val() && $('#ps').val() != null && $('#ps').val() != ''){
+            var psStr = $('#ps').val();
+            //现金分红 T11、红利再投 T12、份额强增 C3、份额强减 C6
+            var fe = "C3,C6";    //清算信息-份额强增、份额强减
+            var xjfh = "T11";    //清算信息-现金分红
+            var hl = "T12";      //清算信息-红利再投
+            if(xjfh.indexOf(psStr) >-1){ //清算信息-现金分红
+                $('#value_div_xjfh').show();
+                $('#value_div_hl').hide();
+                $('#value_div_fe').hide();
+            }else if(hl.indexOf(psStr) >-1){ //清算信息-红利再投
+                $('#value_div_xjfh').hide();
+                $('#value_div_hl').show();
+                $('#value_div_fe').hide();
+            }else if(fe.indexOf(psStr) >-1){//清算信息-份额强增、份额强减
+                $('#value_div_xjfh').hide();
+                $('#value_div_hl').hide();
+                $('#value_div_fe').show();
+            }else{//默认
+                $('#value_div_xjfh').show();
+                $('#value_div_hl').show();
+                $('#value_div_fe').show();
+            }
+
+        }
+    });
+
 
 
     //分红金额 联动

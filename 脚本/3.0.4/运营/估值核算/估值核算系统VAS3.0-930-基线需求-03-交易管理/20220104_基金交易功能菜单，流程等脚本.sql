@@ -12,6 +12,11 @@ delete from sys_page where page_id='TrdFundValuationTrade002';
 insert into sys_page (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('TrdFundValuationTrade002', 'TRD', '/valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002', 'valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002', null, null, null, '02', '01', '基金交易新建', 'system', null, sysdate, 'system', sysdate);
 
+delete from sys_page where page_id='TrdFundValuationTrade003';
+insert into sys_page (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+values ('TrdFundValuationTrade003', 'TRD', '/valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade003', 'valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade003', null, null, null, '02', '01', '赎回到账', 'system', null, sysdate, 'system', sysdate);
+
+
 /*基金交易-新建页面-交易类型下拉框*/
 delete from  sys_page_dictlist where page_id='TrdFundValuationTrade002' and DICT_ID='PS';
 insert into sys_page_dictlist (PAGE_ID, SUB_PAGE_ID, DICT_ID, DICT_ITEM_VAL, DICT_ITEM_VAL_CNNAME, DICT_ITEM_VAL_DEFAULT, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE)

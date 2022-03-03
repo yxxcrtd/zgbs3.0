@@ -31,34 +31,84 @@
     $('#ps').change(function(){
         if($('#ps').val() && $('#ps').val() != null && $('#ps').val() != ''){
             var psStr = $('#ps').val();
-            var sqps = "T01,T02,T52,T04";//申请信息  --买入 T01、卖出T02、认购 T52、申购 T04
-            var qrps = "T18,T05,T19";    //确认信息  --认购确认 T18、申购确认T05、赎回确认 T19
-            var dzps = "T24";               //到账信息  --赎回到账 T24
-            if(sqps.indexOf(psStr) >-1){
-                $('#value_div_sq').show();
-                $('#value_div_qr').hide();
-                $('#value_div_dz').hide();
-                $('#confirmTradeAmt').val('');
-                $('#settleAmt').val('');
-            }else if(qrps.indexOf(psStr) >-1){
+            //买入 T01、卖出T02、认购 T52、申购 T04、认购确认 T18、申购确认T05、赎回确认 T19、赎回到账 T24
+            var jyps = "T01,T02";//交易信息
+            var rgps = "T52";//认购信息
+            var sqps = "T04";    //申请信息
+            var rgqr = "T18";    //确认信息 认购确认
+            var sgqr = "T05";    //确认信息 申购确认
+            var shqr = "T19";    //确认信息 赎回确认
+            if(jyps.indexOf(psStr) >-1){ //交易信息
+                $('#value_div_jy').show();
+                $('#value_div_rg').hide();
                 $('#value_div_sq').hide();
-                $('#value_div_qr').show();
-                $('#value_div_dz').hide();
-                $('#tradeAmt').val('');
-                $('#settleAmt').val('');
-            }else if(dzps.indexOf(psStr) >-1){
+                $('#value_div_rgqr').hide();
+                $('#value_div_sgqr').hide();
+                $('#value_div_shqr').hide();
+
+                //交易日期、结算日期默认系统平台日
+                $('#tradeDate').val(platDate);// 默认平台日
+                $('#settleDate').val(platDate);// 默认平台日
+            }else if(rgps.indexOf(psStr) >-1){ //认购信息
+                $('#value_div_jy').hide();
+                $('#value_div_rg').show();
                 $('#value_div_sq').hide();
-                $('#value_div_qr').hide();
-                $('#value_div_dz').show();
-                $('#tradeAmt').val('')
-                $('#confirmTradeAmt').val('')
-            }else{
+                $('#value_div_rgqr').hide();
+                $('#value_div_sgqr').hide();
+                $('#value_div_shqr').hide();
+
+                //交易日期、结算日期默认系统平台日
+                $('#tradeDate').val(platDate);// 默认平台日
+                $('#settleDate').val(platDate);// 默认平台日
+            }else if(sqps.indexOf(psStr) >-1){//申请信息
+                $('#value_div_jy').hide();
+                $('#value_div_rg').hide();
                 $('#value_div_sq').show();
-                $('#value_div_qr').show();
-                $('#value_div_dz').show();
-                $('#tradeAmt').val('');
-                $('#confirmTradeAmt').val('');
-                $('#settleAmt').val('');
+                $('#value_div_rgqr').hide();
+                $('#value_div_sgqr').hide();
+                $('#value_div_shqr').hide();
+
+                //交易日期、结算日期默认系统平台日
+                $('#tradeDate').val(platDate);// 默认平台日
+                $('#settleDate').val(platDate);// 默认平台日
+            }else if(rgqr.indexOf(psStr) >-1){//认购确认信息
+                $('#value_div_jy').hide();
+                $('#value_div_rg').hide();
+                $('#value_div_sq').hide();
+                $('#value_div_rgqr').show();
+                $('#value_div_sgqr').hide();
+                $('#value_div_shqr').hide();
+
+                //确认日期默认系统平台日
+                $('#tradeDate').val(platDate);// 默认平台日
+            }else if(sgqr.indexOf(psStr) >-1){//申购确认信息
+                $('#value_div_jy').hide();
+                $('#value_div_rg').hide();
+                $('#value_div_sq').hide();
+                $('#value_div_rgqr').hide();
+                $('#value_div_sgqr').show();
+                $('#value_div_shqr').hide();
+
+                //确认日期默认系统平台日
+                $('#tradeDate').val(platDate);// 默认平台日
+            }else if(shqr.indexOf(psStr) >-1){//赎回确认信息
+                $('#value_div_jy').hide();
+                $('#value_div_rg').hide();
+                $('#value_div_sq').hide();
+                $('#value_div_rgqr').hide();
+                $('#value_div_sgqr').hide();
+                $('#value_div_shqr').show();
+
+                //交易日期、结算日期默认系统平台日
+                $('#tradeDate').val(platDate);// 默认平台日
+                $('#settleDate').val(platDate);// 默认平台日
+            }else{//默认
+                $('#value_div_jy').show();
+                $('#value_div_rg').show();
+                $('#value_div_sq').show();
+                $('#value_div_rgqr').show();
+                $('#value_div_sgqr').show();
+                $('#value_div_shqr').show();
             }
 
         }

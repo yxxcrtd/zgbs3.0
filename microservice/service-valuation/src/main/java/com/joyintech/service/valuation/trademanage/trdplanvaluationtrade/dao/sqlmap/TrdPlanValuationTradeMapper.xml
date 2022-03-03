@@ -24,9 +24,9 @@
 		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal on deal.BUSI_NO = t.TRADE_ID
 		LEFT JOIN BOK_BOOKSET bok on bok.BOOKSET_ID = deal.BOOKSET_ID
-		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE ='17'
-		where
-		t.BUSI_TYPE ='17'
+		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID
+		<where>
+		<!-- t.BUSI_TYPE ='17' -->
 		<if test="tradeId !=null and tradeId !='' ">
 			and t.TRADE_ID like  concat(concat('%',#{tradeId}),'%')
 		</if>
@@ -48,6 +48,7 @@
 				#{ps}
 			</foreach>
 		</if>
+		</where>
 		order by t.TRADE_ID desc
 	</select>
 

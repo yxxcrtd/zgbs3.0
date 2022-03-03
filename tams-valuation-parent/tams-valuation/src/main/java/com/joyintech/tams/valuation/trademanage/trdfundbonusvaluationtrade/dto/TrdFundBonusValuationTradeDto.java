@@ -67,12 +67,6 @@ public class TrdFundBonusValuationTradeDto extends WflTrdProductDeal implements 
     private BigDecimal nums;
 
     /**
-     * 单位分红净值
-     */
-    private BigDecimal unitCprice;
-
-
-    /**
      * 其他费用
      */
     private BigDecimal feeAmtQT;
@@ -101,6 +95,48 @@ public class TrdFundBonusValuationTradeDto extends WflTrdProductDeal implements 
      * 金融产品名称
      */
     private String finprodName;
+
+    /**
+     * 交易日期（红利再投）
+     */
+    private Date hlTradeDate;
+    /**
+     * 分红金额（红利再投）
+     */
+    private BigDecimal hlBonusAmt;
+    /**
+     * 交易份额（红利再投）
+     */
+    private BigDecimal hlNums;
+    /**
+     * 单位分红净值（红利再投）
+     */
+    private BigDecimal hlUnitCprice;
+    /**
+     * 结算金额（红利再投）
+     */
+    private BigDecimal hlMdateSettleAmt;
+    /**
+     * 资金账户（红利再投）
+     */
+    private String hlTrdAcctId;
+
+    /**
+     * 交易日期（份额强增，份额强减）
+     */
+    private Date feTradeDate;
+
+    /**
+     * 交易日期（份额强增，份额强减）
+     */
+    private BigDecimal feNums;
+    /**
+     * 交易日期（份额强增，份额强减）
+     */
+    private String feTrdAcctId;
+
+
+
     /**
      * 操作类型
      */
@@ -413,14 +449,76 @@ public class TrdFundBonusValuationTradeDto extends WflTrdProductDeal implements 
         this.bonusAmt = bonusAmt;
     }
 
-    @Override
-    public BigDecimal getUnitCprice() {
-        return unitCprice;
+    public Date getHlTradeDate() {
+        return hlTradeDate;
     }
 
-    @Override
-    public void setUnitCprice(BigDecimal unitCprice) {
-        this.unitCprice = unitCprice;
+    public void setHlTradeDate(Date hlTradeDate) {
+        this.hlTradeDate = hlTradeDate;
+    }
+
+    public BigDecimal getHlBonusAmt() {
+        return hlBonusAmt;
+    }
+
+    public void setHlBonusAmt(BigDecimal hlBonusAmt) {
+        this.hlBonusAmt = hlBonusAmt;
+    }
+
+    public BigDecimal getHlNums() {
+        return hlNums;
+    }
+
+    public void setHlNums(BigDecimal hlNums) {
+        this.hlNums = hlNums;
+    }
+
+    public BigDecimal getHlUnitCprice() {
+        return hlUnitCprice;
+    }
+
+    public void setHlUnitCprice(BigDecimal hlUnitCprice) {
+        this.hlUnitCprice = hlUnitCprice;
+    }
+
+    public BigDecimal getHlMdateSettleAmt() {
+        return hlMdateSettleAmt;
+    }
+
+    public void setHlMdateSettleAmt(BigDecimal hlMdateSettleAmt) {
+        this.hlMdateSettleAmt = hlMdateSettleAmt;
+    }
+
+    public String getHlTrdAcctId() {
+        return hlTrdAcctId;
+    }
+
+    public void setHlTrdAcctId(String hlTrdAcctId) {
+        this.hlTrdAcctId = hlTrdAcctId;
+    }
+
+    public Date getFeTradeDate() {
+        return feTradeDate;
+    }
+
+    public void setFeTradeDate(Date feTradeDate) {
+        this.feTradeDate = feTradeDate;
+    }
+
+    public BigDecimal getFeNums() {
+        return feNums;
+    }
+
+    public void setFeNums(BigDecimal feNums) {
+        this.feNums = feNums;
+    }
+
+    public String getFeTrdAcctId() {
+        return feTrdAcctId;
+    }
+
+    public void setFeTrdAcctId(String feTrdAcctId) {
+        this.feTrdAcctId = feTrdAcctId;
     }
 }
 
