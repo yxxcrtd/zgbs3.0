@@ -43,10 +43,10 @@ public interface AccountingMethodNewMapper {
      * 根据内部编码查询对应科目信息
      * @param booksetId 账套代码
      * @param listSubjectInternalCode 内部科目编码
-     * @param isBottom 是否底层科目
+     * @param isAcc 是否核算科目
      * @return
      */
     List<BokSubject> getSubjectByInternalCode(@Param("booksetId") String booksetId,
                                               @Param("listSubjectInternalCode") List<String> listSubjectInternalCode,
-                                                @Param("isBottom") String isBottom);
+                                                @Param("isAcc") String isAcc);
 }
