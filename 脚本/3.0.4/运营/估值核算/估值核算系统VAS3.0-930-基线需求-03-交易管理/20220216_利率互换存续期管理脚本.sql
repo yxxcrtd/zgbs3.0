@@ -11,7 +11,7 @@ INSERT INTO SYS_PAGE
 VALUES('TrdIrsValuationDuration001', 'VAL', '/valuation/trademanage/trdirsvaluationduration/TrdIrsValuationDuration001', 'valuation/trademanage/trdirsvaluationduration/TrdIrsValuationDuration001', 'DEAL_001_003_007', NULL, NULL, '02', '01', '利率互换存续期管理查询', 'system', NULL, sysdate, 'system', sysdate);
 INSERT INTO SYS_PAGE
 (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES('TrdIrsValuationDuration002', 'VAL', '/valuation/trademanage/trdirsvaluationduration/TrdIrsValuationDuration002', 'valuation/trademanage/trdirsvaluationduration/TrdIrsValuationDuration002', 'DEAL_001_003_007', NULL, NULL, '02', '01', '利率互换存续期管理新建', 'system', NULL, sysdate, 'system', sysdate);
+VALUES('TrdIrsValuationDuration002', 'VAL', '/valuation/trademanage/trdirsvaluationduration/TrdIrsValuationDuration002', 'valuation/trademanage/trdirsvaluationduration/TrdIrsValuationDuration002', NULL, NULL, NULL, '02', '01', '利率互换存续期管理新建', 'system', NULL, sysdate, 'system', sysdate);
 
 --交易方向 画面数据字典明细关联
 DELETE FROM SYS_PAGE_DICTLIST WHERE PAGE_ID='TrdIrsValuationDuration002' AND DICT_ID='PS';

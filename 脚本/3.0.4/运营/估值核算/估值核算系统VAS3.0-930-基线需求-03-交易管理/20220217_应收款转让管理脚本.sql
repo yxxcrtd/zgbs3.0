@@ -11,7 +11,7 @@ INSERT INTO SYS_PAGE
 VALUES('TrdSecOverTransferValuationDuration001', 'VAL', '/valuation/trademanage/trdsecovertransfervaluationduration/TrdSecOverTransferValuationDuration001', 'valuation/trademanage/trdsecovertransfervaluationduration/TrdSecOverTransferValuationDuration001', 'DEAL_001_003_009', NULL, NULL, '02', '01', '应收款转让管理查询', 'system', NULL, sysdate, 'system', sysdate);
 INSERT INTO SYS_PAGE
 (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES('TrdSecOverTransferValuationDuration002', 'VAL', '/valuation/trademanage/trdsecovertransfervaluationduration/TrdSecOverTransferValuationDuration002', 'valuation/trademanage/trdsecovertransfervaluationduration/TrdSecOverTransferValuationDuration002', 'DEAL_001_003_009', NULL, NULL, '02', '01', '应收款转让管理新建', 'system', NULL, sysdate, 'system', sysdate);
+VALUES('TrdSecOverTransferValuationDuration002', 'VAL', '/valuation/trademanage/trdsecovertransfervaluationduration/TrdSecOverTransferValuationDuration002', 'valuation/trademanage/trdsecovertransfervaluationduration/TrdSecOverTransferValuationDuration002', NULL, NULL, NULL, '02', '01', '应收款转让管理新建', 'system', NULL, sysdate, 'system', sysdate);
 
 --交易方向 画面数据字典明细关联
 DELETE FROM SYS_PAGE_DICTLIST WHERE PAGE_ID='TrdSecOverTransferValuationDuration001' AND DICT_ID='PS';

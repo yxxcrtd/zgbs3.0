@@ -1,20 +1,20 @@
 /*在交易管理下添加【计划类资产交易】菜单*/
-delete from sys_menu where MENU_ID='DEAL_001_001_015';
+delete from sys_menu where MENU_ID='DEAL_001_001_018';
 insert into sys_menu (MENU_ID, SYSTEM_CODE, ICON, PARENT_MENU_ID, PAGE_ID, ORDER_NO, IS_SPREAD, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-values ('DEAL_001_001_015', 'VAL', null, 'DEAL_001_001', 'TrdPlanValuationTrade001', 15, '2', '计划类资产交易', 'system', null,sysdate, 'system', sysdate);
+values ('DEAL_001_001_018', 'VAL', null, 'DEAL_001_001', 'TrdPlanValuationTrade001', 18, '2', '计划类资产交易', 'system', null,sysdate, 'system', sysdate);
 
 /*计划类资产(利率型)交易-查询及新建页面*/
 delete from sys_page where page_id='TrdPlanValuationTrade001';
 insert into sys_page (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-values ('TrdPlanValuationTrade001', 'TRD', '/valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade001', 'valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade001', null, null, null, '02', '01', '计划类资产交易', 'system', null, sysdate, 'system', sysdate);
+values ('TrdPlanValuationTrade001', 'VAL', '/valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade001', 'valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade001', 'DEAL_001_001_018', null, null, '02', '01', '计划类资产交易', 'system', null, sysdate, 'system', sysdate);
 
 delete from sys_page where page_id='TrdPlanValuationTrade002';
 insert into sys_page (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-values ('TrdPlanValuationTrade002', 'TRD', '/valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade002', 'valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade002', null, null, null, '02', '01', '计划类资产交易新建', 'system', null, sysdate, 'system', sysdate);
+values ('TrdPlanValuationTrade002', 'VAL', '/valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade002', 'valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade002', null, null, null, '02', '01', '计划类资产交易新建', 'system', null, sysdate, 'system', sysdate);
 
 delete from sys_page where page_id='TrdPlanValuationTrade003';
 insert into sys_page (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-values ('TrdPlanValuationTrade003', 'TRD', '/valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade003', 'valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade003', null, null, null, '02', '01', '赎回到账', 'system', null, sysdate, 'system', sysdate);
+values ('TrdPlanValuationTrade003', 'VAL', '/valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade003', 'valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade003', null, null, null, '02', '01', '赎回到账', 'system', null, sysdate, 'system', sysdate);
 
 
 /*计划类资产交易-新建页面-交易类型下拉框*/

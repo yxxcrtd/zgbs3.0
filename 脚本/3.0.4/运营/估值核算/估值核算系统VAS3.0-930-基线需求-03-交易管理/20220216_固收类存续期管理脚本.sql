@@ -1,18 +1,16 @@
 --固收类存续期管理菜单
-delete from SYS_MENU where MENU_ID='DEAL_001_003_008';
-
-INSERT INTO SYS_MENU (MENU_ID, SYSTEM_CODE, ICON, PARENT_MENU_ID, PAGE_ID, ORDER_NO, IS_SPREAD, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES ('DEAL_001_003_008', 'VAL', null, 'DEAL_001_003', 'TrdFixIncomeValuDuration001', 8, '2', '固收类存续期', 'system', null, TO_TIMESTAMP('2022-01-05 18:16:21.000000', 'YYYY-MM-DD HH24:MI:SS.FF6'), 'system', TO_TIMESTAMP('2022-01-05 18:16:21.000000', 'YYYY-MM-DD HH24:MI:SS.FF6'));
-
+delete from SYS_MENU where MENU_ID='DEAL_001_003_002';
+INSERT INTO SYS_MENU (MENU_ID, SYSTEM_CODE, ICON, PARENT_MENU_ID, PAGE_ID, ORDER_NO, IS_SPREAD, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+VALUES ('DEAL_001_003_002', 'VAL', null, 'DEAL_001_003', 'TrdFixIncomeValuDuration001', 2, '2', '固收类存续期', 'system', null, TO_TIMESTAMP('2022-01-05 18:16:21.000000', 'YYYY-MM-DD HH24:MI:SS.FF6'), 'system', TO_TIMESTAMP('2022-01-05 18:16:21.000000', 'YYYY-MM-DD HH24:MI:SS.FF6'));
 
 --固收类存续期管理查询页面
 delete from SYS_PAGE where PAGE_ID='TrdFixIncomeValuDuration001';
-
-INSERT INTO SYS_PAGE (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES ('TrdFixIncomeValuDuration001', 'VAL', '/valuation/trademanage/trdfixincomevaluduration/TrdFixIncomeValuDuration001', 'valuation/trademanage/trdfixincomevaluduration/TrdFixIncomeValuDuration001', 'DEAL_001_003_008', null, null, '02', '01', '固收类存续期查询', 'system', null, TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF6'), 'system', TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF6'));
-
+INSERT INTO SYS_PAGE (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+VALUES ('TrdFixIncomeValuDuration001', 'VAL', '/valuation/trademanage/trdfixincomevaluduration/TrdFixIncomeValuDuration001', 'valuation/trademanage/trdfixincomevaluduration/TrdFixIncomeValuDuration001', 'DEAL_001_003_002', null, null, '02', '01', '固收类存续期查询', 'system', null, TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF6'), 'system', TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF6'));
 --固收类存续期管理新建页面
 delete from SYS_PAGE where PAGE_ID='TrdFixIncomeValuDuration002';
-
-INSERT INTO SYS_PAGE (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES ('TrdFixIncomeValuDuration002', 'VAL', '/valuation/trademanage/trdfixincomevaluduration/TrdFixIncomeValuDuration002', 'valuation/trademanage/trdfixincomevaluduration/TrdFixIncomeValuDuration002', null, null, null, '02', '01', '固收类存续期新建', 'system', null, TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF6'), 'system', TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF6'));
+INSERT INTO SYS_PAGE (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+VALUES ('TrdFixIncomeValuDuration002', 'VAL', '/valuation/trademanage/trdfixincomevaluduration/TrdFixIncomeValuDuration002', 'valuation/trademanage/trdfixincomevaluduration/TrdFixIncomeValuDuration002', null, null, null, '02', '01', '固收类存续期新建', 'system', null, TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF6'), 'system', TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF6'));
 
 --会计分类  新建页面数据字典添加
 DELETE FROM SYS_PAGE_DICTLIST WHERE PAGE_ID = 'TrdBondTrade002' AND DICT_ID='INV_AIM';

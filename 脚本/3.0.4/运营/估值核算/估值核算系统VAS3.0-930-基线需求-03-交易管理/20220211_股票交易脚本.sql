@@ -1,17 +1,17 @@
 --股票交易菜单
-DELETE FROM SYS_MENU WHERE MENU_ID='DEAL_001_001_029';
+DELETE FROM SYS_MENU WHERE MENU_ID='DEAL_001_001_019';
 INSERT INTO SYS_MENU
 (MENU_ID, SYSTEM_CODE, ICON, PARENT_MENU_ID, PAGE_ID, ORDER_NO, IS_SPREAD, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES('DEAL_001_001_029', 'VAL', NULL, 'DEAL_001_001', 'TrdStockTrade001', 29, '2', '股票交易', 'system', NULL, sysdate, 'system', sysdate);
+VALUES('DEAL_001_001_019', 'VAL', NULL, 'DEAL_001_001', 'TrdStockTrade001', 19, '2', '股票交易', 'system', NULL, sysdate, 'system', sysdate);
 
 --股票交易页面表
 DELETE FROM SYS_PAGE WHERE PAGE_ID in('TrdStockTrade001','TrdStockTrade002');
 INSERT INTO SYS_PAGE
 (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES('TrdStockTrade001', 'VAL', '/valuation/trademanage/trdstockvaluationtrade/TrdStockTrade001', 'valuation/trademanage/trdstockvaluationtrade/TrdStockTrade001', 'DEAL_001_001_029', NULL, NULL, '02', '01', '股票交易查询', 'system', NULL, sysdate, 'system', sysdate);
+VALUES('TrdStockTrade001', 'VAL', '/valuation/trademanage/trdstockvaluationtrade/TrdStockTrade001', 'valuation/trademanage/trdstockvaluationtrade/TrdStockTrade001', 'DEAL_001_001_019', NULL, NULL, '02', '01', '股票交易查询', 'system', NULL, sysdate, 'system', sysdate);
 INSERT INTO SYS_PAGE
 (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES('TrdStockTrade002', 'VAL', '/valuation/trademanage/trdstockvaluationtrade/TrdStockTrade002', 'valuation/trademanage/trdstockvaluationtrade/TrdStockTrade002', 'DEAL_001_001_029', NULL, NULL, '02', '01', '股票交易新建', 'system', NULL, sysdate, 'system', sysdate);
+VALUES('TrdStockTrade002', 'VAL', '/valuation/trademanage/trdstockvaluationtrade/TrdStockTrade002', 'valuation/trademanage/trdstockvaluationtrade/TrdStockTrade002', NULL, NULL, NULL, '02', '01', '股票交易新建', 'system', NULL, sysdate, 'system', sysdate);
 
 --交易方向 画面数据字典明细关联
 DELETE FROM SYS_PAGE_DICTLIST WHERE PAGE_ID='TrdStockTrade001' AND DICT_ID='PS';

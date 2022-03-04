@@ -1,26 +1,20 @@
 --质押式回购交易菜单
-
-delete from SYS_MENU where PAGE_ID='TrdRepoValuationTrade001'
-and MENU_ID='DEAL_001_001_020';
-
-
-INSERT INTO SYS_MENU (MENU_ID, SYSTEM_CODE, ICON, PARENT_MENU_ID, PAGE_ID, ORDER_NO, IS_SPREAD, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES ('DEAL_001_001_020', 'VAL', NULL, 'DEAL_001_001', 'TrdRepoValuationTrade001', '20', '2', '质押式回购交易', 'system', NULL, TO_TIMESTAMP('2021-12-24 23:29:50.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'), 'system', TO_TIMESTAMP('2021-12-24 23:29:50.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'));
-
+delete from SYS_MENU where MENU_ID='DEAL_001_001_022';
+INSERT INTO SYS_MENU (MENU_ID, SYSTEM_CODE, ICON, PARENT_MENU_ID, PAGE_ID, ORDER_NO, IS_SPREAD, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+VALUES ('DEAL_001_001_022', 'VAL', NULL, 'DEAL_001_001', 'TrdRepoValuationTrade001', 22, '2', '质押式回购交易', 'system', NULL, TO_TIMESTAMP('2021-12-24 23:29:50.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'), 'system', TO_TIMESTAMP('2021-12-24 23:29:50.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'));
 
 --质押式回购交易查询页面
 delete from SYS_PAGE where PAGE_ID='TrdRepoValuationTrade001';
-
-INSERT INTO SYS_PAGE (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES ('TrdRepoValuationTrade001', 'VAL', '/valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade001', 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade001', 'DEAL_001_001_020', NULL, NULL, '02', '01', '质押式回购交易查询', 'system', NULL, TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'), 'system', TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'));
-
+INSERT INTO SYS_PAGE (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+VALUES ('TrdRepoValuationTrade001', 'VAL', '/valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade001', 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade001', 'DEAL_001_001_022', NULL, NULL, '02', '01', '质押式回购交易查询', 'system', NULL, TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'), 'system', TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'));
 --质押式回购交易新建页面
 delete from SYS_PAGE where PAGE_ID='TrdRepoValuationTrade002';
-
-INSERT INTO SYS_PAGE (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES ('TrdRepoValuationTrade002', 'VAL', '/valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade002', 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade002', NULL, NULL, NULL, '02', '01', '质押式回购交易新建', 'system', NULL, TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'), 'system', TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'));
-
+INSERT INTO SYS_PAGE (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+VALUES ('TrdRepoValuationTrade002', 'VAL', '/valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade002', 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade002', NULL, NULL, NULL, '02', '01', '质押式回购交易新建', 'system', NULL, TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'), 'system', TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'));
 --质押式回购存续期交易页面
 delete from SYS_PAGE where PAGE_ID='TrdRepoValuationTrade003';
-
-INSERT INTO SYS_PAGE (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES ('TrdRepoValuationTrade003', 'VAL', '/valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade003', 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade003', null, null, null, '02', '01', '质押式回购存续期交易', 'system', null, TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF6'), 'system', TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF6'));
+INSERT INTO SYS_PAGE (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+VALUES ('TrdRepoValuationTrade003', 'VAL', '/valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade003', 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade003', null, null, null, '02', '01', '质押式回购存续期交易', 'system', null, TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF6'), 'system', TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF6'));
 
 
 --交易类型  查询页面数据字典添加

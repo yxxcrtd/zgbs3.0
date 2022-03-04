@@ -1,20 +1,20 @@
 --场外期权交易菜单
-DELETE FROM SYS_MENU WHERE MENU_ID='DEAL_001_001_023';
+DELETE FROM SYS_MENU WHERE MENU_ID='DEAL_001_001_025';
 INSERT INTO SYS_MENU
 (MENU_ID, SYSTEM_CODE, ICON, PARENT_MENU_ID, PAGE_ID, ORDER_NO, IS_SPREAD, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES('DEAL_001_001_023', 'VAL', NULL, 'DEAL_001_001', 'TrdOptionValuationTrade001', 23, '2', '场外期权交易', 'system', NULL, sysdate, 'system', sysdate);
+VALUES('DEAL_001_001_025', 'VAL', NULL, 'DEAL_001_001', 'TrdOptionValuationTrade001', 25, '2', '场外期权交易', 'system', NULL, sysdate, 'system', sysdate);
 
 --场外期权交易页面表
 DELETE FROM SYS_PAGE WHERE PAGE_ID in('TrdOptionValuationTrade001','TrdOptionValuationTrade002','TrdOptionValuationTrade003');
 INSERT INTO SYS_PAGE
 (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES('TrdOptionValuationTrade001', 'VAL', '/valuation/trademanage/option/TrdOptionValuationTrade001', 'valuation/trademanage/option/TrdOptionValuationTrade001', 'DEAL_001_001_023', NULL, NULL, '02', '01', '场外期权交易查询', 'system', NULL, sysdate, 'system', sysdate);
+VALUES('TrdOptionValuationTrade001', 'VAL', '/valuation/trademanage/option/TrdOptionValuationTrade001', 'valuation/trademanage/option/TrdOptionValuationTrade001', 'DEAL_001_001_025', NULL, NULL, '02', '01', '场外期权交易查询', 'system', NULL, sysdate, 'system', sysdate);
 INSERT INTO SYS_PAGE
 (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES('TrdOptionValuationTrade002', 'VAL', '/valuation/trademanage/option/TrdOptionValuationTrade002', 'valuation/trademanage/option/TrdOptionValuationTrade002', 'DEAL_001_001_023', NULL, NULL, '02', '01', '场外期权交易新建', 'system', NULL, sysdate, 'system', sysdate);
+VALUES('TrdOptionValuationTrade002', 'VAL', '/valuation/trademanage/option/TrdOptionValuationTrade002', 'valuation/trademanage/option/TrdOptionValuationTrade002', NULL, NULL, NULL, '02', '01', '场外期权交易新建', 'system', NULL, sysdate, 'system', sysdate);
 INSERT INTO SYS_PAGE
 (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES('TrdOptionValuationTrade003', 'VAL', '/valuation/trademanage/option/TrdOptionValuationTrade003', 'valuation/trademanage/option/TrdOptionValuationTrade003', 'DEAL_001_001_023', NULL, NULL, '02', '01', '场外期权存续期交易', 'system', NULL, sysdate, 'system', sysdate);
+VALUES('TrdOptionValuationTrade003', 'VAL', '/valuation/trademanage/option/TrdOptionValuationTrade003', 'valuation/trademanage/option/TrdOptionValuationTrade003', NULL, NULL, NULL, '02', '01', '场外期权存续期交易', 'system', NULL, sysdate, 'system', sysdate);
 
 --交易方向 画面数据字典明细关联
 DELETE FROM SYS_PAGE_DICTLIST WHERE PAGE_ID='TrdOptionValuationTrade001' AND DICT_ID='PS';

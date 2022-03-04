@@ -1,17 +1,17 @@
 --利率互换交易菜单
-DELETE FROM SYS_MENU WHERE MENU_ID='DEAL_001_001_025';
+DELETE FROM SYS_MENU WHERE MENU_ID='DEAL_001_001_029';
 INSERT INTO SYS_MENU
 (MENU_ID, SYSTEM_CODE, ICON, PARENT_MENU_ID, PAGE_ID, ORDER_NO, IS_SPREAD, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES('DEAL_001_001_025', 'VAL', NULL, 'DEAL_001_001', 'TrdIRSValuationTrade001', 25, '2', '利率互换交易', 'system', NULL, sysdate, 'system', sysdate);
+VALUES('DEAL_001_001_029', 'VAL', NULL, 'DEAL_001_001', 'TrdIRSValuationTrade001', 29, '2', '利率互换交易', 'system', NULL, sysdate, 'system', sysdate);
 
 --利率互换交易页面表
 DELETE FROM SYS_PAGE WHERE PAGE_ID in('TrdIRSValuationTrade001','TrdIRSValuationTrade002') ;
 INSERT INTO SYS_PAGE
 (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES('TrdIRSValuationTrade001', 'VAL', '/valuation/trademanage/irs/TrdIRSValuationTrade001', 'valuation/trademanage/irs/TrdIRSValuationTrade001', 'DEAL_001_001_025', NULL, NULL, '02', '01', '利率互换交易查询', 'system', NULL, sysdate, 'system', sysdate);
+VALUES('TrdIRSValuationTrade001', 'VAL', '/valuation/trademanage/irs/TrdIRSValuationTrade001', 'valuation/trademanage/irs/TrdIRSValuationTrade001', 'DEAL_001_001_029', NULL, NULL, '02', '01', '利率互换交易查询', 'system', NULL, sysdate, 'system', sysdate);
 INSERT INTO SYS_PAGE
 (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES('TrdIRSValuationTrade002', 'VAL', '/valuation/trademanage/irs/TrdIRSValuationTrade002', 'valuation/trademanage/irs/TrdIRSValuationTrade002', 'DEAL_001_001_025', NULL, NULL, '02', '01', '利率互换交易新建', 'system', NULL, sysdate, 'system', sysdate);
+VALUES('TrdIRSValuationTrade002', 'VAL', '/valuation/trademanage/irs/TrdIRSValuationTrade002', 'valuation/trademanage/irs/TrdIRSValuationTrade002', NULL, NULL, NULL, '02', '01', '利率互换交易新建', 'system', NULL, sysdate, 'system', sysdate);
 
 
 --计息基础  画面数据字典明细关联

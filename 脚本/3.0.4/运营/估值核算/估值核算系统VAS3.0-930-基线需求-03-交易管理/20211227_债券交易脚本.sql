@@ -11,7 +11,7 @@ INSERT INTO SYS_PAGE
 VALUES('TrdBondTrade001', 'VAL', '/valuation/trademanage/bond/TrdBondTrade001', 'valuation/trademanage/bond/TrdBondTrade001', 'DEAL_001_001_014', NULL, NULL, '02', '01', '债券交易查询', 'system', NULL, sysdate, 'system', sysdate);
 INSERT INTO SYS_PAGE
 (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES('TrdBondTrade002', 'VAL', '/valuation/trademanage/bond/TrdBondTrade002', 'valuation/trademanage/bond/TrdBondTrade002', 'DEAL_001_001_014', NULL, NULL, '02', '01', '债券交易新建', 'system', NULL, sysdate, 'system', sysdate);
+VALUES('TrdBondTrade002', 'VAL', '/valuation/trademanage/bond/TrdBondTrade002', 'valuation/trademanage/bond/TrdBondTrade002', null, NULL, NULL, '02', '01', '债券交易新建', 'system', NULL, sysdate, 'system', sysdate);
 
 
 --交易方向 画面数据字典明细关联

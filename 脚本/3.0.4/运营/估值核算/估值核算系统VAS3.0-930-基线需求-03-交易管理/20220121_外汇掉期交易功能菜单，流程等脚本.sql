@@ -1,12 +1,12 @@
 /*在交易管理下添加【外汇掉期交易】菜单*/
-delete from sys_menu where PAGE_ID='TrdFxSwapValuationTrade001';
+DELETE FROM SYS_MENU WHERE MENU_ID='DEAL_001_001_028';
 insert into sys_menu (MENU_ID, SYSTEM_CODE, ICON, PARENT_MENU_ID, PAGE_ID, ORDER_NO, IS_SPREAD, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('DEAL_001_001_028', 'VAL', null, 'DEAL_001_001', 'TrdFxSwapValuationTrade001', 28, '2', '外汇掉期交易', 'system', null,sysdate, 'system', sysdate);
 
 /*外汇掉期交易-查询及新建页面*/
 delete from sys_page where page_id='TrdFxSwapValuationTrade001';
 insert into sys_page (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-values ('TrdFxSwapValuationTrade001', 'TRD', '/valuation/trademanage/trdfxswapvaluationtrade/TrdFxSwapValuationTrade001', 'valuation/trademanage/trdfxswapvaluationtrade/TrdFxSwapValuationTrade001', null, null, null, '02', '01', '外汇掉期交易', 'system', null, sysdate, 'system', sysdate);
+values ('TrdFxSwapValuationTrade001', 'TRD', '/valuation/trademanage/trdfxswapvaluationtrade/TrdFxSwapValuationTrade001', 'valuation/trademanage/trdfxswapvaluationtrade/TrdFxSwapValuationTrade001', 'DEAL_001_001_028', null, null, '02', '01', '外汇掉期交易', 'system', null, sysdate, 'system', sysdate);
 
 delete from sys_page where page_id='TrdFxSwapValuationTrade002';
 insert into sys_page (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)

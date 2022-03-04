@@ -1,14 +1,12 @@
 /*在存续期管理下添加【基金存续期】菜单*/
-delete from sys_menu where MENU_ID='DEAL_001_003_003';
+delete from sys_menu where MENU_ID='DEAL_001_003_004';
 insert into sys_menu (MENU_ID, SYSTEM_CODE, ICON, PARENT_MENU_ID, PAGE_ID, ORDER_NO, IS_SPREAD, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-values ('DEAL_001_003_003', 'VAL', null, 'DEAL_001_003', 'TrdFundBonusValuationTrade001', 3, '2', '基金存续期', 'system', null,sysdate, 'system', sysdate);
-
+values ('DEAL_001_003_004', 'VAL', null, 'DEAL_001_003', 'TrdFundBonusValuationTrade001', 4, '2', '基金存续期', 'system', null,sysdate, 'system', sysdate);
 
 /*基金存续期-查询及新建页面*/
 delete from sys_page where page_id='TrdFundBonusValuationTrade001';
 insert into sys_page (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-values ('TrdFundBonusValuationTrade001', 'TRD', '/valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade001', 'valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade001', null, null, null, '02', '01', '基金存续期', 'system', null, sysdate, 'system', sysdate);
-
+values ('TrdFundBonusValuationTrade001', 'TRD', '/valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade001', 'valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade001', 'DEAL_001_003_004', null, null, '02', '01', '基金存续期', 'system', null, sysdate, 'system', sysdate);
 delete from sys_page where page_id='TrdFundBonusValuationTrade002';
 insert into sys_page (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('TrdFundBonusValuationTrade002', 'TRD', '/valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade002', 'valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade002', null, null, null, '02', '01', '基金存续期新建', 'system', null, sysdate, 'system', sysdate);

@@ -1,16 +1,16 @@
 /*在交易管理下添加【固收类交易】菜单*/
-delete from sys_menu where MENU_ID='DEAL_001_001_017';
+delete from sys_menu where MENU_ID='DEAL_001_001_015';
 insert into sys_menu (MENU_ID, SYSTEM_CODE, ICON, PARENT_MENU_ID, PAGE_ID, ORDER_NO, IS_SPREAD, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-values ('DEAL_001_001_017', 'VAL', null, 'DEAL_001_001', 'TrdFixIncomeValuationTrade001', 17, '2', '固收类交易', 'system', null,sysdate, 'system', sysdate);
+values ('DEAL_001_001_015', 'VAL', null, 'DEAL_001_001', 'TrdFixIncomeValuationTrade001', 15, '2', '固收类交易', 'system', null,sysdate, 'system', sysdate);
 
 /*固收类交易-查询及新建页面*/
 delete from sys_page where page_id='TrdFixIncomeValuationTrade001';
 insert into sys_page (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-values ('TrdFixIncomeValuationTrade001', 'TRD', '/valuation/trademanage/trdfixincomevaluationtrade/TrdFixIncomeValuationTrade001', 'valuation/trademanage/trdfixincomevaluationtrade/TrdFixIncomeValuationTrade001', null, null, null, '02', '01', '固收类交易', 'system', null, sysdate, 'system', sysdate);
+values ('TrdFixIncomeValuationTrade001', 'VAL', '/valuation/trademanage/trdfixincomevaluationtrade/TrdFixIncomeValuationTrade001', 'valuation/trademanage/trdfixincomevaluationtrade/TrdFixIncomeValuationTrade001', 'DEAL_001_001_015', null, null, '02', '01', '固收类交易', 'system', null, sysdate, 'system', sysdate);
 
 delete from sys_page where page_id='TrdFixIncomeValuationTrade002';
 insert into sys_page (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-values ('TrdFixIncomeValuationTrade002', 'TRD', '/valuation/trademanage/trdfixincomevaluationtrade/TrdFixIncomeValuationTrade002', 'valuation/trademanage/trdfixincomevaluationtrade/TrdFixIncomeValuationTrade002', null, null, null, '02', '01', '固收类交易新建', 'system', null, sysdate, 'system', sysdate);
+values ('TrdFixIncomeValuationTrade002', 'VAL', '/valuation/trademanage/trdfixincomevaluationtrade/TrdFixIncomeValuationTrade002', 'valuation/trademanage/trdfixincomevaluationtrade/TrdFixIncomeValuationTrade002', null, null, null, '02', '01', '固收类交易新建', 'system', null, sysdate, 'system', sysdate);
 
 /*固收类交易-新建页面-交易类型下拉框*/
 delete from  sys_page_dictlist where page_id='TrdFixIncomeValuationTrade002' and DICT_ID='PS' ;
