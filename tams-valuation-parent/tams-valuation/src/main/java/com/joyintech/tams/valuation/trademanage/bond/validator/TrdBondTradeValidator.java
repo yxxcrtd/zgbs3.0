@@ -52,6 +52,86 @@ public class TrdBondTradeValidator implements BeanValidator {
                 }
             }
             if(!StringUtil.isNotEmpty(dto.getPs())){
+                // 成交日期
+                if(!StringUtil.isNotEmpty(dto.getTradeDate())){
+                    resultList.add(new ValidMessage("tradeDate",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.dealDate"))));
+                }
+                // 交割日期
+                if(!StringUtil.isNotEmpty(dto.getSettdateDate())){
+                    resultList.add(new ValidMessage("settdateDate",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.settdateDate"))));
+                }
+                // 资金交收日期
+                if(!StringUtil.isNotEmpty(dto.getFundSettleDate())){
+                    resultList.add(new ValidMessage("fundSettleDate",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.fundSettleDate"))));
+                }
+                // 成交数量
+                if(!StringUtil.isNotEmpty(dto.getDealNum())){
+                    resultList.add(new ValidMessage("dealNum",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.dealNum"))));
+                }
+                // 交易金额
+                if(!StringUtil.isNotEmpty(dto.getTradeAmt())){
+                    resultList.add(new ValidMessage("tradeAmt",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.tradeAmt"))));
+                }
+                // 应收利息总额
+                if(!StringUtil.isNotEmpty(dto.getIntAmt())){
+                    resultList.add(new ValidMessage("intAmt",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.intAmt"))));
+                }
+                // 净价
+                if(!StringUtil.isNotEmpty(dto.getCprice())){
+                    resultList.add(new ValidMessage("cprice",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.cprice"))));
+                }
+                // 汇率日期
+                if(!StringUtil.isNotEmpty(dto.getExchangeDate())){
+                    resultList.add(new ValidMessage("exchangeDate",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.exchangeDate"))));
+                }
+                // 经手费
+                if(!StringUtil.isNotEmpty(dto.getBrokerage())){
+                    resultList.add(new ValidMessage("brokerage",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.brokerage"))));
+                }
+                // 结算费
+                if(!StringUtil.isNotEmpty(dto.getStlAmt())){
+                    resultList.add(new ValidMessage("stlAmt",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.stlAmt"))));
+                }
+                // 净佣金
+                if(!StringUtil.isNotEmpty(dto.getCommission())){
+                    resultList.add(new ValidMessage("commission",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.commission"))));
+                }
+                // 交易手续费
+                if(!StringUtil.isNotEmpty(dto.getDealFeeAmt())){
+                    resultList.add(new ValidMessage("dealFeeAmt",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.dealFeeAmt"))));
+                }
+                // 结算手续费
+                if(!StringUtil.isNotEmpty(dto.getStlFeeAmt())){
+                    resultList.add(new ValidMessage("stlFeeAmt",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.stlFeeAmt"))));
+                }
+                // 其他费用
+                if(!StringUtil.isNotEmpty(dto.getOtherAmt())){
+                    resultList.add(new ValidMessage("otherAmt",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.otherAmt"))));
+                }
+                // 结算金额
+                if(!StringUtil.isNotEmpty(dto.getSettleAmt())){
+                    resultList.add(new ValidMessage("settleAmt",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.settleAmt"))));
+                }
+                // 资金账户
+                if(!StringUtil.isNotEmpty(dto.getMyAcctNo())){
+                    resultList.add(new ValidMessage("myAcctNo",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.myAcctNo"))));
+                }
                 // 申购日期不能为空
                 if(!StringUtil.isNotEmpty(dto.getPurchDate())){
                     resultList.add(new ValidMessage("purchDate",
@@ -175,6 +255,91 @@ public class TrdBondTradeValidator implements BeanValidator {
                     if(!StringUtil.isNotEmpty(dto.getMyAcctNo_qr())){
                         resultList.add(new ValidMessage("myAcctNo_qr",
                                 getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.myAcctNo_qr"))));
+                    }
+                }
+                if(DictCodeList.交易方向_买入.getValue().equals(dto.getPs())
+                        || DictCodeList.交易方向_卖出.getValue().equals(dto.getPs())
+                        || DictCodeList.交易方向_行权_回售.getValue().equals(dto.getPs())
+                        || DictCodeList.交易方向_行权_赎回.getValue().equals(dto.getPs())){
+                    // 成交日期
+                    if(!StringUtil.isNotEmpty(dto.getTradeDate())){
+                        resultList.add(new ValidMessage("tradeDate",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.dealDate"))));
+                    }
+                    // 交割日期
+                    if(!StringUtil.isNotEmpty(dto.getSettdateDate())){
+                        resultList.add(new ValidMessage("settdateDate",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.settdateDate"))));
+                    }
+                    // 资金交收日期
+                    if(!StringUtil.isNotEmpty(dto.getFundSettleDate())){
+                        resultList.add(new ValidMessage("fundSettleDate",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.fundSettleDate"))));
+                    }
+                    // 成交数量
+                    if(!StringUtil.isNotEmpty(dto.getDealNum())){
+                        resultList.add(new ValidMessage("dealNum",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.dealNum"))));
+                    }
+                    // 交易金额
+                    if(!StringUtil.isNotEmpty(dto.getTradeAmt())){
+                        resultList.add(new ValidMessage("tradeAmt",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.tradeAmt"))));
+                    }
+                    // 应收利息总额
+                    if(!StringUtil.isNotEmpty(dto.getIntAmt())){
+                        resultList.add(new ValidMessage("intAmt",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.intAmt"))));
+                    }
+                    // 净价
+                    if(!StringUtil.isNotEmpty(dto.getCprice())){
+                        resultList.add(new ValidMessage("cprice",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.cprice"))));
+                    }
+                    // 汇率日期
+                    if(!StringUtil.isNotEmpty(dto.getExchangeDate())){
+                        resultList.add(new ValidMessage("exchangeDate",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.exchangeDate"))));
+                    }
+                    // 经手费
+                    if(!StringUtil.isNotEmpty(dto.getBrokerage())){
+                        resultList.add(new ValidMessage("brokerage",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.brokerage"))));
+                    }
+                    // 结算费
+                    if(!StringUtil.isNotEmpty(dto.getStlAmt())){
+                        resultList.add(new ValidMessage("stlAmt",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.stlAmt"))));
+                    }
+                    // 净佣金
+                    if(!StringUtil.isNotEmpty(dto.getCommission())){
+                        resultList.add(new ValidMessage("commission",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.commission"))));
+                    }
+                    // 交易手续费
+                    if(!StringUtil.isNotEmpty(dto.getDealFeeAmt())){
+                        resultList.add(new ValidMessage("dealFeeAmt",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.dealFeeAmt"))));
+                    }
+                    // 结算手续费
+                    if(!StringUtil.isNotEmpty(dto.getStlFeeAmt())){
+                        resultList.add(new ValidMessage("stlFeeAmt",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.stlFeeAmt"))));
+                    }
+                    // 其他费用
+                    if(!StringUtil.isNotEmpty(dto.getOtherAmt())){
+                        resultList.add(new ValidMessage("otherAmt",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.otherAmt"))));
+                    }
+                    // 结算金额
+                    if(!StringUtil.isNotEmpty(dto.getSettleAmt())){
+                        resultList.add(new ValidMessage("settleAmt",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.settleAmt"))));
+                    }
+                    // 资金账户
+                    if(!StringUtil.isNotEmpty(dto.getMyAcctNo())){
+                        resultList.add(new ValidMessage("myAcctNo",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.myAcctNo"))));
                     }
                 }
             }
