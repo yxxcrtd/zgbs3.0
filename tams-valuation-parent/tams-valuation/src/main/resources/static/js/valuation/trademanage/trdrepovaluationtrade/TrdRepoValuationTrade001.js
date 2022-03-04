@@ -56,7 +56,7 @@
                     tradeId:data.tradeId});
         },
         cols:[
-            {field:'tradeId', width:200, sortField:'tradeId',title: '交易编号'}
+            {field:'tradeId', width:200,title: '交易编号'}
             ,{field:'outTradeId', width:150, sortField:'outTradeId',title: '外部交易编号'}
             ,{field:'portfolioId', width:150, title: '产品代码',sortField:'portfolioId'}
             ,{field:'portfolioName', width:150, title: '产品名称',sortField:'portfolioName'}
@@ -64,6 +64,7 @@
             ,{field:'ps', title: '交易类型',visible:false}
             ,{field:'tradeMarketStr', width:150, title: '交易场所',sortField:'tradeMarket'}
             ,{field:'tradeMarket', title: '交易场所',visible:false}
+            ,{field:'repoType', title: '回购类型',width:100}
             ,{field:'counterId', title: '交易对手',width:100}
             ,{field:'term', width:150, title: '回购期限',type:'number',sortField:'term'}
             ,{field:'tradeDateStr', width:150,  title: '交易日',sortField:'tradeDate'}

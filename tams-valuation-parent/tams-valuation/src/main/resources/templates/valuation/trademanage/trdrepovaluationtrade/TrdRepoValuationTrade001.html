@@ -45,6 +45,16 @@
                 </div>
 
                 <div class="layui-form-item">
+
+                    <div class="layui-inline layui-col-xs4 layui-col-sm4 layui-col-md4 layui-col-lg4">
+                        <label class="layui-form-label form-lable">回购类型</label>
+                        <div class="layui-input-inline input-inline">
+                            <select type="text" id="repoType" name="repoType" class="layui-input form-input input-select"
+                                    placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"
+                                    data-th-data-result='${TARGET_BACK_TYPE}' allowClear="true" formatoption="true"
+                                    data-th-initValue="${entity?.repoType}"></select>
+                        </div>
+                    </div>
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
                         <label class="layui-form-label form-lable" data-th-text="#{TrdLendValuationTrade001.busiPs}">交易类型</label>
                         <div class="layui-input-inline input-inline">

@@ -181,7 +181,7 @@ public class TrdRepoValuationTrade003Dto extends BaseEntity implements ProcessEn
         this.outTradeId = outTradeId;
     }
 
-    @NotEmpty(fieldName = "TrdRepoValuationTrade003.portfolioName", groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName = "TrdRepoValuationTrade003.portfolioId", groups = {ValidateGroupEdit.class})
     public String getPortfolioId() {
         return portfolioId;
     }
@@ -190,7 +190,7 @@ public class TrdRepoValuationTrade003Dto extends BaseEntity implements ProcessEn
         this.portfolioId = portfolioId;
     }
 
-    @NotEmpty(fieldName = "TrdRepoValuationTrade003.portfolioId", groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName = "TrdRepoValuationTrade003.portfolioName", groups = {ValidateGroupEdit.class})
     public String getPortfolioName() {
         return portfolioName;
     }
@@ -372,5 +372,18 @@ public class TrdRepoValuationTrade003Dto extends BaseEntity implements ProcessEn
 
     public void setMdate(Date mdate) {
         this.mdate = mdate;
+    }
+
+    /**
+     * 回购类型（H01：质押式协议回购；H02：质押式竞价回购）
+     */
+    private String repoType;
+
+    public String getRepoType() {
+        return repoType;
+    }
+
+    public void setRepoType(String repoType) {
+        this.repoType = repoType;
     }
 }

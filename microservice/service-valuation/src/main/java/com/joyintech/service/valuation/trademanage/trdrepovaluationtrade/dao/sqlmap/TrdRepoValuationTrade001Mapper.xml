@@ -53,6 +53,7 @@
 		bok.BOOKSET_NAME portfolioName,/**金融产品名称**/
 		t.PS ps,/**交易方向**/
 		t.TRADE_MARKET tradeMarket,/**交易场所**/
+		null repoType,/**回购类型**/
 		mst.COUNTER_NAME counterId,  /**交易对手**/
 		zc.TERM_DAYS term,  /**回购期限**/
 		t.TRADE_DATE tradeDate,/**交易日**/
@@ -110,6 +111,7 @@
        bok.BOOKSET_NAME  portfolioName,/**金融产品名称**/
        t.PS              ps,/**交易方向**/
        t.TRADE_MARKET    tradeMarket,/**交易场所**/
+       null repoType,/**回购类型**/
        mst.COUNTER_ID    counterId, /**交易对手**/
        zc.TERM_DAYS      term, /**回购期限**/
        t.TRADE_DATE      tradeDate,/**交易日**/
@@ -153,6 +155,7 @@
        bok.BOOKSET_NAME  portfolioName,/**金融产品名称**/
        t.PS              ps,/**交易方向**/
        t.TRADE_MARKET    tradeMarket,/**交易场所**/
+       null repoType,/**回购类型**/
        mst.COUNTER_ID    counterId, /**交易对手**/
        zc.TERM_DAYS      term, /**回购期限**/
        t.TRADE_DATE      tradeDate,/**交易日**/

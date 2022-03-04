@@ -64,7 +64,7 @@ public class TrdRepoValuationTrade001Controller extends BaseController {
 
     @Override
     public String init(Model model) {
-        this.setSelectOptionToModel(model, DictCode.拆借方向, DictCode.拆借类型,DictCode.交易方向,DictCode.交易场所,
+        this.setSelectOptionToModel(model, DictCode.拆借方向, DictCode.拆借类型,DictCode.交易方向,DictCode.交易场所,DictCode.回购类型,
                 DictCode.交易流程状态);
         return super.init(model);
     }
