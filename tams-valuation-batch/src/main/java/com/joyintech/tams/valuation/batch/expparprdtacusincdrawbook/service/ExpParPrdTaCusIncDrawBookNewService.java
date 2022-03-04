@@ -175,7 +175,7 @@ public class ExpParPrdTaCusIncDrawBookNewService {
             //最新结息日查询
             List<BokBookdetailCurrent> listMdate = accountingCommonService.getNewestMdate(acctEntity.getBooksetId(),
                     acctEntity.getBookDate(), acctEntity.getBokDetailId(),
-                    new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.应付利润.getValue())),
+                    new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.利润分配_应付利润.getValue())),
                     new ArrayList<String>(Arrays.asList(DictCodeListTableId.会计场景代码_产品_预期收益型_兑付客户收益.getValue())),
                     null, happenDate, null, null, happenDate);
             if(StringUtil.isEmptyList(listMdate)){
@@ -283,7 +283,7 @@ public class ExpParPrdTaCusIncDrawBookNewService {
             //基础科目性质=“应付利润”，入账日=DTO.入账日，账套代码=DTO.账套代码）
 			List<BookLatestInfoDto> listBookLatestInfoDto = accountingCommonService.getBookLatestInfo(
 					acctEntity.getBooksetId(), acctEntity.getBookDate(), acctEntity.getBokDetailId(),
-					new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.应付利润.getValue())),
+					new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.利润分配_应付利润.getValue())),
 					DictCodeListTableId.会计场景代码_产品_预期收益型_兑付客户收益.getValue(), null, null, null, DateUtils.addDays(vdateNow, 1),
 					happenDate);
 			// 变量.赎回利息 = 赎回利息凭证.本位币发生额 求和
@@ -368,7 +368,7 @@ public class ExpParPrdTaCusIncDrawBookNewService {
                                                                   Date happenDate,
                                                                   String expBalanceDirect) {
         // 设置基础科目性质
-        String baseSubjectNature =  DictCodeBaseSubjectNatrueNew.应付利润.getValue();; // 基础科目性质
+        String baseSubjectNature =  DictCodeBaseSubjectNatrueNew.利润分配_应付利润.getValue();; // 基础科目性质
 
         // 塞入 基础科目性质
         List<String> baseSubjectNatureList = null;

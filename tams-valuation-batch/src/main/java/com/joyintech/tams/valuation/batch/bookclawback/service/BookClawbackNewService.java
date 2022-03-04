@@ -37,7 +37,6 @@ import com.joyintech.tams.valuation.batch.tafloatfeeaccounts.entity.TaFloadFeeAc
 import com.joyintech.tams.valuation.common.batch.finproduct.entity.*;
 import com.joyintech.tams.valuation.common.constants.*;
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -361,7 +360,7 @@ public class BookClawbackNewService {
                 // 4.R值计算
                 // 基础科目性质
                 List<String> 基础科目性质 = new ArrayList<>();
-                基础科目性质.add(DictCodeBaseSubjectNatrueNew.应付利润.getValue());
+                基础科目性质.add(DictCodeBaseSubjectNatrueNew.利润分配_应付利润.getValue());
                 // 变量.回补区间年化收益率
                 BigDecimal 回补区间年化收益率 = BigDecimal.ZERO;
 

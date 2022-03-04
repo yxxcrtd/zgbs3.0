@@ -74,10 +74,10 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
             "SSZB_Z"
     ),
     /**
-     * 应付利润
+     * 其他综合收益
      */
-    应付利润(
-            "YFLR_Z"
+    其他综合收益(
+            "QTZHSY_Z"
     ),
 
     /** add by weipeng on 20220113 估值系统产品3.0.4批处理科目性质改造新增科目性质 start **/
@@ -237,6 +237,12 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
 
     买入返售金融资产_减值准备(
             "MRFSJRZC_JZZB_Z"
+    ),
+    其他综合收益_申赎(
+            "QTZHSY_SH"
+    ),
+    利润分配_应付利润(
+            "LRFP_YFLR"
     ),
     /** ==========新增科目性质======== end**/
     /** add by weipeng on 20220113 估值系统产品3.0.4批处理科目性质改造 end **/

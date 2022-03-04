@@ -8,25 +8,13 @@
  * 系统名称：估值核算系统V1.0
  */
 
-package com.joyintech.tams.valuation.batch.expreturnfeeaccounts.service;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.joyintech.tams.constant.*;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
+package com.joyintech.tams.valuation.batch.expreturntatradebook.service;
 
 import com.joyintech.calculation.config.NumberEnum;
 import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListTableId;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalance;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalanceSearchDto;
 import com.joyintech.tams.valuation.batch.common.accounting.service.AccountingCommonService;
@@ -37,23 +25,29 @@ import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGen
 import com.joyintech.tams.valuation.batch.common.base.entity.extcommon.ValBokBookdetailBatch;
 import com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dto.FinProductDealInfoComDTO;
 import com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dto.FinProductDealInfoResult;
-import com.joyintech.tams.valuation.batch.common.finproduct.service.FinProductCommonService;
 import com.joyintech.tams.valuation.common.constants.BookConstant;
-import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrue;
-import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrueNew;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * 预期收益型TA交易入账批处理 process相关业务处理
  * 
  * @author zhangzhao
  * @version 1.0 2018年5月17日
- * @see ExpReturnFeeAccountsReaderService
+ * @see ExpReturnTaTradeBookProcessorNewService
  * @since 1.0
  */
 @Service
 @Scope("prototype")
-public class ExpReturnFeeAccountsReaderService {
+public class ExpReturnTaTradeBookProcessorNewService {
 
     /**
      * 记账引擎
@@ -109,7 +103,7 @@ public class ExpReturnFeeAccountsReaderService {
         // 1.数据准备
         // 1.1 变量定义
         // 变量.实收资本 = 0
-        // BigDecimal varSszb = BigDecimal.ZERO;
+        BigDecimal varSszb = BigDecimal.ZERO;
         // 变量.应计利息 = 0
 //        BigDecimal varYjlx = BigDecimal.ZERO;
         // 1.2 标的信息查询
@@ -126,6 +120,16 @@ public class ExpReturnFeeAccountsReaderService {
          * (listValBokBooksetExt != null && listValBokBooksetExt.size() > 0) { bonusTailMode =
          * listValBokBooksetExt.get(0).getParamValue(); }
          */
+        // 最新实收资本
+        // 调用共通方法：科目余额查询-期待方向
+        SubjectBalance costBalance = this.getSubjectBalance(acctEntity.getBooksetId(),
+            acctEntity.getBokDetailId(), acctEntity.getHappenDate(),
+            acctEntity.getBookDate(), DictCodeList.余额方向_贷方.getValue(),
+            DictCodeBaseSubjectNatrueNew.实收资本.getValue(),
+            null);
+        if (costBalance != null) {
+            varSszb = costBalance.getBalance() == null ? BigDecimal.ZERO : costBalance.getBalance();
+        }
 
         // 循环金融产品交易信息list,进行逻辑处理
         for (FinProductDealInfoComDTO dealNow : listFinProductDealInfoComDTONow) {
@@ -171,7 +175,15 @@ public class ExpReturnFeeAccountsReaderService {
 
             } // 交易方向 - 产品到期、份额强减
             else if (DictCodeList.交易方向_产品到期.getValue().equals(dealNow.getPs())
-                     || DictCodeList.交易方向_份额强减.getValue().equals(dealNow.getPs())) {
+                     || DictCodeList.交易方向_份额强减.getValue().equals(dealNow.getPs())
+                     || DictCodeList.交易方向_产品赎回.getValue().equals(dealNow.getPs())
+                     
+               		// 与王之昂金强确认：所有产品增加（1、交易方向加提前赎回、违约赎回，估值走赎回分录，2、交易方向加提前终止，估值走到期分录。）
+                    || DictCodeList.交易方向_产品提前赎回.getValue().equals(dealNow.getPs()) 
+               		|| DictCodeList.交易方向_产品违约赎回.getValue().equals(dealNow.getPs())
+               		|| DictCodeList.交易方向_提前终止.getValue().equals(dealNow.getPs())
+            		
+            		) {
                 // 设置账务引擎参数
                 ad.setTableId(DictCodeListTableId.会计场景代码_产品_预期收益型_赎回到期.getValue());
 
@@ -193,28 +205,34 @@ public class ExpReturnFeeAccountsReaderService {
 
             } // 交易方向 -中间付息
             else if (DictCodeList.交易方向_中间付息.getValue().equals(dealNow.getPs())||DictCodeList.交易方向_赎回收益确认.getValue().equals(dealNow.getPs())) {
-                // 设置账务引擎参数
-                ad.setTableId(DictCodeListTableId.会计场景代码_产品_预期收益型_兑付客户收益.getValue());
                 //应付利润
                 BigDecimal varYflr = BigDecimal.ZERO;
-                // if （变量.分红尾差处理方式 = "无需处理"）
-                if (DictCodeList.是否_是.getValue().equals(dealNow.getIsClean())||DictCodeList.交易方向_赎回收益确认.getValue().equals(dealNow.getPs())) {
-                    // 变量.冲减应计利息 = [待处理交易].[交易金额]
-                    varYflr = dealNow.getTradeAmt();
+                // 设置账务引擎参数
+                ad.setTableId(DictCodeListTableId.会计场景代码_产品_预期收益型_兑付客户收益.getValue());
+                if(DictCodeList.是否_否.getValue().equals(dealNow.getIsClean())||(DictCodeList.交易方向_赎回收益确认.getValue().equals(dealNow.getPs())
+                    && !ArithmeticUtil.equals(varSszb, dealNow.getShareAmt()))){
+                    varYflr=dealNow.getTradeAmt();
                 }else{
-                    // 调用共通方法：科目余额汇总查询(接口不接到期日，取交易日)
-                    SubjectBalance subjectBalance = this.getSubjectBalance(acctEntity.getBooksetId(),
-                        acctEntity.getBokDetailId(), DateUtils.addDays(dealNow.getTradeDate(), -1),
-                        acctEntity.getBookDate(), DictCodeList.余额方向_贷方.getValue(),
-                        DictCodeBaseSubjectNatrue.应付利润.getValue(),
-                        listFinProductDealInfoComDTONow.get(0).getTaskPri());
-                    if (subjectBalance != null) {
-                        varYflr = subjectBalance.getBalance() == null ? BigDecimal.ZERO : subjectBalance.getBalance();
+                    Long taskpri=null;
+                    Date happenDate=DateUtils.addDays(dealNow.getMdate()==null?dealNow.getTradeDate():dealNow.getMdate(),-1);
+                    if(happenDate.compareTo(acctEntity.getBookDate())==0){
+                        taskpri=listFinProductDealInfoComDTONow.get(0).getTaskPri();
+                    }else{
+                        // 调用共通方法：科目余额汇总查询(接口不接到期日，取交易日)
+                        SubjectBalance subjectBalance = this.getSubjectBalance(acctEntity.getBooksetId(),
+                            acctEntity.getBokDetailId(), happenDate,
+                            acctEntity.getBookDate(), DictCodeList.余额方向_贷方.getValue(),
+                            DictCodeBaseSubjectNatrueNew.利润分配_应付利润.getValue(),
+                            taskpri);
+                        if (subjectBalance != null) {
+                            varYflr = subjectBalance.getBalance() == null ? BigDecimal.ZERO : subjectBalance.getBalance();
+                        }
+                        // 记账场景要素map塞值
+                        accountSceneMap.put(BookConstant.MDATE,dealNow.getMdate()==null?dealNow.getTradeDate():dealNow.getMdate());// 凭证说明
                     }
-                    //结息日
-                    accountSceneMap.put(BookConstant.MDATE,dealNow.getMdate());//结息日
                 }
-                
+
+     
                 // 全局变量处理
                 // 变量：应计利息 = 变量：应计利息 - 金额元素.客户收益
                 // varYjlx = ArithmeticUtil.subtract(varYjlx, dealNow.getTradeAmt());
@@ -318,9 +336,9 @@ public class ExpReturnFeeAccountsReaderService {
 
         // 设值科目余额查询参数Dto
         SubjectBalanceSearchDto searchDto = new SubjectBalanceSearchDto();
-        if (searchDto.getSpecialAccount() != null) {
+//        if (searchDto.getSpecialAccount() != null) {
             searchDto.setBokDetailId(bokDetailId);
-        }
+//        }
         searchDto.setBooksetId(booksetId);
         searchDto.setHappenDate(happenDate);
         searchDto.setBookDate(bookDate);
