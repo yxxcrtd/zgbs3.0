@@ -67,8 +67,8 @@ public class ValSubjectSet002Controller extends BaseController {
     @Override
     public String init(Model model) {
         this.setSelectOptionToModel(model, DictCode.余额方向, DictCode.是否, DictCode.科目类型, DictCode.币种,
-                SubjectConfigCode.证券品种, SubjectConfigCode.债券类型, SubjectConfigCode.交易市场, SubjectConfigCode.发行方式, SubjectConfigCode.账户类型,
-                SubjectConfigCode.费用类型, SubjectConfigCode.交易对手类型, SubjectConfigCode.税类型, SubjectConfigCode.渠道, SubjectConfigCode.交易属性
+                SubjectConfigCode.证券品种, SubjectConfigCode.债券类型, SubjectConfigCode.交易市场, SubjectConfigCode.账户类型,
+                SubjectConfigCode.费用类型, SubjectConfigCode.税类型
         );
         String booksetId = getParam("booksetId");
         String subjectNo = getParam("subjectNo");
