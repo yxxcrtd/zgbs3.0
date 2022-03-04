@@ -113,7 +113,7 @@
 				        bc.BOOKSET_ID, 
 				        bc.BOK_DETAIL_ID,
 				        /**bc.BASE_SUBJECT_NATURE,**/
-				        bc.SUBEJCT_NO,
+				        bc.SUBJECT_NO,
 				        bc.BRANCH,
 				        bc.O_CCY
 				    ORDER BY 
