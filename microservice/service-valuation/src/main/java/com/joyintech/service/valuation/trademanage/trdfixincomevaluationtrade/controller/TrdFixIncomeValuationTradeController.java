@@ -10,26 +10,19 @@
 
 package com.joyintech.service.valuation.trademanage.trdfixincomevaluationtrade.controller;
 
-import java.util.List;
-import java.util.Map;
-
 import com.joyintech.framework.annotation.DTXTransaction;
-import com.joyintech.service.valuation.trademanage.trdfixincomevaluationtrade.dto.TrdFixIncomeTradeResult;
-import com.joyintech.service.valuation.trademanage.trdfixincomevaluationtrade.dto.TrdFixIncomeValuationTradeDto;
-import com.joyintech.service.valuation.trademanage.trdfixincomevaluationtrade.service.TrdFixIncomeValuationTradeService;
-import com.joyintech.service.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanTradeResult;
-import com.joyintech.service.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanValuationTradeDto;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.service.valuation.trademanage.trdfixincomevaluationtrade.dto.TrdFixIncomeTradeResult;
+import com.joyintech.service.valuation.trademanage.trdfixincomevaluationtrade.dto.TrdFixIncomeValuationTradeDto;
+import com.joyintech.service.valuation.trademanage.trdfixincomevaluationtrade.service.TrdFixIncomeValuationTradeService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * service 固收型交易
@@ -107,16 +100,18 @@ public class TrdFixIncomeValuationTradeController extends BaseController {
     }
 
     /**
-     * 回调函数 操作具体 new
+     * 插入
      *
-     * @see
-     * @since 1.0
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
      */
     @Transactional
     @DTXTransaction
-    @PostMapping("insert")
-    public void insert(@RequestBody TrdFixIncomeTradeResult dto) {
-        trdFixIncomeValuationTradeService.insert(dto);
+    @RequestMapping("insert")
+    public int insert(@RequestBody TrdFixIncomeTradeResult dto)
+            throws Exception {
+        return trdFixIncomeValuationTradeService.insert(dto);
     }
 
     /**
