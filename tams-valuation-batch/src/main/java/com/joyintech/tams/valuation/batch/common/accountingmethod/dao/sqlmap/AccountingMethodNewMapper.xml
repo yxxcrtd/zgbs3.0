@@ -17,23 +17,21 @@
         SELECT BOK_SCENESUBJECT.SCENE_NODE_ID "sceneNodeId",
                BOK_SCENESUBJECT.SUBJECT_NO "subjectId",
                BOK_SCENESUBJECT.CD_FLAG "cdFlag",
-               NVL(scenExt.sub_dict_code,BOK_TABLEDICT.DICT_CODE) "formElement",
+               /**NVL(scenExt.sub_dict_code,BOK_TABLEDICT.DICT_CODE) "formElement",**/
+              BOK_TABLEDICT.DICT_CODE "formElement",
                BOK_SCENESUBJECT.ACCOUNT_NET "accountNet",
-               NVL(scenExt.SUBJECT_NAME,BOK_SUBJECT.SUBJECT_NAME) subjectName,
+               /**NVL(scenExt.SUBJECT_NAME,BOK_SUBJECT.SUBJECT_NAME) subjectName,**/
+               BOK_SUBJECT.SUBJECT_NAME subjectName,
                BOK_SUBJECT.FSUBJECT_ID fsubjectId,
                BOK_SUBJECT.BASE_SUBJECT_NATURE "baseSubjectNature",
                BOK_SUBJECT.SUBJECT_TYPE "subjectType",
                BOK_SUBJECT.ACC_QUA_FLAG "accQuaFlag",
                BOK_SUBJECT.ACC_INT_FLAG "accIntFlag",
                BOK_SUBJECT.OVERDRAWN_FLAG "overdrawnFlag",
-               /* 四级科目生成规则，不再以科目表本身为准，以科目性质为准*/
-               CASE
-                   WHEN internalRule.GEN_DETSUB_RULE IS NOT NULL THEN 'Y'
-                   ELSE 'N' END AS "genDetsubFlag",
-               /*BOK_SUBJECT.GEN_DETSUB_FLAG "genDetsubFlag",*/
                BOK_SUBJECT.BAL_FLAG "balFlag",
                SCIDS.NODE_VALUE "nodeValue",
-               NVL(scenExt.BOK_DETAIL_ID,BOK_SCENESUBJECT.BOK_DETAIL_ID) "bokDetailId",
+        /**NVL(scenExt.BOK_DETAIL_ID,BOK_SCENESUBJECT.BOK_DETAIL_ID) "bokDetailId",**/
+               BOK_SCENESUBJECT.BOK_DETAIL_ID "bokDetailId",
                BOK_SCENESUBJECT.BOOKSET_ID booksetId,
                BOK_TABLEDICT.DICT_SOURCE as dictSource
         FROM BOK_SCENESUBJECT BOK_SCENESUBJECT
@@ -50,12 +48,12 @@
         LEFT JOIN BOK_SUBJECT_INTERNAL_RULE internalRule
             ON internalRule.BOOKSET_ID = BOK_SCENESUBJECT.BOOKSET_ID
             AND internalRule.SUBJECT_INTERNAL_CODE = BOK_SCENESUBJECT.SUBJECT_NO
-        LEFT JOIN BOK_SCENESUBJECT_EXT scenExt
+        /** LEFT JOIN BOK_SCENESUBJECT_EXT scenExt
             ON scenExt.BOOKSET_ID = BOK_SCENESUBJECT.BOOKSET_ID
             AND scenExt.TABLE_ID = SCIDS.NODE_VALUE
             AND scenExt.SUBJECT_NO = BOK_SCENESUBJECT.SUBJECT_NO
             AND scenExt.DICT_ID = BOK_SCENESUBJECT.FORM_ELE
-            AND internalRule.GEN_DETSUB_RULE IS NOT NULL /** 只有生成底层科目,才需要扩展表 **/
+            AND internalRule.GEN_DETSUB_RULE IS NOT NULL 只有生成底层科目,才需要扩展表 **/
         WHERE BOK_SCENESUBJECT.BOOKSET_ID = #{booksetId}
         ORDER BY BOK_SCENESUBJECT.SCENE_NODE_ID
     </select>
