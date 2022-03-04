@@ -34,8 +34,8 @@
         },
         cols:[
             {field:'tradeId', title: '交易编号',width:220},
-            {field:'finprodId', title: '产品代码',width:180},
-            {field:'finprodName', title: '产品名称',width:180},
+            {field:'prodId', title: '产品代码',width:180},
+            {field:'prodName', title: '产品名称',width:180},
             {field:'assetId', title: '资产代码',width:180},
             {field:'assetAbbr', title: '资产名称',width:180},
             {field:'psStr', title: '交易类型',sortField:"ps",width:150},

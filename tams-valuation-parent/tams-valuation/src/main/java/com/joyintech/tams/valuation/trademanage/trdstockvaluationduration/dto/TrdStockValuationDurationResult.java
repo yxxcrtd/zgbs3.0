@@ -13,7 +13,6 @@ package com.joyintech.tams.valuation.trademanage.trdstockvaluationduration.dto;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.valuation.common.interf.base.dto.AssetDealInfoValCommonResult;
-import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,7 +87,7 @@ public class TrdStockValuationDurationResult extends BaseEntity {
      */
     private int dataNum;
 
-    private TrdBondValuationDurationDto trdBondValuationDurationDto;
+    private TrdStockValuationDurationDto trdStockValuationDurationDto;
     
     public TrdStockValuationDurationResult() {
 
@@ -323,11 +322,11 @@ public class TrdStockValuationDurationResult extends BaseEntity {
         this.listValFinTradeProduct = listValFinTradeProduct;
     }
 
-    public TrdBondValuationDurationDto getTrdBondValuationDurationDto() {
-        return trdBondValuationDurationDto;
+    public TrdStockValuationDurationDto getTrdStockValuationDurationDto() {
+        return trdStockValuationDurationDto;
     }
 
-    public void setTrdBondValuationDurationDto(TrdBondValuationDurationDto trdBondValuationDurationDto) {
-        this.trdBondValuationDurationDto = trdBondValuationDurationDto;
+    public void setTrdStockValuationDurationDto(TrdStockValuationDurationDto trdStockValuationDurationDto) {
+        this.trdStockValuationDurationDto = trdStockValuationDurationDto;
     }
 }

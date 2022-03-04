@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Workbook filePath="trademanage/trdstockvaluationduration/TrdStockValuationDuration001.xlsx" name="股票存续期管理信息一览">
-    <Worksheet javaBean="com.joyintech.tams.valuation.trademanage.trdstockvaluationduration.dto.TrdStockValuationDuration001Dto">
+    <Worksheet javaBean="com.joyintech.tams.valuation.trademanage.trdstockvaluationduration.dto.TrdStockValuationDurationDto">
         <Row>
             <Cell order="1" name="交易编号">tradeId</Cell>
-            <Cell order="2" name="产品代码">finprodId</Cell>
-            <Cell order="3" name="产品名称">finprodName</Cell>
+            <Cell order="2" name="产品代码">prodId</Cell>
+            <Cell order="3" name="产品名称">prodName</Cell>
             <Cell order="4" name="资产代码">assetId</Cell>
             <Cell order="5" name="资产名称">assetAbbr</Cell>
             <Cell order="6" name="交易类型">psStr</Cell>

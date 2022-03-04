@@ -12,7 +12,7 @@ package com.joyintech.service.valuation.trademanage.trdstockvaluationduration.co
 
 
 import com.joyintech.framework.annotation.DTXTransaction;
-import com.joyintech.service.valuation.trademanage.trdstockvaluationduration.dto.TrdStockValuationDuration002Dto;
+import com.joyintech.service.valuation.trademanage.trdstockvaluationduration.dto.TrdStockValuationDurationDto;
 import com.joyintech.service.valuation.trademanage.trdstockvaluationduration.dto.TrdStockValuationDurationResult;
 import com.joyintech.service.valuation.trademanage.trdstockvaluationduration.service.TrdStockValuationDuration002Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +45,7 @@ public class TrdStockValuationDuration002Controller {
      *             异常
      */
     @PostMapping("queryTradeInfoByTradeId")
-    public TrdStockValuationDuration002Dto queryTradeInfoByTradeId(@RequestBody String tradeId) {
+    public TrdStockValuationDurationDto queryTradeInfoByTradeId(@RequestBody String tradeId) {
         return trdStockValuationDuration002Service.queryTradeInfoByTradeId(tradeId);
     }
 

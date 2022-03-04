@@ -5,7 +5,7 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.valuation.trademanage.trdstockvaluationduration.dao.TrdStockValuationDurationMapper;
-import com.joyintech.service.valuation.trademanage.trdstockvaluationduration.dto.TrdStockValuationDuration001Dto;
+import com.joyintech.service.valuation.trademanage.trdstockvaluationduration.dto.TrdStockValuationDurationDto;
 import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.valuation.common.interf.base.batch.dao.ValCommonBatchMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +36,8 @@ public class TrdStockValuationDuration001Service extends BaseService {
      * @see
      * @since 1.0
      */
-    public Page<TrdStockValuationDuration001Dto> selectForPage(int page, int length,
-                                                              Map<String, Object> pageParam)
+    public Page<TrdStockValuationDurationDto> selectForPage(int page, int length,
+                                                            Map<String, Object> pageParam)
             throws Exception {
         //产品代码
         String finprodId = (String)pageParam.get("finprodId");
@@ -72,7 +72,7 @@ public class TrdStockValuationDuration001Service extends BaseService {
      * @see
      * @since 1.0
      */
-    public List<TrdStockValuationDuration001Dto> queryPageList(Map<String, Object> params){
+    public List<TrdStockValuationDurationDto> queryPageList(Map<String, Object> params){
         //产品代码
         String finprodId = (String)params.get("finprodId");
         String[] finprodIdArr = null;
@@ -99,10 +99,10 @@ public class TrdStockValuationDuration001Service extends BaseService {
     }
 
 
-    public int delete(TrdStockValuationDuration001Dto dto) {
+    public int delete(TrdStockValuationDurationDto dto) {
         int count=0;
         Map<String, Object> params = new HashMap<>();
-        params.put("booksetId",dto.getFinprodId());
+        params.put("booksetId",dto.getProdId());
         params.put("tradeId",dto.getTradeId());
 
         List<TrdProductDeal> listDeal = new ArrayList<>();

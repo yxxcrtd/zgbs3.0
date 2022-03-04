@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-public class TrdStockValuationDuration002Dto extends BaseEntity implements ProcessEntity {
+public class TrdStockValuationDurationDto extends BaseEntity implements ProcessEntity {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -23,7 +23,7 @@ public class TrdStockValuationDuration002Dto extends BaseEntity implements Proce
     /**
      * 选择数据
      */
-    private List<TrdStockValuationDuration002Dto> selectedItem;
+    private List<TrdStockValuationDurationDto> selectedItem;
 
     /**
      * 要素id
@@ -108,6 +108,72 @@ public class TrdStockValuationDuration002Dto extends BaseEntity implements Proce
      * 资金账户
      */
     private String myAcctNo;
+
+    /**
+     * 权益登记日
+     */
+    private Date regDate_sz;
+
+    /**
+     * 派息日
+     */
+    private Date dividDate_sz;
+
+    /**
+     * 权益登记日股本
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal amount_sz;
+
+    /**
+     * 分红股本
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal devidentAmt_sz;
+
+    /**
+     * 资金账户
+     */
+    private String myAcctNo_sz;
+
+    /**
+     * 权益登记日
+     */
+    private Date regDate_fhsz;
+
+    /**
+     * 派息日
+     */
+    private Date dividDate_fhsz;
+
+    /**
+     * 权益登记日股本
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal amount_fhsz;
+
+    /**
+     * 分红金额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal bonusAmt_fhsz;
+
+    /**
+     * 分红股本
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal devidentAmt_fhsz;
+
+    /**
+     * 结算金额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal settleAmt_fhsz;
+
+    /**
+     * 资金账户
+     */
+    private String myAcctNo_fhsz;
 
     public String getTradeId() {
         return tradeId;
@@ -245,11 +311,11 @@ public class TrdStockValuationDuration002Dto extends BaseEntity implements Proce
         this.pageModel = pageModel;
     }
 
-    public List<TrdStockValuationDuration002Dto> getSelectedItem() {
+    public List<TrdStockValuationDurationDto> getSelectedItem() {
         return selectedItem;
     }
 
-    public void setSelectedItem(List<TrdStockValuationDuration002Dto> selectedItem) {
+    public void setSelectedItem(List<TrdStockValuationDurationDto> selectedItem) {
         this.selectedItem = selectedItem;
     }
 
@@ -259,5 +325,101 @@ public class TrdStockValuationDuration002Dto extends BaseEntity implements Proce
 
     public void setElementId(String elementId) {
         this.elementId = elementId;
+    }
+
+    public Date getRegDate_sz() {
+        return regDate_sz;
+    }
+
+    public void setRegDate_sz(Date regDate_sz) {
+        this.regDate_sz = regDate_sz;
+    }
+
+    public Date getDividDate_sz() {
+        return dividDate_sz;
+    }
+
+    public void setDividDate_sz(Date dividDate_sz) {
+        this.dividDate_sz = dividDate_sz;
+    }
+
+    public BigDecimal getAmount_sz() {
+        return amount_sz;
+    }
+
+    public void setAmount_sz(BigDecimal amount_sz) {
+        this.amount_sz = amount_sz;
+    }
+
+    public BigDecimal getDevidentAmt_sz() {
+        return devidentAmt_sz;
+    }
+
+    public void setDevidentAmt_sz(BigDecimal devidentAmt_sz) {
+        this.devidentAmt_sz = devidentAmt_sz;
+    }
+
+    public String getMyAcctNo_sz() {
+        return myAcctNo_sz;
+    }
+
+    public void setMyAcctNo_sz(String myAcctNo_sz) {
+        this.myAcctNo_sz = myAcctNo_sz;
+    }
+
+    public Date getRegDate_fhsz() {
+        return regDate_fhsz;
+    }
+
+    public void setRegDate_fhsz(Date regDate_fhsz) {
+        this.regDate_fhsz = regDate_fhsz;
+    }
+
+    public Date getDividDate_fhsz() {
+        return dividDate_fhsz;
+    }
+
+    public void setDividDate_fhsz(Date dividDate_fhsz) {
+        this.dividDate_fhsz = dividDate_fhsz;
+    }
+
+    public BigDecimal getAmount_fhsz() {
+        return amount_fhsz;
+    }
+
+    public void setAmount_fhsz(BigDecimal amount_fhsz) {
+        this.amount_fhsz = amount_fhsz;
+    }
+
+    public BigDecimal getBonusAmt_fhsz() {
+        return bonusAmt_fhsz;
+    }
+
+    public void setBonusAmt_fhsz(BigDecimal bonusAmt_fhsz) {
+        this.bonusAmt_fhsz = bonusAmt_fhsz;
+    }
+
+    public BigDecimal getDevidentAmt_fhsz() {
+        return devidentAmt_fhsz;
+    }
+
+    public void setDevidentAmt_fhsz(BigDecimal devidentAmt_fhsz) {
+        this.devidentAmt_fhsz = devidentAmt_fhsz;
+    }
+
+    public BigDecimal getSettleAmt_fhsz() {
+        return settleAmt_fhsz;
+    }
+
+    public void setSettleAmt_fhsz(BigDecimal settleAmt_fhsz) {
+        this.settleAmt_fhsz = settleAmt_fhsz;
+    }
+
+    public String getMyAcctNo_fhsz() {
+        return myAcctNo_fhsz;
+    }
+
+    public void setMyAcctNo_fhsz(String myAcctNo_fhsz) {
+        this.myAcctNo_fhsz = myAcctNo_fhsz;
     }
 }

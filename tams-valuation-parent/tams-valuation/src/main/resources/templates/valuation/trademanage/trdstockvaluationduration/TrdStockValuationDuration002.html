@@ -32,7 +32,7 @@
                             <div class="layui-form-item">
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-lable"
-                                           data-th-text="#{TrdStockValuationDuration002.tradeId}">交易编号</label>
+                                           data-th-text="#{TrdStockValuationDuration.tradeId}">交易编号</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" id="tradeId" name="tradeId"
                                                required disabled
@@ -43,7 +43,7 @@
                                 </div>
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-lable"
-                                           data-th-text="#{TrdStockValuationDuration002.prodId}">产品代码</label>
+                                           data-th-text="#{TrdStockValuationDuration.prodId}">产品代码</label>
                                         <div class="layui-input-inline input-inline" >
                                             <select id="prodId" name="prodId" required
                                                     class="layui-input form-input input-select"
@@ -56,7 +56,7 @@
                                 </div>
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
-                                           data-th-text="#{TrdStockValuationDuration002.prodName}">产品名称</label>
+                                           data-th-text="#{TrdStockValuationDuration.prodName}">产品名称</label>
                                     <div class="layui-input-inline input-inline">
                                         <input  type="text" id="prodName" name="prodName" required disabled
                                                 class="layui-input form-input" placeholder="请输入内容"
@@ -68,7 +68,7 @@
                             <div class="layui-form-item">
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-lable"
-                                           data-th-text="#{TrdStockValuationDuration002.assetId}">资产代码</label>
+                                           data-th-text="#{TrdStockValuationDuration.assetId}">资产代码</label>
                                     <div class="layui-input-inline input-inline">
                                         <select id="assetId" name="assetId" required
                                                 class="layui-input form-input input-select"
@@ -82,7 +82,7 @@
                                 </div>
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-lable"
-                                           data-th-text="#{TrdStockValuationDuration002.assetAbbr}">资产名称</label>
+                                           data-th-text="#{TrdStockValuationDuration.assetAbbr}">资产名称</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" id="assetAbbr" name="assetAbbr"
                                                class="layui-input form-input"
@@ -93,7 +93,7 @@
                                 </div>
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-lable"
-                                           data-th-text="#{TrdStockValuationDuration002.ps}">交易类型</label>
+                                           data-th-text="#{TrdStockValuationDuration.ps}">交易类型</label>
                                     <div class="layui-input-inline input-inline">
                                         <select type="text" id="ps" name="ps" required
                                                 class="layui-input form-input input-select"
@@ -108,19 +108,21 @@
                             </div>
                             <div class="layui-form-item">
                                 <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-lable"
-                                           data-th-text="#{TrdStockValuationDuration002.regDate}">权益登记日</label>
+                                    <label class="layui-form-label form-label-wrap"
+                                           data-th-text="#{TrdStockValuationDuration.ccy}">币种</label>
                                     <div class="layui-input-inline input-inline">
-                                        <input type="text" id="regDate" name="regDate" required
-                                               class="layui-input form-input input-dateSelect"
-                                               placeholder="请输入内容"
-                                               data-th-placeholder="#{SysCommon.placeholder}"
-                                               data-th-value='${#dates.format(entity?.regDate,"yyyy-MM-dd")}'>
+                                        <select  type="text" id="ccy" name="ccy" required
+                                                 class="layui-input form-input input-select"
+                                                 placeholder="请输入内容" th:placeholder="#{SysCommon.placeholder}"
+                                                 th:data-result='${CCY}'
+                                                 allowClear="true"
+                                                 formatoption="true"
+                                                 th:initValue="*{entity?.ccy?:CCY_default}"></select>
                                     </div>
                                 </div>
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-lable"
-                                           data-th-text="#{TrdStockValuationDuration002.exRightsDate}">除权（除息）日</label>
+                                           data-th-text="#{TrdStockValuationDuration.exRightsDate}">除权（除息）日</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" id="exRightsDate" name="exRightsDate" required
                                                class="layui-input form-input input-dateSelect"
@@ -129,32 +131,43 @@
                                                data-th-value='${#dates.format(entity?.exRightsDate,"yyyy-MM-dd")}'>
                                     </div>
                                 </div>
-                                <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-lable"
-                                           data-th-text="#{TrdStockValuationDuration002.dividDate}">派息日</label>
-                                    <div class="layui-input-inline input-inline">
-                                        <input type="text" id="dividDate" name="dividDate" required
-                                               class="layui-input form-input input-dateSelect"
-                                               placeholder="请输入内容"
-                                               data-th-placeholder="#{SysCommon.placeholder}"
-                                               data-th-value='${#dates.format(entity?.dividDate,"yyyy-MM-dd")}'>
-                                    </div>
-                                </div>
                             </div>
                         </div>
 
                     </div>
                 </div>
             </div>
-            <div class="pro-module-wrap">
+            <div class="pro-module-wrap" id="xjfh">
                 <div class="pro-module">
-                    <h3 class="pro-module-title"><span class="title-des">金额信息</span><i
+                    <h3 class="pro-module-title"><span class="title-des">清算信息</span><i
                             class="iconfont icon-arrow-down pro-down-icon"></i></h3>
                     <div class="pro-module-item">
                         <div class="layui-form-item">
                             <div class="form-inline-wrap">
                                 <label class="layui-form-label form-lable"
-                                       data-th-text="#{TrdStockValuationDuration002.amount}">权益登记日股本</label>
+                                       data-th-text="#{TrdStockValuationDuration.regDate}">权益登记日</label>
+                                <div class="layui-input-inline input-inline">
+                                    <input type="text" id="regDate" name="regDate" required
+                                           class="layui-input form-input input-dateSelect"
+                                           placeholder="请输入内容"
+                                           data-th-placeholder="#{SysCommon.placeholder}"
+                                           data-th-value='${#dates.format(entity?.regDate,"yyyy-MM-dd")}'>
+                                </div>
+                            </div>
+                            <div class="form-inline-wrap">
+                                <label class="layui-form-label form-lable"
+                                       data-th-text="#{TrdStockValuationDuration.dividDate}">派息日</label>
+                                <div class="layui-input-inline input-inline">
+                                    <input type="text" id="dividDate" name="dividDate" required
+                                           class="layui-input form-input input-dateSelect"
+                                           placeholder="请输入内容"
+                                           data-th-placeholder="#{SysCommon.placeholder}"
+                                           data-th-value='${#dates.format(entity?.dividDate,"yyyy-MM-dd")}'>
+                                </div>
+                            </div>
+                            <div class="form-inline-wrap">
+                                <label class="layui-form-label form-lable"
+                                       data-th-text="#{TrdStockValuationDuration.amount}">权益登记日股本</label>
                                 <div class="layui-input-inline input-inline">
                                     <input type="text" id="amount" name="amount" required maxLength="30"
                                            class="layui-input form-input text-number"
@@ -163,9 +176,11 @@
                                            placeholder="请输入内容">
                                 </div>
                             </div>
+                        </div>
+                        <div class="layui-form-item">
                             <div class="form-inline-wrap">
                                 <label class="layui-form-label form-lable"
-                                       data-th-text="#{TrdStockValuationDuration002.bonusAmt}">分红金额</label>
+                                       data-th-text="#{TrdStockValuationDuration.bonusAmt}">分红金额</label>
                                 <div class="layui-input-inline input-inline">
                                     <input type="text" id="bonusAmt" name="bonusAmt" maxLength="28"
                                            class="layui-input form-input text-number"
@@ -174,46 +189,9 @@
                                            placeholder="请输入内容">
                                 </div>
                             </div>
-                            <div class="form-inline-wrap">
-                                <label class="layui-form-label form-lable"
-                                       data-th-text="#{TrdStockValuationDuration002.devidentAmt}">分红股本</label>
-                                <div class="layui-input-inline input-inline">
-                                    <input type="text" id="devidentAmt" name="devidentAmt"  maxLength="30"
-                                           class="layui-input form-input text-number"
-                                           data-textrange="0"
-                                           th:value="${entity?.devidentAmt}"
-                                           placeholder="请输入内容">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="layui-form-item">
-                            <div class="form-inline-wrap">
-                                <label class="layui-form-label form-label-wrap"
-                                       data-th-text="#{TrdStockValuationDuration002.ccy}">币种</label>
-                                <div class="layui-input-inline input-inline">
-                                    <select  type="text" id="ccy" name="ccy" required
-                                             class="layui-input form-input input-select"
-                                             placeholder="请输入内容" th:placeholder="#{SysCommon.placeholder}"
-                                             th:data-result='${CCY}'
-                                             allowClear="true"
-                                             formatoption="true"
-                                             th:initValue="*{entity?.ccy?:CCY_default}"></select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pro-module-wrap">
-                <div class="pro-module">
-                    <h3 class="pro-module-title"><span class="title-des">汇总信息</span><i
-                            class="iconfont icon-arrow-down pro-down-icon"></i></h3>
-                    <div class="pro-module-item">
-                        <div class="layui-form-item">
                             <div class="form-inline-wrap" >
                                 <label class="layui-form-label form-label-wrap"
-                                       data-th-text="#{TrdStockValuationDuration002.settleAmt}">结算金额</label>
+                                       data-th-text="#{TrdStockValuationDuration.settleAmt}">结算金额</label>
                                 <div class="layui-input-inline input-inline">
                                     <input  type="text" id="settleAmt" name="settleAmt" required
                                             class="layui-input form-input text-number" placeholder="请输入内容"
@@ -223,7 +201,7 @@
                             </div>
                             <div class="form-inline-wrap" >
                                 <label class="layui-form-label form-label-wrap"
-                                       data-th-text="#{TrdStockValuationDuration002.myAcctNo}">资金账户</label>
+                                       data-th-text="#{TrdStockValuationDuration.myAcctNo}">资金账户</label>
                                 <div class="layui-input-inline input-inline" >
                                     <select id="myAcctNo" name="myAcctNo"
                                             class="layui-input form-input input-select" required
@@ -231,6 +209,169 @@
                                             allowClear="true" placeholder="请输入内容"
                                             data-th-initValue="${entity?.myAcctNo}">
                                     </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pro-module-wrap" id="sz">
+                <div class="pro-module">
+                    <h3 class="pro-module-title"><span class="title-des">清算信息</span><i
+                            class="iconfont icon-arrow-down pro-down-icon"></i></h3>
+                    <div class="pro-module-item">
+                        <div class="layui-form-item">
+                            <div class="form-inline-wrap">
+                                <label class="layui-form-label form-lable"
+                                       data-th-text="#{TrdStockValuationDuration.regDate}">权益登记日</label>
+                                <div class="layui-input-inline input-inline">
+                                    <input type="text" id="regDate_sz" name="regDate_sz" required
+                                           class="layui-input form-input input-dateSelect"
+                                           placeholder="请输入内容"
+                                           data-th-placeholder="#{SysCommon.placeholder}"
+                                           data-th-value='${#dates.format(entity?.regDate_sz,"yyyy-MM-dd")}'>
+                                </div>
+                            </div>
+                            <div class="form-inline-wrap">
+                                <label class="layui-form-label form-lable"
+                                       data-th-text="#{TrdStockValuationDuration.dividDate}">派息日</label>
+                                <div class="layui-input-inline input-inline">
+                                    <input type="text" id="dividDate_sz" name="dividDate_sz" required
+                                           class="layui-input form-input input-dateSelect"
+                                           placeholder="请输入内容"
+                                           data-th-placeholder="#{SysCommon.placeholder}"
+                                           data-th-value='${#dates.format(entity?.dividDate_sz,"yyyy-MM-dd")}'>
+                                </div>
+                            </div>
+                            <div class="form-inline-wrap">
+                                <label class="layui-form-label form-lable"
+                                       data-th-text="#{TrdStockValuationDuration.amount}">权益登记日股本</label>
+                                <div class="layui-input-inline input-inline">
+                                    <input type="text" id="amount_sz" name="amount_sz" required maxLength="30"
+                                           class="layui-input form-input text-number"
+                                           data-textrange="0"
+                                           th:value="${entity?.actInt_sz}"
+                                           placeholder="请输入内容">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="form-inline-wrap">
+                                <label class="layui-form-label form-lable"
+                                       data-th-text="#{TrdStockValuationDuration.devidentAmt}">分红股本</label>
+                                <div class="layui-input-inline input-inline">
+                                    <input type="text" id="devidentAmt_sz" name="devidentAmt_sz"  required maxLength="30"
+                                           class="layui-input form-input text-number"
+                                           data-textrange="0"
+                                           th:value="${entity?.devidentAmt_sz}"
+                                           placeholder="请输入内容">
+                                </div>
+                            </div>
+                            <div class="form-inline-wrap" >
+                                <label class="layui-form-label form-label-wrap"
+                                       data-th-text="#{TrdStockValuationDuration.myAcctNo}">资金账户</label>
+                                <div class="layui-input-inline input-inline" >
+                                    <select id="myAcctNo_sz" name="myAcctNo_sz"
+                                            class="layui-input form-input input-select" required
+                                            data-th-data-url="@{/valuation/trademanage/trdstockvaluationduration/TrdStockValuationDuration002/getTrdAcctId}"
+                                            allowClear="true" placeholder="请输入内容"
+                                            data-th-initValue="${entity?.myAcctNo_sz}">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pro-module-wrap" id="fhsz">
+                <div class="pro-module">
+                    <h3 class="pro-module-title"><span class="title-des">清算信息</span><i
+                            class="iconfont icon-arrow-down pro-down-icon"></i></h3>
+                    <div class="pro-module-item">
+                        <div class="layui-form-item">
+                            <div class="layui-form-item">
+                                <div class="form-inline-wrap">
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdStockValuationDuration.regDate}">权益登记日</label>
+                                    <div class="layui-input-inline input-inline">
+                                        <input type="text" id="regDate_fhsz" name="regDate_fhsz" required
+                                               class="layui-input form-input input-dateSelect"
+                                               placeholder="请输入内容"
+                                               data-th-placeholder="#{SysCommon.placeholder}"
+                                               data-th-value='${#dates.format(entity?.regDate_fhsz,"yyyy-MM-dd")}'>
+                                    </div>
+                                </div>
+                                <div class="form-inline-wrap">
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdStockValuationDuration.dividDate}">派息日</label>
+                                    <div class="layui-input-inline input-inline">
+                                        <input type="text" id="dividDate_fhsz" name="dividDate_fhsz" required
+                                               class="layui-input form-input input-dateSelect"
+                                               placeholder="请输入内容"
+                                               data-th-placeholder="#{SysCommon.placeholder}"
+                                               data-th-value='${#dates.format(entity?.dividDate_fhsz,"yyyy-MM-dd")}'>
+                                    </div>
+                                </div>
+                                <div class="form-inline-wrap">
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdStockValuationDuration.amount}">权益登记日股本</label>
+                                    <div class="layui-input-inline input-inline">
+                                        <input type="text" id="amount_fhsz" name="amount_fhsz" required maxLength="30"
+                                               class="layui-input form-input text-number"
+                                               data-textrange="0"
+                                               th:value="${entity?.actInt_fhsz}"
+                                               placeholder="请输入内容">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="form-inline-wrap">
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdStockValuationDuration.bonusAmt}">分红金额</label>
+                                    <div class="layui-input-inline input-inline">
+                                        <input type="text" id="bonusAmt_fhsz" name="bonusAmt_fhsz" maxLength="28"
+                                               class="layui-input form-input text-number"
+                                               data-textrange="2" data-fixtype="2"
+                                               th:value="${entity?.actCapi_fhsz}"
+                                               placeholder="请输入内容">
+                                    </div>
+                                </div>
+                                <div class="form-inline-wrap">
+                                    <label class="layui-form-label form-lable"
+                                           data-th-text="#{TrdStockValuationDuration.devidentAmt}">分红股本</label>
+                                    <div class="layui-input-inline input-inline">
+                                        <input type="text" id="devidentAmt_fhsz" name="devidentAmt_fhsz"  maxLength="30"
+                                               class="layui-input form-input text-number"
+                                               data-textrange="0"
+                                               th:value="${entity?.devidentAmt_fhsz}"
+                                               placeholder="请输入内容">
+                                    </div>
+                                </div>
+                                <div class="form-inline-wrap" >
+                                    <label class="layui-form-label form-label-wrap"
+                                           data-th-text="#{TrdStockValuationDuration.settleAmt}">结算金额</label>
+                                    <div class="layui-input-inline input-inline">
+                                        <input  type="text" id="settleAmt_fhsz" name="settleAmt_fhsz" required
+                                                class="layui-input form-input text-number" placeholder="请输入内容"
+                                                th:placeholder="#{SysCommon.placeholder}"
+                                                th:value="${entity?.settleAmt_fhsz}" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="form-inline-wrap" >
+                                    <label class="layui-form-label form-label-wrap"
+                                           data-th-text="#{TrdStockValuationDuration.myAcctNo}">资金账户</label>
+                                    <div class="layui-input-inline input-inline" >
+                                        <select id="myAcctNo_fhsz" name="myAcctNo_fhsz"
+                                                class="layui-input form-input input-select" required
+                                                data-th-data-url="@{/valuation/trademanage/trdstockvaluationduration/TrdStockValuationDuration002/getTrdAcctId}"
+                                                allowClear="true" placeholder="请输入内容"
+                                                data-th-initValue="${entity?.myAcctNo_fhsz}">
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                         </div>

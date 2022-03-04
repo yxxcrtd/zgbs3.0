@@ -5,14 +5,14 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.sec.SecVestPeriodTemplateRecService;
 import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationResult;
-import com.joyintech.tams.valuation.trademanage.trdstockvaluationduration.dto.TrdStockValuationDuration002Dto;
+import com.joyintech.tams.valuation.trademanage.trdstockvaluationduration.dto.TrdStockValuationDurationDto;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TrdStockValuationDuration002Service extends CommonExportService<TrdStockValuationDuration002Dto> implements BaseProcessService<TrdStockValuationDuration002Dto> {
+public class TrdStockValuationDuration002Service extends CommonExportService<TrdStockValuationDurationDto> implements BaseProcessService<TrdStockValuationDurationDto> {
 
     @Autowired
     private SecVestPeriodTemplateRecService secVestPeriodTemplateRecService;
@@ -24,10 +24,10 @@ public class TrdStockValuationDuration002Service extends CommonExportService<Trd
      * @see
      * @since 1.0
      */
-    public TrdStockValuationDuration002Dto queryTradeInfoByTradeId(String tradeId) {
+    public TrdStockValuationDurationDto queryTradeInfoByTradeId(String tradeId) {
         return restTemplate.postForObject(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdStockValuationDuration002/queryTradeInfoByTradeId", tradeId,
-                TrdStockValuationDuration002Dto.class);
+                TrdStockValuationDurationDto.class);
     }
 
     //自增序列号
@@ -37,7 +37,7 @@ public class TrdStockValuationDuration002Service extends CommonExportService<Trd
 
 
     @Override
-    public void doComplete(TrdStockValuationDuration002Dto trdStockValuationDuration002Dto, OperationType operationType) {
+    public void doComplete(TrdStockValuationDurationDto trdStockValuationDurationDto, OperationType operationType) {
         //TrdBondValuationDurationResult result = generateEntity(trdStockValuationDuration002Dto);
         String action = StringUtil.EMPTY;
         if (OperationType.NEW.equals(operationType)) {
@@ -47,12 +47,12 @@ public class TrdStockValuationDuration002Service extends CommonExportService<Trd
             action = "update";
         }
         restTemplate.postForObject(
-                ServiceApplication.VALUATION_SERVICE_NAME + "/TrdStockValuationDuration002/" + action, trdStockValuationDuration002Dto,
+                ServiceApplication.VALUATION_SERVICE_NAME + "/TrdStockValuationDuration002/" + action, trdStockValuationDurationDto,
                 Integer.class);
 
     }
 
-    public TrdBondValuationDurationResult generateEntity(TrdStockValuationDuration002Dto dto){
+    public TrdBondValuationDurationResult generateEntity(TrdStockValuationDurationDto dto){
         //设置接口参数
 //        Map<String,Object> params = new HashMap<>();
 //        List<String> prodIds = new ArrayList<>();

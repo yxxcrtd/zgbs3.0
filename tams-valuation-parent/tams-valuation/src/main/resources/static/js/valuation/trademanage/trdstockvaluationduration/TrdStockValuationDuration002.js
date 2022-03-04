@@ -123,17 +123,23 @@
         //交易类型联动
         $('#ps').change(function(){
             var ps = $('#ps').val();
-            if(ps == '01' || ps == '02'){
-                $('#bonusAmt').attr("required",true).trigger('change');
+            if(ps == '01' ){
+                $('#xjfh').show();
+                $('#sz').hide();
+                $('#fhsz').hide();
+            } else if(ps == '02' ){
+                $('#xjfh').hide();
+                $('#sz').show();
+                $('#fhsz').hide();
+            }else if(ps == '03' ){
+                $('#xjfh').hide();
+                $('#sz').hide();
+                $('#fhsz').show();
             }else{
-                $('#bonusAmt').attr("required",false).trigger('change');
+                $('#xjfh').show();
+                $('#sz').show();
+                $('#fhsz').show();
             }
-            if(ps == '02' || ps == '03'){
-                $('#devidentAmt').attr("required",true).trigger('change');
-            }else{
-                $('#devidentAmt').attr("required",false).trigger('change');
-            }
-            star();
         });
 
         // 绑定按钮事件

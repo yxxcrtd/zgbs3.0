@@ -11,8 +11,7 @@
 package com.joyintech.service.valuation.trademanage.trdstockvaluationduration.dao;
 
 
-import com.joyintech.service.valuation.trademanage.trdstockvaluationduration.dto.TrdStockValuationDuration001Dto;
-import com.joyintech.service.valuation.trademanage.trdstockvaluationduration.dto.TrdStockValuationDuration002Dto;
+import com.joyintech.service.valuation.trademanage.trdstockvaluationduration.dto.TrdStockValuationDurationDto;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -29,12 +28,12 @@ import java.util.Map;
 @Repository(value="serviceTrdStockValuationDurationMapper")
 public interface TrdStockValuationDurationMapper {
 
-    List<TrdStockValuationDuration001Dto> selectDeal(Map<String, Object> paraMap);
+    List<TrdStockValuationDurationDto> selectDeal(Map<String, Object> paraMap);
 
     int delBokDetailIdByTradeId(Map<String, Object> map);
 
     int querySequences();
 
-    TrdStockValuationDuration002Dto queryTradeInfoByTradeId(String tradeId);
+    TrdStockValuationDurationDto queryTradeInfoByTradeId(String tradeId);
 
 }

@@ -22,7 +22,7 @@ import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
-import com.joyintech.tams.valuation.trademanage.trdstockvaluationduration.dto.TrdStockValuationDuration002Dto;
+import com.joyintech.tams.valuation.trademanage.trdstockvaluationduration.dto.TrdStockValuationDurationDto;
 import com.joyintech.tams.valuation.trademanage.trdstockvaluationduration.service.TrdStockValuationDuration002Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -69,7 +69,7 @@ public class TrdStockValuationDuration002Controller extends BaseController {
         String tradeId = getParam("tradeId");
 
         if(StringUtil.isNotEmpty(workflowId)){
-            TrdStockValuationDuration002Dto entity= trdStockValuationDuration002Service.getBussinessEntityByWorkflowId(workflowId);
+            TrdStockValuationDurationDto entity= trdStockValuationDuration002Service.getBussinessEntityByWorkflowId(workflowId);
             if(StringUtil.isNotEmpty(entity.getTradeId())) {
                 entity = trdStockValuationDuration002Service.queryTradeInfoByTradeId(entity.getTradeId());
             }
@@ -77,7 +77,7 @@ public class TrdStockValuationDuration002Controller extends BaseController {
             model.addAttribute("workflowId", workflowId);
 
         }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){
-            TrdStockValuationDuration002Dto entity = trdStockValuationDuration002Service.queryTradeInfoByTradeId(tradeId);
+            TrdStockValuationDurationDto entity = trdStockValuationDuration002Service.queryTradeInfoByTradeId(tradeId);
             model.addAttribute("entity", entity);
         }
 
@@ -132,7 +132,7 @@ public class TrdStockValuationDuration002Controller extends BaseController {
     /**
      * 确认校验
      *
-     * @param trdStockValuationDuration002Dto 参数
+     * @param trdStockValuationDurationDto 参数
      * @param result 校验结果
      * @return AjaxResult
      * @see
@@ -141,9 +141,9 @@ public class TrdStockValuationDuration002Controller extends BaseController {
     @ResponseBody
     @RequestMapping("check")
     public AjaxResult check(@RequestBody @Validated({
-            ValidateGroupEdit.class}) TrdStockValuationDuration002Dto trdStockValuationDuration002Dto,
+            ValidateGroupEdit.class}) TrdStockValuationDurationDto trdStockValuationDurationDto,
                             BindingResult result) {
-        return commonCheck(result, trdStockValuationDuration002Dto.getOperateType());
+        return commonCheck(result, trdStockValuationDurationDto.getOperateType());
     }
 
 
@@ -159,15 +159,15 @@ public class TrdStockValuationDuration002Controller extends BaseController {
     @RequestMapping("save")
     @ResponseBody
     AjaxResult save(@RequestBody @Validated({
-            ValidateGroupEdit.class}) TrdStockValuationDuration002Dto dto, BindingResult br)
+            ValidateGroupEdit.class}) TrdStockValuationDurationDto dto, BindingResult br)
             throws Exception {
 
         if (br.hasErrors()) {
             return new AjaxResult(br);
         }
 
-        ProcessParameter<TrdStockValuationDuration002Dto> processParameter = new ProcessParameter<>();
-        WorkFlowParameter<TrdStockValuationDuration002Dto> workFlowParameter = new WorkFlowParameter<>();
+        ProcessParameter<TrdStockValuationDurationDto> processParameter = new ProcessParameter<>();
+        WorkFlowParameter<TrdStockValuationDurationDto> workFlowParameter = new WorkFlowParameter<>();
         processParameter.setWorkFlowParameter(workFlowParameter);
         processParameter.setPageId(this.getPageId());
 

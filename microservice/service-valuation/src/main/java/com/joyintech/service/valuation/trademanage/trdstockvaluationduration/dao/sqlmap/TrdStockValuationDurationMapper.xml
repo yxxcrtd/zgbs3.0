@@ -2,11 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.joyintech.service.valuation.trademanage.trdstockvaluationduration.dao.TrdStockValuationDurationMapper" >
 
-    <select id="selectDeal" resultType="com.joyintech.service.valuation.trademanage.trdstockvaluationduration.dto.TrdStockValuationDuration001Dto">
+    <select id="selectDeal" resultType="com.joyintech.service.valuation.trademanage.trdstockvaluationduration.dto.TrdStockValuationDurationDto">
         SELECT
             t.TRADE_ID tradeId,/**交易编号**/
-            deal.BOOKSET_ID finprodId,/**金融产品代码**/
-            bok.BOOKSET_NAME finprodName,/**金融产品名称**/
+            deal.BOOKSET_ID prodId,/**金融产品代码**/
+            bok.BOOKSET_NAME prodName,/**金融产品名称**/
             zc.FINPROD_MARKET_ID  assetId, /**资产代码**/
             zc.FINPROD_ABBR  assetAbbr,/**资产简称**/
             t.PS ps,/**交易方向**/
@@ -69,7 +69,7 @@
         SELECT JYBOND_SEQUENCE.nextval from dual
     </select>
 
-    <select id="queryTradeInfoByTradeId" resultType="com.joyintech.service.valuation.trademanage.trdstockvaluationduration.dto.TrdStockValuationDuration002Dto">
+    <select id="queryTradeInfoByTradeId" resultType="com.joyintech.service.valuation.trademanage.trdstockvaluationduration.dto.TrdStockValuationDurationDto">
         SELECT
             t.TRADE_ID tradeId,/**交易编号**/
             deal.BOOKSET_ID prodId,/**金融产品代码**/

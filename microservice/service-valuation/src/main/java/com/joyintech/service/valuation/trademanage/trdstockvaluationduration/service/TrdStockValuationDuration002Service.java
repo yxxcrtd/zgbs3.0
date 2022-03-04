@@ -3,8 +3,7 @@ package com.joyintech.service.valuation.trademanage.trdstockvaluationduration.se
 
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.service.valuation.trademanage.trdstockvaluationduration.dao.TrdStockValuationDurationMapper;
-import com.joyintech.service.valuation.trademanage.trdstockvaluationduration.dto.TrdStockValuationDuration001Dto;
-import com.joyintech.service.valuation.trademanage.trdstockvaluationduration.dto.TrdStockValuationDuration002Dto;
+import com.joyintech.service.valuation.trademanage.trdstockvaluationduration.dto.TrdStockValuationDurationDto;
 import com.joyintech.service.valuation.trademanage.trdstockvaluationduration.dto.TrdStockValuationDurationResult;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.valuation.common.interf.base.batch.dao.*;
@@ -96,7 +95,7 @@ public class TrdStockValuationDuration002Service extends BaseService {
      * @see
      * @since 1.0
      */
-    public TrdStockValuationDuration002Dto queryTradeInfoByTradeId(String tradeId){
+    public TrdStockValuationDurationDto queryTradeInfoByTradeId(String tradeId){
         return  trdStockValuationDurationMapper.queryTradeInfoByTradeId(tradeId);
     }
 
@@ -228,9 +227,9 @@ public class TrdStockValuationDuration002Service extends BaseService {
     }
 
     public int update(TrdStockValuationDurationResult dto){
-        TrdStockValuationDuration001Dto dto1 = new TrdStockValuationDuration001Dto();
-//        dto1.setFinprodId(dto.getTrdStockValuationDuration002Dto().getProdId());
-//        dto1.setTradeId(dto.getTrdStockValuationDuration002Dto().getTradeId());
+        TrdStockValuationDurationDto dto1 = new TrdStockValuationDurationDto();
+        dto1.setProdId(dto.getTrdStockValuationDurationDto().getProdId());
+        dto1.setTradeId(dto.getTrdStockValuationDurationDto().getTradeId());
         trdStockValuationDuration001Service.delete(dto1);
        return insert(dto);
     }
