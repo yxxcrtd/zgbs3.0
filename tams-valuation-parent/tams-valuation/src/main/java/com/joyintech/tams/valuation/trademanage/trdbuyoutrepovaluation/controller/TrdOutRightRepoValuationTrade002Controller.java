@@ -23,6 +23,7 @@ import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.trdbuyoutrepovaluation.dto.TrdOutRightRepoValuationTrade001Dto;
 
 import com.joyintech.tams.valuation.trademanage.trdbuyoutrepovaluation.service.TrdOutRightRepoValuationTrade002Service;
@@ -41,6 +42,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 
@@ -51,6 +53,10 @@ import java.util.Map;
 @PageId("TrdOutRightRepoValuationTrade002")
 @RequestMapping("/valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade002")
 public class TrdOutRightRepoValuationTrade002Controller extends BaseController {
+
+    @Autowired(required = false)
+    private CommonBusinessService commonBusinessService;
+
 
     @Autowired
     private TrdOutRightRepoValuationTrade002Service trdOutRightRepoValuationTrade002Service;
@@ -174,6 +180,36 @@ public class TrdOutRightRepoValuationTrade002Controller extends BaseController {
         return new AjaxResult(msg);
     }
 
+
+    /**
+     * 产品代码下拉框
+     *
+     * @return 产品代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getFinprodId")
+    public List<SelectOptionDto> getFinprodId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("finprodType","F16");
+        return commonBusinessService.getProdId(param);
+    }
+
+    /**
+     * 资产代码下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getAssetId")
+    public List<SelectOptionDto> getAssetId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("assetType","F01");
+        return commonBusinessService.getAssetId(param);
+    }
 
 
 }

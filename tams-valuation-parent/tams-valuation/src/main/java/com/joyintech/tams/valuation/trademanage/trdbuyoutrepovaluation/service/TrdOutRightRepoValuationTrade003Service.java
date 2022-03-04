@@ -35,8 +35,7 @@ public class TrdOutRightRepoValuationTrade003Service extends BaseService<TrdOutR
     @Autowired
     private TrdOutRightRepoValuationTrade002Service trdOutRightRepoValuationTrade002Service;
 
-    @Autowired
-    private TrdOutRightRepoValuationTrade001Dto dto1;
+
 
 
 
