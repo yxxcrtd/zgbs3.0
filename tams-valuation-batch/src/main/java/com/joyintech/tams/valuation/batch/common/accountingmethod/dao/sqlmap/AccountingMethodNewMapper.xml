@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.joyintech.tams.valuation.batch.common.accountingmethod.dao.AccountingMethodMapper">
+<mapper namespace="com.joyintech.tams.valuation.batch.common.accountingmethod.dao.AccountingMethodNewMapper">
     
     <select id="getSceneSubjectConfigByNodeId" resultType="com.joyintech.tams.valuation.batch.common.accountingmethod.entity.AccountEntry">
         WITH SCIDS AS ( SELECT SCENE_NODE_ID,NODE_VALUE,BOOKSET_ID
