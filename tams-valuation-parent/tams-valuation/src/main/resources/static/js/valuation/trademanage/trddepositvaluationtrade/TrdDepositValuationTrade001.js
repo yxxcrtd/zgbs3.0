@@ -64,9 +64,9 @@ $(function(){
             ,{field:'finprodName', width:120, sortField:'finprodName',title: '资产名称'}
             ,{field:'psStr', width:100, title: 'TrdDepositValuation001.ps',sortField:'ps'}
             ,{field:'ps', title: '交易类型',visible:false}
-            ,{field:'tradeDateStr', width:120,  title: '交易日',sortField:'tradeDate'}
+            ,{field:'tradeDateStr', width:120,  title: '交易日期',sortField:'tradeDate'}
             ,{field:'tradeDate',title: '交易日期',visible:false}
-            ,{field:'settDateStr', width:120,  title: '交割日',sortField:'settDate'}
+            ,{field:'settDateStr', width:120,  title: '交割日期',sortField:'settDate'}
             ,{field:'settDate', title: '交割日期',visible:false}
             ,{field:'prinAmt', width:120, title: '交易本金',type:'number',sortField:'prinAmt'}
             ,{field:'intAmt', width:120, title: '应记利息总额',type:'number',sortField:'intAmt'}

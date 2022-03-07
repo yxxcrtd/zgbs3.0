@@ -150,36 +150,36 @@ $(function() {
     });
 
 
-    // //根据产品名称联动出产品代码
-    // $('#portfolioId').change(function(){
-    //     var portfolioId = $('#portfolioId').val();
-    //     if(portfolioId){
-    //         var dataPort = $('#portfolioId').select2('data')[0].object;
-    //         var finprodId = dataPort.finprodId;
-    //         $('#portfolioName').val(finprodId).trigger('change');
-    //
-    //     }else {
-    //         $('#portfolioName').val('').trigger('change');
-    //     }
-    // });
-
-
-    /**
-     * 产品代码联动带出产品名称，证券账户
-     */
-    var prodIdChange = function() {
-        var portfolioId = $('#portfolioId').val();
-        if (portfolioId == '' || portfolioId == undefined) {
-            $('#portfolioName').val('');
-        } else {
-            $('#portfolioName').val($('#portfolioId').select2('data')[0].object).trigger('change');
-        }
-    }
-
-    //产品代码联动事件
+    //根据产品名称联动出产品代码
     $('#portfolioId').change(function(){
-        prodIdChange();
+        var portfolioId = $('#portfolioId').val();
+        if(portfolioId){
+            var dataPort = $('#portfolioId').select2('data')[0].object;
+            var finprodId = dataPort.finprodId;
+            $('#portfolioName').val(finprodId).trigger('change');
+
+        }else {
+            $('#portfolioName').val('').trigger('change');
+        }
     });
+
+
+    // /**
+    //  * 产品代码联动带出产品名称，证券账户
+    //  */
+    // var prodIdChange = function() {
+    //     var portfolioId = $('#portfolioId').val();
+    //     if (portfolioId == '' || portfolioId == undefined) {
+    //         $('#portfolioName').val('');
+    //     } else {
+    //         $('#portfolioName').val($('#portfolioId').select2('data')[0].object).trigger('change');
+    //     }
+    // }
+    //
+    // //产品代码联动事件
+    // $('#portfolioId').change(function(){
+    //     prodIdChange();
+    // });
 
     //校验   交割日必须大于等于交易日
     var checkDate=function () {

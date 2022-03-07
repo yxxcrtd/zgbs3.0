@@ -9,15 +9,14 @@
             <Cell order="5" name="资产代码">finprodMarketId</Cell>
             <Cell order="6" name="资产名称">finprodName</Cell>
             <Cell order="7" name="交易类型">psStr</Cell>
-            <Cell order="8" name="交易日">tradeDateStr</Cell>
-            <Cell order="9" name="交割日">settDateStr</Cell>
+            <Cell order="8" name="交易日期">tradeDateStr</Cell>
+            <Cell order="9" name="交割日期">settDateStr</Cell>
             <Cell order="10" name="交易本金">prinAmtStr</Cell>
-            <Cell order="11" name="应记利息">intAmtStr</Cell>
+            <Cell order="11" name="应记利息总额">intAmtStr</Cell>
             <Cell order="12" name="交易对手">counterId</Cell>
             <Cell order="13" name="币种">ccyFmt</Cell>
             <Cell order="14" name="结算金额">settleAmtStr</Cell>
-            <Cell order="15" name="本币交易金额">dealAmtStr</Cell>
-            <Cell order="16" name="资金账户">trdAcctId</Cell>
+            <Cell order="15" name="资金账户">trdAcctId</Cell>
         </Row>
     </Worksheet>
 </Workbook>
