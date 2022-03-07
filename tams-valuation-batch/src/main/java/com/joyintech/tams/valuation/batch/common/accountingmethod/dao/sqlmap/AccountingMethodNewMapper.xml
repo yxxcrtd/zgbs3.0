@@ -92,8 +92,8 @@
         </if>
         <if test="listSubjectInternalCode != null and listSubjectInternalCode.size >0">
             AND A.SUBJECT_INTERNAL_CODE IN
-            <foreach collection="listSubjectInternalCode" item="item" open="(" close=")" separator=",">
-                #{item}
+            <foreach collection="listSubjectInternalCode" item="item" index="index" open="(" close=")" separator=",">
+                <if test="(index % 998) == 0"> NULL ) OR A.SUBJECT_INTERNAL_CODE  IN (</if>#{item}
             </foreach>
         </if>
 
