@@ -10,20 +10,20 @@
 
 package com.joyintech.tams.valuation.batch.prdvaluationfeebefore.processor;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
-
 import com.joyintech.batch.batchbase.baseclass.BaseProcessor;
 import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
-import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGenerateResult;
+import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.valuation.batch.common.prdvaluationfeecommon.dto.BokstatbokpositionReaderDto;
 import com.joyintech.tams.valuation.batch.common.prdvaluationfeecommon.dto.BokstatbokpositionWriterDto;
 import com.joyintech.tams.valuation.batch.prdvaluationfeebefore.service.PrdValuationFeeBeforeProcessorService;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * (产品估值计算-费前) - process
@@ -51,6 +51,19 @@ public class PrdValuationFeeBeforeProcessor extends BaseProcessor<NeedOperateEnt
         // 将返回值塞入参数中
         thisParams.put(GlobalConstant.READER_RESULT, acctEntity);
 
+        // modify by weipeng on 20220304 会计分录生成凭证通过系统参数区分新旧逻辑，保持原有逻辑不动 start
+        BokstatbokpositionWriterDto result = new BokstatbokpositionWriterDto();
+        // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录 start
+        String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+        // 若按照内部科目编码分录，则需要映射分录对应科目信息.
+        //调用service方法进行逻辑逻辑
+        if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
+            result = prdValuationFeeAfterProcessorNewService.execute(thisParams);
+        }
+        else{
+            result = prdValuationFeeAfterProcessorService.execute(thisParams);
+        }
+        // modify by weipeng on 20220304 会计分录生成凭证通过系统参数区分新旧逻辑，保持原有逻辑不动 end
         // 调用service方法进行逻辑逻辑
         BokstatbokpositionWriterDto result = prdValuationFeeBeforeProcessorService.execute(thisParams);
 
