@@ -198,7 +198,7 @@ public class ExpReturnPrdValuationFeeBeforeProcessorNewService {
         // subjectBalanceSearchDto.setBokDetailId(acctEntity.getFinprodId());
         // subjectBalanceSearchDto.setBooksetId(acctEntity.getBooksetId());
         // List<String> baseSubjectNatureList = new ArrayList<>();
-        // baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.利润分配_应付利润.getValue());
+        // baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.应付利润.getValue());
         // subjectBalanceSearchDto.setBaseSubjectNatureList(baseSubjectNatureList);
         // subjectBalanceSearchDto.setTaskPri(acctEntity.getTaskPri());
         // List<SubjectBalance> subjectBalanceExpectDirection = accountCommonService.getSubjectBalanceExpectDirection(
@@ -250,11 +250,11 @@ public class ExpReturnPrdValuationFeeBeforeProcessorNewService {
         valStatBokPositionForToday.setProfitType(acctEntity.getAcctmode());
         // }'
         /*
-         * //前一日应付利润余额 = 上述返回科目余额 BigDecimal varYedYfye = this.getPlanEndAmt(bokDetailId,null, DictCodeBaseSubjectNatrueNew.利润分配_应付利润.getValue(),
+         * //前一日应付利润余额 = 上述返回科目余额 BigDecimal varYedYfye = this.getPlanEndAmt(bokDetailId,null, DictCodeBaseSubjectNatrueNew.应付利润.getValue(),
          * DictCodeList.余额方向_贷方.getValue(), acctEntity.getBooksetId(), DateUtil.addDay(acctEntity.getHappenDate(),-1),
          * DateUtil.addDay(acctEntity.getBookDate(), -1), acctEntity.getStandardCcy(), acctEntity.getTaskPri(), null,false);
          *
-         * //调用共通方法：科目余额汇总查询 //计提结束日应付利润余额 = 上述返回科目余额 BigDecimal varYfye = this.getPlanEndAmt(bokDetailId,null, DictCodeBaseSubjectNatrueNew.利润分配_应付利润.getValue(),
+         * //调用共通方法：科目余额汇总查询 //计提结束日应付利润余额 = 上述返回科目余额 BigDecimal varYfye = this.getPlanEndAmt(bokDetailId,null, DictCodeBaseSubjectNatrueNew.应付利润.getValue(),
          * DictCodeList.余额方向_贷方.getValue(), acctEntity.getBooksetId(), acctEntity.getHappenDate(), acctEntity.getBookDate(), acctEntity.getStandardCcy(),
          * acctEntity.getTaskPri(), null,false);
          *
@@ -269,7 +269,7 @@ public class ExpReturnPrdValuationFeeBeforeProcessorNewService {
             // 调用共通方法查询：凭证最新账务查询（场景代码=“8005”，发生日=DTO.发生日，入账日=DTO.入账日，账套代码=DTO.账套代码）
             // 定义基础科目性质list
             List<String> baseSubjectNatureList = new ArrayList<String>();
-            baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.利润分配_应付利润.getValue());
+            baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.应付利润.getValue());
             List<BookLatestInfoDto> endProfitList = accountCommonService.getBookLatestInfo(acctEntity.getBooksetId(),
                 acctEntity.getBookDate(), bokDetailId, baseSubjectNatureList, DictCodeListTableId.会计场景代码_产品_预期收益型_兑付客户收益.getValue(),
                 null, acctEntity.getHappenDate(), null, null, null);

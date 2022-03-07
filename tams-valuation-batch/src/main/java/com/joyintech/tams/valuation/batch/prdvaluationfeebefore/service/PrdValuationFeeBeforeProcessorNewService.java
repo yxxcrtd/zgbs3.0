@@ -294,7 +294,7 @@ public class PrdValuationFeeBeforeProcessorNewService {
             // 定义基础科目性质list
             List<String> baseSubjectNatureList = new ArrayList<String>();
 //            baseSubjectNatureList.add(DictCodeBaseSubjectNatrue.待分配利润.getValue());// 基础科目性质=“待分配利润”
-            baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.利润分配_应付利润.getValue());// 基础科目性质=“待分配利润”
+            baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.应付利润.getValue());// 基础科目性质=“待分配利润”
             List<BookLatestInfoDto> endPlanProfitShareList = accountCommonService.getBookLatestInfo(
                 acctEntity.getBooksetId(), acctEntity.getBookDate(), null, baseSubjectNatureList,
                 DictCodeListTableId.会计场景代码_产品_净值型_分红除权处理.getValue(), null, acctEntity.getHappenDate(),
@@ -361,7 +361,7 @@ public class PrdValuationFeeBeforeProcessorNewService {
                 // 调用共通方法查询：凭证最新账务查询（场景代码=“8004”，发生日=DTO.发生日，入账日=DTO.入账日，账套代码=DTO.账套代码）
                 // 定义基础科目性质list
                 List<String> baseSubjectNatureList = new ArrayList<String>();
-                baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.利润分配_应付利润.getValue());
+                baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.应付利润.getValue());
                 List<BookLatestInfoDto> endProfitList = accountCommonService.getBookLatestInfo(
                     acctEntity.getBooksetId(), acctEntity.getBookDate(), null,
                     baseSubjectNatureList, DictCodeListTableId.会计场景代码_产品_预期收益型_客户收益计提.getValue(), null,
@@ -506,7 +506,7 @@ public class PrdValuationFeeBeforeProcessorNewService {
             // 定义 变量.红利再投信息 =
             // 调用共通方法查询：凭证最新账务查询（场景代码=“8034”，发生开始日=“变量.周期开始日”，发生结束日=“变量.周期结束日”，基础科目性质=“应付利润”，入账日=DTO.入账日，账套代码=DTO.账套代码）
             List<String> baseSubjectNatureListForHLZT = new ArrayList<String>();
-            baseSubjectNatureListForHLZT.add(DictCodeBaseSubjectNatrueNew.利润分配_应付利润.getValue());// 基础科目性质=“应付利润”
+            baseSubjectNatureListForHLZT.add(DictCodeBaseSubjectNatrueNew.应付利润.getValue());// 基础科目性质=“应付利润”
             List<BookLatestInfoDto> bookLatestInfoDtoListForHLZT = accountCommonService.getBookLatestInfo(
                 acctEntity.getBooksetId(), acctEntity.getBookDate(), null,
                 baseSubjectNatureListForHLZT, DictCodeListTableId.会计场景代码_产品_货币型_红利再投.getValue(), null,

@@ -360,7 +360,7 @@ public class BookClawbackNewService {
                 // 4.R值计算
                 // 基础科目性质
                 List<String> 基础科目性质 = new ArrayList<>();
-                基础科目性质.add(DictCodeBaseSubjectNatrueNew.利润分配_应付利润.getValue());
+                基础科目性质.add(DictCodeBaseSubjectNatrueNew.应付利润.getValue());
                 // 变量.回补区间年化收益率
                 BigDecimal 回补区间年化收益率 = BigDecimal.ZERO;
 
