@@ -258,7 +258,6 @@ public class RepDealSecSubjectTemplateRecService {
         /**add by wujie on 20180822 start**/
         // 分类1 = A.资产类型
         valFinProductType.setType1(dto.getAssetClass());
-        
         // 分类2 = 调用共通方法查询核算分类
         FinProductClass fdto = new FinProductClass();
         //金融产品类型
@@ -278,6 +277,9 @@ public class RepDealSecSubjectTemplateRecService {
 
         /**add by wujie on 20180822 end**/
         valFinProductType.setBranch(InterfCommonConstant.分支序号_默认);
+        /**add by yinya on 2022-03-07 新会计引擎升级，科目体系需要区分回购类型，回购标的接口新增回购类型**/
+        valFinProductType.setType6(dto.getTargetBackType());
+
         return valFinProductType;
     }
 
