@@ -30,7 +30,7 @@ import java.util.Map;
  * 
  * @author yangjian
  * @version 1.0 2018年8月7日
- * @see PrdValuationFeeBeforeReader
+ * @see PrdValuationFeeBeforeProcessor
  * @since 1.0
  */
 @Service
@@ -39,6 +39,9 @@ public class PrdValuationFeeBeforeProcessor extends BaseProcessor<NeedOperateEnt
 
     @Autowired
     private PrdValuationFeeBeforeProcessorService prdValuationFeeBeforeProcessorService;
+
+    @Autowired
+    private PrdValuationFeeBeforeProcessorService prdValuationFeeBeforeProcessorNewService;
 
     @Override
     public BokstatbokpositionWriterDto process(NeedOperateEntity items)
@@ -58,14 +61,12 @@ public class PrdValuationFeeBeforeProcessor extends BaseProcessor<NeedOperateEnt
         // 若按照内部科目编码分录，则需要映射分录对应科目信息.
         //调用service方法进行逻辑逻辑
         if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
-            result = prdValuationFeeAfterProcessorNewService.execute(thisParams);
+            result = prdValuationFeeBeforeProcessorNewService.execute(thisParams);
         }
         else{
-            result = prdValuationFeeAfterProcessorService.execute(thisParams);
+            result = prdValuationFeeBeforeProcessorService.execute(thisParams);
         }
         // modify by weipeng on 20220304 会计分录生成凭证通过系统参数区分新旧逻辑，保持原有逻辑不动 end
-        // 调用service方法进行逻辑逻辑
-        BokstatbokpositionWriterDto result = prdValuationFeeBeforeProcessorService.execute(thisParams);
 
         //当为null时候，给予初始化
         if(result == null){
