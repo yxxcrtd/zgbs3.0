@@ -44,7 +44,7 @@
             {field:'tradeMarket', title: '交易场所',visible:false},
             {field:'psStr', title: '交易类型',sortField:"ps",width:150},
             {field:'ps', title: '交易类型',visible:false},
-            {field:'tradeDateStr', width:120,  title: '交易日日期',sortField:'tradeDate'},
+            {field:'tradeDateStr', width:120,  title: '交易日期',sortField:'tradeDate'},
             {field:'tradeDate',title: '交易日期',visible:false},
             {field:'settdateDateStr', width:120,  title: '交割日期',sortField:'settdateDate'},
             {field:'settdateDate', title: '交割日期',visible:false},

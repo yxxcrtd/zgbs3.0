@@ -34,150 +34,212 @@ import java.util.List;
 public class TrdFundValuationTradeDtoValidator implements BeanValidator {
 
     public List<ValidMessage> valid(Object value) {
-        List<ValidMessage> validMessageList = new ArrayList<ValidMessage>();
+        List<ValidMessage> resultList = new ArrayList<ValidMessage>();
         TrdFundValuationTradeDto dto = (TrdFundValuationTradeDto)value;
 
-        if(dto.getOperateType().equals("submit") || dto.getOperateType().equals("save")) {
+        if("delete".equals(dto.getOperateType())){
+
+        }else{
             if(StringUtil.isNotEmpty(dto.getPs())){
                 if( StringUtil.equals(dto.getPs(), DictCodeList.交易方向_买入.getValue())
                         || StringUtil.equals(dto.getPs(),DictCodeList.交易方向_卖出.getValue())
                 ){
-                    if(dto.getTradeDate() ==null){
-                        String msg = this.getMessage("请输入交易日期。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //交易日期
+                    if(!StringUtil.isNotEmpty(dto.getTradeDate())){
+                        resultList.add(new ValidMessage("tradeDate",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.tradeDate"))));
                     }
-                    if(dto.getSettleDate() ==null){
-                        String msg = this.getMessage("请输入结算日期。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //结算日期
+                    if(!StringUtil.isNotEmpty(dto.getSettleDate())){
+                        resultList.add(new ValidMessage("settleDate",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.settleDate"))));
                     }
-                    if(dto.getNums() ==null){
-                        String msg = this.getMessage("请输入成交数量。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //成交数量
+                    if(!StringUtil.isNotEmpty(dto.getDealNum())){
+                        resultList.add(new ValidMessage("dealNum",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.dealNum"))));
                     }
-                    if(dto.getTradeAmt() ==null){
-                        String msg = this.getMessage("请输入成交金额。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //成交金额
+                    if(!StringUtil.isNotEmpty(dto.getTradeAmt())){
+                        resultList.add(new ValidMessage("tradeAmt",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.tradeAmt"))));
                     }
-                    if(dto.getTrdAcctId() ==null){
-                        String msg = this.getMessage("请输入资金账户。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //资金账户
+                    if(!StringUtil.isNotEmpty(dto.getTrdMyAcctNo())){
+                        resultList.add(new ValidMessage("trdMyAcctNo",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.myAcctNo"))));
                     }
-                    if(dto.getExchangeAmt() ==null){
-                        String msg = this.getMessage("请输入经手费。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //经手费
+                    if(!StringUtil.isNotEmpty(dto.getBrokerage())){
+                        resultList.add(new ValidMessage("brokerage",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.brokerage"))));
                     }
-                    if(dto.getCommissionFee() ==null){
-                        String msg = this.getMessage("请输入净佣金。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //净佣金
+                    if(!StringUtil.isNotEmpty(dto.getCommission())){
+                        resultList.add(new ValidMessage("commission",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.commission"))));
                     }
-                    if(dto.getMdateSettleAmt() ==null){
-                        String msg = this.getMessage("请输入结算金额。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //结算金额
+                    if(!StringUtil.isNotEmpty(dto.getSettleAmt())){
+                        resultList.add(new ValidMessage("settleAmt",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.settleAmt"))));
                     }
-                    if(dto.getTrdAcctId() ==null){
-                        String msg = this.getMessage("请输入资金账户。");
-                        validMessageList.add(new ValidMessage(msg));
-                    }
-
                 }else if(StringUtil.equals(dto.getPs(),DictCodeList.交易方向_认购.getValue())  ){
-                    if(dto.getRgTradeDate() ==null){
-                        String msg = this.getMessage("请输入申请日期。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //申请日期
+                    if(!StringUtil.isNotEmpty(dto.getApplyDate())){
+                        resultList.add(new ValidMessage("applyDate",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.applyDate"))));
                     }
-                    if(dto.getRgSettleDate() ==null){
-                        String msg = this.getMessage("请输入结算日期。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //结算日期
+                    if(!StringUtil.isNotEmpty(dto.getSubSettleDate())){
+                        resultList.add(new ValidMessage("subSettleDate",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.settleDate"))));
                     }
-                    if(dto.getRgTradeAmt() ==null){
-                        String msg = this.getMessage("请输入申请金额。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //申请金额
+                    if(!StringUtil.isNotEmpty(dto.getApplyAmt())){
+                        resultList.add(new ValidMessage("applyAmt",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.applyAmt"))));
                     }
-                    if(dto.getRgTrdAcctId() ==null){
-                        String msg = this.getMessage("请输入资金账户。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //资金账户
+                    if(!StringUtil.isNotEmpty(dto.getSubMyAcctNo())){
+                        resultList.add(new ValidMessage("subMyAcctNo",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.myAcctNo"))));
                     }
-
                 }else if(StringUtil.equals(dto.getPs(),DictCodeList.交易方向_申购.getValue())){
-                    if(dto.getSqTradeDate() ==null){
-                        String msg = this.getMessage("请输入申请日期。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //申请日期
+                    if(!StringUtil.isNotEmpty(dto.getPurApplyDate())){
+                        resultList.add(new ValidMessage("purApplyDate",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.applyDate"))));
                     }
-                    if(dto.getSqSettleDate() ==null){
-                        String msg = this.getMessage("请输入结算日期。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //结算日期
+                    if(!StringUtil.isNotEmpty(dto.getPurSettleDate())){
+                        resultList.add(new ValidMessage("purSettleDate",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.settleDate"))));
                     }
-                    if(dto.getSqTradeAmt() ==null){
-                        String msg = this.getMessage("请输入申请金额。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //申请金额
+                    if(!StringUtil.isNotEmpty(dto.getPurApplyAmt())){
+                        resultList.add(new ValidMessage("purApplyAmt",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.applyAmt"))));
                     }
-                    if(dto.getSqTrdAcctId() ==null){
-                        String msg = this.getMessage("请输入资金账户。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //资金账户
+                    if(!StringUtil.isNotEmpty(dto.getPurMyAcctNo())){
+                        resultList.add(new ValidMessage("purMyAcctNo",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.myAcctNo"))));
                     }
-                }else if(StringUtil.equals(dto.getPs(),DictCodeList.交易方向_认购确认.getValue())){
-                    if(dto.getRgqrTradeDate() ==null){
-                        String msg = this.getMessage("请输入确认日期。");
-                        validMessageList.add(new ValidMessage(msg));
+                }else if(StringUtil.equals(dto.getPs(),DictCodeList.交易方向_认购确认.getValue()) ){
+                    //确认日期
+                    if(!StringUtil.isNotEmpty(dto.getSubConfirmDate())){
+                        resultList.add(new ValidMessage("subConfirmDate",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.subConfirmDate"))));
                     }
-                    if(dto.getRgqrNums() ==null){
-                        String msg = this.getMessage("请输入确认数量。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //确认数量
+                    if(!StringUtil.isNotEmpty(dto.getSubConfirmNum())){
+                        resultList.add(new ValidMessage("subConfirmNum",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.subConfirmNum"))));
                     }
-                    if(dto.getSubscribeFee() ==null){
-                        String msg = this.getMessage("请输入认购费。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //认购费
+                    if(!StringUtil.isNotEmpty(dto.getSubFee())){
+                        resultList.add(new ValidMessage("subFee",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.subFee"))));
                     }
-                    if(dto.getRgqrTrdAcctId() ==null){
-                        String msg = this.getMessage("请输入资金账户。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //资金账户
+                    if(!StringUtil.isNotEmpty(dto.getSubConfirmMyAcctNo())){
+                        resultList.add(new ValidMessage("subConfirmMyAcctNo",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.myAcctNo"))));
                     }
-                }else if(StringUtil.equals(dto.getPs(),DictCodeList.交易方向_申购确认.getValue()) ){
-                    if(dto.getSgqrTradeDate() ==null){
-                        String msg = this.getMessage("请输入确认日期。");
-                        validMessageList.add(new ValidMessage(msg));
+                } else if(StringUtil.equals(dto.getPs(),DictCodeList.交易方向_申购确认.getValue()) ){
+                    //确认日期
+                    if(!StringUtil.isNotEmpty(dto.getPurConfirmDate())){
+                        resultList.add(new ValidMessage("purConfirmDate",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.subConfirmDate"))));
                     }
-                    if(dto.getSgqrNums() ==null){
-                        String msg = this.getMessage("请输入确认数量。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //确认数量
+                    if(!StringUtil.isNotEmpty(dto.getPurConfirmNum())){
+                        resultList.add(new ValidMessage("purConfirmNum",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.subConfirmNum"))));
                     }
-                    if(dto.getPurchaseFee() ==null){
-                        String msg = this.getMessage("请输入申购费。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //申购费
+                    if(!StringUtil.isNotEmpty(dto.getPurFee())){
+                        resultList.add(new ValidMessage("purFee",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.purFee"))));
                     }
-                    if(dto.getSgqrTrdAcctId() ==null){
-                        String msg = this.getMessage("请输入资金账户。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //资金账户
+                    if(!StringUtil.isNotEmpty(dto.getPurConfirmMyAcctNo())){
+                        resultList.add(new ValidMessage("purConfirmMyAcctNo",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.myAcctNo"))));
                     }
                 }else if(StringUtil.equals(dto.getPs(),DictCodeList.交易方向_赎回确认.getValue()) ){
-                    if(dto.getShqrTradeDate() ==null){
-                        String msg = this.getMessage("请输入确认日期。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //确认日期
+                    if(!StringUtil.isNotEmpty(dto.getRedConfirmDate())){
+                        resultList.add(new ValidMessage("redConfirmDate",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.subConfirmDate"))));
                     }
-                    if(dto.getShqrNums() ==null){
-                        String msg = this.getMessage("请输入确认数量。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //确认数量
+                    if(!StringUtil.isNotEmpty(dto.getRedConfirmNum())){
+                        resultList.add(new ValidMessage("redConfirmNum",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.subConfirmNum"))));
                     }
-                    if(dto.getShqrTradeAmt() ==null){
-                        String msg = this.getMessage("请输入确认金额。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //确认金额
+                    if(!StringUtil.isNotEmpty(dto.getRedConfirmAmt())){
+                        resultList.add(new ValidMessage("redConfirmAmt",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.subConfirmAmt"))));
                     }
-                    if(dto.getRedemptionFee() ==null){
-                        String msg = this.getMessage("请输入赎回费。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //赎回费
+                    if(!StringUtil.isNotEmpty(dto.getRedFee())){
+                        resultList.add(new ValidMessage("redFee",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.redFee"))));
                     }
-                    if(dto.getShqrSettleDate() ==null){
-                        String msg = this.getMessage("请输入到账日期。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //到账日期
+                    if(!StringUtil.isNotEmpty(dto.getArriveDate())){
+                        resultList.add(new ValidMessage("arriveDate",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.arriveDate"))));
                     }
-                    if(dto.getShqrTrdAcctId() ==null){
-                        String msg = this.getMessage("请输入资金账户。");
-                        validMessageList.add(new ValidMessage(msg));
+                    //资金账户
+                    if(!StringUtil.isNotEmpty(dto.getRedMyAcctNo())){
+                        resultList.add(new ValidMessage("redMyAcctNo",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.myAcctNo"))));
+                    }
+                }else if(StringUtil.equals(dto.getPs(),DictCodeList.交易方向_赎回到账.getValue())){
+                    //确认日期
+                    if(!StringUtil.isNotEmpty(dto.getRedConfirmDate())){
+                        resultList.add(new ValidMessage("redConfirmDate",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.subConfirmDate"))));
+                    }
+                    //确认数量
+                    if(!StringUtil.isNotEmpty(dto.getRedConfirmNum())){
+                        resultList.add(new ValidMessage("redConfirmNum",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.subConfirmNum"))));
+                    }
+                    //确认金额
+                    if(!StringUtil.isNotEmpty(dto.getRedConfirmAmt())){
+                        resultList.add(new ValidMessage("redConfirmAmt",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.subConfirmAmt"))));
+                    }
+                    //赎回费
+                    if(!StringUtil.isNotEmpty(dto.getRedFee())){
+                        resultList.add(new ValidMessage("redFee",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.redFee"))));
+                    }
+                    //到账日期
+                    if(!StringUtil.isNotEmpty(dto.getArriveDate())){
+                        resultList.add(new ValidMessage("arriveDate",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.arriveDate"))));
+                    }
+                    //到账日期
+                    if(!StringUtil.isNotEmpty(dto.getTradeAmtArrive())){
+                        resultList.add(new ValidMessage("tradeAmtArrive",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.tradeAmtArrive"))));
+                    }
+                    //资金账户
+                    if(!StringUtil.isNotEmpty(dto.getRedMyAcctNo())){
+                        resultList.add(new ValidMessage("redMyAcctNo",
+                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.myAcctNo"))));
                     }
                 }
             }
         }
 
-        return validMessageList;
+        return resultList;
     }
 
 }

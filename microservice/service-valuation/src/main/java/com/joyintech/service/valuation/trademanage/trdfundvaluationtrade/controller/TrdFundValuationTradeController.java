@@ -10,26 +10,18 @@
 
 package com.joyintech.service.valuation.trademanage.trdfundvaluationtrade.controller;
 
-import java.util.List;
-import java.util.Map;
-
 import com.joyintech.framework.annotation.DTXTransaction;
+import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.grid.Page;
 import com.joyintech.service.valuation.trademanage.trdfundvaluationtrade.dto.TrdFundTradeResult;
 import com.joyintech.service.valuation.trademanage.trdfundvaluationtrade.dto.TrdFundValuationTradeDto;
 import com.joyintech.service.valuation.trademanage.trdfundvaluationtrade.service.TrdFundValuationTradeService;
-import com.joyintech.service.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanTradeResult;
-import com.joyintech.service.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanValuationTradeDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.joyintech.framework.base.BaseController;
-import com.joyintech.framework.grid.Page;
-import com.joyintech.framework.select.SelectOptionDto;
+import java.util.List;
+import java.util.Map;
 
 /**
  * service 基金交易
@@ -45,32 +37,6 @@ public class TrdFundValuationTradeController extends BaseController {
 
     @Autowired
     private TrdFundValuationTradeService trdFundValuationTradeService;
-
-    /**
-     * 产品代码下拉框
-     *
-     * @return 返回的数据
-     * @exception Exception
-     *                异常
-     * @since 1.0
-     */
-    @PostMapping("findPortfolioId/{page}/{length}")
-    public Page<SelectOptionDto> findPortfolioId(@RequestBody Map<String,Object> map,
-                                           @PathVariable("page") int page, @PathVariable("length") int length) {
-        return trdFundValuationTradeService.findPortfolioId(page,length,map);
-    }
-
-    /**
-     * 资产代码下拉框
-     * @since 1.0
-     */
-    @PostMapping("findFinprodId/{page}/{length}")
-    public Page<SelectOptionDto> findFinprodId(@RequestBody Map<String,Object> map,
-                                                 @PathVariable("page") int page, @PathVariable("length") int length) {
-        return trdFundValuationTradeService.findFinprodId(page,length,map);
-    }
-
-
 
     /**
      * 查询 支持分页 <功能详细描述>
@@ -114,8 +80,18 @@ public class TrdFundValuationTradeController extends BaseController {
      * @since 1.0
      */
     @PostMapping("queryTradeInfoByTradeId")
-    public TrdFundValuationTradeDto queryTradeInfoByTradeId(@RequestBody String  tradeId) {
-        return trdFundValuationTradeService.queryTradeInfoByTradeId(tradeId);
+    public TrdFundValuationTradeDto queryTradeInfoByTradeId(@RequestBody Map<String, Object> param) {
+        return trdFundValuationTradeService.queryTradeInfoByTradeId(param);
+    }
+
+    /**
+     * 赎回到账详情查询
+     * @see
+     * @since 1.0
+     */
+    @PostMapping("queryRedInfoByTradeId")
+    public TrdFundValuationTradeDto queryRedInfoByTradeId(@RequestBody String tradeId) {
+        return trdFundValuationTradeService.queryRedInfoByTradeId(tradeId);
     }
 
 

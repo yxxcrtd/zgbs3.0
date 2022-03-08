@@ -3,60 +3,56 @@
 <mapper namespace="com.joyintech.service.valuation.trademanage.trdfundvaluationtrade.dao.TrdFundValuationTradeMapper">
 	<!--基金交易首页列表-->
 	<select id="selectDeal" resultType="com.joyintech.service.valuation.trademanage.trdfundvaluationtrade.dto.TrdFundValuationTradeDto">
-		SELECT t.TRADE_ID        tradeId,/**交易编号**/
-		null              outTradeId, /*外部成交编号*/
-		deal.BOOKSET_ID   portfolioId,/**金融产品代码**/
-		bok.BOOKSET_NAME  portfolioName,/**金融产品名称**/
-		zc.FINPROD_MARKET_ID  finprodId, /**资产代码**/
-		zc.FINPROD_ABBR  finprodName,/**资产简称**/
-		t.PS              ps,/**交易方向**/
-		t.TRADE_MARKET    tradeMarket,/**交易场所**/
-		mst.COUNTER_ID    counterId, /**交易对手**/
-		zc.TERM_DAYS      term, /**回购期限**/
-		t.TRADE_DATE      tradeDate,/**交易日**/
-		t.SETTLE_DATE     settleDate,/**交割日期**/
-		t.VDATE           vdate,/**起息日**/
-		t.MDATE           mdate,/**到期日**/
-		t.MDATE - t.VDATE actpaydays, /**实际占款天数**/
-		t.PRIN_AMT        prinAmt, /**交易本金**/
-		ttfd.FEE_AMT  brokerage,/**经手费**/
-		ttfd1.FEE_AMT  stlAmt,/**结算费**/
-		ttfd2.FEE_AMT  commission,/**佣金**/
-		ttfd3.FEE_AMT  dealFeeAmt,/**交易手续费**/
-		ttfd4.FEE_AMT  stlFeeAmt,/**结算手续费**/
-		CASE WHEN ttfd.FEE_TYPE = 'B99' THEN ttfd.FEE_AMT ELSE 0 END as otherAmt,/**其他应付费用**/
-		null              rebackPrice, /**回购利率**/
-		t.INT_AMT         intAmt,/**应计利息**/
-		stl.SETTLE_AMT    settleAmt,/**结算金额**/
-		t.CCY             ccy,/**币种**/
-		stl.MY_ACCT_NO    trdAcctId/**资金账户**/
+		SELECT
+			t.TRADE_ID        tradeId,/**交易编号**/
+			null              outTradeId, /*外部成交编号*/
+			NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID)   prodId,/**金融产品代码**/
+			bok.BOOKSET_NAME  prodName,/**金融产品名称**/
+			zc.FINPROD_MARKET_ID  assetId, /**资产代码**/
+			zc.FINPROD_ABBR  assetAbbr,/**资产简称**/
+			t.PS              ps,/**交易方向**/
+			t.TRADE_MARKET    tradeMarket,/**交易场所**/
+			t.TRADE_DATE      tradeDate,/**交易日期**/
+			t.TRADE_AMT tradeAmt,/**成交金额**/
+			t.SHARE_AMT dealNum,/**成交数量**/
+			t.CCY             ccy,/**币种**/
+			stl.SETTLE_DATE    settleDate,/**结算日期**/
+			CASE t.PS WHEN 'T18' THEN t.TRADE_AMT ELSE 0 END  subFee,/**认购费**/
+			CASE t.PS WHEN 'T05' THEN t.TRADE_AMT ELSE 0 END  purFee,/**申购费**/
+			CASE t.PS WHEN 'T19' THEN t.TRADE_AMT ELSE 0 END  redFee,/**赎回费**/
+			ttfd.FEE_AMT  brokerage,/**经手费**/
+			ttfd2.FEE_AMT  commission,/**佣金**/
+			stl.MY_ACCT_NO    trdMyAcctNo/**资金账户**/
 		FROM TRD_PRODUCT_DEAL t
-		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
-		LEFT JOIN BOK_DEAL_ACCOUNTING deal on deal.BUSI_NO = t.TRADE_ID
-		LEFT JOIN BOK_BOOKSET bok on bok.BOOKSET_ID = deal.BOOKSET_ID
-		LEFT JOIN MST_COUNTER_PARTY mst on mst.COUNTER_ID = t.COUNTER_ID
-		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE  in( '06','07')
+		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = SUBSTR(t.finprod_id,5,LENGTH(t.finprod_id))
+		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE  in( '06','07') AND STL.ORDER_TYPE NOT LIKE 'N%'
+		LEFT JOIN BOK_DEAL_ACCOUNTING deal1 on deal1.BUSI_NO = t.TRADE_ID
+		LEFT JOIN BOK_DEAL_ACCOUNTING deal2 ON stl.ORDER_ID = deal2.BUSI_NO
+		LEFT JOIN BOK_BOOKSET bok on (bok.BOOKSET_ID = deal1.BOOKSET_ID) OR (bok.BOOKSET_ID = deal2.BOOKSET_ID)
 		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd ON ttfd.TRADE_ID = t.TRADE_ID AND ttfd.FEE_TYPE = 'B01'
-		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd1 ON ttfd1.TRADE_ID = t.TRADE_ID AND ttfd1.FEE_TYPE = 'B07'
 		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd2 ON ttfd2.TRADE_ID = t.TRADE_ID AND ttfd2.FEE_TYPE = 'B05'
-		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd3 ON ttfd3.TRADE_ID = t.TRADE_ID AND ttfd3.FEE_TYPE = 'B06'
-		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd4 ON ttfd4.TRADE_ID = t.TRADE_ID AND ttfd4.FEE_TYPE = 'B08'
 		where
 		t.BUSI_TYPE in ('06','07')
 		<if test="tradeId !=null and tradeId !='' ">
 			and t.TRADE_ID like  concat(concat('%',#{tradeId}),'%')
 		</if>
-		<if test="portfolioIdArr != null and portfolioIdArr.length > 0">
-			and deal.BOOKSET_ID IN
-			<foreach collection="portfolioIdArr" item="portfolioId" open="( " close=" )" separator=",">
-				#{portfolioId}
-			</foreach>
-		</if>
 		<if test="finprodIdArr != null and finprodIdArr.length > 0">
-			and zc.FINPROD_MARKET_ID IN
+			and NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) IN
 			<foreach collection="finprodIdArr" item="finprodId" open="( " close=" )" separator=",">
 				#{finprodId}
 			</foreach>
+		</if>
+		<if test="assetIdArr != null and assetIdArr.length > 0">
+			and zc.FINPROD_MARKET_ID IN
+			<foreach collection="assetIdArr" item="assetId" open="( " close=" )" separator=",">
+				#{assetId}
+			</foreach>
+		</if>
+		<if test="tradeDateBegin !=null and tradeDateBegin !='' ">
+			and t.TRADE_DATE <![CDATA[>=]]> to_date(#{tradeDateBegin},'yyyy-mm-dd')
+		</if>
+		<if test="tradeDateEnd !=null and tradeDateEnd !='' ">
+			and t.TRADE_DATE <![CDATA[<=]]> to_date(#{tradeDateEnd},'yyyy-mm-dd')
 		</if>
 		<if test="psArr != null and psArr.length > 0">
 			AND t.PS IN
@@ -64,69 +60,13 @@
 				#{ps}
 			</foreach>
 		</if>
-		<if test="tradeMarket !=null and tradeMarket !='' ">
-			and t.TRADE_MARKET =#{tradeMarket}
+		<if test="tradeMarketArr != null and tradeMarketArr.length > 0">
+			and t.TRADE_MARKET IN
+			<foreach collection="psArr" item="tradeMarket" open="( " close=" )" separator=",">
+				#{ps}
+			</foreach>
 		</if>
 		order by t.TRADE_ID desc
-	</select>
-
-	<resultMap id="finprodIdMap" type="com.joyintech.framework.select.SelectOptionDto">
-		<id column="id" property="id" jdbcType="VARCHAR"/>
-		<result column="text" property="text" jdbcType="VARCHAR"/>
-		<association property="object" javaType="java.util.Map">
-			<result column="id" property="finprodId" jdbcType="VARCHAR" />
-			<result column="TRADE_MARKET" property="tradeMarket" jdbcType="VARCHAR" />
-		</association>
-	</resultMap>
-	<select id="findFinprodId" resultMap="finprodIdMap">
-		select
-		FINPROD_MARKET_ID id,
-		FINPROD_ABBR text,
-		TRADE_MARKET
-		from
-		FIN_PRODUCT
-		<where>
-			1=1
-			<if test="assetType !=null and assetType != ''">
-				and FINPROD_TYPE = #{assetType}
-			</if>
-			<if test="initValue != null and initValue != ''">
-				AND FINPROD_MARKET_ID = #{initValue}
-			</if>
-			<if test="search !=null and search != ''">
-				AND	(FINPROD_MARKET_ID like concat('%',concat(#{search},'%'))
-				OR FINPROD_ABBR like concat('%',concat(#{search},'%')))
-			</if>
-		</where>
-	</select>
-
-
-	<resultMap id="portfolioIdMap" type="com.joyintech.framework.select.SelectOptionDto">
-		<id column="id" property="id" jdbcType="VARCHAR"/>
-		<result column="text" property="text" jdbcType="VARCHAR"/>
-		<association property="object" javaType="java.util.Map">
-			<result column="id" property="finprodId" jdbcType="VARCHAR" />
-		</association>
-	</resultMap>
-	<select id="findPortfolioId" resultMap="portfolioIdMap">
-		select
-		p.FINPROD_ID id,
-		p.FINPROD_ABBR text
-		from
-		FIN_PRODUCT p
-		<where>
-			1=1
-			<if test="finprodType !=null and finprodType != ''">
-				and FINPROD_TYPE =#{finprodType}
-			</if>
-			<if test="initValue != null and initValue != ''">
-				AND p.FINPROD_ID = #{initValue}
-			</if>
-			<if test="search !=null and search != ''">
-				AND	(FINPROD_ID like concat('%',concat(#{search},'%'))
-				OR FINPROD_ABBR like concat('%',concat(#{search},'%')))
-			</if>
-		</where>
 	</select>
 
     <select id="getNextId" resultType="java.lang.String">
@@ -142,44 +82,106 @@
     </select>
 
 	<select id="queryTradeInfoByTradeId" resultType="com.joyintech.service.valuation.trademanage.trdfundvaluationtrade.dto.TrdFundValuationTradeDto">
-		SELECT t.TRADE_ID        tradeId,/**交易编号**/
-		null              outTradeId, /*外部成交编号*/
-		deal.BOOKSET_ID   portfolioId,/**金融产品代码**/
-		bok.BOOKSET_NAME  portfolioName,/**金融产品名称**/
-		zc.FINPROD_MARKET_ID  finprodId, /**资产代码**/
-		zc.FINPROD_ABBR  finprodName,/**资产简称**/
-		t.PS              ps,/**交易方向**/
-		t.TRADE_MARKET    tradeMarket,/**交易场所**/
-		mst.COUNTER_ID    counterId, /**交易对手**/
-		zc.TERM_DAYS      term, /**回购期限**/
-		t.TRADE_DATE      tradeDate,/**交易日**/
-		t.SETTLE_DATE     settleDate,/**交割日期**/
-		t.VDATE           vdate,/**起息日**/
-		t.MDATE           mdate,/**到期日**/
-		t.MDATE - t.VDATE actpaydays, /**实际占款天数**/
-		t.PRIN_AMT        prinAmt, /**交易本金**/
-		ttfd.FEE_AMT  brokerage,/**经手费**/
-		ttfd1.FEE_AMT  stlAmt,/**结算费**/
-		ttfd2.FEE_AMT  commission,/**佣金**/
-		ttfd3.FEE_AMT  dealFeeAmt,/**交易手续费**/
-		ttfd4.FEE_AMT  stlFeeAmt,/**结算手续费**/
-		CASE WHEN ttfd.FEE_TYPE = 'B99' THEN ttfd.FEE_AMT ELSE 0 END as otherAmt,/**其他应付费用**/
-		null              rebackPrice, /**回购利率**/
-		t.INT_AMT         intAmt,/**应计利息**/
-		stl.SETTLE_AMT    settleAmt,/**结算金额**/
-		t.CCY             ccy,/**币种**/
-		stl.MY_ACCT_NO    trdAcctId/**资金账户**/
+		SELECT
+			t.TRADE_ID tradeId,/**交易编号**/
+			null outTradeId, /*外部成交编号*/
+			NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) prodId,/**金融产品代码**/
+			bok.BOOKSET_NAME prodName,/**金融产品名称**/
+			zc.FINPROD_MARKET_ID  assetId, /**资产代码**/
+			zc.FINPROD_ABBR  assetAbbr,/**资产简称**/
+			t.PS ps,/**交易方向**/
+			t.TRADE_MARKET tradeMarket,/**交易场所**/
+			t.CCY ccy,/**币种**/
+			<if test="ps == 'T01' or ps == 'T02'">
+				t.TRADE_DATE      tradeDate,/**交易日期**/
+				stl.SETTLE_DATE    settleDate,/**结算日期**/
+				t.TRADE_AMT tradeAmt,/**成交金额**/
+				t.SHARE_AMT dealNum,/**成交数量**/
+				stl.MY_ACCT_NO    trdMyAcctNo,/**资金账户**/
+				ttfd.FEE_AMT  brokerage,/**经手费**/
+				ttfd2.FEE_AMT  commission,/**佣金**/
+				stl.SETTLE_AMT    settleAmt,/**结算金额**/
+			</if>
+			<if test="ps == 'T52' ">/*认购*/
+				t.TRADE_DATE applyDate,/**申请日期**/
+				stl.SETTLE_DATE subSettleDate,/**结算日期**/
+				t.TRADE_AMT applyAmt,/**申请金额**/
+				stl.MY_ACCT_NO subMyAcctNo/**资金账户**/
+			</if>
+			<if test="ps == 'T04' ">/*申购*/
+				t.TRADE_DATE purApplyDate,/**申请日期**/
+				stl.SETTLE_DATE purSettleDate,/**结算日期**/
+				t.TRADE_AMT purApplyAmt,/**申请金额**/
+				stl.MY_ACCT_NO purMyAcctNo/**资金账户**/
+			</if>
+			<if test="ps == 'T18' ">/*认购确认*/
+				t.TRADE_DATE subConfirmDate,/**确认日期**/
+				t.TRADE_AMT subConfirmAmt,/**确认金额**/
+				t.SHARE_AMT subConfirmNum,/**确认数量**/
+				t.INT_AMT raiseInterest,/**募集期利息**/
+				t.FEE_AMT_UNPAY subFee,/**认购费**/
+				stl.MY_ACCT_NO   subConfirmMyAcctNo/**资金账户**/
+			</if>
+			<if test="ps == 'T05' ">/*申购确认*/
+				t.TRADE_DATE purConfirmDate,/**确认日期**/
+				t.TRADE_AMT purConfirmAmt,/**确认金额**/
+				t.SHARE_AMT purConfirmNum,/**确认数量**/
+				t.UNIT_CPRICE purUnitValue,/**单位净值**/
+				t.INT_AMT interestIncome,/**利息收入**/
+				t.FEE_AMT_UNPAY purFee,/**申购费**/
+				stl.MY_ACCT_NO   purConfirmMyAcctNo/**资金账户**/
+			</if>
+			<if test="ps == 'T19' ">
+				t.TRADE_DATE      redConfirmDate,/**确认日期**/
+				t.TRADE_AMT redConfirmAmt,/**确认金额**/
+				t.SHARE_AMT redConfirmNum,/**确认数量**/
+				t.UNIT_CPRICE redUnitValue,/**单位净值**/
+				t.FEE_AMT_UNPAY redFee,/**赎回费**/
+				null arriveDate,/**到账日期**/
+				stl.MY_ACCT_NO    redMyAcctNo/**资金账户**/
+			</if>
 		FROM TRD_PRODUCT_DEAL t
-		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
-		LEFT JOIN BOK_DEAL_ACCOUNTING deal on deal.BUSI_NO = t.TRADE_ID
-		LEFT JOIN BOK_BOOKSET bok on bok.BOOKSET_ID = deal.BOOKSET_ID
-		LEFT JOIN MST_COUNTER_PARTY mst on mst.COUNTER_ID = t.COUNTER_ID
-		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE  in( '06','07')
+		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = SUBSTR(t.finprod_id,5,LENGTH(t.finprod_id))
+		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE  in( '06','07') AND STL.ORDER_TYPE NOT LIKE 'N%'
+		LEFT JOIN BOK_DEAL_ACCOUNTING deal1 on deal1.BUSI_NO = t.TRADE_ID
+		LEFT JOIN BOK_DEAL_ACCOUNTING deal2 ON stl.ORDER_ID = deal2.BUSI_NO
+		LEFT JOIN BOK_BOOKSET bok on (bok.BOOKSET_ID = deal1.BOOKSET_ID) OR (bok.BOOKSET_ID = deal2.BOOKSET_ID)
 		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd ON ttfd.TRADE_ID = t.TRADE_ID AND ttfd.FEE_TYPE = 'B01'
-		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd1 ON ttfd1.TRADE_ID = t.TRADE_ID AND ttfd1.FEE_TYPE = 'B07'
 		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd2 ON ttfd2.TRADE_ID = t.TRADE_ID AND ttfd2.FEE_TYPE = 'B05'
-		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd3 ON ttfd3.TRADE_ID = t.TRADE_ID AND ttfd3.FEE_TYPE = 'B06'
-		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd4 ON ttfd4.TRADE_ID = t.TRADE_ID AND ttfd4.FEE_TYPE = 'B08'
+		where
+			t.BUSI_TYPE in ('06','07')
+			and t.TRADE_ID  = #{tradeId,jdbcType=VARCHAR}
+			and rownum=1
+
+	</select>
+
+	<select id="queryRedInfoByTradeId" resultType="com.joyintech.service.valuation.trademanage.trdfundvaluationtrade.dto.TrdFundValuationTradeDto">
+		SELECT
+			t.TRADE_ID tradeId,/**交易编号**/
+			null outTradeId, /*外部成交编号*/
+			NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) prodId,/**金融产品代码**/
+			bok.BOOKSET_NAME prodName,/**金融产品名称**/
+			zc.FINPROD_MARKET_ID  assetId, /**资产代码**/
+			zc.FINPROD_ABBR  assetAbbr,/**资产简称**/
+			t.PS ps,/**交易方向**/
+			t.TRADE_MARKET tradeMarket,/**交易场所**/
+			t.CCY ccy,/**币种**/
+			t.TRADE_DATE      redConfirmDate,/**确认日期**/
+			t.TRADE_AMT redConfirmAmt,/**确认金额**/
+			t.SHARE_AMT redConfirmNum,/**确认数量**/
+			t.UNIT_CPRICE redUnitValue,/**单位净值**/
+			t.FEE_AMT_UNPAY redFee,/**赎回费**/
+			null arriveDate,/**到账日期**/
+			null tradeAmtArrive,/**到账金额**/
+			stl.MY_ACCT_NO    redMyAcctNo/**资金账户**/
+		FROM TRD_PRODUCT_DEAL t
+		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = SUBSTR(t.finprod_id,5,LENGTH(t.finprod_id))
+		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE  in( '06','07') AND STL.ORDER_TYPE NOT LIKE 'N%'
+		LEFT JOIN BOK_DEAL_ACCOUNTING deal1 on deal1.BUSI_NO = t.TRADE_ID
+		LEFT JOIN BOK_DEAL_ACCOUNTING deal2 ON stl.ORDER_ID = deal2.BUSI_NO
+		LEFT JOIN BOK_BOOKSET bok on (bok.BOOKSET_ID = deal1.BOOKSET_ID) OR (bok.BOOKSET_ID = deal2.BOOKSET_ID)
+		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd ON ttfd.TRADE_ID = t.TRADE_ID AND ttfd.FEE_TYPE = 'B01'
+		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd2 ON ttfd2.TRADE_ID = t.TRADE_ID AND ttfd2.FEE_TYPE = 'B05'
 		where
 		t.BUSI_TYPE in ('06','07')
 		and t.TRADE_ID  = #{tradeId,jdbcType=VARCHAR}

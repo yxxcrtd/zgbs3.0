@@ -31,19 +31,25 @@
 	<resultMap id="SelectOptionMap" type="com.joyintech.framework.select.SelectOptionDto">
 		<id column="id" property="id" jdbcType="VARCHAR"/>
 		<result column="text" property="text" jdbcType="VARCHAR"/>
-		<result column="object" property="object" jdbcType="VARCHAR"/>
+		<association property="object" javaType="java.util.Map">
+			<result column="id" property="assetId" jdbcType="VARCHAR" />
+			<result column="TRADE_MARKET" property="tradeMarket" jdbcType="VARCHAR" />
+		</association>
 	</resultMap>
 
 	<select id="getAssetId"
 			resultMap="SelectOptionMap">
 		select
 			FINPROD_MARKET_ID id,
-			FINPROD_MARKET_ID text,
-			FINPROD_ABBR object
+			FINPROD_ABBR text,
+			TRADE_MARKET
 		from
 			FIN_PRODUCT
 		where
 			1=1
+			<if test="initValue != null and initValue != ''">
+				AND FINPROD_MARKET_ID = #{initValue}
+			</if>
 			<if test="assetType !=null and assetType != ''">
 				and FINPROD_TYPE = #{assetType}
 			</if>
