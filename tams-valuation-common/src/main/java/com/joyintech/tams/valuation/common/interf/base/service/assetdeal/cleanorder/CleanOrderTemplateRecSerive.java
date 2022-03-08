@@ -185,8 +185,7 @@ public class CleanOrderTemplateRecSerive {
      */
     private StlOrders getValStlOrders(ValCleanOrder dto) throws Exception {
         StlOrders stlOrders = new StlOrders();
-        //指令编号 = interfCommonService.getTradeid(A.指令类型,A.结算日期，“B")
-        stlOrders.setOrderId(interfCommonService.getTradeid(dto.getOrderType(), dto.getSettleDate(), "B"));
+
         //业务类型 = A.业务类型
         stlOrders.setBusiType(dto.getBusiType());
         //指令类型 = A.指令类型
@@ -232,7 +231,8 @@ public class CleanOrderTemplateRecSerive {
             stlOrders.setOrderType(somlist.get(0).getOrderType());
 
         }
-
+        //指令编号 = interfCommonService.getTradeid(A.指令类型,A.结算日期，“B")
+        stlOrders.setOrderId(interfCommonService.getTradeid(dto.getOrderType(), dto.getSettleDate(), "B"));
 
         //结算日期 = A.结算日期
         stlOrders.setSettleDate(dto.getSettleDate());

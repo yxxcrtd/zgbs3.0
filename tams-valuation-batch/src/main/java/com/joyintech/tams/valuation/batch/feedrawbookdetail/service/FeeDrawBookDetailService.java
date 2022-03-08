@@ -181,7 +181,7 @@ public class FeeDrawBookDetailService {
 					accountAmountMap.put(amt,feedetail.getFeeAmt());
 	            }
 	            
-				//accountCurrencyMap设置如下： 费用计提币种 <-交易明细.币种	
+				//accountCurrencyMap设置如下： 费用计提币种 <-交易明细.币种	wo ke
 	            //accountCurrencyMap.put(BookConstant.B_CCY, item.getCcy());
 
 	            

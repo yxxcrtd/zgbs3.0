@@ -17,6 +17,7 @@
             A.BUSI_DETAIL_TYPE as accountType,   /** 账户类型（账务明细代码对应资金账户时） **/
             NVL(B.REGIST_ORG, D.REGIST_ORG) as  registOrg, /**登记托管机构**/
             F.CUSTOMER_NAME as financeOrgName /**金融机构名称**/
+            ,E.TYPE_6 as targetBackType /**回购类型**/
         FROM BOK_DETAIL_ID A
         LEFT JOIN FIN_PRODUCT B
             ON A.BUSI_ID = B.FINPROD_ID

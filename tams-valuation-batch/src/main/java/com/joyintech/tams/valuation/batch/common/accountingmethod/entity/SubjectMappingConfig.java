@@ -101,6 +101,11 @@ public class SubjectMappingConfig {
     private String cashType2;
 
     /**
+     * 回购类型
+     */
+    private String targetBackType;
+
+    /**
      * 获取 账套代码
      * @return 账套代码
      */
@@ -354,5 +359,13 @@ public class SubjectMappingConfig {
 
     public void setCashType2(String cashType2) {
         this.cashType2 = cashType2;
+    }
+
+    public String getTargetBackType() {
+        return targetBackType;
+    }
+
+    public void setTargetBackType(String targetBackType) {
+        this.targetBackType = targetBackType;
     }
 }
