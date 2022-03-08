@@ -222,7 +222,7 @@ public class ExpReturnTaTradeBookProcessorNewService {
                         SubjectBalance subjectBalance = this.getSubjectBalance(acctEntity.getBooksetId(),
                             acctEntity.getBokDetailId(), happenDate,
                             acctEntity.getBookDate(), DictCodeList.余额方向_贷方.getValue(),
-                            DictCodeBaseSubjectNatrueNew.利润分配_应付利润.getValue(),
+                            DictCodeBaseSubjectNatrueNew.应付利润.getValue(),
                             taskpri);
                         if (subjectBalance != null) {
                             varYflr = subjectBalance.getBalance() == null ? BigDecimal.ZERO : subjectBalance.getBalance();

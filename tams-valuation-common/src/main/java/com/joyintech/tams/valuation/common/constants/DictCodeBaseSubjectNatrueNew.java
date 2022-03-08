@@ -80,6 +80,43 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
             "QTZHSY_Z"
     ),
 
+    /**
+     * 损益平准金_已实现
+     */
+    损益平准金_已实现(
+            "SYPZJ_YSX"
+    ),
+    /**
+     * 损益平准金_未实现
+     */
+    损益平准金_未实现(
+            "SYPZJ_WSX"
+    ),
+    /**
+     * 本期利润_已实现
+     */
+    本期利润_已实现(
+            "BQLR_YSX"
+    ),
+    /**
+     * 本期利润_未实现
+     */
+    本期利润_未实现(
+            "BQLR_WSX"
+    ),
+    /**
+     * 利润分配_未分配利润_已实现
+     */
+    利润分配_未分配利润_已实现(
+            "WFPLR_YSX"
+    ),
+    /**
+     * 利润分配_未分配利润_未实现
+     */
+    利润分配_未分配利润_未实现(
+            "WFPLR_WSX"
+    ),
+
     /** add by weipeng on 20220113 估值系统产品3.0.4批处理科目性质改造新增科目性质 start **/
     /** ==========原科目性质修改======== start**/
     /**
@@ -200,7 +237,13 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
      * 应付运营费
      */
     应付运营费(
-            "YFYYF Z"
+            "YFYYF_Z"
+    ),
+    /**
+     * 待摊费用
+     */
+    待摊费用(
+            "DTFY_Z"
     ),
     /** ==========原科目性质修改======== end**/
     /** ==========新增科目性质======== start**/
@@ -243,6 +286,12 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
     ),
     利润分配_应付利润(
             "LRFP_YFLR"
+    ),
+    应付利润(
+            "YFLR_Z"
+    ),
+    其他应付款_其他(
+            "QTYFK"
     ),
     /** ==========新增科目性质======== end**/
     /** add by weipeng on 20220113 估值系统产品3.0.4批处理科目性质改造 end **/

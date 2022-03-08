@@ -10,11 +10,11 @@
  
 package com.joyintech.tams.valuation.batch.profitandlossaccounting.dto;
 
-import java.io.Serializable;
-import java.util.List;
-
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGenerateResult;
 import com.joyintech.tams.valuation.batch.common.base.entity.extcommon.ValBokBookdetailBatch;
+
+import java.io.Serializable;
+import java.util.List;
 
 public class ProfitAndLossAccountingResult extends BookGenerateResult implements Serializable{
 
@@ -22,7 +22,9 @@ public class ProfitAndLossAccountingResult extends BookGenerateResult implements
      * <意义，目的和功能，以及可能被用到的地方>
      */
     private static final long serialVersionUID = 620810151647580998L;
+    public ProfitAndLossAccountingResult(){
 
+    }
     public ProfitAndLossAccountingResult(List<ValBokBookdetailBatch> list){
         super.setValBokBookdetailBatch(list);
     }

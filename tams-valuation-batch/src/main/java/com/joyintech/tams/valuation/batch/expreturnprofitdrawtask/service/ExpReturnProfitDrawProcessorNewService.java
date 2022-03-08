@@ -145,7 +145,7 @@ public class ExpReturnProfitDrawProcessorNewService {
                 //最新结息日查询
                 List<BokBookdetailCurrent> listMdate = accountingCommonService.getNewestMdate(stayDrawSubprdEntity.getBooksetId(),
                     stayDrawSubprdEntity.getBookDate(), stayDrawSubprdEntity.getBokDetailId(),
-                        new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.利润分配_应付利润.getValue())),
+                        new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.应付利润..getValue())),
                         new ArrayList<String>(Arrays.asList(DictCodeListTableId.会计场景代码_产品_预期收益型_兑付客户收益.getValue())),
                         null, happenDate, null, null, happenDate);
                 if(StringUtil.isEmptyList(listMdate)){
@@ -251,7 +251,7 @@ public class ExpReturnProfitDrawProcessorNewService {
                 balanceDto.setBooksetId(booksetId);
                 List<String> baseSubjectNatureList = new ArrayList<>();
                 // 设置基础科目性质
-                baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.利润分配_应付利润.getValue());
+                baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.应付利润..getValue());
                 balanceDto.setBaseSubjectNatureList(baseSubjectNatureList);
                 List<SubjectBalance> balanceList = accountingCommonService.getSubjectBalanceExpectDirection(balanceDto, DictCodeList.余额方向_贷方.getValue());
                 BigDecimal balance = BigDecimal.ZERO;
