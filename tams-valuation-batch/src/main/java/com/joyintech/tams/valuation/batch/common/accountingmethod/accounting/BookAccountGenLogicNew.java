@@ -39,6 +39,7 @@ import com.joyintech.tams.valuation.common.utils.DBUtil;
 import com.joyintech.tams.valuation.common.utils.DataHandleUtil;
 import com.joyintech.tams.valuation.common.utils.ValStringUtil;
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -56,7 +57,10 @@ import java.util.stream.Collectors;
  */
 @Service
 public class BookAccountGenLogicNew {
-
+    /**
+     * 日志
+     */
+    private static org.slf4j.Logger logger = LoggerFactory.getLogger(BookAccountGenLogicNew.class);
     /**
      * DBUtil
      */
@@ -102,7 +106,7 @@ public class BookAccountGenLogicNew {
      * @see
      * @since 1.0
      */
-    public BookGenerateResult genAccount(AccountDriver accountDriver, SysBatchExecInfo batchinfo) {
+    public BookGenerateResult genAccount(AccountDriver accountDriver, SysBatchExecInfo batchinfo)  {
         // 根据驱动信息，生成一条记账凭证主表信息
         BookGenerateResult result = new BookGenerateResult();
         // step1. 获取分录信息
@@ -279,6 +283,9 @@ public class BookAccountGenLogicNew {
             // 分支序号,当前默认为0
             Map<String, Object> accountNatrueSceneMap = accountNatrueMap == null ? null : accountNatrueMap.get(
                     accountEntry.getBaseSubjectNature());
+            Long branch = accountNatrueSceneMap != null ? (Long)accountNatrueSceneMap.get(
+                    BookConstant.BRANCH) : BookConstant.DEFALUT_BRANCH;
+            bookDetail.setBranch(branch != null ? branch : BookConstant.DEFALUT_BRANCH);
             // 科目号 <- 会计分录配置信息.科目号
             bookDetail.setSubjectNo(accountEntry.getSubjectId());
             // 查找账务明细代码表
@@ -1516,7 +1523,7 @@ public class BookAccountGenLogicNew {
      * @param accountEntries 会计分录
      * @param accountDriver 会计场景
      */
-    public void generateEntrySubjectInfo(AccountDriver accountDriver, List<AccountEntry> accountEntries){
+    public void generateEntrySubjectInfo(AccountDriver accountDriver, List<AccountEntry> accountEntries) {
         // 获取记账场景要素信息
         Map<String, Object> accountSceneMap = accountDriver.getAccountSceneMap();
         // 获取记账金额要素信息
@@ -1558,6 +1565,7 @@ public class BookAccountGenLogicNew {
             // 根据内部科目编码获取所有对应科目
             List<BokSubject> entrySubjectList = new ArrayList<>();
             if(CollectionUtils.isEmpty(accountEntry.getBokSubjectList())){
+                logger.error("内部科目编码："+accountEntry.getSubjectId() +"未找到匹配科目信息 \r\n");
                 continue;
             }
             else{
@@ -1614,7 +1622,6 @@ public class BookAccountGenLogicNew {
             if(mappingConfig.getTaxType() == null){
                 mappingConfig.setTaxType(accountEntry.getDictSource());
             }
-
             // 根据辅助核算项匹配查找对应科目
             bokSubject = this.getSubjectByInnerCode(entrySubjectList, mappingConfig);
             // 若变量.科目信息不为空，则分录对应赋值科目相关信息
@@ -1630,6 +1637,17 @@ public class BookAccountGenLogicNew {
                 accountEntry.setOverdrawnFlag(bokSubject.getOverdrawnFlag());
                 accountEntry.setGenDetsubFlag(bokSubject.getGenDetsubFlag());
                 accountEntry.setBalFlag(bokSubject.getBalFlag());
+            }else{
+                // 定义 变量.资产辅助核算项 封装辅助核算项为map对象
+                Map<String, Object> params = initMappingParams(mappingConfig);
+                StringBuffer sb=new StringBuffer();
+                for (String mp : params.keySet()) {
+                    sb.append("key = " + mp + ", value = " + params.get(mp));
+                }
+                logger.error(
+                        "内部科目编码："+accountEntry.getSubjectId() +"未找到匹配科目信息 \r\n"
+              +"辅助核算项："+sb.toString());
+
             }
         }
     }
@@ -1649,6 +1667,7 @@ public class BookAccountGenLogicNew {
         params.put(SubjectConfigCode.债券类型.getValue(), mappingConfig.getAssetType());
         params.put(SubjectConfigCode.存款类资产类型.getValue(), mappingConfig.getAssetType());
         params.put(SubjectConfigCode.基金类型.getValue(), mappingConfig.getAssetType());
+        params.put(SubjectConfigCode.回购标的类型.getValue(), mappingConfig.getAssetType());
         if(DictCodeListExt1.证券品种_基金.getValue().equals(mappingConfig.getSecType())){
             params.put(SubjectConfigCode.估值交易市场.getValue(), mappingConfig.getTradeMarket());
         }
@@ -1659,7 +1678,10 @@ public class BookAccountGenLogicNew {
         params.put(SubjectConfigCode.账户类型.getValue(), mappingConfig.getAccountType());
         params.put(SubjectConfigCode.费用类型.getValue(), mappingConfig.getFeeType());
         params.put(SubjectConfigCode.税类型.getValue(), mappingConfig.getTaxType());
-        params.put(SubjectConfigCode.金融机构简称.getValue(), FinanceOrgEnum.getEnumByName(mappingConfig.getFinanceOrgName()).getValue());
+        if(StringUtil.isNotEmpty(mappingConfig.getFinanceOrgName())){
+            params.put(SubjectConfigCode.金融机构简称.getValue(), FinanceOrgEnum.getEnumByName(mappingConfig.getFinanceOrgName()).getValue());
+        }
+        params.put(SubjectConfigCode.回购类型.getValue(), mappingConfig.getTargetBackType());
         return params;
     }
 
