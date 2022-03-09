@@ -112,3 +112,9 @@ COMMENT ON COLUMN BOK_SUBJECT_INTERNAL_HAND.HAND_CODE IS '辅助核算项';
 ------------------------add by weipeng on 20220308 会计元素表字段备注变更 start---------------------------
 comment on column BOK_TABLEDICT.dict_type is '元素数据类型: P 下拉框 N 数值型 F 辅助核算项';
 ------------------------add by weipeng on 20220308 会计元素表字段备注变更 end---------------------------
+
+------------------------add by weipeng on 20220309 场景科目关系配置表主键修改 start---------------------------
+delete from BOK_SCENESUBJECT where FORM_ELE is null;
+alter table BOK_SCENESUBJECT  DROP PRIMARY KEY ;
+alter table BOK_SCENESUBJECT add constraint PK_BOK_SCENESUBJECT primary key (BOOKSET_ID, SCENE_NODE_ID, SUBJECT_NO, FORM_ELE, CD_FLAG, BOK_DETAIL_ID);
+------------------------add by weipeng on 20220309 场景科目关系配置表主键修改 end---------------------------
