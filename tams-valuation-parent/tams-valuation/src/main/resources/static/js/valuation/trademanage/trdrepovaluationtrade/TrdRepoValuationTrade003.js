@@ -39,7 +39,7 @@ $(function() {
         var mdate=$("#mdate").val();
         if(mdate){
             if(mdate>platDate){ //平台日小于到期日
-                $('#ps').textSelect("setValue",'C20');
+                $('#ps').textSelect("setValue",'T54');
             }else if(mdate==platDate){
                 $('#ps').textSelect("setValue",'T07');
             }else {

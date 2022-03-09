@@ -38,7 +38,7 @@ public class TrdRepoValuationTrade003DtoValidator implements BeanValidator {
         TrdRepoValuationTrade003Dto dto = (TrdRepoValuationTrade003Dto) value;
         List<ValidMessage> errorList = new ArrayList<>();
         //交易方向为提前终止时，提前终止利率必填
-        if(StringUtil.equals(dto.getPs(), DictCodeList.交易方向_提前终止.getValue())){
+        if(StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_投资端_提前终止.getValue())){
             //期限必填
             if(!StringUtil.isNotEmpty(dto.getTerminateRate())){
                 errorList.add(new ValidMessage("terminateRate", this.getMessage("BUSS_COM_E_0038",
