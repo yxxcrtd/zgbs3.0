@@ -81,8 +81,15 @@
             ,{field:'ccy', title: '币种',visible:false}
             ,{field:'trdAcctId', title: '资金账户',width:100}
             ,{field:'operation', title: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操 作', fixed:'right',width : 120,
-                align : 'center',type : 'action', buttons : [ 'edit', 'delt' ,
-                    {text: '<i class="iconfont icon-submit"></i>', clas: 'confirm', title: '存续期交易'}]}
+                align : 'center',type : 'action', buttons : [ 'edit', 'delt' ,'confirm'],
+                    // {text: '<i class="iconfont icon-submit"></i>', clas: 'confirm', title: '存续期交易'}]
+                render: function (data, type, row, meta) {
+                    if (row.ps == 'T07' ||row.ps == 'T54'||row.ps == 'T55')
+                        return '<i class="btn layui-icon edit" title="编辑">&#xe642;</i><i class="btn layui-icon delt" title="删除">&#xe640;</i>';
+                    else
+                        return '<i class="btn layui-icon edit" title="编辑">&#xe642;</i><i class="btn layui-icon delt" title="删除">&#xe640;</i><i class="btn layui-icon confirm" title="存续期交易">&#x1005;</i>';
+                }
+        }
         ],
         //loadonce:tru
     });

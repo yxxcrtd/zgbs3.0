@@ -74,12 +74,25 @@
             ,{field:'ccyFmt', width:150, title: '币种',sortField:'ccy'}
             ,{field:'ccy', title: '币种',visible:false}
             ,{field:'trdAcctId', title: '资金账户',width:100}
-            ,{field:'operation', title: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操 作', fixed:'right',width : 120,
-                align : 'center',type : 'action', buttons : [ 'edit', 'delt' ,
-                    {text: '<i class="iconfont icon-submit"></i>', clas: 'confirm', title: '到期'}]}
+            ,{field:'operation', title: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操 作', fixed:'right',width:'120',
+                align : 'center',type : 'action', buttons : [ 'edit', 'delt' ,'confirm'],
+                    // {text: '<i id="daoqi" class="iconfont icon-submit"></i>', clas: 'confirm', title: '到期'}],
+            render: function (data, type, row, meta) {
+                if (row.ps == 'T07')
+                    return '<i class="btn layui-icon edit" title="编辑">&#xe642;</i><i class="btn layui-icon delt" title="删除">&#xe640;</i>';
+                else
+                    return '<i class="btn layui-icon edit" title="编辑">&#xe642;</i><i class="btn layui-icon delt" title="删除">&#xe640;</i><i class="btn layui-icon confirm" title="确认">&#x1005;</i>';
+            }
+
+            }
         ],
         //loadonce:true
     });
+
+
+
+
+
 
     /**
      * 导出选中的表格数据
@@ -103,6 +116,8 @@
     };
     
     $(function () {
+
+
         // 绑定按钮事件
         $('#TrdOutRightRepoValuationTrade001_btn_search').click(function() {
             table.load();
