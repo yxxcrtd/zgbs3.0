@@ -149,6 +149,11 @@ public class ProfitAndLossAccountingTask extends BatchBaseService {
         step3Reader.setParams(params);
         step4Reader.setParams(params);
         step5Reader.setParams(params);
+        step1Processor.setParams(params);
+        step2Processor.setParams(params);
+        step3Processor.setParams(params);
+        step4Processor.setParams(params);
+        step5Processor.setParams(params);
         logger.info("批处理[" + this.getBatchTask().getTaskName() + "]开始。");
         // 费前结转只处理step1和step2
         if(GlobalConstant.批处理任务_损益结转费前.equals(this.getBatchExecuteInfo().getTaskId())){
