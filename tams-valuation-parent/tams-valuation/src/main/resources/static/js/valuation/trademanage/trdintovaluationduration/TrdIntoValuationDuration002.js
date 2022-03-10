@@ -55,15 +55,11 @@ $(function() {
     //计算结算金额  结算金额=实收本金+实收利息+其他费用
     var settleAmtCalculate = function(){
         if( $('#actCapi').val() != null && $('#actCapi').val() != ''
-            && $('#actInt').val() != null && $('#actInt').val() != ''
-            && $('#otherAmt').val() != null && $('#otherAmt').val() != ''){
+            && $('#actInt').val() != null && $('#actInt').val() != ''){
             var result1 = JoyinMath.doAdd($('#actCapi').val(), $('#actInt').val(),2);
-            var result2 = JoyinMath.doAdd(result1, $('#otherAmt').val(),2);
-            $('#settleAmt').val(result2);
-            $('#dealAmt').val(result2);
+            $('#settleAmt').val(result1);
         }else{
             $('#settleAmt').val('');
-            $('#dealAmt').val('');
         }
     }
 
@@ -77,10 +73,6 @@ $(function() {
         settleAmtCalculate(); //计算结算金额
     });
 
-    //其他费用 联动
-    $('#otherAmt').change(function(){
-        settleAmtCalculate();  //计算结算金额
-    });
 
 
 

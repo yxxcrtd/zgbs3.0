@@ -66,9 +66,10 @@ public class TrdIntoValuationDuration002Controller extends BaseController {
         model.addAttribute("PS_T01", DictCodeList.交易方向_买入.getValue());
         model.addAttribute("PS_T02", DictCodeList.交易方向_卖出.getValue());
         // 一体化对应etliu end
-
+        //平台日
+        model.addAttribute("iPlatformDate", DateUtil.parse(DateUtil.getSysDate()));
         model.addAttribute("YES_OR_NO_N", DictCodeList.是否_否.getValue());
-        model.addAttribute("FINPROD_TYPE_F07", DictCodeListExt1.金融产品类型_存款.getValue());
+        model.addAttribute("FINPROD_TYPE_F01", DictCodeListExt1.金融产品类型_债券.getValue());
         String portfolioId = getParam("portfolioId");
         String tradeId = getParam("tradeId");
         String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
@@ -137,7 +138,7 @@ public class TrdIntoValuationDuration002Controller extends BaseController {
         params.setBusinessType(DictCodeListExt2.共通业务类型_债券借贷存续期.getValue());
         // 设置流程业务说明, entity即传入的dto
         params.setComment(
-                entity -> SpringContextUtil.getTextValue("交易id")+"("+ entity.getTradeId() +")"+"-"+SpringContextUtil.getTextValue("交易日期") + "(" + DateUtil.format(entity.getTradeDate()) + ")"
+                entity -> SpringContextUtil.getTextValue("交易编号")+"("+ entity.getTradeId() +")"+"-"+SpringContextUtil.getTextValue("交易日期") + "(" + DateUtil.format(entity.getTradeDate()) + ")"
         );
         //给参数变成ProcessParameter而非WorkFlowParameter
         ProcessParameter<TrdIntoValuationDuration001Dto> parameter = new ProcessParameter<TrdIntoValuationDuration001Dto>();

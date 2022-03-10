@@ -153,7 +153,7 @@ $(function(){
             var object = {selectedItem: [data], operateType:"edit"};//请求参数
             Joyin.ajaxJson(basePath + 'valuation/trademanage/trddepositvaluationtrade/TrdDepositValuationTrade001/check', object, function(result) {//请求路径，请求参数回调函数
 
-                Joyin.dialog(JoyinUtil.getLabel("项目类交易-修改"),
+                Joyin.dialog(JoyinUtil.getLabel("存款类交易-修改"),
                     basePath + "valuation/trademanage/trddepositvaluationtrade/TrdDepositValuationTrade002/init",//打开新界面
                     "98%", "98%", {
                         pageModel: PAGE_MODEL_EDIT,//请求的page_model

@@ -260,7 +260,6 @@ public class TrdIntoValuationDuration001Dto extends BaseEntity implements Proces
         this.actInt = actInt;
     }
 
-    @NotEmpty(fieldName = "TrdIntoValuationDuration002.otherAmt", groups = {ValidateGroupEdit.class})
     public BigDecimal getOtherAmt() {
         return otherAmt;
     }

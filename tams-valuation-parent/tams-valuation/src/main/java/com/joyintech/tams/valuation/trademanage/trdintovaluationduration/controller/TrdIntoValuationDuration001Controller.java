@@ -11,6 +11,7 @@
 package com.joyintech.tams.valuation.trademanage.trdintovaluationduration.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
@@ -105,6 +106,46 @@ public class TrdIntoValuationDuration001Controller extends BaseController {
     }
 
 
+    /**
+     * 删除前判断
+     *
+     * @param dto
+     * @param result
+     * @return
+     * @throws Exception
+     */
+    @ResponseBody
+    @RequestMapping("check")
+    public AjaxResult check(@RequestBody @Valid TrdIntoValuationDuration001Dto dto,
+                            BindingResult result) throws ParseException {
+
+        List<TrdIntoValuationDuration001Dto> list = dto.getSelectedItem();
+        if(list==null||list.size()<=0){
+            return new AjaxResult("请选择数据", MessageType.错误消息);
+        }
+        //删除时的校验
+        if(StringUtil.isNotEmpty(list) && "delete".equals(dto.getOperateType())) {
+            for (TrdIntoValuationDuration001Dto item : list) {
+                //1.判断是否在流程中
+                //判断当前流程是否存在
+                if (trdIntoValuationDuration001Service.checkBusinessDataInFlow(item)) {
+                    //流程存在情况
+                    return new AjaxResult("交易编号：" + item.getTradeId() + "已存在流程中", MessageType.错误消息);
+                }
+
+            }
+        }else if("edit".equals(dto.getOperateType())){
+            for (TrdIntoValuationDuration001Dto item : list) {
+                //1.判断是否在流程中
+                //判断当前流程是否存在
+                if(trdIntoValuationDuration001Service.checkBusinessDataInFlow(item)){
+                    //流程存在情况
+                    return new AjaxResult("交易编号："+item.getTradeId()+"已存在流程中", MessageType.错误消息);
+                }
+            }
+        }
+        return new AjaxResult();
+    }
 
     //删除
     @ResponseBody

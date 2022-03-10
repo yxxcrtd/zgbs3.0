@@ -80,7 +80,6 @@ public class TrdIntoValuationDuration002Service extends BaseService<TrdIntoValua
         List<ValSeclendAssetPeriodDeal> listValSeclendAssetPeriodDeal = new ArrayList<>();
         ValSeclendAssetPeriodDeal entity = new ValSeclendAssetPeriodDeal();
         BeanUtil.copyPropertiesIgnoreNull(entity,dto);
-//        entity.setFundSettleDate(DateUtil.parse(dto.getFundSettleDate()));
         //比较界面和接口字段差异，并手动给接口字段赋值
         entity.setProdId(dto.getPortfolioId()); //产品代码
         entity.setSecId("F01_"+dto.getFinprodMarketId()); //金融产品代码
