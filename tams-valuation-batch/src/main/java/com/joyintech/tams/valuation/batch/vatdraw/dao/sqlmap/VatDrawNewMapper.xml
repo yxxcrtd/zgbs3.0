@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.valuation.batch.vatdraw.dao.VatDrawNewMapper">
+    
+    <!-- 待计提金融产品现金流- 实体类-->
+    <select id="queryPrdCashDto" resultType="com.joyintech.tams.valuation.batch.vatdraw.dto.PrdCashDto" >
+        WITH TMP AS(
+            SELECT 
+                B.BOOKSET_ID,/**账套 -账套代码**/
+                B.ACCT_SUBJECT_ID FINPROD_ID,/**账套-核算主体代码**/
+                b.ACCT_SUBJECt_type FINPROD_TYPE,/**账套-核算主体类型**/
+                b.start_date, /**账套开始日 **/
+         		b.end_date, /**账套结束日 **/
+                B.STANDARD_CCY,/**账套-本位币**/
+                H.BOOKSET_DATE,/**账套日期**/
+                H.BOOK_DATE/**入账日期**/
+                ,H.IS_SUB_BOOKSET
+            FROM BOK_BOOKSET B/**账套表**/
+            INNER JOIN BOK_BATCH_TASK_TODO H/**批处理待处理任务表**/
+                ON B.BOOKSET_ID=H.BOOKSET_ID
+                <!-- AND B.ACCT_SUBJECT_TYPE = #{accSubjectType} -->
+            WHERE 1=1
+                AND H.SEQ_NO = #{seqNo}
+                AND H.BOOKSET_DATE = #{BOOKSET_DATE}
+                AND H.BOOK_DATE = #{BOOK_DATE}
+                AND H.HAPPEN_DATE = #{HAPPEN_DATE}
+                AND H.TASK_ID = #{taskId}
+                AND H.HAPPEN_DATE <![CDATA[>=]]> TO_DATE('2018-01-01','yyyy-MM-dd')
+                AND H.IS_SUB_BOOKSET = #{IS_SUB_BOOKSET}
+        )
+        SELECT 
+<!--             E.FINPROD_ID, /**金融产品代码**/
+            E.FINPROD_TYPE,   /**金融产品类型**/
+            E.VDATE,  /**起息日**/
+            E.TRADE_MARKET, /** 交易场所 **/
+            E.ACTMDATE, /** 实际到期日 **/ -->
+            F.CASH_ID cashId,    /**现金流代码**/
+            F.CASH_TYPE_1 cashType1,    /**现金流一级类型**/
+            F.CASH_TYPE_2 cashType2,    /**现金流二级类型**/
+            G.BOOKSET_ID booksetId, /**账套代码**/
+            G.BOOKSET_DATE booksetDate,   /**账套日期**/
+            G.BOOK_DATE bookDate,  /**入账日期**/
+            G.STANDARD_CCY standardCcy,    /**本位币**/
+            g.FINPROD_ID finprodId,   /** 核算主体代码 **/
+            g.FINPROD_TYPE finprodType, /** 核算主体类别 **/
+            g.START_DATE startDate,   /** 账套开始日 **/
+            g.END_DATE endDate,  /** 账套结束日 **/
+            VBD.BOK_DETAIL_ID, /**业务明细代码**/
+            g.FINPROD_ID AS busiId,
+            g.IS_SUB_BOOKSET
+        FROM 
+        <!-- FIN_PRODUCT E INNER JOIN  --> 
+        TMP G 
+        <!-- ON E.FINPROD_ID = G.ACCT_SUBJECT_ID -->
+        INNER JOIN FIN_CASH_INFO F ON g.FINPROD_ID = F.FINPROD_ID
+        <if test="cashTypeList != null and cashTypeList.size > 0">
+                AND  F.CASH_TYPE_2 IN
+                <foreach collection="cashTypeList" item="cashType" open="( " close=" )" separator=",">
+                    #{cashType}
+                </foreach>
+        </if>
+        INNER JOIN BOK_DETAIL_ID VBD 
+        	ON g.FINPROD_ID = VBD.BUSI_ID 
+        	AND g.FINPROD_TYPE = VBD.BUSI_DETAIL_TYPE
+        	and g.BOOKSET_ID = VBD.BOOKSET_ID
+<!--         LEFT JOIN BOK_BOOKSET_ext bb ON bb.BOOKSET_ID = G.BOOKSET_ID -->
+        WHERE 1=1
+            and g.start_date<![CDATA[<=]]>#{HAPPEN_DATE}
+            AND g.end_date<![CDATA[>=]]>#{HAPPEN_DATE}
+    </select>
+    
+    <!-- 查询账务明细最大的处理序列 -->
+    <select id="queryMaxBookOrders" resultType="com.joyintech.tams.valuation.batch.vatdraw.dto.TaxBookOrderDto" >
+        SELECT 
+            NVL(maxBookOrder,1) maxBookOrder,
+            NVL(maxTdyBookOrder,0) maxTdyBookOrder
+        FROM
+            (
+                SELECT 
+                    MAX(BOOK_ORDER) maxBookOrder
+                FROM TAX_BOK_BALANCE_SUM
+                WHERE 
+                    HAPPEN_DATE = #{happenDate}
+                    AND BOOK_DATE &lt;= #{bookDate}
+                    AND BOOKSET_ID = #{booksetId} )
+        FULL JOIN
+            (
+            SELECT
+                MAX(BOOK_ORDER) maxTdyBookOrder
+            FROM TAX_BOK_BALANCE_SUM   
+            WHERE
+                BOOKSET_ID = #{booksetId}
+            )
+        ON 1=1
+    </select>
+    
+    <!-- 查询账套下不启用场景 -->
+    <select id="queryCfBokConfig" resultType="java.lang.String">
+		SELECT
+		    BOK_CONFIG_ID
+		FROM TAX_CF_BOK_CONFIG 
+        WHERE
+            (CONFIG_ID,CONFIG_VALUE) IN 
+            <foreach collection="listConfigDto" item="item" open="( " close=" )" separator=",">
+                (#{item.configId},#{item.configValue})
+            </foreach>
+    </select>
+    
+    <!-- 查询税额计提分类配置 -->
+    <select id="queryTaxCalConfig" resultType="com.joyintech.tams.valuation.batch.vatdraw.dto.ValTaxCalConfigDto">
+        SELECT
+            TABLE_ID,
+            SUBJECT_NATURE,
+            VAT_TYPE,
+            CONFIG_ID,
+            TAX_P_TYPE,
+            IN_OUT,
+            INCOME_SOURCE,
+            CALC_TYPE,
+            CD_FLAG,
+            CALC_SCALE,
+            CALC_SNATURE,
+            CALC_BASE,
+            IS_CARRT,
+            INT_REPAY_HANDLE
+        FROM TAX_BOK_CONFIG
+        where CONFIG_ID IN (
+            select c.BOK_CONFIG_ID
+            from TAX_SCHA_BOK_CONFIG c, BOK_BOOKSET_PLAN p
+            where p.scheme_id = c.scheme_id
+            and p.bookset_id = #{booksetId}
+            and p.scheme_type = #{schemeType}
+        )
+    </select>
+    
+    <!-- 取发生日期初增值税明细余额 -->
+    <select id="queryTaxBokBalance" resultType="com.joyintech.tams.valuation.batch.vatdraw.dto.TaxBokBalanceDto">
+        SELECT
+            BOOKSET_ID,
+            BOOKSET_DATE,
+            BOK_DETAIL_ID,
+            HAPPEN_DATE,
+            #{bookDate} AS BOOK_DATE,
+            O_CCY,
+            VAT_TYPE,
+            TAX_P_TYPE,
+            CALC_TYPE,
+            INCOME_SOURCE,
+            INCOME_AMT_ALL,
+            0 AS INCOME_HAPPEN_AMT,
+            0 AS CARRY_AMT,
+            0 AS HAPPEN_AMT,
+            TAX_AMT AS taxAmt,
+            TAX_AMT AS ystTaxBalAmt,
+            BRANCH,
+            BOOK_ORDER
+        FROM TAX_BOK_BALANCE 
+        WHERE 
+            HAPPEN_DATE = #{happenDate}
+            AND BOOK_ORDER = #{bookOrder}
+            AND INCOME_AMT_ALL != 0
+            AND BOOKSET_ID = #{booksetId}
+    </select>
+    
+    <select id="queryYtsTaxBalanceSum" resultType="com.joyintech.tams.common.base.entity.TaxBokBalanceSum">
+        SELECT
+            SEQ_NO,
+            BOOKSET_ID,
+            BOOKSET_DATE,
+            HAPPEN_DATE,
+            O_CCY,
+            VAT_TYPE,
+            TAX_P_TYPE,
+            INCOME_AMT_ALL,
+            TAX_AMT_SUM,
+            TAX_AMT,
+            BOOK_ORDER,
+            0 AS HAPPEN_AMT,
+            #{bookDate} AS BOOK_DATE
+        FROM TAX_BOK_BALANCE_SUM 
+        WHERE
+            HAPPEN_DATE = #{happenDate}
+            AND BOOK_ORDER = #{bookOrder}
+            <!-- AND TAX_AMT != 0 -->
+            AND BOOKSET_ID  = #{booksetId}
+    </select>
+    <select id="collectCarryAmt" resultType="com.joyintech.tams.valuation.batch.vatdraw.dto.TaxBalanceSumDto">
+        SELECT
+            TAX_P_TYPE,
+            ROUND(SUM(CARRY_AMT),2) CARRY_AMT,
+            MAX(O_CCY)
+        FROM
+            TAX_BOK_BALANCE
+        WHERE
+            BOOKSET_ID = #{booksetId}
+            AND HAPPEN_DATE = #{happenDate}
+            AND BOOK_DATE = #{bookDate}
+            AND VAT_TYPE = #{vatType}
+            AND CALC_TYPE = #{calcType}
+        GROUP BY 
+            TAX_P_TYPE
+    </select>
+    
+    <!-- 汇总余额计提 -->
+    <select id="collectBalance" resultType="com.joyintech.tams.valuation.batch.vatdraw.dto.TaxBalanceSumDto">
+        SELECT
+            ROUND(SUM(INCOME_HAPPEN_AMT),2) INCOME_HAPPEN_AMT,
+            ROUND(SUM(HAPPEN_AMT),2) HAPPEN_AMT
+        FROM
+            TAX_BOK_BALANCE
+        WHERE
+            BOOKSET_ID = #{booksetId}
+            AND HAPPEN_DATE = #{happenDate}
+            AND BOOK_DATE = #{bookDate}
+            AND VAT_TYPE = #{vatType}
+            AND TAX_P_TYPE = #{taxPType}
+            AND CALC_TYPE = #{calcType}
+    </select>
+    
+    <!-- 汇总价差收入处理 -->
+    <select id="collectPriceDiffIncome" resultType="com.joyintech.tams.valuation.batch.vatdraw.dto.TaxBalanceSumDto">
+        SELECT
+            ROUND(SUM(HAPPEN_AMT),2) AS happenAmt,
+            <!-- round(sum(增值税账务明细余额.当日发生额(小于0设值为0)),2) -->
+            ROUND(
+                CASE WHEN
+                    SUM(HAPPEN_AMT) <![CDATA[<]]> 0 
+                THEN 0 
+                ELSE 
+                    SUM(HAPPEN_AMT)
+                END,2) AS happenAmt2
+        FROM
+            TAX_BOK_BALANCE
+        WHERE
+            BOOKSET_ID = #{booksetId}
+            AND HAPPEN_DATE = #{happenDate}
+            AND BOOK_DATE = #{bookDate}
+            AND VAT_TYPE = #{vatType}
+            AND TAX_P_TYPE = #{taxPType}
+            AND CALC_TYPE = #{calcType}
+    </select>
+    
+    <select id="queryCashPlan" resultType="com.joyintech.tams.common.base.entity.FinCashPlan">
+        SELECT 
+            fcp.MDATE,
+            fcp.PRIN_AMT,
+            fcp.IS_PAY_INT
+        FROM FIN_CASH_PLAN fcp,
+            TRD_PRODUCT_DEAL tpd,
+            FIN_CASH_INFO fci
+        WHERE
+            fcp.MDATE = tpd.MDATE
+            AND fci.CASH_ID = fcp.CASH_ID
+            AND (fci.CASH_TYPE_2 = #{cashTypeC01})
+            AND fcp.FINPROD_ID = tpd.FINPROD_ID
+            AND tpd.TRADE_ID = #{tradeId}
+    </select>
+    <select id="queryCouponSpecies" resultType="java.lang.String">
+        SELECT 
+            COUPON_SPECIES
+        FROM FIN_PRODUCT
+        WHERE
+            FINPROD_TYPE = #{type}
+            AND FINPROD_ID = #{busiId}
+    </select>
+    
+    <insert id="insertTaxBokDetail" parameterType="java.util.List">
+        insert into TAX_BOK_DETAIL (SEQ_NO, BOOKSET_ID, BOOKSET_DATE,
+            BOK_SEQNO, BOK_DETAIL_ID, HAPPEN_DATE,
+            BOOK_DATE, BOOK_ID, BOOK_ORDER,
+            O_CCY, HAPPEN_AMT, TAX_AMT,
+            BAL_AMT, CARRY_AMT, VAT_TYPE,
+            TAX_P_TYPE, CALC_TYPE, TAX_RATE,
+            TAX_REG_ID, FEE_TYPE, INCOME_SOURCE,
+            MDATE, CREATE_USER, CREATE_DEPT,
+            CREATE_TIME, UPDATE_USER, UPDATE_TIME,
+            SUBJECT_NO, HAPPEN_AMT_B, TAX_AMT_B,
+            BAL_AMT_B, CARRY_AMT_B, B_CCY,
+            INCOME_ACCR_AMT, INCOME_CARRY_AMT, INCOME_ACCR_AMT_B,
+            INCOME_CARRY_AMT_B, BRANCH)
+        <foreach collection="list" item="item" separator="from dual union all select" open="select * from (select "
+             close="from dual)">
+            #{item.seqNo,jdbcType=VARCHAR}, #{item.booksetId,jdbcType=VARCHAR}, #{item.booksetDate,jdbcType=DATE},
+            #{item.bokSeqno,jdbcType=VARCHAR}, #{item.bokDetailId,jdbcType=VARCHAR}, #{item.happenDate,jdbcType=DATE},
+            #{item.bookDate,jdbcType=DATE}, #{item.bookId,jdbcType=VARCHAR}, #{item.bookOrder,jdbcType=DECIMAL},
+            #{item.oCcy,jdbcType=VARCHAR}, #{item.happenAmt,jdbcType=DECIMAL}, #{item.taxAmt,jdbcType=DECIMAL},
+            #{item.balAmt,jdbcType=DECIMAL}, #{item.carryAmt,jdbcType=DECIMAL}, #{item.vatType,jdbcType=VARCHAR},
+            #{item.taxPType,jdbcType=VARCHAR}, #{item.calcType,jdbcType=VARCHAR}, #{item.taxRate,jdbcType=DECIMAL},
+            #{item.taxRegId,jdbcType=VARCHAR}, #{item.feeType,jdbcType=VARCHAR}, #{item.incomeSource,jdbcType=VARCHAR},
+            #{item.mdate,jdbcType=DATE}, #{item.createUser,jdbcType=VARCHAR}, #{item.createDept,jdbcType=VARCHAR},
+            #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateUser,jdbcType=VARCHAR}, #{item.updateTime,jdbcType=TIMESTAMP},
+            #{item.subjectNo,jdbcType=VARCHAR}, #{item.happenAmtB,jdbcType=DECIMAL}, #{item.taxAmtB,jdbcType=DECIMAL},
+            #{item.balAmtB,jdbcType=DECIMAL}, #{item.carryAmtB,jdbcType=DECIMAL}, #{item.bCcy,jdbcType=VARCHAR},
+            #{item.incomeAccrAmt,jdbcType=DECIMAL}, #{item.incomeCarryAmt,jdbcType=DECIMAL}, #{item.incomeAccrAmtB,jdbcType=DECIMAL},
+            #{item.incomeCarryAmtB,jdbcType=DECIMAL}, #{item.branch,jdbcType=DECIMAL}
+        </foreach>  
+    </insert>
+    
+    <insert id="insertTaxBokBalance" parameterType="java.util.List" >
+        insert into TAX_BOK_BALANCE (SEQ_NO, BOOKSET_ID, BOOKSET_DATE,
+            BOK_DETAIL_ID, HAPPEN_DATE, BOOK_DATE,
+            O_CCY, VAT_TYPE, TAX_P_TYPE,
+            CALC_TYPE, INCOME_SOURCE, INCOME_AMT_ALL,
+            INCOME_HAPPEN_AMT, CARRY_AMT, HAPPEN_AMT,
+            TAX_AMT, BOOK_ORDER, CREATE_USER,
+            CREATE_DEPT, CREATE_TIME, UPDATE_USER,
+            UPDATE_TIME, SUBJECT_NO, DUR_BAL_TAX_AMT,
+            INCOME_DUR_AMT, INCOME_AMT_ALL_B, INCOME_HAPPEN_AMT_B,
+            CARRY_AMT_B, HAPPEN_AMT_B, TAX_AMT_B,
+            B_CCY, INCOME_ACCR_AMT, INCOME_CARRY_AMT,
+            INCOME_ACCR_AMT_B, INCOME_CARRY_AMT_B, BAL_CALC_TAX_AMT,
+            BAL_CALC_TAX_AMT_B, INCOME_DUR_AMT_B, DUR_BAL_TAX_AMT_B,
+            BRANCH, TDY_BAL_CALC_TAX_AMT, TDY_BAL_CALC_TAX_AMT_B
+            )
+        <foreach collection="list" item="item" separator="from dual union all select" open="select * from (select "
+             close="from dual)">
+            #{item.seqNo,jdbcType=VARCHAR}, #{item.booksetId,jdbcType=VARCHAR}, #{item.booksetDate,jdbcType=DATE},
+            #{item.bokDetailId,jdbcType=VARCHAR}, #{item.happenDate,jdbcType=DATE}, #{item.bookDate,jdbcType=DATE},
+            #{item.oCcy,jdbcType=VARCHAR}, #{item.vatType,jdbcType=VARCHAR}, #{item.taxPType,jdbcType=VARCHAR},
+            #{item.calcType,jdbcType=VARCHAR}, #{item.incomeSource,jdbcType=VARCHAR}, #{item.incomeAmtAll,jdbcType=DECIMAL},
+            #{item.incomeHappenAmt,jdbcType=DECIMAL}, #{item.carryAmt,jdbcType=DECIMAL}, #{item.happenAmt,jdbcType=DECIMAL},
+            #{item.taxAmt,jdbcType=DECIMAL}, #{item.bookOrder,jdbcType=DECIMAL}, #{item.createUser,jdbcType=VARCHAR},
+            #{item.createDept,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateUser,jdbcType=VARCHAR},
+            #{item.updateTime,jdbcType=TIMESTAMP}, #{item.subjectNo,jdbcType=VARCHAR}, #{item.durBalTaxAmt,jdbcType=DECIMAL},
+            #{item.incomeDurAmt,jdbcType=DECIMAL}, #{item.incomeAmtAllB,jdbcType=DECIMAL}, #{item.incomeHappenAmtB,jdbcType=DECIMAL},
+            #{item.carryAmtB,jdbcType=DECIMAL}, #{item.happenAmtB,jdbcType=DECIMAL}, #{item.taxAmtB,jdbcType=DECIMAL},
+            #{item.bCcy,jdbcType=VARCHAR}, #{item.incomeAccrAmt,jdbcType=DECIMAL}, #{item.incomeCarryAmt,jdbcType=DECIMAL},
+            #{item.incomeAccrAmtB,jdbcType=DECIMAL}, #{item.incomeCarryAmtB,jdbcType=DECIMAL}, #{item.balCalcTaxAmt,jdbcType=DECIMAL},
+            #{item.balCalcTaxAmtB,jdbcType=DECIMAL}, #{item.incomeDurAmtB,jdbcType=DECIMAL}, #{item.durBalTaxAmtB,jdbcType=DECIMAL},
+            #{item.branch,jdbcType=DECIMAL}, #{item.tdyBalCalcTaxAmt,jdbcType=DECIMAL}, #{item.tdyBalCalcTaxAmtB,jdbcType=DECIMAL}
+        </foreach>
+    </insert>
+    
+    <insert id="insertTaxBokBalanceSum" parameterType="java.util.List" >
+        insert into TAX_BOK_BALANCE_SUM (SEQ_NO,  BOOKSET_ID, 
+            BOOKSET_DATE, HAPPEN_DATE, BOOK_DATE, 
+            O_CCY, VAT_TYPE, TAX_P_TYPE, 
+            INCOME_AMT_ALL, HAPPEN_AMT, TAX_AMT_SUM, 
+            TAX_AMT, BOOK_ORDER, CREATE_USER, 
+            CREATE_DEPT, CREATE_TIME, UPDATE_USER, 
+            UPDATE_TIME)
+        <foreach collection="list" item="item" separator="from dual union all select" open="select * from (select "
+             close="from dual)">
+            #{item.seqNo,jdbcType=VARCHAR}, #{item.booksetId,jdbcType=VARCHAR}, 
+            #{item.booksetDate,jdbcType=DATE}, #{item.happenDate,jdbcType=DATE}, #{item.bookDate,jdbcType=DATE}, 
+            #{item.oCcy,jdbcType=VARCHAR}, #{item.vatType,jdbcType=VARCHAR}, #{item.taxPType,jdbcType=VARCHAR}, 
+            #{item.incomeAmtAll,jdbcType=DECIMAL}, #{item.happenAmt,jdbcType=DECIMAL}, #{item.taxAmtSum,jdbcType=DECIMAL}, 
+            #{item.taxAmt,jdbcType=DECIMAL}, #{item.bookOrder,jdbcType=DECIMAL}, #{item.createUser,jdbcType=VARCHAR}, 
+            #{item.createDept,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateUser,jdbcType=VARCHAR}, 
+            #{item.updateTime,jdbcType=TIMESTAMP}
+        </foreach>
+    </insert>
+    
+    <insert id="insertTaxDeductedBalance" parameterType="java.util.List">
+    	INSERT INTO TAX_DEDUCTED_BALANCE (
+		    SEQ_NO,
+		    BOOKSET_ID,
+		    BOOKSET_DATE,
+		    BOK_SEQNO,
+		    BOK_DETAIL_ID,
+		    HAPPEN_DATE,
+		    BOOK_DATE,
+		    BOOK_ID,
+		    BOOK_ORDER,
+		    O_CCY,
+		    CB_AMT,
+		    CB_BALANCE,
+		    TAX_AMT,
+		    BAL_AMT,
+		    CREATE_USER,
+		    CREATE_DEPT,
+		    CREATE_TIME,
+		    UPDATE_USER,
+		    UPDATE_TIME
+		)
+		<foreach collection="list" item="item" separator="from dual union all select" open="select * from (select " close="from dual)">
+            #{item.seqNo,jdbcType=VARCHAR}, #{item.booksetId,jdbcType=VARCHAR}, 
+            #{item.booksetDate,jdbcType=DATE}, #{item.bokSeqno},
+            #{item.bokDetailId,jdbcType=VARCHAR},#{item.happenDate,jdbcType=DATE},
+            #{item.bookDate,jdbcType=DATE}, #{item.bookId},
+            #{item.bookOrder,jdbcType=DECIMAL},#{item.oCcy,jdbcType=VARCHAR}, 
+            #{item.cbAmt,jdbcType=DECIMAL},#{item.cbBalance,jdbcType=DECIMAL},
+            #{item.taxAmt,jdbcType=DECIMAL},#{item.balAmt,jdbcType=DECIMAL},
+            #{item.createUser,jdbcType=VARCHAR},#{item.createDept,jdbcType=VARCHAR},
+            #{item.createTime,jdbcType=TIMESTAMP},#{item.updateUser,jdbcType=VARCHAR}, 
+            #{item.updateTime,jdbcType=TIMESTAMP}
+        </foreach>
+    </insert>
+    
+    <select id="queryMaxDeductBookOrder" resultType="java.math.BigDecimal">
+    	SELECT
+    		NVL(MAX(BOOK_ORDER),0)
+    	FROM TAX_DEDUCTED_BALANCE
+    </select>
+    
+    <select id="queryTaxTurnedBalList" parameterType="map" resultType="com.joyintech.tams.common.base.entity.TaxTurnedBalance">
+    	WITH DEDUCTED_TAX AS (
+    		SELECT
+    			tdb.BOK_DETAIL_ID,	/* 账务明细代码 */
+    			tdb.CB_BALANCE, 	/* 待抵扣资产份额余额 */
+    			tdb.BAL_AMT			/* 待抵扣增值税余额 */
+    		FROM TAX_DEDUCTED_BALANCE tdb
+    		WHERE (tdb.BOOK_ORDER, tdb.BOK_DETAIL_ID) IN (
+    			SELECT
+    				MAX(tdb1.BOOK_ORDER) BOOK_ORDER,
+    				tdb1.BOK_DETAIL_ID
+    			FROM TAX_DEDUCTED_BALANCE tdb1
+    			WHERE tdb1.HAPPEN_DATE <![CDATA[<=]]> #{happenDate,jdbcType=DATE} - 1
+    			AND tdb1.BOOK_DATE <![CDATA[<=]]> #{bookDate,jdbcType=DATE}
+    			AND tdb1.BOOKSET_ID = #{booksetId,jdbcType=VARCHAR}
+    			GROUP BY tdb1.BOK_DETAIL_ID
+    		)
+    	)
+    	SELECT
+    		NVL(dt.BAL_AMT, ttb.INCOME_AMT) incomeAmt,
+    		NVL(dt.CB_BALANCE, ttb.CB_AMT) cbAmt,
+    		ttb.BOK_DETAIL_ID
+    	FROM TAX_TURNED_BALANCE ttb
+    	LEFT JOIN DEDUCTED_TAX dt
+	    	ON (
+	    		ttb.BOK_DETAIL_ID = dt.BOK_DETAIL_ID
+	    	)
+	    WHERE NVL(dt.BAL_AMT, ttb.INCOME_AMT) != 0
+    </select>
+    
+    <select id="getStandardCcy" resultType="java.lang.String">
+    	SELECT
+    		STANDARD_CCY
+    	FROM BOK_BOOKSET
+    	WHERE BOOKSET_ID = #{booksetId}
+    </select>
+    
+</mapper>
