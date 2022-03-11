@@ -156,7 +156,7 @@
         mst_share_price T2
         ON T1.FINPROD_ID = t2.shares_id -->
         <where>
-            T1.FINPROD_TYPE2 = #{planasset}
+            (T1.FINPROD_TYPE = #{planasset} || T1.FINPROD_TYPE2 = #{planasset})
             <if test="search != null and !search.equals('')">
                 and (T1.FINPROD_ID like concat('%',concat(#{search},'%'))
                 	or T1.FINPROD_MARKET_ID like concat('%',concat(#{search},'%')) )
