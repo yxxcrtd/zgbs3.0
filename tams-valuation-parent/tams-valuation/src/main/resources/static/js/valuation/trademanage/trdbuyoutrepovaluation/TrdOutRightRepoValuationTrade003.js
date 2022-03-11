@@ -40,6 +40,7 @@ $(function() {
         $('#endDate').hide(); //到期日隐藏
         var mdate=$('#mdate').val();
         $('#tradeDate').val(mdate);
+        $('#settleDate').val(mdate);
         $('#ps').textSelect("setValue",'T07');
     }
     /**
