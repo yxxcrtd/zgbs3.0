@@ -10,7 +10,6 @@
  
 package com.joyintech.service.valuation.trademanage.trdplanvaluationtrade.dao;
 
-import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.service.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanValuationTradeDto;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -28,28 +27,6 @@ import java.util.Map;
  */
 @Repository(value="serviceTrdPlanValuationTradeMapper")
 public interface TrdPlanValuationTradeMapper {
-
-	/**
-	 * 产品代码下拉框
-	 * @auther: yuzj
-	 * @date: 2021/12/29
-	 * @param:
-	 * @return:
-	 */
-	List<SelectOptionDto> findPortfolioId(Map<String, Object> params);
-
-
-	/**
-	 * 资产代码下拉框
-	 * @auther: yuzj
-	 * @date: 2021/12/29
-	 * @param:
-	 * @return:
-	 */
-	List<SelectOptionDto> findFinprodId(Map<String, Object> params);
-
-
-    List<TrdPlanValuationTradeDto> select(Map<String, Object> key);
 
     Integer  selectCountByTradeId(@Param("tradeId")String tradeId);
 
@@ -72,7 +49,18 @@ public interface TrdPlanValuationTradeMapper {
 	 */
 	List<TrdPlanValuationTradeDto> selectDeal(Map<String, Object> paraMap);
 
+   /*
+	* 查询明细
+	*/
+	TrdPlanValuationTradeDto queryTradeInfoByTradeId(Map<String, Object> param);
 
-	TrdPlanValuationTradeDto queryTradeInfoByTradeId(String tradeId);
+	/**
+	 * 赎回到账详情查询
+	 * @see
+	 * @since 1.0
+	 */
+	TrdPlanValuationTradeDto queryRedInfoByTradeId(@Param("tradeId") String tradeId);
+
+	int delBokDetailIdByTradeId(Map<String, Object> map);
 
 }

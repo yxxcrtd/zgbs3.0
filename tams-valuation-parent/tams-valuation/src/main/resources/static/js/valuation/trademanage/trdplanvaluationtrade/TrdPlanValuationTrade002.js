@@ -1,189 +1,113 @@
 
 (function () {
 
-    $('#portfolioId').change(function(){
-        var portfolioId = $('#portfolioId').val();
-        if(portfolioId){
-            var dataPort = $('#portfolioId').select2('data')[0].object;
-            var finprodId = dataPort.finprodId;
-            var finprodType =dataPort.finprodType;
-            var profitType =dataPort.profitType;
-            $('#portfolioName').val(finprodId).trigger('change');
+    $('#prodId').change(function(){
+        var prodId = $('#prodId').val();
+        if(prodId){
+            $('#prodName').val($('#prodId').select2('data')[0].id).trigger('change');
 
         }else {
-            $('#portfolioName').val('').trigger('change');
+            $('#prodName').val('').trigger('change');
         }
     });
 
-    $('#finprodId').change(function(){
-        var finprodId = $('#finprodId').val();
-        if(finprodId){
-            var dataPort = $('#finprodId').select2('data')[0].object;
-            var finprodId = dataPort.finprodId;
-            $('#finprodName').val(finprodId).trigger('change');
-
+    $('#assetId').change(function(){
+        var assetId = $('#assetId').val();
+        if(assetId){
+            var dataPort = $('#assetId').select2('data')[0].object;
+            var profitType = dataPort.profitType;
+            $('#assetAbbr').val($('#assetId').select2('data')[0].id).trigger('change');
+            $('#profitType').val(profitType).trigger('change');
         }else {
-            $('#finprodName').val('').trigger('change');
+            $('#assetAbbr').val('').trigger('change');
+            $('#profitType').val('').trigger('change');
         }
     });
 
 
     $('#ps').change(function(){
-        if($('#ps').val() && $('#ps').val() != null && $('#ps').val() != ''){
-            var psStr = $('#ps').val();
-            //买入 T01、卖出T02、认购 T52、申购 T04、认购确认 T18、申购确认T05、赎回确认 T19、赎回到账 T24
-            var jyps = "T01,T02";//交易信息
-            var rgps = "T52";//认购信息
-            var sqps = "T04";    //申请信息
-            var rgqr = "T18";    //确认信息 认购确认
-            var sgqr = "T05";    //确认信息 申购确认
-            var shqr = "T19";    //确认信息 赎回确认
-            if(jyps.indexOf(psStr) >-1){ //交易信息
-                $('#value_div_jy').show();
-                $('#value_div_rg').hide();
-                $('#value_div_sq').hide();
-                $('#value_div_rgqr').hide();
-                $('#value_div_sgqr').hide();
-                $('#value_div_shqr').hide();
+        psChange();
+    });
 
-                //交易日期、结算日期默认系统平台日
-                $('#tradeDate').val(platDate);// 默认平台日
-                $('#settleDate').val(platDate);// 默认平台日
-            }else if(rgps.indexOf(psStr) >-1){ //认购信息
-                $('#value_div_jy').hide();
-                $('#value_div_rg').show();
-                $('#value_div_sq').hide();
-                $('#value_div_rgqr').hide();
-                $('#value_div_sgqr').hide();
-                $('#value_div_shqr').hide();
+    var psChange = function () {
+        var ps = $('#ps').val();
+        //买入 T01、卖出T02、认购 T52、申购 T04、认购确认 T18、申购确认T05、赎回确认 T19、赎回到账 T24
+        if(ps == 'T01' || ps == 'T02'){ //交易信息
+            $('#tradeInfo').show();
+            $('#subscriptionInfo').hide();
+            $('#purchaseInfo').hide();
+            $('#subConfirmInfo').hide();
+            $('#purConfirmInfo').hide();
+            $('#redeemInfo').hide();
+        }else if(ps == 'T52'){ //认购信息
+            $('#tradeInfo').hide();
+            $('#subscriptionInfo').show();
+            $('#purchaseInfo').hide();
+            $('#subConfirmInfo').hide();
+            $('#purConfirmInfo').hide();
+            $('#redeemInfo').hide();
 
-                //交易日期、结算日期默认系统平台日
-                $('#tradeDate').val(platDate);// 默认平台日
-                $('#settleDate').val(platDate);// 默认平台日
-            }else if(sqps.indexOf(psStr) >-1){//申请信息
-                $('#value_div_jy').hide();
-                $('#value_div_rg').hide();
-                $('#value_div_sq').show();
-                $('#value_div_rgqr').hide();
-                $('#value_div_sgqr').hide();
-                $('#value_div_shqr').hide();
+        }else if(ps == 'T04'){//申请信息
+            $('#tradeInfo').hide();
+            $('#subscriptionInfo').hide();
+            $('#purchaseInfo').show();
+            $('#subConfirmInfo').hide();
+            $('#purConfirmInfo').hide();
+            $('#redeemInfo').hide();
 
-                //交易日期、结算日期默认系统平台日
-                $('#tradeDate').val(platDate);// 默认平台日
-                $('#settleDate').val(platDate);// 默认平台日
-            }else if(rgqr.indexOf(psStr) >-1){//认购确认信息
-                $('#value_div_jy').hide();
-                $('#value_div_rg').hide();
-                $('#value_div_sq').hide();
-                $('#value_div_rgqr').show();
-                $('#value_div_sgqr').hide();
-                $('#value_div_shqr').hide();
+        }else if(ps == 'T18'){//认购确认信息
+            $('#tradeInfo').hide();
+            $('#subscriptionInfo').hide();
+            $('#purchaseInfo').hide();
+            $('#subConfirmInfo').show();
+            $('#purConfirmInfo').hide();
+            $('#redeemInfo').hide();
 
-                //确认日期默认系统平台日
-                $('#tradeDate').val(platDate);// 默认平台日
-            }else if(sgqr.indexOf(psStr) >-1){//申购确认信息
-                $('#value_div_jy').hide();
-                $('#value_div_rg').hide();
-                $('#value_div_sq').hide();
-                $('#value_div_rgqr').hide();
-                $('#value_div_sgqr').show();
-                $('#value_div_shqr').hide();
+        }else if(ps == 'T05'){//申购确认信息
+            $('#tradeInfo').hide();
+            $('#subscriptionInfo').hide();
+            $('#purchaseInfo').hide();
+            $('#subConfirmInfo').hide();
+            $('#purConfirmInfo').show();
+            $('#redeemInfo').hide();
 
-                //确认日期默认系统平台日
-                $('#tradeDate').val(platDate);// 默认平台日
-            }else if(shqr.indexOf(psStr) >-1){//赎回确认信息
-                $('#value_div_jy').hide();
-                $('#value_div_rg').hide();
-                $('#value_div_sq').hide();
-                $('#value_div_rgqr').hide();
-                $('#value_div_sgqr').hide();
-                $('#value_div_shqr').show();
+        }else if(ps == 'T19'){//赎回确认信息
+            $('#tradeInfo').hide();
+            $('#subscriptionInfo').hide();
+            $('#purchaseInfo').hide();
+            $('#subConfirmInfo').hide();
+            $('#purConfirmInfo').hide();
+            $('#redeemInfo').show();
 
-                //交易日期、结算日期默认系统平台日
-                $('#tradeDate').val(platDate);// 默认平台日
-                $('#settleDate').val(platDate);// 默认平台日
-            }else{//默认
-                $('#value_div_jy').show();
-                $('#value_div_rg').show();
-                $('#value_div_sq').show();
-                $('#value_div_rgqr').show();
-                $('#value_div_sgqr').show();
-                $('#value_div_shqr').show();
+        }else{//默认
+            $('#tradeInfo').hide();
+            $('#subscriptionInfo').hide();
+            $('#purchaseInfo').hide();
+            $('#subConfirmInfo').hide();
+            $('#purConfirmInfo').hide();
+            $('#redeemInfo').hide();
+        }
+    };
+
+    //结算金额  买入时：结算金额=成交金额+投资顾问费+其他费用  卖出时：结算金额=成交金额-投资顾问费-其他费用
+    var settleAmtChange = function(){
+        var tradeAmt = $('#tradeAmt').val();
+        var advFeeOut = $('#advFeeOut').val();
+        var otherAmt = $('#otherAmt').val();
+        var ps = $('#ps').val();
+        if(tradeAmt != null && tradeAmt != ''
+            && advFeeOut != null && advFeeOut != ''
+            && otherAmt != null && otherAmt != ''){
+            if(ps == 'T01'){
+                var settleAmt = JoyinMath.doAdd(JoyinMath.doAdd(tradeAmt, advFeeOut,2),otherAmt,2);
+                $('#settleAmt').val(settleAmt);
+            }else if(ps == 'T02'){
+                var  settleAmt = JoyinMath.doMinus(JoyinMath.doMinus(tradeAmt, advFeeOut,2),otherAmt,2);
+                $('#settleAmt').val(settleAmt);
             }
-
-        }
-
-    });
-
-    //确认金额 联动
-    $('#confirmTradeAmt').change(function(){
-        unitValueCalculate();
-    });
-
-    //交易份额 联动
-    $('#confirmNums').change(function(){
-        unitValueCalculate();
-    });
-
-    /**
-     * 单位净值计算
-     */
-    var unitValueCalculate = function(){
-        if($('#confirmTradeAmt').val() && $('#confirmTradeAmt').val() != null && $('#confirmTradeAmt').val() != ''
-                && $('#confirmNums').val() && $('#confirmNums').val() != null && $('#confirmNums').val() != '' && $('#confirmNums').val() !=0){
-            var unitValue = JoyinMath.doDiv($('#confirmTradeAmt').val(), $('#confirmNums').val(), 2);
-            $('#unitValue').val(unitValue)
         }else{
-            $('#unitValue').val('')
+            $('#settleAmt').val('');
         }
-    }
-
-    //交易金额 联动
-    $('#tradeAmt').change(function(){
-        mdateSettleAmtCalculate();
-    });
-
-    //交易金额 联动
-    $('#confirmTradeAmt').change(function(){
-        mdateSettleAmtCalculate();
-    });
-
-    //到账金额 联动
-    $('#settleAmt').change(function(){
-        mdateSettleAmtCalculate();
-    });
-
-    //交易费用 联动
-    $('#feeAmt').change(function(){
-        mdateSettleAmtCalculate();
-    });
-    //投资顾问费 联动
-    $('#advFeeOut').change(function(){
-        mdateSettleAmtCalculate();
-    });
-    //其他费用 联动
-    $('#feeAmtQT').change(function(){
-        mdateSettleAmtCalculate();
-    });
-
-    /**
-     * 结算金额  计算
-     */
-    var mdateSettleAmtCalculate = function(){
-        //总费用=交易费用+投资顾问费+其他费用
-        var totalFee = JoyinMath.doAdd(JoyinMath.doAdd($('#feeAmt').val(), $('#advFeeOut').val(), 2),$('#feeAmtQT').val(),2);
-        var mdateSettleAmt =0.00;
-        //tradeAmt 交易金额 confirmTradeAmt 确认金额  settleAmt 到账金额
-        if($('#tradeAmt').val() && $('#tradeAmt').val() != null && $('#tradeAmt').val() != ''){
-            mdateSettleAmt=JoyinMath.doAdd($('#tradeAmt').val(), totalFee, 2);
-        }else if($('#confirmTradeAmt').val() && $('#confirmTradeAmt').val() != null && $('#confirmTradeAmt').val() != ''){
-            mdateSettleAmt=JoyinMath.doAdd($('#confirmTradeAmt').val(), totalFee, 2);
-        }else if($('#settleAmt').val() && $('#settleAmt').val() != null && $('#settleAmt').val() != ''){
-            mdateSettleAmt=JoyinMath.doAdd($('#settleAmt').val(), totalFee, 2);
-        }else{
-            mdateSettleAmt= totalFee;
-        }
-        $('#mdateSettleAmt').val(mdateSettleAmt);
     }
 
     /**
@@ -220,6 +144,25 @@
      */
     $(function() {
         // init();
+
+        if(workflowId){
+            psChange();
+        }
+
+        //结算金额联动事件
+        //成交金额
+        $('#tradeAmt').change(function(){
+            settleAmtChange();
+        });
+        //投资顾问费
+        $('#advFeeOut').change(function(){
+            settleAmtChange();
+        });
+        //其他费用
+        $('#otherAmt').change(function(){
+            settleAmtChange();
+        });
+
         //保存
         $('#TrdPlanValuationTrade002_btn_save').click(function() {
             saveOrSubmit('save');

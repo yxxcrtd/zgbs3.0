@@ -1,48 +1,38 @@
 
 (function () {
 
-    $('#portfolioId').change(function(){
-        var portfolioId = $('#portfolioId').val();
-        if(portfolioId){
-            var dataPort = $('#portfolioId').select2('data')[0].object;
-            var finprodId = dataPort.finprodId;
-            $('#portfolioName').val(finprodId).trigger('change');
+    $('#prodId').change(function(){
+        var prodId = $('#prodId').val();
+        if(prodId){
+            $('#prodName').val($('#prodId').select2('data')[0].id).trigger('change');
 
         }else {
-            $('#portfolioName').val('').trigger('change');
+            $('#prodName').val('').trigger('change');
         }
     });
 
-    $('#finprodId').change(function(){
-        var finprodId = $('#finprodId').val();
-        if(finprodId){
-            var dataPort = $('#finprodId').select2('data')[0].object;
-            var finprodId = dataPort.finprodId;
-            var tradeMarket = dataPort.tradeMarket;
-            $('#finprodName').val(finprodId).trigger('change');
-            $('#tradeMarket').val(tradeMarket).trigger('change');
+    $('#assetId').change(function(){
+        var assetId = $('#assetId').val();
+        if(assetId){
+            var dataPort = $('#assetId').select2('data')[0].object;
+            var profitType = dataPort.profitType;
+            $('#assetAbbr').val($('#assetId').select2('data')[0].id).trigger('change');
+            $('#profitType').val(profitType).trigger('change');
         }else {
-            $('#finprodName').val('').trigger('change');
-            $('#tradeMarket').val('').trigger('change');
+            $('#assetAbbr').val('').trigger('change');
+            $('#profitType').val('').trigger('change');
         }
     });
 
-
-    $('#ps').change(function(){
-        if($('#ps').val() && $('#ps').val() != null && $('#ps').val() != ''){
-            var psStr = $('#ps').val();
-            //买入 T01、卖出T02、认购 T52、申购 T04、认购确认 T18、申购确认T05、赎回确认 T19、赎回到账 T24
-            var shdz = "T24";
-            if(shdz.indexOf(psStr) >-1){ //赎回到账
-                //到账日期默认系统平台日
-                $('#shdzSettleDate').val(platDate);// 默认平台日
-            }
-
+    var tradeAmtArriveInit = function(){
+        var redConfirmAmt = $('#redConfirmAmt').val();
+        var redFee = $('#redFee').val();
+        if((redConfirmAmt != '' || redConfirmAmt != null)
+            && (redFee != '' || redFee != null)){
+            var tradeAmtArrive = JoyinMath.doMinus(redConfirmAmt, redFee,2);
+            $('#tradeAmtArrive').val(tradeAmtArrive);
         }
-
-    });
-
-
+    }
 
     /**
      * 保存或提交
@@ -78,6 +68,7 @@
      * 画面加载完成
      */
     $(function() {
+        tradeAmtArriveInit();
         // init();
         //保存
         $('#TrdPlanValuationTrade003_btn_save').click(function() {

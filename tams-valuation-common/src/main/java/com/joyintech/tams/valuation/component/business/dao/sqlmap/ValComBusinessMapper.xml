@@ -33,7 +33,8 @@
 		<result column="text" property="text" jdbcType="VARCHAR"/>
 		<association property="object" javaType="java.util.Map">
 			<result column="id" property="assetId" jdbcType="VARCHAR" />
-			<result column="TRADE_MARKET" property="tradeMarket" jdbcType="VARCHAR" />
+			<result column="tradeMarket" property="tradeMarket" jdbcType="VARCHAR" />
+			<result column="profitType" property="profitType" jdbcType="VARCHAR" />
 		</association>
 	</resultMap>
 
@@ -42,7 +43,8 @@
 		select
 			FINPROD_MARKET_ID id,
 			FINPROD_ABBR text,
-			TRADE_MARKET
+			TRADE_MARKET tradeMarket,
+			PROFIT_TYPE profitType
 		from
 			FIN_PRODUCT
 		where

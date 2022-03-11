@@ -28,7 +28,7 @@ $(function(){
         dblclick:function(table, data) {
             Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
                     basePath + "valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/init",
-                    "98%", "98%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
+                    "95%", "90%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
                     tradeId:data.tradeId,ps:data.ps});
         },
         cols:[

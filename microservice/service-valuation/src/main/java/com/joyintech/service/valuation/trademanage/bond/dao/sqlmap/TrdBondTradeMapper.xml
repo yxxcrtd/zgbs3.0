@@ -78,8 +78,11 @@
 
     <delete id="delBokDetailIdByTradeId">
         DELETE FROM BOK_DETAIL_ID
-        WHERE BOOKSET_ID = #{booksetId}
-          and TRADE_ID = #{tradeId}
+        WHERE
+         TRADE_ID = #{tradeId}
+        <if test="booksetId !=null and booksetId !='' ">
+            AND BOOKSET_ID = #{booksetId}
+        </if>
     </delete>
 
     <select id="getSecManageAcctId" resultType="com.joyintech.framework.select.SelectOptionDto">

@@ -32,7 +32,7 @@
 		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd ON ttfd.TRADE_ID = t.TRADE_ID AND ttfd.FEE_TYPE = 'B01'
 		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd2 ON ttfd2.TRADE_ID = t.TRADE_ID AND ttfd2.FEE_TYPE = 'B05'
 		where
-		t.BUSI_TYPE in ('06','07')
+		t.BUSI_TYPE in ('06','07') AND t.FINPROD_TYPE = 'F06'
 		<if test="tradeId !=null and tradeId !='' ">
 			and t.TRADE_ID like  concat(concat('%',#{tradeId}),'%')
 		</if>
