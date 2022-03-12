@@ -76,8 +76,8 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
     /**
      * 其他综合收益
      */
-    其他综合收益(
-            "QTZHSY_Z"
+    其他综合收益_证券(
+            "QTZHSY_ZQ"
     ),
 
     /**
@@ -219,13 +219,13 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
      * 清算资金往来
      */
     清算资金往来(
-            "QSKZJWL_Z"
+            "QSZJWL"
     ),
     /**
      * 应收股利(应收红利)
      */
     应收股利(
-            "YSGL_Z"
+            "YSGL"
     ),
     /**
      * 运营费用
@@ -329,6 +329,18 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
      */
     投资收益_股利收入_增值税备抵(
             "TZSY_GLSR_ZZSBD"
+    ),
+    /**
+     * 交易性金融负债_成本
+     */
+    交易性金融负债_成本(
+        "JRFZCB"
+    ),
+    /**
+     * 交易性金融负债_公允价值变动
+     */
+    交易性金融负债_公允价值变动(
+        "JYXJRFZ_GYJZBD"
     ),
     /** ==========原科目性质修改======== end**/
     /** ==========新增科目性质======== start**/
