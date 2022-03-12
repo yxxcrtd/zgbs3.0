@@ -236,7 +236,6 @@ public class SettlementInstructionNewService {
             BokDetailId valBokDetailIdForMy = new BokDetailId();
             valBokDetailIdForMy.setBokDetailId(dto.getBokDetailId());//账务明细代码
             valBokDetailIdForMy.setBusiId(dto.getBusiId());//业务明细代码
-            
             //定义对方资金账户信息
             BokDetailId valBokDetailIdForOther = new BokDetailId();
             // 定义 对手账务明细代码 = 交易明细.对方资金账户 == null? Null:调用账务明细代码共通（交易明细.对方资金账户,“现金类”，交易明细.币种)
@@ -381,9 +380,9 @@ public class SettlementInstructionNewService {
             SubjectMappingConfig config = new SubjectMappingConfig();
             // add by weipeng on 20220221 区分资金账户金额元素 start
             // 定义 变量.本方资金账户类型
-            String myAcctType= valBokDetailIdForMy.getBusiDetailType();
+            String myAcctType= dto.getBusiDetailType();
             // 定义 变量.对方资金账户类型
-            String counterAcctType = valBokDetailIdForOther.getBusiDetailType();
+            String counterAcctType = dto.getCounterAcctNoType();
             // 本方资金账户类型 或 对方资金账户类型对应资金账户类型，赋值对应金额元素
             if(DictCodeListExt1.资金账户类型_产品托管户.getValue().equals(myAcctType)
                     || DictCodeListExt1.资金账户类型_产品托管户.getValue().equals(counterAcctType)){
@@ -428,6 +427,7 @@ public class SettlementInstructionNewService {
             config = new SubjectMappingConfig();
             config.setTradeMarket(dto.getTradeMarket());
             configMap.put(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(), config);
+            ad.setSubjectMappingConfigMap(configMap);
             // add by weipeng on 20220302：增加辅助核算项配置 end
             // map塞入场景要素管理中
             ad.setAccountSceneMap(accountSceneMap);// 记账场景要素

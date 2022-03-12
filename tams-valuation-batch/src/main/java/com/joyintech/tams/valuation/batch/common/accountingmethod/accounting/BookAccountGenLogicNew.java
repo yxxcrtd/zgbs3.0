@@ -1732,7 +1732,7 @@ public class BookAccountGenLogicNew {
      * @return
      */
     public BokSubject getSubjectByInnerCode(List<BokSubject> listBokSubject, SubjectMappingConfig subjectMappingConfig){
-        BokSubject bokSubject = new BokSubject();
+        BokSubject bokSubject = null;
         if(CollectionUtils.isEmpty(listBokSubject)){
             return bokSubject;
         }
