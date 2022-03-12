@@ -89,7 +89,11 @@ public class BookCommonLogicNew {
             listSubjectInternalCode.add(accountEntry.getSubjectId());
         }
         // 2. 根据内部编码集合查询相关底层科目信息
-        List<BokSubject> subjectList =  accountingMethodNewMapper.getSubjectByInternalCode(booksetId, listSubjectInternalCode, DictCodeList.是否_是.getValue());
+        Map<String, Object> params = new HashMap<>();
+        params.put("booksetId", booksetId);
+        params.put("listSubjectInternalCode", listSubjectInternalCode);
+        params.put("isAcc", DictCodeList.是否_是.getValue());
+        List<BokSubject> subjectList =  accountingMethodNewMapper.getSubjectByInternalCode(params);
         // 定义 变量.科目Map = 科目按照内部科目编码进行分组
         if(CollectionUtils.isNotEmpty(subjectList)){
             Map<String, List<BokSubject>> subjectMap= subjectList.stream().collect(Collectors.groupingBy(BokSubject :: getSubjectInternalCode));

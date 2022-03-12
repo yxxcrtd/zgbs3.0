@@ -62,7 +62,7 @@
     <select id="getSubjectByInternalCode" resultType="com.joyintech.tams.common.base.entity.BokSubject"
             parameterType="java.util.Map">
         SELECT
-        A.BOOKSET_ID,
+        B.BOOKSET_ID,
         A.SUBJECT_NO,
         A.SUBJECT_NAME,
         A.FSUBJECT_ID,
@@ -86,14 +86,17 @@
         <if test="booksetId != null and booksetId != ''">
             AND B.BOOKSET_ID = #{booksetId}
         </if>
+        <if test="ccy != null and ccy != ''">
+            AND B.CCY = #{ccy}
+        </if>
         <if test="isAcc != null and isAcc != ''">
             /** 查询核算科目，且科目配置项不为空**/
             AND A.IS_ACC = #{isAcc}
         </if>
         <if test="listSubjectInternalCode != null and listSubjectInternalCode.size >0">
             AND A.SUBJECT_INTERNAL_CODE IN
-            <foreach collection="listSubjectInternalCode" item="item" index="index" open="(" close=")" separator=",">
-                <if test="(index % 998) == 0"> NULL ) OR A.SUBJECT_INTERNAL_CODE  IN (</if>#{item}
+            <foreach collection="listSubjectInternalCode" item="item" open="(" close=")" separator=",">
+                #{item}
             </foreach>
         </if>
 

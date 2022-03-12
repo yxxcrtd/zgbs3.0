@@ -90,12 +90,8 @@ public class BookAccountGenLogicNew {
     @Autowired
     private BookAccountGenLogicNewMapper bookAccountGenLogicNewMapper;
 
-    /**
-     * AccountingMethodMapper
-     */
     @Autowired
     private AccountingMethodNewMapper accountingMethodNewMapper;
-
 
     /**
      * 记账凭证生成
@@ -1721,7 +1717,7 @@ public class BookAccountGenLogicNew {
         params.put("isAcc",DictCodeList.是否_是.getValue()); // 是否核算科目
         params.put("ccy",ccy); // 是否核算科目
         // 2. 根据内部编码集合查询相关底层科目信息
-        return bookAccountGenLogicNewMapper.getSubjectByInternalCode(params);
+        return accountingMethodNewMapper.getSubjectByInternalCode(params);
     }
 
     /**

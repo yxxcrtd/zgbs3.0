@@ -11,7 +11,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
+import java.util.Map;
 
 /**
  * 〈一句话功能简述〉 〈功能详细描述〉
@@ -46,7 +46,5 @@ public interface AccountingMethodNewMapper {
      * @param isAcc 是否核算科目
      * @return
      */
-    List<BokSubject> getSubjectByInternalCode(@Param("booksetId") String booksetId,
-                                              @Param("listSubjectInternalCode") List<String> listSubjectInternalCode,
-                                                @Param("isAcc") String isAcc);
+    List<BokSubject> getSubjectByInternalCode(Map<String,Object> params);
 }
