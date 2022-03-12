@@ -28,7 +28,6 @@ import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.*;
 import com.joyintech.tams.valuation.batch.common.base.entity.extcommon.ValBokBookdetailBatch;
 import com.joyintech.tams.valuation.batch.common.calculation.service.CalculationCommonService;
 import com.joyintech.tams.valuation.common.constants.BookConstant;
-import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrue;
 import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrueNew;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,7 +151,7 @@ public class ExpReturnFeeAccountsNewService {
         if(DictCodeListExt1.是或否_是.getValue().equals(isIncomeassetsDeductQtzhsy)){
         	searchDto.setSubjectTypeList(null);
             dataList=new ArrayList<>();
-            dataList.add(DictCodeBaseSubjectNatrueNew.其他综合收益.getValue());
+            dataList.add(DictCodeBaseSubjectNatrueNew.其他综合收益_证券.getValue());
             dataList.add(DictCodeBaseSubjectNatrueNew.其他综合收益_减值准备.getValue());
             dataList.add(DictCodeBaseSubjectNatrueNew.其他综合收益_申赎.getValue());
             searchDto.setBaseSubjectNatureList(dataList);
