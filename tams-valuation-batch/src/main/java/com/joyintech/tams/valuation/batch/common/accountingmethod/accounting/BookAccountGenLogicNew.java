@@ -113,12 +113,12 @@ public class BookAccountGenLogicNew {
         // step2. 根据内部科目编码映射
         // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑 start
         // 按照内部科目编码分录，则需要映射分录对应科目信息
-        generateEntrySubjectInfo(accountDriver, accountEntrys);
+        List<AccountEntry> accountEntries = generateEntrySubjectInfo(accountDriver, accountEntrys);
         // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑 end
 
         // step3. 根据映射后的分录信息生成账务明细信息
         // 遍历步骤获取的列表，循环生成明细凭证信息
-        result = genBookDetails(accountDriver, accountEntrys);
+        result = genBookDetails(accountDriver, accountEntries);
         return result;
     }
 
@@ -1519,7 +1519,8 @@ public class BookAccountGenLogicNew {
      * @param accountEntries 会计分录
      * @param accountDriver 会计场景
      */
-    public void generateEntrySubjectInfo(AccountDriver accountDriver, List<AccountEntry> accountEntries) {
+    public List<AccountEntry> generateEntrySubjectInfo(AccountDriver accountDriver, List<AccountEntry> accountEntries) {
+        List<AccountEntry> resultEnryies = new ArrayList<>();
         // 获取记账场景要素信息
         Map<String, Object> accountSceneMap = accountDriver.getAccountSceneMap();
         // 获取记账金额要素信息
@@ -1536,17 +1537,18 @@ public class BookAccountGenLogicNew {
         for(AccountEntry accountEntry : accountEntries){
             // 若科目基础科目性质不为空，则说明分录为非调整后的内部科目编码分录，不做处理，直接返回
             if(StringUtil.isNotEmpty(accountEntry.getBaseSubjectNature())){
-                return;
+                return accountEntries;
             }
             // 获取账务明细代码
             BokDetailId bokDetailId =(BokDetailId)accountSceneMap.get(accountEntry.getBokDetailId());
             if(bokDetailId != null){
                 listBokDetailId.add(bokDetailId.getBokDetailId());
             }
+            resultEnryies.add(accountEntry);
         }
         // 若科目信息或者账务明细代码为空，直接返回
         if(CollectionUtils.isEmpty(listBokDetailId)){
-            return;
+            return resultEnryies;
         }
 //        // 3. 根据账务明细代码和账套代码，查询对应科目辅助核算项
 //        List<SubjectMappingConfig> subjectMappingConfigList= bookAccountGenLogicNewMapper.getSubjectMappingConfig(booksetId, listBokDetailId, DictCodeListExt1.金融产品类型_存款.getValue());
@@ -1557,7 +1559,7 @@ public class BookAccountGenLogicNew {
         // 定义 变量.默认辅助核算项配置
         SubjectMappingConfig subjectMappingConfigDefault = accountDriver.getSubjectMappingConfigDefault();
         // 循环遍历会计分录
-        for(AccountEntry accountEntry : accountEntries){
+        for(AccountEntry accountEntry : resultEnryies){
             // 根据内部科目编码获取所有对应科目
             List<BokSubject> entrySubjectList = new ArrayList<>();
             if(CollectionUtils.isEmpty(accountEntry.getBokSubjectList())){
@@ -1640,12 +1642,12 @@ public class BookAccountGenLogicNew {
                 for (String mp : params.keySet()) {
                     sb.append("key = " + mp + ", value = " + params.get(mp));
                 }
-                logger.error(
-                        "内部科目编码："+accountEntry.getSubjectId() +"未找到匹配科目信息 \r\n"
+                logger.error("资产【"+bokDetailId.getBusiId()+"】对应内部科目编码："+accountEntry.getSubjectId() +"未找到匹配科目信息 \r\n"
               +"辅助核算项："+sb.toString());
 
             }
         }
+        return resultEnryies;
     }
 
 
