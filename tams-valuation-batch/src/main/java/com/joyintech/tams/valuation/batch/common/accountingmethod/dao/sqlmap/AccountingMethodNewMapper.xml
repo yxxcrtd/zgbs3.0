@@ -87,7 +87,7 @@
             AND B.BOOKSET_ID = #{booksetId}
         </if>
         <if test="ccy != null and ccy != ''">
-            AND B.CCY = #{ccy}
+            AND A.CCY = #{ccy}
         </if>
         <if test="isAcc != null and isAcc != ''">
             /** 查询核算科目，且科目配置项不为空**/

@@ -1597,6 +1597,10 @@ public class DeltRightCalAmortizationProcessorService {
         else if (DictCodeList.推算方式_首次支付日.getValue().equals(secIntSchCalMethodString)) {
             secIntSchCalMethod = SecIntSchCalMethod.首次付息日;
         }
+        // add by weipeng on 20220312:默认起息日向后,否则报错
+        else{
+            secIntSchCalMethod = SecIntSchCalMethod.起息日向后;
+        }
         secInfoModel.setCalMethod(secIntSchCalMethod);
         // 付息频率
         IntFrequency yearIntRate = null;
