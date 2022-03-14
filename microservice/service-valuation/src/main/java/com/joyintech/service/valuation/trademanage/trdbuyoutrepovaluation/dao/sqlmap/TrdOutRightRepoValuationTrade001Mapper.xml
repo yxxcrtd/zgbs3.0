@@ -176,20 +176,28 @@
 	<select id="queryTradeInfoByTradeId01" resultType="com.joyintech.service.valuation.trademanage.trdbuyoutrepovaluation.dto.TrdOutRightRepoValuationTrade003Dto">
 		SELECT
 		t.TRADE_ID tradeId,/**交易编号**/
+		null outTradeId,    /*外部成交编号*/
 		deal.BOOKSET_ID portfolioId,/**金融产品代码**/
 		bok.BOOKSET_NAME portfolioName,/**金融产品名称**/
 		zc.FINPROD_MARKET_ID  finprodMarketId, /**标的资产代码**/
 		zc.FINPROD_ABBR  finprodName,/**标的资产名称**/
 		zc.TERM_DAYS term,  /**回购期限**/
-		mst.COUNTER_NAME counterId,  /**交易对手**/
+		mst.COUNTER_ID counterId,  /**交易对手**/
 		t.PS ps,/**交易类型**/
 		t.TRADE_DATE tradeDate,/**交易日**/
-		zc.VDATE vdate,/**起息日**/
-		zc.MDATE mdate,/**到期日**/
+		t.SETTLE_DATE settleDate,/**资金到账日**/
+		t.VDATE vdate,/**起息日**/
+		t.MDATE mdate,/**到期日**/
 		t.PRIN_AMT/10000 prinAmt, /**券面总额**/
 		null rebackPrice,  /**回购利率**/
-		t.INT_AMT intAmt,/**回购利息**/
+		t.FPRICE_AMT fprice, /**首次全价总额**/
 		t.FPRICE_AMT mfprice, /**到期全价总额**/
+		ttfd.FEE_AMT  brokerage,/**经手费**/
+        ttfd1.FEE_AMT  stlAmt,/**结算费**/
+        ttfd2.FEE_AMT  commission,/**佣金**/
+        ttfd3.FEE_AMT  dealFeeAmt,/**交易手续费**/
+        ttfd4.FEE_AMT  settFeeAmt,/**结算手续费**/
+        CASE WHEN ttfd.FEE_TYPE = 'B99' THEN ttfd.FEE_AMT ELSE 0 END as otherAmt,/**其他应付费用**/
 		stl.SETTLE_AMT settleAmt,/**结算金额**/
 		t.CCY ccy,/**币种**/
 		stl.MY_ACCT_NO trdAcctId/**资金账户**/
@@ -198,9 +206,14 @@
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal on deal.BUSI_NO = t.TRADE_ID
 		LEFT JOIN BOK_BOOKSET bok on bok.BOOKSET_ID = deal.BOOKSET_ID
 		LEFT JOIN MST_COUNTER_PARTY mst on mst.COUNTER_ID = t.COUNTER_ID
-		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE ='02'
+		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE ='05'
+		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd ON ttfd.TRADE_ID = t.TRADE_ID AND ttfd.FEE_TYPE = 'B01'
+        LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd1 ON ttfd1.TRADE_ID = t.TRADE_ID AND ttfd1.FEE_TYPE = 'B07'
+        LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd2 ON ttfd2.TRADE_ID = t.TRADE_ID AND ttfd2.FEE_TYPE = 'B05'
+        LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd3 ON ttfd3.TRADE_ID = t.TRADE_ID AND ttfd3.FEE_TYPE = 'B06'
+        LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd4 ON ttfd4.TRADE_ID = t.TRADE_ID AND ttfd4.FEE_TYPE = 'B08'
 		where
-		t.BUSI_TYPE ='02'
+		t.BUSI_TYPE ='05'
 		and t.TRADE_ID  = #{tradeId,jdbcType=VARCHAR}
 		and rownum=1
 	</select>

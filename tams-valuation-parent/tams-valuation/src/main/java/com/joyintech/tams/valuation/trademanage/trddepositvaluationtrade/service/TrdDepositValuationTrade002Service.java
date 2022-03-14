@@ -222,7 +222,8 @@ public class TrdDepositValuationTrade002Service extends CommonExportService<TrdD
         List<StlOrdersExt> listValOrdersExt = (List<StlOrdersExt>)map.get("listValOrdersExt");
         result.setListValOrders(listValOrders);
         result.setListValOrdersExt(listValOrdersExt);
-
+        // 添加日志
+        result.setValInterflog((List<ValInterflog>)map.get("valInterflogList"));
         TrdDepositValuationTradeResult rst = new TrdDepositValuationTradeResult(result);
         rst.setTrdDepositValuationTrade001Dto(dto);
 

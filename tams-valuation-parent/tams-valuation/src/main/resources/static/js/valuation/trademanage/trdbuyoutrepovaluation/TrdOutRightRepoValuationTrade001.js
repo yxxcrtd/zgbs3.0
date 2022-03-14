@@ -41,13 +41,25 @@
         },
 
         dblclick:function(table, data) {
-            Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
-                basePath + "valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade002/init",
-                "98%", "98%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
-                    portfolioId:data.portfolioId,
-                    entrustId:data.entrustId,
-                    finprodId:data.finprodId,
-                    tradeId:data.tradeId});
+            var ps=data.ps;
+            if(ps=="03" || ps=="04"){
+                Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+                    basePath + "valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade002/init",
+                    "98%", "98%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
+                        portfolioId:data.portfolioId,
+                        entrustId:data.entrustId,
+                        finprodId:data.finprodId,
+                        tradeId:data.tradeId});
+            }else { //展示到期确认页面
+                Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+                    basePath + "valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade003/init",
+                    "98%", "98%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
+                        portfolioId:data.portfolioId,
+                        entrustId:data.entrustId,
+                        finprodId:data.finprodId,
+                        tradeId:data.tradeId});
+            }
+
         },
 
         cols:[
@@ -75,11 +87,11 @@
             ,{field:'ccy', title: '币种',visible:false}
             ,{field:'trdAcctId', title: '资金账户',width:100}
             ,{field:'operation', title: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操 作', fixed:'right',width:'120',
-                align : 'center',type : 'action', buttons : [ 'edit', 'delt' ,'confirm'],
+                align : 'left',type : 'action', buttons : [ 'edit', 'delt' ,'confirm'],
                     // {text: '<i id="daoqi" class="iconfont icon-submit"></i>', clas: 'confirm', title: '到期'}],
             render: function (data, type, row, meta) {
                 if (row.ps == 'T07')
-                    return '<i class="btn layui-icon edit" title="编辑">&#xe642;</i><i class="btn layui-icon delt" title="删除">&#xe640;</i>';
+                    return null;
                 else
                     return '<i class="btn layui-icon edit" title="编辑">&#xe642;</i><i class="btn layui-icon delt" title="删除">&#xe640;</i><i class="btn layui-icon confirm" title="确认">&#x1005;</i>';
             }
