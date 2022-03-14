@@ -34,30 +34,82 @@ import java.util.List;
 public class TrdFundBonusValuationTradeDtoValidator implements BeanValidator {
 
     public List<ValidMessage> valid(Object value) {
-        List<ValidMessage> validMessageList = new ArrayList<ValidMessage>();
+        List<ValidMessage> resultList = new ArrayList<ValidMessage>();
         TrdFundBonusValuationTradeDto dto = (TrdFundBonusValuationTradeDto)value;
 
-        if(dto.getOperateType().equals("submit") || dto.getOperateType().equals("save")){
-            //分红金额 - 当交易类型为现金分红、红利再投时必填
-            if(StringUtil.isNotEmpty(dto.getPs()) && (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_现金分红.getValue())
-                    || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_红利再投.getValue()))  ){
-                if(dto.getBonusAmt() ==null){
-                    String msg = this.getMessage("当交易类型为现金分红、红利再投时,分红金额必填");
-                    validMessageList.add(new ValidMessage(msg));
+        if("delete".equals(dto.getOperateType())){
+
+        }else{
+            //交易类型为现金分红
+            if(DictCodeList.交易方向_现金分红.getValue().equals(dto.getPs())){
+                //交易日期
+                if(!StringUtil.isNotEmpty(dto.getTradeDate())){
+                    resultList.add(new ValidMessage("tradeDate",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdFundBonusValuationTrade002.tradeDate"))));
+                }
+                //结算金额
+                if(!StringUtil.isNotEmpty(dto.getSettleAmt())){
+                    resultList.add(new ValidMessage("settleAmt",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdFundBonusValuationTrade002.settleAmt"))));
+                }
+                //资金账户
+                if(!StringUtil.isNotEmpty(dto.getMyAcctNo())){
+                    resultList.add(new ValidMessage("myAcctNo",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdFundBonusValuationTrade002.myAcctNo"))));
+                }
+            }else if(DictCodeList.交易方向_红利再投.getValue().equals(dto.getPs())){
+                //交易日期
+                if(!StringUtil.isNotEmpty(dto.getTradeDate_hlzt())){
+                    resultList.add(new ValidMessage("tradeDate_hlzt",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdFundBonusValuationTrade002.tradeDate"))));
+                }
+                //分红金额
+                if(!StringUtil.isNotEmpty(dto.getBonusAmt_hlzt())){
+                    resultList.add(new ValidMessage("bonusAmt_hlzt",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdFundBonusValuationTrade002.bonusAmt"))));
+                }
+                //交易份额
+                if(!StringUtil.isNotEmpty(dto.getDealNum_hlzt())){
+                    resultList.add(new ValidMessage("dealNum_hlzt",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdFundBonusValuationTrade002.dealNum"))));
+                }
+                //单位分红净值
+                if(!StringUtil.isNotEmpty(dto.getUnitBonusUnitValue())){
+                    resultList.add(new ValidMessage("unitBonusUnitValue",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdFundBonusValuationTrade002.unitBonusUnitValue"))));
+                }
+                //结算金额
+                if(!StringUtil.isNotEmpty(dto.getSettleAmt_hlzt())){
+                    resultList.add(new ValidMessage("settleAmt_hlzt",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdFundBonusValuationTrade002.settleAmt_hlzt"))));
+                }
+                //资金账户
+                if(!StringUtil.isNotEmpty(dto.getMyAcctNo_hlzt())){
+                    resultList.add(new ValidMessage("myAcctNo_hlzt",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdFundBonusValuationTrade002.myAcctNo"))));
                 }
             }
-
-            //交易份额 - 当交易类型为红利再投、份额强增、份额强减时必填
-            if(StringUtil.isNotEmpty(dto.getPs()) && (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_红利再投.getValue())
-                    || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_份额强增.getValue())
-                    || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_份额强减.getValue()) )){
-                if(dto.getNums() ==null){
-                    String msg = this.getMessage("当交易类型为红利再投、份额强增、份额强减时，交易份额必填");
-                    validMessageList.add(new ValidMessage(msg));
+            //当交易类型为份额强增、份额强减
+           else if( DictCodeList.交易方向_份额强增.getValue().equals(dto.getPs())
+                    || DictCodeList.交易方向_份额强减.getValue().equals(dto.getPs())){
+                //交易日期
+                if(!StringUtil.isNotEmpty(dto.getTradeDate_share())){
+                    resultList.add(new ValidMessage("tradeDate_share",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdFundBonusValuationTrade002.tradeDate"))));
+                }
+                //分红金额
+                if(!StringUtil.isNotEmpty(dto.getDealNum_share())){
+                    resultList.add(new ValidMessage("dealNum_share",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdFundBonusValuationTrade002.dealNum"))));
+                }
+                //资金账户
+                if(!StringUtil.isNotEmpty(dto.getMyAcctNo_share())){
+                    resultList.add(new ValidMessage("myAcctNo_share",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdFundBonusValuationTrade002.myAcctNo"))));
                 }
             }
         }
-        return validMessageList;
+        return resultList;
     }
 
 }

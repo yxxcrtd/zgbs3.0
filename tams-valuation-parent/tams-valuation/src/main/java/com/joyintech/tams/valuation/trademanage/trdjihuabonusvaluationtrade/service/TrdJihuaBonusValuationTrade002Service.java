@@ -11,32 +11,24 @@
 package com.joyintech.tams.valuation.trademanage.trdjihuabonusvaluationtrade.service;
 
 import com.joyintech.framework.export.CommonExportService;
-import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 import com.joyintech.tams.valuation.common.interf.base.dto.FundDealInfoForInterfRecCommonResult;
-import com.joyintech.tams.valuation.common.interf.base.dto.PlanAssetCurrencyDealCommonResult;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.fund.FundBonusReinvestmentDealRecService;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.fund.FundCashDividendDealRecService;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.fund.FundShareConvertDealRecService;
-import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.pacd.CPlannedCashBonusDealTemplateRecService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValBonusResTrade;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValCashBonusTrade;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValFundShareConvert;
-import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValMngMnfCashBonusTrade;
-import com.joyintech.tams.valuation.trademanage.trdfundbonusvaluationtrade.dto.TrdFundBonusTradeResult;
 import com.joyintech.tams.valuation.trademanage.trdjihuabonusvaluationtrade.dto.TrdJihuaBonusTradeResult;
 import com.joyintech.tams.valuation.trademanage.trdjihuabonusvaluationtrade.dto.TrdJihuaBonusValuationTradeDto;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,44 +48,10 @@ import java.util.*;
 public class TrdJihuaBonusValuationTrade002Service extends CommonExportService<TrdJihuaBonusValuationTradeDto>
         implements BaseProcessService<TrdJihuaBonusValuationTradeDto> {
 
-    Logger logger = LoggerFactory.getLogger(this.getClass());
-
     @Autowired(required = false)
     private IPlatformDate iPlatformDate;
 
 
-
-    @Autowired
-    private FinProductMapper finProductMapper;
-    @Autowired
-    private WflStlPayOrdersMapper wflStlPayOrdersMapper;
-
-    @Autowired
-    private WflPaTrdProductDealMapper wflPaTrdProductDealMapper;
-    @Autowired
-    private WflTrdProductDealMapper wflTrdProductDealMapper;
-    @Autowired
-    private WflTrdProductDealAddMapper wflTrdProductDealAddMapper;
-    @Autowired
-    private RepTradeMapper repTradeMapper;
-    @Autowired
-    private RepAssetDeptMapper repAssetDeptMapper;
-
-    @Autowired
-    private TrdAsynHandleStatusMapper trdAsynHandleStatusMapper;
-
-    @Autowired
-    private FinProductTypeMapper finProductTypeMapper;
-
-
-    @Autowired
-    private PtlPortfolioMapper ptlPortfolioMapper;
-
-    @Autowired
-    private FinRateInfoMapper finRateInfoMapper;
-
-    @Autowired
-    private CPlannedCashBonusDealTemplateRecService cPlannedCashBonusDealTemplateRecService;
     @Autowired
     private FundBonusReinvestmentDealRecService fundBonusReinvestmentDealRecService;
 
@@ -102,24 +60,6 @@ public class TrdJihuaBonusValuationTrade002Service extends CommonExportService<T
 
     @Autowired
     private FundCashDividendDealRecService fundCashDividendDealRecService;
-
-
-    /**
-     * 合成初始化实体类
-     *
-     * @param tradeId 交易编号
-     * @return 基金实体类
-     * @see
-     * @since 1.0
-     */
-    public TrdJihuaBonusValuationTradeDto getInitEntity(String tradeId) {
-        TrdJihuaBonusValuationTradeDto entity = new TrdJihuaBonusValuationTradeDto();
-        TrdProductDeal trdProductDeal = null;
-        TrdProductDealAdd trdProductDealAdd = null;
-        String finprodId = null;
-        FinProduct finProduct = null;
-        return entity;
-    }
 
     /**
      * {@inheritDoc}
@@ -137,32 +77,6 @@ public class TrdJihuaBonusValuationTrade002Service extends CommonExportService<T
         }
 
         restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdJihuaBonusValuationTrade/" + action, trdJihuaBonusTradeResult, Integer.class);
-    }
-
-    /**
-     * 产品代码下拉框
-     * @auther: Administrator
-     * @date: 2021/12/29 17:10
-     * @param:
-     * @return:
-     */
-    public Page<SelectOptionDto> findPortfolioId(Map<String, Object> params) {
-        return restTemplate.postForPage(
-                ServiceApplication.VALUATION_SERVICE_NAME + "/TrdJihuaBonusValuationTrade/findPortfolioId",
-                params, SelectOptionDto.class);
-    }
-
-    /**
-     * 资产代码下拉框
-     * @auther: Administrator
-     * @date: 2021/12/29 17:10
-     * @param:
-     * @return:
-     */
-    public Page<SelectOptionDto> findFinprodId(Map<String, Object> params) {
-        return restTemplate.postForPage(
-                ServiceApplication.VALUATION_SERVICE_NAME + "/TrdJihuaBonusValuationTrade/findFinprodId",
-                params, SelectOptionDto.class);
     }
 
     public List<SelectOptionDto> getTrdAcctId(Map<String, Object> param) {
@@ -206,7 +120,7 @@ public class TrdJihuaBonusValuationTrade002Service extends CommonExportService<T
                 //设置接口参数
                 Map<String, Object> params = new HashMap<>();
                 List<String> prodIds = new ArrayList<>();
-                prodIds.add(trdJihuaBonusValuationTradeDto.getPortfolioId());
+                prodIds.add(trdJihuaBonusValuationTradeDto.getProdId());
                 params.put("INTERF_BOOKSETID", prodIds);
                 params.put("VAL_MODEL", "INTERF_MODEL_SINGLE");
 
@@ -214,7 +128,7 @@ public class TrdJihuaBonusValuationTrade002Service extends CommonExportService<T
                 ValCashBonusTrade valCashBonusTrade = new ValCashBonusTrade();
                 BeanUtil.copyPropertiesIgnoreNull(valCashBonusTrade, trdJihuaBonusValuationTradeDto);
                 //比较界面和接口字段差异，并手动给接口字段赋值
-                valCashBonusTrade.setAssetId("F06_" + trdJihuaBonusValuationTradeDto.getFinprodId());//资产代码  F06基金
+                valCashBonusTrade.setAssetId("F06_" + trdJihuaBonusValuationTradeDto.getAssetId());//资产代码  F06基金
                 valCashBonusTrade.setDataActionSign("01");
                 valCashBonusTrade.setIsChlFeeAmt("Y");
                 valCashBonusTrade.setIsClean("N");
@@ -257,7 +171,7 @@ public class TrdJihuaBonusValuationTrade002Service extends CommonExportService<T
                 //设置接口参数
                 Map<String, Object> params = new HashMap<>();
                 List<String> prodIds = new ArrayList<>();
-                prodIds.add(trdJihuaBonusValuationTradeDto.getPortfolioId());
+                prodIds.add(trdJihuaBonusValuationTradeDto.getProdId());
                 params.put("INTERF_BOOKSETID", prodIds);
                 params.put("VAL_MODEL", "INTERF_MODEL_SINGLE");
 
@@ -265,7 +179,7 @@ public class TrdJihuaBonusValuationTrade002Service extends CommonExportService<T
                 ValBonusResTrade valBonusResTrade = new ValBonusResTrade();
                 BeanUtil.copyPropertiesIgnoreNull(valBonusResTrade, trdJihuaBonusValuationTradeDto);
                 //比较界面和接口字段差异，并手动给接口字段赋值
-                valBonusResTrade.setAssetId("F06_" + trdJihuaBonusValuationTradeDto.getFinprodId());//资产代码  F06基金
+                valBonusResTrade.setAssetId("F06_" + trdJihuaBonusValuationTradeDto.getAssetId());//资产代码  F06基金
                 valBonusResTrade.setDataActionSign("01");
                 valBonusResTrade.setIsClean("N");
 
@@ -308,7 +222,7 @@ public class TrdJihuaBonusValuationTrade002Service extends CommonExportService<T
                 //设置接口参数
                 Map<String, Object> params = new HashMap<>();
                 List<String> prodIds = new ArrayList<>();
-                prodIds.add(trdJihuaBonusValuationTradeDto.getPortfolioId());
+                prodIds.add(trdJihuaBonusValuationTradeDto.getProdId());
                 params.put("INTERF_BOOKSETID", prodIds);
                 params.put("VAL_MODEL", "INTERF_MODEL_SINGLE");
 
@@ -316,7 +230,7 @@ public class TrdJihuaBonusValuationTrade002Service extends CommonExportService<T
                 ValFundShareConvert valFundShareConvert = new ValFundShareConvert();
                 BeanUtil.copyPropertiesIgnoreNull(valFundShareConvert, trdJihuaBonusValuationTradeDto);
                 //比较界面和接口字段差异，并手动给接口字段赋值
-                valFundShareConvert.setAssetId("F06_" + trdJihuaBonusValuationTradeDto.getFinprodId());//资产代码  F06基金
+                valFundShareConvert.setAssetId("F06_" + trdJihuaBonusValuationTradeDto.getAssetId());//资产代码  F06基金
                 valFundShareConvert.setDataActionSign("01");
                 valFundShareConvert.setIsClean("N");
 

@@ -14,12 +14,12 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.system.constant.SystemGlobalConstant;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.valuation.common.service.MstWorkflowCommonService;
+import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.trdjihuabonusvaluationtrade.dto.TrdJihuaBonusValuationTradeDto;
 import com.joyintech.tams.valuation.trademanage.trdjihuabonusvaluationtrade.service.TrdJihuaBonusValuationTrade001Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -37,7 +37,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Description:计划类资产存续期查询
@@ -56,20 +58,46 @@ public class TrdJihuaBonusValuationTrade001Controller extends BaseController {
     @Autowired
     private TrdJihuaBonusValuationTrade001Service trdJihuaBonusValuationTrade001Service;
 
-    /**
-     * 流程组件
-     */
     @Autowired
-    private MstWorkflowCommonService mstWorkflowCommonService;
+    private CommonBusinessService commonBusinessService;
+
     /**
      * 初始化方法
      */
     @Override
     public String init(Model model) {
         this.setSelectOptionToModel(model, DictCode.交易方向,DictCode.交易场所);
-        model.addAttribute("TRADE_STATUS", DictCodeListExt1.交易流程状态_有效.getValue());
-        model.addAttribute("isShowType", CacheUtil.getSysParam("IS_SHOW_TYPE")==null?"01": CacheUtil.getSysParam("IS_SHOW_TYPE"));
         return super.init(model);
+    }
+
+    /**
+     * 产品代码下拉框
+     *
+     * @return 产品代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getFinprodId")
+    public List<SelectOptionDto> getFinprodId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("finprodType","F16");
+        return commonBusinessService.getProdName(param);
+    }
+
+    /**
+     * 资产代码下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getAssetId")
+    public List<SelectOptionDto> getAssetId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("assetType","F17");
+        return commonBusinessService.getAssetName(param);
     }
 
 
@@ -109,7 +137,7 @@ public class TrdJihuaBonusValuationTrade001Controller extends BaseController {
             listdto = JsonUtils.json2List(datas, TrdJihuaBonusValuationTradeDto.class);
         }
         File outFile = trdJihuaBonusValuationTrade001Service.makeFile(
-                "/com/joyintech/tams/valuation/trademanage/trdjihuabonusvaluationtrade/conf/export_Jihuabonusvaluationtrade.xml",
+                "/com/joyintech/tams/valuation/trademanage/trdjihuabonusvaluationtrade/conf/export.xml",
                 listdto);
         return ExportUtil.export(
                 this.getMessage(this.getPageId()) + SystemGlobalConstant.OPEN_PARENTHESIS

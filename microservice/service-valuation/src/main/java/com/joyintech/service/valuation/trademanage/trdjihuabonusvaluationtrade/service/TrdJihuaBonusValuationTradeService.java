@@ -10,11 +10,9 @@
  
 package com.joyintech.service.valuation.trademanage.trdjihuabonusvaluationtrade.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.joyintech.framework.export.CommonExportService;
+import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.valuation.trademanage.bond.dao.TrdBondTradeMapper;
@@ -30,9 +28,10 @@ import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.joyintech.framework.export.CommonExportService;
-import com.joyintech.framework.grid.Page;
-import com.joyintech.framework.select.SelectOptionDto;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -456,7 +455,7 @@ public class TrdJihuaBonusValuationTradeService extends CommonExportService<TrdJ
 
     public int update(TrdJihuaBonusTradeResult dto){
         TrdJihuaBonusValuationTradeDto dto1 = new TrdJihuaBonusValuationTradeDto();
-        dto1.setFinprodId(dto.getTrdJihuaBonusValuationTradeDto().getPortfolioId());
+        dto1.setProdId(dto.getTrdJihuaBonusValuationTradeDto().getProdId());
         dto1.setTradeId(dto.getTrdJihuaBonusValuationTradeDto().getTradeId());
         delete(dto1);
         return insert(dto);
@@ -465,7 +464,7 @@ public class TrdJihuaBonusValuationTradeService extends CommonExportService<TrdJ
     public int delete(TrdJihuaBonusValuationTradeDto dto) {
         int count=0;
         Map<String, Object> params = new HashMap<>();
-        params.put("booksetId",dto.getFinprodId());
+        params.put("booksetId",dto.getProdId());
         params.put("tradeId",dto.getTradeId());
 
         List<TrdProductDeal> listDeal = new ArrayList<>();

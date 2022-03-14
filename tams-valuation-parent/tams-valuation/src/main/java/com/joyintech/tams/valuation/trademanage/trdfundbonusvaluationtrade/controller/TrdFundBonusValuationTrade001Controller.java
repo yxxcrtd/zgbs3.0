@@ -11,15 +11,16 @@
 package com.joyintech.tams.valuation.trademanage.trdfundbonusvaluationtrade.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.system.constant.SystemGlobalConstant;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.valuation.common.service.MstWorkflowCommonService;
+import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.trdfundbonusvaluationtrade.dto.TrdFundBonusValuationTradeDto;
 import com.joyintech.tams.valuation.trademanage.trdfundbonusvaluationtrade.service.TrdFundBonusValuationTrade001Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -37,7 +38,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Description:基金存续期查询
@@ -56,20 +60,46 @@ public class TrdFundBonusValuationTrade001Controller extends BaseController {
     @Autowired
     private TrdFundBonusValuationTrade001Service trdFundBonusValuationTrade001Service;
 
-    /**
-     * 流程组件
-     */
     @Autowired
-    private MstWorkflowCommonService mstWorkflowCommonService;
+    private CommonBusinessService commonBusinessService;
+
     /**
      * 初始化方法
      */
     @Override
     public String init(Model model) {
         this.setSelectOptionToModel(model, DictCode.交易方向,DictCode.交易场所);
-        model.addAttribute("TRADE_STATUS", DictCodeListExt1.交易流程状态_有效.getValue());
-        model.addAttribute("isShowType", CacheUtil.getSysParam("IS_SHOW_TYPE")==null?"01": CacheUtil.getSysParam("IS_SHOW_TYPE"));
         return super.init(model);
+    }
+
+    /**
+     * 产品代码下拉框
+     *
+     * @return 产品代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getFinprodId")
+    public List<SelectOptionDto> getFinprodId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("finprodType","F16");
+        return commonBusinessService.getProdName(param);
+    }
+
+    /**
+     * 资产代码下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getAssetId")
+    public List<SelectOptionDto> getAssetId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("assetType","F06");
+        return commonBusinessService.getAssetName(param);
     }
 
 
@@ -109,7 +139,7 @@ public class TrdFundBonusValuationTrade001Controller extends BaseController {
             listdto = JsonUtils.json2List(datas, TrdFundBonusValuationTradeDto.class);
         }
         File outFile = trdFundBonusValuationTrade001Service.makeFile(
-                "/com/joyintech/tams/valuation/trademanage/trdfundbonusvaluationtrade/conf/export_fundbonusvaluationtrade.xml",
+                "/com/joyintech/tams/valuation/trademanage/trdfundbonusvaluationtrade/conf/export.xml",
                 listdto);
         return ExportUtil.export(
                 this.getMessage(this.getPageId()) + SystemGlobalConstant.OPEN_PARENTHESIS
@@ -118,6 +148,46 @@ public class TrdFundBonusValuationTrade001Controller extends BaseController {
                         + SystemGlobalConstant.POINT
                         + FileNameUtil.getFileExtName(outFile),
                 outFile, true);
+    }
+
+    /**
+     * 删除前判断
+     *
+     * @param dto
+     * @param result
+     * @return
+     * @throws Exception
+     */
+    @ResponseBody
+    @RequestMapping("check")
+    public AjaxResult check(@RequestBody @Valid TrdFundBonusValuationTradeDto dto,
+                            BindingResult result) throws ParseException {
+
+        List<TrdFundBonusValuationTradeDto> list = dto.getSelectedItem();
+        if(list==null||list.size()<=0){
+            return new AjaxResult("请选择数据", MessageType.错误消息);
+        }
+        //删除时的校验
+        if(StringUtil.isNotEmpty(list) && "delete".equals(dto.getOperateType())) {
+            for (TrdFundBonusValuationTradeDto item : list) {
+                //1.判断是否在流程中
+                //判断当前流程是否存在
+                if (trdFundBonusValuationTrade001Service.checkBusinessDataInFlow(item)) {
+                    //流程存在情况
+                    return new AjaxResult("交易编号：" + item.getTradeId() + "已存在流程中", MessageType.错误消息);
+                }
+            }
+        }else if("edit".equals(dto.getOperateType())){
+            for (TrdFundBonusValuationTradeDto item : list) {
+                //1.判断是否在流程中
+                //判断当前流程是否存在
+                if(trdFundBonusValuationTrade001Service.checkBusinessDataInFlow(item)){
+                    //流程存在情况
+                    return new AjaxResult("交易编号："+item.getTradeId()+"已存在流程中", MessageType.错误消息);
+                }
+            }
+        }
+        return new AjaxResult();
     }
 
     @ResponseBody
@@ -134,9 +204,9 @@ public class TrdFundBonusValuationTrade001Controller extends BaseController {
         // 业务代码（凭证流水号）
         params.setBusinessCode(item -> item.getTradeId());
         // 业务类型
-        params.setBusinessType(DictCodeList.业务类型_银行间债券交易.getValue());
+        params.setBusinessType(DictCodeList.共通业务类型_基金类资产交易.getValue());
         // 页面id
-        params.setPageId("TrdFundBonusValuationTrade001");
+        params.setPageId("TrdFundBonusValuationTrade002");
         // 元素id
         params.setElementId(dto.getElementId());
 

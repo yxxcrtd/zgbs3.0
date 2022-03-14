@@ -1,70 +1,49 @@
 
 (function () {
 
-    $('#portfolioId').change(function(){
-        var portfolioId = $('#portfolioId').val();
-        if(portfolioId){
-            var dataPort = $('#portfolioId').select2('data')[0].object;
-            var finprodId = dataPort.finprodId;
-            $('#portfolioName').val(finprodId).trigger('change');
+    $('#prodId').change(function(){
+        var prodId = $('#prodId').val();
+        if(prodId){
+            $('#prodName').val($('#prodId').select2('data')[0].id).trigger('change');
 
         }else {
-            $('#portfolioName').val('').trigger('change');
+            $('#prodName').val('').trigger('change');
         }
     });
 
-    $('#finprodId').change(function(){
-        var finprodId = $('#finprodId').val();
-        if(finprodId){
-            var dataPort = $('#finprodId').select2('data')[0].object;
-            var finprodId = dataPort.finprodId;
+    $('#assetId').change(function(){
+        var assetId = $('#assetId').val();
+        if(assetId){
+            var dataPort = $('#assetId').select2('data')[0].object;
             var tradeMarket = dataPort.tradeMarket;
-            $('#finprodName').val(finprodId).trigger('change');
+            $('#assetAbbr').val($('#assetId').select2('data')[0].id).trigger('change');
             $('#tradeMarket').val(tradeMarket).trigger('change');
+
         }else {
-            $('#finprodName').val('').trigger('change');
+            $('#assetAbbr').val('').trigger('change');
             $('#tradeMarket').val('').trigger('change');
         }
     });
 
-    //分红金额 联动
-    $('#bonusAmt').change(function(){
-        //单位分红净值计算
-        unitValueCalculate();
-        //结算金额计算
-        mdateSettleAmtCalculate();
+    $('#ps').change(function(){
+        psChange();
     });
 
-    //交易份额 联动
-    $('#nums').change(function(){
-        //单位分红净值计算
-        unitValueCalculate();
-    });
-
-    //其他费用 联动
-    $('#feeAmtQT').change(function(){
-        //结算金额计算
-        mdateSettleAmtCalculate();
-    });
-
-    /**
-     * 单位分红净值计算
-     */
-    var unitValueCalculate = function(){
-        if($('#bonusAmt').val() && $('#bonusAmt').val() != null && $('#bonusAmt').val() != ''
-                && $('#nums').val() && $('#nums').val() != null && $('#nums').val() != '' && $('#confirmNums').val() !=0){
-            var unitCprice = JoyinMath.doDiv($('#bonusAmt').val(), $('#nums').val(), 2);
-            $('#unitCprice').val(unitCprice)
-        }else{
-            $('#unitValue').val('')
+    var psChange = function () {
+        var ps = $('#ps').val();
+        //现金分红 T11、红利再投 T12、份额强增 C3、份额强减 C6
+        if(ps == 'T11' ){ //现金分红
+            $('#xjfh').show();
+            $('#hlzt').hide();
+        }else if(ps == 'T12'){ //红利再投
+            $('#xjfh').hide();
+            $('#hlzt').show();
+        }else{//默认
+            $('#xjfh').hide();
+            $('#hlzt').hide();
         }
-    }
+    };
 
-    //结算金额计算=分红金额+其他费用，可修改
-    var mdateSettleAmtCalculate = function(){
-        var mdateSettleAmtTotal = JoyinMath.doAdd($('#bonusAmt').val(),$('#feeAmtQT').val(),2);
-        $('#mdateSettleAmt').val(mdateSettleAmtTotal);
-    }
 
     /**
      * 保存或提交
@@ -89,17 +68,15 @@
 
         });
     }
-    /**
-     * 界面初始化
-     * @returns
-     */
-    function init(){
-    }
+
     /**
      * 画面加载完成
      */
     $(function() {
-        // init();
+        if(workflowId){
+            psChange();
+        }
+
         //保存
         $('#TrdJihuaBonusValuationTrade002_btn_save').click(function() {
             saveOrSubmit('save');

@@ -11,31 +11,23 @@
 package com.joyintech.tams.valuation.trademanage.trdfundbonusvaluationtrade.service;
 
 import com.joyintech.framework.export.CommonExportService;
-import com.joyintech.framework.grid.Page;
-import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 import com.joyintech.tams.valuation.common.interf.base.dto.FundDealInfoForInterfRecCommonResult;
-import com.joyintech.tams.valuation.common.interf.base.dto.PlanAssetCurrencyDealCommonResult;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.fund.FundBonusReinvestmentDealRecService;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.fund.FundCashDividendDealRecService;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.fund.FundShareConvertDealRecService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValBonusResTrade;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValCashBonusTrade;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValFundShareConvert;
-import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValMngMnfTade;
 import com.joyintech.tams.valuation.trademanage.trdfundbonusvaluationtrade.dto.TrdFundBonusTradeResult;
 import com.joyintech.tams.valuation.trademanage.trdfundbonusvaluationtrade.dto.TrdFundBonusValuationTradeDto;
-import com.joyintech.tams.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanTradeResult;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,41 +47,8 @@ import java.util.*;
 public class TrdFundBonusValuationTrade002Service extends CommonExportService<TrdFundBonusValuationTradeDto>
         implements BaseProcessService<TrdFundBonusValuationTradeDto> {
 
-    Logger logger = LoggerFactory.getLogger(this.getClass());
-
     @Autowired(required = false)
     private IPlatformDate iPlatformDate;
-
-
-
-    @Autowired
-    private FinProductMapper finProductMapper;
-    @Autowired
-    private WflStlPayOrdersMapper wflStlPayOrdersMapper;
-
-    @Autowired
-    private WflPaTrdProductDealMapper wflPaTrdProductDealMapper;
-    @Autowired
-    private WflTrdProductDealMapper wflTrdProductDealMapper;
-    @Autowired
-    private WflTrdProductDealAddMapper wflTrdProductDealAddMapper;
-    @Autowired
-    private RepTradeMapper repTradeMapper;
-    @Autowired
-    private RepAssetDeptMapper repAssetDeptMapper;
-
-    @Autowired
-    private TrdAsynHandleStatusMapper trdAsynHandleStatusMapper;
-
-    @Autowired
-    private FinProductTypeMapper finProductTypeMapper;
-
-
-    @Autowired
-    private PtlPortfolioMapper ptlPortfolioMapper;
-
-    @Autowired
-    private FinRateInfoMapper finRateInfoMapper;
 
     @Autowired
     private FundCashDividendDealRecService fundCashDividendDealRecService;
@@ -100,23 +59,6 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
     @Autowired
     private FundShareConvertDealRecService fundShareConvertDealRecService;
 
-
-    /**
-     * 合成初始化实体类
-     *
-     * @param tradeId 交易编号
-     * @return 基金实体类
-     * @see
-     * @since 1.0
-     */
-    public TrdFundBonusValuationTradeDto getInitEntity(String tradeId) {
-        TrdFundBonusValuationTradeDto entity = new TrdFundBonusValuationTradeDto();
-        TrdProductDeal trdProductDeal = null;
-        TrdProductDealAdd trdProductDealAdd = null;
-        String finprodId = null;
-        FinProduct finProduct = null;
-        return entity;
-    }
 
     /**
      * {@inheritDoc}
@@ -136,37 +78,6 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
         restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdFundBonusValuationTrade/" + action, trdFundBonusTradeResult, Integer.class);
     }
 
-    /**
-     * 产品代码下拉框
-     * @auther: Administrator
-     * @date: 2021/12/29 17:10
-     * @param:
-     * @return:
-     */
-    public Page<SelectOptionDto> findPortfolioId(Map<String, Object> params) {
-        return restTemplate.postForPage(
-                ServiceApplication.VALUATION_SERVICE_NAME + "/TrdFundBonusValuationTrade/findPortfolioId",
-                params, SelectOptionDto.class);
-    }
-
-    /**
-     * 资产代码下拉框
-     * @auther: Administrator
-     * @date: 2021/12/29 17:10
-     * @param:
-     * @return:
-     */
-    public Page<SelectOptionDto> findFinprodId(Map<String, Object> params) {
-        return restTemplate.postForPage(
-                ServiceApplication.VALUATION_SERVICE_NAME + "/TrdFundBonusValuationTrade/findFinprodId",
-                params, SelectOptionDto.class);
-    }
-
-    public List<SelectOptionDto> getTrdAcctId(Map<String, Object> param) {
-        return restTemplate.postForList(
-                ServiceApplication.VALUATION_SERVICE_NAME + "/TrdFundBonusValuationTrade/getTrdAcctId", param,
-                SelectOptionDto.class);
-    }
 
     /**
      * 策略代码生成
@@ -203,7 +114,7 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
                 //设置接口参数
                 Map<String, Object> params = new HashMap<>();
                 List<String> prodIds = new ArrayList<>();
-                prodIds.add(trdFundBonusValuationTradeDto.getPortfolioId());
+                prodIds.add(trdFundBonusValuationTradeDto.getProdId());
                 params.put("INTERF_BOOKSETID", prodIds);
                 params.put("VAL_MODEL", "INTERF_MODEL_SINGLE");
 
@@ -249,7 +160,7 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
                 //设置接口参数
                 Map<String, Object> params = new HashMap<>();
                 List<String> prodIds = new ArrayList<>();
-                prodIds.add(trdFundBonusValuationTradeDto.getPortfolioId());
+                prodIds.add(trdFundBonusValuationTradeDto.getProdId());
                 params.put("INTERF_BOOKSETID", prodIds);
                 params.put("VAL_MODEL", "INTERF_MODEL_SINGLE");
 
@@ -296,7 +207,7 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
                 //设置接口参数
                 Map<String, Object> params = new HashMap<>();
                 List<String> prodIds = new ArrayList<>();
-                prodIds.add(trdFundBonusValuationTradeDto.getPortfolioId());
+                prodIds.add(trdFundBonusValuationTradeDto.getProdId());
                 params.put("INTERF_BOOKSETID", prodIds);
                 params.put("VAL_MODEL", "INTERF_MODEL_SINGLE");
 
@@ -365,10 +276,13 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
         //相同字段名： 成交编号、交易方向、交易场所、币种
         BeanUtil.copyPropertiesIgnoreNull(valCashBonusTrade, dto);
         //比较界面和接口字段差异，并手动给接口字段赋值
-        valCashBonusTrade.setAssetId("F01_" + dto.getFinprodId());//资产代码
-        valCashBonusTrade.setDataActionSign("01");
-        valCashBonusTrade.setIsChlFeeAmt("Y");
-        valCashBonusTrade.setIsClean("N");
+        valCashBonusTrade.setAssetId("F06_" + dto.getAssetId());//资产代码
+        valCashBonusTrade.setAssetName(dto.getAssetAbbr());//资产名称
+        valCashBonusTrade.setBonusDate(dto.getTradeDate());//分红日
+        valCashBonusTrade.setActBounsAmt(dto.getBonusAmt());//实际分红金额
+        valCashBonusTrade.setDataActionSign("01");//数据动作标志
+        valCashBonusTrade.setIsClean("N");//有无清算指令
+        //valCashBonusTrade.setMdate();//分红截止日
 
         return valCashBonusTrade;
     }
@@ -382,7 +296,13 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
     public ValBonusResTrade dealBean(ValBonusResTrade valBonusResTrade,TrdFundBonusValuationTradeDto dto){
         //相同字段名： 成交编号、交易方向、交易场所、币种
         BeanUtil.copyPropertiesIgnoreNull(valBonusResTrade, dto);
-        valBonusResTrade.setAssetId("F01_" + dto.getFinprodId());//资产代码
+        valBonusResTrade.setAssetId("F06_" + dto.getAssetId());//资产代码
+        valBonusResTrade.setAssetName(dto.getAssetAbbr());//资产名称
+        valBonusResTrade.setBonusAmt(dto.getBonusAmt_hlzt());//红利再投金额
+        valBonusResTrade.setBonusDate(dto.getTradeDate_hlzt());//红利再投日
+        valBonusResTrade.setBonusNet(dto.getUnitBonusUnitValue());//红利再投净值
+        valBonusResTrade.setBonusShare(dto.getDealNum_hlzt());//红利再投份额
+
         valBonusResTrade.setDataActionSign("01");
         valBonusResTrade.setIsClean("N");
 
@@ -398,9 +318,13 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
     public ValFundShareConvert dealBean(ValFundShareConvert valFundShareConvert,TrdFundBonusValuationTradeDto dto){
         //相同字段名： 成交编号、交易方向、交易场所、币种
         BeanUtil.copyPropertiesIgnoreNull(valFundShareConvert, dto);
-        valFundShareConvert.setAssetId("F01_" + dto.getFinprodId());//资产代码
+        valFundShareConvert.setAssetId("F06_" + dto.getAssetId());//资产代码
+        valFundShareConvert.setAssetName(dto.getAssetAbbr());//资产名称
+        valFundShareConvert.setTradeDate(dto.getTradeDate_share());//交易日期
+        valFundShareConvert.setCfmShare(dto.getDealNum_share());//交易份额
+        valFundShareConvert.setBusiType("06");//业务类型
         valFundShareConvert.setDataActionSign("01");
-        valFundShareConvert.setIsClean("N");
+        valFundShareConvert.setIsClean("N");//有无清算指令
 
         return valFundShareConvert;
     }
