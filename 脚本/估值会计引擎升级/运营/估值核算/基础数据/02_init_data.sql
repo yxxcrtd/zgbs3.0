@@ -4961,3 +4961,11 @@ insert into BOK_SCENESUBJECT (BOOKSET_ID, SCENE_NODE_ID, SUBJECT_NO, CD_FLAG, FO
 
 
 --------------------------------------add by dzh on 20220315：会计分录初始化数据 end--------------------------------
+--------------------------------------add by dzh on 20220315：更新科目性质 start--------------------------------
+update BOK_SUBJECT set SUBJECT_TYPE ='01' where substr(SUBJECT_NO,1,1) ='1';
+update BOK_SUBJECT set SUBJECT_TYPE ='02' where substr(SUBJECT_NO,1,1) ='2';
+update BOK_SUBJECT set SUBJECT_TYPE ='03' where substr(SUBJECT_NO,1,1) ='3';
+update BOK_SUBJECT set SUBJECT_TYPE ='04' where substr(SUBJECT_NO,1,1) ='4';
+update BOK_SUBJECT set SUBJECT_TYPE ='05' where substr(SUBJECT_NO,1,1) ='6';
+update BOK_SUBJECT set SUBJECT_TYPE ='06' where substr(SUBJECT_NO,1,1) ='7';
+--------------------------------------add by dzh on 20220315：更新科目性质 end--------------------------------
