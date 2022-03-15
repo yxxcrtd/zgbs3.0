@@ -139,6 +139,11 @@
 			LEFT JOIN SYS_BATCH_TASK bt on bt.task_id = E.task_id
 	
 			LEFT JOIN BOK_BOOKSET F ON F.BOOKSET_ID = A.BOOKSET_ID
+
+			/** ADD BY weipeng ON 20220314 FOR 估值核算系统BS3.0-会计引擎升级 start  **/
+			LEFT JOIN FIN_PRODUCT_TYPE finType
+				ON finType.FINPROD_ID = C.BUSI_ID
+			/** ADD BY weipeng ON 20220314 FOR 估值核算系统BS3.0-会计引擎升级 end  **/
 			
 			WHERE 1=1
 			AND (E.HAPPEN_DATE <![CDATA[ < ]]> A.HAPPEN_DATE
@@ -150,6 +155,16 @@
 			AND A.HAPPEN_DATE = #{HAPPEN_DATE}
 			AND A.TASK_ID = #{taskId}
 			AND A.IS_SUB_BOOKSET = #{IS_SUB_BOOKSET}
+
+			/** ADD BY weipeng ON 20220314 FOR 估值核算系统BS3.0-会计引擎升级 start  **/
+			<if test="secTypeList != null and secTypeList.size > 0">
+				AND finType.TYPE_18 IN
+				<foreach collection="secTypeList" item="item" open="( " close=" )" separator=",">
+					#{item}
+				</foreach>
+			</if>
+			/** ADD BY weipeng ON 20220314 FOR 估值核算系统BS3.0-会计引擎升级 end  **/
+
 			ORDER BY
 			E.BOOKSET_ID,
 			C.BUSI_ID,

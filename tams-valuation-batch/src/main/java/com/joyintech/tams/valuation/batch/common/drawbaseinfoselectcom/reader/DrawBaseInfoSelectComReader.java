@@ -87,11 +87,11 @@ public class DrawBaseInfoSelectComReader extends BaseReader<DrawBaseInfoSelectCo
         // 获取reader返回值
         if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
             listDrawBaseInfoSelectComResult = drawBaseInfoSelectComReaderNewService.execute(
-                    serviceParamMap);
+                this.getParams());
         }
         else{
             listDrawBaseInfoSelectComResult = drawBaseInfoSelectComReaderService.execute(
-                serviceParamMap);
+                this.getParams());
         }
 
 //        logger.error("【调查】计提Reader:[name = " + this.getBatchTask().getBeanName() + "| id="

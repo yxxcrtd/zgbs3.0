@@ -10,9 +10,11 @@
 
 package com.joyintech.tams.valuation.batch.secabscalbook.runner;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.joyintech.tams.constant.DictCodeListExt1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
@@ -88,6 +90,10 @@ public class SecAbsCalBookTask extends BatchBaseService {
         
         // 设置此task的序列任务公用的params参数
         Map<String, Object> params = new HashMap<>();
+
+        /** ADD BY weipeng ON 20220314 科目性质合并，共通reader区分资产类型 start  **/
+        params.put("secTypeList", Arrays.asList(DictCodeListExt1.证券品种_债券.getValue()));
+        /** ADD BY weipeng ON 20220314 科目性质合并，共通reader区分资产类型 end  **/
 
         // 各步骤设置参数
         step1Reader.setParams(params);
