@@ -11,6 +11,7 @@
 package com.joyintech.tams.valuation.trademanage.trdjihuabonusvaluationtrade.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
@@ -37,6 +38,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -148,6 +150,46 @@ public class TrdJihuaBonusValuationTrade001Controller extends BaseController {
                 outFile, true);
     }
 
+    /**
+     * 删除前判断
+     *
+     * @param dto
+     * @param result
+     * @return
+     * @throws Exception
+     */
+    @ResponseBody
+    @RequestMapping("check")
+    public AjaxResult check(@RequestBody @Valid TrdJihuaBonusValuationTradeDto dto,
+                            BindingResult result) throws ParseException {
+
+        List<TrdJihuaBonusValuationTradeDto> list = dto.getSelectedItem();
+        if(list==null||list.size()<=0){
+            return new AjaxResult("请选择数据", MessageType.错误消息);
+        }
+        //删除时的校验
+        if(StringUtil.isNotEmpty(list) && "delete".equals(dto.getOperateType())) {
+            for (TrdJihuaBonusValuationTradeDto item : list) {
+                //1.判断是否在流程中
+                //判断当前流程是否存在
+                if (trdJihuaBonusValuationTrade001Service.checkBusinessDataInFlow(item)) {
+                    //流程存在情况
+                    return new AjaxResult("交易编号：" + item.getTradeId() + "已存在流程中", MessageType.错误消息);
+                }
+            }
+        }else if("edit".equals(dto.getOperateType())){
+            for (TrdJihuaBonusValuationTradeDto item : list) {
+                //1.判断是否在流程中
+                //判断当前流程是否存在
+                if(trdJihuaBonusValuationTrade001Service.checkBusinessDataInFlow(item)){
+                    //流程存在情况
+                    return new AjaxResult("交易编号："+item.getTradeId()+"已存在流程中", MessageType.错误消息);
+                }
+            }
+        }
+        return new AjaxResult();
+    }
+
     @ResponseBody
     @RequestMapping(ACTION_DELETE)
     public AjaxResult delete(@RequestBody @Valid TrdJihuaBonusValuationTradeDto dto, BindingResult br)
@@ -162,14 +204,14 @@ public class TrdJihuaBonusValuationTrade001Controller extends BaseController {
         // 业务代码（凭证流水号）
         params.setBusinessCode(item -> item.getTradeId());
         // 业务类型
-        params.setBusinessType(DictCodeList.业务类型_银行间债券交易.getValue());
+        params.setBusinessType(DictCodeList.共通业务类型_计划类资产_净值型_存续期.getValue());
         // 页面id
-        params.setPageId("TrdJihuaBonusValuationTrade001");
+        params.setPageId("TrdJihuaBonusValuationTrade002");
         // 元素id
         params.setElementId(dto.getElementId());
 
         // 设置流程业务说明, entity即传入的dto
-        params.setComment(entity -> WorkFlowUtil.concatComment("基金交易查询删除：", entity.getTradeId(),
+        params.setComment(entity -> WorkFlowUtil.concatComment("计划类资产交易查询删除：", entity.getTradeId(),
                 DateUtil.format(entity.getTradeDate(),DateUtil.DEFAULT_DATETIME_FORMAT)
         ));
 

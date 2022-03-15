@@ -114,19 +114,19 @@ public class TrdJihuaBonusValuationTradeDto extends BaseEntity implements Proces
     /**
      * 交易日期
      */
-    private Date tradeDate_hlzt;
+    private Date tradeDateReInvest;
 
     /**
      * 分红金额
      */
     @JsonSerialize(using= BigDecimalSerializer.class)
-    private BigDecimal bonusAmt_hlzt;
+    private BigDecimal bonusAmtReInvest;
 
     /**
      * 交易份额
      */
     @JsonSerialize(using= BigDecimalSerializer.class)
-    private BigDecimal dealNum_hlzt;
+    private BigDecimal dealNumReInvest;
 
     /**
      * 单位分红净值
@@ -138,12 +138,12 @@ public class TrdJihuaBonusValuationTradeDto extends BaseEntity implements Proces
      * 结算金额
      */
     @JsonSerialize(using= BigDecimalSerializer.class)
-    private BigDecimal settleAmt_hlzt;
+    private BigDecimal settleAmtReInvest;
 
     /**
      * 资金账户
      */
-    private String myAcctNo_hlzt;
+    private String myAcctNoReInvest;
 
     public String getOperateType() {
         return operateType;
@@ -273,28 +273,28 @@ public class TrdJihuaBonusValuationTradeDto extends BaseEntity implements Proces
         this.myAcctNo = myAcctNo;
     }
 
-    public Date getTradeDate_hlzt() {
-        return tradeDate_hlzt;
+    public Date getTradeDateReInvest() {
+        return tradeDateReInvest;
     }
 
-    public void setTradeDate_hlzt(Date tradeDate_hlzt) {
-        this.tradeDate_hlzt = tradeDate_hlzt;
+    public void setTradeDateReInvest(Date tradeDateReInvest) {
+        this.tradeDateReInvest = tradeDateReInvest;
     }
 
-    public BigDecimal getBonusAmt_hlzt() {
-        return bonusAmt_hlzt;
+    public BigDecimal getBonusAmtReInvest() {
+        return bonusAmtReInvest;
     }
 
-    public void setBonusAmt_hlzt(BigDecimal bonusAmt_hlzt) {
-        this.bonusAmt_hlzt = bonusAmt_hlzt;
+    public void setBonusAmtReInvest(BigDecimal bonusAmtReInvest) {
+        this.bonusAmtReInvest = bonusAmtReInvest;
     }
 
-    public BigDecimal getDealNum_hlzt() {
-        return dealNum_hlzt;
+    public BigDecimal getDealNumReInvest() {
+        return dealNumReInvest;
     }
 
-    public void setDealNum_hlzt(BigDecimal dealNum_hlzt) {
-        this.dealNum_hlzt = dealNum_hlzt;
+    public void setDealNumReInvest(BigDecimal dealNumReInvest) {
+        this.dealNumReInvest = dealNumReInvest;
     }
 
     public BigDecimal getUnitBonusUnitValue() {
@@ -305,20 +305,20 @@ public class TrdJihuaBonusValuationTradeDto extends BaseEntity implements Proces
         this.unitBonusUnitValue = unitBonusUnitValue;
     }
 
-    public BigDecimal getSettleAmt_hlzt() {
-        return settleAmt_hlzt;
+    public BigDecimal getSettleAmtReInvest() {
+        return settleAmtReInvest;
     }
 
-    public void setSettleAmt_hlzt(BigDecimal settleAmt_hlzt) {
-        this.settleAmt_hlzt = settleAmt_hlzt;
+    public void setSettleAmtReInvest(BigDecimal settleAmtReInvest) {
+        this.settleAmtReInvest = settleAmtReInvest;
     }
 
-    public String getMyAcctNo_hlzt() {
-        return myAcctNo_hlzt;
+    public String getMyAcctNoReInvest() {
+        return myAcctNoReInvest;
     }
 
-    public void setMyAcctNo_hlzt(String myAcctNo_hlzt) {
-        this.myAcctNo_hlzt = myAcctNo_hlzt;
+    public void setMyAcctNoReInvest(String myAcctNoReInvest) {
+        this.myAcctNoReInvest = myAcctNoReInvest;
     }
 }
 

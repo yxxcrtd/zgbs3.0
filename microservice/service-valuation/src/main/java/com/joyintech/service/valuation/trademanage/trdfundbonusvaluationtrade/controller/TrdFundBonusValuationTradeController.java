@@ -80,8 +80,8 @@ public class TrdFundBonusValuationTradeController extends BaseController {
      * @since 1.0
      */
     @PostMapping("queryTradeInfoByTradeId")
-    public TrdFundBonusValuationTradeDto queryTradeInfoByTradeId(@RequestBody String  tradeId) {
-        return trdFundBonusValuationTradeService.queryTradeInfoByTradeId(tradeId);
+    public TrdFundBonusValuationTradeDto queryTradeInfoByTradeId(@RequestBody Map<String, Object> param) {
+        return trdFundBonusValuationTradeService.queryTradeInfoByTradeId(param);
     }
 
 

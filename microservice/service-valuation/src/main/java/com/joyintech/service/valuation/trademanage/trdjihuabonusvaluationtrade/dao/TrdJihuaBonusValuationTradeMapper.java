@@ -10,14 +10,12 @@
  
 package com.joyintech.service.valuation.trademanage.trdjihuabonusvaluationtrade.dao;
 
-import java.util.List;
-import java.util.Map;
-
 import com.joyintech.service.valuation.trademanage.trdjihuabonusvaluationtrade.dto.TrdJihuaBonusValuationTradeDto;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
-import com.joyintech.framework.select.SelectOptionDto;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -30,30 +28,7 @@ import com.joyintech.framework.select.SelectOptionDto;
 @Repository(value="serviceTrdJihuaBonusValuationTradeMapper")
 public interface TrdJihuaBonusValuationTradeMapper {
 
-	/**
-	 * 产品代码下拉框
-	 * @auther: yuzj
-	 * @date: 2021/12/29
-	 * @param:
-	 * @return:
-	 */
-	List<SelectOptionDto> findPortfolioId(Map<String, Object> params);
-
-
-	/**
-	 * 资产代码下拉框
-	 * @auther: yuzj
-	 * @date: 2021/12/29
-	 * @param:
-	 * @return:
-	 */
-	List<SelectOptionDto> findFinprodId(Map<String, Object> params);
-
-
-    List<TrdJihuaBonusValuationTradeDto> select(Map<String, Object> key);
-
     Integer  selectCountByTradeId(@Param("tradeId") String tradeId);
-
 
     /**
      * 获取自增序列值
@@ -63,7 +38,7 @@ public interface TrdJihuaBonusValuationTradeMapper {
     String getNextId(@Param("sequenceName") String sequenceName);
 
 
-	TrdJihuaBonusValuationTradeDto queryTradeInfoByTradeId(String tradeId);
+	TrdJihuaBonusValuationTradeDto queryTradeInfoByTradeId(Map<String, Object> params);
 
 	/**
 	 * 检索债券交易列表

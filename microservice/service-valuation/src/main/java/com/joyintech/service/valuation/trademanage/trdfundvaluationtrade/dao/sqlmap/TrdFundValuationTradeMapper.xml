@@ -62,8 +62,8 @@
 		</if>
 		<if test="tradeMarketArr != null and tradeMarketArr.length > 0">
 			and t.TRADE_MARKET IN
-			<foreach collection="psArr" item="tradeMarket" open="( " close=" )" separator=",">
-				#{ps}
+			<foreach collection="tradeMarketArr" item="tradeMarket" open="( " close=" )" separator=",">
+				#{tradeMarket}
 			</foreach>
 		</if>
 		order by t.TRADE_ID desc

@@ -24,7 +24,6 @@ import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.fund.Fu
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.fund.FundShareConvertDealRecService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValBonusResTrade;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValCashBonusTrade;
-import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValFundShareConvert;
 import com.joyintech.tams.valuation.trademanage.trdjihuabonusvaluationtrade.dto.TrdJihuaBonusTradeResult;
 import com.joyintech.tams.valuation.trademanage.trdjihuabonusvaluationtrade.dto.TrdJihuaBonusValuationTradeDto;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -95,7 +94,6 @@ public class TrdJihuaBonusValuationTrade002Service extends CommonExportService<T
         return restTemplate.postForObject(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdJihuaBonusValuationTrade/createJihuaBonusTradeId",
                 null, String.class);
-
     }
 
     /**
@@ -105,10 +103,10 @@ public class TrdJihuaBonusValuationTrade002Service extends CommonExportService<T
      * @param:
      * @return:
      */
-    public TrdJihuaBonusValuationTradeDto queryTradeInfoByTradeId(String tradeId) {
+    public TrdJihuaBonusValuationTradeDto queryTradeInfoByTradeId(Map<String,Object> param) {
         return restTemplate.postForObject(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdJihuaBonusValuationTrade/queryTradeInfoByTradeId",
-                tradeId, TrdJihuaBonusValuationTradeDto.class);
+                param, TrdJihuaBonusValuationTradeDto.class);
     }
 
     //封装实体类
@@ -128,10 +126,14 @@ public class TrdJihuaBonusValuationTrade002Service extends CommonExportService<T
                 ValCashBonusTrade valCashBonusTrade = new ValCashBonusTrade();
                 BeanUtil.copyPropertiesIgnoreNull(valCashBonusTrade, trdJihuaBonusValuationTradeDto);
                 //比较界面和接口字段差异，并手动给接口字段赋值
-                valCashBonusTrade.setAssetId("F06_" + trdJihuaBonusValuationTradeDto.getAssetId());//资产代码  F06基金
+                valCashBonusTrade.setAssetId("F17_" + trdJihuaBonusValuationTradeDto.getAssetId());//资产代码
+                valCashBonusTrade.setAssetName(trdJihuaBonusValuationTradeDto.getAssetAbbr());//资产名称
+                valCashBonusTrade.setBonusDate(trdJihuaBonusValuationTradeDto.getTradeDate());//分红日
+                valCashBonusTrade.setActBounsAmt(trdJihuaBonusValuationTradeDto.getBonusAmt());//实际分红金额
+                valCashBonusTrade.setMdate(trdJihuaBonusValuationTradeDto.getTradeDate());//todo 分红截止日
                 valCashBonusTrade.setDataActionSign("01");
-                valCashBonusTrade.setIsChlFeeAmt("Y");
                 valCashBonusTrade.setIsClean("N");
+                valCashBonusTrade.setSettleDate(trdJihuaBonusValuationTradeDto.getTradeDate());
 
                 listValCashBonusTrade.add(valCashBonusTrade);
 
@@ -165,6 +167,7 @@ public class TrdJihuaBonusValuationTrade002Service extends CommonExportService<T
                     result.setListValInterflog((List<ValInterflog>)map.get("valInterflogList"));
                 }
                 TrdJihuaBonusTradeResult rst = new TrdJihuaBonusTradeResult(result);
+                rst.setTrdJihuaBonusValuationTradeDto(trdJihuaBonusValuationTradeDto);
                 return rst;
             } else if (trdJihuaBonusValuationTradeDto.getPs().equals(DictCodeList.交易方向_红利再投.getValue()) ) {
                 //申购、认购 ==>对应接口【基金&计划类红利再投交易】
@@ -179,9 +182,15 @@ public class TrdJihuaBonusValuationTrade002Service extends CommonExportService<T
                 ValBonusResTrade valBonusResTrade = new ValBonusResTrade();
                 BeanUtil.copyPropertiesIgnoreNull(valBonusResTrade, trdJihuaBonusValuationTradeDto);
                 //比较界面和接口字段差异，并手动给接口字段赋值
-                valBonusResTrade.setAssetId("F06_" + trdJihuaBonusValuationTradeDto.getAssetId());//资产代码  F06基金
-                valBonusResTrade.setDataActionSign("01");
+                valBonusResTrade.setAssetId("F17_" + trdJihuaBonusValuationTradeDto.getAssetId());//资产代码
+                valBonusResTrade.setAssetName(trdJihuaBonusValuationTradeDto.getAssetAbbr());//资产名称
+                valBonusResTrade.setBonusDate(trdJihuaBonusValuationTradeDto.getTradeDateReInvest());//红利再投日
+                valBonusResTrade.setBonusAmt(trdJihuaBonusValuationTradeDto.getBonusAmtReInvest());//红利再投金额
+                valBonusResTrade.setBonusNet(trdJihuaBonusValuationTradeDto.getUnitBonusUnitValue());//红利再投净值
+                valBonusResTrade.setBonusShare(trdJihuaBonusValuationTradeDto.getDealNumReInvest());//红利再投份额
+                valBonusResTrade.setMdate(trdJihuaBonusValuationTradeDto.getTradeDate());//todo 分红截止日
                 valBonusResTrade.setIsClean("N");
+                valBonusResTrade.setDataActionSign("01");
 
                 listValBonusResTrade.add(valBonusResTrade);
 
@@ -215,66 +224,9 @@ public class TrdJihuaBonusValuationTrade002Service extends CommonExportService<T
                     result.setListValInterflog((List<ValInterflog>)map.get("valInterflogList"));
                 }
                 TrdJihuaBonusTradeResult rst = new TrdJihuaBonusTradeResult(result);
+                rst.setTrdJihuaBonusValuationTradeDto(trdJihuaBonusValuationTradeDto);
                 return rst;
-            } else if (trdJihuaBonusValuationTradeDto.getPs().equals(DictCodeList.交易方向_份额强增.getValue())
-                    || trdJihuaBonusValuationTradeDto.getPs().equals(DictCodeList.交易方向_份额强减.getValue()) ) {
-                //申购、认购 ==>对应接口【基金份额折算交易】
-                //设置接口参数
-                Map<String, Object> params = new HashMap<>();
-                List<String> prodIds = new ArrayList<>();
-                prodIds.add(trdJihuaBonusValuationTradeDto.getProdId());
-                params.put("INTERF_BOOKSETID", prodIds);
-                params.put("VAL_MODEL", "INTERF_MODEL_SINGLE");
-
-                List<ValFundShareConvert> listValFundTrade = new ArrayList<ValFundShareConvert>();
-                ValFundShareConvert valFundShareConvert = new ValFundShareConvert();
-                BeanUtil.copyPropertiesIgnoreNull(valFundShareConvert, trdJihuaBonusValuationTradeDto);
-                //比较界面和接口字段差异，并手动给接口字段赋值
-                valFundShareConvert.setAssetId("F06_" + trdJihuaBonusValuationTradeDto.getAssetId());//资产代码  F06基金
-                valFundShareConvert.setDataActionSign("01");
-                valFundShareConvert.setIsClean("N");
-
-                listValFundTrade.add(valFundShareConvert);
-
-                Map<String, Object> map = fundShareConvertDealRecService.handleValFundTrade(listValFundTrade, new Date(), params, null);
-                // 定义返回变量
-                FundDealInfoForInterfRecCommonResult result = new FundDealInfoForInterfRecCommonResult();
-                if (!map.isEmpty()) {
-                    result.setListValFinProductDeal(
-                            (List<TrdProductDeal>)map.get("ValFinProductDeal"));
-                    result.setListValFinProductDealExt(
-                            (List<TrdProductDealAdd>)map.get("ValFinProductDealExt"));
-                    /**modify by wujie on 20190118 start
-                     result.setListInterfProductDealBookCommonDto(
-                     (List<InterfProductDealBookCommonDto>)map.get(
-                     "listInterfProductDealBookCommonDto"));
-                     **/
-                    List<BokDealAccounting> listValDealAccounting = (List<BokDealAccounting>)map.get(
-                            "ValDealAccounting");
-                    result.setListValDealAccounting(listValDealAccounting);
-
-                    List<BokDealAccountingDetail> listValDealAccountingDetail = (List<BokDealAccountingDetail>)map.get(
-                            "ValDealAccountingDetail");
-                    result.setListValDealAccountingDetail(listValDealAccountingDetail);
-
-                    List<BokDetailId> listValBokDetailId = (List<BokDetailId>)map.get(
-                            "ValBokDetailId");
-                    result.setListValBokDetailId(listValBokDetailId);
-                    /**modify by wujie on 20190118 end**/
-
-                    //结算指令
-                    List<StlOrders> listValOrders = (List<StlOrders>)map.get(
-                            "listValOrders");
-                    List<StlOrdersExt> listValOrdersExt = (List<StlOrdersExt>)map.get(
-                            "listValOrdersExt");
-                    result.setListValOrders(listValOrders);
-                    result.setListValOrdersExt(listValOrdersExt);
-                    // 日志
-                    result.setListValInterflog((List<ValInterflog>)map.get("valInterflogList"));
-                }
-                TrdJihuaBonusTradeResult rst = new TrdJihuaBonusTradeResult(result);
-                return rst;
-            }else{
+            } else{
                 //返回初始化
                 return trdJihuaBonusTradeResult;
             }

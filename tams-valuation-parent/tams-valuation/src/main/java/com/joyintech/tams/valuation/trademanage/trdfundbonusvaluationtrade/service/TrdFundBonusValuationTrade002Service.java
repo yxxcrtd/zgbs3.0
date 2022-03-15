@@ -99,10 +99,10 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
      * @param:
      * @return:
      */
-    public TrdFundBonusValuationTradeDto queryTradeInfoByTradeId(String tradeId) {
+    public TrdFundBonusValuationTradeDto queryTradeInfoByTradeId(Map<String,Object> param) {
         return restTemplate.postForObject(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdFundBonusValuationTrade/queryTradeInfoByTradeId",
-                tradeId, TrdFundBonusValuationTradeDto.class);
+                param, TrdFundBonusValuationTradeDto.class);
     }
 
     //封装实体类
@@ -283,6 +283,8 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
         valCashBonusTrade.setDataActionSign("01");//数据动作标志
         valCashBonusTrade.setIsClean("N");//有无清算指令
         //valCashBonusTrade.setMdate();//分红截止日
+        valCashBonusTrade.setSettleDate(dto.getTradeDate());
+        valCashBonusTrade.setTradeMarket(dto.getTradeMarket());
 
         return valCashBonusTrade;
     }
@@ -298,10 +300,10 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
         BeanUtil.copyPropertiesIgnoreNull(valBonusResTrade, dto);
         valBonusResTrade.setAssetId("F06_" + dto.getAssetId());//资产代码
         valBonusResTrade.setAssetName(dto.getAssetAbbr());//资产名称
-        valBonusResTrade.setBonusAmt(dto.getBonusAmt_hlzt());//红利再投金额
-        valBonusResTrade.setBonusDate(dto.getTradeDate_hlzt());//红利再投日
+        valBonusResTrade.setBonusAmt(dto.getBonusAmtReInvest());//红利再投金额
+        valBonusResTrade.setBonusDate(dto.getTradeDateReInvest());//红利再投日
         valBonusResTrade.setBonusNet(dto.getUnitBonusUnitValue());//红利再投净值
-        valBonusResTrade.setBonusShare(dto.getDealNum_hlzt());//红利再投份额
+        valBonusResTrade.setBonusShare(dto.getDealNumReInvest());//红利再投份额
 
         valBonusResTrade.setDataActionSign("01");
         valBonusResTrade.setIsClean("N");
@@ -320,8 +322,8 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
         BeanUtil.copyPropertiesIgnoreNull(valFundShareConvert, dto);
         valFundShareConvert.setAssetId("F06_" + dto.getAssetId());//资产代码
         valFundShareConvert.setAssetName(dto.getAssetAbbr());//资产名称
-        valFundShareConvert.setTradeDate(dto.getTradeDate_share());//交易日期
-        valFundShareConvert.setCfmShare(dto.getDealNum_share());//交易份额
+        valFundShareConvert.setTradeDate(dto.getTradeDateStrengthen());//交易日期
+        valFundShareConvert.setCfmShare(dto.getDealNumStrengthen());//交易份额
         valFundShareConvert.setBusiType("06");//业务类型
         valFundShareConvert.setDataActionSign("01");
         valFundShareConvert.setIsClean("N");//有无清算指令

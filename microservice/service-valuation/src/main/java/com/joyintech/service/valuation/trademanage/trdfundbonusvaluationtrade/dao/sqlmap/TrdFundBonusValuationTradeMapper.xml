@@ -12,15 +12,22 @@
 			t.TRADE_MARKET tradeMarket,/**交易场所**/
 			t.PS ps,/**交易方向**/
 			t.TRADE_DATE tradeDate,/**交易日**/
-			t.TRADE_AMT bonusAmt,/**交易金额**/
-			t.SHARE_AMT dealNum_hlzt,/**交易份额**/
+			t.TRADE_DATE tradeDateReInvest,/**交易日**/
+			t.TRADE_DATE tradeDateStrengthen,/**交易日**/
+			nvl(t.TRADE_AMT,t.PRIN_AMT) bonusAmt,/**交易金额**/
+			t.PRIN_AMT bonusAmtReInvest,/**分红金额**/
+			t.SHARE_AMT dealNumReInvest,/**交易份额**/
+			t.SHARE_AMT dealNumStrengthen,/**交易份额**/
 			t.UNIT_CPRICE unitBonusUnitValue,/**单位净值**/
 			t.CCY ccy,/**币种**/
 			stl.SETTLE_AMT settleAmt,/**结算金额**/
-			stl.MY_ACCT_NO myAcctNo/**资金账户**/
+			stl.SETTLE_AMT settleAmtReInvest,/**结算金额**/
+			stl.MY_ACCT_NO myAcctNo,/**资金账户**/
+			stl.MY_ACCT_NO myAcctNoReInvest,/**资金账户**/
+			stl.MY_ACCT_NO myAcctNoStrengthen/**资金账户**/
 		FROM TRD_PRODUCT_DEAL t
 		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = SUBSTR(t.finprod_id,5,LENGTH(t.finprod_id))
-		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE  in( '06','07') AND STL.ORDER_TYPE NOT LIKE 'N%'
+		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE  in( '06','07')
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal1 on deal1.BUSI_NO = t.TRADE_ID
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal2 ON stl.ORDER_ID = deal2.BUSI_NO
 		LEFT JOIN BOK_BOOKSET bok on (bok.BOOKSET_ID = deal1.BOOKSET_ID) OR (bok.BOOKSET_ID = deal2.BOOKSET_ID)
@@ -76,32 +83,43 @@
     </select>
 
 	<select id="queryTradeInfoByTradeId" resultType="com.joyintech.service.valuation.trademanage.trdfundbonusvaluationtrade.dto.TrdFundBonusValuationTradeDto">
-		SELECT t.TRADE_ID tradeId,/**交易编号**/
-		null outTradeId,    /*外部成交编号*/
-		deal.BOOKSET_ID portfolioId,/**金融产品代码**/
-		bok.BOOKSET_NAME portfolioName,/**金融产品名称**/
-		zc.FINPROD_MARKET_ID  finprodId, /**资产代码**/
-		zc.FINPROD_ABBR  finprodName,/**资产简称**/
-		t.TRADE_MARKET tradeMarket,/**交易场所**/
-		t.PS ps,/**交易方向**/
-		t.TRADE_DATE tradeDate,/**交易日**/
-		t.TRADE_AMT tradeAmt,/**交易金额**/
-		t.SHARE_AMT nums,/**交易份额**/
-		t.UNIT_CPRICE unitValue,/**单位净值**/
-		t.CCY ccy,/**币种**/
-		stl.SETTLE_AMT mdateSettleAmt,/**结算金额**/
-
-		stl.MY_ACCT_NO trdAcctId/**资金账户**/
+		SELECT
+			t.TRADE_ID tradeId,/**交易编号**/
+			NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) prodId,/**金融产品代码**/
+			bok.BOOKSET_NAME prodName,/**金融产品名称**/
+			zc.FINPROD_MARKET_ID  assetId, /**资产代码**/
+			zc.FINPROD_ABBR  assetAbbr,/**资产简称**/
+			t.TRADE_MARKET tradeMarket,/**交易场所**/
+			t.PS ps,/**交易方向**/
+			<if test="ps == 'T11' ">
+				t.TRADE_DATE tradeDate,/**交易日期**/
+				t.TRADE_AMT bonusAmt,/**分红金额**/
+				stl.MY_ACCT_NO    myAcctNo,/**资金账户**/
+				stl.SETTLE_AMT    settleAmt/**结算金额**/
+			</if>
+			<if test="ps == 'T12' ">
+				t.TRADE_DATE tradeDateReInvest,/**交易日期**/
+				t.PRIN_AMT bonusAmtReInvest,/**分红金额**/
+				t.SHARE_AMT dealNumReInvest,/**交易份额**/
+				t.UNIT_CPRICE unitBonusUnitValue,/**单位净值**/
+				stl.SETTLE_AMT    settleAmtReInvest,/**结算金额**/
+				stl.MY_ACCT_NO    myAcctNoReInvest/**资金账户**/
+			</if>
+			<if test="ps == 'C3' or ps == 'C6'">
+				t.TRADE_DATE tradeDateStrengthen,/**交易日期**/
+				t.SHARE_AMT dealNumStrengthen,/**交易份额**/
+				stl.MY_ACCT_NO    myAcctNoStrengthen/**资金账户**/
+			</if>
 		FROM TRD_PRODUCT_DEAL t
-		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
-		LEFT JOIN BOK_DEAL_ACCOUNTING deal on deal.BUSI_NO = t.TRADE_ID
-		LEFT JOIN BOK_BOOKSET bok on bok.BOOKSET_ID = deal.BOOKSET_ID
-		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE ='02'
+		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = SUBSTR(t.finprod_id,5,LENGTH(t.finprod_id))
+		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE  in( '06','07')
+		LEFT JOIN BOK_DEAL_ACCOUNTING deal1 on deal1.BUSI_NO = t.TRADE_ID
+		LEFT JOIN BOK_DEAL_ACCOUNTING deal2 ON stl.ORDER_ID = deal2.BUSI_NO
+		LEFT JOIN BOK_BOOKSET bok on (bok.BOOKSET_ID = deal1.BOOKSET_ID) OR (bok.BOOKSET_ID = deal2.BOOKSET_ID)
 		where
-		t.BUSI_TYPE ='02'
+		t.BUSI_TYPE in( '06','07')
 		and t.TRADE_ID  = #{tradeId,jdbcType=VARCHAR}
 		and rownum=1
-
 	</select>
 
 

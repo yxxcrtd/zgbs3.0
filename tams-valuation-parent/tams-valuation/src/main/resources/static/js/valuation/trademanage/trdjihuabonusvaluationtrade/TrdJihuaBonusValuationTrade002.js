@@ -44,6 +44,39 @@
         }
     };
 
+    //现金分红 结算金额 默认等于分红金额
+    var settleAmt = function(){
+        var bonusAmt = $('#bonusAmt').val();
+        if(bonusAmt != null && bonusAmt != ''){
+            $('#settleAmt').val(bonusAmt);
+        }else{
+            $('#settleAmt').val('');
+        }
+    }
+
+    //红利再投 单位分红净值=分红金额/分红份额
+    var unitBonusUnitValueChange = function(){
+        var bonusAmt_hlzt = $('#bonusAmt_hlzt').val();
+        var dealNum_hlzt = $('#dealNum_hlzt').val();
+        if(bonusAmt_hlzt != null && bonusAmt_hlzt != ''
+            && dealNum_hlzt != null && dealNum_hlzt != ''){
+            var unitBonusUnitValue =JoyinMath.doDiv(bonusAmt_hlzt, dealNum_hlzt,4,JoyinMath.ROUND_HALF_UP);
+            $('#unitBonusUnitValue').val(unitBonusUnitValue);
+        }else{
+            $('#unitBonusUnitValue').val('');
+        }
+    }
+
+    //红利再投 结算金额 默认等于分红金额
+    var settleAmt_hlzt = function(){
+        var bonusAmt_hlzt = $('#bonusAmt_hlzt').val();
+        if(bonusAmt_hlzt != null && bonusAmt_hlzt != ''){
+            $('#settleAmt_hlzt').val(bonusAmt_hlzt);
+        }else{
+            $('#settleAmt_hlzt').val('');
+        }
+    }
+
 
     /**
      * 保存或提交
@@ -76,6 +109,19 @@
         if(workflowId){
             psChange();
         }
+
+        $('#bonusAmt').change(function(){
+            settleAmt();
+        });
+
+        //红利再投 单位分红净值=分红金额/分红份额
+        $('#bonusAmt_hlzt').change(function(){
+            unitBonusUnitValueChange();
+            settleAmt_hlzt();
+        });
+        $('#dealNum_hlzt').change(function(){
+            unitBonusUnitValueChange();
+        });
 
         //保存
         $('#TrdJihuaBonusValuationTrade002_btn_save').click(function() {

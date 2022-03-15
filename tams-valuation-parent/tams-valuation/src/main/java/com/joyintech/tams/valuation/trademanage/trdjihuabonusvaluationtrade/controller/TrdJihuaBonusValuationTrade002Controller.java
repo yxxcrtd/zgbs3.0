@@ -31,7 +31,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description:计划类资产存续期新建
@@ -64,6 +66,8 @@ public class TrdJihuaBonusValuationTrade002Controller extends BaseController {
 
         String tradeId = getParam("tradeId");
         String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
+        //交易方向
+        String ps = getParam("ps");
 
         if(StringUtil.isNotEmpty(workflowId)){
             TrdJihuaBonusValuationTradeDto entity= trdJihuaBonusValuationTrade002Service.getBussinessEntityByWorkflowId(workflowId);
@@ -71,11 +75,29 @@ public class TrdJihuaBonusValuationTrade002Controller extends BaseController {
             model.addAttribute("workflowId", workflowId);
 
         }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){
-            TrdJihuaBonusValuationTradeDto entity = trdJihuaBonusValuationTrade002Service.queryTradeInfoByTradeId(tradeId);
+            Map<String,Object> param = new HashMap<>();
+            param.put("tradeId",tradeId);
+            param.put("ps",ps);
+            TrdJihuaBonusValuationTradeDto entity = trdJihuaBonusValuationTrade002Service.queryTradeInfoByTradeId(param);
             model.addAttribute("entity", entity);
         }
 
         return super.init(model);
+    }
+
+    /**
+     * 资产代码下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getAssetId")
+    public List<SelectOptionDto> getAssetId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("assetType","F17");
+        return commonBusinessService.getAssetId(param);
     }
 
     /**
@@ -141,7 +163,7 @@ public class TrdJihuaBonusValuationTrade002Controller extends BaseController {
         params.setBusinessType(DictCodeList.共通业务类型_计划类资产_净值型_存续期.getValue());
         // 设置流程业务说明, entity即传入的dto
         params.setComment(
-                entity -> SpringContextUtil.getTextValue("TrdJihuaBonusValuationTrade001.tradeId")+"("+ entity.getTradeId() +")"+"-"+SpringContextUtil.getTextValue("TrdJihuaValuationTrade002.tradeDate") + "(" + DateUtil.format(entity.getTradeDate()) + ")"
+                entity -> SpringContextUtil.getTextValue("TrdJihuaBonusValuationTrade002.tradeId")+"("+ entity.getTradeId() +")"+"-"+SpringContextUtil.getTextValue("TrdJihuaBonusValuationTrade002.tradeDate") + "(" + DateUtil.format(entity.getTradeDate()) + ")"
         );
         //给参数变成ProcessParameter而非WorkFlowParameter
         ProcessParameter<TrdJihuaBonusValuationTradeDto> parameter = new ProcessParameter<TrdJihuaBonusValuationTradeDto>();

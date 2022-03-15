@@ -59,18 +59,18 @@ public class TrdFundBonusValuationTradeDtoValidator implements BeanValidator {
                 }
             }else if(DictCodeList.交易方向_红利再投.getValue().equals(dto.getPs())){
                 //交易日期
-                if(!StringUtil.isNotEmpty(dto.getTradeDate_hlzt())){
-                    resultList.add(new ValidMessage("tradeDate_hlzt",
+                if(!StringUtil.isNotEmpty(dto.getTradeDateReInvest())){
+                    resultList.add(new ValidMessage("tradeDateReInvest",
                             getMessage("VAL_COMMON_E_0002", getMessage("TrdFundBonusValuationTrade002.tradeDate"))));
                 }
                 //分红金额
-                if(!StringUtil.isNotEmpty(dto.getBonusAmt_hlzt())){
-                    resultList.add(new ValidMessage("bonusAmt_hlzt",
+                if(!StringUtil.isNotEmpty(dto.getBonusAmtReInvest())){
+                    resultList.add(new ValidMessage("bonusAmtReInvest",
                             getMessage("VAL_COMMON_E_0002", getMessage("TrdFundBonusValuationTrade002.bonusAmt"))));
                 }
                 //交易份额
-                if(!StringUtil.isNotEmpty(dto.getDealNum_hlzt())){
-                    resultList.add(new ValidMessage("dealNum_hlzt",
+                if(!StringUtil.isNotEmpty(dto.getDealNumReInvest())){
+                    resultList.add(new ValidMessage("dealNumReInvest",
                             getMessage("VAL_COMMON_E_0002", getMessage("TrdFundBonusValuationTrade002.dealNum"))));
                 }
                 //单位分红净值
@@ -79,13 +79,13 @@ public class TrdFundBonusValuationTradeDtoValidator implements BeanValidator {
                             getMessage("VAL_COMMON_E_0002", getMessage("TrdFundBonusValuationTrade002.unitBonusUnitValue"))));
                 }
                 //结算金额
-                if(!StringUtil.isNotEmpty(dto.getSettleAmt_hlzt())){
-                    resultList.add(new ValidMessage("settleAmt_hlzt",
-                            getMessage("VAL_COMMON_E_0002", getMessage("TrdFundBonusValuationTrade002.settleAmt_hlzt"))));
+                if(!StringUtil.isNotEmpty(dto.getSettleAmtReInvest())){
+                    resultList.add(new ValidMessage("settleAmtReInvest",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdFundBonusValuationTrade002.settleAmtReInvest"))));
                 }
                 //资金账户
-                if(!StringUtil.isNotEmpty(dto.getMyAcctNo_hlzt())){
-                    resultList.add(new ValidMessage("myAcctNo_hlzt",
+                if(!StringUtil.isNotEmpty(dto.getMyAcctNoReInvest())){
+                    resultList.add(new ValidMessage("myAcctNoReInvest",
                             getMessage("VAL_COMMON_E_0002", getMessage("TrdFundBonusValuationTrade002.myAcctNo"))));
                 }
             }
@@ -93,18 +93,18 @@ public class TrdFundBonusValuationTradeDtoValidator implements BeanValidator {
            else if( DictCodeList.交易方向_份额强增.getValue().equals(dto.getPs())
                     || DictCodeList.交易方向_份额强减.getValue().equals(dto.getPs())){
                 //交易日期
-                if(!StringUtil.isNotEmpty(dto.getTradeDate_share())){
-                    resultList.add(new ValidMessage("tradeDate_share",
+                if(!StringUtil.isNotEmpty(dto.getTradeDateStrengthen())){
+                    resultList.add(new ValidMessage("tradeDateStrengthen",
                             getMessage("VAL_COMMON_E_0002", getMessage("TrdFundBonusValuationTrade002.tradeDate"))));
                 }
                 //分红金额
-                if(!StringUtil.isNotEmpty(dto.getDealNum_share())){
-                    resultList.add(new ValidMessage("dealNum_share",
+                if(!StringUtil.isNotEmpty(dto.getDealNumStrengthen())){
+                    resultList.add(new ValidMessage("dealNumStrengthen",
                             getMessage("VAL_COMMON_E_0002", getMessage("TrdFundBonusValuationTrade002.dealNum"))));
                 }
                 //资金账户
-                if(!StringUtil.isNotEmpty(dto.getMyAcctNo_share())){
-                    resultList.add(new ValidMessage("myAcctNo_share",
+                if(!StringUtil.isNotEmpty(dto.getMyAcctNoStrengthen())){
+                    resultList.add(new ValidMessage("myAcctNoStrengthen",
                             getMessage("VAL_COMMON_E_0002", getMessage("TrdFundBonusValuationTrade002.myAcctNo"))));
                 }
             }

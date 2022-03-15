@@ -41,7 +41,7 @@ public interface TrdFundBonusValuationTradeMapper {
     String getNextId(@Param("sequenceName") String sequenceName);
 
 
-	TrdFundBonusValuationTradeDto queryTradeInfoByTradeId(String tradeId);
+	TrdFundBonusValuationTradeDto queryTradeInfoByTradeId(Map<String, Object> param);
 
 	/**
 	 * 检索债券交易列表

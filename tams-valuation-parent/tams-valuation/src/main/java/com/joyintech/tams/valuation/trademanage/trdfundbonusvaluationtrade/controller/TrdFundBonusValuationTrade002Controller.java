@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -62,17 +63,20 @@ public class TrdFundBonusValuationTrade002Controller extends BaseController {
 
         String tradeId = getParam("tradeId");
         String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
+        //交易方向
+        String ps = getParam("ps");
 
         if(StringUtil.isNotEmpty(workflowId)){
             TrdFundBonusValuationTradeDto entity= trdFundBonusValuationTrade002Service.getBussinessEntityByWorkflowId(workflowId);
             model.addAttribute("entity", entity);
             model.addAttribute("workflowId", workflowId);
-
         }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){
-            TrdFundBonusValuationTradeDto entity = trdFundBonusValuationTrade002Service.queryTradeInfoByTradeId(tradeId);
+            Map<String,Object> param = new HashMap<>();
+            param.put("tradeId",tradeId);
+            param.put("ps",ps);
+            TrdFundBonusValuationTradeDto entity = trdFundBonusValuationTrade002Service.queryTradeInfoByTradeId(param);
             model.addAttribute("entity", entity);
         }
-
         return super.init(model);
     }
 
@@ -147,13 +151,13 @@ public class TrdFundBonusValuationTrade002Controller extends BaseController {
         }else if(DictCodeList.交易方向_红利再投.getValue().equals(dto.getPs())){
             // 设置流程业务说明, entity即传入的dto
             params.setComment(
-                    entity -> SpringContextUtil.getTextValue("TrdFundBonusValuationTrade002.tradeId")+"("+ entity.getTradeId() +")"+"-"+SpringContextUtil.getTextValue("TrdFundValuationTrade002.tradeDate") + "(" + DateUtil.format(entity.getTradeDate_hlzt()) + ")"
+                    entity -> SpringContextUtil.getTextValue("TrdFundBonusValuationTrade002.tradeId")+"("+ entity.getTradeId() +")"+"-"+SpringContextUtil.getTextValue("TrdFundValuationTrade002.tradeDate") + "(" + DateUtil.format(entity.getTradeDateReInvest()) + ")"
             );
         }else if( DictCodeList.交易方向_份额强增.getValue().equals(dto.getPs())
                 || DictCodeList.交易方向_份额强减.getValue().equals(dto.getPs())){
             // 设置流程业务说明, entity即传入的dto
             params.setComment(
-                    entity -> SpringContextUtil.getTextValue("TrdFundBonusValuationTrade002.tradeId")+"("+ entity.getTradeId() +")"+"-"+SpringContextUtil.getTextValue("TrdFundValuationTrade002.tradeDate") + "(" + DateUtil.format(entity.getTradeDate_share()) + ")"
+                    entity -> SpringContextUtil.getTextValue("TrdFundBonusValuationTrade002.tradeId")+"("+ entity.getTradeId() +")"+"-"+SpringContextUtil.getTextValue("TrdFundValuationTrade002.tradeDate") + "(" + DateUtil.format(entity.getTradeDateStrengthen()) + ")"
             );
         }
 

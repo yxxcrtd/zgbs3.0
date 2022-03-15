@@ -115,19 +115,19 @@ public class TrdFundBonusValuationTradeDto extends BaseEntity implements Process
     /**
      * 交易日期
      */
-    private Date tradeDate_hlzt;
+    private Date tradeDateReInvest;
 
     /**
      * 分红金额
      */
     @JsonSerialize(using= BigDecimalSerializer.class)
-    private BigDecimal bonusAmt_hlzt;
+    private BigDecimal bonusAmtReInvest;
 
     /**
      * 交易份额
      */
     @JsonSerialize(using= BigDecimalSerializer.class)
-    private BigDecimal dealNum_hlzt;
+    private BigDecimal dealNumReInvest;
 
     /**
      * 单位分红净值
@@ -139,28 +139,28 @@ public class TrdFundBonusValuationTradeDto extends BaseEntity implements Process
      * 结算金额
      */
     @JsonSerialize(using= BigDecimalSerializer.class)
-    private BigDecimal settleAmt_hlzt;
+    private BigDecimal settleAmtReInvest;
 
     /**
      * 资金账户
      */
-    private String myAcctNo_hlzt;
+    private String myAcctNoReInvest;
 
     /**
      * 交易日期
      */
-    private Date tradeDate_share;
+    private Date tradeDateStrengthen;
 
     /**
      * 交易份额
      */
     @JsonSerialize(using= BigDecimalSerializer.class)
-    private BigDecimal dealNum_share;
+    private BigDecimal dealNumStrengthen;
 
     /**
      * 资金账户
      */
-    private String myAcctNo_share;
+    private String myAcctNoStrengthen;
 
     public String getOperateType() {
         return operateType;
@@ -300,28 +300,28 @@ public class TrdFundBonusValuationTradeDto extends BaseEntity implements Process
         this.myAcctNo = myAcctNo;
     }
 
-    public Date getTradeDate_hlzt() {
-        return tradeDate_hlzt;
+    public Date getTradeDateReInvest() {
+        return tradeDateReInvest;
     }
 
-    public void setTradeDate_hlzt(Date tradeDate_hlzt) {
-        this.tradeDate_hlzt = tradeDate_hlzt;
+    public void setTradeDateReInvest(Date tradeDateReInvest) {
+        this.tradeDateReInvest = tradeDateReInvest;
     }
 
-    public BigDecimal getBonusAmt_hlzt() {
-        return bonusAmt_hlzt;
+    public BigDecimal getBonusAmtReInvest() {
+        return bonusAmtReInvest;
     }
 
-    public void setBonusAmt_hlzt(BigDecimal bonusAmt_hlzt) {
-        this.bonusAmt_hlzt = bonusAmt_hlzt;
+    public void setBonusAmtReInvest(BigDecimal bonusAmtReInvest) {
+        this.bonusAmtReInvest = bonusAmtReInvest;
     }
 
-    public BigDecimal getDealNum_hlzt() {
-        return dealNum_hlzt;
+    public BigDecimal getDealNumReInvest() {
+        return dealNumReInvest;
     }
 
-    public void setDealNum_hlzt(BigDecimal dealNum_hlzt) {
-        this.dealNum_hlzt = dealNum_hlzt;
+    public void setDealNumReInvest(BigDecimal dealNumReInvest) {
+        this.dealNumReInvest = dealNumReInvest;
     }
 
     public BigDecimal getUnitBonusUnitValue() {
@@ -332,44 +332,44 @@ public class TrdFundBonusValuationTradeDto extends BaseEntity implements Process
         this.unitBonusUnitValue = unitBonusUnitValue;
     }
 
-    public BigDecimal getSettleAmt_hlzt() {
-        return settleAmt_hlzt;
+    public BigDecimal getSettleAmtReInvest() {
+        return settleAmtReInvest;
     }
 
-    public void setSettleAmt_hlzt(BigDecimal settleAmt_hlzt) {
-        this.settleAmt_hlzt = settleAmt_hlzt;
+    public void setSettleAmtReInvest(BigDecimal settleAmtReInvest) {
+        this.settleAmtReInvest = settleAmtReInvest;
     }
 
-    public String getMyAcctNo_hlzt() {
-        return myAcctNo_hlzt;
+    public String getMyAcctNoReInvest() {
+        return myAcctNoReInvest;
     }
 
-    public void setMyAcctNo_hlzt(String myAcctNo_hlzt) {
-        this.myAcctNo_hlzt = myAcctNo_hlzt;
+    public void setMyAcctNoReInvest(String myAcctNoReInvest) {
+        this.myAcctNoReInvest = myAcctNoReInvest;
     }
 
-    public Date getTradeDate_share() {
-        return tradeDate_share;
+    public Date getTradeDateStrengthen() {
+        return tradeDateStrengthen;
     }
 
-    public void setTradeDate_share(Date tradeDate_share) {
-        this.tradeDate_share = tradeDate_share;
+    public void setTradeDateStrengthen(Date tradeDateStrengthen) {
+        this.tradeDateStrengthen = tradeDateStrengthen;
     }
 
-    public BigDecimal getDealNum_share() {
-        return dealNum_share;
+    public BigDecimal getDealNumStrengthen() {
+        return dealNumStrengthen;
     }
 
-    public void setDealNum_share(BigDecimal dealNum_share) {
-        this.dealNum_share = dealNum_share;
+    public void setDealNumStrengthen(BigDecimal dealNumStrengthen) {
+        this.dealNumStrengthen = dealNumStrengthen;
     }
 
-    public String getMyAcctNo_share() {
-        return myAcctNo_share;
+    public String getMyAcctNoStrengthen() {
+        return myAcctNoStrengthen;
     }
 
-    public void setMyAcctNo_share(String myAcctNo_share) {
-        this.myAcctNo_share = myAcctNo_share;
+    public void setMyAcctNoStrengthen(String myAcctNoStrengthen) {
+        this.myAcctNoStrengthen = myAcctNoStrengthen;
     }
 }
 

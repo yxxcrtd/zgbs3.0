@@ -43,7 +43,7 @@ $(function(){
             ,{field:'tradeDate',  title: '交易日期', visible: false}
             ,{field:'bonusAmt', width:150, title: '分红金额',type:'number'}
             ,{field:'unitBonusUnitValue', width:150, title: '单位分红净值',type:'number'}
-            ,{field:'dealNum_hlzt', width:150, title: '交易份额',type:'money'}
+            ,{field:'dealNumReInvest', width:150, title: '交易份额',type:'number'}
             ,{field:'ccyFmt', title: '币种',sortField:"ccy",width:180}
             ,{field:'ccy', title: '币种',visible:false}
             ,{field:'settleAmt', width:150, title: '结算金额',type:'money'}
@@ -59,7 +59,7 @@ $(function(){
         data.pageModel = PAGE_MODEL_EDIT;
         var object = {selectedItem: [data], operateType:"edit"};//请求参数
         Joyin.ajaxJson(basePath + 'valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade001/check', object, function(result) {//请求路径，请求参数回调函数
-            Joyin.dialog(JoyinUtil.getLabel("基金交易-修改"),
+            Joyin.dialog(JoyinUtil.getLabel("基金存续期管理-修改"),
                 basePath + "valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade002/init",//打开新界面
                 "95%", "90%", {pageModel:PAGE_MODEL_EDIT,//请求的page_model
                     tradeId:data.tradeId  //金融产品代码
@@ -128,7 +128,7 @@ $(function(){
         });
 
         // 绑定删除事件
-        $('#TrdFundValuationTrade001_btn_delete').click(function() {
+        $('#TrdFundBonusValuationTrade001_btn_delete').click(function() {
             if(table!=null && table!=''){
                 var selArr = table.getAllCheckedRows();
             }

@@ -180,8 +180,8 @@ public class TrdFundBonusValuationTradeService extends CommonExportService<TrdFu
         return trdFundBonusValuationTradeMapper.selectDeal(params);
     }
 
-    public TrdFundBonusValuationTradeDto queryTradeInfoByTradeId(String tradeId) {
-        return trdFundBonusValuationTradeMapper.queryTradeInfoByTradeId(tradeId);
+    public TrdFundBonusValuationTradeDto queryTradeInfoByTradeId(Map<String, Object> params) {
+        return trdFundBonusValuationTradeMapper.queryTradeInfoByTradeId(params);
     }
 
 

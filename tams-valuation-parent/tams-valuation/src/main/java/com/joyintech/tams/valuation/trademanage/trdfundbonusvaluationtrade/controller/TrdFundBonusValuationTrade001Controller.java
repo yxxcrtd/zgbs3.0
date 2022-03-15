@@ -201,6 +201,8 @@ public class TrdFundBonusValuationTrade001Controller extends BaseController {
         ProcessParameter<TrdFundBonusValuationTradeDto> proParam = new ProcessParameter<>();
         WorkFlowParameter<TrdFundBonusValuationTradeDto> params = new WorkFlowParameter<>();
 
+        TrdFundBonusValuationTradeDto tradeDto = dto.getSelectedItem().get(0);
+
         // 业务代码（凭证流水号）
         params.setBusinessCode(item -> item.getTradeId());
         // 业务类型
@@ -211,9 +213,10 @@ public class TrdFundBonusValuationTrade001Controller extends BaseController {
         params.setElementId(dto.getElementId());
 
         // 设置流程业务说明, entity即传入的dto
-        params.setComment(entity -> WorkFlowUtil.concatComment("基金交易查询删除：", entity.getTradeId(),
-                DateUtil.format(entity.getTradeDate(),DateUtil.DEFAULT_DATETIME_FORMAT)
+        params.setComment(entity -> WorkFlowUtil.concatComment("基金交易查询删除：交易编号", entity.getTradeId(),
+                "交易日期",DateUtil.format(tradeDto.getTradeDate())
         ));
+
 
         // 塞入流程参数
         proParam.setWorkFlowParameter(params);

@@ -64,11 +64,11 @@
 
     //红利再投 单位分红净值=分红金额/分红份额
     var unitBonusUnitValueChange = function(){
-        var bonusAmt_hlzt = $('#bonusAmt_hlzt').val();
-        var dealNum_hlzt = $('#dealNum_hlzt').val();
-        if(bonusAmt_hlzt != null && bonusAmt_hlzt != ''
-            && dealNum_hlzt != null && dealNum_hlzt != ''){
-            var unitBonusUnitValue =JoyinMath.doDiv(bonusAmt_hlzt, dealNum_hlzt,4,JoyinMath.ROUND_HALF_UP);
+        var bonusAmtReInvest = $('#bonusAmtReInvest').val();
+        var dealNumReInvest = $('#dealNumReInvest').val();
+        if(bonusAmtReInvest != null && bonusAmtReInvest != ''
+            && dealNumReInvest != null && dealNumReInvest != ''){
+            var unitBonusUnitValue =JoyinMath.doDiv(bonusAmtReInvest, dealNumReInvest,4,JoyinMath.ROUND_HALF_UP);
             $('#unitBonusUnitValue').val(unitBonusUnitValue);
         }else{
             $('#unitBonusUnitValue').val('');
@@ -76,12 +76,12 @@
     }
 
     //红利再投 结算金额 默认等于分红金额
-    var settleAmt_hlzt = function(){
-        var bonusAmt_hlzt = $('#bonusAmt_hlzt').val();
-        if(bonusAmt_hlzt != null && bonusAmt_hlzt != ''){
-            $('#settleAmt_hlzt').val(bonusAmt_hlzt);
+    var settleAmtReInvest = function(){
+        var bonusAmtReInvest = $('#bonusAmtReInvest').val();
+        if(bonusAmtReInvest != null && bonusAmtReInvest != ''){
+            $('#settleAmtReInvest').val(bonusAmtReInvest);
         }else{
-            $('#settleAmt_hlzt').val('');
+            $('#settleAmtReInvest').val('');
         }
 
     }
@@ -124,11 +124,11 @@
         });
 
         //红利再投 单位分红净值=分红金额/分红份额
-        $('#bonusAmt_hlzt').change(function(){
+        $('#bonusAmtReInvest').change(function(){
             unitBonusUnitValueChange();
-            settleAmt_hlzt();
+            settleAmtReInvest();
         });
-        $('#dealNum_hlzt').change(function(){
+        $('#dealNumReInvest').change(function(){
             unitBonusUnitValueChange();
         });
 
