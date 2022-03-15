@@ -2,39 +2,54 @@ $(function(){
     /**
      * 获取查询参数
      */
+    // var getPageParams = function() {
+    //
+    //     //产品代码 多选择
+    //     var portfolioIdTemp = $('#portfolioId').val();
+    //     var portfolioId = null;
+    //     if(portfolioIdTemp != null){
+    //         portfolioId = portfolioIdTemp.join(",");
+    //     }
+    //
+    //     //资产代码  多选择
+    //     var finprodMarketIdTemp = $('#finprodMarketId').val();
+    //     var finprodMarketId = null;
+    //     if(finprodMarketIdTemp != null){
+    //         finprodMarketId = finprodMarketIdTemp.join(",");
+    //     }
+    //
+    //     //交易类型  多选择
+    //     var psTemp = $('#ps').val();
+    //     var ps = null;
+    //     if(psTemp != null){
+    //         ps = psTemp.join(",");
+    //     }
+    //
+    //     return {
+    //         tradeId: $('#tradeId').val(),
+    //         portfolioId: portfolioId,
+    //         finprodMarketId: finprodMarketId,
+    //         tradeDateBegin: $("#tradeDate").startDate(),
+    //         tradeDateEnd: $("#tradeDate").endDate(),
+    //         ps: ps
+    //     }
+    // };
+
+    /**
+     * 获取查询参数
+     */
     var getPageParams = function() {
-
-        //产品代码 多选择
-        var portfolioIdTemp = $('#portfolioId').val();
-        var portfolioId = null;
-        if(portfolioIdTemp != null){
-            portfolioId = portfolioIdTemp.join(",");
-        }
-
-        //资产代码  多选择
-        var finprodMarketIdTemp = $('#finprodMarketId').val();
-        var finprodMarketId = null;
-        if(finprodMarketIdTemp != null){
-            finprodMarketId = finprodMarketIdTemp.join(",");
-        }
-
-        //交易类型  多选择
-        var psTemp = $('#ps').val();
-        var ps = null;
-        if(psTemp != null){
-            ps = psTemp.join(",");
-        }
-
         return {
             tradeId: $('#tradeId').val(),
-            portfolioId: portfolioId,
-            finprodMarketId: finprodMarketId,
+            portfolioId: $.trim($('#portfolioId').val()),
+            finprodMarketId: $.trim($('#finprodMarketId').val()),
             tradeDateBegin: $("#tradeDate").startDate(),
             tradeDateEnd: $("#tradeDate").endDate(),
-            ps: ps
+            ps: $.trim($('#ps').val())
+
         }
     };
-    
+
     /**
      * 定义数据表格
      */
