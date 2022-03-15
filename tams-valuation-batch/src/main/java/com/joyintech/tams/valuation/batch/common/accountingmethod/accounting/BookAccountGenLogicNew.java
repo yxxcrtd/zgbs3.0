@@ -8,6 +8,7 @@ package com.joyintech.tams.valuation.batch.common.accountingmethod.accounting;
 import com.joyintech.calculation.config.NumberEnum;
 import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
+import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
@@ -1544,11 +1545,10 @@ public class BookAccountGenLogicNew {
             if(bokDetailId != null){
                 listBokDetailId.add(bokDetailId.getBokDetailId());
             }
-            resultEnryies.add(accountEntry);
         }
         // 若科目信息或者账务明细代码为空，直接返回
         if(CollectionUtils.isEmpty(listBokDetailId)){
-            return resultEnryies;
+            return accountEntries;
         }
 //        // 3. 根据账务明细代码和账套代码，查询对应科目辅助核算项
 //        List<SubjectMappingConfig> subjectMappingConfigList= bookAccountGenLogicNewMapper.getSubjectMappingConfig(booksetId, listBokDetailId, DictCodeListExt1.金融产品类型_存款.getValue());
@@ -1559,11 +1559,19 @@ public class BookAccountGenLogicNew {
         // 定义 变量.默认辅助核算项配置
         SubjectMappingConfig subjectMappingConfigDefault = accountDriver.getSubjectMappingConfigDefault();
         // 循环遍历会计分录
-        for(AccountEntry accountEntry : resultEnryies){
+        for(AccountEntry entry : accountEntries){
+            AccountEntry accountEntry = new AccountEntry();
+            try {
+                BeanUtil.copyProperties(accountEntry, entry);
+            }
+            catch (Exception e){
+                e.printStackTrace();
+                logger.error("场景代码【"+ accountDriver.getTableId()+"】对内部科目编码【"+entry.getSubjectId()+"】解析分录内部编码对应科目时复制分录信息异常结束");
+            }
             // 根据内部科目编码获取所有对应科目
             List<BokSubject> entrySubjectList = new ArrayList<>();
             if(CollectionUtils.isEmpty(accountEntry.getBokSubjectList())){
-                logger.error("内部科目编码："+accountEntry.getSubjectId() +"未找到匹配科目信息 \r\n");
+                logger.error("场景代码【"+ accountDriver.getTableId()+"】对应内部科目编码："+accountEntry.getSubjectId() +"未找到匹配科目信息 \r\n");
                 continue;
             }
             else{
@@ -1642,10 +1650,11 @@ public class BookAccountGenLogicNew {
                 for (String mp : params.keySet()) {
                     sb.append("key = " + mp + ", value = " + params.get(mp));
                 }
-                logger.error("资产【"+bokDetailId.getBusiId()+"】对应内部科目编码："+accountEntry.getSubjectId() +"未找到匹配科目信息 \r\n"
+                logger.error("资产【"+bokDetailId.getBusiId()+"】对应场景【"+ accountDriver.getTableId()+"】查找内部科目编码有误："+accountEntry.getSubjectId() +"未找到匹配科目信息 \r\n"
               +"辅助核算项："+sb.toString());
 
             }
+            resultEnryies.add(accountEntry);
         }
         return resultEnryies;
     }
