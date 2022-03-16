@@ -39,13 +39,13 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
      * 综合收益类成本
      */
     综合收益类_成本(
-        "ZHSYLCB"
+        "ZHSYL_CB"
     ),
     /**
      * 综合收益类利息调整
      */
     综合收益类_利息调整(
-        "ZHSYLLXTZ"
+        "ZHSYL_LXTZ"
     ),
     /**
      * 综合收益类_公允价值变动
@@ -201,7 +201,7 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
      * 综合收益类_应计利息
      */
     综合收益类_应计利息(
-            "ZHSYLYJLX"
+            "ZHSYL_YJLX"
     ),
     /**
      * 应付交易费用_费用
