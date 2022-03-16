@@ -1732,6 +1732,29 @@ public class BookAccountGenLogicNew {
     }
 
     /**
+     * 根据账套获取对应科目信息
+     * @param subjectInternalCode 内部科目编码
+     * @param booksetId 账套信息
+     * @return
+     */
+    public Map<String, List<BokSubject>> getFeeSubjectMapByCodes(List<String> listSubjectInternalCode, String booksetId, String ccy){
+        Map<String, List<BokSubject>> result = new HashMap<>();
+        // 定义 变量.查询map
+        Map<String,Object> params = new HashMap<>();
+        params.put("booksetId",booksetId);//账套代码
+        params.put("listSubjectInternalCode",listSubjectInternalCode); //内部科目编码集合
+        params.put("isAcc",DictCodeList.是否_是.getValue()); // 是否核算科目
+        params.put("ccy",ccy); // 是否核算科目
+        // 2. 根据内部编码集合查询相关底层科目信息
+        List<BokSubject> listBokSubject =  accountingMethodNewMapper.getSubjectByInternalCode(params);
+        if(CollectionUtils.isNotEmpty(listBokSubject)){
+            // 按照内部科目编码分组
+            result = listBokSubject.stream().collect(Collectors.groupingBy(BokSubject::getSubjectInternalCode));
+        }
+        return result;
+    }
+
+    /**
      * 根据辅助核算项匹配查找对应科目
      * @param listBokSubject 科目信息列表
      * @param subjectMappingConfig 辅助核算项

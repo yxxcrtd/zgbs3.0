@@ -243,7 +243,7 @@ public class BookClawbackNewService {
 
             if (theoryFlag) {
                 // add by weipeng on 20220303：由于浮动管理费和固定管理费对应基础科目性质为一个，查询余额需要按照科目查询
-                List<BokSubject> bokSubjectList = bookAccountGenLogicNew.getFeeSubjectByCode(DictCodeBaseSubjectNatrueNew.运营费用.getValue(), booksetId, standardCcy);
+                List<BokSubject> bokSubjectList = bookAccountGenLogicNew.getFeeSubjectByCode(DictCodeBaseSubjectNatrueNew.应付运营费.getValue(), booksetId, standardCcy);
                 SubjectMappingConfig mappingConfig = new SubjectMappingConfig();
                 mappingConfig.setCashType2(DictCodeListExt1.现金流二级类型_固定管理费.getValue());
                 // 定义 变量.固定管理费科目信息
