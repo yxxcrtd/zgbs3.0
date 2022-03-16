@@ -83,6 +83,7 @@
         INNER JOIN BOK_BOOKSET B
         ON A.BOOKSET_ID = B.BOOKSET_ID_TMPL
         WHERE 1=1
+            AND A.SUBJECT_INTERNAL_CODE IS NOT NULL
         <if test="booksetId != null and booksetId != ''">
             AND B.BOOKSET_ID = #{booksetId}
         </if>
