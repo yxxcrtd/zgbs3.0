@@ -23,6 +23,7 @@ import com.joyintech.tams.constant.DictCodeList;
 
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.trdintovaluationduration.dto.TrdIntoValuationDuration001Dto;
 import com.joyintech.tams.valuation.trademanage.trdintovaluationduration.service.TrdIntoValuationDuration001Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -60,6 +61,9 @@ public class TrdIntoValuationDuration001Controller extends BaseController {
     @Autowired
     private TrdIntoValuationDuration001Service trdIntoValuationDuration001Service;
 
+    @Autowired
+    private CommonBusinessService commonBusinessService;
+
     @Override
     public String init(Model model) {
         this.setSelectOptionToModel(model,DictCode.交易方向,DictCode.交易场所,
@@ -78,32 +82,33 @@ public class TrdIntoValuationDuration001Controller extends BaseController {
     }
 
 
-    /**
-     * 自定义产品代码下拉框
-     * @param request
-     * @return
-     */
-    @RequestMapping("/findPortfolioId")
-    @ResponseBody
-    public Page<SelectOptionDto> findPortfolioId(HttpServletRequest request) {
-        Map<String, Object> param =RequestUtil.getPageParam();
-        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-        param.put("finprodType", "F16"); //测试
-        return trdIntoValuationDuration001Service.findPortfolioId(param);
-    }
 
-
-    /**
-     * 自定义资产代码下拉框
-     */
-    @RequestMapping("/findFinprodId")
-    @ResponseBody
-    public Page<SelectOptionDto> findFinprodId(HttpServletRequest request) {
-        Map<String, Object> param =RequestUtil.getPageParam();
-        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
+//    /**
+//     * 自定义产品代码下拉框
+//     * @param request
+//     * @return
+//     */
+//    @RequestMapping("/findPortfolioId")
+//    @ResponseBody
+//    public Page<SelectOptionDto> findPortfolioId(HttpServletRequest request) {
+//        Map<String, Object> param =RequestUtil.getPageParam();
+//        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
 //        param.put("finprodType", "F16"); //测试
-        return trdIntoValuationDuration001Service.findFinprodId(param);
-    }
+//        return trdIntoValuationDuration001Service.findPortfolioId(param);
+//    }
+//
+//
+//    /**
+//     * 自定义资产代码下拉框
+//     */
+//    @RequestMapping("/findFinprodId")
+//    @ResponseBody
+//    public Page<SelectOptionDto> findFinprodId(HttpServletRequest request) {
+//        Map<String, Object> param =RequestUtil.getPageParam();
+//        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
+////        param.put("finprodType", "F16"); //测试
+//        return trdIntoValuationDuration001Service.findFinprodId(param);
+//    }
 
 
     /**
@@ -215,5 +220,36 @@ public class TrdIntoValuationDuration001Controller extends BaseController {
                         + SystemGlobalConstant.POINT
                         + FileNameUtil.getFileExtName(outFile),
                 outFile, true);
+    }
+
+
+    /**
+     * 产品代码下拉框
+     *
+     * @return 产品代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getFinprodId")
+    public List<SelectOptionDto> getFinprodId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("finprodType","F16");
+        return commonBusinessService.getProdName(param);
+    }
+
+    /**
+     * 资产代码下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getAssetId")
+    public List<SelectOptionDto> getAssetId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("assetType","F01");
+        return commonBusinessService.getAssetId(param);
     }
 }

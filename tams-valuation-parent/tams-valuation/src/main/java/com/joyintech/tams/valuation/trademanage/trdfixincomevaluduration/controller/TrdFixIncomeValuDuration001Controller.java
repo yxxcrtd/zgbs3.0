@@ -20,6 +20,7 @@ import com.joyintech.framework.util.*;
 import com.joyintech.system.constant.SystemGlobalConstant;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.trdfixincomevaluduration.dto.TrdFixIncomeValuDuration001Dto;
 import com.joyintech.tams.valuation.trademanage.trdfixincomevaluduration.service.TrdFixIncomeValuDuration001Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -57,6 +58,9 @@ public class TrdFixIncomeValuDuration001Controller extends BaseController {
     @Autowired
     private TrdFixIncomeValuDuration001Service trdFixIncomeValuDuration001Service;
 
+    @Autowired
+    private CommonBusinessService commonBusinessService;
+
     @Override
     public String init(Model model) {
         this.setSelectOptionToModel(model,DictCode.交易方向,DictCode.交易场所,
@@ -75,32 +79,32 @@ public class TrdFixIncomeValuDuration001Controller extends BaseController {
     }
 
 
-    /**
-     * 自定义产品代码下拉框
-     * @param request
-     * @return
-     */
-    @RequestMapping("/findPortfolioId")
-    @ResponseBody
-    public Page<SelectOptionDto> findPortfolioId(HttpServletRequest request) {
-        Map<String, Object> param =RequestUtil.getPageParam();
-        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-        param.put("finprodType", "F16"); //测试
-        return trdFixIncomeValuDuration001Service.findPortfolioId(param);
-    }
-
-
-    /**
-     * 自定义资产代码下拉框
-     */
-    @RequestMapping("/findFinprodId")
-    @ResponseBody
-    public Page<SelectOptionDto> findFinprodId(HttpServletRequest request) {
-        Map<String, Object> param =RequestUtil.getPageParam();
-        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-        param.put("finprodType", "F01"); //测试
-        return trdFixIncomeValuDuration001Service.findFinprodId(param);
-    }
+//    /**
+//     * 自定义产品代码下拉框
+//     * @param request
+//     * @return
+//     */
+//    @RequestMapping("/findPortfolioId")
+//    @ResponseBody
+//    public Page<SelectOptionDto> findPortfolioId(HttpServletRequest request) {
+//        Map<String, Object> param =RequestUtil.getPageParam();
+//        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
+//        param.put("finprodType", "F16"); //测试
+//        return trdFixIncomeValuDuration001Service.findPortfolioId(param);
+//    }
+//
+//
+//    /**
+//     * 自定义资产代码下拉框
+//     */
+//    @RequestMapping("/findFinprodId")
+//    @ResponseBody
+//    public Page<SelectOptionDto> findFinprodId(HttpServletRequest request) {
+//        Map<String, Object> param =RequestUtil.getPageParam();
+//        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
+//        param.put("finprodType", "F01"); //测试
+//        return trdFixIncomeValuDuration001Service.findFinprodId(param);
+//    }
 
 
 
@@ -214,5 +218,37 @@ public class TrdFixIncomeValuDuration001Controller extends BaseController {
                         + SystemGlobalConstant.POINT
                         + FileNameUtil.getFileExtName(outFile),
                 outFile, true);
+    }
+
+
+    /**
+     * 产品代码下拉框
+     *
+     * @return 产品代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getFinprodId")
+    public List<SelectOptionDto> getFinprodId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("finprodType","F16");
+        return commonBusinessService.getProdName(param);
+    }
+
+    /**
+     * 资产代码下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getAssetId")
+    public List<SelectOptionDto> getAssetId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("assetType","F17");
+        param.put("profitType","02");
+        return commonBusinessService.getAssetId(param);
     }
 }

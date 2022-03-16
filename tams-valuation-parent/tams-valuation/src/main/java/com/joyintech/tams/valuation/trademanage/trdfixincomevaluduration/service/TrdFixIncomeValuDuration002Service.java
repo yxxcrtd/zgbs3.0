@@ -86,7 +86,7 @@ public class TrdFixIncomeValuDuration002Service extends BaseService<TrdFixIncome
         //比较界面和接口字段差异，并手动给接口字段赋值
         entity.setProdId(dto.getPortfolioId());
         entity.setTradeId(dto.getTradeId());  //交易编号
-        entity.setAssetId("F01_"+dto.getFinprodMarketId());  //资产代码
+        entity.setAssetId("F17_"+dto.getFinprodMarketId());  //资产代码
         entity.setAssetName(dto.getFinprodName()); //资产名称
         entity.setDataActionSign("01");//数据动作标志
         entity.setDealType(dto.getPs());//交易类型
