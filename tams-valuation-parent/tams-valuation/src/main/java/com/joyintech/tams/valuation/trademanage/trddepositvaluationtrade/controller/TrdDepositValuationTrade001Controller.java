@@ -15,6 +15,7 @@ import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.system.constant.SystemGlobalConstant;
@@ -22,6 +23,7 @@ import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.service.MstWorkflowCommonService;
+import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.dto.TrdDepositValuationTrade001Dto;
 import com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.service.TrdDepositValuationTrade001Service;
 import com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.service.TrdDepositValuationTrade002Service;
@@ -61,16 +63,14 @@ public class TrdDepositValuationTrade001Controller extends BaseController {
         /*
          * 注入service
          */
-        @Autowired
-        private TrdDepositValuationTrade001Service trdDepositValuationTrade001Service;
-        
-        @Autowired
-        private TrdDepositValuationTrade002Service trdDepositValuationTrade002Service;
-//    /**
-//     * 通用Mapper共同代理方法
-//     */
-//    @Autowired(required = false)
-//    private BussCommonMapperDelegateService bussCommonMapperDelegateService;
+    @Autowired
+    private TrdDepositValuationTrade001Service trdDepositValuationTrade001Service;
+
+    @Autowired
+    private TrdDepositValuationTrade002Service trdDepositValuationTrade002Service;
+
+    @Autowired
+    private CommonBusinessService commonBusinessService;
 
 
 
@@ -79,9 +79,7 @@ public class TrdDepositValuationTrade001Controller extends BaseController {
      */
     @Autowired
     private MstWorkflowCommonService mstWorkflowCommonService;
-    
-    @Autowired
-    private TrdDepositValuationTrade002Controller trade002Controller;
+
         /**
          * 初始化方法
          * {@inheritDoc}
@@ -225,6 +223,36 @@ public class TrdDepositValuationTrade001Controller extends BaseController {
         return new AjaxResult(msg);
     }
 
+
+    /**
+     * 产品代码下拉框
+     *
+     * @return 产品代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getFinprodId")
+    public List<SelectOptionDto> getFinprodId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("finprodType","F16");
+        return commonBusinessService.getProdName(param);
+    }
+
+    /**
+     * 资产代码下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getAssetId")
+    public List<SelectOptionDto> getAssetId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("assetType","F07");  //存款类资产
+        return commonBusinessService.getAssetId(param);
+    }
 
 }
 

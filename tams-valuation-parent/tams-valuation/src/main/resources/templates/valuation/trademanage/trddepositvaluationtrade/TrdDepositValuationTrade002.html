@@ -41,7 +41,7 @@
 											<select id="portfolioId" name="portfolioId" th:initValue="${entity?.portfolioId}"
 													class="layui-input form-input input-select available"
 													data-th-placeholder="#{SysCommon.placeholder}" required
-													data-th-data-url="@{/valuation/trademanage/trddepositvaluationtrade/TrdDepositValuationTrade002/findPortfolioId}">
+													data-th-data-url="@{/valuation/trademanage/trddepositvaluationtrade/TrdDepositValuationTrade001/getFinprodId}">
 											</select>
 										</div>
 									</div>
@@ -61,7 +61,7 @@
 										<div class="layui-input-inline input-inline">
 											<select id="finprodMarketId" name="finprodMarketId" class="layui-input form-input input-select" required
 													data-th-placeholder="#{SysCommon.placeholder}" th:initValue="${entity?.finprodMarketId}"  childrenIds='chlId'
-													data-th-data-url="@{/valuation/trademanage/trddepositvaluationtrade/TrdDepositValuationTrade002/findFinprodId}">
+													data-th-data-url="@{/valuation/trademanage/trddepositvaluationtrade/TrdDepositValuationTrade001/getAssetId}">
 
 											</select>
 										</div>

@@ -61,21 +61,6 @@ public class TrdDepoValuationDuration002Controller extends BaseController {
     @Autowired(required = false)
     private CommonBusinessService commonBusinessService;
 
-    /**
-     * 资产代码下拉框
-     *
-     * @return 资产代码
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("/getAssetId")
-    public List<SelectOptionDto> getAssetId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("assetType","F01");
-        return commonBusinessService.getAssetId(param);
-    }
-
 
 
     public String init(Model model) {
@@ -169,5 +154,19 @@ public class TrdDepoValuationDuration002Controller extends BaseController {
     }
 
 
+    /**
+     * 资金账户下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getTrdAcctId")
+    public List<SelectOptionDto> getTrdAcctId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("portfolioId",param.get("finprodId"));
+        return commonBusinessService.getTrdAcctId(param);
+    }
 
 }
