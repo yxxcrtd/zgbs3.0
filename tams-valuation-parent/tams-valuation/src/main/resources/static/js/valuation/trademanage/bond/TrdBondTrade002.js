@@ -63,39 +63,32 @@
     /**
      * 产品代码联动带出产品名称，证券账户
      */
-    var prodIdChange = function() {
+    $('#prodId').change(function(){
         var prodId = $('#prodId').val();
-        if (prodId == '' || prodId == undefined) {
-            $('#prodName').val('');
-        } else {
-            $('#prodName').val($('#prodId').select2('data')[0].object).trigger('change');
+        if(prodId){
+            $('#prodName').val($('#prodId').select2('data')[0].id).trigger('change');
+
+        }else {
+            $('#prodName').val('').trigger('change');
         }
-        Joyin.ajaxJson(basePath + 'valuation/trademanage/bond/TrdBondTrade002/selectInfoByProdId',
-            {prodId: prodId}, function (data) {
-                if (data) {
-                    $('#secManageAcctId').val(data.secManageAcctId).trigger("change");
-                }
-            })
-    }
+    });
 
     /**
      * 资产代码联动带出资产简称，交易场所
      */
-    var secIdChange = function() {
-        var secId =  $('#secId').val();
-        Joyin.ajax(basePath + 'valuation/trademanage/bond/TrdBondTrade002/selectInfoBySecId',
-            {secId:secId}, function(data){
-                if(data) {
-                    $('#secId').textSelect($('#secId').select2('data')[0].id);
-                    $('#secAbbr').val(data.finprodAbbr).trigger("change");
-                    $('#tradeMarket').textSelect('setValue',data.tradeMarket);
-                }else{
-                    $('#secId').text($('#secId').select2('data')[0].id);
-                    $('#secAbbr').val("").trigger("change");
-                    $('#tradeMarket').textSelect('setValue',"");
-                }
-            });
-    }
+    $('#secId').change(function(){
+        var secId = $('#secId').val();
+        if(secId){
+            var dataPort = $('#secId').select2('data')[0].object;
+            var tradeMarket = dataPort.tradeMarket;
+            $('#secAbbr').val($('#secId').select2('data')[0].id).trigger('change');
+            $('#tradeMarket').val(tradeMarket).trigger('change');
+
+        }else {
+            $('#secAbbr').val('').trigger('change');
+            $('#tradeMarket').val('').trigger('change');
+        }
+    });
 
     /*净价 = 净价总额/数量计算 */
     $('#dealNum').change(function () {
@@ -123,9 +116,9 @@
             $('#confirmInfo').hide();
             $('#settleInfo').show();
         }else{
-            $('#purchInfo').show();
-            $('#confirmInfo').show();
-            $('#settleInfo').show();
+            $('#purchInfo').hide();
+            $('#confirmInfo').hide();
+            $('#settleInfo').hide();
         }
     });
 

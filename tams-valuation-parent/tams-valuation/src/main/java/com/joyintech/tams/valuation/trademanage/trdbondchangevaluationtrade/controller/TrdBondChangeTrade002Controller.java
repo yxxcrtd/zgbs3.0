@@ -95,21 +95,6 @@ public class TrdBondChangeTrade002Controller extends BaseController {
     }
 
     /**
-     * 产品代码下拉框
-     *
-     * @return 产品代码
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("/getFinprodId")
-    public List<SelectOptionDto> getFinprodId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("finprodType","F16");
-        return commonBusinessService.getProdId(param);
-    }
-
-    /**
      *
      * 新建界面，转出证券代码下拉框默认显示可转债资产和基金
      *
@@ -207,23 +192,6 @@ public class TrdBondChangeTrade002Controller extends BaseController {
         Map<String,Object> map=RequestUtil.getPageParam();
         return trdBondChangeTrade002Service.selectInfoBySecId(map);
     }
-
-
-    /**
-     * 通过产品代码查询证券账户
-     *
-     * @return 产品代码列表
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("selectInfoByProdId")
-    public List<SelectOptionDto> selectInfoByProdId() {
-        Map<String,Object> map=RequestUtil.getPageParam();
-
-        return commonBusinessService.getProdId(map);
-    }
-
 
     /**
      * 资金账户下拉框

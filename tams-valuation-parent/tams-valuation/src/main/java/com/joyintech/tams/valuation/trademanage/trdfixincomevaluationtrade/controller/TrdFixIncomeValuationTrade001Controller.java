@@ -99,7 +99,8 @@ public class TrdFixIncomeValuationTrade001Controller extends BaseController {
     public List<SelectOptionDto> getAssetId() {
         Map<String, Object> param = RequestUtil.getPageParam();
         param.put("assetType","F17");
-        return commonBusinessService.getAssetName(param);
+        param.put("profitType","02");
+        return commonBusinessService.getAssetId(param);
     }
 
 

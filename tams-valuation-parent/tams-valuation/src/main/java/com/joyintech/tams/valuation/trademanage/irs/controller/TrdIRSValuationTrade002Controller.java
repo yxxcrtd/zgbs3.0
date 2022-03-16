@@ -19,7 +19,6 @@ import com.joyintech.framework.select.SelectDto;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.JsonUtils;
-import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
@@ -45,7 +44,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 利率互换交易新建
@@ -95,20 +93,6 @@ public class TrdIRSValuationTrade002Controller extends BaseController {
         return super.init(model);
     }
 
-    /**
-     * 产品代码下拉框
-     *
-     * @return 产品代码
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("/getFinprodId")
-    public List<SelectOptionDto> getFinprodId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("finprodType","F16");
-        return commonBusinessService.getProdId(param);
-    }
     /**
      * 确认校验
      *

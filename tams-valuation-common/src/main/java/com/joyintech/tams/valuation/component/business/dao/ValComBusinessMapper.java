@@ -50,20 +50,6 @@ public interface ValComBusinessMapper {
     List<SelectOptionDto> getAssetId(Map<String, Object> pageParam);
 
     /**
-     * 资产名称
-     * @param pageParam
-     * @return
-     */
-    List<SelectOptionDto> getAssetName(Map<String, Object> pageParam);
-
-    /**
-     * 产品代码
-     * @param pageParam
-     * @return
-     */
-    List<SelectOptionDto> getProdId(Map<String, Object> pageParam);
-
-    /**
      * 产品代码
      * @param pageParam
      * @return

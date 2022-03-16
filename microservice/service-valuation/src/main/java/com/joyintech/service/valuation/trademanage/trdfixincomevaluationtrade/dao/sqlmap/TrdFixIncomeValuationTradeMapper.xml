@@ -27,7 +27,7 @@
 		LEFT JOIN BOK_BOOKSET bok on bok.BOOKSET_ID = deal.BOOKSET_ID
 		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE ='09' and stl.ORDER_TYPE NOT LIKE 'N%'
 		where
-		t.BUSI_TYPE ='09'
+		t.BUSI_TYPE ='09' and  t.FINPROD_TYPE = 'F17'
 		<if test="tradeId !=null and tradeId !='' ">
 			and t.TRADE_ID like  concat(concat('%',#{tradeId}),'%')
 		</if>

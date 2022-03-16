@@ -100,21 +100,6 @@ public class TrdIrsValuationDuration001Controller extends BaseController {
     }
 
     /**
-     * 资产代码下拉框
-     *
-     * @return 资产代码
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("/getAssetId")
-    public List<SelectOptionDto> getAssetId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("assetType","F01");
-        return commonBusinessService.getAssetName(param);
-    }
-
-    /**
      * 删除前判断
      *
      * @param dto

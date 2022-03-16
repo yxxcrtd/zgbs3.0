@@ -89,21 +89,6 @@ public class TrdBondTrade002Controller extends BaseController {
     }
 
     /**
-     * 产品代码下拉框
-     *
-     * @return 产品代码
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("/getFinprodId")
-    public List<SelectOptionDto> getFinprodId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("finprodType","F16");
-        return commonBusinessService.getProdId(param);
-    }
-
-    /**
      * 资产代码下拉框
      *
      * @return 资产代码
@@ -131,23 +116,6 @@ public class TrdBondTrade002Controller extends BaseController {
         Map<String,Object> map=RequestUtil.getPageParam();
         return trdBondTrade002Service.selectInfoBySecId(map);
     }
-
-
-    /**
-     * 通过产品代码查询证券账户
-     *
-     * @return 产品代码列表
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("selectInfoByProdId")
-    public List<SelectOptionDto> selectInfoByProdId() {
-        Map<String,Object> map=RequestUtil.getPageParam();
-
-        return commonBusinessService.getProdId(map);
-    }
-
 
     /**
      * 查询证券托管户：下拉框

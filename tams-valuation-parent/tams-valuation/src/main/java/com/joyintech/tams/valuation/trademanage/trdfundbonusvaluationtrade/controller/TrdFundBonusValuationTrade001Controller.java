@@ -88,22 +88,6 @@ public class TrdFundBonusValuationTrade001Controller extends BaseController {
     }
 
     /**
-     * 资产代码下拉框
-     *
-     * @return 资产代码
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("/getAssetId")
-    public List<SelectOptionDto> getAssetId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("assetType","F06");
-        return commonBusinessService.getAssetName(param);
-    }
-
-
-    /**
      * @Description:页面查询，表格分页
      * @auther: yuzj
      * @date: 2021/12/30

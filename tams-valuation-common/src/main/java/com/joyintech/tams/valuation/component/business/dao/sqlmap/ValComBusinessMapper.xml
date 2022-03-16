@@ -59,41 +59,8 @@
 				AND	(FINPROD_MARKET_ID like concat('%',concat(#{search},'%'))
 				OR FINPROD_ABBR like concat('%',concat(#{search},'%')))
 			</if>
-	</select>
-
-	<select id="getAssetName" resultType="com.joyintech.framework.select.SelectOptionDto">
-		select
-		FINPROD_MARKET_ID id,
-		FINPROD_ABBR text,
-		FINPROD_ABBR object
-		from
-		FIN_PRODUCT
-		where
-		1=1
-		<if test="assetType !=null and assetType != ''">
-			and FINPROD_TYPE = #{assetType}
-		</if>
-		<if test="search !=null and search != ''">
-			AND	(FINPROD_MARKET_ID like concat('%',concat(#{search},'%'))
-			OR FINPROD_ABBR like concat('%',concat(#{search},'%')))
-		</if>
-	</select>
-
-	<select id="getProdId" resultMap="SelectOptionMap" >
-		select
-			FINPROD_ID id,
-			FINPROD_ID text,
-			FINPROD_ABBR object
-		from
-			FIN_PRODUCT
-		where
-			1=1
-			<if test="finprodType !=null and finprodType != ''">
-				and FINPROD_TYPE =#{finprodType}
-			</if>
-			<if test="search !=null and search != ''">
-				AND	(FINPROD_ID like concat('%',concat(#{search},'%'))
-				OR FINPROD_ABBR like concat('%',concat(#{search},'%')))
+			<if test="profitType !=null and profitType != ''">
+				AND	PROFIT_TYPE = #{profitType}
 			</if>
 	</select>
 

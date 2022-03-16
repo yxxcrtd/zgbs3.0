@@ -7,7 +7,7 @@
     $('#prodId').change(function(){
         var prodId = $('#prodId').val();
         if(prodId){
-            $('#prodName').val($('#prodId').select2('data')[0].object).trigger('change');
+            $('#prodName').val($('#prodId').select2('data')[0].id).trigger('change');
         }else {
             $('#prodName').val('').trigger('change');
         }
@@ -19,7 +19,7 @@
     $('#assetId').change(function(){
         var assetId = $('#assetId').val();
         if(assetId){
-            $('#assetName').val($('#assetId').select2('data')[0].object).trigger('change');
+            $('#assetName').val($('#assetId').select2('data')[0].id).trigger('change');
         }else {
             $('#assetName').val('').trigger('change');
         }

@@ -12,7 +12,6 @@ package com.joyintech.service.valuation.trademanage.trdfixincomevaluationtrade.s
 
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
-import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.valuation.trademanage.bond.dao.TrdBondTradeMapper;
@@ -101,28 +100,6 @@ public class TrdFixIncomeValuationTradeService extends CommonExportService<TrdFi
      */
     @Autowired
     private ValDealAccountingBatchMapper valDealAccountingBatchMapper;
-
-    /**
-     * 产品代码下拉框
-     * @auther: Administrator
-     * @date: 2021/12/29 16:47
-     * @param:
-     * @return:
-     */
-    public Page<SelectOptionDto> findPortfolioId(int page, int length,Map<String, Object> params) {
-        return this.queryForPageForSelectReturn(page, length, ()->trdFixIncomeValuationTradeMapper.findPortfolioId(params));
-    }
-
-    /**
-     * 资产代码下拉框
-     * @auther: Administrator
-     * @date: 2021/12/29 16:47
-     * @param:
-     * @return:
-     */
-    public Page<SelectOptionDto> findFinprodId(int page, int length,Map<String, Object> params) {
-        return this.queryForPageForSelectReturn(page, length, ()->trdFixIncomeValuationTradeMapper.findFinprodId(params));
-    }
 
     /**
      *

@@ -679,6 +679,7 @@ public class TrdBondTradeDto extends BaseEntity implements ProcessEntity {
         this.outTradeId = outTradeId;
     }
 
+    @NotEmpty(fieldName = "TrdBondTrade.prodName", groups = { ValidateGroupEdit.class })
     public String getProdName() {
         return prodName;
     }

@@ -13,9 +13,7 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
-import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.SpringContextUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
@@ -38,8 +36,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -59,21 +55,6 @@ public class TrdRepoValuationTrade003Controller extends BaseController {
 
     @Autowired(required = false)
     private CommonBusinessService commonBusinessService;
-
-    /**
-     * 产品代码下拉框
-     *
-     * @return 产品代码
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("/getFinprodId")
-    public List<SelectOptionDto> getFinprodId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("finprodType","F16");
-        return commonBusinessService.getProdId(param);
-    }
 
     public String init(Model model) {
         this.setSelectOptionToModel(model, DictCode.拆借方向, DictCode.拆借类型,DictCode.交易方向,DictCode.交易场所,

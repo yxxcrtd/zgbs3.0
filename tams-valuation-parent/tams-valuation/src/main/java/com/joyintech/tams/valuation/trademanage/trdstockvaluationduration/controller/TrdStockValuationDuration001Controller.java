@@ -97,22 +97,6 @@ public class TrdStockValuationDuration001Controller extends BaseController {
         param.put("finprodType","F16");
         return commonBusinessService.getProdName(param);
     }
-
-    /**
-     * 资产代码下拉框
-     *
-     * @return 资产代码
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("/getAssetId")
-    public List<SelectOptionDto> getAssetId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("assetType","F01");
-        return commonBusinessService.getAssetName(param);
-    }
-
     /**
      * 删除前判断
      *

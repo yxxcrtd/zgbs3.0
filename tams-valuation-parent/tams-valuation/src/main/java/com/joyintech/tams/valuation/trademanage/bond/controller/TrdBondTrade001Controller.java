@@ -21,7 +21,6 @@ import com.joyintech.framework.util.*;
 import com.joyintech.system.constant.SystemGlobalConstant;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.valuation.common.service.BaseCommonService;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTradeDto;
 import com.joyintech.tams.valuation.trademanage.bond.service.TrdBondTrade001Service;
@@ -61,9 +60,6 @@ public class TrdBondTrade001Controller extends BaseController {
 
     @Autowired
     private TrdBondTrade001Service trdBondTrade001Service;
-
-    @Autowired
-    private BaseCommonService baseCommonService;
 
     @Autowired
     private CommonBusinessService commonBusinessService;
@@ -106,21 +102,6 @@ public class TrdBondTrade001Controller extends BaseController {
     }
 
     /**
-     * 资产代码下拉框
-     *
-     * @return 资产代码
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("/getAssetId")
-    public List<SelectOptionDto> getAssetId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("assetType","F01");
-        return commonBusinessService.getAssetName(param);
-    }
-
-    /**
      * 删除前判断
      *
      * @param dto
@@ -146,19 +127,6 @@ public class TrdBondTrade001Controller extends BaseController {
                     //流程存在情况
                     return new AjaxResult("交易编号：" + item.getTradeId() + "已存在流程中", MessageType.错误消息);
                 }
-//                //2.判断交易日等于平台日
-//                String tradeDate = item.getTradeDate();
-//                // 系统平台日
-//                Date sysDate = baseCommonService.getSysDate();
-//                if (StringUtil.isNotEmpty(tradeDate)) {
-//                    Date bDate = DateUtil.parseDate(tradeDate, "yyyy-MM-dd");
-//                    if (DateUtil.compareDate(sysDate, bDate) != 0) {
-//                        return new AjaxResult("只能删除交易日等于平台日的交易", MessageType.错误消息);
-//                    } else {
-//                        return new AjaxResult("确定要删除？", MessageType.确认消息);
-//                    }
-//                }
-
             }
         }else if("edit".equals(dto.getOperateType())){
                 for (TrdBondTradeDto item : list) {

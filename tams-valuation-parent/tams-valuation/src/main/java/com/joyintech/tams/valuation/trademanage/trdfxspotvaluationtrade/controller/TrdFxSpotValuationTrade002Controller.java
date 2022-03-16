@@ -16,9 +16,11 @@ import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.*;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.RequestUtil;
+import com.joyintech.framework.util.SpringContextUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
-import com.joyintech.tams.common.base.entity.WflTrdProductDeal;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -27,7 +29,6 @@ import com.joyintech.tams.valuation.trademanage.trdfxspotvaluationtrade.dto.TrdF
 import com.joyintech.tams.valuation.trademanage.trdfxspotvaluationtrade.service.TrdFxSpotValuationTrade002Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
-import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
@@ -102,24 +106,6 @@ public class TrdFxSpotValuationTrade002Controller extends BaseController {
         }
         model.addAttribute("YES_OR_NO_N", DictCodeList.是否_否.getValue());
         return super.init(model);
-    }
-
-
-    /**
-     * @Description:产品代码下拉框
-     * @auther: yuzj
-     * @date: 2021/12/29
-     * @param:
-     * @return:
-     */
-    @RequestMapping("selectPortfolioId")
-    @ResponseBody
-    public List<SelectOptionDto> selectPortfolioId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        // 查询组合添加权限限制
-        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-        param.put("finprodType", "F01"); //测试
-        return commonBusinessService.getProdId(param);
     }
 
     /**

@@ -13,7 +13,6 @@ package com.joyintech.service.valuation.trademanage.trdfixincomevaluationtrade.c
 import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
-import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.service.valuation.trademanage.trdfixincomevaluationtrade.dto.TrdFixIncomeTradeResult;
 import com.joyintech.service.valuation.trademanage.trdfixincomevaluationtrade.dto.TrdFixIncomeValuationTradeDto;
 import com.joyintech.service.valuation.trademanage.trdfixincomevaluationtrade.service.TrdFixIncomeValuationTradeService;
@@ -38,30 +37,6 @@ public class TrdFixIncomeValuationTradeController extends BaseController {
 
     @Autowired
     private TrdFixIncomeValuationTradeService trdFixIncomeValuationTradeService;
-
-    /**
-     * 产品代码下拉框
-     *
-     * @return 返回的数据
-     * @exception Exception
-     *                异常
-     * @since 1.0
-     */
-    @PostMapping("findPortfolioId/{page}/{length}")
-    public Page<SelectOptionDto> findPortfolioId(@RequestBody Map<String,Object> map,
-                                           @PathVariable("page") int page, @PathVariable("length") int length) {
-        return trdFixIncomeValuationTradeService.findPortfolioId(page,length,map);
-    }
-
-    /**
-     * 资产代码下拉框
-     * @since 1.0
-     */
-    @PostMapping("findFinprodId/{page}/{length}")
-    public Page<SelectOptionDto> findFinprodId(@RequestBody Map<String,Object> map,
-                                                 @PathVariable("page") int page, @PathVariable("length") int length) {
-        return trdFixIncomeValuationTradeService.findFinprodId(page,length,map);
-    }
 
     /**
      * 查询 支持分页 <功能详细描述>

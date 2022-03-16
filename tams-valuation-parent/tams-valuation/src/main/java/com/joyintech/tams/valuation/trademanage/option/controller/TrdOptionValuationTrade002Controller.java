@@ -87,21 +87,6 @@ public class TrdOptionValuationTrade002Controller extends BaseController {
     }
 
     /**
-     * 产品代码下拉框
-     *
-     * @return 产品代码
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("/getFinprodId")
-    public List<SelectOptionDto> getFinprodId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("finprodType","F16");
-        return commonBusinessService.getProdId(param);
-    }
-
-    /**
      * 交易对手代码下拉框
      *
      * @return 交易对手
