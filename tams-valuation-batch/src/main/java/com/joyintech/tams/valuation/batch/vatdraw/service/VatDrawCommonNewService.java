@@ -49,12 +49,6 @@ import java.util.stream.Collectors;
  */
 @Service
 public class VatDrawCommonNewService {
-
-    /**
-     * 记账引擎
-     */
-    @Autowired
-    private BookAccountGenLogic bookLogic;
     /**
      * 记账引擎
      */

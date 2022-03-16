@@ -206,17 +206,17 @@ public class AssetImpairmentProvisionProcessorNewService {
 		}
 
 		// 1.4.其他应收款-本金
-		searchDto.setBaseSubjectNatureList(
-				new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
-		Map<String, BigDecimal> receivableMap = accountingCommonService
-				.getSubjectBalanceCollection(searchDto, DictCodeList.余额方向_借方.getValue(),null);
+//		searchDto.setBaseSubjectNatureList(
+//				new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
+//		Map<String, BigDecimal> receivableMap = accountingCommonService
+//				.getSubjectBalanceCollection(searchDto, DictCodeList.余额方向_借方.getValue(),null);
 		// 变量.其他应收本金 = 科目余额
 		BigDecimal receivableBjSubjectBalance = BigDecimal.ZERO;
-		if(receivableMap !=null&& receivableMap.get(targetFinProduct.getCcy())!=null){
-			receivableBjSubjectBalance = receivableMap.get(targetFinProduct.getCcy());
-		}else{
-			receivableBjSubjectBalance = BigDecimal.ZERO;
-		}
+//		if(receivableMap !=null&& receivableMap.get(targetFinProduct.getCcy())!=null){
+//			receivableBjSubjectBalance = receivableMap.get(targetFinProduct.getCcy());
+//		}else{
+//			receivableBjSubjectBalance = BigDecimal.ZERO;
+//		}
 
 		// 1.5.其他应收款-利息
 		// 变量.其他应收利息 = 科目余额

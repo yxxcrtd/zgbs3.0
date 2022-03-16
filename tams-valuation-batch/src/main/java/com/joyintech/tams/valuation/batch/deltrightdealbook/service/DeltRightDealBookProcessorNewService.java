@@ -23,7 +23,7 @@ import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalanc
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalanceSearchDto;
 import com.joyintech.tams.valuation.batch.common.accounting.service.AccountingCommonService;
 import com.joyintech.tams.valuation.batch.common.accounting.service.LossCommonBatchService;
-import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookAccountGenLogic;
+import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookAccountGenLogicNew;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookCommonLogic;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.AccountDriver;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGenerateResult;
@@ -61,7 +61,7 @@ public class DeltRightDealBookProcessorNewService {
      * 记账引擎
      */
     @Autowired
-    private BookAccountGenLogic bookLogic;
+    private BookAccountGenLogicNew bookLogicNew;
 
     /**
      * 公用方法services
@@ -680,7 +680,7 @@ public class DeltRightDealBookProcessorNewService {
         // add by weipeng on 20220303:会计引擎升级改造，增加辅助核算项入参 end
 
         // 记账凭证生成
-        BookGenerateResult resultNowNow = bookLogic.genAccount(ad, new SysBatchExecInfo());
+        BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
         returnResult.getValBokBookdetailBatch().addAll(resultNowNow.getValBokBookdetailBatch());
         
@@ -949,7 +949,7 @@ public class DeltRightDealBookProcessorNewService {
         // add by weipeng on 20220303:会计引擎升级改造，增加辅助核算项入参 end
 
         // 记账凭证生成
-        BookGenerateResult resultNowNow = bookLogic.genAccount(ad, new SysBatchExecInfo());
+        BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
         returnResult.getValBokBookdetailBatch().addAll(resultNowNow.getValBokBookdetailBatch());
        
@@ -1242,7 +1242,7 @@ public class DeltRightDealBookProcessorNewService {
         // add by weipeng on 20220303:会计引擎升级改造，增加辅助核算项入参 end
 
         // 记账凭证生成
-        BookGenerateResult resultNowNow = bookLogic.genAccount(ad, new SysBatchExecInfo());
+        BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
         returnResult.getValBokBookdetailBatch().addAll(resultNowNow.getValBokBookdetailBatch());
         
@@ -1486,7 +1486,7 @@ public class DeltRightDealBookProcessorNewService {
         // add by weipeng on 20220303:会计引擎升级改造，增加辅助核算项入参 end
 
         // 记账凭证生成
-        BookGenerateResult resultNowNow = bookLogic.genAccount(ad, new SysBatchExecInfo());
+        BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
         returnResult.getValBokBookdetailBatch().addAll(resultNowNow.getValBokBookdetailBatch());
         
@@ -1741,7 +1741,7 @@ public class DeltRightDealBookProcessorNewService {
         // add by weipeng on 20220303:会计引擎升级改造，增加辅助核算项入参 end
 
         // 记账凭证生成
-        BookGenerateResult resultNowNow = bookLogic.genAccount(ad, new SysBatchExecInfo());
+        BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
         returnResult.getValBokBookdetailBatch().addAll(resultNowNow.getValBokBookdetailBatch());
     }
@@ -2043,7 +2043,7 @@ public class DeltRightDealBookProcessorNewService {
         // add by weipeng on 20220303:会计引擎升级改造，增加辅助核算项入参 end
 
         // 记账凭证生成
-        BookGenerateResult resultNowNow = bookLogic.genAccount(ad, new SysBatchExecInfo());
+        BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
         returnResult.getValBokBookdetailBatch().addAll(resultNowNow.getValBokBookdetailBatch());
     }
@@ -2169,7 +2169,7 @@ public class DeltRightDealBookProcessorNewService {
         // add by weipeng on 20220303:会计引擎升级改造，增加辅助核算项入参 end
 
         // 记账凭证生成
-        BookGenerateResult resultNowNow = bookLogic.genAccount(ad, new SysBatchExecInfo());
+        BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
         returnResult.getValBokBookdetailBatch().addAll(resultNowNow.getValBokBookdetailBatch());
         
@@ -2383,7 +2383,7 @@ public class DeltRightDealBookProcessorNewService {
         // add by weipeng on 20220303:会计引擎升级改造，增加辅助核算项入参 end
 
         // 记账凭证生成
-        BookGenerateResult resultNowNow = bookLogic.genAccount(ad, new SysBatchExecInfo());
+        BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
         returnResult.getValBokBookdetailBatch().addAll(resultNowNow.getValBokBookdetailBatch());
         
@@ -2544,7 +2544,7 @@ public class DeltRightDealBookProcessorNewService {
         // add by weipeng on 20220303:会计引擎升级改造，增加辅助核算项入参 end
 
         // 记账凭证生成
-        BookGenerateResult resultNowNow = bookLogic.genAccount(ad, new SysBatchExecInfo());
+        BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
         returnResult.getValBokBookdetailBatch().addAll(resultNowNow.getValBokBookdetailBatch());
         
@@ -2799,7 +2799,7 @@ public class DeltRightDealBookProcessorNewService {
         // add by weipeng on 20220303:会计引擎升级改造，增加辅助核算项入参 end
 
         // 记账凭证生成
-        BookGenerateResult resultNowNow = bookLogic.genAccount(ad, new SysBatchExecInfo());
+        BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
         returnResult.getValBokBookdetailBatch().addAll(resultNowNow.getValBokBookdetailBatch());
        
@@ -3088,7 +3088,7 @@ public class DeltRightDealBookProcessorNewService {
         // add by weipeng on 20220303:会计引擎升级改造，增加辅助核算项入参 end
 
         // 记账凭证生成
-        BookGenerateResult resultNowNow = bookLogic.genAccount(ad, new SysBatchExecInfo());
+        BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
         returnResult.getValBokBookdetailBatch().addAll(resultNowNow.getValBokBookdetailBatch());
        
@@ -3367,7 +3367,7 @@ public class DeltRightDealBookProcessorNewService {
         // add by weipeng on 20220303:会计引擎升级改造，增加辅助核算项入参 end
 
         // 记账凭证生成
-        BookGenerateResult resultNowNow = bookLogic.genAccount(ad, new SysBatchExecInfo());
+        BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
         returnResult.getValBokBookdetailBatch().addAll(resultNowNow.getValBokBookdetailBatch());
        
@@ -3606,7 +3606,7 @@ public class DeltRightDealBookProcessorNewService {
         // add by weipeng on 20220303:会计引擎升级改造，增加辅助核算项入参 end
 
         // 记账凭证生成
-        BookGenerateResult resultNowNow = bookLogic.genAccount(ad, new SysBatchExecInfo());
+        BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
         // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
         returnResult.getValBokBookdetailBatch().addAll(resultNowNow.getValBokBookdetailBatch());
        

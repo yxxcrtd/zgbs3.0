@@ -17,7 +17,7 @@ import com.joyintech.tams.common.base.entity.TrdTradeFeeDetail;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.valuation.batch.common.accounting.service.AccountingCommonService;
-import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookAccountGenLogic;
+import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookAccountGenLogicNew;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookCommonLogic;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.AccountDriver;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGenerateResult;
@@ -57,7 +57,7 @@ public class FeeDrawBookDetailNewService {
      * 记账引擎
      */
     @Autowired
-    private BookAccountGenLogic bookLogic;
+    private BookAccountGenLogicNew bookLogicNew;
 
     /**
      * 公用方法services
@@ -204,7 +204,7 @@ public class FeeDrawBookDetailNewService {
 				// add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
 
 	            // 记账凭证生成 : 调用记账引擎公共记账方法，生成记账凭证
-	            BookGenerateResult bookGenerateResult = bookLogic.genAccount(ad, batchExecInfo);
+	            BookGenerateResult bookGenerateResult = bookLogicNew.genAccount(ad, batchExecInfo);
 	            returnResult.getValBokBookdetailBatch().addAll(bookGenerateResult.getValBokBookdetailBatch());
 			}
 		}
