@@ -18,10 +18,11 @@ import com.joyintech.tams.constant.DictCodeListTableId;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalance;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalanceSearchDto;
 import com.joyintech.tams.valuation.batch.common.accounting.service.AccountingCommonService;
-import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookAccountGenLogic;
+import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookAccountGenLogicNew;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookCommonLogic;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.AccountDriver;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGenerateResult;
+import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.SubjectMappingConfig;
 import com.joyintech.tams.valuation.batch.common.base.entity.extcommon.ValBokBookdetailBatch;
 import com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dto.FinProductDealInfoComDTO;
 import com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dto.FinProductDealInfoResult;
@@ -53,7 +54,7 @@ public class ExpReturnTaTradeBookProcessorNewService {
      * 记账引擎
      */
     @Autowired
-    private BookAccountGenLogic bookLogic;
+    private BookAccountGenLogicNew bookLogicNew;
 
     /**
      * 记账公共类
@@ -277,8 +278,12 @@ public class ExpReturnTaTradeBookProcessorNewService {
             ad.setAccountAmountMap(accountAmountMap);// 记账金额要素
             ad.setAccountCurrencyMap(accountCurrencyMap);// 记账金额币种要素
 
+            // 辅助核算项配置信息
+            SubjectMappingConfig mappingConfig = new SubjectMappingConfig();
+            mappingConfig.setAccountType(dealNow.getAcctType());
+            ad.setSubjectMappingConfigDefault(mappingConfig);
             // 记账凭证生成
-            BookGenerateResult resultNowNow = bookLogic.genAccount(ad, new SysBatchExecInfo());
+            BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
             // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
             returnResult.getValBokBookdetailBatch().addAll(
                 resultNowNow.getValBokBookdetailBatch());
