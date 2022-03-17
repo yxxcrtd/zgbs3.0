@@ -89,64 +89,62 @@ $(function() {
     });
 
 
-    //根据产品名称联动出产品代码
+    /**
+     * 产品代码联动带出产品名称，证券账户
+     */
+
     $('#portfolioId').change(function(){
         var portfolioId = $('#portfolioId').val();
         if(portfolioId){
-            var dataPort = $('#portfolioId').select2('data')[0].object;
-            var finprodId = dataPort.finprodId;
-            $('#portfolioName').val(finprodId).trigger('change');
+            $('#portfolioName').val($('#portfolioId').select2('data')[0].id).trigger('change');
 
         }else {
             $('#portfolioName').val('').trigger('change');
         }
     });
 
-    //根据标的资产名称联动出标的资产代码
+    /**
+     * 资产代码联动带出资产简称，交易场所
+     */
+
     $('#finprodMarketId').change(function(){
         var finprodMarketId = $('#finprodMarketId').val();
         if(finprodMarketId){
-            var dataPort = $('#finprodMarketId').select2('data')[0].object;
-            var finprodId = dataPort.finprodId;
-            $('#finprodName').val(finprodId).trigger('change');
+            $('#finprodName').val($('#finprodMarketId').select2('data')[0].id).trigger('change');
 
         }else {
             $('#finprodName').val('').trigger('change');
         }
     });
 
-    // /**
-    //  * 产品代码联动带出产品名称，证券账户
-    //  */
-    // var prodIdChange = function() {
-    //     var portfolioId = $('#portfolioId').val();
-    //     if (portfolioId == '' || portfolioId == undefined) {
-    //         $('#portfolioName').val('');
-    //     } else {
-    //         $('#portfolioName').val($('#portfolioId').select2('data')[0].object).trigger('change');
-    //     }
-    // }
-    //
-    // //产品代码联动事件
+
+    // //根据产品名称联动出产品代码
     // $('#portfolioId').change(function(){
-    //     prodIdChange();
+    //     var portfolioId = $('#portfolioId').val();
+    //     if(portfolioId){
+    //         var dataPort = $('#portfolioId').select2('data')[0].object;
+    //         var finprodId = dataPort.finprodId;
+    //         $('#portfolioName').val(finprodId).trigger('change');
+    //
+    //     }else {
+    //         $('#portfolioName').val('').trigger('change');
+    //     }
     // });
     //
-    // //资产代码联动事件
+    // //根据标的资产名称联动出标的资产代码
     // $('#finprodMarketId').change(function(){
-    //     secIdChange();
-    // });
-    // /**
-    //  * 资产代码联动带出资产简称，交易场所
-    //  */
-    // var secIdChange = function() {
-    //     var finprodMarketId =  $('#finprodMarketId').val();
-    //     if (finprodMarketId == '' || finprodMarketId == undefined) {
-    //         $('#finprodName').val('');
-    //     } else {
-    //         $('#finprodName').val($('#finprodMarketId').select2('data')[0].object).trigger('change');
+    //     var finprodMarketId = $('#finprodMarketId').val();
+    //     if(finprodMarketId){
+    //         var dataPort = $('#finprodMarketId').select2('data')[0].object;
+    //         var finprodId = dataPort.finprodId;
+    //         $('#finprodName').val(finprodId).trigger('change');
+    //
+    //     }else {
+    //         $('#finprodName').val('').trigger('change');
     //     }
-    // }
+    // });
+
+
 
     //校验   到期日必须大于等于起息日
     var checkDate01=function () {

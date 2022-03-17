@@ -225,5 +225,19 @@ public class TrdDepositValuationTrade002Controller extends BaseController {
         return new AjaxResult(msg);
     }
 
+    /**
+     * 资金账户下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getTrdAcctId")
+    public List<SelectOptionDto> getTrdAcctId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("portfolioId",param.get("finprodId"));
+        return commonBusinessService.getTrdAcctId(param);
+    }
 
 }

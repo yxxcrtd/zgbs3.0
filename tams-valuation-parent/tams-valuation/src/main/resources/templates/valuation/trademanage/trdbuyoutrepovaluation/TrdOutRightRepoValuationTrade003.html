@@ -29,7 +29,7 @@
                                         <select id="portfolioId" name="portfolioId" th:initValue="${entity?.portfolioId}"
                                                 class="layui-input form-input input-select available" disabled
                                                 data-th-placeholder="#{SysCommon.placeholder}" required
-                                                data-th-data-url="@{/valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade002/findPortfolioId}">
+                                                data-th-data-url="@{/valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade001/getFinprodId}">
                                         </select>
                                     </div>
                                 </div>
@@ -49,7 +49,7 @@
                                     <div class="layui-input-inline input-inline">
                                         <select id="finprodMarketId" name="finprodMarketId" class="layui-input form-input input-select" required
                                                 data-th-placeholder="#{SysCommon.placeholder}" th:initValue="${entity?.finprodMarketId}"  childrenIds='chlId'
-                                                data-th-data-url="@{/valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade002/findFinprodId}">
+                                                data-th-data-url="@{/valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade001/getAssetId}">
                                         </select>
                                     </div>
                                 </div>
@@ -239,7 +239,7 @@
                                     <label class="layui-form-label form-lable" >资金账户</label>
                                     <div class="layui-input-inline input-inline">
                                         <select type="text" id="trdAcctId" name="trdAcctId" class="layui-input form-input input-select" parentIds="portfolioId"
-                                                th:data-url="@{/valuation/trademanage/bondlend/TrdBondLendTrade002/getTrdAcctId}"
+                                                th:data-url="@{/valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade002/getTrdAcctId}"
                                                 allowClear="true" placeholder="请输入内容" required="required"
                                                 data-th-placeholder="#{SysCommon.placeholder}">
                                         </select>

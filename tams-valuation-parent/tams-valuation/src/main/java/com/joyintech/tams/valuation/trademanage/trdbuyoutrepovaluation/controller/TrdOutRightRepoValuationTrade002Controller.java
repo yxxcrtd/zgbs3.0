@@ -110,34 +110,34 @@ public class TrdOutRightRepoValuationTrade002Controller extends BaseController {
         return commonCheck(result, dto.getOperateType());
     }
 
-    /**
-     * 自定义产品代码下拉框
-     * @param request
-     * @return
-     */
-    @RequestMapping("/findPortfolioId")
-    @ResponseBody
-    public Page<SelectOptionDto> findPortfolioId(HttpServletRequest request) {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-        param.put("finprodType", "F16"); //测试
-        return trdOutRightRepoValuationTrade002Service.findPortfolioId(param);
-    }
-
-
-    /**
-     * 自定义资产代码下拉框
-     * @param request
-     * @return
-     */
-    @RequestMapping("/findFinprodId")
-    @ResponseBody
-    public Page<SelectOptionDto> findFinprodId(HttpServletRequest request) {
-        Map<String, Object> param =RequestUtil.getPageParam();
-        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-        param.put("finprodType", "F01"); //测试
-        return trdOutRightRepoValuationTrade002Service.findFinprodId(param);
-    }
+//    /**
+//     * 自定义产品代码下拉框
+//     * @param request
+//     * @return
+//     */
+//    @RequestMapping("/findPortfolioId")
+//    @ResponseBody
+//    public Page<SelectOptionDto> findPortfolioId(HttpServletRequest request) {
+//        Map<String, Object> param = RequestUtil.getPageParam();
+//        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
+//        param.put("finprodType", "F16"); //测试
+//        return trdOutRightRepoValuationTrade002Service.findPortfolioId(param);
+//    }
+//
+//
+//    /**
+//     * 自定义资产代码下拉框
+//     * @param request
+//     * @return
+//     */
+//    @RequestMapping("/findFinprodId")
+//    @ResponseBody
+//    public Page<SelectOptionDto> findFinprodId(HttpServletRequest request) {
+//        Map<String, Object> param =RequestUtil.getPageParam();
+//        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
+//        param.put("finprodType", "F02"); //测试
+//        return trdOutRightRepoValuationTrade002Service.findFinprodId(param);
+//    }
 
 
     /**
@@ -179,19 +179,18 @@ public class TrdOutRightRepoValuationTrade002Controller extends BaseController {
     }
 
     /**
-     * 资产代码下拉框
+     * 资金账户下拉框
      *
      * @return 资产代码
      * @see
      * @since 1.0
      */
     @ResponseBody
-    @RequestMapping("/getAssetId")
-    public List<SelectOptionDto> getAssetId() {
+    @RequestMapping("/getTrdAcctId")
+    public List<SelectOptionDto> getTrdAcctId() {
         Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("assetType","F01");
-        return commonBusinessService.getAssetId(param);
+        param.put("portfolioId",param.get("finprodId"));
+        return commonBusinessService.getTrdAcctId(param);
     }
-
 
 }

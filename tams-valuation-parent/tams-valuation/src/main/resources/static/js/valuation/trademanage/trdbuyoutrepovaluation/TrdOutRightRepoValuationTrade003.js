@@ -82,34 +82,57 @@ $(function() {
     });
 
 
-    //根据产品名称联动出产品代码
+    // //根据产品名称联动出产品代码
+    // $('#portfolioId').change(function(){
+    //     var portfolioId = $('#portfolioId').val();
+    //     if(portfolioId){
+    //         var dataPort = $('#portfolioId').select2('data')[0].object;
+    //         var finprodId = dataPort.finprodId;
+    //         $('#portfolioName').val(finprodId).trigger('change');
+    //
+    //     }else {
+    //         $('#portfolioName').val('').trigger('change');
+    //     }
+    // });
+    //
+    // //根据标的资产名称联动出标的资产代码
+    // $('#finprodMarketId').change(function(){
+    //     var finprodMarketId = $('#finprodMarketId').val();
+    //     if(finprodMarketId){
+    //         var dataPort = $('#finprodMarketId').select2('data')[0].object;
+    //         var finprodId = dataPort.finprodId;
+    //         $('#finprodName').val(finprodId).trigger('change');
+    //
+    //     }else {
+    //         $('#finprodName').val('').trigger('change');
+    //     }
+    // });
+
+
+
     $('#portfolioId').change(function(){
         var portfolioId = $('#portfolioId').val();
         if(portfolioId){
-            var dataPort = $('#portfolioId').select2('data')[0].object;
-            var finprodId = dataPort.finprodId;
-            $('#portfolioName').val(finprodId).trigger('change');
+            $('#portfolioName').val($('#portfolioId').select2('data')[0].id).trigger('change');
 
         }else {
             $('#portfolioName').val('').trigger('change');
         }
     });
 
-    //根据标的资产名称联动出标的资产代码
+    /**
+     * 资产代码联动带出资产简称，交易场所
+     */
+
     $('#finprodMarketId').change(function(){
         var finprodMarketId = $('#finprodMarketId').val();
         if(finprodMarketId){
-            var dataPort = $('#finprodMarketId').select2('data')[0].object;
-            var finprodId = dataPort.finprodId;
-            $('#finprodName').val(finprodId).trigger('change');
+            $('#finprodName').val($('#finprodMarketId').select2('data')[0].id).trigger('change');
 
         }else {
             $('#finprodName').val('').trigger('change');
         }
     });
-
-
-
 
 
 
