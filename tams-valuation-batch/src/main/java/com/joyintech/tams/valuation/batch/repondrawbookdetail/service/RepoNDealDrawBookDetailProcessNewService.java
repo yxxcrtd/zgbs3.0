@@ -185,10 +185,17 @@ public class RepoNDealDrawBookDetailProcessNewService {
             if (dealInfoForTarget == null) {
                 continue;
             }
+            // 基础科目性质 : 成本
+            String baseSubjectNatureCB = DictCodeBaseSubjectNatrueNew.买入返售金融资产_成本.getValue();
+            String baseSubjectNatureYjlx = DictCodeBaseSubjectNatrueNew.买入返售金融资产_应计利息.getValue();
+            if(dealInfoForTarget.getOFinprodType().equals(DictCodeListExt1.金融产品类型_债券买断式正回购.getValue())){
+                baseSubjectNatureCB = DictCodeBaseSubjectNatrueNew.卖出回购金融资产_成本.getValue();
+                baseSubjectNatureYjlx = DictCodeBaseSubjectNatrueNew.卖出回购金融资产_应计利息.getValue();
+            }
             // 获取初始成本科目余额
             SubjectBalance subjectBalanceForAmt = this.getSubjectBalance(booksetIdNow,
                     bokDetailIdNow, happenDateNow, bookDateNow, null,ps,
-                    DictCodeBaseSubjectNatrueNew.买入返售金融资产_成本.getValue(), taskPri);
+                    baseSubjectNatureCB, taskPri);
 
             if (subjectBalanceForAmt != null) {
                 // 变量.成本科目余额= DTO.科目余额
@@ -204,7 +211,7 @@ public class RepoNDealDrawBookDetailProcessNewService {
 /*              //计提成本目余额查询
                 SubjectBalance 计提成本目余额查询 = this.getSubjectBalance(booksetIdNow,
                     bokDetailIdNow, happenDateNow, bookDateNow,happenDateNow, ps,
-                    DictCodeBaseSubjectNatrueNew.买入返售金融资产_成本.getValue(), taskPri);
+                    baseSubjectNatureCB, taskPri);
 
                 if (计提成本目余额查询 != null) {
                 	// 变量.计提成本科目余额= DTO.科目余额
@@ -217,7 +224,7 @@ public class RepoNDealDrawBookDetailProcessNewService {
                 // 次日获取初始成本科目余额
                 SubjectBalance 次日计提成本目余额查询 = this.getSubjectBalance(booksetIdNow,
                         bokDetailIdNow, happenDateNow,bookDateNow,DateUtil.addDay(happenDateNow,1) , ps,
-                        DictCodeBaseSubjectNatrueNew.买入返售金融资产_成本.getValue(), taskPri);
+                        baseSubjectNatureCB, taskPri);
                 if (次日计提成本目余额查询 != null) {
                     //变量.次日计提成本科目余额 = DTO.科目余额
                     次日计提成本科目余额 = 次日计提成本目余额查询.getBalance() == null ? BigDecimal.ZERO : 次日计提成本目余额查询.getBalance();
@@ -226,7 +233,7 @@ public class RepoNDealDrawBookDetailProcessNewService {
                 // 最新余额：应收利息类科目余额
                 SubjectBalance 应收利息类科目余额 = this.getSubjectBalance(booksetIdNow,
                         bokDetailIdNow, happenDateNow,bookDateNow,null, ps,
-                        DictCodeBaseSubjectNatrueNew.买入返售金融资产_应计利息.getValue(), taskPri);
+                        baseSubjectNatureYjlx, taskPri);
                 if (应收利息类科目余额 != null) {
                     //变量.应计利息余额 = DTO.科目余额
                     glb_subjectInt = 应收利息类科目余额.getBalance() == null ? BigDecimal.ZERO : 应收利息类科目余额.getBalance();
@@ -238,7 +245,7 @@ public class RepoNDealDrawBookDetailProcessNewService {
 /*            	// 最新余额：应收利息类科目余额
                 SubjectBalance 计提应收利息类科目余额 = this.getSubjectBalance(booksetIdNow,
                     bokDetailIdNow, happenDateNow,bookDateNow,happenDateNow, ps,
-                    DictCodeBaseSubjectNatrueNew.买入返售金融资产_应计利息.getValue(), taskPri);
+                    baseSubjectNatureYjlx, taskPri);
                 if (计提应收利息类科目余额 != null) {
                 	//变量.计提应计利息余额 = DTO.科目余额
                 	计提应计利息余额 = 计提应收利息类科目余额.getBalance() == null ? BigDecimal.ZERO : 计提应收利息类科目余额.getBalance();
@@ -306,7 +313,7 @@ public class RepoNDealDrawBookDetailProcessNewService {
                 // 获取前一日余额：应收利息类科目余额
                 SubjectBalance subjectBalanceForAmtYsd = this.getSubjectBalance(booksetIdNow,
                         bokDetailIdNow, happenDateNow, bookDateNow,null, ps,
-                        DictCodeBaseSubjectNatrueNew.买入返售金融资产_应计利息.getValue(), taskPri);
+                        baseSubjectNatureYjlx, taskPri);
                 // 变量.应计利息余额 = DTO.科目余额
                 if (subjectBalanceForAmtYsd != null) {
                     glb_subjectProfit = subjectBalanceForAmtYsd.getBalance() == null ? BigDecimal.ZERO : subjectBalanceForAmtYsd.getBalance();// 变量.成本科目余额

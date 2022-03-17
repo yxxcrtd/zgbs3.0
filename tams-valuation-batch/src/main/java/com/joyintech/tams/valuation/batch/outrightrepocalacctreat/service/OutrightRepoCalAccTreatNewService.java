@@ -156,10 +156,7 @@ public class OutrightRepoCalAccTreatNewService {
         TreeNode bookSetTreeNodeNow = acctEntity.getBookSetTreeNode();// 会计场景
         Date happenDateNow = acctEntity.getHappenDate();// 发生日期
         Date bookDateNow = acctEntity.getBookDate();// 入账日期
-        //塞入 基础科目性质
-        List<String> baseSubjectNatureList =Lists.newArrayList();
-        baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.买入返售金融资产_应计利息.getValue());
-        
+
 
         Long taskPri = listDrawBaseInfoSelectComDTONow.get(0).getTaskPri();//任务优先级（计提基础信息列表的任务优先级都是一致的，故取第一个）
 
@@ -171,10 +168,15 @@ public class OutrightRepoCalAccTreatNewService {
             return null;
         }
         String expBalanceDirect="";
+        //塞入 基础科目性质
+        List<String> baseSubjectNatureList =Lists.newArrayList();
+
         if (dealInfoForTarget.getOFinprodType().equals( DictCodeListExt1.金融产品类型_债券买断式正回购.getValue())) {
             expBalanceDirect=DictCodeList.余额方向_贷方.getValue();
+            baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.卖出回购金融资产_应计利息.getValue());
         }else{
             expBalanceDirect=DictCodeList.余额方向_借方.getValue();
+            baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.买入返售金融资产_应计利息.getValue());
         }
         SubjectBalanceSearchDto searchDto = new SubjectBalanceSearchDto();
         searchDto.setHappenDate(happenDateNow);// 发生日
@@ -221,7 +223,12 @@ public class OutrightRepoCalAccTreatNewService {
                 // 调用账务共通设计->【凭证最新账务查询】
                 // 塞入要查询的参数-基础科目性质
                 baseSubjectNatureList = new ArrayList<String>();
-                baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.买入返售金融资产_成本.getValue());
+                if(DictCodeListExt1.金融产品类型_债券买断式正回购.getValue().equals(dto.getBusiDetailType())){
+                    baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.卖出回购金融资产_成本.getValue());
+                }
+                else{
+                    baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.买入返售金融资产_成本.getValue());
+                }
                 // 塞入要查询的参数-场景代码
                 String scenecode = "";
                 if (dealInfoForTarget.getOFinprodType().equals(

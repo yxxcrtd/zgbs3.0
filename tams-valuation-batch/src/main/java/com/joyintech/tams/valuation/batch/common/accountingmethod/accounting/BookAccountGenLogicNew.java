@@ -1528,8 +1528,8 @@ public class BookAccountGenLogicNew {
         Map<String, BigDecimal> accountAmountMap = accountDriver.getAccountAmountMap();
         // 定义 变量.账套信息
         String booksetId = (String)accountSceneMap.get(BookConstant.BOOKSET_ID);
-        // 定义 变量.币种 = 会计场景元素.币种
-        String ccy = (String)accountSceneMap.get(BookConstant.CCY);
+        // 定义 变量.币种 = 会计场景元素.币种 != null ? 会计场景元素.币种：会计场景元素.本币币种
+        String ccy = accountSceneMap.get(BookConstant.CCY) != null ? (String)accountSceneMap.get(BookConstant.CCY) : (String)accountSceneMap.get(BookConstant.B_CCY);
         // 定义 变量.场景代码 = accountDriver.tableId
         String tableId = accountDriver.getTableId();
         // 定义 变量.账务明细代码集合
@@ -1570,17 +1570,15 @@ public class BookAccountGenLogicNew {
             }
             // 根据内部科目编码获取所有对应科目
             List<BokSubject> entrySubjectList = new ArrayList<>();
-            if(CollectionUtils.isEmpty(accountEntry.getBokSubjectList())){
-                logger.error("场景代码【"+ accountDriver.getTableId()+"】对应内部科目编码："+accountEntry.getSubjectId() +"未找到匹配科目信息 \r\n");
-                continue;
-            }
-            else{
-                // 按照币种筛选科目
-                for(BokSubject item : accountEntry.getBokSubjectList()){
-                    if(StringUtil.equals(ccy, item.getCcy())){
-                        entrySubjectList.add(item);
-                    }
+            // 按照币种筛选科目
+            for(BokSubject item : accountEntry.getBokSubjectList()){
+                if(StringUtil.equals(ccy, item.getCcy())){
+                    entrySubjectList.add(item);
                 }
+            }
+            if(CollectionUtils.isEmpty(entrySubjectList)){
+                logger.error("场景代码【"+ accountDriver.getTableId()+"】对应内部科目编码："+accountEntry.getSubjectId() +"；币种："+ccy+" 未找到匹配科目信息 \r\n");
+                continue;
             }
             // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑 end
             // 若对应记账金额元素为空或为非0入账且金额为0，则不记账，跳过

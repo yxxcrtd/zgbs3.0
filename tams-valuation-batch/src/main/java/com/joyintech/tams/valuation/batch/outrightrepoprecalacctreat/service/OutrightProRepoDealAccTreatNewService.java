@@ -151,17 +151,21 @@ public class OutrightProRepoDealAccTreatNewService {
         String expBalanceDirect = DictCodeList.余额方向_借方.getValue();
 
         // 2.1 调用共通设计->【详细设计-账务类共通方法设计.xlsx】->科目余额查询-期待方向SHEET
-        // 基础科目性质 : 成本
-        SubjectBalance subjectBalance = this.getSubjectBalance(booksetIdNow, bokDetailId,
-            happenDateNow, bookDateNow, expBalanceDirect, DictCodeBaseSubjectNatrueNew.买入返售金融资产_成本.getValue(),
-            null, taskPri);
-        if (subjectBalance != null) {
-            // 成本类科目余额赋值
-            costBalance = subjectBalance.getBalance() == null ? BigDecimal.ZERO : subjectBalance.getBalance();
-        }
         // 3. 交易处理
         // 循环 交易类账务处理结果.交易明细列表,进行逻辑处理
         for (FinProductDealInfoComDTO dealNow : listFinProductDealInfoComDTONow) {
+            // 基础科目性质 : 成本
+            String baseSubjectNatureCB = DictCodeBaseSubjectNatrueNew.买入返售金融资产_成本.getValue();
+            if(dealNow.getFinprodType().equals(DictCodeListExt1.金融产品类型_债券买断式正回购.getValue())){
+                baseSubjectNatureCB = DictCodeBaseSubjectNatrueNew.卖出回购金融资产_成本.getValue();
+            }
+            SubjectBalance subjectBalance = this.getSubjectBalance(booksetIdNow, bokDetailId,
+                happenDateNow, bookDateNow, expBalanceDirect, baseSubjectNatureCB,
+                null, taskPri);
+            if (subjectBalance != null) {
+                // 成本类科目余额赋值
+                costBalance = subjectBalance.getBalance() == null ? BigDecimal.ZERO : subjectBalance.getBalance();
+            }
             // 调用共通设计 ：标的类共通-交易信息查询
             TradeInfoDto tradeInfoDto = this.getTargetInfo(dealNow.getFinprodId(),
                 dealNow.getFinprodType(), BookConstant.DEFALUT_BRANCH);

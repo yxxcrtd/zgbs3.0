@@ -155,27 +155,6 @@ public class OutrightRepoDealAccTreatNewService {
             expBalanceDirect = DictCodeList.余额方向_贷方.getValue();
         }
 
-        // 2.1 获取成本类科目余额 -【 调用共通方法：科目余额查询,获取成本类科目余额 】
-        // 基础科目性质 : 成本
-        SubjectBalance subjectBalance = this.getSubjectBalance(booksetIdNow, bokDetailId,
-            happenDateNow, bookDateNow, expBalanceDirect, DictCodeBaseSubjectNatrueNew.买入返售金融资产_成本.getValue(),
-            null,taskPri);
-        if(subjectBalance!=null){
-         // 成本类科目余额赋值                                                                                                                                                        
-         costBalance = subjectBalance.getBalance() == null ? BigDecimal.ZERO : subjectBalance.getBalance();
-         // 成本类科目数量赋值
-         costQuantity = subjectBalance.getNum() == null ? BigDecimal.ZERO : subjectBalance.getNum();
-        }
-
-        // 2.2 获取应收利息类科目余额 -【 调用共通方法：科目余额查询,获取成本类科目余额 】
-        // 基础科目性质 : 应计利息
-        subjectBalance = this.getSubjectBalance(booksetIdNow, bokDetailId, happenDateNow,
-            bookDateNow, expBalanceDirect, DictCodeBaseSubjectNatrueNew.买入返售金融资产_应计利息.getValue(), null,taskPri);
-        if (subjectBalance != null) {
-        // 变量.应计利息余额 = DTO.科目余额
-        interestBalance = subjectBalance.getBalance() == null ? BigDecimal.ZERO : subjectBalance.getBalance();
-        }
-
         /** add by chufengjie on 20210927 估值核算系统VAS3.0-930-基线需求-买断式逆回购减值场景增加 start**/
         //定义  变量.统计分析明细表（资产减值）减值使用列表
         if (returnResult.getBokStatLossPosiitonList() == null) {
@@ -218,6 +197,32 @@ public class OutrightRepoDealAccTreatNewService {
         // 循环 交易类账务处理结果.交易明细列表,进行逻辑处理
         for (FinProductDealInfoComDTO dealNow : listFinProductDealInfoComDTONow) {
            // if(dealNow.getFinprodType().equals(DictCodeListExt1.金融产品类型_债券买断式正回购.getValue())){
+            // 2.1 获取成本类科目余额 -【 调用共通方法：科目余额查询,获取成本类科目余额 】
+            // 基础科目性质 : 成本
+            String baseSubjectNatureCB = DictCodeBaseSubjectNatrueNew.买入返售金融资产_成本.getValue();
+            String baseSubjectNatureYjlx = DictCodeBaseSubjectNatrueNew.买入返售金融资产_应计利息.getValue();
+            if(dealNow.getFinprodType().equals(DictCodeListExt1.金融产品类型_债券买断式正回购.getValue())){
+                baseSubjectNatureCB = DictCodeBaseSubjectNatrueNew.卖出回购金融资产_成本.getValue();
+                baseSubjectNatureYjlx = DictCodeBaseSubjectNatrueNew.卖出回购金融资产_应计利息.getValue();
+            }
+            SubjectBalance subjectBalance = this.getSubjectBalance(booksetIdNow, bokDetailId,
+                happenDateNow, bookDateNow, expBalanceDirect, baseSubjectNatureCB,
+                null,taskPri);
+            if(subjectBalance!=null){
+                // 成本类科目余额赋值
+                costBalance = subjectBalance.getBalance() == null ? BigDecimal.ZERO : subjectBalance.getBalance();
+                // 成本类科目数量赋值
+                costQuantity = subjectBalance.getNum() == null ? BigDecimal.ZERO : subjectBalance.getNum();
+            }
+
+            // 2.2 获取应收利息类科目余额 -【 调用共通方法：科目余额查询,获取成本类科目余额 】
+            // 基础科目性质 : 应计利息
+            subjectBalance = this.getSubjectBalance(booksetIdNow, bokDetailId, happenDateNow,
+                bookDateNow, expBalanceDirect, baseSubjectNatureYjlx, null,taskPri);
+            if (subjectBalance != null) {
+                // 变量.应计利息余额 = DTO.科目余额
+                interestBalance = subjectBalance.getBalance() == null ? BigDecimal.ZERO : subjectBalance.getBalance();
+            }
 
             // 调用共通设计 ：标的类共通-交易信息查询
             TradeInfoDto tradeInfoDto = this.getTargetInfo(dealNow.getFinprodId(),dealNow.getFinprodType(),dealNow.getBranch());

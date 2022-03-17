@@ -155,14 +155,19 @@ public class RepoNBookDetailProcessDealServiceNew {
 
         // 交易期待方向——借方（默认）
         String expBalanceDirect = DictCodeList.余额方向_借方.getValue();
+        // 基础科目性质 : 成本
+        String baseSubjectNatureCB = DictCodeBaseSubjectNatrueNew.买入返售金融资产_成本.getValue();
+        String baseSubjectNatureYjlx = DictCodeBaseSubjectNatrueNew.买入返售金融资产_应计利息.getValue();
         // 若为正回购，则设置为贷方
         if (finprodTypeNow.equals(DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())) {
             expBalanceDirect = DictCodeList.余额方向_贷方.getValue();
+            baseSubjectNatureCB = DictCodeBaseSubjectNatrueNew.卖出回购金融资产_成本.getValue();
+            baseSubjectNatureYjlx = DictCodeBaseSubjectNatrueNew.卖出回购金融资产_应计利息.getValue();
         }
 
         // 2.1.成本类科目余额
         SubjectBalance subjectBalanceForAmt = this.getSubjectBalance(booksetIdNow, bokDetailIdNow, happenDateNow,
-            bookDateNow, expBalanceDirect, DictCodeBaseSubjectNatrueNew.买入返售金融资产_成本.getValue(), taskPri);
+            bookDateNow, expBalanceDirect, baseSubjectNatureCB, taskPri);
         if (subjectBalanceForAmt != null) {
             glb_subjectAmt =
                 subjectBalanceForAmt.getBalance() == null ? BigDecimal.ZERO : subjectBalanceForAmt.getBalance();// 变量.成本科目余额
@@ -175,7 +180,7 @@ public class RepoNBookDetailProcessDealServiceNew {
 
         // 2.2.应计利息类科目余额
         SubjectBalance subjectBalanceForfit = this.getSubjectBalance(booksetIdNow, bokDetailIdNow, happenDateNow,
-            bookDateNow, expBalanceDirect, DictCodeBaseSubjectNatrueNew.买入返售金融资产_应计利息.getValue(), taskPri);
+            bookDateNow, expBalanceDirect, baseSubjectNatureYjlx, taskPri);
         if (subjectBalanceForfit != null) {
             glb_subjectProfit =
                 subjectBalanceForfit.getBalance() == null ? BigDecimal.ZERO : subjectBalanceForfit.getBalance();// 变量.应计利息科目余额

@@ -387,6 +387,12 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
     其他应付款_其他(
             "QTYFK"
     ),
+    卖出回购金融资产_成本(
+            "MCHGJRZC_CB"
+    ),
+    卖出回购金融资产_应计利息(
+            "MCHGJRZC_YJLX"
+    ),
     买入返售金融资产_成本(
             "MRFSJRZC_CB"
     ),
