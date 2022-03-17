@@ -2620,6 +2620,7 @@ insert into BOK_TABLEDICT (BOOKSET_ID,DICT_ID, DICT_CODE, TABLE_ID, DICT_NAME, D
 
 --场景分支配置
 DELETE FROM BOK_SCENECONFIG WHERE BOOKSET_ID = 'SUBJECT_INTERNAL_001';
+insert into BOK_SCENECONFIG values('001', null, 'SUBJECT_INTERNAL_001', '0', '0', 0, '',  'admin', '003', to_date('2018/4/25', 'yyyy/mm/dd'), 'admin',to_date('2018/4/25', 'yyyy/mm/dd'));
 insert into BOK_SCENECONFIG values('001001', '001', 'SUBJECT_INTERNAL_001', 'ACCOUNTEVENTS', '1105', 1, '',  'admin', '003', to_date('2018/4/25', 'yyyy/mm/dd'), 'admin',to_date('2018/4/25', 'yyyy/mm/dd'));
 insert into BOK_SCENECONFIG values('001002', '001', 'SUBJECT_INTERNAL_001', 'ACCOUNTEVENTS', '1106', 1, '',  'admin', '003', to_date('2018/4/25', 'yyyy/mm/dd'), 'admin',to_date('2018/4/25', 'yyyy/mm/dd'));
 insert into BOK_SCENECONFIG values('001003', '001', 'SUBJECT_INTERNAL_001', 'ACCOUNTEVENTS', '1107', 1, '',  'admin', '003', to_date('2018/4/25', 'yyyy/mm/dd'), 'admin',to_date('2018/4/25', 'yyyy/mm/dd'));
