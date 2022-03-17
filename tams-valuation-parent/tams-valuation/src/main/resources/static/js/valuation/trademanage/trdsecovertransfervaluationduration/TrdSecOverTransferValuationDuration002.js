@@ -68,14 +68,8 @@
         if (prodId == '' || prodId == undefined) {
             $('#prodName').val('');
         } else {
-            $('#prodName').val($('#prodId').select2('data')[0].object).trigger('change');
+            $('#prodName').val($('#prodId').select2('data')[0].id).trigger('change');
         }
-        Joyin.ajax(basePath + 'valuation/trademanage/trdsecovertransfervaluationduration/TrdSecOverTransferValuationDuration002/getTrdAcctId',
-            {prodId: prodId,acctType:'A01'}, function (result) {
-                if (result) {
-                        $('#myAcctNo').textSelect('setValue',result);
-                    }
-            })
     }
 
     /**
@@ -86,7 +80,7 @@
         if (assetId == '' || assetId == undefined) {
             $('#assetAbbr').val('');
         } else {
-            $('#assetAbbr').val($('#assetId').select2('data')[0].object).trigger('change');
+            $('#assetAbbr').val($('#assetId').select2('data')[0].id).trigger('change');
         }
     }
 

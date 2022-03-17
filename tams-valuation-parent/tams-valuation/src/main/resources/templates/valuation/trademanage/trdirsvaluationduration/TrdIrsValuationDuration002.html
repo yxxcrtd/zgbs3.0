@@ -57,11 +57,11 @@
                                 </div>
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-lable"
-                                           data-th-text="#{TrdIrsValuationDuration002.prodId}">产品代码</label>
+                                           data-th-text="#{TrdIrsValuationDuration002.prodName}">产品代码</label>
                                         <div class="layui-input-inline input-inline" >
                                             <select id="prodId" name="prodId" required disabled
                                                     class="layui-input form-input input-select"
-                                                    data-th-data-url="@{/valuation/trademanage/trdirsvaluationduration/TrdIrsValuationDuration002/getFinprodId}"
+                                                    data-th-data-url="@{/valuation/trademanage/trdirsvaluationduration/TrdIrsValuationDuration001/getFinprodId}"
                                                      allowClear="true" placeholder="请输入内容"
                                                     th:formatoption="false"
                                                     data-th-initValue="${entity?.prodId}" >
@@ -72,7 +72,7 @@
                             <div class="layui-form-item">
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
-                                           data-th-text="#{TrdIrsValuationDuration002.prodName}">产品名称</label>
+                                           data-th-text="#{TrdIrsValuationDuration002.prodId}">产品名称</label>
                                     <div class="layui-input-inline input-inline">
                                         <input  type="text" id="prodName" name="prodName" required disabled
                                                 class="layui-input form-input" placeholder="请输入内容"

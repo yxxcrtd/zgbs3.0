@@ -63,26 +63,33 @@
     /**
      * 产品代码联动带出产品名称
      */
-    var prodIdChange = function() {
+    $('#prodId').change(function(){
         var prodId = $('#prodId').val();
-        if (prodId == '' || prodId == undefined) {
-            $('#prodName').val('');
-        } else {
-            $('#prodName').val($('#prodId').select2('data')[0].object).trigger('change');
+        if(prodId){
+            $('#prodName').val($('#prodId').select2('data')[0].id).trigger('change');
+
+        }else {
+            $('#prodName').val('').trigger('change');
         }
-    }
+    });
+
 
     /**
      * 资产代码联动带出资产简称，交易场所
      */
-    var secIdChange = function() {
-        var assetId =  $('#assetId').val();
-        if (assetId == '' || assetId == undefined) {
-            $('#assetAbbr').val('');
-        } else {
-            $('#assetAbbr').val($('#assetId').select2('data')[0].object).trigger('change');
+    $('#assetId').change(function(){
+        var assetId = $('#assetId').val();
+        if(assetId){
+            var dataPort = $('#assetId').select2('data')[0].object;
+            var tradeMarket = dataPort.tradeMarket;
+            $('#assetAbbr').val($('#assetId').select2('data')[0].id).trigger('change');
+            $('#tradeMarket').val(tradeMarket).trigger('change');
+
+        }else {
+            $('#assetAbbr').val('').trigger('change');
+            $('#tradeMarket').val('').trigger('change');
         }
-    }
+    });
 
     //结算金额  结算金额=分红金额
     var settleAmtChange = function(){
@@ -94,6 +101,32 @@
         }
     }
 
+    $('#ps').change(function(){
+        psChange();
+    });
+
+    //交易类型联动
+    var psChange = function () {
+        var ps = $('#ps').val();
+        if(ps == '01' ){
+            $('#xjfh').show();
+            $('#sz').hide();
+            $('#fhsz').hide();
+        } else if(ps == '02' ){
+            $('#xjfh').hide();
+            $('#sz').show();
+            $('#fhsz').hide();
+        }else if(ps == '03' ){
+            $('#xjfh').hide();
+            $('#sz').hide();
+            $('#fhsz').show();
+        }else{
+            $('#xjfh').hide();
+            $('#sz').hide();
+            $('#fhsz').hide();
+        }
+    };
+
 
     /**
      * 画面加载完成
@@ -103,43 +136,10 @@
         //当前是否包含流程
         var workflowIdNow = $("#workflowId").val()
 
-        // init();
-        //产品代码联动事件
-        $('#prodId').change(function(){
-            prodIdChange();
-        });
-
-        //资产代码联动事件
-        $('#assetId').change(function(){
-            secIdChange();
-        });
-
         //结算金额联动事件
         //分红金额
         $('#bonusAmt').change(function(){
             settleAmtChange();
-        });
-
-        //交易类型联动
-        $('#ps').change(function(){
-            var ps = $('#ps').val();
-            if(ps == '01' ){
-                $('#xjfh').show();
-                $('#sz').hide();
-                $('#fhsz').hide();
-            } else if(ps == '02' ){
-                $('#xjfh').hide();
-                $('#sz').show();
-                $('#fhsz').hide();
-            }else if(ps == '03' ){
-                $('#xjfh').hide();
-                $('#sz').hide();
-                $('#fhsz').show();
-            }else{
-                $('#xjfh').show();
-                $('#sz').show();
-                $('#fhsz').show();
-            }
         });
 
         // 绑定按钮事件

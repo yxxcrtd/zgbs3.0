@@ -109,6 +109,10 @@
         $('#otherAmt').change(function(){
             settleAmtChange();
         });
+        //交易类型
+        $('#ps').change(function(){
+            settleAmtChange();
+        });
 
         //保存
         $('#TrdFixIncomeValuationTrade002_btn_save').click(function() {

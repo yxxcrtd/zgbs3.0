@@ -68,14 +68,8 @@
         if (prodId == '' || prodId == undefined) {
             $('#prodName').val('');
         } else {
-            $('#prodName').val($('#prodId').select2('data')[0].object).trigger('change');
+            $('#prodName').val($('#prodId').select2('data')[0].id).trigger('change');
         }
-        // Joyin.ajaxJson(basePath + 'valuation/trademanage/trdbondchangevaluationtrade/TrdBondChangeTrade002/selectInfoByProdId',
-        //     {prodId: prodId}, function (data) {
-        //         if (data) {
-        //             $('#secManageAcctId').val(data.secManageAcctId).trigger("change");
-        //         }
-        //     })
     }
 
     /**

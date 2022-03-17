@@ -52,46 +52,46 @@
                                 </div>
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-lable"
-                                           data-th-text="#{TrdStockTrade.prodId}">产品代码</label>
-                                        <div class="layui-input-inline input-inline" >
-                                            <select id="prodId" name="prodId" required
-                                                    class="layui-input form-input input-select"
-                                                    data-th-data-url="@{/valuation/trademanage/trdstockvaluationtrade/TrdStockTrade002/getFinprodId}"
-                                                     allowClear="true" placeholder="请输入内容"
-                                                    th:formatoption="false"
-                                                    data-th-initValue="${entity?.prodId}" >
-                                            </select>
-                                        </div>
+                                           data-th-text="#{TrdStockTrade.prodName}">产品名称</label>
+                                    <div class="layui-input-inline input-inline" >
+                                        <select id="prodId" name="prodId" required
+                                                class="layui-input form-input input-select"
+                                                data-th-data-url="@{/valuation/trademanage/trdstockvaluationtrade/TrdStockTrade001/getFinprodId}"
+                                                allowClear="true"
+                                                placeholder="请输入内容"
+                                                data-th-initValue="${entity?.prodId}" >
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                             <div class="layui-form-item">
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
-                                           data-th-text="#{TrdStockTrade.prodName}">产品名称</label>
+                                           data-th-text="#{TrdStockTrade.prodId}">产品代码</label>
                                     <div class="layui-input-inline input-inline">
                                         <input  type="text" id="prodName" name="prodName" required disabled
-                                               class="layui-input form-input" placeholder="请输入内容"
-                                               th:placeholder="#{SysCommon.placeholder}"
-                                               th:value="${entity?.prodName}">
+                                                class="layui-input form-input" placeholder="请输入内容"
+                                                th:placeholder="#{SysCommon.placeholder}"
+                                                th:value="${entity?.prodName}">
                                     </div>
                                 </div>
+
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-lable"
-                                           data-th-text="#{TrdStockTrade.assetId}">资产代码</label>
+                                           data-th-text="#{TrdStockTrade.assetAbbr}">资产名称</label>
                                     <div class="layui-input-inline input-inline">
                                         <select id="assetId" name="assetId" required
                                                 class="layui-input form-input input-select"
                                                 data-th-data-url="@{/valuation/trademanage/trdstockvaluationtrade/TrdStockTrade002/getAssetId}"
-                                                allowClear="true"
-                                                th:formatoption="false"
-                                                data-th-initValue="${entity?.assetId}"
-                                                placeholder="请输入内容">
+                                                allowClear="true" placeholder="请输入内容"
+                                                data-th-initValue="${entity?.assetId}" >
                                         </select>
                                     </div>
                                 </div>
+
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-lable"
-                                           data-th-text="#{TrdStockTrade.assetAbbr}">资产名称</label>
+                                           data-th-text="#{TrdStockTrade.assetId}">资产代码</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" id="assetAbbr" name="assetAbbr"
                                                class="layui-input form-input"
@@ -327,7 +327,7 @@
                                 <label class="layui-form-label form-label-wrap"
                                        data-th-text="#{TrdStockTrade.myAcctNo}">资金账户</label>
                                 <div class="layui-input-inline input-inline" >
-                                    <select id="myAcctNo" name="myAcctNo"
+                                    <select id="myAcctNo" name="myAcctNo" required
                                             class="layui-input form-input input-select"
                                             data-th-data-url="@{/valuation/trademanage/trdstockvaluationtrade/TrdStockTrade002/getTrdAcctId}"
                                             allowClear="true" placeholder="请输入内容"

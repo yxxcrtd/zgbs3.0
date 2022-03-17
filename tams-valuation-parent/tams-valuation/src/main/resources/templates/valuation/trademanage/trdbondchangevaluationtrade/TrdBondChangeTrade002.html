@@ -52,27 +52,26 @@
                                 </div>
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-lable"
-                                           data-th-text="#{TrdBondChangeTrade.prodId}">产品代码</label>
-                                        <div class="layui-input-inline input-inline" >
-                                            <select id="prodId" name="prodId" required
-                                                    class="layui-input form-input input-select"
-                                                    data-th-data-url="@{/valuation/trademanage/trdbondchangevaluationtrade/TrdBondChangeTrade002/getFinprodId}"
-                                                     allowClear="true" placeholder="请输入内容"
-                                                    th:formatoption="false"
-                                                    data-th-initValue="${entity?.prodId}" >
-                                            </select>
-                                        </div>
+                                           data-th-text="#{TrdBondChangeTrade.prodName}">产品名称</label>
+                                    <div class="layui-input-inline input-inline" >
+                                        <select id="prodId" name="prodId" required
+                                                class="layui-input form-input input-select"
+                                                data-th-data-url="@{/valuation/trademanage/trdbondchangevaluationtrade/TrdBondChangeTrade001/getFinprodName}"
+                                                allowClear="true" placeholder="请输入内容"
+                                                data-th-initValue="${entity?.prodId}" >
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                             <div class="layui-form-item">
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
-                                           data-th-text="#{TrdBondChangeTrade.prodName}">产品名称</label>
+                                           data-th-text="#{TrdBondChangeTrade.prodId}">产品代码</label>
                                     <div class="layui-input-inline input-inline">
                                         <input  type="text" id="prodName" name="prodName" required disabled
-                                               class="layui-input form-input" placeholder="请输入内容"
-                                               th:placeholder="#{SysCommon.placeholder}"
-                                               th:value="${entity?.prodName}">
+                                                class="layui-input form-input" placeholder="请输入内容"
+                                                th:placeholder="#{SysCommon.placeholder}"
+                                                th:value="${entity?.prodName}">
                                     </div>
                                 </div>
                                 <div class="form-inline-wrap">

@@ -34,21 +34,21 @@ $(function(){
             {field:'tradeId', width:180, title: '交易编号'}
             ,{field:'outTradeId', width:150, title: '外部成交编号'}
             ,{field:'prodId', width:150, title: '产品代码'}
-            ,{field:'prodName', width:150, title: '产品名称'}
+            ,{field:'prodName', width:220, title: '产品名称'}
             ,{field:'assetId', width:150, title: '资产代码'}
-            ,{field:'assetName', width:150, title: '资产名称'}
+            ,{field:'assetName', width:220, title: '资产名称'}
             ,{field:'psStr', width:150, title: '交易类型',sortField:'ps'}
             ,{field:'tradeDateStr',width:150, title: '交易日期',sortField:'tradeDate'}
             ,{field:'tradeDate', title: '交易日期', visible: false}
             ,{field:'effDateStr',width:150, title: '交割日期',sortField:'effDate'}
             ,{field:'effDate', title: '交割日期', visible: false}
-            ,{field:'invAimStr', width:220, title: '会计分类'}
+            ,{field:'invAimStr', width:240, title: '会计分类'}
             ,{field:'capital', width:150, title: '本金金额',type:'number'}
             ,{field:'cpriceAmt', width:150, title: '净价金额',type:'number'}
             ,{field:'intAmt', width:150, title: '应收利息总额',type:'number'}
             ,{field:'ccyFmt', title: '币种',sortField:"ccy",width:180}
             ,{field:'ccy',  title: '币种' ,visible: false}
-            ,{field:'myAcctNo', width:150, title: '资金账户'}
+            ,{field:'myAcctNo', width:200, title: '资金账户'}
             ,{field:'operation', title: 'SysCommon.operation', type:'action', buttons: ['edit', 'delt']}
         ]
     });

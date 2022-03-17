@@ -68,7 +68,7 @@
         if (prodId == '' || prodId == undefined) {
             $('#prodName').val('');
         } else {
-            $('#prodName').val($('#prodId').select2('data')[0].object).trigger('change');
+            $('#prodName').val($('#prodId').select2('data')[0].id).trigger('change');
         }
     }
 
@@ -80,7 +80,7 @@
         if (secId == '' || secId == undefined) {
             $('#secAbbr').val('');
         } else {
-            $('#secAbbr').val($('#secId').select2('data')[0].object).trigger('change');
+            $('#secAbbr').val($('#secId').select2('data')[0].id).trigger('change');
         }
     }
 

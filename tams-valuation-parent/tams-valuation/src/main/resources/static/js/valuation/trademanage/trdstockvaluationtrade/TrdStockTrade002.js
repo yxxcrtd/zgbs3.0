@@ -63,26 +63,27 @@
     /**
      * 产品代码联动带出产品名称
      */
-    var prodIdChange = function() {
+    $('#prodId').change(function(){
         var prodId = $('#prodId').val();
-        if (prodId == '' || prodId == undefined) {
-            $('#prodName').val('');
-        } else {
-            $('#prodName').val($('#prodId').select2('data')[0].object).trigger('change');
+        if(prodId){
+            $('#prodName').val($('#prodId').select2('data')[0].id).trigger('change');
+
+        }else {
+            $('#prodName').val('').trigger('change');
         }
-    }
+    });
 
     /**
      * 资产代码联动带出资产简称，交易场所
      */
-    var secIdChange = function() {
-        var assetId =  $('#assetId').val();
-        if (assetId == '' || assetId == undefined) {
-            $('#assetAbbr').val('');
-        } else {
-            $('#assetAbbr').val($('#assetId').select2('data')[0].object).trigger('change');
+    $('#assetId').change(function(){
+        var assetId = $('#assetId').val();
+        if(assetId){
+            $('#assetAbbr').val($('#assetId').select2('data')[0].id).trigger('change');
+        }else {
+            $('#assetAbbr').val('').trigger('change');
         }
-    }
+    });
 
     //结算金额  买入时：结算金额=成交金额+净佣金+印花税+经手费+证管费+过户费+结算费+其他费用
     //卖出时：结算金额=成交金额-净佣金-印花税-经手费-证管费-过户费-结算费-其他费用
@@ -127,16 +128,51 @@
         }
     }
 
+    $('#ps').change(function(){
+        psChange();
+    });
+
+    //交易类型联动
+    var psChange = function () {
+        var ps = $('#ps').val();
+        if(ps == 'T01' || ps == 'T02'){
+            $('#qsxx').show();
+            $('#pgxx').hide();
+            $('#sgxx').hide();
+            $('#qrxx').hide();
+        }else if(ps == 'T46' || ps == 'T47' ){
+            $('#qsxx').hide();
+            $('#pgxx').show();
+            $('#sgxx').hide();
+            $('#qrxx').hide();
+        }else if(ps == '105'){
+            $('#qsxx').hide();
+            $('#pgxx').hide();
+            $('#sgxx').show();
+            $('#qrxx').hide();
+        }else if(ps == 'T48'){
+            $('#qsxx').hide();
+            $('#pgxx').hide();
+            $('#sgxx').hide();
+            $('#qrxx').show();
+        }else{
+            $('#qsxx').hide();
+            $('#pgxx').hide();
+            $('#sgxx').hide();
+            $('#qrxx').hide();
+        }
+    };
+
 
     /**
      * 画面加载完成
      */
     $(function() {
 
-        //当前是否包含流程
-        var workflowIdNow = $("#workflowId").val()
+        if(workflowId){
+            psChange();
+        }
 
-        // init();
         //产品代码联动事件
         $('#prodId').change(function(){
             prodIdChange();
@@ -193,37 +229,6 @@
         //交易方向
         $('#ps').change(function(){
             settleAmtChange();
-        });
-
-        //交易类型联动
-        $('#ps').change(function () {
-            var ps = $('#ps').val();
-            if(ps == 'T01' || ps == 'T02'){
-                $('#qsxx').show();
-                $('#pgxx').hide();
-                $('#sgxx').hide();
-                $('#qrxx').hide();
-            }else if(ps == 'T46' || ps == 'T47' ){
-                $('#qsxx').hide();
-                $('#pgxx').show();
-                $('#sgxx').hide();
-                $('#qrxx').hide();
-            }else if(ps == '105'){
-                $('#qsxx').hide();
-                $('#pgxx').hide();
-                $('#sgxx').show();
-                $('#qrxx').hide();
-            }else if(ps == 'T48'){
-                $('#qsxx').hide();
-                $('#pgxx').hide();
-                $('#sgxx').hide();
-                $('#qrxx').show();
-            }else{
-                $('#qsxx').show();
-                $('#pgxx').show();
-                $('#sgxx').show();
-                $('#qrxx').show();
-            }
         });
 
         //是否锁定联动

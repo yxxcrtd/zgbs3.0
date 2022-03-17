@@ -75,7 +75,7 @@
                         //$('#prodId').val(result.finprodId).trigger('change');
                         $('#prodId').textSelect('setValue',result.finprodId);
                         $('#prodId').trigger('change');
-                        $('#prodName').val(result.finprodName).trigger('change');
+                        $('#prodName').val(result.finprodId).trigger('change');
                         $('#counterId').textSelect('setValue', result.counterId);
                         $('#counterId').trigger('change');
                     }
