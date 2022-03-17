@@ -232,7 +232,7 @@ public class DepositeAssetCalBookNewService {
             if(DictCodeList.存款类资产类型_GZ_活期类资产.getValue().equals(targetFinProduct.getType1())) {
                 interestBlanceForYstVar = this.getSubjectBalance(dto.getBooksetId(),
                         dto.getBokDetailId(), happenDateNow, bookDateNow,
-                        DictCodeList.余额方向_借方.getValue(), DictCodeBaseSubjectNatrueNew.活期存款_应计利息.getValue(),
+                        DictCodeList.余额方向_借方.getValue(), DictCodeBaseSubjectNatrueNew.定期存款_应计利息.getValue(),
                         taskPri);
                 if(costBalance != null && BigDecimal.ZERO.compareTo(costBalance)<0) {
                     // 定义 变量.本金列表

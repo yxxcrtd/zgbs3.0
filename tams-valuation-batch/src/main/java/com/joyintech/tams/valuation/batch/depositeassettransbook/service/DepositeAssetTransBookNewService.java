@@ -427,7 +427,7 @@ public class DepositeAssetTransBookNewService {
                         SubjectBalance otherSubjectBalance = this.getSubjectBalance(booksetIdNow,
                             bokDetailId, DateUtil.addDay(dealNow.getMdate(), -1),
                             dealNow.getBooksetDate(), DictCodeList.余额方向_借方.getValue(),
-                            DictCodeBaseSubjectNatrueNew.活期存款_应计利息.getValue(), null, null);
+                            DictCodeBaseSubjectNatrueNew.定期存款_应计利息.getValue(), null, null);
 
                         // 非空判断
                         if (otherSubjectBalance != null) {
@@ -655,7 +655,7 @@ public class DepositeAssetTransBookNewService {
                 Map<String, Object> accountNatrueBranchMap = new HashMap<String, Object>();
                 accountNatrueBranchMap.put(BookConstant.BRANCH, dealNow.getBranch());
                 if (DictCodeList.存款类资产类型_GZ_活期类资产.getValue().equals(targetFinProduct.getType1())) {
-                    accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.活期存款_应计利息.getValue(),
+                    accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.定期存款_应计利息.getValue(),
                         accountNatrueBranchMap);
                 }
                 else {
@@ -1370,7 +1370,7 @@ public class DepositeAssetTransBookNewService {
                         SubjectBalance otherSubjectBalance = this.getSubjectBalance(booksetIdNow,
                             bokDetailId, DateUtil.addDay(dealNow.getMdate(), -1),
                             dealNow.getBooksetDate(), DictCodeList.余额方向_借方.getValue(),
-                            DictCodeBaseSubjectNatrueNew.活期存款_应计利息.getValue(), null, null);
+                            DictCodeBaseSubjectNatrueNew.定期存款_应计利息.getValue(), null, null);
 
                         // 非空判断
                         if (otherSubjectBalance != null) {
@@ -1534,7 +1534,7 @@ public class DepositeAssetTransBookNewService {
                 Map<String, Object> accountNatrueBranchMap = new HashMap<String, Object>();
                 accountNatrueBranchMap.put(BookConstant.BRANCH, dealNow.getBranch());
                 if (DictCodeList.存款类资产类型_GZ_活期类资产.getValue().equals(targetFinProduct.getType1())) {
-                    accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.活期存款_应计利息.getValue(),
+                    accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.定期存款_应计利息.getValue(),
                         accountNatrueBranchMap);
                 }
                 else {
