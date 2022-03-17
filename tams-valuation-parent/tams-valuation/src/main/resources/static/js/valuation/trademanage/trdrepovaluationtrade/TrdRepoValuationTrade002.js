@@ -154,9 +154,7 @@ $(function() {
     $('#portfolioId').change(function(){
         var portfolioId = $('#portfolioId').val();
         if(portfolioId){
-            var dataPort = $('#portfolioId').select2('data')[0].object;
-            var finprodId = dataPort.finprodId;
-            $('#portfolioName').val(finprodId).trigger('change');
+            $('#portfolioName').val($('#portfolioId').select2('data')[0].id).trigger('change');
 
         }else {
             $('#portfolioName').val('').trigger('change');

@@ -82,8 +82,8 @@ public class TrdIntoValuationDuration002Service extends BaseService<TrdIntoValua
         BeanUtil.copyPropertiesIgnoreNull(entity,dto);
         //比较界面和接口字段差异，并手动给接口字段赋值
         entity.setProdId(dto.getPortfolioId()); //产品代码
-        entity.setSecId("F01_"+dto.getFinprodMarketId()); //金融产品代码
-        entity.setFinprodId("F01_"+dto.getFinprodMarketId()); //金融产品代码=资产代码
+        entity.setSecId(dto.getFinprodMarketId()); //金融产品代码
+        entity.setFinprodId(dto.getFinprodMarketId()); //金融产品代码=资产代码
         entity.setFinprodType("F04"); //金融产品类型
         entity.setDataActionSign("01");//数据动作标志
         entity.setPs(dto.getPs());//交易方向

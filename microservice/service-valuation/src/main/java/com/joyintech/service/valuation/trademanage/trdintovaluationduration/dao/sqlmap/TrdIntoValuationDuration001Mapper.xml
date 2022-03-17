@@ -77,7 +77,7 @@
 		t.TRADE_ID tradeId,/**交易编号**/
 		NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) portfolioId,/**金融产品代码**/
 		bok.BOOKSET_NAME portfolioName,/**金融产品名称**/
-		zc.FINPROD_MARKET_ID  finprodMarketId, /**资产代码**/
+		zc.FINPROD_ID  finprodMarketId, /**资产代码**/
 		zc.FINPROD_ABBR  finprodName,/**资产名称**/
 		t.PS ps,/**交易类型**/
 		t.CCY ccy,/**币种**/
@@ -107,7 +107,7 @@
 			</foreach>
 		</if>
 		<if test="finprodMarketIdArr != null and finprodMarketIdArr.length > 0">
-			and zc.FINPROD_MARKET_ID IN
+			and zc.FINPROD_ID IN
 			<foreach collection="finprodMarketIdArr" item="finprodMarketId" open="( " close=" )" separator=",">
 				#{finprodMarketId}
 			</foreach>
@@ -129,11 +129,11 @@
 
 	<!--更加交易编号查询数据-->
     <select id="queryTradeInfoByTradeId" resultType="com.joyintech.service.valuation.trademanage.trdintovaluationduration.dto.TrdIntoValuationDuration001Dto">
-				SELECT
+		SELECT
 		t.TRADE_ID tradeId,/**交易编号**/
 		NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) portfolioId,/**金融产品代码**/
 		bok.BOOKSET_NAME portfolioName,/**金融产品名称**/
-		zc.FINPROD_MARKET_ID  finprodMarketId, /**资产代码**/
+		zc.FINPROD_ID  finprodMarketId, /**资产代码**/
 		zc.FINPROD_ABBR  finprodName,/**资产名称**/
 		t.PS ps,/**交易类型**/
 		t.CCY ccy,/**币种**/

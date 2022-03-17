@@ -13,7 +13,9 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.SpringContextUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
@@ -36,6 +38,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 //import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 //import com.joyintech.tams.constant.DictCode;
@@ -151,4 +155,19 @@ public class TrdRepoValuationTrade002Controller extends BaseController {
         return new AjaxResult(msg);
     }
 
+
+    /**
+     * 资金账户下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getTrdAcctId")
+    public List<SelectOptionDto> getTrdAcctId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("portfolioId",param.get("finprodId"));
+        return commonBusinessService.getTrdAcctId(param);
+    }
 }

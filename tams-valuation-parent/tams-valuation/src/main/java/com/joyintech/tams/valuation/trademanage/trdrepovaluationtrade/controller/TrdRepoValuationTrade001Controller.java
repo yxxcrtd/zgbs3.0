@@ -25,6 +25,7 @@ import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 
+import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.trdrepovaluationtrade.dto.TrdRepoValuationTrade001Dto;
 import com.joyintech.tams.valuation.trademanage.trdrepovaluationtrade.service.TrdRepoValuationTrade001Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -62,6 +63,9 @@ public class TrdRepoValuationTrade001Controller extends BaseController {
     @Autowired
     private TrdRepoValuationTrade001Service trdRepoValuationTrade001Service;
 
+    @Autowired
+    private CommonBusinessService commonBusinessService;
+
     @Override
     public String init(Model model) {
         this.setSelectOptionToModel(model, DictCode.拆借方向, DictCode.拆借类型,DictCode.交易方向,DictCode.交易场所,DictCode.回购类型,
@@ -80,19 +84,35 @@ public class TrdRepoValuationTrade001Controller extends BaseController {
     }
 
 
+//    /**
+//     * 自定义产品代码下拉框
+//     * @param request
+//     * @return
+//     */
+//    @RequestMapping("/findPortfolioId")
+//    @ResponseBody
+//    public Page<SelectOptionDto> findPortfolioId(HttpServletRequest request) {
+//        Map<String, Object> param =RequestUtil.getPageParam();
+//        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
+//        param.put("finprodType", "F16"); //测试
+//        return trdRepoValuationTrade001Service.findPortfolioId(param);
+//    }
+
     /**
-     * 自定义产品代码下拉框
-     * @param request
-     * @return
+     * 产品代码下拉框
+     *
+     * @return 产品代码
+     * @see
+     * @since 1.0
      */
-    @RequestMapping("/findPortfolioId")
     @ResponseBody
-    public Page<SelectOptionDto> findPortfolioId(HttpServletRequest request) {
-        Map<String, Object> param =RequestUtil.getPageParam();
-        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-        param.put("finprodType", "F16"); //测试
-        return trdRepoValuationTrade001Service.findPortfolioId(param);
+    @RequestMapping("/getFinprodId")
+    public List<SelectOptionDto> getFinprodId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("finprodType","F16");
+        return commonBusinessService.getProdName(param);
     }
+
 
     /**
      * 导出数据

@@ -40,7 +40,7 @@
                                         <select id="portfolioId" name="portfolioId" th:initValue="${entity?.portfolioId}"
                                                 class="layui-input form-input input-select available"
                                                 data-th-placeholder="#{SysCommon.placeholder}" required
-                                                data-th-data-url="@{/valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade001/findPortfolioId}">
+                                                data-th-data-url="@{/valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade001/getFinprodId}">
                                         </select>
                                     </div>
                                 </div>
@@ -286,7 +286,7 @@
                                     <label class="layui-form-label form-lable" >资金账户</label>
                                     <div class="layui-input-inline input-inline">
                                         <select type="text" id="trdAcctId" name="trdAcctId" class="layui-input form-input input-select" parentIds="portfolioId"
-                                                th:data-url="@{/valuation/trademanage/bondlend/TrdBondLendTrade002/getTrdAcctId}"
+                                                th:data-url="@{/valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade002/getTrdAcctId}"
                                                 allowClear="true" placeholder="请输入内容" required="required"
                                                 data-th-placeholder="#{SysCommon.placeholder}">
                                         </select>
