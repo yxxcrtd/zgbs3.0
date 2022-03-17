@@ -41,7 +41,7 @@
 	<select id="getAssetId"
 			resultMap="SelectOptionMap">
 		select
-			FINPROD_MARKET_ID id,
+			FINPROD_ID id,
 			FINPROD_ABBR text,
 			TRADE_MARKET tradeMarket,
 			PROFIT_TYPE profitType
@@ -50,14 +50,20 @@
 		where
 			1=1
 			<if test="initValue != null and initValue != ''">
-				AND FINPROD_MARKET_ID = #{initValue}
+				AND FINPROD_ID = #{initValue}
 			</if>
 			<if test="assetType !=null and assetType != ''">
 				and FINPROD_TYPE = #{assetType}
 			</if>
 			<if test="search !=null and search != ''">
-				AND	(FINPROD_MARKET_ID like concat('%',concat(#{search},'%'))
+				AND	(FINPROD_ID like concat('%',concat(#{search},'%'))
 				OR FINPROD_ABBR like concat('%',concat(#{search},'%')))
+			</if>
+			<if test="profitTypeArr != null and profitTypeArr.length > 0">
+				AND	PROFIT_TYPE IN
+				<foreach collection="profitTypeArr" item="profit" open="( " close=" )" separator=",">
+					#{profit}
+				</foreach>
 			</if>
 			<if test="profitType !=null and profitType != ''">
 				AND	PROFIT_TYPE = #{profitType}
