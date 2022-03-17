@@ -739,13 +739,15 @@ public class SecDealAccountsNewService {
         // 公共场景赋值
         getAccountSceneMap(accountSceneMap, dealNow, rstBaseinfo);
 
-        // 费用处理共通
-        DealTypesFeeDto dealTypesFeeDto = calculationCommonService.quaryDealTypesFeeamt(
-            dealNow.getValTradeFeeDetailList(), dealNow.getProdId(), dealNow.getPortfolioId());
-        // 实付通道费 <-变量.交易各种费用.通道费
-        accountAmountMap.put(BookConstant.CHLAMT,
-            ArithmeticUtil.round(dealTypesFeeDto.getChlFee(), NumberEnum.MONEY));
+//        // 费用处理共通
+//        DealTypesFeeDto dealTypesFeeDto = calculationCommonService.quaryDealTypesFeeamt(
+//            dealNow.getValTradeFeeDetailList(), dealNow.getProdId(), dealNow.getPortfolioId());
+//        // 实付通道费 <-变量.交易各种费用.通道费
+//        accountAmountMap.put(BookConstant.CHLAMT,
+//            ArithmeticUtil.round(dealTypesFeeDto.getChlFee(), NumberEnum.MONEY));
 
+        // 定义 变量.交易本金
+        BigDecimal 交易本金 = dealNow.getTradeAmt();
         // accountAmountMap设置
         // 交易金额 <- 交易明细.交易金额
         accountAmountMap.put(BookConstant.DEALAMT,
@@ -753,74 +755,50 @@ public class SecDealAccountsNewService {
         // add by weipeng on 20220221 区分资金账户金额元素 start
         // 本方资金账户类型 或 对方资金账户类型对应资金账户类型，赋值对应金额元素
         if(DictCodeListExt1.资金账户类型_产品托管户.getValue().equals(dealNow.getAcctType())){
-            accountAmountMap.put(BookConstant.DEALAMT_HQ, dealNow.getTradeAmt());
+            accountAmountMap.put(BookConstant.DEALAMT_HQ, 交易本金);
         }
         else if(DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(dealNow.getAcctType())){
-            accountAmountMap.put(BookConstant.DEALAMT_JS, dealNow.getTradeAmt());
+            accountAmountMap.put(BookConstant.DEALAMT_JS, 交易本金);
         }
         // 券商资金账户现划分在结算备付金科目性质下
         else if(DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(dealNow.getAcctType())){
-            accountAmountMap.put(BookConstant.DEALAMT_JS, dealNow.getTradeAmt());
+            accountAmountMap.put(BookConstant.DEALAMT_JS, 交易本金);
         }
         // add by weipeng on 20220221 区分资金账户金额元素 end
 
-        /** modify by yanya on 20210301 存续期增加提前交收处理 start**/
-        //定义 变量.交易本金 = 交易明细.全价总额
-        BigDecimal 交易本金 = dealNow.getFpriceAmt();
-        //定义 变量.交易金额_清算款 = 0
-        BigDecimal 交易金额清算款 = BigDecimal.ZERO;
-        //IF 数据字典：估值交易市场.上交所 eq 交易明细.交易场所 OR 数据字典：估值交易市场.深交所 eq 交易明细.交易场所 AND 交易明细.交易日 < 交易明细.到期日
-        if(
-                (
-                        StringUtil.equals(DictCodeListExt1.估值交易市场_上交所.getValue(), dealNow.getTradeMarket())
-                                || StringUtil.equals(DictCodeListExt1.估值交易市场_深交所.getValue(), dealNow.getTradeMarket())
-                )
-                        && DateUtil.compareDate(dealNow.getTradeDate(), dealNow.getMdate()) < 0
-        ) {
-            //变量.交易金额_清算款 = 交易明细.交易金额
-            交易金额清算款 = dealNow.getTradeAmt();
-            //变量.交易本金 = 0
-            交易本金 = BigDecimal.ZERO;
-        }
         //金额元素.实收金额_清算款 <-		变量.交易金额_清算款
-        accountAmountMap.put(BookConstant.DEALAMT_QSK, 交易金额清算款);
-        // 交易本金 <- 变量.交易本金
-//        accountAmountMap.put(BookConstant.RECEITAMT,
-//            ArithmeticUtil.round(dealNow.getFpriceAmt(), NumberEnum.MONEY));
-        accountAmountMap.put(BookConstant.RECEITAMT,
-            ArithmeticUtil.round(交易本金, NumberEnum.MONEY));
-        /** modify by yanya on 20210301 存续期增加提前交收处理 end**/
+
+        accountAmountMap.put(BookConstant.DEALAMT_QSK, 交易本金);
         BigDecimal 冲抵减值金额 = BigDecimal.ZERO;
         /**ADD BY CAOGUO ON 20201102 减值相关修改 START **/
         if(DictCodeListExt3.还本收息冲抵减值准备处理日_资金到账日.getValue().equals(offsetImptDateType)
                 && BigDecimal.ZERO.compareTo(param.getVarJzzbSubjectAmt()) != 0){
         	
             BigDecimal qtyskBjBalAmt = param.getVarQtyskxBJSubjectAmt().get(String.valueOf(dealNow.getBranch()));
-            if(qtyskBjBalAmt == null) {
-                SubjectBalanceSearchDto searchDao = new SubjectBalanceSearchDto();
-                searchDao.setBooksetId(dealNow.getBooksetId());
-                searchDao.setBokDetailId(dealNow.getBokDetailId());
-                searchDao.setHappenDate(dealNow.getHappenDate());
-                searchDao.setBookDate(dealNow.getBookDate());
-                searchDao.setTaskPri(dealNow.getTaskPri());
-                searchDao.setBaseSubjectNatureList(new ArrayList<String>(
-                        Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
-                searchDao.setBranch(dealNow.getBranch());
-                List<SubjectBalance> listSubjectBalance = accountingCommonService.getSubjectBalanceExpectDirection(
-                        searchDao, DictCodeList.余额方向_借方.getValue());
-                SubjectBalance subjectBalance = new SubjectBalance();
-                if(!StringUtil.isEmptyList(listSubjectBalance)) {
-                    subjectBalance = listSubjectBalance.get(0);
-                    param.getVarQtyskxBJSubjectAmt().put(String.valueOf(dealNow.getBranch()),subjectBalance.getBalance());
-                }
-            }
+//            if(qtyskBjBalAmt == null) {
+//                SubjectBalanceSearchDto searchDao = new SubjectBalanceSearchDto();
+//                searchDao.setBooksetId(dealNow.getBooksetId());
+//                searchDao.setBokDetailId(dealNow.getBokDetailId());
+//                searchDao.setHappenDate(dealNow.getHappenDate());
+//                searchDao.setBookDate(dealNow.getBookDate());
+//                searchDao.setTaskPri(dealNow.getTaskPri());
+//                searchDao.setBaseSubjectNatureList(new ArrayList<String>(
+//                        Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
+//                searchDao.setBranch(dealNow.getBranch());
+//                List<SubjectBalance> listSubjectBalance = accountingCommonService.getSubjectBalanceExpectDirection(
+//                        searchDao, DictCodeList.余额方向_借方.getValue());
+//                SubjectBalance subjectBalance = new SubjectBalance();
+//                if(!StringUtil.isEmptyList(listSubjectBalance)) {
+//                    subjectBalance = listSubjectBalance.get(0);
+//                    param.getVarQtyskxBJSubjectAmt().put(String.valueOf(dealNow.getBranch()),subjectBalance.getBalance());
+//                }
+//            }
         	
             LossAmtInputDto dto = this.getLossAmtInputDto(acctEntity, dealNow, 
                     DictCodeListExt1.现金流一级类型_本金.getValue(),
                     /** modify by yanya on 20210301 存续期增加提前交收处理 sart**/
                     //变量.交易本金 + 变量.交易金额_清算款
-                    //dealNow.getTradeAmt(),
-                    ArithmeticUtil.doAdd(交易本金, 交易金额清算款),
+                    交易本金,
                     /** modify by yanya on 20210301 存续期增加提前交收处理 end**/
                     //减值准备余额
                     param.getVarJzzbSubjectAmt(), 
@@ -876,15 +854,15 @@ public class SecDealAccountsNewService {
         accountAmountMap.putAll(accountAmountBCCYAMTMap);
         //accountAmountMap再次设置如下：
         /** modify by yanya on 20210301 存续期增加提前交收处理 sart**/
-        //交易金额_本位币 <-	交易本金_本位币 + 实付通道费_本位币 + 交易金额清算款_本位币
-        BigDecimal 交易金额本位币 = ArithmeticUtil.doAdd(
-                accountAmountBCCYAMTMap.get(BookConstant.RECEITAMT + BookConstant.BCCYAMT),//交易本金_本位币
-                accountAmountBCCYAMTMap.get(BookConstant.CHLAMT + BookConstant.BCCYAMT),//实付通道费_本位币
-                accountAmountBCCYAMTMap.get(BookConstant.DEALAMT_QSK + BookConstant.BCCYAMT)//交易金额清算款_本位币
-        );
+//        //交易金额_本位币 <-	交易本金_本位币 + 实付通道费_本位币 + 交易金额清算款_本位币
+//        BigDecimal 交易金额本位币 = ArithmeticUtil.doAdd(
+//                accountAmountBCCYAMTMap.get(BookConstant.RECEITAMT + BookConstant.BCCYAMT),//交易本金_本位币
+//                accountAmountBCCYAMTMap.get(BookConstant.CHLAMT + BookConstant.BCCYAMT),//实付通道费_本位币
+//                accountAmountBCCYAMTMap.get(BookConstant.DEALAMT_QSK + BookConstant.BCCYAMT)//交易金额清算款_本位币
+//        );
         /** modify by yanya on 20210301 存续期增加提前交收处理 end**/
-        accountAmountMap.put(BookConstant.DEALAMT + BookConstant.BCCYAMT,
-                ArithmeticUtil.round(交易金额本位币, NumberEnum.MONEY));
+//        accountAmountMap.put(BookConstant.DEALAMT + BookConstant.BCCYAMT,
+//                ArithmeticUtil.round(交易金额本位币, NumberEnum.MONEY));
         accountCurrencyMap.put(BookConstant.DEALAMT + BookConstant.BCCYAMT, standardCcyNow);// value值塞入当前交易币种
         /** modify by yanya on 20200102 增加本位币处理 end**/
 
