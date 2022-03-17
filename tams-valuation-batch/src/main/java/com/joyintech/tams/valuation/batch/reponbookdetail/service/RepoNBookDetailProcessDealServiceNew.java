@@ -4,14 +4,6 @@
  */
 package com.joyintech.tams.valuation.batch.reponbookdetail.service;
 
-import java.math.BigDecimal;
-import java.util.*;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
-
 import com.joyintech.calculation.config.NumberEnum;
 import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
@@ -45,10 +37,14 @@ import com.joyintech.tams.valuation.common.batch.finproduct.entity.TradeInfoDto;
 import com.joyintech.tams.valuation.common.batch.losscommon.service.LossCommonService;
 import com.joyintech.tams.valuation.common.batch.tradecommon.dto.ValTrdProductDealInfoDto;
 import com.joyintech.tams.valuation.common.batch.tradecommon.service.ValTradeCommonService;
-import com.joyintech.tams.valuation.common.constants.BookConstant;
-import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrue;
-import com.joyintech.tams.valuation.common.constants.GlobalConstant;
-import com.joyintech.tams.valuation.common.constants.ValDictCodeList;
+import com.joyintech.tams.valuation.common.constants.*;
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * 质押式回购交易账务处理 process逻辑处理
@@ -166,7 +162,7 @@ public class RepoNBookDetailProcessDealServiceNew {
 
         // 2.1.成本类科目余额
         SubjectBalance subjectBalanceForAmt = this.getSubjectBalance(booksetIdNow, bokDetailIdNow, happenDateNow,
-            bookDateNow, expBalanceDirect, DictCodeBaseSubjectNatrue.成本.getValue(), taskPri);
+            bookDateNow, expBalanceDirect, DictCodeBaseSubjectNatrueNew.买入返售金融资产_成本.getValue(), taskPri);
         if (subjectBalanceForAmt != null) {
             glb_subjectAmt =
                 subjectBalanceForAmt.getBalance() == null ? BigDecimal.ZERO : subjectBalanceForAmt.getBalance();// 变量.成本科目余额
@@ -179,7 +175,7 @@ public class RepoNBookDetailProcessDealServiceNew {
 
         // 2.2.应计利息类科目余额
         SubjectBalance subjectBalanceForfit = this.getSubjectBalance(booksetIdNow, bokDetailIdNow, happenDateNow,
-            bookDateNow, expBalanceDirect, DictCodeBaseSubjectNatrue.应计利息.getValue(), taskPri);
+            bookDateNow, expBalanceDirect, DictCodeBaseSubjectNatrueNew.买入返售金融资产_应计利息.getValue(), taskPri);
         if (subjectBalanceForfit != null) {
             glb_subjectProfit =
                 subjectBalanceForfit.getBalance() == null ? BigDecimal.ZERO : subjectBalanceForfit.getBalance();// 变量.应计利息科目余额
@@ -196,7 +192,7 @@ public class RepoNBookDetailProcessDealServiceNew {
         BigDecimal glb_subjectjz = BigDecimal.ZERO;// 减值准备类科目余额
         // 调用共通设计->【详细设计-账务类共通方法设计.xlsx】->科目余额查询-期待方向SHEET
         SubjectBalance jzBalance = this.getSubjectBalance(booksetIdNow, bokDetailIdNow, happenDateNow, bookDateNow,
-            DictCodeList.余额方向_借方.getValue(), DictCodeBaseSubjectNatrue.摊余成本类资产减值.getValue(), taskPri);
+            DictCodeList.余额方向_借方.getValue(), DictCodeBaseSubjectNatrueNew.买入返售金融资产_减值准备.getValue(), taskPri);
         if (jzBalance != null) {
             // 变量.减值准备类科目余额 = DTO.科目余额
             glb_subjectjz = jzBalance.getBalance() == null ? BigDecimal.ZERO : jzBalance.getBalance();
@@ -747,7 +743,7 @@ public class RepoNBookDetailProcessDealServiceNew {
                 BokStatLossPosiiton statLoss = null;
                 for (ValBokBookdetailBatch detail : resultNowNow.getValBokBookdetailBatch()) {
                     // 变量.账务明细 = 调用账务明细生成共通返回结果中 基础科目性质 ="买入返售资产减值"的第一条数据
-                    if (StringUtil.equals(DictCodeBaseSubjectNatrue.摊余成本类资产减值.getValue(),
+                    if (StringUtil.equals(DictCodeBaseSubjectNatrueNew.买入返售金融资产_减值准备.getValue(),
                         detail.getBaseSubjectNature())) {
                         // 调用【减值相关共通-减值使用明细数据生成】
                         statLoss = lossCommonService.setLossInfoUsed(detail, accountAmountMap.get(BookConstant.IMPAMT),
