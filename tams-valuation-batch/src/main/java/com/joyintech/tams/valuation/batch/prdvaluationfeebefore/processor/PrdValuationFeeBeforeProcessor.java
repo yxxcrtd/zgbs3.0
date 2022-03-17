@@ -16,6 +16,7 @@ import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.valuation.batch.common.prdvaluationfeecommon.dto.BokstatbokpositionReaderDto;
 import com.joyintech.tams.valuation.batch.common.prdvaluationfeecommon.dto.BokstatbokpositionWriterDto;
+import com.joyintech.tams.valuation.batch.prdvaluationfeebefore.service.PrdValuationFeeBeforeProcessorNewService;
 import com.joyintech.tams.valuation.batch.prdvaluationfeebefore.service.PrdValuationFeeBeforeProcessorService;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,7 @@ public class PrdValuationFeeBeforeProcessor extends BaseProcessor<NeedOperateEnt
     private PrdValuationFeeBeforeProcessorService prdValuationFeeBeforeProcessorService;
 
     @Autowired
-    private PrdValuationFeeBeforeProcessorService prdValuationFeeBeforeProcessorNewService;
+    private PrdValuationFeeBeforeProcessorNewService prdValuationFeeBeforeProcessorNewService;
 
     @Override
     public BokstatbokpositionWriterDto process(NeedOperateEntity items)

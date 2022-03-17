@@ -375,9 +375,6 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
             "CCBZJ_YJLX"
     ),
 
-    买入返售金融资产_减值准备(
-            "MRFSJRZC_JZZB_Z"
-    ),
     其他综合收益_申赎(
             "QTZHSY_SH"
     ),
@@ -389,6 +386,15 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
     ),
     其他应付款_其他(
             "QTYFK"
+    ),
+    买入返售金融资产_成本(
+            "MRFSJRZC_CB"
+    ),
+    买入返售金融资产_应计利息(
+            "MRFSJRZC_YJLX"
+    ),
+    买入返售金融资产_减值准备(
+        "MRFSJRZC_JZZB_Z"
     ),
     /** ==========新增科目性质======== end**/
     /** add by weipeng on 20220113 估值系统产品3.0.4批处理科目性质改造 end **/
