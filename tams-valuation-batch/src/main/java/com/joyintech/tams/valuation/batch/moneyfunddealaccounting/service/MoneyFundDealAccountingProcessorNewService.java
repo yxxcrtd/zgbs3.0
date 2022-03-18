@@ -1088,7 +1088,7 @@ public class MoneyFundDealAccountingProcessorNewService {
 //                accountAmountMap.put("BONUSAMT" + BookConstant.BCCYAMT
 //                		,calculationCommonService.doMultiply(NumberEnum.MONEY.getCode(), null, accountAmountMap.get("BONUSAMT"), changeRate));
                 // 定义 本位币金额
-                BigDecimal bonusAmtBccy = calculationCommonService.doMultiply(NumberEnum.MONEY.getCode(), null, accountAmountMap.get("BONUSAMT"), changeRate);
+                BigDecimal bonusAmtBccy = calculationCommonService.doMultiply(NumberEnum.MONEY.getCode(), null, accountAmountMap.get(资金账户金额元素), changeRate);
                 accountAmountMap.put(资金账户金额元素, dealDto.getTradeAmt());
                 accountAmountMap.put(资金账户金额元素 + BookConstant.BCCYAMT, bonusAmtBccy);
                 // add by weipeng on 20220221 区分资金账户金额元素 end
