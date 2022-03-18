@@ -182,7 +182,9 @@
                     basePath + "valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade002/init",//打开新界面
                     "98%", "98%", {
                         pageModel: PAGE_MODEL_EDIT,//请求的page_model
-                        tradeId: data.tradeId  //金融产品代码
+                        tradeId: data.tradeId //金融产品代码
+                        ,ps: data.ps  //交易方向
+                        ,portfolioId: data.portfolioId  //产品代码
                     }, function () {
                         table.reload();//回调函数，表格刷新
                     });

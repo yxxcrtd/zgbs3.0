@@ -172,6 +172,8 @@
        CASE WHEN ttfd.FEE_TYPE = 'B99' THEN ttfd.FEE_AMT ELSE 0 END as otherAmt,/**其他应付费用**/
        null              rebackPrice, /**回购利率**/
        t.INT_AMT         intAmt,/**应计利息**/
+       null terminateRate, /**提前终止利率**/
+       null overdueAmt,  /**逾期利息金额**/
        stl.SETTLE_AMT    settleAmt,/**结算金额**/
        t.CCY             ccy,/**币种**/
        stl.MY_ACCT_NO    trdAcctId/**资金账户**/

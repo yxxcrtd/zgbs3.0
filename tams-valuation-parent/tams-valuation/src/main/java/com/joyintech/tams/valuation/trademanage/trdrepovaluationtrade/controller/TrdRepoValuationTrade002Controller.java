@@ -75,11 +75,10 @@ public class TrdRepoValuationTrade002Controller extends BaseController {
         model.addAttribute("PS_T01", DictCodeList.交易方向_买入.getValue());
         model.addAttribute("PS_T02", DictCodeList.交易方向_卖出.getValue());
         // 一体化对应etliu end
-
-        model.addAttribute("YES_OR_NO_N", DictCodeList.是否_否.getValue());
         model.addAttribute("FINPROD_TYPE_F07", DictCodeListExt1.金融产品类型_存款.getValue());
         String portfolioId = getParam("portfolioId");
         String tradeId = getParam("tradeId");
+        String ps = getParam("ps");
         String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
         if (!WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotEmpty(workflowId)) {
             TrdRepoValuationTrade001Dto entity = trdRepoValuationTrade002Service.getBussinessEntityByWorkflowId(
