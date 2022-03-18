@@ -213,6 +213,13 @@ public class NonMonetaryFundDealProcessorNewService {
             accountSceneMap = bookCommonLogic.transactionElementAssign(acctEntity, dealNow);
             getAccountSceneMap(accountSceneMap, dealNow, targetFinProduct);
 
+            // add by weipeng on 20220317：增加资金账户金额元素区分不同资金账户
+            String 资金账户金额元素 = BookConstant.DEALAMT_HQ ; //默认托管户
+            if(DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(dealNow.getAcctType())
+               || DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(dealNow.getAcctType())){
+                资金账户金额元素 = BookConstant.DEALAMT_JS ;
+            }
+
             if (DictCodeList.交易方向_认购确认.getValue().equals(dealPsNow)) {
 
                 // **********共通元素设值 - 设置账务引擎参数**********
@@ -464,7 +471,7 @@ public class NonMonetaryFundDealProcessorNewService {
                 // 发生数量	<-	交易明细.交易份额
                 accountAmountMap.put(BookConstant.ACCQUA,dealNow.getShareAmt()==null?BigDecimal.ZERO:dealNow.getShareAmt());
                 // 成本金额	<-	交易明细.交易本金
-                accountAmountMap.put(BookConstant.DEALAMT,dealNow.getPrinAmt()==null?BigDecimal.ZERO:dealNow.getPrinAmt());
+                accountAmountMap.put(资金账户金额元素,dealNow.getTradeAmt()==null?BigDecimal.ZERO:dealNow.getTradeAmt());
                 // 交易金额	<-	交易明细.交易金额
                 accountAmountMap.put(BookConstant.DEALAMT,dealNow.getTradeAmt()==null?BigDecimal.ZERO:dealNow.getTradeAmt());
                 
@@ -472,8 +479,8 @@ public class NonMonetaryFundDealProcessorNewService {
                 //成本金额_本位币<-	成本金额 * 变量.汇率						
                 accountAmountMap.put(BookConstant.DEALAMT + BookConstant.BCCYAMT, 
                 		calculationCommonService.doMultiply(NumberEnum.MONEY.getCode(), null, accountAmountMap.get(BookConstant.DEALAMT), changeRate));
-                //交易金额_本位币<-	成本金额_本位币		debug					
-                accountAmountMap.put(BookConstant.DEALAMT + BookConstant.BCCYAMT, 
+                //交易金额_本位币<-	成本金额_本位币
+                accountAmountMap.put(资金账户金额元素 + BookConstant.BCCYAMT,
                 		accountAmountMap.get(BookConstant.DEALAMT + BookConstant.BCCYAMT));
                 /**20200102 taoran add end**/
                 
@@ -509,16 +516,16 @@ public class NonMonetaryFundDealProcessorNewService {
                 // 发生数量	<-	交易明细.交易份额
                 accountAmountMap.put(BookConstant.ACCQUA,dealNow.getShareAmt()==null?BigDecimal.ZERO:dealNow.getShareAmt());
                 // 成本金额	<-	交易明细.交易本金
-                accountAmountMap.put(BookConstant.DEALAMT,dealNow.getPrinAmt()==null?BigDecimal.ZERO:dealNow.getPrinAmt());
-                // 交易金额	<-	交易明细.交易金额
                 accountAmountMap.put(BookConstant.DEALAMT,dealNow.getTradeAmt()==null?BigDecimal.ZERO:dealNow.getTradeAmt());
+                // 交易金额	<-	交易明细.交易金额
+                accountAmountMap.put(资金账户金额元素,dealNow.getTradeAmt()==null?BigDecimal.ZERO:dealNow.getTradeAmt());
                 
                 /**20200102 taoran add start**/
                 //成本金额_本位币<-	成本金额 * 变量.汇率						
                 accountAmountMap.put(BookConstant.DEALAMT + BookConstant.BCCYAMT, 
                 		calculationCommonService.doMultiply(NumberEnum.MONEY.getCode(), null, accountAmountMap.get(BookConstant.DEALAMT), changeRate));
                 //交易金额_本位币<-	成本金额_本位币		debug					
-                accountAmountMap.put(BookConstant.DEALAMT + BookConstant.BCCYAMT, 
+                accountAmountMap.put(资金账户金额元素 + BookConstant.BCCYAMT,
                 		accountAmountMap.get(BookConstant.DEALAMT + BookConstant.BCCYAMT));
                 /**20200102 taoran add end**/
                 
@@ -958,7 +965,7 @@ public class NonMonetaryFundDealProcessorNewService {
                 BigDecimal varYcAmt = ArithmeticUtil.doSub(dealNow.getTradeAmt(), varYsfghAmt);
 
                 // 实收金额 <- 交易明细.交易金额
-                accountAmountMap.put(BookConstant.DEALAMT,dealNow.getTradeAmt());
+                accountAmountMap.put(资金账户金额元素,dealNow.getTradeAmt());
                 // 分红金额 <- 变量.应收红利科目余额
                 accountAmountMap.put(BookConstant.BONUSAMT,varYsfghAmt);
                 // 分红金额 <- 变量.应收红利科目余额
@@ -980,7 +987,7 @@ public class NonMonetaryFundDealProcessorNewService {
                 accountAmountMap.putAll(bccyAmountMap);
                 
             	//定义 变量.轧差金额_本位币 = 实收金额_本位币 - 分红金额_本位币
-                BigDecimal varYcAmtBccy = ArithmeticUtil.doSub(accountAmountMap.get(BookConstant.DEALAMT + BookConstant.BCCYAMT),
+                BigDecimal varYcAmtBccy = ArithmeticUtil.doSub(accountAmountMap.get(资金账户金额元素 + BookConstant.BCCYAMT),
                 		accountAmountMap.get(BookConstant.BONUSAMT + BookConstant.BCCYAMT));
             	if(varYcAmtBccy.compareTo(BigDecimal.ZERO)>0) {
             		accountAmountMap.put(BookConstant.NETAMT_C + BookConstant.BCCYAMT, ArithmeticUtil.round(varYcAmtBccy, NumberEnum.MONEY.getCode(), null));
