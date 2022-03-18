@@ -173,16 +173,6 @@
             psChange();
         }
 
-        //产品代码联动事件
-        $('#prodId').change(function(){
-            prodIdChange();
-        });
-
-        //资产代码联动事件
-        $('#assetId').change(function(){
-            secIdChange();
-        });
-
         //缴款金额联动
         //成交数量
         $('#dealNum_pg').change(function(){

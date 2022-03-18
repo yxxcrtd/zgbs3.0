@@ -66,7 +66,7 @@
 									<div class="layui-input-inline input-inline">
 										<select id="assetId" name="assetId" required
 												class="layui-input form-input input-select"
-												data-th-data-url="@{/valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/getAssetId}"
+												data-th-data-url="@{/valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade001/getAssetId}"
 												allowClear="true" placeholder="请输入内容"
 												data-th-initValue="${entity?.assetId}" >
 										</select>
@@ -610,6 +610,7 @@
 					</div>
 				</div>
 				<input type="hidden" id="workflowId" name="workflowId" data-th-initValue="${entity?.workflowId}" />
+				<input type="hidden" id="fundType" name="fundType" data-th-initValue="${entity?.fundType}" />
 			</form>
 			<div class="layui-form-item">
 				<div align="center" style="height:50px;padding-top: 10px;">

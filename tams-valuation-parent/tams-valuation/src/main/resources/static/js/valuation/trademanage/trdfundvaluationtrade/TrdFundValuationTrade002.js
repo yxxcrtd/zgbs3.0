@@ -16,12 +16,14 @@
         if(assetId){
             var dataPort = $('#assetId').select2('data')[0].object;
             var tradeMarket = dataPort.tradeMarket;
+            var assetType = dataPort.assetType;
             $('#assetAbbr').val($('#assetId').select2('data')[0].id).trigger('change');
             $('#tradeMarket').val(tradeMarket).trigger('change');
-
+            $('#fundType').val(assetType).trigger('change');
         }else {
             $('#assetAbbr').val('').trigger('change');
             $('#tradeMarket').val('').trigger('change');
+            $('#fundType').val('').trigger('change');
         }
     });
 

@@ -88,6 +88,21 @@ public class TrdFundValuationTrade001Controller extends BaseController {
     }
 
     /**
+     * 资产代码下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getAssetId")
+    public List<SelectOptionDto> getAssetId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("assetType","F06");
+        return commonBusinessService.getAssetId(param);
+    }
+
+    /**
      * @Description:页面查询，表格分页
      * @auther: yuzj
      * @date: 2021/12/30
@@ -195,8 +210,8 @@ public class TrdFundValuationTrade001Controller extends BaseController {
         params.setElementId(dto.getElementId());
 
         // 设置流程业务说明, entity即传入的dto
-        params.setComment(entity -> WorkFlowUtil.concatComment("基金交易查询删除：", entity.getTradeId(),
-                DateUtil.format(entity.getTradeDate(),DateUtil.DEFAULT_DATETIME_FORMAT)
+        params.setComment(entity -> WorkFlowUtil.concatComment("基金交易查询删除：交易编号", entity.getTradeId(),
+               "交易日期", DateUtil.format(entity.getTradeDate(),DateUtil.DEFAULT_DATETIME_FORMAT)
         ));
 
         // 塞入流程参数

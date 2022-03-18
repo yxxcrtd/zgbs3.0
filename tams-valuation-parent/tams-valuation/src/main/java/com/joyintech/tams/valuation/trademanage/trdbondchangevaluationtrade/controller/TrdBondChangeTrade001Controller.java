@@ -108,10 +108,25 @@ public class TrdBondChangeTrade001Controller extends BaseController {
      * @since 1.0
      */
     @ResponseBody
-    @RequestMapping("/getAssetId")
-    public Page<SelectOptionDto> getAssetId() {
+    @RequestMapping("/getAssetId1")
+    public Page<SelectOptionDto> getAssetId1() {
         Map<String, Object> param = RequestUtil.getPageParam();
         return trdBondChangeTrade001Service.getAssetId(param);
+    }
+
+    /**
+     * 资产代码下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getAssetId")
+    public List<SelectOptionDto> getAssetId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("assetType","F01");
+        return commonBusinessService.getAssetId(param);
     }
 
     /**

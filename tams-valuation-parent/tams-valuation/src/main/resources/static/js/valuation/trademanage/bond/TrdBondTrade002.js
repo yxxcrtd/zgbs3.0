@@ -155,20 +155,6 @@
      */
     $(function() {
 
-        //当前是否包含流程
-        var workflowIdNow = $("#workflowId").val()
-
-        // init();
-        //产品代码联动事件
-        $('#prodId').change(function(){
-            prodIdChange();
-        });
-
-        //资产代码联动事件
-        $('#secId').change(function(){
-            secIdChange();
-        });
-
         /*全价总额变动计算净价总额*/
         $('#tradeAmt').change(function () {
             var tradeAmt = $('#tradeAmt').val();

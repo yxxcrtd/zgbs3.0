@@ -97,6 +97,11 @@ public class TrdFundValuationTradeDto extends BaseEntity implements ProcessEntit
     private String assetAbbr;
 
     /**
+     * 基金类型
+     */
+    private String fundType;
+
+    /**
      * 交易类型
      */
     private String ps;
@@ -760,6 +765,14 @@ public class TrdFundValuationTradeDto extends BaseEntity implements ProcessEntit
 
     public void setTradeAmtArrive(BigDecimal tradeAmtArrive) {
         this.tradeAmtArrive = tradeAmtArrive;
+    }
+
+    public String getFundType() {
+        return fundType;
+    }
+
+    public void setFundType(String fundType) {
+        this.fundType = fundType;
     }
 
     public String getTradeAmtStr() {

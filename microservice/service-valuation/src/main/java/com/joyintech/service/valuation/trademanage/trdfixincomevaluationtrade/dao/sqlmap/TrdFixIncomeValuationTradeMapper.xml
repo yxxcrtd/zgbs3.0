@@ -23,7 +23,7 @@
 			stl.SETTLE_AMT settleAmt,/**结算金额**/
 			stl.MY_ACCT_NO myAcctNo/**资金账户**/
 		FROM TRD_PRODUCT_DEAL t
-		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = SUBSTR(t.finprod_id,5,LENGTH(t.finprod_id))
+		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
 		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE  in( '09') AND STL.ORDER_TYPE NOT LIKE 'N%'
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal1 on deal1.BUSI_NO = t.TRADE_ID
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal2 ON stl.ORDER_ID = deal2.BUSI_NO
@@ -77,7 +77,7 @@
 			null outTradeId,    /*外部成交编号*/
 			NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) prodId,/**金融产品代码**/
 			bok.BOOKSET_NAME prodName,/**金融产品名称**/
-			zc.FINPROD_MARKET_ID  assetId, /**资产代码**/
+			zc.FINPROD_ID  assetId, /**资产代码**/
 			zc.FINPROD_ABBR  assetName,/**资产简称**/
 			t.PS ps,/**交易方向**/
 			t.TRADE_DATE tradeDate,/**交易日**/

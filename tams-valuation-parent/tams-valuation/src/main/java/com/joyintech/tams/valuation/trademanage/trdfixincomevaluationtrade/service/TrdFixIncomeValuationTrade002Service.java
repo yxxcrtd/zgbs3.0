@@ -10,6 +10,7 @@
 
 package com.joyintech.tams.valuation.trademanage.trdfixincomevaluationtrade.service;
 
+import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
@@ -103,7 +104,7 @@ public class TrdFixIncomeValuationTrade002Service extends CommonExportService<Tr
         BeanUtil.copyPropertiesIgnoreNull(valMngBuyTrade,dto);
         //相同字段有：交易日期、交易方向、应收利息总额、净价总额、全价总额、币种、成交编号、会计分类
         //比较界面和接口字段差异，并手动给接口字段赋值
-        valMngBuyTrade.setAssetId("F17_"+dto.getAssetId());//资产代码
+        valMngBuyTrade.setFprice(ArithmeticUtil.doAdd(dto.getCpriceAmt(),dto.getIntAmt()));//全价=净价总额+应收利息总额
         valMngBuyTrade.setNums(dto.getCapital()); //数量
         valMngBuyTrade.setParValue(new BigDecimal(0));//单位面值
         valMngBuyTrade.setFeeAmtUnpay(new BigDecimal(0));//未随交易支付费用
@@ -111,7 +112,6 @@ public class TrdFixIncomeValuationTrade002Service extends CommonExportService<Tr
         valMngBuyTrade.setCounterId(null);//必填 交易对手
         valMngBuyTrade.setCounterType(null);//必填 交易对手类型
         valMngBuyTrade.setTrader(null);//交易员
-        valMngBuyTrade.setFprice(new BigDecimal(0));//全价
         valMngBuyTrade.setUnitInt(new BigDecimal(0));//应收利息
         valMngBuyTrade.setFpriceAmt(dto.getSettleAmt());
         valMngBuyTrade.setFee(new BigDecimal(0));//费用

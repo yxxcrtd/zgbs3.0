@@ -24,7 +24,7 @@
 			ttfd2.FEE_AMT  commission,/**佣金**/
 			stl.MY_ACCT_NO    trdMyAcctNo/**资金账户**/
 		FROM TRD_PRODUCT_DEAL t
-		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = SUBSTR(t.finprod_id,5,LENGTH(t.finprod_id))
+		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
 		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE  in( '06','07') AND STL.ORDER_TYPE NOT LIKE 'N%'
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal1 on deal1.BUSI_NO = t.TRADE_ID
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal2 ON stl.ORDER_ID = deal2.BUSI_NO

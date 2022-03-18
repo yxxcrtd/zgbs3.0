@@ -1,5 +1,6 @@
 package com.joyintech.tams.valuation.trademanage.bond.service;
 
+import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
@@ -112,13 +113,13 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTradeDto>
         BeanUtil.copyPropertiesIgnoreNull(valSecVestAssetDeal, trdBondTradeDto);
         valSecVestAssetDeal.setDealDate(trdBondTradeDto.getTradeDate());
         valSecVestAssetDeal.setInvestAim(trdBondTradeDto.getInvAim());//投资目的
-        valSecVestAssetDeal.setFpriceAmt(trdBondTradeDto.getSettleAmt());
-        valSecVestAssetDeal.setCpriceAmt(trdBondTradeDto.getTradeAmt());
-//        valSecVestAssetDeal.setSettdateDate(trdBondTrade002Dto.getSettdateDate());
-//        valSecVestAssetDeal.setFundSettleDate(trdBondTrade002Dto.getFundSettleDate());
         //比较界面和接口字段差异，并手动给接口字段赋值
-        valSecVestAssetDeal.setAssetId("F01_"+ trdBondTradeDto.getSecId());//资产代码
+        valSecVestAssetDeal.setAssetId(trdBondTradeDto.getSecId());//资产代码
         valSecVestAssetDeal.setDataActionSign("01");//数据动作标志
+        valSecVestAssetDeal.setFprice(trdBondTradeDto.getTradeAmt());//全价
+        valSecVestAssetDeal.setCpriceAmt(ArithmeticUtil.subtract(trdBondTradeDto.getTradeAmt(),trdBondTradeDto.getIntAmt()));//净价总额
+        valSecVestAssetDeal.setTradeAmt(trdBondTradeDto.getSettleAmt());//交易金额
+
         valSecVestAssetDeal.setStlForm(null);//结算方式
         valSecVestAssetDeal.setParValue(new BigDecimal(0));//单位面值
         valSecVestAssetDeal.setFeeAmtUnpay(new BigDecimal(0));//未随交易支付费用
@@ -126,7 +127,6 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTradeDto>
         valSecVestAssetDeal.setCounterId(null);//交易对手
         valSecVestAssetDeal.setCounterType(null);//交易对手类型
         valSecVestAssetDeal.setTrader(null);//交易员
-        valSecVestAssetDeal.setFprice(new BigDecimal(0));//全价
         valSecVestAssetDeal.setUnitInt(new BigDecimal(0));//应收利息
         valSecVestAssetDeal.setIsStampDuty("Y");//印花税是否随交易支付
         valSecVestAssetDeal.setIsBrokerage("Y");//经手费是否随交易支付

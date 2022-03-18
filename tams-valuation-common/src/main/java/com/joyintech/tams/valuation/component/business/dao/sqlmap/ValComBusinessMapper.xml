@@ -35,38 +35,44 @@
 			<result column="id" property="assetId" jdbcType="VARCHAR" />
 			<result column="tradeMarket" property="tradeMarket" jdbcType="VARCHAR" />
 			<result column="profitType" property="profitType" jdbcType="VARCHAR" />
+			<result column="assetType" property="assetType" jdbcType="VARCHAR" />
 		</association>
 	</resultMap>
 
 	<select id="getAssetId"
 			resultMap="SelectOptionMap">
 		select
-			FINPROD_ID id,
-			FINPROD_ABBR text,
-			TRADE_MARKET tradeMarket,
-			PROFIT_TYPE profitType
+			fp.FINPROD_ID id,
+			fp.FINPROD_ABBR text,
+			fp.TRADE_MARKET tradeMarket,
+			fp.PROFIT_TYPE profitType,
+			fpt.TYPE_1 assetType
 		from
-			FIN_PRODUCT
+			FIN_PRODUCT fp
+		LEFT JOIN FIN_PRODUCT_TYPE fpt ON fp.FINPROD_ID = fpt.FINPROD_ID
 		where
 			1=1
 			<if test="initValue != null and initValue != ''">
-				AND FINPROD_ID = #{initValue}
+				AND fp.FINPROD_ID = #{initValue}
 			</if>
 			<if test="assetType !=null and assetType != ''">
-				and FINPROD_TYPE = #{assetType}
+				and fp.FINPROD_TYPE = #{assetType}
 			</if>
 			<if test="search !=null and search != ''">
-				AND	(FINPROD_ID like concat('%',concat(#{search},'%'))
-				OR FINPROD_ABBR like concat('%',concat(#{search},'%')))
+				AND	(fp.FINPROD_ID like concat('%',concat(#{search},'%'))
+				OR fp.FINPROD_ABBR like concat('%',concat(#{search},'%')))
 			</if>
 			<if test="profitTypeArr != null and profitTypeArr.length > 0">
-				AND	PROFIT_TYPE IN
+				AND	fp.PROFIT_TYPE IN
 				<foreach collection="profitTypeArr" item="profit" open="( " close=" )" separator=",">
 					#{profit}
 				</foreach>
 			</if>
 			<if test="profitType !=null and profitType != ''">
-				AND	PROFIT_TYPE = #{profitType}
+				AND	fp.PROFIT_TYPE = #{profitType}
+			</if>
+			<if test="type1 !=null and type1 != ''">
+				AND	fpt.TYPE_1 = #{type1}
 			</if>
 	</select>
 
