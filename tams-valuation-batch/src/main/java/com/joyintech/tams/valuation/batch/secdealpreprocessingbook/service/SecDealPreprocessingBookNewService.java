@@ -893,6 +893,8 @@ public class SecDealPreprocessingBookNewService {
         boolean 是否提前交收 = false;
         //定义 变量.发生金额 = 变量.应计利息
         BigDecimal 发生金额 = BigDecimal.ZERO;
+        //定义 变量.其他应收款利息  =0
+        BigDecimal 其他应收款利息 = BigDecimal.ZERO;
         //IF 数据字典：估值交易市场.上交所 eq 交易明细.交易场所 OR 数据字典：估值交易市场.深交所 eq 交易明细.交易场所
         if(StringUtil.equals(DictCodeListExt1.估值交易市场_上交所.getValue(), dealNow.getTradeMarket())
                 || StringUtil.equals(DictCodeListExt1.估值交易市场_深交所.getValue(), dealNow.getTradeMarket())
@@ -928,12 +930,12 @@ public class SecDealPreprocessingBookNewService {
             }
             else {
                 //变量.其他应收款利息 = 变量.应计利息
-                实收金额 = varInterestAccBal;
+                其他应收款利息 = varInterestAccBal;
             }
         }
         else {
             //变量.其他应收款利息 = 变量.应计利息
-            实收金额 = varInterestAccBal;
+            其他应收款利息 = varInterestAccBal;
         }
         /** modify by yanya on 20210301 存续期增加提前交收处理 end**/
         // accountAmountMap设置
@@ -997,6 +999,8 @@ public class SecDealPreprocessingBookNewService {
         /**add by wujie on 20201002 end remark: 还本收息增加资产减值处理逻辑**/
 
         /** modify by yanya on 20210301 存续期增加提前交收处理 start**/
+        //金额元素.其他应收款_利息	<-	   变量.其他应收款利息
+        accountAmountMap.put(BookConstant.OTHER_INTAMT, ArithmeticUtil.round(其他应收款利息, NumberEnum.MONEY));
         //金额元素.实收金额_清算款 <-		变量.实收金额
         accountAmountMap.put(BookConstant.DEALAMT_QSK, ArithmeticUtil.round(实收金额, NumberEnum.MONEY));
         //if 变量.利息差额 >= 0
@@ -1708,7 +1712,7 @@ public class SecDealPreprocessingBookNewService {
             //IF 变量.交易信息List IS NOT NULL AND 变量.交易信息List.SIZE()>0
             if (CollectionUtils.isNotEmpty(交易数据List)) {
                 //变量.交易金额 = 变量.交易信息List.get(0).交易金额
-                varDealAmt = 交易数据List.get(0).getTradeAmt();
+
                 //变量.买卖价差	=		变量.交易金额 - 变量.冲减成本 - 变量.冲减折溢价
                 varMmjc = ArithmeticUtil.doSub(varDealAmt, varCjcb, varCjyzj);
             }
@@ -1749,27 +1753,27 @@ public class SecDealPreprocessingBookNewService {
         /**add by wujie on 20201103 start remark:还本收息增加资产减值处理逻辑**/
         
         // 定义 变量.其他应收款-本金科目余额 = 变量.其他应收款科目余额MAP.get(交易明细.分支序号)
-        if(param.getVarQtyskxBJSubjectAmt().get(String.valueOf(dealNow.getBranch()))==null){
-            searchDao = new SubjectBalanceSearchDto();
-            searchDao.setBooksetId(acctEntity.getBooksetId());
-            searchDao.setBokDetailId(acctEntity.getBokDetailId());
-            searchDao.setHappenDate(acctEntity.getHappenDate());
-            searchDao.setBookDate(acctEntity.getBookDate());
-            searchDao.setTaskPri(dealNow.getTaskPri());
-            // modify by weipeng on 20220127 估值会计引擎升级改造 start
-            // 去除其他应收款-本金科目，走清算款科目
+//        if(param.getVarQtyskxBJSubjectAmt().get(String.valueOf(dealNow.getBranch()))==null){
+//            searchDao = new SubjectBalanceSearchDto();
+//            searchDao.setBooksetId(acctEntity.getBooksetId());
+//            searchDao.setBokDetailId(acctEntity.getBokDetailId());
+//            searchDao.setHappenDate(acctEntity.getHappenDate());
+//            searchDao.setBookDate(acctEntity.getBookDate());
+//            searchDao.setTaskPri(dealNow.getTaskPri());
+//            // modify by weipeng on 20220127 估值会计引擎升级改造 start
+//            // 去除其他应收款-本金科目，走清算款科目
+////            searchDao.setBaseSubjectNatureList(new ArrayList<String>(
+////                Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
+////            searchDao.setBranch(dealNow.getBranch());
 //            searchDao.setBaseSubjectNatureList(new ArrayList<String>(
-//                Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
-//            searchDao.setBranch(dealNow.getBranch());
-            searchDao.setBaseSubjectNatureList(new ArrayList<String>(
-                    Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
-            // modify by weipeng on 20220127 估值会计引擎升级改造 end
-            listSubjectBalance = accountingCommonService.getSubjectBalanceExpectDirection(
-                searchDao, DictCodeList.余额方向_借方.getValue());
-            if (listSubjectBalance != null && listSubjectBalance.size() > 0) {
-                param.getVarQtyskxBJSubjectAmt().put(String.valueOf(dealNow.getBranch()), listSubjectBalance.get(0).getBalance());
-            }
-        }
+//                    Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
+//            // modify by weipeng on 20220127 估值会计引擎升级改造 end
+//            listSubjectBalance = accountingCommonService.getSubjectBalanceExpectDirection(
+//                searchDao, DictCodeList.余额方向_借方.getValue());
+//            if (listSubjectBalance != null && listSubjectBalance.size() > 0) {
+//                param.getVarQtyskxBJSubjectAmt().put(String.valueOf(dealNow.getBranch()), listSubjectBalance.get(0).getBalance());
+//            }
+//        }
         
         BigDecimal 冲抵减值金额 = BigDecimal.ZERO;
         
@@ -1942,8 +1946,8 @@ public class SecDealPreprocessingBookNewService {
         
         /**add by wujie on 20201103 start remark:还本收息增加资产减值处理逻辑**/
         //将变更后的余额更新到变量.其他应收款-本金科目余额MAP中
-        param.getVarQtyskxBJSubjectAmt().put(String.valueOf(dealNow.getBranch()),
-        		ArithmeticUtil.doAdd(param.getVarQtyskxBJSubjectAmt().get(String.valueOf(dealNow.getBranch())),varCjcb));
+//        param.getVarQtyskxBJSubjectAmt().put(String.valueOf(dealNow.getBranch()),
+//        		ArithmeticUtil.doAdd(param.getVarQtyskxBJSubjectAmt().get(String.valueOf(dealNow.getBranch())),varCjcb));
         //变量.其他应收款本金汇总余额 = 变量.其他应收款本金汇总余额 + 变量.冲减成本
         param.setVarQtyskBjSubjectSumAmt(ArithmeticUtil.doAdd(param.getVarQtyskBjSubjectSumAmt(),varCjcb));
         //变量.减值准备科目余额 =	变量.减值准备科目余额 - 变量.冲减减值金额												
@@ -2439,26 +2443,26 @@ public class SecDealPreprocessingBookNewService {
         
         /**add by wujie on 20201102 start remark:还本收息增加资产减值处理逻辑**/
         // 定义 变量.其他应收款-本金科目余额 = 变量.其他应收款科目余额MAP.get(交易明细.分支序号)
-        if(param.getVarQtyskxBJSubjectAmt().get(String.valueOf(dealNow.getBranch()))==null){
-            searchDao = new SubjectBalanceSearchDto();
-            searchDao.setBooksetId(acctEntity.getBooksetId());
-            searchDao.setBokDetailId(acctEntity.getBokDetailId());
-            searchDao.setHappenDate(acctEntity.getHappenDate());
-            searchDao.setBookDate(acctEntity.getBookDate());
-            searchDao.setTaskPri(dealNow.getTaskPri());
-            // modify by weipeng on 20220127 估值会计引擎升级改造 start
+//        if(param.getVarQtyskxBJSubjectAmt().get(String.valueOf(dealNow.getBranch()))==null){
+//            searchDao = new SubjectBalanceSearchDto();
+//            searchDao.setBooksetId(acctEntity.getBooksetId());
+//            searchDao.setBokDetailId(acctEntity.getBokDetailId());
+//            searchDao.setHappenDate(acctEntity.getHappenDate());
+//            searchDao.setBookDate(acctEntity.getBookDate());
+//            searchDao.setTaskPri(dealNow.getTaskPri());
+//            // modify by weipeng on 20220127 估值会计引擎升级改造 start
+////            searchDao.setBaseSubjectNatureList(new ArrayList<String>(
+////                Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
+////            searchDao.setBranch(dealNow.getBranch());
 //            searchDao.setBaseSubjectNatureList(new ArrayList<String>(
-//                Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
-//            searchDao.setBranch(dealNow.getBranch());
-            searchDao.setBaseSubjectNatureList(new ArrayList<String>(
-                    Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
-            // modify by weipeng on 20220127 估值会计引擎升级改造 end
-            listSubjectBalance = accountingCommonService.getSubjectBalanceExpectDirection(
-                searchDao, DictCodeList.余额方向_借方.getValue());
-            if (listSubjectBalance != null && listSubjectBalance.size() > 0) {
-                param.getVarQtyskxBJSubjectAmt().put(String.valueOf(dealNow.getBranch()), listSubjectBalance.get(0).getBalance());
-            }
-        }
+//                    Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
+//            // modify by weipeng on 20220127 估值会计引擎升级改造 end
+//            listSubjectBalance = accountingCommonService.getSubjectBalanceExpectDirection(
+//                searchDao, DictCodeList.余额方向_借方.getValue());
+//            if (listSubjectBalance != null && listSubjectBalance.size() > 0) {
+//                param.getVarQtyskxBJSubjectAmt().put(String.valueOf(dealNow.getBranch()), listSubjectBalance.get(0).getBalance());
+//            }
+//        }
         BigDecimal 冲抵减值金额 = BigDecimal.ZERO;
         if(DictCodeListExt3.还本收息冲抵减值准备处理日_理论日.getValue().equals(offsetImptDateType)
         		&& BigDecimal.ZERO.compareTo(param.getVarJzzbSubjectAmt()) != 0){
@@ -2655,8 +2659,8 @@ public class SecDealPreprocessingBookNewService {
         
         /**add by wujie on 20201102 start remark:还本收息增加资产减值处理逻辑**/
         //将变更后的余额更新到变量.其他应收款-本金科目余额MAP中
-        param.getVarQtyskxBJSubjectAmt().put(String.valueOf(dealNow.getBranch()),
-        		ArithmeticUtil.doAdd(param.getVarQtyskxBJSubjectAmt().get(String.valueOf(dealNow.getBranch())),varCjcb));
+//        param.getVarQtyskxBJSubjectAmt().put(String.valueOf(dealNow.getBranch()),
+//        		ArithmeticUtil.doAdd(param.getVarQtyskxBJSubjectAmt().get(String.valueOf(dealNow.getBranch())),varCjcb));
         
         //变量.其他应收款本金汇总余额 = 变量.其他应收款本金汇总余额 + 变量.冲减成本
         param.setVarQtyskBjSubjectSumAmt(ArithmeticUtil.doAdd(param.getVarQtyskBjSubjectSumAmt(),varCjcb));

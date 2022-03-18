@@ -1687,6 +1687,10 @@ public class BookAccountGenLogicNew {
             params.put(SubjectConfigCode.金融机构简称.getValue(), FinanceOrgEnum.getEnumByName(mappingConfig.getFinanceOrgName()).getValue());
         }
         params.put(SubjectConfigCode.回购类型.getValue(), mappingConfig.getTargetBackType());
+        params.put(SubjectConfigCode.现金流二级类型.getValue(), mappingConfig.getCashType2());
+        params.put(SubjectConfigCode.登记托管机构.getValue(), mappingConfig.getRegistOrg());
+        params.put(SubjectConfigCode.账户细分类.getValue(), mappingConfig.getAcctDetailType());
+        params.put(SubjectConfigCode.投资目的.getValue(), mappingConfig.getInvAim());
         return params;
     }
 
