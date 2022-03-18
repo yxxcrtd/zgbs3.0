@@ -126,7 +126,6 @@ public class TrdJihuaBonusValuationTrade002Service extends CommonExportService<T
                 ValCashBonusTrade valCashBonusTrade = new ValCashBonusTrade();
                 BeanUtil.copyPropertiesIgnoreNull(valCashBonusTrade, trdJihuaBonusValuationTradeDto);
                 //比较界面和接口字段差异，并手动给接口字段赋值
-                valCashBonusTrade.setAssetId("F17_" + trdJihuaBonusValuationTradeDto.getAssetId());//资产代码
                 valCashBonusTrade.setAssetName(trdJihuaBonusValuationTradeDto.getAssetAbbr());//资产名称
                 valCashBonusTrade.setBonusDate(trdJihuaBonusValuationTradeDto.getTradeDate());//分红日
                 valCashBonusTrade.setActBounsAmt(trdJihuaBonusValuationTradeDto.getBonusAmt());//实际分红金额
@@ -182,7 +181,6 @@ public class TrdJihuaBonusValuationTrade002Service extends CommonExportService<T
                 ValBonusResTrade valBonusResTrade = new ValBonusResTrade();
                 BeanUtil.copyPropertiesIgnoreNull(valBonusResTrade, trdJihuaBonusValuationTradeDto);
                 //比较界面和接口字段差异，并手动给接口字段赋值
-                valBonusResTrade.setAssetId("F17_" + trdJihuaBonusValuationTradeDto.getAssetId());//资产代码
                 valBonusResTrade.setAssetName(trdJihuaBonusValuationTradeDto.getAssetAbbr());//资产名称
                 valBonusResTrade.setBonusDate(trdJihuaBonusValuationTradeDto.getTradeDateReInvest());//红利再投日
                 valBonusResTrade.setBonusAmt(trdJihuaBonusValuationTradeDto.getBonusAmtReInvest());//红利再投金额

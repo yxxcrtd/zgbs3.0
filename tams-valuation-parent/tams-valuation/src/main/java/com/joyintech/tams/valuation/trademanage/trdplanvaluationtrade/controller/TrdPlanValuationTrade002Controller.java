@@ -99,21 +99,6 @@ public class TrdPlanValuationTrade002Controller extends BaseController {
     }
 
     /**
-     * 资产代码下拉框
-     *
-     * @return 资产代码
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("/getAssetId")
-    public List<SelectOptionDto> getAssetId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("assetType","F17");
-        return commonBusinessService.getAssetId(param);
-    }
-
-    /**
      * @Description:画面点击保存按钮时check
      * @auther: yuzj
      * @date: 2021/12/30

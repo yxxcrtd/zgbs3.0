@@ -8,7 +8,7 @@
             null outTradeId,    /*外部成交编号*/
             deal.BOOKSET_ID prodId,/**金融产品代码**/
             bok.BOOKSET_NAME prodName,/**金融产品名称**/
-            zc.FINPROD_MARKET_ID  secId, /**资产代码**/
+            zc.FINPROD_ID  secId, /**资产代码**/
             zc.FINPROD_ABBR  secAbbr,/**资产简称**/
             case
                 when t.PS != 'T07' and t.FINPROD_TYPE = 'F23' THEN '01'
@@ -85,7 +85,7 @@
             deal.BOOKSET_ID prodId,/**金融产品代码**/
             deal.BOOKSET_ID prodName,/**金融产品名称**/
             t.FINPROD_TYPE finprodType,
-            zc.FINPROD_MARKET_ID  secId, /**资产代码**/
+            zc.FINPROD_ID  secId, /**资产代码**/
             zc.FINPROD_ABBR  secAbbr,/**资产简称**/
             case
                 when t.PS != 'T07' and t.FINPROD_TYPE = 'F23' THEN '01'
@@ -149,7 +149,7 @@
             null outTradeId,    /*外部成交编号*/
             deal.BOOKSET_ID prodId,/**金融产品代码**/
             deal.BOOKSET_ID prodName,/**金融产品名称**/
-            zc.FINPROD_MARKET_ID  secId, /**资产代码**/
+            zc.FINPROD_ID  secId, /**资产代码**/
             zc.FINPROD_ABBR  secAbbr,/**资产简称**/
             '03' ps,/**交易方向**/
             t.MDATE tradeDate,/**交易日**/

@@ -23,7 +23,6 @@ import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
-import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTradeDto;
 import com.joyintech.tams.valuation.trademanage.bondlend.service.TrdBondLendTrade002Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -41,7 +40,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -59,9 +57,6 @@ public class TrdBondLendTrade002Controller extends BaseController {
 
     @Autowired
     private TrdBondLendTrade002Service trdBondLendTrade002Service;
-
-    @Autowired
-    private CommonBusinessService commonBusinessService;
     
     @Override
     public String init(Model model) {
@@ -69,8 +64,6 @@ public class TrdBondLendTrade002Controller extends BaseController {
 
         // 工作流ID
         String workflowId = this.getParam(GlobalConstant.WORKFLOW_ID);
-
-        String operateType = getParam("operateType");
 
         String tradeId = getParam("tradeId");
 
@@ -85,23 +78,7 @@ public class TrdBondLendTrade002Controller extends BaseController {
             model.addAttribute("entity", entity);
         }
 
-
         return super.init(model);
-    }
-
-    /**
-     * 资产代码下拉框
-     *
-     * @return 资产代码
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("/getAssetId")
-    public List<SelectOptionDto> getAssetId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("assetType","F01");
-        return commonBusinessService.getAssetId(param);
     }
 
     /**

@@ -55,7 +55,7 @@
     var settleAmt = function(){
         var bonusAmt = $('#bonusAmt').val();
         if(bonusAmt != null && bonusAmt != ''){
-            $('#settleAmt').val(bonusAmt);
+            $('#settleAmt').val(bonusAmt).trigger('blur');
         }else{
             $('#settleAmt').val('');
         }
@@ -79,7 +79,7 @@
     var settleAmtReInvest = function(){
         var bonusAmtReInvest = $('#bonusAmtReInvest').val();
         if(bonusAmtReInvest != null && bonusAmtReInvest != ''){
-            $('#settleAmtReInvest').val(bonusAmtReInvest);
+            $('#settleAmtReInvest').val(bonusAmtReInvest).trigger('blur');
         }else{
             $('#settleAmtReInvest').val('');
         }

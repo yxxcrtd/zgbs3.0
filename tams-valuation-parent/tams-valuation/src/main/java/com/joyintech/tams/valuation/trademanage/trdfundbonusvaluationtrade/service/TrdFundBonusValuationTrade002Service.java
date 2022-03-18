@@ -276,7 +276,6 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
         //相同字段名： 成交编号、交易方向、交易场所、币种
         BeanUtil.copyPropertiesIgnoreNull(valCashBonusTrade, dto);
         //比较界面和接口字段差异，并手动给接口字段赋值
-        valCashBonusTrade.setAssetId("F06_" + dto.getAssetId());//资产代码
         valCashBonusTrade.setAssetName(dto.getAssetAbbr());//资产名称
         valCashBonusTrade.setBonusDate(dto.getTradeDate());//分红日
         valCashBonusTrade.setActBounsAmt(dto.getBonusAmt());//实际分红金额
@@ -298,7 +297,6 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
     public ValBonusResTrade dealBean(ValBonusResTrade valBonusResTrade,TrdFundBonusValuationTradeDto dto){
         //相同字段名： 成交编号、交易方向、交易场所、币种
         BeanUtil.copyPropertiesIgnoreNull(valBonusResTrade, dto);
-        valBonusResTrade.setAssetId("F06_" + dto.getAssetId());//资产代码
         valBonusResTrade.setAssetName(dto.getAssetAbbr());//资产名称
         valBonusResTrade.setBonusAmt(dto.getBonusAmtReInvest());//红利再投金额
         valBonusResTrade.setBonusDate(dto.getTradeDateReInvest());//红利再投日
@@ -320,7 +318,6 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
     public ValFundShareConvert dealBean(ValFundShareConvert valFundShareConvert,TrdFundBonusValuationTradeDto dto){
         //相同字段名： 成交编号、交易方向、交易场所、币种
         BeanUtil.copyPropertiesIgnoreNull(valFundShareConvert, dto);
-        valFundShareConvert.setAssetId("F06_" + dto.getAssetId());//资产代码
         valFundShareConvert.setAssetName(dto.getAssetAbbr());//资产名称
         valFundShareConvert.setTradeDate(dto.getTradeDateStrengthen());//交易日期
         valFundShareConvert.setCfmShare(dto.getDealNumStrengthen());//交易份额

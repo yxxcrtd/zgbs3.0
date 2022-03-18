@@ -146,10 +146,18 @@ public class TrdJihuaBonusValuationTrade002Controller extends BaseController {
 
         params.setBusinessCode(dto.getTradeId());
         params.setBusinessType(DictCodeList.共通业务类型_计划类资产_净值型_存续期.getValue());
-        // 设置流程业务说明, entity即传入的dto
-        params.setComment(
-                entity -> SpringContextUtil.getTextValue("TrdJihuaBonusValuationTrade002.tradeId")+"("+ entity.getTradeId() +")"+"-"+SpringContextUtil.getTextValue("TrdJihuaBonusValuationTrade002.tradeDate") + "(" + DateUtil.format(entity.getTradeDate()) + ")"
-        );
+        if(DictCodeList.交易方向_现金分红.getValue().equals(dto.getPs())){
+            // 设置流程业务说明, entity即传入的dto
+            params.setComment(
+                    entity -> SpringContextUtil.getTextValue("TrdJihuaBonusValuationTrade002.tradeId")+"("+ entity.getTradeId() +")"+"-"+SpringContextUtil.getTextValue("TrdJihuaBonusValuationTrade002.tradeDate") + "(" + DateUtil.format(entity.getTradeDate()) + ")"
+            );
+        }else{
+            // 设置流程业务说明, entity即传入的dto
+            params.setComment(
+                    entity -> SpringContextUtil.getTextValue("TrdJihuaBonusValuationTrade002.tradeId")+"("+ entity.getTradeId() +")"+"-"+SpringContextUtil.getTextValue("TrdJihuaBonusValuationTrade002.tradeDate") + "(" + DateUtil.format(entity.getTradeDateReInvest()) + ")"
+            );
+        }
+
         //给参数变成ProcessParameter而非WorkFlowParameter
         ProcessParameter<TrdJihuaBonusValuationTradeDto> parameter = new ProcessParameter<TrdJihuaBonusValuationTradeDto>();
         parameter.setWorkFlowParameter(params);

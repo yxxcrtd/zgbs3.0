@@ -7,7 +7,7 @@
 			t.TRADE_ID tradeId,/**交易编号**/
 			NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) prodId,/**金融产品代码**/
 			bok.BOOKSET_NAME prodName,/**金融产品名称**/
-			zc.FINPROD_MARKET_ID  assetId, /**资产代码**/
+			zc.FINPROD_ID  assetId, /**资产代码**/
 			zc.FINPROD_ABBR  assetAbbr,/**资产简称**/
 			t.PS ps,/**交易方向**/
 			t.TRADE_DATE tradeDate,/**交易日**/
@@ -39,7 +39,7 @@
 				</foreach>
 			</if>
 			<if test="assetIdArr != null and assetIdArr.length > 0">
-				and zc.FINPROD_MARKET_ID IN
+				and zc.FINPROD_ID IN
 				<foreach collection="assetIdArr" item="assetId" open="( " close=" )" separator=",">
 					#{assetId}
 				</foreach>
@@ -75,7 +75,7 @@
 			t.TRADE_ID tradeId,/**交易编号**/
 			NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) prodId,/**金融产品代码**/
 			bok.BOOKSET_NAME prodName,/**金融产品名称**/
-			zc.FINPROD_MARKET_ID  assetId, /**资产代码**/
+			zc.FINPROD_ID  assetId, /**资产代码**/
 			zc.FINPROD_ABBR  assetAbbr,/**资产简称**/
 			t.PS ps,/**交易方向**/
 			t.CCY ccy,/**币种**/

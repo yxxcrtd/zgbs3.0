@@ -8,12 +8,12 @@
 			null              outTradeId, /*外部成交编号*/
 			NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID)   prodId,/**金融产品代码**/
 			bok.BOOKSET_NAME  prodName,/**金融产品名称**/
-			zc.FINPROD_MARKET_ID  assetId, /**资产代码**/
+			zc.FINPROD_ID  assetId, /**资产代码**/
 			zc.FINPROD_ABBR  assetAbbr,/**资产简称**/
 			t.PS              ps,/**交易方向**/
 			t.TRADE_MARKET    tradeMarket,/**交易场所**/
 			t.TRADE_DATE      tradeDate,/**交易日期**/
-			t.TRADE_AMT tradeAmt,/**成交金额**/
+			t.PRIN_AMT tradeAmt,/**成交金额**/
 			t.SHARE_AMT dealNum,/**成交数量**/
 			t.CCY             ccy,/**币种**/
 			stl.SETTLE_DATE    settleDate,/**结算日期**/
@@ -87,7 +87,7 @@
 			null outTradeId, /*外部成交编号*/
 			NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) prodId,/**金融产品代码**/
 			bok.BOOKSET_NAME prodName,/**金融产品名称**/
-			zc.FINPROD_MARKET_ID  assetId, /**资产代码**/
+			zc.FINPROD_ID  assetId, /**资产代码**/
 			zc.FINPROD_ABBR  assetAbbr,/**资产简称**/
 			t.PS ps,/**交易方向**/
 			t.TRADE_MARKET tradeMarket,/**交易场所**/
@@ -95,12 +95,12 @@
 			<if test="ps == 'T01' or ps == 'T02'">
 				t.TRADE_DATE      tradeDate,/**交易日期**/
 				stl.SETTLE_DATE    settleDate,/**结算日期**/
-				t.TRADE_AMT tradeAmt,/**成交金额**/
+				t.PRIN_AMT tradeAmt,/**成交金额**/
 				t.SHARE_AMT dealNum,/**成交数量**/
 				stl.MY_ACCT_NO    trdMyAcctNo,/**资金账户**/
 				ttfd.FEE_AMT  brokerage,/**经手费**/
 				ttfd2.FEE_AMT  commission,/**佣金**/
-				stl.SETTLE_AMT    settleAmt,/**结算金额**/
+			    t.TRADE_AMT   settleAmt/**结算金额**/
 			</if>
 			<if test="ps == 'T52' ">/*认购*/
 				t.TRADE_DATE applyDate,/**申请日期**/
@@ -161,7 +161,7 @@
 			null outTradeId, /*外部成交编号*/
 			NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) prodId,/**金融产品代码**/
 			bok.BOOKSET_NAME prodName,/**金融产品名称**/
-			zc.FINPROD_MARKET_ID  assetId, /**资产代码**/
+			zc.FINPROD_ID  assetId, /**资产代码**/
 			zc.FINPROD_ABBR  assetAbbr,/**资产简称**/
 			t.PS ps,/**交易方向**/
 			t.TRADE_MARKET tradeMarket,/**交易场所**/

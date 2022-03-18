@@ -12,6 +12,7 @@ package com.joyintech.tams.valuation.trademanage.trdplanvaluationtrade.service;
 
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
@@ -32,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 /**
@@ -425,14 +426,13 @@ public class TrdPlanValuationTrade002Service extends CommonExportService<TrdPlan
         BeanUtil.copyPropertiesIgnoreNull(valMngMnfTade,dto);
         //相同字段名： 成交编号、交易方向、交易场所、交易日、交易金额、币种
         //实体类字段映射处理
-        valMngMnfTade.setAssetId("F17_"+dto.getAssetId());//资产代码
         valMngMnfTade.setAssetName(dto.getAssetAbbr());//资产名称
         valMngMnfTade.setShareAmt(dto.getDealNum());//交易份额
-
         valMngMnfTade.setDataActionSign("01");//数据动作标志
         valMngMnfTade.setPrinAmt(dto.getTradeAmt());//交易本金
         valMngMnfTade.setTradeMarket("09");//交易市场
-        valMngMnfTade.setUnitCprice(new BigDecimal(1));//单位净价
+        valMngMnfTade.setTradeAmt(dto.getSettleAmt());
+        valMngMnfTade.setUnitCprice(ArithmeticUtil.divide(dto.getTradeAmt(),dto.getDealNum(),4, RoundingMode.HALF_UP));//单位净价
         valMngMnfTade.setIsClean("N"); //有无清算指令
 
         return valMngMnfTade;
@@ -448,7 +448,6 @@ public class TrdPlanValuationTrade002Service extends CommonExportService<TrdPlan
         BeanUtil.copyPropertiesIgnoreNull(valMngMnfApplyPurTade,dto);
         //相同字段名： 成交编号、交易方向、交易场所、币种
         //比较界面和接口字段差异，并手动给接口字段赋值
-        valMngMnfApplyPurTade.setAssetId("F17_"+dto.getAssetId());//资产代码
         valMngMnfApplyPurTade.setAssetName(dto.getAssetAbbr());//资产名称
 
         if(StringUtil.isNotEmpty(dto.getPs())){
@@ -478,7 +477,6 @@ public class TrdPlanValuationTrade002Service extends CommonExportService<TrdPlan
         BeanUtil.copyPropertiesIgnoreNull(valMngMnfAffirmPurTrade,dto);
         //相同字段名： 成交编号、交易方向、交易场所、币种
         //比较界面和接口字段差异，并手动给接口字段赋值
-        valMngMnfAffirmPurTrade.setAssetId("F17_"+dto.getAssetId());//资产代码  F06基金
         valMngMnfAffirmPurTrade.setAssetName(dto.getAssetAbbr());//资产名称
 
         if(StringUtil.isNotEmpty(dto.getPs())){
@@ -506,7 +504,6 @@ public class TrdPlanValuationTrade002Service extends CommonExportService<TrdPlan
         BeanUtil.copyPropertiesIgnoreNull(valMngMnfRedAffirm,dto);
         //相同字段名： 成交编号、交易方向、交易场所、币种
         //比较界面和接口字段差异，并手动给接口字段赋值
-        valMngMnfRedAffirm.setAssetId("F17_"+dto.getAssetId());//资产代码  F06基金
         valMngMnfRedAffirm.setAssetName(dto.getAssetAbbr());//资产名称
 
         valMngMnfRedAffirm.setTradeDate(dto.getRedConfirmDate());//交易日
