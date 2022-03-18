@@ -282,6 +282,57 @@ public class SettlementInstructionNewService {
             accountAmountMap.put(BookConstant.DEALAMT, dto.getSettleAmt());//结算金额         
             accountCurrencyMap.put(BookConstant.DEALAMT, dto.getCcy());
 
+            // add by weipeng on 20220302：增加辅助核算项配置 start
+            // 定义 变量.辅助核算项Map，用于会计分录对应辅助核算项
+            Map<String, SubjectMappingConfig> configMap = new HashMap<>();
+            // 定义 变量.辅助核算项
+            SubjectMappingConfig config = new SubjectMappingConfig();
+            // add by weipeng on 20220221 区分资金账户金额元素 start
+            // 定义 变量.本方资金账户类型
+            String myAcctType= dto.getBusiDetailType();
+            // 定义 变量.对方资金账户类型
+            String counterAcctType = dto.getCounterAcctNoType();
+            // 本方资金账户类型 或 对方资金账户类型对应资金账户类型，赋值对应金额元素
+            if(DictCodeListExt1.资金账户类型_产品托管户.getValue().equals(myAcctType)
+               || DictCodeListExt1.资金账户类型_产品托管户.getValue().equals(counterAcctType)){
+                accountAmountMap.put(BookConstant.DEALAMT_HQ, dto.getSettleAmt());
+                accountCurrencyMap.put(BookConstant.DEALAMT_HQ, dto.getCcy());
+                // 增加辅助核算项配置
+                config = new SubjectMappingConfig();
+                config.setAccountType(DictCodeListExt1.资金账户类型_产品托管户.getValue());
+                configMap.put(DictCodeBaseSubjectNatrueNew.活期存款_本金.getValue(), config);
+            }
+            if(DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(myAcctType)
+               || DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(counterAcctType)){
+                accountAmountMap.put(BookConstant.DEALAMT_JS, dto.getSettleAmt());
+                accountCurrencyMap.put(BookConstant.DEALAMT_JS, dto.getCcy());
+                // 增加辅助核算项配置
+                config = new SubjectMappingConfig();
+                config.setAccountType(DictCodeListExt1.资金账户类型_结算备付金账户.getValue());
+                configMap.put(DictCodeBaseSubjectNatrueNew.结算备付金_本金.getValue(), config);
+            }
+            // 券商资金账户现划分在结算备付金科目性质下
+            if(DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(myAcctType)
+               || DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(counterAcctType)){
+                accountAmountMap.put(BookConstant.DEALAMT_JS, dto.getSettleAmt());
+                accountCurrencyMap.put(BookConstant.DEALAMT_JS, dto.getCcy());
+                // 增加辅助核算项配置
+                config = new SubjectMappingConfig();
+                config.setAccountType(DictCodeListExt1.资金账户类型_券商资金账户.getValue());
+                configMap.put(DictCodeBaseSubjectNatrueNew.结算备付金_本金.getValue(), config);
+            }
+            // 券商资金账户现划分在结算备付金科目性质下
+            if(DictCodeListExt1.资金账户类型_交易保证金账户.getValue().equals(myAcctType)
+               || DictCodeListExt1.资金账户类型_交易保证金账户.getValue().equals(counterAcctType)){
+                accountAmountMap.put(BookConstant.DEALAMT_CC, dto.getSettleAmt());
+                accountCurrencyMap.put(BookConstant.DEALAMT_CC, dto.getCcy());
+                // 增加辅助核算项配置
+                config = new SubjectMappingConfig();
+                config.setAccountType(DictCodeListExt1.资金账户类型_交易保证金账户.getValue());
+                configMap.put(DictCodeBaseSubjectNatrueNew.存出保证金_本金.getValue(), config);
+            }
+            // add by weipeng on 20220221 区分资金账户金额元素 end
+
             // add by weipeng on 20220221 区分资金账户金额元素 start
             // 定义 资金账户对应金额
             BigDecimal 资金账户金额 = dto.getSettleAmt();
@@ -299,18 +350,41 @@ public class SettlementInstructionNewService {
             		
             		BigDecimal depositAmt = ArithmeticUtil.doSub(deal.getFpriceAmt(), deal.getTradeAmt());
 	            	//保证金金额--账务明细代码3
-	            	accountAmountMap.put(BookConstant.BONDAMT, depositAmt);  
-	                accountCurrencyMap.put(BookConstant.BONDAMT, deal.getCcy());
+	            	accountAmountMap.put(BookConstant.DEALAMT_CC, depositAmt);
+	                accountCurrencyMap.put(BookConstant.DEALAMT_CC, deal.getCcy());
 	                
 	            	//补缴款金额
-	                accountAmountMap.put(BookConstant.SUPAMT, deal.getTradeAmt());
-	                accountCurrencyMap.put(BookConstant.SUPAMT, deal.getCcy());
                     // add by weipeng on 20220221 区分资金账户金额元素 start
-	                // 资金账户交易金额 = 补缴款金额
-                    资金账户金额 = deal.getTradeAmt();
-                    资金账户币种 = deal.getCcy();
+                    if(DictCodeListExt1.资金账户类型_产品托管户.getValue().equals(myAcctType)
+                       || DictCodeListExt1.资金账户类型_产品托管户.getValue().equals(counterAcctType)){
+                        accountAmountMap.put(BookConstant.DEALAMT_HQ, deal.getTradeAmt());
+                        accountCurrencyMap.put(BookConstant.DEALAMT_HQ, dto.getCcy());
+                        // 增加辅助核算项配置
+                        config = new SubjectMappingConfig();
+                        config.setAccountType(DictCodeListExt1.资金账户类型_产品托管户.getValue());
+                        configMap.put(DictCodeBaseSubjectNatrueNew.活期存款_本金.getValue(), config);
+                    }
+                    if(DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(myAcctType)
+                       || DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(counterAcctType)){
+                        accountAmountMap.put(BookConstant.DEALAMT_JS, deal.getTradeAmt());
+                        accountCurrencyMap.put(BookConstant.DEALAMT_JS, dto.getCcy());
+                        // 增加辅助核算项配置
+                        config = new SubjectMappingConfig();
+                        config.setAccountType(DictCodeListExt1.资金账户类型_结算备付金账户.getValue());
+                        configMap.put(DictCodeBaseSubjectNatrueNew.结算备付金_本金.getValue(), config);
+                    }
+                    // 券商资金账户现划分在结算备付金科目性质下
+                    if(DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(myAcctType)
+                       || DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(counterAcctType)){
+                        accountAmountMap.put(BookConstant.DEALAMT_JS, deal.getTradeAmt());
+                        accountCurrencyMap.put(BookConstant.DEALAMT_JS, dto.getCcy());
+                        // 增加辅助核算项配置
+                        config = new SubjectMappingConfig();
+                        config.setAccountType(DictCodeListExt1.资金账户类型_券商资金账户.getValue());
+                        configMap.put(DictCodeBaseSubjectNatrueNew.结算备付金_本金.getValue(), config);
+                    }
                     // add by weipeng on 20220221 区分资金账户金额元素 end
-	                
+
 	                //账务明细代码3
 	                accountSceneMap.put(BookConstant.BOK_DETAIL_ID3,deal.getBokDetailId3());
 	                
@@ -373,56 +447,6 @@ public class SettlementInstructionNewService {
             }
             /**针对【2903】业务场景特殊处理 by yanya on 20201217 end **/
 
-            // add by weipeng on 20220302：增加辅助核算项配置 start
-            // 定义 变量.辅助核算项Map，用于会计分录对应辅助核算项
-            Map<String, SubjectMappingConfig> configMap = new HashMap<>();
-            // 定义 变量.辅助核算项
-            SubjectMappingConfig config = new SubjectMappingConfig();
-            // add by weipeng on 20220221 区分资金账户金额元素 start
-            // 定义 变量.本方资金账户类型
-            String myAcctType= dto.getBusiDetailType();
-            // 定义 变量.对方资金账户类型
-            String counterAcctType = dto.getCounterAcctNoType();
-            // 本方资金账户类型 或 对方资金账户类型对应资金账户类型，赋值对应金额元素
-            if(DictCodeListExt1.资金账户类型_产品托管户.getValue().equals(myAcctType)
-                    || DictCodeListExt1.资金账户类型_产品托管户.getValue().equals(counterAcctType)){
-                accountAmountMap.put(BookConstant.DEALAMT_HQ, 资金账户金额);
-                accountCurrencyMap.put(BookConstant.DEALAMT_HQ, 资金账户币种);
-                // 增加辅助核算项配置
-                config = new SubjectMappingConfig();
-                config.setAccountType(DictCodeListExt1.资金账户类型_产品托管户.getValue());
-                configMap.put(DictCodeBaseSubjectNatrueNew.活期存款_本金.getValue(), config);
-            }
-            if(DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(myAcctType)
-                    || DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(counterAcctType)){
-                accountAmountMap.put(BookConstant.DEALAMT_JS, 资金账户金额);
-                accountCurrencyMap.put(BookConstant.DEALAMT_JS, 资金账户币种);
-                // 增加辅助核算项配置
-                config = new SubjectMappingConfig();
-                config.setAccountType(DictCodeListExt1.资金账户类型_结算备付金账户.getValue());
-                configMap.put(DictCodeBaseSubjectNatrueNew.结算备付金_本金.getValue(), config);
-            }
-            // 券商资金账户现划分在结算备付金科目性质下
-            if(DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(myAcctType)
-                    || DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(counterAcctType)){
-                accountAmountMap.put(BookConstant.DEALAMT_JS, 资金账户金额);
-                accountCurrencyMap.put(BookConstant.DEALAMT_JS, 资金账户币种);
-                // 增加辅助核算项配置
-                config = new SubjectMappingConfig();
-                config.setAccountType(DictCodeListExt1.资金账户类型_券商资金账户.getValue());
-                configMap.put(DictCodeBaseSubjectNatrueNew.结算备付金_本金.getValue(), config);
-            }
-            // 券商资金账户现划分在结算备付金科目性质下
-            if(DictCodeListExt1.资金账户类型_交易保证金账户.getValue().equals(myAcctType)
-                    || DictCodeListExt1.资金账户类型_交易保证金账户.getValue().equals(counterAcctType)){
-                accountAmountMap.put(BookConstant.DEALAMT_CC, 资金账户金额);
-                accountCurrencyMap.put(BookConstant.DEALAMT_CC, 资金账户币种);
-                // 增加辅助核算项配置
-                config = new SubjectMappingConfig();
-                config.setAccountType(DictCodeListExt1.资金账户类型_交易保证金账户.getValue());
-                configMap.put(DictCodeBaseSubjectNatrueNew.存出保证金_本金.getValue(), config);
-            }
-            // add by weipeng on 20220221 区分资金账户金额元素 end
             // 增加清算款对应的辅助核算项
             config = new SubjectMappingConfig();
             config.setTradeMarket(dto.getTradeMarket());
