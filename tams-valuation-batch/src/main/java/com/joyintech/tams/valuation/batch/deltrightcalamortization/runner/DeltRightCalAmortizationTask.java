@@ -88,6 +88,7 @@ public class DeltRightCalAmortizationTask extends BatchBaseService{
 
         /** ADD BY weipeng ON 20220314 科目性质合并，共通reader区分资产类型 start  **/
         params.put("secTypeList", Arrays.asList(DictCodeListExt1.证券品种_计划类资产_收益型.getValue()));
+        params.put("secTypeList", Arrays.asList(DictCodeListExt1.证券品种_项目类资产.getValue()));
         /** ADD BY weipeng ON 20220314 科目性质合并，共通reader区分资产类型 end  **/
 
         // 各步骤设置参数
