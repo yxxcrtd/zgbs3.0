@@ -171,7 +171,7 @@ public class TrdDepositValuationTrade002Service extends CommonExportService<TrdD
         ValBotAstTrade entity = new ValBotAstTrade();
         BeanUtil.copyPropertiesIgnoreNull(entity,dto);
         //比较界面和接口字段差异，并手动给接口字段赋值
-        entity.setTradeId(dto.getTradeId());  //交易编号
+        entity.setTradeId(null);  //交易编号
         entity.setProdId(dto.getPortfolioId()); //产品代码
         entity.setAssetId(dto.getFinprodMarketId());  //资产代码
         entity.setDataActionSign("01");//数据动作标志
