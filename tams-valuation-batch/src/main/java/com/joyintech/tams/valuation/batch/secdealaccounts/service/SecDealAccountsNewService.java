@@ -2469,7 +2469,7 @@ public class SecDealAccountsNewService {
 
         // 2.8. 逾期利息汇总余额
         searchDao.setBaseSubjectNatureList(
-            new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.其他应收款_利息.getValue())));
+            new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.应收逾期款_利息.getValue())));
 
         // 变量.逾期利息汇总余额 = 科目余额
         param.setVarYqfxSubjectSumAmt(
@@ -7809,7 +7809,7 @@ public class SecDealAccountsNewService {
         if (bjfxYe == null) {
             SubjectBalance subjectBalance = getQtysk(dealNow,
                 new ArrayList<String>(
-                    Arrays.asList(DictCodeBaseSubjectNatrueNew.其他应收款_利息.getValue())));
+                    Arrays.asList(DictCodeBaseSubjectNatrueNew.应收逾期款_利息.getValue())));
             // 查询交易的到期日对应的罚息利息  定义 变量.逾期利息科目余额 = 上述共通返回的科目余额
             bjfxYe = subjectBalance.getBalance();
             // 变量.逾期罚息科目余额MAP.put(交易明细.分支序号，变量.逾期利息科目余额)
@@ -7903,7 +7903,7 @@ public class SecDealAccountsNewService {
         accountNatrueBranchMap.put(BookConstant.BRANCH, dealNow.getBranch());
         accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(),
             accountNatrueBranchMap);
-        accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.其他应收款_利息.getValue(),
+        accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.应收逾期款_利息.getValue(),
             accountNatrueBranchMap);
         ad.setAccountNatrueMap(accountNatrueMap);
         // map塞入场景要素管理中
@@ -8003,7 +8003,7 @@ public class SecDealAccountsNewService {
         if (fxYe == null) {    
             SubjectBalance subjectBalance = getQtysk(dealNow,
                 new ArrayList<String>(
-                    Arrays.asList(DictCodeBaseSubjectNatrueNew.其他应收款_利息.getValue())));
+                    Arrays.asList(DictCodeBaseSubjectNatrueNew.应收逾期款_利息.getValue())));
             // 查询交易的到期日对应的罚息利息  定义 变量.逾期利息科目余额 = 上述共通返回的科目余额
             fxYe = subjectBalance.getBalance();
             // 变量.逾期罚息科目余额MAP.put(交易明细.分支序号，变量.逾期利息科目余额)
@@ -8097,7 +8097,7 @@ public class SecDealAccountsNewService {
         accountNatrueBranchMap.put(BookConstant.BRANCH, dealNow.getBranch());
         accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.应收利息_证券.getValue(),
             accountNatrueBranchMap);
-        accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.其他应收款_利息.getValue(),
+        accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.应收逾期款_利息.getValue(),
                 accountNatrueBranchMap);
         ad.setAccountNatrueMap(accountNatrueMap);
         // map塞入场景要素管理中

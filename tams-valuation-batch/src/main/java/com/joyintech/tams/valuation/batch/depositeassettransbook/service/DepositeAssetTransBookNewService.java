@@ -212,7 +212,7 @@ public class DepositeAssetTransBookNewService {
         glb_qtysklxsum = this.getSubjectBalanceSum(searchDao, DictCodeList.余额方向_借方.getValue());
         
         //2.6. 逾期利息余额查询
-        searchDao.setBaseSubjectNatureList(new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.其他应收款_利息.getValue())));
+        searchDao.setBaseSubjectNatureList(new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.应收逾期款_利息.getValue())));
         glb_qilxsum = this.getSubjectBalanceSum(searchDao, DictCodeList.余额方向_借方.getValue());
         
         
@@ -1667,7 +1667,7 @@ public class DepositeAssetTransBookNewService {
                 accountNatrueBranchMap.put(BookConstant.BRANCH, dealNow.getBranch());
                 accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(),
                     accountNatrueBranchMap);
-                accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.其他应收款_利息.getValue(),
+                accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.应收逾期款_利息.getValue(),
                         accountNatrueBranchMap);
                 ad.setAccountNatrueMap(accountNatrueMap);
             }
@@ -1683,7 +1683,7 @@ public class DepositeAssetTransBookNewService {
                 accountNatrueBranchMap.put(BookConstant.BRANCH, dealNow.getBranch());
                 accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.应收利息_证券.getValue(),
                     accountNatrueBranchMap);
-                accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.其他应收款_利息.getValue(),
+                accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.应收逾期款_利息.getValue(),
                         accountNatrueBranchMap);
                 ad.setAccountNatrueMap(accountNatrueMap);
             }
@@ -1793,7 +1793,7 @@ public class DepositeAssetTransBookNewService {
             bjfxYe = BigDecimal.ZERO;
             SubjectBalance bjfxBalance = this.getSubjectBalance(booksetIdNow, bokDetailId,
                 dealNow.getHappenDate(), dealNow.getBookDate(), DictCodeList.余额方向_借方.getValue(),
-                DictCodeBaseSubjectNatrueNew.其他应收款_利息.getValue(), dealNow.getBranch(), taskPri);
+                DictCodeBaseSubjectNatrueNew.应收逾期款_利息.getValue(), dealNow.getBranch(), taskPri);
             if (bjfxBalance != null) {
                 // 变量.其他应收款-本金科目余额 = 上述共通返回的科目余额
                 bjfxYe = bjfxBalance.getBalance();
@@ -1961,7 +1961,7 @@ public class DepositeAssetTransBookNewService {
             // 查询交易的到期日对应的罚息利息
             SubjectBalance lxfxBalance = this.getSubjectBalance(booksetIdNow, bokDetailId,
                 dealNow.getHappenDate(), dealNow.getBookDate(), DictCodeList.余额方向_借方.getValue(),
-                DictCodeBaseSubjectNatrueNew.其他应收款_利息.getValue(), dealNow.getBranch(), taskPri);
+                DictCodeBaseSubjectNatrueNew.应收逾期款_利息.getValue(), dealNow.getBranch(), taskPri);
             if (lxfxBalance != null) {
                 // 变量.其他应收款-本金科目余额 = 上述共通返回的科目余额
                 lxfxYe = lxfxBalance.getBalance();

@@ -234,7 +234,7 @@ public class AssetImpairmentProvisionProcessorNewService {
 
 		// 1.6.逾期利息
 		searchDto.setBaseSubjectNatureList(
-				new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.其他应收款_利息.getValue())));
+				new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.应收逾期款_利息.getValue())));
 		Map<String, BigDecimal> overdueLxMap = accountingCommonService
 				.getSubjectBalanceCollection(searchDto, DictCodeList.余额方向_借方.getValue(), null);
 		// 变量.逾期利息 = 科目余额

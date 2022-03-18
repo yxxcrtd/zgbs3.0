@@ -201,15 +201,15 @@ public class DepositAssetsReadyDealProcessorNewService {
         searchDao.setBookDate(acctEntity.getBookDate());
         List<SubjectBalance> listSubjectBalance = null;
         //2.4.其他应收款本金余额
-        searchDao.setBaseSubjectNatureList(new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
-        glb_qtyskbjsum = this.getSubjectBalanceSum(searchDao, DictCodeList.余额方向_借方.getValue());
+//        searchDao.setBaseSubjectNatureList(new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
+//        glb_qtyskbjsum = this.getSubjectBalanceSum(searchDao, DictCodeList.余额方向_借方.getValue());
         
         //2.5.其他应收款利息余额
         searchDao.setBaseSubjectNatureList(new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.应收利息_证券.getValue())));
         glb_qtysklxsum = this.getSubjectBalanceSum(searchDao, DictCodeList.余额方向_借方.getValue());
         
         //2.6. 逾期利息余额查询
-        searchDao.setBaseSubjectNatureList(new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.其他应收款_利息.getValue())));
+        searchDao.setBaseSubjectNatureList(new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.应收逾期款_利息.getValue())));
         glb_qilxsum = this.getSubjectBalanceSum(searchDao, DictCodeList.余额方向_借方.getValue());
         
         /**add by wujie on 20201031 end**/

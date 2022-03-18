@@ -1384,7 +1384,7 @@ public class SecDealPreprocessingBookNewService {
         param.setVarQtyskLxSubjectSumAmt(this.getSubjectBalanceSum(searchDao, DictCodeList.余额方向_借方.getValue()));
         
         //2.8. 逾期利息汇总余额
-        searchDao.setBaseSubjectNatureList(new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.其他应收款_利息.getValue())));
+        searchDao.setBaseSubjectNatureList(new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.应收逾期款_利息.getValue())));
         // 变量.逾期利息汇总余额 = 科目余额
         param.setVarYqfxSubjectSumAmt(this.getSubjectBalanceSum(searchDao, DictCodeList.余额方向_借方.getValue()));
         

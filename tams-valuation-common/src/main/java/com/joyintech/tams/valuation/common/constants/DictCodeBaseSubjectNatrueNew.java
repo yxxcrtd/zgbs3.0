@@ -158,7 +158,7 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
     /**
      * 其他应收款_利息（应收逾期款_利息）
      */
-    其他应收款_利息(
+    应收逾期款_利息(
             "YSYQKLX"
     ),
     /**

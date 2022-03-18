@@ -303,12 +303,12 @@ public class DeltRightDealPreprocessingBookProcessorNewService {
         	param.setVarJzzbSubjectAmtBccy(BigDecimal.ZERO);
         }
     	//2.6.其他应收款本金汇总余额
-        searchDao.setBaseSubjectNatureList(new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
+//        searchDao.setBaseSubjectNatureList(new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
         // 变量.其他应收款本金汇总余额 = 科目余额
-        param.setVarQtyskBjSubjectSumAmt(this.getSubjectBalanceSum(searchDao, DictCodeList.余额方向_借方.getValue()));
+//        param.setVarQtyskBjSubjectSumAmt(this.getSubjectBalanceSum(searchDao, DictCodeList.余额方向_借方.getValue()));
         
         //2.7.其他应收款利息汇总余额
-        searchDao.setBaseSubjectNatureList(new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.其他应收款_利息.getValue())));
+        searchDao.setBaseSubjectNatureList(new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.应收利息_证券.getValue())));
         // 变量.其他应收款利息汇总余额 = 科目余额
         param.setVarQtyskLxSubjectSumAmt(this.getSubjectBalanceSum(searchDao, DictCodeList.余额方向_借方.getValue()));
         
@@ -629,7 +629,7 @@ public class DeltRightDealPreprocessingBookProcessorNewService {
             searchDao.setBranch(dealNow.getBranch());
             searchDao.setTaskPri(dealNow.getTaskPri());
             searchDao.setBaseSubjectNatureList(new ArrayList<String>(
-                Arrays.asList(DictCodeBaseSubjectNatrueNew.其他应收款_利息.getValue())));
+                Arrays.asList(DictCodeBaseSubjectNatrueNew.应收利息_证券.getValue())));
             listSubjectBalance = accountingCommonService.getSubjectBalanceExpectDirection(
                 searchDao, DictCodeList.余额方向_借方.getValue());
             if(listSubjectBalance!=null && listSubjectBalance.size()>0){
@@ -692,7 +692,7 @@ public class DeltRightDealPreprocessingBookProcessorNewService {
         Map<String, Map<String, Object>> accountNatrueMap = new HashMap<>();
         Map<String, Object> accountNatrueBranchMap = new HashMap<>();
         accountNatrueBranchMap.put(BookConstant.BRANCH, dealNow.getBranch());
-        accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.其他应收款_利息.getValue(),
+        accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.应收利息_证券.getValue(),
             accountNatrueBranchMap);
         ad.setAccountNatrueMap(accountNatrueMap);
 
@@ -994,11 +994,11 @@ public class DeltRightDealPreprocessingBookProcessorNewService {
         ad.setAccountCurrencyMap(accountCurrencyMap);
         // 基础科目性质
         Map<String, Map<String, Object>> accountNatrueMap = new HashMap<>();
-        Map<String, Object> accountNatrueBranchMap = new HashMap<>();
-        accountNatrueBranchMap.put(BookConstant.BRANCH, dealNow.getBranch());
-        accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(),
-            accountNatrueBranchMap);
-        ad.setAccountNatrueMap(accountNatrueMap);
+//        Map<String, Object> accountNatrueBranchMap = new HashMap<>();
+//        accountNatrueBranchMap.put(BookConstant.BRANCH, dealNow.getBranch());
+//        accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(),
+//            accountNatrueBranchMap);
+//        ad.setAccountNatrueMap(accountNatrueMap);
 
         // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
         ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
@@ -1215,22 +1215,22 @@ public class DeltRightDealPreprocessingBookProcessorNewService {
         
         
         // 定义 变量.其他应收款-本金科目余额 = 变量.其他应收款科目余额MAP.get(交易明细.分支序号)
-        if(param.getVarQtyskxBJSubjectAmt().get(String.valueOf(dealNow.getBranch()))==null){
-            searchDao = new SubjectBalanceSearchDto();
-            searchDao.setBooksetId(acctEntity.getBooksetId());
-            searchDao.setBokDetailId(acctEntity.getBokDetailId());
-            searchDao.setHappenDate(acctEntity.getHappenDate());
-            searchDao.setBookDate(acctEntity.getBookDate());
-            searchDao.setTaskPri(dealNow.getTaskPri());
-            searchDao.setBaseSubjectNatureList(new ArrayList<String>(
-                Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
-            searchDao.setBranch(dealNow.getBranch());
-            listSubjectBalance = accountingCommonService.getSubjectBalanceExpectDirection(
-                searchDao, DictCodeList.余额方向_借方.getValue());
-            if (listSubjectBalance != null && listSubjectBalance.size() > 0) {
-                param.getVarQtyskxBJSubjectAmt().put(String.valueOf(dealNow.getBranch()), listSubjectBalance.get(0).getBalance());
-            }
-        }
+//        if(param.getVarQtyskxBJSubjectAmt().get(String.valueOf(dealNow.getBranch()))==null){
+//            searchDao = new SubjectBalanceSearchDto();
+//            searchDao.setBooksetId(acctEntity.getBooksetId());
+//            searchDao.setBokDetailId(acctEntity.getBokDetailId());
+//            searchDao.setHappenDate(acctEntity.getHappenDate());
+//            searchDao.setBookDate(acctEntity.getBookDate());
+//            searchDao.setTaskPri(dealNow.getTaskPri());
+//            searchDao.setBaseSubjectNatureList(new ArrayList<String>(
+//                Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
+//            searchDao.setBranch(dealNow.getBranch());
+//            listSubjectBalance = accountingCommonService.getSubjectBalanceExpectDirection(
+//                searchDao, DictCodeList.余额方向_借方.getValue());
+//            if (listSubjectBalance != null && listSubjectBalance.size() > 0) {
+//                param.getVarQtyskxBJSubjectAmt().put(String.valueOf(dealNow.getBranch()), listSubjectBalance.get(0).getBalance());
+//            }
+//        }
         
         BigDecimal 冲抵减值金额 = BigDecimal.ZERO;
         
@@ -1321,12 +1321,12 @@ public class DeltRightDealPreprocessingBookProcessorNewService {
         // 记账金额币种要素
         ad.setAccountCurrencyMap(accountCurrencyMap);
         // 基础科目性质
-        Map<String, Map<String, Object>> accountNatrueMap = new HashMap<>();
-        Map<String, Object> accountNatrueBranchMap = new HashMap<>();
-        accountNatrueBranchMap.put(BookConstant.BRANCH, dealNow.getBranch());
-        accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(),
-            accountNatrueBranchMap);
-        ad.setAccountNatrueMap(accountNatrueMap);
+//        Map<String, Map<String, Object>> accountNatrueMap = new HashMap<>();
+//        Map<String, Object> accountNatrueBranchMap = new HashMap<>();
+//        accountNatrueBranchMap.put(BookConstant.BRANCH, dealNow.getBranch());
+//        accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(),
+//            accountNatrueBranchMap);
+//        ad.setAccountNatrueMap(accountNatrueMap);
 
         // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
         ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
@@ -1624,22 +1624,22 @@ public class DeltRightDealPreprocessingBookProcessorNewService {
         
         
      // 定义 变量.其他应收款-本金科目余额 = 变量.其他应收款科目余额MAP.get(交易明细.分支序号)
-        if(param.getVarQtyskxBJSubjectAmt().get(String.valueOf(dealNow.getBranch()))==null){
-            searchDao = new SubjectBalanceSearchDto();
-            searchDao.setBooksetId(acctEntity.getBooksetId());
-            searchDao.setBokDetailId(acctEntity.getBokDetailId());
-            searchDao.setHappenDate(acctEntity.getHappenDate());
-            searchDao.setBookDate(acctEntity.getBookDate());
-            searchDao.setTaskPri(dealNow.getTaskPri());
-            searchDao.setBaseSubjectNatureList(new ArrayList<String>(
-                Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
-            searchDao.setBranch(dealNow.getBranch());
-            listSubjectBalance = accountingCommonService.getSubjectBalanceExpectDirection(
-                searchDao, DictCodeList.余额方向_借方.getValue());
-            if (listSubjectBalance != null && listSubjectBalance.size() > 0) {
-                param.getVarQtyskxBJSubjectAmt().put(String.valueOf(dealNow.getBranch()), listSubjectBalance.get(0).getBalance());
-            }
-        }
+//        if(param.getVarQtyskxBJSubjectAmt().get(String.valueOf(dealNow.getBranch()))==null){
+//            searchDao = new SubjectBalanceSearchDto();
+//            searchDao.setBooksetId(acctEntity.getBooksetId());
+//            searchDao.setBokDetailId(acctEntity.getBokDetailId());
+//            searchDao.setHappenDate(acctEntity.getHappenDate());
+//            searchDao.setBookDate(acctEntity.getBookDate());
+//            searchDao.setTaskPri(dealNow.getTaskPri());
+//            searchDao.setBaseSubjectNatureList(new ArrayList<String>(
+//                Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
+//            searchDao.setBranch(dealNow.getBranch());
+//            listSubjectBalance = accountingCommonService.getSubjectBalanceExpectDirection(
+//                searchDao, DictCodeList.余额方向_借方.getValue());
+//            if (listSubjectBalance != null && listSubjectBalance.size() > 0) {
+//                param.getVarQtyskxBJSubjectAmt().put(String.valueOf(dealNow.getBranch()), listSubjectBalance.get(0).getBalance());
+//            }
+//        }
         
         BigDecimal 冲抵减值金额 = BigDecimal.ZERO;
         if(DictCodeListExt3.还本收息冲抵减值准备处理日_理论日.getValue().equals(offsetImptDateType)
