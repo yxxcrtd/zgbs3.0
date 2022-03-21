@@ -2,7 +2,6 @@ package com.joyintech.tams.valuation.batch.positionmake.service;
 
 import com.joyintech.calculation.config.NumberEnum;
 import com.joyintech.calculation.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.*;
@@ -30,7 +29,7 @@ import java.util.*;
 
 @Service
 @Scope("prototype")
-public class PositionMakeReaderService {
+public class PositionMakeProcessorNewService {
 
 	//	@Autowired
 	//	private PositionMakeMapper positionMakeMapper;
@@ -45,18 +44,19 @@ public class PositionMakeReaderService {
 	/**
 	 * 调用投管接口平台
 	 */
-	public List<PositionMakeReaderResult> execute(Map<String, Object> params){
+	public PositionMakeWriterResult execute(Map<String, Object> params){
+		// process返回值
+		PositionMakeWriterResult result = new PositionMakeWriterResult();
 		if (MapUtils.isEmpty(params)) {
-			return new ArrayList<>();
+			return result;
 		}
-
+		PositionMakeReaderResult acctEntity = (PositionMakeReaderResult) params.get(GlobalConstant.READER_RESULT);
 		// 数据参数
 		String seqNo = (String)params.get("seqNo");
 		String taskId = (String)params.get("taskId");
 		Date booksetDate = (Date)params.get(BookConstant.BOOKSET_DATE);
 		Date bookDate = (Date)params.get(BookConstant.BOOK_DATE);
 		Date happenDate = (Date)params.get(BookConstant.HAPPEN_DATE);
-		List<PositionMakeReaderResult> result = new ArrayList<PositionMakeReaderResult>();
 		String isSubBookset = (String)params.get(BookConstant.IS_SUB_BOOKSET);
 		if (!DictCodeListExt1.是或否_否.getValue().equals(isSubBookset)) {
 			return result;
@@ -74,17 +74,7 @@ public class PositionMakeReaderService {
 		sqlMap.put("busiDetailTypeSub", DictCodeListExt1.金融产品类型_理财子产品.getValue());// 业务明细类型
 		sqlMap.put("profitType", DictCodeList.收益类型_净值型.getValue());// 收益类型
 		sqlMap.put("profitType02", DictCodeList.收益类型_收益型.getValue());// 收益类型
-		sqlMap.put("booksetIds", (List<String>)params.get(GlobalConstant.BOOKSETS));
-
-		/**
-		 * MODIFY BY WUJIE ON 20191104 START
-		 * sqlMap.put("booksetIds", (List<String>)this.getParams().get(GlobalConstant.BOOKSETS));
-		 */
-		//sqlMap.put("booksetIds", (List<String>)this.getParams().get(GlobalConstant.BOOKSETS));
-
-		sqlMap.put("booksetIds", positionMakeWithoutDispatchMapper.getBooksets(sqlMap));
-		/**MODIFY BY WUJIE ON 20191104 END**/
-
+		sqlMap.put("booksetIds", Arrays.asList(acctEntity.getBooksetId()));
 		/**
 		 * 子组合特殊处理：按产品出头寸
 		 * ADD BY WUJIE ON 20191121 START
@@ -111,17 +101,48 @@ public class PositionMakeReaderService {
 		List<PtlSecReceivables> ptlSecReceivablesList = this.getPtlSecReceivablesList(sqlMap, bookDate, happenDate);
 
 		// 定义返回值
-		PositionMakeReaderResult positionMakeReaderResult = new PositionMakeReaderResult();
-		positionMakeReaderResult.setPtlSecValutionList(ptlSecValutionList);// 组合资产估值
-		positionMakeReaderResult.setBokPositionPrdfeeList(bokPositionPrdfeeList);// 产品费用头寸
-		positionMakeReaderResult.setBokPositionPrdList(bokPositionPrdList);// 产品头寸
-		positionMakeReaderResult.setPtlFeePositionList(ptlFeePositionList);// 组合费用头寸
-		positionMakeReaderResult.setPtlPortfolioValuationList(ptlPortfolioValuationList);// 组合估值头寸
-		positionMakeReaderResult.setPtlSecReceivablesList(ptlSecReceivablesList);//组合资产应收款头寸
-
-		result.add(positionMakeReaderResult);
-
+		result.setPtlSecValutionList(ptlSecValutionList);// 组合资产估值
+		result.setBokPositionPrdfeeList(bokPositionPrdfeeList);// 产品费用头寸
+		result.setBokPositionPrdList(bokPositionPrdList);// 产品头寸
+		result.setPtlFeePositionList(ptlFeePositionList);// 组合费用头寸
+		result.setPtlPortfolioValuationList(ptlPortfolioValuationList);// 组合估值头寸
+		result.setPtlSecReceivablesList(ptlSecReceivablesList);//组合资产应收款头寸
 		return result;
+	}
+
+	/**
+	 * 调用共通查询发生日前一日余额 调用共通查询：科目余额查询-期待方向，查询现金类科目余额
+	 *
+	 * @param readerEntity reader传递的参数
+	 * @param expBalanceDirect 期待余额方向
+	 * @param baseSubjectNature 基础科目性质
+	 * @param taskPri 任务优先级
+	 * @return
+	 * @see
+	 * @since 1.0
+	 */
+
+	private SubjectBalance getSubjectBalance2(String booksetId, String bokDetailId,Date happenDate, Date bookDate,
+											  String expBalanceDirect, List<String> baseSubjectNatureList) {
+		// 初始化返回结果
+		SubjectBalance balance = new SubjectBalance();
+		// 设值科目余额查询参数Dto
+		SubjectBalanceSearchDto searchDto = new SubjectBalanceSearchDto();
+		searchDto.setBooksetId(booksetId);
+		searchDto.setBokDetailId(bokDetailId);
+		searchDto.setHappenDate(happenDate);
+		searchDto.setBookDate(bookDate);
+		searchDto.setBaseSubjectNatureList(baseSubjectNatureList);
+		// 调用公用方法：【科目余额查询 - 期待方向】,获取科目余额信息
+		List<SubjectBalance> subjectBalanceList = accountingCommonService.getSubjectBalanceExpectDirection(
+			searchDto, expBalanceDirect);
+
+		// 获取科目余额
+		if (subjectBalanceList != null && subjectBalanceList.size() > 0) {
+			balance = subjectBalanceList.get(0);
+		}
+
+		return balance;
 	}
 
 
@@ -1008,39 +1029,39 @@ public class PositionMakeReaderService {
 				}
 			}
 
-			// 通道费、通道增值税
-			Map<String, Object> nowMap = new HashMap<String, Object>();
-			nowMap.put("booksetId", dto.getBooksetId());
-			nowMap.put("booksetDate", dto.getCdate());
-			List<BokPositionPrdfee> resultWithTdZzs = positionMakeWithoutDispatchMapper.getBokPositionPrdfeeWithTdZzs(nowMap);
-
-			// LOOP 上述结果->费用明细
-			if (CollectionUtils.isNotEmpty(resultWithTdZzs)) {
-				for (BokPositionPrdfee bokPositionPrdfee : resultWithTdZzs) {
-					BokPositionPrdfeeWithOtherFieldDto newdto = new BokPositionPrdfeeWithOtherFieldDto();
-					BeanUtil.copyPropertiesIgnoreNull(newdto,dto);
-					// ENTITY.当日累计未付费用 = 费用明细.当日累计未付费用
-					newdto.setTdyUnpaidIntincexp(bokPositionPrdfee.getTdyUnpaidIntincexp());
-					// ENTITY.费用类型 = 费用明细.费用类型
-					newdto.setFeeType(bokPositionPrdfee.getFeeType());
-
-					// ENTITY.当日新增费用
-					if (DictCodeListExt1.一次性费用类型_通道费.getValue().equals(bokPositionPrdfee.getFeeType())) {
-						// ENTITY.当日新增费用 = 变量.每日新增费用
-						newdto.setTdyIntincexpAdd(varTdyIntincexpAdd);
-						// ENTITY.当日新增费用_本位币 = 变量.每日新增费用_本位币
-						newdto.setTdyIntincexpAddB(varTdyIntincexpAddForB);
-					} else {
-						// ENTITY.当日新增费用 = null
-						newdto.setTdyIntincexpAdd(null);
-						// ENTITY.当日新增费用_本位币 = null
-						newdto.setTdyIntincexpAddB(null);
-					}
-
-					// 费用头寸.add（ENTITY）
-					bokPositionPrdfeeWithOtherFieldListWithTdAll.add(newdto);
-				}
-			}
+//			// 通道费、通道增值税
+//			Map<String, Object> nowMap = new HashMap<String, Object>();
+//			nowMap.put("booksetId", dto.getBooksetId());
+//			nowMap.put("booksetDate", dto.getCdate());
+//			List<BokPositionPrdfee> resultWithTdZzs = positionMakeWithoutDispatchMapper.getBokPositionPrdfeeWithTdZzs(nowMap);
+//
+//			// LOOP 上述结果->费用明细
+//			if (CollectionUtils.isNotEmpty(resultWithTdZzs)) {
+//				for (BokPositionPrdfee bokPositionPrdfee : resultWithTdZzs) {
+//					BokPositionPrdfeeWithOtherFieldDto newdto = new BokPositionPrdfeeWithOtherFieldDto();
+//					BeanUtil.copyPropertiesIgnoreNull(newdto,dto);
+//					// ENTITY.当日累计未付费用 = 费用明细.当日累计未付费用
+//					newdto.setTdyUnpaidIntincexp(bokPositionPrdfee.getTdyUnpaidIntincexp());
+//					// ENTITY.费用类型 = 费用明细.费用类型
+//					newdto.setFeeType(bokPositionPrdfee.getFeeType());
+//
+//					// ENTITY.当日新增费用
+//					if (DictCodeListExt1.一次性费用类型_通道费.getValue().equals(bokPositionPrdfee.getFeeType())) {
+//						// ENTITY.当日新增费用 = 变量.每日新增费用
+//						newdto.setTdyIntincexpAdd(varTdyIntincexpAdd);
+//						// ENTITY.当日新增费用_本位币 = 变量.每日新增费用_本位币
+//						newdto.setTdyIntincexpAddB(varTdyIntincexpAddForB);
+//					} else {
+//						// ENTITY.当日新增费用 = null
+//						newdto.setTdyIntincexpAdd(null);
+//						// ENTITY.当日新增费用_本位币 = null
+//						newdto.setTdyIntincexpAddB(null);
+//					}
+//
+//					// 费用头寸.add（ENTITY）
+//					bokPositionPrdfeeWithOtherFieldListWithTdAll.add(newdto);
+//				}
+//			}
 		}
 
 		// 2.3 增值税费用

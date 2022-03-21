@@ -258,7 +258,7 @@ public interface PositionMakeWithoutDispatchMapper {
 	 * @param param
 	 * @return
 	 */
-	List<String> getBooksets(Map<String, Object> param);
+	List<PositionMakeReaderResult> getBooksets(Map<String, Object> param);
 
 	/**
 	 * 查询[LIST-应收款科目余额信息]

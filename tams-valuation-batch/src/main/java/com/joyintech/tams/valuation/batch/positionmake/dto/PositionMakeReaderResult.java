@@ -14,6 +14,8 @@ import java.util.List;
  */
 public class PositionMakeReaderResult extends NeedOperateEntity  {
 
+	private String booksetId;
+
 	/**
 	 * 组合资产估值List
 	 */
@@ -91,5 +93,13 @@ public class PositionMakeReaderResult extends NeedOperateEntity  {
 
 	public void setPtlSecReceivablesList(List<PtlSecReceivables> ptlSecReceivablesList) {
 		this.ptlSecReceivablesList = ptlSecReceivablesList;
+	}
+
+	public String getBooksetId() {
+		return booksetId;
+	}
+
+	public void setBooksetId(String booksetId) {
+		this.booksetId = booksetId;
 	}
 }
