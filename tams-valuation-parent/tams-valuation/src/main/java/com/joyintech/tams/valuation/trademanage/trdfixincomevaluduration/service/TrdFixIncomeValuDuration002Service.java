@@ -94,7 +94,7 @@ public class TrdFixIncomeValuDuration002Service extends BaseService<TrdFixIncome
         entity.setVdate(new Date()); //计息开始日
         entity.setMdate(new Date()); //计息结束日
         entity.setPlanPayDate(new Date()); //计划
-        entity.setPayDate(new Date()); //实际支付日
+        entity.setPayDate(dto.getTradeDate()); //实际支付日  (取交易日)
         entity.setActInt(dto.getActInt()); //实收利息
         entity.setActCapi(dto.getActCapi()); //实收本金
         entity.setDealAmt(dto.getActInt().add(dto.getActCapi())); //交易金额=实收本金+实收利息
@@ -103,7 +103,7 @@ public class TrdFixIncomeValuDuration002Service extends BaseService<TrdFixIncome
         entity.setSettleDate(dto.getSettleDate()); //交割日 =settleDate
         entity.setIsClean2("Y");//是否结清
         entity.setCcy(dto.getCcy());//币种
-        entity.setTradeId(dto.getTradeId());  //交易编号
+        entity.setTradeId(null);  //交易编号
         entity.setIsClean("Y");//有无清算指令
 
         listValMngPeriodTrade.add(entity);

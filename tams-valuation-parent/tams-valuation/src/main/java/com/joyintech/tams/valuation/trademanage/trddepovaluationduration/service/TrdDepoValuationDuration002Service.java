@@ -147,6 +147,7 @@ public class TrdDepoValuationDuration002Service extends BaseService<TrdDepoValua
         result.setListValOrders(listValOrders);
         result.setListValOrdersExt(listValOrdersExt);
         TrdDepoValuationDurationResult rst = new TrdDepoValuationDurationResult(result);
+        rst.setTrdDepoValuationDuration001Dto(dto);
         return rst;
     }
 
