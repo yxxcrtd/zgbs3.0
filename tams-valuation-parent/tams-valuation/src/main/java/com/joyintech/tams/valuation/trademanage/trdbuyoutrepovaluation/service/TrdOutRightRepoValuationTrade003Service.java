@@ -127,8 +127,8 @@ public class TrdOutRightRepoValuationTrade003Service extends BaseService<TrdOutR
         //比较界面和接口字段差异，并手动给接口字段赋值
 
         entity.setProdId(dto3.getPortfolioId()); //产品代码
-        entity.setDataActionSign("01");//数据动作标志
-        entity.setTradeId(createPlanTradeId());
+        entity.setDataActionSign("02");//数据动作标志
+        entity.setTradeId(null);
 //        entity.setTradeId(dto3.getTradeId());  //交易编号
         entity.setTermKind("R007"); //期限品种
         //DictCodeList.回购期限品种_R007.getValue()

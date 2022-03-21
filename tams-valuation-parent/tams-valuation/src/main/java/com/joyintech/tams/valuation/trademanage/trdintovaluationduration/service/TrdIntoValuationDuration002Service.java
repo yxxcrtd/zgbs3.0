@@ -97,7 +97,7 @@ public class TrdIntoValuationDuration002Service extends BaseService<TrdIntoValua
         entity.setSettleDate(dto.getSettleDate()); //交割日
         entity.setIsClean2("Y");//是否结清
         entity.setCcy(dto.getCcy());//币种
-        entity.setTradeId(dto.getTradeId());  //交易编号
+        entity.setTradeId(null);  //交易编号
         entity.setIsClean("Y");//有无清算指令
         listValSeclendAssetPeriodDeal.add(entity);
         Map<String, Object> map = secPeriodDealTemplateRecService.handleValSeclendDeal(listValSeclendAssetPeriodDeal,new Date(),params,null);

@@ -86,8 +86,8 @@ public class TrdRepoValuationTrade002Service extends BaseService<TrdRepoValuatio
         //比较界面和接口字段差异，并手动给接口字段赋值
 
         entity.setProdId(dto.getPortfolioId()); //产品代码
-        entity.setDataActionSign("01");//数据动作标志
-        entity.setTradeId(dto.getTradeId());  //交易编号
+        entity.setDataActionSign("02");//数据动作标志
+        entity.setTradeId(null);  //交易编号
         entity.setTermKind("R007"); //期限品种
         //DictCodeList.回购期限品种_R007.getValue()
         entity.setTradeMarket(dto.getTradeMarket()); //交易市场

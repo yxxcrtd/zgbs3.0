@@ -89,7 +89,7 @@
 		t.TRADE_DATE tradeDate,/**交易日**/
 		t.VDATE vdate,/**起息日**/
 		t.MDATE mdate,/**到期日**/
-		t.PRIN_AMT/1000 prinAmt, /**券面总额**/
+		t.FPRICE_AMT/1000 prinAmt, /**券面总额**/
 		null rebackPrice,  /**回购利率**/
 		t.FPRICE_AMT fprice, /**首次全价总额**/
 		t.FPRICE_AMT mfprice, /**到期全价总额**/
@@ -143,7 +143,7 @@
 		t.TRADE_DATE tradeDate,/**交易日**/
 		t.VDATE vdate,/**起息日**/
 		t.MDATE mdate,/**到期日**/
-		t.PRIN_AMT/10000 prinAmt, /**券面总额**/
+		t.FPRICE_AMT/10000 prinAmt, /**券面总额**/
 		null rebackPrice,  /**回购利率**/
 		t.FPRICE_AMT fprice, /**首次全价总额**/
 		t.FPRICE_AMT mfprice, /**到期全价总额**/

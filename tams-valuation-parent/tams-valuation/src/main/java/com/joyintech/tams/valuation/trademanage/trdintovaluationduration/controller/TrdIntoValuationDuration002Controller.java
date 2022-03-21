@@ -132,17 +132,17 @@ public class TrdIntoValuationDuration002Controller extends BaseController {
         params.setElementId(dto.getElementId());
 
         //设置主键
-        if(!StringUtil.isNotEmpty(dto.getTradeId())){
-            Date sysDate= DateUtil.platDateFromCache();
-            //新建初始化交易编号
-            dto.setTradeId(trdIntoValuationDuration002Service.createPlanTradeId());
-        }
+//        if(!StringUtil.isNotEmpty(dto.getTradeId())){
+//            Date sysDate= DateUtil.platDateFromCache();
+//            //新建初始化交易编号
+//            dto.setTradeId(trdIntoValuationDuration002Service.createPlanTradeId());
+//        }
 
-        params.setBusinessCode(dto.getTradeId());
+        params.setBusinessCode(dto.getFinprodMarketId());  //资产代码
         params.setBusinessType(DictCodeListExt2.共通业务类型_债券借贷存续期.getValue());
         // 设置流程业务说明, entity即传入的dto
         params.setComment(
-                entity -> SpringContextUtil.getTextValue("交易编号")+"("+ entity.getTradeId() +")"+"-"+SpringContextUtil.getTextValue("交易日期") + "(" + DateUtil.format(entity.getTradeDate()) + ")"
+                entity -> SpringContextUtil.getTextValue("资产代码")+"("+ entity.getFinprodMarketId() +")"+"-"+SpringContextUtil.getTextValue("交易日期") + "(" + DateUtil.format(entity.getTradeDate()) + ")"
         );
         //给参数变成ProcessParameter而非WorkFlowParameter
         ProcessParameter<TrdIntoValuationDuration001Dto> parameter = new ProcessParameter<TrdIntoValuationDuration001Dto>();

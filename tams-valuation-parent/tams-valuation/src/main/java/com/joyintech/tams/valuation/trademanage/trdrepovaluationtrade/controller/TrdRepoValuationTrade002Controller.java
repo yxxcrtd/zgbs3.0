@@ -134,17 +134,17 @@ public class TrdRepoValuationTrade002Controller extends BaseController {
         params.setElementId(dto.getElementId());
 
         //设置主键
-        if(!StringUtil.isNotEmpty(dto.getTradeId())){
-            Date sysDate= DateUtil.platDateFromCache();
-            //新建初始化交易编号
-            dto.setTradeId(trdRepoValuationTrade002Service.createPlanTradeId());
-        }
+//        if(!StringUtil.isNotEmpty(dto.getTradeId())){
+//            Date sysDate= DateUtil.platDateFromCache();
+//            //新建初始化交易编号
+//            dto.setTradeId(trdRepoValuationTrade002Service.createPlanTradeId());
+//        }
 
-        params.setBusinessCode(dto.getTradeId());
+        params.setBusinessCode(dto.getPortfolioId());  //产品代码
         params.setBusinessType(DictCodeList.共通业务类型_质押式回购交易.getValue());
         // 设置流程业务说明, entity即传入的dto
         params.setComment(
-                entity -> SpringContextUtil.getTextValue("交易编号")+"("+ entity.getTradeId() +")"+"-"+SpringContextUtil.getTextValue("交易日") + "(" + DateUtil.format(entity.getTradeDate()) + ")"
+                entity -> SpringContextUtil.getTextValue("产品代码")+"("+ entity.getPortfolioId() +")"+"-"+SpringContextUtil.getTextValue("交易日") + "(" + DateUtil.format(entity.getTradeDate()) + ")"
         );
         //给参数变成ProcessParameter而非WorkFlowParameter
         ProcessParameter<TrdRepoValuationTrade001Dto> parameter = new ProcessParameter<TrdRepoValuationTrade001Dto>();
