@@ -337,6 +337,12 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
         "JRFZCB"
     ),
     /**
+     * 交易性金融负债_应计利息
+     */
+    交易性金融负债_应计利息(
+        "JYXJRFZ_YJLX"
+    ),
+    /**
      * 交易性金融负债_公允价值变动
      */
     交易性金融负债_公允价值变动(
@@ -401,6 +407,24 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
     ),
     买入返售金融资产_减值准备(
         "MRFSJRZC_JZZB_Z"
+    ),
+    应收利息_融出(
+        "YSLX_RC"
+    ),
+    利息收入_融出(
+        "LXSR_RC"
+    ),
+    应收利息_融入(
+        "YSLX_RR"
+    ),
+    利息收入_融入(
+        "LXSR_RR"
+    ),
+    期收债券本金(
+        "QSZQBJ"
+    ),
+    期付债券本金(
+        "QFZQBJ"
     ),
     /** ==========新增科目性质======== end**/
     /** add by weipeng on 20220113 估值系统产品3.0.4批处理科目性质改造 end **/
