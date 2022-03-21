@@ -52,7 +52,7 @@
             {field:'fundSettleDate', title: '资金交收日期',visible:false},
             {field:'invAimStr', title: '会计分类',sortField:"invAim",width:240},
             {field:'invAim', title: '会计分类',visible:false},
-            {field:'dealNum', type:"money",title: '成交数量',width:180},
+            {field:'dealNum',title: '成交数量',width:180},
             //{field:'fpriceAmt',type:"money", title: '全价总额',width:180},
             {field:'tradeAmt', type:"money",title: '交易金额',width:180},
             {field:'intAmt', type:"money",title: '应收利息总额',width:180},

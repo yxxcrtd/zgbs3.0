@@ -100,8 +100,12 @@
         }
     });
 
+    $('#ps').change(function(){
+        psChange();
+    });
+
     //申购时必填
-    $('#ps').change(function () {
+    var psChange = function () {
         var ps = $('#ps').val();
         if(ps == "T04"){
             $('#purchInfo').show();
@@ -120,7 +124,7 @@
             $('#confirmInfo').hide();
             $('#settleInfo').hide();
         }
-    });
+    };
 
     //结算金额  结算金额=全价总额+经手费+结算费+佣金+交易手续费+结算服务费+其他费用+保证金
     var settleAmtChange = function(){
@@ -154,6 +158,10 @@
      * 画面加载完成
      */
     $(function() {
+
+        if(workflowId){
+            psChange();
+        }
 
         /*全价总额变动计算净价总额*/
         $('#tradeAmt').change(function () {

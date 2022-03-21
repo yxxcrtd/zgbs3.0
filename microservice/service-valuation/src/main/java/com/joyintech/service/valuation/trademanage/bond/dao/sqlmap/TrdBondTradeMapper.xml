@@ -16,7 +16,7 @@
             t.SETTLE_DATE settdateDate,/**交割日期**/
             stl.SETTLE_DATE fundSettleDate,/**资金交收日**/
             t.INV_AIM invAim,/**会计分类**/
-            t.SHARE_AMT dealNum,/**成交数量**/
+            t.SHARE_AMT*100 dealNum,/**成交数量**/
             t.FPRICE_AMT fpriceAmt,/**全价总额**/
             t.INT_AMT intAmt,/**应收利息总额**/
             t.CCY ccy,/**币种**/
@@ -27,7 +27,7 @@
         LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
         LEFT JOIN BOK_DEAL_ACCOUNTING deal on deal.BUSI_NO = t.TRADE_ID
         LEFT JOIN BOK_BOOKSET bok on bok.BOOKSET_ID = deal.BOOKSET_ID
-        LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE ='02' AND STL.ORDER_TYPE NOT LIKE 'N%'
+        LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE ='02'
         where
             t.BUSI_TYPE ='02' and t.PS IN('T01','T02','T03','T04','T05','T39')
             <if test="tradeId !=null and tradeId !='' ">

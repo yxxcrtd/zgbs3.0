@@ -80,6 +80,9 @@ public class TrdStockTrade002Controller extends BaseController {
 
         if(StringUtil.isNotEmpty(workflowId)){
             TrdStockTradeDto entity= trdStockTrade002Service.getBussinessEntityByWorkflowId(workflowId);
+            if(!StringUtil.isNotEmpty(entity.getTradeId())){
+                entity.setTradeId("提交后自动生成，无需填写");
+            }
             model.addAttribute("entity", entity);
             model.addAttribute("workflowId", workflowId);
         }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){
@@ -161,18 +164,18 @@ public class TrdStockTrade002Controller extends BaseController {
         processParameter.setWorkFlowParameter(workFlowParameter);
         processParameter.setPageId(this.getPageId());
 
-        //设置主键
-        if(!StringUtil.isNotEmpty(dto.getTradeId())){
-            Date sysDate= DateUtil.platDateFromCache();
-            dto.setTradeId(getTradeId("JYSTOCK", sysDate, "A"));
-        }
+//        //设置主键
+//        if(!StringUtil.isNotEmpty(dto.getTradeId())){
+//            Date sysDate= DateUtil.platDateFromCache();
+//            dto.setTradeId(getTradeId("JYSTOCK", sysDate, "A"));
+//        }
 
         workFlowParameter.setPageId(this.getPageId());
         workFlowParameter.setElementId(this.getParam("elementId"));
-        workFlowParameter.setBusinessCode(dto.getTradeId());
+        workFlowParameter.setBusinessCode(dto.getAssetId());
         workFlowParameter.setBusinessType(DictCodeList.共通业务类型_债券类资产交易.getValue());
         workFlowParameter.setComment((entity) -> WorkFlowUtil.concatComment(
-            getMessage("交易编号") + GlobalConstant.COLON + entity.getTradeId(),
+            getMessage("资产代码") + GlobalConstant.COLON + entity.getAssetId(),
             getMessage("交易日") + GlobalConstant.COLON + DateUtil.format(entity.getTradeDate())));
 
         String msg = trdStockTrade002Service.start(processParameter, dto);

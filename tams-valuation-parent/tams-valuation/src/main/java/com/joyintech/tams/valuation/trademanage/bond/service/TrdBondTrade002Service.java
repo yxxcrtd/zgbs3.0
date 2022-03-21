@@ -116,11 +116,11 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTradeDto>
         //比较界面和接口字段差异，并手动给接口字段赋值
         valSecVestAssetDeal.setAssetId(trdBondTradeDto.getSecId());//资产代码
         valSecVestAssetDeal.setDataActionSign("01");//数据动作标志
-        valSecVestAssetDeal.setFprice(trdBondTradeDto.getTradeAmt());//全价
+        valSecVestAssetDeal.setFpriceAmt(trdBondTradeDto.getTradeAmt());//全价
         valSecVestAssetDeal.setCpriceAmt(ArithmeticUtil.subtract(trdBondTradeDto.getTradeAmt(),trdBondTradeDto.getIntAmt()));//净价总额
         valSecVestAssetDeal.setTradeAmt(trdBondTradeDto.getSettleAmt());//交易金额
 
-        valSecVestAssetDeal.setStlForm(null);//结算方式
+        valSecVestAssetDeal.setStlForm("03");//结算方式
         valSecVestAssetDeal.setParValue(new BigDecimal(0));//单位面值
         valSecVestAssetDeal.setFeeAmtUnpay(new BigDecimal(0));//未随交易支付费用
         valSecVestAssetDeal.setYield(new BigDecimal(0));//到期收益率
@@ -147,7 +147,7 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTradeDto>
         }else{
             valSecVestAssetDeal.setMyAcctNo(trdBondTradeDto.getMyAcctNo());
         }
-
+        valSecVestAssetDeal.setCounterAcctNo(valSecVestAssetDeal.getMyAcctNo());
 
         listValSecVestAssetDeal.add(valSecVestAssetDeal);
 

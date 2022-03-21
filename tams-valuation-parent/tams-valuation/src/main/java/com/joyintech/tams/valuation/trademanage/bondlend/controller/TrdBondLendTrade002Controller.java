@@ -70,6 +70,9 @@ public class TrdBondLendTrade002Controller extends BaseController {
         //工作流
         if(StringUtil.isNotEmpty(workflowId)){
             TrdBondLendTradeDto entity= trdBondLendTrade002Service.getBussinessEntityByWorkflowId(workflowId);
+            if(!StringUtil.isNotEmpty(entity.getTradeId())){
+                entity.setTradeId("提交后自动生成，无需填写");
+            }
             model.addAttribute("entity", entity);
             model.addAttribute("workflowId", workflowId);
 
@@ -138,19 +141,19 @@ public class TrdBondLendTrade002Controller extends BaseController {
         processParameter.setWorkFlowParameter(workFlowParameter);
         processParameter.setPageId(this.getPageId());
 
-        //设置主键
-        if(!StringUtil.isNotEmpty(dto.getTradeId())){
-            Date sysDate= DateUtil.platDateFromCache();
-            dto.setTradeId(getTradeId("JYSL", sysDate, "A"));
-        }
+//        //设置主键
+//        if(!StringUtil.isNotEmpty(dto.getTradeId())){
+//            Date sysDate= DateUtil.platDateFromCache();
+//            dto.setTradeId(getTradeId("JYSL", sysDate, "A"));
+//        }
 
         workFlowParameter.setPageId(this.getPageId());
         workFlowParameter.setElementId(this.getParam("elementId"));
-        workFlowParameter.setBusinessCode(dto.getTradeId());
+        workFlowParameter.setBusinessCode(dto.getSecId());
         workFlowParameter.setBusinessType(DictCodeListExt2.共通业务类型_债券借贷交易.getValue());
         workFlowParameter.setComment((entity) -> WorkFlowUtil.concatComment(
-            getMessage("交易编号") + GlobalConstant.COLON + entity.getTradeId(),
-            getMessage("交易日") + GlobalConstant.COLON + DateUtil.format(entity.getTradeDate())));
+            getMessage("债券代码") + GlobalConstant.COLON + entity.getTradeId(),
+            getMessage("交易日期") + GlobalConstant.COLON + DateUtil.format(entity.getTradeDate())));
 
         String msg = trdBondLendTrade002Service.start(processParameter, dto);
 

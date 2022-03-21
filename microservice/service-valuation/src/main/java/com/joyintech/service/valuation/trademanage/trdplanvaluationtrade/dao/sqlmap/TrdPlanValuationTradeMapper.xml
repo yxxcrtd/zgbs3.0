@@ -24,7 +24,9 @@
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal2 ON stl.ORDER_ID = deal2.BUSI_NO
 		LEFT JOIN BOK_BOOKSET bok on (bok.BOOKSET_ID = deal1.BOOKSET_ID) OR (bok.BOOKSET_ID = deal2.BOOKSET_ID)
 		where
-		 t.BUSI_TYPE IN('06','07') and t.FINPROD_TYPE = 'F17'
+		 t.BUSI_TYPE IN('06','07')
+		 and t.FINPROD_TYPE = 'F17'
+		AND t.PS IN('T01','T02','T04','T05','T18','T19','T24','T52')
 		<if test="tradeId !=null and tradeId !='' ">
 			and t.TRADE_ID like  concat(concat('%',#{tradeId}),'%')
 		</if>

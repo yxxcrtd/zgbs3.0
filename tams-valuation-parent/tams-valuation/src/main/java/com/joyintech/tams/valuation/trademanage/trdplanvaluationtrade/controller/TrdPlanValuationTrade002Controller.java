@@ -39,7 +39,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,6 +83,9 @@ public class TrdPlanValuationTrade002Controller extends BaseController {
 
         if(StringUtil.isNotEmpty(workflowId)){
             TrdPlanValuationTradeDto entity= trdPlanValuationTrade002Service.getBussinessEntityByWorkflowId(workflowId);
+            if(!StringUtil.isNotEmpty(entity.getTradeId())){
+                entity.setTradeId("提交后自动生成，无需填写");
+            }
             model.addAttribute("entity", entity);
             model.addAttribute("workflowId", workflowId);
 
@@ -156,17 +158,17 @@ public class TrdPlanValuationTrade002Controller extends BaseController {
             params.setBusinessType(DictCodeList.共通业务类型_计划类资产_货币型_交易.getValue());
         }
 
-        //设置主键
-        if(!StringUtil.isNotEmpty(dto.getTradeId())){
-            Date sysDate= DateUtil.platDateFromCache();
-            //新建初始化交易编号
-            dto.setTradeId(trdPlanValuationTrade002Service.createPlanTradeId());
-        }
-        params.setBusinessCode(dto.getTradeId());
+//        //设置主键
+//        if(!StringUtil.isNotEmpty(dto.getTradeId())){
+//            Date sysDate= DateUtil.platDateFromCache();
+//            //新建初始化交易编号
+//            dto.setTradeId(trdPlanValuationTrade002Service.createPlanTradeId());
+//        }
+        params.setBusinessCode(dto.getAssetId());
 
         // 设置流程业务说明, entity即传入的dto
         params.setComment(
-                entity -> SpringContextUtil.getTextValue("TrdPlanValuationTrade002.tradeId")+"("+ entity.getTradeId() +")"+"-"+SpringContextUtil.getTextValue("TrdPlanValuationTrade002.tradeDate") + "(" + DateUtil.format(entity.getTradeDate()) + ")"
+                entity -> SpringContextUtil.getTextValue("资产代码：")+ entity.getAssetId() +"-"+SpringContextUtil.getTextValue("交易日期：") + DateUtil.format(entity.getTradeDate())
         );
         //给参数变成ProcessParameter而非WorkFlowParameter
         ProcessParameter<TrdPlanValuationTradeDto> parameter = new ProcessParameter<TrdPlanValuationTradeDto>();

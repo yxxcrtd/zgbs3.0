@@ -37,7 +37,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,6 +83,9 @@ public class TrdFundValuationTrade002Controller extends BaseController {
 
         if(StringUtil.isNotEmpty(workflowId)){
             TrdFundValuationTradeDto entity= trdFundValuationTrade002Service.getBussinessEntityByWorkflowId(workflowId);
+            if(!StringUtil.isNotEmpty(entity.getTradeId())){
+                entity.setTradeId("提交后自动生成，无需填写");
+            }
             model.addAttribute("entity", entity);
             model.addAttribute("workflowId", workflowId);
 
@@ -151,18 +153,18 @@ public class TrdFundValuationTrade002Controller extends BaseController {
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
 
-        //设置主键
-        if(!StringUtil.isNotEmpty(dto.getTradeId())){
-            Date sysDate= DateUtil.platDateFromCache();
-            //新建初始化交易编号
-            dto.setTradeId(trdFundValuationTrade002Service.createFundTradeId());
-        }
+//        //设置主键
+//        if(!StringUtil.isNotEmpty(dto.getTradeId())){
+//            Date sysDate= DateUtil.platDateFromCache();
+//            //新建初始化交易编号
+//            dto.setTradeId(trdFundValuationTrade002Service.createFundTradeId());
+//        }
 
-        params.setBusinessCode(dto.getTradeId());
+        params.setBusinessCode(dto.getAssetId());
         params.setBusinessType(DictCodeList.共通业务类型_基金类资产交易.getValue());
         // 设置流程业务说明, entity即传入的dto
         params.setComment(
-                entity -> SpringContextUtil.getTextValue("TrdFundValuationTrade002.tradeId")+"("+ entity.getTradeId() +")"+"-"+SpringContextUtil.getTextValue("TrdFundValuationTrade002.tradeDate") + "(" + DateUtil.format(entity.getTradeDate()) + ")"
+                entity -> SpringContextUtil.getTextValue("资产代码：")+ entity.getAssetId() +"-"+SpringContextUtil.getTextValue("TrdFundValuationTrade002.tradeDate") + ":" + DateUtil.format(entity.getTradeDate())
         );
         //给参数变成ProcessParameter而非WorkFlowParameter
         ProcessParameter<TrdFundValuationTradeDto> parameter = new ProcessParameter<TrdFundValuationTradeDto>();
