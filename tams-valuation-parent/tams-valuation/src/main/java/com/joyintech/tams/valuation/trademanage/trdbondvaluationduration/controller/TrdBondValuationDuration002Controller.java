@@ -157,7 +157,7 @@ public class TrdBondValuationDuration002Controller extends BaseController {
         workFlowParameter.setBusinessType(DictCodeList.共通业务类型_债券类资产存续期.getValue());
         workFlowParameter.setComment((entity) -> WorkFlowUtil.concatComment(
                 getMessage("资产代码") + GlobalConstant.COLON + entity.getAssetId(),
-                getMessage("交易日期") + DateUtil.parse(DateUtil.getSysDate())));
+                getMessage("交易日期") + DateUtil.format(entity.getTradeDate())));
 
         String msg = trdBondValuationDuration002Service.start(processParameter, dto);
 

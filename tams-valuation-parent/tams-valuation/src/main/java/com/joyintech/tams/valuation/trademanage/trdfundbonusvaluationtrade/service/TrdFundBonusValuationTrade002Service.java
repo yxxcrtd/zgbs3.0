@@ -154,6 +154,7 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
                     result.setListValInterflog((List<ValInterflog>)map.get("valInterflogList"));
                 }
                 TrdFundBonusTradeResult rst = new TrdFundBonusTradeResult(result);
+                rst.setTrdFundBonusValuationTradeDto(trdFundBonusValuationTradeDto);
                 return rst;
             } else if (trdFundBonusValuationTradeDto.getPs().equals(DictCodeList.交易方向_红利再投.getValue()) ) {
                 //申购、认购 ==>对应接口【基金&计划类红利再投交易】
@@ -200,6 +201,7 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
                     result.setListValInterflog((List<ValInterflog>)map.get("valInterflogList"));
                 }
                 TrdFundBonusTradeResult rst = new TrdFundBonusTradeResult(result);
+                rst.setTrdFundBonusValuationTradeDto(trdFundBonusValuationTradeDto);
                 return rst;
             } else if (trdFundBonusValuationTradeDto.getPs().equals(DictCodeList.交易方向_份额强增.getValue())
                     || trdFundBonusValuationTradeDto.getPs().equals(DictCodeList.交易方向_份额强减.getValue()) ) {
@@ -254,6 +256,7 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
                     result.setListValInterflog((List<ValInterflog>)map.get("valInterflogList"));
                 }
                 TrdFundBonusTradeResult rst = new TrdFundBonusTradeResult(result);
+                rst.setTrdFundBonusValuationTradeDto(trdFundBonusValuationTradeDto);
                 return rst;
             }else{
                 //返回初始化

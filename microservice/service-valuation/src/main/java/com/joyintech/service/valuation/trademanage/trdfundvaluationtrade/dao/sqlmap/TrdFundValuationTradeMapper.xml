@@ -13,15 +13,17 @@
 			t.PS              ps,/**交易方向**/
 			t.TRADE_MARKET    tradeMarket,/**交易场所**/
 			t.TRADE_DATE      tradeDate,/**交易日期**/
-			t.PRIN_AMT tradeAmt,/**成交金额**/
+			CASE WHEN t.PS in('T01','T02') THEN t.PRIN_AMT
+			ELSE t.TRADE_AMT END AS tradeAmt,/**成交金额**/
 			t.SHARE_AMT dealNum,/**成交数量**/
 			t.CCY             ccy,/**币种**/
 			stl.SETTLE_DATE    settleDate,/**结算日期**/
 			CASE t.PS WHEN 'T18' THEN t.TRADE_AMT ELSE 0 END  subFee,/**认购费**/
 			CASE t.PS WHEN 'T05' THEN t.TRADE_AMT ELSE 0 END  purFee,/**申购费**/
 			CASE t.PS WHEN 'T19' THEN t.TRADE_AMT ELSE 0 END  redFee,/**赎回费**/
-			ttfd.FEE_AMT  brokerage,/**经手费**/
-			ttfd2.FEE_AMT  commission,/**佣金**/
+			CASE t.PS WHEN 'T24' THEN t.TRADE_AMT ELSE 0 END tradeAmtArrive,/*到账金额*/
+			nvl(ttfd.FEE_AMT,0)  brokerage,/**经手费**/
+			nvl(ttfd2.FEE_AMT,0)  commission,/**佣金**/
 			stl.MY_ACCT_NO    trdMyAcctNo/**资金账户**/
 		FROM TRD_PRODUCT_DEAL t
 		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id

@@ -190,8 +190,8 @@ public class TrdBondValuationDuration001Controller extends BaseController {
         params.setElementId(dto.getElementId());
 
         // 设置流程业务说明, entity即传入的dto
-        params.setComment(entity -> WorkFlowUtil.concatComment("债券存续期交易删除：", entity.getTradeId(),
-                DateUtil.format(entity.getTradeDate())
+        params.setComment(entity -> WorkFlowUtil.concatComment("债券存续期交易删除：交易编号：", entity.getTradeId(),
+                "交易日期：",DateUtil.format(entity.getTradeDate())
         ));
 
         // 塞入流程参数

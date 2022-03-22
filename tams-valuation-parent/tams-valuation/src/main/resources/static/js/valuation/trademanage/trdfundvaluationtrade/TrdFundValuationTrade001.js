@@ -26,10 +26,17 @@ $(function(){
             }
         },
         dblclick:function(table, data) {
-            Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+            if(data.ps == 'T24'){
+                Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+                    basePath + "valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade003/init",
+                    "95%", "90%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
+                        tradeId:data.tradeId,ps:data.ps});
+            }else{
+                Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
                     basePath + "valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/init",
                     "95%", "90%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
-                    tradeId:data.tradeId,ps:data.ps});
+                        tradeId:data.tradeId,ps:data.ps});
+            }
         },
         cols:[
             {field:'tradeId', width:180, title: '交易编号'}
@@ -48,7 +55,7 @@ $(function(){
             ,{field:'ccy', title: '币种',visible:false}
             ,{field:'settleDateStr',width:150, title: '结算日期',sortField:'settleDate'}
             ,{field:'settleDate',  title: '结算日期', visible: false}
-            ,{field:'tradeAmt', width:150, title: '到账金额',type:'money'}
+            ,{field:'tradeAmtArrive', width:150, title: '到账金额',type:'money'}
             ,{field:'subFee', width:150, title: '认购费',type:'money'}
             ,{field:'purFee', width:150, title: '申购费',type:'money'}
             ,{field:'redFee', width:150, title: '赎回费',type:'money'}
@@ -66,16 +73,29 @@ $(function(){
     table.bind('click', '.edit', function(data, index) {
         data.pageModel = PAGE_MODEL_EDIT;
         var object = {selectedItem: [data], operateType:"edit"};//请求参数
-        Joyin.ajaxJson(basePath + 'valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade001/check', object, function(result) {//请求路径，请求参数回调函数
-            Joyin.dialog(JoyinUtil.getLabel("基金交易-修改"),
-                basePath + "valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/init",//打开新界面
-                "95%", "90%", {pageModel:PAGE_MODEL_EDIT,//请求的page_model
-                    tradeId:data.tradeId  //金融产品代码
-                    ,ps:data.ps
-                },function(){
-                    table.reload();//回调函数，表格刷新
-                });
-        });
+        if(data.ps == 'T24'){
+            Joyin.ajaxJson(basePath + 'valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade001/check', object, function(result) {//请求路径，请求参数回调函数
+                Joyin.dialog(JoyinUtil.getLabel("基金交易-修改"),
+                    basePath + "valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade003/init",//打开新界面
+                    "95%", "90%", {pageModel:PAGE_MODEL_EDIT,//请求的page_model
+                        tradeId:data.tradeId  //金融产品代码
+                        ,ps:data.ps
+                    },function(){
+                        table.reload();//回调函数，表格刷新
+                    });
+            });
+        }else{
+            Joyin.ajaxJson(basePath + 'valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade001/check', object, function(result) {//请求路径，请求参数回调函数
+                Joyin.dialog(JoyinUtil.getLabel("基金交易-修改"),
+                    basePath + "valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/init",//打开新界面
+                    "95%", "90%", {pageModel:PAGE_MODEL_EDIT,//请求的page_model
+                        tradeId:data.tradeId  //金融产品代码
+                        ,ps:data.ps
+                    },function(){
+                        table.reload();//回调函数，表格刷新
+                    });
+            });
+        }
     });
 
     /**

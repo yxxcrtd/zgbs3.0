@@ -33,8 +33,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.Date;
-
 /**
  * @Description:基金交易-赎回到账新建
  * @auther: yuzj
@@ -120,18 +118,18 @@ public class TrdPlanValuationTrade003Controller extends BaseController {
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
 
-        //设置主键
-        if(!StringUtil.isNotEmpty(dto.getTradeId())){
-            Date sysDate= DateUtil.platDateFromCache();
-            //新建初始化交易编号
-            dto.setTradeId(trdPlanValuationTrade002Service.createPlanTradeId());
-        }
+//        //设置主键
+//        if(!StringUtil.isNotEmpty(dto.getTradeId())){
+//            Date sysDate= DateUtil.platDateFromCache();
+//            //新建初始化交易编号
+//            dto.setTradeId(trdPlanValuationTrade002Service.createPlanTradeId());
+//        }
 
-        params.setBusinessCode(dto.getTradeId());
+        params.setBusinessCode(dto.getAssetId());
         params.setBusinessType(DictCodeList.共通业务类型_基金类资产交易.getValue());
         // 设置流程业务说明, entity即传入的dto
         params.setComment(
-                entity -> SpringContextUtil.getTextValue("TrdPlanValuationTrade002.tradeId")+"("+ entity.getTradeId() +")"+"-"+SpringContextUtil.getTextValue("TrdPlanValuationTrade002.tradeDate") + "(" + DateUtil.format(entity.getTradeDate()) + ")"
+                entity -> SpringContextUtil.getTextValue("资产代码：")+"("+ entity.getAssetId() +")"+"-"+SpringContextUtil.getTextValue("TrdPlanValuationTrade002.tradeDate") + "(" + DateUtil.format(entity.getArriveDate()) + ")"
         );
         //给参数变成ProcessParameter而非WorkFlowParameter
         ProcessParameter<TrdPlanValuationTradeDto> parameter = new ProcessParameter<TrdPlanValuationTradeDto>();

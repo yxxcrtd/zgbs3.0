@@ -16,10 +16,13 @@ import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 import com.joyintech.tams.valuation.common.interf.base.dto.FundDealInfoForInterfRecCommonResult;
+import com.joyintech.tams.valuation.common.interf.base.dto.TargetFinProduct;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.fund.*;
+import com.joyintech.tams.valuation.common.interf.base.service.common.InterfCommonService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.*;
 import com.joyintech.tams.valuation.trademanage.trdfundvaluationtrade.dto.TrdFundTradeResult;
 import com.joyintech.tams.valuation.trademanage.trdfundvaluationtrade.dto.TrdFundValuationTradeDto;
@@ -57,6 +60,10 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
     private FundMoneyFundRedeemConfirmDealRecService fundMoneyFundRedeemConfirmDealRecService;
     @Autowired
     private FundRedeemArrivalAccountDealRecService fundRedeemArrivalAccountDealRecService;
+    @Autowired
+    private InterfCommonService interfCommonService;
+    @Autowired
+    private FundNMoneyFundRedeemConfirmDealRecService fundNMoneyFundRedeemConfirmDealRecService;
 
     /**
      * 策略代码生成
@@ -272,13 +279,30 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
                 prodIds.add(trdFundValuationTradeDto.getProdId());
                 params.put("INTERF_BOOKSETID",prodIds);
                 params.put("VAL_MODEL","INTERF_MODEL_SINGLE");
-                List<ValFundMnfRedAffirm> listValFundMnfRedAffirm = new ArrayList<ValFundMnfRedAffirm>();
-                ValFundMnfRedAffirm valFundMnfRedAffirm = new ValFundMnfRedAffirm();
-                //实体类字段映射处理
-                valFundMnfRedAffirm = dealBean(valFundMnfRedAffirm,trdFundValuationTradeDto,type);
 
-                listValFundMnfRedAffirm.add(valFundMnfRedAffirm);
-                Map<String, Object>  map = fundMoneyFundRedeemConfirmDealRecService.handleValFundMnfRedAffirm(listValFundMnfRedAffirm,new Date(),params,null);
+                TargetFinProduct item = interfCommonService.getTargetFinProduct(trdFundValuationTradeDto.getAssetId());
+                String finprodType = "";
+                if(item!=null){
+                    finprodType = item.getFinprodType();
+                }
+
+                Map<String, Object> map = new HashMap<>();
+                if(DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue().equals(finprodType)){
+                    List<ValFundNRedAffirmN> listValFundNRedAffirmN = new ArrayList<ValFundNRedAffirmN>();
+                    ValFundNRedAffirmN valFundNRedAffirmN = new ValFundNRedAffirmN();
+                    valFundNRedAffirmN = dealBean(valFundNRedAffirmN,trdFundValuationTradeDto,type);
+                    listValFundNRedAffirmN.add(valFundNRedAffirmN);
+                    map = fundNMoneyFundRedeemConfirmDealRecService.handleValFundNRedAffirmN(listValFundNRedAffirmN,new Date(),params,null);
+                }else{
+                    List<ValFundMnfRedAffirm> listValFundMnfRedAffirm = new ArrayList<ValFundMnfRedAffirm>();
+                    ValFundMnfRedAffirm valFundMnfRedAffirm = new ValFundMnfRedAffirm();
+                    //实体类字段映射处理
+                    valFundMnfRedAffirm = dealBean(valFundMnfRedAffirm,trdFundValuationTradeDto,type);
+
+                    listValFundMnfRedAffirm.add(valFundMnfRedAffirm);
+                    map = fundMoneyFundRedeemConfirmDealRecService.handleValFundMnfRedAffirm(listValFundMnfRedAffirm,new Date(),params,null);
+                }
+
                 // 定义返回变量
                 FundDealInfoForInterfRecCommonResult result = new FundDealInfoForInterfRecCommonResult();
                 if (!map.isEmpty()) {
@@ -309,6 +333,7 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
                     // 日志
                     result.setListValInterflog((List<ValInterflog>)map.get("valInterflogList"));
                 }
+
                 TrdFundTradeResult rst = new TrdFundTradeResult(result);
                 rst.setTrdFundValuationTradeDto(trdFundValuationTradeDto);
                 return rst;
@@ -487,11 +512,6 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
         BeanUtil.copyPropertiesIgnoreNull(valFundMnfRedAffirm,dto);
         //相同字段名： 成交编号、交易方向、交易场所、币种
         //比较界面和接口字段差异，并手动给接口字段赋值
-//        if("A".equals(type)){
-//            valFundMnfRedAffirm.setAssetId("F06_"+dto.getAssetId());//资产代码  F06基金
-//        }else if("B".equals(type)){
-//            valFundMnfRedAffirm.setAssetId("F17_"+dto.getAssetId());//资产代码
-//        }
 
         valFundMnfRedAffirm.setAssetName(dto.getAssetAbbr());//资产名称
         valFundMnfRedAffirm.setTradeDate(dto.getRedConfirmDate());//交易日
@@ -503,6 +523,29 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
         valFundMnfRedAffirm.setDataActionSign("01");//数据动作标志
         valFundMnfRedAffirm.setIsClean("N"); //有无清算指令
         return valFundMnfRedAffirm;
+    }
+
+    /**
+     * @auther: 属性转换处理-赎回确认(净值型)
+     * @date: 2022/3/1 16:01
+     * @param:
+     * @return:
+     */
+    public ValFundNRedAffirmN dealBean(ValFundNRedAffirmN valFundNRedAffirmN,TrdFundValuationTradeDto dto,String type){
+        BeanUtil.copyPropertiesIgnoreNull(valFundNRedAffirmN,dto);
+        //相同字段名： 成交编号、交易方向、交易场所、币种
+        //比较界面和接口字段差异，并手动给接口字段赋值
+
+        valFundNRedAffirmN.setAssetName(dto.getAssetAbbr());//资产名称
+        valFundNRedAffirmN.setTradeDate(dto.getRedConfirmDate());//交易日
+        valFundNRedAffirmN.setPreDate(dto.getArriveDate());//预计到账日
+        valFundNRedAffirmN.setRedShare(dto.getRedConfirmNum());//确认数量
+        valFundNRedAffirmN.setRedAmt(dto.getRedConfirmAmt());//赎回金额
+        valFundNRedAffirmN.setFee(dto.getRedFee());
+
+        valFundNRedAffirmN.setDataActionSign("01");//数据动作标志
+        valFundNRedAffirmN.setIsClean("N"); //有无清算指令
+        return valFundNRedAffirmN;
     }
 
 
@@ -523,9 +566,10 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
         }
 
         valRedAccoutTrade.setTradeDate(dto.getArriveDate());//交易日
-        valRedAccoutTrade.setTradeAmt(dto.getRedFee());//赎回费
+        valRedAccoutTrade.setTradeAmt(dto.getTradeAmtArrive());//赎回费
         valRedAccoutTrade.setMyAcctNo(dto.getRedMyAcctNo());//资金账户
 
+        valRedAccoutTrade.setSettleDate(dto.getArriveDate());
         valRedAccoutTrade.setDataActionSign("01");//数据动作标志
         valRedAccoutTrade.setIsClean("N"); //有无清算指令
         return valRedAccoutTrade;

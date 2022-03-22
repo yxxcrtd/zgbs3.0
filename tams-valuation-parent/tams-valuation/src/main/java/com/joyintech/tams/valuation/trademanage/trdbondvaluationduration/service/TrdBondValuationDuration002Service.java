@@ -86,7 +86,6 @@ public class TrdBondValuationDuration002Service extends CommonExportService<TrdB
         BeanUtil.copyPropertiesIgnoreNull(entity,dto);
         entity.setFundSettleDate(dto.getFundSettleDate());
         //比较界面和接口字段差异，并手动给接口字段赋值
-        entity.setAssetId("F01_"+dto.getAssetId());
         entity.setSecId(dto.getAssetId());
         entity.setSecAbbr(dto.getAssetAbbr());
         entity.setDataActionSign("01");//数据动作标志

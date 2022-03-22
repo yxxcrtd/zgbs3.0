@@ -8,11 +8,12 @@
 			null outTradeId,    /*外部成交编号*/
 			NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) prodId,/**金融产品代码**/
 			bok.BOOKSET_NAME prodName,/**金融产品名称**/
-			zc.FINPROD_MARKET_ID  assetId, /**资产代码**/
+			zc.FINPROD_ID  assetId, /**资产代码**/
 			zc.FINPROD_ABBR  assetAbbr,/**资产简称**/
 			t.PS ps,/**交易方向**/
 			t.TRADE_DATE tradeDate,/**交易日**/
-			t.PRIN_AMT tradeAmt,/**交易金额**/
+			CASE WHEN t.PS in('T01','T02') THEN t.PRIN_AMT
+			ELSE t.TRADE_AMT END AS tradeAmt,/**成交金额**/
 			t.SHARE_AMT dealNum,/**交易份额**/
 			t.CCY ccy,/**币种**/
 			t.TRADE_AMT settleAmt,/**结算金额**/

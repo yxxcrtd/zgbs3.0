@@ -175,7 +175,7 @@ public class TrdStockTrade001Controller extends BaseController {
         params.setElementId(dto.getElementId());
 
         // 设置流程业务说明, entity即传入的dto
-        params.setComment(entity -> WorkFlowUtil.concatComment("股票交易查询删除：", entity.getTradeId(),
+        params.setComment(entity -> WorkFlowUtil.concatComment("股票交易删除：", entity.getTradeId(),
                 DateUtil.format(entity.getTradeDate())
         ));
 

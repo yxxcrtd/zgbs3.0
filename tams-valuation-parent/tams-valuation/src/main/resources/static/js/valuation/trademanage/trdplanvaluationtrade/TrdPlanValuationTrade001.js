@@ -25,10 +25,17 @@ $(function(){
             }
         },
         dblclick:function(table, data) {
-            Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+            if(data.ps == 'T24'){
+                Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+                    basePath + "valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade003/init",
+                    "98%", "98%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
+                        tradeId:data.tradeId,ps:data.ps});
+            }else{
+                Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
                     basePath + "valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade002/init",
                     "98%", "98%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
-                    tradeId:data.tradeId,ps:data.ps});
+                        tradeId:data.tradeId,ps:data.ps});
+            }
         },
         cols:[
             {field:'tradeId', width:180, title: '交易编号'}
@@ -57,14 +64,26 @@ $(function(){
     table.bind('click', '.edit', function(data, index) {
         data.pageModel = PAGE_MODEL_EDIT;
         var object = {selectedItem: [data], operateType:"edit"};//请求参数
-        Joyin.dialog(JoyinUtil.getLabel("计划类交易-修改"),
-            basePath + "valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade002/init",//打开新界面
-            "95%", "90%", {pageModel:PAGE_MODEL_EDIT,//请求的page_model
-                tradeId:data.tradeId  //金融产品代码
-                ,ps:data.ps
-            },function(){
-                table.reload();//回调函数，表格刷新
-            });
+        if(data.ps == 'T24'){
+            Joyin.dialog(JoyinUtil.getLabel("计划类交易-修改"),
+                basePath + "valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade003/init",//打开新界面
+                "95%", "90%", {pageModel:PAGE_MODEL_EDIT,//请求的page_model
+                    tradeId:data.tradeId  //金融产品代码
+                    ,ps:data.ps
+                },function(){
+                    table.reload();//回调函数，表格刷新
+                });
+        }else{
+            Joyin.dialog(JoyinUtil.getLabel("计划类交易-修改"),
+                basePath + "valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade002/init",//打开新界面
+                "95%", "90%", {pageModel:PAGE_MODEL_EDIT,//请求的page_model
+                    tradeId:data.tradeId  //金融产品代码
+                    ,ps:data.ps
+                },function(){
+                    table.reload();//回调函数，表格刷新
+                });
+        }
+
     });
 
     /**

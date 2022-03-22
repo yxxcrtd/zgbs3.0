@@ -211,8 +211,8 @@ public class TrdJihuaBonusValuationTrade001Controller extends BaseController {
         params.setElementId(dto.getElementId());
 
         // 设置流程业务说明, entity即传入的dto
-        params.setComment(entity -> WorkFlowUtil.concatComment("计划类资产交易查询删除：", entity.getTradeId(),
-                DateUtil.format(entity.getTradeDate(),DateUtil.DEFAULT_DATETIME_FORMAT)
+        params.setComment(entity -> WorkFlowUtil.concatComment("计划类资产交易删除：交易编号：", entity.getTradeId(),
+                "交易日期：",DateUtil.format(entity.getTradeDate(),DateUtil.DEFAULT_DATETIME_FORMAT)
         ));
 
         // 塞入流程参数

@@ -524,16 +524,15 @@ public class TrdPlanValuationTrade002Service extends CommonExportService<TrdPlan
      * @return:
      */
     public ValMngMnfRedAccoutTrade dealBean(ValMngMnfRedAccoutTrade valMngMnfRedAccoutTrade,TrdPlanValuationTradeDto dto){
-//        BeanUtil.copyPropertiesIgnoreNull(valMngMnfRedAccoutTrade,dto);
-//        //相同字段名： 成交编号、交易方向、交易场所、币种
-//        valMngMnfRedAccoutTrade.setProdId(dto.getPortfolioId());//产品代码
-//        //比较界面和接口字段差异，并手动给接口字段赋值
-//        valMngMnfRedAccoutTrade.setAssetId("F01_"+dto.getFinprodId());//资产代码  F06基金
-//        valMngMnfRedAccoutTrade.setTradeDate(dto.getShqrSettleDate());//交易日
-//        valMngMnfRedAccoutTrade.setTradeAmt(dto.getRedemptionFee());//赎回费
-//
-//        valMngMnfRedAccoutTrade.setDataActionSign("01");//数据动作标志
-//        valMngMnfRedAccoutTrade.setIsClean("N"); //有无清算指令
+        BeanUtil.copyPropertiesIgnoreNull(valMngMnfRedAccoutTrade,dto);
+        //相同字段名： 成交编号、交易方向、交易场所、币种
+        //比较界面和接口字段差异，并手动给接口字段赋值
+        valMngMnfRedAccoutTrade.setAssetId(dto.getAssetId());//资产代码  F06基金
+        valMngMnfRedAccoutTrade.setTradeDate(dto.getArriveDate());//交易日
+        valMngMnfRedAccoutTrade.setTradeAmt(dto.getTradeAmtArrive());//赎回费
+
+        valMngMnfRedAccoutTrade.setDataActionSign("01");//数据动作标志
+        valMngMnfRedAccoutTrade.setIsClean("N"); //有无清算指令
         return valMngMnfRedAccoutTrade;
     }
 

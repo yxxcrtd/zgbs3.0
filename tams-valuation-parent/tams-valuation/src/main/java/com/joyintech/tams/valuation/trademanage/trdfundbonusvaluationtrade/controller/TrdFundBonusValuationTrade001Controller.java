@@ -197,7 +197,7 @@ public class TrdFundBonusValuationTrade001Controller extends BaseController {
         params.setElementId(dto.getElementId());
 
         // 设置流程业务说明, entity即传入的dto
-        params.setComment(entity -> WorkFlowUtil.concatComment("基金交易查询删除：交易编号", entity.getTradeId(),
+        params.setComment(entity -> WorkFlowUtil.concatComment("基金交易删除：交易编号", entity.getTradeId(),
                 "交易日期",DateUtil.format(tradeDto.getTradeDate())
         ));
 

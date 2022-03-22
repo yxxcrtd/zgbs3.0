@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -137,24 +136,24 @@ public class TrdJihuaBonusValuationTrade002Controller extends BaseController {
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
 
-        //设置主键
-        if(!StringUtil.isNotEmpty(dto.getTradeId())){
-            Date sysDate= DateUtil.platDateFromCache();
-            //新建初始化交易编号
-            dto.setTradeId(trdJihuaBonusValuationTrade002Service.createJihuaBonusTradeId());
-        }
+//        //设置主键
+//        if(!StringUtil.isNotEmpty(dto.getTradeId())){
+//            Date sysDate= DateUtil.platDateFromCache();
+//            //新建初始化交易编号
+//            dto.setTradeId(trdJihuaBonusValuationTrade002Service.createJihuaBonusTradeId());
+//        }
 
-        params.setBusinessCode(dto.getTradeId());
+        params.setBusinessCode(dto.getAssetId());
         params.setBusinessType(DictCodeList.共通业务类型_计划类资产_净值型_存续期.getValue());
         if(DictCodeList.交易方向_现金分红.getValue().equals(dto.getPs())){
             // 设置流程业务说明, entity即传入的dto
             params.setComment(
-                    entity -> SpringContextUtil.getTextValue("TrdJihuaBonusValuationTrade002.tradeId")+"("+ entity.getTradeId() +")"+"-"+SpringContextUtil.getTextValue("TrdJihuaBonusValuationTrade002.tradeDate") + "(" + DateUtil.format(entity.getTradeDate()) + ")"
+                    entity -> SpringContextUtil.getTextValue("TrdJihuaBonusValuationTrade002.assetId")+"("+ entity.getAssetId() +")"+"-"+SpringContextUtil.getTextValue("TrdJihuaBonusValuationTrade002.tradeDate") + "(" + DateUtil.format(entity.getTradeDate()) + ")"
             );
         }else{
             // 设置流程业务说明, entity即传入的dto
             params.setComment(
-                    entity -> SpringContextUtil.getTextValue("TrdJihuaBonusValuationTrade002.tradeId")+"("+ entity.getTradeId() +")"+"-"+SpringContextUtil.getTextValue("TrdJihuaBonusValuationTrade002.tradeDate") + "(" + DateUtil.format(entity.getTradeDateReInvest()) + ")"
+                    entity -> SpringContextUtil.getTextValue("TrdJihuaBonusValuationTrade002.assetId")+"("+ entity.getAssetId() +")"+"-"+SpringContextUtil.getTextValue("TrdJihuaBonusValuationTrade002.tradeDate") + "(" + DateUtil.format(entity.getTradeDateReInvest()) + ")"
             );
         }
 

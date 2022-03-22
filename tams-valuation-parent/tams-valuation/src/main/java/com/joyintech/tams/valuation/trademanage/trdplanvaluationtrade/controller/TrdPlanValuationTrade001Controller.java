@@ -210,7 +210,7 @@ public class TrdPlanValuationTrade001Controller extends BaseController {
         params.setElementId(dto.getElementId());
 
         // 设置流程业务说明, entity即传入的dto
-        params.setComment(entity -> WorkFlowUtil.concatComment("计划类资产查询删除：", entity.getTradeId(),
+        params.setComment(entity -> WorkFlowUtil.concatComment("计划类资产删除：", entity.getTradeId(),
                 DateUtil.format(entity.getTradeDate(),DateUtil.DEFAULT_DATETIME_FORMAT)
         ));
 
