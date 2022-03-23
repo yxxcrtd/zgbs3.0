@@ -14,8 +14,8 @@
 			<Cell order="10" name="单位分红净值">unitBonusUnitValue</Cell>
 			<Cell order="11" name="交易份额">dealNumReInvestStr</Cell>
 			<Cell order="12" name="币种">ccyFmt</Cell>
-			<Cell order="13" name="结算金额">settleAmtStr</Cell>
-			<Cell order="14" name="资金账户">myAcctNo</Cell>
+<!--			<Cell order="13" name="结算金额">settleAmtStr</Cell>-->
+			<Cell order="13" name="资金账户">myAcctNo</Cell>
 		</Row>
 	</Worksheet>
 </Workbook>

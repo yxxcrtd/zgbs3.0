@@ -112,6 +112,16 @@ public class TrdFundBonusValuationTradeDto extends BaseEntity implements Process
     private Date tradeDate;
 
     /**
+     * 权益登记日
+     */
+    private Date mdate;
+
+    /**
+     * 资金到账日
+     */
+    private Date settleDate;
+
+    /**
      * 分红金额
      */
     @JsonSerialize(using= BigDecimalSerializer.class)
@@ -132,6 +142,11 @@ public class TrdFundBonusValuationTradeDto extends BaseEntity implements Process
      * 交易日期
      */
     private Date tradeDateReInvest;
+
+    /**
+     * 权益登记日
+     */
+    private Date mdateInvest;
 
     /**
      * 分红金额
@@ -323,6 +338,22 @@ public class TrdFundBonusValuationTradeDto extends BaseEntity implements Process
         return DateUtil.format(this.getTradeDate());
     }
 
+    public Date getMdate() {
+        return mdate;
+    }
+
+    public void setMdate(Date mdate) {
+        this.mdate = mdate;
+    }
+
+    public Date getSettleDate() {
+        return settleDate;
+    }
+
+    public void setSettleDate(Date settleDate) {
+        this.settleDate = settleDate;
+    }
+
     public BigDecimal getBonusAmt() {
         return bonusAmt;
     }
@@ -353,6 +384,14 @@ public class TrdFundBonusValuationTradeDto extends BaseEntity implements Process
 
     public void setTradeDateReInvest(Date tradeDateReInvest) {
         this.tradeDateReInvest = tradeDateReInvest;
+    }
+
+    public Date getMdateInvest() {
+        return mdateInvest;
+    }
+
+    public void setMdateInvest(Date mdateInvest) {
+        this.mdateInvest = mdateInvest;
     }
 
     public BigDecimal getBonusAmtReInvest() {

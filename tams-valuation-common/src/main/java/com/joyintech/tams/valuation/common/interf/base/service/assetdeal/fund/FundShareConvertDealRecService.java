@@ -327,6 +327,10 @@ public class FundShareConvertDealRecService {
         }
         //通道代码 = a.通道代码
         result.setChlId(dto.getChannelId());
+        /*add by sunshuaishuai 交易管理 20220323 start*/
+        //资金账户
+        result.setMyAcctNo(dto.getMyAcctNo());
+        /*add by sunshuaishuai 20220323 end*/
         return result;
     }
 

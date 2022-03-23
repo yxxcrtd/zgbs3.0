@@ -1650,7 +1650,7 @@ public class TrdProductDeal extends BaseEntity {
 
     /*add by sunshuaishuai 20220323 交易界面：交易表添加资金账户 start*/
     /**
-     * 指令编号
+     * 资金账户
      */
     private String myAcctNo;
 

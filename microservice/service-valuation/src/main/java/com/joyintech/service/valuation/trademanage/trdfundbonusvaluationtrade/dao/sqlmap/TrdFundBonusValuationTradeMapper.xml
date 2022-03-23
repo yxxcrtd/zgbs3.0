@@ -20,11 +20,9 @@
 			t.SHARE_AMT dealNumStrengthen,/**交易份额**/
 			t.UNIT_CPRICE unitBonusUnitValue,/**单位净值**/
 			t.CCY ccy,/**币种**/
-			stl.SETTLE_AMT settleAmt,/**结算金额**/
-			stl.SETTLE_AMT settleAmtReInvest,/**结算金额**/
-			stl.MY_ACCT_NO myAcctNo,/**资金账户**/
-			stl.MY_ACCT_NO myAcctNoReInvest,/**资金账户**/
-			stl.MY_ACCT_NO myAcctNoStrengthen/**资金账户**/
+			t.MY_ACCT_NO myAcctNo,/**资金账户**/
+			t.MY_ACCT_NO myAcctNoReInvest,/**资金账户**/
+			t.MY_ACCT_NO myAcctNoStrengthen/**资金账户**/
 		FROM TRD_PRODUCT_DEAL t
 		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
 		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE  in( '06','07')
@@ -93,22 +91,22 @@
 			t.PS ps,/**交易方向**/
 			<if test="ps == 'T11' ">
 				t.TRADE_DATE tradeDate,/**交易日期**/
+				t.MDATE mdate,/*权益登记日*/
+				t.SETTLE_DATE settleDate,/*资金到账日*/
 				t.TRADE_AMT bonusAmt,/**分红金额**/
-				stl.MY_ACCT_NO    myAcctNo,/**资金账户**/
-				stl.SETTLE_AMT    settleAmt/**结算金额**/
+				t.MY_ACCT_NO    myAcctNo/**资金账户**/
 			</if>
 			<if test="ps == 'T12' ">
 				t.TRADE_DATE tradeDateReInvest,/**交易日期**/
+				t.MDATE mdateInvest,/*权益登记日*/
 				t.PRIN_AMT bonusAmtReInvest,/**分红金额**/
 				t.SHARE_AMT dealNumReInvest,/**交易份额**/
-				t.UNIT_CPRICE unitBonusUnitValue,/**单位净值**/
-				stl.SETTLE_AMT    settleAmtReInvest,/**结算金额**/
-				stl.MY_ACCT_NO    myAcctNoReInvest/**资金账户**/
+				t.UNIT_CPRICE unitBonusUnitValue/**单位净值**/
 			</if>
 			<if test="ps == 'C3' or ps == 'C6'">
 				t.TRADE_DATE tradeDateStrengthen,/**交易日期**/
 				t.SHARE_AMT dealNumStrengthen,/**交易份额**/
-				stl.MY_ACCT_NO    myAcctNoStrengthen/**资金账户**/
+				t.MY_ACCT_NO    myAcctNoStrengthen/**资金账户**/
 			</if>
 		FROM TRD_PRODUCT_DEAL t
 		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id

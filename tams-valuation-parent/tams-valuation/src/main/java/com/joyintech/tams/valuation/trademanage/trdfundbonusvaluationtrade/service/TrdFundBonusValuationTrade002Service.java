@@ -284,8 +284,7 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
         valCashBonusTrade.setActBounsAmt(dto.getBonusAmt());//实际分红金额
         valCashBonusTrade.setDataActionSign("01");//数据动作标志
         valCashBonusTrade.setIsClean("N");//有无清算指令
-        //valCashBonusTrade.setMdate();//分红截止日
-        valCashBonusTrade.setSettleDate(dto.getTradeDate());
+
         valCashBonusTrade.setTradeMarket(dto.getTradeMarket());
 
         return valCashBonusTrade;
@@ -305,6 +304,7 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
         valBonusResTrade.setBonusDate(dto.getTradeDateReInvest());//红利再投日
         valBonusResTrade.setBonusNet(dto.getUnitBonusUnitValue());//红利再投净值
         valBonusResTrade.setBonusShare(dto.getDealNumReInvest());//红利再投份额
+        valBonusResTrade.setMdate(dto.getMdateInvest());//分红截止日
 
         valBonusResTrade.setDataActionSign("01");
         valBonusResTrade.setIsClean("N");
@@ -327,7 +327,7 @@ public class TrdFundBonusValuationTrade002Service extends CommonExportService<Tr
         valFundShareConvert.setBusiType("06");//业务类型
         valFundShareConvert.setDataActionSign("01");
         valFundShareConvert.setIsClean("N");//有无清算指令
-
+        valFundShareConvert.setMyAcctNo(dto.getMyAcctNoStrengthen());
         return valFundShareConvert;
     }
 

@@ -52,15 +52,15 @@
     };
 
     //现金分红 结算金额 默认等于分红金额
-    var settleAmt = function(){
-        var bonusAmt = $('#bonusAmt').val();
-        if(bonusAmt != null && bonusAmt != ''){
-            $('#settleAmt').val(bonusAmt).trigger('blur');
-        }else{
-            $('#settleAmt').val('');
-        }
-
-    }
+    // var settleAmt = function(){
+    //     var bonusAmt = $('#bonusAmt').val();
+    //     if(bonusAmt != null && bonusAmt != ''){
+    //         $('#settleAmt').val(bonusAmt).trigger('blur');
+    //     }else{
+    //         $('#settleAmt').val('');
+    //     }
+    //
+    // }
 
     //红利再投 单位分红净值=分红金额/分红份额
     var unitBonusUnitValueChange = function(){
@@ -76,15 +76,15 @@
     }
 
     //红利再投 结算金额 默认等于分红金额
-    var settleAmtReInvest = function(){
-        var bonusAmtReInvest = $('#bonusAmtReInvest').val();
-        if(bonusAmtReInvest != null && bonusAmtReInvest != ''){
-            $('#settleAmtReInvest').val(bonusAmtReInvest).trigger('blur');
-        }else{
-            $('#settleAmtReInvest').val('');
-        }
-
-    }
+    // var settleAmtReInvest = function(){
+    //     var bonusAmtReInvest = $('#bonusAmtReInvest').val();
+    //     if(bonusAmtReInvest != null && bonusAmtReInvest != ''){
+    //         $('#settleAmtReInvest').val(bonusAmtReInvest).trigger('blur');
+    //     }else{
+    //         $('#settleAmtReInvest').val('');
+    //     }
+    //
+    // }
 
     /**
      * 保存或提交
@@ -126,7 +126,7 @@
         //红利再投 单位分红净值=分红金额/分红份额
         $('#bonusAmtReInvest').change(function(){
             unitBonusUnitValueChange();
-            settleAmtReInvest();
+            // settleAmtReInvest();
         });
         $('#dealNumReInvest').change(function(){
             unitBonusUnitValueChange();

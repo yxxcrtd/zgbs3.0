@@ -42,11 +42,11 @@ $(function(){
             ,{field:'tradeDateStr',width:150, title: '交易日期',sortField:'tradeDate'}
             ,{field:'tradeDate',  title: '交易日期', visible: false}
             ,{field:'bonusAmt', width:150, title: '分红金额',type:'number'}
-            ,{field:'unitBonusUnitValue', width:150, title: '单位分红净值',type:'number'}
+            ,{field:'unitBonusUnitValue', width:150, title: '单位分红净值',type:'number',digit: '4'}
             ,{field:'dealNumReInvest', width:150, title: '交易份额',type:'number'}
             ,{field:'ccyFmt', title: '币种',sortField:"ccy",width:180}
             ,{field:'ccy', title: '币种',visible:false}
-            ,{field:'settleAmt', width:150, title: '结算金额',type:'money'}
+            // ,{field:'settleAmt', width:150, title: '结算金额',type:'money'}
             ,{field:'myAcctNo', title: '资金账户',width:180}
             ,{field:'operation', title: 'SysCommon.operation', type:'action', buttons: ['edit', 'delt']}
         ]

@@ -68,14 +68,3 @@ insert into sys_wfl_business_module (PAGE_ID, ELEMENT_ID, MODULE_ID, CREATE_USER
 values ('TrdFundBonusValuationTrade002', 'TrdFundBonusValuationTrade001_btn_delete', 'oneApproval', 'system', null, sysdate, 'system', sysdate, 'ALL', '02');
 
 
-
-
-/*基金存续期-4位数的交易编号，序列*/
-DROP SEQUENCE FUNDBONUSTRADEID_SEQUENCE;
--- Create sequence
-create sequence FUNDBONUSTRADEID_SEQUENCE
-minvalue 1
-maxvalue 9999
-start with 1
-increment by 1
-cache 20;
