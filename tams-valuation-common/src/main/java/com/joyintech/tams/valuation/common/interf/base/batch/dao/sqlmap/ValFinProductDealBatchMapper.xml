@@ -57,6 +57,9 @@
         <!-- add by wujie on 20190420 end -->
 
         <result column="B_TRADE_ID" property="bTradeId" jdbcType="VARCHAR" />
+        <!-- add by sunshuaishuai on 20220323 start -->
+        <result column="MY_ACCT_NO" property="myAcctNo" jdbcType="VARCHAR" />
+        <!-- add by sunshuaishuai on 20220323 end -->
     </resultMap>
     <sql id="Base_Column_List" >
         TRADE_ID TRADE_ID, BUSI_TYPE BUSI_TYPE, FINPROD_ID FINPROD_ID, FINPROD_TYPE FINPROD_TYPE,
@@ -77,6 +80,9 @@
         ,PAY_DATE
         <!-- add by wujie on 20190420 end -->
         ,B_TRADE_ID
+        <!-- add by sunshuaishuai on 20220323 start -->
+        ,MY_ACCT_NO
+        <!-- add by sunshuaishuai on 20220323 end -->
     </sql>
     <insert id="insertBatch" parameterType="java.util.List" >
         insert into TRD_PRODUCT_DEAL (TRADE_ID, BUSI_TYPE, FINPROD_ID,
@@ -102,6 +108,9 @@
         <!-- add by wujie on 20190420 end -->
         ,B_TRADE_ID
         ,ACCR_NUM
+        <!-- add by sunshuaishuai on 20220323 start -->
+        ,MY_ACCT_NO
+        <!-- add by sunshuaishuai on 20220323 end -->
         )
         <foreach collection="list" item="item" separator="from dual union all select" open="select * from (select "
                  close=" from dual)">
@@ -129,6 +138,9 @@
             <!-- add by wujie on 20190420 end -->
             ,#{item.bTradeId,jdbcType=VARCHAR}
             ,#{item.accrNum,jdbcType=DECIMAL}
+            <!-- add by sunshuaishuai on 20220323 start -->
+            ,#{item.myAcctNo,jdbcType=VARCHAR}
+            <!-- add by sunshuaishuai on 20220323 end -->
         </foreach>
     </insert>
 
@@ -157,6 +169,9 @@
         ,PAY_DATE
         <!-- add by wujie on 20190420 end -->
         ,B_TRADE_ID
+        <!-- add by sunshuaishuai on 20220323 start -->
+        ,MY_ACCT_NO
+        <!-- add by sunshuaishuai on 20220323 end -->
         ) VALUES(
         #{tradeId,jdbcType=VARCHAR}, #{busiType,jdbcType=VARCHAR}, #{finprodId,jdbcType=VARCHAR},
         #{finprodType,jdbcType=VARCHAR}, #{branch,jdbcType=DECIMAL}, #{tradeDate,jdbcType=DATE},
@@ -181,6 +196,9 @@
         ,#{payDate,jdbcType=DATE}
         <!-- add by wujie on 20190420 end -->
         , #{bTradeId,jdbcType=VARCHAR}
+        <!-- add by sunshuaishuai on 20220323 start -->
+        ,#{myAcctNo,jdbcType=VARCHAR}
+        <!-- add by sunshuaishuai on 20220323 end -->
         )
     </insert>
 </mapper>
