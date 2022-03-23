@@ -1610,11 +1610,11 @@ public class BookAccountGenLogicNew {
             // 定义 变量.辅助核算项 = 会计场景.默认辅助核算项
             SubjectMappingConfig mappingConfig = new SubjectMappingConfig();
             if(subjectMappingConfigDefault != null){
-                mappingConfig = subjectMappingConfigDefault;
+                BeanUtil.copyPropertiesIgnoreNull(mappingConfig, subjectMappingConfigDefault);
             }
             // 若场景中辅助核算项map不为空，且匹配上，则根据内部科目编码获取对应辅助核算项
             if(subjectMappingConfigMap != null && subjectMappingConfigMap.get(accountEntry.getSubjectId()) != null){
-                mappingConfig = subjectMappingConfigMap.get(accountEntry.getSubjectId());
+                BeanUtil.copyPropertiesIgnoreNull(mappingConfig, subjectMappingConfigMap.get(accountEntry.getSubjectId()));
             }
             // 若费用类型字段为空值，则初始化赋值
             if(mappingConfig.getFeeType() == null){

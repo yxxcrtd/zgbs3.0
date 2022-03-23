@@ -118,3 +118,7 @@ delete from BOK_SCENESUBJECT where FORM_ELE is null;
 alter table BOK_SCENESUBJECT  DROP PRIMARY KEY ;
 alter table BOK_SCENESUBJECT add constraint PK_BOK_SCENESUBJECT primary key (BOOKSET_ID, SCENE_NODE_ID, SUBJECT_NO, FORM_ELE, CD_FLAG, BOK_DETAIL_ID);
 ------------------------add by weipeng on 20220309 场景科目关系配置表主键修改 end---------------------------
+
+------------------------add by weipeng on 20220323 修改BOK_ASSET_MARKET_INFO表字段MARKET_CODE长度与FINPROD_ID长度一致，跑批报错 start---------------------------
+alter table BOK_ASSET_MARKET_INFO MODIFY MARKET_CODE VARCHAR2(50);
+------------------------add by weipeng on 20220323 修改BOK_ASSET_MARKET_INFO表字段MARKET_CODE长度与FINPROD_ID长度一致，跑批报错 end---------------------------
