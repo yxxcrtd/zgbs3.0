@@ -183,7 +183,7 @@ public class SecLendDrawBookDetailNewService {
             // 基本科目属性： case '债券借贷融入' then '贷方' else '借方'
             // 期待余额方向： case '债券借贷融入' then '应付债券借贷借入费' else '应收债券借贷费用
             if (DictCodeListExt1.金融产品类型_债券借贷融入.getValue().equals(dto.getBusiDetailType())) {
-                baseSubjectNature = DictCodeBaseSubjectNatrueNew.应收利息_融入.getValue();
+                baseSubjectNature = DictCodeBaseSubjectNatrueNew.应付利息_融入.getValue();
                 expBalanceDirect = DictCodeList.余额方向_贷方.getValue();
             }
             else {

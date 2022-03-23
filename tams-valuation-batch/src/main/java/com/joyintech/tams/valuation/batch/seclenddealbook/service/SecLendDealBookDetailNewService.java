@@ -21,6 +21,7 @@ import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.Boo
 import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookCommonLogic;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.AccountDriver;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGenerateResult;
+import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.SubjectMappingConfig;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.TreeNode;
 import com.joyintech.tams.valuation.batch.common.base.entity.extcommon.ValBokBookdetailBatch;
 import com.joyintech.tams.valuation.batch.common.calculation.entity.DealTypesFeeDto;
@@ -29,7 +30,10 @@ import com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dto.FinProduc
 import com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dto.FinProductDealInfoResult;
 import com.joyintech.tams.valuation.batch.common.finproduct.service.FinProductCommonService;
 import com.joyintech.tams.valuation.common.batch.finproduct.entity.TradeInfoDto;
-import com.joyintech.tams.valuation.common.constants.*;
+import com.joyintech.tams.valuation.common.constants.BookConstant;
+import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrueNew;
+import com.joyintech.tams.valuation.common.constants.GlobalConstant;
+import com.joyintech.tams.valuation.common.constants.ValDictCodeList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -155,7 +159,7 @@ public class SecLendDealBookDetailNewService {
             finprodTypeNow = dealDto.getFinprodType();
             if(finprodTypeNow.equals(DictCodeListExt1.金融产品类型_债券借贷融入.getValue())){
                 expBalanceDirect = DictCodeList.余额方向_贷方.getValue();
-                baseSubjectNature = DictCodeBaseSubjectNatrueNew.应收利息_融入.getValue();
+                baseSubjectNature = DictCodeBaseSubjectNatrueNew.应付利息_融入.getValue();
             }
             // 应计利息类科目余额
             SubjectBalance subjectBalanceForfit = this.getSubjectBalance(booksetIdNow, bokDetailIdNow,
@@ -188,7 +192,7 @@ public class SecLendDealBookDetailNewService {
             
             String finprodTypeName = SysDataUtil.getNameFromDataDict(DictCode.金融产品类型, dealDto.getFinprodType());
             String psName = SysDataUtil.getNameFromDataDict(DictCode.交易方向, dealDto.getPs());
-            
+
             if (DictCodeList.交易方向_买入.getValue().equals(dealDto.getPs())) {// 交易方向 - 买入
                 ad.setTableId(getTableId(dealDto.getPs(), finprodTypeNow, null));// ad.会计场景代码
                 accountSceneMap.put(BookConstant.BOOK_REMARK, finprodTypeName + psName + "交易登账"); // 金融产品类型+交易方向+"交易登账"
@@ -260,6 +264,7 @@ public class SecLendDealBookDetailNewService {
                     }else{
                         accountAmountMap.put(BookConstant.DSCLOSS_C, jdfce.multiply(new BigDecimal("-1")));// 借贷费差额_贷 
                     }
+
                     rtnResult = doGenAccount(rtnResult, dealDto, batchExecuteInfo, ad, accountSceneMap, accountAmountMap);
                     
                     // -------------------- 账务处理2:
@@ -324,9 +329,16 @@ public class SecLendDealBookDetailNewService {
         ad.setAccountAmountMap(accountAmountMap);// 记账金额要素
         ad.setAccountCurrencyMap(accountCurrencyMap);// 记账金额币种要素
 
-        // add by weipeng on 20220321：增加辅助核算项配置 start
-        ad.setSubjectMappingConfigDefault(dealDto.getSubjectMappingConfig());
-        // add by weipeng on 20220321：增加辅助核算项配置 end
+        // add by weipeng on 20220323 增加辅助核算项配置项 start
+        SubjectMappingConfig mappingConfig = dealDto.getSubjectMappingConfig();
+        if (DictCodeList.交易方向_买入.getValue().equals(dealDto.getPs())) {
+            //辅助核算项配置.费用类型 = 结算手续费
+            mappingConfig.setFeeType(DictCodeListExt1.一次性费用类型_结算手续费.getValue());
+            //辅助核算项配置.登记托管机构 = 登记托管机构
+            mappingConfig.setRegistOrg(dealDto.getRegistOrg());
+        }
+        ad.setSubjectMappingConfigDefault(mappingConfig);
+        // add by weipeng on 20220323 增加辅助核算项配置项 end
 
         // 记账凭证生成
         BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, batchExecuteInfo);

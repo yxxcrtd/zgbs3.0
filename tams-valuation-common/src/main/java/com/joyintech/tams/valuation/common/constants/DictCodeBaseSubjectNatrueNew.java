@@ -414,8 +414,8 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
     利息收入_融出(
         "LXSR_RC"
     ),
-    应收利息_融入(
-        "YSLX_RR"
+    应付利息_融入(
+        "YFLX_RR"
     ),
     利息收入_融入(
         "LXSR_RR"
@@ -425,6 +425,13 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
     ),
     期付债券本金(
         "QFZQBJ"
+    ),
+
+    /**
+     * 公允价值损益类_公允价值变动
+     */
+    公允价值损益类_利息调整(
+        "GYJZSYL_LXTZ"
     ),
     /** ==========新增科目性质======== end**/
     /** add by weipeng on 20220113 估值系统产品3.0.4批处理科目性质改造 end **/
