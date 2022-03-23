@@ -296,11 +296,11 @@ public class TrdBondTradeValidator implements BeanValidator {
                         resultList.add(new ValidMessage("cprice",
                                 getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.cprice"))));
                     }
-                    // 汇率日期
-                    if(!StringUtil.isNotEmpty(dto.getExchangeDate())){
-                        resultList.add(new ValidMessage("exchangeDate",
-                                getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.exchangeDate"))));
-                    }
+//                    // 汇率日期
+//                    if(!StringUtil.isNotEmpty(dto.getExchangeDate())){
+//                        resultList.add(new ValidMessage("exchangeDate",
+//                                getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.exchangeDate"))));
+//                    }
                     // 经手费
                     if(!StringUtil.isNotEmpty(dto.getBrokerage())){
                         resultList.add(new ValidMessage("brokerage",

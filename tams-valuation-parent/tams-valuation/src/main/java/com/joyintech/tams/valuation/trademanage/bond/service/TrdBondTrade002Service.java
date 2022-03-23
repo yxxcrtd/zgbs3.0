@@ -137,9 +137,10 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTradeDto>
         valSecVestAssetDeal.setIsStlFeeAmt("N");//结算手续费是否随交易支付
         valSecVestAssetDeal.setIsChlFeeAmt("Y");//通道费是否随交易支付
         valSecVestAssetDeal.setRegistAgency(null);//登记结算机构
-        valSecVestAssetDeal.setIsClean("N");//有无清算指令
+        valSecVestAssetDeal.setIsClean("Y");//有无清算指令
         valSecVestAssetDeal.setExeYield(new BigDecimal(0));//行权收益率
         valSecVestAssetDeal.setSharesTradeMarket("02");//流通市场
+        valSecVestAssetDeal.setIsOtherAmt("N");
         if(DictCodeList.交易方向_申购.getValue().equals(trdBondTradeDto.getPs())){
             valSecVestAssetDeal.setMyAcctNo(trdBondTradeDto.getMyAcctNo_sq());
         }else if(DictCodeList.交易方向_申购确认.getValue().equals(trdBondTradeDto.getPs())){

@@ -50,7 +50,7 @@ $(function(){
             ,{field:'tradeDateStr',width:150, title: '交易日期',sortField:'tradeDate'}
             ,{field:'tradeDate',  title: '交易日期', visible: false}
             ,{field:'tradeAmt', width:150, title: '交易金额',type:'money'}
-            ,{field:'dealNum', width:150, title: '交易份额',type:'money'}
+            ,{field:'dealNum', width:150, title: '交易份额',type:'number'}
             ,{field:'ccyFmt', title: '币种',sortField:"ccy",width:180}
             ,{field:'ccy', title: '币种',visible:false}
             ,{field:'settleDateStr',width:150, title: '结算日期',sortField:'settleDate'}

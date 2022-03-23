@@ -25,12 +25,10 @@
             }
         },
         dblclick:function(table, data) {
-            Joyin.dialog(JoyinUtil.getLabel("债券存续期管理查看："),
-                JoyinUtil.getRealPath("/valuation/trademanage/trdbondvaluationduration/TrdBondValuationDuration002/init"),
-                "90%", "90%", {pageModel:PAGE_MODEL_REFERENCE,tradeId:data.tradeId,prodId:data.finprodId,ps:data.ps},
-                function(){
-                    //table.reload();
-                });
+            Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+                basePath + "valuation/trademanage/trdbondvaluationduration/TrdBondValuationDuration002/init",
+                "95%", "90%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
+                    tradeId:data.tradeId,ps:data.ps});
         },
         cols:[
             {field:'tradeId', title: '交易编号',width:220},
