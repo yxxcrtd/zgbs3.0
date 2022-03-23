@@ -9,7 +9,7 @@
             <Cell order="5" name="资产名称">finprodName</Cell>
             <Cell order="6" name="交易类型">psStr</Cell>
             <Cell order="7" name="交易日期">tradeDateStr</Cell>
-            <Cell order="8" name="计划支付日">planPayDateStr</Cell>
+            <Cell order="8" name="计息结束日">endDateStr</Cell>
             <Cell order="9" name="实际支付日">payDateStr</Cell>
             <Cell order="10" name="实收利息">actIntStr</Cell>
             <Cell order="11" name="实收本金">actCapiStr</Cell>

@@ -187,6 +187,7 @@ public class TrdDepositValuationTrade002Service extends CommonExportService<TrdD
         entity.setChlFeeAmt(null);
         entity.setIsChlFeeAmt("N");
         entity.setChannelId(null);
+        entity.setMyAcctNo(dto.getTrdAcctId());  //资金账户
 //        entity.setTrdFee(new BigDecimal(222.1));
 
 

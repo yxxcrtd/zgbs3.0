@@ -91,9 +91,9 @@ public class TrdDepoValuationDuration001Dto extends BaseEntity implements Proces
     private String ps;
 
     /**
-     * 计划支付日
+     * 计息结束日
      */
-    private Date planPayDate;
+    private Date endDate;
 
     /**
      * 实际支付日
@@ -232,13 +232,13 @@ public class TrdDepoValuationDuration001Dto extends BaseEntity implements Proces
         this.ps = ps;
     }
 
-    @NotEmpty(fieldName = "TrdDepoValuationDuration002.planPayDate", groups = {ValidateGroupEdit.class})
-    public Date getPlanPayDate() {
-        return planPayDate;
+    @NotEmpty(fieldName = "TrdDepoValuationDuration002.endDate", groups = {ValidateGroupEdit.class})
+    public Date getEndDate() {
+        return endDate;
     }
 
-    public void setPlanPayDate(Date planPayDate) {
-        this.planPayDate = planPayDate;
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 
     @NotEmpty(fieldName = "TrdDepoValuationDuration002.payDate", groups = {ValidateGroupEdit.class})
@@ -341,15 +341,15 @@ public class TrdDepoValuationDuration001Dto extends BaseEntity implements Proces
     }
 
 
-    //导出转化计划支付日
-    private  String planPayDateStr;
+    //导出转化计息结束日
+    private  String endDateStr;
 
-    public String getPlanPayDateStr() {
-        String planPayDateStr=" ";
-        if(getPlanPayDate() !=null){
-            planPayDateStr=DateUtil.format(getPlanPayDate());
+    public String getEndDateStr() {
+        String endDateStr=" ";
+        if(getEndDate() !=null){
+            endDateStr=DateUtil.format(getEndDate());
         }
-        return planPayDateStr;
+        return endDateStr;
     }
 
     //导出转化实际支付日

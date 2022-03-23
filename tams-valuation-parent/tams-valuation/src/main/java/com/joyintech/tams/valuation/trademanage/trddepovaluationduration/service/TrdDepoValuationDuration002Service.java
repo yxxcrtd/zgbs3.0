@@ -106,8 +106,7 @@ public class TrdDepoValuationDuration002Service extends BaseService<TrdDepoValua
         entity.setDataActionSign("01");//数据动作标志
         entity.setDealType(dto.getPs()); //交易类型
         entity.setVdate(new Date());//计息开始日
-        entity.setEndDate(new Date());//计息结束日
-        entity.setPlanPayDate(dto.getPlanPayDate()); //计划支付日
+        entity.setEndDate(dto.getEndDate());//计息结束日
         entity.setPayDate(dto.getPayDate()); //实际支付日
         entity.setActInt(dto.getActInt()); //实收利息
         entity.setActCapi(dto.getActCapi());//实收本金
@@ -116,7 +115,7 @@ public class TrdDepoValuationDuration002Service extends BaseService<TrdDepoValua
         entity.setCcy(dto.getCcy());//币种
         entity.setTradeId(dto.getTradeId());  //交易编号
         entity.setIsClean("Y");//有无清算指令
-
+        entity.setMyAcctNo(dto.getTrdAcctId());  //资金账户
         listValBotPeriodFund.add(entity);
         TemplateOrderInfoReaderResult acctEntity = new TemplateOrderInfoReaderResult();
         Date date = new Date();

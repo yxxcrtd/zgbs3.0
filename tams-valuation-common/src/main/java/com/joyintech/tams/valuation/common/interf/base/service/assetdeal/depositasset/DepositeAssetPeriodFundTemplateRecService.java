@@ -557,6 +557,8 @@ public class DepositeAssetPeriodFundTemplateRecService {
         valFinProductDeal.setIsClean(dto.getIsClean2());
         // 关联系统交易编号 = B.成交编号
         valFinProductDeal.setfTradeId(dto.getTradeId());
+		//接口添加 资金账户=A.资金账户  yc
+		valFinProductDeal.setMyAcctNo(dto.getMyAcctNo());
         // 创建时间 = 系统时间
         valFinProductDeal.setCreateTime(dto.getCreateTime());
         if(valFinProductDeal.getTradeStatus().equals(DictCodeListExt1.交易状态_撤销.getValue())){
@@ -640,6 +642,8 @@ public class DepositeAssetPeriodFundTemplateRecService {
          valFinProductDeal.setfTradeId(dto.getTradeId());
          // 创建时间 = 系统时间
          valFinProductDeal.setCreateTime(dto.getCreateTime());
+		 //接口添加 资金账户=A.资金账户  yc
+		 valFinProductDeal.setMyAcctNo(dto.getMyAcctNo());
          if (DictCodeList.交易方向_还本到账.getValue().equals(bookType)){
         	  //交易份额 = B.实收本金
              valFinProductDeal.setShareAmt(dto.getActCapi());

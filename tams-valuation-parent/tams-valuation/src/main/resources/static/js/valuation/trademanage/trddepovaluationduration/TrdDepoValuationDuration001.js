@@ -66,8 +66,8 @@
             ,{field:'ps', title: '交易类型',visible:false}
             ,{field:'tradeDateStr', width:150,  title: '交易日期',sortField:'tradeDate'}
             ,{field:'tradeDate',title: '交易日期',visible:false}
-            ,{field:'planPayDateStr', width:150,  title: '计划支付日',sortField:'planPayDate'}
-            ,{field:'planPayDate', title: '计划支付日',visible:false}
+            ,{field:'endDateStr', width:150,  title: '计息结束日',sortField:'planPayDate'}
+            ,{field:'endDate', title: '计息结束日',visible:false}
             ,{field:'payDateStr', width:150,  title: '实际支付日',sortField:'payDate'}
             ,{field:'payDate', title: '实际支付日',visible:false}
             ,{field:'actIntStr', width:150, title: '实收利息',type:'number',sortField:'actInt'}

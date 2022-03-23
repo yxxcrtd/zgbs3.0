@@ -495,6 +495,10 @@ public class DepositeAssetAstDealTemplateRecService {
         valFinProductDeal.setIsClean(InterfCommonConstant.是否结清_默认);
         // 交易对手 = A.交易对手
         valFinProductDeal.setCounterId(dto.getCounterId());
+        //接口添加 资金账户=A.资金账户  yc
+        valFinProductDeal.setMyAcctNo(dto.getMyAcctNo());
+
+
 //        // 交易对手类型 = 根据交易对手到客户信息表中查询获取
 //        MstCustomerInfo valCustomerInfo = valCustomerInfoMapper.selectByPrimaryKey(
 //            dto.getCounterId());
