@@ -188,7 +188,7 @@ public class RepoNDealDrawBookDetailProcessNewService {
             // 基础科目性质 : 成本
             String baseSubjectNatureCB = DictCodeBaseSubjectNatrueNew.买入返售金融资产_成本.getValue();
             String baseSubjectNatureYjlx = DictCodeBaseSubjectNatrueNew.买入返售金融资产_应计利息.getValue();
-            if(dealInfoForTarget.getOFinprodType().equals(DictCodeListExt1.金融产品类型_债券买断式正回购.getValue())){
+            if(dealInfoForTarget.getOFinprodType().equals(DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())){
                 baseSubjectNatureCB = DictCodeBaseSubjectNatrueNew.卖出回购金融资产_成本.getValue();
                 baseSubjectNatureYjlx = DictCodeBaseSubjectNatrueNew.卖出回购金融资产_应计利息.getValue();
             }
