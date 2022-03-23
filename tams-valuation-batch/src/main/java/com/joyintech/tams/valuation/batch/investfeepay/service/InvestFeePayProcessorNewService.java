@@ -753,6 +753,10 @@ public class InvestFeePayProcessorNewService {
 		mappingConfig.setTradeMarket(item.getTradeMarket());
 		// 资金账户类型
 		mappingConfig.setAccountType(item.getAcctType());
+		// 费用类型 = 费用明细.费用类型（投资端其他费用）
+		mappingConfig.setFeeType(item.getFeeType());
+		// 现金流二级类型  = 费用明细.费用类型（产品端费用）
+		mappingConfig.setCashType2(item.getFeeType());
 
 		// 1）共通元素设置
 		// 初始化定义 - 记账场景要素管理
@@ -810,8 +814,6 @@ public class InvestFeePayProcessorNewService {
 			BokFeeTableSet feeSet = listFeeTableSet.get(0);
 			List<BokSubject> bokSubjectList = subjectMap.get(feeSet.getBaseSubjectNature());
 			// add by weipeng on 20220316 增加辅助核算项配置信息
-			// 费用类型 = 费用明细.费用类型
-			mappingConfig.setFeeType(feeSet.getFeeTypeId());
 			// 查询参数设值
 			SubjectBalanceSearchDto searchDto = setSubjectBalanceSearchDto(item, feeSet,
 				item.getBokDetailId());
