@@ -11,6 +11,7 @@
 package com.joyintech.service.valuation.trademanage.trdfixincomevaluduration.dao;
 
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.service.valuation.component.common.dto.FinCashPlanDto;
 import com.joyintech.service.valuation.trademanage.trdfixincomevaluduration.dto.TrdFixIncomeValuDuration001Dto;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -64,5 +65,11 @@ public interface TrdFixIncomeValuDuration001Mapper {
 	 */
 	TrdFixIncomeValuDuration001Dto queryTradeInfoByTradeId(String tradeId);
 
+
+	/**
+	 *
+	 * 查询资产付息计划
+	 */
+	List<FinCashPlanDto> getFinCashPlanByProductId(Map<String, Object> paraMap);
 
 }

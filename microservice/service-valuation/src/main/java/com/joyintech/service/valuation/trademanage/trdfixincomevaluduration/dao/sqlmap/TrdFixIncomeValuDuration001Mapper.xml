@@ -2,7 +2,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.joyintech.service.valuation.trademanage.trdfixincomevaluduration.dao.TrdFixIncomeValuDuration001Mapper">
 
-
+	<sql id="FinCashPlan_Base_Column_List" >
+        T1.CASH_ID CASH_ID, T1.MDATE MDATE, T1.CASH_NUM CASH_NUM, T1.CASH_TYPE CASH_TYPE, T1.VDATE_UNADJUST VDATE_UNADJUST,
+        T1.MDATE_UNADJUST MDATE_UNADJUST, T1.PAY_DATE_UNADJUST PAY_DATE_UNADJUST, T1.VDATE VDATE,
+        T1.PAY_DATE PAY_DATE, T1.TERMDAYS TERMDAYS, T1.VDATE_Y VDATE_Y, T1.VDATE_TERM VDATE_TERM, T1.MDATE_TERM MDATE_TERM,
+        T1.TERMDAYS_TERM TERMDAYS_TERM, T1.PRIN_AMT PRIN_AMT, T1.INT_PRIN_AMT INT_PRIN_AMT, T1.INT_AMT INT_AMT,
+        T1.IS_PAY_INT IS_PAY_INT, T1.CASH_AMT CASH_AMT, T1.CASH_BASEAMT CASH_BASEAMT, T1.CASH_UNIT_TYPE CASH_UNIT_TYPE,
+        T1.CALC_FUNCTION CALC_FUNCTION, T1.FREQUENCY FREQUENCY, T1.FINPROD_ID FINPROD_ID, T1.FINPROD_TYPE FINPROD_TYPE,
+        T1.FINPROD_TYPE2 FINPROD_TYPE2, T1.BRANCH BRANCH, T1.PAY_TYPE PAY_TYPE,T1.RANGE_YIELD*100 RANGE_YIELD, T1.CREATE_USER CREATE_USER,
+        T1.CREATE_DEPT CREATE_DEPT, T1.CREATE_TIME CREATE_TIME, T1.UPDATE_USER UPDATE_USER, T1.UPDATE_TIME UPDATE_TIME,T1.REPAY_WITHOUT_INT
+    </sql>
 
 	<resultMap id="portfolioIdMap" type="com.joyintech.framework.select.SelectOptionDto">
 		<id column="id" property="id" jdbcType="VARCHAR"/>
@@ -153,6 +162,26 @@
 		t.BUSI_TYPE ='09'
 		and t.TRADE_ID = #{tradeId,jdbcType=VARCHAR}
 		and rownum=1
+	</select>
+    <select id="getFinCashPlanByProductId" resultType="com.joyintech.service.valuation.component.common.dto.FinCashPlanDto">
+		SELECT
+		<include refid="com.joyintech.service.valuation.trademanage.trdfixincomevaluduration.dao.TrdFixIncomeValuDuration001Mapper.FinCashPlan_Base_Column_List" />
+		,T2.CASH_TYPE_2
+		FROM
+		FIN_CASH_PLAN T1,
+		FIN_CASH_INFO T2
+		WHERE
+		T2.CASH_ID = T1.CASH_ID
+		<if test="finprodId != null and finprodId != ''">
+			AND T2.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+		</if>
+		<if test="cashType != null and cashType != ''">
+			AND T2.CASH_TYPE_2 = #{cashType,jdbcType=VARCHAR}
+		</if>
+		<if test="finprodType != null and finprodType != ''">
+			AND T2.FINPROD_TYPE = #{finprodType,jdbcType=VARCHAR}
+		</if>
+		ORDER BY T1.VDATE ASC
 	</select>
 
 

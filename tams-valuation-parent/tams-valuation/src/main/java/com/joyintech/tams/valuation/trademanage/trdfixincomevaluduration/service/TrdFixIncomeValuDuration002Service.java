@@ -6,13 +6,16 @@ package com.joyintech.tams.valuation.trademanage.trdfixincomevaluduration.servic
 
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 import com.joyintech.tams.valuation.common.interf.base.dto.PlannedAssetDealCommonResult;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.mngasset.PlannedPeriodTradeTemplateRecService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValMngPeriodTrade;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValSecVestPeriod;
+import com.joyintech.tams.valuation.component.common.dto.FinCashPlanDto;
 import com.joyintech.tams.valuation.trademanage.trdfixincomevaluduration.dto.TrdFixIncomeValuDuration001Dto;
 import com.joyintech.tams.valuation.trademanage.trdfixincomevaluduration.dto.TrdFixIncomeValuDurationResult;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -90,16 +93,31 @@ public class TrdFixIncomeValuDuration002Service extends BaseService<TrdFixIncome
         entity.setAssetName(dto.getFinprodName()); //资产名称
         entity.setDataActionSign("01");//数据动作标志
         entity.setDealType(dto.getPs());//交易类型
-        entity.setIsInt("Y"); //是否还本带息
-        entity.setVdate(new Date()); //计息开始日
-        entity.setMdate(new Date()); //计息结束日
-        entity.setPlanPayDate(new Date()); //计划
+        if(DictCodeList.交易方向_收息.getValue().equals(dto.getPs()) && dto.getActInt().compareTo(new BigDecimal(0))==1 ){
+            entity.setIsInt("Y");
+        }else{
+            entity.setIsInt("N");//是否还本带息 交易方向为还本，应收利息是否为0，不为0，isAmt为Y
+        }
+        //查询债券的付息计划
+        Map<String,Object> hashMap = new HashMap<>();
+        hashMap.put("finprodId",entity.getAssetId());
+        List<FinCashPlanDto> list = getFinCashPlanByProductId(hashMap);
+        if(!StringUtil.isEmptyList(list)){
+            entity.setVdate(list.get(0).getVdate());//计息开始日 根据标的信息查询
+            entity.setMdate(list.get(0).getMdate());//计息结束日 根据标的信息查询
+        }else{
+            entity.setVdate(DateUtil.parse(DateUtil.getSysDate()));//计息开始日 根据标的信息查询
+            entity.setMdate(DateUtil.parse(DateUtil.getSysDate()));//计息结束日 根据标的信息查询
+        }
+//        entity.setVdate(new Date()); //计息开始日
+//        entity.setMdate(new Date()); //计息结束日
+//        entity.setPlanPayDate(dto.getTradeDate()); //计划
         entity.setPayDate(dto.getTradeDate()); //实际支付日  (取交易日)
         entity.setActInt(dto.getActInt()); //实收利息
         entity.setActCapi(dto.getActCapi()); //实收本金
         entity.setDealAmt(dto.getActInt().add(dto.getActCapi())); //交易金额=实收本金+实收利息
         entity.setInvAim(dto.getInvAim()); //投资目的=会计分类
-        entity.setParValue(new BigDecimal(100.00)); //单位面值
+        entity.setParValue(new BigDecimal(0)); //单位面值
         entity.setSettleDate(dto.getSettleDate()); //交割日 =settleDate
         entity.setIsClean2(dto.getIsClean2());//是否结清
         entity.setCcy(dto.getCcy());//币种
@@ -136,4 +154,14 @@ public class TrdFixIncomeValuDuration002Service extends BaseService<TrdFixIncome
     }
 
 
+    /**
+     * 查询计划类资产付息计划
+     *
+     * @return 产品代码列表
+     * @see
+     * @since 1.0
+     */
+    public List<FinCashPlanDto> getFinCashPlanByProductId(Map<String,Object> param){
+        return restTemplate.postForList(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdFixIncomeValuDuration001/getFinCashPlanByProductId",param,FinCashPlanDto.class);
+    }
 }

@@ -14,6 +14,7 @@ import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.service.valuation.component.common.dto.FinCashPlanDto;
 import com.joyintech.service.valuation.trademanage.trdfixincomevaluduration.dto.TrdFixIncomeValuDuration001Dto;
 import com.joyintech.service.valuation.trademanage.trdfixincomevaluduration.dto.TrdFixIncomeValuDurationResult;
 import com.joyintech.service.valuation.trademanage.trdfixincomevaluduration.service.TrdFixIncomeValuDuration001Service;
@@ -165,5 +166,18 @@ public class TrdFixIncomeValuDuration001Controller extends BaseController {
     public int update(@RequestBody TrdFixIncomeValuDurationResult dto)
             throws Exception {
         return trdFixIncomeValuDuration001Service.update(dto);
+    }
+
+    /**
+     *
+     * 查询计划类资产付息计划
+     *
+     * @return
+     * @see
+     * @since 1.0
+     */
+    @PostMapping("/getFinCashPlanByProductId")
+    public List<FinCashPlanDto> getFinCashPlanByProductId(@RequestBody Map<String, Object> param){
+        return trdFixIncomeValuDuration001Service.getFinCashPlanByProductId(param);
     }
 }
