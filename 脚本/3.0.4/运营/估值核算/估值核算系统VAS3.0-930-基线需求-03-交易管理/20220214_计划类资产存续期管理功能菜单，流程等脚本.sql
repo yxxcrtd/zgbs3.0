@@ -37,14 +37,3 @@ values ('TrdJihuaBonusValuationTrade002', 'TrdJihuaBonusValuationTrade002_btn_su
 
 insert into sys_wfl_business_module (PAGE_ID, ELEMENT_ID, MODULE_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE, IS_SEND_UORG)
 values ('TrdJihuaBonusValuationTrade002', 'TrdJihuaBonusValuationTrade001_btn_delete', 'oneApproval', 'system', null, sysdate, 'system', sysdate, 'ALL', '02');
-
-
-/*计划类资产存续期-4位数的交易编号，序列*/
-DROP SEQUENCE JIHUABONUSTRADEID_SEQUENCE;
--- Create sequence
-create sequence JIHUABONUSTRADEID_SEQUENCE
-minvalue 1
-maxvalue 9999
-start with 1
-increment by 1
-cache 20;

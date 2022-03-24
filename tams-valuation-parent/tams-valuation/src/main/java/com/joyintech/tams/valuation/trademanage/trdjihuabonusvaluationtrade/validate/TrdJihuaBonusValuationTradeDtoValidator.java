@@ -46,16 +46,26 @@ public class TrdJihuaBonusValuationTradeDtoValidator implements BeanValidator {
                     resultList.add(new ValidMessage("tradeDate",
                             getMessage("VAL_COMMON_E_0002", getMessage("TrdJihuaBonusValuationTrade002.tradeDate"))));
                 }
+                //权益登记日
+                if(!StringUtil.isNotEmpty(dto.getMdate())){
+                    resultList.add(new ValidMessage("mdate",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdJihuaBonusValuationTrade002.mdate"))));
+                }
+                //资金到账日
+                if(!StringUtil.isNotEmpty(dto.getSettleDate())){
+                    resultList.add(new ValidMessage("settleDate",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdJihuaBonusValuationTrade002.settleDate"))));
+                }
                 //分红金额
                 if (!StringUtil.isNotEmpty(dto.getBonusAmt())) {
                     resultList.add(new ValidMessage("bonusAmt",
                             getMessage("VAL_COMMON_E_0002", getMessage("TrdJihuaBonusValuationTrade002.bonusAmt"))));
                 }
-                //结算金额
-                if (!StringUtil.isNotEmpty(dto.getSettleAmt())) {
-                    resultList.add(new ValidMessage("settleAmt",
-                            getMessage("VAL_COMMON_E_0002", getMessage("TrdJihuaBonusValuationTrade002.settleAmt"))));
-                }
+//                //结算金额
+//                if (!StringUtil.isNotEmpty(dto.getSettleAmt())) {
+//                    resultList.add(new ValidMessage("settleAmt",
+//                            getMessage("VAL_COMMON_E_0002", getMessage("TrdJihuaBonusValuationTrade002.settleAmt"))));
+//                }
                 //资金账户
                 if (!StringUtil.isNotEmpty(dto.getMyAcctNo())) {
                     resultList.add(new ValidMessage("myAcctNo",
@@ -66,6 +76,11 @@ public class TrdJihuaBonusValuationTradeDtoValidator implements BeanValidator {
                 if (!StringUtil.isNotEmpty(dto.getTradeDateReInvest())) {
                     resultList.add(new ValidMessage("tradeDateReInvest",
                             getMessage("VAL_COMMON_E_0002", getMessage("TrdJihuaBonusValuationTrade002.tradeDate"))));
+                }
+                //权益登记日
+                if(!StringUtil.isNotEmpty(dto.getMdateInvest())){
+                    resultList.add(new ValidMessage("mdateInvest",
+                            getMessage("VAL_COMMON_E_0002", getMessage("TrdFundBonusValuationTrade002.mdate"))));
                 }
                 //分红金额
                 if (!StringUtil.isNotEmpty(dto.getBonusAmtReInvest())) {
@@ -82,16 +97,16 @@ public class TrdJihuaBonusValuationTradeDtoValidator implements BeanValidator {
                     resultList.add(new ValidMessage("unitBonusUnitValue",
                             getMessage("VAL_COMMON_E_0002", getMessage("TrdJihuaBonusValuationTrade002.unitBonusUnitValue"))));
                 }
-                //结算金额
-                if (!StringUtil.isNotEmpty(dto.getSettleAmtReInvest())) {
-                    resultList.add(new ValidMessage("settleAmtReInvest",
-                            getMessage("VAL_COMMON_E_0002", getMessage("TrdJihuaBonusValuationTrade002.settleAmt"))));
-                }
-                //资金账户
-                if (!StringUtil.isNotEmpty(dto.getMyAcctNoReInvest())) {
-                    resultList.add(new ValidMessage("myAcctNoReInvest",
-                            getMessage("VAL_COMMON_E_0002", getMessage("TrdJihuaBonusValuationTrade002.myAcctNo"))));
-                }
+//                //结算金额
+//                if (!StringUtil.isNotEmpty(dto.getSettleAmtReInvest())) {
+//                    resultList.add(new ValidMessage("settleAmtReInvest",
+//                            getMessage("VAL_COMMON_E_0002", getMessage("TrdJihuaBonusValuationTrade002.settleAmt"))));
+//                }
+//                //资金账户
+//                if (!StringUtil.isNotEmpty(dto.getMyAcctNoReInvest())) {
+//                    resultList.add(new ValidMessage("myAcctNoReInvest",
+//                            getMessage("VAL_COMMON_E_0002", getMessage("TrdJihuaBonusValuationTrade002.myAcctNo"))));
+//                }
             }
         }
 

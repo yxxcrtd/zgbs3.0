@@ -129,7 +129,6 @@ public class TrdJihuaBonusValuationTrade002Service extends CommonExportService<T
                 valCashBonusTrade.setAssetName(trdJihuaBonusValuationTradeDto.getAssetAbbr());//资产名称
                 valCashBonusTrade.setBonusDate(trdJihuaBonusValuationTradeDto.getTradeDate());//分红日
                 valCashBonusTrade.setActBounsAmt(trdJihuaBonusValuationTradeDto.getBonusAmt());//实际分红金额
-                valCashBonusTrade.setMdate(trdJihuaBonusValuationTradeDto.getTradeDate());//todo 分红截止日
                 valCashBonusTrade.setDataActionSign("01");
                 valCashBonusTrade.setIsClean("N");
                 valCashBonusTrade.setSettleDate(trdJihuaBonusValuationTradeDto.getTradeDate());
@@ -186,7 +185,7 @@ public class TrdJihuaBonusValuationTrade002Service extends CommonExportService<T
                 valBonusResTrade.setBonusAmt(trdJihuaBonusValuationTradeDto.getBonusAmtReInvest());//红利再投金额
                 valBonusResTrade.setBonusNet(trdJihuaBonusValuationTradeDto.getUnitBonusUnitValue());//红利再投净值
                 valBonusResTrade.setBonusShare(trdJihuaBonusValuationTradeDto.getDealNumReInvest());//红利再投份额
-                valBonusResTrade.setMdate(trdJihuaBonusValuationTradeDto.getTradeDate());//todo 分红截止日
+                valBonusResTrade.setMdate(trdJihuaBonusValuationTradeDto.getMdateInvest());// 分红截止日
                 valBonusResTrade.setIsClean("N");
                 valBonusResTrade.setDataActionSign("01");
 

@@ -70,6 +70,9 @@ public class TrdJihuaBonusValuationTrade002Controller extends BaseController {
 
         if(StringUtil.isNotEmpty(workflowId)){
             TrdJihuaBonusValuationTradeDto entity= trdJihuaBonusValuationTrade002Service.getBussinessEntityByWorkflowId(workflowId);
+            if(!StringUtil.isNotEmpty(entity.getTradeId())){
+                entity.setTradeId("提交后自动生成，无需填写");
+            }
             model.addAttribute("entity", entity);
             model.addAttribute("workflowId", workflowId);
 
