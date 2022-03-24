@@ -385,4 +385,17 @@ public class ValBotAstTrade extends BaseEntity {
     public void setMyAcctNo(String myAcctNo) {
         this.myAcctNo = myAcctNo;
     }
+
+    /**
+     * 关联系统交易编号  外部交易编号
+     */
+    private String fTradeId;
+
+    public String getfTradeId() {
+        return fTradeId;
+    }
+
+    public void setfTradeId(String fTradeId) {
+        this.fTradeId = fTradeId;
+    }
 }
