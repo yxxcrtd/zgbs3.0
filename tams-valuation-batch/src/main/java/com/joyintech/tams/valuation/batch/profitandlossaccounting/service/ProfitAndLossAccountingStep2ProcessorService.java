@@ -255,8 +255,8 @@ public class ProfitAndLossAccountingStep2ProcessorService {
 			detail2.setBusiId(item.getBusiId());
 			// 账务明细代码
 			detail2.setBokDetailId(item.getBokDetailId());
-			// 四级科目号
-			detail2.setDetailSubjectNo(detail.getDetailSubjectNo());
+//			// 四级科目号
+//			detail2.setDetailSubjectNo(detail.getDetailSubjectNo());
 			// 其他字段设值同 币种余额entity
 			// if 损益平准金entity.基础科目性质 = 损益平准金_已实现
 			/**
