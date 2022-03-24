@@ -6,6 +6,7 @@ package com.joyintech.tams.valuation.trademanage.trddepovaluationduration.servic
 
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
@@ -14,6 +15,7 @@ import com.joyintech.tams.valuation.common.interf.base.dto.AssetDealInfoValCommo
 import com.joyintech.tams.valuation.common.interf.base.dto.TemplateOrderInfoReaderResult;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.depositasset.DepositeAssetPeriodFundTemplateRecService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValBotPeriodFund;
+import com.joyintech.tams.valuation.component.common.dto.FinCashPlanDto;
 import com.joyintech.tams.valuation.trademanage.trddepovaluationduration.dto.TrdDepoValuationDuration001Dto;
 import com.joyintech.tams.valuation.trademanage.trddepovaluationduration.dto.TrdDepoValuationDurationResult;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -105,7 +107,15 @@ public class TrdDepoValuationDuration002Service extends BaseService<TrdDepoValua
         entity.setAssetId(dto.getFinprodMarketId());  //资产代码
         entity.setDataActionSign("01");//数据动作标志
         entity.setDealType(dto.getPs()); //交易类型
-        entity.setVdate(new Date());//计息开始日
+        //查询债券的付息计划
+        Map<String,Object> hashMap = new HashMap<>();
+        hashMap.put("finprodId",entity.getAssetId());
+        List<FinCashPlanDto> list = getFinCashPlanByProductId(hashMap);
+        if(!StringUtil.isEmptyList(list)){
+            entity.setVdate(list.get(0).getVdate());//计息开始日 根据标的信息查询
+        }else{
+            entity.setVdate(DateUtil.parse(DateUtil.getSysDate()));//计息开始日 根据标的信息查询
+        }
         entity.setEndDate(dto.getEndDate());//计息结束日
         entity.setPayDate(dto.getPayDate()); //实际支付日
         entity.setActInt(dto.getActInt()); //实收利息
@@ -150,4 +160,16 @@ public class TrdDepoValuationDuration002Service extends BaseService<TrdDepoValua
         return rst;
     }
 
+
+
+    /**
+     * 查询债券付息计划
+     *
+     * @return 产品代码列表
+     * @see
+     * @since 1.0
+     */
+    public List<FinCashPlanDto> getFinCashPlanByProductId(Map<String,Object> param){
+        return restTemplate.postForList(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdDepoValuationDuration001/getFinCashPlanByProductId",param,FinCashPlanDto.class);
+    }
 }

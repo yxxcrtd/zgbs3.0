@@ -14,6 +14,7 @@ import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.service.valuation.component.common.dto.FinCashPlanDto;
 import com.joyintech.service.valuation.trademanage.trddepovaluationduration.dto.TrdDepoValuationDuration001Dto;
 import com.joyintech.service.valuation.trademanage.trddepovaluationduration.dto.TrdDepoValuationDurationResult;
 import com.joyintech.service.valuation.trademanage.trddepovaluationduration.service.TrdDepoValuationDuration001Service;
@@ -166,4 +167,17 @@ public class TrdDepoValuationDuration001Controller extends BaseController {
         return trdDepoValuationDuration001Service.update(dto);
     }
 
+
+    /**
+     *
+     * 查询存款付息计划
+     *
+     * @return
+     * @see
+     * @since 1.0
+     */
+    @PostMapping("/getFinCashPlanByProductId")
+    public List<FinCashPlanDto> getFinCashPlanByProductId(@RequestBody Map<String, Object> param){
+        return trdDepoValuationDuration001Service.getFinCashPlanByProductId(param);
+    }
 }

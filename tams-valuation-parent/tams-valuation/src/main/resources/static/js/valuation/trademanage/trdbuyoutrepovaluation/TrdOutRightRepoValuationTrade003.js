@@ -35,8 +35,8 @@ $(function() {
     }
 
     var init=function(){
-        $('#cpdm').hide();
-        $('#zcdm').hide();
+        // $('#cpdm').hide();
+        // $('#zcdm').hide();
         $('#endDate').hide(); //到期日隐藏
         var mdate=$('#mdate').val();
         $('#tradeDate').val(mdate);

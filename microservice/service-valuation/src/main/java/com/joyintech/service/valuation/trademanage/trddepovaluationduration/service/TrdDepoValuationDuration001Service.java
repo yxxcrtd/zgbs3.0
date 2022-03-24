@@ -15,11 +15,13 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.service.valuation.component.common.dto.FinCashPlanDto;
 import com.joyintech.service.valuation.trademanage.bond.dao.TrdBondTradeMapper;
 import com.joyintech.service.valuation.trademanage.trddepovaluationduration.dao.TrdDepoValuationDuration001Mapper;
 import com.joyintech.service.valuation.trademanage.trddepovaluationduration.dto.TrdDepoValuationDuration001Dto;
 import com.joyintech.service.valuation.trademanage.trddepovaluationduration.dto.TrdDepoValuationDurationResult;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.valuation.common.interf.base.batch.dao.*;
 import com.joyintech.tams.valuation.common.interf.base.service.common.InterfCommonService;
@@ -536,4 +538,17 @@ public class TrdDepoValuationDuration001Service extends CommonExportService<TrdD
     }
 
 
+    /**
+     *
+     * 查询存款付息计划
+     *
+     * @return
+     * @see
+     * @since 1.0
+     */
+    public  List<FinCashPlanDto> getFinCashPlanByProductId(Map<String, Object> param){
+        param.put("cashType", DictCodeListExt1.现金流二级类型_利息.getValue());
+        param.put("finprodType", DictCodeListExt1.金融产品类型_存款.getValue());
+        return trdDepoValuationDuration001Mapper.getFinCashPlanByProductId(param);
+    }
 }

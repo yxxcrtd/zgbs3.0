@@ -11,6 +11,7 @@
 package com.joyintech.service.valuation.trademanage.trddepovaluationduration.dao;
 
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.service.valuation.component.common.dto.FinCashPlanDto;
 import com.joyintech.service.valuation.trademanage.trddepovaluationduration.dto.TrdDepoValuationDuration001Dto;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -64,5 +65,9 @@ public interface TrdDepoValuationDuration001Mapper {
 	 */
 	TrdDepoValuationDuration001Dto queryTradeInfoByTradeId(String tradeId);
 
-
+	/**
+	 *
+	 * 查询存款付息计划
+	 */
+	List<FinCashPlanDto> getFinCashPlanByProductId(Map<String, Object> paraMap);
 }
