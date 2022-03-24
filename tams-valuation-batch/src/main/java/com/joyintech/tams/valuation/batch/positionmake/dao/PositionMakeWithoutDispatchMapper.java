@@ -87,7 +87,7 @@ public interface PositionMakeWithoutDispatchMapper {
 	 */
 	List<SubjectNatureFeeTypeInfo> getSubjectNatureFeeTypeInfo(
             @Param("list")
-                    List<String> subjectNatureList);
+                    List<String> subjectNatureList, @Param("accountEntryType")String accountEntryType);
 
 
 

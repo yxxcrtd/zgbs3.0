@@ -2,6 +2,7 @@ package com.joyintech.tams.valuation.batch.positionmake.service;
 
 import com.joyintech.calculation.config.NumberEnum;
 import com.joyintech.calculation.util.ArithmeticUtil;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.*;
@@ -649,8 +650,11 @@ public class PositionMakeProcessorNewService {
 		// 组装MAP<基础科目性质，费用信息>
 		Map<String, SubjectNatureFeeTypeInfo> subjectNatureFeeTypeMap = new HashMap<String, SubjectNatureFeeTypeInfo>();
 		if (subjectNatureList != null && !subjectNatureList.isEmpty()) {
+			/**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 start **/
+			String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+			/**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 end **/
 			List<SubjectNatureFeeTypeInfo> subjectNatureFeeTypeInfoList = positionMakeWithoutDispatchMapper.getSubjectNatureFeeTypeInfo(
-				subjectNatureList);
+				subjectNatureList,accountEntryType);
 			// 组装MAP<基础科目性质，费用信息>
 			for (SubjectNatureFeeTypeInfo vo : subjectNatureFeeTypeInfoList) {
 				subjectNatureFeeTypeMap.put(vo.getBaseSubjectNature(), vo);
@@ -1156,6 +1160,10 @@ public class PositionMakeProcessorNewService {
 		positionMakeWithoutDispatchMapper.deletePtlSecReceivables(listInsert, bookDate);
 		//删除已有头寸  add by xr end
 		//1.查询应收款科目余额信息
+		/**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 start **/
+		String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+		sqlMap.put("accountEntryType",accountEntryType);
+		/**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 end **/
 		List<PtlSecReceivablesDto> dealList = positionMakeWithoutDispatchMapper.getPtlSecReceivablesList(sqlMap);
 		//IF 变量.应收款科目余额List IS NULL OR 变量.应收款科目余额List.SIZE==0
 		if(StringUtil.isEmptyList(dealList)) {
