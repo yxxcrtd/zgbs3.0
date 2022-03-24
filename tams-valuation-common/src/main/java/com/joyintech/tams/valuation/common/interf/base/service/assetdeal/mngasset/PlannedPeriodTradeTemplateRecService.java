@@ -447,6 +447,10 @@ public class PlannedPeriodTradeTemplateRecService {
         valFinProductDeal.setSettleDate(dto.getSettleDate());
         // 交易币种= B.币种
         valFinProductDeal.setCcy(dto.getCcy());
+
+        //接口添加 资金账户= B.资金账户  yangchen 20220324 start
+        valFinProductDeal.setMyAcctNo(dto.getMyAcctNo());
+        /*add by yangchen 20220324 交易界面：添加资金账户 end*/
         
         if (DictCodeList.交易方向_还本到账.getValue().equals(bookType)) {
             // 净价总额 = B.实收本金

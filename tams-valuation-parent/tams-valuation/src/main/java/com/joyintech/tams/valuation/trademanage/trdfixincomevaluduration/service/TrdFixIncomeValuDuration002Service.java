@@ -105,6 +105,7 @@ public class TrdFixIncomeValuDuration002Service extends BaseService<TrdFixIncome
         entity.setCcy(dto.getCcy());//币种
         entity.setTradeId(null);  //交易编号
         entity.setIsClean("Y");//有无清算指令
+        entity.setMyAcctNo(dto.getTrdAcctId()); //资金账户
 
         listValMngPeriodTrade.add(entity);
         Map<String, Object> map = plannedPeriodTradeTemplateRecService.handleListValMngPeriodTrade(listValMngPeriodTrade,new Date(),params,null);

@@ -87,7 +87,7 @@
 		t.PRIN_AMT actCapi, /**实收本金**/
 		stl.SETTLE_AMT settleAmt,/**结算金额**/
 		t.CCY ccy,/**币种**/
-		stl.MY_ACCT_NO trdAcctId/**资金账户**/
+		t.MY_ACCT_NO trdAcctId/**资金账户**/
 		FROM TRD_PRODUCT_DEAL t
 		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
 		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE ='09'
@@ -142,7 +142,7 @@
 		t.PRIN_AMT actCapi, /**实收本金**/
 		stl.SETTLE_AMT settleAmt,/**结算金额**/
 		t.CCY ccy,/**币种**/
-		stl.MY_ACCT_NO trdAcctId/**资金账户**/
+		t.MY_ACCT_NO trdAcctId/**资金账户**/
 		FROM TRD_PRODUCT_DEAL t
 		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
 		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE ='09'
