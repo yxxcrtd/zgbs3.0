@@ -140,7 +140,7 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTradeDto>
         valSecVestAssetDeal.setIsClean("Y");//有无清算指令
         valSecVestAssetDeal.setExeYield(new BigDecimal(0));//行权收益率
         valSecVestAssetDeal.setSharesTradeMarket("02");//流通市场
-        valSecVestAssetDeal.setIsOtherAmt("N");
+        //valSecVestAssetDeal.setIsOtherAmt("N");
         if(DictCodeList.交易方向_申购.getValue().equals(trdBondTradeDto.getPs())){
             valSecVestAssetDeal.setMyAcctNo(trdBondTradeDto.getMyAcctNo_sq());
         }else if(DictCodeList.交易方向_申购确认.getValue().equals(trdBondTradeDto.getPs())){
