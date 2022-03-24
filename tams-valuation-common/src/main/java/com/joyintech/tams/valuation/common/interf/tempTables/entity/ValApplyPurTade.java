@@ -100,6 +100,13 @@ public class ValApplyPurTade extends BaseEntity {
      */
     private String ps;
 
+    /*add by sunshuaishuai 20220324 交易管理 start*/
+    /**
+     * 外部成交编号
+     */
+    private String outTradeId;
+    /*add by sunshuaishuai 20220324 end*/
+
     /**
      * 取得 产品代码
      * @return 产品代码
@@ -389,4 +396,22 @@ public class ValApplyPurTade extends BaseEntity {
     public void setPs(String ps) {
         this.ps = ps == null ? null : ps.trim();
     }
+
+    /*add by sunshuaishuai 20220324 交易管理 start*/
+    /**
+     * 取得 外部成交编号
+     * @return 外部成交编号
+     */
+    public String getOutTradeId() {
+        return outTradeId;
+    }
+
+    /**
+     * 设置 外部成交编号
+     * @param outTradeId 外部成交编号
+     */
+    public void setOutTradeId(String outTradeId) {
+        this.outTradeId = outTradeId == null ? null : outTradeId.trim();
+    }
+    /*add by sunshuaishuai 20220324 end*/
 }

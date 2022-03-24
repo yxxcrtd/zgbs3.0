@@ -94,6 +94,16 @@ public class TrdFundValuationTradeController extends BaseController {
         return trdFundValuationTradeService.queryRedInfoByTradeId(tradeId);
     }
 
+    /**
+     * 赎回到账双击明细页面
+     * @see
+     * @since 1.0
+     */
+    @PostMapping("queryRedInfoByOutTradeId")
+    public TrdFundValuationTradeDto queryRedInfoByOutTradeId(@RequestBody String tradeId) {
+        return trdFundValuationTradeService.queryRedInfoByOutTradeId(tradeId);
+    }
+
 
     /**
      * 回调函数 操作具体 new

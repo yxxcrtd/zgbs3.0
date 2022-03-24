@@ -41,6 +41,11 @@
      */
     $(function() {
         tradeAmtArriveInit();
+
+        //赎回费
+        $('#redFee').change(function(){
+            tradeAmtArriveInit();
+        });
         //保存
         $('#TrdFundValuationTrade003_btn_save').click(function() {
             saveOrSubmit('save');

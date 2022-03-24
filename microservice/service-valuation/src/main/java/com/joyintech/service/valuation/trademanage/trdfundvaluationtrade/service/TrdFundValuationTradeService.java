@@ -189,6 +189,13 @@ public class TrdFundValuationTradeService extends CommonExportService<TrdFundVal
     }
 
     /**
+     * 赎回到账双击明细页面
+     */
+    public TrdFundValuationTradeDto queryRedInfoByOutTradeId(String tradeId) {
+        return trdFundValuationTradeMapper.queryRedInfoByOutTradeId(tradeId);
+    }
+
+    /**
      *
      * 工作流完结之后的操作
      * <功能详细描述>

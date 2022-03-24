@@ -60,7 +60,8 @@ public class TrdFundValuationTrade003Controller extends BaseController {
 
         String tradeId = getParam("tradeId");
         String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
-
+        //交易方向
+        String ps = getParam("ps");
         //平台日
         model.addAttribute("iPlatformDate", DateUtil.parse(DateUtil.getSysDate()));
 
@@ -72,7 +73,14 @@ public class TrdFundValuationTrade003Controller extends BaseController {
             model.addAttribute("entity", entity);
             model.addAttribute("workflowId", workflowId);
         }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){
-            TrdFundValuationTradeDto entity = trdFundValuationTrade002Service.queryRedInfoByTradeId(tradeId);
+            TrdFundValuationTradeDto entity = new TrdFundValuationTradeDto();
+            if(DictCodeList.交易方向_赎回确认.getValue().equals(ps)){
+                entity = trdFundValuationTrade002Service.queryRedInfoByTradeId(tradeId);
+                entity.setOutTradeId(entity.getTradeId());
+                entity.setTradeId("提交后自动生成，无需填写");
+            }else{
+                entity = trdFundValuationTrade002Service.queryRedInfoByOutTradeId(tradeId);
+            }
             entity.setPs(DictCodeList.交易方向_赎回到账.getValue());
             model.addAttribute("entity", entity);
         }

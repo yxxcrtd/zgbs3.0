@@ -100,6 +100,15 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
     }
 
     /**
+     * 赎回到账双击明细页面
+     */
+    public TrdFundValuationTradeDto queryRedInfoByOutTradeId(String tradeId) {
+        return restTemplate.postForObject(
+                ServiceApplication.VALUATION_SERVICE_NAME + "/TrdFundValuationTrade/queryRedInfoByOutTradeId",
+                tradeId, TrdFundValuationTradeDto.class);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -420,6 +429,7 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
         valFundTrade.setShareAmt(dto.getDealNum());//交易份额
         valFundTrade.setUnitCprice(ArithmeticUtil.divide(dto.getTradeAmt(),dto.getDealNum(),4, RoundingMode.HALF_UP));
         valFundTrade.setMyAcctNo(dto.getTrdMyAcctNo());//付款账户-资金账户
+        valFundTrade.setTradeAmt(dto.getSettleAmt());//交易金额
         valFundTrade.setIsClean("N"); //有无清算指令
         valFundTrade.setIsCommission("N");
 
@@ -435,7 +445,6 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
     public ValApplyPurTade dealBean(ValApplyPurTade valApplyPurTade,TrdFundValuationTradeDto dto,String type){
         BeanUtil.copyPropertiesIgnoreNull(valApplyPurTade,dto);
         //相同字段名： 成交编号、交易方向、交易场所、币种
-        valApplyPurTade.setProdId(dto.getProdId());//产品代码
         //比较界面和接口字段差异，并手动给接口字段赋值
         if("A".equals(type) && "01".equals(dto.getFundType())){
             valApplyPurTade.setBusiType("06");//业务类型
@@ -472,14 +481,7 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
         BeanUtil.copyPropertiesIgnoreNull(valAffirmPurTrade,dto);
         //相同字段名： 成交编号、交易方向、交易场所、币种
         //比较界面和接口字段差异，并手动给接口字段赋值
-//        if("A".equals(type)){
-//            valAffirmPurTrade.setAssetId("F06_"+dto.getAssetId());//资产代码  F06基金
-//        }else{
-//            valAffirmPurTrade.setAssetId("F17_"+dto.getAssetId());//资产代码
-//        }
-
         valAffirmPurTrade.setAssetName(dto.getAssetAbbr());//资产名称
-        valAffirmPurTrade.setApplyTradeId(dto.getOutTradeId());//认购申请成交编号
         valAffirmPurTrade.setDataActionSign("01");//数据动作标志
         valAffirmPurTrade.setIsClean("N"); //有无清算指令
         //valAffirmPurTrade.setFundType();//基金类型
@@ -488,15 +490,17 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
                 valAffirmPurTrade.setTradeDate(dto.getPurConfirmDate());//交易日
                 valAffirmPurTrade.setCfmAmt(dto.getPurConfirmAmt());//确认金额
                 valAffirmPurTrade.setCfmShare(dto.getPurConfirmNum());//确认份额
-                valAffirmPurTrade.setRefundAmt(dto.getInterestIncome());//利息金额
+                //valAffirmPurTrade.setRefundAmt(dto.getInterestIncome());//利息金额
                 valAffirmPurTrade.setCfmUnitCpr(dto.getPurUnitValue());//单位净值
                 valAffirmPurTrade.setFee(dto.getPurFee());//费用
+                valAffirmPurTrade.setMyAcctNo(dto.getPurConfirmMyAcctNo());//资金账户
             }else if(dto.getPs().equals(DictCodeList.交易方向_认购确认.getValue()) ){
                 valAffirmPurTrade.setTradeDate(dto.getSubConfirmDate());//交易日
                 valAffirmPurTrade.setCfmAmt(dto.getSubConfirmAmt());//确认金额
                 valAffirmPurTrade.setCfmShare(dto.getSubConfirmNum());//确认份额
                 valAffirmPurTrade.setRefundAmt(dto.getRaiseInterest());//利息金额
                 valAffirmPurTrade.setFee(dto.getSubFee());//费用
+                valAffirmPurTrade.setMyAcctNo(dto.getSubConfirmMyAcctNo());//资金账户
             }
         }
         return valAffirmPurTrade;
@@ -515,10 +519,13 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
 
         valFundMnfRedAffirm.setAssetName(dto.getAssetAbbr());//资产名称
         valFundMnfRedAffirm.setTradeDate(dto.getRedConfirmDate());//交易日
-        valFundMnfRedAffirm.setPreDate(dto.getArriveDate());//预计到账日
+//        valFundMnfRedAffirm.setPreDate(dto.getArriveDate());//预计到账日
         valFundMnfRedAffirm.setRedShare(dto.getRedConfirmNum());//确认数量
         valFundMnfRedAffirm.setRedAmt(dto.getRedConfirmAmt());//赎回金额
-        valFundMnfRedAffirm.setFee(dto.getRedFee());
+        valFundMnfRedAffirm.setFee(dto.getRedFee());//赎回费
+
+        valFundMnfRedAffirm.setMyAcctNo(dto.getRedMyAcctNo());//资金账户
+        valFundMnfRedAffirm.setUnitCprice(ArithmeticUtil.divide(dto.getRedConfirmAmt(),dto.getRedConfirmNum(),4, RoundingMode.HALF_UP));
 
         valFundMnfRedAffirm.setDataActionSign("01");//数据动作标志
         valFundMnfRedAffirm.setIsClean("N"); //有无清算指令

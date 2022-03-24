@@ -168,7 +168,7 @@ $(function(){
             Joyin.dialog(JoyinUtil.getLabel("基金赎回到账（<i class='iconfont must' style='display:inline'>*</i>必填）"),
                 basePath + "valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade003/init",
                 "95%", "90%",
-                {tradeId:tradeId }
+                {tradeId:tradeId ,ps:ps}
                 ,function(){
                     table.reload();
                 });

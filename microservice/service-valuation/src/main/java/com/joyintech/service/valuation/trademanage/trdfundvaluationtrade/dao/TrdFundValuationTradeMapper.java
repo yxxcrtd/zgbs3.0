@@ -45,6 +45,8 @@ public interface TrdFundValuationTradeMapper {
 
 	TrdFundValuationTradeDto queryRedInfoByTradeId(@Param("tradeId") String tradeId);
 
+	TrdFundValuationTradeDto queryRedInfoByOutTradeId(@Param("tradeId") String tradeId);
+
 	/**
 	 * 检索债券交易列表
 	 *
