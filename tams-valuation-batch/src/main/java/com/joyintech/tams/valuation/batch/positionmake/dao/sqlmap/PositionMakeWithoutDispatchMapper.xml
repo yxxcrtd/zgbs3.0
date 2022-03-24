@@ -421,11 +421,22 @@
 		SELECT
 			FEE_TYPE_ID AS feeTypeId,
 			BASE_SUBJECT_NATURE as baseSubjectNature,
-			case 
-		        when BASE_SUBJECT_NATURE = 'YFZZDJSSXF' or BASE_SUBJECT_NATURE = 'YFZZDJYSXF' then '01'
-		        when BASE_SUBJECT_NATURE = 'YFSQSJSSXF' or BASE_SUBJECT_NATURE = 'YFSQSJYSXF' then '02'
-		        when BASE_SUBJECT_NATURE = 'YFZDJSSXF' then '03'
-		    ELSE '999999' END AS feePlace
+
+		/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 start**/
+		<choose>
+			<when test="accountEntryType =='02' ">
+				 '999999'  AS feePlace
+			</when>
+			<otherwise>
+				case
+				when BASE_SUBJECT_NATURE = 'YFZZDJSSXF' or BASE_SUBJECT_NATURE = 'YFZZDJYSXF' then '01'
+				when BASE_SUBJECT_NATURE = 'YFSQSJSSXF' or BASE_SUBJECT_NATURE = 'YFSQSJYSXF' then '02'
+				when BASE_SUBJECT_NATURE = 'YFZDJSSXF' then '03'
+				ELSE '999999' END AS feePlace
+			</otherwise>
+		</choose>
+		/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 end**/
+
 		FROM BOK_FEE_TABLE_SET
 		WHERE BASE_SUBJECT_NATURE IN 
         <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
@@ -877,7 +888,18 @@
 		    on bc.trade_id = ddeal.trade_id
 		    and bc.table_id='1413' /*针对债券买断式逆回购，若BOK_DETAIL_ID表中无数据，直接取trd_product_deal交易表数据*/
 
-			WHERE bc.BASE_SUBJECT_NATURE IN ('QTYSK_BJ','QTYSK_LX') /** 基础科目性质 其他应收款本金、其他应收款利息**/
+			WHERE
+		/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 start**/
+		<choose>
+			<when test="accountEntryType =='02' ">
+				bc.BASE_SUBJECT_NATURE IN ('QTYSK_QT') /** 基础科目性质 其他应收款**/
+			</when>
+			<otherwise>
+				bc.BASE_SUBJECT_NATURE IN ('QTYSK_BJ','QTYSK_LX') /** 基础科目性质 其他应收款本金、其他应收款利息**/
+			</otherwise>
+		</choose>
+		/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 end**/
+
 			AND bc.HAPPEN_DATE <![CDATA[ <= ]]>  #{happenDate,jdbcType=DATE}
 			AND bc.BOOK_DATE <![CDATA[ <= ]]> #{happenDate,jdbcType=DATE}
 			AND (bc.OFFSET_DATE <![CDATA[ < ]]>  #{happenDate,jdbcType=DATE} OR bc.OFFSET_DATE IS NULL)

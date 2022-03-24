@@ -2696,6 +2696,10 @@ public class AccountingCommonService {
         param.put("bookDate", bookDate);
         param.put("listBaseSubjectNature", listBaseSubjectNature);
         param.put("isFloat", isFloat);
+        /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 start **/
+        String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+        param.put("accountEntryType",accountEntryType);
+        /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 end **/
         return accountingCommonMapper.selectFloatSubjectBalance(param);
     }
 

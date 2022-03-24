@@ -205,7 +205,16 @@
     	WHERE A.BOOKSET_ID = C.BOOKSET_ID
     	AND B.BOOKSET_ID = C.BOOKSET_ID_TMPL
     	AND A.SUBJECT_NO = B.SUBJECT_NO
-    	AND B.BASE_SUBJECT_NATURE = 'XJ'
+		/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 start**/
+		<choose>
+			<when test="accountEntryType =='02' ">
+				AND B.BASE_SUBJECT_NATURE = 'HQCK_BJ'
+			</when>
+			<otherwise>
+				AND B.BASE_SUBJECT_NATURE = 'XJ'
+			</otherwise>
+		</choose>
+		/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 end**/
     	AND A.SUBJECT_LEVEL = '1'
 		<if test="booksetId !=null and booksetId !='' ">
 			AND  A.BOOKSET_ID in
@@ -223,7 +232,17 @@
 		WHERE A.BOOKSET_ID = C.BOOKSET_ID
 		AND B.BOOKSET_ID = C.BOOKSET_ID_TMPL
 		AND A.SUBJECT_NO = B.SUBJECT_NO
-		AND B.BASE_SUBJECT_NATURE = 'XJ'
+		/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 start**/
+		<choose>
+			<when test="accountEntryType =='02' ">
+				AND B.BASE_SUBJECT_NATURE = 'HQCK_BJ'
+			</when>
+			<otherwise>
+				AND B.BASE_SUBJECT_NATURE = 'XJ'
+			</otherwise>
+		</choose>
+		/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 end**/
+
 		AND A.SUBJECT_LEVEL = '1'
 		<if test="booksetId !=null and booksetId !='' ">
 			AND  A.BOOKSET_ID in
@@ -248,7 +267,16 @@
     	AND	C.BOOKSET_ID = A.BOOKSET_ID
     	AND	B.BOOKSET_ID = C.BOOKSET_ID_TMPL
     	AND	A.SUBJECT_NO = B.SUBJECT_NO
-    	AND	B.BASE_SUBJECT_NATURE = 'XJ'
+		/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 start**/
+		<choose>
+			<when test="accountEntryType =='02' ">
+				AND B.BASE_SUBJECT_NATURE = 'HQCK_BJ'
+			</when>
+			<otherwise>
+				AND B.BASE_SUBJECT_NATURE = 'XJ'
+			</otherwise>
+		</choose>
+		/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 end**/
     	AND D.TRADE_ID = A.TRADE_ID
     	AND	A.CD_FLAG = #{crdrFlg,jdbcType=VARCHAR}
     	AND TO_CHAR(D.BOOK_DATE,'yyyy-MM-dd') &gt;= #{vdate,jdbcType=VARCHAR}
