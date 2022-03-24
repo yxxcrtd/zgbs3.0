@@ -70,7 +70,7 @@ public class SecLendDrawBookDetailProcessor extends BaseProcessor<NeedOperateEnt
         // 若按照内部科目编码分录，则需要映射分录对应科目信息
         //调用service方法进行逻辑逻辑
         if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
-            result = secLendDrawBookDetailService.execute(thisParams);
+            result = secLendDrawBookDetailNewService.execute(thisParams);
         }
         else{
             result = secLendDrawBookDetailService.execute(thisParams);
