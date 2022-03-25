@@ -22,14 +22,14 @@
             t.PS ps,/**交易方向**/
             t.TRADE_DATE tradeDate,/**交易日**/
             t.INV_AIM invAim,/**会计分类**/
-            t.INT_AMT intAmtReal,  /**实收利息**/
-            t.PRIN_AMT actCapi, /**实收本金**/
-            stl.SETTLE_DATE fundSettleDate,/**资金交收日**/
+            nvl(t.INT_AMT,0) intAmtReal,  /**实收利息**/
+            nvl(t.PRIN_AMT,0) actCapi, /**实收本金**/
+            t.SETTLE_DATE fundSettleDate,/**资金交收日**/
             t.MDATE mdate,/**计息结束日**/
             t.CCY ccy,/**币种**/
-            stl.SETTLE_AMT settleAmt,/**结算金额**/
+            t.TRADE_AMT settleAmt,/**结算金额**/
             t.TRADE_AMT tradeAmt,/**交易金额**/
-            stl.MY_ACCT_NO myAcctNo/**资金账户**/
+            nvl(t.MY_ACCT_NO,stl.MY_ACCT_NO)  myAcctNo/**资金账户**/
         FROM TRD_PRODUCT_DEAL t
         LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
         LEFT JOIN BOK_DEAL_ACCOUNTING deal on deal.BUSI_NO = t.TRADE_ID
@@ -89,19 +89,19 @@
             bok.BOOKSET_NAME prodName,/**金融产品名称**/
             zc.FINPROD_ID  assetId, /**资产代码**/
             zc.FINPROD_ABBR  assetAbbr,/**资产简称**/
-            null secManageAcctId,/**证券账户**/
+            t.SEC_MANAGE_ACCT_ID secManageAcctId,/**证券账户**/
             t.PS ps,/**交易方向**/
             t.mdate mdate,/**计划支付日**/
-            stl.SETTLE_DATE fundSettleDate,/**资金交收日**/
+            t.SETTLE_DATE fundSettleDate,/**资金交收日**/
             t.INV_AIM invAim,/**投资目的**/
-            t.INT_AMT intAmtReal,/**实收利息**/
+            t.TRADE_AMT actInt,/**实收利息**/
             t.PRIN_AMT actCapi, /**实收本金**/
             t.CCY ccy,/**币种**/
             CASE WHEN ttfd.FEE_TYPE = 'B99' THEN ttfd.FEE_AMT ELSE 0 END as otherAmt,/**其他费用**/
             t.IS_CLEAN  isClean2,/**是否结清**/
             t.TRADE_AMT tardeAmt,/**本币交易金额**/
-            stl.SETTLE_AMT settleAmt,/**结算金额**/
-            stl.MY_ACCT_NO myAcctNo/**资金账户**/
+            t.TRADE_AMT settleAmt,/**结算金额**/
+            nvl(t.MY_ACCT_NO,stl.MY_ACCT_NO) myAcctNo/**资金账户**/
             FROM TRD_PRODUCT_DEAL t
             LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
             LEFT JOIN BOK_DEAL_ACCOUNTING deal on deal.BUSI_NO = t.TRADE_ID
@@ -130,6 +130,10 @@
         </if>
         <if test="finprodType != null and finprodType != ''">
             AND T2.FINPROD_TYPE = #{finprodType,jdbcType=VARCHAR}
+        </if>
+        <if test="mdate != null and mdate != ''">
+            and T1.VDATE <![CDATA[<]]> to_date(#{mdate},'yyyy-mm-dd')
+            and T1.MDATE <![CDATA[>=]]> to_date(#{mdate},'yyyy-mm-dd')
         </if>
         ORDER BY T1.VDATE ASC
     </select>

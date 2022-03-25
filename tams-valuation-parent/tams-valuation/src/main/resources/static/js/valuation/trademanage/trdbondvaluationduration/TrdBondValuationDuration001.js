@@ -43,8 +43,8 @@
             {field:'invAim', title: '会计分类',visible:false},
             {field:'intAmtReal',type:"money", title: '实收利息',width:180},
             {field:'actCapi', type:"money",title: '实收本金',width:180},
-            {field:'mdateStr', width:120,  title: '计划支付日',sortField:'mdate'},
-            {field:'mdate', title: '计划支付日',visible:false},
+            {field:'mdateStr', width:120,  title: '计息结束日',sortField:'mdate'},
+            {field:'mdate', title: '计息结束日',visible:false},
             {field:'fundSettleDateStr', width:120,  title: '资金交收日',sortField:'fundSettleDate'},
             {field:'fundSettleDate', title: '资金交收日',visible:false},
             {field:'settleAmt',type:"money", title: '结算金额',width:180},
@@ -66,7 +66,7 @@
         Joyin.ajaxJson(basePath + 'valuation/trademanage/trdbondvaluationduration/TrdBondValuationDuration001/check', object, function(result) {//请求路径，请求参数回调函数
                 Joyin.dialog(JoyinUtil.getLabel("债券存续期管理-修改"),
                     basePath + "valuation/trademanage/trdbondvaluationduration/TrdBondValuationDuration002/init",//打开新界面
-                    "98%", "98%", {pageModel:PAGE_MODEL_EDIT,//请求的page_model
+                    "95%", "90%", {pageModel:PAGE_MODEL_EDIT,//请求的page_model
                         tradeId:data.tradeId  //金融产品代码
                     },function(){
                         table.reload();//回调函数，表格刷新

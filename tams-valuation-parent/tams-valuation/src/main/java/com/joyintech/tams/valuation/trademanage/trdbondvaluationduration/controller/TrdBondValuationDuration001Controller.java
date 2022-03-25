@@ -109,8 +109,7 @@ public class TrdBondValuationDuration001Controller extends BaseController {
     @RequestMapping("/getAssetId")
     public List<SelectOptionDto> getAssetId() {
         Map<String, Object> param = RequestUtil.getPageParam();
-        // param.put("assetType","F10");
-        param.put("assetType","F01");//todo
+        param.put("assetType","F01");
         return commonBusinessService.getAssetId(param);
     }
 

@@ -607,6 +607,12 @@ public class SecVestPeriodTemplateRecService {
         valFinProductDeal.setChlId(dto.getChannelId());
         //计提份额 = a.计提份额 add by yanya on 20210303
         valFinProductDeal.setAccrNum(dto.getAccrNum());
+        /*add by sunshuaishuai 交易管理 20220325 start*/
+        //资金账户
+        valFinProductDeal.setMyAcctNo(dto.getMyAcctNo());
+        //证券账户
+        valFinProductDeal.setSecManageAcctId(dto.getSecManageAcctId());
+        /*add by sunshuaishuai 20220325 end*/
         return valFinProductDeal;
     }
 

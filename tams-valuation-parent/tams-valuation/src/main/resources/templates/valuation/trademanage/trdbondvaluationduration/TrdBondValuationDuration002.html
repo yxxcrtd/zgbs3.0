@@ -166,7 +166,7 @@
                         <div class="layui-form-item">
                             <div class="form-inline-wrap">
                                 <label class="layui-form-label form-lable"
-                                       data-th-text="#{TrdBondValuationDuration.mdate}">计划支付日</label>
+                                       data-th-text="#{TrdBondValuationDuration.mdate}">计息结束日</label>
                                 <div class="layui-input-inline input-inline">
                                     <input type="text" id="mdate" name="mdate" required
                                            class="layui-input form-input input-dateSelect"
@@ -209,16 +209,16 @@
                                            placeholder="请输入内容">
                                 </div>
                             </div>
-                            <div class="form-inline-wrap" >
-                                <label class="layui-form-label form-label-wrap"
-                                       data-th-text="#{TrdBondValuationDuration.otherAmt}">其他费用</label>
-                                <div class="layui-input-inline input-inline">
-                                    <input  type="text" id="otherAmt" name="otherAmt" required
-                                            class="layui-input form-input text-number" placeholder="请输入内容"
-                                            th:placeholder="#{SysCommon.placeholder}"
-                                            th:value="${entity?.otherAmt?:0}" />
-                                </div>
-                            </div>
+<!--                            <div class="form-inline-wrap" >-->
+<!--                                <label class="layui-form-label form-label-wrap"-->
+<!--                                       data-th-text="#{TrdBondValuationDuration.otherAmt}">其他费用</label>-->
+<!--                                <div class="layui-input-inline input-inline">-->
+<!--                                    <input  type="text" id="otherAmt" name="otherAmt" required-->
+<!--                                            class="layui-input form-input text-number" placeholder="请输入内容"-->
+<!--                                            th:placeholder="#{SysCommon.placeholder}"-->
+<!--                                            th:value="${entity?.otherAmt?:0}" />-->
+<!--                                </div>-->
+<!--                            </div>-->
                             <div  class="form-inline-wrap">
                                 <label class="layui-form-label form-label-wrap"
                                        data-th-text="#{TrdBondValuationDuration.isClean2}">是否结清</label>
@@ -231,17 +231,18 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="layui-form-item">
-                                <div class="form-inline-wrap" >
-                                    <label class="layui-form-label form-label-wrap"
-                                           data-th-text="#{TrdBondValuationDuration.settleAmt}">结算金额</label>
-                                    <div class="layui-input-inline input-inline">
-                                        <input  type="text" id="settleAmt" name="settleAmt" required
-                                                class="layui-input form-input text-number" placeholder="请输入内容"
-                                                th:placeholder="#{SysCommon.placeholder}"
-                                                th:value="${entity?.settleAmt}" />
-                                    </div>
+                            <div class="form-inline-wrap" >
+                                <label class="layui-form-label form-label-wrap"
+                                       data-th-text="#{TrdBondValuationDuration.settleAmt}">结算金额</label>
+                                <div class="layui-input-inline input-inline">
+                                    <input  type="text" id="settleAmt" name="settleAmt" required
+                                            class="layui-input form-input text-number" placeholder="请输入内容"
+                                            th:placeholder="#{SysCommon.placeholder}"
+                                            th:value="${entity?.settleAmt}" />
                                 </div>
+                            </div>
+                        </div>
+                            <div class="layui-form-item">
                                 <div class="form-inline-wrap" >
                                     <label class="layui-form-label form-label-wrap"
                                            data-th-text="#{TrdBondValuationDuration.myAcctNo}">资金账户</label>
