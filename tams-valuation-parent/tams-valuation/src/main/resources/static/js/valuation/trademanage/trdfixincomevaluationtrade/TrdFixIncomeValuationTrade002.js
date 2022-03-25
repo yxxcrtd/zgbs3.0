@@ -42,14 +42,16 @@
     var settleAmtChange = function(){
         var cpriceAmt = $('#cpriceAmt').val();
         var intAmt = $('#intAmt').val();
-        var otherAmt = $('#otherAmt').val();
+        //var otherAmt = $('#otherAmt').val();
         var ps = $('#ps').val();
         if(cpriceAmt != null && cpriceAmt != ''
-            && intAmt != null && intAmt != ''&& otherAmt != null && otherAmt != '' ){
+            && intAmt != null && intAmt != ''
+            //&& otherAmt != null && otherAmt != ''
+            ){
             if(ps != '' && ps == 'T01'){
-                var settleAmt1 = JoyinMath.doAdd(JoyinMath.doAdd(cpriceAmt, intAmt,2),otherAmt,2);
+                var settleAmt1 = JoyinMath.doAdd(cpriceAmt, intAmt,2);
             }else if(ps != '' && ps == 'T02'){
-                var settleAmt1 = JoyinMath.doMinus(JoyinMath.doAdd(cpriceAmt, intAmt,2),otherAmt,2);
+                var settleAmt1 = JoyinMath.doAdd(cpriceAmt, intAmt,2);
             }
             $('#settleAmt').val(settleAmt1);
         }else{
@@ -105,10 +107,10 @@
         $('#intAmt').change(function(){
             settleAmtChange();
         });
-        //其他费用
-        $('#otherAmt').change(function(){
-            settleAmtChange();
-        });
+        // //其他费用
+        // $('#otherAmt').change(function(){
+        //     settleAmtChange();
+        // });
         //交易类型
         $('#ps').change(function(){
             settleAmtChange();

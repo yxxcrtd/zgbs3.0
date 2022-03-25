@@ -328,7 +328,7 @@ public class TrdFixIncomeValuationTradeDto extends BaseEntity implements Process
         return DateUtil.format(this.getEffDate());
     }
 
-    @NotEmpty(fieldName = "TrdFixIncomeValuationTrade.fundSettleDate" , groups = { ValidateGroupEdit.class })
+//    @NotEmpty(fieldName = "TrdFixIncomeValuationTrade.fundSettleDate" , groups = { ValidateGroupEdit.class })
     public Date getFundSettleDate() {
         return fundSettleDate;
     }
@@ -377,7 +377,7 @@ public class TrdFixIncomeValuationTradeDto extends BaseEntity implements Process
         this.cprice = cprice;
     }
 
-    @NotEmpty(fieldName = "TrdFixIncomeValuationTrade.otherAmt" , groups = { ValidateGroupEdit.class })
+    //@NotEmpty(fieldName = "TrdFixIncomeValuationTrade.otherAmt" , groups = { ValidateGroupEdit.class })
     public BigDecimal getOtherAmt() {
         return otherAmt;
     }

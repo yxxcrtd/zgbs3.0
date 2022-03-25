@@ -10,6 +10,7 @@
  
 package com.joyintech.tams.valuation.trademanage.trdfixincomevaluationtrade.validate;
 
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.BeanValidator;
@@ -43,6 +44,13 @@ public class TrdFixIncomeValuationTradeValidator implements BeanValidator {
                 if(!(DateUtil.compareDate(dto.getEffDate(), dto.getTradeDate())==1)){
                     String msg = this.getMessage("交割日期必须大于等于交易日期");
                     validMessageList.add(new ValidMessage(msg));
+                }
+            }
+            //结算金额公式校验
+            if(StringUtil.isNotEmpty(dto.getSettleAmt())){
+                if(dto.getSettleAmt().compareTo(ArithmeticUtil.doAdd(dto.getCpriceAmt(),dto.getIntAmt())) !=0 ){
+                    validMessageList.add(new ValidMessage("settleAmt",
+                            getMessage("结算金额不满足公式：结算金额=净价总额+应收利息总额")));
                 }
             }
         }

@@ -59,18 +59,6 @@ insert into sys_wfl_business_module (PAGE_ID, ELEMENT_ID, MODULE_ID, CREATE_USER
 values ('TrdFixIncomeValuationTrade002', 'TrdFixIncomeValuationTrade001_btn_delete', 'oneApproval', 'system', null, sysdate, 'system', sysdate, 'ALL', '02');
 
 
-
-
-/*固收类交易-4位数的交易编号，序列*/
-DROP SEQUENCE FIXINCOMETRADEID_SEQUENCE;
--- Create sequence
-create sequence FIXINCOMETRADEID_SEQUENCE
-minvalue 1
-maxvalue 9999
-start with 1
-increment by 1
-cache 20;
-
 /*共通业务类型_固收类资产交易*/
 delete  from  sys_datadict_list where DICT_CODE='COMMON_BUSINESS_TYPE' and ITEM_CODE='TRD85';
 insert into sys_datadict_list (DICT_CODE, ITEM_CODE, ITEM_VALUE, ORDER_NO, DEFAULT_VALUE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE)
