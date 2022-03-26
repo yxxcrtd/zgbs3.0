@@ -270,6 +270,8 @@ public class DeltRightFairValeAlterationsProcessorNewService {
             if (rstBaseinfo == null) {
                 break;
             }
+            // 项目类资产不走其他债权分录，是否其他债权设置为否
+            rstBaseinfo.setIsRight(DictCodeList.是否_否.getValue());
             /** 资产标的信息查询增加其他债券分录配置需要做区分，故从下面代码移上来 end**/
             // 2.4.应计利息类科目余额
             if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(invAim)) {

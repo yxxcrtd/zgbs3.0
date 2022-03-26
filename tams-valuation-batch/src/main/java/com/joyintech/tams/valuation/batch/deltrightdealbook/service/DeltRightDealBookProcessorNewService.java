@@ -369,6 +369,11 @@ public class DeltRightDealBookProcessorNewService {
         // 交易明细 ：交易类账务处理结果.交易明细列表
         for (FinProductDealInfoComDTO dealNow : acctEntity.getListFinProductDealInfoComDTO()) {
             TargetFinProduct rstBaseinfo = getTargetFinProduct(dealNow);
+            if (rstBaseinfo == null) {
+                continue;
+            }
+            // 项目类资产不走其他债权分录，是否其他债权设置为否
+            rstBaseinfo.setIsRight(DictCodeList.是否_否.getValue());
             if (DictCodeList.交易方向_买入.getValue().equals(dealNow.getPs())) {
                 quaryAcBuy(rstBaseinfo, returnResult, dealNow, acctEntity, param,accrType);
             }

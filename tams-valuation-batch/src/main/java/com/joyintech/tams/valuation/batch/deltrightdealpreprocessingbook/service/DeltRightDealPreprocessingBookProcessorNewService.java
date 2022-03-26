@@ -1820,6 +1820,8 @@ public class DeltRightDealPreprocessingBookProcessorNewService {
 
         // 变量.标的信息 = 上述共通返回标的信息
         TargetFinProduct rstBaseinfo = (TargetFinProduct)targetSearchMap.get(searchBaseinfo);
+        // 项目类资产不走其他债权分录，是否其他债权设置为否
+        rstBaseinfo.setIsRight(DictCodeList.是否_否.getValue());
         return rstBaseinfo;
     }
     
