@@ -86,6 +86,7 @@ public class FinPlanAssetCService extends BaseService<FinPlanAssetCDto> {
         pageParam.put("FINPROD_TYPE_TG_F17", DictCodeListExt1.金融产品类型_计划类资产.getValue());
         pageParam.put("PROFIT_TYPE_03", DictCodeList.收益类型_货币型.getValue());
         pageParam.put("PROFIT_TYPE_01", DictCodeList.收益类型_净值型.getValue());
+        pageParam.put("PROFIT_TYPE_02", DictCodeList.收益类型_收益型.getValue());
         /*lishuping 2019/7/19 start*/
       if(StringUtil.isNotEmpty(pageParam.get("category"))){
             pageParam.put("categoryList",StringUtil.splitToList(GlobalConstant.COMMA,(String)pageParam.get("category")));
@@ -442,6 +443,7 @@ public class FinPlanAssetCService extends BaseService<FinPlanAssetCDto> {
         }
         param.put("PROFIT_TYPE_03", DictCodeList.收益类型_货币型.getValue());
         param.put("PROFIT_TYPE_01", DictCodeList.收益类型_净值型.getValue());
+        param.put("PROFIT_TYPE_02", DictCodeList.收益类型_收益型.getValue());
         return finPlanAssetCMapper.getAssetId(param);
     }
 
