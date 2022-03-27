@@ -117,6 +117,16 @@ public class CommonBusinessService {
     }
 
     /**
+     * 回购资产代码下拉框
+     * 参数包括：模糊查询search，资产类型assetType
+     * @param param
+     * @return
+     */
+    public List<SelectOptionDto> getRepoId( Map<String, Object> param) {
+        return commonBusinessMapper.getRepoId(param);
+    }
+
+    /**
      * 产品名称下拉框
      * 参数包括：模糊查询search，产品类型finprodType
      * @param param

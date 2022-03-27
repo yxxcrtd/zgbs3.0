@@ -180,5 +180,39 @@
 		</if>
 	</select>
 
+	<resultMap id="SelectOptionMap01" type="com.joyintech.framework.select.SelectOptionDto">
+		<id column="id" property="id" jdbcType="VARCHAR"/>
+		<result column="text" property="text" jdbcType="VARCHAR"/>
+		<association property="object" javaType="java.util.Map">
+			<result column="id" property="id" jdbcType="VARCHAR" />
+			<result column="term" property="term" jdbcType="NUMERIC" />
+			<result column="rebackPrice" property="rebackPrice" jdbcType="NUMERIC" />
+		</association>
+	</resultMap>
+
+	<!--回购资产代码-->
+	<select id="getRepoId" resultMap="SelectOptionMap01">
+		select
+		zc.FINPROD_ID id,
+		zc.FINPROD_TYPE text,
+		zc.TERM term,
+		zc.INT_RATE rebackPrice
+		from
+		FIN_TRADE_PRODUCT zc
+		where
+		1=1
+		<if test="finprodTypeArr !=null and finprodTypeArr.size() >0">
+			and FINPROD_TYPE in
+			<foreach collection="finprodTypeArr" item="finprodType" open="( " close=" )" separator=",">
+				#{finprodType}
+			</foreach>
+		</if>
+		<if test="search !=null and search != ''">
+			AND	(FINPROD_ID like concat('%',concat(#{search},'%'))
+			OR FINPROD_TYPE like concat('%',concat(#{search},'%')))
+
+		</if>
+	</select>
+
 
 </mapper>

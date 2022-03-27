@@ -59,8 +59,8 @@
                                     <label class="layui-form-label form-label-wrap">标的资产名称</label>
                                     <div class="layui-input-inline input-inline">
                                         <select id="finprodMarketId" name="finprodMarketId" class="layui-input form-input input-select" required
-                                                data-th-placeholder="#{SysCommon.placeholder}" th:initValue="${entity?.finprodMarketId}"  childrenIds='chlId'
-                                                data-th-data-url="@{/valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade001/getAssetId}">
+                                                data-th-placeholder="#{SysCommon.placeholder}" th:initValue="${entity?.finprodMarketId}"  childrenIds='chlId' parentIds="ps"
+                                                data-th-data-url="@{/valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade001/getRepoId}">
 
                                         </select>
                                     </div>
@@ -238,7 +238,8 @@
                                         <select type="text" id="trdAcctId" name="trdAcctId" class="layui-input form-input input-select" parentIds="portfolioId"
                                                 th:data-url="@{/valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade002/getTrdAcctId}"
                                                 allowClear="true" placeholder="请输入内容" required="required"
-                                                data-th-placeholder="#{SysCommon.placeholder}">
+                                                data-th-placeholder="#{SysCommon.placeholder}"
+                                                data-th-initValue="${entity?.trdAcctId}">
                                         </select>
                                     </div>
                                 </div>

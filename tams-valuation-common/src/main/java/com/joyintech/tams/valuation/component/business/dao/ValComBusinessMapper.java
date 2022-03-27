@@ -49,6 +49,15 @@ public interface ValComBusinessMapper {
      */
     List<SelectOptionDto> getAssetId(Map<String, Object> pageParam);
 
+
+    /**
+     * 回购资产代码
+     * @param pageParam
+     * @return
+     */
+    List<SelectOptionDto> getRepoId(Map<String, Object> pageParam);
+
+
     /**
      * 产品代码
      * @param pageParam

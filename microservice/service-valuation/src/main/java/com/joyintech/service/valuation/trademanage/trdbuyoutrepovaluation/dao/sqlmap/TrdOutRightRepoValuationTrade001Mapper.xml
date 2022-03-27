@@ -79,25 +79,25 @@
 	<select id="selectDeal" resultType="com.joyintech.service.valuation.trademanage.trdbuyoutrepovaluation.dto.TrdOutRightRepoValuationTrade001Dto">
 		SELECT
 		t.TRADE_ID tradeId,/**交易编号**/
-		null outTradeId,    /*外部成交编号*/
+		t.F_TRADE_ID outTradeId,    /*外部成交编号*/
 		NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) portfolioId,/**金融产品代码**/
 		bok.BOOKSET_NAME portfolioName,/**金融产品名称**/
-		zc.FINPROD_MARKET_ID  finprodMarketId, /**标的资产代码**/
-		zc.FINPROD_ABBR  finprodName,/**标的资产名称**/
-		zc.TERM_DAYS term,  /**回购期限**/
+		t.FINPROD_ID  finprodMarketId, /**标的资产代码**/
+-- 		zc.FINPROD_ABBR  finprodName,/**标的资产名称**/
+		zc.TERM term,  /**回购期限**/
 		t.PS ps,/**交易类型**/
 		t.TRADE_DATE tradeDate,/**交易日**/
 		t.VDATE vdate,/**起息日**/
 		t.MDATE mdate,/**到期日**/
 		t.FPRICE_AMT/1000 prinAmt, /**券面总额**/
-		null rebackPrice,  /**回购利率**/
+		zc.INT_RATE rebackPrice,  /**回购利率**/
 		t.FPRICE_AMT fprice, /**首次全价总额**/
 		t.FPRICE_AMT mfprice, /**到期全价总额**/
 		stl.SETTLE_AMT settleAmt,/**结算金额**/
 		t.CCY ccy,/**币种**/
-		stl.MY_ACCT_NO trdAcctId/**资金账户**/
+		t.MY_ACCT_NO trdAcctId/**资金账户**/
 		FROM TRD_PRODUCT_DEAL t
-		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
+		LEFT JOIN FIN_TRADE_PRODUCT zc on zc.finprod_id = t.finprod_id
 		LEFT JOIN MST_COUNTER_PARTY mst on mst.COUNTER_ID = t.COUNTER_ID
 		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE ='05'
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal1 on deal1.BUSI_NO = t.TRADE_ID
@@ -133,18 +133,18 @@
     <select id="queryTradeInfoByTradeId" resultType="com.joyintech.service.valuation.trademanage.trdbuyoutrepovaluation.dto.TrdOutRightRepoValuationTrade001Dto">
 		SELECT
 		t.TRADE_ID tradeId,/**交易编号**/
-		null outTradeId,    /*外部成交编号*/
+		t.F_TRADE_ID outTradeId,    /*外部成交编号*/
 		NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) portfolioId,/**金融产品代码**/
 		bok.BOOKSET_NAME portfolioName,/**金融产品名称**/
-		zc.FINPROD_MARKET_ID  finprodMarketId, /**标的资产代码**/
-		zc.FINPROD_ABBR  finprodName,/**标的资产名称**/
-		zc.TERM_DAYS term,  /**回购期限**/
+		t.FINPROD_ID  finprodMarketId, /**标的资产代码**/
+-- 		zc.FINPROD_ABBR  finprodName,/**标的资产名称**/
+		zc.TERM term,  /**回购期限**/
 		t.PS ps,/**交易类型**/
 		t.TRADE_DATE tradeDate,/**交易日**/
 		t.VDATE vdate,/**起息日**/
 		t.MDATE mdate,/**到期日**/
 		t.FPRICE_AMT/10000 prinAmt, /**券面总额**/
-		null rebackPrice,  /**回购利率**/
+		zc.INT_RATE rebackPrice,  /**回购利率**/
 		t.FPRICE_AMT fprice, /**首次全价总额**/
 		t.FPRICE_AMT mfprice, /**到期全价总额**/
 		ttfd.FEE_AMT  brokerage,/**经手费**/
@@ -155,9 +155,9 @@
         CASE WHEN ttfd.FEE_TYPE = 'B99' THEN ttfd.FEE_AMT ELSE 0 END as otherAmt,/**其他应付费用**/
 		stl.SETTLE_AMT settleAmt,/**结算金额**/
 		t.CCY ccy,/**币种**/
-		stl.MY_ACCT_NO trdAcctId/**资金账户**/
+		t.MY_ACCT_NO trdAcctId/**资金账户**/
 		FROM TRD_PRODUCT_DEAL t
-		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
+		LEFT JOIN FIN_TRADE_PRODUCT zc on zc.finprod_id = t.finprod_id
 		LEFT JOIN MST_COUNTER_PARTY mst on mst.COUNTER_ID = t.COUNTER_ID
 		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE ='05'
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal1 on deal1.BUSI_NO = t.TRADE_ID

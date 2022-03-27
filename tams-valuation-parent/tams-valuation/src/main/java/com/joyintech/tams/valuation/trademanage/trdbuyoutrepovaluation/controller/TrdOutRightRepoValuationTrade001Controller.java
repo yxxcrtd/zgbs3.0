@@ -13,6 +13,7 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
@@ -227,5 +228,28 @@ public class TrdOutRightRepoValuationTrade001Controller extends BaseController {
         return commonBusinessService.getAssetId(param);
     }
 
+    /**
+     * 资产代码下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getRepoId")
+    public List<SelectOptionDto> getRepoId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        String finprodType=null;
+        String ps=(String) param.get("ps");
+        if(ps.equals("03")){
+             finprodType="F04";
+        }else if(ps.equals("04")){
+             finprodType="F05";
+        }else {
+             finprodType="F04,F05";
+        }
+        param.put("finprodTypeArr", StringUtil.splitToList(GlobalConstant.COMMA,finprodType));
+        return commonBusinessService.getRepoId(param);
+    }
 
 }

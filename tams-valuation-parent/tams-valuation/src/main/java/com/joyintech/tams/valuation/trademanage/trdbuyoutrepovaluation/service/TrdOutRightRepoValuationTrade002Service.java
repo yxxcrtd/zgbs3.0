@@ -115,13 +115,14 @@ public class TrdOutRightRepoValuationTrade002Service extends BaseService<TrdOutR
         //比较界面和接口字段差异，并手动给接口字段赋值
 
         entity.setProdId(dto.getPortfolioId()); //产品代码
+        entity.setfTradeId(dto.getOutTradeId()); //外部交易编号
         entity.setDataActionSign("02");//数据动作标志
         entity.setTradeId(null);  //交易编号
         entity.setTermKind("R007"); //期限品种
         //DictCodeList.回购期限品种_R007.getValue()
         entity.setTradeMarket("01"); //交易市场 银行间
-
-        entity.setBusiType(dto.getPs()); //交易类型
+        entity.setPs(dto.getPs()); //交易类型
+//        entity.setBusiType(dto.getPs()); //交易类型
         entity.setTrader("yc"); //交易员
         entity.setTradeDate(dto.getTradeDate());//交易日
         entity.setSettleDate(dto.getTradeDate()); //交割日
@@ -146,30 +147,13 @@ public class TrdOutRightRepoValuationTrade002Service extends BaseService<TrdOutR
         entity.setStlFeeAmt(dto.getSettFeeAmt()); //结算手续费
         entity.setIsStlFeeAmt("N");
         entity.setIsChlFeeAmt("N");//通道费是否随交易支付
-        entity.setpTradeId("JYREPO202107270895"); //原交易编号
+        entity.setpTradeId(dto.getFinprodMarketId()); //原交易编号
         entity.setIsClean("N");//有无清算指令
         entity.setPaydate(new Date()); //交收日
         entity.setMyAcctNo(dto.getTrdAcctId()); //付款账户
         entity.setCounterAcctNo(null);//收款账户
         entity.setFundSettleDate(null);//资金交收日
         entity.setBusiType("05"); //业务类型
-
-//        entity.setAssetId("F01_"+dto.getFinprodMarketId());  //资产代码
-
-//        entity.setDealDate(dto.getTradeDate());//交易日
-//        entity.setSettDate(dto.getSettDate()); //交割日
-//        entity.setPs(dto.getPs());//交易方向
-//        entity.setTradeCapi(dto.getPrinAmt()); //交易本金
-//        entity.setIntAmt(dto.getIntAmt()); //应收利息
-//        entity.setDealAmt(dto.getDealAmt());//交易金额
-//        entity.setCcy(dto.getCcy());//币种
-//        entity.setCounterId("JYDS000000000424");//交易对手
-//        entity.setIsClean("Y");//有无清算指令
-//        entity.setChlFeeAmt(new BigDecimal(1.22));
-//        entity.setIsChlFeeAmt("N");
-//        entity.setChannelId("2222");
-//        entity.setTrdFee(new BigDecimal(222.1));
-
 
         listValBotAstTrade.add(entity);
 

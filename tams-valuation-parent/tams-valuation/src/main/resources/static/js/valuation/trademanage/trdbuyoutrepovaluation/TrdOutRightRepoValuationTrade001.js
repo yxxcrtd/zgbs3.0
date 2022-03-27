@@ -166,7 +166,7 @@
         });
         $('#TrdOutRightRepoValuationTrade001_btn_add').click(
                 function() {
-                    Joyin.dialog(JoyinUtil.getLabel("TrdRepoValuationTrade002"), basePath
+                    Joyin.dialog(JoyinUtil.getLabel("TrdOutRightRepoValuationTrade002"), basePath
                             + "valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade002/init", "99%", "99%", {
                         pageModel : PAGE_MODEL_NEW
                     }, function() {
