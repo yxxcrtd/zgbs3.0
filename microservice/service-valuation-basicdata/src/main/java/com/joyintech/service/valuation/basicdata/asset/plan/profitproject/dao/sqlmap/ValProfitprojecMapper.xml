@@ -79,7 +79,7 @@
             group by FINPROD_ID
         ) tempT8 on A.FINPROD_ID = tempT8.FINPROD_ID
         LEFT JOIN FIN_CASH_CALC_RULE T8 ON T8.FINPROD_ID = tempT8.FINPROD_ID AND T8.EFF_DATE = tempT8.EFF_DATE and T8.CASH_ID = T5.CASH_ID
-        WHERE B.TYPE_18 IN ('13','12') /** 项目类资产、及计划类利率型**/
+        WHERE B.TYPE_18 IN ('13') /** 项目类资产**/
             <if test="finprodMarketId != null and finprodMarketId !=''">
                 AND (A.FINPROD_MARKET_ID LIKE CONCAT(CONCAT('%',#{finprodMarketId}),'%')
                     OR A.FINPROD_NAME like concat(concat('%',#{finprodMarketId}),'%')
@@ -270,6 +270,7 @@
             FINPROD_MARKET_ID hidCode
         FROM FIN_PRODUCT
         <where>
+            B.TYPE_18 IN ('13')
             <if test="search != null and search != ''">
                 and (FINPROD_MARKET_ID like concat(concat('%',#{search}),'%')
                 or FINPROD_NAME like concat(concat('%',#{search}),'%'))
@@ -294,7 +295,7 @@
         FROM FIN_PRODUCT A
         inner join FIN_PRODUCT_TYPE B on A.FINPROD_ID = B.FINPROD_ID
         where
-            B.TYPE_18 IN ('13','12') /** 项目类资产、及计划类利率型**/
+            B.TYPE_18 IN ('13') /** 项目类资产**/
             <if test="search != null and search != ''">
                 and (
                     A.FINPROD_MARKET_ID like concat(concat('%',#{search}),'%')

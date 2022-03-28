@@ -75,7 +75,7 @@
             </foreach>
         </if>
         AND A.FINPROD_TYPE = #{FINPROD_TYPE_TG_F17, jdbcType = VARCHAR}
-        AND A.PROFIT_TYPE in (#{PROFIT_TYPE_01},#{PROFIT_TYPE_03})
+        AND A.PROFIT_TYPE in (#{PROFIT_TYPE_01},#{PROFIT_TYPE_02},#{PROFIT_TYPE_03})
         <if test="profitType != null and profitType != ''">
             AND A.PROFIT_TYPE = #{profitType, jdbcType = VARCHAR}
         </if>
@@ -305,7 +305,7 @@
             <if test="child != null and (!child or child == 'false')">
                 AND P_FINPROD_ID IS NULL
             </if>
-            AND PROFIT_TYPE in (#{PROFIT_TYPE_01},#{PROFIT_TYPE_03})
+            AND PROFIT_TYPE in (#{PROFIT_TYPE_01},#{PROFIT_TYPE_03},#{PROFIT_TYPE_02})
         </where>
     </select>
     <select id="selectDealCalendarHolidayCount" resultType="java.lang.Integer" parameterType="java.lang.String">
