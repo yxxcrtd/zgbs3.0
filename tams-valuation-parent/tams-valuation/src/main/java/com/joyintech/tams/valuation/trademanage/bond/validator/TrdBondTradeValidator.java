@@ -326,11 +326,11 @@ public class TrdBondTradeValidator implements BeanValidator {
                         resultList.add(new ValidMessage("stlFeeAmt",
                                 getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.stlFeeAmt"))));
                     }
-                    // 其他费用
-                    if(!StringUtil.isNotEmpty(dto.getOtherAmt())){
-                        resultList.add(new ValidMessage("otherAmt",
-                                getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.otherAmt"))));
-                    }
+//                    // 其他费用
+//                    if(!StringUtil.isNotEmpty(dto.getOtherAmt())){
+//                        resultList.add(new ValidMessage("otherAmt",
+//                                getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.otherAmt"))));
+//                    }
                     // 结算金额
                     if(!StringUtil.isNotEmpty(dto.getSettleAmt())){
                         resultList.add(new ValidMessage("settleAmt",

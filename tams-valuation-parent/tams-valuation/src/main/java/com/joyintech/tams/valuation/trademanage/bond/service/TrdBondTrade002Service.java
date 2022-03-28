@@ -132,7 +132,7 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTradeDto>
         valSecVestAssetDeal.setIsBrokerage("Y");//经手费是否随交易支付
         valSecVestAssetDeal.setIsCertfFee("Y");//证管费是否随交易支付
         valSecVestAssetDeal.setIsStlAmt("Y");//结算费是否随交易支付
-        valSecVestAssetDeal.setIsCommission("Y");//佣金是否随交易支付
+        valSecVestAssetDeal.setIsCommission("N");//佣金是否随交易支付
         valSecVestAssetDeal.setIsDealFeeAmt("N");//交易手续费是否随交易支付
         valSecVestAssetDeal.setIsStlFeeAmt("N");//结算手续费是否随交易支付
         valSecVestAssetDeal.setIsChlFeeAmt("Y");//通道费是否随交易支付
@@ -148,7 +148,7 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTradeDto>
         }else{
             valSecVestAssetDeal.setMyAcctNo(trdBondTradeDto.getMyAcctNo());
         }
-        valSecVestAssetDeal.setCounterAcctNo(valSecVestAssetDeal.getMyAcctNo());
+//        valSecVestAssetDeal.setCounterAcctNo(valSecVestAssetDeal.getMyAcctNo());
 
         listValSecVestAssetDeal.add(valSecVestAssetDeal);
 

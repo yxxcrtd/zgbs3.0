@@ -134,17 +134,18 @@
         var commission = $('#commission').val();
         var dealFeeAmt = $('#dealFeeAmt').val();
         var stlFeeAmt = $('#stlFeeAmt').val();
-        var otherAmt = $('#otherAmt').val();
+        //var otherAmt = $('#otherAmt').val();
         if(tradeAmt != null && tradeAmt != ''
             && brokerage != null && brokerage != ''
             && stlAmt != null && stlAmt != ''
             && commission != null && commission != ''
             && dealFeeAmt != null && dealFeeAmt != ''
             && stlFeeAmt != null && stlFeeAmt != ''
-            && otherAmt != null && otherAmt != ''){
+            //&& otherAmt != null && otherAmt != ''
+            ){
             var settleAmt1 = JoyinMath.doAdd(JoyinMath.doAdd(tradeAmt, brokerage,2),stlAmt,2);
             var settleAmt2 = JoyinMath.doAdd(JoyinMath.doAdd(settleAmt1, commission,2),dealFeeAmt,2);
-            var settleAmt3 = JoyinMath.doAdd(JoyinMath.doAdd(settleAmt2, stlFeeAmt,2),otherAmt,2);
+            var settleAmt3 = JoyinMath.doAdd(settleAmt2, stlFeeAmt,2);
             $('#settleAmt').val(settleAmt3);
             $('#bTradeAmt').val(settleAmt3);
         }else{
@@ -239,10 +240,10 @@
         $('#stlFeeAmt').change(function(){
             settleAmtChange();
         });
-        //其他费用
-        $('#otherAmt').change(function(){
-            settleAmtChange();
-        });
+        // //其他费用
+        // $('#otherAmt').change(function(){
+        //     settleAmtChange();
+        // });
 
         // 绑定按钮事件
         $('#TrdBondTrade002_btn_save').click(function() {
