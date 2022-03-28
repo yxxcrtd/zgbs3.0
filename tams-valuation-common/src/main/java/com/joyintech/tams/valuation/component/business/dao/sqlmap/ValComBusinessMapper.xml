@@ -201,6 +201,9 @@
 		FIN_TRADE_PRODUCT zc
 		where
 		1=1
+		<if test="initValue != null and initValue != ''">
+			AND FINPROD_ID = #{initValue}
+		</if>
 		<if test="finprodTypeArr !=null and finprodTypeArr.size() >0">
 			and FINPROD_TYPE in
 			<foreach collection="finprodTypeArr" item="finprodType" open="( " close=" )" separator=",">

@@ -79,7 +79,7 @@
             ,{field:'mdateStr', width:150,  title: '到期日',sortField:'mdate'}
             ,{field:'mdate', title: '到期日',visible:false}
             ,{field:'prinAmt', width:150, title: '券面总额(万元)',type:'number',sortField:'prinAmt',digit:2}
-            ,{field:'rebackPrice', width:150, title: '回购利率%',type:'number',sortField:'rebackPrice'}
+            ,{field:'rebackPrice', width:150, title: '回购利率%',type:'number',sortField:'rebackPrice',digit:4}
             ,{field:'fprice', width:150, title: '首次全价总额',type:'number',sortField:'fprice'}
             ,{field:'mfprice', width:150, title: '到期全价总额',type:'number',sortField:'mfprice'}
             ,{field:'settleAmt', width:150, title: '结算金额',type:'number',sortField:'settleAmt'}

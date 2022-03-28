@@ -125,7 +125,7 @@ public class TrdOutRightRepoValuationTrade003Service extends BaseService<TrdOutR
         ValRepDealSec entity = new ValRepDealSec();
 //        BeanUtil.copyPropertiesIgnoreNull(entity,dto);
         //比较界面和接口字段差异，并手动给接口字段赋值
-
+        entity.setfTradeId(dto.getOutTradeId()); //外部交易编号
         entity.setProdId(dto3.getPortfolioId()); //产品代码
         entity.setDataActionSign("02");//数据动作标志
         entity.setTradeId(null);
@@ -160,7 +160,7 @@ public class TrdOutRightRepoValuationTrade003Service extends BaseService<TrdOutR
         entity.setStlFeeAmt(dto.getSettFeeAmt()); //结算手续费
         entity.setIsStlFeeAmt("N");
         entity.setIsChlFeeAmt("N");//通道费是否随交易支付
-        entity.setpTradeId("JYREPO202107270895"); //原交易编号
+        entity.setpTradeId(dto.getFinprodMarketId()); //原交易编号
 //        entity.setpTradeId(dto.getTradeId()); //原交易编号
         entity.setIsClean("N");//有无清算指令
         entity.setPaydate(new Date()); //交收日

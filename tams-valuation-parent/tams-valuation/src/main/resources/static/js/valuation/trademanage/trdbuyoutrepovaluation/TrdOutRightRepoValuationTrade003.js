@@ -42,6 +42,8 @@ $(function() {
         $('#tradeDate').val(mdate);
         $('#settleDate').val(mdate);
         $('#ps').textSelect("setValue",'T07');
+        var settleAmt=JoyinMath.doAdd($('#mfprice').val(), $('#otherAmt').val(), 2);
+        $('#settleAmt').val(settleAmt);
     }
     /**
      * 画面加载完成
@@ -82,33 +84,6 @@ $(function() {
     });
 
 
-    // //根据产品名称联动出产品代码
-    // $('#portfolioId').change(function(){
-    //     var portfolioId = $('#portfolioId').val();
-    //     if(portfolioId){
-    //         var dataPort = $('#portfolioId').select2('data')[0].object;
-    //         var finprodId = dataPort.finprodId;
-    //         $('#portfolioName').val(finprodId).trigger('change');
-    //
-    //     }else {
-    //         $('#portfolioName').val('').trigger('change');
-    //     }
-    // });
-    //
-    // //根据标的资产名称联动出标的资产代码
-    // $('#finprodMarketId').change(function(){
-    //     var finprodMarketId = $('#finprodMarketId').val();
-    //     if(finprodMarketId){
-    //         var dataPort = $('#finprodMarketId').select2('data')[0].object;
-    //         var finprodId = dataPort.finprodId;
-    //         $('#finprodName').val(finprodId).trigger('change');
-    //
-    //     }else {
-    //         $('#finprodName').val('').trigger('change');
-    //     }
-    // });
-
-
 
     $('#portfolioId').change(function(){
         var portfolioId = $('#portfolioId').val();
@@ -124,16 +99,27 @@ $(function() {
      * 资产代码联动带出资产简称，交易场所
      */
 
+    /**
+     * 资产代码联动带出资产简称，交易场所
+     */
+
     $('#finprodMarketId').change(function(){
         var finprodMarketId = $('#finprodMarketId').val();
         if(finprodMarketId){
+            var dataPort = $('#finprodMarketId').select2('data')[0].object;
+            var term = dataPort.term;
+            var rebackPrice = JoyinMath.doMul(dataPort.rebackPrice, 100, 4);
+
             $('#finprodName').val($('#finprodMarketId').select2('data')[0].id).trigger('change');
+            $('#term').val(term).trigger('change');
+            $('#rebackPrice').val(rebackPrice).trigger('change');
 
         }else {
             $('#finprodName').val('').trigger('change');
+            $('#term').val('').trigger('change');
+            $('#rebackPrice').val('').trigger('change');
         }
     });
-
 
 
 }());
