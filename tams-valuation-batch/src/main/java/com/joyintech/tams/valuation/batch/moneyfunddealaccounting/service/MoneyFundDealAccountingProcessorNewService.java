@@ -1088,8 +1088,8 @@ public class MoneyFundDealAccountingProcessorNewService {
 //                accountAmountMap.put("BONUSAMT" + BookConstant.BCCYAMT
 //                		,calculationCommonService.doMultiply(NumberEnum.MONEY.getCode(), null, accountAmountMap.get("BONUSAMT"), changeRate));
                 // 定义 本位币金额
-                BigDecimal bonusAmtBccy = calculationCommonService.doMultiply(NumberEnum.MONEY.getCode(), null, accountAmountMap.get(资金账户金额元素), changeRate);
                 accountAmountMap.put(资金账户金额元素, dealDto.getTradeAmt());
+                BigDecimal bonusAmtBccy = calculationCommonService.doMultiply(NumberEnum.MONEY.getCode(), null, accountAmountMap.get(资金账户金额元素), changeRate);
                 accountAmountMap.put(资金账户金额元素 + BookConstant.BCCYAMT, bonusAmtBccy);
                 // add by weipeng on 20220221 区分资金账户金额元素 end
                 // accountAmountMap.put("NETAMT_D", null);// 轧差金额（借）
@@ -1566,7 +1566,9 @@ public class MoneyFundDealAccountingProcessorNewService {
                 accountSceneMap.put(BookConstant.BOOK_REMARK, DictCodeListTableId.会计场景代码_货币基金及货币型资产_份额调增.getCodeName() + "登账");// 备注
                 accountSceneMap.put(BookConstant.IS_ZERO_ACCOUNT,DictCodeList.是否_是.getValue());
 
-                BigDecimal prinamt = dealDto.getPrinAmt()==null?BigDecimal.ZERO:dealDto.getPrinAmt();
+//                BigDecimal prinamt = dealDto.getPrinAmt()==null?BigDecimal.ZERO:dealDto.getPrinAmt();
+                // modify by weipeng on 20220328:货币基金默认单位净值为1，份额调增只存份额字段
+                BigDecimal prinamt = dealDto.getShareAmt()==null?BigDecimal.ZERO:dealDto.getShareAmt();
                 // 记账金额要素 map塞值
                 accountAmountMap.put("IN_DEALAMT",prinamt);// 调增金额 - 交易明细.交易本金
                 accountAmountMap.put("ACCQUA", dealDto.getShareAmt()==null?BigDecimal.ZERO:dealDto.getShareAmt());// 核算数量 - 交易明细.交易份额
@@ -1602,7 +1604,7 @@ public class MoneyFundDealAccountingProcessorNewService {
                 accountSceneMap.put(BookConstant.BOOK_REMARK, DictCodeListTableId.会计场景代码_货币基金及货币型资产_份额调减.getCodeName() + "登账");// 备注
                 accountSceneMap.put(BookConstant.IS_ZERO_ACCOUNT,DictCodeList.是否_是.getValue());
                 // 记账金额要素 map塞值
-                BigDecimal prinamt = dealDto.getPrinAmt()==null?BigDecimal.ZERO:dealDto.getPrinAmt();
+                BigDecimal prinamt = dealDto.getShareAmt()==null?BigDecimal.ZERO:dealDto.getShareAmt();
                 
                 accountAmountMap.put("OUT_DEALAMT", prinamt);// 调减金额 - 交易明细.交易本金
                 accountAmountMap.put("ACCQUA", dealDto.getShareAmt()==null?BigDecimal.ZERO:dealDto.getShareAmt());// 核算数量 - 交易明细.交易份额
