@@ -851,3 +851,11 @@ insert into  BOK_MATCH_RLAT(   MATCH_TYPE    ,ACCT_STANDARD  ,  SOURCE , TARGET,
 DELETE FROM BOK_MATCH_RLAT T WHERE T.SOURCE='27' AND T.TARGET='DQCK_BJ';
 insert into  BOK_MATCH_RLAT(   MATCH_TYPE    ,ACCT_STANDARD  ,  SOURCE , TARGET, CREATE_USER   , CREATE_DEPT    ,  CREATE_TIME    ,UPDATE_USER   , UPDATE_TIME   )values ('02','QY','27','MCHGJRZC_CB','SYS', 'SYSDEPT', SYSDATE, 'SYS', SYSDATE);
 insert into  BOK_MATCH_RLAT(   MATCH_TYPE    ,ACCT_STANDARD  ,  SOURCE , TARGET, CREATE_USER   , CREATE_DEPT    ,  CREATE_TIME    ,UPDATE_USER   , UPDATE_TIME   )values ('02','QY','27','MRFSJRZC_CB','SYS', 'SYSDEPT', SYSDATE, 'SYS', SYSDATE);
+
+--------------------------------add by weipeng on 20220329 : 债券借贷计提批处理匹配关系表科目性质变更 start---------------------------------------
+delete from bok_match_rlat where source='403' and match_type='02';
+insert into bok_match_rlat (MATCH_TYPE, ACCT_STANDARD, SOURCE, TARGET, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+values ('02', 'QY', '403', 'QFZQBJ', 'system', null, sysdate, 'system', sysdate);
+insert into bok_match_rlat (MATCH_TYPE, ACCT_STANDARD, SOURCE, TARGET, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+values ('02', 'QY', '403', 'QSZQBJ', 'system', null, sysdate, 'system', sysdate);
+--------------------------------add by weipeng on 20220329 : 债券借贷计提批处理匹配关系表科目性质变更 end---------------------------------------
