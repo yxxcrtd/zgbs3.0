@@ -98,11 +98,6 @@ $(function() {
     /**
      * 资产代码联动带出资产简称，交易场所
      */
-
-    /**
-     * 资产代码联动带出资产简称，交易场所
-     */
-
     $('#finprodMarketId').change(function(){
         var finprodMarketId = $('#finprodMarketId').val();
         if(finprodMarketId){

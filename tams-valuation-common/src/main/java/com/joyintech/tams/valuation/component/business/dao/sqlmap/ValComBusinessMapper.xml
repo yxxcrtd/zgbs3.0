@@ -194,16 +194,17 @@
 	<select id="getRepoId" resultMap="SelectOptionMap01">
 		select
 		zc.FINPROD_ID id,
-		zc.FINPROD_TYPE text,
+		zc.FINPROD_ID text,
+		zc.FINPROD_TYPE finprodType,
 		zc.TERM term,
 		zc.INT_RATE rebackPrice
 		from
 		FIN_TRADE_PRODUCT zc
 		where
 		1=1
-		<if test="initValue != null and initValue != ''">
-			AND FINPROD_ID = #{initValue}
-		</if>
+<!--		<if test="initValue != null and initValue != ''">-->
+<!--			AND FINPROD_ID = #{initValue}-->
+<!--		</if>-->
 		<if test="finprodTypeArr !=null and finprodTypeArr.size() >0">
 			and FINPROD_TYPE in
 			<foreach collection="finprodTypeArr" item="finprodType" open="( " close=" )" separator=",">

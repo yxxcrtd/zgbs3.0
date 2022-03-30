@@ -104,7 +104,7 @@
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal2 ON stl.ORDER_ID = deal2.BUSI_NO
 		LEFT JOIN BOK_BOOKSET bok on (bok.BOOKSET_ID = deal1.BOOKSET_ID) OR (bok.BOOKSET_ID = deal2.BOOKSET_ID)
 		where
-		t.BUSI_TYPE ='05'
+		t.BUSI_TYPE ='05' and t.FINPROD_TYPE in ('F04','F05')
 		<if test="tradeId !=null and tradeId !='' ">
 			and t.TRADE_ID like  concat(concat('%',#{tradeId}),'%')
 		</if>
@@ -192,6 +192,7 @@
 		t.MDATE mdate,/**到期日**/
 		t.PRIN_AMT/10000 prinAmt, /**券面总额**/
 		zc.INT_RATE rebackPrice,  /**回购利率**/
+		t.INT_AMT intAmt,  /**回购利息**/
 		t.FPRICE_AMT fprice, /**首次全价总额**/
 		t.FPRICE_AMT mfprice, /**到期全价总额**/
 		ttfd.FEE_AMT  brokerage,/**经手费**/
