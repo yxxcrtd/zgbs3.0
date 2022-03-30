@@ -1,4 +1,4 @@
-package com.joyintech.tams.valuation.batch.common.log;
+package com.joyintech.tams.valuation.batch.common.log.dto;
 /*
  * @ClassName DetailBatchLog
  * @Description 详情日志实体类
@@ -7,16 +7,11 @@ package com.joyintech.tams.valuation.batch.common.log;
  * @Version 1.0
  **/
 
-import com.alibaba.fastjson.JSON;
-import com.joyintech.batch.batchbase.baseclass.BatchBaseService;
-import org.activiti.engine.impl.util.CollectionUtil;
-import org.apache.commons.collections.CollectionUtils;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-public class DetailBatchLog {
+public class DetailBatchLogDto {
     private static DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     //任务组ID
     private String groupId;
@@ -28,12 +23,6 @@ public class DetailBatchLog {
     private String taskName;
     //任务调度bean
     private String taskBeanName;
-    //账套ID
-    private String booksetId;
-    //业务代码
-    private String busiId;
-    //业务明细代码
-    private String bokDetailId;
     //开始时间
     private LocalDateTime start;
     //结束时间
@@ -44,11 +33,16 @@ public class DetailBatchLog {
     private String methodName;
     //参数
     private Object[] args;
+    //账套ID
+    private String booksetId;
+    //金融产品ID
+    private String finprodId;
+    //业务编码
+    private String busiId;
     //执行结果
     private Object result;
-    //明细日志
-    private List<DetailBatchLog> detailList;
-
+    //扩展明细
+    private List<DetailBatchLogExpand> detailList;
 
     public String getGroupId() {
         return groupId;
@@ -88,30 +82,6 @@ public class DetailBatchLog {
 
     public void setTaskBeanName(String taskBeanName) {
         this.taskBeanName = taskBeanName;
-    }
-
-    public String getBooksetId() {
-        return booksetId;
-    }
-
-    public void setBooksetId(String booksetId) {
-        this.booksetId = booksetId;
-    }
-
-    public String getBusiId() {
-        return busiId;
-    }
-
-    public void setBusiId(String busiId) {
-        this.busiId = busiId;
-    }
-
-    public String getBokDetailId() {
-        return bokDetailId;
-    }
-
-    public void setBokDetailId(String bokDetailId) {
-        this.bokDetailId = bokDetailId;
     }
 
     public LocalDateTime getStart() {
@@ -154,6 +124,30 @@ public class DetailBatchLog {
         this.args = args;
     }
 
+    public String getBooksetId() {
+        return booksetId;
+    }
+
+    public void setBooksetId(String booksetId) {
+        this.booksetId = booksetId;
+    }
+
+    public String getFinprodId() {
+        return finprodId;
+    }
+
+    public void setFinprodId(String finprodId) {
+        this.finprodId = finprodId;
+    }
+
+    public String getBusiId() {
+        return busiId;
+    }
+
+    public void setBusiId(String busiId) {
+        this.busiId = busiId;
+    }
+
     public Object getResult() {
         return result;
     }
@@ -162,13 +156,11 @@ public class DetailBatchLog {
         this.result = result;
     }
 
-    public List<DetailBatchLog> getDetailList() {
+    public List<DetailBatchLogExpand> getDetailList() {
         return detailList;
     }
 
-    public void setDetailList(List<DetailBatchLog> detailList) {
+    public void setDetailList(List<DetailBatchLogExpand> detailList) {
         this.detailList = detailList;
     }
-
-
 }
