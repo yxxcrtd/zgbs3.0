@@ -37,6 +37,18 @@
                     </div>
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
                         <label class="layui-form-label form-lable"
+                               data-th-text="#{TrdBondLendTrade.tradeDate}">交易日期</label>
+                        <div class="layui-input-inline input-inline">
+                            <input type="text" id="tradeDate" name="tradeDate"
+                                   class="layui-input form-input input-dateRangeSelect" placeholder="请输入内容"
+                                   data-th-placeholder="#{SysCommon.placeholder}"
+                                   data-th-value="${#dates.format(entity?.tradeDate,'yyyy-MM-dd')}">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
+                        <label class="layui-form-label form-lable"
                                data-th-text="#{TrdBondLendTrade.ps}">交易类型</label>
                         <div class="layui-input-inline input-inline">
                             <select type="text" id="ps" name="ps" class="layui-input form-input input-select" allowClear="true" placeholder="请输入内容"
@@ -45,18 +57,6 @@
                                 <option value="02">融出</option>
                                 <option value="03">到期</option>
                             </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="layui-form-item">
-                    <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
-                        <label class="layui-form-label form-lable"
-                               data-th-text="#{TrdBondLendTrade.tradeDate}">交易日期</label>
-                        <div class="layui-input-inline input-inline">
-                            <input type="text" id="tradeDate" name="tradeDate"
-                                   class="layui-input form-input input-dateRangeSelect" placeholder="请输入内容"
-                                   data-th-placeholder="#{SysCommon.placeholder}"
-                                   data-th-value="${#dates.format(entity?.tradeDate,'yyyy-MM-dd')}">
                         </div>
                     </div>
                 </div>

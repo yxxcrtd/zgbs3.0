@@ -9,17 +9,15 @@
             <Cell order="5" name="标的债券代码">secId</Cell>
             <Cell order="6" name="标的债券简称">secAbbr</Cell>
             <Cell order="7" name="交易类型">psStr</Cell>
-            <Cell order="8" name="交易日">tradeDateStr</Cell>
-            <Cell order="9" name="交割日">settdateDateStr</Cell>
-            <Cell order="10" name="起息日">vdateStr</Cell>
-            <Cell order="11" name="到期日">mdateStr</Cell>
-            <Cell order="12" name="借贷期限">term</Cell>
-            <Cell order="13" name="券面总额（万元）">prinAmtStr</Cell>
-            <Cell order="14" name="借贷费率%">feeRateStr</Cell>
-            <Cell order="15" name="借贷费用">feeStr</Cell>
-            <Cell order="16" name="结算金额">settleAmtStr</Cell>
-            <Cell order="17" name="币种">ccyFmt</Cell>
-            <Cell order="18" name="资金账户">acctNo</Cell>
+            <Cell order="8" name="交易日期">tradeDateStr</Cell>
+            <Cell order="9" name="首次结算日">vdateStr</Cell>
+            <Cell order="10" name="到期结算日">mdateStr</Cell>
+            <Cell order="11" name="借贷期限">term</Cell>
+            <Cell order="12" name="券面总额（万元）">prinAmtStr</Cell>
+            <Cell order="13" name="借贷费率%">feeRateStr</Cell>
+            <Cell order="14" name="借贷费用">feeStr</Cell>
+            <Cell order="15" name="币种">ccyFmt</Cell>
+            <Cell order="16" name="资金账户">acctNo</Cell>
         </Row>
     </Worksheet>
 </Workbook>

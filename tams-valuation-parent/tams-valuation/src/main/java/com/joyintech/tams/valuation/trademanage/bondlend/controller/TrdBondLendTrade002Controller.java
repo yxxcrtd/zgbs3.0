@@ -66,6 +66,8 @@ public class TrdBondLendTrade002Controller extends BaseController {
         String workflowId = this.getParam(GlobalConstant.WORKFLOW_ID);
 
         String tradeId = getParam("tradeId");
+        //平台日
+        model.addAttribute("iPlatformDate", DateUtil.parse(DateUtil.getSysDate()));
 
         //工作流
         if(StringUtil.isNotEmpty(workflowId)){
@@ -152,7 +154,7 @@ public class TrdBondLendTrade002Controller extends BaseController {
         workFlowParameter.setBusinessCode(dto.getSecId());
         workFlowParameter.setBusinessType(DictCodeListExt2.共通业务类型_债券借贷交易.getValue());
         workFlowParameter.setComment((entity) -> WorkFlowUtil.concatComment(
-            getMessage("债券代码") + GlobalConstant.COLON + entity.getTradeId(),
+            getMessage("债券代码") + GlobalConstant.COLON + entity.getSecId(),
             getMessage("交易日期") + GlobalConstant.COLON + DateUtil.format(entity.getTradeDate())));
 
         String msg = trdBondLendTrade002Service.start(processParameter, dto);

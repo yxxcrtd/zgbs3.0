@@ -24,12 +24,21 @@
             }
         },
         dblclick:function(table, data) {
-            Joyin.dialog(JoyinUtil.getLabel("债券借贷交易查看："),
-                JoyinUtil.getRealPath("/valuation/trademanage/bondlend/TrdBondLendTrade002/init"),
-                "90%", "90%", {pageModel:PAGE_MODEL_REFERENCE,tradeId:data.tradeId,prodId:data.finprodId,ps:data.ps},
-                function(){
-                    //table.reload();
-                });
+            if(data.ps == '01' || data.ps == '02') {
+                Joyin.dialog(JoyinUtil.getLabel("债券借贷交易查看："),
+                    basePath + "valuation/trademanage/bondlend/TrdBondLendTrade002/init",
+                    "95%", "90%", {
+                        pageModel: PAGE_MODEL_REFERENCE,
+                        tradeId: data.tradeId, prodId: data.finprodId, ps: data.ps
+                    });
+            }else{
+                Joyin.dialog(JoyinUtil.getLabel("债券借贷交易查看："),
+                    basePath + "valuation/trademanage/bondlend/TrdBondLendTrade003/init",
+                    "95%", "90%", {
+                        pageModel: PAGE_MODEL_REFERENCE,
+                        tradeId: data.tradeId, prodId: data.finprodId, ps: data.ps
+                    });
+            }
         },
         cols:[
             {field:'tradeId', title: '交易编号',width:220},
@@ -40,19 +49,16 @@
             {field:'secAbbr', title: '标的债券简称',width:180},
             {field:'psStr', title: '交易类型',sortField:"ps",width:150},
             {field:'ps', title: '交易类型',visible:false},
-            {field:'tradeDateStr', width:120,  title: '交易日',sortField:'tradeDate'},
-            {field:'tradeDate', title: '交易日',visible:false},
-            {field:'settdateDateStr', width:120,  title: '交割日',sortField:'settdateDate'},
-            {field:'settdateDate', title: '交割日',visible:false},
-            {field:'vdateStr', width:120,  title: '起息日',sortField:'vdate'},
-            {field:'vdate', title: '起息日',visible:false},
-            {field:'mdateStr', width:120,  title: '到期日',sortField:'mdate'},
-            {field:'mdate', title: '到期日',visible:false},
+            {field:'tradeDateStr', width:120,  title: '交易日期',sortField:'tradeDate'},
+            {field:'tradeDate', title: '交易日期',visible:false},
+            {field:'vdateStr', width:120,  title: '首次结算日',sortField:'vdate'},
+            {field:'vdate', title: '首次结算日',visible:false},
+            {field:'mdateStr', width:120,  title: '到期结算日',sortField:'mdate'},
+            {field:'mdate', title: '到期结算日',visible:false},
             {field:'term',title: '借贷期限',width:180},
             {field:'prinAmt',type:"money", title: '券面总额（万元）',width:180},
             {field:'feeRate', type:"money",digit:4,title: '借贷费率%',width:180},
             {field:'fee',type:"money", title: '借贷费用',width:180},
-            {field:'settleAmt',type:"money", title: '结算金额',width:180},
             {field:'ccyFmt', title: '币种',sortField:"ccy",width:180},
             {field:'ccy', title: '币种',visible:false},
             {field:'acctNo', title: '资金账户',width:180},

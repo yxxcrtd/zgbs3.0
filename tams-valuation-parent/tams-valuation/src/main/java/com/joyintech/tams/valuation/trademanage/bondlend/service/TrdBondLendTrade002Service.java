@@ -4,6 +4,7 @@ import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.ArithmeticUtil;
+import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 @Service
@@ -105,8 +107,7 @@ public class TrdBondLendTrade002Service extends CommonExportService<TrdBondLendT
         //将页面输入值赋值给接口实体类
         List<ValSeclendDeal> listValSeclendDeal=new ArrayList<>();
         ValSeclendDeal entity = new ValSeclendDeal();
-        entity.setTradeId(dto.getTradeId());
-        entity.setProdId(dto.getProdId());
+        BeanUtil.copyPropertiesIgnoreNull(entity, dto);
         //金融产品类型
         if("01".equals(dto.getPs())){
             entity.setFinprodType(DictCodeListExt1.金融产品类型_债券借贷融入.getValue());
@@ -116,26 +117,20 @@ public class TrdBondLendTrade002Service extends CommonExportService<TrdBondLendT
             entity.setPs("T01");//交易方向
         }else if("03".equals(dto.getPs())){
             entity.setPs(DictCodeList.交易方向_到期.getValue());
+            entity.setFee(dto.getSettleAmt());
         }
-        entity.setTradeDate(dto.getTradeDate());//交易日
-        entity.setVdate(dto.getVdate());//起息日
-        entity.setMdate(dto.getMdate());//到期日
-        entity.setTerm(dto.getTerm());//借贷期限
-        entity.setFeeRate(dto.getFeeRate());//借贷费率
-        entity.setFee(dto.getFee());//借贷费用
-        entity.setCcy(dto.getCcy());//币种
-        entity.setSecId("F01_"+dto.getSecId());//标的债券代码
         entity.setPrinAmt(ArithmeticUtil.multiply(dto.getPrinAmt(), new BigDecimal(10000)));//券面总额
-        entity.setStlFeeAmt(dto.getStlFeeAmt());//结算服务费
-        entity.setMyAcctNo(dto.getAcctNo());
+        entity.setFeeRate(ArithmeticUtil.divide(dto.getFeeRate(),new BigDecimal(100),4, RoundingMode.HALF_UP));
+        entity.setMyAcctNo(dto.getAcctNo());//资金账户
+        entity.setFundSettleDate(dto.getTradeDate());//资金交收日
         //比较界面和接口字段差异，并手动给接口字段赋值
-        entity.setFinprodId("F01_"+ dto.getSecId());//金融产品代码
+        entity.setFinprodId( dto.getSecId());//金融产品代码
         entity.setDataActionSign("01");//数据动作标志
         entity.setBasis(null);//计息基础  接口没用到
         entity.setCounterId(null);//交易对手
         entity.setTradeMarket("01");//交易场所  默认银行间
         entity.setmPrinAmt(new BigDecimal(0));//质押券面总额
-        entity.setIsClean("N");//有无清算指令 默认：无
+        entity.setIsClean("Y");//有无清算指令 默认：无//TODO
         entity.setRegistAgency(null);//登记结算机构
         entity.setIsStlFeeAmt("N");//结算手续费是否随交易支付 默认：否
 

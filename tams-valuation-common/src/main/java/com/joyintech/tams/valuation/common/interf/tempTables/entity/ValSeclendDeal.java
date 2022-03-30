@@ -165,6 +165,13 @@ public class ValSeclendDeal extends BaseEntity {
      */
     private String isStlFeeAmt;
 
+    /*add by sunshuaishuai 20220325 交易管理 start*/
+    /**
+     * 外部成交编号
+     */
+    private String outTradeId;
+    /*add by sunshuaishuai 20220325 end*/
+
     /**
      * 取得 成交编号
      * @return 成交编号
@@ -648,4 +655,22 @@ public class ValSeclendDeal extends BaseEntity {
     public void setIsStlFeeAmt(String isStlFeeAmt) {
         this.isStlFeeAmt = isStlFeeAmt;
     }
+
+    /*add by sunshuaishuai 20220325 交易管理 start*/
+    /**
+     * 取得 外部成交编号
+     * @return 外部成交编号
+     */
+    public String getOutTradeId() {
+        return outTradeId;
+    }
+
+    /**
+     * 设置 外部成交编号
+     * @param outTradeId 外部成交编号
+     */
+    public void setOutTradeId(String outTradeId) {
+        this.outTradeId = outTradeId == null ? null : outTradeId.trim();
+    }
+    /*add by sunshuaishuai 20220325 end*/
 }

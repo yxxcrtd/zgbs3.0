@@ -21,6 +21,7 @@ import com.joyintech.framework.util.*;
 import com.joyintech.system.constant.SystemGlobalConstant;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.valuation.common.service.BaseCommonService;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTradeDto;
@@ -174,7 +175,7 @@ public class TrdBondLendTrade001Controller extends BaseController {
         // 业务代码（凭证流水号）
         params.setBusinessCode(item -> item.getTradeId());
         // 业务类型
-        params.setBusinessType(DictCodeList.业务类型_债券借贷交易.getValue());
+        params.setBusinessType(DictCodeListExt2.共通业务类型_债券借贷交易.getValue());
         // 页面id
         params.setPageId("TrdBondLendTrade002");
         // 元素id

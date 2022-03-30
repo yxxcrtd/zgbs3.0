@@ -105,21 +105,21 @@
         }
     }
 
-    //结算金额  结算金额=借贷费用+交易手续费+结算服务费+其他费用
-    var settleAmtChange = function(){
-        var fee = $('#fee').val();
-        var dealFeeAmt = $('#dealFeeAmt').val();
-        var stlFeeAmt = $('#stlFeeAmt').val();
-        var otherAmt = $('#otherAmt').val();
-        if(fee != null && fee != ''
-            && dealFeeAmt != null && dealFeeAmt != ''
-            && stlFeeAmt != null && stlFeeAmt != ''
-            && otherAmt != null && otherAmt != ''){
-            var settleAmt1 = JoyinMath.doAdd(JoyinMath.doAdd(fee, dealFeeAmt,2),stlFeeAmt,2);
-            var settleAmt2 = JoyinMath.doAdd(settleAmt1, otherAmt,2);
-            $('#settleAmt').val(settleAmt2);
+    var calMdate = function(){
+        var bondLendTerm = $('#term').val();
+        if(bondLendTerm ){
+            var vdate = $('#vdate').val();//首次结算日
+            if(vdate){
+                var d1 = new Date(vdate).getTime();
+                var day = parseInt(bondLendTerm*24*60*60*1000);
+                var mdate = new Date(d1+day);
+                mdate=mdate.format("yyyy-MM-dd");
+                $("#mdate").val(mdate).trigger("change");
+                }else{
+                    $("#mdate").val('').trigger('change');
+                }
         }else{
-            $('#settleAmt').val('');
+            $("#mdate").val('').trigger('change');
         }
     }
 
@@ -143,6 +143,12 @@
             secIdChange();
         });
 
+        $('#term').change(function(){
+            feeChange();
+            calMdate();
+        });
+
+
         //借贷费用联动事件
         //起息日
         $('#vdate').change(function(){
@@ -159,24 +165,6 @@
         //借贷费率
         $('#feeRate').change(function(){
             feeChange();
-        });
-
-        //结算金额联动事件
-        //借贷费用
-        $('#fee').change(function(){
-            settleAmtChange();
-        });
-        //交易手续费
-        $('#dealFeeAmt').change(function(){
-            settleAmtChange();
-        });
-        //结算手续费
-        $('#stlFeeAmt').change(function(){
-            settleAmtChange();
-        });
-        //其他费用
-        $('#otherAmt').change(function(){
-            settleAmtChange();
         });
 
         // 绑定按钮事件

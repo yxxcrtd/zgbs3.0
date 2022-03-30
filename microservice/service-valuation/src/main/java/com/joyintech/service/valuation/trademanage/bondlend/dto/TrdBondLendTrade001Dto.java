@@ -61,6 +61,11 @@ public class TrdBondLendTrade001Dto extends BaseEntity implements ProcessEntity 
     private String secAbbr;
 
     /**
+     * 金融产品类型
+     */
+    private String finprodType;
+
+    /**
      * 交易方向
      */
     private String ps;
@@ -75,6 +80,16 @@ public class TrdBondLendTrade001Dto extends BaseEntity implements ProcessEntity 
      * 交易日
      */
     private Date tradeDate;
+
+    /**
+     * 起息日
+     */
+    private Date vdate;
+
+    /**
+     * 到期日
+     */
+    private Date mdate;
 
     /**
      * 券面总额
@@ -121,6 +136,11 @@ public class TrdBondLendTrade001Dto extends BaseEntity implements ProcessEntity 
      * 资金账户
      */
     private String acctNo;
+
+    /**
+     * 是否现金交割
+     */
+    private String isSettAmt;
 
     public String getProdId() {
         return prodId;
@@ -288,5 +308,37 @@ public class TrdBondLendTrade001Dto extends BaseEntity implements ProcessEntity 
 
     public void setSettAmt(BigDecimal settAmt) {
         this.settAmt = settAmt;
+    }
+
+    public String getIsSettAmt() {
+        return isSettAmt;
+    }
+
+    public void setIsSettAmt(String isSettAmt) {
+        this.isSettAmt = isSettAmt;
+    }
+
+    public Date getVdate() {
+        return vdate;
+    }
+
+    public void setVdate(Date vdate) {
+        this.vdate = vdate;
+    }
+
+    public Date getMdate() {
+        return mdate;
+    }
+
+    public void setMdate(Date mdate) {
+        this.mdate = mdate;
+    }
+
+    public String getFinprodType() {
+        return finprodType;
+    }
+
+    public void setFinprodType(String finprodType) {
+        this.finprodType = finprodType;
     }
 }
