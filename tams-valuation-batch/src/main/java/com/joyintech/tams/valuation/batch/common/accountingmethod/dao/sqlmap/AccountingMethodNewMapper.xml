@@ -95,11 +95,12 @@
             AND A.IS_ACC = #{isAcc}
         </if>
         <if test="listSubjectInternalCode != null and listSubjectInternalCode.size >0">
-            AND A.SUBJECT_INTERNAL_CODE IN
-            <foreach collection="listSubjectInternalCode" item="item" index="index" open="(" close=")" separator=",">
-                <if test="(index % 999) == 998"> NULL ) OR A.SUBJECT_INTERNAL_CODE  IN (</if>#{item}
-                <if test="(index % 998) == 0"> NULL ) OR A.SUBJECT_INTERNAL_CODE  IN (</if>#{item}
-            </foreach>
+            <foreach collection="listSubjectInternalCode" item="item" separator="," index= "index"  open="and (A.SUBJECT_INTERNAL_CODE  in(" close=")">
+                <if test="(index % 998) == 0">
+                    null) or A.SUBJECT_INTERNAL_CODE  in (
+                </if>
+                #{item}
+            </foreach>)
         </if>
 
     </select>
