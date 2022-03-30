@@ -10,4 +10,17 @@ package com.joyintech.tams.valuation.batch.common.log.dto;
 public class CustomDetailBatchLogDto extends DetailBatchLogExpand{
     // TODO
     //属性名必须使用DetailLogConfig注解配置字段描述
+    /*
+     *业务代码
+     **/
+    @DetailLogConfig(description="测试")
+    private String test;
+
+    public String getTest() {
+        return test;
+    }
+
+    public void setTest(String test) {
+        this.test = test;
+    }
 }

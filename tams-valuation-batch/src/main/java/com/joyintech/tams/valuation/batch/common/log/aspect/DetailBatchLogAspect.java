@@ -8,6 +8,7 @@ import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.tams.valuation.batch.common.log.dto.CustomDetailBatchLogDto;
 import com.joyintech.tams.valuation.batch.common.log.dto.DetailBatchLogDto;
 import com.joyintech.tams.valuation.batch.common.log.dto.DetailBatchLogExpand;
+import com.joyintech.tams.valuation.batch.common.log.dto.DetailLogConfig;
 import com.joyintech.tams.valuation.batch.common.log.exception.DetailBatchException;
 import groovy.util.logging.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -22,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -157,13 +159,36 @@ public class DetailBatchLogAspect {
         DetailBatchLogDto lger = errorLogger.get(batchTask.getTaskId());
         if(lger!=null){
             String booksetId=lger.getBooksetId();
+            String finprodId=lger.getFinprodId();
+            String busiId=lger.getBusiId();
+            List<DetailBatchLogExpand> dto=lger.getDetailList();
+            List<CustomDetailBatchLogDto> detailLsit=new  ArrayList<CustomDetailBatchLogDto>();
+            dto.stream().forEach(s->{
+                CustomDetailBatchLogDto cus=(CustomDetailBatchLogDto) s;
+                detailLsit.add(cus);
+            });
+
+            StringBuffer prodIdJson=new StringBuffer();
+            prodIdJson.append("{");
+            prodIdJson.append("账套代码："+booksetId);
+            if(finprodId!=null){
+                prodIdJson.append(",金融产品代码："+finprodId);
+            }
+            if(busiId!=null){
+                prodIdJson.append(",业务代码："+busiId);
+            }
+            if(CollectionUtils.isNotEmpty(detailLsit)){
+                prodIdJson.append(",详情信息："+getDetailJson(detailLsit));
+            }
+
+            prodIdJson.append("}");
             Class <?> clz=items.getClass().getSuperclass();
             Field prodId = clz.getDeclaredField(PROD_ID);
             prodId.setAccessible(true);
             //系统原有逻辑有些批会在reder层给process执行参数增加账套、业务明细等信息，所以不破坏原来的逻辑，为空才赋值
             String orcProdid=(String)prodId.get(items);
             if(StringUtils.isEmpty(orcProdid)){
-                prodId.set(items,booksetId);
+                prodId.set(items,prodIdJson.toString());
             }
 
         }
@@ -394,6 +419,7 @@ public class DetailBatchLogAspect {
             CustomDetailBatchLogDto detailLog = new CustomDetailBatchLogDto();
             loggers.setBusiId(((DetailBatchException) e).getBusiId());
             detailLog=(CustomDetailBatchLogDto) ((DetailBatchException) e).getDetailBatchLogExpand();
+            detailLog.setResult(detaiError);
             List<DetailBatchLogExpand> detailList=new ArrayList<>();
             detailList.add(detailLog);
             loggers.setDetailList(detailList);
@@ -402,7 +428,13 @@ public class DetailBatchLogAspect {
         logger.error("任务组【"+loggers.getGroupId()+"】详情日志---------------开始-------------------------------");
         logger.error("任务:"+loggers.getTaskName());
         logger.error("账套ID:"+booksetId);
-        logger.error("业务编号:"+loggers.getBusiId());
+        if(loggers.getBusiId()!=null){
+            logger.error("业务编号:"+loggers.getBusiId());
+        }
+        if(loggers.getFinprodId()!=null){
+            logger.error("金融产品代码:"+loggers.getFinprodId());
+        }
+
         if(CollectionUtils.isNotEmpty(loggers.getDetailList()) ){
             loggers.getDetailList().stream().forEach(s->{
                 logger.error("----业务详细:"+JSON.toJSONString(s));
@@ -418,18 +450,87 @@ public class DetailBatchLogAspect {
         logger.error("结束执行时间:"+loggers.getEnd().format(df));
         logger.error("执行结果:");
         logger.error(JSON.toJSONString(loggers.getResult()));
-        logger.error("没有账套ID的集合"+JSON.toJSONString(noBookSetId));
+        logger.warn("没有账套ID的集合"+JSON.toJSONString(noBookSetId));
+        //放错误日志
         errorLogger.put(batchTask.getTaskId(),loggers);
         logger.error("任务组【"+loggers.getGroupId()+"】详情日志---------------结束-------------------------------");
 
     }
 
-
+    /* @Author 殷亚
+     * @Description TODO 首字母转为大写
+     * @Date  2022/3/30 15:18
+     * @Version 1.0        
+     * @Param [fildeName]
+     * @Return java.lang.String
+     **/
     private static String getMethodName(String fildeName) throws Exception{
                  byte[] items = fildeName.getBytes();
                  items[0] = (byte) ((char) items[0] - 'a' + 'A');
                  String name=new String(items);
                  return name;
-             }
+    }
+
+    /* @Author 殷亚
+     * @Description TODO 组装日志明细的json，中文描述反射调用注解生成
+     * @Date  2022/3/30 15:19
+     * @Version 1.0        
+     * @Param [dto]
+     * @Return java.lang.String
+     **/
+    public String getDetailJson(List<CustomDetailBatchLogDto> list){
+        StringBuffer json=new StringBuffer();
+        Field[] field = CustomDetailBatchLogDto.class.getDeclaredFields();
+        Field[] pfield = CustomDetailBatchLogDto.class.getSuperclass().getDeclaredFields();
+        json.append("[");
+        for(CustomDetailBatchLogDto dto:list) {
+            json.append("{");
+            if (pfield != null) {
+                for (Field fie : pfield) {
+                    if (!fie.isAccessible()) {
+                        fie.setAccessible(true);
+                    }
+                    try {
+                        String val = (String) fie.get(dto);
+                        DetailLogConfig annon = fie.getAnnotation(DetailLogConfig.class);
+                        String dis = annon.description();
+                        boolean show = annon.show();
+                        if (show&&val!=null) {
+                            json.append(dis + ":" + val + ",");
+                        }
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+            if (field != null) {
+                for (Field fie : field) {
+                    if (!fie.isAccessible()) {
+                        fie.setAccessible(true);
+                    }
+                    try {
+                        String val = (String) fie.get(dto);
+                        DetailLogConfig annon = fie.getAnnotation(DetailLogConfig.class);
+                        String dis = annon.description();
+                        boolean show = annon.show();
+                        if (show&&val!=null) {
+                            json.append(dis + ":" + val + ",");
+                        }
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+                json.delete(json.length() - 1, json.length());
+            }
+
+
+            json.append("},");
+        }
+        json.delete(json.length() - 1, json.length());
+        json.append("]");
+        return json.toString();
+    }
 
 }

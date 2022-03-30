@@ -36,7 +36,7 @@ public  class DetailBatchLogExpand {
     /*
      *执行结果
      **/
-    @DetailLogConfig(description="执行结果")
+    @DetailLogConfig(description="执行结果",show = false)
     private String result;
 
     public String getBusiId() {

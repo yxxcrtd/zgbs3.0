@@ -19,4 +19,9 @@ public @interface DetailLogConfig {
      * @return
      */
     String description() default "";
+    /**
+     * 是否展示
+     * @return
+     */
+    boolean show() default true;
 }
