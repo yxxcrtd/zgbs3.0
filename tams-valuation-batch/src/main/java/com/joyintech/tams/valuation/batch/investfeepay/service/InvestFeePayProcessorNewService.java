@@ -811,7 +811,7 @@ public class InvestFeePayProcessorNewService {
 		// 场景代码
 		ad.setTableId(listFeeListDto.get(0).getTableId());
 		if (DictCodeList.是否_是.getValue().equals(item.getIsClean())) {
-			BokFeeTableSet feeSet = listFeeTableSet.get(0);
+			BokFeeTableSet feeSet = listFeeListDto.get(0);
 			List<BokSubject> bokSubjectList = subjectMap.get(feeSet.getBaseSubjectNature());
 			// add by weipeng on 20220316 增加辅助核算项配置信息
 			// 查询参数设值
