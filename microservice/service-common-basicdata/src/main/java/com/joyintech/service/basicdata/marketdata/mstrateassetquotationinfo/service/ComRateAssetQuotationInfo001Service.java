@@ -107,7 +107,10 @@ public class ComRateAssetQuotationInfo001Service extends BaseService<ComRateAsse
 
     public int insert(ComRateAssetQuotationInfo001Dto entity) {
         Date sysDate = DateUtil.getSysDate() != null ? DateUtil.parse(DateUtil.getSysDate()) : DateUtil.now();
-        entity.setPublishDate(entity.getPublishDate() == null ? sysDate : entity.getPublishDate());
+//        entity.setPublishDate(entity.getPublishDate() == null ? sysDate : entity.getPublishDate());
+
+        //修改 公布日期默认=估值日期  yangchen 20220331
+        entity.setPublishDate(entity.getValDate());
         // 一体化对应etliu start
         // entity.setInputType(BussinessDictCodeList.录入方式_手工维护.getValue());
         entity.setInputType(DictCodeListExt1.录入方式_手工录入.getValue());
