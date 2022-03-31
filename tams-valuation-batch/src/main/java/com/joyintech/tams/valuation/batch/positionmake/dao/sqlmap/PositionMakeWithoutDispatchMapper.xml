@@ -817,7 +817,7 @@
 	      from BOK_BOOKSET
 	      where  END_DATE <![CDATA[ >= ]]> #{BOOKSET_DATE}
 	      AND START_DATE <![CDATA[ <= ]]> #{BOOKSET_DATE}
-	      <if test="booksetIds != null and booksetIds.size > 0">
+	      <if test="BOOKSETS != null and BOOKSETS.size > 0">
 			AND (BOOKSET_ID IN
 			<foreach collection="BOOKSETS" item="item" index="index" open="( " close=" )" separator=",">
 				<if test="(index % 998) == 0">
