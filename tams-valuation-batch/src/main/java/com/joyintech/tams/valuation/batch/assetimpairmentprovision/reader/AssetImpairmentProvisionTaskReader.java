@@ -15,7 +15,6 @@ import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.valuation.batch.assetimpairmentprovision.dto.AssetImpairmentProvisionReaderResult;
-import com.joyintech.tams.valuation.batch.assetimpairmentprovision.service.AssetImpairmentProvisionReaderNewService;
 import com.joyintech.tams.valuation.batch.assetimpairmentprovision.service.AssetImpairmentProvisionReaderService;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookCommonLogic;
 import com.joyintech.tams.valuation.common.constants.BookConstant;
@@ -49,7 +48,7 @@ public class AssetImpairmentProvisionTaskReader extends BaseReader<AssetImpairme
      * reader方法的 Service
      */
     @Autowired
-    private AssetImpairmentProvisionReaderNewService assetImpairmentProvisionReaderNewService;
+    private AssetImpairmentProvisionReaderService assetImpairmentProvisionReaderNewService;
     
     @Autowired
     private BookCommonLogic bookCommonLogic;
