@@ -204,10 +204,10 @@ public class TrdBondTradeDto extends BaseEntity implements ProcessEntity {
     private BigDecimal stlFeeAmt;
 
     /**
-     * 其他应付费用
+     * 应付佣金
      */
     @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal otherAmt;
+    private BigDecimal commissionPay;
 
     /**
      * 通道费
@@ -559,12 +559,12 @@ public class TrdBondTradeDto extends BaseEntity implements ProcessEntity {
         this.stlFeeAmt = stlFeeAmt;
     }
 
-    public BigDecimal getOtherAmt() {
-        return otherAmt;
+    public BigDecimal getCommissionPay() {
+        return commissionPay;
     }
 
-    public void setOtherAmt(BigDecimal otherAmt) {
-        this.otherAmt = otherAmt;
+    public void setCommissionPay(BigDecimal commissionPay) {
+        this.commissionPay = commissionPay;
     }
 
     public BigDecimal getChlFeeAmt() {

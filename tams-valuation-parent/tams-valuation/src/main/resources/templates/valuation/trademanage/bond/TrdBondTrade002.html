@@ -207,7 +207,7 @@
                                     <input type="text" id="tradeDate" name="tradeDate" required
                                            class="layui-input form-input input-dateSelect" placeholder="请输入内容"
                                            data-th-placeholder="#{SysCommon.placeholder}"
-                                           data-th-value='${#dates.format(entity?.tradeDate,"yyyy-MM-dd")}'>
+                                           data-th-value='${#dates.format(entity?.tradeDate?:iPlatformDate,"yyyy-MM-dd")}'>
                                 </div>
                             </div>
                             <div class="form-inline-wrap">
@@ -217,7 +217,7 @@
                                     <input type="text" id="settdateDate" name="settdateDate" required
                                            class="layui-input form-input input-dateSelect" placeholder="请输入内容"
                                            data-th-placeholder="#{SysCommon.placeholder}"
-                                           data-th-value='${#dates.format(entity?.settdateDate,"yyyy-MM-dd")}'>
+                                           data-th-value='${#dates.format(entity?.settdateDate?:iPlatformDate,"yyyy-MM-dd")}'>
                                 </div>
                             </div>
                             <div class="form-inline-wrap">
@@ -227,7 +227,7 @@
                                     <input type="text" id="fundSettleDate" name="fundSettleDate" required
                                            class="layui-input form-input input-dateSelect" placeholder="请输入内容"
                                            data-th-placeholder="#{SysCommon.placeholder}"
-                                           data-th-value='${#dates.format(entity?.fundSettleDate,"yyyy-MM-dd")}'>
+                                           data-th-value='${#dates.format(entity?.fundSettleDate?:iPlatformDate,"yyyy-MM-dd")}'>
                                 </div>
                             </div>
                         </div>
@@ -245,7 +245,7 @@
                             </div>
                             <div class="form-inline-wrap">
                                 <label class="layui-form-label form-lable"
-                                       data-th-text="#{TrdBondTrade.tradeAmt}">交易金额</label>
+                                       data-th-text="#{TrdBondTrade.tradeAmt}">净价成交金额</label>
                                 <div class="layui-input-inline input-inline">
                                     <input type="text" id="tradeAmt" name="tradeAmt" required
                                            class="layui-input form-input text-number"
@@ -347,17 +347,17 @@
                             </div>
                         </div>
                         <div class="layui-form-item">
-<!--                            <div class="form-inline-wrap" >-->
-<!--                                <label class="layui-form-label form-label-wrap"-->
-<!--                                       data-th-text="#{TrdBondTrade.otherAmt}">其他费用</label>-->
-<!--                                <div class="layui-input-inline input-inline">-->
-<!--                                    <input  type="text" id="otherAmt" name="otherAmt" required-->
-<!--                                            class="layui-input form-input text-number" placeholder="请输入内容"-->
-<!--                                            maxLength="28" data-textrange="2" data-fixtype="2"-->
-<!--                                            th:placeholder="#{SysCommon.placeholder}"-->
-<!--                                            th:value="${entity?.otherAmt?:0}" />-->
-<!--                                </div>-->
-<!--                            </div>-->
+                            <div class="form-inline-wrap" >
+                                <label class="layui-form-label form-label-wrap"
+                                       data-th-text="#{TrdBondTrade.commissionPay}">应付佣金</label>
+                                <div class="layui-input-inline input-inline">
+                                    <input  type="text" id="commissionPay" name="commissionPay" required
+                                            class="layui-input form-input text-number" placeholder="请输入内容"
+                                            maxLength="28" data-textrange="2" data-fixtype="2"
+                                            th:placeholder="#{SysCommon.placeholder}"
+                                            th:value="${entity?.commissionPay?:0}" />
+                                </div>
+                            </div>
                             <div class="form-inline-wrap" >
                                 <label class="layui-form-label form-label-wrap"
                                        data-th-text="#{TrdBondTrade.settleAmt}">结算金额</label>

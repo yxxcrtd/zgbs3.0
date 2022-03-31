@@ -83,7 +83,6 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTradeDto>
         TrdBondTradeResult trdBondTradeResult = generateEntity(trdBondTradeDto);
         String action = StringUtil.EMPTY;
          if (OperationType.NEW.equals(operationType)) {
-            //insert(secDealInfoProcessorResult);
              action = "insert";
         }
         else {
@@ -116,9 +115,17 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTradeDto>
         //比较界面和接口字段差异，并手动给接口字段赋值
         valSecVestAssetDeal.setAssetId(trdBondTradeDto.getSecId());//资产代码
         valSecVestAssetDeal.setDataActionSign("01");//数据动作标志
-        valSecVestAssetDeal.setFpriceAmt(trdBondTradeDto.getTradeAmt());//全价
-        valSecVestAssetDeal.setCpriceAmt(ArithmeticUtil.subtract(trdBondTradeDto.getTradeAmt(),trdBondTradeDto.getIntAmt()));//净价总额
+        valSecVestAssetDeal.setFpriceAmt(ArithmeticUtil.doAdd(trdBondTradeDto.getTradeAmt(),trdBondTradeDto.getIntAmt()));//全价
+        valSecVestAssetDeal.setCpriceAmt(trdBondTradeDto.getTradeAmt());//净价总额
         valSecVestAssetDeal.setTradeAmt(trdBondTradeDto.getSettleAmt());//交易金额
+        if((new BigDecimal(0)).compareTo(trdBondTradeDto.getCommission()) == -1
+            && (new BigDecimal(0)).compareTo(trdBondTradeDto.getCommissionPay()) != -1){
+            valSecVestAssetDeal.setIsCommission("Y");//佣金是否随交易支付
+            valSecVestAssetDeal.setCommission(trdBondTradeDto.getCommission());
+        }else{
+            valSecVestAssetDeal.setIsCommission("N");//佣金是否随交易支付
+            valSecVestAssetDeal.setCommission(trdBondTradeDto.getCommissionPay());
+        }
 
         valSecVestAssetDeal.setStlForm("03");//结算方式
         valSecVestAssetDeal.setParValue(new BigDecimal(0));//单位面值
@@ -132,7 +139,6 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTradeDto>
         valSecVestAssetDeal.setIsBrokerage("Y");//经手费是否随交易支付
         valSecVestAssetDeal.setIsCertfFee("Y");//证管费是否随交易支付
         valSecVestAssetDeal.setIsStlAmt("Y");//结算费是否随交易支付
-        valSecVestAssetDeal.setIsCommission("N");//佣金是否随交易支付
         valSecVestAssetDeal.setIsDealFeeAmt("N");//交易手续费是否随交易支付
         valSecVestAssetDeal.setIsStlFeeAmt("N");//结算手续费是否随交易支付
         valSecVestAssetDeal.setIsChlFeeAmt("Y");//通道费是否随交易支付

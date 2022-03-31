@@ -73,6 +73,8 @@ public class TrdBondTrade002Controller extends BaseController {
         String workflowId = this.getParam(GlobalConstant.WORKFLOW_ID);
 
         String tradeId = getParam("tradeId");
+        //平台日
+        model.addAttribute("iPlatformDate", DateUtil.parse(DateUtil.getSysDate()));
 
         if(!WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotEmpty(workflowId)){
             TrdBondTradeDto entity= trdBondTrade002Service.getBussinessEntityByWorkflowId(workflowId);
