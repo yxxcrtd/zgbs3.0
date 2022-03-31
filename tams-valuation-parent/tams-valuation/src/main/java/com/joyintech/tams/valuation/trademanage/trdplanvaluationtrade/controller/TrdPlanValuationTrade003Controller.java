@@ -64,6 +64,8 @@ public class TrdPlanValuationTrade003Controller extends BaseController {
 
         String tradeId = getParam("tradeId");
         String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
+        //交易方向
+        String ps = getParam("ps");
 
         if(StringUtil.isNotEmpty(workflowId)){
             TrdPlanValuationTradeDto entity= trdPlanValuationTrade002Service.getBussinessEntityByWorkflowId(workflowId);
@@ -71,7 +73,14 @@ public class TrdPlanValuationTrade003Controller extends BaseController {
             model.addAttribute("workflowId", workflowId);
 
         }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){
-            TrdPlanValuationTradeDto entity = trdPlanValuationTrade002Service.queryRedInfoByTradeId(tradeId);
+            TrdPlanValuationTradeDto entity = new TrdPlanValuationTradeDto();
+            if(DictCodeList.交易方向_赎回确认.getValue().equals(ps)){
+                entity = trdPlanValuationTrade002Service.queryRedInfoByTradeId(tradeId);
+                entity.setOutTradeId(entity.getTradeId());
+                entity.setTradeId("提交后自动生成，无需填写");
+            }else{
+                entity = trdPlanValuationTrade002Service.queryRedInfoByOutTradeId(tradeId);
+            }
             entity.setPs(DictCodeList.交易方向_赎回到账.getValue());
             model.addAttribute("entity", entity);
         }

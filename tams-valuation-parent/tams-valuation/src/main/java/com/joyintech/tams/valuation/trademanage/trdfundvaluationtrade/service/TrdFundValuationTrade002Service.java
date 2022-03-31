@@ -448,8 +448,18 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
         //比较界面和接口字段差异，并手动给接口字段赋值
         if("A".equals(type) && "01".equals(dto.getFundType())){
             valApplyPurTade.setBusiType("06");//业务类型
+            if(dto.getPs().equals(DictCodeList.交易方向_认购.getValue()) ){
+                valApplyPurTade.setMyAcctNo(dto.getSubMyAcctNo());//付款账户
+            }else if(dto.getPs().equals(DictCodeList.交易方向_申购.getValue()) ){
+                valApplyPurTade.setMyAcctNo(dto.getPurMyAcctNo());//付款账户
+            }
         }else {
             valApplyPurTade.setBusiType("07");//业务类型
+            if(dto.getPs().equals(DictCodeList.交易方向_认购.getValue()) ){
+                valApplyPurTade.setAcctNo(dto.getSubMyAcctNo());
+            }else if(dto.getPs().equals(DictCodeList.交易方向_申购.getValue()) ){
+                valApplyPurTade.setAcctNo(dto.getPurMyAcctNo());//付款账户
+            }
         }
 
         valApplyPurTade.setAssetName(dto.getAssetAbbr());//资产名称
@@ -459,12 +469,10 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
             if(dto.getPs().equals(DictCodeList.交易方向_认购.getValue()) ){
                 valApplyPurTade.setTradeDate(dto.getApplyDate());//交易日
                 valApplyPurTade.setPurAmt(dto.getApplyAmt());//申购金额
-                valApplyPurTade.setMyAcctNo(dto.getSubMyAcctNo());//付款账户
                 valApplyPurTade.setSettleDate(dto.getSubSettleDate());//资金交收日
             }else if(dto.getPs().equals(DictCodeList.交易方向_申购.getValue()) ){
                 valApplyPurTade.setTradeDate(dto.getPurApplyDate());//交易日
                 valApplyPurTade.setPurAmt(dto.getPurApplyAmt());//认购金额
-                valApplyPurTade.setMyAcctNo(dto.getPurMyAcctNo());//付款账户
                 valApplyPurTade.setSettleDate(dto.getPurSettleDate());//资金交收日
             }
         }
@@ -542,16 +550,17 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
         BeanUtil.copyPropertiesIgnoreNull(valFundNRedAffirmN,dto);
         //相同字段名： 成交编号、交易方向、交易场所、币种
         //比较界面和接口字段差异，并手动给接口字段赋值
-
+        valFundNRedAffirmN.setMyAcctNo(dto.getRedMyAcctNo());//‘资金账户’
         valFundNRedAffirmN.setAssetName(dto.getAssetAbbr());//资产名称
         valFundNRedAffirmN.setTradeDate(dto.getRedConfirmDate());//交易日
         valFundNRedAffirmN.setPreDate(dto.getArriveDate());//预计到账日
         valFundNRedAffirmN.setRedShare(dto.getRedConfirmNum());//确认数量
         valFundNRedAffirmN.setRedAmt(dto.getRedConfirmAmt());//赎回金额
-        valFundNRedAffirmN.setFee(dto.getRedFee());
-
+        valFundNRedAffirmN.setRedNet(ArithmeticUtil.divide(dto.getRedConfirmAmt(),dto.getRedConfirmNum(),4, RoundingMode.HALF_UP));//赎回净值
+        valFundNRedAffirmN.setFee(dto.getRedFee());//费用
         valFundNRedAffirmN.setDataActionSign("01");//数据动作标志
         valFundNRedAffirmN.setIsClean("N"); //有无清算指令
+        valFundNRedAffirmN.setTradeMarket("09");//交易场所
         return valFundNRedAffirmN;
     }
 
@@ -570,6 +579,7 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
             valRedAccoutTrade.setTradeType("06");//业务类型
         }else {
             valRedAccoutTrade.setTradeType("07");//业务类型
+            valRedAccoutTrade.setTradeMarket("09");
         }
 
         valRedAccoutTrade.setTradeDate(dto.getArriveDate());//交易日

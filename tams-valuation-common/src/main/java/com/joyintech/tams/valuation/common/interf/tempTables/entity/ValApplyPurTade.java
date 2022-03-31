@@ -105,6 +105,11 @@ public class ValApplyPurTade extends BaseEntity {
      * 外部成交编号
      */
     private String outTradeId;
+
+    /**
+     * 付款账户
+     */
+    private String acctNo;
     /*add by sunshuaishuai 20220324 end*/
 
     /**
@@ -413,5 +418,22 @@ public class ValApplyPurTade extends BaseEntity {
     public void setOutTradeId(String outTradeId) {
         this.outTradeId = outTradeId == null ? null : outTradeId.trim();
     }
+
+    /**
+     * 取得 资金账户
+     * @return 资金账户
+     */
+    public String getAcctNo() {
+        return acctNo;
+    }
+
+    /**
+     * 设置 资金账户
+     * @param acctNo 资金账户
+     */
+    public void setAcctNo(String acctNo) {
+        this.acctNo = acctNo;
+    }
+
     /*add by sunshuaishuai 20220324 end*/
 }

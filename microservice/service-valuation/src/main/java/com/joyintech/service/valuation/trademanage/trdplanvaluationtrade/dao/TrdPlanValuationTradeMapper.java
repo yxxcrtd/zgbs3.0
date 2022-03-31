@@ -61,6 +61,8 @@ public interface TrdPlanValuationTradeMapper {
 	 */
 	TrdPlanValuationTradeDto queryRedInfoByTradeId(@Param("tradeId") String tradeId);
 
+	TrdPlanValuationTradeDto queryRedInfoByOutTradeId(@Param("tradeId") String tradeId);
+
 	int delBokDetailIdByTradeId(Map<String, Object> map);
 
 }

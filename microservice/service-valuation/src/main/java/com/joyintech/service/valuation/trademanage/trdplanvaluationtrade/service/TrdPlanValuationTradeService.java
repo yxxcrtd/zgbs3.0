@@ -209,6 +209,13 @@ public class TrdPlanValuationTradeService extends CommonExportService<TrdPlanVal
     }
 
     /**
+     * 赎回到账双击明细页面
+     */
+    public TrdPlanValuationTradeDto queryRedInfoByOutTradeId(String tradeId) {
+        return trdPlanValuationTradeMapper.queryRedInfoByOutTradeId(tradeId);
+    }
+
+    /**
      *
      * 工作流完结之后的操作
      * <功能详细描述>

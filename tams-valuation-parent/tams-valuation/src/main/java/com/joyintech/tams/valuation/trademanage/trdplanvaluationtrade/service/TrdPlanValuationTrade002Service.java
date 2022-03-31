@@ -109,6 +109,15 @@ public class TrdPlanValuationTrade002Service extends CommonExportService<TrdPlan
     }
 
     /**
+     * 赎回到账双击明细页面
+     */
+    public TrdPlanValuationTradeDto queryRedInfoByOutTradeId(String tradeId) {
+        return restTemplate.postForObject(
+                ServiceApplication.VALUATION_SERVICE_NAME + "/TrdPlanValuationTrade/queryRedInfoByOutTradeId",
+                tradeId, TrdPlanValuationTradeDto.class);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -125,9 +134,7 @@ public class TrdPlanValuationTrade002Service extends CommonExportService<TrdPlan
         }
 
         //净值型走基金&计划类（净值型）接口
-         if(DictCodeList.收益类型_净值型.getValue().equals(entity.getProfitType())
-                || DictCodeList.交易方向_认购.getValue().equals(entity.getPs())
-                || DictCodeList.交易方向_认购确认.getValue().equals(entity.getPs())){
+         if(DictCodeList.收益类型_净值型.getValue().equals(entity.getProfitType())){
             TrdFundValuationTradeDto dto = new TrdFundValuationTradeDto();
             BeanUtil.copyPropertiesIgnoreNull(dto,entity);
             trdFundTradeResult = trdFundValuationTrade002Service.generateEntity(dto,"B");
@@ -435,6 +442,8 @@ public class TrdPlanValuationTrade002Service extends CommonExportService<TrdPlan
         valMngMnfTade.setUnitCprice(ArithmeticUtil.divide(dto.getTradeAmt(),dto.getDealNum(),4, RoundingMode.HALF_UP));//单位净价
         valMngMnfTade.setIsClean("N"); //有无清算指令
 
+        valMngMnfTade.setMyAcctNo(dto.getTrdMyAcctNo());//资金账户
+
         return valMngMnfTade;
     }
 
@@ -454,9 +463,11 @@ public class TrdPlanValuationTrade002Service extends CommonExportService<TrdPlan
             if(dto.getPs().equals(DictCodeList.交易方向_申购.getValue()) ){
                 valMngMnfApplyPurTade.setTradeDate(dto.getPurApplyDate());//交易日
                 valMngMnfApplyPurTade.setPurAmt(dto.getPurApplyAmt());//申购金额
+                valMngMnfApplyPurTade.setMyAcctNo(dto.getPurMyAcctNo());//资金账户
             }else if(dto.getPs().equals(DictCodeList.交易方向_认购.getValue()) ){
                 valMngMnfApplyPurTade.setTradeDate(dto.getApplyDate());//交易日
                 valMngMnfApplyPurTade.setPurAmt(dto.getApplyAmt());//认购金额
+                valMngMnfApplyPurTade.setMyAcctNo(dto.getSubMyAcctNo());//资金账户
             }
         }
 
@@ -484,6 +495,9 @@ public class TrdPlanValuationTrade002Service extends CommonExportService<TrdPlan
                 valMngMnfAffirmPurTrade.setTradeDate(dto.getPurConfirmDate());//交易日
                 valMngMnfAffirmPurTrade.setCfmAmt(dto.getPurConfirmAmt());//确认金额
                 valMngMnfAffirmPurTrade.setCfmShare(dto.getPurConfirmNum());//确认份额
+                valMngMnfAffirmPurTrade.setMyAcctNo(dto.getPurConfirmMyAcctNo());//资金账户
+                valMngMnfAffirmPurTrade.setUnitCprice(dto.getPurUnitValue());//单位净值
+                valMngMnfAffirmPurTrade.setFee(dto.getPurFee());//申购费
             }
         }
 
@@ -510,10 +524,15 @@ public class TrdPlanValuationTrade002Service extends CommonExportService<TrdPlan
         valMngMnfRedAffirm.setPreDate(dto.getArriveDate());//预计到账日
         valMngMnfRedAffirm.setRedShare(dto.getRedConfirmNum());//确认数量
         valMngMnfRedAffirm.setRedAmt(dto.getRedConfirmAmt());//赎回金额
+        valMngMnfRedAffirm.setFee(dto.getRedFee());//赎回费
 
         valMngMnfRedAffirm.setTradeMarket("09");//交易市场
         valMngMnfRedAffirm.setDataActionSign("01");//数据动作标志
         valMngMnfRedAffirm.setIsClean("N"); //有无清算指令
+
+        valMngMnfRedAffirm.setMyAcctNo(dto.getRedMyAcctNo());//资金账户
+        valMngMnfRedAffirm.setUnitCprice(dto.getRedUnitValue());//单位净值
+
         return valMngMnfRedAffirm;
     }
 
@@ -533,6 +552,9 @@ public class TrdPlanValuationTrade002Service extends CommonExportService<TrdPlan
 
         valMngMnfRedAccoutTrade.setDataActionSign("01");//数据动作标志
         valMngMnfRedAccoutTrade.setIsClean("N"); //有无清算指令
+
+        valMngMnfRedAccoutTrade.setMyAcctNo(dto.getRedMyAcctNo());//资金账户
+
         return valMngMnfRedAccoutTrade;
     }
 

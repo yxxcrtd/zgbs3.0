@@ -28,12 +28,12 @@ $(function(){
             if(data.ps == 'T24'){
                 Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
                     basePath + "valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade003/init",
-                    "98%", "98%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
+                    "95%", "90%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
                         tradeId:data.tradeId,ps:data.ps});
             }else{
                 Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
                     basePath + "valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade002/init",
-                    "98%", "98%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
+                    "95%", "90%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
                         tradeId:data.tradeId,ps:data.ps});
             }
         },
@@ -154,7 +154,7 @@ $(function(){
             Joyin.dialog(JoyinUtil.getLabel("计划类资产赎回到账（<i class='iconfont must' style='display:inline'>*</i>必填）"),
                 basePath + "valuation/trademanage/trdplanvaluationtrade/TrdPlanValuationTrade003/init",
                 "95%", "90%",
-                {tradeId:tradeId }
+                {tradeId:tradeId ,ps:ps}
                 ,function(){
                     table.reload();
                 });

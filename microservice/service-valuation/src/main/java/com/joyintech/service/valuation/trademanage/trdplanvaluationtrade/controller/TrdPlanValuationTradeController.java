@@ -13,6 +13,7 @@ package com.joyintech.service.valuation.trademanage.trdplanvaluationtrade.contro
 import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.service.valuation.trademanage.trdfundvaluationtrade.dto.TrdFundValuationTradeDto;
 import com.joyintech.service.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanTradeResult;
 import com.joyintech.service.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanValuationTradeDto;
 import com.joyintech.service.valuation.trademanage.trdplanvaluationtrade.service.TrdPlanValuationTradeService;
@@ -92,6 +93,16 @@ public class TrdPlanValuationTradeController extends BaseController {
     @PostMapping("queryRedInfoByTradeId")
     public TrdPlanValuationTradeDto queryRedInfoByTradeId(@RequestBody String tradeId) {
         return trdPlanValuationTradeService.queryRedInfoByTradeId(tradeId);
+    }
+
+    /**
+     * 赎回到账双击明细页面
+     * @see
+     * @since 1.0
+     */
+    @PostMapping("queryRedInfoByOutTradeId")
+    public TrdPlanValuationTradeDto queryRedInfoByOutTradeId(@RequestBody String tradeId) {
+        return trdPlanValuationTradeService.queryRedInfoByOutTradeId(tradeId);
     }
 
     @Transactional

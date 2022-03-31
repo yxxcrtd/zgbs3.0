@@ -83,6 +83,17 @@ public class TrdPlanValuationTrade002Controller extends BaseController {
 
         if(StringUtil.isNotEmpty(workflowId)){
             TrdPlanValuationTradeDto entity= trdPlanValuationTrade002Service.getBussinessEntityByWorkflowId(workflowId);
+            if(DictCodeList.数据状态_删除中.getValue().equals(entity.getStatus())){
+                if(DictCodeList.交易方向_赎回到账.getValue().equals(entity.getPs())){
+                    entity = trdPlanValuationTrade002Service.queryRedInfoByOutTradeId(entity.getTradeId());
+                    entity.setPs(DictCodeList.交易方向_赎回到账.getValue());
+                }else {
+                    Map<String, Object> param = new HashMap<>();
+                    param.put("tradeId", entity.getTradeId());
+                    param.put("ps", entity.getPs());
+                    entity = trdPlanValuationTrade002Service.queryTradeInfoByTradeId(param);
+                }
+            }
             if(!StringUtil.isNotEmpty(entity.getTradeId())){
                 entity.setTradeId("提交后自动生成，无需填写");
             }

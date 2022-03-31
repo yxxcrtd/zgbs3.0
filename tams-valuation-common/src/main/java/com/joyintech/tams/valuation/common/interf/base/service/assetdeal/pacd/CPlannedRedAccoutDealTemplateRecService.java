@@ -10,37 +10,21 @@
  
 package com.joyintech.tams.valuation.common.interf.base.service.assetdeal.pacd;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.interf.base.constant.FinalString;
+import com.joyintech.tams.valuation.common.interf.base.constant.InterfCommonConstant;
 import com.joyintech.tams.valuation.common.interf.base.dto.*;
-
+import com.joyintech.tams.valuation.common.interf.base.service.common.InterfCommonService;
+import com.joyintech.tams.valuation.common.interf.base.service.common.TemplateAnalysisForXMLService;
+import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValMngMnfRedAccoutTrade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.common.base.entity.BokDealAccounting;
-import com.joyintech.tams.common.base.entity.BokDealAccountingDetail;
-import com.joyintech.tams.common.base.entity.BokDetailId;
-import com.joyintech.tams.common.base.entity.StlOrders;
-import com.joyintech.tams.common.base.entity.StlOrdersExt;
-import com.joyintech.tams.common.base.entity.TrdProductDeal;
-import com.joyintech.tams.common.base.entity.TrdProductDealAdd;
-import com.joyintech.tams.common.base.entity.ValInterflog;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.valuation.common.interf.base.constant.InterfCommonConstant;
-import com.joyintech.tams.valuation.common.interf.base.service.common.InterfCommonService;
-import com.joyintech.tams.valuation.common.interf.base.service.common.TemplateAnalysisForXMLService;
-import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValMngMnfRedAccoutTrade;
+import java.util.*;
 
 /**
  * 计划类资产货币型赎回到账交易
@@ -249,8 +233,10 @@ public class CPlannedRedAccoutDealTemplateRecService {
         
         // 是否结清 =数据字典：是否.是
         result.setIsClean(DictCodeList.是否_是.getValue());
+        /*modify by sunshuaishuai 交易管理 20220325 start*/
         // 关联系统交易编号= A.成交编号
-        result.setfTradeId(dto.getTradeId());
+        result.setfTradeId(dto.getOutTradeId());
+        /*modify by sunshuaishuai 交易管理 20220325 end*/
         // 原交易编号 =交易状态为撤销时：
         // 原交易编号=调用共通设计->【详细设计-接口共通方法设计.xlsx】->撤销交易对应的原交易编号查询SHEET
         // 交易状态为非撤销时：
@@ -264,6 +250,11 @@ public class CPlannedRedAccoutDealTemplateRecService {
         }
       //通道代码 = a.通道代码
         result.setChlId(dto.getChannelId());
+
+        /*add by sunshuaishuai 交易管理 20220325 start*/
+        //资金账户
+        result.setMyAcctNo(dto.getMyAcctNo());
+        /*add by sunshuaishuai 20220325 end*/
         return result;
     }
 

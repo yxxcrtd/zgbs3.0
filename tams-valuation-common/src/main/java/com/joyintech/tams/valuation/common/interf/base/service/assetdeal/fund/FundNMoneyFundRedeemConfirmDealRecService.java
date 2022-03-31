@@ -428,8 +428,10 @@ public class FundNMoneyFundRedeemConfirmDealRecService {
         result.setIsClean(InterfCommonConstant.是否结清_默认);
         // 交易场所 =D.交易场所
         result.setTradeMarket(dto.getTradeMarket());
+        /*modify by sunshuaishuai 交易管理 20220330 start*/
         // 关联系统交易编号 = D.成交编号
-        result.setfTradeId(dto.getTradeId());
+        result.setfTradeId(dto.getOutTradeId());
+        /*modify by sunshuaishuai 交易管理 20220330 end*/
         // 创建时间 = 系统时间
         result.setCreateTime(dto.getCreateTime());
         //20181012 leipeng 原交易编号 = 交易状态为撤销时： 原交易编号=调用共通设计->【详细设计-接口共通方法设计.xlsx】->撤销交易对应的原交易编号查询SHEET 交易状态为非撤销时：原交易编号为空
@@ -438,6 +440,11 @@ public class FundNMoneyFundRedeemConfirmDealRecService {
         }
       //通道代码 = a.通道代码
         result.setChlId(dto.getChannelId());
+
+        /*add by sunshuaishuai 交易管理 20220330 start*/
+        //资金账户
+        result.setMyAcctNo(dto.getMyAcctNo());
+        /*add by sunshuaishuai 20220330 end*/
         return result;
     }
 

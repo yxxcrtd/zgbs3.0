@@ -278,7 +278,11 @@ public class FundSubscribeApplyDealRecService {
         /*add by sunshuaishuai 添加交易份额 20210430 end*/
         /*add by sunshuaishuai 交易管理 20220324 start*/
         //资金账户
-        result.setMyAcctNo(dto.getMyAcctNo());
+        if(DictCodeListExt1.金融产品类型_基金.getValue().equals(finprodType)){
+            result.setMyAcctNo(dto.getMyAcctNo());
+        }else{
+            result.setMyAcctNo(dto.getAcctNo());
+        }
         /*add by sunshuaishuai 20220324 end*/
         return result;
     }

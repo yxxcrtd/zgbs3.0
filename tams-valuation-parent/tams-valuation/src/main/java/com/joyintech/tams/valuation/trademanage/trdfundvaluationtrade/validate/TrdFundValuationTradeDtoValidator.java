@@ -69,11 +69,11 @@ public class TrdFundValuationTradeDtoValidator implements BeanValidator {
                         resultList.add(new ValidMessage("trdMyAcctNo",
                                 getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.myAcctNo"))));
                     }
-                    //经手费
-                    if(!StringUtil.isNotEmpty(dto.getBrokerage())){
-                        resultList.add(new ValidMessage("brokerage",
-                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.brokerage"))));
-                    }
+//                    //经手费
+//                    if(!StringUtil.isNotEmpty(dto.getBrokerage())){
+//                        resultList.add(new ValidMessage("brokerage",
+//                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.brokerage"))));
+//                    }
                     //净佣金
                     if(!StringUtil.isNotEmpty(dto.getCommission())){
                         resultList.add(new ValidMessage("commission",

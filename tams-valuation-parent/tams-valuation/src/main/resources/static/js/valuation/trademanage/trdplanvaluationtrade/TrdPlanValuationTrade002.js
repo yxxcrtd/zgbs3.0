@@ -30,6 +30,7 @@
     });
 
     var psChange = function () {
+        debugger;
         var ps = $('#ps').val();
         //买入 T01、卖出T02、认购 T52、申购 T04、认购确认 T18、申购确认T05、赎回确认 T19、赎回到账 T24
         if(ps == 'T01' || ps == 'T02'){ //交易信息
@@ -79,6 +80,14 @@
             $('#purConfirmInfo').hide();
             $('#redeemInfo').show();
 
+        }else if(ps == 'T24'){//赎回确认信息
+            $('#tradeInfo').hide();
+            $('#subscriptionInfo').hide();
+            $('#purchaseInfo').hide();
+            $('#subConfirmInfo').hide();
+            $('#purConfirmInfo').hide();
+            $('#redeemInfo').show();
+
         }else{//默认
             $('#tradeInfo').hide();
             $('#subscriptionInfo').hide();
@@ -92,18 +101,19 @@
     //结算金额  买入时：结算金额=成交金额+投资顾问费+其他费用  卖出时：结算金额=成交金额-投资顾问费-其他费用
     var settleAmtChange = function(){
         var tradeAmt = $('#tradeAmt').val();
-        var advFeeOut = $('#advFeeOut').val();
-        var otherAmt = $('#otherAmt').val();
+        //var advFeeOut = $('#advFeeOut').val();
+        //var otherAmt = $('#otherAmt').val();
         var ps = $('#ps').val();
         if(tradeAmt != null && tradeAmt != ''
-            && advFeeOut != null && advFeeOut != ''
-            && otherAmt != null && otherAmt != ''){
+           // && advFeeOut != null && advFeeOut != ''
+           // && otherAmt != null && otherAmt != ''
+        ){
             if(ps == 'T01'){
-                var settleAmt = JoyinMath.doAdd(JoyinMath.doAdd(tradeAmt, advFeeOut,2),otherAmt,2);
-                $('#settleAmt').val(settleAmt);
+                //var settleAmt = JoyinMath.doAdd(tradeAmt, advFeeOut,2);
+                $('#settleAmt').val(tradeAmt);
             }else if(ps == 'T02'){
-                var  settleAmt = JoyinMath.doMinus(JoyinMath.doMinus(tradeAmt, advFeeOut,2),otherAmt,2);
-                $('#settleAmt').val(settleAmt);
+               // var  settleAmt = JoyinMath.doMinus(tradeAmt, advFeeOut,2);
+                $('#settleAmt').val(tradeAmt);
             }
         }else{
             $('#settleAmt').val('');
@@ -158,10 +168,10 @@
         $('#advFeeOut').change(function(){
             settleAmtChange();
         });
-        //其他费用
-        $('#otherAmt').change(function(){
-            settleAmtChange();
-        });
+        // //其他费用
+        // $('#otherAmt').change(function(){
+        //     settleAmtChange();
+        // });
 
         //保存
         $('#TrdPlanValuationTrade002_btn_save').click(function() {
