@@ -110,7 +110,7 @@ public class RepDealSecSubjectTemplateRecService {
         return result;
     }
 
-    private Map<String, Object> handleValBotAstInfo(List<ValRepDealSecSubject> listValRepDealSecSubject) {
+    public Map<String, Object> handleValBotAstInfo(List<ValRepDealSecSubject> listValRepDealSecSubject) {
         Map<String, Object> result = new HashMap<>();
         // 定义 交易类金融产品List
         List<FinTradeProduct> listValTradeFinProduct = new ArrayList<FinTradeProduct>();

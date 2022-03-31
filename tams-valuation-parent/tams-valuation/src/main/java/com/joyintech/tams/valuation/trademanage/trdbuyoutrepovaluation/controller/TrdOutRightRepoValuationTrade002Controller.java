@@ -110,36 +110,6 @@ public class TrdOutRightRepoValuationTrade002Controller extends BaseController {
         return commonCheck(result, dto.getOperateType());
     }
 
-//    /**
-//     * 自定义产品代码下拉框
-//     * @param request
-//     * @return
-//     */
-//    @RequestMapping("/findPortfolioId")
-//    @ResponseBody
-//    public Page<SelectOptionDto> findPortfolioId(HttpServletRequest request) {
-//        Map<String, Object> param = RequestUtil.getPageParam();
-//        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-//        param.put("finprodType", "F16"); //测试
-//        return trdOutRightRepoValuationTrade002Service.findPortfolioId(param);
-//    }
-//
-//
-//    /**
-//     * 自定义资产代码下拉框
-//     * @param request
-//     * @return
-//     */
-//    @RequestMapping("/findFinprodId")
-//    @ResponseBody
-//    public Page<SelectOptionDto> findFinprodId(HttpServletRequest request) {
-//        Map<String, Object> param =RequestUtil.getPageParam();
-//        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-//        param.put("finprodType", "F02"); //测试
-//        return trdOutRightRepoValuationTrade002Service.findFinprodId(param);
-//    }
-
-
     /**
      * @Description:保存
      * @date: 2021/12/30
@@ -158,11 +128,11 @@ public class TrdOutRightRepoValuationTrade002Controller extends BaseController {
         params.setElementId(dto.getElementId());
 
         //设置主键
-//        if(!StringUtil.isNotEmpty(dto.getTradeId())){
-//            Date sysDate= DateUtil.platDateFromCache();
-//            //新建初始化交易编号
-//            dto.setTradeId(trdOutRightRepoValuationTrade002Service.createPlanTradeId());
-//        }
+        if(!StringUtil.isNotEmpty(dto.getTradeId())){
+            Date sysDate= DateUtil.platDateFromCache();
+            //新建初始化交易编号
+            dto.setTradeId(trdOutRightRepoValuationTrade002Service.createPlanTradeId());
+        }
 
         params.setBusinessCode(dto.getPortfolioId());
         params.setBusinessType(DictCodeList.共通业务类型_买断式回购交易.getValue());
