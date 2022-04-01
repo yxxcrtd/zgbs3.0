@@ -161,7 +161,35 @@ public class TrdOutRightRepoValuationTrade001Controller extends BaseController {
         return trdOutRightRepoValuationTrade001Service.update(dto);
     }
 
+    /**
+     * 修改
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("update01")
+    public int update(@RequestBody TrdOutRightRepoValuationTrade001Result dto)
+            throws Exception {
+        return trdOutRightRepoValuationTrade001Service.update01(dto);
+    }
 
+    /**
+     * 修改
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("update02")
+    public int update(@RequestBody TrdOutRightRepoValuationTrade002Result dto)
+            throws Exception {
+        return trdOutRightRepoValuationTrade001Service.update02(dto);
+    }
     /**
      * 插入 债券回购标的
      *

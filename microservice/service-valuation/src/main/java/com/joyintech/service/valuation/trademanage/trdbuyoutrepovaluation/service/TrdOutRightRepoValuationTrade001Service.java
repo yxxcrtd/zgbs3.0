@@ -951,4 +951,19 @@ public class TrdOutRightRepoValuationTrade001Service extends CommonExportService
         return insert(dto);
     }
 
+    public int update01(TrdOutRightRepoValuationTrade001Result dto){
+        TrdOutRightRepoValuationTrade001Dto dto1 = new TrdOutRightRepoValuationTrade001Dto();
+        dto1.setPortfolioId(dto.getTrdOutRightRepoValuationTrade001Dto().getPortfolioId());
+        dto1.setTradeId(dto.getTrdOutRightRepoValuationTrade001Dto().getTradeId());
+        delete(dto1);
+        return insert01(dto);
+    }
+
+    public int update02(TrdOutRightRepoValuationTrade002Result dto){
+        TrdOutRightRepoValuationTrade001Dto dto1 = new TrdOutRightRepoValuationTrade001Dto();
+        dto1.setPortfolioId(dto.getTrdOutRightRepoValuationTrade001Dto().getPortfolioId());
+        dto1.setTradeId(dto.getTrdOutRightRepoValuationTrade001Dto().getTradeId());
+        delete(dto1);
+        return insert02(dto);
+    }
 }
