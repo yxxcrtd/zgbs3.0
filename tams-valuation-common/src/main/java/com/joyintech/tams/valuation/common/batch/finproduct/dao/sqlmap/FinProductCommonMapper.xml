@@ -60,7 +60,8 @@
 			c.TYPE_18 AS type18, /**分类18,证券代码**/
 			a.REGIST_ORG registOrg, /**登记托管机构**/
 			/** add by yanya on 20201217 增加是否其他债券的查询 **/
-			NVL(b.IS_QTZQ, 'N') isQtzq /**是否其他债券**/
+			/**NVL(b.IS_QTZQ, 'N') isQtzq 是否其他债券**/
+			'N' AS isQtzq /**不走其他债权场景**/
 			FROM
 			FIN_PRODUCT a
 			left join FIN_PRODUCT ofpd on ofpd.finprod_id = a.finprod_id
@@ -126,7 +127,8 @@
 				c.TYPE_18 AS type18, /**分类18,证券代码**/
 				null registOrg, /**登记托管机构**/
 			   /** add by yanya on 20201217 增加是否其他债券的查询 **/
-			   NVL(b.IS_QTZQ, 'N') isQtzq /**是否其他债券**/
+				/**NVL(b.IS_QTZQ, 'N') isQtzq 是否其他债券**/
+				'N' AS isQtzq /**不走其他债权场景**/
 		    FROM
 		    FIN_trade_PRODUCT a
 		    LEFT JOIN FIN_PRODUCT_ADD b ON a.finprod_id =
