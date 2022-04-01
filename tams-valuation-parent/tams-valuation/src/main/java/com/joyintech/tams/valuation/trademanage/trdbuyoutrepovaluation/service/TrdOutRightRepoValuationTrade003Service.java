@@ -129,7 +129,7 @@ public class TrdOutRightRepoValuationTrade003Service extends BaseService<TrdOutR
         entity.setProdId(dto3.getPortfolioId()); //产品代码
         entity.setDataActionSign("01");//数据动作标志
         entity.setTradeId(createPlanTradeId());
-        entity.setTermKind("R007"); //期限品种
+//        entity.setTermKind("R007"); //期限品种
         entity.setTradeMarket("01"); //交易市场 银行间
         entity.setPs(DictCodeList.交易方向_到期.getValue());
         entity.setTrader("yc"); //交易员

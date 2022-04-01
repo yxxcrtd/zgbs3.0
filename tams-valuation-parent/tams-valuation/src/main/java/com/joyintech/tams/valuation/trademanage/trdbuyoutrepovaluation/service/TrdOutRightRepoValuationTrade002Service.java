@@ -152,7 +152,7 @@ public class TrdOutRightRepoValuationTrade002Service extends BaseService<TrdOutR
             entity.setTradeType("F05");
         }
         entity.setDataActionSign("01");//数据动作标志
-        entity.setTermKind("R007");
+//        entity.setTermKind("R007"); //期限品种
         entity.setBusiType("05"); //业务类型 买断式回购
         entity.setVdate(dto.getVdate());//起息日
         entity.setMdate(dto.getMdate());//到期日

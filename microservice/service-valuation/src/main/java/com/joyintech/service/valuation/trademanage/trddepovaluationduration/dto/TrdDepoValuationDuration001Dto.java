@@ -262,7 +262,7 @@ public class TrdDepoValuationDuration001Dto extends WflTrdProductDeal implements
         this.ccy = ccy;
     }
 
-    @NotEmpty(fieldName = "TrdDepoValuationDuration002.otherAmt", groups = {ValidateGroupEdit.class})
+//    @NotEmpty(fieldName = "TrdDepoValuationDuration002.otherAmt", groups = {ValidateGroupEdit.class})
     public BigDecimal getOtherAmt() {
         return otherAmt;
     }
