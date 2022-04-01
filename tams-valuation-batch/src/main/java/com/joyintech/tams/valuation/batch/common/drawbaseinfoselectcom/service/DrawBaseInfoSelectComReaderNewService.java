@@ -16,7 +16,7 @@ import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.Boo
 import com.joyintech.tams.valuation.batch.common.accountingmethod.dao.AccountingMethodMapper;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.SubjectMappingConfig;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.TreeNode;
-import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dao.DrawBaseInfoSelectComMapper;
+import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dao.DrawBaseInfoSelectComNewMapper;
 import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto.DrawBaseInfoSelectComDTO;
 import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto.DrawBaseInfoSelectComResult;
 import com.joyintech.tams.valuation.common.constants.BookConstant;
@@ -43,7 +43,7 @@ public class DrawBaseInfoSelectComReaderNewService {
      * 拆借计提入账批处理Mapper
      */
     @Autowired
-    private DrawBaseInfoSelectComMapper drawBaseInfoSelectComMapper;
+    private DrawBaseInfoSelectComNewMapper drawBaseInfoSelectComNewMapper;
 
     /**
      * 记账公共类
@@ -103,7 +103,7 @@ public class DrawBaseInfoSelectComReaderNewService {
 
         // 2.2、从当前表中，读取计提基础信息数据
         List<DrawBaseInfoSelectComDTO> listHisDrawBaseInfoSelectComDTO = new ArrayList<DrawBaseInfoSelectComDTO>();
-        listHisDrawBaseInfoSelectComDTO = drawBaseInfoSelectComMapper.selectDrawBaseInfoFromHis(sqlMap);
+        listHisDrawBaseInfoSelectComDTO = drawBaseInfoSelectComNewMapper.selectDrawBaseInfoFromHis(sqlMap);
 
         if (CollectionUtils.isEmpty(listHisDrawBaseInfoSelectComDTO)) {
             return result;

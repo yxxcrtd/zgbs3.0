@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.common.base.dao.BokFinprodSchemeInfoMapper" >
+    <resultMap id="BaseResultMap" type="com.joyintech.tams.common.base.entity.BokFinprodSchemeInfo" >
+        <id column="BOOKSET_ID" property="booksetId" jdbcType="VARCHAR" />
+        <result column="FINPROD_ID" property="finprodId" jdbcType="VARCHAR" />
+        <result column="TRADE_MARKET" property="tradeMarket" jdbcType="VARCHAR" />
+        <result column="SEC_TYPE" property="secType" jdbcType="VARCHAR" />
+        <result column="TYPE1" property="type1" jdbcType="VARCHAR" />
+        <result column="INV_AIM" property="invAim" jdbcType="VARCHAR" />
+        <result column="SCHEME_DETAIL_ID" property="schemeDetailId" jdbcType="VARCHAR" />
+        <result column="SCHEME_ID" property="schemeId" jdbcType="VARCHAR" />
+        <result column="VALUATION_METHOD" property="valuationMethod" jdbcType="VARCHAR" />
+        <result column="VALUATION_PRICE" property="valuationPrice" jdbcType="VARCHAR" />
+        <result column="VALUATION_PRICE_2" property="valuationPrice2" jdbcType="VARCHAR" />
+        <result column="QUOTA_DIGIT" property="quotaDigit" jdbcType="DECIMAL" />
+        <result column="VALUATION_DATE" property="valuationDate" jdbcType="VARCHAR" />
+        <result column="VDATE" property="vdate" jdbcType="DATE" />
+        <result column="MDATE" property="mdate" jdbcType="DATE" />
+        <result column="VALUATION_SOURCE" property="valuationSource" jdbcType="VARCHAR" />
+        <result column="PRICE_TAIL_MODE" property="priceTailMode" jdbcType="VARCHAR" />
+        <result column="PRICE_CLASS" property="priceClass" jdbcType="VARCHAR" />
+        <result column="CREATE_USER" property="createUser" jdbcType="VARCHAR" />
+        <result column="CREATE_DEPT" property="createDept" jdbcType="VARCHAR" />
+        <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
+        <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+        BOOKSET_ID BOOKSET_ID, FINPROD_ID FINPROD_ID, TRADE_MARKET TRADE_MARKET, SEC_TYPE SEC_TYPE, 
+        TYPE1 TYPE1, INV_AIM INV_AIM, SCHEME_DETAIL_ID SCHEME_DETAIL_ID, SCHEME_ID SCHEME_ID, 
+        VALUATION_METHOD VALUATION_METHOD, VALUATION_PRICE VALUATION_PRICE, VALUATION_PRICE_2 VALUATION_PRICE_2, 
+        QUOTA_DIGIT QUOTA_DIGIT, VALUATION_DATE VALUATION_DATE, VDATE VDATE, MDATE MDATE, 
+        VALUATION_SOURCE VALUATION_SOURCE, PRICE_TAIL_MODE PRICE_TAIL_MODE, PRICE_CLASS PRICE_CLASS, 
+        CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, 
+        UPDATE_TIME UPDATE_TIME
+    </sql>
+    <sql id="Sql_All_Data" >
+        select 
+        <include refid="com.joyintech.tams.common.base.dao.BokFinprodSchemeInfoMapper.Base_Column_List" />
+        from BOK_FINPROD_SCHEME_INFO
+    </sql>
+    <sql id="Sql_All_Effective_Data" >
+        select 
+        <include refid="com.joyintech.tams.common.base.dao.BokFinprodSchemeInfoMapper.Base_Column_List" />
+        from BOK_FINPROD_SCHEME_INFO
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select 
+        <include refid="com.joyintech.tams.common.base.dao.BokFinprodSchemeInfoMapper.Base_Column_List" />
+        from BOK_FINPROD_SCHEME_INFO
+        where BOOKSET_ID = #{booksetId,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+        delete from BOK_FINPROD_SCHEME_INFO
+        where BOOKSET_ID = #{booksetId,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.BokFinprodSchemeInfo" >
+        insert into BOK_FINPROD_SCHEME_INFO (BOOKSET_ID, FINPROD_ID, TRADE_MARKET, 
+            SEC_TYPE, TYPE1, INV_AIM, 
+            SCHEME_DETAIL_ID, SCHEME_ID, VALUATION_METHOD, 
+            VALUATION_PRICE, VALUATION_PRICE_2, QUOTA_DIGIT, 
+            VALUATION_DATE, VDATE, MDATE, 
+            VALUATION_SOURCE, PRICE_TAIL_MODE, PRICE_CLASS, 
+            CREATE_USER, CREATE_DEPT, CREATE_TIME, 
+            UPDATE_USER, UPDATE_TIME)
+        values (#{booksetId,jdbcType=VARCHAR}, #{finprodId,jdbcType=VARCHAR}, #{tradeMarket,jdbcType=VARCHAR}, 
+            #{secType,jdbcType=VARCHAR}, #{type1,jdbcType=VARCHAR}, #{invAim,jdbcType=VARCHAR}, 
+            #{schemeDetailId,jdbcType=VARCHAR}, #{schemeId,jdbcType=VARCHAR}, #{valuationMethod,jdbcType=VARCHAR}, 
+            #{valuationPrice,jdbcType=VARCHAR}, #{valuationPrice2,jdbcType=VARCHAR}, #{quotaDigit,jdbcType=DECIMAL}, 
+            #{valuationDate,jdbcType=VARCHAR}, #{vdate,jdbcType=DATE}, #{mdate,jdbcType=DATE}, 
+            #{valuationSource,jdbcType=VARCHAR}, #{priceTailMode,jdbcType=VARCHAR}, #{priceClass,jdbcType=VARCHAR}, 
+            #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+            #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.BokFinprodSchemeInfo" >
+        insert into BOK_FINPROD_SCHEME_INFO
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="booksetId != null" >
+                BOOKSET_ID,
+            </if>
+            <if test="finprodId != null" >
+                FINPROD_ID,
+            </if>
+            <if test="tradeMarket != null" >
+                TRADE_MARKET,
+            </if>
+            <if test="secType != null" >
+                SEC_TYPE,
+            </if>
+            <if test="type1 != null" >
+                TYPE1,
+            </if>
+            <if test="invAim != null" >
+                INV_AIM,
+            </if>
+            <if test="schemeDetailId != null" >
+                SCHEME_DETAIL_ID,
+            </if>
+            <if test="schemeId != null" >
+                SCHEME_ID,
+            </if>
+            <if test="valuationMethod != null" >
+                VALUATION_METHOD,
+            </if>
+            <if test="valuationPrice != null" >
+                VALUATION_PRICE,
+            </if>
+            <if test="valuationPrice2 != null" >
+                VALUATION_PRICE_2,
+            </if>
+            <if test="quotaDigit != null" >
+                QUOTA_DIGIT,
+            </if>
+            <if test="valuationDate != null" >
+                VALUATION_DATE,
+            </if>
+            <if test="vdate != null" >
+                VDATE,
+            </if>
+            <if test="mdate != null" >
+                MDATE,
+            </if>
+            <if test="valuationSource != null" >
+                VALUATION_SOURCE,
+            </if>
+            <if test="priceTailMode != null" >
+                PRICE_TAIL_MODE,
+            </if>
+            <if test="priceClass != null" >
+                PRICE_CLASS,
+            </if>
+            <if test="createUser != null" >
+                CREATE_USER,
+            </if>
+            <if test="createDept != null" >
+                CREATE_DEPT,
+            </if>
+            <if test="createTime != null" >
+                CREATE_TIME,
+            </if>
+            <if test="updateUser != null" >
+                UPDATE_USER,
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="booksetId != null" >
+                #{booksetId,jdbcType=VARCHAR},
+            </if>
+            <if test="finprodId != null" >
+                #{finprodId,jdbcType=VARCHAR},
+            </if>
+            <if test="tradeMarket != null" >
+                #{tradeMarket,jdbcType=VARCHAR},
+            </if>
+            <if test="secType != null" >
+                #{secType,jdbcType=VARCHAR},
+            </if>
+            <if test="type1 != null" >
+                #{type1,jdbcType=VARCHAR},
+            </if>
+            <if test="invAim != null" >
+                #{invAim,jdbcType=VARCHAR},
+            </if>
+            <if test="schemeDetailId != null" >
+                #{schemeDetailId,jdbcType=VARCHAR},
+            </if>
+            <if test="schemeId != null" >
+                #{schemeId,jdbcType=VARCHAR},
+            </if>
+            <if test="valuationMethod != null" >
+                #{valuationMethod,jdbcType=VARCHAR},
+            </if>
+            <if test="valuationPrice != null" >
+                #{valuationPrice,jdbcType=VARCHAR},
+            </if>
+            <if test="valuationPrice2 != null" >
+                #{valuationPrice2,jdbcType=VARCHAR},
+            </if>
+            <if test="quotaDigit != null" >
+                #{quotaDigit,jdbcType=DECIMAL},
+            </if>
+            <if test="valuationDate != null" >
+                #{valuationDate,jdbcType=VARCHAR},
+            </if>
+            <if test="vdate != null" >
+                #{vdate,jdbcType=DATE},
+            </if>
+            <if test="mdate != null" >
+                #{mdate,jdbcType=DATE},
+            </if>
+            <if test="valuationSource != null" >
+                #{valuationSource,jdbcType=VARCHAR},
+            </if>
+            <if test="priceTailMode != null" >
+                #{priceTailMode,jdbcType=VARCHAR},
+            </if>
+            <if test="priceClass != null" >
+                #{priceClass,jdbcType=VARCHAR},
+            </if>
+            <if test="createUser != null" >
+                #{createUser,jdbcType=VARCHAR},
+            </if>
+            <if test="createDept != null" >
+                #{createDept,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null" >
+                #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.BokFinprodSchemeInfo" >
+        insert into BOK_FINPROD_SCHEME_INFO(BOOKSET_ID, FINPROD_ID, TRADE_MARKET, SEC_TYPE, 
+        TYPE1, INV_AIM, SCHEME_DETAIL_ID, SCHEME_ID, VALUATION_METHOD, VALUATION_PRICE, VALUATION_PRICE_2, 
+        QUOTA_DIGIT, VALUATION_DATE, VDATE, MDATE, VALUATION_SOURCE, PRICE_TAIL_MODE, PRICE_CLASS, 
+        CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+        select BOOKSET_ID, FINPROD_ID, TRADE_MARKET, SEC_TYPE, 
+            TYPE1, INV_AIM, SCHEME_DETAIL_ID, SCHEME_ID, VALUATION_METHOD, VALUATION_PRICE, VALUATION_PRICE_2, 
+            QUOTA_DIGIT, VALUATION_DATE, VDATE, MDATE, VALUATION_SOURCE, PRICE_TAIL_MODE, PRICE_CLASS, 
+            CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME
+             from BOK_FINPROD_SCHEME_INFO
+             where 1 = 1 and BOOKSET_ID = #{booksetId,jdbcType=VARCHAR}
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.common.base.entity.BokFinprodSchemeInfo" >
+        update BOK_FINPROD_SCHEME_INFO
+        <set >
+            <if test="finprodId != null" >
+                FINPROD_ID = #{finprodId,jdbcType=VARCHAR},
+            </if>
+            <if test="tradeMarket != null" >
+                TRADE_MARKET = #{tradeMarket,jdbcType=VARCHAR},
+            </if>
+            <if test="secType != null" >
+                SEC_TYPE = #{secType,jdbcType=VARCHAR},
+            </if>
+            <if test="type1 != null" >
+                TYPE1 = #{type1,jdbcType=VARCHAR},
+            </if>
+            <if test="invAim != null" >
+                INV_AIM = #{invAim,jdbcType=VARCHAR},
+            </if>
+            <if test="schemeDetailId != null" >
+                SCHEME_DETAIL_ID = #{schemeDetailId,jdbcType=VARCHAR},
+            </if>
+            <if test="schemeId != null" >
+                SCHEME_ID = #{schemeId,jdbcType=VARCHAR},
+            </if>
+            <if test="valuationMethod != null" >
+                VALUATION_METHOD = #{valuationMethod,jdbcType=VARCHAR},
+            </if>
+            <if test="valuationPrice != null" >
+                VALUATION_PRICE = #{valuationPrice,jdbcType=VARCHAR},
+            </if>
+            <if test="valuationPrice2 != null" >
+                VALUATION_PRICE_2 = #{valuationPrice2,jdbcType=VARCHAR},
+            </if>
+            <if test="quotaDigit != null" >
+                QUOTA_DIGIT = #{quotaDigit,jdbcType=DECIMAL},
+            </if>
+            <if test="valuationDate != null" >
+                VALUATION_DATE = #{valuationDate,jdbcType=VARCHAR},
+            </if>
+            <if test="vdate != null" >
+                VDATE = #{vdate,jdbcType=DATE},
+            </if>
+            <if test="mdate != null" >
+                MDATE = #{mdate,jdbcType=DATE},
+            </if>
+            <if test="valuationSource != null" >
+                VALUATION_SOURCE = #{valuationSource,jdbcType=VARCHAR},
+            </if>
+            <if test="priceTailMode != null" >
+                PRICE_TAIL_MODE = #{priceTailMode,jdbcType=VARCHAR},
+            </if>
+            <if test="priceClass != null" >
+                PRICE_CLASS = #{priceClass,jdbcType=VARCHAR},
+            </if>
+            <if test="updateUser != null" >
+                UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where BOOKSET_ID = #{booksetId,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.BokFinprodSchemeInfo" >
+        update BOK_FINPROD_SCHEME_INFO
+        set FINPROD_ID = #{finprodId,jdbcType=VARCHAR},
+            TRADE_MARKET = #{tradeMarket,jdbcType=VARCHAR},
+            SEC_TYPE = #{secType,jdbcType=VARCHAR},
+            TYPE1 = #{type1,jdbcType=VARCHAR},
+            INV_AIM = #{invAim,jdbcType=VARCHAR},
+            SCHEME_DETAIL_ID = #{schemeDetailId,jdbcType=VARCHAR},
+            SCHEME_ID = #{schemeId,jdbcType=VARCHAR},
+            VALUATION_METHOD = #{valuationMethod,jdbcType=VARCHAR},
+            VALUATION_PRICE = #{valuationPrice,jdbcType=VARCHAR},
+            VALUATION_PRICE_2 = #{valuationPrice2,jdbcType=VARCHAR},
+            QUOTA_DIGIT = #{quotaDigit,jdbcType=DECIMAL},
+            VALUATION_DATE = #{valuationDate,jdbcType=VARCHAR},
+            VDATE = #{vdate,jdbcType=DATE},
+            MDATE = #{mdate,jdbcType=DATE},
+            VALUATION_SOURCE = #{valuationSource,jdbcType=VARCHAR},
+            PRICE_TAIL_MODE = #{priceTailMode,jdbcType=VARCHAR},
+            PRICE_CLASS = #{priceClass,jdbcType=VARCHAR},
+            UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+            UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+        where BOOKSET_ID = #{booksetId,jdbcType=VARCHAR}
+    </update>
+</mapper>

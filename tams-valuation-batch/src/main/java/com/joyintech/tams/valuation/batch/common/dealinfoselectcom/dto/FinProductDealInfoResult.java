@@ -10,12 +10,12 @@
 
 package com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dto;
 
+import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
+import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.TreeNode;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
-import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.TreeNode;
 
 /**
  * 交易信息结果DTO 〈功能详细描述〉
@@ -76,6 +76,11 @@ public class FinProductDealInfoResult extends NeedOperateEntity {
      * 会计准则
      */
     private String acctStandard;
+
+    /**
+     * 现金管理类
+     */
+    private String isCashManage;
 
     /**
      * 交易基本信息列表
@@ -293,7 +298,12 @@ public class FinProductDealInfoResult extends NeedOperateEntity {
 	public void setStage(String stage) {
 		this.stage = stage;
 	}
-    
-    
 
+    public String getIsCashManage() {
+        return isCashManage;
+    }
+
+    public void setIsCashManage(String isCashManage) {
+        this.isCashManage = isCashManage;
+    }
 }

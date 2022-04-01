@@ -91,6 +91,9 @@
             /** add by yanya on 20200221 增加负债共同类 科目余额方向
                 case when 科目余额.科目级别 = 全局变量【底层科目级别】then 账套科目2.余额方向 else 账套科目.余额方向 end as 科目期待余额方向 **/
             ,case when VBB.SUBJECT_LEVEL = #{maxSubjectLevel} then VBS2.BAL_FLAG else VBS.BAL_FLAG end expectBalFlag
+            /** add by weipeng on 20220331 增加估值方案落地表关联 start **/
+           ,schemeInfo.VALUATION_METHOD as valuationMethod
+            /** add by weipeng on 20220331 增加估值方案落地表关联 end **/
         FROM
 		    BOK_BALANCE VBB
 		    
@@ -111,6 +114,11 @@
 		    BOK_BUSS_DETSUB VBBD
 		ON  VBB.BOOKSET_ID = VBBD.BOOKSET_ID
 		AND VBB.SUBJECT_NO = VBBD.DETAIL_SUBJECT_NO
+        /** add by weipeng on 20220331 增加估值方案落地表关联 start **/
+        LEFT JOIN BOK_FINPROD_SCHEME_INFO schemeInfo
+            ON schemeInfo.BOOKSET_ID = VBS.BOOKSET_ID
+            AND schemeInfo.FINPROD_ID = VBBD.DETAIL_SUBJECT_NO_TAIL
+        /** add by weipeng on 20220331 增加估值方案落地表关联 end **/
 		WHERE VBB.BALANCE_DATE = #{bookDate}
 		AND   VBB.BOOKSET_ID = #{booksetId}
 		AND (

@@ -22,7 +22,7 @@ import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.Boo
 import com.joyintech.tams.valuation.batch.common.accountingmethod.dao.AccountingMethodMapper;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.SubjectMappingConfig;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.TreeNode;
-import com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dao.FinProductDealInfoComMapper;
+import com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dao.FinProductDealInfoComNewMapper;
 import com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dto.FinProductDealInfoComDTO;
 import com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dto.FinProductDealInfoKey;
 import com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dto.FinProductDealInfoResult;
@@ -51,7 +51,7 @@ public class FinProductDealInfoComReaderNewService {
      * 拆借计提入账批处理Mapper
      */
     @Autowired
-    private FinProductDealInfoComMapper finProductDealInfoComMapper;
+    private FinProductDealInfoComNewMapper finProductDealInfoComNewMapper;
 
     /**
      * 记账公共类
@@ -96,7 +96,7 @@ public class FinProductDealInfoComReaderNewService {
         if (valMatchRlats != null && valMatchRlats.size() > 0) {
             sqlMap.put("target", valMatchRlats.get(0).getTarget());
         }
-        List<FinProductDealInfoComDTO> listFinProductDealInfoComDTO = finProductDealInfoComMapper.selectDealInfo(sqlMap);
+        List<FinProductDealInfoComDTO> listFinProductDealInfoComDTO = finProductDealInfoComNewMapper.selectDealInfo(sqlMap);
 
         // add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 start
         List<String> listBokdetailId = new ArrayList<>();

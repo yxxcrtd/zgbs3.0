@@ -122,3 +122,86 @@ alter table BOK_SCENESUBJECT add constraint PK_BOK_SCENESUBJECT primary key (BOO
 ------------------------add by weipeng on 20220323 修改BOK_ASSET_MARKET_INFO表字段MARKET_CODE长度与FINPROD_ID长度一致，跑批报错 start---------------------------
 alter table BOK_ASSET_MARKET_INFO MODIFY MARKET_CODE VARCHAR2(50);
 ------------------------add by weipeng on 20220323 修改BOK_ASSET_MARKET_INFO表字段MARKET_CODE长度与FINPROD_ID长度一致，跑批报错 end---------------------------
+
+------------------------add by weipeng on 20220323 现金管理类改造，增加资产估值方案信息表 start---------------------------
+DROP TABLE BOK_FINPROD_SCHEME_INFO;
+create table BOK_FINPROD_SCHEME_INFO
+(
+    bookset_id  VARCHAR2(50) not null,
+    finprod_id        VARCHAR2(50) not null,
+    trade_market      VARCHAR2(50),
+    sec_type          VARCHAR2(50),
+    type1   VARCHAR2(50),
+    inv_aim           VARCHAR2(50),
+    scheme_detail_id  VARCHAR2(32) not null,
+    scheme_id         VARCHAR2(32) not null,
+    valuation_method  VARCHAR2(50),
+    valuation_price   VARCHAR2(50),
+    valuation_price_2 VARCHAR2(50),
+    quota_digit       NUMBER(10),
+    valuation_date    VARCHAR2(50),
+    vdate             DATE,
+    mdate             DATE,
+    valuation_source  VARCHAR2(50),
+    price_tail_mode   VARCHAR2(50),
+    price_class       VARCHAR2(50),
+    create_user       VARCHAR2(20) not null,
+    create_dept       VARCHAR2(32),
+    create_time       TIMESTAMP(6) not null,
+    update_user       VARCHAR2(20) not null,
+    update_time       TIMESTAMP(6) not null
+);
+-- Add comments to the table
+comment on table BOK_FINPROD_SCHEME_INFO
+  is '资产估值方案信息';
+-- Add comments to the columns
+comment on column BOK_FINPROD_SCHEME_INFO.bookset_id
+  is '账套代码';
+comment on column BOK_FINPROD_SCHEME_INFO.finprod_id
+  is '金融产品代码';
+comment on column BOK_FINPROD_SCHEME_INFO.trade_market
+  is '交易市场';
+comment on column BOK_FINPROD_SCHEME_INFO.sec_type
+  is '证券品种';
+comment on column BOK_FINPROD_SCHEME_INFO.type1
+  is '资产类型';
+comment on column BOK_FINPROD_SCHEME_INFO.inv_aim
+  is '投资目的';
+comment on column BOK_FINPROD_SCHEME_INFO.scheme_detail_id
+  is '方案明细代码';
+comment on column BOK_FINPROD_SCHEME_INFO.scheme_id
+  is '方案代码';
+comment on column BOK_FINPROD_SCHEME_INFO.valuation_method
+  is '估值方法';
+comment on column BOK_FINPROD_SCHEME_INFO.valuation_price
+  is '估值市价';
+comment on column BOK_FINPROD_SCHEME_INFO.valuation_price_2
+  is '估值第二市价';
+comment on column BOK_FINPROD_SCHEME_INFO.quota_digit
+  is '行情位数';
+comment on column BOK_FINPROD_SCHEME_INFO.valuation_date
+  is '行情日期';
+comment on column BOK_FINPROD_SCHEME_INFO.vdate
+  is '开始日';
+comment on column BOK_FINPROD_SCHEME_INFO.mdate
+  is '结束日';
+comment on column BOK_FINPROD_SCHEME_INFO.valuation_source
+  is '估值来源';
+comment on column BOK_FINPROD_SCHEME_INFO.price_tail_mode
+  is '行情尾数处理方式';
+comment on column BOK_FINPROD_SCHEME_INFO.price_class
+  is '价格类型';
+comment on column BOK_FINPROD_SCHEME_INFO.create_user
+  is '创建人';
+comment on column BOK_FINPROD_SCHEME_INFO.create_dept
+  is '创建部门';
+comment on column BOK_FINPROD_SCHEME_INFO.create_time
+  is '创建时间';
+comment on column BOK_FINPROD_SCHEME_INFO.update_user
+  is '更新人';
+comment on column BOK_FINPROD_SCHEME_INFO.update_time
+  is '更新时间';
+
+--增加主键
+alter table BOK_FINPROD_SCHEME_INFO add constraint PK_BOK_FINPROD_SCHEME_INFO primary key (BOOKSET_ID,FINPROD_ID);
+------------------------add by weipeng on 20220323 现金管理类改造，增加资产估值方案信息表 end---------------------------

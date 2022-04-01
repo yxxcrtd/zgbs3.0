@@ -88,6 +88,8 @@ public class BookCommonLogicNew {
             // 若科目基础科目性质不为空，则说明分录为非调整后的内部科目编码分录，不做处理，直接返回
             listSubjectInternalCode.add(accountEntry.getSubjectId());
         }
+        //去重处理
+        listSubjectInternalCode=listSubjectInternalCode.stream().distinct().collect(Collectors.toList());
         // 2. 根据内部编码集合查询相关底层科目信息
         Map<String, Object> params = new HashMap<>();
         params.put("booksetId", booksetId);

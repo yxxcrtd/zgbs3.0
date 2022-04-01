@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper
+	namespace="com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dao.DrawBaseInfoSelectComNewMapper">
+	    
+	<select id="selectDrawBaseInfoFromCurr" resultType="com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto.DrawBaseInfoSelectComDTO"
+		parameterType="java.util.Map">
+		SELECT 
+			E.BOOKSET_ID,
+			A.BOOKSET_DATE,
+			C.BUSI_ID,
+			E.BOK_DETAIL_ID,
+			C.INV_AIM,
+			E.O_CCY,
+			E.BAL_FLAG_HAPPEN_DATE,
+			E.O_AMT_HAPPEN_DATE,
+			E.NUM_AMT_HAPPEN_DATE,
+			E.HAPPEN_DATE,
+			E.BASE_SUBJECT_NATURE,
+			F.STANDARD_CCY
+		FROM 
+				BOK_BATCH_TASK_TODO A 
+		  INNER JOIN BOK_MATCH_RLAT B ON
+				(A.TASK_ID = #{taskId,jdbcType=VARCHAR}
+				AND A.TASK_ID = B.SOURCE
+				)
+		  INNER JOIN BOK_DETAIL_ID C ON
+		  		(A.BOOKSET_ID = C.BOOKSET_ID
+		  		 AND A.BOK_DETAIL_ID = C.BOK_DETAIL_ID		  		
+		  		)							
+		  INNER JOIN BOK_SUBJECT_DETAIL D ON
+		  		(A.BOOKSET_ID = D.BOOKSET_ID
+		  		 AND A.BOK_DETAIL_ID = D.BOK_DETAIL_ID	
+		  		 AND B.TARGET = D.BASE_SUBJECT_NATURE  		
+		  		)		  
+		  INNER JOIN BOK_BOOKDETAIL_CURRENT E ON
+		  		(A.BOOKSET_ID = E.BOOKSET_ID
+		  		AND A.BOK_DETAIL_ID = E.BOK_DETAIL_ID
+		  		AND B.TARGET = E.BASE_SUBJECT_NATURE
+		  		AND A.HAPPEN_DATE = E.HAPPEN_DATE
+		  		)
+		  LEFT JOIN BOK_BOOKSET F ON
+		  		F.BOOKSET_ID = A.BOOKSET_ID
+		where
+			A.BOOK_DATE <![CDATA[ <= ]]> E.BOOK_DATE AND
+			(E.ONWAY_DATE <![CDATA[ <= ]]> A.HAPPEN_DATE OR 
+			E.ONWAY_DATE IS NULL)
+			AND A.SEQ_NO = #{seqNo}
+			AND A.BOOKSET_DATE = #{BOOKSET_DATE}
+            AND A.BOOK_DATE = #{BOOK_DATE}
+            AND A.HAPPEN_DATE = #{HAPPEN_DATE}
+            AND A.TASK_ID = #{taskId}   
+		ORDER BY
+			E.BOOKSET_ID,
+			E.BOK_DETAIL_ID,
+			C.BUSI_ID				
+	</select>
+	
+	<select id="selectDrawBaseInfoFromHis" resultType="com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto.DrawBaseInfoSelectComDTO"
+		parameterType="java.util.Map">
+		SELECT B.*,numPL+numPR as numP3 FROM
+		(
+		SELECT
+			A.TASK_ID,
+			A.BOOKSET_ID,
+			A.BOOKSET_DATE,
+			A.BUSI_ID,
+			A.BUSI_DETAIL_TYPE,
+			A.BRANCH,
+			A.BOK_DETAIL_ID,
+			A.INV_AIM,
+			A.O_CCY,
+			A.BAL_FLAG_HAPPEN_DATE,
+			A.O_AMT_HAPPEN_DATE,
+			A.NUM_AMT_HAPPEN_DATE,
+			A.HAPPEN_DATE,
+			A.BASE_SUBJECT_NATURE,
+			A.STANDARD_CCY,
+			A.MDATE,
+			A.IS_BACK_VALUE
+			/** add by weipeng on 20220331 增加估值方案落地表关联 start **/
+		    ,A.VALUATION_METHOD
+			/** add by weipeng on 20220331 增加估值方案落地表关联 end **/
+		    <!-- ADD BY chufengjie ON 20210926 FOR 估值核算系统VAS3.0-930-基线需求 Start  -->
+			<!-- add by caoguo  on 20201019 start remark:资产减值 -->
+			,(SELECT COUNT(1)
+				FROM TRD_ASSET_LOSS TT
+				WHERE TT.SEC_ID = MR.SEC_ID
+				AND TT.VAL_DATE = MR.VAL_DATE
+				AND TT.STAGE = #{stageP3}
+				AND TT.status = #{TRADE_STATUS_01}
+		      ) AS numPL
+			,(SELECT COUNT(1)
+				FROM MOD_ECL_RESULT MER
+				WHERE MER.ASSET_ID = ME.ASSET_ID
+				AND MER.DEC_DATE = ME.DEC_DATE
+				AND MER.STAGE = #{stageP3}
+			 ) AS numPR
+			<!-- add by caoguo on 20201019 end -->
+		    <!-- ADD BY chufengjie ON 20210926 FOR 估值核算系统VAS3.0-930-基线需求 End  -->
+		FROM(
+			SELECT
+				E.BOOKSET_ID,
+				A.BOOKSET_DATE,
+				A.TASK_ID,
+				C.BUSI_ID,
+				C.BUSI_DETAIL_TYPE,
+				E.BRANCH,
+				E.BOK_DETAIL_ID,
+				C.INV_AIM,
+				E.O_CCY,
+				E.BAL_FLAG_HAPPEN_DATE,
+				Row_Number() OVER (partition by E.BOOKSET_ID ,E.BOK_DETAIL_ID,E.BASE_SUBJECT_NATURE, E.O_CCY ORDER BY E.BOOK_ORDER desc) rank ,
+				E.O_AMT_HAPPEN_DATE,
+				E.NUM_AMT_HAPPEN_DATE,
+				E.HAPPEN_DATE,
+				E.BASE_SUBJECT_NATURE,
+				F.STANDARD_CCY,
+				E.MDATE,
+				A.IS_BACK_VALUE
+				,E.ONWAY_DATE
+				/** add by weipeng on 20220331 增加估值方案落地表关联 start **/
+				,schemeInfo.VALUATION_METHOD
+				/** add by weipeng on 20220331 增加估值方案落地表关联 end **/
+			FROM
+			BOK_BATCH_TASK_TODO A
+			INNER JOIN BOK_MATCH_RLAT B2 ON
+			A.TASK_ID = B2.SOURCE AND
+			B2.MATCH_TYPE = #{matchType2}
+			INNER JOIN BOK_BOOKDETAIL_CURRENT E ON
+			A.BOOKSET_ID = E.BOOKSET_ID
+			AND (A.BOK_DETAIL_ID = E.BOK_DETAIL_ID or A.BOK_DETAIL_ID is null)
+			<if test="baseSubjectNatureList != null and baseSubjectNatureList.size > 0">
+				AND E.BASE_SUBJECT_NATURE IN
+				<foreach collection="baseSubjectNatureList" item="baseSubjectNature" open="( " close=" )" separator=",">
+					#{baseSubjectNature}
+				</foreach>
+			</if>
+			AND E.BOOK_DATE <![CDATA[ <= ]]> A.BOOK_DATE
+			AND (E.OFFSET_DATE <![CDATA[ < ]]> #{BOOK_DATE} OR E.OFFSET_DATE IS NULL)
+			AND (B2.TARGET is null or E.TABLE_ID IN B2.TARGET)
+	
+			INNER JOIN BOK_DETAIL_ID C ON (E.BOOKSET_ID = C.BOOKSET_ID AND E.BOK_DETAIL_ID = C.BOK_DETAIL_ID )
+	
+			LEFT JOIN SYS_BATCH_TASK bt on bt.task_id = E.task_id
+	
+			LEFT JOIN BOK_BOOKSET F ON F.BOOKSET_ID = A.BOOKSET_ID
+
+			/** ADD BY weipeng ON 20220314 FOR 估值核算系统BS3.0-会计引擎升级 start  **/
+			LEFT JOIN FIN_PRODUCT_TYPE finType
+				ON finType.FINPROD_ID = C.BUSI_ID
+			/** ADD BY weipeng ON 20220314 FOR 估值核算系统BS3.0-会计引擎升级 end  **/
+			/** add by weipeng on 20220331 增加估值方案落地表关联 start **/
+			LEFT JOIN BOK_FINPROD_SCHEME_INFO schemeInfo
+				ON schemeInfo.BOOKSET_ID = A.BOOKSET_ID
+				AND schemeInfo.FINPROD_ID = C.BUSI_ID
+			/** add by weipeng on 20220331 增加估值方案落地表关联 end **/
+			WHERE 1=1
+			AND (E.HAPPEN_DATE <![CDATA[ < ]]> A.HAPPEN_DATE
+			OR (E.HAPPEN_DATE = A.HAPPEN_DATE AND NVL(bt.task_pri,E.TASK_PRI) <![CDATA[ < ]]> #{taskPri} )
+			)
+			AND A.SEQ_NO = #{seqNo}
+			AND A.BOOKSET_DATE = #{BOOKSET_DATE}
+			AND A.BOOK_DATE = #{BOOK_DATE}
+			AND A.HAPPEN_DATE = #{HAPPEN_DATE}
+			AND A.TASK_ID = #{taskId}
+			AND A.IS_SUB_BOOKSET = #{IS_SUB_BOOKSET}
+
+			/** ADD BY weipeng ON 20220314 FOR 估值核算系统BS3.0-会计引擎升级 start  **/
+			<if test="secTypeList != null and secTypeList.size > 0">
+				AND finType.TYPE_18 IN
+				<foreach collection="secTypeList" item="item" open="( " close=" )" separator=",">
+					#{item}
+				</foreach>
+			</if>
+			/** ADD BY weipeng ON 20220314 FOR 估值核算系统BS3.0-会计引擎升级 end  **/
+
+			ORDER BY
+			E.BOOKSET_ID,
+			C.BUSI_ID,
+			C.INV_AIM
+		) A
+		<!-- ADD BY CAOGUO ON 20201031 FOR 资产减值 Start  -->
+		LEFT JOIN FIN_PRODUCT finProduct
+		ON finProduct.FINPROD_ID = A.BUSI_ID
+		LEFT JOIN (
+				SELECT 
+					MAX(VAL_DATE) VAL_DATE,
+					SEC_ID 
+				FROM 
+					TRD_ASSET_LOSS
+				WHERE
+					VAL_DATE <![CDATA[ <= ]]> #{HAPPEN_DATE} 
+					AND STATUS = #{TRADE_STATUS_01}
+				GROUP BY 
+					SEC_ID	
+				) MR
+			 ON finProduct.FINPROD_MARKET_ID = MR.SEC_ID
+		<!-- ADD BY CAOGUO ON 20201031 FOR 资产减值 Start  -->
+		<!-- ADD BY chufengjie ON 20210926 FOR 估值核算系统VAS3.0-930-基线需求 Start  -->
+		LEFT JOIN (
+			SELECT
+			MAX(DEC_DATE) DEC_DATE,
+			ASSET_ID
+			FROM
+			MOD_ECL_RESULT
+			WHERE
+			DEC_DATE <![CDATA[ <= ]]> #{HAPPEN_DATE}
+			GROUP BY
+			ASSET_ID
+		) ME
+		ON finProduct.FINPROD_ID = ME.ASSET_ID
+		<!-- ADD BY chufengjie ON 20210926 FOR 估值核算系统VAS3.0-930-基线需求 End  -->
+		WHERE
+		A.rank = 1
+		AND (A.NUM_AMT_HAPPEN_DATE<![CDATA[ > ]]> 0
+		OR A.O_AMT_HAPPEN_DATE <![CDATA[ > ]]> 0
+		OR A.HAPPEN_DATE = #{HAPPEN_DATE}
+		OR A.IS_BACK_VALUE = #{isBackValue}
+		OR (A.ONWAY_DATE IS NOT NULL AND A.ONWAY_DATE <![CDATA[ >= ]]> #{HAPPEN_DATE})))B
+	</select>
+	
+</mapper>
