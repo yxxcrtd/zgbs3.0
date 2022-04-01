@@ -863,3 +863,14 @@ values ('02', 'QY', '403', 'QSZQBJ', 'system', null, sysdate, 'system', sysdate)
 delete from BOK_BOOKSET BB where BB.BOOKSET_ID='SUBJECT_INTERNAL_001';
 insert into BOK_BOOKSET (BOOKSET_ID, BOOKSET_NAME, BOOKSET_FULLNAME, BOOKSET_TYPE, ACCT_MODE, BOK_SPEC_MODE, ACCT_SUBJECT_ID, ACCT_SUBJECT_TYPE, STANDARD_CCY, BOOKSET_ID_TMPL, ACCT_STANDARD, START_DATE, END_DATE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('SUBJECT_INTERNAL_001', '辅助核算默认账套模板', '辅助核算默认账套模板', '01', null, null, null, null, 'CNY', 'SUBJECT_INTERNAL_001', 'QY', sysdate, sysdate, 'system', null, sysdate, 'system', sysdate);
+
+--------------------------------add by weipeng on 20220401 : 增加资产估值方案关联落地批处理 start---------------------------------------
+--批处理
+DELETE FROM SYS_BATCH_TASK WHERE TASK_ID ='910';
+insert into SYS_BATCH_TASK (TASK_ID, SYSTEM_CODE, TASK_NAME, FTASK_ID, BEAN_NAME, TASK_PRI, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_BATCH_START_TARGET)
+values ('910', 'VAL', '估值方案落地批处理', null, 'valSchemeLandingTask', 5, 'system', null, SYSDATE, 'system', SYSDATE, null);
+
+DELETE FROM SYS_BATCH_JOB WHERE TASK_ID ='910';
+insert into SYS_BATCH_JOB (BATCH_SEQ_NO, TASK_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+values ('6f8803b3aa6fbaffe050007f01003cad', '910', 'system', null, SYSDATE, 'system', SYSDATE);
+--------------------------------add by weipeng on 20220401 : 增加资产估值方案关联落地批处理 end---------------------------------------
