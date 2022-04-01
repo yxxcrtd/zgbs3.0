@@ -859,3 +859,7 @@ values ('02', 'QY', '403', 'QFZQBJ', 'system', null, sysdate, 'system', sysdate)
 insert into bok_match_rlat (MATCH_TYPE, ACCT_STANDARD, SOURCE, TARGET, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('02', 'QY', '403', 'QSZQBJ', 'system', null, sysdate, 'system', sysdate);
 --------------------------------add by weipeng on 20220329 : 债券借贷计提批处理匹配关系表科目性质变更 end---------------------------------------
+
+delete from BOK_BOOKSET BB where BB.BOOKSET_ID='SUBJECT_INTERNAL_001';
+insert into BOK_BOOKSET (BOOKSET_ID, BOOKSET_NAME, BOOKSET_FULLNAME, BOOKSET_TYPE, ACCT_MODE, BOK_SPEC_MODE, ACCT_SUBJECT_ID, ACCT_SUBJECT_TYPE, STANDARD_CCY, BOOKSET_ID_TMPL, ACCT_STANDARD, START_DATE, END_DATE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+values ('SUBJECT_INTERNAL_001', '辅助核算默认账套模板', '辅助核算默认账套模板', '01', null, null, null, null, 'CNY', 'SUBJECT_INTERNAL_001', 'QY', sysdate, sysdate, 'system', null, sysdate, 'system', sysdate);
