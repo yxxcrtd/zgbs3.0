@@ -4422,13 +4422,15 @@ public class InterfCommonService {
             && StringUtil.equals(DictCodeList.业务类型_计划类资产交易_类债券资产交易.getValue(), tradeDeal.getBusiType())) {
             //定义 是否其他债券 默认为否
             String 是否其他债券 = DictCodeList.是否_否.getValue();
+            //modify by sunshuaishuai 项目类也走计划类场景，去除项目类记账场景 20220401 start
             //定义 变量.标的类金融产品附属DTO = 查询标的类金融产品附属表
-            FinProductAdd finProductAddDto = finProductAddMapper.selectByPrimaryKey(tradeDeal.getFinprodId());
-            //IF 变量.标的类金融产品附属DTO IS NOT NULL AND 变量.标的类金融产品附属DTO.是否其他债权 IS NOT NULL
-            if(finProductAddDto != null && StringUtil.isNotEmpty(finProductAddDto.getIsQtzq())) {
-                //变量.是否其他债权 = 变量.标的类金融产品附属DTO.是否其他债权
-                是否其他债券 = finProductAddDto.getIsQtzq();
-            }
+//            FinProductAdd finProductAddDto = finProductAddMapper.selectByPrimaryKey(tradeDeal.getFinprodId());
+//            //IF 变量.标的类金融产品附属DTO IS NOT NULL AND 变量.标的类金融产品附属DTO.是否其他债权 IS NOT NULL
+//            if(finProductAddDto != null && StringUtil.isNotEmpty(finProductAddDto.getIsQtzq())) {
+//                //变量.是否其他债权 = 变量.标的类金融产品附属DTO.是否其他债权
+//                是否其他债券 = finProductAddDto.getIsQtzq();
+//            }
+            //modify by sunshuaishuai 项目类也走计划类场景，去除项目类记账场景 20220401 end
             //变量.交易标的DTO.参数条件Map.put("IS_QTZQ",变量.是否其他债权)
             paramMap.put("IS_QTZQ", 是否其他债券);
         }
