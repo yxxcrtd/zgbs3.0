@@ -204,8 +204,8 @@ public class ValSchemeHZLayerNewService extends CommonExportService<ValSchemeBat
 
             // 以下处理 金额*汇率在过程中或结果均是保留2位小数
             // if（变量.科目明细.基础科目性质 = "摊余成本类成本" and 变量.科目明细.科目级别 = 全局变量【底层科目级别】）
-            if (StringUtil.equals(dto.getBaseSubjectNature(),
-                DictCodeBaseSubjectNatrueNew.摊余成本类_成本.getValue())
+            // modify by weipeng on 20220331 : if（使用摊余成本法估值 and 变量.科目明细.科目级别 = 全局变量【底层科目级别】）
+            if (dto.getIsAcMethod()
                 && BookConstant.MAX_SUBJECT_LEVEL.equals(dto.getSubjectLevel())) {
                 // 变量.科目信息列表 = 调用账务类共通【对应科目查询（参数.账套代码，基础科目性质列表{摊余成本类利息调整}，变量.科目明细.上级科目号）】
                 List<CorrespondSubjectEntity> 利息调整科目数据 = accountingCommonService.getCorrespondSubject(

@@ -1,6 +1,8 @@
 package com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dto;
 
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.TrdTradeFeeDetail;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.SubjectMappingConfig;
 
 import java.math.BigDecimal;
@@ -361,6 +363,11 @@ public class FinProductDealInfoComDTO {
      */
     private SubjectMappingConfig subjectMappingConfig;
     // add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 end
+
+    /**
+     * 估值方法
+     */
+    private String valuationMethod;
 
     /**
      * 取得 交易市场，一级市场、二级市场
@@ -1575,4 +1582,32 @@ public class FinProductDealInfoComDTO {
         this.subjectMappingConfig = subjectMappingConfig;
     }
     // add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 end
+    /**
+     * 获取 估值方法
+     * @return 估值方法
+     */
+    public String getValuationMethod() {
+        return valuationMethod;
+    }
+
+    /**
+     * 设置 估值方法
+     * @param valuationMethod 估值方法
+     */
+    public void setValuationMethod(String valuationMethod) {
+        this.valuationMethod = valuationMethod;
+    }
+
+    /**
+     * 是否使用摊余成本法
+     * @return 是否使用摊余成本法
+     */
+    public boolean getIsAcMethod(){
+        if(StringUtil.equals(DictCodeListExt1.估值方法_摊余成本法.getValue(), this.getValuationMethod())){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
 }
