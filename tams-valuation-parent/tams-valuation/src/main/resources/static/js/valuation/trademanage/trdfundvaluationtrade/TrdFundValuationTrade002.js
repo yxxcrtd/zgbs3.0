@@ -1,142 +1,99 @@
 
 (function () {
 
-    $('#portfolioId').change(function(){
-        var portfolioId = $('#portfolioId').val();
-        if(portfolioId){
-            var dataPort = $('#portfolioId').select2('data')[0].object;
-            var finprodId = dataPort.finprodId;
-            $('#portfolioName').val(finprodId).trigger('change');
+    $('#prodId').change(function(){
+        var prodId = $('#prodId').val();
+        if(prodId){
+            $('#prodName').val($('#prodId').select2('data')[0].id).trigger('change');
 
         }else {
-            $('#portfolioName').val('').trigger('change');
+            $('#prodName').val('').trigger('change');
         }
     });
 
-    $('#finprodId').change(function(){
-        var finprodId = $('#finprodId').val();
-        if(finprodId){
-            var dataPort = $('#finprodId').select2('data')[0].object;
-            var finprodId = dataPort.finprodId;
+    $('#assetId').change(function(){
+        var assetId = $('#assetId').val();
+        if(assetId){
+            var dataPort = $('#assetId').select2('data')[0].object;
             var tradeMarket = dataPort.tradeMarket;
-            $('#finprodName').val(finprodId).trigger('change');
+            var assetType = dataPort.assetType;
+            $('#assetAbbr').val($('#assetId').select2('data')[0].id).trigger('change');
             $('#tradeMarket').val(tradeMarket).trigger('change');
-            // $("#tradeMarket").val("01").trigger("change");
-            // $("#tradeMarket").attr("disabled", "disabled");
+            $('#fundType').val(assetType).trigger('change');
         }else {
-            $('#finprodName').val('').trigger('change');
+            $('#assetAbbr').val('').trigger('change');
             $('#tradeMarket').val('').trigger('change');
+            $('#fundType').val('').trigger('change');
         }
     });
 
 
     $('#ps').change(function(){
-        if($('#ps').val() && $('#ps').val() != null && $('#ps').val() != ''){
-            var psStr = $('#ps').val();
-            var sqps = "T01,T02,T52,T04";//申请信息  --买入 T01、卖出T02、认购 T52、申购 T04
-            var qrps = "T18,T05,T19";    //确认信息  --认购确认 T18、申购确认T05、赎回确认 T19
-            var dzps = "T24";               //到账信息  --赎回到账 T24
-            if(sqps.indexOf(psStr) >-1){
-                $('#value_div_sq').show();
-                $('#value_div_qr').hide();
-                $('#value_div_dz').hide();
-                $('#confirmTradeAmt').val('');
-                $('#settleAmt').val('');
-            }else if(qrps.indexOf(psStr) >-1){
-                $('#value_div_sq').hide();
-                $('#value_div_qr').show();
-                $('#value_div_dz').hide();
-                $('#tradeAmt').val('');
-                $('#settleAmt').val('');
-            }else if(dzps.indexOf(psStr) >-1){
-                $('#value_div_sq').hide();
-                $('#value_div_qr').hide();
-                $('#value_div_dz').show();
-                $('#tradeAmt').val('')
-                $('#confirmTradeAmt').val('')
-            }else{
-                $('#value_div_sq').show();
-                $('#value_div_qr').show();
-                $('#value_div_dz').show();
-                $('#tradeAmt').val('');
-                $('#confirmTradeAmt').val('');
-                $('#settleAmt').val('');
+        psChange();
+    });
+
+
+        var psChange = function () {
+            var ps = $('#ps').val();
+            //买入 T01、卖出T02、认购 T52、申购 T04、认购确认 T18、申购确认T05、赎回确认 T19、赎回到账 T24
+            if(ps == 'T01' || ps == 'T02'){ //交易信息
+                $('#tradeInfo').show();
+                $('#subscriptionInfo').hide();
+                $('#purchaseInfo').hide();
+                $('#subConfirmInfo').hide();
+                $('#purConfirmInfo').hide();
+                $('#redeemInfo').hide();
+            }else if(ps == 'T52'){ //认购信息
+                $('#tradeInfo').hide();
+                $('#subscriptionInfo').show();
+                $('#purchaseInfo').hide();
+                $('#subConfirmInfo').hide();
+                $('#purConfirmInfo').hide();
+                $('#redeemInfo').hide();
+
+            }else if(ps == 'T04'){//申请信息
+                $('#tradeInfo').hide();
+                $('#subscriptionInfo').hide();
+                $('#purchaseInfo').show();
+                $('#subConfirmInfo').hide();
+                $('#purConfirmInfo').hide();
+                $('#redeemInfo').hide();
+
+            }else if(ps == 'T18'){//认购确认信息
+                $('#tradeInfo').hide();
+                $('#subscriptionInfo').hide();
+                $('#purchaseInfo').hide();
+                $('#subConfirmInfo').show();
+                $('#purConfirmInfo').hide();
+                $('#redeemInfo').hide();
+
+            }else if(ps == 'T05'){//申购确认信息
+                $('#tradeInfo').hide();
+                $('#subscriptionInfo').hide();
+                $('#purchaseInfo').hide();
+                $('#subConfirmInfo').hide();
+                $('#purConfirmInfo').show();
+                $('#redeemInfo').hide();
+
+            }else if(ps == 'T19'){//赎回确认信息
+                $('#tradeInfo').hide();
+                $('#subscriptionInfo').hide();
+                $('#purchaseInfo').hide();
+                $('#subConfirmInfo').hide();
+                $('#purConfirmInfo').hide();
+                $('#redeemInfo').show();
+
+            }else{//默认
+                $('#tradeInfo').hide();
+                $('#subscriptionInfo').hide();
+                $('#purchaseInfo').hide();
+                $('#subConfirmInfo').hide();
+                $('#purConfirmInfo').hide();
+                $('#redeemInfo').hide();
             }
+        };
 
-        }
 
-    });
-
-    //确认金额 联动
-    $('#confirmTradeAmt').change(function(){
-        unitValueCalculate();
-    });
-
-    //交易份额 联动
-    $('#confirmNums').change(function(){
-        unitValueCalculate();
-    });
-
-    /**
-     * 单位净值计算
-     */
-    var unitValueCalculate = function(){
-        if($('#confirmTradeAmt').val() && $('#confirmTradeAmt').val() != null && $('#confirmTradeAmt').val() != ''
-                && $('#confirmNums').val() && $('#confirmNums').val() != null && $('#confirmNums').val() != '' && $('#confirmNums').val() !=0){
-            var unitValue = JoyinMath.doDiv($('#confirmTradeAmt').val(), $('#confirmNums').val(), 2);
-            $('#unitValue').val(unitValue)
-        }else{
-            $('#unitValue').val('')
-        }
-    }
-
-    //交易金额 联动
-    $('#tradeAmt').change(function(){
-        mdateSettleAmtCalculate();
-    });
-
-    //交易金额 联动
-    $('#confirmTradeAmt').change(function(){
-        mdateSettleAmtCalculate();
-    });
-
-    //到账金额 联动
-    $('#settleAmt').change(function(){
-        mdateSettleAmtCalculate();
-    });
-
-    //交易费用 联动
-    $('#feeAmt').change(function(){
-        mdateSettleAmtCalculate();
-    });
-    //投资顾问费 联动
-    $('#advFeeOut').change(function(){
-        mdateSettleAmtCalculate();
-    });
-    //其他费用 联动
-    $('#feeAmtQT').change(function(){
-        mdateSettleAmtCalculate();
-    });
-
-    /**
-     * 结算金额  计算
-     */
-    var mdateSettleAmtCalculate = function(){
-        //总费用=交易费用+投资顾问费+其他费用
-        var totalFee = JoyinMath.doAdd(JoyinMath.doAdd($('#feeAmt').val(), $('#commissionFee').val(), 2),$('#feeAmtQT').val(),2);
-        var mdateSettleAmt =0.00;
-        //tradeAmt 交易金额 confirmTradeAmt 确认金额  settleAmt 到账金额
-        if($('#tradeAmt').val() && $('#tradeAmt').val() != null && $('#tradeAmt').val() != ''){
-            mdateSettleAmt=JoyinMath.doAdd($('#tradeAmt').val(), totalFee, 2);
-        }else if($('#confirmTradeAmt').val() && $('#confirmTradeAmt').val() != null && $('#confirmTradeAmt').val() != ''){
-            mdateSettleAmt=JoyinMath.doAdd($('#confirmTradeAmt').val(), totalFee, 2);
-        }else if($('#settleAmt').val() && $('#settleAmt').val() != null && $('#settleAmt').val() != ''){
-            mdateSettleAmt=JoyinMath.doAdd($('#settleAmt').val(), totalFee, 2);
-        }else{
-            mdateSettleAmt= totalFee;
-        }
-        $('#mdateSettleAmt').val(mdateSettleAmt);
-    }
 
     /**
      * 保存或提交
@@ -148,19 +105,23 @@
          * 获取列表参数
          */
         var object = $.serializeToObject('#basicInfoForm',true);
+
+        // var getSecDetailType = function() {
+        //     return {
+        //         secDetailType: $.trim($('#secDetailType').val()),
+        //     }
+        // };
+        object.tradeAmt=$.trim($('#tradeAmt').val());
+        object.operateType=operateType;
+        object.pageId=pageId;
         Joyin.ajaxJson(basePath + 'valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/check', object, function(result) {
             Joyin.confirm(result.data, function () {
                 if(operateType === 'save') {
-                    Joyin.confirm(message, function() {
-                        WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/save', object, "TrdFundValuationTrade002_btn_save");
-                    });
+                    WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/save', object, "TrdFundValuationTrade002_btn_save");
                 }else{
-                    Joyin.confirm(message, function() {
-                        WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/save', object, "TrdFundValuationTrade002_btn_sbumit");
-                    });
+                    WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdfundvaluationtrade/TrdFundValuationTrade002/save', object, "TrdFundValuationTrade002_btn_submit");
                 }
             });
-
         });
     }
     /**
@@ -174,6 +135,12 @@
      */
     $(function() {
         // init();
+        if(workflowId){
+            psChange();
+        }
+
+
+
         //保存
         $('#TrdFundValuationTrade002_btn_save').click(function() {
             saveOrSubmit('save');

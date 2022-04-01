@@ -1,24 +1,18 @@
 package com.joyintech.tams.valuation.trademanage.bond.service;
 
-import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
-import com.joyintech.framework.security.LoginUserUtil;
-import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
-import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTrade001Dto;
-import com.joyintech.tams.valuation.trademanage.finprodtradequery.dto.ValFinprodTradeQuery001Dto;
+import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTradeDto;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @Service
-public class TrdBondTrade001Service extends CommonExportService<TrdBondTrade001Dto> implements BaseProcessService<TrdBondTrade001Dto> {
+public class TrdBondTrade001Service extends CommonExportService<TrdBondTradeDto> implements BaseProcessService<TrdBondTradeDto> {
 
     /**
      * 检索债券信息
@@ -28,10 +22,10 @@ public class TrdBondTrade001Service extends CommonExportService<TrdBondTrade001D
      * @see
      * @since 1.0
      */
-    public Page<TrdBondTrade001Dto> findPage(Map<String, Object> pageParam) {
+    public Page<TrdBondTradeDto> findPage(Map<String, Object> pageParam) {
 
         return restTemplate.postForPage(ServiceApplication.VALUATION_SERVICE_NAME + "/TrdBondTrade001/findPage",
-                pageParam,TrdBondTrade001Dto.class);
+                pageParam,TrdBondTradeDto.class);
     }
 
     /**
@@ -40,17 +34,17 @@ public class TrdBondTrade001Service extends CommonExportService<TrdBondTrade001D
      * @param params
      * @return
      */
-    public List<TrdBondTrade001Dto> queryPageList(Map<String, Object> params) {
+    public List<TrdBondTradeDto> queryPageList(Map<String, Object> params) {
         return restTemplate.postForList(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdBondTrade001/queryPageList", params,
-                TrdBondTrade001Dto.class);
+                TrdBondTradeDto.class);
     }
 
     @Override
-    public void doComplete(TrdBondTrade001Dto trdBondTrade001Dto, OperationType operationType) {
+    public void doComplete(TrdBondTradeDto trdBondTradeDto, OperationType operationType) {
         // 删除操作
         if(OperationType.DELETE.equals(operationType)) {
-            restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdBondTrade001/delete", trdBondTrade001Dto, Integer.class);
+            restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdBondTrade001/delete", trdBondTradeDto, Integer.class);
         }
     }
 }

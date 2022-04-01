@@ -12,12 +12,7 @@ package com.joyintech.tams.valuation.trademanage.trdfixincomevaluationtrade.dto;
 
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.tams.common.base.entity.*;
-import com.joyintech.tams.valuation.common.interf.base.dto.FundDealInfoForInterfRecCommonResult;
-import com.joyintech.tams.valuation.common.interf.base.dto.InterfProductDealBookCommonDto;
-import com.joyintech.tams.valuation.common.interf.base.dto.PlanAssetCurrencyDealCommonResult;
 import com.joyintech.tams.valuation.common.interf.base.dto.PlannedAssetDealCommonResult;
-import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTradeResult;
-import com.joyintech.tams.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanValuationTradeDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,6 +81,9 @@ public class TrdFixIncomeTradeResult extends BaseEntity {
      */
     private int dataNum;
 
+    public TrdFixIncomeTradeResult(){
+
+    }
 
     /**
      * 重载构造方法 从valuation-common中返回的result重新赋值

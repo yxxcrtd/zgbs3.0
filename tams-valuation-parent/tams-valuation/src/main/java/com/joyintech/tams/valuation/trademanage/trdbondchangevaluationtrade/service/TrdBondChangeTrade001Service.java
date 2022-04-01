@@ -4,7 +4,7 @@ import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
-import com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTrade001Dto;
+import com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeDto;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class TrdBondChangeTrade001Service extends CommonExportService<TrdBondChangeTrade001Dto> implements BaseProcessService<TrdBondChangeTrade001Dto> {
+public class TrdBondChangeTrade001Service extends CommonExportService<TrdBondChangeTradeDto> implements BaseProcessService<TrdBondChangeTradeDto> {
 
     /**
      * 检索债券信息
@@ -23,10 +23,10 @@ public class TrdBondChangeTrade001Service extends CommonExportService<TrdBondCha
      * @see
      * @since 1.0
      */
-    public Page<TrdBondChangeTrade001Dto> findPage(Map<String, Object> pageParam) {
+    public Page<TrdBondChangeTradeDto> findPage(Map<String, Object> pageParam) {
 
         return restTemplate.postForPage(ServiceApplication.VALUATION_SERVICE_NAME + "/TrdBondChangeTrade001/findPage",
-                pageParam,TrdBondChangeTrade001Dto.class);
+                pageParam,TrdBondChangeTradeDto.class);
     }
 
     /**
@@ -35,10 +35,10 @@ public class TrdBondChangeTrade001Service extends CommonExportService<TrdBondCha
      * @param params
      * @return
      */
-    public List<TrdBondChangeTrade001Dto> queryPageList(Map<String, Object> params) {
+    public List<TrdBondChangeTradeDto> queryPageList(Map<String, Object> params) {
         return restTemplate.postForList(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdBondChangeTrade001/queryPageList", params,
-                TrdBondChangeTrade001Dto.class);
+                TrdBondChangeTradeDto.class);
     }
 
     /**
@@ -72,10 +72,10 @@ public class TrdBondChangeTrade001Service extends CommonExportService<TrdBondCha
     }
 
     @Override
-    public void doComplete(TrdBondChangeTrade001Dto TrdBondChangeTrade001Dto, OperationType operationType) {
+    public void doComplete(TrdBondChangeTradeDto trdBondChangeTradeDto, OperationType operationType) {
         // 删除操作
         if(OperationType.DELETE.equals(operationType)) {
-            restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdBondChangeTrade001/delete", TrdBondChangeTrade001Dto, Integer.class);
+            restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdBondChangeTrade001/delete", trdBondChangeTradeDto, Integer.class);
         }
     }
 }

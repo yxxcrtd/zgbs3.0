@@ -153,7 +153,7 @@ public class RepurchaseDealTemplateRecService {
      * @since 1.0
      */
     @SuppressWarnings({"unchecked"})
-    private Map<String, Object> handleValBotAstTrade(List<ValRepDealSec> listValBotAstTrade,Date resovleDate,Map<String,Object> params,
+    public Map<String, Object> handleValBotAstTrade(List<ValRepDealSec> listValBotAstTrade,Date resovleDate,Map<String,Object> params,
     		List<ValInterflog> valInterflog) {
         List<String> bookSetIds = (List<String>)params.get(InterfCommonConstant.接口_运行接口账套ID);
     	String valModel = (String)params.get(InterfCommonConstant.接口模式);
@@ -374,6 +374,10 @@ public class RepurchaseDealTemplateRecService {
         valFinProductDeal.setSettleDate(dto.getSettleDate());
         // 交易币种 = A.币种
         valFinProductDeal.setCcy(dto.getCcy());
+
+        // 接口添加 资金账户 = A.资金账户 yangchen 20220325 start
+        valFinProductDeal.setMyAcctNo(dto.getMyAcctNo());
+        // 接口添加 资金账户 = A.资金账户 yangchen 20220325 end
         // 单位净价
         if (DictCodeList.交易方向_买入.getValue().equals(dto.getPs())
             && (DictCodeList.业务类型_债券买断式回购交易.getValue().equals(dto.getBusiType()))) {
@@ -561,7 +565,10 @@ public class RepurchaseDealTemplateRecService {
         // 交易员 = A.交易员
         valFinProductDeal.setTrader(dto.getTrader());
         // 关联系统交易编号 = A.成交编号
-        valFinProductDeal.setfTradeId(dto.getTradeId());
+//        valFinProductDeal.setfTradeId(dto.getTradeId());
+        // 接口添加 关联系统交易编号 = A.外部交易编号 yangchen 20220325 start
+        valFinProductDeal.setfTradeId(dto.getfTradeId());
+        // 接口添加 关联系统交易编号 = A.外部交易编号 yangchen 20220325 end
         //交易市场 = 数据字典：流通市场.二级市场
         valFinProductDeal.setTradeMarketMode(DictCodeListExt1.交易市场_二级市场.getValue());
         valFinProductDeal.setCreateTime(dto.getCreateTime());

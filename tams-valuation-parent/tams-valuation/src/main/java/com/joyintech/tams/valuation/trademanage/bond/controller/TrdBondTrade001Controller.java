@@ -15,28 +15,19 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
-import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.grid.Page;
-import com.joyintech.framework.select.SelectDto;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
-import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.system.constant.SystemGlobalConstant;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt3;
-import com.joyintech.tams.valuation.accounadjustmanage.manualvoucher.dto.ValManualVoucher001Dto;
-import com.joyintech.tams.valuation.common.constants.GlobalConstant;
-import com.joyintech.tams.valuation.common.service.BaseCommonService;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
-import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTrade001Dto;
+import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTradeDto;
 import com.joyintech.tams.valuation.trademanage.bond.service.TrdBondTrade001Service;
-import com.joyintech.tams.valuation.trademanage.finprodtradequery.dto.ValFinprodTradeQuery001Dto;
-import com.joyintech.workflow.engine.WorkflowContext;
+import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -50,7 +41,6 @@ import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -72,9 +62,6 @@ public class TrdBondTrade001Controller extends BaseController {
     private TrdBondTrade001Service trdBondTrade001Service;
 
     @Autowired
-    private BaseCommonService baseCommonService;
-
-    @Autowired
     private CommonBusinessService commonBusinessService;
 
     @Override
@@ -94,7 +81,7 @@ public class TrdBondTrade001Controller extends BaseController {
      */
     @RequestMapping("findPage")
     @ResponseBody
-    public Page<TrdBondTrade001Dto> findPage()
+    public Page<TrdBondTradeDto> findPage()
         throws Exception {
         return trdBondTrade001Service.findPage(RequestUtil.getPageParam());
     }
@@ -111,7 +98,7 @@ public class TrdBondTrade001Controller extends BaseController {
     public List<SelectOptionDto> getFinprodId() {
         Map<String, Object> param = RequestUtil.getPageParam();
         param.put("finprodType","F16");
-        return commonBusinessService.getProdId(param);
+        return commonBusinessService.getProdName(param);
     }
 
     /**
@@ -139,38 +126,25 @@ public class TrdBondTrade001Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("check")
-    public AjaxResult check(@RequestBody @Valid TrdBondTrade001Dto dto,
+    public AjaxResult check(@RequestBody @Valid TrdBondTradeDto dto,
                                   BindingResult result) throws ParseException {
 
-        List<TrdBondTrade001Dto> list = dto.getSelectedItem();
+        List<TrdBondTradeDto> list = dto.getSelectedItem();
         if(list==null||list.size()<=0){
             return new AjaxResult("请选择数据", MessageType.错误消息);
         }
         //删除时的校验
         if(StringUtil.isNotEmpty(list) && "delete".equals(dto.getOperateType())) {
-            for (TrdBondTrade001Dto item : list) {
+            for (TrdBondTradeDto item : list) {
                 //1.判断是否在流程中
                 //判断当前流程是否存在
                 if (trdBondTrade001Service.checkBusinessDataInFlow(item)) {
                     //流程存在情况
                     return new AjaxResult("交易编号：" + item.getTradeId() + "已存在流程中", MessageType.错误消息);
                 }
-//                //2.判断交易日等于平台日
-//                String tradeDate = item.getTradeDate();
-//                // 系统平台日
-//                Date sysDate = baseCommonService.getSysDate();
-//                if (StringUtil.isNotEmpty(tradeDate)) {
-//                    Date bDate = DateUtil.parseDate(tradeDate, "yyyy-MM-dd");
-//                    if (DateUtil.compareDate(sysDate, bDate) != 0) {
-//                        return new AjaxResult("只能删除交易日等于平台日的交易", MessageType.错误消息);
-//                    } else {
-//                        return new AjaxResult("确定要删除？", MessageType.确认消息);
-//                    }
-//                }
-
             }
         }else if("edit".equals(dto.getOperateType())){
-                for (TrdBondTrade001Dto item : list) {
+                for (TrdBondTradeDto item : list) {
                     //1.判断是否在流程中
                     //判断当前流程是否存在
                     if(trdBondTrade001Service.checkBusinessDataInFlow(item)){
@@ -184,7 +158,7 @@ public class TrdBondTrade001Controller extends BaseController {
 
     @ResponseBody
     @RequestMapping(ACTION_DELETE)
-    public AjaxResult delete(@RequestBody @Valid TrdBondTrade001Dto dto, BindingResult br)
+    public AjaxResult delete(@RequestBody @Valid TrdBondTradeDto dto, BindingResult br)
     {
 
         if (br.hasErrors()) {
@@ -192,30 +166,30 @@ public class TrdBondTrade001Controller extends BaseController {
         }
 
         // 启动流程
-        ProcessParameter<TrdBondTrade001Dto> proParam = new ProcessParameter<>();
-        WorkFlowParameter<TrdBondTrade001Dto> params = new WorkFlowParameter<>();
+        ProcessParameter<TrdBondTradeDto> proParam = new ProcessParameter<>();
+        WorkFlowParameter<TrdBondTradeDto> params = new WorkFlowParameter<>();
 
         // 业务代码（凭证流水号）
         params.setBusinessCode(item -> item.getTradeId());
         // 业务类型
-        params.setBusinessType(DictCodeList.业务类型_银行间债券交易.getValue());
+        params.setBusinessType(DictCodeList.共通业务类型_债券类资产交易.getValue());
         // 页面id
-        params.setPageId("BondTradeQuery001");
+        params.setPageId("TrdBondTrade002");
         // 元素id
         params.setElementId(dto.getElementId());
 
         // 设置流程业务说明, entity即传入的dto
-        params.setComment(entity -> WorkFlowUtil.concatComment("债券交易查询删除：", entity.getTradeId(),
-                entity.getTradeDate()
+        params.setComment(entity -> WorkFlowUtil.concatComment("债券交易删除：交易编号", entity.getTradeId(),
+                "交易日期",DateUtil.format(entity.getTradeDate())
         ));
 
         // 塞入流程参数
         proParam.setWorkFlowParameter(params);
-
+        proParam.setOperationType(OperationType.DELETE);
         String msg = getMessage("COMMON_I_0001");
         try {
             msg = trdBondTrade001Service.start(proParam, dto.getSelectedItem().toArray(
-                    new TrdBondTrade001Dto[dto.getSelectedItem().size()]));
+                    new TrdBondTradeDto[dto.getSelectedItem().size()]));
         }
         catch (Exception e) {
             getLogger().error("启动流程失败：", e);
@@ -252,9 +226,9 @@ public class TrdBondTrade001Controller extends BaseController {
 
         String datas = this.getParam("datas");
         Map<String, Object> params = RequestUtil.getPageParam();
-        List<TrdBondTrade001Dto> listdto;
+        List<TrdBondTradeDto> listdto;
         if (datas != null) {
-            listdto = JsonUtils.json2List(datas, TrdBondTrade001Dto.class);
+            listdto = JsonUtils.json2List(datas, TrdBondTradeDto.class);
         }
         else {
             listdto = trdBondTrade001Service.queryPageList(params);

@@ -10,21 +10,24 @@
  
 package com.joyintech.tams.valuation.trademanage.trdfixincomevaluationtrade.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.annotation.PageId;
+import com.joyintech.framework.base.BaseEntity;
+import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.framework.validation.annotation.NotEmpty;
 import com.joyintech.framework.validation.annotation.ValidLogic;
 import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
-import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.valuation.trademanage.trdfixincomevaluationtrade.validate.TrdFixIncomeValuationTradeDtoValidator;
+import com.joyintech.tams.valuation.trademanage.trdfixincomevaluationtrade.validate.TrdFixIncomeValuationTradeValidator;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
-import com.joyintech.workflow.engine.annotation.PrimaryKey.Field;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -36,9 +39,9 @@ import java.util.List;
  * @return:
  */
 @PageId("TrdFixIncomeValuationTrade002")
-@ValidLogic(targetClass = TrdFixIncomeValuationTradeDtoValidator.class, groups = {ValidateGroupEdit.class,
+@ValidLogic(targetClass = TrdFixIncomeValuationTradeValidator.class, groups = {ValidateGroupEdit.class,
     ValidateGroupDelete.class})
-public class TrdFixIncomeValuationTradeDto extends WflTrdProductDeal implements ProcessEntity {
+public class TrdFixIncomeValuationTradeDto extends BaseEntity implements ProcessEntity {
 
     /**
      * <意义，目的和功能，以及可能被用到的地方>
@@ -46,319 +49,162 @@ public class TrdFixIncomeValuationTradeDto extends WflTrdProductDeal implements 
     private static final long serialVersionUID = 5309538894816479429L;
 
     /**
-     * 产品代码
-     */
-    private String portfolioId;
-
-    /**
-     * 产品名称
-     */
-    private String portfolioName;
-
-
-
-    /**
-     * 其他费用
-     */
-    private BigDecimal feeAmtQT;
-
-    /**
-     * 结算金额
-     */
-    private BigDecimal mdateSettleAmt;
-
-
-    /**
-     * 资金账户
-     */
-    private String trdAcctId;
-
-    /**
-     * 外部交易编号
-     */
-    private String outTradeId;
-
-    /**
-     * 交割日期
-     */
-    private Date settleDate;
-
-    /**
-     * 全价总额
-     */
-    private BigDecimal fpriceAmt;
-
-    /**
-     * 应收利息总额
-     */
-    private BigDecimal intAmt;
-
-    /**
-     * 净价总额
-     */
-    private BigDecimal cpriceAmt;
-
-    /**
-     * 净价
-     */
-    private BigDecimal netPrice;
-
-    /**
-     * 金融产品名称
-     */
-    private String finprodName;
-    /**
      * 操作类型
      */
     private String operateType;
+
+    private String pageModel;
+
     /**
-     * 市场机构代码
-     */
-    private String finprodMarketId;
-    /**
-     * elementId
-     */
-    private String elementId;
-    /**
-     * 计划类实体类
+     * 选择数据
      */
     private List<TrdFixIncomeValuationTradeDto> selectedItem;
 
     /**
-     * 撤销原因
+     * 要素id
      */
-    private String cancelRemark;
-    /**
-     * pageModel
-     */
-    private String pageModel;
-
+    private String elementId;
 
     /**
-     * 获取 pageModel
-     * @return pageModel.
+     * 交易编号
      */
-    public String getPageModel() {
-        return pageModel;
-    }
+    @PrimaryKey(value= PrimaryKey.Field.PK_1)
+    private String tradeId;
 
     /**
-     * 获取 finprodMarketId
-     * @return finprodMarketId.
+     * 外部成交编号
      */
-    public String getFinprodMarketId() {
-        return finprodMarketId;
-    }
+    private String outTradeId;
 
     /**
-     * 设置 finprodMarketId
-     * @param finprodMarketId finprodMarketId
+     * 金融产品代码
      */
-    public void setFinprodMarketId(String finprodMarketId) {
-        this.finprodMarketId = finprodMarketId;
-    }
+    private String prodId;
 
     /**
-     * 设置 pageModel
-     * @param pageModel pageModel
+     * 金融产品名称
      */
-    public void setPageModel(String pageModel) {
-        this.pageModel = pageModel;
-    }
-    /**
-     * 金融产品类型
-     * {@inheritDoc}
-     */
-    @Override
-    public String getFinprodType(){
-        return super.getFinprodType();
-    }
-
-    @Override
-    @NotEmpty(fieldName="TrdFixIncomeValuationTrade001.tradeDate",groups = {ValidateGroupEdit.class})
-    public Date getTradeDate(){
-        return super.getTradeDate();
-    }
-
-
-
+    private String prodName;
 
     /**
-     * 获取 selectedItem
-     * @return selectedItem.
+     * 资产代码
      */
-    public List<TrdFixIncomeValuationTradeDto> getSelectedItem() {
-        return selectedItem;
-    }
-
-
+    private String assetId;
 
     /**
-     * 设置 selectedItem
-     * @param selectedItem selectedItem
+     * 资产名称
      */
-    public void setSelectedItem(List<TrdFixIncomeValuationTradeDto> selectedItem) {
-        this.selectedItem = selectedItem;
-    }
-    /**
-     * 设置主键
-     * {@inheritDoc}
-     */
-    @Override
-    @PrimaryKey(Field.PK_1)
-    @NotEmpty(fieldName="TrdFixIncomeValuationTrade001.tradeId",groups = {ValidateGroupEdit.class})
-    public String getTradeId(){
-        return super.getTradeId();
-    }
-    /**
-     * 业务类型
-     * {@inheritDoc}
-     */
-    @Override
-    @PrimaryKey(Field.PK_2)
-    public String getBusiType(){
-        return super.getBusiType();
-    }
+    private String assetName;
 
     /**
-     * 获取 elementId
-     * @return elementId.
+     * 交易类型
      */
-    public String getElementId() {
-        return elementId;
-    }
+    private String ps;
 
     /**
-     * 设置 elementId
-     * @param elementId elementId
+     * 币种
      */
-    public void setElementId(String elementId) {
-        this.elementId = elementId;
-    }
-
-    public String getTrdAcctId() {
-        return trdAcctId;
-    }
-
-    public void setTrdAcctId(String trdAcctId) {
-        this.trdAcctId = trdAcctId;
-    }
-
-    @Override
-    public String getCancelRemark() {
-        return cancelRemark;
-    }
-
-    @Override
-    public void setCancelRemark(String cancelRemark) {
-        this.cancelRemark = cancelRemark;
-    }
+    private String ccy;
 
     /**
-     * 获取 operatType
-     * @return operatType.
+     * 投资目的
      */
+    private String invAim;
+
+    /**
+     * 交易日
+     */
+    private Date tradeDate;
+
+    /**
+     * 交割日期
+     */
+    private Date effDate;
+
+    /**
+     * 资金交收日期
+     */
+    private Date fundSettleDate;
+
+    /**
+     * 本金金额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal capital;
+
+    /**
+     * 净价总额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal cpriceAmt;
+
+    /**
+     * 应收利息总额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal intAmt;
+
+    /**
+     * 净价
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal cprice;
+
+    /**
+     * 其他费用
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal otherAmt;
+
+    /**
+     * 结算金额
+     */
+    private BigDecimal settleAmt;
+
+    /**
+     * 资金账户
+     */
+    private String myAcctNo;
+
     public String getOperateType() {
         return operateType;
     }
 
-    /**
-     * 设置 operatType
-     * @param operateType operateType
-     */
     public void setOperateType(String operateType) {
         this.operateType = operateType;
     }
 
-    /**
-     * 币种字符串
-     * @return 币种
-     * @see
-     * @since 1.0
-     */
-    public String getCcyStr(){
-        return SysDataUtil.getNameFromDataDict(DictCode.币种, super.getCcy());
-    }
-    /**
-     * 币种
-     * {@inheritDoc}
-     */
-    @Override
-    @NotEmpty(fieldName="TrdFixIncomeValuationTrade001.ccy",groups = {ValidateGroupEdit.class})
-    public String getCcy(){
-        return super.getCcy();
-    }
-    /**
-     * 交易方向
-     * {@inheritDoc}
-     */
-    @NotEmpty(fieldName="TrdFixIncomeValuationTrade001.ps",groups = {ValidateGroupEdit.class})
-    public String getPs(){
-        return super.getPs();
-    }
-    /**
-     * 交易方向字符串
-     * @return 交易方向
-     * @see
-     * @since 1.0
-     */
-    public String getPsStr(){
-        return SysDataUtil.getNameFromDataDict(DictCode.交易方向, super.getPs());
+    public String getPageModel() {
+        return pageModel;
     }
 
-
-    /**
-     * 获取 portfolioId
-     * @return portfolioId.
-     */
-    @NotEmpty(fieldName="TrdFixIncomeValuationTrade001.portfolioId",groups = {ValidateGroupEdit.class})
-    public String getPortfolioId() {
-        return portfolioId;
+    public void setPageModel(String pageModel) {
+        this.pageModel = pageModel;
     }
 
-    /**
-     * 设置 portfolioId
-     * @param portfolioId portfolioId
-     */
-    public void setPortfolioId(String portfolioId) {
-        this.portfolioId = portfolioId;
+    public List<TrdFixIncomeValuationTradeDto> getSelectedItem() {
+        return selectedItem;
     }
 
-    /**
-     * 获取 portfolioName
-     * @return portfolioName.
-     */
-    @NotEmpty(fieldName="TrdFixIncomeValuationTrade001.portfolioName",groups = {ValidateGroupEdit.class})
-    public String getPortfolioName() {
-        return portfolioName;
+    public void setSelectedItem(List<TrdFixIncomeValuationTradeDto> selectedItem) {
+        this.selectedItem = selectedItem;
     }
 
-    /**
-     * 设置 portfolioNamefinprodMarketId
-     * @param portfolioName portfolioName
-     */
-    public void setPortfolioName(String portfolioName) {
-        this.portfolioName = portfolioName;
+    public String getElementId() {
+        return elementId;
     }
 
-
-    /**
-     * 获取 finprodName
-     * @return finprodName.
-     */
-    @NotEmpty(fieldName="TrdFixIncomeValuationTrade001.finprodName",groups = {ValidateGroupEdit.class})
-    public String getFinprodName() {
-        return finprodName;
+    public void setElementId(String elementId) {
+        this.elementId = elementId;
     }
 
-    /**
-     * 设置 finprodName
-     * @param finprodName finprodName
-     */
-    public void setFinprodName(String finprodName) {
-        this.finprodName = finprodName;
+    public String getTradeId() {
+        return tradeId;
     }
 
+    public void setTradeId(String tradeId) {
+        this.tradeId = tradeId;
+    }
 
     public String getOutTradeId() {
         return outTradeId;
@@ -368,116 +214,214 @@ public class TrdFixIncomeValuationTradeDto extends WflTrdProductDeal implements 
         this.outTradeId = outTradeId;
     }
 
-    @NotEmpty(fieldName="TrdFixIncomeValuationTrade002.feeAmtQT",groups = {ValidateGroupEdit.class})
-    public BigDecimal getFeeAmtQT() {
-        return feeAmtQT;
+    @NotEmpty(fieldName = "TrdFixIncomeValuationTrade.prodId" , groups = { ValidateGroupEdit.class })
+    public String getProdId() {
+        return prodId;
     }
 
-    public void setFeeAmtQT(BigDecimal feeAmtQT) {
-        this.feeAmtQT = feeAmtQT;
+    public void setProdId(String prodId) {
+        this.prodId = prodId;
     }
 
-    @NotEmpty(fieldName="TrdFixIncomeValuationTrade002.mdateSettleAmt",groups = {ValidateGroupEdit.class})
-    public BigDecimal getMdateSettleAmt() {
-        return mdateSettleAmt;
+    @NotEmpty(fieldName = "TrdFixIncomeValuationTrade.prodName" , groups = { ValidateGroupEdit.class })
+    public String getProdName() {
+        return prodName;
     }
 
-    public void setMdateSettleAmt(BigDecimal mdateSettleAmt) {
-        this.mdateSettleAmt = mdateSettleAmt;
+    public void setProdName(String prodName) {
+        this.prodName = prodName;
     }
 
-
-    //交易金额
-    @Override
-    @NotEmpty(fieldName="TrdFixIncomeValuationTrade001.tradeAmt",groups = {ValidateGroupEdit.class})
-    public BigDecimal getTradeAmt() {
-        return super.getTradeAmt();
-    }
-    //交易费用
-    @Override
-    @NotEmpty(fieldName="TrdFixIncomeValuationTrade002.feeAmt",groups = {ValidateGroupEdit.class})
-    public BigDecimal getFeeAmt() {
-        return super.getFeeAmt();
+    @NotEmpty(fieldName = "TrdFixIncomeValuationTrade.assetId" , groups = { ValidateGroupEdit.class })
+    public String getAssetId() {
+        return assetId;
     }
 
-    //资产代码
-    @Override
-    @NotEmpty(fieldName="TrdFixIncomeValuationTrade001.finprodId",groups = {ValidateGroupEdit.class})
-    public String getFinprodId() {
-        return super.getFinprodId();
+    public void setAssetId(String assetId) {
+        this.assetId = assetId;
     }
 
-    @NotEmpty(fieldName="TrdFixIncomeValuationTrade002.settleDate",groups = {ValidateGroupEdit.class})
-    @Override
-    public Date getSettleDate() {
-        return settleDate;
+    @NotEmpty(fieldName = "TrdFixIncomeValuationTrade.assetName" , groups = { ValidateGroupEdit.class })
+    public String getAssetName() {
+        return assetName;
     }
 
-    @Override
-    public void setSettleDate(Date settleDate) {
-        this.settleDate = settleDate;
+    public void setAssetName(String assetName) {
+        this.assetName = assetName;
     }
 
-    @Override
-    @NotEmpty(fieldName="TrdFixIncomeValuationTrade002.fpriceAmt",groups = {ValidateGroupEdit.class})
-    public BigDecimal getFpriceAmt() {
-        return fpriceAmt;
+    @NotEmpty(fieldName = "TrdFixIncomeValuationTrade.ps" , groups = { ValidateGroupEdit.class })
+    public String getPs() {
+        return ps;
     }
 
-    @Override
-    public void setFpriceAmt(BigDecimal fpriceAmt) {
-        this.fpriceAmt = fpriceAmt;
+    public void setPs(String ps) {
+        this.ps = ps;
     }
 
-    @Override
-    @NotEmpty(fieldName="TrdFixIncomeValuationTrade002.intAmt",groups = {ValidateGroupEdit.class})
-    public BigDecimal getIntAmt() {
-        return intAmt;
+    /**
+     * 取得 交易方向str
+     *
+     * @return 交易方向
+     */
+    public String getPsStr() {
+        return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.交易方向, ps))?
+                SysDataUtil.getNameFromDataDict(DictCode.交易方向, ps):ps;
     }
 
-    @Override
-    public void setIntAmt(BigDecimal intAmt) {
-        this.intAmt = intAmt;
+    @NotEmpty(fieldName = "TrdFixIncomeValuationTrade.ccy" , groups = { ValidateGroupEdit.class })
+    public String getCcy() {
+        return ccy;
     }
 
-    @Override
-    @NotEmpty(fieldName="TrdFixIncomeValuationTrade002.cpriceAmt",groups = {ValidateGroupEdit.class})
+    public void setCcy(String ccy) {
+        this.ccy = ccy;
+    }
+
+    /**
+     * 取得 币种Fmt
+     *
+     * @return 币种
+     */
+    public String getCcyFmt() {
+        return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.币种, ccy))?
+                SysDataUtil.getNameFromDataDict(DictCode.币种, ccy):ccy;
+    }
+
+    @NotEmpty(fieldName = "TrdFixIncomeValuationTrade.invAim" , groups = { ValidateGroupEdit.class })
+    public String getInvAim() {
+        return invAim;
+    }
+
+    public void setInvAim(String invAim) {
+        this.invAim = invAim;
+    }
+
+    public String getInvAimStr() {
+        return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.投资目的, invAim))?
+                SysDataUtil.getNameFromDataDict(DictCode.投资目的, invAim):invAim;
+    }
+
+    @NotEmpty(fieldName = "TrdFixIncomeValuationTrade.tradeDate" , groups = { ValidateGroupEdit.class })
+    public Date getTradeDate() {
+        return tradeDate;
+    }
+
+    public void setTradeDate(Date tradeDate) {
+        this.tradeDate = tradeDate;
+    }
+
+    public String getTradeDateStr() {
+        return DateUtil.format(this.getTradeDate());
+    }
+
+    @NotEmpty(fieldName = "TrdFixIncomeValuationTrade.effDate" , groups = { ValidateGroupEdit.class })
+    public Date getEffDate() {
+        return effDate;
+    }
+
+    public void setEffDate(Date effDate) {
+        this.effDate = effDate;
+    }
+
+    public String getEffDateStr() {
+        return DateUtil.format(this.getEffDate());
+    }
+
+//    @NotEmpty(fieldName = "TrdFixIncomeValuationTrade.fundSettleDate" , groups = { ValidateGroupEdit.class })
+    public Date getFundSettleDate() {
+        return fundSettleDate;
+    }
+
+    public void setFundSettleDate(Date fundSettleDate) {
+        this.fundSettleDate = fundSettleDate;
+    }
+
+    public String getFundSettleDateStr() {
+        return DateUtil.format(this.getFundSettleDate());
+    }
+
+    @NotEmpty(fieldName = "TrdFixIncomeValuationTrade.capital" , groups = { ValidateGroupEdit.class })
+    public BigDecimal getCapital() {
+        return capital;
+    }
+
+    public void setCapital(BigDecimal capital) {
+        this.capital = capital;
+    }
+
+    @NotEmpty(fieldName = "TrdFixIncomeValuationTrade.cpriceAmt" , groups = { ValidateGroupEdit.class })
     public BigDecimal getCpriceAmt() {
         return cpriceAmt;
     }
 
-    @Override
     public void setCpriceAmt(BigDecimal cpriceAmt) {
         this.cpriceAmt = cpriceAmt;
     }
 
-    @NotEmpty(fieldName="TrdFixIncomeValuationTrade002.netPrice",groups = {ValidateGroupEdit.class})
-    public BigDecimal getNetPrice() {
-        return netPrice;
+    @NotEmpty(fieldName = "TrdFixIncomeValuationTrade.intAmt" , groups = { ValidateGroupEdit.class })
+    public BigDecimal getIntAmt() {
+        return intAmt;
     }
 
-    public void setNetPrice(BigDecimal netPrice) {
-        this.netPrice = netPrice;
+    public void setIntAmt(BigDecimal intAmt) {
+        this.intAmt = intAmt;
     }
 
-    public String getInvAimStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.投资目的, super.getInvAim());
+    @NotEmpty(fieldName = "TrdFixIncomeValuationTrade.cprice" , groups = { ValidateGroupEdit.class })
+    public BigDecimal getCprice() {
+        return cprice;
     }
 
-    public String getTradeDateStr() {
-        String tradeDateStr="";
-        if(super.getTradeDate() !=null){
-            tradeDateStr= DateUtil.format(super.getTradeDate());
-        }
-        return tradeDateStr;
+    public void setCprice(BigDecimal cprice) {
+        this.cprice = cprice;
     }
 
-    public String getSettleDateStr() {
-        String settleDateStr="";
-        if(super.getSettleDate() !=null){
-            settleDateStr= DateUtil.format(super.getSettleDate());
-        }
-        return settleDateStr;
+    //@NotEmpty(fieldName = "TrdFixIncomeValuationTrade.otherAmt" , groups = { ValidateGroupEdit.class })
+    public BigDecimal getOtherAmt() {
+        return otherAmt;
+    }
+
+    public void setOtherAmt(BigDecimal otherAmt) {
+        this.otherAmt = otherAmt;
+    }
+
+    @NotEmpty(fieldName = "TrdFixIncomeValuationTrade.settleAmt" , groups = { ValidateGroupEdit.class })
+    public BigDecimal getSettleAmt() {
+        return settleAmt;
+    }
+
+    public void setSettleAmt(BigDecimal settleAmt) {
+        this.settleAmt = settleAmt;
+    }
+
+    @NotEmpty(fieldName = "TrdFixIncomeValuationTrade.myAcctNo" , groups = { ValidateGroupEdit.class })
+    public String getMyAcctNo() {
+        return myAcctNo;
+    }
+
+    public void setMyAcctNo(String myAcctNo) {
+        this.myAcctNo = myAcctNo;
+    }
+
+    public String getCapitalStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getCapital()==null?"0.00":decimalFormat.format(this.getCapital().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getCpriceAmtStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getCpriceAmt()==null?"0.00":decimalFormat.format(this.getCpriceAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getIntAmtStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getIntAmt()==null?"0.00":decimalFormat.format(this.getIntAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getSettleAmtStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getSettleAmt()==null?"0.00":decimalFormat.format(this.getSettleAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
     }
 }
 

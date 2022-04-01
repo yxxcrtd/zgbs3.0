@@ -1,133 +1,62 @@
 
 (function () {
 
-    $('#portfolioId').change(function(){
-        var portfolioId = $('#portfolioId').val();
-        if(portfolioId){
-            var dataPort = $('#portfolioId').select2('data')[0].object;
-            var finprodId = dataPort.finprodId;
-            $('#portfolioName').val(finprodId).trigger('change');
-
+    /*
+    * 产品代码联动带出产品名称
+    */
+    $('#prodId').change(function(){
+        var prodId = $('#prodId').val();
+        if(prodId){
+            $('#prodName').val($('#prodId').select2('data')[0].id).trigger('change');
         }else {
-            $('#portfolioName').val('').trigger('change');
+            $('#prodName').val('').trigger('change');
         }
     });
 
-    $('#finprodId').change(function(){
-        var finprodId = $('#finprodId').val();
-        if(finprodId){
-            var dataPort = $('#finprodId').select2('data')[0].object;
-            var finprodId = dataPort.finprodId;
-            $('#finprodName').val(finprodId).trigger('change');
-
+    /*
+    * 资产代码联动带出资产名称
+    */
+    $('#assetId').change(function(){
+        var assetId = $('#assetId').val();
+        if(assetId){
+            $('#assetName').val($('#assetId').select2('data')[0].id).trigger('change');
         }else {
-            $('#finprodName').val('').trigger('change');
+            $('#assetName').val('').trigger('change');
         }
     });
 
+    //净价=净价总额/本金金额
+    var cpriceChange= function(){
+        var capital = $('#capital').val();
+        var cpriceAmt = $('#cpriceAmt').val();
+        if (capital && cpriceAmt ) {
+            var cprice = JoyinMath.doDiv(cpriceAmt, capital, 2, JoyinMath.ROUND_HALF_UP);
+            $("#cprice").val(cprice).trigger("blur");
+        }else {
+            $("#cprice").val('').trigger("blur");
+        }
+    }
 
-    $('#ps').change(function(){
-        if($('#ps').val() && $('#ps').val() != null && $('#ps').val() != ''){
-            var psStr = $('#ps').val();
-            var sqps = "T01,T02,T52,T04";//申请信息  --买入 T01、卖出T02、认购 T52、申购 T04
-            var qrps = "T18,T05,T19";    //确认信息  --认购确认 T18、申购确认T05、赎回确认 T19
-            var dzps = "T24";               //到账信息  --赎回到账 T24
-            if(sqps.indexOf(psStr) >-1){
-                $('#value_div_sq').show();
-                $('#value_div_qr').hide();
-                $('#value_div_dz').hide();
-                $('#confirmTradeAmt').val('');
-                $('#settleAmt').val('');
-            }else if(qrps.indexOf(psStr) >-1){
-                $('#value_div_sq').hide();
-                $('#value_div_qr').show();
-                $('#value_div_dz').hide();
-                $('#tradeAmt').val('');
-                $('#settleAmt').val('');
-            }else if(dzps.indexOf(psStr) >-1){
-                $('#value_div_sq').hide();
-                $('#value_div_qr').hide();
-                $('#value_div_dz').show();
-                $('#tradeAmt').val('')
-                $('#confirmTradeAmt').val('')
-            }else{
-                $('#value_div_sq').show();
-                $('#value_div_qr').show();
-                $('#value_div_dz').show();
-                $('#tradeAmt').val('');
-                $('#confirmTradeAmt').val('');
-                $('#settleAmt').val('');
+    //结算金额  结算金额=净价总额+应收利息总额+其他费用
+    //卖出时：结算金额=净价总额+应收利息总额-其他费用
+    var settleAmtChange = function(){
+        var cpriceAmt = $('#cpriceAmt').val();
+        var intAmt = $('#intAmt').val();
+        //var otherAmt = $('#otherAmt').val();
+        var ps = $('#ps').val();
+        if(cpriceAmt != null && cpriceAmt != ''
+            && intAmt != null && intAmt != ''
+            //&& otherAmt != null && otherAmt != ''
+            ){
+            if(ps != '' && ps == 'T01'){
+                var settleAmt1 = JoyinMath.doAdd(cpriceAmt, intAmt,2);
+            }else if(ps != '' && ps == 'T02'){
+                var settleAmt1 = JoyinMath.doAdd(cpriceAmt, intAmt,2);
             }
-
-        }
-
-    });
-
-    //净价总额 联动
-    $('#cpriceAmt').change(function(){
-        netPriceCalculate();
-    });
-
-    //本金金额 联动
-    $('#tradeAmt').change(function(){
-        netPriceCalculate();
-    });
-
-    /**
-     * 净价计算 净价总额/本金金额
-     */
-    var netPriceCalculate = function(){
-        if($('#cpriceAmt').val() && $('#cpriceAmt').val() !==null && $('#cpriceAmt').val() !=''
-        &&  $('#tradeAmt').val() && $('#tradeAmt').val() !=null && $('#tradeAmt').val() !='' && $('#tradeAmt').val()!=0){
-            var netPrice = JoyinMath.doDiv($('#cpriceAmt').val(),$('#tradeAmt').val(),2);
-            $('#netPrice').val(netPrice);
+            $('#settleAmt').val(settleAmt1);
         }else{
-            $('#netPrice').val('');
+            $('#settleAmt').val('');
         }
-
-    }
-
-    //全价总额 联动
-    $('#fpriceAmt').change(function(){
-        cpriceAmtCalculate();
-    });
-
-    //应收利息总额 联动
-    $('#intAmt').change(function(){
-        cpriceAmtCalculate();
-    });
-
-    /**
-     * 净价总额计算
-     */
-    var cpriceAmtCalculate = function(){
-        if($('#fpriceAmt').val() && $('#fpriceAmt').val() != null && $('#fpriceAmt').val() != ''
-                && $('#intAmt').val() && $('#intAmt').val() != null && $('#intAmt').val() != '' ){
-            var cpriceAmt = JoyinMath.doMinus($('#fpriceAmt').val(), $('#intAmt').val(), 2);
-            $('#cpriceAmt').val(cpriceAmt)
-        }else{
-            $('#cpriceAmt').val('')
-        }
-    }
-
-    //全价总额 联动
-    $('#fpriceAmt').change(function(){
-        mdateSettleAmtCalculate();
-    });
-
-    //其他费用 联动
-    $('#feeAmtQT').change(function(){
-        mdateSettleAmtCalculate();
-    });
-
-
-    /**
-     * 结算金额  计算
-     */
-    var mdateSettleAmtCalculate = function(){
-        //结算金额=全价总额+其他费用
-        var mdateSettleAmt=JoyinMath.doAdd($('#fpriceAmt').val(), $('#feeAmtQT').val(), 2);
-        $('#mdateSettleAmt').val(mdateSettleAmt);
     }
 
     /**
@@ -140,32 +69,53 @@
          * 获取列表参数
          */
         var object = $.serializeToObject('#basicInfoForm',true);
+        object.operateType=operateType;
+        object.pageId=pageId;
         Joyin.ajaxJson(basePath + 'valuation/trademanage/trdfixincomevaluationtrade/TrdFixIncomeValuationTrade002/check', object, function(result) {
             Joyin.confirm(result.data, function () {
                 if(operateType === 'save') {
-                    Joyin.confirm(message, function() {
-                        WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdfixincomevaluationtrade/TrdFixIncomeValuationTrade002/save', object, "TrdFixIncomeValuationTrade002_btn_save");
-                    });
+                    WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdfixincomevaluationtrade/TrdFixIncomeValuationTrade002/save', object, "TrdFixIncomeValuationTrade002_btn_save");
                 }else{
-                    Joyin.confirm(message, function() {
-                        WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdfixincomevaluationtrade/TrdFixIncomeValuationTrade002/save', object, "TrdFixIncomeValuationTrade002_btn_sbumit");
-                    });
+                    WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdfixincomevaluationtrade/TrdFixIncomeValuationTrade002/save', object, "TrdFixIncomeValuationTrade002_btn_submit");
                 }
             });
 
         });
     }
-    /**
-     * 界面初始化
-     * @returns
-     */
-    function init(){
-    }
+
     /**
      * 画面加载完成
      */
     $(function() {
         // init();
+
+        //本金金额
+        $('#capital').change(function(){
+            cpriceChange();
+        });
+        //净价总额
+        $('#cpriceAmt').change(function(){
+            cpriceChange();
+        });
+
+        //结算金额联动事件
+        //净价总额
+        $('#cpriceAmt').change(function(){
+            settleAmtChange();
+        });
+        //应收利息总额
+        $('#intAmt').change(function(){
+            settleAmtChange();
+        });
+        // //其他费用
+        // $('#otherAmt').change(function(){
+        //     settleAmtChange();
+        // });
+        //交易类型
+        $('#ps').change(function(){
+            settleAmtChange();
+        });
+
         //保存
         $('#TrdFixIncomeValuationTrade002_btn_save').click(function() {
             saveOrSubmit('save');

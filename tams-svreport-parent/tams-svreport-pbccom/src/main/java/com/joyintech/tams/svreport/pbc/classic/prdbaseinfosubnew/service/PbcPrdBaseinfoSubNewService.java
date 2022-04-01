@@ -151,7 +151,7 @@ public class PbcPrdBaseinfoSubNewService extends PbcClassicsSubService<PbcPrdBas
 		// 处理产品发行登记
 		for(PbcPrdBaseinfoSubNew sub : needRegistSubList){
 			if(sub.getInDepName() != null && inDepCodeMap.containsKey(sub.getInDepName())){
-				sub.setInDepCode(inDepCodeMap.get(sub.getInDepName()).getSrcfield2());
+				sub.setInDepCode(inDepCodeMap.get(sub.getInDepName()).getObjfield2());
 			}
 			String pbcProdId;
 			if(pbcProdIdMap.containsKey(sub.getProdId())){

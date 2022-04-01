@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.service.valuation.trademanage.irs.dao.TrdIRSValuationTradeMapper" >
+
+    <select id="selectDeal" resultType="com.joyintech.service.valuation.trademanage.irs.dto.TrdIRSValuationTrade001Dto">
+        SELECT
+            t.TRADE_ID tradeId,/**交易编号**/
+            null outTradeId,    /*外部成交编号*/
+            deal.BOOKSET_ID finprodId,/**金融产品代码**/
+            bok.BOOKSET_NAME finprodName,/**金融产品名称**/
+            ftp.IRS_TYPE ps,/**交易类型**/
+            t.TRADE_DATE tradeDate,/**交易日**/
+            t.VDATE vdate,/**起息日**/
+            t.MDATE mdate,/**到期日**/
+            t.PRIN_AMT prin,/**名义本金**/
+            FCCR_R.Yield*100 yield,/**固定利率%**/
+            FCPR_R.PAY_CYCLE fixPayCycle,/**固定利率付息频率**/
+            FCPR_R.FIRST_PAY_DATE firstPayDateR,/**固定利率首期起息日**/
+            FRI_F.BENCHMARK_ID intType,/**浮动挂钩利率**/
+            FRI_F.SPREAD_RATE spreadRate,/**利差（BP）**/
+            FCPR_F.PAY_CYCLE floatPayCycle,/**浮动利率付息频率**/
+            FCPR_F.FIRST_PAY_DATE firstPayDateF,/**浮动利率首期起息日**/
+            party.counter_name counterId,/**交易对手**/
+            t.CCY ccy,/**币种**/
+            stl.SETTLE_AMT settleAmt,/**结算金额**/
+            stl.MY_ACCT_NO acctNo/**资金账户**/
+        FROM TRD_PRODUCT_DEAL t
+        LEFT JOIN FIN_TRADE_PRODUCT ftp on ftp.FINPROD_ID = t.FINPROD_ID
+        LEFT JOIN BOK_DEAL_ACCOUNTING deal on deal.BUSI_NO = t.TRADE_ID
+        LEFT JOIN BOK_BOOKSET bok on bok.BOOKSET_ID = deal.BOOKSET_ID
+        LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID
+        left join FIN_RATE_INFO FRI_R on FRI_R.FINPROD_ID = t.FINPROD_ID and FRI_R.INT_TYPE = #{INT_TYPE_01}
+        left join FIN_CASH_CALC_RULE FCCR_R on FRI_R.CASH_ID = FCCR_R.CASH_ID
+        left join FIN_RATE_INFO FRI_F on FRI_F.FINPROD_ID = t.FINPROD_ID
+            and FRI_F.INT_TYPE = #{INT_TYPE_02} and FRI_F.EFF_DATE = ftp.VDATE
+        left join FIN_CASH_PAY_RULE FCPR_F on FRI_F.CASH_ID = FCPR_F.CASH_ID and FCPR_F.EFF_DATE = ftp.VDATE
+        left join FIN_CASH_PAY_RULE FCPR_R on FRI_R.CASH_ID = FCPR_R.CASH_ID and FCPR_R.EFF_DATE = ftp.VDATE
+        left join mst_counter_party party on t.COUNTER_ID=party.counter_id
+        where
+            t.BUSI_TYPE = '13'
+            <if test="tradeId !=null and tradeId !='' ">
+                and t.TRADE_ID like  concat(concat('%',#{tradeId}),'%')
+            </if>
+            <if test="finprodIdArr != null and finprodIdArr.length > 0">
+                and deal.BOOKSET_ID IN
+                <foreach collection="finprodIdArr" item="finprodId" open="( " close=" )" separator=",">
+                    #{finprodId}
+                </foreach>
+            </if>
+            <if test="tradeDateBegin !=null and tradeDateBegin !='' ">
+                and t.TRADE_DATE <![CDATA[>=]]> to_date(#{tradeDateBegin},'yyyy-mm-dd')
+            </if>
+            <if test="tradeDateEnd !=null and tradeDateEnd !='' ">
+                and t.TRADE_DATE <![CDATA[<=]]> to_date(#{tradeDateEnd},'yyyy-mm-dd')
+            </if>
+            <if test="ps !=null and ps !='' ">
+                and ftp.IRS_TYPE =#{ps}
+            </if>
+        order by t.TRADE_ID desc
+    </select>
+
+    <select id="querySequences" resultType="Integer" useCache="false"
+            flushCache="true">
+        SELECT JYSL_SEQUENCE.nextval from dual
+    </select>
+
+    <delete id="delBokDetailIdByTradeId">
+        DELETE FROM BOK_DETAIL_ID
+        WHERE BOOKSET_ID = #{booksetId}
+          and TRADE_ID = #{tradeId}
+    </delete>
+
+</mapper>

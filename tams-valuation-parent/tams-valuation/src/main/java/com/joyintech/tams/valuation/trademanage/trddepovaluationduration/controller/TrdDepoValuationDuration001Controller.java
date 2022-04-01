@@ -11,6 +11,7 @@
 package com.joyintech.tams.valuation.trademanage.trddepovaluationduration.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
@@ -20,6 +21,7 @@ import com.joyintech.system.constant.SystemGlobalConstant;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 
+import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.trddepovaluationduration.dto.TrdDepoValuationDuration001Dto;
 import com.joyintech.tams.valuation.trademanage.trddepovaluationduration.service.TrdDepoValuationDuration001Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -57,6 +59,9 @@ public class TrdDepoValuationDuration001Controller extends BaseController {
     @Autowired
     private TrdDepoValuationDuration001Service trdDepoValuationDuration001Service;
 
+    @Autowired
+    private CommonBusinessService commonBusinessService;
+
     @Override
     public String init(Model model) {
         this.setSelectOptionToModel(model,DictCode.交易方向,DictCode.交易场所,
@@ -76,61 +81,105 @@ public class TrdDepoValuationDuration001Controller extends BaseController {
 
 
     /**
-     * 自定义产品代码下拉框
-     * @param request
-     * @return
+     * 产品代码下拉框
+     *
+     * @return 产品代码
+     * @see
+     * @since 1.0
      */
-    @RequestMapping("/findPortfolioId")
     @ResponseBody
-    public Page<SelectOptionDto> findPortfolioId(HttpServletRequest request) {
-        Map<String, Object> param =RequestUtil.getPageParam();
-        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-//        param.put("finprodType", "F01"); //测试
-        return trdDepoValuationDuration001Service.findPortfolioId(param);
+    @RequestMapping("/getFinprodId")
+    public List<SelectOptionDto> getFinprodId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("finprodType","F16");
+        return commonBusinessService.getProdName(param);
     }
 
-
     /**
-     * 自定义资产代码下拉框
+     * 资产代码下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
      */
-    @RequestMapping("/findFinprodId")
     @ResponseBody
-    public Page<SelectOptionDto> findFinprodId(HttpServletRequest request) {
-        Map<String, Object> param =RequestUtil.getPageParam();
-        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-        param.put("finprodType", "F01"); //测试
-        return trdDepoValuationDuration001Service.findFinprodId(param);
+    @RequestMapping("/getAssetId")
+    public List<SelectOptionDto> getAssetId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("assetType","F07");  //存款类资产
+        return commonBusinessService.getAssetId(param);
     }
 
 
 //    /**
-//     * 导出数据
+//     * 自定义产品代码下拉框
+//     * @param request
+//     * @return
 //     */
-//    @RequestMapping(ACTION_EXPORT)
-//    public ResponseEntity<byte[]> export()
-//            throws ParseException, IOException {
-//
-//        String datas = this.getParam("datas");
-//        Map<String, Object> params = RequestUtil.getPageParam();
-//        List<TrdRepoValuationTrade001Dto> listdto;
-//        if (datas != null) {
-//            listdto = JsonUtils.json2List(datas, TrdRepoValuationTrade001Dto.class);
-//        } else {
-//            listdto = trdRepoValuationTrade001Service.queryPageList(params);
-//        }
-//        File outFile = trdRepoValuationTrade001Service.makeFile(
-//                "/com/joyintech/tams/valuation/trademanage/trdrepovaluationtrade/conf/export_conf.xml",
-//                listdto);
-//        return ExportUtil.export(
-//                this.getMessage(this.getPageId()) + SystemGlobalConstant.OPEN_PARENTHESIS
-//                        + DateUtil.format(new Date())
-//                        + SystemGlobalConstant.CLOSE_PARENTHESIS
-//                        + SystemGlobalConstant.POINT
-//                        + FileNameUtil.getFileExtName(outFile),
-//                outFile, true);
+//    @RequestMapping("/findPortfolioId")
+//    @ResponseBody
+//    public Page<SelectOptionDto> findPortfolioId(HttpServletRequest request) {
+//        Map<String, Object> param =RequestUtil.getPageParam();
+//        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
+//        param.put("finprodType", "F16"); //测试
+//        return trdDepoValuationDuration001Service.findPortfolioId(param);
 //    }
 //
 //
+//    /**
+//     * 自定义资产代码下拉框
+//     */
+//    @RequestMapping("/findFinprodId")
+//    @ResponseBody
+//    public Page<SelectOptionDto> findFinprodId(HttpServletRequest request) {
+//        Map<String, Object> param =RequestUtil.getPageParam();
+//        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
+//        param.put("finprodType", "F01"); //测试
+//        return trdDepoValuationDuration001Service.findFinprodId(param);
+//    }
+
+    /**
+     * 删除前判断
+     *
+     * @param dto
+     * @param result
+     * @return
+     * @throws Exception
+     */
+    @ResponseBody
+    @RequestMapping("check")
+    public AjaxResult check(@RequestBody @Valid TrdDepoValuationDuration001Dto dto,
+                            BindingResult result) throws ParseException {
+
+        List<TrdDepoValuationDuration001Dto> list = dto.getSelectedItem();
+        if(list==null||list.size()<=0){
+            return new AjaxResult("请选择数据", MessageType.错误消息);
+        }
+        //删除时的校验
+        if(StringUtil.isNotEmpty(list) && "delete".equals(dto.getOperateType())) {
+            for (TrdDepoValuationDuration001Dto item : list) {
+                //1.判断是否在流程中
+                //判断当前流程是否存在
+                if (trdDepoValuationDuration001Service.checkBusinessDataInFlow(item)) {
+                    //流程存在情况
+                    return new AjaxResult("交易编号：" + item.getTradeId() + "已存在流程中", MessageType.错误消息);
+                }
+
+            }
+        }else if("edit".equals(dto.getOperateType())){
+            for (TrdDepoValuationDuration001Dto item : list) {
+                //1.判断是否在流程中
+                //判断当前流程是否存在
+                if(trdDepoValuationDuration001Service.checkBusinessDataInFlow(item)){
+                    //流程存在情况
+                    return new AjaxResult("交易编号："+item.getTradeId()+"已存在流程中", MessageType.错误消息);
+                }
+            }
+        }
+        return new AjaxResult();
+    }
+
+
     //删除
     @ResponseBody
     @RequestMapping(ACTION_DELETE)
@@ -146,9 +195,9 @@ public class TrdDepoValuationDuration001Controller extends BaseController {
         // 业务代码（凭证流水号）
         params.setBusinessCode(item -> item.getTradeId());
         // 业务类型
-        params.setBusinessType(DictCodeList.业务类型_银行间债券交易.getValue());
+        params.setBusinessType(DictCodeList.共通业务类型_存款类资产存续期.getValue());
         // 页面id
-        params.setPageId("BondTradeQuery001");
+        params.setPageId("TrdDepoValuationDuration002");
         // 元素id
         params.setElementId(dto.getElementId());
 

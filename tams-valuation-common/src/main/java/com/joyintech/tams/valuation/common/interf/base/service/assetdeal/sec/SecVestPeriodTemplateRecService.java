@@ -10,45 +10,23 @@
 
 package com.joyintech.tams.valuation.common.interf.base.service.assetdeal.sec;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.framework.util.ArithmeticUtil;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.valuation.common.interf.base.constant.FinalString;
+import com.joyintech.tams.valuation.common.interf.base.constant.InterfCommonConstant;
+import com.joyintech.tams.valuation.common.interf.base.dto.*;
+import com.joyintech.tams.valuation.common.interf.base.service.common.InterfCommonService;
+import com.joyintech.tams.valuation.common.interf.base.service.common.TemplateAnalysisForXMLService;
+import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValSecVestPeriod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.joyintech.tams.common.base.entity.BokDealAccounting;
-import com.joyintech.tams.common.base.entity.BokDealAccountingDetail;
-import com.joyintech.tams.common.base.entity.BokDetailId;
-import com.joyintech.tams.common.base.entity.StlOrders;
-import com.joyintech.tams.common.base.entity.StlOrdersExt;
-import com.joyintech.tams.common.base.entity.TrdProductDeal;
-import com.joyintech.tams.common.base.entity.TrdProductDealAdd;
-import com.joyintech.tams.common.base.entity.TrdTradeFeeDetail;
-import com.joyintech.tams.common.base.entity.ValInterflog;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.valuation.common.interf.base.constant.FinalString;
-import com.joyintech.tams.valuation.common.interf.base.constant.InterfCommonConstant;
-import com.joyintech.tams.valuation.common.interf.base.dto.AssetDealInfoValCommonResult;
-import com.joyintech.tams.valuation.common.interf.base.dto.ChannelFeeInfoDeal;
-import com.joyintech.tams.valuation.common.interf.base.dto.InterfProductDealBookCommonDto;
-import com.joyintech.tams.valuation.common.interf.base.dto.TargetFinProduct;
-import com.joyintech.tams.valuation.common.interf.base.dto.TemplateCheckReturnResult;
-import com.joyintech.tams.valuation.common.interf.base.dto.TemplateOrderInfoReaderResult;
-import com.joyintech.tams.valuation.common.interf.base.dto.TemplateSourceFlgDTO;
-import com.joyintech.tams.valuation.common.interf.base.service.common.InterfCommonService;
-import com.joyintech.tams.valuation.common.interf.base.service.common.TemplateAnalysisForXMLService;
-import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValSecVestPeriod;
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.StringUtil;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * 债券存续期交易 模板处理Service(VAL_BOT_AST_INFO)
@@ -148,7 +126,7 @@ public class SecVestPeriodTemplateRecService {
      * @since 1.0
      */
     @SuppressWarnings({"unchecked"})
-    private Map<String, Object> handleValSecVestPeriod(List<ValSecVestPeriod> listValSecVestPeriod,Date resovleDate,Map<String,Object> params,
+    public Map<String, Object> handleValSecVestPeriod(List<ValSecVestPeriod> listValSecVestPeriod,Date resovleDate,Map<String,Object> params,
     		List<ValInterflog> valInterflog) {
         List<String> bookSetIds = (List<String>)params.get(InterfCommonConstant.接口_运行接口账套ID);
     	String valModel = (String)params.get(InterfCommonConstant.接口模式);
@@ -629,6 +607,12 @@ public class SecVestPeriodTemplateRecService {
         valFinProductDeal.setChlId(dto.getChannelId());
         //计提份额 = a.计提份额 add by yanya on 20210303
         valFinProductDeal.setAccrNum(dto.getAccrNum());
+        /*add by sunshuaishuai 交易管理 20220325 start*/
+        //资金账户
+        valFinProductDeal.setMyAcctNo(dto.getMyAcctNo());
+        //证券账户
+        valFinProductDeal.setSecManageAcctId(dto.getSecManageAcctId());
+        /*add by sunshuaishuai 20220325 end*/
         return valFinProductDeal;
     }
 

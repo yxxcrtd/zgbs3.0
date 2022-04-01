@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workbook filePath="trademanage/trdfixincomevaluationtrade/TrdFixIncomeValuationTrade001.xlsx" name="固收类交易导出">
+	<Worksheet javaBean="com.joyintech.tams.valuation.trademanage.trdfixincomevaluationtrade.dto.TrdFixIncomeValuationTradeDto">
+		<Row>
+			<Cell order="1" name="交易编号">tradeId</Cell>
+			<Cell order="2" name="外部成交编号">outTradeId</Cell>
+			<Cell order="3" name="产品代码">prodId</Cell>
+			<Cell order="4" name="产品名称">prodName</Cell>
+			<Cell order="5" name="资产代码">assetId</Cell>
+			<Cell order="6" name="资产名称">assetName</Cell>
+			<Cell order="7" name="交易类型">psStr</Cell>
+			<Cell order="8" name="交易日">tradeDateStr</Cell>
+			<Cell order="9" name="交割日">effDateStr</Cell>
+			<Cell order="10" name="会计分类">invAimStr</Cell>
+			<Cell order="11" name="本金金额">capitalStr</Cell>
+			<Cell order="12" name="净价金额">cpriceAmtStr</Cell>
+			<Cell order="13" name="应收利息总额">intAmtStr</Cell>
+			<Cell order="14" name="币种">ccyFmt</Cell>
+			<Cell order="15" name="资金账户">myAcctNo</Cell>
+		</Row>
+	</Worksheet>
+</Workbook>

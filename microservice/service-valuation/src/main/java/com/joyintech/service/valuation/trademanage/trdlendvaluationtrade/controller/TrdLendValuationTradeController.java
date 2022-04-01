@@ -15,6 +15,7 @@ import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.service.valuation.trademanage.trdlendvaluationtrade.dto.TrdLendValuationTradeDto;
+import com.joyintech.service.valuation.trademanage.trdlendvaluationtrade.dto.TrdLendValuationTradeResult;
 import com.joyintech.service.valuation.trademanage.trdlendvaluationtrade.service.TrdLendValuationTradeService;
 import com.joyintech.service.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanValuationTradeDto;
 import com.joyintech.service.valuation.trademanage.trdplanvaluationtrade.service.TrdPlanValuationTradeService;
@@ -125,5 +126,36 @@ public class TrdLendValuationTradeController extends BaseController {
     @PostMapping("/queryPageList")
     public List<TrdLendValuationTradeDto> queryPageList(@RequestBody Map<String, Object> param){
         return trdLendValuationTradeService.queryPageList(param);
+    }
+
+
+    /**
+     * 插入
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("insert")
+    public int insert(@RequestBody TrdLendValuationTradeResult dto)
+            throws Exception {
+        return trdLendValuationTradeService.insert(dto);
+    }
+
+    /**
+     * 修改
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("update")
+    public int update(@RequestBody TrdLendValuationTradeResult dto)
+            throws Exception {
+        return trdLendValuationTradeService.update(dto);
     }
 }

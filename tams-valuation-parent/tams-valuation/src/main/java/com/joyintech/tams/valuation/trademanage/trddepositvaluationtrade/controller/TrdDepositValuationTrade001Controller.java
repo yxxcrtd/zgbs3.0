@@ -11,31 +11,22 @@
 package com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.system.constant.SystemGlobalConstant;
-import com.joyintech.tams.common.base.dao.FinProductMapper;
-import com.joyintech.tams.common.base.dao.TrdProductDealAddMapper;
-import com.joyintech.tams.common.base.dao.TrdProductDealMapper;
-import com.joyintech.tams.common.base.entity.FinProduct;
-import com.joyintech.tams.common.base.entity.TrdProductDeal;
-import com.joyintech.tams.common.base.entity.TrdProductDealAdd;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
-
 import com.joyintech.tams.valuation.common.service.MstWorkflowCommonService;
-import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTrade001Dto;
+import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.dto.TrdDepositValuationTrade001Dto;
 import com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.service.TrdDepositValuationTrade001Service;
 import com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.service.TrdDepositValuationTrade002Service;
-
-import com.joyintech.tams.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanValuationTradeDto;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
@@ -72,16 +63,14 @@ public class TrdDepositValuationTrade001Controller extends BaseController {
         /*
          * 注入service
          */
-        @Autowired
-        private TrdDepositValuationTrade001Service trdDepositValuationTrade001Service;
-        
-        @Autowired
-        private TrdDepositValuationTrade002Service trdDepositValuationTrade002Service;
-//    /**
-//     * 通用Mapper共同代理方法
-//     */
-//    @Autowired(required = false)
-//    private BussCommonMapperDelegateService bussCommonMapperDelegateService;
+    @Autowired
+    private TrdDepositValuationTrade001Service trdDepositValuationTrade001Service;
+
+    @Autowired
+    private TrdDepositValuationTrade002Service trdDepositValuationTrade002Service;
+
+    @Autowired
+    private CommonBusinessService commonBusinessService;
 
 
 
@@ -90,9 +79,7 @@ public class TrdDepositValuationTrade001Controller extends BaseController {
      */
     @Autowired
     private MstWorkflowCommonService mstWorkflowCommonService;
-    
-    @Autowired
-    private TrdDepositValuationTrade002Controller trade002Controller;
+
         /**
          * 初始化方法
          * {@inheritDoc}
@@ -113,15 +100,6 @@ public class TrdDepositValuationTrade001Controller extends BaseController {
      * @Description:页面查询，表格分页
      * @return:
      */
-//    @ResponseBody
-//    @RequestMapping("findPage")
-//    public Page<TrdDepositValuationTrade001Dto> findPage()
-//            throws Exception {
-//        Page<TrdDepositValuationTrade001Dto> page = trdDepositValuationTrade001Service.findPage(
-//                RequestUtil.getParameters(getRequest()));
-//        return page;
-//    }
-
 
     @RequestMapping("findPage")
     @ResponseBody
@@ -133,19 +111,6 @@ public class TrdDepositValuationTrade001Controller extends BaseController {
     }
 
 
-        
-        /**
-         * 删除按钮点击时的check
-         * @param dto 验证的实体类
-         * @param result 验证的结果
-         * @return 错误信息
-         */
-        @ResponseBody
-        @RequestMapping("check")
-        public AjaxResult check(@RequestBody @Validated({
-            ValidateGroupDelete.class}) TrdDepositValuationTrade001Dto dto, BindingResult result) {
-            return commonCheck(result, dto.getOperateType());
-        }
 
     /**
      * 导出数据
@@ -174,6 +139,46 @@ public class TrdDepositValuationTrade001Controller extends BaseController {
                 outFile, true);
     }
 
+    /**
+     * 删除前判断
+     *
+     * @param dto
+     * @param result
+     * @return
+     * @throws Exception
+     */
+    @ResponseBody
+    @RequestMapping("check")
+    public AjaxResult check(@RequestBody @Valid TrdDepositValuationTrade001Dto dto,
+                            BindingResult result) throws ParseException {
+
+        List<TrdDepositValuationTrade001Dto> list = dto.getSelectedItem();
+        if(list==null||list.size()<=0){
+            return new AjaxResult("请选择数据", MessageType.错误消息);
+        }
+        //删除时的校验
+        if(StringUtil.isNotEmpty(list) && "delete".equals(dto.getOperateType())) {
+            for (TrdDepositValuationTrade001Dto item : list) {
+                //1.判断是否在流程中
+                //判断当前流程是否存在
+                if (trdDepositValuationTrade001Service.checkBusinessDataInFlow(item)) {
+                    //流程存在情况
+                    return new AjaxResult("交易编号：" + item.getTradeId() + "已存在流程中", MessageType.错误消息);
+                }
+
+            }
+        }else if("edit".equals(dto.getOperateType())){
+            for (TrdDepositValuationTrade001Dto item : list) {
+                //1.判断是否在流程中
+                //判断当前流程是否存在
+                if(trdDepositValuationTrade001Service.checkBusinessDataInFlow(item)){
+                    //流程存在情况
+                    return new AjaxResult("交易编号："+item.getTradeId()+"已存在流程中", MessageType.错误消息);
+                }
+            }
+        }
+        return new AjaxResult();
+    }
 
 
     //删除
@@ -191,9 +196,9 @@ public class TrdDepositValuationTrade001Controller extends BaseController {
         // 业务代码（凭证流水号）
         params.setBusinessCode(item -> item.getTradeId());
         // 业务类型
-        params.setBusinessType(DictCodeList.业务类型_银行间债券交易.getValue());
+        params.setBusinessType(DictCodeList.共通业务类型_存款类资产交易.getValue());
         // 页面id
-        params.setPageId("BondTradeQuery001");
+        params.setPageId("TrdDepositValuationTrade002");
         // 元素id
         params.setElementId(dto.getElementId());
 
@@ -218,6 +223,36 @@ public class TrdDepositValuationTrade001Controller extends BaseController {
         return new AjaxResult(msg);
     }
 
+
+    /**
+     * 产品代码下拉框
+     *
+     * @return 产品代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getFinprodId")
+    public List<SelectOptionDto> getFinprodId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("finprodType","F16");
+        return commonBusinessService.getProdName(param);
+    }
+
+    /**
+     * 资产代码下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getAssetId")
+    public List<SelectOptionDto> getAssetId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("assetType","F07");  //存款类资产
+        return commonBusinessService.getAssetId(param);
+    }
 
 }
 

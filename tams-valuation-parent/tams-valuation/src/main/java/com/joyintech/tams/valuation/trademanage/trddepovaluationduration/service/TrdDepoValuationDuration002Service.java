@@ -5,21 +5,49 @@
 package com.joyintech.tams.valuation.trademanage.trddepovaluationduration.service;
 
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 
+import com.joyintech.tams.valuation.common.interf.base.dto.AssetDealInfoValCommonResult;
+import com.joyintech.tams.valuation.common.interf.base.dto.TemplateOrderInfoReaderResult;
+import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.depositasset.DepositeAssetPeriodFundTemplateRecService;
+import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValBotPeriodFund;
+import com.joyintech.tams.valuation.component.common.dto.FinCashPlanDto;
 import com.joyintech.tams.valuation.trademanage.trddepovaluationduration.dto.TrdDepoValuationDuration001Dto;
+import com.joyintech.tams.valuation.trademanage.trddepovaluationduration.dto.TrdDepoValuationDurationResult;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 
 @Service
 public class TrdDepoValuationDuration002Service extends BaseService<TrdDepoValuationDuration001Dto> implements BaseProcessService<TrdDepoValuationDuration001Dto> {
-    @Override
-    public void doComplete(TrdDepoValuationDuration001Dto trdDepoValuationDuration001Dto, OperationType operationType) {
 
+    @Autowired
+    private DepositeAssetPeriodFundTemplateRecService depositeAssetPeriodFundTemplateRecService;
+
+    /**
+     * 合成初始化实体类
+     *
+     * @param tradeId 交易编号
+     * @return 存款类资产实体类
+     * @see
+     * @since 1.0
+     */
+    public TrdDepoValuationDuration001Dto getInitEntity(String tradeId) {
+        TrdDepoValuationDuration001Dto entity = new TrdDepoValuationDuration001Dto();
+        TrdProductDeal trdProductDeal = null;
+        TrdProductDealAdd trdProductDealAdd = null;
+        String finprodId = null;
+        FinProduct finProduct = null;
+        return entity;
     }
-
     /**
      * 根据交易编号查询详情
      */
@@ -29,5 +57,119 @@ public class TrdDepoValuationDuration002Service extends BaseService<TrdDepoValua
                 tradeId, TrdDepoValuationDuration001Dto.class);
     }
 
+    /**
+     * 策略代码生成
+     *
+     * @see
+     * @since 1.0
+     */
+    public String createPlanTradeId() {
+        return restTemplate.postForObject(
+                ServiceApplication.VALUATION_SERVICE_NAME + "/TrdDepoValuationDuration001/createPlanTradeId",
+                null, String.class);
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void doComplete(TrdDepoValuationDuration001Dto entity, OperationType operationType) {
+        String action = StringUtil.EMPTY;
+        TrdDepoValuationDurationResult trdDepoValuationDurationResult = new TrdDepoValuationDurationResult();
+        trdDepoValuationDurationResult = generateEntity(entity);
+        if (OperationType.NEW.equals(operationType)) {
+            action = "insert";
+        }
+        else {
+            action = "update";
+        }
+
+        restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdDepoValuationDuration001/" + action, trdDepoValuationDurationResult, Integer.class);
+    }
+
+    //封装实体类
+    public TrdDepoValuationDurationResult generateEntity(TrdDepoValuationDuration001Dto dto){
+        //设置接口参数
+        Map<String,Object> params = new HashMap<>();
+        List<String> prodIds = new ArrayList<>();
+        prodIds.add(dto.getPortfolioId());
+        params.put("INTERF_BOOKSETID",prodIds);
+        params.put("VAL_MODEL","INTERF_MODEL_SINGLE");
+
+        //将页面输入值赋值给接口实体类
+        ArrayList<ValBotPeriodFund> listValBotPeriodFund = new ArrayList<>();
+        ValBotPeriodFund entity = new ValBotPeriodFund();
+        BeanUtil.copyPropertiesIgnoreNull(entity,dto);
+//        entity.setFundSettleDate(DateUtil.parse(dto.getFundSettleDate()));
+        //比较界面和接口字段差异，并手动给接口字段赋值
+        entity.setProdId(dto.getPortfolioId()); //资产代码
+        entity.setAssetId(dto.getFinprodMarketId());  //资产代码
+        entity.setDataActionSign("01");//数据动作标志
+        entity.setDealType(dto.getPs()); //交易类型
+        //查询债券的付息计划
+        Map<String,Object> hashMap = new HashMap<>();
+        hashMap.put("finprodId",entity.getAssetId());
+        List<FinCashPlanDto> list = getFinCashPlanByProductId(hashMap);
+        if(!StringUtil.isEmptyList(list)){
+            entity.setVdate(list.get(0).getVdate());//计息开始日 根据标的信息查询
+        }else{
+            entity.setVdate(DateUtil.parse(DateUtil.getSysDate()));//计息开始日 根据标的信息查询
+        }
+        entity.setEndDate(dto.getEndDate());//计息结束日
+        entity.setPayDate(dto.getPayDate()); //实际支付日
+        entity.setActInt(dto.getActInt()); //实收利息
+        entity.setActCapi(dto.getActCapi());//实收本金
+        entity.setDealAmt(dto.getSettleAmt()); //交易金额  =结算
+        entity.setIsClean2("Y");//是否结清
+        entity.setCcy(dto.getCcy());//币种
+        entity.setTradeId(dto.getTradeId());  //交易编号
+        entity.setIsClean("Y");//有无清算指令
+        entity.setMyAcctNo(dto.getTrdAcctId());  //资金账户
+        listValBotPeriodFund.add(entity);
+        TemplateOrderInfoReaderResult acctEntity = new TemplateOrderInfoReaderResult();
+        Date date = new Date();
+        acctEntity.setResovleDate(date);
+        acctEntity.setFourLevelSubjectKg("Y");
+        Map<String, Object> map = depositeAssetPeriodFundTemplateRecService.handleValBotPeriodFund(listValBotPeriodFund,acctEntity,params,null);
+        // 定义返回变量
+        AssetDealInfoValCommonResult result = new AssetDealInfoValCommonResult();
+        // 金融产品交易List
+        List<TrdProductDeal> listValFinProductDeal = (List<TrdProductDeal>)map.get("ValFinProductDeal");
+        result.setListValFinProductDeal(listValFinProductDeal);
+        // 估值核算交易扩展表List
+        List<TrdProductDealAdd> listValFinProductDealExt = (List<TrdProductDealAdd>)map.get("ValFinProductDealExt");
+        result.setListValFinProductDealExt(listValFinProductDealExt);
+        // 入账信息表List
+        List<BokDealAccounting> listValDealAccounting = (List<BokDealAccounting>)map.get("ValDealAccounting");
+        result.setListValDealAccounting(listValDealAccounting);
+        // 账务明细表List
+        List<BokDealAccountingDetail> listValDealAccountingDetail = (List<BokDealAccountingDetail>)map.get("ValDealAccountingDetail");
+        result.setListValDealAccountingDetail(listValDealAccountingDetail);
+        //账务明细代码表
+        List<BokDetailId> listValBokDetailId = (List<BokDetailId>)map.get("ValBokDetailId");
+        result.setListValBokDetailId(listValBokDetailId);
+
+        //结算指令
+        List<StlOrders> listValOrders = (List<StlOrders>)map.get("listValOrders");
+        List<StlOrdersExt> listValOrdersExt = (List<StlOrdersExt>)map.get("listValOrdersExt");
+        result.setListValOrders(listValOrders);
+        result.setListValOrdersExt(listValOrdersExt);
+        TrdDepoValuationDurationResult rst = new TrdDepoValuationDurationResult(result);
+        rst.setTrdDepoValuationDuration001Dto(dto);
+        return rst;
+    }
+
+
+
+    /**
+     * 查询债券付息计划
+     *
+     * @return 产品代码列表
+     * @see
+     * @since 1.0
+     */
+    public List<FinCashPlanDto> getFinCashPlanByProductId(Map<String,Object> param){
+        return restTemplate.postForList(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdDepoValuationDuration001/getFinCashPlanByProductId",param,FinCashPlanDto.class);
+    }
 }

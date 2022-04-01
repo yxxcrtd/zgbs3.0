@@ -10,34 +10,23 @@
 
 package com.joyintech.tams.valuation.common.interf.base.service.assetdeal.pacd;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.joyintech.calculation.util.ArithmeticUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.common.base.entity.TrdTradeFeeDetail;
+import com.joyintech.tams.valuation.common.interf.base.constant.FinalString;
+import com.joyintech.tams.valuation.common.interf.base.constant.InterfCommonConstant;
+import com.joyintech.tams.valuation.common.interf.base.dto.*;
+import com.joyintech.tams.valuation.common.interf.base.service.common.InterfCommonService;
+import com.joyintech.tams.valuation.common.interf.base.service.common.TemplateAnalysisForXMLService;
+import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValMngMnfAffirmPurTrade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.valuation.common.interf.base.constant.FinalString;
-import com.joyintech.tams.valuation.common.interf.base.constant.InterfCommonConstant;
-import com.joyintech.tams.valuation.common.interf.base.dto.ChannelFeeInfoDeal;
-import com.joyintech.tams.valuation.common.interf.base.dto.InterfProductDealBookCommonDto;
-import com.joyintech.tams.valuation.common.interf.base.dto.PlanAssetCurrencyDealCommonResult;
-import com.joyintech.tams.valuation.common.interf.base.dto.TemplateCheckReturnResult;
-import com.joyintech.tams.valuation.common.interf.base.dto.TemplateOrderInfoReaderResult;
-import com.joyintech.tams.valuation.common.interf.base.dto.TemplateSourceFlgDTO;
-import com.joyintech.tams.valuation.common.interf.base.service.common.InterfCommonService;
-import com.joyintech.tams.valuation.common.interf.base.service.common.TemplateAnalysisForXMLService;
-import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValMngMnfAffirmPurTrade;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * 计划类资产货币型申购确认交易
@@ -138,7 +127,7 @@ public class CPlannedAffirmPurDealTemplateRecService {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> handleValMngMnfAffirmPurTrade(List<ValMngMnfAffirmPurTrade> listValMngMnfAffirmPurTrade,Date resovleDate,
+    public Map<String, Object> handleValMngMnfAffirmPurTrade(List<ValMngMnfAffirmPurTrade> listValMngMnfAffirmPurTrade,Date resovleDate,
     		Map<String,Object> params, List<ValInterflog> valInterflog) {
         Map<String, Object> resultMap = new HashMap<>();
         // 金融产品交易
@@ -371,8 +360,10 @@ public class CPlannedAffirmPurDealTemplateRecService {
         result.setIsClean(DictCodeList.是否_是.getValue());
         // 交易场所 = A.交易场所
         result.setTradeMarket(dto.getTradeMarket());
+        /*modify by sunshuaishuai 交易管理 20220325 start*/
         // 关联系统交易编号= A.成交编号
-        result.setfTradeId(dto.getTradeId());
+        result.setfTradeId(dto.getOutTradeId());
+        /*modify by sunshuaishuai 交易管理 20220325 end*/
         // 原交易编号 =交易状态为撤销时：
         // 原交易编号=调用共通设计->【详细设计-接口共通方法设计.xlsx】->撤销交易对应的原交易编号查询SHEET
         // 交易状态为非撤销时：
@@ -386,6 +377,13 @@ public class CPlannedAffirmPurDealTemplateRecService {
         }
       //通道代码 = a.通道代码
         result.setChlId(dto.getChannelId());
+
+        /*add by sunshuaishuai 交易管理 20220325 start*/
+        //单位净值
+        result.setUnitCprice(dto.getUnitCprice());
+        //资金账户
+        result.setMyAcctNo(dto.getMyAcctNo());
+        /*add by sunshuaishuai 20220325 end*/
         return result;
     }
 

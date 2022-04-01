@@ -521,4 +521,17 @@ public class TrdRepoValuationTrade001Dto extends WflTrdProductDeal implements Pr
     }
 
 
+    /**
+     * 回购类型（H01：质押式协议回购；H02：质押式竞价回购）
+     */
+    private String repoType;
+
+    public String getRepoType() {
+        return repoType;
+    }
+
+    public void setRepoType(String repoType) {
+        this.repoType = repoType;
+    }
+
 }

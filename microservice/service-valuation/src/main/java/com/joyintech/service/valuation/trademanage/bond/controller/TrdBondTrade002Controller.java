@@ -14,9 +14,8 @@ package com.joyintech.service.valuation.trademanage.bond.controller;
 import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTradeResult;
-import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTrade002Dto;
+import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTradeDto;
 import com.joyintech.service.valuation.trademanage.bond.service.TrdBondTrade002Service;
 import com.joyintech.tams.common.base.entity.FinProduct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +60,7 @@ public class TrdBondTrade002Controller {
      *             异常
      */
     @PostMapping("queryTradeInfoByTradeId")
-    public TrdBondTrade002Dto queryTradeInfoByTradeId(@RequestBody String tradeId) {
+    public TrdBondTradeDto queryTradeInfoByTradeId(@RequestBody String tradeId) {
         return trdBondTrade002Service.queryTradeInfoByTradeId(tradeId);
     }
 

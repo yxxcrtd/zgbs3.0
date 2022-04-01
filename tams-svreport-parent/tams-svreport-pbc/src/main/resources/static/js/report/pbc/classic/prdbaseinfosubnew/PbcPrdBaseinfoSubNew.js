@@ -73,8 +73,8 @@ $(function () {
             {title: "货币市场基金或现金管理类产品", field: 'isMarketFundStr', width: 150, sortField: 'isMarketFund'},
 
             /***未提供字段.暂时使用资产池代码替代.*/
-            {title: "其他产品标识1", field: '', width: 150, sortable:false},
-            {title: "其他产品标识2", field: '', width: 150, sortable:false},
+            {title: "跨境理财通", field: 'crossBorderFlag', width: 150, sortField: 'crossBorderFlag'},
+            {title: "以财产权信托名义开展的资金信托标识", field: 'zjxtFlag', width: 150, sortField: 'zjxtFlag'},
             {title: "其他产品标识3", field: '', width: 150, sortable:false},
 
 
@@ -83,8 +83,7 @@ $(function () {
             {title: "兑付收益币种", field: 'cashProfCcy', width: 150, sortField: 'cashProfCcy'},
             {title: "增信机构类型", field: 'creditType', width: 150, sortField: 'creditType'},
             {title: "增信形式", field: 'creditMode', width: 150, sortField: 'creditMode'},
-            {title: "跨境理财通", field: 'crossBorderFlag', width: 150, sortField: 'crossBorderFlag'},
-            {title: "以财产权信托名义开展的资金信托标识", field: 'zjxtFlag', width: 150, sortField: 'zjxtFlag'},
+
             //
             // {title: "客户类型", field: 'customerType', width: 150, sortField: 'customerType'},
             // {title: "合作模式", field: 'contMode', width: 150, sortField: 'contMode'},

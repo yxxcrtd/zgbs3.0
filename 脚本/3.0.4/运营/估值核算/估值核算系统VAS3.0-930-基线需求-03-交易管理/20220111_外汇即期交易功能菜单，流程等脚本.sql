@@ -1,13 +1,12 @@
 /*在交易管理下添加【外汇即期交易】菜单*/
-delete from sys_menu where PAGE_ID='TrdFxSpotValuationTrade001';
+DELETE FROM SYS_MENU WHERE MENU_ID='DEAL_001_001_026';
 insert into sys_menu (MENU_ID, SYSTEM_CODE, ICON, PARENT_MENU_ID, PAGE_ID, ORDER_NO, IS_SPREAD, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-values ('DEAL_001_001_024', 'VAL', null, 'DEAL_001_001', 'TrdFxSpotValuationTrade001', 24, '2', '外汇即期交易', 'system', null,sysdate, 'system', sysdate);
+values ('DEAL_001_001_026', 'VAL', null, 'DEAL_001_001', 'TrdFxSpotValuationTrade001', 26, '2', '外汇即期交易', 'system', null,sysdate, 'system', sysdate);
 
 /*外汇即期交易-查询及新建页面*/
 delete from sys_page where page_id='TrdFxSpotValuationTrade001';
 insert into sys_page (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-values ('TrdFxSpotValuationTrade001', 'TRD', '/valuation/trademanage/trdfxspotvaluationtrade/TrdFxSpotValuationTrade001', 'valuation/trademanage/trdfxspotvaluationtrade/TrdFxSpotValuationTrade001', null, null, null, '02', '01', '外汇即期交易', 'system', null, sysdate, 'system', sysdate);
-
+values ('TrdFxSpotValuationTrade001', 'TRD', '/valuation/trademanage/trdfxspotvaluationtrade/TrdFxSpotValuationTrade001', 'valuation/trademanage/trdfxspotvaluationtrade/TrdFxSpotValuationTrade001', 'DEAL_001_001_026', null, null, '02', '01', '外汇即期交易', 'system', null, sysdate, 'system', sysdate);
 delete from sys_page where page_id='TrdFxSpotValuationTrade002';
 insert into sys_page (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('TrdFxSpotValuationTrade002', 'TRD', '/valuation/trademanage/trdfxspotvaluationtrade/TrdFxSpotValuationTrade002', 'valuation/trademanage/trdfxspotvaluationtrade/TrdFxSpotValuationTrade002', null, null, null, '02', '01', '外汇即期交易新建', 'system', null, sysdate, 'system', sysdate);

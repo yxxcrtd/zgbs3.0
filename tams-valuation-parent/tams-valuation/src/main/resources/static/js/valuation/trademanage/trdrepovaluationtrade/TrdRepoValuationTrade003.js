@@ -26,9 +26,9 @@ $(function() {
         Joyin.ajaxJson(basePath + 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade003/check', object, function(result) {
             Joyin.confirm(result.data, function() {
                 if (operateType === 'save') {
-                    WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade003/save', object, "TrdLendValuationTrade003_btn_save");
+                    WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade003/save', object, "TrdRepoValuationTrade003_btn_save");
                 } else {
-                    WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade003/save', object, "TrdLendValuationTrade003_btn_submit");
+                    WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade003/save', object, "TrdRepoValuationTrade003_btn_submit");
                 }
             });
         })
@@ -39,7 +39,7 @@ $(function() {
         var mdate=$("#mdate").val();
         if(mdate){
             if(mdate>platDate){ //平台日小于到期日
-                $('#ps').textSelect("setValue",'C20');
+                $('#ps').textSelect("setValue",'T54');
             }else if(mdate==platDate){
                 $('#ps').textSelect("setValue",'T07');
             }else {
@@ -147,14 +147,13 @@ $(function() {
     $('#portfolioId').change(function(){
         var portfolioId = $('#portfolioId').val();
         if(portfolioId){
-            var dataPort = $('#portfolioId').select2('data')[0].object;
-            var finprodId = dataPort.finprodId;
-            $('#portfolioName').val(finprodId).trigger('change');
+            $('#portfolioName').val($('#portfolioId').select2('data')[0].id).trigger('change');
 
         }else {
             $('#portfolioName').val('').trigger('change');
         }
     });
+
 
     //校验   交割日必须大于等于交易日
     var checkDate=function () {

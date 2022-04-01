@@ -10,29 +10,21 @@
 
 package com.joyintech.service.valuation.trademanage.trdfixincomevaluationtrade.controller;
 
-import java.util.List;
-import java.util.Map;
-
 import com.joyintech.framework.annotation.DTXTransaction;
+import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.grid.Page;
 import com.joyintech.service.valuation.trademanage.trdfixincomevaluationtrade.dto.TrdFixIncomeTradeResult;
 import com.joyintech.service.valuation.trademanage.trdfixincomevaluationtrade.dto.TrdFixIncomeValuationTradeDto;
 import com.joyintech.service.valuation.trademanage.trdfixincomevaluationtrade.service.TrdFixIncomeValuationTradeService;
-import com.joyintech.service.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanTradeResult;
-import com.joyintech.service.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanValuationTradeDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.joyintech.framework.base.BaseController;
-import com.joyintech.framework.grid.Page;
-import com.joyintech.framework.select.SelectOptionDto;
+import java.util.List;
+import java.util.Map;
 
 /**
- * service 计划类利率型交易
+ * service 固收型交易
  * 
  * @author yuzj
  * @version 1.0 2021年12月29日
@@ -45,30 +37,6 @@ public class TrdFixIncomeValuationTradeController extends BaseController {
 
     @Autowired
     private TrdFixIncomeValuationTradeService trdFixIncomeValuationTradeService;
-
-    /**
-     * 产品代码下拉框
-     *
-     * @return 返回的数据
-     * @exception Exception
-     *                异常
-     * @since 1.0
-     */
-    @PostMapping("findPortfolioId/{page}/{length}")
-    public Page<SelectOptionDto> findPortfolioId(@RequestBody Map<String,Object> map,
-                                           @PathVariable("page") int page, @PathVariable("length") int length) {
-        return trdFixIncomeValuationTradeService.findPortfolioId(page,length,map);
-    }
-
-    /**
-     * 资产代码下拉框
-     * @since 1.0
-     */
-    @PostMapping("findFinprodId/{page}/{length}")
-    public Page<SelectOptionDto> findFinprodId(@RequestBody Map<String,Object> map,
-                                                 @PathVariable("page") int page, @PathVariable("length") int length) {
-        return trdFixIncomeValuationTradeService.findFinprodId(page,length,map);
-    }
 
     /**
      * 查询 支持分页 <功能详细描述>
@@ -107,16 +75,18 @@ public class TrdFixIncomeValuationTradeController extends BaseController {
     }
 
     /**
-     * 回调函数 操作具体 new
+     * 插入
      *
-     * @see
-     * @since 1.0
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
      */
     @Transactional
     @DTXTransaction
-    @PostMapping("insert")
-    public void insert(@RequestBody TrdFixIncomeTradeResult dto) {
-        trdFixIncomeValuationTradeService.insert(dto);
+    @RequestMapping("insert")
+    public int insert(@RequestBody TrdFixIncomeTradeResult dto)
+            throws Exception {
+        return trdFixIncomeValuationTradeService.insert(dto);
     }
 
     /**

@@ -1,25 +1,20 @@
 --信用拆借交易菜单
-
-delete from SYS_MENU where PAGE_ID='TrdLendValuationTrade001'
-and MENU_ID='DEAL_001_001_019';
-
-INSERT INTO SYS_MENU (MENU_ID, SYSTEM_CODE, ICON, PARENT_MENU_ID, PAGE_ID, ORDER_NO, IS_SPREAD, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES ('DEAL_001_001_019', 'VAL', NULL, 'DEAL_001_001', 'TrdLendValuationTrade001', '19', '2', '信用拆借交易', 'system', NULL, TO_TIMESTAMP('2021-12-24 23:29:50.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'), 'system', TO_TIMESTAMP('2021-12-24 23:29:50.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'));
-
+delete from SYS_MENU where MENU_ID='DEAL_001_001_021';
+INSERT INTO SYS_MENU (MENU_ID, SYSTEM_CODE, ICON, PARENT_MENU_ID, PAGE_ID, ORDER_NO, IS_SPREAD, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+VALUES ('DEAL_001_001_021', 'VAL', NULL, 'DEAL_001_001', 'TrdLendValuationTrade001', 21, '2', '信用拆借交易', 'system', NULL, TO_TIMESTAMP('2021-12-24 23:29:50.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'), 'system', TO_TIMESTAMP('2021-12-24 23:29:50.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'));
 
 --信用拆借交易查询页面
 delete from SYS_PAGE where PAGE_ID='TrdLendValuationTrade001';
-
-INSERT INTO SYS_PAGE (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES ('TrdLendValuationTrade001', 'VAL', '/valuation/trademanage/trdlendvaluationtrade/TrdLendValuationTrade001', 'valuation/trademanage/trdlendvaluationtrade/TrdLendValuationTrade001', 'DEAL_001_001_019', NULL, NULL, '02', '02', '信用拆借交易查询', 'system', NULL, TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'), 'system', TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'));
-
+INSERT INTO SYS_PAGE (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+VALUES ('TrdLendValuationTrade001', 'VAL', '/valuation/trademanage/trdlendvaluationtrade/TrdLendValuationTrade001', 'valuation/trademanage/trdlendvaluationtrade/TrdLendValuationTrade001', 'DEAL_001_001_021', NULL, NULL, '02', '02', '信用拆借交易查询', 'system', NULL, TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'), 'system', TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'));
 --信用拆借交易新建页面
 delete from SYS_PAGE where PAGE_ID='TrdLendValuationTrade002';
-
-INSERT INTO SYS_PAGE (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES ('TrdLendValuationTrade002', 'VAL', '/valuation/trademanage/trdlendvaluationtrade/TrdLendValuationTrade002', 'valuation/trademanage/trdlendvaluationtrade/TrdLendValuationTrade002', NULL, NULL, NULL, '02', '02', '信用拆借交易新建', 'system', NULL, TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'), 'system', TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'));
-
+INSERT INTO SYS_PAGE (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+VALUES ('TrdLendValuationTrade002', 'VAL', '/valuation/trademanage/trdlendvaluationtrade/TrdLendValuationTrade002', 'valuation/trademanage/trdlendvaluationtrade/TrdLendValuationTrade002', NULL, NULL, NULL, '02', '02', '信用拆借交易新建', 'system', NULL, TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'), 'system', TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'SYYYY-MM-DD HH24:MI:SS:FF6'));
 --信用拆借交易到期确认页面
 delete from SYS_PAGE where PAGE_ID='TrdLendValuationTrade003';
-
-INSERT INTO SYS_PAGE (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES ('TrdLendValuationTrade003', 'VAL', '/valuation/trademanage/trdlendvaluationtrade/TrdLendValuationTrade003', 'valuation/trademanage/trdlendvaluationtrade/TrdLendValuationTrade003', null, null, null, '02', '01', '信用拆借交易到期确认', 'system', null, TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF6'), 'system', TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF6'));
+INSERT INTO SYS_PAGE (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+VALUES ('TrdLendValuationTrade003', 'VAL', '/valuation/trademanage/trdlendvaluationtrade/TrdLendValuationTrade003', 'valuation/trademanage/trdlendvaluationtrade/TrdLendValuationTrade003', null, null, null, '02', '01', '信用拆借交易到期确认', 'system', null, TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF6'), 'system', TO_TIMESTAMP('2019-05-24 00:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF6'));
 
 -- 添加新的拆借类型数据字典
 DELETE FROM SYS_DATADICT WHERE DICT_CODE='BACK_LEND_DIRECTIONS';

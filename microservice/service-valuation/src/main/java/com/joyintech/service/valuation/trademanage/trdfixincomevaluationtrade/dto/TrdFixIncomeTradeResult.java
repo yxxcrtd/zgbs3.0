@@ -81,6 +81,9 @@ public class TrdFixIncomeTradeResult extends BaseEntity {
      */
     private int dataNum;
 
+    public TrdFixIncomeTradeResult(){
+
+    }
 
     /**
      * 重载构造方法 从valuation-common中返回的result重新赋值

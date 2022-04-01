@@ -26,38 +26,38 @@
             }
         },
         dblclick:function(table, data) {
-            Joyin.dialog(JoyinUtil.getLabel("债券交易查看："),
-                JoyinUtil.getRealPath("/valuation/trademanage/investtradequery/bandtrade/BondTradeQuery001/init"),
-                "90%", "90%", {pageModel:PAGE_MODEL_REFERENCE,tradeId:data.tradeId,prodId:data.finprodId,ps:data.ps},
-                function(){
-                    //table.reload();
-                });
+            Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+                basePath + "valuation/trademanage/bond/TrdBondTrade002/init",
+                "95%", "90%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
+                    tradeId:data.tradeId,ps:data.ps});
         },
         cols:[
             {field:'tradeId', title: '交易编号',width:220},
             {field:'outTradeId', title: '外部成交编号',width:220},
-            {field:'finprodId', title: '产品代码',width:180},
-            {field:'finprodName', title: '产品名称',width:180},
+            {field:'prodId', title: '产品代码',width:180},
+            {field:'prodName', title: '产品名称',width:180},
             {field:'secId', title: '债券代码',width:180},
             {field:'secAbbr', title: '债券简称',width:180},
             {field:'tradeMarketStr', title: '交易场所',sortField:"tradeMarket",width:180},
             {field:'tradeMarket', title: '交易场所',visible:false},
             {field:'psStr', title: '交易类型',sortField:"ps",width:150},
             {field:'ps', title: '交易类型',visible:false},
-            {field:'tradeDate', title: '交易日',width:120},
-            {field:'settleDate', title: '交割日',width:120},
-            {field:'fundSettleDate', title: '资金交收日',width:120},
+            {field:'tradeDateStr', width:120,  title: '交易日期',sortField:'tradeDate'},
+            {field:'tradeDate',title: '交易日期',visible:false},
+            {field:'settdateDateStr', width:120,  title: '交割日期',sortField:'settdateDate'},
+            {field:'settdateDate', title: '交割日期',visible:false},
+            {field:'fundSettleDateStr', width:120,  title: '资金交收日期',sortField:'fundSettleDate'},
+            {field:'fundSettleDate', title: '资金交收日期',visible:false},
             {field:'invAimStr', title: '会计分类',sortField:"invAim",width:240},
             {field:'invAim', title: '会计分类',visible:false},
-            {field:'chlFinprodId', title: '交易通道代码',width:180},
-            {field:'tradeNum', type:"money",title: '成交数量',width:180},
-            {field:'fpriceAmt',type:"money", title: '全价总额',width:180},
+            {field:'dealNum',title: '成交数量',width:180},
+            //{field:'fpriceAmt',type:"money", title: '全价总额',width:180},
+            {field:'tradeAmt', type:"money",title: '净价成交金额',width:180},
             {field:'intAmt', type:"money",title: '应收利息总额',width:180},
             {field:'ccyFmt', title: '币种',sortField:"ccy",width:180},
             {field:'ccy', title: '币种',visible:false},
             {field:'settleAmt',type:"money", title: '结算金额',width:180},
-            {field:'bTradeAmt', type:"money",title: '本币交易金额',width:180},
-            {field:'acctNo', title: '资金账户',width:180},
+            {field:'myAcctNo', title: '资金账户',width:180},
             {field:'operation', title:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操 作', type:'action', fixed: 'right',width:120,
                 buttons:['edit', 'delt']},
         ],
@@ -92,7 +92,7 @@
                     basePath + 'valuation/trademanage/bond/TrdBondTrade001/delete',
                     object,
                     "TrdBondTrade001_btn_delete",
-                    "BondTradeQuery001",
+                    "TrdBondTrade002",
                     function() {
                         table.reload();
                     }
@@ -159,7 +159,7 @@
                         basePath + 'valuation/trademanage/bond/TrdBondTrade001/delete',
                         object,
                         "TrdBondTrade001_btn_delete",
-                        "BondTradeQuery001",
+                        "TrdBondTrade002",
                         function() {
                             table.reload();
                         }

@@ -18,6 +18,7 @@ import com.joyintech.service.valuation.trademanage.trddepositvaluationtrade.dto.
 import com.joyintech.service.valuation.trademanage.trdlendvaluationtrade.dto.TrdLendValuationTradeDto;
 import com.joyintech.service.valuation.trademanage.trdlendvaluationtrade.service.TrdLendValuationTradeService;
 import com.joyintech.service.valuation.trademanage.trdrepovaluationtrade.dto.TrdRepoValuationTrade001Dto;
+import com.joyintech.service.valuation.trademanage.trdrepovaluationtrade.dto.TrdRepoValuationTradeResult;
 import com.joyintech.service.valuation.trademanage.trdrepovaluationtrade.service.TrdRepoValuationTrade001Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -130,6 +131,37 @@ public class TrdRepoValuationTrade001Controller extends BaseController {
     @PostMapping("delete")
     public int delete(@RequestBody TrdRepoValuationTrade001Dto dto){
         return trdRepoValuationTrade001Service.delete(dto);
+    }
+
+
+    /**
+     * 插入
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("insert")
+    public int insert(@RequestBody TrdRepoValuationTradeResult dto)
+            throws Exception {
+        return trdRepoValuationTrade001Service.insert(dto);
+    }
+
+    /**
+     * 修改
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("update")
+    public int update(@RequestBody TrdRepoValuationTradeResult dto)
+            throws Exception {
+        return trdRepoValuationTrade001Service.update(dto);
     }
 
 }

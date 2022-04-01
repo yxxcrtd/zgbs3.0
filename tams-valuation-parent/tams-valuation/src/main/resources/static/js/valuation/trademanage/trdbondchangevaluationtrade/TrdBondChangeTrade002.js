@@ -68,14 +68,8 @@
         if (prodId == '' || prodId == undefined) {
             $('#prodName').val('');
         } else {
-            $('#prodName').val($('#prodId').select2('data')[0].object).trigger('change');
+            $('#prodName').val($('#prodId').select2('data')[0].id).trigger('change');
         }
-        // Joyin.ajaxJson(basePath + 'valuation/trademanage/trdbondchangevaluationtrade/TrdBondChangeTrade002/selectInfoByProdId',
-        //     {prodId: prodId}, function (data) {
-        //         if (data) {
-        //             $('#secManageAcctId').val(data.secManageAcctId).trigger("change");
-        //         }
-        //     })
     }
 
     /**
@@ -132,7 +126,7 @@
             && (cAssetId == '' || cAssetId == undefined)
             &&(cAssetIdFund == '' || cAssetIdFund == undefined)){
 
-            $('#cAssetAbbr').val($('#cAssetIdFund').select2('data')[0].object).trigger('change');
+            $('#cAssetAbbr').val($('#cAssetIdSec').select2('data')[0].object).trigger('change');
         } else if(cAssetIdFund != '' || cAssetIdFund != undefined
             && (cAssetIdSec == '' || cAssetIdSec == undefined)
             &&(cAssetId == '' || cAssetId == undefined)){
@@ -177,7 +171,6 @@
                 $('#cAssetIdDiv2').hide();
                 $('#cAssetIdDiv3').hide();
             }
-
         }
 
     });
@@ -243,10 +236,10 @@
         });
 
         // 绑定按钮事件
-        $('#TrdBondTrade002_btn_save').click(function() {
+        $('#TrdBondChangeTrade002_btn_save').click(function() {
             saveOrSubmit('save');
         });
-        $('#TrdBondTrade002_btn_submit').click(function() {
+        $('#TrdBondChangeTrade002_btn_submit').click(function() {
             saveOrSubmit('submit');
         });
 

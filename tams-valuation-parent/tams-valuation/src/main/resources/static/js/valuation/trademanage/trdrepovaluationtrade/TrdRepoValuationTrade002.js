@@ -26,9 +26,9 @@ $(function() {
         Joyin.ajaxJson(basePath + 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade002/check', object, function(result) {
             Joyin.confirm(result.data, function() {
                 if (operateType === 'save') {
-                    WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade002/save', object, "TrdLendValuationTrade002_btn_save");
+                    WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade002/save', object, "TrdRepoValuationTrade002_btn_save");
                 } else {
-                    WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade002/save', object, "TrdLendValuationTrade002_btn_submit");
+                    WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade002/save', object, "TrdRepoValuationTrade002_btn_submit");
                 }
             });
         })
@@ -154,14 +154,30 @@ $(function() {
     $('#portfolioId').change(function(){
         var portfolioId = $('#portfolioId').val();
         if(portfolioId){
-            var dataPort = $('#portfolioId').select2('data')[0].object;
-            var finprodId = dataPort.finprodId;
-            $('#portfolioName').val(finprodId).trigger('change');
+            $('#portfolioName').val($('#portfolioId').select2('data')[0].id).trigger('change');
 
         }else {
             $('#portfolioName').val('').trigger('change');
         }
     });
+
+
+    // /**
+    //  * 产品代码联动带出产品名称，证券账户
+    //  */
+    // var prodIdChange = function() {
+    //     var portfolioId = $('#portfolioId').val();
+    //     if (portfolioId == '' || portfolioId == undefined) {
+    //         $('#portfolioName').val('');
+    //     } else {
+    //         $('#portfolioName').val($('#portfolioId').select2('data')[0].object).trigger('change');
+    //     }
+    // }
+    //
+    // //产品代码联动事件
+    // $('#portfolioId').change(function(){
+    //     prodIdChange();
+    // });
 
     //校验   交割日必须大于等于交易日
     var checkDate=function () {

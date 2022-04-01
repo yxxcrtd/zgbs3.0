@@ -548,4 +548,16 @@ public class TrdRepoValuationTrade001Dto extends BaseEntity implements ProcessEn
         return this.getSettleAmt()==null?"0.00":decimalFormat.format(this.getSettleAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
     }
 
+    /**
+     * 回购类型（H01：质押式协议回购；H02：质押式竞价回购）
+     */
+    private String repoType;
+
+    public String getRepoType() {
+        return repoType;
+    }
+
+    public void setRepoType(String repoType) {
+        this.repoType = repoType;
+    }
 }

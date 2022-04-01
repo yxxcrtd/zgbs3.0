@@ -127,7 +127,7 @@ public class FundShareConvertDealRecService {
      * @since 1.0
      */
     @SuppressWarnings({"unchecked"})
-    private Map<String, Object> handleValFundTrade(List<ValFundShareConvert> listValFundTrade,Date resovleDate,Map<String,Object> params,
+    public Map<String, Object> handleValFundTrade(List<ValFundShareConvert> listValFundTrade,Date resovleDate,Map<String,Object> params,
     		List<ValInterflog> valInterflog) {
         List<String> bookSetIds = (List<String>)params.get(InterfCommonConstant.接口_运行接口账套ID);
     	String valModel = (String)params.get(InterfCommonConstant.接口模式);
@@ -327,6 +327,10 @@ public class FundShareConvertDealRecService {
         }
         //通道代码 = a.通道代码
         result.setChlId(dto.getChannelId());
+        /*add by sunshuaishuai 交易管理 20220323 start*/
+        //资金账户
+        result.setMyAcctNo(dto.getMyAcctNo());
+        /*add by sunshuaishuai 20220323 end*/
         return result;
     }
 

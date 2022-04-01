@@ -151,7 +151,7 @@ public class DepositeAssetAstDealTemplateRecService {
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-	private Map<String, Object> handleValBotAstTrade(List<ValBotAstTrade> listValBotAstTrade,TemplateOrderInfoReaderResult acctEntity,Map<String,Object> params,
+	public Map<String, Object> handleValBotAstTrade(List<ValBotAstTrade> listValBotAstTrade,TemplateOrderInfoReaderResult acctEntity,Map<String,Object> params,
 			List<ValInterflog> valInterflog) {
         List<String> bookSetIds = (List<String>)params.get(InterfCommonConstant.接口_运行接口账套ID);
     	String valModel = (String)params.get(InterfCommonConstant.接口模式);
@@ -495,6 +495,10 @@ public class DepositeAssetAstDealTemplateRecService {
         valFinProductDeal.setIsClean(InterfCommonConstant.是否结清_默认);
         // 交易对手 = A.交易对手
         valFinProductDeal.setCounterId(dto.getCounterId());
+        //接口添加 资金账户=A.资金账户  yangchen 20220324
+        valFinProductDeal.setMyAcctNo(dto.getMyAcctNo());
+
+
 //        // 交易对手类型 = 根据交易对手到客户信息表中查询获取
 //        MstCustomerInfo valCustomerInfo = valCustomerInfoMapper.selectByPrimaryKey(
 //            dto.getCounterId());
@@ -504,8 +508,13 @@ public class DepositeAssetAstDealTemplateRecService {
 //        else {
 //            valFinProductDeal.setCounterType(null);
 //        }
-        // 关联系统交易编号 = A.成交编号
-        valFinProductDeal.setfTradeId(dto.getTradeId());
+//        // 关联系统交易编号 = A.成交编号
+////        valFinProductDeal.setfTradeId(dto.getTradeId());
+
+        //接口修改 外部交易编号=A.外部交易编号  yangchen 20220324 start
+        valFinProductDeal.setfTradeId(dto.getfTradeId());
+        //接口修改 外部交易编号=A.外部交易编号  yangchen 20220324 end
+
         // 创建时间 = 系统时间
         valFinProductDeal.setCreateTime(dto.getCreateTime());
         //20181012 leipeng 原交易编号 = 交易状态为撤销时： 原交易编号=调用共通设计->【详细设计-接口共通方法设计.xlsx】->撤销交易对应的原交易编号查询SHEET 交易状态为非撤销时：原交易编号为空

@@ -1,17 +1,17 @@
---债券交易菜单
-DELETE FROM SYS_MENU WHERE MENU_ID='DEAL_001_001_021';
+--证券转换交易菜单
+DELETE FROM SYS_MENU WHERE MENU_ID='DEAL_001_001_020';
 INSERT INTO SYS_MENU
 (MENU_ID, SYSTEM_CODE, ICON, PARENT_MENU_ID, PAGE_ID, ORDER_NO, IS_SPREAD, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES('DEAL_001_001_021', 'VAL', NULL, 'DEAL_001_001', 'TrdBondChangeTrade001', 21, '2', '证券转换交易', 'system', NULL, sysdate, 'system', sysdate);
+VALUES('DEAL_001_001_020', 'VAL', NULL, 'DEAL_001_001', 'TrdBondChangeTrade001', 20, '2', '证券转换交易', 'system', NULL, sysdate, 'system', sysdate);
 
 --证券啊转换交易页面表
 DELETE FROM SYS_PAGE WHERE PAGE_ID in('TrdBondChangeTrade001','TrdBondChangeTrade002') ;
 INSERT INTO SYS_PAGE
 (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES('TrdBondChangeTrade001', 'VAL', '/valuation/trademanage/trdbondchangevaluationtrade/TrdBondChangeTrade001', 'valuation/trademanage/trdbondchangevaluationtrade/TrdBondChangeTrade001', 'DEAL_001_001_021', NULL, NULL, '02', '01', '证券转换交易查询', 'system', NULL, sysdate, 'system', sysdate);
+VALUES('TrdBondChangeTrade001', 'VAL', '/valuation/trademanage/trdbondchangevaluationtrade/TrdBondChangeTrade001', 'valuation/trademanage/trdbondchangevaluationtrade/TrdBondChangeTrade001', 'DEAL_001_001_020', NULL, NULL, '02', '01', '证券转换交易查询', 'system', NULL, sysdate, 'system', sysdate);
 INSERT INTO SYS_PAGE
 (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES('TrdBondChangeTrade002', 'VAL', '/valuation/trademanage/trdbondchangevaluationtrade/TrdBondChangeTrade002', 'valuation/trademanage/trdbondchangevaluationtrade/TrdBondChangeTrade002', 'DEAL_001_001_021', NULL, NULL, '02', '01', '证券转换交易新建', 'system', NULL, sysdate, 'system', sysdate);
+VALUES('TrdBondChangeTrade002', 'VAL', '/valuation/trademanage/trdbondchangevaluationtrade/TrdBondChangeTrade002', 'valuation/trademanage/trdbondchangevaluationtrade/TrdBondChangeTrade002', NULL, NULL, NULL, '02', '01', '证券转换交易新建', 'system', NULL, sysdate, 'system', sysdate);
 
 --业务类型
 DELETE FROM SYS_DATADICT_LIST WHERE DICT_CODE ='BUSI_TYPE' AND ITEM_CODE ='40';

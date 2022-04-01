@@ -11,6 +11,7 @@
 package com.joyintech.tams.valuation.trademanage.trdrepovaluationtrade.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
@@ -24,9 +25,7 @@ import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 
-import com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.dto.TrdDepositValuationTrade001Dto;
-import com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.service.TrdDepositValuationTrade001Service;
-import com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.service.TrdDepositValuationTrade002Service;
+import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.trdrepovaluationtrade.dto.TrdRepoValuationTrade001Dto;
 import com.joyintech.tams.valuation.trademanage.trdrepovaluationtrade.service.TrdRepoValuationTrade001Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -64,9 +63,12 @@ public class TrdRepoValuationTrade001Controller extends BaseController {
     @Autowired
     private TrdRepoValuationTrade001Service trdRepoValuationTrade001Service;
 
+    @Autowired
+    private CommonBusinessService commonBusinessService;
+
     @Override
     public String init(Model model) {
-        this.setSelectOptionToModel(model, DictCode.拆借方向, DictCode.拆借类型,DictCode.交易方向,DictCode.交易场所,
+        this.setSelectOptionToModel(model, DictCode.拆借方向, DictCode.拆借类型,DictCode.交易方向,DictCode.交易场所,DictCode.回购类型,
                 DictCode.交易流程状态);
         return super.init(model);
     }
@@ -82,19 +84,35 @@ public class TrdRepoValuationTrade001Controller extends BaseController {
     }
 
 
+//    /**
+//     * 自定义产品代码下拉框
+//     * @param request
+//     * @return
+//     */
+//    @RequestMapping("/findPortfolioId")
+//    @ResponseBody
+//    public Page<SelectOptionDto> findPortfolioId(HttpServletRequest request) {
+//        Map<String, Object> param =RequestUtil.getPageParam();
+//        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
+//        param.put("finprodType", "F16"); //测试
+//        return trdRepoValuationTrade001Service.findPortfolioId(param);
+//    }
+
     /**
-     * 自定义产品代码下拉框
-     * @param request
-     * @return
+     * 产品代码下拉框
+     *
+     * @return 产品代码
+     * @see
+     * @since 1.0
      */
-    @RequestMapping("/findPortfolioId")
     @ResponseBody
-    public Page<SelectOptionDto> findPortfolioId(HttpServletRequest request) {
-        Map<String, Object> param =RequestUtil.getPageParam();
-        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-//        param.put("finprodType", "F01"); //测试
-        return trdRepoValuationTrade001Service.findPortfolioId(param);
+    @RequestMapping("/getFinprodId")
+    public List<SelectOptionDto> getFinprodId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("finprodType","F16");
+        return commonBusinessService.getProdName(param);
     }
+
 
     /**
      * 导出数据
@@ -124,6 +142,48 @@ public class TrdRepoValuationTrade001Controller extends BaseController {
     }
 
 
+    /**
+     * 删除前判断
+     *
+     * @param dto
+     * @param result
+     * @return
+     * @throws Exception
+     */
+    @ResponseBody
+    @RequestMapping("check")
+    public AjaxResult check(@RequestBody @Valid TrdRepoValuationTrade001Dto dto,
+                            BindingResult result) throws ParseException {
+
+        List<TrdRepoValuationTrade001Dto> list = dto.getSelectedItem();
+        if(list==null||list.size()<=0){
+            return new AjaxResult("请选择数据", MessageType.错误消息);
+        }
+        //删除时的校验
+        if(StringUtil.isNotEmpty(list) && "delete".equals(dto.getOperateType())) {
+            for (TrdRepoValuationTrade001Dto item : list) {
+                //1.判断是否在流程中
+                //判断当前流程是否存在
+                if (trdRepoValuationTrade001Service.checkBusinessDataInFlow(item)) {
+                    //流程存在情况
+                    return new AjaxResult("交易编号：" + item.getTradeId() + "已存在流程中", MessageType.错误消息);
+                }
+
+            }
+        }else if("edit".equals(dto.getOperateType())){
+            for (TrdRepoValuationTrade001Dto item : list) {
+                //1.判断是否在流程中
+                //判断当前流程是否存在
+                if(trdRepoValuationTrade001Service.checkBusinessDataInFlow(item)){
+                    //流程存在情况
+                    return new AjaxResult("交易编号："+item.getTradeId()+"已存在流程中", MessageType.错误消息);
+                }
+            }
+        }
+        return new AjaxResult();
+    }
+
+
     //删除
     @ResponseBody
     @RequestMapping(ACTION_DELETE)
@@ -139,9 +199,9 @@ public class TrdRepoValuationTrade001Controller extends BaseController {
         // 业务代码（凭证流水号）
         params.setBusinessCode(item -> item.getTradeId());
         // 业务类型
-        params.setBusinessType(DictCodeList.业务类型_银行间债券交易.getValue());
+        params.setBusinessType(DictCodeList.共通业务类型_质押式回购交易.getValue());
         // 页面id
-        params.setPageId("BondTradeQuery001");
+        params.setPageId("TrdRepoValuationTrade002");
         // 元素id
         params.setElementId(dto.getElementId());
 

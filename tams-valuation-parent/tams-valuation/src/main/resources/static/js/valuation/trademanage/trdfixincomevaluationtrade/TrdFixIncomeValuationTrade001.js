@@ -3,39 +3,14 @@ $(function(){
      * 获取查询参数
      */
     var getPageParams = function() {
-        // add by 2021-04-06  wbq  3.5投资交易查询优化 begin
-        var createUser=$("#createUser").val()
-        if(createUser){
-            createUser=createUser.join(",");
-        }
-        //产品代码 多选择
-        var portfolioIdTemp = $('#portfolioId').val();
-        var portfolioId = null;
-        if(portfolioIdTemp != null){
-            portfolioId = portfolioIdTemp.join(",");
-        }
-
-        //资产代码  多选择
-        var finprodIdTemp = $('#finprodId').val();
-        var finprodId = null;
-        if(finprodIdTemp != null){
-            finprodId = finprodIdTemp.join(",");
-        }
-
-        //交易类型  多选择
-        var psTemp = $('#ps').val();
-        var ps = null;
-        if(psTemp && psTemp != null && psTemp != ''){
-            ps = psTemp.join(",");
-        }
         return {
-            tradeId:$('#tradeId').val(),
-            portfolioId:portfolioId,
-            finprodType:$('#finprodType').val(),
-            finprodId:finprodId,
-            ps:ps,
-            createUser:createUser
-        };
+            tradeId: $('#tradeId').val(),
+            finprodId: $.trim($('#finprodId').val()),
+            asset: $.trim($('#asset').val()),
+            tradeDateBegin: $("#tradeDate").startDate(),
+            tradeDateEnd: $("#tradeDate").endDate(),
+            ps: $('#ps').val()
+        }
     };
     
     /**
@@ -52,29 +27,28 @@ $(function(){
         dblclick:function(table, data) {
             Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
                     basePath + "valuation/trademanage/trdfixincomevaluationtrade/TrdFixIncomeValuationTrade002/init",
-                    "98%", "98%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
-                    portfolioId:data.portfolioId,
-                    finprodId:data.finprodId,
+                    "95%", "90%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
                     tradeId:data.tradeId});
         },
         cols:[
             {field:'tradeId', width:180, title: '交易编号'}
             ,{field:'outTradeId', width:150, title: '外部成交编号'}
-            ,{field:'portfolioId', width:150, title: '产品代码'}
-            ,{field:'portfolioName', width:150, title: '产品名称'}
-            ,{field:'finprodId', width:150, title: '资产代码'}
-            ,{field:'finprodName', width:150, title: '资产名称'}
+            ,{field:'prodId', width:150, title: '产品代码'}
+            ,{field:'prodName', width:220, title: '产品名称'}
+            ,{field:'assetId', width:150, title: '资产代码'}
+            ,{field:'assetName', width:220, title: '资产名称'}
             ,{field:'psStr', width:150, title: '交易类型',sortField:'ps'}
-            ,{field:'tradeDate', type:'date' ,width:150, title: '交易日', visible: false}
-            ,{field:'tradeDateStr',width:150, title: '交易日'}
-            ,{field:'settleDate', width:150, title: '交割日', visible: false}
-            ,{field:'settleDateStr',width:150, title: '交割日'}
-            ,{field:'invAimStr', width:150, title: '会计分类'}
-            ,{field:'tradeAmt', width:150, title: '本金金额',type:'number'}
-            ,{field:'fpriceAmt', width:150, title: '全价金额',type:'number'}
+            ,{field:'tradeDateStr',width:150, title: '交易日期',sortField:'tradeDate'}
+            ,{field:'tradeDate', title: '交易日期', visible: false}
+            ,{field:'effDateStr',width:150, title: '交割日期',sortField:'effDate'}
+            ,{field:'effDate', title: '交割日期', visible: false}
+            ,{field:'invAimStr', width:240, title: '会计分类'}
+            ,{field:'capital', width:150, title: '本金金额',type:'number'}
+            ,{field:'cpriceAmt', width:150, title: '净价金额',type:'number'}
             ,{field:'intAmt', width:150, title: '应收利息总额',type:'number'}
-            ,{field:'ccy', width:150, title: '币种',sortField:'ccy'}
-            ,{field:'trdAcctId', width:150, title: '资金账户'}
+            ,{field:'ccyFmt', title: '币种',sortField:"ccy",width:180}
+            ,{field:'ccy',  title: '币种' ,visible: false}
+            ,{field:'myAcctNo', width:200, title: '资金账户'}
             ,{field:'operation', title: 'SysCommon.operation', type:'action', buttons: ['edit', 'delt']}
         ]
     });
@@ -146,6 +120,33 @@ $(function(){
         //查询
         $('#TrdFixIncomeValuationTrade001_btn_search').click(function(){
             table.load();
+        });
+
+        // 绑定删除事件
+        $('#TrdFixIncomeValuationTrade001_btn_delete').click(function() {
+            if(table!=null && table!=''){
+                var selArr = table.getAllCheckedRows();
+            }
+            if (!selArr || selArr.length == 0) {
+                Joyin.error(JoyinUtil.getMessage("COMMON_E_0002"));
+                return;
+            }
+
+            // 启动删除流程
+            var object = {selectedItem: selArr, operateType:"delete"};
+            Joyin.ajaxJson(basePath + 'valuation/trademanage/trdfixincomevaluationtrade/TrdFixIncomeValuationTrade001/check', object, function(result) {
+                Joyin.confirm(JoyinUtil.getMessage("COMMON_C_0001",JoyinUtil.getLabel("SysCommon.delete")), function(){
+                    WorkFlow.doDeleteList(
+                        basePath + 'valuation/trademanage/trdfixincomevaluationtrade/TrdFixIncomeValuationTrade001/delete',
+                        object,
+                        "TrdFixIncomeValuationTrade001_btn_delete",
+                        "TrdFixIncomeValuationTrade002",
+                        function() {
+                            table.reload();
+                        }
+                    );
+                });
+            });
         });
 
     });

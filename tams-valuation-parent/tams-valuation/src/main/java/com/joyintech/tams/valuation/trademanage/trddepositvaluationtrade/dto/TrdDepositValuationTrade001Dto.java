@@ -38,7 +38,7 @@ import java.util.List;
  * @see TrdDepositValuationTrade001Dto
  * @since 1.0
  */
-@PageId("TrdDepositInvestTrade002")
+@PageId("TrdDepositValuationTrade002")
 @ValidLogic(targetClass = TrdDepositValuationTrade001Validator.class, groups = {ValidateGroupEdit.class,
     ValidateGroupDelete.class})
 public class TrdDepositValuationTrade001Dto extends BaseEntity implements ProcessEntity {
@@ -130,7 +130,7 @@ public class TrdDepositValuationTrade001Dto extends BaseEntity implements Proces
 
 
     /**
-     * 应计利息
+     * 应记利息总额
      */
     private BigDecimal intAmt;
 
@@ -183,7 +183,7 @@ public class TrdDepositValuationTrade001Dto extends BaseEntity implements Proces
     }
 
     @PrimaryKey(PrimaryKey.Field.PK_1)
-    @NotEmpty(fieldName = "TrdDepositValuation001.tradeId", groups = {ValidateGroupEdit.class})
+//    @NotEmpty(fieldName = "TrdDepositValuation001.tradeId", groups = {ValidateGroupEdit.class})
     public String getTradeId() {
         return tradeId;
     }
@@ -213,7 +213,7 @@ public class TrdDepositValuationTrade001Dto extends BaseEntity implements Proces
         this.intAmt = intAmt;
     }
 
-    @NotEmpty(fieldName = "TrdDepositValuation001.dealAmt", groups = {ValidateGroupEdit.class})
+//    @NotEmpty(fieldName = "TrdDepositValuation001.dealAmt", groups = {ValidateGroupEdit.class})
     public BigDecimal getDealAmt() {
         return dealAmt;
     }
@@ -243,7 +243,7 @@ public class TrdDepositValuationTrade001Dto extends BaseEntity implements Proces
 
     //资金账户
     private String trdAcctId;
-//    @NotEmpty(fieldName = "TrdDepositValuation001.trdAcctId", groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName = "TrdDepositValuation001.trdAcctId", groups = {ValidateGroupEdit.class})
     public String getTrdAcctId() {
         return trdAcctId;
     }

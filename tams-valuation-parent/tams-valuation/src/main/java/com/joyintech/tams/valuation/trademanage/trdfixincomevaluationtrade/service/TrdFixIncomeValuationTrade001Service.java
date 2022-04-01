@@ -44,12 +44,12 @@ public class TrdFixIncomeValuationTrade001Service extends CommonExportService<Tr
                 pageParam, TrdFixIncomeValuationTradeDto.class);
     }
 
-    /**
-     * 工作流（留痕处理进行的操作）
-     */
     @Override
-    public void doComplete(TrdFixIncomeValuationTradeDto entity, OperationType type) {
-        restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdFixIncomeValuationTrade/doComplete/" + type, entity, Integer.class);
+    public void doComplete(TrdFixIncomeValuationTradeDto trdFixIncomeValuationTradeDto, OperationType operationType) {
+        // 删除操作
+        if(OperationType.DELETE.equals(operationType)) {
+            restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdFixIncomeValuationTrade/delete", trdFixIncomeValuationTradeDto, Integer.class);
+        }
     }
 
 

@@ -372,4 +372,30 @@ public class ValBotAstTrade extends BaseEntity {
     public void setChannelId(String channelId) {
         this.channelId = channelId == null ? null : channelId.trim();
     }
+
+    /**
+     *资金账户
+     */
+    private String myAcctNo;
+
+    public String getMyAcctNo() {
+        return myAcctNo;
+    }
+
+    public void setMyAcctNo(String myAcctNo) {
+        this.myAcctNo = myAcctNo;
+    }
+
+    /**
+     * 关联系统交易编号  外部交易编号
+     */
+    private String fTradeId;
+
+    public String getfTradeId() {
+        return fTradeId;
+    }
+
+    public void setfTradeId(String fTradeId) {
+        this.fTradeId = fTradeId;
+    }
 }

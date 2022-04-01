@@ -6,7 +6,7 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dao.TrdBondChangeTradeMapper;
-import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTrade001Dto;
+import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeDto;
 import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -39,7 +39,7 @@ public class TrdBondChangeTrade001Service extends BaseService {
      * @see
      * @since 1.0
      */
-    public Page<TrdBondChangeTrade001Dto> selectForPage(int page, int length,
+    public Page<TrdBondChangeTradeDto> selectForPage(int page, int length,
                                                      Map<String, Object> pageParam)
             throws Exception {
         //产品代码
@@ -83,7 +83,7 @@ public class TrdBondChangeTrade001Service extends BaseService {
      * @see
      * @since 1.0
      */
-    public List<TrdBondChangeTrade001Dto> queryPageList(Map<String, Object> params){
+    public List<TrdBondChangeTradeDto> queryPageList(Map<String, Object> params){
         //产品代码
         String finprodId = (String)params.get("finprodId");
         String[] finprodIdArr = null;
@@ -146,10 +146,10 @@ public class TrdBondChangeTrade001Service extends BaseService {
         return this.queryForPageForSelectReturn(page, length,() -> trdBondChangeTradeMapper.getStockId(map));
     }
 
-    public int delete(TrdBondChangeTrade001Dto dto) {
+    public int delete(TrdBondChangeTradeDto dto) {
         int count=0;
         Map<String, Object> params = new HashMap<>();
-        params.put("booksetId",dto.getFinprodId());
+        params.put("booksetId",dto.getProdId());
         params.put("tradeId",dto.getTradeId());
 
         List<TrdProductDeal> listDeal = new ArrayList<>();

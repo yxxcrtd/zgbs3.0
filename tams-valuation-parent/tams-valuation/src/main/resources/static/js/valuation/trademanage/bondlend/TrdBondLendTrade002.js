@@ -68,7 +68,7 @@
         if (prodId == '' || prodId == undefined) {
             $('#prodName').val('');
         } else {
-            $('#prodName').val($('#prodId').select2('data')[0].object).trigger('change');
+            $('#prodName').val($('#prodId').select2('data')[0].id).trigger('change');
         }
     }
 
@@ -80,25 +80,46 @@
         if (secId == '' || secId == undefined) {
             $('#secAbbr').val('');
         } else {
-            $('#secAbbr').val($('#secId').select2('data')[0].object).trigger('change');
+            $('#secAbbr').val($('#secId').select2('data')[0].id).trigger('change');
         }
     }
 
-    //结算金额  结算金额=借贷费用+交易手续费+结算服务费+其他费用
-    var settleAmtChange = function(){
-        var fee = $('#fee').val();
-        var dealFeeAmt = $('#dealFeeAmt').val();
-        var stlFeeAmt = $('#stlFeeAmt').val();
-        var otherAmt = $('#otherAmt').val();
-        if(fee != null && fee != ''
-            && dealFeeAmt != null && dealFeeAmt != ''
-            && stlFeeAmt != null && stlFeeAmt != ''
-            && otherAmt != null && otherAmt != ''){
-            var settleAmt1 = JoyinMath.doAdd(JoyinMath.doAdd(fee, dealFeeAmt,2),stlFeeAmt,2);
-            var settleAmt2 = JoyinMath.doAdd(settleAmt1, otherAmt,2);
-            $('#settleAmt').val(settleAmt2);
+    //借贷费用=券面总额（万元）×10000×借贷费率%×（到期日-起息日）/365
+    var feeChange = function () {
+        var vdate = $('#vdate').val();
+        var mdate = $('#mdate').val();
+        var prinAmt = $('#prinAmt').val();
+        var feeRate = $('#feeRate').val();
+        if(vdate != null && vdate != ''
+            && mdate != null && mdate != ''
+            && prinAmt != null && prinAmt != ''
+            && feeRate != null && feeRate != ''){
+            var days = (Date.ofDate(mdate) - Date.ofDate(vdate))/ (1000 * 60 * 60 * 24);
+            var fee = JoyinMath.doMul(prinAmt,10000,2,JoyinMath.ROUND_HALF_UP);
+            var fee1 = JoyinMath.doDiv(feeRate,100,2,JoyinMath.ROUND_HALF_UP);
+            var fee2 = JoyinMath.doMul(fee,fee1,2,JoyinMath.ROUND_HALF_UP);
+            var fee3 = JoyinMath.doDiv(JoyinMath.doMul(fee2,days,2,JoyinMath.ROUND_HALF_UP),365,2,JoyinMath.ROUND_HALF_UP);
+            $('#fee').val(fee3).trigger('change');
         }else{
-            $('#settleAmt').val('');
+            $('#fee').val('').trigger('change');
+        }
+    }
+
+    var calMdate = function(){
+        var bondLendTerm = $('#term').val();
+        if(bondLendTerm ){
+            var vdate = $('#vdate').val();//首次结算日
+            if(vdate){
+                var d1 = new Date(vdate).getTime();
+                var day = parseInt(bondLendTerm*24*60*60*1000);
+                var mdate = new Date(d1+day);
+                mdate=mdate.format("yyyy-MM-dd");
+                $("#mdate").val(mdate).trigger("change");
+                }else{
+                    $("#mdate").val('').trigger('change');
+                }
+        }else{
+            $("#mdate").val('').trigger('change');
         }
     }
 
@@ -122,22 +143,28 @@
             secIdChange();
         });
 
-        //结算金额联动事件
-        //借贷费用
-        $('#fee').change(function(){
-            settleAmtChange();
+        $('#term').change(function(){
+            feeChange();
+            calMdate();
         });
-        //交易手续费
-        $('#dealFeeAmt').change(function(){
-            settleAmtChange();
+
+
+        //借贷费用联动事件
+        //起息日
+        $('#vdate').change(function(){
+            feeChange();
         });
-        //结算手续费
-        $('#stlFeeAmt').change(function(){
-            settleAmtChange();
+        //到期日
+        $('#mdate').change(function(){
+            feeChange();
         });
-        //其他费用
-        $('#otherAmt').change(function(){
-            settleAmtChange();
+        //券面总额
+        $('#prinAmt').change(function(){
+            feeChange();
+        });
+        //借贷费率
+        $('#feeRate').change(function(){
+            feeChange();
         });
 
         // 绑定按钮事件
