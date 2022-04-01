@@ -110,7 +110,6 @@ public class TrdOutRightRepoValuationTrade003Service extends BaseService<TrdOutR
     public TrdOutRightRepoValuationTradeResult generateEntity(TrdOutRightRepoValuationTrade003Dto dto3){
 
 
-
         TrdOutRightRepoValuationTrade001Dto dto = trdOutRightRepoValuationTrade002Service.queryTradeInfoByTradeId(dto3.getTradeId());
 
         //设置接口参数
@@ -126,16 +125,13 @@ public class TrdOutRightRepoValuationTrade003Service extends BaseService<TrdOutR
 //        BeanUtil.copyPropertiesIgnoreNull(entity,dto);
         //比较界面和接口字段差异，并手动给接口字段赋值
         entity.setfTradeId(dto.getOutTradeId()); //外部交易编号
+        entity.setpTradeId(dto.getTradeId()); //原交易编号
         entity.setProdId(dto3.getPortfolioId()); //产品代码
-        entity.setDataActionSign("02");//数据动作标志
-        entity.setTradeId(null);
-//        entity.setTradeId(dto3.getTradeId());  //交易编号
+        entity.setDataActionSign("01");//数据动作标志
+        entity.setTradeId(createPlanTradeId());
         entity.setTermKind("R007"); //期限品种
-        //DictCodeList.回购期限品种_R007.getValue()
         entity.setTradeMarket("01"); //交易市场 银行间
-
         entity.setPs(DictCodeList.交易方向_到期.getValue());
-//        entity.setBusiType(DictCodeList.交易方向_到期.getValue()); //交易类型
         entity.setTrader("yc"); //交易员
         entity.setTradeDate(dto.getTradeDate());//交易日
         entity.setSettleDate(dto3.getSettleDate()); //交割日
@@ -148,7 +144,7 @@ public class TrdOutRightRepoValuationTrade003Service extends BaseService<TrdOutR
         entity.setCapiProfFeature("01"); //本金收益特征 01保本
         entity.setCounterId(dto3.getCounterId());//交易对手
         entity.setCounterType("01"); //交易对手类型 01 内部
-        entity.setRegistOrg("02"); //登记托管机构
+        entity.setRegistOrg("01"); //登记托管机构
         entity.setIsTradeFee("N");
         entity.setIsStampDuty("N");
         entity.setIsBrokerage("N");
@@ -160,7 +156,7 @@ public class TrdOutRightRepoValuationTrade003Service extends BaseService<TrdOutR
         entity.setStlFeeAmt(dto.getSettFeeAmt()); //结算手续费
         entity.setIsStlFeeAmt("N");
         entity.setIsChlFeeAmt("N");//通道费是否随交易支付
-        entity.setpTradeId(dto.getFinprodMarketId()); //原交易编号
+
 //        entity.setpTradeId(dto.getTradeId()); //原交易编号
         entity.setIsClean("N");//有无清算指令
         entity.setPaydate(new Date()); //交收日

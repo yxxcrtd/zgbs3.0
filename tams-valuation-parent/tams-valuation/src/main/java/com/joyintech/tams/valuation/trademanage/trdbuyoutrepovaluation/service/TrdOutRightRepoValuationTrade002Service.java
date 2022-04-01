@@ -113,17 +113,22 @@ public class TrdOutRightRepoValuationTrade002Service extends BaseService<TrdOutR
         trdOutRightRepoValuationTrade001Result = generateEntity01(entity);
         TrdOutRightRepoValuationTrade002Result trdOutRightRepoValuationTrade002Result = new TrdOutRightRepoValuationTrade002Result();
         trdOutRightRepoValuationTrade002Result = generateEntity02(entity);
-        TrdOutRightRepoValuationTradeResult trdOutRightRepoValuationTradeResult = new TrdOutRightRepoValuationTradeResult();
-        trdOutRightRepoValuationTradeResult = generateEntity(entity);
         if (OperationType.NEW.equals(operationType)) {
             action = "insert";
+            restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdOutRightRepoValuationTrade001/insert01" , trdOutRightRepoValuationTrade001Result, Integer.class);
+            restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdOutRightRepoValuationTrade001/insert02" , trdOutRightRepoValuationTrade002Result, Integer.class);
+            TrdOutRightRepoValuationTradeResult trdOutRightRepoValuationTradeResult = new TrdOutRightRepoValuationTradeResult();
+            trdOutRightRepoValuationTradeResult = generateEntity(entity);
+            restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdOutRightRepoValuationTrade001/" + action, trdOutRightRepoValuationTradeResult, Integer.class);
         }
         else {
             action = "update";
+            restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdOutRightRepoValuationTrade001/update01" , trdOutRightRepoValuationTrade001Result, Integer.class);
+            restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdOutRightRepoValuationTrade001/update02" , trdOutRightRepoValuationTrade002Result, Integer.class);
+            TrdOutRightRepoValuationTradeResult trdOutRightRepoValuationTradeResult = new TrdOutRightRepoValuationTradeResult();
+            trdOutRightRepoValuationTradeResult = generateEntity(entity);
+            restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdOutRightRepoValuationTrade001/" + action, trdOutRightRepoValuationTradeResult, Integer.class);
         }
-        restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdOutRightRepoValuationTrade001/insert01" , trdOutRightRepoValuationTrade001Result, Integer.class);
-        restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdOutRightRepoValuationTrade001/insert02" , trdOutRightRepoValuationTrade002Result, Integer.class);
-        restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdOutRightRepoValuationTrade001/" + action, trdOutRightRepoValuationTradeResult, Integer.class);
     }
 
     //封装实体类01
@@ -154,7 +159,7 @@ public class TrdOutRightRepoValuationTrade002Service extends BaseService<TrdOutR
         entity.setBasis("A/365");  //计息基础
         entity.setAssetClass(dto.getPs()); //资产类型
         entity.setRateType("01"); //利率类型  固定
-        entity.setRedRate(dto.getRebackPrice()); //回购利率
+        entity.setRedRate(dto.getRebackPrice().divide(new BigDecimal(100))); //回购利率
         entity.setTradeMarket("01"); //交易市场 银行间
         entity.setCapital(dto.getPrinAmt());  //名义本金(券面总额)
         entity.setmIntAmt(dto.getIntAmt());  //到期利息   回购利息
@@ -168,7 +173,7 @@ public class TrdOutRightRepoValuationTrade002Service extends BaseService<TrdOutR
         entity.setTradeMarket("01"); //交易场所  01银行间
         entity.setVpayDate(new Date());//首期交付日
         entity.setMpayDate(new Date());//到期交付日
-        entity.setCounterId("JYDS000000000001");
+        entity.setCounterId(dto.getCounterId());
 
 
 
@@ -203,7 +208,7 @@ public class TrdOutRightRepoValuationTrade002Service extends BaseService<TrdOutR
 
 
 
-    //封装实体类01
+    //封装实体类02
     public TrdOutRightRepoValuationTrade002Result generateEntity02(TrdOutRightRepoValuationTrade001Dto dto){
         Map<String,Object> params = new HashMap<>();
         List<String> prodIds = new ArrayList<>();
@@ -217,7 +222,6 @@ public class TrdOutRightRepoValuationTrade002Service extends BaseService<TrdOutR
         //比较界面和接口字段差异，并手动给接口字段赋值
         entity.setTradeId(dto.getTradeId());  //交易编号
         entity.setDataActionSign("01"); //数据标记动作 新建
-        entity.setTradeId(dto.getTradeId());  //交易编号
         if(dto.getPs().equals("03")){
             entity.setTradeType(DictCodeListExt1.金融产品类型_债券买断式正回购.getValue());
         }else if(dto.getPs().equals("04")){
@@ -263,7 +267,6 @@ public class TrdOutRightRepoValuationTrade002Service extends BaseService<TrdOutR
         //DictCodeList.回购期限品种_R007.getValue()
         entity.setTradeMarket("01"); //交易市场 银行间
         entity.setPs(dto.getPs()); //交易类型
-//        entity.setBusiType(dto.getPs()); //交易类型
         entity.setTrader("yc"); //交易员
         entity.setTradeDate(dto.getTradeDate());//交易日
         entity.setSettleDate(dto.getTradeDate()); //交割日
@@ -274,9 +277,9 @@ public class TrdOutRightRepoValuationTrade002Service extends BaseService<TrdOutR
         entity.setIntAmt(dto.getIntAmt());//利息金额
         entity.setCcy(dto.getCcy());//币种
         entity.setCapiProfFeature("01"); //本金收益特征 01保本
-        entity.setCounterId("JYDS000000000424");//交易对手
+        entity.setCounterId(dto.getCounterId());//交易对手
         entity.setCounterType("01"); //交易对手类型 01 内部
-        entity.setRegistOrg("02"); //登记托管机构
+        entity.setRegistOrg("01"); //登记托管机构 01
         entity.setIsTradeFee("N");
         entity.setIsStampDuty("N");
         entity.setIsBrokerage("N");
@@ -288,7 +291,7 @@ public class TrdOutRightRepoValuationTrade002Service extends BaseService<TrdOutR
         entity.setStlFeeAmt(dto.getSettFeeAmt()); //结算手续费
         entity.setIsStlFeeAmt("N");
         entity.setIsChlFeeAmt("N");//通道费是否随交易支付
-        entity.setpTradeId(dto.getFinprodMarketId()); //原交易编号
+        entity.setpTradeId(dto.getTradeId()); //原交易编号
         entity.setIsClean("N");//有无清算指令
         entity.setPaydate(new Date()); //交收日
         entity.setMyAcctNo(dto.getTrdAcctId()); //付款账户
