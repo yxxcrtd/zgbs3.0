@@ -1170,7 +1170,7 @@ public class TradeHelper {
         order.setUserId(orderPlaceBean.getUserId());
         order.setAssetType(instruction.getAssetType());
         Map<String, Instruction> instructionBeanMap = getInstructionBeans(order);
-        return MapUtils.isNotEmpty(instructionBeanMap);
+        return MapUtils.isNotEmpty(instructionBeanMap) && instructionBeanMap.size() > 1;
     }
 
     /**
