@@ -1515,7 +1515,7 @@
               AND fscr.VDATE &lt;= to_date(#{sysDateStr},'yyyy-mm-dd') AND fscr.MDATE >= to_date(#{sysDateStr},'yyyy-mm-dd')
         LEFT JOIN ( SELECT ENTRUST_ID, wm_concat ( PORTFOLIO_ID ) PORTFOLIO_ID FROM ETR_ENTRUST_DETAIL GROUP BY ENTRUST_ID ) det ON det.ENTRUST_ID = ete.ENTRUST_ID
         left join MST_COUNTER_PARTY mcpdata on ete.COUNTER_ID = mcpdata.COUNTER_ID
-        LEFT JOIN FIN_PRODUCT T7 ON ete.STOCK_ID = T7.FINPROD_MARKET_ID
+        LEFT JOIN FIN_PRODUCT T7 ON ete.STOCK_ID = T7.FINPROD_MARKET_ID and ete.FINPROD_TYPE2 = T7.FINPROD_TYPE2
         WHERE ete.entrust_id = #{entrustId}
         AND ( fscr.VDATE  = ( select max(VDATE) from FIN_STDSEC_CONVERSE_RADIO fscr1
         where fscr1.FINPROD_ID= fscr.FINPROD_ID and fscr1.BRANCH = fscr.BRANCH )  OR fscr.VDATE IS NULL )
@@ -1620,7 +1620,7 @@
               AND fscr.VDATE &lt;= to_date(#{sysDateStr},'yyyy-mm-dd') AND fscr.MDATE >= to_date(#{sysDateStr},'yyyy-mm-dd')
         LEFT JOIN ( SELECT ENTRUST_ID, wm_concat ( PORTFOLIO_ID ) PORTFOLIO_ID FROM WFL_ETR_ENTRUST_DETAIL GROUP BY ENTRUST_ID ) det ON det.ENTRUST_ID = ete.ENTRUST_ID
         left join MST_COUNTER_PARTY mcpdata on ete.COUNTER_ID = mcpdata.COUNTER_ID
-        LEFT JOIN FIN_PRODUCT T7 ON ete.STOCK_ID = T7.FINPROD_MARKET_ID
+        LEFT JOIN FIN_PRODUCT T7 ON ete.STOCK_ID = T7.FINPROD_MARKET_ID and ete.FINPROD_TYPE2 = T7.FINPROD_TYPE2
         WHERE ete.entrust_id = #{entrustId}
     </select>
 
