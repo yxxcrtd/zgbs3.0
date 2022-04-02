@@ -151,13 +151,13 @@ public class SecLendFinDealBookDetailNewService {
 
         // 2.1.调用共通设计->【详细设计-账务类共通方法设计.xlsx】->科目余额查询-期待方向SHEET
         SubjectBalance yfrcflxSubjectBalance = getSubjectBalance(acctEntity, expBalanceDirect,
-            DictCodeBaseSubjectNatrue.其他应付款_利息.getValue(), taskPri);
+            DictCodeBaseSubjectNatrueNew.其他应付款_利息.getValue(), taskPri);
         // 变量.应付融出方利息 = DTO.科目余额
         BigDecimal yfrcflx = yfrcflxSubjectBalance.getBalance();
 
         // 2.1.调用共通设计->【详细设计-账务类共通方法设计.xlsx】->科目余额查询-期待方向SHEET
 //        SubjectBalance yfrcfbjSubjectBalance = getSubjectBalance(acctEntity, expBalanceDirect,
-//            DictCodeBaseSubjectNatrue.其他应付款_本金.getValue(), taskPri);
+//            DictCodeBaseSubjectNatrueNew.其他应付款_本金.getValue(), taskPri);
 //        // 变量.应付融出方本金 = DTO.科目余额
 //        BigDecimal yfrcfbj = yfrcfbjSubjectBalance.getBalance();
 
@@ -272,7 +272,7 @@ public class SecLendFinDealBookDetailNewService {
                     putAccountAmountMap(accountAmountMap,BookConstant.REALAMT,dealDto.getTradeAmt());
 
                     accountNatrueBranchMap.put(BookConstant.BRANCH, dealDto.getBranch());
-                    accountNatrueMap.put(DictCodeBaseSubjectNatrue.其他应付款_利息.getValue(), accountNatrueBranchMap);
+                    accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.其他应付款_利息.getValue(), accountNatrueBranchMap);
 
                 }
                 else{
@@ -283,7 +283,7 @@ public class SecLendFinDealBookDetailNewService {
                     // 其他应收款-利息  <- 交易明细.交易金额
                     putAccountAmountMap(accountAmountMap,BookConstant.OTHER_INT_AMT,dealDto.getTradeAmt());
                     accountNatrueBranchMap.put(BookConstant.BRANCH, dealDto.getBranch());
-                    accountNatrueMap.put(DictCodeBaseSubjectNatrue.其他应收款_利息.getValue(), accountNatrueBranchMap);
+                    accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.应收利息_证券.getValue(), accountNatrueBranchMap);
                     // 实收金额 <-交易明细.交易金额
                     // add by weipeng on 20220225 区分资金账户金额元素 start
 //                    putAccountAmountMap(accountAmountMap,BookConstant.DEALAMT,dealDto.getTradeAmt());
@@ -336,7 +336,7 @@ public class SecLendFinDealBookDetailNewService {
                 yfrcflx = ArithmeticUtil.doSub(yfrcflx,yfrcflx);
 
                 accountNatrueBranchMap.put(BookConstant.BRANCH, dealDto.getBranch());
-                accountNatrueMap.put(DictCodeBaseSubjectNatrue.其他应付款_利息.getValue(), accountNatrueBranchMap);
+                accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.其他应付款_利息.getValue(), accountNatrueBranchMap);
 
             }
             // else if（交易方向 = "卖空债券结息" OR 交易方向 = "收息"）
@@ -362,7 +362,7 @@ public class SecLendFinDealBookDetailNewService {
                 yfrcflx = ArithmeticUtil.doAdd(yfrcflx, returnYglix);
                 // 分支序号 <- 交易明细.分支序号
                 accountNatrueBranchMap.put(BookConstant.BRANCH, dealDto.getBranch());
-                accountNatrueMap.put(DictCodeBaseSubjectNatrue.其他应付款_利息.getValue(), accountNatrueBranchMap);
+                accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.其他应付款_利息.getValue(), accountNatrueBranchMap);
             }
             // else if（交易方向 = "融入债券还本" or 交易方向 = '融入债券派本到账' OR 交易方向 = "还本到账"）
             else if(DictCodeList.交易方向_融入债券还本.getValue().equals(ps) || 
@@ -376,7 +376,7 @@ public class SecLendFinDealBookDetailNewService {
                     book_remark = "债券借贷-融入期间标的债券还本交易登账";
                     // 分支序号 <- 交易明细.分支序号
                     accountNatrueBranchMap.put(BookConstant.BRANCH, dealDto.getBranch());
-                    accountNatrueMap.put(DictCodeBaseSubjectNatrue.其他应付款_本金.getValue(), accountNatrueBranchMap);
+                    accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.其他应付款_本金.getValue(), accountNatrueBranchMap);
                 }
                 else{
                     // ad.会计场景代码="资金收款-买断式逆回购期间债券派息"
@@ -386,7 +386,7 @@ public class SecLendFinDealBookDetailNewService {
                     // 其他应收款-本金 <- 交易明细.交易金额
                     putAccountAmountMap(accountAmountMap,BookConstant.OTHER_COST_AMT,dealDto.getTradeAmt());
                     accountNatrueBranchMap.put(BookConstant.BRANCH, dealDto.getBranch());
-                    accountNatrueMap.put(DictCodeBaseSubjectNatrue.其他应收款_本金.getValue(), accountNatrueBranchMap);
+                    accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(), accountNatrueBranchMap);
                 }
                 // 实收金额 <- 交易明细.交易金额
                 putAccountAmountMap(accountAmountMap,BookConstant.DEALAMT,dealDto.getTradeAmt());
@@ -406,7 +406,7 @@ public class SecLendFinDealBookDetailNewService {
 
 
                 accountNatrueBranchMap.put(BookConstant.BRANCH, dealDto.getBranch());
-                accountNatrueMap.put(DictCodeBaseSubjectNatrue.其他应付款_本金.getValue(), accountNatrueBranchMap);
+                accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.其他应付款_本金.getValue(), accountNatrueBranchMap);
 
             }
             // else if（交易方向 = "卖空债券还本" OR 交易方向 = "还本"）
@@ -422,7 +422,7 @@ public class SecLendFinDealBookDetailNewService {
                 book_remark = "债券借贷-融入债券卖出后还本交易登账";
                 // 分支序号 <- 交易明细.分支序号
                 accountNatrueBranchMap.put(BookConstant.BRANCH, dealDto.getBranch());
-                accountNatrueMap.put(DictCodeBaseSubjectNatrue.其他应付款_本金.getValue(), accountNatrueBranchMap);
+                accountNatrueMap.put(DictCodeBaseSubjectNatrueNew.其他应付款_本金.getValue(), accountNatrueBranchMap);
 
                 // accountAmountMap设置如下：
                 // 调用 金融负债还本到期处理 共通处理，返回值:金额元素dto 
