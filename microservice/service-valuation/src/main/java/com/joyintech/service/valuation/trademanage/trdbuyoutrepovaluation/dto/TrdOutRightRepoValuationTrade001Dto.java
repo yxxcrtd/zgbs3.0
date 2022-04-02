@@ -449,4 +449,17 @@ public class TrdOutRightRepoValuationTrade001Dto extends WflTrdProductDeal imple
         }
         return tradeDateStr;
     }
+
+    /**
+     * 交易对手
+     */
+    private String counterId;
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
 }

@@ -158,14 +158,14 @@
 												   placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
 										</div>
 									</div>
-									<div class="form-inline-wrap">
-										<label class="layui-form-label form-label-wrap">其他费用</label>
-										<div class="layui-input-inline input-inline">
-											<input type="text" th:id="otherAmt" th:name="otherAmt" required th:value="${entity?.otherAmt?:0}" maxlength="28"
-											   data-textrange="2" data-fixtype="2" class="layui-input form-input text-number"
-											   placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
-										</div>
-									</div>
+<!--									<div class="form-inline-wrap">-->
+<!--										<label class="layui-form-label form-label-wrap">其他费用</label>-->
+<!--										<div class="layui-input-inline input-inline">-->
+<!--											<input type="text" th:id="otherAmt" th:name="otherAmt" required th:value="${entity?.otherAmt?:0}" maxlength="28"-->
+<!--											   data-textrange="2" data-fixtype="2" class="layui-input form-input text-number"-->
+<!--											   placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>-->
+<!--										</div>-->
+<!--									</div>-->
 
 									<div class="form-inline-wrap">
 										<label class="layui-form-label form-label-wrap">结算金额</label>
@@ -175,17 +175,15 @@
 												   placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
 										</div>
 									</div>
-									<div class="layui-form-item">
-										<div class="form-inline-wrap" >
-											<label class="layui-form-label form-lable" >资金账户</label>
-											<div class="layui-input-inline input-inline">
-												<select type="text" id="trdAcctId" name="trdAcctId" class="layui-input form-input input-select"  required
-														th:data-url="@{/valuation/trademanage/trddepositvaluationtrade/TrdDepositValuationTrade002/getTrdAcctId}"
-														allowClear="true" placeholder="请输入内容"
-														data-th-placeholder="#{SysCommon.placeholder}"
-														data-th-initValue="${entity?.trdAcctId}">
-												</select>
-											</div>
+									<div class="form-inline-wrap" >
+										<label class="layui-form-label form-lable" >资金账户</label>
+										<div class="layui-input-inline input-inline">
+											<select type="text" id="trdAcctId" name="trdAcctId" class="layui-input form-input input-select"  required
+													th:data-url="@{/valuation/trademanage/trddepositvaluationtrade/TrdDepositValuationTrade002/getTrdAcctId}"
+													allowClear="true" placeholder="请输入内容"
+													data-th-placeholder="#{SysCommon.placeholder}"
+													data-th-initValue="${entity?.trdAcctId}">
+											</select>
 										</div>
 									</div>
 

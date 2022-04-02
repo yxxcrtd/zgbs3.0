@@ -251,7 +251,7 @@ public class TrdFixIncomeValuDuration001Dto extends BaseEntity implements Proces
         this.actInt = actInt;
     }
 
-    @NotEmpty(fieldName = "TrdFixIncomeValuDuration002.finprodMarketId", groups = {ValidateGroupEdit.class})
+//    @NotEmpty(fieldName = "TrdFixIncomeValuDuration002.otherAmt", groups = {ValidateGroupEdit.class})
     public BigDecimal getOtherAmt() {
         return otherAmt;
     }
@@ -260,7 +260,7 @@ public class TrdFixIncomeValuDuration001Dto extends BaseEntity implements Proces
         this.otherAmt = otherAmt;
     }
 
-    @NotEmpty(fieldName = "TrdFixIncomeValuDuration002.finprodMarketId", groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName = "TrdFixIncomeValuDuration002.isClean2", groups = {ValidateGroupEdit.class})
     public String getIsClean2() {
         return isClean2;
     }

@@ -215,6 +215,9 @@
 		            AND bc.BRANCH = #{branch}
 		        </if>
 	        </if>
+			<if test="subjectNo != null and subjectNo != ''">
+				AND bc.SUBJECT_NO = #{subjectNo}
+			</if>
         ) TEMP
         INNER JOIN BOK_BOOKSET_DATE bbd
             ON bbd.BOOKSET_ID = TEMP.booksetId
@@ -247,7 +250,8 @@
 			ROW_NUMBER() OVER(PARTITION BY 
 			          ba.BOOKSET_ID, 
 			          ba.BOK_DETAIL_ID,
-			       ba.BASE_SUBJECT_NATURE,
+					/**ba.BASE_SUBJECT_NATURE,**/
+					ba.SUBJECT_NO,
 			       ba.BRANCH,
 			       ba.O_CCY
 			 ORDER BY 
@@ -275,6 +279,9 @@
 		     <if test="bokDetailId != null and bokDetailId != ''">
 		         AND ba.BOK_DETAIL_ID = #{bokDetailId}
 		     </if>
+			<if test="subjectNo != null and subjectNo != ''">
+				AND ba.SUBJECT_NO = #{subjectNo}
+			</if>
 		 ) TEMP
 		INNER JOIN BOK_BOOKSET_DATE bbd
 		    ON bbd.BOOKSET_ID = TEMP.BOOKSETID

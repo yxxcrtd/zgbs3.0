@@ -37,31 +37,6 @@
     });
 
 
-    // //根据产品名称联动出产品代码
-    // $('#portfolioId').change(function(){
-    //     var portfolioId = $('#portfolioId').val();
-    //     if(portfolioId){
-    //         var dataPort = $('#portfolioId').select2('data')[0].object;
-    //         var finprodId = dataPort.finprodId;
-    //         $('#portfolioName').val(finprodId).trigger('change');
-    //
-    //     }else {
-    //         $('#portfolioName').val('').trigger('change');
-    //     }
-    // });
-    //
-    // //根据资产名称联动出资产代码
-    // $('#finprodMarketId').change(function(){
-    //     var finprodMarketId = $('#finprodMarketId').val();
-    //     if(finprodMarketId){
-    //         var dataPort = $('#finprodMarketId').select2('data')[0].object;
-    //         var finprodId = dataPort.finprodId;
-    //         $('#finprodName').val(finprodId).trigger('change');
-    //
-    //     }else {
-    //         $('#finprodName').val('').trigger('change');
-    //     }
-    // });
 
     /**
      * 保存或提交
@@ -107,14 +82,14 @@
     //计算结算金额  结算金额=交易本金+应计利息+其他费用
     var mdateSettleAmtCalculate = function(){
 
-            if($('#prinAmt').val() && $('#intAmt').val() && $('#otherAmt').val()&& $('#otherAmt').val().replace(/(^s*)|(s*$)/g, "").length !==0
+            if($('#prinAmt').val() && $('#intAmt').val()
                 &&$('#prinAmt').val() !=='' && $('#intAmt').val()!==''&& $('#otherAmt').val()!==''){
                 if($('#ps').val()=="T01"){ //交易方向为买入时 结算金额=交易本金+应计利息+其他费用
-                    var unitValue = JoyinMath.doAdd($('#prinAmt').val(), $('#intAmt').val(),2);
-                    var settleAmt = JoyinMath.doAdd(unitValue, $('#otherAmt').val(),2);
+                    var settleAmt = JoyinMath.doAdd($('#prinAmt').val(), $('#intAmt').val(),2);
+                    // var settleAmt = JoyinMath.doAdd(unitValue, $('#otherAmt').val(),2);
                 }else if($('#ps').val()=="T02"){ //交易方向为卖出时 结算金额=交易本金+应计利息-其他费用
-                    var unitValue = JoyinMath.doAdd($('#prinAmt').val(), $('#intAmt').val(),2);
-                    var settleAmt = JoyinMath.doMinus(unitValue, $('#otherAmt').val(),2);
+                    var settleAmt = JoyinMath.doAdd($('#prinAmt').val(), $('#intAmt').val(),2);
+                    // var settleAmt = JoyinMath.doMinus(unitValue, $('#otherAmt').val(),2);
                 }
                 $('#settleAmt').val(settleAmt);
                 // $('#dealAmt').val(settleAmt);

@@ -102,17 +102,17 @@ $(function() {
         var finprodMarketId = $('#finprodMarketId').val();
         if(finprodMarketId){
             var dataPort = $('#finprodMarketId').select2('data')[0].object;
-            var term = dataPort.term;
-            var rebackPrice = JoyinMath.doMul(dataPort.rebackPrice, 100, 4);
+            // var term = dataPort.term;
+            // var rebackPrice = JoyinMath.doMul(dataPort.rebackPrice, 100, 4);
 
             $('#finprodName').val($('#finprodMarketId').select2('data')[0].id).trigger('change');
-            $('#term').val(term).trigger('change');
-            $('#rebackPrice').val(rebackPrice).trigger('change');
+            // $('#term').val(term).trigger('change');
+            // $('#rebackPrice').val(rebackPrice).trigger('change');
 
         }else {
             $('#finprodName').val('').trigger('change');
-            $('#term').val('').trigger('change');
-            $('#rebackPrice').val('').trigger('change');
+            // $('#term').val('').trigger('change');
+            // $('#rebackPrice').val('').trigger('change');
         }
     });
 
