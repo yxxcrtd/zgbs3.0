@@ -28,6 +28,7 @@ import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalanc
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalanceSearchDto;
 import com.joyintech.tams.valuation.batch.common.accounting.service.AccountingCommonService;
 import com.joyintech.tams.valuation.batch.common.finproduct.service.FinProductCommonService;
+import com.joyintech.tams.valuation.batch.common.log.exception.DetailBatchException;
 import com.joyintech.tams.valuation.common.constants.BookConstant;
 import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrue;
 import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrueNew;
@@ -98,7 +99,7 @@ public class AssetIntdateCarryoverProcessorNewService {
      * @see
      * @since 1.0
      */
-    public AssetIntdateCarryoverResult execute(Map<String, Object> param1) throws Exception {
+    public AssetIntdateCarryoverResult execute(Map<String, Object> param1) {
         // 获取reader返回值
         AssetIntdateCarryoverReaderResult acctEntity = (AssetIntdateCarryoverReaderResult)param1.get(
             GlobalConstant.READER_RESULT);
@@ -130,7 +131,7 @@ public class AssetIntdateCarryoverProcessorNewService {
             }
             catch (Exception e){
                 logger.error("《资产理论结息日结转批处理-标的类》--自动结转处理 报错相关信息： 账套信息【"+detail.getBooksetId()+"】；金融产品代码【"+detail.getFinprodId()+"】",e);
-                throw new Exception(e);
+                throw new DetailBatchException(detail.getFinprodId(),"账套信息【"+detail.getBooksetId()+"】；金融产品代码【"+detail.getFinprodId()+"】",e);
             }
             // add by weipeng on 20220114 增加批处理报错时相关明细日志打印 end
         }
