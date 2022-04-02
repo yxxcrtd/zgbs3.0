@@ -69,11 +69,8 @@
                                         <select type="text" id="ps" name="ps" class="layui-input form-input input-select"
                                                 placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}" required="required"
                                                 allowClear="true" formatoption="true"
+                                                data-th-data-result='${PS}'
                                                 data-th-initValue="${entity?.ps}">
-                                            <option value=""></option>
-                                            <option value="T09">中间收息</option>
-                                            <option value="T08">中间还本</option>
-                                            <option value="T07">到期</option>
                                         </select>
                                     </div>
                                 </div>
