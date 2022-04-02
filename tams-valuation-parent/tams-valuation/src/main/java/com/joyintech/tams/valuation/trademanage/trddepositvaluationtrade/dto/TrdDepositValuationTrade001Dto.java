@@ -118,7 +118,7 @@ public class TrdDepositValuationTrade001Dto extends BaseEntity implements Proces
     //其他费用
     private BigDecimal otherAmt;
 
-    @NotEmpty(fieldName = "TrdDepositValuation001.otherAmt", groups = {ValidateGroupEdit.class})
+//    @NotEmpty(fieldName = "TrdDepositValuation001.otherAmt", groups = {ValidateGroupEdit.class})
     public BigDecimal getOtherAmt() {
         return otherAmt;
     }

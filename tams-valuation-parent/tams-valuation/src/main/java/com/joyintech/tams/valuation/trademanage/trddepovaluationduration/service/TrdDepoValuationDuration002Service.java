@@ -9,6 +9,7 @@ import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 
 import com.joyintech.tams.valuation.common.interf.base.dto.AssetDealInfoValCommonResult;
@@ -106,6 +107,13 @@ public class TrdDepoValuationDuration002Service extends BaseService<TrdDepoValua
         entity.setProdId(dto.getPortfolioId()); //资产代码
         entity.setAssetId(dto.getFinprodMarketId());  //资产代码
         entity.setDataActionSign("01");//数据动作标志
+
+        //交易方向转换
+        if(DictCodeList.交易方向_收息到账.getValue().equals(dto.getPs())){
+            dto.setPs(DictCodeList.交易方向_收息.getValue());
+        }else{
+            dto.setPs(DictCodeList.交易方向_还本.getValue());
+        }
         entity.setDealType(dto.getPs()); //交易类型
         //查询债券的付息计划
         Map<String,Object> hashMap = new HashMap<>();

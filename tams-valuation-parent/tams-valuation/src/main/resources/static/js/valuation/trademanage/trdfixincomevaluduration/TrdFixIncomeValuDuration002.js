@@ -36,15 +36,13 @@ $(function() {
 
     var init = function(){
         if( $('#actCapi').val() != null && $('#actCapi').val() != ''
-            && $('#actInt').val() != null && $('#actInt').val() != ''
-            && $('#otherAmt').val() != null && $('#otherAmt').val() != ''){
+            && $('#actInt').val() != null && $('#actInt').val() != ''){
             var result1 = JoyinMath.doAdd($('#actCapi').val(), $('#actInt').val(),2);
-            var result2 = JoyinMath.doMinus(result1, $('#otherAmt').val(),2);
-            $('#settleAmt').val(result2);
-            $('#dealAmt').val(result2);
+            $('#settleAmt').val(result1);
+            // $('#dealAmt').val(result1);
         }else{
             $('#settleAmt').val('');
-            $('#dealAmt').val('');
+            // $('#dealAmt').val('');
         }
     }
 
@@ -69,15 +67,14 @@ $(function() {
     //计算结算金额  结算金额=实收本金+实收利息+其他费用
     var settleAmtCalculate = function(){
         if( $('#actCapi').val() != null && $('#actCapi').val() != ''
-            && $('#actInt').val() != null && $('#actInt').val() != ''
-            && $('#otherAmt').val() != null && $('#otherAmt').val() != ''){
+            && $('#actInt').val() != null && $('#actInt').val() != ''){
             var result1 = JoyinMath.doAdd($('#actCapi').val(), $('#actInt').val(),2);
-            var result2 = JoyinMath.doMinus(result1, $('#otherAmt').val(),2);
-            $('#settleAmt').val(result2);
-            $('#dealAmt').val(result2);
+            // var result2 = JoyinMath.doMinus(result1, $('#otherAmt').val(),2);
+            $('#settleAmt').val(result1);
+
         }else{
             $('#settleAmt').val('');
-            $('#dealAmt').val('');
+
         }
     }
 
