@@ -176,9 +176,14 @@
         SUBJECT_NAME text
         FROM BOK_SUBJECT
         <where>
+             /*add by sunshuaishuai 20220402 增加账套代码条件筛选 start*/
+            <if test="booksetId !=null and  booksetId !='' ">
+                BOOKSET_ID = #{booksetId}
+            </if>
+            /*add by sunshuaishuai 20220402 增加账套代码条件筛选 end*/
             <if test="subjectLevel !=null and  subjectLevel !='' ">
                 /** modify by yanya on 20191204 科目号随科目级别展示，原来级别向下取，现改为只取当前级别**/
-                to_number(subject_level) = #{subjectLevel}
+              and  to_number(subject_level) = #{subjectLevel}
             </if>
             <if test="search !=null and  search !='' ">
                 AND (SUBJECT_NO like '%' || #{search} || '%'
