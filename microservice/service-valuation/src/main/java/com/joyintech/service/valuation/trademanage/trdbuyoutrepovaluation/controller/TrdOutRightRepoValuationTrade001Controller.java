@@ -171,7 +171,7 @@ public class TrdOutRightRepoValuationTrade001Controller extends BaseController {
     @Transactional
     @DTXTransaction
     @RequestMapping("update01")
-    public int update(@RequestBody TrdOutRightRepoValuationTrade001Result dto)
+    public int update01(@RequestBody TrdOutRightRepoValuationTrade001Result dto)
             throws Exception {
         return trdOutRightRepoValuationTrade001Service.update01(dto);
     }
@@ -186,7 +186,7 @@ public class TrdOutRightRepoValuationTrade001Controller extends BaseController {
     @Transactional
     @DTXTransaction
     @RequestMapping("update02")
-    public int update(@RequestBody TrdOutRightRepoValuationTrade002Result dto)
+    public int update02(@RequestBody TrdOutRightRepoValuationTrade002Result dto)
             throws Exception {
         return trdOutRightRepoValuationTrade001Service.update02(dto);
     }
@@ -200,7 +200,7 @@ public class TrdOutRightRepoValuationTrade001Controller extends BaseController {
     @Transactional
     @DTXTransaction
     @RequestMapping("insert01")
-    public int insert(@RequestBody TrdOutRightRepoValuationTrade001Result dto)
+    public int insert01(@RequestBody TrdOutRightRepoValuationTrade001Result dto)
             throws Exception {
         return trdOutRightRepoValuationTrade001Service.insert01(dto);
     }
@@ -216,7 +216,7 @@ public class TrdOutRightRepoValuationTrade001Controller extends BaseController {
     @Transactional
     @DTXTransaction
     @RequestMapping("insert02")
-    public int insert(@RequestBody TrdOutRightRepoValuationTrade002Result dto)
+    public int insert02(@RequestBody TrdOutRightRepoValuationTrade002Result dto)
             throws Exception {
         return trdOutRightRepoValuationTrade001Service.insert02(dto);
     }

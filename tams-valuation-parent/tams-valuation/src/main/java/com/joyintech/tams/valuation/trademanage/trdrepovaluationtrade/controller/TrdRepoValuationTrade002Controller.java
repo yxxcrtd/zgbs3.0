@@ -134,11 +134,11 @@ public class TrdRepoValuationTrade002Controller extends BaseController {
         params.setElementId(dto.getElementId());
 
         //设置主键
-//        if(!StringUtil.isNotEmpty(dto.getTradeId())){
-//            Date sysDate= DateUtil.platDateFromCache();
-//            //新建初始化交易编号
-//            dto.setTradeId(trdRepoValuationTrade002Service.createPlanTradeId());
-//        }
+        if(!StringUtil.isNotEmpty(dto.getTradeId())){
+            Date sysDate= DateUtil.platDateFromCache();
+            //新建初始化交易编号
+            dto.setTradeId(trdRepoValuationTrade002Service.createPlanTradeId());
+        }
 
         params.setBusinessCode(dto.getPortfolioId());  //产品代码
         params.setBusinessType(DictCodeList.共通业务类型_质押式回购交易.getValue());
