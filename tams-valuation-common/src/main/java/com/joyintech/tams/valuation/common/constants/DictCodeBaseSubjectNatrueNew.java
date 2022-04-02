@@ -116,7 +116,26 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
     利润分配_未分配利润_未实现(
             "WFPLR_WSX"
     ),
+    /**
+     * 其他应付款_本金
+     */
+    其他应付款_本金(
+        "QTYFK_BJ"
+    ),
+    /**
+     * 其他应付款_利息
+     */
+    其他应付款_利息(
+        "QTYFK_LX"
+    ),
 
+    其他应收款期权费 (
+        "QTYSK_QQF"
+    ),
+
+    其他应付款期权费 (
+        "QTYFK_QQF"
+    ),
     /** add by weipeng on 20220113 估值系统产品3.0.4批处理科目性质改造新增科目性质 start **/
     /** ==========原科目性质修改======== start**/
     /**
