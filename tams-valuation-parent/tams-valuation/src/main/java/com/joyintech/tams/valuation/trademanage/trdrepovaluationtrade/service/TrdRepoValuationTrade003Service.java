@@ -91,15 +91,15 @@ public class TrdRepoValuationTrade003Service extends BaseService<TrdRepoValuatio
         ValRepDealSec entity = new ValRepDealSec();
 //        BeanUtil.copyPropertiesIgnoreNull(entity,dto);
         //比较界面和接口字段差异，并手动给接口字段赋值
-
+        entity.setpTradeId(dto.getTradeId()); //原交易编号
+        entity.setfTradeId(dto.getOutTradeId()); //外部交易编号
         entity.setProdId(dto3.getPortfolioId()); //产品代码
-        entity.setDataActionSign("02");//数据动作标志
-        entity.setTradeId(null);  //交易编号
+        entity.setDataActionSign("01");//数据动作标志
+        entity.setTradeId(createPlanTradeId());  //交易编号
 //        entity.setTradeId(dto.getTradeId());
-        entity.setTermKind("R007"); //期限品种
+//        entity.setTermKind("R007"); //期限品种
         //DictCodeList.回购期限品种_R007.getValue()
         entity.setTradeMarket(dto3.getTradeMarket()); //交易市场
-
         entity.setPs(dto3.getPs()); //交易类型
         entity.setTrader("yc"); //交易员
         entity.setTradeDate(dto3.getTradeDate());//交易日
@@ -129,7 +129,6 @@ public class TrdRepoValuationTrade003Service extends BaseService<TrdRepoValuatio
         entity.setIsStlFeeAmt("N"); //结算手续费是否随交易支付
 
         entity.setIsChlFeeAmt("N");//通道费是否随交易支付
-        entity.setpTradeId("JYREPO202107270895"); //原交易编号
         entity.setIsClean("N");//有无清算指令
         entity.setPaydate(new Date()); //交收日
         entity.setMyAcctNo(dto3.getTrdAcctId()); //付款账户

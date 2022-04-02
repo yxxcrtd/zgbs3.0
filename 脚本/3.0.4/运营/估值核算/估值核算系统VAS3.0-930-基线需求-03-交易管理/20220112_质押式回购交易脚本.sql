@@ -89,3 +89,13 @@ INSERT INTO SYS_WFL_BUSINESS_MODULE (PAGE_ID, ELEMENT_ID, MODULE_ID, CREATE_USER
 
 
 
+/*质押式回购交易-4位数的交易编号，序列*/
+DROP SEQUENCE REPOTRADEID_SEQUENCE;
+
+-- Create sequence
+create sequence REPOTRADEID_SEQUENCE
+minvalue 1
+maxvalue 9999
+start with 1
+increment by 1
+cache 20;

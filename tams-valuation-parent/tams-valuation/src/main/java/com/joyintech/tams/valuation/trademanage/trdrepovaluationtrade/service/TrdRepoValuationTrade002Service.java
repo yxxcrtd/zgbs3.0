@@ -9,11 +9,18 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
+import com.joyintech.tams.valuation.common.interf.base.dto.RepoNStandardCommonResult;
 import com.joyintech.tams.valuation.common.interf.base.dto.RepurchaseDealInfoValCommonResult;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.repdeal.RepurchaseDealTemplateRecService;
+import com.joyintech.tams.valuation.common.interf.base.service.baseinfo.repoNstandard.RepDealSecSubjectTemplateRecService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValRepDealSec;
+import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValRepDealSecSubject;
+import com.joyintech.tams.valuation.trademanage.trdbuyoutrepovaluation.dto.TrdOutRightRepoValuationTrade001Dto;
+import com.joyintech.tams.valuation.trademanage.trdbuyoutrepovaluation.dto.TrdOutRightRepoValuationTrade001Result;
 import com.joyintech.tams.valuation.trademanage.trdrepovaluationtrade.dto.TrdRepoValuationTrade001Dto;
+import com.joyintech.tams.valuation.trademanage.trdrepovaluationtrade.dto.TrdRepoValuationTrade001Result;
 import com.joyintech.tams.valuation.trademanage.trdrepovaluationtrade.dto.TrdRepoValuationTradeResult;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
@@ -29,6 +36,12 @@ public class TrdRepoValuationTrade002Service extends BaseService<TrdRepoValuatio
 
     @Autowired
     private RepurchaseDealTemplateRecService repurchaseDealTemplateRecService;
+
+    /**
+     * 债券质押式回购标的信息 模板处理Service
+     */
+    @Autowired
+    private RepDealSecSubjectTemplateRecService repDealSecSubjectTemplateRecService;
 
     /**
      * 根据交易编号查询详情
@@ -59,17 +72,98 @@ public class TrdRepoValuationTrade002Service extends BaseService<TrdRepoValuatio
     @Override
     public void doComplete(TrdRepoValuationTrade001Dto entity, OperationType operationType) {
         String action = StringUtil.EMPTY;
-        TrdRepoValuationTradeResult trdRepoValuationTradeResult = new TrdRepoValuationTradeResult();
-        trdRepoValuationTradeResult = generateEntity(entity);
+        TrdRepoValuationTrade001Result trdRepoValuationTrade001Result = new TrdRepoValuationTrade001Result();
+        trdRepoValuationTrade001Result = generateEntity01(entity);
+
+        //先操作标的接口，再操作交易接口
         if (OperationType.NEW.equals(operationType)) {
             action = "insert";
+            restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdRepoValuationTrade001/insert01" , trdRepoValuationTrade001Result, Integer.class);
+            TrdRepoValuationTradeResult trdRepoValuationTradeResult = new TrdRepoValuationTradeResult();
+            trdRepoValuationTradeResult = generateEntity(entity);
+            restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdRepoValuationTrade001/" + action, trdRepoValuationTradeResult, Integer.class);
         }
         else {
             action = "update";
+            restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdRepoValuationTrade001/update01" , trdRepoValuationTrade001Result, Integer.class);
+            TrdRepoValuationTradeResult trdRepoValuationTradeResult = new TrdRepoValuationTradeResult();
+            trdRepoValuationTradeResult = generateEntity(entity);
+            restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdRepoValuationTrade001/" + action, trdRepoValuationTradeResult, Integer.class);
         }
 
-        restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdRepoValuationTrade001/" + action, trdRepoValuationTradeResult, Integer.class);
     }
+
+    //封装实体类01
+    public TrdRepoValuationTrade001Result generateEntity01(TrdRepoValuationTrade001Dto dto){
+        Map<String,Object> params = new HashMap<>();
+        List<String> prodIds = new ArrayList<>();
+        prodIds.add(dto.getPortfolioId());
+        params.put("INTERF_BOOKSETID",prodIds);
+        params.put("VAL_MODEL","INTERF_MODEL_SINGLE");
+        //将页面输入值赋值给接口实体类
+        List<ValRepDealSecSubject> listValRepDealSecSubject = new ArrayList<>();
+        ValRepDealSecSubject entity = new ValRepDealSecSubject();
+        BeanUtil.copyPropertiesIgnoreNull(entity,dto);
+        //比较界面和接口字段差异，并手动给接口字段赋值
+        entity.setTradeId(dto.getTradeId());  //交易编号
+        if(dto.getPs().equals("03")){
+            entity.setTradeType(DictCodeListExt1.金融产品类型_债券质押式正回购.getValue()); //F02
+        }else if(dto.getPs().equals("04")){
+            entity.setTradeType("F03");  //债券质押式逆回购
+        }
+        entity.setDataActionSign("01");//数据动作标志
+//      entity.setTermKind("R007"); //期限品种
+        entity.setBusiType("04"); //业务类型 质押式回购
+        entity.setVdate(dto.getVdate());//起息日
+        entity.setMdate(dto.getMdate());//到期日
+        entity.setBasis("A/365");  //计息基础
+        entity.setAssetClass(dto.getPs()); //资产类型
+        entity.setRateType("01"); //利率类型  固定
+        entity.setRedRate(dto.getRebackPrice().divide(new BigDecimal(100))); //回购利率
+        entity.setTradeMarket("01"); //交易市场 银行间
+        entity.setCapital(dto.getPrinAmt());  //名义本金(券面总额)
+        entity.setmIntAmt(dto.getIntAmt());  //到期利息   应计利息
+        entity.setmPrinAmt(new BigDecimal(0)); //到期本金
+        entity.setmTradeAmt(new BigDecimal(0)); //到期全价总额 本金+利息
+        entity.setCcy(dto.getCcy());//币种
+        entity.setCapiIncomeFeature("01"); //本金收益特征 01保本
+        entity.setRegistOrg("01"); //登记托管结构
+        entity.setPledgeSecNum(new Long(1)); //押品只数
+        entity.setTradeMarket("01"); //交易场所  01银行间
+        entity.setVpayDate(new Date());//首期交付日
+        entity.setMpayDate(new Date());//到期交付日
+        entity.setCounterId(dto.getCounterId());
+
+        listValRepDealSecSubject.add(entity);
+
+        Map<String, Object> map = repDealSecSubjectTemplateRecService.handleValBotAstInfo(listValRepDealSecSubject);
+
+        // 定义返回变量
+        RepoNStandardCommonResult result = new RepoNStandardCommonResult();
+
+        // 交易类金融产品List
+        List<FinTradeProduct> listValTradeFinProduct = (List<FinTradeProduct>)map.get("ValTradeFinProduct");
+        result.setListValTradeFinProduct(listValTradeFinProduct);
+        // 定义 金融产品分类List
+        List<FinProductType> listValFinProductType = (List<FinProductType>)map.get("ValFinProductType");
+        result.setListValFinProductType(listValFinProductType);
+
+        // 定义 交易类金融产品附属表List
+        List<FinTradeProductAdd> listFinTradeProductAdd = (List<FinTradeProductAdd>)map.get("FinTradeProductAdd");
+        result.setListFinTradeProductAdd(listFinTradeProductAdd);
+        /**add by wujie on 20190420 start**/
+        //金融产品估值参数表
+        List<FinProductValuationPara> listFinProductValuationPara = (List<FinProductValuationPara>) map.get("FinProductValuationPara");
+        result.setListFinProductValuationPara(listFinProductValuationPara);
+        /**add by wujie on 20190420 end**/
+
+        TrdRepoValuationTrade001Result rst = new TrdRepoValuationTrade001Result(result);
+        rst.setTrdRepoValuationTrade001Dto(dto);
+        return rst;
+    }
+
+
+
 
     //封装实体类
     public TrdRepoValuationTradeResult generateEntity(TrdRepoValuationTrade001Dto dto){
@@ -86,8 +180,9 @@ public class TrdRepoValuationTrade002Service extends BaseService<TrdRepoValuatio
         //比较界面和接口字段差异，并手动给接口字段赋值
 
         entity.setProdId(dto.getPortfolioId()); //产品代码
-        entity.setDataActionSign("02");//数据动作标志
-        entity.setTradeId(null);  //交易编号
+        entity.setDataActionSign("01");//数据动作标志
+         entity.setTradeId(dto.getTradeId());  //交易编号
+        entity.setfTradeId(dto.getOutTradeId()); //外部成交编号
         entity.setTermKind("R007"); //期限品种
         //DictCodeList.回购期限品种_R007.getValue()
         entity.setTradeMarket(dto.getTradeMarket()); //交易市场
@@ -121,7 +216,7 @@ public class TrdRepoValuationTrade002Service extends BaseService<TrdRepoValuatio
         entity.setIsStlFeeAmt("N"); //结算手续费是否随交易支付
 
         entity.setIsChlFeeAmt("N");//通道费是否随交易支付
-        entity.setpTradeId("JYREPO202107270895"); //原交易编号
+        entity.setpTradeId(dto.getTradeId()); //原交易编号
         entity.setIsClean("N");//有无清算指令
         entity.setPaydate(new Date()); //交收日
         entity.setMyAcctNo(dto.getTrdAcctId()); //付款账户
