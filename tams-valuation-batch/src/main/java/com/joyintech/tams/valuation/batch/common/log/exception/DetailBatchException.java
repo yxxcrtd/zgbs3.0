@@ -1,15 +1,23 @@
 package com.joyintech.tams.valuation.batch.common.log.exception;
-/*
- * @ClassName DetailBatchException
- * @Description 详细日志的异常类
- * @Date 2022/3/28 13:49
- * @Author 殷亚
- * @Version 1.0
- **/
+/**
+ * <p>Title: DetailBatchException</p>
+ * <p>Description: 详细日志的异常类</p>
+ *
+ * @author 殷亚
+ * @version 1.0
+ * @date 2022/4/1 11:31
+ */
 
 import com.joyintech.tams.valuation.batch.common.log.dto.DetailBatchLogExpand;
 import com.joyintech.tams.valuation.batch.common.log.dto.DetailLogLevel;
 
+/* @Author 殷亚
+ * @Description 详细日志的异常类
+ * @Date  2022/4/1 10:55
+ * @Version 1.0
+ * @Param
+ * @Return
+ **/
 public class DetailBatchException extends RuntimeException{
     /**
      * 序列号
@@ -51,68 +59,125 @@ public class DetailBatchException extends RuntimeException{
     }
 
 
-   /* @Author 殷亚
-    * @Description TODO 简单场景，输出业务编码，带堆栈日志的输出
-    * @Date  2022/3/28 14:52
-    * @Version 1.0
-    * @Param [busiCode, message, cause]
-    * @Return
-    **/
+    /**
+     * 简单场景，输出业务编码，带堆栈日志的输出
+     * @author 殷亚
+     * @date  2022/3/28 14:52
+     * @param busiId 业务编号
+     * @param message 异常信息
+     * @param cause 堆栈信息
+     * @see
+     * @since 1.0
+     */
     public DetailBatchException(String busiId,String message, Throwable cause) {
         super(message, cause);
         this.busiId=busiId==null?"":busiId;
     }
+
+    /**
+     * 简单场景，输出业务编码，带堆栈日志的输出
+     * @author 殷亚
+     * @date  2022/3/28 14:52
+     * @param busiId 业务编号
+     * @param message 异常信息
+     * @param cause 堆栈信息
+     * @param level 日志级别
+     * @see
+     * @since 1.0
+     */
     public DetailBatchException(String busiId,String message, Throwable cause,Enum level) {
         super(message, cause);
         this.busiId=busiId==null?"":busiId;
     }
 
-    /* @Author 殷亚
-     * @Description TODO 简单场景，输出业务编码，不带堆栈日志的输出
-     * @Date  2022/3/28 14:52
-     * @Version 1.0
-     * @Param [busiCode, message]
-     * @Return
-     **/
+    /**
+     * 简单场景，输出业务编码，不带堆栈日志的输出
+     * @author 殷亚
+     * @date  2022/3/28 14:52
+     * @param busiId 业务编号
+     * @param message 异常信息
+     * @see
+     * @since 1.0
+     */
     public DetailBatchException(String busiId,String message) {
         super(message);
         this.busiId=busiId==null?"":busiId;
     }
+
+
+    /**
+     * 简单场景，输出扩展明细，不带堆栈日志的输出
+     * @author 殷亚
+     * @date  2022/3/28 14:52
+     * @param busiId 业务编号
+     * @param message 异常信息
+     * @param level 日志级别
+     * @see
+     * @since 1.0
+     */
     public DetailBatchException(String busiId,String message,Enum level) {
         super(message);
         this.busiId=busiId==null?"":busiId;
         this.lev=level.toString();
     }
 
-    /* @Author 殷亚
-     * @Description TODO 复杂场景，输出扩展明细，带堆栈日志的输出
-     * @Date  2022/3/30 14:21
-     * @Version 1.0        
-     * @Param [detailBatchLogExpand, message, cause]
-     * @Return 
-     **/
+    /**
+     * 复杂场景，输出扩展明细，带堆栈日志的输出
+     * @author 殷亚
+     * @date  2022/3/28 14:52
+     * @param detailBatchLogExpand 日志扩展明细
+     * @param message 异常信息
+     * @param cause 堆栈信息
+     * @see
+     * @since 1.0
+     */
     public DetailBatchException(DetailBatchLogExpand detailBatchLogExpand,String message, Throwable cause) {
         super(message, cause);
         this.detailBatchLogExpand=detailBatchLogExpand;
     }
+
+    /**
+     * 复杂场景，输出扩展明细，带堆栈日志的输出
+     * @author 殷亚
+     * @date  2022/3/28 14:52
+     * @param detailBatchLogExpand 日志扩展明细
+     * @param message 异常信息
+     * @param cause 堆栈信息
+     * @param level 日志级别
+     * @see
+     * @since 1.0
+     */
 
     public DetailBatchException(DetailBatchLogExpand detailBatchLogExpand,String message, Throwable cause,Enum level) {
         super(message, cause);
         this.detailBatchLogExpand=detailBatchLogExpand;
         this.lev=level.toString();
     }
-    /* @Author 殷亚
-     * @Description TODO 复杂场景，输出扩展明细，不带堆栈日志的输出
-     * @Date  2022/3/30 14:21
-     * @Version 1.0
-     * @Param [detailBatchLogExpand, message, cause]
-     * @Return
-     **/
+
+    /**
+     * 复杂场景，输出扩展明细，不带堆栈日志的输出
+     * @author 殷亚
+     * @date  2022/3/28 14:52
+     * @param detailBatchLogExpand 日志扩展明细
+     * @param message 异常信息
+     * @see
+     * @since 1.0
+     */
     public DetailBatchException(DetailBatchLogExpand detailBatchLogExpand,String message) {
         super(message);
         this.detailBatchLogExpand=detailBatchLogExpand;
     }
 
+    /**
+     * 复杂场景，输出扩展明细，不带堆栈日志的输出
+     * @author 殷亚
+     * @date  2022/3/28 14:52
+     * @param detailBatchLogExpand 日志扩展明细
+     * @param message 异常信息
+     * @param level 日志级别
+     * @see
+     * @since 1.0
+     */
     public DetailBatchException(DetailBatchLogExpand detailBatchLogExpand,String message,Enum level) {
         super(message);
         this.detailBatchLogExpand=detailBatchLogExpand;
