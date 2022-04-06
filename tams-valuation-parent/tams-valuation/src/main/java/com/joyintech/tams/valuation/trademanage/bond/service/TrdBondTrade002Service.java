@@ -118,6 +118,7 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTradeDto>
         valSecVestAssetDeal.setFpriceAmt(ArithmeticUtil.doAdd(trdBondTradeDto.getTradeAmt(),trdBondTradeDto.getIntAmt()));//全价
         valSecVestAssetDeal.setCpriceAmt(trdBondTradeDto.getTradeAmt());//净价总额
         valSecVestAssetDeal.setTradeAmt(trdBondTradeDto.getSettleAmt());//交易金额
+        valSecVestAssetDeal.setDealNum(ArithmeticUtil.multiply(trdBondTradeDto.getDealNum(),new BigDecimal(100)));
         if((new BigDecimal(0)).compareTo(trdBondTradeDto.getCommission()) == -1
             && (new BigDecimal(0)).compareTo(trdBondTradeDto.getCommissionPay()) != -1){
             valSecVestAssetDeal.setIsCommission("Y");//佣金是否随交易支付
@@ -139,8 +140,8 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTradeDto>
         valSecVestAssetDeal.setIsBrokerage("Y");//经手费是否随交易支付
         valSecVestAssetDeal.setIsCertfFee("Y");//证管费是否随交易支付
         valSecVestAssetDeal.setIsStlAmt("Y");//结算费是否随交易支付
-        valSecVestAssetDeal.setIsDealFeeAmt("N");//交易手续费是否随交易支付
-        valSecVestAssetDeal.setIsStlFeeAmt("N");//结算手续费是否随交易支付
+        valSecVestAssetDeal.setIsDealFeeAmt("Y");//交易手续费是否随交易支付
+        valSecVestAssetDeal.setIsStlFeeAmt("Y");//结算手续费是否随交易支付
         valSecVestAssetDeal.setIsChlFeeAmt("Y");//通道费是否随交易支付
         valSecVestAssetDeal.setRegistAgency(null);//登记结算机构
         valSecVestAssetDeal.setIsClean("Y");//有无清算指令
