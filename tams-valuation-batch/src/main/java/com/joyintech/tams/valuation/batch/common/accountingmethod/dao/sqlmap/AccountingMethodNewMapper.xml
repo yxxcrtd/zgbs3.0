@@ -81,7 +81,7 @@
         A.CCY
         FROM BOK_SUBJECT A
         INNER JOIN BOK_BOOKSET B
-        ON A.BOOKSET_ID = B.BOOKSET_ID_TMPL
+        ON (A.BOOKSET_ID = B.BOOKSET_ID_TMPL OR A.BOOKSET_ID = B.BOOKSET_ID)
         WHERE 1=1
             AND A.SUBJECT_INTERNAL_CODE IS NOT NULL
         <if test="booksetId != null and booksetId != ''">

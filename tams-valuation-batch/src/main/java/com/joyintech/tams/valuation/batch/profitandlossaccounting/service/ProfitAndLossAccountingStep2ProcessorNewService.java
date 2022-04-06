@@ -103,6 +103,7 @@ public class ProfitAndLossAccountingStep2ProcessorNewService {
 		// 科目类型=“损益类
 		科目性质列表.add(DictCodeBaseSubjectNatrueNew.损益平准金_已实现.getValue());
 		科目性质列表.add(DictCodeBaseSubjectNatrueNew.损益平准金_未实现.getValue());
+		科目性质列表.add(DictCodeBaseSubjectNatrueNew.损益平准金_其他综合收益.getValue());
 		searchDto.setBaseSubjectNatureList(科目性质列表);
 		// 参照共通【科目余额查询】方法，参照【详细设计-账务类共通方法设计.xlsx的【科目余额查询】sheet】
 		List<SubjectBalance> 损益平准金最新余额集合 = accountingCommonService.getSubjectLatestBalance(searchDto);
@@ -137,6 +138,19 @@ public class ProfitAndLossAccountingStep2ProcessorNewService {
 					Collectors.groupingBy(item -> item.getBokDetailId() + item.getOCcy()));
 		}
 
+		// 1-1.3 本期利润_未实现余额查询
+		科目性质列表.clear();
+		科目性质列表.add(DictCodeBaseSubjectNatrueNew.其他综合收益_申赎.getValue());
+		searchDto.setBaseSubjectNatureList(科目性质列表);
+		// 调用共通设计->【详细设计-账务类共通方法设计.xlsx】->科目余额查询-期待方向SHEET
+		List<SubjectBalance> listOtherIncome = accountingCommonService.getSubjectLatestBalance(searchDto);
+		Map<String, List<SubjectBalance>> 其他综合收益_申赎余额集合 = new HashMap<>();
+		if (CollectionUtils.isNotEmpty(listOtherIncome)) {
+			其他综合收益_申赎余额集合 = listOtherIncome.stream().filter(
+					item -> !ArithmeticUtil.equals(BigDecimal.ZERO, item.getBalance())).collect(
+					Collectors.groupingBy(item -> item.getBokDetailId() + item.getOCcy()));
+		}
+
 		// 1-1.4.损益结转科目查询
 		ArrayList<String> 科目类型列表 = new ArrayList<>();
 		科目类型列表.add(DictCodeList.科目类型_损益类.getValue());
@@ -144,6 +158,7 @@ public class ProfitAndLossAccountingStep2ProcessorNewService {
 		科目性质列表.clear();
 		科目性质列表.add(DictCodeBaseSubjectNatrueNew.利润分配_未分配利润_已实现.getValue());
 		科目性质列表.add(DictCodeBaseSubjectNatrueNew.利润分配_未分配利润_未实现.getValue());
+		科目性质列表.add(DictCodeBaseSubjectNatrueNew.其他综合收益_申赎.getValue());
 		Map<String, List<ProfitAndLossAccountingSubject>> 损益结转科目集合 = mapper.selectPalSubject(
 				booksetId, 科目类型列表, 科目性质列表).stream().collect(
 				Collectors.groupingBy(ProfitAndLossAccountingSubject::getBaseSubjectNature));
@@ -217,12 +232,19 @@ public class ProfitAndLossAccountingStep2ProcessorNewService {
 				// 账务明细_2.基础科目性质 = 未分配利润-已实现
 				detail2.setBaseSubjectNature(DictCodeBaseSubjectNatrueNew.利润分配_未分配利润_已实现.getValue());
 			}
-			else {
+			else if (DictCodeBaseSubjectNatrueNew.损益平准金_未实现.getValue().equals(item.getBaseSubjectNature())) {
 				// 账务明细_2.科目号 = 未分配利润_未实现
 				ProfitAndLossAccountingSubject subject = 损益结转科目集合.get(DictCodeBaseSubjectNatrueNew.利润分配_未分配利润_未实现.getValue()).get(0);
 				detail2.setSubjectNo(subject.getSubjectNo());
 				// 账务明细_2.基础科目性质 = 未分配利润-未实现
 				detail2.setBaseSubjectNature(DictCodeBaseSubjectNatrueNew.利润分配_未分配利润_未实现.getValue());
+			}
+			else{
+				// 账务明细_2.科目号 = 其他综合收益_申赎
+				ProfitAndLossAccountingSubject subject = 损益结转科目集合.get(DictCodeBaseSubjectNatrueNew.其他综合收益_申赎.getValue()).get(0);
+				detail2.setSubjectNo(subject.getSubjectNo());
+				// 账务明细_2.基础科目性质 = 其他综合收益_申赎
+				detail2.setBaseSubjectNature(DictCodeBaseSubjectNatrueNew.其他综合收益_申赎.getValue());
 			}
 			// 四级科目号
 			detailSubjectNo=detail2.getDetailSubjectNo();
@@ -267,10 +289,16 @@ public class ProfitAndLossAccountingStep2ProcessorNewService {
 					data = 未分配利润_已实现余额集合.get(item.getBokDetailId() + item.getOCcy()).get(0);
 				}
 			}
-			else{
+			else if(DictCodeBaseSubjectNatrueNew.损益平准金_未实现.getValue().equals(item.getBaseSubjectNature())){
 				// 处理前余额 = 未分配利润-未实现 查询结果,通过币种和账务明细代码获取
 				if(未分配利润_未实现余额集合.get(item.getBokDetailId() + item.getOCcy())!=null){
 					data=未分配利润_未实现余额集合.get(item.getBokDetailId() + item.getOCcy()).get(0);
+				}
+			}
+			else{
+				// 处理前余额 = 其他综合收益_申赎 查询结果,通过币种和账务明细代码获取
+				if(其他综合收益_申赎余额集合.get(item.getBokDetailId() + item.getOCcy())!=null){
+					data=其他综合收益_申赎余额集合.get(item.getBokDetailId() + item.getOCcy()).get(0);
 				}
 			}
 			if(data==null){
