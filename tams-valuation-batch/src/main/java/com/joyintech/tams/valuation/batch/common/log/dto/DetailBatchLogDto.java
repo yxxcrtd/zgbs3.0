@@ -7,12 +7,18 @@ package com.joyintech.tams.valuation.batch.common.log.dto;
  * @Version 1.0
  **/
 
+import com.alibaba.fastjson.JSON;
+import com.joyintech.framework.base.BaseEntity;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 
-public class DetailBatchLogDto {
+public class DetailBatchLogDto extends BaseEntity {
     private static DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    //执行信息seq =sys_batch_exec_info.seqno
+    private String exeSeqno;
     //任务组ID
     private String groupId;
     //任务组名称
@@ -23,6 +29,8 @@ public class DetailBatchLogDto {
     private String taskName;
     //任务调度bean
     private String taskBeanName;
+    //执行时间
+    private Date excuteDate;
     //开始时间
     private LocalDateTime start;
     //结束时间
@@ -33,6 +41,8 @@ public class DetailBatchLogDto {
     private String methodName;
     //参数
     private Object[] args;
+
+    private String argsClob;
     //账套ID
     private String booksetId;
     //金融产品ID
@@ -40,9 +50,20 @@ public class DetailBatchLogDto {
     //业务编码
     private String busiId;
     //执行结果
-    private Object result;
+    private Object resultInfo;
     //扩展明细
     private List<DetailBatchLogExpand> detailList;
+    private String detailEx;
+
+
+
+    public String getExeSeqno() {
+        return exeSeqno;
+    }
+
+    public void setExeSeqno(String exeSeqno) {
+        this.exeSeqno = exeSeqno;
+    }
 
     public String getGroupId() {
         return groupId;
@@ -84,6 +105,14 @@ public class DetailBatchLogDto {
         this.taskBeanName = taskBeanName;
     }
 
+    public Date getExcuteDate() {
+        return excuteDate;
+    }
+
+    public void setExcuteDate(Date excuteDate) {
+        this.excuteDate = excuteDate;
+    }
+
     public LocalDateTime getStart() {
         return start;
     }
@@ -122,6 +151,15 @@ public class DetailBatchLogDto {
 
     public void setArgs(Object[] args) {
         this.args = args;
+        this.argsClob =JSON.toJSONString(args);
+    }
+
+    public String getArgsClob() {
+        return argsClob;
+    }
+
+    public void setArgsClob(String argsClob) {
+        this.argsClob = argsClob;
     }
 
     public String getBooksetId() {
@@ -148,12 +186,12 @@ public class DetailBatchLogDto {
         this.busiId = busiId;
     }
 
-    public Object getResult() {
-        return result;
+    public Object getResultInfo() {
+        return resultInfo;
     }
 
-    public void setResult(Object result) {
-        this.result = result;
+    public void setResultInfo(Object resultInfo) {
+        this.resultInfo = resultInfo;
     }
 
     public List<DetailBatchLogExpand> getDetailList() {
@@ -162,5 +200,14 @@ public class DetailBatchLogDto {
 
     public void setDetailList(List<DetailBatchLogExpand> detailList) {
         this.detailList = detailList;
+        this.detailEx = JSON.toJSONString(detailList);
+    }
+
+    public String getDetailEx() {
+        return detailEx;
+    }
+
+    public void setDetailEx(String detailEx) {
+        this.detailEx = detailEx;
     }
 }
