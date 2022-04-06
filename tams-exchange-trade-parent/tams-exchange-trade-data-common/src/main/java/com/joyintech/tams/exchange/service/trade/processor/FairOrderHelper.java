@@ -3,6 +3,9 @@ package com.joyintech.tams.exchange.service.trade.processor;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Strings;
+import com.joyintech.exchange.service.quote.service.QuoteService;
+import com.joyintech.tams.exchange.common.bean.ResultBean;
+import com.joyintech.tams.exchange.common.bean.TickBean;
 import com.joyintech.tams.exchange.common.bean.WorkflowBean;
 import com.joyintech.tams.exchange.common.bean.investment.ReqRiskTrigger;
 import com.joyintech.tams.exchange.common.bean.investment.RiskOccupyBean;
@@ -49,8 +52,10 @@ public class FairOrderHelper {
     private InvestRiskManagement investRiskManagement;
     @Autowired
     private TradeHelper tradeHelper;
+//    @Autowired
+//    private QuoteTickService quoteTickService;
     @Autowired
-    private QuoteTickService quoteTickService;
+    private QuoteService quoteService;
     @Autowired
     private CommonManagement commonManagement;
     @Autowired
@@ -80,9 +85,12 @@ public class FairOrderHelper {
             order.setIsFullPrice(FullPriceConst.NET_PRICE.value);
         }
         if (!order.getEntrustProp().equals(EntrustProp.NORMAL.value)) {
-            QuoteProto.TickBean tickBean = quoteTickService.getTickFromCache(order.getStockCode());
-            if (Objects.nonNull(tickBean)) {
-                price = order.getEntrustBs().equals(EntrustBs.BUY.value) ? TradeUtils.getBigDecimal(tickBean.getUpperLimitPrice(), 4) : TradeUtils.getBigDecimal(tickBean.getLowerLimitPrice(), 4);
+            ResultBean tickBean = quoteService.getTick(order.getStockCode());
+            if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
+                TickBean tick = (TickBean)tickBean.getData();
+//            QuoteProto.TickBean tickBean = quoteTickService.getTickFromCache(order.getStockCode());
+//            if (Objects.nonNull(tickBean)) {
+                price = order.getEntrustBs().equals(EntrustBs.BUY.value) ? TradeUtils.getBigDecimal(tick.getUpperLimitPrice(), 4) : TradeUtils.getBigDecimal(tick.getLowerLimitPrice(), 4);
                 // 转换为净价计算 指令数量
                 if (EntrustUtils.isFullPrice(instrument, order.getAssetType(), order.getEntrustProp(), order.getIsFullPrice())) {
                     Instruction instruction = instructionService.findById(order.getStockCode());
@@ -167,8 +175,11 @@ public class FairOrderHelper {
                     .collect(Collectors.toMap(Instruction::getEntrustId, instructionBean -> instructionBean));
             // 市价委托，需检查限价委托是否超过涨跌停
             if (EntrustProp.isMarketPrice(order.getEntrustProp())) {
-                QuoteProto.TickBean tick = quoteTickService.getTickFromCache(order.getStockCode());
-                if (Objects.nonNull(tick)) {
+                ResultBean tickBean = quoteService.getTick(order.getStockCode());
+                if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
+                    TickBean tick = (TickBean)tickBean.getData();
+//                QuoteProto.TickBean tick = quoteTickService.getTickFromCache(order.getStockCode());
+//                if (Objects.nonNull(tick)) {
                     double lowerLimitPrice = TradeUtils.formatDouble(tick.getLowerLimitPrice(), 4);
                     double upperLimitPrice = TradeUtils.formatDouble(tick.getUpperLimitPrice(), 4);
                     boolean flag = false;
