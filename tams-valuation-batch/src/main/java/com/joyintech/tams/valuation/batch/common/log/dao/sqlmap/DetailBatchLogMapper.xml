@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.valuation.batch.common.log.dao.DetailBatchLogMapper">
+    <insert id="insertBatchDetailLog">
+        insert into SYS_BATCH_DETAIL_LOG (EXE_SEQNO,GROUP_ID,TASK_ID,TASK_BEAN_NAME,EXCUTE_DATE,CLASS_NAME,METHOD_NAME,ARGS,
+        BOOKSET_ID,FINPROD_ID,BUSI_ID,RESULT_INFO,DETAIL_EX,CREATE_USER,CREATE_TIME,UPDATE_USER,UPDATE_TIME
+        )
+        values(
+            #{exeSeqno,jdbcType=VARCHAR},#{groupId,jdbcType=VARCHAR}, #{taskId,jdbcType=VARCHAR},
+            #{taskBeanName,jdbcType=VARCHAR},#{excuteDate,jdbcType=DATE},#{className,jdbcType=VARCHAR},
+            #{methodName,jdbcType=VARCHAR}, #{argsClob,jdbcType=CLOB}, #{booksetId,jdbcType=VARCHAR},
+            #{finprodId,jdbcType=VARCHAR},#{busiId,jdbcType=VARCHAR},#{resultInfo,jdbcType=CLOB},#{detailEx,jdbcType=CLOB},
+            #{createUser,jdbcType=VARCHAR},sysdate, #{updateUser,jdbcType=VARCHAR}, sysdate
+        )
+    </insert>
+
+</mapper>
