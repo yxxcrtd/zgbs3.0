@@ -312,7 +312,7 @@ public class TrdRepoValuationTrade003Dto extends BaseEntity implements ProcessEn
         this.ccy = ccy;
     }
 
-    @NotEmpty(fieldName = "TrdRepoValuationTrade003.otherAmt", groups = {ValidateGroupEdit.class})
+//    @NotEmpty(fieldName = "TrdRepoValuationTrade003.otherAmt", groups = {ValidateGroupEdit.class})
     public BigDecimal getOtherAmt() {
         return otherAmt;
     }

@@ -92,13 +92,19 @@ public class TrdFixIncomeValuDuration002Service extends BaseService<TrdFixIncome
         entity.setAssetId(dto.getFinprodMarketId());  //资产代码
         entity.setAssetName(dto.getFinprodName()); //资产名称
         entity.setDataActionSign("01");//数据动作标志
-        entity.setDealType(dto.getPs());//交易类型
-        if(DictCodeList.交易方向_收息.getValue().equals(dto.getPs()) && dto.getActInt().compareTo(new BigDecimal(0))==1 ){
+        //交易方向转换
+        if(DictCodeList.交易方向_收息到账.getValue().equals(dto.getPs())){
+            dto.setPs(DictCodeList.交易方向_收息.getValue());
+        }else{
+            dto.setPs(DictCodeList.交易方向_还本.getValue());
+        }
+        entity.setDealType(dto.getPs());
+        if(DictCodeList.交易方向_还本.getValue().equals(dto.getPs()) && dto.getActInt().compareTo(new BigDecimal(0))==1 ){
             entity.setIsInt("Y");
         }else{
-            entity.setIsInt("N");//是否还本带息 交易方向为还本，应收利息是否为0，不为0，isAmt为Y
+            entity.setIsInt("N");//是否还本带息 交易方向为还本，应收利息是否为0，不为0，IsInt为Y
         }
-        //查询债券的付息计划
+        //查询债券的划
         Map<String,Object> hashMap = new HashMap<>();
         hashMap.put("finprodId",entity.getAssetId());
         List<FinCashPlanDto> list = getFinCashPlanByProductId(hashMap);

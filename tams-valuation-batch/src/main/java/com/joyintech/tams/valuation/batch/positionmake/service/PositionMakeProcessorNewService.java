@@ -13,10 +13,7 @@ import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalanc
 import com.joyintech.tams.valuation.batch.common.accounting.service.AccountingCommonService;
 import com.joyintech.tams.valuation.batch.positionmake.dao.PositionMakeWithoutDispatchMapper;
 import com.joyintech.tams.valuation.batch.positionmake.dto.*;
-import com.joyintech.tams.valuation.common.constants.BookConstant;
-import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrue;
-import com.joyintech.tams.valuation.common.constants.GlobalConstant;
-import com.joyintech.tams.valuation.common.constants.ValDictCodeList;
+import com.joyintech.tams.valuation.common.constants.*;
 import com.joyintech.tams.valuation.common.utils.ValDateUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
@@ -168,15 +165,23 @@ public class PositionMakeProcessorNewService {
 		// 调用共通查询：科目余额查询-期待方向，查询现金类科目余额
 		if (ptlSecValutionListWithNoTdF20 != null && ptlSecValutionListWithNoTdF20.size() > 0) {
 			for (PtlSecValutionWithOtherFieldDto item : ptlSecValutionListWithNoTdF20) {
+				List<String> subjectBaseNatureList = new ArrayList<>();
+				subjectBaseNatureList.add(DictCodeBaseSubjectNatrueNew.活期存款_本金.getValue());
+				subjectBaseNatureList.add(DictCodeBaseSubjectNatrueNew.结算备付金_本金.getValue());
+				subjectBaseNatureList.add(DictCodeBaseSubjectNatrueNew.存出保证金_本金.getValue());
 				//查询现金科目余额
-				SubjectBalance balance = this.getSubjectBalance(item.getBooksetId(), item.getBokDetailId(),
-					happenDate, bookDate, DictCodeList.余额方向_借方.getValue(), DictCodeBaseSubjectNatrue.现金.getValue());
+				SubjectBalance balance = this.getSubjectBalanceByNatures(item.getBooksetId(), item.getBokDetailId(),
+					happenDate, bookDate, DictCodeList.余额方向_借方.getValue(), subjectBaseNatureList);
 				item.setDscCostAmt(balance.getBalance());
 				item.setDscCostAmtB(balance.getbAmt());
 				item.setShareAmt(balance.getNum());
 				//查询应计利息
-				SubjectBalance balanceYjlx = this.getSubjectBalance(item.getBooksetId(), item.getBokDetailId(),
-					happenDate, bookDate, DictCodeList.余额方向_借方.getValue(), DictCodeBaseSubjectNatrue.应计利息.getValue());
+				subjectBaseNatureList.clear();
+				subjectBaseNatureList.add(DictCodeBaseSubjectNatrueNew.活期存款_应计利息.getValue());
+				subjectBaseNatureList.add(DictCodeBaseSubjectNatrueNew.结算备付金_应计利息.getValue());
+				subjectBaseNatureList.add(DictCodeBaseSubjectNatrueNew.存出保证金_应计利息.getValue());
+				SubjectBalance balanceYjlx = this.getSubjectBalanceByNatures(item.getBooksetId(), item.getBokDetailId(),
+					happenDate, bookDate, DictCodeList.余额方向_借方.getValue(), subjectBaseNatureList);
 				item.setTdyIntincexp(balanceYjlx.getBalance());
 				item.setTdyIntincexpB(balanceYjlx.getBalance());
 				item.setCdate(happenDate);
@@ -353,10 +358,10 @@ public class PositionMakeProcessorNewService {
 							else{
 								List<String> subjectNatureList = new ArrayList<String>();
 								if(DictCodeListExt1.投资目的_摊余成本类.getValue().equals(dto.getInvAim())){
-									subjectNatureList = Arrays.asList(DictCodeBaseSubjectNatrue.摊余成本类利息调整.getValue());
+									subjectNatureList = Arrays.asList(DictCodeBaseSubjectNatrueNew.摊余成本类_利息调整.getValue());
 								}
 								else if(DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(dto.getInvAim())){
-									subjectNatureList = Arrays.asList(DictCodeBaseSubjectNatrue.综合收益类利息调整.getValue());
+									subjectNatureList = Arrays.asList(DictCodeBaseSubjectNatrueNew.综合收益类_利息调整.getValue());
 								}
 								// 调用共通【账务类共通方法】，科目余额查询-期待方向
 								SubjectBalanceSearchDto searchDao = new SubjectBalanceSearchDto();
@@ -489,10 +494,10 @@ public class PositionMakeProcessorNewService {
 			searchDao.setBookDate(bookDate);
 			searchDao.setBooksetId(booksetIdNow);
 			searchDao.setBaseSubjectNatureList(new ArrayList<String>(
-				Arrays.asList(DictCodeBaseSubjectNatrue.其他应收款_本金.getValue(), DictCodeBaseSubjectNatrue.其他应收款_利息.getValue(),
-					DictCodeBaseSubjectNatrue.其他应付款_本金.getValue(), DictCodeBaseSubjectNatrue.其他应付款_利息.getValue(),
-					DictCodeBaseSubjectNatrue.清算款.getValue(),DictCodeBaseSubjectNatrue.其他应付款期权费.getValue(),
-					DictCodeBaseSubjectNatrue.其他应收款期权费.getValue())));
+				Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue(), DictCodeBaseSubjectNatrueNew.应收利息_证券.getValue(),
+					DictCodeBaseSubjectNatrueNew.应收利息_资金.getValue(),DictCodeBaseSubjectNatrueNew.应收利息_融出.getValue(),
+					DictCodeBaseSubjectNatrueNew.其他应付款_本金.getValue(), DictCodeBaseSubjectNatrueNew.其他应付款_利息.getValue(),
+					DictCodeBaseSubjectNatrueNew.其他应付款期权费.getValue(),DictCodeBaseSubjectNatrueNew.其他应收款期权费.getValue())));
 			List<SubjectBalance> listSubjectBalance = accountingCommonService.getSubjectBalanceExpectDirection(searchDao,
 				DictCodeList.余额方向_借方.getValue());
 
@@ -793,7 +798,7 @@ public class PositionMakeProcessorNewService {
 			searchDao.setHappenDate(happenDate);
 			searchDao.setBookDate(bookDate);
 			searchDao.setBooksetId(dto.getBooksetId());
-			searchDao.setBaseSubjectNatureList(new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrue.应付利润.getValue())));
+			searchDao.setBaseSubjectNatureList(new ArrayList<String>(Arrays.asList(DictCodeBaseSubjectNatrueNew.应付利润.getValue())));
 
 			searchDao.setBokDetailIdList(bokDetailIds);
 			// 收益类型区分,获取科目余额
@@ -1016,7 +1021,7 @@ public class PositionMakeProcessorNewService {
 			// 定义 变量.通道费计提信息 =
 			// 调用共通方法查询：凭证最新账务查询（场景代码=“1701”，发生开始日=“参数.发生日”，发生结束日=“参数.发生日”，基础科目性质=“应付交易费费”，入账日=DTO.入账日，账套代码=变量.通道账套信息.子账套代码）
 			List<String> listBaseSubjectNature = new ArrayList<>();
-			listBaseSubjectNature.add(DictCodeBaseSubjectNatrue.应付交易费用.getValue());
+			listBaseSubjectNature.add(DictCodeBaseSubjectNatrueNew.应付交易费用_费用.getValue());
 			List<BookLatestInfoDto> listBookLatestInfo = accountingCommonService.getBookLatestInfo(dto.getBooksetId(),
 				bookDate, null, listBaseSubjectNature, DictCodeListTableId.会计场景代码_通道费_计提.getValue(), null, null, null,
 				happenDate, happenDate);
@@ -1184,7 +1189,7 @@ public class PositionMakeProcessorNewService {
 			//账套代码	应收款科目余额ENTITY.账套代码
 			searchDto.setBooksetId(dealDto.getBooksetId());
 			//基础科目性质"逾期资产应计利息"
-			searchDto.setBaseSubjectNatureList(Arrays.asList(DictCodeBaseSubjectNatrue.逾期资产应计利息.getValue()));
+			searchDto.setBaseSubjectNatureList(Arrays.asList(DictCodeBaseSubjectNatrueNew.逾期资产应计利息.getValue()));
 			//分支序号	应收款科目余额ENTITY.分支序号
 			searchDto.setBranch(dealDto.getBranch());
 			//期待余额方向  借方
@@ -1200,7 +1205,7 @@ public class PositionMakeProcessorNewService {
 			   && (ysfxBalance == null || ysfxBalance.compareTo(BigDecimal.ZERO) == 0)) {
 				continue;
 			}
-			BigDecimal ljfx = this.getPtlSecReceivablesSum(DictCodeBaseSubjectNatrue.逾期资产应计利息.getValue(), DictCodeList.借贷方向_借.getValue(),
+			BigDecimal ljfx = this.getPtlSecReceivablesSum(DictCodeBaseSubjectNatrueNew.逾期资产应计利息.getValue(), DictCodeList.借贷方向_借.getValue(),
 				happenDate, dealDto.getBooksetId(), dealDto.getBokDetailId(), dealDto.getBranch(), dealDto.getoCcy());
 			result.add(getPtlSecReceivables(dealDto, happenDate, ljfx, ysfxBalance));
 		}
@@ -1291,6 +1296,42 @@ public class PositionMakeProcessorNewService {
 			baseSubjectNatureList = new ArrayList<String>();
 			baseSubjectNatureList.add(baseSubjectNature);
 		}
+
+		// 设值科目余额查询参数Dto
+		SubjectBalanceSearchDto searchDto = new SubjectBalanceSearchDto();
+		searchDto.setBooksetId(booksetId);
+		searchDto.setBokDetailId(bokDetailId);
+		searchDto.setHappenDate(happenDate);
+		searchDto.setBookDate(bookDate);
+		searchDto.setBaseSubjectNatureList(baseSubjectNatureList);
+		// 调用公用方法：【科目余额查询 - 期待方向】,获取科目余额信息
+		List<SubjectBalance> subjectBalanceList = accountingCommonService.getSubjectBalanceExpectDirection(
+			searchDto, expBalanceDirect);
+
+		// 获取科目余额
+		if (subjectBalanceList != null && subjectBalanceList.size() > 0) {
+			balance = subjectBalanceList.get(0);
+		}
+
+		return balance;
+	}
+
+	/**
+	 * 调用共通查询发生日前一日余额 调用共通查询：科目余额查询-期待方向，查询现金类科目余额
+	 *
+	 * @param readerEntity reader传递的参数
+	 * @param expBalanceDirect 期待余额方向
+	 * @param baseSubjectNature 基础科目性质
+	 * @param taskPri 任务优先级
+	 * @return
+	 * @see
+	 * @since 1.0
+	 */
+
+	private SubjectBalance getSubjectBalanceByNatures(String booksetId, String bokDetailId,Date happenDate, Date bookDate,
+											 String expBalanceDirect, List<String> baseSubjectNatureList) {
+		// 初始化返回结果
+		SubjectBalance balance = new SubjectBalance();
 
 		// 设值科目余额查询参数Dto
 		SubjectBalanceSearchDto searchDto = new SubjectBalanceSearchDto();

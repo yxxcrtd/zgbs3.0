@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * service 拆借交易
+ * service 质押式回购交易
  * 
  * @author yuzj
  * @version 1.0 2021年12月29日

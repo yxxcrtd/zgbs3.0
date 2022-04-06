@@ -22,6 +22,7 @@ import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.trdfixincomevaluduration.dto.TrdFixIncomeValuDuration001Dto;
@@ -140,7 +141,7 @@ public class TrdFixIncomeValuDuration002Controller extends BaseController {
 //        }
 
         params.setBusinessCode(dto.getFinprodMarketId());  //资产代码
-        params.setBusinessType(DictCodeList.共通业务类型_计划类资产_净值型_存续期.getValue());
+        params.setBusinessType(DictCodeListExt3.共通业务类型_固收类资产存续期.getValue());
         // 设置流程业务说明, entity即传入的dto
         params.setComment(
                 entity -> SpringContextUtil.getTextValue("TrdFixIncomeValuDuration002.finprodMarketId")+"("+ entity.getFinprodMarketId() +")"+"-"+SpringContextUtil.getTextValue("TrdFixIncomeValuDuration002.tradeDate") + "(" + DateUtil.format(entity.getTradeDate()) + ")"

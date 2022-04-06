@@ -102,7 +102,7 @@
 		ttfd3.FEE_AMT  dealFeeAmt,/**交易手续费**/
 		ttfd4.FEE_AMT  settFeeAmt,/**结算手续费**/
 		CASE WHEN ttfd.FEE_TYPE = 'B99' THEN ttfd.FEE_AMT ELSE 0 END as otherAmt,/**其他应付费用**/
-		CASE WHEN t.PS in('03','04') THEN t.PRIN_AMT+ttfd3.FEE_AMT+ttfd4.FEE_AMT
+		CASE WHEN t.PS in('03','04') THEN t.PRIN_AMT+NVL(ttfd3.FEE_AMT,0)+NVL(ttfd4.FEE_AMT,0)
 		ELSE hgzc.M_TRADE_AMT END AS settleAmt,/**结算金额**/
 		t.CCY ccy,/**币种**/
 		t.MY_ACCT_NO trdAcctId/**资金账户**/
