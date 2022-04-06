@@ -1773,7 +1773,11 @@ public enum DictCodeListExt3 implements BaseDictCodeList {
 
     //共通业务类型-固收类资产交易
     共通业务类型_固收类资产交易(DictCode.共通业务类型,"TRD85","固收类资产交易"),
+
+    //共通业务类型字典添加  yangchen 20220406 start
     共通业务类型_固收类资产存续期(DictCode.共通业务类型,"TRD86","固收类资产存续期"),
+    共通业务类型_融入券存续期(DictCode.共通业务类型,"TRD87","共通业务类型_融入券存续期"),
+    //共通业务类型字典添加  yangchen 20220406 end
 
     /**
      * 操作类型

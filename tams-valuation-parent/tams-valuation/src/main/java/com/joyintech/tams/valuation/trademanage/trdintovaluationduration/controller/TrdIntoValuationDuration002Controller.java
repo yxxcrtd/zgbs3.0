@@ -19,10 +19,7 @@ import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.SpringContextUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.trdintovaluationduration.dto.TrdIntoValuationDuration001Dto;
 import com.joyintech.tams.valuation.trademanage.trdintovaluationduration.service.TrdIntoValuationDuration002Service;
@@ -139,7 +136,7 @@ public class TrdIntoValuationDuration002Controller extends BaseController {
 //        }
 
         params.setBusinessCode(dto.getFinprodMarketId());  //资产代码
-        params.setBusinessType(DictCodeListExt2.共通业务类型_债券借贷存续期.getValue());
+        params.setBusinessType(DictCodeListExt3.共通业务类型_融入券存续期.getValue());
         // 设置流程业务说明, entity即传入的dto
         params.setComment(
                 entity -> SpringContextUtil.getTextValue("资产代码")+"("+ entity.getFinprodMarketId() +")"+"-"+SpringContextUtil.getTextValue("交易日期") + "(" + DateUtil.format(entity.getTradeDate()) + ")"

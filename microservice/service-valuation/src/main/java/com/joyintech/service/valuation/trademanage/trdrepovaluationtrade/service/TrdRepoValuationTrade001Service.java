@@ -217,11 +217,11 @@ public class TrdRepoValuationTrade001Service extends CommonExportService<TrdRepo
         // 回购类型
         String repoType=(String)pageParam.get("repoType");
         // 回购类型多选，转为数组
-        String[] repoTypArr = null;
+        String[] repoTypeArr = null;
         if (StringUtil.isNotEmpty(repoType)) {
-            repoTypArr = repoType.split(",");
+            repoTypeArr = repoType.split(",");
         }
-        pageParam.put("repoTypArr", repoTypArr);
+        pageParam.put("repoTypeArr", repoTypeArr);
 
 
         // 获取交易方向
