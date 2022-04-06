@@ -10,6 +10,7 @@
  
 package com.joyintech.service.valuation.trademanage.trdrepovaluationtrade.service;
 
+import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.data.MultilevelDataAuthorityService;
@@ -212,6 +213,16 @@ public class TrdRepoValuationTrade001Service extends CommonExportService<TrdRepo
             portfolioIdArr = portfolioId.split(",");
         }
         pageParam.put("portfolioIdArr", portfolioIdArr);
+
+        // 回购类型
+        String repoType=(String)pageParam.get("repoType");
+        // 回购类型多选，转为数组
+        String[] repoTypArr = null;
+        if (StringUtil.isNotEmpty(repoType)) {
+            repoTypArr = repoType.split(",");
+        }
+        pageParam.put("repoTypArr", repoTypArr);
+
 
         // 获取交易方向
         String ps = (String)pageParam.get("ps");

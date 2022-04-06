@@ -81,7 +81,7 @@
                                     <label class="layui-form-label form-lable">交易类型</label>
                                     <div class="layui-input-inline input-inline">
                                         <select type="text" id="ps" name="ps" class="layui-input form-input input-select"
-                                                placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}" required="required"
+                                                placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}" required="required" disabled
                                                 data-th-data-result='${PS}' allowClear="true" formatoption="true"
                                                 data-th-initValue="${entity?.ps}"></select>
                                     </div>
@@ -120,7 +120,7 @@
                                     <div class="layui-input-inline input-inline">
                                         <select type="text" id="repoType" name="repoType" class="layui-input form-input input-select"
                                                 placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"
-                                                data-th-data-result='${TARGET_BACK_TYPE}' allowClear="true" formatoption="true" required
+                                                data-th-data-result='${TARGET_BACK_TYPE}' allowClear="true" formatoption="true" required disabled
                                                 data-th-initValue="${entity?.repoType}"></select>
                                     </div>
                                 </div>
@@ -162,23 +162,23 @@
                             <div class="layui-form-item">
 
 
-                                <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-label-wra">提前终止利率%</label>
-                                    <div class="layui-input-inline input-inline">
-                                        <input type="text" th:id="terminateRate" name="terminateRate" maxLength="30"
-                                                th:value="${entity?.terminateRate}" class="layui-input form-input text-number rateCal"
-                                               data-textrange="4" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
-                                    </div>
-                                </div>
+<!--                                <div class="form-inline-wrap">-->
+<!--                                    <label class="layui-form-label form-label-wra">提前终止利率%</label>-->
+<!--                                    <div class="layui-input-inline input-inline">-->
+<!--                                        <input type="text" th:id="terminateRate" name="terminateRate" maxLength="30"-->
+<!--                                                th:value="${entity?.terminateRate}" class="layui-input form-input text-number rateCal"-->
+<!--                                               data-textrange="4" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>-->
+<!--                                    </div>-->
+<!--                                </div>-->
 
-                                <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-label-wra">逾期利息金额</label>
-                                    <div class="layui-input-inline input-inline">
-                                        <input type="text" th:id="overdueAmt" name="overdueAmt" maxLength="30"
-                                                th:value="${entity?.overdueAmt}" class="layui-input form-input text-number rateCal"
-                                               data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>
-                                    </div>
-                                </div>
+<!--                                <div class="form-inline-wrap">-->
+<!--                                    <label class="layui-form-label form-label-wra">逾期利息金额</label>-->
+<!--                                    <div class="layui-input-inline input-inline">-->
+<!--                                        <input type="text" th:id="overdueAmt" name="overdueAmt" maxLength="30"-->
+<!--                                                th:value="${entity?.overdueAmt}" class="layui-input form-input text-number rateCal"-->
+<!--                                               data-textrange="2" data-fixtype="2" placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"/>-->
+<!--                                    </div>-->
+<!--                                </div>-->
 
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap" data-th-text="#{TrdDepositValuationTrade002.ccy}">币种</label>

@@ -4,35 +4,40 @@
      */
     var getPageParams = function() {
         //产品代码 多选择
-        var portfolioIdTemp = $('#portfolioId').val();
-        var portfolioId = null;
-        if(portfolioIdTemp != null){
-            portfolioId = portfolioIdTemp.join(",");
-        }
-
-        //交易场所  多选择
-        var tradeMarketTemp = $('#tradeMarket').val();
-        var tradeMarket = null;
-        if(tradeMarketTemp != null){
-            tradeMarket = tradeMarketTemp.join(",");
-        }
-
-        //交易类型  多选择
-        var psTemp = $('#ps').val();
-        var ps = null;
-        if(psTemp != null){
-            ps = psTemp.join(",");
-        }
+        // var portfolioIdTemp = $('#portfolioId').val();
+        // var portfolioId = null;
+        // if(portfolioIdTemp != null){
+        //     portfolioId = portfolioIdTemp.join(",");
+        // }
+        //
+        // //交易场所  多选择
+        // var tradeMarketTemp = $('#tradeMarket').val();
+        // var tradeMarket = null;
+        // if(tradeMarketTemp != null){
+        //     tradeMarket = tradeMarketTemp.join(",");
+        // }
+        //
+        // //交易类型  多选择
+        // var psTemp = $('#ps').val();
+        // var ps = null;
+        // if(psTemp != null){
+        //     ps = psTemp.join(",");
+        // }
 
         return {
             tradeId: $('#tradeId').val(),
-            portfolioId: portfolioId,
+            portfolioId: $.trim($('#portfolioId').val()),
+            finprodMarketId: $.trim($('#finprodMarketId').val()),
             tradeDateBegin: $("#tradeDate").startDate(),
             tradeDateEnd: $("#tradeDate").endDate(),
-            ps: ps,
-            tradeMarket: tradeMarket
+            ps: $.trim($('#ps').val()),
+            repoType: $.trim($('#repoType').val())  //回购类型
         }
     };
+
+
+
+
 
     /**
      * 定义数据表格
@@ -76,7 +81,8 @@
             ,{field:'ps', title: '交易类型',visible:false}
             ,{field:'tradeMarketStr', width:150, title: '交易场所',sortField:'tradeMarket'}
             ,{field:'tradeMarket', title: '交易场所',visible:false}
-            ,{field:'repoType', title: '回购类型',width:100}
+            ,{field:'repoTypeStr', width:130, title: '回购类型',sortField:'repoType'}
+            ,{field:'repoType', title: '回购类型',visible:false}
             ,{field:'counterId', title: '交易对手',width:100}
             ,{field:'term', width:150, title: '回购期限',type:'number',sortField:'term'}
             ,{field:'tradeDateStr', width:150,  title: '交易日',sortField:'tradeDate'}

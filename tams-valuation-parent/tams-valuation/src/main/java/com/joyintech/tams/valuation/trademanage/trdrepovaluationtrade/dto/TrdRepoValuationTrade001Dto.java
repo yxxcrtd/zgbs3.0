@@ -560,4 +560,16 @@ public class TrdRepoValuationTrade001Dto extends BaseEntity implements ProcessEn
     public void setRepoType(String repoType) {
         this.repoType = repoType;
     }
+
+    /**
+     * 取得 回购类型str
+     *
+     * @return 回购类型
+     */
+    public String getRepoTypeStr() {
+        return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.回购类型, repoType))?
+                SysDataUtil.getNameFromDataDict(DictCode.回购类型, repoType):repoType;
+    }
+
+
 }

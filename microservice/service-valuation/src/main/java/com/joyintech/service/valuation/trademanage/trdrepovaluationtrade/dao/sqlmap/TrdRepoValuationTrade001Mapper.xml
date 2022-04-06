@@ -52,9 +52,10 @@
 		NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) portfolioId,/**金融产品代码**/
 		bok.BOOKSET_NAME portfolioName,/**金融产品名称**/
 		hgzc.TERM term,  /**回购期限**/
-		mst.COUNTER_ID counterId,  /**交易对手**/
+		mst.COUNTER_NAME counterId,  /**交易对手**/
 		t.PS ps,/**交易类型**/
 		t.TRADE_MARKET    tradeMarket,/**交易场所**/
+		fpt.TYPE_6 repoType, /**回购类型**/
 		t.TRADE_DATE tradeDate,/**交易日**/
 		t.VDATE vdate,/**起息日**/
 		t.MDATE mdate,/**到期日**/
@@ -68,10 +69,11 @@
 		NVL(ttfd4.FEE_AMT,0)  settFeeAmt,/**结算手续费**/
 		CASE WHEN ttfd.FEE_TYPE = 'B99' THEN ttfd.FEE_AMT ELSE 0 END as otherAmt,/**其他应付费用**/
 		CASE WHEN t.PS in('03','04') THEN hgzc.PRIN+NVL(ttfd.FEE_AMT,0)+NVL(ttfd1.FEE_AMT,0)+NVL(ttfd2.FEE_AMT,0)+NVL(ttfd3.FEE_AMT,0)+NVL(ttfd4.FEE_AMT,0)
-		ELSE hgzc.PRIN+t.INT_AMT+0 END AS settleAmt,/**结算金额**/
+		ELSE hgzc.PRIN+t.INT_AMT END AS settleAmt,/**结算金额**/
 		t.CCY ccy,/**币种**/
 		t.MY_ACCT_NO trdAcctId/**资金账户**/
 		FROM TRD_PRODUCT_DEAL t
+		LEFT JOIN FIN_PRODUCT_TYPE fpt on t.finprod_id=fpt.finprod_id
 		LEFT JOIN FIN_DEAL_PLEDGE fdp on t.finprod_id=fdp.finprod_id
 		LEFT JOIN FIN_PRODUCT zc on zc.FINPROD_ID=fdp.PLEDGE_FINPROD_ID
 		LEFT JOIN FIN_TRADE_PRODUCT hgzc on t.FINPROD_ID=hgzc.FINPROD_ID
@@ -115,6 +117,12 @@
 				#{tradeMarket}
 			</foreach>
 		</if>
+		<if test="repoTypeArr != null and repoTypeArr.length > 0">
+			AND fpt.TYPE_6 IN
+			<foreach collection="repoTypeArr" item="repoType" open="( " close=" )" separator=",">
+				#{repoType}
+			</foreach>
+		</if>
 		order by t.TRADE_ID desc
 	</select>
 
@@ -129,6 +137,7 @@
 		mst.COUNTER_ID counterId,  /**交易对手**/
 		t.PS ps,/**交易类型**/
 		t.TRADE_MARKET    tradeMarket,/**交易场所**/
+		fpt.TYPE_6 repoType, /**回购类型**/
 		t.TRADE_DATE tradeDate,/**交易日**/
 		t.VDATE vdate,/**起息日**/
 		t.SETTLE_DATE     settleDate,/**交割日期**/
@@ -148,6 +157,7 @@
 		t.CCY ccy,/**币种**/
 		t.MY_ACCT_NO trdAcctId/**资金账户**/
 		FROM TRD_PRODUCT_DEAL t
+		LEFT JOIN FIN_PRODUCT_TYPE fpt on t.finprod_id=fpt.finprod_id
 		LEFT JOIN FIN_DEAL_PLEDGE fdp on t.finprod_id=fdp.finprod_id
 		LEFT JOIN FIN_PRODUCT zc on zc.FINPROD_ID=fdp.PLEDGE_FINPROD_ID
 		LEFT JOIN FIN_TRADE_PRODUCT hgzc on t.FINPROD_ID=hgzc.FINPROD_ID
@@ -179,6 +189,7 @@
 		mst.COUNTER_ID counterId,  /**交易对手**/
 		t.PS ps,/**交易类型**/
 		t.TRADE_MARKET    tradeMarket,/**交易场所**/
+		fpt.TYPE_6 repoType, /**回购类型**/
 		t.TRADE_DATE tradeDate,/**交易日**/
 		t.VDATE vdate,/**起息日**/
 		t.SETTLE_DATE     settleDate,/**交割日期**/
@@ -187,13 +198,12 @@
 		hgzc.PRIN prinAmt, /**本金金额**/
 		hgzc.INT_RATE*100 rebackPrice,  /**回购利率**/
 		t.INT_AMT intAmt,  /**应计利息**/
-		null terminateRate, /**提前终止利率**/
-        null overdueAmt,  /**逾期利息金额**/
 		CASE WHEN ttfd.FEE_TYPE = 'B99' THEN ttfd.FEE_AMT ELSE 0 END as otherAmt,/**其他应付费用**/
 		hgzc.PRIN+t.INT_AMT+0  settleAmt,/**结算金额**/
 		t.CCY ccy,/**币种**/
 		t.MY_ACCT_NO trdAcctId/**资金账户**/
 		FROM TRD_PRODUCT_DEAL t
+		LEFT JOIN FIN_PRODUCT_TYPE fpt on t.finprod_id=fpt.finprod_id
 		LEFT JOIN FIN_DEAL_PLEDGE fdp on t.finprod_id=fdp.finprod_id
 		LEFT JOIN FIN_PRODUCT zc on zc.FINPROD_ID=fdp.PLEDGE_FINPROD_ID
 		LEFT JOIN FIN_TRADE_PRODUCT hgzc on t.FINPROD_ID=hgzc.FINPROD_ID

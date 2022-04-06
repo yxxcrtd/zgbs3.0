@@ -133,6 +133,7 @@ public class TrdRepoValuationTrade002Service extends BaseService<TrdRepoValuatio
         entity.setVpayDate(new Date());//首期交付日
         entity.setMpayDate(new Date());//到期交付日
         entity.setCounterId(dto.getCounterId());
+        entity.setTargetBackType(dto.getRepoType());  //回购类型
 
         listValRepDealSecSubject.add(entity);
 
