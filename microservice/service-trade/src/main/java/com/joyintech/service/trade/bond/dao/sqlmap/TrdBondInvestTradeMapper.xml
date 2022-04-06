@@ -1141,7 +1141,8 @@
         B.MDATE_TERM mdateTerm,
         B.PRIN_AMT prinAmt,
         B.INT_AMT intAmt,
-        B.IS_PAY_INT isPayInt
+        B.IS_PAY_INT isPayInt,
+        B.INT_PRIN_AMT intPrinAmt
       FROM FIN_CASH_INFO A
       LEFT JOIN FIN_CASH_PLAN B
         ON A.CASH_ID = B.CASH_ID
