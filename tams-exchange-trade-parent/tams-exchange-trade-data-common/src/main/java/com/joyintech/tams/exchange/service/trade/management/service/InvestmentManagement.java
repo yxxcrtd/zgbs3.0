@@ -12,6 +12,7 @@ import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Lists;
 import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.framework.base.BaseService;
@@ -41,6 +42,8 @@ import com.joyintech.tams.exchange.service.trade.processor.constants.Constants;
 import com.joyintech.tams.exchange.service.trade.processor.msg.MsgReceiverManager;
 import com.joyintech.tams.exchange.service.trade.processor.msg.MsgType;
 import com.joyintech.tams.exchange.service.trade.processor.msg.TradeMsgReceiver;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,38 +111,32 @@ public class InvestmentManagement extends BaseService {
      */
     public List<Instruction> queryInstructions(String instructionId, String portfolioId, String entrustStatus, String traderList, Double AMOUNT, String positionStr) {
         String param = null;
-        if (Objects.nonNull(instructionId))
-            param = "?entrustID=" + instructionId;
-        if (Objects.nonNull(portfolioId))
-            if (Objects.nonNull(param)) {
-                param += "&portfolioId=" + portfolioId;
-            } else {
-                param = "?portfolioId=" + portfolioId;
-            }
-        if (Objects.nonNull(entrustStatus))
-            if (Objects.nonNull(param)) {
-                param += "&entrustStatus=" + entrustStatus;
-            } else {
-                param = "?entrustStatus=" + entrustStatus;
-            }
-        if (Objects.nonNull(traderList))
-            if (Objects.nonNull(param)) {
-                param += "&traderList=" + traderList;
-            } else {
-                param = "?traderList=" + traderList;
-            }
-        if (Objects.nonNull(AMOUNT))
-            if (Objects.nonNull(param)) {
-                param += "&AMOUNT=" + AMOUNT;
-            } else {
-                param = "?AMOUNT=" + AMOUNT;
-            }
-        if (Objects.nonNull(positionStr))
-            if (Objects.nonNull(param)) {
-                param += "&positionStr=" + positionStr;
-            } else {
-                param = "?positionStr=" + positionStr;
-            }
+        if (Objects.nonNull(instructionId)) param = "?entrustID=" + instructionId;
+        if (Objects.nonNull(portfolioId)) if (Objects.nonNull(param)) {
+            param += "&portfolioId=" + portfolioId;
+        } else {
+            param = "?portfolioId=" + portfolioId;
+        }
+        if (Objects.nonNull(entrustStatus)) if (Objects.nonNull(param)) {
+            param += "&entrustStatus=" + entrustStatus;
+        } else {
+            param = "?entrustStatus=" + entrustStatus;
+        }
+        if (Objects.nonNull(traderList)) if (Objects.nonNull(param)) {
+            param += "&traderList=" + traderList;
+        } else {
+            param = "?traderList=" + traderList;
+        }
+        if (Objects.nonNull(AMOUNT)) if (Objects.nonNull(param)) {
+            param += "&AMOUNT=" + AMOUNT;
+        } else {
+            param = "?AMOUNT=" + AMOUNT;
+        }
+        if (Objects.nonNull(positionStr)) if (Objects.nonNull(param)) {
+            param += "&positionStr=" + positionStr;
+        } else {
+            param = "?positionStr=" + positionStr;
+        }
         if (!Strings.isNullOrEmpty(ServiceApplication.INSTRUCTION_SERVICE)) {
             Instruction[] forObject = null;
             if (isSingle) {
@@ -316,9 +313,7 @@ public class InvestmentManagement extends BaseService {
                 });
             }
             //指令根据创建时间倒排序
-            bean.setEtr_entrust_list(instructionUserList.stream()
-                    .sorted((o1, o2) -> DateUtil.compareDate(o2.getCreateTime(), o1.getCreateTime()))
-                    .collect(Collectors.toList()));
+            bean.setEtr_entrust_list(instructionUserList.stream().sorted((o1, o2) -> DateUtil.compareDate(o2.getCreateTime(), o1.getCreateTime())).collect(Collectors.toList()));
             bean.setEtr_pledge_list(pledgeList);
             bean.setEtr_entrust_detail_list(detailList);
         } else {
@@ -330,9 +325,7 @@ public class InvestmentManagement extends BaseService {
 
             List<Instruction> instructions = ListConvertUtils.convertList(bean.getEtr_entrust_list(), Instruction.class);
             //指令根据创建时间倒排序
-            bean.setEtr_entrust_list(instructions.stream()
-                    .sorted((o1, o2) -> DateUtil.compareDate(o2.getCreateTime(), o1.getCreateTime()))
-                    .collect(Collectors.toList()));
+            bean.setEtr_entrust_list(instructions.stream().sorted((o1, o2) -> DateUtil.compareDate(o2.getCreateTime(), o1.getCreateTime())).collect(Collectors.toList()));
             bean.setEtr_pledge_list(ListConvertUtils.convertList(bean.getEtr_pledge_list(), InstructionPledge.class));
             bean.setEtr_entrust_detail_list(ListConvertUtils.convertList(bean.getEtr_entrust_detail_list(), InstructionDetail.class));
         }
@@ -1056,22 +1049,22 @@ public class InvestmentManagement extends BaseService {
         List<String> entrustIds = instructionList.stream().map(Instruction::getEntrustId).collect(Collectors.toList());
         try {
             //保存分发指令数据
-            saveAppointInstruction(instructionList, detailList, pledgeList);
+            List<AppointInstructionRecord> records = saveAppointInstruction(instructionList, detailList, pledgeList);
 
             CheckResult checkResult = appointInstructionCheck.checkAppointInstruction(instructionList, detailList, pledgeList);
             int code = checkResult.getCode();
             if (code == 1) {
-                updateAppointInstruction(entrustIds, entrustIds);
                 return new ResultBean(ErrorCode.APPOINT_INSTRUCTION_PARAMETER_ERROR.value(), checkResult.getMsg());
             } else if (code == 2) {
-                Set<String> keys = checkResult.getData().keySet();
+                Map<String, Object> data = checkResult.getData();
+                Set<String> keys = data.keySet();
                 instructionList = instructionList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
                 detailList = detailList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
                 pledgeList = pledgeList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
 
-                updateAppointInstruction(entrustIds, Lists.newArrayList(keys.iterator()));
+                updateAppointInstruction(records, entrustIds, Lists.newArrayList(keys.iterator()), data);
             } else {
-                updateAppointInstruction(entrustIds, null);
+                updateAppointInstruction(records, entrustIds, null, null);
             }
 
             dealAppointInstruction(instructionList, detailList, pledgeList);
@@ -1086,17 +1079,97 @@ public class InvestmentManagement extends BaseService {
         }
     }
 
-    private void saveAppointInstruction(List<Instruction> instructionList, List<InstructionDetail> detailList,
-                                        List<InstructionPledge> pledgeList) {
+    @Autowired
+    private AppointInstructionRecordService appointInstructionRecordService;
 
+    private List<AppointInstructionRecord> saveAppointInstruction(List<Instruction> instructionList, List<InstructionDetail> detailList,
+                                                                  List<InstructionPledge> pledgeList) {
+        logger.info("保存分发指令数据开始...");
+        if (CollectionUtils.isEmpty(instructionList)) {
+            logger.error("分发指令数据为空");
+            return Collections.emptyList();
+        }
+        Map<String, List<InstructionDetail>> detailMap = Maps.newHashMap();
+        if (Objects.nonNull(detailList)) {
+            detailMap.putAll(detailList.stream().collect(Collectors.groupingBy(InstructionDetail::getEntrustId)));
+        }
+        Map<String, List<InstructionPledge>> pledgeMap = Maps.newHashMap();
+        if (Objects.nonNull(pledgeList)) {
+            pledgeMap.putAll(pledgeList.stream().collect(Collectors.groupingBy(InstructionPledge::getEntrustId)));
+        }
+
+        List<AppointInstructionRecord> records = Lists.newArrayList();
+        instructionList.forEach(instruction -> {
+            String entrustId = instruction.getEntrustId();
+            AppointInstructionRecord record = new AppointInstructionRecord();
+            record.setId(UUID.randomUUID().toString().replaceAll("-", ""));
+            record.setEntrustId(entrustId);
+            String entrustInfo = JsonUtils.getJsonFromObject(instruction);
+            List<String> remark = Lists.newArrayList();
+            if (entrustInfo.length() > 4000) {
+                entrustInfo = entrustInfo.substring(0, 4000);
+                remark.add("指令信息长度超出4000");
+            }
+            record.setEntrustInfo(entrustInfo);
+
+            String detailInfo = JsonUtils.getJsonFromObject(detailMap.get(entrustId));
+            if (detailInfo.length() > 4000) {
+                detailInfo = detailInfo.substring(0, 4000);
+                remark.add("组合信息长度超出4000");
+            }
+            record.setDetailInfo(detailInfo);
+
+            List<InstructionPledge> pledges = pledgeMap.get(entrustId);
+            if (CollectionUtils.isNotEmpty(pledges)) {
+                String pledgeInfo = JsonUtils.getJsonFromObject(pledges);
+                if (pledgeInfo.length() > 4000) {
+                    pledgeInfo = pledgeInfo.substring(0, 4000);
+                    remark.add("质押券信息长度超出4000");
+                }
+                record.setPledgeInfo(pledgeInfo);
+            }
+            record.setStatus(0);
+            record.setCreateTime(new Date());
+            record.setUpdateTime(record.getCreateTime());
+            if (CollectionUtils.isNotEmpty(remark)) {
+                record.setRemark(String.join(";", remark));
+            }
+            records.add(record);
+        });
+        appointInstructionRecordService.saveBatch(records);
+        logger.info("保存分发指令数据结束...");
+        return records;
     }
 
-    private void updateAppointInstruction(List<String> entrustIds, List<String> errorIds) {
+    private void updateAppointInstruction(List<AppointInstructionRecord> records, List<String> entrustIds,
+                                          List<String> errorIds, Map<String, Object> data) {
 
+        if (CollectionUtils.isNotEmpty(errorIds)) {
+            logger.info("指令分发检查[不通过]：{}", errorIds);
+            List<String> list = ListUtils.subtract(entrustIds, errorIds);
+            logger.info("指令分发检查[通过]：{}", list);
+            records.forEach(record -> {
+                record.setUpdateTime(new Date());
+                if (errorIds.contains(record.getEntrustId())) {
+                    record.setStatus(2);
+                    record.setCheckMsg(JsonUtils.getJsonFromObject(data.get(record.getEntrustId())));
+                } else {
+                    record.setCheckMsg("检查通过");
+                    record.setStatus(1);
+                }
+            });
+        } else {
+            logger.info("指令分发检查[通过]：{}", entrustIds);
+            records.forEach(record -> {
+                record.setUpdateTime(new Date());
+                record.setCheckMsg("检查通过");
+                record.setStatus(1);
+            });
+        }
+        appointInstructionRecordService.updateBatch(records);
     }
 
-    private void dealAppointInstruction(List<Instruction> instructionList, List<InstructionDetail> detailList,
-                                        List<InstructionPledge> pledgeList) {
+    private void dealAppointInstruction(List<Instruction> instructionList, List<InstructionDetail> detailList, List<InstructionPledge> pledgeList) {
         Set<String> instructionPledgeIdSet = new HashSet<>();
         Set<String> instructionDetailIdSet = new HashSet<>();
         if (Objects.nonNull(pledgeList))

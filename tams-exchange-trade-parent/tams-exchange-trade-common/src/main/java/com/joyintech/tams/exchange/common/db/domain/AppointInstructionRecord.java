@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.common.db.domain;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 指令分发数据记录
@@ -46,11 +47,11 @@ public class AppointInstructionRecord implements Serializable {
     /**
      * 创建时间
      */
-    private String createTime;
+    private Date createTime;
     /**
      * 修改时间
      */
-    private String updateTime;
+    private Date updateTime;
 
     public String getId() {
         return id;
@@ -116,19 +117,19 @@ public class AppointInstructionRecord implements Serializable {
         this.remark = remark;
     }
 
-    public String getCreateTime() {
+    public Date getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(String createTime) {
+    public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 
-    public String getUpdateTime() {
+    public Date getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(String updateTime) {
+    public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
 }
