@@ -299,7 +299,7 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
     @Size(max = 128)
     private String invAim = "";
 
-    @ApiModelProperty(required = false, name = "invAim", value = "存储指令分发时，同一条指令的对应的多个trader")
+    @ApiModelProperty(required = false, name = "tradersInfo", value = "存储指令分发时，同一条指令的对应的多个trader")
     private String tradersInfo;
 
     @ApiModelProperty(required = false, name = "isAutoReceive", value = "自动接收标志")

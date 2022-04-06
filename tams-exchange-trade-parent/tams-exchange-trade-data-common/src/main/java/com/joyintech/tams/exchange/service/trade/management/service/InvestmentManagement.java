@@ -34,11 +34,14 @@ import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.common.utils.ListConvertUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
+import com.joyintech.tams.exchange.service.trade.check.AppointInstructionCheck;
+import com.joyintech.tams.exchange.service.trade.check.CheckResult;
 import com.joyintech.tams.exchange.service.trade.processor.MessageConsumerService;
 import com.joyintech.tams.exchange.service.trade.processor.constants.Constants;
 import com.joyintech.tams.exchange.service.trade.processor.msg.MsgReceiverManager;
 import com.joyintech.tams.exchange.service.trade.processor.msg.MsgType;
 import com.joyintech.tams.exchange.service.trade.processor.msg.TradeMsgReceiver;
+import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +84,12 @@ public class InvestmentManagement extends BaseService {
     @Autowired
     private InstrumentService instrumentService;
     @Autowired
+    private FuturesInstrumentService futuresInstrumentService;
+    @Autowired
     private OrderService orderService;
+    @Autowired
+    private AppointInstructionCheck appointInstructionCheck;
+
     /**
      * 是否单体服务
      */
@@ -1037,27 +1045,68 @@ public class InvestmentManagement extends BaseService {
     }
 
     public ResultBean appointInstruction(InstructionPage<Instruction, InstructionPledge, InstructionDetail> instructionPage) throws Exception {
+        logger.info("接收指令分发数据信息：{}", JsonUtils.getJsonFromObject(instructionPage));
+
+        //指令信息
+        List<Instruction> instructionList = instructionPage.getEtr_entrust_list();
+        //组合信息
+        List<InstructionDetail> detailList = instructionPage.getEtr_entrust_detail_list();
+        //质押券信息
+        List<InstructionPledge> pledgeList = instructionPage.getEtr_pledge_list();
+        List<String> entrustIds = instructionList.stream().map(Instruction::getEntrustId).collect(Collectors.toList());
         try {
-            logger.info("指令分发数据信息：{}", JsonUtils.getJsonFromObject(instructionPage));
-            List<Instruction> instructionEtrEntrustList = instructionPage.getEtr_entrust_list();
-            List<InstructionPledge> pledgeList = instructionPage.getEtr_pledge_list();
-            List<InstructionDetail> detailList = instructionPage.getEtr_entrust_detail_list();
-            Set<String> instructionPledgeIdSet = new HashSet<>();
-            Set<String> instructionDetailIdSet = new HashSet<>();
-            if (Objects.nonNull(pledgeList))
-                pledgeList.forEach(instructionPledge -> instructionPledgeIdSet.add(instructionPledge.getEntrustId()));
-            if (Objects.nonNull(detailList))
-                detailList.forEach(instructionDetail -> instructionDetailIdSet.add(instructionDetail.getEntrustId()));
-            //对于多组合时，组合代码、组合名称展示多个用逗号隔开
-            messageConsumerService.processInstructionsPortfolio(instructionEtrEntrustList, detailList);
-            messageConsumerService.processInstructions(instructionEtrEntrustList, instructionPledgeIdSet, instructionDetailIdSet);
-            messageConsumerService.processInstructionPledges(pledgeList, instructionPledgeIdSet);
-            messageConsumerService.processInstructionDetail(detailList, instructionDetailIdSet);
-            logger.info("appointInstruction {}", JsonUtils.getJsonFromObject(instructionPage));
+            //保存分发指令数据
+            saveAppointInstruction(instructionList, detailList, pledgeList);
+
+            CheckResult checkResult = appointInstructionCheck.checkAppointInstruction(instructionList, detailList, pledgeList);
+            int code = checkResult.getCode();
+            if (code == 1) {
+                updateAppointInstruction(entrustIds, entrustIds);
+                return new ResultBean(ErrorCode.APPOINT_INSTRUCTION_PARAMETER_ERROR.value(), checkResult.getMsg());
+            } else if (code == 2) {
+                Set<String> keys = checkResult.getData().keySet();
+                instructionList = instructionList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
+                detailList = detailList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
+                pledgeList = pledgeList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
+
+                updateAppointInstruction(entrustIds, Lists.newArrayList(keys.iterator()));
+            } else {
+                updateAppointInstruction(entrustIds, null);
+            }
+
+            dealAppointInstruction(instructionList, detailList, pledgeList);
+
+            logger.info("处理指令分发数据信息: {}", JsonUtils.getJsonFromObject(instructionPage));
+
             return new ResultBean(ErrorCode.SUCCESS);
         } catch (Exception e) {
-            logger.warn("appointInstruction error {}", e.getMessage(), e);
-            throw e;
+            logger.warn("处理指令分发数据失败：{}", e.getMessage(), e);
+//            throw e;
+            return new ResultBean(ErrorCode.APPOINT_INSTRUCTION_ERROR);
         }
+    }
+
+    private void saveAppointInstruction(List<Instruction> instructionList, List<InstructionDetail> detailList,
+                                        List<InstructionPledge> pledgeList) {
+
+    }
+
+    private void updateAppointInstruction(List<String> entrustIds, List<String> errorIds) {
+
+    }
+
+    private void dealAppointInstruction(List<Instruction> instructionList, List<InstructionDetail> detailList,
+                                        List<InstructionPledge> pledgeList) {
+        Set<String> instructionPledgeIdSet = new HashSet<>();
+        Set<String> instructionDetailIdSet = new HashSet<>();
+        if (Objects.nonNull(pledgeList))
+            pledgeList.forEach(instructionPledge -> instructionPledgeIdSet.add(instructionPledge.getEntrustId()));
+        if (Objects.nonNull(detailList))
+            detailList.forEach(instructionDetail -> instructionDetailIdSet.add(instructionDetail.getEntrustId()));
+        //对于多组合时，组合代码、组合名称展示多个用逗号隔开
+        messageConsumerService.processInstructionsPortfolio(instructionList, detailList);
+        messageConsumerService.processInstructions(instructionList, instructionPledgeIdSet, instructionDetailIdSet);
+        messageConsumerService.processInstructionPledges(pledgeList, instructionPledgeIdSet);
+        messageConsumerService.processInstructionDetail(detailList, instructionDetailIdSet);
     }
 }
