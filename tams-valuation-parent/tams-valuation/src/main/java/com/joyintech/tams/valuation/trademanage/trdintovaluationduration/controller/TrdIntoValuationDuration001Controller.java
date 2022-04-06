@@ -167,7 +167,7 @@ public class TrdIntoValuationDuration001Controller extends BaseController {
         // 业务代码（凭证流水号）
         params.setBusinessCode(item -> item.getTradeId());
         // 业务类型
-        params.setBusinessType(DictCodeListExt2.共通业务类型_债券借贷存续期.getValue());
+        params.setBusinessType(DictCodeListExt3.共通业务类型_融入券存续期.getValue());
         // 页面id
         params.setPageId("TrdIntoValuationDuration002");
         // 元素id

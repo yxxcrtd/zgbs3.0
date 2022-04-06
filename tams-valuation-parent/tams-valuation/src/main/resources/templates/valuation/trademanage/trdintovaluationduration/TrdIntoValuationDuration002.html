@@ -159,7 +159,8 @@
                                         <select type="text" id="trdAcctId" name="trdAcctId" class="layui-input form-input input-select" parentIds="portfolioId"
                                                 th:data-url="@{/valuation/trademanage/trdintovaluationduration/TrdIntoValuationDuration002/getTrdAcctId}"
                                                 allowClear="true" placeholder="请输入内容" required="required"
-                                                data-th-placeholder="#{SysCommon.placeholder}">
+                                                data-th-placeholder="#{SysCommon.placeholder}"
+                                                data-th-initvalue="${entity?.trdAcctId}">
                                         </select>
                                     </div>
                                 </div>
