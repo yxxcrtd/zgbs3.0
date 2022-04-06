@@ -134,19 +134,17 @@
             stl.SETTLE_DATE fundSettleDate,/**资金交收日**/
             t.INV_AIM invAim,/**会计分类**/
             t.SHARE_AMT dealNum,/**成交数量**/
-            t.FPRICE_AMT fpriceAmt,/**全价总额**/
+            t.CPRICE_AMT tradeAmt,/**本币交易金额**/
             t.INT_AMT intAmt,/**应收利息总额**/
-            t.CPRICE_AMT cpriceAmt,/**净价总额**/
             t.UNIT_CPRICE cprice,/**净价**/
             ttfd.FEE_AMT  brokerage,/**经手费**/
             ttfd1.FEE_AMT  stlAmt,/**结算费**/
-            ttfd2.FEE_AMT  commission,/**佣金**/
+            NVL(ttfd2.FEE_AMT,0)  commissionPay,/**应付佣金**/
+            NVL(ttfd5.FEE_AMT,0)  commission,/**净佣金**/
             ttfd3.FEE_AMT  dealFeeAmt,/**交易手续费**/
             ttfd4.FEE_AMT  stlFeeAmt,/**结算手续费**/
-            ttfd5.FEE_AMT  otherAmt,/**其他应付费用**/
             tpda.DEPOSIT_AMT bondAmt,/**保证金**/
             t.TRADE_AMT settleAmt,/**结算金额**/
-            t.FPRICE_AMT tradeAmt,/**本币交易金额**/
             nvl(t.MY_ACCT_NO,stl.MY_ACCT_NO) myAcctNo/**资金账户**/
             FROM TRD_PRODUCT_DEAL t
             LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
@@ -155,10 +153,10 @@
             LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE ='02' AND STL.ORDER_TYPE NOT LIKE 'N%'
             LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd ON ttfd.TRADE_ID = t.TRADE_ID AND ttfd.FEE_TYPE = 'B01'
             LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd1 ON ttfd1.TRADE_ID = t.TRADE_ID AND ttfd1.FEE_TYPE = 'B07'
-            LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd2 ON ttfd2.TRADE_ID = t.TRADE_ID AND ttfd2.FEE_TYPE = 'B05'
+            LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd2 ON ttfd2.TRADE_ID = t.TRADE_ID AND ttfd2.FEE_TYPE = 'B05' and ttfd2.IS_PAY_WITH_TRADE='N'
             LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd3 ON ttfd3.TRADE_ID = t.TRADE_ID AND ttfd3.FEE_TYPE = 'B06'
             LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd4 ON ttfd4.TRADE_ID = t.TRADE_ID AND ttfd4.FEE_TYPE = 'B08'
-            LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd5 ON ttfd5.TRADE_ID = t.TRADE_ID AND ttfd5.FEE_TYPE = 'B99'
+            LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd5 ON ttfd5.TRADE_ID = t.TRADE_ID AND ttfd5.FEE_TYPE = 'B05' and ttfd2.IS_PAY_WITH_TRADE='Y'
             LEFT JOIN TRD_PRODUCT_DEAL_ADD tpda on tpda.TRADE_ID = t.TRADE_ID
         where
             t.BUSI_TYPE ='02'

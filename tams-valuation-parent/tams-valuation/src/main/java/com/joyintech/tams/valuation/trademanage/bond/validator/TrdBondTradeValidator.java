@@ -11,6 +11,7 @@
 package com.joyintech.tams.valuation.trademanage.bond.validator;
 
 
+import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.BeanValidator;
@@ -19,6 +20,7 @@ import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTradeDto;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -340,6 +342,28 @@ public class TrdBondTradeValidator implements BeanValidator {
                     if(!StringUtil.isNotEmpty(dto.getMyAcctNo())){
                         resultList.add(new ValidMessage("myAcctNo",
                                 getMessage("VAL_COMMON_E_0002", getMessage("TrdBondTrade.myAcctNo"))));
+                    }
+                }
+                //结算金额校验
+                //买入：结算金额=净价成交金额+应收利息总额+经手费+结算费+净佣金+交易手续费+结算服务费
+                if(DictCodeList.交易方向_买入.getValue().equals(dto.getPs())){
+                    BigDecimal account = ArithmeticUtil.doAdd(dto.getTradeAmt(),dto.getIntAmt(),dto.getBrokerage()
+                            ,dto.getStlAmt(),dto.getCommission(),dto.getDealFeeAmt(),dto.getStlFeeAmt());
+                    if(account.compareTo(dto.getSettleAmt()) != 0){
+                        resultList.add(new ValidMessage("settleAmt",
+                                getMessage("结算金额需满足：结算金额=净价成交金额+应收利息总额+经手费+结算费+净佣金+交易手续费+结算服务费")));
+
+                    }
+                }//卖出：结算金额=净价成交金额+应收利息总额-经手费-结算费-净佣金-交易手续费-结算服务费
+                else if(DictCodeList.交易方向_卖出.getValue().equals(dto.getPs())
+                        || DictCodeList.交易方向_行权_回售.getValue().equals(dto.getPs())
+                        || DictCodeList.交易方向_行权_赎回.getValue().equals(dto.getPs())){
+                    BigDecimal account = ArithmeticUtil.doSub(ArithmeticUtil.doAdd(dto.getTradeAmt(),dto.getIntAmt()),
+                            ArithmeticUtil.doAdd(dto.getBrokerage(),dto.getStlAmt(),dto.getCommission(),dto.getDealFeeAmt(),dto.getStlFeeAmt()));
+                    if(account.compareTo(dto.getSettleAmt()) != 0){
+                        resultList.add(new ValidMessage("settleAmt",
+                                getMessage("结算金额需满足：结算金额=净价成交金额+应收利息总额-经手费-结算费-净佣金-交易手续费-结算服务费")));
+
                     }
                 }
             }
