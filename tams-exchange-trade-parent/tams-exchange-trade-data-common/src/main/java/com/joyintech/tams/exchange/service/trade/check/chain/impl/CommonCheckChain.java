@@ -1,14 +1,16 @@
-package com.joyintech.tams.exchange.service.trade.check.chain;
+package com.joyintech.tams.exchange.service.trade.check.chain.impl;
 
 import com.joyintech.tams.exchange.common.constant.joyin.DictCode;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt2;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
-import com.joyintech.tams.exchange.service.trade.check.AbstractChain;
+import com.joyintech.tams.exchange.service.trade.check.chain.AbstractChain;
+import com.joyintech.tams.exchange.service.trade.check.chain.CheckChainBean;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Objects;
 
@@ -67,6 +69,9 @@ public class CommonCheckChain extends AbstractChain<CheckChainBean> {
         if (StringUtils.isBlank(instruction.getFinprodMarketId())) {
             checkRsp.put("finprodMarketId", "市场代码不能为空");
         }
+        if (StringUtils.isBlank(instruction.getTradeMarket())) {
+            checkRsp.put("tradeMarket", "交易场所不能为空");
+        }
         if (StringUtils.isBlank(instruction.getPs())) {
             checkRsp.put("ps", "交易方向不能为空");
         }
@@ -88,6 +93,21 @@ public class CommonCheckChain extends AbstractChain<CheckChainBean> {
         if (StringUtils.isBlank(instruction.getPriceMode())) {
             checkRsp.put("priceMode", "限价模式不能为空");
         }
+        if (null == DictCodeListExt3.from(DictCode.价格模式, instruction.getPriceMode())) {
+            checkRsp.put("priceMode", "限价模式取值不合法");
+        }
+        if (Objects.isNull(instruction.getValueDate())) {
+            checkRsp.put("valueDate", "起息日不能为空");
+        }
+        if (Objects.isNull(instruction.getValueDate2())) {
+            checkRsp.put("valueDate2", "起息日2不能为空");
+        }
+        if (Objects.isNull(instruction.getMaturityDate())) {
+            checkRsp.put("maturityDate", "到期日不能为空");
+        }
+        if (Objects.isNull(instruction.getMaturityDate2())) {
+            checkRsp.put("maturityDate2", "到期日2不能为空");
+        }
         if (StringUtils.isBlank(instruction.getTradeId())) {
             checkRsp.put("tradeId", "交易员编号不能为空");
         }
@@ -106,15 +126,45 @@ public class CommonCheckChain extends AbstractChain<CheckChainBean> {
         if (StringUtils.isBlank(instruction.getEntrustClass())) {
             checkRsp.put("entrustClass", "委托指令类别不能为空");
         }
+        if (null == DictCodeListExt3.from(DictCode.投资指令类型, instruction.getEntrustClass())) {
+            checkRsp.put("entrustClass", "委托指令类别取值不合法");
+        }
         if (StringUtils.isBlank(instruction.getBusiTypeTg())) {
             checkRsp.put("busiTypeTg", "投管业务类型不能为空");
         }
         if (null == DictCodeListExt3.from(DictCode.投管业务类型, instruction.getBusiTypeTg())) {
             checkRsp.put("busiTypeTg", "投管业务类型取值不合法");
         }
+        if (StringUtils.isBlank(instruction.getTargetType())) {
+            checkRsp.put("targetType", "目标类型不能为空");
+        }
+        if (null == DictCodeListExt3.from(DictCode.目标类型, instruction.getTargetType())) {
+            checkRsp.put("targetType", "目标类型取值不合法");
+        }
         if (CollectionUtils.isEmpty(chainBean.getDetailList())) {
             checkRsp.put("instructionDetail", "指令组合明细不能为空");
         }
+
+        if (DictCodeListExt3.目标类型_数量.getValue().equals(instruction.getTargetType())) {
+            if (instruction.getEntrustNum() == 0) {
+                checkRsp.put("entrustNum", "数量单指令数量不能为0");
+            }
+        } else if (DictCodeListExt3.目标类型_金额.getValue().equals(instruction.getTargetType())) {
+            if (null == instruction.getEntrustAmt() || instruction.getEntrustAmt().compareTo(BigDecimal.ZERO) <= 0) {
+                checkRsp.put("entrustAmt", "金额单指令金额不能为空或0");
+            }
+        }
+
+        if (DictCodeListExt2.价格模式_指定价格.getValue().equals(instruction.getPriceMode())) {
+            if (null == instruction.getEntrustPrice() || instruction.getEntrustPrice().compareTo(BigDecimal.ZERO) <= 0) {
+                checkRsp.put("entrustPrice", "指定价格指令价格不能为空或0");
+            }
+        } else if (DictCodeListExt2.价格模式_限价指令.getValue().equals(instruction.getPriceMode())) {
+            if (null == instruction.getEntrustPrice() || instruction.getEntrustPrice().compareTo(BigDecimal.ZERO) <= 0) {
+                checkRsp.put("entrustPrice", "限价指令价格不能为空或0");
+            }
+        }
+
     }
 
 }

@@ -393,6 +393,8 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
     @ApiModelProperty( name = "tradeSide", value = "交易方向")
     private String tradeSide;
 
+    private String targetType;
+
     @Id
     public String getEntrustId() {
         return entrustId;
@@ -1080,6 +1082,14 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(String targetType) {
+        this.targetType = targetType;
     }
 
     public String getTradeSide() {

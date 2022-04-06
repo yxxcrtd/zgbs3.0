@@ -1,4 +1,4 @@
-package com.joyintech.tams.exchange.service.trade.check;
+package com.joyintech.tams.exchange.service.trade.check.chain;
 
 import java.io.Serializable;
 

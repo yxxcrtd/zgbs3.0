@@ -1,4 +1,4 @@
-package com.joyintech.tams.exchange.service.trade.check;
+package com.joyintech.tams.exchange.service.trade.check.chain;
 
 /**
  * 抽象责任链

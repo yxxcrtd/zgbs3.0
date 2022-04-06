@@ -92,6 +92,8 @@ public class InvestmentManagement extends BaseService {
     private OrderService orderService;
     @Autowired
     private AppointInstructionCheck appointInstructionCheck;
+    @Autowired
+    private AppointInstructionRecordService appointInstructionRecordService;
 
     /**
      * 是否单体服务
@@ -1078,9 +1080,6 @@ public class InvestmentManagement extends BaseService {
             return new ResultBean(ErrorCode.APPOINT_INSTRUCTION_ERROR);
         }
     }
-
-    @Autowired
-    private AppointInstructionRecordService appointInstructionRecordService;
 
     private List<AppointInstructionRecord> saveAppointInstruction(List<Instruction> instructionList, List<InstructionDetail> detailList,
                                                                   List<InstructionPledge> pledgeList) {

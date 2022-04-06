@@ -1,13 +1,12 @@
 package com.joyintech.tams.exchange.service.trade.check;
 
 import com.google.common.collect.Maps;
-import com.joyintech.tams.exchange.common.bean.InstructionPage;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.InstructionDetail;
 import com.joyintech.tams.exchange.common.db.domain.InstructionPledge;
-import com.joyintech.tams.exchange.service.trade.check.chain.BusinessCheckChain;
+import com.joyintech.tams.exchange.service.trade.check.chain.impl.BusinessCheckChain;
 import com.joyintech.tams.exchange.service.trade.check.chain.CheckChainBean;
-import com.joyintech.tams.exchange.service.trade.check.chain.CommonCheckChain;
+import com.joyintech.tams.exchange.service.trade.check.chain.impl.CommonCheckChain;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,10 +57,10 @@ public class AppointInstructionCheck {
         //检查分发指令数据
         Map<String, Object> errorMap = checkAppointInstruction(instructionList, detailMap, pledgeMap);
         if (MapUtils.isNotEmpty(errorMap)) {
-            return new CheckResult(2, "", errorMap);
+            return new CheckResult(2, "指令数据部分检查不通过", errorMap);
         }
 
-        return new CheckResult(0, "指令信息检查通过");
+        return new CheckResult(0, "指令数据检查通过");
     }
 
 

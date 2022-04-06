@@ -3,7 +3,6 @@ package com.joyintech.tams.exchange.service.trade.check.chain;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.InstructionDetail;
 import com.joyintech.tams.exchange.common.db.domain.InstructionPledge;
-import com.joyintech.tams.exchange.service.trade.check.ChainBean;
 
 import java.util.List;
 import java.util.Map;
