@@ -248,7 +248,7 @@ public class DetailBatchLogDto extends BaseEntity {
                         String dis = annon.description();
                         boolean show = annon.show();
                         if (show&&val!=null) {
-                            json.append(dis + ":" + val + ",");
+                            json.append("'"+dis+"'" + ":" +"'"+ val +"'"+ ",");
                         }
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
@@ -267,7 +267,7 @@ public class DetailBatchLogDto extends BaseEntity {
                         String dis = annon.description();
                         boolean show = annon.show();
                         if (show&&val!=null) {
-                            json.append(dis + ":" + val + ",");
+                            json.append("'"+dis+"'" + ":" +"'"+ val +"'"+ ",");
                         }
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();

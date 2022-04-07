@@ -14,6 +14,7 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 
+import com.joyintech.tams.valuation.system.log.dto.ValBatchLogDetailExDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -126,6 +127,14 @@ public class ValBatchLog001Controller extends BaseController {
     public Page<ValBatchLog001Dto> selectBatchLog() {
         return valBatchLog001Service.selectForPage(RequestUtil.getPageParam());
     }
+
+    @ResponseBody
+    @RequestMapping("findDetai")
+    public Page<ValBatchLogDetailExDto> findDetai() {
+        return valBatchLog001Service.findDetai(this.getParam("seqNo"));
+    }
+
+
     
     /**
      * 导出信息excel

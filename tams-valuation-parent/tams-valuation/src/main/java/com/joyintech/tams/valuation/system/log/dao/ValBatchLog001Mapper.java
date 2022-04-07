@@ -67,4 +67,6 @@ public interface ValBatchLog001Mapper {
 
     ValBatchLog001Dto findLogDetail(String logSeqNo);
 
+    ValBatchLog001Dto findLogDetailEx(String logSeqNo);
+
 }
