@@ -31,7 +31,7 @@
         progressBar: true,
         dblclick: function (table, data) {
             var index = Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
-                "SysBatchLog002",	
+                JoyinUtil.getRealPath("/valuation/system/log/ValBatchLog001/ValBatchLog003"),
                 "98%", "95%", {
                     pageModel: PAGE_MODEL_REFERENCE,
                     logSeqNo: data.seqNo

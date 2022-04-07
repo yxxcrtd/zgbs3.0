@@ -29,11 +29,14 @@ import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -273,7 +276,7 @@ public class DetailBatchLogAspect {
             noBookSetId.put(batchTask.getBeanName(),items);
         }
         String key=batchExecuteInfo.getSeqNo();
-        DetailBatchLogDto loggers = taskLogger.get(key);
+        DetailBatchLogDto loggers = null;
         if(loggers==null){
             loggers=new DetailBatchLogDto();
             loggers.setBooksetId(booksetId==null?"":booksetId);
@@ -301,7 +304,7 @@ public class DetailBatchLogAspect {
             result = point.proceed();
         } catch (Exception e) {
             handleThrowing(point,e,loggers);
-            throw new Exception(e.getMessage());
+            throw e;
         }
         stopWatch.stop();
         loggers.setEnd(LocalDateTime.now());
@@ -340,16 +343,7 @@ public class DetailBatchLogAspect {
             String booksetId=lger.getBooksetId();
             String finprodId=lger.getFinprodId();
             String busiId=lger.getBusiId();
-            List<DetailBatchLogExpand> dto=lger.getDetailList();
-            List<CustomDetailBatchLogDto> detailLsit=new  ArrayList<CustomDetailBatchLogDto>();
-            if(CollectionUtils.isNotEmpty(dto)){
-                dto.stream().forEach(s->{
-                    CustomDetailBatchLogDto cus=(CustomDetailBatchLogDto) s;
-                    detailLsit.add(cus);
-                });
-            }
-
-
+            List<CustomDetailBatchLogDto> detailLsit=lger.getDetailList();
             StringBuffer prodIdJson=new StringBuffer();
             prodIdJson.append("{");
             prodIdJson.append("账套代码："+booksetId);
@@ -491,17 +485,21 @@ public class DetailBatchLogAspect {
         loggers.setCreateUser(batchExecuteInfo.getCreateUser());
         loggers.setUpdateUser(batchExecuteInfo.getUpdateUser());
         StringBuffer mes=new StringBuffer();
-        String errorMsg = StringUtils.isEmpty(e.getMessage()) ? "系统异常" : e.getMessage();
-        loggers.setResultInfo(errorMsg);
+        StackTraceElement stackTraceElement= e.getStackTrace()[0];
+        String errormsg=StringUtils.isEmpty(e.getMessage()) ? "系统异常" : e.getMessage();
+        String errorInfo =errormsg+"</br>"+ e.toString()+"\r\n"+stackTraceElement;
+        loggers.setResultInfo(errorInfo);
         //对于主动抛出的详细日志异常，写入详细日志
         if(e instanceof DetailBatchException){
-            String detaiError = StringUtils.isEmpty(e.getMessage()) ? "系统异常" : e.getMessage();
+            StackTraceElement stackTraceDetail= e.getStackTrace()[0];
+            String detaiError=StringUtils.isEmpty(e.getMessage()) ? "系统异常" : e.getMessage();
+            String detaiMsg =detaiError+"</br>"+ e.toString()+"\r\n"+stackTraceDetail;
             CustomDetailBatchLogDto detailLog = new CustomDetailBatchLogDto();
             loggers.setBusiId(((DetailBatchException) e).getBusiId());
             detailLog=(CustomDetailBatchLogDto) ((DetailBatchException) e).getDetailBatchLogExpand();
             if(detailLog!=null) {
-                detailLog.setResult(detaiError);
-                List<DetailBatchLogExpand> detailList = new ArrayList<>();
+                detailLog.setResult(detaiMsg);
+                List<CustomDetailBatchLogDto> detailList = new ArrayList<>();
                 detailList.add(detailLog);
                 loggers.setDetailList(detailList);
             }
@@ -546,8 +544,13 @@ public class DetailBatchLogAspect {
         TransactionStatus status = getTransactionStatus();
         //参数字段入库很慢，暂不入库
         loggers.setArgsClob(null);
-        int a=detailBatchLogMapper.insertBatchDetailLog(loggers);
-        transactionManager.commit(status);
+        try {
+            int a=detailBatchLogMapper.insertBatchDetailLog(loggers);
+            transactionManager.commit(status);
+        } catch (Exception ex) {
+            transactionManager.rollback(status);
+            throw new DetailBatchException(loggers.getExeSeqno(),"写入详情日志表异常："+ex.getMessage());
+        }
         logger.error("--写入详情日志表开结束");
 
     }
@@ -569,7 +572,7 @@ public class DetailBatchLogAspect {
     /* @Author 殷亚
      * @Description TODO 组装日志明细的json，中文描述反射调用注解生成
      * @Date  2022/3/30 15:19
-     * @Version 1.0        
+     * @Version 1.0
      * @Param [dto]
      * @Return java.lang.String
      **/
