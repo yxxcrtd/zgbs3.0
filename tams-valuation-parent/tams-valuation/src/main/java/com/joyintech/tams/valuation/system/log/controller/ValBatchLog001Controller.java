@@ -94,12 +94,12 @@ public class ValBatchLog001Controller extends BaseController {
      * @return List<SelectOptionDto>
      * @throws Exception
      */
-    @LogMethod(action="init",pageId="SysBatchLog002")
-    @RequestMapping(value = "SysBatchLog002", method = RequestMethod.GET)
-    public String sysBatchLog002(String logSeqNo, Model model){
+    @LogMethod(action="init",pageId="ValBatchLog003")
+    @RequestMapping(value = "ValBatchLog003", method = RequestMethod.GET)
+    public String valBatchLog003(String logSeqNo, Model model){
         ValBatchLog001Dto log = valBatchLog001Service.findLogDetail(logSeqNo);
         model.addAttribute("log", log);
-        return "system/log/SysBatchLog002";
+        return "/valuation/system/log/ValBatchLog003";
     }
     
 

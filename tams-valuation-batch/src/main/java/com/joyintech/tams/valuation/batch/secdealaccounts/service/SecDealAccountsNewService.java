@@ -340,11 +340,11 @@ public class SecDealAccountsNewService {
                 //            }
                 else if (DictCodeList.交易方向_行权_回售.getValue().equals(dealNow.getPs())) {
                     quaryFvtplRight(rstBaseinfo, returnResult, dealNow, acctEntity, param, paramT1,
-                        varSecDealFeeSubject, DictCodeListTableId.会计场景代码_公允价值损益类债券_行权回售.getValue());
+                        varSecDealFeeSubject, DictCodeListTableId.会计场景代码_公允价值损益类债券_回售确认.getValue());
                 }
                 else if (DictCodeList.交易方向_行权_赎回.getValue().equals(dealNow.getPs())) {
                     quaryFvtplRight(rstBaseinfo, returnResult, dealNow, acctEntity, param, paramT1,
-                        varSecDealFeeSubject, DictCodeListTableId.会计场景代码_公允价值损益类债券_行权赎回.getValue());
+                        varSecDealFeeSubject, DictCodeListTableId.会计场景代码_公允价值损益类债券_赎回确认.getValue());
                 }
                 //交易方向_应收款项转入 add by yanya on 20191226
                 else if (DictCodeList.交易方向_应收款项转入.getValue().equals(dealNow.getPs())) {
@@ -8568,11 +8568,11 @@ public class SecDealAccountsNewService {
         //            				&& DictCodeList.交易方向_买入.getValue().equals(dealNow.getPs()))) {
         //                quaryAcApply(rstBaseinfo, returnResult, dealNow, acctEntity, param, paramT1);
         //            }
-        else if (DictCodeListExt4.交易方向_行权_回售确认.getValue().equals(dealNow.getPs())) {
+        else if (DictCodeList.交易方向_行权_回售.getValue().equals(dealNow.getPs())) {
             quaryFvtplRightCashManage(rstBaseinfo, returnResult, dealNow, acctEntity, param, paramT1,
                 DictCodeListTableId.会计场景代码_公允价值损益类债券_回售确认.getValue());
         }
-        else if (DictCodeListExt4.交易方向_行权_赎回确认.getValue().equals(dealNow.getPs())) {
+        else if (DictCodeList.交易方向_行权_赎回.getValue().equals(dealNow.getPs())) {
             quaryFvtplRightCashManage(rstBaseinfo, returnResult, dealNow, acctEntity, param, paramT1,
                 DictCodeListTableId.会计场景代码_公允价值损益类债券_赎回确认.getValue());
         }
