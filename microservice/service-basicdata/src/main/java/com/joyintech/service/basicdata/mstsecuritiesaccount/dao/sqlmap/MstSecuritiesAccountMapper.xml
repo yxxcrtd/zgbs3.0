@@ -603,13 +603,17 @@
             on t.finprod_id = v.finprod_id
             left join fin_product_add va
             on va.finprod_id = v.finprod_id
+            left join fin_product_type r
+            on v.FINPROD_ID = r.FINPROD_ID
             and ((
             <if test="tradePlat != null and tradePlat != ''">
                 va.TRADE_PLAT like concat('%',concat(#{tradePlat},'%')) and
             </if>
-                v.finprod_type2 = 'F01') or v.finprod_type2 != 'F01')
+                v.finprod_type2 = 'F01' and r.type_6='B14') or v.finprod_type2 != 'F01')
             where t.branch = 0
-            and t.oth_type in (#{FINPROD_OTH_CODE_TYPE_05}, #{FINPROD_OTH_CODE_TYPE_06}, #{FINPROD_OTH_CODE_TYPE_07})
+            <if test="tradePlat == null and tradePlat == '' ">
+                and  v.finprod_type2='F01' or v.finprod_type2='F01' and t.oth_type=#{FINPROD_OTH_CODE_TYPE_05}
+            </if>
             <if test="tradePlat != null and tradePlat != '' and tradePlat==SHARES_TRADE_PLATFORM_02">
                 and  t.oth_type in (#{FINPROD_OTH_CODE_TYPE_06}, #{FINPROD_OTH_CODE_TYPE_07})
             </if>
@@ -638,19 +642,15 @@
         <if test="acctTradeMarket != null and acctTradeMarket != ''">
             and a.trade_market = #{acctTradeMarket}
         </if>
-        <if test="tradePlat != null and tradePlat != '' and tradePlat_05 == null">
-            and (((b.TRADE_PLAT like concat('%',concat(#{tradePlat},'%')) or b.TRADE_PLAT is null) and a.finprod_type2 = 'F01') or a.finprod_type2 != 'F01')
-        </if>
-        <if test="tradePlat != null and tradePlat != '' and tradePlat_05 != null and tradePlat_05 != ''">
-            and(((b.TRADE_PLAT like concat('%',concat(#{tradePlat},'%')) or b.TRADE_PLAT like concat('%', concat('05', '%')) or b.TRADE_PLAT is null)
-            and a.finprod_type2 = 'F01') or a.finprod_type2 != 'F01')
-        </if>
         <choose>
             <when test="tradePlat != null and tradePlat != '' and tradePlat == '04'.toString()">
-                and a.finprod_type2 in (#{FINPROD_TYPE_TG_F01}, #{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}) <!-- 债券 、股票 、基金 -->
+                and (a.finprod_type2='F01' and r.type_6='B14') or (a.finprod_type2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10})) <!-- 债券 、股票 、基金 -->
             </when>
             <when test="tradePlat != null and tradePlat != '' and tradePlat == '02'.toString()">
-                and a.finprod_type2 in (#{FINPROD_TYPE_TG_F01}, #{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}) <!-- 债券 、股票 、基金 -->
+                and (a.finprod_type2='F01' and r.type_6='B14') or (a.finprod_type2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10})) <!-- 债券 、股票 、基金 -->
+            </when>
+            <when test="tradePlat != null and tradePlat != '' and tradePlat == '03'.toString()">
+                and a.finprod_type2='F01' and r.type_6='B14'
             </when>
             <otherwise>
                 and a.finprod_type2 in (#{FINPROD_TYPE_TG_F01})<!--  债券 -->
