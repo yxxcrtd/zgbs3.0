@@ -205,3 +205,9 @@ comment on column BOK_FINPROD_SCHEME_INFO.update_time
 --增加主键
 alter table BOK_FINPROD_SCHEME_INFO add constraint PK_BOK_FINPROD_SCHEME_INFO primary key (BOOKSET_ID,FINPROD_ID);
 ------------------------add by weipeng on 20220323 现金管理类改造，增加资产估值方案信息表 end---------------------------
+
+--------------------add by sunshuaishuai 20220407 交易表中添加资金账户字段 start-------------------------------------
+/*交易表添加资金账户字段*/
+ALTER TABLE TRD_PRODUCT_DEAL ADD MY_ACCT_NO VARCHAR2(50);
+COMMENT ON COLUMN TRD_PRODUCT_DEAL.MY_ACCT_NO IS '资金账户';
+--------------------add by sunshuaishuai 20220407 交易表中添加资金账户字段 end---------------------------------------
