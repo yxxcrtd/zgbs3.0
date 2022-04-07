@@ -36,6 +36,7 @@ import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.Boo
 import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookCommonLogic;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.AccountDriver;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGenerateResult;
+import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.SubjectMappingConfig;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.TreeNode;
 import com.joyintech.tams.valuation.batch.common.base.entity.extcommon.ValBokBookdetailBatch;
 import com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dto.FinProductDealInfoComDTO;
@@ -44,8 +45,10 @@ import com.joyintech.tams.valuation.batch.common.finproduct.service.FinProductCo
 import com.joyintech.tams.valuation.batch.outrightrepoprecalacctreat.dao.OutrightProRepoDealAccTreatMapper;
 import com.joyintech.tams.valuation.batch.outrightrepoprecalacctreat.dto.FinDealPledgeOutRightPro;
 import com.joyintech.tams.valuation.common.batch.finproduct.entity.*;
+import com.joyintech.tams.valuation.common.constants.BookConstant;
+import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrueNew;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
-import com.joyintech.tams.valuation.common.constants.*;
+import com.joyintech.tams.valuation.common.constants.ValDictCodeList;
 import com.joyintech.tams.valuation.common.service.BookAccountCommonService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -469,7 +472,16 @@ public class OutrightProRepoDealAccTreatNewService {
                 /*** modify by weipeng on 20220317 传入辅助核算项 start **/
                 ad.setSubjectMappingConfigDefault(dealNow.getSubjectMappingConfig());
                 /*** modify by weipeng on 20220317 传入辅助核算项 end **/
-
+                // add by weipeng on 20220407：买断式逆回购还本派息时，应收利息_证券科目记应收利息-融入券科目，不随回购本身记应收利息科目
+                if(DictCodeListExt1.金融产品类型_债券买断式逆回购.getValue().equals(finprodType)){
+                    Map<String, SubjectMappingConfig> subjectMappingConfigMap = new HashMap<>();
+                    // 增加应收利息-证券的辅助核算项，对应融入券的应收利息科目
+                    SubjectMappingConfig mappingConfig = new SubjectMappingConfig();
+                    mappingConfig.setSecType(DictCodeListExt1.证券品种_债券.getValue());
+                    mappingConfig.setInvAim(DictCodeListExt1.投资目的_卖空.getValue());
+                    subjectMappingConfigMap.put(DictCodeBaseSubjectNatrueNew.应收利息_证券.getValue(), mappingConfig);
+                    ad.setSubjectMappingConfigMap(subjectMappingConfigMap);
+                }
                 // 记账凭证生成
                 BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, batchExecuteInfo);
                 // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中
