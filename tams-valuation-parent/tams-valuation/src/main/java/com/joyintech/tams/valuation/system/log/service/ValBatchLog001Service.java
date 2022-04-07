@@ -11,8 +11,13 @@
 package com.joyintech.tams.valuation.system.log.service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.joyintech.tams.valuation.system.log.dto.ValBatchLogDetailExDto;
 import org.apache.poi.ss.usermodel.Cell;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -183,5 +188,30 @@ public class ValBatchLog001Service extends CommonExportService<ValBatchLog001Dto
     		cell.setCellValue((Long)value / 1000);
     	}
     }
-    
+
+	public Page<ValBatchLogDetailExDto> findDetai( String seqNo) {
+		List<ValBatchLogDetailExDto> newList = new ArrayList<ValBatchLogDetailExDto>();
+		Page<ValBatchLogDetailExDto> pageList=new Page<ValBatchLogDetailExDto>();
+		ValBatchLog001Dto dto = valBatchLog001Mapper.findLogDetail(seqNo);
+		if (dto != null) {
+			String detailEx = dto.getDetailEx();
+			//String detailEx = "[{'业务代码':'ABDGDG','业务类型':'债券','业务明细代码':'21212121','交易代码':'123','账务场景代码':'1401'}]";
+			JSONArray array = JSONArray.parseArray(detailEx);
+			for (Object mapList : array) {
+				for (Object entry : ((Map) mapList).entrySet()) {
+					ValBatchLogDetailExDto detail = new ValBatchLogDetailExDto();
+					detail.setRemark((String) ((Map.Entry) entry).getKey());
+					detail.setValue((String) ((Map.Entry) entry).getValue());
+					newList.add(detail);
+				}
+			}
+		}
+		pageList.setCode(0);
+		pageList.setRoot(newList);
+		pageList.setRecords(newList.size());
+		return pageList;
+	}
+
+
+
 }
