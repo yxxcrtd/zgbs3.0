@@ -24,7 +24,7 @@ import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalanc
 import com.joyintech.tams.valuation.batch.common.accounting.service.AccountingCommonService;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookAccountGenLogic;
 import com.joyintech.tams.valuation.batch.common.base.entity.extcommon.ValBokBookdetailBatch;
-import com.joyintech.tams.valuation.batch.profitandlossaccounting.dao.ProfitAndLossAccountingMapper;
+import com.joyintech.tams.valuation.batch.profitandlossaccounting.dao.ProfitAndLossAccountingNewMapper;
 import com.joyintech.tams.valuation.batch.profitandlossaccounting.dto.ProfitAndLossAccountingNeedOperateEntity;
 import com.joyintech.tams.valuation.batch.profitandlossaccounting.dto.ProfitAndLossAccountingResult;
 import com.joyintech.tams.valuation.batch.profitandlossaccounting.dto.ProfitAndLossAccountingSubject;
@@ -59,7 +59,7 @@ import java.util.stream.Collectors;
 public class ProfitAndLossAccountingStep2ProcessorNewService {
 
 	@Autowired
-	private ProfitAndLossAccountingMapper mapper;
+	private ProfitAndLossAccountingNewMapper mapper;
 
 	@Autowired
 	private AccountingCommonService accountingCommonService;

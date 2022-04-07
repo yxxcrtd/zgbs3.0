@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.valuation.batch.profitandlossaccounting.dao.ProfitAndLossAccountingNewMapper">
+	<select id="selectTodoBooksetIdList" resultType="com.joyintech.tams.valuation.batch.profitandlossaccounting.dto.ProfitAndLossAccountingNeedOperateEntity">
+		SELECT
+            a.bookset_id booksetId,
+	       a.happen_date       happenDate,
+	       a.book_date         bookDate,
+	       a.bookset_date      booksetDate,
+	       a.task_id           taskId,
+	       b.standard_ccy      standardCcy,
+	       b.end_date          bksenddate,
+	       c2.mdate            prdmdate,
+	       d.param_value       carryoverCycle,
+	       b.acct_subject_id   busiId,
+	       b.acct_subject_type busiDetailType,
+	       det.bok_detail_id   bokDetailId,
+	       b.bok_spec_mode
+        FROM
+            (
+                SELECT
+                    bookset_id,
+                    happen_date,
+                    book_date,
+                    bookset_date,
+                    task_id
+                FROM
+                    BOK_BATCH_TASK_TODO
+                WHERE
+                    SEQ_NO = #{seqNo}
+					AND BOOKSET_DATE = #{BOOKSET_DATE}
+		            AND BOOK_DATE = #{BOOK_DATE}
+		            AND HAPPEN_DATE = #{HAPPEN_DATE}
+                    AND TASK_ID = #{taskId}    
+                    AND IS_SUB_BOOKSET = #{IS_SUB_BOOKSET} 
+                GROUP BY
+                    bookset_id,
+                    happen_date,
+                    book_date,
+                    bookset_date,
+                    task_id
+            ) a
+            LEFT JOIN BOK_BOOKSET b
+            ON a.bookset_id = b.bookset_id
+<!--             LEFT JOIN FIN_PRODUCT c
+            ON b.acct_subject_id = c.finprod_id -->
+            LEFT JOIN BOK_ACCT_LAYERING_INFO c2
+            ON b.acct_subject_id = c2.busi_id AND c2.bookset_id = b.bookset_id
+            	AND b.ACCT_SUBJECT_TYPE = c2.BUSI_DETAIL_TYPE
+            LEFT JOIN BOK_BOOKSET_ext d
+            ON b.bookset_id = d.bookset_id
+               AND d.param_code = #{carryoverCycle}
+           left join bok_detail_id det
+		    on b.bookset_id = det.bookset_id
+		   and b.acct_subject_id = det.busi_id
+		   and b.acct_subject_type = det.busi_detail_type
+           WHERE 1=1
+<!--            <if test="bokSpecMode != null and bokSpecMode != ''"> -->
+<!--                AND B.BOK_SPEC_MODE = #{bokSpecMode} -->
+<!--            </if> -->
+           <if test="bokSpecModeList != null">
+            AND B.BOK_SPEC_MODE IN
+            <foreach item="item" index="index" collection="bokSpecModeList" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+	</select>
+	<select id="selectPalSubject" resultType="com.joyintech.tams.valuation.batch.profitandlossaccounting.dto.ProfitAndLossAccountingSubject">
+	SELECT																						
+		bs.SUBJECT_NO subjectNo,
+		bs.SUBJECT_INTERNAL_CODE baseSubjectNature,
+        bs.BAL_FLAG balFlag,
+        bs.SUBJECT_TYPE subjectType
+	FROM
+		BOK_SUBJECT bs,BOK_BOOKSET bb
+	WHERE
+		bb.BOOKSET_ID = #{booksetId}
+		AND bb.BOOKSET_ID_TMPL = bs.BOOKSET_ID
+        <if test="subjectTypeList != null">
+            AND bs.SUBJECT_TYPE IN
+            <foreach item="item" index="index" collection="subjectTypeList" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="baseSubjectNatureList != null">
+            AND bs.SUBJECT_INTERNAL_CODE IN
+            <foreach item="item" index="index" collection="baseSubjectNatureList" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+	</select>
+</mapper>
