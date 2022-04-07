@@ -62,7 +62,7 @@ public interface TrdIntoValuationDuration001Mapper {
 	/**
 	 * 根据交易编号查询数据
 	 */
-	TrdIntoValuationDuration001Dto queryTradeInfoByTradeId(String tradeId);
+	TrdIntoValuationDuration001Dto queryTradeInfoByTradeId(Map<String, Object> paraMap);
 
 
 }

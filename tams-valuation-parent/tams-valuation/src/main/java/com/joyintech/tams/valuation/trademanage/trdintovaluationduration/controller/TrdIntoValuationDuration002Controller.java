@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -81,7 +82,10 @@ public class TrdIntoValuationDuration002Controller extends BaseController {
             model.addAttribute("workflowId", workflowId);
             model.addAttribute("tradeId", entity.getTradeId());
         }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){
-            TrdIntoValuationDuration001Dto entity = trdIntoValuationDuration002Service.queryTradeInfoByTradeId(tradeId);
+            Map<String, Object> map = new HashMap<>();
+            map.put("tradeId",tradeId);
+            map.put("busiType",DictCodeList.业务类型_债券借贷标的债券交易.getValue());
+            TrdIntoValuationDuration001Dto entity = trdIntoValuationDuration002Service.queryTradeInfoByTradeId(map);
             model.addAttribute("entity", entity);
         }else{
             //初始化值

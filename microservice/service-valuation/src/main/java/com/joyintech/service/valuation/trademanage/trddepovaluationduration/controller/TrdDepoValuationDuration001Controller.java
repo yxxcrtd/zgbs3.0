@@ -123,8 +123,8 @@ public class TrdDepoValuationDuration001Controller extends BaseController {
 
      */
     @PostMapping("queryTradeInfoByTradeId")
-    public TrdDepoValuationDuration001Dto queryTradeInfoByTradeId(@RequestBody String  tradeId) {
-        return trdDepoValuationDuration001Service.queryTradeInfoByTradeId(tradeId);
+    public TrdDepoValuationDuration001Dto queryTradeInfoByTradeId(@RequestBody Map<String, Object> param) {
+        return trdDepoValuationDuration001Service.queryTradeInfoByTradeId(param);
     }
 
     /**
