@@ -10,6 +10,7 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 import com.joyintech.tams.valuation.common.interf.base.dto.RepurchaseDealInfoValCommonResult;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.repdeal.RepurchaseDealTemplateRecService;
@@ -69,10 +70,10 @@ public class TrdOutRightRepoValuationTrade003Service extends BaseService<TrdOutR
     /**
      * 根据交易编号查询详情  到期确认
      */
-    public TrdOutRightRepoValuationTrade003Dto queryTradeInfoByTradeId01(String tradeId) {
+    public TrdOutRightRepoValuationTrade003Dto queryTradeInfoByTradeId01(Map<String, Object> params) {
         return restTemplate.postForObject(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdOutRightRepoValuationTrade002/queryTradeInfoByTradeId01",
-                tradeId, TrdOutRightRepoValuationTrade003Dto.class);
+                params, TrdOutRightRepoValuationTrade003Dto.class);
     }
 
     /**
@@ -109,8 +110,16 @@ public class TrdOutRightRepoValuationTrade003Service extends BaseService<TrdOutR
     //封装实体类
     public TrdOutRightRepoValuationTradeResult generateEntity(TrdOutRightRepoValuationTrade003Dto dto3){
 
-
-        TrdOutRightRepoValuationTrade001Dto dto = trdOutRightRepoValuationTrade002Service.queryTradeInfoByTradeId(dto3.getTradeId());
+        Map<String, Object> map1 = new HashMap<>();
+        map1.put("tradeId",dto3.getTradeId());
+        map1.put("feeType_B99", DictCodeListExt1.一次性费用类型_其他费用.getValue());
+        map1.put("feeType_B01",DictCodeListExt1.一次性费用类型_经手费.getValue());
+        map1.put("feeType_B07",DictCodeListExt1.一次性费用类型_结算费.getValue());
+        map1.put("feeType_B05",DictCodeListExt1.一次性费用类型_佣金.getValue());
+        map1.put("feeType_B06",DictCodeListExt1.一次性费用类型_交易手续费.getValue());
+        map1.put("feeType_B08",DictCodeListExt1.一次性费用类型_结算手续费.getValue());
+        map1.put("busiType",DictCodeList.业务类型_债券买断式回购交易.getValue());
+        TrdOutRightRepoValuationTrade001Dto dto = trdOutRightRepoValuationTrade002Service.queryTradeInfoByTradeId(map1);
 
         //设置接口参数
         Map<String,Object> params = new HashMap<>();

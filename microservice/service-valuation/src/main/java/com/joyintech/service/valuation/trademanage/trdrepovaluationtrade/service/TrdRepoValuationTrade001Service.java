@@ -25,6 +25,8 @@ import com.joyintech.service.valuation.trademanage.trdrepovaluationtrade.dto.Trd
 import com.joyintech.service.valuation.trademanage.trdrepovaluationtrade.dto.TrdRepoValuationTrade001Result;
 import com.joyintech.service.valuation.trademanage.trdrepovaluationtrade.dto.TrdRepoValuationTradeResult;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.valuation.common.interf.base.batch.dao.*;
@@ -242,6 +244,19 @@ public class TrdRepoValuationTrade001Service extends CommonExportService<TrdRepo
         }
         pageParam.put("tradeMarketArr", tradeMarketArr);
 
+        //传递默认值
+        pageParam.put("PS_03", DictCodeListExt3.交易方向_正回购.getValue());
+        pageParam.put("PS_04",DictCodeListExt3.交易方向_逆回购.getValue());
+        pageParam.put("busiType", DictCodeList.业务类型_债券质押式回购交易.getValue());
+        pageParam.put("feeType_B99", DictCodeListExt1.一次性费用类型_其他费用.getValue());
+        pageParam.put("feeType_B01",DictCodeListExt1.一次性费用类型_经手费.getValue());
+        pageParam.put("feeType_B07",DictCodeListExt1.一次性费用类型_结算费.getValue());
+        pageParam.put("feeType_B05",DictCodeListExt1.一次性费用类型_佣金.getValue());
+        pageParam.put("feeType_B06",DictCodeListExt1.一次性费用类型_交易手续费.getValue());
+        pageParam.put("feeType_B08",DictCodeListExt1.一次性费用类型_结算手续费.getValue());
+
+
+
         return this.queryForPage(page, length,
                 () -> trdRepoValuationTrade001Mapper.selectDeal(pageParam));
     }
@@ -280,6 +295,15 @@ public class TrdRepoValuationTrade001Service extends CommonExportService<TrdRepo
         }
         params.put("tradeMarketArr", tradeMarketArr);
 
+        params.put("PS_03", DictCodeListExt3.交易方向_正回购.getValue());
+        params.put("PS_04",DictCodeListExt3.交易方向_逆回购.getValue());
+        params.put("busiType", DictCodeList.业务类型_债券质押式回购交易.getValue());
+        params.put("feeType_B99", DictCodeListExt1.一次性费用类型_其他费用.getValue());
+        params.put("feeType_B01",DictCodeListExt1.一次性费用类型_经手费.getValue());
+        params.put("feeType_B07",DictCodeListExt1.一次性费用类型_结算费.getValue());
+        params.put("feeType_B05",DictCodeListExt1.一次性费用类型_佣金.getValue());
+        params.put("feeType_B06",DictCodeListExt1.一次性费用类型_交易手续费.getValue());
+        params.put("feeType_B08",DictCodeListExt1.一次性费用类型_结算手续费.getValue());
         return trdRepoValuationTrade001Mapper.selectDeal(params);
     }
 
@@ -323,8 +347,8 @@ public class TrdRepoValuationTrade001Service extends CommonExportService<TrdRepo
 
 
     //根据交易编号查询
-    public TrdRepoValuationTrade001Dto queryTradeInfoByTradeId(String tradeId) {
-        return trdRepoValuationTrade001Mapper.queryTradeInfoByTradeId(tradeId);
+    public TrdRepoValuationTrade001Dto queryTradeInfoByTradeId(Map<String, Object> param) {
+        return trdRepoValuationTrade001Mapper.queryTradeInfoByTradeId(param);
     }
 
     //删除

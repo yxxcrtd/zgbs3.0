@@ -23,6 +23,7 @@ import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
+import com.joyintech.tams.valuation.trademanage.trdbuyoutrepovaluation.dto.TrdOutRightRepoValuationTrade001Dto;
 import com.joyintech.tams.valuation.trademanage.trdrepovaluationtrade.dto.TrdRepoValuationTrade001Dto;
 import com.joyintech.tams.valuation.trademanage.trdrepovaluationtrade.service.TrdRepoValuationTrade002Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -38,6 +39,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -87,7 +89,16 @@ public class TrdRepoValuationTrade002Controller extends BaseController {
             model.addAttribute("workflowId", workflowId);
             model.addAttribute("tradeId", entity.getTradeId());
         }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){
-            TrdRepoValuationTrade001Dto entity = trdRepoValuationTrade002Service.queryTradeInfoByTradeId(tradeId);
+            Map<String, Object> map = new HashMap<>();
+            map.put("tradeId",tradeId);
+            map.put("feeType_B99",DictCodeListExt1.一次性费用类型_其他费用.getValue());
+            map.put("feeType_B01",DictCodeListExt1.一次性费用类型_经手费.getValue());
+            map.put("feeType_B07",DictCodeListExt1.一次性费用类型_结算费.getValue());
+            map.put("feeType_B05",DictCodeListExt1.一次性费用类型_佣金.getValue());
+            map.put("feeType_B06",DictCodeListExt1.一次性费用类型_交易手续费.getValue());
+            map.put("feeType_B08",DictCodeListExt1.一次性费用类型_结算手续费.getValue());
+            map.put("busiType",DictCodeList.业务类型_债券质押式回购交易.getValue());
+            TrdRepoValuationTrade001Dto entity = trdRepoValuationTrade002Service.queryTradeInfoByTradeId(map);
             model.addAttribute("entity", entity);
         }else{
             //初始化值

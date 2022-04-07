@@ -103,8 +103,8 @@ public class TrdRepoValuationTrade002Service extends CommonExportService<TrdRepo
 
 
     //根据交易编号查询
-    public TrdRepoValuationTrade003Dto queryTradeInfoByTradeId01(String tradeId) {
-        return trdRepoValuationTrade001Mapper.queryTradeInfoByTradeId01(tradeId);
+    public TrdRepoValuationTrade003Dto queryTradeInfoByTradeId01(Map<String, Object> params) {
+        return trdRepoValuationTrade001Mapper.queryTradeInfoByTradeId01(params);
     }
 
 

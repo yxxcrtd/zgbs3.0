@@ -46,10 +46,10 @@ public class TrdRepoValuationTrade002Service extends BaseService<TrdRepoValuatio
     /**
      * 根据交易编号查询详情
      */
-    public TrdRepoValuationTrade001Dto queryTradeInfoByTradeId(String tradeId) {
+    public TrdRepoValuationTrade001Dto queryTradeInfoByTradeId(Map<String, Object> params) {
         return restTemplate.postForObject(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdRepoValuationTrade001/queryTradeInfoByTradeId",
-                tradeId, TrdRepoValuationTrade001Dto.class);
+                params, TrdRepoValuationTrade001Dto.class);
     }
 
     /**

@@ -66,11 +66,11 @@ public interface TrdRepoValuationTrade001Mapper {
 
 
 	//根据交易编号查询数据  修改
-	TrdRepoValuationTrade001Dto queryTradeInfoByTradeId(String tradeId);
+	TrdRepoValuationTrade001Dto queryTradeInfoByTradeId(Map<String, Object> paraMap);
 
 
 	//根据交易编号查询数据  存续期交易
-	TrdRepoValuationTrade003Dto queryTradeInfoByTradeId01(String tradeId);
+	TrdRepoValuationTrade003Dto queryTradeInfoByTradeId01(Map<String, Object> paraMap);
 
 
 }

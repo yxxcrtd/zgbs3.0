@@ -73,8 +73,8 @@ public class TrdRepoValuationTrade002Controller extends BaseController {
      * @since 1.0
      */
     @PostMapping("queryTradeInfoByTradeId01")
-    public TrdRepoValuationTrade003Dto queryTradeInfoByTradeId01(@RequestBody String  tradeId) {
-        return trdRepoValuationTrade002Service.queryTradeInfoByTradeId01(tradeId);
+    public TrdRepoValuationTrade003Dto queryTradeInfoByTradeId01(@RequestBody Map<String, Object> params) {
+        return trdRepoValuationTrade002Service.queryTradeInfoByTradeId01(params);
     }
 
 

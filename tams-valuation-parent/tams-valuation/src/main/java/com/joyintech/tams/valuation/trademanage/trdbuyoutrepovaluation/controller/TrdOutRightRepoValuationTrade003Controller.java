@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -74,7 +75,16 @@ public class TrdOutRightRepoValuationTrade003Controller extends BaseController {
             model.addAttribute("workflowId", workflowId);
             model.addAttribute("tradeId", entity.getTradeId());
         }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){
-            TrdOutRightRepoValuationTrade003Dto entity = trdOutRightRepoValuationTrade003Service.queryTradeInfoByTradeId01(tradeId);
+            Map<String, Object> map = new HashMap<>();
+            map.put("tradeId",tradeId);
+            map.put("feeType_B99",DictCodeListExt1.一次性费用类型_其他费用.getValue());
+            map.put("feeType_B01",DictCodeListExt1.一次性费用类型_经手费.getValue());
+            map.put("feeType_B07",DictCodeListExt1.一次性费用类型_结算费.getValue());
+            map.put("feeType_B05",DictCodeListExt1.一次性费用类型_佣金.getValue());
+            map.put("feeType_B06",DictCodeListExt1.一次性费用类型_交易手续费.getValue());
+            map.put("feeType_B08",DictCodeListExt1.一次性费用类型_结算手续费.getValue());
+            map.put("busiType",DictCodeList.业务类型_债券买断式回购交易.getValue());
+            TrdOutRightRepoValuationTrade003Dto entity = trdOutRightRepoValuationTrade003Service.queryTradeInfoByTradeId01(map);
             model.addAttribute("entity", entity);
         }else{
             //初始化值
