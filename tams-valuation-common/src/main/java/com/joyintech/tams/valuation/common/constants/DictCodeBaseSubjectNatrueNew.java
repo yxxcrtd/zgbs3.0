@@ -199,7 +199,7 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
             "LXSR_AC_ZQ"
     ),
     摊余成本类_减值准备(
-            "TYCBLTZ_JZZB"
+            "TYCBL_JZZB"
     ),
     其他综合收益_减值准备(
             "QTZHSY_JZZB"
