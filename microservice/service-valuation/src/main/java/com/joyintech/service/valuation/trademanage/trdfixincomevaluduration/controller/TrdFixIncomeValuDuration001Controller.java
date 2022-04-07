@@ -123,8 +123,8 @@ public class TrdFixIncomeValuDuration001Controller extends BaseController {
 
      */
     @PostMapping("queryTradeInfoByTradeId")
-    public TrdFixIncomeValuDuration001Dto queryTradeInfoByTradeId(@RequestBody String  tradeId) {
-        return trdFixIncomeValuDuration001Service.queryTradeInfoByTradeId(tradeId);
+    public TrdFixIncomeValuDuration001Dto queryTradeInfoByTradeId(@RequestBody Map<String, Object> params) {
+        return trdFixIncomeValuDuration001Service.queryTradeInfoByTradeId(params);
     }
 
     /**

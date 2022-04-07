@@ -63,7 +63,7 @@ public interface TrdFixIncomeValuDuration001Mapper {
 	/**
 	 * 根据交易编号查询数据
 	 */
-	TrdFixIncomeValuDuration001Dto queryTradeInfoByTradeId(String tradeId);
+	TrdFixIncomeValuDuration001Dto queryTradeInfoByTradeId(Map<String, Object> paraMap);
 
 
 	/**
