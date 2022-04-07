@@ -52,10 +52,10 @@ public class TrdDepoValuationDuration002Service extends BaseService<TrdDepoValua
     /**
      * 根据交易编号查询详情
      */
-    public TrdDepoValuationDuration001Dto queryTradeInfoByTradeId(String tradeId) {
+    public TrdDepoValuationDuration001Dto queryTradeInfoByTradeId(Map<String,Object> param) {
         return restTemplate.postForObject(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdDepoValuationDuration001/queryTradeInfoByTradeId",
-                tradeId, TrdDepoValuationDuration001Dto.class);
+                param, TrdDepoValuationDuration001Dto.class);
     }
 
     /**

@@ -80,32 +80,6 @@ public class TrdFixIncomeValuDuration001Controller extends BaseController {
     }
 
 
-//    /**
-//     * 自定义产品代码下拉框
-//     * @param request
-//     * @return
-//     */
-//    @RequestMapping("/findPortfolioId")
-//    @ResponseBody
-//    public Page<SelectOptionDto> findPortfolioId(HttpServletRequest request) {
-//        Map<String, Object> param =RequestUtil.getPageParam();
-//        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-//        param.put("finprodType", "F16"); //测试
-//        return trdFixIncomeValuDuration001Service.findPortfolioId(param);
-//    }
-//
-//
-//    /**
-//     * 自定义资产代码下拉框
-//     */
-//    @RequestMapping("/findFinprodId")
-//    @ResponseBody
-//    public Page<SelectOptionDto> findFinprodId(HttpServletRequest request) {
-//        Map<String, Object> param =RequestUtil.getPageParam();
-//        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-//        param.put("finprodType", "F01"); //测试
-//        return trdFixIncomeValuDuration001Service.findFinprodId(param);
-//    }
 
 
 

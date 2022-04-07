@@ -21,6 +21,7 @@ import com.joyintech.service.valuation.trademanage.trdfixincomevaluduration.dao.
 import com.joyintech.service.valuation.trademanage.trdfixincomevaluduration.dto.TrdFixIncomeValuDuration001Dto;
 import com.joyintech.service.valuation.trademanage.trdfixincomevaluduration.dto.TrdFixIncomeValuDurationResult;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.valuation.common.interf.base.batch.dao.*;
@@ -184,6 +185,12 @@ public class TrdFixIncomeValuDuration001Service extends CommonExportService<TrdF
         }
         pageParam.put("psArr", psArr);
 
+        //传递默认值
+        pageParam.put("PS_T22", DictCodeList.交易方向_收息到账.getValue());
+        pageParam.put("PS_T23",DictCodeList.交易方向_还本到账.getValue());
+        pageParam.put("busiType",DictCodeList.业务类型_计划类资产交易_类债券资产交易.getValue());
+        pageParam.put("finprodType", DictCodeListExt1.金融产品类型_计划类资产.getValue());
+
         return this.queryForPage(page, length,
                 () -> trdFixIncomeValuDuration001Mapper.selectDeal(pageParam));
 
@@ -223,7 +230,11 @@ public class TrdFixIncomeValuDuration001Service extends CommonExportService<TrdF
         }
         params.put("psArr", psArr);
 
-
+        //传递默认值
+        params.put("PS_T22", DictCodeList.交易方向_收息到账.getValue());
+        params.put("PS_T23",DictCodeList.交易方向_还本到账.getValue());
+        params.put("busiType",DictCodeList.业务类型_计划类资产交易_类债券资产交易.getValue());
+        params.put("finprodType", DictCodeListExt1.金融产品类型_计划类资产.getValue());
 
         return trdFixIncomeValuDuration001Mapper.selectDeal(params);
     }
@@ -268,8 +279,8 @@ public class TrdFixIncomeValuDuration001Service extends CommonExportService<TrdF
 
 
     //根据交易编号查询
-    public TrdFixIncomeValuDuration001Dto queryTradeInfoByTradeId(String tradeId) {
-        return trdFixIncomeValuDuration001Mapper.queryTradeInfoByTradeId(tradeId);
+    public TrdFixIncomeValuDuration001Dto queryTradeInfoByTradeId(Map<String, Object> params) {
+        return trdFixIncomeValuDuration001Mapper.queryTradeInfoByTradeId(params);
     }
 
     //删除

@@ -21,6 +21,7 @@ import com.joyintech.service.valuation.trademanage.trddepovaluationduration.dao.
 import com.joyintech.service.valuation.trademanage.trddepovaluationduration.dto.TrdDepoValuationDuration001Dto;
 import com.joyintech.service.valuation.trademanage.trddepovaluationduration.dto.TrdDepoValuationDurationResult;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.valuation.common.interf.base.batch.dao.*;
@@ -186,6 +187,12 @@ public class TrdDepoValuationDuration001Service extends CommonExportService<TrdD
         }
         pageParam.put("psArr", psArr);
 
+        //传递默认值
+        pageParam.put("PS_T22", DictCodeList.交易方向_收息到账.getValue());
+        pageParam.put("PS_T23",DictCodeList.交易方向_还本到账.getValue());
+        pageParam.put("busiType",DictCodeList.业务类型_存款类资产交易.getValue());
+        pageParam.put("finprodType", DictCodeListExt1.金融产品类型_存款.getValue());
+
         return this.queryForPage(page, length,
                 () -> trdDepoValuationDuration001Mapper.selectDeal(pageParam));
 
@@ -226,7 +233,11 @@ public class TrdDepoValuationDuration001Service extends CommonExportService<TrdD
         }
         params.put("psArr", psArr);
 
-
+        //传递默认值
+        params.put("PS_T22", DictCodeList.交易方向_收息到账.getValue());
+        params.put("PS_T23",DictCodeList.交易方向_还本到账.getValue());
+        params.put("busiType",DictCodeList.业务类型_存款类资产交易.getValue());
+        params.put("finprodType", DictCodeListExt1.金融产品类型_存款.getValue());
 
         return trdDepoValuationDuration001Mapper.selectDeal(params);
     }
@@ -271,8 +282,8 @@ public class TrdDepoValuationDuration001Service extends CommonExportService<TrdD
 
 
 //    根据交易编号查询
-    public TrdDepoValuationDuration001Dto queryTradeInfoByTradeId(String tradeId) {
-        return trdDepoValuationDuration001Mapper.queryTradeInfoByTradeId(tradeId);
+    public TrdDepoValuationDuration001Dto queryTradeInfoByTradeId(Map<String, Object> param) {
+        return trdDepoValuationDuration001Mapper.queryTradeInfoByTradeId(param);
     }
 
     //删除

@@ -23,6 +23,7 @@ import com.joyintech.service.valuation.trademanage.trddepositvaluationtrade.dto.
 import com.joyintech.service.valuation.trademanage.trddepositvaluationtrade.dto.TrdDepositValuationTradeResult;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 
@@ -227,6 +228,11 @@ public class TrdDepositValuationTrade001Service extends BaseService<TrdDepositVa
         }
         pageParam.put("psArr", psArr);
 
+        //传递默认值
+        pageParam.put("PS_T01",DictCodeList.交易方向_买入.getValue());
+        pageParam.put("PS_T02",DictCodeList.交易方向_卖出.getValue());
+        pageParam.put("busiType",DictCodeList.业务类型_存款类资产交易.getValue());
+        pageParam.put("finprodType", DictCodeListExt1.金融产品类型_存款.getValue());
 
         return this.queryForPage(page, length,
                 () -> trdDepositValuationTrade001Mapper.selectDeal(pageParam));
@@ -263,13 +269,18 @@ public class TrdDepositValuationTrade001Service extends BaseService<TrdDepositVa
         }
         params.put("psArr", psArr);
 
+        //传递默认值
+        params.put("PS_T01",DictCodeList.交易方向_买入.getValue());
+        params.put("PS_T02",DictCodeList.交易方向_卖出.getValue());
+        params.put("busiType",DictCodeList.业务类型_存款类资产交易.getValue());
+        params.put("finprodType", DictCodeListExt1.金融产品类型_存款.getValue());
         return trdDepositValuationTrade001Mapper.selectDeal(params);
     }
 
 
     //根据交易编号查询
-    public TrdDepositValuationTrade001Dto queryTradeInfoByTradeId(String tradeId) {
-        return trdDepositValuationTrade001Mapper.queryTradeInfoByTradeId(tradeId);
+    public TrdDepositValuationTrade001Dto queryTradeInfoByTradeId(Map<String, Object> params) {
+        return trdDepositValuationTrade001Mapper.queryTradeInfoByTradeId(params);
     }
 
 

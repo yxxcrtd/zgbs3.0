@@ -133,10 +133,11 @@ public class TrdDepositValuationTrade002Service extends CommonExportService<TrdD
     /**
      * 根据交易编号查询详情
      */
-    public TrdDepositValuationTrade001Dto queryTradeInfoByTradeId(String tradeId) {
+    public TrdDepositValuationTrade001Dto queryTradeInfoByTradeId(Map<String, Object> params) {
+
         return restTemplate.postForObject(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdDepositValuationTrade001/queryTradeInfoByTradeId",
-                tradeId, TrdDepositValuationTrade001Dto.class);
+                params, TrdDepositValuationTrade001Dto.class);
     }
 
 

@@ -15,6 +15,7 @@ create table SYS_BATCH_DETAIL_LOG
   busi_id        VARCHAR2(2000),
   result_info    CLOB,
   detail_ex      CLOB,
+  file_path      VARCHAR2(200),
   create_user    VARCHAR2(20) not null,
   create_time    TIMESTAMP(6) not null,
   update_user    VARCHAR2(20) not null,
@@ -50,6 +51,8 @@ comment on column SYS_BATCH_DETAIL_LOG.result_info
   is '执行结果';
 comment on column SYS_BATCH_DETAIL_LOG.detail_ex
   is '扩展明细信息';
+comment on column SYS_BATCH_DETAIL_LOG.file_path
+  is '日志文件路径';
 comment on column SYS_BATCH_DETAIL_LOG.create_user
   is '创建人';
 comment on column SYS_BATCH_DETAIL_LOG.create_time
