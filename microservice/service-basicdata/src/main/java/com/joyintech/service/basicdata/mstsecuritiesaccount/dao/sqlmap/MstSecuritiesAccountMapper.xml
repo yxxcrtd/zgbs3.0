@@ -514,7 +514,7 @@
     <!-- 证券代码 -->
     <select id="getFinprodMarketInfoNewUi" resultMap="secAcctInfo">
         <!-- 质押式回购代码与期限品种映射关系 -->
-        with ZYSHG as
+        <!--with ZYSHG as
         (select '204001.SH' as item_code, 'GC001' as item_value
         from dual
         union
@@ -567,7 +567,7 @@
         from dual
         union
         select '131806.SZ' as item_code, 'R-182' as item_value
-        from dual)
+        from dual)-->
         select distinct t.finprod_market_id as id,
         t.finprod_name as text,
         '${acctTradeMarket}' as parentId,
@@ -656,7 +656,7 @@
                 and a.finprod_type2 in (#{FINPROD_TYPE_TG_F01})<!--  债券 -->
             </otherwise>
         </choose>
-        <if test="tradePlat != null and tradePlat != '' and (tradePlat == '02'.toString())">
+        <!--<if test="tradePlat != null and tradePlat != '' and (tradePlat == '02'.toString())">
             union
             select distinct a.item_code as finprod_market_id,
             a.item_code  || '|' || a.item_value as finprod_name,
@@ -694,7 +694,7 @@
             null AS FACE_VALUE,
             null AS IS_NETPRICE
             from ZYSHG a
-        </if>
+        </if>-->
         ) t
         <where>
             <if test="finprodType2 != null and finprodType2 != ''">
