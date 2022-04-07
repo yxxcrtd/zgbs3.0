@@ -87,7 +87,7 @@ public interface TrdDepositValuationTrade001Mapper {
 
 
 
-    TrdDepositValuationTrade001Dto queryTradeInfoByTradeId(String tradeId);
+    TrdDepositValuationTrade001Dto queryTradeInfoByTradeId(Map<String, Object> paraMap);
 
 
 

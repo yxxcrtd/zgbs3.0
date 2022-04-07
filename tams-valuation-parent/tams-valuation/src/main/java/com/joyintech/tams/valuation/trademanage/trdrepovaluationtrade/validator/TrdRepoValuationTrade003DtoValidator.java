@@ -35,25 +35,26 @@ public class TrdRepoValuationTrade003DtoValidator implements BeanValidator {
 
     @Override
     public List<ValidMessage> valid(Object value) {
-        TrdRepoValuationTrade003Dto dto = (TrdRepoValuationTrade003Dto) value;
-        List<ValidMessage> errorList = new ArrayList<>();
-        //交易方向为提前终止时，提前终止利率必填
-        if(StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_投资端_提前终止.getValue())){
-            //期限必填
-            if(!StringUtil.isNotEmpty(dto.getTerminateRate())){
-                errorList.add(new ValidMessage("terminateRate", this.getMessage("BUSS_COM_E_0038",
-                        this.getMessage("TrdRepoValuationTrade003.terminateRate"))));
-            }
-        }
-        //交易方向为逾期返售时，逾期利息金额必填
-        if(StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_投资端_逾期返售.getValue())){
-            //期限必填
-            if(!StringUtil.isNotEmpty(dto.getOverdueAmt())){
-                errorList.add(new ValidMessage("overdueAmt", this.getMessage("BUSS_COM_E_0038",
-                        this.getMessage("TrdRepoValuationTrade003.overdueAmt"))));
-            }
-        }
-
-        return errorList;
+//        TrdRepoValuationTrade003Dto dto = (TrdRepoValuationTrade003Dto) value;
+//        List<ValidMessage> errorList = new ArrayList<>();
+//        //交易方向为提前终止时，提前终止利率必填
+//        if(StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_投资端_提前终止.getValue())){
+//            //期限必填
+//            if(!StringUtil.isNotEmpty(dto.getTerminateRate())){
+//                errorList.add(new ValidMessage("terminateRate", this.getMessage("BUSS_COM_E_0038",
+//                        this.getMessage("TrdRepoValuationTrade003.terminateRate"))));
+//            }
+//        }
+//        //交易方向为逾期返售时，逾期利息金额必填
+//        if(StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_投资端_逾期返售.getValue())){
+//            //期限必填
+//            if(!StringUtil.isNotEmpty(dto.getOverdueAmt())){
+//                errorList.add(new ValidMessage("overdueAmt", this.getMessage("BUSS_COM_E_0038",
+//                        this.getMessage("TrdRepoValuationTrade003.overdueAmt"))));
+//            }
+//        }
+//
+//        return errorList;
+        return null;
     }
 }

@@ -144,8 +144,8 @@ public class TrdDepositValuationTrade001Controller {
      * @since 1.0
      */
     @PostMapping("queryTradeInfoByTradeId")
-    public TrdDepositValuationTrade001Dto queryTradeInfoByTradeId(@RequestBody String  tradeId) {
-        return trdDepositValuationTrade001Service.queryTradeInfoByTradeId(tradeId);
+    public TrdDepositValuationTrade001Dto queryTradeInfoByTradeId(@RequestBody Map<String, Object> param) {
+        return trdDepositValuationTrade001Service.queryTradeInfoByTradeId(param);
     }
 
     /**

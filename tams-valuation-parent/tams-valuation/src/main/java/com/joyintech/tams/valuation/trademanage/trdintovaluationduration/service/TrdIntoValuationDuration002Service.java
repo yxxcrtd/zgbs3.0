@@ -32,10 +32,10 @@ public class TrdIntoValuationDuration002Service extends BaseService<TrdIntoValua
     /**
      * 根据交易编号查询详情
      */
-    public TrdIntoValuationDuration001Dto queryTradeInfoByTradeId(String tradeId) {
+    public TrdIntoValuationDuration001Dto queryTradeInfoByTradeId(Map<String, Object> params) {
         return restTemplate.postForObject(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdIntoValuationDuration001/queryTradeInfoByTradeId",
-                tradeId, TrdIntoValuationDuration001Dto.class);
+                params, TrdIntoValuationDuration001Dto.class);
     }
 
     /**
@@ -99,6 +99,7 @@ public class TrdIntoValuationDuration002Service extends BaseService<TrdIntoValua
         entity.setCcy(dto.getCcy());//币种
         entity.setTradeId(null);  //交易编号
         entity.setIsClean("Y");//有无清算指令
+        entity.setMyAcctNo(dto.getTrdAcctId()); //资金账户
         listValSeclendAssetPeriodDeal.add(entity);
         Map<String, Object> map = secPeriodDealTemplateRecService.handleValSeclendDeal(listValSeclendAssetPeriodDeal,new Date(),params,null);
         //定义返回变量

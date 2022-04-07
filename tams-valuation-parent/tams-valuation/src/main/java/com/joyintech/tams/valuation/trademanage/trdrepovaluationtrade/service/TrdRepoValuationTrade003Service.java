@@ -100,6 +100,7 @@ public class TrdRepoValuationTrade003Service extends BaseService<TrdRepoValuatio
 //        entity.setTermKind("R007"); //期限品种
         //DictCodeList.回购期限品种_R007.getValue()
         entity.setTradeMarket(dto3.getTradeMarket()); //交易市场
+
         entity.setPs(dto3.getPs()); //交易类型
         entity.setTrader("yc"); //交易员
         entity.setTradeDate(dto3.getTradeDate());//交易日
@@ -135,7 +136,6 @@ public class TrdRepoValuationTrade003Service extends BaseService<TrdRepoValuatio
         entity.setCounterAcctNo(null);//收款账户
         entity.setFundSettleDate(null);//资金交收日
         entity.setBusiType("04"); //业务类型
-
 
         listValBotAstTrade.add(entity);
 

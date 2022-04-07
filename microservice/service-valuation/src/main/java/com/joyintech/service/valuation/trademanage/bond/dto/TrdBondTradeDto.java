@@ -314,6 +314,12 @@ public class TrdBondTradeDto extends BaseEntity implements ProcessEntity {
      */
     private String myAcctNo_qr;
 
+    /**
+     * 应付佣金
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal commissionPay;
+
     public String getProdId() {
         return prodId;
     }
@@ -760,5 +766,13 @@ public class TrdBondTradeDto extends BaseEntity implements ProcessEntity {
 
     public void setMyAcctNo_qr(String myAcctNo_qr) {
         this.myAcctNo_qr = myAcctNo_qr;
+    }
+
+    public BigDecimal getCommissionPay() {
+        return commissionPay;
+    }
+
+    public void setCommissionPay(BigDecimal commissionPay) {
+        this.commissionPay = commissionPay;
     }
 }

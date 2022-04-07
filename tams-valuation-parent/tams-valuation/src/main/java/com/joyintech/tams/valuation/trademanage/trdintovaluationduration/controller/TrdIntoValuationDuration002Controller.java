@@ -19,10 +19,7 @@ import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.SpringContextUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.trdintovaluationduration.dto.TrdIntoValuationDuration001Dto;
 import com.joyintech.tams.valuation.trademanage.trdintovaluationduration.service.TrdIntoValuationDuration002Service;
@@ -39,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -84,7 +82,10 @@ public class TrdIntoValuationDuration002Controller extends BaseController {
             model.addAttribute("workflowId", workflowId);
             model.addAttribute("tradeId", entity.getTradeId());
         }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){
-            TrdIntoValuationDuration001Dto entity = trdIntoValuationDuration002Service.queryTradeInfoByTradeId(tradeId);
+            Map<String, Object> map = new HashMap<>();
+            map.put("tradeId",tradeId);
+            map.put("busiType",DictCodeList.业务类型_债券借贷标的债券交易.getValue());
+            TrdIntoValuationDuration001Dto entity = trdIntoValuationDuration002Service.queryTradeInfoByTradeId(map);
             model.addAttribute("entity", entity);
         }else{
             //初始化值
@@ -139,7 +140,7 @@ public class TrdIntoValuationDuration002Controller extends BaseController {
 //        }
 
         params.setBusinessCode(dto.getFinprodMarketId());  //资产代码
-        params.setBusinessType(DictCodeListExt2.共通业务类型_债券借贷存续期.getValue());
+        params.setBusinessType(DictCodeListExt3.共通业务类型_融入券存续期.getValue());
         // 设置流程业务说明, entity即传入的dto
         params.setComment(
                 entity -> SpringContextUtil.getTextValue("资产代码")+"("+ entity.getFinprodMarketId() +")"+"-"+SpringContextUtil.getTextValue("交易日期") + "(" + DateUtil.format(entity.getTradeDate()) + ")"

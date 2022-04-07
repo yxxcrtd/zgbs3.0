@@ -534,4 +534,14 @@ public class TrdRepoValuationTrade001Dto extends WflTrdProductDeal implements Pr
         this.repoType = repoType;
     }
 
+    /**
+     * 取得 回购类型str
+     *
+     * @return 回购类型
+     */
+    public String getRepoTypeStr() {
+        return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.回购类型, repoType))?
+                SysDataUtil.getNameFromDataDict(DictCode.回购类型, repoType):repoType;
+    }
+
 }

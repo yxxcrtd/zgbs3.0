@@ -148,7 +148,7 @@
                 var settleAmt1 = JoyinMath.doAdd(JoyinMath.doAdd(tradeAmt, intAmt,2),brokerage,2);
                 var settleAmt2 = JoyinMath.doAdd(JoyinMath.doAdd(JoyinMath.doAdd(settleAmt1,stlAmt,2),dealFeeAmt,2),stlFeeAmt,2);
                 if(commissionPay && commissionPay != 0 ){
-                    var settleAmt3 = JoyinMath.doAdd(settleAmt2, commissionPay,2);
+                    var settleAmt3 = settleAmt2;
                 }else{
                     var settleAmt3 = JoyinMath.doAdd(settleAmt2, commission,2);
                 }
@@ -156,7 +156,7 @@
                 var settleAmt1 = JoyinMath.doMinus(JoyinMath.doAdd(tradeAmt, intAmt,2),brokerage,2);
                 var settleAmt2 = JoyinMath.doMinus(JoyinMath.doMinus(JoyinMath.doMinus(settleAmt1,stlAmt,2),dealFeeAmt,2),stlFeeAmt,2);
                 if(commissionPay && commissionPay != 0 ){
-                    var settleAmt3 = JoyinMath.doMinus(settleAmt2, commissionPay,2);
+                    var settleAmt3 =settleAmt2;
                 }else{
                     var settleAmt3 = JoyinMath.doMinus(settleAmt2, commission,2);
                 }

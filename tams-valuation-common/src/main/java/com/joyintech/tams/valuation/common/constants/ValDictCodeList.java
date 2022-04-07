@@ -1,12 +1,12 @@
 package com.joyintech.tams.valuation.common.constants;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.joyintech.framework.base.BaseDictCodeList;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.StringUtil;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 数据字典明细枚举
@@ -899,6 +899,12 @@ public enum ValDictCodeList implements BaseDictCodeList {
      */
     账套配置表参数项_项目类计提区间倒减方式(
             ValDictCode.账套配置表参数项, "PLAN_SUBTRACTION_TYPE", "项目类计提区间倒减方式"
+    ),
+    /**
+     * 账套配置表参数项_其他综合收益计算的平准金科目
+     */
+    账套配置表参数项_其他综合收益计算的平准金科目(
+        ValDictCode.账套配置表参数项, "OTHER_INCOME_PZJ_SUBJECT", "净值型产品认申赎场景其他综合收益计算的平准金科目"
     ),
     ;
     /**

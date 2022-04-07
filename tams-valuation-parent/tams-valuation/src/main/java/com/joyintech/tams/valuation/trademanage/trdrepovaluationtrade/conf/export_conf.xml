@@ -8,7 +8,7 @@
             <Cell order="4" name="产品名称">portfolioName</Cell>
             <Cell order="5" name="交易类型">psStr</Cell>
             <Cell order="6" name="交易场所">tradeMarketStr</Cell>
-            <Cell order="7" name="回购类型">repoType</Cell>
+            <Cell order="7" name="回购类型">repoTypeStr</Cell>
             <Cell order="8" name="交易对手">counterId</Cell>
             <Cell order="9" name="回购期限">term</Cell>
             <Cell order="10" name="交易日">tradeDateStr</Cell>

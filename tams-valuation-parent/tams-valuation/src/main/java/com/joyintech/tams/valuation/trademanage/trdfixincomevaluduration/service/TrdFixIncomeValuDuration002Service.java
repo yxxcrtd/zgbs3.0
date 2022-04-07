@@ -36,10 +36,10 @@ public class TrdFixIncomeValuDuration002Service extends BaseService<TrdFixIncome
     /**
      * 根据交易编号查询详情
      */
-    public TrdFixIncomeValuDuration001Dto queryTradeInfoByTradeId(String tradeId) {
+    public TrdFixIncomeValuDuration001Dto queryTradeInfoByTradeId(Map<String,Object> param) {
         return restTemplate.postForObject(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdFixIncomeValuDuration001/queryTradeInfoByTradeId",
-                tradeId, TrdFixIncomeValuDuration001Dto.class);
+                param, TrdFixIncomeValuDuration001Dto.class);
     }
 
 

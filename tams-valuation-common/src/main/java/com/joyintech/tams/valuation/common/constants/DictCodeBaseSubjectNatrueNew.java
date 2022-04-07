@@ -452,6 +452,13 @@ public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
     公允价值损益类_利息调整(
         "GYJZSYL_LXTZ"
     ),
+
+    /**
+     * 损益平准金_未实现
+     */
+    损益平准金_其他综合收益(
+        "SYPZJ_QTZHSY"
+    ),
     /** ==========新增科目性质======== end**/
     /** add by weipeng on 20220113 估值系统产品3.0.4批处理科目性质改造 end **/
     ;
