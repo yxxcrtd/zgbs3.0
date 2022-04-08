@@ -94,7 +94,7 @@
 			and t.TRADE_ID like  concat(concat('%',#{tradeId}),'%')
 		</if>
 		<if test="portfolioIdArr != null and portfolioIdArr.length > 0">
-			and deal.BOOKSET_ID IN
+			and NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) IN
 			<foreach collection="portfolioIdArr" item="portfolioId" open="( " close=" )" separator=",">
 				#{portfolioId}
 			</foreach>
