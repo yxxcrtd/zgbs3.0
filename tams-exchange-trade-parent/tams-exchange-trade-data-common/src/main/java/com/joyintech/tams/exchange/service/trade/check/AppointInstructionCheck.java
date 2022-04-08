@@ -46,11 +46,11 @@ public class AppointInstructionCheck {
             return new CheckResult(1, "指令组合信息不能为空");
         }
         Map<String, List<InstructionDetail>> detailMap = Maps.newHashMap();
-        if (Objects.nonNull(detailList)) {
+        if (CollectionUtils.isEmpty(detailList)) {
             detailMap.putAll(detailList.stream().collect(Collectors.groupingBy(InstructionDetail::getEntrustId)));
         }
         Map<String, List<InstructionPledge>> pledgeMap = Maps.newHashMap();
-        if (Objects.nonNull(pledgeList)) {
+        if (CollectionUtils.isEmpty(pledgeList)) {
             pledgeMap.putAll(pledgeList.stream().collect(Collectors.groupingBy(InstructionPledge::getEntrustId)));
         }
 
