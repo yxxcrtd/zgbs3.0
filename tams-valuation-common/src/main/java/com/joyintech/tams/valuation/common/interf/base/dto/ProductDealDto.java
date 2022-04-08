@@ -10,12 +10,12 @@
 
 package com.joyintech.tams.valuation.common.interf.base.dto;
 
+import com.joyintech.framework.base.BaseEntity;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import com.joyintech.framework.base.BaseEntity;
 
 /**
  * 交易标的
@@ -144,6 +144,11 @@ public class ProductDealDto extends BaseEntity {
      * 全价总额
      */
     private BigDecimal fpriceAmt;
+
+    /**
+     * 券商资金账户
+     */
+    private String acctNo;
     
     /**
      * 参数条件
@@ -533,6 +538,14 @@ public class ProductDealDto extends BaseEntity {
      */
     public void setFpriceAmt(BigDecimal fpriceAmt) {
         this.fpriceAmt = fpriceAmt;
+    }
+
+    public String getAcctNo() {
+        return acctNo;
+    }
+
+    public void setAcctNo(String acctNo) {
+        this.acctNo = acctNo;
     }
 
     /**
