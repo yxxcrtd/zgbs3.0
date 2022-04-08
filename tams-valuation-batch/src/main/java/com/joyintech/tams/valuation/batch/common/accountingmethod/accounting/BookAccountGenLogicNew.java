@@ -1673,7 +1673,16 @@ public class BookAccountGenLogicNew {
         params.put(SubjectConfigCode.存款类资产类型.getValue(), mappingConfig.getAssetType());
         params.put(SubjectConfigCode.基金类型.getValue(), mappingConfig.getAssetType());
         params.put(SubjectConfigCode.回购标的类型.getValue(), mappingConfig.getAssetType());
-        params.put(SubjectConfigCode.估值交易市场.getValue(), mappingConfig.getTradeMarket());
+        // add by weipeng on 20220408：计划类净值型、货币型、利率型以及项目类资产全部默认场外
+        if(StringUtil.equals(DictCodeListExt1.证券品种_计划类资产_净值型.getValue(), mappingConfig.getSecType())
+            || StringUtil.equals(DictCodeListExt1.证券品种_计划类资产_货币型.getValue(), mappingConfig.getSecType())
+            || StringUtil.equals(DictCodeListExt1.证券品种_计划类资产_收益型.getValue(), mappingConfig.getSecType())
+            || StringUtil.equals(DictCodeListExt1.证券品种_项目类资产.getValue(), mappingConfig.getSecType())){
+            params.put(SubjectConfigCode.估值交易市场.getValue(), DictCodeListExt1.估值交易市场_场外.getValue());
+        }
+        else{
+            params.put(SubjectConfigCode.估值交易市场.getValue(), mappingConfig.getTradeMarket());
+        }
         params.put(SubjectConfigCode.交易市场.getValue(), mappingConfig.getTradeMarket());
 //        params.put(SubjectConfigCode.交易对手.getValue(), mappingConfig.getTradeMarket());
         params.put(SubjectConfigCode.账户类型.getValue(), mappingConfig.getAccountType());

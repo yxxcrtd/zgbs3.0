@@ -4,9 +4,11 @@ import com.joyintech.calculation.config.NumberEnum;
 import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.BokBooksetExt;
 import com.joyintech.tams.common.base.entity.BokStatDetPosiiton;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListTableId;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalance;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalanceSearchDto;
@@ -211,6 +213,18 @@ public class PrepaidExpensesDrawProcessorNewService {
             accountAmountMap.put(BookConstant.FEEAMT, prepaidFeeAmt);
             //待摊费用_本位币  <- 变量.当日待摊费用_本位币
             accountAmountMap.put(BookConstant.FEEAMT+BookConstant.BCCYAMT, prepaidFeeAmt_BCcy);
+            if(StringUtil.equals(DictCodeListExt1.一次性费用类型_交易手续费.getValue(),dealInfoForTarget.getType1())
+            || StringUtil.equals(DictCodeListExt1.一次性费用类型_结算手续费.getValue(),dealInfoForTarget.getType1())){
+                accountAmountMap.put(BookConstant.FEEAMT_JY, prepaidFeeAmt);
+                //待摊费用_本位币  <- 变量.当日待摊费用_本位币
+                accountAmountMap.put(BookConstant.FEEAMT_JY+BookConstant.BCCYAMT, prepaidFeeAmt_BCcy);
+            }
+            else{
+                accountAmountMap.put(BookConstant.FEEAMT_QT, prepaidFeeAmt);
+                //待摊费用_本位币  <- 变量.当日待摊费用_本位币
+                accountAmountMap.put(BookConstant.FEEAMT_QT+BookConstant.BCCYAMT, prepaidFeeAmt_BCcy);
+            }
+
 
             //accountCurrencyMap设置如下：
             // 因为与记账金额元素map的key及数量一致，故采用循环
@@ -233,7 +247,7 @@ public class PrepaidExpensesDrawProcessorNewService {
             // 证券品种
             mappingConfig.setSecType(dealInfoForTarget.getType2());
             // 交易场所
-            mappingConfig.setTradeMarket(dealInfoForTarget.getTradeMarket());
+            mappingConfig.setTradeMarket(DictCodeListExt1.估值交易市场_银行间.getValue());
             ad.setSubjectMappingConfigDefault(mappingConfig);
             // add by weipeng on 20220307:会计引擎升级改造，增加辅助核算项入参 end
 

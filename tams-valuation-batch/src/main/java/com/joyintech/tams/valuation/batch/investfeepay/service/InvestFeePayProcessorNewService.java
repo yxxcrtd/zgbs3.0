@@ -175,6 +175,8 @@ public class InvestFeePayProcessorNewService {
 		mappingConfig.setTradeMarket(item.getTradeMarket());
 		// 资金账户类型
 		mappingConfig.setAccountType(item.getAcctType());
+		// 费用类型 = 费用明细.费用类型
+		mappingConfig.setFeeType(item.getFeeType());
 	    // 循环去除作为待摊费用的明细
 	    for(TrdTradeFeeDetail detail : item.getValTradeFeeDetailList()){
 			// add by weipeng on 20220316 增加辅助核算项配置信息
@@ -208,9 +210,15 @@ public class InvestFeePayProcessorNewService {
 	            accountSceneMap.put(BookConstant.BOK_DETAIL_ID1, bokDetailId);
 	            //场景元素.是否待摊 <- 费用明细.是否待摊
 	            accountSceneMap.put(BookConstant.IS_PREPAID, detail.getIsPrepaid());
-	            
-	            // 金额元素.交易金额 = 交易明细.交易金额
-                accountAmountMap.put(BookConstant.DEALAMT, detail.getFeeAmt());
+	            if(StringUtil.equals(DictCodeListExt1.资金账户类型_产品托管户.getValue(), item.getAcctType())){
+					// 金额元素.交易金额 = 交易明细.交易金额
+					accountAmountMap.put(BookConstant.DEALAMT_HQ, detail.getFeeAmt());
+				}
+	            else{
+					// 金额元素.交易金额 = 交易明细.交易金额
+					accountAmountMap.put(BookConstant.DEALAMT_JS, detail.getFeeAmt());
+				}
+
                 // 金额元素.待摊费用 = 交易明细.交易金额
                 accountAmountMap.put(BookConstant.DTFEE, detail.getFeeAmt());
 	            // 记账金额元素币种信息塞值
@@ -386,9 +394,6 @@ public class InvestFeePayProcessorNewService {
 			if (list != null && list.size() > 0) {
 				// LOOP 变量.费用列表
 				for (BokFeeTableSet fee : list) {
-					// add by weipeng on 20220316 增加辅助核算项配置信息
-					// 费用类型 = 费用明细.费用类型
-					mappingConfig.setFeeType(fee.getFeeTypeId());
 					// 查询参数设值
 					SubjectBalanceSearchDto searchDto = setSubjectBalanceSearchDto(item, fee, bokDetailId);
 					// add by weipeng on 20220316 由于除佣金外一次性费用合并为一个基础科目性质，费用余额查询增加科目号匹配,且账户维护费没有应付科目
