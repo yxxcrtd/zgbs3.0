@@ -58,9 +58,9 @@
                 #{item}
             </foreach>)
         </if> GROUP BY PORTFOLIO_ID,TRADE_ID) t)
-        <if test="NOT_NULL_FLAG != null and NOT_NULL_FLAG!='' ">
+       <!-- <if test="NOT_NULL_FLAG != null and NOT_NULL_FLAG!='' ">
             AND rit.conclusion is null
-        </if>
+        </if>-->
         <!-- AND rit.conclusion is null
          AND fp.finprod_id is not null 注释掉这个过滤条件否则质押式回购的风险试算信息无法查出,add by gaowenlong at 20220110-->
     </select>
