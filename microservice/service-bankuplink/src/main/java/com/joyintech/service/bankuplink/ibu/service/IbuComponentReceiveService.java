@@ -618,13 +618,13 @@ public class IbuComponentReceiveService extends BaseService{
             // 接收撤回新增报价失败通知 // 接收撤回交谈报价失败通知 // 接收报价拒绝失败反馈 // 接收报价撤回失败反馈 // 接收拒绝成交报价失败通知
             // 场景不处理头寸
             if (StringUtils.equals(tempResult.getIbuQuoteCrepDto().getTradeStatus(), DictCodeList.银行间上行报价状态_撤回中.getValue())
-                    && StringUtils.equals(tempResult.getIbuQuoteCrepDto().getTradeStatus(), DictCodeList.银行间上行报价状态_撤回中.getValue())
-                    && StringUtils.equals(tempResult.getIbuQuoteCrepDto().getTradeStatus(), DictCodeList.银行间上行报价状态_撤回中.getValue())
-                    && StringUtils.equals(tempResult.getIbuQuoteCrepDto().getTradeStatus(), DictCodeList.银行间上行报价状态_撤回中.getValue())
-                    && StringUtils.equals(tempResult.getIbuQuoteCrepDto().getTradeStatus(), DictCodeList.银行间上行报价状态_撤回中.getValue())) {
+                    && StringUtils.equals(tempResult.getIbuQuoteCrepDto().getTradeStatus(), DictCodeList.银行间上行报价状态_交谈中.getValue())
+                    && StringUtils.equals(tempResult.getIbuQuoteCrepDto().getTradeStatus(), DictCodeList.银行间上行报价状态_成交中.getValue())) {
                 //接口失败反馈
                 return new ResultBaseDto(true);
             }
+            //接口失败反馈
+            return new ResultBaseDto(true);
         }
         IbuQuoteCrepDto ibuQuoteCrepDto = tempResult.getIbuQuoteCrepDto();
         ibuQuoteCrepDto.setQuoteType(BussinessDictCodeList.报价方式_对话报价.getValue());
