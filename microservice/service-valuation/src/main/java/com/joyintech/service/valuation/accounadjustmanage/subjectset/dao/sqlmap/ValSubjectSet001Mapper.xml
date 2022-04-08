@@ -42,7 +42,7 @@
         BS.OVERDRAWN_FLAG as overdrawnFlag,
         BS.GEN_DETSUB_FLAG as genDetsubFlag,/**是否生成四级科目**/
         BS.GEN_DETSUB_FLAG as genDetsubFlagCode,
-        BAS.SUBJECT_NATURE_NAME as baseSubjectNature,
+        BAS.SUBJECT_INTERNAL_NAME as baseSubjectNature,
         BS.CREATE_USER as createUser,
         BS.CREATE_DEPT as createDept,
         BS.CREATE_TIME as createTime,
@@ -50,8 +50,7 @@
         BS.UPDATE_TIME as updateTime
         from BOK_SUBJECT BS
         LEFT JOIN BOK_BOOKSET BB ON BS.BOOKSET_ID=BB.BOOKSET_ID
-        LEFT JOIN BOK_ACCT_STANDARD_NATURE BAS ON BS.BASE_SUBJECT_NATURE = BAS.BASE_SUBJECT_NATURE AND
-        BB.ACCT_STANDARD=BAS.ACCT_STANDARD_ID
+        LEFT JOIN BOK_SUBJECT_INTERNAL BAS ON BS.BASE_SUBJECT_NATURE = BAS.SUBJECT_INTERNAL_CODE
         <where>
             <if test="subjectLevel != null and subjectLevel != ''">
                 /** modify by yanya on 20191204 科目号随科目级别展示，原来级别向上取，现改为只取当前级别**/
@@ -80,65 +79,46 @@
     </select>
     <select id="selectValBokSubject"
             resultType="com.joyintech.service.valuation.accounadjustmanage.subjectset.dto.ValBokSubjectDto">
+		WITH temp as(
+            SELECT
+                b.HAND_CODE ,listagg(b.HAND_CODE_VALUE,',') WITHIN GROUP (ORDER BY b.HAND_CODE_VALUE ) AS value
+            FROM
+                BOK_SUBJECT_HAND_VALUE b
+            WHERE
+                b.BOOKSET_ID = #{booksetId} AND b.SUBJECT_NO = #{subjectNo} AND b.HAND_CODE != #{default}
+            GROUP BY HAND_CODE
+            ORDER BY b.HAND_CODE
+        )
 		SELECT
-		BS.BOOKSET_ID as booksetId,
-		BS.SUBJECT_NO as subjectNo,
-		BS.SUBJECT_NAME as subjectName,
-		BS.FSUBJECT_ID as fsubjectId,
-		BS.BAL_FLAG as balFlag,
-		BS.SUBJECT_TYPE as subjectType,
-		BS.SUBJECT_LEVEL as subjectLevel,
-		BS.ACC_QUA_FLAG as accQuaFlag,
-		BS.ACC_INT_FLAG as accIntFlag,
-		BS.OVERDRAWN_FLAG as overdrawnFlag,
-		BS.BASE_SUBJECT_NATURE as baseSubjectNature,
-		BS.GEN_DETSUB_FLAG as genDetsubFlag,
-		BS.CCY as ccy,
-		BS.SUBJECT_INTERNAL_CODE as subjectInternalCode,
-		BS.SUBJECT_HAND_FEL_CODE as subjectHandFelCode,
-		BS.CREATE_USER as createUser,
-		BS.CREATE_DEPT as createDept,
-		BS.CREATE_TIME as createTime,
-		BS.UPDATE_USER as updateUser,
-		BS.UPDATE_TIME as updateTime,
-		BOK_BOND_TYPE.HAND_CODE_VALUE as bokBondType,
-		BOK_BOND_TYPE2.HAND_CODE_VALUE as bokBondType2,
-		BOK_TRD_MARKET.HAND_CODE_VALUE as bokTrdMarket,
-		BOK_ISSUE_TYPE.HAND_CODE_VALUE as bokIssueType,
-		BOK_CPY_TYPE.HAND_CODE_VALUE as bokCpyType,
-
-		BOK_ACCOUNT_TYPE.HAND_CODE_VALUE as bokAccountType,
-		BOK_FEE_TYPE.HAND_CODE_VALUE as bokFeeType,
-		BOK_TRD_PROP.HAND_CODE_VALUE as bokTrdProp,
-		BOK_TAX_TYPE.HAND_CODE_VALUE as bokTaxType,
-		BOK_CPY.HAND_CODE_VALUE as bokCpy,
-		BOK_CHANNEL.HAND_CODE_VALUE as bokChannel
-		FROM BOK_SUBJECT BS
-		LEFT JOIN BOK_SUBJECT_HAND_VALUE BOK_BOND_TYPE
-		on BS.BOOKSET_ID=BOK_BOND_TYPE.BOOKSET_ID and BS.SUBJECT_NO=BOK_BOND_TYPE.SUBJECT_NO and BOK_BOND_TYPE.HAND_CODE='SEC_TYPE'
-		LEFT JOIN BOK_SUBJECT_HAND_VALUE BOK_BOND_TYPE2
-		on BS.BOOKSET_ID=BOK_BOND_TYPE2.BOOKSET_ID and BS.SUBJECT_NO=BOK_BOND_TYPE2.SUBJECT_NO and BOK_BOND_TYPE2.HAND_CODE='TYPE_2'
-		LEFT JOIN BOK_SUBJECT_HAND_VALUE BOK_TRD_MARKET
-		on BS.BOOKSET_ID=BOK_TRD_MARKET.BOOKSET_ID and BS.SUBJECT_NO=BOK_TRD_MARKET.SUBJECT_NO and BOK_TRD_MARKET.HAND_CODE='TRADE_MARKET'
-		LEFT JOIN BOK_SUBJECT_HAND_VALUE BOK_ISSUE_TYPE
-		on BS.BOOKSET_ID=BOK_ISSUE_TYPE.BOOKSET_ID and BS.SUBJECT_NO=BOK_ISSUE_TYPE.SUBJECT_NO and BOK_ISSUE_TYPE.HAND_CODE='ISSUE_TYPE'
-		LEFT JOIN BOK_SUBJECT_HAND_VALUE BOK_CPY_TYPE
-		on BS.BOOKSET_ID=BOK_CPY_TYPE.BOOKSET_ID and BS.SUBJECT_NO=BOK_CPY_TYPE.SUBJECT_NO and BOK_CPY_TYPE.HAND_CODE='COUNTER_TYPE'
-
-		LEFT JOIN BOK_SUBJECT_HAND_VALUE BOK_ACCOUNT_TYPE
-		on BS.BOOKSET_ID=BOK_ACCOUNT_TYPE.BOOKSET_ID and BS.SUBJECT_NO=BOK_ACCOUNT_TYPE.SUBJECT_NO and BOK_ACCOUNT_TYPE.HAND_CODE='ACCT_TYPE'
-		LEFT JOIN BOK_SUBJECT_HAND_VALUE BOK_FEE_TYPE
-		on BS.BOOKSET_ID=BOK_FEE_TYPE.BOOKSET_ID and BS.SUBJECT_NO=BOK_FEE_TYPE.SUBJECT_NO and BOK_FEE_TYPE.HAND_CODE='FEE_TYPE'
-		LEFT JOIN BOK_SUBJECT_HAND_VALUE BOK_TRD_PROP
-		on BS.BOOKSET_ID=BOK_TRD_PROP.BOOKSET_ID and BS.SUBJECT_NO=BOK_TRD_PROP.SUBJECT_NO and BOK_TRD_PROP.HAND_CODE='TRD_PROP'
-		LEFT JOIN BOK_SUBJECT_HAND_VALUE BOK_TAX_TYPE
-		on BS.BOOKSET_ID=BOK_TAX_TYPE.BOOKSET_ID and BS.SUBJECT_NO=BOK_TAX_TYPE.SUBJECT_NO and BOK_TAX_TYPE.HAND_CODE='TAX_FEE_TYPE'
-		LEFT JOIN BOK_SUBJECT_HAND_VALUE BOK_CPY
-		on BS.BOOKSET_ID=BOK_CPY.BOOKSET_ID and BS.SUBJECT_NO=BOK_CPY.SUBJECT_NO and BOK_CPY.HAND_CODE='COUNTER_ID'
-        LEFT JOIN BOK_SUBJECT_HAND_VALUE BOK_CHANNEL
-		on BS.BOOKSET_ID=BOK_CHANNEL.BOOKSET_ID and BS.SUBJECT_NO=BOK_CHANNEL.SUBJECT_NO and BOK_CHANNEL.HAND_CODE='CHANNEL'
-
-		where BS.BOOKSET_ID = #{booksetId} AND BS.SUBJECT_NO = #{subjectNo}
+            bs.BOOKSET_ID as booksetId,
+            bs.SUBJECT_NO as subjectNo,
+            bs.SUBJECT_NAME as subjectName,
+            bs.FSUBJECT_ID as fsubjectId,
+            bs.BAL_FLAG as balFlag,
+            bs.SUBJECT_TYPE as subjectType,
+            bs.SUBJECT_LEVEL as subjectLevel,
+            bs.ACC_QUA_FLAG as accQuaFlag,
+            bs.ACC_INT_FLAG as accIntFlag,
+            bs.OVERDRAWN_FLAG as overdrawnFlag,
+            bs.BASE_SUBJECT_NATURE as baseSubjectNature,
+            bs.GEN_DETSUB_FLAG as genDetsubFlag,
+            bs.CCY as ccy,
+            bs.SUBJECT_INTERNAL_CODE as subjectInternalCode,
+            bs.SUBJECT_HAND_FEL_CODE as subjectHandFelCode,
+            bs.CREATE_USER as createUser,
+            bs.CREATE_DEPT as createDept,
+            bs.CREATE_TIME as createTime,
+            bs.UPDATE_USER as updateUser,
+            bs.UPDATE_TIME as updateTime,
+            nvl(b.HAND_CODE_VALUE,null) AS typeDefault,
+            h.HAND_CODE type1,
+            temp.value type2
+        FROM BOK_SUBJECT bs
+        LEFT JOIN BOK_SUBJECT_HAND_VALUE b ON b.BOOKSET_ID = bs.BOOKSET_ID AND b.SUBJECT_NO = bs.SUBJECT_NO  AND b.HAND_CODE = #{default}
+        LEFT JOIN BOK_SUBJECT_INTERNAL_HAND h ON h.BOOKSET_ID = bs.BOOKSET_ID AND h.SUBJECT_INTERNAL_CODE = bs.SUBJECT_INTERNAL_CODE AND h.HAND_CODE != #{default}
+        LEFT JOIN temp ON temp.HAND_CODE = h.HAND_CODE
+        where bs.BOOKSET_ID = #{booksetId} AND bs.SUBJECT_NO = #{subjectNo}
+        ORDER BY h.HAND_CODE desc
 	</select>
 
     <!-- 账套查询 -->
@@ -176,11 +156,9 @@
         SUBJECT_NAME text
         FROM BOK_SUBJECT
         <where>
-             /*add by sunshuaishuai 20220402 增加账套代码条件筛选 start*/
             <if test="booksetId !=null and  booksetId !='' ">
                 BOOKSET_ID = #{booksetId}
             </if>
-            /*add by sunshuaishuai 20220402 增加账套代码条件筛选 end*/
             <if test="subjectLevel !=null and  subjectLevel !='' ">
                 /** modify by yanya on 20191204 科目号随科目级别展示，原来级别向下取，现改为只取当前级别**/
               and  to_number(subject_level) = #{subjectLevel}
@@ -358,4 +336,52 @@
             AND BS.SUBJECT_NO != #{subjectNo}
         </if>
 	</select>
+
+    <select id="getHandCode" resultType="com.joyintech.service.valuation.accounadjustmanage.subjectset.dto.ValSubjectHandDto">
+        SELECT
+            hand.BOOKSET_ID booksetId,
+            hand.SUBJECT_INTERNAL_CODE subjectInternalCode,
+            hand.HAND_CODE handCode,
+            dict.DICT_CNNAME handName
+        FROM BOK_SUBJECT_INTERNAL_HAND hand
+        LEFT JOIN SYS_DATADICT dict ON dict.DICT_CODE = hand.HAND_CODE
+        WHERE
+            1=1
+            <if test="default !=null and  default !='' ">
+                and hand.HAND_CODE != #{default}
+            </if>
+            <if test="subjectInternalCode !=null and  subjectInternalCode !='' ">
+                AND hand.SUBJECT_INTERNAL_CODE = #{subjectInternalCode}
+            </if>
+        order by hand.HAND_CODE desc
+    </select>
+
+    <resultMap id="SelectOptionMap" type="com.joyintech.framework.select.SelectOptionDto">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="text" property="text" jdbcType="VARCHAR"/>
+        <association property="object" javaType="java.util.Map">
+            <result column="dictCode" property="dictCode" jdbcType="VARCHAR" />
+            <result column="dictName" property="dictName" jdbcType="VARCHAR" />
+        </association>
+    </resultMap>
+
+    <select id="getType" resultMap="SelectOptionMap">
+        SELECT
+            dict.ITEM_CODE id,
+            dict.ITEM_VALUE text,
+            dict.DICT_CODE dictCode,
+            datadict.DICT_CNNAME dictName
+        FROM BOK_SUBJECT_INTERNAL_HAND hand
+        LEFT JOIN SYS_DATADICT datadict ON datadict.DICT_CODE = hand.HAND_CODE
+        LEFT JOIN SYS_DATADICT_LIST dict ON dict.DICT_CODE  = hand.HAND_CODE
+        WHERE
+            1=1
+            <if test="subjectInternalCode !=null and  subjectInternalCode !='' ">
+                AND hand.SUBJECT_INTERNAL_CODE = #{subjectInternalCode}
+            </if>
+            <if test="handCode !=null and  handCode !='' ">
+                AND hand.HAND_CODE = #{handCode}
+            </if>
+        order by hand.HAND_CODE DESC
+    </select>
 </mapper>

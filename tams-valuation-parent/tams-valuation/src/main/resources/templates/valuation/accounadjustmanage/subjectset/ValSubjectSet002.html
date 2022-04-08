@@ -483,7 +483,146 @@
                     </textarea>
                 </div>
                 </div>
+                <div class="layui-form-item">
+                    <div class=" form-inline-wrap typeDiv" id="divDefault" >
+                        <label class="layui-form-label form-label-wrap" id="labelDefault">是否默认</label>
+                        <div class="layui-input-inline input-inline">
+                            <select type="text" id="typeDefault" name="typeDefault" parentIds="subjectInternalCode"
+                                    class="layui-input form-input input-select"
+                                    allowClear="true" placeholder="请输入内容"
+                                    data-th-placeholder="#{SysCommon.placeholder}"
+                                    data-th-data-result="${YES_OR_NO}"
+                                    data-th-initValue='${entity?.typeDefault}'>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
+            <!--add by sunshuaishuai 辅助核算项修改 20220406 start-->
+            <div class="layui-form-item">
+                <div class=" form-inline-wrap typeDiv" id="div1" >
+                    <label class="layui-form-label form-label-wrap" id="label1">辅助核算项1</label>
+                    <div class="layui-input-inline input-inline">
+                        <select type="text" id="type1" name="type1" parentIds="subjectInternalCode"
+                                class="layui-input form-input input-select"
+                                multiple="true"
+                                allowClear="true" placeholder="请输入内容"
+                                data-th-placeholder="#{SysCommon.placeholder}"
+                                data-th-data-url="@{/valuation/accounadjustmanage/subjectset/ValSubjectSet002/getType(type='type1')}"
+                                data-th-initValue='${entity?.type1}'>
+                        </select>
+                    </div>
+                </div>
+                <div class=" form-inline-wrap typeDiv" id="div2" >
+                    <label class="layui-form-label form-label-wrap" id="label2">辅助核算项2</label>
+                    <div class="layui-input-inline input-inline">
+                        <select type="text" id="type2" name="type2" parentIds="subjectInternalCode"
+                                class="layui-input form-input input-select"
+                                multiple="true"
+                                allowClear="true" placeholder="请输入内容"
+                                data-th-placeholder="#{SysCommon.placeholder}"
+                                data-th-data-url="@{/valuation/accounadjustmanage/subjectset/ValSubjectSet002/getType(type='type2')}"
+                                data-th-initValue='${entity?.type2}'>
+                        </select>
+                    </div>
+                </div>
+                <div class=" form-inline-wrap typeDiv" id="div3" >
+                    <label class="layui-form-label form-label-wrap" id="label3">辅助核算项3</label>
+                    <div class="layui-input-inline input-inline">
+                        <select type="text" id="type3" name="type3" parentIds="subjectInternalCode"
+                                class="layui-input form-input input-select"
+                                multiple="true"
+                                allowClear="true" placeholder="请输入内容"
+                                data-th-placeholder="#{SysCommon.placeholder}"
+                                data-th-data-url="@{/valuation/accounadjustmanage/subjectset/ValSubjectSet002/getType(type='type3')}"
+                                data-th-initValue='${entity?.type3}'>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class=" form-inline-wrap typeDiv" id="div4" >
+                    <label class="layui-form-label form-label-wrap" id="label4">辅助核算项4</label>
+                    <div class="layui-input-inline input-inline">
+                        <select type="text" id="type4" name="type4" parentIds="subjectInternalCode"
+                                class="layui-input form-input input-select"
+                                multiple="true"
+                                allowClear="true" placeholder="请输入内容"
+                                data-th-placeholder="#{SysCommon.placeholder}"
+                                data-th-data-url="@{/valuation/accounadjustmanage/subjectset/ValSubjectSet002/getType(type='type4')}"
+                                data-th-initValue='${entity?.type4}'>
+                        </select>
+                    </div>
+                </div>
+                <div class=" form-inline-wrap typeDiv" id="div5" >
+                    <label class="layui-form-label form-label-wrap" id="label5">辅助核算项5</label>
+                    <div class="layui-input-inline input-inline">
+                        <select type="text" id="type5" name="type5" parentIds="subjectInternalCode"
+                                class="layui-input form-input input-select"
+                                multiple="true"
+                                allowClear="true" placeholder="请输入内容"
+                                data-th-placeholder="#{SysCommon.placeholder}"
+                                data-th-data-url="@{/valuation/accounadjustmanage/subjectset/ValSubjectSet002/getType(type='type5')}"
+                                data-th-initValue='${entity?.type5}'>
+                        </select>
+                    </div>
+                </div>
+                <div class=" form-inline-wrap typeDiv" id="div6" >
+                    <label class="layui-form-label form-label-wrap" id="label6">辅助核算项6</label>
+                    <div class="layui-input-inline input-inline">
+                        <select type="text" id="type6" name="type6" parentIds="subjectInternalCode"
+                                class="layui-input form-input input-select"
+                                multiple="true"
+                                allowClear="true" placeholder="请输入内容"
+                                data-th-placeholder="#{SysCommon.placeholder}"
+                                data-th-data-url="@{/valuation/accounadjustmanage/subjectset/ValSubjectSet002/getType(type='type6')}"
+                                data-th-initValue='${entity?.type6}'>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class=" form-inline-wrap typeDiv" id="div7" >
+                    <label class="layui-form-label form-label-wrap" id="label7">辅助核算项7</label>
+                    <div class="layui-input-inline input-inline">
+                        <select type="text" id="type7" name="type7" parentIds="subjectInternalCode"
+                                class="layui-input form-input input-select"
+                                multiple="true"
+                                allowClear="true" placeholder="请输入内容"
+                                data-th-placeholder="#{SysCommon.placeholder}"
+                                data-th-data-url="@{/valuation/accounadjustmanage/subjectset/ValSubjectSet002/getType(type='type7')}"
+                                data-th-initValue='${entity?.type7}'>
+                        </select>
+                    </div>
+                </div>
+                <div class=" form-inline-wrap typeDiv" id="div8" >
+                    <label class="layui-form-label form-label-wrap" id="label8">辅助核算项8</label>
+                    <div class="layui-input-inline input-inline">
+                        <select type="text" id="type8" name="type8" parentIds="subjectInternalCode"
+                                class="layui-input form-input input-select"
+                                multiple="true"
+                                allowClear="true" placeholder="请输入内容"
+                                data-th-placeholder="#{SysCommon.placeholder}"
+                                data-th-data-url="@{/valuation/accounadjustmanage/subjectset/ValSubjectSet002/getType(type='type8')}"
+                                data-th-initValue='${entity?.type8}'>
+                        </select>
+                    </div>
+                </div>
+                <div class=" form-inline-wrap typeDiv" id="div9" >
+                    <label class="layui-form-label form-label-wrap" id="label9">辅助核算项9</label>
+                    <div class="layui-input-inline input-inline">
+                        <select type="text" id="type9" name="type9" parentIds="subjectInternalCode"
+                                class="layui-input form-input input-select"
+                                multiple="true"
+                                allowClear="true" placeholder="请输入内容"
+                                data-th-placeholder="#{SysCommon.placeholder}"
+                                data-th-data-url="@{/valuation/accounadjustmanage/subjectset/ValSubjectSet002/getType(type='type9')}"
+                                data-th-initValue='${entity?.type9}'>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <!--add by sunshuaishuai 辅助核算项修改 20220406 end-->
         </div>
 
 
@@ -491,8 +630,8 @@
         <input type="hidden" id="handjson" name="handjson"
                class="layui-input form-input">
 
-        <input type="hidden" id="subjectHandFelCode" name="subjectHandFelCode" data-th-value="${entity?.subjectHandFelCode}"
-               class="layui-input form-input">
+<!--        <input type="hidden" id="subjectHandFelCode" name="subjectHandFelCode" data-th-value="${entity?.subjectHandFelCode}"-->
+<!--               class="layui-input form-input">-->
     </form>
     <div class="layui-col-md11" style="margin: 10px;">
         <div class="text-center">
