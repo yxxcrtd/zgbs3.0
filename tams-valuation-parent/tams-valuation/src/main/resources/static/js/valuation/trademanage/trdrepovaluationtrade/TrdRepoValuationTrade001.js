@@ -3,31 +3,10 @@
      * 获取查询参数
      */
     var getPageParams = function() {
-        //产品代码 多选择
-        // var portfolioIdTemp = $('#portfolioId').val();
-        // var portfolioId = null;
-        // if(portfolioIdTemp != null){
-        //     portfolioId = portfolioIdTemp.join(",");
-        // }
-        //
-        // //交易场所  多选择
-        // var tradeMarketTemp = $('#tradeMarket').val();
-        // var tradeMarket = null;
-        // if(tradeMarketTemp != null){
-        //     tradeMarket = tradeMarketTemp.join(",");
-        // }
-        //
-        // //交易类型  多选择
-        // var psTemp = $('#ps').val();
-        // var ps = null;
-        // if(psTemp != null){
-        //     ps = psTemp.join(",");
-        // }
-
         return {
             tradeId: $('#tradeId').val(),
             portfolioId: $.trim($('#portfolioId').val()),
-            finprodMarketId: $.trim($('#finprodMarketId').val()),
+            tradeMarket: $.trim($('#tradeMarket').val()),
             tradeDateBegin: $("#tradeDate").startDate(),
             tradeDateEnd: $("#tradeDate").endDate(),
             ps: $.trim($('#ps').val()),

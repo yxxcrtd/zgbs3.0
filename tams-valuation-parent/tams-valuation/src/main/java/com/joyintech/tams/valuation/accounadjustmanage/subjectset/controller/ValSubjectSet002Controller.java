@@ -14,6 +14,7 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
@@ -21,6 +22,7 @@ import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.valuation.accounadjustmanage.assistaccout.dto.ValAssistHandDto;
 import com.joyintech.tams.valuation.accounadjustmanage.assistaccout.service.ValAssistAccounting001Service;
 import com.joyintech.tams.valuation.accounadjustmanage.subjectset.dto.ValBokSubjectDto;
+import com.joyintech.tams.valuation.accounadjustmanage.subjectset.dto.ValSubjectHandDto;
 import com.joyintech.tams.valuation.accounadjustmanage.subjectset.service.ValSubjectSet001Service;
 import com.joyintech.tams.valuation.common.constants.SubjectConfigCode;
 import org.apache.commons.collections.CollectionUtils;
@@ -92,6 +94,34 @@ public class ValSubjectSet002Controller extends BaseController {
         }
         return super.init(model);
     }
+
+    /*add by sunshuaishuai 辅助核算项修改 20220406 start*/
+    /**
+     * 根据基础科目性质联动辅助核算项下拉框
+     *
+     * @return check结果
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("getType")
+    public List<SelectOptionDto> getType(){
+        return valSubjectSet001Service.getType(RequestUtil.getPageParam());
+    }
+
+    /**
+     * 根据基础科目性质查询辅助核算项
+     *
+     * @return check结果
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("getHandCode")
+    public List<ValSubjectHandDto> getHandCode(){
+        return valSubjectSet001Service.getHandCode(RequestUtil.getPageParam());
+    }
+    /*add by sunshuaishuai 辅助核算项修改 20220406 start*/
 
     /**
      * 保存按钮点击时的check

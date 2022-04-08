@@ -123,7 +123,7 @@ public interface ValSubjectSet001Mapper {
      * @param dto:
      * @return com.joyintech.service.valuation.accounadjustmanage.subjectset.dto.ValBokSubjectDto
      */
-    ValBokSubjectDto selectValBokSubject(ValBokSubjectDto dto);
+    List<ValBokSubjectDto> selectValBokSubject(Map<String, Object> map);
     /**
      * check科目是否存在
      * 
@@ -170,4 +170,23 @@ public interface ValSubjectSet001Mapper {
      */
     List<ValBokSubjectDto> selectValBokSubjectByInCode(ValBokSubjectDto dto);
 
+    /*add by sunshuaishuai 辅助核算项修改 20220406 start*/
+    /**
+     * 根据基础科目性质查询辅助核算项
+     *
+     * @return 科目代码列表
+     * @see
+     * @since 1.0
+     */
+    List<ValSubjectHandDto> getHandCode(Map<String, Object> map);
+
+    /**
+     * 根据基础科目性质查询辅助核算项
+     *
+     * @return 科目代码列表
+     * @see
+     * @since 1.0
+     */
+    List<SelectOptionDto> getType(Map<String, Object> map);
+    /*add by sunshuaishuai 辅助核算项修改 20220406 end*/
 }

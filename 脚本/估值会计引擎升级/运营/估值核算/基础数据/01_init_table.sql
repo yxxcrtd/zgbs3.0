@@ -88,26 +88,34 @@ COMMENT ON COLUMN BOK_SUBJECT_INTERNAL.SUBJECT_TYPE IS '核算属性:资产类
 损益类';
 ------------------------add by weipeng on 20220301 增加内部科目表 end---------------------------
 
-------------------------add by weipeng on 20220301 内部科目记账辅助总表start---------------------------
+------------------------modify by sunshuaishuai on 20220408 内部科目记账辅助总表start---------------------------
 DROP TABLE BOK_SUBJECT_INTERNAL_HAND;
 CREATE TABLE BOK_SUBJECT_INTERNAL_HAND
 (
-    SUBJECT_INTERNAL_CODE VARCHAR2(100)
-    , HAND_CODE VARCHAR2(50)
-    , CREATE_USER VARCHAR2(20)
-    , CREATE_DEPT VARCHAR2(20)
-    , CREATE_TIME TIMESTAMP
-    , UPDATE_USER VARCHAR2(20)
-    , UPDATE_TIME TIMESTAMP
+	BOOKSET_ID VARCHAR2(50),
+    SUBJECT_INTERNAL_CODE VARCHAR2(100),
+    HAND_CODE VARCHAR2(50) NOT null,
+    STATUS char(1),
+    CREATE_USER VARCHAR2(20),
+    CREATE_DEPT VARCHAR2(20),
+    CREATE_TIME TIMESTAMP,
+    UPDATE_USER VARCHAR2(20),
+    UPDATE_TIME TIMESTAMP,
+    CONSTRAINT "PK_BOK_SUBJECT_INTERNAL_HAND" PRIMARY KEY ("BOOKSET_ID", "SUBJECT_INTERNAL_CODE")
 );
 
 COMMENT ON TABLE BOK_SUBJECT_INTERNAL_HAND IS '内部科目记账辅助总表';
-
+COMMENT ON COLUMN BOK_SUBJECT_INTERNAL_HAND.BOOKSET_ID IS '账套代码';
 COMMENT ON COLUMN BOK_SUBJECT_INTERNAL_HAND.SUBJECT_INTERNAL_CODE IS '内部科目编码';
+COMMENT ON COLUMN BOK_SUBJECT_INTERNAL_HAND.HAND_CODE IS '辅助核算项编码';
+COMMENT ON COLUMN BOK_SUBJECT_INTERNAL_HAND.STATUS IS '是否启用:是:Y 否：N';
+COMMENT ON COLUMN BOK_SUBJECT_INTERNAL_HAND.CREATE_USER IS '创建人';
+COMMENT ON COLUMN BOK_SUBJECT_INTERNAL_HAND.CREATE_DEPT IS '创建部门';
+COMMENT ON COLUMN BOK_SUBJECT_INTERNAL_HAND.CREATE_TIME IS '创建时间';
+COMMENT ON COLUMN BOK_SUBJECT_INTERNAL_HAND.UPDATE_USER IS '更新人';
+COMMENT ON COLUMN BOK_SUBJECT_INTERNAL_HAND.UPDATE_TIME IS '更新时间';
 
-COMMENT ON COLUMN BOK_SUBJECT_INTERNAL_HAND.HAND_CODE IS '辅助核算项';
-
-------------------------add by weipeng on 20220301 增加内部科目记账辅助底层代码规则表 end---------------------------
+------------------------modify by sunshuaishuai on 20220408 增加内部科目记账辅助底层代码规则表 end---------------------------
 
 ------------------------add by weipeng on 20220308 会计元素表字段备注变更 start---------------------------
 comment on column BOK_TABLEDICT.dict_type is '元素数据类型: P 下拉框 N 数值型 F 辅助核算项';
@@ -211,3 +219,7 @@ alter table BOK_FINPROD_SCHEME_INFO add constraint PK_BOK_FINPROD_SCHEME_INFO pr
 ALTER TABLE TRD_PRODUCT_DEAL ADD MY_ACCT_NO VARCHAR2(50);
 COMMENT ON COLUMN TRD_PRODUCT_DEAL.MY_ACCT_NO IS '资金账户';
 --------------------add by sunshuaishuai 20220407 交易表中添加资金账户字段 end---------------------------------------
+
+--------------------add by sunshuaishuai 20220408 修改账套科目表中辅助核算表达式字段长度 start-------------------------------------
+ALTER TABLE BOK_SUBJECT MODIFY SUBJECT_HAND_FEL_CODE VARCHAR2(500);
+--------------------add by sunshuaishuai 20220408 修改账套科目表中辅助核算表达式字段长度 end---------------------------------------
