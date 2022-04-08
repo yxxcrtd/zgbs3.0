@@ -93,7 +93,7 @@ public class InvestmentManagement extends BaseService {
     @Autowired
     private AppointInstructionCheck appointInstructionCheck;
     @Autowired
-    private AppointInstructionRecordService appointInstructionRecordService;
+    private RecordLogService recordLogService;
 
     /**
      * 是否单体服务
@@ -1051,7 +1051,7 @@ public class InvestmentManagement extends BaseService {
         List<String> entrustIds = instructionList.stream().map(Instruction::getEntrustId).collect(Collectors.toList());
         try {
             //保存分发指令数据
-            List<AppointInstructionRecord> records = saveAppointInstruction(instructionList, detailList, pledgeList);
+            List<RecordLog> records = saveAppointInstruction(instructionList, detailList, pledgeList);
 
             CheckResult checkResult = appointInstructionCheck.checkAppointInstruction(instructionList, detailList, pledgeList);
             int code = checkResult.getCode();
@@ -1081,8 +1081,8 @@ public class InvestmentManagement extends BaseService {
         }
     }
 
-    private List<AppointInstructionRecord> saveAppointInstruction(List<Instruction> instructionList, List<InstructionDetail> detailList,
-                                                                  List<InstructionPledge> pledgeList) {
+    private List<RecordLog> saveAppointInstruction(List<Instruction> instructionList, List<InstructionDetail> detailList,
+                                                   List<InstructionPledge> pledgeList) {
         logger.info("保存分发指令数据开始...");
         if (CollectionUtils.isEmpty(instructionList)) {
             logger.error("分发指令数据为空");
@@ -1097,19 +1097,19 @@ public class InvestmentManagement extends BaseService {
             pledgeMap.putAll(pledgeList.stream().collect(Collectors.groupingBy(InstructionPledge::getEntrustId)));
         }
 
-        List<AppointInstructionRecord> records = Lists.newArrayList();
+        List<RecordLog> records = Lists.newArrayList();
         instructionList.forEach(instruction -> {
             String entrustId = instruction.getEntrustId();
-            AppointInstructionRecord record = new AppointInstructionRecord();
+            RecordLog record = new RecordLog();
             record.setId(UUID.randomUUID().toString().replaceAll("-", ""));
-            record.setEntrustId(entrustId);
+            record.setBusiCode1(entrustId);
             String entrustInfo = JsonUtils.getJsonFromObject(instruction);
             List<String> remark = Lists.newArrayList();
             if (entrustInfo.length() > 4000) {
                 entrustInfo = entrustInfo.substring(0, 4000);
                 remark.add("指令信息长度超出4000");
             }
-            record.setEntrustInfo(entrustInfo);
+            record.setRecordInfo(entrustInfo);
 
             String detailInfo = JsonUtils.getJsonFromObject(detailMap.get(entrustId));
             if (detailInfo.length() > 4000) {
@@ -1127,20 +1127,23 @@ public class InvestmentManagement extends BaseService {
                 }
                 record.setPledgeInfo(pledgeInfo);
             }
+            record.setLogType(0);
             record.setStatus(0);
+            record.setCreateUser(instruction.getInvManagerId());
             record.setCreateTime(new Date());
+            record.setUpdateUser(instruction.getInvManagerId());
             record.setUpdateTime(record.getCreateTime());
             if (CollectionUtils.isNotEmpty(remark)) {
                 record.setRemark(String.join(";", remark));
             }
             records.add(record);
         });
-        appointInstructionRecordService.saveBatch(records);
+        recordLogService.saveBatch(records);
         logger.info("保存分发指令数据结束...");
         return records;
     }
 
-    private void updateAppointInstruction(List<AppointInstructionRecord> records, List<String> entrustIds,
+    private void updateAppointInstruction(List<RecordLog> records, List<String> entrustIds,
                                           List<String> errorIds, Map<String, Object> data) {
 
         if (CollectionUtils.isNotEmpty(errorIds)) {
@@ -1149,9 +1152,9 @@ public class InvestmentManagement extends BaseService {
             logger.info("指令分发检查[通过]：{}", list);
             records.forEach(record -> {
                 record.setUpdateTime(new Date());
-                if (errorIds.contains(record.getEntrustId())) {
+                if (errorIds.contains(record.getBusiCode1())) {
                     record.setStatus(2);
-                    record.setCheckMsg(JsonUtils.getJsonFromObject(data.get(record.getEntrustId())));
+                    record.setCheckMsg(JsonUtils.getJsonFromObject(data.get(record.getBusiCode1())));
                 } else {
                     record.setCheckMsg("检查通过");
                     record.setStatus(1);
@@ -1165,7 +1168,7 @@ public class InvestmentManagement extends BaseService {
                 record.setStatus(1);
             });
         }
-        appointInstructionRecordService.updateBatch(records);
+        recordLogService.updateBatch(records);
     }
 
     private void dealAppointInstruction(List<Instruction> instructionList, List<InstructionDetail> detailList, List<InstructionPledge> pledgeList) {

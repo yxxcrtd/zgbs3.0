@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.joyintech.tams.exchange.datacommon.db.dao.AppointInstructionRecordMapper">
-    <resultMap id="BaseResultMap" type="com.joyintech.tams.exchange.common.db.domain.AppointInstructionRecord">
+<mapper namespace="com.joyintech.tams.exchange.datacommon.db.dao.RecordLogMapper">
+    <resultMap id="BaseResultMap" type="com.joyintech.tams.exchange.common.db.domain.RecordLog">
         <result column="ID" property="id" jdbcType="VARCHAR"/>
-        <result column="ENTRUST_ID" property="entrustId" jdbcType="VARCHAR"/>
-        <result column="ENTRUST_INFO" property="entrustInfo" jdbcType="VARCHAR"/>
+        <result column="BUSI_CODE1" property="busiCode1" jdbcType="VARCHAR"/>
+        <result column="BUSI_CODE2" property="busiCode2" jdbcType="VARCHAR"/>
+        <result column="BUSI_CODE3" property="busiCode3" jdbcType="VARCHAR"/>
+        <result column="RECORD_INFO" property="recordInfo" jdbcType="VARCHAR"/>
         <result column="DETAIL_INFO" property="detailInfo" jdbcType="VARCHAR"/>
         <result column="PLEDGE_INFO" property="pledgeInfo" jdbcType="VARCHAR"/>
+        <result column="LOG_TYPE" property="logType" jdbcType="NUMERIC"/>
         <result column="STATUS" property="status" jdbcType="NUMERIC"/>
         <result column="CHECK_MSG" property="checkMsg" jdbcType="VARCHAR"/>
         <result column="REMARK" property="remark" jdbcType="VARCHAR"/>
+        <result column="CREATE_USER" property="createUser" jdbcType="VARCHAR"/>
         <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR"/>
         <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP"/>
     </resultMap>
     <sql id="Example_Where_Clause">
@@ -74,17 +79,18 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-        ID, ENTRUST_ID, ENTRUST_INFO, DETAIL_INFO,PLEDGE_INFO,STATUS,CHECK_MSG,REMARK,CREATE_TIME, UPDATE_TIME
+        ID, BUSI_CODE1, BUSI_CODE2, BUSI_CODE3, RECORD_INFO, DETAIL_INFO,PLEDGE_INFO,LOG_TYPE,STATUS,CHECK_MSG,REMARK,
+        CREATE_USER,CREATE_TIME, UPDATE_USER,UPDATE_TIME
     </sql>
 
     <select id="selectByExample" resultMap="BaseResultMap"
-            parameterType="com.joyintech.tams.exchange.common.db.domain.AppointInstructionRecordExample">
+            parameterType="com.joyintech.tams.exchange.common.db.domain.RecordLogExample">
         select
         <if test="distinct">
             distinct
         </if>
         <include refid="Base_Column_List"/>
-        from T_APPOINT_INSTRUCTION_RECORD
+        from T_RECORD_LOG
         <if test="_parameter != null">
             <include refid="Example_Where_Clause"/>
         </if>
@@ -92,97 +98,43 @@
             order by ${orderByClause}
         </if>
     </select>
+
     <delete id="deleteBatchByPrimaryKey" parameterType="java.lang.String">
-        delete from T_APPOINT_INSTRUCTION_RECORD
+        delete from T_RECORD_LOG
         where ID in
         <foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
             #{id,jdbcType=VARCHAR}
         </foreach>
     </delete>
 
-    <insert id="insert" parameterType="com.joyintech.tams.exchange.common.db.domain.AppointInstructionRecord">
-        insert into T_APPOINT_INSTRUCTION_RECORD (ID, ENTRUST_ID, ENTRUST_INFO, DETAIL_INFO, PLEDGE_INFO, STATUS,
-                                                  CHECK_MSG, REMARK, CREATE_TIME, UPDATE_TIME)
-        values (#{id,jdbcType=VARCHAR}, #{entrustId,jdbcType=VARCHAR}, #{entrustInfo,jdbcType=VARCHAR},
-                #{detailInfo,jdbcType=VARCHAR}, #{pledgeInfo,jdbcType=VARCHAR}, #{status,jdbcType=NUMERIC},
-                #{checkMsg,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
-                #{updateTime,jdbcType=TIMESTAMP})
+    <insert id="insert" parameterType="com.joyintech.tams.exchange.common.db.domain.RecordLog">
+        insert into T_RECORD_LOG (ID, BUSI_CODE1, BUSI_CODE2, BUSI_CODE3, RECORD_INFO, DETAIL_INFO,
+                                  PLEDGE_INFO, LOG_TYPE, STATUS, CHECK_MSG, REMARK,
+                                  CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+        values (#{id,jdbcType=VARCHAR}, #{busiCode1,jdbcType=VARCHAR}, #{busiCode2,jdbcType=VARCHAR},
+                #{busiCode3,jdbcType=VARCHAR}, #{recordInfo,jdbcType=VARCHAR}, #{detailInfo,jdbcType=VARCHAR},
+                #{pledgeInfo,jdbcType=VARCHAR}, #{logType,jdbcType=NUMERIC}, #{status,jdbcType=NUMERIC},
+                #{checkMsg,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR},
+                #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
     </insert>
 
-    <insert id="insertSelective" parameterType="com.joyintech.tams.exchange.common.db.domain.AppointInstructionRecord">
-        insert into T_APPOINT_INSTRUCTION_RECORD
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                ID,
-            </if>
-            <if test="entrustId != null">
-                ENTRUST_ID,
-            </if>
-            <if test="entrustInfo != null">
-                ENTRUST_INFO,
-            </if>
-            <if test="detailInfo != null">
-                DETAIL_INFO,
-            </if>
-            <if test="pledgeInfo != null">
-                PLEDGE_INFO,
-            </if>
-            STATUS,
-            <if test="checkMsg != null">
-                CHECK_MSG,
-            </if>
-            <if test="remark != null">
-                REMARK,
-            </if>
-            <if test="createTime != null">
-                CREATE_TIME,
-            </if>
-            <if test="updateTime != null">
-                UPDATE_TIME,
-            </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                #{id,jdbcType=VARCHAR},
-            </if>
-            <if test="entrustId != null">
-                #{entrustId,jdbcType=VARCHAR},
-            </if>
-            <if test="entrustInfo != null">
-                #{entrustInfo,jdbcType=VARCHAR},
-            </if>
-            <if test="detailInfo != null">
-                #{detailInfo,jdbcType=VARCHAR},
-            </if>
-            <if test="pledgeInfo != null">
-                #{pledgeInfo,jdbcType=VARCHAR},
-            </if>
-            STATUS,
-            <if test="checkMsg != null">
-                #{checkMsg,jdbcType=VARCHAR},
-            </if>
-            <if test="remark != null">
-                #{remark,jdbcType=VARCHAR},
-            </if>
-            <if test="createTime != null">
-                #{createTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="updateTime != null">
-                #{updateTime,jdbcType=TIMESTAMP},
-            </if>
-        </trim>
-    </insert>
     <sql id="insert">
-        insert into T_APPOINT_INSTRUCTION_RECORD
+        insert into T_RECORD_LOG
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
                 ID,
             </if>
-            <if test="entrustId != null">
-                ENTRUST_ID,
+            <if test="busiCode1 != null">
+                BUSI_CODE1,
             </if>
-            <if test="entrustInfo != null">
-                ENTRUST_INFO,
+            <if test="busiCode2 != null">
+                BUSI_CODE2,
+            </if>
+            <if test="busiCode3 != null">
+                BUSI_CODE3,
+            </if>
+            <if test="recordInfo != null">
+                RECORD_INFO,
             </if>
             <if test="detailInfo != null">
                 DETAIL_INFO,
@@ -190,6 +142,7 @@
             <if test="pledgeInfo != null">
                 PLEDGE_INFO,
             </if>
+            LOG_TYPE,
             STATUS,
             <if test="checkMsg != null">
                 CHECK_MSG,
@@ -197,8 +150,14 @@
             <if test="remark != null">
                 REMARK,
             </if>
+            <if test="createUser != null">
+                CREATE_USER,
+            </if>
             <if test="createTime != null">
                 CREATE_TIME,
+            </if>
+            <if test="updateUser != null">
+                UPDATE_USER,
             </if>
             <if test="updateTime != null">
                 UPDATE_TIME,
@@ -208,11 +167,17 @@
             <if test="id != null">
                 #{id,jdbcType=VARCHAR},
             </if>
-            <if test="entrustId != null">
-                #{entrustId,jdbcType=VARCHAR},
+            <if test="busiCode1 != null">
+                #{busiCode1,jdbcType=VARCHAR},
             </if>
-            <if test="entrustInfo != null">
-                #{entrustInfo,jdbcType=VARCHAR},
+            <if test="busiCode2 != null">
+                #{busiCode2,jdbcType=VARCHAR},
+            </if>
+            <if test="busiCode3 != null">
+                #{busiCode3,jdbcType=VARCHAR},
+            </if>
+            <if test="recordInfo != null">
+                #{recordInfo,jdbcType=VARCHAR},
             </if>
             <if test="detailInfo != null">
                 #{detailInfo,jdbcType=VARCHAR},
@@ -220,29 +185,43 @@
             <if test="pledgeInfo != null">
                 #{pledgeInfo,jdbcType=VARCHAR},
             </if>
-            STATUS,
+            logType,
+            status,
             <if test="checkMsg != null">
                 #{checkMsg,jdbcType=VARCHAR},
             </if>
             <if test="remark != null">
                 #{remark,jdbcType=VARCHAR},
             </if>
+            <if test="createUser != null">
+                #{createUser,jdbcType=VARCHAR},
+            </if>
             <if test="createTime != null">
                 #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null">
+                #{updateUser,jdbcType=VARCHAR},
             </if>
             <if test="updateTime != null">
                 #{updateTime,jdbcType=TIMESTAMP},
             </if>
         </trim>
     </sql>
+
     <sql id="update">
-        update T_APPOINT_INSTRUCTION_RECORD
+        update T_RECORD_LOG
         <set>
-            <if test="entrustId != null">
-                ENTRUST_ID= #{entrustId,jdbcType=VARCHAR},
+            <if test="busiCode1 != null">
+                BUSI_CODE1=#{busiCode1,jdbcType=VARCHAR},
             </if>
-            <if test="entrustInfo != null">
-                ENTRUST_INFO=#{entrustInfo,jdbcType=VARCHAR},
+            <if test="busiCode2 != null">
+                BUSI_CODE2=#{busiCode2,jdbcType=VARCHAR},
+            </if>
+            <if test="busiCode3 != null">
+                BUSI_CODE3=#{busiCode3,jdbcType=VARCHAR},
+            </if>
+            <if test="recordInfo != null">
+                RECORD_INFO=#{recordInfo,jdbcType=VARCHAR},
             </if>
             <if test="detailInfo != null">
                 DETAIL_INFO=#{detailInfo,jdbcType=VARCHAR},
@@ -250,6 +229,7 @@
             <if test="pledgeInfo != null">
                 PLEDGE_INFO= #{pledgeInfo,jdbcType=VARCHAR},
             </if>
+            LOG_TYPE = #{logType},
             STATUS = #{status},
             <if test="checkMsg != null">
                 CHECK_MSG=#{checkMsg,jdbcType=VARCHAR},
@@ -257,8 +237,14 @@
             <if test="remark != null">
                 REMARK=#{remark,jdbcType=VARCHAR},
             </if>
+            <if test="createUser != null">
+                CREATE_USER=#{createUser,jdbcType=VARCHAR},
+            </if>
             <if test="createTime != null">
                 CREATE_TIME=#{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null">
+                UPDATE_USER=#{updateUser,jdbcType=VARCHAR},
             </if>
             <if test="updateTime != null">
                 UPDATE_TIME=#{updateTime,jdbcType=TIMESTAMP},
@@ -268,9 +254,9 @@
     </sql>
 
     <insert id="updateOrInsertSelective"
-            parameterType="com.joyintech.tams.exchange.common.db.domain.AppointInstructionRecord">
+            parameterType="com.joyintech.tams.exchange.common.db.domain.RecordLog">
         <selectKey keyProperty="count" resultType="int" order="BEFORE">
-            select count(1) from T_APPOINT_INSTRUCTION_RECORD where ID = #{id,jdbcType=VARCHAR}
+            select count(1) from T_RECORD_LOG where ID = #{id,jdbcType=VARCHAR}
         </selectKey>
         <if test="count > 0">
             <include refid="update"/>
@@ -280,8 +266,12 @@
         </if>
     </insert>
 
+    <insert id="insertSelective" parameterType="com.joyintech.tams.exchange.common.db.domain.RecordLog">
+        <include refid="insert"/>
+    </insert>
+
     <update id="updateByPrimaryKeySelective"
-            parameterType="com.joyintech.tams.exchange.common.db.domain.AppointInstructionRecord">
+            parameterType="com.joyintech.tams.exchange.common.db.domain.RecordLog">
         <include refid="update"/>
     </update>
 </mapper>

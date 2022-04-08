@@ -1,9 +1,8 @@
 package com.joyintech.tams.exchange.datacommon.db.service.impl;
 
-import com.joyintech.tams.exchange.common.db.domain.AppointInstructionRecord;
-import com.joyintech.tams.exchange.datacommon.db.dao.AppointInstructionRecordMapper;
-import com.joyintech.tams.exchange.datacommon.db.dao.OrderHistoryMapper;
-import com.joyintech.tams.exchange.datacommon.db.service.AppointInstructionRecordService;
+import com.joyintech.tams.exchange.common.db.domain.RecordLog;
+import com.joyintech.tams.exchange.datacommon.db.dao.RecordLogMapper;
+import com.joyintech.tams.exchange.datacommon.db.service.RecordLogService;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -18,20 +17,20 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @date 2022/4/2 11:50
  */
 @Service
-public class AppointInstructionRecordServiceImpl implements AppointInstructionRecordService {
+public class RecordLogServiceImpl implements RecordLogService {
     @Autowired
-    private AppointInstructionRecordMapper appointInstructionRecordMapper;
+    private RecordLogMapper recordLogMapper;
     @Autowired
     private SqlSessionTemplate sqlSessionTemplate;
 
     @Override
-    public void saveBatch(List<AppointInstructionRecord> records) {
+    public void saveBatch(List<RecordLog> records) {
         SqlSession sqlSession = sqlSessionTemplate.getSqlSessionFactory().openSession(ExecutorType.BATCH, false);
-        AppointInstructionRecordMapper recordMapper = sqlSession.getMapper(AppointInstructionRecordMapper.class);
+        RecordLogMapper recordMapper = sqlSession.getMapper(RecordLogMapper.class);
         AtomicInteger index = new AtomicInteger(0);
         records.forEach(record -> {
             index.getAndIncrement();
-            recordMapper.insertSelective(record);
+            recordMapper.insert(record);
             if (index.get() % 500 == 0) {
                 sqlSession.flushStatements();
             }
@@ -41,9 +40,9 @@ public class AppointInstructionRecordServiceImpl implements AppointInstructionRe
     }
 
     @Override
-    public void updateBatch(List<AppointInstructionRecord> records) {
+    public void updateBatch(List<RecordLog> records) {
         SqlSession sqlSession = sqlSessionTemplate.getSqlSessionFactory().openSession(ExecutorType.BATCH, false);
-        AppointInstructionRecordMapper recordMapper = sqlSession.getMapper(AppointInstructionRecordMapper.class);
+        RecordLogMapper recordMapper = sqlSession.getMapper(RecordLogMapper.class);
         AtomicInteger index = new AtomicInteger(0);
         records.forEach(record -> {
             index.getAndIncrement();
@@ -57,13 +56,13 @@ public class AppointInstructionRecordServiceImpl implements AppointInstructionRe
     }
 
     @Override
-    public int save(AppointInstructionRecord record) {
-        return appointInstructionRecordMapper.insert(record);
+    public int save(RecordLog record) {
+        return recordLogMapper.insert(record);
     }
 
     @Override
-    public int update(AppointInstructionRecord record) {
-        return appointInstructionRecordMapper.updateByPrimaryKeySelective(record);
+    public int update(RecordLog record) {
+        return recordLogMapper.updateByPrimaryKeySelective(record);
     }
 
 }
