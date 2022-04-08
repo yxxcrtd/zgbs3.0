@@ -501,10 +501,9 @@ public class CfetsInterfReceiveService {
             if (StringUtil.isBlank(dealCalId) || StringUtil.equals("ibuVar_calendarId", dealCalId)) {
                 dealCalId = "IB";
             }
-            ibuQuoteCrepDto.setmSettleDate(
+            ibuQuoteCrepDto.setvSettleDate(
                     dateCalCommonService.getPlusDaysWorkDay(transactTime,
-                            ibuQuoteCrepDto.getTerm().intValue(), dealCalId));
-            ibuQuoteCrepDto.setvSettleDate(transactTime);// 60域-业务发生时间
+                            ibuQuoteCrepDto.getSettleSpeed().intValue(), dealCalId));
         }
         
         if(null!=param.get("tradeLimitDays")) {
