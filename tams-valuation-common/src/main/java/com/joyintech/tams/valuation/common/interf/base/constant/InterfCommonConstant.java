@@ -154,17 +154,20 @@ public class InterfCommonConstant {
      *  普通账套代码
      */
     public static final String BOOKSETID = "00000000000000000002";
-    
+    public static final String BOOKSETID_NEW = "SUBJECT_INTERNAL_001";
+
     /**add by wujie on 20181017 start**/
     /**
      *  普通分层账套代码
      */
     public static final String BOOKSETID_LAYERING_NOR = "00000000000000000003";
-    
+    public static final String BOOKSETID_LAYERING_NOR_NEW = "SUBJECT_INTERNAL_001";
+
     /**
      *  权益分层账套代码
      */
     public static final String BOOKSETID_LAYERING_RI = "00000000000000000004";
+    public static final String BOOKSETID_LAYERING_RI_NEW = "SUBJECT_INTERNAL_001";
     /**add by wuji eon 20181017 end**/
     
     

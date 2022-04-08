@@ -2674,21 +2674,46 @@ public class InterfCommonService {
         /**
          * 1.初始化账套信息
          */
-        if (finProductExt.getIsLayerAccount().equals(DictCodeList.是否_否.getValue())) {
-            bokTemplateId = InterfCommonConstant.BOOKSETID;
-        }
-        else { 
-            if (DictCodeList.收益类型_收益型.getValue().equals(finProduct.getProfitType())) {
-                bokTemplateId = InterfCommonConstant.BOOKSETID;
-                if(finProductAdd!=null && DictCodeList.是否_是.getValue().equals(finProductAdd.getIsLay())){
-                    bokTemplateId = InterfCommonConstant.BOOKSETID_LAYERING_NOR;
-                }
+        // add by weipeng on 20220408：会计引擎升级改造，若按照内部科目编码分录，则需要对应新会计引擎模板 start
+        // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录
+        String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+        //调用service方法进行逻辑逻辑
+        if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
+            if (finProductExt.getIsLayerAccount().equals(DictCodeList.是否_否.getValue())) {
+                bokTemplateId = InterfCommonConstant.BOOKSETID_NEW;
             }
             else {
-                bokTemplateId = InterfCommonConstant.BOOKSETID_LAYERING_RI;
+                if (DictCodeList.收益类型_收益型.getValue().equals(finProduct.getProfitType())) {
+                    bokTemplateId = InterfCommonConstant.BOOKSETID_NEW;
+                    if(finProductAdd!=null && DictCodeList.是否_是.getValue().equals(finProductAdd.getIsLay())){
+                        bokTemplateId = InterfCommonConstant.BOOKSETID_LAYERING_NOR_NEW;
+                    }
+                }
+                else {
+                    bokTemplateId = InterfCommonConstant.BOOKSETID_LAYERING_RI_NEW;
+                }
+                //        	bokTemplateId = InterfCommonConstant.BOOKSETID_LAYERING_NOR;
             }
-//        	bokTemplateId = InterfCommonConstant.BOOKSETID_LAYERING_NOR;
         }
+        else{
+            if (finProductExt.getIsLayerAccount().equals(DictCodeList.是否_否.getValue())) {
+                bokTemplateId = InterfCommonConstant.BOOKSETID;
+            }
+            else {
+                if (DictCodeList.收益类型_收益型.getValue().equals(finProduct.getProfitType())) {
+                    bokTemplateId = InterfCommonConstant.BOOKSETID;
+                    if(finProductAdd!=null && DictCodeList.是否_是.getValue().equals(finProductAdd.getIsLay())){
+                        bokTemplateId = InterfCommonConstant.BOOKSETID_LAYERING_NOR;
+                    }
+                }
+                else {
+                    bokTemplateId = InterfCommonConstant.BOOKSETID_LAYERING_RI;
+                }
+                //        	bokTemplateId = InterfCommonConstant.BOOKSETID_LAYERING_NOR;
+            }
+        }
+        // add by weipeng on 20220408：会计引擎升级改造，若按照内部科目编码分录，则需要对应新会计引擎模板 end
+
         otherParams.setTmp_booksetId(bokTemplateId);
         booksetInitResult = booksetInit(finProduct, finProductExt, otherParams);
         /**
@@ -6250,7 +6275,18 @@ public class InterfCommonService {
 	    	//(2) 税务方案信息-默认方案
 	    	if(!StringUtil.isNotEmpty(bokBooksetPlan) || bokBooksetPlan.getSchemeId() ==null){
 	    		map.clear();
-	    		map.put("BOOKSETID", InterfCommonConstant.BOOKSETID);
+                // add by weipeng on 20220408：会计引擎升级改造，若按照内部科目编码分录，则需要对应新会计引擎模板 start
+                // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录
+                String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+                //调用service方法进行逻辑逻辑
+                if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
+                    map.put("BOOKSETID", InterfCommonConstant.BOOKSETID_NEW);
+                }
+                else{
+                    map.put("BOOKSETID", InterfCommonConstant.BOOKSETID);
+                }
+                // add by weipeng on 20220408：会计引擎升级改造，若按照内部科目编码分录，则需要对应新会计引擎模板 end
+
 	    		map.put("ISDEFAULT", DictCodeList.是否_是.getValue());
 	    		map.put("SCHEMETYPE", DictCodeListExt1.配置方案类型_税务方案.getValue());
 	    		bokBooksetPlan=mapper.buildPlan(map);
