@@ -11,6 +11,7 @@
 package com.joyintech.tams.valuation.system.log.service;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -24,6 +25,7 @@ import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.ExportUtil;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 import com.joyintech.tams.valuation.common.utils.FTPTool;
+import com.joyintech.tams.valuation.common.utils.IpUtil;
 import com.joyintech.tams.valuation.common.utils.SftpTools;
 import com.joyintech.tams.valuation.dailyoperation.dailyaccountmake.valnetvalueconfirm.dto.BokFileTransfer003Dto;
 import com.joyintech.tams.valuation.dailyoperation.dailyaccountmake.valnetvalueconfirm.service.ValNetValueConfirm003Service;
@@ -266,47 +268,105 @@ public class ValBatchLog001Service extends CommonExportService<ValBatchLog001Dto
 		// 本地路径
 		String localPath = CacheUtil.getSysParam("upload_file_path");
 		File outFile = null;
-
-		if(port==21){
-			FTPTool ftptool=new FTPTool();
-			try {
-				// ftp登录
-				ftptool.login(username, password, ip, port, sftpLoginType);
-				outFile = ftptool.getFileTransfer(allPath,fileName,localPath);
-			}
-			catch (Exception e) {
-				logger.error("FTP下载文件失败",e);
-				ftptool.close();
-			}
-			try {
-				// 关闭登录
-				ftptool.close();
-			}
-			catch (Exception e) {
-				logger.error("FTP关闭登录失败",e);
-			}
+		//获取本机IP地址
+		String myIp=IpUtil.getLocalIp4Address().get().toString().replaceAll("/","");
+		ResponseEntity responseEntity = null;
+		if(myIp.equals(ip)){
+			//对于本机直接下载
+			outFile=new File(allPath);
+			responseEntity= ExportUtil.export(fileName, outFile, false);
 		}else{
+			if(port==21){
+				FTPTool ftptool=new FTPTool();
+				try {
+					// ftp登录
+					ftptool.login(username, password, ip, port, sftpLoginType);
+					outFile = ftptool.getFileTransfer(filePath,allPath,localPath);
+				}
+				catch (Exception e) {
+					logger.error("FTP下载文件失败",e);
+					ftptool.close();
+				}
+				try {
+					// 关闭登录
+					ftptool.close();
+				}
+				catch (Exception e) {
+					logger.error("FTP关闭登录失败",e);
+				}
+			}else{
 
-			SftpTools sftpTools = new SftpTools();
-			try {
-				// sftp登录
-				sftpTools.login(username, password, ip, port, sftpLoginType);
-				outFile = sftpTools.getFileTransfer(allPath,fileName,localPath,seqNo);
+				SftpTools sftpTools = new SftpTools();
+				try {
+					// sftp登录
+					sftpTools.login(username, password, ip, port, sftpLoginType);
+					outFile = sftpTools.getFileTransfer(filePath,fileName,localPath,seqNo);
+				}
+				catch (Exception e) {
+					logger.error("SFTP下载文件失败",e);
+				}
+				try {
+					// 关闭登录
+					sftpTools.close();
+				}
+				catch (Exception e) {
+					logger.error("SFTP关闭登录失败",e);
+				}
 			}
-			catch (Exception e) {
-				logger.error("SFTP下载文件失败",e);
-			}
-			try {
-				// 关闭登录
-				sftpTools.close();
-			}
-			catch (Exception e) {
-				logger.error("SFTP关闭登录失败",e);
-			}
+			responseEntity= ExportUtil.export(fileName, outFile, true);
 		}
-		return ExportUtil.export(fileName, outFile, true);
+
+
+		return responseEntity;
 	}
 
 
+	public static void main(String[] args) throws IOException {
+
+		String allPath = "/home/tams/logs/batch/detail/detail_2022-04-09.log";
+
+		// 附件存储路径
+		String filePath = allPath.substring(0,allPath.lastIndexOf("/"));
+
+		// 文件名称
+		String fileName = allPath.substring(allPath.lastIndexOf("/")+1,allPath.length());
+		File outFile = null;
+//		SftpTools sftpTools = new SftpTools();
+//		try {
+//
+//			// ftp登录
+//			sftpTools.login("root", "joyin1125", "192.168.60.142", 22, "01");
+//			outFile = sftpTools.getFileTransfer(filePath,fileName,"/home/bs3.0/yy/app/tams/upload","12112121");
+//		}catch (Exception e) {
+//			sftpTools.close();
+//		}
+//		try {
+//			// 关闭登录
+//			sftpTools.close();
+//		}
+//		catch (Exception e) {
+//		}
+		System.out.println( IpUtil.getLocalIp4Address().get().toString().replaceAll("/",""));
+		FTPTool ftptool=new FTPTool();
+		try {
+			// ftp登录
+			ftptool.login("logftp", "123456", "192.168.10.225", 21, "01");
+			outFile = ftptool.getFileTransfer(filePath,fileName,"/home/bs3.0/yy/app/tams/upload");
+			//outFile=new File(allPath);
+		}
+		catch (Exception e) {
+			ftptool.close();
+		}
+		try {
+			// 关闭登录
+			ftptool.close();
+		}
+		catch (Exception e) {
+		}
+
+
+
+
+	}
 
 }
