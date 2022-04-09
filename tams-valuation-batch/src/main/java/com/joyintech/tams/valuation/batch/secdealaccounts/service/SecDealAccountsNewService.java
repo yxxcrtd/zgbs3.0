@@ -232,15 +232,7 @@ public class SecDealAccountsNewService {
             // 3.2投资目的 = 摊余成本的情况
             quaryFvoci(returnResult, acctEntity, param, paramT1);
         }
-        CustomDetailBatchLogDto dto=new CustomDetailBatchLogDto();
-        dto.setTradeId("123");
-        dto.setBusiType("债券");
-        dto.setBokDetailId("21212121");
-        dto.setBusiId("ABDGDG");
-        dto.setSceneId("1401");
-        dto.setResult("测试失败");
-        throw new DetailBatchException(dto,"账务明细测试报错",new NullPointerException());
-        //return returnResult;
+        return returnResult;
     }
 
     /**
