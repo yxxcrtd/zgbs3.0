@@ -10,6 +10,7 @@
  
 package com.joyintech.tams.valuation.system.log.service;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -17,9 +18,21 @@ import java.util.Map;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.jcraft.jsch.JSchException;
+import com.joyintech.framework.file.SafelyFile;
+import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.framework.util.ExportUtil;
+import com.joyintech.tams.valuation.common.constants.ServiceApplication;
+import com.joyintech.tams.valuation.common.utils.FTPTool;
+import com.joyintech.tams.valuation.common.utils.SftpTools;
+import com.joyintech.tams.valuation.dailyoperation.dailyaccountmake.valnetvalueconfirm.dto.BokFileTransfer003Dto;
+import com.joyintech.tams.valuation.dailyoperation.dailyaccountmake.valnetvalueconfirm.service.ValNetValueConfirm003Service;
 import com.joyintech.tams.valuation.system.log.dto.ValBatchLogDetailExDto;
 import org.apache.poi.ss.usermodel.Cell;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
@@ -36,6 +49,8 @@ import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt1;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * 批处理日志service	
  * 
@@ -46,7 +61,10 @@ import com.joyintech.tams.constant.DictCodeListExt1;
  */
 @Service
 public class ValBatchLog001Service extends CommonExportService<ValBatchLog001Dto> {
-
+	/**
+	 * 日志
+	 */
+	private Logger logger = LoggerFactory.getLogger(ValBatchLog001Service.class);
     /**
      * <意义，目的和功能，以及可能被用到的地方>
      */
@@ -189,27 +207,104 @@ public class ValBatchLog001Service extends CommonExportService<ValBatchLog001Dto
     	}
     }
 
-	public Page<ValBatchLogDetailExDto> findDetai( String seqNo) {
+	public Page<ValBatchLogDetailExDto> findDetail( String seqNo) {
 		List<ValBatchLogDetailExDto> newList = new ArrayList<ValBatchLogDetailExDto>();
 		Page<ValBatchLogDetailExDto> pageList=new Page<ValBatchLogDetailExDto>();
 		ValBatchLog001Dto dto = valBatchLog001Mapper.findLogDetail(seqNo);
 		if (dto != null) {
 			String detailEx = dto.getDetailEx();
 			//String detailEx = "[{'业务代码':'ABDGDG','业务类型':'债券','业务明细代码':'21212121','交易代码':'123','账务场景代码':'1401'}]";
-			JSONArray array = JSONArray.parseArray(detailEx);
-			for (Object mapList : array) {
-				for (Object entry : ((Map) mapList).entrySet()) {
-					ValBatchLogDetailExDto detail = new ValBatchLogDetailExDto();
-					detail.setRemark((String) ((Map.Entry) entry).getKey());
-					detail.setValue((String) ((Map.Entry) entry).getValue());
-					newList.add(detail);
+			if(!StringUtil.isEmpty(detailEx)){
+				JSONArray array = JSONArray.parseArray(detailEx);
+				for (Object mapList : array) {
+					for (Object entry : ((Map) mapList).entrySet()) {
+						ValBatchLogDetailExDto detail = new ValBatchLogDetailExDto();
+						detail.setRemark((String) ((Map.Entry) entry).getKey());
+						detail.setValue((String) ((Map.Entry) entry).getValue());
+						newList.add(detail);
+					}
 				}
 			}
+
 		}
 		pageList.setCode(0);
 		pageList.setRoot(newList);
 		pageList.setRecords(newList.size());
 		return pageList;
+	}
+
+	/**
+	 * 文件下载
+	 *
+	 * @param request
+	 * @throws Exception
+	 */
+	public ResponseEntity<byte[]> downloadFile(HttpServletRequest request) throws Exception {
+		// 文件本地路径
+		String seqNo = request.getParameter("seqNo")==null?"":request.getParameter("seqNo");
+		ValBatchLog001Dto dto = valBatchLog001Mapper.findLogDetail(seqNo);
+		String allPath = dto.getFilePath();
+
+		// 附件存储路径
+		String filePath = allPath.substring(0,allPath.lastIndexOf("/"));
+
+		// 文件名称
+		String fileName = allPath.substring(allPath.lastIndexOf("/")+1,allPath.length());
+		File file = new SafelyFile(filePath);
+		boolean rec = file.renameTo(new SafelyFile(fileName));
+		if(rec){
+			logger.info("处理成功");
+		}
+
+
+		String ip = CacheUtil.getSysParam("BATCHLOG_HOST");// 主机IP
+		Integer port = Integer.parseInt(CacheUtil.getSysParam("BATCHLOG_PORT"));// 主机端口
+		String username = CacheUtil.getSysParam("BATCHLOG_USERNAME");// 主机用户名
+		String password = CacheUtil.getSysParam("BATCHLOG_PASSWORD");// 主机密码或秘钥地址
+		String sftpLoginType = CacheUtil.getSysParam("SFTP_LOGIN_TYPE");// SFTP登录方式
+
+		// 本地路径
+		String localPath = CacheUtil.getSysParam("upload_file_path");
+		File outFile = null;
+
+		if(port==21){
+			FTPTool ftptool=new FTPTool();
+			try {
+				// ftp登录
+				ftptool.login(username, password, ip, port, sftpLoginType);
+				outFile = ftptool.getFileTransfer(allPath,fileName,localPath);
+			}
+			catch (Exception e) {
+				logger.error("FTP下载文件失败",e);
+				ftptool.close();
+			}
+			try {
+				// 关闭登录
+				ftptool.close();
+			}
+			catch (Exception e) {
+				logger.error("FTP关闭登录失败",e);
+			}
+		}else{
+
+			SftpTools sftpTools = new SftpTools();
+			try {
+				// sftp登录
+				sftpTools.login(username, password, ip, port, sftpLoginType);
+				outFile = sftpTools.getFileTransfer(allPath,fileName,localPath,seqNo);
+			}
+			catch (Exception e) {
+				logger.error("SFTP下载文件失败",e);
+			}
+			try {
+				// 关闭登录
+				sftpTools.close();
+			}
+			catch (Exception e) {
+				logger.error("SFTP关闭登录失败",e);
+			}
+		}
+		return ExportUtil.export(fileName, outFile, true);
 	}
 
 

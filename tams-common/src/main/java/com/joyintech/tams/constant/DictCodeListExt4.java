@@ -19,6 +19,8 @@ import java.util.Map;
  * @since 1.0
  */
 public enum DictCodeListExt4 implements BaseDictCodeList {
+    详情日志切面开关_关闭(DictCode.详情日志切面开关,"01","关闭"),
+    详情日志切面开关_开启(DictCode.详情日志切面开关,"02","开启"),
 
     会计分录类型_按科目分录(DictCode.会计分录类型,"01","按科目分录"),
     会计分录类型_按内部科目编码分录(DictCode.会计分录类型,"02","按内部科目编码分录"),

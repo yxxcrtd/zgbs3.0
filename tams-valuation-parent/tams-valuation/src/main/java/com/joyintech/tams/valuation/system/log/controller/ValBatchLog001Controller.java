@@ -14,6 +14,7 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 
+import com.jcraft.jsch.JSchException;
 import com.joyintech.tams.valuation.system.log.dto.ValBatchLogDetailExDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,8 @@ import com.joyintech.system.constant.SystemDictCode;
 import com.joyintech.system.constant.SystemGlobalConstant;
 import com.joyintech.tams.valuation.system.log.dto.ValBatchLog001Dto;
 import com.joyintech.tams.valuation.system.log.service.ValBatchLog001Service;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -129,9 +132,9 @@ public class ValBatchLog001Controller extends BaseController {
     }
 
     @ResponseBody
-    @RequestMapping("findDetai")
-    public Page<ValBatchLogDetailExDto> findDetai() {
-        return valBatchLog001Service.findDetai(this.getParam("seqNo"));
+    @RequestMapping("findDetail")
+    public Page<ValBatchLogDetailExDto> findDetail() {
+        return valBatchLog001Service.findDetail(this.getParam("seqNo"));
     }
 
 
@@ -153,5 +156,23 @@ public class ValBatchLog001Controller extends BaseController {
                                  + DateUtil.format(new Date()) + SystemGlobalConstant.CLOSE_PARENTHESIS
                                  + SystemGlobalConstant.POINT + FileNameUtil.getFileExtName(outFile),
             outFile, true);
+    }
+
+
+    /**
+     * 文件下载
+     *
+     * @param request
+     *            请求
+     * @return 保存文件信息
+     * @throws Exception
+     *             异常
+     * @see
+     * @since 1.0
+     */
+    @RequestMapping(value = "/downloadFile")
+    @ResponseBody
+    public ResponseEntity<byte[]> downloadFile(HttpServletRequest request) throws Exception {
+        return valBatchLog001Service.downloadFile(request);
     }
 }

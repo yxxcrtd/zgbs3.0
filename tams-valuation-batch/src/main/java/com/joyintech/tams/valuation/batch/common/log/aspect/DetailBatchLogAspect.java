@@ -5,18 +5,19 @@ import com.alibaba.fastjson.JSON;
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
 import com.joyintech.framework.base.entity.SysBatchTask;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.valuation.batch.common.fund.dao.FundCommonMapper;
 import com.joyintech.tams.valuation.batch.common.log.dao.DetailBatchLogMapper;
-import com.joyintech.tams.valuation.batch.common.log.dto.CustomDetailBatchLogDto;
-import com.joyintech.tams.valuation.batch.common.log.dto.DetailBatchLogDto;
-import com.joyintech.tams.valuation.batch.common.log.dto.DetailBatchLogExpand;
-import com.joyintech.tams.valuation.batch.common.log.dto.DetailLogConfig;
+import com.joyintech.tams.valuation.batch.common.log.dto.*;
 import com.joyintech.tams.valuation.batch.common.log.exception.DetailBatchException;
 import groovy.util.logging.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
+import org.apache.http.client.utils.DateUtils;
+import org.apache.log4j.DailyRollingFileAppender;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
@@ -35,6 +36,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
@@ -57,13 +59,13 @@ import java.util.concurrent.ConcurrentHashMap;
 @Aspect
 public class DetailBatchLogAspect {
     private Logger logger = LoggerFactory.getLogger(getClass());
+    private static final String FILE_APPENDER_ID = "detail";
+    private org.apache.log4j.Logger detaiLogger = org.apache.log4j.Logger.getLogger(getClass());
     private static DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     //保存最新任务日志 map<任务组+taskID,日志>
     private ConcurrentHashMap<String, DetailBatchLogDto> taskLogger=new ConcurrentHashMap<String, DetailBatchLogDto>();
-
     //保存错误日志 map<任务组+taskID,日志>
     private ConcurrentHashMap<String, DetailBatchLogDto> errorLogger=new ConcurrentHashMap<String, DetailBatchLogDto>();
-
     //账套属性名称
     private final String BOOK_SET_ID="booksetId";
     //金融产品代码
@@ -221,95 +223,100 @@ public class DetailBatchLogAspect {
      **/
     @Around(value = "processAspect()")
     public Object processAround(ProceedingJoinPoint point) throws Throwable {
-        MethodSignature signature = (MethodSignature) point.getSignature();
-        Object[] args = point.getArgs();
-        Object items= (Object) args[0];
-        Class classz = point.getTarget().getClass();
-        Method method = signature.getMethod();
-        Class <?> clz=items.getClass();
-        Field[] fields = clz.getDeclaredFields();
-        //从参数抽取账套ID
-        String booksetId=null;
-        String finProdId=null;
-        for (Field field : fields) {
-            //获取账套ID
-            if(field.getName().equals(BOOK_SET_ID)){
-                field.setAccessible(true);
-                Method m = null;
-                try {
-                    m = (Method) items.getClass().getMethod("get"+getMethodName(field.getName()));
-                    booksetId=(String)m.invoke(items);
-                } catch (Exception exception) {
-                    exception.printStackTrace();
+        String DETAIL_ASPECT_SWITCH= CacheUtil.getSysParam("DETAIL_ASPECT_SWITCH");
+        if(DictCodeListExt4.详情日志切面开关_开启.getValue().equals(DETAIL_ASPECT_SWITCH)) {
+            MethodSignature signature = (MethodSignature) point.getSignature();
+            Object[] args = point.getArgs();
+            Object items = (Object) args[0];
+            Class classz = point.getTarget().getClass();
+            Method method = signature.getMethod();
+            Class<?> clz = items.getClass();
+            Field[] fields = clz.getDeclaredFields();
+            //从参数抽取账套ID
+            String booksetId = null;
+            String finProdId = null;
+            for (Field field : fields) {
+                //获取账套ID
+                if (field.getName().equals(BOOK_SET_ID)) {
+                    field.setAccessible(true);
+                    Method m = null;
+                    try {
+                        m = (Method) items.getClass().getMethod("get" + getMethodName(field.getName()));
+                        booksetId = (String) m.invoke(items);
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                    }
+                }
+                //获取金融产品代码
+                if (field.getName().equals(FIN_PROD_ID)) {
+                    field.setAccessible(true);
+                    Method m = null;
+                    try {
+                        m = (Method) items.getClass().getMethod("get" + getMethodName(field.getName()));
+                        finProdId = (String) m.invoke(items);
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                    }
                 }
             }
-            //获取金融产品代码
-            if(field.getName().equals(FIN_PROD_ID)){
-                field.setAccessible(true);
-                Method m = null;
-                try {
-                    m = (Method) items.getClass().getMethod("get"+getMethodName(field.getName()));
-                    finProdId=(String)m.invoke(items);
-                } catch (Exception exception) {
-                    exception.printStackTrace();
+
+
+            //获取process的父类-->BaseProcessor
+            Class baseProcessor = point.getTarget().getClass().getSuperclass();
+            //从process父类属性中抽取任务组相关信息
+            Field[] baseProcessFileds = baseProcessor.getDeclaredFields();
+            SysBatchExecInfo batchExecuteInfo = new SysBatchExecInfo();
+            SysBatchTask batchTask = new SysBatchTask();
+
+            Field excuteInfo = baseProcessor.getDeclaredField(BATCH_EXCUTE_INFO);
+            excuteInfo.setAccessible(true);
+            batchExecuteInfo = (SysBatchExecInfo) excuteInfo.get(point.getTarget());
+
+            Field taskinfo = baseProcessor.getDeclaredField(BATCH_TASK);
+            taskinfo.setAccessible(true);
+            batchTask = (SysBatchTask) taskinfo.get(point.getTarget());
+
+            if (booksetId == null) {
+                noBookSetId.put(batchTask.getBeanName(), items);
+            }
+            String key = batchExecuteInfo.getSeqNo();
+            DetailBatchLogDto loggers = null;
+            if (loggers == null) {
+                loggers = new DetailBatchLogDto();
+                loggers.setBooksetId(booksetId == null ? "" : booksetId);
+                loggers.setFinprodId(finProdId);
+                loggers.setClassName(classz.getName());
+                loggers.setMethodName(method.getName());
+                loggers.setArgs(args);
+                if (batchExecuteInfo != null) {
+                    loggers.setExeSeqno(batchExecuteInfo.getSeqNo());
+                    loggers.setGroupId(batchExecuteInfo.getBatchExedetailSeqNo());
+                    loggers.setExcuteDate(batchExecuteInfo.getExecuteDate());
+                }
+                if (batchTask != null) {
+                    loggers.setTaskId(batchTask.getTaskId());
+                    loggers.setTaskName(batchTask.getTaskName());
+                    loggers.setTaskBeanName(batchTask.getBeanName());
                 }
             }
-        }
 
-
-        //获取process的父类-->BaseProcessor
-        Class baseProcessor=point.getTarget().getClass().getSuperclass();
-        //从process父类属性中抽取任务组相关信息
-        Field[] baseProcessFileds = baseProcessor.getDeclaredFields();
-        SysBatchExecInfo batchExecuteInfo=new SysBatchExecInfo();
-        SysBatchTask batchTask=new SysBatchTask();
-
-        Field excuteInfo = baseProcessor.getDeclaredField(BATCH_EXCUTE_INFO);
-        excuteInfo.setAccessible(true);
-        batchExecuteInfo=(SysBatchExecInfo)excuteInfo.get(point.getTarget());
-
-        Field taskinfo = baseProcessor.getDeclaredField(BATCH_TASK);
-        taskinfo.setAccessible(true);
-        batchTask=(SysBatchTask)taskinfo.get(point.getTarget());
-
-        if(booksetId==null){
-            noBookSetId.put(batchTask.getBeanName(),items);
-        }
-        String key=batchExecuteInfo.getSeqNo();
-        DetailBatchLogDto loggers = null;
-        if(loggers==null){
-            loggers=new DetailBatchLogDto();
-            loggers.setBooksetId(booksetId==null?"":booksetId);
-            loggers.setFinprodId(finProdId);
-            loggers.setClassName(classz.getName());
-            loggers.setMethodName(method.getName());
-            loggers.setArgs(args);
-            if(batchExecuteInfo!=null){
-                loggers.setExeSeqno(batchExecuteInfo.getSeqNo());
-                loggers.setGroupId(batchExecuteInfo.getBatchExedetailSeqNo());
-                loggers.setExcuteDate(batchExecuteInfo.getExecuteDate());
+            StopWatch stopWatch = new StopWatch();
+            loggers.setStart(LocalDateTime.now());
+            stopWatch.start();
+            Object result = null;
+            try {
+                result = point.proceed();
+            } catch (Exception e) {
+                handleThrowing(point, e, loggers);
+                throw e;
             }
-            if(batchTask!=null){
-                loggers.setTaskId(batchTask.getTaskId());
-                loggers.setTaskName(batchTask.getTaskName());
-                loggers.setTaskBeanName(batchTask.getBeanName());
-            }
+            stopWatch.stop();
+            loggers.setEnd(LocalDateTime.now());
+            loggers.setResultInfo(result);
+            return result;
+        }else{
+            return point.proceed();
         }
-
-        StopWatch stopWatch = new StopWatch();
-        loggers.setStart(LocalDateTime.now());
-        stopWatch.start();
-        Object result = null;
-        try {
-            result = point.proceed();
-        } catch (Exception e) {
-            handleThrowing(point,e,loggers);
-            throw e;
-        }
-        stopWatch.stop();
-        loggers.setEnd(LocalDateTime.now());
-        loggers.setResultInfo(result);
-        return result;
     }
 
     /* @Author 殷亚
@@ -321,62 +328,63 @@ public class DetailBatchLogAspect {
      **/
     @After(value = "processAspect()")
     public void processAfter(JoinPoint point) throws Throwable {
-        //从父类baseProcess中抽取任务信息
-        Class baseProcess = point.getTarget().getClass().getSuperclass();
-        Field[] fields = baseProcess.getDeclaredFields();
-        // 请求的参数
-        Object[] args = point.getArgs();
-        Object items= (Object) args[0];
-        SysBatchExecInfo batchExecuteInfo=new SysBatchExecInfo();
-        SysBatchTask batchTask=new SysBatchTask();
+        String DETAIL_ASPECT_SWITCH= CacheUtil.getSysParam("DETAIL_ASPECT_SWITCH");
+        if(DictCodeListExt4.详情日志切面开关_开启.getValue().equals(DETAIL_ASPECT_SWITCH)) {
+            //从父类baseProcess中抽取任务信息
+            Class baseProcess = point.getTarget().getClass().getSuperclass();
+            Field[] fields = baseProcess.getDeclaredFields();
+            // 请求的参数
+            Object[] args = point.getArgs();
+            Object items = (Object) args[0];
+            SysBatchExecInfo batchExecuteInfo = new SysBatchExecInfo();
+            SysBatchTask batchTask = new SysBatchTask();
 
-        Field excuteInfo = baseProcess.getDeclaredField(BATCH_EXCUTE_INFO);
-        excuteInfo.setAccessible(true);
-        batchExecuteInfo=(SysBatchExecInfo)excuteInfo.get(point.getTarget());
+            Field excuteInfo = baseProcess.getDeclaredField(BATCH_EXCUTE_INFO);
+            excuteInfo.setAccessible(true);
+            batchExecuteInfo = (SysBatchExecInfo) excuteInfo.get(point.getTarget());
 
-        Field taskinfo = baseProcess.getDeclaredField(BATCH_TASK);
-        taskinfo.setAccessible(true);
-        batchTask=(SysBatchTask)taskinfo.get(point.getTarget());
-        String key=batchExecuteInfo.getSeqNo();
-        DetailBatchLogDto lger = errorLogger.get(key);
-        if(lger!=null){
-            String booksetId=lger.getBooksetId();
-            String finprodId=lger.getFinprodId();
-            String busiId=lger.getBusiId();
-            List<CustomDetailBatchLogDto> detailLsit=lger.getDetailList();
-            StringBuffer prodIdJson=new StringBuffer();
-            prodIdJson.append("{");
-            prodIdJson.append("账套代码："+booksetId);
-            if(finprodId!=null){
-                prodIdJson.append(",金融产品代码："+finprodId);
-            }
-            if(busiId!=null){
-                prodIdJson.append(",业务代码："+busiId);
-            }
-            if(CollectionUtils.isNotEmpty(detailLsit)){
-                prodIdJson.append(",详情信息："+getDetailJson(detailLsit));
-            }
+            Field taskinfo = baseProcess.getDeclaredField(BATCH_TASK);
+            taskinfo.setAccessible(true);
+            batchTask = (SysBatchTask) taskinfo.get(point.getTarget());
+            String key = batchExecuteInfo.getSeqNo();
+            DetailBatchLogDto lger = errorLogger.get(key);
+            if (lger != null) {
+                String booksetId = lger.getBooksetId();
+                String finprodId = lger.getFinprodId();
+                String busiId = lger.getBusiId();
+                List<CustomDetailBatchLogDto> detailLsit = lger.getDetailList();
+                StringBuffer prodIdJson = new StringBuffer();
+                prodIdJson.append("{");
+                prodIdJson.append("账套代码：" + booksetId);
+                if (finprodId != null) {
+                    prodIdJson.append(",金融产品代码：" + finprodId);
+                }
+                if (busiId != null) {
+                    prodIdJson.append(",业务代码：" + busiId);
+                }
+                if (CollectionUtils.isNotEmpty(detailLsit)) {
+                    prodIdJson.append(",详情信息：" + getDetailJson(detailLsit));
+                }
 
-            prodIdJson.append("}");
-            Class <?> clz=items.getClass().getSuperclass();
-            Field prodId = clz.getDeclaredField(PROD_ID);
-            prodId.setAccessible(true);
-            //系统原有逻辑有些批会在reder层给process执行参数增加账套、业务明细等信息，所以不破坏原来的逻辑，为空才赋值
-            String orcProdid=(String)prodId.get(items);
-            if(StringUtils.isEmpty(orcProdid)){
-                prodId.set(items,prodIdJson.toString());
-            }
-            //写完错误日志后释放errorLogger
-            Iterator<String> erroriter = errorLogger.keySet().iterator();
-            while(erroriter.hasNext()){
-                String ikey = erroriter.next();
-                if(key.equals(ikey)){
-                    erroriter.remove();
+                prodIdJson.append("}");
+                Class<?> clz = items.getClass().getSuperclass();
+                Field prodId = clz.getDeclaredField(PROD_ID);
+                prodId.setAccessible(true);
+                //系统原有逻辑有些批会在reder层给process执行参数增加账套、业务明细等信息，所以不破坏原来的逻辑，为空才赋值
+                String orcProdid = (String) prodId.get(items);
+                if (StringUtils.isEmpty(orcProdid)) {
+                    prodId.set(items, prodIdJson.toString());
+                }
+                //写完错误日志后释放errorLogger
+                Iterator<String> erroriter = errorLogger.keySet().iterator();
+                while (erroriter.hasNext()) {
+                    String ikey = erroriter.next();
+                    if (key.equals(ikey)) {
+                        erroriter.remove();
+                    }
                 }
             }
         }
-
-
 
 
     }
@@ -504,11 +512,11 @@ public class DetailBatchLogAspect {
                 loggers.setDetailList(detailList);
             }
         }
-        //由于框架限制了换行符，只能逐行打印
+        //由于框架限制了换行符，只能逐行打印,逐行打印时，需要加synchronized，保证多线程能逐行。
         synchronized(this) {
             logger.error("任务组【" + loggers.getGroupId() + "】详情日志---------------开始-------------------------------");
             logger.error("任务:" + loggers.getTaskName());
-            logger.error("执行时间:" + loggers.getExcuteDate());
+            logger.error("执行时间: " +  DateUtils.formatDate(loggers.getExcuteDate(),"yyyy-MM-dd"));
             logger.error("账套ID:" + booksetId);
             if (loggers.getBusiId() != null) {
                 logger.error("业务编号:" + loggers.getBusiId());
@@ -536,9 +544,115 @@ public class DetailBatchLogAspect {
             //放错误日志
             errorLogger.put(key, loggers);
             logger.error("任务组【" + loggers.getGroupId() + "】详情日志---------------结束-------------------------------");
+
+            //单独写入detail日志
+            DailyRollingFileAppender appender = (DailyRollingFileAppender) detaiLogger
+                    .getRootLogger().getAppender(FILE_APPENDER_ID);
+
+            //反射调用文件路径
+            Class logClz = appender.getClass().getSuperclass();
+            try {
+                Field myfield=appender.getClass().getDeclaredField("scheduledFilename");
+                myfield.setAccessible(true);
+                String scheduledFilename=(String)myfield.get(appender);
+
+                Field field=logClz.getDeclaredField("fileName");
+                field.setAccessible(true);
+                field.set(appender,scheduledFilename+".log");
+
+
+                loggers.setFilePath(scheduledFilename+".log");
+            } catch (NoSuchFieldException noSuchFieldException) {
+                noSuchFieldException.printStackTrace();
+            } catch (IllegalAccessException illegalAccessException) {
+                illegalAccessException.printStackTrace();
+            }
+            detaiLogger.error("任务组【" + loggers.getGroupId() + "】详情日志---------------开始-------------------------------");
+            detaiLogger.error("任务:" + loggers.getTaskName());
+            detaiLogger.error("执行时间: " + DateUtils.formatDate(loggers.getExcuteDate(),"yyyy-MM-dd"));
+            detaiLogger.error("账套ID:" + booksetId);
+            if (loggers.getBusiId() != null) {
+                detaiLogger.error("业务编号:" + loggers.getBusiId());
+            }
+            if (loggers.getFinprodId() != null) {
+                detaiLogger.error("金融产品代码:" + loggers.getFinprodId());
+            }
+
+            if (CollectionUtils.isNotEmpty(loggers.getDetailList())) {
+                loggers.getDetailList().stream().forEach(s -> {
+                    detaiLogger.error("----业务详细:" + JSON.toJSONString(s));
+                    detaiLogger.error("----异常信息:");
+                    detaiLogger.error(JSON.toJSONString(s.getResult()));
+                });
+
+            }
+            detaiLogger.error("类名:" + loggers.getClassName());
+            detaiLogger.error("方法名:" + loggers.getMethodName());
+            detaiLogger.error("入参:" + JSON.toJSONString(args));
+            detaiLogger.error("开始执行时间:" + loggers.getStart().format(df));
+            detaiLogger.error("结束执行时间:" + loggers.getEnd().format(df));
+            detaiLogger.error("执行结果:");
+            detaiLogger.error(JSON.toJSONString(loggers.getResultInfo()));
+            detaiLogger.warn("没有账套ID的集合" + JSON.toJSONString(noBookSetId));
+            detaiLogger.error("任务组【" + loggers.getGroupId() + "】详情日志---------------结束-------------------------------");
+
         }
+            //单独写入detail日志
+//            DailyRollingFileAppender appender = (DailyRollingFileAppender) detaiLogger
+//                    .getRootLogger().getAppender(FILE_APPENDER_ID);
+//
+//            //反射调用文件路径
+//            Class logClz = appender.getClass().getSuperclass();
+//            try {
+//                Field myfield=appender.getClass().getDeclaredField("scheduledFilename");
+//                myfield.setAccessible(true);
+//                String scheduledFilename=(String)myfield.get(appender);
+//
+//                Field field=logClz.getDeclaredField("fileName");
+//                field.setAccessible(true);
+//                field.set(appender,scheduledFilename+".log");
+//
+//
+//                loggers.setFilePath(scheduledFilename+".log");
+//            } catch (NoSuchFieldException noSuchFieldException) {
+//                noSuchFieldException.printStackTrace();
+//            } catch (IllegalAccessException illegalAccessException) {
+//                illegalAccessException.printStackTrace();
+//            }
+//            StringBuffer sb=new StringBuffer();
+//
+//            sb.append("任务组【" + loggers.getGroupId() + "】详情日志---------------开始-------------------------------");
+//            sb.append("\r\n任务:" + loggers.getTaskName());
+//            sb.append("\r\n执行时间: " + DateUtils.formatDate(loggers.getExcuteDate(),"yyyy-MM-dd"));
+//            sb.append("\r\n账套ID:" + booksetId);
+//            if (loggers.getBusiId() != null) {
+//                sb.append("\r\n业务编号:" + loggers.getBusiId());
+//            }
+//            if (loggers.getFinprodId() != null) {
+//                sb.append("\r\n金融产品代码:" + loggers.getFinprodId());
+//            }
+//
+//            if (CollectionUtils.isNotEmpty(loggers.getDetailList())) {
+//                loggers.getDetailList().stream().forEach(s -> {
+//                    sb.append("\r\n----业务详细:" + JSON.toJSONString(s));
+//                    sb.append("\r\n----异常信息:");
+//                    sb.append("\r\n"+JSON.toJSONString(s.getResult()));
+//                });
+//
+//            }
+//            sb.append("\r\n类名:" + loggers.getClassName());
+//            sb.append("\r\n方法名:" + loggers.getMethodName());
+//            sb.append("\r\n入参:" + JSON.toJSONString(args));
+//            sb.append("\r\n开始执行时间:" + loggers.getStart().format(df));
+//            sb.append("\r\n结束执行时间:" + loggers.getEnd().format(df));
+//            sb.append("\r\n执行结果:");
+//            sb.append("\r\n"+JSON.toJSONString(loggers.getResultInfo()));
+//            sb.append("\r\n没有账套ID的集合" + JSON.toJSONString(noBookSetId));
+//            sb.append("\r\n任务组【" + loggers.getGroupId() + "】详情日志---------------结束-------------------------------");
+//
+//        detaiLogger.error(sb.toString());
         //写入数据库
-        logger.error("--写入详情日志表开始");
+        detaiLogger.error("--写入详情日志表开始");
         DataSourceTransactionManager transactionManager = getTransactionManager();
         // 获取事务控制管理器
         TransactionStatus status = getTransactionStatus();
@@ -551,7 +665,7 @@ public class DetailBatchLogAspect {
             transactionManager.rollback(status);
             throw new DetailBatchException(loggers.getExeSeqno(),"写入详情日志表异常："+ex.getMessage());
         }
-        logger.error("--写入详情日志表开结束");
+        detaiLogger.error("--写入详情日志表开结束");
 
     }
 
@@ -657,5 +771,6 @@ public class DetailBatchLogAspect {
         // 获得事务状态
         return transactionManager.getTransaction(def);
     }
+
 
 }

@@ -47,7 +47,7 @@
     </div>
 
 
-    <div class="pro-module-wrapper pro-module-base">
+    <div class="pro-module-wrapper pro-module-base" id="detailLog">
         <div class="pro-module-wrap">
             <div class="pro-module">
                 <h3 class="pro-module-title">
@@ -86,7 +86,15 @@
                             <div class="layui-input-inline input-inline">
                                 <input type="text" id="filePath" name="finprodId" class="layui-input form-input"
                                        data-th-value="${log?.filePath}"/>
+
                             </div>
+
+                        </div>
+                        <div class="layui-col-md4">
+                            <div class="layui-input-inline input-inline">
+                                <i id="download" class="layui-icon layui-icon-file" style="color: #1E9FFF;"></i>
+                            </div>
+
                         </div>
 
                     </div>
@@ -109,6 +117,7 @@
                                 <table class="layui-table" id="dataTable"></table>
                             </div>
                             <div style="display: none;" id="seqNo" data-th-text="${log?.seqNo}"></div>
+                            <div style="display: none;" id="exeSeqno" data-th-text="${log?.exeSeqno}"></div>
                         </div>
                     </div>
                 </div>

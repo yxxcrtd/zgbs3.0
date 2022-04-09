@@ -9,7 +9,7 @@ package com.joyintech.tams.valuation.batch.common.log.exception;
  */
 
 import com.joyintech.tams.valuation.batch.common.log.dto.DetailBatchLogExpand;
-import com.joyintech.tams.valuation.batch.common.log.dto.DetailLogLevel;
+import com.joyintech.tams.valuation.batch.common.log.dto.LogLevel;
 
 /* @Author 殷亚
  * @Description 详细日志的异常类
@@ -36,7 +36,7 @@ public class DetailBatchException extends RuntimeException{
      * 异常级别：INFO,DEBUG,ERROR,WRAN
      * 默认error
      */
-    public String lev= DetailLogLevel.ERROR.toString();
+    public String lev= LogLevel.ERROR.toString();
 
     /**
      * 日志扩展明细实体

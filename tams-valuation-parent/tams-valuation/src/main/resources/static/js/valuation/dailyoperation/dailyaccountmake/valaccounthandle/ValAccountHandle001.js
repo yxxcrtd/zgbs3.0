@@ -130,11 +130,11 @@ $(function () {
                     , {field: 'useingTime', width: 100, title: '耗时(s)',sort: true}
                     , {field: 'startTimeFmt',sorfiled:'batchStartTime', width: 150, title: '开始时间',sort: true}
                     , {field: 'endTimeFmt',sorfiled:'batchEndTime', width: 150, title: '结束时间',sort: true}
-                    , {field:'operation', title: '操作',sort: true,
-                    render: function (data, type, row, meta) {
-                        return '<a href="javascript:void(0);" onclick="openShow()" data-taskId="' + row.taskId + '">详细</a>';
-                    }
-                }
+                //     , {field:'operation', title: '操作',sort: true,
+                //     render: function (data, type, row, meta) {
+                //         return '<a href="javascript:void(0);" onclick="openShow()" data-taskId="' + row.taskId + '">详细</a>';
+                //     }
+                // }
                 ],
             loadonce:true,
             page:false
