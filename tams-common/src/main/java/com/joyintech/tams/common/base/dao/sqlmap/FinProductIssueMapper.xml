@@ -1,8 +1,507 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.joyintech.tams.common.base.dao.FinProductIssueMapper" >
-    <resultMap id="BaseResultMap" type="com.joyintech.tams.common.base.entity.FinProductIssue" >
-
-    </resultMap>
-
+  <resultMap id="BaseResultMap" type="com.joyintech.tams.common.base.entity.FinProductIssue" >
+    <id column="FINPROD_ID" property="finprodId" jdbcType="VARCHAR" />
+    <result column="ISSUE_CLASS" property="issueClass" jdbcType="VARCHAR" />
+    <result column="TENDER_TYPE" property="tenderType" jdbcType="VARCHAR" />
+    <result column="TENDER_TARGET" property="tenderTarget" jdbcType="VARCHAR" />
+    <result column="PLAN_ISSUE_AMT" property="planIssueAmt" jdbcType="DECIMAL" />
+    <result column="ISSUE_STYLE" property="issueStyle" jdbcType="VARCHAR" />
+    <result column="ADD_BATCH" property="addBatch" jdbcType="DECIMAL" />
+    <result column="ISSUE_PRICE" property="issuePrice" jdbcType="DECIMAL" />
+    <result column="REFER_YIELD" property="referYield" jdbcType="DECIMAL" />
+    <result column="INT_RATE_ID" property="intRateId" jdbcType="VARCHAR" />
+    <result column="RATE_GRADE" property="rateGrade" jdbcType="VARCHAR" />
+    <result column="BP" property="bp" jdbcType="DECIMAL" />
+    <result column="ISSUE_DATE" property="issueDate" jdbcType="TIMESTAMP" />
+    <result column="PAY_DATE" property="payDate" jdbcType="TIMESTAMP" />
+    <result column="FIRST_CONFIRM_DATE" property="firstConfirmDate" jdbcType="TIMESTAMP" />
+    <result column="ISSUE_SDATE" property="issueSdate" jdbcType="TIMESTAMP" />
+    <result column="ISSUE_EDATE" property="issueEdate" jdbcType="TIMESTAMP" />
+    <result column="TENDER_SDATE" property="tenderSdate" jdbcType="TIMESTAMP" />
+    <result column="TENDER_EDATE" property="tenderEdate" jdbcType="TIMESTAMP" />
+    <result column="PAY_EDATE" property="payEdate" jdbcType="TIMESTAMP" />
+    <result column="ASSIGN_REGDATE" property="assignRegdate" jdbcType="TIMESTAMP" />
+    <result column="MIN_PAMT" property="minPamt" jdbcType="DECIMAL" />
+    <result column="MAX_PAMT" property="maxPamt" jdbcType="DECIMAL" />
+    <result column="MAX_TOTALAMT" property="maxTotalamt" jdbcType="DECIMAL" />
+    <result column="MIN_PER_TAMT" property="minPerTamt" jdbcType="DECIMAL" />
+    <result column="MAX_PER_UTAMT" property="maxPerUtamt" jdbcType="DECIMAL" />
+    <result column="MIN_TAMT" property="minTamt" jdbcType="DECIMAL" />
+    <result column="MAX_TAMT" property="maxTamt" jdbcType="DECIMAL" />
+    <result column="TENDER_UNIT" property="tenderUnit" jdbcType="DECIMAL" />
+    <result column="MAX_TENDER_UNIT" property="maxTenderUnit" jdbcType="DECIMAL" />
+    <result column="MAX_TENDER_PLUS" property="maxTenderPlus" jdbcType="DECIMAL" />
+    <result column="SERI_Y_N" property="seriYN" jdbcType="VARCHAR" />
+    <result column="MAX_TOTAL_TENDER" property="maxTotalTender" jdbcType="DECIMAL" />
+    <result column="PAY_CYCLE" property="payCycle" jdbcType="VARCHAR" />
+    <result column="INT_TYPE" property="intType" jdbcType="VARCHAR" />
+    <result column="CREATE_USER" property="createUser" jdbcType="VARCHAR" />
+    <result column="CREATE_DEPT" property="createDept" jdbcType="VARCHAR" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
+    <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    FINPROD_ID, ISSUE_CLASS, TENDER_TYPE, TENDER_TARGET, PLAN_ISSUE_AMT, ISSUE_STYLE, 
+    ADD_BATCH, ISSUE_PRICE, REFER_YIELD, INT_RATE_ID, RATE_GRADE, BP, ISSUE_DATE, PAY_DATE, 
+    FIRST_CONFIRM_DATE, ISSUE_SDATE, ISSUE_EDATE, TENDER_SDATE, TENDER_EDATE, PAY_EDATE, 
+    ASSIGN_REGDATE, MIN_PAMT, MAX_PAMT, MAX_TOTALAMT, MIN_PER_TAMT, MAX_PER_UTAMT, MIN_TAMT, 
+    MAX_TAMT, TENDER_UNIT, MAX_TENDER_UNIT, MAX_TENDER_PLUS, SERI_Y_N, MAX_TOTAL_TENDER, 
+    PAY_CYCLE, INT_TYPE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from FIN_PRODUCT_ISSUE
+    where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from FIN_PRODUCT_ISSUE
+    where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.FinProductIssue" >
+    insert into FIN_PRODUCT_ISSUE (FINPROD_ID, ISSUE_CLASS, TENDER_TYPE, 
+      TENDER_TARGET, PLAN_ISSUE_AMT, ISSUE_STYLE, 
+      ADD_BATCH, ISSUE_PRICE, REFER_YIELD, 
+      INT_RATE_ID, RATE_GRADE, BP, 
+      ISSUE_DATE, PAY_DATE, FIRST_CONFIRM_DATE, 
+      ISSUE_SDATE, ISSUE_EDATE, TENDER_SDATE, 
+      TENDER_EDATE, PAY_EDATE, ASSIGN_REGDATE, 
+      MIN_PAMT, MAX_PAMT, MAX_TOTALAMT, 
+      MIN_PER_TAMT, MAX_PER_UTAMT, MIN_TAMT, 
+      MAX_TAMT, TENDER_UNIT, MAX_TENDER_UNIT, 
+      MAX_TENDER_PLUS, SERI_Y_N, MAX_TOTAL_TENDER, 
+      PAY_CYCLE, INT_TYPE, CREATE_USER, 
+      CREATE_DEPT, CREATE_TIME, UPDATE_USER, 
+      UPDATE_TIME)
+    values (#{finprodId,jdbcType=VARCHAR}, #{issueClass,jdbcType=VARCHAR}, #{tenderType,jdbcType=VARCHAR}, 
+      #{tenderTarget,jdbcType=VARCHAR}, #{planIssueAmt,jdbcType=DECIMAL}, #{issueStyle,jdbcType=VARCHAR}, 
+      #{addBatch,jdbcType=DECIMAL}, #{issuePrice,jdbcType=DECIMAL}, #{referYield,jdbcType=DECIMAL}, 
+      #{intRateId,jdbcType=VARCHAR}, #{rateGrade,jdbcType=VARCHAR}, #{bp,jdbcType=DECIMAL}, 
+      #{issueDate,jdbcType=TIMESTAMP}, #{payDate,jdbcType=TIMESTAMP}, #{firstConfirmDate,jdbcType=TIMESTAMP}, 
+      #{issueSdate,jdbcType=TIMESTAMP}, #{issueEdate,jdbcType=TIMESTAMP}, #{tenderSdate,jdbcType=TIMESTAMP}, 
+      #{tenderEdate,jdbcType=TIMESTAMP}, #{payEdate,jdbcType=TIMESTAMP}, #{assignRegdate,jdbcType=TIMESTAMP}, 
+      #{minPamt,jdbcType=DECIMAL}, #{maxPamt,jdbcType=DECIMAL}, #{maxTotalamt,jdbcType=DECIMAL}, 
+      #{minPerTamt,jdbcType=DECIMAL}, #{maxPerUtamt,jdbcType=DECIMAL}, #{minTamt,jdbcType=DECIMAL}, 
+      #{maxTamt,jdbcType=DECIMAL}, #{tenderUnit,jdbcType=DECIMAL}, #{maxTenderUnit,jdbcType=DECIMAL}, 
+      #{maxTenderPlus,jdbcType=DECIMAL}, #{seriYN,jdbcType=VARCHAR}, #{maxTotalTender,jdbcType=DECIMAL}, 
+      #{payCycle,jdbcType=VARCHAR}, #{intType,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, 
+      #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.FinProductIssue" >
+    insert into FIN_PRODUCT_ISSUE
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="finprodId != null" >
+        FINPROD_ID,
+      </if>
+      <if test="issueClass != null" >
+        ISSUE_CLASS,
+      </if>
+      <if test="tenderType != null" >
+        TENDER_TYPE,
+      </if>
+      <if test="tenderTarget != null" >
+        TENDER_TARGET,
+      </if>
+      <if test="planIssueAmt != null" >
+        PLAN_ISSUE_AMT,
+      </if>
+      <if test="issueStyle != null" >
+        ISSUE_STYLE,
+      </if>
+      <if test="addBatch != null" >
+        ADD_BATCH,
+      </if>
+      <if test="issuePrice != null" >
+        ISSUE_PRICE,
+      </if>
+      <if test="referYield != null" >
+        REFER_YIELD,
+      </if>
+      <if test="intRateId != null" >
+        INT_RATE_ID,
+      </if>
+      <if test="rateGrade != null" >
+        RATE_GRADE,
+      </if>
+      <if test="bp != null" >
+        BP,
+      </if>
+      <if test="issueDate != null" >
+        ISSUE_DATE,
+      </if>
+      <if test="payDate != null" >
+        PAY_DATE,
+      </if>
+      <if test="firstConfirmDate != null" >
+        FIRST_CONFIRM_DATE,
+      </if>
+      <if test="issueSdate != null" >
+        ISSUE_SDATE,
+      </if>
+      <if test="issueEdate != null" >
+        ISSUE_EDATE,
+      </if>
+      <if test="tenderSdate != null" >
+        TENDER_SDATE,
+      </if>
+      <if test="tenderEdate != null" >
+        TENDER_EDATE,
+      </if>
+      <if test="payEdate != null" >
+        PAY_EDATE,
+      </if>
+      <if test="assignRegdate != null" >
+        ASSIGN_REGDATE,
+      </if>
+      <if test="minPamt != null" >
+        MIN_PAMT,
+      </if>
+      <if test="maxPamt != null" >
+        MAX_PAMT,
+      </if>
+      <if test="maxTotalamt != null" >
+        MAX_TOTALAMT,
+      </if>
+      <if test="minPerTamt != null" >
+        MIN_PER_TAMT,
+      </if>
+      <if test="maxPerUtamt != null" >
+        MAX_PER_UTAMT,
+      </if>
+      <if test="minTamt != null" >
+        MIN_TAMT,
+      </if>
+      <if test="maxTamt != null" >
+        MAX_TAMT,
+      </if>
+      <if test="tenderUnit != null" >
+        TENDER_UNIT,
+      </if>
+      <if test="maxTenderUnit != null" >
+        MAX_TENDER_UNIT,
+      </if>
+      <if test="maxTenderPlus != null" >
+        MAX_TENDER_PLUS,
+      </if>
+      <if test="seriYN != null" >
+        SERI_Y_N,
+      </if>
+      <if test="maxTotalTender != null" >
+        MAX_TOTAL_TENDER,
+      </if>
+      <if test="payCycle != null" >
+        PAY_CYCLE,
+      </if>
+      <if test="intType != null" >
+        INT_TYPE,
+      </if>
+      <if test="createUser != null" >
+        CREATE_USER,
+      </if>
+      <if test="createDept != null" >
+        CREATE_DEPT,
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME,
+      </if>
+      <if test="updateUser != null" >
+        UPDATE_USER,
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="finprodId != null" >
+        #{finprodId,jdbcType=VARCHAR},
+      </if>
+      <if test="issueClass != null" >
+        #{issueClass,jdbcType=VARCHAR},
+      </if>
+      <if test="tenderType != null" >
+        #{tenderType,jdbcType=VARCHAR},
+      </if>
+      <if test="tenderTarget != null" >
+        #{tenderTarget,jdbcType=VARCHAR},
+      </if>
+      <if test="planIssueAmt != null" >
+        #{planIssueAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="issueStyle != null" >
+        #{issueStyle,jdbcType=VARCHAR},
+      </if>
+      <if test="addBatch != null" >
+        #{addBatch,jdbcType=DECIMAL},
+      </if>
+      <if test="issuePrice != null" >
+        #{issuePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="referYield != null" >
+        #{referYield,jdbcType=DECIMAL},
+      </if>
+      <if test="intRateId != null" >
+        #{intRateId,jdbcType=VARCHAR},
+      </if>
+      <if test="rateGrade != null" >
+        #{rateGrade,jdbcType=VARCHAR},
+      </if>
+      <if test="bp != null" >
+        #{bp,jdbcType=DECIMAL},
+      </if>
+      <if test="issueDate != null" >
+        #{issueDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="payDate != null" >
+        #{payDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="firstConfirmDate != null" >
+        #{firstConfirmDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="issueSdate != null" >
+        #{issueSdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="issueEdate != null" >
+        #{issueEdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="tenderSdate != null" >
+        #{tenderSdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="tenderEdate != null" >
+        #{tenderEdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="payEdate != null" >
+        #{payEdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="assignRegdate != null" >
+        #{assignRegdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="minPamt != null" >
+        #{minPamt,jdbcType=DECIMAL},
+      </if>
+      <if test="maxPamt != null" >
+        #{maxPamt,jdbcType=DECIMAL},
+      </if>
+      <if test="maxTotalamt != null" >
+        #{maxTotalamt,jdbcType=DECIMAL},
+      </if>
+      <if test="minPerTamt != null" >
+        #{minPerTamt,jdbcType=DECIMAL},
+      </if>
+      <if test="maxPerUtamt != null" >
+        #{maxPerUtamt,jdbcType=DECIMAL},
+      </if>
+      <if test="minTamt != null" >
+        #{minTamt,jdbcType=DECIMAL},
+      </if>
+      <if test="maxTamt != null" >
+        #{maxTamt,jdbcType=DECIMAL},
+      </if>
+      <if test="tenderUnit != null" >
+        #{tenderUnit,jdbcType=DECIMAL},
+      </if>
+      <if test="maxTenderUnit != null" >
+        #{maxTenderUnit,jdbcType=DECIMAL},
+      </if>
+      <if test="maxTenderPlus != null" >
+        #{maxTenderPlus,jdbcType=DECIMAL},
+      </if>
+      <if test="seriYN != null" >
+        #{seriYN,jdbcType=VARCHAR},
+      </if>
+      <if test="maxTotalTender != null" >
+        #{maxTotalTender,jdbcType=DECIMAL},
+      </if>
+      <if test="payCycle != null" >
+        #{payCycle,jdbcType=VARCHAR},
+      </if>
+      <if test="intType != null" >
+        #{intType,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null" >
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createDept != null" >
+        #{createDept,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null" >
+        #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.common.base.entity.FinProductIssue" >
+    update FIN_PRODUCT_ISSUE
+    <set >
+      <if test="issueClass != null" >
+        ISSUE_CLASS = #{issueClass,jdbcType=VARCHAR},
+      </if>
+      <if test="tenderType != null" >
+        TENDER_TYPE = #{tenderType,jdbcType=VARCHAR},
+      </if>
+      <if test="tenderTarget != null" >
+        TENDER_TARGET = #{tenderTarget,jdbcType=VARCHAR},
+      </if>
+      <if test="planIssueAmt != null" >
+        PLAN_ISSUE_AMT = #{planIssueAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="issueStyle != null" >
+        ISSUE_STYLE = #{issueStyle,jdbcType=VARCHAR},
+      </if>
+      <if test="addBatch != null" >
+        ADD_BATCH = #{addBatch,jdbcType=DECIMAL},
+      </if>
+      <if test="issuePrice != null" >
+        ISSUE_PRICE = #{issuePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="referYield != null" >
+        REFER_YIELD = #{referYield,jdbcType=DECIMAL},
+      </if>
+      <if test="intRateId != null" >
+        INT_RATE_ID = #{intRateId,jdbcType=VARCHAR},
+      </if>
+      <if test="rateGrade != null" >
+        RATE_GRADE = #{rateGrade,jdbcType=VARCHAR},
+      </if>
+      <if test="bp != null" >
+        BP = #{bp,jdbcType=DECIMAL},
+      </if>
+      <if test="issueDate != null" >
+        ISSUE_DATE = #{issueDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="payDate != null" >
+        PAY_DATE = #{payDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="firstConfirmDate != null" >
+        FIRST_CONFIRM_DATE = #{firstConfirmDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="issueSdate != null" >
+        ISSUE_SDATE = #{issueSdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="issueEdate != null" >
+        ISSUE_EDATE = #{issueEdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="tenderSdate != null" >
+        TENDER_SDATE = #{tenderSdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="tenderEdate != null" >
+        TENDER_EDATE = #{tenderEdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="payEdate != null" >
+        PAY_EDATE = #{payEdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="assignRegdate != null" >
+        ASSIGN_REGDATE = #{assignRegdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="minPamt != null" >
+        MIN_PAMT = #{minPamt,jdbcType=DECIMAL},
+      </if>
+      <if test="maxPamt != null" >
+        MAX_PAMT = #{maxPamt,jdbcType=DECIMAL},
+      </if>
+      <if test="maxTotalamt != null" >
+        MAX_TOTALAMT = #{maxTotalamt,jdbcType=DECIMAL},
+      </if>
+      <if test="minPerTamt != null" >
+        MIN_PER_TAMT = #{minPerTamt,jdbcType=DECIMAL},
+      </if>
+      <if test="maxPerUtamt != null" >
+        MAX_PER_UTAMT = #{maxPerUtamt,jdbcType=DECIMAL},
+      </if>
+      <if test="minTamt != null" >
+        MIN_TAMT = #{minTamt,jdbcType=DECIMAL},
+      </if>
+      <if test="maxTamt != null" >
+        MAX_TAMT = #{maxTamt,jdbcType=DECIMAL},
+      </if>
+      <if test="tenderUnit != null" >
+        TENDER_UNIT = #{tenderUnit,jdbcType=DECIMAL},
+      </if>
+      <if test="maxTenderUnit != null" >
+        MAX_TENDER_UNIT = #{maxTenderUnit,jdbcType=DECIMAL},
+      </if>
+      <if test="maxTenderPlus != null" >
+        MAX_TENDER_PLUS = #{maxTenderPlus,jdbcType=DECIMAL},
+      </if>
+      <if test="seriYN != null" >
+        SERI_Y_N = #{seriYN,jdbcType=VARCHAR},
+      </if>
+      <if test="maxTotalTender != null" >
+        MAX_TOTAL_TENDER = #{maxTotalTender,jdbcType=DECIMAL},
+      </if>
+      <if test="payCycle != null" >
+        PAY_CYCLE = #{payCycle,jdbcType=VARCHAR},
+      </if>
+      <if test="intType != null" >
+        INT_TYPE = #{intType,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null" >
+        CREATE_USER = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createDept != null" >
+        CREATE_DEPT = #{createDept,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null" >
+        UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.FinProductIssue" >
+    update FIN_PRODUCT_ISSUE
+    set ISSUE_CLASS = #{issueClass,jdbcType=VARCHAR},
+      TENDER_TYPE = #{tenderType,jdbcType=VARCHAR},
+      TENDER_TARGET = #{tenderTarget,jdbcType=VARCHAR},
+      PLAN_ISSUE_AMT = #{planIssueAmt,jdbcType=DECIMAL},
+      ISSUE_STYLE = #{issueStyle,jdbcType=VARCHAR},
+      ADD_BATCH = #{addBatch,jdbcType=DECIMAL},
+      ISSUE_PRICE = #{issuePrice,jdbcType=DECIMAL},
+      REFER_YIELD = #{referYield,jdbcType=DECIMAL},
+      INT_RATE_ID = #{intRateId,jdbcType=VARCHAR},
+      RATE_GRADE = #{rateGrade,jdbcType=VARCHAR},
+      BP = #{bp,jdbcType=DECIMAL},
+      ISSUE_DATE = #{issueDate,jdbcType=TIMESTAMP},
+      PAY_DATE = #{payDate,jdbcType=TIMESTAMP},
+      FIRST_CONFIRM_DATE = #{firstConfirmDate,jdbcType=TIMESTAMP},
+      ISSUE_SDATE = #{issueSdate,jdbcType=TIMESTAMP},
+      ISSUE_EDATE = #{issueEdate,jdbcType=TIMESTAMP},
+      TENDER_SDATE = #{tenderSdate,jdbcType=TIMESTAMP},
+      TENDER_EDATE = #{tenderEdate,jdbcType=TIMESTAMP},
+      PAY_EDATE = #{payEdate,jdbcType=TIMESTAMP},
+      ASSIGN_REGDATE = #{assignRegdate,jdbcType=TIMESTAMP},
+      MIN_PAMT = #{minPamt,jdbcType=DECIMAL},
+      MAX_PAMT = #{maxPamt,jdbcType=DECIMAL},
+      MAX_TOTALAMT = #{maxTotalamt,jdbcType=DECIMAL},
+      MIN_PER_TAMT = #{minPerTamt,jdbcType=DECIMAL},
+      MAX_PER_UTAMT = #{maxPerUtamt,jdbcType=DECIMAL},
+      MIN_TAMT = #{minTamt,jdbcType=DECIMAL},
+      MAX_TAMT = #{maxTamt,jdbcType=DECIMAL},
+      TENDER_UNIT = #{tenderUnit,jdbcType=DECIMAL},
+      MAX_TENDER_UNIT = #{maxTenderUnit,jdbcType=DECIMAL},
+      MAX_TENDER_PLUS = #{maxTenderPlus,jdbcType=DECIMAL},
+      SERI_Y_N = #{seriYN,jdbcType=VARCHAR},
+      MAX_TOTAL_TENDER = #{maxTotalTender,jdbcType=DECIMAL},
+      PAY_CYCLE = #{payCycle,jdbcType=VARCHAR},
+      INT_TYPE = #{intType,jdbcType=VARCHAR},
+      CREATE_USER = #{createUser,jdbcType=VARCHAR},
+      CREATE_DEPT = #{createDept,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+      UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+    where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+  </update>
 </mapper>
