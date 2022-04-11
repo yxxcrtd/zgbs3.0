@@ -640,9 +640,10 @@ public class BaseEtrCashPositionCommServiceImpl extends BaseService implements B
                     && StringUtil.equals(etrEntrust.getTradeMarket(), DictCodeListExt1.交易场所_银行间.getValue())) {
                 return;
             }
-            // 委托指令附属表查询
-            etrEntrustAddMapper.updateByPrimaryKeySelective(etrEntrustAdd);
-
+            if(etrEntrustAdd != null) {
+                // 委托指令附属表查询
+                etrEntrustAddMapper.updateByPrimaryKeySelective(etrEntrustAdd);
+            }
             if(etrEntrustAdd != null && !StringUtil.equals(etrEntrustAdd.getAssetType1(), DictCodeList.回购类型_质押式协议回购.getValue())){
                 etrPositionHoldDto.getPtlCashPositionFlows().forEach(etrCashPositionFlowDto -> etrCashPositionFlowDto.setCdate(platformDateImpl.getSysDate()));
                 etrPositionHoldDto.getPtlSecPositionFlows().forEach(etrSecPositionFlowDto -> etrSecPositionFlowDto.setCdate(platformDateImpl.getSysDate()));
