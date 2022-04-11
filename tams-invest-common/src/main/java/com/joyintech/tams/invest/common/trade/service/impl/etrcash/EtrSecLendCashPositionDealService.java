@@ -334,7 +334,10 @@ public class EtrSecLendCashPositionDealService  {
                 for (EtrPledge pledgeBondInfoDto:etrPledges) {
                     etrSecPositionFlowDto.setFinprodId(pledgeBondInfoDto.getFinprodId());
                     //获取质押流水
-                    etrSecPositionFlowDto.setAmount(etrCommonCashPositionMapper.selectCommandPositionFlow(etrSecPositionFlowDto).negate());            
+                    BigDecimal amount = etrCommonCashPositionMapper.selectCommandPositionFlow(etrSecPositionFlowDto);
+                    if (StringUtil.isNotEmpty(amount)) {
+                        etrSecPositionFlowDto.setAmount(amount.negate());
+                    }
                     etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
 
                     //上面是释放指令全部占用的头寸，下面是加上 占用交易部分的头寸

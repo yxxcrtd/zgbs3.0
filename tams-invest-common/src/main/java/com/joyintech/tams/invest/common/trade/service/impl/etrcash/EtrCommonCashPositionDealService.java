@@ -598,7 +598,9 @@ public class EtrCommonCashPositionDealService extends BaseService {
             && !etrPositionHoldDto.getPtlCashPositionFlows().isEmpty()) {
             List<EtrCashPositionFlowDto> 母组合流水 = new ArrayList<>();
             etrPositionHoldDto.getPtlCashPositionFlows().forEach(etrCashFlowDto -> {
-                etrCashPositionFlowMapper.insertSelective(etrCashFlowDto);
+                if (StringUtil.isNotEmpty(etrCashFlowDto.getAcctId())) {
+                    etrCashPositionFlowMapper.insertSelective(etrCashFlowDto);
+                }
                 // 影响母组合持仓的情况
                 if (etrPositionHoldDto.isDealEtr()) {
                     String 母组合代码 = AllTradeCommonUtil.exchangePortfolio(etrCashFlowDto.getPortfolioId());
@@ -650,7 +652,10 @@ public class EtrCommonCashPositionDealService extends BaseService {
     public static EtrSecPositionFlowDto getEtrSecPositionFlowDtoFromEtr(EntrustCommonDto entrustCommonDto) {
         EtrSecPositionFlowDto ret = new EtrSecPositionFlowDto();
         ret.setSeqno(getSeqNo());
-        String secAcctId = entrustCommonDto.getEtrEntrustAdd().getSecAcctId();
+        String secAcctId = null;
+        if (StringUtil.isNotEmpty(entrustCommonDto.getEtrEntrustAdd())) {
+            secAcctId = entrustCommonDto.getEtrEntrustAdd().getSecAcctId();
+        }
         if (StringUtil.isEmpty(secAcctId) && StringUtil.isEmpty(entrustCommonDto.getEtrEntrust().getChlId())) {
             secAcctId = "999999";
         }

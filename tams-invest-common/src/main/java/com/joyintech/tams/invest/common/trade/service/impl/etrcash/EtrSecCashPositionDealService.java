@@ -1111,7 +1111,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
             // 可用现金 关闭日增加剩余委托券面总额*委托全价/100
             EtrCashPositionFlowDto etrCashPositionFlowDto = EtrCommonCashPositionDealService.getEtrCashPositionFlowDtoFromEtr(
                 entrustCommonDto);
-            String acctId;
+            String acctId = null;
             // if (StringUtil.isNotEmpty(etrEntrust.getChlId()) && DictCodeListExt2.划款方式_一次性划款.getValue().equals(
             //                // etrCommonCashPositionDealService.queryChlType(etrEntrust.getChlId()))) {
             // acctId = EtrCommonCashPositionDealService.select通道资金账户(etrEntrust.getChlId());
@@ -1120,11 +1120,16 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
             // acctId = EtrCommonCashPositionDealService.select组合托管户(etrEntrust.getPortfolioId(), etrEntrust.getCcy(),
             // DictCodeListExt2.资金账户类型_托管户.getValue());
             // }
-            if(StringUtil.equals(etrEntrustAdd.getPurchType(),DictCodeListExt2.申购类型_优先配售.getValue())){
+            if(StringUtil.isNotEmpty(etrEntrustAdd) &&
+                    StringUtil.isNotEmpty(etrEntrustAdd.getPurchType()) && StringUtil.equals(etrEntrustAdd.getPurchType(),DictCodeListExt2.申购类型_优先配售.getValue())){
                 acctId = EtrCommonCashPositionDealService.select组合托管户(etrEntrust.getPortfolioId(), etrEntrust.getCcy(), DictCodeListExt2.资金账户类型_托管户.getValue());
             }else{
+                String secManageAcctId = null;
+                if(StringUtil.isNotEmpty(etrEntrustAdd)){
+                    secManageAcctId = entrustCommonDto.getEtrEntrustAdd().getSecAcctId();
+                }
                 acctId = gen账号(etrEntrust.getTradeMarket(), etrEntrust.getChlId(), etrEntrust.getPortfolioId(), etrEntrust.getCcy(),
-                    entrustCommonDto.getEtrEntrustAdd().getSecAcctId(),entrustCommonDto.getEtrEntrust().getCounterId(), etrCashPositionFlowDto);
+                        secManageAcctId,entrustCommonDto.getEtrEntrust().getCounterId(), etrCashPositionFlowDto);
             }
             //查询指令现金流水，获取需要冲销的指令金额
             BigDecimal amount =  EtrCommonCashPositionDealService.getEtrSurplusAmt(etrEntrust.getEntrustId(), etrEntrust.getPortfolioId());
