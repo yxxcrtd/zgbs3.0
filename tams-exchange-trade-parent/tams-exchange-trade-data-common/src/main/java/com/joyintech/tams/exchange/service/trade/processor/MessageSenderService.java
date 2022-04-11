@@ -119,7 +119,6 @@ public class MessageSenderService {
         tradeMessage.setTradePlat(instruction.getTradePlat());
         tradeMessage.setPS(instruction.getPs());
         tradeMessage.setCcy(instruction.getCcy());
-        tradeMessage.setTradingDay(trade.getTradingDay());
         tradeMessage.setFinprodId(instruction.getFinprodId());
 
         // 此处 if-else 是否合理？
