@@ -1,9 +1,18 @@
 package com.joyintech.tams.exchange.service.trade.management.service;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.util.DateUtil;
@@ -20,7 +29,10 @@ import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
 import com.joyintech.tams.exchange.common.request.InstructionQueryRequest;
-import com.joyintech.tams.exchange.common.utils.*;
+import com.joyintech.tams.exchange.common.utils.EntrustUtils;
+import com.joyintech.tams.exchange.common.utils.JsonUtils;
+import com.joyintech.tams.exchange.common.utils.ListConvertUtils;
+import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
 import com.joyintech.tams.exchange.service.trade.processor.MessageConsumerService;
 import com.joyintech.tams.exchange.service.trade.processor.constants.Constants;
@@ -38,9 +50,16 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_质押券出入库;
+
 @Component
 public class InvestmentManagement extends BaseService {
     private static final Logger logger = LoggerFactory.getLogger(InvestmentManagement.class);
+    @Autowired(required = false)
+    @Qualifier("simpleRestTemplate")
+    protected JoyinRestTemplate simpleRestTemplate;
+    @Autowired
+    FuturesInstrumentService futuresInstrumentService;
     @Autowired
     private EntrustService entrustService;
     @Autowired
@@ -62,19 +81,12 @@ public class InvestmentManagement extends BaseService {
     @Autowired
     private InstrumentService instrumentService;
     @Autowired
-    FuturesInstrumentService futuresInstrumentService;
-    @Autowired
     private OrderService orderService;
-
     /**
      * 是否单体服务
      */
     @Value("${application.micorservice.contextPath.single:false}")
     private boolean isSingle;
-
-    @Autowired(required = false)
-    @Qualifier("simpleRestTemplate")
-    protected JoyinRestTemplate simpleRestTemplate;
 
     /**
      * 指令查询带条件
@@ -171,7 +183,7 @@ public class InvestmentManagement extends BaseService {
      */
     public List<InstructionExportVo> queryExportPage(InstructionQueryRequest request) {
         Map<String, Object> pageParam = JsonUtils.getObjectFromJson(JsonUtils.getJsonFromObject(request), Map.class);
-        InstructionPage<Instruction, InstructionPledge, InstructionDetail> page = queryInstructionsFromCache(pageParam);
+        InstructionPage<Instruction, InstructionPledge, InstructionDetail> page = queryInstructions(pageParam);
         List<Instruction> instructionList = page.getEtr_entrust_list();
         return convertFieldValue(instructionList);
     }
@@ -217,13 +229,33 @@ public class InvestmentManagement extends BaseService {
 
     /**
      * 查询指令列表
+     * <p/>
+     * <ul>
+     *  <li>
+     *      dataType : 数据类型（为空时从内存查询，否则从投管查询）
+     *      traderList : 交易员列表
+ *      </li>
+     * </ul>
      *
-     * @return
+     * @param pageParam 查询参数
+     * @return 指令列表
      */
-    public InstructionPage<Instruction, InstructionPledge, InstructionDetail> queryInstructionsFromCache(Map<String, Object> pageParam) {
+    public InstructionPage<Instruction, InstructionPledge, InstructionDetail> queryInstructions(Map<String, Object> pageParam) {
         // 更新系统参数
         updateSysParam(pageParam);
-        InstructionPage<Instruction, InstructionPledge, InstructionDetail> bean = new InstructionPage<>();
+
+        InstructionPage<Instruction, InstructionPledge, InstructionDetail> instructionPage;
+        String dataType = (String) pageParam.get("dataType");
+
+        if (CharSequenceUtil.isNotEmpty(dataType)) {
+            instructionPage = queryInstructionsFromTg(pageParam);
+        } else {
+            instructionPage = queryInstructionsFromCache(pageParam);
+        }
+
+        return instructionPage;
+
+        /*InstructionPage<Instruction, InstructionPledge, InstructionDetail> bean = new InstructionPage<>();
         List<InstructionPledge> pledgeList = new ArrayList<>();
         List<InstructionDetail> detailList = new ArrayList<>();
         List<Instruction> instructionUserList = new ArrayList<>();
@@ -296,7 +328,152 @@ public class InvestmentManagement extends BaseService {
             bean.setEtr_pledge_list(ListConvertUtils.convertList(bean.getEtr_pledge_list(), InstructionPledge.class));
             bean.setEtr_entrust_detail_list(ListConvertUtils.convertList(bean.getEtr_entrust_detail_list(), InstructionDetail.class));
         }
+        return bean;*/
+    }
+
+    /**
+     * 调用投管接口查询指令列表
+     *
+     * @param pageParam 查询参数
+     * @return 指令列表
+     */
+    private InstructionPage<Instruction, InstructionPledge, InstructionDetail> queryInstructionsFromTg(Map<String, Object> pageParam) {
+
+        InstructionPage<Instruction, InstructionPledge, InstructionDetail> bean = null;
+        String url = ServiceApplication.INSTRUCTION_SERVICE + TradeServiceURL.queryInstructions;
+
+        try {
+            if (isSingle) {
+                bean = simpleRestTemplate.postForObject(url, pageParam, InstructionPage.class);
+            } else {
+                bean = restTemplate.postForObject(url, pageParam, InstructionPage.class);
+            }
+        } catch (Exception e) {
+            logger.warn("调用投管接口失败: url = [{}], param = [{}], errorMsg = [{}]", url, JSONUtil.toJsonStr(pageParam), ExceptionUtil.getMessage(e));
+        }
+
+        if (ObjectUtil.isNull(bean)) {
+            return new InstructionPage<>();
+        }
+
+        List<Instruction> instructions = ListConvertUtils.convertList(bean.getEtr_entrust_list(), Instruction.class);
+        fillMinPriceAndTrdUnitLimit(instructions);
+        handlePriceWithZYCRK(instructions);
+        bean.setEtr_entrust_list(sortInstructionsByCreateTime(instructions));
+
+        List<InstructionPledge> instructionPledges = ListConvertUtils.convertList(bean.getEtr_pledge_list(), InstructionPledge.class);
+        bean.setEtr_pledge_list(instructionPledges);
+
+        List<InstructionDetail> instructionDetails = ListConvertUtils.convertList(bean.getEtr_entrust_detail_list(), InstructionDetail.class);
+        bean.setEtr_entrust_detail_list(instructionDetails);
+
         return bean;
+    }
+
+    /**
+     * 缓存中查询指令列表
+     *
+     * @param pageParam 查询参数
+     * @return 指令列表
+     */
+    public InstructionPage<Instruction, InstructionPledge, InstructionDetail> queryInstructionsFromCache(Map<String, Object> pageParam) {
+
+        InstructionPage<Instruction, InstructionPledge, InstructionDetail> bean = new InstructionPage<>();
+
+        List<String> traderList = Convert.toList(String.class, pageParam.get("traderList"));
+        if (CollUtil.isEmpty(traderList)) {
+            return bean;
+        }
+
+        List<Instruction> instructionList = Lists.newArrayList();
+        traderList.forEach(trader -> instructionList.addAll(instructionService.queryInstructionByUserIdAndStockCode(trader, null)));
+        if (CollUtil.isEmpty(instructionList)) {
+            return bean;
+        }
+
+        fillMinPriceAndTrdUnitLimit(instructionList);
+
+        // 价格修改仅限于前端展示，故使用拷贝的数据，而不使用内存数据
+        List<Instruction> instructionCloneList = cloneInstructions(instructionList);
+        handlePriceWithZYCRK(instructionCloneList);
+        bean.setEtr_entrust_list(sortInstructionsByCreateTime(instructionCloneList));
+
+        List<String> ids = instructionList.stream().map(Instruction::getEntrustId).collect(Collectors.toList());
+        bean.setEtr_pledge_list(getPledgesByIds(ids));
+        bean.setEtr_entrust_detail_list(getDetailsByIds(ids));
+
+        return bean;
+    }
+
+    private List<Instruction> sortInstructionsByCreateTime(List<Instruction> instructions) {
+        return instructions.stream()
+                .sorted((o1, o2) -> DateUtil.compareDate(o2.getCreateTime(), o1.getCreateTime()))
+                .collect(Collectors.toList());
+    }
+
+    private List<Instruction> cloneInstructions(List<Instruction> instructions) {
+        return instructions.stream().map(Instruction::cloneInstruction).collect(Collectors.toList());
+    }
+
+    private void handlePriceWithZYCRK(List<Instruction> instructions) {
+        if (CollUtil.isEmpty(instructions)) {
+            return;
+        }
+        for (Instruction instruction : instructions) {
+            if (投管业务类型_质押券出入库.getValue().equals(instruction.getBusiTypeTg())) {
+                instruction.setEntrustPrice(NumberUtil.mul(instruction.getEntrustPrice(), 100));
+            }
+        }
+    }
+
+    private void fillMinPriceAndTrdUnitLimit(List<Instruction> instructions) {
+        if (CollUtil.isEmpty(instructions)) {
+            return;
+        }
+        MinPriceAndMinTrdUnitLimitBean minPriceAndMinTrdUnitLimitBean = null;
+        for (Instruction instruction : instructions) {
+            minPriceAndMinTrdUnitLimitBean = instruction.getMinPriceAndMinTrdUnitLimitBean();
+
+            if (ObjectUtil.isNull(minPriceAndMinTrdUnitLimitBean) || ErrorCode.isFail(minPriceAndMinTrdUnitLimitBean.getErrorCode())) {
+            /*if (InvestmentAssetType.FUTURES.value.equals(instruction.getAssetType())) {
+                minPriceAndMinTrdUnitLimitBean = futuresInstrumentService.queryMinPriceAndMinTrdUnitLimitByFuture(instruction);
+                instruction.setMinPriceAndMinTrdUnitLimitBean(minPriceAndMinTrdUnitLimitBean);
+                Instruction instructionClone = instruction.cloneInstruction();
+                instructionClone.setFinprodMarketId(StockCodeUtils.getStockCode(instruction.getFinprodMarketId()));
+                return;
+            }*/
+                minPriceAndMinTrdUnitLimitBean = instrumentService.queryMinPriceAndMinTrdUnitLimit(instruction.getFinprodMarketId(), instruction.getTradePlat(), instruction.getPs());
+                instruction.setMinPriceAndMinTrdUnitLimitBean(minPriceAndMinTrdUnitLimitBean);
+            }
+        }
+    }
+
+    private List<InstructionDetail> getDetailsByIds(List<String> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return ListUtil.empty();
+        }
+        List<InstructionDetail> details = Lists.newArrayList();
+        for (String id : ids) {
+            List<InstructionDetail> instructionDetails = instructionDetailService.queryInstructionDetailsByInstructionId(id);
+            if (CollUtil.isNotEmpty(instructionDetails)) {
+                details.addAll(instructionDetails);
+            }
+        }
+        return details;
+    }
+
+    private List<InstructionPledge> getPledgesByIds(List<String> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return ListUtil.empty();
+        }
+        List<InstructionPledge> pledges = Lists.newArrayList();
+        for (String id : ids) {
+            List<InstructionPledge> instructionPledges = instructionPledgeService.queryInstructionPledgesByInstructionId(id);
+            if (CollUtil.isNotEmpty(instructionPledges)) {
+                pledges.addAll(instructionPledges);
+            }
+        }
+        return pledges;
     }
 
 
@@ -318,6 +495,7 @@ public class InvestmentManagement extends BaseService {
             }
             bean.setEtr_entrust_list(ListConvertUtils.convertList(bean.getEtr_entrust_list(), Instruction.class));
             bean.setEtr_pledge_list(ListConvertUtils.convertList(bean.getEtr_pledge_list(), InstructionPledge.class));
+            bean.setEtr_entrust_detail_list(ListConvertUtils.convertList(bean.getEtr_entrust_detail_list(), InstructionDetail.class));
             return bean;
         }
         return new InstructionPage<>();

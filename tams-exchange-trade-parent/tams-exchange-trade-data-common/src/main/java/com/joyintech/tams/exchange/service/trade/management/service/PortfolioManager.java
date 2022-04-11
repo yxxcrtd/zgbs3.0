@@ -9,6 +9,7 @@ import com.joyintech.exchange.service.quote.service.QuoteService;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
@@ -126,7 +127,7 @@ public class PortfolioManager extends BaseService {
         log.info("queryPortfolioInfo() called with parameters => 【request = {}】", request.toString());
 
         // 1. 获取组合列表
-        String[] portfolioIdArray = StrUtil.split(request.getPortfolioId(), StrUtil.COMMA);
+        String[] portfolioIdArray = StringUtil.split(request.getPortfolioId(), StrUtil.COMMA);
 
         // 返回的map： key 组合代码； value 组合现金持仓
         Map<String, PortfolioInfoResponse> result = new HashMap<>(8);
@@ -173,7 +174,7 @@ public class PortfolioManager extends BaseService {
         log.info("queryPortfolioCash() called with parameters => 【portfolioIds = {}】, 【acctNo = {}】", portfolioIds, acctNo);
 
         // 1. 获取组合列表
-        String[] portfolioIdArray = StrUtil.split(portfolioIds, StrUtil.COMMA);
+        String[] portfolioIdArray = StringUtil.split(portfolioIds, StrUtil.COMMA);
 
         // 返回的map： key 组合代码； value 组合现金信息
         Map<String, PortfolioInfoResponse> result = new HashMap<>(8);
@@ -213,7 +214,7 @@ public class PortfolioManager extends BaseService {
                 portfolioIds, finprodId, secAcctId, tradeMarket);
 
         // 1. 获取组合列表
-        String[] portfolioIdArray = StrUtil.split(portfolioIds, StrUtil.COMMA);
+        String[] portfolioIdArray = StringUtil.split(portfolioIds, StrUtil.COMMA);
 
         // 返回的map： key 组合代码； value 组合持仓
         Map<String, PortfolioInfoResponse> result = new HashMap<>();

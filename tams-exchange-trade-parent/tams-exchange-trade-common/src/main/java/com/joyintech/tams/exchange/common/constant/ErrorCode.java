@@ -217,6 +217,10 @@ public enum ErrorCode {
         return this.value == 0;
     }
 
+    public static boolean isFail(int value) {
+        return value != 0;
+    }
+
     public static boolean isSuccess(int value) {
         return value == 0;
     }
