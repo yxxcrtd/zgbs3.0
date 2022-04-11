@@ -144,7 +144,11 @@ public class EntrustStatusService {
             } else {
                 closeItem.setBusiType(busiTypePosition);
             }
-            closeItem.setPs(t.getPs());
+            if (StringUtil.isNotEmpty(t.getPs())){
+                closeItem.setPs(t.getPs());
+            }else{
+                closeItem.setPs(DictCodeList.交易方向_买入.getValue());
+            }
             closeItem.setCloseId(t.getCloseId());
             closeItem.setSystemAct(DictCodeListExt3.系统动作_关闭.getValue());
             closeItem.setBusiAct(DictCodeListExt3.业务动作_指令日终关闭.getValue());
