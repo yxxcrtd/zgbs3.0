@@ -14,6 +14,7 @@ import com.joyintech.service.entrust.etrbondfirstlbidding.dto.BussEtrInvestPerso
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.common.base.entity.SysUploadFileInfo;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
@@ -142,6 +143,11 @@ public class EtrConBondDto extends EtrEntrust {
      * 通道可用现金
      */
     private BigDecimal channelAvailableCash;
+
+    /**
+     * 软控是否继续？Y：继续
+     */
+    private String softSkipMode;
     /**
      * 获取 fileArray
      * @return fileArray.
@@ -439,5 +445,13 @@ public class EtrConBondDto extends EtrEntrust {
 
     public void setNextUser(String nextUser) {
         this.nextUser = nextUser;
+    }
+
+    public String getSoftSkipMode() {
+        return softSkipMode;
+    }
+
+    public void setSoftSkipMode(String softSkipMode) {
+        this.softSkipMode = softSkipMode;
     }
 }

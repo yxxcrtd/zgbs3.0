@@ -1,6 +1,7 @@
 package com.joyintech.service.entrust.etrconbond.service;
 
 import com.joyintech.framework.security.SecurityUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.entrust.etrconbond.dao.EtrConBondMapper;
 import com.joyintech.service.entrust.etrconbond.dto.EtrConBondDto;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
@@ -130,6 +131,18 @@ public class PositionRequestEtrConBondService {
         bondSec.put("secAmount", entity.getPurchBondTotal());
         bondSecList.add(bondSec);
         resultMap.put("bondSecList", bondSecList);
+
+        //余额校验
+        String balanceCheck = DictCodeList.是否_是.getValue();
+        if (StringUtil.isNotEmpty(entity.getSoftSkipMode()) && StringUtil.equals(entity.getSoftSkipMode(), DictCodeList.是否_是.getValue())) {
+            balanceCheck = DictCodeList.是否_否.getValue();
+        }
+
+        resultMap.put("balanceCheck", balanceCheck);
+        resultMap.put("userId", SecurityUtil.getLoginUser().getUserName());
+        resultMap.put("totalTradeId",entity.getEntrustId());
+        resultMap.put("flowStatus", DictCodeListExt3.流程节点_流程提交.getValue());
+        resultMap.put("modelType", DictCodeListExt1.子系统代码_委托.getValue());
     }
 
     /**
