@@ -1,22 +1,22 @@
-package com.joyintech.tams.invest.asset.bond.dto;
+package com.joyintech.tams.invest.asset.issue.dto;
 
 import com.joyintech.framework.export.paginator.domain.ITableRow;
-import com.joyintech.tams.common.base.entity.FinProductIssue;
+import com.joyintech.tams.common.base.entity.InterfCfetsNewbondIssue;
 import com.joyintech.tams.invest.asset.channel.dto.ChannelAssetDto;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.util.List;
 
 /**
- * 标的类金融产品发行信息dto
+ * CFETS新债标的发行信息dto
  * 〈功能详细描述〉
  *
  * @author zhuys
  * @version 1.0 2022年04月10日
- * @see FinProductIssueAssetDto
+ * @see InterfCfetsNewbondIssueDto
  * @since 1.0
  */
-public class FinProductIssueAssetDto extends FinProductIssue implements ITableRow, ProcessEntity {
+public class InterfCfetsNewbondIssueDto extends InterfCfetsNewbondIssue implements ITableRow, ProcessEntity {
 
     /**
      * <意义，目的和功能，以及可能被用到的地方>
