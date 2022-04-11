@@ -37,35 +37,17 @@ public class AppointInstructionCheck {
         commonCheckChain.nextChain(businessCheckChain);
     }
 
-    public CheckResult checkAppointInstruction(List<Instruction> instructionList, List<InstructionDetail> detailList,
-                                               List<InstructionPledge> pledgeList) {
+    public CheckResult checkAppointInstruction(List<Instruction> instructionList,
+                                               Map<String, List<InstructionDetail>> detailMap,
+                                               Map<String, List<InstructionPledge>> pledgeMap) {
         if (CollectionUtils.isEmpty(instructionList)) {
             return new CheckResult(1, "指令信息不能为空");
         }
-        if (CollectionUtils.isEmpty(detailList)) {
+        if (MapUtils.isEmpty(detailMap)) {
             return new CheckResult(1, "指令组合信息不能为空");
-        }
-        Map<String, List<InstructionDetail>> detailMap = Maps.newHashMap();
-        if (CollectionUtils.isEmpty(detailList)) {
-            detailMap.putAll(detailList.stream().collect(Collectors.groupingBy(InstructionDetail::getEntrustId)));
-        }
-        Map<String, List<InstructionPledge>> pledgeMap = Maps.newHashMap();
-        if (CollectionUtils.isEmpty(pledgeList)) {
-            pledgeMap.putAll(pledgeList.stream().collect(Collectors.groupingBy(InstructionPledge::getEntrustId)));
         }
 
         //检查分发指令数据
-        Map<String, Object> errorMap = checkAppointInstruction(instructionList, detailMap, pledgeMap);
-        if (MapUtils.isNotEmpty(errorMap)) {
-            return new CheckResult(2, "指令数据部分检查不通过", errorMap);
-        }
-
-        return new CheckResult(0, "指令数据检查通过");
-    }
-
-
-    private Map<String, Object> checkAppointInstruction(List<Instruction> instructionList, Map<String, List<InstructionDetail>> detailMap,
-                                                        Map<String, List<InstructionPledge>> pledgeMap) {
         Map<String, Object> errorMap = Maps.newHashMap();
         instructionList.forEach(instruction -> {
             String entrustId = instruction.getEntrustId();
@@ -75,7 +57,11 @@ public class AppointInstructionCheck {
             }
         });
 
-        return errorMap;
+        if (MapUtils.isNotEmpty(errorMap)) {
+            return new CheckResult(2, "指令数据部分检查不通过", errorMap);
+        }
+
+        return new CheckResult(0, "指令数据检查通过");
     }
 
     private Map<String, Object> doCheck(Instruction instruction, List<InstructionDetail> detailList, List<InstructionPledge> pledgeList) {

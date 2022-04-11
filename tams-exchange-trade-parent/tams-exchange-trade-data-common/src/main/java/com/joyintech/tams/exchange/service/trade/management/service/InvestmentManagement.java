@@ -1050,11 +1050,21 @@ public class InvestmentManagement extends BaseService {
         //质押券信息
         List<InstructionPledge> pledgeList = instructionPage.getEtr_pledge_list();
         List<String> entrustIds = instructionList.stream().map(Instruction::getEntrustId).collect(Collectors.toList());
+
+        Map<String, List<InstructionDetail>> detailMap = Maps.newHashMap();
+        if (CollectionUtils.isNotEmpty(detailList)) {
+            detailMap.putAll(detailList.stream().collect(Collectors.groupingBy(InstructionDetail::getEntrustId)));
+        }
+        Map<String, List<InstructionPledge>> pledgeMap = Maps.newHashMap();
+        if (CollectionUtils.isNotEmpty(pledgeList)) {
+            pledgeMap.putAll(pledgeList.stream().collect(Collectors.groupingBy(InstructionPledge::getEntrustId)));
+        }
+
         try {
             //保存分发指令数据
-            List<RecordLog> records = saveAppointInstruction(instructionList, detailList, pledgeList);
+            List<RecordLog> records = saveAppointInstruction(instructionList, detailMap, pledgeMap);
 
-            CheckResult checkResult = appointInstructionCheck.checkAppointInstruction(instructionList, detailList, pledgeList);
+            CheckResult checkResult = appointInstructionCheck.checkAppointInstruction(instructionList, detailMap, pledgeMap);
             logger.info("指令分发数据检查结果：{}", JsonUtils.getJsonFromObject(checkResult));
             int code = checkResult.getCode();
             Map<String, Object> data = checkResult.getData();
@@ -1089,19 +1099,13 @@ public class InvestmentManagement extends BaseService {
         }
     }
 
-    private List<RecordLog> saveAppointInstruction(List<Instruction> instructionList, List<InstructionDetail> detailList, List<InstructionPledge> pledgeList) {
+    private List<RecordLog> saveAppointInstruction(List<Instruction> instructionList,
+                                                   Map<String, List<InstructionDetail>> detailMap,
+                                                   Map<String, List<InstructionPledge>> pledgeMap) {
         logger.info("保存分发指令数据开始...");
         if (CollectionUtils.isEmpty(instructionList)) {
             logger.error("分发指令数据为空");
             return Collections.emptyList();
-        }
-        Map<String, List<InstructionDetail>> detailMap = Maps.newHashMap();
-        if (Objects.nonNull(detailList)) {
-            detailMap.putAll(detailList.stream().collect(Collectors.groupingBy(InstructionDetail::getEntrustId)));
-        }
-        Map<String, List<InstructionPledge>> pledgeMap = Maps.newHashMap();
-        if (Objects.nonNull(pledgeList)) {
-            pledgeMap.putAll(pledgeList.stream().collect(Collectors.groupingBy(InstructionPledge::getEntrustId)));
         }
 
         List<RecordLog> records = Lists.newArrayList();
