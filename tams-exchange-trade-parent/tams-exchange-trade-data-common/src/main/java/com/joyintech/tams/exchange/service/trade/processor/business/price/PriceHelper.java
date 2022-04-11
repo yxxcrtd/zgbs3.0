@@ -1,5 +1,7 @@
 package com.joyintech.tams.exchange.service.trade.processor.business.price;
 
+import cn.hutool.core.util.NumberUtil;
+import com.google.common.collect.Lists;
 import com.joyintech.tams.exchange.common.bean.TickBean;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.instrument.SubStockType;
@@ -15,12 +17,16 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
+import java.util.ArrayList;
 
 /**
  * create By MAXX on 2020/12/17
  */
 @Component
 public class PriceHelper {
+    /**
+     * 日志对象
+     */
     private static final Logger logger = LoggerFactory.getLogger(PriceHelper.class);
     private double buyRatio = 1.02;
     private double sellRatio = 0.98;
@@ -109,42 +115,6 @@ public class PriceHelper {
             return false;
         }
         return true;
-    }
-
-    //买入基准价格
-    private double getBuyStandardPrice(TickBean tick) {
-        double buyStandardPrice = tick.getAskPrice().get(0);
-        if (Double.compare(buyStandardPrice, 0.0) > 0) {
-            return buyStandardPrice;
-        }
-        buyStandardPrice = tick.getBidPrice().get(0);
-        if (Double.compare(buyStandardPrice, 0.0) > 0) {
-            return buyStandardPrice;
-        }
-        buyStandardPrice = tick.getLastPrice();
-        if (Double.compare(buyStandardPrice, 0.0) > 0) {
-            return buyStandardPrice;
-        }
-        buyStandardPrice = tick.getPreClosePrice();
-        return buyStandardPrice;
-    }
-
-    //卖出基准价格
-    private double getSaleStandardPrice(TickBean tick) {
-        double saleStandardPrice = tick.getBidPrice().get(0);
-        if (Double.compare(saleStandardPrice, 0.0) > 0) {
-            return saleStandardPrice;
-        }
-        saleStandardPrice = tick.getAskPrice().get(0);
-        if (Double.compare(saleStandardPrice, 0.0) > 0) {
-            return saleStandardPrice;
-        }
-        saleStandardPrice = tick.getLastPrice();
-        if (Double.compare(saleStandardPrice, 0.0) > 0) {
-            return saleStandardPrice;
-        }
-        saleStandardPrice = tick.getPreClosePrice();
-        return saleStandardPrice;
     }
 
     //沪深大宗交易
@@ -278,10 +248,25 @@ public class PriceHelper {
         return true;
     }
 
+    /**
+     * 获取当前所属交易时间段
+     */
     public int getTradeTimeStage() {
         LocalTime now = LocalTime.now().withNano(0);
         int tradeTimeStage = -1;
-        if (now.compareTo(LocalTime.parse(TradeTime.THE_OPENING_BEGIN.value)) >= 0
+        if (now.compareTo(TradeTime.THE_OPENING_BEGIN.getTime()) >= 0
+                && now.compareTo(TradeTime.THE_OPENING_END.getTime()) <= 0) {
+            tradeTimeStage = TradeTimeStage.THE_OPENING_SET.value;
+        } else if ((now.compareTo(TradeTime.THE_CONTINUOUS_AUCTION_BEGIN1.getTime()) >= 0
+                && now.compareTo(TradeTime.THE_CONTINUOUS_AUCTION_END1.getTime()) <= 0)
+                || (now.compareTo(TradeTime.THE_CONTINUOUS_AUCTION_BEGIN2.getTime()) >= 0
+                && now.compareTo(TradeTime.THE_CONTINUOUS_AUCTION_END2.getTime()) <= 0)) {
+            tradeTimeStage = TradeTimeStage.THE_CONTINUOUS_AUCTION.value;
+        } else if (now.compareTo(TradeTime.THE_CLOSED_BEGIN.getTime()) >= 0
+                && now.compareTo(TradeTime.THE_CLOSED_END.getTime()) <= 0) {
+            tradeTimeStage = TradeTimeStage.THE_CLOSED_SET.value;
+        }
+        /*if (now.compareTo(LocalTime.parse(TradeTime.THE_OPENING_BEGIN.value)) >= 0
                 && now.compareTo(LocalTime.parse(TradeTime.THE_OPENING_END.value)) <= 0) {
             tradeTimeStage = TradeTimeStage.THE_OPENING_SET.value;
         } else if ((now.compareTo(LocalTime.parse(TradeTime.THE_CONTINUOUS_AUCTION_BEGIN1.value)) >= 0
@@ -292,43 +277,167 @@ public class PriceHelper {
         } else if (now.compareTo(LocalTime.parse(TradeTime.THE_CLOSED_BEGIN.value)) >= 0
                 && now.compareTo(LocalTime.parse(TradeTime.THE_CLOSED_END.value)) <= 0) {
             tradeTimeStage = TradeTimeStage.THE_CLOSED_SET.value;
-        }
+        }*/
         return tradeTimeStage;
     }
 
-    //获取买一价
+    /**
+     * 获取买一价
+     * <p/>
+     * 规则：
+     * <br>1.依次判断买一价、卖一价和最新价中最小值，最新价中大于0.0的值，若大于0，则返回该值。
+     * <br>2.若都不符合，则返回昨收盘价
+     *
+     * @param tick 行情数据
+     * @return 买一价
+     */
     public double getBidPrice1(TickBean tick) {
+        ArrayList<Double> prices = Lists.newArrayList();
+        prices.add(tick.getBidPrice().get(0));
+        prices.add(Math.min(tick.getAskPrice().get(0), tick.getLastPrice()));
+        prices.add(tick.getLastPrice());
+
+        return prices.stream()
+                .filter(item -> NumberUtil.compare(item, 0.0) > 0)
+                .findFirst()
+                .orElse(tick.getPreClosePrice());
+
+        /*// 买一价
         double bidPrice1 = tick.getBidPrice().get(0);
         if (Double.compare(bidPrice1, 0.0) > 0) {
             return bidPrice1;
         }
+        // 卖一价和最新价中最小值
         bidPrice1 = Math.min(tick.getAskPrice().get(0), tick.getLastPrice());
         if (Double.compare(bidPrice1, 0.0) > 0) {
             return bidPrice1;
         }
+        // 最新价
         bidPrice1 = tick.getLastPrice();
         if (Double.compare(bidPrice1, 0.0) > 0) {
             return bidPrice1;
         }
+        // 昨收盘价
         bidPrice1 = tick.getPreClosePrice();
-        return bidPrice1;
+        return bidPrice1;*/
     }
 
-    //获取卖一价
+    /**
+     * 获取卖一价
+     * <p/>
+     * 规则：
+     * <br>1.依次判断卖一价、买一价和最新价中最小值，最新价中大于0.0的值，若大于0，则返回该值。
+     * <br>2.若都不符合，则返回昨收盘价
+     *
+     * @param tick 行情数据
+     * @return 卖一价
+     */
     public double getAskPrice1(TickBean tick) {
+        ArrayList<Double> prices = Lists.newArrayList();
+        prices.add(tick.getAskPrice().get(0));
+        prices.add(Math.min(tick.getBidPrice().get(0), tick.getLastPrice()));
+        prices.add(tick.getLastPrice());
+
+        return prices.stream()
+                .filter(item -> NumberUtil.compare(item, 0.0) > 0)
+                .findFirst()
+                .orElse(tick.getPreClosePrice());
+
+        /*// 卖一价
         double askPrice1 = tick.getAskPrice().get(0);
         if (Double.compare(askPrice1, 0.0) > 0) {
             return askPrice1;
         }
+        // 买一价和最新价中最小值
         askPrice1 = Math.min(tick.getBidPrice().get(0), tick.getLastPrice());
         if (Double.compare(askPrice1, 0.0) > 0) {
             return askPrice1;
         }
+        // 最新价
         askPrice1 = tick.getLastPrice();
         if (Double.compare(askPrice1, 0.0) > 0) {
             return askPrice1;
         }
+        // 昨收盘价
         askPrice1 = tick.getPreClosePrice();
-        return askPrice1;
+        return askPrice1;*/
+    }
+
+    /**
+     * 获取买入基准价
+     * <p/>
+     * 规则：
+     * <br>1.依次判断卖一价、买一价、最新价中大于0.0的值，若大于0，则返回该值。
+     * <br>2.若都不符合，则返回昨收盘价
+     *
+     * @param tick 行情数据
+     * @return 买入基准价
+     */
+    private double getBuyStandardPrice(TickBean tick) {
+        ArrayList<Double> prices = Lists.newArrayList();
+        prices.add(tick.getAskPrice().get(0));
+        prices.add(tick.getBidPrice().get(0));
+        prices.add(tick.getLastPrice());
+
+        return prices.stream()
+                .filter(item -> NumberUtil.compare(item, 0.0) > 0)
+                .findFirst()
+                .orElse(tick.getPreClosePrice());
+
+        /*// 卖一价
+        double buyStandardPrice = tick.getAskPrice().get(0);
+        if (Double.compare(buyStandardPrice, 0.0) > 0) {
+            return buyStandardPrice;
+        }
+        // 买一价
+        buyStandardPrice = tick.getBidPrice().get(0);
+        if (Double.compare(buyStandardPrice, 0.0) > 0) {
+            return buyStandardPrice;
+        }
+        // 最新价
+        buyStandardPrice = tick.getLastPrice();
+        if (Double.compare(buyStandardPrice, 0.0) > 0) {
+            return buyStandardPrice;
+        }
+        // 昨收盘价
+        buyStandardPrice = tick.getPreClosePrice();
+        return buyStandardPrice;*/
+    }
+
+    /**
+     * 获取卖出基准价格
+     * <p/>
+     * 规则：
+     * <br>1.依次判断买一价、卖一价、最新价中大于0.0的值，若大于0，则返回该值。
+     * <br>2.若都不符合，则返回昨收盘价
+     *
+     * @param tick 行情数据
+     * @return 卖出基准价格
+     */
+    private double getSaleStandardPrice(TickBean tick) {
+        ArrayList<Double> prices = Lists.newArrayList();
+        prices.add(tick.getBidPrice().get(0));
+        prices.add(tick.getAskPrice().get(0));
+        prices.add(tick.getLastPrice());
+
+        return prices.stream()
+                .filter(item -> NumberUtil.compare(item, 0.0) > 0)
+                .findFirst()
+                .orElse(tick.getPreClosePrice());
+
+        /*double saleStandardPrice = tick.getBidPrice().get(0);
+        if (Double.compare(saleStandardPrice, 0.0) > 0) {
+            return saleStandardPrice;
+        }
+        saleStandardPrice = tick.getAskPrice().get(0);
+        if (Double.compare(saleStandardPrice, 0.0) > 0) {
+            return saleStandardPrice;
+        }
+        saleStandardPrice = tick.getLastPrice();
+        if (Double.compare(saleStandardPrice, 0.0) > 0) {
+            return saleStandardPrice;
+        }
+        saleStandardPrice = tick.getPreClosePrice();
+        return saleStandardPrice;*/
     }
 }
