@@ -3,35 +3,13 @@
      * 获取查询参数
      */
     var getPageParams = function() {
-
-        //产品代码 多选择
-        var portfolioIdTemp = $('#portfolioId').val();
-        var portfolioId = null;
-        if(portfolioIdTemp != null){
-            portfolioId = portfolioIdTemp.join(",");
-        }
-
-        //资产代码  多选择
-        var finprodMarketIdTemp = $('#finprodMarketId').val();
-        var finprodMarketId = null;
-        if(finprodMarketIdTemp != null){
-            finprodMarketId = finprodMarketIdTemp.join(",");
-        }
-
-        //交易类型  多选择
-        var psTemp = $('#ps').val();
-        var ps = null;
-        if(psTemp != null){
-            ps = psTemp.join(",");
-        }
-
         return {
             tradeId: $('#tradeId').val(),
-            portfolioId: portfolioId,
-            finprodMarketId: finprodMarketId,
+            finprodId: $.trim($('#finprodId').val()),
+            asset: $.trim($('#asset').val()),
             tradeDateBegin: $("#tradeDate").startDate(),
             tradeDateEnd: $("#tradeDate").endDate(),
-            ps: ps
+            ps: $('#ps').val()
         }
     };
 
@@ -50,18 +28,15 @@
         dblclick:function(table, data) {
             Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
                 basePath + "valuation/trademanage/trdintovaluationduration/TrdIntoValuationDuration002/init",
-                "98%", "98%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
-                    portfolioId:data.portfolioId,
-                    entrustId:data.entrustId,
-                    finprodId:data.finprodId,
+                "95%", "90%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
                     tradeId:data.tradeId});
         },
         cols:[
             {field:'tradeId', width:180, sortField:'tradeId',title: '交易编号'}
-            ,{field:'portfolioId', width:150, title: '产品代码',sortField:'portfolioId'}
-            ,{field:'portfolioName', width:150, title: '产品名称',sortField:'portfolioName'}
-            ,{field:'finprodMarketId', width:150, sortField:'finprodMarketId',title: '资产代码'}
-            ,{field:'finprodName', width:150, sortField:'finprodName',title: '资产名称'}
+            ,{field:'prodId', width:150, title: '产品代码'}
+            ,{field:'prodName', width:150, title: '产品名称'}
+            ,{field:'secId', width:150,title: '资产代码'}
+            ,{field:'secAbbr', width:150,title: '资产名称'}
             ,{field:'psStr', width:150, title: '交易类型',sortField:'ps'}
             ,{field:'ps', title: '交易类型',visible:false}
             ,{field:'ccyFmt', width:150, title: '币种',sortField:'ccy'}
@@ -74,10 +49,10 @@
             ,{field:'tradeDate',title: '交易日期',visible:false}
             ,{field:'settleDateStr', width:150,  title: '交割日期',sortField:'settleDate'}
             ,{field:'settleDate',title: '交割日期',visible:false}
-            ,{field:'actIntStr', width:150, title: '实收利息',type:'number',sortField:'actInt'}
-            ,{field:'actCapiStr', width:150, title: '实收本金',type:'number',sortField:'actCapi'}
-            ,{field:'settleAmtStr', width:150, title: '结算金额',type:'number',sortField:'settleAmt'}
-            ,{field:'trdAcctId', title: '资金账户',width:100}
+            ,{field:'actInt', width:150, title: '实收利息',type:'money'}
+            ,{field:'actCapi', width:150, title: '实收本金',type:'money'}
+            ,{field:'settleAmt', width:150, title: '结算金额',type:'money'}
+            ,{field:'myAcctNo', title: '资金账户',width:100}
             ,{field:'action', title: '操作' , type:'action',buttons: ['edit', 'delt'] , width:'10%'}
         ],
         //loadonce:tru
@@ -142,7 +117,7 @@
         $('#TrdIntoValuationDuration001_btn_add').click(
                 function() {
                     Joyin.dialog(JoyinUtil.getLabel("TrdIntoValuationDuration002"), basePath
-                            + "valuation/trademanage/trdintovaluationduration/TrdIntoValuationDuration002/init", "99%", "99%", {
+                            + "valuation/trademanage/trdintovaluationduration/TrdIntoValuationDuration002/init", "95%", "90%", {
                         pageModel : PAGE_MODEL_NEW
                     }, function() {
                         table.reload();
@@ -158,7 +133,7 @@
             Joyin.ajaxJson(basePath + 'valuation/trademanage/trdintovaluationduration/TrdIntoValuationDuration001/check', object, function(result) {//请求路径，请求参数回调函数
                 Joyin.dialog(JoyinUtil.getLabel("融入券存续期-修改"),
                     basePath + "valuation/trademanage/trdintovaluationduration/TrdIntoValuationDuration002/init",//打开新界面
-                    "98%", "98%", {
+                    "95%", "90%", {
                         pageModel: PAGE_MODEL_EDIT,//请求的page_model
                         tradeId: data.tradeId  //金融产品代码
                     }, function () {

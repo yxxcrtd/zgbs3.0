@@ -18,8 +18,9 @@
                                     <label class="layui-form-label form-lable"
                                            data-th-text="#{TrdIntoValuationDuration002.tradeId}">交易编号</label>
                                     <div class="layui-input-inline input-inline">
-                                        <input type="text" class="layui-input form-input" id="tradeId"
-                                               name="tradeId" placeholder="自动生成"
+                                        <input type="text"  id="tradeId" name="tradeId"
+                                               class="layui-input form-input"
+                                               placeholder="提交后自动生成，无需填写"
                                                disabled="disabled"
                                                data-th-value="${entity?.tradeId}" maxlength="60">
                                     </div>
@@ -27,7 +28,7 @@
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap">产品名称</label>
                                     <div class="layui-input-inline input-inline">
-                                        <select id="portfolioId" name="portfolioId" th:initValue="${entity?.portfolioId}"
+                                        <select id="prodId" name="prodId" th:initValue="${entity?.prodId}"
                                                 class="layui-input form-input input-select available"
                                                 data-th-placeholder="#{SysCommon.placeholder}" required
                                                 data-th-data-url="@{/valuation/trademanage/trdintovaluationduration/TrdIntoValuationDuration001/getFinprodId}">
@@ -37,10 +38,10 @@
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-lable">产品代码</label>
                                     <div class="layui-input-inline input-inline">
-                                        <input type="text" class="layui-input form-input" id="portfolioName"
-                                               name="portfolioName" placeholder="请输入内容"
+                                        <input type="text" class="layui-input form-input" id="prodName"
+                                               name="prodName" placeholder="请输入内容"
                                                data-th-placeholder="#{SysCommon.placeholder}" required="required" disabled="disabled"
-                                               data-th-value="${entity?.portfolioName}" maxlength="60">
+                                               data-th-value="${entity?.prodName}" maxlength="60">
                                     </div>
                                 </div>
                             </div>
@@ -48,8 +49,8 @@
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap">资产名称</label>
                                     <div class="layui-input-inline input-inline">
-                                        <select id="finprodMarketId" name="finprodMarketId" class="layui-input form-input input-select" required
-                                                data-th-placeholder="#{SysCommon.placeholder}" th:initValue="${entity?.finprodMarketId}"  childrenIds='chlId'
+                                        <select id="secId" name="secId" class="layui-input form-input input-select" required
+                                                data-th-placeholder="#{SysCommon.placeholder}" th:initValue="${entity?.secId}"  childrenIds='chlId'
                                                 data-th-data-url="@{/valuation/trademanage/trdintovaluationduration/TrdIntoValuationDuration001/getAssetId}">
 
                                         </select>
@@ -58,7 +59,7 @@
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap">资产代码</label>
                                     <div class="layui-input-inline input-inline">
-                                        <input type="text" id="finprodName" name="finprodName" th:value="${entity?.finprodName}" class="layui-input form-input hidden" placeholder="请输入内容"
+                                        <input type="text" id="secAbbr" name="secAbbr" th:value="${entity?.secAbbr}" class="layui-input form-input hidden" placeholder="请输入内容"
                                                required="required" disabled="disabled" data-th-placeholder="#{SysCommon.placeholder}">
                                     </div>
                                 </div>
@@ -156,11 +157,11 @@
                                 <div class="form-inline-wrap" >
                                     <label class="layui-form-label form-lable" >资金账户</label>
                                     <div class="layui-input-inline input-inline">
-                                        <select type="text" id="trdAcctId" name="trdAcctId" class="layui-input form-input input-select" parentIds="portfolioId"
+                                        <select type="text" id="myAcctNo" name="myAcctNo" class="layui-input form-input input-select" parentIds="prodId"
                                                 th:data-url="@{/valuation/trademanage/trdintovaluationduration/TrdIntoValuationDuration002/getTrdAcctId}"
                                                 allowClear="true" placeholder="请输入内容" required="required"
                                                 data-th-placeholder="#{SysCommon.placeholder}"
-                                                data-th-initvalue="${entity?.trdAcctId}">
+                                                data-th-initvalue="${entity?.myAcctNo}">
                                         </select>
                                     </div>
                                 </div>
@@ -182,21 +183,6 @@
 </div>
 <div layout:fragment="script">
     <script data-th-inline="javascript" type="text/javascript">
-        var entrustId = /*[[${entrustId}]]*/'';
-        var YES_OR_NO_Y = /*[[${YES_OR_NO_Y}]]*/'';
-        var YES_OR_NO_N = /*[[${YES_OR_NO_N}]]*/'';
-        var PS_T01 = /*[[${PS_T01}]]*/'';
-        var BANK_LENDING_TYPE_01 = /*[[${BANK_LENDING_TYPE_01}]]*/'';
-        var BANK_LENDING_TYPE_02 = /*[[${BANK_LENDING_TYPE_02}]]*/'';
-        var BACK_LEND_DIRECTION_01 = /*[[${BACK_LEND_DIRECTION_01}]]*/'';
-        var BACK_LEND_DIRECTION_02 = /*[[${BACK_LEND_DIRECTION_02}]]*/'';
-        var FINPROD_TYPE_TG_F08 = /*[[${FINPROD_TYPE_TG_F08}]]*/'';
-        var FINPROD_TYPE_TG_F09 = /*[[${FINPROD_TYPE_TG_F09}]]*/'';
-        var FINPROD_TYPE_TG_F09 = /*[[${FINPROD_TYPE_TG_F09}]]*/'';
-        var FINPROD_TYPE_TG_F25 = /*[[${FINPROD_TYPE_TG_F25}]]*/'';
-        var MY_SUP_TIME_TYPE_02 = /*[[${MY_SUP_TIME_TYPE_02}]]*/'';
-        var FINPROD_TYPE_F08 = /*[[${FINPROD_TYPE_F08}]]*/'';
-        var FINPROD_TYPE_F09 = /*[[${FINPROD_TYPE_F09}]]*/'';
     </script>
     <script th:src="@{/js/valuation/trademanage/trdintovaluationduration/TrdIntoValuationDuration002.js}" type="text/javascript"></script>
 </div>

@@ -48,8 +48,8 @@ public class TrdIntoValuationDuration002Service extends BaseService<TrdIntoValua
         return restTemplate.postForObject(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdIntoValuationDuration001/createPlanTradeId",
                 null, String.class);
-
     }
+
     /**
      * {@inheritDoc}
      */
@@ -73,7 +73,7 @@ public class TrdIntoValuationDuration002Service extends BaseService<TrdIntoValua
         //设置接口参数
         Map<String,Object> params = new HashMap<>();
         List<String> prodIds = new ArrayList<>();
-        prodIds.add(dto.getPortfolioId());
+        prodIds.add(dto.getProdId());
         params.put("INTERF_BOOKSETID",prodIds);
         params.put("VAL_MODEL","INTERF_MODEL_SINGLE");
 
@@ -81,25 +81,14 @@ public class TrdIntoValuationDuration002Service extends BaseService<TrdIntoValua
         ValSeclendAssetPeriodDeal entity = new ValSeclendAssetPeriodDeal();
         BeanUtil.copyPropertiesIgnoreNull(entity,dto);
         //比较界面和接口字段差异，并手动给接口字段赋值
-        entity.setProdId(dto.getPortfolioId()); //产品代码
-        entity.setSecId(dto.getFinprodMarketId()); //金融产品代码
-        entity.setFinprodId(dto.getFinprodMarketId()); //金融产品代码=资产代码
-        entity.setFinprodType("F04"); //金融产品类型
+        entity.setFinprodId(dto.getSecId()); //金融产品代码=资产代码
+        entity.setFinprodType("F01"); //金融产品类型
         entity.setDataActionSign("01");//数据动作标志
-        entity.setPs(dto.getPs());//交易方向
         entity.setIsAmt("Y"); //是否还本带息
-        entity.setActInt(dto.getActInt()); //实收利息
-        entity.setActCapi(dto.getActCapi()); //实收本金
-        entity.setTardeAmt(dto.getActInt().add(dto.getActCapi())); //交易金额=实收本金+实收利息
-        entity.setVdate(dto.getVdate()); //计息开始日
-        entity.setMdate(dto.getMdate()); //计息结束日
-        entity.setTradeDate(dto.getTradeDate());//交易日
-        entity.setSettleDate(dto.getSettleDate()); //交割日
+        entity.setTardeAmt(dto.getSettleAmt()); //交易金额=实收本金+实收利息
         entity.setIsClean2("Y");//是否结清
-        entity.setCcy(dto.getCcy());//币种
-        entity.setTradeId(null);  //交易编号
-        entity.setIsClean("Y");//有无清算指令
-        entity.setMyAcctNo(dto.getTrdAcctId()); //资金账户
+        entity.setIsClean("N");//有无清算指令
+        entity.setFundSettleDate(dto.getSettleDate());
         listValSeclendAssetPeriodDeal.add(entity);
         Map<String, Object> map = secPeriodDealTemplateRecService.handleValSeclendDeal(listValSeclendAssetPeriodDeal,new Date(),params,null);
         //定义返回变量
@@ -119,9 +108,7 @@ public class TrdIntoValuationDuration002Service extends BaseService<TrdIntoValua
         //账务明细代码表
         List<BokDetailId> listValBokDetailId=(List<BokDetailId>)map.get("listValBokDetailId");
         result.setListValBokDetailId(listValBokDetailId);
-        // 添加日志
-        //result.setValInterflog((List<ValInterflog>)map.get("valInterflogList"));
-        //结算指令
+
         List<StlOrders> valOrdersList=(List<StlOrders>)map.get("listValOrders");
         result.setListValOrders(valOrdersList);
         //结算指令拓展表list
