@@ -74,9 +74,8 @@ public class CommonCheckChain extends AbstractChain<CheckChainBean> {
         }
         if (StringUtils.isBlank(instruction.getPs())) {
             checkRsp.put("ps", "交易方向不能为空");
-        }
-        if (null == DictCodeListExt2.from(DictCode.交易方向, instruction.getBusiTypeTg())) {
-            checkRsp.put("ps", "交易方向取值不合法");
+        } else if (null == DictCodeListExt2.from(DictCode.交易方向, instruction.getPs())) {
+            checkRsp.put("ps", "交易方向取值不合法:" + instruction.getPs());
         }
         if (Objects.isNull(instruction.getTradeDate())) {
             checkRsp.put("tradeDate", "委托日期不能为空");
@@ -92,9 +91,8 @@ public class CommonCheckChain extends AbstractChain<CheckChainBean> {
         }
         if (StringUtils.isBlank(instruction.getPriceMode())) {
             checkRsp.put("priceMode", "限价模式不能为空");
-        }
-        if (null == DictCodeListExt3.from(DictCode.价格模式, instruction.getPriceMode())) {
-            checkRsp.put("priceMode", "限价模式取值不合法");
+        } else if (null == DictCodeListExt2.from(DictCode.价格模式, instruction.getPriceMode())) {
+            checkRsp.put("priceMode", "限价模式取值不合法:" + instruction.getPriceMode());
         }
         if (Objects.isNull(instruction.getValueDate())) {
             checkRsp.put("valueDate", "起息日不能为空");
@@ -125,21 +123,18 @@ public class CommonCheckChain extends AbstractChain<CheckChainBean> {
         }
         if (StringUtils.isBlank(instruction.getEntrustClass())) {
             checkRsp.put("entrustClass", "委托指令类别不能为空");
-        }
-        if (null == DictCodeListExt3.from(DictCode.投资指令类型, instruction.getEntrustClass())) {
-            checkRsp.put("entrustClass", "委托指令类别取值不合法");
+        }else if (null == DictCodeListExt3.from(DictCode.投资指令类型, instruction.getEntrustClass())) {
+            checkRsp.put("entrustClass", "委托指令类别取值不合法:" + instruction.getEntrustClass());
         }
         if (StringUtils.isBlank(instruction.getBusiTypeTg())) {
             checkRsp.put("busiTypeTg", "投管业务类型不能为空");
-        }
-        if (null == DictCodeListExt3.from(DictCode.投管业务类型, instruction.getBusiTypeTg())) {
-            checkRsp.put("busiTypeTg", "投管业务类型取值不合法");
+        } else if (null == DictCodeListExt3.from(DictCode.投管业务类型, instruction.getBusiTypeTg())) {
+            checkRsp.put("busiTypeTg", "投管业务类型取值不合法:" + instruction.getBusiTypeTg());
         }
         if (StringUtils.isBlank(instruction.getTargetType())) {
             checkRsp.put("targetType", "目标类型不能为空");
-        }
-        if (null == DictCodeListExt3.from(DictCode.目标类型, instruction.getTargetType())) {
-            checkRsp.put("targetType", "目标类型取值不合法");
+        } else if (null == DictCodeListExt3.from(DictCode.目标类型, instruction.getTargetType())) {
+            checkRsp.put("targetType", "目标类型取值不合法:" + instruction.getTargetType());
         }
         if (CollectionUtils.isEmpty(chainBean.getDetailList())) {
             checkRsp.put("instructionDetail", "指令组合明细不能为空");
