@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.joyintech.service.valuation.basicdata.asset.issue.dao.FinProductIssueMapper">
+
+    <!--画面一分页查询-->
+    <select id="queryForPage"  resultType="com.joyintech.service.valuation.basicdata.asset.issue.dto.FinProductIssueDto" parameterType="Map">
+        SELECT  * from (
+        SELECT
+        CASE WHEN <![CDATA[
+            ISSUE.ISSUE_EDATE >= TO_DATE(#{iPlatformDate},'YYYY-MM-DD')  or
+            ISSUE.TENDER_EDATE >= TO_DATE(#{iPlatformDate},'YYYY-MM-DD')  THEN '01'
+        WHEN (ISSUE.ISSUE_EDATE < TO_DATE(#{iPlatformDate},'YYYY-MM-DD') or
+            ISSUE.TENDER_EDATE < TO_DATE(#{iPlatformDate},'YYYY-MM-DD')) and PRODUCT.CIRCULATION_CODE is null THEN '02'
+        WHEN (ISSUE.ISSUE_EDATE < TO_DATE(#{iPlatformDate},'YYYY-MM-DD') or
+            ISSUE.TENDER_EDATE < TO_DATE(#{iPlatformDate},'YYYY-MM-DD')) and PRODUCT.CIRCULATION_CODE is not null THEN '03'
+            ]]>
+        ELSE NULL END AS ISSUE_STAGE,
+        PRODUCT_ADD.ISSUE_STATUS,
+        PRODUCT.ISSUE_TYPE,
+        PRODUCT.FINPROD_MARKET_ID,
+        PRODUCT.FINPROD_ABBR,
+        PRODUCT.FINPROD_NAME,
+        PRODUCT.TRADE_MARKET,
+        PRODUCT.REGIST_ORG,
+        PRODUCT.ISSUER,
+        PRODUCT.ISSUE_TYPE,
+        ISSUE.ISSUE_CLASS ISSUE_CLASS,
+        ISSUE.TENDER_TYPE,
+        ISSUE.TENDER_TARGET,
+        ISSUE.ISSUE_STYLE,
+        ISSUE.PLAN_ISSUE_AMT,
+        case when ISSUE.ISSUE_CLASS = '02' THEN ISSUE.ISSUE_SDATE else   ISSUE.TENDER_SDATE end as SDATE_FORM,
+        case when ISSUE.ISSUE_CLASS = '02' THEN ISSUE.ISSUE_EDATE else   ISSUE.TENDER_EDATE end as EDATE_TO,
+        ISSUE.PAY_EDATE, ISSUE.ASSIGN_REGDATE,
+        case when PRODUCT.CIRCULATION_CODE is not null then TOTAL.SETTLE_DATE else PRODUCT_ADD.LISTING_DATE end as ONMARKET_DATE,
+        case when PRODUCT.CIRCULATION_CODE is not null then PRODUCT2.FINPROD_MARKET_ID else PRODUCT_ADD.APPEAR_MARKET_ID end as APPEAR_MARKET_ID,
+        PRODUCT.VDATE,
+        PRODUCT.MDATE,
+        PRODUCT_TYPE.TYPE_9,
+        PRODUCT_TYPE.TYPE_10,
+        PRODUCT_TYPE.TYPE_11,
+        PRODUCT.COUPON_SPECIES,
+        PRODUCT.CCY,
+        PRODUCT.ISSUE_PRICE,
+        ISSUE.INT_TYPE,
+        ISSUE.PAY_CYCLE,
+        ISSUE.REFER_YIELD,
+        ISSUE.MIN_PER_TAMT,
+        ISSUE.MAX_PER_UTAMT,
+        PRODUCT.REMARK
+        FROM
+        FIN_PRODUCT PRODUCT
+        LEFT JOIN FIN_PRODUCT_ADD PRODUCT_ADD ON PRODUCT.FINPROD_ID = PRODUCT_ADD.FINPROD_ID
+        LEFT JOIN TRD_FIN_PRODUCT_DEAL_TOTAL TOTAL ON PRODUCT.FINPROD_ID = TOTAL.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE ISSUE ON PRODUCT.FINPROD_ID = ISSUE.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_TYPE PRODUCT_TYPE ON PRODUCT.FINPROD_ID = PRODUCT_TYPE.FINPROD_ID
+        AND PRODUCT_TYPE.BRANCH = '0'
+        LEFT JOIN MST_CUSTOMER_INFO CUSTOMER_INFO ON PRODUCT.ISSUER = CUSTOMER_INFO.CUSTOMER_ID
+        LEFT JOIN FIN_PRODUCT PRODUCT2 ON PRODUCT.CIRCULATION_CODE = PRODUCT2.FINPROD_ID
+        <where>
+            <if test="finProdType2 != null and finProdType2 != ''">
+                PRODUCT.FINPROD_TYPE2 = #{finProdType2,jdbcType=VARCHAR}
+            </if>
+            <if test="finProdId != null and finProdId != ''">
+                AND PRODUCT.FINPROD_ID = #{finProdId,jdbcType=VARCHAR}
+            </if>
+
+            <if test="tradeMarketList != null and tradeMarketList.size()>0">
+                <foreach collection="tradeMarketList" open="PRODUCT.TRADE_MARKET in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+        </where>) t
+        ORDER BY t.ISSUE_STAGE, t.ISSUE_STATUS, t.TYPE_9, t.TYPE_10, t.TYPE_11, t.ISSUE_CLASS
+    </select>
+
+</mapper>
