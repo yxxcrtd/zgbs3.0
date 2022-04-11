@@ -274,6 +274,7 @@ public class PositionRequestManualSettleService {
             ptlCash.put("etrSecAmount", dto.getEtrSecAmount());
             ptlCash.put("ordId", dto.getOrderId());
             ptlCash.put("ordSecAmount", dto.getOrdSecAmount());
+            ptlCash.put("secAmount", dto.getSecAmount());
             ptlCashList.add(ptlCash);
 
             Map<String, Object> bondSec = new HashMap<>();
