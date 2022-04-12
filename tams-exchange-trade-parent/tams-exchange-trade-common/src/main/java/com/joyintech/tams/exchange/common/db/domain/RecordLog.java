@@ -45,7 +45,7 @@ public class RecordLog implements Serializable {
      */
     private int logType;
     /**
-     * 状态：0-新建，1-检查通过，2-检查不通过
+     * 状态：0-新建，1-检查通过/发送成功，2-检查不通过/发送失败
      */
     private int status;
     /**

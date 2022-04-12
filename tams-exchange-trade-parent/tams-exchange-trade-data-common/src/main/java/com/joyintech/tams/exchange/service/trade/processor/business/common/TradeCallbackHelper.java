@@ -5,7 +5,7 @@ import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.utils.*;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
-import com.joyintech.tams.exchange.service.trade.processor.MessageSenderService;
+import com.joyintech.tams.exchange.service.trade.processor.MessageSenderManagement;
 import com.joyintech.tams.exchange.service.trade.processor.account.AccountPositionHelper;
 import com.joyintech.tams.exchange.service.trade.processor.business.bond.BondHelper;
 import com.joyintech.tams.exchange.service.trade.processor.others.SplitOrderHelper;
@@ -40,8 +40,8 @@ public class TradeCallbackHelper {
     private OrderService orderService;
     @Autowired
     private InstructionService instructionService;
-    @Autowired
-    private MessageSenderService messageSenderService;
+    //    @Autowired
+//    private MessageSenderService messageSenderService;
     @Autowired
     private FuturesInstrumentService futuresInstrumentService;
     @Autowired
@@ -52,6 +52,8 @@ public class TradeCallbackHelper {
     private BondHelper bondHelper;
     @Autowired
     private InstrumentService instrumentService;
+    @Autowired
+    private MessageSenderManagement messageSenderHelper;
 
     public void onTrade(Trade tradeRecord) {
         logger.info("成交回报信息 {}", JsonUtils.getJsonFromObject(tradeRecord));
@@ -85,7 +87,7 @@ public class TradeCallbackHelper {
                     } else {
                         logger.info("tradeRecord has not found businessFlag brokerEntrustId is {}", tradeRecord.getBrokerEntrustId());
                     }
-                    IntegratedEntrust integratedEntrust =  (IntegratedEntrust) entrust;
+                    IntegratedEntrust integratedEntrust = (IntegratedEntrust) entrust;
                     tradeRecord.setPropSeatNo(integratedEntrust.getPropSeatNo());
                     tradeRecord.setPropSeatName(integratedEntrust.getPropSeatName());
                     tradeRecord.setDiscount(integratedEntrust.getDiscount());
@@ -267,18 +269,21 @@ public class TradeCallbackHelper {
             updateInstructionStatus(instruction);
             // 是否需要手工交手
             if (IntegratedEntrustUtils.isProtocolBack(tradeRecord.getEntrustProp())) {//协议回购
-                messageSenderService.pushTradeToMQForFixedIncome(tradeRecord, instruction, entrust);
+//                messageSenderService.pushTradeToMQForFixedIncome(tradeRecord, instruction, entrust);
+                messageSenderHelper.pushTradeForFixedIncome(tradeRecord, instruction, entrust);
                 return;
             } else if (InvestmentAssetType.isBond(instruction.getAssetType()) && TradePlat.needSettleTrade(instruction.getTradePlat())) {
                 Instrument instrument = instrumentService.queryByInnerCode(entrust.getStockCode());
                 if (Objects.nonNull(instrument)) {
                     if (EntrustUtils.isSettleTrade(instrument.getTradePlat(), entrust.getEntrustProp())) {
-                        messageSenderService.pushTradeToMQForFixedIncome(tradeRecord, instruction, entrust);
+//                        messageSenderService.pushTradeToMQForFixedIncome(tradeRecord, instruction, entrust);
+                        messageSenderHelper.pushTradeForFixedIncome(tradeRecord, instruction, entrust);
                         return;
                     }
                 }
             }
-            messageSenderService.pushTradeToMQ(tradeRecord, instruction, entrust);
+//            messageSenderService.pushTradeToMQ(tradeRecord, instruction, entrust);
+            messageSenderHelper.pushTrade(tradeRecord, instruction, entrust);
         } else if (tradeRecord.getTradeType() == TradeType.INVALID.value) {
             if (entrust.getEntrustStatus() == EntrustStatus.INVALID.value) {
                 logger.info("委托已通过委托回报废单处理，忽略废单成交");
