@@ -12,8 +12,8 @@ import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.util.DateUtil;
@@ -45,7 +45,6 @@ import com.joyintech.tams.exchange.service.trade.processor.msg.TradeMsgReceiver;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,13 +87,11 @@ public class InvestmentManagement extends BaseService {
     @Autowired
     private InstrumentService instrumentService;
     @Autowired
-    private FuturesInstrumentService futuresInstrumentService;
-    @Autowired
     private OrderService orderService;
     @Autowired
-    private AppointInstructionCheck appointInstructionCheck;
-    @Autowired
     private RecordLogService recordLogService;
+    @Autowired
+    private AppointInstructionCheck appointInstructionCheck;
 
     /**
      * 是否单体服务
@@ -242,7 +239,7 @@ public class InvestmentManagement extends BaseService {
      *  <li>
      *      dataType : 数据类型（为空时从内存查询，否则从投管查询）
      *      traderList : 交易员列表
- *      </li>
+     *      </li>
      * </ul>
      *
      * @param pageParam 查询参数
