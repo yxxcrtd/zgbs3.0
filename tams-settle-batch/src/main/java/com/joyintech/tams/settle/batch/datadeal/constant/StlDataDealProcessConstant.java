@@ -48,6 +48,8 @@ public class StlDataDealProcessConstant {
 	public static final String YWLX_012 = "012";
 	// SzdJsmx业务类型_要约收购及债券回售
 	public static final String YWLX_301 = "301";
+	//SzdJsmx业务类型_要约收购及债券回售   JSMX03债回购的业务类型从301-》305
+	public static final String YWLX_305 = "305";
 	// SzdJsmx业务类型_可转换公司债券申购
 	public static final String YWLX_020 = "020";
 	// SzdJsmx业务类型_网上发行业务
@@ -291,6 +293,8 @@ public class StlDataDealProcessConstant {
 	public static final String SJSMX_JYFS_02 = "02";
 	// SzdSjsmx交易方式_经深交所申报的非交易业务-撮合交易平台
 	public static final String SJSMX_JYFS_03 = "03";
+	// SzdSjsmx交易方式_固定收益交易平台业务
+	public static final String SJSMX_JYFS_13 = "13";
 	// SzdSjsmx交易方式_担保净额DVP交收
 	public static final String SJSMX_JSFS_Y = "Y";
 	// SzdSjsmx交易方式_非担保交收

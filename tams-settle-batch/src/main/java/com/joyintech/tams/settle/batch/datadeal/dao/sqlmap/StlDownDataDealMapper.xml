@@ -731,7 +731,7 @@
 		CON_FINPROD_ID conFinprodId
 		FROM
 		FIN_PRODUCT_CONVERTIBLE
-		where CON_SHARE_ID = #{zqdm1}
+		where FINPROD_ID = #{zqdm1}
 	</select>
 
 	<select id="selectSqSettleTransDatas" resultType="com.joyintech.tams.common.base.entity.SettleTransData">

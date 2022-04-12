@@ -5,19 +5,13 @@ import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.common.base.entity.FinProduct;
-import com.joyintech.tams.common.base.entity.SettleTransData;
-import com.joyintech.tams.common.base.entity.SettleTransDataAdd;
-import com.joyintech.tams.common.base.entity.SettleTransDataPledge;
-import com.joyintech.tams.common.base.entity.SettleTransTgMapping;
-import com.joyintech.tams.common.base.entity.SzdJsmx;
+import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.constant.DictCodeListStl;
-import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
-import com.joyintech.tams.invest.common.redisinit.dto.ImplCalendar;
 import com.joyintech.tams.settle.batch.datadeal.constant.StlDataDealProcessConstant;
 import com.joyintech.tams.settle.batch.datadeal.dao.StlDownDataDealMapper;
 import com.joyintech.tams.settle.batch.datadeal.dto.StlDownDataDealOperatorDto;
@@ -28,6 +22,8 @@ import com.joyintech.tams.settle.common.dto.StlDownDataDealAccountInfoDto;
 import com.joyintech.tams.settle.common.service.SettleCommonService;
 import com.joyintech.tams.settle.common.util.DateUtil;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -63,6 +59,11 @@ public class StlDataDealSzdJsmxProcessService {
 
 	@Autowired
     protected StlDownDataDealMapper stlDownDataDealMapper;
+
+	@Autowired
+	protected FinProductTypeMapper finProductTypeMapper;
+
+	private Logger logger = LoggerFactory.getLogger(StlDataDealSzdJsmxProcessService.class);
 
 	/*@Autowired
 	protected ICalendar iCalendar;*/
@@ -216,7 +217,11 @@ public class StlDataDealSzdJsmxProcessService {
 				// 交易币种
 				settleTransData.setCcy(stlDataDealProcessCommonService.getCcy(szdJsmx.getBz()));
 				// 交易平台
-				settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdJsmx.getJyfs()));
+				String finProductTypeType6 = getFinProductTypeType6(szdJsmx);
+				settleTransData.setTradePlat(null);
+				if ("B14".equals(finProductTypeType6)) {
+					settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdJsmx.getJyfs()));
+				}
 				// 交收方式
 				settleTransData.setSettleMode(stlDataDealProcessCommonService.getSettleMode(szdJsmx.getJsfs()));
 				// 交易方向
@@ -296,7 +301,8 @@ public class StlDataDealSzdJsmxProcessService {
 						settleTransData.setFinprodType(DictCodeListExt1.金融产品类型_股票.getValue());
 						//settleTransDataAdd.setTradeId(szdJsmx.getCjbh());
 						settleTransDataAdd.setTradeId(generate);
-						settleTransDataAdd.setrFinprodId(szdJsmx.getZqdm2());
+						//债转股代码
+						//settleTransDataAdd.setrFinprodId(szdJsmx.getZqdm2());
 						//变量份额
 						// modify by etliu 20211225 start
 						// 光大反馈问题修复：产品的这种写法统一改下吧，精度缺失，会导致我们对不上资金余额；
@@ -307,7 +313,7 @@ public class StlDataDealSzdJsmxProcessService {
 					else if (StringUtil.equals(StlDataDealProcessConstant.ZQLB_GZ, szdJsmx.getZqlb())) {
 						//settleTransDataAdd.setTradeId(szdJsmx.getCjbh());
 						settleTransDataAdd.setTradeId(generate);
-						settleTransDataAdd.setrFinprodId(szdJsmx.getZqdm2());
+						//settleTransDataAdd.setrFinprodId(szdJsmx.getZqdm2());
 					}
 					else {
 						// 金融产品代码
@@ -334,7 +340,7 @@ public class StlDataDealSzdJsmxProcessService {
 						// modify by etliu 20211225 end
 						//settleTransDataAdd.setTradeId(szdJsmx.getCjbh());
 						settleTransDataAdd.setTradeId(generate);
-						settleTransDataAdd.setrFinprodId(szdJsmx.getZqdm1());
+						//settleTransDataAdd.setrFinprodId(szdJsmx.getZqdm1());
 					}
 				}
 				// 成交编号
@@ -487,7 +493,7 @@ public class StlDataDealSzdJsmxProcessService {
 			// 定义变量.成交数据明细质押品信息表
 			SettleTransDataPledge settleTransDataPledge = new SettleTransDataPledge();
 			// 交易平台
-			settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdJsmx.getJyfs()));
+			settleTransData.setTradePlat(null);
 			// 交收方式
 			settleTransData.setSettleMode(stlDataDealProcessCommonService.getSettleMode(szdJsmx.getJsfs()));
 			// 交易币种
@@ -1958,7 +1964,7 @@ public class StlDataDealSzdJsmxProcessService {
 					return DictCodeList.交易方向_卖出.getValue();
 				}
 			}
-			if (StringUtil.equals(ywlx, StlDataDealProcessConstant.YWLX_301)) {
+			if (StringUtil.equals(ywlx, StlDataDealProcessConstant.YWLX_305)) {
 				if (StringUtil.equals(StlDataDealProcessConstant.ZQLB_GZ, zqlb)) {
 					return DictCodeList.交易方向_行权_回售.getValue();
 				}
@@ -2184,7 +2190,11 @@ public class StlDataDealSzdJsmxProcessService {
 		// 交易币种
 		settleTransData.setCcy(stlDataDealProcessCommonService.getCcy(szdJsmx.getBz()));
 		// 交易平台
-		settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdJsmx.getJyfs()));
+		String finProductTypeType6 = getFinProductTypeType6(szdJsmx);
+		settleTransData.setTradePlat(null);
+		if ("B14".equals(finProductTypeType6)) {
+			settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdJsmx.getJyfs()));
+		}
 		// 交收方式
 		settleTransData.setSettleMode(stlDataDealProcessCommonService.getSettleMode(szdJsmx.getJsfs()));
 		// 执行日期
@@ -2370,6 +2380,23 @@ public class StlDataDealSzdJsmxProcessService {
 		settleTransTgMapping.setTradeId(settleTransData.getTradeId());
 		stlDownDataDealWriteBaseDto.setSettleTransTgMapping(settleTransTgMapping);
 		return stlDownDataDealWriteBaseDto;
+	}
+
+	/**
+	 * 根据金融产品代码查询FIN_PRODUCT_TYPE.TYPE_6 -- 投管一级类型
+	 */
+	private String getFinProductTypeType6(SzdJsmx szdJsmx) {
+		FinProductTypeKey finProductTypeKey = new FinProductTypeKey();
+		finProductTypeKey.setBranch(0L);
+		finProductTypeKey.setFinprodId(DictCodeListExt1.金融产品类型_投管用_债券.getValue() + GlobalConstant.UNDER_LINE + szdJsmx.getZqdm1() + ".SH");
+
+		FinProductType finProductType = new FinProductType();
+		try {
+			finProductType = finProductTypeMapper.selectByPrimaryKey(finProductTypeKey);
+		} catch (Exception e) {
+			logger.error("根据金融产品代码查询投管一级类型出错信息：" + e);
+		}
+		return finProductType.getType6();
 	}
 
 	/**
