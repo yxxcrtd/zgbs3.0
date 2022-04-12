@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.service.trade.check.chain.impl;
 
 import com.joyintech.tams.exchange.common.constant.joyin.DictCode;
+import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt1;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt2;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
@@ -123,7 +124,7 @@ public class CommonCheckChain extends AbstractChain<CheckChainBean> {
         }
         if (StringUtils.isBlank(instruction.getEntrustClass())) {
             checkRsp.put("entrustClass", "委托指令类别不能为空");
-        }else if (null == DictCodeListExt3.from(DictCode.投资指令类型, instruction.getEntrustClass())) {
+        } else if (null == DictCodeListExt3.from(DictCode.投资指令类型, instruction.getEntrustClass())) {
             checkRsp.put("entrustClass", "委托指令类别取值不合法:" + instruction.getEntrustClass());
         }
         if (StringUtils.isBlank(instruction.getBusiTypeTg())) {
@@ -136,6 +137,19 @@ public class CommonCheckChain extends AbstractChain<CheckChainBean> {
         } else if (null == DictCodeListExt3.from(DictCode.目标类型, instruction.getTargetType())) {
             checkRsp.put("targetType", "目标类型取值不合法:" + instruction.getTargetType());
         }
+
+        if (StringUtils.isBlank(instruction.getIsNoGuard())) {
+            checkRsp.put("isNoGuard", "是否非担保不能为空");
+        } else if (null == DictCodeListExt1.from(DictCode.是否, instruction.getIsNoGuard())) {
+            checkRsp.put("isNoGuard", "是否非担保取值不合法:" + instruction.getIsNoGuard());
+        }
+
+        if (StringUtils.isBlank(instruction.getIsNetPrice())) {
+            checkRsp.put("isNetPrice", "是否净价交易不能为空");
+        } else if (null == DictCodeListExt1.from(DictCode.是否, instruction.getIsNetPrice())) {
+            checkRsp.put("isNetPrice", "是否净价交易取值不合法:" + instruction.getIsNetPrice());
+        }
+
         if (CollectionUtils.isEmpty(chainBean.getDetailList())) {
             checkRsp.put("instructionDetail", "指令组合明细不能为空");
         }
