@@ -197,7 +197,7 @@ public class ReconInterfController {
             logger.debug("接口平台调用对账单处理第四步-调用批处理开始");
             // modify by fuyongsheng 20211201 接收对账单文件消息后新增批处理 start
             // param.put("beanNames", Arrays.asList("autoReconciliationTask","stlSettleTransDataGatherTask","stlDownDataGatherTask"));
-            param.put("beanNames", Arrays.asList("autoReconciliationTask","stlSettleTransDataGatherTask","stlDownDataGatherTask","investDealRevokeTask","stlDownDataDealTask"));
+            param.put("beanNames", Arrays.asList("autoReconciliationTask","stlSettleTransDataGatherTask","stlDownDataGatherTask","investDealRevokeTask","stlDownDataDealTask","stlDownDurationDataGatherTask"));
             // modify by fuyongsheng 20211201 接收对账单文件消息后新增批处理 end
             batchManualExcuteService.execute(param);
             logger.debug("接口平台调用对账单处理第四步-批处理成功");

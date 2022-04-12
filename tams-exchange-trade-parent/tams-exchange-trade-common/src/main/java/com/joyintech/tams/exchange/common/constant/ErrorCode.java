@@ -49,6 +49,7 @@ public enum ErrorCode {
     SYSTEM_FUNCTION_NOT_IMPLEMENT(501, "功能未实现"),
 
     EUREKA_SERVER_ERROR(600, "当前主节点不可用"),
+
     /**
      * 1001 —— 2000业务错误号
      */
@@ -163,6 +164,12 @@ public enum ErrorCode {
 
     QUOTATION_NOT_EXIST(4052, "未获取到当前资产行情信息"),
 
+    APPOINT_INSTRUCTION_EXIST_PARAMETER_ERROR(4997, "分发指令数据存在不合法"),
+
+    APPOINT_INSTRUCTION_PARAMETER_ERROR(4998, "分发指令数据错误"),
+
+    APPOINT_INSTRUCTION_ERROR(4999, "处理分发指令数据失败"),
+
     INSTRUCTIONS_ERROR_CODE_END(5000, "instruction error code end"),
     /**
      * 6001 —— 7000账号相关错误号
@@ -215,6 +222,10 @@ public enum ErrorCode {
 
     public boolean isSuccess() {
         return this.value == 0;
+    }
+
+    public static boolean isFail(int value) {
+        return value != 0;
     }
 
     public static boolean isSuccess(int value) {

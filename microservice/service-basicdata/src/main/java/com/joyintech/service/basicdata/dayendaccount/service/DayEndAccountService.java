@@ -175,7 +175,7 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
         // 查询对账结果不一致的数量
         int count = reconciliationCommonMapper.queryCheckDisaccordCount(param);
         if(count == 0){
-            param.put("beanNames", Arrays.asList("stlSettleTransDataGatherTask","stlDownDataGatherTask"));
+            param.put("beanNames", Arrays.asList("stlSettleTransDataGatherTask","stlDownDataGatherTask","stlDownDurationDataGatherTask"));
 
             batchManualExcuteService.execute(param);
         }

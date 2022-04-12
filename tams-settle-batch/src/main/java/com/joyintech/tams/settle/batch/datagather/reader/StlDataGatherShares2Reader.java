@@ -85,9 +85,6 @@ public class StlDataGatherShares2Reader extends StlDataGatherReader {
         // ZGTFCP-1363:通过开关控制查询新老头寸,默认查询新头寸 modify by fuyongsheng 20220321 end
         investTradeReaderDto.setSettleTransDataList(settleTransDataDtos);
 
-        //申购确认
-        investTradeReaderDto.setSettleTransDataSgqrList(stlDataGatherMapper.selectCashBonusSettleTransData1(searchParam));
-
         resultList.add(investTradeReaderDto);
         return resultList;
     }

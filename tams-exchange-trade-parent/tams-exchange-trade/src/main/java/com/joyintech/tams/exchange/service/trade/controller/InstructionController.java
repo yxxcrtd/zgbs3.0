@@ -96,7 +96,7 @@ public class InstructionController {
 
         Map<String, Object> pageParam = JsonUtils.getObjectFromJson(JsonUtils.getJsonFromObject(instructionQuery), Map.class);
         pageParam.remove("entrustStatus");
-        return new Message<InstructionPage<Instruction, InstructionPledge, InstructionDetail>>(investmentManagement.queryInstructionsFromCache(pageParam));
+        return new Message<>(investmentManagement.queryInstructions(pageParam));
     }
 
     @PostMapping(value = "/instruction/export")

@@ -299,7 +299,7 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
     @Size(max = 128)
     private String invAim = "";
 
-    @ApiModelProperty(required = false, name = "invAim", value = "存储指令分发时，同一条指令的对应的多个trader")
+    @ApiModelProperty(required = false, name = "tradersInfo", value = "存储指令分发时，同一条指令的对应的多个trader")
     private String tradersInfo;
 
     @ApiModelProperty(required = false, name = "isAutoReceive", value = "自动接收标志")
@@ -390,8 +390,15 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
     @ApiModelProperty(required = false, name = "updateTime", value = "修改时间")
     private Date updateTime;
 
-    @ApiModelProperty( name = "tradeSide", value = "交易方向")
+    @ApiModelProperty(name = "tradeSide", value = "交易方向")
     private String tradeSide;
+
+    @ApiModelProperty(name = "targetType", value = "目标类型")
+    private String targetType;
+    @ApiModelProperty(name = "isNoGuard", value = "是否非担保")
+    private String isNoGuard;
+    @ApiModelProperty(name = "isNetPrice", value = "是否净价交易")
+    private String isNetPrice;
 
     @Id
     public String getEntrustId() {
@@ -1080,6 +1087,30 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(String targetType) {
+        this.targetType = targetType;
+    }
+
+    public String getIsNoGuard() {
+        return isNoGuard;
+    }
+
+    public void setIsNoGuard(String isNoGuard) {
+        this.isNoGuard = isNoGuard;
+    }
+
+    public String getIsNetPrice() {
+        return isNetPrice;
+    }
+
+    public void setIsNetPrice(String isNetPrice) {
+        this.isNetPrice = isNetPrice;
     }
 
     public String getTradeSide() {

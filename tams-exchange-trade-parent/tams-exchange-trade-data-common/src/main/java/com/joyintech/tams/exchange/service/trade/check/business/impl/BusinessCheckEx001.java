@@ -1,0 +1,36 @@
+package com.joyintech.tams.exchange.service.trade.check.business.impl;
+
+import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.constant.instrument.SubStockType;
+import com.joyintech.tams.exchange.common.db.domain.Instruction;
+import com.joyintech.tams.exchange.service.trade.check.business.Check;
+import com.joyintech.tams.exchange.service.trade.check.business.IBusinessCheck;
+import com.joyintech.tams.exchange.service.trade.check.chain.CheckChainBean;
+import org.springframework.stereotype.Component;
+
+import java.util.Map;
+
+/**
+ * 竞价交易
+ *
+ * @author lifangpeng
+ * @date 2022/4/6 17:06
+ */
+@Check(action = "EX001")
+@Component
+public class BusinessCheckEx001 implements IBusinessCheck {
+
+    @Override
+    public void check(CheckChainBean chainBean) {
+        Map<String, Object> checkRsp = chainBean.getCheckRsp();
+        Instruction instruction = chainBean.getInstruction();
+        //债券竞价交易
+        if (InvestmentAssetType.isBond(instruction.getFinprodType2())) {
+            if (!SubStockType.KZZ.value.equals(instruction.getAssetType1())) {
+                checkRsp.put("assetType1", "债券竞价交易只支持可转债");
+            }
+
+        }
+
+    }
+}

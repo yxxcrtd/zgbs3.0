@@ -1357,4 +1357,28 @@
                 AND FSCRINNER.VDATE > FSCR.VDATE
             )
     </select>
+
+    <select id="getUnFinishMatchSettleTransDataNum" parameterType="map" resultType="java.lang.Integer">
+        select
+            COUNT(1)
+        from
+            SETTLE_TRANS_DATA_TOTAL stdt
+        left join SETTLE_TRANS_DATA_TOTAL_STATUS stdts
+            on stdt.SEQ_ID = stdts.SEQ_NO
+        where
+            stdt.DEAL_DATE = #{executeDate, jdbcType=DATE}
+            AND (stdts.MATCH_STATUS IS NULL OR stdts.MATCH_STATUS != #{TRD_MATCH_STATUS_2})
+            <!--协议回购逆回购到期购回没有指令，不需要成交匹配-->
+            AND stdt.SEQ_ID NOT IN (
+                select
+                   A2.SEQ_ID
+                from SETTLE_TRANS_DATA_TOTAL A2
+                INNER JOIN SETTLE_TRANS_DATA_TOTAL_ADD B2
+                ON A2.SEQ_ID = B2.TRADE_ID
+                WHERE A2.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F03})
+                AND B2.REPO_TYPE = #{TARGET_BACK_TYPE_H01}
+                AND A2.PS IN (#{PS_T07})
+                AND A2.DEAL_DATE = #{executeDate, jdbcType=DATE}
+            )
+    </select>
 </mapper>

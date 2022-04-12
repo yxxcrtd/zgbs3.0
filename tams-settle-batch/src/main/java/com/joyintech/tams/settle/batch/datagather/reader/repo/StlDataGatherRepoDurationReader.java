@@ -4,6 +4,7 @@ import com.joyintech.batch.batchbase.baseclass.BaseReader;
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListStl;
 import com.joyintech.tams.settle.batch.datagather.dto.InvestTradeReaderDto;
 import com.joyintech.tams.settle.batch.datagather.dto.SettleTransDataDto;
 import com.joyintech.tams.settle.batch.datagather.reader.StlDataGatherReader;
@@ -31,6 +32,8 @@ public class StlDataGatherRepoDurationReader extends StlDataGatherReader {
         // reader 类型
         searchParam.put("readerType", "RepoDuration");
         // ZGZGST-4212:使用自定义字段类型标识回购存续期 fuyongsheng 20211214 modify end
+        // reader 回购类型
+        searchParam.put("readerRepoType", DictCodeList.回购类型_质押式竞价回购.getValue());
     }
     @Override
     protected boolean isSecType(String secType) {

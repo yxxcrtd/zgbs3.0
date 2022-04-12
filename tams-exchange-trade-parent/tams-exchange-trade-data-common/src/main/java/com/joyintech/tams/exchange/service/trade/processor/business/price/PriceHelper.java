@@ -8,7 +8,6 @@ import com.joyintech.tams.exchange.common.constant.instrument.SubStockType;
 import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
 import com.joyintech.tams.exchange.common.db.domain.OrderInterface;
-import com.joyintech.tams.exchange.common.proto.QuoteProto;
 import com.joyintech.tams.exchange.common.utils.IntegratedEntrustUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import org.slf4j.Logger;
@@ -90,7 +89,7 @@ public class PriceHelper {
     }
 
     //创业板
-    public boolean checkPriceForCYB(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick) {
+    private boolean checkPriceForCYB(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick) {
         logger.info("沪深竞价创业板");
         //首次公开发行上市的股票，上市后的前五个交易日不设价格涨跌幅限制
         boolean result = false;
@@ -118,7 +117,7 @@ public class PriceHelper {
     }
 
     //沪深大宗交易
-    public boolean checkPriceForBulk(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick) {
+    private boolean checkPriceForBulk(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick) {
         logger.info("沪深大宗交易");
         double lowerLimitPrice = 0;
         double upperLimitPrice = 0;
@@ -141,7 +140,7 @@ public class PriceHelper {
     }
 
     //沪深竞价平台主板A股以及中小企业板
-    public boolean checkPriceForZBA(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick) {
+    private boolean checkPriceForZBA(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick) {
         logger.info("沪深竞价平台主板A股以及中小企业板");
         int tradeTimeStage = getTradeTimeStage();
         double lowerLimitPrice = 0;
@@ -178,7 +177,7 @@ public class PriceHelper {
         return true;
     }
 
-    public boolean checkPriceForBondRepurchase(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick) {
+    private boolean checkPriceForBondRepurchase(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick) {
         logger.info("沪深竞价平台，债券质押式回购");
         double lowerLimitPrice = 0;
         double upperLimitPrice = 0;
@@ -214,7 +213,7 @@ public class PriceHelper {
     }
 
     //沪深竞价平台债券交易
-    public boolean checkPriceForBond(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick) {
+    private boolean checkPriceForBond(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick) {
         logger.info("沪深竞价平台债券交易");
         double lowerLimitPrice = 0;
         double upperLimitPrice = 0;
@@ -251,7 +250,7 @@ public class PriceHelper {
     /**
      * 获取当前所属交易时间段
      */
-    public int getTradeTimeStage() {
+    private int getTradeTimeStage() {
         LocalTime now = LocalTime.now().withNano(0);
         int tradeTimeStage = -1;
         if (now.compareTo(TradeTime.THE_OPENING_BEGIN.getTime()) >= 0
@@ -291,7 +290,7 @@ public class PriceHelper {
      * @param tick 行情数据
      * @return 买一价
      */
-    public double getBidPrice1(TickBean tick) {
+    private double getBidPrice1(TickBean tick) {
         ArrayList<Double> prices = Lists.newArrayList();
         prices.add(tick.getBidPrice().get(0));
         prices.add(Math.min(tick.getAskPrice().get(0), tick.getLastPrice()));
@@ -332,7 +331,7 @@ public class PriceHelper {
      * @param tick 行情数据
      * @return 卖一价
      */
-    public double getAskPrice1(TickBean tick) {
+    private double getAskPrice1(TickBean tick) {
         ArrayList<Double> prices = Lists.newArrayList();
         prices.add(tick.getAskPrice().get(0));
         prices.add(Math.min(tick.getBidPrice().get(0), tick.getLastPrice()));

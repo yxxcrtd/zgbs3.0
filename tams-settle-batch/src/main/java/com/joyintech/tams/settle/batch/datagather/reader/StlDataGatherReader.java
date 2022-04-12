@@ -146,28 +146,13 @@ public abstract class StlDataGatherReader extends BaseReader<InvestTradeReaderDt
             if(searchParam.containsKey("readerType")&&StringUtil.equals(searchParam.get("readerType"),"RepoDuration")){
                 // ZGZGST-4212:使用自定义字段类型区分回购存续期和债券存续期 fuyongsheng 20211214 modify end
                 searchParam.put("dealDate", execInfo.getExecuteDate());
-                // 资产类型
-                searchParam.put("finprodTypes", Arrays.asList(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue(),DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue()));
-                // 交易方向列表
-                searchParam.put("psList",  Arrays.asList(DictCodeList.交易方向_到期.getValue()));
-                // ZGZGST-4214:增加业务场景类型条件 fuyongsheng 20211214 add start
-                // 业务场景分类
-                searchParam.put("busiSceneCalssList",  Arrays.asList(DictCodeListStl.业务场景分类明细_债券质押式竞价逆回购_到期.getValue(),DictCodeListStl.业务场景分类明细_债券质押式竞价正回购_到期.getValue()));
-                // ZGZGST-4214:增加业务场景类型条件 fuyongsheng 20211214 add end
-                //
-                String isRecon = CacheUtil.getSysParam("IS_RECON");
-                //（ YWBS IN （4030，债券质押购回交易）or 摘要标识 IN （220134，债券回购购回收取））
-                searchParam.put("dzcjList",  Arrays.asList("债券质押购回交易","4030"));
-                searchParam.put("zybsList",  Arrays.asList("债券回购购回收取","220134"));
-                int dzcjCount =  stlDataGatherMapper.selectDzcjList(searchParam);
-                if (StringUtil.equals(isRecon,"02") && dzcjCount > 0){
-                    searchParam.put("checkResultList",  Arrays.asList(DictCodeListExt3.对账状态结果_一致.getValue(),
-                            DictCodeListExt3.对账状态结果_手工完成.getValue()));
+                List<SettleTransDataDto> settleTransDataDtos = new ArrayList<>();
+                if(StringUtil.equals(searchParam.get("readerRepoType"), DictCodeList.回购类型_质押式竞价回购.getValue())){
+                    settleTransDataDtos = this.getRepoSettleTransData(searchParam);
                 }
-                searchParam.put("dqPs",  DictCodeList.交易方向_到期.getValue());
-                searchParam.put("busiSceneCalssDqList",  Arrays.asList(DictCodeListStl.业务场景分类明细_债券协议逆回购_到期.getValue()));
-//                searchParam.put("tradeMarketSh", DictCodeListExt1.交易场所_上海证券交易所.getValue());
-                List<SettleTransDataDto> settleTransDataDtos = stlDataGatherService.listRepoSettleTransData(searchParam);
+                else if(StringUtil.equals(searchParam.get("readerRepoType"), DictCodeList.回购类型_质押式协议回购.getValue())){
+                    settleTransDataDtos = this.getRepoH01MaturitySettleTransData(searchParam);
+                }
                 investTradeReaderDto.setSettleTransDataList(settleTransDataDtos);
                 List<InvestTradeReaderDto> result = new ArrayList<>();
                 result.add(investTradeReaderDto);
@@ -175,6 +160,44 @@ public abstract class StlDataGatherReader extends BaseReader<InvestTradeReaderDt
             }
         }
         return new ArrayList<InvestTradeReaderDto>();
+    }
+
+    /**
+     * 查询竞价回购存续期成交明细数据
+     */
+    private List<SettleTransDataDto> getRepoSettleTransData(Map<String, Object> searchParam){
+        // 资产类型
+        searchParam.put("finprodTypes", Arrays.asList(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue()
+                ,DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue()));
+        // 交易方向列表
+        searchParam.put("psList",  Arrays.asList(DictCodeList.交易方向_到期.getValue()));
+        // ZGZGST-4214:增加业务场景类型条件 fuyongsheng 20211214 add start
+        // 业务场景分类
+        searchParam.put("busiSceneCalssList",  Arrays.asList(DictCodeListStl.业务场景分类明细_债券质押式竞价逆回购_到期.getValue()
+                ,DictCodeListStl.业务场景分类明细_债券质押式竞价正回购_到期.getValue()));
+        // ZGZGST-4214:增加业务场景类型条件 fuyongsheng 20211214 add end
+        return stlDataGatherService.listRepoSettleTransData(searchParam);
+    }
+
+    /**
+     * 查询协议回购逆回购到期成交明细数据
+     * @param searchParam
+     * @return
+     */
+    private List<SettleTransDataDto> getRepoH01MaturitySettleTransData(Map<String, Object> searchParam){
+        // 对账参数
+        String isRecon = CacheUtil.getSysParam("IS_RECON");
+        //（ YWBS IN （4030，债券质押购回交易）or 摘要标识 IN （220134，债券回购购回收取））
+        searchParam.put("dzcjList",  Arrays.asList("债券质押购回交易","4030"));
+        searchParam.put("zybsList",  Arrays.asList("债券回购购回收取","220134"));
+        int dzcjCount =  stlDataGatherMapper.selectDzcjList(searchParam);
+        if (StringUtil.equals(isRecon,"02") && dzcjCount > 0){
+            searchParam.put("checkResultList",  Arrays.asList(DictCodeListExt3.对账状态结果_一致.getValue(),
+                    DictCodeListExt3.对账状态结果_手工完成.getValue()));
+        }
+        searchParam.put("dqPs",  DictCodeList.交易方向_到期.getValue());
+        searchParam.put("busiSceneCalssDqList",  Arrays.asList(DictCodeListStl.业务场景分类明细_债券协议逆回购_到期.getValue()));
+        return stlDataGatherService.listRepoH01MaturitySettleTransData(searchParam);
     }
 
     /**

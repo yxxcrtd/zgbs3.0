@@ -387,6 +387,13 @@ public class InstructionHistory implements Serializable, KeyMethodInterface<Stri
     @ApiModelProperty(required = false, name = "updateTime", value = "修改时间")
     private Date updateTime;
 
+    @ApiModelProperty(name = "targetType", value = "目标类型")
+    private String targetType;
+    @ApiModelProperty(name = "isNoGuard", value = "是否非担保")
+    private String isNoGuard;
+    @ApiModelProperty(name = "isNetPrice", value = "是否净价交易")
+    private String isNetPrice;
+
     @Id
     public String getEntrustId() {
         return entrustId;
@@ -1084,5 +1091,29 @@ public class InstructionHistory implements Serializable, KeyMethodInterface<Stri
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(String targetType) {
+        this.targetType = targetType;
+    }
+
+    public String getIsNoGuard() {
+        return isNoGuard;
+    }
+
+    public void setIsNoGuard(String isNoGuard) {
+        this.isNoGuard = isNoGuard;
+    }
+
+    public String getIsNetPrice() {
+        return isNetPrice;
+    }
+
+    public void setIsNetPrice(String isNetPrice) {
+        this.isNetPrice = isNetPrice;
     }
 }
