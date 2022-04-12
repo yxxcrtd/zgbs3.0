@@ -324,7 +324,7 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
                         needUpdateStatusEntrustIdList.add(currEtrEntrustList.get(0).getEntrustId());
                     }
                     if(currEtrEntrustList.size()>1){
-                        List<String> entrustIds = currEtrEntrustList.stream().map(e -> e.getEntrustId()).collect(Collectors.toList());
+                        List<String> entrustIds = currEtrEntrustList.stream().map(EtrEntrust::getEntrustId).collect(Collectors.toList());
                         needUpdateStatusEntrustIdList.addAll(entrustIds);
 
                         //委托数量汇总
@@ -534,7 +534,10 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
             if( !settleTransDataDto.getSecAcctId().equals(etrEntrustDto.getSecAcctId())
                 ||!settleTransDataDto.getAcctNo().equals(etrEntrustDto.getDealCurAcct())
                 || !settleTransDataDto.getTradeDate().equals(etrEntrustDto.getEntrustDate())
-                || !settleTransDataDto.getTradePlat().equals(etrEntrustDto.getTradePlat())){
+                // modify by fuyongsheng 匹配指令忽略交易平台 start
+                // || !settleTransDataDto.getTradePlat().equals(etrEntrustDto.getTradePlat())
+                // modify by fuyongsheng 匹配指令忽略交易平台 end
+            ){
                 continue;
             }
             if(DictCodeList.交易方向_买入.getValue().equals(settlePs)){ // 首期
@@ -686,18 +689,24 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
                 ps = DictCodeListExt3.交易方向_逆回购.getValue();
             }
             String finProdId = settleTransDataDto.getTermType();
-            return StringUtil.joinString(Arrays.asList(settleTransDataDto.getSecAcctId(),settleTransDataDto.getAcctNo(),finProdId, DateUtil.format(settleTransDataDto.getTradeDate()),settleTransDataDto.getTradePlat(),ps),"_");
+            // modify by fuyongsheng 匹配指令忽略交易平台 start
+            // return StringUtil.joinString(Arrays.asList(settleTransDataDto.getSecAcctId(),settleTransDataDto.getAcctNo(),finProdId, DateUtil.format(settleTransDataDto.getTradeDate()),settleTransDataDto.getTradePlat(),ps),"_");
+            return StringUtil.joinString(Arrays.asList(settleTransDataDto.getSecAcctId(),settleTransDataDto.getAcctNo(),finProdId, DateUtil.format(settleTransDataDto.getTradeDate()),ps),"_");
+            // modify by fuyongsheng 匹配指令忽略交易平台 end
         }
+        // modify by fuyongsheng 匹配指令忽略交易平台 start
         // GNS-922:质押券出入库不看交易平台 modify by fuyongsheng 20220219 start
-        else if(DictCodeListExt3.交易方向_质押券入库.getValue().equals(settleTransDataDto.getPs()) || DictCodeListExt3.交易方向_质押券出库.getValue().equals(settleTransDataDto.getPs())){
-            return StringUtil.joinString(Arrays.asList(settleTransDataDto.getSecAcctId(),settleTransDataDto.getAcctNo(),settleTransDataDto.getFinprodId(), DateUtil.format(settleTransDataDto.getTradeDate()),settleTransDataDto.getPs()),"_");
-        }
-        // GNS-922:质押券出入库不看交易平台 modify by fuyongsheng 20220219 end
-        else if(DictCodeListExt3.交易方向_债转股.getValue().equals(settleTransDataDto.getPs())){
-            return StringUtil.joinString(Arrays.asList(settleTransDataDto.getSecAcctId(),settleTransDataDto.getAcctNo(),settleTransDataDto.getFinprodId(), DateUtil.format(settleTransDataDto.getTradeDate()),settleTransDataDto.getPs()),"_");
-        }
-        else{
-            return StringUtil.joinString(Arrays.asList(settleTransDataDto.getSecAcctId(),settleTransDataDto.getAcctNo(),settleTransDataDto.getFinprodId(), DateUtil.format(settleTransDataDto.getTradeDate()),settleTransDataDto.getTradePlat(),settleTransDataDto.getPs()),"_");
-        }
+//        else if(DictCodeListExt3.交易方向_质押券入库.getValue().equals(settleTransDataDto.getPs()) || DictCodeListExt3.交易方向_质押券出库.getValue().equals(settleTransDataDto.getPs())){
+//            return StringUtil.joinString(Arrays.asList(settleTransDataDto.getSecAcctId(),settleTransDataDto.getAcctNo(),settleTransDataDto.getFinprodId(), DateUtil.format(settleTransDataDto.getTradeDate()),settleTransDataDto.getPs()),"_");
+//        }
+//        // GNS-922:质押券出入库不看交易平台 modify by fuyongsheng 20220219 end
+//        else if(DictCodeListExt3.交易方向_债转股.getValue().equals(settleTransDataDto.getPs())){
+//            return StringUtil.joinString(Arrays.asList(settleTransDataDto.getSecAcctId(),settleTransDataDto.getAcctNo(),settleTransDataDto.getFinprodId(), DateUtil.format(settleTransDataDto.getTradeDate()),settleTransDataDto.getPs()),"_");
+//        }
+//        else{
+//            return StringUtil.joinString(Arrays.asList(settleTransDataDto.getSecAcctId(),settleTransDataDto.getAcctNo(),settleTransDataDto.getFinprodId(), DateUtil.format(settleTransDataDto.getTradeDate()),settleTransDataDto.getTradePlat(),settleTransDataDto.getPs()),"_");
+//        }
+        return StringUtil.joinString(Arrays.asList(settleTransDataDto.getSecAcctId(),settleTransDataDto.getAcctNo(),settleTransDataDto.getFinprodId(), DateUtil.format(settleTransDataDto.getTradeDate()),settleTransDataDto.getPs()),"_");
+        // modify by fuyongsheng 匹配指令忽略交易平台 end
     }
 }
