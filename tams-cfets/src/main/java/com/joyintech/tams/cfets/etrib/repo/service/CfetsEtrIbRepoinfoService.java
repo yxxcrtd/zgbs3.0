@@ -291,15 +291,19 @@ public class CfetsEtrIbRepoinfoService extends BaseService{
         pageParam.put("year",year);
         pageParam.put("sort",cfetsEtrRepoZLCXPositionRequest.getPageMode().getSort());
         pageParam.put("direction",cfetsEtrRepoZLCXPositionRequest.getPageMode().getDirection());
+        pageParam.put("exPendingPeriod",cfetsEtrRepoZLCXPositionRequest.getExPendingPeriod());
+        pageParam.put("exPendingPeriodUnit",cfetsEtrRepoZLCXPositionRequest.getExPendingPeriodUnit());
+        pageParam.put("mPendingPeriod",cfetsEtrRepoZLCXPositionRequest.getmPendingPeriod());
+        pageParam.put("mPendingPeriodUnit",cfetsEtrRepoZLCXPositionRequest.getmPendingPeriodUnit());
         Page<CfetsEtrRepoZLCXPositionResponse> result =
                 super.queryForPage(cfetsEtrRepoZLCXPositionRequest.getPageMode().getPageNo(),
                         cfetsEtrRepoZLCXPositionRequest.getPageMode().getPageSize(), () -> cfetsEtrIbRepoinfoMapper.findZlglPositionPage(pageParam));
-        for (CfetsEtrRepoZLCXPositionResponse dto : result.getRoot()) {
-            String pendingPeriodStr = joyinbusinessCommonService.calPendingPeriod(dto.getFinprodId());
-            String period = pendingPeriodStr.substring(0, pendingPeriodStr.length() - 1);
-            String periodUnit = pendingPeriodStr.substring(pendingPeriodStr.length() - 1, pendingPeriodStr.length());
-            dto.setWaitPeriod(pendingPeriodStr);
-        }
+//        for (CfetsEtrRepoZLCXPositionResponse dto : result.getRoot()) {
+//            String pendingPeriodStr = joyinbusinessCommonService.calPendingPeriod(dto.getFinprodId());
+//            String period = pendingPeriodStr.substring(0, pendingPeriodStr.length() - 1);
+//            String periodUnit = pendingPeriodStr.substring(pendingPeriodStr.length() - 1, pendingPeriodStr.length());
+//            dto.setWaitPeriod(pendingPeriodStr);
+//        }
         return result;
     }
     

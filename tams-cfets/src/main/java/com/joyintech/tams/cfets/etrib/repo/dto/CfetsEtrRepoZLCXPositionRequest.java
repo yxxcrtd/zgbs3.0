@@ -1,9 +1,12 @@
 package com.joyintech.tams.cfets.etrib.repo.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.tams.business.common.dto.PageMode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -36,6 +39,30 @@ public class CfetsEtrRepoZLCXPositionRequest {
 
     @ApiModelProperty(name="search",value="关键字",example="CBC")
     private String search;
+
+    /**
+     * 未来行权日待偿期
+     */
+    @ApiModelProperty(name="exPendingPeriod",value="未来行权日待偿期")
+    private BigDecimal exPendingPeriod;
+
+    /**
+     * 未来行权日待偿期单位（D/Y）
+     */
+    @ApiModelProperty(name="exPendingPeriodUnit",value="未来行权日待偿期单位")
+    private String exPendingPeriodUnit;
+
+    /**
+     * 到期日待偿期
+     */
+    @ApiModelProperty(name="mPendingPeriod",value="到期日待偿期")
+    private String mPendingPeriod;
+
+    /**
+     * 到期日待偿期单位（D/Y）
+     */
+    @ApiModelProperty(name="mPendingPeriodUnit",value="到期日待偿期单位")
+    private String mPendingPeriodUnit;
 
     public PageMode getPageMode() {
         return pageMode;
@@ -99,5 +126,37 @@ public class CfetsEtrRepoZLCXPositionRequest {
 
     public void setSearch(String search) {
         this.search = search;
+    }
+
+    public BigDecimal getExPendingPeriod() {
+        return exPendingPeriod;
+    }
+
+    public void setExPendingPeriod(BigDecimal exPendingPeriod) {
+        this.exPendingPeriod = exPendingPeriod;
+    }
+
+    public String getExPendingPeriodUnit() {
+        return exPendingPeriodUnit;
+    }
+
+    public void setExPendingPeriodUnit(String exPendingPeriodUnit) {
+        this.exPendingPeriodUnit = exPendingPeriodUnit;
+    }
+
+    public String getmPendingPeriod() {
+        return mPendingPeriod;
+    }
+
+    public void setmPendingPeriod(String mPendingPeriod) {
+        this.mPendingPeriod = mPendingPeriod;
+    }
+
+    public String getmPendingPeriodUnit() {
+        return mPendingPeriodUnit;
+    }
+
+    public void setmPendingPeriodUnit(String mPendingPeriodUnit) {
+        this.mPendingPeriodUnit = mPendingPeriodUnit;
     }
 }
