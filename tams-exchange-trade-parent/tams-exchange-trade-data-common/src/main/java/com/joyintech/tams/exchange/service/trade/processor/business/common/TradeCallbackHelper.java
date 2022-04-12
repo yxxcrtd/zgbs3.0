@@ -53,7 +53,7 @@ public class TradeCallbackHelper {
     @Autowired
     private InstrumentService instrumentService;
     @Autowired
-    private MessageSenderManagement messageSenderHelper;
+    private MessageSenderManagement messageSenderManagement;
 
     public void onTrade(Trade tradeRecord) {
         logger.info("成交回报信息 {}", JsonUtils.getJsonFromObject(tradeRecord));
@@ -270,20 +270,20 @@ public class TradeCallbackHelper {
             // 是否需要手工交手
             if (IntegratedEntrustUtils.isProtocolBack(tradeRecord.getEntrustProp())) {//协议回购
 //                messageSenderService.pushTradeToMQForFixedIncome(tradeRecord, instruction, entrust);
-                messageSenderHelper.pushTradeForFixedIncome(tradeRecord, instruction, entrust);
+                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust);
                 return;
             } else if (InvestmentAssetType.isBond(instruction.getAssetType()) && TradePlat.needSettleTrade(instruction.getTradePlat())) {
                 Instrument instrument = instrumentService.queryByInnerCode(entrust.getStockCode());
                 if (Objects.nonNull(instrument)) {
                     if (EntrustUtils.isSettleTrade(instrument.getTradePlat(), entrust.getEntrustProp())) {
 //                        messageSenderService.pushTradeToMQForFixedIncome(tradeRecord, instruction, entrust);
-                        messageSenderHelper.pushTradeForFixedIncome(tradeRecord, instruction, entrust);
+                        messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust);
                         return;
                     }
                 }
             }
 //            messageSenderService.pushTradeToMQ(tradeRecord, instruction, entrust);
-            messageSenderHelper.pushTrade(tradeRecord, instruction, entrust);
+            messageSenderManagement.pushTrade(tradeRecord, instruction, entrust);
         } else if (tradeRecord.getTradeType() == TradeType.INVALID.value) {
             if (entrust.getEntrustStatus() == EntrustStatus.INVALID.value) {
                 logger.info("委托已通过委托回报废单处理，忽略废单成交");

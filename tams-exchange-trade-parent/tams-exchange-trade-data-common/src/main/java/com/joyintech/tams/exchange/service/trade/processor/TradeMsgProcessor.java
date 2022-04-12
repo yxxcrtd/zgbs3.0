@@ -95,7 +95,7 @@ public class TradeMsgProcessor {
     @Autowired
     private PositionRequestServiceInstructionRequest positionRequestServiceInstructionRequest;
     @Autowired
-    private MessageSenderManagement messageSenderHelper;
+    private MessageSenderManagement messageSenderManagement;
 
     @Value("${yali.open:false}")
     private boolean yaliFlag;
@@ -389,7 +389,7 @@ public class TradeMsgProcessor {
                 }
                 instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() + entrustVolume));
 //                messageSenderService.pushProgressToMQ(instruction);
-                messageSenderHelper.pushProgress(instruction);
+                messageSenderManagement.pushProgress(instruction);
                 logger.info("frozen instruction EntrustNum {} FrozenQuantity {} EntrustLeftAmt {}", instruction.getEntrustNum(), instruction.getFrozenQuantity(), instruction.getEntrustLeftAmt());
                 return true;
             }
@@ -404,7 +404,7 @@ public class TradeMsgProcessor {
                 }
                 instruction.setFrozenQuantity(TradeUtils.add(instruction.getFrozenQuantity(), instructionBalance, 2));
 //                messageSenderService.pushProgressToMQ(instruction);
-                messageSenderHelper.pushProgress(instruction);
+                messageSenderManagement.pushProgress(instruction);
                 logger.info("frozen instruction EntrustAmt {} FrozenQuantity {} EntrustLeftAmt {}", instruction.getEntrustAmt(), instruction.getFrozenQuantity(), instruction.getEntrustLeftAmt());
             }
         } else if (!Strings.isNullOrEmpty(ServiceApplication.INSTRUCTION_SERVICE) && EntrustUtils.isIntentionEntrust(orderInterface.getEntrustProp())) {
@@ -416,7 +416,7 @@ public class TradeMsgProcessor {
                 }
                 instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() + entrustVolume));
 //                messageSenderService.pushProgressToMQ(instruction);
-                messageSenderHelper.pushProgress(instruction);
+                messageSenderManagement.pushProgress(instruction);
                 logger.info("frozen instruction EntrustNum {} FrozenQuantity {} EntrustLeftAmt {}", instruction.getEntrustNum(), instruction.getFrozenQuantity(), instruction.getEntrustLeftAmt());
                 return true;
             }
@@ -430,7 +430,7 @@ public class TradeMsgProcessor {
                 }
                 instruction.setFrozenQuantity(TradeUtils.add(instruction.getFrozenQuantity(), instructionBalance, 2));
 //                messageSenderService.pushProgressToMQ(instruction);
-                messageSenderHelper.pushProgress(instruction);
+                messageSenderManagement.pushProgress(instruction);
                 logger.info("frozen instruction EntrustAmt {} FrozenQuantity {} EntrustLeftAmt {}", instruction.getEntrustAmt(), instruction.getFrozenQuantity(), instruction.getEntrustLeftAmt());
             }
         }

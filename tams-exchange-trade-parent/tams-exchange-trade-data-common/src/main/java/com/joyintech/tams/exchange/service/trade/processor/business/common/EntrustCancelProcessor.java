@@ -68,7 +68,7 @@ public class EntrustCancelProcessor {
     @Autowired
     private BondHelper bondHelper;
     @Autowired
-    private MessageSenderManagement messageSenderHelper;
+    private MessageSenderManagement messageSenderManagement;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -247,7 +247,7 @@ public class EntrustCancelProcessor {
                 }
             }
 //            messageSenderService.pushProgressToMQ(instruction);
-            messageSenderHelper.pushProgress(instruction);
+            messageSenderManagement.pushProgress(instruction);
 
             logger.info("解冻指令信息成功，指令委托数量为：{} 指令委托金额为：{} 指令已完成数量或者金额为：{} 指令冻结为：{}", instruction.getEntrustNum(), instruction.getEntrustAmt(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity());
             //解冻时释放风控
