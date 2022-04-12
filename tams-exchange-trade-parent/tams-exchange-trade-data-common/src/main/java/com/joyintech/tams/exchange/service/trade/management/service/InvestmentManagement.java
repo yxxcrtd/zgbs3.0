@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.service.trade.management.service;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.builder.GenericBuilder;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.convert.Convert;
@@ -11,11 +12,12 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.*;
@@ -44,11 +46,9 @@ import com.joyintech.tams.exchange.service.trade.processor.msg.MsgType;
 import com.joyintech.tams.exchange.service.trade.processor.msg.TradeMsgReceiver;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -56,16 +56,18 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_质押券出入库;
+import static com.joyintech.tams.constant.DictCodeListExt3.投资指令类型_多组合单资产指令;
+import static com.joyintech.tams.exchange.common.constant.InvestmentAssetType.PLEDGE_REPURCHASE;
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.*;
+import static com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1.BIDDING_REPO;
+import static com.joyintech.tams.exchange.common.enums.EntrustBussTypeEnum.*;
+import static java.util.stream.Collectors.groupingBy;
 
+@SuppressWarnings("rawtypes")
 @Component
 public class InvestmentManagement extends BaseService {
     private static final Logger logger = LoggerFactory.getLogger(InvestmentManagement.class);
-    @Autowired(required = false)
-    @Qualifier("simpleRestTemplate")
-    protected JoyinRestTemplate simpleRestTemplate;
-    @Autowired
-    FuturesInstrumentService futuresInstrumentService;
+
     @Autowired
     private EntrustService entrustService;
     @Autowired
@@ -87,11 +89,13 @@ public class InvestmentManagement extends BaseService {
     @Autowired
     private InstrumentService instrumentService;
     @Autowired
+    private FuturesInstrumentService futuresInstrumentService;
+    @Autowired
     private OrderService orderService;
     @Autowired
-    private RecordLogService recordLogService;
-    @Autowired
     private AppointInstructionCheck appointInstructionCheck;
+    @Autowired
+    private RecordLogService recordLogService;
 
     /**
      * 是否单体服务
@@ -1037,6 +1041,13 @@ public class InvestmentManagement extends BaseService {
         }
     }
 
+    /**
+     * 处理分发的指令
+     *
+     * @param instructionPage
+     * @return
+     * @throws Exception
+     */
     public ResultBean appointInstruction(InstructionPage<Instruction, InstructionPledge, InstructionDetail> instructionPage) throws Exception {
         logger.info("接收指令分发数据信息：{}", JsonUtils.getJsonFromObject(instructionPage));
 
@@ -1050,11 +1061,11 @@ public class InvestmentManagement extends BaseService {
 
         Map<String, List<InstructionDetail>> detailMap = Maps.newHashMap();
         if (CollectionUtils.isNotEmpty(detailList)) {
-            detailMap.putAll(detailList.stream().collect(Collectors.groupingBy(InstructionDetail::getEntrustId)));
+            detailMap.putAll(detailList.stream().collect(groupingBy(InstructionDetail::getEntrustId)));
         }
         Map<String, List<InstructionPledge>> pledgeMap = Maps.newHashMap();
         if (CollectionUtils.isNotEmpty(pledgeList)) {
-            pledgeMap.putAll(pledgeList.stream().collect(Collectors.groupingBy(InstructionPledge::getEntrustId)));
+            pledgeMap.putAll(pledgeList.stream().collect(groupingBy(InstructionPledge::getEntrustId)));
         }
 
         try {
@@ -1071,7 +1082,7 @@ public class InvestmentManagement extends BaseService {
             }
 
             ResultBean resultBean = new ResultBean(ErrorCode.SUCCESS);
-            if (code == 2 && MapUtils.isNotEmpty(data)) {
+            if (code == 2 && CollUtil.isNotEmpty(data)) {
                 Set<String> keys = data.keySet();
                 instructionList = instructionList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
                 detailList = detailList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
@@ -1195,17 +1206,356 @@ public class InvestmentManagement extends BaseService {
         recordLogService.updateBatch(records);
     }
 
-    private void dealAppointInstruction(List<Instruction> instructionList, List<InstructionDetail> detailList, List<InstructionPledge> pledgeList) {
-        Set<String> instructionPledgeIdSet = new HashSet<>();
-        Set<String> instructionDetailIdSet = new HashSet<>();
-        if (Objects.nonNull(pledgeList))
-            pledgeList.forEach(instructionPledge -> instructionPledgeIdSet.add(instructionPledge.getEntrustId()));
-        if (Objects.nonNull(detailList))
-            detailList.forEach(instructionDetail -> instructionDetailIdSet.add(instructionDetail.getEntrustId()));
-        //对于多组合时，组合代码、组合名称展示多个用逗号隔开
-        messageConsumerService.processInstructionsPortfolio(instructionList, detailList);
-        messageConsumerService.processInstructions(instructionList, instructionPledgeIdSet, instructionDetailIdSet);
-        messageConsumerService.processInstructionPledges(pledgeList, instructionPledgeIdSet);
-        messageConsumerService.processInstructionDetail(detailList, instructionDetailIdSet);
+    private void dealAppointInstruction(List<Instruction> instructions, List<InstructionDetail> details, List<InstructionPledge> pledges) {
+
+        /* 已在前面校验中被过滤，无须考虑
+        // 过滤掉指令中平台日小于当前平台日的指令
+        handleInstructionFilterMdateBeforPlatDate(instructions, details, pledges);
+        // 过滤掉无tradeId的指令
+        handleInstructionFilterNoTrader(instructions, details, pledges);*/
+
+        handleInstructionPledges(pledges);
+        handleInstructionDetail(details);
+
+        handlePortfolioIdAndName(instructions, details);
+
+        handleInstructions(instructions);
+    }
+
+    private void handleInstructions(List<Instruction> instructions) {
+        if (CollUtil.isEmpty(instructions)) {
+            return;
+        }
+
+        Date now = DateUtil.now();
+        for (Instruction instruction : instructions) {
+            // 1. 设置指令分发交易员列表字段
+            handleInstructionSetTradersInfo(instruction, instructions);
+            // 1. 设置交易平台字段（非交易类）
+            handleInstructionSetTradePlat(instruction);
+            // 5. 设置交易价格字段（协议回购，竞价回购，不包括质押式出入库）
+            handleInstructionSetPrice(instruction);
+            // 2. 设置创建时间和更新时间字段
+            handleInstructionSetCreateAndUpdateTime(instruction, now);
+            // 3. 处理已存在且存在trader的指令
+            handleInstructionWithExist(instruction);
+            // 4. 处理新下发的指令（内存中不存在该指令编号）
+            handleInstructionWithUnExist(instruction);
+        }
+        /*List<Instruction> instructionList = new ArrayList<>();
+        Set<String> removeInstructionIdSet = new HashSet<>();
+        List<Instruction> removeInstructionList = new ArrayList<>();
+        Map<String, Instruction> instructionMapCache = instructionService.getMap();
+        // 记录推送指令
+        Map<String, Map<String, Instruction>> traderMap = new HashMap<>();
+        Map<String, Set<String>> instructionTraderMap = new HashMap<>();
+        List<EntrustOpeBean> entrustList = new ArrayList<>();
+        if (instructionEtrEntrustList.size() > 0) {
+            instructionEtrEntrustList.forEach(instruction -> {
+                String entrustBussType = instruction.getEntrustBussType();
+                //非交易业务指令，设置交易平台为 沪深竞价撮合平台
+                if (EntrustBussTypeEnum.BOND_REPURCHASE.value.equals(entrustBussType)
+                        || EntrustBussTypeEnum.ALLOTMENT_DEBT.value.equals(entrustBussType)
+                        || EntrustBussTypeEnum.CONVERTIBLE_BOND_SUBSCRIPTION.value.equals(entrustBussType)
+                        || EntrustBussTypeEnum.STANDARD_COUPONS_IN_AND_OUT.value.equals(entrustBussType)
+                        || EntrustBussTypeEnum.DEBT_TO_EQUITY.value.equals(entrustBussType)) {
+                    instruction.setTradePlat(TradePlat.NORMAL.value);
+                }
+            });
+            instructionEtrEntrustList.forEach(instruction -> {
+                // 为指令设置trader
+                Set<String> tradeSet = instructionTraderMap.getOrDefault(instruction.getEntrustId(), new HashSet<>());
+                tradeSet.add(instruction.getTradeId());
+                instructionTraderMap.put(instruction.getEntrustId(), tradeSet);
+
+                if (traderMap.containsKey(instruction.getTradeId())) {
+                    traderMap.get(instruction.getTradeId()).put(instruction.getEntrustId(), instruction);
+                } else {
+                    Map<String, Instruction> instructionBeanMap = new HashMap<>();
+                    instructionBeanMap.put(instruction.getEntrustId(), instruction);
+                    traderMap.put(instruction.getTradeId(), instructionBeanMap);
+                }
+            });
+            instructionEtrEntrustList.forEach(instruction -> {
+                String instructionId = instruction.getEntrustId();
+                Instruction instructionFormCache = instructionMapCache.get(instructionId);
+                Set<String> stringSet = instructionTraderMap.get(instructionId);
+                instruction.setTradersInfo(JsonUtils.getJsonFromObject(stringSet));
+                //创建时间、修改时间
+                Date now = DateUtil.now();
+                instruction.setCreateTime(now);
+                instruction.setUpdateTime(now);
+                // 过滤掉指令中平台日小于当前平台日和无tradeId的指令
+                Date investSystemDate = commonManagement.getPlatDate();
+                logger.debug("当前平台日: {}", investSystemDate.toString());
+                if (!investSystemDate.after(instruction.getMdate()) && !Strings.isNullOrEmpty(instruction.getTradeId())) {
+                    // 处理已存在且存在trader的指令
+                    if (Objects.nonNull(instructionFormCache) && !Strings.isNullOrEmpty(instructionFormCache.getTradersInfo())) {
+                        // 内存中缓存交易员信息
+                        List<String> traderSetFromRedis = JsonUtils.getObjectListFromJson(instructionFormCache.getTradersInfo(), String.class);
+                        if (Objects.nonNull(traderSetFromRedis)) {
+                            // 当前分发指令的交易员信息
+                            String tradersInfo = traderMap.get(instruction.getTradeId()).get(instructionId).getTradersInfo();
+                            List<String> localTradersInfoList = JsonUtils.getObjectListFromJson(tradersInfo, String.class);
+                            // 处理指令中user变化的情况
+                            traderSetFromRedis.forEach(s -> {
+                                if (!localTradersInfoList.contains(s)) {
+                                    // 如果该条指令对应的trader减少，删除该指令,并重新添加该指令
+                                    logger.info("instruction [{}] trader change and delete other traders [{}] ", instruction.getEntrustId(), s);
+                                    instructionService.deleteTraderCache(s, instruction.getFinprodMarketId(), instructionId);
+                                }
+                            });
+                            // 指令状态不同
+                            if (!instructionFormCache.getEntrustStatus().equals(instruction.getEntrustStatus()) && !instructionFormCache.getEntrustStatus().equals(InstructionStatus.TOBE_CANCELED.value)) {
+                                logger.info("instruction status updated {}", instruction.getEntrustStatus());
+                                traderSetFromRedis.forEach(s -> {
+                                    instructionService.deleteTraderCache(s, instructionFormCache.getFinprodMarketId(), instructionId);
+                                });
+                            }
+                            instruction.setFrozenQuantity(instructionFormCache.getFrozenQuantity());
+                            instruction.setEntrustLeftAmt(instructionFormCache.getEntrustLeftAmt());
+                        }
+                    } else {
+                        logger.info("收到下发的新指令： {}", instruction.getEntrustId());
+                        if (AutoReceiveFlag.AUTO.value.equals(instruction.getIsAutoReceive())) {
+                            logger.info("自动接收指令：{}", instructionId);
+                            EntrustOpeBean opeBean = new EntrustOpeBean();
+                            opeBean.setTrader(instruction.getTradeId());
+                            opeBean.setRecStatus(InstructionFlag.ACCEPT.value);
+                            opeBean.setEntrustId(instructionId);
+                            entrustList.add(opeBean);
+                        }
+                    }
+                    //如果是协议回购、质押式回购 回购利率乘以100
+                    if (isPledge(instruction)) {
+                        BigDecimal entrustPrice = instruction.getEntrustPrice();
+                        instruction.setEntrustPrice(entrustPrice.multiply(BigDecimal.valueOf(100)));
+                    }
+
+                    instructionList.add(instruction);
+                } else {
+                    logger.info("investSystemDate {} > instruction mDate {}", JsonUtils.getJsonFromObject(investSystemDate), JsonUtils.getJsonFromObject(instruction.getMdate()));
+                    // 清除对应指令的抵押券信息
+                    instructionPledgeIdSet.remove(instruction.getEntrustId());
+                    // 清除对应指令的组合明细信息
+                    instructionDetailIdSet.remove(instruction.getEntrustId());
+                    // 清除之前缓存的数据
+                    if (Objects.nonNull(instructionFormCache)) {
+                        removeInstructionList.add(instructionFormCache);
+                    }
+                    List<InstructionPledge> instructionPledges = instructionPledgeService.queryInstructionPledgesByInstructionId(instruction.getEntrustId());
+                    if (Objects.nonNull(instructionPledges))
+                        removeInstructionIdSet.add(instruction.getEntrustId());
+                    List<InstructionDetail> instructionDetails = instructionDetailService.queryInstructionDetailsByInstructionId(instruction.getEntrustId());
+                    if (Objects.nonNull(instructionDetails))
+                        removeInstructionIdSet.add(instruction.getEntrustId());
+                }
+            });
+            if (removeInstructionList.size() > 0) {
+                logger.info("delete origin instructions from DB {}", removeInstructionList.size());
+                instructionService.asyncDel(removeInstructionList);
+            }
+            if (removeInstructionIdSet.size() > 0) {
+                logger.info("delete origin instructionPledges from DB {}", removeInstructionIdSet.size());
+                instructionPledgeService.deleteInstructionPledgesByInstructionsIds(removeInstructionIdSet);
+            }
+            if (removeInstructionIdSet.size() > 0) {
+                logger.info("delete origin instructionDetails from DB {}", removeInstructionIdSet.size());
+                instructionDetailService.deleteInstructionDetailsByInstructionsIds(removeInstructionIdSet);
+            }
+
+            logger.info("存储下发指令 {}", instructionList.size());
+            instructionService.asyncUpdate(instructionList);
+            if (!entrustList.isEmpty()) {
+                logger.info("自动接收中...");
+                investmentManagement.doAcceptOrRefuse(entrustList);
+                logger.info("自动接收完成。");
+            }
+        }*/
+    }
+
+
+    private void handleInstructionWithExist(Instruction instruction) {
+        String instructionId = instruction.getEntrustId();
+        Instruction instructionFromCache = instructionService.findById(instructionId);
+        if (ObjectUtil.isNull(instructionFromCache) || CharSequenceUtil.isEmpty(instructionFromCache.getTradersInfo())) {
+            return;
+        }
+        // 处理冻结数量和交易完成数量
+        instruction.setFrozenQuantity(instructionFromCache.getFrozenQuantity());
+        instruction.setEntrustLeftAmt(instructionFromCache.getEntrustLeftAmt());
+
+
+        List<String> tradersFromCache = JSONUtil.toList(instructionFromCache.getTradersInfo(), String.class);
+        List<String> tradersFromAppoint = JSONUtil.toList(instruction.getTradersInfo(), String.class);
+
+        // 处理交易员变化
+        CollUtil.removeWithAddIf(tradersFromCache, tradersFromAppoint::contains);
+        logger.info("instruction [{}] trader change and delete other traders [{}] ", instructionId, tradersFromCache);
+        tradersFromCache.forEach(trader -> instructionService.deleteTraderCache(trader, instruction.getFinprodMarketId(), instructionId));
+        // 处理指令状态
+        String entrustStatusFromCache = instructionFromCache.getEntrustStatus();
+        String entrustStatusFromAppoint = instruction.getEntrustStatus();
+        if (!CharSequenceUtil.equals(entrustStatusFromCache, entrustStatusFromAppoint)
+                && !InstructionStatus.TOBE_CANCELED.value.equals(entrustStatusFromCache)) {
+            logger.info("instruction [{}] status changed {}", instructionId, entrustStatusFromAppoint);
+            tradersFromCache.forEach(trader -> instructionService.deleteTraderCache(trader, instructionFromCache.getFinprodMarketId(), instructionId));
+        }
+
+        logger.info("存储下发的指令: [{}]", instruction);
+        instructionService.asyncUpdate(instruction);
+    }
+
+    private void handleInstructionWithUnExist(Instruction instruction) {
+        String instructionId = instruction.getEntrustId();
+        Instruction instructionFormCache = instructionService.findById(instructionId);
+        if (ObjectUtil.isNull(instructionFormCache) || CharSequenceUtil.isEmpty(instructionFormCache.getTradersInfo())) {
+            logger.info("存储下发的指令: [{}]", instruction);
+            instructionService.asyncUpdate(instruction);
+
+            String isAutoReceive = instruction.getIsAutoReceive();
+            if (CharSequenceUtil.isEmpty(isAutoReceive)
+                    || AutoReceiveFlag.MANUAL.value.equals(isAutoReceive)) {
+                return;
+            }
+
+            logger.info("自动接收指令开始：[{}]", instructionId);
+            EntrustOpeBean entrustOpeBean = GenericBuilder.of(EntrustOpeBean::new)
+                    .with(EntrustOpeBean::setTrader, instruction.getTradeId())
+                    .with(EntrustOpeBean::setRecStatus, InstructionFlag.ACCEPT.value)
+                    .with(EntrustOpeBean::setEntrustId, instructionId)
+                    .build();
+            doAcceptOrRefuse(ListUtil.toList(entrustOpeBean));
+            logger.info("自动接收指令完成: [{}]", instructionId);
+        }
+    }
+
+    private void handleInstructionSetPrice(Instruction instruction) {
+        //如果是协议回购、质押式回购 回购利率乘以100
+        if (isPledge(instruction)) {
+            instruction.setEntrustPrice(NumberUtil.mul(instruction.getEntrustPrice(), 100));
+        }
+    }
+
+    private boolean isPledge(Instruction instruction) {
+        String busiTypeTg = instruction.getBusiTypeTg();
+
+        if (投管业务类型_首期.getValue().equals(busiTypeTg)
+                || 投管业务类型_提前购回.getValue().equals(busiTypeTg)
+                || 投管业务类型_到期购回.getValue().equals(busiTypeTg)
+                || 投管业务类型_到期续做.getValue().equals(busiTypeTg)
+                || 投管业务类型_中途换券.getValue().equals(busiTypeTg)
+                || 投管业务类型_解除质押.getValue().equals(busiTypeTg)) {
+            return true;
+        }
+
+        return 投管业务类型_竞价交易.getValue().equals(busiTypeTg)
+                && PLEDGE_REPURCHASE.value.equals(instruction.getAssetType())
+                && BIDDING_REPO.value.equals(instruction.getAssetType1());
+    }
+
+    private void handleInstructionSetTradePlat(Instruction instruction) {
+        String entrustBussType = instruction.getEntrustBussType();
+        //非交易业务指令，设置交易平台为 沪深竞价撮合平台
+        if (BOND_REPURCHASE.value.equals(entrustBussType)
+                || ALLOTMENT_DEBT.value.equals(entrustBussType)
+                || CONVERTIBLE_BOND_SUBSCRIPTION.value.equals(entrustBussType)
+                || STANDARD_COUPONS_IN_AND_OUT.value.equals(entrustBussType)
+                || DEBT_TO_EQUITY.value.equals(entrustBussType)) {
+            instruction.setTradePlat(TradePlat.NORMAL.value);
+        }
+    }
+
+    private void handleInstructionSetTradersInfo(Instruction instruction, List<Instruction> instructions) {
+        List<String> traders = instructions.stream()
+                .filter(item -> instruction.getEntrustId().equals(item.getEntrustId()))
+                .map(Instruction::getTradeId)
+                .collect(Collectors.toList());
+        instruction.setTradersInfo(JSONUtil.toJsonStr(traders));
+    }
+
+    private void handleInstructionSetCreateAndUpdateTime(Instruction instruction, Date now) {
+        instruction.setCreateTime(now);
+        instruction.setUpdateTime(now);
+    }
+
+    private void handleInstructionFilterMdateBeforPlatDate(List<Instruction> instructions, List<InstructionDetail> details, List<InstructionPledge> pledges) {
+        Date platDate = DateUtil.platDateFromCache();
+        Set<Instruction> mdateBeforPlatDateInstructionSet = instructions.stream()
+                .filter(instruction -> DateUtil.compareDate(platDate, instruction.getMdate()) > 0)
+                .collect(Collectors.toSet());
+        instructionService.asyncDel(mdateBeforPlatDateInstructionSet);
+
+        Set<String> mdateBeforPlatDateInstructionIdSet = mdateBeforPlatDateInstructionSet.stream().map(Instruction::getEntrustId).collect(Collectors.toSet());
+        instructionPledgeService.deleteInstructionPledgesByInstructionsIds(mdateBeforPlatDateInstructionIdSet);
+        instructionDetailService.deleteInstructionDetailsByInstructionsIds(mdateBeforPlatDateInstructionIdSet);
+
+    }
+
+    private void handleInstructionFilterNoTrader(List<Instruction> instructions, List<InstructionDetail> details, List<InstructionPledge> pledges) {
+        Set<Instruction> noTraderInstructionSet = instructions.stream()
+                .filter(instruction -> CharSequenceUtil.isEmpty(instruction.getTradeId()))
+                .collect(Collectors.toSet());
+        instructionService.asyncDel(noTraderInstructionSet);
+
+        Set<String> noTraderInstructionIdSet = noTraderInstructionSet.stream().map(Instruction::getEntrustId).collect(Collectors.toSet());
+
+        instructionPledgeService.deleteInstructionPledgesByInstructionsIds(noTraderInstructionIdSet);
+        instructionDetailService.deleteInstructionDetailsByInstructionsIds(noTraderInstructionIdSet);
+    }
+
+    /**
+     * 处理指令的组合代码和组合名称
+     * <p/>
+     * 对于多组合，组合代码、组合名称展示多个用逗号隔开
+     *
+     * @param instructions 指令列表
+     * @param details      组合明细列表
+     */
+    private void handlePortfolioIdAndName(List<Instruction> instructions, List<InstructionDetail> details) {
+        if (CollUtil.isEmpty(instructions) || CollUtil.isEmpty(details)) {
+            return;
+        }
+        for (Instruction instruction : instructions) {
+            if (投资指令类型_多组合单资产指令.getValue().equals(instruction.getEntrustClass())) {
+                List<String> portfolioIds = details.stream()
+                        .filter(detail -> instruction.getEntrustId().equals(detail.getEntrustId()))
+                        .map(InstructionDetail::getPortfolioId)
+                        .collect(Collectors.toList());
+                if (CollUtil.isEmpty(portfolioIds)) {
+                    logger.warn("多组合指令[{}]的组合明细为空", instruction.getEntrustId());
+                } else {
+                    instruction.setPortfolioId(Joiner.on(GlobalConstant.COMMA).join(portfolioIds));
+                }
+
+                List<String> portfolioNames = details.stream()
+                        .filter(detail -> instruction.getEntrustId().equals(detail.getEntrustId()))
+                        .map(InstructionDetail::getPortfolioName)
+                        .collect(Collectors.toList());
+                if (CollUtil.isEmpty(portfolioIds)) {
+                    logger.warn("多组合指令[{}]的组合明细为空", instruction.getEntrustId());
+                } else {
+                    instruction.setPortfolioName(Joiner.on(GlobalConstant.COMMA).join(portfolioNames));
+                }
+            }
+        }
+    }
+
+    public void handleInstructionPledges(List<InstructionPledge> pledges) {
+        if (CollUtil.isEmpty(pledges)) {
+            return;
+        }
+        Set<String> ids = pledges.stream().map(InstructionPledge::getEntrustId).collect(Collectors.toSet());
+        instructionPledgeService.deleteInstructionPledgesByInstructionsIds(ids);
+        instructionPledgeService.asyncUpdate(pledges);
+    }
+
+    public void handleInstructionDetail(List<InstructionDetail> details) {
+        if (CollUtil.isEmpty(details)) {
+            return;
+        }
+        Set<String> ids = details.stream().map(InstructionDetail::getEntrustId).collect(Collectors.toSet());
+        instructionDetailService.deleteInstructionDetailsByInstructionsIds(ids);
+        instructionDetailService.asyncUpdate(details);
     }
 }
