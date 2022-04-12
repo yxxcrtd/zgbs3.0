@@ -1,5 +1,6 @@
 package com.joyintech.service.trade.conbond.service;
 
+import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.service.trade.conbond.dao.TrdConBondMapper;
 import com.joyintech.service.trade.conbond.dto.TrdConBondDto;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
@@ -111,5 +112,11 @@ public class PositionRequestTrdConBondService {
         bondSec.put("secAmount", entity.getPrinAmt());
         bondSecList.add(bondSec);
         resultMap.put("bondSecList", bondSecList);
+
+        resultMap.put("balanceCheck", DictCodeList.是否_否.getValue());
+        resultMap.put("userId", SecurityUtil.getLoginUser().getUserName());
+        resultMap.put("totalTradeId",entity.getEntrustId());
+        resultMap.put("flowStatus", DictCodeListExt3.流程节点_流程提交.getValue());
+        resultMap.put("modelType", DictCodeListExt1.子系统代码_委托.getValue());
     }
 }
