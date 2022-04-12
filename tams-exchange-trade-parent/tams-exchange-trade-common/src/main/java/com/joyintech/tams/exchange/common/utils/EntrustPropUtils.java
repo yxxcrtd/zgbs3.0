@@ -30,6 +30,11 @@ public class EntrustPropUtils {
         if (null == instruction) {
             return entrustProp;
         }
+        //新债改造
+        if(false) {//TODO 判断出新债相关业务
+            return entrustProp;
+        }
+        
         //竞价平台
         if (EntrustUtils.isNormalTrade(instruction)) {
             //市价
