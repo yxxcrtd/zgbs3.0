@@ -25,8 +25,6 @@ import java.util.Map;
 @Service
 public class TrdIntoValuationDuration001Service extends CommonExportService<TrdIntoValuationDuration001Dto> implements BaseProcessService<TrdIntoValuationDuration001Dto> {
 
-
-
 	/**
 	 * 查询
 	 * @param pageParam Map
@@ -38,37 +36,6 @@ public class TrdIntoValuationDuration001Service extends CommonExportService<TrdI
 				ServiceApplication.VALUATION_SERVICE_NAME + "/TrdIntoValuationDuration001/findPage",
 				pageParam, TrdIntoValuationDuration001Dto.class);
 	}
-
-
-
-
-	/**
-	 * 产品代码下拉框
-	 * @auther: Administrator
-	 * @date: 2021/12/29 17:10
-	 * @param:
-	 * @return:
-	 */
-	public Page<SelectOptionDto> findPortfolioId(Map<String, Object> params) {
-		return restTemplate.postForPage(
-				ServiceApplication.VALUATION_SERVICE_NAME + "/TrdIntoValuationDuration001/findPortfolioId",
-				params, SelectOptionDto.class);
-	}
-
-	/**
-	 * 资产代码下拉框
-	 * @auther: Administrator
-	 * @date: 2021/12/29 17:10
-	 * @param:
-	 * @return:
-	 */
-	public Page<SelectOptionDto> findFinprodId(Map<String, Object> params) {
-		return restTemplate.postForPage(
-				ServiceApplication.VALUATION_SERVICE_NAME + "/TrdIntoValuationDuration001/findFinprodId",
-				params, SelectOptionDto.class);
-	}
-
-
 
 	/**
 	 * 不分页  导出
@@ -91,6 +58,5 @@ public class TrdIntoValuationDuration001Service extends CommonExportService<TrdI
 		String action = "delete";
 		restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdIntoValuationDuration001/" + action, entity, Integer.class);
 	}
-
 
 }

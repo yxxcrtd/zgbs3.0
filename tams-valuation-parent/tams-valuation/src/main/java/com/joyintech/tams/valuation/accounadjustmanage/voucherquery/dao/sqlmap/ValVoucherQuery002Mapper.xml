@@ -46,7 +46,9 @@
 	   		 <if test="subjectNo != null and subjectNo != ''">
 		   		AND B.SUBJECT_NO = #{subjectNo}
 	   		</if>
-    </select>
+		ORDER by  B.CD_FLAG DESC ,
+		NVL(B.DETAIL_SUBJECT_NO, B.SUBJECT_NO) ASC
+	</select>
     
     <select id="selectBusVouchNumByVouchNum" resultType="java.lang.String">
     	select BUS_VOUCHNUM from BOK_VOUCH_MAIN where VOUCH_NUM = #{vouchNum,jdbcType=VARCHAR}
