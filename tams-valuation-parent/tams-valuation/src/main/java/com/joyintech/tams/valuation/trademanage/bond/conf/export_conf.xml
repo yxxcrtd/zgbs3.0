@@ -20,6 +20,7 @@
             <Cell order="16" name="币种">ccyFmt</Cell>
             <Cell order="17" name="结算金额">settleAmtStr</Cell>
             <Cell order="18" name="资金账户">myAcctNo</Cell>
+            <Cell order="19" name="数据来源">dataSourceStr</Cell>
         </Row>
     </Worksheet>
 </Workbook>

@@ -67,7 +67,7 @@ public class TrdBondTrade001Controller extends BaseController {
     @Override
     public String init(Model model) {
 
-        this.setSelectOptionToModel(model, DictCode.交易方向, DictCode.交易场所);
+        this.setSelectOptionToModel(model, DictCode.交易方向, DictCode.交易场所,DictCode.生成方式);
 
         return super.init(model);
     }

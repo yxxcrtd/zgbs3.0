@@ -346,26 +346,26 @@ public class TrdBondTradeValidator implements BeanValidator {
                 }
                 //结算金额校验
                 //买入：结算金额=净价成交金额+应收利息总额+经手费+结算费+净佣金+交易手续费+结算服务费
-                if(DictCodeList.交易方向_买入.getValue().equals(dto.getPs())){
-                    BigDecimal account = ArithmeticUtil.doAdd(dto.getTradeAmt(),dto.getIntAmt(),dto.getBrokerage()
-                            ,dto.getStlAmt(),dto.getCommission(),dto.getDealFeeAmt(),dto.getStlFeeAmt());
-                    if(account.compareTo(dto.getSettleAmt()) != 0){
-                        resultList.add(new ValidMessage("settleAmt",
-                                getMessage("结算金额需满足：结算金额=净价成交金额+应收利息总额+经手费+结算费+净佣金+交易手续费+结算服务费")));
-
-                    }
-                }//卖出：结算金额=净价成交金额+应收利息总额-经手费-结算费-净佣金-交易手续费-结算服务费
-                else if(DictCodeList.交易方向_卖出.getValue().equals(dto.getPs())
-                        || DictCodeList.交易方向_行权_回售.getValue().equals(dto.getPs())
-                        || DictCodeList.交易方向_行权_赎回.getValue().equals(dto.getPs())){
-                    BigDecimal account = ArithmeticUtil.doSub(ArithmeticUtil.doAdd(dto.getTradeAmt(),dto.getIntAmt()),
-                            ArithmeticUtil.doAdd(dto.getBrokerage(),dto.getStlAmt(),dto.getCommission(),dto.getDealFeeAmt(),dto.getStlFeeAmt()));
-                    if(account.compareTo(dto.getSettleAmt()) != 0){
-                        resultList.add(new ValidMessage("settleAmt",
-                                getMessage("结算金额需满足：结算金额=净价成交金额+应收利息总额-经手费-结算费-净佣金-交易手续费-结算服务费")));
-
-                    }
-                }
+//                if(DictCodeList.交易方向_买入.getValue().equals(dto.getPs())){
+//                    BigDecimal account = ArithmeticUtil.doAdd(dto.getTradeAmt(),dto.getIntAmt(),dto.getBrokerage()
+//                            ,dto.getStlAmt(),dto.getCommission(),dto.getDealFeeAmt(),dto.getStlFeeAmt());
+//                    if(account.compareTo(dto.getSettleAmt()) != 0){
+//                        resultList.add(new ValidMessage("settleAmt",
+//                                getMessage("结算金额需满足：结算金额=净价成交金额+应收利息总额+经手费+结算费+净佣金+交易手续费+结算服务费")));
+//
+//                    }
+//                }//卖出：结算金额=净价成交金额+应收利息总额-经手费-结算费-净佣金-交易手续费-结算服务费
+//                else if(DictCodeList.交易方向_卖出.getValue().equals(dto.getPs())
+//                        || DictCodeList.交易方向_行权_回售.getValue().equals(dto.getPs())
+//                        || DictCodeList.交易方向_行权_赎回.getValue().equals(dto.getPs())){
+//                    BigDecimal account = ArithmeticUtil.doSub(ArithmeticUtil.doAdd(dto.getTradeAmt(),dto.getIntAmt()),
+//                            ArithmeticUtil.doAdd(dto.getBrokerage(),dto.getStlAmt(),dto.getCommission(),dto.getDealFeeAmt(),dto.getStlFeeAmt()));
+//                    if(account.compareTo(dto.getSettleAmt()) != 0){
+//                        resultList.add(new ValidMessage("settleAmt",
+//                                getMessage("结算金额需满足：结算金额=净价成交金额+应收利息总额-经手费-结算费-净佣金-交易手续费-结算服务费")));
+//
+//                    }
+//                }
             }
 
         }

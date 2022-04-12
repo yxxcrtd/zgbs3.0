@@ -12,6 +12,7 @@ import com.joyintech.framework.validation.annotation.ValidLogic;
 import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.trademanage.bond.validator.TrdBondTradeValidator;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
@@ -49,6 +50,11 @@ public class TrdBondTradeDto extends BaseEntity implements ProcessEntity {
      */
     @PrimaryKey(value= PrimaryKey.Field.PK_1)
     private String tradeId;
+
+    /**
+     * 数据来源
+     */
+    private String dataSource;
 
     /**
      * 外部成交编号
@@ -330,6 +336,13 @@ public class TrdBondTradeDto extends BaseEntity implements ProcessEntity {
      */
     private String myAcctNo_qr;
 
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
+    }
 
     @NotEmpty(fieldName = "TrdBondTrade.prodId", groups = { ValidateGroupEdit.class })
     public String getProdId() {
@@ -859,5 +872,15 @@ public class TrdBondTradeDto extends BaseEntity implements ProcessEntity {
     public String getTradeAmtStr() {
         DecimalFormat decimalFormat = new DecimalFormat("0.00#");
         return this.getTradeAmt()==null?"0.00":decimalFormat.format(this.getTradeAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    /**
+     * 取得 数据来源str
+     *
+     * @return 交易方向
+     */
+    public String getDataSourceStr() {
+        return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.生成方式, dataSource))?
+                SysDataUtil.getNameFromDataDict(DictCode.生成方式, dataSource):dataSource;
     }
 }

@@ -30,6 +30,11 @@ public class TrdBondTradeDto extends BaseEntity implements ProcessEntity {
     private String elementId;
 
     /**
+     * 数据来源
+     */
+    private String dataSource;
+
+    /**
      * 外部成交编号
      */
     private String outTradeId;
@@ -319,6 +324,14 @@ public class TrdBondTradeDto extends BaseEntity implements ProcessEntity {
      */
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal commissionPay;
+
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
+    }
 
     public String getProdId() {
         return prodId;
