@@ -105,7 +105,7 @@ public class MessageSenderHelper {
         tradeMessage.setDealPrice(trade.getTradedPrice());
         tradeMessage.setDealBalance(trade.getTradedBalance());
         tradeMessage.setTradingDay(trade.getTradingDay());
-        tradeMessage.setAcctNo(instruction.getAcctNo());
+//        tradeMessage.setAcctNo(instruction.getAcctNo());
         tradeMessage.setSecAcctId(instruction.getSecAcctId());
         tradeMessage.setPortfolioId(instruction.getPortfolioId());
         tradeMessage.setTradeMarket(instruction.getTradeMarket());
