@@ -110,12 +110,6 @@ public class TrdBondValuationDurationDto extends BaseEntity implements ProcessEn
     private String ccy;
 
     /**
-     * 其他费用
-     */
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal otherAmt;
-
-    /**
      * 是否结清
      */
     private String isClean2;
@@ -189,14 +183,6 @@ public class TrdBondValuationDurationDto extends BaseEntity implements ProcessEn
 
     public void setCcy(String ccy) {
         this.ccy = ccy;
-    }
-
-    public BigDecimal getOtherAmt() {
-        return otherAmt;
-    }
-
-    public void setOtherAmt(BigDecimal otherAmt) {
-        this.otherAmt = otherAmt;
     }
 
     public String getMyAcctNo() {
