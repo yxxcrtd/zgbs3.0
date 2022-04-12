@@ -294,7 +294,10 @@
         MST_BOND_VALUATION_INFO.NETPRICE firstNetPrice,
         FIN_PRODUCT.FINPROD_MARKET_ID finprodMarketId,/*市场代码*/
         STL_SEC_ACCT_INFO.SEC_ACCT_NAME secAcctIdStr ,
-        ETR_SEC_STOCK.PLEDGE_STOCK_NAME PLEDGESTOCKNAME
+        ETR_SEC_STOCK.PLEDGE_STOCK_NAME PLEDGESTOCKNAME,
+        case when atd.EX_PENDING_PERIOD IS NULL THEN  atd.M_PENDING_PERIOD || atd.M_PENDING_PERIOD_UNIT
+             else atd.EX_PENDING_PERIOD || atd.EX_PENDING_PERIOD_UNIT ||'+'|| atd.M_PENDING_PERIOD || atd.M_PENDING_PERIOD_UNIT
+              end AS waitPeriod
         FROM ETR_ENTRUST_PLEDGE
         <if test="loginUserId!=null and loginUserId!=''">
             LEFT JOIN PTL_PORTFOLIO_AUTHORITY PPA ON ETR_ENTRUST_PLEDGE.PORTFOLIO_ID = PPA.PORTFOLIO_ID
@@ -391,6 +394,9 @@
         WHERE GRADE_DATE &lt;= to_date(#{sysDate},'yyyy-MM-dd')
         and GRADE_ORG_ID !='22') MBCR
         ON MBCR.O_CODE = FIN_PRODUCT.FINPROD_MARKET_ID AND MBCR.NUM = 1
+        LEFT JOIN ASSET_DAILY_INFO atd
+              ON ETR_ENTRUST_PLEDGE.FINPROD_ID = atd.FINPROD_ID
+             AND atd.CDATE = to_date(#{sysDate},'yyyy-MM-dd')
         WHERE 1=1
         /*只获取交易场所为：01银行间*/
         AND FIN_PRODUCT.TRADE_MARKET = #{TRADEPLACE01}
@@ -433,6 +439,18 @@
         <if test="finProdType != null and finProdType!='' ">
             fpt.TYPE_11 = #{finProdType}
         </if>
+        <if test="exPendingPeriod != null and exPendingPeriod!='' ">
+            AND  to_char(atd.EX_PENDING_PERIOD) = #{exPendingPeriod}
+        </if>
+        <if test="exPendingPeriodUnit != null and exPendingPeriodUnit!='' ">
+            AND  atd.EX_PENDING_PERIOD_UNIT = #{exPendingPeriodUnit}
+        </if>
+        <if test="mPendingPeriod != null and mPendingPeriod!='' ">
+            AND to_char(atd.M_PENDING_PERIOD) = #{mPendingPeriod}
+        </if>
+        <if test="mPendingPeriodUnit != null and mPendingPeriodUnit!='' ">
+            AND  atd.M_PENDING_PERIOD_UNIT = #{mPendingPeriodUnit}
+        </if>
         <if test="finprodTypeList != null and !finprodTypeList.isEmpty()">
             AND fpt.TYPE_11 in
             <foreach collection="finprodTypeList" item="item" open="(" close=")" separator=",">
@@ -448,7 +466,7 @@
             <where>(aaa.portfolioId || '|' || aaa.finprodAbbr || '|'
                 || aaa.portfolioName || '|' || aaa.secAcctIdStr || '|' || sdl_ps.ITEM_VALUE || '|' || finProdId
                 || '|' || sdl_es.ITEM_VALUE || '|' || aaa.PLEDGESTOCKNAME || '|' || sdl_pm.ITEM_VALUE
-                like '%' || #{search} || '%'
+                || '|' || aaa.waitPeriod like '%' || #{search} || '%'
                 or to_char(aaa.pledStrdPrinAmt)=#{search}
                 or to_char(aaa.pledgeAmount)=#{search}
                 or to_char(aaa.firstNetPrice)=#{search}
