@@ -398,4 +398,18 @@ public class MstSecuritiesAccountController {
         Page<SelectOptionDto> asas=mstSecuritiesAccountService.getFinprodMarketInfoNewUi(page, length, map);
         return asas;
     }
+
+    /**
+     * 获取证券代码(债券 质押式回购)
+     *
+     * @param map
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("getFinprodMarketInfoSecRepo/{page}/{length}")
+    public Page<SelectOptionDto> getFinprodMarketInfoSecRepo(@RequestBody Map<String, Object> map,
+                                                           @PathVariable("page") int page, @PathVariable("length") int length) throws Exception {
+        Page<SelectOptionDto> asas=mstSecuritiesAccountService.getFinprodMarketInfoSecRepo(page, length, map);
+        return asas;
+    }
 }
