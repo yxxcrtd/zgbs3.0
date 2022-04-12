@@ -89,13 +89,17 @@ $(function () {
             var fixedCheckBox = $('#dataTable').next('.layui-table-view').find('.layui-table-fixed').find('tr[data-index="' + index + '"]').find(':checkbox[name="layTableCheckbox"]:checked');
             if(rowList != '' && rowList!=undefined){
                 for(var j=0;j<rowList.length;j++){
-                    if(data.booksetId == rowList[j].booksetId && data.busVouchnum == rowList[j].busVouchnum && index != j ){
+                    if(index != j ) {
                         var checkBox = $('#dataTable').next('.layui-table-view').find('.layui-table-fixed').find('tr[data-index="' + j + '"]').find(':checkbox[name="layTableCheckbox"]:checked');
-                        //勾选时：选中的判断，全部是否选中
-                        if(fixedCheckBox.length > 0 && checkBox.length == 0){
-                            table.checkRow(j);
-                        }//取消时：
-                        else if(fixedCheckBox.length == 0 && checkBox.length > 0){
+                        if (data.booksetId == rowList[j].booksetId && data.busVouchnum == rowList[j].busVouchnum ) {
+                            //勾选时：选中的判断，全部是否选中
+                            if (fixedCheckBox.length > 0 && checkBox.length == 0) {
+                                table.checkRow(j);
+                            }//取消时：
+                            else if (fixedCheckBox.length == 0 && checkBox.length > 0) {
+                                table.checkRow(j);
+                            }
+                        }else if( data.busVouchnum != rowList[j].busVouchnum && checkBox.length > 0){
                             table.checkRow(j);
                         }
                     }
