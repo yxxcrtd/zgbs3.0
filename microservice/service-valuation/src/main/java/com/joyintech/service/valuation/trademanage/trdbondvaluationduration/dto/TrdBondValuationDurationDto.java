@@ -129,6 +129,11 @@ public class TrdBondValuationDurationDto extends BaseEntity implements ProcessEn
      */
     private String myAcctNo;
 
+    /**
+     * 数据来源
+     */
+    private String dataSource;
+
     public String getProdId() {
         return prodId;
     }
@@ -311,5 +316,13 @@ public class TrdBondValuationDurationDto extends BaseEntity implements ProcessEn
 
     public void setTardeAmt(BigDecimal tardeAmt) {
         this.tardeAmt = tardeAmt;
+    }
+
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
     }
 }

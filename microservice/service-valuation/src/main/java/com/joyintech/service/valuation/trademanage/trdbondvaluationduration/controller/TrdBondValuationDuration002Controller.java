@@ -55,20 +55,6 @@ public class TrdBondValuationDuration002Controller {
 
     /**
      *
-     * 编号查询
-     *
-     * @return
-     * @see
-     * @since 1.0
-     */
-    @PostMapping("/querySequences")
-    public int querySequences(){
-        int  count = trdBondValuationDuration002Service.querySequences();
-        return count;
-    }
-
-    /**
-     *
      * 查询债券付息计划
      *
      * @return

@@ -2,6 +2,7 @@ package com.joyintech.service.valuation.trademanage.trdbondvaluationduration.ser
 
 
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.service.valuation.component.common.constants.BussinessDictCodeList;
 import com.joyintech.service.valuation.component.common.dto.FinCashPlanDto;
 import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dao.TrdBondValuationDurationMapper;
 import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationDto;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -99,12 +101,10 @@ public class TrdBondValuationDuration002Service extends BaseService {
      * @since 1.0
      */
     public TrdBondValuationDurationDto queryTradeInfoByTradeId(String tradeId){
-        return  trdBondValuationDurationMapper.queryTradeInfoByTradeId(tradeId);
-    }
-
-    public int querySequences(){
-        int i=trdBondValuationDurationMapper.querySequences();
-        return i;
+        Map<String, Object> param = new HashMap<>();
+        param.put("tradeId",tradeId);
+        param.put("BUSI_TYPE_02", BussinessDictCodeList.业务类型_债券交易.getValue());
+        return  trdBondValuationDurationMapper.queryTradeInfoByTradeId(param);
     }
 
     /**

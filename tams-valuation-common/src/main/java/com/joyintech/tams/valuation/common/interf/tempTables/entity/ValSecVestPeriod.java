@@ -160,6 +160,11 @@ public class ValSecVestPeriod extends BaseEntity {
      * 证券账户
      */
     private String secManageAcctId;
+
+    /**
+     * 数据来源
+     */
+    private String dataSource;
     /*add by sunshuaishuai 20220325 end*/
 
   /**
@@ -622,6 +627,22 @@ public class ValSecVestPeriod extends BaseEntity {
      */
     public void setSecManageAcctId(String secManageAcctId) {
         this.secManageAcctId = secManageAcctId;
+    }
+
+    /**
+     * 取得 数据来源
+     * @return 数据来源
+     */
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    /**
+     * 设置 数据来源
+     * @param dataSource 数据来源
+     */
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
     }
     /*add by sunshuaishuai 20220325 交易管理 end*/
 }

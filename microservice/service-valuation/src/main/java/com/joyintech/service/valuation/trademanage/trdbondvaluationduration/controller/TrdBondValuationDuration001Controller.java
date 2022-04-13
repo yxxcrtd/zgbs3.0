@@ -52,18 +52,6 @@ public class TrdBondValuationDuration001Controller {
         return trdBondValuationDuration001Service.selectForPage(page, length, param);
     }
 
-    /**
-     * 不分页数据查询
-     *
-     * @param param
-     * @return
-     * @throws Exception
-     */
-    @PostMapping("/queryPageList")
-    public List<TrdBondValuationDurationDto> queryPageList(@RequestBody Map<String, Object> param){
-        return trdBondValuationDuration001Service.queryPageList(param);
-    }
-
     @Transactional
     @DTXTransaction
     @PostMapping("delete")

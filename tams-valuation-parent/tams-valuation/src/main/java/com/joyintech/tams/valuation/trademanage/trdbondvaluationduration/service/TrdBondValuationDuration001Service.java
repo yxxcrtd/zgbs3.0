@@ -1,7 +1,11 @@
 package com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.service;
 
 import com.joyintech.framework.export.CommonExportService;
+import com.joyintech.framework.export.ExportParam;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.jdbc.enums.DataSourceType;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationDto;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -28,16 +32,18 @@ public class TrdBondValuationDuration001Service extends CommonExportService<TrdB
                 pageParam,TrdBondValuationDurationDto.class);
     }
 
+    @Override
+    protected void buildExportParam(ExportParam exportParam) {
+            exportParam.config("/com/joyintech/tams/valuation/trademanage/trdbondvaluationduration/conf/export_conf.xml")
+                    .dataSource(DataSourceType.MASERT);
+    }
+
     /**
-     * 不分页
-     *
-     * @param params
-     * @return
+     * {@inheritDoc}
      */
-    public List<TrdBondValuationDurationDto> queryPageList(Map<String, Object> params) {
-        return restTemplate.postForList(
-                ServiceApplication.VALUATION_SERVICE_NAME + "/TrdBondValuationDuration001/queryPageList", params,
-                TrdBondValuationDurationDto.class);
+    @Override
+    public Page<TrdBondValuationDurationDto> selectPageData(Map<String, Object> selectParam) {
+        return findPage(selectParam);
     }
 
     @Override

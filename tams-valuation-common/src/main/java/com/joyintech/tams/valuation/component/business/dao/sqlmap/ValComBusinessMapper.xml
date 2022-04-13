@@ -96,54 +96,25 @@
 
 	<!--资金账户下拉框-->
 	<select id="getTrdAcctId" resultType="com.joyintech.framework.select.SelectOptionDto">
-		<!--select ssai.TRD_ACCT_ID as id,sci.ACCT_NAME as text
-		from STL_FIN_PRODUCT_ACCT psa
-		inner join STL_SEC_ACCT_INFO ssai on psa.ACCT_NO=ssai.SEC_ACCT_ID
-		inner join STL_CAPACCT_INFO sci on ssai.TRD_ACCT_ID=sci.ACCT_NO
-		<where>
-			<if test="portfolioId != null and portfolioId != ''">
-				AND psa.FINPROD_ID =#{portfolioId}
-			</if>
-			<if test="finprodType != null and finprodType != '' ">
-				AND psa.FINPROD_TYPE = #{finprodType}
-			</if>
-			<if test="acctTypeList!=null and acctTypeList.size()>0 ">
-				AND (psa.ACCT_TYPE IN
-				<foreach item="item" index="index" collection="acctTypeList" open="(" close=")" separator=",">
-					<if test="(index % 998) == 0">
-						null) or psa.ACCT_TYPE in (
-					</if>
-					#{item}
-				</foreach>)
-			</if>
-		</where>-->
-
 		select
-		distinct acct.ACCT_NO as id,acct.ACCT_NO as text
+			 acct.ACCT_NO as id,
+			info.acct_name as text
 		FROM STL_FIN_PRODUCT_ACCT acct
+		LEFT JOIN stl_capacct_info info ON acct.acct_no = info.acct_no
 		<where>
-			<!--<if test="portfolioId != null and portfolioId != ''">
-				AND acct.FINPROD_ID =#{portfolioId}
-			</if>-->
+			<if test="accTypeArr != null and accTypeArr.length > 0">
+				AND acct.ACCT_TYPE IN
+				<foreach collection="accTypeArr" item="accType" open="( " close=" )" separator=",">
+					#{accType}
+				</foreach>
+			</if>
+			<if test="finprodId != null and finprodId != ''">
+				AND acct.FINPROD_ID =#{finprodId}
+			</if>
 			<if test=" initValue != null and initValue != ''">
 				AND acct.ACCT_NO = #{initValue}
 			</if>
 		</where>
-	</select>
-
-	<!--资金账户下拉框-->
-	<select id="getTrdAcctId1" resultType="java.lang.String">
-		select
-		distinct acct.ACCT_NO as acctno
-		FROM STL_FIN_PRODUCT_ACCT acct
-		where
-		acct.ACCT_TYPE = 'A01'
-		<if test="finprodId != null and finprodId != ''">
-			AND acct.FINPROD_ID =#{finprodId}
-		</if>
-		<if test=" initValue != null and initValue != ''">
-			AND acct.ACCT_NO = #{initValue}
-		</if>
 	</select>
 
 	<!--内部科目定义下拉框-->

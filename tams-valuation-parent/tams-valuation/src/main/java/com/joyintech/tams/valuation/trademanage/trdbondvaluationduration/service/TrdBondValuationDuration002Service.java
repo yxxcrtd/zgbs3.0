@@ -6,6 +6,7 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 import com.joyintech.tams.valuation.common.interf.base.dto.AssetDealInfoValCommonResult;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.sec.SecVestPeriodTemplateRecService;
@@ -38,11 +39,6 @@ public class TrdBondValuationDuration002Service extends CommonExportService<TrdB
         return restTemplate.postForObject(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdBondValuationDuration002/queryTradeInfoByTradeId", tradeId,
                 TrdBondValuationDurationDto.class);
-    }
-
-    //自增序列号
-    public int querySequences(){
-        return restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdBondValuationDuration002/querySequences", null,Integer.class);
     }
 
     /**
@@ -104,7 +100,7 @@ public class TrdBondValuationDuration002Service extends CommonExportService<TrdB
         //查询债券的付息计划
         Map<String,Object> hashMap = new HashMap<>();
         hashMap.put("finprodId",entity.getAssetId());
-        hashMap.put("mdate",entity.getMdate());
+        hashMap.put("mdate",DateUtil.format(entity.getMdate()));
         List<FinCashPlanDto> list = getFinCashPlanByProductId(hashMap);
         if(!StringUtil.isEmptyList(list)){
             entity.setVdate(list.get(0).getVdate());//计息开始日 根据标的信息查询
@@ -117,6 +113,9 @@ public class TrdBondValuationDuration002Service extends CommonExportService<TrdB
         entity.setIsClean("N");//有无清算指令
         entity.setDealNum(dto.getActCapi());//成交数量
         entity.setTardeAmt(dto.getSettleAmt());//交易金额
+
+        //设置数据来源：画面录入
+        entity.setDataSource(DictCodeListExt1.生成方式_画面录入.getValue());
 
         listValSecVestPeriod.add(entity);
         Map<String, Object> map = secVestPeriodTemplateRecService.handleValSecVestPeriod(listValSecVestPeriod,new Date(),params,null);

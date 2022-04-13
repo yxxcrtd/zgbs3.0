@@ -143,6 +143,11 @@ public class TrdBondValuationDurationDto extends BaseEntity implements ProcessEn
      */
     private String myAcctNo;
 
+    /**
+     * 数据来源
+     */
+    private String dataSource;
+
     @NotEmpty(fieldName = "TrdBondValuationDuration.prodId", groups = { ValidateGroupEdit.class })
     public String getProdId() {
         return prodId;
@@ -403,4 +408,21 @@ public class TrdBondValuationDurationDto extends BaseEntity implements ProcessEn
         return this.getIntAmtReal()==null?"0.00":decimalFormat.format(this.getIntAmtReal().setScale(2,BigDecimal.ROUND_HALF_UP));
     }
 
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    /**
+     * 取得 数据来源str
+     *
+     * @return 交易方向
+     */
+    public String getDataSourceStr() {
+        return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.生成方式, dataSource))?
+                SysDataUtil.getNameFromDataDict(DictCode.生成方式, dataSource):dataSource;
+    }
 }

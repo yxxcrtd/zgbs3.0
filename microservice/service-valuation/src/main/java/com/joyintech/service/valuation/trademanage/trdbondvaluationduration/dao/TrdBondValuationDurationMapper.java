@@ -33,9 +33,7 @@ public interface TrdBondValuationDurationMapper {
 
     int delBokDetailIdByTradeId(Map<String, Object> map);
 
-    int querySequences();
-
-    TrdBondValuationDurationDto queryTradeInfoByTradeId(String tradeId);
+    TrdBondValuationDurationDto queryTradeInfoByTradeId(Map<String, Object> paraMap);
 
     List<FinCashPlanDto> getFinCashPlanByProductId(Map<String, Object> paraMap);
 }
