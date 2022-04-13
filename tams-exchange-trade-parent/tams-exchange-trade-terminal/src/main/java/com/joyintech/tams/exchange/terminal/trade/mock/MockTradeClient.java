@@ -691,8 +691,6 @@ public class MockTradeClient implements ITradeRequest {
     private String quoteTickUrl;
 
     private TickBean queryQuoteTick(String stockCode) {
-        Map<String, String> param = Maps.newHashMap();
-        param.put("stockCode", stockCode);
         try {
             HttpRequest request = HttpRequest.post(quoteTickUrl)
                     .body(JSONUtil.createObj()
