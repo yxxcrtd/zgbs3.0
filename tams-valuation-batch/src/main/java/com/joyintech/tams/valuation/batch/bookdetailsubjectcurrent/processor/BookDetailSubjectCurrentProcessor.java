@@ -10,23 +10,25 @@
 
 package com.joyintech.tams.valuation.batch.bookdetailsubjectcurrent.processor;
 
+import com.joyintech.batch.batchbase.baseclass.BaseProcessor;
+import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
+import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.valuation.batch.bookdetailsubjectcurrent.dto.BookDetailSubjectCurrentReadResult;
+import com.joyintech.tams.valuation.batch.bookdetailsubjectcurrent.service.BookDetailSubjectCurrentProcessorNewService;
+import com.joyintech.tams.valuation.batch.bookdetailsubjectcurrent.service.BookDetailSubjectCurrentProcessorService;
+import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGenerateResult;
+import com.joyintech.tams.valuation.batch.common.base.entity.extcommon.ValBokBookdetailBatch;
+import com.joyintech.tams.valuation.common.constants.GlobalConstant;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
-
-import com.joyintech.batch.batchbase.baseclass.BaseProcessor;
-import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
-import com.joyintech.tams.valuation.batch.bookdetailsubjectcurrent.dto.BookDetailSubjectCurrentReadResult;
-import com.joyintech.tams.valuation.batch.bookdetailsubjectcurrent.service.BookDetailSubjectCurrentProcessorService;
-import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGenerateResult;
-import com.joyintech.tams.valuation.batch.common.base.entity.extcommon.ValBokBookdetailBatch;
-import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 
 /**
  * 更新账务明细（历史表）科目余额批处理- processor
@@ -45,6 +47,11 @@ public class BookDetailSubjectCurrentProcessor extends BaseProcessor<NeedOperate
      */
     @Autowired
     private BookDetailSubjectCurrentProcessorService bookDetailSubjectCurrentProcessorService;
+    /**
+     * processor方法的 Service
+     */
+    @Autowired
+    private BookDetailSubjectCurrentProcessorNewService bookDetailSubjectCurrentProcessorNewService;
 
     @Override
     public BookGenerateResult process(NeedOperateEntity items)
@@ -86,11 +93,20 @@ public class BookDetailSubjectCurrentProcessor extends BaseProcessor<NeedOperate
         
         BookGenerateResult result = new BookGenerateResult();
         result.setValBokBookdetailBatch(new ArrayList<>());
+        // modify by weipeng on 20220302 会计分录生成凭证通过系统参数区分新旧逻辑，保持原有逻辑不动 start
+        // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录 start
+        String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
         for(Entry<String, BookDetailSubjectCurrentReadResult> entry : temp.entrySet()){
             // 将返回值塞入参数中
             thisParams.put(GlobalConstant.READER_RESULT, entry.getValue());
+            BookGenerateResult resultOnce = new BookGenerateResult();
             // 调用service方法进行逻辑逻辑
-            BookGenerateResult resultOnce = bookDetailSubjectCurrentProcessorService.execute(thisParams);
+            if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
+                resultOnce = bookDetailSubjectCurrentProcessorNewService.execute(thisParams);
+            }
+            else{
+                resultOnce = bookDetailSubjectCurrentProcessorService.execute(thisParams);
+            }
             result.getValBokBookdetailBatch().addAll(resultOnce.getValBokBookdetailBatch());
         }
         result.setProdId(
