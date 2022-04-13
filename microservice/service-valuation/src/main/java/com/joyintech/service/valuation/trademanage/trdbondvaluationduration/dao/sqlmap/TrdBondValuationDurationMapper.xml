@@ -29,16 +29,18 @@
             t.CCY ccy,/**币种**/
             t.TRADE_AMT settleAmt,/**结算金额**/
             t.TRADE_AMT tradeAmt,/**交易金额**/
-            nvl(t.MY_ACCT_NO,stl.MY_ACCT_NO)  myAcctNo/**资金账户**/
+            stl.MY_ACCT_NO  myAcctNo,/**资金账户**/
+            d.GEN_TYPE dataSource /**数据来源**/
         FROM TRD_PRODUCT_DEAL t
+        LEFT JOIN TRD_PRODUCT_DEAL_ADD d on t.TRADE_ID = d.TRADE_ID
         LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
         LEFT JOIN BOK_DEAL_ACCOUNTING deal on deal.BUSI_NO = t.TRADE_ID
         LEFT JOIN BOK_BOOKSET bok on bok.BOOKSET_ID = deal.BOOKSET_ID
         LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID
         where
-            t.BUSI_TYPE ='02'
+            t.BUSI_TYPE =#{BUSI_TYPE_02}
             <if test="psArr ==null or psArr.length == 0">
-                and t.PS IN('T22','T23')
+                and t.PS IN(#{PS_T22},#{PS_T23})
             </if>
             <if test="tradeId !=null and tradeId !='' ">
                 and t.TRADE_ID like  concat(concat('%',#{tradeId}),'%')
@@ -67,7 +69,12 @@
                     #{ps}
                 </foreach>
             </if>
-
+            <if test="dataSourceArr != null and dataSourceArr.length > 0">
+                AND d.GEN_TYPE IN
+                <foreach collection="dataSourceArr" item="dataSource" open="( " close=" )" separator=",">
+                    #{dataSource}
+                </foreach>
+            </if>
         order by t.TRADE_ID desc
     </select>
 
@@ -76,11 +83,6 @@
         WHERE BOOKSET_ID = #{booksetId}
           and TRADE_ID = #{tradeId}
     </delete>
-
-    <select id="querySequences" resultType="Integer" useCache="false"
-            flushCache="true">
-        SELECT JYBOND_SEQUENCE.nextval from dual
-    </select>
 
     <select id="queryTradeInfoByTradeId" resultType="com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationDto">
         SELECT
@@ -97,7 +99,6 @@
             t.TRADE_AMT actInt,/**实收利息**/
             t.PRIN_AMT actCapi, /**实收本金**/
             t.CCY ccy,/**币种**/
-            CASE WHEN ttfd.FEE_TYPE = 'B99' THEN ttfd.FEE_AMT ELSE 0 END as otherAmt,/**其他费用**/
             t.IS_CLEAN  isClean2,/**是否结清**/
             t.TRADE_AMT tardeAmt,/**本币交易金额**/
             t.TRADE_AMT settleAmt,/**结算金额**/
@@ -106,10 +107,9 @@
             LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
             LEFT JOIN BOK_DEAL_ACCOUNTING deal on deal.BUSI_NO = t.TRADE_ID
             LEFT JOIN BOK_BOOKSET bok on bok.BOOKSET_ID = deal.BOOKSET_ID
-            LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE ='02'
-            LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd ON ttfd.TRADE_ID = t.TRADE_ID
+            LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE =#{BUSI_TYPE_02}
         where
-            t.BUSI_TYPE ='02'
+            t.BUSI_TYPE =#{BUSI_TYPE_02}
             and t.TRADE_ID = #{tradeId}
     </select>
 

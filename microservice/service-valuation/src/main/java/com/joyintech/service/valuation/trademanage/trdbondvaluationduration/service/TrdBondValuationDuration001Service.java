@@ -4,9 +4,11 @@ package com.joyintech.service.valuation.trademanage.trdbondvaluationduration.ser
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.service.valuation.component.common.constants.BussinessDictCodeList;
 import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dao.TrdBondValuationDurationMapper;
 import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationDto;
 import com.joyintech.tams.common.base.entity.TrdProductDeal;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.valuation.common.interf.base.batch.dao.ValCommonBatchMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,42 +64,22 @@ public class TrdBondValuationDuration001Service extends BaseService {
         }
         pageParam.put("psArr", psArr);
 
+        // 获取数据来源
+        String dataSource = (String)pageParam.get("dataSource");
+        // 数据来源多选，转为数组
+        String[] dataSourceArr = null;
+        if (StringUtil.isNotEmpty(dataSource)) {
+            dataSourceArr = dataSource.split(",");
+        }
+        pageParam.put("dataSourceArr", dataSourceArr);
+
+        pageParam.put("BUSI_TYPE_02", BussinessDictCodeList.业务类型_债券交易.getValue());
+        pageParam.put("PS_T22", DictCodeList.交易方向_收息到账.getValue());
+        pageParam.put("PS_T23", DictCodeList.交易方向_还本到账.getValue());
+
         return this.queryForPage(page, length,
                 () -> trdBondValuationDurationMapper.selectDeal(pageParam));
     }
-
-    /**
-     * 不分页查询
-     *
-     * @see
-     * @since 1.0
-     */
-    public List<TrdBondValuationDurationDto> queryPageList(Map<String, Object> params){
-        //产品代码
-        String finprodId = (String)params.get("finprodId");
-        String[] finprodIdArr = null;
-        if(StringUtil.isNotEmpty(finprodId)){
-            finprodIdArr = finprodId.split(",");
-        }
-        params.put("finprodIdArr", finprodIdArr);
-        //资产代码
-        String asset = (String)params.get("asset");
-        String[] assetIdArr = null;
-        if(StringUtil.isNotEmpty(asset)){
-            assetIdArr = asset.split(",");
-        }
-        params.put("assetIdArr", assetIdArr);
-        // 获取交易方向
-        String ps = (String)params.get("ps");
-        // 交易方向多选，转为数组
-        String[] psArr = null;
-        if (StringUtil.isNotEmpty(ps)) {
-            psArr = ps.split(",");
-        }
-        params.put("psArr", psArr);
-        return trdBondValuationDurationMapper.selectDeal(params);
-    }
-
 
     public int delete(TrdBondValuationDurationDto dto) {
         int count=0;

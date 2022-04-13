@@ -65,7 +65,7 @@ public class TrdBondValuationDuration001Controller extends BaseController {
 
     @Override
     public String init(Model model) {
-        this.setSelectOptionToModel(model, DictCode.交易方向);
+        this.setSelectOptionToModel(model, DictCode.交易方向,DictCode.生成方式);
         return super.init(model);
     }
     /**
@@ -139,19 +139,6 @@ public class TrdBondValuationDuration001Controller extends BaseController {
                     //流程存在情况
                     return new AjaxResult("交易编号：" + item.getTradeId() + "已存在流程中", MessageType.错误消息);
                 }
-//                //2.判断交易日等于平台日
-//                String tradeDate = item.getTradeDate();
-//                // 系统平台日
-//                Date sysDate = baseCommonService.getSysDate();
-//                if (StringUtil.isNotEmpty(tradeDate)) {
-//                    Date bDate = DateUtil.parseDate(tradeDate, "yyyy-MM-dd");
-//                    if (DateUtil.compareDate(sysDate, bDate) != 0) {
-//                        return new AjaxResult("只能删除交易日等于平台日的交易", MessageType.错误消息);
-//                    } else {
-//                        return new AjaxResult("确定要删除？", MessageType.确认消息);
-//                    }
-//                }
-
             }
         }else if("edit".equals(dto.getOperateType())){
             for (TrdBondValuationDurationDto item : list) {
@@ -210,35 +197,15 @@ public class TrdBondValuationDuration001Controller extends BaseController {
     }
 
     /**
-     * 导出数据 <一句话功能简述> <功能详细描述>
-     *
-     * @return List<ValFundMarketInfo001dto>
-     * @throws Exception Exception
+     * 导出
+     * @return
+     * @throws Exception
+     * @see
+     * @since 1.0
      */
     @RequestMapping(ACTION_EXPORT)
-    public ResponseEntity<byte[]> export()
-            throws ParseException, IOException {
-
-        String datas = this.getParam("datas");
-        Map<String, Object> params = RequestUtil.getPageParam();
-        List<TrdBondValuationDurationDto> listdto;
-        if (datas != null) {
-            listdto = JsonUtils.json2List(datas, TrdBondValuationDurationDto.class);
-        }
-        else {
-            listdto = trdBondValuationDuration001Service.queryPageList(params);
-        }
-
-        File outFile = trdBondValuationDuration001Service.makeFile(
-                "/com/joyintech/tams/valuation/trademanage/trdbondvaluationduration/conf/export_conf.xml",
-                listdto);
-        return ExportUtil.export(
-                this.getMessage(this.getPageId()) + SystemGlobalConstant.OPEN_PARENTHESIS
-                        + DateUtil.format(new Date())
-                        + SystemGlobalConstant.CLOSE_PARENTHESIS
-                        + SystemGlobalConstant.POINT
-                        + FileNameUtil.getFileExtName(outFile),
-                outFile, true);
+    public ResponseEntity<byte[]> export(){
+        Map<String, Object> param = RequestUtil.getParameters(getRequest());
+        return trdBondValuationDuration001Service.export(this.getPageId(),param);
     }
-
 }

@@ -11,13 +11,20 @@
 package com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.validator;
 
 
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.BeanValidator;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.valuation.component.common.dto.FinCashPlanDto;
 import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationDto;
+import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.service.TrdBondValuationDuration002Service;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  利率互换交易--业务验证
@@ -30,6 +37,9 @@ import java.util.List;
 @Component
 public class TrdBondValuationDurationValidator implements BeanValidator {
 
+    @Autowired
+    private TrdBondValuationDuration002Service trdBondValuationDuration002Service;
+
     /**
      * {@inheritDoc}
      */
@@ -40,7 +50,16 @@ public class TrdBondValuationDurationValidator implements BeanValidator {
         if("delete".equals(dto.getOperateType())){
 
         }else{
-
+            //校验标的付息开始日是否存在
+            //查询债券的付息计划
+            Map<String,Object> hashMap = new HashMap<>();
+            hashMap.put("finprodId",dto.getAssetId());
+            hashMap.put("mdate", DateUtil.format(dto.getMdate()));
+            List<FinCashPlanDto> list = trdBondValuationDuration002Service.getFinCashPlanByProductId(hashMap);
+            if(StringUtil.isEmptyList(list)){
+                resultList.add(new ValidMessage("mdate",
+                        getMessage("未匹配到对用的标的付息计划，请维护标的付息计划或者更改计息结束日")));
+            }
         }
 
          return resultList;

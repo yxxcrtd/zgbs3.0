@@ -9,7 +9,8 @@
             asset: $.trim($('#asset').val()),
             tradeDateBegin: $("#tradeDate").startDate(),
             tradeDateEnd: $("#tradeDate").endDate(),
-            ps: $('#ps').val()
+            ps: $('#ps').val(),
+            dataSource:$('#dataSource').val()
         }
     };
 
@@ -51,6 +52,8 @@
             {field:'ccyFmt', title: '币种',sortField:"ccy",width:180},
             {field:'ccy', title: '币种',visible:false},
             {field:'myAcctNo', title: '资金账户',width:180},
+            {field:'dataSourceStr', title: '数据来源',sortField:"dataSource",width:150},
+            {field:'dataSource', title: '数据来源',visible:false},
             {field:'operation', title:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操 作', type:'action', fixed: 'right',width:120,
                 buttons:['edit', 'delt']},
         ],
@@ -98,21 +101,8 @@
      * 导出选中的表格数据
      */
     var exportExcel = function() {
-
-        var selArr = [];
-        var datas = null;
-        if (table != null && table != '') {
-            selArr = table.getAllCheckedRows();
-            datas = JSON.stringify(selArr);
-        }
-        if (!selArr || selArr.length == 0) {
-            var paramObj = getPageParams();
-            Joyin.exportExcel('export', paramObj);
-        } else {
-            Joyin.exportExcel('export', {
-                datas : datas
-            });
-        }
+        var paramObj = getPageParams();//请求参数json格式
+        Joyin.exportExcel('export', paramObj);//导出（共通）
     };
 
 
