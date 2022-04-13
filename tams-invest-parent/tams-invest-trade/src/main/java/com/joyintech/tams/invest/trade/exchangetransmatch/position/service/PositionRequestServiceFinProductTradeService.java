@@ -84,10 +84,6 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
                 finprodType += "-" + type6;
             }
             // ZGTFCP-1164:修改判断协议回购方法 modify by fuyongsheng 20220317 start
-//            if (DictCodeList.回购类型_质押式协议回购.getValue().equals(entity.getAssetType2())
-//                    || (DictCodeList.回购类型_质押式竞价回购.getValue().equals(entity.getAssetType2()))) {
-//                finprodType += "-" + entity.getAssetType2();
-//            }
             EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entity.getTrdProductDealAdd().getEntrustId());
             if(etrEntrustAdd != null){
                 if (DictCodeList.回购类型_质押式协议回购.getValue().equals(etrEntrustAdd.getAssetType1())
@@ -140,6 +136,8 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
      */
     private void bond002(BaseTradeProductDealDto entity, Map<String, Object> resultMap) {
         resultMap.put(INTERFACE_TYPE, PositionConstant.INTERF_TYPE_BOND002);
+        // 交易平台	见数据字典：交易平台
+        resultMap.put(SHARES_TRADE_PLATFORM, this.getSharesTradePlatform(entity, PositionConstant.INTERF_TYPE_BOND002));
         resultMap.put(BUSI_ACT, DictCodeListExt3.业务动作_成交匹配.getValue());
         resultMap.put(BID_RESULT, 是否_否.getValue());
         resultMap.put(PURCH_MODLE, null);
@@ -151,7 +149,6 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
         String deliveryType = commonPositionEngineService.getDeliveryType(dealEntity.getFinprodId());
         resultMap.put(SETTLE_SPEED, commonPositionEngineService.parseSettleSpreed((String) resultMap.get(DELIVERY_TYPE)));
         resultMap.put(TRADE_PLACE, dealEntity.getTradeMarket());
-        resultMap.put(SHARES_TRADE_PLATFORM, dealEntity.getTradePlat());
         resultMap.put(DELIVERY_TYPE, deliveryType);
         resultMap.put(WORK_FLOW_ID, dealEntity.getWorkflowId());
         resultMap.put("cdate", DateUtil.format(dealEntity.getTradeDate()));
@@ -213,6 +210,8 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
      */
     private void bond003(BaseTradeProductDealDto entity, Map<String, Object> resultMap) {
         resultMap.put(INTERFACE_TYPE, PositionConstant.INTERF_TYPE_BOND003);
+        // 交易平台	见数据字典：交易平台
+        resultMap.put(SHARES_TRADE_PLATFORM, this.getSharesTradePlatform(entity, PositionConstant.INTERF_TYPE_BOND003));
         // 业务动作
         resultMap.put(BUSI_ACT, DictCodeListExt3.业务动作_成交匹配.getValue());
 
@@ -330,6 +329,8 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
      */
     private void fund002(BaseTradeProductDealDto entity, Map<String, Object> resultMap) {
         resultMap.put(INTERFACE_TYPE, INTERF_TYPE_FUND002);
+        // 交易平台	见数据字典：交易平台
+        resultMap.put(SHARES_TRADE_PLATFORM, this.getSharesTradePlatform(entity, PositionConstant.INTERF_TYPE_FUND002));
         // 业务动作
         resultMap.put(BUSI_ACT, DictCodeListExt3.业务动作_成交匹配.getValue());
         resultMap.put(SETTLE_SPEED, null);
@@ -385,6 +386,8 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
      */
     private void repo003(BaseTradeProductDealDto entity, Map<String, Object> resultMap) {
         resultMap.put(INTERFACE_TYPE, PositionConstant.INTERF_TYPE_REPO003);
+        // 交易平台	见数据字典：交易平台
+        resultMap.put(SHARES_TRADE_PLATFORM, this.getSharesTradePlatform(entity, PositionConstant.INTERF_TYPE_REPO003));
         // 业务动作
         resultMap.put(BUSI_ACT, DictCodeListExt3.业务动作_成交匹配.getValue());
         resultMap.put(SETTLE_SPEED, null);
@@ -500,6 +503,8 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
      */
     private void repo002(BaseTradeProductDealDto entity, Map<String, Object> resultMap) {
         resultMap.put(INTERFACE_TYPE, PositionConstant.INTERF_TYPE_REPO002);
+        // 交易平台	见数据字典：交易平台
+        resultMap.put(SHARES_TRADE_PLATFORM, this.getSharesTradePlatform(entity, PositionConstant.INTERF_TYPE_REPO002));
         // 业务动作
         resultMap.put(BUSI_ACT, DictCodeListExt3.业务动作_成交匹配.getValue());
         // 清算速度
@@ -694,14 +699,17 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
      * @param resultMap
      */
     private void stock001(BaseTradeProductDealDto entity, Map<String, Object> resultMap) {
+        // 业务动作
+        resultMap.put(INTERFACE_TYPE, PositionConstant.INTERF_TYPE_STOCK001);
+        // 交易平台	见数据字典：交易平台
+        resultMap.put(SHARES_TRADE_PLATFORM, this.getSharesTradePlatform(entity, PositionConstant.INTERF_TYPE_STOCK001));
+
         TrdProductDeal dealEntity = entity.getTrdProductDeal();
         TrdProductDealAdd trdProductDealAdd = entity.getTrdProductDealAdd();
 
         String ps = dealEntity.getPs();
         String cashAcctId = exchangeTransMatchCommonMapper.queryAccountNo(dealEntity.getSecManageAcctId());
         // ZGTFCP-1615:申购、申购确认业务动作特殊处理 modify by fuyongsheng 20220322 start
-        // 业务动作
-        resultMap.put(INTERFACE_TYPE, PositionConstant.INTERF_TYPE_STOCK001);
         if (DictCodeList.交易方向_申购.getValue().equals(dealEntity.getPs())) {
             resultMap.put(BUSI_ACT, DictCodeListExt3.业务动作_中签.getValue());
         }else if(DictCodeList.交易方向_申购确认.getValue().equals(dealEntity.getPs())){
@@ -799,8 +807,6 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
         resultMap.put(PS, entity.getTrdProductDeal().getPs());
         // 交易场所	见数据字典：交易场所
         resultMap.put(TRADE_PLACE, entity.getTrdProductDeal().getTradeMarket());
-        // 交易平台	见数据字典：交易平台
-        resultMap.put(SHARES_TRADE_PLATFORM, this.getSharesTradePlatform(entity));
         // 流程编号	指令的工作流ID
         resultMap.put(WORK_FLOW_ID, entity.getTrdProductDeal().getWorkflowId());
         // 日期
@@ -815,23 +821,16 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
         resultMap.put(B_TOTAL_TRADE_ID, null);
     }
 
-    private String getSharesTradePlatform(BaseTradeProductDealDto entity){
-        EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entity.getTrdProductDealAdd().getEntrustId());
-        if((DictCodeList.交易平台_大宗交易平台.getValue().equals(entity.getTrdProductDeal().getTradePlat())
-                ||DictCodeList.交易平台_综合协议交易平台.getValue().equals(entity.getTrdProductDeal().getTradePlat()))
-                &&(DictCodeList.交易方向_买入.getValue().equals(entity.getTrdProductDeal().getPs())
-                ||DictCodeList.交易方向_卖出.getValue().equals(entity.getTrdProductDeal().getPs()))
-                &&(DictCodeListExt3.申报类型_意向申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_定价申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_点击成交申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_成交申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_日均价固定价格申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_收盘价固定价格申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_不指定.getValue().equals(etrEntrustAdd.getDealMode()))){
-            return DictCodeList.交易平台_大宗交易平台.getValue();
-        }else {
-            return DictCodeList.交易平台_竞价撮合平台.getValue();
-        }
+    /**
+     * 获取交易平台
+     * @param entity
+     * @param interfaceType
+     * @return
+     */
+    private String getSharesTradePlatform(BaseTradeProductDealDto entity, String interfaceType){
+        return commonPositionEngineService.getExchangeTradePlatform(entity.getTrdProductDealAdd().getEntrustId(),
+                entity.getTrdProductDeal().getTradePlat(), entity.getTrdProductDeal().getPs(),
+                entity.getTrdProductDeal().getFinprodId(), interfaceType);
     }
 
     /**
