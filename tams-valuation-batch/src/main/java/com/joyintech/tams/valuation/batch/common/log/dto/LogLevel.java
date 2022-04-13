@@ -7,6 +7,6 @@ package com.joyintech.tams.valuation.batch.common.log.dto;
  * @Version 1.0
  **/
 
-public enum DetailLogLevel {
+public enum LogLevel {
     DEBUG,INFO,ERROR,WARN
 }

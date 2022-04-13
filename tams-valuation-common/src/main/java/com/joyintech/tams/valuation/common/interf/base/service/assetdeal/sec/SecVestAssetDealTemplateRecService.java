@@ -538,10 +538,6 @@ public class SecVestAssetDealTemplateRecService {
         //是否生成结算指令 add by yinya on 20211201
         valFinProductDeal.setIsOrders(dto.getIsClean());
 
-        /*add by sunshuaishuai 交易管理 20220406 start*/
-        //资金账户
-        valFinProductDeal.setMyAcctNo(dto.getMyAcctNo());
-        /*add by sunshuaishuai 20220406 end*/
         return valFinProductDeal;
     }
 
@@ -565,8 +561,14 @@ public class SecVestAssetDealTemplateRecService {
         valFinProductDealExt.setCreateTime(dto.getCreateTime());
         // 保证金 = A.保证金
         valFinProductDealExt.setDepositAmt(dto.getBondAmt());
+        /*modify by sunshuaishuai 20220413 判断生成方式是接口接入还是画面录入 start*/
         //生成方式
-        valFinProductDealExt.setGenType(com.joyintech.tams.constant.DictCodeListExt1.生成方式_接口接入.getValue());
+        if(StringUtil.isNotEmpty(dto.getDataSource())){
+            valFinProductDealExt.setGenType(dto.getDataSource());
+        }else {
+            valFinProductDealExt.setGenType(com.joyintech.tams.constant.DictCodeListExt1.生成方式_接口接入.getValue());
+        }
+        /*modify by sunshuaishuai 20220413 判断生成方式是接口接入还是画面录入 end*/
         return valFinProductDealExt;
     }
     /**

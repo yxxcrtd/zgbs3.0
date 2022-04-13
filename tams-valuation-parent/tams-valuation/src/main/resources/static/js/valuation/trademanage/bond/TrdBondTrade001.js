@@ -10,7 +10,8 @@
             tradeDateBegin: $("#tradeDate").startDate(),
             tradeDateEnd: $("#tradeDate").endDate(),
             ps: $('#ps').val(),
-            tradeMarket: $('#tradeMarket').val()
+            tradeMarket: $('#tradeMarket').val(),
+            dataSource:$('#dataSource').val()
         }
     };
 
@@ -58,6 +59,8 @@
             {field:'ccy', title: '币种',visible:false},
             {field:'settleAmt',type:"money", title: '结算金额',width:180},
             {field:'myAcctNo', title: '资金账户',width:180},
+            {field:'dataSourceStr', title: '数据来源',sortField:"dataSource",width:150},
+            {field:'dataSource', title: '数据来源',visible:false},
             {field:'operation', title:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操 作', type:'action', fixed: 'right',width:120,
                 buttons:['edit', 'delt']},
         ],

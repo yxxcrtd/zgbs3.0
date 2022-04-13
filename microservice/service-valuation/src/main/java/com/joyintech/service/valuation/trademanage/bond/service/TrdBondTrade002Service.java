@@ -6,6 +6,7 @@ import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.service.valuation.component.common.constants.BussinessDictCodeList;
 import com.joyintech.service.valuation.trademanage.bond.dao.TrdBondTradeMapper;
 import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTradeDto;
 import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTradeResult;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -116,7 +118,17 @@ public class TrdBondTrade002Service extends BaseService {
      * @since 1.0
      */
     public TrdBondTradeDto queryTradeInfoByTradeId(String tradeId){
-        return  trdBondTradeMapper.queryTradeInfoByTradeId(tradeId);
+        Map<String, Object> param = new HashMap<>();
+        param.put("tradeId",tradeId);
+        param.put("BUSI_TYPE_02", BussinessDictCodeList.业务类型_债券交易.getValue());
+        param.put("FEE_TYPE_B01",BussinessDictCodeList.费用类型_经手费.getValue());
+        param.put("FEE_TYPE_B05",BussinessDictCodeList.费用类型_佣金.getValue());
+        param.put("FEE_TYPE_B06",BussinessDictCodeList.费用类型_交易手续费.getValue());
+        param.put("FEE_TYPE_B07",BussinessDictCodeList.费用类型_结算费.getValue());
+        param.put("FEE_TYPE_B08",BussinessDictCodeList.费用类型_结算手续费.getValue());
+        param.put("YES_NO_Y",DictCodeList.是否_是.getValue());
+        param.put("YES_NO_N",DictCodeList.是否_否.getValue());
+        return  trdBondTradeMapper.queryTradeInfoByTradeId(param);
     }
 
     /**

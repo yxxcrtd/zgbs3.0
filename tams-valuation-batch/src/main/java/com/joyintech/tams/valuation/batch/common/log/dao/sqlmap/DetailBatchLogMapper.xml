@@ -21,7 +21,8 @@
             #{createUser,jdbcType=VARCHAR} CREATE_USER,
             sysdate CREATE_TIME,
             #{updateUser,jdbcType=VARCHAR} UPDATE_USER,
-            sysdate UPDATE_TIME
+            sysdate UPDATE_TIME,
+            #{filePath,jdbcType=VARCHAR} FILE_PATH
 			FROM
 			DUAL
 
@@ -45,10 +46,11 @@
             L.CREATE_USER=TEMP.CREATE_USER,
             L.CREATE_TIME=TEMP.CREATE_TIME,
             L.UPDATE_USER=TEMP.UPDATE_USER,
-            L.UPDATE_TIME=TEMP.UPDATE_TIME
+            L.UPDATE_TIME=TEMP.UPDATE_TIME,
+            L.FILE_PATH=TEMP.FILE_PATH
         WHEN NOT MATCHED THEN INSERT
         (EXE_SEQNO,GROUP_ID,TASK_ID,TASK_BEAN_NAME,EXCUTE_DATE,CLASS_NAME,METHOD_NAME,ARGS,
-        BOOKSET_ID,FINPROD_ID,BUSI_ID,RESULT_INFO,DETAIL_EX,CREATE_USER,CREATE_TIME,UPDATE_USER,UPDATE_TIME
+        BOOKSET_ID,FINPROD_ID,BUSI_ID,RESULT_INFO,DETAIL_EX,CREATE_USER,CREATE_TIME,UPDATE_USER,UPDATE_TIME,FILE_PATH
         )
         values(
             TEMP.EXE_SEQNO,
@@ -67,7 +69,8 @@
             TEMP.CREATE_USER,
             TEMP.CREATE_TIME,
             TEMP.UPDATE_USER,
-            TEMP.UPDATE_TIME
+            TEMP.UPDATE_TIME,
+            TEMP.FILE_PATH
         )
     </insert>
 

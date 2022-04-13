@@ -4,9 +4,12 @@ package com.joyintech.service.valuation.trademanage.bond.service;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.service.valuation.component.common.constants.BussinessDictCodeList;
 import com.joyintech.service.valuation.trademanage.bond.dao.TrdBondTradeMapper;
 import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTradeDto;
 import com.joyintech.tams.common.base.entity.TrdProductDeal;
+import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.valuation.common.interf.base.batch.dao.ValCommonBatchMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -71,6 +74,22 @@ public class TrdBondTrade001Service extends BaseService {
         }
         pageParam.put("tradeMarketArr", tradeMarketArr);
 
+        // 获取数据来源
+        String dataSource = (String)pageParam.get("dataSource");
+        // 数据来源多选，转为数组
+        String[] dataSourceArr = null;
+        if (StringUtil.isNotEmpty(dataSource)) {
+            dataSourceArr = dataSource.split(",");
+        }
+        pageParam.put("dataSourceArr", dataSourceArr);
+
+        pageParam.put("BUSI_TYPE_02", BussinessDictCodeList.业务类型_债券交易.getValue());
+        pageParam.put("PS_T01", DictCodeList.交易方向_买入.getValue());
+        pageParam.put("PS_T02", DictCodeList.交易方向_卖出.getValue());
+        pageParam.put("PS_T03", DictCodeList.交易方向_行权_回售.getValue());
+        pageParam.put("PS_T04", DictCodeList.交易方向_申购.getValue());
+        pageParam.put("PS_T05", DictCodeList.交易方向_申购确认.getValue());
+        pageParam.put("PS_T39", DictCodeList.交易方向_行权_赎回.getValue());
 
         return this.queryForPage(page, length,
                 () -> trdBondTradeMapper.selectDeal(pageParam));
@@ -114,6 +133,14 @@ public class TrdBondTrade001Service extends BaseService {
             tradeMarketArr = tradeMarket.split(",");
         }
         params.put("tradeMarketArr", tradeMarketArr);
+
+        params.put("BUSI_TYPE_02", BussinessDictCodeList.业务类型_债券交易.getValue());
+        params.put("PS_T01", DictCodeList.交易方向_买入.getValue());
+        params.put("PS_T02", DictCodeList.交易方向_卖出.getValue());
+        params.put("PS_T03", DictCodeList.交易方向_行权_回售.getValue());
+        params.put("PS_T04", DictCodeList.交易方向_申购.getValue());
+        params.put("PS_T05", DictCodeList.交易方向_申购确认.getValue());
+        params.put("PS_T39", DictCodeList.交易方向_行权_赎回.getValue());
 
         return trdBondTradeMapper.selectDeal(params);
     }

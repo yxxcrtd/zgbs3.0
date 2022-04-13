@@ -37,6 +37,8 @@ import com.joyintech.tams.valuation.batch.common.calculation.service.Calculation
 import com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dto.FinProductDealInfoComDTO;
 import com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dto.FinProductDealInfoResult;
 import com.joyintech.tams.valuation.batch.common.finproduct.service.FinProductCommonService;
+import com.joyintech.tams.valuation.batch.common.log.dto.CustomDetailBatchLogDto;
+import com.joyintech.tams.valuation.batch.common.log.exception.DetailBatchException;
 import com.joyintech.tams.valuation.batch.common.sect1handle.entity.DealHappenAmtDto;
 import com.joyintech.tams.valuation.batch.common.sect1handle.entity.SecT1HandleParamterDto;
 import com.joyintech.tams.valuation.batch.common.sect1handle.entity.SecT1HandleResultDto;
@@ -230,7 +232,6 @@ public class SecDealAccountsNewService {
             // 3.2投资目的 = 摊余成本的情况
             quaryFvoci(returnResult, acctEntity, param, paramT1);
         }
-
         return returnResult;
     }
 

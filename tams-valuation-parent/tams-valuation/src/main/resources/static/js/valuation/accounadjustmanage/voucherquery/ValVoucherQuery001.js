@@ -1,5 +1,6 @@
 
 var indexParams;
+var table;
 
 $(function () {
     
@@ -58,7 +59,7 @@ $(function () {
     /**
      * 定义数据表格
      */
-	var table=$("#dataTable").joyintable({
+	table=$("#dataTable").joyintable({
 	    ajax: {
             url: 'findPage',
             type: 'POST',
@@ -81,6 +82,50 @@ $(function () {
                 		index=null;
                 	});
         },
+        click:function(table,data){
+            //2.获取所有行
+            var rowList = table.getAllRows();
+            //获取行号
+            var index = data.LAY_TABLE_INDEX;
+            if(index == undefined){
+                for (var i = 0 ;i < rowList.length;i++){
+                    if(JSON.stringify(rowList[i]).indexOf(JSON.stringify(data)) != -1){
+                        index = i;
+                        break;
+                    }
+                }
+            }
+            var fixedCheckBox = $('#dataTable').next('.layui-table-view').find('.layui-table-fixed').find('tr[data-index="' + index + '"]').find(':checkbox[name="layTableCheckbox"]:checked');
+            if(rowList != '' && rowList!=undefined){
+                for(var j=0;j<rowList.length;j++){
+                    if(index != j ) {
+                        var checkBox = $('#dataTable').next('.layui-table-view').find('.layui-table-fixed').find('tr[data-index="' + j + '"]').find(':checkbox[name="layTableCheckbox"]:checked');
+                        if (data.booksetId == rowList[j].booksetId && data.busVouchnum == rowList[j].busVouchnum ) {
+                            //勾选时：选中的判断，全部是否选中
+                            if (fixedCheckBox.length > 0 && checkBox.length == 0) {
+                                table.checkRow(j);
+                            }//取消时：
+                            else if (fixedCheckBox.length == 0 && checkBox.length > 0) {
+                                table.checkRow(j);
+                            }
+                        }else if( data.busVouchnum != rowList[j].busVouchnum && checkBox.length > 0){
+                            table.checkRow(j);
+                        }
+                    }
+                }
+            }
+        },
+        // check:function(table,data,index){
+        //     //2.获取所有行
+        //     var rowList = table.getAllRows();
+        //     // if(rowList != '' && rowList!=undefined){
+        //     //     for(var j=0;j<rowList.length;j++){
+        //     //         if(data.busVouchnum == rowList[j].busVouchnum && data.LAY_TABLE_INDEX != j){
+        //     //             table.checkRow(j);
+        //     //         }
+        //     //     }
+        //     // }
+        // },
 		cols: [
 		   {field:'bookDate', title: '记账日期',width:120},
 		   {field:'happenDate', title: '生成日期',width:120},
@@ -117,7 +162,7 @@ $(function () {
 //  	                  }
 //  	                  return html;
 //  					} 
-		   }]
+		   }],
 	});
 
 
@@ -131,6 +176,22 @@ $(function () {
                     table.reload();
                 });
     });
+
+    /**
+     * @param target 被比较的对象
+     * @param data 比较对象
+     */
+    var compare = function(target, data) {
+        if(data['LAY_CHECKED'] != 'undefined') {
+            delete data['LAY_CHECKED'];
+            delete target['LAY_CHECKED'];
+        }
+        if(typeof data['LAY_TABLE_INDEX'] != 'undefined') {
+            delete data['LAY_TABLE_INDEX'];
+            delete target['LAY_TABLE_INDEX'];
+        }
+        return _.isEqual(target, data);
+    };
 
 	/**
 	 * 导出数据

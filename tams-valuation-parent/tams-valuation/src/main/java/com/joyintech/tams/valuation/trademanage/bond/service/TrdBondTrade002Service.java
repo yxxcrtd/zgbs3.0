@@ -8,6 +8,7 @@ import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 import com.joyintech.tams.valuation.common.interf.base.dto.AssetDealInfoValCommonResult;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.sec.SecVestAssetDealTemplateRecService;
@@ -155,7 +156,9 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTradeDto>
         }else{
             valSecVestAssetDeal.setMyAcctNo(trdBondTradeDto.getMyAcctNo());
         }
-//        valSecVestAssetDeal.setCounterAcctNo(valSecVestAssetDeal.getMyAcctNo());
+
+        //设置数据来源：画面录入
+        valSecVestAssetDeal.setDataSource(DictCodeListExt1.生成方式_画面录入.getValue());
 
         listValSecVestAssetDeal.add(valSecVestAssetDeal);
 

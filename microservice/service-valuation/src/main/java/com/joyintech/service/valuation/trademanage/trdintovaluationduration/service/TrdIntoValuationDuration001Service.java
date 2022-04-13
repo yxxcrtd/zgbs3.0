@@ -117,35 +117,6 @@ public class TrdIntoValuationDuration001Service extends CommonExportService<TrdI
     private InterfCommonService interfCommonService;
 
     /**
-     * 产品代码下拉框
-     * @auther: Administrator
-     * @date: 2021/12/29 16:47
-     * @param:
-     * @return:
-     */
-    public Page<SelectOptionDto> findPortfolioId(int page, int length,Map<String, Object> params) {
-        return this.queryForPageForSelectReturn(page, length, ()->trdIntoValuationDuration001Mapper.findPortfolioId(params));
-    }
-
-    //资产代码下拉框
-    public Page<SelectOptionDto> findFinprodId(int page, int length,Map<String, Object> params){
-        return this.queryForPageForSelectReturn(page, length, ()->trdIntoValuationDuration001Mapper.findFinprodId(params));
-    }
-
-
-    /**
-     *
-     * 工作流完结之后的操作
-     * <功能详细描述>
-     * @param entity 实体
-     * @see
-     * @since 1.0
-     */
-    public void doComplete(TrdIntoValuationDuration001Dto entity) {
-
-    }
-
-    /**
      *
      * 获取分页查询结果（sharesId  dealDateString）
      * <功能详细描述>
@@ -157,21 +128,19 @@ public class TrdIntoValuationDuration001Service extends CommonExportService<TrdI
      */
     public Page<TrdIntoValuationDuration001Dto> selectForPage(int page, int length, Map<String, Object> pageParam) throws Exception {
         //产品代码
-        String portfolioId = (String)pageParam.get("portfolioId");
-        String[] portfolioIdArr = null;
-        if(StringUtil.isNotEmpty(portfolioId)){
-            portfolioIdArr = portfolioId.split(",");
+        String finprodId = (String)pageParam.get("finprodId");
+        String[] finprodIdArr = null;
+        if(StringUtil.isNotEmpty(finprodId)){
+            finprodIdArr = finprodId.split(",");
         }
-        pageParam.put("portfolioIdArr", portfolioIdArr);
-
+        pageParam.put("finprodIdArr", finprodIdArr);
         //资产代码
-        String finprodMarketId = (String)pageParam.get("finprodMarketId");
-        String[] finprodMarketIdArr = null;
-        if(StringUtil.isNotEmpty(finprodMarketId)){
-            finprodMarketIdArr = finprodMarketId.split(",");
+        String asset = (String)pageParam.get("asset");
+        String[] assetIdArr = null;
+        if(StringUtil.isNotEmpty(asset)){
+            assetIdArr = asset.split(",");
         }
-        pageParam.put("finprodMarketIdArr", finprodMarketIdArr);
-
+        pageParam.put("assetIdArr", assetIdArr);
         // 获取交易方向
         String ps = (String)pageParam.get("ps");
         // 交易方向多选，转为数组
@@ -189,9 +158,7 @@ public class TrdIntoValuationDuration001Service extends CommonExportService<TrdI
 
         return this.queryForPage(page, length,
                 () -> trdIntoValuationDuration001Mapper.selectDeal(pageParam));
-
     }
-
 
     /**
      *
@@ -199,24 +166,20 @@ public class TrdIntoValuationDuration001Service extends CommonExportService<TrdI
      * <功能详细描述>
      */
     public List<TrdIntoValuationDuration001Dto> queryPageList(Map<String, Object> params)  {
-
         //产品代码
-        String portfolioId = (String)params.get("portfolioId");
-        String[] portfolioIdArr = null;
-        if(StringUtil.isNotEmpty(portfolioId)){
-            portfolioIdArr = portfolioId.split(",");
+        String finprodId = (String)params.get("finprodId");
+        String[] finprodIdArr = null;
+        if(StringUtil.isNotEmpty(finprodId)){
+            finprodIdArr = finprodId.split(",");
         }
-        params.put("portfolioIdArr", portfolioIdArr);
-
-
-        //资产代码多选
-        String finprodMarketId=(String)params.get("finprodMarketId");
-        String[] finprodMarketIdArr=null;
-        if(StringUtil.isNotEmpty(finprodMarketId)){
-            finprodMarketIdArr = finprodMarketId.split(",");
+        params.put("finprodIdArr", finprodIdArr);
+        //资产代码
+        String asset = (String)params.get("asset");
+        String[] assetIdArr = null;
+        if(StringUtil.isNotEmpty(asset)){
+            assetIdArr = asset.split(",");
         }
-        params.put("finprodMarketIdArr", finprodMarketIdArr);
-
+        params.put("assetIdArr", assetIdArr);
         // 获取交易方向
         String ps = (String)params.get("ps");
         // 交易方向多选，转为数组
@@ -234,8 +197,6 @@ public class TrdIntoValuationDuration001Service extends CommonExportService<TrdI
 
         return trdIntoValuationDuration001Mapper.selectDeal(params);
     }
-
-
 
     /**
      * 策略代码生成
@@ -283,7 +244,7 @@ public class TrdIntoValuationDuration001Service extends CommonExportService<TrdI
     public int delete(TrdIntoValuationDuration001Dto dto) {
         int count=0;
         Map<String, Object> params = new HashMap<>();
-        params.put("booksetId",dto.getPortfolioId());   //产品代码
+        params.put("booksetId",dto.getProdId());   //产品代码
         params.put("tradeId",dto.getTradeId());
 
         List<TrdProductDeal> listDeal = new ArrayList<>();
@@ -292,21 +253,17 @@ public class TrdIntoValuationDuration001Service extends CommonExportService<TrdI
         listDeal.add(entity);
         // 1.估值核算交易扩展表 TRD_PRODUCT_DEAL_ADD
         count += valCommonBatchMapper.delProductDealExtByTradeId(listDeal);
-        // 2.交易费用明细表 TRD_TRADE_FEE_DETAIL
-        count += valCommonBatchMapper.delTradeFeeDetailByTradeId(listDeal);
-        // 3.入账账务明细表 BOK_DEAL_ACCOUNTING_DETAIL
+        // 2.入账账务明细表 BOK_DEAL_ACCOUNTING_DETAIL
         count += valCommonBatchMapper.delDealAccountingDetailByTradeId(listDeal);
-        // 4.入账信息表 BOK_DEAL_ACCOUNTING
+        // 3.入账信息表 BOK_DEAL_ACCOUNTING
         count += valCommonBatchMapper.delDealAccountingByTradeId(listDeal);
-        // 5.结算指令扩展表 STL_ORDERS_EXT
+        // 4.结算指令扩展表 STL_ORDERS_EXT
         count += valCommonBatchMapper.delOrdersExtByTradeId(listDeal);
-        // 6.结算指令表 STL_ORDERS
+        // 5.结算指令表 STL_ORDERS
         count += valCommonBatchMapper.delOrdersByTradeId(listDeal);
-        // 7.金融产品交易 TRD_PRODUCT_DEAL
+        // 6.金融产品交易 TRD_PRODUCT_DEAL
         count += valCommonBatchMapper.delProductDealByTradeId(listDeal);
-        // 8.金融产品实物交易 TRD_FIN_PRODUCT_BARTER
-        count += valCommonBatchMapper.delTrdFinProductBarterByTradeId(listDeal);
-        // 9.账务明细代码表 BOK_DETAIL_ID
+        // 7.账务明细代码表 BOK_DETAIL_ID
         count += trdBondTradeMapper.delBokDetailIdByTradeId(params);
 
         return count;
@@ -503,7 +460,7 @@ public class TrdIntoValuationDuration001Service extends CommonExportService<TrdI
 
     public int update(TrdIntoValuationDurationResult dto){
         TrdIntoValuationDuration001Dto dto1 = new TrdIntoValuationDuration001Dto();
-        dto1.setPortfolioId(dto.getTrdIntoValuationDuration001Dto().getPortfolioId());
+        dto1.setProdId(dto.getTrdIntoValuationDuration001Dto().getProdId());
         dto1.setTradeId(dto.getTrdIntoValuationDuration001Dto().getTradeId());
         delete(dto1);
         return insert(dto);

@@ -322,6 +322,11 @@ public class ValSecVestAssetDeal extends BaseEntity {
      * 外部成交编号
      */
     private String outTradeId;
+
+    /**
+     * 数据来源
+     */
+    private String dataSource;
     /*add by sunshuaishuai 20220325 end*/
 
     /**
@@ -1254,6 +1259,14 @@ public class ValSecVestAssetDeal extends BaseEntity {
      */
     public void setOutTradeId(String outTradeId) {
         this.outTradeId = outTradeId == null ? null : outTradeId.trim();
+    }
+
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
     }
     /*add by sunshuaishuai 20220325 end*/
 }

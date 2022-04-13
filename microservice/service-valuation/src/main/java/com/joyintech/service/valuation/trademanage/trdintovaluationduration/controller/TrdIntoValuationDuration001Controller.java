@@ -40,47 +40,6 @@ public class TrdIntoValuationDuration001Controller extends BaseController {
     private TrdIntoValuationDuration001Service trdIntoValuationDuration001Service;
 
     /**
-     * 产品代码下拉框
-     *
-     * @return 返回的数据
-     * @exception Exception
-     *                异常
-     * @since 1.0
-     */
-    @PostMapping("findPortfolioId/{page}/{length}")
-    public Page<SelectOptionDto> findPortfolioId(@RequestBody Map<String,Object> map,
-                                           @PathVariable("page") int page, @PathVariable("length") int length) {
-        return trdIntoValuationDuration001Service.findPortfolioId(page,length,map);
-    }
-
-    /**
-     * 资产代码下拉框
-     */
-    @PostMapping("findFinprodId/{page}/{length}")
-    public Page<SelectOptionDto> findFinprodId(@RequestBody Map<String,Object> map,
-                                               @PathVariable("page") int page, @PathVariable("length") int length) {
-        return trdIntoValuationDuration001Service.findFinprodId(page,length,map);
-    }
-
-
-
-    /**
-     * 回调函数 操作具体 new delete update <功能详细描述>
-     *
-     * @see
-     * @since 1.0
-     */
-    @Transactional
-    @DTXTransaction
-    @PostMapping("/doComplete/{type}")
-    public void doComplete(@RequestBody TrdIntoValuationDuration001Dto dto, @PathVariable("type") String type) {
-        dto.setOperateType(type);
-        trdIntoValuationDuration001Service.doComplete(dto);
-    }
-
-
-
-    /**
      * 策略代码生成
      * @see
      * @since 1.0

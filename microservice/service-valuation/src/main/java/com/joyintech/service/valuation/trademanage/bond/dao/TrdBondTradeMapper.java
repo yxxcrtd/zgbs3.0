@@ -51,6 +51,6 @@ public interface TrdBondTradeMapper {
 
     int querySequences();
 
-    TrdBondTradeDto queryTradeInfoByTradeId(String tradeId);
+    TrdBondTradeDto queryTradeInfoByTradeId(Map<String, Object> param);
 
 }

@@ -161,6 +161,19 @@ public class ValBatchLog001Dto extends BaseEntity implements ITableRow {
      */
     private String filePath;
 
+    /**
+     * 详情日志主键
+     */
+    private String exeSeqno;
+
+    public String getExeSeqno() {
+        return exeSeqno;
+    }
+
+    public void setExeSeqno(String exeSeqno) {
+        this.exeSeqno = exeSeqno;
+    }
+
     public String getBooksetId() {
         return booksetId;
     }
