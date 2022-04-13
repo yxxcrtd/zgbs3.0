@@ -991,7 +991,7 @@ public class StlDataDealSzdJsmxProcessService {
 					        // 回购利息
 							// settleTransData.setmIntAmt(new BigDecimal(szdJsmx.getQsje()).abs().subtract(new BigDecimal(szdJsmx.getCjsl()).abs()));
 							// 查询首期清算数据
-							List<SettleTransData> sqSettleTransDatas = stlDownDataDealMapper.selectShSqSettleTransDatas(
+							List<SettleTransData> sqSettleTransDatas = stlDownDataDealMapper.selectSqSettleTransDatas(
 									settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId(),
 									settleTransData.getVdate());
 							if(!CollectionUtils.isEmpty(sqSettleTransDatas)){
@@ -1153,7 +1153,8 @@ public class StlDataDealSzdJsmxProcessService {
 						if(DictCodeListExt3.质押券置换_置换方向_换出.getValue().equals(settleTransData.getTradeType())){
 							// 查询首期质押券信息
 							List<SettleTransDataPledge> sqSettleTransDataPledges = stlDownDataDealMapper.selectSqSettleTransDataPledges(
-									settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId());
+									settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId(),
+									settleTransData.getVdate());
 							if(org.apache.commons.collections.CollectionUtils.isNotEmpty(sqSettleTransDataPledges)
 							&& StringUtil.isNotEmpty(sqSettleTransDataPledges.get(0).getPledgeRatio())){
 								settleTransDataPledge.setPledgeRatio(sqSettleTransDataPledges.get(0).getPledgeRatio());
@@ -1161,7 +1162,8 @@ public class StlDataDealSzdJsmxProcessService {
 						}else if(DictCodeListExt3.质押券置换_置换方向_换入.getValue().equals(settleTransData.getTradeType())){
 							// 查询首期清算数据
 							List<SettleTransData> sqSettleTransDatas = stlDownDataDealMapper.selectSqSettleTransDatas(
-									settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId());
+									settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId(),
+									settleTransData.getVdate());
 							if(!CollectionUtils.isEmpty(sqSettleTransDatas)){
 								settleTransDataPledge.setPledgeRatio(ArithmeticUtil.divide(sqSettleTransDatas.get(0).getPrinAmt().abs(),
 										new BigDecimal(szdJsmx.getCjsl()).abs(),2));

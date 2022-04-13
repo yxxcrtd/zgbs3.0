@@ -97,7 +97,12 @@ public class StlSettleTransDataGatherService {
         return stlSettleTransDataGatherMapper.insetSettleTransDataTotalPledge(settleTransDataTotalPledge);
     }
 
+    /**
+     * 深交所协议回购_到期续作查询首期(券商文件中vdate字段为空,所以传null)
+     * @param item
+     * @return
+     */
     public List<SettleTransData> selectSqSettleTransDatas(StlSettleTransDataGatherDto item) {
-        return stlDownDataDealMapper.selectSqSettleTransDatas(item.getfCjbh(), item.getSeatNumber(), item.getSecAcctId());
+        return stlDownDataDealMapper.selectSqSettleTransDatas(item.getfCjbh(), item.getSeatNumber(), item.getSecAcctId(), null);
     }
 }
