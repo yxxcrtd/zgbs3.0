@@ -66,7 +66,8 @@ public class PositionRequestTradeReportService {
     public void sendTradeReportPositionRequest(TrdTempDto trdTempDto) {
         logger.debug("【发送成交回报头寸请求】trdTempDto: {}", JSON.toJSONString(trdTempDto));
         Map<String, Object> resultMap = new HashMap<>();
-        setCommonField(trdTempDto, resultMap);
+        // 设置公共字段
+        this.setCommonField(trdTempDto, resultMap);
         String finprodType = trdTempDto.getFinprodType2();
         String ps = trdTempDto.getPs();
         String type6 = commonPositionEngineService.getType6(trdTempDto.getFinprodId());
@@ -112,24 +113,15 @@ public class PositionRequestTradeReportService {
      */
     private void bond002(TrdTempDto entity, Map<String, Object> resultMap) {
         resultMap.put("interfaceType", INTERF_TYPE_BOND002);
-        EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(entity.getEntrustId());
-        EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entity.getEntrustId());
-        String busiType = commonPositionEngineService.getPositionBusiType(etrEntrust.getFinprodType2(), etrEntrust.getPs(),
-                etrEntrustAdd.getAssetType1());
-        // 业务类型
-        resultMap.put("busiType", busiType);
-        // 业务动作
-        resultMap.put("busiAct", DictCodeListExt3.业务动作_成交回报.getValue());
+        // 交易平台
+        resultMap.put("sharesTradePlatform", this.getSharesTradePlatform(entity, INTERF_TYPE_BOND002));
         resultMap.put("ps", entity.getPs());
         String deliveryType = commonPositionEngineService.getDeliveryType(entity.getFinprodId());
         resultMap.put("settleSpeed", parseSettleSpreed(deliveryType));
         resultMap.put("bidResult", 是否_否.getValue());
         resultMap.put("purchModle", null);
         resultMap.put("tradePlace", entity.getTradeMarket());
-        resultMap.put("sharesTradePlatform", this.getSharesTradePlatform(entity));
         resultMap.put("deliveryType", deliveryType);
-        resultMap.put("decisionAct", DictCodeListExt3.系统动作_新建.getValue());
-        resultMap.put("systemAct", DictCodeListExt3.系统动作_新建.getValue());
         resultMap.put("workFlowId", null);
         resultMap.put("cdate", entity.getTradeDate());
         resultMap.put("ccy", entity.getCcy());
@@ -173,22 +165,14 @@ public class PositionRequestTradeReportService {
      */
     private void bond003(TrdTempDto entity, Map<String, Object> resultMap) {
         resultMap.put("interfaceType", INTERF_TYPE_BOND003);
-        EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(entity.getEntrustId());
-        EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entity.getEntrustId());
-        String busiType = commonPositionEngineService.getPositionBusiType(etrEntrust.getFinprodType2(), etrEntrust.getPs(),
-                etrEntrustAdd.getAssetType1());
-        resultMap.put("busiType", busiType);
-        // 业务动作
-        resultMap.put("busiAct", DictCodeListExt3.业务动作_成交回报.getValue());
+        // 交易平台
+        resultMap.put("sharesTradePlatform", this.getSharesTradePlatform(entity, INTERF_TYPE_BOND003));
         resultMap.put("ps", entity.getPs());
         String deliveryType = commonPositionEngineService.getDeliveryType(entity.getFinprodId());
         resultMap.put("settleSpeed", parseSettleSpreed(deliveryType));
         resultMap.put("purchModle", null);
         resultMap.put("tradePlace", entity.getTradeMarket());
-        resultMap.put("sharesTradePlatform", this.getSharesTradePlatform(entity));
         resultMap.put("deliveryType", deliveryType);
-        resultMap.put("decisionAct", DictCodeListExt3.系统动作_新建.getValue());
-        resultMap.put("systemAct", DictCodeListExt3.系统动作_新建.getValue());
         resultMap.put("workFlowId", null);
         resultMap.put("cdate", entity.getSettleDate());
         resultMap.put("ccy", entity.getCcy());
@@ -238,20 +222,11 @@ public class PositionRequestTradeReportService {
      */
     private void repo003(TrdTempDto entity, Map<String, Object> resultMap) {
         resultMap.put("interfaceType", INTERF_TYPE_REPO003);
-        EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(entity.getEntrustId());
-        EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entity.getEntrustId());
-        String busiType = commonPositionEngineService.getPositionBusiType(etrEntrust.getFinprodType2(), etrEntrust.getPs(),
-                etrEntrustAdd.getAssetType1());
-        resultMap.put("busiType", busiType);
-        // 业务动作
-        resultMap.put("busiAct", DictCodeListExt3.业务动作_成交回报.getValue());
         resultMap.put("ps", entity.getPs());
         resultMap.put("tradePlace", entity.getTradeMarket());
         resultMap.put("settleSpeed", null);
         resultMap.put("sharesTradePlatform", null);
         resultMap.put("deliveryType", null);
-        resultMap.put("decisionAct", DictCodeListExt3.系统动作_新建.getValue());
-        resultMap.put("systemAct", DictCodeListExt3.系统动作_新建.getValue());
         resultMap.put("workFlowId", null);
         resultMap.put("cdate", entity.getTradeDate());
         resultMap.put("ccy", entity.getCcy());
@@ -321,12 +296,6 @@ public class PositionRequestTradeReportService {
     private void repo002(TrdTempDto entity, Map<String, Object> resultMap) {
         resultMap.put("interfaceType", INTERF_TYPE_REPO002);
         EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(entity.getEntrustId());
-        EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entity.getEntrustId());
-        String busiType = commonPositionEngineService.getPositionBusiType(etrEntrust.getFinprodType2(), etrEntrust.getPs(),
-                etrEntrustAdd.getAssetType1());
-        resultMap.put("busiType", busiType);
-        // 业务动作
-        resultMap.put("busiAct", DictCodeListExt3.业务动作_成交回报.getValue());
         // ZGTFCP-1644:协议回购新头寸交易方向通过资产类型判断 modify by fuyongsheng 20220323 start
         if(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(etrEntrust.getFinprodType2())){
             resultMap.put("ps", DictCodeListExt3.交易方向_正回购.getValue());
@@ -338,8 +307,6 @@ public class PositionRequestTradeReportService {
         resultMap.put("settleSpeed", null);
         resultMap.put("sharesTradePlatform", null);
         resultMap.put("deliveryType", null);
-        resultMap.put("decisionAct", DictCodeListExt3.系统动作_新建.getValue());
-        resultMap.put("systemAct", DictCodeListExt3.系统动作_新建.getValue());
         resultMap.put("workFlowId", null);
         resultMap.put("cdate", entity.getTradeDate());
         resultMap.put("ccy", entity.getCcy());
@@ -504,20 +471,12 @@ public class PositionRequestTradeReportService {
      */
     private void fund002(TrdTempDto entity, Map<String, Object> resultMap) {
         resultMap.put("interfaceType", INTERF_TYPE_FUND002);
-        EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(entity.getEntrustId());
-        EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entity.getEntrustId());
-        String busiType = commonPositionEngineService.getPositionBusiType(etrEntrust.getFinprodType2(), etrEntrust.getPs(),
-                etrEntrustAdd.getAssetType1());
-        resultMap.put("busiType", busiType);
-        // 业务动作
-        resultMap.put("busiAct", DictCodeListExt3.业务动作_成交回报.getValue());
+        // 交易平台
+        resultMap.put("sharesTradePlatform", this.getSharesTradePlatform(entity, INTERF_TYPE_FUND002));
         resultMap.put("ps", entity.getPs());
         resultMap.put("settleSpeed", null);
         resultMap.put("tradePlace", entity.getTradeMarket());
-        resultMap.put("sharesTradePlatform", this.getSharesTradePlatform(entity));
         resultMap.put("deliveryType", null);
-        resultMap.put("decisionAct", DictCodeListExt3.系统动作_新建.getValue());
-        resultMap.put("systemAct", DictCodeListExt3.系统动作_新建.getValue());
         resultMap.put("workFlowId", null);
         resultMap.put("sameDayTurn", 是否_否.getValue());
         resultMap.put("ETFRedemptionMethod", null);
@@ -556,19 +515,11 @@ public class PositionRequestTradeReportService {
      */
     private void stock001(TrdTempDto entity, Map<String, Object> resultMap) {
         resultMap.put("interfaceType", INTERF_TYPE_STOCK001);
-        EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(entity.getEntrustId());
-        EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entity.getEntrustId());
-        String busiType = commonPositionEngineService.getPositionBusiType(etrEntrust.getFinprodType2(), etrEntrust.getPs(),
-                etrEntrustAdd.getAssetType1());
-        resultMap.put("busiType", busiType);
-        // 业务动作
-        resultMap.put("busiAct", DictCodeListExt3.业务动作_成交回报.getValue());
+        // 交易平台
+        resultMap.put("sharesTradePlatform", this.getSharesTradePlatform(entity, INTERF_TYPE_STOCK001));
         resultMap.put("ps", entity.getPs());
         resultMap.put("tradePlace", entity.getTradeMarket());
         resultMap.put("settleSpeed", null);
-        resultMap.put("sharesTradePlatform", this.getSharesTradePlatform(entity));
-        resultMap.put("decisionAct", DictCodeListExt3.系统动作_新建.getValue());
-        resultMap.put("systemAct", DictCodeListExt3.系统动作_新建.getValue());
         resultMap.put("workFlowId", null);
         resultMap.put("cdate", entity.getTradeDate());
         resultMap.put("ccy", entity.getCcy());
@@ -655,23 +606,15 @@ public class PositionRequestTradeReportService {
         return null;
     }
 
-    private String getSharesTradePlatform(TrdTempDto entity){
-        EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entity.getEntrustId());
-        if((DictCodeList.交易平台_大宗交易平台.getValue().equals(entity.getTradePlat())
-                ||DictCodeList.交易平台_综合协议交易平台.getValue().equals(entity.getTradePlat()))
-                &&(DictCodeList.交易方向_买入.getValue().equals(entity.getPs())
-                ||DictCodeList.交易方向_卖出.getValue().equals(entity.getPs()))
-                &&(DictCodeListExt3.申报类型_意向申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_定价申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_点击成交申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_成交申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_日均价固定价格申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_收盘价固定价格申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_不指定.getValue().equals(etrEntrustAdd.getDealMode()))){
-            return DictCodeList.交易平台_大宗交易平台.getValue();
-        }else {
-            return DictCodeList.交易平台_竞价撮合平台.getValue();
-        }
+    /**
+     * 获取交易平台
+     * @param entity
+     * @param interfaceType
+     * @return
+     */
+    private String getSharesTradePlatform(TrdTempDto entity, String interfaceType){
+        return commonPositionEngineService.getExchangeTradePlatform(entity.getEntrustId(), entity.getTradePlat(),
+                entity.getPs(), entity.getFinprodId(), interfaceType);
     }
 
     /**
@@ -687,6 +630,16 @@ public class PositionRequestTradeReportService {
         resultMap.put("balanceCheck", "N");
         resultMap.put("flowStatus", DictCodeListExt3.流程节点_审批生效.getValue());
         resultMap.put("modelType", DictCodeListExt1.子系统代码_交易.getValue());
+        EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(entity.getEntrustId());
+        EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entity.getEntrustId());
+        String busiType = commonPositionEngineService.getPositionBusiType(etrEntrust.getFinprodType2(), etrEntrust.getPs(),
+                etrEntrustAdd.getAssetType1());
+        // 业务类型
+        resultMap.put("busiType", busiType);
+        // 业务动作
+        resultMap.put("busiAct", DictCodeListExt3.业务动作_成交回报.getValue());
+        resultMap.put("decisionAct", DictCodeListExt3.系统动作_新建.getValue());
+        resultMap.put("systemAct", DictCodeListExt3.系统动作_新建.getValue());
     }
 
     /**

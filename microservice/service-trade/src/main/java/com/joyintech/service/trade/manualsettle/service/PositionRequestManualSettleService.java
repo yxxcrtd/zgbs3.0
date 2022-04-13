@@ -5,6 +5,7 @@ import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.service.trade.entrustmsgbymq.dto.TrdTempDto;
 import com.joyintech.service.trade.manualsettle.dao.ManualSettleMapper;
 import com.joyintech.service.trade.manualsettle.dto.ManualSettleDto;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
@@ -69,15 +70,6 @@ public class PositionRequestManualSettleService {
         Map<String, Object> resultMap = new HashMap<>();
         setCommonField(entity, resultMap);
         String finprodType = entity.getFinprodType2();
-//        if(!entity.getBusiType().equals("01")&&!entity.getBusiType().equals("02")&&!entity.getBusiType().equals("03")&&!entity.getBusiType().equals("04")){
-//            finprodType = DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue();
-//        }else {
-//            finprodType = DictCodeListExt1.金融产品类型_投管用_债券.getValue();
-//            String type6 = commonPositionEngineService.getType6(entity.getFinprodId());
-//            if (DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue().equals(type6)) {
-//                finprodType += "-" + type6;
-//            }
-//        }
         String type6 = commonPositionEngineService.getType6(entity.getFinprodId());
         if (DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue().equals(type6)
                 // ZGTFCP-1372:增加债券资产类型条件 modify by fuyongsheng 20220319 start
@@ -146,21 +138,8 @@ public class PositionRequestManualSettleService {
         resultMap.put("bidResult", 是否_否.getValue());
         resultMap.put("purchModle", null);
         resultMap.put("tradePlace", entity.getTradeMarket());
-        if((DictCodeList.交易平台_大宗交易平台.getValue().equals(entity.getTradePlat())
-                ||DictCodeList.交易平台_综合协议交易平台.getValue().equals(entity.getTradePlat()))
-                &&(DictCodeList.交易方向_买入.getValue().equals(trdProductTempDeal.getPs())
-                ||DictCodeList.交易方向_卖出.getValue().equals(trdProductTempDeal.getPs()))
-                &&(DictCodeListExt3.申报类型_意向申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_定价申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_点击成交申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_成交申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_日均价固定价格申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_收盘价固定价格申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_不指定.getValue().equals(etrEntrustAdd.getDealMode()))){
-            resultMap.put("sharesTradePlatform", DictCodeList.交易平台_大宗交易平台.getValue());
-        }else {
-            resultMap.put("sharesTradePlatform", DictCodeList.交易平台_竞价撮合平台.getValue());
-        }
+        // 交易平台
+        resultMap.put("sharesTradePlatform", this.getSharesTradePlatform(entity, trdProductTempDeal.getPs(), INTERF_TYPE_BOND002));
         resultMap.put("deliveryType", deliveryType);
         resultMap.put("decisionAct", DictCodeListExt3.系统动作_新建.getValue());
         resultMap.put("systemAct", DictCodeListExt3.系统动作_新建.getValue());
@@ -237,21 +216,8 @@ public class PositionRequestManualSettleService {
         resultMap.put("settleSpeed", parseSettleSpreed(deliveryType));
         resultMap.put("purchModle", null);
         resultMap.put("tradePlace", entity.getTradeMarket());
-        if((DictCodeList.交易平台_大宗交易平台.getValue().equals(entity.getTradePlat())
-                ||DictCodeList.交易平台_综合协议交易平台.getValue().equals(entity.getTradePlat()))
-                &&(DictCodeList.交易方向_买入.getValue().equals(trdProductTempDeal.getPs())
-                ||DictCodeList.交易方向_卖出.getValue().equals(trdProductTempDeal.getPs()))
-                &&(DictCodeListExt3.申报类型_意向申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_定价申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_点击成交申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_成交申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_日均价固定价格申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_收盘价固定价格申报.getValue().equals(etrEntrustAdd.getDealMode())
-                ||DictCodeListExt3.申报类型_不指定.getValue().equals(etrEntrustAdd.getDealMode()))){
-            resultMap.put("sharesTradePlatform", DictCodeList.交易平台_大宗交易平台.getValue());
-        }else {
-            resultMap.put("sharesTradePlatform", DictCodeList.交易平台_竞价撮合平台.getValue());
-        }
+        // 交易平台
+        resultMap.put("sharesTradePlatform", this.getSharesTradePlatform(entity, trdProductTempDeal.getPs(), INTERF_TYPE_BOND003));
         resultMap.put("deliveryType", deliveryType);
         resultMap.put("decisionAct", DictCodeListExt3.系统动作_新建.getValue());
         resultMap.put("systemAct", DictCodeListExt3.系统动作_新建.getValue());
@@ -577,4 +543,17 @@ public class PositionRequestManualSettleService {
         finTradeProductKey.setBranch(0L);
         return finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
     }
+
+    /**
+     * 获取交易平台
+     * @param entity
+     * @param ps
+     * @param interfaceType
+     * @return
+     */
+    private String getSharesTradePlatform(ManualSettleDto entity, String ps, String interfaceType){
+        return commonPositionEngineService.getExchangeTradePlatform(entity.getEntrustNo(),
+                entity.getTradePlat(), ps, entity.getFinprodId(), interfaceType);
+    }
+
 }

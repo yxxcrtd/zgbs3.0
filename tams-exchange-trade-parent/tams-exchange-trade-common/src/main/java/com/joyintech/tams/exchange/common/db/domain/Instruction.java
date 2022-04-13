@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.common.db.domain;
 
+import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.tams.exchange.common.bean.instrument.MinPriceAndMinTrdUnitLimitBean;
@@ -1237,5 +1238,10 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
         } catch (CloneNotSupportedException e) {
             return null;
         }
+    }
+
+    @Override
+    public String toString() {
+        return JSONUtil.toJsonStr(this);
     }
 }

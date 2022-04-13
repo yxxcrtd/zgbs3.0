@@ -92,6 +92,12 @@ public enum EntrustProp {
     AGREED_REPURCHASE_BUYBACK_SMALL("约定购回零碎股购回", "RNL"),
     AGREED_REPURCHASE_BUYBACK_WARRANT("约定购回配股权证购回", "RNP"),
     AGREED_REPURCHASE_BUYBACK("约定购回购回交易", "RNR"),
+    
+    //新债改造
+//  	XZ_PPCJ_XD("匹配成交下单", "0"),//重复了，使用原有的
+  	SZ_XSCJ_XD("协商成交下单", "FI9-1"),
+  	SZ_XSCJ_JS("协商成交接受", "FI9-2"),
+  	SZ_XSCJ_JJ("协商成交拒绝", "FI9-3"),
 
     //期货市价
     FTDC_OPT_ANYPRICE("任意价", "FU1"),

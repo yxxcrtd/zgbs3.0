@@ -270,8 +270,17 @@ public class EntrustUtils {
         } else if (bsFlag.equals(BSFlag.ZYJCJSBMR.value) || bsFlag.equals(BSFlag.ZYJCJSBMC.value)
                 || bsFlag.equals(BSFlag.ZYJCJSBMR.kdValue) || bsFlag.equals(BSFlag.ZYJCJSBMC.kdValue)) {
             return EntrustProp.SH_FIXEDINCOME_ZYJCJSB.value;
-        } else if ("9B".equals(bsFlag) || "9S".equals(bsFlag)) // 针对平安质押式回购：正回购为9B，逆回购为9S
+        } else if ("9B".equals(bsFlag) || "9S".equals(bsFlag)) { // 针对平安质押式回购：正回购为9B，逆回购为9S
             return EntrustProp.NORMAL.value;
+        } else if (bsFlag.equals(BSFlag.PPCJMR.value) || bsFlag.equals(BSFlag.PPCJMC.value)) {
+            return EntrustProp.NORMAL.value;
+        } else if (bsFlag.equals(BSFlag.XSCJSBMR.value) || bsFlag.equals(BSFlag.XSCJSBMC.value)) {
+            return EntrustProp.SZ_XSCJ_XD.value;
+        } else if (bsFlag.equals(BSFlag.XSCJHFJSMR.value) || bsFlag.equals(BSFlag.XSCJHFJSMC.value)) {
+            return EntrustProp.SZ_XSCJ_JS.value;
+        } else if (bsFlag.equals(BSFlag.XSCJHFJJMR.value) || bsFlag.equals(BSFlag.XSCJHFJJMC.value)) {
+            return EntrustProp.SZ_XSCJ_JJ.value;
+        }
         return EntrustProp.NORMAL.value;
     }
 
@@ -378,6 +387,18 @@ public class EntrustUtils {
             return BSFlag.PHDJDZMR.value;
         } else if (entrustProp.equals(EntrustProp.LARGE_AFTER_CLOSING_WEIGHT_PRICE.value) && entrustBs.equals(EntrustBs.SELL.value)) {
             return BSFlag.PHDJDZMC.value;
+        } else if (entrustProp.equals(EntrustProp.SZ_XSCJ_XD.value) && entrustBs.equals(EntrustBs.BUY.value)) {
+            return BSFlag.XSCJSBMR.value;
+        } else if (entrustProp.equals(EntrustProp.SZ_XSCJ_XD.value) && entrustBs.equals(EntrustBs.SELL.value)) {
+            return BSFlag.XSCJSBMC.value;
+        } else if (entrustProp.equals(EntrustProp.SZ_XSCJ_JS.value) && entrustBs.equals(EntrustBs.BUY.value)) {
+            return BSFlag.XSCJHFJSMR.value;
+        } else if (entrustProp.equals(EntrustProp.SZ_XSCJ_JS.value) && entrustBs.equals(EntrustBs.SELL.value)) {
+            return BSFlag.XSCJHFJSMC.value;
+        } else if (entrustProp.equals(EntrustProp.SZ_XSCJ_JJ.value) && entrustBs.equals(EntrustBs.BUY.value)) {
+            return BSFlag.XSCJHFJJMR.value;
+        } else if (entrustProp.equals(EntrustProp.SZ_XSCJ_JJ.value) && entrustBs.equals(EntrustBs.SELL.value)) {
+            return BSFlag.XSCJHFJJMC.value;
         }
         return BSFlag.ZQMR.value;
     }
@@ -437,8 +458,14 @@ public class EntrustUtils {
             return getBsFlagForETF(entrustBs, deliveryMethod, instrument.getMarket(), instrument.getEtfType());
         }
         if (entrustProp.equals(EntrustProp.NORMAL.value) && entrustBs.equals(EntrustBs.BUY.value)) {
+        	if(InvestmentAssetType.isBond(assetType) && !Objects.isNull(instrument) && !"B14".equals(instrument.getAssetType1())) {
+        		return BSFlag.PPCJMR.value;
+        	}
             return BSFlag.ZQMR.value;
         } else if (entrustProp.equals(EntrustProp.NORMAL.value) && entrustBs.equals(EntrustBs.SELL.value)) {
+        	if(InvestmentAssetType.isBond(assetType) && !Objects.isNull(instrument) && !"B14".equals(instrument.getAssetType1())) {
+        		return BSFlag.PPCJMC.value;
+        	}
             return BSFlag.ZQMC.value;
         } else if (entrustProp.equals(EntrustProp.IMMEDIATE_TO_CANCEL.value) && entrustBs.equals(EntrustBs.BUY.value)) {
             return BSFlag.JSMR.value;
