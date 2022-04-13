@@ -1016,10 +1016,209 @@ values ('02', 'QY', '403', 'QFZQBJ', 'system', null, sysdate, 'system', sysdate)
 insert into bok_match_rlat (MATCH_TYPE, ACCT_STANDARD, SOURCE, TARGET, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('02', 'QY', '403', 'QSZQBJ', 'system', null, sysdate, 'system', sysdate);
 --------------------------------add by weipeng on 20220329 : 债券借贷计提批处理匹配关系表科目性质变更 end---------------------------------------
-
+--增加模板账套
 delete from BOK_BOOKSET BB where BB.BOOKSET_ID='SUBJECT_INTERNAL_001';
 insert into BOK_BOOKSET (BOOKSET_ID, BOOKSET_NAME, BOOKSET_FULLNAME, BOOKSET_TYPE, ACCT_MODE, BOK_SPEC_MODE, ACCT_SUBJECT_ID, ACCT_SUBJECT_TYPE, STANDARD_CCY, BOOKSET_ID_TMPL, ACCT_STANDARD, START_DATE, END_DATE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('SUBJECT_INTERNAL_001', '辅助核算默认账套模板', '辅助核算默认账套模板', '01', null, null, null, null, 'CNY', 'SUBJECT_INTERNAL_001', 'QY', sysdate, sysdate, 'system', null, sysdate, 'system', sysdate);
+
+--增加账套参数表模板数据
+DELETE FROM bok_bookset_ext WHERE BOOKSET_ID ='SUBJECT_INTERNAL_001';
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'AFT_EXP_IS_CAL', 'N', '资产到期之后是否计提减值', 'Y：是 N：否（默认N否）', 'system', null, SYSDATE, 'system', SYSDATE, '07');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'AMORTIZE_RULE', 'Y', '摊销额小于剩余摊销时是否只摊销到0', '摊销额小于剩余摊销时是否只摊销到0', 'system', null, SYSDATE, 'system', SYSDATE, null);
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'ANAPLEROTIC_RULE', '04', '回补规则', '01：使用固定管理费回补 02：使用浮动管理费回补 03：优先使用浮动管理费回补 04：强制回补', 'system', null, SYSDATE, 'system', SYSDATE, '02');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'ANAPLEROTIC_TYPE', '02', '回补方式', '01：手动回补 02：自动回补', 'system', null, SYSDATE, 'system', SYSDATE, '02');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'BCCYADJ_TYPE', '01', '本位币差额处理方式：01 利息收入  02 减值准备', null, 'system', null, SYSDATE, 'system', SYSDATE, '07');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'BOND_LENDING_DEAL_FEE_SUBJECT', '02', '债券借贷费用损益计入方式', '01:计入投资收益,02:计入费用支出 ', 'system', null, SYSDATE, 'system', SYSDATE, '01');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'BONUS_TAIL_MODE', '01', '分红尾差处理方式', '货币型产品分红尾差处理方式：01:无需处理 02:确认为当期损益；理财产品的分红：01无需处理，则分红记账按照交易金额入账，02：冲减前一日应付利润余额', 'system', null, SYSDATE, 'system', SYSDATE, '03');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'CARRYOVER_CYCLE', 'D', '损益科目结转频率', '数据字段：损益结转频率，枚举值D:日 M：月  Y:年', 'system', null, SYSDATE, 'system', SYSDATE, '03');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'DAY7_YEILD_DEC_DIGITS', '4', '7日年化收益率小数位数_估值表展示', '估值表指标：7日年化收益率', 'system', null, SYSDATE, 'system', SYSDATE, '05');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'DAY7_YEILD_DEC_TYPE', '01', '7日年化收益率小数尾数_估值表展示', '估值舍入规则: 01、进位 02、舍位 03、四舍五入 ', 'system', null, SYSDATE, 'system', SYSDATE, '05');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'DELTRIGHT_FAIRVALUE_DIGITS', '2', '债权类资产公允价值变动计算过程小数位', null, 'system', null, SYSDATE, 'system', SYSDATE, '01');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'DEPOSIT_ACCOUT', 'N', '活期存款是否计提', '账户剩余现金是否进行活期利息计提，是否：N:否 Y:是', 'system', null, SYSDATE, 'system', SYSDATE, '01');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'DEPO_ACCR_TYPE', '02', '存款计提方式', '计提方式: 01：区间倒减，02：每日新增；每日新增，最后一日区间倒减', 'system', null, SYSDATE, 'system', SYSDATE, '01');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'DL_ACCR_TYPE', '02', '拆借计提方式', '计提方式: 01：区间倒减，02：每日新增；每日新增，最后一日区间倒减', 'system', null, SYSDATE, 'system', SYSDATE, '01');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'EXCHANGE_CYCLE', 'D', '汇兑损益结转频率', 'D:日 M：月  Y:年；汇兑换算批处理频率', 'system', null, SYSDATE, 'system', SYSDATE, '03');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'FLOAT_CYCLYEAR_YIELD_DIGITS', '-1', '浮动管理费_周期年化收益率小数位数', '保留的小数位数，-1默认为全精度', 'system', null, SYSDATE, 'system', SYSDATE, '02');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'FLOAT_CYCLYEAR_YIELD_TYPE', '03', '浮动管理费_周期年化收益率位数处理方式', '估值舍入规则: 01、进位 02、舍位 03、四舍五入', 'system', null, SYSDATE, 'system', SYSDATE, '02');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'FLOAT_DEC_DIGITS', '6', '浮动管理费_估值小数位', '保留的小数位数，估值表中周期年化收益率显示', 'system', null, SYSDATE, 'system', SYSDATE, '02');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'FLOAT_DEC_TYPE', '03', '浮动管理费_估值小数尾数处理方式', '估值舍入规则: 01、进位 02、舍位 03、四舍五入；估值表中周期年化收益率显示', 'system', null, SYSDATE, 'system', SYSDATE, '02');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'FLOAT_ENDTOTAL_NET_DIGITS', '6', '浮动管理费_期末累计净值小数位数', '保留的小数位数', 'system', null, SYSDATE, 'system', SYSDATE, '02');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'FLOAT_ENDTOTAL_NET_TYPE', '03', '浮动管理费_期末累计净值尾数处理方式', '估值舍入规则: 01、进位 02、舍位 03、四舍五入', 'system', null, SYSDATE, 'system', SYSDATE, '02');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'FLOAT_STARTTOTAL_NET_DIGITS', '6', '浮动管理费_期初累计净值小数位数', '保留的小数位数', 'system', null, SYSDATE, 'system', SYSDATE, '02');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'FLOAT_STARTTOTAL_NET_TYPE', '03', '浮动管理费_期初累计净值尾数处理方式', '估值舍入规则: 01、进位 02、舍位 03、四舍五入', 'system', null, SYSDATE, 'system', SYSDATE, '02');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'FLOAT_STARTTOTAL_UNITNET_DIGITS', '6', '浮动管理费_期初单位净值小数位数', '保留的小数位数', 'system', null, SYSDATE, 'system', SYSDATE, '02');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'FLOAT_STARTTOTAL_UNITNET_TYPE', '03', '浮动管理费_期初单位净值尾数处理方式', '估值舍入规则: 01、进位 02、舍位 03、四舍五入', 'system', null, SYSDATE, 'system', SYSDATE, '02');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'FV_CALCDATE_TYPE', '01', '公允价值变动计提日类型，交易日或交割日', '公允价值变动计提日类型：01：交易日，02：交割日；若交易日与交割日非同一日，公允价值变动损益记账时间', 'system', null, SYSDATE, 'system', SYSDATE, '01');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'IB_C_REP_FEE_EXE_TYPE', '02', '银行间质押式回购费用处理方式', '数据字典：回购费用处理方式：01 不计入成本/02 计入成本；计入成本指的是首期费用金额体现在成本类科目进行摊销考虑，但不支持资产转仓；不计入成本指的首期费用金额体现在损益科目不进行摊销考虑', 'system', null, SYSDATE, 'system', SYSDATE, '02');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'IB_O_REP_FEE_EXE_TYPE', '02', '银行间买断式回购费用处理方式', '数据字典：回购费用处理方式：01 不计入成本/04 计入成本；计入成本指的是首期费用金额体现在成本类科目进行摊销考虑，但不支持资产转仓；不计入成本指的首期费用金额体现在损益科目不进行摊销考虑', 'system', null, SYSDATE, 'system', SYSDATE, '02');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'INT_SHARE_CALC_TYPE', '02', '计提份额占比收息方式', '01:按占比收息；02:不按占比收息', 'system', null, SYSDATE, 'system', SYSDATE, '04');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'INT_TAX_DEDUCT_SUBJECT', '01', '增值税缴纳利息收入备抵科目', '增值税缴纳利息收入备抵科目：01 利息收入增值税备抵；02 投资收益利息收入增值税备抵', 'system', null, SYSDATE, 'system', SYSDATE, '13');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'INVESTMENT_PURPOSE_ACCESS', '01', '投资目的获取方式', '01：上游提供 02：估值方案生成；选择02时候，可以不使用交易界面的投资目的', 'system', null, SYSDATE, 'system', SYSDATE, '04');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'IS_AUTO_DIV_REINVEST', 'Y', '是否自动红利再投', null, 'system', null, SYSDATE, 'system', SYSDATE, null);
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'IS_COMB_SUP_REC', 'N', '补账分录是否合并', '是否：N:否 Y:是，该参数无需客户确认，按照默认值配置', 'system', null, SYSDATE, 'system', SYSDATE, '03');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'IS_COMB_SUP_VOUC', 'N', '补账凭证是否合并', '是否：N:否 Y:是，该参数无需客户确认，按照默认值配置', 'system', null, SYSDATE, 'system', SYSDATE, '03');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'IS_COMB_TRA_VOUC', 'N', '交易凭证是否合并', '是否：N:否 Y:是，该参数无需客户确认，按照默认值配置', 'system', null, SYSDATE, 'system', SYSDATE, '03');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'IS_DIFF_CCY', 'Y', '是否分币核算', '是否：N:否 Y:是', 'system', null, SYSDATE, 'system', SYSDATE, '03');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'IS_ENTIRE', 'N', '批处理是否全量', '是否：N:否 Y:是', 'system', null, SYSDATE, 'system', SYSDATE, '04');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'IS_OFFSETIMPT_SX', 'N', '收息是否冲抵减值准备', 'Y：是 N：否（默认N否）', 'system', null, SYSDATE, 'system', SYSDATE, '07');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'IS_PRD_INT_ACCR', 'Y', '产品是否本系统计提', '是否：N:否 Y:是；收益型产品利息计提是否本系统处理，如果不是本系统计提，可通过上游接入数据，但无账务数据', 'system', null, SYSDATE, 'system', SYSDATE, '03');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'LOSS_P3_SECACCR_SUBJECT_NO', '02', '减值资产第三阶段利息计提摊销差额计入', '01：减值准备 02：原科目（默认02：原科目）', 'system', null, SYSDATE, 'system', SYSDATE, '07');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'LOSS_P3_SECACCR_YEILD_RECALC', '01', '减值资产第三阶段是否重新计算实际利率', '01：不重算 02：重算（默认01：不重算）', 'system', null, SYSDATE, 'system', SYSDATE, '07');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'LOSS_TEST_DATE', '2', '减值测算日', '数字', 'system', null, SYSDATE, 'system', SYSDATE, '07');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'LOSS_TEST_RATE', '05', '减值测算频率', '数据字典 LOSS_TEST_RATE', 'system', null, SYSDATE, 'system', SYSDATE, '07');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'LOSS_TEST_TREAD', 'T01,T02,T03', '触发减值交易类型', '交易类型 数据字典PS,逗号分隔。', 'system', null, SYSDATE, 'system', SYSDATE, '07');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'OFFSETIMPT_DATETYPE', '01', '还本收息冲抵减值准备处理日', '01:理论日？ 02:资金到账日（默认01理论日）', 'system', null, SYSDATE, 'system', SYSDATE, '07');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'OFFSETIMPT_SHELL_TYPE', '02', '卖出冲抵减值准备处理方式（包括债转股、回售、赎回）', '01:数量占比 02：金额占比 03：原金额占比', 'system', null, SYSDATE, 'system', SYSDATE, '07');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'OFFSETIMPT_SX_TYPE', '01', '收息还本冲抵减值准备处理方式', '01:数量占比 02：金额占比 03：原金额占比', 'system', null, SYSDATE, 'system', SYSDATE, '07');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'PAL_CARRYOVER_CYCLE', 'D', '损益平准金结转频率', '数据字段：损益结转频率，枚举值D:日 M：月  Y:年', 'system', null, SYSDATE, 'system', SYSDATE, '03');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'PLAN_ACCR_TYPE', '02', '计划类利率型资产计提方式', '计提方式: 01：区间倒减，02：每日新增；每日新增，最后一日区间倒减', 'system', null, SYSDATE, 'system', SYSDATE, '01');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'PLAN_SUBTRACTION_TYPE', '01', '项目类计提区间倒减方式', '01：倒减科目余额；02：倒减前一日计算结果；指项目类资产计提时，若是区间倒减，可选择倒减形式。计提时候是否考虑交易上的应收利息的影响，部分客户提出该需求', 'system', null, SYSDATE, 'system', SYSDATE, null);
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'PRD_FEE_ACCR_TYPE_C03', '02', '产品费用计提方式_固定管理费', '01：区间倒减，02：每日新增；计费基数不管是资产净值还是存续本金均支持该参数。', 'system', null, SYSDATE, 'system', SYSDATE, '02');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'PRD_FEE_ACCR_TYPE_C04', '02', '净值型产品区间内浮动管理费计提方式', '01:区间结束日一次计提， 02:区间内每日倒减计提；仅支持净值化普通、分档产品', 'system', null, SYSDATE, 'system', SYSDATE, '02');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'PRD_FEE_ACCR_TYPE_C05', '02', '产品费用计提方式_托管费', '01：区间倒减，02：每日新增；计费基数不管是资产净值还是存续本金均支持该参数。', 'system', null, SYSDATE, 'system', SYSDATE, '02');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'PRD_FEE_ACCR_TYPE_C06', '02', '产品费用计提方式_销售费', '01：区间倒减，02：每日新增；计费基数不管是资产净值还是存续本金均支持该参数。', 'system', null, SYSDATE, 'system', SYSDATE, '02');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'PRD_FEE_ACCR_TYPE_C09', '02', '产品费用计提方式_外包服务费', '01：区间倒减，02：每日新增；计费基数不管是资产净值还是存续本金均支持该参数。', 'system', null, SYSDATE, 'system', SYSDATE, '02');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'PRD_FEE_ACCR_TYPE_C10', '02', '产品费用计提方式_代销费', '01：区间倒减，02：每日新增；计费基数不管是资产净值还是存续本金均支持该参数。', 'system', null, SYSDATE, 'system', SYSDATE, '02');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'PRD_FEE_ACCR_TYPE_C18', '02', '产品费用计提方式_投资顾问费', '01：区间倒减，02：每日新增；计费基数不管是资产净值还是存续本金均支持该参数。', 'system', null, SYSDATE, 'system', SYSDATE, '02');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'PRD_INT_ACCR_TYPE', '02', '产品利息计提方式', '01：区间倒减，02：每日新增；收益型产品客户收益计提方式，若选择每日新增，最后一笔不进行区间倒减', 'system', null, SYSDATE, 'system', SYSDATE, '03');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'PYEILD_DEC_DIGITS', '4', '万份收益小数位位数', '保留的小数位数；默认执行为该参数，但是若前台界面要素配置，系统会根据前台要素配置的信息联动调整该账套参数', 'system', null, SYSDATE, 'system', SYSDATE, '05');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'REDAMOFLAG', 'Y', '还本是否冲减摊销', 'Y:是/N:否；若选择N则在资产到期时或者资产全量卖出时候进行冲销，存在行提出该需求', 'system', null, SYSDATE, 'system', SYSDATE, null);
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'REPO_ACCR_TYPE_F02_F03', '02', '回购计提方式_质押式', '计提方式: 01：区间倒减，02：每日新增；每日新增，最后一日区间倒减', 'system', null, SYSDATE, 'system', SYSDATE, '01');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'REPO_ACCR_TYPE_F04_F05', '02', '回购计提方式_买断式', '计提方式: 01：区间倒减，02：每日新增；每日新增，最后一日未处理区间倒减', 'system', null, SYSDATE, 'system', SYSDATE, '01');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'SECLEND_ACCR_TYPE', '02', '债券借贷计提方式', '计提方式: 01：区间倒减，02：每日新增；每日新增，最后一日区间倒减', 'system', null, SYSDATE, 'system', SYSDATE, '01');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'SEC_DEAL_FEE_SUBJECT', '02', '债券交易费用损益计入方式', '对于计入当期损益债券类资产卖出交易，随交易支付的费用损益科目使用哪个科目01:计入投资收益,02:计入费用支出；其他投资目的的其他债券类资产卖出的场景均计入了投资收益', 'system', null, SYSDATE, 'system', SYSDATE, '01');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'SEC_FAIRVALUE_DIGITS', '2', '债券公允价值变动计算过程小数位', null, 'system', null, SYSDATE, 'system', SYSDATE, '01');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'SEC_MPRICE_OBVERSION', '01', '债券市价折算方式', '市价取最近的时候有时间差，中间如果发生券面变化需要折算。01：按占比计算(当前市价=当前市价*估值日债券面值/行情日债券面值) 02：按金额计算 (当前市价=当前市价-(行情日债券面值-估值日债券面值)', 'system', null, SYSDATE, 'system', SYSDATE, '01');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'SETTLEMENT_MODEL', 'A07', '交易所结算模式', 'A07:券商结算 A01:托管结算 A04:结算备付金', 'system', null, SYSDATE, 'system', SYSDATE, '04');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'SHARE_DEC_DIGITS', '2', '份额小数位位数', '保留的小数位数，估值表显示小数位设置', 'system', null, SYSDATE, 'system', SYSDATE, '03');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'SHOW_AFTER_DEC_DIGITS', '4', '产品费后估值小数位数_估值表展示', null, 'system', null, SYSDATE, 'system', SYSDATE, '05');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'SHOW_AFTER_DEC_SUM_DIGITS', '4', '累积万份收益小数位数_估值表展示', '估值表指标：本年累积万份收益、从成立以来累计万份收益', 'system', null, SYSDATE, 'system', SYSDATE, '05');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'SHOW_AFTER_DEC_SUM_TYPE', '03', '累积万份收益小数尾数_估值表展示', '估值表指标：本年累积万份收益、从成立以来累计万份收益', 'system', null, SYSDATE, 'system', SYSDATE, '05');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'SHOW_AFTER_DEC_TYPE', '03', '产品费后估值小数尾数处理方式_估值表展示', null, 'system', null, SYSDATE, 'system', SYSDATE, '05');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'SHOW_BEFORE_DEC_DIGITS', '4', '产品费前估值小数位数_估值表展示', null, 'system', null, SYSDATE, 'system', SYSDATE, '05');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'SHOW_BEFORE_DEC_TYPE', '03', '产品费前估值小数尾数处理方式_估值表展示', null, 'system', null, SYSDATE, 'system', SYSDATE, '05');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'SHOW_CYCLYEAR_YIELD_DIGITS', '4', '周期年化收益率小数位数_估值表展示', null, 'system', null, SYSDATE, 'system', SYSDATE, '05');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'SHOW_CYCLYEAR_YIELD_TYPE', '03', '周期年化收益率小数尾数处理方式_估值表展示', null, 'system', null, SYSDATE, 'system', SYSDATE, '05');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'SHOW_TOTBOUNS_DEC_DIGITS', '4', '累计单位净值小数位数_估值表展示', '估值表指标：产品累计单位净值', 'system', null, SYSDATE, 'system', SYSDATE, '05');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'SHOW_TOTBOUNS_DEC_TYPE', '03', '累计单位净值小数位数_估值表展示', '估值表指标：产品累计单位净值', 'system', null, SYSDATE, 'system', SYSDATE, '05');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'TAX_ACCR_BASE_TYPE_DKYWSR_FS', '01', '当日计税计提基准_贷款业务收入_发生', '01：发生额 02：余额；计算含税销售额的取值逻辑 ', 'system', null, SYSDATE, 'system', SYSDATE, '06');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'TAX_ACCR_BASE_TYPE_DKYWSR_YG', '01', '当日计税计提基准_贷款业务收入_预估', '01：发生额 02：余额；计算含税销售额的取值逻辑  ', 'system', null, SYSDATE, 'system', SYSDATE, '06');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'TAX_ASSET_TYPE_DKYWSR_FS', '01', '证券类型计税方式_贷款业务收入_发生', '01：单资产 03：全资产；算当日单产品的增值税，是按照单资产分别算含税销售额及增值税，进行增值税额汇总，还是按照全资产进行含税销售额汇总后进行增值税额  ', 'system', null, SYSDATE, 'system', SYSDATE, '06');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'TAX_ASSET_TYPE_DKYWSR_YG', '01', '证券类型计税方式_贷款业务收入_预估', '01：单资产 03：全资产；算当日单产品的增值税，是按照单资产分别算含税销售额及增值税，进行增值税额汇总，还是按照全资产进行含税销售额汇总后进行增值税额 ', 'system', null, SYSDATE, 'system', SYSDATE, '06');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'TAX_ASSET_TYPE_JRSPZR_FS', '01', '证券类型计税方式_金融商品转让_发生', '01：单资产 03：全资产；算当日单产品的增值税，是按照单资产分别算含税销售额及增值税，进行增值税额汇总，还是按照全资产进行含税销售额汇总后进行增值税额 ', 'system', null, SYSDATE, 'system', SYSDATE, '06');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'TAX_ASSET_TYPE_JRSPZR_YG', '01', '证券类型计税方式_金融商品转让_预估', '01：单资产 03：全资产；算当日单产品的增值税，是按照单资产分别算含税销售额及增值税，进行增值税额汇总，还是按照全资产进行含税销售额汇总后进行增值税额 ', 'system', null, SYSDATE, 'system', SYSDATE, '06');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'TDY_YEILD_DEC_DIGITS', '4', '本日年化收益率小数位数_估值表展示', '估值表指标：本日年化收益率', 'system', null, SYSDATE, 'system', SYSDATE, '05');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'TDY_YEILD_DEC_TYPE', '01', '本日年化收益率小数尾数_估值表展示', '估值表指标：本日年化收益率', 'system', null, SYSDATE, 'system', SYSDATE, '05');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'TOCAL_ACCR_TYPE', '02', '费用预提计提方式', '01：区间倒减，02：每日新增', 'system', null, SYSDATE, 'system', SYSDATE, null);
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'TRA_C_REP_FEE_EXE_TYPE', '02', '交易所质押式回购费用处理方式', '数据字典：回购费用处理方式：01 不计入成本/03 计入成本；计入成本指的是首期费用金额体现在成本类科目进行摊销考虑，但不支持资产转仓；不计入成本指的首期费用金额体现在损益科目不进行摊销考虑', 'system', null, SYSDATE, 'system', SYSDATE, '02');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'TRA_O_REP_FEE_EXE_TYPE', '02', '交易所买断式回购费用处理方式', '数据字典：回购费用处理方式：01 不计入成本/05 计入成本；计入成本指的是首期费用金额体现在成本类科目进行摊销考虑，但不支持资产转仓；不计入成本指的首期费用金额体现在损益科目不进行摊销考虑', 'system', null, SYSDATE, 'system', SYSDATE, '02');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'TYJK_FORSUBJECT', '02', '同业借款四级科目类型', '01：资产代码  02：期限品种', 'system', null, SYSDATE, 'system', SYSDATE, '01');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'UNAMO_ACCR_TYPE', '02', '待摊费用计提方式', '01:计提方式_区间倒减；02:计提方式_每日新增', 'system', null, SYSDATE, 'system', SYSDATE, '02');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'UP_CARRYOVER_CYCLE', 'D', '本期利润损益结转频率', '数据字段：损益结转频率，枚举值D:日 M：月  Y:年', 'system', null, SYSDATE, 'system', SYSDATE, '03');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'VALUATION_DATETYPE', '01', '昨日单位净值估值日期类型', '估值表里面昨日单位净值展示的数据来源；01:上一自然日  02：上一工作日', 'system', null, SYSDATE, 'system', SYSDATE, '05');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'VAL_CPRD_AUTO_BONUS_TYPE', '02', '货币型产品自动红利再投', '01：当日自动结转，不生成交易，02：次日生成交易，不自动结转，99：不处理；虽然有参数，但是代码里写死了02', 'system', null, SYSDATE, 'system', SYSDATE, '03');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'VAL_DEC_DIGITS', '4', '估值小数位位数', '保留的小数位数默认执行为该参数，但是若前台界面要素配置，系统会根据前台要素配置的信息联动调整该账套参数', 'system', null, SYSDATE, 'system', SYSDATE, '03');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'VAL_DEC_TYPE', '03', '估值小数位处理方式', '估值舍入规则: 01、进位 02、舍位 03、四舍五入默认执行为该参数，但是若前台界面要素配置，系统会根据前台要素配置的信息联动调整该账套参数', 'system', null, SYSDATE, 'system', SYSDATE, '03');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'YEILD_DEC_DIGITS', '4', '收益率小数位位数', '保留的小数位数；默认执行为该参数，但是若前台界面要素配置，系统会根据前台要素配置的信息联动调整该账套参数', 'system', null, SYSDATE, 'system', SYSDATE, '05');
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('SUBJECT_INTERNAL_001', 'YEILD_DEC_TYPE', '03', '收益率小数位处理方式', '估值舍入规则: 01、进位 02、舍位 03、四舍五入；默认执行为该参数，但是若前台界面要素配置，系统会根据前台要素配置的信息联动调整该账套参数', 'system', null, SYSDATE, 'system', SYSDATE, '05');
 
 --------------------------------add by weipeng on 20220401 : 增加资产估值方案关联落地批处理 start---------------------------------------
 --批处理
