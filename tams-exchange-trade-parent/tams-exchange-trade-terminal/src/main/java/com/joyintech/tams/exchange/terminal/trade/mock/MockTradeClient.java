@@ -1,5 +1,8 @@
 package com.joyintech.tams.exchange.terminal.trade.mock;
 
+import cn.hutool.core.convert.Convert;
+import cn.hutool.http.HttpRequest;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Strings;
@@ -21,8 +24,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -51,6 +56,11 @@ public class MockTradeClient implements ITradeRequest {
     @Autowired
     private TradeResponseImpl tradeResponse;
     private ITerminalMsgNotify iTerminalMsgNotify;
+
+    @Autowired
+    protected RestTemplate restTemplate;
+
+    private static String URL = "http://127.0.0.1:8080/tams/service/joyin/quote/tick";
 
     @Override
     public Set<String> getLoginAccount() {
@@ -654,24 +664,49 @@ public class MockTradeClient implements ITradeRequest {
 
     @Override
     public void queryIntegratedQuotes(QuoteQryBean quoteQryBean, Long requestId) {
+        String stockCode = quoteQryBean.getStockCode();
+        TickBean tickBean = queryQuoteTick(stockCode);
+
         List<IntegratedQuote> integratedQuotes = new ArrayList<>();
         if (quoteQryBean.getQuoteType() == QuoteType.BULK_QUOTE.value) {
             if (integratedEntrustQuoteList.size() > 0) {
                 integratedEntrustQuoteList.forEach(integratedEntrust -> {
-                    if (integratedEntrust.getStockCode().equals(quoteQryBean.getStockCode())) {
+                    if (integratedEntrust.getStockCode().equals(stockCode)) {
                         IntegratedQuote integratedQuote = MockQuoteData.makeIntegratedEntrustQuote(integratedEntrust);
                         integratedQuote.setQuoteType(QuoteType.BULK_QUOTE.value);
                         integratedQuotes.add(integratedQuote);
                     }
                 });
             }
-            integratedQuotes.addAll(MockQuoteData.makeMockDataForBulk(quoteQryBean.getStockCode()));
+            integratedQuotes.addAll(MockQuoteData.makeMockDataForBulk(stockCode, tickBean));
         } else if (quoteQryBean.getQuoteType() == QuoteType.AFTER_BULK_QUOTE.value) {
-            integratedQuotes.addAll(MockQuoteData.makeAfterBulkQuote(quoteQryBean.getStockCode()));
+            integratedQuotes.addAll(MockQuoteData.makeAfterBulkQuote(stockCode, tickBean));
         } else if (quoteQryBean.getQuoteType() == QuoteType.FIXED_INCOME_QUOTE.value) {
-            integratedQuotes.addAll(MockQuoteData.makeFixedIncomeQuote(quoteQryBean.getStockCode()));
+            integratedQuotes.addAll(MockQuoteData.makeFixedIncomeQuote(stockCode, tickBean));
         }
         mockTradeResponse.resQueryIntegratedQuotes(integratedQuotes, requestId);
+    }
+
+    @Value("${mock.quote-tick-url:http://127.0.0.1:8080/tams/service/joyin/quote/tick}")
+    private String quoteTickUrl;
+
+    private TickBean queryQuoteTick(String stockCode) {
+        Map<String, String> param = Maps.newHashMap();
+        param.put("stockCode", stockCode);
+        try {
+            HttpRequest request = HttpRequest.post(quoteTickUrl)
+                    .body(JSONUtil.createObj()
+                            .set("userId", "xxx")
+                            .set("stockCode", stockCode)
+                            .toString());
+            String body = request.execute().body();
+            logger.info("行情信息：{}", body);
+            ResultBean resultBean = JSONUtil.toBean(body, ResultBean.class);
+            return Convert.convert(TickBean.class, resultBean.getData());
+        } catch (Exception e) {
+            logger.error("获取行情失败：stockCode={}", stockCode, e);
+        }
+        return null;
     }
 
     @Override
@@ -730,13 +765,19 @@ public class MockTradeClient implements ITradeRequest {
 
     @Override
     public void queryIntegratedBulkQuote(IntegratedBulkQuoteQryBean integratedBulkQuoteQryBean, Long requestId) {
-        List<IntegratedQuote> integratedQuotes = MockQuoteData.makeMockDataForBulk(integratedBulkQuoteQryBean.getStockCode());
+        String stockCode = integratedBulkQuoteQryBean.getStockCode();
+        TickBean tickBean = queryQuoteTick(stockCode);
+
+        List<IntegratedQuote> integratedQuotes = MockQuoteData.makeMockDataForBulk(stockCode, tickBean);
         mockTradeResponse.resQueryIntegratedBulkQuote(MockConverter.convertIntegratedBulkQuoteBeans(integratedQuotes), requestId);
     }
 
     @Override
     public void queryIntegratedBulkCloseQuote(IntegratedBulkCloseQuoteQryBean integratedBulkCloseQuoteQryBean, Long requestId) {
-        List<IntegratedQuote> integratedQuotes = MockQuoteData.makeAfterBulkQuote(integratedBulkCloseQuoteQryBean.getStockCode());
+        String stockCode = integratedBulkCloseQuoteQryBean.getStockCode();
+        TickBean tickBean = queryQuoteTick(stockCode);
+
+        List<IntegratedQuote> integratedQuotes = MockQuoteData.makeAfterBulkQuote(stockCode, tickBean);
         mockTradeResponse.resQueryIntegratedBulkCloseQuote(MockConverter.convertIntegratedBulkCloseQuoteBeans(integratedQuotes), requestId);
     }
 
@@ -957,7 +998,10 @@ public class MockTradeClient implements ITradeRequest {
 
     @Override
     public void queryIntegratedFixedIncomeQuote(IntegratedFixedIncomeQuoteQryBean integratedFixedIncomeQuoteQryBean, Long requestId) {
-        List<IntegratedQuote> integratedQuotes = MockQuoteData.makeFixedIncomeQuote(integratedFixedIncomeQuoteQryBean.getStockCode());
+        String stockCode = integratedFixedIncomeQuoteQryBean.getStockCode();
+        TickBean tickBean = queryQuoteTick(stockCode);
+
+        List<IntegratedQuote> integratedQuotes = MockQuoteData.makeFixedIncomeQuote(stockCode, tickBean);
         mockTradeResponse.resQueryIntegratedFixedIncomeQuote(MockConverter.convertIntegratedFixedIncomeQuoteBeans(integratedQuotes), requestId);
     }
 
