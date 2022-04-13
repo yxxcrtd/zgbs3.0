@@ -2,6 +2,7 @@ package com.joyintech.service.entrust.etrconbond.service;
 
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.service.entrust.etrconbond.dao.EtrConBondMapper;
 import com.joyintech.service.entrust.etrconbond.dto.EtrConBondDto;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
@@ -12,6 +13,8 @@ import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +27,7 @@ import static com.joyintech.tams.invest.common.position.constant.PositionCommonC
 
 @Service
 public class PositionRequestEtrConBondService {
+    private final Logger log = LoggerFactory.getLogger(PositionRequestEtrConBondService.class);
 
     public static final String STANDAR_SEC_ID = "XN_PRODID999";
     @Autowired
@@ -43,6 +47,7 @@ public class PositionRequestEtrConBondService {
         resultMap.put("systemAct", systemAct);
 //        String interType = commonPositionEngineService.getPositionInterType("ETR", entity.getTradePlat(), finprodType, entity.getPs(), entity.getOptType(), entity.getClass().getName());
         this.bond003(entity, resultMap);
+        log.info("sendEtrConBondDto() called with parameters => 【entity = {}】", JsonUtils.object2Json(entity));
         PositionHttpRequest.send(resultMap);
     }
 
@@ -52,6 +57,7 @@ public class PositionRequestEtrConBondService {
      * @param entity
      */
     public void sendDelete(EtrConBondDto entity) {
+        log.info("sendDelete() called with parameters => 【entity = {}】", JsonUtils.object2Json(entity));
         PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(), "ETR", DictCodeListExt3.头寸业务类型_网下申购.getValue(), DictCodeList.交易方向_申购.getValue());
     }
 
@@ -61,6 +67,7 @@ public class PositionRequestEtrConBondService {
      * @param entity
      */
     public void sendRevoke(EtrConBondDto entity) {
+        log.info("sendRevoke() called with parameters => 【entity = {}】", JsonUtils.object2Json(entity));
         PositionHttpRequest.dorevoke(entity.getEntrustId(), "TRD", DictCodeListExt3.头寸业务类型_网下申购.getValue(), DictCodeList.交易方向_申购.getValue());
     }
 
@@ -79,6 +86,8 @@ public class PositionRequestEtrConBondService {
         resultMap.put("decisionAct", DictCodeListExt3.系统动作_关闭.getValue());
         resultMap.put("systemAct", DictCodeListExt3.系统动作_关闭.getValue());
         resultMap.put("closeId", entrustId);
+
+        log.info("sendClose() called with parameters => 【entity = {}】", JsonUtils.object2Json(resultMap));
         PositionHttpRequest.batchClose(resultMap);
     }
 
