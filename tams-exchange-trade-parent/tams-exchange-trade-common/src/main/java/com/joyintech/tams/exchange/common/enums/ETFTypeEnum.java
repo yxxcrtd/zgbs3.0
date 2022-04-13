@@ -1,6 +1,6 @@
 package com.joyintech.tams.exchange.common.enums;
 
-public enum ETFTypeEnum {
+public enum ETFTypeEnum implements ICodeEnum<String>{
     ETF_SINGLE_MARKET("01"),
     ETF_CROSS_MARKET("02"),
     ETF_CROSS_BORDER("03"),
@@ -12,5 +12,10 @@ public enum ETFTypeEnum {
 
     ETFTypeEnum(String code) {
         this.code = code;
+    }
+
+    @Override
+    public String getCode() {
+        return code;
     }
 }
