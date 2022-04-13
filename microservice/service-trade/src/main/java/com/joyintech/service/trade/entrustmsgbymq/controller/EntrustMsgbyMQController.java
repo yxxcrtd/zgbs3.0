@@ -1,6 +1,7 @@
 package com.joyintech.service.trade.entrustmsgbymq.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.base.MoreObjects;
 import com.joyintech.service.trade.entrustmsgbymq.dto.OrderFinishAmtMessage;
 import com.joyintech.service.trade.entrustmsgbymq.dto.TradeMessage;
 import com.joyintech.service.trade.entrustmsgbymq.service.EntrustMsgbyMQService;
@@ -44,6 +45,7 @@ public class EntrustMsgbyMQController {
         } catch (Exception e) {
             logger.error("成交消息接收失败-错误信息:{}", e.getMessage(), e);
             logger.error("成交消息接收失败-错误信息:{},消息内容:{}", e.getLocalizedMessage(), tradeMessageStr);
+            message.setMessage(MoreObjects.firstNonNull(e.getMessage(), e.getLocalizedMessage()));
         }
         return message.fail();
     }

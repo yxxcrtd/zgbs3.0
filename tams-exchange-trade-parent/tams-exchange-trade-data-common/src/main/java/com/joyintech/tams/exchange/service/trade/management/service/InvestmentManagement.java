@@ -1075,25 +1075,25 @@ public class InvestmentManagement extends BaseService {
             CheckResult checkResult = appointInstructionCheck.checkAppointInstruction(instructionList, detailMap, pledgeMap);
             logger.info("指令分发数据检查结果：{}", JsonUtils.getJsonFromObject(checkResult));
             int code = checkResult.getCode();
-            Map<String, Object> data = checkResult.getData();
             if (code == 1) {
                 updateAppointInstruction(records, entrustIds, checkResult.getMsg());
                 return new ResultBean(ErrorCode.APPOINT_INSTRUCTION_PARAMETER_ERROR.value(), checkResult.getMsg());
             }
 
             ResultBean resultBean = new ResultBean(ErrorCode.SUCCESS);
-            if (code == 2 && CollUtil.isNotEmpty(data)) {
-                Set<String> keys = data.keySet();
-                instructionList = instructionList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
-                detailList = detailList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
-                pledgeList = pledgeList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
-
-                updateAppointInstruction(records, entrustIds, Lists.newArrayList(keys.iterator()), data);
-
-                resultBean.setErrorCode(ErrorCode.APPOINT_INSTRUCTION_EXIST_PARAMETER_ERROR);
-            } else {
-                updateAppointInstruction(records, entrustIds);
-            }
+            Map<String, Object> data = checkResult.getData();
+//            if (code == 2 && CollUtil.isNotEmpty(data)) {
+//                Set<String> keys = data.keySet();
+//                instructionList = instructionList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
+//                detailList = detailList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
+//                pledgeList = pledgeList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
+//
+//                updateAppointInstruction(records, entrustIds, Lists.newArrayList(keys.iterator()), data);
+//
+//                resultBean.setErrorCode(ErrorCode.APPOINT_INSTRUCTION_EXIST_PARAMETER_ERROR);
+//            } else {
+//                updateAppointInstruction(records, entrustIds);
+//            }
 
             dealAppointInstruction(instructionList, detailList, pledgeList);
 
