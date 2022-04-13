@@ -9,9 +9,9 @@
             asset: $.trim($('#asset').val()),
             tradeDateBegin: $("#tradeDate").startDate(),
             tradeDateEnd: $("#tradeDate").endDate(),
-            ps: $('#ps').val(),
-            tradeMarket: $('#tradeMarket').val(),
-            dataSource:$('#dataSource').val()
+            ps: $.trim($('#ps').val()),
+            tradeMarket: $.trim($('#tradeMarket').val()),
+            dataSource:$.trim($('#dataSource').val())
         }
     };
 
@@ -108,21 +108,8 @@
      * 导出选中的表格数据
      */
     var exportExcel = function() {
-
-        var selArr = [];
-        var datas = null;
-        if (table != null && table != '') {
-            selArr = table.getAllCheckedRows();
-            datas = JSON.stringify(selArr);
-        }
-        if (!selArr || selArr.length == 0) {
-            var paramObj = getPageParams();
-            Joyin.exportExcel('export', paramObj);
-        } else {
-            Joyin.exportExcel('export', {
-                datas : datas
-            });
-        }
+        var paramObj = getPageParams();//请求参数json格式
+        Joyin.exportExcel('export', paramObj);//导出（共通）
     };
 
 

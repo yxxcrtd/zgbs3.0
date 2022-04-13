@@ -12,6 +12,7 @@ package com.joyintech.service.valuation.trademanage.bond.dao;
 
 
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.service.valuation.component.common.dto.FinCashPlanDto;
 import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTradeDto;
 import com.joyintech.tams.common.base.entity.FinProduct;
 import org.springframework.stereotype.Repository;
@@ -53,4 +54,5 @@ public interface TrdBondTradeMapper {
 
     TrdBondTradeDto queryTradeInfoByTradeId(Map<String, Object> param);
 
+    List<FinCashPlanDto> getRepaymentInfo(Map<String, Object> param);
 }

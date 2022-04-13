@@ -7,9 +7,11 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.valuation.component.common.constants.BussinessDictCodeList;
+import com.joyintech.service.valuation.component.common.dto.FinCashPlanDto;
 import com.joyintech.service.valuation.trademanage.bond.dao.TrdBondTradeMapper;
 import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTradeDto;
 import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTradeResult;
+import com.joyintech.tams.common.base.dao.FinProductAddMapper;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -30,6 +32,9 @@ public class TrdBondTrade002Service extends BaseService {
 
     @Autowired
     private TrdBondTradeMapper trdBondTradeMapper;
+
+    @Autowired
+    private FinProductAddMapper finProductAddMapper;
 
     /**
      * 金融产品交易BatchMapper
@@ -289,6 +294,12 @@ public class TrdBondTrade002Service extends BaseService {
         dto1.setTradeId(dto.getTrdBondTradeDto().getTradeId());
        trdBondTrade001Service.delete(dto1);
        return insert(dto);
+    }
+
+    public List<FinCashPlanDto> getRepaymentInfo(Map<String, Object> map){
+        map.put("cashType",DictCodeListExt1.现金流二级类型_本金.getValue());
+        map.put("finprodType",DictCodeListExt1.金融产品类型_债券.getValue());
+        return trdBondTradeMapper.getRepaymentInfo(map);
     }
 
 }

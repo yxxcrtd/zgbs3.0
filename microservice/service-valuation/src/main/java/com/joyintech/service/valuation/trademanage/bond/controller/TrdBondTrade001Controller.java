@@ -52,18 +52,6 @@ public class TrdBondTrade001Controller {
         return trdBondTrade001Service.selectForPage(page, length, param);
     }
 
-    /**
-     * 不分页数据查询
-     *
-     * @param param
-     * @return
-     * @throws Exception
-     */
-    @PostMapping("/queryPageList")
-    public List<TrdBondTradeDto> queryPageList(@RequestBody Map<String, Object> param){
-        return trdBondTrade001Service.queryPageList(param);
-    }
-
     @Transactional
     @DTXTransaction
     @PostMapping("delete")
