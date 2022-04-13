@@ -660,4 +660,10 @@ public class JSDTradeClientImpl implements ITradeRequest {
     public void setEntrustIdManager(EntrustIdManager entrustIdManager) {
         this.entrustIdManager = entrustIdManager;
     }
+
+	@Override
+	public void queryNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean, Long requestId) {
+		// TODO Auto-generated method stub
+		
+	}
 }

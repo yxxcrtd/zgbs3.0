@@ -211,6 +211,13 @@ public interface ITradeRequest {
      * @Date: 2020/9/22
      */
     void queryIntegratedFixedIncomeQuote(IntegratedFixedIncomeQuoteQryBean integratedFixedIncomeQuoteQryBean, Long requestId);
+    
+    /**
+     * @Description: 深圳我收到的协商成交行情查询
+     * @param negotiateQuoteQueryBean
+     * @param requestId
+     */
+    void queryNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean, Long requestId);
 
     /***
      * @Description: 委托重传

@@ -833,4 +833,10 @@ public class UfxTradeClientImpl implements ITradeRequest {
     public void setTradeStatus(String accountId, AccountLoginStatus status) {
         ufxTradeApi.setStatus(accountId, status);
     }
+
+	@Override
+	public void queryNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean, Long requestId) {
+		// TODO Auto-generated method stub
+		
+	}
 }
