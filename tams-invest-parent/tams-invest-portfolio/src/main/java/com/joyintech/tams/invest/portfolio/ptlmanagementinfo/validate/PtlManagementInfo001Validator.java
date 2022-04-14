@@ -280,7 +280,7 @@ public class PtlManagementInfo001Validator implements BeanValidator{
             if (stringList.size() != secLists.size()) {
                 errorList.add(new ValidMessage("银行间or商业银行柜台同一登记托管机构只能最多绑定一个证券账户！"));
             }
-            if (stringTwoList.size() != stringTwoList.size()) {
+            if (stringTwoList.size() != secTwoLists.size()) {
                 errorList.add(new ValidMessage("银行间or商业银行柜台同一登记托管机构只能最多绑定一个证券账户！"));
             }
             //银行间or商业银行柜台同一登记托管机构只能最多绑定一个证券账户 add by chenkang 20220104 end
