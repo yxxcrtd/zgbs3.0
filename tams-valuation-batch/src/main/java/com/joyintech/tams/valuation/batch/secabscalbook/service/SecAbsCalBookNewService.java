@@ -266,7 +266,7 @@ public class SecAbsCalBookNewService {
                 searchPayinfo);
 
             // 是否使用摊余成本法计算
-            boolean isAcFlag =acctEntityEx.getIsAcMethod();
+            boolean isAcFlag =true;
 
             // 1.2 百元券面处理
             varFaceValue = finProductCommonService.getFaceValue(acctEntityEx.getBusiId(),
@@ -286,6 +286,10 @@ public class SecAbsCalBookNewService {
             List<String> natureList = new ArrayList<String>();
             if (DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(
                 acctEntity.getInvAim())) {
+                // 若采用的非摊余成本法，则是否使用摊余成本法计算 = false
+                if(!acctEntityEx.getIsAcMethod()){
+                    isAcFlag = false;
+                }
                 buyTableId = DictCodeListTableId.会计场景代码_公允价值损益类债券_买入.getValue();
                 natureList.add(DictCodeBaseSubjectNatrueNew.公允价值损益类_成本.getValue());
             }
@@ -1032,14 +1036,14 @@ public class SecAbsCalBookNewService {
                             //设计变更-计提摊销重算逻辑修改 zhangyf 20181205 start
                             //if (变量.重算Flag = true and 变量.摊销重算配置DTO.实际日利率 ！=null)
                             if (amoFlg && null!= bokAmoConfig && null != bokAmoConfig.getDailydscYield()) {
-                                //变量.利息调整 = 变量.摊销重算配置DTO.实际日利率 * (变量.当日计算摊销溢折价科目余额 + 变量.当日计算摊销成本科目余额) - 金额元素.应计利息  
+                                //变量.利息调整 = 变量.摊销重算配置DTO.实际日利率 * (变量.当日计算摊销溢折价科目余额 + 变量.当日计算摊销成本科目余额) - 金额元素.应计利息
                                 varLxtz = ArithmeticUtil.subtract(
                                     ArithmeticUtil.multiply(
                                         bokAmoConfig.getDailydscYield(),
                                         ArithmeticUtil.doAdd(varDrjstxzyjKmye, varDrjscbKmye)),
                                     ArithmeticUtil.round(intAmt, NumberEnum.MONEY),
                                     NumberEnum.MONEY.getCode(), null);
-                                //变量.摊销日利率 = 变量.摊销重算配置DTO.实际日利率   
+                                //变量.摊销日利率 = 变量.摊销重算配置DTO.实际日利率
                                 varDayRate = bokAmoConfig.getDailydscYield();
                             }
                             // else (变量.重算Flag = true and 变量.摊销重算配置DTO.实际日利率 =null)
@@ -1107,7 +1111,7 @@ public class SecAbsCalBookNewService {
                                     varDayRate = bokSummaryTableYestdy.getDailydscYield();
                                   }
                             }
-                            // if（"A/365F" = 计提规则.get(0).计算基础 && 计提类账务处理结果.发生日 为 2/29日时） 
+                            // if（"A/365F" = 计提规则.get(0).计算基础 && 计提类账务处理结果.发生日 为 2/29日时）
                             String basisString = listCashinfo != null
                                 && listCashinfo.size() > 0 ? listCashinfo.get(
                                     0).getBasis() : null;
