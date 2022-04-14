@@ -108,6 +108,13 @@ public interface EtrExchangeTradeSecRepoMapper {
 
 	String IsSpeedTOneOrZero(Map<String, Object> map);
 
+	/**
+	 * 获取债券的是否净价交易
+	 * @param map
+	 * @return
+	 */
+	String getIsNetPrice(Map<String, Object> map);
+
     /**
      * 查询债券利率重置信息
      *

@@ -754,4 +754,16 @@ public class EtrExchangeTradeSaveSecRepoRequest extends EtrEntrust implements Pr
     public void setCurrentTab(String currentTab) {
         this.currentTab = currentTab;
     }
+
+    @ApiModelProperty(name="priceClass",value="计价方式",example="01")
+    private String priceClass;
+
+    public String getPriceClass() {
+        return priceClass;
+    }
+
+    public void setPriceClass(String priceClass) {
+        this.priceClass = priceClass;
+    }
+
 }

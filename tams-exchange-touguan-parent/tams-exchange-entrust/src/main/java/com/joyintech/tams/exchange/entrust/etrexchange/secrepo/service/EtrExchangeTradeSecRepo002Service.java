@@ -51,7 +51,7 @@ import java.util.*;
 
 
 /**
- * 交易所指令交易（债券股票回购基金场内指令交易）
+ * 交易所指令交易（现券+通用质押式回购）
  *
  * @author meifaxin
  * @version 1.0 2021年12月20日
@@ -517,30 +517,30 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
         }
         return pages;
     }
-
-    /**
-     * 场内指令-标准券可用持仓可用查询
-     *
-     * @param secDto
-     * @return
-     */
-    public BigDecimal querySecInCanUse(PositionCashSecDto secDto) {
-        secDto.setTradePlat(TempConstant.NO_TRADE_BUSINESS_ETR);
-        BigDecimal ticketCanUse = etrTradeCommonervice.selectAvailableNum(secDto);
-        return ticketCanUse;
-    }
-
-    //共通
-    public BigDecimal queryProPosition(String holdingType, List<PositionCashSecDto> list) {
-        List<PositionCashSecDto> secList = new ArrayList<>();
-        for (PositionCashSecDto temp : list) {
-            temp.setHoldingType(holdingType);
-            secList.add(temp);
-        }
-        BigDecimal newSecAmount = etrTradeCommonervice.queryPosition(secList, "02", "");
-
-        return newSecAmount;
-
-    }
+//
+//    /**
+//     * 场内指令-标准券可用持仓可用查询
+//     *
+//     * @param secDto
+//     * @return
+//     */
+//    public BigDecimal querySecInCanUse(PositionCashSecDto secDto) {
+//        secDto.setTradePlat(TempConstant.NO_TRADE_BUSINESS_ETR);
+//        BigDecimal ticketCanUse = etrTradeCommonervice.selectAvailableNum(secDto);
+//        return ticketCanUse;
+//    }
+//
+//    //共通
+//    public BigDecimal queryProPosition(String holdingType, List<PositionCashSecDto> list) {
+//        List<PositionCashSecDto> secList = new ArrayList<>();
+//        for (PositionCashSecDto temp : list) {
+//            temp.setHoldingType(holdingType);
+//            secList.add(temp);
+//        }
+//        BigDecimal newSecAmount = etrTradeCommonervice.queryPosition(secList, "02", "");
+//
+//        return newSecAmount;
+//
+//    }
 
 }
