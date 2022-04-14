@@ -332,6 +332,8 @@ public class EtrExchangeTradeSecRepo001Controller extends BaseController{
 		initPageParams.put("TARGET_CLASS", this.getSelectDataFromDataDic(DictCode.目标类型, null));
 //		initPageParams.put("DECLA_TYPE", this.getSelectDataFromDataDic(DictCode.申报类型, null));
 		initPageParams.put("BUSINESS_MODEL", this.getSelectDataFromDataDic(DictCode.业务模式, null));
+		initPageParams.put("PRICE_TYPE", this.getSelectDataFromDataDic(DictCode.计价方式, null));
+		initPageParams.put("ASSIGN_DEAL_MODE", this.getSelectDataFromDataDic(DictCode.指定交易方式, null));
 		this.setInvAimSelectOption(initPageParams);
 		this.setPsSelectOptions(initPageParams);
 		this.setPriceModelSelectOptions(initPageParams);
@@ -719,6 +721,28 @@ public class EtrExchangeTradeSecRepo001Controller extends BaseController{
 	}
 
 	/**
+	 * 判断资产计价方式
+	 *
+	 * @return List
+	 * @throws Exception Exception
+	 * @see
+	 * @since 1.0
+	 */
+	@ApiOperation(value = "计价方式", notes = "计价方式")
+	@ResponseBody
+	@PostMapping("/getPriceType")
+	public Message<String> getPriceType(@RequestBody Map<String, Object> map)
+	{
+		try{
+			String result = etrExchangeTradeSecRepo001Service.getPriceType(map);
+			return new Message<String>().success().setData(result);
+		} catch(Exception e){
+			return new Message<String>().fail().setMessage("查询异常");
+		}
+
+	}
+
+	/**
 	 * 由于交易平台不同，设置不同交易平台对应的委托方向
 	 * @param psOptionsRequest psOptionsRequest
 	 */
@@ -763,13 +787,32 @@ public class EtrExchangeTradeSecRepo001Controller extends BaseController{
 
 
 	@ResponseBody
-	@PostMapping("/getFinprodMarketInfo")
-	@ApiOperation(value = "查询资产列表", notes = "查询资产列表")
-	public Message<Page<SelectOptionDto>> getFinprodMarketInfo(@RequestBody FinprodMarketInfoRequest dto){
+	@PostMapping("/getFinprodMarketInfoSec")
+	@ApiOperation(value = "查询现券资产列表", notes = "查询现券资产列表")
+	public Message<Page<SelectOptionDto>> getFinprodMarketInfoSec(@RequestBody FinprodMarketInfoRequest dto){
 		logger.debug("getFinprodMarketInfo() called with parameters => 【dto = {}】",JsonUtils.object2Json(dto));
 		try {
 			Map<String, Object> map = BeanUtil.object2Map(dto);
 			map.put("acctTradeMarket", dto.getTradeMarket());
+			map.put("FINPROD_TYPE2",DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+			Page<SelectOptionDto> tempList = etrExchangeTradeSecRepo001Service.getFinprodMarketInfo(map);
+			return new Message<Page<SelectOptionDto>>().success().setData(tempList);
+		} catch (Exception e) {
+			logger.error("查询功能异常", e);
+			return new Message<Page<SelectOptionDto>>().fail().setMessage("查询异常");
+		}
+	}
+
+
+	@ResponseBody
+	@PostMapping("/getFinprodMarketInfoRepo")
+	@ApiOperation(value = "查询回购资产列表", notes = "查询回购资产列表")
+	public Message<Page<SelectOptionDto>> getFinprodMarketInfoRepo(@RequestBody FinprodMarketInfoRequest dto){
+		logger.debug("getFinprodMarketInfo() called with parameters => 【dto = {}】",JsonUtils.object2Json(dto));
+		try {
+			Map<String, Object> map = BeanUtil.object2Map(dto);
+			map.put("acctTradeMarket", dto.getTradeMarket());
+			map.put("FINPROD_TYPE2","ZYSHG");
 			Page<SelectOptionDto> tempList = etrExchangeTradeSecRepo001Service.getFinprodMarketInfo(map);
 			return new Message<Page<SelectOptionDto>>().success().setData(tempList);
 		} catch (Exception e) {
@@ -1055,18 +1098,35 @@ public class EtrExchangeTradeSecRepo001Controller extends BaseController{
 			throws Exception {
 		AjaxResult ajax= etrExchangeTradeSecRepo001Service.checkSave(dto,br);
 		List<ValidMessage> validList = etrExchangeTradeSecRepoValidatorService.valid(dto);
-		List<ValidMessage> validListBussValid = etrExchangeTradeJj001Validator.bussValid(dto);
+//		List<ValidMessage> validListBussValid = etrExchangeTradeJj001Validator.bussValid(dto);
+		List<ValidMessage> validListPriceRange = etrExchangeTradeSecRepo001Service.checkSavePriceRange(dto,br);
 		if (!CollectionUtils.isEmpty(validList)){
 			ajax.setErrorList(validList);
 		}
-		if (!CollectionUtils.isEmpty(validListBussValid)){
-			ajax.setErrorList(validListBussValid);
+//		if (!CollectionUtils.isEmpty(validListBussValid)){
+//			ajax.setErrorList(validListBussValid);
+//		}
+
+		String confirmMsg = "";
+		// 有效价格申报范围控制参数
+		String priceScopeControllEtr = CacheUtil.getSysParam("PRICE_SCOPE_CONTROLL_ETR");
+		if (!CollectionUtils.isEmpty(validListPriceRange)){
+			// 禁止
+			if(StringUtil.equals(priceScopeControllEtr,"01")){
+				ajax.setErrorList(validListPriceRange);
+			}
+			// 仅提示
+			if(StringUtil.equals(priceScopeControllEtr,"02")){
+				for(ValidMessage validMessage:validListPriceRange){
+					confirmMsg += validMessage.getMessage();
+					confirmMsg += "<br />";
+				}
+			}
 		}
 		if (ajax != null && !StringUtil.isEmptyList(ajax.getErrorList()) && !StringUtil.equals(dto.getOperateType(),"save")) {
 			return ajax;
 		}
 
-		String confirmMsg = "";
 //		if (DictCodeList.交易方向_申购.getValue().equals(dto.getPs()) && DictCodeListExt1.金融产品类型_投管用_股票.getValue().equals(dto.getFinprodType2())) {
 //			Map<String, Object> paramMap = new HashMap<String, Object>();
 //			//paramMap.put("finprodId", dto.getFinprodId());//金融产品代码
@@ -1648,27 +1708,27 @@ public class EtrExchangeTradeSecRepo001Controller extends BaseController{
 		map.put("param", param);
 		return etrExchangeTradeSecRepo001Service.selectBondExecPlan(map);
 	}
-
-	/**
-	 * 导入
-	 *
-	 * @param paramMap 导入的文件名
-	 * @return 处理结果
-	 * @throws Exception
-	 *             异常
-	 */
-	@ApiOperation(value = "导入的文件check", notes = "导入的文件check")
-	@PostMapping("/checkImportData")
-	@ResponseBody
-	public Message<AjaxResult> checkImportData(@RequestBody Map<String,Object> paramMap, BindingResult br)  {
-		try{
-			AjaxResult ajaxResult=etrExchangeTradeSecRepo001Service.checkImportData(paramMap,br);
-			return new Message<AjaxResult>().success().setData(ajaxResult);
-		}catch (Exception e){
-			return new Message<AjaxResult>().fail().setData(new AjaxResult("check失败"));
-		}
-	}
-
+//
+//	/**
+//	 * 导入
+//	 *
+//	 * @param paramMap 导入的文件名
+//	 * @return 处理结果
+//	 * @throws Exception
+//	 *             异常
+//	 */
+//	@ApiOperation(value = "导入的文件check", notes = "导入的文件check")
+//	@PostMapping("/checkImportData")
+//	@ResponseBody
+//	public Message<AjaxResult> checkImportData(@RequestBody Map<String,Object> paramMap, BindingResult br)  {
+//		try{
+//			AjaxResult ajaxResult=etrExchangeTradeSecRepo001Service.checkImportData(paramMap,br);
+//			return new Message<AjaxResult>().success().setData(ajaxResult);
+//		}catch (Exception e){
+//			return new Message<AjaxResult>().fail().setData(new AjaxResult("check失败"));
+//		}
+//	}
+//
 	/**
 	 * 折算率如果取不到值，默认100%
 	 *
@@ -1714,87 +1774,87 @@ public class EtrExchangeTradeSecRepo001Controller extends BaseController{
 		return null;
 	}
 
-	@RequestMapping(value = "/selectConverseSharePrice")
-	@ResponseBody
-	public BigDecimal selectConverseSharePrice(@RequestBody Map<String, Object> param) throws Exception {
-		return etrExchangeTradeSecRepo001Service.selectConverseSharePrice(param);
-	}
-    //配债、配股
-	@RequestMapping(value = "/selectTrdOthPrice")
-	@ResponseBody
-	public  Message<BigDecimal> selectOthPrice(@RequestBody TrdOthPriceRequest request)  {
-		try{
-		Map<String,Object> param= JsonUtils.object2Map(request);
-		TrdOthCodeInfoDto dto = etrExchangeTradeSecRepo001Service.getTrdOthCodeInfo(param);
-		BigDecimal declaredPrice=null;
-		if (null != dto && dto.getDeclaredPrice() != null && dto.getDeclaredPrice().compareTo(BigDecimal.ZERO) > 0) {
-			declaredPrice=dto.getDeclaredPrice();
-		}
-		return new Message<BigDecimal>().success().setData(declaredPrice);
-	}catch (Exception e) {
-		logger.error("查询配债",e);
-		return new Message<BigDecimal>().fail().setMessage("查询配债、配股异常");
-	}
-	}
-
-	@RequestMapping(value = "/selectExtPs")
-	@ResponseBody
-	public Message<Map<String, Object>> selectExtPs(@RequestBody PsOptionsRequest psOptionsRequest) throws Exception {
-		try{
-			Map<String, Object> map = new HashMap<String, Object>();
-			Date sysDate = DateUtil.platDateFromCache();
-			Map<String,Object> param= JsonUtils.object2Map(psOptionsRequest);
-			param.put("date", DateUtil.format(sysDate));
-			List<TrdOthCodeInfoDto> list = etrExchangeTradeSecRepo001Service.getTrdOthCodeInfos(param);
-			if (null != list && list.size() > 0) {
-				for (TrdOthCodeInfoDto dto : list) {
-					if (!StringUtils.equals(dto.getOthCodeType(), DictCodeListExt3.金融产品其他代码类型_配债代码.getValue())) {
-						// 只能选择申购，其他委托方向不可选
-						String ps = OthTypeMapToPs(dto.getOthCodeType());
-						if (StringUtils.equals(ps, DictCodeList.交易方向_申购.getValue())) {
-							map.clear();
-							map.put(ps, dto.getDeclaredPrice());
-							return new Message<Map<String, Object>>().success().setData(map);
-						} else if (StringUtils.equals(ps, DictCodeListExt3.交易方向_质押券入库.getValue())) {
-							String converseRatio = etrExchangeTradeSecRepo001Service.selectStdsecConverseRatio(param);
-							if (null != converseRatio) {
-								map.put(DictCodeListExt3.交易方向_质押券入库.getValue(), converseRatio);
-								map.put(DictCodeListExt3.交易方向_质押券出库.getValue(), converseRatio);
-							}
-						} else {
-							map.put(ps, dto.getDeclaredPrice());
-						}
-					}
-				}
-			}
-			return new Message<Map<String, Object>>().success().setData(map);
-		}catch (Exception e) {
-			logger.error("查询报价维护信息",e);
-			return new Message<Map<String, Object>>().fail().setMessage("查询报价维护信息异常");
-		}
-	}
-
-	/**
-	 * 申报类型-》交易方向的映射
-	 * @param othCodeType
-	 * @return
-	 */
-	private String OthTypeMapToPs(String othCodeType) {
-		if (StringUtils.equals(othCodeType, DictCodeListExt3.金融产品其他代码类型_可转债信用申购代码.getValue())) {
-			return DictCodeList.交易方向_申购.getValue();
-		}else if(StringUtils.equals(othCodeType, DictCodeListExt3.金融产品其他代码类型_回售代码.getValue())){
-			return DictCodeList.交易方向_行权_回售.getValue();
-		}else if(StringUtils.equals(othCodeType, DictCodeListExt3.金融产品其他代码类型_可转债转股代码.getValue())){
-			return DictCodeListExt1.交易方向_债转股.getValue();
-		}else if(StringUtils.equals(othCodeType, DictCodeListExt3.金融产品其他代码类型_质押代码.getValue())){
-			return DictCodeListExt3.交易方向_质押券入库.getValue();
-		}else if(StringUtils.equals(othCodeType, DictCodeListExt3.金融产品其他代码类型_配股代码.getValue())){
-			return DictCodeListExt2.交易方向_配股.getValue();
-		}else if(StringUtils.equals(othCodeType, DictCodeListExt3.金融产品其他代码类型_新股申购代码.getValue())){
-			return DictCodeList.交易方向_申购.getValue();
-		}
-		return null;
-	}
+//	@RequestMapping(value = "/selectConverseSharePrice")
+//	@ResponseBody
+//	public BigDecimal selectConverseSharePrice(@RequestBody Map<String, Object> param) throws Exception {
+//		return etrExchangeTradeSecRepo001Service.selectConverseSharePrice(param);
+//	}
+//    //配债、配股
+//	@RequestMapping(value = "/selectTrdOthPrice")
+//	@ResponseBody
+//	public  Message<BigDecimal> selectOthPrice(@RequestBody TrdOthPriceRequest request)  {
+//		try{
+//		Map<String,Object> param= JsonUtils.object2Map(request);
+//		TrdOthCodeInfoDto dto = etrExchangeTradeSecRepo001Service.getTrdOthCodeInfo(param);
+//		BigDecimal declaredPrice=null;
+//		if (null != dto && dto.getDeclaredPrice() != null && dto.getDeclaredPrice().compareTo(BigDecimal.ZERO) > 0) {
+//			declaredPrice=dto.getDeclaredPrice();
+//		}
+//		return new Message<BigDecimal>().success().setData(declaredPrice);
+//	}catch (Exception e) {
+//		logger.error("查询配债",e);
+//		return new Message<BigDecimal>().fail().setMessage("查询配债、配股异常");
+//	}
+//	}
+//
+//	@RequestMapping(value = "/selectExtPs")
+//	@ResponseBody
+//	public Message<Map<String, Object>> selectExtPs(@RequestBody PsOptionsRequest psOptionsRequest) throws Exception {
+//		try{
+//			Map<String, Object> map = new HashMap<String, Object>();
+//			Date sysDate = DateUtil.platDateFromCache();
+//			Map<String,Object> param= JsonUtils.object2Map(psOptionsRequest);
+//			param.put("date", DateUtil.format(sysDate));
+//			List<TrdOthCodeInfoDto> list = etrExchangeTradeSecRepo001Service.getTrdOthCodeInfos(param);
+//			if (null != list && list.size() > 0) {
+//				for (TrdOthCodeInfoDto dto : list) {
+//					if (!StringUtils.equals(dto.getOthCodeType(), DictCodeListExt3.金融产品其他代码类型_配债代码.getValue())) {
+//						// 只能选择申购，其他委托方向不可选
+//						String ps = OthTypeMapToPs(dto.getOthCodeType());
+//						if (StringUtils.equals(ps, DictCodeList.交易方向_申购.getValue())) {
+//							map.clear();
+//							map.put(ps, dto.getDeclaredPrice());
+//							return new Message<Map<String, Object>>().success().setData(map);
+//						} else if (StringUtils.equals(ps, DictCodeListExt3.交易方向_质押券入库.getValue())) {
+//							String converseRatio = etrExchangeTradeSecRepo001Service.selectStdsecConverseRatio(param);
+//							if (null != converseRatio) {
+//								map.put(DictCodeListExt3.交易方向_质押券入库.getValue(), converseRatio);
+//								map.put(DictCodeListExt3.交易方向_质押券出库.getValue(), converseRatio);
+//							}
+//						} else {
+//							map.put(ps, dto.getDeclaredPrice());
+//						}
+//					}
+//				}
+//			}
+//			return new Message<Map<String, Object>>().success().setData(map);
+//		}catch (Exception e) {
+//			logger.error("查询报价维护信息",e);
+//			return new Message<Map<String, Object>>().fail().setMessage("查询报价维护信息异常");
+//		}
+//	}
+//
+//	/**
+//	 * 申报类型-》交易方向的映射
+//	 * @param othCodeType
+//	 * @return
+//	 */
+//	private String OthTypeMapToPs(String othCodeType) {
+//		if (StringUtils.equals(othCodeType, DictCodeListExt3.金融产品其他代码类型_可转债信用申购代码.getValue())) {
+//			return DictCodeList.交易方向_申购.getValue();
+//		}else if(StringUtils.equals(othCodeType, DictCodeListExt3.金融产品其他代码类型_回售代码.getValue())){
+//			return DictCodeList.交易方向_行权_回售.getValue();
+//		}else if(StringUtils.equals(othCodeType, DictCodeListExt3.金融产品其他代码类型_可转债转股代码.getValue())){
+//			return DictCodeListExt1.交易方向_债转股.getValue();
+//		}else if(StringUtils.equals(othCodeType, DictCodeListExt3.金融产品其他代码类型_质押代码.getValue())){
+//			return DictCodeListExt3.交易方向_质押券入库.getValue();
+//		}else if(StringUtils.equals(othCodeType, DictCodeListExt3.金融产品其他代码类型_配股代码.getValue())){
+//			return DictCodeListExt2.交易方向_配股.getValue();
+//		}else if(StringUtils.equals(othCodeType, DictCodeListExt3.金融产品其他代码类型_新股申购代码.getValue())){
+//			return DictCodeList.交易方向_申购.getValue();
+//		}
+//		return null;
+//	}
 
 
 	/***
@@ -1827,7 +1887,7 @@ public class EtrExchangeTradeSecRepo001Controller extends BaseController{
 	 * @see
 	 * @since 1.0
 	 */
-	@ApiOperation(value="查询竞价交易行情信息",notes = "查询竞价交易行情信息")
+	@ApiOperation(value="查询交易行情信息",notes = "查询交易行情信息")
 	@ResponseBody
 	@PostMapping("findQuotations")
 	public Message<EtrExchangeTradeQuotationHqSecRepoResponse> findQuotations(@RequestBody String secId) {
@@ -1836,8 +1896,8 @@ public class EtrExchangeTradeSecRepo001Controller extends BaseController{
 			EtrExchangeTradeQuotationHqSecRepoResponse quotations = etrExchangeTradeSecRepo001Service.findQuotations(secId);
 			return new Message<EtrExchangeTradeQuotationHqSecRepoResponse>().success().setData(quotations);
 		}catch (Exception e) {
-			logger.error("查询竞价易行情数据异常",e);
-			return new Message<EtrExchangeTradeQuotationHqSecRepoResponse>().fail().setMessage("查询竞价交易行情信息数据异常");
+			logger.error("查询交易行情数据异常",e);
+			return new Message<EtrExchangeTradeQuotationHqSecRepoResponse>().fail().setMessage("查询交易行情信息数据异常");
 		}
 	}
 
@@ -1896,32 +1956,32 @@ public class EtrExchangeTradeSecRepo001Controller extends BaseController{
 		}
 	}
 
-
-
-	/**
-	 * 查询最大申请数量
-	 * <一句话功能简述>
-	 * @return
-	 * @see
-	 * @since 1.0
-	 */
-	@ApiOperation(value="查询最大申请数量",notes = "查询最大申请数量")
-	@ResponseBody
-	@PostMapping("getMaxEntrustNum")
-	public Message<String> getEntrustNum(@RequestBody EtrExchangeTradeSecRepoRequest request) {
-		try {
-			Map<String,Object> param = BeanUtil.object2Map(request);
-			BigDecimal entrustNum = etrExchangeTradeSecRepo001Service.getEntrustNum(param);
-			if(entrustNum == null) {
-				entrustNum= BigDecimal.ZERO;
-			}
-			String entrustNumStr=entrustNum.setScale(2).toString();
-			return new Message<String>(entrustNumStr);
-		}catch (Exception e) {
-			logger.error("查询最大申请数量异常",e);
-			return new Message<String>().fail().setMessage("查询最大申请数量异常");
-		}
-	}
+//
+//
+//	/**
+//	 * 查询最大申请数量
+//	 * <一句话功能简述>
+//	 * @return
+//	 * @see
+//	 * @since 1.0
+//	 */
+//	@ApiOperation(value="查询最大申请数量",notes = "查询最大申请数量")
+//	@ResponseBody
+//	@PostMapping("getMaxEntrustNum")
+//	public Message<String> getEntrustNum(@RequestBody EtrExchangeTradeSecRepoRequest request) {
+//		try {
+//			Map<String,Object> param = BeanUtil.object2Map(request);
+//			BigDecimal entrustNum = etrExchangeTradeSecRepo001Service.getEntrustNum(param);
+//			if(entrustNum == null) {
+//				entrustNum= BigDecimal.ZERO;
+//			}
+//			String entrustNumStr=entrustNum.setScale(2).toString();
+//			return new Message<String>(entrustNumStr);
+//		}catch (Exception e) {
+//			logger.error("查询最大申请数量异常",e);
+//			return new Message<String>().fail().setMessage("查询最大申请数量异常");
+//		}
+//	}
 	@ApiOperation(value = "获取服务器时间", notes = "获取服务器时间")
 	@ResponseBody
 	@RequestMapping(value = "queryLocalTime", method = RequestMethod.POST)
@@ -1945,31 +2005,31 @@ public class EtrExchangeTradeSecRepo001Controller extends BaseController{
 			return new Message<List<MinPirceDto>>().fail().setData(null);
 		}
 	}
-
-	/**
-	 *
-	 * @Description //获得权益额度
-	 * @Param [map]
-	 * @return java.util.List<com.joyintech.tams.common.base.entity.FinProductQuto>
-	 * @version 1.0
-	 * @see
-	 **/
-	@ApiOperation(value = "获得权益额度", notes = "获得权益额度")
-	@ResponseBody
-	@PostMapping("getFinProductQutoInfo")
-	public Message<FinProductQuto> getFinProductQutoInfo(@RequestBody FinProductQutoRequest request){
-		try{
-			Map<String,Object> param= JsonUtils.object2Map(request);
-			List<FinProductQuto> finProductQutoList = etrExchangeTradeSecRepo001Service.getFinProductQutoInfo(param);
-			if(!CollectionUtils.isEmpty(finProductQutoList)){
-				return new Message<FinProductQuto>().success().setData(finProductQutoList.get(0));
-			}else{
-				return new Message<FinProductQuto>().success().setData(null);
-			}
-		}catch (Exception e){
-			return new Message<FinProductQuto>().fail().setData(null);
-		}
-	}
+//
+//	/**
+//	 *
+//	 * @Description //获得权益额度
+//	 * @Param [map]
+//	 * @return java.util.List<com.joyintech.tams.common.base.entity.FinProductQuto>
+//	 * @version 1.0
+//	 * @see
+//	 **/
+//	@ApiOperation(value = "获得权益额度", notes = "获得权益额度")
+//	@ResponseBody
+//	@PostMapping("getFinProductQutoInfo")
+//	public Message<FinProductQuto> getFinProductQutoInfo(@RequestBody FinProductQutoRequest request){
+//		try{
+//			Map<String,Object> param= JsonUtils.object2Map(request);
+//			List<FinProductQuto> finProductQutoList = etrExchangeTradeSecRepo001Service.getFinProductQutoInfo(param);
+//			if(!CollectionUtils.isEmpty(finProductQutoList)){
+//				return new Message<FinProductQuto>().success().setData(finProductQutoList.get(0));
+//			}else{
+//				return new Message<FinProductQuto>().success().setData(null);
+//			}
+//		}catch (Exception e){
+//			return new Message<FinProductQuto>().fail().setData(null);
+//		}
+//	}
 	@ApiOperation(value = "头寸信息查询", notes = "头寸信息查询")
 	@PostMapping("/queryPositionInfo")
 	@ResponseBody
