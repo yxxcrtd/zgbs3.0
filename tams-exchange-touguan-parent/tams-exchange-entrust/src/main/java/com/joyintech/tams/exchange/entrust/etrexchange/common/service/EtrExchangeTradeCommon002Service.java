@@ -138,6 +138,8 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
                 }
                 param.put("A_001", DictCodeListExt3.资产类型_资产账户持仓.getValue());
                 param.put("NO_TRADE_BUSINESS_ETR", TempConstant.NO_TRADE_BUSINESS_ETR);
+                param.put("SHARES_TRADE_PLATFORM_03", DictCodeList.交易平台_固定收益平台.getValue());
+                param.put("TYPE_6", DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue());
                 // 浮动盈亏计算修改 modify by yufei 20200806 start
                 //Page<EtrExchangeTradePositionsCommonResponse> result = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> etrExchangeTradeCommonMapper.findPositionsPage(param));
                 Page<EtrExchangeTradePositionsCommonResponse> result = new Page<>();

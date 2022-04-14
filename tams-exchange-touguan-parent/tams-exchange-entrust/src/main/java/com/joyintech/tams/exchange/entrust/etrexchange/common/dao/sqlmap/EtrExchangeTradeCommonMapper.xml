@@ -425,6 +425,7 @@
             FIN_PRODUCT FP
         ON
             TEMP.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_TYPE FPT ON FPT.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN
             PTL_PORTFOLIO PP
         ON
@@ -477,9 +478,20 @@
         ) invaim on invaim.FINPROD_ID=TEMP.FINPROD_ID and invaim.PORTFOLIO_ID=TEMP.PORTFOLIO_ID
         WHERE
         FP.TRADE_MARKET IN (#{TRADE_PLACE_03}, #{TRADE_PLACE_04})
-        <if test="tradePlat != null and tradePlat !='' and tradePlat==NO_TRADE_BUSINESS_ETR">
-            AND FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR}
-        </if>
+        <choose>
+            <when test="tradePlat != null and tradePlat !='' and tradePlat==NO_TRADE_BUSINESS_ETR">
+                AND FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR}                                             <!-- 债券 -->
+            </when>
+            <when test="tradePlat != null and tradePlat !='' and tradePlat==SHARES_TRADE_PLATFORM_03">
+                AND FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR} AND  FPT.TYPE_6=#{TYPE_6,jdbcType=VARCHAR}   <!-- 可债券 -->
+            </when>
+            <when test="tradePlat != null and tradePlat != '' and tradePlat == SHARES_TRADE_PLATFORM_04">
+                 (AND FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR} AND  FPT.TYPE_6=#{TYPE_6,jdbcType=VARCHAR}) or (FP.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10})) <!-- 可债券 、股票 、基金 -->
+            </when>
+            <when test="tradePlat != null and tradePlat != '' and tradePlat == SHARES_TRADE_PLATFORM_04">
+                 (AND FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR} AND  FPT.TYPE_6=#{TYPE_6,jdbcType=VARCHAR}) or (FP.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10})) <!-- 可债券 、股票 、基金 -->
+            </when>
+        </choose>
         <if test="portfolioIdList != null and portfolioIdList.size()>0">
             <foreach collection="portfolioIdList" open="AND TEMP.PORTFOLIO_ID IN (" item="portfolioId" separator="," close=")">
                     #{portfolioId,jdbcType=VARCHAR}
