@@ -3,7 +3,6 @@ package com.joyintech.tams.cfets.etrib.bond.controller;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.tams.business.common.pojo.Message;
-import com.joyintech.tams.business.common.service.CfgDataTableService;
 import com.joyintech.tams.cfets.etrib.bond.dto.CfetsEtrFinProductInfoResponse;
 import com.joyintech.tams.cfets.etrib.bond.service.CfetsEtrFinProductInfoService;
 import io.swagger.annotations.Api;
@@ -16,10 +15,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 
 /**
@@ -44,7 +39,9 @@ public class CfetsEtrIbBondProductInfoController extends BaseController {
     @PostMapping("/getEtrFinProductInfo/{pageCode}/{dtCode}/{secId:.+}")
     @ApiOperation(value = "债券信息查询功能", notes = "债券信息查询功能")
     @ResponseBody
-    public Message<CfetsEtrFinProductInfoResponse> getEtrFinProductInfo(@PathVariable("pageCode") String pageCode, @PathVariable("dtCode") String dtCode, @PathVariable String secId) {
+    public Message<CfetsEtrFinProductInfoResponse> getEtrFinProductInfo(@PathVariable("pageCode") String pageCode,
+                                                                        @PathVariable("dtCode") String dtCode,
+                                                                        @PathVariable String secId) {
         try {
             //查询债券信息
             CfetsEtrFinProductInfoResponse finProductInfo = cfetsEtrFinProductInfoService.findFinProductInfo(pageCode, dtCode, secId);
