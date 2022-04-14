@@ -1,6 +1,9 @@
 package com.joyintech.service.entrust.etrconbond.service;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.joyintech.framework.security.SecurityUtil;
+import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.entrust.etrconbond.dao.EtrConBondMapper;
 import com.joyintech.service.entrust.etrconbond.dto.EtrConBondDto;
@@ -67,6 +70,7 @@ public class PositionRequestEtrConBondService {
      * @param entity
      */
     public void sendClose(String entrustId, String closeWay) {
+        /*
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("userId", SecurityUtil.getLoginUser().getUserName());
 //        resultMap.put("totalTradeId", entity.getWorkflowId());
@@ -76,6 +80,23 @@ public class PositionRequestEtrConBondService {
         resultMap.put("decisionAct", DictCodeListExt3.系统动作_关闭.getValue());
         resultMap.put("systemAct", DictCodeListExt3.系统动作_关闭.getValue());
         resultMap.put("closeId", entrustId);
+        PositionHttpRequest.batchClose(resultMap);**/
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("userId", SecurityUtil.getLoginUser().getUserName());
+        resultMap.put("totalTradeId", IDGenerator.generate(32));
+        resultMap.put("modelType", "ETR");
+
+        List<Map<String, Object>> list = Lists.newArrayList();
+        Map<String, Object> map = Maps.newHashMap();
+
+        map.put("busiType", DictCodeListExt3.头寸业务类型_网下申购.getValue());
+        map.put("ps", DictCodeList.交易方向_申购.getValue());
+        map.put("busiAct",DictCodeListExt3.业务动作_指令手动关闭.getValue());
+        map.put("systemAct", DictCodeListExt3.系统动作_关闭.getValue());
+        map.put("closeId", entrustId);
+
+        list.add(map);
+        resultMap.put("data",list);
         PositionHttpRequest.batchClose(resultMap);
     }
 

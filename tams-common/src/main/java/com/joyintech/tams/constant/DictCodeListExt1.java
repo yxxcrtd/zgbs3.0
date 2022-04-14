@@ -695,6 +695,8 @@ public enum DictCodeListExt1 implements BaseDictCodeList {
 	平安业务类型_通道费用支付(DictCode.平安业务类型,"118", "通道费用支付"),
 	平安业务类型_增值税缴纳(DictCode.平安业务类型,"116","增值税缴纳"),
 	平安业务类型_产品交易资金分配(DictCode.平安业务类型,"120","产品交易资金分配"),
+	平安业务类型_上市流通(DictCode.平安业务类型,"82","上市流通"),
+
 	/*guyunfei 20191122 子组合资金调配码值跟设计文档不统一 start*/
 	平安业务类型_子组合资金调配(DictCode.平安业务类型,"119","子组合资金调配"),
 	/*guyunfei 20191122 子组合资金调配码值跟设计文档不统一 end*/

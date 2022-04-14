@@ -92,6 +92,8 @@
         <result column="IS_ISSUE_ASSET" property="isIssueAsset" jdbcType="VARCHAR" />
         <result column="APPEAR_MARKET_ID" property="appearMarketId" jdbcType="VARCHAR" />
         <result column="WIND_CODE" property="windCode" jdbcType="VARCHAR" />
+        <result column="CROSS_MARKET" property="crossMarket" jdbcType="VARCHAR" />
+        <result column="CROSS_MARKET_CODE" property="crossMarketCode" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
         FINPROD_ID FINPROD_ID, SALE_DEPARTMENT SALE_DEPARTMENT, SALE_LAYER SALE_LAYER, SALE_PERIOD SALE_PERIOD, 
@@ -118,7 +120,8 @@
         BONUS_TYPE BONUS_TYPE, TDY_REV_TRANS TDY_REV_TRANS, LISTING_DATE LISTING_DATE, MIN_SALE_UNIT MIN_SALE_UNIT, 
         FUTURES_CONTRACT_ID FUTURES_CONTRACT_ID, LAST_TRADE_DATE LAST_TRADE_DATE, LAST_SETTLE_DATE LAST_SETTLE_DATE, 
         DELIVERY_METHOD DELIVERY_METHOD, CONTRACT_MULTIPLIER CONTRACT_MULTIPLIER, IS_EFF_PLEDGE IS_EFF_PLEDGE, 
-        IS_ISSUE_ASSET IS_ISSUE_ASSET, APPEAR_MARKET_ID APPEAR_MARKET_ID, WIND_CODE WIND_CODE
+        IS_ISSUE_ASSET IS_ISSUE_ASSET, APPEAR_MARKET_ID APPEAR_MARKET_ID, WIND_CODE WIND_CODE,CROSS_MARKET CROSS_MARKET,
+        CROSS_MARKET_CODE CROSS_MARKET_CODE
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -171,7 +174,7 @@
             MIN_SALE_UNIT, FUTURES_CONTRACT_ID, LAST_TRADE_DATE, 
             LAST_SETTLE_DATE, DELIVERY_METHOD, CONTRACT_MULTIPLIER, 
             IS_EFF_PLEDGE, IS_ISSUE_ASSET, APPEAR_MARKET_ID, 
-            WIND_CODE)
+            WIND_CODE,CROSS_MARKET,CROSS_MARKET_CODE)
         values (#{finprodId,jdbcType=VARCHAR}, #{saleDepartment,jdbcType=VARCHAR}, #{saleLayer,jdbcType=VARCHAR}, 
             #{salePeriod,jdbcType=DECIMAL}, #{purSpeed,jdbcType=DECIMAL}, #{redSpeed,jdbcType=DECIMAL}, 
             #{isSecBond,jdbcType=VARCHAR}, #{windId,jdbcType=VARCHAR}, #{isAutoUpdate,jdbcType=VARCHAR}, 
@@ -202,7 +205,7 @@
             #{minSaleUnit,jdbcType=DECIMAL}, #{futuresContractId,jdbcType=VARCHAR}, #{lastTradeDate,jdbcType=DATE}, 
             #{lastSettleDate,jdbcType=DATE}, #{deliveryMethod,jdbcType=VARCHAR}, #{contractMultiplier,jdbcType=DECIMAL}, 
             #{isEffPledge,jdbcType=VARCHAR}, #{isIssueAsset,jdbcType=VARCHAR}, #{appearMarketId,jdbcType=VARCHAR}, 
-            #{windCode,jdbcType=VARCHAR})
+            #{windCode,jdbcType=VARCHAR},#{crossMarket,jdbcType=VARCHAR},#{crossMarketCode,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.FinProductAdd" >
         insert into FIN_PRODUCT_ADD
@@ -477,6 +480,12 @@
             <if test="windCode != null" >
                 WIND_CODE,
             </if>
+            <if test="crossMarket != null" >
+                CROSS_MARKET,
+            </if>
+            <if test="crossMarketCode != null" >
+                CROSS_MARKET_CODE,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="finprodId != null" >
@@ -749,6 +758,12 @@
             <if test="windCode != null" >
                 #{windCode,jdbcType=VARCHAR},
             </if>
+            <if test="crossMarket != null" >
+                #{crossMarket,jdbcType=VARCHAR},
+            </if>
+            <if test="crossMarketCode != null" >
+                #{crossMarketCode,jdbcType=VARCHAR},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.FinProductAdd" >
@@ -766,7 +781,7 @@
         IS_QTZQ, DATA_SOURCE, IS_RATE_ADJUST, BOND_RISK_TYPE, CREDIT_ENHANCE_MEASURE, FUND_MANGER_NAME, 
         BONUS_TYPE, TDY_REV_TRANS, LISTING_DATE, MIN_SALE_UNIT, FUTURES_CONTRACT_ID, LAST_TRADE_DATE, 
         LAST_SETTLE_DATE, DELIVERY_METHOD, CONTRACT_MULTIPLIER, IS_EFF_PLEDGE, IS_ISSUE_ASSET, 
-        APPEAR_MARKET_ID, WIND_CODE)
+        APPEAR_MARKET_ID, WIND_CODE,CROSS_MARKET,CROSS_MARKET_CODE)
         select FINPROD_ID, SALE_DEPARTMENT, SALE_LAYER, SALE_PERIOD, 
             PUR_SPEED, RED_SPEED, IS_SEC_BOND, WIND_ID, IS_AUTO_UPDATE, PORTFOLIO_ID, PROD_REGIST_CODE, 
             IS_CYCLE, IS_LAY, LAY_TYPE, INVEST_NATURE, PROFIT_FLAG, SALE_MODE, CHB_ID, TMPL_ID, 
@@ -781,7 +796,7 @@
             IS_QTZQ, DATA_SOURCE, IS_RATE_ADJUST, BOND_RISK_TYPE, CREDIT_ENHANCE_MEASURE, FUND_MANGER_NAME, 
             BONUS_TYPE, TDY_REV_TRANS, LISTING_DATE, MIN_SALE_UNIT, FUTURES_CONTRACT_ID, LAST_TRADE_DATE, 
             LAST_SETTLE_DATE, DELIVERY_METHOD, CONTRACT_MULTIPLIER, IS_EFF_PLEDGE, IS_ISSUE_ASSET, 
-            APPEAR_MARKET_ID, WIND_CODE
+            APPEAR_MARKET_ID, WIND_CODE,CROSS_MARKET,CROSS_MARKET_CODE
              from FIN_PRODUCT_ADD
              where 1 = 1 and FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
     </insert>
@@ -1043,6 +1058,12 @@
             <if test="windCode != null" >
                 WIND_CODE = #{windCode,jdbcType=VARCHAR},
             </if>
+            <if test="crossMarket != null" >
+                CROSS_MARKET = #{crossMarket,jdbcType=VARCHAR},
+            </if>
+            <if test="crossMarketCode != null" >
+                CROSS_MARKET_CODE = #{crossMarketCode,jdbcType=VARCHAR},
+            </if>
         </set>
         where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
     </update>
@@ -1132,7 +1153,9 @@
             IS_EFF_PLEDGE = #{isEffPledge,jdbcType=VARCHAR},
             IS_ISSUE_ASSET = #{isIssueAsset,jdbcType=VARCHAR},
             APPEAR_MARKET_ID = #{appearMarketId,jdbcType=VARCHAR},
-            WIND_CODE = #{windCode,jdbcType=VARCHAR}
+            WIND_CODE = #{windCode,jdbcType=VARCHAR},
+            CROSS_MARKET = #{crossMarket,jdbcType=VARCHAR},
+            CROSS_MARKET_CODE = #{crossMarketCode,jdbcType=VARCHAR}
         where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
     </update>
 </mapper>

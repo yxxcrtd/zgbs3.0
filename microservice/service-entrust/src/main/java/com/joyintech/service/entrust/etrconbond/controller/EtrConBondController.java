@@ -129,7 +129,7 @@ public class EtrConBondController {
     @PostMapping("recall")
     public boolean recallDelegate(@RequestBody EtrConBondDto dto) throws IllegalAccessException, InvocationTargetException {
         boolean result = service.recallDelegate(dto);
-        positionRequestService.sendRevoke(dto);
+//        positionRequestService.sendRevoke(dto);
         return result;
     }
 

@@ -441,6 +441,16 @@ public class FinProductAdd extends BaseEntity {
     private String windCode;
 
     /**
+     * 跨市场发行
+     */
+    private String crossMarket;
+
+    /**
+     * 跨市场发行代码,多个逗号分割
+     */
+    private String crossMarketCode;
+
+    /**
      * 取得 金融产品代码
      * @return 金融产品代码
      */
@@ -1804,5 +1814,37 @@ public class FinProductAdd extends BaseEntity {
      */
     public void setWindCode(String windCode) {
         this.windCode = windCode == null ? null : windCode.trim();
+    }
+
+    /**
+     * 取得 跨市场发行
+     * @return 跨市场发行
+     */
+    public String getCrossMarket() {
+        return crossMarket;
+    }
+
+    /**
+     * 设置 跨市场发行
+     * @param crossMarket 跨市场发行
+     */
+    public void setCrossMarket(String crossMarket) {
+        this.crossMarket = crossMarket == null ? null : crossMarket.trim();
+    }
+
+    /**
+     * 取得 跨市场发行代码,多个逗号分割
+     * @return 跨市场发行代码,多个逗号分割
+     */
+    public String getCrossMarketCode() {
+        return crossMarketCode;
+    }
+
+    /**
+     * 设置 跨市场发行代码,多个逗号分割
+     * @param crossMarketCode 跨市场发行代码,多个逗号分割
+     */
+    public void setCrossMarketCode(String crossMarketCode) {
+        this.crossMarketCode = crossMarketCode == null ? null : crossMarketCode.trim();
     }
 }
