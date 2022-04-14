@@ -23,6 +23,7 @@ import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTradeDto;
@@ -104,6 +105,26 @@ public class TrdBondTrade002Controller extends BaseController {
         return trdBondTrade002Service.selectInfoBySecId(map);
     }
 
+
+    /**
+     * 资金账户下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getTrdAcctId")
+    public List<SelectOptionDto> getTrdAcctId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        String[] accTypeArr =  {DictCodeListExt1.资金账户类型_产品托管户.getValue(),
+                DictCodeListExt1.资金账户类型_券商资金账户.getValue(),
+                DictCodeListExt1.资金账户类型_结算备付金账户.getValue(),};
+        param.put("finprodId",param.get("prodId"));
+        param.put("accTypeArr",accTypeArr);
+        return commonBusinessService.getTrdAcctId(param);
+    }
+
     /**
      * 查询证券托管户：下拉框
      *
@@ -129,21 +150,6 @@ public class TrdBondTrade002Controller extends BaseController {
     @ResponseBody
     public Page<SelectOptionDto> getChannelId() {
         return trdBondTrade002Service.getChannelId(RequestUtil.getPageParam());
-    }
-
-    /**
-     * 资金账户下拉框
-     *
-     * @return 资产代码
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("/getTrdAcctId")
-    public List<SelectOptionDto> getTrdAcctId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("portfolioId",param.get("finprodId"));
-        return commonBusinessService.getTrdAcctId(param);
     }
 
     /**

@@ -1,10 +1,11 @@
 package com.joyintech.tams.valuation.trademanage.bond.service;
 
-import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
@@ -13,6 +14,7 @@ import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 import com.joyintech.tams.valuation.common.interf.base.dto.AssetDealInfoValCommonResult;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.sec.SecVestAssetDealTemplateRecService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValSecVestAssetDeal;
+import com.joyintech.tams.valuation.component.common.dto.FinCashPlanDto;
 import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTradeDto;
 import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTradeResult;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -130,7 +132,25 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTradeDto>
         }
 
         valSecVestAssetDeal.setStlForm("03");//结算方式
-        valSecVestAssetDeal.setParValue(new BigDecimal(0));//单位面值
+        //查询标的面值,查询还本计划
+        List<FinCashPlanDto> findinvList = new ArrayList<>();
+        Map<String,Object> param = new HashMap<>();
+        param.put("finprodId",trdBondTradeDto.getSecId());
+        param.put("tradeDate", DateUtil.format(trdBondTradeDto.getTradeDate()));
+        findinvList= getRepaymentInfo(param);
+        BigDecimal faceValue = new BigDecimal(100);
+        if(!StringUtil.isEmptyList(findinvList)){
+            for(FinCashPlanDto dto:findinvList){
+                faceValue = ArithmeticUtil.subtract(faceValue,dto.getPrinAmt()) ;
+            }
+            if((new BigDecimal(0)).compareTo(faceValue) == -1){
+                valSecVestAssetDeal.setParValue(faceValue);//单位面值
+            }else{
+                valSecVestAssetDeal.setParValue(new BigDecimal(100));//单位面值
+            }
+        }else{
+            valSecVestAssetDeal.setParValue(new BigDecimal(100));//单位面值
+        }
         valSecVestAssetDeal.setFeeAmtUnpay(new BigDecimal(0));//未随交易支付费用
         valSecVestAssetDeal.setYield(new BigDecimal(0));//到期收益率
         valSecVestAssetDeal.setCounterId(null);//交易对手
@@ -208,6 +228,11 @@ public class TrdBondTrade002Service extends CommonExportService<TrdBondTradeDto>
         TrdBondTradeResult entity = new TrdBondTradeResult(result);
         entity.setTrdBondTradeDto(trdBondTradeDto);
         return entity;
+    }
+
+    public List<FinCashPlanDto> getRepaymentInfo(Map<String, Object> map){
+        return restTemplate.postForList(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdBondTrade002/getRepaymentInfo"
+                , map,FinCashPlanDto.class);
     }
 
 }

@@ -529,9 +529,9 @@
                                         <label class="layui-form-label form-label-wrap"
                                                data-th-text="#{TrdBondTrade.myAcctNo_qr}">资金账户</label>
                                         <div class="layui-input-inline input-inline" >
-                                            <select id="myAcctNo_qr" name="myAcctNo_qr" required
+                                            <select id="myAcctNo_qr" name="myAcctNo_qr" required parentIds="prodId"
                                                     class="layui-input form-input input-select"
-                                                    data-th-data-url="@{/valuation/trademanage/bondlend/TrdBondLendTrade002/getTrdAcctId}"
+                                                    data-th-data-url="@{/valuation/trademanage/bond/TrdBondTrade002/getTrdAcctId}"
                                                     allowClear="true" placeholder="请输入内容"
                                                     data-th-initValue="${entity?.myAcctNo_qr}">
                                             </select>

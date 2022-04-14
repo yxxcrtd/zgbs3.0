@@ -62,8 +62,17 @@ public class TrdBondTrade001Service extends BaseService {
         String[] psArr = null;
         if (StringUtil.isNotEmpty(ps)) {
             psArr = ps.split(",");
+            pageParam.put("psArr", psArr);
+        }else{
+            String[] psArr1 = {DictCodeList.交易方向_买入.getValue()
+            ,DictCodeList.交易方向_卖出.getValue()
+            ,DictCodeList.交易方向_行权_回售.getValue()
+            ,DictCodeList.交易方向_申购.getValue()
+            ,DictCodeList.交易方向_申购确认.getValue()
+            ,DictCodeList.交易方向_行权_赎回.getValue()};
+            pageParam.put("psArr", psArr1);
         }
-        pageParam.put("psArr", psArr);
+
 
         // 获取交易方向
         String tradeMarket = (String)pageParam.get("tradeMarket");
@@ -94,57 +103,6 @@ public class TrdBondTrade001Service extends BaseService {
         return this.queryForPage(page, length,
                 () -> trdBondTradeMapper.selectDeal(pageParam));
     }
-
-    /**
-     * 不分页查询
-     *
-     * @see
-     * @since 1.0
-     */
-    public List<TrdBondTradeDto> queryPageList(Map<String, Object> params){
-        //产品代码
-        String finprodId = (String)params.get("finprodId");
-        String[] finprodIdArr = null;
-        if(StringUtil.isNotEmpty(finprodId)){
-            finprodIdArr = finprodId.split(",");
-        }
-        params.put("finprodIdArr", finprodIdArr);
-        //资产代码
-        String asset = (String)params.get("asset");
-        String[] assetIdArr = null;
-        if(StringUtil.isNotEmpty(asset)){
-            assetIdArr = asset.split(",");
-        }
-        params.put("assetIdArr", assetIdArr);
-        // 获取交易方向
-        String ps = (String)params.get("ps");
-        // 交易方向多选，转为数组
-        String[] psArr = null;
-        if (StringUtil.isNotEmpty(ps)) {
-            psArr = ps.split(",");
-        }
-        params.put("psArr", psArr);
-
-        // 获取交易方向
-        String tradeMarket = (String)params.get("tradeMarket");
-        // 交易方向多选，转为数组
-        String[] tradeMarketArr = null;
-        if (StringUtil.isNotEmpty(tradeMarket)) {
-            tradeMarketArr = tradeMarket.split(",");
-        }
-        params.put("tradeMarketArr", tradeMarketArr);
-
-        params.put("BUSI_TYPE_02", BussinessDictCodeList.业务类型_债券交易.getValue());
-        params.put("PS_T01", DictCodeList.交易方向_买入.getValue());
-        params.put("PS_T02", DictCodeList.交易方向_卖出.getValue());
-        params.put("PS_T03", DictCodeList.交易方向_行权_回售.getValue());
-        params.put("PS_T04", DictCodeList.交易方向_申购.getValue());
-        params.put("PS_T05", DictCodeList.交易方向_申购确认.getValue());
-        params.put("PS_T39", DictCodeList.交易方向_行权_赎回.getValue());
-
-        return trdBondTradeMapper.selectDeal(params);
-    }
-
 
     public int delete(TrdBondTradeDto dto) {
         int count=0;

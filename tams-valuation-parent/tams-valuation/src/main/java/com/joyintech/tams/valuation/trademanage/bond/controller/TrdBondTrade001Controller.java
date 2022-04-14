@@ -21,6 +21,7 @@ import com.joyintech.framework.util.*;
 import com.joyintech.system.constant.SystemGlobalConstant;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTradeDto;
 import com.joyintech.tams.valuation.trademanage.bond.service.TrdBondTrade001Service;
@@ -199,51 +200,17 @@ public class TrdBondTrade001Controller extends BaseController {
         return new AjaxResult(msg);
     }
 
-
     /**
-     * 导出信息excel
-     *
-     * @return excel
-     * @throws Exception 异常
+     * 导出
+     * @return
+     * @throws Exception
      * @see
      * @since 1.0
      */
-//    @RequestMapping(ACTION_EXPORT)
-//    public ResponseEntity<byte[]> export()
-//        throws Exception {
-//        return trdBondTrade001Service.export(this.getPageId(), RequestUtil.getPageParam());
-//    }
-
-    /**
-     * 导出数据 <一句话功能简述> <功能详细描述>
-     *
-     * @return List<ValFundMarketInfo001dto>
-     * @throws Exception Exception
-     */
     @RequestMapping(ACTION_EXPORT)
-    public ResponseEntity<byte[]> export()
-            throws ParseException, IOException {
-
-        String datas = this.getParam("datas");
-        Map<String, Object> params = RequestUtil.getPageParam();
-        List<TrdBondTradeDto> listdto;
-        if (datas != null) {
-            listdto = JsonUtils.json2List(datas, TrdBondTradeDto.class);
-        }
-        else {
-            listdto = trdBondTrade001Service.queryPageList(params);
-        }
-
-        File outFile = trdBondTrade001Service.makeFile(
-                "/com/joyintech/tams/valuation/trademanage/bond/conf/export_conf.xml",
-                listdto);
-        return ExportUtil.export(
-                this.getMessage(this.getPageId()) + SystemGlobalConstant.OPEN_PARENTHESIS
-                        + DateUtil.format(new Date())
-                        + SystemGlobalConstant.CLOSE_PARENTHESIS
-                        + SystemGlobalConstant.POINT
-                        + FileNameUtil.getFileExtName(outFile),
-                outFile, true);
+    public ResponseEntity<byte[]> export(){
+        Map<String, Object> param = RequestUtil.getParameters(getRequest());
+        return trdBondTrade001Service.export(this.getPageId(),param);
     }
 
 }
