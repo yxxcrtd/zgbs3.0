@@ -193,6 +193,18 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<!--基础数据-->
+		<dependency>
+			<groupId>com.joyintech</groupId>
+			<artifactId>tams-exchange-basicdata</artifactId>
+			<version>3.0.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 
 	</dependencies>
 	<build>
