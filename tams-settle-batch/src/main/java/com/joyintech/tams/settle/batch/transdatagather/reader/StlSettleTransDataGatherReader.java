@@ -65,10 +65,12 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
         //1)成交明细数量.回购类型 = 数据字典.回购类型.质押式竞价回购的数据组合list，后续逻辑参照【详细处理-协议回购sheet】
         List<StlSettleTransDataGatherParamDto> returnList=new ArrayList<>();
         List<StlSettleTransDataGatherDto> agreRepList= selectNeedTotalDataNewList.stream().filter(item->DictCodeList.回购类型_质押式协议回购.getValue().equals(item.getRepoType())).collect(Collectors.toList());
-        createAgreRepList(agreRepList,tradeDate,returnList);
+        // 处理协议回购数据
+        this.createAgreRepList(agreRepList,tradeDate,returnList);
         //2)成交明细数量.交易方向 = 数据字典.交易方向.债转股的数据组合list，后续逻辑参照【详细处理-债转股】sheet
         List<StlSettleTransDataGatherDto> bondToStockList= selectNeedTotalDataNewList.stream().filter(item->DictCodeListExt3.交易方向_债转股.getValue().equals(item.getPs())).collect(Collectors.toList());
-        createBondToStockList(bondToStockList,tradeDate,returnList);
+        // 处理债转股数据
+        this.createBondToStockList(bondToStockList,tradeDate,returnList);
         //3)其他的还是下面的逻辑	 查询得到的数据list按照 席位号 + 申请编号 的维度进行分组 得到List<Map<席位号 + 申请编号,StlSettleTransDataGatherDto>>
         List<StlSettleTransDataGatherDto> selectNeedTotalDataList= selectNeedTotalDataNewList.stream().filter(item->!DictCodeListExt3.交易方向_债转股.getValue().equals(item.getPs())&&
                         !DictCodeList.回购类型_质押式协议回购.getValue().equals(item.getRepoType())).collect(Collectors.toList());
@@ -398,52 +400,9 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
             SettleTransDataTotal dealTotal=new SettleTransDataTotal();
             StlSettleTransDataGatherDto settleTransDataDto=list.get(0);
             if(list.size()==1){
-                    String checkResult = settleTransDataDto.getCheckResult();
-                    if (StringUtil.isEmpty(checkResult)
-                            || StringUtil.equals(checkResult, DictCodeListExt3.对账状态结果_一致.getValue())
-                            || StringUtil.equals(checkResult, DictCodeListExt3.对账状态结果_手工完成.getValue())) {
-                        dealTotal = new SettleTransDataTotal();
-                        BeanUtils.copyProperties(settleTransDataDto, dealTotal);
-                        // GZYHTZJY-1100:深交所的到期续作到期交付日特殊处理 modify fuyongsheng 20220113 start
-                        if(DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(settleTransDataDto.getTradeMarket())
-                                && DictCodeList.交易方向_到期续做.getValue().equals(settleTransDataDto.getPs())){
-                            // 查询首期
-                            List<SettleTransData> sqSettleTransDatas = stlSettleTransDataGatherService.selectSqSettleTransDatas(settleTransDataDto);
-                            if(CollectionUtils.isNotEmpty(sqSettleTransDatas)){
-                                //到期交付日
-                                dealTotal.setMpayDate(sqSettleTransDatas.get(0).getVdate());
-                            }
-                        }
-                        // GZYHTZJY-1100:深交所的到期续作到期交付日特殊处理 modify fuyongsheng 20220113 end
-                        //  汇总交易编号
-                        dealTotal.setSeqId(IDGenerator.generate());
-                        if(DictCodeList.交易方向_买入.getValue().equals(dealTotal.getPs())){
-                            dealTotal.setfCjbh(settleTransDataDto.getCjbh());
-                        }
-                        settleTransDataList.add(dealTotal);
-                        //当笔成交数据明细.附属表流水号 非空
-                        if(StringUtil.isNotEmpty(settleTransDataDto.getTradeIdAdd())){
-                            SettleTransDataTotalAdd settleTransDataTotalAdd = new SettleTransDataTotalAdd();
-                            BeanUtils.copyProperties(settleTransDataDto, settleTransDataTotalAdd);
-                            settleTransDataTotalAdd.setTradeId(dealTotal.getSeqId());
-                            settleTransDataAddList.add(settleTransDataTotalAdd);
-                        }
-                        //当笔成交数据明细.质押品信息流水号 非空
-                        if(StringUtil.isNotEmpty(settleTransDataDto.getPledgeTradeId())){
-                            SettleTransDataTotalPledge settleTransDataTotalPledge = new SettleTransDataTotalPledge();
-                            settleTransDataTotalPledge.setTradeId(dealTotal.getSeqId());
-                            settleTransDataTotalPledge.setBranch(dealTotal.getBranch());
-                            settleTransDataTotalPledge.setPledgeFinprodId(settleTransDataDto.getPledgeFinprodId());
-                            // settleTransDataTotalPledge.setPledgeFaceValue(settleTransDataDto.getPledgeFaceValue());
-                            settleTransDataTotalPledge.setPledgeFaceValue(stlDataDealProcessCommonService
-                                    .getUnitPrice(settleTransDataDto.getPledgeFinprodId(), settleTransDataDto.getTradeDate()));
-                            settleTransDataTotalPledge.setPledgeNumber(settleTransDataDto.getPledgeNumber());
-                            settleTransDataTotalPledge.setPledgeRatio(settleTransDataDto.getPledgeRatio());
-                            settleTransDataTotalPledge.setPledgeAmt(settleTransDataDto.getPledgeAmt());
-                            settleTransDataTotalPledge.setDisplaceDirection(settleTransDataDto.getDisplaceDirection());
-                            settleTransDataPledgeList.add(settleTransDataTotalPledge);
-                        }
-                    }
+                // 处理单条协议回购成交明细数据
+                this.handleSingleH01SettleTransData(settleTransDataDto, settleTransDataList, settleTransDataAddList,
+                        settleTransDataPledgeList);
             }else{
                 //对账结果核对if 变量.temp_当前成交数据明细数据list 中所有数据都满足【对账结果 为空 或者为 对账一致 或者为 手工完成】
                 boolean flag=true;
@@ -554,9 +513,11 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                                 //本金金额
                                 dealTotal.setPrinAmt(item.getPrinAmt());
                                 // 首期成交编号
-                                if(!DictCodeList.交易方向_到期续做.getValue().equals(settleTransDataDto.getPs())){
-                                    dealTotal.setfCjbh(item.getCjbh());
-                                }
+                                // modify by fuyongsheng 协议回购首期的成交明细数据只有一条,不存在list>1的情况 20220414 start
+//                                if(!DictCodeList.交易方向_到期续做.getValue().equals(settleTransDataDto.getPs())){
+//                                    dealTotal.setfCjbh(item.getCjbh());
+//                                }
+                                // modify by fuyongsheng 协议回购首期的成交明细数据只有一条,不存在list>1的情况 20220414 end
                             }
                             if(StringUtil.equals(item.getBusiSceneCalss(), DictCodeListStl.业务场景分类明细_债券协议正回购_到期.getValue())
                                     ||StringUtil.equals(item.getBusiSceneCalss(), DictCodeListStl.业务场景分类明细_债券协议逆回购_到期.getValue())
@@ -655,7 +616,7 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                         }
                     }else{
                         flag=true;
-                        for (StlSettleTransDataGatherDto item : list) {
+                        for (StlSettleTransDataGatherDto item : list) { // 交易方向 in （中途换券， 解除质押）
                             String ps = item.getPs();
                             if (!(StringUtil.equals(ps, DictCodeListExt3.交易方向_中途换券.getValue())
                                     || StringUtil.equals(ps, DictCodeListExt3.交易方向_解除质押.getValue())
@@ -872,6 +833,68 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
         StlSettleTransDataGatherParamDto dataGatherParamDto = new StlSettleTransDataGatherParamDto(settleTransDataList,settleTransDataAddList,settleTransDataPledgeList);
         returnList.add(dataGatherParamDto);
         return returnList;
+    }
+
+    /**
+     * 处理单条协议回购成交明细数据
+     * @param settleTransDataDto
+     * @param settleTransDataList
+     * @param settleTransDataAddList
+     * @param settleTransDataPledgeList
+     */
+    private void handleSingleH01SettleTransData(StlSettleTransDataGatherDto settleTransDataDto,
+                                                List<SettleTransDataTotal> settleTransDataList,
+                                                List<SettleTransDataTotalAdd> settleTransDataAddList,
+                                                List<SettleTransDataTotalPledge> settleTransDataPledgeList){
+        String checkResult = settleTransDataDto.getCheckResult();
+        if (StringUtil.isEmpty(checkResult)
+                || StringUtil.equals(checkResult, DictCodeListExt3.对账状态结果_一致.getValue())
+                || StringUtil.equals(checkResult, DictCodeListExt3.对账状态结果_手工完成.getValue())) {
+            SettleTransDataTotal dealTotal = new SettleTransDataTotal();
+            BeanUtils.copyProperties(settleTransDataDto, dealTotal);
+            // GZYHTZJY-1100:深交所的到期续作到期交付日特殊处理 modify fuyongsheng 20220113 start
+            if(DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(settleTransDataDto.getTradeMarket())
+                    && DictCodeList.交易方向_到期续做.getValue().equals(settleTransDataDto.getPs())){
+                // 查询首期
+                List<SettleTransData> sqSettleTransDatas = stlSettleTransDataGatherService.selectSqSettleTransDatas(settleTransDataDto);
+                if(CollectionUtils.isNotEmpty(sqSettleTransDatas)){
+                    //到期交付日
+                    dealTotal.setMpayDate(sqSettleTransDatas.get(0).getVdate());
+                }
+            }
+            // GZYHTZJY-1100:深交所的到期续作到期交付日特殊处理 modify fuyongsheng 20220113 end
+            //  汇总交易编号
+            dealTotal.setSeqId(IDGenerator.generate());
+            if(DictCodeList.交易方向_买入.getValue().equals(dealTotal.getPs())){
+                // modify by fuyongsheng 协议回购首期的FCjbh存明细表的主键 start
+                // dealTotal.setfCjbh(settleTransDataDto.getCjbh());
+                dealTotal.setfCjbh(settleTransDataDto.getTradeId());
+                // modify by fuyongsheng 协议回购首期的FCjbh存明细表的主键 end
+            }
+            settleTransDataList.add(dealTotal);
+            //当笔成交数据明细.附属表流水号 非空
+            if(StringUtil.isNotEmpty(settleTransDataDto.getTradeIdAdd())){
+                SettleTransDataTotalAdd settleTransDataTotalAdd = new SettleTransDataTotalAdd();
+                BeanUtils.copyProperties(settleTransDataDto, settleTransDataTotalAdd);
+                settleTransDataTotalAdd.setTradeId(dealTotal.getSeqId());
+                settleTransDataAddList.add(settleTransDataTotalAdd);
+            }
+            //当笔成交数据明细.质押品信息流水号 非空
+            if(StringUtil.isNotEmpty(settleTransDataDto.getPledgeTradeId())){
+                SettleTransDataTotalPledge settleTransDataTotalPledge = new SettleTransDataTotalPledge();
+                settleTransDataTotalPledge.setTradeId(dealTotal.getSeqId());
+                settleTransDataTotalPledge.setBranch(dealTotal.getBranch());
+                settleTransDataTotalPledge.setPledgeFinprodId(settleTransDataDto.getPledgeFinprodId());
+                // settleTransDataTotalPledge.setPledgeFaceValue(settleTransDataDto.getPledgeFaceValue());
+                settleTransDataTotalPledge.setPledgeFaceValue(stlDataDealProcessCommonService
+                        .getUnitPrice(settleTransDataDto.getPledgeFinprodId(), settleTransDataDto.getTradeDate()));
+                settleTransDataTotalPledge.setPledgeNumber(settleTransDataDto.getPledgeNumber());
+                settleTransDataTotalPledge.setPledgeRatio(settleTransDataDto.getPledgeRatio());
+                settleTransDataTotalPledge.setPledgeAmt(settleTransDataDto.getPledgeAmt());
+                settleTransDataTotalPledge.setDisplaceDirection(settleTransDataDto.getDisplaceDirection());
+                settleTransDataPledgeList.add(settleTransDataTotalPledge);
+            }
+        }
     }
 
     //成交明细数量.交易方向 = 数据字典.交易方向.债转股的数据组合list，后续逻辑参照【详细处理-债转股】sheet

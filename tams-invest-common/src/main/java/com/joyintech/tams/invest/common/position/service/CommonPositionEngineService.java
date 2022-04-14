@@ -212,8 +212,9 @@ public class CommonPositionEngineService {
     public String getExchangeTradePlatform(String entrustId, String tradePlat, String ps, String finprodId, String interfaceType){
         // 可转债以外的债券调用头寸引擎判断逻辑使用是否非担保进行判断是竞价交易还是大宗交易
         if(INTERF_TYPE_BOND002.equals(interfaceType)){
-            // todo 查询标的信息根据是否非担保赋值交易平台 是:大宗 否:竞价
-            return null;
+            FinProductAdd finProductAdd = finProductAddMapper.selectByPrimaryKey(finprodId);
+            return DictCodeList.是否_是.getValue().equals(finProductAdd.getIsNoGuard()) ?
+                    DictCodeList.交易平台_大宗交易平台.getValue() : DictCodeList.交易平台_竞价撮合平台.getValue();
         }else{
             if(StringUtil.isEmpty(entrustId)){ // 存续期无指令
                 return tradePlat;

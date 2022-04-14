@@ -593,4 +593,10 @@ public class TradeAgentTerminal extends Agent implements TradeAgent, IAgentMsgHa
     public void reqAccountFuturesCommissionRate(FuturesInstrumentCommissionRateQryBean futuresInstrumentCommissionRateQryBean) throws Exception {
         asyncWrite(FunctionCode.REQ_QRY_FUTURES_COMMISSION_RATE, futuresInstrumentCommissionRateQryBean);
     }
+
+	@Override
+	public List<NegotiateQuoteReceiveBean> reqNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean)
+			throws Exception {
+		return (List<NegotiateQuoteReceiveBean>) syncWrite(FunctionCode.REQ_QRY_INTEGRATED_REPURCHASE_QUOTE, negotiateQuoteQueryBean);
+	}
 }

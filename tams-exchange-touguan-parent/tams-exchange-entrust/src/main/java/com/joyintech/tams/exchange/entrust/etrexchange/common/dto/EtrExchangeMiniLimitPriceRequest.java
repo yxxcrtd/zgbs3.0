@@ -15,7 +15,7 @@ public class EtrExchangeMiniLimitPriceRequest {
 
     @ApiModelProperty(name="finprodId",value="交易方向",example="xxx", required = true)
     private String ps;
-    @ApiModelProperty(name="tradePlat",value="交易平台",example="xxx", required = true)
+    @ApiModelProperty(name="tradePlat",value="交易平台(场内现券指令传'指定交易方式')",example="xxx", required = true)
     private String tradePlat;
     @ApiModelProperty(name="finprodType2",value="资产类型投管",example="xxx", required = true)
     private String finprodType2;

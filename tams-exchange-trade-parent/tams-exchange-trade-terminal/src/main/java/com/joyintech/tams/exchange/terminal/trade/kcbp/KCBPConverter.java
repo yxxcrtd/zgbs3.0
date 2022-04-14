@@ -1805,4 +1805,44 @@ public class KCBPConverter {
         }
         return rtgsStatusBeanList;
     }
+    
+    public static List<NegotiateQuoteReceiveBean> convertToNegotiateQuoteReceiveResponseSZ(List<List<String>> data) {
+        List<NegotiateQuoteReceiveBean> negotiateQuoteReceiveBeans = Lists.newArrayListWithExpectedSize(data.size() - 1);
+        List<String> columnNames = data.get(0);
+        for (int i = 1; i < data.size(); i++) {
+            List<String> content = data.get(i);
+            NegotiateQuoteReceiveBean negotiateQuoteReceiveBean = new NegotiateQuoteReceiveBean();
+            String bsFlag = null;
+            for (int j = 0; j < columnNames.size(); j++) {
+                String columnName = columnNames.get(j);
+                String value = content.get(j);
+                //TODO 根据接口返回转换成对应bean
+//                switch (columnName) {
+//
+//                    case "HQZQDM": {//证券代码
+//                        integratedBulkCloseQuoteBean.setStockCode(StockCodeUtils.formatStockCode(value, "SZ"));
+//                        break;
+//                    }
+//                    case "HQSBJG": {//申报价格
+//                        integratedBulkCloseQuoteBean.setClosingPrice(Double.parseDouble(value));
+//                        break;
+//                    }
+//                    case "HQSBSL": {//申报数量
+//                        integratedBulkCloseQuoteBean.setBuyAmount1(Integer.parseInt(value));
+//                        break;
+//                    }
+//                    case "HQSBSL2": {//申报数量2
+//                        integratedBulkCloseQuoteBean.setBuyAmount2(Integer.parseInt(value));
+//                        break;
+//                    }
+//                    case "HQZLLB": {//指令类别
+//                        bsFlag = value;
+//                        break;
+//                    }
+//                }
+            }
+        	negotiateQuoteReceiveBeans.add(negotiateQuoteReceiveBean);
+        }
+        return negotiateQuoteReceiveBeans;
+    }
 }

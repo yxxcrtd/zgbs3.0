@@ -66,6 +66,7 @@ public class MessageSenderManagement extends BaseService {
      * 成交推送
      */
     public void pushTrade(Trade trade, Instruction instruction, EntrustInterface entrust) {
+        logger.info("【pushTrade】 parameters：{}", JsonUtils.getJsonFromObject(trade));
         if (Objects.isNull(trade) || Strings.isNullOrEmpty(trade.getId())) {
             logger.error("【pushTrade】 check parameter failed");
             return;
@@ -82,6 +83,7 @@ public class MessageSenderManagement extends BaseService {
      * 成交手动交收推送
      */
     public void pushTradeForFixedIncome(Trade trade, Instruction instruction, EntrustInterface entrust) {
+        logger.info("【pushTradeForFixedIncome】 parameters：{}", JsonUtils.getJsonFromObject(trade));
         if (Objects.isNull(trade) || StringUtil.isEmpty(trade.getId()) || Objects.isNull(instruction)) {
             logger.error("【pushTradeForFixedIncome】 check parameter failed");
             return;
@@ -98,6 +100,7 @@ public class MessageSenderManagement extends BaseService {
      * 指令进度推送
      */
     public void pushProgress(Instruction instruction) {
+        logger.info("【pushProgress】 parameters：{}", JsonUtils.getJsonFromObject(instruction));
         if (Objects.isNull(instruction) || Strings.isNullOrEmpty(instruction.getEntrustId())) {
             logger.error("【pushProgress】 check parameter failed");
             return;
@@ -152,6 +155,8 @@ public class MessageSenderManagement extends BaseService {
     private void sendMessage(RecordLog recordLog, BasicMessage basicMessage, int pushType) {
         //消息推送方式:01-MQ；02-接口
         String trdInfoPushMode = CacheUtil.getSysParam(ExchangeConstant.TRD_INFO_PUSH_MODE);
+        logger.info("【sendMessage】 parameters：pushType={}，trdInfoPushMode={}，basicMessage={}",
+                pushType, trdInfoPushMode, JsonUtils.getJsonFromObject(basicMessage));
         //推送MQ
         if (StringUtil.equals(trdInfoPushMode, MQ)) {
             try {
@@ -195,6 +200,9 @@ public class MessageSenderManagement extends BaseService {
                     recordLog.setStatus(2);
                     recordLog.setRemark(result.getMessage());
                 }
+            } else {
+                recordLog.setStatus(2);
+                recordLog.setRemark("推送接口失败");
             }
         } else {
             logger.error("不支持当前推送方式：trdInfoPushMode={}", trdInfoPushMode);
@@ -215,10 +223,10 @@ public class MessageSenderManagement extends BaseService {
             } else {
                 result = restTemplate.postForObject(sendUrl, param, Message.class);
             }
-            logger.info("推送消息接口成功：{}", result);
+            logger.info("【推送消息】接口成功：result：{}，msg：{}", JsonUtils.getJsonFromObject(result), JsonUtils.getJsonFromObject(msg));
             return result;
         } catch (Exception e) {
-            logger.error("推送消息接口失败，" + e.getMessage(), e);
+            logger.error("【推送消息】接口失败，" + e.getMessage(), e);
             return new Message<>(ResultBean.error(ErrorCode.API_RETURN_ERROR));
         }
     }

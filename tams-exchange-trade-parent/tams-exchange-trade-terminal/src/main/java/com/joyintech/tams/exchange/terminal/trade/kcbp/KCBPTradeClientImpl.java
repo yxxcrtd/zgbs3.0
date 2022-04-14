@@ -347,4 +347,9 @@ public class KCBPTradeClientImpl implements ITradeRequest {
             }
         }
     }
+
+	@Override
+	public void queryNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean, Long requestId) {
+		kcbpTradeApi.queryNegotiateQuoteReceive(negotiateQuoteQueryBean, requestId);
+	}
 }

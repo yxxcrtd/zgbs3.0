@@ -547,6 +547,13 @@ public class TerminalAgent extends Agent implements ITerminalMsgHandler, ITermin
         logger.info("queryIntegratedFixedIncomeQuote accountId:{}", integratedFixedIncomeQuoteQryBean.getAccountId());
         tradeRequestMap.get(integratedFixedIncomeQuoteQryBean.getAccountId()).queryIntegratedFixedIncomeQuote(integratedFixedIncomeQuoteQryBean, requestId);
     }
+    
+    //深圳我收到的协商成交行情查询
+    @Override
+    public void queryNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean, Long requestId) {
+        logger.info("queryNegotiateQuoteReceive accountId:{}", negotiateQuoteQueryBean.getAccountId());
+        tradeRequestMap.get(negotiateQuoteQueryBean.getAccountId()).queryNegotiateQuoteReceive(negotiateQuoteQueryBean, requestId);
+    }
 
     @Override
     public void reqReissueEntrust(ReissueEntrustQryBean reissueEntrustQryBean, Long requestId) {
