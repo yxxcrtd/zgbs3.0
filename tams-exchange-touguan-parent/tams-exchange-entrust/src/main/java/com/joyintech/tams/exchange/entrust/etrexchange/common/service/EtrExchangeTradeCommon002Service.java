@@ -41,6 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 
@@ -183,7 +184,21 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
                 // 查询单位成本数据
                 Map<String, EtrExchangeUnitCostDto> unitCostMap = calcEachCostAmtMap(DateUtil.parse(platDate), pList, fList, "");
                 // 计算单位成本、计算持仓成本、最新净价、持仓市值、浮动盈亏
-                return calculationAmount(unitCostMap, result, platDate);
+                calculationAmount(unitCostMap, result, platDate);
+                //非交易指令单位修改
+                if(StringUtil.equals(TempConstant.NO_TRADE_BUSINESS_ETR,dto.getTradePlat())){
+                    if (result != null && result.getRoot() != null && !result.getRoot().isEmpty()) {
+                        result.getRoot().forEach(r -> {
+                            //持仓数量		N2			万元
+                            BigDecimal positionsNum=ArithmeticUtil.divide(r.getPositionsNum(),new BigDecimal(100),2, RoundingMode.DOWN);
+                            r.setPositionsNum(positionsNum);
+                            //可卖数量		N2			万元
+                            BigDecimal sellNum=ArithmeticUtil.divide(r.getSellNum(),new BigDecimal(100),2, RoundingMode.DOWN);
+                            r.setSellNum(sellNum);
+                        });
+                    }
+                }
+                return result;
 //				return restTemplate.postForPage(
 //						ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrExchangeTrade/findPositionsPage", param,
 //						EtrExchangeTrade002Dto.class);
@@ -586,7 +601,7 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
     public BigDecimal querySecInCanUse(PositionCashSecDto secDto) {
         secDto.setTradePlat(TempConstant.NO_TRADE_BUSINESS_ETR);
         BigDecimal ticketCanUse = etrTradeCommonervice.selectAvailableNum(secDto);
-        //ticketCanUse = ArithmeticUtil.divide(ticketCanUse, 100, 0);
+        ticketCanUse = ArithmeticUtil.divide(ticketCanUse, new BigDecimal(100),2, RoundingMode.DOWN); //单位改成万元
         return ticketCanUse;
     }
 
@@ -640,6 +655,7 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
         miniSecNum = ArithmeticUtil.divide(miniSecNum, faceValue, 0);
         miniSecNum = ArithmeticUtil.divide(miniSecNum, scale, 0);
         miniSecNum = ArithmeticUtil.multiply(miniSecNum,new BigDecimal(100));
+        miniSecNum=ArithmeticUtil.divide(miniSecNum, new BigDecimal(100),2, RoundingMode.DOWN); //单位改成万元
         return miniSecNum;
     }
 
