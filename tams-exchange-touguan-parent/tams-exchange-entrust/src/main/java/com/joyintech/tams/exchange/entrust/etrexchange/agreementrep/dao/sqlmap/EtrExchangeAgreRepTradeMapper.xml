@@ -444,8 +444,10 @@
         fin_trade_product.m_Trade_Amt expireSettleAmt, /** 到期结算金额 **/
         <!--decode(fin_trade_product.TRADE_MARKET,'03',trd_product_deal_2.f_trade_id,'04','') tradeId, /** 成交编号 **/
         decode(fin_trade_product.TRADE_MARKET,'03','','04',trd_product_deal_2.f_trade_id) intiTradeId /** 初始交易编号 **/-->
-        trd_product_deal_2.f_trade_id tradeId,
-        trd_product_deal_2.f_trade_id intiTradeId,
+        /*trd_product_deal_2.f_trade_id tradeId,
+        trd_product_deal_2.f_trade_id intiTradeId,*/
+        std.cjbh tradeId,
+        std.cjbh intiTradeId,
         SCI.ACCT_NAME AS acctName,
         fin_trade_product.term as term,
         mcp.counter_name counterName, /**交易对手名称**/
@@ -474,6 +476,8 @@
             AND fin_trade_product.branch = fin_deal_pledge.branch
         left join FIN_PRODUCT fp
             on fp.finprod_id = fin_deal_pledge.pledge_finprod_id
+        LEFT JOIN settle_trans_data std
+            on trd_product_deal_2.f_trade_id = std.trade_id
         LEFT JOIN PTL_PORTFOLIO /** 组合 **/
             on trd_product_deal_add.Portfolio_Id = PTL_PORTFOLIO.Portfolio_Id
         LEFT JOIN trd_fin_product_deal_total trd_fin_product_deal_total /** 金融产品临时交易1 **/
