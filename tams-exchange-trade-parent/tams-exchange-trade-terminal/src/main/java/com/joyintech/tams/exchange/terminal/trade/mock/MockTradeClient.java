@@ -1032,7 +1032,6 @@ public class MockTradeClient implements ITradeRequest {
         String stockCode = negotiateQuoteQueryBean.getStockCode();
 //        TickBean tickBean = queryQuoteTick(stockCode);
         List<NegotiateQuoteReceiveBean> negotiateQuoteReceiveBeans = MockQuoteData.makeNegotiateQuoteReceive(stockCode, null);
-        NegotiateQuoteReceiveBean NegotiateQuoteReceiveBean = new NegotiateQuoteReceiveBean();
         mockTradeResponse.resQueryNegotiateQuoteReceive(negotiateQuoteReceiveBeans, requestId);
 	}
 

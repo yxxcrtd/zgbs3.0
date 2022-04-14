@@ -70,6 +70,7 @@ public enum FunctionCode {
     RESP_QRY_FUTURES_POSITION_DETAIL("查询期货持仓明细返回", 526),
     RESP_QRY_FUTURES_MARGIN_RATE("查询期货保证金", 527),
     RESP_QRY_FUTURES_COMMISSION_RATE("查询期货手续费", 528),
+    RESP_QRY_INTEGRATED_NEGOTIATE_QUOTE_RECEIVE("查询我收到的协商成交行情返回", 530),
 
     RESP_ENTRUST("下单返回", 520),
     RESP_CANCEL_ENTRUST("撤单返回", 521),

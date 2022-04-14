@@ -336,6 +336,6 @@ public class TradeResponseImpl implements ITradeResponse {
     //我收到的协商成交行情查询返回
     @Override
     public void resQueryNegotiateQuoteReceive(List<NegotiateQuoteReceiveBean> list, Long requestId) {
-        terminalAgent.asyncWrite(FunctionCode.REQ_QRY_INTEGRATED_NEGOTIATE_QUOTE_RECEIVE, requestId, 0, list);
+        terminalAgent.asyncWrite(FunctionCode.RESP_QRY_INTEGRATED_NEGOTIATE_QUOTE_RECEIVE, requestId, 0, list);
     }
 }

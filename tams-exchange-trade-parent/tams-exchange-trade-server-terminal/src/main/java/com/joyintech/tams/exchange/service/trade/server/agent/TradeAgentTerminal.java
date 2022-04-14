@@ -182,6 +182,8 @@ public class TradeAgentTerminal extends Agent implements TradeAgent, IAgentMsgHa
             return JsonUtils.getObjectListFromJson(message.getBody(), FuturesInstrumentMarginRateBean.class);
         } else if (message.getFc() == FunctionCode.RESP_QRY_FUTURES_COMMISSION_RATE.value) {
             return JsonUtils.getObjectListFromJson(message.getBody(), FuturesInstrumentCommissionRateBean.class);
+        } else if (message.getFc() == FunctionCode.RESP_QRY_INTEGRATED_NEGOTIATE_QUOTE_RECEIVE.value) {
+            return JsonUtils.getObjectListFromJson(message.getBody(), NegotiateQuoteReceiveBean.class);
         } else
             throw new Exception("unknown protocol function code:" + message.getFc());
     }
