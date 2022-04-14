@@ -51,7 +51,10 @@
         B.TRADER trader,
         B.realName realName,
         ETR_ENTRUST.REMARK remark,
-        nvl(btm1.OUTPUT_VALUE_1,btm.busi_type) busiTypePosition,
+        /*nvl(btm1.OUTPUT_VALUE_1,btm.busi_type) busiTypePosition,*/
+        CASE
+        WHEN ETR_ENTRUST.TRADE_MARKET in  ('03','04') then ETR_ENTRUST_ADD.BUSI_TYPE_POSITION
+        else nvl(btm1.OUTPUT_VALUE_1,btm.busi_type) end busiTypePosition,
         ssai.sec_acct_name secAcctId,
         CASE WHEN ETR_ENTRUST_ADD.ASSET_TYPE = 'F08' THEN DECODE( ETR_ENTRUST_ADD.SETTLE_SPREED, 1, '01', 2, '02', 3, '03')
         ELSE DECODE( ETR_ENTRUST_ADD.SETTLE_SPREED, 0, '01', 1, '02', 2, '03') END AS settleSpeed,
@@ -1443,13 +1446,17 @@
         mci.CUSTOMER_NAME mainConsignee,
         to_char(eted.payment_date,'yyyy-MM-dd') paymentDate,
         to_char(eted.listing_date,'yyyy-MM-dd')  listingDate,
-        ete.entrust_num entrustNum,
+        /*ete.entrust_num entrustNum,*/
+        case when eted.BUSI_TYPE_POSITION='ex017' THEN round(ete.entrust_num/100,4)
+        when ete.ps in ('T68','T69') THEN round(ete.entrust_num/100,4)
+        else ete.entrust_num end entrustNum,
         <!--ete.entrust_amt entrustAmt,
         按照列表查询价格修改 -->
         decode(
         eted.ASSET_TYPE,
         'F01',
-        decode(ete.PS,'T03',ete.ENTRUST_AMT,NVL(ete.ENTRUST_NUM * 100, 0 )),
+        /*decode(ete.PS,'T03',ete.ENTRUST_AMT,NVL(ete.ENTRUST_NUM * 100, 0 )),*/
+        decode(ete.PS,'T03',ete.ENTRUST_AMT,'03',ete.ENTRUST_AMT/100,'04',ete.ENTRUST_AMT/100,ete.ENTRUST_AMT,'T68',ete.ENTRUST_AMT/100,'T68',ete.ENTRUST_AMT/100,NVL(ete.ENTRUST_NUM * 100, 0 )),
         'F10',
         NVL( ete.ENTRUST_NUM * 100, 0 ),
         NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
