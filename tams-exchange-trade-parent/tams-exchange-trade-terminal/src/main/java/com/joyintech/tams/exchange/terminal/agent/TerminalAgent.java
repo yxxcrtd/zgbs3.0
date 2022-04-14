@@ -1,14 +1,64 @@
 package com.joyintech.tams.exchange.terminal.agent;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import com.alibaba.fastjson.util.TypeUtils;
 import com.google.common.collect.Maps;
-import com.joyintech.tams.exchange.common.bean.*;
+import com.joyintech.tams.exchange.common.bean.AccountLoginReqBean;
+import com.joyintech.tams.exchange.common.bean.EnableQryBean;
+import com.joyintech.tams.exchange.common.bean.FuturesInstrumentCommissionRateQryBean;
+import com.joyintech.tams.exchange.common.bean.FuturesInstrumentMarginRateQryBean;
+import com.joyintech.tams.exchange.common.bean.FuturesInstrumentQryBean;
+import com.joyintech.tams.exchange.common.bean.FuturesPositionDetailQryBean;
+import com.joyintech.tams.exchange.common.bean.FuturesPositionQryBean;
+import com.joyintech.tams.exchange.common.bean.HistoryQryBean;
+import com.joyintech.tams.exchange.common.bean.InstrumentQryBean;
+import com.joyintech.tams.exchange.common.bean.IntegratedBulkCloseQuoteQryBean;
+import com.joyintech.tams.exchange.common.bean.IntegratedBulkQuoteQryBean;
+import com.joyintech.tams.exchange.common.bean.IntegratedFixedIncomeQuoteQryBean;
+import com.joyintech.tams.exchange.common.bean.IntegratedRepurchaseQuoteQryBean;
+import com.joyintech.tams.exchange.common.bean.NegotiateQuoteQueryBean;
+import com.joyintech.tams.exchange.common.bean.PositionQueryBean;
+import com.joyintech.tams.exchange.common.bean.QuoteQryBean;
+import com.joyintech.tams.exchange.common.bean.ReissueEntrustBean;
+import com.joyintech.tams.exchange.common.bean.ReissueEntrustQryBean;
+import com.joyintech.tams.exchange.common.bean.ReissueTradeBean;
+import com.joyintech.tams.exchange.common.bean.ReissueTradeQryBean;
+import com.joyintech.tams.exchange.common.bean.RepairConnectionMsg;
+import com.joyintech.tams.exchange.common.bean.ServerExtendInfo;
+import com.joyintech.tams.exchange.common.bean.TerminalLogin;
+import com.joyintech.tams.exchange.common.bean.TerminalLoginRet;
 import com.joyintech.tams.exchange.common.bean.bond.StandardBondQryBean;
 import com.joyintech.tams.exchange.common.bean.terminal.RTGSStatusBean;
 import com.joyintech.tams.exchange.common.constant.AgentType;
 import com.joyintech.tams.exchange.common.constant.EntrustStatus;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
-import com.joyintech.tams.exchange.common.db.domain.*;
+import com.joyintech.tams.exchange.common.db.domain.Account;
+import com.joyintech.tams.exchange.common.db.domain.CancelEntrustBean;
+import com.joyintech.tams.exchange.common.db.domain.Entrust;
+import com.joyintech.tams.exchange.common.db.domain.EntrustInterface;
+import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
+import com.joyintech.tams.exchange.common.db.domain.ServiceNode;
+import com.joyintech.tams.exchange.common.db.domain.Trade;
 import com.joyintech.tams.exchange.common.net.agent.Agent;
 import com.joyintech.tams.exchange.common.net.protocol.FunctionCode;
 import com.joyintech.tams.exchange.common.net.protocol.ProtocolMessage;
@@ -23,19 +73,8 @@ import com.joyintech.tams.exchange.terminal.trade.IFuturesTradeRequest;
 import com.joyintech.tams.exchange.terminal.trade.ITradeRequest;
 import com.joyintech.tams.exchange.terminal.trade.TradeResponseImpl;
 import com.joyintech.tams.exchange.terminal.trade.kcbp.KCBPTradeClient;
-import io.netty.channel.Channel;
-import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import io.netty.channel.Channel;
 
 @Component
 @Scope("prototype")
@@ -232,6 +271,8 @@ public class TerminalAgent extends Agent implements ITerminalMsgHandler, ITermin
             queryFuturesInstrumentMarginRate((FuturesInstrumentMarginRateQryBean) message, requestId);
         } else if (functionCode == FunctionCode.REQ_QRY_FUTURES_COMMISSION_RATE.value) {
             queryFuturesInstrumentCommissionRate((FuturesInstrumentCommissionRateQryBean) message, requestId);
+        } else if (functionCode == FunctionCode.REQ_QRY_INTEGRATED_NEGOTIATE_QUOTE_RECEIVE.value) {
+        	queryNegotiateQuoteReceive((NegotiateQuoteQueryBean) message, requestId);
         } else if (functionCode != FunctionCode.ACK.value) {    // 未知消息
             logger.warn("unknown functionCode:{} message:{}", functionCode, JsonUtils.getJsonFromObject(message));
         }
@@ -306,6 +347,8 @@ public class TerminalAgent extends Agent implements ITerminalMsgHandler, ITermin
             return JsonUtils.getObjectFromJson(message.getBody(), FuturesInstrumentMarginRateQryBean.class);
         } else if (message.getFc() == FunctionCode.REQ_QRY_FUTURES_COMMISSION_RATE.value) {
             return JsonUtils.getObjectFromJson(message.getBody(), FuturesInstrumentCommissionRateQryBean.class);
+        } else if (message.getFc() == FunctionCode.REQ_QRY_INTEGRATED_NEGOTIATE_QUOTE_RECEIVE.value) {
+            return JsonUtils.getObjectFromJson(message.getBody(), NegotiateQuoteQueryBean.class);
         } else {
             logger.warn("unknown functionCode:{} message:{}", message.getFc(), message.getBody());
             throw new Exception("unknown functionCode:" + message.getFc());

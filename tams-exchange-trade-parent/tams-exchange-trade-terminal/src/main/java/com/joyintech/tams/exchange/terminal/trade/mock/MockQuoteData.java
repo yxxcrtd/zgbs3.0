@@ -3,6 +3,7 @@ package com.joyintech.tams.exchange.terminal.trade.mock;
 import com.google.common.base.Strings;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.IntegratedQuote;
+import com.joyintech.tams.exchange.common.bean.NegotiateQuoteReceiveBean;
 import com.joyintech.tams.exchange.common.bean.TickBean;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
@@ -243,5 +244,21 @@ public class MockQuoteData {
             integratedQuote.setContractId(123 + orderNo.incrementAndGet() + "");
         }
         return integratedQuote;
+    }
+    
+    public static List<NegotiateQuoteReceiveBean> makeNegotiateQuoteReceive(String stockCode, TickBean tickBean) {
+        List<NegotiateQuoteReceiveBean> negotiateQuoteReceiveBeans = new ArrayList<>();
+        if (StringUtil.isEmpty(stockCode)) {
+            return negotiateQuoteReceiveBeans;
+        }
+
+        NegotiateQuoteReceiveBean buy = new NegotiateQuoteReceiveBean();
+        buy.setBs(EntrustBs.BUY.value);
+        NegotiateQuoteReceiveBean sell = new NegotiateQuoteReceiveBean();
+        sell.setBs(EntrustBs.SELL.value);
+        negotiateQuoteReceiveBeans.add(buy);
+        negotiateQuoteReceiveBeans.add(sell);
+
+        return negotiateQuoteReceiveBeans;
     }
 }

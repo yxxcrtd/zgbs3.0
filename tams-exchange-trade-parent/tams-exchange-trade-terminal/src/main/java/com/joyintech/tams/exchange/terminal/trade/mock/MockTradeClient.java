@@ -20,6 +20,9 @@ import com.joyintech.tams.exchange.terminal.agent.TerminalAgent;
 import com.joyintech.tams.exchange.terminal.constant.AccountLoginStatus;
 import com.joyintech.tams.exchange.terminal.trade.ITradeRequest;
 import com.joyintech.tams.exchange.terminal.trade.TradeResponseImpl;
+import com.joyintech.tams.exchange.terminal.trade.kcbp.KCBPAccount;
+import com.joyintech.tams.exchange.terminal.trade.kcbp.KCBPConverter;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -1026,7 +1029,11 @@ public class MockTradeClient implements ITradeRequest {
 	@Override
 	public void queryNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean, Long requestId) {
 		// TODO Auto-generated method stub
-		
+        String stockCode = negotiateQuoteQueryBean.getStockCode();
+//        TickBean tickBean = queryQuoteTick(stockCode);
+        List<NegotiateQuoteReceiveBean> negotiateQuoteReceiveBeans = MockQuoteData.makeNegotiateQuoteReceive(stockCode, null);
+        NegotiateQuoteReceiveBean NegotiateQuoteReceiveBean = new NegotiateQuoteReceiveBean();
+        mockTradeResponse.resQueryNegotiateQuoteReceive(negotiateQuoteReceiveBeans, requestId);
 	}
 
 }

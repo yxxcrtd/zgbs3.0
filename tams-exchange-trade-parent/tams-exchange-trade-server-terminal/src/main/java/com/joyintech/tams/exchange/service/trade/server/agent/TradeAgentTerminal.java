@@ -597,6 +597,6 @@ public class TradeAgentTerminal extends Agent implements TradeAgent, IAgentMsgHa
 	@Override
 	public List<NegotiateQuoteReceiveBean> reqNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean)
 			throws Exception {
-		return (List<NegotiateQuoteReceiveBean>) syncWrite(FunctionCode.REQ_QRY_INTEGRATED_REPURCHASE_QUOTE, negotiateQuoteQueryBean);
+		return (List<NegotiateQuoteReceiveBean>) syncWrite(FunctionCode.REQ_QRY_INTEGRATED_NEGOTIATE_QUOTE_RECEIVE, negotiateQuoteQueryBean);
 	}
 }
