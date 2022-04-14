@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.service.trade.processor.business.price;
 
+import com.joyintech.tams.exchange.common.bean.TickBean;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.instrument.SubStockType;
 import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
@@ -25,7 +26,7 @@ public class PriceHelper {
     private double sellRatio = 0.98;
 
     //沪深竞价平台
-    public boolean checkPrice(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, QuoteProto.TickBean tick, String tradePlat, String entrustBussType, String priceMode) {
+    public boolean checkPrice(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick, String tradePlat, String entrustBussType, String priceMode) {
         if (TradePlat.NORMAL.value.equals(tradePlat)) {//沪深竞价
             if (SubStockType.ZB.value.equals(instrument.getSubStockType())
                     || SubStockType.ZXQYB.value.equals(instrument.getSubStockType())) {
@@ -50,7 +51,7 @@ public class PriceHelper {
     }
 
     //科创板
-    private boolean checkPriceForKCB(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, QuoteProto.TickBean tick, String priceMode) {
+    private boolean checkPriceForKCB(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick, String priceMode) {
         logger.info("沪深竞价科创板");
         int tradeTimeStage = getTradeTimeStage();
         if (tradeTimeStage == TradeTimeStage.THE_CONTINUOUS_AUCTION.value) {//连续竞价
@@ -83,7 +84,7 @@ public class PriceHelper {
     }
 
     //创业板
-    public boolean checkPriceForCYB(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, QuoteProto.TickBean tick) {
+    public boolean checkPriceForCYB(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick) {
         logger.info("沪深竞价创业板");
         //首次公开发行上市的股票，上市后的前五个交易日不设价格涨跌幅限制
         boolean result = false;
@@ -111,12 +112,12 @@ public class PriceHelper {
     }
 
     //买入基准价格
-    private double getBuyStandardPrice(QuoteProto.TickBean tick) {
-        double buyStandardPrice = tick.getAskPrice(0);
+    private double getBuyStandardPrice(TickBean tick) {
+        double buyStandardPrice = tick.getAskPrice().get(0);
         if (Double.compare(buyStandardPrice, 0.0) > 0) {
             return buyStandardPrice;
         }
-        buyStandardPrice = tick.getBidPrice(0);
+        buyStandardPrice = tick.getBidPrice().get(0);
         if (Double.compare(buyStandardPrice, 0.0) > 0) {
             return buyStandardPrice;
         }
@@ -129,12 +130,12 @@ public class PriceHelper {
     }
 
     //卖出基准价格
-    private double getSaleStandardPrice(QuoteProto.TickBean tick) {
-        double saleStandardPrice = tick.getBidPrice(0);
+    private double getSaleStandardPrice(TickBean tick) {
+        double saleStandardPrice = tick.getBidPrice().get(0);
         if (Double.compare(saleStandardPrice, 0.0) > 0) {
             return saleStandardPrice;
         }
-        saleStandardPrice = tick.getAskPrice(0);
+        saleStandardPrice = tick.getAskPrice().get(0);
         if (Double.compare(saleStandardPrice, 0.0) > 0) {
             return saleStandardPrice;
         }
@@ -147,7 +148,7 @@ public class PriceHelper {
     }
 
     //沪深大宗交易
-    public boolean checkPriceForBulk(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, QuoteProto.TickBean tick) {
+    public boolean checkPriceForBulk(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick) {
         logger.info("沪深大宗交易");
         double lowerLimitPrice = 0;
         double upperLimitPrice = 0;
@@ -170,7 +171,7 @@ public class PriceHelper {
     }
 
     //沪深竞价平台主板A股以及中小企业板
-    public boolean checkPriceForZBA(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, QuoteProto.TickBean tick) {
+    public boolean checkPriceForZBA(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick) {
         logger.info("沪深竞价平台主板A股以及中小企业板");
         int tradeTimeStage = getTradeTimeStage();
         double lowerLimitPrice = 0;
@@ -207,7 +208,7 @@ public class PriceHelper {
         return true;
     }
 
-    public boolean checkPriceForBondRepurchase(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, QuoteProto.TickBean tick) {
+    public boolean checkPriceForBondRepurchase(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick) {
         logger.info("沪深竞价平台，债券质押式回购");
         double lowerLimitPrice = 0;
         double upperLimitPrice = 0;
@@ -243,7 +244,7 @@ public class PriceHelper {
     }
 
     //沪深竞价平台债券交易
-    public boolean checkPriceForBond(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, QuoteProto.TickBean tick) {
+    public boolean checkPriceForBond(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick) {
         logger.info("沪深竞价平台债券交易");
         double lowerLimitPrice = 0;
         double upperLimitPrice = 0;
@@ -296,12 +297,12 @@ public class PriceHelper {
     }
 
     //获取买一价
-    public double getBidPrice1(QuoteProto.TickBean tick) {
-        double bidPrice1 = tick.getBidPrice(0);
+    public double getBidPrice1(TickBean tick) {
+        double bidPrice1 = tick.getBidPrice().get(0);
         if (Double.compare(bidPrice1, 0.0) > 0) {
             return bidPrice1;
         }
-        bidPrice1 = Math.min(tick.getAskPrice(0), tick.getLastPrice());
+        bidPrice1 = Math.min(tick.getAskPrice().get(0), tick.getLastPrice());
         if (Double.compare(bidPrice1, 0.0) > 0) {
             return bidPrice1;
         }
@@ -314,12 +315,12 @@ public class PriceHelper {
     }
 
     //获取卖一价
-    public double getAskPrice1(QuoteProto.TickBean tick) {
-        double askPrice1 = tick.getAskPrice(0);
+    public double getAskPrice1(TickBean tick) {
+        double askPrice1 = tick.getAskPrice().get(0);
         if (Double.compare(askPrice1, 0.0) > 0) {
             return askPrice1;
         }
-        askPrice1 = Math.min(tick.getBidPrice(0), tick.getLastPrice());
+        askPrice1 = Math.min(tick.getBidPrice().get(0), tick.getLastPrice());
         if (Double.compare(askPrice1, 0.0) > 0) {
             return askPrice1;
         }

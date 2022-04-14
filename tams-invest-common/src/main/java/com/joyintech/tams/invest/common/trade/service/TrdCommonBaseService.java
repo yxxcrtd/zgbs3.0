@@ -1350,7 +1350,7 @@ public class TrdCommonBaseService extends BaseService {
                 BigDecimal standardSecAmount = ArithmeticUtil.multiply(infContractDetailfile.getShareAmt().multiply(converseRadio)
                         .multiply(百元券面), ratio);
                 BigDecimal standardSecAmountTemp = ArithmeticUtil.divide(standardSecAmount, new BigDecimal(100),0, RoundingMode.DOWN);
-                portfolioDto.setStandardSecAmount(ArithmeticUtil.multiply(standardSecAmount, new BigDecimal(100)));
+                portfolioDto.setStandardSecAmount(ArithmeticUtil.multiply(standardSecAmountTemp, new BigDecimal(100)));
                 // 融入券券面总额
                 portfolioDto.setIntegrateSecAmount(BigDecimal.ZERO);
                 portfolioDtos.add(portfolioDto);

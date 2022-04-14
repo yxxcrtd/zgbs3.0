@@ -2,8 +2,11 @@ package com.joyintech.tams.exchange.service.trade.processor.business.common;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.base.Strings;
+import com.joyintech.exchange.service.quote.service.QuoteService;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
+import com.joyintech.tams.exchange.common.bean.ResultBean;
+import com.joyintech.tams.exchange.common.bean.TickBean;
 import com.joyintech.tams.exchange.common.bean.investment.TradeTimeBean;
 import com.joyintech.tams.exchange.common.cache.QuoteTickService;
 import com.joyintech.tams.exchange.common.cache.TradeTimeService;
@@ -40,8 +43,10 @@ public class CommonCheckHelper {
     private EntrustService entrustService;
     @Autowired
     private IntegratedEntrustService integratedEntrustService;
+//    @Autowired
+//    private QuoteTickService quoteTickService;
     @Autowired
-    private QuoteTickService quoteTickService;
+    private QuoteService quoteService;
     @Autowired
     private InstrumentService instrumentService;
 
@@ -214,8 +219,11 @@ public class CommonCheckHelper {
                 orderInterface.setErrorMsg("委托价格不满足最小价差：" + instrument.getPriceStep().doubleValue());
                 return false;
             }
-            QuoteProto.TickBean tick = quoteTickService.getTickFromCache(orderInterface.getStockCode());
-            if (Objects.nonNull(tick)) {
+            ResultBean tickBean = quoteService.getTick(orderInterface.getStockCode());
+            if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
+                TickBean tick = (TickBean)tickBean.getData();
+//            QuoteProto.TickBean tick = quoteTickService.getTickFromCache(orderInterface.getStockCode());
+//            if (Objects.nonNull(tick)) {
                 double lowerLimitPrice = TradeUtils.formatDouble(tick.getLowerLimitPrice(), 4);
                 double upperLimitPrice = TradeUtils.formatDouble(tick.getUpperLimitPrice(), 4);
                 if (Double.compare(lowerLimitPrice, 0.0) == 0 && Double.compare(upperLimitPrice, 0.0) == 0) {
@@ -323,8 +331,11 @@ public class CommonCheckHelper {
 
         //市价委托填充反向涨跌停价
         if (EntrustProp.isMarketPrice(order.getEntrustProp())) {
-            QuoteProto.TickBean tick = quoteTickService.getTickFromCache(order.getStockCode());
-            if (Objects.nonNull(tick)) {
+            ResultBean tickBean = quoteService.getTick(order.getStockCode());
+            if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
+                TickBean tick = (TickBean)tickBean.getData();
+//            QuoteProto.TickBean tick = quoteTickService.getTickFromCache(order.getStockCode());
+//            if (Objects.nonNull(tick)) {
                 if (order.getEntrustBs().equals(EntrustBs.SELL.value)) {
                     order.setOrderPrice(TradeUtils.getBigDecimal(tick.getLowerLimitPrice(), 4));
                 } else {

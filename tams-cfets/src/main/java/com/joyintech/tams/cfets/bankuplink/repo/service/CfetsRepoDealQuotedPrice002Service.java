@@ -2138,7 +2138,9 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
                 pledgeDto.setAvaPledgePrin(pledgeBondDto.getAvaPledgePrin());
                 // 质押券总额 元->万元
                 pledgeDto.setPledgePrin(ArithmeticUtil.multiply(pledgeBondDto.getPledgePrin(), new BigDecimal(10000)));
-                pageDto.setQuoteId(pledgeBondDto.getQuoteId());
+                if(StringUtil.isEmpty(pageDto.getQuoteId())) {
+                    pageDto.setQuoteId(pledgeBondDto.getQuoteId());
+                }
                 repoEntrustPledgeDtos.add(pledgeDto);
             }
         }

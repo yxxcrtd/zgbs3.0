@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import com.joyintech.exchange.service.quote.service.QuoteService;
 import com.joyintech.tams.exchange.common.BusinessResultException;
 import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.bean.investment.ReqRiskTrigger;
@@ -92,8 +93,10 @@ public class TradeHelper {
     private MsgReceiverManager msgReceiverManager;
     @Autowired
     private EntrustManagement entrustManagement;
+//    @Autowired
+//    private QuoteTickService quoteTickService;
     @Autowired
-    private QuoteTickService quoteTickService;
+    private QuoteService quoteService;
     @Autowired
     private ReviewManagement reviewManagement;
     @Autowired
@@ -514,9 +517,11 @@ public class TradeHelper {
             logger.info("检查【指令价格限定】，指令价格：[{}]，委托价格：[{}]", price, entrustPrice);
             entrust.setEntrustPrice(price);
         }
-
-        QuoteProto.TickBean tick = quoteTickService.findFromRedisById(entrust.getStockCode());
-        if (Objects.nonNull(tick)) {
+        ResultBean tickBean = quoteService.getTick(entrust.getStockCode());
+        if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
+            TickBean tick = (TickBean)tickBean.getData();
+//        QuoteProto.TickBean tick = quoteTickService.findFromRedisById(entrust.getStockCode());
+//        if (Objects.nonNull(tick)) {
             double lowerLimitPrice = TradeUtils.formatDouble(tick.getLowerLimitPrice(), 4);
             double upperLimitPrice = TradeUtils.formatDouble(tick.getUpperLimitPrice(), 4);
             if (InvestmentAssetType.STOCK.value.equals(entrust.getAssetType())) {
@@ -817,17 +822,20 @@ public class TradeHelper {
         if (batchInfo.getPriceMode() == BatchPriceMode.FIX_AND_INCREASE.value) {
             return;
         }
-        QuoteProto.TickBean tick = quoteTickService.findFromRedisById(order.getStockCode());
-        if (Objects.nonNull(tick)) {
+        ResultBean tickBean = quoteService.getTick(order.getStockCode());
+        if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
+            TickBean tick = (TickBean)tickBean.getData();
+//        QuoteProto.TickBean tick = quoteTickService.findFromRedisById(order.getStockCode());
+//        if (Objects.nonNull(tick)) {
             if (batchInfo.getPriceMode() == BatchPriceMode.BID_OFFSET.value) {
-                if (tick.getBidPrice(0) > 0) {
-                    order.setOrderPrice(TradeUtils.add(tick.getBidPrice(0), batchInfo.getPriceOffset(), round));
+                if (tick.getBidPrice().get(0) > 0) {
+                    order.setOrderPrice(TradeUtils.add(tick.getBidPrice().get(0), batchInfo.getPriceOffset(), round));
                 } else if (tick.getLastPrice() > 0) {
                     order.setOrderPrice(TradeUtils.add(tick.getLastPrice(), batchInfo.getPriceOffset(), round));
                 }
             } else if (batchInfo.getPriceMode() == BatchPriceMode.ASK_OFFSET.value) {
-                if (tick.getAskPrice(0) > 0) {
-                    order.setOrderPrice(TradeUtils.add(tick.getAskPrice(0), batchInfo.getPriceOffset(), round));
+                if (tick.getAskPrice().get(0) > 0) {
+                    order.setOrderPrice(TradeUtils.add(tick.getAskPrice().get(0), batchInfo.getPriceOffset(), round));
                 } else if (tick.getLastPrice() > 0) {
                     order.setOrderPrice(TradeUtils.add(tick.getLastPrice(), batchInfo.getPriceOffset(), round));
                 }
@@ -859,19 +867,22 @@ public class TradeHelper {
             entrust.setEntrustPrice(TradeUtils.add(batchInfo.getBeginPrice(), TradeUtils.multiply(batchInfo.getPriceOffset(), batchInfo.getCompleteTimes(), 4), 4));
             return;
         }
-        QuoteProto.TickBean tick = quoteTickService.findFromRedisById(entrust.getStockCode());
-        if (Objects.nonNull(tick)) {
+        ResultBean tickBean = quoteService.getTick(entrust.getStockCode());
+        if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
+            TickBean tick = (TickBean)tickBean.getData();
+//        QuoteProto.TickBean tick = quoteTickService.findFromRedisById(entrust.getStockCode());
+//        if (Objects.nonNull(tick)) {
             if (batchInfo.getPriceMode() == BatchPriceMode.BID_OFFSET.value) {
-                if (tick.getBidPrice(0) > 0) {
-                    entrust.setEntrustPrice(TradeUtils.add(tick.getBidPrice(0), batchInfo.getPriceOffset(), round));
+                if (tick.getBidPrice().get(0) > 0) {
+                    entrust.setEntrustPrice(TradeUtils.add(tick.getBidPrice().get(0), batchInfo.getPriceOffset(), round));
                 } else {
                     logger.info("bidPrice not greater than zero {}, try lastPrice", entrust.getStockCode());
                     if (tick.getLastPrice() > 0)
                         entrust.setEntrustPrice(TradeUtils.add(tick.getLastPrice(), batchInfo.getPriceOffset(), round));
                 }
             } else if (batchInfo.getPriceMode() == BatchPriceMode.ASK_OFFSET.value) {
-                if (tick.getAskPrice(0) > 0) {
-                    entrust.setEntrustPrice(TradeUtils.add(tick.getAskPrice(0), batchInfo.getPriceOffset(), round));
+                if (tick.getAskPrice().get(0) > 0) {
+                    entrust.setEntrustPrice(TradeUtils.add(tick.getAskPrice().get(0), batchInfo.getPriceOffset(), round));
                 } else {
                     logger.info("askPrice not greater than zero {}, try lastPrice", entrust.getStockCode());
                     if (tick.getLastPrice() > 0)
@@ -1170,7 +1181,7 @@ public class TradeHelper {
         order.setUserId(orderPlaceBean.getUserId());
         order.setAssetType(instruction.getAssetType());
         Map<String, Instruction> instructionBeanMap = getInstructionBeans(order);
-        return MapUtils.isNotEmpty(instructionBeanMap);
+        return MapUtils.isNotEmpty(instructionBeanMap) && instructionBeanMap.size() > 1;
     }
 
     /**
@@ -1250,8 +1261,11 @@ public class TradeHelper {
     }
 
     public void fillQuotePrice(OrderPlaceBean orderPlaceBean, PositionInstructionRequest instructionClone) {
-        QuoteProto.TickBean tick = quoteTickService.getTickFromCache(orderPlaceBean.getStockCode());
-        if (Objects.nonNull(tick)) {
+        ResultBean tickBean = quoteService.getTick(orderPlaceBean.getStockCode());
+        if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
+            TickBean tick = (TickBean)tickBean.getData();
+//        QuoteProto.TickBean tick = quoteTickService.getTickFromCache(orderPlaceBean.getStockCode());
+//        if (Objects.nonNull(tick)) {
             if (orderPlaceBean.getEntrustBs().equals(EntrustBs.SELL.value)) {
                 instructionClone.setEntrustPrice(TradeUtils.getBigDecimal(tick.getLowerLimitPrice(), 4));
             } else {
@@ -1274,8 +1288,11 @@ public class TradeHelper {
                     .collect(Collectors.toMap(Instruction::getEntrustId, instructionBean -> instructionBean));
             // 市价委托，需检查限价委托是否超过涨跌停
             if (EntrustProp.isMarketPrice(order.getEntrustProp())) {
-                QuoteProto.TickBean tick = quoteTickService.getTickFromCache(order.getStockCode());
-                if (Objects.nonNull(tick)) {
+                ResultBean tickBean = quoteService.getTick(order.getStockCode());
+                if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
+                    TickBean tick = (TickBean)tickBean.getData();
+//                QuoteProto.TickBean tick = quoteTickService.getTickFromCache(order.getStockCode());
+//                if (Objects.nonNull(tick)) {
                     double lowerLimitPrice = TradeUtils.formatDouble(tick.getLowerLimitPrice(), 4);
                     double upperLimitPrice = TradeUtils.formatDouble(tick.getUpperLimitPrice(), 4);
                     boolean flag = false;

@@ -331,8 +331,10 @@ public class FieldEtrDispatcherService extends BaseService{
                 BigDecimal pledgeStandardNumber = fieldResponseDto.getPledgeStandardNumber();
                 Date sysDate = DateUtil.platDateFromCache();
                 String finprodId = fieldResponseDto.getFinprodId();
-                BigDecimal faceAmt =  (BigDecimal) etrCommonService.select券面面值(finprodId, DateUtil.format(sysDate));
-                fieldResponseDto.setPledgeStandardNumber(pledgeStandardNumber.multiply(faceAmt).divide(new BigDecimal(100)));
+                if (StringUtil.isNotEmpty(finprodId)) {
+                    BigDecimal faceAmt = (BigDecimal) etrCommonService.select券面面值(finprodId, DateUtil.format(sysDate));
+                    fieldResponseDto.setPledgeStandardNumber(pledgeStandardNumber.multiply(faceAmt).divide(new BigDecimal(100)));
+                }
                 if (StringUtil.equals(dto.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue())) {
                     fieldResponseDto.setBidPriceList(mapper.selectBidPriceByKey(pageParam));
                     fieldResponseDto.setEtrBidDate(fieldResponseDto.getEntrustDate());

@@ -1,6 +1,8 @@
 package com.joyintech.service.entrust.etrconbond.service;
 
 import com.joyintech.framework.security.SecurityUtil;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.service.entrust.etrconbond.dao.EtrConBondMapper;
 import com.joyintech.service.entrust.etrconbond.dto.EtrConBondDto;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
@@ -10,16 +12,22 @@ import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.util.*;
+
+import static com.joyintech.tams.constant.DictCodeListExt2.申购类型_普通申购;
+import static com.joyintech.tams.constant.DictCodeListExt3.业务动作_投资指令;
+import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.*;
 
 @Service
 public class PositionRequestEtrConBondService {
+    private final Logger log = LoggerFactory.getLogger(PositionRequestEtrConBondService.class);
 
     public static final String STANDAR_SEC_ID = "XN_PRODID999";
     @Autowired
@@ -39,6 +47,7 @@ public class PositionRequestEtrConBondService {
         resultMap.put("systemAct", systemAct);
 //        String interType = commonPositionEngineService.getPositionInterType("ETR", entity.getTradePlat(), finprodType, entity.getPs(), entity.getOptType(), entity.getClass().getName());
         this.bond003(entity, resultMap);
+        log.info("sendEtrConBondDto() called with parameters => 【entity = {}】", JsonUtils.object2Json(entity));
         PositionHttpRequest.send(resultMap);
     }
 
@@ -48,6 +57,7 @@ public class PositionRequestEtrConBondService {
      * @param entity
      */
     public void sendDelete(EtrConBondDto entity) {
+        log.info("sendDelete() called with parameters => 【entity = {}】", JsonUtils.object2Json(entity));
         PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(), "ETR", DictCodeListExt3.头寸业务类型_网下申购.getValue(), DictCodeList.交易方向_申购.getValue());
     }
 
@@ -57,6 +67,7 @@ public class PositionRequestEtrConBondService {
      * @param entity
      */
     public void sendRevoke(EtrConBondDto entity) {
+        log.info("sendRevoke() called with parameters => 【entity = {}】", JsonUtils.object2Json(entity));
         PositionHttpRequest.dorevoke(entity.getEntrustId(), "TRD", DictCodeListExt3.头寸业务类型_网下申购.getValue(), DictCodeList.交易方向_申购.getValue());
     }
 
@@ -75,6 +86,8 @@ public class PositionRequestEtrConBondService {
         resultMap.put("decisionAct", DictCodeListExt3.系统动作_关闭.getValue());
         resultMap.put("systemAct", DictCodeListExt3.系统动作_关闭.getValue());
         resultMap.put("closeId", entrustId);
+
+        log.info("sendClose() called with parameters => 【entity = {}】", JsonUtils.object2Json(resultMap));
         PositionHttpRequest.batchClose(resultMap);
     }
 
@@ -86,24 +99,36 @@ public class PositionRequestEtrConBondService {
      */
     private void bond003(EtrConBondDto entity, Map<String, Object> resultMap) {
         resultMap.put("interfaceType", "Bond003");
-
-        resultMap.put("busiType", DictCodeListExt3.头寸业务类型_网下申购.getValue());
-        resultMap.put("busiAct", DictCodeListExt3.业务动作_投资指令.getValue());
-        resultMap.put("ps", DictCodeList.交易方向_申购.getValue());
+        resultMap.put(BUSI_ACT, 业务动作_投资指令.getValue());
         String deliveryType = commonPositionEngineService.getDeliveryType(entity.getFinprodId());
-        resultMap.put("settleSpeed", parseSettleSpreed(deliveryType));
-        if (DictCodeListExt2.申购类型_普通申购.getValue().equals(entity.getPurchType())) {
-            resultMap.put("purchModle", DictCodeListExt2.申购方式_网下申购.getValue());
+        resultMap.put(DELIVERY_TYPE, commonPositionEngineService.getDeliveryType(entity.getFinprodId()));
+        resultMap.put(SETTLE_SPEED, commonPositionEngineService.parseSettleSpreed(deliveryType));
+        resultMap.put("ps", DictCodeList.交易方向_申购.getValue());
+        resultMap.put("busiType", DictCodeListExt3.头寸业务类型_网下申购.getValue());
+        if (申购类型_普通申购.getValue().equals(entity.getPurchType())) {
+            resultMap.put(PURCH_MODLE, DictCodeListExt2.申购方式_网下申购.getValue());
         } else {
-            resultMap.put("purchModle", DictCodeListExt2.申购方式_网下优先配售.getValue());
+            resultMap.put(PURCH_MODLE, DictCodeListExt2.申购方式_网下优先配售.getValue());
         }
         resultMap.put("tradePlace", entity.getTradeMarket());
-        resultMap.put("sharesTradePlatform", null);
-        resultMap.put("deliveryType", deliveryType);
-        resultMap.put("workFlowId", null);
-        resultMap.put("cdate", entity.getEntrustDate());
-        resultMap.put("ccy", entity.getCcy());
-        resultMap.put("bTotalTradeId", null);
+        // 交易平台
+        resultMap.put(SHARES_TRADE_PLATFORM, commonPositionEngineService.getSharesTradePlatform(entity.getTradePlat(), entity.getPs(), "", ""));
+
+        resultMap.put("workFlowId", entity.getWorkflowId());
+        // 日期
+        resultMap.put("cdate", DateUtil.format(entity.getVdate()));
+        // 币种
+        if (StringUtils.isNotEmpty(entity.getCcy())) {
+            resultMap.put(CCY, entity.getCcy());
+        } else {
+            resultMap.put(CCY, DictCodeList.币种_人民币_CNY.getValue());
+        }
+        // 前次交易编号
+        if (DictCodeListExt3.系统动作_修改.getValue().equals((String) resultMap.get("decisionAct"))) {
+            resultMap.put(B_TOTAL_TRADE_ID, entity.getEntrustId());
+        } else {
+            resultMap.put(B_TOTAL_TRADE_ID, null);
+        }
 
         Map<String, String> accnoParm = new HashMap<>();
         accnoParm.put("ccy", entity.getCcy());
@@ -111,25 +136,51 @@ public class PositionRequestEtrConBondService {
         accnoParm.put("acctType", DictCodeListExt1.资金账户类型_产品托管户.getValue());
         String accNo = etrConBondMapper.getAccNo(accnoParm);
 
-        List<Map<String, Object>> ptlCashList = new ArrayList<>(4);
+        List<Map<String, Object>> ptlCashList = new ArrayList<>(1);
         Map<String, Object> ptlCash = new HashMap<>(8);
         ptlCash.put("portfolioId", entity.getPortfolioId());
         ptlCash.put("cashAcctId", accNo);
         ptlCash.put("tradeId", null);
         ptlCash.put("etrId", entity.getEntrustId());
-        ptlCash.put("cashAmount", entity.getPurchBondTotal());
+        ptlCash.put("secAmount", entity.getEntrustNum());
+        BigDecimal entrustAmt = entity.getEntrustAmt();
+        BigDecimal cashAmount = BigDecimal.ZERO;
+        if (Objects.isNull(entrustAmt) || BigDecimal.ZERO.compareTo(entrustAmt) > -1) {
+            BigDecimal entrustPrice = Objects.isNull(entity.getPrice()) ? new BigDecimal(0) : entity.getPrice();
+            cashAmount = cashAmount.add(entity.getEntrustNum().multiply(entrustPrice));
+        } else {
+            cashAmount = cashAmount.add(entrustAmt);
+        }
+        ptlCash.put("cashAmount", cashAmount);
         ptlCashList.add(ptlCash);
         resultMap.put("ptlCashList", ptlCashList);
 
-        List<Map<String, Object>> bondSecList = new ArrayList<>(4);
+        List<Map<String, Object>> bondSecList = new ArrayList<>(1);
         Map<String, Object> bondSec = new HashMap<>();
         bondSec.put("portfolioId", entity.getPortfolioId());
         bondSec.put("finprodId", entity.getFinprodId());
         bondSec.put("secAcctId", entity.getSecAcctId());
+        bondSec.put("cashAcctId", accNo);
         bondSec.put("etrId", entity.getEntrustId());
-        bondSec.put("secAmount", entity.getPurchBondTotal());
+        bondSec.put("secAmount", commonPositionEngineService.getSecAmountByBondUnit(entity.getEntrustNum()));
+        bondSec.put("cashAmount", BigDecimal.ZERO);
+        //融入券券面总额
+        bondSec.put(INTEGRATE_SEC_AMOUNT, 0);
         bondSecList.add(bondSec);
         resultMap.put("bondSecList", bondSecList);
+
+        // 申购数据集
+        List<Map<String, Object>> applyBondSecList = new ArrayList<>(1);
+        Map<String, Object> applyBondSec = new HashMap<>();
+        applyBondSec.put("portfolioId", entity.getPortfolioId());
+        applyBondSec.put("finprodId", entity.getFinprodId());
+        applyBondSec.put("secAcctId", entity.getSecAcctId());
+        applyBondSec.put("cashAcctId", accNo);
+        applyBondSec.put("etrId", entity.getEntrustId());
+        applyBondSec.put("secAmount", commonPositionEngineService.getSecAmountByBondUnit(entity.getEntrustNum()));
+        applyBondSec.put("cashAmount", null);
+        applyBondSecList.add(applyBondSec);
+        resultMap.put("applyBondSecList", applyBondSecList);
     }
 
     /**
