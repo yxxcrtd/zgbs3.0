@@ -24,11 +24,6 @@ public class TrdStockTrade002Service extends CommonExportService<TrdStockTradeDt
                 TrdStockTradeDto.class);
     }
 
-    //自增序列号
-    public int querySequences(){
-        return restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdStockTrade002/querySequences", null,Integer.class);
-    }
-
 
     @Override
     public void doComplete(TrdStockTradeDto trdStockTradeDto, OperationType operationType) {

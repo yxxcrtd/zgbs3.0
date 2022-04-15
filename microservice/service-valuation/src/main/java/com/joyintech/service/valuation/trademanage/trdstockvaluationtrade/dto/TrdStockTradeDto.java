@@ -37,6 +37,11 @@ public class TrdStockTradeDto extends BaseEntity implements ProcessEntity {
     private String tradeId;
 
     /**
+     * 数据来源
+     */
+    private String dataSource;
+
+    /**
      * 外部成交编号
      */
     private String outTradeId;
@@ -67,34 +72,25 @@ public class TrdStockTradeDto extends BaseEntity implements ProcessEntity {
     private String ps;
 
     /**
+     * 币种
+     */
+    private String ccy;
+
+    /**
+     * 证券账户
+     */
+    private String secManageAcctId;
+
+    /**
      * 交易日
      */
-    private String tradeDate;
+    private Date tradeDate;
 
+    //清算信息
     /**
-     * 缴款日
+     * 资金交收日期
      */
-    private String paymentDate;
-
-    /**
-     * 交割日期
-     */
-    private String settdateDate;
-
-    /**
-     * 交收日
-     */
-    private String settleDate;
-
-    /**
-     * 是否锁定
-     */
-    private String isLock;
-
-    /**
-     * 锁定期截止日
-     */
-    private String endDate;
+    private Date fundSettleDate;
 
     /**
      * 交易数量
@@ -103,53 +99,22 @@ public class TrdStockTradeDto extends BaseEntity implements ProcessEntity {
     private BigDecimal dealNum;
 
     /**
-     * 交易价格
+     * 成交金额
      */
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal tradeAmt;
 
     /**
-     * 币种
+     * 成交价格
      */
-    private String ccy;
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal price;
 
     /**
      * 印花税
      */
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal stampDutyAmt;
-
-    /**
-     * 佣金
-     */
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal commission;
-
-    /**
-     * 其他应付费用
-     */
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal otherAmt;
-
-    /**
-     * 结算金额
-     */
-    private BigDecimal settleAmt;
-
-    /**
-     * 资金账户
-     */
-    private String myAcctNo;
-
-    /**
-     * 成交日期
-     */
-    private Date dealDate;
-
-    /**
-     * 资金交收日期
-     */
-    private Date fundSettleDate;
 
     /**
      * 经手费
@@ -176,24 +141,50 @@ public class TrdStockTradeDto extends BaseEntity implements ProcessEntity {
     private BigDecimal stlAmt;
 
     /**
+     * 交易费
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal feeAmt;
+
+    /**
+     * 证券其它费
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal secOtherAmt;
+
+    /**
+     * 净佣金
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal commission;
+
+    /**
+     * 应付佣金
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal commissionPay;
+
+    /**
      * 汇率日期
      */
     private Date exchangeDate;
 
     /**
-     * 配售代码
+     * 清算金额
      */
-    private String saleCode;
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal settleAmt;
 
     /**
-     * 结算日期
+     * 资金账户
      */
-    private Date settleDate_pg;
+    private String myAcctNo;
 
+    //配股信息
     /**
-     * 资金交收日期
+     * 缴款日期
      */
-    private Date fundSettleDate_pg;
+    private Date paymentDate_pg;
 
     /**
      * 成交数量
@@ -205,7 +196,7 @@ public class TrdStockTradeDto extends BaseEntity implements ProcessEntity {
      * 成交价格
      */
     @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal tradedPrice;
+    private BigDecimal price_pg;
 
     /**
      * 缴款金额
@@ -218,16 +209,7 @@ public class TrdStockTradeDto extends BaseEntity implements ProcessEntity {
      */
     private String myAcctNo_pg;
 
-    /**
-     * 申购日期
-     */
-    private Date purchDate;
-
-    /**
-     * 结算日期
-     */
-    private Date settleDate_sg;
-
+    //申购信息
     /**
      * 申购金额
      */
@@ -239,11 +221,7 @@ public class TrdStockTradeDto extends BaseEntity implements ProcessEntity {
      */
     private String myAcctNo_sg;
 
-    /**
-     * 确认日期
-     */
-    private Date confirmDate;
-
+    //确认信息
     /**
      * 中签数量
      */
@@ -263,151 +241,49 @@ public class TrdStockTradeDto extends BaseEntity implements ProcessEntity {
     private BigDecimal confirmAmt;
 
     /**
+     * 补款到账日期
+     */
+    private Date receiptArriveDate;
+
+    /**
+     * 补款金额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal receiptAmt;
+
+    /**
+     * 返款到账日期
+     */
+    private Date refundArriveDate;
+
+    /**
+     * 返款金额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal refundAmount;
+
+    /**
      * 资金账户
      */
     private String myAcctNo_qr;
 
     /**
-     * 缴款金额
+     * 净佣金
      */
     @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal paymentAmt;
+    private BigDecimal commission_qr;
 
-    public String getProdId() {
-        return prodId;
-    }
+    /**
+     * 应付佣金
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal commissionPay_qr;
 
-    public void setProdId(String prodId) {
-        this.prodId = prodId;
-    }
-
-    public String getAssetId() {
-        return assetId;
-    }
-
-    public void setAssetId(String assetId) {
-        this.assetId = assetId;
-    }
-
-    public String getAssetAbbr() {
-        return assetAbbr;
-    }
-
-    public void setAssetAbbr(String assetAbbr) {
-        this.assetAbbr = assetAbbr;
-    }
-
-    public String getPaymentDate() {
-        return paymentDate;
-    }
-
-    public void setPaymentDate(String paymentDate) {
-        this.paymentDate = paymentDate;
-    }
-
-    public String getSettleDate() {
-        return settleDate;
-    }
-
-    public void setSettleDate(String settleDate) {
-        this.settleDate = settleDate;
-    }
-
-    public String getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(String endDate) {
-        this.endDate = endDate;
-    }
-
-    public BigDecimal getStampDutyAmt() {
-        return stampDutyAmt;
-    }
-
-    public void setStampDutyAmt(BigDecimal stampDutyAmt) {
-        this.stampDutyAmt = stampDutyAmt;
-    }
-
-    public String getPs() {
-        return ps;
-    }
-
-    public void setPs(String ps) {
-        this.ps = ps;
-    }
-
-    public String getTradeId() {
-        return tradeId;
-    }
-
-    public void setTradeId(String tradeId) {
-        this.tradeId = tradeId;
-    }
-
-    public String getTradeDate() {
-        return tradeDate;
-    }
-
-    public void setTradeDate(String tradeDate) {
-        this.tradeDate = tradeDate;
-    }
-
-    public String getSettdateDate() {
-        return settdateDate;
-    }
-
-    public void setSettdateDate(String settdateDate) {
-        this.settdateDate = settdateDate;
-    }
-
-    public BigDecimal getDealNum() {
-        return dealNum;
-    }
-
-    public void setDealNum(BigDecimal dealNum) {
-        this.dealNum = dealNum;
-    }
-
-    public String getCcy() {
-        return ccy;
-    }
-
-    public void setCcy(String ccy) {
-        this.ccy = ccy;
-    }
-
-    public BigDecimal getCommission() {
-        return commission;
-    }
-
-    public void setCommission(BigDecimal commission) {
-        this.commission = commission;
-    }
-
-    public BigDecimal getOtherAmt() {
-        return otherAmt;
-    }
-
-    public void setOtherAmt(BigDecimal otherAmt) {
-        this.otherAmt = otherAmt;
-    }
-
-    public BigDecimal getTradeAmt() {
-        return tradeAmt;
-    }
-
-    public void setTradeAmt(BigDecimal tradeAmt) {
-        this.tradeAmt = tradeAmt;
-    }
-
-    public String getMyAcctNo() {
-        return myAcctNo;
-    }
-
-    public void setMyAcctNo(String myAcctNo) {
-        this.myAcctNo = myAcctNo;
-    }
+    /**
+     * 清算金额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal settleAmt_qr;
 
     public String getOperateType() {
         return operateType;
@@ -441,12 +317,36 @@ public class TrdStockTradeDto extends BaseEntity implements ProcessEntity {
         this.elementId = elementId;
     }
 
+    public String getTradeId() {
+        return tradeId;
+    }
+
+    public void setTradeId(String tradeId) {
+        this.tradeId = tradeId;
+    }
+
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
+    }
+
     public String getOutTradeId() {
         return outTradeId;
     }
 
     public void setOutTradeId(String outTradeId) {
         this.outTradeId = outTradeId;
+    }
+
+    public String getProdId() {
+        return prodId;
+    }
+
+    public void setProdId(String prodId) {
+        this.prodId = prodId;
     }
 
     public String getProdName() {
@@ -457,28 +357,52 @@ public class TrdStockTradeDto extends BaseEntity implements ProcessEntity {
         this.prodName = prodName;
     }
 
-    public BigDecimal getSettleAmt() {
-        return settleAmt;
+    public String getAssetId() {
+        return assetId;
     }
 
-    public void setSettleAmt(BigDecimal settleAmt) {
-        this.settleAmt = settleAmt;
+    public void setAssetId(String assetId) {
+        this.assetId = assetId;
     }
 
-    public String getIsLock() {
-        return isLock;
+    public String getAssetAbbr() {
+        return assetAbbr;
     }
 
-    public void setIsLock(String isLock) {
-        this.isLock = isLock;
+    public void setAssetAbbr(String assetAbbr) {
+        this.assetAbbr = assetAbbr;
     }
 
-    public Date getDealDate() {
-        return dealDate;
+    public String getPs() {
+        return ps;
     }
 
-    public void setDealDate(Date dealDate) {
-        this.dealDate = dealDate;
+    public void setPs(String ps) {
+        this.ps = ps;
+    }
+
+    public String getCcy() {
+        return ccy;
+    }
+
+    public void setCcy(String ccy) {
+        this.ccy = ccy;
+    }
+
+    public String getSecManageAcctId() {
+        return secManageAcctId;
+    }
+
+    public void setSecManageAcctId(String secManageAcctId) {
+        this.secManageAcctId = secManageAcctId;
+    }
+
+    public Date getTradeDate() {
+        return tradeDate;
+    }
+
+    public void setTradeDate(Date tradeDate) {
+        this.tradeDate = tradeDate;
     }
 
     public Date getFundSettleDate() {
@@ -487,6 +411,38 @@ public class TrdStockTradeDto extends BaseEntity implements ProcessEntity {
 
     public void setFundSettleDate(Date fundSettleDate) {
         this.fundSettleDate = fundSettleDate;
+    }
+
+    public BigDecimal getDealNum() {
+        return dealNum;
+    }
+
+    public void setDealNum(BigDecimal dealNum) {
+        this.dealNum = dealNum;
+    }
+
+    public BigDecimal getTradeAmt() {
+        return tradeAmt;
+    }
+
+    public void setTradeAmt(BigDecimal tradeAmt) {
+        this.tradeAmt = tradeAmt;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public BigDecimal getStampDutyAmt() {
+        return stampDutyAmt;
+    }
+
+    public void setStampDutyAmt(BigDecimal stampDutyAmt) {
+        this.stampDutyAmt = stampDutyAmt;
     }
 
     public BigDecimal getBrokerage() {
@@ -521,6 +477,38 @@ public class TrdStockTradeDto extends BaseEntity implements ProcessEntity {
         this.stlAmt = stlAmt;
     }
 
+    public BigDecimal getFeeAmt() {
+        return feeAmt;
+    }
+
+    public void setFeeAmt(BigDecimal feeAmt) {
+        this.feeAmt = feeAmt;
+    }
+
+    public BigDecimal getSecOtherAmt() {
+        return secOtherAmt;
+    }
+
+    public void setSecOtherAmt(BigDecimal secOtherAmt) {
+        this.secOtherAmt = secOtherAmt;
+    }
+
+    public BigDecimal getCommission() {
+        return commission;
+    }
+
+    public void setCommission(BigDecimal commission) {
+        this.commission = commission;
+    }
+
+    public BigDecimal getCommissionPay() {
+        return commissionPay;
+    }
+
+    public void setCommissionPay(BigDecimal commissionPay) {
+        this.commissionPay = commissionPay;
+    }
+
     public Date getExchangeDate() {
         return exchangeDate;
     }
@@ -529,28 +517,28 @@ public class TrdStockTradeDto extends BaseEntity implements ProcessEntity {
         this.exchangeDate = exchangeDate;
     }
 
-    public String getSaleCode() {
-        return saleCode;
+    public BigDecimal getSettleAmt() {
+        return settleAmt;
     }
 
-    public void setSaleCode(String saleCode) {
-        this.saleCode = saleCode;
+    public void setSettleAmt(BigDecimal settleAmt) {
+        this.settleAmt = settleAmt;
     }
 
-    public Date getSettleDate_pg() {
-        return settleDate_pg;
+    public String getMyAcctNo() {
+        return myAcctNo;
     }
 
-    public void setSettleDate_pg(Date settleDate_pg) {
-        this.settleDate_pg = settleDate_pg;
+    public void setMyAcctNo(String myAcctNo) {
+        this.myAcctNo = myAcctNo;
     }
 
-    public Date getFundSettleDate_pg() {
-        return fundSettleDate_pg;
+    public Date getPaymentDate_pg() {
+        return paymentDate_pg;
     }
 
-    public void setFundSettleDate_pg(Date fundSettleDate_pg) {
-        this.fundSettleDate_pg = fundSettleDate_pg;
+    public void setPaymentDate_pg(Date paymentDate_pg) {
+        this.paymentDate_pg = paymentDate_pg;
     }
 
     public BigDecimal getDealNum_pg() {
@@ -561,12 +549,12 @@ public class TrdStockTradeDto extends BaseEntity implements ProcessEntity {
         this.dealNum_pg = dealNum_pg;
     }
 
-    public BigDecimal getTradedPrice() {
-        return tradedPrice;
+    public BigDecimal getPrice_pg() {
+        return price_pg;
     }
 
-    public void setTradedPrice(BigDecimal tradedPrice) {
-        this.tradedPrice = tradedPrice;
+    public void setPrice_pg(BigDecimal price_pg) {
+        this.price_pg = price_pg;
     }
 
     public BigDecimal getPaymentAmt_pg() {
@@ -585,22 +573,6 @@ public class TrdStockTradeDto extends BaseEntity implements ProcessEntity {
         this.myAcctNo_pg = myAcctNo_pg;
     }
 
-    public Date getPurchDate() {
-        return purchDate;
-    }
-
-    public void setPurchDate(Date purchDate) {
-        this.purchDate = purchDate;
-    }
-
-    public Date getSettleDate_sg() {
-        return settleDate_sg;
-    }
-
-    public void setSettleDate_sg(Date settleDate_sg) {
-        this.settleDate_sg = settleDate_sg;
-    }
-
     public BigDecimal getEntrustAmt() {
         return entrustAmt;
     }
@@ -615,14 +587,6 @@ public class TrdStockTradeDto extends BaseEntity implements ProcessEntity {
 
     public void setMyAcctNo_sg(String myAcctNo_sg) {
         this.myAcctNo_sg = myAcctNo_sg;
-    }
-
-    public Date getConfirmDate() {
-        return confirmDate;
-    }
-
-    public void setConfirmDate(Date confirmDate) {
-        this.confirmDate = confirmDate;
     }
 
     public BigDecimal getConfirmNum() {
@@ -649,6 +613,38 @@ public class TrdStockTradeDto extends BaseEntity implements ProcessEntity {
         this.confirmAmt = confirmAmt;
     }
 
+    public Date getReceiptArriveDate() {
+        return receiptArriveDate;
+    }
+
+    public void setReceiptArriveDate(Date receiptArriveDate) {
+        this.receiptArriveDate = receiptArriveDate;
+    }
+
+    public BigDecimal getReceiptAmt() {
+        return receiptAmt;
+    }
+
+    public void setReceiptAmt(BigDecimal receiptAmt) {
+        this.receiptAmt = receiptAmt;
+    }
+
+    public Date getRefundArriveDate() {
+        return refundArriveDate;
+    }
+
+    public void setRefundArriveDate(Date refundArriveDate) {
+        this.refundArriveDate = refundArriveDate;
+    }
+
+    public BigDecimal getRefundAmount() {
+        return refundAmount;
+    }
+
+    public void setRefundAmount(BigDecimal refundAmount) {
+        this.refundAmount = refundAmount;
+    }
+
     public String getMyAcctNo_qr() {
         return myAcctNo_qr;
     }
@@ -657,11 +653,27 @@ public class TrdStockTradeDto extends BaseEntity implements ProcessEntity {
         this.myAcctNo_qr = myAcctNo_qr;
     }
 
-    public BigDecimal getPaymentAmt() {
-        return paymentAmt;
+    public BigDecimal getCommission_qr() {
+        return commission_qr;
     }
 
-    public void setPaymentAmt(BigDecimal paymentAmt) {
-        this.paymentAmt = paymentAmt;
+    public void setCommission_qr(BigDecimal commission_qr) {
+        this.commission_qr = commission_qr;
+    }
+
+    public BigDecimal getCommissionPay_qr() {
+        return commissionPay_qr;
+    }
+
+    public void setCommissionPay_qr(BigDecimal commissionPay_qr) {
+        this.commissionPay_qr = commissionPay_qr;
+    }
+
+    public BigDecimal getSettleAmt_qr() {
+        return settleAmt_qr;
+    }
+
+    public void setSettleAmt_qr(BigDecimal settleAmt_qr) {
+        this.settleAmt_qr = settleAmt_qr;
     }
 }
