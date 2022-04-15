@@ -1447,7 +1447,7 @@
         to_char(eted.payment_date,'yyyy-MM-dd') paymentDate,
         to_char(eted.listing_date,'yyyy-MM-dd')  listingDate,
         /*ete.entrust_num entrustNum,*/
-        case when eted.BUSI_TYPE_POSITION='ex017' THEN round(ete.entrust_num/100,4)
+        case when eted.BUSI_TYPE_POSITION='EX017' THEN round(ete.entrust_num/100,4)
         when ete.ps in ('T68','T69') THEN round(ete.entrust_num/100,4)
         else ete.entrust_num end entrustNum,
         <!--ete.entrust_amt entrustAmt,
