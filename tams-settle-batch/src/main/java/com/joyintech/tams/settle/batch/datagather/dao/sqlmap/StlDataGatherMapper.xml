@@ -350,7 +350,9 @@
 			ON T2.FINPROD_ID = T1.FINPROD_ID
 			AND T2.BRANCH = '0'
 		<where>
+			1 = 1
 			<if test="checkResultList != null and checkResultList.size() > 0">
+			    AND NOT EXISTS (SELECT 1 FROM SETTLE_TRANS_TG_MAPPING temp where temp.TRADE_ID = std.TRADE_ID)
 				<foreach collection="checkResultList" item="result" open="AND stds.CHECK_RESULT IN (" close=")" separator=",">
 					#{result,jdbcType=VARCHAR}
 				</foreach>
