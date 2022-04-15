@@ -3187,7 +3187,7 @@
     var initPage = function () {
             $("#businessModelDiv_jj").hide();
             $("#businessModelDiv_gd").hide();
-            $("#businessModelDiv_dz").hide();
+            //$("#businessModelDiv_dz").hide();
             var finprodType2 = $("#finprodType2_" + currentTab).val();
             var ps = $("#ps_" + currentTab).val();
             if(ps){
