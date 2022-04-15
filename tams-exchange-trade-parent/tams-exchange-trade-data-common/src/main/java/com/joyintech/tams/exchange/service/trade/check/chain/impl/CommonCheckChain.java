@@ -87,13 +87,12 @@ public class CommonCheckChain extends AbstractChain<CheckChainBean> {
         }
         if (Objects.isNull(instruction.getTradeDate())) {
             checkRsp.put("tradeDate", "委托日期不能为空");
-        } else if (instruction.getTradeDate().compareTo(commonManagement.getPlatDate()) < 0) {
-            //交易日期不得早于平台日
-            checkRsp.put("tradeDate", "委托日期不得早于平台日");
         }
-
         if (Objects.isNull(instruction.getVdate())) {
             checkRsp.put("vdate", "委托开始日不能为空");
+        }else if (instruction.getVdate().compareTo(commonManagement.getPlatDate()) < 0) {
+            //交易日期不得早于平台日
+            checkRsp.put("vdate", "委托开始日不得早于平台日");
         }
         if (Objects.isNull(instruction.getMdate())) {
             checkRsp.put("mdate", "委托结束日不能为空");

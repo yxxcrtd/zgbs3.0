@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.Objects;
 
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_质押券出入库;
+
 @RestController("OrderController_dtx")
 @RequestMapping("/trade/joyin")
 @Api(tags = "场内交易-委托操作接口")
@@ -66,7 +68,7 @@ public class OrderController {
         if (Objects.isNull(instruction)) {
             return new Message<>(ResultBean.error(ErrorCode.INSTRUCTIONS_NOT_EXIST, order));
         }
-        if ("EX005".equals(instruction.getBusiTypeTg())) {
+        if (投管业务类型_质押券出入库.getValue().equals(instruction.getBusiTypeTg())) {
             order.setEntrustPrice(order.getEntrustPrice().divide(BigDecimal.valueOf(100)));
         }
 

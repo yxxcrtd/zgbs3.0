@@ -1082,18 +1082,18 @@ public class InvestmentManagement extends BaseService {
 
             ResultBean resultBean = new ResultBean(ErrorCode.SUCCESS);
             Map<String, Object> data = checkResult.getData();
-//            if (code == 2 && CollUtil.isNotEmpty(data)) {
-//                Set<String> keys = data.keySet();
+            if (code == 2 && CollUtil.isNotEmpty(data)) {
+                Set<String> keys = data.keySet();
 //                instructionList = instructionList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
 //                detailList = detailList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
 //                pledgeList = pledgeList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
-//
-//                updateAppointInstruction(records, entrustIds, Lists.newArrayList(keys.iterator()), data);
-//
-//                resultBean.setErrorCode(ErrorCode.APPOINT_INSTRUCTION_EXIST_PARAMETER_ERROR);
-//            } else {
-//                updateAppointInstruction(records, entrustIds);
-//            }
+
+                updateAppointInstruction(records, entrustIds, Lists.newArrayList(keys.iterator()), data);
+
+                resultBean.setErrorCode(ErrorCode.APPOINT_INSTRUCTION_EXIST_PARAMETER_ERROR);
+            } else {
+                updateAppointInstruction(records, entrustIds);
+            }
 
             dealAppointInstruction(instructionList, detailList, pledgeList);
 

@@ -1,11 +1,21 @@
 package com.joyintech.tams.exchange.service.trade.check.business.impl;
 
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt2;
+import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.service.trade.check.business.Check;
 import com.joyintech.tams.exchange.service.trade.check.business.IBusinessCheck;
 import com.joyintech.tams.exchange.service.trade.check.chain.CheckChainBean;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.util.Map;
+import java.util.Objects;
+
 /**
+ * 质押券出入库
+ *
  * @author lifangpeng
  * @date 2022/4/6 17:06
  */
@@ -15,6 +25,20 @@ public class BusinessCheckEx005 implements IBusinessCheck {
 
     @Override
     public void check(CheckChainBean chainBean) {
-
+        Map<String, Object> checkRsp = chainBean.getCheckRsp();
+        Instruction instruction = chainBean.getInstruction();
+        if (!StringUtil.equals(InvestmentAssetType.PLEDGE_REPURCHASE.value, instruction.getAssetType())) {
+            checkRsp.put("assetType", "质押券出入库只支持债券");
+        }
+        String ps = instruction.getPs();
+        if (!DictCodeListExt2.交易方向_质押券入库.getValue().equals(ps) && !DictCodeListExt2.交易方向_质押券出库.getValue().equals(ps)) {
+            checkRsp.put("ps", "质押券出入库交易方向只支持质押入库或质押出库");
+        }
+        if (instruction.getEntrustNum() == 0) {
+            checkRsp.put("entrustNum", "质押券数量不能为空或0");
+        }
+        if (Objects.isNull(instruction.getEntrustPrice()) || instruction.getEntrustPrice().compareTo(BigDecimal.ZERO) < 1) {
+            checkRsp.put("entrustPrice", "折算率不能为空或0");
+        }
     }
 }
