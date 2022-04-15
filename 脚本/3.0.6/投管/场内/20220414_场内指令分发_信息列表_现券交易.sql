@@ -68,7 +68,7 @@ VALUES ('CfetsEtrDispatcher', 'CfetsEtrDispatcherInfo', 'EX017', 'otherTargetTyp
 INSERT INTO CFG_READONLY_FORM_SHOW ("PAGECODE", "DTCODE", "SPCDCODE", "COLCODE", "COLNAME", "DICTCODE", "SEQNO",
                                     "EXTENDCFG", "STATUS", "REMARK1", "REMARK2", "REMARK3")
 VALUES ('CfetsEtrDispatcher', 'CfetsEtrDispatcherInfo', 'EX017', 'entrustNum', '指令数量', NULL, '16',
-        '{"colAlign": "left","dataType":"amount","precision":"0","unit":"zhang"}', '1', '0', NULL, NULL);
+        '{"colAlign": "left","dataType":"amount","precision":"3","unit":"wanyuan"}', '1', '0', NULL, NULL);
 INSERT INTO CFG_READONLY_FORM_SHOW ("PAGECODE", "DTCODE", "SPCDCODE", "COLCODE", "COLNAME", "DICTCODE", "SEQNO",
                                     "EXTENDCFG", "STATUS", "REMARK1", "REMARK2", "REMARK3")
 VALUES ('CfetsEtrDispatcher', 'CfetsEtrDispatcherInfo', 'EX017', 'entrustAmt', '指令金额', NULL, '17',
