@@ -705,6 +705,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         etrSinglePortfolioDto.setTradeMarket(dto.getTradeMarket());// 交易场所
         etrSinglePortfolioDto.setTradePlat(dto.getTradePlat());// 交易平台
         etrSinglePortfolioDto.setBusinessModel(dto.getBusinessModel());
+        etrSinglePortfolioDto.setBusiTypePosition(dto.getBusiTypePosition());
         /*
          * if 画面.交易平台 = 数据字典.交易平台.大宗交易平台 and 画面.交易场所 = 数据字典.交易场所.深圳证券交易所
          * 交易平台 = 数据字典.交易平台.综合协议平台
@@ -5349,6 +5350,8 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         etrExchangeTrade001Dto.setStockId(dto.getStockId());
         etrExchangeTrade001Dto.setEntrustDate(DateUtil.parse(DateUtil.format(dto.getEntrustDate(), DateUtil.DEFAULT_DATE_FORMAT_EN)));
         etrExchangeTrade001Dto.setOptType(dto.getOptType());
+        etrExchangeTrade001Dto.setBusiTypePosition(dto.getBusiTypePosition());
+
 
         return etrExchangeTrade001Dto;
     }
@@ -6022,6 +6025,45 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
     public MinTrdUnitLimitDto getMinTrdUnitLimitPrice(EtrExchangeMiniLimitPriceRequest request) {
         MinTrdUnitLimitDto minTrdUnitLimitDto = getInterfSysMinTrdUnit(request.getFinprodId(), request.getTradePlat(), request.getTradeMarket(), request.getFinprodType2(), request.getPs());
         return minTrdUnitLimitDto;
+    }
+
+    //投管业务类型
+    public String genBusiTypeTg(EtrExchangeTradeSaveRequest dto) {
+        //投管业务类型
+        String busiTypePosition = String.valueOf("");
+        if (dto.getTradePlat().equals(DictCodeList.交易平台_竞价撮合平台.getValue())) {
+            busiTypePosition=DictCodeListExt3.投管业务类型_竞价交易.getValue();
+        }
+        if (dto.getTradePlat().equals(DictCodeList.交易平台_大宗交易平台.getValue())) {
+            busiTypePosition=DictCodeListExt3.投管业务类型_大宗交易.getValue();
+        }
+        if (dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue()) /*&& dto.getTradePlat().equals(DictCodeList.交易平台_竞价撮合平台.getValue())*/) {
+            if (StringUtils.equals(dto.getPs(), DictCodeList.交易方向_行权_回售.getValue())) {
+                busiTypePosition=DictCodeListExt3.投管业务类型_行权.getValue();
+            } else if (StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_配债.getValue())) {
+                dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_配债指令.getValue());
+                busiTypePosition=DictCodeListExt3.投管业务类型_配债.getValue();
+            } else if (StringUtils.equals(dto.getPs(), DictCodeList.交易方向_申购.getValue())) {
+                busiTypePosition=DictCodeListExt3.投管业务类型_可转债申购.getValue();
+            } else if (StringUtils.equals(dto.getPs(), DictCodeListExt1.交易方向_债转股.getValue())) {
+                busiTypePosition=DictCodeListExt3.投管业务类型_新股申购.getValue();
+            } else if (StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_质押券入库.getValue()) || StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_质押券出库.getValue())) {
+                busiTypePosition=DictCodeListExt3.投管业务类型_质押券出入库.getValue();
+            }
+        }
+        if (dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_股票.getValue()) && dto.getTradePlat().equals(DictCodeList.交易平台_竞价撮合平台.getValue())) {
+            // add  start
+            if (StringUtils.equals(dto.getPs(), DictCodeListExt2.交易方向_配股.getValue())) {
+                busiTypePosition=DictCodeListExt3.投管业务类型_配股.getValue();
+            } else if (StringUtils.equals(dto.getPs(), DictCodeList.交易方向_申购.getValue())) {
+                busiTypePosition=DictCodeListExt3.投管业务类型_新股申购.getValue();
+            }
+        }
+        if (dto.getTradePlat().equals(DictCodeList.交易平台_固定收益平台.getValue())) {
+            busiTypePosition=DictCodeListExt3.投管业务类型_协议现券.getValue();
+        }
+        dto.setBusiTypePosition(busiTypePosition);
+        return busiTypePosition;
     }
 
 }

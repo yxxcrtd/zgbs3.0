@@ -313,6 +313,9 @@
             <if test="transmitTime != null" >
                 TRANSMIT_TIME,
             </if>
+            <if test="busiTypePosition != null" >
+                BUSI_TYPE_POSITION,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="entrustId != null" >
@@ -491,6 +494,9 @@
             </if>
             <if test="transmitTime != null" >
                 #{transmitTime,jdbcType=VARCHAR},
+            </if>
+            <if test="busiTypePosition != null" >
+                #{busiTypePosition,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>
