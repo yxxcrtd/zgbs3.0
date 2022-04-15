@@ -25,7 +25,7 @@ public class BusinessCheckEx001 implements IBusinessCheck {
         Map<String, Object> checkRsp = chainBean.getCheckRsp();
         Instruction instruction = chainBean.getInstruction();
         //债券竞价交易
-        if (InvestmentAssetType.isBond(instruction.getFinprodType2())) {
+        if (InvestmentAssetType.isBond(instruction.getAssetType())) {
             if (!SubStockType.KZZ.value.equals(instruction.getAssetType1())) {
                 checkRsp.put("assetType1", "债券竞价交易只支持可转债");
             }

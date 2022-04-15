@@ -256,6 +256,10 @@ public class EtrExchangeTradeSaveRequest extends EtrEntrust implements ProcessEn
 
 
     private BigDecimal disRate;
+    /**
+     * 投管业务类型
+     */
+    private String busiTypePosition;
 
     public BigDecimal getDisRate() {
         return disRate;
@@ -753,5 +757,14 @@ public class EtrExchangeTradeSaveRequest extends EtrEntrust implements ProcessEn
 
     public void setCurrentTab(String currentTab) {
         this.currentTab = currentTab;
+    }
+
+
+    public String getBusiTypePosition() {
+        return busiTypePosition;
+    }
+
+    public void setBusiTypePosition(String busiTypePosition) {
+        this.busiTypePosition = busiTypePosition;
     }
 }

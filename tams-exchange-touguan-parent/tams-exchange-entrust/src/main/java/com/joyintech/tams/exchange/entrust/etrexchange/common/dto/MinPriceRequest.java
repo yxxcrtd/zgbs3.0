@@ -16,6 +16,8 @@ public class MinPriceRequest {
      */
     @ApiModelProperty(name="assetType",value="资产类型",example="A1")
     private String assetType;
+    @ApiModelProperty(name="tradePlat",value="交易平台",example="A1")
+    private String tradePlat;
 
     public String getFinprodId() {
         return finprodId;
@@ -31,5 +33,13 @@ public class MinPriceRequest {
 
     public void setAssetType(String assetType) {
         this.assetType = assetType;
+    }
+
+    public String getTradePlat() {
+        return tradePlat;
+    }
+
+    public void setTradePlat(String tradePlat) {
+        this.tradePlat = tradePlat;
     }
 }

@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.service.trade.check.business.impl;
 
+import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
 import com.joyintech.tams.exchange.common.constant.instrument.SubStockType;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.service.trade.check.business.Check;
@@ -23,7 +24,9 @@ public class BusinessCheckEx016 implements IBusinessCheck {
     public void check(CheckChainBean chainBean) {
         Map<String, Object> checkRsp = chainBean.getCheckRsp();
         Instruction instruction = chainBean.getInstruction();
-        //协议现券交易
+        if (!InvestmentAssetType.isBond(instruction.getAssetType())) {
+            checkRsp.put("assetType", "协议现券交易只支持债券");
+        }
         if (!SubStockType.KZZ.value.equals(instruction.getAssetType1())) {
             checkRsp.put("assetType1", "协议现券交易只支持可转债");
         }
