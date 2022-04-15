@@ -29,6 +29,7 @@ public class CfetsEtrFinProductInfoService extends BaseService {
 
     private static String SEPARATOR = "/";
     private static String AMPERS_AND = "&";
+    private static String BASE_SPCD_CODE = "999999";
 
     @Autowired
     private CfetsEtrFinProductInfoMapper cfetsEtrFinProductInfoMapper;
@@ -62,7 +63,7 @@ public class CfetsEtrFinProductInfoService extends BaseService {
     }
 
     /**
-     * 拼接对于业务场景spcdCode
+     * 拼接对应业务场景spcdCode
      *
      * @param finProductInfo
      * @return
@@ -76,11 +77,13 @@ public class CfetsEtrFinProductInfoService extends BaseService {
         //发行类型
         String issueStyle = finProductInfo.getIssueStyle();
         if (DictCodeListExt4.新债_发行方式_报价发行.getValue().equals(issueClass)) {
-            return sb.append(DictCodeListExt4.新债_发行方式_报价发行.getValue()).toString();
+            return sb.append(BASE_SPCD_CODE).append(",").append(DictCodeListExt4.新债_发行方式_报价发行.getValue()).toString();
         }
 
         if (DictCodeListExt4.招标方式_单一价格招标.getValue().equals(tenderType) || DictCodeListExt4.招标方式_数量招标.getValue().equals(tenderType)) {
-            return sb.append(DictCodeListExt4.新债_发行方式_招标发行.getValue())
+            return sb.append(BASE_SPCD_CODE)
+                    .append(",")
+                    .append(DictCodeListExt4.新债_发行方式_招标发行.getValue())
                     .append(SEPARATOR)
                     .append(DictCodeListExt4.新债_发行方式_簿记建档.getValue())
                     .append(AMPERS_AND)
@@ -89,7 +92,9 @@ public class CfetsEtrFinProductInfoService extends BaseService {
         }
 
         if (DictCodeListExt4.发行类型_首发.getValue().equals(issueStyle) || DictCodeListExt4.发行类型_首发.getValue().equals(issueStyle)) {
-            return sb.append(DictCodeListExt4.新债_发行方式_招标发行.getValue())
+            return sb.append(BASE_SPCD_CODE)
+                    .append(",")
+                    .append(DictCodeListExt4.新债_发行方式_招标发行.getValue())
                     .append(SEPARATOR)
                     .append(DictCodeListExt4.新债_发行方式_簿记建档.getValue())
                     .append(AMPERS_AND)
