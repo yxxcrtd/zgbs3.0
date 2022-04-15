@@ -1,5 +1,7 @@
 package com.joyintech.service.trade.conbond.service;
 
+import com.joyintech.framework.security.SecurityUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.trade.conbond.dao.TrdConBondMapper;
 import com.joyintech.service.trade.conbond.dto.TrdConBondDto;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
@@ -11,6 +13,7 @@ import com.joyintech.tams.invest.common.position.service.CommonPositionEngineSer
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -98,7 +101,13 @@ public class PositionRequestTrdConBondService {
         ptlCash.put("cashAcctId", accNo);
         ptlCash.put("tradeId", entity.getTrdProductDeal().getTradeId());
         ptlCash.put("etrId", entity.getEntrustId());
-        ptlCash.put("cashAmount", entity.getPrinAmt());
+        //网下申购，普通申购传50万，优先配售用券面总额
+        if (StringUtil.isNotBlank(entity.getPurchType()) && StringUtil.equals(entity.getPurchType(), DictCodeListExt2.申购类型_优先配售.getValue())) {
+            ptlCash.put("cashAmount", entity.getTradeAmt());
+        }else {
+            ptlCash.put("cashAmount", new BigDecimal("500000"));
+        }
+
         ptlCashList.add(ptlCash);
         resultMap.put("ptlCashList", ptlCashList);
 
@@ -108,8 +117,15 @@ public class PositionRequestTrdConBondService {
         bondSec.put("finprodId", entity.getFinprodId());
         bondSec.put("secAcctId", entity.getSecManageAcctId());
         bondSec.put("etrId", entity.getEntrustId());
-        bondSec.put("secAmount", entity.getPrinAmt());
+        bondSec.put("secAmount", entity.getTradeAmt()   );
         bondSecList.add(bondSec);
         resultMap.put("bondSecList", bondSecList);
+
+        resultMap.put("balanceCheck", DictCodeList.是否_否.getValue());
+        resultMap.put("userId", SecurityUtil.getLoginUser().getUserName());
+        resultMap.put("totalTradeId",entity.getEntrustId());
+        resultMap.put("totalTradeId", entity.getEntrustId());
+        resultMap.put("flowStatus", DictCodeListExt3.流程节点_流程提交.getValue());
+        resultMap.put("modelType", DictCodeListExt1.子系统代码_委托.getValue());
     }
 }
