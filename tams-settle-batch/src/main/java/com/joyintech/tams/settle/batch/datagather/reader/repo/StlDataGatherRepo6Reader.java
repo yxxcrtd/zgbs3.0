@@ -1,6 +1,7 @@
 package com.joyintech.tams.settle.batch.datagather.reader.repo;
 
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.settle.batch.datagather.constant.StlDataGatherConstant;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,7 @@ public class StlDataGatherRepo6Reader extends StlDataGatherRepoDurationReader {
     @Override
     protected void setSearchParam(Map<String, Object> searchParam) {
         // reader 类型
-        searchParam.put("readerType", "RepoDuration");
+        searchParam.put("readerType", StlDataGatherConstant.AGRE_ANTI_REPO_EXPIRED);
         // reader 回购类型
         searchParam.put("readerRepoType", DictCodeList.回购类型_质押式协议回购.getValue());
     }
