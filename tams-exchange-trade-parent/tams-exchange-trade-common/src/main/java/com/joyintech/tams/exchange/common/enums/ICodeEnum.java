@@ -37,6 +37,18 @@ public interface ICodeEnum<T> {
         return Objects.equals(this.getCode(), enumCode);
     }
 
+
+    /**
+     * 对比当前枚举对象和传入的枚举值是否一致（String类型会忽略大小写）
+     * <br>当前枚举值是否匹配远端传入的值（比如：数据库的字段值、RPC传入的参数值）
+     *
+     * @param enumCode 枚举值
+     * @return 是否匹配
+     */
+    default boolean codeNotEquals(T enumCode) {
+        return !codeEquals(enumCode);
+    }
+
     /**
      * 对比两个枚举对象是否完全相同（==）
      *
