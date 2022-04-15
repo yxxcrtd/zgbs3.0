@@ -145,15 +145,13 @@ public class StlDownDataGatherTask extends BatchBaseService {
             .buildFlow("基金买入、卖出、除权交易", "fund1")
             .buildFlow("债券质押式回购_首期", "repo1")
             .buildFlow("债券质押式协议回购_逆回购_到期交易", "repo6")
-            .buildFlow("股票分红及送转交易", "shares2")
+            .buildFlow("股票新股中签交易", "shares1")
             .buildFlow("股票申购确认交易", "shares3")
-            .buildFlow("债券存续期", "bond6")
             .buildFlow("债券股票上市流通", "bond7")
             .parallelBuilder(this.getBatchTask().getBeanName() + StringUtil.SPACE + this.getBatchTask().getTaskId(),
                     stlDataGatherJobListener,
                     "债券买卖交易", "可转债申购", "可转债申购确认", "债转股", "配债", "基金买入、卖出、除权交易"
-                    , "债券质押式回购_首期", "债券质押式协议回购_逆回购_到期交易", "股票分红及送转交易","股票申购确认交易",
-                    "债券存续期", "债券股票上市流通")
+                    , "债券质押式回购_首期", "债券质押式协议回购_逆回购_到期交易", "股票新股中签交易","股票申购确认交易", "债券股票上市流通")
             .run();
 
         return jobExecution;

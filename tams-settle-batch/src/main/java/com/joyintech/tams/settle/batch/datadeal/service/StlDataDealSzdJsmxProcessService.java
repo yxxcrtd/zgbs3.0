@@ -216,12 +216,6 @@ public class StlDataDealSzdJsmxProcessService {
 				}
 				// 交易币种
 				settleTransData.setCcy(stlDataDealProcessCommonService.getCcy(szdJsmx.getBz()));
-				// 交易平台
-				String finProductTypeType6 = getFinProductTypeType6(szdJsmx);
-				settleTransData.setTradePlat(null);
-				if ("B14".equals(finProductTypeType6)) {
-					settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdJsmx.getJyfs()));
-				}
 				// 交收方式
 				settleTransData.setSettleMode(stlDataDealProcessCommonService.getSettleMode(szdJsmx.getJsfs()));
 				// 交易方向
@@ -270,7 +264,12 @@ public class StlDataDealSzdJsmxProcessService {
 					// GNS-908:申购和申购确认需要通过申报代码查询资产代码 modify by fuyongsheng 20220218 end
 					szdJsmx.setCjbh(szdJsmx.getJsbh());
 				}
-
+				// 交易平台
+				String finProductTypeType6 = getFinProductTypeType6(settleTransData);
+				settleTransData.setTradePlat(null);
+				if ("B14".equals(finProductTypeType6)) {
+					settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdJsmx.getJyfs()));
+				}
 				// 债可交换债换股业务
 				if (StringUtil.lowerCase(stlDownDataDealOperatorDto.getDataFile()).startsWith(StlDataDealProcessConstant.SZD_JSMX_03)) {
 					if (StringUtil.equals(szdJsmx.getYwlx(), StlDataDealProcessConstant.YWLX_653)) {
@@ -2192,7 +2191,7 @@ public class StlDataDealSzdJsmxProcessService {
 		// 交易币种
 		settleTransData.setCcy(stlDataDealProcessCommonService.getCcy(szdJsmx.getBz()));
 		// 交易平台
-		String finProductTypeType6 = getFinProductTypeType6(szdJsmx);
+		String finProductTypeType6 = getFinProductTypeType6(settleTransData);
 		settleTransData.setTradePlat(null);
 		if ("B14".equals(finProductTypeType6)) {
 			settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdJsmx.getJyfs()));
@@ -2387,10 +2386,10 @@ public class StlDataDealSzdJsmxProcessService {
 	/**
 	 * 根据金融产品代码查询FIN_PRODUCT_TYPE.TYPE_6 -- 投管一级类型
 	 */
-	private String getFinProductTypeType6(SzdJsmx szdJsmx) {
+	private String getFinProductTypeType6(SettleTransData settleTransData) {
 		FinProductTypeKey finProductTypeKey = new FinProductTypeKey();
 		finProductTypeKey.setBranch(0L);
-		finProductTypeKey.setFinprodId(DictCodeListExt1.金融产品类型_投管用_债券.getValue() + GlobalConstant.UNDER_LINE + szdJsmx.getZqdm1() + ".SH");
+		finProductTypeKey.setFinprodId(settleTransData.getFinprodId());
 
 		FinProductType finProductType = new FinProductType();
 		try {

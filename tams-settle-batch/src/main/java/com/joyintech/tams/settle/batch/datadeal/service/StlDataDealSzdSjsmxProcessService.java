@@ -174,7 +174,9 @@ public class StlDataDealSzdSjsmxProcessService {
             settleTransData.setShareAmt(abs(szdSjsmx.getMxqssl()));
             // 全价总额
             settleTransData.setFpriceAmt(abs(szdSjsmx.getMxqsbj()));
-
+            if ("B14".equals(getFinProductTypeType6(settleTransData))) {
+                settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdSjsmx.getMxjyfs()));
+            }
             // 日终过来的文件结算价格就是全价的，需要反算净价总额、应计利息总额
             stlDownDataDealService.calc(settleTransData);
 
@@ -306,9 +308,6 @@ public class StlDataDealSzdSjsmxProcessService {
             settleTransData.setShareAmt(abs(szdSjsmx.getMxcjsl()));
             // 交易平台
             settleTransData.setTradePlat(null);
-            if ("B14".equals(getFinProductTypeType6(szdSjsmx))) {
-                settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdSjsmx.getMxjyfs()));
-            }
             // 交收方式
             settleTransData.setSettleMode(stlDataDealProcessCommonService.getSettleMode(szdSjsmx.getMxjsfs()));
             // 成交编号
@@ -791,10 +790,10 @@ public class StlDataDealSzdSjsmxProcessService {
     /**
      * 根据金融产品代码查询FIN_PRODUCT_TYPE.TYPE_6 -- 投管一级类型
      */
-    private String getFinProductTypeType6(SzdSjsmx szdSjsmx) {
+    private String getFinProductTypeType6(SettleTransData settleTransData) {
         FinProductTypeKey finProductTypeKey = new FinProductTypeKey();
         finProductTypeKey.setBranch(0L);
-        finProductTypeKey.setFinprodId(DictCodeListExt1.金融产品类型_投管用_股票.getValue() + GlobalConstant.UNDER_LINE + szdSjsmx.getMxzqdm() + ".SZ");
+        finProductTypeKey.setFinprodId(settleTransData.getFinprodId());
         FinProductType finProductType = new FinProductType();
         try {
             finProductType = finProductTypeMapper.selectByPrimaryKey(finProductTypeKey);
