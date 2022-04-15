@@ -24,7 +24,7 @@ import java.util.List;
  * @see EtrExchangeTradeEtrExchangeSecRepoRequest
  * @since 1.0
  */
-@ApiModel(value="持仓信息查询请求参数",description="持仓信息查询请求参数")
+@ApiModel(value="指令列表查询请求参数",description="指令列表查询请求参数")
 public class EtrExchangeTradeEtrExchangeSecRepoRequest {
 
     @ApiModelProperty(name="tradePlat",value="交易平台",example="A1")

@@ -1803,5 +1803,40 @@
     </select>
 
 
+    <select id="getTrdPriceTimeConfig" resultType="com.joyintech.tams.common.base.entity.TrdPriceTimeConfig">
+        select  CONFIG_NO       configNo,
+                ETR_TRAD        etrTrad,
+                TRADE_MARKET    tradeMarket,
+                TRADE_PLAT      tradePlat,
+                ASSET_CLASSIFY1 assetClassify1,
+                ASSET_CLASSIFY2 assetClassify2,
+                ASSET_CLASSIFY3 assetClassify3,
+                PRICE_TIME_TYPE priceTimeType,
+                OPEN_TIME       openTime,
+                CLOSE_TIME      closeTime
+        from trd_price_time_config
+        <where>
+            <if test="TRADE_PLAT != null and TRADE_PLAT != ''">
+                TRADE_PLAT = #{TRADE_PLAT}
+            </if>
+            <if test="TRADE_MARKET != null and TRADE_MARKET != ''">
+                and  TRADE_MARKET = #{TRADE_MARKET}
+            </if>
+            <if test="assetClassify1 != null and assetClassify1 != ''">
+                and  ASSET_CLASSIFY1 = #{ASSET_CLASSIFY1}
+            </if>
+            <if test="ASSET_CLASSIFY2 != null and ASSET_CLASSIFY2 != ''">
+                and  (ASSET_CLASSIFY2 = #{ASSET_CLASSIFY2} or ASSET_CLASSIFY2 is null)
+            </if>
+            <if test="ASSET_CLASSIFY3 != null and ASSET_CLASSIFY3 != ''">
+                and  (ASSET_CLASSIFY3 = #{ASSET_CLASSIFY3} or ASSET_CLASSIFY3 is null)
+            </if>
+            <if test="NOW_DATE != null">
+                and   to_date((to_char(#{NOW_DATE},'yyyy-MM-dd')||' '||OPEN_TIME),'yyyy-MM-dd hh24:mi:ss') &lt;= #{NOW_DATE}
+                and   to_date((to_char(#{NOW_DATE},'yyyy-MM-dd')||' '||CLOSE_TIME),'yyyy-MM-dd hh24:mi:ss') >= #{NOW_DATE}
+            </if>
+        </where>
+    </select>
+
 
 </mapper>

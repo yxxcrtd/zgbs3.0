@@ -129,6 +129,12 @@ public class EtrSinglePortfolioDto extends EtrBaseDto {
     private String busiTypePosition;
 
     /**
+     * 计价方式
+     */
+    private String priceType;
+
+
+    /**
      * Constructor
      */
     public EtrSinglePortfolioDto() {
@@ -486,5 +492,13 @@ public class EtrSinglePortfolioDto extends EtrBaseDto {
 
     public void setBusiTypePosition(String busiTypePosition) {
         this.busiTypePosition = busiTypePosition;
+    }
+
+    public String getPriceType() {
+        return priceType;
+    }
+
+    public void setPriceType(String priceType) {
+        this.priceType = priceType;
     }
 }

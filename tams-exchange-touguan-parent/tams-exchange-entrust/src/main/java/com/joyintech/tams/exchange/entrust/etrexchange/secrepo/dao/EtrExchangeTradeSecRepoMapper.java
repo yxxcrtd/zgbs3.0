@@ -383,5 +383,5 @@ public interface EtrExchangeTradeSecRepoMapper {
 
 	Map findTandardRate(Map<String, Object> pageParam);
 
-
+    List<TrdPriceTimeConfig> getTrdPriceTimeConfig(Map<String, Object> paraMap);
 }

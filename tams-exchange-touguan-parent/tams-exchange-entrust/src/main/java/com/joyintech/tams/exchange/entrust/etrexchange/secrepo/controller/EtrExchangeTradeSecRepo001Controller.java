@@ -76,6 +76,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
+ * 历史遗留  后续不使用
  * 场内债券指令（现券+通用质押式回购）
  * @author qmh
  * @version 1.0 2022年4月7日
@@ -85,7 +86,7 @@ import java.util.stream.Collectors;
 @Controller
 @PageId("etrExchangeTradeSecRepo")
 @RequestMapping("/etrexchange/secrepo/etrExchangeTradeSecRepo001")
-@Api(tags = "场内交易-债券指令下单接口")
+@Api(tags = "场内交易-债券指令下单接口—废弃")
 public class EtrExchangeTradeSecRepo001Controller extends BaseController{
 
 	/**

@@ -45,7 +45,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * 场内债券指令（现券+通用质押式回购）
+ * 场内债券指令（现券+通用质押式回购） 左侧共通界面
  * @author qmh
  * @version 1.0 2022年4月7日
  * @see EtrExchangeTradeSecRepo002Controller
@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
 @Controller
 @PageId("EtrExchangeTradeSecRepo002")
 @RequestMapping("/etrexchange/secrepo/EtrExchangeTradeSecRepo002")
-@Api(tags = "场内交易-持仓指令债券接口")
+@Api(tags = "场内交易-场内债券指令左侧共通接口")
 public class EtrExchangeTradeSecRepo002Controller extends BaseController{
 
     private static final Logger logger = LoggerFactory.getLogger(EtrExchangeTradeSecRepo002Controller.class);
@@ -79,15 +79,9 @@ public class EtrExchangeTradeSecRepo002Controller extends BaseController{
         initPageParams.put("FINPROD_TYPE_TG_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         initPageParams.put("FINPROD_TYPE_TG_F02", DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue());
         initPageParams.put("FINPROD_TYPE_TG_F03", DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
-        initPageParams.put("DECLA_TYPE_PRM05", DictCodeListExt3.申报类型_不指定.getValue());
-        initPageParams.put("DECLA_TYPE_PRM14", DictCodeListExt3.申报类型_指定对手方成交申报.getValue());
-        initPageParams.put("ENTRUST_BUSS_TYPE_15", DictCodeListExt3.上农商_指令业务类型_债券质押式回购竞价指令.getValue());
         initPageParams.put("PS_T02", DictCodeList.交易方向_卖出.getValue());
-        initPageParams.put("PS_T69", DictCodeListExt3.交易方向_质押券出库.getValue());
         initPageParams.put("TARGET_CLASS_01", DictCodeListExt3.目标类型_数量.getValue());
         initPageParams.put("PRICE_MODEL_PRM01", DictCodeListExt2.价格模式_指定价格.getValue());
-        initPageParams.put("SHARES_TRADE_PLATFORM_02", DictCodeList.交易平台_竞价撮合平台.getValue());
-        initPageParams.put("SHARES_TRADE_PLATFORM_04", DictCodeList.交易平台_大宗交易平台.getValue());
         // 场内交易指令画面持仓列表自动刷新时间（毫秒）
         long etrExchange_posTable_refresh_period = 20000;
         String tempSysParaVal = CacheUtil.getSysParam(
@@ -138,11 +132,8 @@ public class EtrExchangeTradeSecRepo002Controller extends BaseController{
      */
     private void setFinprodTypeTgSelectOptions(Map<String, Object> initPageParams) {
         SelectDto selectDto =this.getSelectDataFromDataDic(DictCode.金融产品类型_投管用, null);
-        // 固定收益
         List<SelectOptionDto> finprodTypeTgList = selectDto.getOptions().stream().filter(option -> {
             return StringUtil.equals(option.getId(), DictCodeListExt1.金融产品类型_投管用_债券.getValue());
-//                    || StringUtil.equals(option.getId(), DictCodeListExt1.金融产品类型_投管用_基金.getValue())
-//                    || StringUtil.equals(option.getId(), DictCodeListExt1.金融产品类型_投管用_股票.getValue());
         }).collect(Collectors.toList());
         selectDto.setOptions(finprodTypeTgList);
         initPageParams.put("FINPROD_TYPE_TG", selectDto);
@@ -174,37 +165,6 @@ public class EtrExchangeTradeSecRepo002Controller extends BaseController{
         }).collect(Collectors.toList());
         selectDto.setOptions(ps_repo);
         initPageParams.put("PS_REPO", selectDto);
-//        // 竞价平台
-//        List<SelectOptionDto> ps_jj = selectDto.getOptions().stream().filter(option -> {
-//            return StringUtil.equals(option.getId(), DictCodeListExt3.交易方向_正回购.getValue())
-//                    || StringUtil.equals(option.getId(), DictCodeListExt3.交易方向_逆回购.getValue())
-//                    || StringUtil.equals(option.getId(), DictCodeList.交易方向_买入.getValue())
-//                    || StringUtil.equals(option.getId(), DictCodeList.交易方向_卖出.getValue())
-//                    || StringUtil.equals(option.getId(), DictCodeList.交易方向_行权_回售.getValue())
-//                    || StringUtil.equals(option.getId(), DictCodeList.交易方向_申购.getValue())
-//                    || StringUtil.equals(option.getId(), DictCodeListExt2.交易方向_配股.getValue())
-//                    || StringUtil.equals(option.getId(), DictCodeListExt3.交易方向_债转股.getValue())
-//                    || StringUtil.equals(option.getId(), DictCodeListExt3.交易方向_质押券入库.getValue())
-//                    || StringUtil.equals(option.getId(), DictCodeListExt3.交易方向_质押券出库.getValue())
-//                     || StringUtil.equals(option.getId(), DictCodeListExt3.交易方向_配债.getValue());
-//        }).collect(Collectors.toList());
-//        selectDto.setOptions(ps_jj);
-//        initPageParams.put("PS_JJ", selectDto);
-//
-//        // 大宗平台
-//        List<SelectOptionDto> ps_dz = selectDto.getOptions().stream().filter(option -> {
-//            return StringUtil.equals(option.getId(), DictCodeList.交易方向_买入.getValue())
-//                    || StringUtil.equals(option.getId(), DictCodeList.交易方向_卖出.getValue());
-////                    || StringUtil.equals(option.getId(), DictCodeListExt3.交易方向_正回购.getValue())
-////                    || StringUtil.equals(option.getId(), DictCodeListExt3.交易方向_逆回购.getValue());
-//        }).collect(Collectors.toList());
-//        initPageParams.put("PS_DZ", JsonUtils.objectArray2Json(ps_dz.toArray()));
-//        // 固定收益
-//        List<SelectOptionDto> ps_gd = selectDto.getOptions().stream().filter(option -> {
-//            return StringUtil.equals(option.getId(), DictCodeList.交易方向_买入.getValue())
-//                    || StringUtil.equals(option.getId(), DictCodeList.交易方向_卖出.getValue());
-//        }).collect(Collectors.toList());
-//        initPageParams.put("PS_GD", JsonUtils.objectArray2Json(ps_gd.toArray()));
     }
     
     /**
@@ -227,23 +187,6 @@ public class EtrExchangeTradeSecRepo002Controller extends BaseController{
         }
 
     }
-
-    // modify by etliu 债券质押持仓查询只有非交易业务指令使用，代码删除 20220308 start
-//    /**
-//     * 查询债券质押持仓
-//     *
-//     * @return
-//     * @see
-//     * @since 1.0
-//     */
-//    @ApiOperation(value="查询债券质押持仓分页数据",notes="查询债券质押持仓分页数据")
-//    @PostMapping("findZqzyPositionsPage")
-//    @ResponseBody
-//    public Message<Page<EtrExchangeTradePositionsSecRepoResponse>> findZqzyPositionsPage(@RequestBody   EtrExchangeTradePositionsSecRepoRequest request){
-//        Page<EtrExchangeTradePositionsSecRepoResponse> page = etrExchangeTradeSecRepo002Service.findZqzyPositionsPage(request);
-//        return new Message<Page<EtrExchangeTradePositionsSecRepoResponse>>().success().setData(page);
-//    }
-    // modify by etliu 债券质押持仓查询只有非交易业务指令使用，代码删除 20220308 end
 
     /**
      * 查询证券代码联想框文本框

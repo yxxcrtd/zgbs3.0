@@ -24,7 +24,7 @@ import java.util.List;
  * @see EtrExchangeTradeQuotationHqSecRepoResponse
  * @since 1.0
  */
-@ApiModel(value="竞价行情信息查询返回参数",description="竞价行情信息查询返回参数")
+@ApiModel(value="行情信息查询返回参数",description="行情信息查询返回参数")
 public class EtrExchangeTradeQuotationHqSecRepoResponse {
 
 

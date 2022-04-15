@@ -59,6 +59,8 @@
         <result column="DERIVATIVE_BS_DIR" property="derivativeBsDir" jdbcType="VARCHAR" />
         <result column="DERIVATIVE_OC_FLAG" property="derivativeOcFlag" jdbcType="VARCHAR" />
         <result column="ENTRUST_CREATE_SOURCE" property="entrustCreateSource" jdbcType="VARCHAR" />
+        <result column="BUSI_TYPE_POSITION" property="busiTypePosition" jdbcType="VARCHAR" />
+        <result column="PRICE_TYPE" property="priceType" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
          ENTRUST_ID ENTRUST_ID, SETTLE_SPREED SETTLE_SPREED, EXER_YIELD EXER_YIELD, MATURE_YIELD MATURE_YIELD,
@@ -74,7 +76,8 @@
         EXP_CON_NUM EXP_CON_NUM, CAL_MODE CAL_MODE, COUNTER_SEAT COUNTER_SEAT, COUNTER_CON_NO COUNTER_CON_NO,
         FULL_PRICE FULL_PRICE, TARGET_TYPE TARGET_TYPE, COUNTER_ORG COUNTER_ORG, TRADER TRADER,
         VPAY_DATE VPAY_DATE, MPAY_DATE MPAY_DATE,M_INT_AMT M_INT_AMT,M_TRADE_AMT M_TRADE_AMT,
-        CAP_DAYS CAP_DAYS,TRADE_ID TRADE_ID,REQUEST_ID REQUEST_ID,DERIVATIVE_BS_DIR,DERIVATIVE_OC_FLAG, ENTRUST_CREATE_SOURCE ENTRUST_CREATE_SOURCE
+        CAP_DAYS CAP_DAYS,TRADE_ID TRADE_ID,REQUEST_ID REQUEST_ID,DERIVATIVE_BS_DIR,DERIVATIVE_OC_FLAG,
+         ENTRUST_CREATE_SOURCE ENTRUST_CREATE_SOURCE,BUSI_TYPE_POSITION BUSI_TYPE_POSITION,PRICE_TYPE PRICE_TYPE
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -113,7 +116,8 @@
             EXP_CON_NUM, CAL_MODE, COUNTER_SEAT,
             COUNTER_CON_NO, FULL_PRICE, TARGET_TYPE,
             COUNTER_ORG, TRADER,VPAY_DATE, MPAY_DATE,M_INT_AMT ,M_TRADE_AMT,
-            CAP_DAYS,TRADE_ID,REQUEST_ID, DERIVATIVE_BS_DIR, DERIVATIVE_OC_FLAG, ENTRUST_CREATE_SOURCE)
+            CAP_DAYS,TRADE_ID,REQUEST_ID, DERIVATIVE_BS_DIR, DERIVATIVE_OC_FLAG, ENTRUST_CREATE_SOURCE,
+            BUSI_TYPE_POSITION,PRICE_TYPE)
         values (#{entrustId,jdbcType=VARCHAR}, #{settleSpreed,jdbcType=DECIMAL}, #{exerYield,jdbcType=DECIMAL},
             #{matureYield,jdbcType=DECIMAL}, #{vdate,jdbcType=DATE}, #{mdate,jdbcType=DATE},
             #{termDays,jdbcType=DECIMAL}, #{termDays2,jdbcType=DECIMAL}, #{termType,jdbcType=VARCHAR},
@@ -131,7 +135,8 @@
             #{counterConNo,jdbcType=VARCHAR}, #{fullPrice,jdbcType=DECIMAL}, #{targetType,jdbcType=VARCHAR},
             #{counterOrg,jdbcType=VARCHAR}, #{trader,jdbcType=VARCHAR},#{vpayDate,jdbcType=DATE}, #{mpayDate,jdbcType=DATE},
             #{mIntAmt,jdbcType=DECIMAL}, #{mTradeAmt,jdbcType=DECIMAL},#{capDays,jdbcType=DECIMAL}, #{tradeId,jdbcType=VARCHAR},
-            #{requestId,jdbcType=VARCHAR},#{derivativeBsDir,jdbcType=VARCHAR},#{derivativeOcFlag,jdbcType=VARCHAR},#{entrustCreateSource,jdbcType=VARCHAR})
+            #{requestId,jdbcType=VARCHAR},#{derivativeBsDir,jdbcType=VARCHAR},#{derivativeOcFlag,jdbcType=VARCHAR},
+            #{entrustCreateSource,jdbcType=VARCHAR},#{busiTypePosition,jdbcType=VARCHAR},#{priceType,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.background.component.order.exchange.database.entity.EntrustAddComponent" >
         insert into ETR_ENTRUST_ADD
@@ -316,6 +321,9 @@
             <if test="busiTypePosition != null" >
                 BUSI_TYPE_POSITION,
             </if>
+            <if test="priceType != null" >
+                PRICE_TYPE,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="entrustId != null" >
@@ -498,6 +506,9 @@
             <if test="busiTypePosition != null" >
                 #{busiTypePosition,jdbcType=VARCHAR},
             </if>
+            <if test="priceType != null" >
+                #{priceType,jdbcType=VARCHAR},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.background.component.order.exchange.database.entity.EntrustAddComponent" >
@@ -509,7 +520,8 @@
         LOW_EXERC_PRICE, EXE_PRICE, KNOCK_PRICE, EXERCISE_TYPE, EXEC_BASE_DATE, OPT_FEE_PAY_TYPE2,
         OPT_FEE_PAY_TYPE, DEAL_CUR_ACCT, EXP_CON_NUM, CAL_MODE, COUNTER_SEAT, COUNTER_CON_NO,
         FULL_PRICE, TARGET_TYPE, COUNTER_ORG, TRADER,VPAY_DATE, MPAY_DATE,M_INT_AMT ,M_TRADE_AMT,
-            CAP_DAYS,TRADE_ID,REQUEST_ID,DERIVATIVE_BS_DIR,DERIVATIVE_OC_FLAG, ENTRUST_CREATE_SOURCE)
+            CAP_DAYS,TRADE_ID,REQUEST_ID,DERIVATIVE_BS_DIR,DERIVATIVE_OC_FLAG, ENTRUST_CREATE_SOURCE,
+            BUSI_TYPE_POSITION,PRICE_TYPE)
         select ENTRUST_ID, SETTLE_SPREED, EXER_YIELD, MATURE_YIELD,
             VDATE, MDATE, TERM_DAYS, TERM_DAYS2, TERM_TYPE, PAY_FREQ, FIRST_CAL_DATE, ASSET_TYPE,
             ASSET_TYPE1, BUSI_PS, CASH_USEDATE, SEC_ACCT_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME,
@@ -518,7 +530,8 @@
             LOW_EXERC_PRICE, EXE_PRICE, KNOCK_PRICE, EXERCISE_TYPE, EXEC_BASE_DATE, OPT_FEE_PAY_TYPE2,
             OPT_FEE_PAY_TYPE, DEAL_CUR_ACCT, EXP_CON_NUM, CAL_MODE, COUNTER_SEAT, COUNTER_CON_NO,
             FULL_PRICE, TARGET_TYPE, COUNTER_ORG, TRADER,VPAY_DATE, MPAY_DATE,M_INT_AMT ,M_TRADE_AMT,
-            CAP_DAYS,TRADE_ID,REQUEST_ID,DERIVATIVE_BS_DIR,DERIVATIVE_OC_FLAG,ENTRUST_CREATE_SOURCE
+            CAP_DAYS,TRADE_ID,REQUEST_ID,DERIVATIVE_BS_DIR,DERIVATIVE_OC_FLAG,ENTRUST_CREATE_SOURCE,
+            BUSI_TYPE_POSITION,PRICE_TYPE
              from ETR_ENTRUST_ADD
              where 1 = 1 and ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
     </insert>
@@ -684,6 +697,12 @@
             <if test="entrustCreateSource != null" >
                 ENTRUST_CREATE_SOURCE = #{entrustCreateSource,jdbcType=VARCHAR},
             </if>
+            <if test="busiTypePosition != null" >
+                BUSI_TYPE_POSITION = #{busiTypePosition,jdbcType=VARCHAR},
+            </if>
+            <if test="priceType != null" >
+                PRICE_TYPE = #{priceType,jdbcType=VARCHAR},
+            </if>
         </set>
         where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
     </update>
@@ -741,7 +760,9 @@
             REQUEST_ID = #{requestId,jdbcType=VARCHAR},
             DERIVATIVE_BS_DIR = #{derivativeBsDir,jdbcType=VARCHAR},
             DERIVATIVE_OC_FLAG = #{derivativeOcFlag,jdbcType=VARCHAR},
-            ENTRUST_CREATE_SOURCE = #{entrustCreateSource,jdbcType=VARCHAR}
+            ENTRUST_CREATE_SOURCE = #{entrustCreateSource,jdbcType=VARCHAR},
+            BUSI_TYPE_POSITION = #{busiTypePosition,jdbcType=VARCHAR},
+            PRICE_TYPE = #{priceType,jdbcType=VARCHAR}
         where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
     </update>
 </mapper>

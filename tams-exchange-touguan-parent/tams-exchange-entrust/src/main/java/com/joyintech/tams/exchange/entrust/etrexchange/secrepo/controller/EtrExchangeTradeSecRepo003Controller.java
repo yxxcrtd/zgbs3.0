@@ -51,7 +51,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 场内债券指令（现券+通用质押式回购）
+ * 场内债券指令（现券+通用质押式回购） 关闭撤回指令操作
  * @author qmh
  * @version 1.0 2022年4月7日
  * @see EtrExchangeTradeSecRepo003Controller

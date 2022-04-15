@@ -20,6 +20,7 @@ import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.exchange.entrust.etrexchange.hqjj.validator.EtrExchangeTradeJj001Validator;
+import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.validator.EtrExchangeTradeSecRepo001Validator;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.annotation.PrimaryKey.Field;
@@ -38,7 +39,7 @@ import java.util.List;
  * @since 1.0
  */
 @PageId("EtrExchangeTradeSecRepo004")
-@ValidLogic(targetClass = EtrExchangeTradeJj001Validator.class , groups = {ValidateGroupEdit.class,
+@ValidLogic(targetClass = EtrExchangeTradeSecRepo001Validator.class , groups = {ValidateGroupEdit.class,
     ValidateGroupDelete.class})
 @ApiModel(value="指令下单表单",description="指令下单表单")
 public class EtrExchangeTradeSaveSecRepoRequest extends EtrEntrust implements ProcessEntity{
@@ -755,15 +756,27 @@ public class EtrExchangeTradeSaveSecRepoRequest extends EtrEntrust implements Pr
         this.currentTab = currentTab;
     }
 
-    @ApiModelProperty(name="priceClass",value="计价方式",example="01")
-    private String priceClass;
+    @ApiModelProperty(name="priceType",value="计价方式",example="01")
+    private String priceType;
 
-    public String getPriceClass() {
-        return priceClass;
+    public String getPriceType() {
+        return priceType;
     }
 
-    public void setPriceClass(String priceClass) {
-        this.priceClass = priceClass;
+    public void setPriceType(String priceType) {
+        this.priceType = priceType;
     }
 
+    /**
+     * 交易方式
+     */
+    private String dealMode;
+
+    public String getDealMode() {
+        return dealMode;
+    }
+
+    public void setDealMode(String dealMode) {
+        this.dealMode = dealMode;
+    }
 }

@@ -11,7 +11,6 @@
 package com.joyintech.tams.exchange.entrust.etrexchange.secrepo.service;
 
 import com.joyintech.framework.base.BaseService;
-import com.joyintech.framework.base.intf.DataDictItem;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.SecurityUtil;
@@ -19,7 +18,6 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.service.entrust.etrexchangetrade.dto.EtrExchangeTrade002Dto;
 import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
-import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.dto.PageMode;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.constant.*;
@@ -33,7 +31,6 @@ import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTr
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradePositionsSecRepoRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradePositionsSecRepoResponse;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
-import com.joyintech.tams.invest.common.constant.TempConstant;
 import com.joyintech.tams.invest.common.constant.TempConstant;
 import com.joyintech.tams.invest.common.dto.position.PositionCashSecDto;
 import com.joyintech.tams.invest.common.entrust.inter.EtrTradeCommonervice;
@@ -77,7 +74,7 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
     private EtrExchangeTradeJj001Service exchangeTradeJj001Service;
 
     /**
-     * 分页查询产品持仓信息
+     * 分页查询持仓信息
      * <功能详细描述>
      *
      * @param dto 查询参数
@@ -188,9 +185,6 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
                 Map<String, EtrExchangeUnitCostDto> unitCostMap = calcEachCostAmtMap(DateUtil.parse(platDate), pList, fList, "");
                 // 计算单位成本、计算持仓成本、最新净价、持仓市值、浮动盈亏
                 return calculationAmount(unitCostMap, result, platDate);
-//				return restTemplate.postForPage(
-//						ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrExchangeTrade/findPositionsPage", param,
-//						EtrExchangeTrade002Dto.class);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -247,13 +241,12 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
         return resultMap;
     }
 
-
+    /**
+     * 指令列表查询
+     * @param request
+     * @return
+     */
     public Page<EtrExchangeTradeEtrExchangeSecRepoResponse> selectEtrExchange(EtrExchangeTradeEtrExchangeSecRepoRequest request) {
-//		if (StringUtil.isNotEmpty(request.getPageMode())){
-//			PageMode pageMode =request.getPageMode();
-//			pageMode.setPageNo(1);
-//			request.setPageMode(pageMode);
-//		}
         Map<String, Object> param = BeanUtil.object2Map(request);
         param.put("userId", SecurityUtil.getLoginUser().getUserName());
         param.put("sysDate", iPlatformDate.getSysDateStr());
@@ -288,53 +281,7 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
         } else {
             param.put("finprodMarketIds", null);
         }
-        //申报类型 - 模糊查询
-        if (StringUtils.isNotEmpty((String) param.get("search"))) {
-            List<String> declaTypeList = new ArrayList<>();
-            List<? extends DataDictItem> list = SysDataUtil.getDataDictItem(DictCode.申报类型.getValue());
-            if (!list.isEmpty() && list.size() > 0) {
-                for (DataDictItem t :
-                        list) {
-                    String typeValue = t.getItemValue();
-                    String typeId = t.getItemCode();
-                    if (typeValue.indexOf((String) param.get("search")) != -1 && typeId.equals("PRM14")) {
-                        declaTypeList.add(t.getItemCode());
-                    }
-                }
-                param.put("declaTypeList", declaTypeList);
-            }
-        } else {
-            param.put("declaTypeList", null);
-        }
         return super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> etrExchangeTradeSecRepoMapper.selectEtrExchange(param));
-//		return restTemplate.postForPage(ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrExchangeTrade/selectEtrExchange",
-//				param, EtrExchangeTrade003Dto.class);
-    }
-
-    /* 指令导出履历处理
-     *
-     * @param dataList 数据列表
-     * @author jiangpeng
-     * @date 2021/12/20 14:33
-     */
-    public void handExportTimes(List<EtrExchangeTradeEtrExchangeSecRepoRequest> dataList) {
-        List<CfetsOprHisInfoRequest> result = new ArrayList<>();
-        dataList.forEach(item -> {
-            if (StringUtil.isNotEmpty(item.getEntrustId())) {
-                CfetsOprHisInfoRequest cfetsOprHisInfoRequest = new CfetsOprHisInfoRequest();
-                cfetsOprHisInfoRequest.setEntrustId(item.getEntrustId());
-                cfetsOprHisInfoRequest.setOperType(DictCodeListExt3.操作类型_导出.getValue());
-                cfetsOprHisInfoRequest.setSeqNo(IDGenerator.generate(32));
-                cfetsOprHisInfoRequest.setOperDate(DateUtil.platDateFromCache());
-                cfetsOprHisInfoRequest.setOperTime(DateUtil.platDateFromCache());
-                cfetsOprHisInfoRequest.setUserId(SecurityUtil.getLoginUser().getUserName());
-                cfetsOprHisInfoRequest.setCreateUser(SecurityUtil.getLoginUser().getUserName());
-                cfetsOprHisInfoRequest.setCreateDept(CommonUtil.getDeptCode());
-                cfetsOprHisInfoRequest.setUpdateUser(SecurityUtil.getLoginUser().getUserName());
-                result.add(cfetsOprHisInfoRequest);
-            }
-        });
-        joyinbusinessCommonMapper.mergeCfetsOprHis(result);
     }
 
     /**
@@ -456,7 +403,6 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
                     dto = new EtrExchangeUnitCostDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
                     resultMap.put(key, dto);
                 }
-
                 if (StringUtil.equals(i.getString("PS"), DictCodeList.交易方向_买入.getValue())) {
                     // 成本
                     BigDecimal thisBuyCostAmt = dto.getBuyCostAmt()
@@ -517,30 +463,5 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
         }
         return pages;
     }
-//
-//    /**
-//     * 场内指令-标准券可用持仓可用查询
-//     *
-//     * @param secDto
-//     * @return
-//     */
-//    public BigDecimal querySecInCanUse(PositionCashSecDto secDto) {
-//        secDto.setTradePlat(TempConstant.NO_TRADE_BUSINESS_ETR);
-//        BigDecimal ticketCanUse = etrTradeCommonervice.selectAvailableNum(secDto);
-//        return ticketCanUse;
-//    }
-//
-//    //共通
-//    public BigDecimal queryProPosition(String holdingType, List<PositionCashSecDto> list) {
-//        List<PositionCashSecDto> secList = new ArrayList<>();
-//        for (PositionCashSecDto temp : list) {
-//            temp.setHoldingType(holdingType);
-//            secList.add(temp);
-//        }
-//        BigDecimal newSecAmount = etrTradeCommonervice.queryPosition(secList, "02", "");
-//
-//        return newSecAmount;
-//
-//    }
 
 }
