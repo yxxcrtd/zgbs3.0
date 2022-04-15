@@ -166,6 +166,11 @@ public class TrdFixIncomeValuationTradeDto extends BaseEntity implements Process
      */
     private String myAcctNo;
 
+    /**
+     * 数据来源
+     */
+    private String dataSource;
+
     public String getOperateType() {
         return operateType;
     }
@@ -422,6 +427,24 @@ public class TrdFixIncomeValuationTradeDto extends BaseEntity implements Process
     public String getSettleAmtStr() {
         DecimalFormat decimalFormat = new DecimalFormat("0.00#");
         return this.getSettleAmt()==null?"0.00":decimalFormat.format(this.getSettleAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    /**
+     * 取得 数据来源str
+     *
+     * @return 交易方向
+     */
+    public String getDataSourceStr() {
+        return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.生成方式, dataSource))?
+                SysDataUtil.getNameFromDataDict(DictCode.生成方式, dataSource):dataSource;
     }
 }
 

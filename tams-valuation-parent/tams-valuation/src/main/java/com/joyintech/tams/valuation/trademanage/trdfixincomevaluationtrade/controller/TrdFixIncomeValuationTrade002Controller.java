@@ -21,6 +21,7 @@ import com.joyintech.framework.util.SpringContextUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.trdfixincomevaluationtrade.dto.TrdFixIncomeValuationTradeDto;
@@ -90,24 +91,6 @@ public class TrdFixIncomeValuationTrade002Controller extends BaseController {
     }
 
     /**
-     * 资产代码下拉框
-     *
-     * @return 资产代码
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("/getAssetId")
-    public List<SelectOptionDto> getAssetId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("assetType","F17");
-        param.put("profitType","02");
-        return commonBusinessService.getAssetId(param);
-    }
-
-
-
-    /**
      * @Description:画面点击保存按钮时check
      * @auther: yuzj
      * @date: 2021/12/30
@@ -123,16 +106,22 @@ public class TrdFixIncomeValuationTrade002Controller extends BaseController {
 
 
     /**
-     * @Description:资金账户信息
-     * @auther: yuzj
-     * @date: 2021/12/30
-     * @param:
-     * @return:
+     * 资金账户下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
      */
-    @RequestMapping("/getTrdAcctId")
     @ResponseBody
-    public List<SelectOptionDto> getTrdAcctId(){
-        return commonBusinessService.getTrdAcctId(RequestUtil.getPageParam());
+    @RequestMapping("/getTrdAcctId")
+    public List<SelectOptionDto> getTrdAcctId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        String[] accTypeArr =  {DictCodeListExt1.资金账户类型_产品托管户.getValue(),
+                DictCodeListExt1.资金账户类型_券商资金账户.getValue(),
+                DictCodeListExt1.资金账户类型_结算备付金账户.getValue(),};
+        param.put("finprodId",param.get("prodId"));
+        param.put("accTypeArr",accTypeArr);
+        return commonBusinessService.getTrdAcctId(param);
     }
 
 
@@ -155,12 +144,6 @@ public class TrdFixIncomeValuationTrade002Controller extends BaseController {
         params.setElementId(dto.getElementId());
         params.setBusinessType(DictCodeListExt3.共通业务类型_固收类资产交易.getValue());
 
-//        //设置主键
-//        if(!StringUtil.isNotEmpty(dto.getTradeId())){
-//            Date sysDate= DateUtil.platDateFromCache();
-//            //新建初始化交易编号
-//            dto.setTradeId(trdFixIncomeValuationTrade002Service.createPlanTradeId());
-//        }
         params.setBusinessCode(dto.getAssetId());
 
         // 设置流程业务说明, entity即传入的dto
@@ -174,16 +157,5 @@ public class TrdFixIncomeValuationTrade002Controller extends BaseController {
         String msg = trdFixIncomeValuationTrade002Service.start(parameter, dto);
         return new AjaxResult(msg);
     }
-
-    /**
-     * 策略计划类交易代码生成
-     * @see
-     * @since 1.0
-     */
-    @PostMapping("createPlanTradeId")
-    public String createPlanTradeId() {
-        return trdFixIncomeValuationTrade002Service.createPlanTradeId();
-    }
-
 
 }

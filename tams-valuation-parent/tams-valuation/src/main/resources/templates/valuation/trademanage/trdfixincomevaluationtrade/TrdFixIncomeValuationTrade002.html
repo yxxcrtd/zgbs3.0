@@ -69,7 +69,7 @@
 										<div class="layui-input-inline input-inline">
 											<select id="assetId" name="assetId" required
 													class="layui-input form-input input-select"
-													data-th-data-url="@{/valuation/trademanage/trdfixincomevaluationtrade/TrdFixIncomeValuationTrade002/getAssetId}"
+													data-th-data-url="@{/valuation/trademanage/trdfixincomevaluationtrade/TrdFixIncomeValuationTrade001/getAssetId}"
 													allowClear="true"
 													data-th-initValue="${entity?.assetId}"
 													placeholder="请输入内容">
@@ -248,9 +248,9 @@
 										<label class="layui-form-label form-label-wrap"
 											   data-th-text="#{TrdFixIncomeValuationTrade.myAcctNo}">资金账户</label>
 										<div class="layui-input-inline input-inline" >
-											<select id="myAcctNo" name="myAcctNo" required
+											<select id="myAcctNo" name="myAcctNo" required parentIds="prodId"
 													class="layui-input form-input input-select"
-													data-th-data-url="@{/valuation/trademanage/bondlend/TrdBondLendTrade002/getTrdAcctId}"
+													data-th-data-url="@{/valuation/trademanage/trdfixincomevaluationtrade/TrdFixIncomeValuationTrade002/getTrdAcctId}"
 													allowClear="true" placeholder="请输入内容"
 													data-th-initValue="${entity?.myAcctNo}">
 											</select>

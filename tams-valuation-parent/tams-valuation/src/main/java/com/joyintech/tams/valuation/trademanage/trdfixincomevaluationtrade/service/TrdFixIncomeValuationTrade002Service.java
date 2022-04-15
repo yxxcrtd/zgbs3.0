@@ -15,6 +15,7 @@ import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 import com.joyintech.tams.valuation.common.interf.base.dto.PlannedAssetDealCommonResult;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.mngasset.PlannedBuyTradeTemplateRecService;
@@ -63,20 +64,6 @@ public class TrdFixIncomeValuationTrade002Service extends CommonExportService<Tr
         restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdFixIncomeValuationTrade/" + action, trdFixIncomeTradeResult, Integer.class);
     }
 
-
-    /**
-     * 策略代码生成
-     *
-     * @see
-     * @since 1.0
-     */
-    public String createPlanTradeId() {
-        return restTemplate.postForObject(
-                ServiceApplication.VALUATION_SERVICE_NAME + "/TrdFixIncomeValuationTrade/createPlanTradeId",
-                null, String.class);
-
-    }
-
     /**
      * @Description:根据交易编号查询详情
      * @auther: yuzj
@@ -117,6 +104,9 @@ public class TrdFixIncomeValuationTrade002Service extends CommonExportService<Tr
         valMngBuyTrade.setFee(new BigDecimal(0));//费用
         valMngBuyTrade.setDataActionSign("01");//数据动作标志
         valMngBuyTrade.setIsClean("N"); //有无清算指令
+
+        //设置数据来源：画面录入
+        valMngBuyTrade.setDataSource(DictCodeListExt1.生成方式_画面录入.getValue());
 
         listValMngBuyTrade.add(valMngBuyTrade);
 

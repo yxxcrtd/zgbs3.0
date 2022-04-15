@@ -28,19 +28,7 @@ import java.util.Map;
 @Repository(value="serviceTrdFixIncomeValuationTradeMapper")
 public interface TrdFixIncomeValuationTradeMapper {
 
-    List<TrdFixIncomeValuationTradeDto> select(Map<String, Object> key);
-
-    Integer  selectCountByTradeId(@Param("tradeId") String tradeId);
-
-
-    /**
-     * 获取自增序列值
-     * @param sequenceName 序列名
-     * @return
-     */
-    String getNextId(@Param("sequenceName") String sequenceName);
-
-	TrdFixIncomeValuationTradeDto queryTradeInfoByTradeId(String tradeId);
+	TrdFixIncomeValuationTradeDto queryTradeInfoByTradeId(Map<String, Object> param);
 
 	/**
 	 * 检索债券交易列表
