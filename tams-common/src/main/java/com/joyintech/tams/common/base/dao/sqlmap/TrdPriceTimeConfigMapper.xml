@@ -9,6 +9,7 @@
         <result column="ASSET_CLASSIFY1" property="assetClassify1" jdbcType="VARCHAR" />
         <result column="ASSET_CLASSIFY2" property="assetClassify2" jdbcType="VARCHAR" />
         <result column="ASSET_CLASSIFY3" property="assetClassify3" jdbcType="VARCHAR" />
+        <result column="DEAL_MODE" property="dealMode" jdbcType="VARCHAR" />
         <result column="PRICE_TIME_TYPE" property="priceTimeType" jdbcType="VARCHAR" />
         <result column="OPEN_TIME" property="openTime" jdbcType="VARCHAR" />
         <result column="CLOSE_TIME" property="closeTime" jdbcType="VARCHAR" />
@@ -22,9 +23,9 @@
     <sql id="Base_Column_List" >
         CONFIG_NO CONFIG_NO, ETR_TRAD ETR_TRAD, TRADE_MARKET TRADE_MARKET, TRADE_PLAT TRADE_PLAT, 
         ASSET_CLASSIFY1 ASSET_CLASSIFY1, ASSET_CLASSIFY2 ASSET_CLASSIFY2, ASSET_CLASSIFY3 ASSET_CLASSIFY3, 
-        PRICE_TIME_TYPE PRICE_TIME_TYPE, OPEN_TIME OPEN_TIME, CLOSE_TIME CLOSE_TIME, REMARK REMARK, 
-        CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, 
-        UPDATE_TIME UPDATE_TIME
+        DEAL_MODE DEAL_MODE, PRICE_TIME_TYPE PRICE_TIME_TYPE, OPEN_TIME OPEN_TIME, CLOSE_TIME CLOSE_TIME, 
+        REMARK REMARK, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, 
+        UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -49,16 +50,16 @@
     <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.TrdPriceTimeConfig" >
         insert into TRD_PRICE_TIME_CONFIG (CONFIG_NO, ETR_TRAD, TRADE_MARKET, 
             TRADE_PLAT, ASSET_CLASSIFY1, ASSET_CLASSIFY2, 
-            ASSET_CLASSIFY3, PRICE_TIME_TYPE, OPEN_TIME, 
-            CLOSE_TIME, REMARK, CREATE_USER, 
-            CREATE_DEPT, CREATE_TIME, UPDATE_USER, 
-            UPDATE_TIME)
+            ASSET_CLASSIFY3, DEAL_MODE, PRICE_TIME_TYPE, 
+            OPEN_TIME, CLOSE_TIME, REMARK, 
+            CREATE_USER, CREATE_DEPT, CREATE_TIME, 
+            UPDATE_USER, UPDATE_TIME)
         values (#{configNo,jdbcType=VARCHAR}, #{etrTrad,jdbcType=VARCHAR}, #{tradeMarket,jdbcType=VARCHAR}, 
             #{tradePlat,jdbcType=VARCHAR}, #{assetClassify1,jdbcType=VARCHAR}, #{assetClassify2,jdbcType=VARCHAR}, 
-            #{assetClassify3,jdbcType=VARCHAR}, #{priceTimeType,jdbcType=VARCHAR}, #{openTime,jdbcType=VARCHAR}, 
-            #{closeTime,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, 
-            #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, 
-            #{updateTime,jdbcType=TIMESTAMP})
+            #{assetClassify3,jdbcType=VARCHAR}, #{dealMode,jdbcType=VARCHAR}, #{priceTimeType,jdbcType=VARCHAR}, 
+            #{openTime,jdbcType=VARCHAR}, #{closeTime,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
+            #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+            #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.TrdPriceTimeConfig" >
         insert into TRD_PRICE_TIME_CONFIG
@@ -83,6 +84,9 @@
             </if>
             <if test="assetClassify3 != null" >
                 ASSET_CLASSIFY3,
+            </if>
+            <if test="dealMode != null" >
+                DEAL_MODE,
             </if>
             <if test="priceTimeType != null" >
                 PRICE_TIME_TYPE,
@@ -134,6 +138,9 @@
             <if test="assetClassify3 != null" >
                 #{assetClassify3,jdbcType=VARCHAR},
             </if>
+            <if test="dealMode != null" >
+                #{dealMode,jdbcType=VARCHAR},
+            </if>
             <if test="priceTimeType != null" >
                 #{priceTimeType,jdbcType=VARCHAR},
             </if>
@@ -165,11 +172,13 @@
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.TrdPriceTimeConfig" >
         insert into TRD_PRICE_TIME_CONFIG(CONFIG_NO, ETR_TRAD, TRADE_MARKET, TRADE_PLAT, 
-        ASSET_CLASSIFY1, ASSET_CLASSIFY2, ASSET_CLASSIFY3, PRICE_TIME_TYPE, OPEN_TIME, CLOSE_TIME, 
-        REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+        ASSET_CLASSIFY1, ASSET_CLASSIFY2, ASSET_CLASSIFY3, DEAL_MODE, PRICE_TIME_TYPE, OPEN_TIME, 
+        CLOSE_TIME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME
+        )
         select CONFIG_NO, ETR_TRAD, TRADE_MARKET, TRADE_PLAT, 
-            ASSET_CLASSIFY1, ASSET_CLASSIFY2, ASSET_CLASSIFY3, PRICE_TIME_TYPE, OPEN_TIME, CLOSE_TIME, 
-            REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME
+            ASSET_CLASSIFY1, ASSET_CLASSIFY2, ASSET_CLASSIFY3, DEAL_MODE, PRICE_TIME_TYPE, OPEN_TIME, 
+            CLOSE_TIME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME
+            
              from TRD_PRICE_TIME_CONFIG
              where 1 = 1 and CONFIG_NO = #{configNo,jdbcType=VARCHAR}
     </insert>
@@ -193,6 +202,9 @@
             </if>
             <if test="assetClassify3 != null" >
                 ASSET_CLASSIFY3 = #{assetClassify3,jdbcType=VARCHAR},
+            </if>
+            <if test="dealMode != null" >
+                DEAL_MODE = #{dealMode,jdbcType=VARCHAR},
             </if>
             <if test="priceTimeType != null" >
                 PRICE_TIME_TYPE = #{priceTimeType,jdbcType=VARCHAR},
@@ -223,6 +235,7 @@
             ASSET_CLASSIFY1 = #{assetClassify1,jdbcType=VARCHAR},
             ASSET_CLASSIFY2 = #{assetClassify2,jdbcType=VARCHAR},
             ASSET_CLASSIFY3 = #{assetClassify3,jdbcType=VARCHAR},
+            DEAL_MODE = #{dealMode,jdbcType=VARCHAR},
             PRICE_TIME_TYPE = #{priceTimeType,jdbcType=VARCHAR},
             OPEN_TIME = #{openTime,jdbcType=VARCHAR},
             CLOSE_TIME = #{closeTime,jdbcType=VARCHAR},

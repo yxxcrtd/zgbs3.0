@@ -39,6 +39,11 @@ public class TrdPriceTimeConfig extends BaseEntity {
     private String assetClassify3;
 
     /**
+     * 交易方式
+     */
+    private String dealMode;
+
+    /**
      * 申报价格范围类型
      */
     private String priceTimeType;
@@ -168,6 +173,22 @@ public class TrdPriceTimeConfig extends BaseEntity {
      */
     public void setAssetClassify3(String assetClassify3) {
         this.assetClassify3 = assetClassify3 == null ? null : assetClassify3.trim();
+    }
+
+    /**
+     * 取得 交易方式
+     * @return 交易方式
+     */
+    public String getDealMode() {
+        return dealMode;
+    }
+
+    /**
+     * 设置 交易方式
+     * @param dealMode 交易方式
+     */
+    public void setDealMode(String dealMode) {
+        this.dealMode = dealMode == null ? null : dealMode.trim();
     }
 
     /**

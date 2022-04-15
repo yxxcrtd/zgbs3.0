@@ -12,6 +12,7 @@ create table TRD_PRICE_TIME_CONFIG
    ASSET_CLASSIFY1      VARCHAR2(50),
    ASSET_CLASSIFY2      VARCHAR2(50),
    ASSET_CLASSIFY3      VARCHAR2(50),
+   DEAL_MODE            VARCHAR(50),
    PRICE_TIME_TYPE      VARCHAR2(50),
    OPEN_TIME            VARCHAR2(50),
    CLOSE_TIME           VARCHAR2(50),
@@ -47,6 +48,9 @@ comment on column TRD_PRICE_TIME_CONFIG.ASSET_CLASSIFY2 is
 
 comment on column TRD_PRICE_TIME_CONFIG.ASSET_CLASSIFY3 is
 '资产分类三';
+
+comment on column TRD_PRICE_TIME_CONFIG.DEAL_MODE is
+'交易方式';
 
 comment on column TRD_PRICE_TIME_CONFIG.PRICE_TIME_TYPE is
 '申报价格范围类型';
