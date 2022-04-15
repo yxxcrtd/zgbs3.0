@@ -5,14 +5,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.framework.base.BaseService;
-import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.investment.BasicMessage;
 import com.joyintech.tams.exchange.common.bean.investment.ProgressMessage;
 import com.joyintech.tams.exchange.common.bean.investment.TradeMessage;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
-import com.joyintech.tams.exchange.common.constant.ExchangeConstant;
 import com.joyintech.tams.exchange.common.db.domain.EntrustInterface;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.RecordLog;
@@ -58,6 +56,9 @@ public class MessageSenderManagement extends BaseService {
      */
     @Value("${application.micorservice.contextPath.single:false}")
     private boolean isSingle;
+
+    @Value("${trd-info-push-mode:01}")
+    private String trdInfoPushMode;
 
     private static final String MQ = "01";
     private static final String INTERFACE = "02";
@@ -154,11 +155,9 @@ public class MessageSenderManagement extends BaseService {
 
     private void sendMessage(RecordLog recordLog, BasicMessage basicMessage, int pushType) {
         //消息推送方式:01-MQ；02-接口
-        String trdInfoPushMode = CacheUtil.getSysParam(ExchangeConstant.TRD_INFO_PUSH_MODE);
-        logger.info("【sendMessage】 parameters：pushType={}，trdInfoPushMode={}，basicMessage={}",
-                pushType, trdInfoPushMode, JsonUtils.getJsonFromObject(basicMessage));
+        logger.info("【sendMessage】 parameters：pushType={}，trdInfoPushMode={}，basicMessage={}", pushType, trdInfoPushMode, JsonUtils.getJsonFromObject(basicMessage));
         //推送MQ
-        if (StringUtil.equals(trdInfoPushMode, MQ)) {
+        if (StringUtil.isEmpty(trdInfoPushMode) || StringUtil.equals(trdInfoPushMode, MQ)) {
             try {
                 recordLog.setStatus(1);
                 if (pushType == 1) {

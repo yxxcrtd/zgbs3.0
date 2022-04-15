@@ -490,6 +490,8 @@ position:
 url:
   batch: http://192.168.90.243:8084/main/about/refreshCache
 
+#消息推送方式:01-MQ；02-接口  开发使用
+trd-info-push-mode: 02
 
 ---
 spring:
