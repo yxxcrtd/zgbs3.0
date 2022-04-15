@@ -7,11 +7,14 @@ import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.service.trade.check.chain.AbstractChain;
 import com.joyintech.tams.exchange.service.trade.check.chain.CheckChainBean;
+import com.joyintech.tams.exchange.service.trade.management.service.CommonManagement;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 
@@ -23,6 +26,8 @@ import java.util.Objects;
  */
 @Component
 public class CommonCheckChain extends AbstractChain<CheckChainBean> {
+    @Autowired
+    private CommonManagement commonManagement;
 
     @Override
     public void doChain(CheckChainBean chainBean) {
@@ -68,10 +73,12 @@ public class CommonCheckChain extends AbstractChain<CheckChainBean> {
             checkRsp.put("secAcctName", "证券账户名称不能为空");
         }
         if (StringUtils.isBlank(instruction.getFinprodMarketId())) {
-            checkRsp.put("finprodMarketId", "市场代码不能为空");
+            checkRsp.put("finprodMarketId", "证券代码不能为空");
         }
         if (StringUtils.isBlank(instruction.getTradeMarket())) {
             checkRsp.put("tradeMarket", "交易场所不能为空");
+        } else if (null == DictCodeListExt1.from(DictCode.交易场所, instruction.getTradeMarket())) {
+            checkRsp.put("tradeMarket", "交易场所取值不合法:" + instruction.getTradeMarket());
         }
         if (StringUtils.isBlank(instruction.getPs())) {
             checkRsp.put("ps", "交易方向不能为空");
@@ -80,7 +87,11 @@ public class CommonCheckChain extends AbstractChain<CheckChainBean> {
         }
         if (Objects.isNull(instruction.getTradeDate())) {
             checkRsp.put("tradeDate", "委托日期不能为空");
+        } else if (instruction.getTradeDate().compareTo(commonManagement.getPlatDate()) < 0) {
+            //交易日期不得早于平台日
+            checkRsp.put("tradeDate", "委托日期不得早于平台日");
         }
+
         if (Objects.isNull(instruction.getVdate())) {
             checkRsp.put("vdate", "委托开始日不能为空");
         }
@@ -115,9 +126,6 @@ public class CommonCheckChain extends AbstractChain<CheckChainBean> {
         }
         if (StringUtils.isBlank(instruction.getAssetType())) {
             checkRsp.put("assetType", "资产类型不能为空");
-        }
-        if (StringUtils.isBlank(instruction.getTradersInfo())) {
-            checkRsp.put("tradersInfo", "指令分发交易员不能为空");
         }
         if (StringUtils.isBlank(instruction.getEntrustBussType())) {
             checkRsp.put("entrustBussType", "指令业务类型不能为空");
