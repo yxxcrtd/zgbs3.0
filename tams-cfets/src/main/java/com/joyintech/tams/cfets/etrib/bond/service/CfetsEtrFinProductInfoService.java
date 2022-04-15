@@ -30,6 +30,7 @@ public class CfetsEtrFinProductInfoService extends BaseService {
     private static String SEPARATOR = "/";
     private static String AMPERS_AND = "&";
     private static String BASE_SPCD_CODE = "999999";
+    private static String COMM = ",";
 
     @Autowired
     private CfetsEtrFinProductInfoMapper cfetsEtrFinProductInfoMapper;
@@ -53,7 +54,7 @@ public class CfetsEtrFinProductInfoService extends BaseService {
 
             //查询对于业务场景展示表头
             String spcdCode = getSpcdCodesByFinProduct(finProductInfo);
-            List<String> spcdCodeList = new ArrayList<>(Arrays.asList(spcdCode.split(",")));
+            List<String> spcdCodeList = new ArrayList<>(Arrays.asList(spcdCode.split(COMM)));
             List<CfgDataTableShow> byPageCodeAndDtCodes = cfgDataTableService.getByPageCodeAndDtCodes(pageCode, dtCode, spcdCodeList);
             if (CollectionUtils.isNotEmpty(byPageCodeAndDtCodes)) {
                 finProductInfo.setTableShows(byPageCodeAndDtCodes);
@@ -77,12 +78,12 @@ public class CfetsEtrFinProductInfoService extends BaseService {
         //发行类型
         String issueStyle = finProductInfo.getIssueStyle();
         if (DictCodeListExt4.新债_发行方式_报价发行.getValue().equals(issueClass)) {
-            return sb.append(BASE_SPCD_CODE).append(",").append(DictCodeListExt4.新债_发行方式_报价发行.getValue()).toString();
+            return sb.append(BASE_SPCD_CODE).append(COMM).append(DictCodeListExt4.新债_发行方式_报价发行.getValue()).toString();
         }
 
         if (DictCodeListExt4.招标方式_单一价格招标.getValue().equals(tenderType) || DictCodeListExt4.招标方式_数量招标.getValue().equals(tenderType)) {
             return sb.append(BASE_SPCD_CODE)
-                    .append(",")
+                    .append(COMM)
                     .append(DictCodeListExt4.新债_发行方式_招标发行.getValue())
                     .append(SEPARATOR)
                     .append(DictCodeListExt4.新债_发行方式_簿记建档.getValue())
@@ -93,7 +94,7 @@ public class CfetsEtrFinProductInfoService extends BaseService {
 
         if (DictCodeListExt4.发行类型_首发.getValue().equals(issueStyle) || DictCodeListExt4.发行类型_首发.getValue().equals(issueStyle)) {
             return sb.append(BASE_SPCD_CODE)
-                    .append(",")
+                    .append(COMM)
                     .append(DictCodeListExt4.新债_发行方式_招标发行.getValue())
                     .append(SEPARATOR)
                     .append(DictCodeListExt4.新债_发行方式_簿记建档.getValue())
