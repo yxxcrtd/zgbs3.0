@@ -233,4 +233,19 @@ public class TrdPriceTimeConfig extends BaseEntity {
     public void setRemark(String remark) {
         this.remark = remark == null ? null : remark.trim();
     }
+
+    public enum ETRTRADEnum {
+        ETR("ETR"),
+        TRAD("TRAD"),
+        ;
+        private final String code;
+
+        ETRTRADEnum(String code) {
+            this.code = code;
+        }
+
+        public String getCode() {
+            return code;
+        }
+    }
 }

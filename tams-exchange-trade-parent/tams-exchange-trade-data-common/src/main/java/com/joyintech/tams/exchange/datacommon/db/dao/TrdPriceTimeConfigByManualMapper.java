@@ -1,6 +1,6 @@
 package com.joyintech.tams.exchange.datacommon.db.dao;
 
-import com.joyintech.tams.exchange.common.db.domain.TrdPriceTimeConfig;
+import com.joyintech.tams.common.base.entity.TrdPriceTimeConfig;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

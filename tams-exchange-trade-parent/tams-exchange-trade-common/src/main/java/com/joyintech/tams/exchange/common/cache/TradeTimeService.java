@@ -1,10 +1,10 @@
 package com.joyintech.tams.exchange.common.cache;
 
+import com.joyintech.tams.common.base.entity.TrdPriceTimeConfig;
 import com.joyintech.tams.exchange.common.bean.dto.OpenCloseTime;
 import com.joyintech.tams.exchange.common.bean.investment.TradeTimeBean;
 import com.joyintech.tams.exchange.common.bean.request.BaseOrderRequest;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
-import com.joyintech.tams.exchange.common.db.domain.TrdPriceTimeConfig;
 
 import java.util.List;
 

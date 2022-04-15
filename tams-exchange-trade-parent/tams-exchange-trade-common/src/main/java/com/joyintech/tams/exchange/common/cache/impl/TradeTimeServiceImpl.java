@@ -7,13 +7,13 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.joyintech.tams.common.base.entity.TrdPriceTimeConfig;
 import com.joyintech.tams.exchange.common.bean.dto.OpenCloseTime;
 import com.joyintech.tams.exchange.common.bean.investment.TradeTimeBean;
 import com.joyintech.tams.exchange.common.bean.request.BaseOrderRequest;
 import com.joyintech.tams.exchange.common.cache.TradeTimeService;
 import com.joyintech.tams.exchange.common.constant.joyin.DeclarationType;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
-import com.joyintech.tams.exchange.common.db.domain.TrdPriceTimeConfig;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -35,6 +35,7 @@ public class TradeTimeServiceImpl implements TradeTimeService {
     private final List<TrdPriceTimeConfig> TRD_PRICE_TIME_CONFIG_LIST = Lists.newArrayList();
     private Map<String, TradeTimeBean> tradeTimeBeanMap = new ConcurrentHashMap<>();
     private Map<String, List<OpenCloseTime>> OPEN_CLOSE_TIME_MAP = new ConcurrentHashMap<>();
+    public static final String DEFAULT = "defaults";
 
     @Override
     public void saveTradeTimeCache(List<TradeTimeBean> tradeTimeBeanList) {
@@ -54,6 +55,8 @@ public class TradeTimeServiceImpl implements TradeTimeService {
         TRD_PRICE_TIME_CONFIG_LIST.clear();
         OPEN_CLOSE_TIME_MAP.clear();
         if (CollUtil.isEmpty(trdPriceTimeConfigs)) {
+            // TODO 程序中的兜底方案
+            OPEN_CLOSE_TIME_MAP.put(DEFAULT,ListUtil.of());
             return;
         }
 
@@ -68,14 +71,14 @@ public class TradeTimeServiceImpl implements TradeTimeService {
                 .collect(groupingBy(item -> {
                             List<String> keys = ListUtil.of(item.getAssetClassify1()
                                     , item.getAssetClassify2(),
-                                    item.getDealMode(),
+//                                    item.getDealMode(),
                                     item.getTradeMarket(),
                                     item.getTradePlat());
                             return Joiner.on(StrUtil.COMMA).useForNull(StrUtil.AT).join(keys);
                         }, mapping(item -> new OpenCloseTime(item.getPriceTimeType(), item.getOpenTime(), item.getCloseTime()), toList())
                 ));
         OPEN_CLOSE_TIME_MAP.putAll(collect);
-        OPEN_CLOSE_TIME_MAP.put("default", defaults);
+        OPEN_CLOSE_TIME_MAP.put(DEFAULT, defaults);
 
     }
 
@@ -103,7 +106,7 @@ public class TradeTimeServiceImpl implements TradeTimeService {
         String res = OPEN_CLOSE_TIME_MAP.keySet().stream()
                 .filter(key -> diff(StrUtil.split(key, StrUtil.COMMA), querys))
                 .min(Comparator.comparing(item -> StrUtil.count(item, StrUtil.AT)))
-                .orElse("default");
+                .orElse(DEFAULT);
         return OPEN_CLOSE_TIME_MAP.get(res);
     }
 
