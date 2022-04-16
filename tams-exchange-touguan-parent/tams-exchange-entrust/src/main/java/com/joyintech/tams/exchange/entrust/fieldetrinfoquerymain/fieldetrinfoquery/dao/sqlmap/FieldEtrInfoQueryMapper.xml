@@ -104,7 +104,7 @@
         ETR_ENTRUST.PRICE_MODEL priceModel,
         sci.ACCT_NAME trdAcctId,
         case when ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX017'  then ROUND(ETR_ENTRUST.ENTRUST_NUM/100,2)
-        when ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX018'  then ''
+        when ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX018'  then 0
         else ETR_ENTRUST.ENTRUST_NUM end as entrustNum,
         ETR_ENTRUST_ADD.CALCULATE_FIELD calculateField,
         mcpdata.COUNTER_NAME counterId,
@@ -348,7 +348,7 @@
         WFL_ETR_ENTRUST.PRICE_MODEL priceModel,
         sci.ACCT_NAME trdAcctId,
         case when WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX017' then ROUND(WFL_ETR_ENTRUST.ENTRUST_NUM/100,2)
-        when WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX018' then ''
+        when WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX018' then 0
         else WFL_ETR_ENTRUST.ENTRUST_NUM end entrustNum,
         WFL_ETR_ENTRUST_ADD.CALCULATE_FIELD calculateField,
         mcpdata.COUNTER_NAME counterId,
@@ -409,6 +409,7 @@
         LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
         LEFT JOIN SYS_USER su1 ON WFL_ETR_ENTRUST.INV_MANAGER_ID = su1.USER_NAME
         left join MST_COUNTER_PARTY mcpdata on WFL_ETR_ENTRUST.COUNTER_ID = mcpdata.COUNTER_ID
+        left join ETR_ENTRUST_ADD on ETR_ENTRUST_ADD.ENTRUST_ID = WFL_ETR_ENTRUST.ENTRUST_ID
         <where>
             AND WFL_ETR_ENTRUST.ENTRUST_STATUS IN(#{entrustInwfl})
             <if test="entrustStatusList != null and entrustStatusList.size() > 0">
