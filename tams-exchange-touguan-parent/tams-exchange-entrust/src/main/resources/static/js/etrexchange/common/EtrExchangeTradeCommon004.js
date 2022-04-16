@@ -3464,7 +3464,7 @@
             },
             {
                 field: 'entrustAmt',
-                title: SHARES_TRADE_PLATFORM_03==currentTab?'EtrExchangeTrade001.entrustNum':'EtrExchangeTrade001.entrustAmt',
+                title: currentTab == 'gd'?'EtrExchangeTrade001.netPriceAmt':'EtrExchangeTrade001.entrustAmt',
                 sortField: 'entrustAmt',
                 width: 200,
                 type: 'number',
