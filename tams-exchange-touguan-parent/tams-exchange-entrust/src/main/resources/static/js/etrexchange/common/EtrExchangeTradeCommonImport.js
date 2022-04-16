@@ -124,11 +124,12 @@
         , {field: 'priceModelStr', title: 'EtrExchangeTrade003.priceModel',sortable : false, width: 120,edit: false}
         , {field: 'entrustPrice', title: 'EtrExchangeTrade003.price', width:100, type:'number', digit : 3, sortable: false,
         	render: function(data, type, row, meta) {
-        	    if (row.priceModel == "PRM03") {
+        	   /* if (row.priceModel == "PRM03") {
         	        return "0.00";//市价指令，价格默认显示0
         	    } else {
-        	        return row.entrustPrice.toFixed(3);
-        	    }
+
+        	    }*/
+                return row.entrustPrice.toFixed(3);
         	}
         }
         , {field: 'fprice', title: 'EtrExchangeTrade001.fprice', width:100, type:'number', digit : 3, sortable: false}
