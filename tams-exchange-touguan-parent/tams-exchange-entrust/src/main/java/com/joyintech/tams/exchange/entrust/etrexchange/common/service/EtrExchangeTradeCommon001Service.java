@@ -267,7 +267,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         if (StringUtil.isNotEmpty(dto.getTrader())){
             map.put("counterId","homeTrader");
             map.put("counterTraderId",dto.getTrader());
-            restTemplate.postForObject(ServiceApplication.BASICDATA_SERVICE_NAME + "/InterfSysTrdConfig/insertCounterTraderId", homeTraderMap,
+            restTemplate.postForObject(ServiceApplication.BASICDATA_SERVICE_NAME + "/InterfSysTrdConfig/insertCounterTraderId", map,
                     Object.class);
         }
         // 新增交易对手席位
