@@ -263,6 +263,13 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
     public void doComplete(EtrExchangeTradeSaveRequest dto, OperationType arg1) {
         // TODO Auto-generated method stub
         Map<String, Object> map = new HashMap<>();
+        // 新增本方交易员
+        if (StringUtil.isNotEmpty(dto.getTrader())){
+            map.put("counterId","homeTrader");
+            map.put("counterTraderId",dto.getTrader());
+            restTemplate.postForObject(ServiceApplication.BASICDATA_SERVICE_NAME + "/InterfSysTrdConfig/insertCounterTraderId", map,
+                    Object.class);
+        }
         // 新增交易对手席位
         if (StringUtil.isNotEmpty(dto.getCounterId()) && StringUtil.isNotEmpty(dto.getSeatId())) {
             map.put("counterId", dto.getCounterId());
