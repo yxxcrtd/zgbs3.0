@@ -1092,9 +1092,9 @@
                 }
                 if (finprodType2 == FINPROD_TYPE_TG_F01 && isStandardPs(ps)) {
                     $("#price_" + currentTab).attr("disabled", true);
-                    if (priceModel == PRICE_MODEL_PRM03) {
+                    /*if (priceModel == PRICE_MODEL_PRM03) {
                         $("#price_" + currentTab).val(zeroPrice).trigger('change');
-                    }
+                    }*/
                     $("input[name=calculateField_" + currentTab + "]").attr("disabled", true);
                     $("#price_div_" + currentTab).find(':radio[value="01"]').prop('checked', true);
                     layui.form.render();
@@ -2426,7 +2426,7 @@
         if (!param.entrustAmt && !param.entrustNum) {
             return;
         }
-        Joyin.ajaxJson(basePath + 'invest/entrust/etrexchangetrade/EtrExchangeTrade001/calcEntrustNumAndAmt', param, function (result) {
+        Joyin.ajaxJson(basePath + 'etrexchange/common/etrExchangeTrade001/calcEntrustNumAndAmt', param, function (result) {
             if (param.targetType == TARGET_CLASS_01 && param.availableNum && param.availableNum > 0) {
                 var stockNum = param.availableNum - result.entrustNum;
                 if (result.minNum) {
@@ -3464,7 +3464,7 @@
             },
             {
                 field: 'entrustAmt',
-                title: 'EtrExchangeTrade001.entrustAmt',
+                title: currentTab == 'gd'?'EtrExchangeTrade001.netPriceAmt':'EtrExchangeTrade001.entrustAmt',
                 sortField: 'entrustAmt',
                 width: 200,
                 type: 'number',
