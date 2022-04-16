@@ -1092,9 +1092,9 @@
                 }
                 if (finprodType2 == FINPROD_TYPE_TG_F01 && isStandardPs(ps)) {
                     $("#price_" + currentTab).attr("disabled", true);
-                    if (priceModel == PRICE_MODEL_PRM03) {
+                    /*if (priceModel == PRICE_MODEL_PRM03) {
                         $("#price_" + currentTab).val(zeroPrice).trigger('change');
-                    }
+                    }*/
                     $("input[name=calculateField_" + currentTab + "]").attr("disabled", true);
                     $("#price_div_" + currentTab).find(':radio[value="01"]').prop('checked', true);
                     layui.form.render();
@@ -3464,7 +3464,7 @@
             },
             {
                 field: 'entrustAmt',
-                title: 'EtrExchangeTrade001.entrustAmt',
+                title: SHARES_TRADE_PLATFORM_03==currentTab?'EtrExchangeTrade001.entrustNum':'EtrExchangeTrade001.entrustAmt',
                 sortField: 'entrustAmt',
                 width: 200,
                 type: 'number',
