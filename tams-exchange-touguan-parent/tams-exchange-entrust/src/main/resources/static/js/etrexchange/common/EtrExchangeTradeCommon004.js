@@ -2426,7 +2426,7 @@
         if (!param.entrustAmt && !param.entrustNum) {
             return;
         }
-        Joyin.ajaxJson(basePath + 'invest/entrust/etrexchangetrade/EtrExchangeTrade001/calcEntrustNumAndAmt', param, function (result) {
+        Joyin.ajaxJson(basePath + 'etrexchange/common/etrExchangeTrade001/calcEntrustNumAndAmt', param, function (result) {
             if (param.targetType == TARGET_CLASS_01 && param.availableNum && param.availableNum > 0) {
                 var stockNum = param.availableNum - result.entrustNum;
                 if (result.minNum) {
