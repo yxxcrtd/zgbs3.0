@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.service.trade.management.service;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
@@ -15,6 +16,7 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.system.syspara.dto.SysParaSet001Dto;
 import com.joyintech.system.syspara.service.SysParaSet001Service;
+import com.joyintech.tams.common.base.entity.TrdPriceTimeConfig;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.SysParamBean;
 import com.joyintech.tams.exchange.common.bean.investment.PtlAuthInfo;
@@ -35,6 +37,7 @@ import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
 import com.joyintech.tams.exchange.common.utils.InvestmentUtils;
 import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.common.utils.TradeTimeConvertUtils;
+import com.joyintech.tams.exchange.datacommon.db.dao.TrdPriceTimeConfigByManualMapper;
 import com.joyintech.tams.exchange.datacommon.db.service.FuturesInstrumentService;
 import com.joyintech.tams.exchange.datacommon.db.service.InstrumentService;
 import com.joyintech.tams.exchange.datacommon.db.service.ServiceNodeService;
@@ -78,6 +81,8 @@ public class CommonManagement extends BaseService {
     private FuturesInstrumentService futuresInstrumentService;
     @Autowired
     private AccountPositionHelper accountPositionHelper;
+    @Autowired
+    private TrdPriceTimeConfigByManualMapper trdPriceTimeConfigByManualMapper;
     /**
      * 是否单体服务
      */
@@ -92,6 +97,8 @@ public class CommonManagement extends BaseService {
     private String riskApprovalCode = ExchangeConstant.TRUE_IN_PARA;
 
     private String tradeTimeSwitch = ExchangeConstant.ETR_TRADE_TIME_SWITCH;
+    //TODO 交易单独设置时间开关
+    /*private String tradeTimeSwitch = ExchangeConstant.TRD_TRADE_TIME_SWITCH;*/
 
     private String fairModeEntrustPriceBestThanInstruction = ExchangeConstant.TRUE_IN_PARA;
 

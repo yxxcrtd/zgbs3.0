@@ -1,6 +1,8 @@
 package com.joyintech.tams.exchange.common.constant;
 
-public enum ErrorCode {
+import com.joyintech.tams.exchange.common.enums.IEnum;
+
+public enum ErrorCode implements IEnum<Integer> {
 
     SUCCESS(0, "success"),
     /**
@@ -234,5 +236,15 @@ public enum ErrorCode {
 
     public static String getStr(ErrorCode errorCode) {
         return errorCode.value + ":" + errorCode.errorMsg;
+    }
+
+    @Override
+    public Integer getCode() {
+        return value;
+    }
+
+    @Override
+    public String getDescription() {
+        return errorMsg;
     }
 }

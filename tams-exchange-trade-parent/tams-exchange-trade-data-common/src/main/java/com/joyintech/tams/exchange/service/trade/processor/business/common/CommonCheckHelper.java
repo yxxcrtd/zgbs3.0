@@ -73,6 +73,7 @@ public class CommonCheckHelper {
      */
     public boolean checkTradeTime(Instruction instruction, Instrument instrument, OrderInterface orderInterface) {
 
+        // TODO 仅15:00-15:30允许下达收盘价固定价格委托，以及科创版校验
         if (Objects.isNull(instruction) || Objects.isNull(instrument) || Objects.isNull(orderInterface)) {
             logger.debug("checkTradeTime() called with parameters => 【instruction = {}】, 【instrument = {}】, 【orderInterface = {}】",
                     instruction, instrument, orderInterface);

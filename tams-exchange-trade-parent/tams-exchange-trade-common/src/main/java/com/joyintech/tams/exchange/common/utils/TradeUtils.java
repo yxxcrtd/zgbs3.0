@@ -180,12 +180,17 @@ public class TradeUtils {
         return calculateBalance(null, entrustPrice, entrustVolume, assetType, null, null);
     }
 
-    public static BigDecimal calculateBalance(String entrustBs, BigDecimal entrustPrice, long entrustVolume, String assetType, OrderInterface orderInterface, FuturesInstrument futuresInstrument) {
-        //协议回购金额计算
+    public static BigDecimal calculateBalance(BigDecimal entrustPrice, long entrustVolume, String assetType, OrderInterface orderInterface) {
+        return calculateBalance(null, entrustPrice, entrustVolume, assetType, orderInterface, null);
+    }
+
+    public static BigDecimal calculateBalance(String entrustBs, BigDecimal entrustPrice, long entrustVolume, String assetType, OrderInterface orderInterface) {
+        return calculateBalance(entrustBs, entrustPrice, entrustVolume, assetType, orderInterface, null);
+        /*//协议回购金额计算
         if (Objects.nonNull(orderInterface) && IntegratedEntrustUtils.isProtocolBack(orderInterface.getEntrustProp())) {
             return ((IntegratedEntrust) orderInterface).getEntrustBalance();
         }
-        //债券按净价冻结 --- 需求新修正为净价 --- > 修正为全价
+        // 债券按净价冻结 --- 需求新修正为净价 --- > 修正为全价
         // 债券且是交易类
         if (InvestmentAssetType.BOND.value.equals(assetType)
                 && Objects.nonNull(orderInterface)
@@ -196,15 +201,11 @@ public class TradeUtils {
         if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(assetType)) {
             return new BigDecimal(entrustVolume * 100).setScale(2, RoundingMode.HALF_UP);
         }
-        if (InvestmentAssetType.FUTURES.value.equals(assetType)) {
-            BigDecimal res = multiply(entrustPrice, entrustVolume, 2);
-            return multiply(res, BigDecimal.valueOf(Objects.nonNull(futuresInstrument) ? futuresInstrument.getVolumeMultiple() : 1), 2);
-        }
         // TODO ETF计算
-        return multiply(entrustPrice, entrustVolume, 2);
+        return multiply(entrustPrice, entrustVolume, 2);*/
     }
 
-    public static BigDecimal calculateBalance(String entrustBs, BigDecimal entrustPrice, long entrustVolume, String assetType, OrderInterface orderInterface) {
+    public static BigDecimal calculateBalance(String entrustBs, BigDecimal entrustPrice, long entrustVolume, String assetType, OrderInterface orderInterface, FuturesInstrument futuresInstrument) {
         //协议回购金额计算
         if (Objects.nonNull(orderInterface) && IntegratedEntrustUtils.isProtocolBack(orderInterface.getEntrustProp())) {
             return ((IntegratedEntrust) orderInterface).getEntrustBalance();
@@ -219,6 +220,10 @@ public class TradeUtils {
         // 质押式竞价回购，金额计算
         if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(assetType)) {
             return new BigDecimal(entrustVolume * 100).setScale(2, RoundingMode.HALF_UP);
+        }
+        if (InvestmentAssetType.FUTURES.value.equals(assetType)) {
+            BigDecimal res = multiply(entrustPrice, entrustVolume, 2);
+            return multiply(res, BigDecimal.valueOf(Objects.nonNull(futuresInstrument) ? futuresInstrument.getVolumeMultiple() : 1), 2);
         }
         // TODO ETF计算
         return multiply(entrustPrice, entrustVolume, 2);
