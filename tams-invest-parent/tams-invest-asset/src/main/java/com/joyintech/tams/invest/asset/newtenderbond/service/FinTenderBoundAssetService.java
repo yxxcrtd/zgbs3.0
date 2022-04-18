@@ -417,8 +417,8 @@ public class FinTenderBoundAssetService extends CommonExportService<FinTenderBou
      * @return
      */
     public String getFinprodId(FinTenderBoundAsset002Dto dto) {
-        return String.format("%s_%s_%d_%s", DictCodeListExt2.平安资产类型_一级市场债.getValue(), dto.getFinprodMarketId(),
-                dto.getIssueDto().getAddBatch(), dto.getTradeMarket());
+        return String.format("%s_%s_%d_%s_%s", DictCodeListExt2.平安资产类型_一级市场债.getValue(), dto.getFinprodMarketId(),
+                dto.getIssueDto().getAddBatch(), dto.getTradeMarket(),DateUtil.format(dto.getProductAddDto().getBidDate(),"yyyyMMdd"));
     }
 
 
