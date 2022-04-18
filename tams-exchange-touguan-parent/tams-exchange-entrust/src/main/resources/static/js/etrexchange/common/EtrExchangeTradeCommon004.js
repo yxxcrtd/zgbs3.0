@@ -1181,8 +1181,50 @@
      * 申报类型的联动处理
      */
     var declaTypeChange = function (init, isNotTrigger) {
-        priceModelChange(init, isNotTrigger);
+        declaTypeChange(init, isNotTrigger);
     };
+
+
+    /**
+     * 价格模式选择后的联动处理
+     */
+    var declaTypeChange = function (init, isNotTrigger) {
+        var declaType = $("#declaType_" + currentTab).val();
+        // 十五.申报类型和席位号、交易对手、约定号联动
+        // 联动画面.席位号、交易对手、约定号
+        if (currentTab == 'dz') {
+            // 画面.价格模式 IN（意向申报，定价申报，收盘价固定价格申报，日均价固定价格申报）
+            if (declaType == DECLA_TYPE_PRM06 || declaType == DECLA_TYPE_PRM07 || declaType == DECLA_TYPE_PRM10 || declaType == DECLA_TYPE_PRM11) {
+                // 画面.席位号、交易对手、约定号 隐藏
+                $("#counterId_" + currentTab).val('').trigger('change');
+                $("#seatId_" + currentTab).val('').trigger('change');
+                $("#agreeOnId_" + currentTab).val('').trigger('change');
+                $("#counterId_div_" + currentTab).hide();
+                $("#seatId_div_" + currentTab).hide();
+                $("#agreeOnId_div_" + currentTab).hide();
+            }
+            // 画面.价格模式 IN（点击成交申报，成交申报，不指定）
+            else if (declaType == DECLA_TYPE_PRM05 || declaType == DECLA_TYPE_PRM08 || declaType == DECLA_TYPE_PRM09) {
+                // 画面.席位号、交易对手、约定号展示，可编辑
+                $("#counterId_div_" + currentTab).show();
+                $("#seatId_div_" + currentTab).show();
+                $("#agreeOnId_div_" + currentTab).show();
+            }
+            if (declaType == DECLA_TYPE_PRM08) {
+                $("#seatId_" + currentTab).attr("disabled", true);
+                $("#agreeOnId_" + currentTab).attr("disabled", true);
+            } else {
+                $("#seatId_" + currentTab).attr("disabled", false);
+                $("#agreeOnId_" + currentTab).attr("disabled", false);
+            }
+        }
+    };
+
+
+
+
+
+
     /**
      * 委托价格变更时联动计算委托金额
      */
