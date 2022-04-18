@@ -38,6 +38,11 @@ public enum DictCodeListExt4 implements BaseDictCodeList {
     招标标的_利差(DictCode.招标标的,"03","利差(BP)"),
     发行类型_首发(DictCode.发行类型,"01","首发"),
     发行类型_增发(DictCode.发行类型,"02","增发"),
+
+    基准利率精度_1(DictCode.基准利率精度,"1","1"),
+    基准利率精度_2(DictCode.基准利率精度,"2","2"),
+    基准利率精度_3(DictCode.基准利率精度,"3","3"),
+    基准利率精度_4(DictCode.基准利率精度,"4","4"),
     //20220413 add by gwl end
     ;
     /**
