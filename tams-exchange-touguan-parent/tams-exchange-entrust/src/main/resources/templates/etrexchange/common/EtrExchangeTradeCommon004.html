@@ -665,7 +665,7 @@
                     </div>
                 </div>
                 <!--add by chenjiaxing 添加投资目的字段 start-->
-                <div class="form-inline-wrap" style=" float: none !important; padding-top:6px !important;" id="invAim_div_gd">
+                <div th:if="${SHOW_INVAIM_OR_BUSSINSSMODEL} =='01'" class="form-inline-wrap" style=" float: none !important; padding-top:6px !important;" id="invAim_div_gd">
                     <label class="layui-form-label " th:text="#{EtrExchangeTrade001.invAim}">投资目的</label>
                     <div class="layui-input-inline input-inline">
                         <select type="text" id="invAim_gd" name="invAim" class="layui-input form-input input-select" th:placeholder="#{SysCommon.placeholder}"
@@ -673,7 +673,7 @@
                     </div>
                 </div>
 
-                <div class="form-inline-wrap" id = "businessModelDiv_gd" style=" float: none !important; padding-top:6px !important;">
+                <div th:if="${SHOW_INVAIM_OR_BUSSINSSMODEL} =='02'" class="form-inline-wrap" id = "businessModelDiv_gd" style=" float: none !important; padding-top:6px !important;">
                     <label class="layui-form-label form-label-wrap"
                            data-th-text="#{EtrBondFirstLBidding002.businessModel}">业务模式</label>
                     <div class="layui-input-inline input-inline">
