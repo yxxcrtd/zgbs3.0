@@ -90,4 +90,17 @@ public class Message<T> implements Serializable {
         return this;
     }
 
+
+    public static Message success(String message,Object obj) {
+        return new Message(SUCCESS,message,obj);
+    }
+
+    public static Message fail(String message,Object obj) {
+        return new Message(FAIL,message,obj);
+    }
+
+    public static Message fail(String message) {
+        return new Message(FAIL,message,null);
+    }
+
 }
