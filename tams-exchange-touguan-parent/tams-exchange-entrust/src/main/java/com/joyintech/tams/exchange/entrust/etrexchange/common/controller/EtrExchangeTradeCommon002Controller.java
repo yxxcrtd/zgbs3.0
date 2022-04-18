@@ -309,7 +309,8 @@ public class EtrExchangeTradeCommon002Controller extends BaseController{
         // 导出
         ExcelUitl.doExport(requestDto, response, "持仓列表", () -> {
             EtrExchangeTradePositionsCommonRequest dto = requestDto.getDto(EtrExchangeTradePositionsCommonRequest.class);
-            List dataList = etrExchangeTradeCommon002Service.findPositionsPage(dto).getRoot();
+            //List dataList = etrExchangeTradeCommon002Service.findPositionsPage(dto).getRoot();
+            List dataList=dto.getQueryList();
             return dataList;
         });
     }

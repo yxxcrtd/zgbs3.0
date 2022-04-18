@@ -497,7 +497,7 @@ public class PortfolioManager extends BaseService {
                     entrustVolume = TradeUtils.subtractMod(entrustVolume, minStep);
                 }
 //                entrustAmt = NumberUtil.mul(entrustVolume, price);
-                entrustAmt = entrustVolume.multiply(price).setScale(2);
+                entrustAmt = entrustVolume.multiply(price).setScale(2, RoundingMode.HALF_UP);
             }
 
             log.debug("根据分配比例计算，组合名称 = [{}]， 组合编号 = [{}]，订单数量 = [{}]， 分配比例 = [{}]， 委托数量 = [{}]，委托金额 = [{}]",
@@ -519,7 +519,7 @@ public class PortfolioManager extends BaseService {
                 .mapToLong(PortfolioCalculateResponse::getEntrustNum)
                 .sum();
         long tailVolume = bean.getEntrustVolume() - sum;
-        BigDecimal tailAmt = price.multiply(BigDecimal.valueOf(tailVolume)).setScale(2);
+        BigDecimal tailAmt = price.multiply(BigDecimal.valueOf(tailVolume)).setScale(2, RoundingMode.HALF_UP);
         log.debug("尾插处理，组合名称 = [{}], 组合编号 = [{}], 原委托数量 = [{}], 现委托数量 = [{}]，现委托金额 = [{}]",
                 maxPortfolioCalculateResponse.getPortfolioName(),
                 maxPortfolioCalculateResponse.getPortfolioId(),
