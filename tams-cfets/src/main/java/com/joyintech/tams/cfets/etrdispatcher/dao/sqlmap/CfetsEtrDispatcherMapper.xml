@@ -1424,7 +1424,7 @@
         CASE WHEN det.PORTFOLIO_ID IS NULL THEN ete.PORTFOLIO_ID ELSE det.PORTFOLIO_ID END AS portfolioId,
         pp.portfolio_name portfolioName,
         /*ete.inv_aim busiModel,*/
-        decode(#{SHOW_INVAIM_OR_BUSSINSSMODEL},'02',ete.BUSINESS_MODEL,ete.inv_aim) busiModel,
+        nvl(ete.inv_aim,ete.BUSINESS_MODEL) busiModel,
         NVL(fp.finprod_market_id,ete.STOCK_ID) finprodMarketId,
         nvl(fp.finprod_abbr,ete.finprod_id) finprodAbbr,
         ete.trade_market tradeMarket,
@@ -1531,7 +1531,7 @@
         CASE WHEN det.PORTFOLIO_ID IS NULL THEN ete.PORTFOLIO_ID ELSE det.PORTFOLIO_ID END AS portfolioId,
         pp.portfolio_name portfolioName,
         /*ete.inv_aim busiModel,*/
-        decode(#{SHOW_INVAIM_OR_BUSSINSSMODEL},'02',ete.BUSINESS_MODEL,ete.inv_aim) busiModel,
+        nvl(ete.inv_aim,ete.BUSINESS_MODEL) busiModel,
         NVL(fp.finprod_market_id,ete.STOCK_ID) finprodMarketId,
         nvl(fp.finprod_abbr,ete.finprod_id) finprodAbbr,
         ete.trade_market tradeMarket,

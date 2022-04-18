@@ -1586,7 +1586,7 @@ public class CfetsEtrDispatcherService extends BaseService {
         pageParam.put("YESORNO_YES", DictCodeList.是否_是.getValue());
         List<String> entrustIdList = StringUtil.splitToList(",", (String) pageParam.get("entrustId"));
         pageParam.put("sysDateStr", platformDateImpl.getSysDateStr());
-        pageParam.put("SHOW_INVAIM_OR_BUSSINSSMODEL", CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL"));
+//        pageParam.put("SHOW_INVAIM_OR_BUSSINSSMODEL", CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL"));
 
         if (StringUtil.isBlank(dto.getEntrustId()) || entrustIdList.size() > 1) {
             return new CfetsEtrDispatcherInfoExcResponse();

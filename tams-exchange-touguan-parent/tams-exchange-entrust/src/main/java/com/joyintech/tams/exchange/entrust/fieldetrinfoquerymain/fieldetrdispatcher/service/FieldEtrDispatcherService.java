@@ -511,6 +511,14 @@ public class FieldEtrDispatcherService extends BaseService{
             }
         });
         FieldEtrDispatcherInfoResponse fieldResponseDto = this.getEtrDispatcherInfo(dto);
+        String showInvaimOrBussinssmodel = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
+        if(null != showInvaimOrBussinssmodel && showInvaimOrBussinssmodel.equals("02")){
+            infoForm.forEach(field->{
+                if(field.getColname().equals("投资目的")){
+                    field.setColname("业务模式");
+                }
+            });
+        }
         resultData.put(dtCode+"_form",infoForm);
         resultData.put(dtCode+"_data",fieldResponseDto);
         return resultData;
