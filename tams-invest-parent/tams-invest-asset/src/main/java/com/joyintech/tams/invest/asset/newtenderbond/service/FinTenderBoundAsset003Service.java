@@ -91,6 +91,8 @@ public class FinTenderBoundAsset003Service implements BaseProcessService<FinTend
                     productAdd.setFinprodId(dto.getFinprodId());
                     productAdd.setIssueStatus(null);
                     finProductAddMapper.updateForTenderBound(productAdd);
+
+                    //TODO 调用头寸
                 });
             }
         } else {
@@ -129,6 +131,7 @@ public class FinTenderBoundAsset003Service implements BaseProcessService<FinTend
             productAdd.setIssueStatus(DictCodeListExt1.发行状态_发行成功.getValue());
             finProductAddMapper.updateForTenderBound(productAdd);
 
+            //TODO 调用头寸
             //TODO 这里处理加券
         }
         //3、记录操作日志
