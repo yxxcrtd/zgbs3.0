@@ -29,6 +29,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 /**
+ * 投资交易汇总批处理
  * @author 何阳阳
  * @date 2020/7/16
  * @see StlDownDataGatherTask
