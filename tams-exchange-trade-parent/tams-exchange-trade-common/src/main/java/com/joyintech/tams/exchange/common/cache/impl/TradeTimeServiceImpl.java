@@ -14,6 +14,8 @@ import com.joyintech.tams.exchange.common.bean.request.BaseOrderRequest;
 import com.joyintech.tams.exchange.common.cache.TradeTimeService;
 import com.joyintech.tams.exchange.common.constant.joyin.DeclarationType;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -25,17 +27,20 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.util.stream.Collectors.*;
 
 /**
- * @Author: think
- * @Description: 交易时间段服务
- * @Date: Created in 9:12 2020/11/2
+ * 交易时间段
  */
 @Service
 public class TradeTimeServiceImpl implements TradeTimeService {
 
-    private final List<TrdPriceTimeConfig> TRD_PRICE_TIME_CONFIG_LIST = Lists.newArrayList();
-    private Map<String, TradeTimeBean> tradeTimeBeanMap = new ConcurrentHashMap<>();
-    private Map<String, List<OpenCloseTime>> OPEN_CLOSE_TIME_MAP = new ConcurrentHashMap<>();
+    /**
+     * 日志对象
+     */
+    private static final Logger log = LoggerFactory.getLogger(TradeTimeServiceImpl.class); 
+
     public static final String DEFAULT = "defaults";
+    private final List<TrdPriceTimeConfig> trdPriceTimeConfigList = Lists.newArrayList();
+    private final Map<String, TradeTimeBean> tradeTimeBeanMap = new ConcurrentHashMap<>();
+    private final Map<String, List<OpenCloseTime>> openCloseTimeMap = new ConcurrentHashMap<>();
 
     @Override
     public void saveTradeTimeCache(List<TradeTimeBean> tradeTimeBeanList) {
@@ -52,33 +57,39 @@ public class TradeTimeServiceImpl implements TradeTimeService {
 
     @Override
     public void saveInCache(List<TrdPriceTimeConfig> trdPriceTimeConfigs) {
-        TRD_PRICE_TIME_CONFIG_LIST.clear();
-        OPEN_CLOSE_TIME_MAP.clear();
+        log.info("saveInCache() called with parameters => 【trdPriceTimeConfigs = {}】",trdPriceTimeConfigs);
+        trdPriceTimeConfigList.clear();
+        openCloseTimeMap.clear();
         if (CollUtil.isEmpty(trdPriceTimeConfigs)) {
-            // TODO 程序中的兜底方案
-            OPEN_CLOSE_TIME_MAP.put(DEFAULT,ListUtil.of());
+            // 程序中的兜底方案
+            openCloseTimeMap.put(DEFAULT, ListUtil.of(
+                    new OpenCloseTime(OpenCloseTime.PriceTimeTypeEnum.OPEN.getCode(), "9:15:00", "9:25:00"),
+                    new OpenCloseTime(OpenCloseTime.PriceTimeTypeEnum.KEEP.getCode(), "9:30:00", "11:30:00"),
+                    new OpenCloseTime(OpenCloseTime.PriceTimeTypeEnum.CLOSE.getCode(), "14:57:00", "15:30:00")
+            ));
             return;
         }
 
-        TRD_PRICE_TIME_CONFIG_LIST.addAll(trdPriceTimeConfigs);
+        trdPriceTimeConfigList.addAll(trdPriceTimeConfigs);
 
         List<OpenCloseTime> defaults = trdPriceTimeConfigs.stream()
                 .filter(item -> ObjectUtil.isEmpty(item.getAssetClassify1()))
                 .map(item -> BeanUtil.toBean(item, OpenCloseTime.class))
                 .collect(toList());
 
-        Map<String, List<OpenCloseTime>> collect = TRD_PRICE_TIME_CONFIG_LIST.stream()
+        Map<String, List<OpenCloseTime>> collect = trdPriceTimeConfigList.stream()
+                .filter(item -> ObjectUtil.isEmpty(item.getAssetClassify1()))
                 .collect(groupingBy(item -> {
                             List<String> keys = ListUtil.of(item.getAssetClassify1()
                                     , item.getAssetClassify2(),
-//                                    item.getDealMode(),
+                                    item.getDealMode(),
                                     item.getTradeMarket(),
                                     item.getTradePlat());
                             return Joiner.on(StrUtil.COMMA).useForNull(StrUtil.AT).join(keys);
                         }, mapping(item -> new OpenCloseTime(item.getPriceTimeType(), item.getOpenTime(), item.getCloseTime()), toList())
                 ));
-        OPEN_CLOSE_TIME_MAP.putAll(collect);
-        OPEN_CLOSE_TIME_MAP.put(DEFAULT, defaults);
+        openCloseTimeMap.putAll(collect);
+        openCloseTimeMap.put(DEFAULT, defaults);
 
     }
 
@@ -91,41 +102,43 @@ public class TradeTimeServiceImpl implements TradeTimeService {
      */
     @Override
     public List<OpenCloseTime> getTradePeriod(Instruction instruction, BaseOrderRequest order) {
+        log.debug("getTradePeriod() called with parameters => 【instruction = {}】, 【order = {}】",instruction, order);
         String entrustProp = order.getEntrustProp();
         String tradeMarket = instruction.getTradeMarket();
         String tradePlat = instruction.getTradePlat();
         String assetType = instruction.getAssetType();
         String assetType1 = instruction.getAssetType1();
         String assetType10 = instruction.getAssetType10();
-        List<String> querys = ListUtil.of(assetType
+        List<String> queries = ListUtil.of(assetType
                 , assetType1,
                 entrustProp,
                 tradeMarket,
                 tradePlat);
 
-        String res = OPEN_CLOSE_TIME_MAP.keySet().stream()
-                .filter(key -> diff(StrUtil.split(key, StrUtil.COMMA), querys))
+        String res = openCloseTimeMap.keySet().stream()
+                .filter(key -> diff(StrUtil.split(key, StrUtil.COMMA), queries))
                 .min(Comparator.comparing(item -> StrUtil.count(item, StrUtil.AT)))
                 .orElse(DEFAULT);
-        return OPEN_CLOSE_TIME_MAP.get(res);
+        return openCloseTimeMap.get(res);
     }
 
+    @SuppressWarnings("unused")
     private boolean diff(String source, String dest) {
         if (StrUtil.isEmpty(source) || StrUtil.isEmpty(dest)) {
             return false;
         }
         List<String> sources = StrUtil.split(source, StrUtil.COMMA);
-        List<String> dests = StrUtil.split(dest, StrUtil.COMMA);
-        return diff(sources, dests);
+        List<String> targets = StrUtil.split(dest, StrUtil.COMMA);
+        return diff(sources, targets);
     }
 
-    private boolean diff(List<String> sources, List<String> dests) {
-        if (CollUtil.isEmpty(sources) || CollUtil.isEmpty(dests)) {
+    private boolean diff(List<String> sources, List<String> targets) {
+        if (CollUtil.isEmpty(sources) || CollUtil.isEmpty(targets)) {
             return false;
         }
         for (int i = 0, len = sources.size(); i < len; i++) {
             String s = sources.get(i);
-            String d = dests.get(i);
+            String d = targets.get(i);
 
             if (!StrUtil.AT.equals(s) && !s.equals(d)) {
                 return false;

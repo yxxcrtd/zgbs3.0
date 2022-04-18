@@ -1,5 +1,6 @@
 package com.joyintech.tams.common.base.entity;
 
+import com.google.common.base.MoreObjects;
 import com.joyintech.framework.base.BaseEntity;
 
 public class TrdPriceTimeConfig extends BaseEntity {
@@ -268,5 +269,23 @@ public class TrdPriceTimeConfig extends BaseEntity {
         public String getCode() {
             return code;
         }
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("configNo", configNo)
+                .add("etrTrad", etrTrad)
+                .add("tradeMarket", tradeMarket)
+                .add("tradePlat", tradePlat)
+                .add("assetClassify1", assetClassify1)
+                .add("assetClassify2", assetClassify2)
+                .add("assetClassify3", assetClassify3)
+                .add("dealMode", dealMode)
+                .add("priceTimeType", priceTimeType)
+                .add("openTime", openTime)
+                .add("closeTime", closeTime)
+                .add("remark", remark)
+                .toString();
     }
 }

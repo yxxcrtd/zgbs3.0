@@ -46,7 +46,7 @@ import java.util.List;
 @Component
 public class CommonCheckKit extends BaseCheckKit {
 
-    public static final String TRD_TRADETIME_SWITCH = "TRD_TRADETIME_SWITCH";
+    public static final String TRD_TRADE_TIME_SWITCH = "trd_trade_time_switch";
     /**
      * 日志对象
      */
@@ -108,9 +108,9 @@ public class CommonCheckKit extends BaseCheckKit {
 
         Instruction instruction = getInstruction(order);
 
-        String trdTradetimeSwitch = CacheUtil.getSysParam(TRD_TRADETIME_SWITCH);
-        if (SwitcheEnum.OPEN.codeNotEquals(trdTradetimeSwitch)) {
-            log.debug("系统参数[{}:{}]，跳过交易时间检查", TRD_TRADETIME_SWITCH, trdTradetimeSwitch);
+        String trdTradeTimeSwitch = CacheUtil.getSysParam(TRD_TRADE_TIME_SWITCH);
+        if (SwitcheEnum.OPEN.codeNotEquals(trdTradeTimeSwitch)) {
+            log.debug("系统参数[{}:{}]，跳过交易时间检查", TRD_TRADE_TIME_SWITCH, trdTradeTimeSwitch);
             return;
         }
 
@@ -127,8 +127,9 @@ public class CommonCheckKit extends BaseCheckKit {
         if (!result) {
             StringBuilder builder = StrUtil.builder();
             tradePeriod.forEach(item -> builder.append(item.getOpenTime()).append("~").append(item.getCloseTime()).append(StrUtil.COMMA));
-            throw new BusinessResultException(ErrorCode.INNER_RISK_ERROR, StrUtil.format("当前时间[{}],不允许委托,允许委托时间段为：[{}]",
-                    localTime, StrUtil.removeSuffix(builder.toString(), StrUtil.COMMA)));
+            throw new BusinessResultException(ErrorCode.INNER_RISK_ERROR,
+                    StrUtil.format("当前时间[{}],不允许委托,允许委托时间段为：[{}]",
+                            localTime, StrUtil.removeSuffix(builder.toString(), StrUtil.COMMA)));
         }
     }
 

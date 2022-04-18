@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.common.bean.request;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.google.common.base.MoreObjects;
 import com.joyintech.tams.exchange.common.utils.DoubleSerializerUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -102,5 +103,18 @@ public class BaseOrderRequest implements Serializable {
 
     public void setSoftSkipMode(String softSkipMode) {
         this.softSkipMode = softSkipMode;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("instructionId", instructionId)
+                .add("entrustProp", entrustProp)
+                .add("entrustVolume", entrustVolume)
+                .add("entrustPrice", entrustPrice)
+                .add("fullPrice", fullPrice)
+                .add("entrustBalance", entrustBalance)
+                .add("softSkipMode", softSkipMode)
+                .toString();
     }
 }
