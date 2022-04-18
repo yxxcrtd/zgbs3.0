@@ -2,9 +2,7 @@ package com.joyintech.tams.invest.asset.newtenderbond.dao;
 
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
-import com.joyintech.tams.invest.asset.newtenderbond.dto.FinTenderBoundAsset001Dto;
-import com.joyintech.tams.invest.asset.newtenderbond.dto.FinTenderBoundAssetSearch;
-import com.joyintech.tams.invest.asset.newtenderbond.dto.MstBondCreditRatingDto;
+import com.joyintech.tams.invest.asset.newtenderbond.dto.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -13,7 +11,6 @@ import java.util.Map;
 
 @Repository
 public interface FinTenderBoundAssetMapper {
-
 
     /**
      * 列表查询
@@ -102,5 +99,22 @@ public interface FinTenderBoundAssetMapper {
      * @param finprodId
      * @return
      */
-    List<String> selectTotleTradeId(@Param("finprodId")String finprodId);
+    List<String> selectTotleTradeId(@Param("finprodId") String finprodId);
+
+    /**
+     * 平台日
+     *
+     * @param params{ iplatformDate:平台日
+     *                }
+     * @return
+     */
+    FinTenderBoundAsset004Dto getBoundMarketInfo(Map<String, Object> params);
+
+    /**
+     * 债券付息信息
+     *
+     * @param param
+     * @return
+     */
+    List<FinTenderBoundAsset004PayHSrcSecSchedulDto> selectWindBondSchedule(Map<String, Object> param);
 }
