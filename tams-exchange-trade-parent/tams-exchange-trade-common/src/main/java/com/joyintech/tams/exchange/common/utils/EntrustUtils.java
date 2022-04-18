@@ -3,10 +3,12 @@ package com.joyintech.tams.exchange.common.utils;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Strings;
 import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.OrderPlaceBean;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt2;
+import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
 import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
@@ -458,14 +460,14 @@ public class EntrustUtils {
             return getBsFlagForETF(entrustBs, deliveryMethod, instrument.getMarket(), instrument.getEtfType());
         }
         if (entrustProp.equals(EntrustProp.NORMAL.value) && entrustBs.equals(EntrustBs.BUY.value)) {
-        	if(InvestmentAssetType.isBond(assetType) && !Objects.isNull(instrument) && !"B14".equals(instrument.getAssetType1())) {
-        		return BSFlag.PPCJMR.value;
-        	}
+            if (InvestmentAssetType.isBond(assetType) && !Objects.isNull(instrument) && !"B14".equals(instrument.getAssetType1())) {
+                return BSFlag.PPCJMR.value;
+            }
             return BSFlag.ZQMR.value;
         } else if (entrustProp.equals(EntrustProp.NORMAL.value) && entrustBs.equals(EntrustBs.SELL.value)) {
-        	if(InvestmentAssetType.isBond(assetType) && !Objects.isNull(instrument) && !"B14".equals(instrument.getAssetType1())) {
-        		return BSFlag.PPCJMC.value;
-        	}
+            if (InvestmentAssetType.isBond(assetType) && !Objects.isNull(instrument) && !"B14".equals(instrument.getAssetType1())) {
+                return BSFlag.PPCJMC.value;
+            }
             return BSFlag.ZQMC.value;
         } else if (entrustProp.equals(EntrustProp.IMMEDIATE_TO_CANCEL.value) && entrustBs.equals(EntrustBs.BUY.value)) {
             return BSFlag.JSMR.value;
@@ -939,5 +941,65 @@ public class EntrustUtils {
             return code;
         }
         return entrustProp.getName();
+    }
+
+    /**
+     * 判断是否新债业务
+     */
+    public static boolean isNewBond(String busiTypeTg) {
+        return StringUtil.equals(DictCodeListExt3.投管业务类型_现券交易.getValue(), busiTypeTg);
+    }
+
+    /**
+     * 判断是否通用质押式回购
+     */
+    public static boolean isRepurchase(String busiTypeTg) {
+        return StringUtil.equals(DictCodeListExt3.投管业务类型_通用式质押回购.getValue(), busiTypeTg);
+    }
+
+    /**
+     * 判断是否非交易业务
+     */
+    public static boolean isNotTrade(String busiTypeTg) {
+        return StringUtil.equals(DictCodeListExt3.投管业务类型_行权.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_债转股.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_质押券出入库.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_配债.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_可转债申购.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_配股.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_新股申购.getValue(), busiTypeTg);
+    }
+
+    /**
+     * 判断是否竞价交易业务
+     */
+    public static boolean isNormalTrade(String busiTypeTg) {
+        return StringUtil.equals(DictCodeListExt3.投管业务类型_竞价交易.getValue(), busiTypeTg);
+    }
+
+    /**
+     * 判断是否大宗交易业务
+     */
+    public static boolean isBulk(String busiTypeTg) {
+        return StringUtil.equals(DictCodeListExt3.投管业务类型_大宗交易.getValue(), busiTypeTg);
+    }
+
+    /**
+     * 判断是否协议现券业务
+     */
+    public static boolean isAgreementCashBond(String busiTypeTg) {
+        return StringUtil.equals(DictCodeListExt3.投管业务类型_协议现券.getValue(), busiTypeTg);
+    }
+
+    /**
+     * 判断是否协议回购
+     */
+    public static boolean isPledgeAgreementRepurchase(String busiTypeTg) {
+        return StringUtil.equals(DictCodeListExt3.投管业务类型_首期.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_提前购回.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_到期购回.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_到期续做.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_中途换券.getValue(), busiTypeTg)
+                || StringUtil.equals(DictCodeListExt3.投管业务类型_解除质押.getValue(), busiTypeTg);
     }
 }
