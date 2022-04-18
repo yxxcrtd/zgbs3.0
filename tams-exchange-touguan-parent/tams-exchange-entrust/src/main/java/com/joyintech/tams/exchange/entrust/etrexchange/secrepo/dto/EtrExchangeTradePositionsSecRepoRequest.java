@@ -147,4 +147,14 @@ public class EtrExchangeTradePositionsSecRepoRequest {
         this.finprodMarketIds = finprodMarketIds;
     }
 
+    @ApiModelProperty(name="assetType",value="资产类型",example="A1")
+    private String assetType;
+
+    public String getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
+    }
 }

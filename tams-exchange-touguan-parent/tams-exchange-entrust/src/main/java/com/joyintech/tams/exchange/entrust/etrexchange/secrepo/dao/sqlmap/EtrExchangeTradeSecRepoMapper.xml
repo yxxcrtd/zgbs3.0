@@ -49,7 +49,7 @@
         ,c1.acctName as dealCurAcctName
         ,T1.PRICE_MODEL priceModel
         ,T2.DEAL_MODE as declaType
-        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}, #{PS_03}, #{PS_04}) THEN T1.PRICE * 100 ELSE
+        ,CASE WHEN T1.PS IN ( #{PS_03}, #{PS_04}) THEN T1.PRICE * 100 ELSE
         T1.PRICE END price
         /* ,T1.ENTRUST_AMT*NVL(T1.PRICE,1) ENTRUST_AMT*/
         ,T1.ENTRUST_AMT entrustAmt
@@ -64,7 +64,6 @@
         ,T1.ENTRUST_TYPE
         ,fpt.TYPE_8 paAssetType
         ,case when T1.ENTRUST_TYPE in ('09','12','13','14','16') then T7.FINPROD_MARKET_ID
-            when T1.ENTRUST_TYPE in (#{PS_10}, #{PS_11}, #{PS_12}) then T7.FINPROD_MARKET_ID
             when T1.STOCK_ID IS NOT NULL THEN T1.STOCK_ID
         ELSE T7.FINPROD_MARKET_ID END finprodMarketId
         /*,T7.FINPROD_MARKET_ID finprodMarketId*/
@@ -189,7 +188,8 @@
         ,c1.acctName as dealCurAcctName
         ,T1.PRICE_MODEL priceModel
         ,T2.DEAL_MODE as declaType
-        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}, #{PS_03}, #{PS_04}) THEN T1.PRICE * 100 ELSE T1.PRICE END price
+        ,CASE WHEN T1.PS IN ( #{PS_03}, #{PS_04}) THEN T1.PRICE * 100 ELSE
+        T1.PRICE END price
         /* ,T1.ENTRUST_AMT*NVL(T1.PRICE,1) ENTRUST_AMT*/
         ,T1.ENTRUST_AMT entrustAmt
         ,T1.ENTRUST_NUM entrustNum
@@ -203,7 +203,6 @@
         ,T1.ENTRUST_TYPE
         ,fpt.TYPE_8  paAssetType
         ,case when T1.ENTRUST_TYPE in ('09','12','13','14','16') then T7.FINPROD_MARKET_ID
-          when T1.ENTRUST_TYPE in (#{PS_10}, #{PS_11}, #{PS_12}) then T7.FINPROD_MARKET_ID
         when T1.STOCK_ID IS NOT NULL THEN T1.STOCK_ID
         ELSE T7.FINPROD_MARKET_ID END finprodMarketId
         /*,T7.FINPROD_MARKET_ID finprodMarketId*/
@@ -346,7 +345,8 @@
             FP.FINPROD_TYPE2                          AS finprodType2,
             FP.TRADE_MARKET                           AS tradeMarket,
             c1.acctNo1                          AS acctNo,
-            c1.acctName as dealCurAcctName
+            c1.acctName as dealCurAcctName,
+            FPT.TYPE_10 assetType
         FROM
             (
             SELECT
@@ -475,11 +475,12 @@
             AND a.TRADE_DATE = #{sysDate}
             ) GROUP BY FINPROD_ID, PORTFOLIO_ID
         ) invaim on invaim.FINPROD_ID=TEMP.FINPROD_ID and invaim.PORTFOLIO_ID=TEMP.PORTFOLIO_ID
+        lEFT JOIN FIN_PRODUCT_TYPE FPT
+        on FP.FINPROD_ID = FPT.FINPROD_ID
         WHERE
         FP.TRADE_MARKET IN (#{TRADE_PLACE_03}, #{TRADE_PLACE_04})
-        <if test="tradePlat != null and tradePlat !='' and tradePlat==NO_TRADE_BUSINESS_ETR">
-            AND FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR}
-        </if>
+        AND FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01}<!--  债券 -->
+        AND FPT.TYPE_11 != #{CUSTOM_ASSET_TYPE_FOUR_013}<!--  非可转债 -->
         <if test="portfolioIdList != null and portfolioIdList.size()>0">
             <foreach collection="portfolioIdList" open="AND TEMP.PORTFOLIO_ID IN (" item="portfolioId" separator="," close=")">
                     #{portfolioId,jdbcType=VARCHAR}
@@ -512,6 +513,9 @@
             <foreach item="item" index="index" collection="finprodMarketIds" open="(" separator="," close=")">
                 #{item, jdbcType=VARCHAR}
             </foreach>)
+        </if>
+        <if test="assetType != null and assetType !=''">
+            AND FPT.TYPE_10 = #{assetType,jdbcType=VARCHAR}
         </if>
     </select>
     <!--// modify by etliu 债券质押持仓查询只有非交易业务指令使用，代码删除 20220308 start -->
@@ -1109,68 +1113,6 @@
 
     </select>
 
-    <select id="selectWflEntrust" resultType="com.joyintech.tams.common.base.entity.WflEtrEntrust">
-        select
-        <include refid="com.joyintech.tams.common.base.dao.WflEtrEntrustMapper.Base_Column_List" />
-        from WFL_ETR_ENTRUST
-        <where>
-            PS = #{ps_T04,jdbcType=VARCHAR}
-            <if test="portfolioId != null and portfolioId != ''">
-                and PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
-            </if>
-            <if test="finprodId != null and finprodId != ''">
-                and  FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
-            </if>
-            <if test="entrustId != null and entrustId != ''">
-                and  ENTRUST_ID != #{entrustId,jdbcType=VARCHAR}
-            </if>
-        </where>
-    </select>
-
-    <select id="selectWflEntrustAddAndEtrEntrustAdd" resultType="java.lang.String">
-        with acctid as (
-            select ssai.SEC_ACCT_ID from STL_SEC_ACCT_INFO ssai
-            where ssai.BOND_ID = (
-                select ssai2.BOND_ID from STL_SEC_ACCT_INFO ssai2
-                where ssai2.SEC_ACCT_ID = #{secAcctId,jdbcType=VARCHAR}
-            )
-        )
-        <!-- 查询委托指令附属表中是否已经存在该证券账户发布的此债券的申购委托 -->
-        select eea.sec_acct_id secAcctId
-        from etr_entrust_add eea
-        left join etr_entrust ee
-            on eea.entrust_id = ee.entrust_id
-        where
-            eea.SEC_ACCT_ID in (select SEC_ACCT_ID from acctid)
-            and ee.finprod_id = #{finprodId,jdbcType=VARCHAR}
-            and ee.ps = #{ps,jdbcType=VARCHAR}
-            and ee.FINPROD_TYPE2 = #{finprodType2,jdbcType=VARCHAR}
-            <if test="tradePlat != null and tradePlat != ''">
-                and ee.trade_plat = #{tradePlat,jdbcType=VARCHAR}
-            </if>
-            <if test="entrustReturn != null and entrustReturn != '' and entrustRecall!=null and entrustRecall != ''">
-                and  ee.ENTRUST_STATUS not in  (#{entrustReturn,jdbcType=VARCHAR},#{entrustRecall,jdbcType=VARCHAR})
-            </if>
-        UNION
-        <!-- 查询委托指令流程表中是否已经存在该证券账户发布的此债券的申购委托 -->
-        select weea.sec_acct_id secAcctId
-        from wfl_etr_entrust_add weea
-        left join wfl_etr_entrust wee
-            on weea.entrust_id = wee.entrust_id
-        where
-            weea.sec_acct_id in (select SEC_ACCT_ID from acctid)
-            and wee.finprod_id = #{finprodId,jdbcType=VARCHAR}
-            and weea.workflow_status = '01'
-            and wee.ps = #{ps,jdbcType=VARCHAR}
-            and wee.FINPROD_TYPE2 = #{finprodType2,jdbcType=VARCHAR}
-            <if test="tradePlat != null and tradePlat != ''">
-                and wee.trade_plat = #{tradePlat,jdbcType=VARCHAR}
-            </if>
-            <if test="entrustReturn != null and entrustReturn != '' and entrustRecall!=null and entrustRecall != ''">
-                and  wee.ENTRUST_STATUS not in  (#{entrustReturn,jdbcType=VARCHAR},#{entrustRecall,jdbcType=VARCHAR})
-            </if>
-    </select>
-
     <select id="getLastNetPrice" resultType="java.math.BigDecimal">
         SELECT
             NETPRICE
@@ -1231,60 +1173,6 @@
             T1.ENTRUST_ID=#{entrustId}
     </select>
 
-    <select id="selectByFinprodId" resultType="com.joyintech.tams.component.business.common.dto.FinStockInfoDto">
-        SELECT
-        FIN_PRODUCT.FINPROD_ID as finprodId,
-        FIN_PRODUCT.FINPROD_MARKET_ID as finprodMarketId,
-        FIN_PRODUCT_ADD.BOARD as board,
-        FIN_PRODUCT.ISSUER as issuer,
-        FIN_PRODUCT.CALENDAR_ID as calendarId,
-        MST_CUSTOMER_INFO.CUSTOMER_NAME as customerName,
-        FIN_PRODUCT.FINPROD_ABBR as finprodAbbr,
-        FIN_PRODUCT.TRADE_MARKET as tradeMarket,
-        C.S_SHARES as sShares,
-        C.C_SHARES as cShares,
-        FIN_PRODUCT.MDATE as mDate,
-        FIN_PRODUCT.VDATE as vDate,
-        FIN_PRODUCT.CCY as ccy,
-        FIN_PRODUCT_ADD.SH_OR_ZH as shOrZh,
-        FIN_PRODUCT_ADD.MIN_SALE_UNIT as minSaleUnit,
-        FIN_PRODUCT_ADD.IS_MARGIN_FINPROD as isMarginFinprod,
-        FIN_PRODUCT.REMARK as remark
-        FROM
-        FIN_PRODUCT
-        LEFT JOIN
-        MST_CUSTOMER_INFO
-        ON
-        FIN_PRODUCT.ISSUER = MST_CUSTOMER_INFO.CUSTOMER_ID
-        LEFT JOIN
-        FIN_PRODUCT_ADD
-        ON FIN_PRODUCT_ADD.FINPROD_ID = FIN_PRODUCT.FINPROD_ID
-        LEFT JOIN
-        ( SELECT *
-        FROM
-        MST_SHARE_PRICE A
-        WHERE
-        DEAL_DATE IN (
-        SELECT
-        MAX (DEAL_DATE)
-        FROM
-        MST_SHARE_PRICE b
-        WHERE
-        A .SHARES_ID = b.SHARES_ID
-        AND DEAL_DATE <![CDATA[<]]> TO_DATE(#{sysDate,jdbcType=VARCHAR},'YYYY-MM-DD')
-        GROUP BY
-        SHARES_ID
-        )
-        ORDER BY SHARES_ID
-        ) C
-        ON C.SHARES_ID = FIN_PRODUCT.FINPROD_MARKET_ID
-        <where>
-            <if test="finprodId != null and finprodId != ''">
-                AND FIN_PRODUCT.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
-            </if>
-            and FIN_PRODUCT.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F10,jdbcType=VARCHAR}
-        </where>
-    </select>
 
     <!--add by etliu 20211207 交易所债券非交易类业务迁移 start-->
     <select id="selectFinExercisePlanData" resultType="com.joyintech.tams.common.base.entity.FinExercisePlan">

@@ -295,10 +295,6 @@ public interface EtrExchangeTradeSecRepoMapper {
 
 	List<SubEqutityDto> getsubEqutity(Map<String, Object> map);
 
-    List<WflEtrEntrust> selectWflEntrust(Map<String, Object> map);
-
-	List<String> selectWflEntrustAddAndEtrEntrustAdd(Map<String, Object> map);
-
     //add by chenjiaxing 20210907 债券竞价交易添加偏离度 start
 	BigDecimal getLastNetPrice(Map<String, Object> param);
 	//add by chenjiaxing 20210907 债券竞价交易添加偏离度 end
@@ -312,8 +308,6 @@ public interface EtrExchangeTradeSecRepoMapper {
 
 
     List<EtrExchangeTradeSaveSecRepoRequest>	selectEntrustDetail(EtrExchangeTradeSaveSecRepoRequest dto);
-
-	FinStockInfoDto selectByFinprodId(Map<String, Object> map);
 
 	// add by etliu 20211207 start
 	// 交易所债券非交易类业务迁移

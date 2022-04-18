@@ -117,20 +117,11 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
                 param.put("POSITION_TYPE_06", BussinessDictCodeList.持仓类型_融出.getValue());
                 param.put("VALUATION_SOURCE_CSD", BussinessDictCodeList.估值来源_中证登.getValue());
                 param.put("FINPROD_TYPE_TG_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
-                param.put("FINPROD_TYPE_TG_F06", DictCodeListExt1.金融产品类型_投管用_基金.getValue());
-                param.put("FINPROD_TYPE_TG_F10", DictCodeListExt1.金融产品类型_投管用_股票.getValue());
                 param.put("PS_T01", BussinessDictCodeList.交易方向_买入.getValue());
                 param.put("PS_T02", BussinessDictCodeList.交易方向_卖出.getValue());
-                param.put("PS_T03", BussinessDictCodeList.交易方向_行权回售.getValue());
-                param.put("PS_T05", BussinessDictCodeList.交易方向_申购确认.getValue());
-                param.put("PS_T19", BussinessDictCodeList.交易方向_赎回确认.getValue());
-                param.put("PS_T46", DictCodeListExt2.交易方向_配股.getValue());
-                param.put("PS_T48", DictCodeListExt2.交易方向_新股中签.getValue());
-                param.put("PS_T49", DictCodeListExt3.交易方向_债转股.getValue());
-                param.put("PS_T97", DictCodeListExt3.交易方向_配债.getValue());
-                param.put("PS_T04", DictCodeList.交易方向_申购.getValue());
                 param.put("TRADE_PLACE_03", BussinessDictCodeList.交易场所_深圳证券交易所.getValue());
                 param.put("TRADE_PLACE_04", BussinessDictCodeList.交易场所_上海证券交易所.getValue());
+                param.put("CUSTOM_ASSET_TYPE_FOUR_013", DictCodeListExt3.行内资产四级分类_可转债.getValue()); // 可转债
                 param.put("search_isNumberFlag", CommonUtil.isNumeric(dto.getSearch()));
                 if (StringUtil.isNotEmpty((String) param.get("finprodMarketIds"))) {
                     param.put("finprodMarketIds", StringUtil.splitToList(GlobalConstant.COMMA, param.get("finprodMarketIds").toString()));
@@ -435,8 +426,8 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
                 if (dto != null) {
                     // 1.持仓成本（元）
                     r.setPositionsAmt(dto.getBuyCostAmt());
-                    // 2.持仓成本价（元） 取单位成本
-                    //r.setUnitCost(dto.getUnitCost());
+                    // 2.持仓成本单位价（元） 取单位成本
+                    r.setPositionUnitCost(dto.getUnitCost());
                 }
                 // 最新净价*组合持仓.数量 - 持仓成本 as 浮动盈亏
                 BigDecimal floatFd = ArithmeticUtil.multiply(r.getPrice(), r.getPositionsNum());

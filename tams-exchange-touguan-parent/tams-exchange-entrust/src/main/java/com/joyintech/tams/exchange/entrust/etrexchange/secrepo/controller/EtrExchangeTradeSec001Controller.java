@@ -1174,28 +1174,6 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 		return etrExchangeTradeSecRepo001Service.selectWflEtrPortfolioList(dto);
 	}
 
-	/**
-	 *
-	 * 通过金融产品代码查询dto
-	 * <功能详细描述>
-	 * @param finprodId
-	 * @return
-	 * @throws Exception
-	 * @see
-	 * @since 1.0
-	 */
-	@ResponseBody
-	@PostMapping("selectByFinprodId")
-	public Message<FinStockInfoDto> selectByFinprodId(@RequestParam(value = "finprodId") String finprodId){
-		try{
-			FinStockInfoDto dto=etrExchangeTradeSecRepo001Service.selectByFinprodId(finprodId);
-			return new Message<FinStockInfoDto>().success().setData(dto);
-		}catch (Exception e){
-			return new Message<FinStockInfoDto>().fail().setData(null);
-		}
-	}
-
-
 	@ApiOperation(value = "获取服务器时间", notes = "获取服务器时间")
 	@ResponseBody
 	@RequestMapping(value = "queryLocalTime", method = RequestMethod.POST)

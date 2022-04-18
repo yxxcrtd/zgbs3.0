@@ -25,6 +25,7 @@ import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.SelectOptionRe
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.*;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.service.EtrExchangeTradeSecRepo002Service;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constant.TempConstant;
 import com.joyintech.tams.invest.entrust.etrexchangetrade.dto.EtrExchangeTrade002Dto;
 import io.swagger.annotations.Api;
@@ -74,6 +75,7 @@ public class EtrExchangeTradeSecRepo002Controller extends BaseController{
         setTradePlaceSelectOptions(initPageParams);
         setFinprodTypeTgSelectOptions(initPageParams);
         setPsSelectOptions(initPageParams);
+        setAssetTypeSelectOptions(initPageParams);
         EtrExchangeTrade002Dto exchangeTradeDto002 = new EtrExchangeTrade002Dto();
         initPageParams.put("entity",exchangeTradeDto002);
         initPageParams.put("FINPROD_TYPE_TG_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
@@ -153,20 +155,48 @@ public class EtrExchangeTradeSecRepo002Controller extends BaseController{
         }).collect(Collectors.toList());
         selectDto.setOptions(ps);
         initPageParams.put("PS", selectDto);
-        List<SelectOptionDto> ps_sec = selectDto.getOptions().stream().filter(option -> {
-            return  StringUtil.equals(option.getId(), DictCodeList.交易方向_买入.getValue())
-                    || StringUtil.equals(option.getId(), DictCodeList.交易方向_卖出.getValue());
-        }).collect(Collectors.toList());
-        selectDto.setOptions(ps_sec);
-        initPageParams.put("PS_SEC", selectDto);
-        List<SelectOptionDto> ps_repo = selectDto.getOptions().stream().filter(option -> {
-            return  StringUtil.equals(option.getId(), DictCodeListExt3.交易方向_正回购.getValue())
-                    || StringUtil.equals(option.getId(), DictCodeListExt3.交易方向_逆回购.getValue());
-        }).collect(Collectors.toList());
-        selectDto.setOptions(ps_repo);
-        initPageParams.put("PS_REPO", selectDto);
+//        List<SelectOptionDto> ps_sec = selectDto.getOptions().stream().filter(option -> {
+//            return  StringUtil.equals(option.getId(), DictCodeList.交易方向_买入.getValue())
+//                    || StringUtil.equals(option.getId(), DictCodeList.交易方向_卖出.getValue());
+//        }).collect(Collectors.toList());
+//        selectDto.setOptions(ps_sec);
+//        initPageParams.put("PS_SEC", selectDto);
+//        List<SelectOptionDto> ps_repo = selectDto.getOptions().stream().filter(option -> {
+//            return  StringUtil.equals(option.getId(), DictCodeListExt3.交易方向_正回购.getValue())
+//                    || StringUtil.equals(option.getId(), DictCodeListExt3.交易方向_逆回购.getValue());
+//        }).collect(Collectors.toList());
+//        selectDto.setOptions(ps_repo);
+//        initPageParams.put("PS_REPO", selectDto);
     }
-    
+
+    /**
+     *
+     * @param initPageParams
+     */
+    private void setAssetTypeSelectOptions(Map<String, Object> initPageParams) {
+        SelectDto selectDto = this.getSelectDataFromDataDic(DictCode.资产三级分类, null);
+        List<SelectOptionDto> assetType = selectDto.getOptions().stream().filter(option -> {
+            return StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_本行发行的同业存单.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_他行发行的同业存单.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_国债.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_地方政府债.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_央票.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_政策性金融债.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_政府支持机构债券.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_商业性金融债.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_企业债券.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_公司债券.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_企业债务融资工具.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_资产支持证券.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_外国债券.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_理财直接融资工具.getValue());
+        }).collect(Collectors.toList());
+        selectDto.setOptions(assetType);
+        initPageParams.put("ASSET_TYPE", selectDto);
+
+    }
+
+
     /**
      * 查询持仓
      * @return

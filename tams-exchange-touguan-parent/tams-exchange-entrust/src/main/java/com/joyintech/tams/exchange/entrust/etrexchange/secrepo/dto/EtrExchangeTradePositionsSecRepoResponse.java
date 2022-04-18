@@ -74,7 +74,7 @@ public class EtrExchangeTradePositionsSecRepoResponse {
     private String businessModel;
 
 
-    
+
     @ApiModelProperty(name="positionsNum",value="持仓数量",example="12")
     private BigDecimal positionsNum;
 
@@ -349,5 +349,31 @@ public class EtrExchangeTradePositionsSecRepoResponse {
 
     public void setBusinessModel(String businessModel) {
         this.businessModel = businessModel;
+    }
+
+    private String assetType;
+
+    public String getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
+    }
+
+    public  String getAssetTypeStr(){
+        return SysDataUtil.getNameFromDataDict(DictCode.资产三级分类, this.getAssetType());
+    }
+
+
+    @ApiModelProperty(name="positionUnitCost",value="持仓成本单位",example="12")
+    private BigDecimal positionUnitCost;
+
+    public BigDecimal getPositionUnitCost() {
+        return positionUnitCost;
+    }
+
+    public void setPositionUnitCost(BigDecimal positionUnitCost) {
+        this.positionUnitCost = positionUnitCost;
     }
 }

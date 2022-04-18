@@ -125,7 +125,7 @@ import static com.joyintech.tams.invest.common.asset.service.BondAssetCalcServic
 public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrExchangeTradeSaveSecRepoRequest>
         implements BaseProcessService<EtrExchangeTradeSaveSecRepoRequest> {
 
-    public static String queryIntegratedTick = "/joyin/场内现券指令";
+    public static String queryIntegratedTick = "/joyin/quote/tick";
     /**
      * 指令共通Service
      */
@@ -2323,24 +2323,6 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
 
-    /**
-     * 根据金融产品代码查询dto
-     * <功能详细描述>
-     *
-     * @param finprodId
-     * @return
-     * @see
-     * @since 1.0
-     */
-    public FinStockInfoDto selectByFinprodId(String finprodId) {
-        Map<String, Object> param = new HashMap<String, Object>();
-        if (iPlatformDate != null) {
-            param.put("sysDate", iPlatformDate.getSysDateStr());
-        }
-        param.put("finprodId", finprodId);
-        param.put("FINPROD_TYPE_TG_F10", DictCodeListExt1.金融产品类型_投管用_股票.getValue());
-        return etrExchangeTradeSecRepoMapper.selectByFinprodId(param);
-    }
 
 
     /**
