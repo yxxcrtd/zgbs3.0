@@ -59,84 +59,63 @@ import java.util.Map;
 @PageId("TrdDepositValuationTrade001")
 @RequestMapping("/valuation/trademanage/trddepositvaluationtrade/TrdDepositValuationTrade001")
 public class TrdDepositValuationTrade001Controller extends BaseController {
-    
-        /*
-         * 注入service
-         */
+
     @Autowired
     private TrdDepositValuationTrade001Service trdDepositValuationTrade001Service;
 
     @Autowired
-    private TrdDepositValuationTrade002Service trdDepositValuationTrade002Service;
-
-    @Autowired
     private CommonBusinessService commonBusinessService;
 
-
+    /**
+     * 初始化方法
+     * {@inheritDoc}
+     */
+    @Override
+    public String init(Model model) {
+        this.setSelectOptionToModel(model, DictCode.交易方向,DictCode.生成方式);
+        return super.init(model);
+    }
 
     /**
-     * 流程组件
+     * 产品代码下拉框
+     *
+     * @return 产品代码
+     * @see
+     * @since 1.0
      */
-    @Autowired
-    private MstWorkflowCommonService mstWorkflowCommonService;
+    @ResponseBody
+    @RequestMapping("/getFinprodId")
+    public List<SelectOptionDto> getFinprodId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("finprodType",DictCodeListExt1.金融产品类型_理财产品.getValue());
+        return commonBusinessService.getProdName(param);
+    }
 
-        /**
-         * 初始化方法
-         * {@inheritDoc}
-         */
-        @Override
-        public String init(Model model) {
-            this.setSelectOptionToModel(model, DictCode.交易方向, DictCode.交易流程状态, DictCode.存款类资产类型
-            		, DictCode.行内资产二级分类, DictCode.行内资产三级分类, DictCode.行内资产四级分类, DictCode.行内资产五级分类);//新增资产二、三、四级分类 王贵奇 2019/08/01
-            model.addAttribute("TRADE_STATUS", DictCodeListExt1.交易流程状态_有效.getValue());
-            
-            model.addAttribute("isShowType", CacheUtil.getSysParam("IS_SHOW_TYPE")==null?"01": CacheUtil.getSysParam("IS_SHOW_TYPE"));
-            
-            return super.init(model);
-        }
-
+    /**
+     * 资产代码下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getAssetId")
+    public List<SelectOptionDto> getAssetId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("assetType",DictCodeListExt1.金融产品类型_存款.getValue());  //存款类资产
+        return commonBusinessService.getAssetId(param);
+    }
 
     /**
      * @Description:页面查询，表格分页
      * @return:
      */
-
     @RequestMapping("findPage")
     @ResponseBody
-    public Page<TrdDepositValuationTrade001Dto> findPage()
-            throws Exception {
-                Page<TrdDepositValuationTrade001Dto> page = trdDepositValuationTrade001Service.findPage(
-                RequestUtil.getParameters(getRequest()));
-                return page;
-    }
-
-
-
-    /**
-     * 导出数据
-     */
-    @RequestMapping(ACTION_EXPORT)
-    public ResponseEntity<byte[]> export()
-            throws ParseException, IOException {
-
-        String datas = this.getParam("datas");
-        Map<String, Object> params = RequestUtil.getPageParam();
-        List<TrdDepositValuationTrade001Dto> listdto;
-        if (datas != null) {
-            listdto = JsonUtils.json2List(datas, TrdDepositValuationTrade001Dto.class);
-        } else {
-            listdto = trdDepositValuationTrade001Service.queryPageList(params);
-        }
-        File outFile = trdDepositValuationTrade001Service.makeFile(
-                "/com/joyintech/tams/valuation/trademanage/trddepositvaluationtrade/conf/export_conf.xml",
-                listdto);
-        return ExportUtil.export(
-                this.getMessage(this.getPageId()) + SystemGlobalConstant.OPEN_PARENTHESIS
-                        + DateUtil.format(new Date())
-                        + SystemGlobalConstant.CLOSE_PARENTHESIS
-                        + SystemGlobalConstant.POINT
-                        + FileNameUtil.getFileExtName(outFile),
-                outFile, true);
+    public Page<TrdDepositValuationTrade001Dto> findPage() throws Exception {
+        Page<TrdDepositValuationTrade001Dto> page =
+                trdDepositValuationTrade001Service.findPage(RequestUtil.getParameters(getRequest()));
+        return page;
     }
 
     /**
@@ -203,8 +182,8 @@ public class TrdDepositValuationTrade001Controller extends BaseController {
         params.setElementId(dto.getElementId());
 
         // 设置流程业务说明, entity即传入的dto
-        params.setComment(entity -> WorkFlowUtil.concatComment("存款类资产查询删除：", entity.getTradeId(),
-                DateUtil.format(entity.getTradeDate(),DateUtil.DEFAULT_DATETIME_FORMAT)
+        params.setComment(entity -> WorkFlowUtil.concatComment("存款类资产交易删除：交易编号:", entity.getTradeId(),
+                "交易日期:",DateUtil.format(entity.getTradeDate())
         ));
 
         // 塞入流程参数
@@ -223,35 +202,17 @@ public class TrdDepositValuationTrade001Controller extends BaseController {
         return new AjaxResult(msg);
     }
 
-
     /**
-     * 产品代码下拉框
-     *
-     * @return 产品代码
+     * 导出
+     * @return
+     * @throws Exception
      * @see
      * @since 1.0
      */
-    @ResponseBody
-    @RequestMapping("/getFinprodId")
-    public List<SelectOptionDto> getFinprodId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("finprodType","F16");
-        return commonBusinessService.getProdName(param);
-    }
-
-    /**
-     * 资产代码下拉框
-     *
-     * @return 资产代码
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("/getAssetId")
-    public List<SelectOptionDto> getAssetId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("assetType","F07");  //存款类资产
-        return commonBusinessService.getAssetId(param);
+    @RequestMapping(ACTION_EXPORT)
+    public ResponseEntity<byte[]> export(){
+        Map<String, Object> param = RequestUtil.getParameters(getRequest());
+        return trdDepositValuationTrade001Service.export(this.getPageId(),param);
     }
 
 }

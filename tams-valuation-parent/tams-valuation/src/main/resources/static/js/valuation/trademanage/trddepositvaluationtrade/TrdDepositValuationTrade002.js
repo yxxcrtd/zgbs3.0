@@ -7,36 +7,30 @@
         return $.serializeToObject('#informationForm');
     }
 
-
     /**
      * 产品代码联动带出产品名称，证券账户
      */
-
-    $('#portfolioId').change(function(){
-        var portfolioId = $('#portfolioId').val();
-        if(portfolioId){
-            $('#portfolioName').val($('#portfolioId').select2('data')[0].id).trigger('change');
+    $('#prodId').change(function(){
+        var prodId = $('#prodId').val();
+        if(prodId){
+            $('#prodName').val($('#prodId').select2('data')[0].id).trigger('change');
 
         }else {
-            $('#portfolioName').val('').trigger('change');
+            $('#prodName').val('').trigger('change');
         }
     });
 
     /**
      * 资产代码联动带出资产简称，交易场所
      */
-
-    $('#finprodMarketId').change(function(){
-        var finprodMarketId = $('#finprodMarketId').val();
-        if(finprodMarketId){
-            $('#finprodName').val($('#finprodMarketId').select2('data')[0].id).trigger('change');
-
+    $('#assetId').change(function(){
+        var assetId = $('#assetId').val();
+        if(assetId){
+            $('#assetName').val($('#assetId').select2('data')[0].id).trigger('change');
         }else {
-            $('#finprodName').val('').trigger('change');
+            $('#assetName').val('').trigger('change');
         }
     });
-
-
 
     /**
      * 保存或提交

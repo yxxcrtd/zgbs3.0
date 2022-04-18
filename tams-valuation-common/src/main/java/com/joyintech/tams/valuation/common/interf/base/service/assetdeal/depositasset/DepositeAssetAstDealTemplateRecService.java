@@ -19,6 +19,7 @@ import java.util.Map;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt1;
 
+import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValMngBuyTrade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -234,8 +235,12 @@ public class DepositeAssetAstDealTemplateRecService {
             	listValBokDetailId.addAll(bokDetailIdlist);
             }
             **/
-            Map<String, Object> map = interfCommonService.instructionGenerate(valFinProductDeal, 
-            		dto.getProdId(), finprodType,null);
+            /*modify by sunshuaishuai 20220415 交易管理：录入界面的资金账户 start*/
+            //结算指令
+            StlOrders stlOrders = this.getStlOrders(dto,valFinProductDeal);
+            Map<String, Object> map = interfCommonService.instructionGenerate_Interf(valFinProductDeal,stlOrders,
+                    dto.getProdId(), dealAccounting.getAcctSubjectType(),null);
+            /*modify by sunshuaishuai 20220415 交易管理：录入界面的资金账户 end*/
             if(map.get("ORDERS")!=null){
             	listValOrders.addAll((List<StlOrders>)map.get("ORDERS"));
             }
@@ -553,8 +558,15 @@ public class DepositeAssetAstDealTemplateRecService {
         /**modify by wujie on 20181115 end remark:投资组合投资时应赋值[表.投资组合代码]字段**/
         // 是否有结算指令 = A.有无清算指令
 //        valFinProductDealExt.setHasOrder(dto.getIsClean());
+        /*modify by sunshuaishuai 20220414 判断生成方式是接口接入还是画面录入 start*/
         //生成方式
-        valFinProductDealExt.setGenType(com.joyintech.tams.constant.DictCodeListExt1.生成方式_接口接入.getValue());
+        if(StringUtil.isNotEmpty(dto.getDataSource())){
+            valFinProductDealExt.setGenType(dto.getDataSource());
+        }else {
+            valFinProductDealExt.setGenType(com.joyintech.tams.constant.DictCodeListExt1.生成方式_接口接入.getValue());
+        }
+        /*modify by sunshuaishuai 20220414 判断生成方式是接口接入还是画面录入 end*/
+
         // 创建时间 = 系统时间
         valFinProductDealExt.setCreateTime(dto.getCreateTime());
         return valFinProductDealExt;
@@ -584,5 +596,26 @@ public class DepositeAssetAstDealTemplateRecService {
         valTradeFeeDetail.setCreateTime(dto.getCreateTime());
         return valTradeFeeDetail;
     }
+
+    /*add by sunshuaishuai 20220415 交易管理：录入界面的资金账户 start*/
+    /**
+     * 接收 结算指令信息
+     * @param dto
+     * @return
+     */
+    private StlOrders getStlOrders(ValBotAstTrade dto, TrdProductDeal valFinProductDeal){
+        StlOrders result = new StlOrders();
+        //modify by yanya on 20210204 判定为空包含空字符
+        //if(dto.getMyAcctNo() == null && dto.getCounterAcctNo() == null){
+        if(StringUtil.isEmpty(dto.getMyAcctNo()) ){
+            return null;
+        }
+        result.setMyAcctNo(dto.getMyAcctNo());
+        //result.setCounterAcctNo(dto.getCounterAcctNo());
+        result.setSettleDate(valFinProductDeal.getSettleDate());
+        result.setSettleAmt(valFinProductDeal.getTradeAmt());
+        return result;
+    }
+    /*add by sunshuaishuai 20220415 交易管理：录入界面的资金账户 end*/
 
 }
