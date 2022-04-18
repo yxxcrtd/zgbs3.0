@@ -145,18 +145,6 @@ public class CommonCheckChain extends AbstractChain<CheckChainBean> {
             checkRsp.put("targetType", "目标类型取值不合法:" + instruction.getTargetType());
         }
 
-        if (StringUtils.isBlank(instruction.getIsNoGuard())) {
-            checkRsp.put("isNoGuard", "是否非担保不能为空");
-        } else if (null == DictCodeListExt1.from(DictCode.是否, instruction.getIsNoGuard())) {
-            checkRsp.put("isNoGuard", "是否非担保取值不合法:" + instruction.getIsNoGuard());
-        }
-
-        if (StringUtils.isBlank(instruction.getIsNetPrice())) {
-            checkRsp.put("isNetPrice", "是否净价交易不能为空");
-        } else if (null == DictCodeListExt1.from(DictCode.是否, instruction.getIsNetPrice())) {
-            checkRsp.put("isNetPrice", "是否净价交易取值不合法:" + instruction.getIsNetPrice());
-        }
-
         if (CollectionUtils.isEmpty(chainBean.getDetailList())) {
             checkRsp.put("instructionDetail", "指令组合明细不能为空");
         }
