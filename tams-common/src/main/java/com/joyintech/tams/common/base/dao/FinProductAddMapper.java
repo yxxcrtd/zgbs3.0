@@ -18,4 +18,6 @@ public interface FinProductAddMapper {
     int updateByPrimaryKeySelective(FinProductAdd record);
 
     int updateByPrimaryKey(FinProductAdd record);
+
+    int updateForTenderBound(FinProductAdd record);
 }

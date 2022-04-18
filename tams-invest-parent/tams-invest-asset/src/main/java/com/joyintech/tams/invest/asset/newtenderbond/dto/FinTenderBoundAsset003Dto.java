@@ -104,6 +104,12 @@ public class FinTenderBoundAsset003Dto extends BaseEntity implements ProcessEnti
     private Date listingDate;
 
     /**
+     * 备注
+     */
+    @ApiModelProperty(name = "remark", value = "备注")
+    private String remark;
+
+    /**
      * 操作类型：NEW,MODIFY,DELETE,REVOKE
      */
     @ApiModelProperty(name="operateType",value="操作类型：NEW,MODIFY,DELETE,REVOKE")
@@ -267,6 +273,14 @@ public class FinTenderBoundAsset003Dto extends BaseEntity implements ProcessEnti
 
     public void setIssueStatus(String issueStatus) {
         this.issueStatus = issueStatus;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 
     /**

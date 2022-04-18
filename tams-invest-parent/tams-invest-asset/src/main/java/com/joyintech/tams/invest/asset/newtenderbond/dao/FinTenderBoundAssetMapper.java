@@ -95,4 +95,12 @@ public interface FinTenderBoundAssetMapper {
      * @return
      */
     List<String> getBusinessData(WflValidInputParameter wflValidInputParameter);
+
+    /**
+     * 根据金融产品代码
+     *
+     * @param finprodId
+     * @return
+     */
+    List<String> selectTotleTradeId(@Param("finprodId")String finprodId);
 }

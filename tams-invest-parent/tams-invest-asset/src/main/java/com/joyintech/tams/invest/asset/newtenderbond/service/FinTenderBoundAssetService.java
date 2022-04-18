@@ -85,7 +85,7 @@ public class FinTenderBoundAssetService extends CommonExportService<FinTenderBou
             this.update(dto);
         }
         //记录操作日志
-        this.saveOperate(dto, type);
+        this.saveOperate(dto.getFinprodId(),dto.getRemark(), type);
     }
 
     /**
@@ -143,7 +143,7 @@ public class FinTenderBoundAssetService extends CommonExportService<FinTenderBou
      */
     public FinTenderBoundAsset002Dto addCoupons(String finprodMarketId) {
         Map<String, String> param = new HashMap<>();
-        param.put("assestType", DictCodeListExt2.平安资产类型_一级市场债.getValue());
+        param.put("finprodType2", DictCodeListExt2.平安资产类型_一级市场债.getValue());
         param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
         param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
         param.put("finprodMarketId", finprodMarketId);
@@ -221,20 +221,23 @@ public class FinTenderBoundAssetService extends CommonExportService<FinTenderBou
     /**
      * 保存操作类型
      *
-     * @param dto
+     * @param tradeId
+     * @param remark
      * @param type
      */
-    public void saveOperate(FinTenderBoundAsset002Dto dto, OperationType type) {
+    public void saveOperate(String tradeId,String remark, OperationType type) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
-        oprHisReq.setEntrustId(dto.getFinprodId());
+        oprHisReq.setEntrustId(tradeId);
         if (StringUtil.equals(type.name(), OperationType.NEW.name())) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_新建.getValue());
         } else if (StringUtil.equals(type.name(), OperationType.MODIFY.name())) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_修改.getValue());
-        } else {
+        } else if(StringUtil.equals(type.name(), OperationType.REVOKE.name())){
+            oprHisReq.setOperType(DictCodeListExt3.操作类型_撤回.getValue());
+        }else {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_关闭.getValue());
         }
-        oprHisReq.setBusiDes(dto.getRemark());
+        oprHisReq.setBusiDes(remark);
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
 
@@ -245,7 +248,7 @@ public class FinTenderBoundAssetService extends CommonExportService<FinTenderBou
      * @return
      */
     public Page<SelectOptionDto> getFinprodIdForSelect(Map<String, Object> param) {
-        param.put("assestType", DictCodeListExt2.平安资产类型_一级市场债.getValue());
+        param.put("finprodType2", DictCodeListExt2.平安资产类型_一级市场债.getValue());
         param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
         param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
         param.put("platDate", DateUtil.platDateFromCache());
@@ -261,7 +264,7 @@ public class FinTenderBoundAssetService extends CommonExportService<FinTenderBou
      * @return
      */
     public Page<SelectOptionDto> getAppearMarketIdForSelect(Map<String, Object> param) {
-        param.put("assestType", DictCodeListExt2.平安资产类型_一级市场债.getValue());
+        param.put("finprodType2", DictCodeListExt2.平安资产类型_一级市场债.getValue());
         param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
         param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
         param.put("platDate", DateUtil.platDateFromCache());

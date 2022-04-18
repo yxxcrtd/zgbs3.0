@@ -833,4 +833,13 @@
         </set>
         where P_FINPROD_ID = #{pFinprodId,jdbcType=VARCHAR}
     </update>
+
+    <update id="updateForTenderBound" parameterType="com.joyintech.tams.common.base.entity.FinProduct">
+        update FIN_PRODUCT
+        set CIRCULATION_CODE = #{circulationCode,jdbcType=VARCHAR},
+            CIRCULATION_DATE = #{circulationDate,jdbcType=DATE},
+            UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+            UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+        where FINPROD_ID=#{finprodId,jdbcType=VARCHAR}
+    </update>
 </mapper>

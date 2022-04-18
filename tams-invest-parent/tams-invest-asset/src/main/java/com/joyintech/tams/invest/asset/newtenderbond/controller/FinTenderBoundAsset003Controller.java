@@ -34,7 +34,7 @@ public class FinTenderBoundAsset003Controller extends BaseController {
 
     @ResponseBody
     @PostMapping("/check")
-    @ApiOperation(value = "上市流通/撤销提交时校验", notes = "上市流通/撤销提交时校验")
+    @ApiOperation(value = "上市流通/撤销校验", notes = "上市流通/撤销校验")
     public Message check(@RequestBody FinTenderBoundAsset003Dto dto) {
         List<ValidMessage> validMessageList = finTenderBoundAsset003Service.valid(dto);
         if (CollectionUtils.isNotEmpty(validMessageList)) {
@@ -46,7 +46,7 @@ public class FinTenderBoundAsset003Controller extends BaseController {
 
     @ResponseBody
     @PostMapping("/save")
-    @ApiOperation(value = "新债标的新建/修改/删除", notes = "新债标的新建/修改/删除")
+    @ApiOperation(value = "上市流通/撤销", notes = "上市流通/撤销")
     public Message<AjaxResult> save(@RequestBody FinTenderBoundAsset003Dto dto) {
         ProcessParameter<FinTenderBoundAsset003Dto> processParameter = new ProcessParameter<>();
         WorkFlowParameter<FinTenderBoundAsset003Dto> params = new WorkFlowParameter<>();
