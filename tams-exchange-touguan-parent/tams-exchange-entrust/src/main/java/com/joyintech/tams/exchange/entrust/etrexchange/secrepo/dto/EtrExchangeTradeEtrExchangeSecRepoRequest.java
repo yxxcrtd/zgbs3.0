@@ -27,9 +27,6 @@ import java.util.List;
 @ApiModel(value="指令列表查询请求参数",description="指令列表查询请求参数")
 public class EtrExchangeTradeEtrExchangeSecRepoRequest {
 
-    @ApiModelProperty(name="tradePlat",value="交易平台",example="A1")
-    private String tradePlat;
-
     @ApiModelProperty(name="entrustId",value="指令代码",example="A1")
     private String entrustId;
 
@@ -180,14 +177,6 @@ public class EtrExchangeTradeEtrExchangeSecRepoRequest {
 
     public void setSearch(String search) {
         this.search = search;
-    }
-
-    public String getTradePlat() {
-        return tradePlat;
-    }
-
-    public void setTradePlat(String tradePlat) {
-        this.tradePlat = tradePlat;
     }
 
     public String getFinprodMarketId() {

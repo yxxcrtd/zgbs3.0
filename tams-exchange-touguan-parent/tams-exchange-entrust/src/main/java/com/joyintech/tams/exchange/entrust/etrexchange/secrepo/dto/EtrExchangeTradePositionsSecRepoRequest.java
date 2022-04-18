@@ -55,13 +55,8 @@ public class EtrExchangeTradePositionsSecRepoRequest {
     @ApiModelProperty(name="finprodName",value="资产名称",example="A1")
     private String finprodName;
 
-    @ApiModelProperty(name="finprodType2",value="资产类型",example="A1")
-    private String finprodType2;
-
     @ApiModelProperty(name="finprodMarketIds",value="多个市场代码",example="A,B")
     private String finprodMarketIds;
-    @ApiModelProperty(name="tradePlat",value="交易平台",example="A")
-    private String tradePlat;
 
     @ApiModelProperty(name="从pageMode获取",value="从pageMode获取")
     public String getSort() {
@@ -128,14 +123,6 @@ public class EtrExchangeTradePositionsSecRepoRequest {
         this.search = search;
     }
 
-    public String getFinprodType2() {
-        return finprodType2;
-    }
-
-    public void setFinprodType2(String finprodType2) {
-        this.finprodType2 = finprodType2;
-    }
-
     public String getFinprodName() {
         return finprodName;
     }
@@ -160,11 +147,4 @@ public class EtrExchangeTradePositionsSecRepoRequest {
         this.finprodMarketIds = finprodMarketIds;
     }
 
-    public String getTradePlat() {
-        return tradePlat;
-    }
-
-    public void setTradePlat(String tradePlat) {
-        this.tradePlat = tradePlat;
-    }
 }

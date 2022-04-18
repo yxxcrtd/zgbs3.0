@@ -1360,7 +1360,7 @@
         FROM
             fin_product fp
             LEFT JOIN FIN_PRODUCT_ADD fpa ON fp.FINPROD_ID = fpa.FINPROD_ID
-        where  fp.finprod_market_id = #{finprodId}
+        where  fp.finprod_id = #{finprodId}
     </select>
 
 

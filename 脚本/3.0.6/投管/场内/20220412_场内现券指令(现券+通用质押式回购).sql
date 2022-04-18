@@ -62,3 +62,5 @@ insert into sys_wfl_business_module values('etrExchangeTradeSecRepo','etrExchang
 
 delete from SYS_DATADICT_LIST where dict_code = 'COMMON_BUSINESS_TYPE' and item_code = 'ETR54';
 insert into SYS_DATADICT_LIST values ('COMMON_BUSINESS_TYPE','ETR54','场内现券指令','440','0','system','',sysdate, 'system',sysdate);
+delete from SYS_DATADICT_LIST where dict_code = 'COMMON_BUSINESS_TYPE' and item_code = 'ETR55';
+insert into SYS_DATADICT_LIST values ('COMMON_BUSINESS_TYPE','ETR55','场内现券指令','440','0','system','',sysdate, 'system',sysdate);

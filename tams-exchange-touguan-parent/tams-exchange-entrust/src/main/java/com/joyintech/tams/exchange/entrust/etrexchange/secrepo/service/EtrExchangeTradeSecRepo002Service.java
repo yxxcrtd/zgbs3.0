@@ -150,7 +150,6 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
                         //可用数量
                         PositionCashSecDto secDto = new PositionCashSecDto();
                         BeanUtil.copyPropertiesIgnoreNull(secDto, entity);
-                        secDto.setTradePlat(dto.getTradePlat());
                         BigDecimal sellNum = etrTradeCommonervice.selectAvailableNum(secDto);
                         entity.setSellNum(sellNum);
                         //过滤掉实际持仓和可用持仓都等于0
@@ -252,11 +251,6 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
         param.put("sysDate", iPlatformDate.getSysDateStr());
         param.put("PS_03", DictCodeListExt3.交易方向_正回购.getValue());
         param.put("PS_04", DictCodeListExt3.交易方向_逆回购.getValue());
-        param.put("PS_T68", DictCodeListExt3.交易方向_质押券入库.getValue());
-        param.put("PS_T69", DictCodeListExt3.交易方向_质押券出库.getValue());
-        param.put("PS_10", DictCodeListExt3.上农商_指令业务类型_配股指令.getValue());
-        param.put("PS_11", DictCodeListExt3.上农商_指令业务类型_新股申购指令.getValue());
-        param.put("PS_12", DictCodeListExt3.上农商_指令业务类型_配债指令.getValue());
         String portfolioId = (String) param.get("portfolioId");
         if (StringUtil.isNotEmpty(portfolioId)) {
             param.put("portfolioIdList",
@@ -267,14 +261,6 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
         }
         param.put("search_isNumberFlag", BaseMap.isNumeric(request.getSearch()));
         List<String> tradePlatList = new ArrayList<>();
-        if (StringUtil.isNotEmpty(request.getTradePlat())) {
-            if ((DictCodeList.交易平台_大宗交易平台.getValue()).equals(request.getTradePlat())) {
-                tradePlatList.add(request.getTradePlat());
-                tradePlatList.add(DictCodeList.交易平台_综合协议交易平台.getValue());
-            } else {
-                tradePlatList.add(request.getTradePlat());
-            }
-        }
         param.put("tradePlatList", tradePlatList);
         if (StringUtil.isNotEmpty((String) param.get("finprodMarketIds"))) {
             param.put("finprodMarketIds", StringUtil.splitToList(GlobalConstant.COMMA, param.get("finprodMarketIds").toString()));
