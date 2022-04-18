@@ -201,7 +201,7 @@ application:
   leftMenuLogo: /image/logos/left-logo.png #系统图标，框架中会根据分辨率自动适配
   topMenuLogo: /image/logos/top-logo.png #系统图标，框架中会根据分辨率自动适配
   sessionTimeout: 1800000  #超时自动退出
-  joyinsso: false  #统一登录是否开启  需要ssoEnable为true。
+  joyinsso: true  #统一登录是否开启  需要ssoEnable为true。
   interfMaxCorePoolSize: 20  #上游接口解析读取文件处理最大线程数
   maxDataCountOneTimeForInvestholdInfo: 50  #上游接口解析读取文件处理中持有信息批量查询单次最大查询主键数（江苏银行50）
   reportInterfIsNeedOkFile: 1  #上游接口解析读取文件处理中，是否需要.ok传输完成标志文件（1：需要 0：不需要）
@@ -383,10 +383,10 @@ shiro:
     /invest/trade/bond/TrdBondInvestTrade002/secAutoTrade,/invest/trade/trdrepotrade/TrdRepoTrade002/repoAutoTrade,/cstp/match/*,/CfetsQuotedCommon/**,
     /InterfSysTrdConfig/**,/interf/risk/**,/EtrTradeSysInterf/**,/MstCaptialAccount/**,/MstSaleDepartment/**,/TrdBondInvestTrade/**,/AssetDeclarationCodeMaintenance/**,/ptlmanagementinfo/**,/InterfSysPara/**,/MstMarketCalendarInfo/**,
     /TrdExchangeWorkflow/**,/invest/trade/bond/TrdBondInvestTrade002/**,/invest/trade/trdrepotrade/TrdRepoTrade002/**,/invest/trade/forwex/TrdForwexInvestTrade002/**,/invest/trade/api/**,/commonPosition/**,
-    /CfetsRepoDealQuotedPrice001/selectEtrReByQuoteId,/core/getAssetFiveType,/common/trdcommonbase/insertFinProductCashData,/common/entrustcommonbase/finishEntrust,/TrdRepoTrade/selectPreTradeId,/joyin/**,
+    /CfetsRepoDealQuotedPrice001/selectEtrReByQuoteId,/core/getAssetFiveType,/common/trdcommonbase/insertFinProductCashData,/common/entrustcommonbase/finishEntrust,/TrdRepoTrade/selectPreTradeId,/joyin/**,/trade/joyin/**,
     /interf/refreshCache,/interf/execute,/interf/ziguanSysUserInfo,/interf/xp,/interf/xp/**,/interf/zg,/interf/zg/**,/FinProjectTargetAsset/insert,/FinAssetRateAdj/getFinAssetRateAdjByCashId,
-    /cfets/**,/common/workflow/**,/common/config/**,/component/**,/FinProductRating/**,/common/joyinbusinessCommon/**,/core/isInWflProcess,/svreport/interf/file/CreateZHXPFile/createFiledfdd,/trade/joyin/**,/invest/entrust/**,/common/**,/RiskNamBatchValidator/**,/etrexchange/common/etrExchangeTrade001/calcPriceAndYield,/reconInterf/executeReconAll,/settleDownLink/execute,/invest/trade/exchangetransmatch/ExchangeTransMatchCommon/**,
-    /EtrAgreRepTrade/getEntrustInfoByTradeId
+    /cfets/**,/common/workflow/**,/common/config/**,/component/**,/FinProductRating/**,/svreport/interf/file/CreateZHXPFile/createFile,
+    /EtrAgreRepTrade/getEntrustInfoByTradeId,/trade/joyin/**,/EntrustMsgbyMQ/**
 base:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
