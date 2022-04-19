@@ -2,8 +2,7 @@ package com.joyintech.tams.cfets.trdconfirm.dao;
 
 
 
-import com.joyintech.service.bankuplink.common.dto.TrdConfirmRegAndIbuInfoDto;
-import com.joyintech.tams.cfets.etrib.bond.dto.CfetsEtrIbBondinfoDto;
+import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbBondinfoDto;
 import com.joyintech.tams.cfets.trdconfirm.dto.*;
 import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
 import org.apache.ibatis.annotations.Param;

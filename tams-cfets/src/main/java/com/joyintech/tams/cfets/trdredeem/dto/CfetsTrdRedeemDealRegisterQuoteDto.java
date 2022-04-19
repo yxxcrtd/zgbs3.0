@@ -12,11 +12,10 @@ package com.joyintech.tams.cfets.trdredeem.dto;
 
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.util.DateUtil;
-import com.joyintech.tams.cfets.bankuplink.bond.dto.PtlAllocationDto;
+import com.joyintech.tams.cfets.trd.bond.dto.PtlAllocationDto;
 import com.joyintech.tams.common.base.entity.RegFinProductDealTotal;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
-import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 import java.util.Date;

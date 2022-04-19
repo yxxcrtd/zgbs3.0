@@ -17,9 +17,8 @@ import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.json.CustomDateDeserialize;
 import com.joyintech.framework.validation.annotation.NotEmpty;
 import com.joyintech.framework.validation.annotation.Pattern;
-import com.joyintech.framework.validation.annotation.ValidLogic;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
-import com.joyintech.tams.cfets.cfetsmanualsettle.dto.PortIntFenPeiInfoDto;
+import com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.trade.dto.BussTrdAvailableCashQuery;
 import com.joyintech.tams.component.business.trade.dto.TrdInvestPersonInfo002Dto;
@@ -30,7 +29,6 @@ import com.joyintech.tams.invest.common.risk.dto.RiskCreditListCommonDto;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.tams.invest.interf.dto.CreditAmtSelDto;
 import com.joyintech.tams.invest.trade.lend.dto.FinTradeProductDto;
-import com.joyintech.tams.invest.trade.trdrepotrade.validator.TrdRepoTrade002DtoValidator;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
