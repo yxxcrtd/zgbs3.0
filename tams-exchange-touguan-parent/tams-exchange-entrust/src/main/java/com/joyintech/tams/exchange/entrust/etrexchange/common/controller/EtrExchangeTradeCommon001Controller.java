@@ -32,7 +32,6 @@ import com.joyintech.tams.common.base.entity.FinProductQuto;
 import com.joyintech.tams.component.business.bond.BusiFinExercisePlanService;
 import com.joyintech.tams.component.business.common.dto.FinStockInfoDto;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
-import com.joyintech.tams.component.business.trade.dto.BussEtrInvestPersonInfoDto;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.exchange.entrust.common.aop.ExchangeEntrustRdsCommonAop;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dao.EtrExchangeTradeCommonMapper;
@@ -663,9 +662,9 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 	private void setInvAimSelectOption(Map<String, Object> initPageParams) {
 		SelectDto selectDto = this.getSelectDataFromDataDic(DictCode.投资目的, null);
 		List<SelectOptionDto> invAimList = selectDto.getOptions().stream().filter(option -> {
-			return StringUtil.equals(option.getId(), DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue())
-					|| StringUtil.equals(option.getId(), DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue())
-					|| StringUtil.equals(option.getId(), DictCodeListExt1.投资目的_摊余成本类.getValue());
+			return StringUtil.equals(option.getId(), DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue())
+					|| StringUtil.equals(option.getId(), DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue())
+					|| StringUtil.equals(option.getId(), DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue());
 		}).collect(Collectors.toList());
 		selectDto.setOptions(invAimList);
 		initPageParams.put("INV_AIM", selectDto);

@@ -28,7 +28,6 @@ import com.joyintech.calculation.util.BasicUtil;
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.common.base.entity.BokBooksetExt;
 import com.joyintech.tams.common.base.entity.BokStatDetPosiiton;
 import com.joyintech.tams.common.base.entity.BokStatLossPosiiton;
 import com.joyintech.tams.constant.DictCodeList;
@@ -275,7 +274,7 @@ public class DeltRightCalAmortizationProcessorService {
             /** modify by yanya on 20201222 会计场景分支判定需要用到标的资产信息，从下面代码移上来 end**/
             String tableId = DictCodeListTableId.会计场景代码_收益型资产_利息计提.getValue();
             String remark = "摊余成本类计划类(收益型)资产";
-            if (DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(acctEntity.getInvAim())) {
+            if (DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue().equals(acctEntity.getInvAim())) {
             	// 2.1 应计利息类科目余额
                 interestBalance = this.getSubjectBalance(booksetId, bokDetailId, happenDate, bookDate,
                     expBalanceDirect, DictCodeBaseSubjectNatrue.公允价值类类计划类收益型资产_应计利息.getValue(),
@@ -307,7 +306,7 @@ public class DeltRightCalAmortizationProcessorService {
                 }
                 /** modify by yanya on 20201222 增加是否其他债券分支处理逻辑 end**/
             }
-            else if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(acctEntity.getInvAim())) {
+            else if (DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue().equals(acctEntity.getInvAim())) {
             	// 2.1 应计利息类科目余额
                 interestBalance = this.getSubjectBalance(booksetId, bokDetailId, happenDate, bookDate,
                     expBalanceDirect, DictCodeBaseSubjectNatrue.应计利息.getValue(),
@@ -346,7 +345,7 @@ public class DeltRightCalAmortizationProcessorService {
                         acctEntityEx.getTaskPri());
                 /**add by wujie on 20201017 end**/
             }
-            else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(acctEntity.getInvAim())) {
+            else if (DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue().equals(acctEntity.getInvAim())) {
             	// 2.1 应计利息类科目余额
                 interestBalance = this.getSubjectBalance(booksetId, bokDetailId, happenDate, bookDate,
                     expBalanceDirect, DictCodeBaseSubjectNatrue.综合收益类计划类收益型资产_应计利息.getValue(),
@@ -714,7 +713,7 @@ public class DeltRightCalAmortizationProcessorService {
                 //公允价值变动无需处理减值计提
                 // 定义      变量.减值计提 = 0
                 if (!acctEntityEx.getInvAim().equals(
-                        DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue())) {
+                        DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue())) {
                     // if（计提类账务处理结果.减值阶段3数量 >0 && 变量.投资收益！=0）
                     if (acctEntityEx.getNumP3() > 0
                         && dscloss.compareTo(BigDecimal.ZERO) != 0) {
@@ -944,14 +943,14 @@ public class DeltRightCalAmortizationProcessorService {
             	List<ValBokBookdetailBatch> valBokBookdetailBatch = resultNowNow.getValBokBookdetailBatch();
             	List<ValBokBookdetailBatch> valBokBookdetailBatchResult = new ArrayList<ValBokBookdetailBatch>();
 
-            	if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(acctEntity.getInvAim())) {
+            	if (DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue().equals(acctEntity.getInvAim())) {
             		for (ValBokBookdetailBatch dto : valBokBookdetailBatch) {
             			if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrue.摊余成本类资产减值.getValue())) {
             				valBokBookdetailBatchResult.add(dto);
             			}
             		}
             	}
-            	else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(acctEntity.getInvAim())) {
+            	else if (DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue().equals(acctEntity.getInvAim())) {
             		for (ValBokBookdetailBatch dto : valBokBookdetailBatch) {
             			if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrue.其它综合收益_减值.getValue())) {
             				valBokBookdetailBatchResult.add(dto);

@@ -11,7 +11,6 @@ import java.util.LinkedHashMap;
 
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.export.paginator.domain.ITableRow;
-import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import org.slf4j.Logger;
@@ -192,12 +191,12 @@ public class PtlMockTestImportService extends BaseService<ITableRow> {
             if (StringUtil.equals(DictCodeList.平安资产类型_债券.getCodeName(), rowData.get(3))) {
                 this.checkIsBlank(rowData.get(6), "投资目的", messageList);
                 // 投资目的
-                if(StringUtil.isNotBlank(rowData.get(6))&&!StringUtil.equals(DictCodeListExt1.投资目的_公允价值变动计入当期损益.getCodeName(),rowData.get(6))
-                        &&!StringUtil.equals(DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getCodeName(),rowData.get(6))
-                        &&!StringUtil.equals(DictCodeListExt1.投资目的_摊余成本类.getCodeName(),rowData.get(6))){
-                    messageList.add("投资目的只能输入"+DictCodeListExt1.投资目的_公允价值变动计入当期损益.getCodeName()
-                            +","+DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getCodeName()
-                            +","+DictCodeListExt1.投资目的_摊余成本类.getCodeName()+"!");
+                if(StringUtil.isNotBlank(rowData.get(6))&&!StringUtil.equals(DictCodeListExt1.投资目的_以出售该金融资产为目的.getCodeName(),rowData.get(6))
+                        &&!StringUtil.equals(DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getCodeName(),rowData.get(6))
+                        &&!StringUtil.equals(DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getCodeName(),rowData.get(6))){
+                    messageList.add("投资目的只能输入"+DictCodeListExt1.投资目的_以出售该金融资产为目的.getCodeName()
+                            +","+DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getCodeName()
+                            +","+DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getCodeName()+"!");
                 };
             }
             // 交易数量不能为空

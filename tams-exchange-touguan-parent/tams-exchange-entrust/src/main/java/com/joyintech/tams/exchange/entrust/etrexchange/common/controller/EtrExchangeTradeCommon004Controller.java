@@ -23,7 +23,6 @@ import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.component.business.bond.BusiFinExercisePlanService;
-import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.exchange.entrust.common.aop.ExchangeEntrustRdsCommonAop;
@@ -294,7 +293,7 @@ public class EtrExchangeTradeCommon004Controller extends BaseController {
     private void setInvAimSelectOption(Model model) {
         SelectDto selectDto = this.getSelectDataFromDataDic(DictCode.投资目的, null);
         List<SelectOptionDto> invAimList = selectDto.getOptions().stream().filter(option -> {
-            return StringUtil.equals(option.getId(), DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue()) || StringUtil.equals(option.getId(), DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue()) || StringUtil.equals(option.getId(), DictCodeListExt1.投资目的_摊余成本类.getValue());
+            return StringUtil.equals(option.getId(), DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue()) || StringUtil.equals(option.getId(), DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue()) || StringUtil.equals(option.getId(), DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue());
         }).collect(Collectors.toList());
         selectDto.setOptions(invAimList);
         model.addAttribute("INV_AIM", JsonUtils.objectArray2Json(invAimList.toArray()));

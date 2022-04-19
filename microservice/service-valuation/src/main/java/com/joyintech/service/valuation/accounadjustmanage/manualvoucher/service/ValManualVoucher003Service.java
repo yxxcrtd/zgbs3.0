@@ -703,13 +703,13 @@ public class ValManualVoucher003Service extends CommonExportService<ValManualVou
         	invAim = dto.getInvAim();
             for (ValManualVoucher003AddDto item : dto.getListAddDto()) {
                 if (ac_kmcx.contains(item.getBaseSubjectNature())) {
-                    invAim = DictCodeListExt1.投资目的_摊余成本类.getValue();
+                    invAim = DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue();
                 }
                 else if (fvtpl_kmcx.contains(item.getBaseSubjectNature())) {
-                    invAim = DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue();
+                    invAim = DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue();
                 }
                 else if (fvoci_kmcx.contains(item.getBaseSubjectNature())) {
-                    invAim = DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue();
+                    invAim = DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue();
                 }
                 else{
                 	invAim = dto.getInvAim();
@@ -1660,13 +1660,13 @@ public class ValManualVoucher003Service extends CommonExportService<ValManualVou
             invAim = dto.getInvAim();
             for (ValManualVoucher003AddDto item : dto.getListAddDto()) {
                 if (ac_kmcx.contains(item.getBaseSubjectNature())) {
-                    invAim = DictCodeListExt1.投资目的_摊余成本类.getValue();
+                    invAim = DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue();
                 }
                 else if (fvtpl_kmcx.contains(item.getBaseSubjectNature())) {
-                    invAim = DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue();
+                    invAim = DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue();
                 }
                 else if (fvoci_kmcx.contains(item.getBaseSubjectNature())) {
-                    invAim = DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue();
+                    invAim = DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue();
                 }
                 else{
                     invAim = dto.getInvAim();

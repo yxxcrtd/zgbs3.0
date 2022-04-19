@@ -190,8 +190,8 @@ public class TrdBondInvestTradeDtoValidator implements TradeCommonValidator {
         if(DictCodeListExt1.是否_是.getValue().equals(CacheUtil.getSysParam("IS_NEED_SPPI_CHECK"))){
             //投资目的
             if(StringUtil.isNotEmpty(inputDto.getInvAim())) {
-                if(StringUtil.equals(inputDto.getInvAim(), DictCodeListExt1.投资目的_摊余成本类.getValue())
-                        || StringUtil.equals(inputDto.getInvAim(), DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue())) {
+                if(StringUtil.equals(inputDto.getInvAim(), DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue())
+                        || StringUtil.equals(inputDto.getInvAim(), DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue())) {
                     FinProduct finProduct = finProductMapper.selectByPrimaryKey(inputDto.getFinprodId());
                     if(StringUtil.isNotEmpty(finProduct)) {
                         if(StringUtil.equals(finProduct.getSppiTestStatus(), DictCodeListExt3.SPPI测试状态_测试不通过.getValue())) {

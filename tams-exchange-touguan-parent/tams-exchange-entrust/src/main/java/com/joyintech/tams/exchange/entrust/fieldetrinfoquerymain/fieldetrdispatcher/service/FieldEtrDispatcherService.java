@@ -317,6 +317,7 @@ public class FieldEtrDispatcherService extends BaseService{
         pageParam.put("YESORNO_YES", DictCodeList.是否_是.getValue());
         pageParam.put("BACK_LEND_DIRECTION", DictCode.回购拆借方向.getValue());
         pageParam.put("PS", DictCode.交易方向.getValue());
+        pageParam.put("SHOW_INVAIM_OR_BUSSINSSMODEL", CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL"));
         List<String> entrustIdList = StringUtil.splitToList(",",(String)pageParam.get("entrustId"));
         if(StringUtil.isBlank(dto.getEntrustId()) || entrustIdList.size() > 1){
             return new FieldEtrDispatcherInfoResponse();

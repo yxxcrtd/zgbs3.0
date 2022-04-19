@@ -1037,9 +1037,9 @@ public class TrdBondInvestTrade002Controller extends BaseController {
         AjaxResult ajaxResult = new AjaxResult();
         String isCounterId = trdBondInvestTrade002Service.getCounterId(params);
         if (StringUtil.equals(isCounterId, "01")) {
-            ajaxResult.setData(DictCodeListExt1.投资目的_摊余成本类.getValue());
+            ajaxResult.setData(DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue());
         }else if (StringUtil.equals(isCounterId, "02")){ 
-            ajaxResult.setData(DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue());
+            ajaxResult.setData(DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue());
         }
         return ajaxResult;
     }
