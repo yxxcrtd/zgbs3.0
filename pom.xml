@@ -116,5 +116,6 @@
         <module>microservice/tams-service-container-touguan</module>
         <module>microservice/tams-service-system</module>
         <module>tams-exchange-touguan-parent</module>
+        <module>tams-touguan-common</module>
     </modules>
 </project>
