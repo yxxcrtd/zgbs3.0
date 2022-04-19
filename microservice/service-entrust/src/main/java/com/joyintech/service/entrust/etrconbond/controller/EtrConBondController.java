@@ -305,8 +305,9 @@ public class EtrConBondController {
     @Transactional
     @DTXTransaction
     @PostMapping("doDelete")
-    public void doDelete(String workflowId) {
-        log.info("doDelete() called with parameters => 【workflowId = {}】", workflowId);
+    public void doDelete(@RequestBody Map<String, Object> param) {
+        log.info("doDelete() called with parameters => 【param = {}】", param);
+        final String workflowId = (String) param.get("workflowId");
         WFlowCommonService.deleteFlow(workflowId);
         EtrConBondDto entity = new EtrConBondDto();
         entity.setWorkflowId(workflowId);

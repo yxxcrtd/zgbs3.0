@@ -136,6 +136,15 @@ public class EtrConBondService extends CommonExportService<EtrConBondDto> implem
                 Integer.class);
     }
 
+    @Override
+    public void doDelete(String workflowId) {
+        Map<String,Object> param = new HashMap<>();
+        param.put("workflowId",workflowId);
+        restTemplate.postForObject(
+                ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrConBond/doDelete",param,
+                Integer.class);
+    }
+
     /**
      * 分页查询可转债委托信息
      * <功能详细描述>
