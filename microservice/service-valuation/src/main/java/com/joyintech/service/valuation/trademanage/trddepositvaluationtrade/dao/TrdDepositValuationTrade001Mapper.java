@@ -34,45 +34,11 @@ import java.util.Map;
  */
 @Repository
 public interface TrdDepositValuationTrade001Mapper {
-
-
-
-    //查询是否重复
-    Integer  selectCountByTradeId(@Param("tradeId")String tradeId);
-
-
-    /**
-     * 获取自增序列值
-     * @param sequenceName 序列名
-     * @return
-     */
-    String getNextId(@Param("sequenceName")String sequenceName);
-
-
-
-    /**
-     * 产品代码下拉框
-     * @date: 2021/12/29
-     * @param:
-     * @return:
-     */
-    List<SelectOptionDto> findPortfolioId(Map<String, Object> params);
-
-    /**
-     * 资产代码下拉框
-     * @date: 2021/12/29
-     * @param:
-     * @return:
-     */
-    List<SelectOptionDto> findFinprodId(Map<String, Object> params);
-
-
     /**
      * 查询交易对手
      * <功能详细描述>
      */
     List<SelectOptionDto> getCounterId(Map<String, Object> param);
-
 
     /**
      * 检索交易列表
@@ -84,15 +50,5 @@ public interface TrdDepositValuationTrade001Mapper {
      */
     List<TrdDepositValuationTrade001Dto> selectDeal(Map<String, Object> paraMap);
 
-
-
-
     TrdDepositValuationTrade001Dto queryTradeInfoByTradeId(Map<String, Object> paraMap);
-
-
-
-
-
-
-
 }

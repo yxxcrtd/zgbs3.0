@@ -52,29 +52,6 @@ public class TrdFixIncomeValuationTradeController extends BaseController {
     }
 
     /**
-     * 策略代码生成
-     * @see
-     * @since 1.0
-     */
-    @PostMapping("createPlanTradeId")
-    public String createPlanTradeId() {
-        return trdFixIncomeValuationTradeService.createPlanTradeId();
-    }
-
-    /**
-     * 分页数据查询
-     *
-     * @return page
-     * @throws Exception 异常
-     * @see
-     * @since 1.0
-     */
-    @PostMapping("/findAll")
-    public List<TrdFixIncomeValuationTradeDto> findAll(@RequestBody Map<String, Object> param){
-        return trdFixIncomeValuationTradeService.findAll(param);
-    }
-
-    /**
      * 插入
      *
      * @param dto 页面选中的数据

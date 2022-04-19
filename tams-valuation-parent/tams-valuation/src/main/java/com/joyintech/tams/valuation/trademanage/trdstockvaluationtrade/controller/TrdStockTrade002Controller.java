@@ -21,9 +21,14 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.valuation.accounadjustmanage.manualvouchertemplete.dto.ValManualVoucherTemplete003AddDto;
+import com.joyintech.tams.valuation.accounadjustmanage.manualvouchertemplete.dto.ValManualVoucherTemplete003AddValidatorDto;
+import com.joyintech.tams.valuation.accounadjustmanage.manualvouchertemplete.dto.ValManualVoucherTemplete003Dto;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.common.service.BaseCommonService;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
+import com.joyintech.tams.valuation.trademanage.trdstockvaluationtrade.dto.TrdStockTradeAddDto;
 import com.joyintech.tams.valuation.trademanage.trdstockvaluationtrade.dto.TrdStockTradeDto;
 import com.joyintech.tams.valuation.trademanage.trdstockvaluationtrade.service.TrdStockTrade002Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -39,7 +44,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.validation.Valid;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -118,8 +125,71 @@ public class TrdStockTrade002Controller extends BaseController {
     @RequestMapping("/getTrdAcctId")
     public List<SelectOptionDto> getTrdAcctId() {
         Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("portfolioId",param.get("finprodId"));
+        String[] accTypeArr =  {DictCodeListExt1.资金账户类型_产品托管户.getValue(),
+                DictCodeListExt1.资金账户类型_券商资金账户.getValue(),
+                DictCodeListExt1.资金账户类型_结算备付金账户.getValue(),};
+        param.put("finprodId",param.get("prodId"));
+        param.put("accTypeArr",accTypeArr);
         return commonBusinessService.getTrdAcctId(param);
+    }
+
+    /**
+     * 点击新增一个空的分录行
+     *
+     * @param dto 参数
+     * @param result 校验结果
+     * @return AjaxResult
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("doAdd")
+    public AjaxResult doAdd(@Valid @RequestBody TrdStockTradeAddDto dto, BindingResult result) {
+        if (result != null && result.hasErrors()) {
+            return new AjaxResult(result);
+        }
+        TrdStockTradeAddDto dto1 = new TrdStockTradeAddDto();
+        AjaxResult ajaxResult = new AjaxResult();
+        ajaxResult.setData(dto1);
+        return ajaxResult;
+    }
+
+    /**
+     * 根据流程id，获取对应的凭证新建时的分录信息
+     * @return
+     * @see
+     * @since 1.0
+     */
+    @RequestMapping("/getAddList")
+    @ResponseBody
+    public List<ValManualVoucherTemplete003AddDto> getAddList() {
+
+        List<ValManualVoucherTemplete003AddDto> returnList = new ArrayList<>();
+
+        Map<String,Object> map= RequestUtil.getPageParam();
+
+        String workflowId = (String)map.get("workflowId");
+
+        String tmpCode = String.valueOf(map.get("tmpCode"));
+
+//        String flag=getFlag();
+//
+//        //根据流程id获取对应的凭证新建时的分录信息
+//        if(workflowId!=null && workflowId.length()>0){
+//            TrdStockTradeDto entity= trdStockTrade002Service.getBussinessEntityByWorkflowId(workflowId);
+//            returnList = entity.getListAddDto();
+//        }else if(!StringUtil.isNotEmpty(workflowId) && tmpCode!=null && tmpCode.length()>0){
+//            List<ValManualVoucherTemplete003AddDto> entity = trdStockTrade002Service.searchList(tmpCode);
+//            returnList = entity;
+//        }else if(flag!="" &&"saveTmp".equals(flag)){
+//            returnList=getListAddDto();
+//            setFlag("");
+//        }
+
+            // 若为空给予一个空list，不能为null，否则前台报错。
+            returnList = new ArrayList<ValManualVoucherTemplete003AddDto>();
+
+        return returnList;
     }
 
     /**
@@ -164,12 +234,6 @@ public class TrdStockTrade002Controller extends BaseController {
         processParameter.setWorkFlowParameter(workFlowParameter);
         processParameter.setPageId(this.getPageId());
 
-//        //设置主键
-//        if(!StringUtil.isNotEmpty(dto.getTradeId())){
-//            Date sysDate= DateUtil.platDateFromCache();
-//            dto.setTradeId(getTradeId("JYSTOCK", sysDate, "A"));
-//        }
-
         workFlowParameter.setPageId(this.getPageId());
         workFlowParameter.setElementId(this.getParam("elementId"));
         workFlowParameter.setBusinessCode(dto.getAssetId());
@@ -182,25 +246,5 @@ public class TrdStockTrade002Controller extends BaseController {
 
         return new AjaxResult(msg);
     }
-
-    /**
-     * 编号生成
-     */
-    public String getTradeId(String str, Date date, String flag) {
-        int  sequences=0;
-        // 查询数据库sequences
-        if ("A".equals(flag)) {
-            sequences = trdStockTrade002Service.querySequences();
-        }
-        // 组装4位序列号 不足补0
-        String sequence = StringUtils.leftPad(String.valueOf(sequences), 4, '0');
-        // 日期格式化yyymmdd
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        String formatDate = sdf.format(date);
-
-        String tradeIdStr = str + formatDate + sequence;
-        return tradeIdStr;
-    }
-
 
 }

@@ -9,7 +9,8 @@ $(function(){
             asset: $.trim($('#asset').val()),
             tradeDateBegin: $("#tradeDate").startDate(),
             tradeDateEnd: $("#tradeDate").endDate(),
-            ps: $('#ps').val()
+            ps: $.trim($('#ps').val()),
+            dataSource:$.trim($('#dataSource').val())
         }
     };
     
@@ -49,25 +50,18 @@ $(function(){
             ,{field:'ccyFmt', title: '币种',sortField:"ccy",width:180}
             ,{field:'ccy',  title: '币种' ,visible: false}
             ,{field:'myAcctNo', width:200, title: '资金账户'}
+            ,{field:'dataSourceStr', title: '数据来源',sortField:"dataSource",width:150}
+            ,{field:'dataSource', title: '数据来源',visible:false}
             ,{field:'operation', title: 'SysCommon.operation', type:'action', buttons: ['edit', 'delt']}
         ]
     });
+
     /**
-     * 导出事件
+     * 导出选中的表格数据
      */
     var exportExcel = function() {
-        if (table != null && table != '') {
-            var selArr = table.getAllCheckedRows();
-            var datas = JSON.stringify(selArr);
-        }
-        if (!selArr || selArr.length == 0) {
-            var paramObj = getPageParams();
-            Joyin.exportExcel('export', paramObj);
-        } else {
-            Joyin.exportExcel('export', {
-                datas : datas
-            });
-        }
+        var paramObj = getPageParams();//请求参数json格式
+        Joyin.exportExcel('export', paramObj);//导出（共通）
     };
 
     /**
@@ -78,7 +72,7 @@ $(function(){
         var object = {selectedItem: [data], operateType:"edit"};//请求参数
         Joyin.dialog(JoyinUtil.getLabel("固收类交易-修改"),
             basePath + "valuation/trademanage/trdfixincomevaluationtrade/TrdFixIncomeValuationTrade002/init",//打开新界面
-            "98%", "98%", {pageModel:PAGE_MODEL_EDIT,//请求的page_model
+            "95%", "90%", {pageModel:PAGE_MODEL_EDIT,//请求的page_model
                 tradeId:data.tradeId  //金融产品代码
             },function(){
                 table.reload();//回调函数，表格刷新
@@ -110,7 +104,7 @@ $(function(){
         $('#TrdFixIncomeValuationTrade001_btn_add').click(function() {
             Joyin.dialog(JoyinUtil.getLabel("TrdFixIncomeValuationTrade002"),
                     basePath+ "valuation/trademanage/trdfixincomevaluationtrade/TrdFixIncomeValuationTrade002/init",
-                        "98%", "98%", {pageModel:PAGE_MODEL_NEW});
+                        "95%", "90%", {pageModel:PAGE_MODEL_NEW});
         });
        
         //导出

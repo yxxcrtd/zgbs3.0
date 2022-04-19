@@ -26,7 +26,7 @@
                     </div>
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
                         <label class="layui-form-label form-lable"
-                               data-th-text="#{TrdStockTrade.prodId}">产品名称</label>
+                               data-th-text="#{TrdStockTrade.prodName}">产品名称</label>
                         <div class="layui-input-inline input-inline">
                             <select id="finprodId" name="finprodId"
                                     class="layui-input form-input input-select"
@@ -65,6 +65,18 @@
                             <input id="ps" name="ps" class="input-select"
                                    placeholder="请选择"
                                    data-th-data-result="${PS}"
+                                   allowClear="true"
+                                   multiple="multiple"
+                                   data-th-placeholder="#{SysCommon.placeholder}">
+                        </div>
+                    </div>
+                    <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
+                        <label class="layui-form-label form-lable"
+                               data-th-text="#{TrdStockTrade.dataSource}">数据来源</label>
+                        <div class="layui-input-inline input-inline">
+                            <input id="dataSource" name="dataSource" class="input-select"
+                                   placeholder="请选择"
+                                   data-th-data-result="${CREATE_TYPE}"
                                    allowClear="true"
                                    multiple="multiple"
                                    data-th-placeholder="#{SysCommon.placeholder}">

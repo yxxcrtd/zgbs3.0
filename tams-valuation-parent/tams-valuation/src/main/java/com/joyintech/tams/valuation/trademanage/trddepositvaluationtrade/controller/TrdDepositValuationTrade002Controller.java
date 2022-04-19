@@ -59,14 +59,6 @@ import java.util.Map;
 @PageId("TrdDepositValuationTrade002")
 @RequestMapping("/valuation/trademanage/trddepositvaluationtrade/TrdDepositValuationTrade002")
 public class TrdDepositValuationTrade002Controller extends BaseController {
-//	@Autowired
-//	private TradeCommonService tradeCommonService;
-//    /**
-//     * 注入业务主键生产类
-//     */
-//    @Autowired(required=false)
-//    private BaseGetBusinessId baseGetBusinessId;
-
     /**
      * 注入存款类交易Service
      */
@@ -77,94 +69,58 @@ public class TrdDepositValuationTrade002Controller extends BaseController {
     @Autowired(required = false)
     private CommonBusinessService commonBusinessService;
 
-    @Autowired
-    private IPlatformDate iPlatformDate;
-
-
     /**
      * 初始化方法
      * {@inheritDoc}
      */
     @Override
     public String init(Model model) {
-        this.setSelectOptionToModel(model, DictCode.交易方向, DictCode.计息基础, DictCode.是否, DictCode.存款类资产类型, DictCode.币种
-        		);// 新增资产二、三、四级分类 王贵奇 2019/8/1
-        // 一体化对应etliu start
-        model.addAttribute("PS_T01", DictCodeList.交易方向_买入.getValue());
-        model.addAttribute("PS_T02", DictCodeList.交易方向_卖出.getValue());
-        // 一体化对应etliu end
+        this.setSelectOptionToModel(model, DictCode.交易方向,DictCode.币种);
 
-        model.addAttribute("YES_OR_NO_N", DictCodeList.是否_否.getValue());
-        model.addAttribute("FINPROD_TYPE_F07", DictCodeListExt1.金融产品类型_存款.getValue());
-        String portfolioId = getParam("portfolioId");
         String tradeId = getParam("tradeId");
         String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
+
+        //平台日
+        model.addAttribute("iPlatformDate", DateUtil.parse(DateUtil.getSysDate()));
+
         if (!WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotEmpty(workflowId)) {
             TrdDepositValuationTrade001Dto entity = trdDepositValuationTrade002Service.getBussinessEntityByWorkflowId(
                     workflowId);
+            if(!StringUtil.isNotEmpty(entity.getTradeId())){
+                entity.setTradeId("提交后自动生成，无需填写");
+            }
             model.addAttribute("entity",entity);
             model.addAttribute("workflowId", workflowId);
-            model.addAttribute("tradeId", entity.getTradeId());
         }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){
             Map<String, Object> map = new HashMap<>();
             map.put("tradeId",tradeId);
             map.put("busiType",DictCodeList.业务类型_存款类资产交易.getValue());
             TrdDepositValuationTrade001Dto entity = trdDepositValuationTrade002Service.queryTradeInfoByTradeId(map);
             model.addAttribute("entity", entity);
-        }else{
-            //初始化值
-            TrdDepositValuationTrade001Dto entity = new TrdDepositValuationTrade001Dto();
-            entity.setOtherAmt(new BigDecimal("0.00"));   //其他费用
-            entity.setCcy(DictCodeList.币种_人民币_CNY.getValue());
-            model.addAttribute("entity", entity);
         }
-        model.addAttribute("YES_OR_NO_N", DictCodeList.是否_否.getValue());
 
         return super.init(model);
 
     }
 
-
     /**
-     * 策略计划类交易代码生成
+     * 资金账户下拉框
+     *
+     * @return 资产代码
      * @see
      * @since 1.0
      */
-    @PostMapping("createPlanTradeId")
-    public String createPlanTradeId() {
-        return trdDepositValuationTrade002Service.createPlanTradeId();
+    @ResponseBody
+    @RequestMapping("/getTrdAcctId")
+    public List<SelectOptionDto> getTrdAcctId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        String[] accTypeArr =  {DictCodeListExt1.资金账户类型_产品托管户.getValue(),
+                DictCodeListExt1.资金账户类型_券商资金账户.getValue(),
+                DictCodeListExt1.资金账户类型_结算备付金账户.getValue(),};
+        param.put("finprodId",param.get("prodId"));
+        param.put("accTypeArr",accTypeArr);
+        return commonBusinessService.getTrdAcctId(param);
     }
-
-//    /**
-//     * 自定义产品代码下拉框
-//     * @param request
-//     * @return
-//     */
-//    @RequestMapping("/findPortfolioId")
-//    @ResponseBody
-//    public Page<SelectOptionDto> findPortfolioId(HttpServletRequest request) {
-//        Map<String, Object> param =RequestUtil.getPageParam();
-//        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-//        param.put("finprodType", "F16"); //测试
-//        return trdDepositValuationTrade002Service.findPortfolioId(param);
-//    }
-//
-//
-//    /**
-//     * 自定义资产代码下拉框
-//     * @param request
-//     * @return
-//     */
-//    @RequestMapping("/findFinprodId")
-//    @ResponseBody
-//    public Page<SelectOptionDto> findFinprodId(HttpServletRequest request) {
-//        Map<String, Object> param =RequestUtil.getPageParam();
-//        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-//        param.put("finprodType", "F01"); //测试
-//        return trdDepositValuationTrade002Service.findFinprodId(param);
-//    }
-
-
 
     //交易对手下拉框
     @ResponseBody
@@ -172,8 +128,6 @@ public class TrdDepositValuationTrade002Controller extends BaseController {
     public Page<SelectOptionDto> getCounterId(){
         return trdDepositValuationTrade002Service.getCounterId(RequestUtil.getPageParam());
     }
-
-
 
     /**
      * 保存按钮点击时的check
@@ -208,18 +162,11 @@ public class TrdDepositValuationTrade002Controller extends BaseController {
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
 
-        //设置主键
-//        if(!StringUtil.isNotEmpty(dto.getTradeId())){
-//            Date sysDate= DateUtil.platDateFromCache();
-//            //新建初始化交易编号
-//            dto.setTradeId(trdDepositValuationTrade002Service.createPlanTradeId());
-//        }
-
-        params.setBusinessCode(dto.getFinprodMarketId());
+        params.setBusinessCode(dto.getAssetId());
         params.setBusinessType(DictCodeList.共通业务类型_存款类资产交易.getValue());
         // 设置流程业务说明, entity即传入的dto
         params.setComment(
-                entity -> SpringContextUtil.getTextValue("资产代码")+"("+ entity.getFinprodMarketId() +")"+"-"+SpringContextUtil.getTextValue("交易日") + "(" + DateUtil.format(entity.getTradeDate()) + ")"
+                entity -> SpringContextUtil.getTextValue("资产代码")+"("+ entity.getAssetId() +")"+"-"+SpringContextUtil.getTextValue("交易日") + "(" + DateUtil.format(entity.getTradeDate()) + ")"
         );
         //给参数变成ProcessParameter而非WorkFlowParameter
         ProcessParameter<TrdDepositValuationTrade001Dto> parameter = new ProcessParameter<TrdDepositValuationTrade001Dto>();
@@ -227,21 +174,6 @@ public class TrdDepositValuationTrade002Controller extends BaseController {
         //系统页面表IS_NEED_WORKFLOW 是否走流程，01-是，02-否
         String msg = trdDepositValuationTrade002Service.start(parameter, dto);
         return new AjaxResult(msg);
-    }
-
-    /**
-     * 资金账户下拉框
-     *
-     * @return 资产代码
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("/getTrdAcctId")
-    public List<SelectOptionDto> getTrdAcctId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("portfolioId",param.get("finprodId"));
-        return commonBusinessService.getTrdAcctId(param);
     }
 
 }

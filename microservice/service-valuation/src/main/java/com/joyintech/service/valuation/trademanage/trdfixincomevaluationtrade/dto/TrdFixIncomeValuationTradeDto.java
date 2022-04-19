@@ -133,6 +133,11 @@ public class TrdFixIncomeValuationTradeDto extends BaseEntity implements Process
      */
     private String myAcctNo;
 
+    /**
+     * 数据来源
+     */
+    private String dataSource;
+
     public String getTradeId() {
         return tradeId;
     }
@@ -284,6 +289,14 @@ public class TrdFixIncomeValuationTradeDto extends BaseEntity implements Process
     public void setMyAcctNo(String myAcctNo) {
         this.myAcctNo = myAcctNo;
     }
+
+    public String getDataSource() {
+        return dataSource;
     }
+
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
+    }
+}
 
 

@@ -11,10 +11,13 @@
 package com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.service;
 
 import com.joyintech.framework.export.CommonExportService;
+import com.joyintech.framework.export.ExportParam;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.jdbc.enums.DataSourceType;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 import com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.dto.TrdDepositValuationTrade001Dto;
+import com.joyintech.tams.valuation.trademanage.trdfixincomevaluationtrade.dto.TrdFixIncomeValuationTradeDto;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.apache.poi.ss.usermodel.Cell;
@@ -36,56 +39,30 @@ import java.util.Map;
 @Transactional(rollbackFor=Exception.class)
 public class TrdDepositValuationTrade001Service extends CommonExportService<TrdDepositValuationTrade001Dto> implements BaseProcessService<TrdDepositValuationTrade001Dto> {
 
-
     /**
      * 查询
      * @param pageParam Map
      * @return Page类
      * @throws Exception 异常信息
      */
-
     public Page<TrdDepositValuationTrade001Dto> findPage(Map<String, Object> pageParam) {
-
         return restTemplate.postForPage(ServiceApplication.VALUATION_SERVICE_NAME + "/TrdDepositValuationTrade001/findPage",
                 pageParam,TrdDepositValuationTrade001Dto.class);
     }
 
-
-
-    /**
-     * 不分页
-     *
-     * @param params
-     * @return
-     */
-    public List<TrdDepositValuationTrade001Dto> queryPageList(Map<String, Object> params) {
-        return restTemplate.postForList(
-                ServiceApplication.VALUATION_SERVICE_NAME + "/TrdDepositValuationTrade001/queryPageList", params,
-                TrdDepositValuationTrade001Dto.class);
+    @Override
+    protected void buildExportParam(ExportParam exportParam) {
+        exportParam.config("/com/joyintech/tams/valuation/trademanage/trddepositvaluationtrade/conf/export_conf.xml")
+                .dataSource(DataSourceType.MASERT);
     }
 
-
-
-
-     
-     /**
-      * 设置单元格值
-      * <p>
-      * 如果单元格值需要特殊处理，比如数值计算等，可以实现该方法
-      * </p>
-      * 
-      * @param beanName sheet对应的JavaBean
-      * @param cell 单元格
-      * @param propName 属性名
-      * @param value 单元格的值
-      */
-     @Override
-     public void setCellValue(String beanName, Cell cell, String propName, Object value) {
-         if("tradeDate".equals(propName)){
-             cell.setCellValue(DateUtil.format((Date)value, "yyyy-MM-dd"));
-         }
-     }
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Page<TrdDepositValuationTrade001Dto> selectPageData(Map<String, Object> selectParam) {
+        return findPage(selectParam);
+    }
 
     /**
      * 工作流（留痕处理进行的操作）

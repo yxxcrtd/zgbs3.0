@@ -2,51 +2,15 @@ $(function(){
     /**
      * 获取查询参数
      */
-    // var getPageParams = function() {
-    //
-    //     //产品代码 多选择
-    //     var portfolioIdTemp = $('#portfolioId').val();
-    //     var portfolioId = null;
-    //     if(portfolioIdTemp != null){
-    //         portfolioId = portfolioIdTemp.join(",");
-    //     }
-    //
-    //     //资产代码  多选择
-    //     var finprodMarketIdTemp = $('#finprodMarketId').val();
-    //     var finprodMarketId = null;
-    //     if(finprodMarketIdTemp != null){
-    //         finprodMarketId = finprodMarketIdTemp.join(",");
-    //     }
-    //
-    //     //交易类型  多选择
-    //     var psTemp = $('#ps').val();
-    //     var ps = null;
-    //     if(psTemp != null){
-    //         ps = psTemp.join(",");
-    //     }
-    //
-    //     return {
-    //         tradeId: $('#tradeId').val(),
-    //         portfolioId: portfolioId,
-    //         finprodMarketId: finprodMarketId,
-    //         tradeDateBegin: $("#tradeDate").startDate(),
-    //         tradeDateEnd: $("#tradeDate").endDate(),
-    //         ps: ps
-    //     }
-    // };
-
-    /**
-     * 获取查询参数
-     */
     var getPageParams = function() {
         return {
             tradeId: $('#tradeId').val(),
-            portfolioId: $.trim($('#portfolioId').val()),
-            finprodMarketId: $.trim($('#finprodMarketId').val()),
+            finprodId: $.trim($('#finprodId').val()),
+            asset: $.trim($('#asset').val()),
             tradeDateBegin: $("#tradeDate").startDate(),
             tradeDateEnd: $("#tradeDate").endDate(),
-            ps: $.trim($('#ps').val())
-
+            ps: $.trim($('#ps').val()),
+            dataSource:$.trim($('#dataSource').val())
         }
     };
 
@@ -64,55 +28,44 @@ $(function(){
         dblclick:function(table, data) {
             Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
                     basePath + "valuation/trademanage/trddepositvaluationtrade/TrdDepositValuationTrade002/init",
-                    "98%", "98%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
+                    "95%", "90%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
                     portfolioId:data.portfolioId,
                     entrustId:data.entrustId,
                     finprodId:data.finprodId,
                     tradeId:data.tradeId});
         },
         cols:[
-            {field:'tradeId', width:200, sortField:'tradeId',title: '交易编号'}
-            ,{field:'outTradeId', width:120, sortField:'outTradeId',title: '外部交易编号'}
-            ,{field:'portfolioId', width:150, title: '产品代码',sortField:'portfolioId'}
-            ,{field:'portfolioName', width:150, title: '产品名称',sortField:'portfolioName'}
-            ,{field:'finprodMarketId', width:150, sortField:'finprodMarketId',title: '资产代码'}
-            ,{field:'finprodName', width:120, sortField:'finprodName',title: '资产名称'}
-            ,{field:'psStr', width:100, title: 'TrdDepositValuation001.ps',sortField:'ps'}
+            {field:'tradeId', width:200,title: '交易编号'}
+            ,{field:'outTradeId', width:180,title: '外部交易编号'}
+            ,{field:'prodId', width:180, title: '产品代码'}
+            ,{field:'prodName', width:200, title: '产品名称'}
+            ,{field:'assetId', width:200,title: '资产代码'}
+            ,{field:'assetName', width:200,title: '资产名称'}
+            ,{field:'psStr', width:100, title: '交易类型',sortField:'ps'}
             ,{field:'ps', title: '交易类型',visible:false}
             ,{field:'tradeDateStr', width:120,  title: '交易日期',sortField:'tradeDate'}
             ,{field:'tradeDate',title: '交易日期',visible:false}
             ,{field:'settDateStr', width:120,  title: '交割日期',sortField:'settDate'}
             ,{field:'settDate', title: '交割日期',visible:false}
-            ,{field:'prinAmt', width:120, title: '交易本金',type:'number',sortField:'prinAmt'}
-            ,{field:'intAmt', width:120, title: '应记利息总额',type:'number',sortField:'intAmt'}
-            ,{field:'counterId', title: '交易对手',width:100}
-            ,{field:'ccyFmt', width:120, title: '币种',sortField:'ccy'}
+            ,{field:'prinAmt', width:150, title: '交易本金',type:'number',sortField:'prinAmt'}
+            ,{field:'intAmt', width:150, title: '应记利息总额',type:'number',sortField:'intAmt'}
+            ,{field:'counterName', title: '交易对手',width:150}
+            ,{field:'ccyFmt', width:150, title: '币种',sortField:'ccy'}
             ,{field:'ccy', title: '币种',visible:false}
-            ,{field:'settleAmt', width:120, title: '结算金额',type:'number',sortField:'settleAmt'}
-            // ,{field:'dealAmt', width:120, title: '本币交易金额',type:'number',sortField:'dealAmt'}
-            ,{field:'trdAcctId', title: '资金账户',width:100}
+            ,{field:'settleAmt', width:150, title: '结算金额',type:'number',sortField:'settleAmt'}
+            ,{field:'myAcctNo', title: '资金账户',width:180}
+            ,{field:'dataSourceStr', title: '数据来源',sortField:"dataSource",width:150}
+            ,{field:'dataSource', title: '数据来源',visible:false}
             ,{field:'action', title: '操作' , type:'action',buttons: ['edit', 'delt'] , width:'10%'}
         ]
     });
+
     /**
      * 导出选中的表格数据
      */
     var exportExcel = function() {
-
-        var selArr = [];
-        var datas = null;
-        if (table != null && table != '') {
-            selArr = table.getAllCheckedRows();
-            datas = JSON.stringify(selArr);
-        }
-        if (!selArr || selArr.length == 0) {
-            var paramObj = getPageParams();
-            Joyin.exportExcel('export', paramObj);
-        } else {
-            Joyin.exportExcel('export', {
-                datas : datas
-            });
-        }
+        var paramObj = getPageParams();//请求参数json格式
+        Joyin.exportExcel('export', paramObj);//导出（共通）
     };
     
     /**
@@ -122,7 +75,7 @@ $(function(){
         $('#TrdDepositValuationTrade001_btn_add').click(function () {
             Joyin.dialog(JoyinUtil.getLabel("TrdDepositValuationTrade002"),
                 basePath + "valuation/trademanage/trddepositvaluationtrade/TrdDepositValuationTrade002/init",
-                "98%", "98%", {pageModel: PAGE_MODEL_NEW});
+                "95%", "90%", {pageModel: PAGE_MODEL_NEW});
         });
 
 
@@ -170,7 +123,7 @@ $(function(){
 
                 Joyin.dialog(JoyinUtil.getLabel("存款类交易-修改"),
                     basePath + "valuation/trademanage/trddepositvaluationtrade/TrdDepositValuationTrade002/init",//打开新界面
-                    "98%", "98%", {
+                    "95%", "90%", {
                         pageModel: PAGE_MODEL_EDIT,//请求的page_model
                         tradeId: data.tradeId  //金融产品代码
                     }, function () {

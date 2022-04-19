@@ -19,6 +19,7 @@ import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 import com.joyintech.tams.valuation.common.interf.base.dto.AssetDealInfoValCommonResult;
@@ -59,70 +60,8 @@ import java.util.stream.Collectors;
 @Transactional(rollbackFor = Exception.class)
 public class TrdDepositValuationTrade002Service extends CommonExportService<TrdDepositValuationTrade001Dto> implements BaseProcessService<TrdDepositValuationTrade001Dto> {
 
-
-
     @Autowired
     private DepositeAssetAstDealTemplateRecService depositeAssetAstDealTemplateRecService;
-
-
-
-
-    /**
-     * 合成初始化实体类
-     *
-     * @param tradeId 交易编号
-     * @return 存款类资产实体类
-     * @see
-     * @since 1.0
-     */
-    public TrdDepositValuationTrade001Dto getInitEntity(String tradeId) {
-        TrdDepositValuationTrade001Dto entity = new TrdDepositValuationTrade001Dto();
-        TrdProductDeal trdProductDeal = null;
-        TrdProductDealAdd trdProductDealAdd = null;
-        String finprodId = null;
-        FinProduct finProduct = null;
-        return entity;
-    }
-
-    /**
-     * 策略代码生成
-     *
-     * @see
-     * @since 1.0
-     */
-    public String createPlanTradeId() {
-        return restTemplate.postForObject(
-                ServiceApplication.VALUATION_SERVICE_NAME + "/TrdDepositValuationTrade001/createPlanTradeId",
-                null, String.class);
-
-    }
-
-
-    /**
-     * 产品代码下拉框
-     * @auther: Administrator
-     * @date: 2021/12/29 17:10
-     * @param:
-     * @return:
-     */
-    public Page<SelectOptionDto> findPortfolioId(Map<String, Object> params) {
-        return restTemplate.postForPage(
-                ServiceApplication.VALUATION_SERVICE_NAME + "/TrdDepositValuationTrade001/findPortfolioId",
-                params, SelectOptionDto.class);
-    }
-
-    /**
-     * 资产代码下拉框
-     * @auther: Administrator
-     * @date: 2021/12/29 17:10
-     * @param:
-     * @return:
-     */
-    public Page<SelectOptionDto> findFinprodId(Map<String, Object> params) {
-        return restTemplate.postForPage(
-                ServiceApplication.VALUATION_SERVICE_NAME + "/TrdDepositValuationTrade001/findFinprodId",
-                params, SelectOptionDto.class);
-    }
 
     //交易对手
     public Page<SelectOptionDto> getCounterId(Map<String, Object> param) {
@@ -134,7 +73,6 @@ public class TrdDepositValuationTrade002Service extends CommonExportService<TrdD
      * 根据交易编号查询详情
      */
     public TrdDepositValuationTrade001Dto queryTradeInfoByTradeId(Map<String, Object> params) {
-
         return restTemplate.postForObject(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdDepositValuationTrade001/queryTradeInfoByTradeId",
                 params, TrdDepositValuationTrade001Dto.class);
@@ -163,7 +101,7 @@ public class TrdDepositValuationTrade002Service extends CommonExportService<TrdD
     public TrdDepositValuationTradeResult generateEntity(TrdDepositValuationTrade001Dto dto){
         Map<String,Object> params = new HashMap<>();
         List<String> prodIds = new ArrayList<>();
-        prodIds.add(dto.getPortfolioId());
+        prodIds.add(dto.getProdId());
         params.put("INTERF_BOOKSETID",prodIds);
         params.put("VAL_MODEL","INTERF_MODEL_SINGLE");
 
@@ -172,26 +110,20 @@ public class TrdDepositValuationTrade002Service extends CommonExportService<TrdD
         ValBotAstTrade entity = new ValBotAstTrade();
         BeanUtil.copyPropertiesIgnoreNull(entity,dto);
         //比较界面和接口字段差异，并手动给接口字段赋值
-        entity.setTradeId(null);  //交易编号
         entity.setfTradeId(dto.getOutTradeId());  //外部交易编号
-        entity.setProdId(dto.getPortfolioId()); //产品代码
-        entity.setAssetId(dto.getFinprodMarketId());  //资产代码
         entity.setDataActionSign("01");//数据动作标志
         entity.setDealDate(dto.getTradeDate());//交易日
-        entity.setSettDate(dto.getSettDate()); //交割日
-        entity.setPs(dto.getPs());//交易方向
         entity.setTradeCapi(dto.getPrinAmt()); //交易本金
-        entity.setIntAmt(dto.getIntAmt()); //应收利息
         entity.setDealAmt(dto.getSettleAmt());//交易金额
         entity.setCcy(dto.getCcy());//币种
         entity.setCounterId(dto.getCounterId());//交易对手
-        entity.setIsClean("Y");//有无清算指令
+        entity.setIsClean("N");//有无清算指令
         entity.setChlFeeAmt(null);
         entity.setIsChlFeeAmt("N");
         entity.setChannelId(null);
-        entity.setMyAcctNo(dto.getTrdAcctId());  //资金账户
-//        entity.setTrdFee(new BigDecimal(222.1));
 
+        //设置数据来源：画面录入
+        entity.setDataSource(DictCodeListExt1.生成方式_画面录入.getValue());
 
         listValBotAstTrade.add(entity);
         TemplateOrderInfoReaderResult acctEntity= new TemplateOrderInfoReaderResult();
@@ -225,11 +157,9 @@ public class TrdDepositValuationTrade002Service extends CommonExportService<TrdD
         List<StlOrdersExt> listValOrdersExt = (List<StlOrdersExt>)map.get("listValOrdersExt");
         result.setListValOrders(listValOrders);
         result.setListValOrdersExt(listValOrdersExt);
-        // 添加日志
-        result.setValInterflog((List<ValInterflog>)map.get("valInterflogList"));
+
         TrdDepositValuationTradeResult rst = new TrdDepositValuationTradeResult(result);
         rst.setTrdDepositValuationTrade001Dto(dto);
-
         return rst;
     }
 
