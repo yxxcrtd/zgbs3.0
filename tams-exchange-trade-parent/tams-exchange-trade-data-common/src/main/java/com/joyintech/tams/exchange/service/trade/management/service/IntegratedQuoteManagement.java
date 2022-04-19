@@ -93,9 +93,9 @@ public class IntegratedQuoteManagement {
         return new ResultBean(ErrorCode.SUCCESS, terminalHelper.queryNegotiateQuoteReceive(negotiateQuoteQueryBean));
     }
     
-    public ResultBean queryNegotiateQuoteSend(NegotiateQuoteQueryBean negotiateQuoteQueryBean) {
-        return new ResultBean(ErrorCode.SUCCESS, terminalHelper.queryNegotiateQuoteReceive(negotiateQuoteQueryBean));
-    }
+//    public ResultBean queryNegotiateQuoteSend(NegotiateQuoteQueryBean negotiateQuoteQueryBean) {
+//        return new ResultBean(ErrorCode.SUCCESS, terminalHelper.queryNegotiateQuoteReceive(negotiateQuoteQueryBean));
+//    }
 }
 
 

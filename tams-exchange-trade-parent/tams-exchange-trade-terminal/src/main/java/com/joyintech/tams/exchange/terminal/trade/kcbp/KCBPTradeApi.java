@@ -1584,23 +1584,23 @@ public class KCBPTradeApi {
         if (Market.SZSE.value.equals(market)) {
             //深圳现券协商成交转发成交申报查询
             parameters.put("funcid", "410682");
-            parameters.put("side", "");//买卖方向
+            parameters.put("side", negotiateQuoteQueryBean.getSide());//买卖方向
             parameters.put("count", "1000");//请求行数
             parameters.put("posstr", "");//定位串
-            parameters.put("tradercode", "");//本方交易员代码
-            parameters.put("investorid", "");//本方交易主体代码
-            parameters.put("confirmid", "");//当交易主体类型为03或04时必须送值
+            parameters.put("tradercode", negotiateQuoteQueryBean.getTraderCode());//本方交易员代码
+            parameters.put("investorid", negotiateQuoteQueryBean.getInvestorId());//本方交易主体代码
+            parameters.put("confirmid", negotiateQuoteQueryBean.getConfirmId());//当交易主体类型为03或04时必须送值
             if (!Strings.isNullOrEmpty(negotiateQuoteQueryBean.getStockCode()))
                 parameters.put("stkcode", StockCodeUtils.getStockCode(negotiateQuoteQueryBean.getStockCode()));//证券代码
             logger.info("parameters {}", JsonUtils.getJsonFromObject(parameters));
             ResultBean resultBean = sendCommand(parameters.get("funcid"), parameters);
-            logger.info("queryIntegratedBulkCloseQuote SZ result {}", JsonUtils.getJsonFromObject(resultBean));
+            logger.info("queryNegotiateQuoteReceive SZ result {}", JsonUtils.getJsonFromObject(resultBean));
             if (resultBean.getErrorCode() == ErrorCode.SUCCESS.value) {
                 List<List<String>> data = (List<List<String>>) resultBean.getData();
                 if (data.size() > 0)
                 	negotiateQuoteReceiveBeans = KCBPConverter.convertToNegotiateQuoteReceiveResponseSZ(data);
             } else
-                logger.info("queryIntegratedBulkCloseQuote SZ fail {}", resultBean.getErrorMsg());
+                logger.info("queryNegotiateQuoteReceive SZ fail {}", resultBean.getErrorMsg());
         }
         kcbpTradeResponse.resQueryNegotiateQuoteReceive(negotiateQuoteReceiveBeans, requestId);
     }

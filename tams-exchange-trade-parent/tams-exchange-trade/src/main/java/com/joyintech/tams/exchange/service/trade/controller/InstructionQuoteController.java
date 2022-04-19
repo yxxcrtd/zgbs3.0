@@ -140,7 +140,7 @@ public class InstructionQuoteController {
         return integratedQuoteManagement.addIntegratedRepurchaseQuote(repurchaseQuoteBean);
     }
     
-    @ApiOperation(value = "我收到的协商成交行情接口", notes = "我收到的协商成交行情接口")
+    @ApiOperation(value = "我收到的协商成交行情接口(深交所)", notes = "我收到的协商成交行情接口(深交所)")
     @RequestMapping(value = "/entrust/integrated/negotiateQuoteReceive", method = RequestMethod.POST)
     public ResultBean queryNegotiateQuoteReceive(@RequestBody NegotiateQuoteQueryBean negotiateQuoteQueryBean) {
         if(!MasterUtil.isMaster()) {
@@ -149,12 +149,12 @@ public class InstructionQuoteController {
         return integratedQuoteManagement.queryNegotiateQuoteReceive(negotiateQuoteQueryBean);
     }
     
-    @ApiOperation(value = "我发起的协商成交行情接口", notes = "我发起的协商成交行情接口")
-    @RequestMapping(value = "/entrust/integrated/negotiateQuoteSend", method = RequestMethod.POST)
-    public ResultBean queryNegotiateQuoteSend(@RequestBody NegotiateQuoteQueryBean negotiateQuoteQueryBean) {
-        if(!MasterUtil.isMaster()) {
-    		return MasterUtil.postForObjectResultBean(negotiateQuoteQueryBean);
-    	}
-        return integratedQuoteManagement.queryNegotiateQuoteSend(negotiateQuoteQueryBean);
-    }
+//    @ApiOperation(value = "我发起的协商成交行情接口", notes = "我发起的协商成交行情接口")
+//    @RequestMapping(value = "/entrust/integrated/negotiateQuoteSend", method = RequestMethod.POST)
+//    public ResultBean queryNegotiateQuoteSend(@RequestBody NegotiateQuoteQueryBean negotiateQuoteQueryBean) {
+//        if(!MasterUtil.isMaster()) {
+//    		return MasterUtil.postForObjectResultBean(negotiateQuoteQueryBean);
+//    	}
+//        return integratedQuoteManagement.queryNegotiateQuoteSend(negotiateQuoteQueryBean);
+//    }
 }
