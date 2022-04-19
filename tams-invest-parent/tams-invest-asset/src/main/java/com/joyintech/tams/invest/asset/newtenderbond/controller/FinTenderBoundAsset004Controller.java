@@ -25,7 +25,7 @@ public class FinTenderBoundAsset004Controller extends BaseController {
     private FinTenderBoundAsset004Service finTenderBoundAsset004Service;
 
     @ResponseBody
-    @PostMapping("/crossMarketCodeForSelect")
+    @PostMapping("/getBoundMarketInfo")
     @ApiOperation(value = "债券市场信息查询", notes = "债券市场信息查询")
     public FinTenderBoundAsset004Dto getBoundMarketInfo(@RequestBody Map<String, Object> search) {
         return finTenderBoundAsset004Service.getBoundMarketInfo(search);
