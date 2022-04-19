@@ -230,14 +230,17 @@ public class TradeCallbackHelper {
         tradeRecord.setPs(instruction.getTradeSide());
         tradeRecord.setBusiTypeTg(instruction.getBusiTypeTg());
         tradeRecord.setEntrustClass(instruction.getEntrustClass());
-        if (tradeRecord.getClearBalance() == null || tradeRecord.getClearBalance().compareTo(BigDecimal.ZERO) == 0) {
-            if (IntegratedEntrustUtils.isProtocolBack_SH(entrust.getEntrustProp())
-                    || IntegratedEntrustUtils.isProtocolBack_SZ(entrust.getEntrustProp())) {
-                //到期结算金额
-                tradeRecord.setClearBalance(entrust.getBackBalance());
-            } else if (InvestmentAssetType.isBond(tradeRecord.getFinprodType2()) && tradeRecord.getFullPrice() != null) {
-                //成交全价金额
-                tradeRecord.setClearBalance(tradeRecord.getFullPrice().multiply(BigDecimal.valueOf(tradeRecord.getTradedVolume())));
+        //协议回购
+        if (IntegratedEntrustUtils.isProtocolBack_SH(entrust.getEntrustProp())
+                || IntegratedEntrustUtils.isProtocolBack_SZ(entrust.getEntrustProp())) {
+            //到期结算金额
+            tradeRecord.setClearBalance(entrust.getBackBalance());
+        } else {
+            if (tradeRecord.getClearBalance() == null || tradeRecord.getClearBalance().compareTo(BigDecimal.ZERO) == 0) {
+                if (InvestmentAssetType.isBond(tradeRecord.getFinprodType2()) && tradeRecord.getFullPrice() != null) {
+                    //成交全价金额
+                    tradeRecord.setClearBalance(tradeRecord.getFullPrice().multiply(BigDecimal.valueOf(tradeRecord.getTradedVolume())));
+                }
             }
         }
 
