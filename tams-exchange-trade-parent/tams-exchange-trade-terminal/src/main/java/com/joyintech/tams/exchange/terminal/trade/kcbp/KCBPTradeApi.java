@@ -1031,7 +1031,7 @@ public class KCBPTradeApi {
         }
         return new ArrayList<>();
     }
-
+    
     private List<IntegratedEntrust> queryProtocolBackAndFixedIncomeEntrust(List<List<String>> data, KCBPAccount kcbpAccount, boolean reissueFlag) {
         List<IntegratedEntrust> integratedEntrusts = new ArrayList<>();
         List<Entrust> entrustList = KCBPConverter.convertToEntrust(kcbpAccount.getAccountId(), data, entrustIdManager);
@@ -1046,6 +1046,70 @@ public class KCBPTradeApi {
         logger.debug("queryProtocolBackAndFixedIncomeEntrust entrustList:{}", JSONArray.toJSONString(entrustList));
         return integratedEntrusts;
     }
+    
+    //深圳现券协商成交、竞买发起、竞买应价成交查询
+    public void queryBondNegotiate_SZ_Trade(KCBPAccount kcbpAccount) {
+    	queryBondNegotiate_SZ_Trade(kcbpAccount, false);
+    }
+
+    public List<Trade> queryBondNegotiate_SZ_Trade(KCBPAccount kcbpAccount, boolean reissueFlag) {
+        Map<String, String> parameters = composeOrderTradeQuery(kcbpAccount, "410681", kcbpAccount.getAccountId(),
+                kcbpAccount.getBondNegotiate_SZ_PositionStr_Trade(), "", formatBeginDate.format(new Date(System.currentTimeMillis())));
+        ResultBean resultBean = sendCommand("410681", parameters);
+        if (resultBean.getErrorCode() == ErrorCode.SUCCESS.value) {
+            List<List<String>> data = (List<List<String>>) resultBean.getData();
+            List<Trade> trades = KCBPConverter.convertToTrade(kcbpAccount.getAccountId(), data, entrustIdManager);
+            if (!reissueFlag) {
+                trades.forEach(trade -> kcbpTradeClient.onTrade(trade));
+            }
+            if (data.size() > 1) {
+                int positionStr = data.get(0).size() - 1;
+                String newPositionStr = data.get(data.size() - 1).get(positionStr);
+                kcbpAccount.setBondNegotiate_SZ_PositionStr_Trade(newPositionStr);
+                logger.info("queryBondNegotiate_SZ_Trade newPositionStr :{}", newPositionStr);
+            }
+            return trades;
+        }
+        return new ArrayList<>();
+    }
+    
+    //深圳现券协商成交、竞买发起、竞买应价委托查询
+    public void queryBondNegotiate_SZ_Entrust(KCBPAccount kcbpAccount) {
+    	queryBondNegotiate_SZ_Entrust(kcbpAccount, false);
+    }
+    
+    public List<IntegratedEntrust> queryBondNegotiate_SZ_Entrust(KCBPAccount kcbpAccount, boolean reissueFlag) {
+        Map<String, String> parameters = composeOrderTradeQuery(kcbpAccount, "410680", kcbpAccount.getAccountId(),
+                kcbpAccount.getBondNegotiate_SZ_PositionStr_Entrust(), "1", "");
+        ResultBean resultBean = sendCommand("410680", parameters);
+        if (resultBean.getErrorCode() == ErrorCode.SUCCESS.value) {
+            List<List<String>> data = (List<List<String>>) resultBean.getData();
+            List<IntegratedEntrust> integratedEntrusts = queryBondNegotiateEntrust(data, kcbpAccount, reissueFlag);
+            if (data.size() > 1) {
+                int positionStr = data.get(0).size() - 1;
+                String newPositionStr = data.get(data.size() - 1).get(positionStr);
+                kcbpAccount.setBondNegotiate_SZ_PositionStr_Entrust(newPositionStr);
+                logger.info("queryFixedIncomeEntrust newPositionStr :{}", newPositionStr);
+            }
+            return integratedEntrusts;
+        }
+        return new ArrayList<>();
+    }
+    
+    private List<IntegratedEntrust> queryBondNegotiateEntrust(List<List<String>> data, KCBPAccount kcbpAccount, boolean reissueFlag) {
+        List<IntegratedEntrust> integratedEntrusts = new ArrayList<>();
+        List<Entrust> entrustList = KCBPConverter.convertToEntrust(kcbpAccount.getAccountId(), data, entrustIdManager);
+        entrustList.forEach(entrust -> {
+            IntegratedEntrust integratedEntrust = new IntegratedEntrust();
+            BeanUtils.copyProperties(entrust, integratedEntrust);
+            integratedEntrusts.add(integratedEntrust);
+            if (!reissueFlag) {
+                kcbpTradeClient.onIntegratedEntrust(integratedEntrust);
+            }
+        });
+        logger.debug("queryBondNegotiateEntrust entrustList:{}", JSONArray.toJSONString(entrustList));
+        return integratedEntrusts;
+    } 
 
     public void queryIntegratedBulkQuote(IntegratedBulkQuoteQryBean integratedBulkQuoteQryBean, long requestId) {
         KCBPAccount kcbpAccount = kcbpTradeClient.getKCBPAccount(integratedBulkQuoteQryBean.getAccountId());
