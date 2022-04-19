@@ -81,7 +81,7 @@ public class TradeAgentTerminal extends Agent implements TradeAgent, IAgentMsgHa
 
     @Override
     protected void handleAsyncMessage(long requestId, int functionCode, Object message) {
-        logger.info("handleAsyncMessage: functionCode={}，requestId={}，message{}", functionCode, requestId, JsonUtils.getJsonFromObject(message));
+        logger.debug("TradeAgentTerminal handleAsyncMessage: functionCode={}，requestId={}，message{}", functionCode, requestId, JsonUtils.getJsonFromObject(message));
         if (functionCode == FunctionCode.NOTIFY_ENTRUST.value) {
             onRtnEntrust((Entrust) message);
         } else if (functionCode == FunctionCode.NOTIFY_INTEGRATED_ENTRUST.value) {
@@ -118,6 +118,7 @@ public class TradeAgentTerminal extends Agent implements TradeAgent, IAgentMsgHa
 
     @Override
     protected Object getResponseObjectFromMessage(ProtocolMessage message) throws Exception {
+    	logger.debug("TradeAgentTerminal getResponseObjectFromMessage: functionCode={}，requestId={}，message{}", message.getFc(), message.getReqId(), JsonUtils.getJsonFromObject(message));
         if (message.getFc() == FunctionCode.NOTIFY_ENTRUST.value) {
             return JsonUtils.getObjectFromJson(message.getBody(), Entrust.class);
         } else if (message.getFc() == FunctionCode.NOTIFY_TRADE.value) {

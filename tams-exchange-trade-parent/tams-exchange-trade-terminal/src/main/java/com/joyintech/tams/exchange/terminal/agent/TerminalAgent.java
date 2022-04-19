@@ -209,6 +209,7 @@ public class TerminalAgent extends Agent implements ITerminalMsgHandler, ITermin
      */
     @Override
     protected void handleAsyncMessage(long requestId, int functionCode, Object message) {
+    	logger.debug("TerminalAgent handleAsyncMessage requestId:{} functionCode:{} message:{}", requestId, functionCode, JsonUtils.getJsonFromObject(message));
         if (functionCode == FunctionCode.REQ_ACCOUNT_LOGIN.value) { //终端登陆
             onReqLoginAccount((AccountLoginReqBean) message, requestId);
         } else if (functionCode == FunctionCode.REQ_ACCOUNT_LOGOUT.value) { // 终端退出
@@ -287,6 +288,7 @@ public class TerminalAgent extends Agent implements ITerminalMsgHandler, ITermin
      */
     @Override
     protected Object getResponseObjectFromMessage(ProtocolMessage message) throws Exception {
+    	logger.debug("TerminalAgent getResponseObjectFromMessage functionCode:{} message:{}", message.getFc(), message.getBody());
         if (message.getFc() == FunctionCode.REQ_ACCOUNT_LOGIN.value) {
             return JsonUtils.getObjectFromJson(message.getBody(), AccountLoginReqBean.class);
         } else if (message.getFc() == FunctionCode.REQ_ACCOUNT_LOGOUT.value) {

@@ -9,6 +9,8 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(value = "我发起的协商成交行情返回报文", description = "我发起的协商成交行情返回报文")
 public class NegotiateQuoteSendBean {
 
+	@ApiModelProperty(name = "requestNo", value = "请求编号")
+    private String requestNo;
     @ApiModelProperty(name = "requestTime", value = "请求时间")
     private int requestTime;
     @ApiModelProperty(name = "requestStatus", value = "请求状态(1：待确认  3：已撤销 4：已成交 )")
@@ -169,6 +171,12 @@ public class NegotiateQuoteSendBean {
 	}
 	public void setRemark(String remark) {
 		this.remark = remark;
+	}
+	public String getRequestNo() {
+		return requestNo;
+	}
+	public void setRequestNo(String requestNo) {
+		this.requestNo = requestNo;
 	}
     
 }

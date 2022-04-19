@@ -1515,10 +1515,16 @@ public class KCBPTradeApi {
         Map<String, String> parameters = Maps.newHashMap(kcbpAccount.getHeadMessages());
         String market = StockCodeUtils.getMarket(negotiateQuoteQueryBean.getStockCode());
         if (Market.SZSE.value.equals(market)) {
-            //深圳盘后固定价格交易行情查询
+            //深圳现券协商成交转发成交申报查询
             parameters.put("funcid", "410682");
+            parameters.put("side", "");//买卖方向
+            parameters.put("count", "1000");//请求行数
+            parameters.put("posstr", "");//定位串
+            parameters.put("tradercode", "");//本方交易员代码
+            parameters.put("investorid", "");//本方交易主体代码
+            parameters.put("confirmid", "");//当交易主体类型为03或04时必须送值
             if (!Strings.isNullOrEmpty(negotiateQuoteQueryBean.getStockCode()))
-                parameters.put("stkcode", StockCodeUtils.getStockCode(negotiateQuoteQueryBean.getStockCode()));
+                parameters.put("stkcode", StockCodeUtils.getStockCode(negotiateQuoteQueryBean.getStockCode()));//证券代码
             logger.info("parameters {}", JsonUtils.getJsonFromObject(parameters));
             ResultBean resultBean = sendCommand(parameters.get("funcid"), parameters);
             logger.info("queryIntegratedBulkCloseQuote SZ result {}", JsonUtils.getJsonFromObject(resultBean));
@@ -1530,6 +1536,38 @@ public class KCBPTradeApi {
                 logger.info("queryIntegratedBulkCloseQuote SZ fail {}", resultBean.getErrorMsg());
         }
         kcbpTradeResponse.resQueryNegotiateQuoteReceive(negotiateQuoteReceiveBeans, requestId);
+    }
+    
+    public void queryNegotiateQuoteSend(NegotiateQuoteQueryBean negotiateQuoteQueryBean, Long requestId) {
+        List<NegotiateQuoteSendBean> negotiateQuoteSendBeans = null;
+        KCBPAccount kcbpAccount = kcbpTradeClient.getKCBPAccount(negotiateQuoteQueryBean.getAccountId());
+        Map<String, String> parameters = Maps.newHashMap(kcbpAccount.getHeadMessages());
+        String market = StockCodeUtils.getMarket(negotiateQuoteQueryBean.getStockCode());
+        if (Market.SZSE.value.equals(market)) {
+            //深圳现券协商成交、竞买发起、竞买应价委托查询
+            parameters.put("funcid", "410680");
+            parameters.put("market", "");//交易市场
+            parameters.put("fundid", negotiateQuoteQueryBean.getAccountId());//资金帐户
+            parameters.put("secuid", "");//股东代码
+            parameters.put("ordersno", "");//委托序号
+            parameters.put("begindate", "");//开始日期
+            parameters.put("enddate", "");//结束日期
+            parameters.put("count", "1000");//请求行数
+            parameters.put("posstr", "");//定位串
+            parameters.put("bsflag", "");//买卖类别
+            if (!Strings.isNullOrEmpty(negotiateQuoteQueryBean.getStockCode()))
+                parameters.put("stkcode", StockCodeUtils.getStockCode(negotiateQuoteQueryBean.getStockCode()));//证券代码
+            logger.info("parameters {}", JsonUtils.getJsonFromObject(parameters));
+            ResultBean resultBean = sendCommand(parameters.get("funcid"), parameters);
+            logger.info("queryIntegratedBulkCloseQuote SZ result {}", JsonUtils.getJsonFromObject(resultBean));
+            if (resultBean.getErrorCode() == ErrorCode.SUCCESS.value) {
+                List<List<String>> data = (List<List<String>>) resultBean.getData();
+//                if (data.size() > 0)
+//                	negotiateQuoteSendBeans = KCBPConverter.convertToNegotiateQuoteSendResponseSZ(data);
+            } else
+                logger.info("queryIntegratedBulkCloseQuote SZ fail {}", resultBean.getErrorMsg());
+        }
+//        kcbpTradeResponse.resQueryNegotiateQuoteReceive(negotiateQuoteSendBeans, requestId);
     }
 }
 
