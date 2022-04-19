@@ -1492,7 +1492,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         TrdPriceTimeConfig trdPriceTimeConfig = getTrdPriceTimeConfig(paraMap);
         // 无匹配交易价格时间配置
         if(trdPriceTimeConfig==null){
-            validMessageList.add(new ValidMessage("PRICE_RANGE_001"));
+            validMessageList.add(new ValidMessage("当前时间不在允许范围时间内!"));
         }
         // 开盘集合竞价
         else if(StringUtil.equals(trdPriceTimeConfig.getPriceTimeType(),DictCodeListExt3.价格申报范围类型_开盘集合竞价.getValue())){
@@ -1500,14 +1500,14 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                 if(quotation!=null
                         &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(1.3),quotation.getPreClosePrice()))>0
                             ||checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(0.7),quotation.getPreClosePrice()))<0)){
-                    validMessageList.add(new ValidMessage("PRICE_RANGE_002"));
+                    validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
                 }
             }
             else if(StringUtil.equals(finprodType,DictCodeList.回购类型_质押式竞价回购.getValue())){
                 if(quotation!=null
                         &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(2),quotation.getPreClosePrice()))>0
                         ||checkPrice.compareTo(BigDecimal.ZERO)<0)){
-                    validMessageList.add(new ValidMessage("PRICE_RANGE_002"));
+                    validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
                 }
             }
         }
@@ -1521,13 +1521,13 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                     if(quotation!=null
                             &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(1.1),quotation.getLastPrice()))>0
                             ||checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(0.9),quotation.getLastPrice()))<0)){
-                        validMessageList.add(new ValidMessage("PRICE_RANGE_002"));
+                        validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
                     }
                 }else{
                     if(quotation!=null
                             &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(1.2),quotation.getLastPrice()))>0
                             ||checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(0.8),quotation.getLastPrice()))<0)){
-                        validMessageList.add(new ValidMessage("PRICE_RANGE_002"));
+                        validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
                     }
                 }
             }
@@ -1535,7 +1535,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                 if(quotation!=null
                         &&(checkPrice.compareTo(ArithmeticUtil.doAdd(new BigDecimal(0.01),quotation.getLastPrice()))>0
                         ||checkPrice.compareTo(BigDecimal.ZERO)<0)){
-                    validMessageList.add(new ValidMessage("PRICE_RANGE_002"));
+                    validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
                 }
             }
         }
