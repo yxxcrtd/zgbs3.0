@@ -477,7 +477,7 @@ public class KCBPTradeApi {
             parameters.put("secuid", kcbpAccount.getSecuIds().get("1"));
             parameters.put("market", "1");
             // 上交所固收平台业务
-            //委托买卖
+            //委托买卖    //TODO 上交所新债  指定对手方交易----需要关注可要调整
             if (IntegratedEntrustUtils.isFixedIncome_BS(integratedEntrust.getEntrustProp())) {
                 processFixedIncomeBS(integratedEntrust, parameters);
             }
