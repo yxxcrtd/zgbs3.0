@@ -327,9 +327,7 @@ public class EtrConBondController {
     @GetMapping("delete")
     public boolean deleteDelegate(String entrustId) {
         log.info("delete() called with parameters => 【entrustId = {}】", entrustId);
-        boolean b = service.deleteDelegate(entrustId);
-
-        return b;
+        return service.deleteDelegate(entrustId);
     }
 
     /**
