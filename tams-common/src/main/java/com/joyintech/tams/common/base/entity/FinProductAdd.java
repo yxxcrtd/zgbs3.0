@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.json.CustomDateDeserialize;
+import oracle.sql.DATE;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -449,6 +451,26 @@ public class FinProductAdd extends BaseEntity {
      * 跨市场发行代码,多个逗号分割
      */
     private String crossMarketCode;
+
+    /**
+     * 是否非担保
+     */
+    private String isNoGuard;
+
+    /**
+     * 概念标识
+     */
+    private String conceptType;
+
+    /**
+     * 是否允许资讯数据覆盖
+     */
+    private String isAllowOverwrite;
+
+    /**
+     * 原摘牌日
+     */
+    private String oldDelistingDate;
 
     /**
      * 取得 金融产品代码
@@ -1846,5 +1868,78 @@ public class FinProductAdd extends BaseEntity {
      */
     public void setCrossMarketCode(String crossMarketCode) {
         this.crossMarketCode = crossMarketCode == null ? null : crossMarketCode.trim();
+    }
+
+
+    /**
+     * 获取 是否非担保
+     *
+     * @return isNoGuard 是否非担保
+     */
+    public String getIsNoGuard() {
+        return this.isNoGuard;
+    }
+
+    /**
+     * 设置 是否非担保
+     *
+     * @param isNoGuard 是否非担保
+     */
+    public void setIsNoGuard(String isNoGuard) {
+        this.isNoGuard = isNoGuard;
+    }
+
+    /**
+     * 获取 概念标识
+     *
+     * @return conceptType 概念标识
+     */
+    public String getConceptType() {
+        return this.conceptType;
+    }
+
+    /**
+     * 设置 概念标识
+     *
+     * @param conceptType 概念标识
+     */
+    public void setConceptType(String conceptType) {
+        this.conceptType = conceptType;
+    }
+
+    /**
+     * 获取 是否允许资讯数据覆盖
+     *
+     * @return isAllowOverwrite 是否允许资讯数据覆盖
+     */
+    public String getIsAllowOverwrite() {
+        return this.isAllowOverwrite;
+    }
+
+    /**
+     * 设置 是否允许资讯数据覆盖
+     *
+     * @param isAllowOverwrite 是否允许资讯数据覆盖
+     */
+    public void setIsAllowOverwrite(String isAllowOverwrite) {
+        this.isAllowOverwrite = isAllowOverwrite;
+    }
+
+    /**
+     * 获取 原摘牌日
+     *
+     * @return oldDelistingDate 原摘牌日
+     */
+    public String getOldDelistingDate() {
+        return this.oldDelistingDate;
+    }
+
+    /**
+     * 设置 原摘牌日
+     *
+     * @param oldDelistingDate 原摘牌日
+     */
+    public void setOldDelistingDate(String oldDelistingDate) {
+        this.oldDelistingDate = oldDelistingDate;
     }
 }

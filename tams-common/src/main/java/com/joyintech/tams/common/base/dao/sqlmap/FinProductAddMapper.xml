@@ -94,6 +94,10 @@
         <result column="WIND_CODE" property="windCode" jdbcType="VARCHAR" />
         <result column="CROSS_MARKET" property="crossMarket" jdbcType="VARCHAR" />
         <result column="CROSS_MARKET_CODE" property="crossMarketCode" jdbcType="VARCHAR" />
+        <result column="IS_NO_GUARD" property="isNoGuard" jdbcType="VARCHAR" />
+        <result column="CONCEPT_TYPE" property="conceptType" jdbcType="VARCHAR" />
+        <result column="IS_ALLOW_OVERWRITE" property="isAllowOverwrite" jdbcType="VARCHAR" />
+        <result column="OLD_DELISTING_DATE" property="oldDelistingDate" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
         FINPROD_ID FINPROD_ID, SALE_DEPARTMENT SALE_DEPARTMENT, SALE_LAYER SALE_LAYER, SALE_PERIOD SALE_PERIOD, 
@@ -121,7 +125,7 @@
         FUTURES_CONTRACT_ID FUTURES_CONTRACT_ID, LAST_TRADE_DATE LAST_TRADE_DATE, LAST_SETTLE_DATE LAST_SETTLE_DATE, 
         DELIVERY_METHOD DELIVERY_METHOD, CONTRACT_MULTIPLIER CONTRACT_MULTIPLIER, IS_EFF_PLEDGE IS_EFF_PLEDGE, 
         IS_ISSUE_ASSET IS_ISSUE_ASSET, APPEAR_MARKET_ID APPEAR_MARKET_ID, WIND_CODE WIND_CODE,CROSS_MARKET CROSS_MARKET,
-        CROSS_MARKET_CODE CROSS_MARKET_CODE
+        CROSS_MARKET_CODE CROSS_MARKET_CODE, IS_NO_GUARD IS_NO_GUARD, CONCEPT_TYPE CONCEPT_TYPE, IS_ALLOW_OVERWRITE IS_ALLOW_OVERWRITE,OLD_DELISTING_DATE OLD_DELISTING_DATE
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -174,7 +178,7 @@
             MIN_SALE_UNIT, FUTURES_CONTRACT_ID, LAST_TRADE_DATE, 
             LAST_SETTLE_DATE, DELIVERY_METHOD, CONTRACT_MULTIPLIER, 
             IS_EFF_PLEDGE, IS_ISSUE_ASSET, APPEAR_MARKET_ID, 
-            WIND_CODE,CROSS_MARKET,CROSS_MARKET_CODE)
+            WIND_CODE,CROSS_MARKET,CROSS_MARKET_CODE, IS_NO_GUARD , CONCEPT_TYPE , IS_ALLOW_OVERWRITE ,OLD_DELISTING_DATE)
         values (#{finprodId,jdbcType=VARCHAR}, #{saleDepartment,jdbcType=VARCHAR}, #{saleLayer,jdbcType=VARCHAR}, 
             #{salePeriod,jdbcType=DECIMAL}, #{purSpeed,jdbcType=DECIMAL}, #{redSpeed,jdbcType=DECIMAL}, 
             #{isSecBond,jdbcType=VARCHAR}, #{windId,jdbcType=VARCHAR}, #{isAutoUpdate,jdbcType=VARCHAR}, 
@@ -205,7 +209,8 @@
             #{minSaleUnit,jdbcType=DECIMAL}, #{futuresContractId,jdbcType=VARCHAR}, #{lastTradeDate,jdbcType=DATE}, 
             #{lastSettleDate,jdbcType=DATE}, #{deliveryMethod,jdbcType=VARCHAR}, #{contractMultiplier,jdbcType=DECIMAL}, 
             #{isEffPledge,jdbcType=VARCHAR}, #{isIssueAsset,jdbcType=VARCHAR}, #{appearMarketId,jdbcType=VARCHAR}, 
-            #{windCode,jdbcType=VARCHAR},#{crossMarket,jdbcType=VARCHAR},#{crossMarketCode,jdbcType=VARCHAR})
+            #{windCode,jdbcType=VARCHAR},#{crossMarket,jdbcType=VARCHAR},#{crossMarketCode,jdbcType=VARCHAR},
+            #{isNoGuard,jdbcType=VARCHAR},#{conceptType,jdbcType=VARCHAR},#{isAllowOverwrite,jdbcType=VARCHAR},#{oldDelistingDate,jdbcType=DATE})
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.FinProductAdd" >
         insert into FIN_PRODUCT_ADD
@@ -486,7 +491,19 @@
             <if test="crossMarketCode != null" >
                 CROSS_MARKET_CODE,
             </if>
-        </trim>
+            <if test="isNoGuard != null" >
+                IS_NO_GUARD,
+            </if>
+            <if test="conceptType != null" >
+                CONCEPT_TYPE,
+            </if>
+            <if test="isAllowOverwrite != null" >
+                IS_ALLOW_OVERWRITE,
+            </if>
+            <if test="oldDelistingDate != null" >
+                OLD_DELISTING_DATE,
+            </if>
+         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="finprodId != null" >
                 #{finprodId,jdbcType=VARCHAR},
@@ -764,6 +781,18 @@
             <if test="crossMarketCode != null" >
                 #{crossMarketCode,jdbcType=VARCHAR},
             </if>
+            <if test="isNoGuard != null" >
+                #{isNoGuard,jdbcType=VARCHAR},
+            </if>
+            <if test="conceptType != null" >
+                #{conceptType,jdbcType=VARCHAR},
+            </if>
+            <if test="isAllowOverwrite != null" >
+                #{isAllowOverwrite,jdbcType=VARCHAR},
+            </if>
+            <if test="oldDelistingDate != null" >
+                #{oldDelistingDate,jdbcType=DATE},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.FinProductAdd" >
@@ -781,7 +810,7 @@
         IS_QTZQ, DATA_SOURCE, IS_RATE_ADJUST, BOND_RISK_TYPE, CREDIT_ENHANCE_MEASURE, FUND_MANGER_NAME, 
         BONUS_TYPE, TDY_REV_TRANS, LISTING_DATE, MIN_SALE_UNIT, FUTURES_CONTRACT_ID, LAST_TRADE_DATE, 
         LAST_SETTLE_DATE, DELIVERY_METHOD, CONTRACT_MULTIPLIER, IS_EFF_PLEDGE, IS_ISSUE_ASSET, 
-        APPEAR_MARKET_ID, WIND_CODE,CROSS_MARKET,CROSS_MARKET_CODE)
+        APPEAR_MARKET_ID, WIND_CODE,CROSS_MARKET,CROSS_MARKET_CODE, IS_NO_GUARD, CONCEPT_TYPE, IS_ALLOW_OVERWRITE, OLD_DELISTING_DATE)
         select FINPROD_ID, SALE_DEPARTMENT, SALE_LAYER, SALE_PERIOD, 
             PUR_SPEED, RED_SPEED, IS_SEC_BOND, WIND_ID, IS_AUTO_UPDATE, PORTFOLIO_ID, PROD_REGIST_CODE, 
             IS_CYCLE, IS_LAY, LAY_TYPE, INVEST_NATURE, PROFIT_FLAG, SALE_MODE, CHB_ID, TMPL_ID, 
@@ -796,7 +825,7 @@
             IS_QTZQ, DATA_SOURCE, IS_RATE_ADJUST, BOND_RISK_TYPE, CREDIT_ENHANCE_MEASURE, FUND_MANGER_NAME, 
             BONUS_TYPE, TDY_REV_TRANS, LISTING_DATE, MIN_SALE_UNIT, FUTURES_CONTRACT_ID, LAST_TRADE_DATE, 
             LAST_SETTLE_DATE, DELIVERY_METHOD, CONTRACT_MULTIPLIER, IS_EFF_PLEDGE, IS_ISSUE_ASSET, 
-            APPEAR_MARKET_ID, WIND_CODE,CROSS_MARKET,CROSS_MARKET_CODE
+            APPEAR_MARKET_ID, WIND_CODE,CROSS_MARKET,CROSS_MARKET_CODE,IS_NO_GUARD,CONCEPT_TYPE,IS_ALLOW_OVERWRITE,OLD_DELISTING_DATE
              from FIN_PRODUCT_ADD
              where 1 = 1 and FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
     </insert>
@@ -1064,6 +1093,18 @@
             <if test="crossMarketCode != null" >
                 CROSS_MARKET_CODE = #{crossMarketCode,jdbcType=VARCHAR},
             </if>
+            <if test="isNoGuard != null" >
+                IS_NO_GUARD = #{isNoGuard,jdbcType=VARCHAR},
+            </if>
+            <if test="conceptType != null" >
+                CONCEPT_TYPE = #{conceptType,jdbcType=VARCHAR},
+            </if>
+            <if test="isAllowOverwrite != null" >
+                IS_ALLOW_OVERWRITE = #{isAllowOverwrite,jdbcType=VARCHAR},
+            </if>
+            <if test="oldDelistingDate != null" >
+                OLD_DELISTING_DATE = #{oldDelistingDate,jdbcType=DATE},
+            </if>
         </set>
         where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
     </update>
@@ -1155,7 +1196,11 @@
             APPEAR_MARKET_ID = #{appearMarketId,jdbcType=VARCHAR},
             WIND_CODE = #{windCode,jdbcType=VARCHAR},
             CROSS_MARKET = #{crossMarket,jdbcType=VARCHAR},
-            CROSS_MARKET_CODE = #{crossMarketCode,jdbcType=VARCHAR}
+            CROSS_MARKET_CODE = #{crossMarketCode,jdbcType=VARCHAR},
+            IS_NO_GUARD = #{isNoGuard,jdbcType=VARCHAR},
+            CONCEPT_TYPE = #{conceptType,jdbcType=VARCHAR},
+            IS_ALLOW_OVERWRITE = #{isAllowOverwrite,jdbcType=VARCHAR},
+            OLD_DELISTING_DATE = #{oldDelistingDate,jdbcType=DATE}
         where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
     </update>
 </mapper>
