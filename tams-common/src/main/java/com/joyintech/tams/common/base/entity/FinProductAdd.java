@@ -458,11 +458,6 @@ public class FinProductAdd extends BaseEntity {
     private String crossMarketCode;
 
     /**
-     * 是否非担保
-     */
-    private String isNoGuard;
-
-    /**
      * 概念标识
      */
     private String conceptType;
@@ -1881,25 +1876,6 @@ public class FinProductAdd extends BaseEntity {
      */
     public void setCrossMarketCode(String crossMarketCode) {
         this.crossMarketCode = crossMarketCode == null ? null : crossMarketCode.trim();
-    }
-
-
-    /**
-     * 获取 是否非担保
-     *
-     * @return isNoGuard 是否非担保
-     */
-    public String getIsNoGuard() {
-        return this.isNoGuard;
-    }
-
-    /**
-     * 设置 是否非担保
-     *
-     * @param isNoGuard 是否非担保
-     */
-    public void setIsNoGuard(String isNoGuard) {
-        this.isNoGuard = isNoGuard;
     }
 
     /**
