@@ -2,9 +2,8 @@ package com.joyintech.tams.cfets.trdredeem.dao;
 
 
 
-import com.joyintech.tams.cfets.bankuplink.bond.dto.PtlAllocationDto;
+import com.joyintech.tams.cfets.trd.bond.dto.PtlAllocationDto;
 import com.joyintech.tams.cfets.trdredeem.dto.CfetsTrdRedeemRegInfoListResponse;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

@@ -17,21 +17,16 @@ import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
-import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.service.bankuplink.common.dto.TrdBondInvestTradeDto;
 import com.joyintech.service.bankuplink.common.util.ProdTypeUtil;
 import com.joyintech.tams.business.common.pojo.Message;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
-import com.joyintech.tams.cfets.bankuplink.repo.service.CfetsRepoQuotedPrice004Service;
-import com.joyintech.tams.cfets.etrib.bond.dao.CfetsEtrIbBondinfoMapper;
-import com.joyintech.tams.cfets.etrib.bond.dto.CfetsEtrIbBondinfoDto;
-import com.joyintech.tams.cfets.etrib.bond.dto.CfetsEtrIbPosPortfolioRequest;
-import com.joyintech.tams.cfets.etrib.bond.dto.CfetsEtrIbPositionRequest;
-import com.joyintech.tams.cfets.etrib.bond.service.CfetsEtribBondInfo003Service;
+import com.joyintech.tams.cfets.trd.repo.service.CfetsRepoQuotedPrice004Service;
+import com.joyintech.tams.cfets.etr.bond.dao.CfetsEtrIbBondinfoMapper;
+import com.joyintech.tams.cfets.etr.bond.service.CfetsEtribBondInfo003Service;
 import com.joyintech.tams.cfets.trdconfirm.dao.CfetsTrdConfirmMapper;
 import com.joyintech.tams.cfets.trdconfirm.dto.*;
 import com.joyintech.tams.cfets.trdquery.dao.CfetsTrdQueryMapper;
@@ -51,14 +46,11 @@ import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.cstp.service.CstpCommonService;
-import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
 import com.joyintech.tams.invest.common.dto.common.BussRepoSecDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.tams.invest.common.service.InvestInterfCommService;
-import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
-import com.joyintech.tams.invest.common.trade.dto.AllTradeCommonInputDto;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
 import com.joyintech.tams.invest.common.trade.service.PreTrdCommonBaseService;
 import com.joyintech.tams.invest.trade.lend.dto.FinTradeProductDto;
@@ -76,8 +68,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
-
 
 
 /**

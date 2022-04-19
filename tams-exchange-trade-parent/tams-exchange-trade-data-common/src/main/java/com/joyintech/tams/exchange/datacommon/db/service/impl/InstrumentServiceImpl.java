@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.datacommon.db.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.alibaba.fastjson.JSON;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
@@ -21,6 +22,8 @@ import com.joyintech.tams.exchange.datacommon.db.dao.InstrumentMapper;
 import com.joyintech.tams.exchange.datacommon.db.service.FuturesInstrumentService;
 import com.joyintech.tams.exchange.datacommon.db.service.InstrumentService;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +34,11 @@ import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt2
 
 @Service
 public class InstrumentServiceImpl extends AsyncServiceImpl<String, Instrument> implements InstrumentService {
+
+    /**
+     * 日志对象
+     */
+    private static final Logger log = LoggerFactory.getLogger(InstrumentServiceImpl.class); 
 
     @Autowired
     private InstrumentMapper instrumentMapper;
@@ -106,9 +114,14 @@ public class InstrumentServiceImpl extends AsyncServiceImpl<String, Instrument> 
 
     @Override
     public void saveMinPrice(List<MinPrice> minPriceList) {
+        log.info("saveMinPrice() called with parameters => 【minPriceList = {}】",minPriceList);
         futuresInstrumentService.clearMinPriceAndMinTrdUnitLimitCache();
         minPriceAndMinTrdUnitLimitBeanMap.clear();
         minPriceMap.clear();
+        if (CollUtil.isEmpty(minPriceList)) {
+            return;
+        }
+
         String ps = null;
         minPriceList.forEach(minPrice -> {
             minPrice.setMarket(InvestmentUtils.convertInvestMarketToTrade(minPrice.getTradeMarket()));
@@ -122,9 +135,14 @@ public class InstrumentServiceImpl extends AsyncServiceImpl<String, Instrument> 
 
     @Override
     public void saveTrdUnitLimit(List<MinTrdUnitLimit> minTrdUnitLimitList) {
+        log.info("saveTrdUnitLimit() called with parameters => 【minTrdUnitLimitList = {}】",minTrdUnitLimitList);
         futuresInstrumentService.clearMinPriceAndMinTrdUnitLimitCache();
         minPriceAndMinTrdUnitLimitBeanMap.clear();
         minTrdUnitLimitMap.clear();
+        if (CollUtil.isEmpty(minTrdUnitLimitList)) {
+            return;
+        }
+
         minTrdUnitLimitList.forEach(minTrdUnitLimit -> {
             minTrdUnitLimit.setMarket(InvestmentUtils.convertInvestMarketToTrade(minTrdUnitLimit.getTradeMarket()));
             ArrayList<Object> list = Lists.newArrayList(minTrdUnitLimit.getMarket(), minTrdUnitLimit.getTradePlat(),
@@ -234,7 +252,7 @@ public class InstrumentServiceImpl extends AsyncServiceImpl<String, Instrument> 
 
     @Override
     public void trdUnitLimitFlush() {
-        logger.info("minPriceAndMinTrdUnitLimitBeanMap:{}", JSON.toJSONString(minPriceAndMinTrdUnitLimitBeanMap));
+        logger.info("minPriceAndMinTrdUnitLimitBeanMap:{}", minPriceAndMinTrdUnitLimitBeanMap);
         minPriceAndMinTrdUnitLimitBeanMap.clear();
     }
 

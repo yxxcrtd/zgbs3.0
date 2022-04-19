@@ -4,11 +4,10 @@ import com.joyintech.tams.exchange.common.constant.BusinessFlag;
 import com.joyintech.tams.exchange.common.db.domain.Trade;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 
 
-public class TradeMessage implements Cloneable, Serializable {
+public class TradeMessage extends BasicMessage {
     private static final long serialVersionUID = -7909494233501258978L;
     private String entrustId;       // 委托代码
     private String orderId;         // 订单代码
@@ -36,6 +35,7 @@ public class TradeMessage implements Cloneable, Serializable {
     private String busiType;        // 业务类型（手工交收用）
     private String counterId;     // 交易对手
     private BigDecimal pledgeRatio;     // 折算比例%
+    private Double entrustVolume;      // 委托数量
 
     public String getEntrustId() {
         return entrustId;
@@ -245,12 +245,21 @@ public class TradeMessage implements Cloneable, Serializable {
         this.pledgeRatio = pledgeRatio;
     }
 
+    public Double getEntrustVolume() {
+        return entrustVolume;
+    }
+
+    public void setEntrustVolume(Double entrustVolume) {
+        this.entrustVolume = entrustVolume;
+    }
+
     private static TradeMessage templateMessage = new TradeMessage();
 
     public static TradeMessage createTradeMessage(Trade trade) {
         TradeMessage tradeMessage;
         try {
             tradeMessage = (TradeMessage) templateMessage.clone();
+            tradeMessage.setId(trade.getId());
             tradeMessage.setEntrustId(trade.getInstructionId());
             tradeMessage.setOrderId(trade.getEntrustId());
             tradeMessage.setEntrustNo(trade.getBrokerEntrustId());

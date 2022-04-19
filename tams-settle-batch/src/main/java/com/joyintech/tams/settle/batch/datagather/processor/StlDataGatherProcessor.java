@@ -131,19 +131,58 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
      */
     protected void generateSettleTransData(List<SettleTransDataDto> settleTransDataList) {
         logger.debug("汇总成交匹配数据:" + JSON.toJSONString(settleTransDataList));
-        // modify by etliu 20211204 start
-        // GZYHTZJY-711: 自动匹配应优先处理能够匹配到上行委托的数据，再根据业务字段匹配指令
-        List<SettleTransDataDto> tempSettleTransDataList = new ArrayList<>();
-        tempSettleTransDataList.addAll(settleTransDataList.stream().filter(
-                x -> StringUtil.isNotBlank(x.getEntrustId())).collect(Collectors.toList()));
-        tempSettleTransDataList.addAll(settleTransDataList.stream().filter(
-                x -> StringUtil.isBlank(x.getEntrustId())).collect(Collectors.toList()));
-        // modify by etliu 20211204 end
+        // 对成交明细汇总数据进行重新排序,匹配到上行委托的数据优先
+        List<SettleTransDataDto> reRankSettleTransDataList = this.reRankSettleTransDataList(settleTransDataList);
+        // modify by etliu 20211227 start
+        // GZYHTZJY-777:回售交易当日无法得到成交的清算数据，导致无法匹配到对应的上行委托或指令
+        // 筛选普通处理的成交明细汇总数据(除债回售、可转债申购、新股申购、配债、配股之外的数据)
+        List<SettleTransDataDto> normalSettleTransDataList = filterNormalSettleTransDataList(reRankSettleTransDataList);
+        // 筛选需特殊处理的成交明细汇总数据(债回售、可转债申购、新股申购、配债、配股的数据)
+        List<SettleTransDataDto> specailSettleTransDataList = filterSpecialSettleTransDataList(reRankSettleTransDataList);
+
+        // 需要更新状态的指令
+        List <String> needUpdateStatusEntrustIdList = new ArrayList<>();
+        // modify by etliu 20211227 end
+
+        List<ExchangeTransMatchCommonDto> exchangeTransMatchCommons = new ArrayList<>();
+
+        // 处理除债回售、可转债申购、新股申购、配债、配股之外的数据
+        this.handleNormalTrade(normalSettleTransDataList, exchangeTransMatchCommons, needUpdateStatusEntrustIdList);
 
         // modify by etliu 20211227 start
         // GZYHTZJY-777:回售交易当日无法得到成交的清算数据，导致无法匹配到对应的上行委托或指令
-        Map<String, String> tradeIdMatchedMap = new HashMap<>();
-        List<SettleTransDataDto> normalSettleTransDataList = tempSettleTransDataList.stream().filter(
+        // 债回售、可转债申购、新股申购、配债、配股需要特殊处理
+        this.handleSpecailTrade(specailSettleTransDataList, exchangeTransMatchCommons, needUpdateStatusEntrustIdList);
+        // modify by etliu 20211227 end
+
+        // 调用画面端成交匹配逻辑
+        stlDataGatherService.transactionMacthBatch(exchangeTransMatchCommons, needUpdateStatusEntrustIdList);
+    }
+
+    /**
+     * 对成交明细汇总数据进行重新排序,匹配到上行委托的数据优先
+     * @param settleTransDataList
+     * @return
+     */
+    private List<SettleTransDataDto> reRankSettleTransDataList(List<SettleTransDataDto> settleTransDataList){
+        // modify by etliu 20211204 start
+        // GZYHTZJY-711: 自动匹配应优先处理能够匹配到上行委托的数据，再根据业务字段匹配指令
+        List<SettleTransDataDto> reRankSettleTransDataList = new ArrayList<>();
+        reRankSettleTransDataList.addAll(settleTransDataList.stream().filter(
+                x -> StringUtil.isNotBlank(x.getEntrustId())).collect(Collectors.toList()));
+        reRankSettleTransDataList.addAll(settleTransDataList.stream().filter(
+                x -> StringUtil.isBlank(x.getEntrustId())).collect(Collectors.toList()));
+        // modify by etliu 20211204 end
+        return reRankSettleTransDataList;
+    }
+
+    /**
+     * 筛选普通处理的成交明细汇总数据(除债回售、可转债申购、新股申购、配债、配股之外的数据)
+     * @param settleTransDataDtos
+     * @return
+     */
+    private List<SettleTransDataDto> filterNormalSettleTransDataList(List<SettleTransDataDto> settleTransDataDtos){
+        return  settleTransDataDtos.stream().filter(
                 x -> !(StringUtil.equals(DictCodeList.交易方向_行权_回售.getValue(), x.getPs())
                         || (StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue(), x.getFinprodType2())
                         && StringUtil.equals(DictCodeList.交易方向_申购.getValue(), x.getPs())
@@ -154,8 +193,16 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
                         || StringUtil.equals(DictCodeListExt3.交易方向_配债.getValue(), x.getPs())
                         || StringUtil.equals(DictCodeListExt2.交易方向_配股.getValue(), x.getPs())
                 )
-            ).collect(Collectors.toList());
-        List<SettleTransDataDto> specailSettleTransDataList = tempSettleTransDataList.stream().filter(
+        ).collect(Collectors.toList());
+    }
+
+    /**
+     * 筛选需特殊处理的成交明细汇总数据(债回售、可转债申购、新股申购、配债、配股的数据)
+     * @param settleTransDataDtos
+     * @return
+     */
+    private List<SettleTransDataDto> filterSpecialSettleTransDataList(List<SettleTransDataDto> settleTransDataDtos){
+        return  settleTransDataDtos.stream().filter(
                 x -> (StringUtil.equals(DictCodeList.交易方向_行权_回售.getValue(), x.getPs())
                         || (StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue(), x.getFinprodType2())
                         && StringUtil.equals(DictCodeList.交易方向_申购.getValue(), x.getPs())
@@ -166,150 +213,149 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
                         || StringUtil.equals(DictCodeListExt3.交易方向_配债.getValue(), x.getPs())
                         || StringUtil.equals(DictCodeListExt2.交易方向_配股.getValue(), x.getPs())
                 )
-            ).collect(Collectors.toList());
+        ).collect(Collectors.toList());
+    }
 
-        List<String> needUpdateStatusEntrustIdList = new ArrayList<>();
-        // modify by etliu 20211227 end
-
-        List<ExchangeTransMatchCommonDto>  exchangeTransMatchCommons = new ArrayList<>();
+    /**
+     * 除债回售、可转债申购、新股申购、配债、配股之外的普通数据处理
+     * @param normalSettleTransDataList
+     * @param exchangeTransMatchCommons
+     * @param needUpdateStatusEntrustIdList
+     */
+    private void handleNormalTrade(List<SettleTransDataDto> normalSettleTransDataList,
+                                     List<ExchangeTransMatchCommonDto>  exchangeTransMatchCommons,
+                                     List<String> needUpdateStatusEntrustIdList) {
         List<EtrEntrustDto> etrEntrustDtos = stlDataGatherMapper.listEtrEntrust(getFinprodType(),this.getBatchExecuteInfo().getExecuteDate());
         logger.debug("指令匹配数据:" + JSON.toJSONString(etrEntrustDtos));
         Map<String, List<EtrEntrustDto>> etrEntrustMap = etrEntrustDtos.stream().collect(Collectors.groupingBy(EtrEntrustDto::getBusiKey, Collectors.toList()));
-        if(null!=etrEntrustDtos&&!StringUtil.isEmptyList(etrEntrustDtos)){
-            // modify by etliu 20211204 start
-            // GZYHTZJY-711: 自动匹配应优先处理能够匹配到上行委托的数据，再根据业务字段匹配指令
-//            for (SettleTransDataDto settleTransDataDto : settleTransDataList) {
-            for (SettleTransDataDto settleTransDataDto : normalSettleTransDataList) {
+        if(StringUtil.isEmptyList(etrEntrustDtos)){
+            return;
+        }
+        // modify by etliu 20211204 start
+        // GZYHTZJY-711: 自动匹配应优先处理能够匹配到上行委托的数据，再根据业务字段匹配指令
+        // for (SettleTransDataDto settleTransDataDto : settleTransDataList) {
+        for (SettleTransDataDto settleTransDataDto : normalSettleTransDataList) {
             // modify by etliu 20211204 end
-                ExchangeTransMatchCommonDto exchangeTransMatchCommonDto = new ExchangeTransMatchCommonDto();
-                BeanUtil.copyPropertiesIgnoreNull(exchangeTransMatchCommonDto,settleTransDataDto);
-                exchangeTransMatchCommonDto.setMatchType("0");
+            ExchangeTransMatchCommonDto exchangeTransMatchCommonDto = new ExchangeTransMatchCommonDto();
+            BeanUtil.copyPropertiesIgnoreNull(exchangeTransMatchCommonDto,settleTransDataDto);
+            exchangeTransMatchCommonDto.setMatchType("0");
 
-                exchangeTransMatchCommonDto.setRemainNum(settleTransDataDto.getShareAmt());
-                exchangeTransMatchCommonDto.setRemainAmount(settleTransDataDto.getFpriceAmt());
-                exchangeTransMatchCommonDto.setSeqId(settleTransDataDto.getTradeId());
+            exchangeTransMatchCommonDto.setRemainNum(settleTransDataDto.getShareAmt());
+            exchangeTransMatchCommonDto.setRemainAmount(settleTransDataDto.getFpriceAmt());
+            exchangeTransMatchCommonDto.setSeqId(settleTransDataDto.getTradeId());
 
-                if(StringUtil.isNotEmpty(settleTransDataDto.getEntrustId())){
-                    // modify by etliu 20211210 start
-                    // ZGZGST-4158: 重新跑清结算的批处理后，结算数据与当天全部的场内指令进行了自动匹配
+            if(StringUtil.isNotEmpty(settleTransDataDto.getEntrustId())){
+                // modify by etliu 20211210 start
+                // ZGZGST-4158: 重新跑清结算的批处理后，结算数据与当天全部的场内指令进行了自动匹配
 //                    exchangeTransMatchCommonDto.setEntrustIdList(Arrays.asList(etrEntrustDtos.get(0).getEntrustId()));
-                    exchangeTransMatchCommonDto.setEntrustIdList(Arrays.asList(settleTransDataDto.getEntrustId()));
+                exchangeTransMatchCommonDto.setEntrustIdList(Collections.singletonList(settleTransDataDto.getEntrustId()));
 
-                    needUpdateStatusEntrustIdList.add(settleTransDataDto.getEntrustId());
-                    // modify by etliu 20211210 end
-                }else{
-                    if(DictCodeList.回购类型_质押式协议回购.getValue().equals(settleTransDataDto.getRepoType())){
-                        // 协议回购特殊处理,筛选未完成匹配的(协议回购没有部分匹配)
-                        etrEntrustDtos = etrEntrustDtos.stream()
-                                .filter(entry-> !DictCodeListExt3.下行交易匹配状态_匹配完成.getValue().equals(entry.getMatchClass()))
-                                .collect(Collectors.toList());
-                        // 处理质押式协议回购匹配逻辑
-                        List<EtrEntrustDto> currEtrEntrustList = executeRepoH01Match(settleTransDataDto, etrEntrustDtos);
-                        if(CollectionUtils.isEmpty(currEtrEntrustList)){
-                            continue;
-                        }
-                        if(currEtrEntrustList.size()==1){
-                            if(DictCodeListExt3.交易方向_中途换券.getValue().equals(settleTransDataDto.getPs())
-                                    || DictCodeListExt3.交易方向_解除质押.getValue().equals(settleTransDataDto.getPs())){
-                                // 查询指令质押券信息
-                                List<EtrPledge> etrPledges = stlDataGatherMapper.selectEtrPledges(
-                                        currEtrEntrustList.get(0).getEntrustId(), currEtrEntrustList.get(0).getFinprodId());
-                                if(CollectionUtils.isNotEmpty(etrPledges)){
-                                    if(null!=settleTransDataDto.getShareAmt()&&settleTransDataDto.getShareAmt().compareTo(etrPledges.get(0).getPledgeNumber())<=0){
-                                        exchangeTransMatchCommonDto.setEntrustIdList(Arrays.asList(currEtrEntrustList.get(0).getEntrustId()));
-
-                                        needUpdateStatusEntrustIdList.add(currEtrEntrustList.get(0).getEntrustId());
-                                    }
-                                }
-                            }else{
-                                if(null!=settleTransDataDto.getShareAmt()&&settleTransDataDto.getShareAmt().compareTo(currEtrEntrustList.get(0).getEntrustAmt())<=0){
-                                    exchangeTransMatchCommonDto.setEntrustIdList(Arrays.asList(currEtrEntrustList.get(0).getEntrustId()));
+                needUpdateStatusEntrustIdList.add(settleTransDataDto.getEntrustId());
+                // modify by etliu 20211210 end
+            }else{
+                if(DictCodeList.回购类型_质押式协议回购.getValue().equals(settleTransDataDto.getRepoType())){
+                    // 协议回购特殊处理,筛选未完成匹配的(协议回购没有部分匹配)
+                    etrEntrustDtos = etrEntrustDtos.stream()
+                            .filter(entry-> !DictCodeListExt3.下行交易匹配状态_匹配完成.getValue().equals(entry.getMatchClass()))
+                            .collect(Collectors.toList());
+                    // 处理质押式协议回购匹配逻辑
+                    List<EtrEntrustDto> currEtrEntrustList = executeRepoH01Match(settleTransDataDto, etrEntrustDtos);
+                    if(CollectionUtils.isEmpty(currEtrEntrustList)){
+                        continue;
+                    }
+                    if(currEtrEntrustList.size()==1){
+                        if(DictCodeListExt3.交易方向_中途换券.getValue().equals(settleTransDataDto.getPs())
+                                || DictCodeListExt3.交易方向_解除质押.getValue().equals(settleTransDataDto.getPs())){
+                            // 查询指令质押券信息
+                            List<EtrPledge> etrPledges = stlDataGatherMapper.selectEtrPledges(
+                                    currEtrEntrustList.get(0).getEntrustId(), currEtrEntrustList.get(0).getFinprodId());
+                            if(CollectionUtils.isNotEmpty(etrPledges)){
+                                if(null!=settleTransDataDto.getShareAmt()&&settleTransDataDto.getShareAmt().compareTo(etrPledges.get(0).getPledgeNumber())<=0){
+                                    exchangeTransMatchCommonDto.setEntrustIdList(Collections.singletonList(currEtrEntrustList.get(0).getEntrustId()));
 
                                     needUpdateStatusEntrustIdList.add(currEtrEntrustList.get(0).getEntrustId());
                                 }
                             }
+                        }else{
+                            if(null!=settleTransDataDto.getShareAmt()&&settleTransDataDto.getShareAmt().compareTo(currEtrEntrustList.get(0).getEntrustAmt())<=0){
+                                exchangeTransMatchCommonDto.setEntrustIdList(Collections.singletonList(currEtrEntrustList.get(0).getEntrustId()));
+
+                                needUpdateStatusEntrustIdList.add(currEtrEntrustList.get(0).getEntrustId());
+                            }
                         }
-                        if(currEtrEntrustList.size()>1){
-                            List<String> entrustIds = Lists.newArrayList();
-                            for(EtrEntrustDto currEtrEntrust : currEtrEntrustList){
-                                if(DictCodeListExt3.交易方向_中途换券.getValue().equals(settleTransDataDto.getPs())
-                                        || DictCodeListExt3.交易方向_解除质押.getValue().equals(settleTransDataDto.getPs())){
-                                    // 查询指令质押券信息
-                                    List<EtrPledge> etrPledges = stlDataGatherMapper.selectEtrPledges(
-                                            currEtrEntrust.getEntrustId(), currEtrEntrust.getFinprodId());
-                                    if(CollectionUtils.isNotEmpty(etrPledges)){
-                                        needUpdateStatusEntrustIdList.add(currEtrEntrust.getEntrustId());
-                                        if(null!=settleTransDataDto.getShareAmt()&&settleTransDataDto.getShareAmt().compareTo(etrPledges.get(0).getPledgeNumber())<=0){
-                                            entrustIds.add(currEtrEntrust.getEntrustId());
-                                        }
-                                    }
-                                }else{
+                    }
+                    if(currEtrEntrustList.size()>1){
+                        List<String> entrustIds = Lists.newArrayList();
+                        for(EtrEntrustDto currEtrEntrust : currEtrEntrustList){
+                            if(DictCodeListExt3.交易方向_中途换券.getValue().equals(settleTransDataDto.getPs())
+                                    || DictCodeListExt3.交易方向_解除质押.getValue().equals(settleTransDataDto.getPs())){
+                                // 查询指令质押券信息
+                                List<EtrPledge> etrPledges = stlDataGatherMapper.selectEtrPledges(
+                                        currEtrEntrust.getEntrustId(), currEtrEntrust.getFinprodId());
+                                if(CollectionUtils.isNotEmpty(etrPledges)){
                                     needUpdateStatusEntrustIdList.add(currEtrEntrust.getEntrustId());
-                                    if(null!=settleTransDataDto.getShareAmt()&&settleTransDataDto.getShareAmt().compareTo(currEtrEntrust.getEntrustAmt())<=0){
+                                    if(null!=settleTransDataDto.getShareAmt()&&settleTransDataDto.getShareAmt().compareTo(etrPledges.get(0).getPledgeNumber())<=0){
                                         entrustIds.add(currEtrEntrust.getEntrustId());
                                     }
                                 }
-                            }
-                            // 协议回购一对多的情况下,当且仅有一条指令满足条件时,自动匹配
-                            if(entrustIds.size() == 1){
-                                exchangeTransMatchCommonDto.setEntrustIdList(entrustIds);
-                            }
-                        }
-                    }else{
-                        String busiKey = getSettleTransDataBusiKey(settleTransDataDto);
-                        if(!etrEntrustMap.containsKey(busiKey)){
-                            continue;
-                        }
-                        List<EtrEntrustDto> currEtrEntrustList = etrEntrustMap.get(busiKey);
-                        if(CollectionUtils.isEmpty(currEtrEntrustList)){
-                            continue;
-                        }
-                        if(currEtrEntrustList.size()==1){
-                            exchangeTransMatchCommonDto.setEntrustIdList(Arrays.asList(currEtrEntrustList.get(0).getEntrustId()));
-                            needUpdateStatusEntrustIdList.add(currEtrEntrustList.get(0).getEntrustId());
-                        }
-                        if(currEtrEntrustList.size()>1){
-                            List<String> entrustIds = currEtrEntrustList.stream().map(e -> e.getEntrustId()).collect(Collectors.toList());
-                            needUpdateStatusEntrustIdList.addAll(entrustIds);
-
-                            //委托数量汇总
-                            BigDecimal entrustNumTotal = currEtrEntrustList.stream().map(EtrEntrustDto::getEntrustNum).reduce(BigDecimal.ZERO, BigDecimal::add);
-                            // GNS-847:竞价回购匹配时,shareAmt需除以100, modify by fuyongsheng 20220222 start
-                            BigDecimal shareAmt = settleTransDataDto.getShareAmt();
-                            if(null != shareAmt && DictCodeList.回购类型_质押式竞价回购.getValue().equals(settleTransDataDto.getRepoType())){
-                                shareAmt = ArithmeticUtil.divide(shareAmt, new BigDecimal(100), 4, RoundingMode.HALF_UP);
-                            }
-                            // if(null!=settleTransDataDto.getShareAmt()&&settleTransDataDto.getShareAmt().compareTo(entrustNumTotal)>=0){
-                            if(null != shareAmt && shareAmt.compareTo(entrustNumTotal)>=0){
-                                // GNS-847:竞价回购匹配时,shareAmt需除以100, modify by fuyongsheng 20220222 end
-                                exchangeTransMatchCommonDto.setEntrustIdList(entrustIds);
                             }else{
-                                // 按金额汇总匹配,筛选指令金额不为空数据
-                                List<EtrEntrustDto> filterEtrEntrustList = currEtrEntrustList.stream().filter(item->item.getEntrustAmt()!=null).collect(Collectors.toList());
-                                //委托金额汇总
-                                if(CollectionUtils.isNotEmpty(filterEtrEntrustList)){
-                                    BigDecimal entrustAmtTotal = filterEtrEntrustList.stream().map(EtrEntrustDto::getEntrustAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
-                                    if(null!=settleTransDataDto.getTradeAmt()&&settleTransDataDto.getTradeAmt().compareTo(entrustAmtTotal)>=0){
-                                        exchangeTransMatchCommonDto.setEntrustIdList(entrustIds);
-                                    }
+                                needUpdateStatusEntrustIdList.add(currEtrEntrust.getEntrustId());
+                                if(null!=settleTransDataDto.getShareAmt()&&settleTransDataDto.getShareAmt().compareTo(currEtrEntrust.getEntrustAmt())<=0){
+                                    entrustIds.add(currEtrEntrust.getEntrustId());
+                                }
+                            }
+                        }
+                        // 协议回购一对多的情况下,当且仅有一条指令满足条件时,自动匹配
+                        if(entrustIds.size() == 1){
+                            exchangeTransMatchCommonDto.setEntrustIdList(entrustIds);
+                        }
+                    }
+                }else{
+                    String busiKey = getSettleTransDataBusiKey(settleTransDataDto);
+                    if(!etrEntrustMap.containsKey(busiKey)){
+                        continue;
+                    }
+                    List<EtrEntrustDto> currEtrEntrustList = etrEntrustMap.get(busiKey);
+                    if(CollectionUtils.isEmpty(currEtrEntrustList)){
+                        continue;
+                    }
+                    if(currEtrEntrustList.size()==1){
+                        exchangeTransMatchCommonDto.setEntrustIdList(Collections.singletonList(currEtrEntrustList.get(0).getEntrustId()));
+                        needUpdateStatusEntrustIdList.add(currEtrEntrustList.get(0).getEntrustId());
+                    }
+                    if(currEtrEntrustList.size()>1){
+                        List<String> entrustIds = currEtrEntrustList.stream().map(EtrEntrust::getEntrustId).collect(Collectors.toList());
+                        needUpdateStatusEntrustIdList.addAll(entrustIds);
+
+                        //委托数量汇总
+                        BigDecimal entrustNumTotal = currEtrEntrustList.stream().map(EtrEntrustDto::getEntrustNum).reduce(BigDecimal.ZERO, BigDecimal::add);
+                        // GNS-847:竞价回购匹配时,shareAmt需除以100, modify by fuyongsheng 20220222 start
+                        BigDecimal shareAmt = settleTransDataDto.getShareAmt();
+                        if(null != shareAmt && DictCodeList.回购类型_质押式竞价回购.getValue().equals(settleTransDataDto.getRepoType())){
+                            shareAmt = ArithmeticUtil.divide(shareAmt, new BigDecimal(100), 4, RoundingMode.HALF_UP);
+                        }
+                        // if(null!=settleTransDataDto.getShareAmt()&&settleTransDataDto.getShareAmt().compareTo(entrustNumTotal)>=0){
+                        if(null != shareAmt && shareAmt.compareTo(entrustNumTotal)>=0){
+                            // GNS-847:竞价回购匹配时,shareAmt需除以100, modify by fuyongsheng 20220222 end
+                            exchangeTransMatchCommonDto.setEntrustIdList(entrustIds);
+                        }else{
+                            // 按金额汇总匹配,筛选指令金额不为空数据
+                            List<EtrEntrustDto> filterEtrEntrustList = currEtrEntrustList.stream().filter(item->item.getEntrustAmt()!=null).collect(Collectors.toList());
+                            //委托金额汇总
+                            if(CollectionUtils.isNotEmpty(filterEtrEntrustList)){
+                                BigDecimal entrustAmtTotal = filterEtrEntrustList.stream().map(EtrEntrustDto::getEntrustAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+                                if(null!=settleTransDataDto.getTradeAmt()&&settleTransDataDto.getTradeAmt().compareTo(entrustAmtTotal)>=0){
+                                    exchangeTransMatchCommonDto.setEntrustIdList(entrustIds);
                                 }
                             }
                         }
                     }
                 }
-                if(null!=exchangeTransMatchCommonDto&&!StringUtil.isEmptyList(exchangeTransMatchCommonDto.getEntrustIdList())){
-                    exchangeTransMatchCommons.add(exchangeTransMatchCommonDto);
-                }
+            }
+            if(null!=exchangeTransMatchCommonDto&&!StringUtil.isEmptyList(exchangeTransMatchCommonDto.getEntrustIdList())){
+                exchangeTransMatchCommons.add(exchangeTransMatchCommonDto);
             }
         }
-
-        // modify by etliu 20211227 start
-        // GZYHTZJY-777:回售交易当日无法得到成交的清算数据，导致无法匹配到对应的上行委托或指令
-        // 债回售、可转债申购、新股申购、配债、配股需要特殊处理
-        this.handleSpecailTrade(specailSettleTransDataList, exchangeTransMatchCommons, needUpdateStatusEntrustIdList);
-        // modify by etliu 20211227 end
-
-        stlDataGatherService.transactionMacthBatch(exchangeTransMatchCommons, needUpdateStatusEntrustIdList);
     }
 
     // modify by etliu 20211227 start
@@ -488,7 +534,10 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
             if( !settleTransDataDto.getSecAcctId().equals(etrEntrustDto.getSecAcctId())
                 ||!settleTransDataDto.getAcctNo().equals(etrEntrustDto.getDealCurAcct())
                 || !settleTransDataDto.getTradeDate().equals(etrEntrustDto.getEntrustDate())
-                || !settleTransDataDto.getTradePlat().equals(etrEntrustDto.getTradePlat())){
+                // modify by fuyongsheng 匹配指令忽略交易平台 start
+                // || !settleTransDataDto.getTradePlat().equals(etrEntrustDto.getTradePlat())
+                // modify by fuyongsheng 匹配指令忽略交易平台 end
+            ){
                 continue;
             }
             if(DictCodeList.交易方向_买入.getValue().equals(settlePs)){ // 首期
@@ -640,18 +689,24 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
                 ps = DictCodeListExt3.交易方向_逆回购.getValue();
             }
             String finProdId = settleTransDataDto.getTermType();
-            return StringUtil.joinString(Arrays.asList(settleTransDataDto.getSecAcctId(),settleTransDataDto.getAcctNo(),finProdId, DateUtil.format(settleTransDataDto.getTradeDate()),settleTransDataDto.getTradePlat(),ps),"_");
+            // modify by fuyongsheng 匹配指令忽略交易平台 start
+            // return StringUtil.joinString(Arrays.asList(settleTransDataDto.getSecAcctId(),settleTransDataDto.getAcctNo(),finProdId, DateUtil.format(settleTransDataDto.getTradeDate()),settleTransDataDto.getTradePlat(),ps),"_");
+            return StringUtil.joinString(Arrays.asList(settleTransDataDto.getSecAcctId(),settleTransDataDto.getAcctNo(),finProdId, DateUtil.format(settleTransDataDto.getTradeDate()),ps),"_");
+            // modify by fuyongsheng 匹配指令忽略交易平台 end
         }
+        // modify by fuyongsheng 匹配指令忽略交易平台 start
         // GNS-922:质押券出入库不看交易平台 modify by fuyongsheng 20220219 start
-        else if(DictCodeListExt3.交易方向_质押券入库.getValue().equals(settleTransDataDto.getPs()) || DictCodeListExt3.交易方向_质押券出库.getValue().equals(settleTransDataDto.getPs())){
-            return StringUtil.joinString(Arrays.asList(settleTransDataDto.getSecAcctId(),settleTransDataDto.getAcctNo(),settleTransDataDto.getFinprodId(), DateUtil.format(settleTransDataDto.getTradeDate()),settleTransDataDto.getPs()),"_");
-        }
-        // GNS-922:质押券出入库不看交易平台 modify by fuyongsheng 20220219 end
-        else if(DictCodeListExt3.交易方向_债转股.getValue().equals(settleTransDataDto.getPs())){
-            return StringUtil.joinString(Arrays.asList(settleTransDataDto.getSecAcctId(),settleTransDataDto.getAcctNo(),settleTransDataDto.getFinprodId(), DateUtil.format(settleTransDataDto.getTradeDate()),settleTransDataDto.getPs()),"_");
-        }
-        else{
-            return StringUtil.joinString(Arrays.asList(settleTransDataDto.getSecAcctId(),settleTransDataDto.getAcctNo(),settleTransDataDto.getFinprodId(), DateUtil.format(settleTransDataDto.getTradeDate()),settleTransDataDto.getTradePlat(),settleTransDataDto.getPs()),"_");
-        }
+//        else if(DictCodeListExt3.交易方向_质押券入库.getValue().equals(settleTransDataDto.getPs()) || DictCodeListExt3.交易方向_质押券出库.getValue().equals(settleTransDataDto.getPs())){
+//            return StringUtil.joinString(Arrays.asList(settleTransDataDto.getSecAcctId(),settleTransDataDto.getAcctNo(),settleTransDataDto.getFinprodId(), DateUtil.format(settleTransDataDto.getTradeDate()),settleTransDataDto.getPs()),"_");
+//        }
+//        // GNS-922:质押券出入库不看交易平台 modify by fuyongsheng 20220219 end
+//        else if(DictCodeListExt3.交易方向_债转股.getValue().equals(settleTransDataDto.getPs())){
+//            return StringUtil.joinString(Arrays.asList(settleTransDataDto.getSecAcctId(),settleTransDataDto.getAcctNo(),settleTransDataDto.getFinprodId(), DateUtil.format(settleTransDataDto.getTradeDate()),settleTransDataDto.getPs()),"_");
+//        }
+//        else{
+//            return StringUtil.joinString(Arrays.asList(settleTransDataDto.getSecAcctId(),settleTransDataDto.getAcctNo(),settleTransDataDto.getFinprodId(), DateUtil.format(settleTransDataDto.getTradeDate()),settleTransDataDto.getTradePlat(),settleTransDataDto.getPs()),"_");
+//        }
+        return StringUtil.joinString(Arrays.asList(settleTransDataDto.getSecAcctId(),settleTransDataDto.getAcctNo(),settleTransDataDto.getFinprodId(), DateUtil.format(settleTransDataDto.getTradeDate()),settleTransDataDto.getPs()),"_");
+        // modify by fuyongsheng 匹配指令忽略交易平台 end
     }
 }

@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.common.bean.instrument;
 
+import com.google.common.base.MoreObjects;
 import com.joyintech.tams.exchange.common.bean.MinPrice;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import io.swagger.annotations.ApiModel;
@@ -96,5 +97,18 @@ public class MinPriceAndMinTrdUnitLimitBean implements Serializable {
 
     public void setIsFullPrice(String isFullPrice) {
         this.isFullPrice = isFullPrice;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("errorCode", errorCode)
+                .add("errorMsg", errorMsg)
+                .add("stockCode", stockCode)
+                .add("minPriceList", minPriceList)
+                .add("minTrdUnitLimitList", minTrdUnitLimitList)
+                .add("volumeMultiple", volumeMultiple)
+                .add("isFullPrice", isFullPrice)
+                .toString();
     }
 }

@@ -270,6 +270,14 @@ public class EntrustAddComponent extends BaseEntity {
      * 指令下达时间
      */
     private Date transmitTime;
+    /**
+     * 投管业务类型
+     */
+    private String busiTypePosition;
+    /**
+     *  计价方式
+     */
+    private String priceType;
 
     /**
      * 取得 委托代码
@@ -1049,5 +1057,21 @@ public class EntrustAddComponent extends BaseEntity {
 
     public void setTransmitTime(Date transmitTime) {
         this.transmitTime = transmitTime;
+    }
+
+    public String getBusiTypePosition() {
+        return busiTypePosition;
+    }
+
+    public void setBusiTypePosition(String busiTypePosition) {
+        this.busiTypePosition = busiTypePosition;
+    }
+
+    public String getPriceType() {
+        return priceType;
+    }
+
+    public void setPriceType(String priceType) {
+        this.priceType = priceType;
     }
 }

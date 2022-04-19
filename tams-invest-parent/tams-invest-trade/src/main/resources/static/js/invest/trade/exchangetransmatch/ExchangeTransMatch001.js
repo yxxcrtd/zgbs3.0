@@ -71,7 +71,7 @@
             {field:'finprodMarketId', sortField:'finprodMarketId',width:200, title: 'ExchangeTransMatch001.finprodId'},
             {field:'finprodAbbr', sortField:'finprodAbbr',width:200, title: 'ExchangeTransMatch001.finprodAbbr'},
             {field:'seatNumber', sortField:'seatNumber',width:200, title: 'ExchangeTransMatch001.seatNo'},
-            {field:'tradePlatStr', sortField:'tradePlat',width:200, title: 'ExchangeTransMatch001.tradePlat'},
+            // {field:'tradePlatStr', sortField:'tradePlat',width:200, title: 'ExchangeTransMatch001.tradePlat', visible:false},
             {field:'psStr', sortField:'ps',width:200, title: 'ExchangeTransMatch001.ps'},
             {field:'remainAmount', sortField:'remainAmount',width:200, title: 'ExchangeTransMatch001.remainAmount',type: 'money'},
             {field:'remainNum', sortField:'remainNum',width:200, title: 'ExchangeTransMatch001.remainNum',type: 'number'},
@@ -92,7 +92,7 @@
             {field:'seqId', visible:false},
             {field:'settleDate', visible:false},
             {field:'tradeMarketMode', visible:false},
-            {field:'tradePlat', visible:false},
+            // {field:'tradePlat', visible:false},
             {field:'shareAmt', visible:false},
             {field:'fpriceAmt', visible:false},
             {field:'repoType', visible:false},
@@ -156,7 +156,7 @@
             // {field:'tradeDate', sortField:'tradeDate',width:200, title: 'ExchangeTransMatch001.tradeDate',type: 'date'},
             {field:'psStr', sortField:'ps',width:200, title: 'ExchangeTransMatch001.ertPs'},
             {field:'tradeMarketStr', sortField:'tradeMarket',width:200, title: 'ExchangeTransMatch001.tradeMarket'},
-            {field:'tradePlatStr', sortField:'tradePlat',width:200, title: 'ExchangeTransMatch001.tradePlat'},
+            // {field:'tradePlatStr', sortField:'tradePlat',width:200, title: 'ExchangeTransMatch001.tradePlat', visible:false},
             {field:'entrustAmt', sortField:'entrustAmount',width:200, title: 'ExchangeTransMatch001.entrustAmount',type: 'number'},
             {field:'price', sortField:'entrustPrice',width:200, title: 'ExchangeTransMatch001.entrustPrice',type: 'number',digit: 4},
             {field:'entrustNum', sortField:'entrustNum',width:200, title: 'ExchangeTransMatch001.entrustNum',type: 'number'},
@@ -168,8 +168,8 @@
             {field:'secAcctId', visible:false},
             {field:'acctNo', visible:false},
             {field:'ps', visible:false},
-            {field:'tradeMarket', visible:false},
-            {field:'tradePlat', visible:false}
+            {field:'tradeMarket', visible:false}
+            // {field:'tradePlat', visible:false}
         ]
 
     });
@@ -276,7 +276,7 @@
                 object.finprodId = item.finprodMarketId;
                 object.finprodType1 = item.finprodType2;
                 object.ps = item.ps;
-                object.tradePlat = item.tradePlat;
+                // object.tradePlat = item.tradePlat;
                 object.tradeMarket = item.tradeMarket;
                 object.dealDate = new Date(item.dealDate).Format("yyyy-MM-dd");
                 object.secAccount = item.secAcctId;
@@ -527,11 +527,11 @@
         $('#ExchangeTransMatch001_deal_btn_more').click(function () {
             if($('#ExchangeTransMatch001_deal_btn_more').find('span').html()=="更多"){
                 $('#ExchangeTransMatch001_more_div').show();
-                $('#ExchangeTransMatch001_more_div2').show();
+                // $('#ExchangeTransMatch001_more_div2').show();
                 $('#ExchangeTransMatch001_deal_btn_more').find('span').html("取消更多");
             }else{
                 $('#ExchangeTransMatch001_more_div').hide();
-                $('#ExchangeTransMatch001_more_div2').hide();
+                // $('#ExchangeTransMatch001_more_div2').hide();
                 $('#ExchangeTransMatch001_deal_btn_more').find('span').html("更多");
             }
         });

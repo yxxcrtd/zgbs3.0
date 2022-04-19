@@ -58,12 +58,14 @@
         /*B.TRADER trader,
         B.realName realName,*/
         ETR_ENTRUST.REMARK remark,
-        btm.OUTPUT_VALUE_1 busiTypePosition,
+        ETR_ENTRUST_ADD.BUSI_TYPE_POSITION busiTypePosition,
         ssai.sec_acct_name secAcctId,
         DECODE(ETR_ENTRUST_ADD.SETTLE_SPREED,0,'01',1,'02','2','03') settleSpeed,
         decode(ETR_ENTRUST_ADD.ASSET_TYPE,'F01','','F07',ETR_ENTRUST_ADD.TERM_DAYS,'F10',ETR_ENTRUST_ADD.TERM_DAYS,'F12',ETR_ENTRUST_ADD.TERM_DAYS,'F16',ETR_ENTRUST_ADD.TERM_DAYS,'')
         termDays,
         case when ETR_ENTRUST.PS in ('T68', 'T69') or ETR_ENTRUST_ADD.ASSET_TYPE = 'F07' then ETR_ENTRUST.PRICE*100
+        when ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX017' then decode(ETR_ENTRUST_ADD.PRICE_TYPE,#{PRICE_CLASS_01,jdbcType=VARCHAR},ROUND(ETR_ENTRUST.PRICE,4),#{PRICE_CLASS_02,jdbcType=VARCHAR},ROUND(ETR_ENTRUST_ADD.FULL_PRICE,4))
+        when ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX018' then ROUND(ETR_ENTRUST.price,3)
          else round(decode(btm.OUTPUT_VALUE_1,#{busiTypePosition02},decode(ETR_ENTRUST_ADD.CALCULATE_FIELD,'price',ETR_ENTRUST.PRICE,'exerYield',ETR_ENTRUST_ADD.EXER_YIELD*100,'matureYield',ETR_ENTRUST_ADD.MATURE_YIELD*100),#{busiTypePosition03},ETR_ENTRUST.PRICE,NVL(ETR_ENTRUST.PRICE,
             0.00)),4)
             end as etrPrice,
@@ -101,7 +103,9 @@
         to_char(ETR_ENTRUST_ADD.TRANSMIT_TIME,'hh24:mi') transmitTimeSer,
         ETR_ENTRUST.PRICE_MODEL priceModel,
         sci.ACCT_NAME trdAcctId,
-        ETR_ENTRUST.ENTRUST_NUM entrustNum,
+        case when ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX017'  then ROUND(ETR_ENTRUST.ENTRUST_NUM/100,2)
+        when ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX018'  then 0
+        else ETR_ENTRUST.ENTRUST_NUM end as entrustNum,
         ETR_ENTRUST_ADD.CALCULATE_FIELD calculateField,
         mcpdata.COUNTER_NAME counterId,
         ETR_ENTRUST_ADD.TARGET_TYPE
@@ -184,7 +188,7 @@
                 AND ETR_ENTRUST_ADD.ASSET_TYPE = #{finprodType2}
             </if>
             <if test="busiTypePosition != null and busiTypePosition!='' ">
-                AND btm.OUTPUT_VALUE_1 = #{busiTypePosition}
+                AND ETR_ENTRUST_ADD.BUSI_TYPE_POSITION = #{busiTypePosition}
             </if>
             <if test="finprodMarketIdList != null and finprodMarketIdList.size()>0">
                 AND FIN_PRODUCT.FINPROD_MARKET_ID IN(
@@ -269,7 +273,7 @@
         WFL_ETR_ENTRUST_ADD.BUSI_PS busiPs,
         WFL_ETR_ENTRUST.TRADE_MARKET tradeMarket,
         decode(
-        btm.OUTPUT_VALUE_1,
+        ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,
         'EX004',
         '',
         decode(
@@ -292,12 +296,14 @@
       /*  B.TRADER trader,
         B.realName realName,*/
         WFL_ETR_ENTRUST.REMARK remark,
-        btm.OUTPUT_VALUE_1 busiTypePosition,
+        ETR_ENTRUST_ADD.BUSI_TYPE_POSITION busiTypePosition,
         ssai.sec_acct_name secAcctId,
         DECODE(WFL_ETR_ENTRUST_ADD.SETTLE_SPREED,0,'01',1,'02','2','03') settleSpeed,
         decode(WFL_ETR_ENTRUST_ADD.ASSET_TYPE,'F01','','F07',WFL_ETR_ENTRUST_ADD.TERM_DAYS,'F10',WFL_ETR_ENTRUST_ADD.TERM_DAYS,'F12',WFL_ETR_ENTRUST_ADD.TERM_DAYS,'F16',WFL_ETR_ENTRUST_ADD.TERM_DAYS,'')
         termDays,
         case when WFL_ETR_ENTRUST.PS in ('T68', 'T69') or WFL_ETR_ENTRUST_ADD.ASSET_TYPE = 'F07' then WFL_ETR_ENTRUST.PRICE*100
+        when WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX017' then decode(WFL_ETR_ENTRUST_ADD.PRICE_TYPE,#{PRICE_CLASS_01,jdbcType=VARCHAR},ROUND(WFL_ETR_ENTRUST.PRICE,4),#{PRICE_CLASS_02,jdbcType=VARCHAR},ROUND(ETR_ENTRUST_ADD.FULL_PRICE,4))
+        when WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX018' then ROUND(WFL_ETR_ENTRUST.price,3)
             else round(decode(btm.OUTPUT_VALUE_1,#{busiTypePosition02},decode(WFL_ETR_ENTRUST_ADD.CALCULATE_FIELD,'price',WFL_ETR_ENTRUST.PRICE,'exerYield',WFL_ETR_ENTRUST_ADD.EXER_YIELD*100,'matureYield',WFL_ETR_ENTRUST_ADD.MATURE_YIELD*100),#{busiTypePosition03},WFL_ETR_ENTRUST.PRICE,NVL(WFL_ETR_ENTRUST.PRICE,
             0.00)),4)
             end as etrPrice,
@@ -341,7 +347,9 @@
         NULL transmitTimeSer,
         WFL_ETR_ENTRUST.PRICE_MODEL priceModel,
         sci.ACCT_NAME trdAcctId,
-        WFL_ETR_ENTRUST.ENTRUST_NUM entrustNum,
+        case when WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX017' then ROUND(WFL_ETR_ENTRUST.ENTRUST_NUM/100,2)
+        when WFL_ETR_ENTRUST_ADD.BUSI_TYPE_POSITION='EX018' then 0
+        else WFL_ETR_ENTRUST.ENTRUST_NUM end entrustNum,
         WFL_ETR_ENTRUST_ADD.CALCULATE_FIELD calculateField,
         mcpdata.COUNTER_NAME counterId,
         WFL_ETR_ENTRUST_ADD.TARGET_TYPE
@@ -401,6 +409,7 @@
         LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
         LEFT JOIN SYS_USER su1 ON WFL_ETR_ENTRUST.INV_MANAGER_ID = su1.USER_NAME
         left join MST_COUNTER_PARTY mcpdata on WFL_ETR_ENTRUST.COUNTER_ID = mcpdata.COUNTER_ID
+        left join ETR_ENTRUST_ADD on ETR_ENTRUST_ADD.ENTRUST_ID = WFL_ETR_ENTRUST.ENTRUST_ID
         <where>
             AND WFL_ETR_ENTRUST.ENTRUST_STATUS IN(#{entrustInwfl})
             <if test="entrustStatusList != null and entrustStatusList.size() > 0">
@@ -423,7 +432,7 @@
                 AND WFL_ETR_ENTRUST_ADD.ASSET_TYPE = #{finprodType2}
             </if>
             <if test="busiTypePosition != null and busiTypePosition!='' ">
-                AND btm.OUTPUT_VALUE_1 = #{busiTypePosition}
+                AND ETR_ENTRUST_ADD.BUSI_TYPE_POSITION = #{busiTypePosition}
             </if>
             <if test="finprodMarketIdList != null and finprodMarketIdList.size()>0">
                 AND FIN_PRODUCT.FINPROD_MARKET_ID IN(
@@ -645,11 +654,25 @@
     <sql id="query_integrated_entrust">
         a.ID, a.PARENT_ORDER_ID, a.INSTRUCTION_ID, a.PORTFOLIO_ID, a.USER_ID, a.USERNAME, a.ACCOUNT_ID,
     a.FINANCE_ACCOUNT, a.ACCOUNT_NAME, a.ASSET_TYPE, a.MARKET, a.STOCK_CODE, a.STOCK_NAME, a.ENTRUST_TYPE,
-    a.ENTRUST_PROP, a.BS_FLAG, a.ENTRUST_VOLUME, a.ENTRUST_PRICE, a.FULL_PRICE, a.ENTRUST_BALANCE,
+    a.ENTRUST_PROP, a.BS_FLAG,
+    /*a.ENTRUST_VOLUME, */
+    case
+        when #{busiTypePosition} in ('EX017','EX005') then round(nvl(a.ENTRUST_VOLUME/100,0),3)
+        when #{busiTypePosition} = 'EX018' then 0
+        else a.ENTRUST_VOLUME
+    end as ENTRUST_VOLUME,
+    a.ENTRUST_PRICE, a.FULL_PRICE, a.ENTRUST_BALANCE,
     a.DISCOUNT, a.TRANS_CODE, a.EXPIRE_YEAR_RATE, a.PRETERM_YEAR_RATE, a.LIAISON_NAME, a.LIAISON_TEL,
     a.PROP_SEAT_NO,a.PROP_SEAT_NAME, a.SELLER_NO, a.CONTRACT_ID, a.FIRST_SETTLE_DATE, a.BACK_DATE,
     a.COMPACT_TERM, a.BACK_BALANCE, a.ORIG_SERIAL_NO,a.REDUCTION_TYPE, a.FROZEN_BALANCE, a.FROZEN_VOLUME,
-    a.TRADED_BALANCE, a.TRADED_VOLUME, a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
+    a.TRADED_BALANCE,
+/*a.TRADED_VOLUME, */
+        case
+        when #{busiTypePosition} in ('EX017','EX005') then round(nvl(a.TRADED_VOLUME/100,0),3)
+        when #{busiTypePosition} = 'EX018' then 0
+        else a.TRADED_VOLUME
+        end as TRADED_VOLUME,
+a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
     TO_CHAR(a.CREATE_TIME,'HH24:MI:SS') AS TRADE_TIME,
     a.CANCEL_TIME, a.ERROR_CODE, a.ERROR_MSG,
     TO_CHAR(a.CREATE_TIME,'yyyy-MM-dd' ) AS TRADING_DAY,
@@ -662,12 +685,26 @@
     <sql id="query_entrust">
         a.ID, a.PARENT_ORDER_ID, a.INSTRUCTION_ID, a.PORTFOLIO_ID, a.USER_ID, a.USERNAME, a.ACCOUNT_ID,
         a.FINANCE_ACCOUNT, a.ACCOUNT_NAME, a.ASSET_TYPE, a.MARKET, a.STOCK_CODE, a.STOCK_NAME, a.ENTRUST_TYPE,
-        a.ENTRUST_PROP, a.BS_FLAG, a.ENTRUST_VOLUME, a.ENTRUST_PRICE, a.FULL_PRICE, a.ENTRUST_BALANCE,
+        a.ENTRUST_PROP, a.BS_FLAG,
+        /*a.ENTRUST_VOLUME, */
+        case
+            when #{busiTypePosition} in ('EX017','EX005') then round(nvl(a.ENTRUST_VOLUME/100,0),3)
+            when #{busiTypePosition} = 'EX018' then 0
+            else a.ENTRUST_VOLUME
+        end as ENTRUST_VOLUME,
+        a.ENTRUST_PRICE, a.FULL_PRICE, a.ENTRUST_BALANCE,
         NULL AS DISCOUNT, NULL AS TRANS_CODE, NULL AS EXPIRE_YEAR_RATE, NULL AS PRETERM_YEAR_RATE, NULL AS LIAISON_NAME,
         NULL AS LIAISON_TEL, NULL AS PROP_SEAT_NO, NULL AS PROP_SEAT_NAME, NULL AS SELLER_NO, NULL AS CONTRACT_ID,
         NULL AS FIRST_SETTLE_DATE, NULL AS BACK_DATE, NULL AS COMPACT_TERM, NULL AS BACK_BALANCE, NULL AS ORIG_SERIAL_NO,
         NULL AS REDUCTION_TYPE, FROZEN_BALANCE,
-        a.FROZEN_VOLUME, a.TRADED_BALANCE, a.TRADED_VOLUME, a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
+        a.FROZEN_VOLUME, a.TRADED_BALANCE,
+/*a.TRADED_VOLUME, */
+        case
+        when #{busiTypePosition} in ('EX017','EX005') then round(nvl(a.TRADED_VOLUME/100,0),3)
+        when #{busiTypePosition} = 'EX018' then 0
+        else a.TRADED_VOLUME
+        end as TRADED_VOLUME,
+a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         TO_CHAR(a.CREATE_TIME,'HH24:MI:SS') AS TRADE_TIME,
         a.CANCEL_TIME, a.ERROR_CODE, a.ERROR_MSG,
         TO_CHAR(a.CREATE_TIME,'yyyy-MM-dd' ) AS TRADING_DAY,
@@ -680,12 +717,25 @@
     <sql id="query_entrust_history">
         a.ID, a.PARENT_ORDER_ID, a.INSTRUCTION_ID, a.PORTFOLIO_ID, a.USER_ID, a.USERNAME, a.ACCOUNT_ID,a.FINANCE_ACCOUNT,
         a.ACCOUNT_NAME, a.ASSET_TYPE, a.MARKET,a.STOCK_CODE, a.STOCK_NAME, a.ENTRUST_TYPE,a.ENTRUST_PROP,
-        a.BS_FLAG, a.ENTRUST_VOLUME, a.ENTRUST_PRICE, a.FULL_PRICE,a. ENTRUST_BALANCE, NULL AS DISCOUNT, NULL AS TRANS_CODE,
+        a.BS_FLAG,
+        /*a.ENTRUST_VOLUME, */
+        case
+            when #{busiTypePosition} in ('EX017','EX005') then round(nvl(a.ENTRUST_VOLUME/100,0),3)
+            when #{busiTypePosition} = 'EX018' then 0
+            else a.ENTRUST_VOLUME
+        end as ENTRUST_VOLUME,
+        a.ENTRUST_PRICE, a.FULL_PRICE,a. ENTRUST_BALANCE, NULL AS DISCOUNT, NULL AS TRANS_CODE,
         NULL AS EXPIRE_YEAR_RATE, NULL AS PRETERM_YEAR_RATE, NULL AS LIAISON_NAME, NULL AS LIAISON_TEL,
         NULL AS PROP_SEAT_NO, NULL AS PROP_SEAT_NAME, NULL AS SELLER_NO, NULL AS CONTRACT_ID,
         NULL AS FIRST_SETTLE_DATE, NULL AS BACK_DATE, NULL AS COMPACT_TERM, NULL AS BACK_BALANCE,
         NULL AS ORIG_SERIAL_NO, NULL AS REDUCTION_TYPE, a.FROZEN_BALANCE,a.FROZEN_VOLUME, a.TRADED_BALANCE,
-        a.TRADED_VOLUME, a.TRADED_PRICE, a.CANCEL_VOLUME,a. REPORT_TIME,
+        /*a.TRADED_VOLUME, */
+        case
+        when #{busiTypePosition} in ('EX017','EX005') then round(nvl(a.TRADED_VOLUME/100,0),3)
+        when #{busiTypePosition} = 'EX018' then 0
+        else a.TRADED_VOLUME
+        end as TRADED_VOLUME,
+a.TRADED_PRICE, a.CANCEL_VOLUME,a. REPORT_TIME,
         TO_CHAR(a.CREATE_TIME,'HH24:MI:SS') AS TRADE_TIME,
         a.CANCEL_TIME, a.ERROR_CODE, a.ERROR_MSG,
         TO_CHAR(a.CREATE_TIME,'yyyy-MM-dd' ) AS TRADING_DAY,
@@ -698,11 +748,25 @@
     <sql id="query_integrated_entrust_history">
         a.ID, a.PARENT_ORDER_ID, a.INSTRUCTION_ID, a.PORTFOLIO_ID,a.USER_ID, a.USERNAME,a.ACCOUNT_ID,
     a.FINANCE_ACCOUNT, a.ACCOUNT_NAME, a.ASSET_TYPE, a.MARKET, a.STOCK_CODE, a.STOCK_NAME, a.ENTRUST_TYPE,
-    a.ENTRUST_PROP, a.BS_FLAG, a.ENTRUST_VOLUME, a.ENTRUST_PRICE, a.FULL_PRICE, a.ENTRUST_BALANCE,
+    a.ENTRUST_PROP, a.BS_FLAG,
+    /*a.ENTRUST_VOLUME, */
+    case
+        when #{busiTypePosition} in ('EX017','EX005') then round(nvl(a.ENTRUST_VOLUME/100,0),3)
+        when #{busiTypePosition} = 'EX018' then 0
+        else a.ENTRUST_VOLUME
+    end as ENTRUST_VOLUME,
+    a.ENTRUST_PRICE, a.FULL_PRICE, a.ENTRUST_BALANCE,
     a.DISCOUNT, a.TRANS_CODE, a.EXPIRE_YEAR_RATE, a.PRETERM_YEAR_RATE, a.LIAISON_NAME, a.LIAISON_TEL,
     a.PROP_SEAT_NO, a.PROP_SEAT_NAME, a.SELLER_NO, a.CONTRACT_ID, a.FIRST_SETTLE_DATE, a.BACK_DATE,
     a.COMPACT_TERM, a.BACK_BALANCE, a.ORIG_SERIAL_NO, a.REDUCTION_TYPE, a.FROZEN_BALANCE, a.FROZEN_VOLUME,
-    a.TRADED_BALANCE, a.TRADED_VOLUME, a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
+    a.TRADED_BALANCE,
+/*a.TRADED_VOLUME, */
+        case
+        when #{busiTypePosition} in ('EX017','EX005') then round(nvl(a.TRADED_VOLUME/100,0),3)
+        when #{busiTypePosition} = 'EX018' then 0
+        else a.TRADED_VOLUME
+        end as TRADED_VOLUME,
+a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
     TO_CHAR(a.CREATE_TIME,'HH24:MI:SS') AS TRADE_TIME,
     a.CANCEL_TIME, a.ERROR_CODE, a.ERROR_MSG,
     TO_CHAR(a.CREATE_TIME,'yyyy-MM-dd' ) AS TRADING_DAY,
@@ -713,7 +777,7 @@
     CASE WHEN NVL(a.ENTRUST_VOLUME,0) != 0 THEN ROUND(NVL(a.TRADED_VOLUME,0) / NVL(a.ENTRUST_VOLUME,0),4) * 100 ELSE 0 END AS PROGRESS
     </sql>
 
-    <select id="queryEntrust2Touguan" resultMap="QueryResultMap" parameterType="java.lang.String">
+    <select id="queryEntrust2Touguan" resultMap="QueryResultMap">
       select * from (
         SELECT
         <include refid="query_entrust"/>
@@ -797,7 +861,20 @@
         a.FINANCE_ACCOUNT,
         a.ACCOUNT_NAME ,
         a.MARKET, a.ASSET_TYPE, a.STOCK_CODE, a.STOCK_NAME, a.BUSINESS_FLAG, a.ENTRUST_TYPE, a.ENTRUST_PROP,
-        a.BS_FLAG, a.TRADE_TYPE, a.TRADED_BALANCE, a.TRADED_VOLUME, a.TRADED_PRICE, a.CLEAR_BALANCE,
+        a.BS_FLAG, a.TRADE_TYPE,
+        /*a.TRADED_BALANCE,*/
+        case
+        when #{busiTypePosition} = 'EX018' then round(nvl(a.TRADED_BALANCE/100,0),3)
+        when #{busiTypePosition} = 'EX005' then 0
+        else a.TRADED_BALANCE
+        end as TRADED_BALANCE,
+        /*a.TRADED_VOLUME,*/
+        case
+        when #{busiTypePosition} in ('EX017','EX005') then round(nvl(a.TRADED_VOLUME/100,0),3)
+        when #{busiTypePosition} = 'EX018' then 0
+        else a.TRADED_VOLUME
+        end as TRADED_VOLUME,
+        a.TRADED_PRICE, a.CLEAR_BALANCE,
         <!--nvl(a.TRADE_TIME,0) AS tradeTime,-->
         TO_CHAR( a.CREATE_TIME, 'HH24:MI:SS' ) AS TRADE_TIME,
         a.DISCOUNT, a.TRANS_CODE, a.PROP_SEAT_NO,

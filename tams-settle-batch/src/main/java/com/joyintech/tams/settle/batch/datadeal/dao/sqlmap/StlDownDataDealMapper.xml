@@ -731,21 +731,10 @@
 		CON_FINPROD_ID conFinprodId
 		FROM
 		FIN_PRODUCT_CONVERTIBLE
-		where CON_SHARE_ID = #{zqdm1}
+		where FINPROD_ID = #{zqdm1}
 	</select>
 
 	<select id="selectSqSettleTransDatas" resultType="com.joyintech.tams.common.base.entity.SettleTransData">
-		SELECT
-		<include refid="com.joyintech.tams.common.base.dao.SettleTransDataMapper.Base_Column_List" />
-		FROM
-			SETTLE_TRANS_DATA
-		WHERE
-			CJBH = #{sqcjbh, jdbcType=VARCHAR}
-			AND SEAT_NUMBER = #{seatNumber, jdbcType=VARCHAR}
-			AND SEC_ACCT_ID = #{secAcctId, jdbcType=VARCHAR}
-	</select>
-
-	<select id="selectShSqSettleTransDatas" resultType="com.joyintech.tams.common.base.entity.SettleTransData">
 		SELECT
 		<include refid="com.joyintech.tams.common.base.dao.SettleTransDataMapper.Base_Column_List" />
 		FROM
@@ -754,7 +743,9 @@
 		CJBH = #{sqcjbh, jdbcType=VARCHAR}
 		AND SEAT_NUMBER = #{seatNumber, jdbcType=VARCHAR}
 		AND SEC_ACCT_ID = #{secAcctId, jdbcType=VARCHAR}
-		AND VDATE = #{vdate, jdbcType=DATE}
+		<if test="vdate != null">
+			AND VDATE = #{vdate, jdbcType=DATE}
+		</if>
 	</select>
 
 
@@ -770,6 +761,7 @@
 			std.CJBH = #{sqcjbh, jdbcType=VARCHAR}
 			AND std.SEAT_NUMBER = #{seatNumber, jdbcType=VARCHAR}
 			AND std.SEC_ACCT_ID = #{secAcctId, jdbcType=VARCHAR}
+		  	AND std.VDATE = #{vdate, jdbcType=DATE}
 	</select>
 
 	<!-- 是否节假日 0:工作日 -->

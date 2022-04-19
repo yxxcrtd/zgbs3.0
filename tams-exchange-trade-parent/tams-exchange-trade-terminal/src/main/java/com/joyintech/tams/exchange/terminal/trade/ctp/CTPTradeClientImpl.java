@@ -461,4 +461,10 @@ public class CTPTradeClientImpl implements IFuturesTradeRequest {
             ctpTradeApi.reqQryInstrumentCommissionRate(acc, instrument, requestId);
         }
     }
+
+	@Override
+	public void queryNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean, Long requestId) {
+		// TODO Auto-generated method stub
+		
+	}
 }

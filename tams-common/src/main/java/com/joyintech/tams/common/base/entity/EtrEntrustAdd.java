@@ -502,10 +502,12 @@ public class EtrEntrustAdd extends BaseEntity {
      * 指令创建来源
      */
     private String entrustCreateSource;
+
     /**
      * 头寸业务类型
      */
     private String busiTypePosition;
+
     /**
      * 指令下达时间
      */
@@ -543,6 +545,11 @@ public class EtrEntrustAdd extends BaseEntity {
      * 目标值单位
      */
     private String mulUnit;
+
+    /**
+     * 计价方式
+     */
+    private String priceType;
 
     /**
      * 取得 委托代码
@@ -2047,7 +2054,7 @@ public class EtrEntrustAdd extends BaseEntity {
         this.entrustCreateSource = entrustCreateSource == null ? null : entrustCreateSource.trim();
     }
 
-	public String getBusiTypePosition() {
+    public String getBusiTypePosition() {
         return busiTypePosition;
     }
 
@@ -2109,5 +2116,21 @@ public class EtrEntrustAdd extends BaseEntity {
 
     public void setCloseAmt(BigDecimal closeAmt) {
         this.closeAmt = closeAmt;
+    }
+
+    /**
+     * 取得 计价方式
+     * @return 计价方式
+     */
+    public String getPriceType() {
+        return priceType;
+    }
+
+    /**
+     * 设置 计价方式
+     * @param priceType 计价方式
+     */
+    public void setPriceType(String priceType) {
+        this.priceType = priceType == null ? null : priceType.trim();
     }
 }

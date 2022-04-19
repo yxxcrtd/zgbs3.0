@@ -2013,6 +2013,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         etrSinglePortfolioDto.setEntrustAmt(dto.getTradeAmt());// 指令金额
         etrSinglePortfolioDto.setInvAim(null);// 投资目的
         etrSinglePortfolioDto.setTradeMarket(dto.getTradeMarket());// 交易场所
+        etrSinglePortfolioDto.setBusiTypePosition(dto.getBusiTypePosition());
         //etrSinglePortfolioDto.setTradePlat(dto.getTradePlat());// 交易平台
         /*
          * if 画面.交易平台 = 数据字典.交易平台.大宗交易平台 and 画面.交易场所 = 数据字典.交易场所.深圳证券交易所

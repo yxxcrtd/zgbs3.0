@@ -280,9 +280,9 @@
         <if test="tradeMarket!=null and tradeMarket!='' ">
             AND A1.TRADE_MARKET = #{tradeMarket}
         </if>
-        <if test="tradePlat!=null and tradePlat!='' ">
-            AND A1.TRADE_PLAT = #{tradePlat}
-        </if>
+<!--        <if test="tradePlat!=null and tradePlat!='' ">-->
+<!--            AND A1.TRADE_PLAT = #{tradePlat}-->
+<!--        </if>-->
         <if test="dealDate!=null and dealDate!='' ">
             AND A1.ENTRUST_DATE = STR_TO_DATE(#{dealDate}, '%Y-%m-%d')
         </if>

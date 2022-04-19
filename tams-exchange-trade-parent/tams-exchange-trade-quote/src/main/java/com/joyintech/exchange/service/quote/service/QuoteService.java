@@ -15,11 +15,11 @@ import com.joyintech.tams.exchange.common.bean.TickBean;
 import com.joyintech.tams.exchange.common.bean.TickByte;
 import com.joyintech.tams.exchange.common.cache.QuoteTickService;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
-import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
+//import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
 import com.joyintech.tams.exchange.common.proto.QuoteProto;
 import com.joyintech.tams.exchange.common.utils.TestConverter;
 import com.joyintech.tams.exchange.common.utils.TickConverter;
-import com.joyintech.tams.exchange.datacommon.db.service.FuturesInstrumentService;
+//import com.joyintech.tams.exchange.datacommon.db.service.FuturesInstrumentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +38,8 @@ public class QuoteService {
 
     @Autowired
     private QuoteTickService quoteTickService;
-    @Autowired
-    private FuturesInstrumentService futuresInstrumentService;
+//    @Autowired
+//    private FuturesInstrumentService futuresInstrumentService;
     @Autowired
     private InterfHttpRequestUtil interfHttpRequestUtil;
 
@@ -52,10 +52,10 @@ public class QuoteService {
     public ResultBean getTick(String stockCode) {
         TickBean tickBean = null;
 
-        FuturesInstrument futuresInstrument = futuresInstrumentService.queryByStockCode(stockCode);
-        if (Objects.nonNull(futuresInstrument)) {
-            stockCode = futuresInstrument.getInnerCode();
-        }
+//        FuturesInstrument futuresInstrument = futuresInstrumentService.queryByStockCode(stockCode);
+//        if (Objects.nonNull(futuresInstrument)) {
+//            stockCode = futuresInstrument.getInnerCode();
+//        }
         if (useInterfQuoteFlag) {
             String code = interfHttpRequestUtil.getSimpleStockCode(stockCode);
             String quoteStr = interfHttpRequestUtil.doRequest(code);
@@ -63,7 +63,10 @@ public class QuoteService {
         } else {
             tickBean = TickConverter.convertTick(quoteTickService.findFromRedisById(stockCode));
         }
-
+        if (Objects.isNull(tickBean)) {
+            logger.debug("[行情服务] 获取行情失败");
+            return  new ResultBean(ErrorCode.QUOTATION_NOT_EXIST);
+        }
         logger.debug("[行情服务] 获取行情：证券代码{}，行情数据{}", stockCode, JSON.toJSONString(tickBean));
         return new ResultBean(ErrorCode.SUCCESS, tickBean);
     }

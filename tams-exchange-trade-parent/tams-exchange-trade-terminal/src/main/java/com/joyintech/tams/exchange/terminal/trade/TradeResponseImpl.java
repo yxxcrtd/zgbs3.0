@@ -1,17 +1,39 @@
 package com.joyintech.tams.exchange.terminal.trade;
 
-import com.joyintech.tams.exchange.common.bean.*;
-import com.joyintech.tams.exchange.common.db.domain.*;
-import com.joyintech.tams.exchange.common.net.protocol.FunctionCode;
-import com.joyintech.tams.exchange.common.utils.JsonUtils;
-import com.joyintech.tams.exchange.terminal.agent.TerminalAgent;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import com.joyintech.tams.exchange.common.bean.AccountFinance;
+import com.joyintech.tams.exchange.common.bean.FuturesInstrumentCommissionRateBean;
+import com.joyintech.tams.exchange.common.bean.FuturesPositionBean;
+import com.joyintech.tams.exchange.common.bean.FuturesPositionDetailBean;
+import com.joyintech.tams.exchange.common.bean.HistoryTrade;
+import com.joyintech.tams.exchange.common.bean.IntegratedBulkCloseQuoteBean;
+import com.joyintech.tams.exchange.common.bean.IntegratedBulkQuoteBean;
+import com.joyintech.tams.exchange.common.bean.IntegratedFixedIncomeQuoteBean;
+import com.joyintech.tams.exchange.common.bean.IntegratedQuote;
+import com.joyintech.tams.exchange.common.bean.IntegratedRepurchaseQuoteBean;
+import com.joyintech.tams.exchange.common.bean.NegotiateQuoteReceiveBean;
+import com.joyintech.tams.exchange.common.bean.PledgeDiscount;
+import com.joyintech.tams.exchange.common.bean.ResultBean;
+import com.joyintech.tams.exchange.common.bean.StandardBonds;
+import com.joyintech.tams.exchange.common.db.domain.CancelEntrustBean;
+import com.joyintech.tams.exchange.common.db.domain.Entrust;
+import com.joyintech.tams.exchange.common.db.domain.EntrustInterface;
+import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
+import com.joyintech.tams.exchange.common.db.domain.FuturesInstrumentMarginRateBean;
+import com.joyintech.tams.exchange.common.db.domain.Instrument;
+import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
+import com.joyintech.tams.exchange.common.db.domain.PositionBean;
+import com.joyintech.tams.exchange.common.db.domain.Trade;
+import com.joyintech.tams.exchange.common.net.protocol.FunctionCode;
+import com.joyintech.tams.exchange.common.utils.JsonUtils;
+import com.joyintech.tams.exchange.terminal.agent.TerminalAgent;
 
 @Component
 public class TradeResponseImpl implements ITradeResponse {
@@ -309,5 +331,11 @@ public class TradeResponseImpl implements ITradeResponse {
     @Override
     public void resQueryReissueTrade(String accountId, List<Trade> tradeList, Long requestId) {
         terminalAgent.compareReissueTrade(accountId, tradeList, requestId);
+    }
+    
+    //我收到的协商成交行情查询返回
+    @Override
+    public void resQueryNegotiateQuoteReceive(List<NegotiateQuoteReceiveBean> list, Long requestId) {
+        terminalAgent.asyncWrite(FunctionCode.RESP_QRY_INTEGRATED_NEGOTIATE_QUOTE_RECEIVE, requestId, 0, list);
     }
 }

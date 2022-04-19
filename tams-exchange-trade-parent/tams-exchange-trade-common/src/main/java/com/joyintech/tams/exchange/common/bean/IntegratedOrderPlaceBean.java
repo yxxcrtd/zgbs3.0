@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.common.bean;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.joyintech.tams.exchange.common.bean.request.BaseOrderRequest;
 import com.joyintech.tams.exchange.common.utils.DoubleSerializerUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -12,7 +13,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 @ApiModel(value = "综合业务下单请求报文", description = "综合业务下单请求报文")
-public class IntegratedOrderPlaceBean implements Serializable {
+public class IntegratedOrderPlaceBean extends BaseOrderRequest implements Serializable {
     private static final long serialVersionUID = -8967119294934066076L;
 
     @ApiModelProperty(required = true, name = "id", value = "综合业务委托ID")
@@ -24,9 +25,9 @@ public class IntegratedOrderPlaceBean implements Serializable {
     @ApiModelProperty(required = true, name = "parentOrderId", value = "订单编号")
     private String parentOrderId;
 
-    @ApiModelProperty(required = true, name = "instructionId", value = "指令编号")
-    @NotBlank(message = "指令编号不能为空")
-    private String instructionId;
+//    @ApiModelProperty(required = true, name = "instructionId", value = "指令编号")
+//    @NotBlank(message = "指令编号不能为空")
+//    private String instructionId;
 
     @ApiModelProperty(required = true, name = "portfolioId", value = "组合代码")
     @NotBlank(message = "组合代码不能为空")
@@ -66,8 +67,8 @@ public class IntegratedOrderPlaceBean implements Serializable {
     @ApiModelProperty(required = true, name = "entrustType", value = "委托类型")
     private String entrustType;
 
-    @ApiModelProperty(required = true, name = "entrustProp", value = "委托属性")
-    private String entrustProp;
+//    @ApiModelProperty(required = true, name = "entrustProp", value = "委托属性")
+//    private String entrustProp;
 
     @ApiModelProperty(required = true, name = "entrustBs", value = "交易方向")
     private String entrustBs;
@@ -75,24 +76,24 @@ public class IntegratedOrderPlaceBean implements Serializable {
     @ApiModelProperty(required = true, name = "bsFlag", value = "买卖标志")
     private String bsFlag;
 
-    @ApiModelProperty(required = true, name = "entrustVolume", value = "委托数量")
-    @Digits(integer = 20, fraction = 0)
-    private long entrustVolume;
+//    @ApiModelProperty(required = true, name = "entrustVolume", value = "委托数量")
+//    @Digits(integer = 20, fraction = 0)
+//    private long entrustVolume;
 
-    @ApiModelProperty(required = true, name = "entrustPrice", value = "委托价格")
-    @Digits(integer = 20, fraction = 4)
-    @JsonSerialize(using = DoubleSerializerUtils.class)
-    private BigDecimal entrustPrice;
+//    @ApiModelProperty(required = true, name = "entrustPrice", value = "委托价格")
+//    @Digits(integer = 20, fraction = 4)
+//    @JsonSerialize(using = DoubleSerializerUtils.class)
+//    private BigDecimal entrustPrice;
 
-    @ApiModelProperty(required = true, name = "fullPrice", value = "全价价格")
-    @Digits(integer = 20, fraction = 4)
-    @JsonSerialize(using = DoubleSerializerUtils.class)
-    private BigDecimal fullPrice;
+//    @ApiModelProperty(required = true, name = "fullPrice", value = "全价价格")
+//    @Digits(integer = 20, fraction = 4)
+//    @JsonSerialize(using = DoubleSerializerUtils.class)
+//    private BigDecimal fullPrice;
 
-    @ApiModelProperty(required = true, name = "entrustBalance", value = "委托金额")
-    @Digits(integer = 20, fraction = 4)
-    @JsonSerialize(using = DoubleSerializerUtils.class)
-    private BigDecimal entrustBalance;
+//    @ApiModelProperty(required = true, name = "entrustBalance", value = "委托金额")
+//    @Digits(integer = 20, fraction = 4)
+//    @JsonSerialize(using = DoubleSerializerUtils.class)
+//    private BigDecimal entrustBalance;
 
     @ApiModelProperty(required = true, name = "discount", value = "质押券折算比例")
     @Digits(integer = 10, fraction = 4)
@@ -234,8 +235,8 @@ public class IntegratedOrderPlaceBean implements Serializable {
     @ApiModelProperty(required = true, name = "operateUser", value = "操作人员ID 执行撤销异常委托操作人员ID")
     private String operateUser;
     
-    @ApiModelProperty(name="softSkipMode",value="软控是否继续？Y：继续",example="Y")
-    private String softSkipMode;
+//    @ApiModelProperty(name="softSkipMode",value="软控是否继续？Y：继续",example="Y")
+//    private String softSkipMode;
 
     public boolean isNoCancelEntrust() {
         return noCancelEntrust;
@@ -265,13 +266,13 @@ public class IntegratedOrderPlaceBean implements Serializable {
         this.id = id == null ? null : id.trim();
     }
 
-    public String getSoftSkipMode() {
-		return softSkipMode;
-	}
-
-	public void setSoftSkipMode(String softSkipMode) {
-		this.softSkipMode = softSkipMode;
-	}
+//    public String getSoftSkipMode() {
+//		return softSkipMode;
+//	}
+//
+//	public void setSoftSkipMode(String softSkipMode) {
+//		this.softSkipMode = softSkipMode;
+//	}
 
 	public String getParentOrderId() {
         return parentOrderId;
@@ -281,13 +282,13 @@ public class IntegratedOrderPlaceBean implements Serializable {
         this.parentOrderId = parentOrderId == null ? null : parentOrderId.trim();
     }
 
-    public String getInstructionId() {
-        return instructionId;
-    }
-
-    public void setInstructionId(String instructionId) {
-        this.instructionId = instructionId == null ? null : instructionId.trim();
-    }
+//    public String getInstructionId() {
+//        return instructionId;
+//    }
+//
+//    public void setInstructionId(String instructionId) {
+//        this.instructionId = instructionId == null ? null : instructionId.trim();
+//    }
 
     public String getPortfolioId() {
         return portfolioId;
@@ -377,13 +378,13 @@ public class IntegratedOrderPlaceBean implements Serializable {
         this.entrustType = entrustType == null ? null : entrustType.trim();
     }
 
-    public String getEntrustProp() {
-        return entrustProp;
-    }
-
-    public void setEntrustProp(String entrustProp) {
-        this.entrustProp = entrustProp == null ? null : entrustProp.trim();
-    }
+//    public String getEntrustProp() {
+//        return entrustProp;
+//    }
+//
+//    public void setEntrustProp(String entrustProp) {
+//        this.entrustProp = entrustProp == null ? null : entrustProp.trim();
+//    }
 
     public String getEntrustBs() {
         return entrustBs;
@@ -401,37 +402,37 @@ public class IntegratedOrderPlaceBean implements Serializable {
         this.bsFlag = bsFlag == null ? null : bsFlag.trim();
     }
 
-    public long getEntrustVolume() {
-        return entrustVolume;
-    }
-
-    public void setEntrustVolume(long entrustVolume) {
-        this.entrustVolume = entrustVolume;
-    }
-
-    public BigDecimal getEntrustPrice() {
-        return entrustPrice;
-    }
-
-    public void setEntrustPrice(BigDecimal entrustPrice) {
-        this.entrustPrice = entrustPrice;
-    }
-
-    public BigDecimal getFullPrice() {
-        return fullPrice;
-    }
-
-    public void setFullPrice(BigDecimal fullPrice) {
-        this.fullPrice = fullPrice;
-    }
-
-    public BigDecimal getEntrustBalance() {
-        return entrustBalance;
-    }
-
-    public void setEntrustBalance(BigDecimal entrustBalance) {
-        this.entrustBalance = entrustBalance;
-    }
+//    public long getEntrustVolume() {
+//        return entrustVolume;
+//    }
+//
+//    public void setEntrustVolume(long entrustVolume) {
+//        this.entrustVolume = entrustVolume;
+//    }
+//
+//    public BigDecimal getEntrustPrice() {
+//        return entrustPrice;
+//    }
+//
+//    public void setEntrustPrice(BigDecimal entrustPrice) {
+//        this.entrustPrice = entrustPrice;
+//    }
+//
+//    public BigDecimal getFullPrice() {
+//        return fullPrice;
+//    }
+//
+//    public void setFullPrice(BigDecimal fullPrice) {
+//        this.fullPrice = fullPrice;
+//    }
+//
+//    public BigDecimal getEntrustBalance() {
+//        return entrustBalance;
+//    }
+//
+//    public void setEntrustBalance(BigDecimal entrustBalance) {
+//        this.entrustBalance = entrustBalance;
+//    }
 
     public BigDecimal getDiscount() {
         return discount;

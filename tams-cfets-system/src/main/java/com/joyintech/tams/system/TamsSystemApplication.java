@@ -93,6 +93,11 @@ public class TamsSystemApplication extends WebApplication {
 	public Docket dataCfetsTrdRedeem() {
 		return SwaggerConfig.createDocket("赎回登记", "com.joyintech.tams.cfets.trdredeem.controller");
 	}
+
+	@Bean
+	public Docket dataTenderbond() {
+		return SwaggerConfig.createDocket("新债标的", "com.joyintech.tams.invest.asset.newtenderbond");
+	}
 	public static void main(String[] args) throws Exception {
     	initLog();
     	initSpring(args);

@@ -128,17 +128,17 @@
         CROSS_MARKET_CODE CROSS_MARKET_CODE, IS_NO_GUARD IS_NO_GUARD, CONCEPT_TYPE CONCEPT_TYPE, IS_ALLOW_OVERWRITE IS_ALLOW_OVERWRITE,OLD_DELISTING_DATE OLD_DELISTING_DATE
     </sql>
     <sql id="Sql_All_Data" >
-        select 
+        select
         <include refid="com.joyintech.tams.common.base.dao.FinProductAddMapper.Base_Column_List" />
         from FIN_PRODUCT_ADD
     </sql>
     <sql id="Sql_All_Effective_Data" >
-        select 
+        select
         <include refid="com.joyintech.tams.common.base.dao.FinProductAddMapper.Base_Column_List" />
         from FIN_PRODUCT_ADD
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
-        select 
+        select
         <include refid="com.joyintech.tams.common.base.dao.FinProductAddMapper.Base_Column_List" />
         from FIN_PRODUCT_ADD
         where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
@@ -148,69 +148,69 @@
         where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
     </delete>
     <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.FinProductAdd" >
-        insert into FIN_PRODUCT_ADD (FINPROD_ID, SALE_DEPARTMENT, SALE_LAYER, 
-            SALE_PERIOD, PUR_SPEED, RED_SPEED, 
-            IS_SEC_BOND, WIND_ID, IS_AUTO_UPDATE, 
-            PORTFOLIO_ID, PROD_REGIST_CODE, IS_CYCLE, 
-            IS_LAY, LAY_TYPE, INVEST_NATURE, 
-            PROFIT_FLAG, SALE_MODE, CHB_ID, 
-            TMPL_ID, CLOSE_DAYS, ISSUE_STATUS, 
-            ISSUE_STATUS_REMARK, IS_COMPOUND_INT, TERM_TYPE, 
-            FACE_VALUE, CREATE_USER, CREATE_DEPT, 
-            CREATE_TIME, UPDATE_USER, UPDATE_TIME, 
-            PAY_TYPE, IS_RECONCILIATION, IS_CASH_MANAGE, 
-            RISK_LEVEL, DEAL_MODE, IS_EXCLUSIVE, 
-            BID_DATE, BOARD, SH_OR_ZH, 
-            IS_MARGIN_FINPROD, CITY_BOND_LEV, IS_CITY_BOND, 
-            INVESTMENT_CYCLE, PROD_MANAGER, COLLECT_TYPE, 
-            REGULATORY_RATING, PRD_DESIGN_ID, ADDITION, 
-            IS_PLEDGE_REP, TOFF_STRDATE, TOFF_ENDDATE, 
-            TRM_FUND_ABBR, TRM_FUND_TYPE, GRA_FUND_TYPE, 
-            PUR_RED_ID, PUR_RED_ABBR, PUR_START_LOW, 
-            RED_START_LOW, ETF_TYPE, ETF_MIN_PRUNIT, 
-            IS_RECEIPT, IS_NETPRICE, CREATE_ORG, 
-            VAL_ORG, CAL_RATE_TYPE, REP_FINPROD_INS_ID, 
-            IS_INADVANCE, NO_FIXED_TERM, IS_NET_SETT, 
-            IS_PPB, TRADE_PLAT, IS_QTZQ, 
-            DATA_SOURCE, IS_RATE_ADJUST, BOND_RISK_TYPE, 
-            CREDIT_ENHANCE_MEASURE, FUND_MANGER_NAME, 
-            BONUS_TYPE, TDY_REV_TRANS, LISTING_DATE, 
-            MIN_SALE_UNIT, FUTURES_CONTRACT_ID, LAST_TRADE_DATE, 
-            LAST_SETTLE_DATE, DELIVERY_METHOD, CONTRACT_MULTIPLIER, 
-            IS_EFF_PLEDGE, IS_ISSUE_ASSET, APPEAR_MARKET_ID, 
-            WIND_CODE,CROSS_MARKET,CROSS_MARKET_CODE, IS_NO_GUARD , CONCEPT_TYPE , IS_ALLOW_OVERWRITE ,OLD_DELISTING_DATE)
-        values (#{finprodId,jdbcType=VARCHAR}, #{saleDepartment,jdbcType=VARCHAR}, #{saleLayer,jdbcType=VARCHAR}, 
-            #{salePeriod,jdbcType=DECIMAL}, #{purSpeed,jdbcType=DECIMAL}, #{redSpeed,jdbcType=DECIMAL}, 
-            #{isSecBond,jdbcType=VARCHAR}, #{windId,jdbcType=VARCHAR}, #{isAutoUpdate,jdbcType=VARCHAR}, 
-            #{portfolioId,jdbcType=VARCHAR}, #{prodRegistCode,jdbcType=VARCHAR}, #{isCycle,jdbcType=VARCHAR}, 
-            #{isLay,jdbcType=VARCHAR}, #{layType,jdbcType=VARCHAR}, #{investNature,jdbcType=VARCHAR}, 
-            #{profitFlag,jdbcType=VARCHAR}, #{saleMode,jdbcType=VARCHAR}, #{chbId,jdbcType=VARCHAR}, 
-            #{tmplId,jdbcType=VARCHAR}, #{closeDays,jdbcType=DECIMAL}, #{issueStatus,jdbcType=VARCHAR}, 
-            #{issueStatusRemark,jdbcType=VARCHAR}, #{isCompoundInt,jdbcType=VARCHAR}, #{termType,jdbcType=VARCHAR}, 
-            #{faceValue,jdbcType=DECIMAL}, #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, 
-            #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
-            #{payType,jdbcType=VARCHAR}, #{isReconciliation,jdbcType=VARCHAR}, #{isCashManage,jdbcType=VARCHAR}, 
-            #{riskLevel,jdbcType=VARCHAR}, #{dealMode,jdbcType=VARCHAR}, #{isExclusive,jdbcType=VARCHAR}, 
-            #{bidDate,jdbcType=DATE}, #{board,jdbcType=VARCHAR}, #{shOrZh,jdbcType=VARCHAR}, 
-            #{isMarginFinprod,jdbcType=VARCHAR}, #{cityBondLev,jdbcType=VARCHAR}, #{isCityBond,jdbcType=VARCHAR}, 
-            #{investmentCycle,jdbcType=VARCHAR}, #{prodManager,jdbcType=VARCHAR}, #{collectType,jdbcType=VARCHAR}, 
-            #{regulatoryRating,jdbcType=VARCHAR}, #{prdDesignId,jdbcType=VARCHAR}, #{addition,jdbcType=VARCHAR}, 
-            #{isPledgeRep,jdbcType=VARCHAR}, #{toffStrdate,jdbcType=DATE}, #{toffEnddate,jdbcType=DATE}, 
-            #{trmFundAbbr,jdbcType=VARCHAR}, #{trmFundType,jdbcType=VARCHAR}, #{graFundType,jdbcType=VARCHAR}, 
-            #{purRedId,jdbcType=VARCHAR}, #{purRedAbbr,jdbcType=VARCHAR}, #{purStartLow,jdbcType=DECIMAL}, 
-            #{redStartLow,jdbcType=DECIMAL}, #{etfType,jdbcType=VARCHAR}, #{etfMinPrunit,jdbcType=DECIMAL}, 
-            #{isReceipt,jdbcType=VARCHAR}, #{isNetprice,jdbcType=VARCHAR}, #{createOrg,jdbcType=VARCHAR}, 
-            #{valOrg,jdbcType=VARCHAR}, #{calRateType,jdbcType=VARCHAR}, #{repFinprodInsId,jdbcType=VARCHAR}, 
-            #{isInadvance,jdbcType=VARCHAR}, #{noFixedTerm,jdbcType=VARCHAR}, #{isNetSett,jdbcType=VARCHAR}, 
-            #{isPpb,jdbcType=VARCHAR}, #{tradePlat,jdbcType=VARCHAR}, #{isQtzq,jdbcType=VARCHAR}, 
-            #{dataSource,jdbcType=VARCHAR}, #{isRateAdjust,jdbcType=VARCHAR}, #{bondRiskType,jdbcType=VARCHAR}, 
-            #{creditEnhanceMeasure,jdbcType=VARCHAR}, #{fundMangerName,jdbcType=VARCHAR}, 
-            #{bonusType,jdbcType=VARCHAR}, #{tdyRevTrans,jdbcType=VARCHAR}, #{listingDate,jdbcType=DATE}, 
-            #{minSaleUnit,jdbcType=DECIMAL}, #{futuresContractId,jdbcType=VARCHAR}, #{lastTradeDate,jdbcType=DATE}, 
-            #{lastSettleDate,jdbcType=DATE}, #{deliveryMethod,jdbcType=VARCHAR}, #{contractMultiplier,jdbcType=DECIMAL}, 
-            #{isEffPledge,jdbcType=VARCHAR}, #{isIssueAsset,jdbcType=VARCHAR}, #{appearMarketId,jdbcType=VARCHAR}, 
-            #{windCode,jdbcType=VARCHAR},#{crossMarket,jdbcType=VARCHAR},#{crossMarketCode,jdbcType=VARCHAR},
-            #{isNoGuard,jdbcType=VARCHAR},#{conceptType,jdbcType=VARCHAR},#{isAllowOverwrite,jdbcType=VARCHAR},#{oldDelistingDate,jdbcType=DATE})
+        insert into FIN_PRODUCT_ADD (FINPROD_ID, SALE_DEPARTMENT, SALE_LAYER,
+                                     SALE_PERIOD, PUR_SPEED, RED_SPEED,
+                                     IS_SEC_BOND, WIND_ID, IS_AUTO_UPDATE,
+                                     PORTFOLIO_ID, PROD_REGIST_CODE, IS_CYCLE,
+                                     IS_LAY, LAY_TYPE, INVEST_NATURE,
+                                     PROFIT_FLAG, SALE_MODE, CHB_ID,
+                                     TMPL_ID, CLOSE_DAYS, ISSUE_STATUS,
+                                     ISSUE_STATUS_REMARK, IS_COMPOUND_INT, TERM_TYPE,
+                                     FACE_VALUE, CREATE_USER, CREATE_DEPT,
+                                     CREATE_TIME, UPDATE_USER, UPDATE_TIME,
+                                     PAY_TYPE, IS_RECONCILIATION, IS_CASH_MANAGE,
+                                     RISK_LEVEL, DEAL_MODE, IS_EXCLUSIVE,
+                                     BID_DATE, BOARD, SH_OR_ZH,
+                                     IS_MARGIN_FINPROD, CITY_BOND_LEV, IS_CITY_BOND,
+                                     INVESTMENT_CYCLE, PROD_MANAGER, COLLECT_TYPE,
+                                     REGULATORY_RATING, PRD_DESIGN_ID, ADDITION,
+                                     IS_PLEDGE_REP, TOFF_STRDATE, TOFF_ENDDATE,
+                                     TRM_FUND_ABBR, TRM_FUND_TYPE, GRA_FUND_TYPE,
+                                     PUR_RED_ID, PUR_RED_ABBR, PUR_START_LOW,
+                                     RED_START_LOW, ETF_TYPE, ETF_MIN_PRUNIT,
+                                     IS_RECEIPT, IS_NETPRICE, CREATE_ORG,
+                                     VAL_ORG, CAL_RATE_TYPE, REP_FINPROD_INS_ID,
+                                     IS_INADVANCE, NO_FIXED_TERM, IS_NET_SETT,
+                                     IS_PPB, TRADE_PLAT, IS_QTZQ,
+                                     DATA_SOURCE, IS_RATE_ADJUST, BOND_RISK_TYPE,
+                                     CREDIT_ENHANCE_MEASURE, FUND_MANGER_NAME,
+                                     BONUS_TYPE, TDY_REV_TRANS, LISTING_DATE,
+                                     MIN_SALE_UNIT, FUTURES_CONTRACT_ID, LAST_TRADE_DATE,
+                                     LAST_SETTLE_DATE, DELIVERY_METHOD, CONTRACT_MULTIPLIER,
+                                     IS_EFF_PLEDGE, IS_ISSUE_ASSET, APPEAR_MARKET_ID,
+                                     WIND_CODE,CROSS_MARKET,CROSS_MARKET_CODE, IS_NO_GUARD , CONCEPT_TYPE , IS_ALLOW_OVERWRITE ,OLD_DELISTING_DATE)
+        values (#{finprodId,jdbcType=VARCHAR}, #{saleDepartment,jdbcType=VARCHAR}, #{saleLayer,jdbcType=VARCHAR},
+                #{salePeriod,jdbcType=DECIMAL}, #{purSpeed,jdbcType=DECIMAL}, #{redSpeed,jdbcType=DECIMAL},
+                #{isSecBond,jdbcType=VARCHAR}, #{windId,jdbcType=VARCHAR}, #{isAutoUpdate,jdbcType=VARCHAR},
+                #{portfolioId,jdbcType=VARCHAR}, #{prodRegistCode,jdbcType=VARCHAR}, #{isCycle,jdbcType=VARCHAR},
+                #{isLay,jdbcType=VARCHAR}, #{layType,jdbcType=VARCHAR}, #{investNature,jdbcType=VARCHAR},
+                #{profitFlag,jdbcType=VARCHAR}, #{saleMode,jdbcType=VARCHAR}, #{chbId,jdbcType=VARCHAR},
+                #{tmplId,jdbcType=VARCHAR}, #{closeDays,jdbcType=DECIMAL}, #{issueStatus,jdbcType=VARCHAR},
+                #{issueStatusRemark,jdbcType=VARCHAR}, #{isCompoundInt,jdbcType=VARCHAR}, #{termType,jdbcType=VARCHAR},
+                #{faceValue,jdbcType=DECIMAL}, #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR},
+                #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP},
+                #{payType,jdbcType=VARCHAR}, #{isReconciliation,jdbcType=VARCHAR}, #{isCashManage,jdbcType=VARCHAR},
+                #{riskLevel,jdbcType=VARCHAR}, #{dealMode,jdbcType=VARCHAR}, #{isExclusive,jdbcType=VARCHAR},
+                #{bidDate,jdbcType=DATE}, #{board,jdbcType=VARCHAR}, #{shOrZh,jdbcType=VARCHAR},
+                #{isMarginFinprod,jdbcType=VARCHAR}, #{cityBondLev,jdbcType=VARCHAR}, #{isCityBond,jdbcType=VARCHAR},
+                #{investmentCycle,jdbcType=VARCHAR}, #{prodManager,jdbcType=VARCHAR}, #{collectType,jdbcType=VARCHAR},
+                #{regulatoryRating,jdbcType=VARCHAR}, #{prdDesignId,jdbcType=VARCHAR}, #{addition,jdbcType=VARCHAR},
+                #{isPledgeRep,jdbcType=VARCHAR}, #{toffStrdate,jdbcType=DATE}, #{toffEnddate,jdbcType=DATE},
+                #{trmFundAbbr,jdbcType=VARCHAR}, #{trmFundType,jdbcType=VARCHAR}, #{graFundType,jdbcType=VARCHAR},
+                #{purRedId,jdbcType=VARCHAR}, #{purRedAbbr,jdbcType=VARCHAR}, #{purStartLow,jdbcType=DECIMAL},
+                #{redStartLow,jdbcType=DECIMAL}, #{etfType,jdbcType=VARCHAR}, #{etfMinPrunit,jdbcType=DECIMAL},
+                #{isReceipt,jdbcType=VARCHAR}, #{isNetprice,jdbcType=VARCHAR}, #{createOrg,jdbcType=VARCHAR},
+                #{valOrg,jdbcType=VARCHAR}, #{calRateType,jdbcType=VARCHAR}, #{repFinprodInsId,jdbcType=VARCHAR},
+                #{isInadvance,jdbcType=VARCHAR}, #{noFixedTerm,jdbcType=VARCHAR}, #{isNetSett,jdbcType=VARCHAR},
+                #{isPpb,jdbcType=VARCHAR}, #{tradePlat,jdbcType=VARCHAR}, #{isQtzq,jdbcType=VARCHAR},
+                #{dataSource,jdbcType=VARCHAR}, #{isRateAdjust,jdbcType=VARCHAR}, #{bondRiskType,jdbcType=VARCHAR},
+                #{creditEnhanceMeasure,jdbcType=VARCHAR}, #{fundMangerName,jdbcType=VARCHAR},
+                #{bonusType,jdbcType=VARCHAR}, #{tdyRevTrans,jdbcType=VARCHAR}, #{listingDate,jdbcType=DATE},
+                #{minSaleUnit,jdbcType=DECIMAL}, #{futuresContractId,jdbcType=VARCHAR}, #{lastTradeDate,jdbcType=DATE},
+                #{lastSettleDate,jdbcType=DATE}, #{deliveryMethod,jdbcType=VARCHAR}, #{contractMultiplier,jdbcType=DECIMAL},
+                #{isEffPledge,jdbcType=VARCHAR}, #{isIssueAsset,jdbcType=VARCHAR}, #{appearMarketId,jdbcType=VARCHAR},
+                #{windCode,jdbcType=VARCHAR},#{crossMarket,jdbcType=VARCHAR},#{crossMarketCode,jdbcType=VARCHAR},
+                #{isNoGuard,jdbcType=VARCHAR},#{conceptType,jdbcType=VARCHAR},#{isAllowOverwrite,jdbcType=VARCHAR},#{oldDelistingDate,jdbcType=DATE})
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.FinProductAdd" >
         insert into FIN_PRODUCT_ADD
@@ -503,7 +503,7 @@
             <if test="oldDelistingDate != null" >
                 OLD_DELISTING_DATE,
             </if>
-         </trim>
+        </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="finprodId != null" >
                 #{finprodId,jdbcType=VARCHAR},
@@ -796,38 +796,38 @@
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.FinProductAdd" >
-        insert into FIN_PRODUCT_ADD(FINPROD_ID, SALE_DEPARTMENT, SALE_LAYER, SALE_PERIOD, 
-        PUR_SPEED, RED_SPEED, IS_SEC_BOND, WIND_ID, IS_AUTO_UPDATE, PORTFOLIO_ID, PROD_REGIST_CODE, 
-        IS_CYCLE, IS_LAY, LAY_TYPE, INVEST_NATURE, PROFIT_FLAG, SALE_MODE, CHB_ID, TMPL_ID, 
-        CLOSE_DAYS, ISSUE_STATUS, ISSUE_STATUS_REMARK, IS_COMPOUND_INT, TERM_TYPE, FACE_VALUE, 
-        CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PAY_TYPE, IS_RECONCILIATION, 
-        IS_CASH_MANAGE, RISK_LEVEL, DEAL_MODE, IS_EXCLUSIVE, BID_DATE, BOARD, SH_OR_ZH, IS_MARGIN_FINPROD, 
-        CITY_BOND_LEV, IS_CITY_BOND, INVESTMENT_CYCLE, PROD_MANAGER, COLLECT_TYPE, REGULATORY_RATING, 
-        PRD_DESIGN_ID, ADDITION, IS_PLEDGE_REP, TOFF_STRDATE, TOFF_ENDDATE, TRM_FUND_ABBR, 
-        TRM_FUND_TYPE, GRA_FUND_TYPE, PUR_RED_ID, PUR_RED_ABBR, PUR_START_LOW, RED_START_LOW, 
-        ETF_TYPE, ETF_MIN_PRUNIT, IS_RECEIPT, IS_NETPRICE, CREATE_ORG, VAL_ORG, CAL_RATE_TYPE, 
-        REP_FINPROD_INS_ID, IS_INADVANCE, NO_FIXED_TERM, IS_NET_SETT, IS_PPB, TRADE_PLAT, 
-        IS_QTZQ, DATA_SOURCE, IS_RATE_ADJUST, BOND_RISK_TYPE, CREDIT_ENHANCE_MEASURE, FUND_MANGER_NAME, 
-        BONUS_TYPE, TDY_REV_TRANS, LISTING_DATE, MIN_SALE_UNIT, FUTURES_CONTRACT_ID, LAST_TRADE_DATE, 
-        LAST_SETTLE_DATE, DELIVERY_METHOD, CONTRACT_MULTIPLIER, IS_EFF_PLEDGE, IS_ISSUE_ASSET, 
-        APPEAR_MARKET_ID, WIND_CODE,CROSS_MARKET,CROSS_MARKET_CODE, IS_NO_GUARD, CONCEPT_TYPE, IS_ALLOW_OVERWRITE, OLD_DELISTING_DATE)
-        select FINPROD_ID, SALE_DEPARTMENT, SALE_LAYER, SALE_PERIOD, 
-            PUR_SPEED, RED_SPEED, IS_SEC_BOND, WIND_ID, IS_AUTO_UPDATE, PORTFOLIO_ID, PROD_REGIST_CODE, 
-            IS_CYCLE, IS_LAY, LAY_TYPE, INVEST_NATURE, PROFIT_FLAG, SALE_MODE, CHB_ID, TMPL_ID, 
-            CLOSE_DAYS, ISSUE_STATUS, ISSUE_STATUS_REMARK, IS_COMPOUND_INT, TERM_TYPE, FACE_VALUE, 
-            CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME, PAY_TYPE, IS_RECONCILIATION, 
-            IS_CASH_MANAGE, RISK_LEVEL, DEAL_MODE, IS_EXCLUSIVE, BID_DATE, BOARD, SH_OR_ZH, IS_MARGIN_FINPROD, 
-            CITY_BOND_LEV, IS_CITY_BOND, INVESTMENT_CYCLE, PROD_MANAGER, COLLECT_TYPE, REGULATORY_RATING, 
-            PRD_DESIGN_ID, ADDITION, IS_PLEDGE_REP, TOFF_STRDATE, TOFF_ENDDATE, TRM_FUND_ABBR, 
-            TRM_FUND_TYPE, GRA_FUND_TYPE, PUR_RED_ID, PUR_RED_ABBR, PUR_START_LOW, RED_START_LOW, 
-            ETF_TYPE, ETF_MIN_PRUNIT, IS_RECEIPT, IS_NETPRICE, CREATE_ORG, VAL_ORG, CAL_RATE_TYPE, 
-            REP_FINPROD_INS_ID, IS_INADVANCE, NO_FIXED_TERM, IS_NET_SETT, IS_PPB, TRADE_PLAT, 
-            IS_QTZQ, DATA_SOURCE, IS_RATE_ADJUST, BOND_RISK_TYPE, CREDIT_ENHANCE_MEASURE, FUND_MANGER_NAME, 
-            BONUS_TYPE, TDY_REV_TRANS, LISTING_DATE, MIN_SALE_UNIT, FUTURES_CONTRACT_ID, LAST_TRADE_DATE, 
-            LAST_SETTLE_DATE, DELIVERY_METHOD, CONTRACT_MULTIPLIER, IS_EFF_PLEDGE, IS_ISSUE_ASSET, 
-            APPEAR_MARKET_ID, WIND_CODE,CROSS_MARKET,CROSS_MARKET_CODE,IS_NO_GUARD,CONCEPT_TYPE,IS_ALLOW_OVERWRITE,OLD_DELISTING_DATE
-             from FIN_PRODUCT_ADD
-             where 1 = 1 and FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+        insert into FIN_PRODUCT_ADD(FINPROD_ID, SALE_DEPARTMENT, SALE_LAYER, SALE_PERIOD,
+                                    PUR_SPEED, RED_SPEED, IS_SEC_BOND, WIND_ID, IS_AUTO_UPDATE, PORTFOLIO_ID, PROD_REGIST_CODE,
+                                    IS_CYCLE, IS_LAY, LAY_TYPE, INVEST_NATURE, PROFIT_FLAG, SALE_MODE, CHB_ID, TMPL_ID,
+                                    CLOSE_DAYS, ISSUE_STATUS, ISSUE_STATUS_REMARK, IS_COMPOUND_INT, TERM_TYPE, FACE_VALUE,
+                                    CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PAY_TYPE, IS_RECONCILIATION,
+                                    IS_CASH_MANAGE, RISK_LEVEL, DEAL_MODE, IS_EXCLUSIVE, BID_DATE, BOARD, SH_OR_ZH, IS_MARGIN_FINPROD,
+                                    CITY_BOND_LEV, IS_CITY_BOND, INVESTMENT_CYCLE, PROD_MANAGER, COLLECT_TYPE, REGULATORY_RATING,
+                                    PRD_DESIGN_ID, ADDITION, IS_PLEDGE_REP, TOFF_STRDATE, TOFF_ENDDATE, TRM_FUND_ABBR,
+                                    TRM_FUND_TYPE, GRA_FUND_TYPE, PUR_RED_ID, PUR_RED_ABBR, PUR_START_LOW, RED_START_LOW,
+                                    ETF_TYPE, ETF_MIN_PRUNIT, IS_RECEIPT, IS_NETPRICE, CREATE_ORG, VAL_ORG, CAL_RATE_TYPE,
+                                    REP_FINPROD_INS_ID, IS_INADVANCE, NO_FIXED_TERM, IS_NET_SETT, IS_PPB, TRADE_PLAT,
+                                    IS_QTZQ, DATA_SOURCE, IS_RATE_ADJUST, BOND_RISK_TYPE, CREDIT_ENHANCE_MEASURE, FUND_MANGER_NAME,
+                                    BONUS_TYPE, TDY_REV_TRANS, LISTING_DATE, MIN_SALE_UNIT, FUTURES_CONTRACT_ID, LAST_TRADE_DATE,
+                                    LAST_SETTLE_DATE, DELIVERY_METHOD, CONTRACT_MULTIPLIER, IS_EFF_PLEDGE, IS_ISSUE_ASSET,
+                                    APPEAR_MARKET_ID, WIND_CODE,CROSS_MARKET,CROSS_MARKET_CODE, IS_NO_GUARD, CONCEPT_TYPE, IS_ALLOW_OVERWRITE, OLD_DELISTING_DATE)
+        select FINPROD_ID, SALE_DEPARTMENT, SALE_LAYER, SALE_PERIOD,
+               PUR_SPEED, RED_SPEED, IS_SEC_BOND, WIND_ID, IS_AUTO_UPDATE, PORTFOLIO_ID, PROD_REGIST_CODE,
+               IS_CYCLE, IS_LAY, LAY_TYPE, INVEST_NATURE, PROFIT_FLAG, SALE_MODE, CHB_ID, TMPL_ID,
+               CLOSE_DAYS, ISSUE_STATUS, ISSUE_STATUS_REMARK, IS_COMPOUND_INT, TERM_TYPE, FACE_VALUE,
+               CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME, PAY_TYPE, IS_RECONCILIATION,
+               IS_CASH_MANAGE, RISK_LEVEL, DEAL_MODE, IS_EXCLUSIVE, BID_DATE, BOARD, SH_OR_ZH, IS_MARGIN_FINPROD,
+               CITY_BOND_LEV, IS_CITY_BOND, INVESTMENT_CYCLE, PROD_MANAGER, COLLECT_TYPE, REGULATORY_RATING,
+               PRD_DESIGN_ID, ADDITION, IS_PLEDGE_REP, TOFF_STRDATE, TOFF_ENDDATE, TRM_FUND_ABBR,
+               TRM_FUND_TYPE, GRA_FUND_TYPE, PUR_RED_ID, PUR_RED_ABBR, PUR_START_LOW, RED_START_LOW,
+               ETF_TYPE, ETF_MIN_PRUNIT, IS_RECEIPT, IS_NETPRICE, CREATE_ORG, VAL_ORG, CAL_RATE_TYPE,
+               REP_FINPROD_INS_ID, IS_INADVANCE, NO_FIXED_TERM, IS_NET_SETT, IS_PPB, TRADE_PLAT,
+               IS_QTZQ, DATA_SOURCE, IS_RATE_ADJUST, BOND_RISK_TYPE, CREDIT_ENHANCE_MEASURE, FUND_MANGER_NAME,
+               BONUS_TYPE, TDY_REV_TRANS, LISTING_DATE, MIN_SALE_UNIT, FUTURES_CONTRACT_ID, LAST_TRADE_DATE,
+               LAST_SETTLE_DATE, DELIVERY_METHOD, CONTRACT_MULTIPLIER, IS_EFF_PLEDGE, IS_ISSUE_ASSET,
+               APPEAR_MARKET_ID, WIND_CODE,CROSS_MARKET,CROSS_MARKET_CODE,IS_NO_GUARD,CONCEPT_TYPE,IS_ALLOW_OVERWRITE,OLD_DELISTING_DATE
+        from FIN_PRODUCT_ADD
+        where 1 = 1 and FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.common.base.entity.FinProductAdd" >
         update FIN_PRODUCT_ADD

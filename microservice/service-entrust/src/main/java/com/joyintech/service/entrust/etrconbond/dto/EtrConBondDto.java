@@ -149,6 +149,11 @@ public class EtrConBondDto extends EtrEntrust {
      */
     private String softSkipMode;
     /**
+     * 头寸使用序列号
+     */
+    private Long positionSeqno;
+
+    /**
      * 获取 fileArray
      * @return fileArray.
      */
@@ -445,6 +450,14 @@ public class EtrConBondDto extends EtrEntrust {
 
     public void setNextUser(String nextUser) {
         this.nextUser = nextUser;
+    }
+
+    public Long getPositionSeqno() {
+        return positionSeqno;
+    }
+
+    public void setPositionSeqno(Long positionSeqno) {
+        this.positionSeqno = positionSeqno;
     }
 
     public String getSoftSkipMode() {

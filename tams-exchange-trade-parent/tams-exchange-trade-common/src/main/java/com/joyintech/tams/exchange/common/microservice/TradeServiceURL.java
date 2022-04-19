@@ -160,5 +160,8 @@ public class TradeServiceURL {
     public static String getDeviationDegree = "/etrexchange/common/etrExchangeTrade001/calcDeviationDegree";//偏离度查询
     public static String getEtrDispatcherInfo = "/exchange/entrust/fieldetrinfoquerymain/fieldetrdispatcher/getReadonlyFormEtrInfo/FieldEtrDispatcher/FieldEtrDispatcherInfo/";//指令信息查询
 
+    public static String pushTrade ="/EntrustMsgbyMQ/processFanout";
+    public static String pushTradeForFixedIncome ="/EntrustMsgbyMQ/processManualSettleTrade";
+    public static String pushProgress ="/EntrustMsgbyMQ/updateOrderFinishAmt";
 
 }

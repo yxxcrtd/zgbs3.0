@@ -1,9 +1,7 @@
 package com.joyintech.tams.settle.batch.datagather.reader.bond;
 
-import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.settle.batch.datagather.reader.StlDataGatherReader;
+import com.joyintech.tams.settle.batch.datagather.constant.StlDataGatherConstant;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 债券相关交易取值逻辑
+ * 债券申购确认交易取值逻辑
  * @author 何阳阳
  * @date 2020/7/17
  * @see StlDataGatherBond3Reader
@@ -24,6 +22,11 @@ public class StlDataGatherBond3Reader extends StlDataGatherBondBaseReader {
     @Override
     protected List<String> getPSList() {
         return Arrays.asList(DictCodeList.交易方向_申购确认.getValue());
+    }
+
+    @Override
+    protected void setSearchParam(Map<String, Object> searchParam) {
+        searchParam.put("readerType", StlDataGatherConstant.BOND_PURCHASE_CONFIRM);
     }
 
     @Override

@@ -2,10 +2,9 @@ package com.joyintech.tams.exchange.common.bean.investment;
 
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class ProgressMessage implements Cloneable, Serializable {
+public class ProgressMessage extends BasicMessage {
     private static final long serialVersionUID = 8657021646470132189L;
     private String entrustId;       // 委托代码
     private BigDecimal frozenBalance;       // 剩余未完成委托金额
