@@ -169,6 +169,7 @@ public class ProfitAndLossAccountingStep3ProcessorNewService {
 				if(detsub!=null){
 					detail.setDetailSubjectNo(detsub.getDetailSubjectNo());
 				}
+				detail.setValBokBussDetsub(detsub);
 			}else{
 				detail.setDetailSubjectNo(detailSubjectNo);
 			}
@@ -218,6 +219,7 @@ public class ProfitAndLossAccountingStep3ProcessorNewService {
 				if(detsub!=null){
 					detail2.setDetailSubjectNo(detsub.getDetailSubjectNo());
 				}
+				detail2.setValBokBussDetsub(detsub);
 			}else{
 				detail2.setDetailSubjectNo(detailSubjectNo);
 			}

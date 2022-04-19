@@ -246,17 +246,6 @@ public class ProfitAndLossAccountingStep2ProcessorNewService {
 				// 账务明细_2.基础科目性质 = 其他综合收益_申赎
 				detail2.setBaseSubjectNature(DictCodeBaseSubjectNatrueNew.其他综合收益_申赎.getValue());
 			}
-			// 四级科目号
-			detailSubjectNo=detail2.getDetailSubjectNo();
-			//调用共通处理生成业务明细科目,参数:科目号,科目名称,账务明细代码
-			if(!StringUtils.isNotEmpty(detailSubjectNo)){
-				detsub=bookAccountGenLogic.genBokBussDetsub(detail2);
-				if(detsub!=null){
-					detail2.setDetailSubjectNo(detsub.getDetailSubjectNo());
-				}
-			}else{
-				detail2.setDetailSubjectNo(detailSubjectNo);
-			}
 			// 账务明细.借贷方向 = 损益平准金entity.发生日余额方向
 			detail2.setCdFlag(item.getBalFlag());
 			// 账务明细.原币 = 损益平准金entity.原币
@@ -276,6 +265,17 @@ public class ProfitAndLossAccountingStep2ProcessorNewService {
 			detail2.setBusiId(item.getBusiId());
 			// 账务明细代码
 			detail2.setBokDetailId(item.getBokDetailId());
+			// 四级科目号
+			detailSubjectNo=detail2.getDetailSubjectNo();
+			//调用共通处理生成业务明细科目,参数:科目号,科目名称,账务明细代码
+			if(!StringUtils.isNotEmpty(detailSubjectNo)){
+				detsub=bookAccountGenLogic.genBokBussDetsub(detail2);
+				if(detsub!=null){
+					detail2.setDetailSubjectNo(detsub.getDetailSubjectNo());
+				}
+			}else{
+				detail2.setDetailSubjectNo(detailSubjectNo);
+			}
 			// 其他字段设值同 币种余额entity
 			// if 损益平准金entity.基础科目性质 = 损益平准金_已实现
 			/**
