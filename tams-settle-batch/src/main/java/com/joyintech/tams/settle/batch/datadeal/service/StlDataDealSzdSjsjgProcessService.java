@@ -664,11 +664,14 @@ public class StlDataDealSzdSjsjgProcessService {
                 // 到期本金 = 到期金额-回购利息 modify by fuyongsheng 20220105 end
                 // 首期成交编号
                 settleTransData.setfCjbh(szdSjsjg.getJgfjsm());
+                // 起息日
+                settleTransData.setVdate(DateUtil.parse(szdSjsjg.getJgqtrq()));
                 // 查询首期
                 List<SettleTransData> sqSettleTransDatas = stlDownDataDealMapper.selectSqSettleTransDatas(
-                        settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId());
+                        settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId(),
+                        settleTransData.getVdate());
                 if(CollectionUtils.isNotEmpty(sqSettleTransDatas)){
-                    settleTransData.setVdate(sqSettleTransDatas.get(0).getVdate());
+                    // settleTransData.setVdate(sqSettleTransDatas.get(0).getVdate());
                     // 首期交收日 = 起息日+1个工作日
                     settleTransData.setVpayDate(nextWorkDay(settleTransData.getVdate()));
                     if(sqSettleTransDatas.get(0).getMpayDate().compareTo(settleTransData.getSettleDate())>0){
@@ -743,7 +746,8 @@ public class StlDataDealSzdSjsjgProcessService {
             settleTransData.setmTradeAmt(abs(szdSjsjg.getJgzjje()));
             // 查询首期清算数据
             List<SettleTransData> sqSettleTransDatas = stlDownDataDealMapper.selectSqSettleTransDatas(
-                    settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId());
+                    settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId(),
+                    settleTransData.getVdate());
             if(CollectionUtils.isNotEmpty(sqSettleTransDatas)){
                 // 到期本金
                 settleTransData.setmPrinAmt(sqSettleTransDatas.get(0).getPrinAmt());

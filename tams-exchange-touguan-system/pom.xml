@@ -14,6 +14,7 @@
 
 	<properties>
 		<exchange.entrust.version>3.0.4</exchange.entrust.version>
+		<exchange.basicdata.version>3.0.4</exchange.basicdata.version>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
@@ -49,6 +50,11 @@
 			<groupId>com.joyintech</groupId>
 			<artifactId>tams-exchange-entrust</artifactId>
 			<version>${exchange.entrust.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.joyintech</groupId>
+			<artifactId>tams-exchange-basicdata</artifactId>
+			<version>${exchange.basicdata.version}</version>
 		</dependency>
 		
 		<!-- 集成微服务端的代码 -->

@@ -601,7 +601,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 || StringUtil.equals(commonEntrustDto.getPs(), DictCodeListExt3.交易方向_到期购回.getValue())){
                     baseTradeProductDealDtList = exchangeTransMatchRepo5Service.genFinProductTradeDto(dto,commonEntrustDto);
                 }
-                else {
+                else { // 首期
                     baseTradeProductDealDtList = exchangeTransMatchRepo2Service.genFinProductTradeDto(dto,commonEntrustDto);
                 }
 

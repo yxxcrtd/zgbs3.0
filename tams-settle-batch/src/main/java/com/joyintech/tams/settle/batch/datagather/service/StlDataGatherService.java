@@ -1075,6 +1075,9 @@ public class StlDataGatherService {
         paramDto.setParamDataList(dtoList);
         paramDto.setNeedUpdateStatusEntrustIdList(needUpdateStatusEntrustIdList);
         logger.debug("调用成交匹配:" + JsonUtils.object2Json(paramDto));
+        if(CollectionUtils.isEmpty(dtoList)){
+            return;
+        }
         // 调用债券交易计算逻辑
         if(isSingle) {
             simpleRestTemplate.postForObject(tamsSerever + "/invest/trade/exchangetransmatch/ExchangeTransMatchCommon/transactionMacthBatch", paramDto, Map.class);
@@ -1089,8 +1092,22 @@ public class StlDataGatherService {
         return stlDataGatherMapper.listBondSettleTransData(paraMap);
     }
 
+    /**
+     * 查询竞价回购存续期明细数据
+     * @param paraMap
+     * @return
+     */
     public List<SettleTransDataDto> listRepoSettleTransData(Map<String, Object> paraMap){
         return stlDataGatherMapper.listRepoSettleTransData(paraMap);
+    }
+
+    /**
+     * 查询协议回购到期明细数据
+     * @param paraMap
+     * @return
+     */
+    public List<SettleTransDataDto> listRepoH01MaturitySettleTransData(Map<String, Object> paraMap){
+        return stlDataGatherMapper.listRepoH01MaturitySettleTransData(paraMap);
     }
 
     /**

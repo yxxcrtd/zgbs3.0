@@ -431,6 +431,11 @@ public class FinProductAdd extends BaseEntity {
     private String isIssueAsset;
 
     /**
+     * 是否非担保
+     */
+    private String isNoGuard;
+
+    /**
      * 上市代码
      */
     private String appearMarketId;
@@ -1782,6 +1787,14 @@ public class FinProductAdd extends BaseEntity {
      */
     public void setIsIssueAsset(String isIssueAsset) {
         this.isIssueAsset = isIssueAsset == null ? null : isIssueAsset.trim();
+    }
+
+    public String getIsNoGuard() {
+        return isNoGuard;
+    }
+
+    public void setIsNoGuard(String isNoGuard) {
+        this.isNoGuard = isNoGuard == null ? null : isNoGuard.trim();
     }
 
     /**

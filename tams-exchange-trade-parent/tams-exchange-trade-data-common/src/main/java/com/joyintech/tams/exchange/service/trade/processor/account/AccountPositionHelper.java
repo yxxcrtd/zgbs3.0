@@ -77,11 +77,17 @@ public class AccountPositionHelper {
                 if (positionBeanDeleteList.size() > 0) positionBeanService.asyncDel(positionBeanDeleteList);
             }
         } catch (Exception e) {
-            logger.warn("账户持仓信息缓存失败，{}", e);
+            logger.warn("账户持仓信息缓存失败。", e);
         }
     }
 
-    //持仓检查
+    /**
+     * 持仓检查
+     * @param orderInterface    订单对象
+     * @param entrustVolume 委托数量
+     * @param buyUnit   交易最小单位
+     * @return  检查结果
+     */
     public boolean checkLooseStocksByPosition(OrderInterface orderInterface, long entrustVolume, int buyUnit) {
         if (positionCheckFlag && EntrustBs.SELL.value.equals(orderInterface.getEntrustBs())
                 && EntrustUtils.needPositionCheck(orderInterface.getEntrustProp(), orderInterface.getAssetType())) {
@@ -110,21 +116,21 @@ public class AccountPositionHelper {
     }
 
     public boolean frozenPositionEnable(OrderInterface orderInterface, long frozenVolume) {
-        if (positionCheckFlag && EntrustUtils.needPositionCheck(orderInterface.getEntrustProp(), orderInterface.getAssetType())) {
-            // 卖出冻结数量
-            if (EntrustBs.SELL.value.equals(orderInterface.getEntrustBs())) {
-                PositionBean positionBean = positionBeanService.getPositionBean(orderInterface.getAccountId(), orderInterface.getStockCode());
-                if (Objects.isNull(positionBean)) return true;
-                transactionHelper.addPositionBean(positionBean);
-                if (positionBean.getEnableVolume() < (positionBean.getSellFrozenVolume() + frozenVolume)) {
-                    orderInterface.setErrorCode(ErrorCode.ACCOUNT_POSITION_NOT_ENABLE.value);
-                    orderInterface.setErrorMsg(ErrorCode.ACCOUNT_POSITION_NOT_ENABLE.errorMsg);
-                    return false;
-                }
-                positionBean.setSellFrozenVolume(positionBean.getSellFrozenVolume() + frozenVolume);
-                logger.info("卖出冻结账户持仓；HoldVolume {} EnableVolume {} frozenVolume {}", positionBean.getHoldVolume(), positionBean.getEnableVolume(), positionBean.getSellFrozenVolume());
-                return true;
+        // 卖出冻结数量
+        if (positionCheckFlag
+                && EntrustUtils.needPositionCheck(orderInterface.getEntrustProp(), orderInterface.getAssetType())
+                && EntrustBs.SELL.value.equals(orderInterface.getEntrustBs())) {
+            PositionBean positionBean = positionBeanService.getPositionBean(orderInterface.getAccountId(), orderInterface.getStockCode());
+            if (Objects.isNull(positionBean)) return true;
+            transactionHelper.addPositionBean(positionBean);
+            if (positionBean.getEnableVolume() < (positionBean.getSellFrozenVolume() + frozenVolume)) {
+                orderInterface.setErrorCode(ErrorCode.ACCOUNT_POSITION_NOT_ENABLE.value);
+                orderInterface.setErrorMsg(ErrorCode.ACCOUNT_POSITION_NOT_ENABLE.errorMsg);
+                return false;
             }
+            positionBean.setSellFrozenVolume(positionBean.getSellFrozenVolume() + frozenVolume);
+            logger.info("卖出冻结账户持仓；HoldVolume {} EnableVolume {} frozenVolume {}", positionBean.getHoldVolume(), positionBean.getEnableVolume(), positionBean.getSellFrozenVolume());
+            return true;
         }
         return true;
     }

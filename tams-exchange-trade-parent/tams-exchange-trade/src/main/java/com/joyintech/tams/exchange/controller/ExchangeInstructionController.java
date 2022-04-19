@@ -95,7 +95,7 @@ public class ExchangeInstructionController {
         logger.debug("设置系统参数：fairCode {} platDate {} approveCode {} tradeTimeSwitch {} fairModeEntrustPriceBestThanInstruction {} fairModeWithUnacceptInstruction {}", fairCode, platDate, approveCode, tradeTimeSwitch, fairModeEntrustPriceBestThanInstruction, fairModeWithUnacceptInstruction);
 //        return instructionService.queryAll(pageParam);
 //////////////////////////兼容新UI后端
-        return new ResultBean(ErrorCode.SUCCESS, investmentManagement.queryInstructionsFromCache(pageParam));
+        return new ResultBean(ErrorCode.SUCCESS, investmentManagement.queryInstructions(pageParam));
     }
 
     /***

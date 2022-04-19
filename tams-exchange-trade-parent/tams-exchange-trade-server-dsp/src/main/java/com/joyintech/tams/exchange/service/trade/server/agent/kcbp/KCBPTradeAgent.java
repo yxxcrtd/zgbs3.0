@@ -1955,4 +1955,11 @@ public class KCBPTradeAgent extends TradeAgentDsp {
 //            }
         }
     }
+
+	@Override
+	public List<NegotiateQuoteReceiveBean> reqNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean)
+			throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

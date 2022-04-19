@@ -51,6 +51,17 @@ public enum BSFlag {
     PHDJMR("3m", "盘后定价买", "QB"),
     PHDJMC("3n", "盘后定价卖", "QS"),
 
+    //新债改造
+    PPCJMR("4m", "匹配成交买入/债券现券竞价买入",""),
+    PPCJMC("4n", "匹配成交卖出/债券现券竞价卖出",""),
+    XSCJSBMR("4o", "深圳现券协商成交申报买入",""),
+    XSCJSBMC("4p", "深圳现券协商成交申报卖出",""),
+    XSCJHFJSMR("4q", "深圳现券协商成交回复接受买入",""),
+    XSCJHFJSMC("4r", "深圳现券协商成交回复接受卖出",""),
+    XSCJHFJJMR("4s", "深圳现券协商成交回复拒绝买入",""),
+    XSCJHFJJMC("4t", "深圳现券协商成交回复拒绝卖出",""),
+
+
     LOF_RG("2e", "LOF认购", ""),
     LOF_SG("2f", "LOF申购", ""),
     LOF_SH("2g", "LOF赎回", ""),
@@ -78,6 +89,7 @@ public enum BSFlag {
 
     ZYRZ("n", "质押入质", "9M"),
     ZYCZ("p", "质押出质", "9N"),
+
     // 固收平台买卖委托
     ZDDSFSBMR("2X", "指定对手方申报买入", "BZ"),
     ZDDSFSBMC("2Y", "指定对手方申报卖出", "SZ"),

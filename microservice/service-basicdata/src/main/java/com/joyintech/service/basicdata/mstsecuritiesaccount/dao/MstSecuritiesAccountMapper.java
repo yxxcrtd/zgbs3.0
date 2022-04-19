@@ -215,4 +215,6 @@ public interface MstSecuritiesAccountMapper {
      * @return
      */
     List<SelectOptionDto> getFinprodMarketInfoNewUi(Map<String,Object> map);
+
+    List<SelectOptionDto> getFinprodMarketInfoSecRepo(Map<String, Object> map);
 }

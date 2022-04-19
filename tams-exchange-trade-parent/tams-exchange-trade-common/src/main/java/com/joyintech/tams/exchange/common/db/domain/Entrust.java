@@ -17,6 +17,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_通用式质押回购;
+
 @ApiModel(value = "委托报文", description = "委托报文")
 public class Entrust extends BaseEntity implements Serializable, EntrustInterface, Cloneable, KeyMethodInterface<String> {
     private static final long serialVersionUID = 4354102783892014792L;
@@ -159,6 +161,11 @@ public class Entrust extends BaseEntity implements Serializable, EntrustInterfac
     @NotNull
     @Digits(integer = 20, fraction = 0)
     private long cancelVolume;
+
+    @ApiModelProperty(name = "cancelBalance", value = "撤销金额")
+    @NotNull
+    @Digits(integer = 20, fraction = 4)
+    private BigDecimal cancelBalance;
 
     @ApiModelProperty(name = "reportTime", value = "报文时间")
     private String reportTime;
@@ -512,6 +519,20 @@ public class Entrust extends BaseEntity implements Serializable, EntrustInterfac
 
     public void setCancelVolume(long cancelVolume) {
         this.cancelVolume = cancelVolume;
+    }
+
+    public BigDecimal getCancelBalance() {
+        if (投管业务类型_通用式质押回购.getValue().equals(busiTypeTg)) {
+            return BigDecimal.valueOf(cancelVolume * 100);
+        } else if (entrustPrice != null) {
+            return entrustPrice.multiply(BigDecimal.valueOf(cancelVolume));
+        }
+
+        return cancelBalance;
+    }
+
+    public void setCancelBalance(BigDecimal cancelBalance) {
+        this.cancelBalance = cancelBalance;
     }
 
     public String getReportTime() {

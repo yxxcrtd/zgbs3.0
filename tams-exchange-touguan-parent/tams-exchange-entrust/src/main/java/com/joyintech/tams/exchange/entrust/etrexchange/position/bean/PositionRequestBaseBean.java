@@ -2,6 +2,7 @@ package com.joyintech.tams.exchange.entrust.etrexchange.position.bean;
 
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeTradePortfolioRequest;
+import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradePortfolioSecRepoRequest;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -58,6 +59,23 @@ public class PositionRequestBaseBean {
     }
 
     public PositionRequestBaseBean(EtrExchangeTradePortfolioRequest request) {
+        this.portfolioId = request.getPortfolioId();
+        this.finprodId = request.getFinprodId();
+        this.secAcctId = request.getSecAcctId();
+        this.cashAcctId = request.getAcctNo();
+        this.tradeId = null;
+        this.etrId = request.getEntrustId();
+        this.secAmount = request.getEntrustNum();
+        BigDecimal entrustAmt = request.getEntrustAmt();
+        if (Objects.isNull(entrustAmt) || BigDecimal.ZERO.compareTo(entrustAmt) != -1) {
+            BigDecimal entrustPrice= Objects.isNull(request.getEntrustPrice())?new BigDecimal(0):request.getEntrustPrice();
+            this.cashAmount = this.secAmount.multiply(entrustPrice);
+        } else {
+            this.cashAmount = entrustAmt;
+        }
+    }
+
+    public PositionRequestBaseBean(EtrExchangeTradePortfolioSecRepoRequest request) {
         this.portfolioId = request.getPortfolioId();
         this.finprodId = request.getFinprodId();
         this.secAcctId = request.getSecAcctId();

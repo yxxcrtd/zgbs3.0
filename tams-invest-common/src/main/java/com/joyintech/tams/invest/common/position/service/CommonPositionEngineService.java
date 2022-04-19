@@ -12,6 +12,7 @@ import static com.joyintech.tams.constant.DictCodeListExt3.申报类型_成交�
 import static com.joyintech.tams.constant.DictCodeListExt3.申报类型_收盘价固定价格申报;
 import static com.joyintech.tams.constant.DictCodeListExt3.申报类型_日均价固定价格申报;
 import static com.joyintech.tams.constant.DictCodeListExt3.申报类型_点击成交申报;
+import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.INTERF_TYPE_BOND002;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -20,6 +21,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
+import com.joyintech.tams.common.base.entity.EtrEntrustAdd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +58,8 @@ public class CommonPositionEngineService {
     @Autowired
     private FinProductTypeMapper finProductTypeMapper;
 
+    @Autowired
+    private EtrEntrustAddMapper etrEntrustAddMapper;
     /**
      * 获取结算方式
      *
@@ -146,8 +151,8 @@ public class CommonPositionEngineService {
      * 获取头寸接口类型
      *
      * @param positionType
-     * @param TradePlat
-     * @param FinprodType
+     * @param tradePlat
+     * @param finprodType
      * @param ps
      * @param busiAct
      * @param entity
@@ -194,6 +199,44 @@ public class CommonPositionEngineService {
             return 交易平台_大宗交易平台.getValue();
         }
         return 交易平台_竞价撮合平台.getValue();
+    }
+
+    /**
+     * 获取场内交易平台
+     * @param entrustId
+     * @param tradePlat
+     * @param ps
+     * @param interfaceType
+     * @return
+     */
+    public String getExchangeTradePlatform(String entrustId, String tradePlat, String ps, String finprodId, String interfaceType){
+        // 可转债以外的债券调用头寸引擎判断逻辑使用是否非担保进行判断是竞价交易还是大宗交易
+        if(INTERF_TYPE_BOND002.equals(interfaceType)){
+            FinProductAdd finProductAdd = finProductAddMapper.selectByPrimaryKey(finprodId);
+            return DictCodeList.是否_是.getValue().equals(finProductAdd.getIsNoGuard()) ?
+                    DictCodeList.交易平台_大宗交易平台.getValue() : DictCodeList.交易平台_竞价撮合平台.getValue();
+        }else{
+            if(StringUtil.isEmpty(entrustId)){ // 存续期无指令
+                return tradePlat;
+            }else{
+                EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entrustId);
+                if((DictCodeList.交易平台_大宗交易平台.getValue().equals(tradePlat)
+                        ||DictCodeList.交易平台_综合协议交易平台.getValue().equals(tradePlat))
+                        &&(DictCodeList.交易方向_买入.getValue().equals(ps)
+                        ||DictCodeList.交易方向_卖出.getValue().equals(ps))
+                        &&(DictCodeListExt3.申报类型_意向申报.getValue().equals(etrEntrustAdd.getDealMode())
+                        ||DictCodeListExt3.申报类型_定价申报.getValue().equals(etrEntrustAdd.getDealMode())
+                        ||DictCodeListExt3.申报类型_点击成交申报.getValue().equals(etrEntrustAdd.getDealMode())
+                        ||DictCodeListExt3.申报类型_成交申报.getValue().equals(etrEntrustAdd.getDealMode())
+                        ||DictCodeListExt3.申报类型_日均价固定价格申报.getValue().equals(etrEntrustAdd.getDealMode())
+                        ||DictCodeListExt3.申报类型_收盘价固定价格申报.getValue().equals(etrEntrustAdd.getDealMode())
+                        ||DictCodeListExt3.申报类型_不指定.getValue().equals(etrEntrustAdd.getDealMode()))){
+                    return DictCodeList.交易平台_大宗交易平台.getValue();
+                }else {
+                    return DictCodeList.交易平台_竞价撮合平台.getValue();
+                }
+            }
+        }
     }
 
     public BigDecimal multiplyWithOneHundred(Long value) {

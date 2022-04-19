@@ -239,7 +239,7 @@
 		</where>
 	</select>
 
-	<!--回购存续期专用-->
+	<!--竞价回购存续期专用-->
 	<select id="listRepoSettleTransData" parameterType="java.util.Map"
 			resultType="com.joyintech.tams.settle.batch.datagather.dto.SettleTransDataDto">
 		SELECT
@@ -320,7 +320,11 @@
 			</if>
 			<!--ZGZGST-4214:增加业务场景类型条件 fuyongsheng 20211214 add end-->
 		</where>
-		UNION ALL
+	</select>
+
+	<!--协议逆回购到期-->
+	<select id="listRepoH01MaturitySettleTransData" parameterType="java.util.Map"
+			resultType="com.joyintech.tams.settle.batch.datagather.dto.SettleTransDataDto">
 		SELECT
 		T1.TRADE_ID tradeId2,
 		T1.SHARE_AMT SHARE_NUM,
@@ -331,37 +335,34 @@
 		T2.M_PRIN_AMT,
 		<include refid="settleTransDataSql"></include>
 		LEFT JOIN SETTLE_TRANS_DATA_STATUS stds
-		ON std.TRADE_ID = stds.TRADE_ID
+			ON std.TRADE_ID = stds.TRADE_ID
 		INNER JOIN SETTLE_TRANS_DATA stdsq
-		ON std.SEAT_NUMBER = stdsq.SEAT_NUMBER
-		AND std.VDATE = stdsq.TRADE_DATE
-		AND std.F_CJBH = stdsq.CJBH
+			ON std.SEAT_NUMBER = stdsq.SEAT_NUMBER
+			AND std.VDATE = stdsq.TRADE_DATE
+			AND std.F_CJBH = stdsq.CJBH
 		INNER JOIN SETTLE_TRANS_TG_MAPPING M
-		ON M.TRADE_ID = stdsq.TRADE_ID
+			ON M.TRADE_ID = stdsq.TRADE_ID
 		INNER JOIN TRD_PRODUCT_DEAL T1
-		ON M.TRADE_ID_TG = T1.TRADE_ID
+			ON M.TRADE_ID_TG = T1.TRADE_ID
 		LEFT JOIN TRD_PRODUCT_DEAL_ADD T3
-		ON T3.TRADE_ID = T1.TRADE_ID
+			ON T3.TRADE_ID = T1.TRADE_ID
 		LEFT JOIN FIN_TRADE_PRODUCT T2
-		ON T2.FINPROD_ID = T1.FINPROD_ID
-		AND T2.BRANCH = '0'
-		<!--INNER JOIN SETTLE_TRANS_DATA_STATUS stds2
-				ON std.TRADE_ID = stds2.TRADE_ID
-			   AND stds2.CHECK_RESULT = '1' -->
+			ON T2.FINPROD_ID = T1.FINPROD_ID
+			AND T2.BRANCH = '0'
 		<where>
-			(stds.CHECK_RESULT IS NULL
-		    	OR
-				(stds.CHECK_RESULT IS NOT NULL AND stds.CHECK_RESULT IN ('1','3'))
-		    )
+			1 = 1
+			<if test="checkResultList != null and checkResultList.size() > 0">
+			    AND NOT EXISTS (SELECT 1 FROM SETTLE_TRANS_TG_MAPPING temp where temp.TRADE_ID = std.TRADE_ID)
+				<foreach collection="checkResultList" item="result" open="AND stds.CHECK_RESULT IN (" close=")" separator=",">
+					#{result,jdbcType=VARCHAR}
+				</foreach>
+			</if>
 			<if test="dealDate != null">
 				AND std.DEAL_DATE = #{dealDate,jdbcType=DATE}
 			</if>
 			<if test="dqPs!= null">
 				AND std.PS = #{dqPs,jdbcType=VARCHAR}
 			</if>
-<!--			<if test="tradeMarketSh!= null">-->
-<!--				AND std.TRADE_MARKET = #{tradeMarketSh,jdbcType=VARCHAR}-->
-<!--			</if>-->
 			<if test="finprodIdList != null and finprodIdList.size() > 0">
 				<foreach collection="finprodIdList" item="finprodId" open="AND std.FINPROD_ID IN (" close=")" separator=",">
 					#{finprodId,jdbcType=VARCHAR}

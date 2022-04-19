@@ -1,24 +1,50 @@
 package com.joyintech.tams.exchange.terminal.trade.kcbp;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.exchange.common.bean.*;
-import com.joyintech.tams.exchange.common.bean.terminal.RTGSStatusBean;
-import com.joyintech.tams.exchange.common.constant.*;
-import com.joyintech.tams.exchange.common.db.domain.*;
-import com.joyintech.tams.exchange.common.utils.EntrustUtils;
-import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
-import com.joyintech.tams.exchange.terminal.trade.EntrustIdManager;
-import com.joyintech.tams.exchange.terminal.trade.kcbp.constant.Emmlb;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.exchange.common.bean.AccountFinance;
+import com.joyintech.tams.exchange.common.bean.HistoryTrade;
+import com.joyintech.tams.exchange.common.bean.IntegratedBulkCloseQuoteBean;
+import com.joyintech.tams.exchange.common.bean.IntegratedBulkCloseQuoteQryBean;
+import com.joyintech.tams.exchange.common.bean.IntegratedBulkQuoteBean;
+import com.joyintech.tams.exchange.common.bean.IntegratedFixedIncomeQuoteBean;
+import com.joyintech.tams.exchange.common.bean.IntegratedQuote;
+import com.joyintech.tams.exchange.common.bean.IntegratedRepurchaseQuoteBean;
+import com.joyintech.tams.exchange.common.bean.IntegratedRepurchaseQuoteQryBean;
+import com.joyintech.tams.exchange.common.bean.NegotiateQuoteReceiveBean;
+import com.joyintech.tams.exchange.common.bean.NegotiateQuoteSendBean;
+import com.joyintech.tams.exchange.common.bean.PledgeDiscount;
+import com.joyintech.tams.exchange.common.bean.QuoteQryBean;
+import com.joyintech.tams.exchange.common.bean.StandardBonds;
+import com.joyintech.tams.exchange.common.bean.terminal.RTGSStatusBean;
+import com.joyintech.tams.exchange.common.constant.AssetType;
+import com.joyintech.tams.exchange.common.constant.EntrustBs;
+import com.joyintech.tams.exchange.common.constant.EntrustProp;
+import com.joyintech.tams.exchange.common.constant.EntrustStatus;
+import com.joyintech.tams.exchange.common.constant.Market;
+import com.joyintech.tams.exchange.common.constant.QuoteType;
+import com.joyintech.tams.exchange.common.constant.TradeType;
+import com.joyintech.tams.exchange.common.db.domain.Account;
+import com.joyintech.tams.exchange.common.db.domain.CancelEntrustBean;
+import com.joyintech.tams.exchange.common.db.domain.Entrust;
+import com.joyintech.tams.exchange.common.db.domain.Instrument;
+import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
+import com.joyintech.tams.exchange.common.db.domain.PositionBean;
+import com.joyintech.tams.exchange.common.db.domain.Trade;
+import com.joyintech.tams.exchange.common.utils.EntrustUtils;
+import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
+import com.joyintech.tams.exchange.terminal.trade.EntrustIdManager;
+import com.joyintech.tams.exchange.terminal.trade.kcbp.constant.Emmlb;
 
 public class KCBPConverter {
     private static final Logger logger = LoggerFactory.getLogger(KCBPConverter.class);
@@ -1805,4 +1831,190 @@ public class KCBPConverter {
         }
         return rtgsStatusBeanList;
     }
+    
+    public static List<NegotiateQuoteReceiveBean> convertToNegotiateQuoteReceiveResponseSZ(List<List<String>> data) {
+        List<NegotiateQuoteReceiveBean> negotiateQuoteReceiveBeans = Lists.newArrayListWithExpectedSize(data.size() - 1);
+        List<String> columnNames = data.get(0);
+        for (int i = 1; i < data.size(); i++) {
+            List<String> content = data.get(i);
+            NegotiateQuoteReceiveBean negotiateQuoteReceiveBean = new NegotiateQuoteReceiveBean();
+            for (int j = 0; j < columnNames.size(); j++) {
+                String columnName = columnNames.get(j);
+                String value = content.get(j);
+                //TODO 根据接口返回转换成对应bean
+                switch (columnName) {
+                    case "transacttime": {//申报时间
+                    	negotiateQuoteReceiveBean.setRequestTime(Integer.parseInt(value));
+                        break;
+                    }
+                    case "reportstatus": {//成交申报请求状态
+                    	negotiateQuoteReceiveBean.setRequestStatus(Integer.parseInt(value)); 
+                        break;
+                    }
+                    case "stkcode": {//证券代码
+                    	negotiateQuoteReceiveBean.setStockCode(StockCodeUtils.formatStockCode(value, "SZ"));
+                        break;
+                    }
+                    case "stkname": {//证券名称
+                    	negotiateQuoteReceiveBean.setStockName(value);
+                        break;
+                    }
+                    case "side": {//买卖方向
+                    	negotiateQuoteReceiveBean.setBs(value);
+                        break;
+                    }
+                    case "orderqty": {//数量
+                    	negotiateQuoteReceiveBean.setAmount(Integer.parseInt(value));
+                        break;
+                    }
+                    //TODO 接口返回没有全价  委托金额
+                    case "orderprice": {//价格（净价） 
+                    	negotiateQuoteReceiveBean.setEntrustPrice(BigDecimal.valueOf(Double.parseDouble(value)));
+                        break;
+                    }
+                    case "cpmemberid": {//接收方交易商代码 --> 本方交易商
+                    	negotiateQuoteReceiveBean.setMemberId(value);
+                        break;
+                    }
+                    case "cptradercode": {//接收方交易员代码 --> 本方交易员
+                    	negotiateQuoteReceiveBean.setTraderCode(value);
+                        break;
+                    }
+                    case "cpinvestorid": {//接收方交易主体代码 --> 本方交易主体
+                    	negotiateQuoteReceiveBean.setInvestorId(value);
+                        break;
+                    }
+                    case "cpinvestortype": {//接收方交易主体类型 --> 本方交易主体类型
+                    	negotiateQuoteReceiveBean.setInvestorType(value);
+                        break;
+                    }
+                    case "memberid": {//申报方交易商 --> 对手方交易商
+                    	negotiateQuoteReceiveBean.setCpInvestorType(value);
+                        break;
+                    }
+                    case "tradercode": {//申报方交易员代码 --> 对手方交易员
+                    	negotiateQuoteReceiveBean.setCpTraderCode(value);
+                        break;
+                    }
+                    case "investorid": {//申报方交易主体代码 --> 对手方交易主体
+                    	negotiateQuoteReceiveBean.setCpInvestorId(value);
+                        break;
+                    }
+                    case "investortype": {//申报方交易主体类型 --> 对手方交易主体类型
+                    	negotiateQuoteReceiveBean.setCpInvestorType(value);
+                        break;
+                    }
+                    case "confirmid": {//约定号
+                    	negotiateQuoteReceiveBean.setConfirmId(value);
+                        break;
+                    }
+                    case "posstr": {//定位串
+                    	negotiateQuoteReceiveBean.setPositionStr(value);
+                        break;
+                    }
+                    case "memo": {//备注
+                    	negotiateQuoteReceiveBean.setRemark(value);
+                        break;
+                    }
+                }
+            }
+        	negotiateQuoteReceiveBeans.add(negotiateQuoteReceiveBean);
+        }
+        return negotiateQuoteReceiveBeans;
+    }
+    
+//    public static List<NegotiateQuoteReceiveBean> convertToNegotiateQuoteSendResponseSZ(List<List<String>> data) {
+//        List<NegotiateQuoteSendBean> negotiateQuoteSendBeans = Lists.newArrayListWithExpectedSize(data.size() - 1);
+//        List<String> columnNames = data.get(0);
+//        for (int i = 1; i < data.size(); i++) {
+//            List<String> content = data.get(i);
+//            NegotiateQuoteSendBean negotiateQuoteSendBean = new NegotiateQuoteSendBean();
+//            for (int j = 0; j < columnNames.size(); j++) {
+//                String columnName = columnNames.get(j);
+//                String value = content.get(j);
+//                //TODO 根据接口返回转换成对应bean
+//                switch (columnName) {
+//	                case "ordersno": {//委托序号 --> 请求编号
+//	                	negotiateQuoteSendBean.setRequestNo(value);
+//	                    break;
+//	                }
+//                    case "orderdate": {//委托日期 --> 请求时间
+//                    	negotiateQuoteSendBean.setRequestTime(Integer.parseInt(value));
+//                        break;
+//                    }
+//                    case "orderstatus": {//委托状态 --> 请求状态
+//                    	negotiateQuoteSendBean.setRequestStatus(Integer.parseInt(value));
+//                        break;
+//                    }
+//                    case "stkcode": {//证券代码
+//                    	negotiateQuoteSendBean.setStockCode(StockCodeUtils.formatStockCode(value, "SZ"));
+//                        break;
+//                    }
+//                    case "stkname": {//证券名称
+//                    	negotiateQuoteSendBean.setStockName(value);
+//                        break;
+//                    }
+//                    case "bsflag": {//买卖类别 --> 对手方买卖方向
+//                    	negotiateQuoteSendBean.setBs(value);
+//                        break;
+//                    }
+//                    case "orderqty": {//数量
+//                    	negotiateQuoteSendBean.setAmount(Integer.parseInt(value));
+//                        break;
+//                    }
+//                    //TODO 接口返回没有全价  委托金额
+//                    case "orderprice": {//价格（净价） 
+//                    	negotiateQuoteSendBean.setEntrustPrice(BigDecimal.valueOf(Double.parseDouble(value)));
+//                        break;
+//                    }
+//                    case "cpmemberid": {//接收方交易商代码 --> 本方交易商
+//                    	negotiateQuoteReceiveBean.setMemberId(value);
+//                        break;
+//                    }
+//                    case "cptradercode": {//接收方交易员代码 --> 本方交易员
+//                    	negotiateQuoteReceiveBean.setTraderCode(value);
+//                        break;
+//                    }
+//                    case "cpinvestorid": {//接收方交易主体代码 --> 本方交易主体
+//                    	negotiateQuoteReceiveBean.setInvestorId(value);
+//                        break;
+//                    }
+//                    case "cpinvestortype": {//接收方交易主体类型 --> 本方交易主体类型
+//                    	negotiateQuoteReceiveBean.setInvestorType(value);
+//                        break;
+//                    }
+//                    case "memberid": {//申报方交易商 --> 对手方交易商
+//                    	negotiateQuoteReceiveBean.setCpInvestorType(value);
+//                        break;
+//                    }
+//                    case "tradercode": {//申报方交易员代码 --> 对手方交易员
+//                    	negotiateQuoteReceiveBean.setCpTraderCode(value);
+//                        break;
+//                    }
+//                    case "investorid": {//申报方交易主体代码 --> 对手方交易主体
+//                    	negotiateQuoteReceiveBean.setCpInvestorId(value);
+//                        break;
+//                    }
+//                    case "investortype": {//申报方交易主体类型 --> 对手方交易主体类型
+//                    	negotiateQuoteReceiveBean.setCpInvestorType(value);
+//                        break;
+//                    }
+//                    case "confirmid": {//约定号
+//                    	negotiateQuoteReceiveBean.setConfirmId(value);
+//                        break;
+//                    }
+//                    case "posstr": {//定位串
+//                    	negotiateQuoteReceiveBean.setPositionStr(value);
+//                        break;
+//                    }
+//                    case "memo": {//备注
+//                    	negotiateQuoteReceiveBean.setRemark(value);
+//                        break;
+//                    }
+//                }
+//            }
+//        	negotiateQuoteReceiveBeans.add(negotiateQuoteReceiveBean);
+//        }
+//        return negotiateQuoteReceiveBeans;
+//    }
 }

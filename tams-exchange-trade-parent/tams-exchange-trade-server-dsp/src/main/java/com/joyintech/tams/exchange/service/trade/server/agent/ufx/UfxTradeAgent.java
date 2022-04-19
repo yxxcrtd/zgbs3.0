@@ -1405,4 +1405,11 @@ public class UfxTradeAgent extends TradeAgentDsp {
     private static double convertExpireYearRate(BigDecimal entrustPrice) {
         return TradeUtils.divide(entrustPrice, 100, 3).doubleValue();
     }
+
+	@Override
+	public List<NegotiateQuoteReceiveBean> reqNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean)
+			throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

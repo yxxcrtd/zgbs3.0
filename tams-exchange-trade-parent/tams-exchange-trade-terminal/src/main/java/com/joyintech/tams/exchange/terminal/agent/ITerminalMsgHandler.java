@@ -188,6 +188,13 @@ public interface ITerminalMsgHandler {
      * @Date: 2020/9/23 
      */
     void queryIntegratedFixedIncomeQuote(IntegratedFixedIncomeQuoteQryBean integratedFixedIncomeQuoteQryBean, Long requestId);
+    
+    /**
+     * @Description: 深圳我收到的协商成交行情查询
+     * @param negotiateQuoteQueryBean
+     * @param requestId
+     */
+    public void queryNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean, Long requestId) ;
 
     void reqReissueEntrust(ReissueEntrustQryBean reissueEntrustQryBean, Long requestId);
 

@@ -79,7 +79,8 @@ public class ExchangeTransMatchValidator implements BeanValidator {
                         || !StringUtil.equals(dealDto.getAcctNo(),entrustDto.getAcctNo())
                         || !StringUtil.equals(dealDto.getFinprodId(),entrustDto.getFinprodId())
                         || !StringUtil.equals(ps,entrustDto.getPs())
-                        || !StringUtil.equals(dealDto.getTradePlat(),entrustDto.getTradePlat())) {
+                        // || !StringUtil.equals(dealDto.getTradePlat(),entrustDto.getTradePlat())
+                ) {
                     errorList.add(new ValidMessage("成交数据的基本信息和委托或交易的基本信息不一致"));
                 }
             }else{
@@ -88,7 +89,8 @@ public class ExchangeTransMatchValidator implements BeanValidator {
                         || !StringUtil.equals(dealDto.getFinprodId(),entrustDto.getFinprodId())
                         || !StringUtil.equals(ps,entrustDto.getPs())
                         || !StringUtil.equals(DateUtil.format(dealDto.getTradeDate()),DateUtil.format(entrustDto.getEntrustDate()))
-                        || !StringUtil.equals(dealDto.getTradePlat(),entrustDto.getTradePlat())) {
+                        // || !StringUtil.equals(dealDto.getTradePlat(),entrustDto.getTradePlat())
+                ) {
                     errorList.add(new ValidMessage("成交数据的基本信息和委托或交易的基本信息不一致"));
                 }
             }

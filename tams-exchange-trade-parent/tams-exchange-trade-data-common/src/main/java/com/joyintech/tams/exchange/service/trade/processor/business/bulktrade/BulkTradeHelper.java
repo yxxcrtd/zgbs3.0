@@ -1,6 +1,9 @@
 package com.joyintech.tams.exchange.service.trade.processor.business.bulktrade;
 
+import com.joyintech.exchange.service.quote.service.QuoteService;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
+import com.joyintech.tams.exchange.common.bean.ResultBean;
+import com.joyintech.tams.exchange.common.bean.TickBean;
 import com.joyintech.tams.exchange.common.cache.QuoteTickService;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
@@ -36,8 +39,10 @@ public class BulkTradeHelper {
 
     @Autowired
     private InstrumentService instrumentService;
+//    @Autowired
+//    private QuoteTickService quoteTickService;
     @Autowired
-    private QuoteTickService quoteTickService;
+    private QuoteService quoteService;
     @Autowired
     private StockHelper stockHelper;
     @Autowired
@@ -187,8 +192,11 @@ public class BulkTradeHelper {
 
     //检查交易价格涨跌停限制
     private boolean checkPriceLimit(OrderInterface orderInterface, BigDecimal entrustPrice) {
-        QuoteProto.TickBean tick = quoteTickService.getTickFromCache(orderInterface.getStockCode());
-        if (Objects.nonNull(tick)) {
+        ResultBean tickBean = quoteService.getTick(orderInterface.getStockCode());
+        if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
+            TickBean tick = (TickBean)tickBean.getData();
+//        QuoteProto.TickBean tick = quoteTickService.getTickFromCache(orderInterface.getStockCode());
+//        if (Objects.nonNull(tick)) {
             double lowerLimitPrice = TradeUtils.formatDouble(tick.getLowerLimitPrice(), 4);
             double upperLimitPrice = TradeUtils.formatDouble(tick.getUpperLimitPrice(), 4);
             if ((Double.compare(lowerLimitPrice, 0.0) > 0 && Double.compare(lowerLimitPrice, entrustPrice.doubleValue()) > 0)
@@ -204,8 +212,11 @@ public class BulkTradeHelper {
     //检查债券交易价格上下限
     private boolean checkBondPriceLimit(OrderInterface orderInterface, BigDecimal entrustPrice) {
         //（min（最低价（债券五档行情中的最低价），收盘价x70%）<=price<=max（最高价（债券五档行情中的最高价），收盘价x130%））
-        QuoteProto.TickBean tick = quoteTickService.getTickFromCache(orderInterface.getStockCode());
-        if (Objects.nonNull(tick)) {
+        ResultBean tickBean = quoteService.getTick(orderInterface.getStockCode());
+        if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
+            TickBean tick = (TickBean)tickBean.getData();
+//        QuoteProto.TickBean tick = quoteTickService.getTickFromCache(orderInterface.getStockCode());
+//        if (Objects.nonNull(tick)) {
             double lowerLimitPrice = TradeUtils.formatDouble(tick.getPreClosePrice() * 0.7, 4);
             double upperLimitPrice = TradeUtils.formatDouble(tick.getPreClosePrice() * 1.3, 4);
             lowerLimitPrice = Math.min(lowerLimitPrice, TradeUtils.formatDouble(tick.getLowPrice(), 4));
@@ -231,17 +242,18 @@ public class BulkTradeHelper {
     //债券交易价格上下限
     private boolean checkBondPriceLimit(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, String tradePlat, String entrustBussType, String priceMode) {
         logger.info("没有涨跌幅");
-        QuoteProto.TickBean tick = quoteTickService.getTickFromCache(orderInterface.getStockCode());
+        boolean checkPrice = false;
         String isFullPrice = orderInterface.getIsFullPrice();
-        boolean checkPrice;
-        if (!FullPriceConst.FULL_PRICE.value.equals(isFullPrice)) {
-            checkPrice = priceHelper.checkPrice(entrustPrice, orderInterface, instrument, tick, tradePlat, entrustBussType, priceMode);
-        } else {
-            checkPrice = priceHelper.checkPrice(orderInterface.getFullPrice(), orderInterface, instrument, tick, tradePlat, entrustBussType, priceMode);
+        ResultBean tickBean = quoteService.getTick(orderInterface.getStockCode());
+        if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
+            TickBean tick = (TickBean) tickBean.getData();
+//        QuoteProto.TickBean tick = quoteTickService.getTickFromCache(orderInterface.getStockCode());
+            if (!FullPriceConst.FULL_PRICE.value.equals(isFullPrice)) {
+                checkPrice = priceHelper.checkPrice(entrustPrice, orderInterface, instrument, tick, tradePlat, entrustBussType, priceMode);
+            } else {
+                checkPrice = priceHelper.checkPrice(orderInterface.getFullPrice(), orderInterface, instrument, tick, tradePlat, entrustBussType, priceMode);
+            }
         }
-        if (!checkPrice) {
-            return false;
-        }
-        return true;
+        return !checkPrice;
     }
 }
