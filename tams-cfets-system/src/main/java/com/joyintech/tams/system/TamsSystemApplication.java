@@ -96,7 +96,7 @@ public class TamsSystemApplication extends WebApplication {
 
 	@Bean
 	public Docket dataTenderbond() {
-		return SwaggerConfig.createDocket("新债标的", "com.joyintech.tams.invest.asset.newtenderbond");
+		return SwaggerConfig.createDocket("新债标的", "com.joyintech.tams.business.asset.tenderbond");
 	}
 	public static void main(String[] args) throws Exception {
     	initLog();

@@ -50,7 +50,14 @@
 			<artifactId>tams-cfets</artifactId>
 			<version>${cfets.version}</version>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>com.joyintech</groupId>
+			<artifactId>tams-touguan-asset</artifactId>
+			<version>${cfets.version}</version>
+		</dependency>
+
+
 		<!-- 集成微服务端的代码 -->
 		<dependency>
 			<groupId>com.joyintech</groupId>
