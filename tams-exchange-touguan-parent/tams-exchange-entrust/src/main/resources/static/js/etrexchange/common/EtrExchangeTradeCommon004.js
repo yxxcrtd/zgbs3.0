@@ -4017,7 +4017,7 @@
                     Joyin.error("组合分配中指令数量不能为空")
                     return false;
                 }
-                if(object.tradeMarket == TRADE_PLACE_03 && item.entrustNum % 10 != 0){
+                if(item.entrustNum % 10 != 0){
                     Joyin.error("指令数量，请输入数量最小交易单位10的整数倍")
                     return false;
                 }
