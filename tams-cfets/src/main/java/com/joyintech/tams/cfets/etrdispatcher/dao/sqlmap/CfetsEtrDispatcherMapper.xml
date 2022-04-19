@@ -843,7 +843,7 @@
         tpd.UNIT_CPRICE fCprice,
         tpd.YIELD * 100 fYield,
         tpd.FPRICE_AMT vTradeAmt,
-        FTP.M_TRADE_AMT mSettleAmt,
+        FTP.M_TRADE_AMT mTradeAmt,
         nvl(fpt.TYPE_6,wtpdo.DL_TYPE) paBussType,
         fpt.TYPE_9 assetType1,
         fpt.TYPE_10 assetType10,

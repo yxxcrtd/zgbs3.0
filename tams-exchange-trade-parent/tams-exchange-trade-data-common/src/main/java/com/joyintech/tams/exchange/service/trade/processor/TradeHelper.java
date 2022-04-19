@@ -715,6 +715,7 @@ public class TradeHelper {
         order.setBusiTypeTg(instruction.getBusiTypeTg());
         order.setConNum(instruction.getConNum());
         order.setEntrustClass(instruction.getEntrustClass());
+        order.setAccountName(instruction.getAcctName());
 
         //1.公平下单
         if (fairOrderHelper.createFairOrder(order)) {
@@ -1102,6 +1103,7 @@ public class TradeHelper {
             integratedEntrust.setPs(instruction.getTradeSide());
             integratedEntrust.setBusiTypeTg(instruction.getBusiTypeTg());
             integratedEntrust.setEntrustClass(instruction.getEntrustClass());
+            integratedEntrust.setAccountName(instruction.getAcctName());
 
             integratedEntrustService.asyncUpdate(integratedEntrust);
             handleWorkflow(null, integratedEntrust, workflow);
