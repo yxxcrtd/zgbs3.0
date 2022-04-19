@@ -230,7 +230,7 @@ public class TradeCallbackHelper {
         tradeRecord.setPs(instruction.getTradeSide());
         tradeRecord.setBusiTypeTg(instruction.getBusiTypeTg());
         tradeRecord.setEntrustClass(instruction.getEntrustClass());
-        if (tradeRecord.getClearBalance() == null) {
+        if (tradeRecord.getClearBalance() == null || tradeRecord.getClearBalance().compareTo(BigDecimal.ZERO) == 0) {
             if (IntegratedEntrustUtils.isProtocolBack_SH(entrust.getEntrustProp())
                     || IntegratedEntrustUtils.isProtocolBack_SZ(entrust.getEntrustProp())) {
                 //到期结算金额
