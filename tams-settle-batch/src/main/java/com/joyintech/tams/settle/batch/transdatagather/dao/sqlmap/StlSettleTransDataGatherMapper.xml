@@ -17,7 +17,7 @@
            )
     </delete>
     <!-- 处理数据对象查询 -->
-    <select id="selectNeedTotalDataList" resultType="com.joyintech.tams.settle.batch.transdatagather.dto.StlSettleTransDataGatherDto">
+    <select id="selectNeedTotalDataList" parameterType="java.util.Map" resultType="com.joyintech.tams.settle.batch.transdatagather.dto.StlSettleTransDataGatherDto">
         select
             A.*,
             B.TRADE_ID tradeIdAdd, B.REPO_TYPE, B.CON_PRICE, B.CON_AMT, B.CON_PRIN_AMT,
@@ -46,14 +46,16 @@
           <!--ZGZGST-4261:存续期数据无需登录SETTLE_TRANS_DATA_TOTAL表 fuyongsheng modify 20211221 start-->
           <!--and A.APPLY_TRADE_ID is not null-->
           <!--GNS-862:配股配债有可能APPLY_TRADE_ID is NULL modify by fuyongsheng 20220217 start-->
-          and (A.APPLY_TRADE_ID is not null OR ((B.REPO_TYPE = 'H02' AND A.PS!= 'T07') OR A.PS = 'T46' OR A.PS = 'T97'))
+          and (A.APPLY_TRADE_ID is not null OR ((B.REPO_TYPE = #{REPO_TYPE_H02} AND A.PS!= #{PS_T07}) OR A.PS = #{PS_T46} OR A.PS = #{PS_T97}))
           <!--GNS-862:配股配债有可能APPLY_TRADE_ID is NULL modify by fuyongsheng 20220217 end-->
           <!--ZGZGST-4261:存续期数据无需登录SETTLE_TRANS_DATA_TOTAL表 fuyongsheng modify 20211221 end-->
           <!--/*AND EXISTS  (
                 SELECT 1 FROM stl_sec_recon_detail ssrd
                 where ssrd.TRADE_ID = A.TRADE_ID)*/-->
-          and A.PS !=#{PS_T05}
-
+            and A.PS !=#{PS_T05}
+            <!--筛选交收成功和部分交收的数据 add by fuyongsheng 20220418 start-->
+            and A.DELIVERY_RESULT IN (#{DELIVERY_RESULT_01}, #{DELIVERY_RESULT_02})
+            <!--筛选交收成功和部分交收的数据 add by fuyongsheng 20220418 end-->
     </select>
 
     <insert id="batchInsetSettleTransDataTotal">
