@@ -238,7 +238,7 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
             // modify by etliu 20211204 end
             ExchangeTransMatchCommonDto exchangeTransMatchCommonDto = new ExchangeTransMatchCommonDto();
             BeanUtil.copyPropertiesIgnoreNull(exchangeTransMatchCommonDto,settleTransDataDto);
-            exchangeTransMatchCommonDto.setMatchType("0");
+            exchangeTransMatchCommonDto.setMatchType(DictCodeListExt3.下行交易匹配类型_自动匹配.getValue());
 
             exchangeTransMatchCommonDto.setRemainNum(settleTransDataDto.getShareAmt());
             exchangeTransMatchCommonDto.setRemainAmount(settleTransDataDto.getFpriceAmt());
@@ -485,7 +485,7 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
         }
         ExchangeTransMatchCommonDto exchangeTransMatchCommonDto = new ExchangeTransMatchCommonDto();
         BeanUtil.copyPropertiesIgnoreNull(exchangeTransMatchCommonDto, settleTransDataDto);
-        exchangeTransMatchCommonDto.setMatchType("0");
+        exchangeTransMatchCommonDto.setMatchType(DictCodeListExt3.下行交易匹配类型_自动匹配.getValue());
 
         exchangeTransMatchCommonDto.setRemainNum(settleTransDataDto.getShareAmt());
         exchangeTransMatchCommonDto.setRemainAmount(settleTransDataDto.getFpriceAmt());
