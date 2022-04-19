@@ -30,6 +30,7 @@
         <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
         <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
         <result column="FIRST_CONFIRM_DATE" property="firstConfirmDate" jdbcType="DATE" />
+        <result column="BENCHMARK_ID_ACCURACY" property="benchmarkIdAccuracy" jdbcType="DECIMAL" />
     </resultMap>
     <sql id="Base_Column_List" >
         CASH_ID CASH_ID, EFF_DATE EFF_DATE, INT_TYPE INT_TYPE, BASIS BASIS, RESET_TYPE RESET_TYPE, 
@@ -38,7 +39,7 @@
         SPREAD_RATE SPREAD_RATE, HIGHEST_RATE HIGHEST_RATE, LOWEST_RATE LOWEST_RATE, BENCHMARK_ID BENCHMARK_ID, 
         BENCHMARK_TYPE BENCHMARK_TYPE, FINPROD_ID FINPROD_ID, BRANCH BRANCH, FINPROD_TYPE FINPROD_TYPE, 
         FINPROD_TYPE2 FINPROD_TYPE2, REMARK REMARK, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, 
-        CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME, FIRST_CONFIRM_DATE FIRST_CONFIRM_DATE
+        CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME, FIRST_CONFIRM_DATE FIRST_CONFIRM_DATE,BENCHMARK_ID_ACCURACY BENCHMARK_ID_ACCURACY
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -72,7 +73,7 @@
             BRANCH, FINPROD_TYPE, FINPROD_TYPE2, 
             REMARK, CREATE_USER, CREATE_DEPT, 
             CREATE_TIME, UPDATE_USER, UPDATE_TIME, 
-            FIRST_CONFIRM_DATE)
+            FIRST_CONFIRM_DATE,BENCHMARK_ID_ACCURACY)
         values (#{cashId,jdbcType=VARCHAR}, #{effDate,jdbcType=DATE}, #{intType,jdbcType=VARCHAR}, 
             #{basis,jdbcType=VARCHAR}, #{resetType,jdbcType=VARCHAR}, #{resetFreq,jdbcType=VARCHAR}, 
             #{firstResetDate,jdbcType=DATE}, #{resetDate,jdbcType=VARCHAR}, #{observeBefDay,jdbcType=DECIMAL}, 
@@ -82,7 +83,7 @@
             #{branch,jdbcType=DECIMAL}, #{finprodType,jdbcType=VARCHAR}, #{finprodType2,jdbcType=VARCHAR}, 
             #{remark,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, 
             #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
-            #{firstConfirmDate,jdbcType=DATE})
+            #{firstConfirmDate,jdbcType=DATE},#{benchmarkIdAccuracy,jdbcType=DECIMAL})
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.FinRateInfo" >
         insert into FIN_RATE_INFO
@@ -171,6 +172,9 @@
             <if test="firstConfirmDate != null" >
                 FIRST_CONFIRM_DATE,
             </if>
+            <if test="benchmarkIdAccuracy != null" >
+                BENCHMARK_ID_ACCURACY,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="cashId != null" >
@@ -257,6 +261,9 @@
             <if test="firstConfirmDate != null" >
                 #{firstConfirmDate,jdbcType=DATE},
             </if>
+            <if test="benchmarkIdAccuracy != null" >
+                #{benchmarkIdAccuracy,jdbcType=DECIMAL},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.FinRateInfo" >
@@ -264,12 +271,12 @@
         FIRST_RESET_DATE, RESET_DATE, OBSERVE_BEF_DAY, OBSERVE_BEF_UNIT, RATE, COEFFICIENT, 
         SPREAD_RATE, HIGHEST_RATE, LOWEST_RATE, BENCHMARK_ID, BENCHMARK_TYPE, FINPROD_ID, 
         BRANCH, FINPROD_TYPE, FINPROD_TYPE2, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, 
-        UPDATE_USER, UPDATE_TIME, FIRST_CONFIRM_DATE)
+        UPDATE_USER, UPDATE_TIME, FIRST_CONFIRM_DATE,BENCHMARK_ID_ACCURACY)
         select CASH_ID, EFF_DATE, INT_TYPE, BASIS, RESET_TYPE, RESET_FREQ, 
             FIRST_RESET_DATE, RESET_DATE, OBSERVE_BEF_DAY, OBSERVE_BEF_UNIT, RATE, COEFFICIENT, 
             SPREAD_RATE, HIGHEST_RATE, LOWEST_RATE, BENCHMARK_ID, BENCHMARK_TYPE, FINPROD_ID, 
             BRANCH, FINPROD_TYPE, FINPROD_TYPE2, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, 
-            #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME, FIRST_CONFIRM_DATE
+            #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME, FIRST_CONFIRM_DATE,BENCHMARK_ID_ACCURACY
              from FIN_RATE_INFO
              where 1 = 1 and CASH_ID = #{cashId,jdbcType=VARCHAR} and EFF_DATE = #{effDate,jdbcType=DATE}
     </insert>
@@ -345,6 +352,9 @@
             <if test="firstConfirmDate != null" >
                 FIRST_CONFIRM_DATE = #{firstConfirmDate,jdbcType=DATE},
             </if>
+            <if test="benchmarkIdAccuracy != null" >
+                BENCHMARK_ID_ACCURACY = #{benchmarkIdAccuracy,jdbcType=DECIMAL},
+            </if>
         </set>
         where CASH_ID = #{cashId,jdbcType=VARCHAR}
           and EFF_DATE = #{effDate,jdbcType=DATE}
@@ -373,7 +383,8 @@
             REMARK = #{remark,jdbcType=VARCHAR},
             UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
             UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
-            FIRST_CONFIRM_DATE = #{firstConfirmDate,jdbcType=DATE}
+            FIRST_CONFIRM_DATE = #{firstConfirmDate,jdbcType=DATE},
+            BENCHMARK_ID_ACCURACY = #{benchmarkIdAccuracy,jdbcType=DECIMAL}
         where CASH_ID = #{cashId,jdbcType=VARCHAR}
           and EFF_DATE = #{effDate,jdbcType=DATE}
     </update>

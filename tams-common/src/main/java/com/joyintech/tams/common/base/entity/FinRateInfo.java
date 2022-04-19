@@ -120,6 +120,12 @@ public class FinRateInfo extends FinRateInfoKey {
     private Date firstConfirmDate;
 
     /**
+     * 基准利率精度
+     */
+    @JsonSerialize(using=BigDecimalSerializer.class)
+    private BigDecimal benchmarkIdAccuracy;
+
+    /**
      * 取得 利率类型
      * @return 利率类型
      */
@@ -455,5 +461,24 @@ public class FinRateInfo extends FinRateInfoKey {
     @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setFirstConfirmDate(Date firstConfirmDate) {
         this.firstConfirmDate = firstConfirmDate;
+    }
+
+
+    /**
+     * 获取 基准利率精度
+     *
+     * @return benchmarkIdAccuracy 基准利率精度
+     */
+    public BigDecimal getBenchmarkIdAccuracy() {
+        return this.benchmarkIdAccuracy;
+    }
+
+    /**
+     * 设置 基准利率精度
+     *
+     * @param benchmarkIdAccuracy 基准利率精度
+     */
+    public void setBenchmarkIdAccuracy(BigDecimal benchmarkIdAccuracy) {
+        this.benchmarkIdAccuracy = benchmarkIdAccuracy;
     }
 }
