@@ -507,12 +507,6 @@
         where T.FINPROD_ID=#{finprodId,jdbcType=VARCHAR}
     </select>
 
-    <select id="selectTotleTradeId" resultType="java.lang.String">
-        select T.TOTLE_TRADE_ID from TRD_FIN_PRODUCT_DEAL_TOTAL T
-                                         inner join TRD_FIN_PRODUCT_BARTER_TOTAL B on T.TOTLE_TRADE_ID=B.TRADE_ID ||'R'
-        where T.FINPROD_ID=#{finprodId,jdbcType=VARCHAR}
-    </select>
-
     <select id="getBoundMarketInfo" resultType="com.joyintech.tams.invest.asset.newtenderbond.dto.FinTenderBoundAsset004Dto" parameterType="Map">
         SELECT
             PAYHSRCSECINFO.SECID,
