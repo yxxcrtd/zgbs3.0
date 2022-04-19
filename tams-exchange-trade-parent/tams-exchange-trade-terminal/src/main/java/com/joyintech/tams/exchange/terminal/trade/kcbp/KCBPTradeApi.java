@@ -602,12 +602,11 @@ public class KCBPTradeApi {
     
     private void processBondXscjBS(IntegratedEntrust integratedEntrust, Map<String, String> parameters) {
         logger.info("start xscj_BS  {}", integratedEntrust.getBsFlag());
-        parameters.put("funcid", "410677"); // 功能： 新债协商成交买卖交易
+        parameters.put("funcid", "410677"); //深圳现券协商成交申报--- 功能： 新债协商成交买卖交易
         parameters.put("stkcode", StockCodeUtils.getStockCode(integratedEntrust.getStockCode())); //证券代码
         parameters.put("ownertype", "101");// 报价所有者类型  TODO需要确定这个值怎么取
         parameters.put("orderprice", String.valueOf(integratedEntrust.getEntrustPrice()));// 价格
         parameters.put("orderqty", String.valueOf(integratedEntrust.getEntrustVolume()));// 数量
-        
         parameters.put("tradercode", String.valueOf(integratedEntrust.getContractId()));//本方交易员代码  TODO需要确定这个值怎么取
         parameters.put("investorid", String.valueOf(integratedEntrust.getContractId()));//本方交易主体代码  TODO需要确定这个值怎么取
         parameters.put("cpmemberid", String.valueOf(integratedEntrust.getContractId()));//对手方交易商代码  TODO需要确定这个值怎么取
@@ -620,13 +619,12 @@ public class KCBPTradeApi {
     
     private void processBondXscjHF(IntegratedEntrust integratedEntrust, Map<String, String> parameters) {
         logger.info("start xscj_HF  {}", integratedEntrust.getBsFlag());
-        parameters.put("funcid", "410678"); // 功能： 新债协商成交买卖交易
+        parameters.put("funcid", "410678"); //深圳现券协商成交申报回复--- 功能： 新债协商成交买卖交易
         parameters.put("stkcode", StockCodeUtils.getStockCode(integratedEntrust.getStockCode())); //证券代码
         parameters.put("trdreportid", "101");// 成交申报请求编号  TODO需要确定这个值怎么取
         parameters.put("ownertype", "101");// 报价所有者类型  TODO需要确定这个值怎么取
         parameters.put("orderprice", String.valueOf(integratedEntrust.getEntrustPrice()));// 价格
         parameters.put("orderqty", String.valueOf(integratedEntrust.getEntrustVolume()));// 数量
-        
         parameters.put("tradercode", String.valueOf(integratedEntrust.getContractId()));//本方交易员代码  TODO需要确定这个值怎么取
         parameters.put("investorid", String.valueOf(integratedEntrust.getContractId()));//本方交易主体代码  TODO需要确定这个值怎么取
         parameters.put("cpmemberid", String.valueOf(integratedEntrust.getContractId()));//对手方交易商代码  TODO需要确定这个值怎么取
