@@ -58,6 +58,8 @@ public abstract class StlDataGatherReader extends BaseReader<InvestTradeReaderDt
             Map<String, Object> searchParam = new HashMap<>(4);
             setSearchParam(searchParam);
             searchParam.put("dealDate", execInfo.getExecuteDate());
+            searchParam.put("DELIVERY_RESULT_01", "01");
+            searchParam.put("DELIVERY_RESULT_02", "02");
             // 债券存续期
             if(searchParam.containsKey("readerType") && StringUtil.equals(searchParam.get("readerType"),
                     StlDataGatherConstant.BOND_DURATION)){
@@ -199,7 +201,7 @@ public abstract class StlDataGatherReader extends BaseReader<InvestTradeReaderDt
                         DictCodeListExt3.对账状态结果_手工完成.getValue()));
             }
             searchParam.put("dqPs",  DictCodeList.交易方向_到期.getValue());
-            searchParam.put("busiSceneCalssDqList",  Arrays.asList(DictCodeListStl.业务场景分类明细_债券协议逆回购_到期.getValue()));
+            searchParam.put("busiSceneCalssDqList", Collections.singletonList(DictCodeListStl.业务场景分类明细_债券协议逆回购_到期.getValue()));
             settleTransDataDtos = stlDataGatherService.listRepoH01MaturitySettleTransData(searchParam);
         }
         investTradeReaderDto.setSettleTransDataList(settleTransDataDtos);

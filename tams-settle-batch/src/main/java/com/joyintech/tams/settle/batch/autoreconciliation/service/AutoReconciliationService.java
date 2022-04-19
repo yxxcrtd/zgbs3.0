@@ -93,8 +93,8 @@ public class AutoReconciliationService {
         param.put("INTER_TYPE_4", DictCodeListExt3.柜台接口类型_金证u版.getValue());
         param.put("TRADE_MARKET_03", BussinessDictCodeList.交易场所_上海证券交易所.getValue());
         param.put("TRADE_MARKET_04", BussinessDictCodeList.交易场所_深圳证券交易所.getValue());
-        param.put("DELIVERY_RESULT_01", DictCodeListExt3.下行交易匹配状态_未匹配.getValue());
-        param.put("DELIVERY_RESULT_02", DictCodeListExt3.下行交易匹配状态_未匹配.getValue());
+        param.put("DELIVERY_RESULT_01", "01");
+        param.put("DELIVERY_RESULT_02", "02");
         // 获取待自动对账的对账数据
         List<DayEndAccountDaichuliDto> autoAccountList = autoReconciliationMapper.queryAccountTodoList(param);
         reconciliationCommonService.executeReconciliation(autoAccountList);

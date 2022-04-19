@@ -7,6 +7,7 @@ import com.joyintech.tams.common.base.entity.SettleBatchPara;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.settle.batch.datadeal.service.StlDownDataDealService;
 import com.joyintech.tams.settle.batch.datagather.constant.StlDataGatherConstant;
 import com.joyintech.tams.settle.batch.datagather.dto.InvestTradeReaderDto;
@@ -60,8 +61,15 @@ public class StlDataGatherShares2Reader extends StlDataGatherReader {
         Map<String, Object> searchParam = new HashMap<String, Object>();
         searchParam.put("portfolioIdList", portfolioIdList);
         setSearchParam(searchParam);
-        // 除权交易
         searchParam.put("dealDate", execInfo.getExecuteDate());
+        searchParam.put("DELIVERY_RESULT_01", "01");
+        searchParam.put("DELIVERY_RESULT_02", "02");
+        searchParam.put("TRADE_MARKET_03", BussinessDictCodeList.交易场所_上海证券交易所.getValue());
+        searchParam.put("TRADE_MARKET_04", BussinessDictCodeList.交易场所_深圳证券交易所.getValue());
+        searchParam.put("PS_T12", DictCodeList.交易方向_红利再投.getValue());
+        searchParam.put("PS_T11", DictCodeList.交易方向_现金分红.getValue());
+        searchParam.put("FINPROD_TYPE_TG_F10", DictCodeListExt1.金融产品类型_投管用_股票.getValue());
+        searchParam.put("HODING_TYPE_03", DictCodeList.持仓类型_实际.getValue());
 
         // GNS-932:除权交易不从SHARE_BONUS_REG读取数据 modify by fuyongsheng 20220224 start
 //        List<SettleDelDealDetailDto> settleDelDealDetailDtoList = stlDataGatherService.selectSettleDelDealDetail(searchParam);

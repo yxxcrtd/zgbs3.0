@@ -62,8 +62,8 @@ public class StlSettleTransDataGatherService {
         paramMap.put("PS_T46", DictCodeListExt2.交易方向_配股.getValue());
         paramMap.put("PS_T97", DictCodeListExt3.交易方向_配债.getValue());
         paramMap.put("REPO_TYPE_H02", DictCodeList.回购类型_质押式竞价回购.getValue());
-        paramMap.put("DELIVERY_RESULT_01", DictCodeListExt3.下行交易匹配状态_未匹配.getValue());
-        paramMap.put("DELIVERY_RESULT_02", DictCodeListExt3.下行交易匹配状态_未匹配.getValue());
+        paramMap.put("DELIVERY_RESULT_01", "01");
+        paramMap.put("DELIVERY_RESULT_02", "02");
 
         return stlSettleTransDataGatherMapper.selectNeedTotalDataList(paramMap);
     }
