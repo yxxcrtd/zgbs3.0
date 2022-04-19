@@ -353,4 +353,10 @@ public class UfxTradeClient implements ITradeRequest {
             logger.warn("client not exist, accountId = {}", accountId);
         }
     }
+
+	@Override
+	public void queryNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean, Long requestId) {
+		// TODO Auto-generated method stub
+		
+	}
 }

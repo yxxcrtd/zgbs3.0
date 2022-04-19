@@ -81,7 +81,7 @@ public class TradeAgentTerminal extends Agent implements TradeAgent, IAgentMsgHa
 
     @Override
     protected void handleAsyncMessage(long requestId, int functionCode, Object message) {
-        logger.info("handleAsyncMessage: functionCode={}，requestId={}，message{}", functionCode, requestId, JsonUtils.getJsonFromObject(message));
+        logger.debug("TradeAgentTerminal handleAsyncMessage: functionCode={}，requestId={}，message{}", functionCode, requestId, JsonUtils.getJsonFromObject(message));
         if (functionCode == FunctionCode.NOTIFY_ENTRUST.value) {
             onRtnEntrust((Entrust) message);
         } else if (functionCode == FunctionCode.NOTIFY_INTEGRATED_ENTRUST.value) {
@@ -118,6 +118,7 @@ public class TradeAgentTerminal extends Agent implements TradeAgent, IAgentMsgHa
 
     @Override
     protected Object getResponseObjectFromMessage(ProtocolMessage message) throws Exception {
+    	logger.debug("TradeAgentTerminal getResponseObjectFromMessage: functionCode={}，requestId={}，message{}", message.getFc(), message.getReqId(), JsonUtils.getJsonFromObject(message));
         if (message.getFc() == FunctionCode.NOTIFY_ENTRUST.value) {
             return JsonUtils.getObjectFromJson(message.getBody(), Entrust.class);
         } else if (message.getFc() == FunctionCode.NOTIFY_TRADE.value) {
@@ -182,6 +183,8 @@ public class TradeAgentTerminal extends Agent implements TradeAgent, IAgentMsgHa
             return JsonUtils.getObjectListFromJson(message.getBody(), FuturesInstrumentMarginRateBean.class);
         } else if (message.getFc() == FunctionCode.RESP_QRY_FUTURES_COMMISSION_RATE.value) {
             return JsonUtils.getObjectListFromJson(message.getBody(), FuturesInstrumentCommissionRateBean.class);
+        } else if (message.getFc() == FunctionCode.RESP_QRY_INTEGRATED_NEGOTIATE_QUOTE_RECEIVE.value) {
+            return JsonUtils.getObjectListFromJson(message.getBody(), NegotiateQuoteReceiveBean.class);
         } else
             throw new Exception("unknown protocol function code:" + message.getFc());
     }
@@ -593,4 +596,10 @@ public class TradeAgentTerminal extends Agent implements TradeAgent, IAgentMsgHa
     public void reqAccountFuturesCommissionRate(FuturesInstrumentCommissionRateQryBean futuresInstrumentCommissionRateQryBean) throws Exception {
         asyncWrite(FunctionCode.REQ_QRY_FUTURES_COMMISSION_RATE, futuresInstrumentCommissionRateQryBean);
     }
+
+	@Override
+	public List<NegotiateQuoteReceiveBean> reqNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean)
+			throws Exception {
+		return (List<NegotiateQuoteReceiveBean>) syncWrite(FunctionCode.REQ_QRY_INTEGRATED_NEGOTIATE_QUOTE_RECEIVE, negotiateQuoteQueryBean);
+	}
 }

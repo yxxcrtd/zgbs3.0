@@ -47,6 +47,8 @@ netty:
       worker: 2
   reconnect:
     delay: 2
+mock:
+  quote-tick-url: http://192.168.10.191:8080/tams/service/joyin/quote/tick
 
 # kcbp config
 kcbp:

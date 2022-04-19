@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper
+	namespace="com.joyintech.tams.cfets.etr.bond.dao.CfetsEtrIbBondinfo002Mapper">
+
+	<delete id="deleteWflEtrEntrustByEntrustId">
+		delete from WFL_ETR_ENTRUST
+        where ENTRUST_ID = #{entrustId, jdbcType=VARCHAR}
+	</delete>
+
+	<delete id="deleteWflEtrEntrustAddByEntrustId">
+		delete from WFL_ETR_ENTRUST_ADD
+        where ENTRUST_ID = #{entrustId, jdbcType=VARCHAR}
+	</delete>
+	<resultMap id="finprodIdMap" type="com.joyintech.framework.select.SelectOptionDto">
+		<id column="id" property="id" jdbcType="VARCHAR"/>
+		<result column="text" property="text" jdbcType="VARCHAR"/>
+		<association property="object" javaType="java.util.Map">
+			<result column="FINPROD_NAME" property="finprodName" jdbcType="VARCHAR" />
+			<result column="CALENDAR_ID" property="calendarId" jdbcType="VARCHAR" />
+			<result column="FINPROD_ID" property="finprodId" jdbcType="VARCHAR" />
+			<result column="TRADE_MARKET" property="tradeMarket" jdbcType="VARCHAR" />
+			<result column="IS_RIGHT" property="isRight" jdbcType="VARCHAR" />
+			<result column="TYPE_9" property="assetType1" jdbcType="VARCHAR" />
+			<result column="TYPE_10" property="assetType10" jdbcType="VARCHAR" />
+			<result column="TYPE_11" property="assetType11" jdbcType="VARCHAR" />
+			<result column="VDATE" property="finvdate" jdbcType="VARCHAR" />
+			<result column="MDATE" property="finmdate" jdbcType="VARCHAR" />
+			<result column="CCY" property="ccy" jdbcType="VARCHAR" />
+		</association>
+	</resultMap>
+	<select id="getfinprodIdForAdd" resultMap="finprodIdMap">
+		SELECT
+		T1.FINPROD_MARKET_ID id,
+		T1.FINPROD_ABBR text,
+		T1.FINPROD_NAME,
+		T1.FINPROD_ID,
+		T1.CALENDAR_ID,
+		T1.TRADE_MARKET,
+		T1.IS_RIGHT,
+		T2.TYPE_9,
+		T2.TYPE_10,
+		T2.TYPE_11,
+		to_char(T1.VDATE,'yyyy-MM-dd') VDATE,
+		to_char(T1.MDATE, 'yyyy-MM-dd') MDATE,
+		T1.CCY
+		FROM
+		FIN_PRODUCT T1
+		LEFT JOIN
+		FIN_PRODUCT_TYPE T2
+		ON T1.FINPROD_ID = T2.FINPROD_ID
+		<include refid="getfinprodIdForAddWhere"></include>
+	</select>
+	<sql id="getfinprodIdForAddWhere">
+	<where>
+			 	T1.FINPROD_TYPE2 = #{assestType}
+			 	AND T1.TRADE_MARKET in(#{TRADE_PLACE_01})
+			<if test="initValue != null and !initValue.equals('')">
+				and T1.FINPROD_MARKET_ID = #{initValue}
+			</if>
+			<if test="tradeMarket != null and !tradeMarket.equals('')">
+				and T1.TRADE_MARKET = #{tradeMarket}
+			</if>
+			<if test="search != null and !search.equals('')">
+				and (T1.FINPROD_MARKET_ID like concat('%',concat(#{search},'%'))
+				or T1.FINPROD_NAME like concat('%',concat(#{search},'%'))
+				or T1.FINPROD_ABBR like concat('%',concat(#{search},'%'))
+				or T1.FINPROD_ID like concat('%',concat(#{search},'%'))
+				)
+			</if>
+		</where>
+	</sql>
+
+	
+
+
+	
+	<select id="getAvailableNum" resultType="java.math.BigDecimal">
+		select 100-sum(nvl(PRIN_AMT,0))
+		from FIN_CASH_PLAN 
+		where
+		FINPROD_ID = #{finprodId}
+		and MDATE &lt;= to_date(#{sysdate},'yyyy-mm-dd') 
+		group by FINPROD_ID
+	</select>
+
+	<select id="getClosePriceByPara" resultType="java.math.BigDecimal">
+		SELECT CLOSE_PRICE 
+		FROM
+			(SELECT *
+	      	FROM MST_BOND_MARK_INFO_FULL
+	      	WHERE
+	      		SEC_ID = #{finprodMarketId}
+	      	AND
+	        	VALUE_DATE &lt;= TO_DATE(#{sysdate},'yyyy-mm-dd') 
+	      	ORDER BY VALUE_DATE DESC) 
+		WHERE ROWNUM =1
+	</select>
+
+	<select id="getExercisePricebyPara" resultType="java.math.BigDecimal">
+		SELECT
+			EXERCISE_PRICE
+		FROM FIN_EXERCISE_PLAN
+		WHERE
+		EXERCISE_DATE = (
+			SELECT MIN(EXERCISE_DATE) FROM FIN_EXERCISE_PLAN WHERE FINPROD_ID = #{finprodId}  AND EXERCISE_DATE &gt;= TO_DATE(#{sysdate},'yyyy-mm-dd')
+		)
+		AND FINPROD_ID = #{finprodId}
+		<if test="ps == 'T03'">AND EXERCISE_TYPE = '02'</if>
+		<if test="ps == 'T39'">AND EXERCISE_TYPE = '01'}</if>
+		and rownum = 1
+	</select>
+
+	<select id="qryPortfolioSecAcctId" resultType="java.lang.String">
+        SELECT V.SEC_ACCT_ID AS SECACCTID
+          FROM PTL_SEC_ACCT PSA, STL_SEC_ACCT_INFO V
+          LEFT JOIN FIN_PRODUCT R
+		ON R.REGIST_ORG = V.REGIST_ORG
+		and V.TRADE_PLACE = R.trade_market
+	 WHERE PSA.ACCT_NO = V.SEC_ACCT_ID
+	   AND V.SEC_ACCT_TYPE = 'SEC'
+	   AND PSA.PORTFOLIO_ID = #{portfolioId}
+	   AND R.FINPROD_ID = #{finprodId}
+    </select>
+	<select id="selectPortfolioIdList" resultType="com.joyintech.framework.select.SelectOptionDto">
+		SELECT DISTINCT
+		A.PORTFOLIO_ID id,
+		　　 A.PORTFOLIO_NAME  text,
+		B.IS_GUARANTEE object,
+		A.PROFIT_TYPE  col
+		FROM PTL_PORTFOLIO A
+		LEFT JOIN PA_PTL_PORTFOLIO B
+		ON A.PORTFOLIO_ID = B.PORTFOLIO_ID
+		<where>
+			<if test="search != null and search != ''">
+				(A.PORTFOLIO_ID LIKE CONCAT('%', CONCAT(#{search}, '%'))
+				OR
+				A.PORTFOLIO_NAME LIKE CONCAT('%', CONCAT(#{search}, '%'))
+				)
+			</if>
+			<if test="initValue != null and initValue != ''">
+				AND A.PORTFOLIO_ID = #{initValue}
+			</if>
+			<if test="prod != null and prod != ''">
+				AND A.PORTFOLIO_TYPE = #{portType01}<!-- 产品组合 -->
+			</if>
+			<if test="act != null and act">
+				AND A.INVEST_YESORNO = 'Y'
+			</if>
+			<if test="ww != null and !ww">
+				AND A.PORTFOLIO_TYPE != '02'
+			</if>
+			<if test="portfolioType != null and portfolioType != ''">
+				AND A.PORTFOLIO_TYPE = #{portfolioType}
+			</if>
+			<if test="loginUserName != null and loginUserName != ''">
+				and A.PORTFOLIO_ID in (select PORTFOLIO_ID from PTL_PORTFOLIO_AUTHORITY where USER_ID = #{loginUserName})
+			</if>
+			<if test="portType != null and portType != ''">
+				AND A.PORTFOLIO_TYPE IN (#{portType}, #{portType1})
+			</if>
+			<if test="portfolioSeries != null and portfolioSeries != ''">
+				AND B.PORTFOLIO_SERIES = #{portfolioSeries}
+			</if>
+		</where>
+	</select>
+	<select id="qryPortfolioCashAcctId" resultType="java.lang.String">
+		SELECT P.ACCT_NO CASHACCTID
+		FROM
+		PTL_CAPACCT_INFO P
+		LEFT JOIN
+		STL_CAPACCT_INFO S
+		ON
+		P.ACCT_NO = S.ACCT_NO
+		where P.PORTFOLIO_ID = #{portfolioId}
+		AND P.ACCT_TYPE = #{acctType}
+		and rownum=1
+	</select>
+
+</mapper>

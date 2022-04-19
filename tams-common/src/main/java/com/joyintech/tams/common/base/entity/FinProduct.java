@@ -270,6 +270,11 @@ public class FinProduct extends BaseEntity {
     private Date circulationDate;
 
     /**
+     * 摘牌日
+     */
+    private Date delistingDate;
+
+    /**
      * 取得 金融产品代码
      * @return 金融产品代码
      */
@@ -1074,5 +1079,23 @@ public class FinProduct extends BaseEntity {
      */
     public void setCirculationDate(Date circulationDate) {
         this.circulationDate = circulationDate;
+    }
+
+    /**
+     * 获取 摘牌日
+     *
+     * @return delistingDate 摘牌日
+     */
+    public Date getDelistingDate() {
+        return this.delistingDate;
+    }
+
+    /**
+     * 设置 摘牌日
+     *
+     * @param delistingDate 摘牌日
+     */
+    public void setDelistingDate(Date delistingDate) {
+        this.delistingDate = delistingDate;
     }
 }

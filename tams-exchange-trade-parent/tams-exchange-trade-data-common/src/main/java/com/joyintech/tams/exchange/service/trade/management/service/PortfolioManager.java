@@ -5,14 +5,17 @@ import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.google.common.collect.Maps;
+import com.joyintech.exchange.service.quote.service.QuoteService;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.bean.OrderPlaceBean;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
+import com.joyintech.tams.exchange.common.bean.TickBean;
 import com.joyintech.tams.exchange.common.cache.QuoteTickService;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
@@ -74,8 +77,11 @@ public class PortfolioManager extends BaseService {
     @Autowired
     private InstructionDetailService instructionDetailService;
 
+//    @Autowired
+//    private QuoteTickService quoteTickService;
+
     @Autowired
-    private QuoteTickService quoteTickService;
+    private QuoteService quoteService;
 
     public List<BaseMap> queryPortfolioInfo(PositionCashSecRequest bean) {
         bean.setFlowType(EtrTradeCommonervice.FLOW_TYPE_TRD);
@@ -121,7 +127,7 @@ public class PortfolioManager extends BaseService {
         log.info("queryPortfolioInfo() called with parameters => 【request = {}】", request.toString());
 
         // 1. 获取组合列表
-        String[] portfolioIdArray = StrUtil.split(request.getPortfolioId(), StrUtil.COMMA);
+        String[] portfolioIdArray = StringUtil.split(request.getPortfolioId(), StrUtil.COMMA);
 
         // 返回的map： key 组合代码； value 组合现金持仓
         Map<String, PortfolioInfoResponse> result = new HashMap<>(8);
@@ -168,7 +174,7 @@ public class PortfolioManager extends BaseService {
         log.info("queryPortfolioCash() called with parameters => 【portfolioIds = {}】, 【acctNo = {}】", portfolioIds, acctNo);
 
         // 1. 获取组合列表
-        String[] portfolioIdArray = StrUtil.split(portfolioIds, StrUtil.COMMA);
+        String[] portfolioIdArray = StringUtil.split(portfolioIds, StrUtil.COMMA);
 
         // 返回的map： key 组合代码； value 组合现金信息
         Map<String, PortfolioInfoResponse> result = new HashMap<>(8);
@@ -208,7 +214,7 @@ public class PortfolioManager extends BaseService {
                 portfolioIds, finprodId, secAcctId, tradeMarket);
 
         // 1. 获取组合列表
-        String[] portfolioIdArray = StrUtil.split(portfolioIds, StrUtil.COMMA);
+        String[] portfolioIdArray = StringUtil.split(portfolioIds, StrUtil.COMMA);
 
         // 返回的map： key 组合代码； value 组合持仓
         Map<String, PortfolioInfoResponse> result = new HashMap<>();
@@ -423,8 +429,10 @@ public class PortfolioManager extends BaseService {
         //市价委托填充反向涨跌停价
         BigDecimal price = bean.getEntrustPrice();
         if (EntrustProp.isMarketPrice(entrustProp)) {
-            QuoteProto.TickBean tick = quoteTickService.getTickFromCache(bean.getStockCode());
-            if (Objects.nonNull(tick)) {
+            ResultBean tickBean = quoteService.getTick(bean.getStockCode());
+//            QuoteProto.TickBean tick = quoteTickService.getTickFromCache(bean.getStockCode());
+            if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
+                TickBean tick = (TickBean)tickBean.getData();
                 if (bean.getEntrustBs().equals(EntrustBs.SELL.value)) {
                     price = TradeUtils.getBigDecimal(tick.getLowerLimitPrice(), 4);
                 } else {
@@ -575,8 +583,11 @@ public class PortfolioManager extends BaseService {
         }
 
         // 行情数据
-        QuoteProto.TickBean tick = quoteTickService.getTickFromCache(bean.getStockCode());
-        if (Objects.isNull(tick)) {
+        ResultBean tickBean = quoteService.getTick(bean.getStockCode());
+        if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
+            TickBean tick = (TickBean)tickBean.getData();
+//        QuoteProto.TickBean tick = quoteTickService.getTickFromCache(bean.getStockCode());
+//        if (Objects.isNull(tick)) {
             log.warn("未找到行情信息: stockId [{}]", instruction.getFinprodMarketId());
             result.setInfoLevel("1");
             result.setInfoDetails(ErrorCode.getStr(ErrorCode.QUOTE_NOT_EXIT));
@@ -609,6 +620,7 @@ public class PortfolioManager extends BaseService {
         }
 
         // 获取公平交易相关指令
+        TickBean tick = (TickBean)tickBean.getData();
         List<PortfolioInstructionContextDto> fairList = getFairList(bean, instruction, tick, result);
         log.debug(JSONUtil.toJsonStr(fairList));
 
@@ -622,7 +634,7 @@ public class PortfolioManager extends BaseService {
     /**
      * 获取公平交易相关指令
      */
-    private List<PortfolioInstructionContextDto> getFairList(OrderPlaceBean bean, Instruction instruction, QuoteProto.TickBean tick, PortfolioAllocationResponse result) {
+    private List<PortfolioInstructionContextDto> getFairList(OrderPlaceBean bean, Instruction instruction, TickBean tick, PortfolioAllocationResponse result) {
 
         // 涨停价
         BigDecimal upperLimitPrice = TradeUtils.getBigDecimal(tick.getUpperLimitPrice(), 4);
@@ -848,7 +860,7 @@ public class PortfolioManager extends BaseService {
         return EntrustUtils.isMarketPrice(instruction) && BigDecimal.ZERO.compareTo(instruction.getEntrustPrice()) == 0;
     }
 
-    private BigDecimal getMarketPrice(QuoteProto.TickBean tick, String entrustBs) {
+    private BigDecimal getMarketPrice(TickBean tick, String entrustBs) {
         if (EntrustBs.isBuy(entrustBs)) {
             return TradeUtils.getBigDecimal(tick.getUpperLimitPrice(), 4);
         } else {

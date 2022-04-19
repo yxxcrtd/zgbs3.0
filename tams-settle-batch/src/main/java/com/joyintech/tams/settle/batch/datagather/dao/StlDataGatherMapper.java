@@ -137,12 +137,18 @@ public interface StlDataGatherMapper {
     List<SettleTransDataDto> listBondSettleTransData(Map<String, Object> paraMap);
 
     /**
-     * 回购存续期
+     * 竞价回购存续期
      * @param paraMap
      * @return
      */
     List<SettleTransDataDto> listRepoSettleTransData(Map<String, Object> paraMap);
 
+    /**
+     * 协议回购到期成交明细数据
+     * @param paraMap
+     * @return
+     */
+    List<SettleTransDataDto> listRepoH01MaturitySettleTransData(Map<String, Object> paraMap);
     /**
      * 持仓余额
      * @param param

@@ -1,7 +1,6 @@
 package com.joyintech.tams.common.base.dao;
 
 import com.joyintech.tams.common.base.entity.FinProduct;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -25,4 +24,6 @@ public interface FinProductMapper {
     List<String> getSubProd(String finprodId);
 
     int updateSonProdByPProd(FinProduct record);
+
+    int updateForTenderBound(FinProduct record);
 }

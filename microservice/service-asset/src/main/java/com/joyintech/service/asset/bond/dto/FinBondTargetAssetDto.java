@@ -10,15 +10,11 @@
  
 package com.joyintech.service.asset.bond.dto;
 
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.service.asset.common.dto.BusiFinBondRatingInfoDto;
 import com.joyintech.service.asset.common.dto.FinInterestFactorDto;
+import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.common.base.entity.FinProductConvertible;
 import com.joyintech.tams.component.base.core.dto.BaseFinProductBaseInfoDto;
 import com.joyintech.tams.component.base.report.dto.BaseRepAssetDeptInfoDto;
@@ -26,6 +22,10 @@ import com.joyintech.tams.component.base.report.dto.BaseRepAssetEquityInfoDto;
 import com.joyintech.tams.component.base.report.dto.BaseRepBondAssetInfoDto;
 import com.joyintech.tams.component.base.report.dto.BaseRepOtherDto;
 import com.joyintech.tams.invest.common.dto.MstFileInputParameter;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 债券标的信息DTO
@@ -240,6 +240,11 @@ public class FinBondTargetAssetDto extends FinProduct{
      * 是否发行标的
      */
     public String isIssueAsset;
+
+    /**
+     * 是否非担保
+     */
+    private String isNoGuard;
 	
 	/**
      * 上市代码
@@ -275,7 +280,15 @@ public class FinBondTargetAssetDto extends FinProduct{
     public void setIsIssueAsset(String isIssueAsset) {
         this.isIssueAsset = isIssueAsset;
     }
-	
+
+    public String getIsNoGuard() {
+        return isNoGuard;
+    }
+
+    public void setIsNoGuard(String isNoGuard) {
+        this.isNoGuard = isNoGuard;
+    }
+
     /**
      * 是否净价交易
      */

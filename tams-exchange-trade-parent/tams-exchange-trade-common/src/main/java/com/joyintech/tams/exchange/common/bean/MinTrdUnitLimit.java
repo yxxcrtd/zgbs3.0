@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.common.bean;
 
+import com.google.common.base.MoreObjects;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -240,5 +241,32 @@ public class MinTrdUnitLimit implements Serializable {
 
     public void setMarket(String market) {
         this.market = market;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("tradeMarket", tradeMarket)
+                .add("tradePlat", tradePlat)
+                .add("assetType", assetType)
+                .add("assetType1", assetType1)
+                .add("assetType2", assetType2)
+                .add("ps", ps)
+                .add("marketType", marketType)
+                .add("minStep", minStep)
+                .add("minStepUnit", minStepUnit)
+                .add("minAmt", minAmt)
+                .add("maxAmt", maxAmt)
+                .add("minNum", minNum)
+                .add("minNumUnit", minNumUnit)
+                .add("maxNum", maxNum)
+                .add("maxNumUnit", maxNumUnit)
+                .add("minNumMarket", minNumMarket)
+                .add("minNumMarketUnit", minNumMarketUnit)
+                .add("maxNumMarket", maxNumMarket)
+                .add("maxNumMarketUnit", maxNumMarketUnit)
+                .add("effDate", effDate)
+                .add("market", market)
+                .toString();
     }
 }

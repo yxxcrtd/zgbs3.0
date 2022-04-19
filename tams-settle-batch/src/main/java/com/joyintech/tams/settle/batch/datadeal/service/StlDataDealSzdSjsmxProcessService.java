@@ -2,11 +2,8 @@ package com.joyintech.tams.settle.batch.datadeal.service;
 
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.util.*;
-import com.joyintech.tams.common.base.entity.SettleTransData;
-import com.joyintech.tams.common.base.entity.SettleTransDataAdd;
-import com.joyintech.tams.common.base.entity.SettleTransTgMapping;
-import com.joyintech.tams.common.base.entity.SzdJsmx;
-import com.joyintech.tams.common.base.entity.SzdSjsmx;
+import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListStl;
@@ -20,6 +17,8 @@ import com.joyintech.tams.settle.common.dto.FundInfoDto;
 import com.joyintech.tams.settle.common.dto.StlDownDataDealAccountInfoDto;
 import com.joyintech.tams.settle.common.service.SettleCommonService;
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -96,6 +95,11 @@ public class StlDataDealSzdSjsmxProcessService {
     @Autowired
     private StlDownDataDealMapper stlDownDataDealMapper;
 
+    @Autowired
+    private FinProductTypeMapper finProductTypeMapper;
+
+    private Logger logger = LoggerFactory.getLogger(StlDataDealSzdSjsmxProcessService.class);
+
     // 生成数据清算批处理step2 processor的结果Dto(深中登ZSMX)
     public StlDownDataDealWriteDto generatorStlDownDataDealSzdSjsmxWriteDto(StlDownDataDealOperatorDto stlDownDataDealOperatorDto) throws ParseException {
         // 核算信息全量数据
@@ -170,7 +174,9 @@ public class StlDataDealSzdSjsmxProcessService {
             settleTransData.setShareAmt(abs(szdSjsmx.getMxqssl()));
             // 全价总额
             settleTransData.setFpriceAmt(abs(szdSjsmx.getMxqsbj()));
-
+            if ("B14".equals(getFinProductTypeType6(settleTransData))) {
+                settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdSjsmx.getMxjyfs()));
+            }
             // 日终过来的文件结算价格就是全价的，需要反算净价总额、应计利息总额
             stlDownDataDealService.calc(settleTransData);
 
@@ -298,11 +304,10 @@ public class StlDataDealSzdSjsmxProcessService {
             SettleTransData settleTransData = new SettleTransData();
             // 定义变量.成交数据明细附属表DTO
             SettleTransDataAdd settleTransDataAdd = new SettleTransDataAdd();
-
             // 交易份额
             settleTransData.setShareAmt(abs(szdSjsmx.getMxcjsl()));
             // 交易平台
-            settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdSjsmx.getMxjyfs()));
+            settleTransData.setTradePlat(null);
             // 交收方式
             settleTransData.setSettleMode(stlDataDealProcessCommonService.getSettleMode(szdSjsmx.getMxjsfs()));
             // 成交编号
@@ -479,15 +484,8 @@ public class StlDataDealSzdSjsmxProcessService {
                 settleTransData.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
                 // 金融产品类型(估值核算)
                 settleTransData.setFinprodType(DictCodeListExt1.金融产品类型_债券质押式逆回购.getValue());
-                // GNS-889:查询首期的成交日期作为到期起息日 modify by fuyongsheng 20220220 start
                 // 起息日
                 settleTransData.setVdate(DateUtil.parse(szdSjsmx.getMxqtrq()));
-//                List<SettleTransData> sqSettleTransDatas = stlDownDataDealMapper.selectSqSettleTransDatas(
-//                        settleTransData.getApplyTradeId(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId());
-//                if(CollectionUtils.isNotEmpty(sqSettleTransDatas)){
-//                    settleTransData.setVdate(sqSettleTransDatas.get(0).getVdate());
-//                }
-                // GNS-889:查询首期的成交日期作为到期起息日 modify by fuyongsheng 20220220 end
                 // 到期日
                 settleTransData.setMdate(DateUtil.parse(szdSjsmx.getMxcjrq()));
                 // 首期交收日
@@ -530,15 +528,8 @@ public class StlDataDealSzdSjsmxProcessService {
                 settleTransData.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue());
                 // 金融产品类型(估值核算)
                 settleTransData.setFinprodType(DictCodeListExt1.金融产品类型_债券质押式正回购.getValue());
-                // GNS-889:查询首期的成交日期作为到期起息日 modify by fuyongsheng 20220220 start
                 // 起息日
-                // settleTransData.setVdate(DateUtil.parse(szdSjsmx.getMxqtrq()));
-                List<SettleTransData> sqSettleTransDatas = stlDownDataDealMapper.selectSqSettleTransDatas(
-                        settleTransData.getApplyTradeId(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId());
-                if(CollectionUtils.isNotEmpty(sqSettleTransDatas)){
-                    settleTransData.setVdate(sqSettleTransDatas.get(0).getVdate());
-                }
-                // GNS-889:查询首期的成交日期作为到期起息日 modify by fuyongsheng 20220220 end
+                settleTransData.setVdate(DateUtil.parse(szdSjsmx.getMxqtrq()));
                 // 到期日
                 settleTransData.setMdate(DateUtil.parse(szdSjsmx.getMxcjrq()));
                 // 首期交收日
@@ -712,7 +703,8 @@ public class StlDataDealSzdSjsmxProcessService {
         String ywlb = szdSjsmx.getMxywlb();
         return LIST_ZQLB_BONDS.contains(zqlb)
                 && (StringUtil.equals(StlDataDealProcessConstant.SJSMX_YWLB_JY00, ywlb) || StringUtil.equals(StlDataDealProcessConstant.SJSMX_YWLB_JY01, ywlb))
-                && (StringUtil.equals(StlDataDealProcessConstant.SJSMX_JYFS_01, jyfs) || StringUtil.equals(StlDataDealProcessConstant.SJSMX_JYFS_02, jyfs) || StringUtil.equals(StlDataDealProcessConstant.SJSMX_JYFS_03, jyfs));
+                && (StringUtil.equals(StlDataDealProcessConstant.SJSMX_JYFS_01, jyfs) || StringUtil.equals(StlDataDealProcessConstant.SJSMX_JYFS_02, jyfs)
+                || StringUtil.equals(StlDataDealProcessConstant.SJSMX_JYFS_03, jyfs) || StringUtil.equals(StlDataDealProcessConstant.SJSMX_JYFS_13, jyfs));
     }
 
     /**
@@ -793,5 +785,21 @@ public class StlDataDealSzdSjsmxProcessService {
     private Date nextWorkDay(Date parseDate) {
         String calendarId = CacheUtil.getSysParam(StlDataDealProcessConstant.STL_DOWNDATA_DEAL_SZJYS_CALID);
         return stlDataDealProcessCommonService.getNextWorkDay(parseDate, calendarId);
+    }
+
+    /**
+     * 根据金融产品代码查询FIN_PRODUCT_TYPE.TYPE_6 -- 投管一级类型
+     */
+    private String getFinProductTypeType6(SettleTransData settleTransData) {
+        FinProductTypeKey finProductTypeKey = new FinProductTypeKey();
+        finProductTypeKey.setBranch(0L);
+        finProductTypeKey.setFinprodId(settleTransData.getFinprodId());
+        FinProductType finProductType = new FinProductType();
+        try {
+            finProductType = finProductTypeMapper.selectByPrimaryKey(finProductTypeKey);
+        } catch (Exception e) {
+            logger.error("根据金融产品代码查询投管一级类型出错信息：" + e);
+        }
+        return finProductType.getType6();
     }
 }

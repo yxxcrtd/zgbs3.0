@@ -1427,4 +1427,18 @@ public class TrdCommonBaseService extends BaseService {
         return null;
     }
 
+    /**
+     * 获取未完全匹配的成交明细汇总数据数量
+     * @return
+     */
+    public Integer getUnFinishMatchSettleTransDataNum(Date executeDate){
+        Map<String, Object> map = new HashMap<>();
+        map.put("executeDate", executeDate);
+        map.put("TRD_MATCH_STATUS_2",DictCodeListExt3.下行交易匹配状态_匹配完成.getValue());
+        map.put("FINPROD_TYPE_TG_F03", DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
+        map.put("TARGET_BACK_TYPE_H01", DictCodeList.回购类型_质押式协议回购.getValue());
+        map.put("PS_T07", DictCodeList.交易方向_到期.getValue());
+        return trdCommonBaseMapper.getUnFinishMatchSettleTransDataNum(map);
+    }
+
 }

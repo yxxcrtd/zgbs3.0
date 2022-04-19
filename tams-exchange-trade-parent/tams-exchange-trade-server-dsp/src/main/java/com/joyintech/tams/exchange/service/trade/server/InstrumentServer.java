@@ -1,6 +1,5 @@
 package com.joyintech.tams.exchange.service.trade.server;
 
-import com.alibaba.fastjson.JSONArray;
 import com.joyintech.tams.exchange.common.bean.MinPrice;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.datacommon.db.service.InstrumentService;
@@ -13,10 +12,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.util.List;
-import java.util.Objects;
 
 @Component
 public class InstrumentServer implements ApplicationListener<ApplicationReadyEvent> {
@@ -29,30 +25,18 @@ public class InstrumentServer implements ApplicationListener<ApplicationReadyEve
     @Autowired
     private CommonManagement commonManagement;
 
-    @PostConstruct
-    public void start() {
-    }
-
-    @PreDestroy
-    public void stop() throws Exception {
-    }
-
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
         try {
             List<MinPrice> minPriceList = instrumentManagement.getMinPrice();
-            logger.info("onApplicationEvent minPriceList:{}", JSONArray.toJSONString(minPriceList));
-            if (Objects.nonNull(minPriceList)) {
-                instrumentService.saveMinPrice(minPriceList);
-            }
+            instrumentService.saveMinPrice(minPriceList);
+
             List<MinTrdUnitLimit> minTrdUnitLimitList = instrumentManagement.getMinTrdUnitLimit();
-            logger.info("onApplicationEvent minTrdUnitLimitList:{}", JSONArray.toJSONString(minTrdUnitLimitList));
-            if (Objects.nonNull(minTrdUnitLimitList)) {
-                instrumentService.saveTrdUnitLimit(minTrdUnitLimitList);
-            }
+            instrumentService.saveTrdUnitLimit(minTrdUnitLimitList);
+
             commonManagement.tradeTimeCache();
         } catch (Exception e) {
-            logger.error("flush minPrice and minTrdUnitLimit:{}", e);
+            logger.error("flush minPrice and minTrdUnitLimit,", e);
         }
     }
 }

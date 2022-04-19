@@ -10,9 +10,13 @@
 
 package com.joyintech.service.entrust.etrconbond.controller;
 
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.select.SuggestDto;
+import com.joyintech.framework.util.JsonUtils;
+import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.service.entrust.common.service.WFlowCommonService;
@@ -21,8 +25,18 @@ import com.joyintech.service.entrust.etrconbond.service.EtrConBondService;
 import com.joyintech.service.entrust.etrconbond.service.PositionRequestEtrConBondService;
 import com.joyintech.system.base.dao.SysWflBusinessListMapper;
 import com.joyintech.system.base.entity.SysWflBusinessList;
+import com.joyintech.tams.business.common.exception.PositionException;
+import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.common.base.dao.EtrEntrustBackupMapper;
+import com.joyintech.tams.common.base.entity.EtrEntrust;
+import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.workflow.engine.util.WorkFlowUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +44,9 @@ import org.springframework.web.bind.annotation.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
+
+import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_修改;
+import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_新建;
 
 /**
  * 可转债委托
@@ -43,6 +60,8 @@ import java.util.Map;
 @RequestMapping("/EtrConBond")
 public class EtrConBondController {
 
+    private static final Logger log = LoggerFactory.getLogger(EtrConBondController.class);
+
     @Autowired
     private EtrConBondService service;
 
@@ -51,6 +70,13 @@ public class EtrConBondController {
 
     @Autowired
     private SysWflBusinessListMapper sysWflBusinessListMapper;
+
+    @Autowired
+    private EtrEntrustBackupMapper etrEntrustBackupMapper;
+
+    public static final String OPERATE_TYPE_SAVE = "save";
+    public static final String OPERATE_TYPE_SUBMIT = "submit";
+    public static final String OPERATE_TYPE_MODIFY = "modify";
 
     /**
      * 检索分页数据。返回类型是Service的泛型。
@@ -184,13 +210,20 @@ public class EtrConBondController {
     @Transactional
     @DTXTransaction
     @PostMapping("doInsert")
-    public void doInsert(@RequestBody EtrConBondDto dto) {
-        WFlowCommonService.doInsertFlow(dto.getOperateType(), service.initBaseDto(dto));
-        service.doInsert(dto, dto.getOperateType());
+    public void doInsert(@RequestBody EtrConBondDto dto){
+        log.debug("doInsert() called with parameters => 【dto = {}】", JsonUtils.object2Json(dto));
 
+        String operateType = dto.getOperateType();
+        WFlowCommonService.doInsertFlow(operateType, service.initBaseDto(dto));
+        service.doInsert(dto, operateType);
+
+        //保存不处理
+        if (StringUtil.equals(OPERATE_TYPE_SAVE, operateType)) {
+            return;
+        }
         String decisionAct = DictCodeListExt3.系统动作_新建.getValue();
         String systemAct = DictCodeListExt3.系统动作_新建.getValue();
-        if (StringUtil.equals(dto.getOperateType(), "modify")) {
+        if (StringUtil.equals(OPERATE_TYPE_MODIFY, operateType)) {
             systemAct = DictCodeListExt3.系统动作_修改.getValue();
         }
         dto.setSoftSkipMode(DictCodeList.是否_是.getValue());
@@ -200,22 +233,65 @@ public class EtrConBondController {
     @Transactional
     @DTXTransaction
     @PostMapping("doUpdate")
-    public void doUpdate(@RequestBody EtrConBondDto dto) {
-        WFlowCommonService.doUpdateFlow(dto.getOperateType(), service.initBaseDto(dto));
+    public void doUpdate(@RequestBody EtrConBondDto dto){
+        log.debug("doUpdate() called with parameters => 【dto = {}】",JsonUtils.object2Json(dto));
 
-        service.doInsert(dto, dto.getOperateType());
+        String operateType = dto.getOperateType();
+        WFlowCommonService.doUpdateFlow(operateType, service.initBaseDto(dto));
 
-        String decisionAct = DictCodeListExt3.系统动作_新建.getValue();
-        String systemAct = DictCodeListExt3.系统动作_新建.getValue();
+        service.doInsert(dto, operateType);
+
+//        String decisionAct = DictCodeListExt3.系统动作_新建.getValue();
+//        String systemAct = DictCodeListExt3.系统动作_新建.getValue();
+//        SysWflBusinessList sysBus=sysWflBusinessListMapper.selectByPrimaryKey(dto.getWorkflowId());
+//        if(null!=sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())){
+//            decisionAct = DictCodeListExt3.系统动作_修改.getValue();
+//        }
+//        if (StringUtil.equals(dto.getOperateType(), "modify")) {
+//            systemAct = DictCodeListExt3.系统动作_修改.getValue();
+//        }
+////        dto.setSoftSkipMode("Y");
+//        positionRequestService.sendEtrConBondDto(dto,decisionAct,systemAct);
+
+        //保存不需要处理头寸
+        if (StringUtil.equals(OPERATE_TYPE_SAVE, operateType)) {
+            return;
+        }
+        //增加调用头寸引擎代码start
+        String decisionAct = 系统动作_修改.getValue();
+        String systemAct = 系统动作_修改.getValue();
+        EtrEntrust etrEntrust = etrEntrustBackupMapper.selectByPrimaryKey(dto.getEntrustId());
         SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey(dto.getWorkflowId());
         if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
-            decisionAct = DictCodeListExt3.系统动作_修改.getValue();
+            if (etrEntrust == null) {
+                systemAct = 系统动作_新建.getValue();
+                decisionAct = 系统动作_修改.getValue();
+            }
+        } else {
+            if (etrEntrust == null) {
+                systemAct = 系统动作_新建.getValue();
+                decisionAct = 系统动作_新建.getValue();
+            }
         }
-        if (StringUtil.equals(dto.getOperateType(), "modify")) {
-            systemAct = DictCodeListExt3.系统动作_修改.getValue();
+        if (StringUtil.equals("1", RequestUtil.getParam("confirmOk"))) {
+            dto.setSoftSkipMode("Y");
         }
-        dto.setSoftSkipMode(DictCodeList.是否_是.getValue());
-        positionRequestService.sendEtrConBondDto(dto, decisionAct, systemAct);
+        try {
+            dto.setPositionSeqno(null);
+            positionRequestService.sendEtrConBondDto(dto,decisionAct,systemAct);
+        } catch (PositionException e) {
+            Message message = PositionUtil.ajaxErrorReturn(e);
+            if (StringUtil.isNotBlank(message.getMessage())) {
+                WorkFlowUtil.showMessage(message.getMessage(), MessageType.错误消息);
+            } else {
+                if (!StringUtil.equals("1", RequestUtil.getParam("confirmOk"))) {
+                    BaseMap bm = (BaseMap) message.getData();
+                    StringBuffer messageStr = (StringBuffer) bm.get("message");
+                    WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
+                }
+            }
+        }
+        //增加调用头寸引擎代码end
     }
 
     @Transactional

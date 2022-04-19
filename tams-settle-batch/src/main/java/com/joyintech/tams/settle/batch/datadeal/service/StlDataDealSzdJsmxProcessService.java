@@ -5,19 +5,13 @@ import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.common.base.entity.FinProduct;
-import com.joyintech.tams.common.base.entity.SettleTransData;
-import com.joyintech.tams.common.base.entity.SettleTransDataAdd;
-import com.joyintech.tams.common.base.entity.SettleTransDataPledge;
-import com.joyintech.tams.common.base.entity.SettleTransTgMapping;
-import com.joyintech.tams.common.base.entity.SzdJsmx;
+import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.constant.DictCodeListStl;
-import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
-import com.joyintech.tams.invest.common.redisinit.dto.ImplCalendar;
 import com.joyintech.tams.settle.batch.datadeal.constant.StlDataDealProcessConstant;
 import com.joyintech.tams.settle.batch.datadeal.dao.StlDownDataDealMapper;
 import com.joyintech.tams.settle.batch.datadeal.dto.StlDownDataDealOperatorDto;
@@ -28,6 +22,8 @@ import com.joyintech.tams.settle.common.dto.StlDownDataDealAccountInfoDto;
 import com.joyintech.tams.settle.common.service.SettleCommonService;
 import com.joyintech.tams.settle.common.util.DateUtil;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -63,6 +59,11 @@ public class StlDataDealSzdJsmxProcessService {
 
 	@Autowired
     protected StlDownDataDealMapper stlDownDataDealMapper;
+
+	@Autowired
+	protected FinProductTypeMapper finProductTypeMapper;
+
+	private Logger logger = LoggerFactory.getLogger(StlDataDealSzdJsmxProcessService.class);
 
 	/*@Autowired
 	protected ICalendar iCalendar;*/
@@ -215,8 +216,6 @@ public class StlDataDealSzdJsmxProcessService {
 				}
 				// 交易币种
 				settleTransData.setCcy(stlDataDealProcessCommonService.getCcy(szdJsmx.getBz()));
-				// 交易平台
-				settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdJsmx.getJyfs()));
 				// 交收方式
 				settleTransData.setSettleMode(stlDataDealProcessCommonService.getSettleMode(szdJsmx.getJsfs()));
 				// 交易方向
@@ -265,7 +264,12 @@ public class StlDataDealSzdJsmxProcessService {
 					// GNS-908:申购和申购确认需要通过申报代码查询资产代码 modify by fuyongsheng 20220218 end
 					szdJsmx.setCjbh(szdJsmx.getJsbh());
 				}
-
+				// 交易平台
+				String finProductTypeType6 = getFinProductTypeType6(settleTransData);
+				settleTransData.setTradePlat(null);
+				if ("B14".equals(finProductTypeType6)) {
+					settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdJsmx.getJyfs()));
+				}
 				// 债可交换债换股业务
 				if (StringUtil.lowerCase(stlDownDataDealOperatorDto.getDataFile()).startsWith(StlDataDealProcessConstant.SZD_JSMX_03)) {
 					if (StringUtil.equals(szdJsmx.getYwlx(), StlDataDealProcessConstant.YWLX_653)) {
@@ -296,7 +300,8 @@ public class StlDataDealSzdJsmxProcessService {
 						settleTransData.setFinprodType(DictCodeListExt1.金融产品类型_股票.getValue());
 						//settleTransDataAdd.setTradeId(szdJsmx.getCjbh());
 						settleTransDataAdd.setTradeId(generate);
-						settleTransDataAdd.setrFinprodId(szdJsmx.getZqdm2());
+						//债转股代码
+						//settleTransDataAdd.setrFinprodId(szdJsmx.getZqdm2());
 						//变量份额
 						// modify by etliu 20211225 start
 						// 光大反馈问题修复：产品的这种写法统一改下吧，精度缺失，会导致我们对不上资金余额；
@@ -307,7 +312,7 @@ public class StlDataDealSzdJsmxProcessService {
 					else if (StringUtil.equals(StlDataDealProcessConstant.ZQLB_GZ, szdJsmx.getZqlb())) {
 						//settleTransDataAdd.setTradeId(szdJsmx.getCjbh());
 						settleTransDataAdd.setTradeId(generate);
-						settleTransDataAdd.setrFinprodId(szdJsmx.getZqdm2());
+						//settleTransDataAdd.setrFinprodId(szdJsmx.getZqdm2());
 					}
 					else {
 						// 金融产品代码
@@ -334,7 +339,7 @@ public class StlDataDealSzdJsmxProcessService {
 						// modify by etliu 20211225 end
 						//settleTransDataAdd.setTradeId(szdJsmx.getCjbh());
 						settleTransDataAdd.setTradeId(generate);
-						settleTransDataAdd.setrFinprodId(szdJsmx.getZqdm1());
+						//settleTransDataAdd.setrFinprodId(szdJsmx.getZqdm1());
 					}
 				}
 				// 成交编号
@@ -487,7 +492,7 @@ public class StlDataDealSzdJsmxProcessService {
 			// 定义变量.成交数据明细质押品信息表
 			SettleTransDataPledge settleTransDataPledge = new SettleTransDataPledge();
 			// 交易平台
-			settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdJsmx.getJyfs()));
+			settleTransData.setTradePlat(null);
 			// 交收方式
 			settleTransData.setSettleMode(stlDataDealProcessCommonService.getSettleMode(szdJsmx.getJsfs()));
 			// 交易币种
@@ -985,7 +990,7 @@ public class StlDataDealSzdJsmxProcessService {
 					        // 回购利息
 							// settleTransData.setmIntAmt(new BigDecimal(szdJsmx.getQsje()).abs().subtract(new BigDecimal(szdJsmx.getCjsl()).abs()));
 							// 查询首期清算数据
-							List<SettleTransData> sqSettleTransDatas = stlDownDataDealMapper.selectShSqSettleTransDatas(
+							List<SettleTransData> sqSettleTransDatas = stlDownDataDealMapper.selectSqSettleTransDatas(
 									settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId(),
 									settleTransData.getVdate());
 							if(!CollectionUtils.isEmpty(sqSettleTransDatas)){
@@ -1147,7 +1152,8 @@ public class StlDataDealSzdJsmxProcessService {
 						if(DictCodeListExt3.质押券置换_置换方向_换出.getValue().equals(settleTransData.getTradeType())){
 							// 查询首期质押券信息
 							List<SettleTransDataPledge> sqSettleTransDataPledges = stlDownDataDealMapper.selectSqSettleTransDataPledges(
-									settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId());
+									settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId(),
+									settleTransData.getVdate());
 							if(org.apache.commons.collections.CollectionUtils.isNotEmpty(sqSettleTransDataPledges)
 							&& StringUtil.isNotEmpty(sqSettleTransDataPledges.get(0).getPledgeRatio())){
 								settleTransDataPledge.setPledgeRatio(sqSettleTransDataPledges.get(0).getPledgeRatio());
@@ -1155,7 +1161,8 @@ public class StlDataDealSzdJsmxProcessService {
 						}else if(DictCodeListExt3.质押券置换_置换方向_换入.getValue().equals(settleTransData.getTradeType())){
 							// 查询首期清算数据
 							List<SettleTransData> sqSettleTransDatas = stlDownDataDealMapper.selectSqSettleTransDatas(
-									settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId());
+									settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId(),
+									settleTransData.getVdate());
 							if(!CollectionUtils.isEmpty(sqSettleTransDatas)){
 								settleTransDataPledge.setPledgeRatio(ArithmeticUtil.divide(sqSettleTransDatas.get(0).getPrinAmt().abs(),
 										new BigDecimal(szdJsmx.getCjsl()).abs(),2));
@@ -1958,7 +1965,7 @@ public class StlDataDealSzdJsmxProcessService {
 					return DictCodeList.交易方向_卖出.getValue();
 				}
 			}
-			if (StringUtil.equals(ywlx, StlDataDealProcessConstant.YWLX_301)) {
+			if (StringUtil.equals(ywlx, StlDataDealProcessConstant.YWLX_305)) {
 				if (StringUtil.equals(StlDataDealProcessConstant.ZQLB_GZ, zqlb)) {
 					return DictCodeList.交易方向_行权_回售.getValue();
 				}
@@ -2184,7 +2191,11 @@ public class StlDataDealSzdJsmxProcessService {
 		// 交易币种
 		settleTransData.setCcy(stlDataDealProcessCommonService.getCcy(szdJsmx.getBz()));
 		// 交易平台
-		settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdJsmx.getJyfs()));
+		String finProductTypeType6 = getFinProductTypeType6(settleTransData);
+		settleTransData.setTradePlat(null);
+		if ("B14".equals(finProductTypeType6)) {
+			settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdJsmx.getJyfs()));
+		}
 		// 交收方式
 		settleTransData.setSettleMode(stlDataDealProcessCommonService.getSettleMode(szdJsmx.getJsfs()));
 		// 执行日期
@@ -2370,6 +2381,23 @@ public class StlDataDealSzdJsmxProcessService {
 		settleTransTgMapping.setTradeId(settleTransData.getTradeId());
 		stlDownDataDealWriteBaseDto.setSettleTransTgMapping(settleTransTgMapping);
 		return stlDownDataDealWriteBaseDto;
+	}
+
+	/**
+	 * 根据金融产品代码查询FIN_PRODUCT_TYPE.TYPE_6 -- 投管一级类型
+	 */
+	private String getFinProductTypeType6(SettleTransData settleTransData) {
+		FinProductTypeKey finProductTypeKey = new FinProductTypeKey();
+		finProductTypeKey.setBranch(0L);
+		finProductTypeKey.setFinprodId(settleTransData.getFinprodId());
+
+		FinProductType finProductType = new FinProductType();
+		try {
+			finProductType = finProductTypeMapper.selectByPrimaryKey(finProductTypeKey);
+		} catch (Exception e) {
+			logger.error("根据金融产品代码查询投管一级类型出错信息：" + e);
+		}
+		return finProductType.getType6();
 	}
 
 	/**

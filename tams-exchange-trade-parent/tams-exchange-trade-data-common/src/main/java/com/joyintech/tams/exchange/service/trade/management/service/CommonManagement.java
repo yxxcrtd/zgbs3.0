@@ -1,10 +1,16 @@
 package com.joyintech.tams.exchange.service.trade.management.service;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.core.map.MapBuilder;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.security.SecurityUtil;
@@ -15,10 +21,10 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.system.syspara.dto.SysParaSet001Dto;
 import com.joyintech.system.syspara.service.SysParaSet001Service;
+import com.joyintech.tams.common.base.entity.TrdPriceTimeConfig;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.SysParamBean;
 import com.joyintech.tams.exchange.common.bean.investment.PtlAuthInfo;
-import com.joyintech.tams.exchange.common.bean.investment.TradeTimeBean;
 import com.joyintech.tams.exchange.common.bean.request.DeviationDegreeRequest;
 import com.joyintech.tams.exchange.common.bean.request.EtrDispatcherInfoRequest;
 import com.joyintech.tams.exchange.common.bean.response.ExchangeContextResponse;
@@ -32,9 +38,7 @@ import com.joyintech.tams.exchange.common.db.domain.ServiceNode;
 import com.joyintech.tams.exchange.common.domain.Message;
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
-import com.joyintech.tams.exchange.common.utils.InvestmentUtils;
-import com.joyintech.tams.exchange.common.utils.JsonUtils;
-import com.joyintech.tams.exchange.common.utils.TradeTimeConvertUtils;
+import com.joyintech.tams.exchange.datacommon.db.dao.TrdPriceTimeConfigByManualMapper;
 import com.joyintech.tams.exchange.datacommon.db.service.FuturesInstrumentService;
 import com.joyintech.tams.exchange.datacommon.db.service.InstrumentService;
 import com.joyintech.tams.exchange.datacommon.db.service.ServiceNodeService;
@@ -56,12 +60,15 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unused")
 @Component
 public class CommonManagement extends BaseService {
+
+    /**
+     * 日志对象
+     */
     private static final Logger logger = LoggerFactory.getLogger(CommonManagement.class);
-    @Autowired(required = false)
-    @Qualifier("simpleRestTemplate")
-    protected JoyinRestTemplate simpleRestTemplate;
+
     @Autowired
     private InstrumentService instrumentService;
     @Autowired
@@ -78,6 +85,8 @@ public class CommonManagement extends BaseService {
     private FuturesInstrumentService futuresInstrumentService;
     @Autowired
     private AccountPositionHelper accountPositionHelper;
+    @Autowired
+    private TrdPriceTimeConfigByManualMapper trdPriceTimeConfigByManualMapper;
     /**
      * 是否单体服务
      */
@@ -100,6 +109,8 @@ public class CommonManagement extends BaseService {
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     @Autowired
     private SysParaSet001Service sysParaSet001Service;
+    @Autowired
+    private EtrTradeOtherCommonService etrTradeOtherCommonService;
 
     public String getFairCode() {
         return fairCode;
@@ -202,16 +213,16 @@ public class CommonManagement extends BaseService {
      * 查询输入日期是否交易日
      *
      * @param tradeCalendarType 交易日历类型  3-上交所; 4-深交所
-     * @param CDATE             日期 格式：yyyyMMdd，如20200512
+     * @param cdate             日期 格式：yyyyMMdd，如20200512
      * @return 是否交易日 0-是；1-否
      */
-    public String checkTradeDate(String tradeCalendarType, String CDATE) {
+    public String checkTradeDate(String tradeCalendarType, String cdate) {
         try {
             String url = ServiceApplication.BASIC_DATA_SERVICE + TradeServiceURL.checkTradeDate;
             String result = "";
             Map<String, Object> pageParam = new HashMap<>();
             pageParam.put("tradeCalendarType", tradeCalendarType);
-            pageParam.put("CDATE", CDATE);
+            pageParam.put("CDATE", cdate);
             if (isSingle) {
                 result = simpleRestTemplate.postForObject(url, pageParam, String.class);
             } else {
@@ -228,7 +239,7 @@ public class CommonManagement extends BaseService {
         try {
             return sysParaSet001Service.getReportInfoList(pageParam);
         } catch (Exception e) {
-            logger.warn("get fairCode form investment error {}", e);
+            logger.warn("get fairCode form investment error：", e);
             SysParaSet001Dto sysParaSet001Dto = new SysParaSet001Dto();
             sysParaSet001Dto.setParamValue(fairCode);
             ArrayList<SysParaSet001Dto> sysParaSet001DtoList = new ArrayList<>();
@@ -268,7 +279,7 @@ public class CommonManagement extends BaseService {
         } else {
             FuturesInstrument futuresInstrument = futuresInstrumentService.queryByInnerCode(stockCode);
             if (futuresInstrument != null) {
-                List<FuturesInstrument> futuresInstruments = new ArrayList();
+                List<FuturesInstrument> futuresInstruments = Lists.newArrayList();
                 futuresInstruments.add(futuresInstrument);
                 return new ResultBean(ErrorCode.SUCCESS, futuresInstruments);
             } else {
@@ -328,7 +339,7 @@ public class CommonManagement extends BaseService {
         String result = "";
         String url = ServiceApplication.BASIC_DATA_SERVICE + TradeServiceURL.querySysParam;
         logger.debug("调用微服务获取系统参数[{}] ", url);
-        logger.debug("请求报文[{}]", JSONUtil.toJsonStr(bean));
+        logger.debug("请求报文[{}]", bean);
         if (isSingle) {
             result = simpleRestTemplate.postForObject(url, bean, String.class);
         } else {
@@ -378,13 +389,14 @@ public class CommonManagement extends BaseService {
             }
             return resultBean;
         } catch (Exception e) {
-            logger.info("调用交易时间段查询接口失败！！！ {}", e);
+            logger.info("调用交易时间段查询接口失败：", e);
             return new ResultBean(ErrorCode.API_RETURN_ERROR);
         }
     }
 
     public ResultBean tradeTimeCache() {
-        logger.info("开始更新交易时间信息到内存...");
+        return tradeTimeInCache();
+        /*logger.info("开始更新交易时间信息到内存...");
         ResultBean resultBean = queryTradeTime(null, null, null, null, null, null, null);
         if (resultBean.getErrorCode() == ErrorCode.SUCCESS.value) {
             List<TradeTimeBean> tradeTimeBeans = JsonUtils.getObjectListFromJson(JSONArray.toJSONString(resultBean.getData()), TradeTimeBean.class);
@@ -404,16 +416,30 @@ public class CommonManagement extends BaseService {
         } else {
             logger.info("交易时间段获取失败，未能成功存入信息！！ {} - {}", resultBean.getErrorCode(), resultBean.getErrorMsg());
             return new ResultBean(ErrorCode.FLUSH_TRADE_TIME_FAILED);
+        }*/
+    }
+
+    public ResultBean tradeTimeInCache() {
+        logger.info("开始任务-交易时间段信息缓存");
+        try {
+            List<TrdPriceTimeConfig> trdPriceTimeConfigs = trdPriceTimeConfigByManualMapper.selectByEtrTrad("TRAD");
+            tradeTimeService.saveInCache(trdPriceTimeConfigs);
+            logger.info("完成任务-交易时间段信息缓存");
+            return ResultBean.success();
+        } catch (Exception e) {
+            logger.error("交易时间段获取失败[{}]", ExceptionUtil.getMessage(e));
+            return ResultBean.error(ErrorCode.FLUSH_TRADE_TIME_FAILED);
         }
     }
 
+    @SuppressWarnings("unused")
     public ResultBean setPositionCheckFlag(String userId, boolean positionCheckFlag) {
         logger.info("改变账户持仓检查状态 {} to {}", accountPositionHelper.isPositionCheckFlag(), positionCheckFlag);
         accountPositionHelper.setPositionCheckFlag(positionCheckFlag);
         return new ResultBean(ErrorCode.SUCCESS, "切换成功");
     }
 
-    /*** 
+    /***
      * @Description: 组合权限查询
      * @Param: [userId]
      * @return: java.util.List<java.lang.String>
@@ -421,28 +447,27 @@ public class CommonManagement extends BaseService {
      * @Date: 2020/12/21
      */
     public List<String> getPtlAuthInfo(String userId) {
+        List<String> list = Lists.newArrayList();
+
         try {
             ResultBean resultBean;
-            Map<String, Object> pageParam = new HashMap<>();
-            pageParam.put("userId", userId);
+            MapBuilder<Object, Object> pageParam = MapUtil.builder().put("userId", userId);
             if (isSingle) {
                 resultBean = simpleRestTemplate.postForObject(ServiceApplication.PORTFOLIO_SERVICE_NAME + TradeServiceURL.getPtlAuthInfo, pageParam, ResultBean.class);
             } else {
                 resultBean = restTemplate.postForObject(ServiceApplication.PORTFOLIO_SERVICE_NAME + TradeServiceURL.getPtlAuthInfo, pageParam, ResultBean.class);
             }
-            if (resultBean.getErrorCode() == ErrorCode.SUCCESS.value) {
+            if (ErrorCode.isSuccess(resultBean.getErrorCode())) {
                 List<PtlAuthInfo> array = JSONArray.parseArray(JSONArray.toJSONString(resultBean.getData()), PtlAuthInfo.class);
-                if (Objects.isNull(array) || array.size() == 0) {
-                    return null;
+                if (CollUtil.isNotEmpty(array)) {
+                    array.forEach(obj -> list.add(obj.getPortfolioCode()));
                 }
-                List<String> list = new ArrayList<String>();
-                array.forEach(obj -> list.add(obj.getPortfolioCode()));
                 return list;
             }
         } catch (Exception e) {
             logger.error("getPtlAuthInfo error:", e);
         }
-        return null;
+        return list;
     }
 
     public Message<Map<String, Object>> getEtrDispatcherInfo(EtrDispatcherInfoRequest request) {
@@ -477,9 +502,6 @@ public class CommonManagement extends BaseService {
             return new Message<>(ResultBean.error(ErrorCode.API_RETURN_ERROR));
         }
     }
-
-    @Autowired
-    private EtrTradeOtherCommonService etrTradeOtherCommonService;
 
     public Message<BigDecimal> getFaceValue(String finprodId) {
         Map<String, Object> params = new HashMap<>();

@@ -356,4 +356,14 @@ public class KCBPTradeClient implements ITradeRequest {
     public void querySystemStatus() {
         kcbpTradeClientMap.values().forEach(KCBPTradeClientImpl::querySystemStatus);
     }
+
+	@Override
+	public void queryNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean, Long requestId) {
+		KCBPTradeClientImpl accountClient = counterClientMap.getOrDefault(negotiateQuoteQueryBean.getAccountId(), null);
+        if (accountClient != null) {
+            accountClient.queryNegotiateQuoteReceive(negotiateQuoteQueryBean, requestId);
+        } else {
+            logger.warn("client not exist, accountId = {}", negotiateQuoteQueryBean.getAccountId());
+        }
+	}
 }

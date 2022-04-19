@@ -417,4 +417,10 @@ public interface TrdCommonBaseMapper {
      * @since 1.0
      */
     BigDecimal queryConverseRadio(@Param("finprodId") String finprodId, @Param("vdate") Date vdate);
+
+    /**
+     * 获取未完全匹配的成交明细汇总数据数量
+     * @return
+     */
+    Integer getUnFinishMatchSettleTransDataNum(Map<String, Object> map);
 }

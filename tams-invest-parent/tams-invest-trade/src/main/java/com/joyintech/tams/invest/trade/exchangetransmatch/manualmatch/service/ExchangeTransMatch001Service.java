@@ -20,6 +20,8 @@ import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
+import com.joyintech.tams.invest.common.service.BatchManualExcuteService;
+import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonDto;
 import com.joyintech.tams.invest.trade.bond.dto.TrdBondInvestTradeDto;
 import com.joyintech.tams.invest.trade.bondtostock.dto.TrdBondToStock001Dto;
@@ -34,6 +36,8 @@ import com.joyintech.tams.invest.trade.trdrepotrade.dto.TrdRepoTrade002Dto;
 import com.joyintech.tams.invest.trade.trdstockconnect.controller.TrdStockConnect002Controller;
 import com.joyintech.tams.invest.trade.trdstockconnect.dto.TrdStockConnectDto;
 import org.apache.poi.ss.usermodel.Cell;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +48,10 @@ import java.util.*;
 @Service
 @Transactional(rollbackFor=Exception.class)
 public class ExchangeTransMatch001Service extends CommonExportService<ExchangeTransMatch004Dto>{
+    /**
+     * 日志
+     */
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private ExchangeTransMatchCommonService exchangeTransMatchCommonService;
@@ -57,6 +65,11 @@ public class ExchangeTransMatch001Service extends CommonExportService<ExchangeTr
     @Autowired
     private SettleTransDataTotalAddMapper settleTransDataTotalAddMapper;
 
+    @Autowired
+    private BatchManualExcuteService batchManualExcuteService;
+
+    @Autowired
+    private TrdCommonBaseService trdCommonBaseService;
 
     /**
      * 获取资产代码下拉框
@@ -262,6 +275,14 @@ public class ExchangeTransMatch001Service extends CommonExportService<ExchangeTr
         exchangeTransMatchCommonDto.setMatchType(DictCodeListExt3.下行交易匹配类型_手动匹配.getValue());
         exchangeTransMatchCommonService.transactionMacth(exchangeTransMatchCommonDto);
 
+        Integer unFinishMatchNum = trdCommonBaseService.getUnFinishMatchSettleTransDataNum(exchangeTransMatchCommonDto.getTradeDate());
+        logger.debug("查询当日未完全成交匹配数量:"+ unFinishMatchNum);
+        if(unFinishMatchNum == 0){
+            Map<String, Object> param = new HashMap<>();
+            param.put("beanNames", Collections.singletonList("stlDownDurationDataGatherTask"));
+            logger.debug("当日无未完全成交匹配数据,启动存续期交易生成批处理任务,日期:" + DateUtil.format(exchangeTransMatchCommonDto.getTradeDate()));
+            batchManualExcuteService.execute(param);
+        }
     }
 
     /**

@@ -307,4 +307,10 @@ public class CTPTradeClient implements IFuturesTradeRequest {
             return;
         }
     }
+
+	@Override
+	public void queryNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean, Long requestId) {
+		// TODO Auto-generated method stub
+		
+	}
 }

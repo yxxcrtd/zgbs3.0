@@ -1,5 +1,7 @@
 package com.joyintech.tams.exchange.common.constant;
 
+import java.time.LocalTime;
+
 /**
  * create By MAXX on 2020/12/15
  */
@@ -19,5 +21,9 @@ public enum TradeTime {
     TradeTime(String name, String value) {
         this.name = name;
         this.value = value;
+    }
+
+    public LocalTime getTime() {
+        return LocalTime.parse(this.value);
     }
 }

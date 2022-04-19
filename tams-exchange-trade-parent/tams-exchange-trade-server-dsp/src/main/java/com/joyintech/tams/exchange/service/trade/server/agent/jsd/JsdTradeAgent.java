@@ -41,6 +41,8 @@ import com.joyintech.tams.exchange.common.bean.IntegratedFixedIncomeQuoteQryBean
 import com.joyintech.tams.exchange.common.bean.IntegratedQuote;
 import com.joyintech.tams.exchange.common.bean.IntegratedRepurchaseQuoteBean;
 import com.joyintech.tams.exchange.common.bean.IntegratedRepurchaseQuoteQryBean;
+import com.joyintech.tams.exchange.common.bean.NegotiateQuoteQueryBean;
+import com.joyintech.tams.exchange.common.bean.NegotiateQuoteReceiveBean;
 import com.joyintech.tams.exchange.common.bean.PledgeDiscount;
 import com.joyintech.tams.exchange.common.bean.PositionQueryBean;
 import com.joyintech.tams.exchange.common.bean.QuoteQryBean;
@@ -1021,4 +1023,11 @@ public class JsdTradeAgent extends TradeAgentDsp {
         }
         return Market.SHSE.value.equals(market) ? "1" : "2";
     }
+
+	@Override
+	public List<NegotiateQuoteReceiveBean> reqNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean)
+			throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

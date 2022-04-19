@@ -55,6 +55,7 @@
         <result column="SPPI_TEST_STATUS" property="sppiTestStatus" jdbcType="CHAR" />
         <result column="CIRCULATION_CODE" property="circulationCode" jdbcType="VARCHAR" />
         <result column="CIRCULATION_DATE" property="circulationDate" jdbcType="DATE" />
+        <result column="DELISTING_DATE" property="delistingDate" jdbcType="DATE" />
     </resultMap>
     <sql id="Base_Column_List" >
         FINPROD_ID FINPROD_ID, FINPROD_TYPE FINPROD_TYPE, FINPROD_TYPE2 FINPROD_TYPE2, FINPROD_ABBR FINPROD_ABBR, 
@@ -70,7 +71,7 @@
         CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME, 
         CONTRACT_NO CONTRACT_NO, IS_FIN_ORG IS_FIN_ORG, SPONSOR SPONSOR, INVEST_ADVISER INVEST_ADVISER, 
         LIQUIDATION_YESNO LIQUIDATION_YESNO, SPPI_TEST_STATUS SPPI_TEST_STATUS, CIRCULATION_CODE CIRCULATION_CODE,
-        CIRCULATION_DATE CIRCULATION_DATE
+        CIRCULATION_DATE CIRCULATION_DATE,DELISTING_DATE DELISTING_DATE
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -109,7 +110,7 @@
             CREATE_USER, CREATE_DEPT, CREATE_TIME, 
             UPDATE_USER, UPDATE_TIME, CONTRACT_NO, 
             IS_FIN_ORG, SPONSOR, INVEST_ADVISER, 
-            LIQUIDATION_YESNO, SPPI_TEST_STATUS, CIRCULATION_CODE,CIRCULATION_DATE
+            LIQUIDATION_YESNO, SPPI_TEST_STATUS, CIRCULATION_CODE,CIRCULATION_DATE,DELISTING_DATE
             )
         values (#{finprodId,jdbcType=VARCHAR}, #{finprodType,jdbcType=VARCHAR}, #{finprodType2,jdbcType=VARCHAR}, 
             #{finprodAbbr,jdbcType=VARCHAR}, #{finprodName,jdbcType=VARCHAR}, #{profitType,jdbcType=VARCHAR}, 
@@ -128,7 +129,7 @@
             #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{contractNo,jdbcType=VARCHAR}, 
             #{isFinOrg,jdbcType=VARCHAR}, #{sponsor,jdbcType=VARCHAR}, #{investAdviser,jdbcType=VARCHAR}, 
             #{liquidationYesno,jdbcType=VARCHAR}, #{sppiTestStatus,jdbcType=CHAR}, #{circulationCode,jdbcType=VARCHAR},
-            #{circulationDate,jdbcType=DATE}
+            #{circulationDate,jdbcType=DATE},#{delistingDate,jdbcType=DATE}
             )
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.FinProduct" >
@@ -293,6 +294,9 @@
             <if test="circulationDate != null" >
                 CIRCULATION_DATE,
             </if>
+            <if test="delistingDate != null" >
+                DELISTING_DATE,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="finprodId != null" >
@@ -454,6 +458,9 @@
             <if test="circulationDate != null" >
                 #{circulationDate,jdbcType=DATE},
             </if>
+            <if test="delistingDate != null" >
+                #{delistingDate,jdbcType=DATE},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.FinProduct" >
@@ -464,7 +471,7 @@
         TERM_DAYS, ACTMDATE, LIQUIDATION_DATE, IS_CHL, IS_SUS, SUSTAINABLE_REMARK, IS_RIGHT, 
         CAPI_INCOME_FEATURE, P_FINPROD_ID, O_FINPROD_ID, REGIST_ORG, EXE_DATE, REMARK, CREATE_USER, 
         CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, CONTRACT_NO, IS_FIN_ORG, SPONSOR, 
-        INVEST_ADVISER, LIQUIDATION_YESNO, SPPI_TEST_STATUS, CIRCULATION_CODE,CIRCULATION_DATE)
+        INVEST_ADVISER, LIQUIDATION_YESNO, SPPI_TEST_STATUS, CIRCULATION_CODE,CIRCULATION_DATE,DELISTING_DATE)
         select FINPROD_ID, FINPROD_TYPE, FINPROD_TYPE2, FINPROD_ABBR, FINPROD_NAME, 
             PROFIT_TYPE, COUPON_SPECIES, CHL_FINPROD_ID, FINPROD_MARKET_ID, ISSUE_ID, ISSUE_PRICE, 
             ISSUE_AMT, CCY, BLN_AREA, TRADE_MARKET, CALENDAR_ID, ISSUE_TYPE, OPERATION_TYPE, 
@@ -472,7 +479,7 @@
             TERM_DAYS, ACTMDATE, LIQUIDATION_DATE, IS_CHL, IS_SUS, SUSTAINABLE_REMARK, IS_RIGHT, 
             CAPI_INCOME_FEATURE, P_FINPROD_ID, O_FINPROD_ID, REGIST_ORG, EXE_DATE, REMARK, CREATE_USER, 
             CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME, CONTRACT_NO, IS_FIN_ORG, SPONSOR, 
-            INVEST_ADVISER, LIQUIDATION_YESNO, SPPI_TEST_STATUS, CIRCULATION_CODE,CIRCULATION_DATE
+            INVEST_ADVISER, LIQUIDATION_YESNO, SPPI_TEST_STATUS, CIRCULATION_CODE,CIRCULATION_DATE,DELISTING_DATE
              from FIN_PRODUCT
              where 1 = 1 and FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
     </insert>
@@ -626,6 +633,9 @@
             <if test="circulationDate != null" >
                 CIRCULATION_DATE = #{circulationDate,jdbcType=DATE},
             </if>
+            <if test="delistingDate != null" >
+                DELISTING_DATE = #{delistingDate,jdbcType=DATE},
+            </if>
         </set>
         where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
     </update>
@@ -679,7 +689,8 @@
             LIQUIDATION_YESNO = #{liquidationYesno,jdbcType=VARCHAR},
             SPPI_TEST_STATUS = #{sppiTestStatus,jdbcType=CHAR},
             CIRCULATION_CODE = #{circulationCode,jdbcType=VARCHAR},
-            CIRCULATION_DATE = #{circulationDate,jdbcType=DATE}
+            CIRCULATION_DATE = #{circulationDate,jdbcType=DATE},
+            DELISTING_DATE = #{delistingDate,jdbcType=DATE}
         where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
     </update>
     <select id="getSubProd" parameterType="map" resultType="java.lang.String">
@@ -830,7 +841,19 @@
             <if test="circulationDate != null" >
                 CIRCULATION_DATE = #{circulationDate,jdbcType=DATE},
             </if>
+            <if test="delistingDate != null" >
+                DELISTING_DATE = #{delistingDate,jdbcType=DATE},
+            </if>
         </set>
         where P_FINPROD_ID = #{pFinprodId,jdbcType=VARCHAR}
+    </update>
+
+    <update id="updateForTenderBound" parameterType="com.joyintech.tams.common.base.entity.FinProduct">
+        update FIN_PRODUCT
+        set CIRCULATION_CODE = #{circulationCode,jdbcType=VARCHAR},
+            CIRCULATION_DATE = #{circulationDate,jdbcType=DATE},
+            UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+            UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+        where FINPROD_ID=#{finprodId,jdbcType=VARCHAR}
     </update>
 </mapper>

@@ -1141,6 +1141,7 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 			}
 			String msg ="";
 			String businessType = etrExchangeTrade001CommonService.setEntrustBussType(dto);
+			etrExchangeTrade001CommonService.genBusiTypeTg(dto);
 			dto.setBusinessTypeName(SysDataUtil.getNameFromDataDict(DictCode.共通业务类型, businessType));
 			if (StringUtil.equals("save", dto.getOperateType())) {  //保存没有check和任何限制
 				if(!CollectionUtils.isEmpty(dto.getPortfolioList())){
@@ -1221,6 +1222,7 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 							etrExchangeTrade001Dto.setFromEtrExchange("Y");
 							etrExchangeTrade001Dto.setDisRate(item.getDisRate());
 							etrExchangeTrade001Dto.setOptType(dto.getOptType());
+							etrExchangeTrade001Dto.setBusiTypePosition(dto.getBusiTypePosition());
 							List<EtrExchangeTradePortfolioRequest> portfolioList=new ArrayList<>();
 							EtrExchangeTradePortfolioRequest portfolioRequest=new EtrExchangeTradePortfolioRequest();
 							BeanUtil.copyPropertiesIgnoreNull(portfolioRequest,etrExchangeTrade001Dto);

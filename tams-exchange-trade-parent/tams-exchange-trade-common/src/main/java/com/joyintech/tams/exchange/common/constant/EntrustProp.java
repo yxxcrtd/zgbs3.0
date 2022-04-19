@@ -93,6 +93,12 @@ public enum EntrustProp {
     AGREED_REPURCHASE_BUYBACK_WARRANT("约定购回配股权证购回", "RNP"),
     AGREED_REPURCHASE_BUYBACK("约定购回购回交易", "RNR"),
 
+    //新债改造
+//  	XZ_PPCJ_XD("匹配成交下单", "0"),//重复了，使用原有的
+    SZ_XSCJ_XD("协商成交下单", "FI9-1"),
+    SZ_XSCJ_JS("协商成交接受", "FI9-2"),
+    SZ_XSCJ_JJ("协商成交拒绝", "FI9-3"),
+
     //期货市价
     FTDC_OPT_ANYPRICE("任意价", "FU1"),
     //FTDC_OPT_LIMITPRICE("限价","FU2"),
@@ -144,6 +150,14 @@ public enum EntrustProp {
     EntrustProp(String name, String value) {
         this.name = name;
         this.value = value;
+    }
+
+    /**
+     * 是否现券交易
+     */
+    public static boolean isNewBondTrade(String entrustProp) {
+        return EntrustProp.NORMAL.value.equals(entrustProp)
+                || EntrustProp.SH_FIXEDINCOME_BAOJIA_OPPOSITE.value.equals(entrustProp);
     }
 
     // 是否需要跳过风控

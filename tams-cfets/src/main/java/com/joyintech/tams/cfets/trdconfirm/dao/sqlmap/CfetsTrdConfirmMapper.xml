@@ -1726,7 +1726,7 @@
         where SEQNO = #{seqno,jdbcType=VARCHAR}
     </delete>
     <!-- 指令管理查询 -->
-    <select id="findEtrinfoByPrimaryKey"  resultType="com.joyintech.tams.cfets.etrib.bond.dto.CfetsEtrIbBondinfoDto">
+    <select id="findEtrinfoByPrimaryKey"  resultType="com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbBondinfoDto">
         select
         T1.ENTRUST_ID entrustId,
         T1.ENTRUST_NUM shareNum

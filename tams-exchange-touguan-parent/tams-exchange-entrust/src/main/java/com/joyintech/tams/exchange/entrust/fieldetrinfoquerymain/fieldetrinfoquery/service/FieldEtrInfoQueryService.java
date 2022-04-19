@@ -114,6 +114,10 @@ public class FieldEtrInfoQueryService extends BaseService{
         pageParam.put("finType_zq", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         pageParam.put("ps_49", DictCodeListExt3.交易方向_债转股.getValue());
         pageParam.put("search_isNumberFlag", BaseMap.isNumeric(dto.getSearch()));
+
+        pageParam.put("PRICE_CLASS_01",DictCodeListExt3.计价方式_净价.getValue());
+        pageParam.put("PRICE_CLASS_02",DictCodeListExt3.计价方式_全价.getValue());
+
         if (StringUtil.equals(dto.getSettleSpeed(),
                 DictCodeList.清算速度_T_0.getValue())) {
             pageParam.put("settleSpeed","0");

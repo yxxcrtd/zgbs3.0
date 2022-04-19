@@ -60,7 +60,8 @@ public class StlDataGatherFund2Reader extends StlDataGatherReader {
         Map<String, Object> searchParam = new HashMap<>();
         searchParam.put("portfolioIdList", portfolioIdList);
         searchParam.put("dealDate", execInfo.getExecuteDate());
-        setSearchParam(searchParam);
+        // 设置公共查询参数
+        this.setSearchParam(searchParam);
         
         List<InvestTradeReaderDto> res = new ArrayList<InvestTradeReaderDto>();
         
@@ -83,6 +84,8 @@ public class StlDataGatherFund2Reader extends StlDataGatherReader {
         if (settleTransDataDelDtos != null && settleTransDataDelDtos.size() > 0) {
 	        investTradeReaderDto.setSettleTransDataDelDtoList(settleTransDataDelDtos);
         }
+        searchParam.put("DELIVERY_RESULT_01", "01");
+        searchParam.put("DELIVERY_RESULT_02", "02");
         List<SettleTransDataDto> tempSettleTransDataDtos = stlDataGatherMapper.selectFundSettleTransData(searchParam);
         if(CollectionUtils.isNotEmpty(tempSettleTransDataDtos)) {
             for (SettleTransDataDto dto : tempSettleTransDataDtos) {

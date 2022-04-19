@@ -1,5 +1,7 @@
 package com.joyintech.tams.exchange.service.trade.management.service;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.framework.base.BaseService;
@@ -29,6 +31,7 @@ import java.util.*;
 /**
  * create By MAXX on 2020/10/15
  */
+@SuppressWarnings("unused")
 @Component
 public class InstrumentManagement extends BaseService {
     private Logger logger = LoggerFactory.getLogger(InstrumentManagement.class);
@@ -46,17 +49,13 @@ public class InstrumentManagement extends BaseService {
     @Value("${application.micorservice.contextPath.single:false}")
     private boolean isSingle;
 
-    @Autowired(required = false)
-    @Qualifier("simpleRestTemplate")
-    protected JoyinRestTemplate simpleRestTemplate;
-
     public ResultBean flushInstrumentData(Map<String, Object> params) {
         try {
             List<Instrument> instrumentList = new ArrayList<>();
             List<FuturesInstrument> futuresInstrumentList = new ArrayList<>();
             List<Instrument> instrumentListFromInvest = getStockInfo(params);
             logger.debug("list:{}", JSONArray.toJSONString(instrumentListFromInvest));
-            if (Objects.nonNull(instrumentListFromInvest) && instrumentListFromInvest.size() > 0) {
+            if (CollUtil.isNotEmpty(instrumentListFromInvest)) {
                 List<MinPrice> minPriceList = getMinPrice();
                 logger.debug("minPriceList:{}", JSONArray.toJSONString(minPriceList));
                 if (Objects.nonNull(minPriceList)) {
@@ -96,12 +95,12 @@ public class InstrumentManagement extends BaseService {
                     }
                 });
                 logger.info("合约数据 {}", instrumentList.size());
-                if (instrumentList.size() > 0) instrumentService.asyncUpdate(instrumentList);
+                if (!instrumentList.isEmpty()) instrumentService.asyncUpdate(instrumentList);
                 logger.info("期货合约数据 {}", futuresInstrumentList.size());
-                if (futuresInstrumentList.size() > 0) futuresInstrumentService.asyncUpdate(futuresInstrumentList);
+                if (!futuresInstrumentList.isEmpty()) futuresInstrumentService.asyncUpdate(futuresInstrumentList);
             }
         } catch (Exception e) {
-            logger.error("flushInstrumentData:{}", e);
+            logger.error("flushInstrumentData:", e);
             return new ResultBean(ErrorCode.API_RETURN_ERROR);
         }
         logger.info("flushInstrumentData end");
@@ -113,7 +112,7 @@ public class InstrumentManagement extends BaseService {
             List<FuturesInstrument> futuresInstruments = terminalHelper.queryFuturesInstrument("", "", "");
             futuresInstrumentService.asyncUpdate(futuresInstruments);
         } catch (Exception e) {
-            logger.error("flushFuturesInstrumentData:{}", e);
+            logger.error("flushFuturesInstrumentData:", e);
             return new ResultBean(ErrorCode.API_RETURN_ERROR);
         }
         logger.info("flushFuturesInstrumentData end");
@@ -129,7 +128,7 @@ public class InstrumentManagement extends BaseService {
      */
     public List<Instrument> getStockInfo(Map<String, Object> params) {
         try {
-            logger.info("获取合约信息: params:{}, url:{}", params, ServiceApplication.BASIC_DATA_SERVICE + TradeServiceURL.selectStockInfo);
+            logger.info("获取合约信息: params:{}, url:{}{}", params, ServiceApplication.BASIC_DATA_SERVICE ,TradeServiceURL.selectStockInfo);
             ResultBean resultBean;
             if (isSingle) {
                 resultBean = simpleRestTemplate.postForObject(ServiceApplication.BASIC_DATA_SERVICE + TradeServiceURL.selectStockInfo, params, ResultBean.class);
@@ -142,7 +141,7 @@ public class InstrumentManagement extends BaseService {
         } catch (Exception e) {
             logger.error("getStockInfo error:", e);
         }
-        return null;
+        return ListUtil.empty();
     }
 
     /***
@@ -166,7 +165,7 @@ public class InstrumentManagement extends BaseService {
         } catch (Exception e) {
             logger.error("getMinPrice error:", e);
         }
-        return null;
+        return ListUtil.empty();
     }
 
     /*** 
@@ -190,7 +189,7 @@ public class InstrumentManagement extends BaseService {
         } catch (Exception e) {
             logger.error("getMinTrdUnitLimit error:", e);
         }
-        return null;
+        return ListUtil.empty();
     }
 
     public ResultBean minPrice(String tradePlat, Instrument instrument) {

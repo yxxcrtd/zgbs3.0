@@ -1,0 +1,614 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.business.asset.tenderbond.dao.FinTenderBondAssetMapper">
+
+    <select id="selectForPage" parameterType="com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAssetSearch"
+            resultType="com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset001Dto">
+        SELECT  * from (
+            SELECT
+            CASE WHEN <![CDATA[
+                ISSUE.ISSUE_EDATE >= TO_DATE(#{platformDate},'YYYY-MM-DD')  or
+                ISSUE.TENDER_EDATE >= TO_DATE(#{platformDate},'YYYY-MM-DD')  THEN '01'
+            WHEN (ISSUE.ISSUE_EDATE < TO_DATE(#{platformDate},'YYYY-MM-DD') or
+                ISSUE.TENDER_EDATE < TO_DATE(#{platformDate},'YYYY-MM-DD')) and PRODUCT.CIRCULATION_CODE is null THEN '02'
+            WHEN (ISSUE.ISSUE_EDATE < TO_DATE(#{platformDate},'YYYY-MM-DD') or
+                ISSUE.TENDER_EDATE < TO_DATE(#{platformDate},'YYYY-MM-DD')) and PRODUCT.CIRCULATION_CODE is not null THEN '03'
+                ]]>
+            ELSE NULL END AS issueStage,
+            PRODUCT_ADD.ISSUE_STATUS as issueStatus,
+            PRODUCT.FINPROD_MARKET_ID as finprodMarketId,
+            PRODUCT.FINPROD_ABBR as finprodAbbr,
+            PRODUCT.TRADE_MARKET as tradeMarket,
+            PRODUCT.REGIST_ORG as registOrg,
+            PRODUCT.ISSUER as issuer ,
+            PRODUCT.ISSUE_TYPE as issueType,
+            ISSUE.ISSUE_CLASS as issueClass,
+            ISSUE.TENDER_TYPE as tenderType,
+            ISSUE.TENDER_TARGET as tenderTarget,
+            ISSUE.ISSUE_STYLE as issueStyle,
+            round(ISSUE.PLAN_ISSUE_AMT/100000000,2) as planIssueAmt,
+            case when ISSUE.ISSUE_CLASS = '02' THEN ISSUE.ISSUE_SDATE else ISSUE.TENDER_SDATE end as issueDate,
+            ISSUE.PAY_EDATE as payEdate,
+            ISSUE.ASSIGN_REGDATE as assignRegdate,
+            case when PRODUCT.CIRCULATION_CODE is not null then PRODUCT.CIRCULATION_DATE else PRODUCT_ADD.LISTING_DATE end as listingDate,
+            case when PRODUCT.CIRCULATION_CODE is not null then PRODUCT2.FINPROD_MARKET_ID else PRODUCT_ADD.APPEAR_MARKET_ID end as appearMarketId,
+            case when PRODUCT.CIRCULATION_CODE is not null then PRODUCT2.FINPROD_ABBR else PRODUCT.FINPROD_ABBR end as appearMarketAbbr,
+            PRODUCT_ADD.CROSS_MARKET as crossMarket,
+            PRODUCT_ADD.CROSS_MARKET_CODE as crossMarketCode,
+            PRODUCT.VDATE as vdate,
+            PRODUCT.MDATE as mdate,
+            PRODUCT_TYPE.TYPE_9 as type9,
+            PRODUCT_TYPE.TYPE_10 as type10,
+            PRODUCT_TYPE.TYPE_11 as type11,
+            PRODUCT.COUPON_SPECIES as couponSpecies,
+            PRODUCT.CCY as ccy,
+            PRODUCT.ISSUE_PRICE as issuePrice,
+            ISSUE.INT_TYPE as intType,
+            ISSUE.PAY_CYCLE as payCycle,
+            ISSUE.REFER_YIELD as referYield ,
+            round(ISSUE.MIN_PER_TAMT/100000000,2) as minPerTamt,
+            round(ISSUE.MAX_PER_UTAMT/100000000,2) as maxPerUtamt,
+            ZT.RATING as subRate,
+            MCI.CUSTOMER_NAME as subRateOrg,
+            ZX.RATING as debRate,
+            MCIT.CUSTOMER_NAME as debRateOrg,
+            PRODUCT.REMARK as remark,
+            PRODUCT.FINPROD_ID as finprodId
+        FROM FIN_PRODUCT PRODUCT
+        LEFT JOIN FIN_PRODUCT_ADD PRODUCT_ADD ON PRODUCT.FINPROD_ID = PRODUCT_ADD.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE ISSUE ON PRODUCT.FINPROD_ID = ISSUE.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_TYPE PRODUCT_TYPE ON PRODUCT.FINPROD_ID = PRODUCT_TYPE.FINPROD_ID AND PRODUCT_TYPE.BRANCH = 0
+        LEFT JOIN MST_CUSTOMER_INFO CUSTOMER_INFO ON PRODUCT.ISSUER = CUSTOMER_INFO.CUSTOMER_ID
+        LEFT JOIN FIN_PRODUCT PRODUCT2 ON PRODUCT.CIRCULATION_CODE = PRODUCT2.FINPROD_ID
+        LEFT JOIN (	SELECT ASSET_CODE,RATING,GRADE_ORG_ID FROM (
+            SELECT ROW_NUMBER() OVER(PARTITION BY BRATING.O_CODE ORDER BY BRATING.O_CODE,BRATING.GRADE_DATE DESC
+            ,BRATING.GRADE_RESULT DESC) RANK,BRATING.O_CODE AS ASSET_CODE,BRATING.GRADE_RESULT AS RATING,BRATING.GRADE_ORG_ID as GRADE_ORG_ID
+            FROM MST_BOND_CREDIT_RATING BRATING
+            WHERE BRATING.O_TYPE = '01' AND BRATING.GRADE_DATE <![CDATA[<=]]> TO_DATE(#{platformDate},'YYYY-MM-DD')
+            ) WHERE RANK=1
+        ) ZT on PRODUCT.FINPROD_MARKET_ID = ZT.ASSET_CODE
+        LEFT JOIN MST_CUSTOMER_INFO MCI ON MCI.CUSTOMER_ID=ZT.GRADE_ORG_ID
+        LEFT JOIN (	SELECT ASSET_CODE,RATING,GRADE_ORG_ID FROM (
+            SELECT ROW_NUMBER() OVER(PARTITION BY BRATING.O_CODE ORDER BY BRATING.O_CODE,BRATING.GRADE_DATE DESC
+            ,BRATING.GRADE_RESULT DESC ) RANK ,BRATING.O_CODE AS ASSET_CODE ,BRATING.GRADE_RESULT AS RATING,BRATING.GRADE_ORG_ID as GRADE_ORG_ID
+            FROM MST_BOND_CREDIT_RATING BRATING
+            WHERE BRATING.O_TYPE = '02' AND BRATING.GRADE_DATE <![CDATA[<=]]> TO_DATE(#{platformDate},'YYYY-MM-DD')
+            ) WHERE RANK=1
+        ) ZX ON PRODUCT.FINPROD_MARKET_ID = ZX.ASSET_CODE
+        LEFT JOIN MST_CUSTOMER_INFO MCIT ON MCIT.CUSTOMER_ID=ZX.GRADE_ORG_ID
+        <where> PRODUCT.FINPROD_TYPE2=#{finprodType2,jdbcType=VARCHAR}
+              AND PRODUCT.TRADE_MARKET in ('01','02')
+            <if test="finprodMarketId !=null and finprodMarketId !=''">
+                AND PRODUCT.FINPROD_MARKET_ID=#{finprodMarketId,jdbcType=VARCHAR}
+            </if>
+            <if test="tradeMarket !=null and tradeMarket !=''">
+                AND PRODUCT.TRADE_MARKET=#{tradeMarket,jdbcType=VARCHAR}
+            </if>
+            <if test="registOrg !=null and registOrg !=''">
+                AND PRODUCT.REGIST_ORG=#{registOrg,jdbcType=VARCHAR}
+            </if>
+            <if test="issuer !=null and issuer !=''">
+                AND PRODUCT.ISSUER=#{issuer,jdbcType=VARCHAR}
+            </if>
+            <if test="issueType !=null and issueType !=''">
+                AND PRODUCT.ISSUE_TYPE=#{issueType,jdbcType=VARCHAR}
+            </if>
+            <if test="issueClass !=null and issueClass !=''">
+                AND ISSUE.ISSUE_CLASS=#{issueClass,jdbcType=VARCHAR}
+            </if>
+            <if test="tenderType !=null and tenderType !=''">
+                AND ISSUE.TENDER_TYPE=#{tenderType,jdbcType=VARCHAR}
+            </if>
+            <if test="tenderTarget !=null and tenderTarget !=''">
+                AND ISSUE.TENDER_TARGET=#{tenderTarget,jdbcType=VARCHAR}
+            </if>
+            <if test="issueStyle !=null and issueStyle !=''">
+                AND ISSUE.ISSUE_STYLE=#{tradeMarket,jdbcType=VARCHAR}
+            </if>
+            <if test="type !=null and type !=''">
+                AND (PRODUCT_TYPE.TYPE_9=#{type,jdbcType=VARCHAR} or PRODUCT_TYPE.TYPE_10=#{type,jdbcType=VARCHAR} or PRODUCT_TYPE.TYPE_11=#{type,jdbcType=VARCHAR})
+            </if>
+            <if test="couponSpecies !=null and couponSpecies !=''">
+                AND PRODUCT.COUPON_SPECIES=#{couponSpecies,jdbcType=VARCHAR}
+            </if>
+            <if test="intType !=null and intType !=''">
+                AND ISSUE.INT_TYPE=#{intType,jdbcType=VARCHAR}
+            </if>
+            <if test="payCycle !=null and payCycle !=''">
+                AND ISSUE.PAY_CYCLE=#{payCycle,jdbcType=VARCHAR}
+            </if>
+            <if test="ccy !=null and ccy !=''">
+                AND PRODUCT.CCY=#{ccy,jdbcType=VARCHAR}
+            </if>
+            <if test="issueStatus !=null and issueStatus !=''">
+                AND PRODUCT_ADD.ISSUE_STATUS=#{couponSpecies,jdbcType=VARCHAR}
+            </if>
+            <if test="payEdateStart != null">
+                AND ISSUE.PAY_EDATE >= #{payEdateStart,jdbcType=DATE}
+            </if>
+            <if test="payEdateEnd != null">
+            <![CDATA[ AND ISSUE.PAY_EDATE <= #{payEdateEnd,jdbcType=DATE} ]]>
+            </if>
+            <if test="vdateStart != null">
+                AND PRODUCT.VDATE >= #{vdateStart,jdbcType=DATE}
+            </if>
+            <if test="vdateEnd != null">
+            <![CDATA[ AND PRODUCT.VDATE <= #{vdateEnd,jdbcType=DATE} ]]>
+            </if>
+            <if test="mdateStart != null">
+                AND PRODUCT.MDATE >= #{mdateStart,jdbcType=DATE}
+            </if>
+            <if test="mdateEnd != null">
+            <![CDATA[ AND PRODUCT.MDATE <= #{mdateEnd,jdbcType=DATE} ]]>
+            </if>
+        </where>
+        ) t
+        LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'ISSUE_STAGE') E1 ON t.issueStage=E1.ITEM_CODE
+        LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'TRADE_PLACE') E2 ON t.tradeMarket=E2.ITEM_CODE
+        LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'REGIST_ORG') E3 ON t.registOrg=E2.ITEM_CODE
+        LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'RAISE_TYPE') E4 ON t.issueType=E2.ITEM_CODE
+        LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'ISSUE_CLASS') E5 ON t.issueClass=E2.ITEM_CODE
+        LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'TENDER_TYPE') E6 ON t.tenderType=E2.ITEM_CODE
+        LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'TENDER_TARGET') E7 ON t.tenderTarget=E2.ITEM_CODE
+        LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'ISSUE_STYLE') E8 ON t.issueStyle=E2.ITEM_CODE
+        LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'COUPON_SPECIES') E9 ON t.couponSpecies=E2.ITEM_CODE
+        LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'INT_TYPE') E10 ON t.intType=E2.ITEM_CODE
+        LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'CCY') E11 ON t.ccy=E2.ITEM_CODE
+        LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'ISSUE_STATUS') E12 ON t.issueStatus=E2.ITEM_CODE
+        LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'CUSTOM_ASSET_TYPE_TWO') E13 ON t.type9=E2.ITEM_CODE
+        LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'CUSTOM_ASSET_TYPE_THREE') E14 ON t.type10=E2.ITEM_CODE
+        LEFT JOIN (SELECT ITEM_CODE,ITEM_VALUE FROM SYS_DATADICT_LIST T WHERE T.DICT_CODE= 'CUSTOM_ASSET_TYPE_FOUR') E15 ON t.type11=E2.ITEM_CODE
+        <where>
+            <if test="appearMarketId !=null and appearMarketId !=''">
+                AND t.appearMarketId=#{appearMarketId,jdbcType=VARCHAR}
+            </if>
+            <if test="issueDateStart != null">
+                AND t.issueDate >= #{issueDateStart,jdbcType=DATE}
+            </if>
+            <if test="issueDateEnd != null">
+            <![CDATA[ AND t.issueDate <= #{issueDateEnd,jdbcType=DATE} ]]>
+            </if>
+            <if test="listingDateStart != null">
+                AND t.listingDate >= #{listingDateStart,jdbcType=DATE}
+            </if>
+            <if test="listingDateEnd != null">
+            <![CDATA[ AND t.listingDate <= #{listingDateEnd,jdbcType=DATE} ]]>
+            </if>
+            <if test="issueStage != null and issueStage.size() > 0">
+                AND t.issueStage IN
+                <foreach collection="issueStage" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="search !=null and search !=''">
+                (
+                    E1.ITEM_VALUE like '%' || #{search} || '%' OR
+                    E2.ITEM_VALUE like '%' || #{search} || '%' OR
+                    E3.ITEM_VALUE like '%' || #{search} || '%' OR
+                    E4.ITEM_VALUE like '%' || #{search} || '%' OR
+                    E5.ITEM_VALUE like '%' || #{search} || '%' OR
+                    E6.ITEM_VALUE like '%' || #{search} || '%' OR
+                    E7.ITEM_VALUE like '%' || #{search} || '%' OR
+                    E8.ITEM_VALUE like '%' || #{search} || '%' OR
+                    E9.ITEM_VALUE like '%' || #{search} || '%' OR
+                    E10.ITEM_VALUE like '%' || #{search} || '%' OR
+                    E11.ITEM_VALUE like '%' || #{search} || '%' OR
+                    E12.ITEM_VALUE like '%' || #{search} || '%' OR
+                    E13.ITEM_VALUE like '%' || #{search} || '%' OR
+                    E4.ITEM_VALUE like '%' || #{search} || '%' OR
+                    E5.ITEM_VALUE like '%' || #{search} || '%' OR
+                    t.finprodMarketId like '%' || #{search} || '%' OR
+                    t.finprodAbbr like '%' || #{search} || '%' OR
+                    t.issuer like '%' || #{search} || '%' OR
+                    t.appearMarketId like '%' || #{search} || '%' OR
+                    t.crossMarket like '%' || #{search} || '%' OR
+                    t.crossMarketCode like '%' || #{search} || '%' OR
+                    t.subRate like '%' || #{search} || '%' OR
+                    t.subRateOrg like '%' || #{search} || '%' OR
+                    t.debRate like '%' || #{search} || '%' OR
+                    t.debRateOrg like '%' || #{search} || '%' OR
+                    t.remark like '%' || #{search} || '%' OR
+                    t.planIssueAmt ||''= #{search} OR
+                    t.planIssueAmt ||''= #{search} OR
+                    t.issuePrice ||''= #{search} OR
+                    t.referYield ||''= #{search} OR
+                    t.minPerTamt ||''= #{search} OR
+                    t.maxPerUtamt ||''= #{search} OR
+                    to_char(t.issueDate,'yyyy-MM-dd')  = #{search} OR
+                    to_char(t.payEdate,'yyyy-MM-dd')  = #{search} OR
+                    to_char(t.assignRegdate,'yyyy-MM-dd')  = #{search} OR
+                    to_char(t.listingDate,'yyyy-MM-dd')  = #{search} OR
+                    to_char(t.vdate,'yyyy-MM-dd')  = #{search} OR
+                    to_char(t.mdate,'yyyy-MM-dd')  = #{search}
+                )
+            </if>
+        </where>
+        ORDER BY t.issueStage, t.issueStatus,t.issueDate, t.type9, t.type10, t.type11, t.issueClass
+    </select>
+
+    <select id="selectFinprodId" resultType="java.lang.String">
+        select T1.FINPROD_ID from FIN_PRODUCT T1
+        where  T1.FINPROD_TYPE2 = #{finprodType2}
+            AND T1.TRADE_MARKET in(#{TRADE_PLACE_01},#{TRADE_PLACE_02})
+            AND T1.FINPROD_MARKET_ID=#{finprodMarketId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectBondCreditRating" resultType="com.joyintech.tams.business.asset.tenderbond.dto.MstBondCreditRatingDto">
+        select
+            t.O_TYPE as oType,
+            t.SHORT_LONG_TERM as shortLongTerm,
+            t.GRADE_DATE as gradeDate,
+            t.RATING as gradeResult,
+            MCI.CUSTOMER_NAME as gradeOrg
+        from (
+            SELECT ASSET_CODE,RATING,GRADE_ORG_ID,SHORT_LONG_TERM,O_TYPE,GRADE_DATE FROM (
+               SELECT ROW_NUMBER() OVER(PARTITION BY BRATING.O_CODE ORDER BY BRATING.O_CODE,BRATING.GRADE_DATE DESC
+                   ,BRATING.GRADE_RESULT DESC) RANK,BRATING.O_CODE AS ASSET_CODE,BRATING.GRADE_RESULT AS RATING,
+                   BRATING.GRADE_ORG_ID as GRADE_ORG_ID,BRATING.SHORT_LONG_TERM as SHORT_LONG_TERM,
+                   BRATING.O_TYPE as O_TYPE,BRATING.GRADE_DATE as GRADE_DATE
+               FROM MST_BOND_CREDIT_RATING BRATING
+               WHERE BRATING.O_TYPE = '01' AND BRATING.GRADE_DATE <![CDATA[<=]]> TO_DATE(#{platformDate},'YYYY-MM-DD')
+           ) WHERE RANK=1
+           union all
+           SELECT ASSET_CODE,RATING,GRADE_ORG_ID,SHORT_LONG_TERM,O_TYPE,GRADE_DATE FROM (
+               SELECT ROW_NUMBER() OVER(PARTITION BY BRATING.O_CODE ORDER BY BRATING.O_CODE,BRATING.GRADE_DATE DESC
+                   ,BRATING.GRADE_RESULT DESC ) RANK ,BRATING.O_CODE AS ASSET_CODE ,BRATING.GRADE_RESULT AS RATING,
+                   BRATING.GRADE_ORG_ID as GRADE_ORG_ID,BRATING.SHORT_LONG_TERM as SHORT_LONG_TERM,
+                   BRATING.O_TYPE as O_TYPE,BRATING.GRADE_DATE as GRADE_DATE
+               FROM MST_BOND_CREDIT_RATING BRATING
+               WHERE BRATING.O_TYPE = '02' AND BRATING.GRADE_DATE <![CDATA[<=]]> TO_DATE(#{platformDate},'YYYY-MM-DD')
+            ) WHERE RANK=1
+        ) t
+        LEFT JOIN MST_CUSTOMER_INFO MCI ON MCI.CUSTOMER_ID=t.GRADE_ORG_ID
+        where t.ASSET_CODE=#{finprodMarketId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="countFinprodIdUse" resultType="java.lang.Integer">
+        select sum(qty) from (
+            select count(1) as qty from ETR_ENTRUST where FINPROD_ID=#{finprodId}
+            <if test="isCancel !=null and isCancel !=''">
+                and ENTRUST_STATUS not in ('05','07') <!-- 撤销、退回 -->
+            </if>
+            union all
+            select count(1) as qty from WFL_ETR_ENTRUST where FINPROD_ID=#{finprodId}
+            union all
+            select count(1) as qty from TRD_FIN_PRODUCT_DEAL_TOTAL t
+            INNER JOIN TRD_PRODUCT_DEAL  d on t.TOTLE_TRADE_ID=d.TOTLE_TRADE_ID
+            where FINPROD_ID=#{finprodId}
+            <if test="isCancel !=null and isCancel !=''">
+                and IS_CANCEL ='N' <!-- 撤销 -->
+            </if>
+            union all
+            select count(1) as qty from WFL_TRD_FIN_PRODUCT_DEAL_TOTAL where FINPROD_ID=#{finprodId}
+        )
+    </select>
+
+    <select id="countListing" resultType="java.lang.Integer">
+        select count(1) as qty from TRD_FIN_PRODUCT_DEAL_TOTAL where FINPROD_ID=#{finprodId} and IS_CANCEL ='N'
+    </select>
+
+
+    <resultMap id="finprodIdMap" type="com.joyintech.framework.select.SelectOptionDto">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="text" property="text" jdbcType="VARCHAR"/>
+        <association property="object" javaType="java.util.Map">
+            <result column="FINPROD_NAME" property="finprodName" jdbcType="VARCHAR" />
+            <result column="CALENDAR_ID" property="calendarId" jdbcType="VARCHAR" />
+            <result column="FINPROD_ID" property="finprodId" jdbcType="VARCHAR" />
+            <result column="TRADE_MARKET" property="tradeMarket" jdbcType="VARCHAR" />
+            <result column="IS_RIGHT" property="isRight" jdbcType="VARCHAR" />
+            <result column="TYPE_9" property="assetType1" jdbcType="VARCHAR" />
+            <result column="TYPE_10" property="assetType10" jdbcType="VARCHAR" />
+            <result column="TYPE_11" property="assetType11" jdbcType="VARCHAR" />
+            <result column="VDATE" property="finvdate" jdbcType="VARCHAR" />
+            <result column="MDATE" property="finmdate" jdbcType="VARCHAR" />
+            <result column="CCY" property="ccy" jdbcType="VARCHAR" />
+        </association>
+    </resultMap>
+
+    <select id="getFinprodIdForSelect" resultMap="finprodIdMap">
+        SELECT
+            T1.FINPROD_MARKET_ID id,
+            T1.FINPROD_ABBR text,
+            T1.FINPROD_NAME,
+            T1.FINPROD_ID,
+            T1.CALENDAR_ID,
+            T1.TRADE_MARKET,
+            T1.IS_RIGHT,
+            T2.TYPE_9,
+            T2.TYPE_10,
+            T2.TYPE_11,
+            to_char(T1.VDATE,'yyyy-MM-dd') VDATE,
+            to_char(T1.MDATE, 'yyyy-MM-dd') MDATE,
+            T1.CCY
+        FROM FIN_PRODUCT T1
+        LEFT JOIN FIN_PRODUCT_TYPE T2 ON T1.FINPROD_ID = T2.FINPROD_ID
+        <where>
+            AND T1.VDATE <![CDATA[<=]]> #{platDate,jdbcType=DATE}
+            AND T1.MDATE <![CDATA[>=]]> #{platDate,jdbcType=DATE}
+            AND T1.FINPROD_TYPE2 = #{finprodType2}
+            AND T1.TRADE_MARKET in(#{TRADE_PLACE_01},#{TRADE_PLACE_02})
+            <if test="initValue != null and !initValue.equals('')">
+                and T1.FINPROD_MARKET_ID = #{initValue}
+            </if>
+            <if test="search != null and !search.equals('')">
+                and (T1.FINPROD_MARKET_ID like concat('%',concat(#{search},'%'))
+                        or T1.FINPROD_NAME like concat('%',concat(#{search},'%'))
+                        or T1.FINPROD_ABBR like concat('%',concat(#{search},'%'))
+                        or T1.FINPROD_ID like concat('%',concat(#{search},'%'))
+                    )
+            </if>
+        </where>
+    </select>
+
+    <select id="getAppearMarketIdForSelect" resultMap="finprodIdMap">
+        select t.* from (
+            SELECT
+                case when PRODUCT.CIRCULATION_CODE is not null then PRODUCT2.FINPROD_MARKET_ID else PRODUCT_ADD.APPEAR_MARKET_ID end as id,
+                case when PRODUCT.CIRCULATION_CODE is not null then PRODUCT2.FINPROD_ABBR else PRODUCT.FINPROD_ABBR end as text,
+                PRODUCT.TRADE_MARKET,
+                PRODUCT.VDATE,
+                PRODUCT.MDATE,
+                PRODUCT.FINPROD_TYPE2
+            FROM FIN_PRODUCT PRODUCT
+            LEFT JOIN FIN_PRODUCT_ADD PRODUCT_ADD ON PRODUCT.FINPROD_ID = PRODUCT_ADD.FINPROD_ID
+            LEFT JOIN FIN_PRODUCT PRODUCT2 ON PRODUCT.CIRCULATION_CODE = PRODUCT2.FINPROD_ID
+        ) t
+        <where>
+            AND t.VDATE <![CDATA[<=]]> #{platDate,jdbcType=DATE}
+            AND t.MDATE <![CDATA[>=]]> #{platDate,jdbcType=DATE}
+            AND t.FINPROD_TYPE2 = #{finprodType2}
+            AND t.TRADE_MARKET in(#{TRADE_PLACE_01},#{TRADE_PLACE_02})
+            <if test="initValue != null and !initValue.equals('')">
+                and t.id = #{initValue}
+            </if>
+            <if test="search != null and !search.equals('')">
+                and (t.id like concat('%',concat(#{search},'%'))
+                        or t.text like concat('%',concat(#{search},'%'))
+                    )
+            </if>
+        </where>
+        <if test="includeInterface !=null">
+            union
+            select
+                t.secid as id,
+                t.SECNAME as text,
+                t.MARKET2 as TRADE_MARKET,
+                t.VDATE,
+                t.MDATE,
+                null as FINPROD_TYPE2
+            from INTERF_PAYHSRCSECINFO t
+            <where>
+                AND t.VDATE <![CDATA[<=]]> #{platDate,jdbcType=DATE}
+                AND t.MDATE <![CDATA[>=]]> #{platDate,jdbcType=DATE}
+                AND t.MARKET2 in(#{TRADE_PLACE_01},#{TRADE_PLACE_02})
+                <if test="initValue != null and !initValue.equals('')">
+                    and t.secid = #{initValue}
+                </if>
+                <if test="search != null and !search.equals('')">
+                    and (t.secid like concat('%',concat(#{search},'%'))
+                            or t.SECNAME like concat('%',concat(#{search},'%'))
+                        )
+                </if>
+            </where>
+        </if>
+    </select>
+
+
+    <select id="getCrossMarketCodeForSelect" resultMap="finprodIdMap">
+        select
+            t.secid as id,
+            t.SECNAME as text,
+            t.MARKET2 as TRADE_MARKET,
+            t.VDATE,
+            t.MDATE,
+            null as FINPROD_TYPE2
+        from INTERF_PAYHSRCSECINFO t
+        <where>
+            t.VDATE <![CDATA[<=]]> #{platDate,jdbcType=DATE}
+            AND t.MDATE <![CDATA[>=]]> #{platDate,jdbcType=DATE}
+            <if test="tradeMarket != null and !tradeMarket.equals('')">
+                AND t.MARKET2 not in(#{tradeMarket})
+            </if>
+            <if test="initValue != null and !initValue.equals('')">
+                and t.secid = #{initValue}
+            </if>
+            <if test="search != null and !search.equals('')">
+                and (t.secid like concat('%',concat(#{search},'%'))
+                        or t.SECNAME like concat('%',concat(#{search},'%'))
+                    )
+            </if>
+        </where>
+        union
+        select
+            t.FINPROD_MARKET_ID as id,
+            t.FINPROD_ABBR as text,
+            t.TRADE_MARKET,
+            t.VDATE,
+            t.MDATE,
+            t.FINPROD_TYPE2
+        from FIN_PRODUCT t
+        <where>
+            AND t.VDATE <![CDATA[<=]]> #{platDate,jdbcType=DATE}
+            AND t.MDATE <![CDATA[>=]]> #{platDate,jdbcType=DATE}
+            AND t.FINPROD_TYPE2 = #{finprodType2}
+            <if test="tradeMarket != null and !tradeMarket.equals('')">
+                AND t.TRADE_MARKET not in(#{tradeMarket})
+            </if>
+            <if test="initValue != null and !initValue.equals('')">
+                and t.FINPROD_MARKET_ID = #{initValue}
+            </if>
+            <if test="search != null and !search.equals('')">
+                and (t.FINPROD_MARKET_ID like concat('%',concat(#{search},'%'))
+                        or t.FINPROD_ABBR like concat('%',concat(#{search},'%'))
+                    )
+            </if>
+        </where>
+    </select>
+
+    <select id="getIntRateForSelect" resultMap="finprodIdMap">
+            select
+                to_char(INT_RATE,'FM99990.99999999999999') id,
+                t.INT_RATE text,
+                t.CCY
+            from MST_INT_RATE_INFO t
+            <where>
+                AND t.EFF_DATE <![CDATA[<=]]> #{platDate,jdbcType=DATE}
+                AND t.INT_RATE_TYPE = #{intRateType}
+                <if test="initValue != null and !initValue.equals('')">
+                    and t.id = #{initValue}
+                </if>
+                <if test="search != null and !search.equals('')">
+                    and (t.id like concat('%',concat(#{search},'%'))
+                            or to_char(t.INT_RATE,'FM99990.99999999999999') like concat('%',concat(#{search},'%'))
+                        )
+                </if>
+            </where>
+    </select>
+
+    <select id="getBusinessData" parameterType="com.joyintech.tams.component.business.core.dto.WflValidInputParameter" resultType="java.lang.String">
+        select pm.STATUS status
+        from SYS_DATA_PROCESS_MARK pm
+        inner join (
+            select
+                max(HIS_NO)	       HIS_NO,
+                WORKFLOW_ID
+            from SYS_DATA_PROCESS_MARK
+            <where>
+                <if test="pageId != null and pageId !=''">
+                    PAGE_ID = #{pageId}
+                </if>
+            </where>
+            group by  WORKFLOW_ID
+        ) tempHis on  pm.HIS_NO = tempHis.HIS_NO and pm.WORKFLOW_ID = tempHis.WORKFLOW_ID
+        <where>
+            <if test="seachMode != null and seachMode !='' and seachMode == '01'.toString()">
+                pm.status in ('A','U','P')
+            </if>
+            <if test="pageId != null and pageId !=''">
+                and pm.PAGE_ID = #{pageId}
+            </if>
+            <if test="businessDataPk1 != null and businessDataPk1 !=''">
+                and pm.BUSINESS_DATA_PK1 = #{businessDataPk1}
+            </if>
+            <if test="businessDataPk2 != null and businessDataPk2 !=''">
+                and pm.BUSINESS_DATA_PK2 = #{businessDataPk2}
+            </if>
+            <if test="workflowId != null and workflowId !=''">
+                and pm.WORKFLOW_ID != #{workflowId}
+            </if>
+        </where>
+        order by pm.create_time desc
+    </select>
+
+    <select id="selectTotleTradeId" resultType="java.lang.String">
+        select T.TOTLE_TRADE_ID from TRD_FIN_PRODUCT_DEAL_TOTAL T
+        inner join TRD_FIN_PRODUCT_BARTER_TOTAL B on T.TOTLE_TRADE_ID=B.TRADE_ID ||'R'
+        where T.FINPROD_ID=#{finprodId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getBoundMarketInfo" resultType="com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBoundAsset004Dto" parameterType="Map">
+        SELECT
+            PAYHSRCSECINFO.SECID,
+            PAYHSRCSECINFO.SECNAME,
+            PAYHSRCSECINFO.SECFULLNAME,
+            PAYHSRCSECINFO.SECCODE,
+            PAYHSRCSECINFO.MARKET,
+            PAYHSRCSECINFO.INSTITUTION,
+            PAYHSRCSECINFO.ISSUEPRICE,
+            PAYHSRCSECINFO.PUBENDDATE,
+            PAYHSRCSECINFO.VDATE,
+            PAYHSRCSECINFO.MDATE,
+            PAYHSRCSECINFO.ISSUEAMT,
+            CUSTOMER_INFO1.CUSTOMER_NAME issuerName,
+            PAYHSRCSECINFO.SECTYPE,
+            PAYHSRCSECINFO.SECTYPE2,
+            CASE
+            PAYHSRCSECINFO.ISSUETYPE
+            WHEN '01' THEN
+            '1' ELSE '2'
+            END AS ISSUETYPE,
+            PAYHSRCSECINFO.BLNAREA,
+            PAYHSRCSECINFO.ISSUS,
+            PAYHSRCSECINFO.ISSECBOND,
+            PAYHSRCSECINFO.CITY_INVEST_SEC_CHB CITYINVESTSECWIND,
+            PAYHSRCSECINFO.CCY,
+            PAYHSRCSECINFO.FACEVALUE,
+            CUSTOMER_INFO2.CUSTOMER_NAME WARRANTOR,
+            PAYHSRCSECINFO.GUARTYPE,
+            CASE
+
+            WHEN ( PAYHSRCSECINFO.CALLOPTION = 'Y' OR PAYHSRCSECINFO.PUTOPTION = 'Y' ) THEN
+            '是' ELSE '否'
+            END AS IS_RIGHT,
+            PAYHSRCSECINFO.REMARK,
+            PAYHSRCSECINFO.COUPONSPECIES,
+            PAYHSRCSECINFO.INTERESTRATE,
+            PAYHSRCSECINFO.PAPERIR,
+            PAYHSRCSECINFO.SPREADRATE_8,
+            PAYHSRCSECINFO.RATECODE,
+            PAYHSRCSECINFO.COEFFICIENT,
+            PAYHSRCSECINFO.TOPRATE,
+            PAYHSRCSECINFO.BOTTOMRATE,
+            PAYHSRCSECINFO.RESETTYPE,
+            PAYHSRCSECINFO.OBSERVEBEFDAY,
+            PAYHSRCSECINFO.OBSERVEBEFUNIT,
+            CASE
+
+            WHEN ( PAYHSRCSECINFO.RATEBASIC = 'A/A_B_COUP' OR PAYHSRCSECINFO.PUTOPTION = 'A_B_DAY' ) THEN
+            'A/A' ELSE PAYHSRCSECINFO.RATEBASIC
+            END AS RATEBASIC,
+            CASE
+
+            WHEN PAYHSRCSECINFO.RATEBASIC = 'A/A_B_COUP' THEN
+            '02'
+            WHEN PAYHSRCSECINFO.RATEBASIC = 'A/A_B_DAY' THEN
+            '01'
+            END AS BASISSTYLE,
+            PAYHSRCSECINFO.WORKDAYRULE,
+            PAYHSRCSECINFO.PAYCYCLE,
+            PAYHSRCSECINFO.SCHECALRULE,
+            PAYHSRCSECINFO.FIRSTRATEDAY
+        FROM
+        INTERF_PAYHSRCSECINFO PAYHSRCSECINFO
+        LEFT JOIN INTERF_CUSTOMER_INFO CUSTOMER_INFO1 ON PAYHSRCSECINFO.ISSUERSHORT = CUSTOMER_INFO1.CUSTOMER_ID
+        LEFT JOIN INTERF_CUSTOMER_INFO CUSTOMER_INFO2 ON CUSTOMER_INFO1.CUSTOMER_ID = PAYHSRCSECINFO.GUARANTOR
+        LEFT JOIN INTERF_PAYHSRCSECOPTION PAYHSRCSECOPTION ON PAYHSRCSECOPTION.SECID = PAYHSRCSECINFO.SECID
+        LEFT JOIN INTERF_PAYHSRCSECRATING PAYHSRCSECRATING ON PAYHSRCSECRATING.SECID = PAYHSRCSECINFO.SECID AND PAYHSRCSECRATING.ratingtype = 'C'
+        LEFT JOIN INTERF_PAYHSRCSECRATING PAYHSRCSECRATING2 ON PAYHSRCSECRATING2.SECID = PAYHSRCSECINFO.SECID AND PAYHSRCSECRATING2.ratingtype = 'I'
+        WHERE
+            PAYHSRCSECINFO.VDATE <![CDATA[<=]]> STR_TO_DATE ( #{iplatformDate}, '%Y-%m-%d' )
+        ORDER BY
+            PAYHSRCSECINFO.SECTYPE,
+            PAYHSRCSECINFO.SECTYPE2,
+            PAYHSRCSECINFO.VDATE,
+            PAYHSRCSECINFO.SECID;
+    </select>
+
+
+    <!-- 债券付息信息 -->
+    <select id="selectWindBondSchedule" resultType="com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBoundAsset004PayHSrcSecSchedulDto" parameterType="Map">
+        select
+        SECID,
+        SCHEDUTYPE,
+        TOTALINTERESTSTARTDAY,
+        TOTALINTERESTENDDAY,
+        INTERESTSTARTDAY,
+        INTERESTENDDAY,
+        INTERESTPAYDAY,
+        COUPONRATE,
+        ACCRUEINTAMT,
+        DAILYACCRUEINT,
+        PRINAMTPAY,
+        CASHPAY,
+        PRINAMT,
+        SOURCE
+        from
+        INTERF_PAYHSRCSECSCHEDULE
+        where SECID = #{secid,jdbcType=VARCHAR}
+        <if test="maxTradeDate != null">
+            AND INTERESTSTARTDAY >= #{maxTradeDate,jdbcType=VARCHAR}
+        </if>
+        ORDER BY INTERESTPAYDAY ASC
+    </select>
+</mapper>

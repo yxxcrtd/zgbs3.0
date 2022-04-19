@@ -250,4 +250,11 @@ public interface ITradeResponse {
     void resQueryReissueEntrust(String accountId, Map<String, EntrustInterface> entrustInterfaceMap, Long requestId);
 
     void resQueryReissueTrade(String accountId, List<Trade> tradeList, Long requestId);
+    
+    /**
+     * @Description: 我收到的协商成交行情查询返回
+     * @param list
+     * @param requestId
+     */
+    void resQueryNegotiateQuoteReceive(List<NegotiateQuoteReceiveBean> list, Long requestId);
 }

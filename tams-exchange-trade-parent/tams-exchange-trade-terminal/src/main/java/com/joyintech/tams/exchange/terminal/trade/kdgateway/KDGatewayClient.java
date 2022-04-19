@@ -338,4 +338,10 @@ public class KDGatewayClient implements ITradeRequest {
         }
     }
 
+	@Override
+	public void queryNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean, Long requestId) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

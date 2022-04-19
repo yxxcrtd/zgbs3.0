@@ -33,16 +33,14 @@
                                                     data-th-data-result='${TRADE_PLACE}' allowClear="true" formatoption="true"></select>
                                         </div>
                                     </div>
-                                    <div class="layui-inline layui-col-md4 layui-col-sm4 layui-col-lg4 layui-col-xs4 layui-inline-width">
-                                        <label class="layui-form-label form-lable label-width" data-th-text="#{ExchangeTransMatch001.tradePlat}">交易平台</label>
-                                        <div class="layui-input-inline input-inline">
-                                            <select type="text" id="tradePlat" name="tradePlat" class="layui-input form-input input-select"
-                                                    placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"
-                                                    data-th-data-result='${SHARES_TRADE_PLATFORM}' allowClear="true" formatoption="true"></select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="layui-form-item">
+<!--                                    <div class="layui-inline layui-col-md4 layui-col-sm4 layui-col-lg4 layui-col-xs4 layui-inline-width">-->
+<!--                                        <label class="layui-form-label form-lable label-width" data-th-text="#{ExchangeTransMatch001.tradePlat}">交易平台</label>-->
+<!--                                        <div class="layui-input-inline input-inline">-->
+<!--                                            <select type="text" id="tradePlat" name="tradePlat" class="layui-input form-input input-select"-->
+<!--                                                    placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"-->
+<!--                                                    data-th-data-result='${SHARES_TRADE_PLATFORM}' allowClear="true" formatoption="true"></select>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
                                     <div class="layui-inline layui-col-md4 layui-col-sm4 layui-col-lg4 layui-col-xs4 layui-inline-width">
                                         <label class="layui-form-label form-lable label-width" data-th-text="#{ExchangeTransMatch001.ps}">交易方向</label>
                                         <div class="layui-input-inline input-inline">
@@ -51,6 +49,8 @@
                                                     data-th-data-result='${PS}' allowClear="true" formatoption="true"></select>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="layui-form-item">
                                     <div class="layui-inline layui-col-md4 layui-col-sm4 layui-col-lg4 layui-col-xs4 layui-inline-width">
                                         <label class="layui-form-label form-lable label-width"
                                                data-th-text="#{ExchangeTransMatch001.secAcctNo}">证券账号</label>
@@ -62,23 +62,21 @@
                                             </select>
                                         </div>
                                     </div>
-                                </div>
-
-                                <div class="layui-form-item">
-
                                     <div class="layui-inline layui-col-md4 layui-col-sm4 layui-col-lg4 layui-col-xs4 layui-inline-width">
                                         <label class="layui-form-label form-lable label-width"
                                                data-th-text="#{ExchangeTransMatch001.applyNo}">申请编号</label>
                                         <div class="layui-input-inline input-inline">
                                             <select type="text" id="applyNo" name="applyNo"
-                                                   class="layui-input form-input input-select" placeholder="请输入内容"
-                                                   data-th-placeholder="#{SysCommon.placeholder}" multiple="true"
-                                                   data-th-data-url="@{/invest/trade/exchangetransmatch/ExchangeTransMatch001/getApplyNo?isFromMatch=Y}"
-                                                   allowClear="true" >
+                                                    class="layui-input form-input input-select" placeholder="请输入内容"
+                                                    data-th-placeholder="#{SysCommon.placeholder}" multiple="true"
+                                                    data-th-data-url="@{/invest/trade/exchangetransmatch/ExchangeTransMatch001/getApplyNo?isFromMatch=Y}"
+                                                    allowClear="true" >
                                             </select>
                                         </div>
                                     </div>
+                                </div>
 
+                                <div class="layui-form-item">
                                     <div class="layui-inline layui-col-md4 layui-col-sm4 layui-col-lg4 layui-col-xs4 layui-inline-width">
                                         <label class="layui-form-label form-lable label-width"
                                                data-th-text="#{ExchangeTransMatch001.finprodId}">资产代码</label>
@@ -91,8 +89,6 @@
                                             </select>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="layui-form-item" id="ExchangeTransMatch001_more_div" style="display: none">
                                     <div class="layui-inline layui-col-md4 layui-col-sm4 layui-col-lg4 layui-col-xs4 layui-inline-width">
                                         <label class="layui-form-label form-lable label-width" data-th-text="#{ExchangeTransMatch001.tradeDate}">交易日期</label>
                                         <div class="layui-input-inline input-inline">
@@ -101,6 +97,8 @@
                                                    data-th-placeholder="#{SysCommon.placeholder}">
                                         </div>
                                     </div>
+                                </div>
+                                <div class="layui-form-item" id="ExchangeTransMatch001_more_div" style="display: none">
                                     <div class="layui-inline layui-col-md4 layui-col-sm4 layui-col-lg4 layui-col-xs4 layui-inline-width">
                                         <label class="layui-form-label form-lable label-width" data-th-text="#{ExchangeTransMatch001.matchStatus}">匹配状态</label>
                                         <div class="layui-input-inline input-inline">
@@ -109,8 +107,6 @@
                                                     data-th-data-result='${TRD_MATCH_STATUS}' allowClear="true" formatoption="true"></select>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="layui-form-item" id="ExchangeTransMatch001_more_div2" style="display: none">
                                     <div class="layui-inline layui-col-md8 layui-col-sm8 layui-col-lg8 layui-col-xs8 layui-inline-width">
                                         <label class="layui-form-label form-lable label-width">交易金额(元)</label>
                                         <input type="text" id="tradeAmt1" name="tradeAmt1"
@@ -124,6 +120,8 @@
                                                data-th-value="${entity?.tradeAmt2}" >
                                     </div>
                                 </div>
+<!--                                <div class="layui-form-item" id="ExchangeTransMatch001_more_div2" style="display: none">-->
+<!--                                </div>-->
                                 <div class="layui-form-item">
                                     <div style="float: left">
                                         <a class="layui-btn layui-btn-sm btn-search" id="ExchangeTransMatch001_deal_btn_search">查询</a>
@@ -200,14 +198,14 @@
                                     </div>
                                 </div>
                                 <div class="layui-form-item">
-                                    <div class="layui-inline layui-col-md4 layui-col-sm4 layui-col-lg4 layui-col-xs4 layui-inline-width">
-                                        <label class="layui-form-label form-lable label-width" data-th-text="#{ExchangeTransMatch001.tradePlat}">交易平台</label>
-                                        <div class="layui-input-inline input-inline">
-                                            <select type="text" id="dealTradePlat" name="tradePlat" class="layui-input form-input input-select"
-                                                    placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"
-                                                    data-th-data-result='${SHARES_TRADE_PLATFORM}' allowClear="true" formatoption="true"></select>
-                                        </div>
-                                    </div>
+<!--                                    <div class="layui-inline layui-col-md4 layui-col-sm4 layui-col-lg4 layui-col-xs4 layui-inline-width">-->
+<!--                                        <label class="layui-form-label form-lable label-width" data-th-text="#{ExchangeTransMatch001.tradePlat}">交易平台</label>-->
+<!--                                        <div class="layui-input-inline input-inline">-->
+<!--                                            <select type="text" id="dealTradePlat" name="tradePlat" class="layui-input form-input input-select"-->
+<!--                                                    placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"-->
+<!--                                                    data-th-data-result='${SHARES_TRADE_PLATFORM}' allowClear="true" formatoption="true"></select>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
 
                                     <div class="layui-inline layui-col-md4 layui-col-sm4 layui-col-lg4 layui-col-xs4 layui-inline-width">
                                         <label class="layui-form-label form-lable label-width" data-th-text="#{ExchangeTransMatch001.entrustDate}">指令日期</label>

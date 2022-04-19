@@ -855,6 +855,8 @@ public class EtrExchangeTradeCommon004Controller extends BaseController {
         String msg = "";
         String businessType = etrExchangeTrade001CommonService.setEntrustBussType(dto);
         dto.setBusinessTypeName(SysDataUtil.getNameFromDataDict(DictCode.共通业务类型, businessType));
+        etrExchangeTrade001CommonService.genBusiTypeTg(dto);
+
         if (StringUtil.equals("save", dto.getOperateType())) {  //保存没有check和任何限制
             //业务编号生成规则参数
             ProcessParameter<EtrExchangeTradeSaveRequest> processParameter = new ProcessParameter<EtrExchangeTradeSaveRequest>();
