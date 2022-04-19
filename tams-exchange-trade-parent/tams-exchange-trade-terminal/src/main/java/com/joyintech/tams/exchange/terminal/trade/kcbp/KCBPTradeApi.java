@@ -816,6 +816,12 @@ public class KCBPTradeApi {
         if (IntegratedEntrustUtils.isBulk(cancelEntrustBean.getEntrustProp())) {
             parameters.put("funcid", KCBP_FUNCTION_CODE_CANCEL_ENTRUST);
         }
+        //深圳现券成交申报、现券竞买发起、现券竞买应价撤单
+        if (EntrustProp.SZ_XSCJ_XD.value.equals(cancelEntrustBean.getEntrustProp())
+        		|| EntrustProp.SZ_XSCJ_JS.value.equals(cancelEntrustBean.getEntrustProp())
+        		|| EntrustProp.SZ_XSCJ_JJ.value.equals(cancelEntrustBean.getEntrustProp())) {
+            parameters.put("funcid", "410679");
+        }
         parameters.put("orderdate", cancelEntrustBean.getTradingDay());
         parameters.put("ordersno", cancelEntrustBean.getBrokerEntrustId());
         parameters.put("bsflag", cancelEntrustBean.getBsFlag());

@@ -32,84 +32,84 @@ public class MsgBeanHandler implements EventHandler<MsgBean> {
             TradeMsgReceiver.consumerOffset.incrementAndGet();
             transactionHelper.clear();
             switch (msgBean.getMsgType()) {
-                case MsgType.REQ_ENTRUST: {
+                case MsgType.REQ_ENTRUST: {//普通下单
                     tradeMsgProcessor.handleEntrust((Entrust) msgBean.getMsg(), msgBean.getTradeAgent(), MsgType.REQ_ENTRUST);
                     break;
                 }
-                case MsgType.RESP_ENTRUST:
-                case MsgType.NOTIFY_ENTRUST_ERROR: {
+                case MsgType.RESP_ENTRUST://普通下单响应
+                case MsgType.NOTIFY_ENTRUST_ERROR: {//下单异常通知
                     tradeMsgProcessor.onRspEntrust((TerminalId) msgBean.getMsg());
                     break;
                 }
-                case MsgType.NOTIFY_ENTRUST: {
+                case MsgType.NOTIFY_ENTRUST: {//普通下单结果通知
                     tradeMsgProcessor.onRtnEntrust((Entrust) msgBean.getMsg());
                     break;
                 }
-                case MsgType.NOTIFY_INTEGRATED: {
+                case MsgType.NOTIFY_INTEGRATED: {//综合下单结果通知
                     tradeMsgProcessor.onRtnIntegratedEntrust((IntegratedEntrust) msgBean.getMsg());
                     break;
                 }
-                case MsgType.NOTIFY_TRADE_RECORD: {
+                case MsgType.NOTIFY_TRADE_RECORD: {//成交通知
                     tradeMsgProcessor.onTrade((Trade) msgBean.getMsg());
                     break;
                 }
-                case MsgType.REQ_ENTRUST_CANCEL: {
+                case MsgType.REQ_ENTRUST_CANCEL: {//撤单
                     tradeMsgProcessor.cancelEntrust((EntrustInterface) msgBean.getMsg());
                     break;
                 }
-                case MsgType.RESP_CANCEL: {
+                case MsgType.RESP_CANCEL: {//撤单响应
                     tradeMsgProcessor.onRspCancelEntrust((CancelEntrustBean) msgBean.getMsg());
                     break;
                 }
-                case MsgType.REQ_INTEGRATED: {
+                case MsgType.REQ_INTEGRATED: {//综合下单
                     tradeMsgProcessor.handIntegratedEntrust((IntegratedEntrust) msgBean.getMsg(), msgBean.getTradeAgent(), MsgType.REQ_INTEGRATED);
                     break;
                 }
-                case MsgType.RESP_INTEGRATED: {
+                case MsgType.RESP_INTEGRATED: {//综合下单响应
                     tradeMsgProcessor.onRspIntegratedEntrust((TerminalId) msgBean.getMsg());
                     break;
                 }
-                case MsgType.EXAMINE_ENTRUST: {
+                case MsgType.EXAMINE_ENTRUST: {//委托审核
                     ExamineOrder order = (ExamineOrder) msgBean.getMsg();
                     tradeMsgProcessor.handleExamineEntrust((EntrustInterface) order.getOrder(), order.getInstructionsStatus(), order.getApproveReason(), order.getProcessType());
                     break;
                 }
-                case MsgType.EXAMINE_REVIEW: {
+                case MsgType.EXAMINE_REVIEW: {//复核审批
                     ExamineOrder order = (ExamineOrder) msgBean.getMsg();
                     tradeMsgProcessor.handleReviewExamine((EntrustInterface) order.getOrder(), order.getInstructionsStatus(), order.getApproveReason(), order.getProcessType());
                     break;
                 }
-                case MsgType.EXAMINE_REVOKE: {
+                case MsgType.EXAMINE_REVOKE: {//撤销审批
                     ExamineOrder order = (ExamineOrder) msgBean.getMsg();
                     tradeMsgProcessor.handleRevokeExamine((EntrustInterface) order.getOrder(), order.getInstructionsStatus(), order.getApproveReason(), order.getProcessType());
                     break;
                 }
-                case MsgType.MQ_INSTRUCTION: {
+                case MsgType.MQ_INSTRUCTION: {//推送指令
                     SimpleRabbitMessage instructionKeyMsg = (SimpleRabbitMessage) msgBean.getMsg();
                     messageConsumerService.handleInstructionFromMQ(instructionKeyMsg);
                     break;
                 }
-                case MsgType.REQ_BATCH_ORDER: {
+                case MsgType.REQ_BATCH_ORDER: {//批量委托
                     tradeMsgProcessor.genFirstBatchEntrust((BatchInfo) msgBean.getMsg());
                     break;
                 }
-                case MsgType.BATCH_ORDER_JOB: {
+                case MsgType.BATCH_ORDER_JOB: {//批量委托
                     tradeMsgProcessor.handleBatchOrder((BatchInfo) msgBean.getMsg());
                     break;
                 }
-                case MsgType.FROZEN_PENDING_ENTRUST: {
+                case MsgType.FROZEN_PENDING_ENTRUST: {//待审批委托冻结处理
                     tradeMsgProcessor.handleFrozenPendingApprovalEntrust((Entrust) msgBean.getMsg());
                     break;
                 }
-                case MsgType.FROZEN_PENDING_INTEGRATED: {
+                case MsgType.FROZEN_PENDING_INTEGRATED: {//待审批综合委托冻结处理
                     tradeMsgProcessor.handleFrozenPendingApprovalIntegratedEntrust((IntegratedEntrust) msgBean.getMsg());
                     break;
                 }
-                case MsgType.UNFROZEN_INNER: {
+                case MsgType.UNFROZEN_INNER: {//撤审内部撤销
                     tradeMsgProcessor.unfrozenForInnerByCancelEntrust((EntrustInterface) msgBean.getMsg());
                     break;
                 }
-                case MsgType.REQ_CLOSE_ENTRUST: {
+                case MsgType.REQ_CLOSE_ENTRUST: {//强制关闭委托
                     tradeMsgProcessor.closeEntrust((EntrustInterface) msgBean.getMsg());
                     break;
                 }
