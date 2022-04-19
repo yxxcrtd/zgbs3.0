@@ -72,7 +72,7 @@ public class PositionRequestTrdConBondService {
     private void bond003(TrdConBondDto entity, Map<String, Object> resultMap) {
         resultMap.put(INTERFACE_TYPE, INTERF_TYPE_BOND003);
         resultMap.put(BUSI_TYPE, DictCodeListExt3.头寸业务类型_网下申购.getValue());
-        resultMap.put(BUSI_ACT, DictCodeListExt3.业务动作_投资指令.getValue());
+        resultMap.put(BUSI_ACT, DictCodeListExt3.业务动作_交易登记.getValue());
         resultMap.put(PS, DictCodeList.交易方向_申购.getValue());
         String deliveryType = commonPositionEngineService.getDeliveryType(entity.getFinprodId());
         resultMap.put(SETTLE_SPEED, commonPositionEngineService.parseSettleSpreed(deliveryType));
@@ -85,7 +85,7 @@ public class PositionRequestTrdConBondService {
         resultMap.put(SHARES_TRADE_PLATFORM, null);
         resultMap.put(DELIVERY_TYPE, deliveryType);
         resultMap.put(WORK_FLOW_ID, null);
-        resultMap.put("cdate", entity.getTradeDate());
+        resultMap.put("cdate", entity.getPurchDate());
         resultMap.put(CCY, entity.getCcy());
         resultMap.put(B_TOTAL_TRADE_ID, null);
 
