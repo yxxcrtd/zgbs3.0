@@ -10,7 +10,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
 
 @PageId("FinTenderBoundAsset003")
-@ApiModel(value="新债标的(输入输出共用)",description="新债标的(输入输出共用)")
+@ApiModel(value="FinTenderBoundAsset003Dto",description="新债标的(输入输出共用)")
 public class FinTenderBoundAsset003Dto extends BaseEntity implements ProcessEntity {
 
     @ApiModelProperty(name = "issueStage", value = "发行阶段")

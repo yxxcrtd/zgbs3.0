@@ -8,7 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@ApiModel(value = "新债标的发行信息", description = "新债标的发行信息")
+@ApiModel(value = "FinProductIssueDto", description = "新债标的发行信息")
 public class FinProductIssueDto {
 
     /**

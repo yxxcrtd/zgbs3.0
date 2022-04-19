@@ -10,7 +10,7 @@ import java.util.Date;
 /**
  * 评级信息
  */
-@ApiModel(value = "新债标的评级信息", description = "新债标的评级信息")
+@ApiModel(value = "MstBondCreditRatingDto", description = "新债标的评级信息")
 public class MstBondCreditRatingDto {
 
     @ApiModelProperty(name = "oType", value = "评级类型，主体评级、债项评级")

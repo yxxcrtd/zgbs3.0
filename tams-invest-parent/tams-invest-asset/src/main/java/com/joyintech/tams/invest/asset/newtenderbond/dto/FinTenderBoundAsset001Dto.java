@@ -21,7 +21,7 @@ import java.util.Date;
  * @see FinTenderBoundAsset001Dto
  * @since 1.0
  */
-@ApiModel(value = "新债标的列表信息", description = "新债标的列表信息")
+@ApiModel(value = "FinTenderBoundAsset001Dto", description = "新债标的列表信息")
 public class FinTenderBoundAsset001Dto extends BaseDto {
 
     @ApiModelProperty(name = "issueStage", value = "发行阶段")

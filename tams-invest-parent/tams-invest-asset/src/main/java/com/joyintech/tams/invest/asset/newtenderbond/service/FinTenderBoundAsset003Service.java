@@ -1,5 +1,6 @@
 package com.joyintech.tams.invest.asset.newtenderbond.service;
 
+import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.common.base.dao.*;
@@ -9,6 +10,7 @@ import com.joyintech.tams.common.base.entity.TrdFinProductBarterTotal;
 import com.joyintech.tams.common.base.entity.TrdFinProductDealTotal;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.asset.newtenderbond.dao.FinTenderBoundAssetMapper;
+import com.joyintech.tams.invest.asset.newtenderbond.dto.FinTenderBoundAsset002Dto;
 import com.joyintech.tams.invest.asset.newtenderbond.dto.FinTenderBoundAsset003Dto;
 import com.joyintech.tams.invest.common.autoperiod.common.AutoPeriodCommonService;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
@@ -32,7 +34,7 @@ import java.util.Objects;
  * @since 1.0
  */
 @Service
-public class FinTenderBoundAsset003Service implements BaseProcessService<FinTenderBoundAsset003Dto> {
+public class FinTenderBoundAsset003Service  extends BaseService<FinTenderBoundAsset003Dto>  implements BaseProcessService<FinTenderBoundAsset003Dto> {
 
     @Resource
     private FinTenderBoundAssetMapper finTenderBoundAssetMapper;
@@ -60,7 +62,7 @@ public class FinTenderBoundAsset003Service implements BaseProcessService<FinTend
 
     @Override
     public String generateTitle(FinTenderBoundAsset003Dto entity, OperationType operationType) {
-        return String.format("资产代码(%) 资产简称(%) 上市流通", StringUtil.isEmpty(entity.getFinprodMarketId()) ? "" : entity.getFinprodMarketId(),
+        return String.format("资产代码(%s) 资产简称(%s) 上市流通", StringUtil.isEmpty(entity.getFinprodMarketId()) ? "" : entity.getFinprodMarketId(),
                 StringUtil.isEmpty(entity.getFinprodAbbr()) ? "" : entity.getFinprodAbbr());
     }
 

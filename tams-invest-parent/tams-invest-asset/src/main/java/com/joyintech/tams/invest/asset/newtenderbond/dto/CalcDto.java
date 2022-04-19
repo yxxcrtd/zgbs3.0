@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 /**
  * 计算发行价格和参考收益率
  */
-@ApiModel(value="计算dto",description="计算dto")
+@ApiModel(value="CalcDto",description="计算dto")
 public class CalcDto {
 
     @ApiModelProperty(name = "calModel", value = "参考收益率:rate,发行价格:price")

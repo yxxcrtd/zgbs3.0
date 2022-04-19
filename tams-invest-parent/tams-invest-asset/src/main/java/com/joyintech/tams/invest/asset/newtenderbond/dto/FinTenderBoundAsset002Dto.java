@@ -19,7 +19,7 @@ import java.util.List;
  * 新债标的新增/修改/查看公用DTO
  */
 @PageId("FinTenderBoundAsset002")
-@ApiModel(value="新债标的(输入输出共用)",description="新债标的(输入输出共用)")
+@ApiModel(value="FinTenderBoundAsset002Dto",description="新债标的(输入输出共用)")
 public class FinTenderBoundAsset002Dto extends BaseEntity implements ProcessEntity {
     /**
      * 金融产品代码

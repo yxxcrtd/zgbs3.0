@@ -10,7 +10,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@ApiModel(value = "新债标的扩展", description = "新债标的扩展")
+@ApiModel(value = "FinProductAddDto", description = "新债标的扩展")
 public class FinProductAddDto {
     /**
      * 金融产品代码

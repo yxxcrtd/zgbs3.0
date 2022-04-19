@@ -16,7 +16,7 @@ import java.util.List;
  * @see FinTenderBoundAssetSearch
  * @since 1.0
  */
-@ApiModel(value="新债标的(输入输出共用)",description="新债标的(输入输出共用)")
+@ApiModel(value="FinTenderBoundAssetSearch",description="新债标的(输入输出共用)")
 public class FinTenderBoundAssetSearch {
 
     @ApiModelProperty(name="issueStage",value="发行阶段",required = true)

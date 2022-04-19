@@ -2,7 +2,7 @@ package com.joyintech.tams.invest.asset.newtenderbond.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.joyintech.framework.export.CommonExportService;
+import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.ArithmeticUtil;
@@ -18,10 +18,7 @@ import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.asset.newtenderbond.dao.FinTenderBoundAssetMapper;
 import com.joyintech.tams.invest.asset.newtenderbond.dto.*;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
@@ -45,7 +42,7 @@ import java.util.*;
  * @since 1.0
  */
 @Service
-public class FinTenderBoundAssetService extends CommonExportService<FinTenderBoundAsset001Dto> implements BaseProcessService<FinTenderBoundAsset002Dto> {
+public class FinTenderBoundAssetService extends BaseService<FinTenderBoundAsset002Dto>  implements BaseProcessService<FinTenderBoundAsset002Dto> {
 
     @Resource
     private FinTenderBoundAssetMapper finTenderBoundAssetMapper;
@@ -70,22 +67,21 @@ public class FinTenderBoundAssetService extends CommonExportService<FinTenderBou
 
     @Override
     public String generateTitle(FinTenderBoundAsset002Dto entity, OperationType operationType) {
-        return String.format("资产代码(%) 资产简称(%)", StringUtil.isEmpty(entity.getFinprodMarketId()) ? "" : entity.getFinprodMarketId(),
+        return String.format("资产代码(%s) 资产简称(%s)", StringUtil.isEmpty(entity.getFinprodMarketId()) ? "" : entity.getFinprodMarketId(),
                 StringUtil.isEmpty(entity.getFinprodAbbr()) ? "" : entity.getFinprodAbbr());
     }
 
     @Override
     public void doComplete(FinTenderBoundAsset002Dto dto, OperationType type) {
-        //处理数据
-        if (OperationType.DELETE.equals(type)) {
+        if (OperationType.DELETE == type) {
             this.delete(dto);
-        } else if (OperationType.NEW.equals(type)) {
+        } else if (OperationType.NEW == type) {
             this.insert(dto);
-        } else {
+        } else if(OperationType.MODIFY == type){
             this.update(dto);
         }
         //记录操作日志
-        this.saveOperate(dto.getFinprodId(),dto.getRemark(), type);
+        this.saveOperate(dto.getFinprodId(), dto.getRemark(), type);
     }
 
     /**
@@ -97,7 +93,9 @@ public class FinTenderBoundAssetService extends CommonExportService<FinTenderBou
     public Page<FinTenderBoundAsset001Dto> selectForPage(FinTenderBoundAssetSearch search) {
         search.setPlatformDate(iPlatformDate.getSysDateStr());
         search.setFinprodType2(DictCodeListExt2.平安资产类型_一级市场债.getValue());
-        return super.queryForPage(search.getPageMode().getPageNo(), search.getPageMode().getPageSize(), () -> finTenderBoundAssetMapper.selectForPage(search));
+        PageHelper.startPage(search.getPageMode().getPageNo(), search.getPageMode().getPageSize());
+        List<FinTenderBoundAsset001Dto> list = finTenderBoundAssetMapper.selectForPage(search);
+        return new Page<>(PageInfo.of(list));
     }
 
     /**
@@ -225,16 +223,16 @@ public class FinTenderBoundAssetService extends CommonExportService<FinTenderBou
      * @param remark
      * @param type
      */
-    public void saveOperate(String tradeId,String remark, OperationType type) {
+    public void saveOperate(String tradeId, String remark, OperationType type) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(tradeId);
-        if (StringUtil.equals(type.name(), OperationType.NEW.name())) {
+        if (type == OperationType.NEW) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_新建.getValue());
-        } else if (StringUtil.equals(type.name(), OperationType.MODIFY.name())) {
+        } else if ( type == OperationType.MODIFY) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_修改.getValue());
-        } else if(StringUtil.equals(type.name(), OperationType.REVOKE.name())){
+        } else if (type == OperationType.REVOKE) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_撤回.getValue());
-        }else {
+        } else {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_关闭.getValue());
         }
         oprHisReq.setBusiDes(remark);
@@ -334,7 +332,7 @@ public class FinTenderBoundAssetService extends CommonExportService<FinTenderBou
             if (year.compareTo(BigDecimal.ONE) <= 0) {
                 dto.setIntRate(ArithmeticUtil.divide(ArithmeticUtil.subtract(hundred, dto.getIssuePrice()), ArithmeticUtil.multiply(dto.getIssuePrice(), year), 14));
             } else {
-                double a = Math.pow(ArithmeticUtil.divide(hundred, dto.getIssuePrice(), 14).doubleValue(), ArithmeticUtil.divide(BigDecimal.ONE,year,14).doubleValue());
+                double a = Math.pow(ArithmeticUtil.divide(hundred, dto.getIssuePrice(), 14).doubleValue(), ArithmeticUtil.divide(BigDecimal.ONE, year, 14).doubleValue());
                 dto.setIntRate(ArithmeticUtil.subtract(new BigDecimal(a), BigDecimal.ONE));
             }
         } else {//计算发行价格
@@ -418,7 +416,7 @@ public class FinTenderBoundAssetService extends CommonExportService<FinTenderBou
      */
     public String getFinprodId(FinTenderBoundAsset002Dto dto) {
         return String.format("%s_%s_%d_%s_%s", DictCodeListExt2.平安资产类型_一级市场债.getValue(), dto.getFinprodMarketId(),
-                dto.getIssueDto().getAddBatch(), dto.getTradeMarket(),DateUtil.format(dto.getProductAddDto().getBidDate(),"yyyyMMdd"));
+                dto.getIssueDto().getAddBatch(), dto.getTradeMarket(), DateUtil.format(dto.getProductAddDto().getBidDate(), "yyyyMMdd"));
     }
 
 
@@ -432,7 +430,24 @@ public class FinTenderBoundAssetService extends CommonExportService<FinTenderBou
         this.valid(dto, validList);
         this.valid(dto.getProductAddDto(), validList);
         this.valid(dto.getIssueDto(), validList);
-        //TODO 根据条件来进行必填校验
+        if (StringUtil.isNotEmpty(dto.getIssueDto().getIssueStyle()) && StringUtil.equals(dto.getIssueDto().getIssueStyle(), DictCodeListExt4.发行类型_增发)) {
+            if (StringUtil.isNotEmpty(dto.getProductAddDto().getCrossMarket()) && StringUtil.equals(dto.getProductAddDto().getCrossMarket(), DictCodeList.是否_是.getValue())) {
+                if (StringUtil.isEmpty(dto.getProductAddDto().getCrossMarketCode())) {
+                    validList.add(new ValidMessage("跨市场代码不能为空"));
+                }
+            }
+            if (StringUtil.isEmpty(dto.getProductAddDto().getAppearMarketId())) {
+                validList.add(new ValidMessage("上市代码不能为空"));
+            }
+            if (StringUtil.isNotEmpty(dto.getProductAddDto().getBidDate()) && DateUtil.compareDate(dto.getProductAddDto().getBidDate(), iPlatformDate.getSysDate()) < 0) {
+                validList.add(new ValidMessage("增发投标日需大于等于平台日"));
+            }
+        } else {
+            if (StringUtil.isNotEmpty(dto.getProductAddDto().getBidDate()) && DateUtil.compareDate(dto.getProductAddDto().getBidDate(), iPlatformDate.getSysDate()) < 0) {
+                validList.add(new ValidMessage("投标日需大于等于平台日"));
+            }
+        }
+
     }
 
 
