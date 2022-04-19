@@ -10,7 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>tams-touguan-common</artifactId>
-    <packaging>pom</packaging>
+    <name>资管3.0投管公共工程(tams-touguan-common)</name>
+    <version>3.0.6</version>
     <modules>
         <module>tams-touguan-asset</module>
         <module>tams-touguan-basicdata</module>
