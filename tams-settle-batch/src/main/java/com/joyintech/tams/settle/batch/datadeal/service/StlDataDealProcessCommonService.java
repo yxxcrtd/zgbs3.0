@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.joyintech.framework.JoyinRestTemplate;
-import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,9 +24,6 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.CommissionCaclProcess;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListStl;
 import com.joyintech.tams.settle.batch.datadeal.constant.StlDataDealProcessConstant;
 import com.joyintech.tams.settle.batch.datadeal.dao.StlDownDataDealMapper;
 import com.joyintech.tams.settle.batch.datadeal.dto.StlDownDataDealOperatorDto;
@@ -154,6 +151,24 @@ public class StlDataDealProcessCommonService {
 		}
 		return null;
 	}
+
+	/**
+	 * 根据码值获取 交收结果 value
+	 * 正常交收  01    0000
+	 * 部分交收  02    0100 0101 0102
+	 * 交收失败  03    ELSE
+	 */
+	public String getDeliveryResult(String jgdm) {
+		if (StringUtil.equals(StlDataDealProcessConstant.JGDM_0000, jgdm)) {
+			return DictCodeListExt4.交收结果_正常交收.getValue();
+		}
+		if (StringUtil.equals(StlDataDealProcessConstant.JGDM_0101, jgdm) || StringUtil.equals(StlDataDealProcessConstant.JGDM_0100, jgdm)
+				|| StringUtil.equals(StlDataDealProcessConstant.JGDM_0102, jgdm)) {
+			return DictCodeListExt4.交收结果_部分交收.getValue();
+		}
+		return DictCodeListExt4.交收结果_交收失败.getValue();
+	}
+
 	
 	// 获取下个工作日
 	public Date getNextWorkDay(Date nowday, String calendarId) {
