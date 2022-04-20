@@ -28,17 +28,17 @@ VALUES ('36','04','02','F11','','','N',to_date('1990-01-01', 'yyyy/mm/dd'), '','
 INSERT INTO TRD_MINPRICE_CONFIG (SEQ_NO, TRADE_MARKET, TRADE_PLAT, ASSET_CLASSIFY1, ASSET_CLASSIFY2, ASSET_CLASSIFY3, IS_GRADE, EFF_DATE, BATCH_SEQ, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 VALUES ('37','04','05','F11','','','N',to_date('1990-01-01', 'yyyy/mm/dd'), '','','system','',to_date('2021-05-12', 'yyyy/mm/dd'), 'system',to_date('2021-05-12', 'yyyy/mm/dd'));
 INSERT INTO TRD_MINPRICE_CONFIG (SEQ_NO, TRADE_MARKET, TRADE_PLAT, ASSET_CLASSIFY1, ASSET_CLASSIFY2, ASSET_CLASSIFY3, IS_GRADE, EFF_DATE, BATCH_SEQ, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES ('46','03','0','F01','0','','N',to_date('1990-01-01', 'yyyy/mm/dd'), '','','system','',to_date('2021-05-12', 'yyyy/mm/dd'), 'system',to_date('2021-05-12', 'yyyy/mm/dd'));
+VALUES ('46','03','0','F01','','','N',to_date('1990-01-01', 'yyyy/mm/dd'), '','','system','',to_date('2021-05-12', 'yyyy/mm/dd'), 'system',to_date('2021-05-12', 'yyyy/mm/dd'));
 INSERT INTO TRD_MINPRICE_CONFIG (SEQ_NO, TRADE_MARKET, TRADE_PLAT, ASSET_CLASSIFY1, ASSET_CLASSIFY2, ASSET_CLASSIFY3, IS_GRADE, EFF_DATE, BATCH_SEQ, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES ('47','03','F19','F01','F19','','N',to_date('1990-01-01', 'yyyy/mm/dd'), '','','system','',to_date('2021-05-12', 'yyyy/mm/dd'), 'system',to_date('2021-05-12', 'yyyy/mm/dd'));
+VALUES ('47','03','FI9','F01','','','N',to_date('1990-01-01', 'yyyy/mm/dd'), '','','system','',to_date('2021-05-12', 'yyyy/mm/dd'), 'system',to_date('2021-05-12', 'yyyy/mm/dd'));
 INSERT INTO TRD_MINPRICE_CONFIG (SEQ_NO, TRADE_MARKET, TRADE_PLAT, ASSET_CLASSIFY1, ASSET_CLASSIFY2, ASSET_CLASSIFY3, IS_GRADE, EFF_DATE, BATCH_SEQ, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES ('48','04','0','F01','0','','N',to_date('1990-01-01', 'yyyy/mm/dd'), '','','system','',to_date('2021-05-12', 'yyyy/mm/dd'), 'system',to_date('2021-05-12', 'yyyy/mm/dd'));
+VALUES ('48','04','0','F01','','','N',to_date('1990-01-01', 'yyyy/mm/dd'), '','','system','',to_date('2021-05-12', 'yyyy/mm/dd'), 'system',to_date('2021-05-12', 'yyyy/mm/dd'));
 INSERT INTO TRD_MINPRICE_CONFIG (SEQ_NO, TRADE_MARKET, TRADE_PLAT, ASSET_CLASSIFY1, ASSET_CLASSIFY2, ASSET_CLASSIFY3, IS_GRADE, EFF_DATE, BATCH_SEQ, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES ('49','04','F19','F01','F19','','N',to_date('1990-01-01', 'yyyy/mm/dd'), '','','system','',to_date('2021-05-12', 'yyyy/mm/dd'), 'system',to_date('2021-05-12', 'yyyy/mm/dd'));
+VALUES ('49','04','FI9','F01','','','N',to_date('1990-01-01', 'yyyy/mm/dd'), '','','system','',to_date('2021-05-12', 'yyyy/mm/dd'), 'system',to_date('2021-05-12', 'yyyy/mm/dd'));
 INSERT INTO TRD_MINPRICE_CONFIG (SEQ_NO, TRADE_MARKET, TRADE_PLAT, ASSET_CLASSIFY1, ASSET_CLASSIFY2, ASSET_CLASSIFY3, IS_GRADE, EFF_DATE, BATCH_SEQ, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES ('50','03','0','F07','0','','N',to_date('1990-01-01', 'yyyy/mm/dd'), '','单位为%','system','',to_date('2021-05-12', 'yyyy/mm/dd'), 'system',to_date('2021-05-12', 'yyyy/mm/dd'));
+VALUES ('50','03','0','F07','','','N',to_date('1990-01-01', 'yyyy/mm/dd'), '','单位为%','system','',to_date('2021-05-12', 'yyyy/mm/dd'), 'system',to_date('2021-05-12', 'yyyy/mm/dd'));
 INSERT INTO TRD_MINPRICE_CONFIG (SEQ_NO, TRADE_MARKET, TRADE_PLAT, ASSET_CLASSIFY1, ASSET_CLASSIFY2, ASSET_CLASSIFY3, IS_GRADE, EFF_DATE, BATCH_SEQ, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES ('51','04','0','F07','0','','N',to_date('1990-01-01', 'yyyy/mm/dd'), '','单位为%','system','',to_date('2021-05-12', 'yyyy/mm/dd'), 'system',to_date('2021-05-12', 'yyyy/mm/dd'));
+VALUES ('51','04','0','F07','','','N',to_date('1990-01-01', 'yyyy/mm/dd'), '','单位为%','system','',to_date('2021-05-12', 'yyyy/mm/dd'), 'system',to_date('2021-05-12', 'yyyy/mm/dd'));
 
 
 -- 交易所最小价差配置明细表更新数据
