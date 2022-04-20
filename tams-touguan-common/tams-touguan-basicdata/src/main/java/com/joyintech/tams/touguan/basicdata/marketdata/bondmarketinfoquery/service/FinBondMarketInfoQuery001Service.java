@@ -1,5 +1,6 @@
 package com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.service;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.joyintech.framework.base.BaseService;
@@ -43,6 +44,7 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
      * @return
      */
     public Page<FinBondMarketInfoQuery001Dto> queryForPage(FinBondMarketInfoQueryRequest request) {
+        logger.info("queryForPage >> 债券市场信息分页查询参数：{}", JSON.toJSONString(request));
         request.setPlatformDate(iPlatformDate.getSysDateStr());
         PageHelper.startPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize());
         List<FinBondMarketInfoQuery001Dto> bondMarketInfoQuery004Dtos = finBondMarketInfoQueryMapper.queryForPage(request);
@@ -56,6 +58,7 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
      * @return
      */
     public FinBondMarketInfoDetailQueryDto detailInfo(String secId) {
+        logger.info("detailInfo >> 债券市场详情信息查询参数：secId：【{}】", secId);
         FinBondMarketInfoQueryRequest request = new FinBondMarketInfoQueryRequest();
         request.setSecId(secId);
         //查询债券市场信息
