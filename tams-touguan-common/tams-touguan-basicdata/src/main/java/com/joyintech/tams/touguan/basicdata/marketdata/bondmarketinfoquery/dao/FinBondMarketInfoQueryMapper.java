@@ -1,6 +1,6 @@
 package com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dao;
 
-import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery004Dto;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQueryPayHSrcSecSchedulDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinBondMarketInfoQueryRequest;
 import org.springframework.stereotype.Repository;
@@ -17,7 +17,7 @@ public interface FinBondMarketInfoQueryMapper {
      * @param request
      * @return
      */
-    List<FinBondMarketInfoQuery004Dto> queryForPage(FinBondMarketInfoQueryRequest request);
+    List<FinBondMarketInfoQuery001Dto> queryForPage(FinBondMarketInfoQueryRequest request);
 
     /**
      * 平台日
@@ -26,7 +26,7 @@ public interface FinBondMarketInfoQueryMapper {
      *                }
      * @return
      */
-    FinBondMarketInfoQuery004Dto getBoundMarketInfo(Map<String, Object> params);
+    FinBondMarketInfoQuery001Dto getBoundMarketInfo(Map<String, Object> params);
 
     /**
      * 债券付息信息

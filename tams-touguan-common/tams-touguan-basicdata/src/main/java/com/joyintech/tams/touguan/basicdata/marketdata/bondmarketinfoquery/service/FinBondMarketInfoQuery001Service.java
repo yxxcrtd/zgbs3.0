@@ -6,7 +6,7 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dao.FinBondMarketInfoQueryMapper;
-import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery004Dto;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinBondMarketInfoQueryRequest;
 import org.springframework.stereotype.Service;
 
@@ -18,14 +18,14 @@ import java.util.List;
  *
  * @author zhuys
  * @version 1.0 2022年4月11日
- * @see FinBondMarketInfoQuery004Service
+ * @see FinBondMarketInfoQuery001Service
  * @since 1.0
  */
 @Service
-public class FinBondMarketInfoQuery004Service extends BaseService {
+public class FinBondMarketInfoQuery001Service extends BaseService {
 
     @Resource
-    private FinBondMarketInfoQueryMapper finTenderBoundAssetMapper;
+    private FinBondMarketInfoQueryMapper finBondMarketInfoQueryMapper;
     @Resource
     private IPlatformDate iPlatformDate;
 
@@ -35,10 +35,10 @@ public class FinBondMarketInfoQuery004Service extends BaseService {
      * @param request
      * @return
      */
-    public Page<FinBondMarketInfoQuery004Dto> queryForPage(FinBondMarketInfoQueryRequest request) {
+    public Page<FinBondMarketInfoQuery001Dto> queryForPage(FinBondMarketInfoQueryRequest request) {
         request.setPlatformDate(iPlatformDate.getSysDateStr());
         PageHelper.startPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize());
-        List<FinBondMarketInfoQuery004Dto> bondMarketInfoQuery004Dtos = finTenderBoundAssetMapper.queryForPage(request);
+        List<FinBondMarketInfoQuery001Dto> bondMarketInfoQuery004Dtos = finBondMarketInfoQueryMapper.queryForPage(request);
         return new Page<>(PageInfo.of(bondMarketInfoQuery004Dtos));
     }
 

@@ -21,19 +21,19 @@ public class FinBondMarketInfoQueryRequest {
     @ApiModelProperty(name = "pageMode", value = "分页对象", example = "{pageSize: 10,pageNo: 1, sort: 'name', direction: 'asc'}")
     private PageMode pageMode;
 
-    @ApiModelProperty(name = "finprodMarketIds", value = "市场代码", example = "[A,B]")
+    @ApiModelProperty(name = "finprodMarketIds", value = "市场代码")
     private List<String> finprodMarketIds;
 
-    @ApiModelProperty(name = "finprodAbbr", value = "资产简称", example = "A")
+    @ApiModelProperty(name = "finprodAbbr", value = "资产简称")
     private String finprodAbbr;
 
-    @ApiModelProperty(name = "tradeMarket", value = "交易场所代码", example = "A")
+    @ApiModelProperty(name = "tradeMarket", value = "交易场所代码")
     private String tradeMarket;
 
-    @ApiModelProperty(name = "tradeMarkets ", value = "交易场所代码集", example = "[A]")
+    @ApiModelProperty(name = "tradeMarkets ", value = "交易场所代码集")
     private List<String> tradeMarkets;
 
-    @ApiModelProperty(name = "issuer", value = "发行人", example = "A")
+    @ApiModelProperty(name = "issuer", value = "发行人")
     private String issuer;
 
     @ApiModelProperty(name = "issueDateStart", value = "发行日开始")
@@ -93,7 +93,7 @@ public class FinBondMarketInfoQueryRequest {
     @ApiModelProperty(name = "warrantor", value = "担保人")
     private String warrantor;
 
-    @ApiModelProperty(name = "platformDate", value = "平台日", example = "12")
+    @ApiModelProperty(name = "platformDate", value = "平台日")
     private String platformDate;
 
     @ApiModelProperty(name = "search", value = "关键词")

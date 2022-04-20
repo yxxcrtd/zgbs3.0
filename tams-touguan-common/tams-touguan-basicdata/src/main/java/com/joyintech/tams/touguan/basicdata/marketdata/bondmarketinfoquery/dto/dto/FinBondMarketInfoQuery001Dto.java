@@ -1,4 +1,4 @@
-package com.joyintech.tams.business.asset.tenderbond.dto;
+package com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto;
 
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -9,23 +9,22 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
 /**
  * 债券市场信息查看DTO
  *
  * @author zhuys
  * @version 1.0 2022年4月18日
- * @see FinTenderBoundAsset004Dto
+ * @see FinBondMarketInfoQuery001Dto
  * @since 1.0
  */
 @ApiModel(value = "债券市场信息查看", description = "债券市场信息查看")
-public class FinTenderBoundAsset004Dto extends BaseDto {
+public class FinBondMarketInfoQuery001Dto extends BaseDto {
 
-    @ApiModelProperty(name = "secId", value = "债券ID")
+    @ApiModelProperty(name = "secId", value = "债券ID/资产代码")
     private String secId;
 
-    @ApiModelProperty(name = "secName", value = "债券名称")
+    @ApiModelProperty(name = "secName", value = "资产简称")
     private String secName;
 
     @ApiModelProperty(name = "secFullName", value = "债券全称")
@@ -41,9 +40,10 @@ public class FinTenderBoundAsset004Dto extends BaseDto {
     private String institution;
 
     @ApiModelProperty(name = "issuePrice", value = "发行价格")
-    private String issuePrice;
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal issuePrice;
 
-    @ApiModelProperty(name = "pubendDate", value = "发行截止日")
+    @ApiModelProperty(name = "pubendDate", value = "发行日（发行截止日）")
     private String pubendDate;
 
     @ApiModelProperty(name = "vdate", value = "起息日")
@@ -53,7 +53,8 @@ public class FinTenderBoundAsset004Dto extends BaseDto {
     private String mdate;
 
     @ApiModelProperty(name = "issueAmt", value = "发行金额")
-    private String issueAmt;
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal issueAmt;
 
     @ApiModelProperty(name = "issuerName", value = "发行人")
     private String issuerName;
@@ -104,19 +105,19 @@ public class FinTenderBoundAsset004Dto extends BaseDto {
     @ApiModelProperty(name = "interestRate", value = "利率类型")
     private String interestRate;
 
-    @ApiModelProperty(name = "paperir", value = "利率类型")
+    @ApiModelProperty(name = "paperir", value = "票面利率(%)")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal paperir;
 
-    @ApiModelProperty(name = "spreadRate8", value = "浮动利差")
+    @ApiModelProperty(name = "spreadRate8", value = "利差（BP）（浮动利差）")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal spreadRate8;
 
-    @ApiModelProperty(name = "coefficient", value = "浮动系数")
+    @ApiModelProperty(name = "coefficient", value = "基准利率系数（浮动系数）")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal coefficient;
 
-    @ApiModelProperty(name = "rateCode", value = "浮动利率code")
+    @ApiModelProperty(name = "rateCode", value = "基准利率（浮动利率code）")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private String rateCode;
 
@@ -153,9 +154,6 @@ public class FinTenderBoundAsset004Dto extends BaseDto {
 
     @ApiModelProperty(name = "schecalRule", value = "首次付息日")
     private String schecalRule;
-
-    @ApiModelProperty(name = "tenderBoundAsset004PayHSrcSecSchedulDtos", value = "付息计划列表")
-    private List<FinTenderBoundAsset004PayHSrcSecSchedulDto> tenderBoundAsset004PayHSrcSecSchedulDtos;
 
     public String getSecId() {
         return secId;
@@ -205,11 +203,11 @@ public class FinTenderBoundAsset004Dto extends BaseDto {
         this.institution = institution;
     }
 
-    public String getIssuePrice() {
+    public BigDecimal getIssuePrice() {
         return issuePrice;
     }
 
-    public void setIssuePrice(String issuePrice) {
+    public void setIssuePrice(BigDecimal issuePrice) {
         this.issuePrice = issuePrice;
     }
 
@@ -237,11 +235,11 @@ public class FinTenderBoundAsset004Dto extends BaseDto {
         this.mdate = mdate;
     }
 
-    public String getIssueAmt() {
+    public BigDecimal getIssueAmt() {
         return issueAmt;
     }
 
-    public void setIssueAmt(String issueAmt) {
+    public void setIssueAmt(BigDecimal issueAmt) {
         this.issueAmt = issueAmt;
     }
 
@@ -483,13 +481,5 @@ public class FinTenderBoundAsset004Dto extends BaseDto {
 
     public void setSchecalRule(String schecalRule) {
         this.schecalRule = schecalRule;
-    }
-
-    public List<FinTenderBoundAsset004PayHSrcSecSchedulDto> getTenderBoundAsset004PayHSrcSecSchedulDtos() {
-        return tenderBoundAsset004PayHSrcSecSchedulDtos;
-    }
-
-    public void setTenderBoundAsset004PayHSrcSecSchedulDtos(List<FinTenderBoundAsset004PayHSrcSecSchedulDto> tenderBoundAsset004PayHSrcSecSchedulDtos) {
-        this.tenderBoundAsset004PayHSrcSecSchedulDtos = tenderBoundAsset004PayHSrcSecSchedulDtos;
     }
 }

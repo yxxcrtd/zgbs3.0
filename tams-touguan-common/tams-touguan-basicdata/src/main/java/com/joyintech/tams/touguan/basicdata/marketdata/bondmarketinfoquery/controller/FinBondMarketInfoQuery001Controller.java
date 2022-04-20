@@ -6,9 +6,9 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery004Dto;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinBondMarketInfoQueryRequest;
-import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.service.FinBondMarketInfoQuery004Service;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.service.FinBondMarketInfoQuery001Service;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +22,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Controller
-@PageId("FinTenderBoundAsset004")
-@RequestMapping("/asset/finBondMarketInfoQuery004")
+@PageId("FinBondMarketInfoQuery001")
+@RequestMapping("/asset/finBondMarketInfoQuery001")
 @Api(tags = "债券市场信息查询")
-public class FinBondMarketInfoQuery004Controller extends BaseController {
+public class FinBondMarketInfoQuery001Controller extends BaseController {
 
     @Autowired
-    private FinBondMarketInfoQuery004Service finBondMarketInfoQuery004Service;
+    private FinBondMarketInfoQuery001Service finBondMarketInfoQuery001Service;
 
 
     @ApiOperation(value = "初始化参数", notes = "初始化参数")
@@ -68,7 +68,7 @@ public class FinBondMarketInfoQuery004Controller extends BaseController {
     @ResponseBody
     @PostMapping("/findPage")
     @ApiOperation(value = "债券市场信息分页查询", notes = "债券市场信息分页查询")
-    public Message<Page<FinBondMarketInfoQuery004Dto>> findPage(@RequestBody FinBondMarketInfoQueryRequest request) {
-        return Message.success("success", finBondMarketInfoQuery004Service.queryForPage(request));
+    public Message<Page<FinBondMarketInfoQuery001Dto>> findPage(@RequestBody FinBondMarketInfoQueryRequest request) {
+        return Message.success("success", finBondMarketInfoQuery001Service.queryForPage(request));
     }
 }

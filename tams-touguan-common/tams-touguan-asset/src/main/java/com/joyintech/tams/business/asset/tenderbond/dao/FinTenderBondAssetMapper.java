@@ -100,21 +100,4 @@ public interface FinTenderBondAssetMapper {
      * @return
      */
     List<String> selectTotleTradeId(@Param("finprodId") String finprodId);
-
-    /**
-     * 平台日
-     *
-     * @param params{ iplatformDate:平台日
-     *                }
-     * @return
-     */
-    FinTenderBoundAsset004Dto getBoundMarketInfo(Map<String, Object> params);
-
-    /**
-     * 债券付息信息
-     *
-     * @param param
-     * @return
-     */
-    List<FinTenderBoundAsset004PayHSrcSecSchedulDto> selectWindBondSchedule(Map<String, Object> param);
 }
