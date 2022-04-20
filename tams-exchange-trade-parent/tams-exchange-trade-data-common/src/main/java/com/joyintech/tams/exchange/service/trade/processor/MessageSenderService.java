@@ -123,6 +123,9 @@ public class MessageSenderService {
         tradeMessage.setPS(instruction.getPs());
         tradeMessage.setCcy(instruction.getCcy());
         tradeMessage.setFinprodId(instruction.getFinprodId());
+        if(entrust instanceof IntegratedEntrust){
+            tradeMessage.setCounterId(((IntegratedEntrust) entrust).getLiaisonName());
+        }
 
         // 此处 if-else 是否合理？
         if (InvestmentAssetType1.BIDDING_REPO.value.equals(instruction.getAssetType1())) {
