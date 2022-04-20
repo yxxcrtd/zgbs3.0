@@ -117,13 +117,16 @@ public class PositionRequestTrdConBondService {
         bondSec.put("finprodId", entity.getFinprodId());
         bondSec.put("secAcctId", entity.getSecManageAcctId());
         bondSec.put("etrId", entity.getEntrustId());
-        bondSec.put("secAmount", entity.getTradeAmt()   );
+        bondSec.put("secAmount", entity.getTradeAmt());
+        bondSec.put("integrateSecAmount",BigDecimal.ZERO);
+        bondSec.put("ownSecAmount",entity.getTradeAmt());
+        bondSec.put("tradeId",entity.getTrdProductDeal().getTradeId());
+        ptlCash.put("etrId", entity.getEntrustId());
         bondSecList.add(bondSec);
         resultMap.put("bondSecList", bondSecList);
 
         resultMap.put("balanceCheck", DictCodeList.是否_否.getValue());
         resultMap.put("userId", SecurityUtil.getLoginUser().getUserName());
-        resultMap.put("totalTradeId",entity.getEntrustId());
         resultMap.put("totalTradeId", entity.getEntrustId());
         resultMap.put("flowStatus", DictCodeListExt3.流程节点_流程提交.getValue());
         resultMap.put("modelType", DictCodeListExt1.子系统代码_委托.getValue());
