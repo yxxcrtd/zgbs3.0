@@ -383,6 +383,7 @@ public class KCBPTradeApi {
         res.addAll(queryFixedIncomeTrade(kcbpAccount, true));
         res.addAll(queryProtocolBack_SZ_Trade(kcbpAccount, true));
         res.addAll(queryProtocolBack_SH_Trade(kcbpAccount, true));
+        res.addAll(queryBondNegotiate_SZ_Trade(kcbpAccount, true));
         return res;
     }
 
@@ -397,6 +398,7 @@ public class KCBPTradeApi {
         res.addAll(queryFixedIncomeEntrust(kcbpAccount, true));
         res.addAll(queryProtocolBack_SH_Entrust(kcbpAccount, true));
         res.addAll(queryProtocolBack_SZ_Entrust(kcbpAccount, true));
+        res.addAll(queryBondNegotiate_SZ_Entrust(kcbpAccount, true));
         return res;
     }
 

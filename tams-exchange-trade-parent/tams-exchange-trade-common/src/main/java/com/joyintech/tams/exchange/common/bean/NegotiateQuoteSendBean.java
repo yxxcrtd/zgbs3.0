@@ -12,7 +12,7 @@ public class NegotiateQuoteSendBean {
 	@ApiModelProperty(name = "requestNo", value = "请求编号")
     private String requestNo;
     @ApiModelProperty(name = "requestTime", value = "请求时间")
-    private int requestTime;
+    private String requestTime;
     @ApiModelProperty(name = "requestStatus", value = "请求状态(1：待确认  3：已撤销 4：已成交 )")
     private int requestStatus;
     @ApiModelProperty(name = "stockCode", value = "证券代码")
@@ -22,7 +22,7 @@ public class NegotiateQuoteSendBean {
     @ApiModelProperty(name = "bs", value = "对手方买卖方向（1：买入 2：卖出）")
     private String bs;
     @ApiModelProperty(name = "amount", value = "数量")
-    private int amount;
+    private long amount;
     @ApiModelProperty(name = "fullPrice", value = "全价价格")
     private BigDecimal fullPrice;
     @ApiModelProperty(name = "entrustPrice", value = "净价价格")
@@ -52,10 +52,10 @@ public class NegotiateQuoteSendBean {
     private String positionStr;
     @ApiModelProperty(name = "remark", value = "备用文本")
     private String remark;
-	public int getRequestTime() {
+	public String getRequestTime() {
 		return requestTime;
 	}
-	public void setRequestTime(int requestTime) {
+	public void setRequestTime(String requestTime) {
 		this.requestTime = requestTime;
 	}
 	public int getRequestStatus() {
@@ -82,10 +82,10 @@ public class NegotiateQuoteSendBean {
 	public void setBs(String bs) {
 		this.bs = bs;
 	}
-	public int getAmount() {
+	public long getAmount() {
 		return amount;
 	}
-	public void setAmount(int amount) {
+	public void setAmount(long amount) {
 		this.amount = amount;
 	}
 	public BigDecimal getFullPrice() {

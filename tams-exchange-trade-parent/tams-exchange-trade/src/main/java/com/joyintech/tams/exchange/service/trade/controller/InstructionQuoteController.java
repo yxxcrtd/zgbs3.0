@@ -2,12 +2,18 @@ package com.joyintech.tams.exchange.service.trade.controller;
 
 import com.joyintech.exchange.service.quote.service.QuoteService;
 import com.joyintech.tams.exchange.common.bean.*;
+import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
+import com.joyintech.tams.exchange.common.domain.Message;
+import com.joyintech.tams.exchange.common.request.EntrustQueryRequest;
 import com.joyintech.tams.exchange.common.request.QueryTickRequest;
 import com.joyintech.tams.exchange.service.trade.management.service.IntegratedQuoteManagement;
 import com.joyintech.tams.exchange.util.MasterUtil;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -149,12 +155,12 @@ public class InstructionQuoteController {
         return integratedQuoteManagement.queryNegotiateQuoteReceive(negotiateQuoteQueryBean);
     }
     
-//    @ApiOperation(value = "我发起的协商成交行情接口", notes = "我发起的协商成交行情接口")
-//    @RequestMapping(value = "/entrust/integrated/negotiateQuoteSend", method = RequestMethod.POST)
-//    public ResultBean queryNegotiateQuoteSend(@RequestBody NegotiateQuoteQueryBean negotiateQuoteQueryBean) {
-//        if(!MasterUtil.isMaster()) {
-//    		return MasterUtil.postForObjectResultBean(negotiateQuoteQueryBean);
-//    	}
-//        return integratedQuoteManagement.queryNegotiateQuoteSend(negotiateQuoteQueryBean);
-//    }
+    @ApiOperation(value = "我发起的协商成交行情接口", notes = "我发起的协商成交行情接口")
+    @RequestMapping(value = "/entrust/integrated/negotiateQuoteSend", method = RequestMethod.POST)
+    public ResultBean queryNegotiateQuoteSend(@RequestBody @Validated EntrustQueryRequest request) {
+        if(!MasterUtil.isMaster()) {
+    		return MasterUtil.postForObjectResultBean(request);
+    	}
+        return integratedQuoteManagement.queryNegotiateQuoteSend(request);
+    }
 }

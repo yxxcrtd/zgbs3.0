@@ -1,20 +1,34 @@
 package com.joyintech.tams.exchange.service.trade.management.service;
 
-import com.joyintech.tams.exchange.common.bean.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.joyintech.tams.exchange.common.bean.IntegratedBulkCloseQuoteQryBean;
+import com.joyintech.tams.exchange.common.bean.IntegratedBulkQuoteBean;
+import com.joyintech.tams.exchange.common.bean.IntegratedBulkQuoteQryBean;
+import com.joyintech.tams.exchange.common.bean.IntegratedFixedIncomeQuoteQryBean;
+import com.joyintech.tams.exchange.common.bean.IntegratedQuote;
+import com.joyintech.tams.exchange.common.bean.IntegratedRepurchaseQuoteBean;
+import com.joyintech.tams.exchange.common.bean.IntegratedRepurchaseQuoteQryBean;
+import com.joyintech.tams.exchange.common.bean.NegotiateQuoteQueryBean;
+import com.joyintech.tams.exchange.common.bean.NegotiateQuoteSendBean;
+import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.cache.QuoteTickService;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
+import com.joyintech.tams.exchange.common.constant.EntrustStatus;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
+import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
+import com.joyintech.tams.exchange.common.request.EntrustQueryRequest;
 import com.joyintech.tams.exchange.common.utils.TickConverter;
 import com.joyintech.tams.exchange.datacommon.db.service.FuturesInstrumentService;
 import com.joyintech.tams.exchange.service.trade.processor.others.TerminalHelper;
 import com.joyintech.tams.exchange.service.trade.scheduled.quote.QuoteJob;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * @ClassName IntegratedQuoteManagement
@@ -34,6 +48,8 @@ public class IntegratedQuoteManagement {
     private QuoteTickService quoteTickService;
     @Autowired
     private FuturesInstrumentService futuresInstrumentService;
+    @Autowired
+    private EntrustManagement entrustManagement;
     
     public ResultBean getTick(String stockCode) {
         if ("*".equals(stockCode)) {
@@ -93,9 +109,59 @@ public class IntegratedQuoteManagement {
         return new ResultBean(ErrorCode.SUCCESS, terminalHelper.queryNegotiateQuoteReceive(negotiateQuoteQueryBean));
     }
     
-//    public ResultBean queryNegotiateQuoteSend(NegotiateQuoteQueryBean negotiateQuoteQueryBean) {
-//        return new ResultBean(ErrorCode.SUCCESS, terminalHelper.queryNegotiateQuoteReceive(negotiateQuoteQueryBean));
-//    }
+    public ResultBean queryNegotiateQuoteSend(EntrustQueryRequest request) {
+    	ResultBean resultBean = entrustManagement.queryIntegratedEntrust(request.getUserId(), request.getInstructionId(), request.getAccountId(), request.getOrderId());
+    	if(null!=resultBean && null!=resultBean.getData()) {
+    		List<NegotiateQuoteSendBean> retList = new ArrayList<NegotiateQuoteSendBean>();
+    		List<IntegratedEntrust> entrustList = (List<IntegratedEntrust>) resultBean.getData();
+    		for(IntegratedEntrust integratedEntrust:entrustList) {
+    			if(integratedEntrust.getEntrustStatus()==EntrustStatus.REPORTED.value
+    					||integratedEntrust.getEntrustStatus()==EntrustStatus.REPORTED_TOBE_CANCEL.value) {
+    				NegotiateQuoteSendBean negotiateQuoteSendBean = new NegotiateQuoteSendBean();
+    				negotiateQuoteSendBean.setRequestStatus(1);//请求状态(1：待确认  3：已撤销 4：已成交 )
+    				setNegotiateQuoteSendBean(negotiateQuoteSendBean,integratedEntrust);
+    				retList.add(negotiateQuoteSendBean);
+    			}else if(integratedEntrust.getEntrustStatus()==EntrustStatus.CANCELED.value) {
+    				NegotiateQuoteSendBean negotiateQuoteSendBean = new NegotiateQuoteSendBean();
+    				negotiateQuoteSendBean.setRequestStatus(3);//请求状态(1：待确认  3：已撤销 4：已成交 )
+    				setNegotiateQuoteSendBean(negotiateQuoteSendBean,integratedEntrust);
+    				retList.add(negotiateQuoteSendBean);
+    			}else if(integratedEntrust.getEntrustStatus()==EntrustStatus.PART_TRADED_TOBE_CANCELED.value
+    					||integratedEntrust.getEntrustStatus()==EntrustStatus.PART_SUCCESS.value
+    					||integratedEntrust.getEntrustStatus()==EntrustStatus.PART_TRADED_CANCELED.value
+    					||integratedEntrust.getEntrustStatus()==EntrustStatus.SUCCEEDED.value) {
+    				NegotiateQuoteSendBean negotiateQuoteSendBean = new NegotiateQuoteSendBean();
+    				negotiateQuoteSendBean.setRequestStatus(4);//请求状态(1：待确认  3：已撤销 4：已成交 )
+    				setNegotiateQuoteSendBean(negotiateQuoteSendBean,integratedEntrust);
+    				retList.add(negotiateQuoteSendBean);
+    			}
+    		}
+    		return new ResultBean(ErrorCode.SUCCESS, retList);
+    	}
+    	return resultBean;
+    }
+    private void setNegotiateQuoteSendBean(NegotiateQuoteSendBean negotiateQuoteSendBean,IntegratedEntrust integratedEntrust) {
+    	negotiateQuoteSendBean.setRequestNo(integratedEntrust.getReportNo());
+    	negotiateQuoteSendBean.setRequestTime(integratedEntrust.getReportTime());
+    	negotiateQuoteSendBean.setStockCode(integratedEntrust.getStockCode());
+    	negotiateQuoteSendBean.setStockName(integratedEntrust.getStockName());
+    	negotiateQuoteSendBean.setBs(integratedEntrust.getEntrustBs());
+    	negotiateQuoteSendBean.setAmount(integratedEntrust.getEntrustVolume());
+    	negotiateQuoteSendBean.setFullPrice(integratedEntrust.getFullPrice());
+    	negotiateQuoteSendBean.setEntrustPrice(integratedEntrust.getEntrustPrice());
+    	negotiateQuoteSendBean.setEntrustBalance(integratedEntrust.getEntrustBalance());
+    	negotiateQuoteSendBean.setMemberId(integratedEntrust.getSellerNo());
+    	negotiateQuoteSendBean.setTraderCode(integratedEntrust.getSellerNo());
+    	negotiateQuoteSendBean.setInvestorId(integratedEntrust.getInvestorId());
+    	negotiateQuoteSendBean.setInvestorType(integratedEntrust.getInvestorName());
+    	negotiateQuoteSendBean.setCpMemberId(integratedEntrust.getPropSeatName());
+    	negotiateQuoteSendBean.setCpTraderCode(integratedEntrust.getLiaisonTel());
+    	negotiateQuoteSendBean.setCpInvestorId(integratedEntrust.getPropInvestorId());
+    	negotiateQuoteSendBean.setCpInvestorType(integratedEntrust.getPropInvestorName());
+    	negotiateQuoteSendBean.setConfirmId("ConfirmId");
+    	negotiateQuoteSendBean.setPositionStr(integratedEntrust.getPositionStr());
+    	negotiateQuoteSendBean.setRemark(integratedEntrust.getRemark());
+    }
 }
 
 
