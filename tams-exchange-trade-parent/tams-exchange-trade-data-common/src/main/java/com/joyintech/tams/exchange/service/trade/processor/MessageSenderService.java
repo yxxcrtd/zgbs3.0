@@ -3,6 +3,7 @@ package com.joyintech.tams.exchange.service.trade.processor;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import com.joyintech.framework.rabbitmq.annotation.MessageSender;
 import com.joyintech.framework.rabbitmq.entity.SimpleRabbitMessage;
 import com.joyintech.framework.util.StringUtil;
@@ -26,6 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -38,10 +41,10 @@ public class MessageSenderService {
     /**
      * 推送成交数据
      *
-     * @param trade 成交报文
-     * @param instruction   指令
-     * @param entrust   委托
-     * @return  MQ消息
+     * @param trade       成交报文
+     * @param instruction 指令
+     * @param entrust     委托
+     * @return MQ消息
      */
     @MessageSender(exchange = "exchange.fanout.exchange.trade", routingKey = "exchange.trade.use")
     public SimpleRabbitMessage pushTradeToMQ(Trade trade, Instruction instruction, EntrustInterface entrust) {
@@ -70,10 +73,10 @@ public class MessageSenderService {
     /**
      * 推送需要手工交收的成交数据
      *
-     * @param trade 成交报文
-     * @param instruction   指令
-     * @param entrust   委托
-     * @return  MQ消息
+     * @param trade       成交报文
+     * @param instruction 指令
+     * @param entrust     委托
+     * @return MQ消息
      */
     @MessageSender(exchange = "exchange.fanout.exchange.manualSettleTrade", routingKey = "exchange.manualSettleTrade.use")
     public SimpleRabbitMessage pushTradeToMQForFixedIncome(Trade trade, Instruction instruction, EntrustInterface entrust) {
@@ -82,7 +85,7 @@ public class MessageSenderService {
 
         if (Objects.isNull(trade)
                 || StringUtil.isEmpty(trade.getId())
-                || Objects.isNull(instruction))  {
+                || Objects.isNull(instruction)) {
             logger.error("[pushTradeToMQForFixedIncome] check parameter failed");
             return null;
         }
@@ -119,8 +122,10 @@ public class MessageSenderService {
         tradeMessage.setTradePlat(instruction.getTradePlat());
         tradeMessage.setPS(instruction.getPs());
         tradeMessage.setCcy(instruction.getCcy());
-        tradeMessage.setTradingDay(trade.getTradingDay());
         tradeMessage.setFinprodId(instruction.getFinprodId());
+        if(entrust instanceof IntegratedEntrust){
+            tradeMessage.setCounterId(((IntegratedEntrust) entrust).getLiaisonName());
+        }
 
         // 此处 if-else 是否合理？
         if (InvestmentAssetType1.BIDDING_REPO.value.equals(instruction.getAssetType1())) {
@@ -163,7 +168,7 @@ public class MessageSenderService {
             if (EntrustProp.isRepurchaseExchange(trade.getEntrustProp())) {
                 tradeMessage.setPledgeRatio(trade.getDiscount());
             }
-        }  else {
+        } else {
             // 非协议回购的特殊处理
             tradeMessage.setFullPrice(
                     trade.getTradedVolume() > 0 ?
@@ -172,7 +177,18 @@ public class MessageSenderService {
 
         // 业务类型（手工交收用）
         String busiType = handleBusiType(trade, instruction, entrust);
+        logger.info("业务类型（手工交收用）：busiType= {}", busiType);
         tradeMessage.setBusiType(busiType);
+
+        String extend1 = trade.getExtend1();
+        Map<String, Object> map;
+        if (StringUtil.isNotEmpty(extend1)) {
+            map = JsonUtils.getObjectFromJson(extend1, Map.class);
+        } else {
+            map = Maps.newHashMap();
+        }
+        map.put("busiType", busiType);
+        trade.setExtend1(JsonUtils.getJsonFromObject(map));
 
         return tradeMessage;
     }
@@ -180,11 +196,13 @@ public class MessageSenderService {
     private String handleBusiType(Trade trade, Instruction instruction, EntrustInterface entrust) {
         String bsFlag = entrust.getBsFlag();
         String entrustBs = entrust.getEntrustBs();
-        String tradePlat = instruction.getTradePlat();
-        String assetType = instruction.getAssetType();
+        String tradePlat = trade.getTradePlat();
+        String assetType = trade.getAssetType();
+        String entrustProp = trade.getEntrustProp();
+        logger.info("获取业务类型（手工交收用）：entrustBs={}，tradePlat={}，assetType={}，entrustProp={}", entrustBs, tradePlat, assetType, entrustProp);
 
         // 协议回购
-        if(IntegratedEntrustUtils.isProtocolBack(trade.getEntrustProp())) {
+        if (IntegratedEntrustUtils.isProtocolBack(entrustProp)) {
             return handleProtocolBakBusiType(trade, instruction, entrust);
         }
 
@@ -203,7 +221,7 @@ public class MessageSenderService {
                 && InvestmentAssetType.isBond(assetType)
                 // GNS-952:更换判断固定收益平台方法 modify by fuyongsheng 20220224 start
                 // && BusinessFlag.FIXED_INCOME.value.equals(bsFlag)
-                && IntegratedEntrustUtils.isFixedIncome(trade.getEntrustProp())
+                && IntegratedEntrustUtils.isFixedIncome(entrustProp)
             // GNS-952:更换判断固定收益平台方法 modify by fuyongsheng 20220224 end
         ) {
             // 上海固收
@@ -259,7 +277,7 @@ public class MessageSenderService {
         }
         // GNS-954:上交所协议回购到期购回 modify by fuyongsheng 20220224 start
         // 到期购回
-        else if(EntrustProp.SH_REPURCHASE_EXPIRE.value.equals(entrustProp)){
+        else if (EntrustProp.SH_REPURCHASE_EXPIRE.value.equals(entrustProp)) {
             busiType = EntrustBs.BUY.value.equals(entrustBs) ?
                     BusinessType.SH_SELL_PROTOCOL_BACK_BUYBACK.value :
                     BusinessType.SH_ANTI_PROTOCOL_BACK_BUYBACK.value;

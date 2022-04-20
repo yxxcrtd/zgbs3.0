@@ -2,6 +2,7 @@ package com.joyintech.tams.exchange.common.bean;
 
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
+import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -34,7 +35,7 @@ public class TrdExchangeDto extends IntegratedEntrust implements ProcessEntity {
     private String roles;
 
     @ApiModelProperty(required = true, name = "operType", value = "操作类型")
-    private String operType;
+    private OperationType operType;
 
     @ApiModelProperty(required = true, name = "pageId", value = "页面ID")
     private String pageId;
@@ -98,11 +99,11 @@ public class TrdExchangeDto extends IntegratedEntrust implements ProcessEntity {
         this.roles = roles;
     }
 
-    public String getOperType() {
+    public OperationType getOperType() {
         return operType;
     }
 
-    public void setOperType(String operType) {
+    public void setOperType(OperationType operType) {
         this.operType = operType;
     }
 

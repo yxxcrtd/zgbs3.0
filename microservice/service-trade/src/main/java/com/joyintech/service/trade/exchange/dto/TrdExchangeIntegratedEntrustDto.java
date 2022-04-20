@@ -3,6 +3,7 @@ package com.joyintech.service.trade.exchange.dto;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
+import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 /**
@@ -52,7 +53,7 @@ public class TrdExchangeIntegratedEntrustDto extends BaseEntity implements Proce
     /**
      * 操作类型
      */
-    private String operType;
+    private OperationType operType;
 
     /**
      * 页面ID
@@ -131,11 +132,11 @@ public class TrdExchangeIntegratedEntrustDto extends BaseEntity implements Proce
         this.roles = roles;
     }
 
-    public String getOperType() {
+    public OperationType getOperType() {
         return operType;
     }
 
-    public void setOperType(String operType) {
+    public void setOperType(OperationType operType) {
         this.operType = operType;
     }
 

@@ -391,7 +391,17 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
             //String[] partsDate = DateUtil.format(dto.getSettleDate()).split("-");
             //String[] partsTime = hms.split(":");
             //GregorianCalendar gc = new GregorianCalendar(Integer.parseInt(partsDate[0]),Integer.parseInt(partsDate[1]),Integer.parseInt(partsDate[2]),Integer.parseInt(partsTime[0]),Integer.parseInt(partsTime[1]),Integer.parseInt(partsTime[2]));
-            flow.setSettleTime(new Date());
+            // ZGCPCN-86:交收日期需要使用平台日的准确时间,通过平台日的日期拼接当前时间的时分秒 modify by fuyongsheng 20220420 start
+            // flow.setSettleTime(new Date());
+            Calendar now = Calendar.getInstance();
+            Calendar plat = Calendar.getInstance();
+            Date sysDate = DateUtil.platDateFromCache();// 获取平台日期
+            plat.setTime(sysDate);
+            plat.set(Calendar.HOUR_OF_DAY, now.get(Calendar.HOUR_OF_DAY));
+            plat.set(Calendar.MINUTE, now.get(Calendar.MINUTE));
+            plat.set(Calendar.SECOND, now.get(Calendar.SECOND));
+            flow.setSettleTime(plat.getTime());
+            // ZGCPCN-86:交收日期需要使用平台日的准确时间,通过平台日的日期拼接当前时间的时分秒 modify by fuyongsheng 20220420 end
             flow.setFinprodId(dto.getFinprodId());
             flow.setSettleNum(dto.getSettleNum());
             flow.setSettleAmt(dto.getSettleAmt());

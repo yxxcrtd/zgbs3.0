@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.Objects;
 
 public class TradeUtils {
-    
+
     private TradeUtils() {
         throw new IllegalStateException("Utility class");
     }
@@ -204,12 +204,12 @@ public class TradeUtils {
         return multiply(entrustPrice, entrustVolume, 2);
     }
 
-    public static BigDecimal calculateBalance(String entrustBs, BigDecimal entrustPrice, long entrustVolume, String assetType, OrderInterface orderInterface) {
+    public static BigDecimal calculateBalance(BigDecimal entrustPrice, long entrustVolume, String assetType, OrderInterface orderInterface) {
         //协议回购金额计算
         if (Objects.nonNull(orderInterface) && IntegratedEntrustUtils.isProtocolBack(orderInterface.getEntrustProp())) {
             return ((IntegratedEntrust) orderInterface).getEntrustBalance();
         }
-        // 债券按净价冻结 --- 需求新修正为净价 --- > 修正为全价
+        //债券按净价冻结 --- 需求新修正为净价 --- > 修正为全价
         // 债券且是交易类
         if (InvestmentAssetType.BOND.value.equals(assetType)
                 && Objects.nonNull(orderInterface)
@@ -220,7 +220,7 @@ public class TradeUtils {
         if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(assetType)) {
             return new BigDecimal(entrustVolume * 100).setScale(2, RoundingMode.HALF_UP);
         }
-        // TODO ETF计算
+        // ETF计算
         return multiply(entrustPrice, entrustVolume, 2);
     }
 

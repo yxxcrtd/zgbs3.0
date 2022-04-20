@@ -237,7 +237,7 @@ public class TradeCallbackHelper {
             tradeRecord.setClearBalance(entrust.getBackBalance());
         } else {
             if (tradeRecord.getClearBalance() == null || tradeRecord.getClearBalance().compareTo(BigDecimal.ZERO) == 0) {
-                if (InvestmentAssetType.isBond(tradeRecord.getFinprodType2()) && tradeRecord.getFullPrice() != null) {
+                if (InvestmentAssetType.isBond(tradeRecord.getAssetType()) && Objects.nonNull(tradeRecord.getFullPrice()) && tradeRecord.getFullPrice().compareTo(BigDecimal.ZERO) != 0) {
                     //成交全价金额
                     tradeRecord.setClearBalance(tradeRecord.getFullPrice().multiply(BigDecimal.valueOf(tradeRecord.getTradedVolume())));
                 }

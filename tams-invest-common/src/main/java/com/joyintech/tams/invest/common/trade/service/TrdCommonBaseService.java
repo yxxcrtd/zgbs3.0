@@ -1331,8 +1331,6 @@ public class TrdCommonBaseService extends BaseService {
                     portfolioDto.setEtrSecAmount(etrEntrustDetail.getEntrustAmt());
                     ratio = ArithmeticUtil.divide(etrEntrustDetail.getEntrustAmt(), etrEntrust.getEntrustAmt(), 8, RoundingMode.HALF_UP);
                 }
-                // 本方券面总额
-                portfolioDto.setOwnSecAmount(portfolioDto.getSecAmount());
                 // 交易金额
                 portfolioDto.setCashAmount(ArithmeticUtil.multiply(infContractDetailfile.getTradeAmt(), ratio));
                 if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(etrEntrust.getFinprodType2())){
@@ -1346,6 +1344,10 @@ public class TrdCommonBaseService extends BaseService {
                     // 下单券面总额
                     portfolioDto.setOrdSecAmount(ArithmeticUtil.multiply(orderInfoDto.getEntrustVolume(), ratio));
                 }
+                // ZGCPCN-126:更改本方券总额赋值 modify by fuyongsheng 20220420 start
+                // 本方券面总额
+                portfolioDto.setOwnSecAmount(portfolioDto.getSecAmount());
+                // ZGCPCN-126:更改本方券总额赋值 modify by fuyongsheng 20220420 end
                 // 标准券券面总额
                 BigDecimal standardSecAmount = ArithmeticUtil.multiply(infContractDetailfile.getShareAmt().multiply(converseRadio)
                         .multiply(百元券面), ratio);

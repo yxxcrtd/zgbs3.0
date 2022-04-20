@@ -7,6 +7,7 @@ import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.common.base.entity.TrdManualSettleInfo;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
+import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.util.Date;
@@ -175,7 +176,7 @@ public class ManualSettleDto extends TrdManualSettleInfo implements ITableRow, P
     /**
      * 操作类型 数据字典
      */
-    private String operType;
+    private OperationType operType;
 
     /**
      * 操作员
@@ -211,17 +212,17 @@ public class ManualSettleDto extends TrdManualSettleInfo implements ITableRow, P
 
     public String getOperTypeStr() {
         if(StringUtil.isNotEmpty(this.getOperType())){
-            return SysDataUtil.getNameFromDataDict(DictCode.交收操作类型, this.getOperType());
+            return SysDataUtil.getNameFromDataDict(DictCode.交收操作类型, this.getOperType().name());
         }
         return StringUtil.EMPTY;
     }
 
 
-    public String getOperType() {
+    public OperationType getOperType() {
         return operType;
     }
 
-    public void setOperType(String operType) {
+    public void setOperType(OperationType operType) {
         this.operType = operType;
     }
 
