@@ -2,6 +2,7 @@ package com.joyintech.service.trade.manualsettle.dto;
 
 import com.joyintech.framework.export.paginator.domain.ITableRow;
 import com.joyintech.tams.common.base.entity.TrdManualSettleInfo;
+import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.util.Date;
@@ -22,7 +23,7 @@ public class ManualSettleDto extends TrdManualSettleInfo implements ITableRow, P
     /**
      * 操作类型
      */
-    private String operateType;
+    private OperationType operateType;
 
     private String pageModel;
     /**
@@ -77,11 +78,11 @@ public class ManualSettleDto extends TrdManualSettleInfo implements ITableRow, P
      */
     private List<ManualSettleDto> selectedItem;
 
-    public String getOperateType() {
+    public OperationType getOperateType() {
         return operateType;
     }
 
-    public void setOperateType(String operateType) {
+    public void setOperateType(OperationType operateType) {
         this.operateType = operateType;
     }
 
