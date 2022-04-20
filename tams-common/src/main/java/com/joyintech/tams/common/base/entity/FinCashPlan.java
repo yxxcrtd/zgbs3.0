@@ -155,6 +155,11 @@ public class FinCashPlan extends FinCashPlanKey {
     private String remark;
 
     /**
+     * 计息基础
+     */
+    private String basis;
+
+    /**
      * 取得 现金流序号，从1开始
      * @return 现金流序号，从1开始
      */
@@ -653,5 +658,24 @@ public class FinCashPlan extends FinCashPlanKey {
      */
     public void setIsPayIntFlag(String isPayIntFlag) {
         this.isPayIntFlag = isPayIntFlag;
+    }
+
+
+    /**
+     * 获取 计息基础
+     *
+     * @return basis 计息基础
+     */
+    public String getBasis() {
+        return this.basis;
+    }
+
+    /**
+     * 设置 计息基础
+     *
+     * @param basis 计息基础
+     */
+    public void setBasis(String basis) {
+        this.basis = basis;
     }
 }
