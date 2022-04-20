@@ -26,9 +26,9 @@ $(function() {
         Joyin.ajaxJson(basePath + 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade002/check', object, function(result) {
             Joyin.confirm(result.data, function() {
                 if (operateType === 'save') {
-                    WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade002/save', object, "TrdLendValuationTrade002_btn_save");
+                    WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade002/save', object, "TrdRepoValuationTrade002_btn_save");
                 } else {
-                    WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade002/save', object, "TrdLendValuationTrade002_btn_submit");
+                    WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdrepovaluationtrade/TrdRepoValuationTrade002/save', object, "TrdRepoValuationTrade002_btn_submit");
                 }
             });
         })
@@ -55,8 +55,10 @@ $(function() {
         if($('#vdate').val() != null && $('#vdate').val() != '' && $('#mdate').val() != null && $('#mdate').val() != ''){
             var actpaydays=(DateUtil.parse($('#mdate').val())-DateUtil.parse($('#vdate').val()))/1000/60/60/24;   //计算 到期日-起息日
             $('#actpaydays').val(actpaydays);
+            $('#term').val(actpaydays);
         }else {
             $('#actpaydays').val('');
+            $('#term').val('');
         }
     }
 
@@ -104,15 +106,13 @@ $(function() {
             && $('#stlAmt').val() != null && $('#stlAmt').val() != ''
             && $('#commission').val() != null && $('#commission').val() != ''
             && $('#dealFeeAmt').val() != null && $('#dealFeeAmt').val() != ''
-            && $('#settFeeAmt').val() != null && $('#settFeeAmt').val() != ''
-            && $('#otherAmt').val() != null && $('#otherAmt').val() != ''){
+            && $('#settFeeAmt').val() != null && $('#settFeeAmt').val() != ''){
             var result1 = JoyinMath.doAdd($('#prinAmt').val(), $('#brokerage').val(),2);
             var result2 = JoyinMath.doAdd(result1, $('#stlAmt').val(),2);
             var result3 = JoyinMath.doAdd(result2, $('#commission').val(),2);
             var result4 = JoyinMath.doAdd(result3, $('#dealFeeAmt').val(),2);
             var result5 = JoyinMath.doAdd(result4, $('#settFeeAmt').val(),2);
-            var result6 = JoyinMath.doAdd(result5, $('#otherAmt').val(),2);
-            $('#settleAmt').val(result6);
+            $('#settleAmt').val(result5);
         }else{
             $('#settleAmt').val('');
         }
@@ -144,24 +144,36 @@ $(function() {
         settleAmtCalculate();
     });
 
-    //其他费用 联动
-    $('#otherAmt').change(function(){
-        settleAmtCalculate();
-    });
 
 
     //根据产品名称联动出产品代码
     $('#portfolioId').change(function(){
         var portfolioId = $('#portfolioId').val();
         if(portfolioId){
-            var dataPort = $('#portfolioId').select2('data')[0].object;
-            var finprodId = dataPort.finprodId;
-            $('#portfolioName').val(finprodId).trigger('change');
+            $('#portfolioName').val($('#portfolioId').select2('data')[0].id).trigger('change');
 
         }else {
             $('#portfolioName').val('').trigger('change');
         }
     });
+
+
+    // /**
+    //  * 产品代码联动带出产品名称，证券账户
+    //  */
+    // var prodIdChange = function() {
+    //     var portfolioId = $('#portfolioId').val();
+    //     if (portfolioId == '' || portfolioId == undefined) {
+    //         $('#portfolioName').val('');
+    //     } else {
+    //         $('#portfolioName').val($('#portfolioId').select2('data')[0].object).trigger('change');
+    //     }
+    // }
+    //
+    // //产品代码联动事件
+    // $('#portfolioId').change(function(){
+    //     prodIdChange();
+    // });
 
     //校验   交割日必须大于等于交易日
     var checkDate=function () {

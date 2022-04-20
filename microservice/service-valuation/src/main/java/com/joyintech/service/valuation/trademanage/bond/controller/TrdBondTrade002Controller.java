@@ -14,11 +14,12 @@ package com.joyintech.service.valuation.trademanage.bond.controller;
 import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.select.SuggestDto;
+import com.joyintech.service.valuation.component.common.dto.FinCashPlanDto;
 import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTradeResult;
-import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTrade002Dto;
+import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTradeDto;
 import com.joyintech.service.valuation.trademanage.bond.service.TrdBondTrade002Service;
 import com.joyintech.tams.common.base.entity.FinProduct;
+import com.joyintech.tams.common.base.entity.FinProductAdd;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -61,7 +62,7 @@ public class TrdBondTrade002Controller {
      *             异常
      */
     @PostMapping("queryTradeInfoByTradeId")
-    public TrdBondTrade002Dto queryTradeInfoByTradeId(@RequestBody String tradeId) {
+    public TrdBondTradeDto queryTradeInfoByTradeId(@RequestBody String tradeId) {
         return trdBondTrade002Service.queryTradeInfoByTradeId(tradeId);
     }
 
@@ -130,6 +131,18 @@ public class TrdBondTrade002Controller {
     public int update(@RequestBody TrdBondTradeResult dto)
             throws Exception {
         return trdBondTrade002Service.update(dto);
+    }
+
+    /**
+     * 查询标的面值
+     *
+     * @return 查询结果集
+     * @throws Exception
+     *             异常
+     */
+    @PostMapping("getRepaymentInfo")
+    public List<FinCashPlanDto> getRepaymentInfo(@RequestBody Map<String, Object> map) {
+        return trdBondTrade002Service.getRepaymentInfo(map);
     }
 
 }

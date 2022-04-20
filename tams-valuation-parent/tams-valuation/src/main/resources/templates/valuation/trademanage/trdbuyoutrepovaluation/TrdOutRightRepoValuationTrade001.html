@@ -9,6 +9,7 @@
     <div layout:fragment="content">
         <div class="form-button-area">
             <a id="TrdOutRightRepoValuationTrade001_btn_add" class="layui-btn layui-btn-sm btn-create" data-th-text="#{SysCommon.create}">新建</a>
+            <a id="TrdOutRightRepoValuationTrade001_btn_delete" class="layui-btn layui-btn-sm btn-delete" data-th-text="#{SysCommon.delete}">删除</a>
         </div>
         <div class="joyin-form-wrap joyin-filter-form condition-area">
             <form class="layui-form" id="searchForm">
@@ -27,7 +28,7 @@
                             <select type="text" id="portfolioId" name="portfolioId"
                                     class="layui-input form-input input-select" placeholder="请输入内容"
                                     data-th-placeholder="#{SysCommon.placeholder}" multiple="true"
-                                    data-th-data-url="@{/valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade002/findPortfolioId}">
+                                    data-th-data-url="@{/valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade001/getFinprodId}">
                             </select>
                         </div>
                     </div>

@@ -48,35 +48,53 @@
 	<select id="selectDeal" resultType="com.joyintech.service.valuation.trademanage.trdrepovaluationtrade.dto.TrdRepoValuationTrade001Dto">
 		SELECT
 		t.TRADE_ID tradeId,/**交易编号**/
-		null outTradeId,    /*外部成交编号*/
-		deal.BOOKSET_ID portfolioId,/**金融产品代码**/
+		t.F_TRADE_ID outTradeId,      /*外部成交编号*/
+		NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) portfolioId,/**金融产品代码**/
 		bok.BOOKSET_NAME portfolioName,/**金融产品名称**/
-		t.PS ps,/**交易方向**/
-		t.TRADE_MARKET tradeMarket,/**交易场所**/
+		hgzc.TERM term,  /**回购期限**/
 		mst.COUNTER_NAME counterId,  /**交易对手**/
-		zc.TERM_DAYS term,  /**回购期限**/
+		t.PS ps,/**交易类型**/
+		t.TRADE_MARKET    tradeMarket,/**交易场所**/
+		fpt.TYPE_6 repoType, /**回购类型**/
 		t.TRADE_DATE tradeDate,/**交易日**/
-		zc.VDATE vdate,/**起息日**/
-		zc.MDATE mdate,/**到期日**/
-		t.PRIN_AMT prinAmt, /**交易本金**/
-		null rebackPrice,  /**回购利率**/
-		t.INT_AMT intAmt,/**应计利息**/
-		stl.SETTLE_AMT settleAmt,/**结算金额**/
+		t.VDATE vdate,/**起息日**/
+		t.MDATE mdate,/**到期日**/
+		hgzc.PRIN prinAmt, /**本金金额**/
+		hgzc.INT_RATE*100 rebackPrice,  /**回购利率**/
+		t.INT_AMT intAmt,  /**回购利息**/
+		NVL(ttfd.FEE_AMT,0)  brokerage,/**经手费**/
+		NVL(ttfd1.FEE_AMT,0)  stlAmt,/**结算费**/
+		NVL(ttfd2.FEE_AMT,0)  commission,/**佣金**/
+		NVL(ttfd3.FEE_AMT,0)  dealFeeAmt,/**交易手续费**/
+		NVL(ttfd4.FEE_AMT,0)  settFeeAmt,/**结算手续费**/
+		CASE WHEN ttfd.FEE_TYPE = #{feeType_B99} THEN ttfd.FEE_AMT ELSE 0 END as otherAmt,/**其他应付费用**/
+		CASE WHEN t.PS in (#{PS_03}, #{PS_04}) THEN hgzc.PRIN+NVL(ttfd.FEE_AMT,0)+NVL(ttfd1.FEE_AMT,0)+NVL(ttfd2.FEE_AMT,0)+NVL(ttfd3.FEE_AMT,0)+NVL(ttfd4.FEE_AMT,0)
+		ELSE hgzc.PRIN+t.INT_AMT END AS settleAmt,/**结算金额**/
 		t.CCY ccy,/**币种**/
-		stl.MY_ACCT_NO trdAcctId/**资金账户**/
+		t.MY_ACCT_NO trdAcctId/**资金账户**/
 		FROM TRD_PRODUCT_DEAL t
-		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
-		LEFT JOIN BOK_DEAL_ACCOUNTING deal on deal.BUSI_NO = t.TRADE_ID
-		LEFT JOIN BOK_BOOKSET bok on bok.BOOKSET_ID = deal.BOOKSET_ID
+		LEFT JOIN FIN_PRODUCT_TYPE fpt on t.finprod_id=fpt.finprod_id
+		LEFT JOIN FIN_DEAL_PLEDGE fdp on t.finprod_id=fdp.finprod_id
+		LEFT JOIN FIN_PRODUCT zc on zc.FINPROD_ID=fdp.PLEDGE_FINPROD_ID
+		LEFT JOIN FIN_TRADE_PRODUCT hgzc on t.FINPROD_ID=hgzc.FINPROD_ID
+		LEFT JOIN FIN_TRADE_PRODUCT hgzc on hgzc.finprod_id = fdp.PLEDGE_FINPROD_ID
 		LEFT JOIN MST_COUNTER_PARTY mst on mst.COUNTER_ID = t.COUNTER_ID
-		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE ='02'
+		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE = #{busiType,jdbcType=VARCHAR}
+		LEFT JOIN BOK_DEAL_ACCOUNTING deal1 on deal1.BUSI_NO = t.TRADE_ID
+		LEFT JOIN BOK_DEAL_ACCOUNTING deal2 ON stl.ORDER_ID = deal2.BUSI_NO
+		LEFT JOIN BOK_BOOKSET bok on (bok.BOOKSET_ID = deal1.BOOKSET_ID) OR (bok.BOOKSET_ID = deal2.BOOKSET_ID)
+		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd ON ttfd.TRADE_ID = t.TRADE_ID AND ttfd.FEE_TYPE = #{feeType_B01}
+		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd1 ON ttfd1.TRADE_ID = t.TRADE_ID AND ttfd1.FEE_TYPE = #{feeType_B07}
+		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd2 ON ttfd2.TRADE_ID = t.TRADE_ID AND ttfd2.FEE_TYPE = #{feeType_B05}
+		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd3 ON ttfd3.TRADE_ID = t.TRADE_ID AND ttfd3.FEE_TYPE = #{feeType_B06}
+		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd4 ON ttfd4.TRADE_ID = t.TRADE_ID AND ttfd4.FEE_TYPE = #{feeType_B08}
 		where
-		t.BUSI_TYPE ='02'
+		t.BUSI_TYPE = #{busiType,jdbcType=VARCHAR}
 		<if test="tradeId !=null and tradeId !='' ">
 			and t.TRADE_ID like  concat(concat('%',#{tradeId}),'%')
 		</if>
 		<if test="portfolioIdArr != null and portfolioIdArr.length > 0">
-			and deal.BOOKSET_ID IN
+			and NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) IN
 			<foreach collection="portfolioIdArr" item="portfolioId" open="( " close=" )" separator=",">
 				#{portfolioId}
 			</foreach>
@@ -99,6 +117,12 @@
 				#{tradeMarket}
 			</foreach>
 		</if>
+		<if test="repoTypeArr != null and repoTypeArr.length > 0">
+			AND fpt.TYPE_6 IN
+			<foreach collection="repoTypeArr" item="repoType" open="( " close=" )" separator=",">
+				#{repoType}
+			</foreach>
+		</if>
 		order by t.TRADE_ID desc
 	</select>
 
@@ -106,32 +130,50 @@
     <select id="queryTradeInfoByTradeId" resultType="com.joyintech.service.valuation.trademanage.trdrepovaluationtrade.dto.TrdRepoValuationTrade001Dto">
 		SELECT
 		t.TRADE_ID tradeId,/**交易编号**/
-		null outTradeId,    /*外部成交编号*/
-		deal.BOOKSET_ID portfolioId,/**金融产品代码**/
+		t.F_TRADE_ID outTradeId,      /*外部成交编号*/
+		NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) portfolioId,/**金融产品代码**/
 		bok.BOOKSET_NAME portfolioName,/**金融产品名称**/
-		t.PS ps,/**交易方向**/
-		t.TRADE_MARKET tradeMarket,/**交易场所**/
-		mst.COUNTER_NAME counterId,  /**交易对手**/
-		zc.TERM_DAYS term,  /**回购期限**/
+		hgzc.TERM term,  /**回购期限**/
+		mst.COUNTER_ID counterId,  /**交易对手**/
+		t.PS ps,/**交易类型**/
+		t.TRADE_MARKET    tradeMarket,/**交易场所**/
+		fpt.TYPE_6 repoType, /**回购类型**/
 		t.TRADE_DATE tradeDate,/**交易日**/
-		t.SETTLE_DATE settleDate,/**交割日期**/
-		zc.VDATE vdate,/**起息日**/
-		zc.MDATE mdate,/**到期日**/
-		zc.MDATE-zc.VDATE actpaydays, /**实际占款天数**/
-		t.PRIN_AMT prinAmt, /**交易本金**/
-		null rebackPrice,  /**回购利率**/
-		t.INT_AMT intAmt,/**应计利息**/
-		stl.SETTLE_AMT settleAmt,/**结算金额**/
+		t.VDATE vdate,/**起息日**/
+		t.SETTLE_DATE     settleDate,/**交割日期**/
+		t.MDATE mdate,/**到期日**/
+		t.MDATE - t.VDATE actpaydays, /**实际占款天数**/
+		hgzc.PRIN prinAmt, /**本金金额**/
+		hgzc.INT_RATE*100 rebackPrice,  /**回购利率**/
+		t.INT_AMT intAmt,  /**回购利息**/
+		NVL(ttfd.FEE_AMT,0)  brokerage,/**经手费**/
+		NVL(ttfd1.FEE_AMT,0)  stlAmt,/**结算费**/
+		NVL(ttfd2.FEE_AMT,0)  commission,/**佣金**/
+		NVL(ttfd3.FEE_AMT,0)  dealFeeAmt,/**交易手续费**/
+		NVL(ttfd4.FEE_AMT,0)  settFeeAmt,/**结算手续费**/
+		CASE WHEN ttfd.FEE_TYPE = 'B99' THEN ttfd.FEE_AMT ELSE 0 END as otherAmt,/**其他应付费用**/
+		CASE WHEN t.PS in('03','04') THEN hgzc.PRIN+NVL(ttfd.FEE_AMT,0)+NVL(ttfd1.FEE_AMT,0)+NVL(ttfd2.FEE_AMT,0)+NVL(ttfd3.FEE_AMT,0)+NVL(ttfd4.FEE_AMT,0)
+		ELSE hgzc.M_TRADE_AMT END AS settleAmt,/**结算金额**/
 		t.CCY ccy,/**币种**/
-		stl.MY_ACCT_NO trdAcctId/**资金账户**/
+		t.MY_ACCT_NO trdAcctId/**资金账户**/
 		FROM TRD_PRODUCT_DEAL t
-		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
-		LEFT JOIN BOK_DEAL_ACCOUNTING deal on deal.BUSI_NO = t.TRADE_ID
-		LEFT JOIN BOK_BOOKSET bok on bok.BOOKSET_ID = deal.BOOKSET_ID
+		LEFT JOIN FIN_PRODUCT_TYPE fpt on t.finprod_id=fpt.finprod_id
+		LEFT JOIN FIN_DEAL_PLEDGE fdp on t.finprod_id=fdp.finprod_id
+		LEFT JOIN FIN_PRODUCT zc on zc.FINPROD_ID=fdp.PLEDGE_FINPROD_ID
+		LEFT JOIN FIN_TRADE_PRODUCT hgzc on t.FINPROD_ID=hgzc.FINPROD_ID
+		LEFT JOIN FIN_TRADE_PRODUCT hgzc on hgzc.finprod_id = fdp.PLEDGE_FINPROD_ID
 		LEFT JOIN MST_COUNTER_PARTY mst on mst.COUNTER_ID = t.COUNTER_ID
-		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE ='02'
+		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE = #{busiType,jdbcType=VARCHAR}
+		LEFT JOIN BOK_DEAL_ACCOUNTING deal1 on deal1.BUSI_NO = t.TRADE_ID
+		LEFT JOIN BOK_DEAL_ACCOUNTING deal2 ON stl.ORDER_ID = deal2.BUSI_NO
+		LEFT JOIN BOK_BOOKSET bok on (bok.BOOKSET_ID = deal1.BOOKSET_ID) OR (bok.BOOKSET_ID = deal2.BOOKSET_ID)
+		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd ON ttfd.TRADE_ID = t.TRADE_ID AND ttfd.FEE_TYPE = #{feeType_B01}
+		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd1 ON ttfd1.TRADE_ID = t.TRADE_ID AND ttfd1.FEE_TYPE = #{feeType_B07}
+		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd2 ON ttfd2.TRADE_ID = t.TRADE_ID AND ttfd2.FEE_TYPE = #{feeType_B05}
+		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd3 ON ttfd3.TRADE_ID = t.TRADE_ID AND ttfd3.FEE_TYPE = #{feeType_B06}
+		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd4 ON ttfd4.TRADE_ID = t.TRADE_ID AND ttfd4.FEE_TYPE = #{feeType_B08}
 		where
-		t.BUSI_TYPE ='02'
+		t.BUSI_TYPE = #{busiType,jdbcType=VARCHAR}
 		and t.TRADE_ID  = #{tradeId,jdbcType=VARCHAR}
 		and rownum=1
 	</select>
@@ -140,28 +182,44 @@
 	<select id="queryTradeInfoByTradeId01" resultType="com.joyintech.service.valuation.trademanage.trdrepovaluationtrade.dto.TrdRepoValuationTrade003Dto">
 		SELECT
 		t.TRADE_ID tradeId,/**交易编号**/
-		deal.BOOKSET_ID portfolioId,/**金融产品代码**/
+		t.F_TRADE_ID outTradeId,      /*外部成交编号*/
+		NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) portfolioId,/**金融产品代码**/
 		bok.BOOKSET_NAME portfolioName,/**金融产品名称**/
-		t.PS ps,/**交易方向**/
-		t.TRADE_MARKET tradeMarket,/**交易场所**/
-		mst.COUNTER_NAME counterId,  /**交易对手**/
+		hgzc.TERM term,  /**回购期限**/
+		mst.COUNTER_ID counterId,  /**交易对手**/
+		t.PS ps,/**交易类型**/
+		t.TRADE_MARKET    tradeMarket,/**交易场所**/
+		fpt.TYPE_6 repoType, /**回购类型**/
 		t.TRADE_DATE tradeDate,/**交易日**/
-		t.SETTLE_DATE settleDate,/**资金到账日**/
-		zc.MDATE mdate,/**到期日**/
-		t.PRIN_AMT prinAmt, /**交易本金**/
-		null rebackPrice,  /**回购利率**/
-		t.INT_AMT intAmt,/**应计利息**/
-		stl.SETTLE_AMT settleAmt,/**结算金额**/
+		t.VDATE vdate,/**起息日**/
+		t.SETTLE_DATE     settleDate,/**交割日期**/
+		t.MDATE mdate,/**到期日**/
+		t.MDATE - t.VDATE actpaydays, /**实际占款天数**/
+		hgzc.PRIN prinAmt, /**本金金额**/
+		hgzc.INT_RATE*100 rebackPrice,  /**回购利率**/
+		t.INT_AMT intAmt,  /**应计利息**/
+		CASE WHEN ttfd.FEE_TYPE = 'B99' THEN ttfd.FEE_AMT ELSE 0 END as otherAmt,/**其他应付费用**/
+		hgzc.PRIN+t.INT_AMT+0  settleAmt,/**结算金额**/
 		t.CCY ccy,/**币种**/
-		stl.MY_ACCT_NO trdAcctId/**资金账户**/
+		t.MY_ACCT_NO trdAcctId/**资金账户**/
 		FROM TRD_PRODUCT_DEAL t
-		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
-		LEFT JOIN BOK_DEAL_ACCOUNTING deal on deal.BUSI_NO = t.TRADE_ID
-		LEFT JOIN BOK_BOOKSET bok on bok.BOOKSET_ID = deal.BOOKSET_ID
+		LEFT JOIN FIN_PRODUCT_TYPE fpt on t.finprod_id=fpt.finprod_id
+		LEFT JOIN FIN_DEAL_PLEDGE fdp on t.finprod_id=fdp.finprod_id
+		LEFT JOIN FIN_PRODUCT zc on zc.FINPROD_ID=fdp.PLEDGE_FINPROD_ID
+		LEFT JOIN FIN_TRADE_PRODUCT hgzc on t.FINPROD_ID=hgzc.FINPROD_ID
+		LEFT JOIN FIN_TRADE_PRODUCT hgzc on hgzc.finprod_id = fdp.PLEDGE_FINPROD_ID
 		LEFT JOIN MST_COUNTER_PARTY mst on mst.COUNTER_ID = t.COUNTER_ID
-		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE ='02'
+		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE = #{busiType,jdbcType=VARCHAR}
+		LEFT JOIN BOK_DEAL_ACCOUNTING deal1 on deal1.BUSI_NO = t.TRADE_ID
+		LEFT JOIN BOK_DEAL_ACCOUNTING deal2 ON stl.ORDER_ID = deal2.BUSI_NO
+		LEFT JOIN BOK_BOOKSET bok on (bok.BOOKSET_ID = deal1.BOOKSET_ID) OR (bok.BOOKSET_ID = deal2.BOOKSET_ID)
+		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd ON ttfd.TRADE_ID = t.TRADE_ID AND ttfd.FEE_TYPE = #{feeType_B01}
+		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd1 ON ttfd1.TRADE_ID = t.TRADE_ID AND ttfd1.FEE_TYPE = #{feeType_B07}
+		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd2 ON ttfd2.TRADE_ID = t.TRADE_ID AND ttfd2.FEE_TYPE = #{feeType_B05}
+		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd3 ON ttfd3.TRADE_ID = t.TRADE_ID AND ttfd3.FEE_TYPE = #{feeType_B06}
+		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd4 ON ttfd4.TRADE_ID = t.TRADE_ID AND ttfd4.FEE_TYPE = #{feeType_B08}
 		where
-		t.BUSI_TYPE ='02'
+		t.BUSI_TYPE = #{busiType,jdbcType=VARCHAR}
 		and t.TRADE_ID  = #{tradeId,jdbcType=VARCHAR}
 		and rownum=1
 	</select>

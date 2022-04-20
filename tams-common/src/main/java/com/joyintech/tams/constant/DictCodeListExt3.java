@@ -596,6 +596,7 @@ public enum DictCodeListExt3 implements BaseDictCodeList {
     业务类型_债券交易(DictCode.业务类型, "02", "债券交易"),
     //add by tanxuan on 20200101
 	业务类型_场外期权(DictCode.业务类型,"38","场外期权"),
+    业务类型_自定义现金流交易(DictCode.业务类型,"35","自定义现金流交易"),
 	金融产品类型_投管用_期权(DictCode.金融产品类型_投管用,"F35","期权"),
     /**
      * 截标状态明细 add by gejiaao 20200109
@@ -1845,6 +1846,11 @@ public enum DictCodeListExt3 implements BaseDictCodeList {
 
     //共通业务类型-固收类资产交易
     共通业务类型_固收类资产交易(DictCode.共通业务类型,"TRD85","固收类资产交易"),
+
+    //共通业务类型字典添加  yangchen 20220406 start
+    共通业务类型_固收类资产存续期(DictCode.共通业务类型,"TRD86","固收类资产存续期"),
+    共通业务类型_融入券存续期(DictCode.共通业务类型,"TRD87","共通业务类型_融入券存续期"),
+    //共通业务类型字典添加  yangchen 20220406 end
 
     /**
      * 操作类型

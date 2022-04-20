@@ -234,7 +234,6 @@ public class TrdFxSpotValuationTradeDto extends WflTrdProductDeal implements Pro
      */
     @Override
     @PrimaryKey(Field.PK_1)
-    @NotEmpty(fieldName="TrdFxSpotValuationTrade001.tradeId",groups = {ValidateGroupEdit.class})
     public String getTradeId(){
         return super.getTradeId();
     }
@@ -308,15 +307,6 @@ public class TrdFxSpotValuationTradeDto extends WflTrdProductDeal implements Pro
         return SysDataUtil.getNameFromDataDict(DictCode.币种, super.getCcy());
     }
     /**
-     * 币种
-     * {@inheritDoc}
-     */
-    @Override
-    @NotEmpty(fieldName="TrdFxSpotValuationTrade001.ccy",groups = {ValidateGroupEdit.class})
-    public String getCcy(){
-        return super.getCcy();
-    }
-    /**
      * 交易方向
      * {@inheritDoc}
      */
@@ -374,7 +364,6 @@ public class TrdFxSpotValuationTradeDto extends WflTrdProductDeal implements Pro
      * 获取 finprodName
      * @return finprodName.
      */
-    @NotEmpty(fieldName="TrdFxSpotValuationTrade001.finprodName",groups = {ValidateGroupEdit.class})
     public String getFinprodName() {
         return finprodName;
     }
@@ -415,25 +404,6 @@ public class TrdFxSpotValuationTradeDto extends WflTrdProductDeal implements Pro
     }
 
 
-    //交易金额
-    @Override
-    @NotEmpty(fieldName="TrdFxSpotValuationTrade001.tradeAmt",groups = {ValidateGroupEdit.class})
-    public BigDecimal getTradeAmt() {
-        return super.getTradeAmt();
-    }
-    //交易费用
-    @Override
-    @NotEmpty(fieldName="TrdFxSpotValuationTrade002.feeAmt",groups = {ValidateGroupEdit.class})
-    public BigDecimal getFeeAmt() {
-        return super.getFeeAmt();
-    }
-
-    //资产代码
-    @Override
-    @NotEmpty(fieldName="TrdFxSpotValuationTrade001.finprodId",groups = {ValidateGroupEdit.class})
-    public String getFinprodId() {
-        return super.getFinprodId();
-    }
 
     @NotEmpty(fieldName="TrdFxSpotValuationTrade002.settleDate",groups = {ValidateGroupEdit.class})
     @Override

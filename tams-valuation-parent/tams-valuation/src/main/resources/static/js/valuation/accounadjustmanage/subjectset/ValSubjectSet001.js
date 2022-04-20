@@ -75,7 +75,7 @@ $(function () {
       $('#ValSubjectSet001_btn_add').click(function() {
           Joyin.dialog(JoyinUtil.getLabel("SysCommon.create")+JoyinUtil.getLabel("ValSubjectSet002"),
                   basePath + "valuation/accounadjustmanage/subjectset/ValSubjectSet002/init",
-                  "95%", "80%", {pageModel:PAGE_MODEL_NEW});
+                  "95%", "90%", {pageModel:PAGE_MODEL_NEW});
       });
       // 绑定按钮事件
       $('#ValSubjectSet001_btn_search').click(function() {

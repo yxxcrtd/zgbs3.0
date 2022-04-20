@@ -14,7 +14,6 @@ package com.joyintech.service.valuation.trademanage.option.dao;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.service.valuation.trademanage.option.dto.TrdOptionValuationTrade001Dto;
 import com.joyintech.service.valuation.trademanage.option.dto.TrdOptionValuationTrade002Dto;
-import com.joyintech.service.valuation.trademanage.option.dto.TrdOptionValuationTrade003Dto;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -52,9 +51,9 @@ public interface TrdOptionValuationTradeMapper {
 
     int querySequences();
 
-    TrdOptionValuationTrade002Dto queryTradeInfoByTradeId(String tradeId);
+    TrdOptionValuationTrade001Dto queryTradeInfoByTradeId(String tradeId);
 
-    TrdOptionValuationTrade003Dto queryInfoByTradeId(String tradeId);
+    TrdOptionValuationTrade002Dto queryInfoByTradeId(String tradeId);
 
     /**
      * 交易对手下拉框

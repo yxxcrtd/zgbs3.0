@@ -12,14 +12,9 @@ package com.joyintech.service.valuation.trademanage.bond.controller;
 
 
 import com.joyintech.framework.annotation.DTXTransaction;
-import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
-import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.RequestUtil;
-import com.joyintech.service.valuation.accounadjustmanage.manualvoucher.dto.ValManualVoucher001Dto;
-import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTrade001Dto;
+import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTradeDto;
 import com.joyintech.service.valuation.trademanage.bond.service.TrdBondTrade001Service;
-import com.joyintech.service.valuation.trademanage.finprodtradequery.dto.ValFinprodTradeQuery001Dto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -51,28 +46,16 @@ public class TrdBondTrade001Controller {
      * @since 1.0
      */
     @RequestMapping("findPage/{page}/{length}")
-    public Page<TrdBondTrade001Dto> queryForPage(@RequestBody Map<String, Object> param,
+    public Page<TrdBondTradeDto> queryForPage(@RequestBody Map<String, Object> param,
                                                     @PathVariable("page") int page, @PathVariable("length") int length)
             throws Exception {
         return trdBondTrade001Service.selectForPage(page, length, param);
     }
 
-    /**
-     * 不分页数据查询
-     *
-     * @param param
-     * @return
-     * @throws Exception
-     */
-    @PostMapping("/queryPageList")
-    public List<TrdBondTrade001Dto> queryPageList(@RequestBody Map<String, Object> param){
-        return trdBondTrade001Service.queryPageList(param);
-    }
-
     @Transactional
     @DTXTransaction
     @PostMapping("delete")
-    public int delete(@RequestBody TrdBondTrade001Dto dto){
+    public int delete(@RequestBody TrdBondTradeDto dto){
         return trdBondTrade001Service.delete(dto);
     }
 

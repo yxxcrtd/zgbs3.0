@@ -1647,4 +1647,19 @@ public class TrdProductDeal extends BaseEntity {
     public void setCancelDate(Date cancelDate) {
         this.cancelDate = cancelDate;
     }
+
+    /*add by sunshuaishuai 20220323 交易界面：交易表添加资金账户 start*/
+    /**
+     * 资金账户
+     */
+    private String myAcctNo;
+
+    public String getMyAcctNo() {
+        return myAcctNo;
+    }
+
+    public void setMyAcctNo(String myAcctNo) {
+        this.myAcctNo = myAcctNo;
+    }
+    /*add by sunshuaishuai 20220323 交易界面：交易表添加资金账户 end*/
 }

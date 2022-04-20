@@ -9,7 +9,8 @@
             asset: $.trim($('#asset').val()),
             tradeDateBegin: $("#tradeDate").startDate(),
             tradeDateEnd: $("#tradeDate").endDate(),
-            ps: $('#ps').val()
+            ps: $('#ps').val(),
+            dataSource:$('#dataSource').val()
         }
     };
 
@@ -25,32 +26,34 @@
             }
         },
         dblclick:function(table, data) {
-            Joyin.dialog(JoyinUtil.getLabel("债券存续期管理查看："),
-                JoyinUtil.getRealPath("/valuation/trademanage/trdbondvaluationduration/TrdBondValuationDuration001/init"),
-                "90%", "90%", {pageModel:PAGE_MODEL_REFERENCE,tradeId:data.tradeId,prodId:data.finprodId,ps:data.ps},
-                function(){
-                    //table.reload();
-                });
+            Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+                basePath + "valuation/trademanage/trdbondvaluationduration/TrdBondValuationDuration002/init",
+                "95%", "90%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
+                    tradeId:data.tradeId,ps:data.ps});
         },
         cols:[
             {field:'tradeId', title: '交易编号',width:220},
-            {field:'finprodId', title: '产品代码',width:180},
+            {field:'prodId', title: '产品代码',width:180},
             {field:'assetId', title: '资产代码',width:180},
             {field:'assetAbbr', title: '资产简称',width:180},
             {field:'psStr', title: '交易类型',sortField:"ps",width:150},
             {field:'ps', title: '交易类型',visible:false},
-            {field:'tradeDate', title: '交易日期',width:120},
+            {field:'tradeDateStr', width:120,  title: '交易日期',sortField:'tradeDate'},
+            {field:'tradeDate', title: '交易日期',visible:false},
             {field:'invAimStr', title: '会计分类',sortField:"invAim",width:240},
             {field:'invAim', title: '会计分类',visible:false},
             {field:'intAmtReal',type:"money", title: '实收利息',width:180},
             {field:'actCapi', type:"money",title: '实收本金',width:180},
-            {field:'plandate', title: '计划支付日',width:120},
-            {field:'fundSettleDate', title: '资金交收日',width:120},
+            {field:'mdateStr', width:120,  title: '计息结束日',sortField:'mdate'},
+            {field:'mdate', title: '计息结束日',visible:false},
+            {field:'fundSettleDateStr', width:120,  title: '资金交收日',sortField:'fundSettleDate'},
+            {field:'fundSettleDate', title: '资金交收日',visible:false},
             {field:'settleAmt',type:"money", title: '结算金额',width:180},
             {field:'ccyFmt', title: '币种',sortField:"ccy",width:180},
             {field:'ccy', title: '币种',visible:false},
-            {field:'bTradeAmt', type:"money",title: '本币交易金额',width:180},
-            {field:'acctNo', title: '资金账户',width:180},
+            {field:'myAcctNo', title: '资金账户',width:180},
+            {field:'dataSourceStr', title: '数据来源',sortField:"dataSource",width:150},
+            {field:'dataSource', title: '数据来源',visible:false},
             {field:'operation', title:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操 作', type:'action', fixed: 'right',width:120,
                 buttons:['edit', 'delt']},
         ],
@@ -66,7 +69,7 @@
         Joyin.ajaxJson(basePath + 'valuation/trademanage/trdbondvaluationduration/TrdBondValuationDuration001/check', object, function(result) {//请求路径，请求参数回调函数
                 Joyin.dialog(JoyinUtil.getLabel("债券存续期管理-修改"),
                     basePath + "valuation/trademanage/trdbondvaluationduration/TrdBondValuationDuration002/init",//打开新界面
-                    "98%", "98%", {pageModel:PAGE_MODEL_EDIT,//请求的page_model
+                    "95%", "90%", {pageModel:PAGE_MODEL_EDIT,//请求的page_model
                         tradeId:data.tradeId  //金融产品代码
                     },function(){
                         table.reload();//回调函数，表格刷新
@@ -98,21 +101,8 @@
      * 导出选中的表格数据
      */
     var exportExcel = function() {
-
-        var selArr = [];
-        var datas = null;
-        if (table != null && table != '') {
-            selArr = table.getAllCheckedRows();
-            datas = JSON.stringify(selArr);
-        }
-        if (!selArr || selArr.length == 0) {
-            var paramObj = getPageParams();
-            Joyin.exportExcel('export', paramObj);
-        } else {
-            Joyin.exportExcel('export', {
-                datas : datas
-            });
-        }
+        var paramObj = getPageParams();//请求参数json格式
+        Joyin.exportExcel('export', paramObj);//导出（共通）
     };
 
 

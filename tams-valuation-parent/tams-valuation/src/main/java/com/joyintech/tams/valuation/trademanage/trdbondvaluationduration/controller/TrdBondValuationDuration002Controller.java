@@ -18,11 +18,13 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
-import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDuration002Dto;
+import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationDto;
 import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.service.TrdBondValuationDuration002Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -32,11 +34,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -68,53 +70,23 @@ public class TrdBondValuationDuration002Controller extends BaseController {
         // 工作流ID
         String workflowId = this.getParam(GlobalConstant.WORKFLOW_ID);
 
-        String operateType = getParam("operateType");
-
         String tradeId = getParam("tradeId");
 
         if(StringUtil.isNotEmpty(workflowId)){
-            TrdBondValuationDuration002Dto entity= trdBondValuationDuration002Service.getBussinessEntityByWorkflowId(workflowId);
+            TrdBondValuationDurationDto entity= trdBondValuationDuration002Service.getBussinessEntityByWorkflowId(workflowId);
+            if(!StringUtil.isNotEmpty(entity.getTradeId())){
+                entity.setTradeId("提交后自动生成，无需填写");
+            }
             model.addAttribute("entity", entity);
             model.addAttribute("workflowId", workflowId);
 
         }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){
-            TrdBondValuationDuration002Dto entity = trdBondValuationDuration002Service.queryTradeInfoByTradeId(tradeId);
+            TrdBondValuationDurationDto entity = trdBondValuationDuration002Service.queryTradeInfoByTradeId(tradeId);
             model.addAttribute("entity", entity);
         }
 
 
         return super.init(model);
-    }
-
-    /**
-     * 产品代码下拉框
-     *
-     * @return 产品代码
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("/getFinprodId")
-    public List<SelectOptionDto> getFinprodId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("finprodType","F16");
-        return commonBusinessService.getProdId(param);
-    }
-
-    /**
-     * 资产代码下拉框
-     *
-     * @return 资产代码
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("/getAssetId")
-    public List<SelectOptionDto> getAssetId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        // param.put("assetType","F10");
-        param.put("assetType","F01");//todo
-        return commonBusinessService.getAssetId(param);
     }
 
     /**
@@ -128,14 +100,18 @@ public class TrdBondValuationDuration002Controller extends BaseController {
     @RequestMapping("/getTrdAcctId")
     public List<SelectOptionDto> getTrdAcctId() {
         Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("portfolioId",param.get("finprodId"));
+        String[] accTypeArr =  {DictCodeListExt1.资金账户类型_产品托管户.getValue(),
+                    DictCodeListExt1.资金账户类型_券商资金账户.getValue(),
+                    DictCodeListExt1.资金账户类型_结算备付金账户.getValue(),};
+        param.put("finprodId",param.get("prodId"));
+        param.put("accTypeArr",accTypeArr);
         return commonBusinessService.getTrdAcctId(param);
     }
 
     /**
      * 确认校验
      *
-     * @param trdBondValuationDuration002Dto 参数
+     * @param trdBondValuationDurationDto 参数
      * @param result 校验结果
      * @return AjaxResult
      * @see
@@ -143,9 +119,10 @@ public class TrdBondValuationDuration002Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("check")
-    public AjaxResult check(@Valid @RequestBody TrdBondValuationDuration002Dto trdBondValuationDuration002Dto,
+    public AjaxResult check(@RequestBody @Validated({
+            ValidateGroupEdit.class}) TrdBondValuationDurationDto trdBondValuationDurationDto,
                             BindingResult result) {
-        return commonCheck(result, trdBondValuationDuration002Dto.getOperateType());
+        return commonCheck(result, trdBondValuationDurationDto.getOperateType());
     }
 
 
@@ -160,54 +137,30 @@ public class TrdBondValuationDuration002Controller extends BaseController {
      */
     @RequestMapping("save")
     @ResponseBody
-    AjaxResult save(@RequestBody @Valid TrdBondValuationDuration002Dto dto, BindingResult br)
+    AjaxResult save(@RequestBody @Validated({
+            ValidateGroupEdit.class}) TrdBondValuationDurationDto dto, BindingResult br)
             throws Exception {
 
         if (br.hasErrors()) {
             return new AjaxResult(br);
         }
 
-        ProcessParameter<TrdBondValuationDuration002Dto> processParameter = new ProcessParameter<>();
-        WorkFlowParameter<TrdBondValuationDuration002Dto> workFlowParameter = new WorkFlowParameter<>();
+        ProcessParameter<TrdBondValuationDurationDto> processParameter = new ProcessParameter<>();
+        WorkFlowParameter<TrdBondValuationDurationDto> workFlowParameter = new WorkFlowParameter<>();
         processParameter.setWorkFlowParameter(workFlowParameter);
         processParameter.setPageId(this.getPageId());
 
-        //设置主键
-        if(!StringUtil.isNotEmpty(dto.getTradeId())){
-            Date sysDate= DateUtil.platDateFromCache();
-            dto.setTradeId(getTradeId("JYBONDBONUS", sysDate, "A"));
-        }
-
         workFlowParameter.setPageId(this.getPageId());
         workFlowParameter.setElementId(this.getParam("elementId"));
-        workFlowParameter.setBusinessCode(dto.getTradeId());
-        workFlowParameter.setBusinessType(DictCodeList.共通业务类型_债券类资产交易.getValue());
+        workFlowParameter.setBusinessCode(dto.getAssetId());
+        workFlowParameter.setBusinessType(DictCodeList.共通业务类型_债券类资产存续期.getValue());
         workFlowParameter.setComment((entity) -> WorkFlowUtil.concatComment(
-                getMessage("交易编号") + GlobalConstant.COLON + entity.getTradeId() ));
+                getMessage("资产代码") + GlobalConstant.COLON + entity.getAssetId(),
+                getMessage("交易日期") + DateUtil.format(DateUtil.parse(DateUtil.getSysDate()))));
 
         String msg = trdBondValuationDuration002Service.start(processParameter, dto);
 
         return new AjaxResult(msg);
     }
-
-    /**
-     * 编号生成
-     */
-    public String getTradeId(String str, Date date, String flag) {
-        int  sequences=0;
-        // 查询数据库sequences
-        if ("A".equals(flag)) {
-            sequences = trdBondValuationDuration002Service.querySequences();
-        }
-        // 组装4位序列号 不足补0
-        String sequence = StringUtils.leftPad(String.valueOf(sequences), 4, '0');
-        // 日期格式化yyymmdd
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        String formatDate = sdf.format(date);
-
-        String tradeIdStr = str + formatDate + sequence;
-        return tradeIdStr;
-    }
-
 
 }

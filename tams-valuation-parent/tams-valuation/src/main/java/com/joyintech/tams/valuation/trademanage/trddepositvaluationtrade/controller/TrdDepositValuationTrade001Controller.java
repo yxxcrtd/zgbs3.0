@@ -11,31 +11,22 @@
 package com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.system.constant.SystemGlobalConstant;
-import com.joyintech.tams.common.base.dao.FinProductMapper;
-import com.joyintech.tams.common.base.dao.TrdProductDealAddMapper;
-import com.joyintech.tams.common.base.dao.TrdProductDealMapper;
-import com.joyintech.tams.common.base.entity.FinProduct;
-import com.joyintech.tams.common.base.entity.TrdProductDeal;
-import com.joyintech.tams.common.base.entity.TrdProductDealAdd;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
-
 import com.joyintech.tams.valuation.common.service.MstWorkflowCommonService;
-import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTrade001Dto;
+import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.dto.TrdDepositValuationTrade001Dto;
 import com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.service.TrdDepositValuationTrade001Service;
 import com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.service.TrdDepositValuationTrade002Service;
-
-import com.joyintech.tams.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanValuationTradeDto;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
@@ -68,112 +59,105 @@ import java.util.Map;
 @PageId("TrdDepositValuationTrade001")
 @RequestMapping("/valuation/trademanage/trddepositvaluationtrade/TrdDepositValuationTrade001")
 public class TrdDepositValuationTrade001Controller extends BaseController {
-    
-        /*
-         * 注入service
-         */
-        @Autowired
-        private TrdDepositValuationTrade001Service trdDepositValuationTrade001Service;
-        
-        @Autowired
-        private TrdDepositValuationTrade002Service trdDepositValuationTrade002Service;
-//    /**
-//     * 通用Mapper共同代理方法
-//     */
-//    @Autowired(required = false)
-//    private BussCommonMapperDelegateService bussCommonMapperDelegateService;
 
+    @Autowired
+    private TrdDepositValuationTrade001Service trdDepositValuationTrade001Service;
 
+    @Autowired
+    private CommonBusinessService commonBusinessService;
 
     /**
-     * 流程组件
+     * 初始化方法
+     * {@inheritDoc}
      */
-    @Autowired
-    private MstWorkflowCommonService mstWorkflowCommonService;
-    
-    @Autowired
-    private TrdDepositValuationTrade002Controller trade002Controller;
-        /**
-         * 初始化方法
-         * {@inheritDoc}
-         */
-        @Override
-        public String init(Model model) {
-            this.setSelectOptionToModel(model, DictCode.交易方向, DictCode.交易流程状态, DictCode.存款类资产类型
-            		, DictCode.行内资产二级分类, DictCode.行内资产三级分类, DictCode.行内资产四级分类, DictCode.行内资产五级分类);//新增资产二、三、四级分类 王贵奇 2019/08/01
-            model.addAttribute("TRADE_STATUS", DictCodeListExt1.交易流程状态_有效.getValue());
-            
-            model.addAttribute("isShowType", CacheUtil.getSysParam("IS_SHOW_TYPE")==null?"01": CacheUtil.getSysParam("IS_SHOW_TYPE"));
-            
-            return super.init(model);
-        }
+    @Override
+    public String init(Model model) {
+        this.setSelectOptionToModel(model, DictCode.交易方向,DictCode.生成方式);
+        return super.init(model);
+    }
 
+    /**
+     * 产品代码下拉框
+     *
+     * @return 产品代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getFinprodId")
+    public List<SelectOptionDto> getFinprodId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("finprodType",DictCodeListExt1.金融产品类型_理财产品.getValue());
+        return commonBusinessService.getProdName(param);
+    }
+
+    /**
+     * 资产代码下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getAssetId")
+    public List<SelectOptionDto> getAssetId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("assetType",DictCodeListExt1.金融产品类型_存款.getValue());  //存款类资产
+        return commonBusinessService.getAssetId(param);
+    }
 
     /**
      * @Description:页面查询，表格分页
      * @return:
      */
-//    @ResponseBody
-//    @RequestMapping("findPage")
-//    public Page<TrdDepositValuationTrade001Dto> findPage()
-//            throws Exception {
-//        Page<TrdDepositValuationTrade001Dto> page = trdDepositValuationTrade001Service.findPage(
-//                RequestUtil.getParameters(getRequest()));
-//        return page;
-//    }
-
-
     @RequestMapping("findPage")
     @ResponseBody
-    public Page<TrdDepositValuationTrade001Dto> findPage()
-            throws Exception {
-                Page<TrdDepositValuationTrade001Dto> page = trdDepositValuationTrade001Service.findPage(
-                RequestUtil.getParameters(getRequest()));
-                return page;
+    public Page<TrdDepositValuationTrade001Dto> findPage() throws Exception {
+        Page<TrdDepositValuationTrade001Dto> page =
+                trdDepositValuationTrade001Service.findPage(RequestUtil.getParameters(getRequest()));
+        return page;
     }
-
-
-        
-        /**
-         * 删除按钮点击时的check
-         * @param dto 验证的实体类
-         * @param result 验证的结果
-         * @return 错误信息
-         */
-        @ResponseBody
-        @RequestMapping("check")
-        public AjaxResult check(@RequestBody @Validated({
-            ValidateGroupDelete.class}) TrdDepositValuationTrade001Dto dto, BindingResult result) {
-            return commonCheck(result, dto.getOperateType());
-        }
 
     /**
-     * 导出数据
+     * 删除前判断
+     *
+     * @param dto
+     * @param result
+     * @return
+     * @throws Exception
      */
-    @RequestMapping(ACTION_EXPORT)
-    public ResponseEntity<byte[]> export()
-            throws ParseException, IOException {
+    @ResponseBody
+    @RequestMapping("check")
+    public AjaxResult check(@RequestBody @Valid TrdDepositValuationTrade001Dto dto,
+                            BindingResult result) throws ParseException {
 
-        String datas = this.getParam("datas");
-        Map<String, Object> params = RequestUtil.getPageParam();
-        List<TrdDepositValuationTrade001Dto> listdto;
-        if (datas != null) {
-            listdto = JsonUtils.json2List(datas, TrdDepositValuationTrade001Dto.class);
-        } else {
-            listdto = trdDepositValuationTrade001Service.queryPageList(params);
+        List<TrdDepositValuationTrade001Dto> list = dto.getSelectedItem();
+        if(list==null||list.size()<=0){
+            return new AjaxResult("请选择数据", MessageType.错误消息);
         }
-        File outFile = trdDepositValuationTrade001Service.makeFile(
-                "/com/joyintech/tams/valuation/trademanage/trddepositvaluationtrade/conf/export_conf.xml",
-                listdto);
-        return ExportUtil.export(
-                this.getMessage(this.getPageId()) + SystemGlobalConstant.OPEN_PARENTHESIS
-                        + DateUtil.format(new Date())
-                        + SystemGlobalConstant.CLOSE_PARENTHESIS
-                        + SystemGlobalConstant.POINT
-                        + FileNameUtil.getFileExtName(outFile),
-                outFile, true);
-    }
+        //删除时的校验
+        if(StringUtil.isNotEmpty(list) && "delete".equals(dto.getOperateType())) {
+            for (TrdDepositValuationTrade001Dto item : list) {
+                //1.判断是否在流程中
+                //判断当前流程是否存在
+                if (trdDepositValuationTrade001Service.checkBusinessDataInFlow(item)) {
+                    //流程存在情况
+                    return new AjaxResult("交易编号：" + item.getTradeId() + "已存在流程中", MessageType.错误消息);
+                }
 
+            }
+        }else if("edit".equals(dto.getOperateType())){
+            for (TrdDepositValuationTrade001Dto item : list) {
+                //1.判断是否在流程中
+                //判断当前流程是否存在
+                if(trdDepositValuationTrade001Service.checkBusinessDataInFlow(item)){
+                    //流程存在情况
+                    return new AjaxResult("交易编号："+item.getTradeId()+"已存在流程中", MessageType.错误消息);
+                }
+            }
+        }
+        return new AjaxResult();
+    }
 
 
     //删除
@@ -191,15 +175,15 @@ public class TrdDepositValuationTrade001Controller extends BaseController {
         // 业务代码（凭证流水号）
         params.setBusinessCode(item -> item.getTradeId());
         // 业务类型
-        params.setBusinessType(DictCodeList.业务类型_银行间债券交易.getValue());
+        params.setBusinessType(DictCodeList.共通业务类型_存款类资产交易.getValue());
         // 页面id
-        params.setPageId("BondTradeQuery001");
+        params.setPageId("TrdDepositValuationTrade002");
         // 元素id
         params.setElementId(dto.getElementId());
 
         // 设置流程业务说明, entity即传入的dto
-        params.setComment(entity -> WorkFlowUtil.concatComment("存款类资产查询删除：", entity.getTradeId(),
-                DateUtil.format(entity.getTradeDate(),DateUtil.DEFAULT_DATETIME_FORMAT)
+        params.setComment(entity -> WorkFlowUtil.concatComment("存款类资产交易删除：交易编号:", entity.getTradeId(),
+                "交易日期:",DateUtil.format(entity.getTradeDate())
         ));
 
         // 塞入流程参数
@@ -218,6 +202,18 @@ public class TrdDepositValuationTrade001Controller extends BaseController {
         return new AjaxResult(msg);
     }
 
+    /**
+     * 导出
+     * @return
+     * @throws Exception
+     * @see
+     * @since 1.0
+     */
+    @RequestMapping(ACTION_EXPORT)
+    public ResponseEntity<byte[]> export(){
+        Map<String, Object> param = RequestUtil.getParameters(getRequest());
+        return trdDepositValuationTrade001Service.export(this.getPageId(),param);
+    }
 
 }
 

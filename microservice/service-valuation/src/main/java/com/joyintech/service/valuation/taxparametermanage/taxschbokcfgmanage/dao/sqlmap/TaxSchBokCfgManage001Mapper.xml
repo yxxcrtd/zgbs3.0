@@ -7,9 +7,9 @@
             TBC.config_id as configId, /*配置代码*/
             TBC.table_id as tableId, /*记账场景(会计事件编码)*/
             TBC.table_id as tableIdCode, /*记账场景(会计事件编码)*/
-            (select n.subject_nature_name
-            from BOK_ACCT_STANDARD_NATURE n
-            where n.base_subject_nature = TBC.subject_nature) as subjectNature, /*发生额科目性质*/
+            (select n.SUBJECT_INTERNAL_NAME
+            from BOK_SUBJECT_INTERNAL n
+            where n.SUBJECT_INTERNAL_CODE = TBC.subject_nature) as subjectNature, /*发生额科目性质*/
             TBC.subject_nature as subjectNatureCode, /*发生额科目性质*/
             TBC.vat_type as vatType, /*增值税类型*/
             TBC.vat_type as vatTypeCode, /*增值税类型*/

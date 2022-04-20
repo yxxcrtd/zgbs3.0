@@ -10,6 +10,7 @@
 package com.joyintech.service.valuation.trademanage.trdintovaluationduration.dto;
 
 
+import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
@@ -25,7 +26,7 @@ import java.util.Date;
 import java.util.List;
 
 
-public class TrdIntoValuationDuration001Dto extends WflTrdProductDeal implements ProcessEntity {
+public class TrdIntoValuationDuration001Dto extends BaseEntity implements ProcessEntity {
 
     /**
      * <意义，目的和功能，以及可能被用到的地方>
@@ -38,28 +39,25 @@ public class TrdIntoValuationDuration001Dto extends WflTrdProductDeal implements
 
     private String tradeId;
 
+    /**
+     *  产品代码
+     */
+    private String prodId;
 
     /**
-     * 组合代码  产品代码
+     *  产品名称
      */
-    private String portfolioId;
-
+    private String prodName;
 
     /**
-     * 组合名称  产品名称
+     *  资产代码
      */
-    private String portfolioName;
+    private String secId;
 
     /**
-     * 市场机构代码  资产代码
+     *  资产名称
      */
-    private String finprodMarketId;
-
-    /**
-     * 金融产品名称  资产名称
-     */
-    private String finprodName;
-
+    private String secAbbr;
 
     /**
      * 交易类型
@@ -94,7 +92,6 @@ public class TrdIntoValuationDuration001Dto extends WflTrdProductDeal implements
      */
     private String ccy;
 
-
     /**
      * 实收本金
      */
@@ -119,7 +116,7 @@ public class TrdIntoValuationDuration001Dto extends WflTrdProductDeal implements
     /**
      * 资金账户
      */
-    private String trdAcctId;
+    private String myAcctNo;
 
     /**
      * 操作类型
@@ -145,43 +142,38 @@ public class TrdIntoValuationDuration001Dto extends WflTrdProductDeal implements
         this.tradeId = tradeId;
     }
 
-    @NotEmpty(fieldName = "TrdIntoValuationDuration002.portfolioName", groups = {ValidateGroupEdit.class})
-    public String getPortfolioId() {
-        return portfolioId;
+    public String getProdId() {
+        return prodId;
     }
 
-    public void setPortfolioId(String portfolioId) {
-        this.portfolioId = portfolioId;
+    public void setProdId(String prodId) {
+        this.prodId = prodId;
     }
 
-    @NotEmpty(fieldName = "TrdIntoValuationDuration002.portfolioId", groups = {ValidateGroupEdit.class})
-    public String getPortfolioName() {
-        return portfolioName;
+    public String getProdName() {
+        return prodName;
     }
 
-    public void setPortfolioName(String portfolioName) {
-        this.portfolioName = portfolioName;
+    public void setProdName(String prodName) {
+        this.prodName = prodName;
     }
 
-    @NotEmpty(fieldName = "TrdIntoValuationDuration002.finprodName", groups = {ValidateGroupEdit.class})
-    public String getFinprodMarketId() {
-        return finprodMarketId;
+    public String getSecId() {
+        return secId;
     }
 
-    public void setFinprodMarketId(String finprodMarketId) {
-        this.finprodMarketId = finprodMarketId;
+    public void setSecId(String secId) {
+        this.secId = secId;
     }
 
-    @NotEmpty(fieldName = "TrdIntoValuationDuration002.finprodMarketId", groups = {ValidateGroupEdit.class})
-    public String getFinprodName() {
-        return finprodName;
+    public String getSecAbbr() {
+        return secAbbr;
     }
 
-    public void setFinprodName(String finprodName) {
-        this.finprodName = finprodName;
+    public void setSecAbbr(String secAbbr) {
+        this.secAbbr = secAbbr;
     }
 
-    @NotEmpty(fieldName = "TrdIntoValuationDuration002.ps", groups = {ValidateGroupEdit.class})
     public String getPs() {
         return ps;
     }
@@ -190,7 +182,6 @@ public class TrdIntoValuationDuration001Dto extends WflTrdProductDeal implements
         this.ps = ps;
     }
 
-    @NotEmpty(fieldName = "TrdIntoValuationDuration002.vdate", groups = {ValidateGroupEdit.class})
     public Date getVdate() {
         return vdate;
     }
@@ -199,7 +190,6 @@ public class TrdIntoValuationDuration001Dto extends WflTrdProductDeal implements
         this.vdate = vdate;
     }
 
-    @NotEmpty(fieldName = "TrdIntoValuationDuration002.mdate", groups = {ValidateGroupEdit.class})
     public Date getMdate() {
         return mdate;
     }
@@ -208,7 +198,6 @@ public class TrdIntoValuationDuration001Dto extends WflTrdProductDeal implements
         this.mdate = mdate;
     }
 
-    @NotEmpty(fieldName = "TrdIntoValuationDuration002.tradeDate", groups = {ValidateGroupEdit.class})
     public Date getTradeDate() {
         return tradeDate;
     }
@@ -217,7 +206,6 @@ public class TrdIntoValuationDuration001Dto extends WflTrdProductDeal implements
         this.tradeDate = tradeDate;
     }
 
-    @NotEmpty(fieldName = "TrdIntoValuationDuration002.settleDate", groups = {ValidateGroupEdit.class})
     public Date getSettleDate() {
         return settleDate;
     }
@@ -226,7 +214,6 @@ public class TrdIntoValuationDuration001Dto extends WflTrdProductDeal implements
         this.settleDate = settleDate;
     }
 
-    @NotEmpty(fieldName = "TrdIntoValuationDuration002.ccy", groups = {ValidateGroupEdit.class})
     public String getCcy() {
         return ccy;
     }
@@ -235,7 +222,6 @@ public class TrdIntoValuationDuration001Dto extends WflTrdProductDeal implements
         this.ccy = ccy;
     }
 
-    @NotEmpty(fieldName = "TrdIntoValuationDuration002.actCapi", groups = {ValidateGroupEdit.class})
     public BigDecimal getActCapi() {
         return actCapi;
     }
@@ -244,7 +230,6 @@ public class TrdIntoValuationDuration001Dto extends WflTrdProductDeal implements
         this.actCapi = actCapi;
     }
 
-    @NotEmpty(fieldName = "TrdIntoValuationDuration002.actInt", groups = {ValidateGroupEdit.class})
     public BigDecimal getActInt() {
         return actInt;
     }
@@ -253,7 +238,6 @@ public class TrdIntoValuationDuration001Dto extends WflTrdProductDeal implements
         this.actInt = actInt;
     }
 
-    @NotEmpty(fieldName = "TrdIntoValuationDuration002.otherAmt", groups = {ValidateGroupEdit.class})
     public BigDecimal getOtherAmt() {
         return otherAmt;
     }
@@ -262,7 +246,6 @@ public class TrdIntoValuationDuration001Dto extends WflTrdProductDeal implements
         this.otherAmt = otherAmt;
     }
 
-    @NotEmpty(fieldName = "TrdIntoValuationDuration002.settleAmt", groups = {ValidateGroupEdit.class})
     public BigDecimal getSettleAmt() {
         return settleAmt;
     }
@@ -271,13 +254,12 @@ public class TrdIntoValuationDuration001Dto extends WflTrdProductDeal implements
         this.settleAmt = settleAmt;
     }
 
-    @NotEmpty(fieldName = "TrdIntoValuationDuration002.trdAcctId", groups = {ValidateGroupEdit.class})
-    public String getTrdAcctId() {
-        return trdAcctId;
+    public String getMyAcctNo() {
+        return myAcctNo;
     }
 
-    public void setTrdAcctId(String trdAcctId) {
-        this.trdAcctId = trdAcctId;
+    public void setMyAcctNo(String myAcctNo) {
+        this.myAcctNo = myAcctNo;
     }
 
     public String getOperateType() {
@@ -303,5 +285,4 @@ public class TrdIntoValuationDuration001Dto extends WflTrdProductDeal implements
     public void setSelectedItem(List<TrdIntoValuationDuration001Dto> selectedItem) {
         this.selectedItem = selectedItem;
     }
-
 }

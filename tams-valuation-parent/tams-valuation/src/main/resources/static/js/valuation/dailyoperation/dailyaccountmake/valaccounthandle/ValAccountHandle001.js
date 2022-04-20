@@ -106,7 +106,12 @@ $(function () {
                 }
                     , {field: 'detailName', width: 200, title: '任务名称',sort: true}
                     , {field: 'taskName', width: 180, title: '批处理类型',visible:false}
-                    , {field: 'taskName', width: 220, title: '任务明细',sort: true}
+                    , {field: 'taskName', width: 220, title: '任务明细',sort: true,
+                    render: function (data, type, row, meta) {
+                        var html = '<a href="javascript:void(0);" class="taskName" data-seqno="' + row.seqNo + '">' + data + '</a>';
+                        return html;
+                    }
+                }
                     , {field: 'taskStatus', width: 100, title: '执行状态',sortField:'taskStatusCode',sort: true,
                     render: function (data, type, row, meta) {
                         if(data=='正常结束'){
@@ -125,11 +130,11 @@ $(function () {
                     , {field: 'useingTime', width: 100, title: '耗时(s)',sort: true}
                     , {field: 'startTimeFmt',sorfiled:'batchStartTime', width: 150, title: '开始时间',sort: true}
                     , {field: 'endTimeFmt',sorfiled:'batchEndTime', width: 150, title: '结束时间',sort: true}
-                    , {field:'operation', title: '操作',sort: true,
-                    render: function (data, type, row, meta) {
-                        return '<a href="javascript:void(0);" onclick="openShow()" data-taskId="' + row.taskId + '">详细</a>';
-                    }
-                }
+                //     , {field:'operation', title: '操作',sort: true,
+                //     render: function (data, type, row, meta) {
+                //         return '<a href="javascript:void(0);" onclick="openShow()" data-taskId="' + row.taskId + '">详细</a>';
+                //     }
+                // }
                 ],
             loadonce:true,
             page:false
@@ -550,6 +555,18 @@ $(function () {
         var tabHeadUlH=100;
         tree.children('div').eq(1).height((docH-tabHeadUlH)+"px");
         tree.children('div').eq(1).css("overflow-x", "hidden");
+
+        $("body").on("click", ".taskName", function () {
+            var seqNo = $(this).data("seqno");
+            var index = Joyin.dialog("任务详情",    JoyinUtil.getRealPath("/valuation/system/log/ValBatchLog001/ValBatchLog003"), "100%", "100%", {logSeqNo: seqNo}, function () {
+
+            }, {
+                "关闭": function () {
+                    layer.close(index);
+                }
+            })
+        })
+
     });
 
 });
@@ -559,5 +576,7 @@ function searchByBatchName() {
     $('#typeDatatree').reloadTree({batchName:batchName});
 }
 var openShow=function(){
-    layer.alert('待开发。。。。');
+
+
+
 }

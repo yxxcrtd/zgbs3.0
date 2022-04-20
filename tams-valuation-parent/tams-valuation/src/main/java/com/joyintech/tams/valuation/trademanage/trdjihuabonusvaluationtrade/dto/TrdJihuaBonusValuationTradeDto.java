@@ -2,21 +2,24 @@
  
 package com.joyintech.tams.valuation.trademanage.trdjihuabonusvaluationtrade.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.annotation.PageId;
+import com.joyintech.framework.base.BaseEntity;
+import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.framework.validation.annotation.NotEmpty;
 import com.joyintech.framework.validation.annotation.ValidLogic;
 import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
-import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.valuation.trademanage.trdjihuabonusvaluationtrade.validate.TrdJihuaBonusValuationTradeDtoValidator;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
-import com.joyintech.workflow.engine.annotation.PrimaryKey.Field;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -30,7 +33,7 @@ import java.util.List;
 @PageId("TrdJihuaBonusValuationTrade002")
 @ValidLogic(targetClass = TrdJihuaBonusValuationTradeDtoValidator.class, groups = {ValidateGroupEdit.class,
     ValidateGroupDelete.class})
-public class TrdJihuaBonusValuationTradeDto extends WflTrdProductDeal implements ProcessEntity {
+public class TrdJihuaBonusValuationTradeDto extends BaseEntity implements ProcessEntity {
 
     /**
      * <意义，目的和功能，以及可能被用到的地方>
@@ -38,360 +41,282 @@ public class TrdJihuaBonusValuationTradeDto extends WflTrdProductDeal implements
     private static final long serialVersionUID = 5309538894816479429L;
 
     /**
-     * 产品代码
-     */
-    private String portfolioId;
-
-    /**
-     * 产品名称
-     */
-    private String portfolioName;
-
-
-    /**
-     * 分红金额
-     */
-    private BigDecimal bonusAmt;
-    /**
-     * 交易份额
-     */
-    private BigDecimal nums;
-
-    /**
-     * 单位分红净值
-     */
-    private BigDecimal unitCprice;
-
-
-    /**
-     * 其他费用
-     */
-    private BigDecimal feeAmtQT;
-
-    /**
-     * 结算金额
-     */
-    private BigDecimal mdateSettleAmt;
-
-
-    /**
-     * 资金账户
-     */
-    private String trdAcctId;
-
-
-    /**
-     * 金融产品名称
-     */
-    private String finprodName;
-    /**
      * 操作类型
      */
     private String operateType;
+
+    private String pageModel;
+
     /**
-     * 市场机构代码
-     */
-    private String finprodMarketId;
-    /**
-     * elementId
-     */
-    private String elementId;
-    /**
-     * 计划类实体类
+     * 选择数据
      */
     private List<TrdJihuaBonusValuationTradeDto> selectedItem;
 
     /**
-     * 撤销原因
+     * 要素id
      */
-    private String cancelRemark;
-    /**
-     * pageModel
-     */
-    private String pageModel;
-
+    private String elementId;
 
     /**
-     * 获取 pageModel
-     * @return pageModel.
+     * 交易编号
      */
-    public String getPageModel() {
-        return pageModel;
-    }
+    @PrimaryKey(value= PrimaryKey.Field.PK_1)
+    private String tradeId;
 
     /**
-     * 获取 finprodMarketId
-     * @return finprodMarketId.
+     * 产品代码
      */
-    public String getFinprodMarketId() {
-        return finprodMarketId;
-    }
+    private String prodId;
 
     /**
-     * 设置 finprodMarketId
-     * @param finprodMarketId finprodMarketId
+     * 产品名称
      */
-    public void setFinprodMarketId(String finprodMarketId) {
-        this.finprodMarketId = finprodMarketId;
-    }
+    private String prodName;
 
     /**
-     * 设置 pageModel
-     * @param pageModel pageModel
+     * 资产代码
      */
-    public void setPageModel(String pageModel) {
-        this.pageModel = pageModel;
-    }
-    /**
-     * 金融产品类型
-     * {@inheritDoc}
-     */
-    @Override
-    public String getFinprodType(){
-        return super.getFinprodType();
-    }
-
-    @Override
-    @NotEmpty(fieldName="TrdJihuaBonusValuationTrade001.tradeDate",groups = {ValidateGroupEdit.class})
-    public Date getTradeDate(){
-        return super.getTradeDate();
-    }
-
-
-
+    private String assetId;
 
     /**
-     * 获取 selectedItem
-     * @return selectedItem.
+     * 资产名称
      */
-    public List<TrdJihuaBonusValuationTradeDto> getSelectedItem() {
-        return selectedItem;
-    }
-
-
+    private String assetAbbr;
 
     /**
-     * 设置 selectedItem
-     * @param selectedItem selectedItem
+     * 交易类型
      */
-    public void setSelectedItem(List<TrdJihuaBonusValuationTradeDto> selectedItem) {
-        this.selectedItem = selectedItem;
-    }
-    /**
-     * 设置主键
-     * {@inheritDoc}
-     */
-    @Override
-    @PrimaryKey(Field.PK_1)
-    @NotEmpty(fieldName="TrdJihuaBonusValuationTrade001.tradeId",groups = {ValidateGroupEdit.class})
-    public String getTradeId(){
-        return super.getTradeId();
-    }
-    /**
-     * 业务类型
-     * {@inheritDoc}
-     */
-    @Override
-    @PrimaryKey(Field.PK_2)
-    public String getBusiType(){
-        return super.getBusiType();
-    }
+    private String ps;
 
     /**
-     * 获取 elementId
-     * @return elementId.
+     * 交易场所
      */
-    public String getElementId() {
-        return elementId;
-    }
+    private String tradeMarket;
 
     /**
-     * 设置 elementId
-     * @param elementId elementId
+     * 币种
      */
-    public void setElementId(String elementId) {
-        this.elementId = elementId;
-    }
-
-    public String getTrdAcctId() {
-        return trdAcctId;
-    }
-
-    public void setTrdAcctId(String trdAcctId) {
-        this.trdAcctId = trdAcctId;
-    }
-
-    @Override
-    public String getCancelRemark() {
-        return cancelRemark;
-    }
-
-    @Override
-    public void setCancelRemark(String cancelRemark) {
-        this.cancelRemark = cancelRemark;
-    }
+    private String ccy;
 
     /**
-     * 获取 operatType
-     * @return operatType.
+     * 交易日期
      */
+    private Date tradeDate;
+
+    /**
+     * 权益登记日
+     */
+    private Date mdate;
+
+    /**
+     * 资金到账日
+     */
+    private Date settleDate;
+
+    /**
+     * 分红金额
+     */
+    @JsonSerialize(using= BigDecimalSerializer.class)
+    private BigDecimal bonusAmt;
+
+    /**
+     * 结算金额
+     */
+    @JsonSerialize(using= BigDecimalSerializer.class)
+    private BigDecimal settleAmt;
+
+    /**
+     * 资金账户
+     */
+    private String myAcctNo;
+
+    /**
+     * 交易日期
+     */
+    private Date tradeDateReInvest;
+
+    /**
+     * 权益登记日
+     */
+    private Date mdateInvest;
+
+    /**
+     * 分红金额
+     */
+    @JsonSerialize(using= BigDecimalSerializer.class)
+    private BigDecimal bonusAmtReInvest;
+
+    /**
+     * 交易份额
+     */
+    @JsonSerialize(using= BigDecimalSerializer.class)
+    private BigDecimal dealNumReInvest;
+
+    /**
+     * 单位分红净值
+     */
+    @JsonSerialize(using= BigDecimalSerializer.class)
+    private BigDecimal unitBonusUnitValue;
+
+    /**
+     * 结算金额
+     */
+    @JsonSerialize(using= BigDecimalSerializer.class)
+    private BigDecimal settleAmtReInvest;
+
+    /**
+     * 资金账户
+     */
+    private String myAcctNoReInvest;
+
     public String getOperateType() {
         return operateType;
     }
 
-    /**
-     * 设置 operatType
-     * @param operateType operateType
-     */
     public void setOperateType(String operateType) {
         this.operateType = operateType;
     }
 
-    /**
-     * 币种字符串
-     * @return 币种
-     * @see
-     * @since 1.0
-     */
-    public String getCcyStr(){
-        return SysDataUtil.getNameFromDataDict(DictCode.币种, super.getCcy());
+    public String getPageModel() {
+        return pageModel;
     }
-    /**
-     * 币种
-     * {@inheritDoc}
-     */
-    @Override
-    @NotEmpty(fieldName="TrdJihuaBonusValuationTrade002.ccy",groups = {ValidateGroupEdit.class})
-    public String getCcy(){
-        return super.getCcy();
+
+    public void setPageModel(String pageModel) {
+        this.pageModel = pageModel;
     }
-    /**
-     * 交易方向
-     * {@inheritDoc}
-     */
-    @NotEmpty(fieldName="TrdJihuaBonusValuationTrade002.ps",groups = {ValidateGroupEdit.class})
-    public String getPs(){
-        return super.getPs();
+
+    public List<TrdJihuaBonusValuationTradeDto> getSelectedItem() {
+        return selectedItem;
     }
+
+    public void setSelectedItem(List<TrdJihuaBonusValuationTradeDto> selectedItem) {
+        this.selectedItem = selectedItem;
+    }
+
+    public String getElementId() {
+        return elementId;
+    }
+
+    public void setElementId(String elementId) {
+        this.elementId = elementId;
+    }
+
+    public String getTradeId() {
+        return tradeId;
+    }
+
+    public void setTradeId(String tradeId) {
+        this.tradeId = tradeId;
+    }
+
+    @NotEmpty(fieldName = "TrdJihuaBonusValuationTrade002.prodId" , groups = { ValidateGroupEdit.class })
+    public String getProdId() {
+        return prodId;
+    }
+
+    public void setProdId(String prodId) {
+        this.prodId = prodId;
+    }
+
+    @NotEmpty(fieldName = "TrdJihuaBonusValuationTrade002.prodName" , groups = { ValidateGroupEdit.class })
+    public String getProdName() {
+        return prodName;
+    }
+
+    public void setProdName(String prodName) {
+        this.prodName = prodName;
+    }
+
+    @NotEmpty(fieldName = "TrdJihuaBonusValuationTrade002.assetId" , groups = { ValidateGroupEdit.class })
+    public String getAssetId() {
+        return assetId;
+    }
+
+    public void setAssetId(String assetId) {
+        this.assetId = assetId;
+    }
+
+    @NotEmpty(fieldName = "TrdJihuaBonusValuationTrade002.assetAbbr" , groups = { ValidateGroupEdit.class })
+    public String getAssetAbbr() {
+        return assetAbbr;
+    }
+
+    public void setAssetAbbr(String assetAbbr) {
+        this.assetAbbr = assetAbbr;
+    }
+
+    @NotEmpty(fieldName = "TrdJihuaBonusValuationTrade002.ps" , groups = { ValidateGroupEdit.class })
+    public String getPs() {
+        return ps;
+    }
+
+    public void setPs(String ps) {
+        this.ps = ps;
+    }
+
     /**
-     * 交易方向字符串
+     * 取得 交易方向str
+     *
      * @return 交易方向
-     * @see
-     * @since 1.0
      */
-    public String getPsStr(){
-        return SysDataUtil.getNameFromDataDict(DictCode.交易方向, super.getPs());
+    public String getPsStr() {
+        return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.交易方向, ps))?
+                SysDataUtil.getNameFromDataDict(DictCode.交易方向, ps):ps;
+    }
+
+    public String getTradeMarket() {
+        return tradeMarket;
+    }
+
+    public void setTradeMarket(String tradeMarket) {
+        this.tradeMarket = tradeMarket;
+    }
+
+    @NotEmpty(fieldName = "TrdJihuaBonusValuationTrade002.ccy" , groups = { ValidateGroupEdit.class })
+    public String getCcy() {
+        return ccy;
+    }
+
+    public void setCcy(String ccy) {
+        this.ccy = ccy;
     }
 
     /**
-     * 获取 portfolioId
-     * @return portfolioId.
+     * 取得 币种Fmt
+     *
+     * @return 币种
      */
-    @NotEmpty(fieldName="TrdJihuaBonusValuationTrade001.portfolioId",groups = {ValidateGroupEdit.class})
-    public String getPortfolioId() {
-        return portfolioId;
+    public String getCcyFmt() {
+        return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.币种, ccy))?
+                SysDataUtil.getNameFromDataDict(DictCode.币种, ccy):ccy;
     }
 
-    /**
-     * 设置 portfolioId
-     * @param portfolioId portfolioId
-     */
-    public void setPortfolioId(String portfolioId) {
-        this.portfolioId = portfolioId;
+    public Date getTradeDate() {
+        return tradeDate;
     }
 
-    /**
-     * 获取 portfolioName
-     * @return portfolioName.
-     */
-    @NotEmpty(fieldName="TrdJihuaBonusValuationTrade001.portfolioName",groups = {ValidateGroupEdit.class})
-    public String getPortfolioName() {
-        return portfolioName;
+    public void setTradeDate(Date tradeDate) {
+        this.tradeDate = tradeDate;
     }
-
-    /**
-     * 设置 portfolioNamefinprodMarketId
-     * @param portfolioName portfolioName
-     */
-    public void setPortfolioName(String portfolioName) {
-        this.portfolioName = portfolioName;
-    }
-
-
-    /**
-     * 获取 finprodName
-     * @return finprodName.
-     */
-    @NotEmpty(fieldName="TrdJihuaBonusValuationTrade002.finprodName",groups = {ValidateGroupEdit.class})
-    public String getFinprodName() {
-        return finprodName;
-    }
-
-    /**
-     * 设置 finprodName
-     * @param finprodName finprodName
-     */
-    public void setFinprodName(String finprodName) {
-        this.finprodName = finprodName;
-    }
-
-
-
-
-    @NotEmpty(fieldName="TrdJihuaBonusValuationTrade002.nums",groups = {ValidateGroupEdit.class})
-    public BigDecimal getNums() {
-        return nums;
-    }
-
-    public void setNums(BigDecimal nums) {
-        this.nums = nums;
-    }
-
-    @NotEmpty(fieldName="TrdJihuaBonusValuationTrade002.feeAmtQT",groups = {ValidateGroupEdit.class})
-    public BigDecimal getFeeAmtQT() {
-        return feeAmtQT;
-    }
-
-    public void setFeeAmtQT(BigDecimal feeAmtQT) {
-        this.feeAmtQT = feeAmtQT;
-    }
-
-    @NotEmpty(fieldName="TrdJihuaBonusValuationTrade002.mdateSettleAmt",groups = {ValidateGroupEdit.class})
-    public BigDecimal getMdateSettleAmt() {
-        return mdateSettleAmt;
-    }
-
-    public void setMdateSettleAmt(BigDecimal mdateSettleAmt) {
-        this.mdateSettleAmt = mdateSettleAmt;
-    }
-
-    //交易金额
-    @Override
-    @NotEmpty(fieldName="TrdJihuaBonusValuationTrade002.tradeAmt",groups = {ValidateGroupEdit.class})
-    public BigDecimal getTradeAmt() {
-        return super.getTradeAmt();
-    }
-    //交易费用
-    @Override
-    @NotEmpty(fieldName="TrdJihuaBonusValuationTrade002.feeAmt",groups = {ValidateGroupEdit.class})
-    public BigDecimal getFeeAmt() {
-        return super.getFeeAmt();
-    }
-
-    //资产代码
-    @Override
-    @NotEmpty(fieldName="TrdJihuaBonusValuationTrade002.finprodId",groups = {ValidateGroupEdit.class})
-    public String getFinprodId() {
-        return super.getFinprodId();
-    }
-
 
     public String getTradeDateStr() {
-        String tradeDateStr="";
-        if(super.getTradeDate() !=null){
-            tradeDateStr= DateUtil.format(super.getTradeDate());
-        }
-        return tradeDateStr;
+        return DateUtil.format(this.getTradeDate());
+    }
+
+    public Date getMdate() {
+        return mdate;
+    }
+
+    public void setMdate(Date mdate) {
+        this.mdate = mdate;
+    }
+
+    public Date getSettleDate() {
+        return settleDate;
+    }
+
+    public void setSettleDate(Date settleDate) {
+        this.settleDate = settleDate;
     }
 
     public BigDecimal getBonusAmt() {
@@ -402,14 +327,96 @@ public class TrdJihuaBonusValuationTradeDto extends WflTrdProductDeal implements
         this.bonusAmt = bonusAmt;
     }
 
-    @Override
-    public BigDecimal getUnitCprice() {
-        return unitCprice;
+    public BigDecimal getSettleAmt() {
+        return settleAmt;
     }
 
-    @Override
-    public void setUnitCprice(BigDecimal unitCprice) {
-        this.unitCprice = unitCprice;
+    public void setSettleAmt(BigDecimal settleAmt) {
+        this.settleAmt = settleAmt;
+    }
+
+    public String getMyAcctNo() {
+        return myAcctNo;
+    }
+
+    public void setMyAcctNo(String myAcctNo) {
+        this.myAcctNo = myAcctNo;
+    }
+
+    public Date getTradeDateReInvest() {
+        return tradeDateReInvest;
+    }
+
+    public void setTradeDateReInvest(Date tradeDateReInvest) {
+        this.tradeDateReInvest = tradeDateReInvest;
+    }
+
+    public Date getMdateInvest() {
+        return mdateInvest;
+    }
+
+    public void setMdateInvest(Date mdateInvest) {
+        this.mdateInvest = mdateInvest;
+    }
+
+    public BigDecimal getBonusAmtReInvest() {
+        return bonusAmtReInvest;
+    }
+
+    public void setBonusAmtReInvest(BigDecimal bonusAmtReInvest) {
+        this.bonusAmtReInvest = bonusAmtReInvest;
+    }
+
+    public BigDecimal getDealNumReInvest() {
+        return dealNumReInvest;
+    }
+
+    public void setDealNumReInvest(BigDecimal dealNumReInvest) {
+        this.dealNumReInvest = dealNumReInvest;
+    }
+
+    public BigDecimal getUnitBonusUnitValue() {
+        return unitBonusUnitValue;
+    }
+
+    public void setUnitBonusUnitValue(BigDecimal unitBonusUnitValue) {
+        this.unitBonusUnitValue = unitBonusUnitValue;
+    }
+
+    public BigDecimal getSettleAmtReInvest() {
+        return settleAmtReInvest;
+    }
+
+    public void setSettleAmtReInvest(BigDecimal settleAmtReInvest) {
+        this.settleAmtReInvest = settleAmtReInvest;
+    }
+
+    public String getMyAcctNoReInvest() {
+        return myAcctNoReInvest;
+    }
+
+    public void setMyAcctNoReInvest(String myAcctNoReInvest) {
+        this.myAcctNoReInvest = myAcctNoReInvest;
+    }
+
+    public String getBonusAmtStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getBonusAmt()==null?"0.00":decimalFormat.format(this.getBonusAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getUnitBonusUnitValueStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.0000#");
+        return this.getUnitBonusUnitValue()==null?"0.0000":decimalFormat.format(this.getUnitBonusUnitValue().setScale(4,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getDealNumReInvestStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getDealNumReInvest()==null?"0.00":decimalFormat.format(this.getDealNumReInvest().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getSettleAmtStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getSettleAmt()==null?"0.00":decimalFormat.format(this.getSettleAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
     }
 }
 

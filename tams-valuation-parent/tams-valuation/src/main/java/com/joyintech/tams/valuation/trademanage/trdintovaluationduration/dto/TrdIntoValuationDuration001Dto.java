@@ -19,6 +19,7 @@ import com.joyintech.framework.validation.annotation.ValidLogic;
 import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTradeDto;
 import com.joyintech.tams.valuation.trademanage.trdintovaluationduration.validator.TrdIntoValuationDuration001Validator;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
@@ -44,28 +45,25 @@ public class TrdIntoValuationDuration001Dto extends BaseEntity implements Proces
 
     private String tradeId;
 
+    /**
+     *  产品代码
+     */
+    private String prodId;
 
     /**
-     * 组合代码  产品代码
+     *  产品名称
      */
-    private String portfolioId;
-
+    private String prodName;
 
     /**
-     * 组合名称  产品名称
+     *  资产代码
      */
-    private String portfolioName;
+    private String secId;
 
     /**
-     * 市场机构代码  资产代码
+     *  资产名称
      */
-    private String finprodMarketId;
-
-    /**
-     * 金融产品名称  资产名称
-     */
-    private String finprodName;
-
+    private String secAbbr;
 
     /**
      * 交易类型
@@ -75,19 +73,16 @@ public class TrdIntoValuationDuration001Dto extends BaseEntity implements Proces
     /**
      * 计息开始日
      */
-
     private Date vdate;
 
     /**
      * 计息结束日
      */
-
     private Date mdate;
 
     /**
      * 交易日
      */
-
     private Date tradeDate;
 
     /**
@@ -100,11 +95,9 @@ public class TrdIntoValuationDuration001Dto extends BaseEntity implements Proces
      */
     private String ccy;
 
-
     /**
      * 实收本金
      */
-
     private BigDecimal actCapi;
 
     /**
@@ -125,24 +118,26 @@ public class TrdIntoValuationDuration001Dto extends BaseEntity implements Proces
     /**
      * 资金账户
      */
-    private String trdAcctId;
+    private String myAcctNo;
 
     /**
      * 操作类型
      */
     private String operateType;
 
-    /**
-     * elementId
-     */
-    private String elementId;
-
+    private String pageModel;
 
     /**
-     * 融入券存续期实体类
+     * 选择数据
      */
     private List<TrdIntoValuationDuration001Dto> selectedItem;
 
+    /**
+     * 要素id
+     */
+    private String elementId;
+
+    @PrimaryKey(PrimaryKey.Field.PK_1)
     public String getTradeId() {
         return tradeId;
     }
@@ -151,40 +146,40 @@ public class TrdIntoValuationDuration001Dto extends BaseEntity implements Proces
         this.tradeId = tradeId;
     }
 
-    @NotEmpty(fieldName = "TrdIntoValuationDuration002.portfolioName", groups = {ValidateGroupEdit.class})
-    public String getPortfolioId() {
-        return portfolioId;
+    @NotEmpty(fieldName = "TrdIntoValuationDuration002.prodId", groups = {ValidateGroupEdit.class})
+    public String getProdId() {
+        return prodId;
     }
 
-    public void setPortfolioId(String portfolioId) {
-        this.portfolioId = portfolioId;
+    public void setProdId(String prodId) {
+        this.prodId = prodId;
     }
 
-    @NotEmpty(fieldName = "TrdIntoValuationDuration002.portfolioId", groups = {ValidateGroupEdit.class})
-    public String getPortfolioName() {
-        return portfolioName;
+    @NotEmpty(fieldName = "TrdIntoValuationDuration002.prodName", groups = {ValidateGroupEdit.class})
+    public String getProdName() {
+        return prodName;
     }
 
-    public void setPortfolioName(String portfolioName) {
-        this.portfolioName = portfolioName;
+    public void setProdName(String prodName) {
+        this.prodName = prodName;
     }
 
-    @NotEmpty(fieldName = "TrdIntoValuationDuration002.finprodName", groups = {ValidateGroupEdit.class})
-    public String getFinprodMarketId() {
-        return finprodMarketId;
+    @NotEmpty(fieldName = "TrdIntoValuationDuration002.secId", groups = {ValidateGroupEdit.class})
+    public String getSecId() {
+        return secId;
     }
 
-    public void setFinprodMarketId(String finprodMarketId) {
-        this.finprodMarketId = finprodMarketId;
+    public void setSecId(String secId) {
+        this.secId = secId;
     }
 
-    @NotEmpty(fieldName = "TrdIntoValuationDuration002.finprodMarketId", groups = {ValidateGroupEdit.class})
-    public String getFinprodName() {
-        return finprodName;
+    @NotEmpty(fieldName = "TrdIntoValuationDuration002.secAbbr", groups = {ValidateGroupEdit.class})
+    public String getSecAbbr() {
+        return secAbbr;
     }
 
-    public void setFinprodName(String finprodName) {
-        this.finprodName = finprodName;
+    public void setSecAbbr(String secAbbr) {
+        this.secAbbr = secAbbr;
     }
 
     @NotEmpty(fieldName = "TrdIntoValuationDuration002.ps", groups = {ValidateGroupEdit.class})
@@ -259,7 +254,6 @@ public class TrdIntoValuationDuration001Dto extends BaseEntity implements Proces
         this.actInt = actInt;
     }
 
-    @NotEmpty(fieldName = "TrdIntoValuationDuration002.otherAmt", groups = {ValidateGroupEdit.class})
     public BigDecimal getOtherAmt() {
         return otherAmt;
     }
@@ -277,13 +271,13 @@ public class TrdIntoValuationDuration001Dto extends BaseEntity implements Proces
         this.settleAmt = settleAmt;
     }
 
-    @NotEmpty(fieldName = "TrdIntoValuationDuration002.trdAcctId", groups = {ValidateGroupEdit.class})
-    public String getTrdAcctId() {
-        return trdAcctId;
+    @NotEmpty(fieldName = "TrdIntoValuationDuration002.myAcctNo", groups = {ValidateGroupEdit.class})
+    public String getMyAcctNo() {
+        return myAcctNo;
     }
 
-    public void setTrdAcctId(String trdAcctId) {
-        this.trdAcctId = trdAcctId;
+    public void setMyAcctNo(String myAcctNo) {
+        this.myAcctNo = myAcctNo;
     }
 
     public String getOperateType() {
@@ -294,12 +288,12 @@ public class TrdIntoValuationDuration001Dto extends BaseEntity implements Proces
         this.operateType = operateType;
     }
 
-    public String getElementId() {
-        return elementId;
+    public String getPageModel() {
+        return pageModel;
     }
 
-    public void setElementId(String elementId) {
-        this.elementId = elementId;
+    public void setPageModel(String pageModel) {
+        this.pageModel = pageModel;
     }
 
     public List<TrdIntoValuationDuration001Dto> getSelectedItem() {
@@ -308,6 +302,14 @@ public class TrdIntoValuationDuration001Dto extends BaseEntity implements Proces
 
     public void setSelectedItem(List<TrdIntoValuationDuration001Dto> selectedItem) {
         this.selectedItem = selectedItem;
+    }
+
+    public String getElementId() {
+        return elementId;
+    }
+
+    public void setElementId(String elementId) {
+        this.elementId = elementId;
     }
 
     //导出转化计息开始日
@@ -380,7 +382,6 @@ public class TrdIntoValuationDuration001Dto extends BaseEntity implements Proces
     public String getActIntStr(){
         DecimalFormat decimalFormat = new DecimalFormat("0.00#");
         return this.getActInt()==null?"0.00":decimalFormat.format(this.getActInt().setScale(2,BigDecimal.ROUND_HALF_UP));
-
     }
 
 
@@ -388,7 +389,6 @@ public class TrdIntoValuationDuration001Dto extends BaseEntity implements Proces
     public String getActCapiStr(){
         DecimalFormat decimalFormat = new DecimalFormat("0.00#");
         return this.getActCapi()==null?"0.00":decimalFormat.format(this.getActCapi().setScale(2,BigDecimal.ROUND_HALF_UP));
-
     }
 
 

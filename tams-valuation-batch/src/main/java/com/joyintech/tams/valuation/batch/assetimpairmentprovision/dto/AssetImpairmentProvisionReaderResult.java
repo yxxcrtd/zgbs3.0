@@ -10,12 +10,13 @@
  
 package com.joyintech.tams.valuation.batch.assetimpairmentprovision.dto;
 
-import java.util.Date;
-import java.util.List;
-
 import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
 import com.joyintech.tams.common.base.entity.TrdAssetLoss;
+import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.SubjectMappingConfig;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.TreeNode;
+
+import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -73,6 +74,13 @@ public class AssetImpairmentProvisionReaderResult extends NeedOperateEntity{
      * 会计场景
      */
     private TreeNode bookSetTreeNode;
+
+	// add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 start
+	/**
+	 *  辅助核算项配置信息
+	 */
+	private SubjectMappingConfig subjectMappingConfig;
+	// add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 end
 
 	public String getBooksetId() {
 		return booksetId;
@@ -154,5 +162,22 @@ public class AssetImpairmentProvisionReaderResult extends NeedOperateEntity{
     public void setBookSetTreeNode(TreeNode bookSetTreeNode) {
         this.bookSetTreeNode = bookSetTreeNode;
     }
-    
+
+	// add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 start
+	/**
+	 * 获取 辅助核算项配置信息
+	 * @return 辅助核算项配置信息.
+	 */
+	public SubjectMappingConfig getSubjectMappingConfig() {
+		return subjectMappingConfig;
+	}
+
+	/**
+	 * 设置 辅助核算项配置信息
+	 * @param subjectMappingConfig 辅助核算项配置信息
+	 */
+	public void setSubjectMappingConfig(SubjectMappingConfig subjectMappingConfig) {
+		this.subjectMappingConfig = subjectMappingConfig;
+	}
+	// add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 end
 }

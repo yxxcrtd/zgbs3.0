@@ -6,7 +6,6 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.service.valuation.trademanage.option.dao.TrdOptionValuationTradeMapper;
 import com.joyintech.service.valuation.trademanage.option.dto.TrdOptionValuationTrade001Dto;
 import com.joyintech.service.valuation.trademanage.option.dto.TrdOptionValuationTrade002Dto;
-import com.joyintech.service.valuation.trademanage.option.dto.TrdOptionValuationTrade003Dto;
 import com.joyintech.service.valuation.trademanage.option.dto.TrdOptionValuationTradeResult;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.valuation.common.interf.base.batch.dao.*;
@@ -87,7 +86,7 @@ public class TrdOptionValuationTrade002Service extends BaseService {
      * @see
      * @since 1.0
      */
-    public TrdOptionValuationTrade002Dto queryTradeInfoByTradeId(String tradeId){
+    public TrdOptionValuationTrade001Dto queryTradeInfoByTradeId(String tradeId){
         return  trdOptionValuationTradeMapper.queryTradeInfoByTradeId(tradeId);
     }
 
@@ -99,7 +98,7 @@ public class TrdOptionValuationTrade002Service extends BaseService {
      * @see
      * @since 1.0
      */
-    public TrdOptionValuationTrade003Dto queryInfoByTradeId(String tradeId){
+    public TrdOptionValuationTrade002Dto queryInfoByTradeId(String tradeId){
         return  trdOptionValuationTradeMapper.queryInfoByTradeId(tradeId);
     }
 
@@ -127,10 +126,9 @@ public class TrdOptionValuationTrade002Service extends BaseService {
             List<TrdProductDeal> listInsert = new ArrayList<TrdProductDeal>();
 
             for (TrdProductDeal e : listValFinProductDeal) {
-                    listInsert.add(e);
-                    valFinProductDealBatchMapper.insertBatch(listInsert);
+                listInsert.add(e);
             }
-
+            valFinProductDealBatchMapper.insertBatch(listInsert);
         }
 
         // 估值核算交易扩展表
@@ -141,8 +139,8 @@ public class TrdOptionValuationTrade002Service extends BaseService {
             List<TrdProductDealAdd> listInsert = new ArrayList<TrdProductDealAdd>();
             for (TrdProductDealAdd e : listValFinProductDealExt) {
                 listInsert.add(e);
-                valTrdProductDealAddBatchMapper.insertBatch(listInsert);
             }
+            valTrdProductDealAddBatchMapper.insertBatch(listInsert);
         }
 
         // 入账信息表
@@ -153,8 +151,8 @@ public class TrdOptionValuationTrade002Service extends BaseService {
             List<BokDealAccounting> listInsert = new ArrayList<BokDealAccounting>();
             for (BokDealAccounting e : listValDealAccounting) {
                 listInsert.add(e);
-                valDealAccountingBatchMapper.insertBatch(listInsert);
             }
+            valDealAccountingBatchMapper.insertBatch(listInsert);
         }
 
         // 账务明细表
@@ -165,8 +163,8 @@ public class TrdOptionValuationTrade002Service extends BaseService {
             List<BokDealAccountingDetail> listInsert = new ArrayList<BokDealAccountingDetail>();
             for (BokDealAccountingDetail e : listValDealAccountingDetail) {
                 listInsert.add(e);
-                valDealAccountingDetailBatchMapper.insertBatch(listInsert);
             }
+            valDealAccountingDetailBatchMapper.insertBatch(listInsert);
         }
 
         //账务明细代码表
@@ -177,8 +175,8 @@ public class TrdOptionValuationTrade002Service extends BaseService {
             List<BokDetailId> listInsert = new ArrayList<BokDetailId>();
             for (BokDetailId e : listValBokDetailId) {
                 listInsert.add(e);
-                valBokDetailIdBatchMapper.insertBatch(listInsert);
             }
+            valBokDetailIdBatchMapper.insertBatch(listInsert);
         }
 
         // 交易费用明细表
@@ -189,8 +187,8 @@ public class TrdOptionValuationTrade002Service extends BaseService {
             List<TrdTradeFeeDetail> listInsert = new ArrayList<TrdTradeFeeDetail>();
             for (TrdTradeFeeDetail e : listValTradeFeeDetail) {
                 listInsert.add(e);
-                valTradeFeeDetailBatchMapper.insertBatch(listInsert);
             }
+            valTradeFeeDetailBatchMapper.insertBatch(listInsert);
         }
 
         //结算指令表
@@ -201,8 +199,8 @@ public class TrdOptionValuationTrade002Service extends BaseService {
             List<StlOrders> listInsert = new ArrayList<StlOrders>();
             for (StlOrders e : ValOrdersList) {
                 listInsert.add(e);
-                valOrdersBatchMapper.insertBatch(listInsert);
             }
+            valOrdersBatchMapper.insertBatch(listInsert);
         }
 
         //结算指令拓展表
@@ -213,8 +211,8 @@ public class TrdOptionValuationTrade002Service extends BaseService {
             List<StlOrdersExt> listInsert = new ArrayList<StlOrdersExt>();
             for (StlOrdersExt e : ValOrdersExtList) {
                 listInsert.add(e);
-                valOrdersExtBatchMapper.insertBatch(listInsert);
             }
+            valOrdersExtBatchMapper.insertBatch(listInsert);
         }
 
         return 1;
@@ -222,8 +220,8 @@ public class TrdOptionValuationTrade002Service extends BaseService {
 
     public int update(TrdOptionValuationTradeResult dto){
         TrdOptionValuationTrade001Dto dto1 = new TrdOptionValuationTrade001Dto();
-        dto1.setFinprodId(dto.getTrdOptionValuationTrade002Dto().getProdId());
-        dto1.setTradeId(dto.getTrdOptionValuationTrade002Dto().getTradeId());
+        dto1.setProdId(dto.getTrdOptionValuationTrade001Dto().getProdId());
+        dto1.setTradeId(dto.getTrdOptionValuationTrade001Dto().getTradeId());
         trdOptionValuationTrade001Service.delete(dto1);
        return insert(dto);
     }

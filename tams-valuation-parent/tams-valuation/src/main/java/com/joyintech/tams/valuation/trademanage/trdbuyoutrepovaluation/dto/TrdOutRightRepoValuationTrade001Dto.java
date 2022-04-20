@@ -101,6 +101,20 @@ public class TrdOutRightRepoValuationTrade001Dto extends BaseEntity implements P
      */
     private Date mdate;
 
+
+    /**
+     * 资金到账日
+     */
+    private Date settleDate;
+
+    public Date getSettleDate() {
+        return settleDate;
+    }
+
+    public void setSettleDate(Date settleDate) {
+        this.settleDate = settleDate;
+    }
+
     /**
      * 券面总额  万元
      */
@@ -337,7 +351,7 @@ public class TrdOutRightRepoValuationTrade001Dto extends BaseEntity implements P
         this.settFeeAmt = settFeeAmt;
     }
 
-    @NotEmpty(fieldName = "TrdOutRightRepoValuationTrade002.otherAmt", groups = {ValidateGroupEdit.class})
+//    @NotEmpty(fieldName = "TrdOutRightRepoValuationTrade002.otherAmt", groups = {ValidateGroupEdit.class})
     public BigDecimal getOtherAmt() {
         return otherAmt;
     }
@@ -467,4 +481,19 @@ public class TrdOutRightRepoValuationTrade001Dto extends BaseEntity implements P
         DecimalFormat decimalFormat = new DecimalFormat("0.00#");
         return this.getSettleAmt()==null?"0.00":decimalFormat.format(this.getSettleAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
     }
+
+
+    /**
+     * 交易对手
+     */
+    private String counterId;
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+
 }

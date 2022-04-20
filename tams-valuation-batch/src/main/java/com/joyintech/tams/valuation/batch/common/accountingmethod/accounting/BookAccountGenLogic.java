@@ -494,6 +494,8 @@ public class BookAccountGenLogic {
         searchDto.setTaskPri(bookDetail.getTaskPri());
         // 分支序号
         searchDto.setBranch(bookDetail.getBranch());
+        // 科目号
+        searchDto.setSubjectNo(bookDetail.getSubjectNo());
         List<SubjectBalance> subjectBalanceList = accountingCommonService.getSubjectLatestBalance(
             searchDto);
         Map<String, Object> mapHappenDate = null;

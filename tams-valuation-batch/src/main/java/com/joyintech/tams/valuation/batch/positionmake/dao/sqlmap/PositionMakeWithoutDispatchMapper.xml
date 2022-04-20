@@ -421,11 +421,22 @@
 		SELECT
 			FEE_TYPE_ID AS feeTypeId,
 			BASE_SUBJECT_NATURE as baseSubjectNature,
-			case 
-		        when BASE_SUBJECT_NATURE = 'YFZZDJSSXF' or BASE_SUBJECT_NATURE = 'YFZZDJYSXF' then '01'
-		        when BASE_SUBJECT_NATURE = 'YFSQSJSSXF' or BASE_SUBJECT_NATURE = 'YFSQSJYSXF' then '02'
-		        when BASE_SUBJECT_NATURE = 'YFZDJSSXF' then '03'
-		    ELSE '999999' END AS feePlace
+
+		/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 start**/
+		<choose>
+			<when test="accountEntryType =='02' ">
+				 '999999'  AS feePlace
+			</when>
+			<otherwise>
+				case
+				when BASE_SUBJECT_NATURE = 'YFZZDJSSXF' or BASE_SUBJECT_NATURE = 'YFZZDJYSXF' then '01'
+				when BASE_SUBJECT_NATURE = 'YFSQSJSSXF' or BASE_SUBJECT_NATURE = 'YFSQSJYSXF' then '02'
+				when BASE_SUBJECT_NATURE = 'YFZDJSSXF' then '03'
+				ELSE '999999' END AS feePlace
+			</otherwise>
+		</choose>
+		/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 end**/
+
 		FROM BOK_FEE_TABLE_SET
 		WHERE BASE_SUBJECT_NATURE IN 
         <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
@@ -621,14 +632,14 @@
 	        0 AS branch,/**分支序号**/
 	        (B.O_C_AMT - B.O_D_AMT) AS tdyUnpaidIntincexp,/**当日累计应付费用**/
 	        (CASE 
-	          WHEN B.SUBJECT_NO = '22210801' THEN 'TAX0102'
-	          WHEN B.SUBJECT_NO = '22210802' THEN 'TAX0202'
-	          WHEN B.SUBJECT_NO = '22210803' THEN 'TAX0302'
-	          WHEN B.SUBJECT_NO = '22210101' THEN 'ALT0102'
-	          WHEN B.SUBJECT_NO = '22210102' THEN 'ALT0202'
-	          WHEN B.SUBJECT_NO = '22210103' THEN 'ALT0302'
+	          WHEN B.SUBJECT_NO = '22210501' THEN 'TAX0102'
+	          WHEN B.SUBJECT_NO = '22210503' THEN 'TAX0202'
+	          WHEN B.SUBJECT_NO = '22210502' THEN 'TAX0302'
+	          WHEN B.SUBJECT_NO = '22210701' THEN 'ALT0102'
+	          WHEN B.SUBJECT_NO = '22210702' THEN 'ALT0202'
+	          WHEN B.SUBJECT_NO = '22210703' THEN 'ALT0302'
 	          <!-- ADD BY YANYA ON 20190918  增加增值税-水利基金税  START -->
-	          WHEN B.SUBJECT_NO = '22210104' THEN 'ALT0402'
+	          WHEN B.SUBJECT_NO = '22210704' THEN 'ALT0402'
 	          <!-- ADD BY YANYA ON 20190918 增加增值税-水利基金税 END -->
 	        ELSE NULL END)  AS feeType,/**费用类型**/
 	        D.P_FINPROD_ID  AS pFinprodId /**母金融产品代码**/
@@ -638,7 +649,7 @@
 		LEFT JOIN FIN_PRODUCT D ON C.ACCT_SUBJECT_ID = D.FINPROD_ID
 		WHERE B.BALANCE_DATE = #{booksetDate,jdbcType=DATE}
 		<!-- UPDATE BY YANYA ON 20190918 增加增值税-水利基金税科目号  START-->
-		AND B.SUBJECT_NO IN ('22210801','22210802','22210803','22210101','22210102','22210103','22210104')
+		AND B.SUBJECT_NO IN ('22210501','22210503','22210502','22210701','22210702','22210703','22210704')
 		<!-- UPDATE BY YANYA ON 20190918 增加增值税-水利基金税科目号  END-->
 		AND NVL(C.ACCT_SUBJECT_TYPE,'') != 'F26'
 		<if test="booksetIds != null and booksetIds.size > 0">
@@ -652,12 +663,12 @@
 			)
 		</if>
 	</select>
-	
+
 	<!-- 获取产品费用头寸 - 通道费、通道增值税  -->
 	<select id="getBokPositionPrdfeeWithTdZzs" resultType="com.joyintech.tams.common.base.entity.BokPositionPrdfee"  parameterType="java.util.Map" >
 		SELECT
 			(B.B_C_AMT - B.B_D_AMT) AS tdyUnpaidIntincexp,/**当日累计应付费用**/
-			(CASE 
+			(CASE
 			  WHEN B.SUBJECT_NO = '22130801' THEN 'TAX0102'
 			  WHEN B.SUBJECT_NO = '22130802' THEN 'TAX0202'
 			  WHEN B.SUBJECT_NO = '22130803' THEN 'TAX0302'
@@ -669,14 +680,14 @@
 			  <!-- ADD BY YANYA ON 20190918 增加增值税-水利基金税 END -->
 			  WHEN B.SUBJECT_NO = '22090101' THEN 'B09'
 			ELSE NULL END)  AS feeType/**费用类型**/
-			<!-- ADD BY WUJIE ON 20190829 START -->  
+			<!-- ADD BY WUJIE ON 20190829 START -->
 			,0 AS branch /**分支序号**/
 			<!-- ADD BY WUJIE ON 20190829 END -->
 		FROM BOK_BALANCE B
 		WHERE B.BOOKSET_ID = #{booksetId,jdbcType=VARCHAR}
 		AND B.BALANCE_DATE = #{booksetDate,jdbcType=DATE}
 		<!-- UPDATE BY YANYA ON 20190918 增加增值税-水利基金税科目号  START-->
-		AND B.SUBJECT_NO IN ('22130801','22130802','22130803','22130101','22130102','22130103','22090101','22130104')    
+		AND B.SUBJECT_NO IN ('22130801','22130802','22130803','22130101','22130102','22130103','22090101','22130104')
 		<!-- UPDATE BY YANYA ON 20190918 增加增值税-水利基金税科目号  END-->
 	</select>
 
@@ -689,14 +700,14 @@
 		 	B.BOOKSET_ID portfolioId,
 			(B.O_C_AMT - B.O_D_AMT) AS tdyAccumulPayFee,/**当日累计应付费用**/
 			(CASE
-			  WHEN B.SUBJECT_NO = '22210801' THEN 'TAX0102'
-			  WHEN B.SUBJECT_NO = '22210802' THEN 'TAX0202'
-			  WHEN B.SUBJECT_NO = '22210803' THEN 'TAX0302'
-			  WHEN B.SUBJECT_NO = '22210101' THEN 'ALT0102'
-			  WHEN B.SUBJECT_NO = '22210102' THEN 'ALT0202'
-			  WHEN B.SUBJECT_NO = '22210103' THEN 'ALT0302'
+			  WHEN B.SUBJECT_NO = '22210501' THEN 'TAX0102'
+			  WHEN B.SUBJECT_NO = '22210503' THEN 'TAX0202'
+			  WHEN B.SUBJECT_NO = '22210502' THEN 'TAX0302'
+			  WHEN B.SUBJECT_NO = '22210701' THEN 'ALT0102'
+			  WHEN B.SUBJECT_NO = '22210702' THEN 'ALT0202'
+			  WHEN B.SUBJECT_NO = '22210703' THEN 'ALT0302'
 			  <!-- ADD BY YANYA ON 20190918  增加增值税-水利基金税  START -->
-			  WHEN B.SUBJECT_NO = '22210104' THEN 'ALT0402'
+			  WHEN B.SUBJECT_NO = '22210704' THEN 'ALT0402'
 			  <!-- ADD BY YANYA ON 20190918  增加增值税-水利基金税  END -->
 			  WHEN B.SUBJECT_NO = '22090101' THEN 'B09'
 			ELSE NULL END)  AS ptlFeeType,/**费用类型**/
@@ -706,7 +717,7 @@
 		WHERE B.BOOKSET_ID = #{booksetId,jdbcType=VARCHAR}
 		AND B.BALANCE_DATE = #{booksetDate,jdbcType=DATE}
 		<!-- UPDATE BY YANYA ON 20190918 增加增值税-水利基金税科目号  START-->
-		AND B.SUBJECT_NO IN ('22210801','22210802','22210803','22210101','22210102','22210103','22090101','22210104')
+		AND B.SUBJECT_NO IN ('22210501','22210503','22210502','22210701','22210702','22210703','22090101','22210704')
 		<!-- UPDATE BY YANYA ON 20190918 增加增值税-水利基金税科目号  END-->
 	</select>
 
@@ -800,15 +811,15 @@
 	</select>
 
 	<!-- 查询本次待处理账套 -->
-	<select id="getBooksets" resultType="java.lang.String"  parameterType="java.util.Map" >
-		select 
+	<select id="getBooksets" resultType="com.joyintech.tams.valuation.batch.positionmake.dto.PositionMakeReaderResult"  parameterType="java.util.Map" >
+		select
            BOOKSET_ID
 	      from BOK_BOOKSET
-	      where  END_DATE <![CDATA[ >= ]]> #{booksetDate}
-	      AND START_DATE <![CDATA[ <= ]]> #{booksetDate}
-	      <if test="booksetIds != null and booksetIds.size > 0">
+	      where  END_DATE <![CDATA[ >= ]]> #{BOOKSET_DATE}
+	      AND START_DATE <![CDATA[ <= ]]> #{BOOKSET_DATE}
+	      <if test="BOOKSETS != null and BOOKSETS.size > 0">
 			AND (BOOKSET_ID IN
-			<foreach collection="booksetIds" item="item" index="index" open="( " close=" )" separator=",">
+			<foreach collection="BOOKSETS" item="item" index="index" open="( " close=" )" separator=",">
 				<if test="(index % 998) == 0">
 					null) OR BOOKSET_ID in (
 				</if>
@@ -877,7 +888,18 @@
 		    on bc.trade_id = ddeal.trade_id
 		    and bc.table_id='1413' /*针对债券买断式逆回购，若BOK_DETAIL_ID表中无数据，直接取trd_product_deal交易表数据*/
 
-			WHERE bc.BASE_SUBJECT_NATURE IN ('QTYSK_BJ','QTYSK_LX') /** 基础科目性质 其他应收款本金、其他应收款利息**/
+			WHERE
+		/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 start**/
+		<choose>
+			<when test="accountEntryType =='02' ">
+				bc.BASE_SUBJECT_NATURE IN ('QTYSK_QT') /** 基础科目性质 其他应收款**/
+			</when>
+			<otherwise>
+				bc.BASE_SUBJECT_NATURE IN ('QTYSK_BJ','QTYSK_LX') /** 基础科目性质 其他应收款本金、其他应收款利息**/
+			</otherwise>
+		</choose>
+		/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 end**/
+
 			AND bc.HAPPEN_DATE <![CDATA[ <= ]]>  #{happenDate,jdbcType=DATE}
 			AND bc.BOOK_DATE <![CDATA[ <= ]]> #{happenDate,jdbcType=DATE}
 			AND (bc.OFFSET_DATE <![CDATA[ < ]]>  #{happenDate,jdbcType=DATE} OR bc.OFFSET_DATE IS NULL)

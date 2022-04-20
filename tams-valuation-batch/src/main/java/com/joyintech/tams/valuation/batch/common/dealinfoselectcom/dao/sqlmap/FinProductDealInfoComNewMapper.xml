@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper
+	namespace="com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dao.FinProductDealInfoComNewMapper">
+	    
+	<select id="selectDealInfo" resultType="com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dto.FinProductDealInfoComDTO"
+		parameterType="java.util.Map">
+		SELECT 
+			A.TRADE_ID,
+			A.BUSI_TYPE,
+			A.FINPROD_ID,
+			A.BRANCH,
+			A.FINPROD_TYPE,
+			A.TRADE_DATE,
+			A.VDATE,
+			A.MDATE,
+			A.SETTLE_DATE,
+			A.CCY,
+			A.UNIT_CPRICE,
+			A.UNIT_INT,
+			A.UNIT_FPRICE,
+			A.PAR_VALUE,
+			A.CPRICE_AMT,
+			A.SHARE_AMT,
+			A.PRIN_AMT,
+			A.INT_AMT,
+			A.FPRICE_AMT,
+			A.FEE_AMT,
+			A.FEE_AMT_PAY,
+			A.TRADE_AMT,
+			A.PS,
+			A.YIELD,
+			A.EXER_YIELD,
+			B.INV_AIM,
+			A.TRADE_STATUS,
+			A.P_TRADE_ID,
+			A.IS_CLEAN,
+			A.CPRICE_DATE,
+			<!-- C.PROD_ID, -->
+			D.BOOKSET_ID as prodId,
+			A.CHL_ID,
+			A.COUNTER_ID,
+			<!-- A.COUNTER_TYPE, -->
+			A.is_out_trade,
+			A.TRADE_MARKET,
+			A.TRADER,
+			A.SEC_MANAGE_ACCT_ID,						
+			H.MY_ACCT_NO,
+			F.CUSTOMER_TYPE,
+<!-- 			J.BASE_SUBJECT_NATURE, -->
+			P.ACCT_TYPE,
+			B2.BOK_DETAIL_ID,
+			D.TASK_ID,
+			D.BOOKSET_ID,
+			D.BOOKSET_DATE,
+			D.HAPPEN_DATE,
+			D.BOOK_DATE,
+			M.STANDARD_CCY,
+            M.ACCT_STANDARD,
+			N.FEE_TYPE,
+			N.IS_PAY_WITH_TRADE,
+			N.FEE_AMT FEE_AMT_DETAIL,
+			N.FEE_ID,
+
+			C.PORTFOLIO_ID portfolioId,/*投资组合代码*/
+			M.BOK_SPEC_MODE,/*特殊核算模型*/
+
+		    A.REGIST_ORG,
+		    Q.INV_AIM RECLS_INV_AIM,
+		    A.TRADE_MARKET_MODE,/** 交易市场 */
+			A.pay_date,
+		    C.MP_FINPROD_ID, /** 主协议金融产品代码 **/
+		    C.MP_BRANCH,  /** 主协议分支序号 **/
+		    N.IS_PREPAID, /** 是否作为待摊 **/
+			A.ACCR_NUM, /** 计提份额 **/
+			A.PS_PAYMENT psPayment /**收付方向**/
+			<!-- ADD BY CAOGUO ON 20201016 减值相关修改 START  -->
+			,NULL lossStage 
+			,A.TOTLE_TRADE_ID totleTradeId
+			<!--ADD BY CAOGUO ON 20201016 减值相关修改 end  -->
+			/** add by weipeng on 20220331 增加估值方案落地表关联 start **/
+			,schemeInfo.VALUATION_METHOD
+			/** add by weipeng on 20220331 增加估值方案落地表关联 end **/
+		FROM 
+			BOK_BATCH_TASK_TODO D
+			INNER JOIN BOK_BOOKSET M
+				ON D.BOOKSET_ID = M.BOOKSET_ID
+			INNER JOIN BOK_DEAL_ACCOUNTING B   ON
+					(D.BOOKSET_ID = B.BOOKSET_ID
+				   	/**AND B.BOK_DETAIL_ID = NVL(D.BOK_DETAIL_ID , B.BOK_DETAIL_ID)**/
+				   	AND D.HAPPEN_DATE = B.HAPPEN_DATE
+				   	AND D.BOOK_DATE >= B.BOOK_DATE
+				   	and busi_table ='02'
+					)	
+			INNER JOIN BOK_DEAL_ACCOUNTING_DETAIL B2   ON
+					(B2.BOOKSET_ID = B.BOOKSET_ID
+					AND B2.BUSI_TYPE = #{target,jdbcType=VARCHAR}
+				   	AND B2.BUSI_NO = B.BUSI_NO
+				   	and B2.busi_table =B.busi_table
+				   	AND B2.BOK_DETAIL_ID = NVL(D.BOK_DETAIL_ID , B2.BOK_DETAIL_ID)
+					)	
+			INNER JOIN TRD_PRODUCT_DEAL A   ON
+					(B.BUSI_NO = A.TRADE_ID
+				   	AND B2.BUSI_TYPE = A.BUSI_TYPE
+				   	AND A.TRADE_STATUS != #{tradeStsCX,jdbcType=VARCHAR}
+					)	
+			LEFT JOIN TRD_PRODUCT_DEAL A1   ON
+					(A.TRADE_ID = A1.P_TRADE_ID
+					AND A1.TRADE_STATUS = #{tradeStsCX,jdbcType=VARCHAR}
+					)
+<!-- 		   一体化问题12:表名变更(金融产品交易扩展表(TRD_PRODUCT_DEAL_EXT) -> 金融产品交易附属表(TRD_PRODUCT_DEAL_ADD))	 -->
+			<!-- LEFT JOIN TRD_PRODUCT_DEAL_EXT  C   ON
+					A.TRADE_ID = C.TRADE_ID -->
+	        LEFT JOIN TRD_PRODUCT_DEAL_ADD  C   ON
+					A.TRADE_ID = C.TRADE_ID
+			LEFT JOIN MST_CUSTOMER_INFO F   ON
+					(A.COUNTER_ID = F.CUSTOMER_ID
+					<!--  一体化：MST_CUSTOMER_INFO.is_counter_party 客户信息表.是否交易对手删除  -->
+					<!-- AND F.IS_COUNTER_PARTY = '' -->
+					)
+			LEFT JOIN STL_ORDERS H   ON
+					A.TRADE_ID = H.TRADE_ID	
+			LEFT JOIN STL_ORDERS_EXT K   ON
+					H.ORDER_ID = K.ORDER_ID		
+					<!-- 		对清算账户做过手工凭证，会重复										
+			LEFT JOIN BOK_DETAIL_ID J   ON
+					H.MY_ACCT_NO = J.BUSI_ID																				 
+					AND J.BOOKSET_ID = D.BOOKSET_ID	
+					 -->																				 
+			LEFT JOIN TRD_TRADE_FEE_DETAIL N ON
+					N.TRADE_ID = A.TRADE_ID
+			LEFT JOIN BOK_BOOKSET_CAPACCT_INFO P ON
+					D.BOOKSET_ID = P.BOOKSET_ID	AND
+					H.MY_ACCT_NO = P.ACCT_NO AND
+					A.CCY = P.CCY
+			LEFT JOIN TRD_FIN_PRODUCT_BARTER Q ON
+			    A.TRADE_ID = Q.TRADE_ID AND
+			    A.FINPROD_ID = Q.FINPROD_ID AND
+			    A.FINPROD_TYPE = Q.FINPROD_TYPE
+			<!-- add by 曹国 增加减值阶段查询
+			LEFT JOIN FIN_PRODUCT_LOSS_STAGE R ON
+				A.FINPROD_ID = R.FINPROD_ID AND
+				D.HAPPEN_DATE >= R.EFF_DATE AND
+				D.HAPPEN_DATE &lt; R.INVALID_DATE -->
+			/** add by weipeng on 20220331 增加估值方案落地表关联 start **/
+			LEFT JOIN BOK_FINPROD_SCHEME_INFO schemeInfo
+				ON schemeInfo.BOOKSET_ID = D.BOOKSET_ID
+				AND schemeInfo.FINPROD_ID = A.FINPROD_ID
+			/** add by weipeng on 20220331 增加估值方案落地表关联 end **/
+		WHERE
+			(K.IS_TRADE = #{isTradeY,jdbcType=VARCHAR}
+			OR K.IS_TRADE IS NULL)
+			AND A1.TRADE_ID IS NULL
+			AND D.SEQ_NO = #{seqNo}
+			AND D.BOOKSET_DATE = #{BOOKSET_DATE,jdbcType=DATE}
+            AND D.BOOK_DATE = #{BOOK_DATE,jdbcType=DATE}
+            AND D.HAPPEN_DATE = #{HAPPEN_DATE,jdbcType=DATE}
+            AND D.IS_SUB_BOOKSET = #{IS_SUB_BOOKSET}
+            AND D.TASK_ID = #{taskId}
+		    <!-- add by yinya 如果清算指令有交收失败的记录，则不出交易的账务 -->
+            AND NOT EXISTS  (SELECT S.TRADE_ID FROM STL_ORDERS S WHERE S.SETTLE_STATUS='02' AND S.TRADE_ID=A.TRADE_ID)
+		ORDER BY
+			D.BOOKSET_ID,
+			B2.BOK_DETAIL_ID
+	</select>
+
+
+
+</mapper>

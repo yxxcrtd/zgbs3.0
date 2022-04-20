@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.valuation.batch.valschemelanding.dao.ValSchemeLandingMapper">
+	<!-- 查询所有待批处理的账套 -->
+	<select id="selectReclsDeal" resultType="com.joyintech.tams.valuation.batch.valschemelanding.dto.ValSchemeLandingReaderDto">
+		SELECT
+			bb.BOOKSET_ID as booksetId,
+			#{HAPPEN_DATE} as happenDate,
+			deal.FINPROD_ID as finprodId,
+			finType.TYPE_18 AS secType,
+			finType.TYPE_1 AS type1,
+			deal.TRADE_MARKET AS tradeMarket,
+			Q.INV_AIM AS invAim
+		FROM BOK_BOOKSET bb
+		INNER JOIN BOK_DEAL_ACCOUNTING acc
+			ON acc.BOOKSET_ID = bb.BOOKSET_ID
+			AND acc.HAPPEN_DATE = #{HAPPEN_DATE}
+		INNER JOIN TRD_PRODUCT_DEAL deal
+			ON deal.TRADE_ID = acc.BUSI_NO
+			AND deal.PS = #{reclsPs}
+		INNER JOIN FIN_PRODUCT_TYPE finType
+			ON finType.FINPROD_ID = deal.FINPROD_ID
+			AND finType.TYPE_18 IS NOT NULL
+		INNER JOIN TRD_FIN_PRODUCT_BARTER Q
+			ON Q.FINPROD_ID = deal.FINPROD_ID
+		WHERE
+			bb.bookset_type = #{booksetType}
+			AND bb.START_DATE <![CDATA[ <= ]]> #{HAPPEN_DATE}
+			AND bb.END_DATE <![CDATA[ >= ]]> #{HAPPEN_DATE}
+			<if test="booksetIds != null and booksetIds.size > 0">
+				AND (bb.BOOKSET_ID IN
+				<foreach collection="booksetIds" item="item" index="index" open="( " close=" )" separator=",">
+					<if test="(index % 998) == 0">
+						null) OR bb.BOOKSET_ID in (
+					</if>
+					#{item}
+				</foreach>
+				)
+			</if>
+	</select>
+
+	<!-- 查询所有待批处理的账套和资产信息 -->
+	<select id="selectValSchemeTaskTodo" resultType="com.joyintech.tams.valuation.batch.valschemelanding.dto.ValSchemeLandingReaderDto">
+		SELECT
+			bb.BOOKSET_ID as booksetId,
+			#{HAPPEN_DATE} as happenDate,
+		    det.busi_id as finprodId,
+			finType.TYPE_18 AS secType,
+			finType.TYPE_1 AS type1,
+			NVL(fin.TRADE_MARKET, trdFin.TRADE_MARKET) AS tradeMarket,
+			bokDetailId.INV_AIM AS invAim
+		FROM BOK_BOOKSET bb
+		INNER JOIN BOK_STAT_DET_POSIITON det
+			ON det.BOOKSET_ID = bb.BOOKSET_ID
+			AND det.HAPPEN_DATE = #{HAPPEN_DATE} -1
+		INNER JOIN BOK_DETAIL_ID bokDetailId
+			ON bokDetailId.BOOKSET_ID = bb.BOOKSET_ID
+			AND bokDetailId.BOK_DETAIL_ID = det.BOK_DETAIL_ID
+		INNER JOIN FIN_PRODUCT_TYPE finType
+			ON finType.FINPROD_ID = det.BUSI_ID
+		    AND finType.TYPE_18 IS NOT NULL
+		LEFT JOIN FIN_PRODUCT fin
+			ON fin.FINPROD_ID = det.BUSI_ID
+		LEFT JOIN FIN_TRADE_PRODUCT trdFin
+		    ON trdFin.FINPROD_ID = det.BUSI_ID
+		WHERE
+			bb.bookset_type = #{booksetType}
+			AND bb.START_DATE <![CDATA[ <= ]]> #{HAPPEN_DATE}
+			AND bb.END_DATE <![CDATA[ >= ]]> #{HAPPEN_DATE}
+			<if test="booksetIds != null and booksetIds.size > 0">
+				AND (bb.BOOKSET_ID IN
+				<foreach collection="booksetIds" item="item" index="index" open="( " close=" )" separator=",">
+					<if test="(index % 998) == 0">
+						null) OR bb.BOOKSET_ID in (
+					</if>
+					#{item}
+				</foreach>
+				)
+			</if>
+
+		UNION
+
+		SELECT
+			bb.BOOKSET_ID as booksetId,
+			#{HAPPEN_DATE} as happenDate,
+			deal.FINPROD_ID as finprodId,
+			finType.TYPE_18 AS secType,
+			finType.TYPE_1 AS type1,
+			deal.TRADE_MARKET AS tradeMarket,
+			deal.INV_AIM AS invAim
+		FROM BOK_BOOKSET bb
+		INNER JOIN BOK_DEAL_ACCOUNTING acc
+			ON acc.BOOKSET_ID = bb.BOOKSET_ID
+			AND acc.HAPPEN_DATE = #{HAPPEN_DATE}
+		INNER JOIN TRD_PRODUCT_DEAL deal
+			ON deal.TRADE_ID = acc.BUSI_NO
+		INNER JOIN FIN_PRODUCT_TYPE finType
+			ON finType.FINPROD_ID = deal.FINPROD_ID
+			AND finType.TYPE_18 IS NOT NULL
+		WHERE
+			bb.bookset_type = #{booksetType}
+			AND bb.START_DATE <![CDATA[ <= ]]> #{HAPPEN_DATE}
+			AND bb.END_DATE <![CDATA[ >= ]]> #{HAPPEN_DATE}
+			AND deal.PS != #{reclsPs}  /** 去除重分类的交易 **/
+			<if test="booksetIds != null and booksetIds.size > 0">
+				AND (bb.BOOKSET_ID IN
+				<foreach collection="booksetIds" item="item" index="index" open="( " close=" )" separator=",">
+					<if test="(index % 998) == 0">
+						null) OR bb.BOOKSET_ID in (
+					</if>
+					#{item}
+				</foreach>
+				)
+			</if>
+	</select>
+
+	<update id="deleteBatch" parameterType="java.util.List">
+		DELETE FROM BOK_FINPROD_SCHEME_INFO
+		WHERE (BOOKSET_ID,FINPROD_ID) in
+		<foreach collection="list" item="item" index="index" separator="," open="("
+				 close=")">
+			<if test="(index % 1000) == 999">
+				(null, null) ) OR (BOOKSET_ID,FINPROD_ID) in (
+			</if>
+			(#{item.booksetId,jdbcType=VARCHAR},#{item.finprodId,jdbcType=VARCHAR})
+		</foreach>
+	</update>
+
+	<insert id="insertBatch" parameterType="java.util.List" >
+		insert into BOK_FINPROD_SCHEME_INFO(BOOKSET_ID, FINPROD_ID, TRADE_MARKET, SEC_TYPE,
+		TYPE1, INV_AIM, SCHEME_DETAIL_ID, SCHEME_ID, VALUATION_METHOD, VALUATION_PRICE, VALUATION_PRICE_2,
+		QUOTA_DIGIT, VALUATION_DATE, VDATE, MDATE, VALUATION_SOURCE, PRICE_TAIL_MODE, PRICE_CLASS,
+		CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+		<foreach collection="list" item="item" separator="from dual union all select" open="select * from (select "
+				 close=" from dual)">
+			#{item.booksetId,jdbcType=VARCHAR}, #{item.finprodId,jdbcType=VARCHAR}, #{item.tradeMarket,jdbcType=VARCHAR},
+			#{item.secType,jdbcType=VARCHAR}, #{item.type1,jdbcType=VARCHAR}, #{item.invAim,jdbcType=VARCHAR},
+			#{item.schemeDetailId,jdbcType=VARCHAR}, #{item.schemeId,jdbcType=VARCHAR}, #{item.valuationMethod,jdbcType=VARCHAR},
+			#{item.valuationPrice,jdbcType=VARCHAR}, #{item.valuationPrice2,jdbcType=VARCHAR}, #{item.quotaDigit,jdbcType=DECIMAL},
+			#{item.valuationDate,jdbcType=VARCHAR}, #{item.vdate,jdbcType=DATE}, #{item.mdate,jdbcType=DATE},
+			#{item.valuationSource,jdbcType=VARCHAR}, #{item.priceTailMode,jdbcType=VARCHAR}, #{item.priceClass,jdbcType=VARCHAR},
+			#{item.createUser,jdbcType=VARCHAR}, #{item.createDept,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP},
+			#{item.updateUser,jdbcType=VARCHAR}, #{item.updateTime,jdbcType=TIMESTAMP}
+		</foreach>
+	</insert>
+</mapper>

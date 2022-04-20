@@ -3,10 +3,10 @@
     <Worksheet javaBean="com.joyintech.tams.valuation.trademanage.trdintovaluationduration.dto.TrdIntoValuationDuration001Dto">
         <Row>
             <Cell order="1" name="交易编号">tradeId</Cell>
-            <Cell order="2" name="产品代码">portfolioId</Cell>
-            <Cell order="3" name="产品名称">portfolioName</Cell>
-            <Cell order="4" name="资产代码">finprodMarketId</Cell>
-            <Cell order="5" name="资产名称">finprodName</Cell>
+            <Cell order="2" name="产品代码">prodId</Cell>
+            <Cell order="3" name="产品名称">prodName</Cell>
+            <Cell order="4" name="资产代码">secId</Cell>
+            <Cell order="5" name="资产名称">secAbbr</Cell>
             <Cell order="6" name="交易类型">psStr</Cell>
             <Cell order="7" name="币种">ccyFmt</Cell>
             <Cell order="8" name="计息开始日">vdateStr</Cell>
@@ -16,7 +16,7 @@
             <Cell order="12" name="实收利息">actIntStr</Cell>
             <Cell order="13" name="实收本金">actCapiStr</Cell>
             <Cell order="14" name="结算金额">settleAmtStr</Cell>
-            <Cell order="15" name="资金账户">trdAcctId</Cell>
+            <Cell order="15" name="资金账户">myAcctNo</Cell>
         </Row>
     </Worksheet>
 </Workbook>

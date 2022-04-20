@@ -10,21 +10,7 @@
 
 package com.joyintech.tams.valuation.batch.profitandlossaccounting.runner;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
-
-import com.joyintech.batch.batchbase.baseclass.BaseProcessor;
-import com.joyintech.batch.batchbase.baseclass.BaseReader;
-import com.joyintech.batch.batchbase.baseclass.BaseWriter;
-import com.joyintech.batch.batchbase.baseclass.BatchBaseService;
-import com.joyintech.batch.batchbase.baseclass.BatchBuilder;
+import com.joyintech.batch.batchbase.baseclass.*;
 import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
 import com.joyintech.batch.batchbase.baseclass.entity.NeedToWriteEntity;
 import com.joyintech.batch.batchbase.exception.BatchException;
@@ -34,18 +20,19 @@ import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.Boo
 import com.joyintech.tams.valuation.batch.common.bookgenerateresult.BookGenerateResultForCurrentCommonWriter;
 import com.joyintech.tams.valuation.batch.profitandlossaccounting.dto.ProfitAndLossAccountingNeedOperateEntity;
 import com.joyintech.tams.valuation.batch.profitandlossaccounting.dto.ProfitAndLossAccountingResult;
-import com.joyintech.tams.valuation.batch.profitandlossaccounting.processor.ProfitAndLossAccountingLayeringProcessor;
-import com.joyintech.tams.valuation.batch.profitandlossaccounting.processor.ProfitAndLossAccountingStep1Processor;
-import com.joyintech.tams.valuation.batch.profitandlossaccounting.processor.ProfitAndLossAccountingStep2Processor;
-import com.joyintech.tams.valuation.batch.profitandlossaccounting.processor.ProfitAndLossAccountingStep3Processor;
-import com.joyintech.tams.valuation.batch.profitandlossaccounting.processor.ProfitAndLossAccountingStep4Processor;
-import com.joyintech.tams.valuation.batch.profitandlossaccounting.reader.ProfitAndLossAccountingLayeringReader;
-import com.joyintech.tams.valuation.batch.profitandlossaccounting.reader.ProfitAndLossAccountingStep1Reader;
-import com.joyintech.tams.valuation.batch.profitandlossaccounting.reader.ProfitAndLossAccountingStep2Reader;
-import com.joyintech.tams.valuation.batch.profitandlossaccounting.reader.ProfitAndLossAccountingStep3Reader;
-import com.joyintech.tams.valuation.batch.profitandlossaccounting.reader.ProfitAndLossAccountingStep4Reader;
+import com.joyintech.tams.valuation.batch.profitandlossaccounting.processor.*;
+import com.joyintech.tams.valuation.batch.profitandlossaccounting.reader.*;
 import com.joyintech.tams.valuation.common.constants.BookConstant;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * ProfitAndLossAccountingTask
@@ -162,6 +149,11 @@ public class ProfitAndLossAccountingTask extends BatchBaseService {
         step3Reader.setParams(params);
         step4Reader.setParams(params);
         step5Reader.setParams(params);
+        step1Processor.setParams(params);
+        step2Processor.setParams(params);
+        step3Processor.setParams(params);
+        step4Processor.setParams(params);
+        step5Processor.setParams(params);
         logger.info("批处理[" + this.getBatchTask().getTaskName() + "]开始。");
         // 费前结转只处理step1和step2
         if(GlobalConstant.批处理任务_损益结转费前.equals(this.getBatchExecuteInfo().getTaskId())){
@@ -171,12 +163,18 @@ public class ProfitAndLossAccountingTask extends BatchBaseService {
         }
         // 费后结转处理step1到step5
         else{
+//            return batchBuilder.init(this).batch("step1", step1Reader, step1Processor,
+//                step1Writer).batch("step2", step2Reader, step2Processor, step1Writer).batch("step3",
+//                    step3Reader, step3Processor, step1Writer).batch("step4", step4Reader,
+//                        step4Processor, step1Writer).batch("step5", step5Reader,
+//                            step5Processor, step1Writer).builder(
+//                                this.getBatchTask().getBeanName() + this.getBatchTask().getTaskId()).run();
+            // 去除待分配利润，只结转到未分配利润-未实现和未分配利润-已实现中
             return batchBuilder.init(this).batch("step1", step1Reader, step1Processor,
-                step1Writer).batch("step2", step2Reader, step2Processor, step1Writer).batch("step3",
+                    step1Writer).batch("step2", step2Reader, step2Processor, step1Writer).batch("step3",
                     step3Reader, step3Processor, step1Writer).batch("step4", step4Reader,
-                        step4Processor, step1Writer).batch("step5", step5Reader,
-                            step5Processor, step1Writer).builder(
-                                this.getBatchTask().getBeanName() + this.getBatchTask().getTaskId()).run();
+                    step4Processor, step1Writer).builder(
+                    this.getBatchTask().getBeanName() + this.getBatchTask().getTaskId()).run();
         }
     }
 

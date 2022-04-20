@@ -10,9 +10,15 @@
 
 package com.joyintech.tams.valuation.batch.nonmonetaryfunddrawbook.runner;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.joyintech.batch.batchbase.baseclass.*;
+import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
+import com.joyintech.batch.batchbase.baseclass.entity.NeedToWriteEntity;
+import com.joyintech.batch.batchbase.exception.BatchException;
+import com.joyintech.framework.base.entity.SysBatchExecInfo;
+import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.valuation.batch.common.bookgenerateresult.BookGenerateResultForCurrentCommonWriterWithBokSummary;
+import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.reader.DrawBaseInfoSelectComReader;
+import com.joyintech.tams.valuation.batch.nonmonetaryfunddrawbook.processor.NonMonetaryFundDrawProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
@@ -20,19 +26,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.joyintech.batch.batchbase.baseclass.BaseProcessor;
-import com.joyintech.batch.batchbase.baseclass.BaseReader;
-import com.joyintech.batch.batchbase.baseclass.BaseWriter;
-import com.joyintech.batch.batchbase.baseclass.BatchBaseService;
-import com.joyintech.batch.batchbase.baseclass.BatchBuilder;
-import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
-import com.joyintech.batch.batchbase.baseclass.entity.NeedToWriteEntity;
-import com.joyintech.batch.batchbase.exception.BatchException;
-import com.joyintech.framework.base.entity.SysBatchExecInfo;
-import com.joyintech.tams.valuation.batch.common.bookgenerateresult.BookGenerateResultForCurrentCommonWriter;
-import com.joyintech.tams.valuation.batch.common.bookgenerateresult.BookGenerateResultForCurrentCommonWriterWithBokSummary;
-import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.reader.DrawBaseInfoSelectComReader;
-import com.joyintech.tams.valuation.batch.nonmonetaryfunddrawbook.processor.NonMonetaryFundDrawProcessor;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 非货币基金公允价值变动账务处理
@@ -89,7 +85,12 @@ public class NonMonetaryFundDrawTask extends BatchBaseService {
 
         // 设置此task的序列任务公用的params参数
         Map<String, Object> params = new HashMap<>();
-        
+
+        /** ADD BY weipeng ON 20220314 科目性质合并，共通reader区分资产类型 start  **/
+        params.put("secTypeList", Arrays.asList(DictCodeListExt1.证券品种_基金.getValue(),
+            DictCodeListExt1.证券品种_计划类资产_净值型.getValue()));
+        /** ADD BY weipeng ON 20220314 科目性质合并，共通reader区分资产类型 end  **/
+
         // 各步骤设置参数
         step1Reader.setParams(params);
         step1Processor.setParams(params);

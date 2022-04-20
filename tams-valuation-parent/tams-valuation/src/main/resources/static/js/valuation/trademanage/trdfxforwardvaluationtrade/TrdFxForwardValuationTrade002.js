@@ -136,13 +136,9 @@
         Joyin.ajaxJson(basePath + 'valuation/trademanage/trdfxforwardvaluationtrade/TrdFxForwardValuationTrade002/check', object, function(result) {
             Joyin.confirm(result.data, function () {
                 if(operateType === 'save') {
-                    Joyin.confirm(message, function() {
-                        WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdfxforwardvaluationtrade/TrdFxForwardValuationTrade002/save', object, "TrdFxForwardValuationTrade002_btn_save");
-                    });
+                     WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdfxforwardvaluationtrade/TrdFxForwardValuationTrade002/save', object, "TrdFxForwardValuationTrade002_btn_save");
                 }else{
-                    Joyin.confirm(message, function() {
-                        WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdfxforwardvaluationtrade/TrdFxForwardValuationTrade002/save', object, "TrdFxForwardValuationTrade002_btn_sbumit");
-                    });
+                     WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdfxforwardvaluationtrade/TrdFxForwardValuationTrade002/save', object, "TrdFxForwardValuationTrade002_btn_submit");
                 }
             });
 

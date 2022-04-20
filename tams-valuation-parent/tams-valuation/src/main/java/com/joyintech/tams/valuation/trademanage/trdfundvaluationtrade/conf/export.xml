@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workbook filePath="trademanage/trdfundvaluationtrade/TrdFundValuationTrade001.xlsx" name="基金交易导出">
+	<Worksheet javaBean="com.joyintech.tams.valuation.trademanage.trdfundvaluationtrade.dto.TrdFundValuationTradeDto">
+		<Row>
+			<Cell order="1" name="交易编号">tradeId</Cell>
+			<Cell order="2" name="外部成交编号">outTradeId</Cell>
+			<Cell order="3" name="产品代码">prodId</Cell>
+			<Cell order="4" name="产品名称">prodName</Cell>
+			<Cell order="5" name="资产代码">assetId</Cell>
+			<Cell order="6" name="资产名称">assetAbbr</Cell>
+			<Cell order="7" name="交易类型">psStr</Cell>
+			<Cell order="8" name="交易场所">tradeMarketStr</Cell>
+			<Cell order="9" name="交易日期">tradeDateStr</Cell>
+			<Cell order="10" name="交易金额">tradeAmtStr</Cell>
+			<Cell order="11" name="交易份额">dealNumStr</Cell>
+			<Cell order="12" name="币种">ccyFmt</Cell>
+			<Cell order="13" name="结算日期">settleDateStr</Cell>
+			<Cell order="14" name="到账金额">tradeAmtStr</Cell>
+			<Cell order="15" name="认购费">subFeeStr</Cell>
+			<Cell order="16" name="申购费">purFeeStr</Cell>
+			<Cell order="17" name="赎回费">redFeeStr</Cell>
+			<Cell order="18" name="经手费">brokerageStr</Cell>
+			<Cell order="18" name="净佣金">commissionStr</Cell>
+			<Cell order="18" name="资金账户">trdMyAcctNo</Cell>
+		</Row>
+	</Worksheet>
+</Workbook>

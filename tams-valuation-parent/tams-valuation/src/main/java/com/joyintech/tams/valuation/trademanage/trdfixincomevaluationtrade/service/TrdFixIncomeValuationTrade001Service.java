@@ -11,8 +11,11 @@
 package com.joyintech.tams.valuation.trademanage.trdfixincomevaluationtrade.service;
 
 import com.joyintech.framework.export.CommonExportService;
+import com.joyintech.framework.export.ExportParam;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.jdbc.enums.DataSourceType;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
+import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationDto;
 import com.joyintech.tams.valuation.trademanage.trdfixincomevaluationtrade.dto.TrdFixIncomeValuationTradeDto;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
@@ -44,28 +47,26 @@ public class TrdFixIncomeValuationTrade001Service extends CommonExportService<Tr
                 pageParam, TrdFixIncomeValuationTradeDto.class);
     }
 
+    @Override
+    protected void buildExportParam(ExportParam exportParam) {
+        exportParam.config("/com/joyintech/tams/valuation/trademanage/trdfixincomevaluationtrade/conf/export.xml")
+                .dataSource(DataSourceType.MASERT);
+    }
+
     /**
-     * 工作流（留痕处理进行的操作）
+     * {@inheritDoc}
      */
     @Override
-    public void doComplete(TrdFixIncomeValuationTradeDto entity, OperationType type) {
-        restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdFixIncomeValuationTrade/doComplete/" + type, entity, Integer.class);
+    public Page<TrdFixIncomeValuationTradeDto> selectPageData(Map<String, Object> selectParam) {
+        return selectForPage(selectParam);
     }
 
-
-    /**
-     * 根据条件查询所有
-     *
-     * @param params
-     * @return
-     * @see
-     * @since 1.0
-     */
-    public List<TrdFixIncomeValuationTradeDto> findAll(Map<String, Object> params) {
-        return restTemplate.postForList(ServiceApplication.VALUATION_SERVICE_NAME + "/TrdFixIncomeValuationTrade/findAll",
-                params, TrdFixIncomeValuationTradeDto.class);
-
+    @Override
+    public void doComplete(TrdFixIncomeValuationTradeDto trdFixIncomeValuationTradeDto, OperationType operationType) {
+        // 删除操作
+        if(OperationType.DELETE.equals(operationType)) {
+            restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdFixIncomeValuationTrade/delete", trdFixIncomeValuationTradeDto, Integer.class);
+        }
     }
-
 
 }

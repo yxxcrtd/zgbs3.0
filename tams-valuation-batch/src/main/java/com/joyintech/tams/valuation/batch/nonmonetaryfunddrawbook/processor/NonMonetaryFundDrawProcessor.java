@@ -9,20 +9,23 @@
  */
 
 package com.joyintech.tams.valuation.batch.nonmonetaryfunddrawbook.processor;
-import java.util.HashMap;
-import java.util.Map;
 
+import com.joyintech.batch.batchbase.baseclass.BaseProcessor;
+import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
+import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGenerateResult;
+import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGenerateResultWithBokSummary;
+import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto.DrawBaseInfoSelectComResult;
+import com.joyintech.tams.valuation.batch.nonmonetaryfunddrawbook.service.NonMonetaryFundDrawProcessorNewService;
+import com.joyintech.tams.valuation.batch.nonmonetaryfunddrawbook.service.NonMonetaryFundDrawProcessorService;
+import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.joyintech.batch.batchbase.baseclass.BaseProcessor;
-import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
-import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGenerateResult;
-import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGenerateResultWithBokSummary;
-import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto.DrawBaseInfoSelectComResult;
-import com.joyintech.tams.valuation.batch.nonmonetaryfunddrawbook.service.NonMonetaryFundDrawProcessorService;
-import com.joyintech.tams.valuation.common.constants.GlobalConstant;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *非货币基金公允价值变动账务处理 - processor
@@ -48,6 +51,12 @@ public class NonMonetaryFundDrawProcessor extends BaseProcessor<NeedOperateEntit
     private NonMonetaryFundDrawProcessorService nonMonetaryFundDrawProcessorService;
 
     /**
+     * processor方法的 Service
+     */
+    @Autowired
+    private NonMonetaryFundDrawProcessorNewService nonMonetaryFundDrawProcessorNewService;
+
+    /**
      * 设置 param
      * 
      * @param param param
@@ -66,9 +75,22 @@ public class NonMonetaryFundDrawProcessor extends BaseProcessor<NeedOperateEntit
         thisParams.putAll(this.getParams());
         // 将返回值塞入参数中
         thisParams.put(GlobalConstant.READER_RESULT, acctEntity);
+        // modify by weipeng on 20220301 会计分录生成凭证通过系统参数区分新旧逻辑，保持原有逻辑不动 start
+        BookGenerateResultWithBokSummary result = new BookGenerateResultWithBokSummary();
+        // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录 start
+        String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+        // 若按照内部科目编码分录，则需要映射分录对应科目信息
+        //调用service方法进行逻辑逻辑
+        if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
+            result = nonMonetaryFundDrawProcessorNewService.execute(thisParams);
+        }
+        else{
+            result = nonMonetaryFundDrawProcessorService.execute(thisParams);
+        }
+        // modify by weipeng on 20220301 会计分录生成凭证通过系统参数区分新旧逻辑，保持原有逻辑不动 end
 
-        // 调用service方法进行逻辑逻辑
-        BookGenerateResultWithBokSummary result = nonMonetaryFundDrawProcessorService.execute(thisParams);
+//        // 调用service方法进行逻辑逻辑
+//        BookGenerateResultWithBokSummary result = nonMonetaryFundDrawProcessorService.execute(thisParams);
         
         //当为null时候，给予初始化
         if(result == null){

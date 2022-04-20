@@ -10,8 +10,10 @@
  
 package com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
+import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
@@ -23,6 +25,7 @@ import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
 
 import com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.validator.TrdDepositValuationTrade001Validator;
+import com.joyintech.tams.valuation.trademanage.trdfixincomevaluationtrade.dto.TrdFixIncomeValuationTradeDto;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
@@ -38,7 +41,7 @@ import java.util.List;
  * @see TrdDepositValuationTrade001Dto
  * @since 1.0
  */
-@PageId("TrdDepositInvestTrade002")
+@PageId("TrdDepositValuationTrade002")
 @ValidLogic(targetClass = TrdDepositValuationTrade001Validator.class, groups = {ValidateGroupEdit.class,
     ValidateGroupDelete.class})
 public class TrdDepositValuationTrade001Dto extends BaseEntity implements ProcessEntity {
@@ -47,22 +50,150 @@ public class TrdDepositValuationTrade001Dto extends BaseEntity implements Proces
      */
     private static final long serialVersionUID = -4814792523354012630L;
 
+    /**
+     * 操作类型
+     */
+    private String operateType;
 
+    private String pageModel;
 
     /**
-     * 交易方向
+     * 选择数据
      */
-    private String ps;
+    private List<TrdDepositValuationTrade001Dto> selectedItem;
+
+    /**
+     * 要素id
+     */
+    private String elementId;
 
     /**
      * 交易编号
      */
+    @PrimaryKey(value= PrimaryKey.Field.PK_1)
     private String tradeId;
 
     /**
-     * 外部交易编号
+     * 外部成交编号
      */
     private String outTradeId;
+
+    /**
+     * 金融产品代码
+     */
+    private String prodId;
+
+    /**
+     * 金融产品名称
+     */
+    private String prodName;
+
+    /**
+     * 资产代码
+     */
+    private String assetId;
+
+    /**
+     * 资产名称
+     */
+    private String assetName;
+
+    /**
+     * 交易类型
+     */
+    private String ps;
+
+    /**
+     * 币种
+     */
+    private String ccy;
+
+    /**
+     * 交易对手
+     */
+    private String counterId;
+
+    /**
+     * 交易对手名称
+     */
+    private String counterName;
+
+    /**
+     * 交易日
+     */
+    private Date tradeDate;
+
+    /**
+     * 交割日期
+     */
+    private Date settDate;
+
+    /**
+     * 本金金额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal prinAmt;
+
+    /**
+     * 应计利息总额
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal intAmt;
+
+    /**
+     * 结算金额
+     */
+    private BigDecimal settleAmt;
+
+    /**
+     * 资金账户
+     */
+    private String myAcctNo;
+
+    /**
+     * 数据来源
+     */
+    private String dataSource;
+
+    public String getOperateType() {
+        return operateType;
+    }
+
+    public void setOperateType(String operateType) {
+        this.operateType = operateType;
+    }
+
+    public String getPageModel() {
+        return pageModel;
+    }
+
+    public void setPageModel(String pageModel) {
+        this.pageModel = pageModel;
+    }
+
+    public List<TrdDepositValuationTrade001Dto> getSelectedItem() {
+        return selectedItem;
+    }
+
+    public void setSelectedItem(List<TrdDepositValuationTrade001Dto> selectedItem) {
+        this.selectedItem = selectedItem;
+    }
+
+    public String getElementId() {
+        return elementId;
+    }
+
+    public void setElementId(String elementId) {
+        this.elementId = elementId;
+    }
+
+    public String getTradeId() {
+        return tradeId;
+    }
+
+    public void setTradeId(String tradeId) {
+        this.tradeId = tradeId;
+    }
 
     public String getOutTradeId() {
         return outTradeId;
@@ -72,108 +203,43 @@ public class TrdDepositValuationTrade001Dto extends BaseEntity implements Proces
         this.outTradeId = outTradeId;
     }
 
-    /**
-     * 组合代码  产品代码
-     */
-    private String portfolioId;
-    /**
-     * 组合名称  产品名称
-     */
-    private String portfolioName;
-
-    /**
-     * 市场机构代码  资产代码
-     */
-    private String finprodMarketId;
-
-    /**
-     * 金融产品名称  资产名称
-     */
-    private String finprodName;
-
-
-    //交易日
-    private Date tradeDate;
-
-    /**
-     * 交割日
-     */
-    private Date settDate;
-
-    /**
-     * 交易本金
-     */
-
-    private BigDecimal prinAmt;
-
-    @NotEmpty(fieldName = "TrdDepositValuation001.prinAmt", groups = {ValidateGroupEdit.class})
-    public BigDecimal getPrinAmt() {
-        return prinAmt;
+    @NotEmpty(fieldName = "TrdDepositValuationTrade.prodId" , groups = { ValidateGroupEdit.class })
+    public String getProdId() {
+        return prodId;
     }
 
-    public void setPrinAmt(BigDecimal prinAmt) {
-        this.prinAmt = prinAmt;
+    public void setProdId(String prodId) {
+        this.prodId = prodId;
     }
 
-    //其他费用
-    private BigDecimal otherAmt;
-
-    @NotEmpty(fieldName = "TrdDepositValuation001.otherAmt", groups = {ValidateGroupEdit.class})
-    public BigDecimal getOtherAmt() {
-        return otherAmt;
+    @NotEmpty(fieldName = "TrdDepositValuationTrade.prodName" , groups = { ValidateGroupEdit.class })
+    public String getProdName() {
+        return prodName;
     }
 
-    public void setOtherAmt(BigDecimal otherAmt) {
-        this.otherAmt = otherAmt;
+    public void setProdName(String prodName) {
+        this.prodName = prodName;
     }
 
-
-
-    /**
-     * 应计利息
-     */
-    private BigDecimal intAmt;
-
-    /**
-     * 交易金额  本币交易金额
-     */
-    private BigDecimal dealAmt;
-
-    /**
-     * 交易对手
-     */
-    private String counterId;
-
-    /**
-     * 币种
-     */
-    private String ccy;
-
-    //结算金额
-    private BigDecimal settleAmt;
-
-    @NotEmpty(fieldName = "TrdDepositValuation001.settleAmt", groups = {ValidateGroupEdit.class})
-    public BigDecimal getSettleAmt() {
-        return settleAmt;
+    @NotEmpty(fieldName = "TrdDepositValuationTrade.assetId" , groups = { ValidateGroupEdit.class })
+    public String getAssetId() {
+        return assetId;
     }
 
-    public void setSettleAmt(BigDecimal settleAmt) {
-        this.settleAmt = settleAmt;
+    public void setAssetId(String assetId) {
+        this.assetId = assetId;
     }
 
-
-
-    @NotEmpty(fieldName = "TrdDepositValuation001.tradeDate", groups = {ValidateGroupEdit.class})
-    public Date getTradeDate() {
-        return tradeDate;
+    @NotEmpty(fieldName = "TrdDepositValuationTrade.prodId" , groups = { ValidateGroupEdit.class })
+    public String getAssetName() {
+        return assetName;
     }
 
-    public void setTradeDate(Date tradeDate) {
-        this.tradeDate = tradeDate;
+    public void setAssetName(String assetName) {
+        this.assetName = assetName;
     }
 
-
-    @NotEmpty(fieldName = "TrdDepositValuation001.ps", groups = {ValidateGroupEdit.class})
+    @NotEmpty(fieldName = "TrdDepositValuationTrade.ps" , groups = { ValidateGroupEdit.class })
     public String getPs() {
         return ps;
     }
@@ -181,197 +247,6 @@ public class TrdDepositValuationTrade001Dto extends BaseEntity implements Proces
     public void setPs(String ps) {
         this.ps = ps;
     }
-
-    @PrimaryKey(PrimaryKey.Field.PK_1)
-    @NotEmpty(fieldName = "TrdDepositValuation001.tradeId", groups = {ValidateGroupEdit.class})
-    public String getTradeId() {
-        return tradeId;
-    }
-
-    public void setTradeId(String tradeId) {
-        this.tradeId = tradeId;
-    }
-
-
-    @NotEmpty(fieldName = "TrdDepositValuation001.settDate", groups = {ValidateGroupEdit.class})
-    public Date getSettDate() {
-        return settDate;
-    }
-
-    public void setSettDate(Date settDate) {
-        this.settDate = settDate;
-    }
-
-
-
-    @NotEmpty(fieldName = "TrdDepositValuation001.intAmt", groups = {ValidateGroupEdit.class})
-    public BigDecimal getIntAmt() {
-        return intAmt;
-    }
-
-    public void setIntAmt(BigDecimal intAmt) {
-        this.intAmt = intAmt;
-    }
-
-    @NotEmpty(fieldName = "TrdDepositValuation001.dealAmt", groups = {ValidateGroupEdit.class})
-    public BigDecimal getDealAmt() {
-        return dealAmt;
-    }
-
-    public void setDealAmt(BigDecimal dealAmt) {
-        this.dealAmt = dealAmt;
-    }
-
-    public String getCounterId() {
-        return counterId;
-    }
-
-    public void setCounterId(String counterId) {
-        this.counterId = counterId;
-    }
-
-    @NotEmpty(fieldName = "TrdDepositValuationTrade002.ccy", groups = {ValidateGroupEdit.class})
-    public String getCcy() {
-        return ccy;
-    }
-
-    public void setCcy(String ccy) {
-        this.ccy = ccy;
-    }
-
-
-
-    //资金账户
-    private String trdAcctId;
-//    @NotEmpty(fieldName = "TrdDepositValuation001.trdAcctId", groups = {ValidateGroupEdit.class})
-    public String getTrdAcctId() {
-        return trdAcctId;
-    }
-
-    public void setTrdAcctId(String trdAcctId) {
-        this.trdAcctId = trdAcctId;
-    }
-
-
-
-
-
-
-    /**
-     * 操作类型
-     */
-    private String operateType;
-    /**
-     * elementId
-     */
-    private String elementId;
-
-
-
-    /**
-     * 获取 finprodMarketId
-     * @return finprodMarketId.
-     */
-    @NotEmpty(fieldName = "TrdDepositValuation001.finprodMarketId", groups = {ValidateGroupEdit.class})
-    public String getFinprodMarketId() {
-        return finprodMarketId;
-    }
-
-    /**
-     * 设置 finprodMarketId
-     * @param finprodMarketId finprodMarketId
-     */
-    public void setFinprodMarketId(String finprodMarketId) {
-        this.finprodMarketId = finprodMarketId;
-    }
-
-
-
-
-    /**
-     * 获取 elementId
-     * @return elementId.
-     */
-    public String getElementId() {
-        return elementId;
-    }
-
-    /**
-     * 设置 elementId
-     * @param elementId elementId
-     */
-    public void setElementId(String elementId) {
-        this.elementId = elementId;
-    }
-
-    /**
-     * 获取 operatType
-     * @return operatType.
-     */
-    public String getOperateType() {
-        return operateType;
-    }
-
-    /**
-     * 设置 operatType
-     * @param operateType operatType
-     */
-    public void setOperateType(String operateType) {
-        this.operateType = operateType;
-    }
-
-    /**
-     * 获取 portfolioId
-     * @return portfolioId.
-     */
-    @NotEmpty(fieldName = "TrdDepositValuation001.portfolioId", groups = {ValidateGroupEdit.class})
-    public String getPortfolioId() {
-        return portfolioId;
-    }
-
-    /**
-     * 设置 portfolioId
-     * @param portfolioId portfolioId
-     */
-    public void setPortfolioId(String portfolioId) {
-        this.portfolioId = portfolioId;
-    }
-
-    /**
-     * 获取 portfolioName
-     * @return portfolioName.
-     */
-    @NotEmpty(fieldName = "TrdDepositValuation001.portfolioName", groups = {ValidateGroupEdit.class})
-    public String getPortfolioName() {
-        return portfolioName;
-    }
-
-    /**
-     * 设置 portfolioName
-     * @param portfolioName portfolioName
-     */
-    public void setPortfolioName(String portfolioName) {
-        this.portfolioName = portfolioName;
-    }
-
-
-    /**
-     * 获取 finprodName
-     * @return finprodName.
-     */
-    @NotEmpty(fieldName = "TrdDepositValuation001.finprodName", groups = {ValidateGroupEdit.class})
-    public String getFinprodName() {
-        return finprodName;
-    }
-
-    /**
-     * 设置 finprodName
-     * @param finprodName finprodName
-     */
-    public void setFinprodName(String finprodName) {
-        this.finprodName = finprodName;
-    }
-
 
     /**
      * 取得 交易方向str
@@ -381,6 +256,15 @@ public class TrdDepositValuationTrade001Dto extends BaseEntity implements Proces
     public String getPsStr() {
         return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.交易方向, ps))?
                 SysDataUtil.getNameFromDataDict(DictCode.交易方向, ps):ps;
+    }
+
+    @NotEmpty(fieldName = "TrdDepositValuationTrade.ccy" , groups = { ValidateGroupEdit.class })
+    public String getCcy() {
+        return ccy;
+    }
+
+    public void setCcy(String ccy) {
+        this.ccy = ccy;
     }
 
     /**
@@ -393,65 +277,114 @@ public class TrdDepositValuationTrade001Dto extends BaseEntity implements Proces
                 SysDataUtil.getNameFromDataDict(DictCode.币种, ccy):ccy;
     }
 
+    public String getCounterId() {
+        return counterId;
+    }
 
-    //导出转化交易日
-    private  String tradeDateStr;
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+
+    public String getCounterName() {
+        return counterName;
+    }
+
+    public void setCounterName(String counterName) {
+        this.counterName = counterName;
+    }
+
+    @NotEmpty(fieldName = "TrdDepositValuationTrade.tradeDate" , groups = { ValidateGroupEdit.class })
+    public Date getTradeDate() {
+        return tradeDate;
+    }
+
+    public void setTradeDate(Date tradeDate) {
+        this.tradeDate = tradeDate;
+    }
 
     public String getTradeDateStr() {
-        String tradeDateStr=" ";
-        if(getTradeDate() !=null){
-            tradeDateStr=DateUtil.format(getTradeDate());
-        }
-        return tradeDateStr;
+        return DateUtil.format(this.getTradeDate());
     }
 
-    //导出转化交割日
-    private String settDateStr;
-    public String getSettDateStr(){
-        String settDateStr=" ";
-        if(getSettDate() !=null){
-            settDateStr=DateUtil.format(getSettDate());
-        }
-        return settDateStr;
+    @NotEmpty(fieldName = "TrdDepositValuationTrade.settDate" , groups = { ValidateGroupEdit.class })
+    public Date getSettDate() {
+        return settDate;
     }
 
-
-    /**
-     * 存款类交易实体类
-     */
-    private List<TrdDepositValuationTrade001Dto> selectedItem;
-
-    public List<TrdDepositValuationTrade001Dto> getSelectedItem() {
-        return selectedItem;
+    public void setSettDate(Date settDate) {
+        this.settDate = settDate;
     }
 
-    public void setSelectedItem(List<TrdDepositValuationTrade001Dto> selectedItem) {
-        this.selectedItem = selectedItem;
+    public String getSettDateStr() {
+        return DateUtil.format(this.getSettDate());
     }
 
-    //导出保留小数位
+    @NotEmpty(fieldName = "TrdDepositValuationTrade.prinAmt" , groups = { ValidateGroupEdit.class })
+    public BigDecimal getPrinAmt() {
+        return prinAmt;
+    }
 
-    //交易本金
+    public void setPrinAmt(BigDecimal prinAmt) {
+        this.prinAmt = prinAmt;
+    }
+
     public String getPrinAmtStr() {
         DecimalFormat decimalFormat = new DecimalFormat("0.00#");
         return this.getPrinAmt()==null?"0.00":decimalFormat.format(this.getPrinAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
     }
 
-    //应计利息
+    @NotEmpty(fieldName = "TrdDepositValuationTrade.intAmt" , groups = { ValidateGroupEdit.class })
+    public BigDecimal getIntAmt() {
+        return intAmt;
+    }
+
+    public void setIntAmt(BigDecimal intAmt) {
+        this.intAmt = intAmt;
+    }
+
     public String getIntAmtStr() {
         DecimalFormat decimalFormat = new DecimalFormat("0.00#");
         return this.getIntAmt()==null?"0.00":decimalFormat.format(this.getIntAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
     }
 
-    //结算金额
+    @NotEmpty(fieldName = "TrdDepositValuationTrade.settleAmt" , groups = { ValidateGroupEdit.class })
+    public BigDecimal getSettleAmt() {
+        return settleAmt;
+    }
+
+    public void setSettleAmt(BigDecimal settleAmt) {
+        this.settleAmt = settleAmt;
+    }
+
     public String getSettleAmtStr() {
         DecimalFormat decimalFormat = new DecimalFormat("0.00#");
         return this.getSettleAmt()==null?"0.00":decimalFormat.format(this.getSettleAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
     }
 
-    //本币交易金额 dealAmt
-    public String getDealAmtStr() {
-        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
-        return this.getDealAmt()==null?"0.00":decimalFormat.format(this.getDealAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
+    @NotEmpty(fieldName = "TrdDepositValuationTrade.myAcctNo" , groups = { ValidateGroupEdit.class })
+    public String getMyAcctNo() {
+        return myAcctNo;
+    }
+
+    public void setMyAcctNo(String myAcctNo) {
+        this.myAcctNo = myAcctNo;
+    }
+
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    /**
+     * 取得 数据来源str
+     *
+     * @return 交易方向
+     */
+    public String getDataSourceStr() {
+        return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.生成方式, dataSource))?
+                SysDataUtil.getNameFromDataDict(DictCode.生成方式, dataSource):dataSource;
     }
 }

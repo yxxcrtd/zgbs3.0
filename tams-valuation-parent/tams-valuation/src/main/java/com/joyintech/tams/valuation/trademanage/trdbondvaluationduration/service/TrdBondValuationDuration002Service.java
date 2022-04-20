@@ -5,11 +5,14 @@ import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 import com.joyintech.tams.valuation.common.interf.base.dto.AssetDealInfoValCommonResult;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.sec.SecVestPeriodTemplateRecService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValSecVestPeriod;
-import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDuration002Dto;
+import com.joyintech.tams.valuation.component.common.dto.FinCashPlanDto;
+import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationDto;
 import com.joyintech.tams.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationResult;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
@@ -20,7 +23,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 @Service
-public class TrdBondValuationDuration002Service extends CommonExportService<TrdBondValuationDuration002Dto> implements BaseProcessService<TrdBondValuationDuration002Dto> {
+public class TrdBondValuationDuration002Service extends CommonExportService<TrdBondValuationDurationDto> implements BaseProcessService<TrdBondValuationDurationDto> {
 
     @Autowired
     private SecVestPeriodTemplateRecService secVestPeriodTemplateRecService;
@@ -32,21 +35,27 @@ public class TrdBondValuationDuration002Service extends CommonExportService<TrdB
      * @see
      * @since 1.0
      */
-    public TrdBondValuationDuration002Dto queryTradeInfoByTradeId(String tradeId) {
+    public TrdBondValuationDurationDto queryTradeInfoByTradeId(String tradeId) {
         return restTemplate.postForObject(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdBondValuationDuration002/queryTradeInfoByTradeId", tradeId,
-                TrdBondValuationDuration002Dto.class);
+                TrdBondValuationDurationDto.class);
     }
 
-    //自增序列号
-    public int querySequences(){
-        return restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdBondValuationDuration002/querySequences", null,Integer.class);
+    /**
+     * 查询债券付息计划
+     *
+     * @return 产品代码列表
+     * @see
+     * @since 1.0
+     */
+    public List<FinCashPlanDto> getFinCashPlanByProductId(Map<String,Object> param){
+        return restTemplate.postForList(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdBondValuationDuration002/getFinCashPlanByProductId",param,FinCashPlanDto.class);
     }
 
 
     @Override
-    public void doComplete(TrdBondValuationDuration002Dto trdBondValuationDuration002Dto, OperationType operationType) {
-        TrdBondValuationDurationResult result = generateEntity(trdBondValuationDuration002Dto);
+    public void doComplete(TrdBondValuationDurationDto trdBondValuationDurationDto, OperationType operationType) {
+        TrdBondValuationDurationResult result = generateEntity(trdBondValuationDurationDto);
         String action = StringUtil.EMPTY;
         if (OperationType.NEW.equals(operationType)) {
             action = "insert";
@@ -60,7 +69,7 @@ public class TrdBondValuationDuration002Service extends CommonExportService<TrdB
 
     }
 
-    public TrdBondValuationDurationResult generateEntity(TrdBondValuationDuration002Dto dto){
+    public TrdBondValuationDurationResult generateEntity(TrdBondValuationDurationDto dto){
         //设置接口参数
         Map<String,Object> params = new HashMap<>();
         List<String> prodIds = new ArrayList<>();
@@ -71,20 +80,42 @@ public class TrdBondValuationDuration002Service extends CommonExportService<TrdB
         List<ValSecVestPeriod> listValSecVestPeriod = new ArrayList<>();
         ValSecVestPeriod entity = new ValSecVestPeriod();
         BeanUtil.copyPropertiesIgnoreNull(entity,dto);
-        entity.setFundSettleDate(DateUtil.parse(dto.getFundSettleDate()));
+        entity.setFundSettleDate(dto.getFundSettleDate());
         //比较界面和接口字段差异，并手动给接口字段赋值
-        entity.setAssetId("F01_"+dto.getAssetId());
         entity.setSecId(dto.getAssetId());
         entity.setSecAbbr(dto.getAssetAbbr());
         entity.setDataActionSign("01");//数据动作标志
-        entity.setIsAmt("N");//是否还本带息
-        entity.setVdate(new Date());//计息开始日
-        entity.setMdate(new Date());//计息结束日
-        entity.setParValue(new BigDecimal(100));//单位面值
-        entity.setSettleDate(new Date());//交割日
-        entity.setTradeDate(new Date());//交易日
+        //交易方向转换
+        if(DictCodeList.交易方向_收息到账.getValue().equals(dto.getPs())){
+            dto.setPs(DictCodeList.交易方向_收息.getValue());
+        }else{
+            dto.setPs(DictCodeList.交易方向_还本.getValue());
+        }
+        entity.setPs(dto.getPs());
+        if(DictCodeList.交易方向_还本.getValue().equals(dto.getPs()) && dto.getActInt().compareTo(new BigDecimal(0))==1 ){
+            entity.setIsAmt("Y");
+        }else{
+            entity.setIsAmt("N");//是否还本带息 交易方向为还本，应收利息是否为0，不为0，isAmt为Y
+        }
+        //查询债券的付息计划
+        Map<String,Object> hashMap = new HashMap<>();
+        hashMap.put("finprodId",entity.getAssetId());
+        hashMap.put("mdate",DateUtil.format(entity.getMdate()));
+        List<FinCashPlanDto> list = getFinCashPlanByProductId(hashMap);
+        if(!StringUtil.isEmptyList(list)){
+            entity.setVdate(list.get(0).getVdate());//计息开始日 根据标的信息查询
+        }else{
+            entity.setVdate(DateUtil.parse(DateUtil.getSysDate()));//计息开始日 根据标的信息查询
+        }
+        entity.setParValue(new BigDecimal(0));//单位面值
+        entity.setSettleDate(dto.getFundSettleDate());//交割日
+        entity.setTradeDate(DateUtil.parse(DateUtil.getSysDate()));//交易日 默认系统日期
         entity.setIsClean("N");//有无清算指令
-        entity.setDealNum(new BigDecimal(0));//成交数量
+        entity.setDealNum(dto.getActCapi());//成交数量
+        entity.setTardeAmt(dto.getSettleAmt());//交易金额
+
+        //设置数据来源：画面录入
+        entity.setDataSource(DictCodeListExt1.生成方式_画面录入.getValue());
 
         listValSecVestPeriod.add(entity);
         Map<String, Object> map = secVestPeriodTemplateRecService.handleValSecVestPeriod(listValSecVestPeriod,new Date(),params,null);
@@ -116,6 +147,7 @@ public class TrdBondValuationDuration002Service extends CommonExportService<TrdB
         List<StlOrdersExt> valOrdersExtList=(List<StlOrdersExt>)map.get("valOrdersExtList");
         result.setListValOrdersExt(valOrdersExtList);
         TrdBondValuationDurationResult rst = new TrdBondValuationDurationResult(result);
+        rst.setTrdBondValuationDurationDto(dto);
         return rst;
      }
 

@@ -16,6 +16,9 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.service.valuation.trademanage.trdbuyoutrepovaluation.dto.TrdOutRightRepoValuationTrade001Dto;
 
+import com.joyintech.service.valuation.trademanage.trdbuyoutrepovaluation.dto.TrdOutRightRepoValuationTrade001Result;
+import com.joyintech.service.valuation.trademanage.trdbuyoutrepovaluation.dto.TrdOutRightRepoValuationTrade002Result;
+import com.joyintech.service.valuation.trademanage.trdbuyoutrepovaluation.dto.TrdOutRightRepoValuationTradeResult;
 import com.joyintech.service.valuation.trademanage.trdbuyoutrepovaluation.service.TrdOutRightRepoValuationTrade001Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,8 +105,8 @@ public class TrdOutRightRepoValuationTrade001Controller extends BaseController {
      * @since 1.0
      */
     @PostMapping("queryTradeInfoByTradeId")
-    public TrdOutRightRepoValuationTrade001Dto queryTradeInfoByTradeId(@RequestBody String  tradeId) {
-        return trdOutRightRepoValuationTrade001Service.queryTradeInfoByTradeId(tradeId);
+    public TrdOutRightRepoValuationTrade001Dto queryTradeInfoByTradeId(@RequestBody Map<String, Object> params) {
+        return trdOutRightRepoValuationTrade001Service.queryTradeInfoByTradeId(params);
     }
 
 
@@ -128,5 +131,93 @@ public class TrdOutRightRepoValuationTrade001Controller extends BaseController {
         return trdOutRightRepoValuationTrade001Service.delete(dto);
     }
 
+    /**
+     * 插入
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("insert")
+    public int insert(@RequestBody TrdOutRightRepoValuationTradeResult dto)
+            throws Exception {
+        return trdOutRightRepoValuationTrade001Service.insert(dto);
+    }
 
+    /**
+     * 修改
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("update")
+    public int update(@RequestBody TrdOutRightRepoValuationTradeResult dto)
+            throws Exception {
+        return trdOutRightRepoValuationTrade001Service.update(dto);
+    }
+
+    /**
+     * 修改
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("update01")
+    public int update01(@RequestBody TrdOutRightRepoValuationTrade001Result dto)
+            throws Exception {
+        return trdOutRightRepoValuationTrade001Service.update01(dto);
+    }
+
+    /**
+     * 修改
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("update02")
+    public int update02(@RequestBody TrdOutRightRepoValuationTrade002Result dto)
+            throws Exception {
+        return trdOutRightRepoValuationTrade001Service.update02(dto);
+    }
+    /**
+     * 插入 债券回购标的
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("insert01")
+    public int insert01(@RequestBody TrdOutRightRepoValuationTrade001Result dto)
+            throws Exception {
+        return trdOutRightRepoValuationTrade001Service.insert01(dto);
+    }
+
+
+    /**
+     * 插入 债券回购质押品信息
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("insert02")
+    public int insert02(@RequestBody TrdOutRightRepoValuationTrade002Result dto)
+            throws Exception {
+        return trdOutRightRepoValuationTrade001Service.insert02(dto);
+    }
 }

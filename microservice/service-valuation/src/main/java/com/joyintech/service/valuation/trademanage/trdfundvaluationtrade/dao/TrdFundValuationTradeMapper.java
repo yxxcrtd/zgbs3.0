@@ -10,14 +10,12 @@
  
 package com.joyintech.service.valuation.trademanage.trdfundvaluationtrade.dao;
 
-import java.util.List;
-import java.util.Map;
-
 import com.joyintech.service.valuation.trademanage.trdfundvaluationtrade.dto.TrdFundValuationTradeDto;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
-import com.joyintech.framework.select.SelectOptionDto;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -29,26 +27,6 @@ import com.joyintech.framework.select.SelectOptionDto;
  */
 @Repository(value="serviceTrdFundValuationTradeMapper")
 public interface TrdFundValuationTradeMapper {
-
-	/**
-	 * 产品代码下拉框
-	 * @auther: yuzj
-	 * @date: 2021/12/29
-	 * @param:
-	 * @return:
-	 */
-	List<SelectOptionDto> findPortfolioId(Map<String, Object> params);
-
-
-	/**
-	 * 资产代码下拉框
-	 * @auther: yuzj
-	 * @date: 2021/12/29
-	 * @param:
-	 * @return:
-	 */
-	List<SelectOptionDto> findFinprodId(Map<String, Object> params);
-
 
     List<TrdFundValuationTradeDto> select(Map<String, Object> key);
 
@@ -63,7 +41,11 @@ public interface TrdFundValuationTradeMapper {
     String getNextId(@Param("sequenceName") String sequenceName);
 
 
-	TrdFundValuationTradeDto queryTradeInfoByTradeId(String tradeId);
+	TrdFundValuationTradeDto queryTradeInfoByTradeId(Map<String, Object> param);
+
+	TrdFundValuationTradeDto queryRedInfoByTradeId(@Param("tradeId") String tradeId);
+
+	TrdFundValuationTradeDto queryRedInfoByOutTradeId(@Param("tradeId") String tradeId);
 
 	/**
 	 * 检索债券交易列表

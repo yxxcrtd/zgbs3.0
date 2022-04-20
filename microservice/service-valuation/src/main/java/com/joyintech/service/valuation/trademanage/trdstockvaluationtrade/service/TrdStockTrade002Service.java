@@ -3,8 +3,7 @@ package com.joyintech.service.valuation.trademanage.trdstockvaluationtrade.servi
 
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.service.valuation.trademanage.trdstockvaluationtrade.dao.TrdStockTradeMapper;
-import com.joyintech.service.valuation.trademanage.trdstockvaluationtrade.dto.TrdStockTrade001Dto;
-import com.joyintech.service.valuation.trademanage.trdstockvaluationtrade.dto.TrdStockTrade002Dto;
+import com.joyintech.service.valuation.trademanage.trdstockvaluationtrade.dto.TrdStockTradeDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -88,7 +87,7 @@ public class TrdStockTrade002Service extends BaseService {
      * @see
      * @since 1.0
      */
-    public TrdStockTrade002Dto queryTradeInfoByTradeId(String tradeId){
+    public TrdStockTradeDto queryTradeInfoByTradeId(String tradeId){
         return  trdStockTradeMapper.queryTradeInfoByTradeId(tradeId);
     }
 
@@ -97,7 +96,7 @@ public class TrdStockTrade002Service extends BaseService {
         return i;
     }
 
-    public int insert(TrdStockTrade002Dto dto){
+    public int insert(TrdStockTradeDto dto){
 //        // 金融产品交易
 //        List<TrdProductDeal> listValFinProductDeal = dto.getListValFinProductDeal();
 //        // 入库
@@ -150,9 +149,9 @@ public class TrdStockTrade002Service extends BaseService {
         return 1;
     }
 
-    public int update(TrdStockTrade002Dto dto){
-        TrdStockTrade001Dto dto1 = new TrdStockTrade001Dto();
-        dto1.setFinprodId(dto.getProdId());
+    public int update(TrdStockTradeDto dto){
+        TrdStockTradeDto dto1 = new TrdStockTradeDto();
+        dto1.setProdId(dto.getProdId());
         dto1.setTradeId(dto.getTradeId());
         trdStockTrade001Service.delete(dto1);
        return insert(dto);

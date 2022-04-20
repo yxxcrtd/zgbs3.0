@@ -1,61 +1,90 @@
 
 (function () {
 
-    $('#portfolioId').change(function(){
-        var portfolioId = $('#portfolioId').val();
-        if(portfolioId){
-            var dataPort = $('#portfolioId').select2('data')[0].object;
-            var finprodId = dataPort.finprodId;
-            $('#portfolioName').val(finprodId).trigger('change');
+    $('#prodId').change(function(){
+        var prodId = $('#prodId').val();
+        if(prodId){
+            $('#prodName').val($('#prodId').select2('data')[0].id).trigger('change');
 
         }else {
-            $('#portfolioName').val('').trigger('change');
+            $('#prodName').val('').trigger('change');
         }
     });
 
-    $('#finprodId').change(function(){
-        var finprodId = $('#finprodId').val();
-        if(finprodId){
-            var dataPort = $('#finprodId').select2('data')[0].object;
-            var finprodId = dataPort.finprodId;
+    $('#assetId').change(function(){
+        var assetId = $('#assetId').val();
+        if(assetId){
+            var dataPort = $('#assetId').select2('data')[0].object;
             var tradeMarket = dataPort.tradeMarket;
-            $('#finprodName').val(finprodId).trigger('change');
+            $('#assetAbbr').val($('#assetId').select2('data')[0].id).trigger('change');
             $('#tradeMarket').val(tradeMarket).trigger('change');
+
         }else {
-            $('#finprodName').val('').trigger('change');
+            $('#assetAbbr').val('').trigger('change');
             $('#tradeMarket').val('').trigger('change');
         }
     });
 
-
-
-    //分红金额 联动
-    $('#bonusAmt').change(function(){
-        unitValueCalculate();
-        //默认等于分红金额，可修改
-        var bonusAmt = $('#bonusAmt').val();
-        $('#mdateSettleAmt').val(bonusAmt);
+    $('#ps').change(function(){
+        psChange();
     });
 
-    //交易份额 联动
-    $('#nums').change(function(){
-        unitValueCalculate();
-    });
+    var psChange = function () {
+        var ps = $('#ps').val();
+        //现金分红 T11、红利再投 T12、份额强增 C3、份额强减 C6
+        if(ps == 'T11' ){ //现金分红
+            $('#xjfh').show();
+            $('#hlzt').hide();
+            $('#share').hide();
+        }else if(ps == 'T12'){ //红利再投
+            $('#xjfh').hide();
+            $('#hlzt').show();
+            $('#share').hide();
+        }else if(ps == 'C3' || ps == 'C6'){//份额强增,份额强减
+            $('#xjfh').hide();
+            $('#hlzt').hide();
+            $('#share').show();
+        }else{//默认
+            $('#xjfh').hide();
+            $('#hlzt').hide();
+            $('#share').hide();
+        }
+    };
 
-    /**
-     * 单位分红净值计算
-     */
-    var unitValueCalculate = function(){
-        if($('#bonusAmt').val() && $('#bonusAmt').val() != null && $('#bonusAmt').val() != ''
-                && $('#nums').val() && $('#nums').val() != null && $('#nums').val() != '' && $('#confirmNums').val() !=0){
-            var unitValue = JoyinMath.doDiv($('#bonusAmt').val(), $('#nums').val(), 2);
-            $('#unitValue').val(unitValue)
+    //现金分红 结算金额 默认等于分红金额
+    // var settleAmt = function(){
+    //     var bonusAmt = $('#bonusAmt').val();
+    //     if(bonusAmt != null && bonusAmt != ''){
+    //         $('#settleAmt').val(bonusAmt).trigger('blur');
+    //     }else{
+    //         $('#settleAmt').val('');
+    //     }
+    //
+    // }
+
+    //红利再投 单位分红净值=分红金额/分红份额
+    var unitBonusUnitValueChange = function(){
+        var bonusAmtReInvest = $('#bonusAmtReInvest').val();
+        var dealNumReInvest = $('#dealNumReInvest').val();
+        if(bonusAmtReInvest != null && bonusAmtReInvest != ''
+            && dealNumReInvest != null && dealNumReInvest != ''){
+            var unitBonusUnitValue =JoyinMath.doDiv(bonusAmtReInvest, dealNumReInvest,4,JoyinMath.ROUND_HALF_UP);
+            $('#unitBonusUnitValue').val(unitBonusUnitValue);
         }else{
-            $('#unitValue').val('')
+            $('#unitBonusUnitValue').val('');
         }
     }
 
-
+    //红利再投 结算金额 默认等于分红金额
+    // var settleAmtReInvest = function(){
+    //     var bonusAmtReInvest = $('#bonusAmtReInvest').val();
+    //     if(bonusAmtReInvest != null && bonusAmtReInvest != ''){
+    //         $('#settleAmtReInvest').val(bonusAmtReInvest).trigger('blur');
+    //     }else{
+    //         $('#settleAmtReInvest').val('');
+    //     }
+    //
+    // }
 
     /**
      * 保存或提交
@@ -67,32 +96,42 @@
          * 获取列表参数
          */
         var object = $.serializeToObject('#basicInfoForm',true);
+        object.operateType=operateType;
+        object.pageId=pageId;
         Joyin.ajaxJson(basePath + 'valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade002/check', object, function(result) {
             Joyin.confirm(result.data, function () {
                 if(operateType === 'save') {
-                    Joyin.confirm(message, function() {
-                        WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade002/save', object, "TrdFundValuationTrade002_btn_save");
-                    });
+                        WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade002/save', object, "TrdFundBonusValuationTrade002_btn_save");
                 }else{
-                    Joyin.confirm(message, function() {
-                        WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade002/save', object, "TrdFundValuationTrade002_btn_sbumit");
-                    });
+                        WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdfundbonusvaluationtrade/TrdFundBonusValuationTrade002/save', object, "TrdFundBonusValuationTrade002_btn_submit");
                 }
             });
 
         });
     }
-    /**
-     * 界面初始化
-     * @returns
-     */
-    function init(){
-    }
+
     /**
      * 画面加载完成
      */
     $(function() {
-        // init();
+
+        if(workflowId){
+            psChange();
+        }
+
+        $('#bonusAmt').change(function(){
+            settleAmt();
+        });
+
+        //红利再投 单位分红净值=分红金额/分红份额
+        $('#bonusAmtReInvest').change(function(){
+            unitBonusUnitValueChange();
+            // settleAmtReInvest();
+        });
+        $('#dealNumReInvest').change(function(){
+            unitBonusUnitValueChange();
+        });
+
         //保存
         $('#TrdFundBonusValuationTrade002_btn_save').click(function() {
             saveOrSubmit('save');

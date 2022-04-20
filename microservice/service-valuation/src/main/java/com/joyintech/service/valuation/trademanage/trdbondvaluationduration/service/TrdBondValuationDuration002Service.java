@@ -2,11 +2,13 @@ package com.joyintech.service.valuation.trademanage.trdbondvaluationduration.ser
 
 
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.service.valuation.component.common.constants.BussinessDictCodeList;
+import com.joyintech.service.valuation.component.common.dto.FinCashPlanDto;
 import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dao.TrdBondValuationDurationMapper;
-import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDuration001Dto;
-import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDuration002Dto;
+import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationDto;
 import com.joyintech.service.valuation.trademanage.trdbondvaluationduration.dto.TrdBondValuationDurationResult;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.interf.base.batch.dao.*;
 import com.joyintech.tams.valuation.common.interf.base.service.common.InterfCommonService;
 import org.apache.commons.collections.CollectionUtils;
@@ -14,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service(value="serviceTrdBondValuationDuration002Service")
 public class TrdBondValuationDuration002Service extends BaseService {
@@ -96,13 +100,25 @@ public class TrdBondValuationDuration002Service extends BaseService {
      * @see
      * @since 1.0
      */
-    public TrdBondValuationDuration002Dto queryTradeInfoByTradeId(String tradeId){
-        return  trdBondValuationDurationMapper.queryTradeInfoByTradeId(tradeId);
+    public TrdBondValuationDurationDto queryTradeInfoByTradeId(String tradeId){
+        Map<String, Object> param = new HashMap<>();
+        param.put("tradeId",tradeId);
+        param.put("BUSI_TYPE_02", BussinessDictCodeList.业务类型_债券交易.getValue());
+        return  trdBondValuationDurationMapper.queryTradeInfoByTradeId(param);
     }
 
-    public int querySequences(){
-        int i=trdBondValuationDurationMapper.querySequences();
-        return i;
+    /**
+     *
+     * 查询债券付息计划
+     *
+     * @return
+     * @see
+     * @since 1.0
+     */
+    public  List<FinCashPlanDto> getFinCashPlanByProductId(Map<String, Object> param){
+        param.put("cashType", DictCodeListExt1.现金流二级类型_利息.getValue());
+        param.put("finprodType", DictCodeListExt1.金融产品类型_债券.getValue());
+        return trdBondValuationDurationMapper.getFinCashPlanByProductId(param);
     }
 
     public int insert(TrdBondValuationDurationResult result){
@@ -114,8 +130,8 @@ public class TrdBondValuationDuration002Service extends BaseService {
             List<TrdProductDeal> listInsert = new ArrayList<TrdProductDeal>();
             for (TrdProductDeal e : listValFinProductDeal) {
                     listInsert.add(e);
-                    valFinProductDealBatchMapper.insertBatch(listInsert);
                 }
+            valFinProductDealBatchMapper.insertBatch(listInsert);
         }
 
         // 金融产品实物交易
@@ -126,8 +142,8 @@ public class TrdBondValuationDuration002Service extends BaseService {
             List<TrdFinProductBarter> listInsert = new ArrayList<TrdFinProductBarter>();
             for (TrdFinProductBarter e : listTrdFinProductBarter) {
                     listInsert.add(e);
-                    valTrdFinProductBarterBatchMapper.insertBatch(listInsert);
                 }
+            valTrdFinProductBarterBatchMapper.insertBatch(listInsert);
         }
 
         // 估值核算交易扩展表
@@ -138,8 +154,8 @@ public class TrdBondValuationDuration002Service extends BaseService {
             List<TrdProductDealAdd> listInsert = new ArrayList<TrdProductDealAdd>();
             for (TrdProductDealAdd e : listValFinProductDealExt) {
                 listInsert.add(e);
-                valTrdProductDealAddBatchMapper.insertBatch(listInsert);
             }
+            valTrdProductDealAddBatchMapper.insertBatch(listInsert);
         }
 
         // 交易类金融产品
@@ -150,8 +166,8 @@ public class TrdBondValuationDuration002Service extends BaseService {
             List<FinTradeProduct> listInsert = new ArrayList<FinTradeProduct>();
             for (FinTradeProduct e : listValFinTradeProduct) {
                 listInsert.add(e);
-                valFinTradeProductBatchMapper.insertBatch(listInsert);
             }
+            valFinTradeProductBatchMapper.insertBatch(listInsert);
         }
 
         // 入账信息表
@@ -161,9 +177,9 @@ public class TrdBondValuationDuration002Service extends BaseService {
             // 定义一个固定大小插入存放集合
             List<BokDealAccounting> listInsert = new ArrayList<BokDealAccounting>();
             for (BokDealAccounting e : listValDealAccounting) {
-                    listInsert.add(e);
-                    valDealAccountingBatchMapper.insertBatch(listInsert);
+                listInsert.add(e);
             }
+            valDealAccountingBatchMapper.insertBatch(listInsert);
         }
 
         // 账务明细表
@@ -174,8 +190,8 @@ public class TrdBondValuationDuration002Service extends BaseService {
             List<BokDealAccountingDetail> listInsert = new ArrayList<BokDealAccountingDetail>();
             for (BokDealAccountingDetail e : listValDealAccountingDetail) {
                 listInsert.add(e);
-                valDealAccountingDetailBatchMapper.insertBatch(listInsert);
             }
+            valDealAccountingDetailBatchMapper.insertBatch(listInsert);
         }
 
         //账务明细代码表
@@ -187,8 +203,8 @@ public class TrdBondValuationDuration002Service extends BaseService {
             List<BokDetailId> listInsert = new ArrayList<BokDetailId>();
             for (BokDetailId e : listValBokDetailId) {
                 listInsert.add(e);
-                valBokDetailIdBatchMapper.insertBatch(listInsert);
             }
+            valBokDetailIdBatchMapper.insertBatch(listInsert);
         }
 
         // 交易费用明细表
@@ -198,9 +214,9 @@ public class TrdBondValuationDuration002Service extends BaseService {
             // 定义一个固定大小插入存放集合
             List<TrdTradeFeeDetail> listInsert = new ArrayList<TrdTradeFeeDetail>();
             for (TrdTradeFeeDetail e : listValTradeFeeDetail) {
-                    listInsert.add(e);
-                    valTradeFeeDetailBatchMapper.insertBatch(listInsert);
+                listInsert.add(e);
             }
+            valTradeFeeDetailBatchMapper.insertBatch(listInsert);
         }
         //结算指令表
         List<StlOrders>  ValOrdersList=result.getValOrdersList();
@@ -209,9 +225,9 @@ public class TrdBondValuationDuration002Service extends BaseService {
             // 定义一个固定大小插入存放集合
             List<StlOrders> listInsert = new ArrayList<StlOrders>();
             for (StlOrders e : ValOrdersList) {
-                    listInsert.add(e);
-                    valOrdersBatchMapper.insertBatch(listInsert);
+                listInsert.add(e);
             }
+            valOrdersBatchMapper.insertBatch(listInsert);
         }
         //结算指令拓展表
         List<StlOrdersExt> ValOrdersExtList=result.getValOrdersExtList();
@@ -220,17 +236,17 @@ public class TrdBondValuationDuration002Service extends BaseService {
             // 定义一个固定大小插入存放集合
             List<StlOrdersExt> listInsert = new ArrayList<StlOrdersExt>();
             for (StlOrdersExt e : ValOrdersExtList) {
-                    listInsert.add(e);
-                    valOrdersExtBatchMapper.insertBatch(listInsert);
+                listInsert.add(e);
             }
+            valOrdersExtBatchMapper.insertBatch(listInsert);
         }
         return 1;
     }
 
     public int update(TrdBondValuationDurationResult dto){
-        TrdBondValuationDuration001Dto dto1 = new TrdBondValuationDuration001Dto();
-        dto1.setFinprodId(dto.getTrdBondValuationDuration002Dto().getProdId());
-        dto1.setTradeId(dto.getTrdBondValuationDuration002Dto().getTradeId());
+        TrdBondValuationDurationDto dto1 = new TrdBondValuationDurationDto();
+        dto1.setProdId(dto.getTrdBondValuationDurationDto().getProdId());
+        dto1.setTradeId(dto.getTrdBondValuationDurationDto().getTradeId());
         trdBondValuationDuration001Service.delete(dto1);
        return insert(dto);
     }

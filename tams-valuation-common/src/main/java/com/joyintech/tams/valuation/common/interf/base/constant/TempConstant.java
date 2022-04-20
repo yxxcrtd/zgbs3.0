@@ -358,5 +358,10 @@ public class TempConstant {
      */
     public static final String 股票行情="ValStockQuotationInfo";
 
+    /**
+     * 自定义现金流交易
+     */
+    public static final String 自定义现金流交易= "ValCashflowTrade";
+
 }
 

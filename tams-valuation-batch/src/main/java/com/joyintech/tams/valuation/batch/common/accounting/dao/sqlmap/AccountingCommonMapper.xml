@@ -112,7 +112,8 @@
 				ROW_NUMBER() OVER(PARTITION BY  
 				        bc.BOOKSET_ID, 
 				        bc.BOK_DETAIL_ID,
-				        bc.BASE_SUBJECT_NATURE,
+				        /**bc.BASE_SUBJECT_NATURE,**/
+				        bc.SUBJECT_NO,
 				        bc.BRANCH,
 				        bc.O_CCY
 				    ORDER BY 
@@ -214,6 +215,9 @@
 		            AND bc.BRANCH = #{branch}
 		        </if>
 	        </if>
+			<if test="subjectNo != null and subjectNo != ''">
+				AND bc.SUBJECT_NO = #{subjectNo}
+			</if>
         ) TEMP
         INNER JOIN BOK_BOOKSET_DATE bbd
             ON bbd.BOOKSET_ID = TEMP.booksetId
@@ -246,7 +250,8 @@
 			ROW_NUMBER() OVER(PARTITION BY 
 			          ba.BOOKSET_ID, 
 			          ba.BOK_DETAIL_ID,
-			       ba.BASE_SUBJECT_NATURE,
+					/**ba.BASE_SUBJECT_NATURE,**/
+					ba.SUBJECT_NO,
 			       ba.BRANCH,
 			       ba.O_CCY
 			 ORDER BY 
@@ -274,6 +279,9 @@
 		     <if test="bokDetailId != null and bokDetailId != ''">
 		         AND ba.BOK_DETAIL_ID = #{bokDetailId}
 		     </if>
+			<if test="subjectNo != null and subjectNo != ''">
+				AND ba.SUBJECT_NO = #{subjectNo}
+			</if>
 		 ) TEMP
 		INNER JOIN BOK_BOOKSET_DATE bbd
 		    ON bbd.BOOKSET_ID = TEMP.BOOKSETID
@@ -1254,20 +1262,51 @@ FROM
         where bb.balance_date = #{bookDate,jdbcType=DATE}
             and bb.bookset_id = #{booksetId,jdbcType=VARCHAR}
             <if test="isFloat == 'Y'.toString()">
-                 and (bs.base_subject_nature in ('ZBGJ', 'QTZHSY') 
-                 or  bs.subject_type in 
-                 <foreach collection="listSubjectType" item="item" open="(" separator="," close=")">
-                  #{item}
-                </foreach>
-                 )
+
+				/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 start**/
+				<choose>
+					<when test="accountEntryType =='02' ">
+						and (bs.base_subject_nature in ('ZBGJ_Z', 'QTZHSY_ZQ')
+						or  bs.subject_type in
+						<foreach collection="listSubjectType" item="item" open="(" separator="," close=")">
+							#{item}
+						</foreach>
+						)
+					</when>
+					<otherwise>
+						and (bs.base_subject_nature in ('ZBGJ', 'QTZHSY')
+						or  bs.subject_type in
+						<foreach collection="listSubjectType" item="item" open="(" separator="," close=")">
+							#{item}
+						</foreach>
+						)
+					</otherwise>
+				</choose>
+				/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 end**/
+
             </if>
             <if test="isFloat == 'N'.toString()">
-                 and (bs.base_subject_nature in ('ZBGJ') 
-                 or  bs.subject_type in 
-                 <foreach collection="listSubjectType" item="item" open="(" separator="," close=")">
-                  #{item}
-                </foreach>
-                 )
+				/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 start**/
+				<choose>
+					<when test="accountEntryType =='02' ">
+						and (bs.base_subject_nature in ('ZBGJ_Z')
+						or  bs.subject_type in
+						<foreach collection="listSubjectType" item="item" open="(" separator="," close=")">
+							#{item}
+						</foreach>
+						)
+					</when>
+					<otherwise>
+						and (bs.base_subject_nature in ('ZBGJ')
+						or  bs.subject_type in
+						<foreach collection="listSubjectType" item="item" open="(" separator="," close=")">
+							#{item}
+						</foreach>
+						)
+					</otherwise>
+				</choose>
+				/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 end**/
+
             </if>
             and bs.base_subject_nature not in 
             <foreach collection="listBaseSubjectNature" item="item" open="(" separator="," close=")">

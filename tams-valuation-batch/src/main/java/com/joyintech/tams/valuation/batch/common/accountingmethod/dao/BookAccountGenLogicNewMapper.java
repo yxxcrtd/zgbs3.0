@@ -5,7 +5,6 @@
 
 package com.joyintech.tams.valuation.batch.common.accountingmethod.dao;
 
-import com.joyintech.tams.common.base.entity.BokSubject;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.SubjectMappingConfig;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -25,22 +24,11 @@ import java.util.List;
 public interface BookAccountGenLogicNewMapper {
 
     /**
-     * 根据内部编码查询对应科目信息
-     * @param booksetId 账套代码
-     * @param listSubjectInternalCode 内部科目编码
-     * @param ccy 币种
-     * @return
-     */
-    List<BokSubject> getSubjectByInternalCode(@Param("booksetId") String booksetId,
-                                              @Param("listSubjectInternalCode") List<String> listSubjectInternalCode,
-                                              @Param("ccy") String ccy);
-
-    /**
      * 查询科目映射关系配置项
      * @param booksetId 账套代码
      * @param listBokDetailId 账务明细代码
      * @return
      */
     List<SubjectMappingConfig> getSubjectMappingConfig(@Param("booksetId") String booksetId,
-                                                 @Param("listBokDetailId") List<String> listBokDetailId);
+                                                                    @Param("listBokDetailId") List<String> listBokDetailId);
 }

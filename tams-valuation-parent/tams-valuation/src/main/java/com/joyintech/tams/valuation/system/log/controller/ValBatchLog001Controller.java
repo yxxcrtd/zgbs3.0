@@ -14,6 +14,8 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 
+import com.jcraft.jsch.JSchException;
+import com.joyintech.tams.valuation.system.log.dto.ValBatchLogDetailExDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -35,6 +37,8 @@ import com.joyintech.system.constant.SystemDictCode;
 import com.joyintech.system.constant.SystemGlobalConstant;
 import com.joyintech.tams.valuation.system.log.dto.ValBatchLog001Dto;
 import com.joyintech.tams.valuation.system.log.service.ValBatchLog001Service;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -94,12 +98,12 @@ public class ValBatchLog001Controller extends BaseController {
      * @return List<SelectOptionDto>
      * @throws Exception
      */
-    @LogMethod(action="init",pageId="SysBatchLog002")
-    @RequestMapping(value = "SysBatchLog002", method = RequestMethod.GET)
-    public String sysBatchLog002(String logSeqNo, Model model){
+    @LogMethod(action="init",pageId="ValBatchLog003")
+    @RequestMapping(value = "ValBatchLog003", method = RequestMethod.GET)
+    public String valBatchLog003(String logSeqNo, Model model){
         ValBatchLog001Dto log = valBatchLog001Service.findLogDetail(logSeqNo);
         model.addAttribute("log", log);
-        return "system/log/SysBatchLog002";
+        return "/valuation/system/log/ValBatchLog003";
     }
     
 
@@ -126,6 +130,14 @@ public class ValBatchLog001Controller extends BaseController {
     public Page<ValBatchLog001Dto> selectBatchLog() {
         return valBatchLog001Service.selectForPage(RequestUtil.getPageParam());
     }
+
+    @ResponseBody
+    @RequestMapping("findDetail")
+    public Page<ValBatchLogDetailExDto> findDetail() {
+        return valBatchLog001Service.findDetail(this.getParam("seqNo"));
+    }
+
+
     
     /**
      * 导出信息excel
@@ -144,5 +156,23 @@ public class ValBatchLog001Controller extends BaseController {
                                  + DateUtil.format(new Date()) + SystemGlobalConstant.CLOSE_PARENTHESIS
                                  + SystemGlobalConstant.POINT + FileNameUtil.getFileExtName(outFile),
             outFile, true);
+    }
+
+
+    /**
+     * 文件下载
+     *
+     * @param request
+     *            请求
+     * @return 保存文件信息
+     * @throws Exception
+     *             异常
+     * @see
+     * @since 1.0
+     */
+    @RequestMapping(value = "/downloadFile")
+    @ResponseBody
+    public ResponseEntity<byte[]> downloadFile(HttpServletRequest request) throws Exception {
+        return valBatchLog001Service.downloadFile(request);
     }
 }

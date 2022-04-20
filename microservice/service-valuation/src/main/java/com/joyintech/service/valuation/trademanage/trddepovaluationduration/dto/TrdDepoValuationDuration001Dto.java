@@ -77,9 +77,9 @@ public class TrdDepoValuationDuration001Dto extends WflTrdProductDeal implements
     private String ps;
 
     /**
-     * 计划支付日
+     * 计息结束日
      */
-    private Date planPayDate;
+    private Date endDate;
 
     /**
      * 实际支付日
@@ -147,7 +147,7 @@ public class TrdDepoValuationDuration001Dto extends WflTrdProductDeal implements
     }
 
     @PrimaryKey(PrimaryKey.Field.PK_1)
-    @NotEmpty(fieldName = "TrdDepoValuationDuration002.tradeId", groups = {ValidateGroupEdit.class})
+//    @NotEmpty(fieldName = "TrdDepoValuationDuration002.tradeId", groups = {ValidateGroupEdit.class})
     public String getTradeId() {
         return tradeId;
     }
@@ -218,13 +218,12 @@ public class TrdDepoValuationDuration001Dto extends WflTrdProductDeal implements
         this.ps = ps;
     }
 
-    @NotEmpty(fieldName = "TrdDepoValuationDuration002.planPayDate", groups = {ValidateGroupEdit.class})
-    public Date getPlanPayDate() {
-        return planPayDate;
+    public Date getEndDate() {
+        return endDate;
     }
 
-    public void setPlanPayDate(Date planPayDate) {
-        this.planPayDate = planPayDate;
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 
     @NotEmpty(fieldName = "TrdDepoValuationDuration002.payDate", groups = {ValidateGroupEdit.class})
@@ -263,7 +262,7 @@ public class TrdDepoValuationDuration001Dto extends WflTrdProductDeal implements
         this.ccy = ccy;
     }
 
-    @NotEmpty(fieldName = "TrdDepoValuationDuration002.otherAmt", groups = {ValidateGroupEdit.class})
+//    @NotEmpty(fieldName = "TrdDepoValuationDuration002.otherAmt", groups = {ValidateGroupEdit.class})
     public BigDecimal getOtherAmt() {
         return otherAmt;
     }
@@ -328,15 +327,15 @@ public class TrdDepoValuationDuration001Dto extends WflTrdProductDeal implements
 
 
     //导出转化计划支付日
-    private  String planPayDateStr;
-
-    public String getPlanPayDateStr() {
-        String planPayDateStr=" ";
-        if(getPlanPayDate() !=null){
-            planPayDateStr=DateUtil.format(getPlanPayDate());
-        }
-        return planPayDateStr;
-    }
+//    private  String planPayDateStr;
+//
+//    public String getPlanPayDateStr() {
+//        String planPayDateStr=" ";
+//        if(getPlanPayDate() !=null){
+//            planPayDateStr=DateUtil.format(getPlanPayDate());
+//        }
+//        return planPayDateStr;
+//    }
 
     //导出转化实际支付日
     private  String payDateStr;
@@ -344,7 +343,7 @@ public class TrdDepoValuationDuration001Dto extends WflTrdProductDeal implements
     public String getPayDateStr() {
         String payDateStr=" ";
         if(getPayDate() !=null){
-            planPayDateStr=DateUtil.format(getPayDate());
+            payDateStr=DateUtil.format(getPayDate());
         }
         return payDateStr;
     }

@@ -15,6 +15,7 @@ import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.service.valuation.trademanage.trdintovaluationduration.dto.TrdIntoValuationDuration001Dto;
+import com.joyintech.service.valuation.trademanage.trdintovaluationduration.dto.TrdIntoValuationDurationResult;
 import com.joyintech.service.valuation.trademanage.trdintovaluationduration.service.TrdIntoValuationDuration001Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * service 存款类存续期
+ * service 融入券存续期
  * 
  * @author yuzj
  * @version 1.0 2021年12月29日
@@ -37,47 +38,6 @@ public class TrdIntoValuationDuration001Controller extends BaseController {
 
     @Autowired
     private TrdIntoValuationDuration001Service trdIntoValuationDuration001Service;
-
-    /**
-     * 产品代码下拉框
-     *
-     * @return 返回的数据
-     * @exception Exception
-     *                异常
-     * @since 1.0
-     */
-    @PostMapping("findPortfolioId/{page}/{length}")
-    public Page<SelectOptionDto> findPortfolioId(@RequestBody Map<String,Object> map,
-                                           @PathVariable("page") int page, @PathVariable("length") int length) {
-        return trdIntoValuationDuration001Service.findPortfolioId(page,length,map);
-    }
-
-    /**
-     * 资产代码下拉框
-     */
-    @PostMapping("findFinprodId/{page}/{length}")
-    public Page<SelectOptionDto> findFinprodId(@RequestBody Map<String,Object> map,
-                                               @PathVariable("page") int page, @PathVariable("length") int length) {
-        return trdIntoValuationDuration001Service.findFinprodId(page,length,map);
-    }
-
-
-
-    /**
-     * 回调函数 操作具体 new delete update <功能详细描述>
-     *
-     * @see
-     * @since 1.0
-     */
-    @Transactional
-    @DTXTransaction
-    @PostMapping("/doComplete/{type}")
-    public void doComplete(@RequestBody TrdIntoValuationDuration001Dto dto, @PathVariable("type") String type) {
-        dto.setOperateType(type);
-        trdIntoValuationDuration001Service.doComplete(dto);
-    }
-
-
 
     /**
      * 策略代码生成
@@ -121,8 +81,8 @@ public class TrdIntoValuationDuration001Controller extends BaseController {
 
      */
     @PostMapping("queryTradeInfoByTradeId")
-    public TrdIntoValuationDuration001Dto queryTradeInfoByTradeId(@RequestBody String  tradeId) {
-        return trdIntoValuationDuration001Service.queryTradeInfoByTradeId(tradeId);
+    public TrdIntoValuationDuration001Dto queryTradeInfoByTradeId(@RequestBody Map<String, Object> param) {
+        return trdIntoValuationDuration001Service.queryTradeInfoByTradeId(param);
     }
 
     /**
@@ -135,4 +95,33 @@ public class TrdIntoValuationDuration001Controller extends BaseController {
         return trdIntoValuationDuration001Service.delete(dto);
     }
 
+    /**
+     * 插入
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("insert")
+    public int insert(@RequestBody TrdIntoValuationDurationResult dto)
+            throws Exception {
+        return trdIntoValuationDuration001Service.insert(dto);
+    }
+
+    /**
+     * 修改
+     *
+     * @param dto 页面选中的数据
+     * @return 结果
+     * @throws Exception 异常
+     */
+    @Transactional
+    @DTXTransaction
+    @RequestMapping("update")
+    public int update(@RequestBody TrdIntoValuationDurationResult dto)
+            throws Exception {
+        return trdIntoValuationDuration001Service.update(dto);
+    }
 }

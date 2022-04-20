@@ -48,8 +48,8 @@
                 $('#value_div_sq').hide();
                 $('#value_div_qr').hide();
                 $('#value_div_dz').show();
-                $('#tradeAmt').val('')
-                $('#confirmTradeAmt').val('')
+                $('#tradeAmt').val('');
+                $('#confirmTradeAmt').val('');
             }else{
                 $('#value_div_sq').show();
                 $('#value_div_qr').show();
@@ -140,16 +140,14 @@
          * 获取列表参数
          */
         var object = $.serializeToObject('#basicInfoForm',true);
+        object.operateType=operateType;
+        object.pageId=pageId;
         Joyin.ajaxJson(basePath + 'valuation/trademanage/trdfxspotvaluationtrade/TrdFxSpotValuationTrade002/check', object, function(result) {
             Joyin.confirm(result.data, function () {
                 if(operateType === 'save') {
-                    Joyin.confirm(message, function() {
-                        WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdfxspotvaluationtrade/TrdFxSpotValuationTrade002/save', object, "TrdFxSpotValuationTrade002_btn_save");
-                    });
+                    WorkFlow.doSaveList(basePath + 'valuation/trademanage/trdfxspotvaluationtrade/TrdFxSpotValuationTrade002/save', object, "TrdFxSpotValuationTrade002_btn_save");
                 }else{
-                    Joyin.confirm(message, function() {
-                        WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdfxspotvaluationtrade/TrdFxSpotValuationTrade002/save', object, "TrdFxSpotValuationTrade002_btn_sbumit");
-                    });
+                    WorkFlow.doSubmitList(basePath + 'valuation/trademanage/trdfxspotvaluationtrade/TrdFxSpotValuationTrade002/save', object, "TrdFxSpotValuationTrade002_btn_submit");
                 }
             });
 

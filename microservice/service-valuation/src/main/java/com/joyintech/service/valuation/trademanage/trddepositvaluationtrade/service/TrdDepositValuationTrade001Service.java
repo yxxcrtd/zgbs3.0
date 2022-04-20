@@ -20,16 +20,19 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.valuation.trademanage.bond.dao.TrdBondTradeMapper;
 import com.joyintech.service.valuation.trademanage.trddepositvaluationtrade.dao.TrdDepositValuationTrade001Mapper;
 import com.joyintech.service.valuation.trademanage.trddepositvaluationtrade.dto.TrdDepositValuationTrade001Dto;
+import com.joyintech.service.valuation.trademanage.trddepositvaluationtrade.dto.TrdDepositValuationTradeResult;
 import com.joyintech.tams.common.base.dao.*;
-import com.joyintech.tams.common.base.entity.InterfSendOpics;
-import com.joyintech.tams.common.base.entity.StlPayOrders;
-import com.joyintech.tams.common.base.entity.TrdProductDeal;
+import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
-import com.joyintech.tams.valuation.common.interf.base.batch.dao.ValCommonBatchMapper;
+import com.joyintech.tams.valuation.common.interf.base.batch.dao.*;
+import com.joyintech.tams.valuation.common.interf.base.service.common.InterfCommonService;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,7 +56,6 @@ public class TrdDepositValuationTrade001Service extends BaseService<TrdDepositVa
     @Autowired
     private TrdDepositValuationTrade001Mapper trdDepositValuationTrade001Mapper;
 
-
     /**
      * 平台日获取接口
      */
@@ -66,63 +68,68 @@ public class TrdDepositValuationTrade001Service extends BaseService<TrdDepositVa
     @Autowired
     private TrdBondTradeMapper trdBondTradeMapper;
 
-
-
+    /**
+     * 入账信息BatchMapper
+     */
+    @Autowired
+    private ValDealAccountingBatchMapper valDealAccountingBatchMapper;
 
     /**
-     * 策略代码生成
-     *
-     * @return
-     * @see
-     * @since 1.0
+     * 结算指令BatchMapper
      */
-    public String createPlanTradeId() {
-        String tradeId = null;
-        while (true) {
-            // 获取自增数
-            String nextId = this.getNextId("PLANTRADEID_SEQUENCE");
-            //平台日
-            String dateStr= DateUtil.format(iPlatformDate.getSysDate(),DateUtil.DEFAULT_OTHER_FORMAT);//yyyyMMdd
-            // 拼接
-            tradeId = "JY"+"FICC"+dateStr+ nextId;
-            // 查询是否重复
-            int num = trdDepositValuationTrade001Mapper.selectCountByTradeId(tradeId);
-            // 如果自增的策略代码不存在，则跳出循环
-            if (num==0) {
-                break;
-            }
-        }
-        return tradeId;
-    }
+    @Autowired
+    private ValOrdersBatchMapper valOrdersBatchMapper;
 
     /**
-     * 获取自增序列值
-     *
-     * @param sequenceName 序列名
-     * @return
+     * 结算指令拓展BatchMapper
      */
-    public String getNextId(String sequenceName) {
-        return trdDepositValuationTrade001Mapper.getNextId(sequenceName);
-    }
-
-
-
+    @Autowired
+    private ValOrdersExtBatchMapper valOrdersExtBatchMapper;
 
     /**
-     * 产品代码下拉框
-     * @auther: Administrator
-     * @date: 2021/12/29 16:47
-     * @param:
-     * @return:
+     * 金融产品交易BatchMapper
      */
-    public Page<SelectOptionDto> findPortfolioId(int page, int length,Map<String, Object> params) {
-        return this.queryForPageForSelectReturn(page, length, ()->trdDepositValuationTrade001Mapper.findPortfolioId(params));
-    }
+    @Autowired
+    private ValFinProductDealBatchMapper valFinProductDealBatchMapper;
 
-    //资产代码下拉框
-    public Page<SelectOptionDto> findFinprodId(int page, int length,Map<String, Object> params){
-        return this.queryForPageForSelectReturn(page, length, ()->trdDepositValuationTrade001Mapper.findFinprodId(params));
-    }
+    /**
+     * 金融产品交易扩展表BatchMapper
+     */
+    @Autowired
+    private ValTrdProductDealAddBatchMapper valTrdProductDealAddBatchMapper;
+
+    /**
+     * 金融产品实物交易表BatchMapper
+     */
+    @Autowired
+    private ValTrdFinProductBarterBatchMapper valTrdFinProductBarterBatchMapper;
+
+    /**
+     * 交易类金融产品表BatchMapper
+     */
+    @Autowired
+    private ValFinTradeProductBatchMapper valFinTradeProductBatchMapper;
+
+    /**
+     * 账务明细BatchBatchMapper
+     */
+    @Autowired
+    private ValDealAccountingDetailBatchMapper valDealAccountingDetailBatchMapper;
+
+    /**
+     * 账务明细代码BatchBatchMapper add by wujie on 20180712
+     */
+    @Autowired
+    private ValBokDetailIdBatchMapper valBokDetailIdBatchMapper;
+
+    /**
+     * 交易费用明细BatchBatchMapper
+     */
+    @Autowired
+    private ValTradeFeeDetailBatchMapper valTradeFeeDetailBatchMapper;
+
+    @Autowired
+    private InterfCommonService interfCommonService;
 
     //交易对手
     public Page<SelectOptionDto> getCounterId(int page, int length, Map<String, Object> param) {
@@ -140,73 +147,55 @@ public class TrdDepositValuationTrade001Service extends BaseService<TrdDepositVa
      * @since 1.0
      */
     public Page<TrdDepositValuationTrade001Dto> selectForPage(int page, int length, Map<String, Object> pageParam) throws Exception {
-
         //产品代码
-        String portfolioId = (String)pageParam.get("portfolioId");
-        String[] portfolioIdArr = null;
-        if(StringUtil.isNotEmpty(portfolioId)){
-            portfolioIdArr = portfolioId.split(",");
+        String finprodId = (String)pageParam.get("finprodId");
+        String[] finprodIdArr = null;
+        if(StringUtil.isNotEmpty(finprodId)){
+            finprodIdArr = finprodId.split(",");
         }
-        pageParam.put("portfolioIdArr", portfolioIdArr);
+        pageParam.put("finprodIdArr", finprodIdArr);
+
         //资产代码
-        String finprodMarketId = (String)pageParam.get("finprodMarketId");
-        String[] finprodMarketIdArr = null;
-        if(StringUtil.isNotEmpty(finprodMarketId)){
-            finprodMarketIdArr = finprodMarketId.split(",");
+        String asset = (String)pageParam.get("asset");
+        String[] assetIdArr = null;
+        if(StringUtil.isNotEmpty(asset)){
+            assetIdArr = asset.split(",");
         }
-        pageParam.put("finprodMarketIdArr", finprodMarketIdArr);
+        pageParam.put("assetIdArr", assetIdArr);
+
         // 获取交易方向
         String ps = (String)pageParam.get("ps");
         // 交易方向多选，转为数组
         String[] psArr = null;
         if (StringUtil.isNotEmpty(ps)) {
             psArr = ps.split(",");
+            pageParam.put("psArr", psArr);
+        }else{
+            String[] psArr1 = {DictCodeList.交易方向_买入.getValue()
+                    ,DictCodeList.交易方向_卖出.getValue()};
+            pageParam.put("psArr", psArr1);
         }
-        pageParam.put("psArr", psArr);
 
+        // 获取数据来源
+        String dataSource = (String)pageParam.get("dataSource");
+        // 数据来源多选，转为数组
+        String[] dataSourceArr = null;
+        if (StringUtil.isNotEmpty(dataSource)) {
+            dataSourceArr = dataSource.split(",");
+        }
+        pageParam.put("dataSourceArr", dataSourceArr);
+
+        //传递默认值
+        pageParam.put("busiType",DictCodeList.业务类型_存款类资产交易.getValue());
+        pageParam.put("finprodType", DictCodeListExt1.金融产品类型_存款.getValue());
 
         return this.queryForPage(page, length,
                 () -> trdDepositValuationTrade001Mapper.selectDeal(pageParam));
     }
 
-
-    /**
-     *
-     * 获取不分页查询结果（sharesId  dealDateString）
-     * <功能详细描述>
-     */
-    public List<TrdDepositValuationTrade001Dto> queryPageList(Map<String, Object> params)  {
-
-        //产品代码
-        String portfolioId = (String)params.get("portfolioId");
-        String[] portfolioIdArr = null;
-        if(StringUtil.isNotEmpty(portfolioId)){
-            portfolioIdArr = portfolioId.split(",");
-        }
-        params.put("portfolioIdArr", portfolioIdArr);
-        //资产代码
-        String finprodMarketId = (String)params.get("finprodMarketId");
-        String[] finprodMarketIdArr = null;
-        if(StringUtil.isNotEmpty(finprodMarketId)){
-            finprodMarketIdArr = finprodMarketId.split(",");
-        }
-        params.put("finprodMarketIdArr", finprodMarketIdArr);
-        // 获取交易方向
-        String ps = (String)params.get("ps");
-        // 交易方向多选，转为数组
-        String[] psArr = null;
-        if (StringUtil.isNotEmpty(ps)) {
-            psArr = ps.split(",");
-        }
-        params.put("psArr", psArr);
-
-        return trdDepositValuationTrade001Mapper.selectDeal(params);
-    }
-
-
     //根据交易编号查询
-    public TrdDepositValuationTrade001Dto queryTradeInfoByTradeId(String tradeId) {
-        return trdDepositValuationTrade001Mapper.queryTradeInfoByTradeId(tradeId);
+    public TrdDepositValuationTrade001Dto queryTradeInfoByTradeId(Map<String, Object> params) {
+        return trdDepositValuationTrade001Mapper.queryTradeInfoByTradeId(params);
     }
 
 
@@ -215,7 +204,7 @@ public class TrdDepositValuationTrade001Service extends BaseService<TrdDepositVa
     public int delete(TrdDepositValuationTrade001Dto dto) {
         int count=0;
         Map<String, Object> params = new HashMap<>();
-        params.put("booksetId",dto.getFinprodMarketId());   //资产代码
+        params.put("booksetId",dto.getProdId());   //产品代码
         params.put("tradeId",dto.getTradeId());
 
         List<TrdProductDeal> listDeal = new ArrayList<>();
@@ -242,5 +231,236 @@ public class TrdDepositValuationTrade001Service extends BaseService<TrdDepositVa
         count += trdBondTradeMapper.delBokDetailIdByTradeId(params);
 
         return count;
+    }
+
+
+    public int insert(TrdDepositValuationTradeResult result){
+
+        int maxSqlNum =100;
+        // 金融产品交易
+        List<TrdProductDeal> listValFinProductDeal = result.getListValFinProductDeal();
+        // 入库
+        if (CollectionUtils.isNotEmpty(listValFinProductDeal)) {
+            // 定义一个固定大小插入存放集合
+            List<TrdProductDeal> listInsert = new ArrayList<TrdProductDeal>();
+
+            for (TrdProductDeal e : listValFinProductDeal) {
+                // 小于最大值
+                if (listInsert.size() < maxSqlNum) {
+                    listInsert.add(e);
+                }
+                else if (listInsert.size() >= maxSqlNum) {
+                    valFinProductDealBatchMapper.insertBatch(listInsert);
+                    listInsert.clear();
+                    listInsert.add(e);
+                }
+            }
+            // 如果循环结束，小于最大值
+            if (CollectionUtils.isNotEmpty(listInsert)) {
+                valFinProductDealBatchMapper.insertBatch(listInsert);
+            }
+        }
+
+        // 估值核算交易扩展表
+        List<TrdProductDealAdd> listValFinProductDealExt = result.getListValFinProductDealExt();
+        // 入库
+        if (CollectionUtils.isNotEmpty(listValFinProductDealExt)) {
+            // 定义一个固定大小插入存放集合
+            List<TrdProductDealAdd> listInsert = new ArrayList<TrdProductDealAdd>();
+
+            for (TrdProductDealAdd e : listValFinProductDealExt) {
+                // 小于最大值
+                if (listInsert.size() < maxSqlNum) {
+                    listInsert.add(e);
+                }
+                else if (listInsert.size() >= maxSqlNum) {
+                    valTrdProductDealAddBatchMapper.insertBatch(listInsert);
+                    listInsert.clear();
+                    listInsert.add(e);
+                }
+            }
+            // 如果循环结束，小于最大值
+            if (CollectionUtils.isNotEmpty(listInsert)) {
+                valTrdProductDealAddBatchMapper.insertBatch(listInsert);
+            }
+        }
+
+        /**add by tanxuan on 20191227 start**/
+        // 交易类金融产品
+        List<FinTradeProduct> listValFinTradeProduct = result.getListValFinTradeProduct();
+        // 入库
+        if (CollectionUtils.isNotEmpty(listValFinTradeProduct)) {
+            // 定义一个固定大小插入存放集合
+            List<FinTradeProduct> listInsert = new ArrayList<FinTradeProduct>();
+
+            for (FinTradeProduct e : listValFinTradeProduct) {
+                // 小于最大值
+                if (listInsert.size() < maxSqlNum) {
+                    listInsert.add(e);
+                }
+                else if (listInsert.size() >= maxSqlNum) {
+                    valFinTradeProductBatchMapper.insertBatch(listInsert);
+                    listInsert.clear();
+                    listInsert.add(e);
+                }
+            }
+            // 如果循环结束，小于最大值
+            if (CollectionUtils.isNotEmpty(listInsert)) {
+                valFinTradeProductBatchMapper.insertBatch(listInsert);
+            }
+        }
+        /**add by tanxuan on 20191227 end**/
+
+        // 入账信息表
+        List<BokDealAccounting> listValDealAccounting = result.getListValDealAccounting();
+        // 入库
+        if (CollectionUtils.isNotEmpty(listValDealAccounting)) {
+            // 定义一个固定大小插入存放集合
+            List<BokDealAccounting> listInsert = new ArrayList<BokDealAccounting>();
+
+            for (BokDealAccounting e : listValDealAccounting) {
+                // 小于最大值
+                if (listInsert.size() < maxSqlNum) {
+                    listInsert.add(e);
+                }
+                else if (listInsert.size() >= maxSqlNum) {
+                    valDealAccountingBatchMapper.insertBatch(listInsert);
+                    listInsert.clear();
+                    listInsert.add(e);
+                }
+            }
+            // 如果循环结束，小于最大值
+            if (CollectionUtils.isNotEmpty(listInsert)) {
+                valDealAccountingBatchMapper.insertBatch(listInsert);
+            }
+        }
+
+        // 账务明细表
+        List<BokDealAccountingDetail> listValDealAccountingDetail = result.getListValDealAccountingDetail();
+        // 入库
+        if (CollectionUtils.isNotEmpty(listValDealAccountingDetail)) {
+            // 定义一个固定大小插入存放集合
+            List<BokDealAccountingDetail> listInsert = new ArrayList<BokDealAccountingDetail>();
+
+            for (BokDealAccountingDetail e : listValDealAccountingDetail) {
+                // 小于最大值
+                if (listInsert.size() < maxSqlNum) {
+                    listInsert.add(e);
+                }
+                else if (listInsert.size() >= maxSqlNum) {
+                    valDealAccountingDetailBatchMapper.insertBatch(listInsert);
+                    listInsert.clear();
+                    listInsert.add(e);
+                }
+            }
+            // 如果循环结束，小于最大值
+            if (CollectionUtils.isNotEmpty(listInsert)) {
+                valDealAccountingDetailBatchMapper.insertBatch(listInsert);
+            }
+        }
+        // 账务明细代码表
+        List<BokDetailId> listValBokDetailId =
+                interfCommonService.toRepeatBokDetailId(result.getListValBokDetailId());
+        if (CollectionUtils.isNotEmpty(listValBokDetailId)) {
+            // 定义一个固定大小插入存放集合
+            List<BokDetailId> listInsert = new ArrayList<BokDetailId>();
+
+            for (BokDetailId e : listValBokDetailId) {
+                // 小于最大值
+                if (listInsert.size() < maxSqlNum) {
+                    listInsert.add(e);
+                }
+                else if (listInsert.size() >= maxSqlNum) {
+                    valBokDetailIdBatchMapper.deleteBatch(listInsert);
+                    valBokDetailIdBatchMapper.insertBatch(listInsert);
+                    listInsert.clear();
+                    listInsert.add(e);
+                }
+            }
+            // 如果循环结束，小于最大值
+            if (CollectionUtils.isNotEmpty(listInsert)) {
+                valBokDetailIdBatchMapper.deleteBatch(listInsert);
+                valBokDetailIdBatchMapper.insertBatch(listInsert);
+            }
+        }
+        // 交易费用明细表
+        List<TrdTradeFeeDetail> listValTradeFeeDetail = result.getListValTradeFeeDetail();
+        // 入库
+        if (CollectionUtils.isNotEmpty(listValTradeFeeDetail)) {
+            // 定义一个固定大小插入存放集合
+            List<TrdTradeFeeDetail> listInsert = new ArrayList<TrdTradeFeeDetail>();
+
+            for (TrdTradeFeeDetail e : listValTradeFeeDetail) {
+                // 小于最大值
+                if (listInsert.size() < maxSqlNum) {
+                    listInsert.add(e);
+                }
+                else if (listInsert.size() >= maxSqlNum) {
+                    valTradeFeeDetailBatchMapper.insertBatch(listInsert);
+                    listInsert.clear();
+                    listInsert.add(e);
+                }
+            }
+            // 如果循环结束，小于最大值
+            if (CollectionUtils.isNotEmpty(listInsert)) {
+                valTradeFeeDetailBatchMapper.insertBatch(listInsert);
+            }
+        }
+        //指令
+        List<StlOrders> listValOrders = result.getValOrdersList();
+        // 入库
+        if (CollectionUtils.isNotEmpty(listValOrders)) {
+            // 定义一个固定大小插入存放集合
+            List<StlOrders> listInsert = new ArrayList<StlOrders>();
+
+            for (StlOrders e : listValOrders) {
+                // 小于最大值
+                if (listInsert.size() < maxSqlNum) {
+                    listInsert.add(e);
+                }
+                else if (listInsert.size() >= maxSqlNum) {
+                    valOrdersBatchMapper.insertBatch(listInsert);
+                    listInsert.clear();
+                    listInsert.add(e);
+                }
+            }
+            // 如果循环结束，小于最大值
+            if (CollectionUtils.isNotEmpty(listInsert)) {
+                valOrdersBatchMapper.insertBatch(listInsert);
+            }
+        }
+
+        List<StlOrdersExt> listValOrdersExt = result.getValOrdersExtList();
+        // 入库
+        if (CollectionUtils.isNotEmpty(listValOrdersExt)) {
+            // 定义一个固定大小插入存放集合
+            List<StlOrdersExt> listInsert = new ArrayList<StlOrdersExt>();
+
+            for (StlOrdersExt e : listValOrdersExt) {
+                // 小于最大值
+                if (listInsert.size() < maxSqlNum) {
+                    listInsert.add(e);
+                }
+                else if (listInsert.size() >= maxSqlNum) {
+                    valOrdersExtBatchMapper.insertBatch(listInsert);
+                    listInsert.clear();
+                    listInsert.add(e);
+                }
+            }
+            // 如果循环结束，小于最大值
+            if (CollectionUtils.isNotEmpty(listInsert)) {
+                valOrdersExtBatchMapper.insertBatch(listInsert);
+            }
+        }
+
+        return 1;
+    }
+
+    public int update(TrdDepositValuationTradeResult dto){
+        TrdDepositValuationTrade001Dto dto1 = new TrdDepositValuationTrade001Dto();
+        dto1.setProdId(dto.getTrdDepositValuationTrade001Dto().getProdId());
+        dto1.setTradeId(dto.getTrdDepositValuationTrade001Dto().getTradeId());
+        delete(dto1);
+        return insert(dto);
     }
 }

@@ -10,20 +10,10 @@
 
 package com.joyintech.tams.valuation.batch.bookdetailcompareinto.service;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
-
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.tams.common.base.entity.BokBookdetailCurrent;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.valuation.batch.bookdetailcompareinto.dto.BokBokBookdetailCurrent;
 import com.joyintech.tams.valuation.batch.bookdetailcompareinto.dto.BokBookdetailKey;
 import com.joyintech.tams.valuation.batch.bookdetailcompareinto.dto.ValBokBookdetailAllExt;
@@ -34,11 +24,17 @@ import com.joyintech.tams.valuation.batch.common.base.entity.extcommon.ValBokBoo
 import com.joyintech.tams.valuation.common.constants.DataIndexSequenceType;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.common.utils.DBUtil;
-import com.joyintech.tams.common.base.entity.BokBookdetailCurrent;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * 账务明细比较合并批处理 - processor相关业务处理
- * 
+ *
  * @author wangwei1
  * @version 1.0 2018年6月7日
  * @see BookDetailCompareIntoProcessorService
@@ -59,7 +55,7 @@ public class BookDetailCompareIntoProcessorService {
 
     /**
      * process 数据处理
-     * 
+     *
      * @param param1 传递参数
      * @return BookGenerateResult
      * @see
@@ -100,7 +96,15 @@ public class BookDetailCompareIntoProcessorService {
                 key_a.setTableId(val.getTableId());// 场景代码
                 key_a.setBranch(val.getBranch());// 分支号
                 key_a.setAssetId(val.getTradeId());// 交易编号
-                key_a.setBaseSubjectNature(val.getBaseSubjectNature());// 基础科目性质
+                /**新会计引擎升级后，一个分录中可能存在基础科目性质一样的，但不能将其合并 add by yinya on 2022-03-08 start**/
+                // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录 start
+                String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+                if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
+                    key_a.setBaseSubjectNature(val.getSubjectNo());//只能按科目号合并
+                }else{
+                    key_a.setBaseSubjectNature(val.getBaseSubjectNature());// 基础科目性质
+                }
+                /**新会计引擎升级后，一个分录中可能存在基础科目性质一样的，但不能将其合并 add by yinya on 2022-03-08 end**/
                 key_a.setCdFlag(val.getCdFlag());// 借贷方向
                 key_a.setBookId(val.getBookId());
                 key_a.setoCcy(val.getoCcy());//原币币种
@@ -109,15 +113,15 @@ public class BookDetailCompareIntoProcessorService {
                 else {
                     // 调用共通方法【账务类共通方法设计-余额方向处理_发生额加余额SHEET】获取余额+发生额
                     Map<String, Object> map = accountingCommonService.balanceDirectDealAccrualAddBalance(
-                            val.getCdFlag(), // B.借贷方向
-                            MAP_A.get(key_a).getCdFlag(), // 实际余额方向 MAP_A.get(key_a).余额方向（入账日）
-                            MAP_A.get(key_a).getoHappenAmt(), // 实际余额 MAP_A.get(key_a).余额（入账日）
-                            MAP_A.get(key_a).getHappenNumber(), // 实际数量 MAP_A.get(key_a).数量（入账日）
-                            val.getCdFlag(), // 借贷方向
-                            val.getoHappenAmt(), // .发生额 B.原币发生额
-                            val.getHappenNumber(),// 发生数量 B.发生数量
-                            MAP_A.get(key_a).getbHappenAmt(), // 实际本币余额
-                            val.getbHappenAmt() // .发生额 B.本币发生额
+                        val.getCdFlag(), // B.借贷方向
+                        MAP_A.get(key_a).getCdFlag(), // 实际余额方向 MAP_A.get(key_a).余额方向（入账日）
+                        MAP_A.get(key_a).getoHappenAmt(), // 实际余额 MAP_A.get(key_a).余额（入账日）
+                        MAP_A.get(key_a).getHappenNumber(), // 实际数量 MAP_A.get(key_a).数量（入账日）
+                        val.getCdFlag(), // 借贷方向
+                        val.getoHappenAmt(), // .发生额 B.原币发生额
+                        val.getHappenNumber(),// 发生数量 B.发生数量
+                        MAP_A.get(key_a).getbHappenAmt(), // 实际本币余额
+                        val.getbHappenAmt() // .发生额 B.本币发生额
                     );
                     // MAP_A.get(key_a).余额方向（发生日） = 返回值.余额方向
                     MAP_A.get(key_a).setCdFlag(map.get("balDirect").toString());
@@ -144,7 +148,15 @@ public class BookDetailCompareIntoProcessorService {
                 key_c.setTableId(val.getTableId());// 场景代码
                 key_c.setBranch(val.getBranch());// 分支号
                 key_c.setAssetId(val.getTradeId());// 交易编号
-                key_c.setBaseSubjectNature(val.getBaseSubjectNature());// 基础科目性质
+                /**新会计引擎升级后，一个分录中可能存在基础科目性质一样的，但不能将其合并 add by yinya on 2022-03-08 start**/
+                // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录 start
+                String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+                if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
+                    key_c.setBaseSubjectNature(val.getSubjectNo());//只能按科目号合并
+                }else{
+                    key_c.setBaseSubjectNature(val.getBaseSubjectNature());// 基础科目性质
+                }
+                /**新会计引擎升级后，一个分录中可能存在基础科目性质一样的，但不能将其合并 add by yinya on 2022-03-08 end**/
                 key_c.setCdFlag(val.getCdFlag());// 借贷方向
                 key_c.setBookId(val.getBookId());
                 key_c.setoCcy(val.getoCcy());//原币币种
@@ -153,15 +165,15 @@ public class BookDetailCompareIntoProcessorService {
                 else {
                     // 调用共通方法【账务类共通方法设计-余额方向处理_发生额加余额SHEET】获取余额+发生额
                     Map<String, Object> map = accountingCommonService.balanceDirectDealAccrualAddBalance(
-                            val.getCdFlag(), // B.借贷方向
-                            MAP_C.get(key_c).getCdFlag(), // 实际余额方向 MAP_C.get(key_c).余额方向（入账日）
-                            MAP_C.get(key_c).getoHappenAmt(), // 实际余额 MAP_C.get(key_c).余额（入账日）
-                            MAP_C.get(key_c).getHappenNumber(), // 实际数量 MAP_C.get(key_c).数量（入账日）
-                            val.getCdFlag(), // 借贷方向
-                            val.getoHappenAmt(), // 发生额 B.原币发生额
-                            val.getHappenNumber(),// 发生数量 B.发生数量
-                            MAP_C.get(key_c).getbHappenAmt(), // 实际本币余额
-                            val.getbHappenAmt() // .发生额 B.本币发生额
+                        val.getCdFlag(), // B.借贷方向
+                        MAP_C.get(key_c).getCdFlag(), // 实际余额方向 MAP_C.get(key_c).余额方向（入账日）
+                        MAP_C.get(key_c).getoHappenAmt(), // 实际余额 MAP_C.get(key_c).余额（入账日）
+                        MAP_C.get(key_c).getHappenNumber(), // 实际数量 MAP_C.get(key_c).数量（入账日）
+                        val.getCdFlag(), // 借贷方向
+                        val.getoHappenAmt(), // 发生额 B.原币发生额
+                        val.getHappenNumber(),// 发生数量 B.发生数量
+                        MAP_C.get(key_c).getbHappenAmt(), // 实际本币余额
+                        val.getbHappenAmt() // .发生额 B.本币发生额
                     );
                     // MAP_C.get(key_c).余额方向（发生日） = 返回值.余额方向
                     MAP_C.get(key_c).setCdFlag(map.get("balDirect").toString());

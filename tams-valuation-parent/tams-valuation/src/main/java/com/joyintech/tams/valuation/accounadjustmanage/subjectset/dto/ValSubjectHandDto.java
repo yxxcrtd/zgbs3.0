@@ -30,7 +30,12 @@ public class ValSubjectHandDto extends BaseEntity {
 	 */
 	private String handCodeValue;
 
-
+	/*add by sunshuaishuai 20220406 start*/
+	/**
+	 * 辅助核算项字典名
+	 */
+	private String handName;
+	/*add by sunshuaishuai 20220406 end*/
 
 	public String getBooksetId() {
 		return booksetId;
@@ -70,5 +75,13 @@ public class ValSubjectHandDto extends BaseEntity {
 
 	public void setHandCodeValue(String handCodeValue) {
 		this.handCodeValue = handCodeValue;
+	}
+
+	public String getHandName() {
+		return handName;
+	}
+
+	public void setHandName(String handName) {
+		this.handName = handName;
 	}
 }

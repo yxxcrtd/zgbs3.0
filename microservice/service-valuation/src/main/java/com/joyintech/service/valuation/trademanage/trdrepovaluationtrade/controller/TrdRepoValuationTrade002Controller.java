@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * service 拆借交易
+ * service 质押式回购交易
  * 
  * @author yuzj
  * @version 1.0 2021年12月29日
@@ -73,8 +73,8 @@ public class TrdRepoValuationTrade002Controller extends BaseController {
      * @since 1.0
      */
     @PostMapping("queryTradeInfoByTradeId01")
-    public TrdRepoValuationTrade003Dto queryTradeInfoByTradeId01(@RequestBody String  tradeId) {
-        return trdRepoValuationTrade002Service.queryTradeInfoByTradeId01(tradeId);
+    public TrdRepoValuationTrade003Dto queryTradeInfoByTradeId01(@RequestBody Map<String, Object> params) {
+        return trdRepoValuationTrade002Service.queryTradeInfoByTradeId01(params);
     }
 
 

@@ -5,23 +5,23 @@
 
 package com.joyintech.tams.valuation.batch.common.accountingmethod.accounting;
 
-import com.github.pagehelper.util.StringUtil;
 import com.joyintech.calculation.config.NumberEnum;
 import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
+import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.dao.BokDetailIdMapper;
 import com.joyintech.tams.common.base.entity.BokBussDetsub;
 import com.joyintech.tams.common.base.entity.BokDetailId;
 import com.joyintech.tams.common.base.entity.BokSubject;
 import com.joyintech.tams.common.base.entity.BokSubjectDetail;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalance;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalanceSearchDto;
 import com.joyintech.tams.valuation.batch.common.accounting.service.AccountingCommonService;
+import com.joyintech.tams.valuation.batch.common.accountingmethod.dao.AccountingMethodNewMapper;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.dao.BookAccountGenLogicNewMapper;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.*;
 import com.joyintech.tams.valuation.batch.common.base.dao.BaseAccountWriterMapper;
@@ -31,12 +31,16 @@ import com.joyintech.tams.valuation.batch.common.finproduct.service.FinProductCo
 import com.joyintech.tams.valuation.batch.common.util.ExpressionUtil;
 import com.joyintech.tams.valuation.common.batch.finproduct.entity.CurrencyMarketDto;
 import com.joyintech.tams.valuation.common.batch.finproduct.service.FinProductCommonBatchService;
-import com.joyintech.tams.valuation.common.constants.*;
+import com.joyintech.tams.valuation.common.constants.BookConstant;
+import com.joyintech.tams.valuation.common.constants.DataIndexSequenceType;
+import com.joyintech.tams.valuation.common.constants.GlobalConstant;
+import com.joyintech.tams.valuation.common.constants.SubjectConfigCode;
 import com.joyintech.tams.valuation.common.service.BookAccountCommonService;
 import com.joyintech.tams.valuation.common.utils.DBUtil;
 import com.joyintech.tams.valuation.common.utils.DataHandleUtil;
 import com.joyintech.tams.valuation.common.utils.ValStringUtil;
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,7 +58,10 @@ import java.util.stream.Collectors;
  */
 @Service
 public class BookAccountGenLogicNew {
-
+    /**
+     * 日志
+     */
+    private static org.slf4j.Logger logger = LoggerFactory.getLogger(BookAccountGenLogicNew.class);
     /**
      * DBUtil
      */
@@ -84,6 +91,9 @@ public class BookAccountGenLogicNew {
     @Autowired
     private BookAccountGenLogicNewMapper bookAccountGenLogicNewMapper;
 
+    @Autowired
+    private AccountingMethodNewMapper accountingMethodNewMapper;
+
     /**
      * 记账凭证生成
      *
@@ -93,7 +103,69 @@ public class BookAccountGenLogicNew {
      * @see
      * @since 1.0
      */
-    public BookGenerateResult genAccount(AccountDriver accountDriver, SysBatchExecInfo batchinfo) {
+    public BookGenerateResult genAccount(AccountDriver accountDriver, SysBatchExecInfo batchinfo)  {
+        // 根据驱动信息，生成一条记账凭证主表信息
+        BookGenerateResult result = new BookGenerateResult();
+        // step1. 获取分录信息
+        // 根据驱动信息，生成记账凭证明细信息。
+        // 定义分录信息变量 = 获取节点对应分录信息
+        List<AccountEntry> accountEntrys = genAccountEntrys(accountDriver);
+
+        // step2. 根据内部科目编码映射
+        // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑 start
+        // 按照内部科目编码分录，则需要映射分录对应科目信息
+        List<AccountEntry> accountEntries = generateEntrySubjectInfo(accountDriver, accountEntrys);
+        // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑 end
+
+        // step3. 根据映射后的分录信息生成账务明细信息
+        // 遍历步骤获取的列表，循环生成明细凭证信息
+        result = genBookDetails(accountDriver, accountEntries);
+        return result;
+    }
+
+    /**
+     * 获取节点对应分录信息
+     *
+     * @param accountDriver 记账驱动信息，包含该笔记账所需使用的所有信息。
+     * @see
+     * @since 1.0
+     */
+    public List<AccountEntry> genAccountEntrys(AccountDriver accountDriver) {
+        // step1. 获取分录信息
+        // 根据驱动信息，生成一条记账凭证主表信息
+        // 获取记账场景要素信息
+        Map<String, Object> accountSceneMap = accountDriver.getAccountSceneMap();
+        // 获取记账金额要素信息
+        Map<String, BigDecimal> accountAmountMap = accountDriver.getAccountAmountMap();
+        // 获取金额元素币种信息
+        Map<String, Object> accountCurrencyMap = accountDriver.getAccountCurrencyMap();
+        // 获取基础科目性质信息
+        Map<String, Map<String, Object>> accountNatrueMap = accountDriver.getAccountNatrueMap();
+        BookGenerateResult result = new BookGenerateResult();
+        List<ValBokBookdetailBatch> bookDetailList = new ArrayList<>();
+        result.setValBokBookdetailBatch(bookDetailList);
+        // 根据驱动信息，生成记账凭证明细信息。
+        // 获取记账场景树节点
+        TreeNode treeNode = accountDriver.getTreeNode();
+        // 定义分录信息变量
+        List<AccountEntry> accountEntrys = new ArrayList<AccountEntry>();
+        // 获取分录信息
+        accountSceneMap.put("ACCOUNTEVENTS", accountDriver.getTableId());
+        getAccountEntryFromTreeNode(treeNode, accountSceneMap, accountEntrys);
+        return accountEntrys;
+    }
+
+    /**
+     * 记账凭证生成
+     *
+     * @param accountDriver 记账驱动信息，包含该笔记账所需使用的所有信息。
+     * @param batchinfo 批的相关信息
+     * @return BookGenerateResult
+     * @see
+     * @since 1.0
+     */
+    public BookGenerateResult genBookDetails(AccountDriver accountDriver, List<AccountEntry> accountEntrys) {
+        // step1. 获取分录信息
         // 根据驱动信息，生成一条记账凭证主表信息
         // 获取记账场景要素信息
         Map<String, Object> accountSceneMap = accountDriver.getAccountSceneMap();
@@ -108,20 +180,6 @@ public class BookAccountGenLogicNew {
 
         List<ValBokBookdetailBatch> bookDetailList = new ArrayList<>();
         result.setValBokBookdetailBatch(bookDetailList);
-        // 根据驱动信息，生成记账凭证明细信息。
-        // 获取记账场景树节点
-        TreeNode treeNode = accountDriver.getTreeNode();
-        // 定义分录信息变量
-        List<AccountEntry> accountEntrys = new ArrayList<AccountEntry>();
-        // 获取分录信息
-        accountSceneMap.put("ACCOUNTEVENTS", accountDriver.getTableId());
-        getAccountEntryFromTreeNode(treeNode, accountSceneMap, accountEntrys);
-
-        // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑 start
-        // 按照内部科目编码分录，则需要映射分录对应科目信息
-        generateEntrySubjectInfo(accountEntrys, accountSceneMap);
-        // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑 end
-
         // 遍历步骤获取的列表，循环生成明细凭证信息
         // 先借后贷
         Collections.sort(accountEntrys, new Comparator<AccountEntry>() {
@@ -1460,75 +1518,143 @@ public class BookAccountGenLogicNew {
     /**
      * 映射生成分录对应科目信息
      * @param accountEntries 会计分录
-     * @param accountSceneMap 会计场景元素
+     * @param accountDriver 会计场景
      */
-    public void generateEntrySubjectInfo(List<AccountEntry> accountEntries, Map<String, Object> accountSceneMap){
+    public List<AccountEntry> generateEntrySubjectInfo(AccountDriver accountDriver, List<AccountEntry> accountEntries) {
+        List<AccountEntry> resultEnryies = new ArrayList<>();
+        // 获取记账场景要素信息
+        Map<String, Object> accountSceneMap = accountDriver.getAccountSceneMap();
+        // 获取记账金额要素信息
+        Map<String, BigDecimal> accountAmountMap = accountDriver.getAccountAmountMap();
+        // 定义 变量.账套信息
         String booksetId = (String)accountSceneMap.get(BookConstant.BOOKSET_ID);
-        String ccy = (String)accountSceneMap.get(BookConstant.CCY);
-        // 定义 变量.内部科目编码集合
-        List<String> listSubjectInternalCode = new ArrayList<>();
+        // 定义 变量.币种 = 会计场景元素.币种 != null ? 会计场景元素.币种：会计场景元素.本币币种
+        String ccy = accountSceneMap.get(BookConstant.CCY) != null ? (String)accountSceneMap.get(BookConstant.CCY) : (String)accountSceneMap.get(BookConstant.B_CCY);
+        // 定义 变量.场景代码 = accountDriver.tableId
+        String tableId = accountDriver.getTableId();
         // 定义 变量.账务明细代码集合
         List<String> listBokDetailId = new ArrayList<>();
-        // 循环会计分录，初始化内部科目编码集合
+        // 1. 循环会计分录，初始化内部科目编码集合
         for(AccountEntry accountEntry : accountEntries){
             // 若科目基础科目性质不为空，则说明分录为非调整后的内部科目编码分录，不做处理，直接返回
             if(StringUtil.isNotEmpty(accountEntry.getBaseSubjectNature())){
-                return;
+                return accountEntries;
             }
-            listSubjectInternalCode.add(accountEntry.getSubjectId());
             // 获取账务明细代码
             BokDetailId bokDetailId =(BokDetailId)accountSceneMap.get(accountEntry.getBokDetailId());
             if(bokDetailId != null){
                 listBokDetailId.add(bokDetailId.getBokDetailId());
             }
         }
-        // 根据内部编码集合查询相关科目信息
-        List<BokSubject> subjectList =  bookAccountGenLogicNewMapper.getSubjectByInternalCode(booksetId, listSubjectInternalCode, ccy);
         // 若科目信息或者账务明细代码为空，直接返回
-        if(!CollectionUtils.isNotEmpty(subjectList) || !CollectionUtils.isNotEmpty(listBokDetailId)){
-            return;
+        if(CollectionUtils.isEmpty(listBokDetailId)){
+            return accountEntries;
         }
-        // 定义 变量.科目Map = 科目按照内部科目编码进行分组
-        Map<String, List<BokSubject>> subjectMap= subjectList.stream().collect(Collectors.groupingBy(BokSubject :: getSubjectInternalCode));
-        // 根据账务明细代码和账套代码，查询对应科目基础配置项
-        List<SubjectMappingConfig> subjectMappingConfigList= bookAccountGenLogicNewMapper.getSubjectMappingConfig(booksetId, listBokDetailId);
-        // 将科目基础配置项按账务明细代码分组
-        Map<String, SubjectMappingConfig> subjectMappingConfigMap= subjectMappingConfigList.stream().collect(Collectors.toMap(SubjectMappingConfig :: getBokDetailId, item -> item));
+//        // 3. 根据账务明细代码和账套代码，查询对应科目辅助核算项
+//        List<SubjectMappingConfig> subjectMappingConfigList= bookAccountGenLogicNewMapper.getSubjectMappingConfig(booksetId, listBokDetailId, DictCodeListExt1.金融产品类型_存款.getValue());
+//        // 将科目辅助核算项按账务明细代码分组
+//        Map<String, SubjectMappingConfig> subjectMappingConfigMap= subjectMappingConfigList.stream().collect(Collectors.toMap(SubjectMappingConfig :: getBokDetailId, item -> item));
+        // 定义 变量.辅助核算项配置Map = 记账场景.辅助核算项配置Map
+        Map<String, SubjectMappingConfig> subjectMappingConfigMap = accountDriver.getSubjectMappingConfigMap();
+        // 定义 变量.默认辅助核算项配置
+        SubjectMappingConfig subjectMappingConfigDefault = accountDriver.getSubjectMappingConfigDefault();
         // 循环遍历会计分录
-        for(AccountEntry accountEntry : accountEntries){
+        for(AccountEntry entry : accountEntries){
+            AccountEntry accountEntry = new AccountEntry();
+            try {
+                BeanUtil.copyProperties(accountEntry, entry);
+            }
+            catch (Exception e){
+                e.printStackTrace();
+                logger.error("场景代码【"+ accountDriver.getTableId()+"】对内部科目编码【"+entry.getSubjectId()+"】解析分录内部编码对应科目时复制分录信息异常结束");
+            }
             // 根据内部科目编码获取所有对应科目
-            List<BokSubject> entrySubjectList = subjectMap.get(accountEntry.getSubjectId());
-            if(CollectionUtils.isEmpty(entrySubjectList)){
-                continue;
-            }
-            // 获取账务明细代码
-            BokDetailId bokDetailId =(BokDetailId)accountSceneMap.get(accountEntry.getBokDetailId());
-            // 根据账务明细代码获取对应基础配置项
-            SubjectMappingConfig mappingConfig = subjectMappingConfigMap.get(bokDetailId.getBokDetailId());
-            // 判断对应内部科目编码是否为应付交易费用,
-            if(DictCodeBaseSubjectNatrueNew.应付交易费用.getValue().equals(accountEntry.getSubjectId())){
-                // 对应费用类型为会计分录对应金额元素
-                mappingConfig.setFeeType(accountEntry.getFormElement());
-            }
-            Map<String, Object> params = initMappingParams(mappingConfig);
-            for(BokSubject bokSubject : entrySubjectList){
-                // 根据配置项表达式匹配
-                if(ExpressionUtil.booleanValue(bokSubject.getSubjectHandFelCode(), params)){
-                    // 匹配成功，相关科目信息录入
-                    accountEntry.setSubjectId(bokSubject.getSubjectNo());
-                    accountEntry.setSubjectName(bokSubject.getSubjectName());
-                    accountEntry.setFsubjectId(bokSubject.getFsubjectId());
-                    accountEntry.setBaseSubjectNature(bokSubject.getSubjectInternalCode());
-                    accountEntry.setSubjectType(bokSubject.getSubjectType());
-                    accountEntry.setAccQuaFlag(bokSubject.getAccQuaFlag());
-                    accountEntry.setAccIntFlag(bokSubject.getAccIntFlag());
-                    accountEntry.setOverdrawnFlag(bokSubject.getOverdrawnFlag());
-                    accountEntry.setGenDetsubFlag(bokSubject.getGenDetsubFlag());
-                    accountEntry.setBalFlag(bokSubject.getBalFlag());
-                    break;
+            List<BokSubject> entrySubjectList = new ArrayList<>();
+            // 按照币种筛选科目
+            for(BokSubject item : accountEntry.getBokSubjectList()){
+                if(StringUtil.equals(ccy, item.getCcy())){
+                    entrySubjectList.add(item);
                 }
             }
+            if(CollectionUtils.isEmpty(entrySubjectList)){
+                logger.error("场景代码【"+ accountDriver.getTableId()+"】对应内部科目编码："+accountEntry.getSubjectId() +"；币种："+ccy+" 未找到匹配科目信息 \r\n");
+                continue;
+            }
+            // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑 end
+            // 若对应记账金额元素为空或为非0入账且金额为0，则不记账，跳过
+            if(accountAmountMap.get(accountEntry.getFormElement() + BookConstant.BCCYAMT)== null){
+                if (accountAmountMap.get(accountEntry.getFormElement()) == null
+                        || (!DictCodeList.是否_是.getValue().equals(
+                        accountSceneMap.get(
+                                BookConstant.IS_ZERO_ACCOUNT))
+                        && BigDecimal.ZERO.compareTo(
+                        accountAmountMap.get(accountEntry.getFormElement())) == 0)) {
+                    continue;
+                }
+            }else{
+                if (accountAmountMap.get(accountEntry.getFormElement()) == null
+                        || (!DictCodeList.是否_是.getValue().equals(
+                        accountSceneMap.get(
+                                BookConstant.IS_ZERO_ACCOUNT))
+                        && BigDecimal.ZERO.compareTo(
+                        accountAmountMap.get(accountEntry.getFormElement())) == 0
+                        && BigDecimal.ZERO.compareTo(
+                        accountAmountMap.get(accountEntry.getFormElement() + BookConstant.BCCYAMT)) == 0)) {
+                    continue;
+                }
+            }
+            // 定义 变量.科目信息
+            BokSubject bokSubject = null;
+            // 获取账务明细代码
+            BokDetailId bokDetailId =(BokDetailId)accountSceneMap.get(accountEntry.getBokDetailId());
+            // 定义 变量.辅助核算项 = 会计场景.默认辅助核算项
+            SubjectMappingConfig mappingConfig = new SubjectMappingConfig();
+            if(subjectMappingConfigDefault != null){
+                BeanUtil.copyPropertiesIgnoreNull(mappingConfig, subjectMappingConfigDefault);
+            }
+            // 若场景中辅助核算项map不为空，且匹配上，则根据内部科目编码获取对应辅助核算项
+            if(subjectMappingConfigMap != null && subjectMappingConfigMap.get(accountEntry.getSubjectId()) != null){
+                BeanUtil.copyPropertiesIgnoreNull(mappingConfig, subjectMappingConfigMap.get(accountEntry.getSubjectId()));
+            }
+            // 若费用类型字段为空值，则初始化赋值
+            if(mappingConfig.getFeeType() == null){
+                // 此处可直接赋值，分录中费用类型对应的会计元素，数据来源会设置为对应费用类型，可直接赋值费用类型，非费用类型的用不到，赋值也不会有问题
+                // 从会计元素对应的数据来源中获取
+                mappingConfig.setFeeType(accountEntry.getDictSource());
+            }
+            // 税类型同样取数据来源字段
+            if(mappingConfig.getTaxType() == null){
+                mappingConfig.setTaxType(accountEntry.getDictSource());
+            }
+            // 根据辅助核算项匹配查找对应科目
+            bokSubject = this.getSubjectByInnerCode(entrySubjectList, mappingConfig);
+            // 若变量.科目信息不为空，则分录对应赋值科目相关信息
+            if(bokSubject != null){
+                // 相关科目信息录入
+                accountEntry.setSubjectId(bokSubject.getSubjectNo());
+                accountEntry.setSubjectName(bokSubject.getSubjectName());
+                accountEntry.setFsubjectId(bokSubject.getFsubjectId());
+                accountEntry.setBaseSubjectNature(bokSubject.getSubjectInternalCode());
+                accountEntry.setSubjectType(bokSubject.getSubjectType());
+                accountEntry.setAccQuaFlag(bokSubject.getAccQuaFlag());
+                accountEntry.setAccIntFlag(bokSubject.getAccIntFlag());
+                accountEntry.setOverdrawnFlag(bokSubject.getOverdrawnFlag());
+                accountEntry.setGenDetsubFlag(bokSubject.getGenDetsubFlag());
+                accountEntry.setBalFlag(bokSubject.getBalFlag());
+            }else{
+                // 定义 变量.资产辅助核算项 封装辅助核算项为map对象
+                Map<String, Object> params = initMappingParams(mappingConfig);
+                StringBuffer sb=new StringBuffer();
+                for (String mp : params.keySet()) {
+                    sb.append("key = " + mp + ", value = " + params.get(mp));
+                }
+                logger.error("资产【"+bokDetailId.getBusiId()+"】对应场景【"+ accountDriver.getTableId()+"】查找内部科目编码有误："+accountEntry.getSubjectId() +"未找到匹配科目信息 \r\n"
+              +"辅助核算项："+sb.toString());
+
+            }
+            resultEnryies.add(accountEntry);
         }
+        return resultEnryies;
     }
 
 
@@ -1539,12 +1665,150 @@ public class BookAccountGenLogicNew {
      */
     public Map<String,Object> initMappingParams(SubjectMappingConfig mappingConfig){
         Map<String, Object> params = new HashMap<>();
+        if(mappingConfig == null){
+            return params;
+        }
         params.put(SubjectConfigCode.证券品种.getValue(), mappingConfig.getSecType());
-        params.put(SubjectConfigCode.证券分类.getValue(), mappingConfig.getSecDetailType());
+        params.put(SubjectConfigCode.债券类型.getValue(), mappingConfig.getAssetType());
+        params.put(SubjectConfigCode.存款类资产类型.getValue(), mappingConfig.getAssetType());
+        params.put(SubjectConfigCode.基金类型.getValue(), mappingConfig.getAssetType());
+        params.put(SubjectConfigCode.回购标的类型.getValue(), mappingConfig.getAssetType());
+        // add by weipeng on 20220408：计划类净值型、货币型、利率型以及项目类资产全部默认场外
+        if(StringUtil.equals(DictCodeListExt1.证券品种_计划类资产_净值型.getValue(), mappingConfig.getSecType())
+            || StringUtil.equals(DictCodeListExt1.证券品种_计划类资产_货币型.getValue(), mappingConfig.getSecType())
+            || StringUtil.equals(DictCodeListExt1.证券品种_计划类资产_收益型.getValue(), mappingConfig.getSecType())
+            || StringUtil.equals(DictCodeListExt1.证券品种_项目类资产.getValue(), mappingConfig.getSecType())){
+            params.put(SubjectConfigCode.估值交易市场.getValue(), DictCodeListExt1.估值交易市场_场外.getValue());
+        }
+        else{
+            params.put(SubjectConfigCode.估值交易市场.getValue(), mappingConfig.getTradeMarket());
+        }
         params.put(SubjectConfigCode.交易市场.getValue(), mappingConfig.getTradeMarket());
-        params.put(SubjectConfigCode.发行方式.getValue(), mappingConfig.getIssueType());
+//        params.put(SubjectConfigCode.交易对手.getValue(), mappingConfig.getTradeMarket());
         params.put(SubjectConfigCode.账户类型.getValue(), mappingConfig.getAccountType());
         params.put(SubjectConfigCode.费用类型.getValue(), mappingConfig.getFeeType());
+        params.put(SubjectConfigCode.税类型.getValue(), mappingConfig.getTaxType());
+        if(StringUtil.isNotEmpty(mappingConfig.getFinanceOrgName())){
+            params.put(SubjectConfigCode.金融机构简称.getValue(), FinanceOrgEnum.getEnumByName(mappingConfig.getFinanceOrgName()).getValue());
+        }
+        params.put(SubjectConfigCode.回购类型.getValue(), mappingConfig.getTargetBackType());
+        params.put(SubjectConfigCode.现金流二级类型.getValue(), mappingConfig.getCashType2());
+        params.put(SubjectConfigCode.登记托管机构.getValue(), mappingConfig.getRegistOrg());
+        params.put(SubjectConfigCode.账户细分类.getValue(), mappingConfig.getAcctDetailType());
+        params.put(SubjectConfigCode.投资目的.getValue(), mappingConfig.getInvAim());
         return params;
+    }
+
+    /**
+     * 查询辅助核算项配置信息
+     * @param booksetId 账套代码
+     * @param listBokDetailId 账务明细代码List
+     * @return Map 账套代码+ 账务明细代码，辅助核算项配置
+     */
+    public Map<String, SubjectMappingConfig> getSubjectMappingConfigList(String booksetId, List<String> listBokDetailId){
+        // 定义 变量.辅助核算项Map<账套代码+账务明细代码, 辅助核算项配置>
+        Map<String, SubjectMappingConfig> mappingConfigMap = new HashMap<>();
+        List<SubjectMappingConfig> listConfigInfo = bookAccountGenLogicNewMapper.getSubjectMappingConfig(booksetId, listBokDetailId);
+        // 遍历 变量.辅助核算项配置信息，按账套+账务明细代码进行分组
+        if(CollectionUtils.isNotEmpty(listConfigInfo)){
+            listConfigInfo.forEach(item ->{
+                mappingConfigMap.put(item.getBooksetId().trim() + item.getBokDetailId().trim(), item);
+            });
+        }
+        return mappingConfigMap;
+    }
+
+    /**
+     * 根据账套获取对应科目信息
+     * @param subjectInternalCode 内部科目编码
+     * @param booksetId 账套信息
+     * @return
+     */
+    public List<BokSubject> getFeeSubjectByCode(String subjectInternalCode, String booksetId, String ccy){
+        // 定义 变量.内部科目编码集合
+        List<String> listSubjectInternalCode = new ArrayList<>();
+        listSubjectInternalCode.add(subjectInternalCode);
+        // 定义 变量.查询map
+        Map<String,Object> params = new HashMap<>();
+        params.put("booksetId",booksetId);//账套代码
+        params.put("listSubjectInternalCode",listSubjectInternalCode); //内部科目编码集合
+        params.put("isAcc",DictCodeList.是否_是.getValue()); // 是否核算科目
+        params.put("ccy",ccy); // 是否核算科目
+        // 2. 根据内部编码集合查询相关底层科目信息
+        return accountingMethodNewMapper.getSubjectByInternalCode(params);
+    }
+
+    /**
+     * 根据账套获取对应科目信息
+     * @param subjectInternalCode 内部科目编码
+     * @param booksetId 账套信息
+     * @return
+     */
+    public Map<String, List<BokSubject>> getFeeSubjectMapByCodes(List<String> listSubjectInternalCode, String booksetId, String ccy){
+        Map<String, List<BokSubject>> result = new HashMap<>();
+        // 定义 变量.查询map
+        Map<String,Object> params = new HashMap<>();
+        params.put("booksetId",booksetId);//账套代码
+        params.put("listSubjectInternalCode",listSubjectInternalCode); //内部科目编码集合
+        params.put("isAcc",DictCodeList.是否_是.getValue()); // 是否核算科目
+        params.put("ccy",ccy); // 是否核算科目
+        // 2. 根据内部编码集合查询相关底层科目信息
+        List<BokSubject> listBokSubject =  accountingMethodNewMapper.getSubjectByInternalCode(params);
+        if(CollectionUtils.isNotEmpty(listBokSubject)){
+            // 按照内部科目编码分组
+            result = listBokSubject.stream().collect(Collectors.groupingBy(BokSubject::getSubjectInternalCode));
+        }
+        return result;
+    }
+
+    /**
+     * 根据辅助核算项匹配查找对应科目
+     * @param listBokSubject 科目信息列表
+     * @param subjectMappingConfig 辅助核算项
+     * @param ccy 币种
+     * @return
+     */
+    public BokSubject getSubjectByInnerCode(List<BokSubject> listBokSubject, SubjectMappingConfig subjectMappingConfig){
+        BokSubject bokSubject = null;
+        if(CollectionUtils.isEmpty(listBokSubject)){
+            return bokSubject;
+        }
+        // 定义 变量.资产辅助核算项 封装辅助核算项为map对象
+        Map<String, Object> params = initMappingParams(subjectMappingConfig);
+        // 定义 变量.默认辅助核算项 封装辅助核算项为map对象
+        Map<String, Object> paramsDefualt = initMappingParams(subjectMappingConfig);
+        // 增加辅助核算项默认（DEFAULT) = 是(Y)
+        paramsDefualt.put(SubjectConfigCode.默认.getValue(), DictCodeList.是否_是.getValue());
+        // 定义 变量.默认科目
+        BokSubject bokSubjectDefault = null;
+        // 若只有一条记录，则直接取值
+        if(listBokSubject.size() == 1){
+            bokSubject = listBokSubject.get(0);
+        }
+        else{
+            for(BokSubject item : listBokSubject){
+                // 根据变量.资产辅助核算
+                // 项通过辅助核算项表达式匹配
+                //  科目内部科目编码不为空 且 科目内部科目编码匹配辅助核算项
+                if (StringUtil.isNotEmpty(item.getSubjectHandFelCode()) &&
+                        ExpressionUtil.booleanValue(item.getSubjectHandFelCode(), params)
+                ) {
+                    bokSubject = item;
+                    break;
+                }
+                // 比较科目与默认辅助核算项，获取默认DEFAULT=='Y'的科目,即默认科目
+                if (StringUtil.isNotEmpty(item.getSubjectHandFelCode()) &&
+                        ExpressionUtil.booleanValue(item.getSubjectHandFelCode(), paramsDefualt)
+                ) {
+                    // 默认科目 = 匹配科目
+                    bokSubjectDefault = item;
+                }
+            }
+        }
+        // 若科目信息为空，则说明未匹配对应科目信息，取默认科目
+        if(bokSubject ==null){
+            bokSubject = bokSubjectDefault;
+        }
+        return bokSubject;
     }
 }

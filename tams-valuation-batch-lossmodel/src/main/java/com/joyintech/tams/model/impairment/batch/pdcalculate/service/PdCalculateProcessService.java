@@ -1,16 +1,17 @@
 package com.joyintech.tams.model.impairment.batch.pdcalculate.service;
+
+import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.entity.ModBatchLogs;
+import com.joyintech.tams.common.base.entity.ModEclResultProcess;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.model.impairment.batch.common.searchinfo.service.ImpairmentCommonService;
 import com.joyintech.tams.model.impairment.batch.pdcalculate.dao.PdCalculateMapper;
 import com.joyintech.tams.model.impairment.batch.pdcalculate.dto.*;
-import com.joyintech.tams.common.base.entity.ModEclResultProcess;
 import com.joyintech.tams.valuation.common.service.CalCommonService;
 import com.joyintech.tams.valuation.component.batch.service.ModLogsService;
 import com.joyintech.tams.valuation.component.common.constant.ValComponentConstant;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.beans.BeanUtils;
@@ -192,7 +193,7 @@ public class PdCalculateProcessService {
                 //deciR6=deciR3/deciR5
                 BigDecimal deciR6=ArithmeticUtil.divide(deciR3,deciR5,12);
                 BigDecimal deciR7 =ArithmeticUtil.multiply(new BigDecimal("0.12"),deciR6);
-                BigDecimal deciR8 =ArithmeticUtil.multiply(new BigDecimal("0.24"),ArithmeticUtil.subtract(BigDecimal.ONE,deciR6));
+                BigDecimal deciR8 = ArithmeticUtil.multiply(new BigDecimal("0.24"),ArithmeticUtil.subtract(BigDecimal.ONE,deciR6));
 //                if(variablePdCalculateDto.getIsFinLicence() ==null){
 //                    //=====记录计算错误日志=====start=====
 //                    logMsg ="【PD计算批处理】：无法判断【机构名称】是否金融机构";
@@ -601,12 +602,12 @@ public class PdCalculateProcessService {
      * @return
      */
     public BigDecimal calcPdRight(VariablePdCalculateDto variablePdCalculateDto, ModPdWeightConfigDto modPdWeightConfigDto){
-        // 乐观因子累计PDm *  乐观因子权重
-        BigDecimal deciTwelve1  =ArithmeticUtil.multiply(variablePdCalculateDto.getOptimisticCdfPd(),modPdWeightConfigDto.getOptimisticWeight());
-        // 基础因子累计PDm *  基础因子权重
-        BigDecimal deciTwelve2  =ArithmeticUtil.multiply(variablePdCalculateDto.getBasicCdfPd(),modPdWeightConfigDto.getBasicWeight());
-        // 悲观因子累计PDm * 悲观因子权重
-        BigDecimal deciTwelve3  =ArithmeticUtil.multiply(variablePdCalculateDto.getPessimismCdfPd(),modPdWeightConfigDto.getPessimismWeight());
+        // 乐观因子累计PDm *  乐观因子权重/100
+        BigDecimal deciTwelve1  =ArithmeticUtil.divide(ArithmeticUtil.multiply(variablePdCalculateDto.getOptimisticCdfPd(),modPdWeightConfigDto.getOptimisticWeight()), new BigDecimal(100));
+        // 基础因子累计PDm *  基础因子权重/100
+        BigDecimal deciTwelve2  =ArithmeticUtil.divide(ArithmeticUtil.multiply(variablePdCalculateDto.getBasicCdfPd(),modPdWeightConfigDto.getBasicWeight()), new BigDecimal(100));
+        // 悲观因子累计PDm * 悲观因子权重/100
+        BigDecimal deciTwelve3  =ArithmeticUtil.divide(ArithmeticUtil.multiply(variablePdCalculateDto.getPessimismCdfPd(),modPdWeightConfigDto.getPessimismWeight()), new BigDecimal(100));
         // 第12个月累积加权PD=乐观因子PDm *  乐观因子权重+基础因子PDm *  基础因子权重+悲观因子PDm * 悲观因子权重
        return ArithmeticUtil.doAdd(deciTwelve1,deciTwelve2,deciTwelve3);
     }

@@ -130,9 +130,98 @@ public class ValBatchLog001Dto extends BaseEntity implements ITableRow {
      * 批处理任务组执行ID
      */
     private String batchExedetailSeqNo;
-    
-    
-    
+
+
+    /**
+     * 账套id
+     */
+    private String booksetId;
+
+
+    /**
+     * 金融产品ID
+     */
+    private String finprodId;
+
+    /**
+     * 业务编码
+     */
+    private String busiId;
+    /**
+     * 详细日志
+     */
+    private String resultInfo;
+    /**
+     * 扩展明细信息
+     */
+    private String detailEx;
+
+    /**
+     * 文件路径
+     */
+    private String filePath;
+
+    /**
+     * 详情日志主键
+     */
+    private String exeSeqno;
+
+    public String getExeSeqno() {
+        return exeSeqno;
+    }
+
+    public void setExeSeqno(String exeSeqno) {
+        this.exeSeqno = exeSeqno;
+    }
+
+    public String getBooksetId() {
+        return booksetId;
+    }
+
+    public void setBooksetId(String booksetId) {
+        this.booksetId = booksetId;
+    }
+
+    public String getFinprodId() {
+        return finprodId;
+    }
+
+    public void setFinprodId(String finprodId) {
+        this.finprodId = finprodId;
+    }
+
+    public String getBusiId() {
+        return busiId;
+    }
+
+    public void setBusiId(String busiId) {
+        this.busiId = busiId;
+    }
+
+    public String getResultInfo() {
+        return resultInfo;
+    }
+
+    public void setResultInfo(String resultInfo) {
+        this.resultInfo = resultInfo;
+    }
+
+    public String getDetailEx() {
+        return detailEx;
+    }
+
+    public void setDetailEx(String detailEx) {
+        this.detailEx = detailEx;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
     public String getBatchExedetailSeqNo() {
 		return batchExedetailSeqNo;
 	}

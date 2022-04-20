@@ -157,15 +157,15 @@ public class TrdIRSValuationTrade001Controller extends BaseController {
         // 业务代码（凭证流水号）
         params.setBusinessCode(item -> item.getTradeId());
         // 业务类型
-        params.setBusinessType(DictCodeList.业务类型_债券借贷交易.getValue());
+        params.setBusinessType(DictCodeList.业务类型_利率互换交易.getValue());
         // 页面id
         params.setPageId("TrdIRSValuationTrade002");
         // 元素id
         params.setElementId(dto.getElementId());
 
         // 设置流程业务说明, entity即传入的dto
-        params.setComment(entity -> WorkFlowUtil.concatComment("债券借贷交易删除：", entity.getTradeId(),
-                entity.getTradeDate()
+        params.setComment(entity -> WorkFlowUtil.concatComment("利率互换交易删除：", entity.getTradeId(),
+                DateUtil.format(entity.getTradeDate())
         ));
 
         // 塞入流程参数
@@ -205,7 +205,7 @@ public class TrdIRSValuationTrade001Controller extends BaseController {
         }
 
         File outFile = trdIRSValuationTrade001Service.makeFile(
-                "/com/joyintech/tams/valuation/trademanage/bondlend/conf/export_conf.xml",
+                "/com/joyintech/tams/valuation/trademanage/irs/conf/export_conf.xml",
                 listdto);
         return ExportUtil.export(
                 this.getMessage(this.getPageId()) + SystemGlobalConstant.OPEN_PARENTHESIS

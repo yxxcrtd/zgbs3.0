@@ -16,29 +16,25 @@ import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
-import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTrade002Dto;
-import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTrade003Dto;
+import com.joyintech.tams.valuation.trademanage.bondlend.dto.TrdBondLendTrade001Dto;
 import com.joyintech.tams.valuation.trademanage.bondlend.service.TrdBondLendTrade002Service;
 import com.joyintech.tams.valuation.trademanage.bondlend.service.TrdBondLendTrade003Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.validation.Valid;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * 债券借贷交易新建
@@ -64,26 +60,34 @@ public class TrdBondLendTrade003Controller extends BaseController {
     
     @Override
     public String init(Model model) {
-        this.setSelectOptionToModel(model, DictCode.交易场所,DictCode.交易方向, DictCode.币种, DictCode.投资目的);
+        this.setSelectOptionToModel(model, DictCode.交易场所,DictCode.交易方向, DictCode.币种,
+                DictCode.投资目的,DictCode.是否);
 
         // 工作流ID
         String workflowId = this.getParam(GlobalConstant.WORKFLOW_ID);
 
-        String operateType = getParam("operateType");
-
         String tradeId = getParam("tradeId");
+
+        String ps = getParam("ps");
 
         //工作流
         if(StringUtil.isNotEmpty(workflowId)){
-            TrdBondLendTrade002Dto entity= trdBondLendTrade002Service.getBussinessEntityByWorkflowId(workflowId);
+            TrdBondLendTrade001Dto entity= trdBondLendTrade003Service.getBussinessEntityByWorkflowId(workflowId);
+            if(!StringUtil.isNotEmpty(entity.getTradeId())){
+                entity.setTradeId("提交后自动生成，无需填写");
+            }
             model.addAttribute("entity", entity);
             model.addAttribute("workflowId", workflowId);
 
-        }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){//编辑页面
-            TrdBondLendTrade003Dto entity = trdBondLendTrade002Service.queryInfoByTradeId(tradeId);
+        }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId) && !StringUtil.isNotEmpty(ps)){//到期
+            TrdBondLendTrade001Dto entity = trdBondLendTrade002Service.queryInfoByTradeId(tradeId);
+            entity.setOutTradeId(entity.getTradeId());
+            entity.setTradeId(null);
+            model.addAttribute("entity", entity);
+        }else if(!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId) && StringUtil.isNotEmpty(ps)){//编辑，删除，明细
+            TrdBondLendTrade001Dto entity = trdBondLendTrade002Service.queryInfoByTradeId(tradeId);
             model.addAttribute("entity", entity);
         }
-
 
         return super.init(model);
     }
@@ -91,7 +95,7 @@ public class TrdBondLendTrade003Controller extends BaseController {
     /**
      * 确认校验
      *
-     * @param trdBondLendTrade003Dto 参数
+     * @param trdBondLendTrade001Dto 参数
      * @param result 校验结果
      * @return AjaxResult
      * @see
@@ -99,9 +103,10 @@ public class TrdBondLendTrade003Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("check")
-    public AjaxResult check(@Valid @RequestBody TrdBondLendTrade003Dto trdBondLendTrade003Dto,
+    public AjaxResult check(@RequestBody @Validated({
+            ValidateGroupEdit.class}) TrdBondLendTrade001Dto trdBondLendTrade001Dto,
                               BindingResult result) {
-        return commonCheck(result, trdBondLendTrade003Dto.getOperateType());
+        return commonCheck(result, trdBondLendTrade001Dto.getOperateType());
     }
 
 
@@ -116,31 +121,32 @@ public class TrdBondLendTrade003Controller extends BaseController {
      */
     @RequestMapping("save")
     @ResponseBody
-    AjaxResult save(@RequestBody @Valid TrdBondLendTrade003Dto dto, BindingResult br)
+    AjaxResult save(@RequestBody @Validated({
+            ValidateGroupEdit.class}) TrdBondLendTrade001Dto dto, BindingResult br)
         throws Exception {
 
         if (br.hasErrors()) {
             return new AjaxResult(br);
         }
 
-        ProcessParameter<TrdBondLendTrade003Dto> processParameter = new ProcessParameter<>();
-        WorkFlowParameter<TrdBondLendTrade003Dto> workFlowParameter = new WorkFlowParameter<>();
+        ProcessParameter<TrdBondLendTrade001Dto> processParameter = new ProcessParameter<>();
+        WorkFlowParameter<TrdBondLendTrade001Dto> workFlowParameter = new WorkFlowParameter<>();
         processParameter.setWorkFlowParameter(workFlowParameter);
         processParameter.setPageId(this.getPageId());
 
-        //设置主键
-        if(!StringUtil.isNotEmpty(dto.getTradeId())){
-            Date sysDate= DateUtil.platDateFromCache();
-            dto.setTradeId(getTradeId("JYSL", sysDate, "A"));
-        }
+//        //设置主键
+//        if(!StringUtil.isNotEmpty(dto.getTradeId())){
+//            Date sysDate= DateUtil.platDateFromCache();
+//            dto.setTradeId(getTradeId("JYSL", sysDate, "A"));
+//        }
 
         workFlowParameter.setPageId(this.getPageId());
         workFlowParameter.setElementId(this.getParam("elementId"));
-        workFlowParameter.setBusinessCode(dto.getTradeId());
-        workFlowParameter.setBusinessType(DictCodeList.共通业务类型_债券类资产交易.getValue());
+        workFlowParameter.setBusinessCode(dto.getSecId());
+        workFlowParameter.setBusinessType(DictCodeListExt2.共通业务类型_债券借贷交易.getValue());
         workFlowParameter.setComment((entity) -> WorkFlowUtil.concatComment(
-            getMessage("交易编号") + GlobalConstant.COLON + entity.getTradeId(),
-            getMessage("交易日") + GlobalConstant.COLON + entity.getTradeDate()));
+            getMessage("资产代码：") + GlobalConstant.COLON + entity.getSecId(),
+            getMessage("交易日:") + GlobalConstant.COLON + DateUtil.format(entity.getTradeDate())));
 
         String msg = trdBondLendTrade003Service.start(processParameter, dto);
 
@@ -150,21 +156,21 @@ public class TrdBondLendTrade003Controller extends BaseController {
     /**
      * 编号生成
      */
-    public String getTradeId(String str, Date date, String flag) {
-        int  sequences=0;
-        // 查询数据库sequences
-        if ("A".equals(flag)) {
-            sequences = trdBondLendTrade002Service.querySequences();
-        }
-        // 组装4位序列号 不足补0
-        String sequence = StringUtils.leftPad(String.valueOf(sequences), 4, '0');
-        // 日期格式化yyymmdd
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        String formatDate = sdf.format(date);
-
-        String tradeIdStr = str + formatDate + sequence;
-        return tradeIdStr;
-    }
+//    public String getTradeId(String str, Date date, String flag) {
+//        int  sequences=0;
+//        // 查询数据库sequences
+//        if ("A".equals(flag)) {
+//            sequences = trdBondLendTrade002Service.querySequences();
+//        }
+//        // 组装4位序列号 不足补0
+//        String sequence = StringUtils.leftPad(String.valueOf(sequences), 4, '0');
+//        // 日期格式化yyymmdd
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+//        String formatDate = sdf.format(date);
+//
+//        String tradeIdStr = str + formatDate + sequence;
+//        return tradeIdStr;
+//    }
 
 
 }

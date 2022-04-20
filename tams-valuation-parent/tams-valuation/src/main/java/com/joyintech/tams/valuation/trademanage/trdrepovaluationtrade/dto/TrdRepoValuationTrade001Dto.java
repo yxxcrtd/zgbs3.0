@@ -397,7 +397,7 @@ public class TrdRepoValuationTrade001Dto extends BaseEntity implements ProcessEn
         this.settFeeAmt = settFeeAmt;
     }
 
-    @NotEmpty(fieldName = "TrdRepoValuationTrade002.otherAmt", groups = {ValidateGroupEdit.class})
+//    @NotEmpty(fieldName = "TrdRepoValuationTrade002.otherAmt", groups = {ValidateGroupEdit.class})
     public BigDecimal getOtherAmt() {
         return otherAmt;
     }
@@ -547,5 +547,29 @@ public class TrdRepoValuationTrade001Dto extends BaseEntity implements ProcessEn
         DecimalFormat decimalFormat = new DecimalFormat("0.00#");
         return this.getSettleAmt()==null?"0.00":decimalFormat.format(this.getSettleAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
     }
+
+    /**
+     * 回购类型（H01：质押式协议回购；H02：质押式竞价回购）
+     */
+    private String repoType;
+
+    public String getRepoType() {
+        return repoType;
+    }
+
+    public void setRepoType(String repoType) {
+        this.repoType = repoType;
+    }
+
+    /**
+     * 取得 回购类型str
+     *
+     * @return 回购类型
+     */
+    public String getRepoTypeStr() {
+        return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.回购类型, repoType))?
+                SysDataUtil.getNameFromDataDict(DictCode.回购类型, repoType):repoType;
+    }
+
 
 }

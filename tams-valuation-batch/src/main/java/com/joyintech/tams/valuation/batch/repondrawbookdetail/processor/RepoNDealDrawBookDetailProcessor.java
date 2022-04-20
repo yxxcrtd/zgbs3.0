@@ -10,20 +10,22 @@
 
 package com.joyintech.tams.valuation.batch.repondrawbookdetail.processor;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.joyintech.batch.batchbase.baseclass.BaseProcessor;
+import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
+import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGenerateResult;
+import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGenerateResultWithBokSummary;
+import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto.DrawBaseInfoSelectComResult;
+import com.joyintech.tams.valuation.batch.repondrawbookdetail.service.RepoNDealDrawBookDetailProcessNewService;
+import com.joyintech.tams.valuation.batch.repondrawbookdetail.service.RepoNDealDrawBookDetailProcessService;
+import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.joyintech.batch.batchbase.baseclass.BaseProcessor;
-import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
-import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGenerateResult;
-import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGenerateResultWithBokSummary;
-import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto.DrawBaseInfoSelectComResult;
-import com.joyintech.tams.valuation.batch.repondrawbookdetail.service.RepoNDealDrawBookDetailProcessService;
-import com.joyintech.tams.valuation.common.constants.GlobalConstant;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 质押式回购计提账务处理 processor
@@ -42,6 +44,11 @@ public class RepoNDealDrawBookDetailProcessor extends BaseProcessor<NeedOperateE
      */
     @Autowired
     private RepoNDealDrawBookDetailProcessService drawBookDetailProcessService;
+    /**
+     * processor方法的 Service
+     */
+    @Autowired
+    private RepoNDealDrawBookDetailProcessNewService drawBookDetailProcessNewService;
 
     @Override
     public BookGenerateResultWithBokSummary process(NeedOperateEntity items)
@@ -54,9 +61,20 @@ public class RepoNDealDrawBookDetailProcessor extends BaseProcessor<NeedOperateE
         // 将返回值塞入参数中
         thisParams.put(GlobalConstant.READER_RESULT, acctEntity);
 
-        // 调用service方法进行逻辑逻辑
-        BookGenerateResultWithBokSummary result = drawBookDetailProcessService.execute(thisParams);
-        
+        /*** modify by weipeng on 20220317 会计分录生成凭证通过系统参数区分新旧逻辑，保持原有逻辑不动 start **/
+        BookGenerateResultWithBokSummary result = new BookGenerateResultWithBokSummary();
+        // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录 start
+        String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+        // 若按照内部科目编码分录，则需要映射分录对应科目信息
+        //调用service方法进行逻辑逻辑
+        if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
+            result = drawBookDetailProcessNewService.execute(thisParams);
+        }
+        else{
+            result = drawBookDetailProcessService.execute(thisParams);
+        }
+        /*** modify by weipeng on 20220317 会计分录生成凭证通过系统参数区分新旧逻辑，保持原有逻辑不动 end **/
+
         //当为null时候，给予初始化
         if(result == null){
             result = new BookGenerateResultWithBokSummary();

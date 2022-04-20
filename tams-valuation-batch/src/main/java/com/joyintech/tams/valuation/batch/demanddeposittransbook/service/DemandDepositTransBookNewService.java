@@ -15,6 +15,7 @@ import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListTableId;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalance;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalanceSearchDto;
@@ -110,18 +111,18 @@ public class DemandDepositTransBookNewService {
         // 2.调用共通查询发生日前一日余额
         // 交易期待方向——借方
         String expBalanceDirect = DictCodeList.余额方向_借方.getValue();
-
-        // 2.1.现金类科目余额
-        // 账务类共通方法:科目余额查询-期待方向
-        SubjectBalance subjectBalance = this.getSubjectBalance(readerEntity, expBalanceDirect,
-            DictCodeBaseSubjectNatrueNew.活期存款.getValue(), null, taskPri, readerEntity.getHappenDate());
-        cashBalance = subjectBalance.getBalance() == null ? BigDecimal.ZERO : subjectBalance.getBalance();
-
-        // 2.2.应收利息类科目余额
-        // 账务类共通方法:科目余额查询
-        subjectBalance = this.getSubjectBalance(readerEntity, expBalanceDirect,
-            DictCodeBaseSubjectNatrueNew.活期存款_应计利息.getValue(), null, taskPri, readerEntity.getHappenDate());
-        interestBalance = subjectBalance.getBalance() == null ? BigDecimal.ZERO : subjectBalance.getBalance();
+//
+//        // 2.1.现金类科目余额
+//        // 账务类共通方法:科目余额查询-期待方向
+//        SubjectBalance subjectBalance = this.getSubjectBalance(readerEntity, expBalanceDirect,
+//            subjectNature_BJ, null, taskPri, readerEntity.getHappenDate());
+//        cashBalance = subjectBalance.getBalance() == null ? BigDecimal.ZERO : subjectBalance.getBalance();
+//
+//        // 2.2.应收利息类科目余额
+//        // 账务类共通方法:科目余额查询
+//        subjectBalance = this.getSubjectBalance(readerEntity, expBalanceDirect,
+//            subjectNature_YJLX, null, taskPri, readerEntity.getHappenDate());
+//        interestBalance = subjectBalance.getBalance() == null ? BigDecimal.ZERO : subjectBalance.getBalance();
 
         // 3.处理交易
         for (FinProductDealInfoComDTO dealInfo : listFinProductDealInfoComDTONow) {
@@ -152,18 +153,55 @@ public class DemandDepositTransBookNewService {
             //资金账户类型
             accountSceneMap.put(BookConstant.ACCT_TYPE, dealInfo.getAcctType());
 
+            // modify by weipeng on 20220303 ：会计引擎升级，资金账户科目性质拆分 start
+            // 定义 变量.金额元素, 默认 = 活期存款-托管户
+            String 交易金额记账元素 =  BookConstant.DEALAMT_HQ;
+            String 利息金额记账元素 = BookConstant.INTAMT_HQ;
+            // 定义 变量.本金基础科目性质
+            String subjectNature_BJ = DictCodeBaseSubjectNatrueNew.活期存款_本金.getValue();
+            // 定义 变量.应计利息基础科目性质
+            String subjectNature_YJLX = DictCodeBaseSubjectNatrueNew.活期存款_应计利息.getValue();
+            // 本方资金账户类型 或 对方资金账户类型对应资金账户类型，赋值对应金额元素
+            // 券商资金账户现划分在结算备付金科目性质下
+            if (DictCodeListExt1.资金账户类型_结算备付金账户.getValue().equals(dealInfo.getAcctType())
+                    || DictCodeListExt1.资金账户类型_券商资金账户.getValue().equals(dealInfo.getAcctType())){
+                交易金额记账元素 = BookConstant.DEALAMT_JS;
+                利息金额记账元素 = BookConstant.INTAMT_JS;
+                subjectNature_BJ = DictCodeBaseSubjectNatrueNew.结算备付金_本金.getValue();
+                subjectNature_YJLX = DictCodeBaseSubjectNatrueNew.结算备付金_应计利息.getValue();
+            }
+            if(DictCodeListExt1.资金账户类型_交易保证金账户.getValue().equals(dealInfo.getAcctType())){
+                交易金额记账元素 = BookConstant.DEALAMT_CC;
+                利息金额记账元素 = BookConstant.INTAMT_CC;
+                subjectNature_BJ = DictCodeBaseSubjectNatrueNew.存出保证金_本金.getValue();
+                subjectNature_YJLX = DictCodeBaseSubjectNatrueNew.存出保证金_应计利息.getValue();
+            }
+
+            // 2.1.现金类科目余额
+            // 账务类共通方法:科目余额查询-期待方向
+            SubjectBalance subjectBalance = this.getSubjectBalance(readerEntity, expBalanceDirect,
+                    subjectNature_BJ, null, taskPri, readerEntity.getHappenDate(), dealInfo.getBokDetailId());
+            cashBalance = subjectBalance.getBalance() == null ? BigDecimal.ZERO : subjectBalance.getBalance();
+
+            // 2.2.应收利息类科目余额
+            // 账务类共通方法:科目余额查询
+            subjectBalance = this.getSubjectBalance(readerEntity, expBalanceDirect,
+                    subjectNature_YJLX, null, taskPri, readerEntity.getHappenDate(), dealInfo.getBokDetailId());
+            interestBalance = subjectBalance.getBalance() == null ? BigDecimal.ZERO : subjectBalance.getBalance();
+            // modify by weipeng on 20220303 ：会计引擎升级，资金账户科目性质拆分 end
+            // add by weipeng on 20220221 区分资金账户金额元素 end
             if (DictCodeList.交易方向_买入.getValue().equals(dealInfo.getPs())) {// 买入
                 // 会计场景代码="活期存款买入（转仓）"
                 ad.setTableId(DictCodeListTableId.会计场景代码_活期存款利息_转仓买入.getValue());
 
                 // 设置accountAmountMap
                 // 实付金额：交易明细.交易金额
-                accountAmountMap.put(BookConstant.DEALAMT,
+                accountAmountMap.put(交易金额记账元素,
                     ArithmeticUtil.round(dealInfo.getTradeAmt(), NumberEnum.MONEY));
 
                 // 设置accountCurrencyMap
                 // 实付金额：交易明细.交易币种
-                accountCurrencyMap.put(BookConstant.DEALAMT, dealInfo.getCcy());
+                accountCurrencyMap.put(交易金额记账元素, dealInfo.getCcy());
 
                 // 全局变量的更新
                 // 变量.现金科目余额 = 变量.现金科目余额 + 交易明细.交易金额
@@ -179,16 +217,16 @@ public class DemandDepositTransBookNewService {
                 // 发生日 ：交易明细.到期日-1；基础科目性质:应计利息
                 // ArithmeticUtil处理一下应计利息
                 BigDecimal interest = this.getSubjectBalance(readerEntity, expBalanceDirect,
-                    DictCodeBaseSubjectNatrueNew.活期存款_应计利息.getValue(), null, null,
-                    DateUtil.addDay(dealInfo.getMdate(), -1)).getBalance();
+                    subjectNature_YJLX, null, null,
+                    DateUtil.addDay(dealInfo.getMdate(), -1), dealInfo.getBokDetailId()).getBalance();
                 interest = interest == null ? BigDecimal.ZERO : interest;
                 interest = ArithmeticUtil.round(interest, NumberEnum.MONEY);
 
                 // 实付金额：交易明细.交易金额
-                accountAmountMap.put(BookConstant.DEALAMT,
+                accountAmountMap.put(交易金额记账元素,
                     ArithmeticUtil.round(dealInfo.getTradeAmt(), NumberEnum.MONEY));
                 // 应收利息：变量.应收利息
-                accountAmountMap.put(BookConstant.INTAMT,
+                accountAmountMap.put(利息金额记账元素,
                     ArithmeticUtil.round(interest, NumberEnum.MONEY));
                 // 交易明细.交易金额- 变量.应收利息科目余额 >0
                 // 利息差额_贷 = 交易明细.交易金额- 变量.应收利息科目余额
@@ -221,7 +259,7 @@ public class DemandDepositTransBookNewService {
                 // // 发生日 ：交易明细.到期日；基础科目性质:应计利息
                 // // ArithmeticUtil处理一下应计利息
                 // BigDecimal interest = this.getSubjectBalance(readerEntity, expBalanceDirect,
-                // DictCodeBaseSubjectNatrueNew.活期存款_应计利息.getValue(), null, taskPri).getBalance();
+                // subjectNature_YJLX, null, taskPri).getBalance();
                 // interest = interest == null ? BigDecimal.ZERO : interest;
                 // interest = ArithmeticUtil.round(interest, NumberEnum.MONEY);
 
@@ -234,9 +272,9 @@ public class DemandDepositTransBookNewService {
                 // 利息差额_借<- 交易明细.交易金额- 变量.应收利息科目余额
                 BigDecimal dealamt = dealInfo.getTradeAmt();
                 BigDecimal intamt = interestBalance;
-                accountAmountMap.put(BookConstant.DEALAMT,
+                accountAmountMap.put(交易金额记账元素,
                     ArithmeticUtil.round(dealamt, NumberEnum.MONEY));
-                accountAmountMap.put(BookConstant.INTAMT,
+                accountAmountMap.put(利息金额记账元素,
                     ArithmeticUtil.round(intamt, NumberEnum.MONEY));
                 if (dealInfo.getTradeAmt().compareTo(interestBalance) > 0) {
                     accountAmountMap.put(BookConstant.INCOMEAMT_C,
@@ -268,7 +306,9 @@ public class DemandDepositTransBookNewService {
             ad.setAccountSceneMap(accountSceneMap);
             ad.setAccountAmountMap(accountAmountMap);
             ad.setAccountCurrencyMap(accountCurrencyMap);
-
+            // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+            ad.setSubjectMappingConfigDefault(dealInfo.getSubjectMappingConfig());
+            // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
             // 记账凭证生成
             BookGenerateResult result = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
 
@@ -296,7 +336,7 @@ public class DemandDepositTransBookNewService {
      */
     private SubjectBalance getSubjectBalance(FinProductDealInfoResult readerEntity,
                                              String expBalanceDirect, String baseSubjectNature,
-                                             Long branch, Long taskPri, Date happenDate) {
+                                             Long branch, Long taskPri, Date happenDate, String bokDetailId) {
         // 定义返回的科目余额
         SubjectBalance balance = new SubjectBalance();
 
@@ -310,7 +350,7 @@ public class DemandDepositTransBookNewService {
         // 设值科目余额查询参数Dto
         SubjectBalanceSearchDto searchDto = new SubjectBalanceSearchDto();
         searchDto.setBooksetId(readerEntity.getBooksetId());
-        searchDto.setBokDetailId(readerEntity.getBokDetailId());
+        searchDto.setBokDetailId(bokDetailId);
         searchDto.setHappenDate(happenDate);
         searchDto.setBookDate(readerEntity.getBookDate());
         searchDto.setBranch(branch);

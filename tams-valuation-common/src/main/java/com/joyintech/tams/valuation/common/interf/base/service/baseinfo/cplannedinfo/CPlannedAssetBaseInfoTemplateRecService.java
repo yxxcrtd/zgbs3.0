@@ -8,24 +8,8 @@
  */
 package com.joyintech.tams.valuation.common.interf.base.service.baseinfo.cplannedinfo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
-
-import com.joyintech.tams.common.base.entity.FinProduct;
-import com.joyintech.tams.common.base.entity.FinProductAdd;
-import com.joyintech.tams.common.base.entity.FinProductClass;
-import com.joyintech.tams.common.base.entity.FinProductType;
-import com.joyintech.tams.common.base.entity.FinProductValuationPara;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.interf.base.constant.InterfCommonConstant;
 import com.joyintech.tams.valuation.common.interf.base.dto.CPlannedAssetBaseInfoValCommonResult;
@@ -35,6 +19,14 @@ import com.joyintech.tams.valuation.common.interf.base.dto.TemplateSourceFlgDTO;
 import com.joyintech.tams.valuation.common.interf.base.service.common.InterfCommonService;
 import com.joyintech.tams.valuation.common.interf.base.service.common.TemplateAnalysisForXMLService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValMngMnfBaseInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 计划类资产(货币型)基础信息模板处理 (ValMngMnfBaseInfo) 
@@ -232,6 +224,8 @@ public class CPlannedAssetBaseInfoTemplateRecService {
 		// 分类3= 调用共通方法查询税务分类
 		valFinProductType.setType3(interfCommonService.getFinanceProductTaxClass(fdto));
 		valFinProductType.setBranch(InterfCommonConstant.分支序号_默认);
+		// 分类18 = 调用共通方法查询证券品种 add by yanya on 20210828
+		valFinProductType.setType18(interfCommonService.getFinanceProductSecType(fdto));
 		return valFinProductType;
 	}
 	

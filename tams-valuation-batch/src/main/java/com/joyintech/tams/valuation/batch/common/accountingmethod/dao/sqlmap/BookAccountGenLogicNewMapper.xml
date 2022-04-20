@@ -1,76 +1,48 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.joyintech.tams.valuation.batch.common.accountingmethod.dao.BookAccountGenLogicNewMapper">
-    <!-- 根据内部编码查询对应科目信息-->
-    <select id="getSubjectByInternalCode" resultType="com.joyintech.tams.common.base.entity.BokSubject"
-            parameterType="java.util.Map">
-        SELECT
-        A.BOOKSET_ID,
-        A.SUBJECT_NO,
-        A.SUBJECT_NAME,
-        A.FSUBJECT_ID,
-        A.BAL_FLAG,
-        A.SUBJECT_TYPE,
-        A.SUBJECT_LEVEL,
-        A.ACC_QUA_FLAG,
-        A.ACC_INT_FLAG,
-        A.OVERDRAWN_FLAG,
-        A.GEN_DETSUB_FLAG,
-        A.BASE_SUBJECT_NATURE,
-        A.INV_AIM,
-        A.SEC_MANAGE_ACCT_ID,
-        A.SUBJECT_INTERNAL_CODE,
-        A.SUBJECT_HAND_FEL_CODE,
-        A.CCY
-        FROM BOK_SUBJECT A
-        INNER JOIN BOK_BOOKSET B
-        ON A.BOOKSET_ID = B.BOOKSET_ID_TMPL
-        WHERE B.BOOKSET_ID = #{booksetId}
-        AND A.CCY = #{ccy}
-        /** 查询底层科目，且科目配置项不为空**/
-        AND A.IS_BOTTOM = 'Y'
-        AND A.SUBJECT_HAND_FEL_CODE IS NOT NULL
-        <if test="listSubjectInternalCode != null and listSubjectInternalCode.size >0">
-            AND A.SUBJECT_INTERNAL_CODE IN
-            <foreach collection="listSubjectInternalCode" item="item" open="(" close=")" separator=",">
-                #{item}
-            </foreach>
-        </if>
-
-    </select>
-
     <!-- 查询资产对应科目配置项 -->
     <select id="getSubjectMappingConfig" resultType="com.joyintech.tams.valuation.batch.common.accountingmethod.entity.SubjectMappingConfig"
             parameterType="java.util.Map">
         SELECT
-        A.BOK_DETAIL_ID AS bokDetailId,
-        E.TYPE_18 as secType,    /**  证券类型**/
-        E.TYPE_2 as secDetailType,   /**证券细分类 **/
-        nvl(B.TRADE_MARKET,C.TRADE_MARKET) as tradeMarket, /** 交易市场 **/
-        B.ISSUE_TYPE as issueType, /** 发行方式 **/
-        CASE WHEN A.BUSI_DETAIL_TYPE = 'F07'
-        THEN B.ISSUER   /** 存款类资产对应市场机构 **/
-        ELSE C.COUNTER_ID END as counterId, /** 交易对手 **/
-        A.BUSI_DETAIL_TYPE as accountType,   /** 账户类型 **/
-        NVL(B.REGIST_ORG, D.REGIST_ORG) as  feeType, /**登记托管机构（费用类型）**/
-        E.TYPE_3 as taxFeeType   /** 税务分类（税费类型） **/
+            A.BOOKSET_ID AS booksetId, /** 账套代码 **/
+            A.BOK_DETAIL_ID AS bokDetailId, /** 账务明细代码 **/
+            A.INV_AIM AS invAim, /** 账务明细代码 **/
+            E.TYPE_18 as secType,    /**  证券类型**/
+            E.TYPE_1 as assetType,   /**资产类型 **/
+            nvl(B.TRADE_MARKET,C.TRADE_MARKET) as tradeMarket, /** 交易市场 **/
+            B.ISSUE_TYPE as issueType, /** 发行方式 **/
+            B.ISSUER AS issuer, /**发行人**/
+            C.COUNTER_ID as counterId, /** 交易对手 **/
+            A.BUSI_DETAIL_TYPE as accountType,   /** 账户类型（账务明细代码对应资金账户时） **/
+            NVL(B.REGIST_ORG, D.REGIST_ORG) as  registOrg, /**登记托管机构**/
+            F.CUSTOMER_NAME as financeOrgName /**金融机构名称**/
+            ,E.TYPE_6 as targetBackType /**回购类型**/
         FROM BOK_DETAIL_ID A
         LEFT JOIN FIN_PRODUCT B
-        ON A.BUSI_ID = B.FINPROD_ID
-        AND A.BUSI_DETAIL_TYPE = B.FINPROD_TYPE
+            ON A.BUSI_ID = B.FINPROD_ID
+            AND A.BUSI_DETAIL_TYPE = B.FINPROD_TYPE
         LEFT JOIN FIN_TRADE_PRODUCT C
-        ON A.BUSI_ID = C.FINPROD_ID
-        AND A.BUSI_DETAIL_TYPE = C.FINPROD_TYPE
-        AND C.BRANCH = 0
+            ON A.BUSI_ID = C.FINPROD_ID
+            AND A.BUSI_DETAIL_TYPE = C.FINPROD_TYPE
+            AND C.BRANCH = 0
         LEFT JOIN FIN_TRADE_PRODUCT_ADD D
-        ON D.FINPROD_ID = C.FINPROD_ID
-        AND D.BRANCH = C.BRANCH
+            ON D.FINPROD_ID = A.BUSI_ID
+            AND D.BRANCH = 0
         LEFT JOIN FIN_PRODUCT_TYPE E
-        ON A.BUSI_ID = E.FINPROD_ID
-        WHERE A.BOOKSET_ID = #{booksetId}
+            ON A.BUSI_ID = E.FINPROD_ID
+        LEFT JOIN MST_CUSTOMER_INFO F  /**存款类资产需要查询存借款机构名称**/
+        ON F.CUSTOMER_ID =B.ISSUE_ID
+        WHERE 1=1
+        <if test="booksetId != null and booksetId != ''">
+            AND  A.BOOKSET_ID = #{booksetId}
+        </if>
         <if test="listBokDetailId != null and listBokDetailId.size >0">
             AND A.BOK_DETAIL_ID IN
-            <foreach collection="listBokDetailId" item="item" open="(" close=")" separator=",">
+            <foreach collection="listBokDetailId" index="index" item="item" open="(" separator="," close=")">
+                <if test="(index % 998) == 0">
+                    null) OR A.BOK_DETAIL_ID IN (
+                </if>
                 #{item}
             </foreach>
         </if>

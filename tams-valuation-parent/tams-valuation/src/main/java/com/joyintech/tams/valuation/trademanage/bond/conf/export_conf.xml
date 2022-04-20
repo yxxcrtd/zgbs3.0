@@ -1,27 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Workbook filePath="trademanage/bond/TrdBondTrade001.xlsx" name="债券交易信息一览">
-    <Worksheet javaBean="com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTrade001Dto">
+    <Worksheet javaBean="com.joyintech.tams.valuation.trademanage.bond.dto.TrdBondTradeDto">
         <Row>
             <Cell order="1" name="交易编号">tradeId</Cell>
             <Cell order="2" name="外部成交编号">outTradeId</Cell>
-            <Cell order="3" name="产品代码">finprodId</Cell>
-            <Cell order="4" name="产品名称">finprodName</Cell>
+            <Cell order="3" name="产品代码">prodId</Cell>
+            <Cell order="4" name="产品名称">prodName</Cell>
             <Cell order="5" name="债券代码">secId</Cell>
             <Cell order="6" name="债券简称">secAbbr</Cell>
             <Cell order="7" name="交易场所">tradeMarketStr</Cell>
             <Cell order="8" name="交易类型">psStr</Cell>
-            <Cell order="9" name="交易日">tradeDate</Cell>
-            <Cell order="10" name="交割日">settleDate</Cell>
-            <Cell order="11" name="资金交收日">fundSettleDate</Cell>
+            <Cell order="9" name="交易日">tradeDateStr</Cell>
+            <Cell order="10" name="交割日">settdateDateStr</Cell>
+            <Cell order="11" name="资金交收日">fundSettleDateStr</Cell>
             <Cell order="12" name="会计分类">invAimStr</Cell>
-            <Cell order="13" name="交易通道代码">chlFinprodId</Cell>
-            <Cell order="14" name="成交数量">tradeNumStr</Cell>
-            <Cell order="15" name="全价总额">fpriceAmtStr</Cell>
-            <Cell order="16" name="应收利息总额">intAmtStr</Cell>
-            <Cell order="17" name="币种">ccyFmt</Cell>
-            <Cell order="18" name="结算金额">settleAmtStr</Cell>
-            <Cell order="19" name="本币交易金额">bTradeAmtStr</Cell>
-            <Cell order="20" name="资金账户">acctNo</Cell>
+            <Cell order="13" name="成交数量">dealNumStr</Cell>
+            <Cell order="14" name="交易金额">tradeAmtStr</Cell>
+            <Cell order="15" name="应收利息总额">intAmtStr</Cell>
+            <Cell order="16" name="币种">ccyFmt</Cell>
+            <Cell order="17" name="结算金额">settleAmtStr</Cell>
+            <Cell order="18" name="资金账户">myAcctNo</Cell>
+            <Cell order="19" name="数据来源">dataSourceStr</Cell>
         </Row>
     </Worksheet>
 </Workbook>

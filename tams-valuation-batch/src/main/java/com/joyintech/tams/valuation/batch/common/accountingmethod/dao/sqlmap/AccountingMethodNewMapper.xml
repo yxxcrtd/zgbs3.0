@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.valuation.batch.common.accountingmethod.dao.AccountingMethodNewMapper">
+    
+    <select id="getSceneSubjectConfigByNodeId" resultType="com.joyintech.tams.valuation.batch.common.accountingmethod.entity.AccountEntry">
+        WITH SCIDS AS ( SELECT SCENE_NODE_ID,NODE_VALUE,BOOKSET_ID
+            FROM BOK_SCENECONFIG
+            WHERE BOOKSET_ID = #{booksetId}
+            AND NODE_ID = #{ACCOUNTEVENTS}
+            <if test="accountSceneCodes != null and accountSceneCodes.size() gt 0">
+                AND NODE_VALUE
+                <foreach collection="accountSceneCodes" open="IN (" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+        )
+        SELECT BOK_SCENESUBJECT.SCENE_NODE_ID "sceneNodeId",
+               BOK_SCENESUBJECT.SUBJECT_NO "subjectId",
+               BOK_SCENESUBJECT.CD_FLAG "cdFlag",
+               /**NVL(scenExt.sub_dict_code,BOK_TABLEDICT.DICT_CODE) "formElement",**/
+              BOK_TABLEDICT.DICT_CODE "formElement",
+               BOK_SCENESUBJECT.ACCOUNT_NET "accountNet",
+               /**NVL(scenExt.SUBJECT_NAME,BOK_SUBJECT.SUBJECT_NAME) subjectName,**/
+               BOK_SUBJECT.SUBJECT_NAME subjectName,
+               BOK_SUBJECT.FSUBJECT_ID fsubjectId,
+               BOK_SUBJECT.BASE_SUBJECT_NATURE "baseSubjectNature",
+               BOK_SUBJECT.SUBJECT_TYPE "subjectType",
+               BOK_SUBJECT.ACC_QUA_FLAG "accQuaFlag",
+               BOK_SUBJECT.ACC_INT_FLAG "accIntFlag",
+               BOK_SUBJECT.OVERDRAWN_FLAG "overdrawnFlag",
+               BOK_SUBJECT.BAL_FLAG "balFlag",
+               SCIDS.NODE_VALUE "nodeValue",
+        /**NVL(scenExt.BOK_DETAIL_ID,BOK_SCENESUBJECT.BOK_DETAIL_ID) "bokDetailId",**/
+               BOK_SCENESUBJECT.BOK_DETAIL_ID "bokDetailId",
+               BOK_SCENESUBJECT.BOOKSET_ID booksetId,
+               BOK_TABLEDICT.DICT_SOURCE as dictSource
+        FROM BOK_SCENESUBJECT BOK_SCENESUBJECT
+        INNER JOIN SCIDS 
+            ON SCIDS.BOOKSET_ID = BOK_SCENESUBJECT.BOOKSET_ID
+            AND INSTR(BOK_SCENESUBJECT.SCENE_NODE_ID, SCIDS.SCENE_NODE_ID) = 1
+        LEFT JOIN BOK_SUBJECT BOK_SUBJECT
+            ON BOK_SUBJECT.BOOKSET_ID = BOK_SCENESUBJECT.BOOKSET_ID
+            AND BOK_SCENESUBJECT.SUBJECT_NO = BOK_SUBJECT.SUBJECT_NO
+        LEFT JOIN BOK_TABLEDICT BOK_TABLEDICT
+            ON BOK_TABLEDICT.BOOKSET_ID = BOK_SCENESUBJECT.BOOKSET_ID
+            AND BOK_TABLEDICT.DICT_ID = BOK_SCENESUBJECT.FORM_ELE
+        /** 关联科目性质内部代码规则表，判断是否生成底层科目。若生成底层科目，关联场景科目关系扩展表 **/
+        LEFT JOIN BOK_SUBJECT_INTERNAL_RULE internalRule
+            ON internalRule.BOOKSET_ID = BOK_SCENESUBJECT.BOOKSET_ID
+            AND internalRule.SUBJECT_INTERNAL_CODE = BOK_SCENESUBJECT.SUBJECT_NO
+        /** LEFT JOIN BOK_SCENESUBJECT_EXT scenExt
+            ON scenExt.BOOKSET_ID = BOK_SCENESUBJECT.BOOKSET_ID
+            AND scenExt.TABLE_ID = SCIDS.NODE_VALUE
+            AND scenExt.SUBJECT_NO = BOK_SCENESUBJECT.SUBJECT_NO
+            AND scenExt.DICT_ID = BOK_SCENESUBJECT.FORM_ELE
+            AND internalRule.GEN_DETSUB_RULE IS NOT NULL 只有生成底层科目,才需要扩展表 **/
+        WHERE BOK_SCENESUBJECT.BOOKSET_ID = #{booksetId}
+        ORDER BY BOK_SCENESUBJECT.SCENE_NODE_ID
+    </select>
+
+    <!-- 根据内部编码查询对应科目信息-->
+    <select id="getSubjectByInternalCode" resultType="com.joyintech.tams.common.base.entity.BokSubject"
+            parameterType="java.util.Map">
+        SELECT
+        B.BOOKSET_ID,
+        A.SUBJECT_NO,
+        A.SUBJECT_NAME,
+        A.FSUBJECT_ID,
+        A.BAL_FLAG,
+        A.SUBJECT_TYPE,
+        A.SUBJECT_LEVEL,
+        A.ACC_QUA_FLAG,
+        A.ACC_INT_FLAG,
+        A.OVERDRAWN_FLAG,
+        A.GEN_DETSUB_FLAG,
+        A.BASE_SUBJECT_NATURE,
+        A.INV_AIM,
+        A.SEC_MANAGE_ACCT_ID,
+        A.SUBJECT_INTERNAL_CODE,
+        A.SUBJECT_HAND_FEL_CODE,
+        A.CCY
+        FROM BOK_SUBJECT A
+        INNER JOIN BOK_BOOKSET B
+        ON (A.BOOKSET_ID = B.BOOKSET_ID_TMPL OR A.BOOKSET_ID = B.BOOKSET_ID)
+        WHERE 1=1
+            AND A.SUBJECT_INTERNAL_CODE IS NOT NULL
+        <if test="booksetId != null and booksetId != ''">
+            AND B.BOOKSET_ID = #{booksetId}
+        </if>
+        <if test="ccy != null and ccy != ''">
+            AND A.CCY = #{ccy}
+        </if>
+        <if test="isAcc != null and isAcc != ''">
+            /** 查询核算科目，且科目配置项不为空**/
+            AND A.IS_ACC = #{isAcc}
+        </if>
+        <if test="listSubjectInternalCode != null and listSubjectInternalCode.size >0">
+            AND A.SUBJECT_INTERNAL_CODE IN
+            <foreach collection="listSubjectInternalCode" item="item" index="index" open="(" close=")" separator=",">
+                /**(index % 1000) == 999" 这种写法超过2000条会报错**/
+                <if test="(index % 999) == 998">
+                    NULL) OR A.SUBJECT_INTERNAL_CODE  IN (
+                </if>
+                #{item}
+            </foreach>
+        </if>
+
+    </select>
+
+</mapper>

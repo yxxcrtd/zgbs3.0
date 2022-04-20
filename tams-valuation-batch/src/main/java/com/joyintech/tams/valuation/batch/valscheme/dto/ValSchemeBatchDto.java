@@ -11,6 +11,8 @@
 package com.joyintech.tams.valuation.batch.valscheme.dto;
 
 import com.joyintech.framework.base.BaseEntity;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.batch.common.base.spring.annotation.BaseEntityClassName;
 
 import java.math.BigDecimal;
@@ -132,6 +134,11 @@ public class ValSchemeBatchDto extends BaseEntity {
      * 科目余额期待方向
      */
     private String expectBalFlag;
+
+    /**
+     * 估值方法
+     */
+    private String valuationMethod;
 
 
     /**
@@ -409,5 +416,35 @@ public class ValSchemeBatchDto extends BaseEntity {
 
     public void setExpectBalFlag(String expectBalFlag) {
         this.expectBalFlag = expectBalFlag;
+    }
+
+    // add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 end
+    /**
+     * 获取 估值方法
+     * @return 估值方法
+     */
+    public String getValuationMethod() {
+        return valuationMethod;
+    }
+
+    /**
+     * 设置 估值方法
+     * @param valuationMethod 估值方法
+     */
+    public void setValuationMethod(String valuationMethod) {
+        this.valuationMethod = valuationMethod;
+    }
+
+    /**
+     * 是否使用摊余成本法
+     * @return 是否使用摊余成本法
+     */
+    public boolean getIsAcMethod(){
+        if(StringUtil.equals(DictCodeListExt1.估值方法_摊余成本法.getValue(), this.getValuationMethod())){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 }

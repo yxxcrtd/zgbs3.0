@@ -14,9 +14,9 @@ package com.joyintech.service.valuation.trademanage.bondlend.controller;
 import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.service.valuation.trademanage.bond.dto.TrdBondTradeResult;
-import com.joyintech.service.valuation.trademanage.bondlend.dto.TrdBondLendTrade002Dto;
-import com.joyintech.service.valuation.trademanage.bondlend.dto.TrdBondLendTrade003Dto;
+import com.joyintech.service.valuation.trademanage.bondlend.dto.TrdBondLendTrade001Dto;
+import com.joyintech.service.valuation.trademanage.bondlend.dto.TrdBondLendTradeDto;
+import com.joyintech.service.valuation.trademanage.bondlend.dto.TrdBondLendTradeResult;
 import com.joyintech.service.valuation.trademanage.bondlend.service.TrdBondLendTrade002Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +47,7 @@ public class TrdBondLendTrade002Controller {
      *             异常
      */
     @PostMapping("queryTradeInfoByTradeId")
-    public TrdBondLendTrade002Dto queryTradeInfoByTradeId(@RequestBody String tradeId) {
+    public TrdBondLendTradeDto queryTradeInfoByTradeId(@RequestBody String tradeId) {
         return trdBondLendTrade002Service.queryTradeInfoByTradeId(tradeId);
     }
 
@@ -59,7 +59,7 @@ public class TrdBondLendTrade002Controller {
      *             异常
      */
     @PostMapping("queryInfoByTradeId")
-    public TrdBondLendTrade003Dto queryInfoByTradeId(@RequestBody String tradeId) {
+    public TrdBondLendTrade001Dto queryInfoByTradeId(@RequestBody String tradeId) {
         return trdBondLendTrade002Service.queryInfoByTradeId(tradeId);
     }
 
@@ -98,7 +98,7 @@ public class TrdBondLendTrade002Controller {
     @Transactional
     @DTXTransaction
     @RequestMapping("insert")
-    public int insert(@RequestBody TrdBondTradeResult dto)
+    public int insert(@RequestBody TrdBondLendTradeResult dto)
             throws Exception {
         return trdBondLendTrade002Service.insert(dto);
     }
@@ -113,7 +113,7 @@ public class TrdBondLendTrade002Controller {
     @Transactional
     @DTXTransaction
     @RequestMapping("update")
-    public int update(@RequestBody TrdBondTradeResult dto)
+    public int update(@RequestBody TrdBondLendTradeResult dto)
             throws Exception {
         return trdBondLendTrade002Service.update(dto);
     }

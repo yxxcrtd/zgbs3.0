@@ -10,6 +10,8 @@
 
 package com.joyintech.tams.valuation.batch.common.accounting.entity;
 
+import com.joyintech.tams.common.base.entity.BokSubject;
+
 import java.math.BigDecimal;
 
 /**
@@ -76,6 +78,11 @@ public class StayDrawSubprdEntity extends PrdCashEntity {
      * 实收资本
      */
     private BigDecimal capital;
+
+    /**
+     * 费用科目信息
+     */
+    private BokSubject feeSubjectNo;
     
     
     /**
@@ -310,5 +317,19 @@ public class StayDrawSubprdEntity extends PrdCashEntity {
         this.capital = capital;
     }
 
-    
+    /**
+     * 获取 费用科目信息
+     * @return 费用科目信息
+     */
+    public BokSubject getFeeSubjectNo() {
+        return feeSubjectNo;
+    }
+
+    /**
+     * 设置 费用科目信息
+     * @param feeSubjectNo 费用科目信息
+     */
+    public void setFeeSubjectNo(BokSubject feeSubjectNo) {
+        this.feeSubjectNo = feeSubjectNo;
+    }
 }

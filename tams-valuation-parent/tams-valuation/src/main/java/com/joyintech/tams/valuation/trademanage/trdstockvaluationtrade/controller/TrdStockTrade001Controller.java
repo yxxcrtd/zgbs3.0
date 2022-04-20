@@ -22,7 +22,7 @@ import com.joyintech.system.constant.SystemGlobalConstant;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
-import com.joyintech.tams.valuation.trademanage.trdstockvaluationtrade.dto.TrdStockTrade001Dto;
+import com.joyintech.tams.valuation.trademanage.trdstockvaluationtrade.dto.TrdStockTradeDto;
 import com.joyintech.tams.valuation.trademanage.trdstockvaluationtrade.service.TrdStockTrade001Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -66,7 +66,7 @@ public class TrdStockTrade001Controller extends BaseController {
     @Override
     public String init(Model model) {
 
-        this.setSelectOptionToModel(model, DictCode.交易方向);
+        this.setSelectOptionToModel(model, DictCode.交易方向,DictCode.生成方式);
         return super.init(model);
     }
     /**
@@ -79,7 +79,7 @@ public class TrdStockTrade001Controller extends BaseController {
      */
     @RequestMapping("findPage")
     @ResponseBody
-    public Page<TrdStockTrade001Dto> findPage()
+    public Page<TrdStockTradeDto> findPage()
         throws Exception {
         return trdStockTrade001Service.findPage(RequestUtil.getPageParam());
     }
@@ -100,21 +100,6 @@ public class TrdStockTrade001Controller extends BaseController {
     }
 
     /**
-     * 资产代码下拉框
-     *
-     * @return 资产代码
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("/getAssetId")
-    public List<SelectOptionDto> getAssetId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("assetType","F10");
-        return commonBusinessService.getAssetName(param);
-    }
-
-    /**
      * 删除前判断
      *
      * @param dto
@@ -124,38 +109,26 @@ public class TrdStockTrade001Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("check")
-    public AjaxResult check(@RequestBody @Valid TrdStockTrade001Dto dto,
+    public AjaxResult check(@RequestBody @Valid TrdStockTradeDto dto,
                                   BindingResult result) throws ParseException {
 
-        List<TrdStockTrade001Dto> list = dto.getSelectedItem();
+        List<TrdStockTradeDto> list = dto.getSelectedItem();
         if(list==null||list.size()<=0){
             return new AjaxResult("请选择数据", MessageType.错误消息);
         }
         //删除时的校验
         if(StringUtil.isNotEmpty(list) && "delete".equals(dto.getOperateType())) {
-            for (TrdStockTrade001Dto item : list) {
+            for (TrdStockTradeDto item : list) {
                 //1.判断是否在流程中
                 //判断当前流程是否存在
                 if (trdStockTrade001Service.checkBusinessDataInFlow(item)) {
                     //流程存在情况
                     return new AjaxResult("交易编号：" + item.getTradeId() + "已存在流程中", MessageType.错误消息);
                 }
-//                //2.判断交易日等于平台日
-//                String tradeDate = item.getTradeDate();
-//                // 系统平台日
-//                Date sysDate = baseCommonService.getSysDate();
-//                if (StringUtil.isNotEmpty(tradeDate)) {
-//                    Date bDate = DateUtil.parseDate(tradeDate, "yyyy-MM-dd");
-//                    if (DateUtil.compareDate(sysDate, bDate) != 0) {
-//                        return new AjaxResult("只能删除交易日等于平台日的交易", MessageType.错误消息);
-//                    } else {
-//                        return new AjaxResult("确定要删除？", MessageType.确认消息);
-//                    }
-//                }
 
             }
         }else if("edit".equals(dto.getOperateType())){
-                for (TrdStockTrade001Dto item : list) {
+                for (TrdStockTradeDto item : list) {
                     //1.判断是否在流程中
                     //判断当前流程是否存在
                     if(trdStockTrade001Service.checkBusinessDataInFlow(item)){
@@ -169,7 +142,7 @@ public class TrdStockTrade001Controller extends BaseController {
 
     @ResponseBody
     @RequestMapping(ACTION_DELETE)
-    public AjaxResult delete(@RequestBody @Valid TrdStockTrade001Dto dto, BindingResult br)
+    public AjaxResult delete(@RequestBody @Valid TrdStockTradeDto dto, BindingResult br)
     {
 
         if (br.hasErrors()) {
@@ -177,8 +150,8 @@ public class TrdStockTrade001Controller extends BaseController {
         }
 
         // 启动流程
-        ProcessParameter<TrdStockTrade001Dto> proParam = new ProcessParameter<>();
-        WorkFlowParameter<TrdStockTrade001Dto> params = new WorkFlowParameter<>();
+        ProcessParameter<TrdStockTradeDto> proParam = new ProcessParameter<>();
+        WorkFlowParameter<TrdStockTradeDto> params = new WorkFlowParameter<>();
 
         // 业务代码（凭证流水号）
         params.setBusinessCode(item -> item.getTradeId());
@@ -190,8 +163,8 @@ public class TrdStockTrade001Controller extends BaseController {
         params.setElementId(dto.getElementId());
 
         // 设置流程业务说明, entity即传入的dto
-        params.setComment(entity -> WorkFlowUtil.concatComment("股票交易查询删除：", entity.getTradeId(),
-                entity.getTradeDate()
+        params.setComment(entity -> WorkFlowUtil.concatComment("股票交易删除：", entity.getTradeId(),
+                DateUtil.format(entity.getTradeDate())
         ));
 
         // 塞入流程参数
@@ -200,7 +173,7 @@ public class TrdStockTrade001Controller extends BaseController {
         String msg = getMessage("COMMON_I_0001");
         try {
             msg = trdStockTrade001Service.start(proParam, dto.getSelectedItem().toArray(
-                    new TrdStockTrade001Dto[dto.getSelectedItem().size()]));
+                    new TrdStockTradeDto[dto.getSelectedItem().size()]));
         }
         catch (Exception e) {
             getLogger().error("启动流程失败：", e);
@@ -219,42 +192,11 @@ public class TrdStockTrade001Controller extends BaseController {
      * @see
      * @since 1.0
      */
-//    @RequestMapping(ACTION_EXPORT)
-//    public ResponseEntity<byte[]> export()
-//        throws Exception {
-//        return trdStockTrade001Service.export(this.getPageId(), RequestUtil.getPageParam());
-//    }
-
-    /**
-     * 导出数据 <一句话功能简述> <功能详细描述>
-     *
-     * @return List<ValFundMarketInfo001dto>
-     * @throws Exception Exception
-     */
     @RequestMapping(ACTION_EXPORT)
     public ResponseEntity<byte[]> export()
-            throws ParseException, IOException {
-
-        String datas = this.getParam("datas");
-        Map<String, Object> params = RequestUtil.getPageParam();
-        List<TrdStockTrade001Dto> listdto;
-        if (datas != null) {
-            listdto = JsonUtils.json2List(datas, TrdStockTrade001Dto.class);
-        }
-        else {
-            listdto = trdStockTrade001Service.queryPageList(params);
-        }
-
-        File outFile = trdStockTrade001Service.makeFile(
-                "/com/joyintech/tams/valuation/trademanage/trdstockvaluationtrade/conf/export_conf.xml",
-                listdto);
-        return ExportUtil.export(
-                this.getMessage(this.getPageId()) + SystemGlobalConstant.OPEN_PARENTHESIS
-                        + DateUtil.format(new Date())
-                        + SystemGlobalConstant.CLOSE_PARENTHESIS
-                        + SystemGlobalConstant.POINT
-                        + FileNameUtil.getFileExtName(outFile),
-                outFile, true);
+        throws Exception {
+        return trdStockTrade001Service.export(this.getPageId(), RequestUtil.getPageParam());
     }
+
 
 }

@@ -141,7 +141,7 @@ public class DrawBaseInfoSelectComReaderService {
         String hisKey = "";
         for (DrawBaseInfoSelectComDTO hisDTO : listHisDrawBaseInfoSelectComDTO) {
             hisKey = hisDTO.getBooksetId().trim() + hisDTO.getBokDetailId().trim() + hisDTO.getBaseSubjectNature().trim()
-                     + hisDTO.getoCcy().trim() + hisDTO.getHappenDate().toString().trim();
+                    + hisDTO.getoCcy().trim() + hisDTO.getHappenDate().toString().trim();
             if (currMap.get(hisKey) == null) {
                 mergeList.add(hisDTO);
             }

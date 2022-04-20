@@ -19,12 +19,13 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
-import com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTrade002Dto;
+import com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeDto;
 import com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.service.TrdBondChangeTrade001Service;
 import com.joyintech.tams.valuation.trademanage.trdbondchangevaluationtrade.service.TrdBondChangeTrade002Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -35,21 +36,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 债券交易新建
+ * 证券转换交易新建
  *
- * @author Zane.Y
- * @version 1.0 2018年9月7日
+ * @author sunshuaishuai
+ * @version 1.0 2021年01月04日
  * @see TrdBondChangeTrade002Controller
  * @since 1.0
  */
@@ -74,37 +75,23 @@ public class TrdBondChangeTrade002Controller extends BaseController {
         // 工作流ID
         String workflowId = this.getParam(GlobalConstant.WORKFLOW_ID);
 
-        String operateType = this.getParam("operateType");
-
         String tradeId = getParam("tradeId");
 
+        //平台日
+        model.addAttribute("iPlatformDate", DateUtil.parse(DateUtil.getSysDate()));
+
         if(StringUtil.isNotEmpty(workflowId)){
-            TrdBondChangeTrade002Dto entity= trdBondChangeTrade002Service.getBussinessEntityByWorkflowId(workflowId);
+            TrdBondChangeTradeDto entity= trdBondChangeTrade002Service.getBussinessEntityByWorkflowId(workflowId);
             model.addAttribute("entity", entity);
             model.addAttribute("workflowId", workflowId);
 
         }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){
-            TrdBondChangeTrade002Dto entity = trdBondChangeTrade002Service.queryTradeInfoByTradeId(tradeId);
+            TrdBondChangeTradeDto entity = trdBondChangeTrade002Service.queryTradeInfoByTradeId(tradeId);
             model.addAttribute("entity", entity);
         }
 
 
         return super.init(model);
-    }
-
-    /**
-     * 产品代码下拉框
-     *
-     * @return 产品代码
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("/getFinprodId")
-    public List<SelectOptionDto> getFinprodId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("finprodType","F16");
-        return commonBusinessService.getProdId(param);
     }
 
     /**
@@ -206,23 +193,6 @@ public class TrdBondChangeTrade002Controller extends BaseController {
         return trdBondChangeTrade002Service.selectInfoBySecId(map);
     }
 
-
-    /**
-     * 通过产品代码查询证券账户
-     *
-     * @return 产品代码列表
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("selectInfoByProdId")
-    public List<SelectOptionDto> selectInfoByProdId() {
-        Map<String,Object> map=RequestUtil.getPageParam();
-
-        return commonBusinessService.getProdId(map);
-    }
-
-
     /**
      * 资金账户下拉框
      *
@@ -241,7 +211,7 @@ public class TrdBondChangeTrade002Controller extends BaseController {
     /**
      * 确认校验
      *
-     * @param trdBondChangeTrade002Dto 参数
+     * @param trdBondChangeTradeDto 参数
      * @param result 校验结果
      * @return AjaxResult
      * @see
@@ -249,9 +219,10 @@ public class TrdBondChangeTrade002Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("check")
-    public AjaxResult check(@Valid @RequestBody TrdBondChangeTrade002Dto trdBondChangeTrade002Dto,
+    public AjaxResult check(@RequestBody @Validated({
+            ValidateGroupEdit.class}) TrdBondChangeTradeDto trdBondChangeTradeDto,
                               BindingResult result) {
-        return commonCheck(result, trdBondChangeTrade002Dto.getOperateType());
+        return commonCheck(result, trdBondChangeTradeDto.getOperateType());
     }
 
 
@@ -266,15 +237,16 @@ public class TrdBondChangeTrade002Controller extends BaseController {
      */
     @RequestMapping("save")
     @ResponseBody
-    AjaxResult save(@RequestBody @Valid TrdBondChangeTrade002Dto dto, BindingResult br)
+    AjaxResult save(@RequestBody @Validated({
+            ValidateGroupEdit.class}) TrdBondChangeTradeDto dto, BindingResult br)
         throws Exception {
 
         if (br.hasErrors()) {
             return new AjaxResult(br);
         }
 
-        ProcessParameter<TrdBondChangeTrade002Dto> processParameter = new ProcessParameter<>();
-        WorkFlowParameter<TrdBondChangeTrade002Dto> workFlowParameter = new WorkFlowParameter<>();
+        ProcessParameter<TrdBondChangeTradeDto> processParameter = new ProcessParameter<>();
+        WorkFlowParameter<TrdBondChangeTradeDto> workFlowParameter = new WorkFlowParameter<>();
         processParameter.setWorkFlowParameter(workFlowParameter);
         processParameter.setPageId(this.getPageId());
 
@@ -290,7 +262,7 @@ public class TrdBondChangeTrade002Controller extends BaseController {
         workFlowParameter.setBusinessType(DictCodeListExt2.业务类型_证券转换交易.getValue());
         workFlowParameter.setComment((entity) -> WorkFlowUtil.concatComment(
             getMessage("交易编号") + GlobalConstant.COLON + entity.getTradeId(),
-            getMessage("交易日") + GlobalConstant.COLON + entity.getTradeDate()));
+            getMessage("交易日") + GlobalConstant.COLON + DateUtil.format(entity.getTradeDate())));
 
         String msg = trdBondChangeTrade002Service.start(processParameter, dto);
 

@@ -165,6 +165,11 @@ public class ValBokSubjectDto extends BokSubject implements ITableRow {
                             key=substr;
                         }
                         str=getDictValue(key,str.replaceAll("'",""));
+                        if(("Y").equals(str)){
+                            str = "是";
+                        }
+                    }else if(str.contains("DEFAULT")){
+                        str ="默认";
                     }
                     sb.append(str);
                 }
@@ -723,4 +728,136 @@ public class ValBokSubjectDto extends BokSubject implements ITableRow {
 
     }
 
+    /*add by sunshuaishuai 辅助核算项 20220406 start*/
+    /**
+     * 辅助核算项type1
+     */
+    private String type1;
+
+    /**
+     * 辅助核算项type2
+     */
+    private String type2;
+
+    /**
+     * 辅助核算项type3
+     */
+    private String type3;
+
+    /**
+     * 辅助核算项type4
+     */
+    private String type4;
+
+    /**
+     * 辅助核算项type5
+     */
+    private String type5;
+
+    /**
+     * 辅助核算项type6
+     */
+    private String type6;
+
+    /**
+     * 辅助核算项type7
+     */
+    private String type7;
+
+    /**
+     * 辅助核算项type8
+     */
+    private String type8;
+
+    /**
+     * 辅助核算项type9
+     */
+    private String type9;
+
+    /**
+     * 默认
+     */
+    private String typeDefault;
+
+    public String getType1() {
+        return type1;
+    }
+
+    public void setType1(String type1) {
+        this.type1 = type1;
+    }
+
+    public String getType2() {
+        return type2;
+    }
+
+    public void setType2(String type2) {
+        this.type2 = type2;
+    }
+
+    public String getType3() {
+        return type3;
+    }
+
+    public void setType3(String type3) {
+        this.type3 = type3;
+    }
+
+    public String getType4() {
+        return type4;
+    }
+
+    public void setType4(String type4) {
+        this.type4 = type4;
+    }
+
+    public String getType5() {
+        return type5;
+    }
+
+    public void setType5(String type5) {
+        this.type5 = type5;
+    }
+
+    public String getType6() {
+        return type6;
+    }
+
+    public void setType6(String type6) {
+        this.type6 = type6;
+    }
+
+    public String getType7() {
+        return type7;
+    }
+
+    public void setType7(String type7) {
+        this.type7 = type7;
+    }
+
+    public String getType8() {
+        return type8;
+    }
+
+    public void setType8(String type8) {
+        this.type8 = type8;
+    }
+
+    public String getType9() {
+        return type9;
+    }
+
+    public void setType9(String type9) {
+        this.type9 = type9;
+    }
+
+    public String getTypeDefault() {
+        return typeDefault;
+    }
+
+    public void setTypeDefault(String typeDefault) {
+        this.typeDefault = typeDefault;
+    }
+
+    /*add by sunshuaishuai 辅助核算项 20220406 end*/
 }

@@ -189,9 +189,9 @@ public class ValuationMethodScheme003Controller extends BaseController {
 				&& !DictCodeListExt1.证券品种_计划类资产_净值型.getValue().equals(dto.getSecType())
 				&& !DictCodeListExt1.证券品种_计划类资产_货币型.getValue().equals(dto.getSecType())
 				&& !DictCodeListExt1.证券品种_计划类资产_收益型.getValue().equals(dto.getSecType())) {
-			if(StringUtils.isEmpty(dto.getTradeMarket())) {
-				bindingResult.rejectValue("tradeMarket", "NotBlank", "交易场所不能为空！");
-			}
+//			if(StringUtils.isEmpty(dto.getTradeMarket())) {
+//				bindingResult.rejectValue("tradeMarket", "NotBlank", "交易场所不能为空！");
+//			}
 		}
 
 		if (DictCodeListExt1.估值方法_市值成本孰低法.getValue().equals(dto.getValuationMethod())

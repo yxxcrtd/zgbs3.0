@@ -11,6 +11,7 @@
 package com.joyintech.tams.valuation.trademanage.trdintovaluationduration.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
@@ -20,6 +21,9 @@ import com.joyintech.system.constant.SystemGlobalConstant;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 
+import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.trdintovaluationduration.dto.TrdIntoValuationDuration001Dto;
 import com.joyintech.tams.valuation.trademanage.trdintovaluationduration.service.TrdIntoValuationDuration001Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -53,17 +57,17 @@ import java.util.Map;
 @Controller
 public class TrdIntoValuationDuration001Controller extends BaseController {
 
-
     @Autowired
     private TrdIntoValuationDuration001Service trdIntoValuationDuration001Service;
 
+    @Autowired
+    private CommonBusinessService commonBusinessService;
+
     @Override
     public String init(Model model) {
-        this.setSelectOptionToModel(model,DictCode.交易方向,DictCode.交易场所,
-                DictCode.交易流程状态);
+        this.setSelectOptionToModel(model,DictCode.交易方向,DictCode.交易场所);
         return super.init(model);
     }
-
 
     @RequestMapping("findPage")
     @ResponseBody
@@ -74,35 +78,76 @@ public class TrdIntoValuationDuration001Controller extends BaseController {
         return page;
     }
 
+    /**
+     * 产品代码下拉框
+     *
+     * @return 产品代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getFinprodId")
+    public List<SelectOptionDto> getFinprodId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("finprodType","F16");
+        return commonBusinessService.getProdName(param);
+    }
 
     /**
-     * 自定义产品代码下拉框
-     * @param request
+     * 资产代码下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getAssetId")
+    public List<SelectOptionDto> getAssetId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("assetType","F01");
+        return commonBusinessService.getAssetId(param);
+    }
+
+    /**
+     * 删除前判断
+     *
+     * @param dto
+     * @param result
      * @return
+     * @throws Exception
      */
-    @RequestMapping("/findPortfolioId")
     @ResponseBody
-    public Page<SelectOptionDto> findPortfolioId(HttpServletRequest request) {
-        Map<String, Object> param =RequestUtil.getPageParam();
-        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-//        param.put("finprodType", "F01"); //测试
-        return trdIntoValuationDuration001Service.findPortfolioId(param);
+    @RequestMapping("check")
+    public AjaxResult check(@RequestBody @Valid TrdIntoValuationDuration001Dto dto,
+                            BindingResult result) throws ParseException {
+
+        List<TrdIntoValuationDuration001Dto> list = dto.getSelectedItem();
+        if(list==null||list.size()<=0){
+            return new AjaxResult("请选择数据", MessageType.错误消息);
+        }
+        //删除时的校验
+        if(StringUtil.isNotEmpty(list) && "delete".equals(dto.getOperateType())) {
+            for (TrdIntoValuationDuration001Dto item : list) {
+                //1.判断是否在流程中
+                //判断当前流程是否存在
+                if (trdIntoValuationDuration001Service.checkBusinessDataInFlow(item)) {
+                    //流程存在情况
+                    return new AjaxResult("交易编号：" + item.getTradeId() + "已存在流程中", MessageType.错误消息);
+                }
+
+            }
+        }else if("edit".equals(dto.getOperateType())){
+            for (TrdIntoValuationDuration001Dto item : list) {
+                //1.判断是否在流程中
+                //判断当前流程是否存在
+                if(trdIntoValuationDuration001Service.checkBusinessDataInFlow(item)){
+                    //流程存在情况
+                    return new AjaxResult("交易编号："+item.getTradeId()+"已存在流程中", MessageType.错误消息);
+                }
+            }
+        }
+        return new AjaxResult();
     }
-
-
-    /**
-     * 自定义资产代码下拉框
-     */
-    @RequestMapping("/findFinprodId")
-    @ResponseBody
-    public Page<SelectOptionDto> findFinprodId(HttpServletRequest request) {
-        Map<String, Object> param =RequestUtil.getPageParam();
-        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-        param.put("finprodType", "F01"); //测试
-        return trdIntoValuationDuration001Service.findFinprodId(param);
-    }
-
-
 
     //删除
     @ResponseBody
@@ -119,14 +164,14 @@ public class TrdIntoValuationDuration001Controller extends BaseController {
         // 业务代码（凭证流水号）
         params.setBusinessCode(item -> item.getTradeId());
         // 业务类型
-        params.setBusinessType(DictCodeList.业务类型_银行间债券交易.getValue());
+        params.setBusinessType(DictCodeListExt3.共通业务类型_融入券存续期.getValue());
         // 页面id
-        params.setPageId("BondTradeQuery001");
+        params.setPageId("TrdIntoValuationDuration002");
         // 元素id
         params.setElementId(dto.getElementId());
 
         // 设置流程业务说明, entity即传入的dto
-        params.setComment(entity -> WorkFlowUtil.concatComment("存款类存续期删除：", entity.getTradeId(),
+        params.setComment(entity -> WorkFlowUtil.concatComment("融入券存续期删除：", entity.getTradeId(),
                 DateUtil.format(entity.getTradeDate(),DateUtil.DEFAULT_DATETIME_FORMAT)
         ));
 
@@ -145,8 +190,7 @@ public class TrdIntoValuationDuration001Controller extends BaseController {
 
         return new AjaxResult(msg);
     }
-//
-//
+
     /**
      * 导出数据
      */
@@ -173,4 +217,5 @@ public class TrdIntoValuationDuration001Controller extends BaseController {
                         + FileNameUtil.getFileExtName(outFile),
                 outFile, true);
     }
+
 }

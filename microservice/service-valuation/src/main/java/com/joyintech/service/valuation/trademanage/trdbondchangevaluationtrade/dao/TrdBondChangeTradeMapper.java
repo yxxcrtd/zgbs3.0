@@ -12,8 +12,7 @@ package com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.
 
 
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTrade001Dto;
-import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTrade002Dto;
+import com.joyintech.service.valuation.trademanage.trdbondchangevaluationtrade.dto.TrdBondChangeTradeDto;
 import com.joyintech.tams.common.base.entity.FinProduct;
 import org.springframework.stereotype.Repository;
 
@@ -39,7 +38,7 @@ public interface TrdBondChangeTradeMapper {
      * @see
      * @since 1.0
      */
-    List<TrdBondChangeTrade001Dto> selectDeal(Map<String, Object> paraMap);
+    List<TrdBondChangeTradeDto> selectDeal(Map<String, Object> paraMap);
 
     /**
      *
@@ -74,7 +73,7 @@ public interface TrdBondChangeTradeMapper {
 
     int querySequences();
 
-    TrdBondChangeTrade002Dto queryTradeInfoByTradeId(String tradeId);
+    TrdBondChangeTradeDto queryTradeInfoByTradeId(String tradeId);
 
     List<SelectOptionDto> getSecExgId(Map<String, Object> map);
 

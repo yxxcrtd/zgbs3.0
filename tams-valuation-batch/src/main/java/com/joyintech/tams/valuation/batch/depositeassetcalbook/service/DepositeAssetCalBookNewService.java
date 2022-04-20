@@ -232,7 +232,7 @@ public class DepositeAssetCalBookNewService {
             if(DictCodeList.存款类资产类型_GZ_活期类资产.getValue().equals(targetFinProduct.getType1())) {
                 interestBlanceForYstVar = this.getSubjectBalance(dto.getBooksetId(),
                         dto.getBokDetailId(), happenDateNow, bookDateNow,
-                        DictCodeList.余额方向_借方.getValue(), DictCodeBaseSubjectNatrueNew.活期存款_应计利息.getValue(),
+                        DictCodeList.余额方向_借方.getValue(), DictCodeBaseSubjectNatrueNew.定期存款_应计利息.getValue(),
                         taskPri);
                 if(costBalance != null && BigDecimal.ZERO.compareTo(costBalance)<0) {
                     // 定义 变量.本金列表
@@ -502,7 +502,9 @@ public class DepositeAssetCalBookNewService {
             ad.setAccountSceneMap(accountSceneMap);// 记账场景要素
             ad.setAccountAmountMap(accountAmountMap);// 记账金额要素
             ad.setAccountCurrencyMap(accountCurrencyMap);// 记账金额币种要素
-
+            // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 start
+            ad.setSubjectMappingConfigDefault(dto.getSubjectMappingConfig());
+            // add by weipeng on 20220302:会计引擎升级改造，增加辅助核算项入参 end
             // 记账凭证生成
             BookGenerateResult resultNowNow = bookLogicNew.genAccount(ad, new SysBatchExecInfo());
             // 因为当前属于同一个维度，故将生成的账务名中的账务明细（当前表）数据，累加到返回数据中

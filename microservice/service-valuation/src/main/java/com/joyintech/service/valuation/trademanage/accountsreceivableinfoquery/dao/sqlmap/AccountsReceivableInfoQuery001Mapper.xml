@@ -12,7 +12,19 @@
 		 LEFT JOIN FIN_PRODUCT C
 		    ON B.BUSI_ID = C.FINPROD_ID
 		   AND B.BUSI_DETAIL_TYPE = C.FINPROD_TYPE
-		 WHERE A.BASE_SUBJECT_NATURE IN ('QTYSK_BJ', 'QTYSK_LX')
+		 WHERE
+
+		 /**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 start**/
+		<choose>
+		<when test="accountEntryType =='02' ">
+			A.BASE_SUBJECT_NATURE IN ('QTYSK_QT')
+		</when>
+		<otherwise>
+			A.BASE_SUBJECT_NATURE IN ('QTYSK_BJ', 'QTYSK_LX')
+		</otherwise>
+		</choose>
+		/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 end**/
+
 		 <if test="bookSetId !=null and bookSetId !='' " >
 		 		AND A.BOOKSET_ID = #{bookSetId}                                                    
 		 </if> 	
@@ -39,7 +51,17 @@
 		          A.O_AMT_HAPPEN_DATE,
 		          row_number() over (PARTITION BY A.BOOKSET_ID,A.BOK_DETAIL_ID,A.BASE_SUBJECT_NATURE,A.SUBJECT_NO, A.BRANCH ORDER BY A.BOOK_ORDER desc) as newResult
 		          FROM  BOK_BOOKDETAIL_CURRENT A         
-		          WHERE A.BASE_SUBJECT_NATURE IN ('QTYSK_BJ','QTYSK_LX')
+		          WHERE
+					/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 start**/
+					<choose>
+						<when test="accountEntryType =='02' ">
+							A.BASE_SUBJECT_NATURE IN ('QTYSK_QT')
+						</when>
+						<otherwise>
+							A.BASE_SUBJECT_NATURE IN ('QTYSK_BJ', 'QTYSK_LX')
+						</otherwise>
+					</choose>
+					/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 end**/
 		          AND A.BOOK_DATE &lt;= to_date(#{bookDate},'yyyy-MM-dd')    /**账务日期**/
 		          <if test="receivablesType != null and receivablesType != ''">
 		          	AND A.BASE_SUBJECT_NATURE = #{receivablesType} 
@@ -63,8 +85,19 @@
 		     B.BUSI_DETAIL_TYPE AS FINPROD_TYPE,
 		     A.BRANCH,
 		     A.BASE_SUBJECT_NATURE,
-		     SUM(CASE WHEN A.BASE_SUBJECT_NATURE ='QTYSK_BJ' THEN A.O_AMT_HAPPEN_DATE ELSE 0 END) AS PRINAMT,
-		     SUM(CASE WHEN A.BASE_SUBJECT_NATURE ='QTYSK_LX' THEN A.O_AMT_HAPPEN_DATE ELSE 0 END) AS INTAMT
+		/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 start**/
+		<choose>
+			<when test="accountEntryType =='02' ">
+				SUM(CASE WHEN A.BASE_SUBJECT_NATURE ='QTYSK_QT' THEN A.O_AMT_HAPPEN_DATE ELSE 0 END) AS PRINAMT,
+				SUM(CASE WHEN A.BASE_SUBJECT_NATURE ='QTYSK_LX' THEN A.O_AMT_HAPPEN_DATE ELSE 0 END) AS INTAMT
+			</when>
+			<otherwise>
+				SUM(CASE WHEN A.BASE_SUBJECT_NATURE ='QTYSK_BJ' THEN A.O_AMT_HAPPEN_DATE ELSE 0 END) AS PRINAMT,
+				SUM(CASE WHEN A.BASE_SUBJECT_NATURE ='QTYSK_LX' THEN A.O_AMT_HAPPEN_DATE ELSE 0 END) AS INTAMT
+			</otherwise>
+		</choose>
+		/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 end**/
+
 		   FROM BASE_CURRENT A,BOK_DETAIL_ID B
 		   WHERE A.BOOKSET_ID = B.BOOKSET_ID
 		   AND A.BOK_DETAIL_ID = B.BOK_DETAIL_ID
@@ -104,9 +137,22 @@
 		  B.FINPROD_NAME   AS bdFinprodName ,/**标的资产名称**/     
 		  A.prinamt,                  
 		  A.intamt,
-		  CASE WHEN A.BASE_SUBJECT_NATURE = 'QTYSK_LX' THEN TO_CHAR(D.VDATE,'yyyy-MM-dd') ELSE NULL END vdate, /**计息开始日**/                  
-		  CASE WHEN A.BASE_SUBJECT_NATURE = 'QTYSK_LX' THEN TO_CHAR(D.MDATE,'yyyy-MM-dd') ELSE NULL END mdate,  /**计息截止日**/                 
-		  CASE WHEN A.BASE_SUBJECT_NATURE = 'QTYSK_BJ' THEN TO_CHAR(D.MDATE,'yyyy-MM-dd') ELSE NULL END tradeDate,/**还本日**/               
+		/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 start**/
+		<choose>
+			<when test="accountEntryType =='02' ">
+				CASE WHEN A.BASE_SUBJECT_NATURE = 'QTYSK_LX' THEN TO_CHAR(D.VDATE,'yyyy-MM-dd') ELSE NULL END vdate, /**计息开始日**/
+				CASE WHEN A.BASE_SUBJECT_NATURE = 'QTYSK_LX' THEN TO_CHAR(D.MDATE,'yyyy-MM-dd') ELSE NULL END mdate,  /**计息截止日**/
+				CASE WHEN A.BASE_SUBJECT_NATURE = 'QTYSK_QT' THEN TO_CHAR(D.MDATE,'yyyy-MM-dd') ELSE NULL END tradeDate,/**还本日**/
+			</when>
+			<otherwise>
+				CASE WHEN A.BASE_SUBJECT_NATURE = 'QTYSK_LX' THEN TO_CHAR(D.VDATE,'yyyy-MM-dd') ELSE NULL END vdate, /**计息开始日**/
+				CASE WHEN A.BASE_SUBJECT_NATURE = 'QTYSK_LX' THEN TO_CHAR(D.MDATE,'yyyy-MM-dd') ELSE NULL END mdate,  /**计息截止日**/
+				CASE WHEN A.BASE_SUBJECT_NATURE = 'QTYSK_BJ' THEN TO_CHAR(D.MDATE,'yyyy-MM-dd') ELSE NULL END tradeDate,/**还本日**/
+			</otherwise>
+		</choose>
+		/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 end**/
+
+
 		  CALC.BASIS basis,/**计息基础**/                
 		  CALC.CALC_TYPE calcType,/**利率类型**/                 
 		  CALC.YIELD yield /**最新利率(%)**/              
@@ -114,7 +160,19 @@
 		LEFT JOIN CALC ON A.FINPROD_ID = CALC.FINPROD_ID AND A.FINPROD_TYPE = CALC.FINPROD_TYPE                 
 		LEFT JOIN FIN_PRODUCT B ON A.FINPROD_ID = B.FINPROD_ID AND A.FINPROD_TYPE = B.FINPROD_TYPE  
 		LEFT JOIN FIN_TRADE_PRODUCT D ON A.FINPROD_ID = D.FINPROD_ID AND A.FINPROD_TYPE = D.FINPROD_TYPE AND A.BRANCH = D.BRANCH 
-		WHERE A.BASE_SUBJECT_NATURE IN ('QTYSK_BJ','QTYSK_LX') 
+		WHERE
+		/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 start**/
+		<choose>
+			<when test="accountEntryType =='02' ">
+				A.BASE_SUBJECT_NATURE IN ('QTYSK_QT')
+			</when>
+			<otherwise>
+				A.BASE_SUBJECT_NATURE IN ('QTYSK_BJ','QTYSK_LX')
+			</otherwise>
+		</choose>
+		/**update by yinya on 2022-03-24 新会计引擎升级，兼容新老科目体系的科目性质 end**/
+
+
 		<if test="vdate !=null and vdate !='' ">
             AND D.MDATE &gt;= to_date(#{vdate},'yyyy-MM-dd')
         </if>

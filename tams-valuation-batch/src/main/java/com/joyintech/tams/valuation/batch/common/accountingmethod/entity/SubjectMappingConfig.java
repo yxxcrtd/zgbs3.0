@@ -6,6 +6,11 @@ package com.joyintech.tams.valuation.batch.common.accountingmethod.entity;
 public class SubjectMappingConfig {
 
     /**
+     * 账套代码
+     */
+    private String booksetId;
+
+    /**
      * 账务明细代码
      */
     private String bokDetailId;
@@ -16,9 +21,9 @@ public class SubjectMappingConfig {
     private String secType;
 
     /**
-     * 证券分类
+     * 资产类型
      */
-    private String secDetailType;
+    private String assetType;
 
     /**
      * 交易市场
@@ -51,9 +56,9 @@ public class SubjectMappingConfig {
     private String tradeAttribute;
 
     /**
-     *  税费类型
+     *  增值税类型
      */
-    private String taxFeeType;
+    private String taxType;
 
     /**
      * 币种
@@ -64,6 +69,57 @@ public class SubjectMappingConfig {
      * 交易对手
      */
     private String counterId;
+
+    /**
+     * 金融机构名称
+     */
+    private String financeOrgName;
+
+    /**
+     * 账户细分类
+     */
+    private String acctDetailType;
+
+    /**
+     * 投资目的
+     */
+    private String invAim;
+
+    /**
+     * 登记托管机构
+     */
+    private String registOrg;
+
+    /**
+     * 发行人
+     */
+    private String issuer;
+
+    /**
+     * 现金流二级类型
+     */
+    private String cashType2;
+
+    /**
+     * 回购类型
+     */
+    private String targetBackType;
+
+    /**
+     * 获取 账套代码
+     * @return 账套代码
+     */
+    public String getBooksetId() {
+        return booksetId;
+    }
+
+    /**
+     * 设置 账套代码
+     * @param booksetId 账套代码
+     */
+    public void setBooksetId(String booksetId) {
+        this.booksetId = booksetId;
+    }
 
     /**
      * 返回 账务明细代码
@@ -98,19 +154,19 @@ public class SubjectMappingConfig {
     }
 
     /**
-     * @return 证券分类
+     * @return 资产类型
      */
-    public String getSecDetailType() {
-        return secDetailType;
+    public String getAssetType() {
+        return assetType;
     }
 
     /**
-     * 设置 证券分类
+     * 设置 资产类型
      *
-     * @param secDetailType 证券分类
+     * @param assetType 资产类型
      */
-    public void setSecDetailType(String secDetailType) {
-        this.secDetailType = secDetailType;
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
     }
 
     /**
@@ -210,19 +266,19 @@ public class SubjectMappingConfig {
     }
 
     /**
-     * @return 税费类型
+     * @return 增值税类型
      */
-    public String getTaxFeeType() {
-        return taxFeeType;
+    public String getTaxType() {
+        return taxType;
     }
 
     /**
-     * 设置 税费类型
+     * 设置 增值税类型
      *
-     * @param taxFeeType 税费类型
+     * @param taxType 增值税类型
      */
-    public void setTaxFeeType(String taxFeeType) {
-        this.taxFeeType = taxFeeType;
+    public void setTaxType(String taxType) {
+        this.taxType = taxType;
     }
 
     /**
@@ -255,5 +311,61 @@ public class SubjectMappingConfig {
      */
     public void setCounterId(String counterId) {
         this.counterId = counterId;
+    }
+
+    public String getFinanceOrgName() {
+        return financeOrgName;
+    }
+
+    public void setFinanceOrgName(String financeOrgName) {
+        this.financeOrgName = financeOrgName;
+    }
+
+    public String getAcctDetailType() {
+        return acctDetailType;
+    }
+
+    public void setAcctDetailType(String acctDetailType) {
+        this.acctDetailType = acctDetailType;
+    }
+
+    public String getInvAim() {
+        return invAim;
+    }
+
+    public void setInvAim(String invAim) {
+        this.invAim = invAim;
+    }
+
+    public String getRegistOrg() {
+        return registOrg;
+    }
+
+    public void setRegistOrg(String registOrg) {
+        this.registOrg = registOrg;
+    }
+
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
+    }
+
+    public String getCashType2() {
+        return cashType2;
+    }
+
+    public void setCashType2(String cashType2) {
+        this.cashType2 = cashType2;
+    }
+
+    public String getTargetBackType() {
+        return targetBackType;
+    }
+
+    public void setTargetBackType(String targetBackType) {
+        this.targetBackType = targetBackType;
     }
 }

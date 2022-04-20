@@ -108,43 +108,31 @@ public class CommonBusinessService {
 
     /**
      * 资产代码下拉框
-     *
-     * @param search 界面查询参数 ,assetType 资产类型
+     * 参数包括：模糊查询search，资产类型assetType，收益类型profitType
+     * @param param
      * @return
      */
     public List<SelectOptionDto> getAssetId( Map<String, Object> param) {
-
         return commonBusinessMapper.getAssetId(param);
     }
 
     /**
-     * 资产名称下拉框
-     *
-     * @param search 界面查询参数 ,assetType 资产类型
+     * 回购资产代码下拉框
+     * 参数包括：模糊查询search，资产类型assetType
+     * @param param
      * @return
      */
-    public List<SelectOptionDto> getAssetName( Map<String, Object> param) {
-
-        return commonBusinessMapper.getAssetName(param);
-    }
-
-    /**
-     * 产品代码下拉框
-     * @param search 界面查询参数 ,finprodType 产品类型
-     * @return
-     */
-    public List<SelectOptionDto> getProdId( Map<String, Object> param) {
-
-        return commonBusinessMapper.getProdId(param);
+    public List<SelectOptionDto> getRepoId( Map<String, Object> param) {
+        return commonBusinessMapper.getRepoId(param);
     }
 
     /**
      * 产品名称下拉框
-     * @param search 界面查询参数 ,finprodType 产品类型
+     * 参数包括：模糊查询search，产品类型finprodType
+     * @param param
      * @return
      */
     public List<SelectOptionDto> getProdName( Map<String, Object> param) {
-
         return commonBusinessMapper.getProdName(param);
     }
 
@@ -160,6 +148,17 @@ public class CommonBusinessService {
         return resultList;
     }
 
+    /**
+     * 资金账户信息
+     * @param param 画面参数
+     * @return 组合代码：下拉框
+     * @see
+     * @since 1.0
+     */
+    public String getTrdAcctId1(Map<String, Object> param) {
+        String resultList = commonBusinessMapper.getTrdAcctId1(param);
+        return resultList;
+    }
     /**
      * @author  殷亚
      * @description 获取内部科目编码定义

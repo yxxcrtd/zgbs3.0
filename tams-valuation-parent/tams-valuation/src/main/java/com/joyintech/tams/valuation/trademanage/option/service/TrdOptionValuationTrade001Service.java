@@ -26,7 +26,7 @@ public class TrdOptionValuationTrade001Service extends CommonExportService<TrdOp
     public Page<TrdOptionValuationTrade001Dto> findPage(Map<String, Object> pageParam) {
 
         return restTemplate.postForPage(ServiceApplication.VALUATION_SERVICE_NAME + "/TrdOptionValuationTrade001/findPage",
-                pageParam,TrdOptionValuationTrade001Dto.class);
+                pageParam, TrdOptionValuationTrade001Dto.class);
     }
 
     /**

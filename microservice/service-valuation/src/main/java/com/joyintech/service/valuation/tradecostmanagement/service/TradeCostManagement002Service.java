@@ -97,6 +97,7 @@ public class TradeCostManagement002Service extends BaseService<TradeCostManageme
         trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());//交易状态
         trdProductDeal.setIsClean(DictCodeList.是否_是.getValue());//是否结清
         trdProductDeal.setRegistOrg(dto.getRegistOrg());//登记托管机构
+        trdProductDeal.setTradeMarket(DictCodeListExt1.估值交易市场_银行间.getValue());//交易场所 = 银行间
 
         trdProductDealMapper.insertSelective(trdProductDeal);
 

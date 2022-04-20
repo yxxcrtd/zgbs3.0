@@ -19,10 +19,20 @@ import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
+import com.joyintech.tams.valuation.common.interf.base.dto.AssetDealInfoValCommonResult;
+import com.joyintech.tams.valuation.common.interf.base.dto.InterfNeedOperateEntity;
+import com.joyintech.tams.valuation.common.interf.base.dto.TemplateOrderInfoReaderResult;
+import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.depositasset.DepositeAssetAstDealTemplateRecService;
+import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValBotAstTrade;
+import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValMngMnfTade;
+import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValSecVestPeriod;
+import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValSeclendDeal;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.dto.TrdDepositValuationTrade001Dto;
+import com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.dto.TrdDepositValuationTradeResult;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.constant.ProcessType;
 import com.joyintech.workflow.engine.entity.FlowEntity;
@@ -49,67 +59,9 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class TrdDepositValuationTrade002Service extends CommonExportService<TrdDepositValuationTrade001Dto> implements BaseProcessService<TrdDepositValuationTrade001Dto> {
-    @Override
-    public void doComplete(TrdDepositValuationTrade001Dto trdDepositValuationTrade001Dto, OperationType operationType) {
 
-    }
-
-    /**
-     * 合成初始化实体类
-     *
-     * @param tradeId 交易编号
-     * @return 存款类资产实体类
-     * @see
-     * @since 1.0
-     */
-    public TrdDepositValuationTrade001Dto getInitEntity(String tradeId) {
-        TrdDepositValuationTrade001Dto entity = new TrdDepositValuationTrade001Dto();
-        TrdProductDeal trdProductDeal = null;
-        TrdProductDealAdd trdProductDealAdd = null;
-        String finprodId = null;
-        FinProduct finProduct = null;
-        return entity;
-    }
-
-    /**
-     * 策略代码生成
-     *
-     * @see
-     * @since 1.0
-     */
-    public String createPlanTradeId() {
-        return restTemplate.postForObject(
-                ServiceApplication.VALUATION_SERVICE_NAME + "/TrdDepositValuationTrade001/createPlanTradeId",
-                null, String.class);
-
-    }
-
-
-    /**
-     * 产品代码下拉框
-     * @auther: Administrator
-     * @date: 2021/12/29 17:10
-     * @param:
-     * @return:
-     */
-    public Page<SelectOptionDto> findPortfolioId(Map<String, Object> params) {
-        return restTemplate.postForPage(
-                ServiceApplication.VALUATION_SERVICE_NAME + "/TrdDepositValuationTrade001/findPortfolioId",
-                params, SelectOptionDto.class);
-    }
-
-    /**
-     * 资产代码下拉框
-     * @auther: Administrator
-     * @date: 2021/12/29 17:10
-     * @param:
-     * @return:
-     */
-    public Page<SelectOptionDto> findFinprodId(Map<String, Object> params) {
-        return restTemplate.postForPage(
-                ServiceApplication.VALUATION_SERVICE_NAME + "/TrdDepositValuationTrade001/findFinprodId",
-                params, SelectOptionDto.class);
-    }
+    @Autowired
+    private DepositeAssetAstDealTemplateRecService depositeAssetAstDealTemplateRecService;
 
     //交易对手
     public Page<SelectOptionDto> getCounterId(Map<String, Object> param) {
@@ -120,12 +72,95 @@ public class TrdDepositValuationTrade002Service extends CommonExportService<TrdD
     /**
      * 根据交易编号查询详情
      */
-    public TrdDepositValuationTrade001Dto queryTradeInfoByTradeId(String tradeId) {
+    public TrdDepositValuationTrade001Dto queryTradeInfoByTradeId(Map<String, Object> params) {
         return restTemplate.postForObject(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdDepositValuationTrade001/queryTradeInfoByTradeId",
-                tradeId, TrdDepositValuationTrade001Dto.class);
+                params, TrdDepositValuationTrade001Dto.class);
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void doComplete(TrdDepositValuationTrade001Dto entity, OperationType operationType) {
+        String action = StringUtil.EMPTY;
+        TrdDepositValuationTradeResult trdDepositValuationTradeResult = new TrdDepositValuationTradeResult();
+        trdDepositValuationTradeResult = generateEntity(entity);
+        if (OperationType.NEW.equals(operationType)) {
+            action = "insert";
+        }
+        else {
+            action = "update";
+        }
+
+        restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdDepositValuationTrade001/" + action, trdDepositValuationTradeResult, Integer.class);
+    }
+
+    //封装实体类
+    public TrdDepositValuationTradeResult generateEntity(TrdDepositValuationTrade001Dto dto){
+        Map<String,Object> params = new HashMap<>();
+        List<String> prodIds = new ArrayList<>();
+        prodIds.add(dto.getProdId());
+        params.put("INTERF_BOOKSETID",prodIds);
+        params.put("VAL_MODEL","INTERF_MODEL_SINGLE");
+
+        //将页面输入值赋值给接口实体类
+        List<ValBotAstTrade> listValBotAstTrade=new ArrayList<>();
+        ValBotAstTrade entity = new ValBotAstTrade();
+        BeanUtil.copyPropertiesIgnoreNull(entity,dto);
+        //比较界面和接口字段差异，并手动给接口字段赋值
+        entity.setfTradeId(dto.getOutTradeId());  //外部交易编号
+        entity.setDataActionSign("01");//数据动作标志
+        entity.setDealDate(dto.getTradeDate());//交易日
+        entity.setTradeCapi(dto.getPrinAmt()); //交易本金
+        entity.setDealAmt(dto.getSettleAmt());//交易金额
+        entity.setCcy(dto.getCcy());//币种
+        entity.setCounterId(dto.getCounterId());//交易对手
+        entity.setIsClean("N");//有无清算指令
+        entity.setChlFeeAmt(null);
+        entity.setIsChlFeeAmt("N");
+        entity.setChannelId(null);
+
+        //设置数据来源：画面录入
+        entity.setDataSource(DictCodeListExt1.生成方式_画面录入.getValue());
+
+        listValBotAstTrade.add(entity);
+        TemplateOrderInfoReaderResult acctEntity= new TemplateOrderInfoReaderResult();
+        Date date = new Date();
+        acctEntity.setResovleDate(date);
+        acctEntity.setFourLevelSubjectKg("Y");
+        Map<String, Object> map = depositeAssetAstDealTemplateRecService.handleValBotAstTrade(listValBotAstTrade,acctEntity,params,null);
+        // 定义返回变量
+        AssetDealInfoValCommonResult result = new AssetDealInfoValCommonResult();
+        // 金融产品交易List
+        List<TrdProductDeal> listValFinProductDeal = (List<TrdProductDeal>)map.get("ValFinProductDeal");
+        result.setListValFinProductDeal(listValFinProductDeal);
+        // 估值核算交易扩展表List
+        List<TrdProductDealAdd> listValFinProductDealExt = (List<TrdProductDealAdd>)map.get("ValFinProductDealExt");
+        result.setListValFinProductDealExt(listValFinProductDealExt);
+        // 入账信息表List
+        List<BokDealAccounting> listValDealAccounting = (List<BokDealAccounting>)map.get("ValDealAccounting");
+        result.setListValDealAccounting(listValDealAccounting);
+        // 账务明细表List
+        List<BokDealAccountingDetail> listValDealAccountingDetail = (List<BokDealAccountingDetail>)map.get("ValDealAccountingDetail");
+        result.setListValDealAccountingDetail(listValDealAccountingDetail);
+        // 交易费用明细表List
+        List<TrdTradeFeeDetail> listValTradeFeeDetail = (List<TrdTradeFeeDetail>)map.get("ValTradeFeeDetail");
+        result.setListValTradeFeeDetail(listValTradeFeeDetail);
+        //账务明细代码表
+        List<BokDetailId> listValBokDetailId = (List<BokDetailId>)map.get("ValBokDetailId");
+        result.setListValBokDetailId(listValBokDetailId);
+
+        //结算指令
+        List<StlOrders> listValOrders = (List<StlOrders>)map.get("listValOrders");
+        List<StlOrdersExt> listValOrdersExt = (List<StlOrdersExt>)map.get("listValOrdersExt");
+        result.setListValOrders(listValOrders);
+        result.setListValOrdersExt(listValOrdersExt);
+
+        TrdDepositValuationTradeResult rst = new TrdDepositValuationTradeResult(result);
+        rst.setTrdDepositValuationTrade001Dto(dto);
+        return rst;
+    }
 
 }

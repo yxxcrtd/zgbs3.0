@@ -63,36 +63,38 @@
     /**
      * 产品代码联动带出产品名称
      */
-    var prodIdChange = function() {
+    $('#prodId').change(function(){
         var prodId = $('#prodId').val();
-        if (prodId == '' || prodId == undefined) {
-            $('#prodName').val('');
-        } else {
-            $('#prodName').val($('#prodId').select2('data')[0].object).trigger('change');
+        if(prodId){
+            $('#prodName').val($('#prodId').select2('data')[0].id).trigger('change');
+
+        }else {
+            $('#prodName').val('').trigger('change');
         }
-    }
+    });
 
     /**
      * 资产代码联动带出资产简称，交易场所
      */
-    var secIdChange = function() {
-        var assetId =  $('#assetId').val();
-        if (assetId == '' || assetId == undefined) {
-            $('#assetAbbr').val('');
-        } else {
-            $('#assetAbbr').val($('#assetId').select2('data')[0].object).trigger('change');
+    $('#assetId').change(function(){
+        var assetId = $('#assetId').val();
+        if(assetId){
+            $('#assetAbbr').val($('#assetId').select2('data')[0].id).trigger('change');
+        }else {
+            $('#assetAbbr').val('').trigger('change');
         }
-    }
+    });
 
     //结算金额  结算金额=实收利息+实收本金+其他费用
     var settleAmtChange = function(){
         var actInt = $('#actInt').val();
         var actCapi = $('#actCapi').val();
-        var otherAmt = $('#otherAmt').val();
+       // var otherAmt = $('#otherAmt').val();
         if(actInt != null && actInt != ''
             && actCapi != null && actCapi != ''
-            && otherAmt != null && otherAmt != ''){
-            var settleAmt = JoyinMath.doAdd(JoyinMath.doAdd(actInt, actCapi,2),otherAmt,2);
+           //&& otherAmt != null && otherAmt != ''
+        ){
+            var settleAmt = JoyinMath.doAdd(JoyinMath.doAdd(actInt, actCapi,2),2);
             $('#settleAmt').val(settleAmt);
         }else{
             $('#settleAmt').val('');
@@ -105,20 +107,6 @@
      */
     $(function() {
 
-        //当前是否包含流程
-        var workflowIdNow = $("#workflowId").val()
-
-        // init();
-        //产品代码联动事件
-        $('#prodId').change(function(){
-            prodIdChange();
-        });
-
-        //资产代码联动事件
-        $('#assetId').change(function(){
-            secIdChange();
-        });
-
         //结算金额联动事件
         //实收利息
         $('#actInt').change(function(){
@@ -128,10 +116,10 @@
         $('#actCapi').change(function(){
             settleAmtChange();
         });
-        //其他费用
-        $('#otherAmt').change(function(){
-            settleAmtChange();
-        });
+        // //其他费用
+        // $('#otherAmt').change(function(){
+        //     settleAmtChange();
+        // });
 
         // 绑定按钮事件
         $('#TrdBondValuationDuration002_btn_save').click(function() {

@@ -86,6 +86,21 @@ public class ValFundShareConvert extends BaseEntity {
      */
     private String channelId;
 
+    /*add by sunshuaishuai 20220323 交易界面：交易表添加资金账户 start*/
+    /**
+     * 资金账户
+     */
+    private String myAcctNo;
+
+    public String getMyAcctNo() {
+        return myAcctNo;
+    }
+
+    public void setMyAcctNo(String myAcctNo) {
+        this.myAcctNo = myAcctNo;
+    }
+    /*add by sunshuaishuai 20220323 交易界面：交易表添加资金账户 end*/
+
     /**
      * 取得 产品代码
      * @return 产品代码

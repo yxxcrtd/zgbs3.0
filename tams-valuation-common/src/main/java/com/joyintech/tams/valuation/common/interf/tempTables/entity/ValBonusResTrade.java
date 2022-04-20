@@ -82,6 +82,13 @@ public class ValBonusResTrade extends BaseEntity {
      */
     private String channelId;
 
+    /*add by sunshuaishuai 交易管理 20220323 start*/
+    /**
+     * 交易场所
+     */
+    private String tradeMarket;
+    /*add by sunshuaishuai 交易管理 20220323 end*/
+
     /**
      * 取得 产品代码
      * @return 产品代码
@@ -306,5 +313,21 @@ public class ValBonusResTrade extends BaseEntity {
      */
     public void setChannelId(String channelId) {
         this.channelId = channelId == null ? null : channelId.trim();
+    }
+
+    /**
+     * 取得 交易场所
+     * @return 交易场所
+     */
+    public String getTradeMarket() {
+        return tradeMarket;
+    }
+
+    /**
+     * 设置 交易场所
+     * @param tradeMarket 交易场所
+     */
+    public void setTradeMarket(String tradeMarket) {
+        this.tradeMarket = tradeMarket == null ? null : tradeMarket.trim();
     }
 }

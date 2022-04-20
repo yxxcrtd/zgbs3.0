@@ -344,7 +344,7 @@ public class FinProductCommonService {
      * @param finProduct
      * @return
      */
-    private SchemeDetailDto querySchemaDetail(Date queryDate, String booksetId, String invAim,TargetFinProduct finProduct) {
+    public SchemeDetailDto querySchemaDetail(Date queryDate, String booksetId, String invAim,TargetFinProduct finProduct) {
         SchemeDetailDto schemeDetail = null;
 
 
@@ -2224,4 +2224,5 @@ public class FinProductCommonService {
     public String getfinprodType2(String finprodId) {
         return  finProductCommonMapper.getfinprodType2(finprodId);
     }
+
 }

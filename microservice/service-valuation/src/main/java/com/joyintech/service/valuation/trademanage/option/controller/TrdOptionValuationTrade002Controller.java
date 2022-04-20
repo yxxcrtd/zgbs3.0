@@ -13,8 +13,8 @@ package com.joyintech.service.valuation.trademanage.option.controller;
 
 import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.service.valuation.trademanage.option.dto.TrdOptionValuationTrade001Dto;
 import com.joyintech.service.valuation.trademanage.option.dto.TrdOptionValuationTrade002Dto;
-import com.joyintech.service.valuation.trademanage.option.dto.TrdOptionValuationTrade003Dto;
 import com.joyintech.service.valuation.trademanage.option.dto.TrdOptionValuationTradeResult;
 import com.joyintech.service.valuation.trademanage.option.service.TrdOptionValuationTrade002Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +50,7 @@ public class TrdOptionValuationTrade002Controller {
      *             异常
      */
     @PostMapping("queryTradeInfoByTradeId")
-    public TrdOptionValuationTrade002Dto queryTradeInfoByTradeId(@RequestBody String tradeId) {
+    public TrdOptionValuationTrade001Dto queryTradeInfoByTradeId(@RequestBody String tradeId) {
         return trdOptionValuationTrade002Service.queryTradeInfoByTradeId(tradeId);
     }
 
@@ -62,7 +62,7 @@ public class TrdOptionValuationTrade002Controller {
      *             异常
      */
     @PostMapping("queryInfoByTradeId")
-    public TrdOptionValuationTrade003Dto queryInfoByTradeId(@RequestBody String tradeId) {
+    public TrdOptionValuationTrade002Dto queryInfoByTradeId(@RequestBody String tradeId) {
         return trdOptionValuationTrade002Service.queryInfoByTradeId(tradeId);
     }
 

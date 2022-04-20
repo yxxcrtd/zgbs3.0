@@ -25,19 +25,19 @@
 
     <select id="getBaseSubjectNature" resultType="com.joyintech.framework.select.SelectOptionDto" >
         select
-               n.base_subject_nature id,
-               n.subject_nature_name text
-        from BOK_ACCT_STANDARD_NATURE n
+            n.SUBJECT_INTERNAL_CODE id,
+            n.SUBJECT_INTERNAL_NAME text
+        from BOK_SUBJECT_INTERNAL n
         <where>
             <if test="search != null and search != ''">
                 (
-                n.base_subject_nature LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                n.SUBJECT_INTERNAL_CODE LIKE CONCAT('%', CONCAT(#{search}, '%'))
                 or
-                n.subject_nature_name LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                n.SUBJECT_INTERNAL_NAME LIKE CONCAT('%', CONCAT(#{search}, '%'))
                 )
             </if>
             <if test="initValue != null and initValue != ''">
-                AND n.base_subject_nature = #{initValue}
+                AND n.SUBJECT_INTERNAL_CODE = #{initValue}
             </if>
         </where>
     </select>

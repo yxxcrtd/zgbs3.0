@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="~{layout/default}">
 
 <head>
-    <title data-th-text="#{TrdStockTrade001}">债券交易</title>
+    <title data-th-text="#{TrdStockTrade001}">股票交易</title>
 </head>
 
 <body>
@@ -15,7 +15,8 @@
             <form class="layui-form" id="searchForm">
                 <div class="layui-form-item">
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
-                        <label class="layui-form-label form-lable" >交易编号</label>
+                        <label class="layui-form-label form-lable"
+                               data-th-text="#{TrdStockTrade.tradeId}">交易编号</label>
                         <div class="layui-input-inline input-inline">
                             <input type="text" id="tradeId" name="tradeId"
                                 class="layui-input form-input input-lenovoselect" placeholder="请输入内容"
@@ -24,7 +25,8 @@
                         </div>
                     </div>
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
-                        <label class="layui-form-label form-lable" >产品名称</label>
+                        <label class="layui-form-label form-lable"
+                               data-th-text="#{TrdStockTrade.prodName}">产品名称</label>
                         <div class="layui-input-inline input-inline">
                             <select id="finprodId" name="finprodId"
                                     class="layui-input form-input input-select"
@@ -34,11 +36,12 @@
                         </div>
                     </div>
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
-                        <label class="layui-form-label form-lable" >资产名称</label>
+                        <label class="layui-form-label form-lable"
+                               data-th-text="#{TrdStockTrade.assetAbbr}">资产名称</label>
                         <div class="layui-input-inline input-inline">
                             <select id="asset" name="asset"
                                     class="layui-input form-input input-select"
-                                    data-th-data-url="@{/valuation/trademanage/trdstockvaluationtrade/TrdStockTrade001/getAssetId}"
+                                    data-th-data-url="@{/valuation/trademanage/trdstockvaluationtrade/TrdStockTrade002/getAssetId}"
                                     multiple="true" allowClear="true" placeholder="请输入内容">
                             </select>
                         </div>
@@ -46,7 +49,8 @@
                 </div>
                 <div class="layui-form-item">
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
-                        <label class="layui-form-label form-lable" >交易日期</label>
+                        <label class="layui-form-label form-lable"
+                               data-th-text="#{TrdStockTrade.tradeDate}">交易日期</label>
                         <div class="layui-input-inline input-inline">
                             <input type="text" id="tradeDate" name="tradeDate"
                                    class="layui-input form-input input-dateRangeSelect" placeholder="请输入内容"
@@ -55,11 +59,24 @@
                         </div>
                     </div>
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
-                        <label class="layui-form-label form-lable" >交易类型</label>
+                        <label class="layui-form-label form-lable"
+                               data-th-text="#{TrdStockTrade.ps}">交易类型</label>
                         <div class="layui-input-inline input-inline">
                             <input id="ps" name="ps" class="input-select"
                                    placeholder="请选择"
                                    data-th-data-result="${PS}"
+                                   allowClear="true"
+                                   multiple="multiple"
+                                   data-th-placeholder="#{SysCommon.placeholder}">
+                        </div>
+                    </div>
+                    <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
+                        <label class="layui-form-label form-lable"
+                               data-th-text="#{TrdStockTrade.dataSource}">数据来源</label>
+                        <div class="layui-input-inline input-inline">
+                            <input id="dataSource" name="dataSource" class="input-select"
+                                   placeholder="请选择"
+                                   data-th-data-result="${CREATE_TYPE}"
                                    allowClear="true"
                                    multiple="multiple"
                                    data-th-placeholder="#{SysCommon.placeholder}">

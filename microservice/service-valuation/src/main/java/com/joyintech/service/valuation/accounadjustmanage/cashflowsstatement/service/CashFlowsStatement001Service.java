@@ -19,6 +19,7 @@ import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.jdbc.datasource.DataSource;
 import com.joyintech.framework.jdbc.enums.DataSourceType;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.valuation.accounadjustmanage.assetbook.service.ValAssetBook001Service;
@@ -903,6 +904,10 @@ public class CashFlowsStatement001Service extends CommonExportService<CashFlowsS
                 //String key4 = "加：年初现金及现金等价物余额";
                 String key4 = 汇总指标6;
                 Map<String, Object> queryMap = new HashMap<String, Object>();
+                /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 start **/
+                String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+                queryMap.put("accountEntryType",accountEntryType);
+                /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 end **/
                 int thisYear = DateUtil.getYear(pageParam.get("thisTermMdate").toString());
                 queryMap.put("mdate", thisYear + "-01-01");
                 queryMap.put("booksetId", pageParam.get("booksetId"));
@@ -922,6 +927,10 @@ public class CashFlowsStatement001Service extends CommonExportService<CashFlowsS
                 //String key4 = "加：年初现金及现金等价物余额";
                 String key4 = 汇总指标6;
                 Map<String, Object> queryMap = new HashMap<String, Object>();
+                /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 start **/
+                String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+                queryMap.put("accountEntryType",accountEntryType);
+                /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 end **/
                 int lastYear = DateUtil.getYear(pageParam.get("lastTermMdate").toString());
                 queryMap.put("mdate", lastYear + "-01-01");
                 queryMap.put("booksetId", pageParam.get("booksetId"));
@@ -943,6 +952,10 @@ public class CashFlowsStatement001Service extends CommonExportService<CashFlowsS
                 //String key4 = "加：年初现金及现金等价物余额";
                 String key4 = 汇总指标6;
                 Map<String, Object> queryMap = new HashMap<String, Object>();
+                /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 start **/
+                String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+                queryMap.put("accountEntryType",accountEntryType);
+                /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 end **/
                 int thisYear = DateUtil.getYear(pageParam.get("thisTermMdate").toString());
                 queryMap.put("mdate", thisYear + "-01-01");
                 queryMap.put("booksetId", pageParam.get("booksetId"));
@@ -961,6 +974,10 @@ public class CashFlowsStatement001Service extends CommonExportService<CashFlowsS
                 //String key4 = "加：年初现金及现金等价物余额";
                 String key4 = 汇总指标6;
                 Map<String, Object> queryMap = new HashMap<String, Object>();
+                /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 start **/
+                String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+                queryMap.put("accountEntryType",accountEntryType);
+                /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 end **/
                 int lastYear = DateUtil.getYear(pageParam.get("lastTermMdate").toString());
                 queryMap.put("mdate", lastYear + "-01-01");
                 queryMap.put("booksetId", pageParam.get("booksetId"));
@@ -1035,6 +1052,10 @@ public class CashFlowsStatement001Service extends CommonExportService<CashFlowsS
         // 手工凭证
         if (rules.length == 2 && 手工凭证.equals(rules[0])) {
             Map<String, Object> queryMap = new HashMap<String, Object>();
+            /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 start **/
+            String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+            queryMap.put("accountEntryType",accountEntryType);
+            /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 end **/
             queryMap.put("booksetId", pageParam.get("booksetId"));
             queryMap.put("crdrFlg", rules[1]);
             queryMap.put("vdate", pageParam.get("vdate"));

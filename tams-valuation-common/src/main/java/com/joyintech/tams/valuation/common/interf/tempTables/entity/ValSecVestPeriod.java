@@ -155,6 +155,18 @@ public class ValSecVestPeriod extends BaseEntity {
      */
     private BigDecimal accrNum;
 
+    /*add by sunshuaishuai 20220325 交易管理 start*/
+    /**
+     * 证券账户
+     */
+    private String secManageAcctId;
+
+    /**
+     * 数据来源
+     */
+    private String dataSource;
+    /*add by sunshuaishuai 20220325 end*/
+
   /**
      * 取得 产品代码
      * @return 产品代码
@@ -599,4 +611,38 @@ public class ValSecVestPeriod extends BaseEntity {
     public void setAccrNum(BigDecimal accrNum) {
         this.accrNum = accrNum;
     }
+
+    /*add by sunshuaishuai 20220325 交易管理 start*/
+    /**
+     * 取得 证券账户
+     * @return 证券账户
+     */
+    public String getSecManageAcctId() {
+        return secManageAcctId;
+    }
+
+    /**
+     * 设置 证券账户
+     * @param secManageAcctId 证券账户
+     */
+    public void setSecManageAcctId(String secManageAcctId) {
+        this.secManageAcctId = secManageAcctId;
+    }
+
+    /**
+     * 取得 数据来源
+     * @return 数据来源
+     */
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    /**
+     * 设置 数据来源
+     * @param dataSource 数据来源
+     */
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
+    }
+    /*add by sunshuaishuai 20220325 交易管理 end*/
 }

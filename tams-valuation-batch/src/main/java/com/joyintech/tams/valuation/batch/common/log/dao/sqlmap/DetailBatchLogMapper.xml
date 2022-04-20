@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.valuation.batch.common.log.dao.DetailBatchLogMapper">
+    <insert id="insertBatchDetailLog">
+        MERGE INTO SYS_BATCH_DETAIL_LOG L
+        USING (
+        SELECT
+			#{exeSeqno,jdbcType=VARCHAR} EXE_SEQNO,
+			#{groupId,jdbcType=VARCHAR} GROUP_ID,
+			#{taskId,jdbcType=VARCHAR} TASK_ID,
+            #{taskBeanName,jdbcType=VARCHAR} TASK_BEAN_NAME,
+            #{excuteDate,jdbcType=DATE} EXCUTE_DATE,
+            #{className,jdbcType=VARCHAR} CLASS_NAME,
+            #{methodName,jdbcType=VARCHAR} METHOD_NAME,
+            #{argsClob,jdbcType=CLOB} ARGS,
+            #{booksetId,jdbcType=VARCHAR} BOOKSET_ID,
+            #{finprodId,jdbcType=VARCHAR} FINPROD_ID,
+            #{busiId,jdbcType=VARCHAR} BUSI_ID,
+            #{resultInfo,jdbcType=CLOB} RESULT_INFO,
+            #{detailEx,jdbcType=CLOB} DETAIL_EX,
+            #{createUser,jdbcType=VARCHAR} CREATE_USER,
+            sysdate CREATE_TIME,
+            #{updateUser,jdbcType=VARCHAR} UPDATE_USER,
+            sysdate UPDATE_TIME,
+            #{filePath,jdbcType=VARCHAR} FILE_PATH
+			FROM
+			DUAL
+
+        )TEMP
+
+        ON (L.EXE_SEQNO=TEMP.EXE_SEQNO)
+        WHEN MATCHED THEN UPDATE
+        SET
+            L.GROUP_ID=TEMP.GROUP_ID,
+            L.TASK_ID=TEMP.TASK_ID,
+            L.TASK_BEAN_NAME=TEMP.TASK_BEAN_NAME,
+            L.EXCUTE_DATE=TEMP.EXCUTE_DATE,
+            L.CLASS_NAME=TEMP.CLASS_NAME,
+            L.METHOD_NAME=TEMP.METHOD_NAME,
+            L.ARGS=TEMP.ARGS,
+            L.BOOKSET_ID=TEMP.BOOKSET_ID,
+            L.FINPROD_ID=TEMP.FINPROD_ID,
+            L.BUSI_ID=TEMP.BUSI_ID,
+            L.RESULT_INFO=TEMP.RESULT_INFO,
+            L.DETAIL_EX=TEMP.DETAIL_EX,
+            L.CREATE_USER=TEMP.CREATE_USER,
+            L.CREATE_TIME=TEMP.CREATE_TIME,
+            L.UPDATE_USER=TEMP.UPDATE_USER,
+            L.UPDATE_TIME=TEMP.UPDATE_TIME,
+            L.FILE_PATH=TEMP.FILE_PATH
+        WHEN NOT MATCHED THEN INSERT
+        (EXE_SEQNO,GROUP_ID,TASK_ID,TASK_BEAN_NAME,EXCUTE_DATE,CLASS_NAME,METHOD_NAME,ARGS,
+        BOOKSET_ID,FINPROD_ID,BUSI_ID,RESULT_INFO,DETAIL_EX,CREATE_USER,CREATE_TIME,UPDATE_USER,UPDATE_TIME,FILE_PATH
+        )
+        values(
+            TEMP.EXE_SEQNO,
+            TEMP.GROUP_ID,
+            TEMP.TASK_ID,
+            TEMP.TASK_BEAN_NAME,
+            TEMP.EXCUTE_DATE,
+            TEMP.CLASS_NAME,
+            TEMP.METHOD_NAME,
+            TEMP.ARGS,
+            TEMP.BOOKSET_ID,
+            TEMP.FINPROD_ID,
+            TEMP.BUSI_ID,
+            TEMP.RESULT_INFO,
+            TEMP.DETAIL_EX,
+            TEMP.CREATE_USER,
+            TEMP.CREATE_TIME,
+            TEMP.UPDATE_USER,
+            TEMP.UPDATE_TIME,
+            TEMP.FILE_PATH
+        )
+    </insert>
+
+</mapper>

@@ -90,11 +90,11 @@ public class TrdOutRightRepoValuationTrade002Service extends CommonExportService
         String tradeId = null;
         while (true) {
             // 获取自增数
-            String nextId = this.getNextId("PLANTRADEID_SEQUENCE");
+            String nextId = this.getNextId("ORTRADEID_SEQUENCE");
             //平台日
             String dateStr= DateUtil.format(iPlatformDate.getSysDate(),DateUtil.DEFAULT_OTHER_FORMAT);//yyyyMMdd
             // 拼接
-            tradeId = "JY"+"PLAN"+dateStr+ nextId;
+            tradeId = "JY"+"OREND"+dateStr+ nextId;
             // 查询是否重复
             int num = trdOutRightRepoValuationTrade001Mapper.selectCountByTradeId(tradeId);
             // 如果自增的策略代码不存在，则跳出循环
@@ -119,8 +119,8 @@ public class TrdOutRightRepoValuationTrade002Service extends CommonExportService
     /**
      * 根据交易编号查询数据
      */
-    public TrdOutRightRepoValuationTrade003Dto queryTradeInfoByTradeId01(String tradeId){
-        return trdOutRightRepoValuationTrade001Mapper.queryTradeInfoByTradeId01(tradeId);
+    public TrdOutRightRepoValuationTrade003Dto queryTradeInfoByTradeId01(Map<String, Object> param){
+        return trdOutRightRepoValuationTrade001Mapper.queryTradeInfoByTradeId01(param);
     }
 
 
