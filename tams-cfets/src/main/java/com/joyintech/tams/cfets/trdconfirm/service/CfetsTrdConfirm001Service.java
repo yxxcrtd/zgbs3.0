@@ -1199,6 +1199,16 @@ public class CfetsTrdConfirm001Service extends BaseService{
         }
         return invAim;
     }
+
+    /**
+     * 处理指令完成情况
+     *
+     * @param finProductTradeDto
+     * @param type
+     * @return java.util.List<java.lang.String>
+     * @author jiangpeng
+     * @date 2022/4/7 20:07
+     */
     public List<String>  baseTradeCommExecute(FinProductTradeDto finProductTradeDto,String type) {
         if (finProductTradeDto == null) {
             return null;
