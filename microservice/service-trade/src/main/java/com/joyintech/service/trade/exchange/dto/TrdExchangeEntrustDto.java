@@ -32,7 +32,7 @@ public class TrdExchangeEntrustDto extends BaseEntity implements ProcessEntity {
     /**
      * 操作类型
      */
-    private OperationType operateType;
+    private String operateType;
 
     /**
      * 画面模式
@@ -112,11 +112,11 @@ public class TrdExchangeEntrustDto extends BaseEntity implements ProcessEntity {
         this.orderPlaceBean = orderPlaceBean;
     }
 
-    public OperationType getOperateType() {
+    public String getOperateType() {
         return operateType;
     }
 
-    public void setOperateType(OperationType operateType) {
+    public void setOperateType(String operateType) {
         this.operateType = operateType;
     }
 

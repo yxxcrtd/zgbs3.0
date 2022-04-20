@@ -23,7 +23,7 @@ public class ManualSettleDto extends TrdManualSettleInfo implements ITableRow, P
     /**
      * 操作类型
      */
-    private OperationType operateType;
+    private String operateType;
 
     private String pageModel;
     /**
@@ -78,11 +78,11 @@ public class ManualSettleDto extends TrdManualSettleInfo implements ITableRow, P
      */
     private List<ManualSettleDto> selectedItem;
 
-    public OperationType getOperateType() {
+    public String getOperateType() {
         return operateType;
     }
 
-    public void setOperateType(OperationType operateType) {
+    public void setOperateType(String operateType) {
         this.operateType = operateType;
     }
 
@@ -150,7 +150,7 @@ public class ManualSettleDto extends TrdManualSettleInfo implements ITableRow, P
     /**
      * 操作类型 数据字典
      */
-    private String operType;
+    private OperationType operType;
 
     /**
      * 操作员
@@ -170,11 +170,11 @@ public class ManualSettleDto extends TrdManualSettleInfo implements ITableRow, P
         this.settleTime = settleTime;
     }
 
-    public String getOperType() {
+    public OperationType getOperType() {
         return operType;
     }
 
-    public void setOperType(String operType) {
+    public void setOperType(OperationType operType) {
         this.operType = operType;
     }
 

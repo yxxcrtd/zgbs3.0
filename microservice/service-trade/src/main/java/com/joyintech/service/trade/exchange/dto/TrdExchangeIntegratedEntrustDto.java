@@ -28,7 +28,7 @@ public class TrdExchangeIntegratedEntrustDto extends BaseEntity implements Proce
     /**
      * 操作类型
      */
-    private OperationType operateType;
+    private String operateType;
 
     /**
      * 画面模式
@@ -53,7 +53,7 @@ public class TrdExchangeIntegratedEntrustDto extends BaseEntity implements Proce
     /**
      * 操作类型
      */
-    private String operType;
+    private OperationType operType;
 
     /**
      * 页面ID
@@ -92,11 +92,11 @@ public class TrdExchangeIntegratedEntrustDto extends BaseEntity implements Proce
         this.entrustList = entrustList;
     }
 
-    public OperationType getOperateType() {
+    public String getOperateType() {
         return operateType;
     }
 
-    public void setOperateType(OperationType operateType) {
+    public void setOperateType(String operateType) {
         this.operateType = operateType;
     }
 
@@ -132,11 +132,11 @@ public class TrdExchangeIntegratedEntrustDto extends BaseEntity implements Proce
         this.roles = roles;
     }
 
-    public String getOperType() {
+    public OperationType getOperType() {
         return operType;
     }
 
-    public void setOperType(String operType) {
+    public void setOperType(OperationType operType) {
         this.operType = operType;
     }
 
