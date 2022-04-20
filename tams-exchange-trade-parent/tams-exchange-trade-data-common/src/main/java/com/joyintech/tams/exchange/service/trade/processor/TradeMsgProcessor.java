@@ -764,12 +764,18 @@ public class TradeMsgProcessor {
 //        if (instructionClone.getEntrustAmt() == null) {
 //            instructionClone.setEntrustAmt(entrust.getEntrustPrice().multiply(BigDecimal.valueOf(entrust.getEntrustVolume())));
 //        }
+
         if (InvestmentAssetType1.NEGOTIATED_REPO.value.equals(instruction.getAssetType1())) {
             logger.info("场内协议回购交易下单头寸检查，指令编号：{}，回购金额：{}", entrust.getInstructionId(), entrust.getEntrustBalance());
             instructionClone.setEntrustAmt(entrust.getEntrustBalance());
-        } else {
+        } else if (InvestmentAssetType.isBond(entrust.getAssetType()) && Objects.nonNull(entrust.getFullPrice()) && entrust.getFullPrice().compareTo(BigDecimal.ZERO) != 0) {
+            //全价金额
+            instructionClone.setEntrustAmt(TradeUtils.multiply(entrust.getFullPrice(), entrust.getEntrustVolume(), 2));
+        } else if (Objects.isNull(entrust.getEntrustBalance()) || entrust.getEntrustBalance().compareTo(BigDecimal.ZERO) == 0) {
             // 计算委托金额
-            instructionClone.setEntrustAmt(entrust.getEntrustPrice().multiply(BigDecimal.valueOf(entrust.getEntrustVolume())));
+            instructionClone.setEntrustAmt(TradeUtils.multiply(entrust.getEntrustPrice(), entrust.getEntrustVolume(), 2));
+        } else {
+            instructionClone.setEntrustAmt(entrust.getEntrustBalance());
         }
 
         instructionClone.setEntrustNum(entrust.getEntrustVolume());
