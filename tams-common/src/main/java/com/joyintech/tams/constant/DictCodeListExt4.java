@@ -43,6 +43,10 @@ public enum DictCodeListExt4 implements BaseDictCodeList {
     基准利率精度_2(DictCode.基准利率精度,"2","2"),
     基准利率精度_3(DictCode.基准利率精度,"3","3"),
     基准利率精度_4(DictCode.基准利率精度,"4","4"),
+    交收结果_正常交收(DictCode.交收结果,"01","正常交收"),
+    交收结果_部分交收(DictCode.交收结果,"02","部分交收"),
+    交收结果_交收失败(DictCode.交收结果,"03","交收失败"),
+    交收结果_未交收(DictCode.交收结果,"04","未交收"),
     //20220413 add by gwl end
     ;
     /**
