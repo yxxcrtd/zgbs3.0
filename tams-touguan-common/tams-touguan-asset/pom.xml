@@ -5,7 +5,7 @@
     <parent>
         <artifactId>tams-touguan-common</artifactId>
         <groupId>com.joyintech</groupId>
-        <version>3.0.6</version>
+        <version>3.0.4</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>tams-touguan-asset</artifactId>
