@@ -10,14 +10,14 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 债券市场信息查看DTO
+ * 债券市场列表信息查看DTO
  *
  * @author zhuys
  * @version 1.0 2022年4月18日
  * @see FinBondMarketInfoQuery001Dto
  * @since 1.0
  */
-@ApiModel(value = "债券市场信息查看", description = "债券市场信息查看")
+@ApiModel(value = "债券市场列表信息查看", description = "债券市场列表信息查看")
 public class FinBondMarketInfoQuery001Dto extends BaseDto {
 
     @ApiModelProperty(name = "secId", value = "债券ID/资产代码")
