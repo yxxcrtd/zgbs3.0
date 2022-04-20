@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.exchange.common.utils.DoubleSerializerUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
-import io.swagger.annotations.ApiModelProperty;
 import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
@@ -149,6 +148,15 @@ public class IntegratedEntrustHistory implements Serializable {
     private String tradeDate;
     private String createDateTime;
     private String entrustClass;
+
+    private String targetType;
+    private String isNoGuard;
+    private String isNetPrice;
+    private String ownerType;
+    private String investorId;
+    private String investorName;
+    private String propInvestorId;
+    private String propInvestorName;
 
     @Id
     public String getId() {
@@ -733,5 +741,69 @@ public class IntegratedEntrustHistory implements Serializable {
 
     public void setEntrustClass(String entrustClass) {
         this.entrustClass = entrustClass;
+    }
+
+    public String getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(String targetType) {
+        this.targetType = targetType;
+    }
+
+    public String getIsNoGuard() {
+        return isNoGuard;
+    }
+
+    public void setIsNoGuard(String isNoGuard) {
+        this.isNoGuard = isNoGuard;
+    }
+
+    public String getIsNetPrice() {
+        return isNetPrice;
+    }
+
+    public void setIsNetPrice(String isNetPrice) {
+        this.isNetPrice = isNetPrice;
+    }
+
+    public String getOwnerType() {
+        return ownerType;
+    }
+
+    public void setOwnerType(String ownerType) {
+        this.ownerType = ownerType;
+    }
+
+    public String getInvestorId() {
+        return investorId;
+    }
+
+    public void setInvestorId(String investorId) {
+        this.investorId = investorId;
+    }
+
+    public String getInvestorName() {
+        return investorName;
+    }
+
+    public void setInvestorName(String investorName) {
+        this.investorName = investorName;
+    }
+
+    public String getPropInvestorId() {
+        return propInvestorId;
+    }
+
+    public void setPropInvestorId(String propInvestorId) {
+        this.propInvestorId = propInvestorId;
+    }
+
+    public String getPropInvestorName() {
+        return propInvestorName;
+    }
+
+    public void setPropInvestorName(String propInvestorName) {
+        this.propInvestorName = propInvestorName;
     }
 }

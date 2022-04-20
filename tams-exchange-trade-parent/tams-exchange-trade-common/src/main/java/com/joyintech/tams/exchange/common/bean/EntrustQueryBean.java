@@ -152,6 +152,25 @@ public class EntrustQueryBean implements Serializable {
     @ApiModelProperty(name = "busiTypeTgStr", value = "业务类型")
     private String busiTypeTgStr;
 
+    @ApiModelProperty(name = "targetType", value = "目标类型")
+    private String targetType;
+    @ApiModelProperty(name = "isNoGuard", value = "是否非担保")
+    private String isNoGuard;
+    @ApiModelProperty(name = "isNetPrice", value = "是否净价交易")
+    private String isNetPrice;
+
+    @ApiModelProperty(required = true, name = "ownerType", value = "报价所有者类型")
+    private String ownerType;
+    @ApiModelProperty(required = true, name = "investorId", value = "本方交易主体ID")
+    private String investorId;
+    @ApiModelProperty(required = true, name = "investorName", value = "本方交易主体名称")
+    private String investorName;
+    @ApiModelProperty(required = true, name = "propInvestorId", value = "对手方交易主体ID")
+    private String propInvestorId;
+
+    @ApiModelProperty(required = true, name = "propInvestorName", value = "对手方交易主体名称")
+    private String propInvestorName;
+
     /**
      * ////////////////////////////查询无用字段
      */
@@ -988,5 +1007,69 @@ public class EntrustQueryBean implements Serializable {
 
     public void setEntrustClass(String entrustClass) {
         this.entrustClass = entrustClass;
+    }
+
+    public String getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(String targetType) {
+        this.targetType = targetType;
+    }
+
+    public String getIsNoGuard() {
+        return isNoGuard;
+    }
+
+    public void setIsNoGuard(String isNoGuard) {
+        this.isNoGuard = isNoGuard;
+    }
+
+    public String getIsNetPrice() {
+        return isNetPrice;
+    }
+
+    public void setIsNetPrice(String isNetPrice) {
+        this.isNetPrice = isNetPrice;
+    }
+
+    public String getOwnerType() {
+        return ownerType;
+    }
+
+    public void setOwnerType(String ownerType) {
+        this.ownerType = ownerType;
+    }
+
+    public String getInvestorId() {
+        return investorId;
+    }
+
+    public void setInvestorId(String investorId) {
+        this.investorId = investorId;
+    }
+
+    public String getInvestorName() {
+        return investorName;
+    }
+
+    public void setInvestorName(String investorName) {
+        this.investorName = investorName;
+    }
+
+    public String getPropInvestorId() {
+        return propInvestorId;
+    }
+
+    public void setPropInvestorId(String propInvestorId) {
+        this.propInvestorId = propInvestorId;
+    }
+
+    public String getPropInvestorName() {
+        return propInvestorName;
+    }
+
+    public void setPropInvestorName(String propInvestorName) {
+        this.propInvestorName = propInvestorName;
     }
 }

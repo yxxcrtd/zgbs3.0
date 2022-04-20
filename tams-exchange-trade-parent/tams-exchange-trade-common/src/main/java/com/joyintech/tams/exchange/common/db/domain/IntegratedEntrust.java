@@ -152,7 +152,6 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     private long pretermYearRate;
 
     @ApiModelProperty(required = true, name = "ownerType", value = "报价所有者类型")
-    @Size(max = 32)
     private String ownerType;
 
     @ApiModelProperty(required = true, name = "sellerNo", value = "本方交易员ID")
@@ -160,14 +159,12 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     private String sellerNo;
 
     @ApiModelProperty(required = true, name = "investorId", value = "本方交易主体ID")
-    @Size(max = 32)
     private String investorId;
 
     @ApiModelProperty(required = true, name = "investorName", value = "本方交易主体名称")
-    @Size(max = 32)
     private String investorName;
 
-    @ApiModelProperty(required = true, name = "liaisonName", value = "联络人姓名")
+    @ApiModelProperty(required = true, name = "liaisonName", value = "交易对手")
     @Size(max = 32)
     private String liaisonName;
 
@@ -184,11 +181,9 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     private String propSeatName;
 
     @ApiModelProperty(required = true, name = "propInvestorId", value = "对手方交易主体ID")
-    @Size(max = 32)
     private String propInvestorId;
 
     @ApiModelProperty(required = true, name = "propInvestorName", value = "对手方交易主体名称")
-    @Size(max = 32)
     private String propInvestorName;
 
     @ApiModelProperty(required = true, name = "contractId", value = "交易所请求编号")
@@ -362,6 +357,13 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
 
     @ApiModelProperty(name = "entrustClass", value = "委托指令类别：01-单组合，02-多组合")
     private String entrustClass;
+
+    @ApiModelProperty(name = "targetType", value = "目标类型")
+    private String targetType;
+    @ApiModelProperty(name = "isNoGuard", value = "是否非担保")
+    private String isNoGuard;
+    @ApiModelProperty(name = "isNetPrice", value = "是否净价交易")
+    private String isNetPrice;
 
     public String getSoftSkipMode() {
         return softSkipMode;
@@ -1048,5 +1050,29 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
 
     public void setPropInvestorName(String propInvestorName) {
         this.propInvestorName = propInvestorName;
+    }
+
+    public String getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(String targetType) {
+        this.targetType = targetType;
+    }
+
+    public String getIsNoGuard() {
+        return isNoGuard;
+    }
+
+    public void setIsNoGuard(String isNoGuard) {
+        this.isNoGuard = isNoGuard;
+    }
+
+    public String getIsNetPrice() {
+        return isNetPrice;
+    }
+
+    public void setIsNetPrice(String isNetPrice) {
+        this.isNetPrice = isNetPrice;
     }
 }
