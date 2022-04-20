@@ -154,6 +154,24 @@ public class StlDataDealProcessCommonService {
 		}
 		return null;
 	}
+
+	/**
+	 * 根据码值获取 交收结果 value
+	 * 正常交收  01    0000
+	 * 部分交收  02    0100 0101 0102
+	 * 交收失败  03    ELSE
+	 */
+	public String getDeliveryResult(String jgdm) {
+		if (StringUtil.equals(StlDataDealProcessConstant.JGDM_0000, jgdm)) {
+			return "01";
+		}
+		if (StringUtil.equals(StlDataDealProcessConstant.JGDM_0101, jgdm) || StringUtil.equals(StlDataDealProcessConstant.JGDM_0100, jgdm)
+				|| StringUtil.equals(StlDataDealProcessConstant.JGDM_0102, jgdm)) {
+			return "02";
+		}
+		return "03";
+	}
+
 	
 	// 获取下个工作日
 	public Date getNextWorkDay(Date nowday, String calendarId) {
