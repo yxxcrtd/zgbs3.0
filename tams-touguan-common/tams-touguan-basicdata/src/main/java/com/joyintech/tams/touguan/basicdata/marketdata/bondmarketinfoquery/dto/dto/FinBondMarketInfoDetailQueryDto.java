@@ -185,6 +185,9 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "zxGradeOrgId", value = "债项评级机构")
     private String zxGradeOrgId;
 
+    @ApiModelProperty(name = "finBondPayHSrcSecOptionDto", value = "行权计划信息")
+    private FinBondPayHSrcSecOptionDto finBondPayHSrcSecOptionDto;
+
     public String getSecId() {
         return secId;
     }
@@ -591,5 +594,13 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     public void setOptionType(String optionType) {
         this.optionType = optionType;
+    }
+
+    public FinBondPayHSrcSecOptionDto getFinBondPayHSrcSecOptionDto() {
+        return finBondPayHSrcSecOptionDto;
+    }
+
+    public void setFinBondPayHSrcSecOptionDto(FinBondPayHSrcSecOptionDto finBondPayHSrcSecOptionDto) {
+        this.finBondPayHSrcSecOptionDto = finBondPayHSrcSecOptionDto;
     }
 }
