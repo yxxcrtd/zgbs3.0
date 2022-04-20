@@ -1,7 +1,10 @@
 package com.joyintech.tams.exchange.service.trade.processor.business.bond;
 
+import com.joyintech.exchange.service.quote.service.QuoteService;
 import com.joyintech.tams.exchange.common.bean.MinPrice;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
+import com.joyintech.tams.exchange.common.bean.ResultBean;
+import com.joyintech.tams.exchange.common.bean.TickBean;
 import com.joyintech.tams.exchange.common.cache.QuoteTickService;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.db.domain.*;
@@ -31,8 +34,10 @@ import java.util.Objects;
 public class BondHelper {
     private static final Logger logger = LoggerFactory.getLogger(BondHelper.class);
 
+//    @Autowired
+//    private QuoteTickService quoteTickService;
     @Autowired
-    private QuoteTickService quoteTickService;
+    private QuoteService quoteService;
     @Autowired
     private InstrumentService instrumentService;
     @Autowired
@@ -81,8 +86,11 @@ public class BondHelper {
                 orderInterface.setErrorMsg("委托价格 {" + entrustPrice + "} 不满足最小价差：" + minPrice.getMinPrice().doubleValue());
                 return false;
             }
-            QuoteProto.TickBean tick = quoteTickService.getTickFromCache(orderInterface.getStockCode());
-            if (Objects.nonNull(tick)) {
+            ResultBean tickBean = quoteService.getTick(orderInterface.getStockCode());
+            if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
+                TickBean tick = (TickBean)tickBean.getData();
+//            QuoteProto.TickBean tick = quoteTickService.getTickFromCache(orderInterface.getStockCode());
+//            if (Objects.nonNull(tick)) {
                 double lowerLimitPrice = TradeUtils.formatDouble(tick.getLowerLimitPrice(), 4);
                 double upperLimitPrice = TradeUtils.formatDouble(tick.getUpperLimitPrice(), 4);
                 if (Double.compare(lowerLimitPrice, 0.0) == 0 && Double.compare(upperLimitPrice, 0.0) == 0) {

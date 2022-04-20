@@ -1,8 +1,11 @@
 package com.joyintech.tams.exchange.service.trade.processor.business.stock;
 
 import com.google.common.base.Strings;
+import com.joyintech.exchange.service.quote.service.QuoteService;
 import com.joyintech.tams.exchange.common.bean.MinPrice;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
+import com.joyintech.tams.exchange.common.bean.ResultBean;
+import com.joyintech.tams.exchange.common.bean.TickBean;
 import com.joyintech.tams.exchange.common.cache.QuoteTickService;
 import com.joyintech.tams.exchange.common.constant.EntrustBs;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
@@ -34,8 +37,10 @@ import java.util.Objects;
 public class StockHelper {
     private static final Logger logger = LoggerFactory.getLogger(StockHelper.class);
 
+//    @Autowired
+//    private QuoteTickService quoteTickService;
     @Autowired
-    private QuoteTickService quoteTickService;
+    private QuoteService quoteService;
     @Autowired
     private InstrumentService instrumentService;
     @Autowired
@@ -71,8 +76,11 @@ public class StockHelper {
                 orderInterface.setErrorMsg("委托价格不满足最小价差：" + minPrice.getMinPrice().doubleValue());
                 return false;
             }
-            QuoteProto.TickBean tick = quoteTickService.findFromRedisById(orderInterface.getStockCode());
-            if (Objects.nonNull(tick)) {
+            ResultBean tickBean = quoteService.getTick(orderInterface.getStockCode());
+            if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
+                TickBean tick = (TickBean)tickBean.getData();
+//            QuoteProto.TickBean tick = quoteTickService.findFromRedisById(orderInterface.getStockCode());
+//            if (Objects.nonNull(tick)) {
                 double lowerLimitPrice = TradeUtils.formatDouble(tick.getLowerLimitPrice(), 4);
                 double upperLimitPrice = TradeUtils.formatDouble(tick.getUpperLimitPrice(), 4);
                 if (Double.compare(lowerLimitPrice, 0.0) == 0 && Double.compare(upperLimitPrice, 0.0) == 0) {
@@ -90,7 +98,7 @@ public class StockHelper {
                     }
                 }
             }
-            return checkPriceForSTIB(entrustPrice, entrustVolume, orderInterface, instrument, tick);
+            return checkPriceForSTIB(entrustPrice, entrustVolume, orderInterface, instrument, null);
         }
         // 交易数量及范围检查
         if (TradePlat.NORMAL.value.equals(tradePlat)) {
@@ -118,7 +126,7 @@ public class StockHelper {
 
     // 科创板股票 限价申报价格限制
     // 科创板股票 限价申报价格限制
-    public boolean checkPriceForSTIB(BigDecimal entrustPrice, long entrustVolume, OrderInterface orderInterface, Instrument instrument, QuoteProto.TickBean tick) {
+    public boolean checkPriceForSTIB(BigDecimal entrustPrice, long entrustVolume, OrderInterface orderInterface, Instrument instrument, TickBean tick) {
         String subStockType = instrument.getSubStockType();
         if (!Strings.isNullOrEmpty(subStockType)) {
             if (SubStockType.KCB.value.equals(instrument.getSubStockType())) {

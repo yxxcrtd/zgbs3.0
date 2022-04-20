@@ -85,7 +85,7 @@ public class TradeCallbackHelper {
                     } else {
                         logger.info("tradeRecord has not found businessFlag brokerEntrustId is {}", tradeRecord.getBrokerEntrustId());
                     }
-                    IntegratedEntrust integratedEntrust =  (IntegratedEntrust) entrust;
+                    IntegratedEntrust integratedEntrust = (IntegratedEntrust) entrust;
                     tradeRecord.setPropSeatNo(integratedEntrust.getPropSeatNo());
                     tradeRecord.setPropSeatName(integratedEntrust.getPropSeatName());
                     tradeRecord.setDiscount(integratedEntrust.getDiscount());
@@ -230,9 +230,15 @@ public class TradeCallbackHelper {
         tradeRecord.setPs(instruction.getTradeSide());
         tradeRecord.setBusiTypeTg(instruction.getBusiTypeTg());
         tradeRecord.setEntrustClass(instruction.getEntrustClass());
-        if (InvestmentAssetType.isBond(tradeRecord.getFinprodType2()) && tradeRecord.getFullPrice() != null) {
-            //成交全价金额
-            tradeRecord.setClearBalance(tradeRecord.getFullPrice().multiply(BigDecimal.valueOf(tradeRecord.getTradedVolume())));
+        if (tradeRecord.getClearBalance() == null) {
+            if (IntegratedEntrustUtils.isProtocolBack_SH(entrust.getEntrustProp())
+                    || IntegratedEntrustUtils.isProtocolBack_SZ(entrust.getEntrustProp())) {
+                //到期结算金额
+                tradeRecord.setClearBalance(entrust.getBackBalance());
+            } else if (InvestmentAssetType.isBond(tradeRecord.getFinprodType2()) && tradeRecord.getFullPrice() != null) {
+                //成交全价金额
+                tradeRecord.setClearBalance(tradeRecord.getFullPrice().multiply(BigDecimal.valueOf(tradeRecord.getTradedVolume())));
+            }
         }
 
         //获取BusinessFlag

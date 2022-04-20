@@ -489,6 +489,29 @@ public class CfetsEtrIbRepoinfo003Service extends CommonExportService<CfetsEtrib
                     isSubmit = false;
                 }
             }*/
+            // 代办中编辑后质押券面未修改
+            for (CfetsEtribRepoInfo003Dto dto : entity.getEtrInvestRepoInfoDtos()) {
+                if (StringUtil.equals(CacheUtil.getSysParam(BussinessConstant.REPO_PLEDGE_MODEL), "02")
+                        || StringUtil.equals(entity.getPs(), DictCodeListExt1.回购方向_正回购.getValue())) {
+                    dto.setBussRepoSec(new BussRepoSecDto());
+                    dto.getBussRepoSec().setPageFrom("CfetsEtrIbRepoinfo003");
+                    List<PledgeBondInfoDto> pledgeBondList = new ArrayList<>();
+                    if (CollectionUtils.isNotEmpty(entity.getPledgeBondTotalListDetailed())) {
+                        for (CfetsPledgeBondInfoDto cfetsPledgeBondInfoDto : entity.getPledgeBondTotalListDetailed()) {
+                            if (StringUtil.equals(dto.getPortfolioId(), cfetsPledgeBondInfoDto.getPortfolioId())) {
+                                //组合代码相同
+                                PledgeBondInfoDto pledgeBondInfoDto = new PledgeBondInfoDto();
+                                BeanUtil.copyPropertiesIgnoreNull(pledgeBondInfoDto, cfetsPledgeBondInfoDto);
+                                pledgeBondInfoDto.setBondCode(cfetsPledgeBondInfoDto.getFinprodMarketId());
+                                pledgeBondInfoDto.setPledgeRatio(cfetsPledgeBondInfoDto.getScale());
+                                pledgeBondInfoDto.setPledgeRatio(cfetsPledgeBondInfoDto.getScale());
+                                pledgeBondList.add(pledgeBondInfoDto);
+                            }
+                        }
+                    }
+                    dto.getBussRepoSec().setPledgeBondList(pledgeBondList);
+                }
+            }
             try {
                 SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey(entity.getWorkflowId());
                 if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
