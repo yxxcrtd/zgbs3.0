@@ -30,7 +30,7 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
     private IPlatformDate iPlatformDate;
 
     /**
-     * 分页查询
+     * 债券市场信息分页查询
      *
      * @param request
      * @return

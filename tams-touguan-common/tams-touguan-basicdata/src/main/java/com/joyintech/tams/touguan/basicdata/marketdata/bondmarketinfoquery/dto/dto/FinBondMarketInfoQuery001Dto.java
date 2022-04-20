@@ -1,6 +1,5 @@
 package com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto;
 
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.dto.BaseDto;
 import com.joyintech.framework.json.BigDecimalSerializer;
@@ -152,8 +151,39 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "firstRateDay", value = "首次付息日")
     private Date firstRateDay;
 
-    @ApiModelProperty(name = "schecalRule", value = "首次付息日")
+    @ApiModelProperty(name = "schecalRule", value = "付息生成规则(即付息计划推算方法)")
     private String schecalRule;
+
+    @ApiModelProperty(name = "firstConfirmDate", value = "首次利率确定日")
+    private Date firstConfirmDate;
+
+    @ApiModelProperty(name = "exerciseType", value = "行权方式")
+    private String exerciseType;
+
+    @ApiModelProperty(name = "exerciseDate", value = "理论行权日")
+    private Date exerciseDate;
+
+    @ApiModelProperty(name = "parValue", value = "单位面值")
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal parValue;
+
+    @ApiModelProperty(name = "crossMarketCode", value = "跨市场代码")
+    private String crossMarketCode;
+
+    @ApiModelProperty(name = "calendarId", value = "交易日历")
+    private String calendarId;
+
+    @ApiModelProperty(name = "ztGradeResult", value = "主体评级结果")
+    private String ztGradeResult;
+
+    @ApiModelProperty(name = "ztGradeOrgId", value = "主体评级机构")
+    private String ztGradeOrgId;
+
+    @ApiModelProperty(name = "zxGradeResult", value = "债项评级结果")
+    private String zxGradeResult;
+
+    @ApiModelProperty(name = "zxGradeOrgId", value = "债项评级机构")
+    private String zxGradeOrgId;
 
     public String getSecId() {
         return secId;
@@ -481,5 +511,85 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
 
     public void setSchecalRule(String schecalRule) {
         this.schecalRule = schecalRule;
+    }
+
+    public Date getFirstConfirmDate() {
+        return firstConfirmDate;
+    }
+
+    public void setFirstConfirmDate(Date firstConfirmDate) {
+        this.firstConfirmDate = firstConfirmDate;
+    }
+
+    public String getExerciseType() {
+        return exerciseType;
+    }
+
+    public void setExerciseType(String exerciseType) {
+        this.exerciseType = exerciseType;
+    }
+
+    public Date getExerciseDate() {
+        return exerciseDate;
+    }
+
+    public void setExerciseDate(Date exerciseDate) {
+        this.exerciseDate = exerciseDate;
+    }
+
+    public BigDecimal getParValue() {
+        return parValue;
+    }
+
+    public void setParValue(BigDecimal parValue) {
+        this.parValue = parValue;
+    }
+
+    public String getCrossMarketCode() {
+        return crossMarketCode;
+    }
+
+    public void setCrossMarketCode(String crossMarketCode) {
+        this.crossMarketCode = crossMarketCode;
+    }
+
+    public String getCalendarId() {
+        return calendarId;
+    }
+
+    public void setCalendarId(String calendarId) {
+        this.calendarId = calendarId;
+    }
+
+    public String getZtGradeResult() {
+        return ztGradeResult;
+    }
+
+    public void setZtGradeResult(String ztGradeResult) {
+        this.ztGradeResult = ztGradeResult;
+    }
+
+    public String getZtGradeOrgId() {
+        return ztGradeOrgId;
+    }
+
+    public void setZtGradeOrgId(String ztGradeOrgId) {
+        this.ztGradeOrgId = ztGradeOrgId;
+    }
+
+    public String getZxGradeResult() {
+        return zxGradeResult;
+    }
+
+    public void setZxGradeResult(String zxGradeResult) {
+        this.zxGradeResult = zxGradeResult;
+    }
+
+    public String getZxGradeOrgId() {
+        return zxGradeOrgId;
+    }
+
+    public void setZxGradeOrgId(String zxGradeOrgId) {
+        this.zxGradeOrgId = zxGradeOrgId;
     }
 }

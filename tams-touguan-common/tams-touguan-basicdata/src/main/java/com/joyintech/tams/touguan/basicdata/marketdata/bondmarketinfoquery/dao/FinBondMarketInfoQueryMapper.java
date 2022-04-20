@@ -20,15 +20,6 @@ public interface FinBondMarketInfoQueryMapper {
     List<FinBondMarketInfoQuery001Dto> queryForPage(FinBondMarketInfoQueryRequest request);
 
     /**
-     * 平台日
-     *
-     * @param params{ iplatformDate:平台日
-     *                }
-     * @return
-     */
-    FinBondMarketInfoQuery001Dto getBoundMarketInfo(Map<String, Object> params);
-
-    /**
      * 债券付息信息
      *
      * @param param
