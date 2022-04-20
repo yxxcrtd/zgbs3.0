@@ -3549,13 +3549,29 @@
         ],
         beforeEditCell: function (preVal, field, rowData) {
             var ps = $("#ps_" + currentTab).val();
+            var targetType = $("#targetType_" + currentTab).val();
             if (field == "acctNo") {
                 curPortfolioId = rowData.portfolioId;
                 return true;
             } else if (field == "portfolioId") {
                 return true;
-            } else if (field == "entrustNum") {
+            }/* else if (field == "entrustNum") {
                 return true;
+            }*/
+            if (targetType && targetType == TARGET_CLASS_02) {
+                if (field == "entrustAmt"){
+                    return true;
+                }
+                if (field == "entrustNum") {
+                    return false;
+                }
+            }else{
+                if (field == "entrustAmt"){
+                    return false;
+                }
+                if (field == "entrustNum") {
+                    return true;
+                }
             }
 
         },
@@ -3739,7 +3755,7 @@
 
                     linkTableEntrustNumAmt();
                 }
-            } else if (filed = 'entrustNum') {
+            } else if (field == 'entrustNum') {
                 if (parseFloat(value) < 0){
                     Joyin.error("指令数量不能为负数！",function(){
                         dateTable.renderRow(data.LAY_TABLE_INDEX, {"entrustNum": 0});
@@ -3761,7 +3777,31 @@
                     $("#entrustNum_" + currentTab).val(entrustNum);
                     calcEntrustNumAndAmt();
                     var entrustAmt =  $("#entrustAmt_" + currentTab).val();
-                    dateTable.renderRow(data.LAY_TABLE_INDEX, {"entrustAmt": parseInt(entrustAmt) * parseInt(value) / entrustNum});
+                    dateTable.renderRow(data.LAY_TABLE_INDEX, {"entrustAmt": parseFloat(entrustAmt) * parseInt(value) / entrustNum});
+                }
+            }else if(field == 'entrustAmt'){
+                if (parseFloat(value) < 0){
+                    Joyin.error("指令金额不能为负数！",function(){
+                        dateTable.renderRow(data.LAY_TABLE_INDEX, {"entrustAmt": 0});
+                    });
+                    return ;
+                }
+                var datas= dateTable.getAllRows();
+                if (datas){
+                    var entrustAmt = Math.floor(Number(0));
+                    for (var i in datas) {
+                        var amt = 0;
+                        if (datas[i].entrustAmt == '' || datas[i].entrustAmt == undefined) {
+                            amt = 0;
+                        } else {
+                            amt = parseFloat(datas[i].entrustAmt);
+                        }
+                        entrustAmt += parseFloat(amt);
+                    }
+                    $("#entrustAmt_" + currentTab).val(entrustAmt);
+                    calcEntrustNumAndAmt();
+                    var entrustNum =  $("#entrustNum_" + currentTab).val();
+                    dateTable.renderRow(data.LAY_TABLE_INDEX, {"entrustNum": parseFloat(entrustNum) * parseInt(value) / entrustAmt});
                 }
             }
         },
