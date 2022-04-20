@@ -583,10 +583,9 @@ public class PortfolioManager extends BaseService {
 
         // 行情数据
         ResultBean tickBean = quoteService.getTick(bean.getStockCode());
-        if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
-            TickBean tick = (TickBean)tickBean.getData();
 //        QuoteProto.TickBean tick = quoteTickService.getTickFromCache(bean.getStockCode());
 //        if (Objects.isNull(tick)) {
+        if (!ErrorCode.isSuccess(tickBean.getErrorCode())) {
             log.warn("未找到行情信息: stockId [{}]", instruction.getFinprodMarketId());
             result.setInfoLevel("1");
             result.setInfoDetails(ErrorCode.getStr(ErrorCode.QUOTE_NOT_EXIT));
