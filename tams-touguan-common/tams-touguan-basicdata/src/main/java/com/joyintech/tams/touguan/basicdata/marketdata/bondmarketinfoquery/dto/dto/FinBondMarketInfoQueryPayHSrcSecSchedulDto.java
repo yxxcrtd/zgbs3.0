@@ -1,4 +1,4 @@
-package com.joyintech.tams.business.asset.tenderbond.dto;
+package com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto;
 
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -15,11 +15,11 @@ import java.util.Date;
  *
  * @author zhuys
  * @version 1.0 2022年4月18日
- * @see FinTenderBoundAsset004PayHSrcSecSchedulDto
+ * @see FinBondMarketInfoQueryPayHSrcSecSchedulDto
  * @since 1.0
  */
 @ApiModel(value = "债券市场付息计划信息", description = "债券市场付息计划信息")
-public class FinTenderBoundAsset004PayHSrcSecSchedulDto extends BaseDto {
+public class FinBondMarketInfoQueryPayHSrcSecSchedulDto extends BaseDto {
 
     /**
      * 债券id

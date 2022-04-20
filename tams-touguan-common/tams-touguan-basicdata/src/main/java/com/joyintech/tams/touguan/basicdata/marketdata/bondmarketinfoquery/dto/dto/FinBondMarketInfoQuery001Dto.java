@@ -1,5 +1,4 @@
-package com.joyintech.tams.business.asset.tenderbond.dto;
-
+package com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.dto.BaseDto;
@@ -9,23 +8,22 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
 /**
  * 债券市场信息查看DTO
  *
  * @author zhuys
  * @version 1.0 2022年4月18日
- * @see FinTenderBoundAsset004Dto
+ * @see FinBondMarketInfoQuery001Dto
  * @since 1.0
  */
 @ApiModel(value = "债券市场信息查看", description = "债券市场信息查看")
-public class FinTenderBoundAsset004Dto extends BaseDto {
+public class FinBondMarketInfoQuery001Dto extends BaseDto {
 
-    @ApiModelProperty(name = "secId", value = "债券ID")
+    @ApiModelProperty(name = "secId", value = "债券ID/资产代码")
     private String secId;
 
-    @ApiModelProperty(name = "secName", value = "债券名称")
+    @ApiModelProperty(name = "secName", value = "资产简称")
     private String secName;
 
     @ApiModelProperty(name = "secFullName", value = "债券全称")
@@ -41,9 +39,10 @@ public class FinTenderBoundAsset004Dto extends BaseDto {
     private String institution;
 
     @ApiModelProperty(name = "issuePrice", value = "发行价格")
-    private String issuePrice;
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal issuePrice;
 
-    @ApiModelProperty(name = "pubendDate", value = "发行截止日")
+    @ApiModelProperty(name = "pubendDate", value = "发行日（发行截止日）")
     private String pubendDate;
 
     @ApiModelProperty(name = "vdate", value = "起息日")
@@ -53,7 +52,8 @@ public class FinTenderBoundAsset004Dto extends BaseDto {
     private String mdate;
 
     @ApiModelProperty(name = "issueAmt", value = "发行金额")
-    private String issueAmt;
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal issueAmt;
 
     @ApiModelProperty(name = "issuerName", value = "发行人")
     private String issuerName;
@@ -89,8 +89,8 @@ public class FinTenderBoundAsset004Dto extends BaseDto {
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal faceValue;
 
-    @ApiModelProperty(name = "warrantor", value = "担保人")
-    private String warrantor;
+    @ApiModelProperty(name = "guarantor", value = "担保人")
+    private String guarantor;
 
     @ApiModelProperty(name = "guarType", value = "担保方式")
     private String guarType;
@@ -104,19 +104,19 @@ public class FinTenderBoundAsset004Dto extends BaseDto {
     @ApiModelProperty(name = "interestRate", value = "利率类型")
     private String interestRate;
 
-    @ApiModelProperty(name = "paperir", value = "利率类型")
+    @ApiModelProperty(name = "paperir", value = "票面利率(%)")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal paperir;
 
-    @ApiModelProperty(name = "spreadRate8", value = "浮动利差")
+    @ApiModelProperty(name = "spreadRate8", value = "利差（BP）（浮动利差）")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal spreadRate8;
 
-    @ApiModelProperty(name = "coefficient", value = "浮动系数")
+    @ApiModelProperty(name = "coefficient", value = "基准利率系数（浮动系数）")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal coefficient;
 
-    @ApiModelProperty(name = "rateCode", value = "浮动利率code")
+    @ApiModelProperty(name = "rateCode", value = "基准利率（浮动利率code）")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private String rateCode;
 
@@ -151,11 +151,39 @@ public class FinTenderBoundAsset004Dto extends BaseDto {
     @ApiModelProperty(name = "firstRateDay", value = "首次付息日")
     private Date firstRateDay;
 
-    @ApiModelProperty(name = "schecalRule", value = "首次付息日")
+    @ApiModelProperty(name = "schecalRule", value = "付息生成规则(即付息计划推算方法)")
     private String schecalRule;
 
-    @ApiModelProperty(name = "tenderBoundAsset004PayHSrcSecSchedulDtos", value = "付息计划列表")
-    private List<FinTenderBoundAsset004PayHSrcSecSchedulDto> tenderBoundAsset004PayHSrcSecSchedulDtos;
+    @ApiModelProperty(name = "firstConfirmDate", value = "首次利率确定日")
+    private Date firstConfirmDate;
+
+    @ApiModelProperty(name = "optionType", value = "行权方式")
+    private String optionType;
+
+    @ApiModelProperty(name = "exerciseDate", value = "理论行权日")
+    private Date exerciseDate;
+
+    @ApiModelProperty(name = "parValue", value = "单位面值")
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal parValue;
+
+    @ApiModelProperty(name = "crossMarketCode", value = "跨市场代码")
+    private String crossMarketCode;
+
+    @ApiModelProperty(name = "calendarId", value = "交易日历")
+    private String calendarId;
+
+    @ApiModelProperty(name = "ztGradeResult", value = "主体评级结果")
+    private String ztGradeResult;
+
+    @ApiModelProperty(name = "ztGradeOrgId", value = "主体评级机构")
+    private String ztGradeOrgId;
+
+    @ApiModelProperty(name = "zxGradeResult", value = "债项评级结果")
+    private String zxGradeResult;
+
+    @ApiModelProperty(name = "zxGradeOrgId", value = "债项评级机构")
+    private String zxGradeOrgId;
 
     public String getSecId() {
         return secId;
@@ -205,11 +233,11 @@ public class FinTenderBoundAsset004Dto extends BaseDto {
         this.institution = institution;
     }
 
-    public String getIssuePrice() {
+    public BigDecimal getIssuePrice() {
         return issuePrice;
     }
 
-    public void setIssuePrice(String issuePrice) {
+    public void setIssuePrice(BigDecimal issuePrice) {
         this.issuePrice = issuePrice;
     }
 
@@ -237,11 +265,11 @@ public class FinTenderBoundAsset004Dto extends BaseDto {
         this.mdate = mdate;
     }
 
-    public String getIssueAmt() {
+    public BigDecimal getIssueAmt() {
         return issueAmt;
     }
 
-    public void setIssueAmt(String issueAmt) {
+    public void setIssueAmt(BigDecimal issueAmt) {
         this.issueAmt = issueAmt;
     }
 
@@ -331,14 +359,6 @@ public class FinTenderBoundAsset004Dto extends BaseDto {
 
     public void setFaceValue(BigDecimal faceValue) {
         this.faceValue = faceValue;
-    }
-
-    public String getWarrantor() {
-        return warrantor;
-    }
-
-    public void setWarrantor(String warrantor) {
-        this.warrantor = warrantor;
     }
 
     public String getGuarType() {
@@ -485,11 +505,91 @@ public class FinTenderBoundAsset004Dto extends BaseDto {
         this.schecalRule = schecalRule;
     }
 
-    public List<FinTenderBoundAsset004PayHSrcSecSchedulDto> getTenderBoundAsset004PayHSrcSecSchedulDtos() {
-        return tenderBoundAsset004PayHSrcSecSchedulDtos;
+    public Date getFirstConfirmDate() {
+        return firstConfirmDate;
     }
 
-    public void setTenderBoundAsset004PayHSrcSecSchedulDtos(List<FinTenderBoundAsset004PayHSrcSecSchedulDto> tenderBoundAsset004PayHSrcSecSchedulDtos) {
-        this.tenderBoundAsset004PayHSrcSecSchedulDtos = tenderBoundAsset004PayHSrcSecSchedulDtos;
+    public void setFirstConfirmDate(Date firstConfirmDate) {
+        this.firstConfirmDate = firstConfirmDate;
+    }
+
+    public Date getExerciseDate() {
+        return exerciseDate;
+    }
+
+    public void setExerciseDate(Date exerciseDate) {
+        this.exerciseDate = exerciseDate;
+    }
+
+    public BigDecimal getParValue() {
+        return parValue;
+    }
+
+    public void setParValue(BigDecimal parValue) {
+        this.parValue = parValue;
+    }
+
+    public String getCrossMarketCode() {
+        return crossMarketCode;
+    }
+
+    public void setCrossMarketCode(String crossMarketCode) {
+        this.crossMarketCode = crossMarketCode;
+    }
+
+    public String getCalendarId() {
+        return calendarId;
+    }
+
+    public void setCalendarId(String calendarId) {
+        this.calendarId = calendarId;
+    }
+
+    public String getZtGradeResult() {
+        return ztGradeResult;
+    }
+
+    public void setZtGradeResult(String ztGradeResult) {
+        this.ztGradeResult = ztGradeResult;
+    }
+
+    public String getZtGradeOrgId() {
+        return ztGradeOrgId;
+    }
+
+    public void setZtGradeOrgId(String ztGradeOrgId) {
+        this.ztGradeOrgId = ztGradeOrgId;
+    }
+
+    public String getZxGradeResult() {
+        return zxGradeResult;
+    }
+
+    public void setZxGradeResult(String zxGradeResult) {
+        this.zxGradeResult = zxGradeResult;
+    }
+
+    public String getZxGradeOrgId() {
+        return zxGradeOrgId;
+    }
+
+    public void setZxGradeOrgId(String zxGradeOrgId) {
+        this.zxGradeOrgId = zxGradeOrgId;
+    }
+
+    public String getGuarantor() {
+        return guarantor;
+    }
+
+    public void setGuarantor(String guarantor) {
+        this.guarantor = guarantor;
+    }
+
+    public String getOptionType() {
+        return optionType;
+    }
+
+    public void setOptionType(String optionType) {
+        this.optionType = optionType;
     }
 }

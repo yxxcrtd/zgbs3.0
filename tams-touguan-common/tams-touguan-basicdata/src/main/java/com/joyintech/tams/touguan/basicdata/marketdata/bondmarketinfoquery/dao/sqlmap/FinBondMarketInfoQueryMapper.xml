@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dao.FinBondMarketInfoQueryMapper">
+
+
+    <select id="queryForPage"
+            resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto"
+            parameterType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinBondMarketInfoQueryRequest">
+        SELECT
+        PAYHSRCSECINFO.SECID,
+        PAYHSRCSECINFO.SECNAME,
+        PAYHSRCSECINFO.SECFULLNAME,
+        PAYHSRCSECINFO.SECCODE,
+        PAYHSRCSECINFO.MARKET,
+        PAYHSRCSECINFO.INSTITUTION,
+        PAYHSRCSECINFO.ISSUEPRICE,
+        PAYHSRCSECINFO.PUBENDDATE,
+        PAYHSRCSECINFO.VDATE,
+        PAYHSRCSECINFO.MDATE,
+        PAYHSRCSECINFO.ISSUEAMT,
+        CUSTOMER_INFO1.CUSTOMER_NAME issuerName,
+        PAYHSRCSECINFO.SECTYPE,
+        PAYHSRCSECINFO.SECTYPE2,
+        CASE
+        PAYHSRCSECINFO.ISSUETYPE
+        WHEN '01' THEN
+        '1' ELSE '2'
+        END AS ISSUETYPE,
+        PAYHSRCSECINFO.BLNAREA,
+        PAYHSRCSECINFO.ISSUS,
+        PAYHSRCSECINFO.ISSECBOND,
+        PAYHSRCSECINFO.CITY_INVEST_SEC_CHB CITYINVESTSECWIND,
+        PAYHSRCSECINFO.CCY,
+        PAYHSRCSECINFO.FACEVALUE,
+        CUSTOMER_INFO2.CUSTOMER_NAME WARRANTOR,
+        PAYHSRCSECINFO.GUARTYPE,
+        CASE
+
+        WHEN ( PAYHSRCSECINFO.CALLOPTION = 'Y' OR PAYHSRCSECINFO.PUTOPTION = 'Y' ) THEN
+        '是' ELSE '否'
+        END AS IS_RIGHT,
+        PAYHSRCSECINFO.REMARK,
+        PAYHSRCSECINFO.COUPONSPECIES,
+        PAYHSRCSECINFO.INTERESTRATE,
+        PAYHSRCSECINFO.PAPERIR,
+        PAYHSRCSECINFO.SPREADRATE_8 SPREADRATE8,
+        PAYHSRCSECINFO.RATECODE,
+        PAYHSRCSECINFO.COEFFICIENT,
+        PAYHSRCSECINFO.TOPRATE,
+        PAYHSRCSECINFO.BOTTOMRATE,
+        PAYHSRCSECINFO.RESETTYPE,
+        PAYHSRCSECINFO.OBSERVEBEFDAY,
+        PAYHSRCSECINFO.OBSERVEBEFUNIT,
+        CASE
+
+        WHEN ( PAYHSRCSECINFO.RATEBASIC = 'A/A_B_COUP' OR PAYHSRCSECINFO.PUTOPTION = 'A_B_DAY' ) THEN
+        'A/A' ELSE PAYHSRCSECINFO.RATEBASIC
+        END AS RATEBASIC,
+        CASE
+
+        WHEN PAYHSRCSECINFO.RATEBASIC = 'A/A_B_COUP' THEN
+        '02'
+        WHEN PAYHSRCSECINFO.RATEBASIC = 'A/A_B_DAY' THEN
+        '01'
+        END AS BASISSTYLE,
+        PAYHSRCSECINFO.WORKDAYRULE,
+        PAYHSRCSECINFO.PAYCYCLE,
+        PAYHSRCSECINFO.SCHECALRULE,
+        PAYHSRCSECINFO.FIRSTRATEDAY
+        FROM
+        INTERF_PAYHSRCSECINFO PAYHSRCSECINFO
+        LEFT JOIN INTERF_CUSTOMER_INFO CUSTOMER_INFO1 ON PAYHSRCSECINFO.ISSUERSHORT = CUSTOMER_INFO1.CUSTOMER_ID
+        LEFT JOIN INTERF_CUSTOMER_INFO CUSTOMER_INFO2 ON CUSTOMER_INFO1.CUSTOMER_ID = PAYHSRCSECINFO.GUARANTOR
+        LEFT JOIN INTERF_PAYHSRCSECOPTION PAYHSRCSECOPTION ON PAYHSRCSECOPTION.SECID = PAYHSRCSECINFO.SECID
+        LEFT JOIN INTERF_PAYHSRCSECRATING PAYHSRCSECRATING ON PAYHSRCSECRATING.SECID = PAYHSRCSECINFO.SECID AND  PAYHSRCSECRATING.ratingtype = 'C'
+        LEFT JOIN INTERF_PAYHSRCSECRATING PAYHSRCSECRATING2 ON PAYHSRCSECRATING2.SECID = PAYHSRCSECINFO.SECID AND PAYHSRCSECRATING2.ratingtype = 'I'
+        <where>
+            PAYHSRCSECINFO.VDATE <![CDATA[<=]]> STR_TO_DATE ( #{iplatformDate}, '%Y-%m-%d' )
+
+            <if test="secId !=null and secId !=''">
+                AND PAYHSRCSECINFO.SECID = #{secId,jdbcType=VARCHAR}
+            </if>
+
+            <if test="market !=null and market !=''">
+                AND PAYHSRCSECINFO.MARKET = #{market,jdbcType=VARCHAR}
+            </if>
+
+            <if test="institution !=null and institution !=''">
+                AND PAYHSRCSECINFO.institution = #{institution,jdbcType=VARCHAR}
+            </if>
+
+            <if test="issuer !=null and issuer !=''">
+                AND PAYHSRCSECINFO.ISSUERSHORT = #{issuer,jdbcType=VARCHAR}
+            </if>
+
+            <if test="issueDateStart != null">
+                AND PAYHSRCSECINFO.PUBENDDATE >= #{issueDateStart,jdbcType=DATE}
+            </if>
+
+            <if test="issueDateEnd != null">
+                <![CDATA[ AND PAYHSRCSECINFO.PUBENDDATE <= #{issueDateEnd,jdbcType=DATE} ]]>
+            </if>
+
+            <if test="vdateStart != null">
+                AND PAYHSRCSECINFO.VDATE >= #{vdateStart,jdbcType=DATE}
+            </if>
+
+            <if test="vdateEnd != null">
+                <![CDATA[ AND PAYHSRCSECINFO.VDATE <= #{vdateEnd,jdbcType=DATE} ]]>
+            </if>
+
+            <if test="mdateStart != null">
+                AND PAYHSRCSECINFO.MDATE >= #{mdateStart,jdbcType=DATE}
+            </if>
+
+            <if test="mdateEnd != null">
+                <![CDATA[ AND PAYHSRCSECINFO.MDATE <= #{mdateEnd,jdbcType=DATE} ]]>
+            </if>
+
+            <if test="theOryOptionPayDayStart != null">
+                AND PAYHSRCSECOPTION.THEORYOPTIONPAYDAY >= #{theOryOptionPayDayStart,jdbcType=DATE}
+            </if>
+
+            <if test="theOryOptionPayDayEnd != null">
+                <![CDATA[ AND PAYHSRCSECOPTION.THEORYOPTIONPAYDAY <= #{theOryOptionPayDayEnd,jdbcType=DATE} ]]>
+            </if>
+
+            <if test="couponSpecies !=null and couponSpecies !=''">
+                AND PAYHSRCSECINFO.COUPONSPECIES = #{couponSpecies,jdbcType=VARCHAR}
+            </if>
+
+            <if test="interestRate !=null and interestRate !=''">
+                AND PAYHSRCSECINFO.INTERESTRATE = #{interestRate,jdbcType=VARCHAR}
+            </if>
+
+            <if test="payCycle !=null and payCycle !=''">
+                AND PAYHSRCSECINFO.PAYCYCLE = #{payCycle,jdbcType=VARCHAR}
+            </if>
+
+            <if test="cyy !=null and cyy !=''">
+                AND PAYHSRCSECINFO.CYY = #{cyy,jdbcType=VARCHAR}
+            </if>
+
+            <if test="isSus !=null and isSus !=''">
+                AND PAYHSRCSECINFO.ISSUS = #{isSus,jdbcType=VARCHAR}
+            </if>
+
+            <if test="isSus !=null and isSus !=''">
+                AND PAYHSRCSECINFO.ISSUS = #{isSus,jdbcType=VARCHAR}
+            </if>
+
+            <if test="isRight !=null and isRight !='' and isRight == Y">
+                AND ( PAYHSRCSECINFO.CALLOPTION = 'Y' OR PAYHSRCSECINFO.PUTOPTION = 'Y')
+            </if>
+
+            <if test="isRight !=null and isRight !='' and isRight == N">
+                AND ( PAYHSRCSECINFO.CALLOPTION = 'N' AND PAYHSRCSECINFO.PUTOPTION = 'N')
+            </if>
+
+            <if test="optionType !=null and optionType !=''">
+                AND PAYHSRCSECOPTION.OPTIONTYPE = #{optionType,jdbcType=VARCHAR}
+            </if>
+
+            <if test="zxGrade !=null and zxGrade !=''">
+                AND PAYHSRCSECRATING2.RATING in (#{zxGrade,jdbcType=VARCHAR})
+            </if>
+
+            <if test="ztGrade !=null and ztGrade !=''">
+                AND PAYHSRCSECRATING.RATING in (#{ztGrade,jdbcType=VARCHAR})
+            </if>
+
+        </where>
+        ORDER BY
+        PAYHSRCSECINFO.SECTYPE,
+        PAYHSRCSECINFO.SECTYPE2,
+        PAYHSRCSECINFO.VDATE,
+        PAYHSRCSECINFO.SECID;
+    </select>
+
+    <!-- 债券付息信息 -->
+    <select id="selectWindBondSchedule"
+            resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQueryPayHSrcSecSchedulDto"
+            parameterType="Map">
+        select
+        SECID,
+        SCHEDUTYPE,
+        TOTALINTERESTSTARTDAY,
+        TOTALINTERESTENDDAY,
+        INTERESTSTARTDAY,
+        INTERESTENDDAY,
+        INTERESTPAYDAY,
+        COUPONRATE,
+        ACCRUEINTAMT,
+        DAILYACCRUEINT,
+        PRINAMTPAY,
+        CASHPAY,
+        PRINAMT,
+        SOURCE
+        from
+        INTERF_PAYHSRCSECSCHEDULE
+        where SECID = #{secid,jdbcType=VARCHAR}
+        <if test="maxTradeDate != null">
+            AND INTERESTSTARTDAY >= #{maxTradeDate,jdbcType=VARCHAR}
+        </if>
+        ORDER BY INTERESTPAYDAY ASC
+    </select>
+</mapper>
