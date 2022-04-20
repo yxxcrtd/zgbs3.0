@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * 债券市场信息查询条件
@@ -21,17 +20,14 @@ public class FinBondMarketInfoQueryRequest {
     @ApiModelProperty(name = "pageMode", value = "分页对象", example = "{pageSize: 10,pageNo: 1, sort: 'name', direction: 'asc'}")
     private PageMode pageMode;
 
-    @ApiModelProperty(name = "finprodMarketIds", value = "市场代码")
-    private List<String> finprodMarketIds;
+    @ApiModelProperty(name = "secId", value = "债券ID/资产代码")
+    private String secId;
 
-    @ApiModelProperty(name = "finprodAbbr", value = "资产简称")
-    private String finprodAbbr;
+    @ApiModelProperty(name = "market", value = "市场")
+    private String market;
 
-    @ApiModelProperty(name = "tradeMarket", value = "交易场所代码")
-    private String tradeMarket;
-
-    @ApiModelProperty(name = "tradeMarkets ", value = "交易场所代码集")
-    private List<String> tradeMarkets;
+    @ApiModelProperty(name = "institution", value = "登记托管机构")
+    private String institution;
 
     @ApiModelProperty(name = "issuer", value = "发行人")
     private String issuer;
@@ -57,8 +53,8 @@ public class FinBondMarketInfoQueryRequest {
     @ApiModelProperty(name = "couponSpecies", value = "息票品种")
     private String couponSpecies;
 
-    @ApiModelProperty(name = "intType", value = "利率类型")
-    private String intType;
+    @ApiModelProperty(name = "interestRate", value = "利率类型")
+    private String interestRate;
 
     @ApiModelProperty(name = "payCycle", value = "付息频率")
     private String payCycle;
@@ -66,20 +62,20 @@ public class FinBondMarketInfoQueryRequest {
     @ApiModelProperty(name = "ccy", value = "币种")
     private String ccy;
 
-    @ApiModelProperty(name = "isRight", value = "是否含权债")
+    @ApiModelProperty(name = "isRight", value = "是否含权债", example = "Y/N")
     private String isRight;
 
-    @ApiModelProperty(name = "exerciseType", value = "行权方式")
-    private String exerciseType;
+    @ApiModelProperty(name = "optionType", value = "行权方式")
+    private String optionType;
+
+    @ApiModelProperty(name = "theOryOptionPayDayStart", value = "理论行权日开始")
+    private Date theOryOptionPayDayStart;
+
+    @ApiModelProperty(name = "theOryOptionPayDayEnd", value = "理论行权日结束")
+    private Date theOryOptionPayDayEnd;
 
     @ApiModelProperty(name = "isSus", value = "是否永续")
     private String isSus;
-
-    @ApiModelProperty(name = "exerciseDateStart", value = "理论行权日开始")
-    private Date exerciseDateStart;
-
-    @ApiModelProperty(name = "exerciseDateEnd", value = "理论行权日结束")
-    private Date exerciseDateEnd;
 
     @ApiModelProperty(name = "zxGrade", value = "债项评级")
     private String zxGrade;
@@ -90,15 +86,14 @@ public class FinBondMarketInfoQueryRequest {
     @ApiModelProperty(name = "crossMarketCode", value = "跨市场代码")
     private String crossMarketCode;
 
-    @ApiModelProperty(name = "warrantor", value = "担保人")
-    private String warrantor;
+    @ApiModelProperty(name = "guarantor", value = "担保人")
+    private String guarantor;
 
     @ApiModelProperty(name = "platformDate", value = "平台日")
     private String platformDate;
 
     @ApiModelProperty(name = "search", value = "关键词")
     private String search;
-
 
     public PageMode getPageMode() {
         return pageMode;
@@ -108,36 +103,29 @@ public class FinBondMarketInfoQueryRequest {
         this.pageMode = pageMode;
     }
 
-    public List<String> getFinprodMarketIds() {
-        return finprodMarketIds;
+
+    public String getSecId() {
+        return secId;
     }
 
-    public void setFinprodMarketIds(List<String> finprodMarketIds) {
-        this.finprodMarketIds = finprodMarketIds;
+    public void setSecId(String secId) {
+        this.secId = secId;
     }
 
-    public String getFinprodAbbr() {
-        return finprodAbbr;
+    public String getMarket() {
+        return market;
     }
 
-    public void setFinprodAbbr(String finprodAbbr) {
-        this.finprodAbbr = finprodAbbr;
+    public void setMarket(String market) {
+        this.market = market;
     }
 
-    public String getTradeMarket() {
-        return tradeMarket;
+    public String getInstitution() {
+        return institution;
     }
 
-    public void setTradeMarket(String tradeMarket) {
-        this.tradeMarket = tradeMarket;
-    }
-
-    public List<String> getTradeMarkets() {
-        return tradeMarkets;
-    }
-
-    public void setTradeMarkets(List<String> tradeMarkets) {
-        this.tradeMarkets = tradeMarkets;
+    public void setInstitution(String institution) {
+        this.institution = institution;
     }
 
     public String getIssuer() {
@@ -204,12 +192,12 @@ public class FinBondMarketInfoQueryRequest {
         this.couponSpecies = couponSpecies;
     }
 
-    public String getIntType() {
-        return intType;
+    public String getInterestRate() {
+        return interestRate;
     }
 
-    public void setIntType(String intType) {
-        this.intType = intType;
+    public void setInterestRate(String interestRate) {
+        this.interestRate = interestRate;
     }
 
     public String getPayCycle() {
@@ -236,12 +224,28 @@ public class FinBondMarketInfoQueryRequest {
         this.isRight = isRight;
     }
 
-    public String getExerciseType() {
-        return exerciseType;
+    public String getOptionType() {
+        return optionType;
     }
 
-    public void setExerciseType(String exerciseType) {
-        this.exerciseType = exerciseType;
+    public void setOptionType(String optionType) {
+        this.optionType = optionType;
+    }
+
+    public Date getTheOryOptionPayDayStart() {
+        return theOryOptionPayDayStart;
+    }
+
+    public void setTheOryOptionPayDayStart(Date theOryOptionPayDayStart) {
+        this.theOryOptionPayDayStart = theOryOptionPayDayStart;
+    }
+
+    public Date getTheOryOptionPayDayEnd() {
+        return theOryOptionPayDayEnd;
+    }
+
+    public void setTheOryOptionPayDayEnd(Date theOryOptionPayDayEnd) {
+        this.theOryOptionPayDayEnd = theOryOptionPayDayEnd;
     }
 
     public String getIsSus() {
@@ -250,22 +254,6 @@ public class FinBondMarketInfoQueryRequest {
 
     public void setIsSus(String isSus) {
         this.isSus = isSus;
-    }
-
-    public Date getExerciseDateStart() {
-        return exerciseDateStart;
-    }
-
-    public void setExerciseDateStart(Date exerciseDateStart) {
-        this.exerciseDateStart = exerciseDateStart;
-    }
-
-    public Date getExerciseDateEnd() {
-        return exerciseDateEnd;
-    }
-
-    public void setExerciseDateEnd(Date exerciseDateEnd) {
-        this.exerciseDateEnd = exerciseDateEnd;
     }
 
     public String getZxGrade() {
@@ -292,12 +280,12 @@ public class FinBondMarketInfoQueryRequest {
         this.crossMarketCode = crossMarketCode;
     }
 
-    public String getWarrantor() {
-        return warrantor;
+    public String getGuarantor() {
+        return guarantor;
     }
 
-    public void setWarrantor(String warrantor) {
-        this.warrantor = warrantor;
+    public void setGuarantor(String guarantor) {
+        this.guarantor = guarantor;
     }
 
     public String getPlatformDate() {
