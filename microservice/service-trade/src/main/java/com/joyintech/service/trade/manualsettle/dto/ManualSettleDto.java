@@ -2,7 +2,6 @@ package com.joyintech.service.trade.manualsettle.dto;
 
 import com.joyintech.framework.export.paginator.domain.ITableRow;
 import com.joyintech.tams.common.base.entity.TrdManualSettleInfo;
-import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.util.Date;

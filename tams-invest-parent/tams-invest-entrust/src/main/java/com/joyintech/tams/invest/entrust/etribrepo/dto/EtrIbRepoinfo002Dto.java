@@ -24,7 +24,6 @@ import com.joyintech.tams.invest.common.dto.common.BussRepoSecDto;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.annotation.PrimaryKey.Field;
-import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import com.joyintech.tams.invest.entrust.etribrepo.validator.EtrIbRepoinfo002Validator;
 import com.joyintech.tams.invest.entrust.etrrepo.dto.EtrRepoDto;
@@ -250,7 +249,7 @@ public class EtrIbRepoinfo002Dto extends EtrEntrust implements ProcessEntity {
 	/**
 	 * 记录操作类型
 	 */
-	private OperationType operType;
+	private String operType;
 
     /**
      * 交易对手类型
@@ -808,11 +807,11 @@ public class EtrIbRepoinfo002Dto extends EtrEntrust implements ProcessEntity {
 	}
 	
 	
-	public OperationType getOperType() {
+	public String getOperType() {
 		return operType;
 	}
 
-	public void setOperType(OperationType operType) {
+	public void setOperType(String operType) {
 		this.operType = operType;
 	}
 
