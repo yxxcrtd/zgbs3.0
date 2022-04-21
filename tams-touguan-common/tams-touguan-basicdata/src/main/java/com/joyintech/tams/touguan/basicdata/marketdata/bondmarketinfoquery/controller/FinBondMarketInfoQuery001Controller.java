@@ -4,7 +4,9 @@ import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoDetailQueryDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,6 +71,14 @@ public class FinBondMarketInfoQuery001Controller extends BaseController {
     @ApiOperation(value = "债券市场信息分页查询", notes = "债券市场信息分页查询")
     public Message<Page<FinBondMarketInfoQuery001Dto>> findPage(@RequestBody FinBondMarketInfoQueryRequest request) {
         return Message.success("success", finBondMarketInfoQuery001Service.queryForPage(request));
+    }
+
+
+    @ResponseBody
+    @PostMapping(value = "/export")
+    @ApiOperation(value = "债券市场信息列表导出", notes = "债券市场信息列表导出")
+    public void export(@RequestBody CfetsExportRequestDto req, HttpServletResponse response) {
+        ExcelUitl.doExport(req, response, "债券市场信息", () -> finBondMarketInfoQuery001Service.queryForPage(req.getDto(FinBondMarketInfoQueryRequest.class)).getRoot());
     }
 
 

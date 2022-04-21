@@ -15,11 +15,11 @@ import java.util.Date;
  *
  * @author zhuys
  * @version 1.0 2022年4月18日
- * @see FinBondMarketInfoQueryPayHSrcSecSchedulDto
+ * @see FinBondMarketCashPlanDto
  * @since 1.0
  */
 @ApiModel(value = "债券市场付息计划信息", description = "债券市场付息计划信息")
-public class FinBondMarketInfoQueryPayHSrcSecSchedulDto extends BaseDto {
+public class FinBondMarketCashPlanDto extends BaseDto {
 
     /**
      * 债券id

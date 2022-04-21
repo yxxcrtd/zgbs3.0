@@ -4,10 +4,16 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.tams.common.base.dao.FinProductMapper;
+import com.joyintech.tams.common.base.entity.FinProduct;
+import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dao.FinBondMarketInfoQueryMapper;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketCashPlanDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoDetailQueryDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinBondMarketInfoQueryRequest;
@@ -17,7 +23,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 债券市场信息查询服务类
@@ -34,6 +42,8 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
 
     @Resource
     private FinBondMarketInfoQueryMapper finBondMarketInfoQueryMapper;
+    @Resource
+    private FinProductMapper finProductMapper;
     @Resource
     private IPlatformDate iPlatformDate;
 
@@ -70,8 +80,32 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         FinBondMarketInfoDetailQueryDto detailQueryDto = new FinBondMarketInfoDetailQueryDto();
         FinBondMarketInfoQuery001Dto finBondMarketInfoQuery001Dto = bondMarketInfoQuery004Dtos.get(0);
         BeanUtil.copyPropertiesIgnoreNull(detailQueryDto, finBondMarketInfoQuery001Dto);
-
+        //付息计划信息
+        HashMap<String, Object> map = new HashMap<>(2);
+        map.put("secId", secId);
+        List<FinBondMarketCashPlanDto> finBondMarketCashPlanDtos = finBondMarketInfoQueryMapper.selectWindBondSchedule(map);
+        detailQueryDto.setBondMarketCashPlanDtos(finBondMarketCashPlanDtos);
         return detailQueryDto;
     }
+
+    /**
+     * 加券
+     *
+     * @param secId
+     * @return
+     */
+    public void addCoupons(String secId) {
+        FinProduct finProduct = finProductMapper.selectByPrimaryKey(secId);
+        if (finProduct != null) {
+            throw new BusinessException("该债券信息在系统中已存在，无法加券！");
+        }
+
+        Map<String, String> param = new HashMap<>(4);
+        param.put("finprodType2", DictCodeListExt2.平安资产类型_一级市场债.getValue());
+        param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
+        param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
+        param.put("secId", secId);
+    }
+
 
 }
