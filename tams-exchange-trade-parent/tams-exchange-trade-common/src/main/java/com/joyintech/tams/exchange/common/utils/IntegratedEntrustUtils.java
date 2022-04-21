@@ -376,4 +376,38 @@ public class IntegratedEntrustUtils {
                 || StringUtil.equals(entrustProp, EntrustProp.SZ_XSCJ_JS.value)
                 || StringUtil.equals(entrustProp, EntrustProp.SZ_XSCJ_JJ.value);
     }
+    
+ // 新债 深交所 协商成交
+    public static boolean isNegotiate_SZ(String entrustProp) {
+        if (!Strings.isNullOrEmpty(entrustProp)) {
+            if (EntrustProp.SZ_XSCJ_XD.value.equals(entrustProp)
+                    || EntrustProp.SZ_XSCJ_JS.value.equals(entrustProp)
+                    || EntrustProp.SZ_XSCJ_JJ.value.equals(entrustProp)) {
+                return true;
+            }
+        }
+        return false;
+    }
+ // 新债 深交所 协商成交下单
+    public static boolean isNegotiateXD_SZ(String entrustProp) {
+        if (!Strings.isNullOrEmpty(entrustProp)) {
+            if (EntrustProp.SZ_XSCJ_XD.value.equals(entrustProp)
+                    || EntrustProp.SZ_XSCJ_JS.value.equals(entrustProp)
+                    || EntrustProp.SZ_XSCJ_JJ.value.equals(entrustProp)) {
+                return true;
+            }
+        }
+        return false;
+    }
+ // 新债 深交所 协商成交回复
+    public static boolean isNegotiateHF_SZ(String entrustProp) {
+        if (!Strings.isNullOrEmpty(entrustProp)) {
+            if (EntrustProp.SZ_XSCJ_XD.value.equals(entrustProp)
+                    || EntrustProp.SZ_XSCJ_JS.value.equals(entrustProp)
+                    || EntrustProp.SZ_XSCJ_JJ.value.equals(entrustProp)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

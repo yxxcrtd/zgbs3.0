@@ -1575,6 +1575,14 @@ public class KCBPTradeAgent extends TradeAgentDsp {
                 entrustProp = "ProtocolBack_SZ";
 
                 buildProtocolBack_SZParameters(entrust, parameters);
+            }else if(IntegratedEntrustUtils.isNegotiateXD_SZ(entrust.getEntrustProp())) {
+            	//新债 深圳 协商成交下单 410677
+            	entrustProp = "Negotiate_XD_SZ";
+            	buildNegotiate_XD_SZParameters(entrust, parameters);
+            }else if(IntegratedEntrustUtils.isNegotiateHF_SZ(entrust.getEntrustProp())) {
+            	//新债 深圳 协商成交回复 410678
+            	entrustProp = "Negotiate_HF_SZ";
+            	buildNegotiate_HF_SZParameters(entrust, parameters);
             }
         } else {
             logger.error("unknown market {}", entrust.getMarket());
@@ -1584,6 +1592,62 @@ public class KCBPTradeAgent extends TradeAgentDsp {
             throw new RuntimeException("不支持当前委托属性，entrustProp：" + entrust.getEntrustProp());
         }
         return entrustProp;
+    }
+    
+    //TODO 大宗字段确认后，需要重新核对
+    private void buildNegotiate_XD_SZParameters(IntegratedEntrust entrust, Map<String, String> parameters) {
+        //报价所有者类型
+        parameters.put("ownertype", entrust.getSellerNo());
+        //委托价格
+        parameters.put("orderprice", String.valueOf(entrust.getEntrustPrice()));
+        //委托数量
+        parameters.put("orderqty", String.valueOf(entrust.getEntrustVolume()));
+        //本方交易员代码
+        parameters.put("tradercode", entrust.getSellerNo());
+        //本方交易主体代码
+        parameters.put("investorid", entrust.getLiaisonTel());
+        //对手方交易商代码
+        parameters.put("cpmemberid", entrust.getPropSeatNo());
+        //对手方交易员代码
+        parameters.put("cptradercode", entrust.getLiaisonTel());
+        //对手方交易主体代码
+        parameters.put("cpinvestorid", entrust.getPropInvestorId());
+        //约定号
+        parameters.put("confirmid", entrust.getContractId());
+        //备注
+        parameters.put("memo", "");
+        //风险揭示签署流水号
+        parameters.put("risksignsno", "");
+    }
+    
+    //TODO 大宗字段确认后，需要重新核对
+    private void buildNegotiate_HF_SZParameters(IntegratedEntrust entrust, Map<String, String> parameters) {
+    	//成交申报请求编号
+        parameters.put("trdreportid", entrust.getSellerNo());//转发成交申报请求编号
+        //报价所有者类型
+        parameters.put("ownertype", entrust.getSellerNo());
+        //委托价格
+        parameters.put("orderprice", String.valueOf(entrust.getEntrustPrice()));
+        //委托数量
+        parameters.put("orderqty", String.valueOf(entrust.getEntrustVolume()));
+        //本方交易员代码
+        parameters.put("tradercode", entrust.getSellerNo());
+        //本方交易主体代码
+        parameters.put("investorid", entrust.getLiaisonTel());
+        //对手方交易商代码
+        parameters.put("cpmemberid", entrust.getPropSeatNo());
+        //对手方交易员代码
+        parameters.put("cptradercode", entrust.getLiaisonTel());
+        //对手方交易主体代码
+        parameters.put("cpinvestorid", entrust.getPropInvestorId());
+        //对手方交易主体类型
+        parameters.put("cpinvestortype", entrust.getPropInvestorId());
+        //约定号
+        parameters.put("confirmid", entrust.getContractId());
+        //备注
+        parameters.put("memo", "");
+        //风险揭示签署流水号
+        parameters.put("risksignsno", "");
     }
 
     private void buildProtocolBack_SZParameters(IntegratedEntrust entrust, Map<String, String> parameters) {
