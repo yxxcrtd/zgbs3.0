@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.service.trade.processor.check;
 
 import cn.hutool.extra.validation.BeanValidationResult;
+import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.request.BaseOrderRequest;
 
 /**
@@ -15,5 +16,5 @@ public abstract class BaseCheckKit {
         return checkResult;
     }
 
-    public abstract BeanValidationResult check(BaseOrderRequest order);
+    public abstract ResultBean check(BaseOrderRequest order);
 }

@@ -1417,7 +1417,7 @@ public class KCBPConverter {
                         break;
                     }
                     case "marketmaxqty": {
-                        instrument.setMarketHighVolume(Integer.parseInt(value));
+                        instrument.setMarketHighVolume(Long.parseLong(value));
                         break;
                     }
                     case "marketminqty": {

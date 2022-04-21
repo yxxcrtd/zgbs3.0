@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.service.trade.management.service;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.map.MapBuilder;
 import cn.hutool.core.map.MapUtil;
@@ -11,7 +12,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.security.User;
@@ -22,12 +22,16 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.system.syspara.dto.SysParaSet001Dto;
 import com.joyintech.system.syspara.service.SysParaSet001Service;
 import com.joyintech.tams.common.base.entity.TrdPriceTimeConfig;
+import com.joyintech.tams.exchange.common.bean.MinPrice;
+import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.SysParamBean;
 import com.joyintech.tams.exchange.common.bean.investment.PtlAuthInfo;
 import com.joyintech.tams.exchange.common.bean.request.DeviationDegreeRequest;
 import com.joyintech.tams.exchange.common.bean.request.EtrDispatcherInfoRequest;
 import com.joyintech.tams.exchange.common.bean.response.ExchangeContextResponse;
+import com.joyintech.tams.exchange.common.cache.MinPriceService;
+import com.joyintech.tams.exchange.common.cache.MinTrdUnitLimitService;
 import com.joyintech.tams.exchange.common.cache.TradeTimeService;
 import com.joyintech.tams.exchange.common.cache.config.DataServiceConfig;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
@@ -43,24 +47,23 @@ import com.joyintech.tams.exchange.datacommon.db.service.FuturesInstrumentServic
 import com.joyintech.tams.exchange.datacommon.db.service.InstrumentService;
 import com.joyintech.tams.exchange.datacommon.db.service.ServiceNodeService;
 import com.joyintech.tams.exchange.service.trade.processor.account.AccountPositionHelper;
+import com.joyintech.tams.exchange.service.trade.processor.check.CommonCheckKit;
 import com.joyintech.tams.exchange.service.trade.scheduled.TokenJob;
 import com.joyintech.tams.invest.common.entrust.inter.EtrTradeOtherCommonService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@SuppressWarnings("unused")
+
+@SuppressWarnings("all")
 @Component
 public class CommonManagement extends BaseService {
 
@@ -81,6 +84,10 @@ public class CommonManagement extends BaseService {
     private DataServiceConfig dataServiceConfig;
     @Autowired
     private TradeTimeService tradeTimeService;
+    @Autowired
+    private MinPriceService minPriceService;
+    @Autowired
+    private MinTrdUnitLimitService minTrdUnitLimitService;
     @Autowired
     private FuturesInstrumentService futuresInstrumentService;
     @Autowired
@@ -106,11 +113,16 @@ public class CommonManagement extends BaseService {
 
     private String fairModeWithUnacceptInstruction = ExchangeConstant.TRUE_IN_PARA;
 
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     @Autowired
     private SysParaSet001Service sysParaSet001Service;
     @Autowired
     private EtrTradeOtherCommonService etrTradeOtherCommonService;
+
+    /**
+     * 交易日缓存<br/>
+     * {@code Map<日期,Map<交易所,是否交易日>>}
+     */
+    private Map<String, Map<String, String>> tradeDateCache = Maps.newConcurrentMap();
 
     public String getFairCode() {
         return fairCode;
@@ -138,16 +150,11 @@ public class CommonManagement extends BaseService {
     }
 
     public Date getPlatDate() {
-        try {
-            if (StringUtil.isEmpty(platDateStr)) {
-                platDateStr = queryPlatDate();
-                setPlatDateStr(platDateStr);
-            }
-            return dateFormat.parse(platDateStr);
-        } catch (ParseException e) {
-            logger.error("convertDateFormat error: {}", e.getMessage());
-            return null;
+        if (StringUtil.isEmpty(platDateStr)) {
+            platDateStr = queryPlatDate();
+            setPlatDateStr(platDateStr);
         }
+        return DateUtil.parse(platDateStr);
     }
 
     public String getTradingDay() {
@@ -206,6 +213,9 @@ public class CommonManagement extends BaseService {
         response.setTrdQuoteRefreshTime(CacheUtil.getSysParam(ExchangeConstant.TRD_QUOTE_REFRESH_TIME));
         response.setTrdEntrustRefreshTime(CacheUtil.getSysParam(ExchangeConstant.TRD_ENTRUST_REFRESH_TIME));
 
+        response.setTrdTradeTimeSwitch(CacheUtil.getSysParam(CommonCheckKit.TRD_TRADE_TIME_SWITCH));
+        response.setTrdPriceScopeControl(CacheUtil.getSysParam(CommonCheckKit.TRD_PRICE_SCOPE_CONTROL));
+
         return response;
     }
 
@@ -217,7 +227,8 @@ public class CommonManagement extends BaseService {
      * @return 是否交易日 0-是；1-否
      */
     public String checkTradeDate(String tradeCalendarType, String cdate) {
-        try {
+        return getTradeDateFlag(tradeCalendarType, cdate);
+        /*try {
             String url = ServiceApplication.BASIC_DATA_SERVICE + TradeServiceURL.checkTradeDate;
             String result = "";
             Map<String, Object> pageParam = new HashMap<>();
@@ -232,7 +243,47 @@ public class CommonManagement extends BaseService {
         } catch (Exception e) {
             logger.error("取交易日调用投管接口出错");
             return StrUtil.EMPTY;
+        }*/
+    }
+
+    /**
+     * 查询输入日期是否交易日
+     *
+     * @param tradeCalendarType 交易日历类型  3-上交所; 4-深交所
+     * @param cdate             日期 格式：yyyyMMdd，如20200512
+     * @return 是否交易日 0-是；1-否
+     */
+    private String getTradeDateFlag(String tradeCalendarType, String cdate) {
+
+        Map<String, String> tradeDate = tradeDateCache.getOrDefault(cdate, Maps.newConcurrentMap());
+        String isTradeDate = tradeDate.get(tradeCalendarType);
+        if (StrUtil.isEmpty(isTradeDate)) {
+            isTradeDate = queryTradeDate(tradeCalendarType, cdate);
+            tradeDate.putIfAbsent(tradeCalendarType, isTradeDate);
+            tradeDateCache.putIfAbsent(cdate, tradeDate);
         }
+        return isTradeDate;
+    }
+
+    private String queryTradeDate(String tradeCalendarType, String cdate) {
+        logger.info("queryTradeDate() called with parameters => 【tradeCalendarType = {}】, 【cdate = {}】", tradeCalendarType, cdate);
+        String result = StrUtil.EMPTY;
+        try {
+            String url = ServiceApplication.BASIC_DATA_SERVICE + TradeServiceURL.checkTradeDate;
+            Map<Object, Object> pageParam = MapUtil.builder()
+                    .put("tradeCalendarType", tradeCalendarType)
+                    .put("CDATE", cdate)
+                    .build();
+            if (isSingle) {
+                result = simpleRestTemplate.postForObject(url, pageParam, String.class);
+            } else {
+                result = restTemplate.postForObject(url, pageParam, String.class);
+            }
+            result = JSON.parseObject(result).getString("tradeDayFlag");
+        } catch (Exception e) {
+            logger.error("queryTradeDate() called with exception => 【tradeCalendarType = {}】, 【cdate = {}】", tradeCalendarType, cdate, e);
+        }
+        return result;
     }
 
     public List<SysParaSet001Dto> querySysPara(Map<String, Object> pageParam) {
@@ -420,16 +471,32 @@ public class CommonManagement extends BaseService {
     }
 
     public ResultBean tradeTimeInCache() {
-        logger.info("开始任务-交易时间段信息缓存");
+        logger.info("开始缓存-交易时间段信息");
         try {
             List<TrdPriceTimeConfig> trdPriceTimeConfigs = trdPriceTimeConfigByManualMapper.selectByEtrTrad("TRAD");
             tradeTimeService.saveInCache(trdPriceTimeConfigs);
-            logger.info("完成任务-交易时间段信息缓存");
+            logger.info("完成缓存-交易时间段信息");
             return ResultBean.success();
         } catch (Exception e) {
             logger.error("交易时间段获取失败[{}]", ExceptionUtil.getMessage(e));
             return ResultBean.error(ErrorCode.FLUSH_TRADE_TIME_FAILED);
         }
+    }
+
+    public ResultBean minPriceInCache() {
+        logger.info("开始缓存-最小价格变动单位");
+        List<MinPrice> minPriceList = queryMinPrices();
+        minPriceService.saveInCache(minPriceList);
+        logger.info("完成缓存-最小价格变动单位");
+        return ResultBean.success();
+    }
+
+    public ResultBean minTrdUnitLimitInCache() {
+        logger.info("开始缓存-交易所交易属性");
+        List<MinTrdUnitLimit> minTrdUnitLimitList = queryMinTrdUnitLimits();
+        minTrdUnitLimitService.saveInCache(minTrdUnitLimitList);
+        logger.info("完成缓存-交易所交易属性");
+        return ResultBean.success();
     }
 
     @SuppressWarnings("unused")
@@ -508,5 +575,50 @@ public class CommonManagement extends BaseService {
         params.put("finprodId", finprodId);
         BigDecimal faceValue = etrTradeOtherCommonService.selectFaceValue(params);
         return new Message<>(faceValue);
+    }
+
+    /**
+     * 调用投管接口查询最小价差
+     *
+     * @return 最小价差列表
+     */
+    private List<MinPrice> queryMinPrices() {
+        logger.info("调用投管接口查询最小价差信息");
+        ResultBean resultBean = doPost(ServiceApplication.BASIC_DATA_SERVICE + TradeServiceURL.getMinPrice, Maps.newHashMap());
+        if (ErrorCode.isSuccess(resultBean.getErrorCode())) {
+            return JSONArray.parseArray(JSONArray.toJSONString(resultBean.getData()), MinPrice.class);
+        }
+        return ListUtil.empty();
+    }
+
+    /**
+     * 调用投管接口查询最小交易单位、交易上下限
+     *
+     * @return 最小交易单位、交易上下限列表
+     */
+    private List<MinTrdUnitLimit> queryMinTrdUnitLimits() {
+        logger.info("调用投管接口查询交易所交易属性");
+        ResultBean resultBean = doPost(ServiceApplication.BASIC_DATA_SERVICE + TradeServiceURL.getMinTrdUnitLimit, Maps.newHashMap());
+        if (ErrorCode.isSuccess(resultBean.getErrorCode())) {
+            return JSONArray.parseArray(JSONArray.toJSONString(resultBean.getData()), MinTrdUnitLimit.class);
+        }
+        return ListUtil.empty();
+    }
+
+    private ResultBean doPost(String url, Map<String, Object> params) {
+
+        logger.info("doPost() called with parameters => 【url = {}】, 【params = {}】", url, params);
+        ResultBean resultBean;
+        try {
+            if (isSingle) {
+                resultBean = simpleRestTemplate.postForObject(url, params, ResultBean.class);
+            } else {
+                resultBean = restTemplate.postForObject(url, params, ResultBean.class);
+            }
+        } catch (Exception e) {
+            logger.error("doPost() called with exception => 【url = {}】, 【params = {}】", url, params, e);
+            resultBean = ResultBean.error(ErrorCode.API_RETURN_ERROR);
+        }
+        return resultBean;
     }
 }

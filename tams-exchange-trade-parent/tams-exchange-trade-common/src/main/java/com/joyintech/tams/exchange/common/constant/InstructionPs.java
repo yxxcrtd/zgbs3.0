@@ -1,8 +1,9 @@
 package com.joyintech.tams.exchange.common.constant;
 
 import cn.hutool.core.util.StrUtil;
+import com.joyintech.tams.exchange.common.enums.IEnum;
 
-public enum InstructionPs {
+public enum InstructionPs implements IEnum<String> {
 
     BUY("T01", "买入", "1"),
     SELL("T02", "卖出", "2"),
@@ -42,5 +43,16 @@ public enum InstructionPs {
             }
         }
         return value;
+    }
+
+
+    @Override
+    public String getCode() {
+        return value;
+    }
+
+    @Override
+    public String getDescription() {
+        return name;
     }
 }

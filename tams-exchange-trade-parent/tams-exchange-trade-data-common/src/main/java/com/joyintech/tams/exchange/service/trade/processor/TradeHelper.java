@@ -465,7 +465,7 @@ public class TradeHelper {
     }
 
     public boolean checkCommonParam(BigDecimal fullPrice, BigDecimal entrustPrice, long entrustVolume, OrderInterface orderInterface, Instruction instruction) {
-        if (Objects.nonNull(instruction)) {
+        /*if (Objects.nonNull(instruction)) {
             if (InvestmentAssetType.FUTURES.value.equals(instruction.getAssetType())) {
                 return futuresHelper.checkCommonParam(entrustPrice, entrustVolume, orderInterface, instruction);
             }
@@ -498,7 +498,7 @@ public class TradeHelper {
                     return false;
                 }
             }
-        }
+        }*/
         return true;
     }
 
