@@ -48,22 +48,6 @@ public class TradeInfoProRequest {
         this.isOur = isOur;
     }
 
-    public String getTradePlace() {
-        return tradePlace;
-    }
-
-    public void setTradePlace(String tradePlace) {
-        this.tradePlace = tradePlace;
-    }
-
-    public String getDealerNo() {
-        return dealerNo;
-    }
-
-    public void setDealerNo(String dealerNo) {
-        this.dealerNo = dealerNo;
-    }
-
     public String getAcctNo() {
         return acctNo;
     }
@@ -72,12 +56,12 @@ public class TradeInfoProRequest {
         this.acctNo = acctNo;
     }
 
-    public String getDealerName() {
-        return dealerName;
+    public String getTradePlace() {
+        return tradePlace;
     }
 
-    public void setDealerName(String dealerName) {
-        this.dealerName = dealerName;
+    public void setTradePlace(String tradePlace) {
+        this.tradePlace = tradePlace;
     }
 
     public String getTraderNo() {
@@ -110,6 +94,22 @@ public class TradeInfoProRequest {
 
     public void setDealerPartyName(String dealerPartyName) {
         this.dealerPartyName = dealerPartyName;
+    }
+
+    public String getDealerNo() {
+        return dealerNo;
+    }
+
+    public void setDealerNo(String dealerNo) {
+        this.dealerNo = dealerNo;
+    }
+
+    public String getDealerName() {
+        return dealerName;
+    }
+
+    public void setDealerName(String dealerName) {
+        this.dealerName = dealerName;
     }
 
     @Override

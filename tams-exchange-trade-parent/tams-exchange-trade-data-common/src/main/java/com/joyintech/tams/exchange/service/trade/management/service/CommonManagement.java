@@ -581,12 +581,20 @@ public class CommonManagement extends BaseService {
 
     public List<TradeInfoProResponse> getDealerTraderInfo(TradeInfoProRequest dto) {
         logger.info("调用投管接口查询交易商交易员信息");
-        Map<String, Object> map = BeanUtil.object2Map(dto);
-        ResultBean resultBean = doPost(ServiceApplication.BASIC_DATA_SERVICE + TradeServiceURL.getDealerTraderInfo, map);
-        if (ErrorCode.isSuccess(resultBean.getErrorCode())) {
-            return JSONArray.parseArray(JSONArray.toJSONString(resultBean.getData()), TradeInfoProResponse.class);
+        Map<String, Object> params = BeanUtil.object2Map(dto);
+        String url = ServiceApplication.BASIC_DATA_SERVICE + TradeServiceURL.getDealerTraderInfo;
+        logger.info("doPost() called with parameters => 【url = {}】, 【params = {}】", url, params);
+        List<TradeInfoProResponse> list = Lists.newArrayList();
+        try {
+            if (isSingle) {
+                list.addAll(simpleRestTemplate.postForObject(url, params, List.class));
+            } else {
+                list.addAll(restTemplate.postForObject(url, params, List.class));
+            }
+        } catch (Exception e) {
+            logger.error("doPost() called with exception => 【url = {}】, 【params = {}】", url, params, e);
         }
-        return ListUtil.empty();
+        return list;
     }
 
     /**
