@@ -167,9 +167,22 @@ public class EntrustQueryBean implements Serializable {
     private String investorName;
     @ApiModelProperty(required = true, name = "propInvestorId", value = "对手方交易主体ID")
     private String propInvestorId;
-
     @ApiModelProperty(required = true, name = "propInvestorName", value = "对手方交易主体名称")
     private String propInvestorName;
+    @ApiModelProperty(required = true, name = "tradeId", value = "本方交易员ID")
+    private String tradeId;
+    @ApiModelProperty(required = true, name = "dealerId", value = "本方交易商ID")
+    private String dealerId;
+    @ApiModelProperty(required = true, name = "dealerName", value = "本方交易商名称")
+    private String dealerName;
+    @ApiModelProperty(required = false, name = "counterId", value = "交易对手")
+    private String counterId;
+    @ApiModelProperty(required = true, name = "propTradeId", value = "对手方交易员")
+    private String propTradeId;
+    @ApiModelProperty(required = true, name = "propDealerId", value = "对手方交易商")
+    private String propDealerId;
+    @ApiModelProperty(required = true, name = "propDealerName", value = "对手方交易商名称")
+    private String propDealerName;
 
     /**
      * ////////////////////////////查询无用字段
@@ -1071,5 +1084,61 @@ public class EntrustQueryBean implements Serializable {
 
     public void setPropInvestorName(String propInvestorName) {
         this.propInvestorName = propInvestorName;
+    }
+
+    public String getTradeId() {
+        return tradeId;
+    }
+
+    public void setTradeId(String tradeId) {
+        this.tradeId = tradeId;
+    }
+
+    public String getDealerId() {
+        return dealerId;
+    }
+
+    public void setDealerId(String dealerId) {
+        this.dealerId = dealerId;
+    }
+
+    public String getDealerName() {
+        return dealerName;
+    }
+
+    public void setDealerName(String dealerName) {
+        this.dealerName = dealerName;
+    }
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+
+    public String getPropTradeId() {
+        return propTradeId;
+    }
+
+    public void setPropTradeId(String propTradeId) {
+        this.propTradeId = propTradeId;
+    }
+
+    public String getPropDealerId() {
+        return propDealerId;
+    }
+
+    public void setPropDealerId(String propDealerId) {
+        this.propDealerId = propDealerId;
+    }
+
+    public String getPropDealerName() {
+        return propDealerName;
+    }
+
+    public void setPropDealerName(String propDealerName) {
+        this.propDealerName = propDealerName;
     }
 }

@@ -175,15 +175,12 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     private String propSeatName;
 
     @ApiModelProperty(required = true, name = "tradeId", value = "本方交易员ID")
-    @Size(max = 32)
     private String tradeId;
 
     @ApiModelProperty(required = true, name = "dealerId", value = "本方交易商ID")
-    @Size(max = 32)
     private String dealerId;
 
     @ApiModelProperty(required = true, name = "dealerName", value = "本方交易商名称")
-    @Size(max = 32)
     private String dealerName;
 
     @ApiModelProperty(required = true, name = "investorId", value = "本方交易主体ID")
