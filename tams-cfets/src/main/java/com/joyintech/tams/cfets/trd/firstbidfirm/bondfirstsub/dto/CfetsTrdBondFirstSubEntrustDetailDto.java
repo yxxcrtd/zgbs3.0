@@ -17,13 +17,13 @@ public class CfetsTrdBondFirstSubEntrustDetailDto {
     @ApiModelProperty(required = false, name = "entrustDate", value = "指令日期")
     private Date entrustDate;
 
-    @ApiModelProperty(required = false, name = "entrustDate", value = "指令日期格式化")
+    @ApiModelProperty(required = false, name = "entrustDateStr", value = "指令日期格式化")
     private String entrustDateStr;
 
-    @ApiModelProperty(required = false, name = "finprodId", value = "资产代码")
+    @ApiModelProperty(required = false, name = "finprodId", value = "资产代码,系统内代码一般不用于显示")
     private String finprodId;
 
-    @ApiModelProperty(required = false, name = "finprodMarketId", value = "市场代码")
+    @ApiModelProperty(required = false, name = "finprodMarketId", value = "市场代码,显示用代码")
     private String finprodMarketId;
 
     @ApiModelProperty(required = false, name = "finprodAbbr", value = "资产简称")
@@ -31,6 +31,9 @@ public class CfetsTrdBondFirstSubEntrustDetailDto {
 
     @ApiModelProperty(required = false, name = "issueType", value = "发行方式")
     private String issueType;
+
+    @ApiModelProperty(required = false, name = "issueTypeStr", value = "发行方式名称,展示用")
+    private String issueTypeStr;
 
     @ApiModelProperty(required = false, name = "issueDate", value = "发行日")
     private Date issueDate;
@@ -193,6 +196,17 @@ public class CfetsTrdBondFirstSubEntrustDetailDto {
 
     public void setIssueType(String issueType) {
         this.issueType = issueType;
+    }
+
+    public String getIssueTypeStr() {
+        if (StringUtil.isEmpty(getIssueType())) {
+            return StringUtil.EMPTY;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.发行方式, getIssueType());
+    }
+
+    public void setIssueTypeStr(String issueTypeStr) {
+        this.issueTypeStr = issueTypeStr;
     }
 
     public BigDecimal getIssuePrice() {

@@ -101,7 +101,7 @@ public class TamsSystemApplication extends WebApplication {
 
 	@Bean
 	public Docket tenderBond() {
-		return SwaggerConfig.createDocket("一级投标确认", "com.joyintech.tams.cfets.finbond.tenderBondSub");
+		return SwaggerConfig.createDocket("一级投标确认", "com.joyintech.tams.cfets.trd.firstbidfirm");
 	}
 
 	public static void main(String[] args) throws Exception {

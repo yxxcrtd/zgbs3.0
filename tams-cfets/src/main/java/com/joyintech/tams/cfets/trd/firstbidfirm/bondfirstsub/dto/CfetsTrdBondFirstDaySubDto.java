@@ -19,10 +19,10 @@ public class CfetsTrdBondFirstDaySubDto {
     @ApiModelProperty(required = false, name = "issueStatusStr", value = "发行状态名称,显示用", example = "发行成功")
     private String issueStatusStr;
 
-    @ApiModelProperty(required = false, name = "finprodId", value = "资产代码", example = "F01_001.IB")
+    @ApiModelProperty(required = false, name = "finprodId", value = "资产代码,系统内代码一般不用于显示", example = "F01_001.IB")
     private String finprodId;
 
-    @ApiModelProperty(required = false, name = "finprodMarketId", value = "市场代码", example = "001.IB")
+    @ApiModelProperty(required = false, name = "finprodMarketId", value = "市场代码,显示用代码", example = "001.IB")
     private String finprodMarketId;
 
     @ApiModelProperty(required = false, name = "finprodAbbr", value = "资产简称", example = "001债券")
@@ -48,6 +48,9 @@ public class CfetsTrdBondFirstDaySubDto {
 
     @ApiModelProperty(required = false, name = "issueType", value = "发行方式")
     private String issueType;
+
+    @ApiModelProperty(required = false, name = "issueTypeStr", value = "发行方式名称,展示用")
+    private String issueTypeStr;
 
     @ApiModelProperty(required = false, name = "issueDate", value = "发行日")
     private Date issueDate;
@@ -183,6 +186,17 @@ public class CfetsTrdBondFirstDaySubDto {
 
     public void setIssueType(String issueType) {
         this.issueType = issueType;
+    }
+
+    public String getIssueTypeStr() {
+        if (StringUtil.isEmpty(getIssueType())) {
+            return StringUtil.EMPTY;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.发行方式, getIssueType());
+    }
+
+    public void setIssueTypeStr(String issueTypeStr) {
+        this.issueTypeStr = issueTypeStr;
     }
 
     public Date getIssueDate() {

@@ -37,7 +37,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 初始化查询页面
+ * 一级申购 初始化页面
+ * @author jp
+ * @date 2022/04/18
  */
 @Controller
 @PageId("TenderBondSub")
@@ -130,9 +132,9 @@ public class CfetsTrdBondFirstSub001Controller extends BaseController {
     @ResponseBody
     public Message<AjaxResult> entrustRefuce(@RequestBody Map<String, Object> param) {
         try {
-            AjaxResult result = new AjaxResult();
+            AjaxResult result;
             if (StringUtil.isNotEmpty(param.get("entrustId"))) {
-                param.put("entrustIdList", com.joyintech.framework.util.StringUtil.splitToList(",", (String) param.get("entrustIds")));
+                param.put("entrustIdList", StringUtil.splitToList(",", (String) param.get("entrustIds")));
             }
             result = cfetsTrdBondFirstSub001Service.entrustRefuceCheck(param);
             if (CollectionUtils.isNotEmpty(result.getErrorList())) {
@@ -149,13 +151,13 @@ public class CfetsTrdBondFirstSub001Controller extends BaseController {
     @ApiOperation(value = "查询指令详细信息", notes = "查询指令详细信息")
     @PostMapping("/getEntrust/{entrustId}")
     @ResponseBody
-    public Message<CfetsTrdBondFirstSubEntrustDetailDto> getEntrust(@PathVariable("entrustId") String entrustId) {
+    public Message<Map<String, Object>> getEntrust(@PathVariable("entrustId") String entrustId) {
         try {
-            CfetsTrdBondFirstSubEntrustDetailDto result = cfetsTrdBondFirstSub001Service.getEntrustInfo(entrustId);
-            return new Message<CfetsTrdBondFirstSubEntrustDetailDto>().success().setData(result);
+            Map<String, Object> result = cfetsTrdBondFirstSub001Service.getEntrustInfo(entrustId);
+            return new Message<Map<String, Object>>().success().setData(result);
         } catch (Exception e) {
             logger.error("查询指令详细信息异常", e);
-            return new Message<CfetsTrdBondFirstSubEntrustDetailDto>().fail().setMessage("查询指令详细信息异常");
+            return new Message<Map<String, Object>>().fail().setMessage("查询指令详细信息异常");
         }
     }
 

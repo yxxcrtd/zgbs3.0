@@ -42,10 +42,10 @@ public class CfetsTrdBondFirstSubEntrustDto {
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal entrustNum;
 
-    @ApiModelProperty(required = false, name = "finprodId", value = "资产代码",example = "F01_aa.IB")
+    @ApiModelProperty(required = false, name = "finprodId", value = "资产代码,系统内代码一般不用于显示",example = "F01_aa.IB")
     private String finprodId;
 
-    @ApiModelProperty(required = false, name = "finprodMarketId", value = "市场代码",example = "aa.IB")
+    @ApiModelProperty(required = false, name = "finprodMarketId", value = "市场代码,显示用代码",example = "aa.IB")
     private String finprodMarketId;
 
     @ApiModelProperty(required = false, name = "finprodAbbr", value = "资产简称",example = "债券aa")
@@ -87,7 +87,7 @@ public class CfetsTrdBondFirstSubEntrustDto {
     @ApiModelProperty(required = false, name = "entrustDate", value = "指令日期")
     private Date entrustDate;
 
-    @ApiModelProperty(required = false, name = "entrustDate", value = "指令日期格式化,展示用")
+    @ApiModelProperty(required = false, name = "entrustDateStr", value = "指令日期格式化,展示用")
     private String entrustDateStr;
 
     @ApiModelProperty(name = "transmitTime", value = "指令下达时间",example = "11:23:45")
