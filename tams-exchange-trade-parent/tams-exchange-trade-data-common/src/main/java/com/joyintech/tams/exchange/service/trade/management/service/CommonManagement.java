@@ -29,7 +29,9 @@ import com.joyintech.tams.exchange.common.bean.SysParamBean;
 import com.joyintech.tams.exchange.common.bean.investment.PtlAuthInfo;
 import com.joyintech.tams.exchange.common.bean.request.DeviationDegreeRequest;
 import com.joyintech.tams.exchange.common.bean.request.EtrDispatcherInfoRequest;
+import com.joyintech.tams.exchange.common.bean.request.TradeInfoProRequest;
 import com.joyintech.tams.exchange.common.bean.response.ExchangeContextResponse;
+import com.joyintech.tams.exchange.common.bean.response.TradeInfoProResponse;
 import com.joyintech.tams.exchange.common.cache.MinPriceService;
 import com.joyintech.tams.exchange.common.cache.MinTrdUnitLimitService;
 import com.joyintech.tams.exchange.common.cache.TradeTimeService;
@@ -575,6 +577,24 @@ public class CommonManagement extends BaseService {
         params.put("finprodId", finprodId);
         BigDecimal faceValue = etrTradeOtherCommonService.selectFaceValue(params);
         return new Message<>(faceValue);
+    }
+
+    public List<TradeInfoProResponse> getDealerTraderInfo(TradeInfoProRequest dto) {
+        logger.info("调用投管接口查询交易商交易员信息");
+        Map<String, Object> params = BeanUtil.object2Map(dto);
+        String url = ServiceApplication.BASIC_DATA_SERVICE + TradeServiceURL.getDealerTraderInfo;
+        logger.info("doPost() called with parameters => 【url = {}】, 【params = {}】", url, params);
+        List<TradeInfoProResponse> list = Lists.newArrayList();
+        try {
+            if (isSingle) {
+                list.addAll(simpleRestTemplate.postForObject(url, params, List.class));
+            } else {
+                list.addAll(restTemplate.postForObject(url, params, List.class));
+            }
+        } catch (Exception e) {
+            logger.error("doPost() called with exception => 【url = {}】, 【params = {}】", url, params, e);
+        }
+        return list;
     }
 
     /**
