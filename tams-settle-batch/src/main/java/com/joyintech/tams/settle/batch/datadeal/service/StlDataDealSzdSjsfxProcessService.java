@@ -151,8 +151,6 @@ public class StlDataDealSzdSjsfxProcessService {
             settleTransData.setSettleFee(BigDecimal.ZERO);
             // 交易方向、业务场景明细分类
             setBondDeal(szdSjsfx, settleTransData);
-            //交收结果
-            settleTransData.setDeliveryResult(stlDataDealProcessCommonService.getDeliveryResult(szdSjsfx.getJgdm()));
             // 清算速度:申购是T+2
             if(DictCodeList.交易方向_申购.getValue().equals(settleTransData.getPs())){
                 settleTransData.setSettleSpeed(2L);
@@ -306,7 +304,8 @@ public class StlDataDealSzdSjsfxProcessService {
             settleTransData.setAcctNo(accountInfoDtolist.get(0).getAcctNo());
 			// 临时表流水号
 			settleTransData.setSeqNo(szdSjsfx.getSeqno());
-            
+            //交收结果
+            settleTransData.setDeliveryResult(stlDataDealProcessCommonService.getDeliveryResult(szdSjsfx.getJgdm()));
             // 日终过来的文件结算价格就是全价的，需要反算净价总额、应计利息总额
             stlDownDataDealService.calc(settleTransData);
 

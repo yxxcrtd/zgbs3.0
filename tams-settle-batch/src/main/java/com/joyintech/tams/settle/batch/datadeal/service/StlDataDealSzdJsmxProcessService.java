@@ -218,6 +218,7 @@ public class StlDataDealSzdJsmxProcessService {
 				settleTransData.setCcy(stlDataDealProcessCommonService.getCcy(szdJsmx.getBz()));
 				// 交收方式
 				settleTransData.setSettleMode(stlDataDealProcessCommonService.getSettleMode(szdJsmx.getJsfs()));
+				settleTransData.setDeliveryResult(stlDataDealProcessCommonService.getDeliveryResult(szdJsmx.getJgdm()));
 				// 交易方向
 				settleTransData.setPs(getSzdJsmxBondPs(stlDownDataDealOperatorDto.getDataFile(), szdJsmx.getMmbz(), szdJsmx.getYwlx(),
 						szdJsmx.getZqlb(), szdJsmx.getJllx(), szdJsmx.getQsbz(), szdJsmx.getGhlx(),szdJsmx.getJgdm()));
@@ -1384,6 +1385,7 @@ public class StlDataDealSzdJsmxProcessService {
 				settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdJsmx.getJyfs()));
 				// 交收方式
 				settleTransData.setSettleMode(stlDataDealProcessCommonService.getSettleMode(szdJsmx.getJsfs()));
+				settleTransData.setDeliveryResult(stlDataDealProcessCommonService.getDeliveryResult(szdJsmx.getJgdm()));
 				// 业务场景分类和交易方向
 				if (StringUtil.lowerCase(stlDownDataDealOperatorDto.getDataFile()).startsWith(StlDataDealProcessConstant.SZD_JSMX_02) && (StringUtil.equals(StlDataDealProcessConstant.YWLX_002, szdJsmx.getYwlx()) || 
 						StringUtil.equals(StlDataDealProcessConstant.YWLX_034, szdJsmx.getYwlx()) || StringUtil.equals(StlDataDealProcessConstant.YWLX_104, szdJsmx.getYwlx()))) {
@@ -1656,6 +1658,7 @@ public class StlDataDealSzdJsmxProcessService {
 			settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdJsmx.getJyfs()));
 			// 交收方式
 			settleTransData.setSettleMode(stlDataDealProcessCommonService.getSettleMode(szdJsmx.getJsfs()));
+			settleTransData.setDeliveryResult(stlDataDealProcessCommonService.getDeliveryResult(szdJsmx.getJgdm()));
 			// 单位净价
 			settleTransData.setUnitCprice(new BigDecimal(szdJsmx.getJg1()));
 
@@ -2198,6 +2201,8 @@ public class StlDataDealSzdJsmxProcessService {
 		}
 		// 交收方式
 		settleTransData.setSettleMode(stlDataDealProcessCommonService.getSettleMode(szdJsmx.getJsfs()));
+		// 交收结果
+		settleTransData.setDeliveryResult(stlDataDealProcessCommonService.getDeliveryResult(szdJsmx.getJgdm()));
 		// 执行日期
 		settleTransData.setDealDate(stlDownDataDealOperatorDto.getDealDate());
 		// 证券品种
