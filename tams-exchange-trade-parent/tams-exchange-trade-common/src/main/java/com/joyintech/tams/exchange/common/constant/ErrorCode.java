@@ -95,6 +95,16 @@ public enum ErrorCode implements IEnum<Integer> {
 
     ENTRUST_PROP_NOT_EXIT(1020, "委托属性不存在"),
 
+    UN_SUPPORT_ENTRUST_PROP(1021, "现券交易不支持当前委托属性"),
+    TRADE_NOT_EMPTY(1022, "本方交易员不能为空"),
+    DEALER_NOT_EMPTY(1023, "本方交易商ID或名称不能为空"),
+    INVESTOR_NOT_EMPTY(1024, "本方交易主体ID或名称不能为空"),
+    COUNTER_NOT_EMPTY(1025, "交易对手不能为空"),
+    PROP_TRADE_NOT_EMPTY(1026, "对手方交易员不能为空"),
+    PROP_DEALER_NOT_EMPTY(1027, "对手方交易商ID或名称不能为空"),
+    PROP_INVESTOR_NOT_EMPTY(1028, "对手方交易主体ID或名称不能为空"),
+    CONTRACT_ID_NOT_EMPTY(1029, "协商成交约定号不能为空"),
+
     /**
      * 2001 —— 3000终端错误号
      */

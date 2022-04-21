@@ -126,8 +126,9 @@ public class OrderManagement extends BaseService {
     public ResultBean sendIntegratedEntrust(String userId, IntegratedEntrust integratedEntrust) {
         // 参数检查
         ErrorCode checkMsg = CheckParamUtils.checkIntegratedEntrustParam(integratedEntrust);
-        if (checkMsg.value != ErrorCode.SUCCESS.value)
+        if (checkMsg.value != ErrorCode.SUCCESS.value) {
             return new ResultBean(checkMsg, integratedEntrust);
+        }
         String uniqueCheck = commonCheckHelper.checkApplyEntrust(integratedEntrust.getEntrustProp(), integratedEntrust.getAccountId(), integratedEntrust.getStockCode(), integratedEntrust.getInstructionId());
         if (Objects.nonNull(uniqueCheck))
             return new ResultBean(ErrorCode.INSTRUCTION_APPLY_NOT_UNIQUE.value, ErrorCode.INSTRUCTION_APPLY_NOT_UNIQUE.errorMsg + ":" + uniqueCheck, integratedEntrust);
