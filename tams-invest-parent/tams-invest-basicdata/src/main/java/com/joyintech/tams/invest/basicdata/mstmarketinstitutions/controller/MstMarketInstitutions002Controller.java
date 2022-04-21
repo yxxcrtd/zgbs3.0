@@ -10,10 +10,7 @@
  
 package com.joyintech.tams.invest.basicdata.mstmarketinstitutions.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import org.slf4j.Logger;
@@ -23,10 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import com.joyintech.tams.common.base.entity.InterfCmsInstitution;
 import com.joyintech.tams.common.base.entity.InterfCompintroduction;
@@ -309,5 +303,12 @@ public class MstMarketInstitutions002Controller extends BaseController{
     public List<SelectOptionDto> getGradeOrgId(@RequestParam Map<String, Object> params) {
         return mstMarketInstitutionsService.getGradeOrgId(params);
     }
+
+    @ResponseBody
+    @GetMapping("/autoAddInstitutions")
+    public Map<String,Object> autoAddInstitutions(@RequestParam("insitituteCode") String insitituteCode) {
+        return mstMarketInstitutionsService.autoAddInstitutions(insitituteCode);
+    }
+
 }
 

@@ -246,4 +246,14 @@ public class MstMarketInstitutionsController {
     public List<MstMarketInstitutionsDto> deleteCheck(@RequestBody List<MstMarketInstitutionsDto> item){
         return mstMarketInstitutionsService.deleteCheck(item);
     }
+
+    /**
+     * 根据insitituteCode判断是否需要新增
+     * @param insitituteCode
+     * @return
+     */
+    @GetMapping("/autoAddInstitutions")
+    public MstMarketInstitutionsDto autoAddInstitutions(@RequestParam("insitituteCode") String insitituteCode) {
+        return mstMarketInstitutionsService.autoAddInstitutions(insitituteCode);
+    }
 }

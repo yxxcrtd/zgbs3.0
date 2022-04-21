@@ -1,7 +1,9 @@
 package com.joyintech.tams.invest.batch.tenderbond.dao;
 
 import com.joyintech.tams.common.base.entity.FinProduct;
+import com.joyintech.tams.common.base.entity.InterfPayhsrcsecinfo;
 import com.joyintech.tams.invest.batch.tenderbond.dto.FinTenderBondAssetDto;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -24,5 +26,21 @@ public interface FinTenderBondAssetMapper {
      * @param param
      * @return
      */
-    List<FinProduct> selectProduct(Map<String,Object> param);
+    FinProduct selectProduct(Map<String,Object> param);
+
+    /**
+     * 查询债券接口表债券数据
+     *
+     * @param finprodMarketId
+     * @return
+     */
+    List<InterfPayhsrcsecinfo> getBySecId(@Param("finprodMarketId") String finprodMarketId);
+
+    /**
+     * 查询债券接口表债券数据
+     *
+     * @param dto
+     * @return
+     */
+    List<InterfPayhsrcsecinfo> getByParam(FinTenderBondAssetDto dto);
 }

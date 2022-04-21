@@ -344,6 +344,44 @@
 	    	#{item.customerId,jdbcType=VARCHAR}
         </foreach>
     </select>
-    
+
+	<select id="getByInsitituteCode" resultType="com.joyintech.service.basicdata.mstmarketinstitutions.dto.MstMarketInstitutionsDto">
+		select * from MST_CUSTOMER_INFO_ADD where INSITITUTE_CODE=#{insitituteCode} and ROWNUM=1
+	</select>
+
+	<select id="getInterfCustomerInfo" resultType="com.joyintech.service.basicdata.mstmarketinstitutions.dto.MstMarketInstitutionsDto">
+		SELECT CUSTOMER_ID as customerId,
+			   CUSTOMER_NAME as customerName,
+			   PARTY_TYPE3 as partyType3,
+			   PARTY_TYPE2 as partyType2,
+			   PARTY_TYPE1 as partyType1 ,
+			   INDUSTRY as industry,
+			   INDUSTRY2 as industry2,
+			   INSITITUTE_CODE as insitituteCode,
+			   IS_GOV as isGov,
+			   MAIN_CAPITAL as mainCapital,
+			   REGISTER_CAPITAL as registerCapital,
+			   PROVINCE as province,
+			   CITY as city,
+			   COUNTY as county,
+			   HOLDING_TYPE as holdingType,
+			   CUSTOMER_OBJ_TYPE as customerObjType,
+			   IS_LISTED_COMPANY as isListedCompany,
+			   IS_GROUP_CUSTOMER as isGroupCustomer,
+			   PARENT_CUSTOMER_ID as parentCustomerId,
+			   PARENT_CUSTOMER_NAME as parentCustomerName,
+			   IS_PRIVATE as isPrivate,
+			   IS_ESCAPE_DEPT as isEscapeDept,
+			   CREDIT_TYPE as creditType ,
+			   IS_CREDIT_RELATED_TRD as isCreditRelatedTrd,
+			   STRUCT_ADJUST_TYPE as structAdjustType,
+			   INDUS_UPGRATE_TYPE as indusUpgrateType,
+			   BUSI_SCOPE as busiScope,
+			   MAIN_BUSI as mainBusi,
+			   COMPANY_NATURE as companyNature,
+			   REMARK as remark,
+			   HS_TYPE as hsType
+		FROM INTERF_CUSTOMER_INFO where INSITITUTE_CODE=#{insitituteCode} and ROWNUM=1
+	</select>
 
 </mapper>

@@ -137,6 +137,27 @@ VALUES ('FinTenderBondAsset001', 'FinTenderBondAsset001List', '999999', 'debRate
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
 VALUES ('FinTenderBondAsset001', 'FinTenderBondAsset001List', '999999', 'remark', '备注', null, 39, 1, 0, 1, 100, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, null, null, 0);
 
+--操作记录
+delete from CFG_DATATABLE_SHOW where PAGECODE = 'FinTenderBondAsset001' and DTCODE = 'FinTenderBondAssetOperateList';
+INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
+VALUES ('FinTenderBondAsset001', 'FinTenderBondAssetOperateList', '999999', 'busiDes', '业务说明', null, 6, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, null, null, 0);
+INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
+VALUES ('FinTenderBondAsset001', 'FinTenderBondAssetOperateList', '999999', 'entrustId', '资产代码', null, 4, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, null, null, 0);
+INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
+VALUES ('FinTenderBondAsset001', 'FinTenderBondAssetOperateList', '999999', 'finprodAbbr', '资产简称', null, 4, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, null, null, 0);
+INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
+VALUES ('FinTenderBondAsset001', 'FinTenderBondAssetOperateList', '999999', 'operDate', '操作日期', null, 2, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, null, null, 0);
+INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
+VALUES ('FinTenderBondAsset001', 'FinTenderBondAssetOperateList', '999999', 'operTime', '操作时间', null, 3, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, null, null, 0);
+INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
+VALUES ('FinTenderBondAsset001', 'FinTenderBondAssetOperateList', '999999', 'operTypeStr', '操作类型', null, 5, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, null, null, 0);
+INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
+VALUES ('FinTenderBondAsset001', 'FinTenderBondAssetOperateList', '999999', 'seqNo', '序号', null, 1, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, null, null, 0);
+INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
+VALUES ('FinTenderBondAsset001', 'FinTenderBondAssetOperateList', '999999', 'userId', '操作员', null, 7, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, null, null, 0);
+
+
+
 -- 配置页面展示数据字典
 delete from SYS_PAGE_DICTLIST where PAGE_ID='FinTenderBondAsset001' and DICT_ID='TRADE_PLACE';
 INSERT INTO SYS_PAGE_DICTLIST (PAGE_ID, SUB_PAGE_ID, DICT_ID, DICT_ITEM_VAL, DICT_ITEM_VAL_CNNAME, DICT_ITEM_VAL_DEFAULT, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE)
@@ -198,4 +219,10 @@ VALUES ('FinTenderBondAsset002', '999999', 'FREQUENCY_UNIT', '06', null, null, '
 INSERT INTO SYS_PAGE_DICTLIST (PAGE_ID, SUB_PAGE_ID, DICT_ID, DICT_ITEM_VAL, DICT_ITEM_VAL_CNNAME, DICT_ITEM_VAL_DEFAULT, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE)
 VALUES ('FinTenderBondAsset002', '999999', 'FREQUENCY_UNIT', '07', null, null, 'system', null, sysdate, 'system', sysdate, null);
 
+--增加操作类型
+delete from SYS_PAGE_DICTLIST where PAGE_ID='OPR_TYPE' and DICT_ID in ('17','18','19','20');
+insert into SYS_DATADICT_LIST values ('OPR_TYPE','17','自动加券','6','0','system','',sysdate, 'system',sysdate,null);
+insert into SYS_DATADICT_LIST values ('OPR_TYPE','18','上市流通','6','0','system','',sysdate, 'system',sysdate,null);
+insert into SYS_DATADICT_LIST values ('OPR_TYPE','19','上市流通撤销','6','0','system','',sysdate, 'system',sysdate,null);
+insert into SYS_DATADICT_LIST values ('OPR_TYPE','20','资讯数据覆盖','6','0','system','',sysdate, 'system',sysdate,null);
 
