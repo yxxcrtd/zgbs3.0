@@ -2825,7 +2825,9 @@
                     if (param.finprodType2 == FINPROD_TYPE_TG_F01 || param.finprodType2 == FINPROD_TYPE_TG_ZYSHG || param.finprodType2 == FINPROD_TYPE_TG_F02 || param.finprodType2 == FINPROD_TYPE_TG_F03) {
                         //场内交易指令，新建 。市价指令时 ，先取最新价，再去收盘价，收盘价都没有才不能下指令
                         var lastPrice = formatPrice(result.lastPrice == 0 || result.lastPrice == "" ? result.preClosePrice : result.lastPrice);
-                        $("#factPrice_" + currentTab).val(lastPrice).trigger('change');
+                        $("#factPrice_" + currentTab).val(lastPrice);
+                        $("#price_" + currentTab).val(lastPrice);
+                        $("#deviationDegree").text("");
                         $.extend(param, {entrustPrice: lastPrice});
                     } else if (param.finprodType2 == FINPROD_TYPE_TG_F06 || param.finprodType2 == FINPROD_TYPE_TG_F10) {
                         if (param.ps == PS_T01) {//市价指令股票、基金买入 价格按涨停价计算风控、头寸
