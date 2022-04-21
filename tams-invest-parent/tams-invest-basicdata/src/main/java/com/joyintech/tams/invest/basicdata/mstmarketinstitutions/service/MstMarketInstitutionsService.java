@@ -361,6 +361,7 @@ public class MstMarketInstitutionsService extends CommonExportService<MstMarketI
         if (Objects.nonNull(mstDto) && mstDto.getDealFlag() == 1) {
             mstDto.setPageModel(GlobalConstant.DETAIL_PAGE_MODEL_NEW);
             mstDto.setOperateType("NEW");
+            mstDto.setMstBondCreditRating(new ArrayList<>());
             Set<ConstraintViolation<MstMarketInstitutionsDto>> validate = Validation.buildDefaultValidatorFactory().getValidator().validate(mstDto, ValidateGroupEdit.class);
             if (CollectionUtils.isNotEmpty(validate)) {//没有校验通过
                 result.put("errorCode", 0);

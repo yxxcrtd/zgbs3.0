@@ -193,6 +193,9 @@ public class MstMarketInstitutionsService extends BaseService<MstMarketInstituti
             mstCustomerInfo.setCustomerId(entity.getCustomerId());//客户代码
             mstCustomerInfo.setCustomerName(entity.getCustomerName());//客户名称
             mstCustomerInfo.setCustomerType(DictCodeList.客户类型_法人.getValue());
+            if(StringUtil.isNotEmpty(entity.getIsIssuer())) {//是否发行人
+                mstCustomerInfo.setIsIssuer(entity.getIsIssuer());
+            }
             mstCustomerInfoMapper.insert(mstCustomerInfo);
             //客户评级表插入数据
             List<MstBondCreditRating> mstBondCreditRatingList = new ArrayList<MstBondCreditRating>();

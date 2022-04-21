@@ -1,8 +1,13 @@
 package com.joyintech.tams.business.asset.tenderbond.service;
 
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.common.exception.PositionException;
+import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.common.base.entity.FinProductAdd;
@@ -16,7 +21,9 @@ import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
-import org.apache.commons.collections.CollectionUtils;
+import com.joyintech.workflow.engine.util.WorkFlowUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -34,6 +41,7 @@ import java.util.Objects;
  */
 @Service
 public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset003Dto> implements BaseProcessService<FinTenderBondAsset003Dto> {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Resource
     private FinTenderBondAssetMapper finTenderBoundAssetMapper;
@@ -68,33 +76,42 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
     @Override
     public void doComplete(FinTenderBondAsset003Dto dto, OperationType type) {
         if (StringUtil.equals(OperationType.REVOKE.name(), type)) {
-            List<String> totleTradeIdList = finTenderBoundAssetMapper.selectTotleTradeId(dto.getFinprodId());
-            if (CollectionUtils.isNotEmpty(totleTradeIdList)) {
-                totleTradeIdList.forEach(e -> {
-                    TrdFinProductDealTotal total = new TrdFinProductDealTotal();
-                    total.setTotleTradeId(e);
-                    total.setIsCancel(DictCodeList.是否_是.getValue());
-                    trdFinProductDealTotalMapper.updateByPrimaryKeySelective(total);
-                    //金融产品实物汇总交易
-                    TrdFinProductBarterTotal trdFinProductBarterTotal = new TrdFinProductBarterTotal();
-                    trdFinProductBarterTotal.setTradeId(String.format("%sR", e));
-                    trdFinProductBarterTotal.setFinprodType(DictCodeListExt2.平安资产类型_一级市场债.getValue());
-                    trdFinProductBarterTotal.setFinprodId(dto.getFinprodId());
-                    trdFinProductBarterTotal.setBranch(0L);
-                    trdFinProductBarterTotalMapper.insert(trdFinProductBarterTotal);
-                    //更新标的表
-                    FinProduct product = new FinProduct();
-                    product.setFinprodId(dto.getFinprodId());
-                    product.setCirculationCode(null);
-                    product.setCirculationDate(null);
-                    finProductMapper.updateForTenderBound(product);
-                    FinProductAdd productAdd = new FinProductAdd();
-                    productAdd.setFinprodId(dto.getFinprodId());
-                    productAdd.setIssueStatus(null);
-                    finProductAddMapper.updateForTenderBound(productAdd);
-
-                    //TODO 调用头寸
-                });
+            String totleTradeId = finTenderBoundAssetMapper.selectTotleTradeId(dto.getFinprodId());
+            if (StringUtil.isNotEmpty(totleTradeId)) {
+                TrdFinProductDealTotal total = new TrdFinProductDealTotal();
+                total.setTotleTradeId(totleTradeId);
+                total.setIsCancel(DictCodeList.是否_是.getValue());
+                trdFinProductDealTotalMapper.updateByPrimaryKeySelective(total);
+                //金融产品实物汇总交易
+                TrdFinProductBarterTotal trdFinProductBarterTotal = new TrdFinProductBarterTotal();
+                trdFinProductBarterTotal.setTradeId(String.format("%sR", totleTradeId));
+                trdFinProductBarterTotal.setFinprodType(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+                trdFinProductBarterTotal.setFinprodId(dto.getFinprodId());
+                trdFinProductBarterTotal.setBranch(0L);
+                trdFinProductBarterTotalMapper.insert(trdFinProductBarterTotal);
+                //更新标的表
+                FinProduct product = new FinProduct();
+                product.setFinprodId(dto.getFinprodId());
+                product.setCirculationCode(null);
+                product.setCirculationDate(null);
+                finProductMapper.updateForTenderBound(product);
+                FinProductAdd productAdd = new FinProductAdd();
+                productAdd.setFinprodId(dto.getFinprodId());
+                productAdd.setIssueStatus(null);
+                finProductAddMapper.updateForTenderBound(productAdd);
+                //TODO 调用撤销头寸
+                BaseMap param = BaseMap.newMap().put("userId", SecurityUtil.getLoginUser().getUserName())
+                        .put("totalTradeId", totleTradeId)
+                        .put("finprodId", dto.getFinprodId())
+                        .put("circulationCode", product.getCirculationCode());
+                //PositionHttpRequest.sendSslt(param);
+                try {
+                    //PositionHttpRequest.sendSslt(param);
+                } catch (PositionException e) {
+                    logger.error("交收失败-头寸处理异常", e);
+                    WorkFlowUtil.showMessage("头寸处理异常,请检查头寸日期", MessageType.错误消息);
+                    throw new PositionException(e);
+                }
                 finTenderBoundAssetService.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_上市流通撤销);
             }
         } else {
@@ -132,11 +149,20 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
             productAdd.setFinprodId(dto.getFinprodId());
             productAdd.setIssueStatus(DictCodeListExt1.发行状态_发行成功.getValue());
             finProductAddMapper.updateForTenderBound(productAdd);
-
-            //TODO 调用头寸
             //TODO 这里处理加券
             finTenderBoundAssetService.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_上市流通);
-
+            //调用头寸
+            BaseMap param = BaseMap.newMap().put("userId", SecurityUtil.getLoginUser().getUserName())
+                    .put("totalTradeId", trdFinProductDealTotal.getTotleTradeId())
+                    .put("finprodId", dto.getFinprodId())
+                    .put("circulationCode", product.getCirculationCode());
+            try {
+                PositionHttpRequest.sendSslt(param);
+            } catch (PositionException e) {
+                logger.error("交收失败-头寸处理异常", e);
+                WorkFlowUtil.showMessage("头寸处理异常,请检查头寸日期", MessageType.错误消息);
+                throw new PositionException(e);
+            }
         }
     }
 
