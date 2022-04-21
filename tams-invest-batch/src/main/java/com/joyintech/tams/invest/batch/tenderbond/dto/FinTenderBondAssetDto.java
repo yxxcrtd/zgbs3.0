@@ -15,14 +15,8 @@ public class FinTenderBondAssetDto {
     @ApiModelProperty(name = "issueStage", value = "发行阶段")
     private String issueStage;
 
-    @ApiModelProperty(name = "issueStageValue", value = "发行阶段字典值")
-    private String issueStageValue;
-
     @ApiModelProperty(name = "issueStatus", value = "发行状态")
     private String issueStatus;
-
-    @ApiModelProperty(name = "issueStatusValue", value = "发行状态字典值")
-    private String issueStatusValue;
 
     @ApiModelProperty(name = "finprodId", value = "金融产品代码")
     private String finprodId;
@@ -33,17 +27,14 @@ public class FinTenderBondAssetDto {
     @ApiModelProperty(name = "finprodAbbr", value = "资产简称")
     private String finprodAbbr;
 
+    @ApiModelProperty(name = "finprodName", value = "资产名称")
+    private String finprodName;
+
     @ApiModelProperty(name = "tradeMarket", value = "交易场所")
     private String tradeMarket;
 
-    @ApiModelProperty(name = "tradeMarketValue", value = "交易场所字典值")
-    private String tradeMarketValue;
-
     @ApiModelProperty(name = "registOrg", value = "登记托管机构")
     private String registOrg;
-
-    @ApiModelProperty(name = "registOrgValue", value = "登记托管机构字典值")
-    private String registOrgValue;
 
     @ApiModelProperty(name = "issuer", value = "发行人")
     private String issuer;
@@ -51,32 +42,17 @@ public class FinTenderBondAssetDto {
     @ApiModelProperty(name = "issueType", value = "募集方式")
     private String issueType;
 
-    @ApiModelProperty(name = "issueTypeValue", value = "募集方式字典值")
-    private String issueTypeValue;
-
     @ApiModelProperty(name = "issueClass", value = "发行方式")
     private String issueClass;
-
-    @ApiModelProperty(name = "issueClassValue", value = "发行方式字典值")
-    private String issueClassValue;
 
     @ApiModelProperty(name = "tenderType", value = "招标方式")
     private String tenderType;
 
-    @ApiModelProperty(name = "tenderTypeValue", value = "招标方式字典值")
-    private String tenderTypeValue;
-
     @ApiModelProperty(name = "tenderTarget", value = "招标标的")
     private String tenderTarget;
 
-    @ApiModelProperty(name = "tenderTargetValue", value = "招标标的字典值")
-    private String tenderTargetValue;
-
     @ApiModelProperty(name = "issueStyle", value = "发行类型")
     private String issueStyle;
-
-    @ApiModelProperty(name = "issueStyleValue", value = "issueStyle字典值")
-    private String issueStyleValue;
 
     @ApiModelProperty(name = "planIssueAmt", value = "计划发行量(亿元)")
     @JsonSerialize(using = BigDecimalSerializer.class)
@@ -103,9 +79,6 @@ public class FinTenderBondAssetDto {
     @ApiModelProperty(name = "crossMarket", value = "跨市场发行")
     private String crossMarket;
 
-    @ApiModelProperty(name = "crossMarketValue", value = "跨市场发行字典值")
-    private String crossMarketValue;
-
     @ApiModelProperty(name = "crossMarketCode", value = "跨市场代码")
     private String crossMarketCode;
 
@@ -121,44 +94,23 @@ public class FinTenderBondAssetDto {
     @ApiModelProperty(name = "type9", value = "资产一级分类")
     private String type9;
 
-    @ApiModelProperty(name = "type9Value", value = "资产一级分类字典值")
-    private String type9Value;
-
     @ApiModelProperty(name = "type10", value = "资产二级分类")
     private String type10;
-
-    @ApiModelProperty(name = "type10Value", value = "资产二级分类字典值")
-    private String type10Value;
 
     @ApiModelProperty(name = "type11", value = "资产三级分类")
     private String type11;
 
-    @ApiModelProperty(name = "type11Value", value = "资产三级分类字典值")
-    private String type11Value;
-
     @ApiModelProperty(name = "couponSpecies", value = "息票品种")
     private String couponSpecies;
-
-    @ApiModelProperty(name = "couponSpeciesValue", value = "息票品种字典值")
-    private String couponSpeciesValue;
 
     @ApiModelProperty(name = "intType", value = "利率类型")
     private String intType;
 
-    @ApiModelProperty(name = "intTypeValue", value = "利率类型字典值")
-    private String intTypeValue;
-
     @ApiModelProperty(name = "payCycle", value = "付息频率,月付/季付/年付/半年付/到期一次")
     private String payCycle;
 
-    @ApiModelProperty(name = "payCycleValue", value = "付息频率字典值")
-    private String payCycleValue;
-
     @ApiModelProperty(name = "ccy", value = "币种")
     private String ccy;
-
-    @ApiModelProperty(name = "ccyValue", value = "币种字典值")
-    private String ccyValue;
 
     @ApiModelProperty(name = "issuePrice", value = "发行价格")
     @JsonSerialize(using = BigDecimalSerializer.class)
@@ -176,17 +128,11 @@ public class FinTenderBondAssetDto {
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal maxPerUtamt;
 
-    @ApiModelProperty(name = "subRate", value = "主体评级")
-    private String subRate;
+    @ApiModelProperty(name="circulationCode",value="上市流通代码")
+    private String circulationCode;
 
-    @ApiModelProperty(name = "debRate", value = "债项评级")
-    private String debRate;
-
-    @ApiModelProperty(name = "subRateOrg", value = "主体评级机构")
-    private String subRateOrg;
-
-    @ApiModelProperty(name = "debRateOrg", value = "债项评级机构")
-    private String debRateOrg;
+    @ApiModelProperty(name="circulationDate",value="上市流通日期")
+    private Date circulationDate;
 
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
@@ -199,14 +145,6 @@ public class FinTenderBondAssetDto {
         this.issueStage = issueStage;
     }
 
-    public String getIssueStageValue() {
-        return SysDataUtil.getNameFromDataDict(DictCode.发行阶段, this.issueStage);
-    }
-
-    public void setIssueStageValue(String issueStageValue) {
-        this.issueStageValue = issueStageValue;
-    }
-
     public String getIssueStatus() {
         return issueStatus;
     }
@@ -215,12 +153,12 @@ public class FinTenderBondAssetDto {
         this.issueStatus = issueStatus;
     }
 
-    public String getIssueStatusValue() {
-        return SysDataUtil.getNameFromDataDict(DictCode.发行状态, this.issueStatus);
+    public String getFinprodId() {
+        return finprodId;
     }
 
-    public void setIssueStatusValue(String issueStatusValue) {
-        this.issueStatusValue = issueStatusValue;
+    public void setFinprodId(String finprodId) {
+        this.finprodId = finprodId;
     }
 
     public String getFinprodMarketId() {
@@ -247,28 +185,12 @@ public class FinTenderBondAssetDto {
         this.tradeMarket = tradeMarket;
     }
 
-    public String getTradeMarketValue() {
-        return SysDataUtil.getNameFromDataDict(DictCode.交易场所, this.tradeMarket);
-    }
-
-    public void setTradeMarketValue(String tradeMarketValue) {
-        this.tradeMarketValue = tradeMarketValue;
-    }
-
     public String getRegistOrg() {
         return registOrg;
     }
 
     public void setRegistOrg(String registOrg) {
         this.registOrg = registOrg;
-    }
-
-    public String getRegistOrgValue() {
-        return SysDataUtil.getNameFromDataDict(DictCode.登记托管机构, this.registOrg);
-    }
-
-    public void setRegistOrgValue(String registOrgValue) {
-        this.registOrgValue = registOrgValue;
     }
 
     public String getIssuer() {
@@ -287,28 +209,12 @@ public class FinTenderBondAssetDto {
         this.issueType = issueType;
     }
 
-    public String getIssueTypeValue() {
-        return SysDataUtil.getNameFromDataDict(DictCode.发行方式, this.issueType);
-    }
-
-    public void setIssueTypeValue(String issueTypeValue) {
-        this.issueTypeValue = issueTypeValue;
-    }
-
     public String getIssueClass() {
         return issueClass;
     }
 
     public void setIssueClass(String issueClass) {
         this.issueClass = issueClass;
-    }
-
-    public String getIssueClassValue() {
-        return SysDataUtil.getNameFromDataDict(DictCode.新债_发行方式, this.issueClass);
-    }
-
-    public void setIssueClassValue(String issueClassValue) {
-        this.issueClassValue = issueClassValue;
     }
 
     public String getTenderType() {
@@ -319,14 +225,6 @@ public class FinTenderBondAssetDto {
         this.tenderType = tenderType;
     }
 
-    public String getTenderTypeValue() {
-        return SysDataUtil.getNameFromDataDict(DictCode.招标方式, this.tenderType);
-    }
-
-    public void setTenderTypeValue(String tenderTypeValue) {
-        this.tenderTypeValue = tenderTypeValue;
-    }
-
     public String getTenderTarget() {
         return tenderTarget;
     }
@@ -335,28 +233,12 @@ public class FinTenderBondAssetDto {
         this.tenderTarget = tenderTarget;
     }
 
-    public String getTenderTargetValue() {
-        return SysDataUtil.getNameFromDataDict(DictCode.招标标的, this.tenderTarget);
-    }
-
-    public void setTenderTargetValue(String tenderTargetValue) {
-        this.tenderTargetValue = tenderTargetValue;
-    }
-
     public String getIssueStyle() {
         return issueStyle;
     }
 
     public void setIssueStyle(String issueStyle) {
         this.issueStyle = issueStyle;
-    }
-
-    public String getIssueStyleValue() {
-        return SysDataUtil.getNameFromDataDict(DictCode.发行类型, this.tenderTarget);
-    }
-
-    public void setIssueStyleValue(String issueStyleValue) {
-        this.issueStyleValue = issueStyleValue;
     }
 
     public BigDecimal getPlanIssueAmt() {
@@ -405,6 +287,14 @@ public class FinTenderBondAssetDto {
 
     public void setAppearMarketId(String appearMarketId) {
         this.appearMarketId = appearMarketId;
+    }
+
+    public String getAppearMarketAbbr() {
+        return appearMarketAbbr;
+    }
+
+    public void setAppearMarketAbbr(String appearMarketAbbr) {
+        this.appearMarketAbbr = appearMarketAbbr;
     }
 
     public String getCrossMarket() {
@@ -487,14 +377,6 @@ public class FinTenderBondAssetDto {
         this.intType = intType;
     }
 
-    public String getIntTypeValue() {
-        return SysDataUtil.getNameFromDataDict(DictCode.利率类型, this.tenderTarget);
-    }
-
-    public void setIntTypeValue(String intTypeValue) {
-        this.intTypeValue = intTypeValue;
-    }
-
     public String getPayCycle() {
         return payCycle;
     }
@@ -503,28 +385,12 @@ public class FinTenderBondAssetDto {
         this.payCycle = payCycle;
     }
 
-    public String getPayCycleValue() {
-        return SysDataUtil.getNameFromDataDict(BussinessDictCode.频率, this.payCycle);
-    }
-
-    public void setPayCycleValue(String payCycleValue) {
-        this.payCycleValue = payCycleValue;
-    }
-
     public String getCcy() {
         return ccy;
     }
 
     public void setCcy(String ccy) {
         this.ccy = ccy;
-    }
-
-    public String getCcyValue() {
-        return SysDataUtil.getNameFromDataDict(BussinessDictCode.币种, this.ccy);
-    }
-
-    public void setCcyValue(String ccyValue) {
-        this.ccyValue = ccyValue;
     }
 
     public BigDecimal getIssuePrice() {
@@ -559,38 +425,6 @@ public class FinTenderBondAssetDto {
         this.maxPerUtamt = maxPerUtamt;
     }
 
-    public String getSubRate() {
-        return subRate;
-    }
-
-    public void setSubRate(String subRate) {
-        this.subRate = subRate;
-    }
-
-    public String getDebRate() {
-        return debRate;
-    }
-
-    public void setDebRate(String debRate) {
-        this.debRate = debRate;
-    }
-
-    public String getSubRateOrg() {
-        return subRateOrg;
-    }
-
-    public void setSubRateOrg(String subRateOrg) {
-        this.subRateOrg = subRateOrg;
-    }
-
-    public String getDebRateOrg() {
-        return debRateOrg;
-    }
-
-    public void setDebRateOrg(String debRateOrg) {
-        this.debRateOrg = debRateOrg;
-    }
-
     public String getRemark() {
         return remark;
     }
@@ -599,59 +433,27 @@ public class FinTenderBondAssetDto {
         this.remark = remark;
     }
 
-    public String getType9Value() {
-        return SysDataUtil.getNameFromDataDict(DictCode.行内资产二级分类, this.type9);
+    public String getCirculationCode() {
+        return circulationCode;
     }
 
-    public void setType9Value(String type9Value) {
-        this.type9Value = type9Value;
+    public void setCirculationCode(String circulationCode) {
+        this.circulationCode = circulationCode;
     }
 
-    public String getType10Value() {
-        return SysDataUtil.getNameFromDataDict(DictCode.行内资产三级分类, this.type10);
+    public Date getCirculationDate() {
+        return circulationDate;
     }
 
-    public void setType10Value(String type10Value) {
-        this.type10Value = type10Value;
+    public void setCirculationDate(Date circulationDate) {
+        this.circulationDate = circulationDate;
     }
 
-    public String getType11Value() {
-        return SysDataUtil.getNameFromDataDict(DictCode.行内资产四级分类, this.type11);
+    public String getFinprodName() {
+        return finprodName;
     }
 
-    public void setType11Value(String type11Value) {
-        this.type11Value = type11Value;
-    }
-
-    public String getCrossMarketValue() {
-        return SysDataUtil.getNameFromDataDict(DictCode.是否, this.crossMarket);
-    }
-
-    public void setCrossMarketValue(String crossMarketValue) {
-        this.crossMarketValue = crossMarketValue;
-    }
-
-    public String getCouponSpeciesValue() {
-        return SysDataUtil.getNameFromDataDict(DictCode.息票品种, this.couponSpecies);
-    }
-
-    public void setCouponSpeciesValue(String couponSpeciesValue) {
-        this.couponSpeciesValue = couponSpeciesValue;
-    }
-
-    public String getFinprodId() {
-        return finprodId;
-    }
-
-    public void setFinprodId(String finprodId) {
-        this.finprodId = finprodId;
-    }
-
-    public String getAppearMarketAbbr() {
-        return appearMarketAbbr;
-    }
-
-    public void setAppearMarketAbbr(String appearMarketAbbr) {
-        this.appearMarketAbbr = appearMarketAbbr;
+    public void setFinprodName(String finprodName) {
+        this.finprodName = finprodName;
     }
 }

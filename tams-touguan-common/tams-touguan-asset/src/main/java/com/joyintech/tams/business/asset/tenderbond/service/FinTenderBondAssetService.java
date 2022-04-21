@@ -42,7 +42,7 @@ import java.util.*;
  * @since 1.0
  */
 @Service
-public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002Dto>  implements BaseProcessService<FinTenderBondAsset002Dto> {
+public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002Dto> implements BaseProcessService<FinTenderBondAsset002Dto> {
 
     @Resource
     private FinTenderBondAssetMapper finTenderBondAssetMapper;
@@ -65,6 +65,8 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
     @Resource
     private JoyinbusinessCommonService joyinbusinessCommonService;
 
+
+
     @Override
     public String generateTitle(FinTenderBondAsset002Dto entity, OperationType operationType) {
         return String.format("资产代码(%s) 资产简称(%s)", StringUtil.isEmpty(entity.getFinprodMarketId()) ? "" : entity.getFinprodMarketId(),
@@ -75,13 +77,14 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
     public void doComplete(FinTenderBondAsset002Dto dto, OperationType type) {
         if (OperationType.DELETE == type) {
             this.delete(dto);
+            this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_放弃);
         } else if (OperationType.NEW == type) {
             this.insert(dto);
-        } else if(OperationType.MODIFY == type){
+            this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_新建);
+        } else if (OperationType.MODIFY == type) {
             this.update(dto);
+            this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_修改);
         }
-        //记录操作日志
-        this.saveOperate(dto.getFinprodId(), dto.getRemark(), type);
     }
 
     /**
@@ -179,7 +182,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         FinProductType finProductType = new FinProductType();
         BeanUtil.copyPropertiesIgnoreNull(finProductType, dto);
         finProductType.setBranch(0l);
-        //TODO 这里需要通过映射表增加type的类型
+        //TODO 这里需要通过映射表增加type6/type7的类型
         //finProductType.setType6(dto.getType4());
         //finProductType.setType7(dto.getType5());
         finProductType.setType8(DictCodeListExt2.平安资产类型_一级市场债.getValue());
@@ -221,21 +224,12 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
      *
      * @param tradeId
      * @param remark
-     * @param type
+     * @param operType
      */
-    public void saveOperate(String tradeId, String remark, OperationType type) {
+    public void saveOperate(String tradeId, String remark, DictCodeListExt3 operType) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(tradeId);
-        if (type == OperationType.NEW) {
-            oprHisReq.setOperType(DictCodeListExt3.操作类型_新建.getValue());
-        } else if ( type == OperationType.MODIFY) {
-            oprHisReq.setOperType(DictCodeListExt3.操作类型_修改.getValue());
-        } else if (type == OperationType.REVOKE) {
-            oprHisReq.setOperType(DictCodeListExt3.操作类型_撤回.getValue());
-        } else {
-            oprHisReq.setOperType(DictCodeListExt3.操作类型_关闭.getValue());
-        }
-        oprHisReq.setBusiDes(remark);
+        oprHisReq.setOperType(operType.getValue());
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
 

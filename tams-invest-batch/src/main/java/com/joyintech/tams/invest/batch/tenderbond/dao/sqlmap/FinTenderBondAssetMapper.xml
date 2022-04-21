@@ -24,11 +24,7 @@
                 ISSUE.ISSUE_CLASS as issueClass,
                 ISSUE.TENDER_TYPE as tenderType,
                 ISSUE.TENDER_TARGET as tenderTarget,
-                ISSUE.ISSUE_STYLE as issueStyle,
-                round(ISSUE.PLAN_ISSUE_AMT/100000000,2) as planIssueAmt,
                 case when ISSUE.ISSUE_CLASS = '02' THEN ISSUE.ISSUE_SDATE else ISSUE.TENDER_SDATE end as issueDate,
-                ISSUE.PAY_EDATE as payEdate,
-                ISSUE.ASSIGN_REGDATE as assignRegdate,
                 case when PRODUCT.CIRCULATION_CODE is not null then PRODUCT.CIRCULATION_DATE else PRODUCT_ADD.LISTING_DATE end as listingDate,
                 case when PRODUCT.CIRCULATION_CODE is not null then PRODUCT2.FINPROD_MARKET_ID else PRODUCT_ADD.APPEAR_MARKET_ID end as appearMarketId,
                 case when PRODUCT.CIRCULATION_CODE is not null then PRODUCT2.FINPROD_ABBR else PRODUCT.FINPROD_ABBR end as appearMarketAbbr,
@@ -41,12 +37,9 @@
                 PRODUCT.CCY as ccy,
                 PRODUCT.ISSUE_PRICE as issuePrice,
                 ISSUE.INT_TYPE as intType,
-                ISSUE.PAY_CYCLE as payCycle,
-                ISSUE.REFER_YIELD as referYield ,
-                round(ISSUE.MIN_PER_TAMT/100000000,2) as minPerTamt,
-                round(ISSUE.MAX_PER_UTAMT/100000000,2) as maxPerUtamt,
                 PRODUCT.REMARK as remark,
-                PRODUCT.FINPROD_ID as finprodId
+                PRODUCT.FINPROD_ID as finprodId,
+                PRODUCT.FINPROD_NAME as finprodName
             FROM FIN_PRODUCT PRODUCT
             LEFT JOIN FIN_PRODUCT_ADD PRODUCT_ADD ON PRODUCT.FINPROD_ID = PRODUCT_ADD.FINPROD_ID
             LEFT JOIN FIN_PRODUCT_ISSUE ISSUE ON PRODUCT.FINPROD_ID = ISSUE.FINPROD_ID
@@ -60,6 +53,31 @@
     </select>
 
     <select id="selectProduct" resultType="com.joyintech.tams.common.base.entity.FinProduct">
+        select * from FIN_PRODUCT
+        where FINPROD_MARKET_ID=#{finprodMarketId,jdbcType=VARCHAR}
+            AND TRADE_MARKET in (#{TRADE_PLACE_01},#{TRADE_PLACE_02})
+            AND FINPROD_TYPE2=#{finprodType2,jdbcType=VARCHAR}
+    </select>
 
+    <!-- 资产名称、资产简称、交易场所、登记托管机构、起息日、到期日、发行人、息票品种、利率类型、币种 进行去重 -->
+    <select id="getBySecId" resultType="com.joyintech.tams.common.base.entity.InterfPayhsrcsecinfo">
+        SELECT SECFULLNAME,SECNAME,MARKET2,INSTITUTION,VDATE,MDATE,ISSUERSHORT,COUPONSPECIES,INTERESTRATE,CCY,MAX(SOURCE) SOURCE
+        from INTERF_PAYHSRCSECINFO WHERE SECID = #{finprodMarketId,jdbcType=VARCHAR}
+        group by SECFULLNAME,SECNAME,MARKET2,INSTITUTION,VDATE,MDATE,ISSUERSHORT,COUPONSPECIES,INTERESTRATE,CCY
+    </select>
+
+    <select id="getByParam" resultType="com.joyintech.tams.common.base.entity.InterfPayhsrcsecinfo">
+        SELECT SECFULLNAME,SECNAME,MARKET2,INSTITUTION,VDATE,MDATE,ISSUERSHORT,COUPONSPECIES,INTERESTRATE,CCY,SOURCE
+        from INTERF_PAYHSRCSECINFO
+        WHERE SECFULLNAME=#{finprodName,jdbcType=VARCHAR}
+          and SECNAME=#{finprodAbbr,jdbcType=VARCHAR}
+          and MARKET2=#{tradeMarket,jdbcType=VARCHAR}
+          and INSTITUTION=#{registOrg,jdbcType=VARCHAR}
+          and VDATE=#{vdate,jdbcType=DATE}
+          and MDATE=#{mdate,jdbcType=DATE}
+          and ISSUERSHORT=#{issuer,jdbcType=VARCHAR}
+          and COUPONSPECIES=#{couponSpecies,jdbcType=VARCHAR}
+          and INTERESTRATE=#{intType,jdbcType=VARCHAR}
+          and CCY=#{ccy,jdbcType=VARCHAR}
     </select>
 </mapper>

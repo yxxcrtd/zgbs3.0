@@ -33,7 +33,7 @@ import java.util.Objects;
  * @since 1.0
  */
 @Service
-public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset003Dto>  implements BaseProcessService<FinTenderBondAsset003Dto> {
+public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset003Dto> implements BaseProcessService<FinTenderBondAsset003Dto> {
 
     @Resource
     private FinTenderBondAssetMapper finTenderBoundAssetMapper;
@@ -95,6 +95,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
 
                     //TODO 调用头寸
                 });
+                finTenderBoundAssetService.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_上市流通撤销);
             }
         } else {
             //1、记录交易信息
@@ -134,9 +135,9 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
 
             //TODO 调用头寸
             //TODO 这里处理加券
+            finTenderBoundAssetService.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_上市流通);
+
         }
-        //3、记录操作日志
-        finTenderBoundAssetService.saveOperate(dto.getFinprodId(), dto.getRemark(), type);
     }
 
 

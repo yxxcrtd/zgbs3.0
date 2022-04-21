@@ -22,6 +22,9 @@ public class CommonSearchInfoOperateListResponse {
     @ApiModelProperty(name="entrustId",value="指令代码",example="A1",required = true)
     private String entrustId;
 
+    @ApiModelProperty(name="finprodAbbr",value="资产简称",example="A1",required = true)
+    private String finprodAbbr;
+
     @ApiModelProperty(name="operDate",value="操作日期",example="2021-01-01")
     private String operDate;
 
@@ -95,5 +98,13 @@ public class CommonSearchInfoOperateListResponse {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getFinprodAbbr() {
+        return finprodAbbr;
+    }
+
+    public void setFinprodAbbr(String finprodAbbr) {
+        this.finprodAbbr = finprodAbbr;
     }
 }

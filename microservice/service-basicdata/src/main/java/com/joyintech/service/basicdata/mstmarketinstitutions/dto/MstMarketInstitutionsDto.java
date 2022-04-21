@@ -65,6 +65,16 @@ public class MstMarketInstitutionsDto extends MstCustomerInfoAddWithBLOBs implem
     private String isFinLicence;
 
     /**
+     * 是否发行人
+     */
+    private String isIssuer;
+
+    /**
+     * 来源：0-成功不需要处理,1-接口返回需要校验
+     */
+    private int dealFlag;
+
+    /**
      * isFinLicence
      * @return isFinLicence
      */
@@ -382,4 +392,19 @@ public class MstMarketInstitutionsDto extends MstCustomerInfoAddWithBLOBs implem
         this.customerName = customerName;
     }
 
+    public String getIsIssuer() {
+        return isIssuer;
+    }
+
+    public void setIsIssuer(String isIssuer) {
+        this.isIssuer = isIssuer;
+    }
+
+    public int getDealFlag() {
+        return dealFlag;
+    }
+
+    public void setDealFlag(int dealFlag) {
+        this.dealFlag = dealFlag;
+    }
 }
