@@ -90,8 +90,10 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         // 业务类型
         dealTotal.setBusiType(DictCodeList.业务类型_债券质押式回购交易.getValue());
         // 金融产品代码
-        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(),dealDto.getVdate(),DictCodeList.交易方向_买入.getValue(),
-                entrustDto.getPortfolioId());
+//        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(),dealDto.getVdate(),DictCodeList.交易方向_买入.getValue(),
+//                entrustDto.getPortfolioId());
+        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(), dealDto.getVdate(), dealDto.getSeatNumber(),
+                dealDto.getSecAcctId());
         if(StringUtil.isNotEmpty(firstRepoTrade)) {
             //金融产品代码
             dealTotal.setFinprodId(firstRepoTrade.getFinprodId());
