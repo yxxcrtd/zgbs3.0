@@ -1,14 +1,15 @@
 package com.joyintech.service.basicdata.systrdconfig.controller;
 
+import com.joyintech.background.component.common.pack.common.grid.Page;
 import com.joyintech.service.basicdata.systrdconfig.dto.*;
 import com.joyintech.service.basicdata.systrdconfig.service.InterfSysTrdConfigService;
 import com.joyintech.service.basicdata.systrdconfig.service.StockInfoService;
 import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.invest.common.dto.position.PositionCashSecRequest;
 import com.joyintech.tams.invest.common.dto.position.PositionCashSecSingleResp;
 import com.joyintech.tams.invest.common.entrust.inter.EtrTradeCommonervice;
 import com.joyintech.tams.invest.common.entrust.inter.EtrTradeOtherCommonService;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -228,5 +229,14 @@ public class InterfSysTrdConfigController{
     public BigDecimal selectFaceValue(@RequestBody Map<String, Object> params) {
         BigDecimal  m = etrTradeOtherCommonService.selectFaceValue(params);
         return m;
+    }
+
+    /**
+     * 交易商交易员信息查询接口
+     */
+    @ResponseBody
+    @PostMapping("/getDealerTraderInfo")
+    public List<TradeInfoProResponse> selectTraderInfo(@RequestBody TradeInfoProRequest dto ){
+        return  interfSysTrdConfigService.getDealerTraderInfo(dto);
     }
 }

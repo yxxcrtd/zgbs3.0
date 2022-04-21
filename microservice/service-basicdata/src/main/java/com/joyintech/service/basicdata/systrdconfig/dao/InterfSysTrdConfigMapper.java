@@ -82,4 +82,6 @@ public interface InterfSysTrdConfigMapper {
     List<StandardCouponReConversionRateDto> getAllConvrate (Map<String,Object> map);
 
     List<PurchQuotaInfoDto> getPurchQuotaInfo(Map<String, Object> params);
+
+    List<TradeInfoProResponse> getDealerTraderInfo(TradeInfoProRequest dto);
 }
