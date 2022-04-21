@@ -29,7 +29,9 @@ import com.joyintech.tams.exchange.common.bean.SysParamBean;
 import com.joyintech.tams.exchange.common.bean.investment.PtlAuthInfo;
 import com.joyintech.tams.exchange.common.bean.request.DeviationDegreeRequest;
 import com.joyintech.tams.exchange.common.bean.request.EtrDispatcherInfoRequest;
+import com.joyintech.tams.exchange.common.bean.request.TradeInfoProRequest;
 import com.joyintech.tams.exchange.common.bean.response.ExchangeContextResponse;
+import com.joyintech.tams.exchange.common.bean.response.TradeInfoProResponse;
 import com.joyintech.tams.exchange.common.cache.MinPriceService;
 import com.joyintech.tams.exchange.common.cache.MinTrdUnitLimitService;
 import com.joyintech.tams.exchange.common.cache.TradeTimeService;
@@ -575,6 +577,16 @@ public class CommonManagement extends BaseService {
         params.put("finprodId", finprodId);
         BigDecimal faceValue = etrTradeOtherCommonService.selectFaceValue(params);
         return new Message<>(faceValue);
+    }
+
+    public List<TradeInfoProResponse> getDealerTraderInfo(TradeInfoProRequest dto) {
+        logger.info("调用投管接口查询交易商交易员信息");
+        Map<String, Object> map = BeanUtil.object2Map(dto);
+        ResultBean resultBean = doPost(ServiceApplication.BASIC_DATA_SERVICE + TradeServiceURL.getDealerTraderInfo, map);
+        if (ErrorCode.isSuccess(resultBean.getErrorCode())) {
+            return JSONArray.parseArray(JSONArray.toJSONString(resultBean.getData()), TradeInfoProResponse.class);
+        }
+        return ListUtil.empty();
     }
 
     /**
