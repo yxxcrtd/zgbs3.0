@@ -115,22 +115,22 @@
                 AND T.entrustStatus in ('02','03','04','05','06')
             </if>
             <if test="entrustStatus != null and entrustStatus.size()>0">
-                <foreach collection="entrustStatus" open="AND T.entrustStatus in(" close=")" separator="," item="item">
+                <foreach collection="entrustStatus" open=" AND T.entrustStatus in(" close=")" separator="," item="item">
                     #{item}
                 </foreach>
             </if>
             <if test="entrustStatus != null and entrustStatus.size()>0">
-                <foreach collection="entrustStatus" open="AND T.entrustStatus in(" close=")" separator="," item="item">
+                <foreach collection="entrustStatus" open=" AND T.entrustStatus in(" close=")" separator="," item="item">
                     #{item}
                 </foreach>
             </if>
             <if test="finprodMarketIds != null and finprodMarketIds.size()>0">
-                <foreach collection="finprodMarketIds" open="AND T.finprodMarketId in(" close=")" separator="," item="item">
+                <foreach collection="finprodMarketIds" open=" AND T.finprodMarketId in(" close=")" separator="," item="item">
                     #{item}
                 </foreach>
             </if>
             <if test="secManageAcctIds != null and secManageAcctIds.size()>0">
-                <foreach collection="secManageAcctIds" open="AND T.secManageAcctId in(" close=")" separator="," item="item">
+                <foreach collection="secManageAcctIds" open=" AND T.secManageAcctId in(" close=")" separator="," item="item">
                     #{item}
                 </foreach>
             </if>
@@ -150,12 +150,93 @@
                 AND T.entrustId = #{entrustId}
                 /*指令代码查询*/
             </if>
+            <if test="entrustIdList != null and entrustIdList.size()>0">
+                <foreach collection="entrustIdList" open=" AND T.entrustId in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+                /*指令代码查询*/
+            </if>
             <!-- 关键字模糊查询 -->
             <include refid="keywordsWhere"></include>
         </where>
         <if test="pageMode != null and pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
             order by ${pageMode.sort} ${pageMode.direction}
         </if>
+    </select>
+
+    <select id="checkDataStatus" resultType="java.lang.Integer">
+     select count(1)  from  (
+             select ENTRUST_ID from WFL_BID_ORDER_BID_PRICE
+            <if test="entrustId != null and entrustId != '' ">
+                ENTRUST_ID = #{entrustId}
+                /*指令代码查询*/
+            </if>
+			union all
+			 select ENTRUST_ID from BID_ORDER_BID_PRICE
+			 	where IS_CANCEL ='N' and TRADE_STATUS != '03'
+                <if test="entrustId != null and entrustId != '' ">
+                    AND ENTRUST_ID = #{entrustId}
+                    /*指令代码查询*/
+                </if>
+            )
+	</select>
+
+    <resultMap id="entrustInfoMap" type="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubEntrustDetailDto">
+        <id property="entrustDate" column="entrustDate"/>
+        <id property="finprodId" column="finprodId"/>
+        <id property="finprodMarketId" column="finprodMarketId"/>
+        <id property="finprodAbbr" column="finprodAbbr"/>
+        <id property="issueType" column="issueType"/>
+        <id property="issueDate" column="issueDate"/>
+        <id property="payDate" column="payDate"/>
+        <id property="issuePrice" column="issuePrice"/>
+        <id property="referenceRate" column="referenceRate"/>
+        <id property="rate" column="rate"/>
+        <id property="secManageAcctId" column="secManageAcctId"/>
+        <id property="secAcctName" column="secAcctName"/>
+        <id property="invManagerName" column="invManagerName"/>
+        <id property="ccy" column="ccy"/>
+        <id property="remark" column="remark"/>
+        <collection property="productDtos" ofType="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubEntrustProductDto"
+                    javaType="java.util.ArrayList" >
+            <result column="portfolioName" property="portfolioName" jdbcType="VARCHAR" />
+            <result column="bidPrinAmt" property="bidPrinAmt" jdbcType="DECIMAL" />
+            <result column="businessModel" property="businessModel" jdbcType="VARCHAR" />
+        </collection>
+    </resultMap>
+
+    <select id="getEntrustInfo" resultMap="entrustInfoMap">
+        select ee.ENTRUST_DATE      entrustDate
+             , ee.FINPROD_ID        finprodId
+             , fp.FINPROD_MARKET_ID finprodMarketId
+             , fp.FINPROD_ABBR      finprodAbbr
+             , fp.ISSUE_TYPE        issueType
+             , fpi.ISSUE_DATE       issueDate
+             , fpi.PAY_DATE         payDate
+             , fpi.ISSUE_PRICE      issuePrice
+             , fpi.REFER_YIELD      referenceRate
+             , fpi.REFER_YIELD      rate
+             , eea.SEC_ACCT_ID      secManageAcctId
+             , ssai.SEC_ACCT_NAME   secAcctName
+             , ee.INV_MANAGER_ID    invManagerName
+             , ee.CCY               ccy
+             , ee.REMARK            remark
+             , pp.PORTFOLIO_NAME    portfolioName
+             , eed.ENTRUST_NUM*100  bidPrinAmt
+             , ee.INV_AIM           businessModel
+        from ETR_ENTRUST ee
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = ee.FINPROD_ID
+                 left join ETR_ENTRUST_ADD eea on eea.ENTRUST_ID = ee.ENTRUST_ID
+                 left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = ee.FINPROD_ID
+                 LEFT JOIN STL_SEC_ACCT_INFO ssai ON eea.SEC_ACCT_ID = ssai.SEC_ACCT_ID
+                 left join ETR_ENTRUST_DETAIL eed on eed.ENTRUST_ID = ee.ENTRUST_ID
+                 left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = eed.PORTFOLIO_ID
+        <where>
+            <if test="entrustId != null and entrustId != '' ">
+                ENTRUST_ID = #{entrustId}
+                /*指令代码查询*/
+            </if>
+        </where>
     </select>
 
 </mapper>
