@@ -8,11 +8,7 @@ import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.entity.*;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt3;
-import com.joyintech.tams.constant.DictCodeListStl;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.redisinit.dto.ImplCalendar;
 import com.joyintech.tams.settle.batch.datacreate.constant.StlDataCreateConstant;
@@ -1010,6 +1006,8 @@ public class StlDataDealSzdSjsjgProcessService {
                 settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdSjsjg.getJgjyfs()));
                 // 交收方式
                 settleTransData.setSettleMode(stlDataDealProcessCommonService.getSettleMode(szdSjsjg.getJgjsfs()));
+                // 交收结果
+                settleTransData.setDeliveryResult(setDeliveryResult(szdSjsjg));
                 // 交易币种
                 settleTransData.setCcy(stlDataDealProcessCommonService.getCcy(szdSjsjg.getJghbdh()));
                 
@@ -1146,6 +1144,20 @@ public class StlDataDealSzdSjsjgProcessService {
             stlDownDataDealWriteDto.getStlDownDataDealWriteBaseDtoList().add(stlDownDataDealWriteBaseDto);
         }
         return stlDownDataDealWriteDto;
+    }
+
+    private String setDeliveryResult(SzdSjsjg szdSjsjg) {
+        String deliveryResult = DictCodeListExt4.交收结果_交收失败.getValue();
+        if ("N".equals(szdSjsjg.getJgjsbz())) {
+            return deliveryResult;
+        }
+        if ("Y".equals(szdSjsjg.getJgjsbz())) {
+            deliveryResult = DictCodeListExt4.交收结果_正常交收.getValue();
+            if (0 != szdSjsjg.getJgjssl().compareTo(szdSjsjg.getJgcjsl())) {
+                deliveryResult = DictCodeListExt4.交收结果_部分交收.getValue();
+            }
+        }
+        return deliveryResult;
     }
 
     private BigDecimal abs(BigDecimal value) {
@@ -1364,6 +1376,8 @@ public class StlDataDealSzdSjsjgProcessService {
         settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdSjsjg.getJgjyfs()));
         // 交收方式
         settleTransData.setSettleMode(stlDataDealProcessCommonService.getSettleMode(szdSjsjg.getJgjsfs()));
+        // 交收结果
+        settleTransData.setDeliveryResult(setDeliveryResult(szdSjsjg));
         // 执行日期
         settleTransData.setDealDate(stlDownDataDealOperatorDto.getDealDate());
         // 证券品种
