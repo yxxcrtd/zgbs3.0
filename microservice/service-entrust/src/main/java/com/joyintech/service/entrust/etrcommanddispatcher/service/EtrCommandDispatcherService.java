@@ -120,14 +120,20 @@ public class EtrCommandDispatcherService extends BaseService<EtrCommandDispatche
 
 
 	@SuppressWarnings("unchecked")
-	public void sendMessageByInf(EtrCommandDispatcherTotalDto dto) {
+	public String sendMessageByInf(EtrCommandDispatcherTotalDto dto) {
+		String msg = "";
 		logger.info("调用交易系统指令分发接口【{}】  接口URL：" + ServiceApplication.EXCHANGE_SERVICE_NAME + "/joyin/instruction/distribute");
 		logger.info("请求报文【{}】", "message = " + JSON.toJSONString(dto));
 		Map<String, Object> result = restTemplate.postForObject(ServiceApplication.EXCHANGE_SERVICE_NAME + "/joyin/instruction/distribute", dto, Map.class);
 		if (result != null) {
-			logger.info("应答报文【{}】","errorCode:" + (Integer) result.get("errorCode") + ";errorMsg:" + (String) result.get("errorMsg"));
-			System.out.println(result);
+			String errorMsg = String.valueOf(result.get("errorMsg"));
+			int errorCode = Integer.parseInt(result.get("errorCode").toString());
+			logger.info("应答报文【{}】","errorCode:" + errorCode + ";errorMsg:" + errorMsg);
+			if(errorCode != 0){
+				msg = errorMsg;
+			}
 		}
+		return msg;
 	}
 	/**
 	 * 委托指令明细列表查询
