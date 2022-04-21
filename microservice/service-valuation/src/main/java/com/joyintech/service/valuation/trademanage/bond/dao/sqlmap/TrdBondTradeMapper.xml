@@ -16,6 +16,7 @@
             t.SETTLE_DATE settdateDate,/**交割日期**/
             stl.SETTLE_DATE fundSettleDate,/**资金交收日**/
             t.INV_AIM invAim,/**会计分类**/
+            t.CHL_ID chlId,/**通道代码**/
             t.SHARE_AMT dealNum,/**成交数量**/
             t.FPRICE_AMT fpriceAmt,/**全价总额**/
             t.INT_AMT intAmt,/**应收利息总额**/
@@ -140,6 +141,7 @@
             t.SETTLE_DATE settdateDate,/**交割日期**/
             stl.SETTLE_DATE fundSettleDate,/**资金交收日**/
             t.INV_AIM invAim,/**会计分类**/
+            t.CHL_ID chlId,/**通道代码**/
             t.SHARE_AMT dealNum,/**成交数量**/
             t.CPRICE_AMT tradeAmt,/**本币交易金额**/
             t.INT_AMT intAmt,/**应收利息总额**/
