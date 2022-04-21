@@ -1,6 +1,8 @@
 package com.joyintech.tams.exchange.common.constant;
 
-public enum FullPriceConst {
+import com.joyintech.tams.exchange.common.enums.IEnum;
+
+public enum FullPriceConst implements IEnum<String> {
 
     FULL_PRICE("Y", "全价"),
 
@@ -14,4 +16,14 @@ public enum FullPriceConst {
     public final String value;
     public final String name;
 
+
+    @Override
+    public String getCode() {
+        return value;
+    }
+
+    @Override
+    public String getDescription() {
+        return name;
+    }
 }

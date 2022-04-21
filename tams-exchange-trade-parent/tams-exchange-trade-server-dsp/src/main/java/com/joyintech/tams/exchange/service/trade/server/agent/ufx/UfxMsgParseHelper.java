@@ -639,7 +639,7 @@ public class UfxMsgParseHelper {
             instrument.setExdividendFlag((String) ds.get("exdividend_flag"));
             instrument.setStbtransFlag((String) ds.get("stbtrans_flag"));
             instrument.setMarketLowVolume(Integer.parseInt((String) ds.get("market_low_amount")));
-            instrument.setMarketHighVolume(Integer.parseInt((String) ds.get("market_high_amount")));
+            instrument.setMarketHighVolume(Long.parseLong((String) ds.get("market_high_amount")));
             instrument.setBondinvFlag((String) ds.get("bondinv_flag"));
             list.add(instrument);
         }

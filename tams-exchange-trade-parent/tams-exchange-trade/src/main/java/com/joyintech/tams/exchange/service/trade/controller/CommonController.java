@@ -226,6 +226,8 @@ public class CommonController {
     	if(!MasterUtil.isMaster()) {
     		return MasterUtil.postForObjectResultBean(null);
     	}
+        commonManagement.minPriceInCache();
+        commonManagement.minTrdUnitLimitInCache();
         return commonManagement.tradeTimeCache();
     }
 

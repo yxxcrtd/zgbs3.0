@@ -26,6 +26,8 @@ import com.joyintech.tams.exchange.common.bean.investment.BusinessDepartmentBean
 import com.joyintech.tams.exchange.common.bean.investment.CapitalAccountBean;
 import com.joyintech.tams.exchange.common.bean.investment.EntrustOpeBean;
 import com.joyintech.tams.exchange.common.bean.investment.EntrustReBackBean;
+import com.joyintech.tams.exchange.common.cache.MinPriceService;
+import com.joyintech.tams.exchange.common.cache.MinTrdUnitLimitService;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.*;
 import com.joyintech.tams.exchange.common.db.domain.*;
@@ -56,9 +58,8 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.joyintech.tams.constant.DictCodeListExt3.投资指令类型_多组合单资产指令;
+import static com.joyintech.tams.constant.DictCodeListExt3.*;
 import static com.joyintech.tams.exchange.common.constant.InvestmentAssetType.PLEDGE_REPURCHASE;
-import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.*;
 import static com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1.BIDDING_REPO;
 import static com.joyintech.tams.exchange.common.enums.EntrustBussTypeEnum.*;
 import static java.util.stream.Collectors.groupingBy;
@@ -96,6 +97,10 @@ public class InvestmentManagement extends BaseService {
     private AppointInstructionCheck appointInstructionCheck;
     @Autowired
     private RecordLogService recordLogService;
+    @Autowired
+    private MinTrdUnitLimitService minTrdUnitLimitService;
+    @Autowired
+    private MinPriceService minPriceService;
 
     /**
      * 是否单体服务
@@ -438,8 +443,11 @@ public class InvestmentManagement extends BaseService {
         MinPriceAndMinTrdUnitLimitBean minPriceAndMinTrdUnitLimitBean = null;
         for (Instruction instruction : instructions) {
             minPriceAndMinTrdUnitLimitBean = instruction.getMinPriceAndMinTrdUnitLimitBean();
+            // TODO: 方便测试
+            /*if (ObjectUtil.isNotNull(minPriceAndMinTrdUnitLimitBean)) {
+                continue;
+            }*/
 
-            if (ObjectUtil.isNull(minPriceAndMinTrdUnitLimitBean) || ErrorCode.isFail(minPriceAndMinTrdUnitLimitBean.getErrorCode())) {
             /*if (InvestmentAssetType.FUTURES.value.equals(instruction.getAssetType())) {
                 minPriceAndMinTrdUnitLimitBean = futuresInstrumentService.queryMinPriceAndMinTrdUnitLimitByFuture(instruction);
                 instruction.setMinPriceAndMinTrdUnitLimitBean(minPriceAndMinTrdUnitLimitBean);
@@ -447,9 +455,48 @@ public class InvestmentManagement extends BaseService {
                 instructionClone.setFinprodMarketId(StockCodeUtils.getStockCode(instruction.getFinprodMarketId()));
                 return;
             }*/
-                minPriceAndMinTrdUnitLimitBean = instrumentService.queryMinPriceAndMinTrdUnitLimit(instruction.getFinprodMarketId(), instruction.getTradePlat(), instruction.getPs());
-                instruction.setMinPriceAndMinTrdUnitLimitBean(minPriceAndMinTrdUnitLimitBean);
+//                minPriceAndMinTrdUnitLimitBean = instrumentService.queryMinPriceAndMinTrdUnitLimit(instruction.getFinprodMarketId(), instruction.getTradePlat(), instruction.getPs());
+//                instruction.setMinPriceAndMinTrdUnitLimitBean(minPriceAndMinTrdUnitLimitBean);
+            String finprodMarketId = instruction.getFinprodMarketId();
+            Instrument instrument = instrumentService.findById(finprodMarketId);
+            if (ObjectUtil.isNull(instrument)) {
+                logger.warn("获取合约信息失败，无法填充最小价差等交易属性信息 => 【instructionId = {}, finprodMarketId = {}】", instruction.getEntrustId(), finprodMarketId);
+                continue;
             }
+
+            MinPrice minPrice = minPriceService.getMinPrice(instruction, instrument);
+            MinTrdUnitLimit minTrdUnitLimit = minTrdUnitLimitService.getMinTrdUnitLimit(instruction, instrument);
+
+            minPriceAndMinTrdUnitLimitBean =
+                    new MinPriceAndMinTrdUnitLimitBean(finprodMarketId, ErrorCode.SUCCESS.value, ErrorCode.SUCCESS.errorMsg);
+            minPriceAndMinTrdUnitLimitBean.setIsFullPrice(instrument.getIsFullPrice());
+            // 特殊处理新债,将多条数据同时塞入
+            if (ObjectUtil.isNull(minPrice)) {
+                String tradeMarket = instruction.getTradeMarket();
+                String assetType = instrument.getAssetType();
+                String assetType1 = instrument.getAssetType1();
+                MinPrice minPriceByPPCJ = minPriceService.getMinPrice(tradeMarket, 指定交易方式_匹配成交.getValue(), assetType, assetType1);
+                MinPrice minPriceByXSCJ = minPriceService.getMinPrice(tradeMarket, 指定交易方式_协商成交.getValue(), assetType, assetType1);
+                minPriceAndMinTrdUnitLimitBean.setMinPriceList(ListUtil.of(minPriceByPPCJ, minPriceByXSCJ));
+            } else {
+                minPriceAndMinTrdUnitLimitBean.setMinPriceList(ListUtil.of(minPrice));
+            }
+
+            if (ObjectUtil.isNull(minTrdUnitLimit)) {
+                String tradeMarket = instruction.getTradeMarket();
+                String assetType = instrument.getAssetType();
+                String assetType1 = instrument.getAssetType1();
+                String subStockType = instrument.getSubStockType();
+                String ps = instruction.getPs();
+                MinTrdUnitLimit minTrdUnitLimitByPPCJ = minTrdUnitLimitService.getMinTrdUnitLimit(tradeMarket, 指定交易方式_匹配成交.getValue(), assetType, assetType1, subStockType, ps);
+                MinTrdUnitLimit minTrdUnitLimitByXSCJ = minTrdUnitLimitService.getMinTrdUnitLimit(tradeMarket, 指定交易方式_协商成交.getValue(), assetType, assetType1, subStockType, ps);
+                minPriceAndMinTrdUnitLimitBean.setMinTrdUnitLimitList(ListUtil.of(minTrdUnitLimitByPPCJ, minTrdUnitLimitByXSCJ));
+            } else {
+                minPriceAndMinTrdUnitLimitBean.setMinTrdUnitLimitList(ListUtil.of(minTrdUnitLimit));
+            }
+
+            logger.info("填充最小价差等交易属性信息 => 【minPriceAndMinTrdUnitLimitBean = {}】", minPriceAndMinTrdUnitLimitBean);
+            instruction.setMinPriceAndMinTrdUnitLimitBean(minPriceAndMinTrdUnitLimitBean);
         }
     }
 

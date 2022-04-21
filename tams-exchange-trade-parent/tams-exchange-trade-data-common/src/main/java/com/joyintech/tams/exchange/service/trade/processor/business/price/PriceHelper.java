@@ -1,22 +1,31 @@
 package com.joyintech.tams.exchange.service.trade.processor.business.price;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import com.google.common.collect.Lists;
 import com.joyintech.tams.exchange.common.bean.TickBean;
+import com.joyintech.tams.exchange.common.bean.dto.OpenCloseTime;
+import com.joyintech.tams.exchange.common.bean.request.BaseOrderRequest;
+import com.joyintech.tams.exchange.common.cache.TradeTimeService;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.instrument.SubStockType;
 import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
+import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
+import com.joyintech.tams.exchange.common.db.domain.Order;
 import com.joyintech.tams.exchange.common.db.domain.OrderInterface;
+import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
 import com.joyintech.tams.exchange.common.utils.IntegratedEntrustUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * create By MAXX on 2020/12/17
@@ -29,6 +38,21 @@ public class PriceHelper {
     private static final Logger logger = LoggerFactory.getLogger(PriceHelper.class);
     private double buyRatio = 1.02;
     private double sellRatio = 0.98;
+    private TradeTimeService tradeTimeService;
+    @Autowired
+    public void setTradeTimeService(TradeTimeService tradeTimeService) {
+        this.tradeTimeService = tradeTimeService;
+    }
+
+    public String checkPrice(BaseOrderRequest order, Instruction instruction, Instrument instrument, TickBean tick) {
+        OrderInterface orderInterface = new Order();
+        BigDecimal entrustPrice = order.getEntrustPrice();
+        String tradePlat = instruction.getTradePlat();
+        String entrustBussType = instruction.getEntrustBussType();
+        String priceMode = EntrustPropUtils.getEntrustProp(instruction, order.getEntrustProp());
+        checkPrice(entrustPrice, orderInterface, instrument, tick, tradePlat, entrustBussType, priceMode);
+        return orderInterface.getErrorMsg();
+    }
 
     //沪深竞价平台
     public boolean checkPrice(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick, String tradePlat, String entrustBussType, String priceMode) {
@@ -245,6 +269,21 @@ public class PriceHelper {
             return false;
         }
         return true;
+    }
+
+    private int getTradeTimeStage(Instruction instruction, BaseOrderRequest order) {
+        int tradeTimeStage = -1;
+        List<OpenCloseTime> tradePeriod = tradeTimeService.getTradePeriod(instruction, order);
+        String localTime = LocalTime.now().toString();
+        boolean result = false;
+        for (OpenCloseTime openCloseTime : tradePeriod) {
+            result = DateUtil.isIn(DateUtil.parseTime(localTime), DateUtil.parseTime(openCloseTime.getOpenTime()), DateUtil.parseTime(openCloseTime.getCloseTime()));
+            if (result) {
+                tradeTimeStage = Integer.valueOf(openCloseTime.getPriceTimeType());
+                break;
+            }
+        }
+        return tradeTimeStage;
     }
 
     /**
