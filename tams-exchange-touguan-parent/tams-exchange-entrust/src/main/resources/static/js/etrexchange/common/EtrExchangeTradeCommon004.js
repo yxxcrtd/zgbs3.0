@@ -2542,6 +2542,8 @@
         // 选择的计算方式为“净价”时
         if (calculateField == SEC_CALC_MODE_01) {
             var price = $("#price_" + currentTab).val();
+            // var fprice = $("#fprice_" + currentTab).val();
+            // var yield = $("#yield_" + currentTab).val();
             if (priceModel == PRICE_MODEL_PRM03) {
                 var price = $("#factPrice_" + currentTab).val();
             }
@@ -2549,10 +2551,12 @@
             formatEntrustPrice();
             if (!resetFlag && price) {
                 param.price = price;
-                Joyin.ajaxJson(basePath + 'invest/entrust/etrexchangetrade/EtrExchangeTrade001/calcPriceAndYield', param, function (result) {
-                    var fprice = formatPrice(price, result.fprice);
+                // param.fprice = fprice;
+                // param.yield = yield;
+                Joyin.ajaxJson(basePath + 'etrexchange/common/etrExchangeTrade001/calcPriceAndYield', param, function (result) {
+                    var fprice = formatPrice(price, result.data.fprice);
                     $("#fprice_" + currentTab).val(fprice).trigger('blur');
-                    $("#yield_" + currentTab).val(result.yield).trigger('blur');
+                    $("#yield_" + currentTab).val(result.data.yield).trigger('blur');
                 }, false);
                 calcEntrustNumAndAmt();
             } else {
@@ -2568,10 +2572,10 @@
             fprice = formatPrice(fprice);
             if (!resetFlag && fprice) {
                 param.fprice = fprice;
-                Joyin.ajaxJson(basePath + 'invest/entrust/etrexchangetrade/EtrExchangeTrade001/calcPriceAndYield', param, function (result) {
-                    var cprice = formatPrice(fprice, result.cprice);
+                Joyin.ajaxJson(basePath + 'etrexchange/common/etrExchangeTrade001/calcPriceAndYield', param, function (result) {
+                    var cprice = formatPrice(fprice, result.data.cprice);
                     $("#price_" + currentTab).val(cprice).trigger('blur');
-                    $("#yield_" + currentTab).val(result.yield).trigger('blur');
+                    $("#yield_" + currentTab).val(result.data.yield).trigger('blur');
                     // 设置净价后格式化价格
                     calcEntrustNumAndAmt();
                 }, false);
@@ -2587,9 +2591,9 @@
             var yield = $("#yield_" + currentTab).val();
             if (!resetFlag && yield) {
                 param.yield = yield;
-                Joyin.ajaxJson(basePath + 'invest/entrust/etrexchangetrade/EtrExchangeTrade001/calcPriceAndYield', param, function (result) {
-                    var cprice = formatPrice(result.cprice);
-                    var fprice = formatPrice(result.cprice, result.fprice);
+                Joyin.ajaxJson(basePath + 'etrexchange/common/etrExchangeTrade001/calcPriceAndYield', param, function (result) {
+                    var cprice = formatPrice(result.data.cprice);
+                    var fprice = formatPrice(result.data.cprice, result.data.fprice);
                     $("#price_" + currentTab).val(cprice).trigger('blur');
                     $("#fprice_" + currentTab).val(fprice).trigger('blur');
                     // 计算完净价需要计算数量或金额
