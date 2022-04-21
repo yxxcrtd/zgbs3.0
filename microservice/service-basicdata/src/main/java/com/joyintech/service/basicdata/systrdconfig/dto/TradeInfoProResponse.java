@@ -11,7 +11,7 @@ public class TradeInfoProResponse {
     private String dealer;
 
 
-    private String tradeMarket;
+    private String tradePlace;
 
 
     private String dealerNo;
@@ -42,12 +42,20 @@ public class TradeInfoProResponse {
         this.dealer = dealer;
     }
 
-    public String getTradeMarket() {
-        return tradeMarket;
+    public String getTradePlace() {
+        return tradePlace;
     }
 
-    public void setTradeMarket(String tradeMarket) {
-        this.tradeMarket = tradeMarket;
+    public void setTradePlace(String tradePlace) {
+        this.tradePlace = tradePlace;
+    }
+
+    public String getDealerPartyNo() {
+        return dealerPartyNo;
+    }
+
+    public void setDealerPartyNo(String dealerPartyNo) {
+        this.dealerPartyNo = dealerPartyNo;
     }
 
     public String getDealerNo() {

@@ -20,7 +20,7 @@ public class TradeInfoProRequest {
     private String dealerName;
 
 
-    private String tradeMarket;
+    private String tradePlace;
 
 
     private String traderNo;
@@ -53,12 +53,12 @@ public class TradeInfoProRequest {
         this.dealer = dealer;
     }
 
-    public String getTradeMarket() {
-        return tradeMarket;
+    public String getTradePlace() {
+        return tradePlace;
     }
 
-    public void setTradeMarket(String tradeMarket) {
-        this.tradeMarket = tradeMarket;
+    public void setTradePlace(String tradePlace) {
+        this.tradePlace = tradePlace;
     }
 
     public String getDealerNo() {
