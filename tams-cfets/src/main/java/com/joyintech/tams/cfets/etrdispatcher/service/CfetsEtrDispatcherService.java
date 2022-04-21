@@ -15,6 +15,7 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.base.intf.DataDictItem;
 import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.security.LoginUserUtil;
@@ -67,6 +68,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 
@@ -892,8 +894,8 @@ public class CfetsEtrDispatcherService extends BaseService {
      * @return Message<AjaxResult>
      * @author sjj
      */
+    @Transactional(rollbackFor = Exception.class)
     public String doDispatcherDeal(Map<String, Object> pageParam) {
-        String mes = "";
         // 删除原先分发过的所有交易员记录
         List<String> entrustIds = StringUtil.splitToList(",", (String) pageParam.get("entrustId"));
         List<String> tradersList = StringUtil.splitToList(",", (String) pageParam.get("traders"));
@@ -936,11 +938,10 @@ public class CfetsEtrDispatcherService extends BaseService {
             String message = restTemplate.postForObject(ServiceApplication.ENTRUST_SERVICE_NAME
                     + "/EtrCommandDispatcher/pushCommandMsg", msgdto, String.class);
             if(StringUtil.isNotEmpty(message)){
-                mes = message;
+                throw new BusinessException(message);
             }
         }
         // modify by etliu 20210203 可转债网下申购不发送交易端 end
-        return mes;
     }
 
     /**
@@ -1094,7 +1095,7 @@ public class CfetsEtrDispatcherService extends BaseService {
                         entrCommandDispatcherDto.setEntrustStatus(DictCodeList.委托状态_已退回.getValue());
                     }
                     restTemplate.postForObject(ServiceApplication.ENTRUST_SERVICE_NAME
-                            + "/EtrCommandDispatcher/pushCommandMsg", msgdto, Integer.class);
+                            + "/EtrCommandDispatcher/pushCommandMsg", msgdto, String.class);
                 }
                 // modify by etliu 20210203 可转债网下申购不发送交易端 end
             }

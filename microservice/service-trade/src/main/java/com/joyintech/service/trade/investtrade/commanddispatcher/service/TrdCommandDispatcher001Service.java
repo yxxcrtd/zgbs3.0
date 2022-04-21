@@ -384,7 +384,7 @@ public class TrdCommandDispatcher001Service extends BaseService<TrdCommandDispat
 		// modify by etliu 20210203 可转债网下申购不发送交易端 start
 		if (msgdto != null && !StringUtil.isEmptyList(msgdto.getEtr_entrust_list())) {
 		    restTemplate.postForObject(ServiceApplication.ENTRUST_SERVICE_NAME
-		        + "/EtrCommandDispatcher/pushCommandMsg",msgdto,Integer.class);	
+		        + "/EtrCommandDispatcher/pushCommandMsg",msgdto,String.class);
 		}
         // modify by etliu 20210203 可转债网下申购不发送交易端 end
     }
