@@ -153,12 +153,12 @@ public class IntegratedQuoteManagement {
     	negotiateQuoteSendBean.setMemberId(integratedEntrust.getSellerNo());
     	negotiateQuoteSendBean.setTraderCode(integratedEntrust.getSellerNo());
     	negotiateQuoteSendBean.setInvestorId(integratedEntrust.getInvestorId());
-    	negotiateQuoteSendBean.setInvestorType(integratedEntrust.getInvestorName());
+    	negotiateQuoteSendBean.setInvestorType(integratedEntrust.getOwnerType());
     	negotiateQuoteSendBean.setCpMemberId(integratedEntrust.getPropSeatName());
     	negotiateQuoteSendBean.setCpTraderCode(integratedEntrust.getLiaisonTel());
     	negotiateQuoteSendBean.setCpInvestorId(integratedEntrust.getPropInvestorId());
     	negotiateQuoteSendBean.setCpInvestorType(integratedEntrust.getPropInvestorName());
-    	negotiateQuoteSendBean.setConfirmId("ConfirmId");
+    	negotiateQuoteSendBean.setConfirmId(integratedEntrust.getContractId());
     	negotiateQuoteSendBean.setPositionStr(integratedEntrust.getPositionStr());
     	negotiateQuoteSendBean.setRemark(integratedEntrust.getRemark());
     }
