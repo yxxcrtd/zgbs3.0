@@ -511,7 +511,7 @@
             decode(
             eted.ASSET_TYPE,
             'F01',
-            NVL( ete.ENTRUST_NUM * ete.PRICE, 0 ),
+            NVL( ete.ENTRUST_AMT,ete.ENTRUST_NUM),
             'F10',
             NVL( ete.ENTRUST_NUM * 100, 0 ),
             NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
@@ -649,7 +649,7 @@
         decode(
         eted.ASSET_TYPE,
         'F01',
-        NVL( ete.ENTRUST_NUM * ete.PRICE, 0 ),
+        NVL( ete.ENTRUST_AMT,ete.ENTRUST_NUM),
         'F10',
         NVL( ete.ENTRUST_NUM * 100, 0 ),
         NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
