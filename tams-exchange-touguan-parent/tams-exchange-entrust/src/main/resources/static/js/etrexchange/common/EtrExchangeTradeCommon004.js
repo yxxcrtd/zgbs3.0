@@ -298,6 +298,7 @@
                     $("#declaType_" + currentTab).val(param.declaType).trigger('change', true);
                 }
                 if (param.calMode) {
+
                     $("input[name=calculateField_" + currentTab + "][value='" + param.calMode + "']").attr("checked", true);
                     layui.form.render(); //更新
                     calculateFieldChange();
@@ -4268,7 +4269,13 @@
             });
         });
 
+        if (calculateField) {
+            $("input[name=calculateField_" + currentTab + "][value='" + calculateField + "']").attr("checked", true);
+            layui.form.render(); //更新
+        }
+
         initPage();
+
         if (calculateField) {
             $("input[name=calculateField_" + currentTab + "][value='" + calculateField + "']").attr("checked", true);
             layui.form.render(); //更新
