@@ -296,12 +296,8 @@ public class CfetsEtrDispatcherController extends BaseController {
                 return new Message<AjaxResult>().fail().setMessage(ajaxResult.getMessage());
             } else {
                 //选择交易员
-                String resMeg = cfetsEtrDispatcherService.doDispatcherDeal(pageParam);
-                if(StringUtil.isEmpty(resMeg)){
-                    return new Message<AjaxResult>().success().setMessage("分发成功");
-                }else {
-                    return new Message<AjaxResult>().fail().setMessage(resMeg);
-                }
+                cfetsEtrDispatcherService.doDispatcherDeal(pageParam);
+                return new Message<AjaxResult>().success().setMessage("分发成功");
             }
         } catch (Exception e) {
             logger.error("分发异常", e);
