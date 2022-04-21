@@ -8,6 +8,7 @@ import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset001Dto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset002Dto;
 import com.joyintech.tams.business.asset.tenderbond.service.FinTenderBondAssetService;
@@ -104,6 +105,18 @@ public class FinTenderBondAsset002Controller extends BaseController {
     @ApiOperation(value = "新建/修改/删除提交时校验", notes = "新建/修改/删除提交时校验")
     public Message check(@RequestBody FinTenderBondAsset002Dto dto) {
         List<ValidMessage> validMessageList = finTenderBoundAssetService.valid(dto);
+        if (CollectionUtils.isNotEmpty(validMessageList)) {
+            return Message.fail("校验失败", validMessageList);
+        } else {
+            return Message.success("校验成功", null);
+        }
+    }
+
+    @ResponseBody
+    @PostMapping("/modifyAndDeleteCheck")
+    @ApiOperation(value = "列表中点击删除和修改时调用校验", notes = "列表中点击删除和修改时调用校验")
+    public Message modifyAndDeleteCheck(@RequestBody FinTenderBondAsset001Dto dto) {
+        List<ValidMessage> validMessageList = finTenderBoundAssetService.modifyAndDeleteCheck(dto);
         if (CollectionUtils.isNotEmpty(validMessageList)) {
             return Message.fail("校验失败", validMessageList);
         } else {
