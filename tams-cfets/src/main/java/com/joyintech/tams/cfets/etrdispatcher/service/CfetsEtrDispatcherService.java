@@ -895,7 +895,7 @@ public class CfetsEtrDispatcherService extends BaseService {
      * @author sjj
      */
     @Transactional(rollbackFor = Exception.class)
-    public String doDispatcherDeal(Map<String, Object> pageParam) {
+    public void doDispatcherDeal(Map<String, Object> pageParam) {
         // 删除原先分发过的所有交易员记录
         List<String> entrustIds = StringUtil.splitToList(",", (String) pageParam.get("entrustId"));
         List<String> tradersList = StringUtil.splitToList(",", (String) pageParam.get("traders"));
