@@ -4,7 +4,6 @@ import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.tams.exchange.common.db.domain.Entrust;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
-import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 import java.util.List;
@@ -53,7 +52,7 @@ public class TrdExchangeEntrustDto extends BaseEntity implements ProcessEntity {
     /**
      * 操作类型
      */
-    private OperationType operType;
+    private String operType;
 
     /**
      * 页面ID
@@ -140,11 +139,11 @@ public class TrdExchangeEntrustDto extends BaseEntity implements ProcessEntity {
         this.roles = roles;
     }
 
-    public OperationType getOperType() {
+    public String getOperType() {
         return operType;
     }
 
-    public void setOperType(OperationType operType) {
+    public void setOperType(String operType) {
         this.operType = operType;
     }
 
