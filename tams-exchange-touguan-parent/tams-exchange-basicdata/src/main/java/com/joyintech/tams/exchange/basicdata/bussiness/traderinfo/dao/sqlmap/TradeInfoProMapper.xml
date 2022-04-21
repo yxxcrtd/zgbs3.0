@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dao.TradeInfoProMapper">
+
+
+    <select id="getCustomerName" resultType="com.joyintech.framework.select.SelectOptionDto">
+        select  CUSTOMER_ID id,
+        CUSTOMER_NAME text
+        from MST_CUSTOMER_INFO
+        <where>
+            IS_BROKER is not null
+            <if test="search != null and search != ''">
+                and (CUSTOMER_ID like concat(concat('%',#{search}),'%')
+                or CUSTOMER_NAME like concat(concat('%',#{search}),'%'))
+            </if>
+            <if test="initValue != null and initValue != ''">
+                and CUSTOMER_ID = #{initValue}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="getDealerTraderInfo"
+            resultType="com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dto.TradeInfoProResponse">
+        select
+               mdi.DEALER_NO,
+                mci.CUSTOMER_ABBR dealerName,
+               MDDI.DEALER_PARTY_NO,
+               MDDI.DEALER_PARTY_TYPE,
+               MDDI.DEALER_PARTY_NAME,
+               MDDI.TRADER_NO ,
+               MDDI.TRADER_NAME ,
+               MDDI.IS_OUR
+    from
+               MST_DEALER_INFO mdi
+    LEFT JOIN  MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO
+               and MDDI.CUSTOMER_ID=mdi.CUSTOMER_ID
+    left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = mdi.CUSTOMER_ID
+    left join MST_SALE_DEPARTMENT MSD on MDDI.DEALER_NO =MSD.BROKER_ID
+    LEFT JOIN STL_CAPACCT_INFO SCI ON MSD.SALE_DEPID = SCI.OWN_DEPT
+    left join STL_SEC_ACCT_INFO SSAI on SCI.ACCT_NO = SSAI.TRD_ACCT_ID
+    <where>
+        <if test="tradePlace != null and tradePlace != ''">
+        SSAI.TRADE_PLACE = #{tradePlace}
+        </if>
+        <if test="acctNo != null and acctNo != ''">
+        and  SSAI.TRD_ACCT_ID = #{acctNo}
+        </if>
+        <if test="isOur != null and isOur != ''">
+        and MDDI.IS_OUR = #{isOur}
+        </if>
+        <if test="dealerNo != null and dealerNo != ''">
+        and mdi.DEALER_NO = #{dealerNo}
+        </if>
+        <if test="dealerName != null and dealerName != ''">
+            and mci.CUSTOMER_ABBR like concat(concat('%',#{dealerName}),'%')
+        </if>
+        <if test="traderNo != null and traderNo != ''">
+            and MDDI.TRADER_NO like concat(concat('%',#{traderNo}),'%')
+        </if>
+        <if test="traderName != null and traderName != ''">
+        and MDDI.TRADER_NAME like concat(concat('%',#{traderName}),'%')
+        </if>
+        <if test="dealerPartyNo != null and dealerPartyNo != ''">
+            and MDDI.DEALER_PARTY_NO like concat(concat('%',#{dealerPartyNo}),'%')
+        </if>
+        <if test="dealerPartyName != null and dealerPartyName != ''">
+            and MDDI.DEALER_PARTY_NAME like concat(concat('%',#{dealerPartyName}),'%')
+        </if>
+    </where>
+    </select>
+
+
+    <delete id="deleteSelectedItem">
+          delete from  MST_DEALER_DETAIL_INFO mddi
+          <where>
+              mddi.CUSTOMER_ID = #{customerId,jdbcType="VARCHAR"}
+              and mddi.DEALER_PARTY_NO =#{dealerPartyNo,jdbcType="VARCHAR"}
+              and mddi.TRADER_NO = #{traderNo,jdbcType="VARCHAR"}
+          </where>
+    </delete>
+
+</mapper>
