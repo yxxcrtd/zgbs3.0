@@ -103,6 +103,19 @@ public class JoyinbusinessCommonController extends BaseController {
         }
     }
 
+    @PostMapping("/getfinprodIdForNewBond")
+    @ApiOperation(value = "新债简称列表查询", notes = "新债简称列表查询")
+    @ResponseBody
+    public Message<Page<SelectOptionDto>> getfinprodIdForNewBond(@RequestBody CfetsSearchInfoRequest item) {
+        try {
+            Page<SelectOptionDto> dto = joyinbusinessCommonService.getfinprodIdForNewBond(item);
+            return new Message<Page<SelectOptionDto>>().success().setData(dto);
+        } catch (Exception e) {
+            logger.error("查询新债简称列表异常", e);
+            return new Message<Page<SelectOptionDto>>().fail().setMessage("查询异常");
+        }
+    }
+
     @ResponseBody
     @RequestMapping("/getfinprodIdForSelect")
     @ApiOperation(value = "债券简称列表查询", notes = "债券简称列表查询")
