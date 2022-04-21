@@ -20,14 +20,7 @@ import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.IDGenerator;
-import com.joyintech.framework.util.RequestUtil;
-import com.joyintech.framework.util.StringUtil;
-import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.service.entrust.etrbondfirstlbidding.dao.EtrBondFirstLBiddingMapper;
 import com.joyintech.service.entrust.etrbondfirstlbidding.dto.EtrBondFirstLBiddingDto;
@@ -52,11 +45,7 @@ import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.business.riskrds.constant.InterfUtil;
 import com.joyintech.tams.component.business.riskrds.constant.PageFieldToInterfFactory;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.CommonUtil;
 import com.joyintech.tams.invest.common.client.ClientData;
 import com.joyintech.tams.invest.common.component.base.entrust.impl.BaseEtrInvestInfoServiceImpl;
@@ -73,7 +62,6 @@ import com.joyintech.tams.invest.common.util.DictCodeUtil;
 import com.joyintech.tams.invest.entrust.common.service.EtrCommonService;
 import com.joyintech.tams.invest.trade.common.aop.TradeRdsCommonAop;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -904,7 +892,8 @@ public class CfetsEtrDispatcherService extends BaseService {
      * @return Message<AjaxResult>
      * @author sjj
      */
-    public void doDispatcherDeal(Map<String, Object> pageParam) {
+    public String doDispatcherDeal(Map<String, Object> pageParam) {
+        String mes = "";
         // 删除原先分发过的所有交易员记录
         List<String> entrustIds = StringUtil.splitToList(",", (String) pageParam.get("entrustId"));
         List<String> tradersList = StringUtil.splitToList(",", (String) pageParam.get("traders"));
@@ -944,10 +933,14 @@ public class CfetsEtrDispatcherService extends BaseService {
 
         // modify by etliu 20210203 可转债网下申购不发送交易端 start
         if (msgdto != null && !StringUtil.isEmptyList(msgdto.getEtr_entrust_list())) {
-            restTemplate.postForObject(ServiceApplication.ENTRUST_SERVICE_NAME
-                    + "/EtrCommandDispatcher/pushCommandMsg", msgdto, Integer.class);
+            String message = restTemplate.postForObject(ServiceApplication.ENTRUST_SERVICE_NAME
+                    + "/EtrCommandDispatcher/pushCommandMsg", msgdto, String.class);
+            if(StringUtil.isNotEmpty(message)){
+                mes = message;
+            }
         }
         // modify by etliu 20210203 可转债网下申购不发送交易端 end
+        return mes;
     }
 
     /**

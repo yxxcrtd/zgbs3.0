@@ -73,6 +73,14 @@
         <result column="EXTEND1" property="extend1" jdbcType="VARCHAR"/>
         <result column="EXTEND2" property="extend2" jdbcType="VARCHAR"/>
         <result column="ENTRUST_CLASS" property="entrustClass" jdbcType="VARCHAR"/>
+        <result column="TARGET_TYPE" property="targetType" jdbcType="VARCHAR"/>
+        <result column="IS_NO_GUARD" property="isNoGuard" jdbcType="VARCHAR"/>
+        <result column="IS_NET_PRICE" property="isNetPrice" jdbcType="VARCHAR"/>
+        <result column="OWNER_TYPE" property="ownerType" jdbcType="VARCHAR"/>
+        <result column="INVESTOR_ID" property="investorId" jdbcType="VARCHAR"/>
+        <result column="INVESTOR_NAME" property="investorName" jdbcType="VARCHAR"/>
+        <result column="PROP_INVESTOR_ID" property="propInvestorId" jdbcType="VARCHAR"/>
+        <result column="PROP_INVESTOR_NAME" property="propInvestorName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <resultMap id="QueryResultMap" type="com.joyintech.tams.exchange.common.bean.EntrustQueryBean">
@@ -147,6 +155,14 @@
         <result column="EXTEND1" property="extend1" jdbcType="VARCHAR"/>
         <result column="EXTEND2" property="extend2" jdbcType="VARCHAR"/>
         <result column="ENTRUST_CLASS" property="entrustClass" jdbcType="VARCHAR"/>
+        <result column="TARGET_TYPE" property="targetType" jdbcType="VARCHAR"/>
+        <result column="IS_NO_GUARD" property="isNoGuard" jdbcType="VARCHAR"/>
+        <result column="IS_NET_PRICE" property="isNetPrice" jdbcType="VARCHAR"/>
+        <result column="OWNER_TYPE" property="ownerType" jdbcType="VARCHAR"/>
+        <result column="INVESTOR_ID" property="investorId" jdbcType="VARCHAR"/>
+        <result column="INVESTOR_NAME" property="investorName" jdbcType="VARCHAR"/>
+        <result column="PROP_INVESTOR_ID" property="propInvestorId" jdbcType="VARCHAR"/>
+        <result column="PROP_INVESTOR_NAME" property="propInvestorName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Example_Where_Clause">
@@ -220,7 +236,8 @@
     CANCEL_TIME, ERROR_CODE, ERROR_MSG, TRADING_DAY, LOCAL_ENTRUST_ID, BROKER_ENTRUST_ID, 
     IP_MAC, REMARK, CREATE_TIME, UPDATE_TIME, ENTRUST_STATUS, ORIG_ENTRUST_ID, REPORT_NO, OPERATE_USER,
     PORTFOLIO_NAME,SEC_ACCT_ID,SEC_ACCT_NAME,TRADE_PLAT,FINPROD_TYPE2, INV_MANAGER_ID,PS,BUSI_TYPE_TG,
-    EXTEND1,EXTEND2,ENTRUST_CLASS
+    EXTEND1,EXTEND2,ENTRUST_CLASS,TARGET_TYPE,IS_NO_GUARD,IS_NET_PRICE,OWNER_TYPE,INVESTOR_ID,INVESTOR_NAME,
+    PROP_INVESTOR_ID,PROP_INVESTOR_NAME
     </sql>
 
     <sql id="entrust">
@@ -235,7 +252,8 @@
         TRADE_TIME, CANCEL_TIME, ERROR_CODE, ERROR_MSG, TRADING_DAY, LOCAL_ENTRUST_ID, BROKER_ENTRUST_ID,
         IP_MAC, REMARK, CREATE_TIME, UPDATE_TIME, ENTRUST_STATUS, ORIG_ENTRUST_ID, REPORT_NO, OPERATE_USER,
         PORTFOLIO_NAME,SEC_ACCT_ID,SEC_ACCT_NAME,TRADE_PLAT,FINPROD_TYPE2, INV_MANAGER_ID,PS,BUSI_TYPE_TG,
-        EXTEND1,EXTEND2,ENTRUST_CLASS
+        EXTEND1,EXTEND2,ENTRUST_CLASS,TARGET_TYPE,IS_NO_GUARD,IS_NET_PRICE,NULL AS OWNER_TYPE,NULL AS INVESTOR_ID,
+        NULL AS INVESTOR_NAME, NULL AS PROP_INVESTOR_ID,NULL AS PROP_INVESTOR_NAME
     </sql>
 
     <sql id="Query_Column_List">
@@ -249,7 +267,8 @@
     a.CANCEL_TIME, a.ERROR_CODE, a.ERROR_MSG, a.TRADING_DAY, a.LOCAL_ENTRUST_ID, a.BROKER_ENTRUST_ID,
     a.IP_MAC, a.REMARK, a.CREATE_TIME, a.UPDATE_TIME, a.ENTRUST_STATUS, a.ORIG_ENTRUST_ID, a.REPORT_NO, a.OPERATE_USER,
     a.ENTRUST_BS,a.PORTFOLIO_NAME,a.SEC_ACCT_ID,a.SEC_ACCT_NAME, a.TRADE_PLAT,a.FINPROD_TYPE2,a.INV_MANAGER_ID,a.PS,
-    a.BUSI_TYPE_TG,a.EXTEND1,a.EXTEND2,a.ENTRUST_CLASS
+    a.BUSI_TYPE_TG,a.EXTEND1,a.EXTEND2,a.ENTRUST_CLASS,a.TARGET_TYPE,a.IS_NO_GUARD,a.IS_NET_PRICE,a.OWNER_TYPE,
+    a.INVESTOR_ID,a.INVESTOR_NAME, a.PROP_INVESTOR_ID,a.PROP_INVESTOR_NAME
     </sql>
     <sql id="query_entrust">
         a.ID, a.PARENT_ORDER_ID, a.INSTRUCTION_ID, a.PORTFOLIO_ID, a.USER_ID, a.USERNAME, a.ACCOUNT_ID,
@@ -263,7 +282,8 @@
         a.TRADE_TIME, a.CANCEL_TIME, a.ERROR_CODE, a.ERROR_MSG, a.TRADING_DAY, a.LOCAL_ENTRUST_ID, a.BROKER_ENTRUST_ID,
         a.IP_MAC, a.REMARK, a.CREATE_TIME, a.UPDATE_TIME, a.ENTRUST_STATUS, a.ORIG_ENTRUST_ID, a.REPORT_NO, a.OPERATE_USER,
         a.ENTRUST_BS,a.PORTFOLIO_NAME,a.SEC_ACCT_ID,a.SEC_ACCT_NAME, a.TRADE_PLAT,a.FINPROD_TYPE2,a.INV_MANAGER_ID,a.PS,
-        a.BUSI_TYPE_TG,a.EXTEND1,a.EXTEND2,a.ENTRUST_CLASS
+        a.BUSI_TYPE_TG,a.EXTEND1,a.EXTEND2,a.ENTRUST_CLASS,a.TARGET_TYPE,a.IS_NO_GUARD,a.IS_NET_PRICE,NULL AS OWNER_TYPE,
+        NULL AS INVESTOR_ID,NULL AS INVESTOR_NAME, NULL AS PROP_INVESTOR_ID,NULL AS PROP_INVESTOR_NAME
     </sql>
 
     <select id="selectByExample" resultMap="BaseResultMap"
@@ -462,7 +482,8 @@
                                           ENTRUST_STATUS, ORIG_ENTRUST_ID, REPORT_NO, OPERATE_USER,
                                           PORTFOLIO_NAME, SEC_ACCT_ID, SEC_ACCT_NAME, TRADE_PLAT,
                                           FINPROD_TYPE2, INV_MANAGER_ID, PS, BUSI_TYPE_TG, EXTEND1, EXTEND2,
-                                          ENTRUST_CLASS)
+                                          ENTRUST_CLASS, TARGET_TYPE, IS_NO_GUARD, IS_NET_PRICE, OWNER_TYPE,
+                                          INVESTOR_ID, INVESTOR_NAME, PROP_INVESTOR_ID, PROP_INVESTOR_NAME)
         values (#{id,jdbcType=VARCHAR}, #{parentOrderId,jdbcType=VARCHAR}, #{instructionId,jdbcType=VARCHAR},
                 #{portfolioId,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR},
                 #{accountId,jdbcType=VARCHAR}, #{financeAccount,jdbcType=VARCHAR}, #{accountName,jdbcType=VARCHAR},
@@ -487,7 +508,10 @@
                 #{secAcctId,jdbcType=VARCHAR}, #{secAcctName,jdbcType=VARCHAR}, #{tradePlat,jdbcType=VARCHAR},
                 #{finprodType2,jdbcType=VARCHAR}, #{invManagerId,jdbcType=VARCHAR}, #{ps,jdbcType=VARCHAR},
                 #{busiTypeTg,jdbcType=VARCHAR}, #{extend1,jdbcType=VARCHAR}, #{extend2,jdbcType=VARCHAR},
-                #{entrustClass,jdbcType=VARCHAR})
+                #{entrustClass,jdbcType=VARCHAR}, #{targetType,jdbcType=VARCHAR}, #{isNoGuard,jdbcType=VARCHAR},
+                #{isNetPrice,jdbcType=VARCHAR}, #{ownerType,jdbcType=VARCHAR}, #{investorId,jdbcType=VARCHAR},
+                #{investorName,jdbcType=VARCHAR}, #{propInvestorId,jdbcType=VARCHAR},
+                #{propInvestorName,jdbcType=VARCHAR})
     </insert>
     <sql id="insert">
         insert into T_INTEGRATED_ENTRUST
@@ -668,6 +692,30 @@
             <if test="entrustClass != null">
                 ENTRUST_CLASS,
             </if>
+            <if test="targetType != null">
+                TARGET_TYPE,
+            </if>
+            <if test="isNoGuard != null">
+                IS_NO_GUARD,
+            </if>
+            <if test="isNetPrice != null">
+                IS_NET_PRICE,
+            </if>
+            <if test="ownerType != null">
+                OWNER_TYPE,
+            </if>
+            <if test="investorId != null">
+                INVESTOR_ID,
+            </if>
+            <if test="investorName != null">
+                INVESTOR_NAME,
+            </if>
+            <if test="propInvestorId != null">
+                PROP_INVESTOR_ID,
+            </if>
+            <if test="propInvestorName != null">
+                PROP_INVESTOR_NAME,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -845,6 +893,30 @@
             </if>
             <if test="entrustClass != null">
                 #{entrustClass,jdbcType=VARCHAR},
+            </if>
+            <if test="targetType != null">
+                #{targetType,jdbcType=VARCHAR},
+            </if>
+            <if test="isNoGuard != null">
+                #{isNoGuard,jdbcType=VARCHAR},
+            </if>
+            <if test="isNetPrice != null">
+                #{isNetPrice,jdbcType=VARCHAR},
+            </if>
+            <if test="ownerType != null">
+                #{ownerType,jdbcType=VARCHAR},
+            </if>
+            <if test="investorId != null">
+                #{investorId,jdbcType=VARCHAR},
+            </if>
+            <if test="investorName != null">
+                #{investorName,jdbcType=VARCHAR},
+            </if>
+            <if test="propInvestorId != null">
+                #{propInvestorId,jdbcType=VARCHAR},
+            </if>
+            <if test="propInvestorName != null">
+                #{propInvestorName,jdbcType=VARCHAR},
             </if>
         </trim>
     </sql>
@@ -1057,6 +1129,30 @@
             </if>
             <if test="entrustClass != null">
                 ENTRUST_CLASS = #{entrustClass,jdbcType=VARCHAR},
+            </if>
+            <if test="targetType != null">
+                TARGET_TYPE = #{targetType,jdbcType=VARCHAR},
+            </if>
+            <if test="isNoGuard != null">
+                IS_NO_GUARD = #{isNoGuard,jdbcType=VARCHAR},
+            </if>
+            <if test="isNetPrice != null">
+                IS_NET_PRICE = #{isNetPrice,jdbcType=VARCHAR},
+            </if>
+            <if test="ownerType != null">
+                OWNER_TYPE = #{ownerType,jdbcType=VARCHAR},
+            </if>
+            <if test="investorId != null">
+                INVESTOR_ID = #{investorId,jdbcType=VARCHAR},
+            </if>
+            <if test="investorName != null">
+                INVESTOR_NAME = #{investorName,jdbcType=VARCHAR},
+            </if>
+            <if test="propInvestorId != null">
+                PROP_INVESTOR_ID = #{propInvestorId,jdbcType=VARCHAR},
+            </if>
+            <if test="propInvestorName != null">
+                PROP_INVESTOR_NAME = #{propInvestorName,jdbcType=VARCHAR},
             </if>
         </set>
         where ID = #{id,jdbcType=VARCHAR}
@@ -1297,6 +1393,30 @@
             <if test="record.entrustClass != null">
                 ENTRUST_CLASS = #{record.entrustClass,jdbcType=VARCHAR},
             </if>
+            <if test="record.targetType != null">
+                TARGET_TYPE = #{record.targetType,jdbcType=VARCHAR},
+            </if>
+            <if test="record.isNoGuard != null">
+                IS_NO_GUARD = #{record.isNoGuard,jdbcType=VARCHAR},
+            </if>
+            <if test="record.isNetPrice != null">
+                IS_NET_PRICE = #{record.isNetPrice,jdbcType=VARCHAR},
+            </if>
+            <if test="record.ownerType != null">
+                OWNER_TYPE = #{record.ownerType,jdbcType=VARCHAR},
+            </if>
+            <if test="record.investorId != null">
+                INVESTOR_ID = #{record.investorId,jdbcType=VARCHAR},
+            </if>
+            <if test="record.investorName != null">
+                INVESTOR_NAME = #{record.investorName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.propInvestorId != null">
+                PROP_INVESTOR_ID = #{record.propInvestorId,jdbcType=VARCHAR},
+            </if>
+            <if test="record.propInvestorName != null">
+                PROP_INVESTOR_NAME = #{record.propInvestorName,jdbcType=VARCHAR},
+            </if>
         </set>
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
@@ -1373,10 +1493,16 @@
         BUSI_TYPE_TG = #{record.busiTypeTg,jdbcType=VARCHAR},
         EXTEND1 = #{record.extend1,jdbcType=VARCHAR},
         EXTEND2 = #{record.extend2,jdbcType=VARCHAR},
-        ENTRUST_CLASS = #{record.entrustClass,jdbcType=VARCHAR}
-        <if test="_parameter != null">
-            <include refid="Update_By_Example_Where_Clause"/>
-        </if>
+        ENTRUST_CLASS = #{record.entrustClass,jdbcType=VARCHAR},
+        TARGET_TYPE = #{record.targetType,jdbcType=VARCHAR},
+        IS_NO_GUARD = #{record.isNoGuard,jdbcType=VARCHAR},
+        IS_NET_PRICE = #{record.isNetPrice,jdbcType=VARCHAR},
+        OWNER_TYPE = #{record.ownerType,jdbcType=VARCHAR},
+        INVESTOR_ID = #{record.investorId,jdbcType=VARCHAR},
+        INVESTOR_NAME = #{record.investorName,jdbcType=VARCHAR},
+        PROP_INVESTOR_ID = #{record.propInvestorId,jdbcType=VARCHAR},
+        PROP_INVESTOR_NAME = #{record.propInvestorName,jdbcType=VARCHAR}
+        <include refid="Update_By_Example_Where_Clause"/>
     </update>
     <update id="updateByPrimaryKeySelective"
             parameterType="com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust">
@@ -1384,75 +1510,83 @@
     </update>
     <update id="updateByPrimaryKey" parameterType="com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust">
         update T_INTEGRATED_ENTRUST
-        set PARENT_ORDER_ID   = #{parentOrderId,jdbcType=VARCHAR},
-            INSTRUCTION_ID    = #{instructionId,jdbcType=VARCHAR},
-            PORTFOLIO_ID      = #{portfolioId,jdbcType=VARCHAR},
-            USER_ID           = #{userId,jdbcType=VARCHAR},
-            USERNAME          = #{username,jdbcType=VARCHAR},
-            ACCOUNT_ID        = #{accountId,jdbcType=VARCHAR},
-            FINANCE_ACCOUNT   = #{financeAccount,jdbcType=VARCHAR},
-            ACCOUNT_NAME      = #{accountName,jdbcType=VARCHAR},
-            ASSET_TYPE        = #{assetType,jdbcType=VARCHAR},
-            MARKET            = #{market,jdbcType=VARCHAR},
-            STOCK_CODE        = #{stockCode,jdbcType=VARCHAR},
-            STOCK_NAME        = #{stockName,jdbcType=VARCHAR},
-            ENTRUST_TYPE      = #{entrustType,jdbcType=VARCHAR},
-            ENTRUST_PROP      = #{entrustProp,jdbcType=VARCHAR},
-            ENTRUST_BS        = #{entrustBs,jdbcType=VARCHAR},
-            BS_FLAG           = #{bsFlag,jdbcType=VARCHAR},
-            ENTRUST_VOLUME    = #{entrustVolume,jdbcType=NUMERIC},
-            ENTRUST_PRICE     = #{entrustPrice,jdbcType=NUMERIC},
-            FULL_PRICE        = #{fullPrice,jdbcType=NUMERIC},
-            ENTRUST_BALANCE   = #{entrustBalance,jdbcType=NUMERIC},
-            DISCOUNT          = #{discount,jdbcType=NUMERIC},
-            TRANS_CODE        = #{transCode,jdbcType=VARCHAR},
-            EXPIRE_YEAR_RATE  = #{expireYearRate,jdbcType=NUMERIC},
-            PRETERM_YEAR_RATE = #{pretermYearRate,jdbcType=NUMERIC},
-            LIAISON_NAME      = #{liaisonName,jdbcType=VARCHAR},
-            LIAISON_TEL       = #{liaisonTel,jdbcType=VARCHAR},
-            PROP_SEAT_NO      = #{propSeatNo,jdbcType=VARCHAR},
-            PROP_SEAT_NAME    = #{propSeatName,jdbcType=VARCHAR},
-            SELLER_NO         = #{sellerNo,jdbcType=VARCHAR},
-            CONTRACT_ID       = #{contractId,jdbcType=VARCHAR},
-            FIRST_SETTLE_DATE = #{firstSettleDate,jdbcType=VARCHAR},
-            BACK_DATE         = #{backDate,jdbcType=VARCHAR},
-            COMPACT_TERM      = #{compactTerm,jdbcType=NUMERIC},
-            BACK_BALANCE      = #{backBalance,jdbcType=NUMERIC},
-            ORIG_SERIAL_NO    = #{origSerialNo,jdbcType=VARCHAR},
-            REDUCTION_TYPE    = #{reductionType,jdbcType=VARCHAR},
-            FROZEN_BALANCE    = #{frozenBalance,jdbcType=NUMERIC},
-            FROZEN_VOLUME     = #{frozenVolume,jdbcType=NUMERIC},
-            TRADED_BALANCE    = #{tradedBalance,jdbcType=NUMERIC},
-            TRADED_VOLUME     = #{tradedVolume,jdbcType=NUMERIC},
-            TRADED_PRICE      = #{tradedPrice,jdbcType=NUMERIC},
-            CANCEL_VOLUME     = #{cancelVolume,jdbcType=NUMERIC},
-            REPORT_TIME       = #{reportTime,jdbcType=VARCHAR},
-            TRADE_TIME        = #{tradeTime,jdbcType=VARCHAR},
-            CANCEL_TIME       = #{cancelTime,jdbcType=VARCHAR},
-            ERROR_CODE        = #{errorCode,jdbcType=NUMERIC},
-            ERROR_MSG         = #{errorMsg,jdbcType=VARCHAR},
-            TRADING_DAY       = #{tradingDay,jdbcType=VARCHAR},
-            LOCAL_ENTRUST_ID  = #{localEntrustId,jdbcType=VARCHAR},
-            BROKER_ENTRUST_ID = #{brokerEntrustId,jdbcType=VARCHAR},
-            IP_MAC            = #{ipMac,jdbcType=VARCHAR},
-            REMARK            = #{remark,jdbcType=VARCHAR},
-            CREATE_TIME       = #{createTime,jdbcType=TIMESTAMP},
-            UPDATE_TIME       = #{updateTime,jdbcType=TIMESTAMP},
-            ENTRUST_STATUS    = #{entrustStatus,jdbcType=NUMERIC},
-            ORIG_ENTRUST_ID   = #{origEntrustId,jdbcType=VARCHAR},
-            REPORT_NO         = #{reportNo,jdbcType=VARCHAR},
-            OPERATE_USER      = #{operateUser,jdbcType=VARCHAR},
-            PORTFOLIO_NAME    = #{portfolioName,jdbcType=VARCHAR},
-            SEC_ACCT_ID       = #{secAcctId,jdbcType=VARCHAR},
-            SEC_ACCT_NAME     = #{secAcctName,jdbcType=VARCHAR},
-            TRADE_PLAT        = #{tradePlat,jdbcType=VARCHAR},
-            FINPROD_TYPE2     = #{finprodType2,jdbcType=VARCHAR},
-            INV_MANAGER_ID    = #{invManagerId,jdbcType=VARCHAR},
-            PS                = #{ps,jdbcType=VARCHAR},
-            BUSI_TYPE_TG      = #{busiTypeTg,jdbcType=VARCHAR},
-            EXTEND1           = #{extend1,jdbcType=VARCHAR},
-            EXTEND2           = #{extend2,jdbcType=VARCHAR},
-            ENTRUST_CLASS     = #{entrustClass,jdbcType=VARCHAR}
+        set PARENT_ORDER_ID    = #{parentOrderId,jdbcType=VARCHAR},
+            INSTRUCTION_ID     = #{instructionId,jdbcType=VARCHAR},
+            PORTFOLIO_ID       = #{portfolioId,jdbcType=VARCHAR},
+            USER_ID            = #{userId,jdbcType=VARCHAR},
+            USERNAME           = #{username,jdbcType=VARCHAR},
+            ACCOUNT_ID         = #{accountId,jdbcType=VARCHAR},
+            FINANCE_ACCOUNT    = #{financeAccount,jdbcType=VARCHAR},
+            ACCOUNT_NAME       = #{accountName,jdbcType=VARCHAR},
+            ASSET_TYPE         = #{assetType,jdbcType=VARCHAR},
+            MARKET             = #{market,jdbcType=VARCHAR},
+            STOCK_CODE         = #{stockCode,jdbcType=VARCHAR},
+            STOCK_NAME         = #{stockName,jdbcType=VARCHAR},
+            ENTRUST_TYPE       = #{entrustType,jdbcType=VARCHAR},
+            ENTRUST_PROP       = #{entrustProp,jdbcType=VARCHAR},
+            ENTRUST_BS         = #{entrustBs,jdbcType=VARCHAR},
+            BS_FLAG            = #{bsFlag,jdbcType=VARCHAR},
+            ENTRUST_VOLUME     = #{entrustVolume,jdbcType=NUMERIC},
+            ENTRUST_PRICE      = #{entrustPrice,jdbcType=NUMERIC},
+            FULL_PRICE         = #{fullPrice,jdbcType=NUMERIC},
+            ENTRUST_BALANCE    = #{entrustBalance,jdbcType=NUMERIC},
+            DISCOUNT           = #{discount,jdbcType=NUMERIC},
+            TRANS_CODE         = #{transCode,jdbcType=VARCHAR},
+            EXPIRE_YEAR_RATE   = #{expireYearRate,jdbcType=NUMERIC},
+            PRETERM_YEAR_RATE  = #{pretermYearRate,jdbcType=NUMERIC},
+            LIAISON_NAME       = #{liaisonName,jdbcType=VARCHAR},
+            LIAISON_TEL        = #{liaisonTel,jdbcType=VARCHAR},
+            PROP_SEAT_NO       = #{propSeatNo,jdbcType=VARCHAR},
+            PROP_SEAT_NAME     = #{propSeatName,jdbcType=VARCHAR},
+            SELLER_NO          = #{sellerNo,jdbcType=VARCHAR},
+            CONTRACT_ID        = #{contractId,jdbcType=VARCHAR},
+            FIRST_SETTLE_DATE  = #{firstSettleDate,jdbcType=VARCHAR},
+            BACK_DATE          = #{backDate,jdbcType=VARCHAR},
+            COMPACT_TERM       = #{compactTerm,jdbcType=NUMERIC},
+            BACK_BALANCE       = #{backBalance,jdbcType=NUMERIC},
+            ORIG_SERIAL_NO     = #{origSerialNo,jdbcType=VARCHAR},
+            REDUCTION_TYPE     = #{reductionType,jdbcType=VARCHAR},
+            FROZEN_BALANCE     = #{frozenBalance,jdbcType=NUMERIC},
+            FROZEN_VOLUME      = #{frozenVolume,jdbcType=NUMERIC},
+            TRADED_BALANCE     = #{tradedBalance,jdbcType=NUMERIC},
+            TRADED_VOLUME      = #{tradedVolume,jdbcType=NUMERIC},
+            TRADED_PRICE       = #{tradedPrice,jdbcType=NUMERIC},
+            CANCEL_VOLUME      = #{cancelVolume,jdbcType=NUMERIC},
+            REPORT_TIME        = #{reportTime,jdbcType=VARCHAR},
+            TRADE_TIME         = #{tradeTime,jdbcType=VARCHAR},
+            CANCEL_TIME        = #{cancelTime,jdbcType=VARCHAR},
+            ERROR_CODE         = #{errorCode,jdbcType=NUMERIC},
+            ERROR_MSG          = #{errorMsg,jdbcType=VARCHAR},
+            TRADING_DAY        = #{tradingDay,jdbcType=VARCHAR},
+            LOCAL_ENTRUST_ID   = #{localEntrustId,jdbcType=VARCHAR},
+            BROKER_ENTRUST_ID  = #{brokerEntrustId,jdbcType=VARCHAR},
+            IP_MAC             = #{ipMac,jdbcType=VARCHAR},
+            REMARK             = #{remark,jdbcType=VARCHAR},
+            CREATE_TIME        = #{createTime,jdbcType=TIMESTAMP},
+            UPDATE_TIME        = #{updateTime,jdbcType=TIMESTAMP},
+            ENTRUST_STATUS     = #{entrustStatus,jdbcType=NUMERIC},
+            ORIG_ENTRUST_ID    = #{origEntrustId,jdbcType=VARCHAR},
+            REPORT_NO          = #{reportNo,jdbcType=VARCHAR},
+            OPERATE_USER       = #{operateUser,jdbcType=VARCHAR},
+            PORTFOLIO_NAME     = #{portfolioName,jdbcType=VARCHAR},
+            SEC_ACCT_ID        = #{secAcctId,jdbcType=VARCHAR},
+            SEC_ACCT_NAME      = #{secAcctName,jdbcType=VARCHAR},
+            TRADE_PLAT         = #{tradePlat,jdbcType=VARCHAR},
+            FINPROD_TYPE2      = #{finprodType2,jdbcType=VARCHAR},
+            INV_MANAGER_ID     = #{invManagerId,jdbcType=VARCHAR},
+            PS                 = #{ps,jdbcType=VARCHAR},
+            BUSI_TYPE_TG       = #{busiTypeTg,jdbcType=VARCHAR},
+            EXTEND1            = #{extend1,jdbcType=VARCHAR},
+            EXTEND2            = #{extend2,jdbcType=VARCHAR},
+            ENTRUST_CLASS      = #{entrustClass,jdbcType=VARCHAR},
+            TARGET_TYPE        = #{targetType,jdbcType=VARCHAR},
+            IS_NO_GUARD        = #{isNoGuard,jdbcType=VARCHAR},
+            IS_NET_PRICE       = #{isNetPrice,jdbcType=VARCHAR},
+            OWNER_TYPE         = #{ownerType,jdbcType=VARCHAR},
+            INVESTOR_ID        = #{investorId,jdbcType=VARCHAR},
+            INVESTOR_NAME      = #{investorName,jdbcType=VARCHAR},
+            PROP_INVESTOR_ID   = #{propInvestorId,jdbcType=VARCHAR},
+            PROP_INVESTOR_NAME = #{propInvestorName,jdbcType=VARCHAR}
         where ID = #{id,jdbcType=VARCHAR}
     </update>
 </mapper>

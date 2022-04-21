@@ -1029,7 +1029,7 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 	}
 
 	/***
-	 * 取更新时间最新记录.投资目的  指令业务类型 = 数据字典.委托类型.大宗债券指令
+	 * 取更新时间最新记录.投资目的
 	 * @return
 	 */
 	@ResponseBody

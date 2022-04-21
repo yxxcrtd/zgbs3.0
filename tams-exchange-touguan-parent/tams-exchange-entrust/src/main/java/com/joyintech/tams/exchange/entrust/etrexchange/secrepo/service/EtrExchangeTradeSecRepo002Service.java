@@ -242,6 +242,8 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
         param.put("sysDate", iPlatformDate.getSysDateStr());
         param.put("PS_03", DictCodeListExt3.交易方向_正回购.getValue());
         param.put("PS_04", DictCodeListExt3.交易方向_逆回购.getValue());
+        param.put("ENTRUST_BUSS_TYPE_28",DictCodeListExt3.上农商_指令业务类型_债券现券交易指令.getValue());
+        param.put("ENTRUST_BUSS_TYPE_29",DictCodeListExt3.上农商_指令业务类型_通用式质押回购指令.getValue());
         String portfolioId = (String) param.get("portfolioId");
         if (StringUtil.isNotEmpty(portfolioId)) {
             param.put("portfolioIdList",
@@ -251,8 +253,6 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
             param.put("entrustTypeList", request.getEntrustTypeList());
         }
         param.put("search_isNumberFlag", BaseMap.isNumeric(request.getSearch()));
-        List<String> tradePlatList = new ArrayList<>();
-        param.put("tradePlatList", tradePlatList);
         if (StringUtil.isNotEmpty((String) param.get("finprodMarketIds"))) {
             param.put("finprodMarketIds", StringUtil.splitToList(GlobalConstant.COMMA, param.get("finprodMarketIds").toString()));
         } else {
