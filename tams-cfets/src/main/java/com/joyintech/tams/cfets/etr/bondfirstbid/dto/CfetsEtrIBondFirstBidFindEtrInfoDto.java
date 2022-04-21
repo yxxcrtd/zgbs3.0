@@ -11,8 +11,8 @@ import java.util.Date;
  * @Author: kchen
  * @Date: 2022/4/20 11:22
  */
-@ApiModel(value="一级投标指令查询请求参数",description="一级投标指令查询请求参数")
-public class CfetsEtrIBondFirstBidFindEtrInfoResponse {
+@ApiModel(value="一级投标指令列表",description="一级投标指令列表")
+public class CfetsEtrIBondFirstBidFindEtrInfoDto {
 
     @ApiModelProperty(name="effectiveStatus",value="有效状态Code",example="A1")
     private String effectiveStatus;

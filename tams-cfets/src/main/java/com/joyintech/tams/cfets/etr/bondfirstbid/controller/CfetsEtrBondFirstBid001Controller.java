@@ -8,8 +8,10 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
+import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoRequest;
-import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoResponse;
+import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIssueInfoDto;
+import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIssueInfoRequest;
 import com.joyintech.tams.cfets.etr.bondfirstbid.service.CfetsEtrBondFirstBid001Service;
 import com.joyintech.tams.common.base.entity.SppiImportData;
 import com.joyintech.tams.constant.DictCode;
@@ -88,14 +90,14 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
     @ApiOperation(value = "查询指令管理分页数据", notes = "查询指令管理分页数据")
     @PostMapping("/findEtrInfoPage")
     @ResponseBody
-    public Message<Page<CfetsEtrIBondFirstBidFindEtrInfoResponse>> findEtrInfoPage(@RequestBody CfetsEtrIBondFirstBidFindEtrInfoRequest dto)
+    public Message<Page<CfetsEtrIBondFirstBidFindEtrInfoDto>> findEtrInfoPage(@RequestBody CfetsEtrIBondFirstBidFindEtrInfoRequest dto)
             throws Exception {
         try {
-            Page<CfetsEtrIBondFirstBidFindEtrInfoResponse> list = cfetsEtrBondFirstBid001Service.findEtrInfoPage(dto);
-            return new Message<Page<CfetsEtrIBondFirstBidFindEtrInfoResponse>>().success().setData(list);
+            Page<CfetsEtrIBondFirstBidFindEtrInfoDto> list = cfetsEtrBondFirstBid001Service.findEtrInfoPage(dto);
+            return new Message<Page<CfetsEtrIBondFirstBidFindEtrInfoDto>>().success().setData(list);
         }catch (Exception e) {
             logger.error("查询指令管理分页数据异常",e);
-            return new Message<Page<CfetsEtrIBondFirstBidFindEtrInfoResponse>>().fail().setMessage("查询指令管理分页数据异常");
+            return new Message<Page<CfetsEtrIBondFirstBidFindEtrInfoDto>>().fail().setMessage("查询指令管理分页数据异常");
         }
 
     }
@@ -103,15 +105,14 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
     @ApiOperation(value = "查询待发行信息分页数据", notes = "查询待发行信息分页数据")
     @PostMapping("/findIssueInfoPage")
     @ResponseBody
-    public Message<Page<CfetsEtrIBondFirstBidFindEtrInfoResponse>> findIssueInfoPage(@RequestBody CfetsEtrIBondFirstBidFindEtrInfoRequest dto)
+    public Message<Page<CfetsEtrIBondFirstBidFindIssueInfoDto>> findIssueInfoPage(@RequestBody CfetsEtrIBondFirstBidFindIssueInfoRequest dto)
             throws Exception {
         try {
-            //TODO
-            Page<CfetsEtrIBondFirstBidFindEtrInfoResponse> list = cfetsEtrBondFirstBid001Service.findEtrInfoPage(dto);
-            return new Message<Page<CfetsEtrIBondFirstBidFindEtrInfoResponse>>().success().setData(list);
+            Page<CfetsEtrIBondFirstBidFindIssueInfoDto> list = cfetsEtrBondFirstBid001Service.findIssueInfoPage(dto);
+            return new Message<Page<CfetsEtrIBondFirstBidFindIssueInfoDto>>().success().setData(list);
         }catch (Exception e) {
             logger.error("查询待发行信息分页数据异常",e);
-            return new Message<Page<CfetsEtrIBondFirstBidFindEtrInfoResponse>>().fail().setMessage("查询待发行信息分页数据异常");
+            return new Message<Page<CfetsEtrIBondFirstBidFindIssueInfoDto>>().fail().setMessage("查询待发行信息分页数据异常");
         }
 
     }

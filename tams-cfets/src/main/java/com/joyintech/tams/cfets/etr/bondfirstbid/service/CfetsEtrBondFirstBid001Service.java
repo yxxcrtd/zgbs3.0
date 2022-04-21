@@ -9,7 +9,9 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dao.CfetsEtrBondFirstBid001Mapper;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoRequest;
-import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoResponse;
+import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoDto;
+import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIssueInfoDto;
+import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIssueInfoRequest;
 import com.joyintech.tams.common.base.entity.SppiImportData;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
@@ -36,7 +38,7 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
      * @param dto
      * @return
      */
-    public Page<CfetsEtrIBondFirstBidFindEtrInfoResponse> findEtrInfoPage(CfetsEtrIBondFirstBidFindEtrInfoRequest dto) {
+    public Page<CfetsEtrIBondFirstBidFindEtrInfoDto> findEtrInfoPage(CfetsEtrIBondFirstBidFindEtrInfoRequest dto) {
         Map<String, Object> pageParam = BeanUtil.object2Map(dto);
         pageParam.put("TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue());
         pageParam.put("TRADE_MARKET_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
@@ -78,7 +80,21 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
 
     }
 
+    /**
+     * 查询SPPI测试结果
+     * @param secId
+     * @return
+     */
     public SppiImportData queryAssetIsSppiTest(String secId) {
+        return null;
+    }
+
+    /**
+     * 查询待发行信息分页数据
+     * @param dto
+     * @return
+     */
+    public Page<CfetsEtrIBondFirstBidFindIssueInfoDto> findIssueInfoPage(CfetsEtrIBondFirstBidFindIssueInfoRequest dto) {
         return null;
     }
 }

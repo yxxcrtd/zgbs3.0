@@ -35,6 +35,7 @@ import java.util.List;
 
 /**
  * 一级投标指令新增/修改
+ *
  * @Author: kchen
  * @Date: 2022/4/18 16:38
  */
@@ -98,14 +99,10 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
                 (dto, list) -> dto.setRiskTrialRetDto(list));
 
         // 临时主键
-        if(StringUtil.isEmpty(allDto.getEntrustId())) {
-            BussinessCodeParameter param = new BussinessCodeParameter();
-            param.setCommonBusinessType(DictCodeList.共同业务类型_债券一级投标委托);
-            String generatedId = bussGetBussinessIdService != null ? bussGetBussinessIdService.buildBussinessCode(param) : IDGenerator.generate();
-            allDto.setTotalEtrustId(generatedId);
-        }else{
-            allDto.setTotalEtrustId(allDto.getEntrustId());
-        }
+        BussinessCodeParameter param = new BussinessCodeParameter();
+        param.setCommonBusinessType(DictCodeList.共同业务类型_债券一级投标委托);
+        String generatedId = bussGetBussinessIdService != null ? bussGetBussinessIdService.buildBussinessCode(param) : IDGenerator.generate();
+        allDto.setTotalEtrustId(generatedId);
 
         ProcessParameter<CfetsEtrBondFirstBid002Dto> processParameter = new ProcessParameter<>();
         WorkFlowParameter<CfetsEtrBondFirstBid002Dto> params = new WorkFlowParameter<>();

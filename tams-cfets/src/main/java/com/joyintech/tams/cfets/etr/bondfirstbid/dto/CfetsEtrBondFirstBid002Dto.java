@@ -110,6 +110,12 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
 
     List<CfetsEtrBondFirstBid002Dto> etrInvestBondFirstBidDtos;
 
+    /**
+     * 资产简称
+     */
+    @ApiModelProperty(name="finprodAbbr",value="资产简称",example="资产简称")
+    private String finprodAbbr;
+
     public String getElementId() {
         return elementId;
     }
@@ -236,5 +242,13 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
 
     public void setEtrInvestBondFirstBidDtos(List<CfetsEtrBondFirstBid002Dto> etrInvestBondFirstBidDtos) {
         this.etrInvestBondFirstBidDtos = etrInvestBondFirstBidDtos;
+    }
+
+    public String getFinprodAbbr() {
+        return finprodAbbr;
+    }
+
+    public void setFinprodAbbr(String finprodAbbr) {
+        this.finprodAbbr = finprodAbbr;
     }
 }

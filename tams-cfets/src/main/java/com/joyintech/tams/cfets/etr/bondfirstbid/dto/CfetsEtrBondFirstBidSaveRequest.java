@@ -8,6 +8,7 @@ import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -88,7 +89,7 @@ public class CfetsEtrBondFirstBidSaveRequest extends EtrEntrust implements Proce
      *  汇总投标券面总额
      */
     @ApiModelProperty(name="totalBiddingNum",value="汇总投标券面总额")
-    private String totalBiddingNum;
+    private BigDecimal totalBiddingNum;
 
     /**
      * 组合分配：投标产品列表
@@ -107,6 +108,13 @@ public class CfetsEtrBondFirstBidSaveRequest extends EtrEntrust implements Proce
      */
     @ApiModelProperty(name="softSkipMode",value="软控是否继续？Y：继续",example="Y")
     private String softSkipMode;
+
+    /**
+     * 指令日期
+     */
+    @ApiModelProperty(name="etrDate",value="指令日期",example="2021-07-06", required = true)
+    private Date etrDate;
+
 
     public String getElementId() {
         return elementId;
@@ -196,11 +204,11 @@ public class CfetsEtrBondFirstBidSaveRequest extends EtrEntrust implements Proce
         this.cfetsEtribdoRiskcalReturn = cfetsEtribdoRiskcalReturn;
     }
 
-    public String getTotalBiddingNum() {
+    public BigDecimal getTotalBiddingNum() {
         return totalBiddingNum;
     }
 
-    public void setTotalBiddingNum(String totalBiddingNum) {
+    public void setTotalBiddingNum(BigDecimal totalBiddingNum) {
         this.totalBiddingNum = totalBiddingNum;
     }
 
@@ -227,4 +235,13 @@ public class CfetsEtrBondFirstBidSaveRequest extends EtrEntrust implements Proce
     public void setSoftSkipMode(String softSkipMode) {
         this.softSkipMode = softSkipMode;
     }
+
+    public Date getEtrDate() {
+        return etrDate;
+    }
+
+    public void setEtrDate(Date etrDate) {
+        this.etrDate = etrDate;
+    }
+
 }
