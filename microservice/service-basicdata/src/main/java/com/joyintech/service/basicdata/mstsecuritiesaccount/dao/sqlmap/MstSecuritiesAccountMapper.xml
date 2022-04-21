@@ -827,7 +827,7 @@
             and a.trade_market = #{acctTradeMarket}
         </if>
         and a.finprod_type2 in (#{FINPROD_TYPE_TG_F01})<!--  债券 -->
-        and r.type_11 != #{CUSTOM_ASSET_TYPE_FOUR_013}
+        and r.type_6 != #{type6_B14}
         union
         select distinct a.item_code as finprod_market_id,
         a.item_code  || '|' || a.item_value as finprod_name,

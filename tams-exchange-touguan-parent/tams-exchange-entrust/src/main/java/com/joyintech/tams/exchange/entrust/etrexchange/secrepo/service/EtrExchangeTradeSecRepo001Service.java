@@ -328,25 +328,26 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         }
 
         // 债券现券交易指令
-        EtrBondBiddingDto etrBondBiddingDto = new EtrBondBiddingDto();
+        EtrSecRepoBondDto etrSecRepoBondDto = new EtrSecRepoBondDto();
         if (DictCodeListExt3.上农商_指令业务类型_债券现券交易指令.getValue().equals(baseDto.getEntrustType())) {
-            BeanUtil.copyPropertiesIgnoreNull(etrBondBiddingDto, etrSinglePortfolioDto);
-            etrBondBiddingDto.setMatureYield(ArithmeticUtil.divide(dto.getYield(), new BigDecimal(100), 8)); // 到期收益率
-            etrBondBiddingDto.setFullPrice(dto.getFprice()); // 全价
-            etrBondBiddingDto.setCalMode(dto.getCalculateField());// 计算方式
-            etrBondBiddingDto.setFinprodType2(dto.getFinprodType2());// 金融产品类型（投管）
-            etrBondBiddingDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());// 资产大类
-            etrBondBiddingDto.setBusiTypePosition(DictCodeListExt3.上农商_指令业务类型_债券现券交易指令.getValue());
+            BeanUtil.copyPropertiesIgnoreNull(etrSecRepoBondDto, etrSinglePortfolioDto);
+            etrSecRepoBondDto.setMatureYield(ArithmeticUtil.divide(dto.getYield(), new BigDecimal(100), 8)); // 到期收益率
+            etrSecRepoBondDto.setFullPrice(dto.getFprice()); // 全价
+            etrSecRepoBondDto.setCalMode(dto.getCalculateField());// 计算方式
+            etrSecRepoBondDto.setFinprodType2(dto.getFinprodType2());// 金融产品类型（投管）
+            etrSecRepoBondDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());// 资产大类
+            etrSecRepoBondDto.setBusiTypePosition(DictCodeListExt3.投管业务类型_现券交易.getValue());
         }
 
         // 通用式质押回购指令
-        EtrBondRepoBiddingDto etrBondRepoBiddingDto = new EtrBondRepoBiddingDto();
+        EtrSecRepoRepoDto etrSecRepoRepoDto = new EtrSecRepoRepoDto();
         if (DictCodeListExt3.上农商_指令业务类型_通用式质押回购指令.getValue().equals(baseDto.getEntrustType())) {
             etrSinglePortfolioDto.setPrice(ArithmeticUtil.divide(etrSinglePortfolioDto.getPrice(), new BigDecimal(100), 6));
-            BeanUtil.copyPropertiesIgnoreNull(etrBondRepoBiddingDto, etrSinglePortfolioDto);
-            etrBondRepoBiddingDto.setFinprodType2(dto.getFinprodType2());// 金融产品类型（投管）
-            etrBondRepoBiddingDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());// 资产大类
-            etrBondRepoBiddingDto.setBusiTypePosition(DictCodeListExt3.上农商_指令业务类型_通用式质押回购指令.getValue());
+            BeanUtil.copyPropertiesIgnoreNull(etrSecRepoRepoDto, etrSinglePortfolioDto);
+            etrSecRepoRepoDto.setFinprodType2(dto.getFinprodType2());// 金融产品类型（投管）
+            etrSecRepoRepoDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());// 资产大类
+            etrSecRepoRepoDto.setBusiTypePosition(DictCodeListExt3.投管业务类型_现券交易.getValue());
+            etrSecRepoRepoDto.setDealMode(DictCodeListExt3.指定交易方式_匹配成交.getValue());
         }
 
         EtrParameterDto paraDto = new EtrParameterDto();
@@ -359,21 +360,21 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         }
         if (StringUtil.equals(dto.getOptType(), ENTRUST_RECORD_NEW)) {//
             if (DictCodeListExt3.上农商_指令业务类型_债券现券交易指令.getValue().equals(baseDto.getEntrustType())) {
-                EtrComponentFactory.getComponentService(EtrBondBiddingDto.class).updateSettings(paraDto);
-                EtrComponentFactory.getComponentService(EtrBondBiddingDto.class).entrustNew(etrBondBiddingDto);
+                EtrComponentFactory.getComponentService(EtrSecRepoBondDto.class).updateSettings(paraDto);
+                EtrComponentFactory.getComponentService(EtrSecRepoBondDto.class).entrustNew(etrSecRepoBondDto);
             } else if (DictCodeListExt3.上农商_指令业务类型_通用式质押回购指令.getValue().equals(baseDto.getEntrustType())) {
-                EtrComponentFactory.getComponentService(EtrBondRepoBiddingDto.class).updateSettings(paraDto);
+                EtrComponentFactory.getComponentService(EtrSecRepoRepoDto.class).updateSettings(paraDto);
                 //质押式回购 设置 AssetType1->平安资产类型_质押式回购
-                etrBondRepoBiddingDto.setAssetType1(DictCodeList.回购类型_质押式竞价回购.getValue());
-                EtrComponentFactory.getComponentService(EtrBondRepoBiddingDto.class).entrustNew(etrBondRepoBiddingDto);
+                etrSecRepoRepoDto.setAssetType1(DictCodeList.回购类型_质押式竞价回购.getValue());
+                EtrComponentFactory.getComponentService(EtrSecRepoRepoDto.class).entrustNew(etrSecRepoRepoDto);
             }
         } else {
             if (DictCodeListExt3.上农商_指令业务类型_债券现券交易指令.getValue().equals(baseDto.getEntrustType())) {
-                EtrComponentFactory.getComponentService(EtrBondBiddingDto.class).updateSettings(paraDto);
-                EtrComponentFactory.getComponentService(EtrBondBiddingDto.class).entrustEdit(etrBondBiddingDto);
+                EtrComponentFactory.getComponentService(EtrSecRepoBondDto.class).updateSettings(paraDto);
+                EtrComponentFactory.getComponentService(EtrSecRepoBondDto.class).entrustEdit(etrSecRepoBondDto);
             } else if (DictCodeListExt3.上农商_指令业务类型_通用式质押回购指令.getValue().equals(baseDto.getEntrustType())) {
-                EtrComponentFactory.getComponentService(EtrBondRepoBiddingDto.class).updateSettings(paraDto);
-                EtrComponentFactory.getComponentService(EtrBondRepoBiddingDto.class).entrustEdit(etrBondRepoBiddingDto);
+                EtrComponentFactory.getComponentService(EtrSecRepoRepoDto.class).updateSettings(paraDto);
+                EtrComponentFactory.getComponentService(EtrSecRepoRepoDto.class).entrustEdit(etrSecRepoRepoDto);
             }
         }
         doDeleteFlow(dto.getWorkflowId());
@@ -432,6 +433,9 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         etrSinglePortfolioDto.setPrice(dto.getEntrustPrice() != null ? dto.getEntrustPrice() : dto.getPrice());// 指令价格
         etrSinglePortfolioDto.setEntrustNum(dto.getEntrustNum());// 指令数量
         etrSinglePortfolioDto.setEntrustAmt(dto.getEntrustAmt());// 指令金额
+        if(!StringUtil.isNotEmpty(etrSinglePortfolioDto.getEntrustNum())){
+            etrSinglePortfolioDto.setEntrustNum(ArithmeticUtil.divide(etrSinglePortfolioDto.getEntrustAmt(),new BigDecimal(100),2,RoundingMode.HALF_UP));
+        }
         etrSinglePortfolioDto.setInvAim(dto.getInvAim());// 投资目的
         etrSinglePortfolioDto.setTradeMarket(dto.getTradeMarket());// 交易场所
         etrSinglePortfolioDto.setTradePlat(dto.getTradePlat());// 交易平台
@@ -1284,21 +1288,21 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
             if (StringUtil.isNotEmpty(etrEntrust)) {
                 // 债券现券交易指令
                 if (DictCodeListExt3.上农商_指令业务类型_债券现券交易指令.getValue().equals(etrEntrust.getEntrustType())) {
-                    EtrBondBiddingDto etrBondBiddingDto = EtrComponentFactory.getComponentService(EtrBondBiddingDto.class).entrustSelect(entrustId);
-                    if (StringUtil.isNotEmpty(etrBondBiddingDto)) {
-                        BeanUtil.copyPropertiesIgnoreNull(etrExchangeTrade001Dto, etrBondBiddingDto);
-                        etrExchangeTrade001Dto.setYield(etrBondBiddingDto.getMatureYield().multiply(new BigDecimal(100))); // 到期收益率
-                        etrExchangeTrade001Dto.setFprice(etrBondBiddingDto.getFullPrice()); // 全价
-                        etrExchangeTrade001Dto.setCalculateField(etrBondBiddingDto.getCalMode());// 计算方式
-                        etrExchangeTrade001Dto.setFinprodType2(etrBondBiddingDto.getFinprodType2());// 金融产品类型（投管）
+                    EtrSecRepoBondDto etrSecRepoBondDto = EtrComponentFactory.getComponentService(EtrSecRepoBondDto.class).entrustSelect(entrustId);
+                    if (StringUtil.isNotEmpty(etrSecRepoBondDto)) {
+                        BeanUtil.copyPropertiesIgnoreNull(etrExchangeTrade001Dto, etrSecRepoBondDto);
+                        etrExchangeTrade001Dto.setYield(etrSecRepoBondDto.getMatureYield().multiply(new BigDecimal(100))); // 到期收益率
+                        etrExchangeTrade001Dto.setFprice(etrSecRepoBondDto.getFullPrice()); // 全价
+                        etrExchangeTrade001Dto.setCalculateField(etrSecRepoBondDto.getCalMode());// 计算方式
+                        etrExchangeTrade001Dto.setFinprodType2(etrSecRepoBondDto.getFinprodType2());// 金融产品类型（投管）
                     }
                 }
                 // 通用式质押回购指令
                 else if (DictCodeListExt3.上农商_指令业务类型_通用式质押回购指令.getValue().equals(etrEntrust.getEntrustType())) {
-                    EtrBondRepoBiddingDto etrBondRepoBiddingDto = EtrComponentFactory.getComponentService(EtrBondRepoBiddingDto.class).entrustSelect(entrustId);
-                    BeanUtil.copyPropertiesIgnoreNull(etrExchangeTrade001Dto, etrBondRepoBiddingDto);
-                    etrExchangeTrade001Dto.setPrice(etrBondRepoBiddingDto.getPrice().multiply(new BigDecimal(100)));
-                    etrExchangeTrade001Dto.setFinprodType2(etrBondRepoBiddingDto.getFinprodType2());// 金融产品类型（投管）
+                    EtrSecRepoRepoDto etrSecRepoRepoDto = EtrComponentFactory.getComponentService(EtrSecRepoRepoDto.class).entrustSelect(entrustId);
+                    BeanUtil.copyPropertiesIgnoreNull(etrExchangeTrade001Dto, etrSecRepoRepoDto);
+                    etrExchangeTrade001Dto.setPrice(etrSecRepoRepoDto.getPrice().multiply(new BigDecimal(100)));
+                    etrExchangeTrade001Dto.setFinprodType2(etrSecRepoRepoDto.getFinprodType2());// 金融产品类型（投管）
                     etrExchangeTrade001Dto.setEntrustPrice(etrExchangeTrade001Dto.getPrice());//指令价格
                     etrExchangeTrade001Dto.setPrice(null);//净价需要置空
                 }
@@ -1377,24 +1381,25 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
             setCheckParams(entity, paraDto);
             if (DictCodeListExt3.上农商_指令业务类型_债券现券交易指令.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
                 // 债券竞价指令
-                EtrBondBiddingDto etrBondBiddingDto = new EtrBondBiddingDto();
-                BeanUtil.copyPropertiesIgnoreNull(etrBondBiddingDto, etrSinglePortfolioDto);
-                etrBondBiddingDto.setMatureYield(ArithmeticUtil.divide(entity.getYield(), new BigDecimal(100), 8)); // 到期收益率
-                etrBondBiddingDto.setFullPrice(entity.getFprice()); // 全价
-                etrBondBiddingDto.setCalMode(entity.getCalculateField());// 计算方式
-                etrBondBiddingDto.setFinprodType2(entity.getFinprodType2());// 金融产品类型（投管）
-                etrBondBiddingDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());// 资产大类
-                EtrComponentFactory.getComponentService(EtrBondBiddingDto.class).updateSettings(paraDto);
-                EtrComponentFactory.getComponentService(EtrBondBiddingDto.class).entrustCheck(etrBondBiddingDto, result);
+                EtrSecRepoBondDto etrSecRepoBondDto = new EtrSecRepoBondDto();
+                BeanUtil.copyPropertiesIgnoreNull(etrSecRepoBondDto, etrSinglePortfolioDto);
+                etrSecRepoBondDto.setMatureYield(ArithmeticUtil.divide(entity.getYield(), new BigDecimal(100), 8)); // 到期收益率
+                etrSecRepoBondDto.setFullPrice(entity.getFprice()); // 全价
+                etrSecRepoBondDto.setCalMode(entity.getCalculateField());// 计算方式
+                etrSecRepoBondDto.setFinprodType2(entity.getFinprodType2());// 金融产品类型（投管）
+                etrSecRepoBondDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());// 资产大类
+                EtrComponentFactory.getComponentService(EtrSecRepoBondDto.class).updateSettings(paraDto);
+                EtrComponentFactory.getComponentService(EtrSecRepoBondDto.class).entrustCheck(etrSecRepoBondDto, result);
             }
             if (DictCodeListExt3.上农商_指令业务类型_通用式质押回购指令.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
                 // 债券质押式回购竞价指令
-                EtrBondRepoBiddingDto etrBondRepoBiddingDto = new EtrBondRepoBiddingDto();
-                BeanUtil.copyPropertiesIgnoreNull(etrBondRepoBiddingDto, etrSinglePortfolioDto);
-                etrBondRepoBiddingDto.setFinprodType2(entity.getFinprodType2());// 金融产品类型（投管）
-                etrBondRepoBiddingDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());// 资产大类
-                EtrComponentFactory.getComponentService(EtrBondRepoBiddingDto.class).updateSettings(paraDto);
-                EtrComponentFactory.getComponentService(EtrBondRepoBiddingDto.class).entrustCheck(etrBondRepoBiddingDto, result);
+                EtrSecRepoRepoDto etrSecRepoRepoDto = new EtrSecRepoRepoDto();
+                BeanUtil.copyPropertiesIgnoreNull(etrSecRepoRepoDto, etrSinglePortfolioDto);
+                etrSecRepoRepoDto.setFinprodType2(entity.getFinprodType2());// 金融产品类型（投管）
+                etrSecRepoRepoDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());// 资产大类
+                etrSecRepoRepoDto.setDealMode(DictCodeListExt3.指定交易方式_匹配成交.getValue());
+                EtrComponentFactory.getComponentService(EtrSecRepoRepoDto.class).updateSettings(paraDto);
+                EtrComponentFactory.getComponentService(EtrSecRepoRepoDto.class).entrustCheck(etrSecRepoRepoDto, result);
             }
             AjaxResult ajax = new AjaxResult(result);
             Field[] fields = ReflectUtil.getDeclaredFields(ajax);
@@ -2217,26 +2222,29 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
             etrEntrustAdd.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
         }
         if (DictCodeListExt3.上农商_指令业务类型_债券现券交易指令.getValue().equals(baseDto.getEntrustType())) {
-            EtrBondBiddingDto etrBondBiddingDto = new EtrBondBiddingDto();
-            BeanUtil.copyPropertiesIgnoreNull(etrBondBiddingDto, etrSinglePortfolioDto);
-            etrBondBiddingDto.setMatureYield(ArithmeticUtil.divide(dto.getYield(), new BigDecimal(100), 8)); // 到期收益率
-            etrBondBiddingDto.setFullPrice(dto.getFprice()); // 全价
-            etrBondBiddingDto.setCalMode(dto.getCalculateField());// 计算方式
-            etrBondBiddingDto.setFinprodType2(dto.getFinprodType2());// 金融产品类型（投管）
-            etrBondBiddingDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());// 资产大类
-            BeanUtil.copyPropertiesIgnoreNull(etrEntrust, etrBondBiddingDto);
-            BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, etrBondBiddingDto);
+            EtrSecRepoBondDto etrSecRepoBondDto = new EtrSecRepoBondDto();
+            BeanUtil.copyPropertiesIgnoreNull(etrSecRepoBondDto, etrSinglePortfolioDto);
+            etrSecRepoBondDto.setMatureYield(ArithmeticUtil.divide(dto.getYield(), new BigDecimal(100), 8)); // 到期收益率
+            etrSecRepoBondDto.setFullPrice(dto.getFprice()); // 全价
+            etrSecRepoBondDto.setCalMode(dto.getCalculateField());// 计算方式
+            etrSecRepoBondDto.setFinprodType2(dto.getFinprodType2());// 金融产品类型（投管）
+            etrSecRepoBondDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());// 资产大类
+            etrSecRepoBondDto.setBusiTypePosition(DictCodeListExt3.投管业务类型_现券交易.getValue());
+            BeanUtil.copyPropertiesIgnoreNull(etrEntrust, etrSecRepoBondDto);
+            BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, etrSecRepoBondDto);
         }
         if (DictCodeListExt3.上农商_指令业务类型_通用式质押回购指令.getValue().equals(baseDto.getEntrustType())) {
-            EtrBondRepoBiddingDto etrBondRepoBiddingDto = new EtrBondRepoBiddingDto();
+            EtrSecRepoRepoDto etrSecRepoRepoDto = new EtrSecRepoRepoDto();
             etrSinglePortfolioDto.setPrice(ArithmeticUtil.divide(etrSinglePortfolioDto.getPrice(), new BigDecimal(100), 6));
-            BeanUtil.copyPropertiesIgnoreNull(etrBondRepoBiddingDto, etrSinglePortfolioDto);
-            etrBondRepoBiddingDto.setFinprodType2(dto.getFinprodType2());// 金融产品类型（投管）
-            etrBondRepoBiddingDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());// 资产大类
+            BeanUtil.copyPropertiesIgnoreNull(etrSecRepoRepoDto, etrSinglePortfolioDto);
+            etrSecRepoRepoDto.setFinprodType2(dto.getFinprodType2());// 金融产品类型（投管）
+            etrSecRepoRepoDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());// 资产大类
             // 质押式回购 设置 AssetType1->平安资产类型_质押式回购
-            etrBondRepoBiddingDto.setAssetType1(DictCodeList.回购类型_质押式竞价回购.getValue());
-            BeanUtil.copyPropertiesIgnoreNull(etrEntrust, etrBondRepoBiddingDto);
-            BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, etrBondRepoBiddingDto);
+            etrSecRepoRepoDto.setAssetType1(DictCodeList.回购类型_质押式竞价回购.getValue());
+            etrSecRepoRepoDto.setDealMode(DictCodeListExt3.指定交易方式_匹配成交.getValue());
+            etrSecRepoRepoDto.setBusiTypePosition(DictCodeListExt3.投管业务类型_通用式质押回购.getValue());
+            BeanUtil.copyPropertiesIgnoreNull(etrEntrust, etrSecRepoRepoDto);
+            BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, etrSecRepoRepoDto);
         }
         entity.setEtrEntrust(etrEntrust);
         entity.setEtrEntrustAdd(etrEntrustAdd);

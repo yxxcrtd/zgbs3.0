@@ -430,7 +430,8 @@ public class MstSecuritiesAccountService extends BaseService<MstSecuritiesAccoun
         map.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
         map.put("FINPROD_TYPE_TG_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         map.put("FINPROD_TYPE_TG_ZYSHG", "ZYSHG");
-        map.put("CUSTOM_ASSET_TYPE_FOUR_013", DictCodeListExt3.行内资产四级分类_可转债.getValue()); // 可转债
+        map.put("type6_B14",DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue());
+//        map.put("CUSTOM_ASSET_TYPE_FOUR_013", DictCodeListExt3.行内资产四级分类_可转债.getValue()); // 可转债
         Map pageMode = (Map) map.get("pageMode");
         if(pageMode != null) { // 设置导出条数
             if(pageMode.get("pageNo")!=null){
