@@ -2020,7 +2020,9 @@ public class CfetsTrdConfirmService extends BaseService{
             return errorRs;
         }
         if(StringUtil.isNotEmpty(dto.getIsDirectTrd()) && StringUtil.equals(dto.getIsDirectTrd(),DictCodeList.是否_是.getValue())){
+            // 银行间债券交易执行是否可手工确认
             String cfets_manualconfirm_bond=CacheUtil.getSysParam("IS_CFETSSECTRD_MANUALCONFIRM_FLAG");
+            // 银行间回购交易执行是否可手工确认
             String cfets_manualconfirm_repo=CacheUtil.getSysParam("IS_CFETSREPOTRD_MANUALCONFIRM_FLAG");
             if(StringUtil.isNotEmpty(selectedItem)){
                 for(CfetsTrdConfirmRegInfoListResponse item:selectedItem){

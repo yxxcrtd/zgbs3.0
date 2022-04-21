@@ -93,6 +93,11 @@ public class SzdSjsfx extends BaseEntity {
     private String fxbybz;
 
     /**
+     * 交收结果
+     */
+    private String jgdm;
+
+    /**
      * 取得 流水号
      * @return 流水号
      */
@@ -347,5 +352,13 @@ public class SzdSjsfx extends BaseEntity {
      */
     public void setFxbybz(String fxbybz) {
         this.fxbybz = fxbybz == null ? null : fxbybz.trim();
+    }
+
+    public String getJgdm() {
+        return jgdm;
+    }
+
+    public void setJgdm(String jgdm) {
+        this.jgdm = jgdm;
     }
 }

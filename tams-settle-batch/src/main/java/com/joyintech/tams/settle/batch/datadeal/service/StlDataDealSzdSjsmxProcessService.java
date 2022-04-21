@@ -310,6 +310,8 @@ public class StlDataDealSzdSjsmxProcessService {
             settleTransData.setTradePlat(null);
             // 交收方式
             settleTransData.setSettleMode(stlDataDealProcessCommonService.getSettleMode(szdSjsmx.getMxjsfs()));
+            //交收结果
+            settleTransData.setDeliveryResult(stlDataDealProcessCommonService.getDeliveryResult(szdSjsmx.getJgdm()));
             // 成交编号
             String generate = IDGenerator.generate();
             settleTransData.setTradeId(generate);

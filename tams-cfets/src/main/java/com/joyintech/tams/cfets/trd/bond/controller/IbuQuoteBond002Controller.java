@@ -583,7 +583,7 @@ public class IbuQuoteBond002Controller extends BaseController {
                         if(StringUtil.isEmpty(accNo)){
                             accNo = stlSecAcctInfoMapper.selectByPrimaryKey(cfetsBondDealQuoteCommonDto.getSecManageAcctId()).getTrdAcctId();
                         }
-                        BaseMap baseMap = positionInfoService.queryTrdAvailableCash(Arrays.asList(item.getPortfolioId()), DateUtil.format(cfetsBondDealQuoteCommonDto.getTradeDate()), accNo, cfetsBondDealQuoteCommonDto.getCcy(), "03", Arrays.asList(DictCodeListExt1.资金账户类型_产品托管户.getValue()), null);
+                        BaseMap baseMap = positionInfoService.queryTrdAvailableCash(Arrays.asList(item.getPortfolioId()), DateUtil.format(cfetsBondDealQuoteCommonDto.getTradeDate()), accNo, cfetsBondDealQuoteCommonDto.getCcy(), "03", Arrays.asList(DictCodeListExt1.资金账户类型_产品托管户.getValue()), null, null , null);
                         if(null!=baseMap&&baseMap.containsKey("cashT")){
                             item.setProAvailableCash((BigDecimal) baseMap.get("cashT"));
                         }

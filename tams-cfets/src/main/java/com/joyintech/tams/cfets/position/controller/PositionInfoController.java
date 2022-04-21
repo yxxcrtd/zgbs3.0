@@ -48,7 +48,9 @@ public class PositionInfoController {
                 requestDto.getCdate(),
                 requestDto.getAcctId(),
                 requestDto.getCcy(),
-                requestDto.getCalId()
+                requestDto.getCalId(),
+                requestDto.getFlowType(),
+                requestDto.getPtlList()
         );
         // 封装现金结果集
         List<BaseMap> data = positionInfoService.assembleCash(cashMap);
@@ -80,7 +82,9 @@ public class PositionInfoController {
                 requestDto.getCcy(),
                 requestDto.getCalId(),
                 requestDto.getAcctTypeList(),
-                requestDto.getAcctTypes()
+                requestDto.getAcctTypes(),
+                requestDto.getFlowType(),
+                requestDto.getPtlList()
         );
         // 封装现金结果集
         List<BaseMap> data = positionInfoService.assembleCash(cashMap);

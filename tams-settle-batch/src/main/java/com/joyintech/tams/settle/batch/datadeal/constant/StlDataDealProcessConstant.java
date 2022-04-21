@@ -33,7 +33,7 @@ public class StlDataDealProcessConstant {
 	public static final String JSFS_001 = "001";
 	// SzdJsmx交收方式_逐笔非担保
 	public static final String JSFS_002 = "002";
-	
+
 	// SzdJsmx业务类型_国债交易
 	public static final String YWLX_003 = "003";
 	// SzdJsmx业务类型_企债交易
@@ -266,6 +266,8 @@ public class StlDataDealProcessConstant {
 	public static final String JGDM_0102 = "0102";
 
 	public static final String JGDM_0100 = "0100";
+
+	public static final String JGDM_0101 = "0101";
 
 	// SzdJsmx权益类别_红利
 	public static final String QYLB_HL = "HL";

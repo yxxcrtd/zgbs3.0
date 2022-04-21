@@ -426,4 +426,29 @@ public class MstMarketInstitutionsDto extends MstCustomerInfoAddWithBLOBs implem
         this.customerName = customerName;
     }
 
+    /**
+     * 来源：0-成功不需要处理,1-接口返回需要处理
+     */
+    private int dealFlag;
+
+    /**
+     * 是否发行人
+     */
+    private String isIssuer;
+
+    public int getDealFlag() {
+        return dealFlag;
+    }
+
+    public void setDealFlag(int dealFlag) {
+        this.dealFlag = dealFlag;
+    }
+
+    public String getIsIssuer() {
+        return isIssuer;
+    }
+
+    public void setIsIssuer(String isIssuer) {
+        this.isIssuer = isIssuer;
+    }
 }

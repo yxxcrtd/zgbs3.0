@@ -99,5 +99,5 @@ public interface FinTenderBondAssetMapper {
      * @param finprodId
      * @return
      */
-    List<String> selectTotleTradeId(@Param("finprodId") String finprodId);
+    String selectTotleTradeId(@Param("finprodId") String finprodId);
 }

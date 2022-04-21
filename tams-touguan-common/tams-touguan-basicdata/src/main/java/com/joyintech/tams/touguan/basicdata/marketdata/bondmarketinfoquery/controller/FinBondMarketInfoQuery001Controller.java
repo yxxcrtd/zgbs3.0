@@ -6,6 +6,7 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoDetailQueryDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinBondMarketInfoQueryRequest;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.service.FinBondMarketInfoQuery001Service;
@@ -13,10 +14,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -70,5 +68,13 @@ public class FinBondMarketInfoQuery001Controller extends BaseController {
     @ApiOperation(value = "债券市场信息分页查询", notes = "债券市场信息分页查询")
     public Message<Page<FinBondMarketInfoQuery001Dto>> findPage(@RequestBody FinBondMarketInfoQueryRequest request) {
         return Message.success("success", finBondMarketInfoQuery001Service.queryForPage(request));
+    }
+
+
+    @ResponseBody
+    @PostMapping("/detailInfo")
+    @ApiOperation(value = "债券市场信息查看", notes = "债券市场信息查看")
+    public Message<FinBondMarketInfoDetailQueryDto> detailInfo(@RequestParam("secId") String secId) {
+        return Message.success("success", finBondMarketInfoQuery001Service.detailInfo(secId));
     }
 }

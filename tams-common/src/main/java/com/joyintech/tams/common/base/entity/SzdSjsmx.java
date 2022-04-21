@@ -144,6 +144,11 @@ public class SzdSjsmx extends BaseEntity {
     private String mxjsfs;
 
     /**
+     * 交收结果
+     */
+    private String jgdm;
+
+    /**
      * 货币代号
      */
     private String mxhbdh;
@@ -699,6 +704,14 @@ public class SzdSjsmx extends BaseEntity {
      */
     public void setMxjsfs(String mxjsfs) {
         this.mxjsfs = mxjsfs == null ? null : mxjsfs.trim();
+    }
+
+    public String getJgdm() {
+        return jgdm;
+    }
+
+    public void setJgdm(String jgdm) {
+        this.jgdm = jgdm;
     }
 
     /**

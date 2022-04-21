@@ -10,14 +10,14 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 债券市场信息查看DTO
+ * 债券市场列表信息查看DTO
  *
  * @author zhuys
  * @version 1.0 2022年4月18日
  * @see FinBondMarketInfoQuery001Dto
  * @since 1.0
  */
-@ApiModel(value = "债券市场信息查看", description = "债券市场信息查看")
+@ApiModel(value = "债券市场列表信息查看", description = "债券市场列表信息查看")
 public class FinBondMarketInfoQuery001Dto extends BaseDto {
 
     @ApiModelProperty(name = "secId", value = "债券ID/资产代码")
@@ -89,8 +89,8 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal faceValue;
 
-    @ApiModelProperty(name = "warrantor", value = "担保人")
-    private String warrantor;
+    @ApiModelProperty(name = "guarantor", value = "担保人")
+    private String guarantor;
 
     @ApiModelProperty(name = "guarType", value = "担保方式")
     private String guarType;
@@ -157,8 +157,8 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "firstConfirmDate", value = "首次利率确定日")
     private Date firstConfirmDate;
 
-    @ApiModelProperty(name = "exerciseType", value = "行权方式")
-    private String exerciseType;
+    @ApiModelProperty(name = "optionType", value = "行权方式")
+    private String optionType;
 
     @ApiModelProperty(name = "exerciseDate", value = "理论行权日")
     private Date exerciseDate;
@@ -361,14 +361,6 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
         this.faceValue = faceValue;
     }
 
-    public String getWarrantor() {
-        return warrantor;
-    }
-
-    public void setWarrantor(String warrantor) {
-        this.warrantor = warrantor;
-    }
-
     public String getGuarType() {
         return guarType;
     }
@@ -521,14 +513,6 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
         this.firstConfirmDate = firstConfirmDate;
     }
 
-    public String getExerciseType() {
-        return exerciseType;
-    }
-
-    public void setExerciseType(String exerciseType) {
-        this.exerciseType = exerciseType;
-    }
-
     public Date getExerciseDate() {
         return exerciseDate;
     }
@@ -591,5 +575,21 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
 
     public void setZxGradeOrgId(String zxGradeOrgId) {
         this.zxGradeOrgId = zxGradeOrgId;
+    }
+
+    public String getGuarantor() {
+        return guarantor;
+    }
+
+    public void setGuarantor(String guarantor) {
+        this.guarantor = guarantor;
+    }
+
+    public String getOptionType() {
+        return optionType;
+    }
+
+    public void setOptionType(String optionType) {
+        this.optionType = optionType;
     }
 }

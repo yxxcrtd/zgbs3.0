@@ -140,7 +140,8 @@
             TRADE_AMT_RAW, TRADE_ID_RAW, SEQ_NO, 
             IS_PURCH_TYPE_YX, CREATE_USER, CREATE_DEPT, 
             CREATE_TIME, UPDATE_USER, UPDATE_TIME, 
-            IS_MODIFY, F_CJBH, FRAGMENTARY_FUNDS
+            IS_MODIFY, F_CJBH, FRAGMENTARY_FUNDS,
+            DELIVERY_RESULT
             )
         values (#{tradeId,jdbcType=VARCHAR}, #{cjbh,jdbcType=VARCHAR}, #{dealDate,jdbcType=DATE}, 
             #{secType,jdbcType=VARCHAR}, #{applyTradeId,jdbcType=VARCHAR}, #{finprodId,jdbcType=VARCHAR}, 
@@ -165,7 +166,8 @@
             #{tradeAmtRaw,jdbcType=DECIMAL}, #{tradeIdRaw,jdbcType=VARCHAR}, #{seqNo,jdbcType=VARCHAR}, 
             #{isPurchTypeYx,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, 
             #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
-            #{isModify,jdbcType=VARCHAR}, #{fCjbh,jdbcType=VARCHAR}, #{fragmentaryFunds,jdbcType=DECIMAL}
+            #{isModify,jdbcType=VARCHAR}, #{fCjbh,jdbcType=VARCHAR}, #{fragmentaryFunds,jdbcType=DECIMAL},
+            #{deliveryResult, jdbcType=VARCHAR}
             )
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.SettleTransData" >
@@ -390,6 +392,9 @@
             <if test="fragmentaryFunds != null" >
                 FRAGMENTARY_FUNDS,
             </if>
+            <if test="deliveryResult != null" >
+                DELIVERY_RESULT,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="tradeId != null" >
@@ -610,6 +615,9 @@
             </if>
             <if test="fragmentaryFunds != null" >
                 #{fragmentaryFunds,jdbcType=DECIMAL},
+            </if>
+            <if test="deliveryResult != null" >
+                #{deliveryResult,jdbcType=DECIMAL},
             </if>
         </trim>
     </insert>
