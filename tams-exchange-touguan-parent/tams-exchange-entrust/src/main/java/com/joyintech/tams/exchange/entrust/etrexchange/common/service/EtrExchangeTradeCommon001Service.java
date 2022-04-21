@@ -2474,8 +2474,8 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
                         && StringUtils.equals(ps, DictCodeList.交易方向_卖出.getValue())
                         && isSalesOfSmallShares(availableNum, minNum, entrustNum)) {
                 } else {
-                    //entrustNum = ArithmeticUtil
-                     //       .multiply(ArithmeticUtil.divide(entrustNum, minNum, 0, RoundingMode.DOWN), minNum);
+                    entrustNum = ArithmeticUtil
+                            .multiply(ArithmeticUtil.divide(entrustNum, minNum, 0, RoundingMode.DOWN), minNum);
                 }
             }
         }
@@ -6031,4 +6031,11 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         return minTrdUnitLimitDto;
     }
 
+
+    public static void main(String[] args) {
+        BigDecimal a=new BigDecimal(3000000);
+        BigDecimal b=new BigDecimal(208.00);
+
+        System.out.println(ArithmeticUtil.divide(a, b, 0, RoundingMode.DOWN));
+    }
 }

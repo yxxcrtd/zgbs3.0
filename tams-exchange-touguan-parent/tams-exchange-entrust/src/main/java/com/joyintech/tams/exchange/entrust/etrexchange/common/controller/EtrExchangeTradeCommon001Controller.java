@@ -983,7 +983,6 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 					dto.setEntrustNum(item.getEntrustNum());
 					dto.setEntrustAmt(item.getEntrustAmt());
 					dto.setSecAcctId(item.getSecAcctId()); // 证券账户
-					dto.setStockId(item.getSecAcctId());
 					//默认证券账户
 					/*if (StringUtil.isNotEmpty(item.getPortfolioId()) && StringUtil.isNotEmpty(dto.getFinprodId())) {
 						Map<String, Object> map = new HashMap<String, Object>();
@@ -1041,6 +1040,19 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 		}
 
 		String confirmMsg = "";
+		if (StringUtils.equals(dto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
+			Map<String, Object> pageParam = new HashMap<String, Object>();
+			Date sysDate = DateUtil.platDateFromCache();
+			pageParam.put("date", DateUtil.format(sysDate));
+			pageParam.put("secId", dto.getStockId());
+			String price = etrExchangeTrade001CommonService.qryMstBondMarketPrice(pageParam);
+			if (StringUtils.isNotEmpty(price)) {
+				BigDecimal bigPrice = new BigDecimal(price);
+				if (dto.getPrice().compareTo(bigPrice.multiply(new BigDecimal(1.02))) > 0) {
+					confirmMsg = "当前价格超过上一日平均价的2%，是否继续？";
+				}
+			}
+		}
 		if (DictCodeList.交易方向_申购.getValue().equals(dto.getPs()) && DictCodeListExt1.金融产品类型_投管用_股票.getValue().equals(dto.getFinprodType2())) {
 			Map<String, Object> paramMap = new HashMap<String, Object>();
 			//paramMap.put("finprodId", dto.getFinprodId());//金融产品代码
