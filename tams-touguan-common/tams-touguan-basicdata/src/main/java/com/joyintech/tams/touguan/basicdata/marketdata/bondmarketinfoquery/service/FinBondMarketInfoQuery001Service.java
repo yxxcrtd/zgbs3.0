@@ -103,6 +103,7 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
      * @return
      */
     public List<ValidMessage> addCoupons(String secId) {
+        logger.info("addCoupons >> 债券市场加券参数：secId：【{}】", secId);
         List<ValidMessage> validMessages = new ArrayList<>();
         FinProduct finProduct = finProductMapper.selectByPrimaryKey(secId);
         if (finProduct != null) {
