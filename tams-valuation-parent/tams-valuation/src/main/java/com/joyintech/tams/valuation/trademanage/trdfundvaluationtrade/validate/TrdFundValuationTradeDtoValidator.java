@@ -189,11 +189,6 @@ public class TrdFundValuationTradeDtoValidator implements BeanValidator {
                         resultList.add(new ValidMessage("redFee",
                                 getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.redFee"))));
                     }
-                    //到账日期
-                    if(!StringUtil.isNotEmpty(dto.getArriveDate())){
-                        resultList.add(new ValidMessage("arriveDate",
-                                getMessage("VAL_COMMON_E_0002", getMessage("TrdFundValuationTrade002.arriveDate"))));
-                    }
                     //资金账户
                     if(!StringUtil.isNotEmpty(dto.getRedMyAcctNo())){
                         resultList.add(new ValidMessage("redMyAcctNo",

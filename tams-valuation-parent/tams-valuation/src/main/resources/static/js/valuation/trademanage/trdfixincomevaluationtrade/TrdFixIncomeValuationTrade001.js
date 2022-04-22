@@ -45,7 +45,7 @@ $(function(){
             ,{field:'effDate', title: '交割日期', visible: false}
             ,{field:'invAimStr', width:240, title: '会计分类'}
             ,{field:'capital', width:150, title: '本金金额',type:'number'}
-            ,{field:'cpriceAmt', width:150, title: '净价金额',type:'number'}
+            ,{field:'cpriceAmt', width:150, title: '净价总额',type:'number'}
             ,{field:'intAmt', width:150, title: '应收利息总额',type:'number'}
             ,{field:'ccyFmt', title: '币种',sortField:"ccy",width:180}
             ,{field:'ccy',  title: '币种' ,visible: false}
