@@ -157,6 +157,11 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         }
     }
 
+    /**
+     * 新增
+     *
+     * @param dto
+     */
     public void insert(FinTenderBondAsset002Dto dto) {
         if (StringUtil.isEmpty(dto.getCalendarId())) {//根据交易场所固定交易日历
             if (StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_银行间.getValue())) {
@@ -236,6 +241,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(tradeId);
         oprHisReq.setOperType(operType.getValue());
+        oprHisReq.setBusiDes(remark);
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
 
