@@ -104,8 +104,8 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
      */
     public List<ValidMessage> addCoupons(String secId) {
         logger.info("addCoupons >> 债券市场加券参数：secId：【{}】", secId);
-        List<ValidMessage> validMessages = new ArrayList<>();
         FinProduct finProduct = finProductMapper.selectByPrimaryKey(secId);
+        List<ValidMessage> validMessages = new ArrayList<>();
         if (finProduct != null) {
             validMessages.add(new ValidMessage("该债券信息在系统中已存在，无法加券！"));
             return validMessages;
@@ -118,9 +118,10 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         List<String> secIdList = new ArrayList<>();
         secIdList.add(secId);
         interfPayhsrcsecinfoDto.setSecidList(secIdList);
-        interfPayhsrcsecinfoDto = commonAutoCouponService.autoBondCoupon(interfPayhsrcsecinfoDto);
-        if (null != interfPayhsrcsecinfoDto && null != interfPayhsrcsecinfoDto.getErrorBondList()) {
-            errorInfoList.addAll(interfPayhsrcsecinfoDto.getErrorBondList());
+        //加券
+        InterfPayhsrcsecinfoDto result = commonAutoCouponService.autoBondCoupon(interfPayhsrcsecinfoDto);
+        if (null != result && null != result.getErrorBondList()) {
+            errorInfoList.addAll(result.getErrorBondList());
         }
         /****************自动加券****end****************/
         if (CollectionUtils.isNotEmpty(errorInfoList)) {
