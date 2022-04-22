@@ -98,12 +98,13 @@ public class ValSchemeHZLayerNewService extends CommonExportService<ValSchemeBat
         List<String> paramCodeList = new ArrayList<>();
         paramCodeList.add(ValDictCodeList.账套配置表参数项_收益类型.getValue());
         
-        List<BokBooksetExt> listBokBooksetExt = accountingCommonService.getValBokBooksetExt(
-            booksetId, paramCodeList);
-        // 定义收益类型
-        String profitType = (CollectionUtils.isEmpty(
-            listBokBooksetExt)) ? "" : listBokBooksetExt.get(0).getParamValue();
-        
+//        List<BokBooksetExt> listBokBooksetExt = accountingCommonService.getValBokBooksetExt(
+//            booksetId, paramCodeList);
+//        // 定义收益类型
+//        String profitType = (CollectionUtils.isEmpty(
+//            listBokBooksetExt)) ? "" : listBokBooksetExt.get(0).getParamValue();
+         // 变量.收益类型 = 估值表处理结果集.核算方式
+         String profitType = acctEntity.getAcctMode();
         //add by tanxuan 20200102 start
         // 定义 变量.待抵扣投资收益税
         BigDecimal deductInvIncomeTax = BigDecimal.ZERO;
