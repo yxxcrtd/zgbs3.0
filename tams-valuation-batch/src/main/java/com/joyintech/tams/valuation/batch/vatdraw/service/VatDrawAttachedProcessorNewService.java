@@ -274,7 +274,7 @@ public class VatDrawAttachedProcessorNewService {
             M2 = tdyTaxBalanceSumMap.get(
                     DictCodeList.增值税类型_价差收入.getValue() + DictCodeList.增值税_确认类型_预估计税.getValue()).getTaxAmt();
             // 计税基数M2 = 计税基数M2 + 预估价差收入计税余额
-            M1 = ArithmeticUtil.doAdd(NumberEnum.MONEY.getCode(), null, M, M2);
+            M1 = ArithmeticUtil.doAdd(NumberEnum.MONEY.getCode(), null, M1, M2);
         }
 
         // 共通元素设置
