@@ -673,6 +673,8 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
             etrInvestInfoMapper.deleteEtrFinishStatusByPrimaryKey(etrFinishStatus);
             // 全删全插委托投标标位表
             etrInvestInfoMapper.deleteBidPrice(entrustId);
+            // 全删全插委托明细表表
+            etrInvestInfoMapper.deleteEntrustDetail(entrustId);
             // 判断删除委托是否全部执行成功
             if (baseEtrCashPositionCommService != null) {
                 baseEtrCashPositionCommService.entrustCloseExecute(entrustId);
@@ -1378,10 +1380,16 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
             // 转移至废弃表
             etrEntrustBackupMapper.deleteByPrimaryKey(dto.getEtrEntrust().getEntrustId());
             etrEntrustBackupMapper.deleteAddByPrimaryKey(dto.getEtrEntrust().getEntrustId());
+            etrEntrustBackupMapper.deleteEntrustBidPriceByEntrustId(dto.getEtrEntrust().getEntrustId());
+            etrEntrustBackupMapper.deleteEntrustDetailByEntrustId(dto.getEtrEntrust().getEntrustId());
             etrEntrustBackupMapper.insertFromQuery(dto.getEtrEntrust().getEntrustId());
             etrEntrustBackupMapper.insertAddFromQuery(dto.getEtrEntrust().getEntrustId());
+            etrEntrustBackupMapper.insertBidPriceFromQuery(dto.getEtrEntrust().getEntrustId());
+            etrEntrustBackupMapper.insertDetailFromQuery(dto.getEtrEntrust().getEntrustId());
             etrEntrustMapper.deleteByPrimaryKey(dto.getEtrEntrust().getEntrustId());
             etrEntrustAddMapper.deleteByPrimaryKey(dto.getEtrEntrustAdd().getEntrustId());
+            etrInvestInfoMapper.deleteBidPrice(dto.getEtrEntrust().getEntrustId());
+            etrInvestInfoMapper.deleteEntrustDetail(dto.getEtrEntrust().getEntrustId());
             // 使用退回或撤回状态
             dto.getEtrEntrust().setEntrustStatus(etr.getEntrustStatus());
         }else{

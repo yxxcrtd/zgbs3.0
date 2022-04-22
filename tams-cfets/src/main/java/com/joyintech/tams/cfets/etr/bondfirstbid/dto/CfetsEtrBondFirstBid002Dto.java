@@ -3,11 +3,15 @@ package com.joyintech.tams.cfets.etr.bondfirstbid.dto;
 
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
+import com.joyintech.tams.common.base.entity.SysUploadFileInfo;
+import com.joyintech.tams.component.business.trade.dto.BussEtrInvestPersonInfoDto;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -88,7 +92,7 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
      *  汇总投标券面总额
      */
     @ApiModelProperty(name="totalBiddingNum",value="汇总投标券面总额")
-    private String totalBiddingNum;
+    private BigDecimal totalBiddingNum;
 
     /**
      * 组合分配：投标产品列表
@@ -115,6 +119,43 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
      */
     @ApiModelProperty(name="finprodAbbr",value="资产简称",example="资产简称")
     private String finprodAbbr;
+
+    /**
+     * 接收状态
+     */
+    @ApiModelProperty(name="recStatus",value="接收状态",example="01")
+    private String recStatus;
+
+    /**
+     * 交易方向
+     */
+    @ApiModelProperty(name="ps",value="交易方向",example="T01")
+    private String ps;
+
+    /**
+     * 证券托管户
+     */
+    @ApiModelProperty(name="secAcctId",value="证券托管户",example="证券托管户")
+    private String secAcctId;
+
+    /**
+     * 文件上传dto
+     */
+    @ApiModelProperty(name="fileArray",value="文件上传dto",example="文件上传dto")
+    private List<SysUploadFileInfo> fileArray;
+
+    /**
+     * 指令下达时间
+     */
+    @ApiModelProperty(name="transmitTime",value="指令下达时间",example="18:30:00")
+    private Date transmitTime;
+
+    /**
+     * 投资人员信息DTO
+     */
+    @Valid
+    @ApiModelProperty(name="etrInvestPersonInfo",value="投资人员信息DTO")
+    private BussEtrInvestPersonInfoDto etrInvestPersonInfo;
 
     public String getElementId() {
         return elementId;
@@ -204,11 +245,11 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
         this.cfetsEtribdoRiskcalReturn = cfetsEtribdoRiskcalReturn;
     }
 
-    public String getTotalBiddingNum() {
+    public BigDecimal getTotalBiddingNum() {
         return totalBiddingNum;
     }
 
-    public void setTotalBiddingNum(String totalBiddingNum) {
+    public void setTotalBiddingNum(BigDecimal totalBiddingNum) {
         this.totalBiddingNum = totalBiddingNum;
     }
 
@@ -250,5 +291,55 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
 
     public void setFinprodAbbr(String finprodAbbr) {
         this.finprodAbbr = finprodAbbr;
+    }
+
+    public String getRecStatus() {
+        return recStatus;
+    }
+
+    public void setRecStatus(String recStatus) {
+        this.recStatus = recStatus;
+    }
+
+    @Override
+    public String getPs() {
+        return ps;
+    }
+
+    @Override
+    public void setPs(String ps) {
+        this.ps = ps;
+    }
+
+    public String getSecAcctId() {
+        return secAcctId;
+    }
+
+    public void setSecAcctId(String secAcctId) {
+        this.secAcctId = secAcctId;
+    }
+
+    public List<SysUploadFileInfo> getFileArray() {
+        return fileArray;
+    }
+
+    public void setFileArray(List<SysUploadFileInfo> fileArray) {
+        this.fileArray = fileArray;
+    }
+
+    public Date getTransmitTime() {
+        return transmitTime;
+    }
+
+    public void setTransmitTime(Date transmitTime) {
+        this.transmitTime = transmitTime;
+    }
+
+    public BussEtrInvestPersonInfoDto getEtrInvestPersonInfo() {
+        return etrInvestPersonInfo;
+    }
+
+    public void setEtrInvestPersonInfo(BussEtrInvestPersonInfoDto etrInvestPersonInfo) {
+        this.etrInvestPersonInfo = etrInvestPersonInfo;
     }
 }
