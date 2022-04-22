@@ -12,6 +12,7 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
+import com.joyintech.tams.business.common.util.ValidUtils;
 import com.joyintech.tams.common.base.dao.FinProductAddMapper;
 import com.joyintech.tams.common.base.dao.FinProductIssueMapper;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
@@ -370,7 +371,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
 
 
     /**
-     * 保存、修改、删除提交校验
+     * 保存、修改提交校验
      *
      * @param dto
      * @return
@@ -381,12 +382,17 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         if (isInProcess(dto.getFinprodMarketId(), "FinTenderBondAsset002", "FinTenderBondAsset003")) {
             validList.add(new ValidMessage("存在流程中的数据"));
         }
+        if(StringUtil.isEmpty(operateType)) {
+            validList.add(new ValidMessage("操作类型不能为空"));
+        }
         if (StringUtil.equals(operateType, OperationType.NEW.name())) {
             this.emptyCheck(dto, validList);
-            String finprodId = getFinprodId(dto);
-            FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
-            if (Objects.nonNull(finProduct)) { //同一资产代码只能存在一条数据
-                validList.add(new ValidMessage("同一资产代码只能存在一条数据"));
+            if(StringUtil.isNotEmpty(dto.getFinprodMarketId()) && StringUtil.isNotEmpty(dto.getTradeMarket())) {
+                String finprodId = getFinprodId(dto);
+                FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
+                if (Objects.nonNull(finProduct)) { //同一资产代码只能存在一条数据
+                    validList.add(new ValidMessage("同一资产代码只能存在一条数据"));
+                }
             }
         }
         if (StringUtil.equals(operateType, OperationType.MODIFY.name())) {
@@ -397,16 +403,15 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
                 validList.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
             }
         }
-        if (StringUtil.equals(operateType, OperationType.DELETE.name())) {
-            //删除时，需要判断当前资产是否存在指令及交易数据，如存在，则不允许删除；
-            Integer count = finTenderBondAssetMapper.countFinprodIdUse(dto.getFinprodId(), null);
-            if (Objects.nonNull(count) && count > 0) {
-                validList.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
-            }
-        }
         return validList;
     }
 
+    /**
+     * 修改或者删除校验
+     *
+     * @param dto
+     * @return
+     */
     public List<ValidMessage> modifyAndDeleteCheck(FinTenderBondAsset001Dto dto) {
         List<ValidMessage> validList = new ArrayList<>();
         String operateType = dto.getOperateType();
@@ -450,9 +455,10 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
      * @param validList
      */
     private void emptyCheck(FinTenderBondAsset002Dto dto, List<ValidMessage> validList) {
-        this.valid(dto, validList);
-        this.valid(dto.getProductAddDto(), validList);
-        this.valid(dto.getIssueDto(), validList);
+        ValidUtils.valid(dto, validList);
+        ValidUtils.valid(dto.getProductAddDto(), validList);
+        ValidUtils.valid(dto.getIssueDto(), validList);
+        if(Objects.isNull(dto.getIssueDto())) return;
         if (StringUtil.isNotEmpty(dto.getIssueDto().getIssueStyle()) && StringUtil.equals(dto.getIssueDto().getIssueStyle(), DictCodeListExt4.发行类型_增发)) {
             if (StringUtil.isNotEmpty(dto.getProductAddDto().getCrossMarket()) && StringUtil.equals(dto.getProductAddDto().getCrossMarket(), DictCodeList.是否_是.getValue())) {
                 if (StringUtil.isEmpty(dto.getProductAddDto().getCrossMarketCode())) {
@@ -473,35 +479,5 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
 
     }
 
-
-    /**
-     * 校验是否必填
-     *
-     * @param obj
-     * @param validList
-     */
-    public void valid(Object obj, List<ValidMessage> validList) {
-        Field[] methods = obj.getClass().getDeclaredFields();
-        if (methods == null || methods.length == 0) return;
-        for (Field field : methods) {
-            ApiModelProperty ap = field.getAnnotation(ApiModelProperty.class);
-            System.out.println(field.getGenericType().getTypeName());
-            if (Objects.nonNull(ap) && ap.required()) {//是必填字段
-                field.setAccessible(true);
-                try {
-                    Object value = field.get(obj);
-                    if (field.getGenericType().getTypeName().equals("java.lang.String")) {
-                        if (Objects.isNull(value) || value.equals("")) {
-                            validList.add(new ValidMessage(String.format("%s%s", ap.value(), "不能为空")));
-                        }
-                    } else if (Objects.isNull(value)) {
-                        validList.add(new ValidMessage(String.format("%s%s", ap.value(), "不能为空")));
-                    }
-                } catch (IllegalAccessException e) {
-                    //e.printStackTrace();
-                }
-            }
-        }
-    }
 
 }

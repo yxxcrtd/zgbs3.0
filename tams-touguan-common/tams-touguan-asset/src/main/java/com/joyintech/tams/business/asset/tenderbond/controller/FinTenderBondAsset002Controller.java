@@ -22,6 +22,7 @@ import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,7 +103,7 @@ public class FinTenderBondAsset002Controller extends BaseController {
 
     @ResponseBody
     @PostMapping("/check")
-    @ApiOperation(value = "新建/修改/删除提交时校验", notes = "新建/修改/删除提交时校验")
+    @ApiOperation(value = "新建/修改提交时校验", notes = "新建/修改提交时校验")
     public Message check(@RequestBody FinTenderBondAsset002Dto dto) {
         List<ValidMessage> validMessageList = finTenderBoundAssetService.valid(dto);
         if (CollectionUtils.isNotEmpty(validMessageList)) {
