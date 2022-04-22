@@ -104,6 +104,12 @@ public class TamsSystemApplication extends WebApplication {
 		return SwaggerConfig.createDocket("一级投标确认", "com.joyintech.tams.cfets.trd.firstbidfirm");
 	}
 
+
+	@Bean
+	public Docket bondMarketInfoQuery() {
+		return SwaggerConfig.createDocket("债券市场信息查询", "com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery");
+	}
+
 	public static void main(String[] args) throws Exception {
     	initLog();
     	initSpring(args);
