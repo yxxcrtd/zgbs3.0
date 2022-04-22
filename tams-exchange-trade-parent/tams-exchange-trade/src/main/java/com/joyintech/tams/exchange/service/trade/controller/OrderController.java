@@ -66,10 +66,10 @@ public class OrderController {
             return MasterUtil.postForObject(order);
         }
 
-        ResultBean checkResult = commonCheckKit.check(order);
+        /*ResultBean checkResult = commonCheckKit.check(order);
         if (ErrorCode.isFail(checkResult.getErrorCode())) {
             return new Message<>(checkResult);
-        }
+        }*/
 
         Instruction instruction = instructionService.findById(order.getInstructionId());
 
@@ -105,10 +105,10 @@ public class OrderController {
             return MasterUtil.postForObject(order);
         }
 
-        ResultBean checkResult = commonCheckKit.check(order);
+        /*ResultBean checkResult = commonCheckKit.check(order);
         if (ErrorCode.isFail(checkResult.getErrorCode())) {
             return new Message<>(checkResult);
-        }
+        }*/
 
         Instruction instruction = instructionService.findById(order.getInstructionId());
 
