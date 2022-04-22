@@ -29,6 +29,9 @@ import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3
 @RequestMapping("/trade/joyin")
 @Api(tags = "场内交易-委托操作接口")
 public class OrderController {
+    /**
+     * 日志对象
+     */
     private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
 
     @Autowired
