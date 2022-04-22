@@ -264,14 +264,14 @@ public interface AccountingCommonMapper {
     /**
      * 对应科目查询
      *
-     * @param subjectNo 科目号
+     * @param detailSubjectNoTail 四级科目尾号
      * @param booksetId 账套代码
      * @param baseSubjectNature 基础科目性质列表
      * @return 科目信息列表
      * @see
      * @since 1.0
      */
-    List<CorrespondSubjectEntity> getCorrespondSubject(@Param("subjectNo") String subjectNo,
+    List<CorrespondSubjectEntity> getCorrespondSubject(@Param("detailSubjectNoTail") String detailSubjectNoTail,
                                                  @Param("booksetId") String booksetId,
                                                  @Param("baseSubjectNature") List<String> baseSubjectNature);
     
@@ -514,4 +514,18 @@ public interface AccountingCommonMapper {
      * @since 1.0
      */
     int deleteBokAssetMarketInfo(Map<String, Object> param);
+
+    /**
+     * 对应科目查询
+     *
+     * @param detailSubjectNoTail 四级科目尾号
+     * @param booksetId 账套代码
+     * @param baseSubjectNature 基础科目性质列表
+     * @return 科目信息列表
+     * @see
+     * @since 1.0
+     */
+    List<CorrespondSubjectEntity> getCorrespondSubjectNew(@Param("detailSubjectNoTail") String detailSubjectNoTail,
+                                                       @Param("booksetId") String booksetId,
+                                                       @Param("baseSubjectNature") List<String> baseSubjectNature);
 }

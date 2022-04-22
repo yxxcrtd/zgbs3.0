@@ -214,7 +214,7 @@ public class ValSchemeNewService extends CommonExportService<ValSchemeBatchDto> 
                 //add jinmaodong 20201019 减值相关设计变更 START
                 // 变量.科目信息列表-摊余成本类资产减值 = 调用账务类共通【对应科目查询（参数.账套代码，基础科目性质列表{摊余成本类利息调整}，变量.科目明细.上级科目号）】
                 List<CorrespondSubjectEntity> 资产减值科目数据 = accountingCommonService.getCorrespondSubject(
-                    dto.getFsubjectNo(), booksetId,
+                    dto.getDetailSubjectNoTail(), booksetId,
                     Arrays.asList(DictCodeBaseSubjectNatrueNew.摊余成本类_减值准备.getValue()));
                 
                 ValSchemeBatchDto 资产减值明细 = null;
@@ -342,7 +342,12 @@ public class ValSchemeNewService extends CommonExportService<ValSchemeBatchDto> 
                     bokAssetMarketInfo.setMarketCode(finProduct.getFinprodMarketId());
                 }
                 // 变量.资产行情信息DTO.投资目的 = 摊余成本类
-                bokAssetMarketInfo.setInvAim(DictCodeListExt1.投资目的_摊余成本类.getValue());
+                if(DictCodeBaseSubjectNatrueNew.摊余成本类_成本.getValue().equals(dto.getBaseSubjectNature())){
+                    bokAssetMarketInfo.setInvAim(DictCodeListExt1.投资目的_摊余成本类.getValue());
+                }
+                else if(DictCodeBaseSubjectNatrueNew.公允价值损益类_成本.getValue().equals(dto.getBaseSubjectNature())){
+                    bokAssetMarketInfo.setInvAim(DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue());
+                }
                 // 变量.资产行情信息DTO.市价 = 变量.市价
                 bokAssetMarketInfo.setMarketPrice(行情价格);
                 if(marketPriceDto != null){
@@ -375,7 +380,7 @@ public class ValSchemeNewService extends CommonExportService<ValSchemeBatchDto> 
                     && BookConstant.MAX_SUBJECT_LEVEL.equals(dto.getSubjectLevel())) {
                 // 变量.科目信息列表 = 调用账务类共通【对应科目查询（参数.账套代码，基础科目性质列表{公允价值损益类-公允价值变动}，变量.科目明细.上级科目号）】
                 List<CorrespondSubjectEntity> 科目信息列表 = accountingCommonService.getCorrespondSubject(
-                        dto.getFsubjectNo(), booksetId,
+                        dto.getDetailSubjectNoTail(), booksetId,
                         Arrays.asList(DictCodeBaseSubjectNatrueNew.公允价值损益类_公允价值变动.getValue()));
                 // 变量.公允价值明细 = 科目明细Map.get(变量.科目信息列表.get（0）.科目号,变量.科目明细.四级科目号尾号)
                 ValSchemeBatchDto 公允价值明细 = null;
@@ -420,7 +425,7 @@ public class ValSchemeNewService extends CommonExportService<ValSchemeBatchDto> 
                     && BookConstant.MAX_SUBJECT_LEVEL.equals(dto.getSubjectLevel())){
                 //变量.科目信息列表 = 调用账务类共通【对应科目查询（参数.账套代码，基础科目性质列表{公允价值变动}，变量.科目明细.上级科目号）】
                 List<CorrespondSubjectEntity> 科目信息列表 = accountingCommonService.getCorrespondSubject(
-                        dto.getFsubjectNo(), booksetId,
+                        dto.getDetailSubjectNoTail(), booksetId,
                         Arrays.asList(DictCodeBaseSubjectNatrueNew.交易性金融负债_公允价值变动.getValue()));
                 // 变量.公允价值明细 = 科目明细Map.get(变量.科目信息列表.get（0）.科目号,变量.科目明细.四级科目号尾号)
                 ValSchemeBatchDto 公允价值明细 = null;
@@ -549,7 +554,7 @@ public class ValSchemeNewService extends CommonExportService<ValSchemeBatchDto> 
 //            ) {
 //                //变量.科目信息列表 = 调用账务类共通【对应科目查询（参数.账套代码，基础科目性质列表{买入期权-公允价值变动}，变量.科目明细.上级科目号）】
 //                List<CorrespondSubjectEntity> 科目信息列表 = accountingCommonService.getCorrespondSubject(
-//                        dto.getFsubjectNo(), booksetId, Arrays.asList(DictCodeBaseSubjectNatrue.买入期权公允价值变动.getValue()));
+//                        dto.getDetailSubjectNoTail(), booksetId, Arrays.asList(DictCodeBaseSubjectNatrue.买入期权公允价值变动.getValue()));
 //                //变量.公允价值明细 = 科目明细Map.get(变量.科目信息列表.get（0）.科目号,变量.科目明细.四级科目号尾号)
 //                ValSchemeBatchDto 公允价值明细 = null;
 //                if (!CollectionUtils.isEmpty(科目信息列表)) {
@@ -589,7 +594,7 @@ public class ValSchemeNewService extends CommonExportService<ValSchemeBatchDto> 
 //            ) {
 //                //变量.科目信息列表 = 调用账务类共通【对应科目查询（参数.账套代码，基础科目性质列表{卖出期权-公允价值变动}，变量.科目明细.上级科目号）】
 //                List<CorrespondSubjectEntity> 科目信息列表 = accountingCommonService.getCorrespondSubject(
-//                        dto.getFsubjectNo(), booksetId, Arrays.asList(DictCodeBaseSubjectNatrue.卖出期权公允价值变动.getValue()));
+//                        dto.getDetailSubjectNoTail(), booksetId, Arrays.asList(DictCodeBaseSubjectNatrue.卖出期权公允价值变动.getValue()));
 //                //变量.公允价值明细 = 科目明细Map.get(变量.科目信息列表.get（0）.科目号,变量.科目明细.四级科目号尾号)
 //                ValSchemeBatchDto 公允价值明细 = null;
 //                if (!CollectionUtils.isEmpty(科目信息列表)) {

@@ -10,21 +10,13 @@
 
 package com.joyintech.tams.valuation.batch.common.accounting.service;
 
-import com.google.common.collect.Lists;
 import com.joyintech.calculation.config.NumberEnum;
 import com.joyintech.calculation.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.StringUtil;
-import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.dao.BokBooksetMapper;
 import com.joyintech.tams.common.base.dao.BokStatBokPositionMapper;
 import com.joyintech.tams.common.base.entity.*;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListTableId;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.valuation.batch.common.accounting.dao.AccountingCommonMapper;
 import com.joyintech.tams.valuation.batch.common.accounting.dao.ValBokSubjectInfoMapper;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.*;
@@ -38,7 +30,6 @@ import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrue;
 import com.joyintech.tams.valuation.common.utils.DBUtil;
 import groovy.lang.Tuple2;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -1785,21 +1776,24 @@ public class AccountingCommonService {
     /**
      * 对应科目查询
      *
-     * @param subjectNo 科目号
+     * @param detailSubjectNoTail 四级科目尾号
      * @param booksetId 账套代码
      * @param baseSubjectNature 基础科目性质列表
      * @return 科目信息列表
      * @see
      * @since 1.0
      */
-    public List<CorrespondSubjectEntity> getCorrespondSubject(String subjectNo, String booksetId,
+    public List<CorrespondSubjectEntity> getCorrespondSubject(String detailSubjectNoTail, String booksetId,
                                                               List<String> baseSubjectNature) {
-        String booksetIdTmpl = null;
-        BokBookset bokBookset = bokBooksetMapper.selectByPrimaryKey(booksetId);
-        if(bokBookset!=null){
-            booksetIdTmpl = bokBookset.getBooksetIdTmpl();
+        // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录 start
+        String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+        // 若按照内部科目编码分录，则需要映射分录对应科目信息.
+        //调用service方法进行逻辑逻辑
+        if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
+            return accountingCommonMapper.getCorrespondSubjectNew(detailSubjectNoTail, booksetId,
+                baseSubjectNature);
         }
-        return accountingCommonMapper.getCorrespondSubject(subjectNo, booksetIdTmpl,
+        return accountingCommonMapper.getCorrespondSubject(detailSubjectNoTail, booksetId,
                 baseSubjectNature);
     }
     /**
