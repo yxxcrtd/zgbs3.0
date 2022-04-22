@@ -237,7 +237,7 @@ public class CommonCheckKit extends BaseCheckKit {
         BigDecimal entrustPrice = order.getEntrustPrice();
 
         BigDecimal lowerLimitPrice = NumberUtil.round(tick.getLowerLimitPrice(), 4, RoundingMode.UP);
-        BigDecimal upperLimitPrice = NumberUtil.round(tick.getLowerLimitPrice(), 4, RoundingMode.DOWN);
+        BigDecimal upperLimitPrice = NumberUtil.round(tick.getUpperLimitPrice(), 4, RoundingMode.DOWN);
 
         if (isNoLimitPrice(tick)) {
             String errorMsg = priceHelper.checkPrice(order, instruction, instrument, tick);
