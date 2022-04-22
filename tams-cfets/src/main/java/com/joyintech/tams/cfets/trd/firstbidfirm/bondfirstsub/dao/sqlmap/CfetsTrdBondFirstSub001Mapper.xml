@@ -223,7 +223,7 @@
              , ee.REMARK            remark
              , pp.PORTFOLIO_NAME    portfolioName
              , eed.ENTRUST_NUM*100  bidPrinAmt
-             , ee.INV_AIM           businessModel
+             , eed.INV_AIM          businessModel
         from ETR_ENTRUST ee
                  left join FIN_PRODUCT fp on fp.FINPROD_ID = ee.FINPROD_ID
                  left join ETR_ENTRUST_ADD eea on eea.ENTRUST_ID = ee.ENTRUST_ID

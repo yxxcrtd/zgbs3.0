@@ -152,10 +152,10 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
      */
     public Page<CfetsTrdBondFirstSubEntrustDto> pageEntrust(CfetsTrdBondFirstSubEntrustRequest dto) {
         Map<String, Object> pageParam = BeanUtil.object2Map(dto);
-        setParam(pageParam);
-        setPageMode(dto.getPageMode());
+        this.setParam(pageParam);
+        PageMode pageMode = this.setPageMode(dto.getPageMode());
         logger.debug("查询指令,入参:" + JsonUtils.object2Json(pageParam));
-        return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsTrdBondFirstSub001Mapper.listEntrust(pageParam));
+        return super.queryForPage(pageMode.getPageNo(), pageMode.getPageSize(), () -> cfetsTrdBondFirstSub001Mapper.listEntrust(pageParam));
     }
 
     /**
@@ -588,15 +588,19 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
     /**
      * 分页设置默认值
      *
-     * @param pageMode
+     * @param pageMode 页面信息
      * @author jiangpeng
      * @date 2022/4/19 14:22
      */
-    private void setPageMode(PageMode pageMode) {
-        int pageNo = StringUtil.isNotEmpty(pageMode.getPageNo()) ? 1 : pageMode.getPageNo();//默认第一页
-        int pageSize = StringUtil.isNotEmpty(pageMode.getPageSize()) ? 10 : pageMode.getPageSize();//默认每页10条
+    private PageMode setPageMode(PageMode pageMode) {
+        if (pageMode == null) {
+            pageMode = new PageMode();
+        }
+        int pageNo = StringUtil.isNotEmpty(pageMode.getPageNo()) ? pageMode.getPageNo() : 1;//默认第一页
+        int pageSize = StringUtil.isNotEmpty(pageMode.getPageSize()) ? pageMode.getPageSize() : 10;//默认每页10条
         pageMode.setPageNo(pageNo);
         pageMode.setPageSize(pageSize);
+        return pageMode;
     }
 
     /**

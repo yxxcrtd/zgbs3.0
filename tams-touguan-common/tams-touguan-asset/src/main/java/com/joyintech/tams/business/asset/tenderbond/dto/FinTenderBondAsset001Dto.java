@@ -203,6 +203,12 @@ public class FinTenderBondAsset001Dto extends BaseDto {
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
 
+    /**
+     * 操作类型：NEW,MODIFY,DELETE,REVOKE
+     */
+    @ApiModelProperty(name="operateType",value="操作类型：NEW,MODIFY,DELETE,REVOKE")
+    private String operateType;
+
     public String getIssueStage() {
         return issueStage;
     }
@@ -665,5 +671,13 @@ public class FinTenderBondAsset001Dto extends BaseDto {
 
     public void setAppearMarketAbbr(String appearMarketAbbr) {
         this.appearMarketAbbr = appearMarketAbbr;
+    }
+
+    public String getOperateType() {
+        return operateType;
+    }
+
+    public void setOperateType(String operateType) {
+        this.operateType = operateType;
     }
 }

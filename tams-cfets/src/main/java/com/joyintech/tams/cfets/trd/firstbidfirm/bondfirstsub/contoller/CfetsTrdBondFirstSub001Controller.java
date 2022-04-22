@@ -178,10 +178,10 @@ public class CfetsTrdBondFirstSub001Controller extends BaseController {
         return new Message<CfetsTrdBondFirstSubInfoDto>().success().setData(cfetsBondDealQuoteCommonDto);
     }
 
-    @ApiOperation(value = "指令查询明细添加", notes = "指令查询明细添加")
-    @PostMapping("/etrSearch")
+    @ApiOperation(value = "指令查询明细", notes = "添加-指令查询明细")
+    @PostMapping("/etrAddSearch")
     @ResponseBody
-    public Message<Page<CfetsTrdBondFirstSubEntrustDto>> etrSearch(@RequestBody CfetsTrdBondFirstSubEntrustRequest dto) {
+    public Message<Page<CfetsTrdBondFirstSubEntrustDto>> etrAddSearch(@RequestBody CfetsTrdBondFirstSubEntrustRequest dto) {
         try {
             Page<CfetsTrdBondFirstSubEntrustDto> list = cfetsTrdBondFirstSub001Service.pageEntrust(dto);
             return new Message<Page<CfetsTrdBondFirstSubEntrustDto>>().success().setData(list);
@@ -306,7 +306,7 @@ public class CfetsTrdBondFirstSub001Controller extends BaseController {
 
     @ApiOperation(value = "当日申购导出", notes = "当日申购导出")
     @ResponseBody
-    @RequestMapping("exportDaySub")
+    @PostMapping("exportDaySub")
     public void exportDaySub(@RequestBody CfetsExportRequestDto requestDto, HttpServletResponse response) {
         // 导出
         ExcelUitl.doExport(requestDto, response, "当日登记", () -> {

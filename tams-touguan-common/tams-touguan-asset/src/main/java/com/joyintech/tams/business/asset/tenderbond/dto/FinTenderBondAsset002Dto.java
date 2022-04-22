@@ -627,22 +627,6 @@ public class FinTenderBondAsset002Dto extends BaseEntity implements ProcessEntit
     }
 
     /**
-     * 取得 运作模式
-     * @return 运作模式
-     */
-    public String getOperationType() {
-        return operationType;
-    }
-
-    /**
-     * 设置 运作模式
-     * @param operationType 运作模式
-     */
-    public void setOperationType(String operationType) {
-        this.operationType = operationType == null ? null : operationType.trim();
-    }
-
-    /**
      * 取得 委托方式
      * @return 委托方式
      */

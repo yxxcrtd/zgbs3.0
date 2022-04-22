@@ -166,6 +166,8 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         }
         //1.保存金融产品标的表
         //金融产品类型_资产代码_增发批次_交易场所进行拼接
+        dto.setFinprodType2(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+        dto.setFinprodType(DictCodeListExt2.平安资产类型_一级市场债.getValue());
         dto.setFinprodId(getFinprodId(dto));
         FinProduct finProduct = new FinProduct();
         BeanUtil.copyPropertiesIgnoreNull(finProduct, dto);
@@ -173,10 +175,12 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         //2.保存金融产品标的附属表
         FinProductAdd productAdd = new FinProductAdd();
         BeanUtil.copyPropertiesIgnoreNull(productAdd, dto.getProductAddDto());
+        productAdd.setFinprodId(dto.getFinprodId());
         finProductAddMapper.insert(productAdd);
         //3.保存标的类金融产品发行信息
         FinProductIssue productIssue = new FinProductIssue();
         BeanUtil.copyPropertiesIgnoreNull(productIssue, dto.getIssueDto());
+        productIssue.setFinprodId(dto.getFinprodId());
         finProductIssueMapper.insert(productIssue);
         //4.保存融产品分类表
         FinProductType finProductType = new FinProductType();
@@ -186,6 +190,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         //finProductType.setType6(dto.getType4());
         //finProductType.setType7(dto.getType5());
         finProductType.setType8(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+
         finProductTypeMapper.insert(finProductType);
     }
 
@@ -402,6 +407,29 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         return validList;
     }
 
+    public List<ValidMessage> modifyAndDeleteCheck(FinTenderBondAsset001Dto dto) {
+        List<ValidMessage> validList = new ArrayList<>();
+        String operateType = dto.getOperateType();
+        if (isInProcess(dto.getFinprodMarketId(), "FinTenderBondAsset002", "FinTenderBondAsset003")) {
+            validList.add(new ValidMessage("存在流程中的数据"));
+        }
+        if (StringUtil.equals(operateType, OperationType.MODIFY.name())) {
+            //修改时以及流程中修改数据审批时，需要判断当前资产是否存在有效或流程中的待执行指令及交易数据，如存在，则不允许修改；
+            Integer count = finTenderBondAssetMapper.countFinprodIdUse(dto.getFinprodId(), DictCodeList.是否_否.getValue());
+            if (Objects.nonNull(count) && count > 0) {
+                validList.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
+            }
+        }
+        if (StringUtil.equals(operateType, OperationType.DELETE.name())) {
+            //删除时，需要判断当前资产是否存在指令及交易数据，如存在，则不允许删除；
+            Integer count = finTenderBondAssetMapper.countFinprodIdUse(dto.getFinprodId(), null);
+            if (Objects.nonNull(count) && count > 0) {
+                validList.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
+            }
+        }
+        return validList;
+    }
+
     /**
      * 构造金融标的代码
      *
@@ -409,8 +437,9 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
      * @return
      */
     public String getFinprodId(FinTenderBondAsset002Dto dto) {
-        return String.format("%s_%s_%d_%s_%s", DictCodeListExt2.平安资产类型_一级市场债.getValue(), dto.getFinprodMarketId(),
-                dto.getIssueDto().getAddBatch(), dto.getTradeMarket(), DateUtil.format(dto.getProductAddDto().getBidDate(), "yyyyMMdd"));
+        String [] arr = dto.getFinprodMarketId().split("\\.");
+        return String.format("%s_%s_%d_%s_%s.%s", DictCodeListExt2.平安资产类型_一级市场债.getValue(), arr[0],
+                dto.getIssueDto().getAddBatch(), dto.getTradeMarket(), DateUtil.format(dto.getProductAddDto().getBidDate(), "yyyyMMdd"),arr[1]);
     }
 
 
