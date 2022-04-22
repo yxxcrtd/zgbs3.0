@@ -183,6 +183,8 @@ public class EntrustQueryBean implements Serializable {
     private String propDealerId;
     @ApiModelProperty(required = true, name = "propDealerName", value = "对手方交易商名称")
     private String propDealerName;
+    @ApiModelProperty(required = true, name = "propOwnerType", value = "对手方报价所有者类型")
+    private String propOwnerType;
 
     /**
      * ////////////////////////////查询无用字段
@@ -1140,5 +1142,13 @@ public class EntrustQueryBean implements Serializable {
 
     public void setPropDealerName(String propDealerName) {
         this.propDealerName = propDealerName;
+    }
+
+    public String getPropOwnerType() {
+        return propOwnerType;
+    }
+
+    public void setPropOwnerType(String propOwnerType) {
+        this.propOwnerType = propOwnerType;
     }
 }

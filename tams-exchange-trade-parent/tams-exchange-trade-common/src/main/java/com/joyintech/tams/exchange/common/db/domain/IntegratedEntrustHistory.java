@@ -164,6 +164,7 @@ public class IntegratedEntrustHistory implements Serializable {
     private String propTradeId;
     private String propDealerId;
     private String propDealerName;
+    private String propOwnerType;
 
     @Id
     public String getId() {
@@ -868,5 +869,13 @@ public class IntegratedEntrustHistory implements Serializable {
 
     public void setPropDealerName(String propDealerName) {
         this.propDealerName = propDealerName;
+    }
+
+    public String getPropOwnerType() {
+        return propOwnerType;
+    }
+
+    public void setPropOwnerType(String propOwnerType) {
+        this.propOwnerType = propOwnerType;
     }
 }

@@ -69,10 +69,15 @@ public class CheckParamUtils {
     }
 
     public static ErrorCode getErrorCode(IntegratedEntrust integratedEntrust) {
+        final String stockCode = integratedEntrust.getStockCode();
+        if (Strings.isNullOrEmpty(stockCode) || StockCodeUtils.getMarketAndStockCode(stockCode).length != 2) {
+            return ErrorCode.REQ_PARAMETER_STOCK_CODE_ERROR;
+        }
         // 检查委托属性
         if (IntegratedEntrustUtils.isNegotiatedTrade(integratedEntrust.getEntrustProp())) {
             return ErrorCode.UN_SUPPORT_ENTRUST_PROP;
         }
+        final String market = StockCodeUtils.getMarket(stockCode);
         //检查本方交易员
         if (Strings.isNullOrEmpty(integratedEntrust.getTradeId())) {
             return ErrorCode.TRADE_NOT_EMPTY;
@@ -82,7 +87,7 @@ public class CheckParamUtils {
             return ErrorCode.DEALER_NOT_EMPTY;
         }
         //检查本方交易主体
-        if (Strings.isNullOrEmpty(integratedEntrust.getInvestorId()) || Strings.isNullOrEmpty(integratedEntrust.getInvestorName())) {
+        if (Market.isSzMarket(market) && (Strings.isNullOrEmpty(integratedEntrust.getInvestorId()) || Strings.isNullOrEmpty(integratedEntrust.getInvestorName()))) {
             return ErrorCode.INVESTOR_NOT_EMPTY;
         }
         //检查交易对手
@@ -98,7 +103,7 @@ public class CheckParamUtils {
             return ErrorCode.PROP_DEALER_NOT_EMPTY;
         }
         //检查对手方交易主体
-        if (Strings.isNullOrEmpty(integratedEntrust.getPropInvestorId()) || Strings.isNullOrEmpty(integratedEntrust.getPropInvestorName())) {
+        if (Market.isSzMarket(market) && (Strings.isNullOrEmpty(integratedEntrust.getPropInvestorId()) || Strings.isNullOrEmpty(integratedEntrust.getPropInvestorName()))) {
             return ErrorCode.PROP_INVESTOR_NOT_EMPTY;
         }
         //检查约定号
@@ -106,7 +111,7 @@ public class CheckParamUtils {
             return ErrorCode.CONTRACT_ID_NOT_EMPTY;
         }
 
-        return getErrorCode(integratedEntrust.getUserId(), integratedEntrust.getInstructionId(), integratedEntrust.getEntrustBs(), integratedEntrust.getStockCode(), integratedEntrust.getEntrustProp(), null, integratedEntrust.getLiaisonName(), integratedEntrust.getContractId(), null, null);
+        return getErrorCode(integratedEntrust.getUserId(), integratedEntrust.getInstructionId(), integratedEntrust.getEntrustBs(), stockCode, integratedEntrust.getEntrustProp(), null, integratedEntrust.getLiaisonName(), integratedEntrust.getContractId(), null, null);
     }
 
     public static boolean checkBuyUnit(OrderInterface orderInterface, long entrustVolume, int buyUnit) {
