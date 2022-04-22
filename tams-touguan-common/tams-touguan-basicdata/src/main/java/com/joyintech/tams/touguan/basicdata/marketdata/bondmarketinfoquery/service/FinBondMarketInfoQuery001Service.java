@@ -75,6 +75,7 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         logger.info("detailInfo >> 债券市场详情信息查询参数：secId：【{}】", secId);
         FinBondMarketInfoQueryRequest request = new FinBondMarketInfoQueryRequest();
         request.setSecId(secId);
+        request.setPlatformDate(iPlatformDate.getSysDateStr());
         //查询债券市场信息
         List<FinBondMarketInfoQuery001Dto> bondMarketInfoQuery004Dtos = finBondMarketInfoQueryMapper.queryForPage(request);
         if (CollectionUtils.isEmpty(bondMarketInfoQuery004Dtos)) {

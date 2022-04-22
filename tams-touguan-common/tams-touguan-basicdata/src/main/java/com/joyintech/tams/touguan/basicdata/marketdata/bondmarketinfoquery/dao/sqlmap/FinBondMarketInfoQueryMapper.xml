@@ -95,7 +95,7 @@
         FROM
         INTERF_PAYHSRCSECOPTION PAYHSRCSECOPTION
         WHERE
-        PAYHSRCSECOPTION.THEORYOPTIONPAYDAY <![CDATA[ > ]]> STR_TO_DATE( #{platformDate}, 'YYYY-MM-DD' )
+        PAYHSRCSECOPTION.THEORYOPTIONPAYDAY <![CDATA[ > ]]> to_date( #{platformDate}, 'YYYY-MM-DD' )
         )
         WHERE
         NUM = 1
@@ -108,7 +108,7 @@
         INTERF_PAYHSRCSECRATING WHERE ratingtype='I') PAYHSRCSECRATING2 ON PAYHSRCSECRATING2.SECID =
         PAYHSRCSECINFO.SECID AND PAYHSRCSECRATING2.NUM = 1
         <where>
-            PAYHSRCSECINFO.VDATE <![CDATA[ <= ]]> STR_TO_DATE ( #{platformDate}, '%Y-%m-%d' )
+            PAYHSRCSECINFO.VDATE <![CDATA[ <= ]]> to_date ( #{platformDate}, '%Y-%m-%d' )
 
             <if test="secId !=null and secId !=''">
                 AND PAYHSRCSECINFO.SECID = #{secId,jdbcType=VARCHAR}
@@ -131,7 +131,7 @@
             </if>
 
             <if test="issueDateEnd != null">
-                <![CDATA[ AND PAYHSRCSECINFO.PUBENDDATE <= #{issueDateEnd,jdbcType=DATE} ]]>
+                AND PAYHSRCSECINFO.PUBENDDATE <![CDATA[ <= ]]> #{issueDateEnd,jdbcType=DATE}
             </if>
 
             <if test="vdateStart != null">
@@ -139,7 +139,7 @@
             </if>
 
             <if test="vdateEnd != null">
-                <![CDATA[ AND PAYHSRCSECINFO.VDATE <= #{vdateEnd,jdbcType=DATE} ]]>
+                AND PAYHSRCSECINFO.VDATE <![CDATA[ <= ]]>  #{vdateEnd,jdbcType=DATE}
             </if>
 
             <if test="mdateStart != null">
@@ -147,7 +147,7 @@
             </if>
 
             <if test="mdateEnd != null">
-                <![CDATA[ AND PAYHSRCSECINFO.MDATE <= #{mdateEnd,jdbcType=DATE} ]]>
+                 AND PAYHSRCSECINFO.MDATE <![CDATA[<=]]> #{mdateEnd,jdbcType=DATE}
             </if>
 
             <if test="theOryOptionPayDayStart != null">
@@ -155,7 +155,7 @@
             </if>
 
             <if test="theOryOptionPayDayEnd != null">
-                <![CDATA[ AND PAYHSRCSECOPTION.THEORYOPTIONPAYDAY <= #{theOryOptionPayDayEnd,jdbcType=DATE} ]]>
+                 AND PAYHSRCSECOPTION.THEORYOPTIONPAYDAY <![CDATA[ <=]]> #{theOryOptionPayDayEnd,jdbcType=DATE}
             </if>
 
             <if test="couponSpecies !=null and couponSpecies !=''">
@@ -170,8 +170,8 @@
                 AND PAYHSRCSECINFO.PAYCYCLE = #{payCycle,jdbcType=VARCHAR}
             </if>
 
-            <if test="cyy !=null and cyy !=''">
-                AND PAYHSRCSECINFO.CYY = #{cyy,jdbcType=VARCHAR}
+            <if test="ccy !=null and ccy !=''">
+                AND PAYHSRCSECINFO.CCY = #{ccy,jdbcType=VARCHAR}
             </if>
 
             <if test="isSus !=null and isSus !=''">
@@ -211,15 +211,15 @@
                 to_char(PAYHSRCSECINFO.PUBENDDATE,'yyyy-MM-dd') = #{search} OR
                 to_char(PAYHSRCSECINFO.VDATE,'yyyy-MM-dd') = #{search} OR
                 to_char(PAYHSRCSECINFO.MDATE,'yyyy-MM-dd') = #{search} OR
-                to_char(PAYHSRCSECINFO.THEORYOPTIONPAYDAY,'yyyy-MM-dd') = #{search} OR
+                to_char(PAYHSRCSECOPTION.THEORYOPTIONPAYDAY,'yyyy-MM-dd') = #{search} OR
                 PAYHSRCSECINFO.COUPONSPECIES like '%' || #{search} || '%' OR
                 PAYHSRCSECINFO.INTERESTRATE like '%' || #{search} || '%' OR
                 PAYHSRCSECINFO.PAYCYCLE like '%' || #{search} || '%' OR
-                PAYHSRCSECINFO.CYY like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.CCY like '%' || #{search} || '%' OR
                 PAYHSRCSECINFO.ISSUS like '%' || #{search} || '%' OR
-                PAYHSRCSECINFO.OPTIONTYPE like '%' || #{search} || '%' OR
+                PAYHSRCSECOPTION.OPTIONTYPE like '%' || #{search} || '%' OR
                 PAYHSRCSECRATING2.RATING like '%' || #{search} || '%' OR
-                PAYHSRCSECRATING.RATING like '%' || #{search} || '%' OR
+                PAYHSRCSECRATING.RATING like '%' || #{search} || '%'
                 )
             </if>
         </where>
@@ -227,7 +227,7 @@
         PAYHSRCSECINFO.SECTYPE,
         PAYHSRCSECINFO.SECTYPE2,
         PAYHSRCSECINFO.VDATE,
-        PAYHSRCSECINFO.SECID;
+        PAYHSRCSECINFO.SECID
     </select>
 
     <select id="queryForAddCoupons"
@@ -304,7 +304,7 @@
         LEFT JOIN INTERF_PAYHSRCSECRATING PAYHSRCSECRATING2 ON PAYHSRCSECRATING2.SECID = PAYHSRCSECINFO.SECID AND
         PAYHSRCSECRATING2.ratingtype = 'I'
         <where>
-            PAYHSRCSECINFO.VDATE <![CDATA[<=]]> STR_TO_DATE ( #{iplatformDate}, '%Y-%m-%d' )
+            PAYHSRCSECINFO.VDATE <![CDATA[<=]]> to_date ( #{iplatformDate}, '%Y-%m-%d' )
 
             <if test="secId !=null and secId !=''">
                 AND PAYHSRCSECINFO.SECID = #{secId,jdbcType=VARCHAR}
