@@ -16,6 +16,7 @@ import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.invest.asset.plan.plancur.service.FinPlanAssetCService;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -35,6 +36,8 @@ import java.util.Map;
 public class FinTenderBondAsset001Controller extends BaseController {
     @Autowired
     private FinTenderBondAssetService finTenderBondAssetService;
+    @Autowired
+    private FinPlanAssetCService finPlanAssetCService;
 
     @ResponseBody
     @PostMapping("/getPageParams")

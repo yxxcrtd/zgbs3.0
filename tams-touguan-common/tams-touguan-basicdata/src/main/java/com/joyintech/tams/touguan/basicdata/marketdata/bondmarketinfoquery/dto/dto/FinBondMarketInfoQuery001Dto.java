@@ -160,8 +160,8 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "optionType", value = "行权方式")
     private String optionType;
 
-    @ApiModelProperty(name = "exerciseDate", value = "理论行权日")
-    private Date exerciseDate;
+    @ApiModelProperty(name = "theOryOptionPayDay", value = "理论行权日")
+    private Date theOryOptionPayDay;
 
     @ApiModelProperty(name = "parValue", value = "单位面值")
     @JsonSerialize(using = BigDecimalSerializer.class)
@@ -513,14 +513,6 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
         this.firstConfirmDate = firstConfirmDate;
     }
 
-    public Date getExerciseDate() {
-        return exerciseDate;
-    }
-
-    public void setExerciseDate(Date exerciseDate) {
-        this.exerciseDate = exerciseDate;
-    }
-
     public BigDecimal getParValue() {
         return parValue;
     }
@@ -591,5 +583,13 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
 
     public void setOptionType(String optionType) {
         this.optionType = optionType;
+    }
+
+    public Date getTheOryOptionPayDay() {
+        return theOryOptionPayDay;
+    }
+
+    public void setTheOryOptionPayDay(Date theOryOptionPayDay) {
+        this.theOryOptionPayDay = theOryOptionPayDay;
     }
 }

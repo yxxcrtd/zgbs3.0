@@ -1,5 +1,7 @@
 package com.joyintech.tams.cfets.etr.bondfirstbid.controller;
 
+import com.joyintech.background.component.common.pack.common.util.StringUtil;
+import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
@@ -8,6 +10,7 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
+import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbdoRiskcalRequest;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoRequest;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIssueInfoDto;
@@ -119,11 +122,22 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
 
     @PostMapping(value="/exportEtrInfo")
     @ResponseBody
-    @ApiOperation(value = "一级投标指令管理", notes = "一级投标指令管理")
+    @ApiOperation(value = "一级投标指令管理导出", notes = "一级投标指令管理导出")
     public void exportEtrInfo(@RequestBody CfetsExportRequestDto req, HttpServletResponse response) {
         // 导出
         ExcelUitl.doExport(req, response, "一级投标指令管理", () -> {
             List dataList = cfetsEtrBondFirstBid001Service.findEtrInfoPage(req.getDto(CfetsEtrIBondFirstBidFindEtrInfoRequest.class)).getRoot();
+            return dataList;
+        });
+    }
+
+    @PostMapping(value="/exportIssueInfo")
+    @ResponseBody
+    @ApiOperation(value = "一级投标待发行信息导出", notes = "一级投标待发行信息导出")
+    public void exportIssueInfo(@RequestBody CfetsExportRequestDto req, HttpServletResponse response) {
+        // 导出
+        ExcelUitl.doExport(req, response, "一级投标待发行信息", () -> {
+            List dataList = cfetsEtrBondFirstBid001Service.findIssueInfoPage(req.getDto(CfetsEtrIBondFirstBidFindIssueInfoRequest.class)).getRoot();
             return dataList;
         });
     }
@@ -139,6 +153,29 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
             logger.error("查询该资产是否进行了SPPI测试异常", e);
             return new Message<SppiImportData>().fail().setMessage("查询异常");
         }
+    }
+
+    @ApiOperation(value = "一级投标指令买入时查询业务模式", notes = "一级投标指令买入时查询业务模式")
+    @PostMapping("/queryInvaimBySecIdAndPrd/{portfolioId}/{secId:.+}")
+    @ResponseBody
+    public Message<String> findInvAim(@PathVariable("portfolioId") String portfolioId,@PathVariable String secId) {
+        try {
+            String restult = cfetsEtrBondFirstBid001Service.findInvAim(portfolioId,secId);
+            if(StringUtil.isEmpty(restult)){
+                restult="";
+            }
+            return new Message<String>().success().setData(restult);
+        } catch (Exception e) {
+            logger.error("查询一级投标指令买入时查询业务模式", e);
+            return new Message<String>().fail().setMessage("查询异常");
+        }
+    }
+
+    @ResponseBody
+    @ApiOperation(value = "风险试算", notes = "风险试算")
+    @PostMapping("doRiskcal")
+    public Message<AjaxResult> doRiskcal(@RequestBody CfetsEtrIbdoRiskcalRequest dto) throws Exception {
+        return null;
     }
 
 }

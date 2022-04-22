@@ -37,7 +37,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 初始化查询页面
+ * 一级申购 初始化页面
+ * @author jp
+ * @date 2022/04/18
  */
 @Controller
 @PageId("TenderBondSub")
@@ -130,9 +132,9 @@ public class CfetsTrdBondFirstSub001Controller extends BaseController {
     @ResponseBody
     public Message<AjaxResult> entrustRefuce(@RequestBody Map<String, Object> param) {
         try {
-            AjaxResult result = new AjaxResult();
+            AjaxResult result;
             if (StringUtil.isNotEmpty(param.get("entrustId"))) {
-                param.put("entrustIdList", com.joyintech.framework.util.StringUtil.splitToList(",", (String) param.get("entrustIds")));
+                param.put("entrustIdList", StringUtil.splitToList(",", (String) param.get("entrustIds")));
             }
             result = cfetsTrdBondFirstSub001Service.entrustRefuceCheck(param);
             if (CollectionUtils.isNotEmpty(result.getErrorList())) {
@@ -149,13 +151,13 @@ public class CfetsTrdBondFirstSub001Controller extends BaseController {
     @ApiOperation(value = "查询指令详细信息", notes = "查询指令详细信息")
     @PostMapping("/getEntrust/{entrustId}")
     @ResponseBody
-    public Message<CfetsTrdBondFirstSubEntrustDetailDto> getEntrust(@PathVariable("entrustId") String entrustId) {
+    public Message<Map<String, Object>> getEntrust(@PathVariable("entrustId") String entrustId) {
         try {
-            CfetsTrdBondFirstSubEntrustDetailDto result = cfetsTrdBondFirstSub001Service.getEntrustInfo(entrustId);
-            return new Message<CfetsTrdBondFirstSubEntrustDetailDto>().success().setData(result);
+            Map<String, Object> result = cfetsTrdBondFirstSub001Service.getEntrustInfo(entrustId);
+            return new Message<Map<String, Object>>().success().setData(result);
         } catch (Exception e) {
             logger.error("查询指令详细信息异常", e);
-            return new Message<CfetsTrdBondFirstSubEntrustDetailDto>().fail().setMessage("查询指令详细信息异常");
+            return new Message<Map<String, Object>>().fail().setMessage("查询指令详细信息异常");
         }
     }
 
@@ -176,10 +178,10 @@ public class CfetsTrdBondFirstSub001Controller extends BaseController {
         return new Message<CfetsTrdBondFirstSubInfoDto>().success().setData(cfetsBondDealQuoteCommonDto);
     }
 
-    @ApiOperation(value = "指令查询明细添加", notes = "指令查询明细添加")
-    @PostMapping("/etrSearch")
+    @ApiOperation(value = "指令查询明细", notes = "添加-指令查询明细")
+    @PostMapping("/etrAddSearch")
     @ResponseBody
-    public Message<Page<CfetsTrdBondFirstSubEntrustDto>> etrSearch(@RequestBody CfetsTrdBondFirstSubEntrustRequest dto) {
+    public Message<Page<CfetsTrdBondFirstSubEntrustDto>> etrAddSearch(@RequestBody CfetsTrdBondFirstSubEntrustRequest dto) {
         try {
             Page<CfetsTrdBondFirstSubEntrustDto> list = cfetsTrdBondFirstSub001Service.pageEntrust(dto);
             return new Message<Page<CfetsTrdBondFirstSubEntrustDto>>().success().setData(list);
@@ -304,7 +306,7 @@ public class CfetsTrdBondFirstSub001Controller extends BaseController {
 
     @ApiOperation(value = "当日申购导出", notes = "当日申购导出")
     @ResponseBody
-    @RequestMapping("exportDaySub")
+    @PostMapping("exportDaySub")
     public void exportDaySub(@RequestBody CfetsExportRequestDto requestDto, HttpServletResponse response) {
         // 导出
         ExcelUitl.doExport(requestDto, response, "当日登记", () -> {

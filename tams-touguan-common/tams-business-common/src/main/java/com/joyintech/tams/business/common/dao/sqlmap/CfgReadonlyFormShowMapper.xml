@@ -202,6 +202,9 @@
           #{item}
         </foreach>
       </if>
+      <if test="spcdCodes == null or spcdCodes.size() == 0 ">
+        AND SPCDCODE = '999999' /*999999为通用规则,无特殊配置时只查询999999*/
+      </if>
     </where>
     order by SEQNO
   </select>

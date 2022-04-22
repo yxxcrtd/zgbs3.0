@@ -30,6 +30,11 @@ public class EtrEntrustDetail extends EtrEntrustDetailKey {
     private String targetType;
 
     /**
+     * 证券托管户
+     */
+    private String secAcctId;
+
+    /**
      * 取得 分配比例
      * @return 分配比例
      */
@@ -91,5 +96,13 @@ public class EtrEntrustDetail extends EtrEntrustDetailKey {
      */
     public void setTargetType(String targetType) {
         this.targetType = targetType == null ? null : targetType.trim();
+    }
+
+    public String getSecAcctId() {
+        return secAcctId;
+    }
+
+    public void setSecAcctId(String secAcctId) {
+        this.secAcctId = secAcctId;
     }
 }

@@ -38,6 +38,4 @@ public interface CfgReadonlyFormShowMapper {
      */
     List<CfgReadonlyFormShow> getReadonlyForms(Map<String,Object> param);
 
-
-
 }

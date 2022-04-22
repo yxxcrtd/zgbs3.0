@@ -12,26 +12,17 @@ import java.math.BigDecimal;
  * @author jiangpeng
  * @date 2022年04月19日 18:12
  */
-@ApiModel(value = "申购产品列表", description = "一级申购指令信息-申购产品列表")
+@ApiModel(value = "申购产品列表", description = "一级申购信息-申购产品列表")
 public class CfetsTrdBondFirstSubEntrustProductDto {
 
-    @ApiModelProperty(required = false, name = "entrustId", value = "指令代码", example = "WTBOND202204191858")
-    private String entrustId;
-
-    @ApiModelProperty(required = false, name = "portfolioId", value = "组合代码,页面不显示")
-    private String portfolioId;
+    @ApiModelProperty(required = false, name = "index", value = "序号")
+    private int index;
 
     @ApiModelProperty(required = false, name = "portfolioName", value = "组合名称")
     private String portfolioName;
 
-    @ApiModelProperty(required = false, name = "avaNum", value = "剩余指令额度,需转化为万元 查看页面不显示")
-    private BigDecimal avaNum;
-
-    @ApiModelProperty(required = false, name = "subscriptionAmount", value = "认购量")
-    private BigDecimal subscriptionAmount;
-
-    @ApiModelProperty(required = false, name = "payableAmount", value = "应缴款金额")
-    private BigDecimal payableAmount;
+    @ApiModelProperty(required = false, name = "bidPrinAmt", value = "投标券面总额,需转化为万元")
+    private BigDecimal bidPrinAmt;
 
     @ApiModelProperty(required = false, name = "businessModel", value = "业务模式代码")
     private String businessModel;
@@ -39,26 +30,12 @@ public class CfetsTrdBondFirstSubEntrustProductDto {
     @ApiModelProperty(required = false, name = "businessModelStr", value = "业务模式名称")
     private String businessModelStr;
 
-    @ApiModelProperty(required = false, name = "secManageAcctId", value = "证券账户")
-    private String secManageAcctId;
-
-    @ApiModelProperty(required = false, name = "secAcctName", value = "证券账户名称")
-    private String secAcctName;
-
-    public String getEntrustId() {
-        return entrustId;
+    public int getIndex() {
+        return index;
     }
 
-    public void setEntrustId(String entrustId) {
-        this.entrustId = entrustId;
-    }
-
-    public String getPortfolioId() {
-        return portfolioId;
-    }
-
-    public void setPortfolioId(String portfolioId) {
-        this.portfolioId = portfolioId;
+    public void setIndex(int index) {
+        this.index = index;
     }
 
     public String getPortfolioName() {
@@ -69,28 +46,12 @@ public class CfetsTrdBondFirstSubEntrustProductDto {
         this.portfolioName = portfolioName;
     }
 
-    public BigDecimal getAvaNum() {
-        return avaNum;
+    public BigDecimal getBidPrinAmt() {
+        return bidPrinAmt;
     }
 
-    public void setAvaNum(BigDecimal avaNum) {
-        this.avaNum = avaNum;
-    }
-
-    public BigDecimal getSubscriptionAmount() {
-        return subscriptionAmount;
-    }
-
-    public void setSubscriptionAmount(BigDecimal subscriptionAmount) {
-        this.subscriptionAmount = subscriptionAmount;
-    }
-
-    public BigDecimal getPayableAmount() {
-        return payableAmount;
-    }
-
-    public void setPayableAmount(BigDecimal payableAmount) {
-        this.payableAmount = payableAmount;
+    public void setBidPrinAmt(BigDecimal bidPrinAmt) {
+        this.bidPrinAmt = bidPrinAmt;
     }
 
     public String getBusinessModel() {
@@ -99,22 +60,6 @@ public class CfetsTrdBondFirstSubEntrustProductDto {
 
     public void setBusinessModel(String businessModel) {
         this.businessModel = businessModel;
-    }
-
-    public String getSecManageAcctId() {
-        return secManageAcctId;
-    }
-
-    public void setSecManageAcctId(String secManageAcctId) {
-        this.secManageAcctId = secManageAcctId;
-    }
-
-    public String getSecAcctName() {
-        return secAcctName;
-    }
-
-    public void setSecAcctName(String secAcctName) {
-        this.secAcctName = secAcctName;
     }
 
     public String getBusinessModelStr() {

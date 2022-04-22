@@ -229,5 +229,9 @@
 	<delete id="deleteEtrDistributeInterfTmp">
 		DELETE FROM ETR_DISTRIBUTE_INTERF_TMP  WHERE ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
 	</delete>
+	<delete id="deleteEntrustDetail" parameterType="java.lang.String" >
+		DELETE FROM ETR_ENTRUST_DETAIL
+		WHERE ENTRUST_ID  = #{workflowId, jdbcType=VARCHAR}
+	</delete>
 
 </mapper>

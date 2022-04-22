@@ -4,14 +4,19 @@ import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBid002Dto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBidSaveRequest;
 import com.joyintech.tams.cfets.etr.bondfirstbid.service.CfetsEtrBondFirstBid002Service;
+import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
+import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
@@ -30,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +56,9 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
     @Autowired
     private CfetsEtrBondFirstBid002Service cfetsEtrBondFirstBid002Service;
 
+    @Autowired
+    private EtrEntrustMapper etrEntrustMapper;
+
     /**
      * 业务编号组件
      */
@@ -57,9 +66,46 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
     private BaseGetBusinessId bussGetBussinessIdService;
 
     @ResponseBody
+    @ApiOperation(value = "多组合指令新建保存/提交校验", notes = "多组合指令新建保存/提交校验")
+    @PostMapping("check")
+    public Message<AjaxResult> check(@RequestBody CfetsEtrBondFirstBidSaveRequest cfetsDto)
+            throws Exception {
+        try {
+            AjaxResult ajax = cfetsEtrBondFirstBid002Service.check(cfetsDto);
+            if (null != ajax) {
+                return new Message<AjaxResult>().success().setData(ajax);
+            } else {
+                return new Message<AjaxResult>().success();
+            }
+        } catch (Exception e) {
+            logger.error("多组合指令新建保存/提交校验异常", e);
+            return new Message<AjaxResult>().fail().setMessage("校验失败");
+        }
+    }
+
+    @ResponseBody
     @ApiOperation(value = "多组合指令新建保存/提交", notes = "多组合指令新建保存/提交")
     @PostMapping("save")
     public Message<AjaxResult> save(@RequestBody CfetsEtrBondFirstBidSaveRequest cfetsDto) {
+
+        if (StringUtil.equals(cfetsDto.getOperateType(), OperationType.MODIFY.name())
+                && (StringUtil.equals(cfetsDto.getIssueClass(), DictCodeListExt4.新债_发行方式_招标发行.getValue())
+                || StringUtil.equals(cfetsDto.getIssueClass(), DictCodeListExt4.新债_发行方式_簿记建档.getValue())
+        )
+        ) {
+            //根据指令代码获取指令信息
+            EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(cfetsDto.getEntrustId());
+            //风控通过且投标量没有改高，不走流程直接更新原指令信息
+            if (StringUtil.equals(cfetsDto.getCfetsEtribdoRiskcalReturn().getRiskTrialSpan(), "试算通过")
+                    && etrEntrust != null
+                    && BigDecimalUtil.ACompareToB(cfetsDto.getTotalBiddingNum(), ArithmeticUtil.multiply(etrEntrust.getEntrustNum(), BigDecimal.valueOf(100)).setScale(4, BigDecimal.ROUND_HALF_UP), 4) < 1
+            ) {
+                CfetsEtrBondFirstBid002Dto allDto = cfetsEtrBondFirstBid002Service.packageEquity(cfetsDto);
+                cfetsEtrBondFirstBid002Service.saveModifyPassInfo(allDto);
+                AjaxResult m = new AjaxResult("一级指令修改直接通过成功！");
+                return new Message<AjaxResult>().success().setData(m);
+            }
+        }
 
         CfetsEtrBondFirstBid002Dto allDto = cfetsEtrBondFirstBid002Service.packageEquity(cfetsDto);
 
@@ -77,7 +123,6 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
             if (StringUtil.isNotEmpty(dto.getEntrustId())) {
                 dataList.add(dto);
             }
-
         }
 
         try {

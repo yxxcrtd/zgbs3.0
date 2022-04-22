@@ -108,6 +108,27 @@
         delete from ETR_ENTRUST_DETAIL_BACKUP
         where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
     </delete>
-
+    <delete id="deleteEntrustBidPriceByEntrustId" parameterType="java.lang.String" >
+        delete from ETR_ENTRUST_BID_PRICE_BACKUP
+        where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+    </delete>
+    <delete id="deleteEntrustDetailByEntrustId" parameterType="java.lang.String" >
+        delete from ETR_ENTRUST_DETAIL_BACKUP
+        where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insertBidPriceFromQuery" parameterType="java.lang.String">
+        INSERT INTO ETR_ENTRUST_BID_PRICE
+        (ENTRUST_ID, BID_PRICE, BID_PRIN_AMT, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PORTFOLIO_ID)
+        SELECT
+            ENTRUST_ID, BID_PRICE, BID_PRIN_AMT, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PORTFOLIO_ID
+        FROM ETR_ENTRUST_BID_PRICE_BACKUP  WHERE ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+    </insert>
+    <insert id="insertDetailFromQuery" parameterType="java.lang.String">
+        INSERT INTO ETR_ENTRUST_DETAIL
+        (ENTRUST_ID, PORTFOLIO_ID, DIS_RATE, ENTRUST_AMT, ENTRUST_NUM, TARGET_TYPE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INV_AIM, SEC_ACCT_ID)
+        SELECT
+            ENTRUST_ID, PORTFOLIO_ID, DIS_RATE, ENTRUST_AMT, ENTRUST_NUM, TARGET_TYPE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INV_AIM, SEC_ACCT_ID
+        FROM ETR_ENTRUST_DETAIL_BACKUP  WHERE ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+    </insert>
 
 </mapper>

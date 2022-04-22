@@ -447,18 +447,18 @@
 
     <select id="getIntRateForSelect" resultMap="finprodIdMap">
             select
-                to_char(INT_RATE,'FM99990.99999999999999') id,
-                t.INT_RATE text,
+                INT_RATE_ID id,
+                to_char(INT_RATE,'FM99990.99999999999999') text,
                 t.CCY
             from MST_INT_RATE_INFO t
             <where>
                 AND t.EFF_DATE <![CDATA[<=]]> #{platDate,jdbcType=DATE}
                 AND t.INT_RATE_TYPE = #{intRateType}
                 <if test="initValue != null and !initValue.equals('')">
-                    and t.id = #{initValue}
+                    and t.INT_RATE_ID = #{initValue}
                 </if>
                 <if test="search != null and !search.equals('')">
-                    and (t.id like concat('%',concat(#{search},'%'))
+                    and (t.INT_RATE_ID like concat('%',concat(#{search},'%'))
                             or to_char(t.INT_RATE,'FM99990.99999999999999') like concat('%',concat(#{search},'%'))
                         )
                 </if>
