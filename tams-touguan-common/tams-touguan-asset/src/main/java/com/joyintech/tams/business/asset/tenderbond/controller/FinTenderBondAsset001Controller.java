@@ -36,8 +36,6 @@ import java.util.Map;
 public class FinTenderBondAsset001Controller extends BaseController {
     @Autowired
     private FinTenderBondAssetService finTenderBondAssetService;
-    @Autowired
-    private FinPlanAssetCService finPlanAssetCService;
 
     @ResponseBody
     @PostMapping("/getPageParams")
