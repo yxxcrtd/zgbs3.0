@@ -392,6 +392,9 @@
             <if test="fragmentaryFunds != null" >
                 FRAGMENTARY_FUNDS,
             </if>
+            <if test="deliveryResult != null" >
+                DELIVERY_RESULT,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="tradeId != null" >
@@ -612,6 +615,9 @@
             </if>
             <if test="fragmentaryFunds != null" >
                 #{fragmentaryFunds,jdbcType=DECIMAL},
+            </if>
+            <if test="deliveryResult != null" >
+                #{deliveryResult,jdbcType=DECIMAL},
             </if>
         </trim>
     </insert>

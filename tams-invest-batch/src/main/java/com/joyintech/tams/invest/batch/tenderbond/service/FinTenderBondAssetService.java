@@ -2,7 +2,9 @@ package com.joyintech.tams.invest.batch.tenderbond.service;
 
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
+import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
+import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.FinProductAddMapper;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.dao.TrdFinProductBarterTotalMapper;
@@ -58,7 +60,7 @@ public class FinTenderBondAssetService {
      *
      * @param plateDate
      */
-    public void listingAndCirculation(Date plateDate) {
+    public void execute(Date plateDate) {
         Map<String, Object> param = new HashMap<>();
         param.put("listingDate", plateDate);
         param.put("issueStage", DictCodeListExt4.发行阶段_已发行.getValue());
@@ -82,7 +84,7 @@ public class FinTenderBondAssetService {
                 //根据 资产名称、资产简称、交易场所、登记托管机构、起息日、到期日、发行人、息票品种、利率类型、币种 进行去重
                 List<InterfPayhsrcsecinfo> interList = finTenderBoundAssetMapper.getBySecId(dto.getAppearMarketId());
                 if (CollectionUtils.isNotEmpty(interList) && interList.size() == 1) {
-                    //TODO 调用加券逻辑,成功之后在执行保存操作,接口表使用source 和secId作为主键来进行加券
+                    this.autoBondCoupon(interList.get(0));
                     dto.setCirculationCode(interList.get(0).getSecid());
                     dto.setCirculationDate(plateDate);
                     save(dto, plateDate);
@@ -93,7 +95,7 @@ public class FinTenderBondAssetService {
                 }
                 interList = finTenderBoundAssetMapper.getByParam(dto);
                 if (CollectionUtils.isNotEmpty(interList) && interList.size() == 1) {
-                    //TODO 调用加券逻辑,成功之后在执行保存操作,接口表使用source 和secId作为主键来进行加券
+                    this.autoBondCoupon(interList.get(0));
                     dto.setCirculationCode(interList.get(0).getSecid());
                     dto.setCirculationDate(plateDate);
                     save(dto, plateDate);
@@ -101,7 +103,7 @@ public class FinTenderBondAssetService {
             } else {
                 List<InterfPayhsrcsecinfo> interList = finTenderBoundAssetMapper.getByParam(dto);
                 if (CollectionUtils.isNotEmpty(interList) && interList.size() == 1) {
-                    //TODO 调用加券逻辑,成功之后在执行保存操作,接口表使用source 和secId作为主键来进行加券
+                    this.autoBondCoupon(interList.get(0));
                     dto.setCirculationCode(interList.get(0).getSecid());
                     dto.setCirculationDate(plateDate);
                     save(dto, plateDate);
@@ -150,10 +152,23 @@ public class FinTenderBondAssetService {
         productAdd.setFinprodId(dto.getFinprodId());
         productAdd.setIssueStatus(DictCodeListExt1.发行状态_发行成功.getValue());
         finProductAddMapper.updateForTenderBound(productAdd);
-
-        //TODO 发送头寸
         //记录操作日志
         saveOperate(dto.getFinprodId(), dto.getRemark());
+        //调用头寸
+        BaseMap param = BaseMap.newMap().put("userId", "SYSTEM")
+                .put("totalTradeId",trdFinProductDealTotal.getTotleTradeId())
+                .put("finprodId",dto.getFinprodId())
+                .put("circulationCode",product.getCirculationCode());
+        PositionHttpRequest.sendSslt(param);
+    }
+
+
+    /**
+     * 自动加券
+     * @param payhsrcsecinfo
+     */
+    private void autoBondCoupon(InterfPayhsrcsecinfo payhsrcsecinfo) {
+        //接口表使用source 和secId作为主键来进行加券
     }
 
     /**

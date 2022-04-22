@@ -96,6 +96,11 @@ public class SzdZsmx extends BaseEntity {
     private Date mxfsrq;
 
     /**
+     * 交收结果
+     */
+    private String jgdm;
+
+    /**
      * 取得 流水号
      * @return 流水号
      */
@@ -369,5 +374,13 @@ public class SzdZsmx extends BaseEntity {
     @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setMxfsrq(Date mxfsrq) {
         this.mxfsrq = mxfsrq;
+    }
+
+    public String getJgdm() {
+        return jgdm;
+    }
+
+    public void setJgdm(String jgdm) {
+        this.jgdm = jgdm;
     }
 }

@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.joyintech.tams.business.asset.tenderbond.dao.FinTenderBondAssetMapper">
+    <resultMap id="finprodIdMap" type="com.joyintech.framework.select.SelectOptionDto">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="text" property="text" jdbcType="VARCHAR"/>
+        <association property="object" javaType="java.util.Map">
+            <result column="FINPROD_NAME" property="finprodName" jdbcType="VARCHAR" />
+            <result column="CALENDAR_ID" property="calendarId" jdbcType="VARCHAR" />
+            <result column="FINPROD_ID" property="finprodId" jdbcType="VARCHAR" />
+            <result column="TRADE_MARKET" property="tradeMarket" jdbcType="VARCHAR" />
+            <result column="IS_RIGHT" property="isRight" jdbcType="VARCHAR" />
+            <result column="TYPE_9" property="assetType1" jdbcType="VARCHAR" />
+            <result column="TYPE_10" property="assetType10" jdbcType="VARCHAR" />
+            <result column="TYPE_11" property="assetType11" jdbcType="VARCHAR" />
+            <result column="VDATE" property="finvdate" jdbcType="VARCHAR" />
+            <result column="MDATE" property="finmdate" jdbcType="VARCHAR" />
+            <result column="CCY" property="ccy" jdbcType="VARCHAR" />
+        </association>
+    </resultMap>
 
     <select id="selectForPage" parameterType="com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAssetSearch"
             resultType="com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset001Dto">
@@ -77,7 +94,7 @@
         ) ZX ON PRODUCT.FINPROD_MARKET_ID = ZX.ASSET_CODE
         LEFT JOIN MST_CUSTOMER_INFO MCIT ON MCIT.CUSTOMER_ID=ZX.GRADE_ORG_ID
         <where> PRODUCT.FINPROD_TYPE2=#{finprodType2,jdbcType=VARCHAR}
-              AND PRODUCT.TRADE_MARKET in ('01','02')
+              AND PRODUCT.TRADE_MARKET in ('01','02') <!-- 限制为银行间和商业柜台-->
             <if test="finprodMarketId !=null and finprodMarketId !=''">
                 AND PRODUCT.FINPROD_MARKET_ID=#{finprodMarketId,jdbcType=VARCHAR}
             </if>
@@ -230,7 +247,7 @@
         select T1.FINPROD_ID from FIN_PRODUCT T1
         where  T1.FINPROD_TYPE2 = #{finprodType2}
             AND T1.TRADE_MARKET in(#{TRADE_PLACE_01},#{TRADE_PLACE_02})
-            AND T1.FINPROD_MARKET_ID=#{finprodMarketId,jdbcType=VARCHAR}
+            AND T1.FINPROD_MARKET_ID=#{finprodMarketId,jdbcType=VARCHAR} AND ROWNUM=1
     </select>
 
     <select id="selectBondCreditRating" resultType="com.joyintech.tams.business.asset.tenderbond.dto.MstBondCreditRatingDto">
@@ -287,24 +304,6 @@
         select count(1) as qty from TRD_FIN_PRODUCT_DEAL_TOTAL where FINPROD_ID=#{finprodId} and IS_CANCEL ='N'
     </select>
 
-
-    <resultMap id="finprodIdMap" type="com.joyintech.framework.select.SelectOptionDto">
-        <id column="id" property="id" jdbcType="VARCHAR"/>
-        <result column="text" property="text" jdbcType="VARCHAR"/>
-        <association property="object" javaType="java.util.Map">
-            <result column="FINPROD_NAME" property="finprodName" jdbcType="VARCHAR" />
-            <result column="CALENDAR_ID" property="calendarId" jdbcType="VARCHAR" />
-            <result column="FINPROD_ID" property="finprodId" jdbcType="VARCHAR" />
-            <result column="TRADE_MARKET" property="tradeMarket" jdbcType="VARCHAR" />
-            <result column="IS_RIGHT" property="isRight" jdbcType="VARCHAR" />
-            <result column="TYPE_9" property="assetType1" jdbcType="VARCHAR" />
-            <result column="TYPE_10" property="assetType10" jdbcType="VARCHAR" />
-            <result column="TYPE_11" property="assetType11" jdbcType="VARCHAR" />
-            <result column="VDATE" property="finvdate" jdbcType="VARCHAR" />
-            <result column="MDATE" property="finmdate" jdbcType="VARCHAR" />
-            <result column="CCY" property="ccy" jdbcType="VARCHAR" />
-        </association>
-    </resultMap>
 
     <select id="getFinprodIdForSelect" resultMap="finprodIdMap">
         SELECT
@@ -448,18 +447,18 @@
 
     <select id="getIntRateForSelect" resultMap="finprodIdMap">
             select
-                to_char(INT_RATE,'FM99990.99999999999999') id,
-                t.INT_RATE text,
+                INT_RATE_ID id,
+                to_char(INT_RATE,'FM99990.99999999999999') text,
                 t.CCY
             from MST_INT_RATE_INFO t
             <where>
                 AND t.EFF_DATE <![CDATA[<=]]> #{platDate,jdbcType=DATE}
                 AND t.INT_RATE_TYPE = #{intRateType}
                 <if test="initValue != null and !initValue.equals('')">
-                    and t.id = #{initValue}
+                    and t.INT_RATE_ID = #{initValue}
                 </if>
                 <if test="search != null and !search.equals('')">
-                    and (t.id like concat('%',concat(#{search},'%'))
+                    and (t.INT_RATE_ID like concat('%',concat(#{search},'%'))
                             or to_char(t.INT_RATE,'FM99990.99999999999999') like concat('%',concat(#{search},'%'))
                         )
                 </if>
@@ -504,6 +503,6 @@
     <select id="selectTotleTradeId" resultType="java.lang.String">
         select T.TOTLE_TRADE_ID from TRD_FIN_PRODUCT_DEAL_TOTAL T
         inner join TRD_FIN_PRODUCT_BARTER_TOTAL B on T.TOTLE_TRADE_ID=B.TRADE_ID ||'R'
-        where T.FINPROD_ID=#{finprodId,jdbcType=VARCHAR}
+        where T.FINPROD_ID=#{finprodId,jdbcType=VARCHAR} and rownum=1
     </select>
 </mapper>

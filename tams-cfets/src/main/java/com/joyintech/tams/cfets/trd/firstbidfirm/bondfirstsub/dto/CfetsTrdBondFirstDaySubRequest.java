@@ -12,10 +12,10 @@ public class CfetsTrdBondFirstDaySubRequest {
     @ApiModelProperty(name = "pageMode", value = "分页对象", example = "{pageSize: 10,pageNo: 1, sort: 'name', direction: 'asc'}")
     private PageMode pageMode;
 
-    @ApiModelProperty(name = "finprodMarketIds", value = "市场代码,列表 etrSearch,pageDaySubDetail接口必传", example = "[A,B]")
+    @ApiModelProperty(name = "finprodMarketIds", value = "市场代码,列表 etrAddSearch,pageDaySubDetail 接口必传", example = "[A,B]")
     private List<String> finprodMarketIds;
 
-    @ApiModelProperty(name = "secManageAcctIds ", value = "证券账户,列表 etrSearch,pageDaySubDetail接口必传", example = "[A,B]")
+    @ApiModelProperty(name = "secManageAcctIds ", value = "证券账户,列表 etrAddSearch,pageDaySubDetail 接口必传", example = "[A,B]")
     private List<String> secManageAcctIds;
 
     @ApiModelProperty(name = "ouParty", value = "本方",example = "1234123")

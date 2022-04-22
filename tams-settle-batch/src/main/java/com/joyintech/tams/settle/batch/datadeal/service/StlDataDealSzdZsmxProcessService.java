@@ -93,6 +93,8 @@ public class StlDataDealSzdZsmxProcessService {
             settleTransData.setCcy(stlDataDealProcessCommonService.getCcy(szdZsmx.getMxhbdh()));
             // 交易方向
             settleTransData.setPs(StringUtil.equalsIgnoreCase(szdZsmx.getMxywlb(), StlDataDealProcessConstant.ZSMX_YWLB_ZS) ? DictCodeList.交易方向_税费缴税.getValue() : null);
+            //交易结果
+            settleTransData.setDeliveryResult(stlDataDealProcessCommonService.getDeliveryResult(szdZsmx.getJgdm()));
             // 成交编号
             String generate = IDGenerator.generate();
             settleTransData.setTradeId(generate);

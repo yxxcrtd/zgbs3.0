@@ -18,10 +18,10 @@ public class CfetsTrdBondFirstSubEntrustRequest {
     @ApiModelProperty(name = "portfolioIds", value = "组合名称,列表", example = "[A,B]")
     private List<String> portfolioIds;
 
-    @ApiModelProperty(name = "finprodMarketIds", value = "市场代码,列表 etrSearch接口必传", example = "[A,B]")
+    @ApiModelProperty(name = "finprodMarketIds", value = "市场代码,列表 etrAddSearch接口必传", example = "[A,B]")
     private List<String> finprodMarketIds;
 
-    @ApiModelProperty(name = "secManageAcctIds ", value = "证券账户,列表 etrSearch接口必传", example = "[A,B]")
+    @ApiModelProperty(name = "secManageAcctIds ", value = "证券账户,列表 etrAddSearch接口必传", example = "[A,B]")
     private List<String> secManageAcctIds;
 
     @ApiModelProperty(name = "entrustDateStart", value = "指令开始日期,字符串", example = "2021-12-21")
@@ -48,7 +48,7 @@ public class CfetsTrdBondFirstSubEntrustRequest {
     @ApiModelProperty(name = "search", value = "关键词")
     private String search;
 
-    @ApiModelProperty(name = "existEntrustIds ", value = "etrSearch接口,已存在的指令代码,用于过滤申购产品列表中已添加的指令", example = "[01,02]")
+    @ApiModelProperty(name = "existEntrustIds ", value = "etrAddSearch接口,已存在的指令代码,用于过滤申购产品列表中已添加的指令", example = "[01,02]")
     private List<String> existEntrustIds;
 
     public PageMode getPageMode() {
