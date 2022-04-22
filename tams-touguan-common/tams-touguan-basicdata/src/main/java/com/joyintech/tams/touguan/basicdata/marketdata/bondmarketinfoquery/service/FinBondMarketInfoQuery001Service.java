@@ -16,6 +16,7 @@ import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dao.F
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketCashPlanDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoDetailQueryDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondPayHSrcSecOptionDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinBondMarketInfoQueryRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -86,8 +87,11 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         //付息计划信息
         HashMap<String, Object> map = new HashMap<>(2);
         map.put("secId", secId);
-        List<FinBondMarketCashPlanDto> finBondMarketCashPlanDtos = finBondMarketInfoQueryMapper.selectWindBondSchedule(map);
+        List<FinBondMarketCashPlanDto> finBondMarketCashPlanDtos = finBondMarketInfoQueryMapper.queryFinBondMarketCashPlan(map);
         detailQueryDto.setBondMarketCashPlanDtos(finBondMarketCashPlanDtos);
+        //行权计划信息
+        List<FinBondPayHSrcSecOptionDto> finBondPayHSrcSecOptionDtos = finBondMarketInfoQueryMapper.queryFinBondPayHSrcSecOption(map);
+        detailQueryDto.setBondPayHSrcSecOptionDtos(finBondPayHSrcSecOptionDtos);
         return detailQueryDto;
     }
 

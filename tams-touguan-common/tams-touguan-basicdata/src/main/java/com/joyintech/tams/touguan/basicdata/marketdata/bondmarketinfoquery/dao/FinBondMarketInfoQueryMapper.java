@@ -1,7 +1,8 @@
 package com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dao;
 
-import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketCashPlanDto;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondPayHSrcSecOptionDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinBondMarketInfoQueryRequest;
 import org.springframework.stereotype.Repository;
 
@@ -25,5 +26,13 @@ public interface FinBondMarketInfoQueryMapper {
      * @param param
      * @return
      */
-    List<FinBondMarketCashPlanDto> selectWindBondSchedule(Map<String, Object> param);
+    List<FinBondMarketCashPlanDto> queryFinBondMarketCashPlan(Map<String, Object> param);
+
+    /**
+     * 债券行权信息
+     *
+     * @param param
+     * @return
+     */
+    List<FinBondPayHSrcSecOptionDto> queryFinBondPayHSrcSecOption(Map<String, Object> param);
 }

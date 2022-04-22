@@ -80,28 +80,33 @@
         LEFT JOIN INTERF_CUSTOMER_INFO CUSTOMER_INFO2 ON CUSTOMER_INFO1.CUSTOMER_ID = PAYHSRCSECINFO.GUARANTOR
         <!-- 债券行权信息表 -->
         LEFT JOIN (
-            SELECT
-                SECID,
-                OPTIONTYPE,
-                THEORYOPTIONPAYDAY
-            FROM
-            (
-                SELECT
-                    ROW_NUMBER ( ) OVER ( PARTITION BY PAYHSRCSECOPTION.SECID ORDER BY PAYHSRCSECOPTION.THEORYOPTIONPAYDAY DESC ) NUM,
-                    SECID,
-                    OPTIONTYPE,
-                    THEORYOPTIONPAYDAY
-                FROM
-                    INTERF_PAYHSRCSECOPTION PAYHSRCSECOPTION
-                WHERE
-                    PAYHSRCSECOPTION.THEORYOPTIONPAYDAY <![CDATA[ > ]]> STR_TO_DATE( #{platformDate}, 'YYYY-MM-DD' )
-            )
-            WHERE
-            NUM = 1
+        SELECT
+        SECID,
+        OPTIONTYPE,
+        THEORYOPTIONPAYDAY
+        FROM
+        (
+        SELECT
+        ROW_NUMBER ( ) OVER ( PARTITION BY PAYHSRCSECOPTION.SECID ORDER BY PAYHSRCSECOPTION.THEORYOPTIONPAYDAY DESC )
+        NUM,
+        SECID,
+        OPTIONTYPE,
+        THEORYOPTIONPAYDAY
+        FROM
+        INTERF_PAYHSRCSECOPTION PAYHSRCSECOPTION
+        WHERE
+        PAYHSRCSECOPTION.THEORYOPTIONPAYDAY <![CDATA[ > ]]> STR_TO_DATE( #{platformDate}, 'YYYY-MM-DD' )
+        )
+        WHERE
+        NUM = 1
         ) PAYHSRCSECOPTION ON PAYHSRCSECOPTION.SECID = PAYHSRCSECINFO.SECID
         <!--接口债券评级信息表 -->
-        LEFT JOIN (SELECT SECID,RATING,RATINGORG,row_number () over (partition BY SECID ORDER BY RATING ASC) num FROM INTERF_PAYHSRCSECRATING WHERE ratingtype='C') PAYHSRCSECRATING ON PAYHSRCSECRATING.SECID = PAYHSRCSECINFO.SECID AND PAYHSRCSECRATING.NUM = 1
-        LEFT JOIN (SELECT SECID,RATING,RATINGORG,row_number () over (partition BY SECID ORDER BY RATING ASC) num FROM INTERF_PAYHSRCSECRATING WHERE ratingtype='I') PAYHSRCSECRATING2 ON PAYHSRCSECRATING2.SECID = PAYHSRCSECINFO.SECID AND PAYHSRCSECRATING2.NUM = 1
+        LEFT JOIN (SELECT SECID,RATING,RATINGORG,row_number () over (partition BY SECID ORDER BY RATING ASC) num FROM
+        INTERF_PAYHSRCSECRATING WHERE ratingtype='C') PAYHSRCSECRATING ON PAYHSRCSECRATING.SECID = PAYHSRCSECINFO.SECID
+        AND PAYHSRCSECRATING.NUM = 1
+        LEFT JOIN (SELECT SECID,RATING,RATINGORG,row_number () over (partition BY SECID ORDER BY RATING ASC) num FROM
+        INTERF_PAYHSRCSECRATING WHERE ratingtype='I') PAYHSRCSECRATING2 ON PAYHSRCSECRATING2.SECID =
+        PAYHSRCSECINFO.SECID AND PAYHSRCSECRATING2.NUM = 1
         <where>
             PAYHSRCSECINFO.VDATE <![CDATA[ <= ]]> STR_TO_DATE ( #{platformDate}, '%Y-%m-%d' )
 
@@ -308,8 +313,8 @@
     </select>
 
 
-    <!-- 债券付息信息 -->
-    <select id="selectWindBondSchedule"
+    <!-- 债券付息计划信息 -->
+    <select id="queryFinBondMarketCashPlan"
             resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketCashPlanDto"
             parameterType="Map">
         select
@@ -334,5 +339,13 @@
             AND INTERESTSTARTDAY >= #{maxTradeDate,jdbcType=VARCHAR}
         </if>
         ORDER BY INTERESTPAYDAY ASC
+    </select>
+
+    <select id="queryFinBondPayHSrcSecOption"
+            resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondPayHSrcSecOptionDto"
+            parameterType="Map">
+        select SECID,OPTIONSTARTDAY,OPTIONENDDAY,OPTIONPAYDAY,THEORYOPTIONPAYDAY,OPTIONPRICE,OPTIONTYPE,OPTIONCLAUSE from INTERF_PAYHSRCSECOPTION
+        where SECID = #{secId,jdbcType=VARCHAR}
+        ORDER BY THEORYOPTIONPAYDAY ASC
     </select>
 </mapper>

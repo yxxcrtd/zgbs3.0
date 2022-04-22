@@ -187,7 +187,7 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     private String zxGradeOrgId;
 
     @ApiModelProperty(name = "finBondPayHSrcSecOptionDto", value = "行权计划信息")
-    private FinBondPayHSrcSecOptionDto finBondPayHSrcSecOptionDto;
+    private List<FinBondPayHSrcSecOptionDto> bondPayHSrcSecOptionDtos;
 
     @ApiModelProperty(name = "bondMarketCashPlanDtos", value = "付息计划信息")
     private List<FinBondMarketCashPlanDto> bondMarketCashPlanDtos;
@@ -592,14 +592,6 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
         this.optionType = optionType;
     }
 
-    public FinBondPayHSrcSecOptionDto getFinBondPayHSrcSecOptionDto() {
-        return finBondPayHSrcSecOptionDto;
-    }
-
-    public void setFinBondPayHSrcSecOptionDto(FinBondPayHSrcSecOptionDto finBondPayHSrcSecOptionDto) {
-        this.finBondPayHSrcSecOptionDto = finBondPayHSrcSecOptionDto;
-    }
-
     public Date getTheOryOptionPayDay() {
         return theOryOptionPayDay;
     }
@@ -614,5 +606,13 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     public void setBondMarketCashPlanDtos(List<FinBondMarketCashPlanDto> bondMarketCashPlanDtos) {
         this.bondMarketCashPlanDtos = bondMarketCashPlanDtos;
+    }
+
+    public List<FinBondPayHSrcSecOptionDto> getBondPayHSrcSecOptionDtos() {
+        return bondPayHSrcSecOptionDtos;
+    }
+
+    public void setBondPayHSrcSecOptionDtos(List<FinBondPayHSrcSecOptionDto> bondPayHSrcSecOptionDtos) {
+        this.bondPayHSrcSecOptionDtos = bondPayHSrcSecOptionDtos;
     }
 }
