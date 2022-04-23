@@ -52,29 +52,6 @@ public class TrdFundValuationTradeController extends BaseController {
     }
 
     /**
-     * 策略代码生成
-     * @see
-     * @since 1.0
-     */
-    @PostMapping("createFundTradeId")
-    public String createPlanTradeId() {
-        return trdFundValuationTradeService.createPlanTradeId();
-    }
-
-    /**
-     * 分页数据查询
-     *
-     * @return page
-     * @throws Exception 异常
-     * @see
-     * @since 1.0
-     */
-    @PostMapping("/findAll")
-    public List<TrdFundValuationTradeDto> findAll(@RequestBody Map<String, Object> param){
-        return trdFundValuationTradeService.findAll(param);
-    }
-
-    /**
      * 根据交易编号查询对象
      * @see
      * @since 1.0

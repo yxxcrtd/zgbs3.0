@@ -295,8 +295,14 @@ public class FundRedeemArrivalAccountDealRecService {
         result.setTradeId(T1.getTradeId());
         // 理财产品代码 = G.产品代码
         result.setPortfolioId(dto.getProdId());
+        /*modify by sunshuaishuai 20220414 判断生成方式是接口接入还是画面录入 start*/
         //生成方式
-        result.setGenType(com.joyintech.tams.constant.DictCodeListExt1.生成方式_接口接入.getValue());
+        if(StringUtil.isNotEmpty(dto.getDataSource())){
+            result.setGenType(dto.getDataSource());
+        }else {
+            result.setGenType(com.joyintech.tams.constant.DictCodeListExt1.生成方式_接口接入.getValue());
+        }
+        /*modify by sunshuaishuai 20220414 判断生成方式是接口接入还是画面录入 end*/
         return result;
     }
 }

@@ -19,9 +19,10 @@
 			<Cell order="15" name="认购费">subFeeStr</Cell>
 			<Cell order="16" name="申购费">purFeeStr</Cell>
 			<Cell order="17" name="赎回费">redFeeStr</Cell>
-			<Cell order="18" name="经手费">brokerageStr</Cell>
 			<Cell order="18" name="净佣金">commissionStr</Cell>
-			<Cell order="18" name="资金账户">trdMyAcctNo</Cell>
+			<Cell order="19" name="应付佣金">commissionPayStr</Cell>
+			<Cell order="20" name="资金账户">trdMyAcctNo</Cell>
+			<Cell order="21" name="数据来源">dataSourceStr</Cell>
 		</Row>
 	</Worksheet>
 </Workbook>

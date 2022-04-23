@@ -26,6 +26,32 @@
         });
     }
 
+    $('#prodId').change(function(){
+        var prodId = $('#prodId').val();
+        if(prodId){
+            $('#prodName').val($('#prodId').select2('data')[0].id).trigger('change');
+
+        }else {
+            $('#prodName').val('').trigger('change');
+        }
+    });
+
+    $('#assetId').change(function(){
+        var assetId = $('#assetId').val();
+        if(assetId){
+            var dataPort = $('#assetId').select2('data')[0].object;
+            var tradeMarket = dataPort.tradeMarket;
+            var assetType = dataPort.assetType;
+            $('#assetAbbr').val($('#assetId').select2('data')[0].id).trigger('change');
+            $('#tradeMarket').val(tradeMarket).trigger('change');
+            $('#fundType').val(assetType).trigger('change');
+        }else {
+            $('#assetAbbr').val('').trigger('change');
+            $('#tradeMarket').val('').trigger('change');
+            $('#fundType').val('').trigger('change');
+        }
+    });
+
     var tradeAmtArriveInit = function(){
         var redConfirmAmt = $('#redConfirmAmt').val();
         var redFee = $('#redFee').val();
