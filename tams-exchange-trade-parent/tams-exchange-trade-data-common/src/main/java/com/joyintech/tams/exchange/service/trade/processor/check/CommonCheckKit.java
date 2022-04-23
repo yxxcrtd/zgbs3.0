@@ -8,7 +8,6 @@ import cn.hutool.extra.validation.BeanValidationResult;
 import com.joyintech.exchange.service.quote.service.QuoteService;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.tams.exchange.common.BusinessResultException;
-import com.joyintech.tams.exchange.common.bean.MinPrice;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.TickBean;
@@ -20,11 +19,14 @@ import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
+import com.joyintech.tams.exchange.common.db.domain.Order;
+import com.joyintech.tams.exchange.common.db.domain.OrderInterface;
 import com.joyintech.tams.exchange.common.enums.SwitcheEnum;
 import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
 import com.joyintech.tams.exchange.datacommon.db.service.InstrumentService;
+import com.joyintech.tams.exchange.service.trade.processor.account.AccountPositionHelper;
 import com.joyintech.tams.exchange.service.trade.processor.business.price.PriceHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +69,7 @@ public class CommonCheckKit extends BaseCheckKit {
     private TradeTimeService tradeTimeService;
     private QuoteService quoteService;
     private PriceHelper priceHelper;
+    private AccountPositionHelper accountPositionHelper;
 
     @Autowired
     public void setInstructionService(InstructionService instructionService) {
@@ -91,6 +94,11 @@ public class CommonCheckKit extends BaseCheckKit {
     @Autowired
     public void setPriceHelper(PriceHelper priceHelper) {
         this.priceHelper = priceHelper;
+    }
+
+    @Autowired
+    public void setAccountPositionHelper(AccountPositionHelper accountPositionHelper) {
+        this.accountPositionHelper = accountPositionHelper;
     }
 
     public ResultBean check(final BaseOrderRequest order) throws BusinessResultException {
@@ -134,7 +142,6 @@ public class CommonCheckKit extends BaseCheckKit {
         Instruction instruction = getInstruction(order);
 
         String trdTradeTimeSwitch = CacheUtil.getSysParam(TRD_TRADE_TIME_SWITCH);
-        // TODO  方便测试
         if (SwitcheEnum.OPEN.codeNotEquals(trdTradeTimeSwitch)) {
             log.debug("系统参数[{}:{}]，跳过交易时间检查", TRD_TRADE_TIME_SWITCH, trdTradeTimeSwitch);
             return;
@@ -150,14 +157,13 @@ public class CommonCheckKit extends BaseCheckKit {
             }
         }
 
-        // TODO: 方便测试
-/*        if (!result) {
+        if (!result) {
             StringBuilder builder = StrUtil.builder();
             tradePeriod.forEach(item -> builder.append(item.getOpenTime()).append("~").append(item.getCloseTime()).append(StrUtil.COMMA));
             throw new BusinessResultException(ErrorCode.INNER_RISK_ERROR,
                     StrUtil.format("当前时间[{}],不允许委托,允许委托时间段为：[{}]",
                             localTime, StrUtil.removeSuffix(builder.toString(), StrUtil.COMMA)));
-        }*/
+        }
     }
 
     /**
@@ -188,13 +194,23 @@ public class CommonCheckKit extends BaseCheckKit {
     }
 
     /**
-     * 持仓检查
+     * 持仓校验
      */
     public void checkPosition(BaseOrderRequest order) throws BusinessResultException {
-        // TODO: 持仓检查
-        /*if (!accountPositionHelper.checkLooseStocksByPosition(orderInterface, entrustVolume, instrument.getBuyUnit())) {
-            return false;
-        }*/
+        Instruction instruction = getInstruction(order);
+        OrderInterface orderInterface = new Order();
+        orderInterface.setEntrustBs(EntrustPropUtils.getEntrustBs(instruction));
+        orderInterface.setAssetType(instruction.getAssetType());
+        orderInterface.setAccountId(instruction.getAcctNo());
+        orderInterface.setStockCode(instruction.getFinprodMarketId());
+        long entrustVolume = order.getEntrustVolume();
+        MinTrdUnitLimit minTrdUnitLimit = getMinTrdUnitLimit(order, instruction);
+        Integer minStep = minTrdUnitLimit.getMinStep();
+        accountPositionHelper.checkLooseStocksByPosition(orderInterface, entrustVolume, minStep);
+        if (StrUtil.isNotEmpty(orderInterface.getErrorMsg())) {
+            throw new BusinessResultException(ErrorCode.INNER_RISK_ERROR,
+                    StrUtil.format("持仓检查未通过，{}", orderInterface.getErrorMsg()));
+        }
     }
 
     private void checkMinStepWithBuy(BaseOrderRequest order, Instruction instruction) {
@@ -204,14 +220,13 @@ public class CommonCheckKit extends BaseCheckKit {
         int minStep = minTrdUnitLimit.getMinStep();
 
         if (minStep <= 0) {
-            addCheckResult("委托数量", entrustVolume,
+            throw new BusinessResultException(ErrorCode.INNER_RISK_ERROR,
                     StrUtil.format("获取最小交易单位异常 => 【minStep = {}】", minStep));
-            return;
         }
 
         if (EntrustBs.isBuy(entrustBs)
                 && entrustVolume % minStep != 0) {
-            addCheckResult("委托数量", entrustVolume,
+            throw new BusinessResultException(ErrorCode.INNER_RISK_ERROR,
                     StrUtil.format("委托数量[{}]不符合最小买入单位[{}]整数倍", entrustVolume, minStep));
         }
     }
@@ -222,18 +237,20 @@ public class CommonCheckKit extends BaseCheckKit {
         BigDecimal entrustPrice = order.getEntrustPrice();
 
         BigDecimal lowerLimitPrice = NumberUtil.round(tick.getLowerLimitPrice(), 4, RoundingMode.UP);
-        BigDecimal upperLimitPrice = NumberUtil.round(tick.getLowerLimitPrice(), 4, RoundingMode.DOWN);
+        BigDecimal upperLimitPrice = NumberUtil.round(tick.getUpperLimitPrice(), 4, RoundingMode.DOWN);
 
         if (isNoLimitPrice(tick)) {
             String errorMsg = priceHelper.checkPrice(order, instruction, instrument, tick);
             if (StrUtil.isNotEmpty(errorMsg)) {
                 addCheckResult("委托价格", entrustPrice, errorMsg);
-            }return;
+            }
+            return;
         }
         if (lowerLimitPrice.compareTo(entrustPrice) > 0
                 || upperLimitPrice.compareTo(entrustPrice) < 0) {
-            addCheckResult("委托价格", entrustPrice,
-                    StrUtil.format("委托价格[{}]不符合涨跌停价限制：跌停价[{}]~涨停价[{}]", entrustPrice, lowerLimitPrice, upperLimitPrice));
+            throw new BusinessResultException(ErrorCode.INNER_RISK_ERROR,
+                    StrUtil.format("委托价格[{}]不符合涨跌停价限制：跌停价[{}]~涨停价[{}]",
+                            entrustPrice, lowerLimitPrice, upperLimitPrice));
         }
     }
 
@@ -271,10 +288,9 @@ public class CommonCheckKit extends BaseCheckKit {
 
         BigDecimal minAmt = minTrdUnitLimit.getMinAmt();
         if (entrustVolume < minNum && entrustBalance.compareTo(minAmt) < 0) {
-            addCheckResult("委托数量", entrustVolume,
-                    StrUtil.format("委托数量[{}]不符合最小买入数量限制[{}]", entrustVolume, minNum));
-            addCheckResult("委托金额", entrustVolume,
-                    StrUtil.format("委托金额[{}]不符合最小买入金额限制[{}]", entrustBalance, minAmt));
+            throw new BusinessResultException(ErrorCode.INNER_RISK_ERROR,
+                    StrUtil.format("委托数量[{}]不符合最小买入数量限制[{}],委托金额[{}]不符合最小买入金额限制[{}]",
+                            entrustVolume, minNum, entrustBalance, minAmt));
         }
     }
 
@@ -287,7 +303,7 @@ public class CommonCheckKit extends BaseCheckKit {
                     StrUtil.format("无法获取最小价格变动单位"));
         }
         if ((entrustPrice.divideAndRemainder(priceStep))[1].compareTo(BigDecimal.ZERO) != 0) {
-            addCheckResult("委托价格", entrustPrice,
+            throw new BusinessResultException(ErrorCode.INNER_RISK_ERROR,
                     StrUtil.format("委托价格[{}]不符合最小价格变动单位[{}]的整数倍", entrustPrice, priceStep));
         }
     }
@@ -343,9 +359,9 @@ public class CommonCheckKit extends BaseCheckKit {
     }
 
     /**
-     * 零股
+     * 零股校验
      */
-/*    public void checkxxx(BaseOrderRequest request) {
+    public void checkFractional(BaseOrderRequest request) {
 
-    }*/
+    }
 }

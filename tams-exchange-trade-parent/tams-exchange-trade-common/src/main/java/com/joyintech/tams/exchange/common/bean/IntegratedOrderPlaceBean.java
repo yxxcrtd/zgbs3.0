@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.Digits;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -126,6 +127,38 @@ public class IntegratedOrderPlaceBean extends BaseOrderRequest implements Serial
 
     @ApiModelProperty(required = true, name = "propSeatName", value = "对手方交易商名称")
     private String propSeatName;
+
+    // 协商成交使用 --start
+    @ApiModelProperty(required = true, name = "tradeId", value = "本方交易员ID")
+    @Size(max = 32)
+    private String tradeId;
+
+    @ApiModelProperty(required = true, name = "dealerId", value = "本方交易商ID")
+    @Size(max = 32)
+    private String dealerId;
+
+    @ApiModelProperty(required = true, name = "dealerName", value = "本方交易商名称")
+    @Size(max = 32)
+    private String dealerName;
+
+    @ApiModelProperty(required = true, name = "investorId", value = "本方交易主体ID")
+    private String investorId;
+
+    @ApiModelProperty(required = true, name = "investorName", value = "本方交易主体名称")
+    private String investorName;
+
+    @ApiModelProperty(required = false, name = "counterId", value = "交易对手")
+    private String counterId;
+
+    @ApiModelProperty(required = true, name = "propTradeId", value = "对手方交易员")
+    private String propTradeId;
+
+    @ApiModelProperty(required = true, name = "propDealerId", value = "对手方交易商")
+    private String propDealerId;
+
+    @ApiModelProperty(required = true, name = "propDealerName", value = "对手方交易商名称")
+    private String propDealerName;
+    // 协商成交使用 --end
 
     @ApiModelProperty(required = true, name = "contractId", value = "交易所请求编号")
     private String contractId;
@@ -776,5 +809,77 @@ public class IntegratedOrderPlaceBean extends BaseOrderRequest implements Serial
 
     public void setHedgeFlag(String hedgeFlag) {
 
+    }
+
+    public String getTradeId() {
+        return tradeId;
+    }
+
+    public void setTradeId(String tradeId) {
+        this.tradeId = tradeId;
+    }
+
+    public String getDealerId() {
+        return dealerId;
+    }
+
+    public void setDealerId(String dealerId) {
+        this.dealerId = dealerId;
+    }
+
+    public String getDealerName() {
+        return dealerName;
+    }
+
+    public void setDealerName(String dealerName) {
+        this.dealerName = dealerName;
+    }
+
+    public String getInvestorId() {
+        return investorId;
+    }
+
+    public void setInvestorId(String investorId) {
+        this.investorId = investorId;
+    }
+
+    public String getInvestorName() {
+        return investorName;
+    }
+
+    public void setInvestorName(String investorName) {
+        this.investorName = investorName;
+    }
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+
+    public String getPropTradeId() {
+        return propTradeId;
+    }
+
+    public void setPropTradeId(String propTradeId) {
+        this.propTradeId = propTradeId;
+    }
+
+    public String getPropDealerId() {
+        return propDealerId;
+    }
+
+    public void setPropDealerId(String propDealerId) {
+        this.propDealerId = propDealerId;
+    }
+
+    public String getPropDealerName() {
+        return propDealerName;
+    }
+
+    public void setPropDealerName(String propDealerName) {
+        this.propDealerName = propDealerName;
     }
 }

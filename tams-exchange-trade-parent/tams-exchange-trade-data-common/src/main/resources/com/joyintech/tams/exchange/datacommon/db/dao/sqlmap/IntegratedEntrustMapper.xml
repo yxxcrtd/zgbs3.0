@@ -81,6 +81,13 @@
         <result column="INVESTOR_NAME" property="investorName" jdbcType="VARCHAR"/>
         <result column="PROP_INVESTOR_ID" property="propInvestorId" jdbcType="VARCHAR"/>
         <result column="PROP_INVESTOR_NAME" property="propInvestorName" jdbcType="VARCHAR"/>
+        <result column="TRADE_ID" property="tradeId" jdbcType="VARCHAR"/>
+        <result column="DEALER_ID" property="dealerId" jdbcType="VARCHAR"/>
+        <result column="DEALER_NAME" property="dealerName" jdbcType="VARCHAR"/>
+        <result column="COUNTER_ID" property="counterId" jdbcType="VARCHAR"/>
+        <result column="PROP_TRADE_ID" property="propTradeId" jdbcType="VARCHAR"/>
+        <result column="PROP_DEALER_ID" property="propDealerId" jdbcType="VARCHAR"/>
+        <result column="PROP_DEALER_NAME" property="propDealerName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <resultMap id="QueryResultMap" type="com.joyintech.tams.exchange.common.bean.EntrustQueryBean">
@@ -163,6 +170,13 @@
         <result column="INVESTOR_NAME" property="investorName" jdbcType="VARCHAR"/>
         <result column="PROP_INVESTOR_ID" property="propInvestorId" jdbcType="VARCHAR"/>
         <result column="PROP_INVESTOR_NAME" property="propInvestorName" jdbcType="VARCHAR"/>
+        <result column="TRADE_ID" property="tradeId" jdbcType="VARCHAR"/>
+        <result column="DEALER_ID" property="dealerId" jdbcType="VARCHAR"/>
+        <result column="DEALER_NAME" property="dealerName" jdbcType="VARCHAR"/>
+        <result column="COUNTER_ID" property="counterId" jdbcType="VARCHAR"/>
+        <result column="PROP_TRADE_ID" property="propTradeId" jdbcType="VARCHAR"/>
+        <result column="PROP_DEALER_ID" property="propDealerId" jdbcType="VARCHAR"/>
+        <result column="PROP_DEALER_NAME" property="propDealerName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Example_Where_Clause">
@@ -237,7 +251,8 @@
     IP_MAC, REMARK, CREATE_TIME, UPDATE_TIME, ENTRUST_STATUS, ORIG_ENTRUST_ID, REPORT_NO, OPERATE_USER,
     PORTFOLIO_NAME,SEC_ACCT_ID,SEC_ACCT_NAME,TRADE_PLAT,FINPROD_TYPE2, INV_MANAGER_ID,PS,BUSI_TYPE_TG,
     EXTEND1,EXTEND2,ENTRUST_CLASS,TARGET_TYPE,IS_NO_GUARD,IS_NET_PRICE,OWNER_TYPE,INVESTOR_ID,INVESTOR_NAME,
-    PROP_INVESTOR_ID,PROP_INVESTOR_NAME
+    PROP_INVESTOR_ID,PROP_INVESTOR_NAME,TRADE_ID,DEALER_ID,DEALER_NAME,COUNTER_ID,PROP_TRADE_ID,PROP_DEALER_ID,
+    PROP_DEALER_NAME
     </sql>
 
     <sql id="entrust">
@@ -253,7 +268,8 @@
         IP_MAC, REMARK, CREATE_TIME, UPDATE_TIME, ENTRUST_STATUS, ORIG_ENTRUST_ID, REPORT_NO, OPERATE_USER,
         PORTFOLIO_NAME,SEC_ACCT_ID,SEC_ACCT_NAME,TRADE_PLAT,FINPROD_TYPE2, INV_MANAGER_ID,PS,BUSI_TYPE_TG,
         EXTEND1,EXTEND2,ENTRUST_CLASS,TARGET_TYPE,IS_NO_GUARD,IS_NET_PRICE,NULL AS OWNER_TYPE,NULL AS INVESTOR_ID,
-        NULL AS INVESTOR_NAME, NULL AS PROP_INVESTOR_ID,NULL AS PROP_INVESTOR_NAME
+        NULL AS INVESTOR_NAME, NULL AS PROP_INVESTOR_ID,NULL AS PROP_INVESTOR_NAME,NULL AS TRADE_ID,NULL AS DEALER_ID,
+        NULL AS DEALER_NAME,NULL AS COUNTER_ID,NULL AS PROP_TRADE_ID,NULL AS PROP_DEALER_ID,NULL AS PROP_DEALER_NAME
     </sql>
 
     <sql id="Query_Column_List">
@@ -268,7 +284,8 @@
     a.IP_MAC, a.REMARK, a.CREATE_TIME, a.UPDATE_TIME, a.ENTRUST_STATUS, a.ORIG_ENTRUST_ID, a.REPORT_NO, a.OPERATE_USER,
     a.ENTRUST_BS,a.PORTFOLIO_NAME,a.SEC_ACCT_ID,a.SEC_ACCT_NAME, a.TRADE_PLAT,a.FINPROD_TYPE2,a.INV_MANAGER_ID,a.PS,
     a.BUSI_TYPE_TG,a.EXTEND1,a.EXTEND2,a.ENTRUST_CLASS,a.TARGET_TYPE,a.IS_NO_GUARD,a.IS_NET_PRICE,a.OWNER_TYPE,
-    a.INVESTOR_ID,a.INVESTOR_NAME, a.PROP_INVESTOR_ID,a.PROP_INVESTOR_NAME
+    a.INVESTOR_ID,a.INVESTOR_NAME, a.PROP_INVESTOR_ID,a.PROP_INVESTOR_NAME,a.TRADE_ID,a.DEALER_ID,a.DEALER_NAME,
+    a.COUNTER_ID,a.PROP_TRADE_ID,a.PROP_DEALER_ID,a.PROP_DEALER_NAME
     </sql>
     <sql id="query_entrust">
         a.ID, a.PARENT_ORDER_ID, a.INSTRUCTION_ID, a.PORTFOLIO_ID, a.USER_ID, a.USERNAME, a.ACCOUNT_ID,
@@ -283,7 +300,9 @@
         a.IP_MAC, a.REMARK, a.CREATE_TIME, a.UPDATE_TIME, a.ENTRUST_STATUS, a.ORIG_ENTRUST_ID, a.REPORT_NO, a.OPERATE_USER,
         a.ENTRUST_BS,a.PORTFOLIO_NAME,a.SEC_ACCT_ID,a.SEC_ACCT_NAME, a.TRADE_PLAT,a.FINPROD_TYPE2,a.INV_MANAGER_ID,a.PS,
         a.BUSI_TYPE_TG,a.EXTEND1,a.EXTEND2,a.ENTRUST_CLASS,a.TARGET_TYPE,a.IS_NO_GUARD,a.IS_NET_PRICE,NULL AS OWNER_TYPE,
-        NULL AS INVESTOR_ID,NULL AS INVESTOR_NAME, NULL AS PROP_INVESTOR_ID,NULL AS PROP_INVESTOR_NAME
+        NULL AS INVESTOR_ID,NULL AS INVESTOR_NAME, NULL AS PROP_INVESTOR_ID,NULL AS PROP_INVESTOR_NAME,
+        NULL AS TRADE_ID,NULL AS DEALER_ID, NULL AS DEALER_NAME,NULL AS COUNTER_ID,NULL AS PROP_TRADE_ID,
+        NULL AS PROP_DEALER_ID,NULL AS PROP_DEALER_NAME
     </sql>
 
     <select id="selectByExample" resultMap="BaseResultMap"
@@ -483,7 +502,9 @@
                                           PORTFOLIO_NAME, SEC_ACCT_ID, SEC_ACCT_NAME, TRADE_PLAT,
                                           FINPROD_TYPE2, INV_MANAGER_ID, PS, BUSI_TYPE_TG, EXTEND1, EXTEND2,
                                           ENTRUST_CLASS, TARGET_TYPE, IS_NO_GUARD, IS_NET_PRICE, OWNER_TYPE,
-                                          INVESTOR_ID, INVESTOR_NAME, PROP_INVESTOR_ID, PROP_INVESTOR_NAME)
+                                          INVESTOR_ID, INVESTOR_NAME, PROP_INVESTOR_ID, PROP_INVESTOR_NAME,
+                                          TRADE_ID, DEALER_ID, DEALER_NAME, COUNTER_ID, PROP_TRADE_ID, PROP_DEALER_ID,
+                                          PROP_DEALER_NAME)
         values (#{id,jdbcType=VARCHAR}, #{parentOrderId,jdbcType=VARCHAR}, #{instructionId,jdbcType=VARCHAR},
                 #{portfolioId,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR},
                 #{accountId,jdbcType=VARCHAR}, #{financeAccount,jdbcType=VARCHAR}, #{accountName,jdbcType=VARCHAR},
@@ -511,7 +532,9 @@
                 #{entrustClass,jdbcType=VARCHAR}, #{targetType,jdbcType=VARCHAR}, #{isNoGuard,jdbcType=VARCHAR},
                 #{isNetPrice,jdbcType=VARCHAR}, #{ownerType,jdbcType=VARCHAR}, #{investorId,jdbcType=VARCHAR},
                 #{investorName,jdbcType=VARCHAR}, #{propInvestorId,jdbcType=VARCHAR},
-                #{propInvestorName,jdbcType=VARCHAR})
+                #{propInvestorName,jdbcType=VARCHAR}, #{tradeId,jdbcType=VARCHAR}, #{dealerId,jdbcType=VARCHAR},
+                #{dealerName,jdbcType=VARCHAR}, #{counterId,jdbcType=VARCHAR}, #{propTradeId,jdbcType=VARCHAR},
+                #{propDealerId,jdbcType=VARCHAR}, #{propDealerName,jdbcType=VARCHAR})
     </insert>
     <sql id="insert">
         insert into T_INTEGRATED_ENTRUST
@@ -716,6 +739,28 @@
             <if test="propInvestorName != null">
                 PROP_INVESTOR_NAME,
             </if>
+
+            <if test="tradeId != null">
+                TRADE_ID,
+            </if>
+            <if test="dealerId != null">
+                DEALER_ID,
+            </if>
+            <if test="dealerName != null">
+                DEALER_NAME,
+            </if>
+            <if test="counterId != null">
+                COUNTER_ID,
+            </if>
+            <if test="propTradeId != null">
+                PROP_TRADE_ID,
+            </if>
+            <if test="propDealerId != null">
+                PROP_DEALER_ID,
+            </if>
+            <if test="propDealerName != null">
+                PROP_DEALER_NAME,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -917,6 +962,27 @@
             </if>
             <if test="propInvestorName != null">
                 #{propInvestorName,jdbcType=VARCHAR},
+            </if>
+            <if test="tradeId != null">
+                #{tradeId,jdbcType=VARCHAR},
+            </if>
+            <if test="dealerId != null">
+                #{dealerId,jdbcType=VARCHAR},
+            </if>
+            <if test="dealerName != null">
+                #{dealerName,jdbcType=VARCHAR},
+            </if>
+            <if test="counterId != null">
+                #{counterId,jdbcType=VARCHAR},
+            </if>
+            <if test="propTradeId != null">
+                #{propTradeId,jdbcType=VARCHAR},
+            </if>
+            <if test="propDealerId != null">
+                #{propDealerId,jdbcType=VARCHAR},
+            </if>
+            <if test="propDealerName != null">
+                #{propDealerName,jdbcType=VARCHAR},
             </if>
         </trim>
     </sql>
@@ -1153,6 +1219,27 @@
             </if>
             <if test="propInvestorName != null">
                 PROP_INVESTOR_NAME = #{propInvestorName,jdbcType=VARCHAR},
+            </if>
+            <if test="tradeId != null">
+                TRADE_ID = #{tradeId,jdbcType=VARCHAR},
+            </if>
+            <if test="dealerId != null">
+                DEALER_ID = #{dealerId,jdbcType=VARCHAR},
+            </if>
+            <if test="dealerName != null">
+                DEALER_NAME = #{dealerName,jdbcType=VARCHAR},
+            </if>
+            <if test="counterId != null">
+                COUNTER_ID = #{counterId,jdbcType=VARCHAR},
+            </if>
+            <if test="propTradeId != null">
+                PROP_TRADE_ID = #{propTradeId,jdbcType=VARCHAR},
+            </if>
+            <if test="propDealerId != null">
+                PROP_DEALER_ID = #{propDealerId,jdbcType=VARCHAR},
+            </if>
+            <if test="propDealerName != null">
+                PROP_DEALER_NAME = #{propDealerName,jdbcType=VARCHAR},
             </if>
         </set>
         where ID = #{id,jdbcType=VARCHAR}
@@ -1417,6 +1504,27 @@
             <if test="record.propInvestorName != null">
                 PROP_INVESTOR_NAME = #{record.propInvestorName,jdbcType=VARCHAR},
             </if>
+            <if test="record.tradeId != null">
+                TRADE_ID = #{record.tradeId,jdbcType=VARCHAR},
+            </if>
+            <if test="record.dealerId != null">
+                DEALER_ID = #{record.dealerId,jdbcType=VARCHAR},
+            </if>
+            <if test="record.dealerName != null">
+                DEALER_NAME = #{record.dealerName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.counterId != null">
+                COUNTER_ID = #{record.counterId,jdbcType=VARCHAR},
+            </if>
+            <if test="record.propTradeId != null">
+                PROP_TRADE_ID = #{record.propTradeId,jdbcType=VARCHAR},
+            </if>
+            <if test="record.propDealerId != null">
+                PROP_DEALER_ID = #{record.propDealerId,jdbcType=VARCHAR},
+            </if>
+            <if test="record.propDealerName != null">
+                PROP_DEALER_NAME = #{record.propDealerName,jdbcType=VARCHAR},
+            </if>
         </set>
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
@@ -1501,7 +1609,14 @@
         INVESTOR_ID = #{record.investorId,jdbcType=VARCHAR},
         INVESTOR_NAME = #{record.investorName,jdbcType=VARCHAR},
         PROP_INVESTOR_ID = #{record.propInvestorId,jdbcType=VARCHAR},
-        PROP_INVESTOR_NAME = #{record.propInvestorName,jdbcType=VARCHAR}
+        PROP_INVESTOR_NAME = #{record.propInvestorName,jdbcType=VARCHAR},
+        TRADE_ID = #{record.tradeId,jdbcType=VARCHAR},
+        DEALER_ID = #{record.dealerId,jdbcType=VARCHAR},
+        DEALER_NAME = #{record.dealerName,jdbcType=VARCHAR},
+        COUNTER_ID = #{record.counterId,jdbcType=VARCHAR},
+        PROP_TRADE_ID = #{record.propTradeId,jdbcType=VARCHAR},
+        PROP_DEALER_ID = #{record.propDealerId,jdbcType=VARCHAR},
+        PROP_DEALER_NAME = #{record.propDealerName,jdbcType=VARCHAR}
         <include refid="Update_By_Example_Where_Clause"/>
     </update>
     <update id="updateByPrimaryKeySelective"
@@ -1586,7 +1701,14 @@
             INVESTOR_ID        = #{investorId,jdbcType=VARCHAR},
             INVESTOR_NAME      = #{investorName,jdbcType=VARCHAR},
             PROP_INVESTOR_ID   = #{propInvestorId,jdbcType=VARCHAR},
-            PROP_INVESTOR_NAME = #{propInvestorName,jdbcType=VARCHAR}
+            PROP_INVESTOR_NAME = #{propInvestorName,jdbcType=VARCHAR},
+            TRADE_ID           = #{tradeId,jdbcType=VARCHAR},
+            DEALER_ID          = #{dealerId,jdbcType=VARCHAR},
+            DEALER_NAME        = #{dealerName,jdbcType=VARCHAR},
+            COUNTER_ID         = #{counterId,jdbcType=VARCHAR},
+            PROP_TRADE_ID      = #{propTradeId,jdbcType=VARCHAR},
+            PROP_DEALER_ID     = #{propDealerId,jdbcType=VARCHAR},
+            PROP_DEALER_NAME   = #{propDealerName,jdbcType=VARCHAR}
         where ID = #{id,jdbcType=VARCHAR}
     </update>
 </mapper>

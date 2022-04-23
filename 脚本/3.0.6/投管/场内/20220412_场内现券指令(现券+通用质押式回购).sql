@@ -33,17 +33,17 @@ insert into sys_menu values('SETTLE_MANAGEMENT_001_003_014','ETR',null,'SETTLE_M
 
 
 delete from sys_page where page_id = 'etrExchangeTradeSecRepo';
-insert into sys_page values('etrExchangeTradeSecRepo','ETR','home.html#/instructions/secrepoorder?a=a'
+insert into sys_page values('etrExchangeTradeSecRepo','ETR','home.html#/instructions/shareorder?a=a'
 ,'etrexchange/secrepo/etrExchangeTradeSecRepo001','SETTLE_MANAGEMENT_001_003_014',null,null,'02','01'
 ,'场内现券指令','system',null,sysdate,'system',sysdate);
 
 delete from sys_page where page_id = 'etrExchangeTradeSec';
-insert into sys_page values('etrExchangeTradeSec','ETR','home.html#/instructions/secrepoorder?a=a'
+insert into sys_page values('etrExchangeTradeSec','ETR','/tams/home.html#/approve/shareOrderBond?a=a'
 ,'etrexchange/secrepo/etrExchangeTradeSec','',null,null,'02','01'
 ,'场内现券指令-现券','system',null,sysdate,'system',sysdate);
 
 delete from sys_page where page_id = 'etrExchangeTradeRepo';
-insert into sys_page values('etrExchangeTradeRepo','ETR','home.html#/instructions/secrepoorder?a=a'
+insert into sys_page values('etrExchangeTradeRepo','ETR','/tams/home.html#/approve/shareOrderRepo?a=a'
 ,'etrexchange/secrepo/etrExchangeTradeRepo','',null,null,'02','01'
 ,'场内现券指令-通用质押式回购','system',null,sysdate,'system',sysdate);
 

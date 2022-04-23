@@ -154,9 +154,34 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @ApiModelProperty(required = true, name = "ownerType", value = "报价所有者类型")
     private String ownerType;
 
-    @ApiModelProperty(required = true, name = "sellerNo", value = "本方交易员ID")
+    @ApiModelProperty(required = true, name = "sellerNo", value = "本方交易员（上海协议回购），本方交易商（深圳协议回购）")
     @Size(max = 32)
     private String sellerNo;
+
+    @ApiModelProperty(required = true, name = "liaisonName", value = "联系人（大宗交易），对手交易员（固收借用）")
+    @Size(max = 32)
+    private String liaisonName;
+
+    @ApiModelProperty(required = true, name = "liaisonTel", value = "联系方式（大宗交易），本方交易员（固收借用），对手方交易员（上海协议回购借用）")
+    @Size(max = 32)
+    private String liaisonTel;
+
+    @ApiModelProperty(required = true, name = "propSeatNo", value = "对手方席位（大宗、深圳协议回购），对手方交易商（固收、上海协议回购借用）")
+    @Size(max = 16)
+    private String propSeatNo;
+
+    @ApiModelProperty(required = true, name = "propSeatName", value = "对手方交易商名称（上海协议回购借用）")
+    @Size(max = 32)
+    private String propSeatName;
+
+    @ApiModelProperty(required = true, name = "tradeId", value = "本方交易员ID")
+    private String tradeId;
+
+    @ApiModelProperty(required = true, name = "dealerId", value = "本方交易商ID")
+    private String dealerId;
+
+    @ApiModelProperty(required = true, name = "dealerName", value = "本方交易商名称")
+    private String dealerName;
 
     @ApiModelProperty(required = true, name = "investorId", value = "本方交易主体ID")
     private String investorId;
@@ -164,21 +189,17 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @ApiModelProperty(required = true, name = "investorName", value = "本方交易主体名称")
     private String investorName;
 
-    @ApiModelProperty(required = true, name = "liaisonName", value = "交易对手")
-    @Size(max = 32)
-    private String liaisonName;
+    @ApiModelProperty(required = false, name = "counterId", value = "交易对手")
+    private String counterId;
 
-    @ApiModelProperty(required = true, name = "liaisonTel", value = "对手方交易员ID")
-    @Size(max = 32)
-    private String liaisonTel;
+    @ApiModelProperty(required = true, name = "propTradeId", value = "对手方交易员")
+    private String propTradeId;
 
-    @ApiModelProperty(required = true, name = "propSeatNo", value = "对手方交易商ID")
-    @Size(max = 16)
-    private String propSeatNo;
+    @ApiModelProperty(required = true, name = "propDealerId", value = "对手方交易商")
+    private String propDealerId;
 
-    @ApiModelProperty(required = true, name = "propSeatName", value = "对手方交易商名称")
-    @Size(max = 32)
-    private String propSeatName;
+    @ApiModelProperty(required = true, name = "propDealerName", value = "对手方交易商名称")
+    private String propDealerName;
 
     @ApiModelProperty(required = true, name = "propInvestorId", value = "对手方交易主体ID")
     private String propInvestorId;
@@ -186,7 +207,7 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @ApiModelProperty(required = true, name = "propInvestorName", value = "对手方交易主体名称")
     private String propInvestorName;
 
-    @ApiModelProperty(required = true, name = "contractId", value = "交易所请求编号--约定号")
+    @ApiModelProperty(required = true, name = "contractId", value = "交易所请求编号，约定号")
     @Size(max = 32)
     private String contractId;
 
@@ -1074,5 +1095,61 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
 
     public void setIsNetPrice(String isNetPrice) {
         this.isNetPrice = isNetPrice;
+    }
+
+    public String getTradeId() {
+        return tradeId;
+    }
+
+    public void setTradeId(String tradeId) {
+        this.tradeId = tradeId;
+    }
+
+    public String getDealerId() {
+        return dealerId;
+    }
+
+    public void setDealerId(String dealerId) {
+        this.dealerId = dealerId;
+    }
+
+    public String getDealerName() {
+        return dealerName;
+    }
+
+    public void setDealerName(String dealerName) {
+        this.dealerName = dealerName;
+    }
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+
+    public String getPropTradeId() {
+        return propTradeId;
+    }
+
+    public void setPropTradeId(String propTradeId) {
+        this.propTradeId = propTradeId;
+    }
+
+    public String getPropDealerId() {
+        return propDealerId;
+    }
+
+    public void setPropDealerId(String propDealerId) {
+        this.propDealerId = propDealerId;
+    }
+
+    public String getPropDealerName() {
+        return propDealerName;
+    }
+
+    public void setPropDealerName(String propDealerName) {
+        this.propDealerName = propDealerName;
     }
 }

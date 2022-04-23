@@ -1,14 +1,12 @@
 package com.joyintech.service.basicdata.systrdconfig.dto;
 
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-
-
 public class TradeInfoProResponse {
 
-
     private String dealer;
+
+
+    private String dealerName;
 
 
     private String tradePlace;
@@ -27,6 +25,9 @@ public class TradeInfoProResponse {
 
 
     private String trader;
+
+
+    private String traderName;
 
 
     private String traderNo;
@@ -88,6 +89,22 @@ public class TradeInfoProResponse {
 
     public void setTrader(String trader) {
         this.trader = trader;
+    }
+
+    public String getDealerName() {
+        return dealerName;
+    }
+
+    public void setDealerName(String dealerName) {
+        this.dealerName = dealerName;
+    }
+
+    public String getTraderName() {
+        return traderName;
+    }
+
+    public void setTraderName(String traderName) {
+        this.traderName = traderName;
     }
 
     public String getTraderNo() {

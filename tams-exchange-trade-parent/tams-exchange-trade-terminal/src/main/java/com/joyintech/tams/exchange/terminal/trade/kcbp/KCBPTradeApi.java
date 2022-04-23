@@ -609,10 +609,10 @@ public class KCBPTradeApi {
         parameters.put("ownertype", integratedEntrust.getOwnerType());// 报价所有者类型
         parameters.put("orderprice", String.valueOf(integratedEntrust.getEntrustPrice()));// 价格
         parameters.put("orderqty", String.valueOf(integratedEntrust.getEntrustVolume()));// 数量
-        parameters.put("tradercode", integratedEntrust.getSellerNo());//本方交易员代码
+        parameters.put("tradercode", integratedEntrust.getTradeId());//本方交易员代码
         parameters.put("investorid", integratedEntrust.getInvestorId());//本方交易主体代码
-        parameters.put("cpmemberid", integratedEntrust.getPropSeatNo());//对手方交易商代码
-        parameters.put("cptradercode", integratedEntrust.getLiaisonTel());//对手方交易员代码
+        parameters.put("cpmemberid", integratedEntrust.getPropDealerId());//对手方交易商代码
+        parameters.put("cptradercode", integratedEntrust.getPropTradeId());//对手方交易员代码
         parameters.put("cpinvestorid", integratedEntrust.getPropInvestorId());//对手方交易主体代码
         parameters.put("confirmid", integratedEntrust.getContractId());//约定号
         parameters.put("memo", integratedEntrust.getRemark());//备注
@@ -627,10 +627,10 @@ public class KCBPTradeApi {
         parameters.put("ownertype", integratedEntrust.getOwnerType());// 报价所有者类型
         parameters.put("orderprice", String.valueOf(integratedEntrust.getEntrustPrice()));// 价格
         parameters.put("orderqty", String.valueOf(integratedEntrust.getEntrustVolume()));// 数量
-        parameters.put("tradercode", integratedEntrust.getSellerNo());//本方交易员代码
+        parameters.put("tradercode", integratedEntrust.getTradeId());//本方交易员代码
         parameters.put("investorid", integratedEntrust.getInvestorId());//本方交易主体代码
-        parameters.put("cpmemberid", integratedEntrust.getPropSeatNo());//对手方交易商代码
-        parameters.put("cptradercode", integratedEntrust.getLiaisonTel());//对手方交易员代码
+        parameters.put("cpmemberid", integratedEntrust.getPropDealerId());//对手方交易商代码
+        parameters.put("cptradercode", integratedEntrust.getPropTradeId());//对手方交易员代码
         parameters.put("cpinvestorid", integratedEntrust.getPropInvestorId());//对手方交易主体代码
         parameters.put("confirmid", integratedEntrust.getContractId());//约定号
         parameters.put("memo", integratedEntrust.getRemark());//备注

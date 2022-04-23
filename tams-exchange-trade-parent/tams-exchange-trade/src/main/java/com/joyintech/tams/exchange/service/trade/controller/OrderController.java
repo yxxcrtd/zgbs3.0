@@ -29,6 +29,9 @@ import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3
 @RequestMapping("/trade/joyin")
 @Api(tags = "场内交易-委托操作接口")
 public class OrderController {
+    /**
+     * 日志对象
+     */
     private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
 
     @Autowired
@@ -66,10 +69,10 @@ public class OrderController {
             return MasterUtil.postForObject(order);
         }
 
-        ResultBean checkResult = commonCheckKit.check(order);
+        /*ResultBean checkResult = commonCheckKit.check(order);
         if (ErrorCode.isFail(checkResult.getErrorCode())) {
             return new Message<>(checkResult);
-        }
+        }*/
 
         Instruction instruction = instructionService.findById(order.getInstructionId());
 
@@ -105,10 +108,10 @@ public class OrderController {
             return MasterUtil.postForObject(order);
         }
 
-        ResultBean checkResult = commonCheckKit.check(order);
+        /*ResultBean checkResult = commonCheckKit.check(order);
         if (ErrorCode.isFail(checkResult.getErrorCode())) {
             return new Message<>(checkResult);
-        }
+        }*/
 
         Instruction instruction = instructionService.findById(order.getInstructionId());
 
