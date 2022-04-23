@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dao.TradeInfoProMapper">
+    <insert id="insertDealer" parameterType="com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dto.TradeInfoProSaveRequest">
+        insert into MST_DEALER_INFO (CUSTOMER_ID, DEALER_NO, TRADE_MARKET,
+            CREATE_USER, CREATE_DEPT, CREATE_TIME,
+            UPDATE_USER, UPDATE_TIME)
+        values (#{customerId,jdbcType=VARCHAR}, #{dealerNo,jdbcType=VARCHAR}, #{tradeMarket,jdbcType=VARCHAR},
+            #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+            #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertDealerDetails" parameterType="com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dto.TradeInfoProSaveRequest">
+        insert into MST_DEALER_DETAIL_INFO (SEQ_NO, CUSTOMER_ID, DEALER_NO,
+            DEALER_PARTY_NO, DEALER_PARTY_TYPE, DEALER_PARTY_NAME,
+            TRADER_NO, TRADER_NAME, IS_OUR,
+            CREATE_USER, CREATE_DEPT, CREATE_TIME,
+            UPDATE_USER, UPDATE_TIME)
+        values (#{seqNo,jdbcType=VARCHAR}, #{customerId,jdbcType=VARCHAR}, #{dealerNo,jdbcType=VARCHAR},
+            #{dealerPartyNo,jdbcType=VARCHAR}, #{dealerPartyType,jdbcType=VARCHAR}, #{dealerPartyName,jdbcType=VARCHAR},
+            #{traderNo,jdbcType=VARCHAR}, #{traderName,jdbcType=VARCHAR}, #{isOur,jdbcType=VARCHAR},
+            #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+            #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
+    </insert>
 
 
     <select id="getCustomerName" resultType="com.joyintech.framework.select.SelectOptionDto">
