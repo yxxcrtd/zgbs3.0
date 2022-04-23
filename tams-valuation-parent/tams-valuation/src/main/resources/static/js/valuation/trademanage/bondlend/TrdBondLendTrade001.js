@@ -5,7 +5,7 @@
     var getPageParams = function() {
         return {
             tradeId: $('#tradeId').val(),
-            finprodId: $.trim($('#finprodId').val()),
+            finprodId: $.trim($('#prodId').val()),
             tradeDateBegin: $("#tradeDate").startDate(),
             tradeDateEnd: $("#tradeDate").endDate(),
             ps: $.trim($('#ps').val())
@@ -62,9 +62,22 @@
             {field:'ccyFmt', title: '币种',sortField:"ccy",width:180},
             {field:'ccy', title: '币种',visible:false},
             {field:'acctNo', title: '资金账户',width:180},
+            {field:'dealFlag', title: '首期交易标识',visible:false},
             {field:'operation', title: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操 作', fixed:'right',width : 120,
-                align : 'center',type : 'action', buttons : [ 'edit', 'delt' ,
-                    {text: '<i class="iconfont icon-submit"></i>', clas: 'check', title: '到期'}]}
+                align : 'center',type : 'action',
+                render : function(data, type, row, meta){
+                    var buttons = "";
+                    if(row.ps == '03' || (row.dealFlag == '01' && (row.ps == '01' || row.ps == '02'))){
+                        buttons += '<i class="btn layui-icon edit" title="编辑">&#xe642;</i>';
+                        buttons += '<i class="btn layui-icon delt" title="删除" >&#xe640;</i>';
+                    }else{
+                        buttons += '<i class="btn layui-icon edit" title="编辑">&#xe642;</i>';
+                        buttons += '<i class="btn layui-icon delt" title="删除">&#xe640;</i>';
+                        buttons += '<i class="iconfont icon-submit check" title="到期"></i>';
+                    }
+                    return buttons;
+                }
+            }
         ],
         //loadonce:true
     });
