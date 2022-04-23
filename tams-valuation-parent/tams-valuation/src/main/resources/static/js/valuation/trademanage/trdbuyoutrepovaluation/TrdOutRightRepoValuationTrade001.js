@@ -45,7 +45,7 @@
             if(ps=="03" || ps=="04"){
                 Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
                     basePath + "valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade002/init",
-                    "98%", "98%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
+                    "95%", "90%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
                         portfolioId:data.portfolioId,
                         entrustId:data.entrustId,
                         finprodId:data.finprodId,
@@ -53,7 +53,7 @@
             }else { //展示到期确认页面
                 Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
                     basePath + "valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade003/init",
-                    "98%", "98%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
+                    "95%", "90%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
                         portfolioId:data.portfolioId,
                         entrustId:data.entrustId,
                         finprodId:data.finprodId,
@@ -86,24 +86,25 @@
             ,{field:'ccyFmt', width:150, title: '币种',sortField:'ccy'}
             ,{field:'ccy', title: '币种',visible:false}
             ,{field:'trdAcctId', title: '资金账户',width:100}
-            ,{field:'operation', title: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操 作', fixed:'right',width:'120',
-                align : 'left',type : 'action', buttons : [ 'edit', 'delt' ,'confirm'],
-                    // {text: '<i id="daoqi" class="iconfont icon-submit"></i>', clas: 'confirm', title: '到期'}],
-            render: function (data, type, row, meta) {
-                if (row.ps == 'T07')
-                    return null;
-                else
-                    return '<i class="btn layui-icon edit" title="编辑">&#xe642;</i><i class="btn layui-icon delt" title="删除">&#xe640;</i><i class="btn layui-icon confirm" title="确认">&#x1005;</i>';
-            }
-
+            ,{field:'dealFlag', title: '首期交易标识',visible:false}
+            ,{field:'operation', title: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操 作', fixed:'right',width : 120,
+                align : 'center',type : 'action',
+                render : function(data, type, row, meta){
+                    var buttons = "";
+                    if(row.ps == 'T07' || (row.dealFlag == '01' && (row.ps == '03' || row.ps == '04'))){
+                        buttons += '<i class="btn layui-icon edit" title="编辑">&#xe642;</i>';
+                        buttons += '<i class="btn layui-icon delt" title="删除" >&#xe640;</i>';
+                    }else{
+                        buttons += '<i class="btn layui-icon edit" title="编辑">&#xe642;</i>';
+                        buttons += '<i class="btn layui-icon delt" title="删除">&#xe640;</i>';
+                        buttons += '<i class="iconfont icon-submit check" title="到期"></i>';
+                    }
+                    return buttons;
+                }
             }
         ],
         //loadonce:true
     });
-
-
-
-
 
 
     /**
@@ -184,7 +185,7 @@
 
                 Joyin.dialog(JoyinUtil.getLabel("买断式回购交易-修改"),
                     basePath + "valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade002/init",//打开新界面
-                    "98%", "98%", {
+                    "95%", "90%", {
                         pageModel: PAGE_MODEL_EDIT,//请求的page_model
                         tradeId: data.tradeId  //金融产品代码
                     }, function () {
@@ -217,12 +218,12 @@
         /**
          * 绑定确认事件
          */
-        table.bind('click', '.confirm', function(data, index) {
+        table.bind('click', '.check', function(data, index) {
             var object = {selectedItem: [data], operateType:"confirm"};//请求参数
             // Joyin.ajaxJson(basePath + 'valuation/trademanage/trdlendvaluationtrade/TrdLendValuationTrade002/check', object, function(result) {//请求路径，请求参数回调函数
             Joyin.dialog(JoyinUtil.getLabel("到期确认"),
                 basePath + "valuation/trademanage/trdbuyoutrepovaluation/TrdOutRightRepoValuationTrade003/init",//打开新界面
-                "98%", "98%", {//请求的page_model
+                "95%", "90%", {//请求的page_model
                     tradeId:data.tradeId,  //金融产品代码
                     operateType:"confirm"
                 },function(){

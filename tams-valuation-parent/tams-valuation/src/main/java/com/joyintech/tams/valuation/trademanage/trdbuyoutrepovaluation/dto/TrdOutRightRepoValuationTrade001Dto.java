@@ -182,6 +182,11 @@ public class TrdOutRightRepoValuationTrade001Dto extends BaseEntity implements P
      */
     private String elementId;
 
+    /**
+     * 到期标识 （用于识别是否做过到期交易）
+     */
+    private String dealFlag;
+
     @PrimaryKey(PrimaryKey.Field.PK_1)
     public String getTradeId() {
         return tradeId;
@@ -494,6 +499,14 @@ public class TrdOutRightRepoValuationTrade001Dto extends BaseEntity implements P
 
     public void setCounterId(String counterId) {
         this.counterId = counterId;
+    }
+
+    public String getDealFlag() {
+        return dealFlag;
+    }
+
+    public void setDealFlag(String dealFlag) {
+        this.dealFlag = dealFlag;
     }
 
 }

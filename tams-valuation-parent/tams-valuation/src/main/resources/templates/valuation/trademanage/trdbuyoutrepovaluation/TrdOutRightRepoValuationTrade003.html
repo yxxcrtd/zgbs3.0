@@ -8,6 +8,7 @@
 <div layout:fragment="content">
     <div class="pro-module-container">
             <form id="submitForm" class="layui-form joyin-form-wrap pro-module-form">
+                <input type="hidden" id="outTradeId" name="outTradeId" th:value="${entity?.outTradeId}">
                 <div class="pro-module-wrap">
                     <div class="pro-module">
                         <h3 class="pro-module-title"><span class="title-des">基本信息</span>（<span class="star-sign">*</span>必填）<i class="iconfont icon-arrow-down pro-down-icon"></i></h3>
