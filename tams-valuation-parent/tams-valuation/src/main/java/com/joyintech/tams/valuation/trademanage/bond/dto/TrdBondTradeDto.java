@@ -883,4 +883,40 @@ public class TrdBondTradeDto extends BaseEntity implements ProcessEntity {
         return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.生成方式, dataSource))?
                 SysDataUtil.getNameFromDataDict(DictCode.生成方式, dataSource):dataSource;
     }
+
+    public String getBrokerageStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getBrokerage()==null?"0.00":decimalFormat.format(this.getBrokerage().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getStlAmtStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getStlAmt()==null?"0.00":decimalFormat.format(this.getStlAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getCommissionStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getCommission()==null?"0.00":decimalFormat.format(this.getCommission().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getStlFeeAmtStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getStlFeeAmt()==null?"0.00":decimalFormat.format(this.getStlFeeAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getCommissionPayStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getCommissionPay()==null?"0.00":decimalFormat.format(this.getCommissionPay().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getEntrustAmtStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getEntrustAmt()==null?"0.00":decimalFormat.format(this.getEntrustAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    public String getConfirmAmtStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getConfirmAmt()==null?"0.00":decimalFormat.format(this.getConfirmAmt().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
 }
