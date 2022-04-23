@@ -85,13 +85,6 @@ public class TrdFixIncomeValuDuration001Service extends CommonExportService<TrdF
     private ValTrdProductDealAddBatchMapper valTrdProductDealAddBatchMapper;
 
     /**
-     * 金融产品实物交易表BatchMapper
-     */
-    @Autowired
-    private ValTrdFinProductBarterBatchMapper valTrdFinProductBarterBatchMapper;
-
-
-    /**
      * 交易类金融产品BatchMapper
      */
     @Autowired
@@ -121,35 +114,6 @@ public class TrdFixIncomeValuDuration001Service extends CommonExportService<TrdF
     private InterfCommonService interfCommonService;
 
     /**
-     * 产品代码下拉框
-     * @auther: Administrator
-     * @date: 2021/12/29 16:47
-     * @param:
-     * @return:
-     */
-    public Page<SelectOptionDto> findPortfolioId(int page, int length,Map<String, Object> params) {
-        return this.queryForPageForSelectReturn(page, length, ()->trdFixIncomeValuDuration001Mapper.findPortfolioId(params));
-    }
-
-    //资产代码下拉框
-    public Page<SelectOptionDto> findFinprodId(int page, int length,Map<String, Object> params){
-        return this.queryForPageForSelectReturn(page, length, ()->trdFixIncomeValuDuration001Mapper.findFinprodId(params));
-    }
-
-
-    /**
-     *
-     * 工作流完结之后的操作
-     * <功能详细描述>
-     * @param entity 实体
-     * @see
-     * @since 1.0
-     */
-    public void doComplete(TrdFixIncomeValuDuration001Dto entity) {
-
-    }
-
-    /**
      *
      * 获取分页查询结果（sharesId  dealDateString）
      * <功能详细描述>
@@ -161,20 +125,20 @@ public class TrdFixIncomeValuDuration001Service extends CommonExportService<TrdF
      */
     public Page<TrdFixIncomeValuDuration001Dto> selectForPage(int page, int length, Map<String, Object> pageParam) throws Exception {
         //产品代码
-        String portfolioId = (String)pageParam.get("portfolioId");
-        String[] portfolioIdArr = null;
-        if(StringUtil.isNotEmpty(portfolioId)){
-            portfolioIdArr = portfolioId.split(",");
+        String finprodId = (String)pageParam.get("finprodId");
+        String[] finprodIdArr = null;
+        if(StringUtil.isNotEmpty(finprodId)){
+            finprodIdArr = finprodId.split(",");
         }
-        pageParam.put("portfolioIdArr", portfolioIdArr);
+        pageParam.put("finprodIdArr", finprodIdArr);
 
         //资产代码
-        String finprodMarketId = (String)pageParam.get("finprodMarketId");
-        String[] finprodMarketIdArr = null;
-        if(StringUtil.isNotEmpty(finprodMarketId)){
-            finprodMarketIdArr = finprodMarketId.split(",");
+        String asset = (String)pageParam.get("asset");
+        String[] assetIdArr = null;
+        if(StringUtil.isNotEmpty(asset)){
+            assetIdArr = asset.split(",");
         }
-        pageParam.put("finprodMarketIdArr", finprodMarketIdArr);
+        pageParam.put("assetIdArr", assetIdArr);
 
         // 获取交易方向
         String ps = (String)pageParam.get("ps");
@@ -182,12 +146,22 @@ public class TrdFixIncomeValuDuration001Service extends CommonExportService<TrdF
         String[] psArr = null;
         if (StringUtil.isNotEmpty(ps)) {
             psArr = ps.split(",");
+            pageParam.put("psArr", psArr);
+        }else{
+            String[] psArr1 = {DictCodeList.交易方向_收息到账.getValue()
+                    ,DictCodeList.交易方向_还本到账.getValue()};
+            pageParam.put("psArr", psArr1);
         }
-        pageParam.put("psArr", psArr);
 
-        //传递默认值
-        pageParam.put("PS_T22", DictCodeList.交易方向_收息到账.getValue());
-        pageParam.put("PS_T23",DictCodeList.交易方向_还本到账.getValue());
+        // 获取数据来源
+        String dataSource = (String)pageParam.get("dataSource");
+        // 数据来源多选，转为数组
+        String[] dataSourceArr = null;
+        if (StringUtil.isNotEmpty(dataSource)) {
+            dataSourceArr = dataSource.split(",");
+        }
+        pageParam.put("dataSourceArr", dataSourceArr);
+
         pageParam.put("busiType",DictCodeList.业务类型_计划类资产交易_类债券资产交易.getValue());
         pageParam.put("finprodType", DictCodeListExt1.金融产品类型_计划类资产.getValue());
 
@@ -195,88 +169,6 @@ public class TrdFixIncomeValuDuration001Service extends CommonExportService<TrdF
                 () -> trdFixIncomeValuDuration001Mapper.selectDeal(pageParam));
 
     }
-
-
-    /**
-     *
-     * 获取不分页查询结果（sharesId  dealDateString）
-     * <功能详细描述>
-     */
-    public List<TrdFixIncomeValuDuration001Dto> queryPageList(Map<String, Object> params)  {
-
-        //产品代码
-        String portfolioId = (String)params.get("portfolioId");
-        String[] portfolioIdArr = null;
-        if(StringUtil.isNotEmpty(portfolioId)){
-            portfolioIdArr = portfolioId.split(",");
-        }
-        params.put("portfolioIdArr", portfolioIdArr);
-
-
-        //资产代码多选
-        String finprodMarketId=(String)params.get("finprodMarketId");
-        String[] finprodMarketIdArr=null;
-        if(StringUtil.isNotEmpty(finprodMarketId)){
-            finprodMarketIdArr = finprodMarketId.split(",");
-        }
-        params.put("finprodMarketIdArr", finprodMarketIdArr);
-
-        // 获取交易方向
-        String ps = (String)params.get("ps");
-        // 交易方向多选，转为数组
-        String[] psArr = null;
-        if (StringUtil.isNotEmpty(ps)) {
-            psArr = ps.split(",");
-        }
-        params.put("psArr", psArr);
-
-        //传递默认值
-        params.put("PS_T22", DictCodeList.交易方向_收息到账.getValue());
-        params.put("PS_T23",DictCodeList.交易方向_还本到账.getValue());
-        params.put("busiType",DictCodeList.业务类型_计划类资产交易_类债券资产交易.getValue());
-        params.put("finprodType", DictCodeListExt1.金融产品类型_计划类资产.getValue());
-
-        return trdFixIncomeValuDuration001Mapper.selectDeal(params);
-    }
-
-
-
-    /**
-     * 策略代码生成
-     *
-     * @return
-     * @see
-     * @since 1.0
-     */
-    public String createPlanTradeId() {
-        String tradeId = null;
-        while (true) {
-            // 获取自增数
-            String nextId = this.getNextId("FIXINTRADEID_SEQUENCE");
-            //平台日
-            String dateStr= DateUtil.format(iPlatformDate.getSysDate(),DateUtil.DEFAULT_OTHER_FORMAT);//yyyyMMdd
-            // 拼接
-            tradeId = "JY"+"FICCBONUS"+dateStr+ nextId;
-            // 查询是否重复
-            int num = trdFixIncomeValuDuration001Mapper.selectCountByTradeId(tradeId);
-            // 如果自增的策略代码不存在，则跳出循环
-            if (num==0) {
-                break;
-            }
-        }
-        return tradeId;
-    }
-
-    /**
-     * 获取自增序列值
-     *
-     * @param sequenceName 序列名
-     * @return
-     */
-    public String getNextId(String sequenceName) {
-        return trdFixIncomeValuDuration001Mapper.getNextId(sequenceName);
-    }
-
 
     //根据交易编号查询
     public TrdFixIncomeValuDuration001Dto queryTradeInfoByTradeId(Map<String, Object> params) {
@@ -287,7 +179,7 @@ public class TrdFixIncomeValuDuration001Service extends CommonExportService<TrdF
     public int delete(TrdFixIncomeValuDuration001Dto dto) {
         int count=0;
         Map<String, Object> params = new HashMap<>();
-        params.put("booksetId",dto.getPortfolioId());   //产品代码
+        params.put("booksetId",dto.getProdId());   //产品代码
         params.put("tradeId",dto.getTradeId());
 
         List<TrdProductDeal> listDeal = new ArrayList<>();
@@ -541,7 +433,7 @@ public class TrdFixIncomeValuDuration001Service extends CommonExportService<TrdF
 
     public int update(TrdFixIncomeValuDurationResult dto){
         TrdFixIncomeValuDuration001Dto dto1 = new TrdFixIncomeValuDuration001Dto();
-        dto1.setPortfolioId(dto.getTrdFixIncomeValuDuration001Dto().getPortfolioId());
+        dto1.setProdId(dto.getTrdFixIncomeValuDuration001Dto().getProdId());
         dto1.setTradeId(dto.getTrdFixIncomeValuDuration001Dto().getTradeId());
         delete(dto1);
         return insert(dto);

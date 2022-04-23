@@ -20,6 +20,7 @@ import com.joyintech.framework.util.*;
 import com.joyintech.system.constant.SystemGlobalConstant;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.trdfixincomevaluduration.dto.TrdFixIncomeValuDuration001Dto;
@@ -64,11 +65,40 @@ public class TrdFixIncomeValuDuration001Controller extends BaseController {
 
     @Override
     public String init(Model model) {
-        this.setSelectOptionToModel(model,DictCode.交易方向,DictCode.交易场所,
-                DictCode.交易流程状态);
+        this.setSelectOptionToModel(model,DictCode.交易方向,DictCode.生成方式);
         return super.init(model);
     }
 
+    /**
+     * 产品代码下拉框
+     *
+     * @return 产品代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getFinprodId")
+    public List<SelectOptionDto> getFinprodId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("finprodType", DictCodeListExt1.金融产品类型_理财产品.getValue());
+        return commonBusinessService.getProdName(param);
+    }
+
+    /**
+     * 资产代码下拉框
+     *
+     * @return 资产代码
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getAssetId")
+    public List<SelectOptionDto> getAssetId() {
+        Map<String, Object> param = RequestUtil.getPageParam();
+        param.put("assetType",DictCodeListExt1.金融产品类型_计划类资产.getValue());
+        param.put("profitType",DictCodeList.收益类型_收益型.getValue());
+        return commonBusinessService.getAssetId(param);
+    }
 
     @RequestMapping("findPage")
     @ResponseBody
@@ -78,10 +108,6 @@ public class TrdFixIncomeValuDuration001Controller extends BaseController {
                 RequestUtil.getParameters(getRequest()));
         return page;
     }
-
-
-
-
 
     /**
      * 删除前判断
@@ -147,8 +173,8 @@ public class TrdFixIncomeValuDuration001Controller extends BaseController {
         params.setElementId(dto.getElementId());
 
         // 设置流程业务说明, entity即传入的dto
-        params.setComment(entity -> WorkFlowUtil.concatComment("固收类存续期删除：", entity.getTradeId(),
-                DateUtil.format(entity.getTradeDate(),DateUtil.DEFAULT_DATETIME_FORMAT)
+        params.setComment(entity -> WorkFlowUtil.concatComment("固收类资产存续期删除：交易编号", entity.getTradeId(),
+                "交易日期",DateUtil.format(entity.getTradeDate())
         ));
 
         // 塞入流程参数
@@ -166,64 +192,17 @@ public class TrdFixIncomeValuDuration001Controller extends BaseController {
 
         return new AjaxResult(msg);
     }
-//
-//
+
     /**
-     * 导出数据
+     * 导出
+     * @return
+     * @throws Exception
+     * @see
+     * @since 1.0
      */
     @RequestMapping(ACTION_EXPORT)
-    public ResponseEntity<byte[]> export()
-            throws ParseException, IOException {
-
-        String datas = this.getParam("datas");
-        Map<String, Object> params = RequestUtil.getPageParam();
-        List<TrdFixIncomeValuDuration001Dto> listdto;
-        if (datas != null) {
-            listdto = JsonUtils.json2List(datas, TrdFixIncomeValuDuration001Dto.class);
-        } else {
-            listdto = trdFixIncomeValuDuration001Service.queryPageList(params);
-        }
-        File outFile = trdFixIncomeValuDuration001Service.makeFile(
-                "/com/joyintech/tams/valuation/trademanage/trdfixincomevaluduration/conf/export_conf.xml",
-                listdto);
-        return ExportUtil.export(
-                this.getMessage(this.getPageId()) + SystemGlobalConstant.OPEN_PARENTHESIS
-                        + DateUtil.format(new Date())
-                        + SystemGlobalConstant.CLOSE_PARENTHESIS
-                        + SystemGlobalConstant.POINT
-                        + FileNameUtil.getFileExtName(outFile),
-                outFile, true);
-    }
-
-
-    /**
-     * 产品代码下拉框
-     *
-     * @return 产品代码
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("/getFinprodId")
-    public List<SelectOptionDto> getFinprodId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("finprodType","F16");
-        return commonBusinessService.getProdName(param);
-    }
-
-    /**
-     * 资产代码下拉框
-     *
-     * @return 资产代码
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("/getAssetId")
-    public List<SelectOptionDto> getAssetId() {
-        Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("assetType","F17");
-        param.put("profitType","02");
-        return commonBusinessService.getAssetId(param);
+    public ResponseEntity<byte[]> export(){
+        Map<String, Object> param = RequestUtil.getParameters(getRequest());
+        return trdFixIncomeValuDuration001Service.export(this.getPageId(),param);
     }
 }

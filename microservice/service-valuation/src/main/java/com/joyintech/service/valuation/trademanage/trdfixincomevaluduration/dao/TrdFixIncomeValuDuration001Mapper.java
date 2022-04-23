@@ -27,34 +27,6 @@ import java.util.Map;
  */
 @Repository(value="serviceTrdFixIncomeValuDuration001Mapper")
 public interface TrdFixIncomeValuDuration001Mapper {
-
-	/**
-	 * 产品代码下拉框
-	 */
-	List<SelectOptionDto> findPortfolioId(Map<String, Object> params);
-
-
-	/**
-	 * 资产代码下拉框
-	 */
-	List<SelectOptionDto> findFinprodId(Map<String, Object> params);
-
-
-
-
-
-    Integer  selectCountByTradeId(@Param("tradeId") String tradeId);
-//
-
-    /**
-     * 获取自增序列值
-     * @param sequenceName 序列名
-     * @return
-     */
-    String getNextId(@Param("sequenceName") String sequenceName);
-
-
-
 	/**
 	 * 检索交易列表
 	 */
@@ -64,7 +36,6 @@ public interface TrdFixIncomeValuDuration001Mapper {
 	 * 根据交易编号查询数据
 	 */
 	TrdFixIncomeValuDuration001Dto queryTradeInfoByTradeId(Map<String, Object> paraMap);
-
 
 	/**
 	 *
