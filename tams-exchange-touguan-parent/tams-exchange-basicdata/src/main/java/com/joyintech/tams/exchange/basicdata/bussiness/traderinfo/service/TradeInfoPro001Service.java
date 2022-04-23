@@ -29,20 +29,42 @@ public class TradeInfoPro001Service extends BaseService implements BaseProcessSe
         return tradeInfoProMapper.getCustomerName(map);
     }
 
-    /**
-     * 工作流（留痕操作结束的时候执行的方法）
-     */
-    @Override
-    public void doComplete(TradeInfoProSaveRequest entity, OperationType type){
-        if (OperationType.DELETE.equals(type)) {
-            tradeInfoProMapper.deleteSelectedItem(entity);
-        }
-    }
+
 
     public TradeInfoProResponse getDealerTraderInfo(TradeInfoProRequest dto) {
         return tradeInfoProMapper.getDealerTraderInfo(dto);
     }
-//    public int deleteSelectedItem(TradeInfoProSaveRequest dto) {
-//        return tradeInfoProMapper.deleteSelectedItem(dto);
-//    }
+
+    public String findCustomerIdByDealerName(String dealerName) {
+        return tradeInfoProMapper.findCustomerIdByDealerName(dealerName);
+    }
+
+    public int deleteDealer(TradeInfoProSaveRequest dto) {
+        return tradeInfoProMapper.deleteDealer(dto);
+    }
+
+    public int hasDealerDetails(String customerId) {
+        return tradeInfoProMapper.hasDealerDetails(customerId);
+    }
+
+    public int deleteDealerDetails(String customerId) {
+        return tradeInfoProMapper.deleteDealerDetails(customerId);
+    }
+
+    @Override
+    public void doComplete(TradeInfoProSaveRequest tradeInfoProSaveRequest, OperationType operationType) {
+
+    }
+
+    public int deleteTrader(TradeInfoProSaveRequest dto) {
+        return tradeInfoProMapper.deleteTrader(dto);
+    }
+
+    public int insertDealer(TradeInfoProSaveRequest dto) {
+        return tradeInfoProMapper.insertDealer(dto);
+    }
+
+    public int insertDealerDetails(TradeInfoProSaveRequest dto) {
+        return tradeInfoProMapper.insertDealerDetails(dto);
+    }
 }

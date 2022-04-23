@@ -22,4 +22,18 @@ public interface TradeInfoProMapper {
     int deleteSelectedItem(TradeInfoProSaveRequest dto);
 
     TradeInfoProResponse getDealerTraderInfo(TradeInfoProRequest dto);
+
+    String findCustomerIdByDealerName(String dealerName);
+
+    int deleteDealer(TradeInfoProSaveRequest dto);
+
+    int hasDealerDetails(String customerId);
+
+    int deleteDealerDetails(String customerId);
+
+    int deleteTrader(TradeInfoProSaveRequest dto);
+
+    int insertDealer(TradeInfoProSaveRequest dto);
+
+    int insertDealerDetails(TradeInfoProSaveRequest dto);
 }

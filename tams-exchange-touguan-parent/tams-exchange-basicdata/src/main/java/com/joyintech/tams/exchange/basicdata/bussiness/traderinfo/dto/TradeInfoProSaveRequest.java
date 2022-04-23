@@ -13,10 +13,8 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.util.List;
 
-@PageId("TradeInfoPro001")
-@ValidLogic(targetClass = TradeInfoPro001Validator.class , groups = {ValidateGroupEdit.class,
-        ValidateGroupDelete.class})
-@ApiModel(value="交易员信息维护表单",description="交易员信息维护表单")
+
+
 public class TradeInfoProSaveRequest extends BaseEntity implements ProcessEntity{
 
     @ApiModelProperty(name="operateType",value="操作类型",example="submit/save", required = true)
@@ -25,14 +23,25 @@ public class TradeInfoProSaveRequest extends BaseEntity implements ProcessEntity
     private String elementId;
     @ApiModelProperty(name="pageId",value="d",example="TradeInfoPro001")
     private String pageId;
+
+    @ApiModelProperty(name="seqNo",value="流水号",example="A1", required = true)
+    private String seqNo;
+    @ApiModelProperty(name="customerId",value="客户代码",example="A1", required = true)
+    private String customerId;
     @ApiModelProperty(name="dealer",value="交易商",example="A1", required = true)
     private String dealer;
+    @ApiModelProperty(name="dealerName",value="交易商名称",example="A1", required = true)
+    private String dealerName;
 
     @ApiModelProperty(name="tradeMarket",value="交易场所",example="A1", required = true)
     private String tradeMarket;
 
     @ApiModelProperty(name="dealerNo",value="交易商代码",example="A1", required = true)
     private String dealerNo;
+
+
+    @ApiModelProperty(name="dealerPartyNo",value="交易主体代码",example="A1", required = true)
+    private String dealerPartyNo;
 
     @ApiModelProperty(name="dealerPartyType",value="交易主体类型",example="A1", required = true)
     private String dealerPartyType;
@@ -146,5 +155,37 @@ public class TradeInfoProSaveRequest extends BaseEntity implements ProcessEntity
 
     public void setSelectedItem(List<TradeInfoProSaveRequest> selectedItem) {
         this.selectedItem = selectedItem;
+    }
+
+    public String getDealerName() {
+        return dealerName;
+    }
+
+    public void setDealerName(String dealerName) {
+        this.dealerName = dealerName;
+    }
+
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
+    }
+
+    public String getDealerPartyNo() {
+        return dealerPartyNo;
+    }
+
+    public void setDealerPartyNo(String dealerPartyNo) {
+        this.dealerPartyNo = dealerPartyNo;
+    }
+
+    public String getSeqNo() {
+        return seqNo;
+    }
+
+    public void setSeqNo(String seqNo) {
+        this.seqNo = seqNo;
     }
 }
