@@ -24,8 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.InvocationTargetException;
-
 import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_质押券出入库;
 
 @RestController("OrderController_dtx")
@@ -69,14 +67,14 @@ public class OrderController {
      */
     @ApiOperation(value = "普通下单（竞价下单）", notes = "普通下单（竞价下单）")
     @PostMapping(value = "/order")
-    public Message<OrderPlaceBean> sendOrder(@RequestBody OrderPlaceBean order) throws InvocationTargetException, IllegalAccessException {
+    public Message<OrderPlaceBean> sendOrder(@RequestBody OrderPlaceBean order) {
         if (isSlave()) {
             return MasterUtil.postForObject(order);
         }
 
-        /*ResultBean commonCheckResult = commonCheckKit.check(order);
-        if (ErrorCode.isFail(commonCheckResult.getErrorCode())) {
-            return new Message<>(commonCheckResult);
+        /*ResultBean checkResult = commonCheckKit.check(order);
+        if (ErrorCode.isFail(checkResult.getErrorCode())) {
+            return new Message<>(checkResult);
         }*/
         ResultBean businessCheckResult = businessCheckKit.check(order);
         if (ErrorCode.isFail(businessCheckResult.getErrorCode())) {
@@ -112,18 +110,18 @@ public class OrderController {
      */
     @ApiOperation(value = "综合业务下单", notes = "综合业务下单")
     @PostMapping(value = "/order/integratedEntrust")
-    public Message<IntegratedEntrust> sendIntegratedEntrust(@RequestBody @Validated IntegratedOrderPlaceBean order) throws InvocationTargetException, IllegalAccessException {
+    public Message<IntegratedEntrust> sendIntegratedEntrust(@RequestBody @Validated IntegratedOrderPlaceBean order) {
         if (isSlave()) {
             return MasterUtil.postForObject(order);
         }
 
-        ResultBean commonCheckResult = commonCheckKit.check(order);
+        /*ResultBean commonCheckResult = commonCheckKit.check(order);
         if (ErrorCode.isFail(commonCheckResult.getErrorCode())) {
             return new Message<>(commonCheckResult);
-        }
-        ResultBean bussinessCheckResult = businessCheckKit.check(order);
-        if (ErrorCode.isFail(bussinessCheckResult.getErrorCode())) {
-            return new Message<>(bussinessCheckResult);
+        }*/
+        ResultBean businessCheckResult = businessCheckKit.check(order);
+        if (ErrorCode.isFail(businessCheckResult.getErrorCode())) {
+            return new Message<>(businessCheckResult);
         }
 
         Instruction instruction = instructionService.findById(order.getInstructionId());
