@@ -10,15 +10,14 @@ import com.joyintech.tams.exchange.common.bean.MinPrice;
 import com.joyintech.tams.exchange.common.cache.MinPriceService;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
+import com.joyintech.tams.exchange.common.utils.TradePlatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -77,7 +76,7 @@ public class MinPriceServiceImpl implements MinPriceService {
     @Override
     public MinPrice getMinPrice(Instruction instruction, Instrument instrument) {
         String tradeMarket = instruction.getTradeMarket();
-        String tradePlat = instruction.getTradePlat();
+        String tradePlat = TradePlatUtils.trd2EtrTradePlat(instruction);
         String assetType = instrument.getAssetType();
         String assetType1 = instrument.getAssetType1();
         return getMinPrice(tradeMarket, tradePlat, assetType, assetType1);
@@ -85,11 +84,12 @@ public class MinPriceServiceImpl implements MinPriceService {
 
     /**
      * 获取最小价格变动单位
+     *
      * @param tradeMarket 交易市场
-     * @param tradePlat 交易平台
-     * @param assetType 资产类型
-     * @param assetType1    资产类型一
-     * @return  最小价格变动单位
+     * @param tradePlat   交易平台
+     * @param assetType   资产类型
+     * @param assetType1  资产类型一
+     * @return 最小价格变动单位
      */
     @Override
     public MinPrice getMinPrice(String tradeMarket, String tradePlat, String assetType, String assetType1) {

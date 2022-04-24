@@ -1319,6 +1319,15 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
     }
 
     /**
+     * 非新债-可转债
+     */
+    public boolean convertibleBond() {
+        return InvestmentAssetType.BOND.codeEquals(this.getAssetType())
+                && SecondAssetType.KZZ.codeEquals(this.getAssetType1())
+                && TradePlat.NEW_BOND.codeNotEquals(this.getTradePlat());
+    }
+
+    /**
      * 全价
      */
     public boolean fullPrice() {
@@ -1331,5 +1340,16 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
      */
     public boolean inconvertibleBondAndFullPrice() {
         return this.inconvertibleBond() && this.fullPrice();
+    }
+
+    public String complexAssertTypeWhenConvertibleBond() {
+        if (convertibleBond()) {
+            return StrUtil.builder()
+                    .append(this.getAssetType())
+                    .append(StrUtil.DASHED)
+                    .append(this.getAssetType1())
+                    .toString();
+        }
+        return this.getAssetType();
     }
 }

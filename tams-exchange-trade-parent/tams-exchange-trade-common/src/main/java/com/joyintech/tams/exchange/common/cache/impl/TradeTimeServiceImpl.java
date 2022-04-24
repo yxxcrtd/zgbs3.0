@@ -12,6 +12,8 @@ import com.joyintech.tams.exchange.common.bean.request.BaseOrderRequest;
 import com.joyintech.tams.exchange.common.cache.TradeTimeService;
 import com.joyintech.tams.exchange.common.constant.joyin.DeclarationType;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
+import com.joyintech.tams.exchange.common.utils.TradePlatUtils;
+import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -99,12 +101,12 @@ public class TradeTimeServiceImpl implements TradeTimeService {
      */
     @Override
     public List<OpenCloseTime> getTradePeriod(Instruction instruction, BaseOrderRequest order) {
-        log.debug("getTradePeriod() called with parameters => 【instruction = {}】, 【order = {}】", instruction, order);
+        log.info("getTradePeriod() called with parameters => 【instruction = {}】, 【order = {}】",instruction, order);
+        String assetType = instruction.complexAssertTypeWhenConvertibleBond();
+        String assetType1 = instruction.getAssetType1();
         String entrustProp = order.getEntrustProp();
         String tradeMarket = instruction.getTradeMarket();
-        String tradePlat = instruction.getTradePlat();
-        String assetType = instruction.getAssetType();
-        String assetType1 = instruction.getAssetType1();
+        String tradePlat = TradePlatUtils.trd2EtrTradePlat(instruction);
         List<String> queries = ListUtil.of(assetType, assetType1, entrustProp, tradeMarket, tradePlat);
 
         String res = openCloseTimeMap.keySet().stream()
@@ -112,7 +114,7 @@ public class TradeTimeServiceImpl implements TradeTimeService {
                 .min(Comparator.comparing(item -> StrUtil.count(item, StrUtil.AT)))
                 .orElse(DEFAULT);
         List<OpenCloseTime> openCloseTimes = openCloseTimeMap.get(res);
-        log.debug("getTradePeriod() end with result => 【openCloseTimes = {}】", openCloseTimes);
+        log.debug("getTradePeriod() end with result => 【key = {}, res = {}, openCloseTimes = {}】", queries, res, openCloseTimes);
         return openCloseTimes;
     }
 

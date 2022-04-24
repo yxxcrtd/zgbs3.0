@@ -1,10 +1,23 @@
 package com.joyintech.tams.exchange.common.utils;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.google.common.base.Strings;
 import com.joyintech.tams.exchange.common.constant.Market;
 import com.joyintech.tams.exchange.common.constant.TradePlat;
+import com.joyintech.tams.exchange.common.db.domain.Instruction;
 
 public class TradePlatUtils {
+
+	/**
+	 *  指令端交易平台-->交易端交易平台
+	 */
+	public static String etr2TrdTradePlat(Instruction instruction) {
+		if (ObjectUtil.isNull(instruction)) {
+			return null;
+		}
+
+		return etr2TrdTradePlat(instruction.getTradeMarket(), instruction.getTradePlat());
+	}
 
 	/**
      * 指令端交易平台--> 交易端交易平台
@@ -25,6 +38,18 @@ public class TradePlatUtils {
     	}
         return tradePlat;
     }
+
+
+	/**
+	 *  交易端交易平台-->指令端交易平台
+	 */
+	public static String trd2EtrTradePlat(Instruction instruction) {
+		if (ObjectUtil.isNull(instruction)) {
+			return null;
+		}
+
+		return trd2EtrTradePlat(instruction.getTradeMarket(), instruction.getTradePlat());
+	}
     
     /**
      *  交易端交易平台-->指令端交易平台

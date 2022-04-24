@@ -7,10 +7,10 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
-import com.joyintech.tams.exchange.common.bean.request.BaseOrderRequest;
 import com.joyintech.tams.exchange.common.cache.MinTrdUnitLimitService;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
+import com.joyintech.tams.exchange.common.utils.TradePlatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -73,7 +72,7 @@ public class MinTrdUnitLimitServiceImpl implements MinTrdUnitLimitService {
     @Override
     public MinTrdUnitLimit getMinTrdUnitLimit(Instruction instruction, Instrument instrument) {
         String tradeMarket = instruction.getTradeMarket();
-        String tradePlat = instruction.getTradePlat();
+        String tradePlat = TradePlatUtils.trd2EtrTradePlat(instruction);
         String assetType = instrument.getAssetType();
         String assetType1 = instrument.getAssetType1();
         String subStockType = instrument.getSubStockType();
@@ -83,16 +82,17 @@ public class MinTrdUnitLimitServiceImpl implements MinTrdUnitLimitService {
 
     /**
      * 获取有效价格申报范围
-     * @param tradeMarket   交易市场
-     * @param tradePlat     交易平台
-     * @param assetType     资产类型
-     * @param assetType1    资产类型一
-     * @param assetType2    资产类型二
-     * @param ps    交易方向
+     *
+     * @param tradeMarket 交易市场
+     * @param tradePlat   交易平台
+     * @param assetType   资产类型
+     * @param assetType1  资产类型一
+     * @param assetType2  资产类型二
+     * @param ps          交易方向
      * @return 有效价格申报范围
      */
     @Override
-    public MinTrdUnitLimit getMinTrdUnitLimit(String tradeMarket, String tradePlat, String  assetType, String assetType1, String assetType2, String ps) {
+    public MinTrdUnitLimit getMinTrdUnitLimit(String tradeMarket, String tradePlat, String assetType, String assetType1, String assetType2, String ps) {
 
         List<String> queries = ListUtil.of(tradeMarket, tradePlat, assetType, assetType1, assetType2, ps);
         log.debug("getMinTrdUnitLimit() called with parameters => 【key = {}】", queries);
