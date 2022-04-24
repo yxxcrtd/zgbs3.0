@@ -428,12 +428,20 @@ public class StlDataDealProcessConstant {
 	public static final String SJSJG_YWLB_PG90 = "PG90";
 	// 业务类别：初始交易
 	public static final String SJSJG_YWLB_XYCS = "XYCS";
+	// 业务类别：提前购回
+	public static final String SJSJG_YWLB_XYTG = "XYTG";
 	// 业务类别：购回交易
 	public static final String SJSJG_YWLB_XYDQ = "XYDQ";
 	// 业务类别：协议回购合约
 	public static final String SJSJG_YWLB_XYHY = "XYHY";
-	// 业务类别：到期续做
+	// 业务类别：到期续做(不更换对手方)
 	public static final String SJSJG_YWLB_XYXZ = "XYXZ";
+	// 业务类别：到期续做(变更对手方)
+	public static final String SJSJG_YWLB_XYXB = "XYXB";
+	// 业务类别：变更质押券
+	public static final String SJSJG_YWLB_XYBG = "XYBG";
+	// 业务类别：解除质押
+	public static final String SJSJG_YWLB_XYZJ = "XYZJ";
 	// 业务类别：报价回购初始交易
 	public static final String SJSJG_YWLB_BJCS = "BJCS";
 	// 业务类别：报价回购购回交易

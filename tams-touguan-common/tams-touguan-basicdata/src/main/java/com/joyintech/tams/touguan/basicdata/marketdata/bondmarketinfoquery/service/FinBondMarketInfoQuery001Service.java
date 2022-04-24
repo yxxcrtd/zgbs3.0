@@ -3,6 +3,7 @@ package com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.serv
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Lists;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.BeanUtil;
@@ -75,6 +76,7 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         logger.info("detailInfo >> 债券市场详情信息查询参数：secId：【{}】", secId);
         FinBondMarketInfoQueryRequest request = new FinBondMarketInfoQueryRequest();
         request.setSecId(secId);
+        request.setPlatformDate(iPlatformDate.getSysDateStr());
         //查询债券市场信息
         List<FinBondMarketInfoQuery001Dto> bondMarketInfoQuery004Dtos = finBondMarketInfoQueryMapper.queryForPage(request);
         if (CollectionUtils.isEmpty(bondMarketInfoQuery004Dtos)) {
@@ -102,8 +104,9 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
      * @return
      */
     public List<ValidMessage> addCoupons(String secId) {
-        List<ValidMessage> validMessages = new ArrayList<>();
+        logger.info("addCoupons >> 债券市场加券参数：secId：【{}】", secId);
         FinProduct finProduct = finProductMapper.selectByPrimaryKey(secId);
+        List<ValidMessage> validMessages = new ArrayList<>();
         if (finProduct != null) {
             validMessages.add(new ValidMessage("该债券信息在系统中已存在，无法加券！"));
             return validMessages;
@@ -113,12 +116,11 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         List<String> errorInfoList = new ArrayList<>();
         //调用债券自动加券方法
         InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = new InterfPayhsrcsecinfoDto();
-        List<String> secIdList = new ArrayList<>();
-        secIdList.add(secId);
-        interfPayhsrcsecinfoDto.setSecidList(secIdList);
-        interfPayhsrcsecinfoDto = commonAutoCouponService.autoBondCoupon(interfPayhsrcsecinfoDto);
-        if (null != interfPayhsrcsecinfoDto && null != interfPayhsrcsecinfoDto.getErrorBondList()) {
-            errorInfoList.addAll(interfPayhsrcsecinfoDto.getErrorBondList());
+        interfPayhsrcsecinfoDto.setSecidList(Lists.newArrayList(secId));
+        //加券
+        InterfPayhsrcsecinfoDto result = commonAutoCouponService.autoBondCoupon(interfPayhsrcsecinfoDto);
+        if (null != result && null != result.getErrorBondList()) {
+            errorInfoList.addAll(result.getErrorBondList());
         }
         /****************自动加券****end****************/
         if (CollectionUtils.isNotEmpty(errorInfoList)) {
