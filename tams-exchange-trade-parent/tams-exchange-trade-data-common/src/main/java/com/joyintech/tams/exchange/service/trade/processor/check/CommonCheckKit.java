@@ -17,10 +17,7 @@ import com.joyintech.tams.exchange.common.cache.TradeTimeService;
 import com.joyintech.tams.exchange.common.constant.EntrustBs;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
-import com.joyintech.tams.exchange.common.db.domain.Instruction;
-import com.joyintech.tams.exchange.common.db.domain.Instrument;
-import com.joyintech.tams.exchange.common.db.domain.Order;
-import com.joyintech.tams.exchange.common.db.domain.OrderInterface;
+import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.enums.SwitcheEnum;
 import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
@@ -28,6 +25,9 @@ import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
 import com.joyintech.tams.exchange.datacommon.db.service.InstrumentService;
 import com.joyintech.tams.exchange.service.trade.processor.account.AccountPositionHelper;
 import com.joyintech.tams.exchange.service.trade.processor.business.price.PriceHelper;
+import com.joyintech.tams.exchange.service.trade.server.agent.AccountManager;
+import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgent;
+import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgentManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +70,8 @@ public class CommonCheckKit extends BaseCheckKit {
     private QuoteService quoteService;
     private PriceHelper priceHelper;
     private AccountPositionHelper accountPositionHelper;
+    private AccountManager accountManager;
+    private TradeAgentManager tradeAgentManager;
 
     @Autowired
     public void setInstructionService(InstructionService instructionService) {
@@ -101,8 +103,19 @@ public class CommonCheckKit extends BaseCheckKit {
         this.accountPositionHelper = accountPositionHelper;
     }
 
+    @Autowired
+    public void setAccountManager(AccountManager accountManager) {
+        this.accountManager = accountManager;
+    }
+
+    @Autowired
+    public void setTradeAgentManager(TradeAgentManager tradeAgentManager) {
+        this.tradeAgentManager = tradeAgentManager;
+    }
+
     public ResultBean check(final BaseOrderRequest order) throws BusinessResultException {
 
+        checkAccountAndAgent(order);
         checkTime(order);
         checkPrice(order);
         checkPosition(order);
@@ -131,6 +144,23 @@ public class CommonCheckKit extends BaseCheckKit {
         return ResultBean.success();
     }
 
+    /**
+     * 检查账号及终端登录情况
+     */
+    private void checkAccountAndAgent(BaseOrderRequest order) throws BusinessResultException {
+        Instruction instruction = getInstruction(order);
+        String acctNo = instruction.getAcctNo();
+
+        Account account = accountManager.getAccountById(acctNo);
+        if (ObjectUtil.isNull(account)) {
+            throw new BusinessResultException(ErrorCode.ACCOUNT_NOT_LOGIN);
+        }
+
+        TradeAgent agent = tradeAgentManager.findAgentByAccountId(acctNo);
+        if (ObjectUtil.isNull(agent)) {
+            throw new BusinessResultException(ErrorCode.TERMINAL_NOT_ONLINE);
+        }
+    }
 
     /**
      * 检查是否在交易时间段内
