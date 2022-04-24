@@ -327,7 +327,9 @@ public class EtrExchangeTradeCommon004Controller extends BaseController {
         model.addAttribute("PS_JJ", JsonUtils.objectArray2Json(ps_jj.toArray()));
         // 大宗平台
         List<SelectOptionDto> ps_dz = selectDto.getOptions().stream().filter(option -> {
-            return StringUtil.equals(option.getId(), DictCodeList.交易方向_买入.getValue()) || StringUtil.equals(option.getId(), DictCodeList.交易方向_卖出.getValue()) || StringUtil.equals(option.getId(), DictCodeListExt3.交易方向_正回购.getValue()) || StringUtil.equals(option.getId(), DictCodeListExt3.交易方向_逆回购.getValue());
+            return StringUtil.equals(option.getId(), DictCodeList.交易方向_买入.getValue()) || StringUtil.equals(option.getId(), DictCodeList.交易方向_卖出.getValue())
+//                    || StringUtil.equals(option.getId(), DictCodeListExt3.交易方向_正回购.getValue()) || StringUtil.equals(option.getId(), DictCodeListExt3.交易方向_逆回购.getValue())
+                    ;
         }).collect(Collectors.toList());
         model.addAttribute("PS_DZ", JsonUtils.objectArray2Json(ps_dz.toArray()));
         // 固定收益
@@ -609,7 +611,9 @@ public class EtrExchangeTradeCommon004Controller extends BaseController {
         initPageParams.put("PS_JJ", JsonUtils.objectArray2Json(ps_jj.toArray()));
         // 大宗平台
         List<SelectOptionDto> ps_dz = selectDto.getOptions().stream().filter(option -> {
-            return StringUtil.equals(option.getId(), DictCodeList.交易方向_买入.getValue()) || StringUtil.equals(option.getId(), DictCodeList.交易方向_卖出.getValue()) || StringUtil.equals(option.getId(), DictCodeListExt3.交易方向_正回购.getValue()) || StringUtil.equals(option.getId(), DictCodeListExt3.交易方向_逆回购.getValue());
+            return StringUtil.equals(option.getId(), DictCodeList.交易方向_买入.getValue()) || StringUtil.equals(option.getId(), DictCodeList.交易方向_卖出.getValue())
+//                    || StringUtil.equals(option.getId(), DictCodeListExt3.交易方向_正回购.getValue()) || StringUtil.equals(option.getId(), DictCodeListExt3.交易方向_逆回购.getValue())
+                    ;
         }).collect(Collectors.toList());
         initPageParams.put("PS_DZ", JsonUtils.objectArray2Json(ps_dz.toArray()));
         // 固定收益
