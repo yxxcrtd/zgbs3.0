@@ -26,7 +26,7 @@ public class FinProductIssueDto {
     /**
      * 招标方式，单一价格招标/数量招标/荷兰式招标/混合式招标
      */
-    @ApiModelProperty(name = "tenderType", value = "招标方式",required = true)
+    @ApiModelProperty(name = "tenderType", value = "招标方式")
     private String tenderType;
 
     /**
@@ -45,13 +45,13 @@ public class FinProductIssueDto {
     /**
      * 发行类型,首发/增发
      */
-    @ApiModelProperty(name = "issueStyle", value = "发行类型",required = true)
+    @ApiModelProperty(name = "issueStyle", value = "发行类型")
     private String issueStyle;
 
     /**
      * 增发批次,首发时为0
      */
-    @ApiModelProperty(name = "addBatch", value = "增发批次",required = true)
+    @ApiModelProperty(name = "addBatch", value = "增发批次")
     private Long addBatch;
 
     /**
