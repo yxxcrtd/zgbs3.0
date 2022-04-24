@@ -62,7 +62,7 @@
     left join STL_SEC_ACCT_INFO SSAI on SCI.ACCT_NO = SSAI.TRD_ACCT_ID
     <where>
         <if test="tradePlace != null and tradePlace != ''">
-            mdi.TRADE_PLACE = #{tradePlace}
+            mdi.TRADE_MARKET = #{tradePlace}
         </if>
         <if test="acctNo != null and acctNo != ''">
         and  SSAI.TRD_ACCT_ID = #{acctNo}
