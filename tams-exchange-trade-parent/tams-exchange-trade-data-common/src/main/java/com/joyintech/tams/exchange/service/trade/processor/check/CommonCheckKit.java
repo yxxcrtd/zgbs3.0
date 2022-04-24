@@ -5,7 +5,6 @@ import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.validation.BeanValidationResult;
-import com.joyintech.exchange.service.quote.service.QuoteService;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.tams.exchange.common.BusinessResultException;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
@@ -21,8 +20,6 @@ import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.enums.SwitcheEnum;
 import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
-import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
-import com.joyintech.tams.exchange.datacommon.db.service.InstrumentService;
 import com.joyintech.tams.exchange.service.trade.processor.account.AccountPositionHelper;
 import com.joyintech.tams.exchange.service.trade.processor.business.price.PriceHelper;
 import com.joyintech.tams.exchange.service.trade.server.agent.AccountManager;
@@ -64,33 +61,15 @@ public class CommonCheckKit extends BaseCheckKit {
      * 日志对象
      */
     private static final Logger log = LoggerFactory.getLogger(CommonCheckKit.class);
-    private InstructionService instructionService;
-    private InstrumentService instrumentService;
     private TradeTimeService tradeTimeService;
-    private QuoteService quoteService;
     private PriceHelper priceHelper;
     private AccountPositionHelper accountPositionHelper;
     private AccountManager accountManager;
     private TradeAgentManager tradeAgentManager;
 
     @Autowired
-    public void setInstructionService(InstructionService instructionService) {
-        this.instructionService = instructionService;
-    }
-
-    @Autowired
-    public void setInstrumentService(InstrumentService instrumentService) {
-        this.instrumentService = instrumentService;
-    }
-
-    @Autowired
     public void setTradeTimeService(TradeTimeService tradeTimeService) {
         this.tradeTimeService = tradeTimeService;
-    }
-
-    @Autowired
-    public void setQuoteService(QuoteService quoteService) {
-        this.quoteService = quoteService;
     }
 
     @Autowired
@@ -113,12 +92,13 @@ public class CommonCheckKit extends BaseCheckKit {
         this.tradeAgentManager = tradeAgentManager;
     }
 
-    public ResultBean check(final BaseOrderRequest order) throws BusinessResultException {
+    @Override
+    public ResultBean check(BaseOrderRequest order, Instruction instruction, Instrument instrument, TickBean tickBean) throws BusinessResultException {
 
-        checkAccountAndAgent(order);
-        checkTime(order);
-        checkPrice(order);
-        checkPosition(order);
+        checkAccountAndAgent(instruction);
+        checkTime(order, instruction);
+        checkPrice(order, instruction, instrument, tickBean);
+        checkPosition(order, instruction);
 
         if (checkResult.isSuccess()) {
             log.info("通用检查通过：订单信息 => 【{}】", order);
@@ -147,8 +127,7 @@ public class CommonCheckKit extends BaseCheckKit {
     /**
      * 检查账号及终端登录情况
      */
-    private void checkAccountAndAgent(BaseOrderRequest order) throws BusinessResultException {
-        Instruction instruction = getInstruction(order);
+    private void checkAccountAndAgent(Instruction instruction) throws BusinessResultException {
         String acctNo = instruction.getAcctNo();
 
         Account account = accountManager.getAccountById(acctNo);
@@ -167,9 +146,7 @@ public class CommonCheckKit extends BaseCheckKit {
      * - 开启校验开关，交易时间段存在且当前时间不在交易时间段内，返回 true
      * - 其他，返回false
      */
-    public void checkTime(BaseOrderRequest order) throws BusinessResultException {
-
-        Instruction instruction = getInstruction(order);
+    public void checkTime(BaseOrderRequest order, Instruction instruction) throws BusinessResultException {
 
         String trdTradeTimeSwitch = CacheUtil.getSysParam(TRD_TRADE_TIME_SWITCH);
         if (SwitcheEnum.OPEN.codeNotEquals(trdTradeTimeSwitch)) {
@@ -199,9 +176,7 @@ public class CommonCheckKit extends BaseCheckKit {
     /**
      * 有效价格申报范围等
      */
-    public void checkPrice(BaseOrderRequest order) throws BusinessResultException {
-        Instruction instruction = getInstruction(order);
-        Instrument instrument = getInstrument(order);
+    public void checkPrice(BaseOrderRequest order, Instruction instruction, Instrument instrument, TickBean tickBean) throws BusinessResultException {
 
         // 最小价差校验 MINI_PRICE （最小价格变动单位）
         checkPriceStep(order, instruction);
@@ -220,14 +195,13 @@ public class CommonCheckKit extends BaseCheckKit {
         if (EntrustUtils.isNoTrade(entrustProp)) {
             return;
         }
-        checkLimitPrice(order, instruction, instrument);
+        checkLimitPrice(order, instruction, instrument, tickBean);
     }
 
     /**
      * 持仓校验
      */
-    public void checkPosition(BaseOrderRequest order) throws BusinessResultException {
-        Instruction instruction = getInstruction(order);
+    public void checkPosition(BaseOrderRequest order, Instruction instruction) throws BusinessResultException {
         OrderInterface orderInterface = new Order();
         orderInterface.setEntrustBs(EntrustPropUtils.getEntrustBs(instruction));
         orderInterface.setAssetType(instruction.getAssetType());
@@ -262,8 +236,7 @@ public class CommonCheckKit extends BaseCheckKit {
     }
 
     @SuppressWarnings("unused")
-    private void checkLimitPrice(BaseOrderRequest order, Instruction instruction, Instrument instrument) {
-        TickBean tick = getTick(instruction);
+    private void checkLimitPrice(BaseOrderRequest order, Instruction instruction, Instrument instrument, TickBean tick) {
         BigDecimal entrustPrice = order.getEntrustPrice();
 
         BigDecimal lowerLimitPrice = NumberUtil.round(tick.getLowerLimitPrice(), 4, RoundingMode.UP);
@@ -336,47 +309,6 @@ public class CommonCheckKit extends BaseCheckKit {
             throw new BusinessResultException(ErrorCode.INNER_RISK_ERROR,
                     StrUtil.format("委托价格[{}]不符合最小价格变动单位[{}]的整数倍", entrustPrice, priceStep));
         }
-    }
-
-    private void addCheckResult(String propertyName, Object value, String message) {
-        BeanValidationResult.ErrorMessage errorMessage = new BeanValidationResult.ErrorMessage();
-        errorMessage.setPropertyName(propertyName);
-        errorMessage.setValue(value);
-        errorMessage.setMessage(message);
-
-        checkResult.setSuccess(false);
-        checkResult.addErrorMessage(errorMessage);
-    }
-
-    private Instruction getInstruction(BaseOrderRequest order) {
-        Instruction instruction = instructionService.findById(order.getInstructionId());
-        if (ObjectUtil.isNull(instruction)) {
-            throw new BusinessResultException(ErrorCode.INSTRUCTIONS_NOT_EXIST);
-        }
-        return instruction;
-    }
-
-    private Instrument getInstrument(BaseOrderRequest order) {
-        Instruction instruction = getInstruction(order);
-        Instrument instrument = instrumentService.findById(instruction.getFinprodMarketId());
-        if (ObjectUtil.isNull(instrument)) {
-            throw new BusinessResultException(ErrorCode.DERIVATIVE_INSTRUMENT_ERROR);
-        }
-        return instrument;
-    }
-
-    @SuppressWarnings("unused")
-    private TickBean getTick(BaseOrderRequest order) {
-        Instruction instruction = getInstruction(order);
-        return getTick(instruction);
-    }
-
-    private TickBean getTick(Instruction instruction) {
-        ResultBean tick = quoteService.getTick(instruction.getFinprodMarketId());
-        if (ErrorCode.isFail(tick.getErrorCode())) {
-            throw new BusinessResultException(ErrorCode.QUOTE_NOT_EXIT);
-        }
-        return (TickBean) tick.getData();
     }
 
     private MinTrdUnitLimit getMinTrdUnitLimit(BaseOrderRequest order, Instruction instruction) {

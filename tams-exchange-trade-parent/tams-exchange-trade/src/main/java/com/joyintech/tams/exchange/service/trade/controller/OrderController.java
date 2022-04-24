@@ -12,6 +12,7 @@ import com.joyintech.tams.exchange.common.domain.Message;
 import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
 import com.joyintech.tams.exchange.service.trade.management.service.OrderManagement;
+import com.joyintech.tams.exchange.service.trade.processor.check.BusinessCheckKit;
 import com.joyintech.tams.exchange.service.trade.processor.check.CommonCheckKit;
 import com.joyintech.tams.exchange.util.MasterUtil;
 import io.swagger.annotations.Api;
@@ -22,6 +23,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.lang.reflect.InvocationTargetException;
 
 import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_质押券出入库;
 
@@ -40,6 +43,8 @@ public class OrderController {
     private InstructionService instructionService;
     @Autowired
     private CommonCheckKit commonCheckKit;
+    @Autowired
+    private BusinessCheckKit businessCheckKit;
 
 //    /**
 //     * 查询订单信息
@@ -64,15 +69,19 @@ public class OrderController {
      */
     @ApiOperation(value = "普通下单（竞价下单）", notes = "普通下单（竞价下单）")
     @PostMapping(value = "/order")
-    public Message<OrderPlaceBean> sendOrder(@RequestBody OrderPlaceBean order) {
+    public Message<OrderPlaceBean> sendOrder(@RequestBody OrderPlaceBean order) throws InvocationTargetException, IllegalAccessException {
         if (isSlave()) {
             return MasterUtil.postForObject(order);
         }
 
-        /*ResultBean checkResult = commonCheckKit.check(order);
-        if (ErrorCode.isFail(checkResult.getErrorCode())) {
-            return new Message<>(checkResult);
+        /*ResultBean commonCheckResult = commonCheckKit.check(order);
+        if (ErrorCode.isFail(commonCheckResult.getErrorCode())) {
+            return new Message<>(commonCheckResult);
         }*/
+        ResultBean businessCheckResult = businessCheckKit.check(order);
+        if (ErrorCode.isFail(businessCheckResult.getErrorCode())) {
+            return new Message<>(businessCheckResult);
+        }
 
         Instruction instruction = instructionService.findById(order.getInstructionId());
 
@@ -103,15 +112,19 @@ public class OrderController {
      */
     @ApiOperation(value = "综合业务下单", notes = "综合业务下单")
     @PostMapping(value = "/order/integratedEntrust")
-    public Message<IntegratedEntrust> sendIntegratedEntrust(@RequestBody @Validated IntegratedOrderPlaceBean order) {
+    public Message<IntegratedEntrust> sendIntegratedEntrust(@RequestBody @Validated IntegratedOrderPlaceBean order) throws InvocationTargetException, IllegalAccessException {
         if (isSlave()) {
             return MasterUtil.postForObject(order);
         }
 
-        /*ResultBean checkResult = commonCheckKit.check(order);
-        if (ErrorCode.isFail(checkResult.getErrorCode())) {
-            return new Message<>(checkResult);
-        }*/
+        ResultBean commonCheckResult = commonCheckKit.check(order);
+        if (ErrorCode.isFail(commonCheckResult.getErrorCode())) {
+            return new Message<>(commonCheckResult);
+        }
+        ResultBean bussinessCheckResult = businessCheckKit.check(order);
+        if (ErrorCode.isFail(bussinessCheckResult.getErrorCode())) {
+            return new Message<>(bussinessCheckResult);
+        }
 
         Instruction instruction = instructionService.findById(order.getInstructionId());
 
