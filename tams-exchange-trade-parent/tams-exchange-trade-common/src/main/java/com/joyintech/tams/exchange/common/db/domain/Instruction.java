@@ -11,6 +11,8 @@ import com.joyintech.tams.exchange.common.bean.MinPrice;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.bean.instrument.MinPriceAndMinTrdUnitLimitBean;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
+import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.constant.instrument.SecondAssetType;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.utils.DoubleSerializerUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
@@ -27,6 +29,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt1.是否_否;
 
 @ApiModel(value = "指令信息", description = "指令信息")
 public class Instruction implements Serializable, KeyMethodInterface<String>, Cloneable {
@@ -1306,5 +1310,28 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
                     .findFirst()
                     .orElse(minPriceList.get(0).getMinPrice());
         }
+    }
+
+    /**
+     * 新债-非可转债
+     */
+    public boolean inconvertibleBond() {
+        return InvestmentAssetType.BOND.codeEquals(this.getAssetType())
+                && SecondAssetType.KZZ.codeNotEquals(this.getAssetType1());
+    }
+
+    /**
+     * 全价
+     */
+    public boolean fullPrice() {
+        return StrUtil.isNotEmpty(this.getIsNetPrice())
+                && 是否_否.getValue().equals(this.getIsNetPrice());
+    }
+
+    /**
+     * 新债且全价
+     */
+    public boolean inconvertibleBondAndFullPrice() {
+        return this.inconvertibleBond() && this.fullPrice();
     }
 }
