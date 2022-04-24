@@ -734,60 +734,6 @@
     <!-- 证券代码 -->
     <select id="getFinprodMarketInfoSecRepo" resultMap="secAcctInfo">
         <!-- 质押式回购代码与期限品种映射关系 -->
-        with ZYSHG as
-        (select '204001.SH' as item_code, 'GC001' as item_value
-        from dual
-        union
-        select '204002.SH' as item_code, 'GC002' as item_value
-        from dual
-        union
-        select '204003.SH' as item_code, 'GC003' as item_value
-        from dual
-        union
-        select '204004.SH' as item_code, 'GC004' as item_value
-        from dual
-        union
-        select '204007.SH' as item_code, 'GC007' as item_value
-        from dual
-        union
-        select '204014.SH' as item_code, 'GC014' as item_value
-        from dual
-        union
-        select '204028.SH' as item_code, 'GC028' as item_value
-        from dual
-        union
-        select '204091.SH' as item_code, 'GC091' as item_value
-        from dual
-        union
-        select '204182.SH' as item_code, 'GC182' as item_value
-        from dual
-        union
-        select '131810.SZ' as item_code, 'R-001' as item_value
-        from dual
-        union
-        select '131811.SZ' as item_code, 'R-002' as item_value
-        from dual
-        union
-        select '131800.SZ' as item_code, 'R-003' as item_value
-        from dual
-        union
-        select '131809.SZ' as item_code, 'R-004' as item_value
-        from dual
-        union
-        select '131801.SZ' as item_code, 'R-007' as item_value
-        from dual
-        union
-        select '131802.SZ' as item_code, 'R-014' as item_value
-        from dual
-        union
-        select '131803.SZ' as item_code, 'R-028' as item_value
-        from dual
-        union
-        select '131805.SZ' as item_code, 'R-091' as item_value
-        from dual
-        union
-        select '131806.SZ' as item_code, 'R-182' as item_value
-        from dual)
         select distinct t.finprod_market_id as id,
         t.finprod_name as text,
         '${acctTradeMarket}' as parentId,
@@ -829,34 +775,13 @@
         and a.finprod_type2 in (#{FINPROD_TYPE_TG_F01})<!--  债券 -->
         and r.type_6 != #{type6_B14}
         union
-        select distinct a.item_code as finprod_market_id,
-        a.item_code  || '|' || a.item_value as finprod_name,
+        select distinct a.TRADE_MARKET as finprod_market_id,
+        concat(concat(a.TRADE_MARKET,'|'),a.TERM_TYPE) as finprod_name,
         null as oth_code_type,
         #{FINPROD_TYPE_TG_ZYSHG} as finprod_type2,
-        a.item_value as finprod_id,
-        case when a.item_value in ('GC001',
-        'GC002',
-        'GC003',
-        'GC004',
-        'GC007',
-        'GC014',
-        'GC028',
-        'GC091',
-        'GC182') then #{TRADE_PLACE_03}
-        when a.item_value IN ('R-001',
-        'R-002',
-        'R-003',
-        'R-004',
-        'R-007',
-        'R-014',
-        'R-028',
-        'R-091',
-        'R-182',
-        'RC001',
-        'RC003',
-        'RC007') then #{TRADE_PLACE_04}
-        else null end as trade_market,
-        a.item_code AS MARKET_ID,
+        a.TERM_TYPE as finprod_id,
+        a.TRADE_MARKET as trade_market,
+        a.MARKET_ID AS MARKET_ID,
         null AS BOARD,
         null AS TYPE_6,
         null AS TYPE_7,
@@ -864,7 +789,7 @@
         null AS mdate,
         null AS FACE_VALUE,
         null AS IS_NETPRICE
-        from ZYSHG a
+        from MST_REPO_PRODUCT a
         ) t
         <where>
             <if test="FINPROD_TYPE2 != null and FINPROD_TYPE2 != ''">

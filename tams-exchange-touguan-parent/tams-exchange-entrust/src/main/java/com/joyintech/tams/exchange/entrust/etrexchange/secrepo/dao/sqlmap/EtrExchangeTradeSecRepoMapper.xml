@@ -53,7 +53,7 @@
         T1.PRICE END price
         /* ,T1.ENTRUST_AMT*NVL(T1.PRICE,1) ENTRUST_AMT*/
         ,T1.ENTRUST_AMT entrustAmt
-        ,T1.ENTRUST_NUM entrustNum
+        ,CASE WHEN T1.PS IN ('03','04') THEN NULL ELSE T1.ENTRUST_NUM END entrustNum
         ,T1.VDATE
         ,T1.MDATE
         ,T2.FULL_PRICE as fprice
@@ -79,6 +79,7 @@
         ,T1.BUSINESS_MODEL businessModel
         ,T1.STOCK_ID
         ,T2.EXP_CON_NUM
+        ,T2.DEAL_MODE dealMode
         FROM
         ETR_ENTRUST T1
         INNER JOIN ETR_ENTRUST_ADD T2 ON
@@ -193,7 +194,7 @@
         T1.PRICE END price
         /* ,T1.ENTRUST_AMT*NVL(T1.PRICE,1) ENTRUST_AMT*/
         ,T1.ENTRUST_AMT entrustAmt
-        ,T1.ENTRUST_NUM entrustNum
+        ,CASE WHEN T1.PS IN ('03','04') THEN NULL ELSE T1.ENTRUST_NUM END entrustNum
         ,T1.VDATE
         ,T1.MDATE
         ,T2.FULL_PRICE as fprice
@@ -219,6 +220,7 @@
         ,T1.BUSINESS_MODEL businessModel
         ,T1.STOCK_ID
         ,T2.EXP_CON_NUM
+        ,T2.DEAL_MODE dealMode
         FROM
         WFL_ETR_ENTRUST T1
         INNER JOIN WFL_ETR_ENTRUST_ADD T2 ON
@@ -482,7 +484,7 @@
         WHERE
         FP.TRADE_MARKET IN (#{TRADE_PLACE_03}, #{TRADE_PLACE_04})
         AND FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01}<!--  债券 -->
-        AND FPT.TYPE_11 != #{CUSTOM_ASSET_TYPE_FOUR_013}<!--  非可转债 -->
+        AND FPT.type_6 != #{type6_B14}<!--  非可转债 -->
         <if test="portfolioIdList != null and portfolioIdList.size()>0">
             <foreach collection="portfolioIdList" open="AND TEMP.PORTFOLIO_ID IN (" item="portfolioId" separator="," close=")">
                     #{portfolioId,jdbcType=VARCHAR}

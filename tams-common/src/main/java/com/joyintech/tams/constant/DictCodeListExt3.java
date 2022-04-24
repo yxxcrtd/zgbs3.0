@@ -1978,6 +1978,7 @@ public enum DictCodeListExt3 implements BaseDictCodeList {
     交易主体类型_资管(DictCode.交易主体类型,"02","资管"),
     交易主体类型_机构经纪(DictCode.交易主体类型,"03","机构经纪"),
     交易主体类型_个人经纪(DictCode.交易主体类型,"04","个人经纪"),
+    交易平台_新债平台(DictCode.交易平台,"06","新债平台"),
 
     ;
     /**
