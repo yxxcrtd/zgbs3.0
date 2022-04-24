@@ -2560,6 +2560,7 @@
                     $("#yield_" + currentTab).val(result.data.yield).trigger('blur');
                 }, false);
                 calcEntrustNumAndAmt();
+                linkTableEntrustNumAmt();
             } else {
                 $("#fprice_" + currentTab).val('').trigger('blur');
                 $("#yield_" + currentTab).val('').trigger('blur');
