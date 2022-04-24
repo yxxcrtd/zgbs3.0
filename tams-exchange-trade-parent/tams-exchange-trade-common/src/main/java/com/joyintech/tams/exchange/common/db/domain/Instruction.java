@@ -1,19 +1,18 @@
 package com.joyintech.tams.exchange.common.db.domain;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.joyintech.tams.exchange.common.BusinessResultException;
 import com.joyintech.tams.exchange.common.bean.MinPrice;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.bean.instrument.MinPriceAndMinTrdUnitLimitBean;
-import com.joyintech.tams.exchange.common.constant.ErrorCode;
+import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.constant.TradePlat;
+import com.joyintech.tams.exchange.common.constant.instrument.SecondAssetType;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.utils.DoubleSerializerUtils;
-import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.data.annotation.Id;
@@ -26,7 +25,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt1.是否_否;
 
 @ApiModel(value = "指令信息", description = "指令信息")
 public class Instruction implements Serializable, KeyMethodInterface<String>, Cloneable {
@@ -1243,6 +1243,7 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
 
     /**
      * 使用序列化实现深拷贝
+     *
      * @return 拷贝对象
      */
     public Instruction cloneInstruction() {
@@ -1306,5 +1307,29 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
                     .findFirst()
                     .orElse(minPriceList.get(0).getMinPrice());
         }
+    }
+
+    /**
+     * 新债-非可转债
+     */
+    public boolean inconvertibleBond() {
+        return InvestmentAssetType.BOND.codeEquals(this.getAssetType())
+                && SecondAssetType.KZZ.codeNotEquals(this.getAssetType1())
+                && TradePlat.NEW_BOND.codeEquals(this.getTradePlat());
+    }
+
+    /**
+     * 全价
+     */
+    public boolean fullPrice() {
+        return StrUtil.isNotEmpty(this.getIsNetPrice())
+                && 是否_否.getValue().equals(this.getIsNetPrice());
+    }
+
+    /**
+     * 新债且全价
+     */
+    public boolean inconvertibleBondAndFullPrice() {
+        return this.inconvertibleBond() && this.fullPrice();
     }
 }

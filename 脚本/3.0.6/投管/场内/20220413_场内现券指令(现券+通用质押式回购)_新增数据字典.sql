@@ -24,8 +24,8 @@ insert into SYS_DATADICT_LIST values ('PRICE_TIME_TYPE','03','收盘集合竞价
 insert into SYS_DATADICT_LIST values ('PRICE_TIME_TYPE','04','开市停牌阶段','4','0','system','',sysdate, 'system',sysdate,'');
 
 
-delete from SYS_DATADICT_LIST where dict_code = 'COMMON_BUSINESS_TYPE' and item_code in ('ETR54','ETR55');
-insert into SYS_DATADICT_LIST values ('COMMON_BUSINESS_TYPE','ETR54','场内现券指令','440','0','system','',sysdate, 'system',sysdate);
+delete from SYS_DATADICT_LIST where dict_code = 'COMMON_BUSINESS_TYPE' and item_code = 'ETR54';
+insert into SYS_DATADICT_LIST values ('COMMON_BUSINESS_TYPE','ETR54','场内债券现券指令','440','0','system','',sysdate, 'system',sysdate,'');
 delete from SYS_DATADICT_LIST where dict_code = 'COMMON_BUSINESS_TYPE' and item_code = 'ETR55';
-insert into SYS_DATADICT_LIST values ('COMMON_BUSINESS_TYPE','ETR55','共通业务类型_场内通用质押式回购指令','441','0','system','',sysdate, 'system',sysdate);
+insert into SYS_DATADICT_LIST values ('COMMON_BUSINESS_TYPE','ETR55','场内通用质押式回购指令','441','0','system','',sysdate, 'system',sysdate,'');
 

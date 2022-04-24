@@ -1594,7 +1594,11 @@ public class KCBPTradeAgent extends TradeAgentDsp {
         return entrustProp;
     }
     
-    //TODO 大宗字段确认后，需要重新核对
+    /**
+     * 新债 深圳 协商成交下单 410677
+     * @param entrust
+     * @param parameters
+     */
     private void buildNegotiate_XD_SZParameters(IntegratedEntrust entrust, Map<String, String> parameters) {
         //报价所有者类型
         parameters.put("ownertype", entrust.getSellerNo());
@@ -1603,13 +1607,13 @@ public class KCBPTradeAgent extends TradeAgentDsp {
         //委托数量
         parameters.put("orderqty", String.valueOf(entrust.getEntrustVolume()));
         //本方交易员代码
-        parameters.put("tradercode", entrust.getSellerNo());
+        parameters.put("tradercode", entrust.getTradeId());
         //本方交易主体代码
-        parameters.put("investorid", entrust.getLiaisonTel());
+        parameters.put("investorid", entrust.getInvestorId());
         //对手方交易商代码
-        parameters.put("cpmemberid", entrust.getPropSeatNo());
+        parameters.put("cpmemberid", entrust.getPropDealerId());
         //对手方交易员代码
-        parameters.put("cptradercode", entrust.getLiaisonTel());
+        parameters.put("cptradercode", entrust.getPropTradeId());
         //对手方交易主体代码
         parameters.put("cpinvestorid", entrust.getPropInvestorId());
         //约定号
