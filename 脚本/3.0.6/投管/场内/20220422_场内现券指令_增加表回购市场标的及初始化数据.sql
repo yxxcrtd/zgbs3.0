@@ -7,7 +7,7 @@ create table MST_REPO_PRODUCT
 (
     SEQ_NO               VARCHAR2(32)         not null,
     TRADE_MARKET         VARCHAR(50),
-    MAKET_ID             VARCHAR2(50),
+    MARKET_ID             VARCHAR2(50),
     TERM_TYPE            VARCHAR(50),
     REMARK               VARCHAR2(1000),
     CREATE_USER          VARCHAR2(20)         not null,
@@ -27,7 +27,7 @@ comment on column MST_REPO_PRODUCT.SEQ_NO is
 comment on column MST_REPO_PRODUCT.TRADE_MARKET is
     '交易场所，上交所、深交所等';
 
-comment on column MST_REPO_PRODUCT.MAKET_ID is
+comment on column MST_REPO_PRODUCT.MARKET_ID is
     '市场代码';
 
 comment on column MST_REPO_PRODUCT.TERM_TYPE is
