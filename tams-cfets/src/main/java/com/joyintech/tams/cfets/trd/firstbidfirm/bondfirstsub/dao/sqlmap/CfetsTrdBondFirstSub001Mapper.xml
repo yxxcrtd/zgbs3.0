@@ -181,6 +181,7 @@
             )
 	</select>
 
+    <!--指令信息详情MAP-->
     <resultMap id="entrustInfoMap" type="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubEntrustDetailDto">
         <id property="entrustDate" column="entrustDate"/>
         <id property="finprodId" column="finprodId"/>
@@ -205,6 +206,7 @@
         </collection>
     </resultMap>
 
+    <!--根据指令代码查询指令详细信息-->
     <select id="getEntrustInfo" resultMap="entrustInfoMap">
         select ee.ENTRUST_DATE      entrustDate
              , ee.FINPROD_ID        finprodId

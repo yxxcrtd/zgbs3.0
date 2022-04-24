@@ -74,6 +74,12 @@
         where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
           and WORKFLOW_STATUS = #{workflowStatus,jdbcType=VARCHAR}
     </select>
+    <select id="selectByEntrustId" resultMap="BaseResultMap" parameterType="com.joyintech.tams.common.base.entity.WflEtrEntrustKey" >
+        select
+        <include refid="com.joyintech.tams.common.base.dao.WflEtrEntrustMapper.Base_Column_List" />
+        from WFL_ETR_ENTRUST
+        where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+    </select>
     <delete id="deleteByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.WflEtrEntrustKey" >
         delete from WFL_ETR_ENTRUST
         where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}

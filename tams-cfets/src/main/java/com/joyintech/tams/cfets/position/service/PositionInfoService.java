@@ -74,7 +74,7 @@ public class PositionInfoService {
         }
 
         // 现金 map.cashT、map.cashT1、map.realCash
-        BaseMap cashMap = queryTrdAvailableCash(requestDto.getPortfolioIdList(), requestDto.getCdate(), requestDto.getAcctId(), null, null,null,null, null ,null);
+        BaseMap cashMap = queryTrdAvailableCash(requestDto.getPortfolioIdList(), requestDto.getCdate(), requestDto.getAcctId(), null, null,null,null, FLOW_TYPE_TRD ,null);
         // 查询头寸信息
         BaseMap positionMap = queryTrdPosition(requestDto.getPortfolioIdList(), requestDto.getCdate(), requestDto.getFinprodId());
 

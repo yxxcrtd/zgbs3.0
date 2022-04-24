@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dao.CfetsTrdBondFirstSub002Mapper">
+    <!--一级申购交易MAP-->
+    <resultMap id="subInfoMap" type="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto">
+        <id property="finprodId" column="finprodId"/>
+        <id property="finprodMarketId" column="finprodMarketId"/>
+        <id property="finprodAbbr" column="finprodAbbr"/>
+        <id property="ouPartyId" column="ouPartyId"/>
+        <id property="ouPartyIdAbbr" column="ouPartyIdAbbr"/>
+        <id property="ourTrader" column="ourTrader"/>
+        <id property="ourTraderName" column="ourTraderName"/>
+        <id property="issuePrice" column="issuePrice"/>
+        <id property="referenceRate" column="referenceRate"/>
+        <id property="rate" column="rate"/>
+        <id property="remark" column="remark"/>
+        <collection property="productDtos" ofType="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubProductDto"
+                    javaType="java.util.ArrayList" >
+            <result column="entrustId" property="entrustId" jdbcType="VARCHAR" />
+            <result column="portfolioId" property="portfolioId" jdbcType="VARCHAR" />
+            <result column="portfolioName" property="portfolioName" jdbcType="VARCHAR" />
+            <result column="avaNum" property="avaNum" jdbcType="DECIMAL" />
+            <result column="subscriptionAmount" property="subscriptionAmount" jdbcType="DECIMAL" />
+            <result column="businessModel" property="businessModel" jdbcType="VARCHAR" />
+            <result column="secManageAcctId" property="secManageAcctId" jdbcType="VARCHAR" />
+            <result column="secAcctName" property="secAcctName" jdbcType="VARCHAR" />
+        </collection>
+    </resultMap>
+
+    <!--根据指令代码查询申购产品列表-->
+    <select id="selectSubProducts" resultMap="subInfoMap">
+
+    </select>
+
+</mapper>

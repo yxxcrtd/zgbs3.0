@@ -21,19 +21,20 @@ import com.joyintech.tams.cfets.etrdispatcher.service.CfetsEtrDispatcherService;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
 import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDayRegDto;
 import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondRegCheckRequst;
-import com.joyintech.tams.cfets.trd.bond.dto.PtlAllocationDto;
-import com.joyintech.tams.cfets.trd.bond.dto.RiskCalRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dao.CfetsTrdBondFirstSub001Mapper;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.*;
 import com.joyintech.tams.common.base.dao.EtrDistributeMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
-import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.common.base.dao.WflEtrEntrustMapper;
+import com.joyintech.tams.common.base.entity.EtrDistribute;
+import com.joyintech.tams.common.base.entity.EtrDistributeInterfTmp;
+import com.joyintech.tams.common.base.entity.EtrDistributeKey;
+import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.invest.common.component.base.entrust.impl.BaseEtrInvestInfoServiceImpl;
-import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -42,10 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 一级申购SERVICE
@@ -68,6 +66,11 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
      */
     @Autowired
     private EtrEntrustMapper etrEntrustMapper;
+    /**
+     * 指令信息(流程中)
+     */
+    @Autowired
+    private WflEtrEntrustMapper wflEtrEntrustMapper;
 
     @Autowired
     private EtrDistributeMapper etrDistributeMapper;
@@ -159,6 +162,23 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
     }
 
     /**
+     * 指令查询明细(分页) 查询已接收的指令数据
+     *
+     * @param dto 入参 查询条件
+     * @return com.joyintech.framework.grid.Page<com.joyintech.tams.cfets.finbond.tenderBondSub.dto.TenderBondSubEntrustDto>
+     * @author jiangpeng
+     * @date 2022/4/19 14:16
+     */
+    public Page<CfetsTrdBondFirstSubEntrustDto> etrAddSearch(CfetsTrdBondFirstSubEntrustRequest request) {
+        Map<String, Object> pageParam = BeanUtil.object2Map(request);
+        this.setParam(pageParam);
+        pageParam.put("entrustStatus", Collections.singletonList(DictCodeList.委托状态_已接收.getValue()));
+        PageMode pageMode = this.setPageMode(request.getPageMode());
+        logger.debug("查询指令,入参:" + JsonUtils.object2Json(pageParam));
+        return super.queryForPage(pageMode.getPageNo(), pageMode.getPageSize(), () -> cfetsTrdBondFirstSub001Mapper.listEntrust(pageParam));
+    }
+
+    /**
      * 接收指令
      *
      * @param param 指令代码列表等
@@ -242,7 +262,7 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
         // 已接收且执行进度<100%的指令可以选择【放弃】接收
         if (CollectionUtils.isNotEmpty(cfetsTrdBondFirstSubEntrustDtos)) {
             for (CfetsTrdBondFirstSubEntrustDto item : cfetsTrdBondFirstSubEntrustDtos) {
-                if (!StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已接收)
+                if (!StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已接收.getValue())
                         && BigDecimalUtil.ACompareToB(item.getTransactioncom(), new BigDecimal(100), 2) >= 0) {
                     return "已接收且执行进度<100%的指令,才能执行放弃操作！";
                 }
@@ -298,8 +318,8 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
         List<CfetsTrdBondFirstSubEntrustDto> cfetsTrdBondFirstSubEntrustDtos = cfetsTrdBondFirstSub001Mapper.listEntrust(param);
         if (CollectionUtils.isNotEmpty(cfetsTrdBondFirstSubEntrustDtos)) {
             cfetsTrdBondFirstSubEntrustDtos.forEach(item -> {
-                if (StringUtil.equals(item.getEntrustStatus(), com.joyintech.tams.constant.DictCodeList.委托状态_待接收)
-                        || (StringUtil.equals(item.getEntrustStatus(), com.joyintech.tams.constant.DictCodeList.委托状态_待接收) && item.getTransactioncom().compareTo(BigDecimal.ZERO) != 0)) {
+                if (StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_待接收.getValue())
+                        || (StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_待接收.getValue()) && item.getTransactioncom().compareTo(BigDecimal.ZERO) != 0)) {
                     errorList.add(new ValidMessage("只可对待分发或者已接收执行进度为0的指令执行退回操作!"));
                 }
                 param.put("entrustId", item.getEntrustId());
@@ -371,156 +391,6 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
         return result;
     }
 
-    /**
-     * 自动分配
-     *
-     * @param autoRequest 画面元素
-     * @return java.util.List<com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubProductDto>
-     * @author jiangpeng
-     * @date 2022/4/21 13:52
-     */
-    public List<CfetsTrdBondFirstSubProductDto> autoAllocation(CfetsTrdBondFirstSubInfoDto autoRequest) {
-        List<CfetsTrdBondFirstSubProductDto> list = new ArrayList<>();
-        logger.debug("自动分配,入参:" + JsonUtils.object2Json(autoRequest));
-        //TODO 处理逻辑
-        logger.debug("自动分配,结果:" + JsonUtils.object2Json(list));
-        return list;
-    }
-
-    /**
-     * 初始化 申购页面
-     *
-     * @param request
-     * @return com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto
-     * @author jiangpeng
-     * @date 2022/4/19 19:32
-     */
-    public CfetsTrdBondFirstSubInfoDto queryEntrustInfoById(CfetsTrdBondFirstSubInitRequest request) {
-        CfetsTrdBondFirstSubInfoDto cfetsTrdBondFirstSubInfoDto = new CfetsTrdBondFirstSubInfoDto();
-        logger.debug("自动分配,入参:" + JsonUtils.object2Json(request));
-        //TODO 处理逻辑
-        logger.debug("自动分配,结果:" + JsonUtils.object2Json(cfetsTrdBondFirstSubInfoDto));
-        return cfetsTrdBondFirstSubInfoDto;
-    }
-
-
-    /**
-     * 申购点击check
-     *
-     * @param request
-     * @return com.joyintech.framework.ajax.AjaxResult
-     * @author jiangpeng
-     * @date 2022/4/18 15:16
-     */
-    public AjaxResult dealexecutioncheck(CfetsTrdBondFirstSubInitRequest request) {
-        AjaxResult ajaxResult = new AjaxResult();
-        logger.debug("自动分配,入参:" + JsonUtils.object2Json(request));
-        //TODO 处理逻辑
-        return ajaxResult;
-    }
-
-    /**
-     * 风险试算check
-     *
-     * @param entity 入参 画面元素
-     * @return com.joyintech.framework.ajax.AjaxResult
-     * @author jiangpeng
-     * @date 2022/4/18 15:00
-     */
-    public AjaxResult riskCheckNotEmpty(RiskCalRequest entity) {
-        AjaxResult ajaxResult = new AjaxResult();
-        List<ValidMessage> errorList = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(entity.getPtlAllocations())) {
-            ajaxResult.setErrorList(errorList);
-        }
-        return ajaxResult;
-    }
-
-    /**
-     * 构造生成交易编号的参数
-     *
-     * @param ps 交易方向
-     * @return com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter
-     * @author jiangpeng
-     * @date 2022/4/21 14:29
-     */
-    public static BussinessCodeParameter getBussinessCodeParameter(String ps) {
-        BussinessCodeParameter codeParameter = new BussinessCodeParameter();
-//        if (StringUtil.equals(com.joyintech.tams.constant.DictCodeList.交易方向_买入.getValue(), ps)) {
-//            codeParameter.setCommonBusinessType(com.joyintech.tams.constant.DictCodeList.共通业务类型_债券买入);
-//        } else {
-//            codeParameter.setCommonBusinessType(com.joyintech.tams.constant.DictCodeList.共通业务类型_债券卖出);
-//        }
-        //TODO 处理逻辑
-        return codeParameter;
-    }
-
-    /**
-     * 构建汇总费用实体
-     *
-     * @param bussinessId
-     * @param feeType
-     * @param amount
-     * @return com.joyintech.tams.common.base.entity.RegTradeFeeTotal
-     * @author jiangpeng
-     * @date 2022/4/18 15:18
-     */
-    public RegTradeFeeTotal prepareRegTradeFeeTotal(String bussinessId, String feeType, BigDecimal amount) {
-        RegTradeFeeTotal regTradeFeeTotal = new RegTradeFeeTotal();
-        regTradeFeeTotal.setTradeId(bussinessId);
-        regTradeFeeTotal.setFeeType(feeType);
-        regTradeFeeTotal.setIsPayWithTrade(DictCodeList.是否_否.getValue());
-        regTradeFeeTotal.setFeeAmt(amount);
-        //TODO 处理逻辑
-        return regTradeFeeTotal;
-    }
-
-    /**
-     * 构建明细费用实体
-     *
-     * @param bussinessId
-     * @param feeType
-     * @param amount
-     * @return com.joyintech.tams.common.base.entity.RegTradeFee
-     * @author jiangpeng
-     * @date 2022/4/18 15:18
-     */
-    public RegTradeFee prepareRegTradeFee(String bussinessId, String feeType, BigDecimal amount) {
-        RegTradeFee regTradeFee = new RegTradeFee();
-        regTradeFee.setTradeId(bussinessId);
-        regTradeFee.setFeeType(feeType);
-        regTradeFee.setIsPayWithTrade(DictCodeList.是否_否.getValue());
-        regTradeFee.setFeeAmt(amount);
-        //TODO 处理逻辑
-        return regTradeFee;
-    }
-
-    /**
-     * 风险试算实体组装
-     *
-     * @param riskCalRequest
-     * @return java.util.Map<java.lang.String, java.lang.Object>
-     * @author jiangpeng
-     * @date 2022/4/21 14:28
-     */
-    public Map<String, Object> doRiskcalPackage(RiskCalRequest riskCalRequest) {
-        Map<String, Object> result = new HashMap<>();
-        List<Map> bussTrdTransfenpeiDto = new ArrayList<>();
-        for (PtlAllocationDto ptlAllocationDto : riskCalRequest.getPtlAllocations()) {
-            Map<String, Object> stringObjectMap = BeanUtil.object2Map(ptlAllocationDto);
-            stringObjectMap.put("tradeAmount", ptlAllocationDto.getShareAmt());
-            stringObjectMap.put("fpriceAmt", ptlAllocationDto.getShareAmt());
-            stringObjectMap.put("portfolioCode", ptlAllocationDto.getPortfolioId());
-            bussTrdTransfenpeiDto.add(stringObjectMap);
-        }
-        result.put("bussTrdTransfenpeiDto", bussTrdTransfenpeiDto);
-        result.put("finprodId", riskCalRequest.getFinprodId());
-        result.put("finprodType2", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
-        result.put("ps", riskCalRequest.getPs());
-        result.put("ccy", "CNY");
-        return result;
-
-    }
 
     /**
      * 当日申购(分页列表)

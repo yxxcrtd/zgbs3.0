@@ -1,9 +1,11 @@
 package com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto;
 
+import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -12,66 +14,66 @@ import java.util.Date;
 import java.util.List;
 
 @ApiModel(value = "交易信息", description = "一级申购信息")
-public class CfetsTrdBondFirstSubInfoDto {
+public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEntity {
 
-    @ApiModelProperty(required = false, name = "validStatus", value = "有效状态", example = "01")
+    @ApiModelProperty(name = "validStatus", value = "有效状态, pageDaySubDetail 接口", example = "01")
     private String validStatus;
 
-    @ApiModelProperty(required = false, name = "validStatusStr", value = "有效状态名称,展示用", example = "有效")
+    @ApiModelProperty(name = "validStatusStr", value = "有效状态名称, pageDaySubDetail 接口 展示用", example = "有效")
     private String validStatusStr;
 
-    @ApiModelProperty(required = false, name = "finprodId", value = "资产代码", example = "F01_001.IB")
+    @ApiModelProperty(name = "finprodId", value = "资产代码", example = "F01_001.IB")
     private String finprodId;
 
-    @ApiModelProperty(required = false, name = "finprodMarketId", value = "市场代码", example = "001.IB")
+    @ApiModelProperty(name = "finprodMarketId", value = "市场代码", example = "001.IB")
     private String finprodMarketId;
 
-    @ApiModelProperty(required = false, name = "finprodAbbr", value = "资产简称", example = "001债券")
+    @ApiModelProperty(name = "finprodAbbr", value = "资产简称", example = "001债券")
     private String finprodAbbr;
 
-    @ApiModelProperty(required = false, name = "ouPartyId", value = "本方id", example = "114912384")
+    @ApiModelProperty(name = "ouPartyId", value = "本方id", example = "114912384")
     private String ouPartyId;
 
-    @ApiModelProperty(required = false, name = "ouPartyIdAbbr", value = "本方简称", example = "广发银行")
+    @ApiModelProperty(name = "ouPartyIdAbbr", value = "本方简称", example = "广发银行")
     private String ouPartyIdAbbr;
 
-    @ApiModelProperty(required = false, name = "ourTrader", value = "本方交易员id(申购人)", example = "001")
+    @ApiModelProperty(name = "ourTrader", value = "本方交易员id(申购人)", example = "001")
     private String ourTrader;
 
-    @ApiModelProperty(required = true, name = "ourTraderName", value = "本方交易员名称", example = "交易员1")
+    @ApiModelProperty(name = "ourTraderName", value = "本方交易员名称", example = "交易员1")
     private String ourTraderName;
 
-    @ApiModelProperty(required = false, name = "issuePrice", value = "发行价格", example = "99.0000")
+    @ApiModelProperty(name = "issuePrice", value = "发行价格", example = "99.0000")
     private BigDecimal issuePrice;
 
-    @ApiModelProperty(required = false, name = "referenceRate", value = "参考收益率", example = "99.0000")
+    @ApiModelProperty(name = "referenceRate", value = "参考收益率", example = "99.0000")
     private BigDecimal referenceRate;
 
-    @ApiModelProperty(required = false, name = "rate", value = "票面利率", example = "99.0000")
+    @ApiModelProperty(name = "rate", value = "票面利率", example = "99.0000")
     private BigDecimal rate;
 
-    @ApiModelProperty(required = false, name = "subscriptionAmount", value = "认购量", example = "1000.00")
+    @ApiModelProperty(name = "subscriptionAmount", value = "认购量", example = "1000.00")
     private BigDecimal subscriptionAmount;
 
-    @ApiModelProperty(required = false, name = "payableAmount", value = "应缴款金额", example = "1000.00")
+    @ApiModelProperty(name = "payableAmount", value = "应缴款金额", example = "1000.00")
     private BigDecimal payableAmount;
 
-    @ApiModelProperty(required = false, name = "settFeeAmt", value = "结算服务费", example = "1000.00")
+    @ApiModelProperty(name = "settFeeAmt", value = "结算服务费", example = "1000.00")
     private BigDecimal settFeeAmt;
 
-    @ApiModelProperty(required = false, name = "remark", value = "备注", example = "XXX")
+    @ApiModelProperty(name = "remark", value = "备注", example = "XXX")
     private String remark;
 
-    @ApiModelProperty(required = false, name = "tradeDate", value = "申购日期")
+    @ApiModelProperty(name = "tradeDate", value = "申购日期")
     private Date tradeDate;
 
-    @ApiModelProperty(required = false, name = "tradeDateStr", value = "申购日期格式化")
+    @ApiModelProperty(name = "tradeDateStr", value = "申购日期格式化")
     private String tradeDateStr;
 
-    @ApiModelProperty(required = false, name = "dipType", value = "分配方式", example = "139")
+    @ApiModelProperty(name = "dipType", value = "分配方式", example = "139")
     private String dipType;
 
-    @ApiModelProperty(required = false, name = "productDtos", value = "申购产品列表")
+    @ApiModelProperty(name = "productDtos", value = "申购产品列表")
     private List<CfetsTrdBondFirstSubProductDto> productDtos;
 
     public String getValidStatus() {
