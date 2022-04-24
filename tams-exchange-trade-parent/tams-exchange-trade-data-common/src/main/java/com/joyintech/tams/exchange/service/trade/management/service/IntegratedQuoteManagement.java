@@ -7,6 +7,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Maps;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.tams.exchange.common.constant.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,9 +23,6 @@ import com.joyintech.tams.exchange.common.bean.NegotiateQuoteQueryBean;
 import com.joyintech.tams.exchange.common.bean.NegotiateQuoteSendBean;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.cache.QuoteTickService;
-import com.joyintech.tams.exchange.common.constant.EntrustProp;
-import com.joyintech.tams.exchange.common.constant.EntrustStatus;
-import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
 import com.joyintech.tams.exchange.common.request.EntrustQueryRequest;
@@ -148,8 +147,8 @@ public class IntegratedQuoteManagement {
     }
 
     private void setNegotiateQuoteSendBean(NegotiateQuoteSendBean negotiateQuoteSendBean, IntegratedEntrust integratedEntrust) {
-        negotiateQuoteSendBean.setRequestNo(integratedEntrust.getReportNo());
-        negotiateQuoteSendBean.setRequestTime(integratedEntrust.getReportTime());
+        negotiateQuoteSendBean.setRequestNo(integratedEntrust.getId());
+        negotiateQuoteSendBean.setRequestTime(DateUtil.formatDateTime(integratedEntrust.getCreateTime()));
         negotiateQuoteSendBean.setStockCode(integratedEntrust.getStockCode());
         negotiateQuoteSendBean.setStockName(integratedEntrust.getStockName());
         negotiateQuoteSendBean.setBs(integratedEntrust.getEntrustBs());
@@ -157,17 +156,21 @@ public class IntegratedQuoteManagement {
         negotiateQuoteSendBean.setFullPrice(integratedEntrust.getFullPrice());
         negotiateQuoteSendBean.setEntrustPrice(integratedEntrust.getEntrustPrice());
         negotiateQuoteSendBean.setEntrustBalance(integratedEntrust.getEntrustBalance());
-        negotiateQuoteSendBean.setMemberId(integratedEntrust.getSellerNo());
-        negotiateQuoteSendBean.setTraderCode(integratedEntrust.getSellerNo());
+        negotiateQuoteSendBean.setMemberId(integratedEntrust.getDealerId());
+        negotiateQuoteSendBean.setTraderCode(integratedEntrust.getTradeId());
         negotiateQuoteSendBean.setInvestorId(integratedEntrust.getInvestorId());
         negotiateQuoteSendBean.setInvestorType(integratedEntrust.getOwnerType());
-        negotiateQuoteSendBean.setCpMemberId(integratedEntrust.getPropSeatName());
-        negotiateQuoteSendBean.setCpTraderCode(integratedEntrust.getLiaisonTel());
+        negotiateQuoteSendBean.setCpMemberId(integratedEntrust.getPropDealerId());
+        negotiateQuoteSendBean.setCpTraderCode(integratedEntrust.getPropTradeId());
         negotiateQuoteSendBean.setCpInvestorId(integratedEntrust.getPropInvestorId());
-        negotiateQuoteSendBean.setCpInvestorType(integratedEntrust.getPropInvestorName());
+        negotiateQuoteSendBean.setCpInvestorType(integratedEntrust.getPropOwnerType());
         negotiateQuoteSendBean.setConfirmId(integratedEntrust.getContractId());
         negotiateQuoteSendBean.setPositionStr(integratedEntrust.getPositionStr());
         negotiateQuoteSendBean.setRemark(integratedEntrust.getRemark());
+        negotiateQuoteSendBean.setRequestStatusStr(RequestStatus.getRequestStatusName(negotiateQuoteSendBean.getRequestStatus()));
+        negotiateQuoteSendBean.setBsStr(EntrustBs.isBuy(negotiateQuoteSendBean.getBs()) ? EntrustBs.BUY.name : EntrustBs.SELL.name);
+        negotiateQuoteSendBean.setInvestorTypeStr(InvestorType.getInvestorTypeName(negotiateQuoteSendBean.getInvestorType()));
+        negotiateQuoteSendBean.setCpInvestorTypeStr(InvestorType.getInvestorTypeName(negotiateQuoteSendBean.getInvestorType()));
     }
 }
 

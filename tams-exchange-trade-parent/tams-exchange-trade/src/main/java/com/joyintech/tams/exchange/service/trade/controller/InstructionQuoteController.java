@@ -143,7 +143,7 @@ public class InstructionQuoteController {
 
     @ApiOperation(value = "我收到的协商成交行情接口(深交所)", notes = "我收到的协商成交行情接口(深交所)")
     @RequestMapping(value = "/entrust/integrated/negotiateQuoteReceive", method = RequestMethod.POST)
-    public Message queryNegotiateQuoteReceive(@RequestBody NegotiateQuoteQueryBean negotiateQuoteQueryBean) {
+    public Message queryNegotiateQuoteReceive(@RequestBody @Validated NegotiateQuoteQueryBean negotiateQuoteQueryBean) {
         if (!MasterUtil.isMaster()) {
             return MasterUtil.postForObject(negotiateQuoteQueryBean);
         }

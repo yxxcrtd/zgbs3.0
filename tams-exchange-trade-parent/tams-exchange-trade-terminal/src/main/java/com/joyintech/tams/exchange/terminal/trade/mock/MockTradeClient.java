@@ -1040,9 +1040,9 @@ public class MockTradeClient implements ITradeRequest {
 	@Override
 	public void queryNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean, Long requestId) {
 		// TODO Auto-generated method stub
-        String stockCode = negotiateQuoteQueryBean.getStockCode();
+//        String stockCode = negotiateQuoteQueryBean.getStockCode();
 //        TickBean tickBean = queryQuoteTick(stockCode);
-        List<NegotiateQuoteReceiveBean> negotiateQuoteReceiveBeans = MockQuoteData.makeNegotiateQuoteReceive(stockCode, null);
+        List<NegotiateQuoteReceiveBean> negotiateQuoteReceiveBeans = MockQuoteData.makeNegotiateQuoteReceive(negotiateQuoteQueryBean, null);
         mockTradeResponse.resQueryNegotiateQuoteReceive(negotiateQuoteReceiveBeans, requestId);
 	}
 
