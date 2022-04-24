@@ -774,7 +774,7 @@
                 }
             } else {
                 //return parent.EtrExchangeTradeJjHq.getJJMktPrice("#latestPrice_jj");
-                return jJHQXX.ceiling.toFixed(2);
+                return jJHQXX.latest.toFixed(2);
             }
         } else if (currentTab == "gd") {
             return $("#price_gd").get(0).value;
