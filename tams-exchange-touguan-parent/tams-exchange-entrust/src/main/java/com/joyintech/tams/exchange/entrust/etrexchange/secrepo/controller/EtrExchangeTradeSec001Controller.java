@@ -19,7 +19,6 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.select.SelectDto;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
@@ -37,7 +36,6 @@ import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.common.base.entity.FinExercisePlan;
 import com.joyintech.tams.component.business.bond.BusiFinExercisePlanService;
-import com.joyintech.tams.component.business.common.dto.FinStockInfoDto;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
@@ -52,10 +50,8 @@ import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeMin
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.FinprodMarketInfoRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.MinNumStepRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.MinPriceRequest;
-import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.PsOptionsRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.PtlSecAcctInfoRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.SecFaceValueRequest;
-import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.SelectOptionRequestDto;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.StdsecConverseRatioRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.hqjj.validator.EtrExchangeTradeJj001Validator;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dao.EtrExchangeTradeSecRepoMapper;
@@ -92,7 +88,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.math.BigDecimal;
@@ -103,7 +98,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -274,6 +268,39 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 		initPageParams.put("ETR_TRADE_TIME_SWITCH", CacheUtil.getSysParam("etr_trade_time_switch"));
 		initPageParams.put("ETR_CHECK_POS_SWITCH",CacheUtil.getSysParam(BussinessConstant.ETR_CHECK_POS_SWITCH));
 		return new Message<Map<String, Object>>(initPageParams).success();
+	}
+
+
+	/**
+	 *  获取流程中信息
+	 * @param workflowId
+	 * @return
+	 */
+	@ApiOperation(value = "获取流程中信息", notes = "获取流程中信息")
+	@ResponseBody
+	@PostMapping("/getApproveEntity")
+	public Message<EtrExchangeTradeSaveSecRepoRequest> getApproveEntity(@RequestBody String workflowId)
+	{
+		try{
+			workflowId = workflowId.replaceAll("\"","");
+			EtrExchangeTradeSaveSecRepoRequest entity = new EtrExchangeTradeSaveSecRepoRequest();
+			if (StringUtil.isNotEmpty(workflowId)) {
+				//流程代办checkImportData
+				entity = etrExchangeTradeSecRepo001Service.getBussinessEntityByWorkflowId(
+						workflowId);
+				//add by chenjiaxing 流程中不显示资产名称 start
+				String[] secIds = StringUtil.split(entity.getFinprodId(),"_");
+				if(secIds!=null){
+					if(secIds.length == 2 && StringUtil.isEmpty(entity.getStockId())){
+						entity.setStockId(secIds[1]);
+					}
+				}
+			}
+			return new Message<EtrExchangeTradeSaveSecRepoRequest>().success().setData(entity);
+		} catch(Exception e){
+			return new Message<EtrExchangeTradeSaveSecRepoRequest>().fail().setMessage("查询异常");
+		}
+
 	}
 
 	/**

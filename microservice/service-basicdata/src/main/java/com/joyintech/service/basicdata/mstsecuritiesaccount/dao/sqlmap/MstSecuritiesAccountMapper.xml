@@ -770,8 +770,8 @@
         and a.finprod_type2 in (#{FINPROD_TYPE_TG_F01})<!--  债券 -->
         and r.type_6 != #{type6_B14}
         union
-        select distinct a.TRADE_MARKET as finprod_market_id,
-        concat(concat(a.TRADE_MARKET,'|'),a.TERM_TYPE) as finprod_name,
+        select distinct a.MARKET_ID as finprod_market_id,
+        concat(concat(a.MARKET_ID,'|'),a.TERM_TYPE) as finprod_name,
         null as oth_code_type,
         #{FINPROD_TYPE_TG_ZYSHG} as finprod_type2,
         a.TERM_TYPE as finprod_id,

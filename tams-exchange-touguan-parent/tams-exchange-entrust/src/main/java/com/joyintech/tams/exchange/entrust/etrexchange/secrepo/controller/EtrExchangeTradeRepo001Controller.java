@@ -261,6 +261,32 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 		return new Message<Map<String, Object>>(initPageParams).success();
 	}
 
+
+	/**
+	 *  获取流程中信息
+	 * @param workflowId
+	 * @return
+	 */
+	@ApiOperation(value = "获取流程中信息", notes = "获取流程中信息")
+	@ResponseBody
+	@PostMapping("/getApproveEntity")
+	public Message<EtrExchangeTradeSaveSecRepoRequest> getApproveEntity(@RequestBody String workflowId)
+	{
+		try{
+			workflowId = workflowId.replaceAll("\"","");
+			EtrExchangeTradeSaveSecRepoRequest entity = new EtrExchangeTradeSaveSecRepoRequest();
+			if (StringUtil.isNotEmpty(workflowId)) {
+				//流程代办checkImportData
+				entity = etrExchangeTradeSecRepo001Service.getBussinessEntityByWorkflowId(
+						workflowId);
+			}
+			return new Message<EtrExchangeTradeSaveSecRepoRequest>().success().setData(entity);
+		} catch(Exception e){
+			return new Message<EtrExchangeTradeSaveSecRepoRequest>().fail().setMessage("查询异常");
+		}
+
+	}
+
 	/**
 	 * 由于交易平台不同，设置不同交易平台对应的委托方向
 	 * @param initPageParams initPageParams

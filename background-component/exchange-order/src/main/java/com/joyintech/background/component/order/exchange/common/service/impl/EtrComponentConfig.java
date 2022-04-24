@@ -10,34 +10,12 @@
  
 package com.joyintech.background.component.order.exchange.common.service.impl;
 
+import com.joyintech.background.component.order.exchange.business.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.Validator;
 
-import com.joyintech.background.component.order.exchange.business.dto.AgreRepAdvBuyDto;
-import com.joyintech.background.component.order.exchange.business.dto.AgreRepExpireDto;
-import com.joyintech.background.component.order.exchange.business.dto.AgreRepExpireUnBuyDto;
-import com.joyintech.background.component.order.exchange.business.dto.AgreRepFristIssueDto;
-import com.joyintech.background.component.order.exchange.business.dto.AgreRepHwayChgSecDto;
-import com.joyintech.background.component.order.exchange.business.dto.AgreRepOpenSecDto;
-import com.joyintech.background.component.order.exchange.business.dto.EtrBlockTradeBondDto;
-import com.joyintech.background.component.order.exchange.business.dto.EtrBlockTradeFundDto;
-import com.joyintech.background.component.order.exchange.business.dto.EtrBlockTradePledgeRepoDto;
-import com.joyintech.background.component.order.exchange.business.dto.EtrBlockTradeStockDto;
-import com.joyintech.background.component.order.exchange.business.dto.EtrBondBiddingDto;
-import com.joyintech.background.component.order.exchange.business.dto.EtrBondFxdIncmPlatSHDto;
-import com.joyintech.background.component.order.exchange.business.dto.EtrBondRepoBiddingDto;
-import com.joyintech.background.component.order.exchange.business.dto.EtrBondRepurchaseDto;
-import com.joyintech.background.component.order.exchange.business.dto.EtrBondRightDto;
-import com.joyintech.background.component.order.exchange.business.dto.EtrBondToStockDto;
-import com.joyintech.background.component.order.exchange.business.dto.EtrConvBondApplyDto;
-import com.joyintech.background.component.order.exchange.business.dto.EtrFundBiddingDto;
-import com.joyintech.background.component.order.exchange.business.dto.EtrFutureBiddingDto;
-import com.joyintech.background.component.order.exchange.business.dto.EtrStandardBondInOutDto;
-import com.joyintech.background.component.order.exchange.business.dto.EtrStockBiddingDto;
-import com.joyintech.background.component.order.exchange.business.dto.EtrStockNewDto;
-import com.joyintech.background.component.order.exchange.business.dto.EtrStockRightDto;
 import com.joyintech.background.component.order.exchange.common.dto.EtrBaseDto;
 import com.joyintech.background.component.order.exchange.common.service.EtrComponentCommService;
 import com.joyintech.background.component.order.exchange.common.service.EtrSubComponentService;
@@ -59,6 +37,17 @@ public class EtrComponentConfig {
 
     @Autowired
     private Validator validator;
+
+
+    @Bean
+    public EtrComponentCommService<EtrSecRepoBondDto> etrSecRepoBondComm(EtrSubComponentService<EtrSecRepoBondDto> etrSecRepoBondService) {
+        return EtrComponentFactory.put(EtrSecRepoBondDto.class, getService(etrSecRepoBondService));
+    }
+
+    @Bean
+    public EtrComponentCommService<EtrSecRepoRepoDto> etrSecRepoRepoComm(EtrSubComponentService<EtrSecRepoRepoDto> etrSecRepoRepoService) {
+        return EtrComponentFactory.put(EtrSecRepoRepoDto.class, getService(etrSecRepoRepoService));
+    }
 
     @Bean
     public EtrComponentCommService<EtrStockBiddingDto> etrStockBiddingComm(EtrSubComponentService<EtrStockBiddingDto> stockBiddingService) {
