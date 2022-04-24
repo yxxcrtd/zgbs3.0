@@ -20,6 +20,7 @@ import com.joyintech.framework.util.*;
 import com.joyintech.system.constant.SystemGlobalConstant;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
 import com.joyintech.tams.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanValuationTradeDto;
 import com.joyintech.tams.valuation.trademanage.trdplanvaluationtrade.service.TrdPlanValuationTrade001Service;
@@ -68,7 +69,7 @@ public class TrdPlanValuationTrade001Controller extends BaseController {
      */
     @Override
     public String init(Model model) {
-        this.setSelectOptionToModel(model, DictCode.交易方向);
+        this.setSelectOptionToModel(model, DictCode.交易方向,DictCode.生成方式);
         return super.init(model);
     }
 
@@ -83,7 +84,7 @@ public class TrdPlanValuationTrade001Controller extends BaseController {
     @RequestMapping("/getFinprodId")
     public List<SelectOptionDto> getFinprodId() {
         Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("finprodType","F16");
+        param.put("finprodType", DictCodeListExt1.金融产品类型_理财产品.getValue());
         return commonBusinessService.getProdName(param);
     }
 
@@ -98,8 +99,8 @@ public class TrdPlanValuationTrade001Controller extends BaseController {
     @RequestMapping("/getAssetId")
     public List<SelectOptionDto> getAssetId() {
         Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("assetType","F17");
-        String[] arr = {"01","03"};
+        param.put("assetType",DictCodeListExt1.金融产品类型_计划类资产.getValue());
+        String[] arr = {DictCodeList.收益类型_净值型.getValue(),DictCodeList.收益类型_货币型.getValue()};
         param.put("profitTypeArr",arr);
         return commonBusinessService.getAssetId(param);
     }
@@ -122,34 +123,16 @@ public class TrdPlanValuationTrade001Controller extends BaseController {
     }
 
     /**
-     * 导出数据
-     *
-     * @return ResponseEntity<byte[]>
-     * @throws Exception ExportUtil.export
+     * 导出
+     * @return
+     * @throws Exception
      * @see
      * @since 1.0
      */
     @RequestMapping(ACTION_EXPORT)
-    public ResponseEntity<byte[]> export()
-            throws IOException {
-        String datas = this.getParam("datas");
-        List<TrdPlanValuationTradeDto> listdto;
-        if (datas == null) {
-            listdto = trdPlanValuationTrade001Service.findAll(RequestUtil.getPageParam());
-        }
-        else {
-            listdto = JsonUtils.json2List(datas, TrdPlanValuationTradeDto.class);
-        }
-        File outFile = trdPlanValuationTrade001Service.makeFile(
-                "/com/joyintech/tams/valuation/trademanage/trdplanvaluationtrade/conf/export.xml",
-                listdto);
-        return ExportUtil.export(
-                this.getMessage(this.getPageId()) + SystemGlobalConstant.OPEN_PARENTHESIS
-                        + DateUtil.format(new Date())
-                        + SystemGlobalConstant.CLOSE_PARENTHESIS
-                        + SystemGlobalConstant.POINT
-                        + FileNameUtil.getFileExtName(outFile),
-                outFile, true);
+    public ResponseEntity<byte[]> export(){
+        Map<String, Object> param = RequestUtil.getParameters(getRequest());
+        return trdPlanValuationTrade001Service.export(this.getPageId(),param);
     }
 
     /**

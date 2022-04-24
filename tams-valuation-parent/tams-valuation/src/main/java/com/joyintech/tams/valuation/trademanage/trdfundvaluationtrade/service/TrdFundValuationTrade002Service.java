@@ -420,13 +420,15 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
         valFundTrade.setMyAcctNo(dto.getTrdMyAcctNo());//付款账户-资金账户
         valFundTrade.setTradeAmt(dto.getSettleAmt());//交易金额
         valFundTrade.setIsClean("N"); //有无清算指令
-        if((new BigDecimal(0)).compareTo(dto.getCommission()) == -1
-                && (new BigDecimal(0)).compareTo(dto.getCommissionPay()) != -1){
-            valFundTrade.setIsCommission("Y");//佣金是否随交易支付
-            valFundTrade.setCommission(dto.getCommission());
-        }else{
-            valFundTrade.setIsCommission("N");//佣金是否随交易支付
-            valFundTrade.setCommission(dto.getCommissionPay());
+        if(StringUtil.isNotEmpty(dto.getCommission()) || StringUtil.isNotEmpty(dto.getCommissionPay())){
+            if((new BigDecimal(0)).compareTo(dto.getCommission()) == -1
+                    && (new BigDecimal(0)).compareTo(dto.getCommissionPay()) != -1){
+                valFundTrade.setIsCommission("Y");//佣金是否随交易支付
+                valFundTrade.setCommission(dto.getCommission());
+            }else{
+                valFundTrade.setIsCommission("N");//佣金是否随交易支付
+                valFundTrade.setCommission(dto.getCommissionPay());
+            }
         }
         //设置数据来源：画面录入
         valFundTrade.setDataSource(DictCodeListExt1.生成方式_画面录入.getValue());

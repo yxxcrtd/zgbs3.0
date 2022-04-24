@@ -6,36 +6,36 @@
 		SELECT
 		 	t.TRADE_ID tradeId,/**交易编号**/
 			t.F_TRADE_ID outTradeId,    /*外部成交编号*/
-			NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) prodId,/**金融产品代码**/
+			deal1.BOOKSET_ID prodId,/**金融产品代码**/
 			bok.BOOKSET_NAME prodName,/**金融产品名称**/
 			zc.FINPROD_ID  assetId, /**资产代码**/
 			zc.FINPROD_ABBR  assetAbbr,/**资产简称**/
 			t.PS ps,/**交易方向**/
 			t.TRADE_DATE tradeDate,/**交易日**/
+			t.SETTLE_DATE settleDate,
 			CASE
-				WHEN t.PS in('T01','T02') THEN t.PRIN_AMT
-				WHEN t.PS in('T05') then t.FPRICE_AMT
-				WHEN t.PS in('T19') then t.SHARE_AMT*t.UNIT_CPRICE
+				WHEN t.PS in(#{PS_T01},#{PS_T02}) THEN t.PRIN_AMT
+				WHEN t.PS in(#{PS_T05}) then t.FPRICE_AMT
+				WHEN t.PS in(#{PS_T19}) then t.SHARE_AMT*t.UNIT_CPRICE
 				ELSE t.TRADE_AMT END AS tradeAmt,/**成交金额**/
 			t.SHARE_AMT dealNum,/**交易份额**/
 			t.CCY ccy,/**币种**/
 			t.TRADE_AMT settleAmt,/**结算金额**/
-			nvl(t.MY_ACCT_NO,stl.MY_ACCT_NO) trdMyAcctNo/**资金账户**/
+			t.MY_ACCT_NO trdMyAcctNo,/**资金账户**/
+			d.GEN_TYPE dataSource /**数据来源**/
 		FROM TRD_PRODUCT_DEAL t
+		LEFT JOIN TRD_PRODUCT_DEAL_ADD d on t.TRADE_ID = d.TRADE_ID
 		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
-		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE  in( '06','07') AND STL.ORDER_TYPE NOT LIKE 'N%'
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal1 on deal1.BUSI_NO = t.TRADE_ID
-		LEFT JOIN BOK_DEAL_ACCOUNTING deal2 ON stl.ORDER_ID = deal2.BUSI_NO
-		LEFT JOIN BOK_BOOKSET bok on (bok.BOOKSET_ID = deal1.BOOKSET_ID) OR (bok.BOOKSET_ID = deal2.BOOKSET_ID)
+		LEFT JOIN BOK_BOOKSET bok on bok.BOOKSET_ID = deal1.BOOKSET_ID
 		where
-		 t.BUSI_TYPE IN('06','07')
-		 and t.FINPROD_TYPE = 'F17'
-		AND t.PS IN('T01','T02','T04','T05','T18','T19','T24','T52')
+		 t.BUSI_TYPE IN(#{busiType_06},#{busiType_07})
+		 and t.FINPROD_TYPE = #{finprodType}
 		<if test="tradeId !=null and tradeId !='' ">
 			and t.TRADE_ID like  concat(concat('%',#{tradeId}),'%')
 		</if>
 		<if test="finprodIdArr != null and finprodIdArr.length > 0">
-			and NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) IN
+			and deal1.BOOKSET_ID IN
 			<foreach collection="finprodIdArr" item="finprodId" open="( " close=" )" separator=",">
 				#{finprodId}
 			</foreach>
@@ -58,6 +58,12 @@
 				#{ps}
 			</foreach>
 		</if>
+		<if test="dataSourceArr != null and dataSourceArr.length > 0">
+			AND d.GEN_TYPE IN
+			<foreach collection="dataSourceArr" item="dataSource" open="( " close=" )" separator=",">
+				#{dataSource}
+			</foreach>
+		</if>
 		order by t.TRADE_ID desc
 	</select>
 
@@ -66,7 +72,7 @@
 		SELECT
 			t.TRADE_ID tradeId,/**交易编号**/
 			t.F_TRADE_ID outTradeId, /*外部成交编号*/
-			NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) prodId,/**金融产品代码**/
+			deal1.BOOKSET_ID prodId,/**金融产品代码**/
 			bok.BOOKSET_NAME prodName,/**金融产品名称**/
 			zc.FINPROD_ID  assetId, /**资产代码**/
 			zc.FINPROD_ABBR  assetAbbr,/**资产简称**/
@@ -77,22 +83,19 @@
 			t.SETTLE_DATE    settleDate,/**结算日期**/
 			t.PRIN_AMT tradeAmt,/**成交金额**/
 			t.SHARE_AMT dealNum,/**成交数量**/
-			nvl(t.MY_ACCT_NO,stl.MY_ACCT_NO)    trdMyAcctNo,/**资金账户**/
-			ttfd.FEE_AMT  advFeeOut,/**经手费**/
-			ttfd2.FEE_AMT  commission,/**佣金**/
-			t.TRADE_AMT    settleAmt/**结算金额**/
+			t.MY_ACCT_NO    trdMyAcctNo/**资金账户**/
 		</if>
 		<if test="ps == 'T52' ">/*认购*/
 			t.TRADE_DATE applyDate,/**申请日期**/
 			t.SETTLE_DATE subSettleDate,/**结算日期**/
 			t.TRADE_AMT applyAmt,/**申请金额**/
-			nvl(t.MY_ACCT_NO,stl.MY_ACCT_NO) subMyAcctNo/**资金账户**/
+			t.MY_ACCT_NO subMyAcctNo/**资金账户**/
 		</if>
 		<if test="ps == 'T04' ">/*申购*/
 			t.TRADE_DATE purApplyDate,/**申请日期**/
 			t.SETTLE_DATE purSettleDate,/**结算日期**/
 			t.TRADE_AMT purApplyAmt,/**申请金额**/
-			nvl(t.MY_ACCT_NO,stl.MY_ACCT_NO) purMyAcctNo/**资金账户**/
+			t.MY_ACCT_NO purMyAcctNo/**资金账户**/
 		</if>
 		<if test="ps == 'T18' ">/*认购确认*/
 			t.TRADE_DATE subConfirmDate,/**确认日期**/
@@ -100,7 +103,7 @@
 			t.SHARE_AMT subConfirmNum,/**确认数量**/
 			t.INT_AMT raiseInterest,/**募集期利息**/
 			t.FEE_AMT_UNPAY subFee,/**认购费**/
-			nvl(t.MY_ACCT_NO,stl.MY_ACCT_NO)   subConfirmMyAcctNo/**资金账户**/
+			t.MY_ACCT_NO   subConfirmMyAcctNo/**资金账户**/
 		</if>
 		<if test="ps == 'T05' ">/*申购确认*/
 			t.TRADE_DATE purConfirmDate,/**确认日期**/
@@ -109,7 +112,7 @@
 			t.UNIT_CPRICE purUnitValue,/**单位净值**/
 			t.INT_AMT interestIncome,/**利息收入**/
 			t.FEE_AMT_PAY purFee,/**申购费**/
-			nvl(t.MY_ACCT_NO,stl.MY_ACCT_NO)   purConfirmMyAcctNo/**资金账户**/
+			t.MY_ACCT_NO   purConfirmMyAcctNo/**资金账户**/
 		</if>
 		<if test="ps == 'T19' ">
 			t.TRADE_DATE      redConfirmDate,/**确认日期**/
@@ -118,19 +121,14 @@
 			t.UNIT_CPRICE redUnitValue,/**单位净值**/
 			t.FEE_AMT_PAY redFee,/**赎回费**/
 			null arriveDate,/**到账日期**/
-			nvl(t.MY_ACCT_NO,stl.MY_ACCT_NO)    redMyAcctNo/**资金账户**/
+			t.MY_ACCT_NO    redMyAcctNo/**资金账户**/
 		</if>
 		FROM TRD_PRODUCT_DEAL t
 		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
-		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE  in( '06','07') AND STL.ORDER_TYPE NOT LIKE 'N%'
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal1 on deal1.BUSI_NO = t.TRADE_ID
-		LEFT JOIN BOK_DEAL_ACCOUNTING deal2 ON stl.ORDER_ID = deal2.BUSI_NO
-		LEFT JOIN BOK_BOOKSET bok on (bok.BOOKSET_ID = deal1.BOOKSET_ID) OR (bok.BOOKSET_ID = deal2.BOOKSET_ID)
-		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd ON ttfd.TRADE_ID = t.TRADE_ID AND ttfd.FEE_TYPE = 'B01'
-		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd2 ON ttfd2.TRADE_ID = t.TRADE_ID AND ttfd2.FEE_TYPE = 'B08'
-         where
-		 t.TRADE_ID  = #{tradeId,jdbcType=VARCHAR}
-		 and t.BUSI_TYPE IN('06','07')
+		LEFT JOIN BOK_BOOKSET bok on bok.BOOKSET_ID = deal1.BOOKSET_ID
+		 where  t.TRADE_ID  = #{tradeId,jdbcType=VARCHAR}
+		 and t.BUSI_TYPE IN(#{busiType_06},#{busiType_07})
 		 and rownum=1
 	</select>
 
@@ -138,7 +136,7 @@
 		SELECT
 			t.TRADE_ID tradeId,/**交易编号**/
 			t.F_TRADE_ID outTradeId, /*外部成交编号*/
-			NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) prodId,/**金融产品代码**/
+			Ndeal1.BOOKSET_ID prodId,/**金融产品代码**/
 			bok.BOOKSET_NAME prodName,/**金融产品名称**/
 			zc.FINPROD_ID  assetId, /**资产代码**/
 			zc.FINPROD_ABBR  assetAbbr,/**资产简称**/
@@ -152,25 +150,22 @@
 			t.FEE_AMT_PAY redFee,/**赎回费**/
 			null arriveDate,/**到账日期**/
 			null tradeAmtArrive,/**到账金额**/
-			nvl(t.MY_ACCT_NO,stl.MY_ACCT_NO)    redMyAcctNo/**资金账户**/
+			t.MY_ACCT_NO    redMyAcctNo/**资金账户**/
 		FROM TRD_PRODUCT_DEAL t
 		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
-		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE  in( '06','07') AND STL.ORDER_TYPE NOT LIKE 'N%'
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal1 on deal1.BUSI_NO = t.TRADE_ID
-		LEFT JOIN BOK_DEAL_ACCOUNTING deal2 ON stl.ORDER_ID = deal2.BUSI_NO
-		LEFT JOIN BOK_BOOKSET bok on (bok.BOOKSET_ID = deal1.BOOKSET_ID) OR (bok.BOOKSET_ID = deal2.BOOKSET_ID)
+		LEFT JOIN BOK_BOOKSET bok on bok.BOOKSET_ID = deal1.BOOKSET_ID
 		where
-		t.BUSI_TYPE in ('06','07')
-		and t.TRADE_ID  = #{tradeId,jdbcType=VARCHAR}
-		and rownum=1
-
+			t.BUSI_TYPE in (#{busiType_06},#{busiType_07})
+			and t.TRADE_ID  = #{tradeId,jdbcType=VARCHAR}
+			and rownum=1
 	</select>
 
 	<select id="queryRedInfoByOutTradeId" resultType="com.joyintech.service.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanValuationTradeDto">
 		SELECT
 			t.TRADE_ID tradeId,/**交易编号**/
 			t.F_TRADE_ID outTradeId, /*外部成交编号*/
-			NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) prodId,/**金融产品代码**/
+			deal1.BOOKSET_ID prodId,/**金融产品代码**/
 			bok.BOOKSET_NAME prodName,/**金融产品名称**/
 			zc.FINPROD_ID  assetId, /**资产代码**/
 			zc.FINPROD_ABBR  assetAbbr,/**资产简称**/
@@ -184,32 +179,18 @@
 			tpd.FEE_AMT_PAY redFee,/**赎回费**/
 			null arriveDate,/**到账日期**/
 			null tradeAmtArrive,/**到账金额**/
-			nvl(t.MY_ACCT_NO,stl.MY_ACCT_NO)    redMyAcctNo/**资金账户**/
+			t.MY_ACCT_NO   redMyAcctNo/**资金账户**/
 		FROM TRD_PRODUCT_DEAL t
 		LEFT JOIN TRD_PRODUCT_DEAL tpd ON t.F_TRADE_ID  = tpd.TRADE_ID
 		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
-		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE  in( '06','07') AND STL.ORDER_TYPE NOT LIKE 'N%'
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal1 on deal1.BUSI_NO = t.TRADE_ID
-		LEFT JOIN BOK_DEAL_ACCOUNTING deal2 ON stl.ORDER_ID = deal2.BUSI_NO
-		LEFT JOIN BOK_BOOKSET bok on (bok.BOOKSET_ID = deal1.BOOKSET_ID) OR (bok.BOOKSET_ID = deal2.BOOKSET_ID)
+		LEFT JOIN BOK_BOOKSET bok on bok.BOOKSET_ID = deal1.BOOKSET_ID
 		where
-		t.BUSI_TYPE in ('06','07')
+		t.BUSI_TYPE in (#{busiType_06},#{busiType_07})
 		and t.TRADE_ID  = #{tradeId,jdbcType=VARCHAR}
 		and rownum=1
 
 	</select>
-
-    <select id="getNextId" resultType="java.lang.String">
-		SELECT REPLACE(LPAD(${sequenceName}.NEXTVAL, 4), ' ', '0') FROM DUAL
-	</select>
-
-
-    <select id="selectCountByTradeId" resultType="java.lang.Integer" parameterType="java.lang.String" >
-        select
-        count(1)
-        from TRD_PRODUCT_DEAL
-        where TRADE_ID = #{tradeId,jdbcType=VARCHAR}
-    </select>
 
 	<delete id="delBokDetailIdByTradeId">
 		DELETE FROM BOK_DETAIL_ID

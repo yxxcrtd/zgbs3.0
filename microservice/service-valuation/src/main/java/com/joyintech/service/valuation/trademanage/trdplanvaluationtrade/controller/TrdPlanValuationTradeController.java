@@ -53,29 +53,6 @@ public class TrdPlanValuationTradeController extends BaseController {
     }
 
     /**
-     * 策略代码生成
-     * @see
-     * @since 1.0
-     */
-    @PostMapping("createPlanTradeId")
-    public String createPlanTradeId() {
-        return trdPlanValuationTradeService.createPlanTradeId();
-    }
-
-    /**
-     * 不分页数据查询
-     *
-     * @return page
-     * @throws Exception 异常
-     * @see
-     * @since 1.0
-     */
-    @PostMapping("/findAll")
-    public List<TrdPlanValuationTradeDto> findAll(@RequestBody Map<String, Object> param){
-        return trdPlanValuationTradeService.findAll(param);
-    }
-
-    /**
      * 根据交易编号查询对象
      * @see
      * @since 1.0

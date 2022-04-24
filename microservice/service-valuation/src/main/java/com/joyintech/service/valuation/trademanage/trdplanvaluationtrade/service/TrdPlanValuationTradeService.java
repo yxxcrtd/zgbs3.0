@@ -14,11 +14,14 @@ import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.service.valuation.component.common.constants.BussinessDictCodeList;
 import com.joyintech.service.valuation.trademanage.trdfundvaluationtrade.dto.TrdFundValuationTradeDto;
 import com.joyintech.service.valuation.trademanage.trdplanvaluationtrade.dao.TrdPlanValuationTradeMapper;
 import com.joyintech.service.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanTradeResult;
 import com.joyintech.service.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanValuationTradeDto;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.valuation.common.interf.base.batch.dao.*;
 import com.joyintech.tams.valuation.common.interf.base.service.common.InterfCommonService;
@@ -115,87 +118,42 @@ public class TrdPlanValuationTradeService extends CommonExportService<TrdPlanVal
         String[] psArr = null;
         if (StringUtil.isNotEmpty(ps)) {
             psArr = ps.split(",");
+            pageParam.put("psArr", psArr);
+        }else{
+            String[] psArr1 = {DictCodeList.交易方向_买入.getValue()
+                    ,DictCodeList.交易方向_卖出.getValue()
+                    ,DictCodeList.交易方向_申购.getValue()
+                    ,DictCodeList.交易方向_申购确认.getValue()
+                    ,DictCodeList.交易方向_赎回确认.getValue()
+                    ,DictCodeList.交易方向_赎回到账.getValue()};
+            pageParam.put("psArr", psArr1);
         }
-        pageParam.put("psArr", psArr);
+
+        // 获取数据来源
+        String dataSource = (String)pageParam.get("dataSource");
+        // 数据来源多选，转为数组
+        String[] dataSourceArr = null;
+        if (StringUtil.isNotEmpty(dataSource)) {
+            dataSourceArr = dataSource.split(",");
+        }
+        pageParam.put("dataSourceArr", dataSourceArr);
+
+        pageParam.put("busiType_06", DictCodeList.业务类型_货币基金交易_货基_类货基资产交易.getValue());
+        pageParam.put("busiType_07",DictCodeList.业务类型_非货币基金交易_非货基_非类货基资产交易.getValue());
+        pageParam.put("finprodType", DictCodeListExt1.金融产品类型_计划类资产.getValue());
+        pageParam.put("PS_T01", DictCodeList.交易方向_买入.getValue());
+        pageParam.put("PS_T02", DictCodeList.交易方向_卖出.getValue());
+        pageParam.put("PS_T04", DictCodeList.交易方向_申购.getValue());
+        pageParam.put("PS_T05", DictCodeList.交易方向_申购确认.getValue());
+        pageParam.put("PS_T19", DictCodeList.交易方向_赎回确认.getValue());
+        pageParam.put("PS_T24", DictCodeList.交易方向_赎回到账.getValue());
 
         return super.queryForPage(page,length,()-> trdPlanValuationTradeMapper.selectDeal(pageParam));
     }
 
-
-    /**
-     * 策略代码生成
-     *
-     * @return
-     * @see
-     * @since 1.0
-     */
-    public String createPlanTradeId() {
-        String tradeId = null;
-        while (true) {
-            // 获取自增数
-            String nextId = this.getNextId("PLANTRADEID_SEQUENCE");
-            //平台日
-            String dateStr= DateUtil.format(iPlatformDate.getSysDate(),DateUtil.DEFAULT_OTHER_FORMAT);//yyyyMMdd
-            // 拼接
-            tradeId = "JY"+"PLAN"+dateStr+ nextId;
-            // 查询是否重复
-            int num = trdPlanValuationTradeMapper.selectCountByTradeId(tradeId);
-            // 如果自增的策略代码不存在，则跳出循环
-            if (num==0) {
-                break;
-            }
-        }
-        return tradeId;
-    }
-
-    /**
-     * 获取自增序列值
-     *
-     * @param sequenceName 序列名
-     * @return
-     */
-    public String getNextId(String sequenceName) {
-        return trdPlanValuationTradeMapper.getNextId(sequenceName);
-    }
-
-    /**
-     * 根据条件查询所有
-     *
-     * @param params
-     * @return
-     * @see
-     * @since 1.0
-     */
-    public List<TrdPlanValuationTradeDto> findAll(Map<String, Object> params) {
-        //产品代码
-        String finprodId = (String)params.get("finprodId");
-        String[] finprodIdArr = null;
-        if(StringUtil.isNotEmpty(finprodId)){
-            finprodIdArr = finprodId.split(",");
-        }
-        params.put("finprodIdArr", finprodIdArr);
-
-        //资产代码
-        String asset = (String)params.get("asset");
-        String[] assetIdArr = null;
-        if(StringUtil.isNotEmpty(asset)){
-            assetIdArr = asset.split(",");
-        }
-        params.put("assetIdArr", assetIdArr);
-
-        // 获取交易方向
-        String ps = (String)params.get("ps");
-        // 交易方向多选，转为数组
-        String[] psArr = null;
-        if (StringUtil.isNotEmpty(ps)) {
-            psArr = ps.split(",");
-        }
-        params.put("psArr", psArr);
-
-        return trdPlanValuationTradeMapper.selectDeal(params);
-    }
-
     public TrdPlanValuationTradeDto queryTradeInfoByTradeId(Map<String, Object> params) {
+        params.put("busiType_06", DictCodeList.业务类型_货币基金交易_货基_类货基资产交易.getValue());
+        params.put("busiType_07",DictCodeList.业务类型_非货币基金交易_非货基_非类货基资产交易.getValue());
         return trdPlanValuationTradeMapper.queryTradeInfoByTradeId(params);
     }
 
@@ -205,14 +163,20 @@ public class TrdPlanValuationTradeService extends CommonExportService<TrdPlanVal
      * @since 1.0
      */
     public TrdPlanValuationTradeDto queryRedInfoByTradeId(String tradeId) {
-        return trdPlanValuationTradeMapper.queryRedInfoByTradeId(tradeId);
+        Map<String, Object> params =new HashMap<>();
+        params.put("busiType_06", DictCodeList.业务类型_货币基金交易_货基_类货基资产交易.getValue());
+        params.put("busiType_07",DictCodeList.业务类型_非货币基金交易_非货基_非类货基资产交易.getValue());
+        return trdPlanValuationTradeMapper.queryRedInfoByTradeId(params);
     }
 
     /**
      * 赎回到账双击明细页面
      */
     public TrdPlanValuationTradeDto queryRedInfoByOutTradeId(String tradeId) {
-        return trdPlanValuationTradeMapper.queryRedInfoByOutTradeId(tradeId);
+        Map<String, Object> params =new HashMap<>();
+        params.put("busiType_06", DictCodeList.业务类型_货币基金交易_货基_类货基资产交易.getValue());
+        params.put("busiType_07",DictCodeList.业务类型_非货币基金交易_非货基_非类货基资产交易.getValue());
+        return trdPlanValuationTradeMapper.queryRedInfoByOutTradeId(params);
     }
 
     /**

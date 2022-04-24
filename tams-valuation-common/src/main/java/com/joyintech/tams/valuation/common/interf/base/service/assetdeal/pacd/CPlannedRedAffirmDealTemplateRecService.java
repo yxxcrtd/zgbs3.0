@@ -20,6 +20,7 @@ import com.joyintech.tams.valuation.common.interf.base.constant.InterfCommonCons
 import com.joyintech.tams.valuation.common.interf.base.dto.*;
 import com.joyintech.tams.valuation.common.interf.base.service.common.InterfCommonService;
 import com.joyintech.tams.valuation.common.interf.base.service.common.TemplateAnalysisForXMLService;
+import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValMngMnfAffirmPurTrade;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValMngMnfRedAffirm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -184,9 +185,12 @@ public class CPlannedRedAffirmDealTemplateRecService {
             /**ADD BY WUJIE ON 20210501 END**/
 
 
-
-            Map<String, Object> map = interfCommonService.instructionGenerate(trdProductDeal,
-                dto.getProdId(),interfProductDealBookCommonDto.getAcctSubjectType(), null);
+            /*modify by sunshuaishuai 20220424 交易管理：录入界面的资金账户 start*/
+            //结算指令
+            StlOrders stlOrders = this.getStlOrders(dto,trdProductDeal);
+            Map<String, Object> map = interfCommonService.instructionGenerate_Interf(trdProductDeal,stlOrders,
+                    dto.getProdId(), interfProductDealBookCommonDto.getAcctSubjectType(),null);
+            /*modify by sunshuaishuai 20220424 交易管理：录入界面的资金账户 end*/
             if (map.get("ORDERS") != null) {
                 listStlOrders.addAll((List<StlOrders>)map.get("ORDERS"));
             }
@@ -352,7 +356,11 @@ public class CPlannedRedAffirmDealTemplateRecService {
         result.setTradeMarket(dto.getTradeMarket());
         /*modify by sunshuaishuai 交易管理 20220325 start*/
         // 关联系统交易编号= A.成交编号
-        result.setfTradeId(dto.getOutTradeId());
+        if(StringUtil.isNotEmpty(dto.getOutTradeId())){
+            result.setfTradeId(dto.getOutTradeId());
+        }else{
+            result.setfTradeId(dto.getTradeId());
+        }
         /*modify by sunshuaishuai 交易管理 20220325 end*/
         // 原交易编号 =交易状态为撤销时：
         // 原交易编号=调用共通设计->【详细设计-接口共通方法设计.xlsx】->撤销交易对应的原交易编号查询SHEET
@@ -396,8 +404,14 @@ public class CPlannedRedAffirmDealTemplateRecService {
 //        }
         // 是否有结算指令 = A.有无清算指令
 //        result.setHasOrder(dto.getIsClean());
+        /*modify by sunshuaishuai 20220424 判断生成方式是接口接入还是画面录入 start*/
         // 生成方式 InterfCommonConstant.接入方式
-        result.setGenType(InterfCommonConstant.接入方式);
+        if(StringUtil.isNotEmpty(dto.getDataSource())){
+            result.setGenType(dto.getDataSource());
+        }else {
+            result.setGenType(InterfCommonConstant.接入方式);
+        }
+        /*modify by sunshuaishuai 20220424 判断生成方式是接口接入还是画面录入 end*/
         return result;
     }
 
@@ -438,4 +452,25 @@ public class CPlannedRedAffirmDealTemplateRecService {
         }
         return listValTradeFeeDetail;
     }
+
+    /*add by sunshuaishuai 20220424 交易管理：录入界面的资金账户 start*/
+    /**
+     * 接收 结算指令信息
+     * @param dto
+     * @return
+     */
+    private StlOrders getStlOrders(ValMngMnfRedAffirm dto, TrdProductDeal valFinProductDeal){
+        StlOrders result = new StlOrders();
+        //modify by yanya on 20210204 判定为空包含空字符
+        //if(dto.getMyAcctNo() == null && dto.getCounterAcctNo() == null){
+        if(StringUtil.isEmpty(dto.getMyAcctNo()) ){
+            return null;
+        }
+        result.setMyAcctNo(dto.getMyAcctNo());
+        //result.setCounterAcctNo(dto.getCounterAcctNo());
+        result.setSettleDate(valFinProductDeal.getSettleDate());
+        result.setSettleAmt(valFinProductDeal.getTradeAmt());
+        return result;
+    }
+    /*add by sunshuaishuai 20220424 交易管理：录入界面的资金账户 end*/
 }
