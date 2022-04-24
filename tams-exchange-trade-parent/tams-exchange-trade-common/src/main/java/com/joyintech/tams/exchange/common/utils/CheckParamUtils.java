@@ -87,7 +87,7 @@ public class CheckParamUtils {
             return ErrorCode.DEALER_NOT_EMPTY;
         }
         //检查本方交易主体
-        if (Market.isSzMarket(market) && (Strings.isNullOrEmpty(integratedEntrust.getInvestorId()) || Strings.isNullOrEmpty(integratedEntrust.getInvestorName()))) {
+        if (Strings.isNullOrEmpty(integratedEntrust.getInvestorId()) || Strings.isNullOrEmpty(integratedEntrust.getInvestorName())) {
             return ErrorCode.INVESTOR_NOT_EMPTY;
         }
         //检查交易对手
@@ -103,7 +103,7 @@ public class CheckParamUtils {
             return ErrorCode.PROP_DEALER_NOT_EMPTY;
         }
         //检查对手方交易主体
-        if (Market.isSzMarket(market) && (Strings.isNullOrEmpty(integratedEntrust.getPropInvestorId()) || Strings.isNullOrEmpty(integratedEntrust.getPropInvestorName()))) {
+        if (Strings.isNullOrEmpty(integratedEntrust.getPropInvestorId()) || Strings.isNullOrEmpty(integratedEntrust.getPropInvestorName())) {
             return ErrorCode.PROP_INVESTOR_NOT_EMPTY;
         }
         //检查约定号
