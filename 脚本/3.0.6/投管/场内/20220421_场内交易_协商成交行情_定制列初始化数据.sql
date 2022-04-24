@@ -1,7 +1,8 @@
----删除个性化定制数据
-delete from CFG_DATATABLE_SHOW where PAGECODE='TrdExchange001' and DTCODE='NEGOTIATE_QUOTE';
 
 ---场内交易我收到的协商成交行情列表
+delete from CFG_DATATABLE_SHOW_FLAG where PAGECODE='TrdExchange001' and DTCODE='NEGOTIATE_QUOTE' and SPCDCODE='000001';
+delete from CFG_DATATABLE_SHOW where PAGECODE='TrdExchange001' and DTCODE='NEGOTIATE_QUOTE' and SPCDCODE='000001';
+
 INSERT INTO "CFG_DATATABLE_SHOW" ("PAGECODE", "DTCODE", "SPCDCODE", "COLCODE", "COLNAME", "DICTCODE", "SEQNO", "DISPLAYED", "FROZEN", "SORT", "MAXLEN", "EXTENDCFG", "EFFERANGE", "RANGEID", "STATUS", "REMARK1", "REMARK2", "REMARK3", "ISKEY")
 VALUES ('TrdExchange001', 'NEGOTIATE_QUOTE', '000001', 'requestTime', '请求时间', NULL, '1', '1', '0', '1', '100', '{"colAlign": "left","supportSearch":"模糊"}', '0', 'COMM', '1', '0', NULL, NULL, '0');
 INSERT INTO "CFG_DATATABLE_SHOW" ("PAGECODE", "DTCODE", "SPCDCODE", "COLCODE", "COLNAME", "DICTCODE", "SEQNO", "DISPLAYED", "FROZEN", "SORT", "MAXLEN", "EXTENDCFG", "EFFERANGE", "RANGEID", "STATUS", "REMARK1", "REMARK2", "REMARK3", "ISKEY")
@@ -46,6 +47,8 @@ INSERT INTO "CFG_DATATABLE_SHOW" ("PAGECODE", "DTCODE", "SPCDCODE", "COLCODE", "
 VALUES ('TrdExchange001', 'NEGOTIATE_QUOTE', '000001', 'remark', '备注', NULL, '20', '1', '0', '1', '100', '{"colAlign": "left","supportSearch":"模糊"}', '0', 'COMM', '1', '0', NULL, NULL, '0');
 
 ---场内交易我发起的协商成交行情列表
+delete from CFG_DATATABLE_SHOW_FLAG where PAGECODE='TrdExchange001' and DTCODE='NEGOTIATE_QUOTE' and SPCDCODE='000002';
+delete from CFG_DATATABLE_SHOW where PAGECODE='TrdExchange001' and DTCODE='NEGOTIATE_QUOTE' and SPCDCODE='000002';
 
 INSERT INTO "CFG_DATATABLE_SHOW" ("PAGECODE", "DTCODE", "SPCDCODE", "COLCODE", "COLNAME", "DICTCODE", "SEQNO", "DISPLAYED", "FROZEN", "SORT", "MAXLEN", "EXTENDCFG", "EFFERANGE", "RANGEID", "STATUS", "REMARK1", "REMARK2", "REMARK3", "ISKEY")
 VALUES ('TrdExchange001', 'NEGOTIATE_QUOTE', '000002', 'requestNo', '请求编号', NULL, '1', '1', '0', '1', '100', '{"colAlign": "left","supportSearch":"模糊"}', '0', 'COMM', '1', '0', NULL, NULL, '0');

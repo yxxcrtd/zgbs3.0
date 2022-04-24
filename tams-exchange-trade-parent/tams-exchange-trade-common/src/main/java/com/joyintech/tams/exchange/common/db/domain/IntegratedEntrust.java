@@ -151,9 +151,6 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @Digits(integer = 10, fraction = 4)
     private long pretermYearRate;
 
-    @ApiModelProperty(required = true, name = "ownerType", value = "报价所有者类型")
-    private String ownerType;
-
     @ApiModelProperty(required = true, name = "sellerNo", value = "本方交易员（上海协议回购），本方交易商（深圳协议回购）")
     @Size(max = 32)
     private String sellerNo;
@@ -173,6 +170,9 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @ApiModelProperty(required = true, name = "propSeatName", value = "对手方交易商名称（上海协议回购借用）")
     @Size(max = 32)
     private String propSeatName;
+
+    @ApiModelProperty(required = true, name = "ownerType", value = "报价所有者类型")
+    private String ownerType;
 
     @ApiModelProperty(required = true, name = "tradeId", value = "本方交易员ID")
     private String tradeId;
@@ -206,6 +206,9 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
 
     @ApiModelProperty(required = true, name = "propInvestorName", value = "对手方交易主体名称")
     private String propInvestorName;
+
+    @ApiModelProperty(required = true, name = "propOwnerType", value = "对手方报价所有者类型")
+    private String propOwnerType;
 
     @ApiModelProperty(required = true, name = "contractId", value = "交易所请求编号，约定号")
     @Size(max = 32)
@@ -1151,5 +1154,13 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
 
     public void setPropDealerName(String propDealerName) {
         this.propDealerName = propDealerName;
+    }
+
+    public String getPropOwnerType() {
+        return propOwnerType;
+    }
+
+    public void setPropOwnerType(String propOwnerType) {
+        this.propOwnerType = propOwnerType;
     }
 }

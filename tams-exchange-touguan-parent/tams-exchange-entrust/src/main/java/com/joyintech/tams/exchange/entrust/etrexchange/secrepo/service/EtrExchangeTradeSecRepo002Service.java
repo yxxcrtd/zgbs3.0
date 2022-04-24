@@ -121,7 +121,8 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
                 param.put("PS_T02", BussinessDictCodeList.交易方向_卖出.getValue());
                 param.put("TRADE_PLACE_03", BussinessDictCodeList.交易场所_深圳证券交易所.getValue());
                 param.put("TRADE_PLACE_04", BussinessDictCodeList.交易场所_上海证券交易所.getValue());
-                param.put("CUSTOM_ASSET_TYPE_FOUR_013", DictCodeListExt3.行内资产四级分类_可转债.getValue()); // 可转债
+                param.put("type6_B14",DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue());
+//                param.put("CUSTOM_ASSET_TYPE_FOUR_013", DictCodeListExt3.行内资产四级分类_可转债.getValue()); // 可转债
                 param.put("search_isNumberFlag", CommonUtil.isNumeric(dto.getSearch()));
                 if (StringUtil.isNotEmpty((String) param.get("finprodMarketIds"))) {
                     param.put("finprodMarketIds", StringUtil.splitToList(GlobalConstant.COMMA, param.get("finprodMarketIds").toString()));

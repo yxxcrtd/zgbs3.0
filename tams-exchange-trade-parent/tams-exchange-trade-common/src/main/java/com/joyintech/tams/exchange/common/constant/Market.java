@@ -57,6 +57,20 @@ public enum Market implements IEnum<String> {
         }
     }
 
+    /**
+     * 判断是否深交所
+     */
+    public static boolean isSzMarket(String market) {
+        return StringUtil.equals(Market.SZSE.value, market);
+    }
+
+    /**
+     * 判断是否上交所
+     */
+    public static boolean isShMarket(String market) {
+        return StringUtil.equals(Market.SHSE.value, market);
+    }
+
     public static String getMarketName(String market) {
         String name = marketMap.get(market);
         return StringUtil.isNotEmpty(name) ? name : market;

@@ -433,12 +433,9 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         etrSinglePortfolioDto.setPrice(dto.getEntrustPrice() != null ? dto.getEntrustPrice() : dto.getPrice());// 指令价格
         etrSinglePortfolioDto.setEntrustNum(dto.getEntrustNum());// 指令数量
         etrSinglePortfolioDto.setEntrustAmt(dto.getEntrustAmt());// 指令金额
-        if(!StringUtil.isNotEmpty(etrSinglePortfolioDto.getEntrustNum())){
-            etrSinglePortfolioDto.setEntrustNum(ArithmeticUtil.divide(etrSinglePortfolioDto.getEntrustAmt(),new BigDecimal(100),2,RoundingMode.HALF_UP));
-        }
         etrSinglePortfolioDto.setInvAim(dto.getInvAim());// 投资目的
         etrSinglePortfolioDto.setTradeMarket(dto.getTradeMarket());// 交易场所
-        etrSinglePortfolioDto.setTradePlat(dto.getTradePlat());// 交易平台
+        etrSinglePortfolioDto.setTradePlat(DictCodeListExt3.交易平台_新债平台.getValue());// 交易平台
         etrSinglePortfolioDto.setBusinessModel(dto.getBusinessModel());
         /***********************************************************************/
         etrSinglePortfolioDto.setFinprodType2(dto.getFinprodType2());// 金融产品分类
@@ -446,6 +443,12 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         /***********************************************************************/
         etrSinglePortfolioDto.setDealMode(dto.getDealMode());//交易方式
         etrSinglePortfolioDto.setPriceType(dto.getPriceType());//计价方式
+        if(DictCodeListExt3.上农商_指令业务类型_通用式质押回购指令.getValue().equals(etrSinglePortfolioDto.getEntrustType())){
+            etrSinglePortfolioDto.setPrice(dto.getRepoRate());
+            etrSinglePortfolioDto.setEntrustAmt(ArithmeticUtil.multiply(dto.getRepoAmt(),new BigDecimal(10000)));
+            etrSinglePortfolioDto.setEntrustNum(ArithmeticUtil.divide(etrSinglePortfolioDto.getEntrustAmt(),new BigDecimal(100),2,RoundingMode.HALF_UP));
+        }
+
         // 构造单组合单资产DTO end
         return etrSinglePortfolioDto;
     }
@@ -1452,6 +1455,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
             else if(DictCodeListExt3.上农商_指令业务类型_通用式质押回购指令.getValue().equals(entity.getEntrustBussType())) {
                 finprodType = DictCodeList.回购类型_质押式竞价回购.getValue();
                 finproduct = null;
+                entity.setDealMode(DictCodeListExt3.指定交易方式_匹配成交.getValue());
             }
             //
             List<ValidMessage> validMessageList = checkPriceRangeCommon(finprodType,finproduct,entity,checkPrice,nowDate,quotation);
@@ -1491,7 +1495,11 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
             paraMap.put("ASSET_CLASSIFY1","ZYSHG");
 
         }
-        paraMap.put("TRADE_PLAT",entity.getTradePlat()); // 指定交易方式
+        if(StringUtil.isNotEmpty(entity.getDealMode())){
+            paraMap.put("DEAL_MODE",entity.getDealMode()); // 指定交易方式
+        }else{
+            paraMap.put("DEAL_MODE",DictCodeListExt3.指定交易方式_协商成交.getValue());
+        }
         paraMap.put("NOW_DATE",nowDate);
         // 价格价格时间配置
         TrdPriceTimeConfig trdPriceTimeConfig = getTrdPriceTimeConfig(paraMap);
