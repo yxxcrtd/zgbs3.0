@@ -17,7 +17,7 @@ public class CalcDto {
     @ApiModelProperty(name = "vdate", value = "起息日")
     private String vdate;
 
-    @ApiModelProperty(name = "vdate", value = "起息日")
+    @ApiModelProperty(name = "mdate", value = "到期日")
     private String mdate;
 
     @ApiModelProperty(name = "intRate", value = "参考收益率")

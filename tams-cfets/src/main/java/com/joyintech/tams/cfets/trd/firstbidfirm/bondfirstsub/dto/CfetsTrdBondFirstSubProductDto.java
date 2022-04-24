@@ -15,34 +15,44 @@ import java.math.BigDecimal;
 @ApiModel(value = "申购产品列表", description = "一级申购指令信息-申购产品列表")
 public class CfetsTrdBondFirstSubProductDto {
 
-    @ApiModelProperty(required = false, name = "entrustId", value = "指令代码", example = "WTBOND202204191858")
+    @ApiModelProperty(name = "entrustId", value = "指令代码", example = "WTBOND202204191858")
     private String entrustId;
 
-    @ApiModelProperty(required = false, name = "portfolioId", value = "组合代码,页面不显示")
+    @ApiModelProperty(name = "portfolioId", value = "组合代码,页面不显示")
     private String portfolioId;
 
-    @ApiModelProperty(required = false, name = "portfolioName", value = "组合名称")
+    @ApiModelProperty(name = "portfolioName", value = "组合名称")
     private String portfolioName;
 
-    @ApiModelProperty(required = false, name = "avaNum", value = "剩余指令额度,需转化为万元 查看页面不显示")
+    @ApiModelProperty(name = "avaNum", value = "剩余指令额度,需转化为万元 查看页面不显示")
     private BigDecimal avaNum;
 
-    @ApiModelProperty(required = false, name = "subscriptionAmount", value = "认购量")
+    /**
+     * 计算尾插时暂时记录扣除分配后的剩余指令额度
+     * @author jiangpeng
+     * @date 2022/4/24 9:41
+     */
+    private BigDecimal avaNumTemp;
+
+    @ApiModelProperty(name = "subscriptionAmount", value = "认购量")
     private BigDecimal subscriptionAmount;
 
-    @ApiModelProperty(required = false, name = "payableAmount", value = "应缴款金额")
+    @ApiModelProperty(name = "payableAmount", value = "应缴款金额")
     private BigDecimal payableAmount;
 
-    @ApiModelProperty(required = false, name = "businessModel", value = "业务模式代码")
+    @ApiModelProperty(name = "settFeeAmt", value = "结算服务费", example = "1000.00")
+    private BigDecimal settFeeAmt;
+
+    @ApiModelProperty(name = "businessModel", value = "业务模式代码")
     private String businessModel;
 
-    @ApiModelProperty(required = false, name = "businessModelStr", value = "业务模式名称")
+    @ApiModelProperty(name = "businessModelStr", value = "业务模式名称")
     private String businessModelStr;
 
-    @ApiModelProperty(required = false, name = "secManageAcctId", value = "证券账户")
+    @ApiModelProperty(name = "secManageAcctId", value = "证券账户")
     private String secManageAcctId;
 
-    @ApiModelProperty(required = false, name = "secAcctName", value = "证券账户名称")
+    @ApiModelProperty(name = "secAcctName", value = "证券账户名称")
     private String secAcctName;
 
     public String getEntrustId() {
@@ -77,6 +87,14 @@ public class CfetsTrdBondFirstSubProductDto {
         this.avaNum = avaNum;
     }
 
+    public BigDecimal getAvaNumTemp() {
+        return avaNumTemp;
+    }
+
+    public void setAvaNumTemp(BigDecimal avaNumTemp) {
+        this.avaNumTemp = avaNumTemp;
+    }
+
     public BigDecimal getSubscriptionAmount() {
         return subscriptionAmount;
     }
@@ -91,6 +109,14 @@ public class CfetsTrdBondFirstSubProductDto {
 
     public void setPayableAmount(BigDecimal payableAmount) {
         this.payableAmount = payableAmount;
+    }
+
+    public BigDecimal getSettFeeAmt() {
+        return settFeeAmt;
+    }
+
+    public void setSettFeeAmt(BigDecimal settFeeAmt) {
+        this.settFeeAmt = settFeeAmt;
     }
 
     public String getBusinessModel() {

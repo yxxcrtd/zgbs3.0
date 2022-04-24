@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.List;
 
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.FinCashCalcRule;
 import com.joyintech.tams.common.base.entity.FinCashPayRule;
 import com.joyintech.tams.common.base.entity.FinRateInfo;
@@ -91,6 +92,7 @@ public class InterestScheduleCal {
             is.setIntAmt(isamt);
             is.setIntPrinAmt(intPrinAmt);
             is.setRepayWithoutInt(isRepayIntAmt);//累计还本不带息场景的利息
+            is.setBasis(StringUtil.isNotEmpty(is.getBasis())?is.getBasis():scai.getBasis());
         }
         //减去区间内还本的利息
         /*for (T resultIs : lis) {

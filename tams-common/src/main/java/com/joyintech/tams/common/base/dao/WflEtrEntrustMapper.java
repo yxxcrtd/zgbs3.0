@@ -3,6 +3,8 @@ package com.joyintech.tams.common.base.dao;
 import com.joyintech.tams.common.base.entity.WflEtrEntrust;
 import com.joyintech.tams.common.base.entity.WflEtrEntrustKey;
 import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -24,6 +26,8 @@ public interface WflEtrEntrustMapper {
     int insertBasicByBasicInfo(WflEtrEntrust record);
 
     WflEtrEntrust selectByPrimaryKey(WflEtrEntrustKey key);
+
+    WflEtrEntrust selectByEntrustId(@Param("entrustId") String entrustId);
 
     int updateByPrimaryKeySelective(WflEtrEntrust record);
 

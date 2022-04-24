@@ -1,0 +1,1289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.business.asset.bond.dao.FinBondAssetMapper">
+    <!--画面一分页查询-->
+    <select id="queryForPage" resultType="com.joyintech.tams.business.asset.bond.dto.FinBondAssetResponse" parameterType="Map">
+        SELECT * FROM (
+        SELECT ss.* FROM (
+        select * from (
+        SELECT
+        T1.FINPROD_ID finprodId,
+        T1.FINPROD_ABBR finprodAbbr,
+        T1.FINPROD_MARKET_ID finprodMarketId,
+        T1.FINPROD_NAME finprodName,
+        T1.TRADE_MARKET tradeMarket,
+        T1.REGIST_ORG registOrg,
+        T1.IDATE idate,
+        T1.VDATE vdate,
+        T1.MDATE mdate,
+        T1.DELISTING_DATE delistingDate,
+        T1.ISSUE_PRICE issuePrice,
+        NVL(T1.ISSUE_AMT,0)/100000000 issueAmt,
+        MST_CUSTOMER_INFO.CUSTOMER_NAME issuerName,
+        MST_CUSTOMER_INFO.CUSTOMER_ID issuer,
+        T4.TYPE_9 type9,
+        T4.TYPE_10 type10,
+        T4.TYPE_11 type11,
+        T1.COUPON_SPECIES couponSpecies,
+        T8.CALC_TYPE rateType,
+        T8.YIELD rate,
+        T6.BENCHMARK_ID basisRate,
+        T6.COEFFICIENT basisRateRatio,
+        T6.SPREAD_RATE*100 spreadRate,
+        T6.FIRST_CONFIRM_DATE firstRateFixDate,
+        T8.BASIS basis,
+        T8.MARKET_BASIS marketBasis,
+        T1.IS_RIGHT isRight,
+        T1.IS_SUS isSus,
+        T1.ISSUE_TYPE issueType,
+        T1.CCY ccy,
+        T2.CROSS_MARKET_CODE crossMarketCode,
+        T2.CONCEPT_TYPE conceptType,
+        B.EXERCISE_TYPE exerciseType,
+        B.EXERCISE_DATE exerciseDate,
+        T9.PAY_CYCLE payCycle,
+        MR.RATING mGradeResult,
+        T10.CUSTOMER_NAME mGradeOrgId,
+        BR.RATING bGradeResult,
+        T11.CUSTOMER_NAME bGradeOrgId
+        FROM FIN_PRODUCT T1
+        LEFT JOIN MST_CUSTOMER_INFO ON MST_CUSTOMER_INFO.CUSTOMER_ID = T1.ISSUER
+        LEFT JOIN FIN_PRODUCT_ADD T2 ON T1.FINPROD_ID = T2.FINPROD_ID
+        LEFT JOIN MST_CUSTOMER_INFO T3 ON T3.CUSTOMER_ID = T1.ISSUER
+        LEFT JOIN FIN_PRODUCT_TYPE T4 ON T4.FINPROD_ID = T1.FINPROD_ID
+        LEFT JOIN FIN_CASH_INFO T5 ON T5.FINPROD_ID = T1.FINPROD_ID
+        <if test="cashType != null and cashType != ''">
+            AND T5.CASH_TYPE_2 = #{cashType,jdbcType=VARCHAR}
+        </if>
+        <if test="finprodType != null and finprodType != ''">
+            AND T5.FINPROD_TYPE = #{finprodType,jdbcType=VARCHAR}
+        </if>
+        LEFT JOIN FIN_RATE_INFO T6 ON T6.CASH_ID = T5.CASH_ID
+        AND T6.EFF_DATE = T1.VDATE
+        left join (select FINPROD_ID, max(eff_date) as EFF_DATE
+        from FIN_CASH_CALC_RULE
+        group by FINPROD_ID
+        ) tempT8
+        on T1.FINPROD_ID = tempT8.FINPROD_ID
+        LEFT JOIN FIN_CASH_CALC_RULE T8 ON T8.FINPROD_ID=tempT8.FINPROD_ID AND T8.EFF_DATE = tempT8.EFF_DATE
+        and T8.CASH_ID = T5.CASH_ID
+        LEFT JOIN MST_CUSTOMER_INFO_ADD T7 ON T7.CUSTOMER_ID = T3.CUSTOMER_ID
+        LEFT JOIN FIN_CASH_PAY_RULE T9 ON T9.CASH_ID = T8.CASH_ID AND T8.EFF_DATE = T9.EFF_DATE
+        LEFT JOIN (select A.FINPROD_ID,max(A.EXERCISE_DATE) EXERCISE_DATE,A.EXERCISE_TYPE
+        from FIN_EXERCISE_PLAN A group by A.FINPROD_ID,A.EXERCISE_TYPE) B
+        on T1.FINPROD_ID = B.FINPROD_ID
+        LEFT JOIN (SELECT ASSET_CODE,RATING,GRADE_ORG_ID FROM (
+        SELECT MBCR.O_CODE AS ASSET_CODE,MBCR.GRADE_RESULT AS RATING,MBCR.GRADE_ORG_ID as GRADE_ORG_ID
+        ,ROW_NUMBER() OVER(PARTITION BY MBCR.O_CODE ORDER BY MBCR.O_CODE,MBCR.GRADE_DATE DESC
+        ,MBCR.GRADE_RESULT DESC) RANK
+        FROM MST_BOND_CREDIT_RATING MBCR
+        WHERE MBCR.O_TYPE = '01' AND MBCR.GRADE_DATE <![CDATA[<=]]> TO_DATE(#{platDate},'YYYY-MM-DD')
+        ) WHERE RANK=1
+        ) MR on T1.FINPROD_MARKET_ID = MR.ASSET_CODE
+        LEFT JOIN MST_CUSTOMER_INFO T10 ON T10.CUSTOMER_ID=MR.GRADE_ORG_ID
+        LEFT JOIN (SELECT ASSET_CODE,RATING,GRADE_ORG_ID FROM (
+        SELECT MBCR.O_CODE AS ASSET_CODE ,MBCR.GRADE_RESULT AS RATING,MBCR.GRADE_ORG_ID as GRADE_ORG_ID,
+        ROW_NUMBER() OVER(PARTITION BY MBCR.O_CODE ORDER BY MBCR.O_CODE,MBCR.GRADE_DATE DESC
+        ,MBCR.GRADE_RESULT DESC) RANK
+        FROM MST_BOND_CREDIT_RATING MBCR
+        WHERE MBCR.O_TYPE = '02' AND MBCR.GRADE_DATE <![CDATA[<=]]> TO_DATE(#{platDate},'YYYY-MM-DD')
+        ) WHERE RANK=1) BR ON T1.FINPROD_MARKET_ID = BR.ASSET_CODE
+        LEFT JOIN MST_CUSTOMER_INFO T11 ON T11.CUSTOMER_ID=BR.GRADE_ORG_ID) T
+        <where>
+            <if test="finprodIdList != null and finprodIdList.size() > 0">
+                AND (T.finprodMarketId IN
+                <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="tradeMarketList != null and tradeMarketList.size() > 0">
+                AND T.tradeMarket IN
+                <foreach collection="tradeMarketList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="ccyList != null and ccyList.size() > 0">
+                AND T.ccy IN
+                <foreach collection="ccyList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="type9 != null and type9.size() > 0">
+                AND T.type9 in
+                <foreach collection="type9" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="type10 != null and type10.size() > 0">
+                AND T.type10 in
+                <foreach collection="type10" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="type11 != null and type11.size() > 0">
+                AND T.type11 in
+                <foreach collection="type11" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="rateTypeList != null and rateTypeList.size() > 0">
+                AND T.rateType in
+                <foreach collection="rateTypeList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="couponSpeciesList != null and couponSpeciesList.size() > 0">
+                AND T.couponSpecies in
+                <foreach collection="couponSpeciesList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="idateStart != null and idateStart != ''">
+                <![CDATA[AND  T.idate >= TO_DATE(#{idateStart},'YYYY-MM-DD') ]]>
+            </if>
+            <if test="idateEnd != null and idateEnd != ''">
+                <![CDATA[AND  T.idate <= TO_DATE(#{idateEnd},'YYYY-MM-DD')]]>
+            </if>
+            <if test="vdateStart != null and vdateStart != ''">
+                <![CDATA[AND  T.vdate >= TO_DATE(#{vdateStart},'YYYY-MM-DD') ]]>
+            </if>
+            <if test="vdateEnd != null and vdateEnd != ''">
+                <![CDATA[AND  T.vdate <= TO_DATE(#{vdateEnd},'YYYY-MM-DD')]]>
+            </if>
+            <if test="mdateStart != null and mdateStart != ''">
+                <![CDATA[AND  T.mdate >= TO_DATE(#{mdateStart},'YYYY-MM-DD')]]>
+            </if>
+            <if test="mdateEnd != null and mdateEnd != ''">
+                <![CDATA[AND  T.mdate <= TO_DATE(#{mdateEnd},'YYYY-MM-DD')]]>
+            </if>
+            <if test="isSus != null and isSus != ''">
+                AND T.isSus = #{isSus,jdbcType=VARCHAR}
+            </if>
+            <if test="isRight != null and isRight != ''">
+                AND T.isRight = #{isRight,jdbcType=VARCHAR}
+            </if>
+            <if test="payCycleList != null and payCycleList.size() > 0">
+                AND T.payCycle in
+                <foreach collection="payCycleList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="issuerList != null and issuerList.size() > 0">
+                AND T.issuer in
+                <foreach collection="issuerList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="exerciseTypeList != null and exerciseTypeList.size() > 0">
+                AND T.exerciseType in
+                <foreach collection="exerciseTypeList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="exerciseDateStart != null and exerciseDateStart != ''">
+                <![CDATA[AND  T.exerciseDate >= TO_DATE(#{exerciseDateStart},'YYYY-MM-DD')]]>
+            </if>
+            <if test="exerciseDateEnd != null and exerciseDateEnd != ''">
+                <![CDATA[AND  T.exerciseDate <= TO_DATE(#{exerciseDateEnd},'YYYY-MM-DD')]]>
+            </if>
+            <if test="mGradeResultList != null and mGradeResultList.size() > 0">
+                AND T.mGradeResult in
+                <foreach collection="mGradeResultList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="bGradeResultList != null and bGradeResultList.size() > 0">
+                AND T.bGradeResult in
+                <foreach collection="bGradeResultList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        ) ss
+        left join SYS_DATADICT_LIST sdl_tp on ss.tradeMarket=sdl_tp.ITEM_CODE and sdl_tp.DICT_CODE='TRADE_PLACE'
+        left join SYS_DATADICT_LIST sdl_ro on ss.registOrg=sdl_ro.ITEM_CODE and sdl_ro.DICT_CODE='REGIST_ORG'
+        left join SYS_DATADICT_LIST sdl_catt on ss.type9=sdl_catt.ITEM_CODE and
+        sdl_catt.DICT_CODE='CUSTOM_ASSET_TYPE_TWO'
+        left join SYS_DATADICT_LIST sdl_catth on ss.type10=sdl_catth.ITEM_CODE and
+        sdl_catth.DICT_CODE='CUSTOM_ASSET_TYPE_THREE'
+        left join SYS_DATADICT_LIST sdl_catf on ss.type11=sdl_catf.ITEM_CODE and
+        sdl_catf.DICT_CODE='CUSTOM_ASSET_TYPE_FOUR'
+        left join SYS_DATADICT_LIST sdl_cs on ss.couponSpecies=sdl_cs.ITEM_CODE and sdl_cs.DICT_CODE='COUPON_SPECIES'
+        left join SYS_DATADICT_LIST sdl_it on ss.rateType=sdl_it.ITEM_CODE and sdl_it.DICT_CODE='INT_TYPE'
+        left join SYS_DATADICT_LIST sdl_fu on ss.payCycle=sdl_fu.ITEM_CODE and sdl_fu.DICT_CODE='FREQUENCY_UNIT'
+        left join SYS_DATADICT_LIST sdl_ir on ss.isRight=sdl_ir.ITEM_CODE and sdl_ir.DICT_CODE='YES_OR_NO'
+        left join SYS_DATADICT_LIST sdl_em on ss.exerciseType=sdl_em.ITEM_CODE and sdl_em.DICT_CODE='EXEC_MODE'
+        left join SYS_DATADICT_LIST sdl_is on ss.isSus=sdl_is.ITEM_CODE and sdl_is.DICT_CODE='YES_OR_NO'
+        left join SYS_DATADICT_LIST sdl_ccy on ss.ccy=sdl_ccy.ITEM_CODE and sdl_ccy.DICT_CODE='CCY'
+        left join SYS_DATADICT_LIST sdl_mgrm on ss.mGradeResult=sdl_mgrm.ITEM_CODE and
+        sdl_mgrm.DICT_CODE='MAIN_GRADE_RESULT'
+        left join SYS_DATADICT_LIST sdl_mgrb on ss.bGradeResult=sdl_mgrb.ITEM_CODE and
+        sdl_mgrb.DICT_CODE='MAIN_GRADE_RESULT'
+        left join SYS_DATADICT_LIST sdl_gpm on ss.mGradeOrgId=sdl_gpm.ITEM_CODE and sdl_gpm.DICT_CODE='GRADE_PARTY'
+        left join SYS_DATADICT_LIST sdl_gpb on ss.bGradeOrgId=sdl_gpb.ITEM_CODE and sdl_gpb.DICT_CODE='GRADE_PARTY'
+        <!-- 关键字模糊查询 -->
+        <include refid="keywordsWhere"></include>)
+     /*  order by ss.type9, ss.type10,ss.type11,ss.vdate,ss.tradeMarket)*/
+        <!--前端传入排序字段-->
+        <if test="sort != null and sort != '' and direction != null and direction != ''">
+            order by ${sort} ${direction}
+        </if>
+    </select>
+
+    <sql id="keywordsWhere">
+        <if test="search != null and search != ''">
+            <where>( ss.finprodId || '|' || ss.finprodName || '|' || ss.finprodAbbr || '|' || ss.finprodMarketId || '|'
+                || '|' || sdl_tp.ITEM_VALUE || '|' || sdl_ro.ITEM_VALUE || '|' || ss.issuerName || '|' || sdl_catt.ITEM_VALUE || '|' || sdl_catth.ITEM_VALUE
+                || '|' || sdl_catf.ITEM_VALUE || '|' || sdl_cs.ITEM_VALUE || '|' || sdl_it.ITEM_VALUE
+                || '|' || sdl_fu.ITEM_VALUE || '|' || sdl_ir.ITEM_VALUE || '|' || sdl_em.ITEM_VALUE || '|' || sdl_is.ITEM_VALUE || '|' || sdl_ccy.ITEM_VALUE
+                || '|' || ss.basis || '|' || ss.marketBasis || '|' || sdl_ccy.ITEM_VALUE
+                || '|' || ss.crossMarketCode || '|' || ss.conceptType || '|' || sdl_mgrm.ITEM_VALUE || '|' || sdl_mgrb.ITEM_VALUE
+                || '|' || sdl_gpm.ITEM_VALUE || '|' || sdl_gpb.ITEM_VALUE  || '|' || to_char(ss.basisRate)
+                like '%' || #{search} || '%'
+                or to_char(ss.issueAmt,'FM99990.9990')=#{search}
+                or to_char(ss.issuePrice,'FM99990.9990')=#{search}
+                or to_char(ss.rate)=#{search}
+                or to_char(ss.basisRateRatio)=#{search}
+                or to_char(ss.spreadRate)=#{search}
+                or to_char(ss.idate,'YYYY-MM-DD')=#{search}
+                or to_char(ss.vdate,'YYYY-MM-DD')=#{search}
+                or to_char(ss.mdate,'YYYY-MM-DD')=#{search}
+                or to_char(ss.delistingDate,'YYYY-MM-DD')=#{search}
+                or to_char(ss.firstRateFixDate,'YYYY-MM-DD')=#{search}
+                or to_char(ss.exerciseDate,'YYYY-MM-DD')=#{search}
+                )
+            </where>
+        </if>
+    </sql>
+
+
+
+    <select id="getBasicInfo" parameterType="Map" resultType="com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest">
+        select
+            T1.FINPROD_ID FINPROD_ID,
+            T1.FINPROD_MARKET_ID finprodMarketId,
+            T1.FINPROD_NAME FINPROD_NAME,
+            T1.FINPROD_ABBR FINPROD_ABBR,
+            T1.TRADE_MARKET TRADE_MARKET,
+            T1.REGIST_ORG REGIST_ORG,
+            T1.ISSUE_PRICE ISSUE_PRICE,
+            T1.IDATE IDATE,
+            T1.VDATE VDATE,
+            T1.MDATE MDATE,
+            T1.DELISTING_DATE DELISTING_DATE,
+            NVl(T1.ISSUE_AMT,0)/100000000 ISSUE_AMT,
+            T1.ISSUER ISSUER,
+            T3.TYPE_9 TYPE_9,
+            T3.TYPE_10 TYPE_10,
+            T3.TYPE_11 TYPE_11,
+            T1.ISSUE_TYPE ISSUE_TYPE,
+            T1.IS_SUS IS_SUS,
+            T1.IS_RIGHT IS_RIGHT,
+            T2.IS_ALLOW_OVERWRITE IS_ALLOW_OVERWRITE,
+            T2.IS_NETPRICE IS_NETPRICE,
+            T2.IS_NO_GUARD IS_NO_GUARD,
+            T1.CCY CCY,
+            T1.CAPI_INCOME_FEATURE  CAPI_INCOME_FEATURE,
+            T2.CONCEPT_TYPE  CONCEPT_TYPE,
+            T2.CROSS_MARKET_CODE CROSS_MARKET_CODE,
+            T1.SUSTAINABLE_REMARK sustainableRemark,
+            T5.CON_FINPROD_ID CON_FINPROD_ID,
+            T5.CON_VDATE CON_VDATE,
+            T5.CON_PRICE CON_PRICE,
+            100/T13.CON_PRICE CON_PROPORTION,
+            T5.RESALE_PRICE RESALE_PRICE,
+            T5.REDEEM_PRICE REDEEM_PRICE,
+            T5.CON_VDATE CON_VDATE,
+            T1.COUPON_SPECIES COUPON_SPECIES,
+            T12.CALC_TYPE CALC_TYPE,
+            T12.YIELD YIELD,
+            T16.BENCHMARK_ID_ACCURACY BENCHMARK_ID_ACCURACY,
+            T16.BENCHMARK_ID basicRate,
+            T16.COEFFICIENT COEFFICIENT,
+            T16.SPREAD_RATE SPREAD_RATE,
+            T16.HIGHEST_RATE HIGHEST_RATE,
+            T16.LOWEST_RATE LOWEST_RATE,
+            T16.RESET_TYPE    RESET_TYPE,
+            T16.OBSERVE_BEF_DAY OBSERVE_BEF_DAY,
+            T16.OBSERVE_BEF_UNIT OBSERVE_BEF_UNIT,
+            T16.FIRST_CONFIRM_DATE FIRST_CONFIRM_DATE
+            T12.BASIS BASIS,
+            T12.MARKET_BASIS MARKET_BASIS,
+            T12.BASIS intpayRule,
+            T1.REMARK REMARK,
+            NVL(T4.CIRCULATION_DATE,T7.LISTING_DATE)
+            T10.CASH_ID interestCashId,
+            T11.CASH_ID principalCashId
+        FROM FIN_PRODUCT T1
+        LEFT JOIN FIN_PRODUCT_ADD T2
+        ON		T2.FINPROD_ID = T1.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_TYPE T3
+        ON		T3.FINPROD_ID = T1.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT T4
+        ON		T4.CIRCULATION_CODE = T1.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ADD T7
+        ON		T7.FINPROD_ID = T4.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_CONVERTIBLE T5
+        ON		T5.FINPROD_ID = T1.FINPROD_ID
+        LEFT JOIN  FIN_PRODUCT T6
+        ON		T5.CON_FINPROD_ID = T6.FINPROD_ID
+        AND		T6.FINPROD_TYPE2=#{FINPROD_TYPE2_F10}
+        LEFT JOIN  MST_CUSTOMER_INFO T8
+        ON		T8.CUSTOMER_ID = T1.ISSUER
+        LEFT JOIN MST_CUSTOMER_INFO_ADD T9
+        ON		T9.CUSTOMER_ID = T8.CUSTOMER_ID
+        LEFT JOIN FIN_CASH_INFO T10
+        ON		T10.FINPROD_ID = T1.FINPROD_ID
+        AND		T10.FINPROD_TYPE = #{FIN_CASH_BUSINESS_TYPE_01}
+        AND		T10.BRANCH = 0
+        AND		T10.CASH_TYPE_1 = #{CASH_TYPE_1_02}
+        AND		T10.CASH_TYPE_2 = #{CASH_TYPE_2_C02}
+        LEFT JOIN FIN_CASH_INFO T11
+        ON		T11.FINPROD_ID = T1.FINPROD_ID
+        AND		T11.FINPROD_TYPE = #{FIN_CASH_BUSINESS_TYPE_01}
+        AND		T11.BRANCH = 0
+        AND		T11.CASH_TYPE_1 = #{CASH_TYPE_1_01}
+        AND		T11.CASH_TYPE_2 = #{CASH_TYPE_2_C01}
+        LEFT JOIN FIN_CASH_CALC_RULE T12
+        ON		T12.FINPROD_ID = T1.FINPROD_ID
+        AND		T12.FINPROD_TYPE = #{FINPROD_TYPE_F01}
+        AND		T12.FINPROD_TYPE2 = #{FINPROD_TYPE_F01}
+        AND		T12.BRANCH = 0
+        AND		T12.CASH_ID = T10.CASH_ID
+        LEFT JOIN FIN_CASH_PAY_RULE T13
+        ON		T13.FINPROD_ID = T1.FINPROD_ID
+        AND		T13.FINPROD_TYPE = #{FINPROD_TYPE_F01}
+        AND		T13.FINPROD_TYPE2 = #{FINPROD_TYPE_F01}
+        AND		T13.BRANCH = 0
+        AND		T13.CASH_ID = T10.CASH_ID
+        LEFT JOIN FIN_RATE_INFO T16
+        ON	 T16.FINPROD_ID = T1.FINPROD_ID
+        AND	 T16.FINPROD_TYPE = #{FINPROD_TYPE_F01}
+        AND	 T16.FINPROD_TYPE2 = #{FINPROD_TYPE_F01}
+        AND	 T16.BRANCH = 0
+        AND	 T16.CASH_ID = T10.CASH_ID
+        <where>
+            <if test="finprodId != null and finprodId != ''">
+                ( T1.FINPROD_ID = #{finprodId}
+                <!-- 债券新建新增快捷录入功能 add by renping 20191010 start -->
+                OR T1.FINPROD_MARKET_ID = #{finprodId})
+                AND T1.FINPROD_TYPE2=#{finprodType}
+                AND T1.TRADE_MARKET IN (#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04})
+            </if>
+        </where>
+    </select>
+
+    <select id = "selectCountByfinprodMarketId" resultType="java.lang.Integer">
+        SELECT
+            count( * )
+        FROM
+            FIN_PRODUCT
+        WHERE
+            FINPROD_MARKET_ID = #{finprodMarketId}
+    </select>
+    <!--
+    /**
+     * 获取主体评级机构数据
+     */
+     -->
+    <select id="getZTPJ" resultType="com.joyintech.service.asset.bond.dto.FinBondTargetAssetDto">
+        SELECT
+            GRADE_ORG_ID ztGradeOrgId,
+            GRADE_RESULT ztGradeResult,
+            MAX(GRADE_DATE)
+        FROM
+            MST_BOND_CREDIT_RATING
+        WHERE
+            O_CODE = #{secId,jdbcType=VARCHAR}
+          AND O_TYPE = #{ZTPI,jdbcType=VARCHAR}
+        GROUP BY GRADE_ORG_ID,GRADE_RESULT
+    </select>
+    <!--
+    /**
+    * 获取债项评级机构数据
+    */
+   List<FinBondTargetAssetDto> getZXPJ(Map<String, Object> param);
+     -->
+    <select id="getZXPJ" resultType="com.joyintech.service.asset.bond.dto.FinBondTargetAssetDto">
+        SELECT
+            GRADE_ORG_ID zxGradeOrgId,
+            GRADE_RESULT zxGradeResult,
+            MAX(GRADE_DATE)
+        FROM
+            MST_BOND_CREDIT_RATING
+        WHERE
+            O_CODE = #{secId,jdbcType=VARCHAR}
+          AND O_TYPE = #{ZXPJ,jdbcType=VARCHAR}
+        GROUP BY GRADE_ORG_ID,GRADE_RESULT
+    </select>
+
+    <!--  获取新建界面的一级市场投标债券代码联想下拉框 王贵奇 2019/7/31 -->
+    <resultMap id="finprodIdMap" type="com.joyintech.framework.select.SelectOptionDto">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="text" property="text" jdbcType="VARCHAR"/>
+        <association property="object" javaType="java.util.Map">
+            <!-- <result column="FINPROD_ID" property="finprodId" jdbcType="VARCHAR" /> -->
+        </association>
+    </resultMap>
+
+    <select id="getfinprodIdForAdd" resultMap="finprodIdMap">
+        SELECT
+        FINPROD_ID id,
+        FINPROD_ABBR||':'||FINPROD_MARKET_ID text
+        FROM
+        FIN_PRODUCT
+        <where>
+            FINPROD_TYPE2 = #{assestType}
+            <!--  一级市场投标债券模糊查询 zhuyongkang 20191030 -->
+            <if test="search != null and search != ''">
+                AND ( FIN_PRODUCT.FINPROD_ABBR LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                OR FIN_PRODUCT.FINPROD_MARKET_ID LIKE CONCAT('%', CONCAT(#{search}, '%')))
+            </if>
+            <choose>
+                <when test="initValue != null and !initValue.equals('')">
+                    AND FINPROD_ID = #{initValue}
+                </when>
+                <otherwise>
+                    AND FINPROD_ID NOT IN(
+                    SELECT
+                    O_FINPROD_ID
+                    FROM
+                    FIN_PRODUCT
+                    WHERE
+                    O_FINPROD_ID IS NOT NULL
+                    )
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+    <select id="isHqTrade" resultType="java.lang.Integer">
+        select count(1) from TRD_PRODUCT_DEAL tpd where
+            tpd.ps in ('T03','T39')
+            and tpd.Trade_Status = '01'
+            and tpd.Is_Cancel = 'N'
+            and tpd.FINPROD_ID = #{finprodId}
+    </select>
+    <select id = "selectCountByfinprodId" resultType="java.lang.Integer">
+        SELECT
+            count( * )
+        FROM
+            FIN_PRODUCT
+        WHERE
+            FINPROD_ID = #{finprodId}
+    </select>
+
+    <select id = "selectCountByOFinprodId" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM FIN_PRODUCT
+        WHERE O_FINPROD_ID = #{oFinprodId}
+          and FINPROD_ID != #{finprodId}
+    </select>
+
+    <select id = "selectIsIssueAsset" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM FIN_PRODUCT FP
+  INNER JOIN FIN_PRODUCT_ADD FPA
+          ON FPA.APPEAR_MARKET_ID = FP.FINPROD_MARKET_ID
+        WHERE FP.FINPROD_ID = #{finprodId}
+    </select>
+
+    <select id="getFinCashPayRuleList"
+            resultType="com.joyintech.tams.common.base.entity.FinCashPayRule">
+        SELECT
+            fcpr.CASH_ID, fcpr.EFF_DATE,fcpr.PAY_CYCLE_VAL, fcpr.PAY_CYCLE,
+            fcpr.DAY_TYPE, fcpr.DAY_VALUE, fcpr.END_TDAY_RULE, fcpr.PAY_TDAY_RULE,
+            fcpr.CALC_RULE, fcpr.FIRST_PAY_DATE, fcpr.CASH_UNIT_TYPE,
+            fcpr.FINPROD_ID, fcpr.FINPROD_TYPE,fcpr.FINPROD_TYPE2, fcpr.BRANCH,
+            fcpr.PAY_TYPE, fcpr.REMARK,fcpr.CREATE_USER, fcpr.CREATE_DEPT,
+            fcpr.UPDATE_USER,fcpr.PAY_MONTH
+        FROM
+            FIN_CASH_PAY_RULE fcpr
+        WHERE fcpr.FINPROD_ID = #{finprodId,jdbcType=VARCHAR} /**金融产品代码**/
+    </select>
+
+    <select id="getFinCashPlanList"
+            resultType="com.joyintech.tams.common.base.entity.FinCashPlan">
+        SELECT
+            fcp.CASH_ID, fcp.MDATE, fcp.CASH_NUM, fcp.CASH_TYPE, fcp.VDATE_UNADJUST,
+            fcp.MDATE_UNADJUST, fcp.PAY_DATE_UNADJUST, fcp.VDATE,fcp.PAY_DATE, fcp.TERMDAYS,
+            fcp.VDATE_Y, fcp.VDATE_TERM, fcp.MDATE_TERM,fcp.TERMDAYS_TERM, fcp.PRIN_AMT,fcp.INT_PRIN_AMT,
+            fcp.INT_AMT,fcp.IS_PAY_INT, fcp.CASH_AMT, fcp.CASH_BASEAMT, fcp.CASH_UNIT_TYPE,
+            fcp.CALC_FUNCTION, fcp.FREQUENCY, fcp.FINPROD_ID, fcp.FINPROD_TYPE,fcp.FINPROD_TYPE2, fcp.BRANCH,
+            fcp.PAY_TYPE PAY_TYPE, fcp.RANGE_YIELD,fcp.REMARK, fcp.CREATE_USER, fcp.CREATE_DEPT,
+            fcp.UPDATE_USER,fcp.REPAY_WITHOUT_INT
+        FROM
+            FIN_CASH_PLAN fcp
+        WHERE fcp.FINPROD_ID = #{finprodId,jdbcType=VARCHAR} /**金融产品代码**/
+    </select>
+
+    <select id="getTargetCashCalcRuleList"
+            resultType="com.joyintech.tams.common.base.entity.FinCashCalcRule">
+        SELECT
+            fccr.CASH_ID CASH_ID, fccr.EFF_DATE EFF_DATE, fccr.CALC_TYPE CALC_TYPE, fccr.BASE_TYPE BASE_TYPE,
+            fccr.BASE_DATE_TYPE BASE_DATE_TYPE,fccr.BASIS BASIS, fccr.YIELD YIELD, fccr.IS_INITIAL IS_INITIAL,
+            fccr.FINPROD_ID FINPROD_ID, fccr.FINPROD_TYPE FINPROD_TYPE,fccr.FINPROD_TYPE2 FINPROD_TYPE2,
+            fccr.BRANCH BRANCH, fccr.REMARK REMARK, fccr.CREATE_USER CREATE_USER,fccr.CREATE_DEPT CREATE_DEPT,
+            fccr.UPDATE_USER UPDATE_USER
+        FROM
+            FIN_CASH_CALC_RULE fccr
+        WHERE fccr.FINPROD_ID = #{finprodId,jdbcType=VARCHAR} /**金融产品代码**/
+    </select>
+
+    <select id="selectFinCashInfo" resultType="com.joyintech.tams.common.base.entity.FinCashInfo">
+        SELECT
+            CASH_ID CASH_ID, CASH_TYPE_1 CASH_TYPE_1, CASH_TYPE_2 CASH_TYPE_2, CCY CCY, FINPROD_ID FINPROD_ID,
+            FINPROD_TYPE FINPROD_TYPE, BRANCH BRANCH, FEE_ID FEE_ID, CHL_FINPROD_ID CHL_FINPROD_ID,
+            CHL_LEVEL CHL_LEVEL, IS_CALC IS_CALC, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT,
+            UPDATE_USER UPDATE_USER,COLLECT_TYPE COLLECT_TYPE
+        FROM FIN_CASH_INFO
+        WHERE FINPROD_ID =#{finprodId}
+    </select>
+
+    <select id="getFinRateInfoList"
+            resultType="com.joyintech.tams.common.base.entity.FinRateInfo">
+        SELECT
+            fri.CASH_ID, fri.EFF_DATE, fri.INT_TYPE, fri.BASIS, fri.RESET_TYPE,
+            fri.RESET_FREQ, fri.FIRST_RESET_DATE, fri.RESET_DATE,fri.OBSERVE_BEF_DAY,
+            fri.OBSERVE_BEF_UNIT, fri.RATE, fri.COEFFICIENT,fri.SPREAD_RATE,fri.HIGHEST_RATE,
+            fri.LOWEST_RATE, fri.BENCHMARK_ID,fri.BENCHMARK_TYPE,fri.FINPROD_ID,fri.BRANCH,
+            fri.FINPROD_TYPE,fri.FINPROD_TYPE2, fri.REMARK,fri.CREATE_USER, fri.CREATE_DEPT,
+            fri.UPDATE_USER,fri.FIRST_CONFIRM_DATE
+        FROM
+            FIN_RATE_INFO fri
+        WHERE fri.FINPROD_ID = #{finprodId,jdbcType=VARCHAR} /**金融产品代码**/
+    </select>
+
+    <select id="selectFinExercisePlanByFinprodId"
+            resultType="com.joyintech.tams.common.base.entity.FinExercisePlan">
+        SELECT
+            CASH_ID CASH_ID, EXERCISE_TYPE EXERCISE_TYPE, EXERCISE_DATE EXERCISE_DATE, VDATE VDATE,
+            MDATE MDATE, EXERCISE_STATUS EXERCISE_STATUS, EXERCISE_PRICE EXERCISE_PRICE, EXERCISE_REMARK EXERCISE_REMARK,
+            FINPROD_ID FINPROD_ID, FINPROD_TYPE FINPROD_TYPE, FINPROD_TYPE2 FINPROD_TYPE2, BRANCH BRANCH,
+            CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER,
+            UPDATE_TIME UPDATE_TIME, ACT_EXERCISE_DATE ACT_EXERCISE_DATE
+        FROM FIN_EXERCISE_PLAN
+        WHERE FINPROD_ID = #{finprodId,jdbcType=VARCHAR} /**金融产品代码**/
+    </select>
+
+    <delete id="deletePaTrdFinDealTotalData">
+        delete from PA_TRD_FIN_PRODUCT_DEAL_TOTAL tfpft
+        where tfpft.TOTLE_TRADE_ID in (
+        select TOTLE_TRADE_ID from TRD_FIN_PRODUCT_DEAL_TOTAL
+        where trade_date =#{batchDate}
+        and BUSI_TYPE = #{busiType}
+        and PS in (#{PS_T07},#{PS_T08},#{PS_T09},#{PS_T39})
+        and finprod_id =#{finprodId}
+        <if test="finProdType2 != null and finProdType2 != ''">
+            and FINPROD_TYPE2 = #{finProdType2}
+        </if>
+        )
+    </delete>
+
+    <delete id="deleteTrdFinProductDealTotalData">
+        delete from TRD_FIN_PRODUCT_DEAL_TOTAL tfpft
+        where tfpft.trade_date =#{batchDate}
+        and tfpft.BUSI_TYPE = #{busiType}
+        and tfpft.PS in (#{PS_T07},#{PS_T08},#{PS_T09},#{PS_T39})
+        and finprod_id =#{finprodId}
+        <if test="finProdType2 != null and finProdType2 != ''">
+            and tfpft.FINPROD_TYPE2 = #{finProdType2}
+        </if>
+    </delete>
+
+    <delete id="deleteTrdProductDeal">
+        delete from trd_product_deal tfpft
+        where tfpft.TOTLE_TRADE_ID in (
+        select TOTLE_TRADE_ID from TRD_FIN_PRODUCT_DEAL_TOTAL
+        where trade_date =#{batchDate}
+        and BUSI_TYPE = #{busiType}
+        and PS in (#{PS_T07},#{PS_T08},#{PS_T09},#{PS_T39})
+        and finprod_id =#{finprodId}
+        <if test="finProdType2 != null and finProdType2 != ''">
+            and FINPROD_TYPE2 = #{finProdType2}
+        </if>
+        )
+    </delete>
+
+    <delete id="deleteTrdProductDealAdd">
+        delete from trd_product_deal_add tfpft
+        where tfpft.trade_id in (
+        select tfpft.trade_id from trd_product_deal tfpft
+        where tfpft.TOTLE_TRADE_ID in (
+        select TOTLE_TRADE_ID from TRD_FIN_PRODUCT_DEAL_TOTAL
+        where trade_date =#{batchDate}
+        and BUSI_TYPE = #{busiType}
+        and PS in (#{PS_T07},#{PS_T08},#{PS_T09},#{PS_T39})
+        and finprod_id =#{finprodId}
+        <if test="finProdType2 != null and finProdType2 != ''">
+            and FINPROD_TYPE2 = #{finProdType2}
+        </if>
+        )
+        )
+    </delete>
+
+    <delete id="deleteStlPayOrdersData">
+        delete from STL_PAY_ORDERS tfpft
+        where tfpft.TRADE_ID in (
+        select TOTLE_TRADE_ID from TRD_FIN_PRODUCT_DEAL_TOTAL
+        where trade_date =#{batchDate}
+        and BUSI_TYPE = #{busiType}
+        and PS in (#{PS_T07},#{PS_T08},#{PS_T09},#{PS_T39})
+        and finprod_id =#{finprodId}
+        <if test="finProdType2 != null and finProdType2 != ''">
+            and FINPROD_TYPE2 = #{finProdType2}
+        </if>
+        )
+    </delete>
+
+    <select id="findEffectiveData"
+            resultType="com.joyintech.tams.invest.common.dto.period.trdbondduration.TrdBondDurationDto">
+        SELECT t1.*,
+               ROUND(100 - SUM(NVL(fcp.prin_amt, 0)), 6) intPrinAmt
+        FROM (
+                 SELECT
+                     t8.CASH_ID cashId,
+                     t8.CASH_TYPE CASH_TYPE,
+                     SUM(T8.QTY)*100 qty,
+                     t8.SEC_ACCT_ID secManageAcctId,
+                     nvl(SAI.SEC_ACCT_NAME, fp.FINPROD_NAME) secAcctName,
+                     FPD.COLLECT_TYPE collectType,
+                     CASE WHEN SAI.SEC_ACCT_ID IS NULL THEN 1 ELSE 0 END channel,
+                     t10.FINPROD_MARKET_ID,
+                     t10.FINPROD_NAME finprodMarketName,
+                     TO_CHAR(t8.VDATE, 'yyyy-MM-dd') vDate,
+                     TO_CHAR(t8.MDATE, 'yyyy-MM-dd') mDate,
+                     T10.FINPROD_ID,
+                     T10.CCY,
+                     T10.ISSUER issuer,
+                     ROUND(t8.INT_AMT, 12) unitIntAmt,/*单位应计利息*/
+                     TO_CHAR(T10.VDATE, 'yyyy-MM-dd') vDateWhole,/*起息日*/
+                     TO_CHAR(T10.MDATE, 'yyyy-MM-dd') mDateWhole,/*到期日*/
+                     ROUND(t8.PRIN_AMT, 4) prinAmt,/*还本面额/百元*/
+                     T8.RANGE_YIELD*100 yield,/*区间票面利率（%）*/
+                     TO_CHAR(T8.PAY_DATE, 'yyyy-MM-dd') payDate,/*支付日*/
+                     TO_CHAR(T8.PAY_DATE, 'yyyy-MM-dd') tradeDate,/*交易日*/
+                     ROUND(sum(T8.intAmt), 8) intAmtTheory,/*理论应计利息*/
+                     ROUND(sum(T8.prinAmt), 4) prinAmtTheory,/*理论还本金额*/
+                     T10.TRADE_MARKET,
+                     ROUND(sum(t8.fpriceAmt), 4) fpriceAmt,/*理论本息总额*/
+                     NULL PA_BUSS_TYPE
+                 from (select T1.FINPROD_ID,
+                              T1.AMOUNT QTY,
+                              listagg(T1.CASH_TYPE, ',') within group ( order by T1.CASH_ID ) CASH_TYPE,
+		listagg(T1.CASH_ID, ',') within group ( order by T1.CASH_ID ) CASH_ID,
+                           min(T1.VDATE) VDATE,
+                           T1.MDATE,
+                           SUM(T1.CASH_AMT * T1.AMOUNT) fpriceAmt,
+                           sum(case when T1.CASH_TYPE IN (#{CASH_CLASS_TYPE01}, '04') then 0
+                           else T1.PRIN_AMT * T1.AMOUNT end) prinAmt,
+                           max(T1.INT_PRIN_AMT) INT_PRIN_AMT,
+                           T1.SEC_ACCT_ID,
+                           SUM(T1.PRIN_AMT) PRIN_AMT,
+                           SUM(T1.INT_AMT) INT_AMT,
+                           SUM(T1.int_amt * T1.AMOUNT) intAmt,
+                           T1.PAY_DATE,
+                           max(t1.RANGE_YIELD) RANGE_YIELD
+                       from (SELECT
+                           T1.FINPROD_ID,
+                           T1.PORTFOLIO_ID,
+                           DECODE(T1.HODING_TYPE, '06', T1.AMOUNT*-1,'11', T1.AMOUNT*-1, T1.AMOUNT)/100 AMOUNT,
+                           T1.SEC_ACCT_ID,
+                           t2.vdate,
+                           t2.mdate,
+                           t2.cash_amt,
+                           t2.prin_amt,
+                           t2.INT_PRIN_AMT,
+                           t2.int_amt,
+                           t2.cash_id,
+                           t2.cash_type,
+                           t2.pay_date,
+                           t2.RANGE_YIELD
+                           FROM PTL_SEC_POSITION_RULE T1 INNER JOIN FIN_CASH_PLAN T2 ON T1.FINPROD_ID = T2.FINPROD_ID
+                           AND T2.FINPROD_TYPE2 = #{FINPROD_TYPE_TGF01} AND t1.CDATE &lt; t2.MDATE
+                           LEFT JOIN PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = T1.PORTFOLIO_ID
+                           WHERE
+                           T1.AMOUNT > 0
+                           AND T1.HODING_TYPE = 'A_004'
+                           AND T1.DATE_TYPE = 0
+                           and nvl(pp.PARENT_PORTFOLIO_ID,'null') = 'null'
+                           AND T2.FINPROD_ID = #{finprodId} AND T2.MDATE = to_date(#{mDate}, 'yyyy-MM-dd')
+                           and T2.CASH_TYPE IN (#{CASH_CLASS_TYPE01},#{CASH_CLASS_TYPE02},#{CASH_CLASS_TYPE03},#{CASH_CLASS_TYPE04})
+                           and (t2.INT_AMT > 0 or t2.PRIN_AMT > 0)
+                           and NOT EXISTS (SELECT 1 FROM TRD_FIN_PRODUCT_DEAL_TOTAL TPDA
+                           LEFT JOIN TRD_DEAL_TOTAL_ADD TDTA ON TPDA.TOTLE_TRADE_ID = TDTA.TOTLE_TRADE_ID
+                           where TDTA.MP_FINPROD_ID IS NULL
+                           and TPDA.TRADE_STATUS = #{TRADE_STATUS01}
+                           AND TPDA.BUSI_TYPE = #{TRD10}
+                           AND TPDA.IS_CANCEL = #{YESNO_N} and T2.MDATE = TPDA.MDATE
+                           AND TPDA.FINPROD_ID = T1.FINPROD_ID
+                           AND T1.PORTFOLIO_ID =TPDA.PORTFOLIO_ID
+                           AND (TPDA.SEC_MANAGE_ACCT_ID = T1.SEC_ACCT_ID OR TPDA.CHL_ID = T1.SEC_ACCT_ID))
+                           AND NOT EXISTS (SELECT 1 FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL TPDA
+                           LEFT JOIN WFL_TRD_DEAL_TOTAL_ADD TDTA ON TPDA.TOTLE_TRADE_ID = TDTA.TOTLE_TRADE_ID
+                           where TDTA.MP_FINPROD_ID IS NULL
+                           and TPDA.TRADE_STATUS = #{TRADE_STATUS01}
+                           AND TPDA.BUSI_TYPE = #{TRD10}
+                           AND TPDA.IS_CANCEL = #{YESNO_N} and T2.MDATE >= TPDA.MDATE
+                           AND TPDA.FINPROD_ID = T1.FINPROD_ID
+                           AND T1.PORTFOLIO_ID =TPDA.PORTFOLIO_ID
+                           AND (TPDA.SEC_MANAGE_ACCT_ID = T1.SEC_ACCT_ID OR TPDA.CHL_ID = T1.SEC_ACCT_ID))
+                           AND NOT EXISTS (
+                           SELECT 1 FROM PTL_SEC_POSITION_RULE tpsp
+                           where tpsp.HODING_TYPE = T1.HODING_TYPE
+                           and tpsp.PORTFOLIO_ID = T1.PORTFOLIO_ID
+                           and tpsp.SEC_ACCT_ID = T1.SEC_ACCT_ID
+                           and tpsp.FINPROD_ID = T1.FINPROD_ID
+                           and tpsp.CDATE > T1.CDATE
+                           and tpsp.CDATE &lt; t2.MDATE
+                           )
+                           ) T1
+                       group by T1.FINPROD_ID,
+                           T1.MDATE,T1.AMOUNT, T1.PORTFOLIO_ID,
+                           T1.SEC_ACCT_ID,
+                           T1.PAY_DATE) T8
+                          LEFT JOIN FIN_PRODUCT T10 ON T10.FINPROD_ID = T8.FINPROD_ID
+                          LEFT JOIN STL_SEC_ACCT_INFO SAI ON T8.SEC_ACCT_ID = SAI.SEC_ACCT_ID
+                          LEFT JOIN FIN_PRODUCT FP ON T8.SEC_ACCT_ID = FP.FINPROD_ID
+                          LEFT JOIN FIN_PRODUCT_ADD FPD ON FP.FINPROD_ID=FPD.FINPROD_ID
+                 WHERE T10.FINPROD_TYPE2 = #{FINPROD_TYPE_TGF01}
+                   and T10.FINPROD_MARKET_ID = #{finprodMarketId}
+                 GROUP BY
+                     t8.CASH_ID ,
+                     t8.CASH_TYPE,
+                     t8.SEC_ACCT_ID,SAI.SEC_ACCT_NAME, fp.FINPROD_NAME,SAI.SEC_ACCT_ID,
+                     t8.PRIN_AMT,
+                     t8.INT_AMT/*还本金额*/,
+                     t10.FINPROD_MARKET_ID,
+                     t10.FINPROD_NAME ,
+                     t8.VDATE,
+                     t8.MDATE,
+                     T10.FINPROD_ID,
+                     T10.CCY,
+                     T10.ISSUER,
+                     T10.VDATE,
+                     T10.MDATE,
+                     T8.RANGE_YIELD ,
+                     T8.PAY_DATE ,
+                     T10.TRADE_MARKET,
+                     FPD.COLLECT_TYPE
+             ) T1
+                 LEFT JOIN FIN_CASH_PLAN fcp ON fcp.FINPROD_TYPE2 =#{FINPROD_TYPE_TGF01}
+            AND fcp.MDATE &lt; to_date(T1.MDATE, 'yyyy-MM-dd')
+            AND T1.FINPROD_ID = fcp.FINPROD_ID
+            and fcp.CASH_TYPE IN (#{CASH_CLASS_TYPE02}) and fcp.PRIN_AMT > 0
+        GROUP BY
+            t1. cashId,
+            t1.CASH_TYPE,
+            t1.QTY,
+            t1.secManageAcctId,
+            t1.channel,
+            t1.secAcctName,
+            t1.FINPROD_MARKET_ID,
+            t1.finprodMarketName,
+            t1.vDate,
+            t1.mDate,
+            t1.FINPROD_ID,
+            t1.CCY,
+            t1.issuer,
+            t1.unitIntAmt ,
+            t1.vDateWhole ,
+            t1.mDateWhole ,
+            t1.prinAmt ,
+            t1.yield ,
+            t1.payDate ,
+            t1.tradeDate ,
+            t1.intAmtTheory ,
+            t1.prinAmtTheory ,
+            t1.TRADE_MARKET,
+            t1.fpriceAmt ,
+            t1.PA_BUSS_TYPE,
+            t1.collectType
+    </select>
+
+    <select id="findAssetIntInfo" resultType="com.joyintech.tams.invest.common.dto.common.FinAssetIntInfo">
+        SELECT
+        cash_id,
+        CASH_TYPE,
+        PORTFOLIO_ID,
+        PORTFOLIO_NAME,
+        INVEST_YESORNO,
+        FINPROD_ID,
+        CDATE,
+        SUM(AMOUNT)/100 AMOUNT,
+        vDate,
+        mDate,
+        yield,
+        CALC_RULE
+        FROM (
+        SELECT
+        listagg(t5.CASH_TYPE, ',') within group ( order by t5.CASH_ID ) CASH_TYPE,
+        listagg(t5.CASH_ID, ',') within group ( order by t5.CASH_ID ) CASH_ID,
+        T1.PORTFOLIO_ID,
+        pp.PORTFOLIO_NAME,
+        pp.INVEST_YESORNO,
+        T1.FINPROD_ID,
+        T1.CDATE,
+        DECODE(T1.HODING_TYPE, '06', T1.AMOUNT*-1,'11', T1.AMOUNT*-1, T1.AMOUNT) AMOUNT,
+        '${vDate}' vDate,
+        '${mDate}' mDate,
+        '${yield}' yield,
+        /*现金流支付规则.支付频率 付息周期*/ T4.PAY_CYCLE CALC_RULE
+        /*检索对象 组合持仓*/ FROM PTL_SEC_POSITION_RULE T1
+        /*left join 标的类金融产品*/ LEFT JOIN FIN_PRODUCT T2
+        /*on 组合持仓.金融产品代码 = 标的类金融产品.金融产品代码*/ ON T1.FINPROD_ID = T2.FINPROD_ID
+        /*left join 现金流信息*/ LEFT JOIN FIN_CASH_INFO T3
+        /*on 标的类金融产品.金融产品代码 = 现金流信息.业务代码*/ ON T1.FINPROD_ID = T3.FINPROD_ID
+        /*and 现金流信息.现金流一级类型 = 数据字典缓存.现金流一级类型.利息*/ AND T3.CASH_TYPE_1 = #{CASH_TYPE_1_02}
+        /*and 现金流信息.现金流二级类型 = 数据字典缓存.现金流二级类型.利息*/ AND T3.CASH_TYPE_2 = #{CASH_TYPE_2_C02}
+        /*left join 现金流支付规则*/ LEFT JOIN FIN_CASH_PAY_RULE T4
+        /*on 现金流信息.现金流代码 = 现金流支付规则.现金流代码*/ ON T3.CASH_ID = T4.CASH_ID
+        /*and 生效日期 小于等于 传参.调整后计算结束日*/ AND T4.EFF_DATE &lt;= #{adjustMDate}
+        LEFT JOIN FIN_CASH_PLAN T5 ON T1.FINPROD_ID = T5.FINPROD_ID AND T5.MDATE = #{adjustMDate}
+        LEFT JOIN PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = T1.PORTFOLIO_ID
+        /*检索条件 金融产品代码 = 传参.金融产品代码*/ where T1.FINPROD_ID = #{finprodId}
+        /*and 持仓类型 = 数据字典缓存.持仓类型.实际*/
+        <!--AND T1.HODING_TYPE IN ('03', '05', '06','11')-->
+        AND T1.HODING_TYPE = 'A_004'
+        /*and 组合持仓.日期 = 平台日*/ AND t1.CDATE &lt; #{adjustMDate}
+        AND T1.SEC_ACCT_ID = #{secAcctId}
+        and T1.AMOUNT > 0
+        AND nvl(pp.PARENT_PORTFOLIO_ID,'null') = 'null'
+        AND NOT EXISTS (
+        SELECT 1 FROM PTL_SEC_POSITION_RULE tpsp
+        where tpsp.HODING_TYPE = T1.HODING_TYPE
+        and tpsp.PORTFOLIO_ID = T1.PORTFOLIO_ID
+        and tpsp.SEC_ACCT_ID = T1.SEC_ACCT_ID
+        and tpsp.FINPROD_ID = T1.FINPROD_ID
+        and tpsp.CDATE > T1.CDATE
+        and tpsp.CDATE &lt; #{adjustMDate}
+        )
+        /*不存在生效的交易*/
+        and NOT EXISTS (SELECT 1 FROM TRD_FIN_PRODUCT_DEAL_TOTAL TPDA
+        LEFT JOIN TRD_DEAL_TOTAL_ADD TDTA ON TPDA.TOTLE_TRADE_ID = TDTA.TOTLE_TRADE_ID
+        where TDTA.MP_FINPROD_ID IS NULL
+        AND TPDA.TRADE_STATUS = #{TRADE_STATUS01}
+        AND TPDA.BUSI_TYPE = #{TRD10}
+        AND TPDA.IS_CANCEL = #{YESNO_N} and TO_DATE(#{mDate}, 'YYYY-MM-DD') = TPDA.MDATE
+        AND TPDA.FINPROD_ID = T1.FINPROD_ID
+        AND T1.PORTFOLIO_ID =TPDA.PORTFOLIO_ID
+        AND (TPDA.CHL_ID = T1.SEC_ACCT_ID OR TPDA.SEC_MANAGE_ACCT_ID = T1.SEC_ACCT_ID))
+        /*不存在流程中的当期或之前的交易*/
+        AND NOT EXISTS (SELECT 1 FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL TPDA
+        LEFT JOIN WFL_TRD_DEAL_TOTAL_ADD TDTA ON TPDA.TOTLE_TRADE_ID = TDTA.TOTLE_TRADE_ID
+        where TDTA.MP_FINPROD_ID IS NULL
+        AND TPDA.TRADE_STATUS = #{TRADE_STATUS01}
+        AND TPDA.BUSI_TYPE = #{TRD10}
+        AND TPDA.IS_CANCEL = #{YESNO_N} and TO_DATE(#{mDate}, 'YYYY-MM-DD') >= TPDA.MDATE
+        AND TPDA.FINPROD_ID = T1.FINPROD_ID
+        AND T1.PORTFOLIO_ID =TPDA.PORTFOLIO_ID
+        AND (TPDA.CHL_ID = T1.SEC_ACCT_ID OR TPDA.SEC_MANAGE_ACCT_ID = T1.SEC_ACCT_ID))
+        group by
+        pp.PORTFOLIO_NAME,
+        T1.PORTFOLIO_ID,
+        T1.FINPROD_ID,
+        PP.INVEST_YESORNO,
+        T1.CDATE,
+        T1.AMOUNT,
+        T1.HODING_TYPE,
+        T4.PAY_CYCLE
+        )
+        group by cash_id,
+        CASH_TYPE,
+        PORTFOLIO_ID,
+        PORTFOLIO_NAME,
+        INVEST_YESORNO,
+        FINPROD_ID,
+        CDATE,
+        vDate,
+        mDate,
+        yield,
+        CALC_RULE
+        having SUM(AMOUNT) > 0
+    </select>
+
+    <select id="getAssetId" resultType="com.joyintech.framework.select.SelectOptionDto">
+        SELECT
+        FINPROD_MARKET_ID id,
+        case FINPROD_TYPE2 when #{FINPROD_TYPE_TG_ZQ}
+        then FINPROD_ABBR
+        ELSE FINPROD_NAME
+        end text,
+        case FINPROD_TYPE2 when #{FINPROD_TYPE_TG_ZQ}
+        then  FINPROD_ABBR
+        ELSE FINPROD_NAME end object,
+        FINPROD_MARKET_ID parentId
+        FROM FIN_PRODUCT
+        <where>
+            FINPROD_TYPE2 in ('F01','F06','F10','F32')
+            <if test="search != null and search != ''">
+                and (FINPROD_MARKET_ID like concat(concat('%',#{search}),'%')
+                or FINPROD_ABBR like concat(concat('%',#{search}),'%')
+                or FINPROD_NAME like concat(concat('%',#{search}),'%')
+                )
+            </if>
+            <if test="finprodType2 != null and finprodType2.size() > 0">
+                AND FINPROD_TYPE2 in
+                <foreach collection="finprodType2" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="child != null and (!child or child == 'false')">
+                AND P_FINPROD_ID IS NULL
+            </if>
+            <if test="profitType != null and profitType != ''">
+                AND PROFIT_TYPE = #{profitType,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+    <select id="getCrossMarketCode" resultType="com.joyintech.framework.select.SelectOptionDto">
+        SELECT
+        FINPROD_MARKET_ID id,
+        case FINPROD_TYPE2 when #{FINPROD_TYPE_TG_ZQ}
+        then FINPROD_ABBR
+        ELSE FINPROD_NAME
+        end text,
+        TRADE_MARKET object
+        FROM FIN_PRODUCT
+        <where>
+            FINPROD_TYPE2 = 'F01'
+            <if test="search != null and search != ''">
+                and (FINPROD_MARKET_ID like concat(concat('%',#{search}),'%')
+                or FINPROD_ABBR like concat(concat('%',#{search}),'%')
+                or FINPROD_NAME like concat(concat('%',#{search}),'%'))
+            </if>
+            <if test="finprodType2 != null and finprodType2.size() > 0">
+                AND FINPROD_TYPE2 in
+                <foreach collection="finprodType2" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="child != null and (!child or child == 'false')">
+                AND P_FINPROD_ID IS NULL
+            </if>
+            <if test="profitType != null and profitType != ''">
+                and PROFIT_TYPE = #{profitType,jdbcType=VARCHAR}
+            </if>
+        </where>
+        union all
+        SELECT SECID id, SECNAME text,MARKET2 object
+        FROM INTERF_PAYHSRCSECINFO
+        <where>
+            SECID NOT IN (select FINPROD_MARKET_ID from FIN_PRODUCT where FINPROD_TYPE2 = 'F01')
+            <if test="search != null and search != ''">
+                and (SECID like concat(concat('%',#{search}),'%')
+                or SECNAME like concat(concat('%',#{search}),'%'))
+            </if>
+        </where>
+    </select>
+
+
+    <!--画面一分页查询-->
+    <select id="getFinInterestFactorByProductId"  parameterType="Map" resultType="com.joyintech.tams.business.asset.bond.dto.BondFinInterestFactorDto">
+        SELECT
+        <!-- 一体化对应etliu -->
+        <!-- T2.RATE_TYPE, -->
+        T2.INT_TYPE,
+        T3.BASIS,
+        T2.RATE*100 RATE,
+        <!-- 一体化对应etliu -->
+        <!-- T2.RATE_MAX*100 ,
+        T2.RATE_MIN*100 RATE_MIN,
+        T2.INDEX_ID,
+        T2.INDEX_SOURCE, -->
+        T2.HIGHEST_RATE*100 as HIGHEST_RATE,
+        T2.LOWEST_RATE*100 LOWEST_RATE,
+        T2.BENCHMARK_ID,
+        T2.BENCHMARK_TYPE,
+        T2.COEFFICIENT,
+        T2.SPREAD_RATE*100 SPREAD_RATE,
+        T2.RESET_TYPE,
+        T2.OBSERVE_BEF_DAY,
+        T2.OBSERVE_BEF_UNIT,
+        T6.INVEST_RATE * 100 INVEST_RATE,
+        T6.LOAD_RATE*100 LOAD_RATE,
+        T5.COUPON_SPECIES,
+        T5.FINPROD_TYPE2,
+        case when T6.cal_Rate_Type is not null then T6.cal_Rate_Type
+        when T5.p_Finprod_Id is not null then K.CAL_RATE_TYPE
+        when T2.RATE != T6.INVEST_RATE then '01'
+        else '02' end  calRateType
+        FROM
+        FIN_CASH_INFO T1
+        LEFT JOIN FIN_RATE_INFO T2 ON T2.CASH_ID = T1.CASH_ID
+        <if test="vdate != null and vdate != ''">
+            AND T2.EFF_DATE = to_date ( #{vdate}, 'yyyy-mm-dd' )
+        </if>
+        LEFT JOIN FIN_CASH_CALC_RULE T3 ON T3.CASH_ID = T1.CASH_ID
+        <if test="vdate != null and vdate != ''">
+            AND T3.EFF_DATE = to_date ( #{vdate}, 'yyyy-mm-dd' )
+        </if>
+        LEFT JOIN FIN_CASH_CALC_RULE T4 on T4.CASH_ID = T1.CASH_ID
+        <if test="vdate != null and vdate != ''">
+            AND T4.EFF_DATE = to_date ( #{vdate}, 'yyyy-mm-dd' )
+        </if>
+        LEFT JOIN PA_FIN_CASH_CALC_RULE T6 on T6.CASH_ID = T1.CASH_ID
+        <if test="vdate != null and vdate != ''">
+            AND T6.EFF_DATE = to_date ( #{vdate}, 'yyyy-mm-dd' )
+        </if>
+        LEFT JOIN FIN_PRODUCT T5 on T5.FINPROD_ID = T1.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_add T6 on T6.FINPROD_ID = T1.FINPROD_ID
+        LEFT JOIN  (SELECT DISTINCT M1.FINPROD_ID, M1.P_FINPROD_ID, M3.CAL_RATE_TYPE from FIN_PRODUCT M1, FIN_PRODUCT_add M3 WHERE M1.P_FINPROD_ID = M3.FINPROD_ID) K
+        ON K.FINPROD_ID = T1.FINPROD_ID
+        <where>
+            <if test="finprodId != null and finprodId != ''">
+                AND T1.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+            </if>
+            <if test="cashType != null and cashType != ''">
+                AND T1.CASH_TYPE_2 = #{cashType,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+    <select id="getCommonSearchTabInfoQueryOperate" resultType="com.joyintech.tams.business.asset.bond.dto.SearchInfoOperateListResponse">
+        SELECT rownum SEQ_NO,t.* from (select
+               his.ENTRUST_ID,
+               FP.FINPROD_ABBR,
+               his.OPER_TYPE,
+               to_char( his.OPER_DATE, 'yyyy-MM-dd' ) OPER_DATE,
+               to_char( his.OPER_TIME, 'hh24:mi:ss' ) OPER_TIME,
+               his.BUSI_DES,
+               CASE WHEN his.OPER_TYPE = '01' THEN
+                        nvl(SU2.real_name,nvl(SUR.REAL_NAME,SUB.REAL_NAME))
+                    ELSE SU.real_name
+                   END AS userId
+           from ETR_ENTRUST_OPER_HIS his
+                    LEFT JOIN FIN_PRODUCT FP ON his.ENTRUST_ID = FP.ENTRUST_ID
+                    LEFT JOIN REG_FIN_PRODUCT_DEAL_TOTAL reg on reg.TOTLE_TRADE_ID= his.ENTRUST_ID
+                    LEFT JOIN ibu_quote_bond iqb on iqb.QUOTE_ID= his.ENTRUST_ID
+                    LEFT JOIN SYS_USER SU ON his.user_id = SU.user_name
+                    LEFT JOIN SYS_USER SU2 ON EE.CREATE_USER = SU2.user_name
+                    LEFT JOIN SYS_USER SUR ON reg.CREATE_USER = SUR.user_name
+                    LEFT JOIN SYS_USER SUB ON iqb.CREATE_USER = SUB.user_name
+           WHERE his.entrust_id = #{entrustId}
+           order by his.OPER_TIME desc) t
+    </select>
+
+    <select id="getfinAssetRateAdjByProductId"   resultType="com.joyintech.tams.business.asset.bond.dto.FinAssetRateAdjResponse">
+        SELECT
+        T3.FINPROD_ID,
+        T3.FINPROD_TYPE,
+        T3.FINPROD_TYPE2,
+        T3.FINPROD_MARKET_ID,
+        T3.FINPROD_NAME,
+        T3.FINPROD_ABBR,
+        T3.ISSUE_AMT,
+        T3.VDATE,
+        T1.EFF_DATE,
+        T1.CALC_TYPE,
+        T1.BASE_TYPE,
+        T1.BASE_DATE_TYPE,
+        T1.BASIS,
+        T1.YIELD*100 YIELD,
+        T1.IS_INITIAL,
+        T1.BRANCH,
+        T2.CASH_ID,
+        T2.FEE_ID
+        FROM
+        FIN_CASH_CALC_RULE T1
+        INNER JOIN FIN_CASH_INFO T2 ON T2.CASH_ID = T1.CASH_ID
+        LEFT JOIN FIN_PRODUCT T3 ON T3.FINPROD_ID = T1.FINPROD_ID
+        AND T2.FINPROD_ID = T3.FINPROD_ID
+        <if test="finprodType != null and finprodType != ''">
+            AND T2.FINPROD_TYPE = #{finprodType,jdbcType=VARCHAR}
+        </if>
+        <choose>
+            <when test="finprodType2 != null and finprodType2.equals(FINPROD_TYPE_TG_F28)">
+                and T2.CASH_TYPE_2 in ('C11','C12','C13','C14')
+            </when>
+            <otherwise>
+                <if test="cashType1 != null and cashType1 != ''">
+                    AND T2.CASH_TYPE_1 = #{cashType1,jdbcType=VARCHAR}
+                </if>
+                <if test="cashType2 != null and cashType2 != ''">
+                    AND T2.CASH_TYPE_2 = #{cashType2,jdbcType=VARCHAR}
+                </if>
+            </otherwise>
+        </choose>
+        <where>
+            <if test="finprodId != null and finprodId != ''">
+                AND T3.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+            </if>
+        </where>
+        order by T1.EFF_DATE ASC
+    </select>
+
+    <select id="selectInvScheduleList" resultType="com.joyintech.tams.business.asset.bond.dto.BondFinCashPlanDto">
+        SELECT VDATE vdate,
+               MDATE mdate,
+               PAY_DATE payDate,
+               RANGE_YIELD rangeYield,
+               INT_PRIN_AMT intPrinAmt,
+               INT_AMT intAmt,
+               BASIS basis,
+               PRIN_AMT prinAmt,
+               CASH_AMT cashAmt
+       from  FIN_CASH_PLAN fcp
+        WHERE  fcp.FINPROD_TYPE = #{FINPROD_TYPE_F01}
+          AND  fcp.FINPROD_TYPE2 = #{FINPROD_TYPE_F01}
+          AND  fcp.BRANCH = 0
+          AND  fcp.CASH_ID = #{cashId}
+    </select>
+
+    <select id="selectFinExercisePlanList" resultType="com.joyintech.tams.business.asset.bond.dto.BondFinExercisePlanDto">
+        SELECT EXERCISE_STATUS exerciseStatus,
+               VDATE vdate,
+               MDATE mdate,
+               EXERCISE_TYPE exerciseType,
+               EXERCISE_DATE exerciseDate,
+               ACT_EXERCISE_DATE actExerciseDate,
+               EXERCISE_PRICE exercisePrice,
+               EXERCISE_REMARK exerciseRemark
+        from FIN_EXERCISE_PLAN fep
+        WHERE  fep.FINPROD_TYPE = #{FINPROD_TYPE_F01}
+          AND  fep.FINPROD_TYPE2 = #{FINPROD_TYPE_F01}
+          AND  fep.BRANCH = 0
+          AND  fep.CASH_ID = #{cashId}
+    </select>
+
+    <select id="selectInterfCustomerInfo" resultType="com.joyintech.tams.business.asset.bond.dto.InterfCustomerInfoDto">
+        SELECT
+            REGISTER_CAPITAL  registerCapital,
+            PROVINCE          province,
+            CITY              city,
+            COUNTY            county,
+            HOLDING_TYPE      holdingType,
+            CUSTOMER_OBJ_TYPE  customerObjType,
+            IS_LISTED_COMPANY  isListedCompany,
+            IS_GROUP_CUSTOMER  isGroupCustomer,
+            PARENT_CUSTOMER_ID  parentCustomerId,
+            PARENT_CUSTOMER_NAME  parentCustomerName,
+            IS_PRIVATE          isPrivate,
+            IS_ESCAPE_DEPT      isEscapeDept,
+            CREDIT_TYPE         creditType,
+            IS_CREDIT_RELATED_TRD   isCreditRelatedTrd,
+            STRUCT_ADJUST_TYPE      structAdjustType,
+            INDUS_UPGRATE_TYPE      indusUpgrateType,
+            BUSI_SCOPE              busiScope,
+            MAIN_BUSI               mainBusi,
+            COMPANY_NATURE          companyNature,
+            REMARK                  remark,
+            HS_TYPE                 hsType,
+            CUSTOMER_ID              customerId,
+            CUSTOMER_NAME            customerName,
+            CUSTOMER_ABBR            customerAbbr,
+            PARTY_TYPE3              partyType3,
+            PARTY_TYPE2              partyType2,
+            PARTY_TYPE1              partyType1,
+            INDUSTRY                 industry,
+            INDUSTRY2                industry2,
+            INSITITUTE_CODE          insitituteCode,
+            IS_GOV                   isGov,
+            MAIN_CAPITAL             mainCapital
+        from INTERF_CUSTOMER_INFO
+        WHERE CUSTOMER_ID = #{issuer}
+    </select>
+
+    <select id="getCustomer" resultType="com.joyintech.framework.select.SelectOptionDto">
+        SELECT
+        CUSTOMER_ID id,
+        CUSTOMER_NAME text
+        FROM MST_CUSTOMER_INFO
+        <where>
+            <if test="search != null and search != ''">
+                (
+                CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                OR
+                CUSTOMER_ABBR LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                OR
+                CUSTOMER_ID LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                )
+            </if>
+            <if test="initValue != null and initValue != ''">
+                (
+                CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
+                OR
+                CUSTOMER_ABBR LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
+                OR
+                CUSTOMER_ID LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
+                )
+            </if>
+            <if test="IS_ISSUER != null and IS_ISSUER != ''">
+                AND IS_ISSUER = #{IS_ISSUER}
+            </if>
+        </where>
+    </select>
+
+    <delete id="deleteFinCashInfo">
+        delete from FIN_CASH_INFO where FINPROD_ID =#{finprodId}
+    </delete>
+
+    <delete id="deleteFinCashCalcRule">
+        delete from FIN_CASH_CALC_RULE where FINPROD_ID =#{finprodId}
+    </delete>
+
+    <delete id="deleteFinCashPayRule">
+        delete from FIN_CASH_PAY_RULE where FINPROD_ID =#{finprodId}
+    </delete>
+
+    <delete id="deleteFinCashPlan">
+        delete from FIN_CASH_PLAN where FINPROD_ID =#{finprodId}
+    </delete>
+
+    <delete id="deleteFinRateInfo">
+        delete from FIN_RATE_INFO where FINPROD_ID =#{finprodId}
+    </delete>
+
+    <delete id="deleteFinExercisePlan">
+        delete from FIN_EXERCISE_PLAN where FINPROD_ID =#{finprodId}
+    </delete>
+
+    <!-- 删除计算规则 -->
+    <delete id="deleteCashCalcRuleByCashId" parameterType="com.joyintech.tams.common.base.entity.FinCashCalcRuleKey" >
+        delete from FIN_CASH_CALC_RULE
+        where CASH_ID = #{cashId,jdbcType=VARCHAR}
+    </delete>
+
+    <!--画面一分页查询-->
+    <select id="selectInitAssetRateAdj"   resultType="com.joyintech.tams.business.asset.bond.dto.FinAssetRateAdjResponse">
+        SELECT
+            T3.FINPROD_ID,
+            T3.FINPROD_TYPE,
+            T3.FINPROD_TYPE2,
+            T3.FINPROD_MARKET_ID,
+            T3.FINPROD_NAME,
+            T3.FINPROD_ABBR,
+            T3.ISSUE_AMT,
+            T3.VDATE,
+            T1.EFF_DATE,
+            T1.CALC_TYPE,
+            T1.BASE_TYPE,
+            T1.BASE_DATE_TYPE,
+            T1.BASIS,
+            T1.YIELD*100 YIELD,
+            T1.IS_INITIAL,
+            T1.BRANCH,
+            T2.CASH_ID,
+            T2.FEE_ID
+        FROM FIN_CASH_CALC_RULE T1
+        LEFT JOIN FIN_PRODUCT T3 ON T3.FINPROD_ID = T1.FINPROD_ID
+        INNER JOIN FIN_CASH_INFO T2 ON T2.CASH_ID = T1.CASH_ID
+        AND T2.FINPROD_ID = T3.FINPROD_ID
+        <if test="finprodType != null and finprodType != ''">
+            AND T2.FINPROD_TYPE = #{finprodType,jdbcType=VARCHAR}
+        </if>
+        <if test="cashType1 != null and cashType1 != ''">
+            AND T2.CASH_TYPE_1 = #{cashType1,jdbcType=VARCHAR}
+        </if>
+        <if test="cashType2 != null and cashType2 != ''">
+            AND T2.CASH_TYPE_2 = #{cashType2,jdbcType=VARCHAR}
+        </if>
+        <where>
+            <if test="finprodId != null and finprodId != ''">
+                AND T1.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+            </if>
+        </where>
+        order by T1.EFF_DATE ASC
+    </select>
+</mapper>

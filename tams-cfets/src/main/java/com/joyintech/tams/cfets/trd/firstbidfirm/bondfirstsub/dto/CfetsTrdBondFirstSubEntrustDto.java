@@ -12,7 +12,11 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 import java.util.Date;
-
+/**
+ * 指令列表
+ * @author jiangpeng
+ * @date 2022/4/22 10:06
+ */
 @ApiModel(value = "指令列表", description = "一级申购指令列表")
 public class CfetsTrdBondFirstSubEntrustDto {
 

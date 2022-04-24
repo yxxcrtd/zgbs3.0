@@ -12,10 +12,10 @@ import java.util.List;
 @ApiModel(value = "指令信息", description = "一级申购指令信息输入")
 public class CfetsTrdBondFirstSubInitRequest {
 
-    @ApiModelProperty(required = false, name = "entrustDtos", value = "委托编号", example = "[WTBOND2022041801,WTBOND2022041802]")
+    @ApiModelProperty(name = "entrustDtos", value = "指令列表")
     private List<CfetsTrdBondFirstSubEntrustDto> entrustDtos;
 
-    @ApiModelProperty(required = false, name = "workflowId", value = "工作流代码", example = "104123904810")
+    @ApiModelProperty(name = "workflowId", value = "工作流代码", example = "104123904810")
     private String workflowId;
 
     public List<CfetsTrdBondFirstSubEntrustDto> getEntrustDtos() {

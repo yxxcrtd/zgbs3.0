@@ -95,7 +95,12 @@ public class TamsSystemApplication extends WebApplication {
 	}
 
 	@Bean
-	public Docket dataTenderbond() {
+	public Docket dataAssetInfo() {
+		return SwaggerConfig.createDocket("债券标的", "com.joyintech.tams.business.asset.bond");
+	}
+
+	@Bean
+	public Docket datatenderbond() {
 		return SwaggerConfig.createDocket("新债标的", "com.joyintech.tams.business.asset.tenderbond");
 	}
 
