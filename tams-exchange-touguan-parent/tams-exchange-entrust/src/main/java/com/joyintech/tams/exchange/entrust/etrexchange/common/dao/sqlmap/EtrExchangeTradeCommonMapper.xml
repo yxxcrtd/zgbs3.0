@@ -483,10 +483,10 @@
                 AND FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR} AND  FPT.TYPE_6=#{TYPE_6,jdbcType=VARCHAR}  AND FP.TRADE_MARKET=#{TRADE_PLACE_03}   <!-- 可债券、上交所 -->
             </when>
             <when test="tradePlat != null and tradePlat != '' and tradePlat == '02'.toString()">
-                AND ( FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR} AND  FPT.TYPE_6=#{TYPE_6,jdbcType=VARCHAR}) or (FP.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10})) <!-- 可债券 、股票 、基金 -->
+                AND ( (FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR} AND  FPT.TYPE_6=#{TYPE_6,jdbcType=VARCHAR}) or (FP.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}))) <!-- 可债券 、股票 、基金 -->
             </when>
             <when test="tradePlat != null and tradePlat != '' and tradePlat == '04'.toString()">
-                AND ( FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR} AND  FPT.TYPE_6=#{TYPE_6,jdbcType=VARCHAR}) or (FP.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10})) <!-- 可债券 、股票 、基金 -->
+                AND ( (FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR} AND  FPT.TYPE_6=#{TYPE_6,jdbcType=VARCHAR}) or (FP.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}))) <!-- 可债券 、股票 、基金 -->
             </when>
             <otherwise>
                 AND FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR}  <!--  债券 -->
