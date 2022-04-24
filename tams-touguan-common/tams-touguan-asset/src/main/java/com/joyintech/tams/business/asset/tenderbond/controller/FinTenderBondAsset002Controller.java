@@ -8,6 +8,7 @@ import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset001Dto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset002Dto;
 import com.joyintech.tams.business.asset.tenderbond.service.FinTenderBondAssetService;
@@ -21,6 +22,7 @@ import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +71,7 @@ public class FinTenderBondAsset002Controller extends BaseController {
         params.put("TRADE_PLACE", this.getSelectDataFromDataDic(DictCode.交易场所, null));
         params.put("REGIST_ORG", this.getSelectDataFromDataDic(DictCode.登记托管机构, null));
         params.put("RAISE_TYPE", this.getSelectDataFromDataDic(DictCode.募集方式, null));
-        params.put("ISSUE_TYPE", this.getSelectDataFromDataDic(DictCode.发行方式, null));
+        params.put("ISSUE_TYPE", this.getSelectDataFromDataDic(DictCode.新债_发行方式, null));
         params.put("TENDER_TYPE", this.getSelectDataFromDataDic(DictCode.招标方式, null));
         params.put("TENDER_TARGET", this.getSelectDataFromDataDic(DictCode.招标标的, null));
         params.put("ISSUE_STYLE", this.getSelectDataFromDataDic(DictCode.发行类型, null));
@@ -101,9 +103,21 @@ public class FinTenderBondAsset002Controller extends BaseController {
 
     @ResponseBody
     @PostMapping("/check")
-    @ApiOperation(value = "新建/修改/删除提交时校验", notes = "新建/修改/删除提交时校验")
+    @ApiOperation(value = "新建/修改提交时校验", notes = "新建/修改提交时校验")
     public Message check(@RequestBody FinTenderBondAsset002Dto dto) {
         List<ValidMessage> validMessageList = finTenderBoundAssetService.valid(dto);
+        if (CollectionUtils.isNotEmpty(validMessageList)) {
+            return Message.fail("校验失败", validMessageList);
+        } else {
+            return Message.success("校验成功", null);
+        }
+    }
+
+    @ResponseBody
+    @PostMapping("/modifyAndDeleteCheck")
+    @ApiOperation(value = "列表中点击删除和修改时调用校验", notes = "列表中点击删除和修改时调用校验")
+    public Message modifyAndDeleteCheck(@RequestBody FinTenderBondAsset001Dto dto) {
+        List<ValidMessage> validMessageList = finTenderBoundAssetService.modifyAndDeleteCheck(dto);
         if (CollectionUtils.isNotEmpty(validMessageList)) {
             return Message.fail("校验失败", validMessageList);
         } else {

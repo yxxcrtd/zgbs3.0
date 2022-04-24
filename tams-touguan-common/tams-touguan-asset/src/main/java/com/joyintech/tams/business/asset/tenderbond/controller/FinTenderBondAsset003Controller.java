@@ -15,6 +15,9 @@ import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.compress.utils.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +32,8 @@ import java.util.List;
 @RequestMapping("/asset/tenderBoundAsset003")
 @Api(tags = "新债标的上市流通")
 public class FinTenderBondAsset003Controller extends BaseController {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Autowired
     private FinTenderBondAsset003Service finTenderBoundAsset003Service;
 
@@ -42,6 +47,7 @@ public class FinTenderBondAsset003Controller extends BaseController {
         } else {
             return Message.success("校验成功", null);
         }
+
     }
 
     @ResponseBody
@@ -63,7 +69,7 @@ public class FinTenderBondAsset003Controller extends BaseController {
         try {
             finTenderBoundAsset003Service.start(processParameter, dto);
         } catch (Exception e) {
-            super.getLogger().error("新债标的流程发起失败", e);
+            logger.error("新债标的流程发起失败", e);
             return Message.fail("流程发起失败");
         }
         return Message.success("处理成功", null);

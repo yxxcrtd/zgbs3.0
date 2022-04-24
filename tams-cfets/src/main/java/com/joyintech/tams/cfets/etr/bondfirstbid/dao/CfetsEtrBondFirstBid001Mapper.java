@@ -28,4 +28,11 @@ public interface CfetsEtrBondFirstBid001Mapper {
      * @return 分页结果
      */
     List<CfetsEtrIBondFirstBidFindEtrInfoDto> findEtrInfoPage(Map<String, Object> pageParam);
+
+    /**
+     * 查询业务模式
+     * @param param
+     * @return
+     */
+    String findInvAimInEtr(Map<String, Object> param);
 }

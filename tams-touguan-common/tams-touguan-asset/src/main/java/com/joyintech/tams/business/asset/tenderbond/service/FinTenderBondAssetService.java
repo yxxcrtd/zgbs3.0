@@ -12,6 +12,7 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
+import com.joyintech.tams.business.common.util.ValidUtils;
 import com.joyintech.tams.common.base.dao.FinProductAddMapper;
 import com.joyintech.tams.common.base.dao.FinProductIssueMapper;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
@@ -156,6 +157,11 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         }
     }
 
+    /**
+     * 新增
+     *
+     * @param dto
+     */
     public void insert(FinTenderBondAsset002Dto dto) {
         if (StringUtil.isEmpty(dto.getCalendarId())) {//根据交易场所固定交易日历
             if (StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_银行间.getValue())) {
@@ -166,6 +172,8 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         }
         //1.保存金融产品标的表
         //金融产品类型_资产代码_增发批次_交易场所进行拼接
+        dto.setFinprodType2(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+        dto.setFinprodType(DictCodeListExt2.平安资产类型_一级市场债.getValue());
         dto.setFinprodId(getFinprodId(dto));
         FinProduct finProduct = new FinProduct();
         BeanUtil.copyPropertiesIgnoreNull(finProduct, dto);
@@ -173,10 +181,12 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         //2.保存金融产品标的附属表
         FinProductAdd productAdd = new FinProductAdd();
         BeanUtil.copyPropertiesIgnoreNull(productAdd, dto.getProductAddDto());
+        productAdd.setFinprodId(dto.getFinprodId());
         finProductAddMapper.insert(productAdd);
         //3.保存标的类金融产品发行信息
         FinProductIssue productIssue = new FinProductIssue();
         BeanUtil.copyPropertiesIgnoreNull(productIssue, dto.getIssueDto());
+        productIssue.setFinprodId(dto.getFinprodId());
         finProductIssueMapper.insert(productIssue);
         //4.保存融产品分类表
         FinProductType finProductType = new FinProductType();
@@ -186,6 +196,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         //finProductType.setType6(dto.getType4());
         //finProductType.setType7(dto.getType5());
         finProductType.setType8(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+
         finProductTypeMapper.insert(finProductType);
     }
 
@@ -230,6 +241,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(tradeId);
         oprHisReq.setOperType(operType.getValue());
+        oprHisReq.setBusiDes(remark);
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
 
@@ -365,7 +377,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
 
 
     /**
-     * 保存、修改、删除提交校验
+     * 保存、修改提交校验
      *
      * @param dto
      * @return
@@ -376,16 +388,43 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         if (isInProcess(dto.getFinprodMarketId(), "FinTenderBondAsset002", "FinTenderBondAsset003")) {
             validList.add(new ValidMessage("存在流程中的数据"));
         }
+        if(StringUtil.isEmpty(operateType)) {
+            validList.add(new ValidMessage("操作类型不能为空"));
+        }
         if (StringUtil.equals(operateType, OperationType.NEW.name())) {
             this.emptyCheck(dto, validList);
-            String finprodId = getFinprodId(dto);
-            FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
-            if (Objects.nonNull(finProduct)) { //同一资产代码只能存在一条数据
-                validList.add(new ValidMessage("同一资产代码只能存在一条数据"));
+            if(StringUtil.isNotEmpty(dto.getFinprodMarketId()) && StringUtil.isNotEmpty(dto.getTradeMarket())) {
+                String finprodId = getFinprodId(dto);
+                FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
+                if (Objects.nonNull(finProduct)) { //同一资产代码只能存在一条数据
+                    validList.add(new ValidMessage("同一资产代码只能存在一条数据"));
+                }
             }
         }
         if (StringUtil.equals(operateType, OperationType.MODIFY.name())) {
             this.emptyCheck(dto, validList);
+            //修改时以及流程中修改数据审批时，需要判断当前资产是否存在有效或流程中的待执行指令及交易数据，如存在，则不允许修改；
+            Integer count = finTenderBondAssetMapper.countFinprodIdUse(dto.getFinprodId(), DictCodeList.是否_否.getValue());
+            if (Objects.nonNull(count) && count > 0) {
+                validList.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
+            }
+        }
+        return validList;
+    }
+
+    /**
+     * 修改或者删除校验
+     *
+     * @param dto
+     * @return
+     */
+    public List<ValidMessage> modifyAndDeleteCheck(FinTenderBondAsset001Dto dto) {
+        List<ValidMessage> validList = new ArrayList<>();
+        String operateType = dto.getOperateType();
+        if (isInProcess(dto.getFinprodMarketId(), "FinTenderBondAsset002", "FinTenderBondAsset003")) {
+            validList.add(new ValidMessage("存在流程中的数据"));
+        }
+        if (StringUtil.equals(operateType, OperationType.MODIFY.name())) {
             //修改时以及流程中修改数据审批时，需要判断当前资产是否存在有效或流程中的待执行指令及交易数据，如存在，则不允许修改；
             Integer count = finTenderBondAssetMapper.countFinprodIdUse(dto.getFinprodId(), DictCodeList.是否_否.getValue());
             if (Objects.nonNull(count) && count > 0) {
@@ -409,8 +448,9 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
      * @return
      */
     public String getFinprodId(FinTenderBondAsset002Dto dto) {
-        return String.format("%s_%s_%d_%s_%s", DictCodeListExt2.平安资产类型_一级市场债.getValue(), dto.getFinprodMarketId(),
-                dto.getIssueDto().getAddBatch(), dto.getTradeMarket(), DateUtil.format(dto.getProductAddDto().getBidDate(), "yyyyMMdd"));
+        String [] arr = dto.getFinprodMarketId().split("\\.");
+        return String.format("%s_%s_%d_%s_%s.%s", DictCodeListExt2.平安资产类型_一级市场债.getValue(), arr[0],
+                dto.getIssueDto().getAddBatch(), dto.getTradeMarket(), DateUtil.format(dto.getProductAddDto().getBidDate(), "yyyyMMdd"),arr[1]);
     }
 
 
@@ -421,9 +461,10 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
      * @param validList
      */
     private void emptyCheck(FinTenderBondAsset002Dto dto, List<ValidMessage> validList) {
-        this.valid(dto, validList);
-        this.valid(dto.getProductAddDto(), validList);
-        this.valid(dto.getIssueDto(), validList);
+        ValidUtils.valid(dto, validList);
+        ValidUtils.valid(dto.getProductAddDto(), validList);
+        ValidUtils.valid(dto.getIssueDto(), validList);
+        if(Objects.isNull(dto.getIssueDto())) return;
         if (StringUtil.isNotEmpty(dto.getIssueDto().getIssueStyle()) && StringUtil.equals(dto.getIssueDto().getIssueStyle(), DictCodeListExt4.发行类型_增发)) {
             if (StringUtil.isNotEmpty(dto.getProductAddDto().getCrossMarket()) && StringUtil.equals(dto.getProductAddDto().getCrossMarket(), DictCodeList.是否_是.getValue())) {
                 if (StringUtil.isEmpty(dto.getProductAddDto().getCrossMarketCode())) {
@@ -444,35 +485,5 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
 
     }
 
-
-    /**
-     * 校验是否必填
-     *
-     * @param obj
-     * @param validList
-     */
-    public void valid(Object obj, List<ValidMessage> validList) {
-        Field[] methods = obj.getClass().getDeclaredFields();
-        if (methods == null || methods.length == 0) return;
-        for (Field field : methods) {
-            ApiModelProperty ap = field.getAnnotation(ApiModelProperty.class);
-            System.out.println(field.getGenericType().getTypeName());
-            if (Objects.nonNull(ap) && ap.required()) {//是必填字段
-                field.setAccessible(true);
-                try {
-                    Object value = field.get(obj);
-                    if (field.getGenericType().getTypeName().equals("java.lang.String")) {
-                        if (Objects.isNull(value) || value.equals("")) {
-                            validList.add(new ValidMessage(String.format("%s%s", ap.value(), "不能为空")));
-                        }
-                    } else if (Objects.isNull(value)) {
-                        validList.add(new ValidMessage(String.format("%s%s", ap.value(), "不能为空")));
-                    }
-                } catch (IllegalAccessException e) {
-                    //e.printStackTrace();
-                }
-            }
-        }
-    }
 
 }

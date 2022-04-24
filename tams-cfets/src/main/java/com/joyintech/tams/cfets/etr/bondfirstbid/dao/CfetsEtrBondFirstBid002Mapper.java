@@ -10,6 +10,7 @@
  
 package com.joyintech.tams.cfets.etr.bondfirstbid.dao;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -19,4 +20,17 @@ import org.springframework.stereotype.Repository;
 public interface CfetsEtrBondFirstBid002Mapper {
 
 
+    /**
+     * 根据指令代码删除委托投标标位表数据
+     * @param entrustId
+     * @return
+     */
+    int deleteEntrustBidPriceByEntrustId(@Param("entrustId") String entrustId);
+
+    /**
+     * 根据指令代码删除委托指令明细数据
+     * @param entrustId
+     * @return
+     */
+    int deleteEntrustDetailByEntrustId(@Param("entrustId")String entrustId);
 }

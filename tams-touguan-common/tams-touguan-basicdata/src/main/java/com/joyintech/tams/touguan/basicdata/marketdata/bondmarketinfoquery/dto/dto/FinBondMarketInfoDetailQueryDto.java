@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 债券市场详情信息查看DTO
@@ -160,8 +161,8 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "optionType", value = "行权方式")
     private String optionType;
 
-    @ApiModelProperty(name = "exerciseDate", value = "理论行权日")
-    private Date exerciseDate;
+    @ApiModelProperty(name = "theOryOptionPayDay", value = "理论行权日")
+    private Date theOryOptionPayDay;
 
     @ApiModelProperty(name = "parValue", value = "单位面值")
     @JsonSerialize(using = BigDecimalSerializer.class)
@@ -186,7 +187,10 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     private String zxGradeOrgId;
 
     @ApiModelProperty(name = "finBondPayHSrcSecOptionDto", value = "行权计划信息")
-    private FinBondPayHSrcSecOptionDto finBondPayHSrcSecOptionDto;
+    private List<FinBondPayHSrcSecOptionDto> bondPayHSrcSecOptionDtos;
+
+    @ApiModelProperty(name = "bondMarketCashPlanDtos", value = "付息计划信息")
+    private List<FinBondMarketCashPlanDto> bondMarketCashPlanDtos;
 
     public String getSecId() {
         return secId;
@@ -516,14 +520,6 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
         this.firstConfirmDate = firstConfirmDate;
     }
 
-    public Date getExerciseDate() {
-        return exerciseDate;
-    }
-
-    public void setExerciseDate(Date exerciseDate) {
-        this.exerciseDate = exerciseDate;
-    }
-
     public BigDecimal getParValue() {
         return parValue;
     }
@@ -596,11 +592,27 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
         this.optionType = optionType;
     }
 
-    public FinBondPayHSrcSecOptionDto getFinBondPayHSrcSecOptionDto() {
-        return finBondPayHSrcSecOptionDto;
+    public Date getTheOryOptionPayDay() {
+        return theOryOptionPayDay;
     }
 
-    public void setFinBondPayHSrcSecOptionDto(FinBondPayHSrcSecOptionDto finBondPayHSrcSecOptionDto) {
-        this.finBondPayHSrcSecOptionDto = finBondPayHSrcSecOptionDto;
+    public void setTheOryOptionPayDay(Date theOryOptionPayDay) {
+        this.theOryOptionPayDay = theOryOptionPayDay;
+    }
+
+    public List<FinBondMarketCashPlanDto> getBondMarketCashPlanDtos() {
+        return bondMarketCashPlanDtos;
+    }
+
+    public void setBondMarketCashPlanDtos(List<FinBondMarketCashPlanDto> bondMarketCashPlanDtos) {
+        this.bondMarketCashPlanDtos = bondMarketCashPlanDtos;
+    }
+
+    public List<FinBondPayHSrcSecOptionDto> getBondPayHSrcSecOptionDtos() {
+        return bondPayHSrcSecOptionDtos;
+    }
+
+    public void setBondPayHSrcSecOptionDtos(List<FinBondPayHSrcSecOptionDto> bondPayHSrcSecOptionDtos) {
+        this.bondPayHSrcSecOptionDtos = bondPayHSrcSecOptionDtos;
     }
 }

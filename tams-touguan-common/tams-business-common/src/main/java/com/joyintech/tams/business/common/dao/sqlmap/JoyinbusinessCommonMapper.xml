@@ -106,6 +106,43 @@
         AND mbmi.VALUE_DATE = #{platDate,jdbcType=DATE}
         <include refid="getfinprodIdForAddWhere"></include>
     </select>
+    <select id="getfinprodIdForNewBond" resultMap="finprodIdMap">
+        SELECT
+        T1.FINPROD_MARKET_ID id,
+        T1.FINPROD_ABBR text,
+        T1.FINPROD_NAME,
+        T1.FINPROD_ID,
+        T1.CALENDAR_ID,
+        T1.TRADE_MARKET,
+        T1.IS_RIGHT,
+        T2.TYPE_9,
+        T2.TYPE_10,
+        T2.TYPE_11,
+        T1.CCY
+        FROM
+        FIN_PRODUCT T1
+        LEFT JOIN FIN_PRODUCT_TYPE T2 ON T1.FINPROD_ID = T2.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ADD T3 ON T1.FINPROD_ID = T3.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE fpi ON fpi.FINPROD_ID = T1.FINPROD_ID
+        WHERE T1.CCY = 'CNY'
+        AND T1.FINPROD_TYPE2 = #{assestType}
+        AND (
+            ((CASE
+            WHEN fpi.ISSUE_CLASS IN ('02', '03') AND T3.LISTING_DATE IS NOT NULL THEN
+            T3.LISTING_DATE
+            ELSE fpi.ISSUE_DATE
+            END ) <![CDATA[>=]]> #{platDate,jdbcType=DATE} )
+            OR  (fpi.ISSUE_CLASS IN ('02', '03') AND T3.LISTING_DATE IS  NULL)
+        )
+        AND T1.TRADE_MARKET in(#{TRADE_PLACE_01},#{TRADE_PLACE_02})
+        <if test="search != null and !search.equals('')">
+            and (T1.FINPROD_MARKET_ID like concat('%',concat(#{search},'%'))
+            or T1.FINPROD_NAME like concat('%',concat(#{search},'%'))
+            or T1.FINPROD_ABBR like concat('%',concat(#{search},'%'))
+            or T1.FINPROD_ID like concat('%',concat(#{search},'%'))
+            )
+        </if>
+    </select>
     <sql id="getfinprodIdForAddAll">
         <where>
             T1.CCY = 'CNY'
