@@ -44,6 +44,7 @@
             resultType="com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dto.TradeInfoProResponse">
         select
                mdi.DEALER_NO,
+               mdi.TRADE_MARKET tradeMarket,
                 mci.CUSTOMER_ABBR dealerName,
                MDDI.DEALER_PARTY_NO,
                MDDI.DEALER_PARTY_TYPE,
@@ -61,7 +62,7 @@
     left join STL_SEC_ACCT_INFO SSAI on SCI.ACCT_NO = SSAI.TRD_ACCT_ID
     <where>
         <if test="tradePlace != null and tradePlace != ''">
-        SSAI.TRADE_PLACE = #{tradePlace}
+            mdi.TRADE_PLACE = #{tradePlace}
         </if>
         <if test="acctNo != null and acctNo != ''">
         and  SSAI.TRD_ACCT_ID = #{acctNo}
