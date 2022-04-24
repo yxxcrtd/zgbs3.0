@@ -14,31 +14,35 @@
         <div class="joyin-form-wrap joyin-filter-form condition-area">
             <form class="layui-form" id="searchForm">
                 <div class="layui-form-item">
-                    <div class="layui-inline layui-col-md4">
-                        <label class="layui-form-label form-lable">交易编号</label>
+                    <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
+                        <label class="layui-form-label form-lable"
+                               data-th-text="#{TrdFixIncomeValuDuration.tradeId}">交易编号</label>
                         <div class="layui-input-inline input-inline">
-                            <input type="text" id="tradeId" name="tradeId" class="layui-input form-input" data-th-placeholder="#{SysCommon.placeholder}"
-                                   data-th-value="${tradeId}">
+                            <input type="text" id="tradeId" name="tradeId"
+                                   class="layui-input form-input input-lenovoselect" placeholder="请输入内容"
+                                   data-th-placeholder="#{SysCommon.placeholder}"
+                                   data-th-value="${entity?.tradeId}">
                         </div>
                     </div>
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
-                        <label class="layui-form-label form-lable">产品名称</label>
+                        <label class="layui-form-label form-lable"
+                               data-th-text="#{TrdFixIncomeValuDuration.prodName}">产品名称</label>
                         <div class="layui-input-inline input-inline">
-                            <select type="text" id="portfolioId" name="portfolioId"
-                                    class="layui-input form-input input-select" placeholder="请输入内容"
-                                    data-th-placeholder="#{SysCommon.placeholder}" multiple="true"
-                                    data-th-data-url="@{/valuation/trademanage/trdfixincomevaluduration/TrdFixIncomeValuDuration001/getFinprodId}">
+                            <select id="finprodId" name="finprodId"
+                                    class="layui-input form-input input-select"
+                                    data-th-data-url="@{/valuation/trademanage/trdfixincomevaluduration/TrdFixIncomeValuDuration001/getFinprodId}"
+                                    multiple="true" allowClear="true" placeholder="请输入内容">
                             </select>
                         </div>
                     </div>
-
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
-                        <label class="layui-form-label form-lable">资产名称</label>
+                        <label class="layui-form-label form-lable"
+                               data-th-text="#{TrdFixIncomeValuDuration.assetAbbr}">资产名称</label>
                         <div class="layui-input-inline input-inline">
-                            <select type="text" id="finprodMarketId" name="finprodMarketId"
-                                    class="layui-input form-input input-select" placeholder="请输入内容" multiple="true"
-                                    data-th-placeholder="#{SysCommon.placeholder}"
-                                    data-th-data-url="@{/valuation/trademanage/trdfixincomevaluduration/TrdFixIncomeValuDuration001/getAssetId}">
+                            <select id="asset" name="asset"
+                                    class="layui-input form-input input-select"
+                                    data-th-data-url="@{/valuation/trademanage/trdfixincomevaluduration/TrdFixIncomeValuDuration001/getAssetId}"
+                                    multiple="true" allowClear="true" placeholder="请输入内容">
                             </select>
                         </div>
                     </div>
@@ -46,7 +50,8 @@
 
                 <div class="layui-form-item">
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
-                        <label class="layui-form-label form-lable">交易日期</label>
+                        <label class="layui-form-label form-lable"
+                               data-th-text="#{TrdFixIncomeValuDuration.tradeDate}">交易日期</label>
                         <div class="layui-input-inline input-inline">
                             <input type="text" id="tradeDate" name="tradeDate"
                                    class="layui-input form-input input-dateRangeSelect" placeholder="请输入内容"
@@ -54,20 +59,30 @@
                                    data-th-value="${#dates.format(entity?.tradeDate,'yyyy-MM-dd')}">
                         </div>
                     </div>
-
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
-                        <label class="layui-form-label form-lable" >交易类型</label>
+                        <label class="layui-form-label form-lable"
+                               data-th-text="#{TrdFixIncomeValuDuration.ps}">交易类型</label>
                         <div class="layui-input-inline input-inline">
-                            <select type="text" id="ps" name="ps"
-                                    class="layui-input form-input input-select"
-                                    allowClear="true" placeholder="请输入内容" multiple="true"
-                                    data-th-placeholder="#{SysCommon.placeholder}"
-                                    data-th-data-result='${PS}'
-                                    data-th-initValue="${entity?.ps}">
-                            </select>
+                            <input id="ps" name="ps" class="input-select"
+                                   placeholder="请选择"
+                                   data-th-data-result="${PS}"
+                                   allowClear="true"
+                                   multiple="multiple"
+                                   data-th-placeholder="#{SysCommon.placeholder}">
                         </div>
                     </div>
-
+                    <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
+                        <label class="layui-form-label form-lable"
+                               data-th-text="#{TrdFixIncomeValuDuration.dataSource}">数据来源</label>
+                        <div class="layui-input-inline input-inline">
+                            <input id="dataSource" name="dataSource" class="input-select"
+                                   placeholder="请选择"
+                                   data-th-data-result="${CREATE_TYPE}"
+                                   allowClear="true"
+                                   multiple="multiple"
+                                   data-th-placeholder="#{SysCommon.placeholder}">
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>

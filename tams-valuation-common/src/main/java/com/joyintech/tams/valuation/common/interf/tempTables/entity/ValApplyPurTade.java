@@ -110,6 +110,11 @@ public class ValApplyPurTade extends BaseEntity {
      * 付款账户
      */
     private String acctNo;
+
+    /**
+     * 数据来源
+     */
+    private String dataSource;
     /*add by sunshuaishuai 20220324 end*/
 
     /**
@@ -435,5 +440,20 @@ public class ValApplyPurTade extends BaseEntity {
         this.acctNo = acctNo;
     }
 
+    /**
+     * 取得 数据来源
+     * @return 数据来源
+     */
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    /**
+     * 设置 数据来源
+     * @param dataSource 数据来源
+     */
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
+    }
     /*add by sunshuaishuai 20220324 end*/
 }

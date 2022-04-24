@@ -85,6 +85,7 @@ public class TrdOutRightRepoValuationTrade003Controller extends BaseController {
             map.put("feeType_B08",DictCodeListExt1.一次性费用类型_结算手续费.getValue());
             map.put("busiType",DictCodeList.业务类型_债券买断式回购交易.getValue());
             TrdOutRightRepoValuationTrade003Dto entity = trdOutRightRepoValuationTrade003Service.queryTradeInfoByTradeId01(map);
+            entity.setOutTradeId(entity.getTradeId());
             model.addAttribute("entity", entity);
         }else{
             //初始化值

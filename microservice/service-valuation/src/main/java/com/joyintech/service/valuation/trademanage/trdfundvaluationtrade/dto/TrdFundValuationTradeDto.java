@@ -301,6 +301,17 @@ public class TrdFundValuationTradeDto extends BaseEntity implements ProcessEntit
     @JsonSerialize(using= BigDecimalSerializer.class)
     private BigDecimal tradeAmtArrive;
 
+    /**
+     * 应付佣金
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal commissionPay;
+
+    /**
+     * 数据来源
+     */
+    private String dataSource;
+
     public String getOperateType() {
         return operateType;
     }
@@ -699,6 +710,22 @@ public class TrdFundValuationTradeDto extends BaseEntity implements ProcessEntit
 
     public void setTradeAmtArrive(BigDecimal tradeAmtArrive) {
         this.tradeAmtArrive = tradeAmtArrive;
+    }
+
+    public BigDecimal getCommissionPay() {
+        return commissionPay;
+    }
+
+    public void setCommissionPay(BigDecimal commissionPay) {
+        this.commissionPay = commissionPay;
+    }
+
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
     }
 }
 

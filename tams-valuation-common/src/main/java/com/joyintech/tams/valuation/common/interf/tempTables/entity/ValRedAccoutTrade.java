@@ -85,6 +85,11 @@ public class ValRedAccoutTrade extends BaseEntity {
      * 外部成交编号
      */
     private String outTradeId;
+
+    /**
+     * 数据来源
+     */
+    private String dataSource;
     /*add by sunshuaishuai 20220324 end*/
 
     /**
@@ -328,6 +333,22 @@ public class ValRedAccoutTrade extends BaseEntity {
      */
     public void setOutTradeId(String outTradeId) {
         this.outTradeId = outTradeId == null ? null : outTradeId.trim();
+    }
+
+    /**
+     * 取得 数据来源
+     * @return 数据来源
+     */
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    /**
+     * 设置 数据来源
+     * @param dataSource 数据来源
+     */
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
     }
     /*add by sunshuaishuai 20220324 end*/
 }

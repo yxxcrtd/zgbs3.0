@@ -165,6 +165,11 @@ public class TrdBondLendTradeDto extends BaseEntity implements ProcessEntity {
      */
     private String acctNo;
 
+    /**
+     * 到期标识 （用于识别是否做过到期交易）
+     */
+    private String dealFlag;
+
     @NotEmpty(fieldName = "TrdBondLendTrade.prodId", groups = { ValidateGroupEdit.class })
     public String getProdId() {
         return prodId;
@@ -459,5 +464,13 @@ public class TrdBondLendTradeDto extends BaseEntity implements ProcessEntity {
 
     public String getMdateStr() {
         return DateUtil.format(this.getMdate());
+    }
+
+    public String getDealFlag() {
+        return dealFlag;
+    }
+
+    public void setDealFlag(String dealFlag) {
+        this.dealFlag = dealFlag;
     }
 }

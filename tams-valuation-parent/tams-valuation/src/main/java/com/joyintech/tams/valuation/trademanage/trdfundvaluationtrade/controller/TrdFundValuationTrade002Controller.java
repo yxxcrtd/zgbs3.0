@@ -153,13 +153,6 @@ public class TrdFundValuationTrade002Controller extends BaseController {
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
 
-//        //设置主键
-//        if(!StringUtil.isNotEmpty(dto.getTradeId())){
-//            Date sysDate= DateUtil.platDateFromCache();
-//            //新建初始化交易编号
-//            dto.setTradeId(trdFundValuationTrade002Service.createFundTradeId());
-//        }
-
         params.setBusinessCode(dto.getAssetId());
         params.setBusinessType(DictCodeList.共通业务类型_基金类资产交易.getValue());
         // 设置流程业务说明, entity即传入的dto
@@ -173,16 +166,4 @@ public class TrdFundValuationTrade002Controller extends BaseController {
         String msg = trdFundValuationTrade002Service.start(parameter, dto);
         return new AjaxResult(msg);
     }
-
-    /**
-     * 策略计划类交易代码生成
-     * @see
-     * @since 1.0
-     */
-    @PostMapping("createFundTradeId")
-    public String createPlanTradeId() {
-        return trdFundValuationTrade002Service.createFundTradeId();
-    }
-
-
 }

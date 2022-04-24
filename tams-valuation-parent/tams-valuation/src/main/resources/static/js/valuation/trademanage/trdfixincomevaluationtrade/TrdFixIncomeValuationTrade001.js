@@ -49,6 +49,7 @@ $(function(){
             ,{field:'intAmt', width:150, title: '应收利息总额',type:'number'}
             ,{field:'ccyFmt', title: '币种',sortField:"ccy",width:180}
             ,{field:'ccy',  title: '币种' ,visible: false}
+            ,{field:'settleAmt', width:150, title: '结算金额',type:'number'}
             ,{field:'myAcctNo', width:200, title: '资金账户'}
             ,{field:'dataSourceStr', title: '数据来源',sortField:"dataSource",width:150}
             ,{field:'dataSource', title: '数据来源',visible:false}

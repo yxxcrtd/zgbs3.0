@@ -105,8 +105,10 @@
 		CASE WHEN t.PS in (#{PS_03}, #{PS_04}) THEN t.PRIN_AMT+NVL(ttfd3.FEE_AMT,0)+NVL(ttfd4.FEE_AMT,0)
 		ELSE hgzc.M_TRADE_AMT END AS settleAmt,/**结算金额**/
 		t.CCY ccy,/**币种**/
-		t.MY_ACCT_NO trdAcctId/**资金账户**/
+		t.MY_ACCT_NO trdAcctId,/**资金账户**/
+		decode(tpd.PS,'T07','01','02') dealFlag
 		FROM TRD_PRODUCT_DEAL t
+		left join TRD_PRODUCT_DEAL tpd on tpd.F_TRADE_ID = t.TRADE_ID
 		LEFT JOIN FIN_DEAL_PLEDGE fdp on t.finprod_id=fdp.finprod_id
 		LEFT JOIN FIN_PRODUCT zc on zc.FINPROD_ID=fdp.PLEDGE_FINPROD_ID
 		LEFT JOIN FIN_TRADE_PRODUCT hgzc on t.FINPROD_ID=hgzc.FINPROD_ID

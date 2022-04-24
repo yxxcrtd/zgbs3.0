@@ -74,6 +74,9 @@ public class TrdFixIncomeValuationTrade002Controller extends BaseController {
 
         String tradeId = getParam("tradeId");
         String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
+        //平台日
+        model.addAttribute("iPlatformDate", DateUtil.parse(DateUtil.getSysDate()));
+
         if(StringUtil.isNotEmpty(workflowId)){
             TrdFixIncomeValuationTradeDto entity= trdFixIncomeValuationTrade002Service.getBussinessEntityByWorkflowId(workflowId);
             if(!StringUtil.isNotEmpty(entity.getTradeId())){

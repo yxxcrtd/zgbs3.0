@@ -124,6 +124,35 @@
             });
         });
     }
+
+    //结算金额  结算金额=成交金额+净佣金
+    var settleAmtChange = function(){
+        var tradeAmt = $('#tradeAmt').val();
+        var commission = $('#commission').val();
+        var commissionPay = $('#commissionPay').val();
+        var ps = $('#ps').val();
+        if(tradeAmt != null && tradeAmt != ''
+            && commission != null && commission != ''
+        ){
+            if(ps == 'T01'){
+                if(commissionPay && commissionPay != 0 ){
+                    var settleAmt1 = JoyinMath.doAdd(tradeAmt, commissionPay,2);;
+                }else{
+                    var settleAmt1 = JoyinMath.doAdd(tradeAmt, commission,2);;
+                }
+            }else if(ps == 'T02'){
+                if(commissionPay && commissionPay != 0 ){
+                    var settleAmt1 =JoyinMath.doMinus(tradeAmt,commissionPay,2);
+                }else{
+                    var settleAmt1 = JoyinMath.doMinus(tradeAmt,commission,2);
+                }
+            }
+            $('#settleAmt').val(settleAmt1);
+        }else{
+            $('#settleAmt').val('');
+        }
+    }
+
     /**
      * 界面初始化
      * @returns
@@ -139,6 +168,18 @@
             psChange();
         }
 
+        //佣金
+        $('#commission').change(function(){
+            settleAmtChange();
+        });
+        //应收利息总额
+        $('#commissionPay').change(function(){
+            settleAmtChange();
+        });
+        //应收利息总额
+        $('#tradeAmt').change(function(){
+            settleAmtChange();
+        });
 
 
         //保存

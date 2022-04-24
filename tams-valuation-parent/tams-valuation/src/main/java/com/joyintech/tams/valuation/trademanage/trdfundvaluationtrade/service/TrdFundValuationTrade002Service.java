@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 
@@ -64,18 +65,6 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
     private InterfCommonService interfCommonService;
     @Autowired
     private FundNMoneyFundRedeemConfirmDealRecService fundNMoneyFundRedeemConfirmDealRecService;
-
-    /**
-     * 策略代码生成
-     *
-     * @see
-     * @since 1.0
-     */
-    public String createFundTradeId() {
-        return restTemplate.postForObject(
-                ServiceApplication.VALUATION_SERVICE_NAME + "/TrdFundValuationTrade/createFundTradeId",
-                null, String.class);
-    }
 
     /**
      * @Description:根据交易编号查询详情
@@ -431,7 +420,16 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
         valFundTrade.setMyAcctNo(dto.getTrdMyAcctNo());//付款账户-资金账户
         valFundTrade.setTradeAmt(dto.getSettleAmt());//交易金额
         valFundTrade.setIsClean("N"); //有无清算指令
-        valFundTrade.setIsCommission("N");
+        if((new BigDecimal(0)).compareTo(dto.getCommission()) == -1
+                && (new BigDecimal(0)).compareTo(dto.getCommissionPay()) != -1){
+            valFundTrade.setIsCommission("Y");//佣金是否随交易支付
+            valFundTrade.setCommission(dto.getCommission());
+        }else{
+            valFundTrade.setIsCommission("N");//佣金是否随交易支付
+            valFundTrade.setCommission(dto.getCommissionPay());
+        }
+        //设置数据来源：画面录入
+        valFundTrade.setDataSource(DictCodeListExt1.生成方式_画面录入.getValue());
 
         return valFundTrade;
     }
@@ -476,6 +474,8 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
                 valApplyPurTade.setSettleDate(dto.getPurSettleDate());//资金交收日
             }
         }
+        //设置数据来源：画面录入
+        valApplyPurTade.setDataSource(DictCodeListExt1.生成方式_画面录入.getValue());
         return valApplyPurTade;
     }
 
@@ -511,6 +511,8 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
                 valAffirmPurTrade.setMyAcctNo(dto.getSubConfirmMyAcctNo());//资金账户
             }
         }
+        //设置数据来源：画面录入
+        valAffirmPurTrade.setDataSource(DictCodeListExt1.生成方式_画面录入.getValue());
         return valAffirmPurTrade;
     }
 
@@ -537,6 +539,8 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
 
         valFundMnfRedAffirm.setDataActionSign("01");//数据动作标志
         valFundMnfRedAffirm.setIsClean("N"); //有无清算指令
+        //设置数据来源：画面录入
+        valFundMnfRedAffirm.setDataSource(DictCodeListExt1.生成方式_画面录入.getValue());
         return valFundMnfRedAffirm;
     }
 
@@ -561,6 +565,8 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
         valFundNRedAffirmN.setDataActionSign("01");//数据动作标志
         valFundNRedAffirmN.setIsClean("N"); //有无清算指令
         valFundNRedAffirmN.setTradeMarket("09");//交易场所
+        //设置数据来源：画面录入
+        valFundNRedAffirmN.setDataSource(DictCodeListExt1.生成方式_画面录入.getValue());
         return valFundNRedAffirmN;
     }
 
@@ -589,6 +595,8 @@ public class TrdFundValuationTrade002Service extends CommonExportService<TrdFund
         valRedAccoutTrade.setSettleDate(dto.getArriveDate());
         valRedAccoutTrade.setDataActionSign("01");//数据动作标志
         valRedAccoutTrade.setIsClean("N"); //有无清算指令
+        //设置数据来源：画面录入
+        valRedAccoutTrade.setDataSource(DictCodeListExt1.生成方式_画面录入.getValue());
         return valRedAccoutTrade;
     }
 

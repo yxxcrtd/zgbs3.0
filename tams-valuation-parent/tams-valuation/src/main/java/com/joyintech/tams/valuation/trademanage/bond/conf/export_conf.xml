@@ -18,9 +18,17 @@
             <Cell order="14" name="交易金额">tradeAmtStr</Cell>
             <Cell order="15" name="应收利息总额">intAmtStr</Cell>
             <Cell order="16" name="币种">ccyFmt</Cell>
-            <Cell order="17" name="结算金额">settleAmtStr</Cell>
-            <Cell order="18" name="资金账户">myAcctNo</Cell>
-            <Cell order="19" name="数据来源">dataSourceStr</Cell>
+            <Cell order="17" name="经手费">brokerageStr</Cell>
+            <Cell order="18" name="结算费">stlAmtStr</Cell>
+            <Cell order="19" name="净佣金">commissionStr</Cell>
+            <Cell order="20" name="交易手续费">dealFeeAmtStr</Cell>
+            <Cell order="21" name="结算服务费">stlFeeAmtStr</Cell>
+            <Cell order="22" name="应付佣金">commissionPayStr</Cell>
+            <Cell order="23" name="清算金额">settleAmtStr</Cell>
+            <Cell order="24" name="申购金额">entrustAmtStr</Cell>
+            <Cell order="25" name="中签金额">confirmAmtStr</Cell>
+            <Cell order="26" name="资金账户">myAcctNo</Cell>
+            <Cell order="27" name="数据来源">dataSourceStr</Cell>
         </Row>
     </Worksheet>
 </Workbook>

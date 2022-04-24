@@ -98,7 +98,7 @@ public class TrdBondTrade001Controller extends BaseController {
     @RequestMapping("/getFinprodId")
     public List<SelectOptionDto> getFinprodId() {
         Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("finprodType","F16");
+        param.put("finprodType",DictCodeListExt1.金融产品类型_理财产品.getValue());
         return commonBusinessService.getProdName(param);
     }
 
@@ -113,7 +113,7 @@ public class TrdBondTrade001Controller extends BaseController {
     @RequestMapping("/getAssetId")
     public List<SelectOptionDto> getAssetId() {
         Map<String, Object> param = RequestUtil.getPageParam();
-        param.put("assetType","F01");
+        param.put("assetType",DictCodeListExt1.金融产品类型_债券.getValue());
         return commonBusinessService.getAssetId(param);
     }
 

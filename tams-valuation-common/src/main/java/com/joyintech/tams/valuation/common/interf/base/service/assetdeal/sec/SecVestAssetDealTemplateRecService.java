@@ -537,6 +537,10 @@ public class SecVestAssetDealTemplateRecService {
         valFinProductDeal.setCreateTime(dto.getCreateTime());
         //是否生成结算指令 add by yinya on 20211201
         valFinProductDeal.setIsOrders(dto.getIsClean());
+        /*add by sunshuaishuai 交易管理 20220406 start*/
+        //资金账户
+        valFinProductDeal.setMyAcctNo(dto.getMyAcctNo());
+        /*add by sunshuaishuai 20220406 end*/
 
         return valFinProductDeal;
     }

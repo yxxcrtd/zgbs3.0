@@ -22,40 +22,53 @@ import java.util.List;
 
 
 public class TrdFixIncomeValuDuration001Dto extends WflTrdProductDeal implements ProcessEntity {
-
     /**
      * <意义，目的和功能，以及可能被用到的地方>
      */
     private static final long serialVersionUID = 1L;
 
     /**
+     * 操作类型
+     */
+    private String operateType;
+
+    private String pageModel;
+
+    /**
+     * 选择数据
+     */
+    private List<TrdFixIncomeValuDuration001Dto> selectedItem;
+
+    /**
+     * 要素id
+     */
+    private String elementId;
+
+    /**
      * 交易编号
      */
-
+    @PrimaryKey(value= PrimaryKey.Field.PK_1)
     private String tradeId;
 
+    /**
+     * 金融产品代码
+     */
+    private String prodId;
 
     /**
-     * 组合代码  产品代码
+     * 金融产品名称
      */
-    private String portfolioId;
-
+    private String prodName;
 
     /**
-     * 组合名称  产品名称
+     * 资产代码
      */
-    private String portfolioName;
+    private String assetId;
 
     /**
-     * 市场机构代码  资产代码
+     * 资产名称
      */
-    private String finprodMarketId;
-
-    /**
-     * 金融产品名称  资产名称
-     */
-    private String finprodName;
-
+    private String assetName;
 
     /**
      * 交易类型
@@ -66,7 +79,6 @@ public class TrdFixIncomeValuDuration001Dto extends WflTrdProductDeal implements
      * 会计分类
      */
     private String invAim;
-
 
     /**
      * 交易日
@@ -84,22 +96,15 @@ public class TrdFixIncomeValuDuration001Dto extends WflTrdProductDeal implements
      */
     private String ccy;
 
-
     /**
      * 实收本金
      */
-
     private BigDecimal actCapi;
 
     /**
      * 实收利息
      */
     private BigDecimal actInt;
-
-    /**
-     * 其他费用
-     */
-    private BigDecimal otherAmt;
 
     /**
      * 是否结清
@@ -114,25 +119,45 @@ public class TrdFixIncomeValuDuration001Dto extends WflTrdProductDeal implements
     /**
      * 资金账户
      */
-    private String trdAcctId;
+    private String myAcctNo;
 
     /**
-     * 操作类型
+     * 数据来源
      */
-    private String operateType;
+    private String dataSource;
 
-    /**
-     * elementId
-     */
-    private String elementId;
+    public String getOperateType() {
+        return operateType;
+    }
 
+    public void setOperateType(String operateType) {
+        this.operateType = operateType;
+    }
 
-    /**
-     * 融入券存续期实体类
-     */
-    private List<TrdFixIncomeValuDuration001Dto> selectedItem;
+    public String getPageModel() {
+        return pageModel;
+    }
 
-    @PrimaryKey(PrimaryKey.Field.PK_1)
+    public void setPageModel(String pageModel) {
+        this.pageModel = pageModel;
+    }
+
+    public List<TrdFixIncomeValuDuration001Dto> getSelectedItem() {
+        return selectedItem;
+    }
+
+    public void setSelectedItem(List<TrdFixIncomeValuDuration001Dto> selectedItem) {
+        this.selectedItem = selectedItem;
+    }
+
+    public String getElementId() {
+        return elementId;
+    }
+
+    public void setElementId(String elementId) {
+        this.elementId = elementId;
+    }
+
     public String getTradeId() {
         return tradeId;
     }
@@ -141,37 +166,36 @@ public class TrdFixIncomeValuDuration001Dto extends WflTrdProductDeal implements
         this.tradeId = tradeId;
     }
 
-
-    public String getPortfolioId() {
-        return portfolioId;
+    public String getProdId() {
+        return prodId;
     }
 
-    public void setPortfolioId(String portfolioId) {
-        this.portfolioId = portfolioId;
+    public void setProdId(String prodId) {
+        this.prodId = prodId;
     }
 
-    public String getPortfolioName() {
-        return portfolioName;
+    public String getProdName() {
+        return prodName;
     }
 
-    public void setPortfolioName(String portfolioName) {
-        this.portfolioName = portfolioName;
+    public void setProdName(String prodName) {
+        this.prodName = prodName;
     }
 
-    public String getFinprodMarketId() {
-        return finprodMarketId;
+    public String getAssetId() {
+        return assetId;
     }
 
-    public void setFinprodMarketId(String finprodMarketId) {
-        this.finprodMarketId = finprodMarketId;
+    public void setAssetId(String assetId) {
+        this.assetId = assetId;
     }
 
-    public String getFinprodName() {
-        return finprodName;
+    public String getAssetName() {
+        return assetName;
     }
 
-    public void setFinprodName(String finprodName) {
-        this.finprodName = finprodName;
+    public void setAssetName(String assetName) {
+        this.assetName = assetName;
     }
 
     public String getPs() {
@@ -230,14 +254,6 @@ public class TrdFixIncomeValuDuration001Dto extends WflTrdProductDeal implements
         this.actInt = actInt;
     }
 
-    public BigDecimal getOtherAmt() {
-        return otherAmt;
-    }
-
-    public void setOtherAmt(BigDecimal otherAmt) {
-        this.otherAmt = otherAmt;
-    }
-
     public String getIsClean2() {
         return isClean2;
     }
@@ -254,36 +270,19 @@ public class TrdFixIncomeValuDuration001Dto extends WflTrdProductDeal implements
         this.settleAmt = settleAmt;
     }
 
-    public String getTrdAcctId() {
-        return trdAcctId;
+    public String getMyAcctNo() {
+        return myAcctNo;
     }
 
-    public void setTrdAcctId(String trdAcctId) {
-        this.trdAcctId = trdAcctId;
+    public void setMyAcctNo(String myAcctNo) {
+        this.myAcctNo = myAcctNo;
     }
 
-    public String getOperateType() {
-        return operateType;
+    public String getDataSource() {
+        return dataSource;
     }
 
-    public void setOperateType(String operateType) {
-        this.operateType = operateType;
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
     }
-
-    public String getElementId() {
-        return elementId;
-    }
-
-    public void setElementId(String elementId) {
-        this.elementId = elementId;
-    }
-
-    public List<TrdFixIncomeValuDuration001Dto> getSelectedItem() {
-        return selectedItem;
-    }
-
-    public void setSelectedItem(List<TrdFixIncomeValuDuration001Dto> selectedItem) {
-        this.selectedItem = selectedItem;
-    }
-
 }
