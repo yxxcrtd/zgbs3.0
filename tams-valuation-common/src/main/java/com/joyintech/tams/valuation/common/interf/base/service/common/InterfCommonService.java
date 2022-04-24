@@ -5490,6 +5490,107 @@ public class InterfCommonService {
             return;
         }
 
+        if(TempConstant.利率互换交易信息.equals(tmpEName)){
+            //1.查询还本到账交易
+            parmas = new HashMap<String,Object>();
+            parmas.put("createTime", interfDate);
+            parmas.put("createUser", InterfCommonConstant.接口_默认用户);
+            parmas.put("busiType", paramMap.get("busiType"));
+            parmas.put("IS_CHL", isChl);
+            parmas.put("TMP_E_NAME", tmpEName);
+            List<TrdProductDeal> dealList_hb = this.queryUnDelDeal(parmas);
+            if(dealList_hb == null || dealList_hb.size()==0){
+                List<TrdProductDeal> totalList = this.queryDelChlFeeDeal(unDelDealList);
+                if(totalList != null && totalList.size()>0){
+                    unDelDealList.addAll(totalList);
+                }
+                this.deleteFinprodDealByTradeId(unDelDealList);
+                return;
+            }
+            unDelDealList.addAll(dealList_hb);
+
+            //查询还本到账拆分生成的收息到账交易
+            parmas = new HashMap<String,Object>();
+            parmas.put("createTime", interfDate);
+            parmas.put("createUser", InterfCommonConstant.接口_默认用户);
+            parmas.put("ftradeList", dealList_hb);
+            parmas.put("IS_CHL", isChl);
+            parmas.put("TMP_E_NAME", tmpEName);
+            List<TrdProductDeal> dealList_fx = this.queryUnDelDeal(parmas);
+            if(dealList_fx == null || dealList_fx.size()==0){
+                List<TrdProductDeal> totalList = this.queryDelChlFeeDeal(unDelDealList);
+                if(totalList != null && totalList.size()>0){
+                    unDelDealList.addAll(totalList);
+                }
+                this.deleteFinprodDealByTradeId(unDelDealList);
+                return;
+            }
+
+            Map<String, TrdProductDeal> hbMap = new HashMap<String, TrdProductDeal>();
+            for(TrdProductDeal d :dealList_hb){
+                hbMap.put(d.getfTradeId(), d);
+            }
+
+            List<TrdProductDeal> fxList = new ArrayList<TrdProductDeal>();
+            for(TrdProductDeal deal :dealList_fx){
+                if(hbMap.get(deal.getfTradeId())!=null){
+                    fxList.add(deal);
+                }
+            }
+            if(fxList!=null && fxList.size()>0){
+                unDelDealList.addAll(fxList);
+            }
+            List<TrdProductDeal> totalList = this.queryDelChlFeeDeal(unDelDealList);
+            if(totalList != null && totalList.size()>0){
+                unDelDealList.addAll(totalList);
+            }
+            this.deleteFinprodDealByTradeId(unDelDealList);
+            return;
+        }
+
+        if(TempConstant.利率互换存续期交易.equals(tmpEName)){
+            parmas = new HashMap<String,Object>();
+            parmas.put("createTime", interfDate);
+            parmas.put("createUser", InterfCommonConstant.接口_默认用户);
+            parmas.put("ftradeList", unDelDealList);
+            parmas.put("fpsList", paramMap.get("fpsList"));
+            parmas.put("IS_CHL", isChl);
+            parmas.put("TMP_E_NAME", tmpEName);
+            List<TrdProductDeal> dealhb = this.queryUnDelDeal(parmas);
+            if(dealhb==null || dealhb.size()==0){
+                List<TrdProductDeal> totalList = this.queryDelChlFeeDeal(unDelDealList);
+                if(totalList != null && totalList.size()>0){
+                    unDelDealList.addAll(totalList);
+                }
+                this.deleteFinprodDealByTradeId(unDelDealList);
+                return;
+            }
+            Map<String, TrdProductDeal> hbMap = new HashMap<String, TrdProductDeal>();
+            for(TrdProductDeal d :dealhb){
+                hbMap.put(d.getfTradeId(), d);
+            }
+            List<TrdProductDeal> delList = new ArrayList<TrdProductDeal>();
+            for(TrdProductDeal deal :unDelDealList){
+                if(hbMap.get(deal.getfTradeId())==null){
+                    delList.add(deal);
+                }
+            }
+            if(delList!=null && delList.size()>0){
+                List<TrdProductDeal> totalList = this.queryDelChlFeeDeal(delList);
+                if(totalList != null && totalList.size()>0){
+                    delList.addAll(totalList);
+                }
+                this.deleteFinprodDealByTradeId(delList);
+                return;
+            }
+            List<TrdProductDeal> totalList = this.queryDelChlFeeDeal(unDelDealList);
+            if(totalList != null && totalList.size()>0){
+                unDelDealList.addAll(totalList);
+            }
+            this.deleteFinprodDealByTradeId(unDelDealList);
+            return;
+        }
+
         // modify by weipeng : 增加原交易编号判空处理，若取不到原交易，则不进行删除衍生交易处理
         if(!CollectionUtils.isEmpty(unDelDealList)){
             parmas = new HashMap<String,Object>();

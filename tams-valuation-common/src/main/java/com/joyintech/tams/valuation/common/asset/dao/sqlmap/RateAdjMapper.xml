@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.joyintech.tams.valuation.common.asset.dao.RateAdjMapper">
+<select id="getDealCalendarHoliday" resultType="java.lang.String">
+        select
+        	to_char(CDATE, 'yyyy-MM-dd') as HOLIDATE
+        from
+        	VAL_VW_MST_HOLIDAY
+        where
+        	IS_HOLIDAY > 0
+		  	<if test="startDate != null">
+		  		and CDATE >= #{startDate, jdbcType=DATE}
+		  	</if>
+		  	<if test="endDate != null">
+		  		and CDATE &lt;= #{endDate, jdbcType=DATE}
+		  	</if>
+		  	<if test="dealCalId != null and dealCalId != ''">
+		  		and TRADE_CALENDAR_ID = #{dealCalId}
+		  	</if>
+    </select>
+    
+    <select id="getFinPayInterestStdInfoByProductId"  parameterType="Map" resultType="com.joyintech.tams.valuation.common.asset.dto.FinCashPayRuleDto">
+		SELECT
+			T1.CASH_ID CASH_ID, T1.CASH_TYPE_1 CASH_TYPE_1, T1.CASH_TYPE_2 CASH_TYPE_2, T1.CCY CCY, T1.FINPROD_ID FINPROD_ID, 
+        T1.FINPROD_TYPE FINPROD_TYPE, T1.BRANCH BRANCH, T1.FEE_ID FEE_ID, T1.CHL_FINPROD_ID CHL_FINPROD_ID, 
+        T1.CHL_LEVEL CHL_LEVEL, T1.CREATE_USER CREATE_USER, 
+        T1.CREATE_DEPT CREATE_DEPT, T1.CREATE_TIME CREATE_TIME, T1.UPDATE_USER UPDATE_USER, T1.UPDATE_TIME UPDATE_TIME
+			,T2.FINPROD_ID FINPROD_ID
+			, T2.FINPROD_TYPE FINPROD_TYPE
+			, T2.FINPROD_TYPE2 FINPROD_TYPE2
+			, T2.FINPROD_ABBR FINPROD_ABBR
+			, T2.FINPROD_NAME FINPROD_NAME
+			, T2.COUPON_SPECIES
+			, T3.EFF_DATE EFF_DATE
+			, T3.PAY_CYCLE_VAL PAY_CYCLE_VAL
+			, T3.PAY_CYCLE PAY_CYCLE
+			, T3.DAY_TYPE DAY_TYPE
+			, T3.DAY_VALUE DAY_VALUE
+			, T3.END_TDAY_RULE END_TDAY_RULE
+			, T3.PAY_TDAY_RULE PAY_TDAY_RULE
+			, T3.CALC_RULE CALC_RULE
+			, T3.FIRST_PAY_DATE FIRST_PAY_DATE
+			, T3.CASH_UNIT_TYPE CASH_UNIT_TYPE
+			,T3.REMARK  REMARK
+		FROM
+		FIN_CASH_INFO T1
+		LEFT JOIN FIN_PRODUCT T2 ON T2.FINPROD_ID = T1.FINPROD_ID
+		LEFT JOIN FIN_CASH_PAY_RULE T3 ON T3.CASH_ID = T1.CASH_ID 
+		<if test="vdate != null and vdate != ''">
+				AND T3.EFF_DATE  = to_date ( #{vdate}, 'yyyy-mm-dd' )
+		</if>
+		<where>
+			<if test="finprodId != null and finprodId != ''">
+				AND T1.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+			</if>
+			<if test="cashType != null and cashType != ''">
+				AND T1.CASH_TYPE_2 = #{cashType,jdbcType=VARCHAR}
+			</if>
+			<if test="finprodType != null and finprodType != ''">
+				AND T1.FINPROD_TYPE = #{finprodType,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</select>
+	
+	<select id="getFinCashPlanByProductId" parameterType="Map" resultType="com.joyintech.tams.valuation.common.asset.dto.FinCashPlanDto">
+		SELECT
+		T1.CASH_ID CASH_ID, T1.MDATE MDATE, T1.CASH_NUM CASH_NUM, T1.CASH_TYPE CASH_TYPE, T1.VDATE_UNADJUST VDATE_UNADJUST, 
+        T1.MDATE_UNADJUST MDATE_UNADJUST, T1.PAY_DATE_UNADJUST PAY_DATE_UNADJUST, T1.VDATE VDATE, 
+        T1.PAY_DATE PAY_DATE, T1.TERMDAYS TERMDAYS, T1.VDATE_Y VDATE_Y, T1.VDATE_TERM VDATE_TERM, T1.MDATE_TERM MDATE_TERM, 
+        T1.TERMDAYS_TERM TERMDAYS_TERM, T1.PRIN_AMT PRIN_AMT, T1.INT_PRIN_AMT INT_PRIN_AMT, T1.INT_AMT INT_AMT, 
+        T1.IS_PAY_INT IS_PAY_INT, T1.CASH_AMT CASH_AMT, T1.CASH_BASEAMT CASH_BASEAMT, T1.CASH_UNIT_TYPE CASH_UNIT_TYPE, 
+        T1.CALC_FUNCTION CALC_FUNCTION, T1.FREQUENCY FREQUENCY, T1.FINPROD_ID FINPROD_ID, T1.FINPROD_TYPE FINPROD_TYPE, 
+        T1.FINPROD_TYPE2 FINPROD_TYPE2, T1.BRANCH BRANCH, T1.PAY_TYPE PAY_TYPE,T1.RANGE_YIELD*100 RANGE_YIELD, T1.CREATE_USER CREATE_USER, 
+        T1.CREATE_DEPT CREATE_DEPT, T1.CREATE_TIME CREATE_TIME, T1.UPDATE_USER UPDATE_USER, T1.UPDATE_TIME UPDATE_TIME
+		,T2.CASH_TYPE_2
+		FROM
+			FIN_CASH_PLAN T1,
+			FIN_CASH_INFO T2 
+		WHERE
+			T2.CASH_ID = T1.CASH_ID 
+			<if test="finprodId != null and finprodId != ''">
+				AND T2.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+			</if>
+			<if test="cashType != null and cashType != ''">
+				AND T2.CASH_TYPE_2 = #{cashType,jdbcType=VARCHAR}
+			</if>
+			<if test="finprodType != null and finprodType != ''">
+				AND T2.FINPROD_TYPE = #{finprodType,jdbcType=VARCHAR}
+			</if>
+		ORDER BY T1.VDATE ASC
+	</select>
+	
+	<select id="getAssetBasicInfoByFinprodId" resultType="com.joyintech.tams.valuation.common.asset.dto.AssetCommonInfoDto">
+    	SELECT
+	T1.FINPROD_ID,
+	T1.FINPROD_TYPE2,
+	T1.VDATE,
+	T1.MDATE,
+	T1.CALENDAR_ID,
+	T1.ISSUE_AMT,
+	T2.BASIS 
+	FROM
+	FIN_PRODUCT T1
+	LEFT JOIN FIN_CASH_INFO T3 on T3.FINPROD_ID=T1.FINPROD_ID AND T3.CASH_TYPE_2=#{cashType,jdbcType=VARCHAR}
+	LEFT JOIN FIN_CASH_CALC_RULE T2 ON T1.FINPROD_ID = T2.FINPROD_ID 
+	AND T2.CASH_ID = T3.CASH_ID AND T2.EFF_DATE = T1.VDATE
+    where T1.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+    </select>
+    
+    <select id="selectInitAssetRateAdj"   resultType="com.joyintech.tams.valuation.common.asset.dto.RateAdjDto">
+		SELECT
+			T3.FINPROD_ID,
+			T3.FINPROD_TYPE,
+			T3.FINPROD_TYPE2,
+			T3.FINPROD_MARKET_ID,
+			T3.FINPROD_NAME,
+			T3.FINPROD_ABBR,
+			T3.ISSUE_AMT,
+			T3.VDATE,
+			T1.EFF_DATE,
+			T1.CALC_TYPE,
+			T1.BASE_TYPE,
+			T1.BASE_DATE_TYPE,
+			T1.BASIS,
+			T1.YIELD*100 YIELD,
+			T1.IS_INITIAL,
+			T1.BRANCH,
+<!-- 			T4.INVEST_RATE*100 INVEST_RATE,
+			T4.REFER_RATE*100 REFER_RATE,
+			T4.BUY_OUT_RATE*100 BUY_OUT_RATE,
+			T4.LOAD_RATE*100 LOAD_RATE,
+ -->			T2.CASH_ID
+			FROM
+				FIN_CASH_CALC_RULE T1
+				LEFT JOIN FIN_PRODUCT T3 ON T3.FINPROD_ID = T1.FINPROD_ID
+				INNER JOIN FIN_CASH_INFO T2 ON T2.CASH_ID = T1.CASH_ID 
+				AND T2.FINPROD_ID = T3.FINPROD_ID 
+			<if test="finprodType != null and finprodType != ''">
+				AND T2.FINPROD_TYPE = #{finprodType,jdbcType=VARCHAR}
+			</if>	
+			<if test="cashType1 != null and cashType1 != ''">
+				AND T2.CASH_TYPE_1 = #{cashType1,jdbcType=VARCHAR}
+			</if>
+			<if test="cashType2 != null and cashType2 != ''">
+				AND T2.CASH_TYPE_2 = #{cashType2,jdbcType=VARCHAR}
+			</if>
+			<!-- LEFT JOIN PA_FIN_CASH_CALC_RULE T4 ON T4.CASH_ID = T1.CASH_ID  AND T4.EFF_DATE = T1.EFF_DATE -->
+		<where>
+			<if test="finprodId != null and finprodId != ''">
+				AND T1.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+			</if>
+		</where>
+		order by T1.EFF_DATE ASC
+	</select>
+	
+	<!-- 删除计算规则 -->
+	<delete id="deleteCashCalcRuleByCashId" parameterType="com.joyintech.tams.common.base.entity.FinCashCalcRuleKey" >
+        delete from FIN_CASH_CALC_RULE
+        where CASH_ID = #{cashId,jdbcType=VARCHAR} and EFF_DATE = #{effDate,jdbcType=DATE}
+    </delete>
+    
+    <!-- 删除计算规则扩展 -->
+    <delete id="deleteCashCalcRuleAddByCashId" parameterType="com.joyintech.tams.common.base.entity.PaFinCashCalcRuleKey" >
+        delete from PA_FIN_CASH_CALC_RULE
+        where CASH_ID = #{cashId,jdbcType=VARCHAR}
+    </delete>
+    
+    
+</mapper>

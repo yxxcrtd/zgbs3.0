@@ -236,6 +236,33 @@ public class FinTradeProduct extends FinTradeProductKey {
      * 数据来源
      */
      private  String dataSource;
+
+    /**
+     * 利率互换清算方式
+     */
+    private  String irsCleanType;
+
+    /**
+     * 利率互换存续期是否计息
+     */
+    private  String isCal;
+
+    public String getIsCal() {
+        return isCal;
+    }
+
+    public void setIsCal(String isCal) {
+        this.isCal = isCal;
+    }
+
+    public String getIrsCleanType() {
+        return irsCleanType;
+    }
+
+    public void setIrsCleanType(String irsCleanType) {
+        this.irsCleanType = irsCleanType;
+    }
+
     /**
      * 取得 ????????????????????????
      * @return ????????????????????????

@@ -68,6 +68,13 @@
         ,MPAY_DATE
         ,ACT_CAP_DAYS
         <!-- add by wujie on 20190420 end -->
+
+        <!-- add by yinya on 20120418 start -->
+        ,IRS_TYPE
+        ,IRS_CLEAN_TYPE
+        ,IS_CAL
+        <!-- add by yinya on 20120418 end -->
+
         )
         <foreach collection="list" item="item" separator="from dual union all select" open="select * from (select "
                  close=" from dual)">
@@ -86,6 +93,13 @@
             ,#{item.mpayDate,jdbcType=DATE}
             ,#{item.actCapDays,jdbcType=DECIMAL}
             <!-- add by wujie on 20190420 end -->
+
+            <!-- add by yinya on 20120418 start -->
+            ,#{item.irsType,jdbcType=VARCHAR}
+            ,#{item.irsCleanType,jdbcType=VARCHAR}
+            ,#{item.isCal,jdbcType=VARCHAR}
+            <!-- add by yinya on 20120418 end -->
+
         </foreach>
     </insert>
 

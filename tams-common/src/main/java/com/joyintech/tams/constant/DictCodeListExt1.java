@@ -19,6 +19,9 @@ import java.util.Map;
  * @since 1.0
  */
 public enum DictCodeListExt1 implements BaseDictCodeList {
+	利率互换方式_收取固定(DictCode.互换方式,"IRS01","收取固定"),
+	利率互换方式_收取浮动(DictCode.互换方式,"IRS02","收取浮动"),
+
 	是否_是(DictCode.是否,"Y","是"),
 	是否_否(DictCode.是否,"N","否"),
 	是否_空(DictCode.是否,"NULL","空"),
@@ -812,6 +815,8 @@ public enum DictCodeListExt1 implements BaseDictCodeList {
 	现金流二级类型_通道其他费(DictCode.现金流二级类型,"C14","通道其他费"),
 	现金流二级类型_回补(DictCode.现金流二级类型,"C11","回补"),
 	现金流二级类型_罚息(DictCode.现金流二级类型,"C19","罚息"),
+	现金流二级类型_支付(DictCode.现金流二级类型,"C16","支付"),
+	现金流二级类型_收取(DictCode.现金流二级类型,"C17","收取"),
 	发行状态_发行成功(DictCode.发行状态,"01","发行成功"),
 	发行状态_发行失败(DictCode.发行状态,"02","发行失败"),
 	发行状态_确认发行(DictCode.发行状态,"03","确认发行"),
