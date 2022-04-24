@@ -1,4 +1,3 @@
-//@ sourceURL=FinPayInterestStdInfo.js
 /**
  * 付息信息组件JS
  * @auth zhangnian
