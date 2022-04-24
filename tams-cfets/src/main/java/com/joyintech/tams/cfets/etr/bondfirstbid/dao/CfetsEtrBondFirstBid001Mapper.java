@@ -11,6 +11,7 @@
 package com.joyintech.tams.cfets.etr.bondfirstbid.dao;
 
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoDto;
+import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIssueInfoDto;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -35,4 +36,11 @@ public interface CfetsEtrBondFirstBid001Mapper {
      * @return
      */
     String findInvAimInEtr(Map<String, Object> param);
+
+    /**
+     * 查询待发行信息分页数据
+     * @param pageParam
+     * @return
+     */
+    List<CfetsEtrIBondFirstBidFindIssueInfoDto> findIssueInfoPage(Map<String, Object> pageParam);
 }

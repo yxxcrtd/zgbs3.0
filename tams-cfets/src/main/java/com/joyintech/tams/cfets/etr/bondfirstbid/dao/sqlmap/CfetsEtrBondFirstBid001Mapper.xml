@@ -4,8 +4,284 @@
 
     <!-- 指令管理查询 -->
     <select id="findEtrInfoPage" parameterType="Map" resultType="com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoDto">
-    </select>
+        select * from (select aaa.* from (
+        <choose>
+            <when test="search == '有效'">
+                <!-- 有效状态查询 -->
+                <include refid="onlyEtrEntrust"></include>
+            </when>
+            <otherwise>
+                <include refid="onlyWtfEtrEntrust"></include>
+                UNION ALL
+                <include refid="onlyEtrEntrust"></include>
+            </otherwise>
+        </choose>
+        ) aaa
+        left join SYS_DATADICT_LIST sdl on aaa.entrustStatus=sdl.ITEM_CODE and sdl.DICT_CODE='ENTRUST_STATUS'
+        left join SYS_DATADICT_LIST dictbusiModel on aaa.busiModel=dictbusiModel.ITEM_CODE and dictbusiModel.DICT_CODE='BUSINESS_MODEL'
+        <where>
+            <if test="issueDateStart!=null and issueDateStart!='' and  issueDateEnd!=null and issueDateEnd!='' ">
+                <![CDATA[ AND aaa.issueDate >= #{issueDateStart, jdbcType=DATE} ]]>
+                <![CDATA[ AND aaa.issueDate <= #{issueDateEnd, jdbcType=DATE} ]]>
+            </if>
+            <!-- 中标状态 -->
 
+            <!-- 关键字模糊查询 -->
+            <if test="search != null and search != '' and search !='有效' ">
+                    (
+                    (aaa.effectiveStatusName || '|' || sdl.ITEM_VALUE || '|' || aaa.portfolioId || '|' || aaa.portfolioName
+                    || '|' || aaa.issueClass || '|' || aaa.finprodMarketId || '|' || aaa.finprodAbbr || '|' || aaa.invManagerId
+                    || '|' || aaa.entrustId || '|' || approver || '|' || aaa.REMARK || '|' || dictbusiModel.ITEM_VALUE
+                    || '|' || aaa.counterId || '|' || aaa.counterName
+                    like '%' || #{search} || '%')
+                    or to_char(aaa.execProcess,'FM99990.9990')=#{search} or  aaa.execProcess||'' =#{search}
+                    or to_char(aaa.transProcess,'FM99990.9990')=#{search} or  aaa.transProcess||'' =#{search}
+                    or to_char(aaa.etrDate,'yyyy-MM-dd')  = #{search}
+                    or to_char(aaa.etrDate,'yyyyMMdd')  = #{search}
+                    or  aaa.etrDate=#{year}||'-'||#{search}
+                    or to_char(aaa.issueDate,'yyyy-MM-dd')  = #{search}
+                    or to_char(aaa.issueDate,'yyyyMMdd')  = #{search}
+                    or aaa.totalBiddingNum ||''= #{search}
+                    or aaa.bidPrice ||''= #{search}
+                    or to_char(aaa.payEdate,'yyyy-MM-dd')  = #{search}
+                    or to_char(aaa.payEdate,'yyyyMMdd')  = #{search}
+                    )
+            </if>
+        </where>
+
+        order by sdl.ORDER_NO, aaa.entrustId DESC)
+        <!--前端传入排序字段-->
+        <if test="sort != null and sort != '' and direction != null and direction != ''">
+            order by ${sort} ${direction}
+        </if>
+    </select>
+    <sql id="onlyEtrEntrust">
+        SELECT
+            decode(ee.ENTRUST_STATUS,'08','流程中','有效') AS effectiveStatusName,
+            ee.ENTRUST_STATUS entrustStatus,
+            trunc((NVL(efs.ENT_FINISH_AMT,0))/(ee.ENTRUST_NUM),4)*100 execProcess,
+            trunc((NVL(efs.FINISH_AMT,0))/(ee.ENTRUST_NUM*100),4)*100 transProcess,
+            ee.FINPROD_ID finprodId,
+            fp.FINPROD_MARKET_ID finprodMarketId,
+            fp.FINPROD_ABBR finprodAbbr,
+            fpi.ISSUE_CLASS issueClass,
+            CASE
+            WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
+            fpa.BID_DATE
+            ELSE fpi.ISSUE_DATE
+            END AS issueDate,
+            ee.ENTRUST_NUM/100 totalBiddingNum,
+            T1.BID_PRICE bidPrice,
+            CASE
+                WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
+                    fpi.PAY_EDATE
+                ELSE fpi.PAY_DATE
+                END AS payEdate,
+            T2.PORTFOLIO_ID portfolioId,
+            T2.PORTFOLIO_NAME portfolioName,
+            T2.INV_AIM busiModel,
+            T8.REAL_NAME invManagerId,
+            ee.ENTRUST_ID entrustId,
+            ee.ENTRUST_DATE AS etrDate,
+            ee.COUNTER_ID counterId,
+            mcp.COUNTER_NAME counterName,
+            NULL AS approver,
+            ee.REMARK remark
+
+        FROM ETR_ENTRUST ee
+        INNER JOIN PTL_PORTFOLIO_AUTHORITY PPA ON ee.PORTFOLIO_ID = PPA.PORTFOLIO_ID
+        <if test="userId != null and userId != ''">
+            AND PPA.USER_ID = #{userId}
+        </if>
+        LEFT JOIN FIN_PRODUCT fp ON fp.FINPROD_ID = ee.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ADD fpa ON fpa.FINPROD_ID = ee.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE fpi ON fpi.FINPROD_ID = fp.FINPROD_ID
+        LEFT JOIN ETR_FINISH_STATUS efs ON efs.ENTRUST_ID = ee.ENTRUST_ID
+        LEFT JOIN MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
+        LEFT JOIN (
+                    SELECT
+                        LISTAGG(BID_PRICE, ',') WITHIN GROUP (ORDER BY (BID_PRICE)) BID_PRICE,
+                        ENTRUST_ID
+                    FROM ETR_ENTRUST_BID_PRICE
+                    GROUP BY ENTRUST_ID
+                ) T1 ON T1.ENTRUST_ID = ee.ENTRUST_ID
+        LEFT JOIN (
+                    SELECT
+                        LISTAGG(eed.PORTFOLIO_ID, ',') WITHIN GROUP (ORDER BY (eed.PORTFOLIO_ID)) PORTFOLIO_ID,
+                        LISTAGG(pp.PORTFOLIO_NAME , ',') WITHIN GROUP (ORDER BY (pp.PORTFOLIO_NAME)) PORTFOLIO_NAME,
+                        LISTAGG(eed.INV_AIM, ',') WITHIN GROUP (ORDER BY (eed.INV_AIM)) INV_AIM,
+                        eed.ENTRUST_ID ENTRUST_ID
+                    FROM ETR_ENTRUST_DETAIL eed
+                    LEFT JOIN  PTL_PORTFOLIO pp ON pp.PORTFOLIO_ID  = eed.PORTFOLIO_ID
+                    GROUP BY ENTRUST_ID
+                ) T2 ON T2.ENTRUST_ID = ee.ENTRUST_ID
+        LEFT JOIN SYS_USER T8 ON ee.INV_MANAGER_ID = T8.USER_NAME
+
+        WHERE ee.ENTRUST_NUM != 0
+	    AND ee.ENTRUST_NUM IS NOT NULL
+        AND ee.TRADE_MARKET IN ( #{TRADE_MARKET_01},#{TRADE_MARKET_02})
+        <if test="portfolioIdList != null and portfolioIdList.size() > 0">
+            AND ee.PORTFOLIO_ID IN
+            <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="finprodIdList != null and finprodIdList.size() > 0">
+            AND fp.FINPROD_ID in
+            <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="issueClassList != null and issueClassList.size() > 0">
+            AND fpi.ISSUE_CLASS IN
+            <foreach collection="issueClassList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="invManagerIdList != null and invManagerIdList.size() > 0">
+            AND ee.INV_MANAGER_ID in
+            <foreach collection="invManagerIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="entrustId != null and entrustId != ''">
+            AND ee.ENTRUST_ID = #{entrustId}
+        </if>
+        <if test="entrustStartDate!=null and entrustStartDate!='' and  entrustEndDate!=null and entrustEndDate!='' ">
+            <![CDATA[ AND ee.ENTRUST_DATE >= #{entrustStartDate, jdbcType=DATE} ]]>
+            <![CDATA[ AND ee.ENTRUST_DATE <= #{entrustStartDate, jdbcType=DATE} ]]>
+        </if>
+        <if test="counterIdList != null and counterIdList.size() > 0">
+            AND ee.COUNTER_ID in
+            <foreach collection="counterIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </sql>
+    <sql id="onlyWtfEtrEntrust">
+        SELECT
+            decode(ee.ENTRUST_STATUS,'08','流程中','有效') AS effectiveStatusName,
+            ee.ENTRUST_STATUS entrustStatus,
+            trunc((NVL(efs.ENT_FINISH_AMT,0))/(ee.ENTRUST_NUM),4)*100 execProcess,
+            trunc((NVL(efs.FINISH_AMT,0))/(ee.ENTRUST_NUM*100),4)*100 transProcess,
+            ee.FINPROD_ID finprodId,
+            fp.FINPROD_MARKET_ID finprodMarketId,
+            fp.FINPROD_ABBR finprodAbbr,
+            fpi.ISSUE_CLASS issueClass,
+            CASE
+                WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
+                    fpa.BID_DATE
+                ELSE fpi.ISSUE_DATE
+                END AS issueDate,
+            ee.ENTRUST_NUM/100 totalBiddingNum,
+            T1.BID_PRICE bidPrice,
+            CASE
+                WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
+                    fpi.PAY_EDATE
+                ELSE fpi.PAY_DATE
+                END AS payEdate,
+            T2.PORTFOLIO_ID portfolioId,
+            T2.PORTFOLIO_NAME portfolioName,
+            T2.INV_AIM busiModel,
+            T8.REAL_NAME invManagerId,
+            ee.ENTRUST_ID entrustId,
+            ee.ENTRUST_DATE AS etrDate,
+            ee.COUNTER_ID counterId,
+            mcp.COUNTER_NAME counterName,
+            nextUser.userName AS approver,
+            ee.REMARK remark
+
+        FROM WFL_ETR_ENTRUST ee
+        INNER JOIN PTL_PORTFOLIO_AUTHORITY PPA ON ee.PORTFOLIO_ID = PPA.PORTFOLIO_ID
+        <if test="userId != null and userId != ''">
+            AND PPA.USER_ID = #{userId}
+        </if>
+        LEFT JOIN FIN_PRODUCT fp ON fp.FINPROD_ID = ee.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ADD fpa ON fpa.FINPROD_ID = ee.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE fpi ON fpi.FINPROD_ID = fp.FINPROD_ID
+        LEFT JOIN ETR_FINISH_STATUS efs ON efs.ENTRUST_ID = ee.ENTRUST_ID
+        LEFT JOIN MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
+        LEFT JOIN (
+            SELECT
+                LISTAGG(BID_PRICE, ',') WITHIN GROUP (ORDER BY (BID_PRICE)) BID_PRICE,
+                ENTRUST_ID
+            FROM WFL_ETR_ENTRUST_BID_PRICE
+            GROUP BY ENTRUST_ID
+        ) T1 ON T1.ENTRUST_ID = ee.ENTRUST_ID
+        LEFT JOIN (
+            SELECT
+                LISTAGG(eed.PORTFOLIO_ID, ',') WITHIN GROUP (ORDER BY (eed.PORTFOLIO_ID)) PORTFOLIO_ID,
+                LISTAGG(pp.PORTFOLIO_NAME , ',') WITHIN GROUP (ORDER BY (pp.PORTFOLIO_NAME)) PORTFOLIO_NAME,
+                LISTAGG(eed.INV_AIM, ',') WITHIN GROUP (ORDER BY (eed.INV_AIM)) INV_AIM,
+                eed.ENTRUST_ID ENTRUST_ID
+            FROM WFL_ETR_ENTRUST_DETAIL eed
+            LEFT JOIN  PTL_PORTFOLIO pp ON pp.PORTFOLIO_ID  = eed.PORTFOLIO_ID
+            GROUP BY ENTRUST_ID
+        ) T2 ON T2.ENTRUST_ID = ee.ENTRUST_ID
+        LEFT JOIN SYS_USER T8 ON ee.INV_MANAGER_ID = T8.USER_NAME
+        LEFT JOIN
+             (SELECT
+                  nextApp.workFlowId,
+                  (SELECT listagg(SYS_USER.REAL_NAME, ',') within GROUP(ORDER BY SYS_USER.USER_NAME) FROM SYS_USER WHERE
+                  instr(','||nextApp.nowUserId||',' , ','||SYS_USER.USER_NAME||',') > 0) userName
+            FROM
+                (
+                    SELECT DISTINCT CASE WHEN T.PROCESS_STATE = 'END' THEN  NULL ELSE T.NEXT_USER END AS nowUserId,
+                    sdpm.Workflow_Id AS workFlowId
+                    FROM SYS_WFL_BUSINESS_LIST T
+                    INNER JOIN SYS_DATA_PROCESS_MARK sdpm
+                    ON sdpm.business_data_pk1=T.TRADE_ID
+                    WHERE EXISTS
+                    (SELECT 1
+                        FROM SYS_WFL_BUSINESS_LIST A
+                        WHERE A.SEQ_NO = (SELECT MAX(B.SEQ_NO)
+                            FROM SYS_WFL_BUSINESS_LIST B
+                            WHERE A.WORKFLOW_ID = B.WORKFLOW_ID)
+                            AND T.SEQ_NO = A.SEQ_NO)
+                            AND T.PROCESS_STATE IN ('ING')
+                            AND T.BUSINESS_TYPE='ETR52') nextApp
+            ) nextUser ON ee.Workflow_Id=nextUser.workFlowId
+        WHERE ee.ENTRUST_NUM != 0
+	    AND ee.ENTRUST_NUM IS NOT NULL
+        AND ee.TRADE_MARKET IN ( #{TRADE_MARKET_01},#{TRADE_MARKET_02})
+        <if test="portfolioIdList != null and portfolioIdList.size() > 0">
+            AND ee.PORTFOLIO_ID IN
+            <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="finprodIdList != null and finprodIdList.size() > 0">
+            AND fp.FINPROD_ID in
+            <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="issueClassList != null and issueClassList.size() > 0">
+            AND fpi.ISSUE_CLASS IN
+            <foreach collection="issueClassList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="invManagerIdList != null and invManagerIdList.size() > 0">
+            AND ee.INV_MANAGER_ID in
+            <foreach collection="invManagerIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="entrustId != null and entrustId != ''">
+            AND ee.ENTRUST_ID = #{entrustId}
+        </if>
+        <if test="entrustStartDate!=null and entrustStartDate!='' and  entrustEndDate!=null and entrustEndDate!='' ">
+            <![CDATA[ AND ee.ENTRUST_DATE >= to_date(#{entrustStartDate},'yyyy-mm-dd') ]]>
+            <![CDATA[ AND ee.ENTRUST_DATE <= to_date(#{entrustEndDate},'yyyy-mm-dd') ]]>
+        </if>
+        <if test="counterIdList != null and counterIdList.size() > 0">
+            AND ee.COUNTER_ID in
+            <foreach collection="counterIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </sql>
     <!-- 查询指令业务模式-->
     <select id="findInvAimInEtr" resultType="string">
         SELECT DISTINCT businessModel
@@ -34,4 +310,145 @@
              )
         WHERE rownum=1
     </select>
+
+    <select id="findIssueInfoPage"  parameterType="Map"
+            resultType="com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIssueInfoDto">
+        select * from (select aaa.* from (
+            <include refid="interfFinProductInfo"></include>
+            UNION
+            <include refid="finProductInfo"></include>
+        ) aaa
+        left join SYS_DATADICT_LIST sdl on aaa.issueClass = sdl.ITEM_CODE and sdl.DICT_CODE = 'ISSUE_CLASS'
+        left join SYS_DATADICT_LIST sdl2 on aaa.couponSpecies = sdl.ITEM_CODE and sdl.DICT_CODE = 'COUPON_SPECIES'
+        left join SYS_DATADICT_LIST sdl3 on aaa.intType = sdl.ITEM_CODE and sdl.DICT_CODE = 'INT_TYPE'
+        left join SYS_DATADICT_LIST sdl4 on aaa.type9 = sdl.ITEM_CODE and sdl.DICT_CODE = 'CUSTOM_ASSET_TYPE_TWO'
+        left join SYS_DATADICT_LIST sdl5 on aaa.type10 = sdl.ITEM_CODE and sdl.DICT_CODE = 'CUSTOM_ASSET_TYPE_THREE'
+        left join SYS_DATADICT_LIST sdl6 on aaa.type11 = sdl.ITEM_CODE and sdl.DICT_CODE = 'CUSTOM_ASSET_TYPE_FOUR'
+        left join SYS_DATADICT_LIST sdl7 on aaa.ccy = sdl.ITEM_CODE and sdl.DICT_CODE = 'CCY'
+        <where>
+            <if test="issueDateStart!=null and issueDateStart!='' and  issueDateEnd!=null and issueDateEnd!='' ">
+                <![CDATA[ AND aaa.issueDate >= #{issueDateStart, jdbcType=DATE} ]]>
+                <![CDATA[ AND aaa.issueDate <= #{issueDateEnd, jdbcType=DATE} ]]>
+            </if>
+            <!-- 关键字模糊查询 -->
+            <if test="search != null and search != '' and search !='有效' ">
+                (
+                sdl.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl2.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl3.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl4.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl5.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl6.ITEM_VALUE like '%' || #{search} || '%' OR
+                sdl7.ITEM_VALUE like '%' || #{search} || '%' OR
+                aaa.finprodMarketId like '%' || #{search} || '%' OR
+                aaa.finprodAbbr like '%' || #{search} || '%' OR
+                aaa.planIssueAmt ||''= #{search} OR
+                to_char(aaa.issueDate,'yyyy-MM-dd')  = #{search} OR
+                to_char(aaa.payEdate,'yyyy-MM-dd')  = #{search} OR
+                to_char(aaa.issueDate,'yyyyMMdd')  = #{search} OR
+                to_char(aaa.payEdate,'yyyyMMdd')  = #{search} OR
+                aaa.issuePrice ||''= #{search} OR
+                aaa.referYield ||''= #{search} OR
+                to_char(aaa.firstConfirmDate,'yyyy-MM-dd')  = #{search} OR
+                to_char(aaa.firstConfirmDate,'yyyyMMdd')  = #{search} OR
+                aaa.minPamt ||''= #{search} OR
+                aaa.maxPamt ||''= #{search} OR
+                aaa.subRate like '%' || #{search} || '%' OR
+                aaa.subRateOrg like '%' || #{search} || '%' OR
+                aaa.debRate like '%' || #{search} || '%' OR
+                aaa.debRateOrg like '%' || #{search} || '%' OR
+                aaa.remark like '%' || #{search} || '%'
+                )
+            </if>
+        </where>
+    </select>
+    <sql id="interfFinProductInfo">
+
+    </sql>
+    <sql id="finProductInfo">
+        SELECT
+            PRODUCT.FINPROD_MARKET_ID as finprodMarketId,
+            PRODUCT.FINPROD_ABBR as finprodAbbr,
+            PRODUCT.FINPROD_ID as finprodId,
+            ISSUE.ISSUE_CLASS as issueClass,
+            round(ISSUE.PLAN_ISSUE_AMT/100000000,2) as planIssueAmt,
+            case
+                when ISSUE.ISSUE_CLASS IN ('02', '03')  THEN
+                    ISSUE.ISSUE_DATE
+                else PRODUCT_ADD.BID_DATE
+                end as issueDate,
+            ISSUE.PAY_EDATE as payEdate,
+            PRODUCT.COUPON_SPECIES as couponSpecies,
+            ISSUE.INT_TYPE as intType,
+            PRODUCT.ISSUE_PRICE as issuePrice,
+            case
+                when PRODUCT.COUPON_SPECIES = '01' AND  ISSUE.INT_TYPE = '01' THEN
+                    ISSUE.REFER_YIELD
+                when PRODUCT.COUPON_SPECIES = '01' AND  ISSUE.INT_TYPE = '02' THEN
+                    (ISSUE.BP + miri.INT_RATE)
+                when PRODUCT.COUPON_SPECIES IN ('02', '03', '04') THEN
+                    ISSUE.REFER_YIELD
+                else ISSUE.REFER_YIELD
+                end as referYield,
+            ISSUE.FIRST_CONFIRM_DATE firstConfirmDate,
+            round(ISSUE.MIN_PER_TAMT/100000000,2) as minPamt,
+            round(ISSUE.MAX_PER_UTAMT/100000000,2) as maxPamt,
+            PRODUCT.TRADE_MARKET as tradeMarket,
+            PRODUCT.ISSUER as issuer,
+            PRODUCT.CCY as ccy,
+            PRODUCT_TYPE.TYPE_9 as type9,
+            PRODUCT_TYPE.TYPE_10 as type10,
+            PRODUCT_TYPE.TYPE_11 as type11,
+            ZT.RATING as subRate,
+            MCI.CUSTOMER_NAME as subRateOrg,
+            ZX.RATING as debRate,
+            MCIT.CUSTOMER_NAME as debRateOrg,
+            PRODUCT.REMARK as remark
+
+        FROM FIN_PRODUCT PRODUCT
+        LEFT JOIN FIN_PRODUCT_ADD PRODUCT_ADD ON PRODUCT.FINPROD_ID = PRODUCT_ADD.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE ISSUE ON PRODUCT.FINPROD_ID = ISSUE.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_TYPE PRODUCT_TYPE ON PRODUCT.FINPROD_ID = PRODUCT_TYPE.FINPROD_ID
+        LEFT JOIN MST_INT_RATE_INFO miri ON miri.INT_RATE_ID  = ISSUE.INT_RATE_ID
+        LEFT JOIN (	SELECT ASSET_CODE,RATING,GRADE_ORG_ID FROM (
+                    SELECT ROW_NUMBER() OVER(PARTITION BY BRATING.O_CODE ORDER BY BRATING.O_CODE,BRATING.GRADE_DATE DESC
+                        ,BRATING.GRADE_RESULT DESC) RANK,BRATING.O_CODE AS ASSET_CODE,BRATING.GRADE_RESULT AS RATING,BRATING.GRADE_ORG_ID as GRADE_ORG_ID
+                    FROM MST_BOND_CREDIT_RATING BRATING
+                    WHERE BRATING.O_TYPE = '01' AND BRATING.GRADE_DATE <![CDATA[<=]]> TO_DATE(#{platformDate},'YYYY-MM-DD')
+                    ) WHERE RANK=1
+        ) ZT on PRODUCT.FINPROD_MARKET_ID = ZT.ASSET_CODE
+        LEFT JOIN MST_CUSTOMER_INFO MCI ON MCI.CUSTOMER_ID=ZT.GRADE_ORG_ID
+        LEFT JOIN (	SELECT ASSET_CODE,RATING,GRADE_ORG_ID FROM (
+                        SELECT ROW_NUMBER() OVER(PARTITION BY BRATING.O_CODE ORDER BY BRATING.O_CODE,BRATING.GRADE_DATE DESC
+                            ,BRATING.GRADE_RESULT DESC ) RANK ,BRATING.O_CODE AS ASSET_CODE ,BRATING.GRADE_RESULT AS RATING,BRATING.GRADE_ORG_ID as GRADE_ORG_ID
+                        FROM MST_BOND_CREDIT_RATING BRATING
+                        WHERE BRATING.O_TYPE = '02' AND BRATING.GRADE_DATE <![CDATA[<=]]> TO_DATE(#{platformDate},'YYYY-MM-DD')
+                        ) WHERE RANK=1
+        ) ZX ON PRODUCT.FINPROD_MARKET_ID = ZX.ASSET_CODE
+        LEFT JOIN MST_CUSTOMER_INFO MCIT ON MCIT.CUSTOMER_ID=ZX.GRADE_ORG_ID
+        <where>
+            PRODUCT.FINPROD_TYPE2=#{finprodType2,jdbcType=VARCHAR}
+            AND PRODUCT.TRADE_MARKET in (#{TRADE_MARKET_01,jdbcType=VARCHAR}, #{TRADE_MARKET_02,jdbcType=VARCHAR}) <!-- 限制为银行间和商业柜台-->
+            AND PRODUCT_ADD.ISSUE_STATUS != '02' <!-- 限制为发行状态不为发行失败-->
+            AND ISSUE.ISSUE_DATE >= TO_DATE(#{platformDate},'YYYY-MM-DD')
+            AND ISSUE.TENDER_EDATE >= TO_DATE(#{platformDate},'YYYY-MM-DD')
+            <if test="finprodMarketId !=null and finprodMarketId !=''">
+                AND PRODUCT.FINPROD_MARKET_ID=#{finprodMarketId,jdbcType=VARCHAR}
+            </if>
+            <if test="issueClass !=null and issueClass !=''">
+                AND ISSUE.ISSUE_CLASS=#{issueClass,jdbcType=VARCHAR}
+            </if>
+            <if test="couponSpecies !=null and couponSpecies !=''">
+                AND PRODUCT.COUPON_SPECIES=#{couponSpecies,jdbcType=VARCHAR}
+            </if>
+            <if test="intType !=null and intType !=''">
+                AND ISSUE.INT_TYPE=#{intType,jdbcType=VARCHAR}
+            </if>
+            <if test="customAssetType !=null and customAssetType !=''">
+                AND PRODUCT_TYPE.TYPE_11=#{customAssetType,jdbcType=VARCHAR}
+            </if>
+        </where>
+
+    </sql>
+
 </mapper>

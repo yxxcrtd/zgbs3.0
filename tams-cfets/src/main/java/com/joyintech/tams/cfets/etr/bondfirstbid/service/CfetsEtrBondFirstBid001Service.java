@@ -1,5 +1,7 @@
 package com.joyintech.tams.cfets.etr.bondfirstbid.service;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
@@ -16,11 +18,15 @@ import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIs
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIssueInfoRequest;
 import com.joyintech.tams.common.base.entity.SppiImportData;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +45,9 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
 
     @Autowired
     private CfetsEtrIbBondinfoMapper cfetsetrIbBondinfoMapper;
+
+    @Resource
+    private IPlatformDate iPlatformDate;
 
     /**
      * 指令信息查询
@@ -67,14 +76,29 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
         if (StringUtil.isNotEmpty(finprodId)) {
             pageParam.put("finprodIdList", StringUtil.splitToList(GlobalConstant.COMMA, finprodId));
         }
+        //发行方式
+        String issueClass = (String) pageParam.get("issueClass");
+        if (StringUtil.isNotEmpty(issueClass)) {
+            pageParam.put("issueClassList", StringUtil.splitToList(GlobalConstant.COMMA, issueClass));
+        }
         //投资经理
         String invManagerId = (String) pageParam.get("invManagerId");
         if (StringUtil.isNotEmpty(invManagerId)) {
             pageParam.put("invManagerIdList", StringUtil.splitToList(GlobalConstant.COMMA, invManagerId));
         }
+        //投资经理
+        String counterId = (String) pageParam.get("counterId");
+        if (StringUtil.isNotEmpty(counterId)) {
+            pageParam.put("counterIdList", StringUtil.splitToList(GlobalConstant.COMMA, counterId));
+        }
         if (StringUtil.isNotEmpty(dto.getSearch())) {
             pageParam.put("search_isNumberFlag", BaseMap.isNumeric(dto.getSearch()));
         }
+
+        Calendar c = Calendar.getInstance();
+        c.setTime(DateUtil.parse(DateUtil.getSysDate()));
+        int year = c.get(Calendar.YEAR);
+        pageParam.put("year",year);
         pageParam.put("sort", dto.getPageMode().getSort());
         pageParam.put("direction", dto.getPageMode().getDirection());
         String userId = SecurityUtil.getLoginUser().getUserName();
@@ -106,11 +130,21 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
     /**
      * 查询待发行信息分页数据
      *
-     * @param dto
+     * @param search
      * @return
      */
-    public Page<CfetsEtrIBondFirstBidFindIssueInfoDto> findIssueInfoPage(CfetsEtrIBondFirstBidFindIssueInfoRequest dto) {
-        return null;
+    public Page<CfetsEtrIBondFirstBidFindIssueInfoDto> findIssueInfoPage(CfetsEtrIBondFirstBidFindIssueInfoRequest search) {
+        search.setPlatformDate(iPlatformDate.getSysDateStr());
+        search.setFinprodType2(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+
+        Map<String, Object> pageParam = BeanUtil.object2Map(search);
+        pageParam.put("TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue());
+        pageParam.put("TRADE_MARKET_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
+        pageParam.put("TRADE_MARKET_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
+
+        PageHelper.startPage(search.getPageMode().getPageNo(), search.getPageMode().getPageSize());
+        List<CfetsEtrIBondFirstBidFindIssueInfoDto> list = cfetsEtrBondFirstBid001Mapper.findIssueInfoPage(pageParam);
+        return new Page<>(PageInfo.of(list));
     }
 
     /**
