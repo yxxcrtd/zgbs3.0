@@ -80,6 +80,8 @@
         ,T1.BUSINESS_MODEL businessModel
         ,T1.STOCK_ID
         ,T2.EXP_CON_NUM
+        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN T1.PRICE * 100  END discountRate
+        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN T1.ENTRUST_AMT/100  END standardBondVolume
         FROM
         ETR_ENTRUST T1
         INNER JOIN ETR_ENTRUST_ADD T2 ON
@@ -219,6 +221,8 @@
         ,T1.BUSINESS_MODEL businessModel
         ,T1.STOCK_ID
         ,T2.EXP_CON_NUM
+        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN T1.PRICE * 100  END discountRate
+        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN T1.ENTRUST_AMT/100  END standardBondVolume
         FROM
         WFL_ETR_ENTRUST T1
         INNER JOIN WFL_ETR_ENTRUST_ADD T2 ON

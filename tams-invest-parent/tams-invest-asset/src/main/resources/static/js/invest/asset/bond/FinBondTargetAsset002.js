@@ -72,9 +72,9 @@ $(function() {
         //update by zhangnian 20190920 end
         var  couponSpecies = getInterestFactorElementById('couponSpecies').val();
         var object = $.serializeToObject('#submitForm', true);
-        if(object.tradePlat){
-            object.tradePlat = object.tradePlat.toString();
-        }
+        // if(object.tradePlat){
+        //     object.tradePlat = object.tradePlat.toString();
+        // }
         object.operateType = operateType;
         object.pageModel = pageModel;
         object.finCashCalcRuleList = finCashCalcRuleList;
@@ -720,10 +720,10 @@ $(function() {
     var isApproveShow = function () {
         if($('#tradeMarket').val() == '03' || $('#tradeMarket').val() == '04'){
             $('#isNetPrice_div').show();
-            $('#isApproveMarket_div').show();
+            //$('#isApproveMarket_div').show();
         }else {
             $('#isNetPrice_div').hide();
-            $('#isApproveMarket_div').hide();
+            //$('#isApproveMarket_div').hide();
         }
     }
 
@@ -756,7 +756,7 @@ $(function() {
                 + finprodMarketId + '&tradeMarket=' + tradeMarket + '&isPpb=' + isPpb
                 + '&type9=' + type9, '', function (result) {
                 $('#isNetSett').val(result.data.isNetSett);
-                var tradePlat = result.data.tradePlat;
+                //var tradePlat = result.data.tradePlat;
                 if($('#tradeMarket').val() == '03' && result.data.isNetSett == "N" ){
 //                    $("#tradePlat").select2();
                     //$("#tradePlat").val(['03']).trigger("change");
@@ -787,7 +787,7 @@ $(function() {
                     //     chosen: isApproveMarket
                     // });
                 }else if($('#tradeMarket').val() == '04' && result.data.isNetSett == "Y" ) {
-                    $("#tradePlat").select2();
+                    //$("#tradePlat").select2();
                     //$("#tradePlat").val(['02', '05']).trigger("change");
                     // var $isApproveMarket = $("#tradePlat");
                     // var isApproveMarket = $isApproveMarket.val();
@@ -796,8 +796,8 @@ $(function() {
                     //     chosen: isApproveMarket
                     // })
                 }else {
-                    $("#tradePlat").select2();
-                    $("#tradePlat").val([]).trigger("change");
+                    //$("#tradePlat").select2();
+                    //$("#tradePlat").val([]).trigger("change");
                     // var $isApproveMarket = $("#tradePlat");
                     // var isApproveMarket = $isApproveMarket.val();
                     // $isApproveMarket.updateChosenArr({
@@ -805,11 +805,11 @@ $(function() {
                     //     chosen: isApproveMarket
                     // })
                 }
-                if(tradePlat){
-                    tradePlat =  tradePlat.split(",");
-                    $("#tradePlat").val(tradePlat).trigger("change");
-                }
-                $('#tradePlat').trigger('change');
+                // if(tradePlat){
+                //     tradePlat =  tradePlat.split(",");
+                //     $("#tradePlat").val(tradePlat).trigger("change");
+                // }
+                // $('#tradePlat').trigger('change');
             });
         }
     };
@@ -944,10 +944,10 @@ $(function() {
 			AssetCommon.setTradeMarketId($('#tradeMarket').val());
 			if($('#tradeMarket').val() == '03' || $('#tradeMarket').val() == '04'){
                 $('#isNetPrice_div').show();
-                $('#isApproveMarket_div').show();
+                //$('#isApproveMarket_div').show();
             }else {
                 $('#isNetPrice_div').hide();
-                $('#isApproveMarket_div').hide();
+                //$('#isApproveMarket_div').hide();
             };
 
             if($('#tradeMarket').val() == '01'){
