@@ -377,6 +377,7 @@ public class MstSecuritiesAccountService extends BaseService<MstSecuritiesAccoun
         map.put("SHARES_TRADE_PLATFORM_02", DictCodeList.交易平台_竞价撮合平台.getValue());
         map.put("SHARES_TRADE_PLATFORM_03", DictCodeList.交易平台_固定收益平台.getValue());
         map.put("SHARES_TRADE_PLATFORM_04", DictCodeList.交易平台_大宗交易平台.getValue());
+        map.put("SHARES_TRADE_PLATFORM_99", DictCodeList.交易平台_其它.getValue());
         // 交易场所
         map.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
         map.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
