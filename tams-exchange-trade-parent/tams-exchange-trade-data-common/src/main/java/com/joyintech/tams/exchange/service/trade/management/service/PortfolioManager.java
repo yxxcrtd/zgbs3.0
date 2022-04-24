@@ -359,8 +359,9 @@ public class PortfolioManager extends BaseService {
             log.warn("未找到指令信息: InstructionId [{}]", instructionId);
             return ResultBean.error(ErrorCode.INSTRUCTIONS_NOT_EXIST);
         }
-        // 新债，根据计价标识取委托价格
-        dealPrice(instruction, order);
+        BigDecimal orginEntrustPrice = order.getEntrustPrice();
+        // 新债，使用全价进行计算
+        coverPrice(instruction, order);
         // 获取委托属性
         String entrustProp = EntrustPropUtils.getEntrustProp(instruction, order.getEntrustProp());
 
@@ -539,17 +540,26 @@ public class PortfolioManager extends BaseService {
             }
         }
 
+        // 新债，使用全价进行计算后恢复订单价格
+        recoverPrice(instruction, list, orginEntrustPrice);
+
         log.debug("queryPortfolioCalculate() called with result => 【list = {}】", JSONUtil.toJsonStr(list));
         return ResultBean.success(list);
     }
 
-    private void dealPrice(Instruction instruction, OrderPlaceBean order) {
+    private void coverPrice(Instruction instruction, OrderPlaceBean order) {
         if (instruction.inconvertibleBond()) {
             BigDecimal fullPrice = order.getFullPrice();
             if (ObjectUtil.isNull(fullPrice) || fullPrice.compareTo(BigDecimal.ZERO) <= 0) {
                 throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR);
             }
             order.setEntrustPrice(fullPrice);
+        }
+    }
+
+    private void recoverPrice(Instruction instruction, List<PortfolioCalculateResponse> list, BigDecimal price) {
+        if (instruction.inconvertibleBond()) {
+            list.forEach(item-> item.setEntrustPrice(price));
         }
     }
 

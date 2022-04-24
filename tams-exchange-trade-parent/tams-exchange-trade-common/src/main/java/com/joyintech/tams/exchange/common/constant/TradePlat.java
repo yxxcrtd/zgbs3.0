@@ -1,6 +1,8 @@
 package com.joyintech.tams.exchange.common.constant;
 
-public enum TradePlat {
+import com.joyintech.tams.exchange.common.enums.IEnum;
+
+public enum TradePlat implements IEnum<String> {
 
     NORMAL("02", "沪深竞价撮合平台"),
     SH_FIXED_INCOME("03", "上海固定收益平台"),
@@ -27,5 +29,15 @@ public enum TradePlat {
         return TradePlat.SH_FIXED_INCOME.value.equals(tradePlat)
                 || TradePlat.SH_SCALE.value.equals(tradePlat)
                 || TradePlat.SZ_PROTOCOL.value.equals(tradePlat);
+    }
+
+    @Override
+    public String getCode() {
+        return value;
+    }
+
+    @Override
+    public String getDescription() {
+        return name;
     }
 }
