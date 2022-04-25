@@ -351,7 +351,7 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
                         logger.info("【成交数据预清算入库处理-开始】tradePreClearing entrustId: {}, seqno: {}",
                             infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
                         
-                    	this.tradePreClear(trdTempDto);
+                    	this.tradePreClear(trdTempDto, infContractDetailfile);
                     	
                     	logger.info("【成交数据预清算入库处理-结束】tradePreClearing entrustId: {}, seqno: {}",
                             infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
@@ -703,7 +703,7 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
      * @see
      * @since 1.0
      */
-    public void tradePreClear(TrdTempDto trdTempDto)
+    public void tradePreClear(TrdTempDto trdTempDto, InfContractDetailfile infContractDetailfile)
             throws Exception {
 
         // 金融产品交易信息DTO.金融产品交易trdTempDto -> 金融产品交易表
@@ -890,7 +890,7 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
 //        }else {
         // 处理头寸
         positionRequestTradeReportService.sendTradeReportPositionRequest(trdTempDto);
-        tradePreCommonService.executePosition(finProductTradeDto);
+        tradePreCommonService.executePosition(finProductTradeDto, infContractDetailfile.getAcctNo());
 //        }
     }
 
