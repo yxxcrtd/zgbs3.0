@@ -168,8 +168,8 @@ public class AssetInfoRegist001Service extends CommonExportService<AssetInfoRegi
         Page<AssetInfoRegist001Dto> page;
 		//update byleipeng  【资产要素登记】公共资产，发行机构代码根据登录人维护 机构登记银行代码管理 登记银行代码
 
-        String issuePartyId = CommonUtil.selectBankCode();
-        
+//        String issuePartyId = CommonUtil.selectBankCode();
+		String issuePartyId = CacheUtil.getSysParam("SVR_ISSUE_PARTY_ID");
         if (pageParam.get(GlobalConstant.PARAM_PAGE) != null
                 && pageParam.get(GlobalConstant.PARAM_LENGTH) != null){
             int pagenum = Integer.parseInt(pageParam.get(GlobalConstant.PARAM_PAGE).toString());
@@ -893,7 +893,8 @@ public class AssetInfoRegist001Service extends CommonExportService<AssetInfoRegi
     	List<AssetInfoRegist001Dto> list = new ArrayList<>();
 		//update byleipeng  【资产要素登记】公共资产，发行机构代码根据登录人维护 机构登记银行代码管理 登记银行代码
 
-    	 String issuePartyId = CommonUtil.selectBankCode();
+//    	 String issuePartyId = CommonUtil.selectBankCode();
+		String issuePartyId = CacheUtil.getSysParam("SVR_ISSUE_PARTY_ID");
 		//通道投资资产管理产品是否穿透报送
 		String isChlBtmStr = SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_IS_CHL_BTM);
 		param.put("isChlBtmStr",isChlBtmStr);
@@ -917,7 +918,8 @@ public class AssetInfoRegist001Service extends CommonExportService<AssetInfoRegi
     public List<AssetInfoRegist001Dto> selectExportSelectListSeq(Map<String, Object> map){
 		//update byleipeng  【资产要素登记】公共资产，发行机构代码根据登录人维护 机构登记银行代码管理 登记银行代码
 
-    	String issuePartyId = CommonUtil.selectBankCode();
+//    	String issuePartyId = CommonUtil.selectBankCode();
+		String issuePartyId = CacheUtil.getSysParam("SVR_ISSUE_PARTY_ID");
     	List<AssetInfoRegist001Dto> list = new ArrayList<>();
 		//通道投资资产管理产品是否穿透报送
 		String isChlBtmStr = SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_IS_CHL_BTM);

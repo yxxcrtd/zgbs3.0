@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.framework.util.CacheUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
@@ -366,9 +367,11 @@ public class TotalCheckBatchService extends SvrCBBaseService{
         // 总体检查合格率
         BigDecimal yield = BigDecimal.ZERO;
         // 发行机构代码
-        String issueId = CommonUtil.selectBankCode();
+//        String issueId = CommonUtil.selectBankCode();
+        String issueId = CacheUtil.getSysParam("SVR_ISSUE_PARTY_ID");
         // 发行机构名称
-        String issueName = CommonUtil.selectBankCodeName();
+//        String issueName = CommonUtil.selectBankCodeName();
+        String issueName = CacheUtil.getSysParam("SVR_ISSUE_PARTY_NAME");
         // 2.产品存续金额和资产持仓偏差情况
         // 存续的封闭式产品总数： = 1.的理财产品存续只数&&封闭式产品                                           
         BigDecimal prodSubstainsCloseCount = chbTotalCheckCBMapper.selectProdSubstainsCount(batchDate, null,ChbTotalCheckCBConstants.PROD_TYPE_C,null);
@@ -495,9 +498,11 @@ public class TotalCheckBatchService extends SvrCBBaseService{
                  JoyinCollectors.groupingBy(x -> x.getProdId()));
         List<String> prodIgnoreList = new ArrayList<>(confsMap.keySet());
         // 发行机构代码
-        String issueId = CommonUtil.selectBankCode();
+//        String issueId = CommonUtil.selectBankCode();
+        String issueId = CacheUtil.getSysParam("SVR_ISSUE_PARTY_ID");
         // 发行机构名称
-        String issueName = CommonUtil.selectBankCodeName();
+//        String issueName = CommonUtil.selectBankCodeName();
+        String issueName = CacheUtil.getSysParam("SVR_ISSUE_PARTY_NAME");
         // 生成总体检查数据
         ChbTotalCheckDto totalCheck = geneTotalCheckByCdateAndCheckType(batchDate, ChbTotalCheckCBConstants.CHECKTYPE03);
         // 总体检查合格率
@@ -553,9 +558,11 @@ public class TotalCheckBatchService extends SvrCBBaseService{
     private void checkRegisterReportMonthBotAssetHold(List<ChbTotalCheckDto> totalCheckList,
             List<ChbTotalCheckDetailDto> totalCheckDetailList, Date batchDate){
         // 发行机构代码
-        String issueId = CommonUtil.selectBankCode();
+//        String issueId = CommonUtil.selectBankCode();
+        String issueId = CacheUtil.getSysParam("SVR_ISSUE_PARTY_ID");
         // 发行机构名称
-        String issueName = CommonUtil.selectBankCodeName();
+//        String issueName = CommonUtil.selectBankCodeName();
+        String issueName = CacheUtil.getSysParam("SVR_ISSUE_PARTY_NAME");
         // 生成总体检查数据
         ChbTotalCheckDto totalCheck = geneTotalCheckByCdateAndCheckType(batchDate, ChbTotalCheckCBConstants.CHECKTYPE04);
         // 总体检查合格率
@@ -622,9 +629,11 @@ public class TotalCheckBatchService extends SvrCBBaseService{
                  JoyinCollectors.groupingBy(x -> x.getProdId()));
         List<String> prodIgnoreList = new ArrayList<>(confsMap.keySet());
         // 发行机构代码
-        String issueId = CommonUtil.selectBankCode();
+//        String issueId = CommonUtil.selectBankCode();
+        String issueId = CacheUtil.getSysParam("SVR_ISSUE_PARTY_ID");
         // 发行机构名称
-        String issueName = CommonUtil.selectBankCodeName();
+//        String issueName = CommonUtil.selectBankCodeName();
+        String issueName = CacheUtil.getSysParam("SVR_ISSUE_PARTY_NAME");
         // 生成总体检查数据
         ChbTotalCheckDto totalCheck = geneTotalCheckByCdateAndCheckType(batchDate, ChbTotalCheckCBConstants.CHECKTYPE05);
         // 总体检查合格率
@@ -693,9 +702,11 @@ public class TotalCheckBatchService extends SvrCBBaseService{
                  JoyinCollectors.groupingBy(x -> x.getProdId()));
         List<String> prodIgnoreList = new ArrayList<>(confsMap.keySet());
         // 发行机构代码
-        String issueId = CommonUtil.selectBankCode();
+//        String issueId = CommonUtil.selectBankCode();
+        String issueId = CacheUtil.getSysParam("SVR_ISSUE_PARTY_ID");
         // 发行机构名称
-        String issueName = CommonUtil.selectBankCodeName();
+//        String issueName = CommonUtil.selectBankCodeName();
+        String issueName = CacheUtil.getSysParam("SVR_ISSUE_PARTY_NAME");
         // 生成总体检查数据
         ChbTotalCheckDto totalCheck = geneTotalCheckByCdateAndCheckType(batchDate, ChbTotalCheckCBConstants.CHECKTYPE06);
         // 总体检查合格率
@@ -807,9 +818,11 @@ public class TotalCheckBatchService extends SvrCBBaseService{
                  JoyinCollectors.groupingBy(x -> x.getProdId()));
         List<String> prodIgnoreList = new ArrayList<>(confsMap.keySet());
         // 发行机构代码
-        String issueId = CommonUtil.selectBankCode();
+//        String issueId = CommonUtil.selectBankCode();
+        String issueId = CacheUtil.getSysParam("SVR_ISSUE_PARTY_ID");
         // 发行机构名称
-        String issueName = CommonUtil.selectBankCodeName();
+//        String issueName = CommonUtil.selectBankCodeName();
+        String issueName = CacheUtil.getSysParam("SVR_ISSUE_PARTY_NAME");
         // 生成总体检查数据
         ChbTotalCheckDto totalCheck = geneTotalCheckByCdateAndCheckType(batchDate, ChbTotalCheckCBConstants.CHECKTYPE07);
         // 总体检查合格率
@@ -878,9 +891,11 @@ public class TotalCheckBatchService extends SvrCBBaseService{
     private void checkRegisterReportAstBotAmt(List<ChbTotalCheckDto> totalCheckList,
             List<ChbTotalCheckDetailDto> totalCheckDetailList, Date batchDate){
      // 发行机构代码
-        String issueId = CommonUtil.selectBankCode();
+//        String issueId = CommonUtil.selectBankCode();
+        String issueId = CacheUtil.getSysParam("SVR_ISSUE_PARTY_ID");
         // 发行机构名称
-        String issueName = CommonUtil.selectBankCodeName();
+//        String issueName = CommonUtil.selectBankCodeName();
+        String issueName = CacheUtil.getSysParam("SVR_ISSUE_PARTY_NAME");
         // 生成总体检查数据
         ChbTotalCheckDto totalCheck = geneTotalCheckByCdateAndCheckType(batchDate, ChbTotalCheckCBConstants.CHECKTYPE08);
         // 总体检查合格率

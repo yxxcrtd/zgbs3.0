@@ -176,7 +176,8 @@ public class ChbAssetInfoInterf  extends BaseInterfService {
             }
             issueId = null!=code?code:"";
         }else{
-            issueId = CommonUtil.selectBankCode();
+//            issueId = CommonUtil.selectBankCode();
+              issueId = CacheUtil.getSysParam("SVR_ISSUE_PARTY_ID");
         }
         // 映射源数据和中债所需数据
         List<ChbTypeMapping> assetTypeTwoMappingList = chbTypeMappingMapper.selectMappingBySrcDataType(InterfMappingConstants.MAAPING_ASSETTYPETWO_ZG);
