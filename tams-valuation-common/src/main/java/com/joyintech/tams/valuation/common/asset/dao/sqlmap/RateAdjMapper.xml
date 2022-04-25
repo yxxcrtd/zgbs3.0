@@ -93,7 +93,7 @@
 	<select id="getAssetBasicInfoByFinprodId" resultType="com.joyintech.tams.valuation.common.asset.dto.AssetCommonInfoDto">
     	SELECT
 	T1.FINPROD_ID,
-	T1.FINPROD_TYPE2,
+	T1.FINPROD_TYPE,
 	T1.VDATE,
 	T1.MDATE,
 	T1.CALENDAR_ID,
@@ -101,10 +101,45 @@
 	T2.BASIS 
 	FROM
 	FIN_PRODUCT T1
-	LEFT JOIN FIN_CASH_INFO T3 on T3.FINPROD_ID=T1.FINPROD_ID AND T3.CASH_TYPE_2=#{cashType,jdbcType=VARCHAR}
-	LEFT JOIN FIN_CASH_CALC_RULE T2 ON T1.FINPROD_ID = T2.FINPROD_ID 
+	LEFT JOIN FIN_CASH_INFO T3 on T3.FINPROD_ID=T1.FINPROD_ID
+		<if test="cashTypeList != null and !cashTypeList.isEmpty()">
+			AND T3.CASH_TYPE_2 in
+			<foreach collection="cashTypeList" item="item" index="index" separator="," open="(" close=")">
+				<if test="(index % 999) == 998">
+					null) OR T3.CASH_TYPE_2 in (
+				</if>
+				#{item}
+			</foreach>
+		</if>
+	LEFT JOIN FIN_CASH_CALC_RULE T2 ON T1.FINPROD_ID = T2.FINPROD_ID
 	AND T2.CASH_ID = T3.CASH_ID AND T2.EFF_DATE = T1.VDATE
     where T1.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+
+    union all
+    SELECT
+	T1.FINPROD_ID,
+	T1.FINPROD_TYPE,
+	T1.VDATE,
+	T1.MDATE,
+	T1.CALENDAR_ID,
+	T1.PRIN ISSUE_AMT,
+	T2.BASIS
+	FROM
+	FIN_TRADE_PRODUCT T1
+	LEFT JOIN FIN_CASH_INFO T3 on T3.FINPROD_ID=T1.FINPROD_ID
+		<if test="cashTypeList != null and !cashTypeList.isEmpty()">
+			AND T3.CASH_TYPE_2 in
+			<foreach collection="cashTypeList" item="item" index="index" separator="," open="(" close=")">
+				<if test="(index % 999) == 998">
+					null) OR T3.CASH_TYPE_2 in (
+				</if>
+				#{item}
+			</foreach>
+		</if>
+	LEFT JOIN FIN_RATE_INFO T2 ON T1.FINPROD_ID = T2.FINPROD_ID
+	AND T2.CASH_ID = T3.CASH_ID AND T2.EFF_DATE = T1.VDATE
+    where T1.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+	AND ROWNUM=1
     </select>
     
     <select id="selectInitAssetRateAdj"   resultType="com.joyintech.tams.valuation.common.asset.dto.RateAdjDto">

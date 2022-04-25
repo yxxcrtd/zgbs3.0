@@ -8,6 +8,15 @@ insert into sys_datadict_list (DICT_CODE, ITEM_CODE, ITEM_VALUE, ORDER_NO, DEFAU
 values ('IRS_CLEAN_TYPE', '01', '集中清算', 1, '0', 'yy', null, sysdate, 'yy', sysdate, null);
 insert into sys_datadict_list (DICT_CODE, ITEM_CODE, ITEM_VALUE, ORDER_NO, DEFAULT_VALUE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE)
 values ('IRS_CLEAN_TYPE', '02', '多边清算', 2, '0', 'yy', null, sysdate, 'yy', sysdate, null);
+
+
+delete from sys_datadict d where d.dict_code='RESET_SCOPE';
+insert into sys_datadict (DICT_CODE, SYSTEM_CODE, DICT_CNNAME, DICT_ENNAME, UPDATE_FLG, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+values ('RESET_SCOPE', 'VAL', '利率重置品种范围', null, '02', 'yy', null, sysdate, 'yy', sysdate);
+delete from sys_datadict_list d where d.dict_code='RESET_SCOPE';
+insert into sys_datadict_list (DICT_CODE, ITEM_CODE, ITEM_VALUE, ORDER_NO, DEFAULT_VALUE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE)
+values ('RESET_SCOPE', 'F14', '利率互换', 1, '0', 'yy', null, sysdate, 'yy', sysdate, null);
+
 /*****数据字典 end**************************************************************************/
 
 
@@ -188,8 +197,8 @@ insert into sys_batch_task (TASK_ID, SYSTEM_CODE, TASK_NAME, FTASK_ID, BEAN_NAME
 values ('530', 'VAL', '利率互换计提-账务明细批处理', null, 'irsCalBookTask', 60, 'yy', null, sysdate, 'yy', sysdate, null);
 insert into sys_batch_task (TASK_ID, SYSTEM_CODE, TASK_NAME, FTASK_ID, BEAN_NAME, TASK_PRI, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_BATCH_START_TARGET)
 values ('531', 'VAL', '利率互换公允价值变动-账务明细批处理', null, 'irsFairValeAlterationsTask', 70, 'yy', null, sysdate, 'yy', sysdate, null);
---整体任务调度(利率重置、业绩基准重置的批移到估值中)
-delete from  SYS_BATCH_JOB b where b.batch_seq_no='6f8803b3aa6fbaffe050007f01003cad' and b.task_id in('528','529','530','531','10014','10013');
+--整体任务调度(利率重置、批移到估值中)
+delete from  SYS_BATCH_JOB b where b.batch_seq_no='6f8803b3aa6fbaffe050007f01003cad' and b.task_id in('528','529','530','531','10014');
 insert into SYS_BATCH_JOB (BATCH_SEQ_NO, TASK_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('6f8803b3aa6fbaffe050007f01003cad', '528', 'yy', null, sysdate, 'yy', sysdate);
 insert into SYS_BATCH_JOB (BATCH_SEQ_NO, TASK_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
@@ -199,8 +208,6 @@ values ('6f8803b3aa6fbaffe050007f01003cad', '530', 'yy', null, sysdate, 'yy', sy
 insert into SYS_BATCH_JOB (BATCH_SEQ_NO, TASK_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('6f8803b3aa6fbaffe050007f01003cad', '531', 'yy', null, sysdate, 'yy', sysdate);
 
-insert into SYS_BATCH_JOB (BATCH_SEQ_NO, TASK_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-values ('6f8803b3aa6fbaffe050007f01003cad', '10013', 'yy', null, sysdate, 'yy', sysdate);
 insert into SYS_BATCH_JOB (BATCH_SEQ_NO, TASK_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('6f8803b3aa6fbaffe050007f01003cad', '10014', 'yy', null, sysdate, 'yy', sysdate);
 

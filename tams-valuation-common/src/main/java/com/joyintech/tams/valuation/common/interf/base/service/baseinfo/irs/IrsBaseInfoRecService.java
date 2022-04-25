@@ -10,13 +10,11 @@
 
 package com.joyintech.tams.valuation.common.interf.base.service.baseinfo.irs;
 
-import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.valuation.common.constants.ValInterfCommonConstant;
 import com.joyintech.tams.valuation.common.interf.base.constant.InterfCommonConstant;
 import com.joyintech.tams.valuation.common.interf.base.dto.IrsCommonResult;
 import com.joyintech.tams.valuation.common.interf.base.dto.TemplateCheckReturnResult;
@@ -302,7 +300,7 @@ public class IrsBaseInfoRecService {
         // 金融产品代码 = A.资产代码
         valCashInfo.setFinprodId(dto.getTradeId());
         // 金融产品类型 = A.业务类型
-        valCashInfo.setFinprodType(DictCodeList.业务类型_利率互换交易.getValue());
+        valCashInfo.setFinprodType(DictCodeListExt1.金融产品类型_利率互换.getValue());
         // 分支序号 = 设置全局变量(默认为0）
         valCashInfo.setBranch(InterfCommonConstant.分支序号_默认);
         return valCashInfo;
@@ -319,30 +317,37 @@ public class IrsBaseInfoRecService {
     private FinCashCalcRule getValCashCalcRule(ValIrsInfo dto, FinCashInfo T3) {
 
         FinCashCalcRule valCashCalcRule = new FinCashCalcRule();
-        //只生成固定利率的
+        valCashCalcRule.setEffDate(dto.getVdate());
         if (DictCodeListExt1.计算类型_固定利率.getValue().equals(T3.getRateType())) {
-            // 现金流代码 = T3.现金流代码
-            valCashCalcRule.setCashId(T3.getCashId());
-            // 生效日期 = A.固定利率首期起息日
-            valCashCalcRule.setEffDate(dto.getFixVdate());
-            // 计算类型 = A.利率类型
-            valCashCalcRule.setCalcType(T3.getRateType());
             // 生效利率 = A.拆借利率
             valCashCalcRule.setYield(dto.getFixRate());
             // 计算基础 = A.计息基础
             valCashCalcRule.setBasis(dto.getFixBasis());
-            // 金融产品代码 = A.资产代码
-            valCashCalcRule.setFinprodId(dto.getTradeId());
-            // 金融产品类型 = A.业务类型
-            valCashCalcRule.setFinprodType(T3.getFinprodType());
-            //基数类型 = 数据字典：基数类型.实收资本
-            valCashCalcRule.setBaseType(DictCodeList.基数类型_实收资本.getValue());
-            //基数日期类型 = 数据字典：基数日期类型.当日
-            valCashCalcRule.setBaseDateType(DictCodeList.基数日期类型_当日.getValue());
-            // 分支序号 = 设置全局变量(默认为0）
-            valCashCalcRule.setBranch(InterfCommonConstant.分支序号_默认);
-            valCashCalcRule.setIsInitial(DictCodeList.是否_是.getValue());
+        }else  if (DictCodeListExt1.计算类型_浮动利率.getValue().equals(T3.getRateType())) {
+            Map<String,Object> paramMap = new HashMap<String, Object>();
+            // 生效利率 = A.拆借利率
+            paramMap.put("sysDate",DateUtil.format(dto.getVdate()));
+            paramMap.put("intRateId", dto.getLinkRate());
+            MstIntRateInfo mstIntRateInfo = interfCommonService.getMstIntRateInfo(paramMap);
+            valCashCalcRule.setYield(mstIntRateInfo.getIntRate());
+            // 计算基础 = A.计息基础
+            valCashCalcRule.setBasis(dto.getFloatBasis());
         }
+        // 现金流代码 = T3.现金流代码
+        valCashCalcRule.setCashId(T3.getCashId());
+        // 计算类型 = A.利率类型
+        valCashCalcRule.setCalcType(T3.getRateType());
+        valCashCalcRule.setIsInitial(DictCodeList.是否_是.getValue());
+        // 金融产品代码 = A.资产代码
+        valCashCalcRule.setFinprodId(dto.getTradeId());
+        // 金融产品类型 = A.业务类型
+        valCashCalcRule.setFinprodType(T3.getFinprodType());
+        //基数类型 = 数据字典：基数类型.实收资本
+        valCashCalcRule.setBaseType(DictCodeList.基数类型_实收资本.getValue());
+        //基数日期类型 = 数据字典：基数日期类型.当日
+        valCashCalcRule.setBaseDateType(DictCodeList.基数日期类型_当日.getValue());
+        // 分支序号 = 设置全局变量(默认为0）
+        valCashCalcRule.setBranch(InterfCommonConstant.分支序号_默认);
         return valCashCalcRule;
 
     }

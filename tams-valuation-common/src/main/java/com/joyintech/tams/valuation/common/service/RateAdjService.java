@@ -312,7 +312,11 @@ public class RateAdjService extends BaseService{
     public AssetCommonInfoDto getAssetBasicInfoByFinprodId(String finprodId){
         Map<String,Object> map = new HashMap<String,Object>();
         map.put("finprodId", finprodId);
-        map.put("cashType", DictCodeListExt1.现金流二级类型_利息.getValue());
+        List<String> cashTypeList=new ArrayList<String>();
+        cashTypeList.add(DictCodeListExt1.现金流二级类型_利息.getValue());
+        cashTypeList.add(DictCodeListExt1.现金流二级类型_收取.getValue());
+        cashTypeList.add(DictCodeListExt1.现金流二级类型_支付.getValue());
+        map.put("cashTypeList", cashTypeList);
         return rateAdjMapper.getAssetBasicInfoByFinprodId(map);
     }
     

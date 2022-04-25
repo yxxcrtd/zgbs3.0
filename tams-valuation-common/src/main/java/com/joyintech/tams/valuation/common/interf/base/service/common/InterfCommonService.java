@@ -10,12 +10,7 @@
 
 package com.joyintech.tams.valuation.common.interf.base.service.common;
 
-import java.lang.reflect.Method;
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.*;
 import com.google.common.collect.Maps;
-
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
@@ -3202,7 +3197,7 @@ public class InterfCommonService {
     /**
      * 账套信息(根据产品代码) _分层产品
      * 
-     * @param prodid
+     * @param prodId
      * @return List<BokBookset>
      */
     public List<ValBooksetInfoDto> getBokBooksetByProdId_Layering(String prodId) {
@@ -4216,6 +4211,27 @@ public class InterfCommonService {
 
             }
             /**add by yinya on 2022-01-08 结算指令自动映射指令类型的检查项 end**/
+
+
+            /**add by yinya on 2022-04-25 利率互换浮动端首期利率检查 start**/
+            if(TempConstant.利率互换标的信息.equals(tmpEName)){
+                String tradeId = InterfHelper.getObjectFieldValue(object, "tradeId");
+                String vdate = InterfHelper.getObjectFieldValue(object, "vdate");
+                String linkRate = InterfHelper.getObjectFieldValue(object, "linkRate");
+                Map<String,Object> paramMap = new HashMap<String, Object>();
+                paramMap.put("sysDate",vdate);
+                paramMap.put("intRateId", linkRate);
+                MstIntRateInfo mstIntRateInfo = this.getMstIntRateInfo(paramMap);
+
+                if(mstIntRateInfo==null){
+                    ischeck = false;
+                    checkError.append("交易编号："+tradeId
+                            +" 浮动挂钩利率："+linkRate
+                            +" 生效日："+vdate
+                            +" 未匹配利率，请检查利率信息【MST_INT_RATE_INFO】");
+                }
+            }
+            /**add by yinya on 2022-04-25 利率互换浮动端首期利率检查 end**/
 
     		if(ischeck){
     			rstlist.add(object);
@@ -6813,7 +6829,7 @@ public class InterfCommonService {
     }
     /**
      * 子账套信息更新(根据账套信息)
-     * @param BokBookset 账套信息
+     * @param bokBookset 账套信息
      * @return 账套日期：BokBooksetDate
      */
     
@@ -7539,7 +7555,7 @@ public class InterfCommonService {
     
     /**
      * 查询附加税税则中的附加税类型
-     * @param finprodId 金融产品代码
+     * @param listFinprodId 金融产品代码
      * @param finprodType 金融产品类型
      * @param queryDate 查询日期
      * @return 缴纳附加税相关附加税类型
@@ -7904,5 +7920,22 @@ public class InterfCommonService {
         String valclas = mapper.getFinanceProductSecType(finProductClass);
         return valclas;
     }
+
+    /**
+     * 挂钩标的利率查询
+     * @author 殷亚
+     * @date 2022/4/25 9:50
+     * @param paramMap
+     * @return com.joyintech.tams.valuation.common.interf.base.dto.MstIntRateInfo
+     * @see
+     * @version 1.0
+     */
+    public MstIntRateInfo getMstIntRateInfo(Map<String,Object> paramMap){
+        MstIntRateInfo mstIntRateInfo=mapper.getMstIntRateInfo(paramMap);
+        return mstIntRateInfo;
+
+    }
+
+
 
 }

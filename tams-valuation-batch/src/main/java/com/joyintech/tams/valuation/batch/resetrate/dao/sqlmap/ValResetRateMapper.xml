@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.joyintech.tams.valuation.batch.resetrate.dao.ValResetRateMapper">
+<delete id="deleteFinCashCalRule">
+	delete from FIN_CASH_CALC_RULE
+	<where>
+		<if test="effDate != null and effDate != ''">
+		    AND EFF_DATE = TO_DATE(#{effDate},'YYYY-MM-DD')
+		</if> 
+		<if test="isInitial != null and isInitial != ''">
+			AND IS_INITIAL = #{isInitial}
+		</if>
+		<if test="calcType != null and calcType != ''">
+			AND CALC_TYPE = #{calcType}
+		</if>
+	</where>
+</delete>
+
+<select id="selectAllRateInfo" resultType="com.joyintech.tams.valuation.common.asset.dto.FinRateInfoDto">
+SELECT
+	T1.CASH_ID CASH_ID,
+	T1.EFF_DATE EFF_DATE,
+	T1.INT_TYPE INT_TYPE,
+	T1.BASIS BASIS,
+	T1.RESET_TYPE RESET_TYPE,
+	T1.RESET_FREQ RESET_FREQ,
+	T1.FIRST_RESET_DATE FIRST_RESET_DATE,
+	T1.RESET_DATE RESET_DATE,
+	T1.OBSERVE_BEF_DAY OBSERVE_BEF_DAY,
+	T1.OBSERVE_BEF_UNIT OBSERVE_BEF_UNIT,
+	T1.RATE RATE,
+	T1.COEFFICIENT COEFFICIENT,
+	T1.SPREAD_RATE SPREAD_RATE,
+	T1.HIGHEST_RATE HIGHEST_RATE,
+	T1.LOWEST_RATE LOWEST_RATE,
+	T1.BENCHMARK_ID BENCHMARK_ID,
+	T1.BENCHMARK_TYPE BENCHMARK_TYPE,
+	T1.FINPROD_ID FINPROD_ID,
+	T1.BRANCH BRANCH,
+	T1.FINPROD_TYPE FINPROD_TYPE,
+	T1.FINPROD_TYPE2 FINPROD_TYPE2, 
+	T4.CALENDAR_ID,
+	T4.VDATE,
+	T4.MDATE
+FROM
+	FIN_RATE_INFO T1, (
+SELECT
+	T2.CASH_ID,
+	MAX( T2.EFF_DATE )  EFF_DATE
+FROM
+	FIN_RATE_INFO T2 
+WHERE
+	<![CDATA[T2.EFF_DATE <= TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
+	AND T2.INT_TYPE = #{rateType02}
+GROUP BY
+	T2.CASH_ID 
+	) T3,
+	(SELECT FINPROD_ID,CALENDAR_ID,VDATE,MDATE FROM FIN_PRODUCT
+	UNION ALL
+	SELECT FINPROD_ID,CALENDAR_ID,VDATE,MDATE FROM FIN_TRADE_PRODUCT) T4 
+WHERE
+	<![CDATA[T1.EFF_DATE <= TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
+	AND T1.EFF_DATE = T3.EFF_DATE 
+	AND T1.CASH_ID = T3.CASH_ID 
+	AND T1.INT_TYPE = #{rateType02}
+	AND T1.FINPROD_ID = T4.FINPROD_ID 
+	AND <![CDATA[T4.VDATE < TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
+	AND <![CDATA[T4.MDATE > TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
+	<if test="productIdList != null and !productIdList.isEmpty()">
+	AND T1.FINPROD_ID in
+		<foreach collection="productIdList" item="item" index="index" separator="," open="(" close="))">
+			<if test="(index % 999) == 998">
+				null) OR T1.FINPROD_ID in (
+			</if>
+			#{item}
+		</foreach>
+	</if>
+
+	AND T1.FINPROD_TYPE in (
+	select d.item_code from sys_datadict_list d where d.dict_code='RESET_SCOPE')
+	<!--zhangnian add 20191022 利率重置批处理修改 start -->
+	UNION ALL
+	SELECT T1.CASH_ID          CASH_ID,
+	T1.EFF_DATE         EFF_DATE,
+	T1.INT_TYPE         INT_TYPE,
+	T1.BASIS            BASIS,
+	T1.RESET_TYPE       RESET_TYPE,
+	T1.RESET_FREQ       RESET_FREQ,
+	T1.FIRST_RESET_DATE FIRST_RESET_DATE,
+	T1.RESET_DATE       RESET_DATE,
+	T1.OBSERVE_BEF_DAY  OBSERVE_BEF_DAY,
+	T1.OBSERVE_BEF_UNIT OBSERVE_BEF_UNIT,
+	T1.RATE             RATE,
+	T1.COEFFICIENT      COEFFICIENT,
+	T1.SPREAD_RATE      SPREAD_RATE,
+	T1.HIGHEST_RATE     HIGHEST_RATE,
+	T1.LOWEST_RATE      LOWEST_RATE,
+	T1.BENCHMARK_ID     BENCHMARK_ID,
+	T1.BENCHMARK_TYPE   BENCHMARK_TYPE,
+	T1.FINPROD_ID       FINPROD_ID,
+	T1.BRANCH           BRANCH,
+	T1.FINPROD_TYPE     FINPROD_TYPE,
+	T1.FINPROD_TYPE2    FINPROD_TYPE2,
+	NULL,
+	NULL,
+	NULL
+	FROM FIN_RATE_INFO T1,
+	(SELECT T2.CASH_ID,
+	MAX(T2.EFF_DATE) EFF_DATE
+	FROM FIN_RATE_INFO T2
+	WHERE <![CDATA[T2.EFF_DATE <= TO_DATE(#{sysDate}, 'YYYY-MM-DD')]]>
+	AND T2.INT_TYPE = #{rateType02}
+	GROUP BY T2.CASH_ID) T3,
+	STL_CAPACCT_INFO T4
+	WHERE  <![CDATA[T1.EFF_DATE <= TO_DATE(#{sysDate}, 'YYYY-MM-DD')]]>
+	AND T1.EFF_DATE = T3.EFF_DATE
+	AND T1.CASH_ID = T3.CASH_ID
+	AND T1.INT_TYPE = #{rateType02}
+	AND T1.FINPROD_ID = T4.ACCT_NO
+	AND T1.FINPROD_TYPE in (
+	select d.item_code from sys_datadict_list d where d.dict_code='RESET_SCOPE')
+	<!--zhangnian add 20191022 利率重置批处理修改 end -->
+</select>
+
+<!-- 浮动利率接口表，获取List<WIND_浮息债报价表Entity> -->
+<select id="selectInterfFloatingcouponsrate" resultType="com.joyintech.tams.common.base.entity.InterfFloatingcouponsrate">
+	SELECT
+		T1.OBJECT_ID OBJECT_ID,
+		T1.S_INFO_WINDCODE S_INFO_WINDCODE,
+		T1.CHANGE_DT CHANGE_DT,
+		T1.RATE RATE,
+		T1.OPDATE OPDATE,
+		T1.OPMODE OPMODE 
+	FROM
+		INTERF_FLOATINGCOUPONSRATE T1,FIN_PRODUCT T2 	
+	WHERE T1.S_INFO_WINDCODE = T2.FINPROD_MARKET_ID
+	AND T2.FINPROD_ID = #{finprodId}
+	AND T1.CHANGE_DT = #{sysDate}
+</select>
+
+<select id="getMstIntRateInfo" resultType="com.joyintech.tams.valuation.batch.resetbaseruleinfo.dto.MstIntRateInfoDto">
+SELECT
+	INT_RATE_ID INT_RATE_ID,
+	INT_RATE_TYPE INT_RATE_TYPE,
+	EFF_DATE EFF_DATE,
+	RELAESE_DATE RELAESE_DATE,
+	INT_RATE INT_RATE,
+	CCY CCY,
+	INPUT_TYPE INPUT_TYPE
+FROM
+	MST_INT_RATE_INFO
+WHERE
+	EFF_DATE = TO_DATE(#{effDate},'YYYY-MM-DD')
+	AND INT_RATE_ID = #{intRateId}
+</select>
+
+<select id="getMstIntRateInfo2" resultType="com.joyintech.tams.valuation.batch.resetbaseruleinfo.dto.MstIntRateInfoDto">
+SELECT
+	T1.INT_RATE_ID INT_RATE_ID,
+	T1.INT_RATE_TYPE INT_RATE_TYPE,
+	T1.EFF_DATE EFF_DATE,
+	T1.RELAESE_DATE RELAESE_DATE,
+	T1.INT_RATE INT_RATE,
+	T1.CCY CCY,
+	T1.INPUT_TYPE INPUT_TYPE 
+FROM
+	MST_INT_RATE_INFO T1,
+	( SELECT max( T2.EFF_DATE ) EFF_DATE, T2.INT_RATE_ID FROM MST_INT_RATE_INFO T2 
+	WHERE <![CDATA[  T2.EFF_DATE <= TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
+	GROUP BY T2.INT_RATE_ID ) T3 
+WHERE
+	T1.EFF_DATE = T3.EFF_DATE 
+	AND T1.INT_RATE_ID = T3.INT_RATE_ID
+	AND T1.INT_RATE_ID = #{intRateId}
+</select>
+
+
+<select id="getPlanVdateBySysDate" resultType="java.util.Date">
+SELECT
+	VDATE 
+FROM
+	FIN_CASH_PLAN
+where VDATE = TO_DATE(#{sysDate},'YYYY-MM-DD')
+<if test="cashId != null and cashId != ''">
+AND CASH_ID = #{cashId}
+</if>
+</select>
+
+<select id="getDealCalendarHoliday" resultType="java.lang.String">
+        select
+        	to_char(CDATE, 'yyyy-MM-dd') as HOLIDATE
+        from
+        	VAL_VW_MST_HOLIDAY
+        where
+        	IS_HOLIDAY > 0
+		  	<if test="startDate != null">
+		  		and CDATE >= #{startDate, jdbcType=DATE}
+		  	</if>
+		  	<if test="endDate != null">
+		  		and CDATE &lt;= #{endDate, jdbcType=DATE}
+		  	</if>
+		  	<if test="dealCalId != null and dealCalId != ''">
+		  		and TRADE_CALENDAR_ID = #{dealCalId}
+		  	</if>
+    </select>
+    
+</mapper>
