@@ -1,31 +1,24 @@
 package com.joyintech.tams.exchange.datacommon.db.service.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
+import com.google.common.collect.Maps;
 import com.joyintech.tams.exchange.common.db.domain.InstructionDetail;
 import com.joyintech.tams.exchange.common.db.domain.InstructionDetailExample;
 import com.joyintech.tams.exchange.datacommon.cache.impl.AsyncServiceImpl;
 import com.joyintech.tams.exchange.datacommon.db.dao.IMybatisMapper;
 import com.joyintech.tams.exchange.datacommon.db.dao.InstructionDetailMapper;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionDetailService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class InstructionDetailServiceImpl extends AsyncServiceImpl<String, InstructionDetail> implements InstructionDetailService {
 
+    private final Map<String, Map<String, InstructionDetail>> instructionIdMap =  Maps.newConcurrentMap();
     @Autowired
     private InstructionDetailMapper instructionDetailMapper;
 
-    private Map<String, Map<String, InstructionDetail>> instructionIdMap = new ConcurrentHashMap<>();
-    
     @Override
     public List<InstructionDetail> queryInstructionDetailsByInstructionId(String instructionId) {
         return new ArrayList<>(instructionIdMap.getOrDefault(instructionId, new HashMap<>()).values());
@@ -55,13 +48,11 @@ public class InstructionDetailServiceImpl extends AsyncServiceImpl<String, Instr
     }
 
     @Override
-    protected void update(InstructionDetail instructionDetail) {
-        Map<String, InstructionDetail> instructionDetailMap = instructionIdMap.get(instructionDetail.getEntrustId());
-        if (Objects.isNull(instructionDetailMap)) {
-            instructionDetailMap = new ConcurrentHashMap<>();
-            instructionIdMap.put(instructionDetail.getEntrustId(), instructionDetailMap);
-        }
-        instructionDetailMap.put(instructionDetail.getId(), instructionDetail);
+    protected void update(InstructionDetail detail) {
+        String instructionId = detail.getEntrustId();
+        Map<String, InstructionDetail> detailMap = instructionIdMap.getOrDefault(instructionId, Maps.newHashMap());
+        detailMap.put(detail.getId(), detail);
+        instructionIdMap.putIfAbsent(instructionId, detailMap);
     }
 
     @Override
@@ -82,5 +73,5 @@ public class InstructionDetailServiceImpl extends AsyncServiceImpl<String, Instr
         }
     }
 
-	
+
 }
