@@ -34,7 +34,7 @@
 			t.TRADE_DATE purApplyDate,/**申请日期**/
 			stl.SETTLE_DATE purSettleDate,/**结算日期**/
 			t.TRADE_AMT purApplyAmt,/**申请金额**/
-			t.MY_ACCT_NO purMyAcctNo/**资金账户**/
+			t.MY_ACCT_NO purMyAcctNo,/**资金账户**/
 			t.TRADE_DATE purConfirmDate,/**确认日期**/
 			t.TRADE_AMT purConfirmAmt,/**确认金额**/
 			t.SHARE_AMT purConfirmNum,/**确认数量**/
