@@ -16,11 +16,9 @@ import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFi
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInitRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubProductDto;
-import com.joyintech.tams.common.base.dao.WflEtrEntrustMapper;
-import com.joyintech.tams.common.base.entity.RegTradeFee;
-import com.joyintech.tams.common.base.entity.RegTradeFeeTotal;
-import com.joyintech.tams.common.base.entity.TrdTradeFeeDetail;
-import com.joyintech.tams.common.base.entity.WflEtrEntrustKey;
+import com.joyintech.tams.common.base.dao.*;
+import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt4;
@@ -50,18 +48,6 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
 
     private static final Logger logger = LoggerFactory.getLogger(CfetsTrdBondFirstSub002Service.class);
 
-    @Autowired
-    private CfetsTrdBondFirstSub001Mapper cfetsTrdBondFirstSub001Mapper;
-
-    @Autowired
-    private CfetsTrdBondFirstSub002Mapper cfetsTrdBondFirstSub002Mapper;
-
-    /**
-     * 指令信息(流程中)
-     */
-    @Autowired
-    private WflEtrEntrustMapper wflEtrEntrustMapper;
-
     /**
      * 平台日期组件接口，提供平台日期的获取和更新
      */
@@ -74,20 +60,47 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     @Autowired
     private CfetsTrdBondFirstSub001Service cfetsTrdBondFirstSub001Service;
 
+    @Autowired
+    private CfetsTrdBondFirstSub001Mapper cfetsTrdBondFirstSub001Mapper;
+
+    @Autowired
+    private CfetsTrdBondFirstSub002Mapper cfetsTrdBondFirstSub002Mapper;
+
+    /**
+     * 指令信息(流程中)
+     */
+    @Autowired
+    private WflEtrEntrustMapper wflEtrEntrustMapper;
+
+    @Autowired
+    private BidOrderMapper bidOrderMapper;
+
+    @Autowired
+    private WflBidOrderMapper wflBidOrderMapper;
+
+    @Autowired
+    private BidOrderBidPriceMapper bidOrderBidPriceMapper;
+
+    @Autowired
+    private WflBidOrderBidPriceMapper wflBidOrderBidPriceMapper;
+
     /**
      * 认购量最小变动单位
      */
-    private static BigDecimal subMinChangeUnit = new BigDecimal(1000);
+    private static final BigDecimal subMinChangeUnit = new BigDecimal(1000);
 
     /**
      * 应缴款金额最小变动单位
      */
-    private static BigDecimal payMinChangeUnit = new BigDecimal(0.01);
+    private static final BigDecimal payMinChangeUnit = new BigDecimal("0.01");
 
     /**
      * 结算服务费最小变动单位
      */
-    private static BigDecimal feeMinChangeUnit = new BigDecimal(0.01);
+    private static final BigDecimal feeMinChangeUnit = new BigDecimal("0.01");
+
+    @Autowired(required = false)
+    private BaseGetBusinessId baseGetBusinessId;
 
     /**
      * 申购点击check
@@ -159,7 +172,12 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         logger.debug("初始化申购页面,入参:" + JsonUtils.object2Json(request));
         CfetsTrdBondFirstSubInfoDto cfetsTrdBondFirstSubInfoDto = new CfetsTrdBondFirstSubInfoDto();
         Map<String, Object> param = new HashMap<>();
+        List<String> entrustIdList = new ArrayList<>();
         //1.查询申购产品列表(获取资产信息,及剩余指令额度)
+        request.getEntrustDtos().forEach(item -> {
+            entrustIdList.add(item.getEntrustId());
+        });
+        param.put("entrustIdList", entrustIdList);
         List<CfetsTrdBondFirstSubInfoDto> listTmp = cfetsTrdBondFirstSub002Mapper.selectSubProducts(param);
         // 数据为空或查询结果大于1 返回空值
         if (CollectionUtils.isEmpty(listTmp)
@@ -225,7 +243,6 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             trdTradeFeeDetails.forEach(item -> {
                 if (StringUtil.equals(item.getFeeType(), BussinessDictCodeList.费用类型_结算手续费.getValue())) {
                     dto.setSettFeeAmt(item.getFeeAmt());
-                    return;
                 }
             });
         }
@@ -513,15 +530,17 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      * @author jiangpeng
      * @date 2022/4/21 14:29
      */
-    public static BussinessCodeParameter getBussinessCodeParameter(String ps) {
-        BussinessCodeParameter codeParameter = new BussinessCodeParameter();
-//        if (StringUtil.equals(com.joyintech.tams.constant.DictCodeList.交易方向_买入.getValue(), ps)) {
-//            codeParameter.setCommonBusinessType(com.joyintech.tams.constant.DictCodeList.共通业务类型_债券买入);
-//        } else {
-//            codeParameter.setCommonBusinessType(com.joyintech.tams.constant.DictCodeList.共通业务类型_债券卖出);
-//        }
-        //TODO 处理逻辑
-        return codeParameter;
+    public String getBidId(BussinessDictCodeList ps) {
+        if (!StringUtil.isNotEmpty(ps)) {
+            ps = BussinessDictCodeList.共同业务类型_中标结果确认;
+        }
+        if (baseGetBusinessId != null) {
+            BussinessCodeParameter codeParameter = new BussinessCodeParameter();
+            codeParameter.setCommonBusinessType(ps);
+            return baseGetBusinessId.buildBussinessCode(codeParameter);
+        } else {
+            return IDGenerator.generate();
+        }
     }
 
     /**
@@ -589,16 +608,79 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     }
 
     /**
+     * 提交校验
+     *
+     * @param dto 页面元素
+     * @return com.joyintech.framework.ajax.AjaxResult
+     * @author jiangpeng
+     * @date 2022/4/25 10:35
+     */
+    public AjaxResult check(CfetsTrdBondFirstSubInfoDto dto) {
+        AjaxResult ajaxResult = new AjaxResult();
+        List<ValidMessage> errorList = new ArrayList<>();
+        //必填项校验
+        errorList.addAll(this.checkNotEmpty(dto));
+        //金额校验
+        errorList.addAll(this.checkCalAmt(dto));
+        if (StringUtil.isNotEmpty(errorList)) {
+            ajaxResult.setErrorList(errorList);
+        }
+//        ajaxResult.resetStatuCode();
+        return ajaxResult;
+    }
+
+    /**
+     * 处理发起流程逻辑
+     *
+     * @param dto           页面元素
+     * @param operationType 操作类型
+     * @author jiangpeng
+     * @date 2022/4/24 11:42
+     */
+    @Override
+    public void doInsert(CfetsTrdBondFirstSubInfoDto dto, OperationType operationType) {
+        WflBidOrder wflBidOrder = new WflBidOrder();
+        BeanUtil.copyPropertiesIgnoreNull(wflBidOrder, dto);
+        // 投标日期=交易日
+        wflBidOrder.setBidDate(dto.getTradeDate());
+        wflBidOrder.setIsCancel(DictCodeList.是否_否.getValue());
+        wflBidOrder.setTradeStatus(DictCodeListExt1.画面数据状态_新建.getValue());
+        wflBidOrder.setWorkflowStatus(DictCodeList.数据状态_新建.getValue());
+        wflBidOrderMapper.insertSelective(wflBidOrder);
+        for (CfetsTrdBondFirstSubProductDto item : dto.getProductDtos()) {
+            WflBidOrderBidPrice wflBidOrderBidPrice = new WflBidOrderBidPrice();
+            BeanUtil.copyPropertiesIgnoreNull(wflBidOrderBidPrice, item);
+            wflBidOrderBidPrice.setBidId(dto.getBidId());
+            wflBidOrderBidPrice.setIsCancel(DictCodeList.是否_否.getValue());
+            wflBidOrderBidPrice.setTradeStatus(DictCodeListExt1.画面数据状态_新建.getValue());
+            wflBidOrderBidPrice.setWorkflowStatus(DictCodeList.数据状态_新建.getValue());
+            wflBidOrderBidPriceMapper.insertSelective(wflBidOrderBidPrice);
+        }
+    }
+
+    /**
      * 处理生效逻辑
      *
-     * @param dto
-     * @param operationType
+     * @param dto           页面元素
+     * @param operationType 操作类型
      * @author jiangpeng
      * @date 2022/4/24 11:42
      */
     @Override
     public void doComplete(CfetsTrdBondFirstSubInfoDto dto, OperationType operationType) {
-
+        BidOrder bidOrder = new BidOrder();
+        BeanUtil.copyPropertiesIgnoreNull(bidOrder, dto);
+        // 投标日期=交易日
+        bidOrder.setBidDate(dto.getTradeDate());
+        bidOrder.setIsCancel(DictCodeList.是否_否.getValue());
+        bidOrderMapper.insertSelective(bidOrder);
+        for (CfetsTrdBondFirstSubProductDto item : dto.getProductDtos()) {
+            BidOrderBidPrice bidOrderBidPrice = new BidOrderBidPrice();
+            BeanUtil.copyPropertiesIgnoreNull(bidOrderBidPrice, item);
+            bidOrderBidPrice.setBidId(dto.getBidId());
+            bidOrderBidPrice.setIsCancel(DictCodeList.是否_否.getValue());
+            bidOrderBidPriceMapper.insertSelective(bidOrderBidPrice);
+        }
     }
 
     /**
@@ -731,6 +813,130 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                 feeTailDifference = ArithmeticUtil.subtract(feeTailDifference, feeAssign);
             }
         }
+    }
+
+    /**
+     * 必填项校验
+     *
+     * @param dto 页面元素
+     * @return java.util.List<com.joyintech.framework.validation.ValidMessage>
+     * @author jiangpeng
+     * @date 2022/4/25 10:40
+     */
+    private List<ValidMessage> checkNotEmpty(CfetsTrdBondFirstSubInfoDto dto) {
+        List<ValidMessage> errorList = new ArrayList<>();
+        // 资产代码
+        if (StringUtil.isEmpty(dto.getFinprodId())) {
+            errorList.add(new ValidMessage("资产代码不可为空!"));
+        }
+        // 本方 - 条件必填
+        if (StringUtil.isEmpty(dto.getOuPartyId())) {
+            errorList.add(new ValidMessage("资产代码不可为空!"));
+        }
+        // 本方交易员
+        if (StringUtil.isEmpty(dto.getOurTrader())) {
+            errorList.add(new ValidMessage("本方交易员不可为空!"));
+        }
+        // 发行价格
+        if (!StringUtil.isNotEmpty(dto.getIssuePrice())) {
+            errorList.add(new ValidMessage("发行价格不可为空!"));
+        }
+        // 参考收益率
+        if (!StringUtil.isNotEmpty(dto.getReferenceRate())) {
+            errorList.add(new ValidMessage("参考收益率不可为空!"));
+        }
+        // 票面利率
+        if (!StringUtil.isNotEmpty(dto.getRate())) {
+            errorList.add(new ValidMessage("票面利率不可为空!"));
+        }
+        // 认购量
+        if (!StringUtil.isNotEmpty(dto.getSubscriptionAmount())) {
+            errorList.add(new ValidMessage("认购量不可为空!"));
+        }
+        // 应缴款金额
+        if (!StringUtil.isNotEmpty(dto.getPayableAmount())) {
+            errorList.add(new ValidMessage("应缴款金额不可为空!"));
+        }
+        // 分配方式
+        if (StringUtil.isEmpty(dto.getDipType())) {
+            errorList.add(new ValidMessage("分配方式不可为空!"));
+        }
+        return errorList;
+    }
+
+    /**
+     * 数值校验
+     *
+     * @param dto 页面元素
+     * @return java.util.List<com.joyintech.framework.validation.ValidMessage>
+     * @author jiangpeng
+     * @date 2022/4/25 10:40
+     */
+    private List<ValidMessage> checkCalAmt(CfetsTrdBondFirstSubInfoDto dto) {
+        List<ValidMessage> errorList = new ArrayList<>();
+        BigDecimal avaNum = BigDecimal.ZERO;
+        BigDecimal payableAmount = BigDecimal.ZERO;
+        BigDecimal subscriptionAmount = BigDecimal.ZERO;
+        BigDecimal settFeeAmt = BigDecimal.ZERO;
+        // 产品申购列表
+        for (CfetsTrdBondFirstSubProductDto item : dto.getProductDtos()) {
+            // 指令代码
+            if (StringUtil.isEmpty(item.getEntrustId())) {
+                errorList.add(new ValidMessage("申购产品列表中指令代码不可为空!"));
+            }
+            // 组合名称
+            if (StringUtil.isEmpty(item.getPortfolioId())) {
+                errorList.add(new ValidMessage("申购产品列表中组合名称不可为空!"));
+            }
+            // 剩余指令额度
+            if (!StringUtil.isNotEmpty(item.getAvaNum())) {
+                errorList.add(new ValidMessage("申购产品列表中剩余指令额度不可为空!"));
+            } else {
+                ArithmeticUtil.doAdd(avaNum, item.getAvaNum());
+            }
+            // 认购量
+            if (!StringUtil.isNotEmpty(item.getSubscriptionAmount())) {
+                errorList.add(new ValidMessage("申购产品列表中结算服务费不可为空!"));
+            } else {
+                ArithmeticUtil.doAdd(subscriptionAmount, item.getSubscriptionAmount());
+            }
+            // 结算服务费
+            if (!StringUtil.isNotEmpty(item.getSettFeeAmt())) {
+                errorList.add(new ValidMessage("申购产品列表中结算服务费不可为空!"));
+            } else {
+                ArithmeticUtil.doAdd(settFeeAmt, item.getSettFeeAmt());
+            }
+            // 应缴款金额
+            if (!StringUtil.isNotEmpty(item.getPayableAmount())) {
+                errorList.add(new ValidMessage("申购产品列表中应缴款金额不可为空!"));
+            } else {
+                ArithmeticUtil.doAdd(payableAmount, item.getPayableAmount());
+            }
+            // 业务模式
+            if (StringUtil.isEmpty(item.getBusinessModel())) {
+                errorList.add(new ValidMessage("申购产品列表中业务模式不可为空!"));
+            }
+            // 证券账户
+            if (StringUtil.isEmpty(item.getSecManageAcctId())) {
+                errorList.add(new ValidMessage("申购产品列表中证券账户不可为空!"));
+            }
+            // TODO 申购产品列表中认购量要小于等于（剩余指令额度-流程中申购额度），不满足时提示到组合维度
+        }
+        // 申购产品列表中认购量、应缴款金额、结算手续费要等于基本信息中各字段的汇总值
+        if (BigDecimalUtil.ACompareToB(subscriptionAmount, dto.getSubscriptionAmount(), 6) != 0) {
+            errorList.add(new ValidMessage("申购产品列表中认购量的汇总值要等于基本信息中认购量!"));
+        }
+        if (BigDecimalUtil.ACompareToB(payableAmount, dto.getPayableAmount(), 6) != 0) {
+            errorList.add(new ValidMessage("申购产品列表中应缴款金额的汇总值要等于基本信息中应缴款金额!"));
+        }
+        if (BigDecimalUtil.ACompareToB(settFeeAmt, dto.getSettFeeAmt(), 6) != 0) {
+            errorList.add(new ValidMessage("申购产品列表中结算手续费的汇总值要等于基本信息中结算手续费!"));
+        }
+        // TODO 基本信息中的认购量需大于等于标的中单笔最低量，小于等于单笔最高量，如标的中无数据则不用判断
+        // TODO 校验当前资产+证券账户维度下流程中、有效的申购记录认购量之和需小于等于标的中最高认购总量，如标的中无数据则不用判断
+        // TODO 申购产品列表中所有组合关联的交易账户必须一致
+
+        return errorList;
     }
 }
 

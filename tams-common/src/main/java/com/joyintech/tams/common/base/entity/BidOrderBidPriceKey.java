@@ -17,21 +17,28 @@ public class BidOrderBidPriceKey extends BaseEntity {
     private String entrustId;
 
     /**
+     * 组合代码
+     */
+    private String portfolioId;
+
+    /**
      * 投标标位
      */
-    @JsonSerialize(using=BigDecimalSerializer.class)
+    @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal bidPrice;
 
     /**
-     * 取得 投标编号
-     * @return 投标编号
+     * 投标编号
+     *
+     * @return BID_ID 投标编号
      */
     public String getBidId() {
         return bidId;
     }
 
     /**
-     * 设置 投标编号
+     * 投标编号
+     *
      * @param bidId 投标编号
      */
     public void setBidId(String bidId) {
@@ -39,15 +46,17 @@ public class BidOrderBidPriceKey extends BaseEntity {
     }
 
     /**
-     * 取得 委托代码
-     * @return 委托代码
+     * 委托代码
+     *
+     * @return ENTRUST_ID 委托代码
      */
     public String getEntrustId() {
         return entrustId;
     }
 
     /**
-     * 设置 委托代码
+     * 委托代码
+     *
      * @param entrustId 委托代码
      */
     public void setEntrustId(String entrustId) {
@@ -55,18 +64,38 @@ public class BidOrderBidPriceKey extends BaseEntity {
     }
 
     /**
-     * 取得 投标标位
-     * @return 投标标位
+     * 投标标位
+     *
+     * @return BID_PRICE 投标标位
      */
     public BigDecimal getBidPrice() {
         return bidPrice;
     }
 
     /**
-     * 设置 投标标位
+     * 投标标位
+     *
      * @param bidPrice 投标标位
      */
     public void setBidPrice(BigDecimal bidPrice) {
         this.bidPrice = bidPrice;
+    }
+
+    /**
+     * 组合代码
+     *
+     * @return PORTFOLIO_ID 组合代码
+     */
+    public String getPortfolioId() {
+        return portfolioId;
+    }
+
+    /**
+     * 组合代码
+     *
+     * @param portfolioId 组合代码
+     */
+    public void setPortfolioId(String portfolioId) {
+        this.portfolioId = portfolioId == null ? null : portfolioId.trim();
     }
 }

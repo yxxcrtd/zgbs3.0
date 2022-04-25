@@ -7,16 +7,24 @@ import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
 import com.joyintech.tams.cfets.trd.bond.dto.RiskCalRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.*;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBondFirstSub001Service;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBondFirstSub002Service;
+import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.component.business.riskrds.controller.InterfRiskRdsController;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.client.ClientData;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import com.joyintech.workflow.engine.constant.OperationType;
+import com.joyintech.workflow.engine.dto.ProcessParameter;
+import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,6 +70,12 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
      */
     @Autowired
     private InterfRiskRdsController interfRiskRdsController;
+
+    @Autowired(required = false)
+    private BaseGetBusinessId baseGetBusinessId;
+
+    @Autowired
+    private IPlatformDate iPlatformDate;
 
     @ApiOperation(value = "初始化参数", notes = "初始化参数")
     @PostMapping("/initParams")
@@ -262,11 +277,11 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
     @ResponseBody
     public Message<AjaxResult> check(@RequestBody CfetsTrdBondFirstSubInfoDto dto) {
         try {
-            AjaxResult ajaxResult = new AjaxResult();
+            AjaxResult ajaxResult = cfetsTrdBondFirstSub002Service.check(dto);
             return new Message<AjaxResult>().success().setData(ajaxResult);
         } catch (Exception e) {
-            logger.error("计算数据异常", e);
-            return new Message<AjaxResult>().fail().setMessage("计算数据异常");
+            logger.error("申购提交检查异常", e);
+            return new Message<AjaxResult>().fail().setMessage("申购提交检查异常");
         }
     }
 
@@ -281,13 +296,28 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
     @ApiOperation(value = "申购提交(保存)", notes = "申购提交(保存)")
     @ResponseBody
     @RequestMapping("save")
-    public Message<AjaxResult> save(@RequestBody CfetsTrdBondFirstSubInfoDto dto) throws WorkFlowException {
+    public Message<AjaxResult> save(@RequestBody CfetsTrdBondFirstSubInfoDto dto, BindingResult br) throws WorkFlowException {
+        if (br.hasErrors()) {
+            return new Message<AjaxResult>().success().setData(new AjaxResult(br));
+        }
+        dto.setBidId(cfetsTrdBondFirstSub002Service.getBidId(null));
+        ProcessParameter<CfetsTrdBondFirstSubInfoDto> processParameter = new ProcessParameter<>();
+        WorkFlowParameter<CfetsTrdBondFirstSubInfoDto> params = new WorkFlowParameter<>();
+        params.setPageId("TenderBondSub002");
+        params.setElementId(dto.getElementId());
+        params.setBusinessType(BussinessDictCodeList.共同业务类型_中标结果确认.getValue());
+        params.setBusinessCode(dto.getBidId());
+        String str = "交易日期:" + DateUtil.format(iPlatformDate.getSysDate());
+        String finalStr = str;
+        params.setComment(entity -> finalStr);
+        processParameter.setWorkFlowParameter(params);
+        processParameter.setOperationType(OperationType.NEW);
         try {
-            AjaxResult ajaxResult = new AjaxResult();
-            return new Message<AjaxResult>().success().setData(ajaxResult);
+            String msg = cfetsTrdBondFirstSub002Service.start(processParameter, dto);
+            return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
         } catch (Exception e) {
-            logger.error("计算数据异常", e);
-            return new Message<AjaxResult>().fail().setMessage("计算数据异常");
+            logger.error("保存申购新建失败", e);
+            return PositionUtil.ajaxErrorReturn(e);
         }
     }
 
