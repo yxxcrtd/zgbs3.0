@@ -33,6 +33,8 @@
     //指令真实价格
     var factPrice = zeroPrice;
 
+    var rskStatus = 0;
+
     function query(ele) {
         return $("#EtrExchangeTradeCommon004_bodydiv " + ele);
     }
@@ -774,7 +776,7 @@
                 }
             } else {
                 //return parent.EtrExchangeTradeJjHq.getJJMktPrice("#latestPrice_jj");
-                return jJHQXX.ceiling.toFixed(2);
+                return jJHQXX.latest.toFixed(2);
             }
         } else if (currentTab == "gd") {
             return $("#price_gd").get(0).value;
@@ -2560,6 +2562,7 @@
                     $("#yield_" + currentTab).val(result.data.yield).trigger('blur');
                 }, false);
                 calcEntrustNumAndAmt();
+                linkTableEntrustNumAmt();
             } else {
                 $("#fprice_" + currentTab).val('').trigger('blur');
                 $("#yield_" + currentTab).val('').trigger('blur');
@@ -4057,6 +4060,10 @@
         riskFlag = flag;
     }
 
+    function setRskStatus(status) {
+        rskStatus = status;
+    }
+
     function paramCheck() {
         var ps = $("#ps_" + currentTab).val();
         console.log(riskFlag);
@@ -4155,28 +4162,33 @@
                     return ;
                 }
             }
-            Joyin.ajaxJson(basePath + '/etrexchange/common/EtrExchangeTradeCommon004/checkSaveError', object,
-                function (result) {
-                    if (ETR_CHECK_POS_SWITCH == '01' && posSwitch) {
-                        result.data = "组合分配中可用持仓不足,请确认是否要提交";
-                    }
-                    if(result.statuCode !== 200){
 
-                    }else{
-                        result.data = "请确认是否要提交";
-                    }
-                    Joyin.confirm(result.data, function () {
-                        Joyin.ajaxJson(basePath + '/etrexchange/common/EtrExchangeTradeCommon004/buildDtoFromTodoSubmit', object,
-                            function (res) {
-                                WorkFlow.doSubmitList(basePath + '/etrexchange/common/EtrExchangeTradeCommon004/save', res, "EtrExchangeTrade004_btn_submit", null, function () {
-                                    JoyinUtil.disableButton("EtrExchangeTradeCommon004_btn_submit", false);
-                                })
-                            });
-                    });
-                });
-
-
+            saveOrSubmitQues(object,posSwitch);
         }
+    }
+
+    function saveOrSubmitQues(object,posSwitch){
+        Joyin.ajaxJson(basePath + '/etrexchange/common/EtrExchangeTradeCommon004/checkSaveError', object,
+            function (result) {
+                if (ETR_CHECK_POS_SWITCH == '01' && posSwitch) {
+                    result.data = "组合分配中可用持仓不足,请确认是否要提交";
+                }else if(rskStatus > 0){
+                    alert(rskStatus);
+                    result.data = "风险试算不通过，是否继续提交";
+                }else if(result.statuCode !== 200){
+
+                }else{
+                    result.data = "请确认是否要提交";
+                }
+                Joyin.confirm(result.data, function () {
+                    Joyin.ajaxJson(basePath + '/etrexchange/common/EtrExchangeTradeCommon004/buildDtoFromTodoSubmit', object,
+                        function (res) {
+                            WorkFlow.doSubmitList(basePath + '/etrexchange/common/EtrExchangeTradeCommon004/save', res, "EtrExchangeTrade004_btn_submit", null, function () {
+                                JoyinUtil.disableButton("EtrExchangeTradeCommon004_btn_submit", false);
+                            })
+                        });
+                });
+            });
     }
 
 
@@ -4518,6 +4530,7 @@
                 tableRisk.clear();
                 tableRisk.addRow(entity_RiskTrialRetList);
                 setRiskFlag(0);
+                setRskStatus(data.data.data.rskStatus);
             });
         });
         $("#etrExchangeTradeMulti001_btn_add").click(function () {

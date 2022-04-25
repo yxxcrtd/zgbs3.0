@@ -231,6 +231,8 @@ public class EtrExchangeTradeSaveRequest extends EtrEntrust implements ProcessEn
     @ApiModelProperty(required = true,name="portfolioList",value="组合列表",example="[{'portfolioId':'qwqw'}]]")
     List<EtrExchangeTradePortfolioRequest> portfolioList;
 
+    List<EtrExchangeTradePortfolioRequest> tradeMultiPtl001Dtos; //待办提交风险试算结果保存需要
+
     /**
      * 组合名称
      */
@@ -753,5 +755,9 @@ public class EtrExchangeTradeSaveRequest extends EtrEntrust implements ProcessEn
 
     public void setCurrentTab(String currentTab) {
         this.currentTab = currentTab;
+    }
+
+    public List<EtrExchangeTradePortfolioRequest> getTradeMultiPtl001Dtos(){
+        return  this.portfolioList;
     }
 }

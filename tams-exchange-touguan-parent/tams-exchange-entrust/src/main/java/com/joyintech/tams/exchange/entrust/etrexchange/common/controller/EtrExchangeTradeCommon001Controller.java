@@ -126,6 +126,10 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 
 	@Autowired
 	private EtrExchangeTradeJj001Validator etrExchangeTradeJj001Validator;
+
+	@Autowired
+	private EtrExchangeTradeCommon001Service etrExchangeTradeCommon001Service;
+
 	/**
 	 * 由于交易平台不同，设置不同交易平台对应的委托方向
 	 *
@@ -969,6 +973,22 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 			throws Exception {
 		AjaxResult ajax=null;
 		try {
+			if(StringUtil.equals(dto.getPs(),DictCodeListExt3.交易方向_配债.getValue())){
+				EtrExchangeTradeCommonRequest etrExchangeTradeCommonRequest = new EtrExchangeTradeCommonRequest();
+				etrExchangeTradeCommonRequest.setFinprodId(dto.getFinprodId());
+				etrExchangeTradeCommonRequest.setFinprodType2(dto.getFinprodType2());
+				etrExchangeTradeCommonRequest.setPortfolioId(dto.getPortfolioId());
+				etrExchangeTradeCommonRequest.setPs(dto.getPs());
+				etrExchangeTradeCommonRequest.setSecAcctId(dto.getSecAcctId());
+				Map<String,Object> param = BeanUtil.object2Map(etrExchangeTradeCommonRequest);
+				BigDecimal entrustNum = etrExchangeTradeCommon001Service.getEntrustNum(param);
+				if(entrustNum == null) {
+					entrustNum= BigDecimal.ZERO;
+				}
+				if(dto.getEntrustNum().compareTo(entrustNum) > 0){
+					return new Message<AjaxResult>().fail().setMessage("最大配债指令数量为" + entrustNum);
+				}
+			}
 			if("dbclick".equals(dto.getOptType())){
 				ajax=etrExchangeTrade001CommonService.dbClickCheck(dto);
 			}
@@ -1072,7 +1092,12 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 			}
 			List<FinProductQuto> qutos = etrExchangeTrade001CommonService.getFinProductQutoInfo(paramMap1);
 			if (qutos.size() == 0) {
-				confirmMsg = "当前资产无申购额度，是否继续？";
+//				confirmMsg = "当前资产无申购额度，是否继续？";
+				List<ValidMessage> validListEnt = new ArrayList<>();
+				validListEnt.add(new ValidMessage("当前资产无申购额度"));
+				AjaxResult ajaxResultEnt = new AjaxResult();
+				ajaxResultEnt.setErrorList(validListEnt);
+				return ajaxResultEnt;
 			}
 		}
 
@@ -1105,7 +1130,12 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 			}
 			List<FinProductQuto> qutos = etrExchangeTrade001CommonService.getFinProductQutoInfo(paramMap1);
 			if (qutos.size() == 0) {
-				confirmMsg = "当前资产无配股/配债额度，是否继续？";
+//				confirmMsg = "当前资产无配股/配债额度，是否继续？";
+				List<ValidMessage> validListEnt = new ArrayList<>();
+				validListEnt.add(new ValidMessage("当前资产无配股/配债额度"));
+				AjaxResult ajaxResultEnt = new AjaxResult();
+				ajaxResultEnt.setErrorList(validListEnt);
+				return ajaxResultEnt;
 			}else{
 				if(dto.getEntrustNum().compareTo(qutos.get(0).getQuto())==1){
 					List<ValidMessage> validListEnt = new ArrayList<>();
