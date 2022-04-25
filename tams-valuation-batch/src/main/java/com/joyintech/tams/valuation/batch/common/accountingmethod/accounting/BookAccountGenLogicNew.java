@@ -28,7 +28,6 @@ import com.joyintech.tams.valuation.batch.common.base.dao.BaseAccountWriterMappe
 import com.joyintech.tams.valuation.batch.common.base.entity.extcommon.ValBokBookdetailBatch;
 import com.joyintech.tams.valuation.batch.common.cache.service.entity.ValBokBussDetsubMem;
 import com.joyintech.tams.valuation.batch.common.finproduct.service.FinProductCommonService;
-import com.joyintech.tams.valuation.batch.common.util.ExpressionUtil;
 import com.joyintech.tams.valuation.common.batch.finproduct.entity.CurrencyMarketDto;
 import com.joyintech.tams.valuation.common.batch.finproduct.service.FinProductCommonBatchService;
 import com.joyintech.tams.valuation.common.constants.BookConstant;
@@ -1769,46 +1768,8 @@ public class BookAccountGenLogicNew {
      * @return
      */
     public BokSubject getSubjectByInnerCode(List<BokSubject> listBokSubject, SubjectMappingConfig subjectMappingConfig){
-        BokSubject bokSubject = null;
-        if(CollectionUtils.isEmpty(listBokSubject)){
-            return bokSubject;
-        }
-        // 定义 变量.资产辅助核算项 封装辅助核算项为map对象
-        Map<String, Object> params = initMappingParams(subjectMappingConfig);
-        // 定义 变量.默认辅助核算项 封装辅助核算项为map对象
-        Map<String, Object> paramsDefualt = initMappingParams(subjectMappingConfig);
-        // 增加辅助核算项默认（DEFAULT) = 是(Y)
-        paramsDefualt.put(SubjectConfigCode.默认.getValue(), DictCodeList.是否_是.getValue());
-        // 定义 变量.默认科目
-        BokSubject bokSubjectDefault = null;
-        // 若只有一条记录，则直接取值
-        if(listBokSubject.size() == 1){
-            bokSubject = listBokSubject.get(0);
-        }
-        else{
-            for(BokSubject item : listBokSubject){
-                // 根据变量.资产辅助核算
-                // 项通过辅助核算项表达式匹配
-                //  科目内部科目编码不为空 且 科目内部科目编码匹配辅助核算项
-                if (StringUtil.isNotEmpty(item.getSubjectHandFelCode()) &&
-                        ExpressionUtil.booleanValue(item.getSubjectHandFelCode(), params)
-                ) {
-                    bokSubject = item;
-                    break;
-                }
-                // 比较科目与默认辅助核算项，获取默认DEFAULT=='Y'的科目,即默认科目
-                if (StringUtil.isNotEmpty(item.getSubjectHandFelCode()) &&
-                        ExpressionUtil.booleanValue(item.getSubjectHandFelCode(), paramsDefualt)
-                ) {
-                    // 默认科目 = 匹配科目
-                    bokSubjectDefault = item;
-                }
-            }
-        }
-        // 若科目信息为空，则说明未匹配对应科目信息，取默认科目
-        if(bokSubject ==null){
-            bokSubject = bokSubjectDefault;
-        }
-        return bokSubject;
+        // 将方法移到common共通中
+        return bookAccountCommonService.getSubjectByInnerCode(listBokSubject, subjectMappingConfig);
     }
+
 }
