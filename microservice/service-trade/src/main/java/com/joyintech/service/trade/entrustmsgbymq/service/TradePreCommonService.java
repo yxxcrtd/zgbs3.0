@@ -3,6 +3,7 @@ package com.joyintech.service.trade.entrustmsgbymq.service;
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.service.trade.entrustmsgbymq.dao.EntrustMsgbyMQMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustDetailMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
@@ -20,9 +21,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class TradePreCommonService {
@@ -37,9 +36,17 @@ public class TradePreCommonService {
     private EtrEntrustMapper etrEntrustMapper;
 
     @Autowired
+    private EntrustMsgbyMQMapper entrustMsgbyMQMapper;
+
+    @Autowired
     private EtrEntrustDetailMapper etrEntrustDetailMapper;
 
-    public void executePosition(FinProductTradeDto finProductTradeDto){
+    /**
+     * 处理头寸
+     * @param finProductTradeDto 交易信息
+     * @param acctNo 资金账号
+     */
+    public void executePosition(FinProductTradeDto finProductTradeDto, String acctNo){
         if(!CollectionUtils.isEmpty(finProductTradeDto.getBaseTradeProductDealDtos())&& StringUtil.isNotEmpty(finProductTradeDto.getBaseTradeProductDealDtos().get(0).getEntrustId())){
             EtrEntrust etrEntrust=etrEntrustMapper.selectByPrimaryKey(finProductTradeDto.getBaseTradeProductDealDtos().get(0).getEntrustId());
             //系列户,循环掉之前的方法
@@ -80,6 +87,10 @@ public class TradePreCommonService {
                             // ZGTFCP-1499:对系列户交易赋值对应的组合 add by fuyongsheng 20220322 start
                             trdProductDealMuilt.setPortfolioId(etrEntrustDetail.getPortfolioId());
                             // ZGTFCP-1499:对系列户交易赋值对应的组合 add by fuyongsheng 20220322 end
+                            // ZGCPCN-198:对系列户交易赋值对应的证券管理账户 modify by fuyongsheng 20220425 start
+                            trdProductDealMuilt.setSecManageAcctId(this.getTradePreSecAcctId(acctNo,
+                                    trdProductDealMuilt.getPortfolioId(), trdProductDealMuilt.getTradeMarket()));
+                            // ZGCPCN-198:对系列户交易赋值对应的证券管理账户 modify by fuyongsheng 20220425 end
                             trdProductDealAddMuilt.setPortfolioId(etrEntrustDetail.getPortfolioId());
                             List<BaseTradeProductDealDto> baseTradeProductDealDtoListMuilt=new ArrayList<>();
                             BaseTradeProductDealDto baseTradeProductDealDtoMuilt=new BaseTradeProductDealDto();
@@ -105,7 +116,7 @@ public class TradePreCommonService {
                             }
                             baseTradeProductDealDtoListMuilt.add(baseTradeProductDealDtoMuilt);
                             FinProductTradeDto finProductTradeDtoMuilt=new FinProductTradeDto();
-                            BeanUtil.copyPropertiesIgnoreNull(finProductTradeDtoMuilt,item);
+                            BeanUtil.copyPropertiesIgnoreNull(finProductTradeDtoMuilt,finProductTradeDto);
                             finProductTradeDtoMuilt.setBaseTradeProductDealDtos(baseTradeProductDealDtoListMuilt);
                             finProductTradeDtoList.add(finProductTradeDtoMuilt);
                         }
@@ -120,5 +131,20 @@ public class TradePreCommonService {
         }else{
             baseTradeProductDealCommService.execute(finProductTradeDto);
         }
+    }
+
+    /**
+     * 查找证券管理户代码
+     * @param acctNo
+     * @param portfolioId
+     * @param tradeMarket
+     * @return
+     */
+    public String getTradePreSecAcctId(String acctNo, String portfolioId, String tradeMarket){
+        Map<String,Object> secMap = new HashMap<>();
+        secMap.put("acctNo", acctNo);
+        secMap.put("portfolioId", portfolioId);
+        secMap.put("tradeMarket", tradeMarket);
+        return entrustMsgbyMQMapper.queryByAcctNo(secMap);
     }
 }
