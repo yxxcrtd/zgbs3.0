@@ -96,7 +96,7 @@ public class CommonCheckKit extends BaseCheckKit {
     public ResultBean check(BaseOrderRequest order, Instruction instruction, Instrument instrument, TickBean tickBean) throws BusinessResultException {
 
         checkAccountAndAgent(instruction);
-        checkTime(order, instruction);
+        checkTime(order, instruction, instrument);
         checkPrice(order, instruction, instrument, tickBean);
         checkPosition(order, instruction);
 
@@ -146,7 +146,7 @@ public class CommonCheckKit extends BaseCheckKit {
      * - 开启校验开关，交易时间段存在且当前时间不在交易时间段内，返回 true
      * - 其他，返回false
      */
-    public void checkTime(BaseOrderRequest order, Instruction instruction) throws BusinessResultException {
+    public void checkTime(BaseOrderRequest order, Instruction instruction, Instrument instrument) throws BusinessResultException {
 
         String trdTradeTimeSwitch = CacheUtil.getSysParam(TRD_TRADE_TIME_SWITCH);
         if (SwitcheEnum.OPEN.codeNotEquals(trdTradeTimeSwitch)) {
@@ -154,7 +154,7 @@ public class CommonCheckKit extends BaseCheckKit {
             return;
         }
 
-        List<OpenCloseTime> tradePeriod = tradeTimeService.getTradePeriod(instruction, order);
+        List<OpenCloseTime> tradePeriod = tradeTimeService.getTradePeriod(instruction, order, instrument);
         String localTime = LocalTime.now().toString();
         boolean result = false;
         for (OpenCloseTime openCloseTime : tradePeriod) {

@@ -56,7 +56,7 @@ public class PriceHelper {
         String entrustBussType = instruction.getEntrustBussType();
         String priceMode = EntrustPropUtils.getEntrustProp(instruction, order.getEntrustProp());
 
-        int tradeTimeStage = getTradeTimeStage(instruction, order);
+        int tradeTimeStage = getTradeTimeStage(instruction, order, instrument);
 
         if (IntegratedEntrustUtils.isBulk(orderInterface.getEntrustProp())) {//沪深大宗交易
             checkPriceForBulk(entrustPrice, orderInterface, instrument, tick);
@@ -386,9 +386,9 @@ public class PriceHelper {
         return errorMsg;
     }
 
-    private int getTradeTimeStage(Instruction instruction, BaseOrderRequest order) {
+    private int getTradeTimeStage(Instruction instruction, BaseOrderRequest order, Instrument instrument) {
         int tradeTimeStage = -1;
-        List<OpenCloseTime> tradePeriod = tradeTimeService.getTradePeriod(instruction, order);
+        List<OpenCloseTime> tradePeriod = tradeTimeService.getTradePeriod(instruction, order, instrument);
         String localTime = LocalTime.now().toString();
         boolean result = false;
         for (OpenCloseTime openCloseTime : tradePeriod) {
