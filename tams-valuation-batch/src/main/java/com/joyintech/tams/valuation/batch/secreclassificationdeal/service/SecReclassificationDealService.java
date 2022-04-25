@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.joyintech.tams.constant.*;
-import com.joyintech.tams.constant.DictCodeListExt2;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -52,7 +51,6 @@ import com.joyintech.tams.valuation.common.batch.finproduct.entity.TargetFinProd
 import com.joyintech.tams.valuation.common.batch.finproduct.entity.TargetSearchDto;
 import com.joyintech.tams.valuation.common.constants.BookConstant;
 import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrue;
-import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.common.constants.ValDictCodeList;
@@ -162,14 +160,14 @@ public class SecReclassificationDealService {
         // 2.1.成本类科目余额
 
         String baseSubjectNature_cost = null;
-        if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(acctEntity.getInvAim())) {
+        if (DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue().equals(acctEntity.getInvAim())) {
             baseSubjectNature_cost = DictCodeBaseSubjectNatrue.摊余成本类成本.getValue();
         }
-        else if (DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(
+        else if (DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue().equals(
             acctEntity.getInvAim())) {
             baseSubjectNature_cost = DictCodeBaseSubjectNatrue.公允价值损益类_成本.getValue();
         }
-        else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(
+        else if (DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue().equals(
             acctEntity.getInvAim())) {
             baseSubjectNature_cost = DictCodeBaseSubjectNatrue.综合收益类成本.getValue();
         }
@@ -184,14 +182,14 @@ public class SecReclassificationDealService {
         varCostSubjectNum = costBalance.getNum();
 
         String baseSubjectNature_Lx = null;
-        if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(acctEntity.getInvAim())) {
+        if (DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue().equals(acctEntity.getInvAim())) {
             baseSubjectNature_Lx = DictCodeBaseSubjectNatrue.摊余成本类债券应计利息.getValue();
         }
-        else if (DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(
+        else if (DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue().equals(
             acctEntity.getInvAim())) {
             baseSubjectNature_Lx = DictCodeBaseSubjectNatrue.公允价值损益类应计利息.getValue();
         }
-        else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(
+        else if (DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue().equals(
             acctEntity.getInvAim())) {
             baseSubjectNature_Lx = DictCodeBaseSubjectNatrue.综合收益类应计利息.getValue();
         }
@@ -205,10 +203,10 @@ public class SecReclassificationDealService {
         varLxSubjectAmt = LxBalance.getBalance();
 
         String baseSubjectNature_GYJZBD = null;
-        if (DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(acctEntity.getInvAim())) {
+        if (DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue().equals(acctEntity.getInvAim())) {
             baseSubjectNature_GYJZBD = DictCodeBaseSubjectNatrue.公允价值损益类_公允价值变动.getValue();
         }
-        else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(
+        else if (DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue().equals(
             acctEntity.getInvAim())) {
             baseSubjectNature_GYJZBD = DictCodeBaseSubjectNatrue.综合收益类_公允价值变动.getValue();
         }
@@ -224,10 +222,10 @@ public class SecReclassificationDealService {
         }
 
         String baseSubjectNature_LXTZ = null;
-        if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(acctEntity.getInvAim())) {
+        if (DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue().equals(acctEntity.getInvAim())) {
             baseSubjectNature_LXTZ = DictCodeBaseSubjectNatrue.摊余成本类利息调整.getValue();
         }
-        else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(
+        else if (DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue().equals(
             acctEntity.getInvAim())) {
             baseSubjectNature_LXTZ = DictCodeBaseSubjectNatrue.综合收益类利息调整.getValue();
         }
@@ -316,7 +314,7 @@ public class SecReclassificationDealService {
                 String couponSpecies = rstFinproduct.getCouponSpecies();
                 if ((DictCodeList.息票品种_零息.getValue().equals(couponSpecies)
                      || DictCodeList.息票品种_贴现.getValue().equals(couponSpecies))
-                    && DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(
+                    && DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue().equals(
                             finProductDealInfoComDTO.getReclsInvAim())) {
                     // 1.2 百元券面处理
                     BigDecimal varFaceValue = finProductCommonService.getFaceValue(finProductDealInfoComDTO.getFinprodId(),
@@ -418,9 +416,9 @@ public class SecReclassificationDealService {
 
                 // if（投资目的 = "摊余成本" and 重分类投资目的 = "公允价值"）
                 if (finProductDealInfoComDTO.getInvAim().equals(
-                    DictCodeListExt1.投资目的_摊余成本类.getValue())
+                    DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue())
                     && finProductDealInfoComDTO.getReclsInvAim().equals(
-                        DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue())) {
+                        DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue())) {
                     // ad.会计场景代码="摊余成本类重分类为损益类"
                     ad.setTableId(DictCodeListTableId.会计场景代码_摊余成本类重分类为损益类.getValue());
 
@@ -486,9 +484,9 @@ public class SecReclassificationDealService {
                 }
                 // else if（投资目的 = "摊余成本" and 重分类投资目的 = "综合收益"）
                 else if (finProductDealInfoComDTO.getInvAim().equals(
-                    DictCodeListExt1.投资目的_摊余成本类.getValue())
+                    DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue())
                          && finProductDealInfoComDTO.getReclsInvAim().equals(
-                             DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue())) {
+                             DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue())) {
                     // ad.会计场景代码="摊余成本类重分类为综合收益类"
                     ad.setTableId(DictCodeListTableId.会计场景代码_摊余成本类重分类为综合收益类.getValue());
 
@@ -566,9 +564,9 @@ public class SecReclassificationDealService {
                 }
                 // else if（投资目的 = "综合收益" and 重分类投资目的 = "摊余成本"）
                 else if (finProductDealInfoComDTO.getInvAim().equals(
-                    DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue())
+                    DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue())
                          && finProductDealInfoComDTO.getReclsInvAim().equals(
-                             DictCodeListExt1.投资目的_摊余成本类.getValue())) {
+                             DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue())) {
                     // ad.会计场景代码="综合收益类重分类为摊余成本类"
                     ad.setTableId(DictCodeListTableId.会计场景代码_综合收益类重分类为摊余成本类.getValue());
                     // 面值 <- 交易类账务处理结果.单位面值 * 变量.成本科目数量
@@ -628,9 +626,9 @@ public class SecReclassificationDealService {
                 }
                 // else if（投资目的 = "综合收益" and 重分类投资目的 = "公允价值"）
                 else if (finProductDealInfoComDTO.getInvAim().equals(
-                    DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue())
+                    DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue())
                          && finProductDealInfoComDTO.getReclsInvAim().equals(
-                             DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue())) {
+                             DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue())) {
 
                     // ad.会计场景代码="综合收益类重分类为损益类"
                     ad.setTableId(DictCodeListTableId.会计场景代码_综合收益类重分类为损益类.getValue());
@@ -710,9 +708,9 @@ public class SecReclassificationDealService {
                 }
                 // else if（投资目的 = "公允价值" and 重分类投资目的 = "摊余成本"）
                 else if (finProductDealInfoComDTO.getInvAim().equals(
-                    DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue())
+                    DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue())
                          && finProductDealInfoComDTO.getReclsInvAim().equals(
-                             DictCodeListExt1.投资目的_摊余成本类.getValue())) {
+                             DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue())) {
 
                     // ad.会计场景代码="损益类重分类为摊余成本类"
                     ad.setTableId(DictCodeListTableId.会计场景代码_损益类重分类为摊余成本类.getValue());
@@ -796,9 +794,9 @@ public class SecReclassificationDealService {
                 }
                 // else if（投资目的 = "公允价值" and 重分类投资目的 = "综合收益"）
                 else if (finProductDealInfoComDTO.getInvAim().equals(
-                    DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue())
+                    DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue())
                          && finProductDealInfoComDTO.getReclsInvAim().equals(
-                             DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue())) {
+                             DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue())) {
 
                     // ad.会计场景代码="损益类重分类为综合收益类"
                     ad.setTableId(DictCodeListTableId.会计场景代码_损益类重分类为综合收益类.getValue());

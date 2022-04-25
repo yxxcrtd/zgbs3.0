@@ -7,14 +7,13 @@
  * 修改内容：新建
  * 系统名称：理财资管管理系统V2.0
  */
- 
+
 package com.joyintech.service.entrust.etrconbond.controller;
 
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
@@ -31,7 +30,6 @@ import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.common.base.dao.EtrEntrustBackupMapper;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
-import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
@@ -50,6 +48,7 @@ import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_新建;
 
 /**
  * 可转债委托
+ *
  * @author gejiaao
  * @version 1.0 2019年10月24日
  * @see EtrConBondController
@@ -60,7 +59,7 @@ import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_新建;
 public class EtrConBondController {
 
     private static final Logger log = LoggerFactory.getLogger(EtrConBondController.class);
-    
+
     @Autowired
     private EtrConBondService service;
 
@@ -78,12 +77,12 @@ public class EtrConBondController {
     public static final String OPERATE_TYPE_MODIFY = "modify";
 
     /**
-     * 
      * 检索分页数据。返回类型是Service的泛型。
      * <功能详细描述>
+     *
      * @param pageParam int
-     * @param page int
-     * @param length int
+     * @param page      int
+     * @param length    int
      * @return Page<EtrFundDto>
      * @throws Exception Exception
      * @see
@@ -92,24 +91,26 @@ public class EtrConBondController {
     @PostMapping("/findPage/{page}/{length}")
     public Page<EtrConBondDto> selectForPage(@RequestBody Map<String, Object> pageParam, @PathVariable("page") int page,
                                              @PathVariable("length") int length) {
-        return service.selectForPage(page,length,pageParam);
+        return service.selectForPage(page, length, pageParam);
     }
 
     /**
      * 获取资产代码联想文本框信息
-     * @return 
+     *
+     * @return
      * @throws Exception
      * @see
      * @since 1.0
      */
     @RequestMapping("getFinprodId/{page}/{length}")
     public Page<SelectOptionDto> getFinprodId(@RequestBody Map<String, Object> param,
-                                              @PathVariable("page") int page, @PathVariable("length") int length)
-    {
+                                              @PathVariable("page") int page, @PathVariable("length") int length) {
         return service.getFinprodId(page, length, param);
     }
+
     /**
      * 获取新建界面的资产代码联想下拉框框
+     *
      * @param
      * @return
      * @throws Exception
@@ -117,44 +118,49 @@ public class EtrConBondController {
      * @since 1.0
      */
     @PostMapping("getFinprodIdForAdd/{page}/{length}")
-    public Page<SelectOptionDto> getFinprodIdForAdd(@RequestBody Map<String, Object> param,@PathVariable("page") int page,
-                                                    @PathVariable("length") int length)
-    {
-        return service.getFinprodIdForAdd(page,length,param);
+    public Page<SelectOptionDto> getFinprodIdForAdd(@RequestBody Map<String, Object> param, @PathVariable("page") int page,
+                                                    @PathVariable("length") int length) {
+        return service.getFinprodIdForAdd(page, length, param);
     }
-    
+
     /**
      * 操作前校验
      * <功能详细描述>
+     *
      * @param dto
      * @return
      * @see
      * @since 1.0
      */
     @PostMapping("check")
-    public List<ValidMessage> check(@RequestBody EtrConBondDto dto){
+    public List<ValidMessage> check(@RequestBody EtrConBondDto dto) {
         return service.check(dto);
     }
+
     /**
-     * 撤回委托 
+     * 撤回委托
      * <功能详细描述>
+     *
      * @param dto 实体类
      * @return boolean
-     * @throws InvocationTargetException 
-     * @throws IllegalAccessException 
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
      * @see
      * @since 1.0
      */
     @Transactional
     @DTXTransaction
     @PostMapping("recall")
-    public boolean recallDelegate(@RequestBody EtrConBondDto dto) throws IllegalAccessException, InvocationTargetException{
+    public boolean recallDelegate(@RequestBody EtrConBondDto dto) throws IllegalAccessException, InvocationTargetException {
+        log.info("recall() called with parameters => 【dto = {}】", JsonUtils.object2Json(dto));
         boolean result = service.recallDelegate(dto);
         //positionRequestService.sendRevoke(dto);
         return result;
     }
+
     /**
      * 关闭委托
+     *
      * @param
      * @return
      * @see
@@ -163,13 +169,16 @@ public class EtrConBondController {
     @Transactional
     @DTXTransaction
     @GetMapping("close")
-    public boolean closeDelegate(String entrustId,String closeWay) {
+    public boolean closeDelegate(String entrustId, String closeWay) {
+        log.info("close() called with parameters => 【entrustId = {}】", entrustId);
         boolean result = service.closeDelegate(entrustId, closeWay);
         positionRequestService.sendClose(entrustId, closeWay);
         return result;
     }
+
     /**
      * 通过主键查询数据
+     *
      * @param entrustId
      * @return
      * @see
@@ -179,19 +188,21 @@ public class EtrConBondController {
     public EtrConBondDto selectByKey(String entrustId) {
         return service.selectByKey(entrustId);
     }
+
     /**
      * 工作流完成方法
      * <功能详细描述>
+     *
      * @param
-     * @throws InvocationTargetException 
-     * @throws IllegalAccessException 
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
      * @see
      * @since 1.0
      */
     @Transactional
     @DTXTransaction
     @PostMapping("doComplete")
-    public void doComplete(@RequestBody EtrConBondDto dto) throws IllegalAccessException, InvocationTargetException{
+    public void doComplete(@RequestBody EtrConBondDto dto) throws IllegalAccessException, InvocationTargetException {
         WFlowCommonService.doCompleteFlow(dto.getWorkflowId());
         service.doComplete(dto, dto.getOperateType());
     }
@@ -199,8 +210,8 @@ public class EtrConBondController {
     @Transactional
     @DTXTransaction
     @PostMapping("doInsert")
-    public void doInsert(@RequestBody EtrConBondDto dto){
-        log.debug("doInsert() called with parameters => 【dto = {}】", JsonUtils.object2Json(dto));
+    public void doInsert(@RequestBody EtrConBondDto dto) {
+        log.info("doInsert() called with parameters => 【dto = {}】", JsonUtils.object2Json(dto));
 
         String operateType = dto.getOperateType();
         WFlowCommonService.doInsertFlow(operateType, service.initBaseDto(dto));
@@ -215,18 +226,18 @@ public class EtrConBondController {
         if (StringUtil.equals(OPERATE_TYPE_MODIFY, operateType)) {
             systemAct = DictCodeListExt3.系统动作_修改.getValue();
         }
-        positionRequestService.sendEtrConBondDto(dto,decisionAct,systemAct);
+        positionRequestService.sendEtrConBondDto(dto, decisionAct, systemAct);
     }
 
     @Transactional
     @DTXTransaction
     @PostMapping("doUpdate")
-    public void doUpdate(@RequestBody EtrConBondDto dto){
-        log.debug("doUpdate() called with parameters => 【dto = {}】",JsonUtils.object2Json(dto));
+    public void doUpdate(@RequestBody EtrConBondDto dto) {
+        log.info("doUpdate() called with parameters => 【dto = {}】", JsonUtils.object2Json(dto));
 
         String operateType = dto.getOperateType();
         WFlowCommonService.doUpdateFlow(operateType, service.initBaseDto(dto));
-        
+
         service.doInsert(dto, operateType);
 
 //        String decisionAct = DictCodeListExt3.系统动作_新建.getValue();
@@ -266,7 +277,7 @@ public class EtrConBondController {
         }
         try {
             dto.setPositionSeqno(null);
-            positionRequestService.sendEtrConBondDto(dto,decisionAct,systemAct);
+            positionRequestService.sendEtrConBondDto(dto, decisionAct, systemAct);
         } catch (PositionException e) {
             Message message = PositionUtil.ajaxErrorReturn(e);
             if (StringUtil.isNotBlank(message.getMessage())) {
@@ -285,14 +296,28 @@ public class EtrConBondController {
     @Transactional
     @DTXTransaction
     @PostMapping("doBack")
-    public void doBack(@RequestBody EtrConBondDto dto){
+    public void doBack(@RequestBody EtrConBondDto dto) {
+        log.info("doBack() called with parameters => 【dto = {}】", JsonUtils.object2Json(dto));
         WFlowCommonService.doBackFlow(dto.getWorkflowId(), dto.getEntrustId());
-        positionRequestService.sendDelete(dto);
+//        positionRequestService.sendDelete(dto);
     }
+
+    @Transactional
+    @DTXTransaction
+    @PostMapping("doDelete")
+    public void doDelete(@RequestBody Map<String, Object> param) {
+        log.info("doDelete() called with parameters => 【param = {}】", param);
+        final String workflowId = (String) param.get("workflowId");
+        WFlowCommonService.deleteFlow(workflowId);
+        EtrConBondDto entity = new EtrConBondDto();
+        entity.setWorkflowId(workflowId);
+        positionRequestService.sendDelete(entity);
+    }
+
     /**
-     * 
      * 删除投资委托
      * <功能详细描述>
+     *
      * @param entrustId
      * @return
      * @see
@@ -302,13 +327,14 @@ public class EtrConBondController {
     @DTXTransaction
     @GetMapping("delete")
     public boolean deleteDelegate(String entrustId) {
+        log.info("delete() called with parameters => 【entrustId = {}】", entrustId);
         return service.deleteDelegate(entrustId);
     }
 
     /**
-     * 
      * 组合可用现金查询
      * <功能详细描述>
+     *
      * @return
      * @see
      * @since 1.0
@@ -319,8 +345,9 @@ public class EtrConBondController {
     }
 
     /**
-     *验证子组合是否可以申购
+     * 验证子组合是否可以申购
      * <功能详细描述>
+     *
      * @return
      * @see
      * @since 1.0
@@ -333,6 +360,7 @@ public class EtrConBondController {
     /**
      * 获取金融产品信息
      * <功能详细描述>
+     *
      * @return
      * @see
      * @since 1.0

@@ -45,11 +45,11 @@
         <module>../../microservice/service-customer-report</module>
         <module>../../microservice/service-document</module>
         <module>../../microservice/service-entrust</module>
-        <module>../../microservice/service-exchange</module>
+<!--        <module>../../microservice/service-exchange</module>-->
         <module>../../microservice/service-period</module>
         <module>../../microservice/service-portfolio</module>
         <module>../../microservice/service-product</module>
-        <module>../../microservice/service-quote-new</module>
+<!--        <module>../../microservice/service-quote-new</module>-->
         <module>../../microservice/service-report</module>
         <module>../../microservice/service-risk</module>
 		<module>../../microservice/service-risk-redis</module>
@@ -70,7 +70,7 @@
         <!-- 前台应用 -->
         <module>../../tams-customer-interf</module>
 
-        <module>../../tams-exchange-parent</module>
+<!--        <module>../../tams-exchange-parent</module>-->
 
         <module>../../tams-invest-interf</module>
 

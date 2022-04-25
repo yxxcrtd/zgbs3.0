@@ -40,7 +40,9 @@
         END AS otherPs,
         ETR_ENTRUST_ADD.BUSI_PS busiPs,
         ETR_ENTRUST.TRADE_MARKET tradeMarket,
-        decode(ETR_ENTRUST_ADD.ASSET_TYPE,'F01',decode(ETR_ENTRUST.PS,'T03',ETR_ENTRUST.ENTRUST_AMT, NVL(ETR_ENTRUST.ENTRUST_NUM * 100,0)),'F10',NVL(ETR_ENTRUST.ENTRUST_NUM *
+        /*decode(ETR_ENTRUST_ADD.ASSET_TYPE,'F01',decode(ETR_ENTRUST.PS,'T03',ETR_ENTRUST.ENTRUST_AMT, NVL(ETR_ENTRUST.ENTRUST_NUM * 100,0)),'F10',NVL(ETR_ENTRUST.ENTRUST_NUM *
+        100,0),'F17',NVL(ETR_ENTRUST.ENTRUST_NUM *100,0),NVL(ETR_ENTRUST.ENTRUST_AMT,ETR_ENTRUST.ENTRUST_NUM)) entrustAmt,*/
+        decode(ETR_ENTRUST_ADD.ASSET_TYPE,'F01',nvl(ETR_ENTRUST.ENTRUST_AMT,nvl(ETR_ENTRUST.ENTRUST_NUM * 100,0)),'F10',NVL(ETR_ENTRUST.ENTRUST_NUM *
         100,0),'F17',NVL(ETR_ENTRUST.ENTRUST_NUM *100,0),NVL(ETR_ENTRUST.ENTRUST_AMT,ETR_ENTRUST.ENTRUST_NUM)) entrustAmt,
         decode(ETR_ENTRUST_ADD.ASSET_TYPE,'F01',NVL(ETR_FINISH_STATUSA.FINISH_AMT * 100,0),'F10',NVL(ETR_FINISH_STATUSA.FINISH_AMT *
         100,0),'F17',NVL(ETR_FINISH_STATUSA.FINISH_AMT * 100,0),NVL(ETR_FINISH_STATUSA.FINISH_AMT,0)) finishAmt,
@@ -841,7 +843,7 @@
         tpd.UNIT_CPRICE fCprice,
         tpd.YIELD * 100 fYield,
         tpd.FPRICE_AMT vTradeAmt,
-        FTP.M_TRADE_AMT mSettleAmt,
+        FTP.M_TRADE_AMT mTradeAmt,
         nvl(fpt.TYPE_6,wtpdo.DL_TYPE) paBussType,
         fpt.TYPE_9 assetType1,
         fpt.TYPE_10 assetType10,
@@ -1421,7 +1423,8 @@
         to_char(ete.entrust_date,'yyyy-MM-dd') entrustDate,
         CASE WHEN det.PORTFOLIO_ID IS NULL THEN ete.PORTFOLIO_ID ELSE det.PORTFOLIO_ID END AS portfolioId,
         pp.portfolio_name portfolioName,
-        ete.inv_aim busiModel,
+        /*ete.inv_aim busiModel,*/
+        decode(#{SHOW_INVAIM_OR_BUSSINSSMODEL},'02',ete.BUSINESS_MODEL,ete.inv_aim) busiModel,
         NVL(fp.finprod_market_id,ete.STOCK_ID) finprodMarketId,
         nvl(fp.finprod_abbr,ete.finprod_id) finprodAbbr,
         ete.trade_market tradeMarket,
@@ -1449,7 +1452,8 @@
         decode(
         eted.ASSET_TYPE,
         'F01',
-        decode(ete.PS,'T03',ete.ENTRUST_AMT,NVL(ete.ENTRUST_NUM * 100, 0 )),
+        /*decode(ete.PS,'T03',ete.ENTRUST_AMT,NVL(ete.ENTRUST_NUM * 100, 0 )),*/
+        decode(ete.TRADE_MARKET,'03',ete.ENTRUST_AMT,'04',ete.ENTRUST_AMT,NVL(ete.ENTRUST_NUM * 100, 0 )),
         'F10',
         NVL( ete.ENTRUST_NUM * 100, 0 ),
         NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
@@ -1526,7 +1530,8 @@
         to_char(ete.entrust_date,'yyyy-MM-dd') entrustDate,
         CASE WHEN det.PORTFOLIO_ID IS NULL THEN ete.PORTFOLIO_ID ELSE det.PORTFOLIO_ID END AS portfolioId,
         pp.portfolio_name portfolioName,
-        ete.inv_aim busiModel,
+        /*ete.inv_aim busiModel,*/
+        decode(#{SHOW_INVAIM_OR_BUSSINSSMODEL},'02',ete.BUSINESS_MODEL,ete.inv_aim) busiModel,
         NVL(fp.finprod_market_id,ete.STOCK_ID) finprodMarketId,
         nvl(fp.finprod_abbr,ete.finprod_id) finprodAbbr,
         ete.trade_market tradeMarket,
@@ -1551,10 +1556,19 @@
         ete.entrust_num entrustNum,
         <!--ete.entrust_amt entrustAmt,
            按照列表查询价格修改 -->
-        decode(
+        /*decode(
         eted.ASSET_TYPE,
         'F01',
         NVL( ete.ENTRUST_NUM * 100, 0 ),
+        'F10',
+        NVL( ete.ENTRUST_NUM * 100, 0 ),
+        NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
+        ) entrustAmt,*/
+        decode(
+        eted.ASSET_TYPE,
+        'F01',
+        /*decode(ete.PS,'T03',ete.ENTRUST_AMT,NVL(ete.ENTRUST_NUM * 100, 0 )),*/
+        decode(ete.TRADE_MARKET,'03',ete.ENTRUST_AMT,'04',ete.ENTRUST_AMT,NVL(ete.ENTRUST_NUM * 100, 0 )),
         'F10',
         NVL( ete.ENTRUST_NUM * 100, 0 ),
         NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )

@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.joyintech.tams.constant.*;
-import com.joyintech.tams.constant.DictCodeListExt2;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +47,6 @@ import com.joyintech.tams.valuation.common.batch.finproduct.entity.TargetSearchD
 import com.joyintech.tams.valuation.common.constants.BookConstant;
 import com.joyintech.tams.valuation.common.constants.DataIndexSequenceType;
 import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrue;
-import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.common.constants.ValDictCodeList;
@@ -140,7 +138,7 @@ public class SecLendFinFloatBookDetailService {
         // 1.2 债券行情处理
         // 调用共通方法【市价查询-债券】取债券最新市价
         MarketPriceDto marketPriceDto = finProductCommonService.getBondMarketPrice(acctEntity.getHappenDate(),
-            acctEntity.getBooksetId(), acctEntity.getBusiId(), DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue());//设计变更：投资目的固定值=FVTPL。 zhangyf 2018-11-29
+            acctEntity.getBooksetId(), acctEntity.getBusiId(), DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue());//设计变更：投资目的固定值=FVTPL。 zhangyf 2018-11-29
         // 市价 = 返回值.市价
         marketPrice = marketPriceDto.getPrice();
         // 估值日期 = 返回值.估值日期

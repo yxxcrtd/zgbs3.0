@@ -143,7 +143,7 @@ public class OrderManagement extends BaseService {
                 instructionClone.setEntrustAmt(integratedEntrust.getEntrustBalance());
             } else {
                 // 计算委托金额
-                BigDecimal entrustBalance = TradeUtils.calculateBalance(integratedEntrust.getEntrustBs(), integratedEntrust.getEntrustPrice(), integratedEntrust.getEntrustVolume(), integratedEntrust.getAssetType(), integratedEntrust);
+                BigDecimal entrustBalance = TradeUtils.calculateBalance(integratedEntrust.getEntrustPrice(), integratedEntrust.getEntrustVolume(), integratedEntrust.getAssetType(), integratedEntrust);
                 instructionClone.setEntrustAmt(entrustBalance);
             }
             instructionClone.setEntrustNum(integratedEntrust.getEntrustVolume());

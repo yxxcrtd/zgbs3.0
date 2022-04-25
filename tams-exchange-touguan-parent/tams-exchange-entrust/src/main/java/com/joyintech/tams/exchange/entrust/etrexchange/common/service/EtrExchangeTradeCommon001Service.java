@@ -6031,4 +6031,11 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         return minTrdUnitLimitDto;
     }
 
+
+    public static void main(String[] args) {
+        BigDecimal a=new BigDecimal(3000000);
+        BigDecimal b=new BigDecimal(208.00);
+
+        System.out.println(ArithmeticUtil.divide(a, b, 0, RoundingMode.DOWN));
+    }
 }

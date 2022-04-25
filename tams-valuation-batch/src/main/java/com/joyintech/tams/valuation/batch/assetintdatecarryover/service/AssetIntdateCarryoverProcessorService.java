@@ -718,16 +718,16 @@ public class AssetIntdateCarryoverProcessorService {
             // 买入场景
             String tableId = null;
             List<String> baseSubjectNatureList = new ArrayList<String>();
-            if (DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(
+            if (DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue().equals(
                 subjectBalance.getInvAim())) {
                 tableId = DictCodeListTableId.会计场景代码_公允价值损益类债券_买入.getValue();
                 baseSubjectNatureList.add(DictCodeBaseSubjectNatrue.公允价值损益类_成本.getValue());
             }
-            else if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(subjectBalance.getInvAim())) {
+            else if (DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue().equals(subjectBalance.getInvAim())) {
                 tableId = DictCodeListTableId.会计场景代码_摊余成本类债券_买入.getValue();
                 baseSubjectNatureList.add(DictCodeBaseSubjectNatrue.摊余成本类成本.getValue());
             }
-            else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(
+            else if (DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue().equals(
                 subjectBalance.getInvAim())) {
                 tableId = DictCodeListTableId.会计场景代码_综合收益类债券_买入.getValue();
                 baseSubjectNatureList.add(DictCodeBaseSubjectNatrue.综合收益类成本.getValue());
@@ -756,14 +756,14 @@ public class AssetIntdateCarryoverProcessorService {
                 }
             }
             // 卖出场景
-            if (DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(
+            if (DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue().equals(
                 subjectBalance.getInvAim())) {
                 tableId = DictCodeListTableId.会计场景代码_公允价值损益类债券_卖出.getValue();
             }
-            else if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(subjectBalance.getInvAim())) {
+            else if (DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue().equals(subjectBalance.getInvAim())) {
                 tableId = DictCodeListTableId.会计场景代码_摊余成本类债券_卖出.getValue();
             }
-            else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(
+            else if (DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue().equals(
                 subjectBalance.getInvAim())) {
                 tableId = DictCodeListTableId.会计场景代码_综合收益类债券_卖出.getValue();
             }

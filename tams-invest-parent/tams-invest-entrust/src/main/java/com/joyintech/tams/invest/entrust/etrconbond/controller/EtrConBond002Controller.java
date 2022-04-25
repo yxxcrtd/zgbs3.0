@@ -118,7 +118,7 @@ public class EtrConBond002Controller extends BaseController {
         model.addAttribute("MY_SUP_TIME_TYPE_02", DictCodeListExt1.监督时分_委托监控.getValue());
         model.addAttribute("fintype", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         model.addAttribute("etrPs", DictCodeList.交易方向_申购.getValue());
-        model.addAttribute("INV_AIM_default", DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue());
+        model.addAttribute("INV_AIM_default", DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue());
         //配置单位 add by yeming 20210721 start
         model.addAttribute("entrustAmtUnit", CacheUtil.getSysParam("entrustAmtUnit"));
         model.addAttribute("PURCH_MODLE_default", DictCodeListExt2.申购方式_网下申购.getValue());

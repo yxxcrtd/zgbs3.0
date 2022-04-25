@@ -1347,9 +1347,9 @@ public class EtrCommonCashPositionDealService extends BaseService {
         param.put("portfolioId", input.getEtrEntrust().getPortfolioId());
         param.put("ps", input.getEtrEntrust().getPs());
         param.put("isWithInvAim", true);
-        param.put("INV_AIM_AC", DictCodeListExt1.投资目的_摊余成本类.getValue());
-        param.put("INV_AIM_FVOCI", DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue());
-        param.put("INV_AIM_FVTPL", DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue());
+        param.put("INV_AIM_AC", DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue());
+        param.put("INV_AIM_FVOCI", DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue());
+        param.put("INV_AIM_FVTPL", DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue());
         param.put("secAcctId", input.getEtrEntrustAdd().getSecAcctId());
         param.put("chlId", input.getEtrEntrust().getChlId());
         return bussRepoSecService.selectAvaPledgeBondDetailList(param);
@@ -1368,9 +1368,9 @@ public class EtrCommonCashPositionDealService extends BaseService {
                 DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue()) ?
                 DictCodeList.回购拆借方向_正回购.getValue() : DictCodeList.回购拆借方向_逆回购.getValue());
         param.put("isWithInvAim", true);
-        param.put("INV_AIM_AC", DictCodeListExt1.投资目的_摊余成本类.getValue());
-        param.put("INV_AIM_FVOCI", DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue());
-        param.put("INV_AIM_FVTPL", DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue());
+        param.put("INV_AIM_AC", DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue());
+        param.put("INV_AIM_FVOCI", DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue());
+        param.put("INV_AIM_FVTPL", DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue());
         param.put("secAcctId", input.getTrdProductDeal().getSecManageAcctId());
         param.put("chlId", input.getTrdProductDeal().getChlId());
         return bussRepoSecService.selectAvaPledgeBondDetailList(param);

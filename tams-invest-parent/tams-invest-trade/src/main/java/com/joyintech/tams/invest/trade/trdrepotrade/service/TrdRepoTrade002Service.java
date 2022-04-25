@@ -69,7 +69,6 @@ import com.joyintech.tams.invest.interf.service.InterfComponentService;
 import com.joyintech.tams.invest.interf.service.InterfComponentService.OrderCaller;
 import com.joyintech.tams.invest.trade.lend.dto.FinTradeProductDto;
 import com.joyintech.tams.invest.trade.trdrepotrade.dto.TrdRepoTrade002Dto;
-import com.joyintech.tams.invest.common.dto.cstp.*;
 import com.joyintech.tools.collectors.JoyinCollectors;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.entity.FlowEntity;
@@ -86,7 +85,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -2308,9 +2306,9 @@ public class TrdRepoTrade002Service extends BaseService<TrdRepoTrade002Dto> impl
         param.put("portfolioId", input.getPortfolioId());
         param.put("ps", input.getPs());
         param.put("isWithInvAim", true);
-        param.put("INV_AIM_AC", DictCodeListExt1.投资目的_摊余成本类.getValue());
-        param.put("INV_AIM_FVOCI", DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue());
-        param.put("INV_AIM_FVTPL", DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue());
+        param.put("INV_AIM_AC", DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue());
+        param.put("INV_AIM_FVOCI", DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue());
+        param.put("INV_AIM_FVTPL", DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue());
         param.put("secAcctId", input.getSecAcctId());
         param.put("chlId", input.getChlId());
         return restTemplate.postForList(ServiceApplication.TRADE_SERVICE_NAME + "/BussRepoSec/selectAvaPledgeBondDetailList",

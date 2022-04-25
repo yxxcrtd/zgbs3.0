@@ -301,4 +301,20 @@ public class BasePtlCashPositionInfoServiceImpl implements BasePtlCashPositionIn
         Assert.isTrue(StringUtil.isNotEmpty(positionQueryDto.getCcy()), "币种不能为空");
         return basePtlCashPositionInfoMapper.queryTrdAvailableCashNew(positionQueryDto);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public BigDecimal queryActCashPosition(PtlCashPositionFlowDto positionQueryDto) {
+        Assert.isTrue(positionQueryDto != null, "查询dto不能为null");
+        Assert.isTrue(StringUtil.isNotEmpty(positionQueryDto.getPortfolioId()), "组合代码不能为空");
+        Assert.notNull(positionQueryDto.getCdate(), "日期不能为null");
+        Assert.isTrue(StringUtil.isNotEmpty(positionQueryDto.getCcy()), "币种不能为空");
+        String holdingType = positionQueryDto.getHodingType();
+        positionQueryDto.setNeedAcctType(true);
+        positionQueryDto.setHodingType(DictCodeList.持仓类型_实际.getValue());
+        BigDecimal 实际现金 = queryOtherCashPosition(positionQueryDto);
+        positionQueryDto.setHodingType(holdingType);
+        return 实际现金;
+    }
 }
