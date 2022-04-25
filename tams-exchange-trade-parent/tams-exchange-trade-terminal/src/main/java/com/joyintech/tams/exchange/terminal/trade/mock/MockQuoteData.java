@@ -255,9 +255,9 @@ public class MockQuoteData {
         final String stockCode = negotiateQuoteQueryBean.getStockCode();
         final String side = negotiateQuoteQueryBean.getSide();
         final String confirmId = MoreObjects.firstNonNull(negotiateQuoteQueryBean.getConfirmId(), "111");
-        final String traderCode = MoreObjects.firstNonNull(negotiateQuoteQueryBean.getTraderCode(), "Z213612");
-        final String investorId = MoreObjects.firstNonNull(negotiateQuoteQueryBean.getInvestorId(), "131");
-        final String memberId = MoreObjects.firstNonNull(negotiateQuoteQueryBean.getMemberId(), "167");
+        final String traderCode = MoreObjects.firstNonNull(negotiateQuoteQueryBean.getTraderCode(), "Z213611");
+        final String investorId = MoreObjects.firstNonNull(negotiateQuoteQueryBean.getInvestorId(), "132");
+        final String memberId = MoreObjects.firstNonNull(negotiateQuoteQueryBean.getMemberId(), "168");
 
         if (StringUtil.isNotEmpty(stockCode)) {
             NegotiateQuoteReceiveBean buy = new NegotiateQuoteReceiveBean();
@@ -274,9 +274,9 @@ public class MockQuoteData {
             buy.setTraderCode(traderCode);
             buy.setInvestorId(investorId);
             buy.setInvestorType("2");
-            buy.setCpMemberId("168");
-            buy.setCpTraderCode("Z213611");
-            buy.setCpInvestorId("132");
+            buy.setCpMemberId("167");
+            buy.setCpTraderCode("Z213612");
+            buy.setCpInvestorId("131");
             buy.setCpInvestorType("2");
             buy.setConfirmId(confirmId);
             buy.setPositionStr("positionStr");
@@ -301,9 +301,9 @@ public class MockQuoteData {
         buy.setTraderCode(traderCode);
         buy.setInvestorId(investorId);
         buy.setInvestorType("2");
-        buy.setCpMemberId("168");
-        buy.setCpTraderCode("Z213611");
-        buy.setCpInvestorId("132");
+        buy.setCpMemberId("167");
+        buy.setCpTraderCode("Z213612");
+        buy.setCpInvestorId("131");
         buy.setCpInvestorType("2");
         buy.setConfirmId(confirmId);
         buy.setPositionStr("positionStr");
@@ -325,9 +325,9 @@ public class MockQuoteData {
         sell.setTraderCode(traderCode);
         sell.setInvestorId(investorId);
         sell.setInvestorType("2");
-        sell.setCpMemberId("168");
-        sell.setCpTraderCode("Z213611");
-        sell.setCpInvestorId("132");
+        sell.setCpMemberId("167");
+        sell.setCpTraderCode("Z213612");
+        sell.setCpInvestorId("131");
         sell.setCpInvestorType("2");
         sell.setConfirmId(confirmId);
         sell.setPositionStr("positionStr");
