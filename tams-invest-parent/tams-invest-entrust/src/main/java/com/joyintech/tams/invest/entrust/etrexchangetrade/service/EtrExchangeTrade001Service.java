@@ -2707,6 +2707,10 @@ public class EtrExchangeTrade001Service extends CommonExportService<EtrExchangeT
 							BigDecimal vailableNum = selectAvailableNum(mapSec);
 							if (StringUtil.isNotEmpty(vailableNum)) {
 								unit.setAccAvailablePos(vailableNum);
+								if(vailableNum.compareTo(new BigDecimal(0))<1){
+									promptMsg ="可用持仓不足";
+									confirmMsg = "";
+								}
 							}
 							unit.setTradePlat(DictCodeList.交易平台_竞价撮合平台.getValue());
 							settleEntrustType(unit);
