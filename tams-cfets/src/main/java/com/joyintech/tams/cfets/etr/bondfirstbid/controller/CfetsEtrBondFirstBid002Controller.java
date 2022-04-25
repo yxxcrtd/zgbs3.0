@@ -7,7 +7,6 @@ import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.tams.business.common.pojo.Message;
-import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBid002Dto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBidSaveRequest;
@@ -98,7 +97,7 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
             //风控通过且投标量没有改高，不走流程直接更新原指令信息
             if (StringUtil.equals(cfetsDto.getCfetsEtribdoRiskcalReturn().getRiskTrialSpan(), "试算通过")
                     && etrEntrust != null
-                    && BigDecimalUtil.ACompareToB(cfetsDto.getTotalBiddingNum(), ArithmeticUtil.multiply(etrEntrust.getEntrustNum(), BigDecimal.valueOf(100)).setScale(4, BigDecimal.ROUND_HALF_UP), 4) < 1
+                    && (cfetsDto.getTotalBiddingNum().compareTo(ArithmeticUtil.multiply(etrEntrust.getEntrustNum(), BigDecimal.valueOf(100))) < 1)
             ) {
                 CfetsEtrBondFirstBid002Dto allDto = cfetsEtrBondFirstBid002Service.packageEquity(cfetsDto);
                 cfetsEtrBondFirstBid002Service.saveModifyPassInfo(allDto);
