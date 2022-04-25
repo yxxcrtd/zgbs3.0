@@ -312,6 +312,7 @@ public class SecFairValeAlterationsProcessorNewService {
                 if (DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(invAim)) {
                     tableId = DictCodeListTableId.会计场景代码_公允价值损益类债券_买入.getValue();
                     baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.公允价值损益类_成本.getValue());
+                    baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.公允价值损益类_利息调整.getValue());
                     baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.公允价值损益类_应计利息.getValue());
                     baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.公允价值损益类_公允价值变动.getValue());
                 }
