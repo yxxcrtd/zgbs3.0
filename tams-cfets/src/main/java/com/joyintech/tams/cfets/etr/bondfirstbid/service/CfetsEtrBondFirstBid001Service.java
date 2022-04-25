@@ -5,15 +5,14 @@ import com.github.pagehelper.PageInfo;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
-import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.cfets.etr.bond.dao.CfetsEtrIbBondinfoMapper;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dao.CfetsEtrBondFirstBid001Mapper;
-import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoRequest;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoDto;
+import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoRequest;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIssueInfoDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIssueInfoRequest;
 import com.joyintech.tams.common.base.entity.SppiImportData;
@@ -101,10 +100,10 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
         pageParam.put("year",year);
         pageParam.put("sort", dto.getPageMode().getSort());
         pageParam.put("direction", dto.getPageMode().getDirection());
-        String userId = SecurityUtil.getLoginUser().getUserName();
+        String userId = "li02";
 
         if (StringUtils.isNotEmpty(userId)) {
-            pageParam.put("userId", SecurityUtil.getLoginUser().getUserName());
+            pageParam.put("userId", "li02");
             return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrBondFirstBid001Mapper.findEtrInfoPage(pageParam));
         } else {
             return null;

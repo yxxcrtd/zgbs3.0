@@ -15,6 +15,20 @@ public interface EtrEntrustBackupMapper {
     int insertFromQuery(String entrustId);
 
     int insertAddFromQuery(String entrustId);
+
+    /**
+     * 撤回或退回再启动流程时转移至委托投标标位备份表
+     * @param entrustId
+     * @return
+     */
+    int insertBidPriceFromQuery(@Param("entrustId") String entrustId);
+
+    /**
+     * 撤回或退回再启动流程时转移至委托明细备份表
+     * @param entrustId
+     * @return
+     */
+    int insertDetailFromQuery(@Param("entrustId") String entrustId);
     /**
      * 作废时转移至指令表
      * @param entrustId
@@ -53,12 +67,12 @@ public interface EtrEntrustBackupMapper {
      * @param entrustId
      * @return
      */
-    int insertBidPriceFromQuery(@Param("entrustId") String entrustId);
+    int insertEtrBidPriceFromQuery(@Param("entrustId") String entrustId);
 
     /**
      * 转移委托明细备份表数据到委托明细表
      * @param entrustId
      * @return
      */
-    int insertDetailFromQuery(@Param("entrustId") String entrustId);
+    int insertEtrDetailFromQuery(@Param("entrustId") String entrustId);
 }

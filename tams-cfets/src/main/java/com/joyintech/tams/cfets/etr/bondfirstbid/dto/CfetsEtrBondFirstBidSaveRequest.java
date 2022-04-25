@@ -62,6 +62,12 @@ public class CfetsEtrBondFirstBidSaveRequest extends EtrEntrust implements Proce
     private Date payEdate;
 
     /**
+     *  投标日
+     */
+    @ApiModelProperty(name="tenderDate",value="投标日")
+    private Date tenderDate;
+
+    /**
      *  发行日
      */
     @ApiModelProperty(name="issueDate",value="发行日")
@@ -244,4 +250,11 @@ public class CfetsEtrBondFirstBidSaveRequest extends EtrEntrust implements Proce
         this.etrDate = etrDate;
     }
 
+    public Date getTenderDate() {
+        return tenderDate;
+    }
+
+    public void setTenderDate(Date tenderDate) {
+        this.tenderDate = tenderDate;
+    }
 }

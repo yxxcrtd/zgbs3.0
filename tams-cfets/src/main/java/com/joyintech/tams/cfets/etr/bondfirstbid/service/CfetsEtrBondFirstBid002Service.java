@@ -8,6 +8,7 @@ import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
@@ -29,6 +30,7 @@ import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsBiddingProductDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBid002Dto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBidSaveRequest;
 import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
+import com.joyintech.tams.common.base.dao.EtrEntrustBackupMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustBidPriceMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustDetailMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
@@ -136,6 +138,12 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
     @Autowired(required = false)
     private EtrCommandDispatcherService etrCommandDispatcherService;
 
+    /**
+     * 指令废弃表
+     */
+    @Autowired
+    private EtrEntrustBackupMapper etrEntrustBackupMapper;
+
     @Override
     public void doInsert(CfetsEtrBondFirstBid002Dto entity, OperationType operationType) {
         if ("submit".equals(entity.getOperateType())) {
@@ -237,6 +245,40 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 throw new RuntimeException("新建指令失败", e);
             }
         }
+    }
+
+    @Override
+    public void doDelete(String workflowId) {
+        doDeleteFlow(workflowId);
+    }
+
+    /**
+     * 流程中数据作废
+     * @param workflowId
+     */
+    private void doDeleteFlow(String workflowId) {
+        CfetsEtrBondFirstBid002Dto entity = getBussinessEntityByWorkflowId(workflowId);
+        if (CollectionUtils.isNotEmpty(entity.getEtrInvestBondFirstBidDtos()))  {
+            for (CfetsEtrBondFirstBid002Dto dto: entity.getEtrInvestBondFirstBidDtos()) {
+                if(StringUtil.isNotEmpty(dto.getEntrustId())) {
+                    Map<String, Object> param = new HashMap<>();
+                    //删除流程中数据
+                    WFlowCommonService.doCompleteFlow(workflowId);
+                    //从废弃表中获取，转移到指令表
+                    etrEntrustBackupMapper.insertEtrFromQuery(dto.getEntrustId());
+                    etrEntrustBackupMapper.insertEtrAddFromQuery(dto.getEntrustId());
+                    etrEntrustBackupMapper.insertEtrBidPriceFromQuery(dto.getEntrustId());
+                    etrEntrustBackupMapper.insertEtrDetailFromQuery(dto.getEntrustId());
+                    // 删除废弃表
+                    etrEntrustBackupMapper.deleteByPrimaryKey(dto.getEntrustId());
+                    etrEntrustBackupMapper.deleteAddByPrimaryKey(dto.getEntrustId());
+                    etrEntrustBackupMapper.deleteEntrustBidPriceByEntrustId(dto.getEntrustId());
+                    etrEntrustBackupMapper.deleteEntrustDetailByEntrustId(dto.getEntrustId());
+                }
+
+            }
+        }
+        //发送头寸
     }
 
     /**
@@ -494,6 +536,8 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
         dto.setEntrustNum(cfetsDto.getTotalBiddingNum());
         dto.setTradeMarketMode(DictCodeListExt1.交易市场_一级市场.getValue());
         dto.setElementId(cfetsDto.getElementId());
+        dto.setEntrustDate(cfetsDto.getEtrDate());
+        dto.setVdate(cfetsDto.getEtrDate());
 
         List<CfetsBiddingProductDto> biddingProductList = cfetsDto.getBiddingProductList();
         List<CfetsEtrBondFirstBid002Dto> etrInvestBondFirstBidList = new ArrayList<>();
@@ -506,12 +550,20 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 dd.setBiddingProductList(null);
                 dd.setBiddingProductList(entry.getValue());
                 dd.setSecAcctId(entry.getKey());
+                //投标日前下的指令，指令结束日为投标日;投标日后下的指令，指令结束日为指令日期
+                if (DateUtil.compareDate(cfetsDto.getEtrDate(), cfetsDto.getIssueDate()) >= 0) {
+                    dd.setMdate(cfetsDto.getIssueDate());
+                } else {
+                    dd.setMdate(cfetsDto.getEtrDate());
+                }
+
                 etrInvestBondFirstBidList.add(dd);
             }
 
         } else {
             CfetsEtrBondFirstBid002Dto dd = new CfetsEtrBondFirstBid002Dto();
             BeanUtil.copyPropertiesIgnoreNull(dd, dto);
+            dd.setMdate(cfetsDto.getTenderDate());
             etrInvestBondFirstBidList.add(dd);
         }
 
