@@ -48,7 +48,7 @@
             FINPROD_TYPE2, REMARK, CREATE_USER, 
             CREATE_DEPT, CREATE_TIME, UPDATE_USER, 
             UPDATE_TIME, INT_TYPE, HIGHEST_RATE, 
-            LOWEST_RATE, BENCHMARK_ID, BENCHMARK_TYPE)
+            LOWEST_RATE, BENCHMARK_ID, BENCHMARK_TYPE,FIRST_CONFIRM_DATE)
         <foreach collection="list" item="item" separator="from dual union all select" open="select * from (select "
                  close=" from dual)">
           #{item.cashId,jdbcType=VARCHAR}, #{item.effDate,jdbcType=DATE}, #{item.basis,jdbcType=VARCHAR}, 
@@ -59,7 +59,7 @@
             #{item.finprodType2,jdbcType=VARCHAR}, #{item.remark,jdbcType=VARCHAR}, #{item.createUser,jdbcType=VARCHAR}, 
             #{item.createDept,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateUser,jdbcType=VARCHAR}, 
             #{item.updateTime,jdbcType=TIMESTAMP}, #{item.intType,jdbcType=VARCHAR}, #{item.highestRate,jdbcType=DECIMAL}, 
-            #{item.lowestRate,jdbcType=DECIMAL}, #{item.benchmarkId,jdbcType=VARCHAR}, #{item.benchmarkType,jdbcType=VARCHAR}
+            #{item.lowestRate,jdbcType=DECIMAL}, #{item.benchmarkId,jdbcType=VARCHAR}, #{item.benchmarkType,jdbcType=VARCHAR},#{item.firstConfirmDate,jdbcType=DATE}
         </foreach>
     </insert>
     

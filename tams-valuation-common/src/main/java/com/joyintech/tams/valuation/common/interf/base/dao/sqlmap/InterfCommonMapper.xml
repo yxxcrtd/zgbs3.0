@@ -1116,4 +1116,26 @@
 			GROUP BY A.SEC_TYPE
 		) T WHERE ROWNUM = 1
 	</select>
+
+
+	<select id="getMstIntRateInfo" resultType="com.joyintech.tams.common.base.entity.MstIntRateInfo">
+			SELECT
+				T1.INT_RATE_ID INT_RATE_ID,
+				T1.INT_RATE_TYPE INT_RATE_TYPE,
+				T1.EFF_DATE EFF_DATE,
+				T1.RELAESE_DATE RELAESE_DATE,
+				T1.INT_RATE INT_RATE,
+				T1.CCY CCY,
+				T1.INPUT_TYPE INPUT_TYPE
+			FROM
+				MST_INT_RATE_INFO T1,
+				( SELECT max( T2.EFF_DATE ) EFF_DATE, T2.INT_RATE_ID FROM MST_INT_RATE_INFO T2
+				WHERE <![CDATA[  T2.EFF_DATE <= TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
+				GROUP BY T2.INT_RATE_ID ) T3
+			WHERE
+				T1.EFF_DATE = T3.EFF_DATE
+				AND T1.INT_RATE_ID = T3.INT_RATE_ID
+				AND T1.INT_RATE_ID = #{intRateId}
+</select>
+
 </mapper>

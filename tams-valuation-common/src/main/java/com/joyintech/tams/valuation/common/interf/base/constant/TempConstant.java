@@ -363,5 +363,25 @@ public class TempConstant {
      */
     public static final String 自定义现金流交易= "ValCashflowTrade";
 
+    /**
+     * 利率互换标的信息
+     */
+    public static final String 利率互换标的信息= "ValIrsInfo";
+    /**
+     * 利率互换付息计划
+     */
+    public static final String 利率互换付息计划= "ValIrsCashPlan";
+    /**
+     * 利率互换交易信息
+     */
+    public static final String 利率互换交易信息= "ValIrsDeal";
+    /**
+     * 利率互换存续期交易
+     */
+    public static final String 利率互换存续期交易= "ValIrsPerIodDeal";
+
+
+
+
 }
 

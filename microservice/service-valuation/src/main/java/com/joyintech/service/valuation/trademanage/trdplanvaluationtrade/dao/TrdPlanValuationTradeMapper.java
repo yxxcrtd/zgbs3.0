@@ -27,18 +27,6 @@ import java.util.Map;
  */
 @Repository(value="serviceTrdPlanValuationTradeMapper")
 public interface TrdPlanValuationTradeMapper {
-
-    Integer  selectCountByTradeId(@Param("tradeId")String tradeId);
-
-
-    /**
-     * 获取自增序列值
-     * @param sequenceName 序列名
-     * @return
-     */
-    String getNextId(@Param("sequenceName")String sequenceName);
-
-
 	/**
 	 * 检索债券交易列表
 	 *
@@ -59,9 +47,9 @@ public interface TrdPlanValuationTradeMapper {
 	 * @see
 	 * @since 1.0
 	 */
-	TrdPlanValuationTradeDto queryRedInfoByTradeId(@Param("tradeId") String tradeId);
+	TrdPlanValuationTradeDto queryRedInfoByTradeId(Map<String, Object> param);
 
-	TrdPlanValuationTradeDto queryRedInfoByOutTradeId(@Param("tradeId") String tradeId);
+	TrdPlanValuationTradeDto queryRedInfoByOutTradeId(Map<String, Object> param);
 
 	int delBokDetailIdByTradeId(Map<String, Object> map);
 

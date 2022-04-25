@@ -10,11 +10,12 @@
 			<Cell order="6" name="资产名称">assetAbbr</Cell>
 			<Cell order="7" name="交易类型">psStr</Cell>
 			<Cell order="8" name="交易日期">tradeDateStr</Cell>
-			<Cell order="9" name="交易金额">tradeAmtStr</Cell>
-			<Cell order="10" name="交易份额">dealNumStr</Cell>
-			<Cell order="11" name="币种">ccyFmt</Cell>
-			<Cell order="12" name="结算金额">settleAmtStr</Cell>
+			<Cell order="9" name="结算日期">settleDateStr</Cell>
+			<Cell order="10" name="交易金额">tradeAmtStr</Cell>
+			<Cell order="11" name="交易数量">dealNumStr</Cell>
+			<Cell order="12" name="币种">ccyFmt</Cell>
 			<Cell order="13" name="资金账户">trdMyAcctNo</Cell>
+			<Cell order="14" name="数据来源">dataSourceStr</Cell>
 		</Row>
 	</Worksheet>
 </Workbook>
