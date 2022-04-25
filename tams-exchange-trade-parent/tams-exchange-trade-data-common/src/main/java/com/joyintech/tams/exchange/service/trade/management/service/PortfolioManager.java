@@ -605,7 +605,7 @@ public class PortfolioManager extends BaseService {
 
         // 行情数据
         ResultBean tickBean = quoteService.getTick(bean.getStockCode());
-        if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
+        if (ErrorCode.isFail(tickBean.getErrorCode())) {
             TickBean tick = (TickBean)tickBean.getData();
 //        QuoteProto.TickBean tick = quoteTickService.getTickFromCache(bean.getStockCode());
 //        if (Objects.isNull(tick)) {

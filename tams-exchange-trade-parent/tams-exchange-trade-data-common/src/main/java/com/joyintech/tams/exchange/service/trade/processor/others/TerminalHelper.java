@@ -6,6 +6,8 @@ import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.bean.bond.StandardBondBean;
 import com.joyintech.tams.exchange.common.bean.bond.StandardBondQryBean;
 import com.joyintech.tams.exchange.common.bean.investment.CapitalAccountBean;
+import com.joyintech.tams.exchange.common.bean.request.TradeInfoProRequest;
+import com.joyintech.tams.exchange.common.bean.response.TradeInfoProResponse;
 import com.joyintech.tams.exchange.common.constant.AgentType;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.constant.InstructionPs;
@@ -14,12 +16,14 @@ import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.utils.ConvertListUtils;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
+import com.joyintech.tams.exchange.service.trade.management.service.CommonManagement;
 import com.joyintech.tams.exchange.service.trade.management.service.InvestmentManagement;
 import com.joyintech.tams.exchange.service.trade.scheduled.LoginJob;
 import com.joyintech.tams.exchange.service.trade.scheduled.quote.QuoteJob;
 import com.joyintech.tams.exchange.service.trade.server.agent.AccountManager;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgent;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgentManager;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +59,8 @@ public class TerminalHelper {
     private QuoteJob quoteJob;
     @Autowired
     private TerminalMappingService terminalMappingService;
+    @Autowired
+    private CommonManagement commonManagement;
 
     private final int batchSize = 1000; // 委托成交比对时，分页发送数据大小
 
@@ -606,13 +612,33 @@ public class TerminalHelper {
         if (pageSize > 1000) {
             negotiateQuoteQueryBean.setPageSize(1000);
         }
+        List<NegotiateQuoteReceiveBean> list = new ArrayList<>();
 
         final String side = negotiateQuoteQueryBean.getSide();
         if (StringUtil.isNotEmpty(side)) {
             negotiateQuoteQueryBean.setSide(InstructionPs.getEntrustBs(side));
         }
 
-        List<NegotiateQuoteReceiveBean> list = new ArrayList<>();
+        TradeInfoProRequest dto = new TradeInfoProRequest();
+        dto.setAcctNo(negotiateQuoteQueryBean.getAccountId());
+        dto.setTradePlace(Market.SZSE.investValue);
+        dto.setIsOur("Y");
+        List<TradeInfoProResponse> dealerTraderList = commonManagement.getDealerTraderInfo(dto);
+        if (CollectionUtils.isEmpty(dealerTraderList)) {
+            logger.error("queryNegotiateQuoteReceive error: 本方交易商、交易主体、交易员信息不存在");
+            return list;
+        }
+        TradeInfoProResponse tradeInfoProResponse = dealerTraderList.get(0);
+        if(StringUtil.isEmpty(negotiateQuoteQueryBean.getMemberId())){
+            negotiateQuoteQueryBean.setMemberId(tradeInfoProResponse.getDealerNo());
+        }
+        if(StringUtil.isEmpty(negotiateQuoteQueryBean.getInvestorId())){
+            negotiateQuoteQueryBean.setInvestorId(tradeInfoProResponse.getDealerPartyNo());
+        }
+        if(StringUtil.isEmpty(negotiateQuoteQueryBean.getTraderCode())){
+            negotiateQuoteQueryBean.setTraderCode(tradeInfoProResponse.getTraderNo());
+        }
+
         TradeAgent tradeAgent = getAgent(negotiateQuoteQueryBean.getAccountId());
         if (Objects.nonNull(tradeAgent)) {
             try {
