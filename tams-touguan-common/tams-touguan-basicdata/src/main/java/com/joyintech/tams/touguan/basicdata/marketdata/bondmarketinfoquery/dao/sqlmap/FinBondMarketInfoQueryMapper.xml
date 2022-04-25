@@ -147,7 +147,7 @@
             </if>
 
             <if test="mdateEnd != null">
-                 AND PAYHSRCSECINFO.MDATE <![CDATA[<=]]> #{mdateEnd,jdbcType=DATE}
+                AND PAYHSRCSECINFO.MDATE <![CDATA[<=]]> #{mdateEnd,jdbcType=DATE}
             </if>
 
             <if test="theOryOptionPayDayStart != null">
@@ -155,7 +155,7 @@
             </if>
 
             <if test="theOryOptionPayDayEnd != null">
-                 AND PAYHSRCSECOPTION.THEORYOPTIONPAYDAY <![CDATA[ <=]]> #{theOryOptionPayDayEnd,jdbcType=DATE}
+                AND PAYHSRCSECOPTION.THEORYOPTIONPAYDAY <![CDATA[ <=]]> #{theOryOptionPayDayEnd,jdbcType=DATE}
             </if>
 
             <if test="couponSpecies !=null and couponSpecies !=''">
@@ -344,8 +344,122 @@
     <select id="queryFinBondPayHSrcSecOption"
             resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondPayHSrcSecOptionDto"
             parameterType="Map">
-        select SECID,OPTIONSTARTDAY,OPTIONENDDAY,OPTIONPAYDAY,THEORYOPTIONPAYDAY,OPTIONPRICE,OPTIONTYPE,OPTIONCLAUSE from INTERF_PAYHSRCSECOPTION
+        select SECID,
+               OPTIONSTARTDAY,
+               OPTIONENDDAY,
+               OPTIONPAYDAY,
+               THEORYOPTIONPAYDAY,
+               OPTIONPRICE,
+               OPTIONTYPE,
+               OPTIONCLAUSE
+        from INTERF_PAYHSRCSECOPTION
         where SECID = #{secId,jdbcType=VARCHAR}
         ORDER BY THEORYOPTIONPAYDAY ASC
+    </select>
+
+    <select id="queryFinBondMarketForCoupons"
+            resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondPayHSrcSecOptionDto"
+            parameterType="Map">
+        SELECT PAYHSRCSECINFO.SECID,
+               PAYHSRCSECINFO.SECNAME,
+               PAYHSRCSECINFO.SECFULLNAME,
+               PAYHSRCSECINFO.SECCODE,
+               PAYHSRCSECINFO.MARKET,
+               PAYHSRCSECINFO.INSTITUTION,
+               PAYHSRCSECINFO.INSTITUTIONTEXT,
+               PAYHSRCSECINFO.ISSUEPRICE,
+               PAYHSRCSECINFO.PUBENDDATE,
+               PAYHSRCSECINFO.VDATE,
+               PAYHSRCSECINFO.MDATE,
+               CASE
+                   WHEN PAYHSRCSECINFO.摘牌日 IS NOT NULL THEN PAYHSRCSECINFO.摘牌日
+                   WHEN (PAYHSRCSECINFO.CALLOPTION = 'Y' OR PAYHSRCSECINFO.PUTOPTION = 'Y') AND
+                        MARKET_INFO.MARKET_AMT = 0 THEN MARKET_INFO.VALUE_DATE
+                   ELSE PAYHSRCSECINFO.MDATE as 摘牌日,
+               PAYHSRCSECINFO.ISSUEAMT,
+               PAYHSRCSECINFO.ISSUERSHORT       ISSUERNAME,
+               CASE
+                   WHEN PAYHSRCSECINFO.ISSUETYPE = '01' THEN '公募'
+                   WHEN PAYHSRCSECINFO.ISSUETYPE = '02' THEN '私募'
+                   ELSE '' END               AS ISSUETYPE,
+               PAYHSRCSECINFO.ISSUS,
+               CASE
+                   WHEN (PAYHSRCSECINFO.CALLOPTION = 'Y' OR PAYHSRCSECINFO.PUTOPTION = 'Y') THEN 'Y'
+                   ELSE 'N' END              AS ISRIGHT,
+               'Y'                              ISAUTOUPDATE,
+               PAYHSRCSECINFO.是否净价交易,
+               PAYHSRCSECINFO.CCY,
+               CASE
+                   WHEN PAYHSRCSECINFO.CITY_INVEST_SEC_WIND = 'Y' AND (PAYHSRCSECINFO.是否绿色债 != 'Y' OR PAYHSRCSECINFO.是否绿色债 IS NULL)
+                       THEN CITYINVESTSECWIND
+                   WHEN PAYHSRCSECINFO.是否绿色债 = 'Y' AND (PAYHSRCSECINFO.CITY_INVEST_SEC_WIND != 'Y' OR PAYHSRCSECINFO.CITY_INVEST_SEC_WIND IS NULL)
+                       THEN 绿色债
+                   WHEN PAYHSRCSECINFO.CITY_INVEST_SEC_WIND = 'Y' AND PAYHSRCSECINFO.是否绿色债 = 'Y' THEN 城投债, 绿色债
+                   ELSE NULL END             AS 概念标识,
+               PAYHSRCSECINFO.跨市场代码,
+               PAYHSRCSECINFO.REMARK,
+               --转债信息
+               PAYHSRCSECINFO.正股代码,
+               PRODUCT.FINPROD_ABBR             SHARENAME,
+               PAYHSRCSECINFO.转股起始日,
+               PAYHSRCSECINFO.转股价格,
+               PAYHSRCSECINFO.回售触发价,
+               PAYHSRCSECINFO.赎回触发价,
+               --计息要素
+               PAYHSRCSECINFO.COUPONSPECIES,
+               PAYHSRCSECINFO.INTERESTRATE,
+               PAYHSRCSECINFO.PAPERIR,
+               PAYHSRCSECINFO.基准利率精度,
+               PAYHSRCSECINFO.RATECODE,
+               PAYHSRCSECINFO.COEFFICIENT,
+               PAYHSRCSECINFO.SPREADRATE_8      SPREADRATE8,
+               PAYHSRCSECINFO.TOPRATE,
+               PAYHSRCSECINFO.BOTTOMRATE,
+               PAYHSRCSECINFO.RESETTYPE,
+               PAYHSRCSECINFO.OBSERVEBEFDAY,
+               PAYHSRCSECINFO.OBSERVEBEFUNIT,
+               PAYHSRCSECINFO.首次利率确定日,
+               CASE
+                   WHEN PAYHSRCSECINFO.RATEBASIC = 'A/365' THEN 'A/365'
+                   WHEN PAYHSRCSECINFO.RATEBASIC = 'A/360' THEN 'A/360'
+                   WHEN PAYHSRCSECINFO.RATEBASIC = 'A/365F' THEN 'A/365F'
+                   WHEN PAYHSRCSECINFO.RATEBASIC = '30/360' THEN '30/360'
+                   WHEN (PAYHSRCSECINFO.RATEBASIC = 'A/A_B_COUP' OR PAYHSRCSECINFO.RATEBASIC = 'A/A_B_DAY') THEN 'A/A'
+                   ELSE NULL END             AS RATEBASIC,
+               CASE
+                   WHEN PAYHSRCSECINFO.RATEBASIC = 'A/A_B_COUP' THEN '平均分配'
+                   WHEN PAYHSRCSECINFO.RATEBASIC = 'A/A_B_DAY' THEN '按实际天数分配'
+                   ELSE NULL END             AS BASICSTYLE,
+               --付息信息
+               PAYHSRCSECINFO.WORKDAYRULE,
+               PAYHSRCSECINFO.PAYCYCLE,
+               PAYHSRCSECINFO.SCHECALRULE,
+               PAYHSRCSECINFO.FIRSTRATEDAY
+               --付息计划
+            PAYHSRCSECSCHEDULE.INTERESTSTARTDAY,
+               PAYHSRCSECSCHEDULE.INTERESTENDDAY,
+               PAYHSRCSECSCHEDULE.COUPONRATE,
+               PAYHSRCSECSCHEDULE.PRINAMT,
+               PAYHSRCSECSCHEDULE.ACCRUEINTAMT,
+               --还本计划
+               PAYHSRCSECSCHEDULE2.INTERESTENDDAY,
+               PAYHSRCSECSCHEDULE2.PRINAMTPAY,
+               PAYHSRCSECSCHEDULE2.ACCRUEINTAMT,
+               PAYHSRCSECSCHEDULE2.CASHPAY
+               --行权计划
+            PAYHSRCSECSCHEDULE2.OPTIONSTARTDAY, PAYHSRCSECSCHEDULE2.OPTIONENDDAY,
+               PAYHSRCSECSCHEDULE2.OPTIONTYPE,
+               PAYHSRCSECSCHEDULE2.THEORYOPTIONPAYDAY,
+               PAYHSRCSECSCHEDULE2.OPTIONPAYDAY,
+               PAYHSRCSECSCHEDULE2.OPTIONPRICE,
+               PAYHSRCSECSCHEDULE2.OPTIONCLAUSE,
+               PAYHSRCSECINFO.REMARK            REMARK
+        FROM INTERF_PAYHSRCSECINFO PAYHSRCSECINFO
+        LEFT JOIN INTERF_PAYHSRCSECSCHEDULE PAYHSRCSECSCHEDULE ON PAYHSRCSECINFO.SECID = PAYHSRCSECSCHEDULE.SECID AND PAYHSRCSECSCHEDULE.SCHEDUTYPE IN ('01', '04')
+        LEFT JOIN INTERF_PAYHSRCSECSCHEDULE PAYHSRCSECSCHEDULE2 ON PAYHSRCSECINFO.SECID = PAYHSRCSECSCHEDULE2.SECID AND PAYHSRCSECSCHEDULE2.SCHEDUTYPE IN ('02', '03');
+        LEFT JOIN INTERF_PAYHSRCSECOPTION PAYHSRCSECOPTION ON PAYHSRCSECINFO.SECID = PAYHSRCSECOPTION.SECID
+        LEFT JOIN FIN_PRODUCT PRODUCT ON PRODUCT.FINPROD_MARKET_ID = PAYHSRCSECINFO.正股代码 AND PRODUCT.FINPROD_TYPE2 = 'F10'
+        LEFT JOIN MST_BOND_MARKET_INFO MARKET_INFO ON MARKET_INFO.SECID = PAYHSRCSECINFO.SECID AND MARKET_INFO.VALUE_DATE <![CDATA[<=]]> to_date(#{sysDate,jdbcType=VARCHAR},'yyyy-MM-dd')
+        WHERE PAYHSRCSECINFO.SECID = #{secId,jdbcType=VARCHAR}
     </select>
 </mapper>

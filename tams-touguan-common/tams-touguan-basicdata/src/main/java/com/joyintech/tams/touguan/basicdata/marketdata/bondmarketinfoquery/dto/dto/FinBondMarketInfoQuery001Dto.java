@@ -185,6 +185,9 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "zxGradeOrgId", value = "债项评级机构")
     private String zxGradeOrgId;
 
+    @ApiModelProperty(name = "finProductConvertibleDto", value = "债项市场转股信息")
+    private FinProductConvertibleDto finProductConvertibleDto;
+
     public String getSecId() {
         return secId;
     }
