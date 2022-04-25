@@ -402,7 +402,9 @@ public class IbuQuoteBondService extends BaseService {
         List<EntrustDto> result = new ArrayList<>();
         Map<String, Object> param = BeanUtil.object2Map(ptlAllocationAddRequest);
         List<String> entrustIdList = ptlAllocationAddRequest.getEntrustIdList();
-        entrustIdList.removeAll(Collections.singleton(null));
+        if (CollectionUtils.isNotEmpty(entrustIdList)) {
+            entrustIdList.removeAll(Collections.singleton(null));
+        }
         param.put("notentrustIdList",CollectionUtils.isNotEmpty(entrustIdList)?entrustIdList:null);
         param.put("platDate", iPlatformDate.getSysDateStr());
         param.put("entrustStatus",Arrays.asList(com.joyintech.tams.constant.DictCodeList.委托状态_已接收.getValue()));
