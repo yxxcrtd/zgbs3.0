@@ -5,9 +5,9 @@
     <select id="queryForPage"
             resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinWindMarketInfoQuery001Dto"
             parameterType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinBondMarketInfoQueryRequest">
-        SELECT SEC_INFO.SEC_ID,
-               SEC_INFO.BOND_NAME,
-               SEC_INFO.BOND_ABBREVIATION,
+        SELECT SEC_INFO.SEC_ID SECID,
+               SEC_INFO.BOND_NAME SECFULLNAME,
+               SEC_INFO.BOND_ABBREVIATION SECNAME,
                SEC_INFO.TRADING_PLACES,
                SEC_INFO.REGISTERED_CUSTODIAN,
                SEC_INFO.RAISE_MODE,
@@ -69,7 +69,7 @@
                SEC_INFO.VARIETY_OF_COUPONS,
                SEC_INFO.INTEREST_PAYMENT_FREQUENCY,
                SEC_INFO.RATE_TYPE,
-               SEC_INFO.CURRENCY,
+               SEC_INFO.CURRENCY CCY,
                CASE
                    WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN RDI_RELEASE_INFO.ISSUE_PX
                    ELSE RELEASE_INFO.ISSUE_PX END                                      as ISSUE_PX,
@@ -95,9 +95,122 @@
         FROM INTERF_WIND_UNRELEASE_SEC_INFO SEC_INFO
                  LEFT JOIN INTERF_WIND_RELEASE_INFO RELEASE_INFO ON SEC_INFO.SEC_ID = RELEASE_INFO.SEC_ID
                  LEFT JOIN INTERF_RDI_RELEASE_INFO RDI_RELEASE_INFO ON RDI_RELEASE_INFO.SECURITY_ID = SEC_INFO.SEC_ID
+        <where>
+            SEC_INFO.VALUE_DATE  <![CDATA[ < ]]> to_date(#{platformDate}, '%Y-%m-%d')
 
-        WHERE SEC_INFO.SETTL_DATE  <![CDATA[ < ]]> to_date(#{platformDate}, '%Y-%m-%d')
+            <if test="secId !=null and secId !=''">
+                AND PAYHSRCSECINFO.SECID = #{secId,jdbcType=VARCHAR}
+            </if>
 
+            <if test="market !=null and market !=''">
+                AND PAYHSRCSECINFO.MARKET = #{market,jdbcType=VARCHAR}
+            </if>
+
+            <if test="institution !=null and institution !=''">
+                AND PAYHSRCSECINFO.institution = #{institution,jdbcType=VARCHAR}
+            </if>
+
+            <if test="issuer !=null and issuer !=''">
+                AND PAYHSRCSECINFO.ISSUERSHORT = #{issuer,jdbcType=VARCHAR}
+            </if>
+
+            <if test="issueDateStart != null">
+                AND PAYHSRCSECINFO.PUBENDDATE >= #{issueDateStart,jdbcType=DATE}
+            </if>
+
+            <if test="issueDateEnd != null">
+                AND PAYHSRCSECINFO.PUBENDDATE <![CDATA[ <= ]]> #{issueDateEnd,jdbcType=DATE}
+            </if>
+
+            <if test="vdateStart != null">
+                AND PAYHSRCSECINFO.VDATE >= #{vdateStart,jdbcType=DATE}
+            </if>
+
+            <if test="vdateEnd != null">
+                AND PAYHSRCSECINFO.VDATE <![CDATA[ <= ]]>  #{vdateEnd,jdbcType=DATE}
+            </if>
+
+            <if test="mdateStart != null">
+                AND PAYHSRCSECINFO.MDATE >= #{mdateStart,jdbcType=DATE}
+            </if>
+
+            <if test="mdateEnd != null">
+                AND PAYHSRCSECINFO.MDATE <![CDATA[<=]]> #{mdateEnd,jdbcType=DATE}
+            </if>
+
+            <if test="theOryOptionPayDayStart != null">
+                AND PAYHSRCSECOPTION.THEORYOPTIONPAYDAY >= #{theOryOptionPayDayStart,jdbcType=DATE}
+            </if>
+
+            <if test="theOryOptionPayDayEnd != null">
+                AND PAYHSRCSECOPTION.THEORYOPTIONPAYDAY <![CDATA[ <=]]> #{theOryOptionPayDayEnd,jdbcType=DATE}
+            </if>
+
+            <if test="couponSpecies !=null and couponSpecies !=''">
+                AND PAYHSRCSECINFO.COUPONSPECIES = #{couponSpecies,jdbcType=VARCHAR}
+            </if>
+
+            <if test="interestRate !=null and interestRate !=''">
+                AND PAYHSRCSECINFO.INTERESTRATE = #{interestRate,jdbcType=VARCHAR}
+            </if>
+
+            <if test="payCycle !=null and payCycle !=''">
+                AND PAYHSRCSECINFO.PAYCYCLE = #{payCycle,jdbcType=VARCHAR}
+            </if>
+
+            <if test="ccy !=null and ccy !=''">
+                AND PAYHSRCSECINFO.CCY = #{ccy,jdbcType=VARCHAR}
+            </if>
+
+            <if test="isSus !=null and isSus !=''">
+                AND PAYHSRCSECINFO.ISSUS = #{isSus,jdbcType=VARCHAR}
+            </if>
+
+            <if test="isSus !=null and isSus !=''">
+                AND PAYHSRCSECINFO.ISSUS = #{isSus,jdbcType=VARCHAR}
+            </if>
+
+            <if test="isRight !=null and isRight !='' and isRight == Y">
+                AND ( PAYHSRCSECINFO.CALLOPTION = 'Y' OR PAYHSRCSECINFO.PUTOPTION = 'Y')
+            </if>
+
+            <if test="isRight !=null and isRight !='' and isRight == N">
+                AND ( PAYHSRCSECINFO.CALLOPTION = 'N' AND PAYHSRCSECINFO.PUTOPTION = 'N')
+            </if>
+
+            <if test="optionType !=null and optionType !=''">
+                AND PAYHSRCSECOPTION.OPTIONTYPE = #{optionType,jdbcType=VARCHAR}
+            </if>
+
+            <if test="zxGrade !=null and zxGrade !=''">
+                AND PAYHSRCSECRATING2.RATING in (#{zxGrade,jdbcType=VARCHAR})
+            </if>
+
+            <if test="ztGrade !=null and ztGrade !=''">
+                AND PAYHSRCSECRATING.RATING in (#{ztGrade,jdbcType=VARCHAR})
+            </if>
+
+            <if test="search !=null and search !=''">
+                AND (
+                PAYHSRCSECINFO.SECID like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.MARKET like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.institution like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.ISSUERSHORT like '%' || #{search} || '%' OR
+                to_char(PAYHSRCSECINFO.PUBENDDATE,'yyyy-MM-dd') = #{search} OR
+                to_char(PAYHSRCSECINFO.VDATE,'yyyy-MM-dd') = #{search} OR
+                to_char(PAYHSRCSECINFO.MDATE,'yyyy-MM-dd') = #{search} OR
+                to_char(PAYHSRCSECOPTION.THEORYOPTIONPAYDAY,'yyyy-MM-dd') = #{search} OR
+                PAYHSRCSECINFO.COUPONSPECIES like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.INTERESTRATE like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.PAYCYCLE like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.CCY like '%' || #{search} || '%' OR
+                PAYHSRCSECINFO.ISSUS like '%' || #{search} || '%' OR
+                PAYHSRCSECOPTION.OPTIONTYPE like '%' || #{search} || '%' OR
+                PAYHSRCSECRATING2.RATING like '%' || #{search} || '%' OR
+                PAYHSRCSECRATING.RATING like '%' || #{search} || '%'
+                )
+            </if>
+        </where>
         ORDER BY PRIMARY_CLASSIFICATION, SECONDARY_CLASSIFICATION
     </select>
 
