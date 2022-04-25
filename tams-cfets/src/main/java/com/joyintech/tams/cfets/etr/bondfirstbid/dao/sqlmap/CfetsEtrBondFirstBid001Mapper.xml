@@ -38,7 +38,8 @@
                     or to_char(aaa.transProcess,'FM99990.9990')=#{search} or  aaa.transProcess||'' =#{search}
                     or to_char(aaa.etrDate,'yyyy-MM-dd')  = #{search}
                     or to_char(aaa.etrDate,'yyyyMMdd')  = #{search}
-                    or  aaa.etrDate=#{year}||'-'||#{search}
+                    or to_char(aaa.etrDate,'yyyy-MM-dd') =#{year}||'-'||#{search}
+                    or to_char(aaa.etrDate,'yyyyMMdd') =#{year}||''||#{search}
                     or to_char(aaa.issueDate,'yyyy-MM-dd')  = #{search}
                     or to_char(aaa.issueDate,'yyyyMMdd')  = #{search}
                     or aaa.totalBiddingNum ||''= #{search}
@@ -314,8 +315,6 @@
     <select id="findIssueInfoPage"  parameterType="Map"
             resultType="com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIssueInfoDto">
         select * from (select aaa.* from (
-            <include refid="interfFinProductInfo"></include>
-            UNION
             <include refid="finProductInfo"></include>
         ) aaa
         left join SYS_DATADICT_LIST sdl on aaa.issueClass = sdl.ITEM_CODE and sdl.DICT_CODE = 'ISSUE_CLASS'
@@ -361,6 +360,7 @@
                 )
             </if>
         </where>
+        )
     </select>
     <sql id="interfFinProductInfo">
 
