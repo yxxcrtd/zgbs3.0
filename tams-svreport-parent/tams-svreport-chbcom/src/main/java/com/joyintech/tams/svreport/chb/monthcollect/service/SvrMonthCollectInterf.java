@@ -1,6 +1,7 @@
 package com.joyintech.tams.svreport.chb.monthcollect.service;
 
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.common.svreport.chb.constant.SVReportGlobalConstant;
 import com.joyintech.tams.common.svreport.chb.util.SvrDataUtil;
@@ -73,7 +74,8 @@ public class SvrMonthCollectInterf extends BaseService{
      */
     private void dbData(Map<String,Map<String,Map<String,ChbMonthCollect>>> AllMap,Date batchDate,Date batchDateStart ,Date batchDateEnd) {
 		//获取本行登记代码
-		String bankCode =CommonUtil.selectBankCode();
+//		String bankCode =CommonUtil.selectBankCode();
+		String bankCode = CacheUtil.getSysParam("SVR_ISSUE_PARTY_ID");
     	if (AllMap.size() != 0) {
 			//获取下个月的第一天
 			Date nextMonFirDay = getFirstDayOfNextMonth(DateUtil.format(batchDate));
