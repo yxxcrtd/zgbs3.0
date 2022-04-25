@@ -82,8 +82,8 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "isRight", value = "是否含权债")
     private String isRight;
 
-    @ApiModelProperty(name = "cyy", value = "币种")
-    private String cyy;
+    @ApiModelProperty(name = "ccy", value = "币种")
+    private String ccy;
 
     @ApiModelProperty(name = "faceValue", value = "面额")
     @JsonSerialize(using = BigDecimalSerializer.class)
@@ -348,14 +348,6 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
         this.isRight = isRight;
     }
 
-    public String getCyy() {
-        return cyy;
-    }
-
-    public void setCyy(String cyy) {
-        this.cyy = cyy;
-    }
-
     public BigDecimal getFaceValue() {
         return faceValue;
     }
@@ -594,5 +586,13 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
 
     public void setTheOryOptionPayDay(Date theOryOptionPayDay) {
         this.theOryOptionPayDay = theOryOptionPayDay;
+    }
+
+    public String getCcy() {
+        return ccy;
+    }
+
+    public void setCcy(String ccy) {
+        this.ccy = ccy;
     }
 }
