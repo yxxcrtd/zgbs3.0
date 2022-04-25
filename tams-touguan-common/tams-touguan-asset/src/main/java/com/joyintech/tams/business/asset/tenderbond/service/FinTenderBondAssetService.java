@@ -67,7 +67,6 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
     private JoyinbusinessCommonService joyinbusinessCommonService;
 
 
-
     @Override
     public String generateTitle(FinTenderBondAsset002Dto entity, OperationType operationType) {
         return String.format("资产代码(%s) 资产简称(%s)", StringUtil.isEmpty(entity.getFinprodMarketId()) ? "" : entity.getFinprodMarketId(),
@@ -388,12 +387,12 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         if (isInProcess(dto.getFinprodMarketId(), "FinTenderBondAsset002", "FinTenderBondAsset003")) {
             validList.add(new ValidMessage("存在流程中的数据"));
         }
-        if(StringUtil.isEmpty(operateType)) {
+        if (StringUtil.isEmpty(operateType)) {
             validList.add(new ValidMessage("操作类型不能为空"));
         }
         if (StringUtil.equals(operateType, OperationType.NEW.name())) {
             this.emptyCheck(dto, validList);
-            if(StringUtil.isNotEmpty(dto.getFinprodMarketId()) && StringUtil.isNotEmpty(dto.getTradeMarket())) {
+            if (StringUtil.isNotEmpty(dto.getFinprodMarketId()) && StringUtil.isNotEmpty(dto.getTradeMarket())) {
                 String finprodId = getFinprodId(dto);
                 FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
                 if (Objects.nonNull(finProduct)) { //同一资产代码只能存在一条数据
@@ -448,9 +447,9 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
      * @return
      */
     public String getFinprodId(FinTenderBondAsset002Dto dto) {
-        String [] arr = dto.getFinprodMarketId().split("\\.");
+        String[] arr = dto.getFinprodMarketId().split("\\.");
         return String.format("%s_%s_%d_%s_%s.%s", DictCodeListExt2.平安资产类型_一级市场债.getValue(), arr[0],
-                dto.getIssueDto().getAddBatch(), dto.getTradeMarket(), DateUtil.format(dto.getProductAddDto().getBidDate(), "yyyyMMdd"),arr[1]);
+                dto.getIssueDto().getAddBatch(), dto.getTradeMarket(), DateUtil.format(dto.getProductAddDto().getBidDate(), "yyyyMMdd"), arr[1]);
     }
 
 
@@ -464,16 +463,29 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         ValidUtils.valid(dto, validList);
         ValidUtils.valid(dto.getProductAddDto(), validList);
         ValidUtils.valid(dto.getIssueDto(), validList);
-        if(Objects.isNull(dto.getIssueDto())) return;
-        if(StringUtil.isNotEmpty(dto.getIssueDto().getIssueClass()) && (StringUtil.equals(dto.getIssueDto().getIssueClass(), DictCodeListExt4.新债_发行方式_招标发行.getValue()) ||
+        if (Objects.isNull(dto.getIssueDto())) return;
+        if (StringUtil.isNotEmpty(dto.getIssueDto().getIssueClass()) && (StringUtil.equals(dto.getIssueDto().getIssueClass(), DictCodeListExt4.新债_发行方式_招标发行.getValue()) ||
                 StringUtil.equals(dto.getIssueDto().getIssueClass(), DictCodeListExt4.新债_发行方式_簿记建档.getValue()))) {
             if (StringUtil.isEmpty(dto.getIssueDto().getTenderTarget())) {
                 validList.add(new ValidMessage("招标标的不能为空"));
             }
         }
-        if(StringUtil.isNotEmpty(dto.getIssueDto().getIssueStyle()) && StringUtil.equals(dto.getIssueDto().getIssueStyle(), DictCodeListExt4.发行类型_增发.getValue()) ) {
+        if (StringUtil.isNotEmpty(dto.getIssueDto().getIssueStyle()) && StringUtil.equals(dto.getIssueDto().getIssueStyle(), DictCodeListExt4.发行类型_增发.getValue())) {
             if (StringUtil.isEmpty(dto.getIssueDto().getTenderTarget())) {
                 validList.add(new ValidMessage("增发批次不能为空"));
+            }
+        }
+        if (StringUtil.isNotEmpty(dto.getIssueDto().getIssueClass()) && (StringUtil.equals(dto.getIssueDto().getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue()) || (
+                StringUtil.equals(dto.getIssueDto().getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue()) && StringUtil.isNotEmpty(dto.getIssueDto().getIssueClass()) &&
+                        (StringUtil.equals(dto.getIssueDto().getIssueClass(), DictCodeListExt4.招标方式_单一价格招标) || StringUtil.equals(dto.getIssueDto().getIssueClass(), DictCodeListExt4.招标方式_数量招标))
+        ))) {
+            if (Objects.isNull(dto.getIssueDto().getIssueDate())) {
+                validList.add(new ValidMessage("发行日不能为空"));
+            }else if(DateUtil.compareDate(dto.getIssueDto().getIssueDate(), iPlatformDate.getSysDate()) < 0){
+                validList.add(new ValidMessage("发行日需大于等于平台日"));
+            }
+            if (Objects.isNull(dto.getIssueDto().getPayDate())) {
+                validList.add(new ValidMessage("缴款日日不能为空"));
             }
         }
         if (StringUtil.isNotEmpty(dto.getIssueDto().getIssueStyle()) && StringUtil.equals(dto.getIssueDto().getIssueStyle(), DictCodeListExt4.发行类型_增发)) {
@@ -493,7 +505,6 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
                 validList.add(new ValidMessage("投标日需大于等于平台日"));
             }
         }
-
     }
 
 

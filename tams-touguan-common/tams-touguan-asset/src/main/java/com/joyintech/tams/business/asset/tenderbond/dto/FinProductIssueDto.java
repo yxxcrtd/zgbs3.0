@@ -90,13 +90,13 @@ public class FinProductIssueDto {
     /**
      * 发行日
      */
-    @ApiModelProperty(name = "issueDate", value = "发行日",required = true)
+    @ApiModelProperty(name = "issueDate", value = "发行日")
     private Date issueDate;
 
     /**
      * 缴款日
      */
-    @ApiModelProperty(name = "payDate", value = "缴款日",required = true)
+    @ApiModelProperty(name = "payDate", value = "缴款日")
     private Date payDate;
 
     /**
