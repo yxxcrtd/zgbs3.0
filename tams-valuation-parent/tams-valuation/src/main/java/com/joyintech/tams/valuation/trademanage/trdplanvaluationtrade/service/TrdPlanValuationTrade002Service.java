@@ -17,6 +17,7 @@ import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 import com.joyintech.tams.valuation.common.interf.base.dto.PlanAssetCurrencyDealCommonResult;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.fund.FundBuyAndSellDealRecService;
@@ -78,25 +79,6 @@ public class TrdPlanValuationTrade002Service extends CommonExportService<TrdPlan
         return restTemplate.postForObject(
                 ServiceApplication.VALUATION_SERVICE_NAME + "/TrdPlanValuationTrade/queryTradeInfoByTradeId",
                 param, TrdPlanValuationTradeDto.class);
-    }
-
-    public List<SelectOptionDto> getTrdAcctId(Map<String, Object> param) {
-        return restTemplate.postForList(
-                ServiceApplication.VALUATION_SERVICE_NAME + "/TrdPlanValuationTrade/getTrdAcctId", param,
-                SelectOptionDto.class);
-    }
-
-    /**
-     * 策略代码生成
-     *
-     * @see
-     * @since 1.0
-     */
-    public String createPlanTradeId() {
-        return restTemplate.postForObject(
-                ServiceApplication.VALUATION_SERVICE_NAME + "/TrdPlanValuationTrade/createPlanTradeId",
-                null, String.class);
-
     }
 
     /**
@@ -438,11 +420,13 @@ public class TrdPlanValuationTrade002Service extends CommonExportService<TrdPlan
         valMngMnfTade.setDataActionSign("01");//数据动作标志
         valMngMnfTade.setPrinAmt(dto.getTradeAmt());//交易本金
         valMngMnfTade.setTradeMarket("09");//交易市场
-        valMngMnfTade.setTradeAmt(dto.getSettleAmt());
+        valMngMnfTade.setTradeAmt(dto.getTradeAmt());
         valMngMnfTade.setUnitCprice(ArithmeticUtil.divide(dto.getTradeAmt(),dto.getDealNum(),4, RoundingMode.HALF_UP));//单位净价
         valMngMnfTade.setIsClean("N"); //有无清算指令
 
         valMngMnfTade.setMyAcctNo(dto.getTrdMyAcctNo());//资金账户
+        //设置数据来源：画面录入
+        valMngMnfTade.setDataSource(DictCodeListExt1.生成方式_画面录入.getValue());
 
         return valMngMnfTade;
     }
@@ -474,6 +458,8 @@ public class TrdPlanValuationTrade002Service extends CommonExportService<TrdPlan
         valMngMnfApplyPurTade.setDataActionSign("01");//数据动作标志
         valMngMnfApplyPurTade.setTradeMarket("09");
         valMngMnfApplyPurTade.setIsClean("N"); //有无清算指令
+        //设置数据来源：画面录入
+        valMngMnfApplyPurTade.setDataSource(DictCodeListExt1.生成方式_画面录入.getValue());
 
         return valMngMnfApplyPurTade;
     }
@@ -504,6 +490,8 @@ public class TrdPlanValuationTrade002Service extends CommonExportService<TrdPlan
         valMngMnfAffirmPurTrade.setTradeMarket("09");//交易市场
         valMngMnfAffirmPurTrade.setDataActionSign("01");//数据动作标志
         valMngMnfAffirmPurTrade.setIsClean("N"); //有无清算指令
+        //设置数据来源：画面录入
+        valMngMnfAffirmPurTrade.setDataSource(DictCodeListExt1.生成方式_画面录入.getValue());
 
         return valMngMnfAffirmPurTrade;
     }
@@ -521,7 +509,7 @@ public class TrdPlanValuationTrade002Service extends CommonExportService<TrdPlan
         valMngMnfRedAffirm.setAssetName(dto.getAssetAbbr());//资产名称
 
         valMngMnfRedAffirm.setTradeDate(dto.getRedConfirmDate());//交易日
-        valMngMnfRedAffirm.setPreDate(dto.getArriveDate());//预计到账日
+        valMngMnfRedAffirm.setPreDate(dto.getRedConfirmDate());//预计到账日
         valMngMnfRedAffirm.setRedShare(dto.getRedConfirmNum());//确认数量
         valMngMnfRedAffirm.setRedAmt(dto.getRedConfirmAmt());//赎回金额
         valMngMnfRedAffirm.setFee(dto.getRedFee());//赎回费
@@ -532,6 +520,9 @@ public class TrdPlanValuationTrade002Service extends CommonExportService<TrdPlan
 
         valMngMnfRedAffirm.setMyAcctNo(dto.getRedMyAcctNo());//资金账户
         valMngMnfRedAffirm.setUnitCprice(dto.getRedUnitValue());//单位净值
+
+        //设置数据来源：画面录入
+        valMngMnfRedAffirm.setDataSource(DictCodeListExt1.生成方式_画面录入.getValue());
 
         return valMngMnfRedAffirm;
     }
@@ -554,6 +545,8 @@ public class TrdPlanValuationTrade002Service extends CommonExportService<TrdPlan
         valMngMnfRedAccoutTrade.setIsClean("N"); //有无清算指令
 
         valMngMnfRedAccoutTrade.setMyAcctNo(dto.getRedMyAcctNo());//资金账户
+        //设置数据来源：画面录入
+        valMngMnfRedAccoutTrade.setDataSource(DictCodeListExt1.生成方式_画面录入.getValue());
 
         return valMngMnfRedAccoutTrade;
     }

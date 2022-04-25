@@ -69,21 +69,6 @@ public class TrdPlanValuationTradeDtoValidator implements BeanValidator {
                         resultList.add(new ValidMessage("trdMyAcctNo",
                                 getMessage("VAL_COMMON_E_0002", getMessage("TrdPlanValuationTrade002.myAcctNo"))));
                     }
-//                    //投资顾问费
-//                    if(!StringUtil.isNotEmpty(dto.getAdvFeeOut())){
-//                        resultList.add(new ValidMessage("advFeeOut",
-//                                getMessage("VAL_COMMON_E_0002", getMessage("TrdPlanValuationTrade002.advFeeOut"))));
-//                    }
-//                    //其他费用
-//                    if(!StringUtil.isNotEmpty(dto.getOtherAmt())){
-//                        resultList.add(new ValidMessage("otherAmt",
-//                                getMessage("VAL_COMMON_E_0002", getMessage("TrdPlanValuationTrade002.otherAmt"))));
-//                    }
-                    //结算金额
-                    if(!StringUtil.isNotEmpty(dto.getSettleAmt())){
-                        resultList.add(new ValidMessage("settleAmt",
-                                getMessage("VAL_COMMON_E_0002", getMessage("TrdPlanValuationTrade002.settleAmt"))));
-                    }
                 }else if(StringUtil.equals(dto.getPs(),DictCodeList.交易方向_认购.getValue())  ){
                     //申请日期
                     if(!StringUtil.isNotEmpty(dto.getApplyDate())){
@@ -198,11 +183,6 @@ public class TrdPlanValuationTradeDtoValidator implements BeanValidator {
                     if(!StringUtil.isNotEmpty(dto.getRedFee())){
                         resultList.add(new ValidMessage("redFee",
                                 getMessage("VAL_COMMON_E_0002", getMessage("TrdPlanValuationTrade002.redFee"))));
-                    }
-                    //到账日期
-                    if(!StringUtil.isNotEmpty(dto.getArriveDate())){
-                        resultList.add(new ValidMessage("arriveDate",
-                                getMessage("VAL_COMMON_E_0002", getMessage("TrdPlanValuationTrade002.arriveDate"))));
                     }
                     //资金账户
                     if(!StringUtil.isNotEmpty(dto.getRedMyAcctNo())){

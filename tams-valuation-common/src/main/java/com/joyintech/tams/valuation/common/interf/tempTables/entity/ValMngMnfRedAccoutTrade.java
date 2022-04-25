@@ -70,6 +70,11 @@ public class ValMngMnfRedAccoutTrade extends BaseEntity {
      * 资金账户
      */
     private String myAcctNo;
+
+    /**
+     * 数据来源
+     */
+    private String dataSource;
     /*add by sunshuaishuai 20220325 end*/
 
     /**
@@ -266,5 +271,20 @@ public class ValMngMnfRedAccoutTrade extends BaseEntity {
         this.myAcctNo = myAcctNo;
     }
 
+    /**
+     * 取得 数据来源
+     * @return 数据来源
+     */
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    /**
+     * 设置 数据来源
+     * @param dataSource 数据来源
+     */
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
+    }
     /*add by sunshuaishuai 20220325 end*/
 }

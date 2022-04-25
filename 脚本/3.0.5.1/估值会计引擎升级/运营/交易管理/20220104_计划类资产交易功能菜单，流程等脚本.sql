@@ -46,6 +46,15 @@ values ('TrdPlanValuationTrade001', '999999', 'PS', 'T19', null, null, 'system',
 insert into sys_page_dictlist (PAGE_ID, SUB_PAGE_ID, DICT_ID, DICT_ITEM_VAL, DICT_ITEM_VAL_CNNAME, DICT_ITEM_VAL_DEFAULT, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE)
 values ('TrdPlanValuationTrade001', '999999', 'PS', 'T24', null, null, 'system', null, sysdate, 'system', sysdate, null);
 
+-- 生成方式  画面数据字典明细关联
+DELETE FROM SYS_PAGE_DICTLIST WHERE PAGE_ID = 'TrdPlanValuationTrade001' AND DICT_ID='CREATE_TYPE';
+INSERT INTO SYS_PAGE_DICTLIST
+(PAGE_ID, SUB_PAGE_ID, DICT_ID, DICT_ITEM_VAL, DICT_ITEM_VAL_CNNAME, DICT_ITEM_VAL_DEFAULT, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE)
+VALUES('TrdPlanValuationTrade001', '999999', 'CREATE_TYPE', '01', '接口接入', NULL, 'system', NULL, sysdate, 'system', sysdate, NULL);
+INSERT INTO SYS_PAGE_DICTLIST
+(PAGE_ID, SUB_PAGE_ID, DICT_ID, DICT_ITEM_VAL, DICT_ITEM_VAL_CNNAME, DICT_ITEM_VAL_DEFAULT, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE)
+VALUES('TrdPlanValuationTrade001', '999999', 'CREATE_TYPE', '02', '画面录入', NULL, 'system', NULL, sysdate, 'system', sysdate, NULL);
+
 /*计划类资产(利率型)交易-工作流配置*/
 delete from sys_wfl_business_module where page_id='TrdPlanValuationTrade002';
 insert into sys_wfl_business_module (PAGE_ID, ELEMENT_ID, MODULE_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE, IS_SEND_UORG)
