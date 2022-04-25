@@ -69,8 +69,8 @@ public class CommonPositionEngineService {
     public String getDeliveryType(String finprodId) {
         String deliveryType = StringUtil.EMPTY;
         FinProductAdd finProductAdd = finProductAddMapper.selectByPrimaryKey(finprodId);
-        String tradePlat = finProductAdd.getTradePlat();
-        if (StringUtil.isNotEmpty(tradePlat) && tradePlat.contains(DictCodeList.交易平台_竞价撮合平台.getValue())) {
+        String isNoGuard = finProductAdd.getIsNoGuard();
+        if (StringUtil.isNotEmpty(isNoGuard) && isNoGuard.contains(DictCodeList.是否_否.getValue())) {
             deliveryType = DictCodeListExt3.结算方式_头寸引擎_净额结算.getValue();
         } else {
             deliveryType = DictCodeListExt3.结算方式_头寸引擎_RTGS.getValue();
