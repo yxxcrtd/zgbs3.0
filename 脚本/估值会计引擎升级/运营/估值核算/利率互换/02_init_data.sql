@@ -198,6 +198,10 @@ values ('530', 'VAL', '利率互换计提-账务明细批处理', null, 'irsCalB
 insert into sys_batch_task (TASK_ID, SYSTEM_CODE, TASK_NAME, FTASK_ID, BEAN_NAME, TASK_PRI, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_BATCH_START_TARGET)
 values ('531', 'VAL', '利率互换公允价值变动-账务明细批处理', null, 'irsFairValeAlterationsTask', 70, 'yy', null, sysdate, 'yy', sysdate, null);
 --整体任务调度(利率重置、批移到估值中)
+delete from sys_batch_task t where t.TASK_ID='10014';
+insert into sys_batch_task (TASK_ID, SYSTEM_CODE, TASK_NAME, FTASK_ID, BEAN_NAME, TASK_PRI, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_BATCH_START_TARGET)
+values ('10014', 'VAL', '利率重置', null, 'resetRateTask', 8, 'system', null, sysdate, 'system', sysdate, null);
+
 delete from  SYS_BATCH_JOB b where b.batch_seq_no='6f8803b3aa6fbaffe050007f01003cad' and b.task_id in('528','529','530','531','10014');
 insert into SYS_BATCH_JOB (BATCH_SEQ_NO, TASK_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('6f8803b3aa6fbaffe050007f01003cad', '528', 'yy', null, sysdate, 'yy', sysdate);

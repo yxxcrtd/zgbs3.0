@@ -10,6 +10,7 @@
 
 package com.joyintech.tams.valuation.common.interf.base.service.baseinfo.irs;
 
+import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
@@ -329,7 +330,9 @@ public class IrsBaseInfoRecService {
             paramMap.put("sysDate",DateUtil.format(dto.getVdate()));
             paramMap.put("intRateId", dto.getLinkRate());
             MstIntRateInfo mstIntRateInfo = interfCommonService.getMstIntRateInfo(paramMap);
-            valCashCalcRule.setYield(mstIntRateInfo.getIntRate());
+            BigDecimal yield = (mstIntRateInfo.getIntRate()==null?BigDecimal.ZERO:mstIntRateInfo.getIntRate())
+                    .add(dto.getSpreadRate()==null?BigDecimal.ZERO:dto.getSpreadRate());
+            valCashCalcRule.setYield(ArithmeticUtil.divide(yield,new BigDecimal(100)));
             // 计算基础 = A.计息基础
             valCashCalcRule.setBasis(dto.getFloatBasis());
         }
