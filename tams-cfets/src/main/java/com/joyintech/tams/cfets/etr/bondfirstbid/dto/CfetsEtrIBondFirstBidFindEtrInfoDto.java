@@ -48,7 +48,7 @@ public class CfetsEtrIBondFirstBidFindEtrInfoDto {
     private String issueClass;
 
     @ApiModelProperty(name="issueDate",value="投标日/发行日",example="2021-10-27")
-    private String issueDate;
+    private Date issueDate;
 
     @ApiModelProperty(name="totalBiddingNum",value="汇总投标券面总额")
     private String totalBiddingNum;
@@ -69,7 +69,7 @@ public class CfetsEtrIBondFirstBidFindEtrInfoDto {
     private String invManagerId;
 
     @ApiModelProperty(name="etrDate",value="指令日期",example="2021-07-06")
-    private String etrDate;
+    private Date etrDate;
 
     @ApiModelProperty(name="counterId",value="交易对手",example="A1")
     private String counterId;
@@ -186,14 +186,6 @@ public class CfetsEtrIBondFirstBidFindEtrInfoDto {
         this.issueClass = issueClass;
     }
 
-    public String getIssueDate() {
-        return issueDate;
-    }
-
-    public void setIssueDate(String issueDate) {
-        this.issueDate = issueDate;
-    }
-
     public String getTotalBiddingNum() {
         return totalBiddingNum;
     }
@@ -240,14 +232,6 @@ public class CfetsEtrIBondFirstBidFindEtrInfoDto {
 
     public void setInvManagerId(String invManagerId) {
         this.invManagerId = invManagerId;
-    }
-
-    public String getEtrDate() {
-        return etrDate;
-    }
-
-    public void setEtrDate(String etrDate) {
-        this.etrDate = etrDate;
     }
 
     public String getCounterId() {
@@ -320,5 +304,21 @@ public class CfetsEtrIBondFirstBidFindEtrInfoDto {
 
     public void setEntrustId(String entrustId) {
         this.entrustId = entrustId;
+    }
+
+    public Date getIssueDate() {
+        return issueDate;
+    }
+
+    public void setIssueDate(Date issueDate) {
+        this.issueDate = issueDate;
+    }
+
+    public Date getEtrDate() {
+        return etrDate;
+    }
+
+    public void setEtrDate(Date etrDate) {
+        this.etrDate = etrDate;
     }
 }

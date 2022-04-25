@@ -465,6 +465,17 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         ValidUtils.valid(dto.getProductAddDto(), validList);
         ValidUtils.valid(dto.getIssueDto(), validList);
         if(Objects.isNull(dto.getIssueDto())) return;
+        if(StringUtil.isNotEmpty(dto.getIssueDto().getIssueClass()) && (StringUtil.equals(dto.getIssueDto().getIssueClass(), DictCodeListExt4.新债_发行方式_招标发行.getValue()) ||
+                StringUtil.equals(dto.getIssueDto().getIssueClass(), DictCodeListExt4.新债_发行方式_簿记建档.getValue()))) {
+            if (StringUtil.isEmpty(dto.getIssueDto().getTenderTarget())) {
+                validList.add(new ValidMessage("招标标的不能为空"));
+            }
+        }
+        if(StringUtil.isNotEmpty(dto.getIssueDto().getIssueStyle()) && StringUtil.equals(dto.getIssueDto().getIssueStyle(), DictCodeListExt4.发行类型_增发.getValue()) ) {
+            if (StringUtil.isEmpty(dto.getIssueDto().getTenderTarget())) {
+                validList.add(new ValidMessage("增发批次不能为空"));
+            }
+        }
         if (StringUtil.isNotEmpty(dto.getIssueDto().getIssueStyle()) && StringUtil.equals(dto.getIssueDto().getIssueStyle(), DictCodeListExt4.发行类型_增发)) {
             if (StringUtil.isNotEmpty(dto.getProductAddDto().getCrossMarket()) && StringUtil.equals(dto.getProductAddDto().getCrossMarket(), DictCodeList.是否_是.getValue())) {
                 if (StringUtil.isEmpty(dto.getProductAddDto().getCrossMarketCode())) {

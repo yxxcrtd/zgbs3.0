@@ -35,4 +35,12 @@ public interface FinBondMarketInfoQueryMapper {
      * @return
      */
     List<FinBondPayHSrcSecOptionDto> queryFinBondPayHSrcSecOption(Map<String, Object> param);
+
+    /**
+     * 债券信息查询
+     *
+     * @param param
+     * @return
+     */
+    FinBondMarketInfoQuery001Dto queryFinBondMarketForCoupons(Map<String, Object> param);
 }

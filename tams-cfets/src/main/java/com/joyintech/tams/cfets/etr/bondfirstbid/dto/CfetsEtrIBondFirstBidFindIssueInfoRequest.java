@@ -4,6 +4,8 @@ import com.joyintech.tams.business.common.dto.PageMode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.Date;
+
 /**
  * @Author: kchen
  * @Date: 2022/4/21 9:51
@@ -14,7 +16,10 @@ public class CfetsEtrIBondFirstBidFindIssueInfoRequest {
     @ApiModelProperty(name="pageMode",value="分页对象",example="{pageSize: 10,pageNo: 1, sort: 'name', direction: 'asc'}")
     private PageMode pageMode;
 
-    @ApiModelProperty(name="finprodId",value="资产代码",example="ZC1",notes ="市场代码" )
+    @ApiModelProperty(name = "finprodMarketId", value = "资产代码")
+    private String finprodMarketId;
+
+    @ApiModelProperty(name="finprodId",value="金融产品代码",example="ZC1")
     private String finprodId;
 
     @ApiModelProperty(name="finprodAbbr",value="资产简称",example="ZC名")
@@ -23,11 +28,11 @@ public class CfetsEtrIBondFirstBidFindIssueInfoRequest {
     @ApiModelProperty(name="issueClass",value="发行方式",example="报价发行/招标发行/簿记建档")
     private String issueClass;
 
-    @ApiModelProperty(name="tenderSdate",value="投标起始日")
-    private String tenderSdate;
+    @ApiModelProperty(name="issueDateStart",value="投标日/发行日开始")
+    private Date issueDateStart;
 
-    @ApiModelProperty(name="tenderEdate",value="投标截止日")
-    private String tenderEdate;
+    @ApiModelProperty(name="issueDateEnd",value="投标日/发行日结束")
+    private Date issueDateEnd;
 
     @ApiModelProperty(name="couponSpecies",value="息票品种")
     private String couponSpecies;
@@ -40,6 +45,12 @@ public class CfetsEtrIBondFirstBidFindIssueInfoRequest {
 
     @ApiModelProperty(name="search",value="关键字",example="12")
     private String search;
+
+    @ApiModelProperty(name = "finprodType2", value = "金融产品类型（投管分类）")
+    private String finprodType2;
+
+    @ApiModelProperty(name="platformDate",value="平台日",example="12")
+    private String platformDate;
 
     public PageMode getPageMode() {
         return pageMode;
@@ -73,22 +84,6 @@ public class CfetsEtrIBondFirstBidFindIssueInfoRequest {
         this.issueClass = issueClass;
     }
 
-    public String getTenderSdate() {
-        return tenderSdate;
-    }
-
-    public void setTenderSdate(String tenderSdate) {
-        this.tenderSdate = tenderSdate;
-    }
-
-    public String getTenderEdate() {
-        return tenderEdate;
-    }
-
-    public void setTenderEdate(String tenderEdate) {
-        this.tenderEdate = tenderEdate;
-    }
-
     public String getCouponSpecies() {
         return couponSpecies;
     }
@@ -119,5 +114,45 @@ public class CfetsEtrIBondFirstBidFindIssueInfoRequest {
 
     public void setSearch(String search) {
         this.search = search;
+    }
+
+    public Date getIssueDateStart() {
+        return issueDateStart;
+    }
+
+    public void setIssueDateStart(Date issueDateStart) {
+        this.issueDateStart = issueDateStart;
+    }
+
+    public Date getIssueDateEnd() {
+        return issueDateEnd;
+    }
+
+    public void setIssueDateEnd(Date issueDateEnd) {
+        this.issueDateEnd = issueDateEnd;
+    }
+
+    public String getFinprodType2() {
+        return finprodType2;
+    }
+
+    public void setFinprodType2(String finprodType2) {
+        this.finprodType2 = finprodType2;
+    }
+
+    public String getPlatformDate() {
+        return platformDate;
+    }
+
+    public void setPlatformDate(String platformDate) {
+        this.platformDate = platformDate;
+    }
+
+    public String getFinprodMarketId() {
+        return finprodMarketId;
+    }
+
+    public void setFinprodMarketId(String finprodMarketId) {
+        this.finprodMarketId = finprodMarketId;
     }
 }

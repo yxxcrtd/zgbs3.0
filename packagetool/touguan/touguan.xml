@@ -76,7 +76,7 @@
 
         <module>../../tams-invest-parent</module>
         <module>../../tams-system/touguan/app</module>
-        <module>../../tams-business-common</module>
+<!--        <module>../../tams-business-common</module>-->
         <module>../../tams-cfets</module>
         <module>../../tams-cfets-system</module>
         <module>../../tams-common-basicdata</module>

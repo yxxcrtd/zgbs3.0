@@ -4,6 +4,7 @@ import com.joyintech.tams.business.common.dto.PageMode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,11 +30,11 @@ public class CfetsEtrIBondFirstBidFindEtrInfoRequest {
     @ApiModelProperty(name="issueClass",value="发行方式",example="报价发行/招标发行/簿记建档")
     private String issueClass;
 
-    @ApiModelProperty(name="tenderSdate",value="投标起始日")
-    private String tenderSdate;
+    @ApiModelProperty(name="issueDateStart",value="投标日/发行日开始")
+    private Date issueDateStart;
 
-    @ApiModelProperty(name="tenderEdate",value="投标截止日")
-    private String tenderEdate;
+    @ApiModelProperty(name="issueDateEnd",value="投标日/发行日结束")
+    private Date issueDateEnd;
 
     @ApiModelProperty(name="invManagerId",value="投资经理",example="A1")
     private String invManagerId;
@@ -42,10 +43,10 @@ public class CfetsEtrIBondFirstBidFindEtrInfoRequest {
     private String entrustId;
 
     @ApiModelProperty(name="entrustStartDate",value="指令开始日",example="2021-10-27")
-    private String entrustStartDate;
+    private Date entrustStartDate;
 
     @ApiModelProperty(name="entrustEndDate",value="指令结束日",example="2021-10-27")
-    private String entrustEndDate;
+    private Date entrustEndDate;
 
     @ApiModelProperty(name="firstBidStatus",value="中标状态",example="A1")
     private String firstBidStatus;
@@ -102,22 +103,6 @@ public class CfetsEtrIBondFirstBidFindEtrInfoRequest {
         this.issueClass = issueClass;
     }
 
-    public String getTenderSdate() {
-        return tenderSdate;
-    }
-
-    public void setTenderSdate(String tenderSdate) {
-        this.tenderSdate = tenderSdate;
-    }
-
-    public String getTenderEdate() {
-        return tenderEdate;
-    }
-
-    public void setTenderEdate(String tenderEdate) {
-        this.tenderEdate = tenderEdate;
-    }
-
     public String getInvManagerId() {
         return invManagerId;
     }
@@ -132,22 +117,6 @@ public class CfetsEtrIBondFirstBidFindEtrInfoRequest {
 
     public void setEntrustId(String entrustId) {
         this.entrustId = entrustId;
-    }
-
-    public String getEntrustStartDate() {
-        return entrustStartDate;
-    }
-
-    public void setEntrustStartDate(String entrustStartDate) {
-        this.entrustStartDate = entrustStartDate;
-    }
-
-    public String getEntrustEndDate() {
-        return entrustEndDate;
-    }
-
-    public void setEntrustEndDate(String entrustEndDate) {
-        this.entrustEndDate = entrustEndDate;
     }
 
     public String getFirstBidStatus() {
@@ -188,5 +157,37 @@ public class CfetsEtrIBondFirstBidFindEtrInfoRequest {
 
     public void setSearch(String search) {
         this.search = search;
+    }
+
+    public Date getIssueDateStart() {
+        return issueDateStart;
+    }
+
+    public void setIssueDateStart(Date issueDateStart) {
+        this.issueDateStart = issueDateStart;
+    }
+
+    public Date getIssueDateEnd() {
+        return issueDateEnd;
+    }
+
+    public void setIssueDateEnd(Date issueDateEnd) {
+        this.issueDateEnd = issueDateEnd;
+    }
+
+    public Date getEntrustStartDate() {
+        return entrustStartDate;
+    }
+
+    public void setEntrustStartDate(Date entrustStartDate) {
+        this.entrustStartDate = entrustStartDate;
+    }
+
+    public Date getEntrustEndDate() {
+        return entrustEndDate;
+    }
+
+    public void setEntrustEndDate(Date entrustEndDate) {
+        this.entrustEndDate = entrustEndDate;
     }
 }

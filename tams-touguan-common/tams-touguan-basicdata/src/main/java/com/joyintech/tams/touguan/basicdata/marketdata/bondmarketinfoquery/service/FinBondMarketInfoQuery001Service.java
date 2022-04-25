@@ -25,9 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -127,6 +125,21 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
             validMessages = errorInfoList.stream().map(errorInfo -> new ValidMessage(errorInfo)).collect(Collectors.toList());
         }
         return validMessages;
+    }
+
+    /**
+     * 加券市场信息查询
+     *
+     * @param param
+     * @return
+     */
+    public FinBondMarketInfoQuery001Dto queryFinBondMarketForCoupons(Map<String, Object> param) {
+        logger.info("queryFinBondMarketForCoupons >> 加券市场信息查询参数：{}", JSON.toJSONString(param));
+        FinBondMarketInfoQuery001Dto finBondMarketInfoQuery001Dto = finBondMarketInfoQueryMapper.queryFinBondMarketForCoupons(param);
+        if (Objects.nonNull(finBondMarketInfoQuery001Dto)) {
+
+        }
+        return finBondMarketInfoQuery001Dto;
     }
 
 
