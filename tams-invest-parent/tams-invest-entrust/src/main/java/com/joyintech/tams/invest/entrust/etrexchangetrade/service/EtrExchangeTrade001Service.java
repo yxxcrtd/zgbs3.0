@@ -2708,7 +2708,9 @@ public class EtrExchangeTrade001Service extends CommonExportService<EtrExchangeT
 							if (StringUtil.isNotEmpty(vailableNum)) {
 								unit.setAccAvailablePos(vailableNum);
 								if(vailableNum.compareTo(new BigDecimal(0))<1){
-									promptMsg ="可用持仓不足";
+									confirmMsg ="可用持仓不足(行号为" + lineNo + ")。";
+									promptMsg = etrCommonService.StringAddByBr(promptMsg, confirmMsg);
+									// 清空confirmMsg
 									confirmMsg = "";
 								}
 							}
