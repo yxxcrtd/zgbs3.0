@@ -251,6 +251,12 @@ public class SecFairValeAlterationsProcessorNewService {
                     happenDate, baseSubjectNature, expBalanceDirect, taskPri);
                 spilledPriceBalance = subjectBalance.getBalance() == null ? BigDecimal.ZERO : subjectBalance.getBalance();
             }
+            if (DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(invAim)) {
+                baseSubjectNature = DictCodeBaseSubjectNatrueNew.公允价值损益类_利息调整.getValue();
+                subjectBalance = this.getSubjectBalanceExpectDirection(booksetId, bokDetailId,
+                    happenDate, baseSubjectNature, expBalanceDirect, taskPri);
+                spilledPriceBalance = subjectBalance.getBalance() == null ? BigDecimal.ZERO : subjectBalance.getBalance();
+            }
             else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(invAim)) {
                 baseSubjectNature = DictCodeBaseSubjectNatrueNew.综合收益类_利息调整.getValue();
                 subjectBalance = this.getSubjectBalanceExpectDirection(booksetId, bokDetailId,
@@ -340,6 +346,8 @@ public class SecFairValeAlterationsProcessorNewService {
                         }
                         // if(变量.账务明细.基础科目性质 = XX利息调整的账务明细 )
                         if (DictCodeBaseSubjectNatrueNew.摊余成本类_利息调整.getValue().equals(
+                            var.getBaseSubjectNature())
+                            || DictCodeBaseSubjectNatrueNew.公允价值损益类_利息调整.getValue().equals(
                             var.getBaseSubjectNature())
                             || DictCodeBaseSubjectNatrueNew.综合收益类_利息调整.getValue().equals(
                                 var.getBaseSubjectNature())) {
@@ -436,6 +444,8 @@ public class SecFairValeAlterationsProcessorNewService {
                         }
                         // if(变量.账务明细.基础科目性质 = XX利息调整的账务明细 )
                         if (DictCodeBaseSubjectNatrueNew.摊余成本类_利息调整.getValue().equals(
+                            var.getBaseSubjectNature())
+                            || DictCodeBaseSubjectNatrueNew.公允价值损益类_利息调整.getValue().equals(
                             var.getBaseSubjectNature())
                             || DictCodeBaseSubjectNatrueNew.综合收益类_利息调整.getValue().equals(
                                 var.getBaseSubjectNature())) {
