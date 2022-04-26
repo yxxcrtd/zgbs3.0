@@ -2,6 +2,7 @@ package com.joyintech.tams.svreport.interf.chb.prodinfo.service;
 
 import com.joyintech.framework.jdbc.datasource.DataSource;
 import com.joyintech.framework.security.SecurityUtil;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.SpringContextUtil;
 import com.joyintech.framework.util.StringUtil;
@@ -87,7 +88,8 @@ public class ChbPrdOpenschInterf extends BaseInterfService{
 			openSchlist = chbPrdOpenschInterf2.selectOpenSchData(null,prodidlist);
 			//查询申赎同频的计划
 			List<ChbPrdOpensch> openSchsublist = chbPrdOpenschInterf2.selectOpenSchData("03",prodidlist);
-			String issuePartyId = CommonUtil.selectBankCode();
+//			String issuePartyId = CommonUtil.selectBankCode();
+			String issuePartyId = CacheUtil.getSysParam("SVR_ISSUE_PARTY_ID");
 			if(CollectionUtils.isNotEmpty(openSchlist)){
 				for(ChbPrdOpensch opensch : openSchlist){
 					//主键

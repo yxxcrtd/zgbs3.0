@@ -330,7 +330,8 @@ public class PbcPrdBaseinfoSubNewService extends PbcClassicsSubService<PbcPrdBas
 	public String getPbcBankCode(String IssuePartyId){
 		String code = "";
 		if(StringUtil.isEmpty(IssuePartyId)){
-			IssuePartyId=CommonUtil.selectBankCode();
+//			IssuePartyId=CommonUtil.selectBankCode();
+			IssuePartyId = CacheUtil.getSysParam("SVR_ISSUE_PARTY_ID");
 		}
 		code = pbcPrdBaseinfoSubNewMapper.selectPbcBankCodeName(IssuePartyId);
 

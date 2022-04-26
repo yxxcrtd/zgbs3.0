@@ -1083,7 +1083,7 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 			paramMap1.put("finprodId", dto.getFinprodId());//金融产品代码
 			paramMap1.put("secAcctId",dto.getSecAcctId());
 			paramMap1.put("cDate",DateUtil.getSysDate());
-			paramMap1.put("portfolioId",dto.getPortfolioId());
+//			paramMap1.put("portfolioId",dto.getPortfolioId());
 			String othType = DictCodeListExt3.金融产品其他代码类型_新股申购代码.getValue();              //业务类型
 			List<FinProductOthCodeDto> codeDtos = etrExchangeTrade001CommonService.getFinprodOthCodeInfo(paramMap);
 			if (codeDtos.size() > 0) {
