@@ -39,6 +39,7 @@ import java.util.Map;
 
 /**
  * 一级投标指令
+ *
  * @Author: kchen
  * @Date: 2022/4/18 16:38
  */
@@ -59,7 +60,7 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
     @ApiOperation(value = "查询页面初始化参数", notes = "查询页面初始化参数")
     @PostMapping("/getPageParams")
     @ResponseBody
-    public Message<Map<String, Object>> getPageParams(){
+    public Message<Map<String, Object>> getPageParams() {
         Map<String, Object> initPageParams = new HashMap<>();
         initPageParams.put("FINPROD_TYPE_TG_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
 
@@ -71,7 +72,7 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
         //CMDS地址
         initPageParams.put("cmdsWebSocketUrl", cmdsWebSocketUrl);
         initPageParams.put("NEED_WORKFLOW", true);
-        initPageParams.put("SHARES_TRADE_MARKET_02",DictCodeListExt1.交易市场_二级市场.getValue());
+        initPageParams.put("SHARES_TRADE_MARKET_02", DictCodeListExt1.交易市场_二级市场.getValue());
         initPageParams.put("platDate", DateUtil.platDateFromCache());
 
         //风险
@@ -98,8 +99,8 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
         try {
             Page<CfetsEtrIBondFirstBidFindEtrInfoDto> list = cfetsEtrBondFirstBid001Service.findEtrInfoPage(dto);
             return new Message<Page<CfetsEtrIBondFirstBidFindEtrInfoDto>>().success().setData(list);
-        }catch (Exception e) {
-            logger.error("查询指令管理分页数据异常",e);
+        } catch (Exception e) {
+            logger.error("查询指令管理分页数据异常", e);
             return new Message<Page<CfetsEtrIBondFirstBidFindEtrInfoDto>>().fail().setMessage("查询指令管理分页数据异常");
         }
 
@@ -113,14 +114,14 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
         try {
             Page<CfetsEtrIBondFirstBidFindIssueInfoDto> list = cfetsEtrBondFirstBid001Service.findIssueInfoPage(dto);
             return new Message<Page<CfetsEtrIBondFirstBidFindIssueInfoDto>>().success().setData(list);
-        }catch (Exception e) {
-            logger.error("查询待发行信息分页数据异常",e);
+        } catch (Exception e) {
+            logger.error("查询待发行信息分页数据异常", e);
             return new Message<Page<CfetsEtrIBondFirstBidFindIssueInfoDto>>().fail().setMessage("查询待发行信息分页数据异常");
         }
 
     }
 
-    @PostMapping(value="/exportEtrInfo")
+    @PostMapping(value = "/exportEtrInfo")
     @ResponseBody
     @ApiOperation(value = "一级投标指令管理导出", notes = "一级投标指令管理导出")
     public void exportEtrInfo(@RequestBody CfetsExportRequestDto req, HttpServletResponse response) {
@@ -131,7 +132,7 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
         });
     }
 
-    @PostMapping(value="/exportIssueInfo")
+    @PostMapping(value = "/exportIssueInfo")
     @ResponseBody
     @ApiOperation(value = "一级投标待发行信息导出", notes = "一级投标待发行信息导出")
     public void exportIssueInfo(@RequestBody CfetsExportRequestDto req, HttpServletResponse response) {
@@ -158,11 +159,11 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
     @ApiOperation(value = "一级投标指令买入时查询业务模式", notes = "一级投标指令买入时查询业务模式")
     @PostMapping("/queryInvaimBySecIdAndPrd/{portfolioId}/{secId:.+}")
     @ResponseBody
-    public Message<String> findInvAim(@PathVariable("portfolioId") String portfolioId,@PathVariable String secId) {
+    public Message<String> findInvAim(@PathVariable("portfolioId") String portfolioId, @PathVariable String secId) {
         try {
-            String restult = cfetsEtrBondFirstBid001Service.findInvAim(portfolioId,secId);
-            if(StringUtil.isEmpty(restult)){
-                restult="";
+            String restult = cfetsEtrBondFirstBid001Service.findInvAim(portfolioId, secId);
+            if (StringUtil.isEmpty(restult)) {
+                restult = "";
             }
             return new Message<String>().success().setData(restult);
         } catch (Exception e) {
@@ -175,7 +176,47 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
     @ApiOperation(value = "风险试算", notes = "风险试算")
     @PostMapping("doRiskcal")
     public Message<AjaxResult> doRiskcal(@RequestBody CfetsEtrIbdoRiskcalRequest dto) throws Exception {
-        return null;
+        AjaxResult ajaxResult = new AjaxResult();
+        return new Message<AjaxResult>().success().setData(ajaxResult);
+    }
+
+    /**
+     * 资产检查
+     *
+     * @param finprodId
+     * @return
+     */
+    @ApiOperation(value = "资产检查", notes = "资产检查")
+    @PostMapping("/finprodIdCheck/{finprodId:.+}")
+    @ResponseBody
+    public Message<AjaxResult> finprodIdCheck(@PathVariable String finprodId) {
+        try {
+            AjaxResult ajaxResult = cfetsEtrBondFirstBid001Service.finprodIdCheck(finprodId);
+            return new Message<AjaxResult>().success().setData(ajaxResult);
+        } catch (Exception e) {
+            logger.error("资产检查异常", e);
+            return new Message<AjaxResult>().fail().setMessage("资产检查异常");
+        }
+    }
+
+
+    /**
+     * 查询证券账户是否存在
+     *
+     * @param finprodId
+     * @return
+     */
+    @ApiOperation(value = "查询证券账户是否存在", notes = "查询证券账户是否存在")
+    @PostMapping("/queryPortfolioSecAcctId/{portfolioId}/{finprodId:.+}")
+    @ResponseBody
+    public Message<Boolean> queryPortfolioSecAcctId(@PathVariable("portfolioId") String portfolioId, @PathVariable String finprodId) {
+        try {
+            Boolean flag = cfetsEtrBondFirstBid001Service.queryPortfolioSecAcctId(portfolioId, finprodId);
+            return new Message<Boolean>().success().setData(flag);
+        } catch (Exception e) {
+            logger.error("查询该资产是否行权债异常", e);
+            return new Message<Boolean>().fail().setMessage("查询异常");
+        }
     }
 
 }

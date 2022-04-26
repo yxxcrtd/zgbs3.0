@@ -2,14 +2,17 @@ package com.joyintech.tams.cfets.etr.bondfirstbid.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.cfets.etr.bond.dao.CfetsEtrIbBondinfoMapper;
+import com.joyintech.tams.cfets.etr.bond.service.CfetsEtrIbBondinfo002Service;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dao.CfetsEtrBondFirstBid001Mapper;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoRequest;
@@ -25,7 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +52,10 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
 
     @Resource
     private IPlatformDate iPlatformDate;
+
+    @Autowired
+    private CfetsEtrIbBondinfo002Service cfetsEtrIbBondinfo002Service;
+
 
     /**
      * 指令信息查询
@@ -97,7 +106,7 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
         Calendar c = Calendar.getInstance();
         c.setTime(DateUtil.parse(DateUtil.getSysDate()));
         int year = c.get(Calendar.YEAR);
-        pageParam.put("year",year);
+        pageParam.put("year", year);
         pageParam.put("sort", dto.getPageMode().getSort());
         pageParam.put("direction", dto.getPageMode().getDirection());
         String userId = "li02";
@@ -160,5 +169,46 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
         param.put("platDate", DateUtil.platDateFromCache());
         String invAim = cfetsEtrBondFirstBid001Mapper.findInvAimInEtr(param);
         return invAim;
+    }
+
+    /**
+     * 资产检查
+     *
+     * @param finprodId
+     * @return
+     */
+    public AjaxResult finprodIdCheck(String finprodId) {
+        //查询投标日截止日/增发投标日截止日是否小于平台日
+        AjaxResult ajaxResult = new AjaxResult();
+        List<ValidMessage> validList = new ArrayList<>();
+        Date platDate = DateUtil.platDateFromCache();
+        //查询新债标的信息
+        if (StringUtil.isEmpty(platDate.toString())) {
+            validList.add(new ValidMessage("资产投标日截止日/增发投标日截止日小于平台日"));
+        }
+        ajaxResult.setErrorList(validList);
+
+        return ajaxResult;
+    }
+
+    /**
+     * 查询证券账户
+     *
+     * @param portfolioId
+     * @param finprodId
+     * @return
+     */
+    public Boolean queryPortfolioSecAcctId(String portfolioId, String finprodId) {
+        if (StringUtil.isNotEmpty(portfolioId) && StringUtil.isNotEmpty(finprodId)) {
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("portfolioId", portfolioId);
+            map.put("finprodId", finprodId);
+            // 证券账户
+            String secAcctId = cfetsEtrIbBondinfo002Service.qryPortfolioSecAcctId(map);
+            if (StringUtil.isNotEmpty(secAcctId)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

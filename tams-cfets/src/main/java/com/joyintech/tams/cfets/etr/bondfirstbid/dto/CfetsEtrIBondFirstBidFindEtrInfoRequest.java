@@ -4,7 +4,6 @@ import com.joyintech.tams.business.common.dto.PageMode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -21,20 +20,20 @@ public class CfetsEtrIBondFirstBidFindEtrInfoRequest {
     @ApiModelProperty(name="portfolioId",value="组合名称",example="A1")
     private String portfolioId;
 
-    @ApiModelProperty(name="finprodId",value="资产代码",example="ZC1",notes ="市场代码" )
+    @ApiModelProperty(name="finprodId",value="资产代码",example="ZC1")
     private String finprodId;
 
     @ApiModelProperty(name="finprodAbbr",value="资产简称",example="ZC名")
     private String finprodAbbr;
 
-    @ApiModelProperty(name="issueClass",value="发行方式",example="报价发行/招标发行/簿记建档")
+    @ApiModelProperty(name="issueClass",value="发行方式",example="01")
     private String issueClass;
 
-    @ApiModelProperty(name="issueDateStart",value="投标日/发行日开始")
-    private Date issueDateStart;
+    @ApiModelProperty(name = "issueDateStart", value = "投标日/发行日开始日期,字符串", example = "2021-12-21")
+    private String issueDateStart;
 
-    @ApiModelProperty(name="issueDateEnd",value="投标日/发行日结束")
-    private Date issueDateEnd;
+    @ApiModelProperty(name = "issueDateEnd", value = "投标日/发行日结束日期,字符串", example = "2021-12-21")
+    private String issueDateEnd;
 
     @ApiModelProperty(name="invManagerId",value="投资经理",example="A1")
     private String invManagerId;
@@ -42,11 +41,11 @@ public class CfetsEtrIBondFirstBidFindEtrInfoRequest {
     @ApiModelProperty(name="entrustId",value="指令代码",example="A1")
     private String entrustId;
 
-    @ApiModelProperty(name="entrustStartDate",value="指令开始日",example="2021-10-27")
-    private Date entrustStartDate;
+    @ApiModelProperty(name="entrustStartDate",value="指令开始日期,字符串", example = "2021-12-21")
+    private String entrustStartDate;
 
-    @ApiModelProperty(name="entrustEndDate",value="指令结束日",example="2021-10-27")
-    private Date entrustEndDate;
+    @ApiModelProperty(name="entrustEndDate",value="指令结束日期,字符串", example = "2021-12-21")
+    private String entrustEndDate;
 
     @ApiModelProperty(name="firstBidStatus",value="中标状态",example="A1")
     private String firstBidStatus;
@@ -57,7 +56,7 @@ public class CfetsEtrIBondFirstBidFindEtrInfoRequest {
     @ApiModelProperty(name="counterName",value="交易对手名称",example="A1")
     private String counterName;
 
-    @ApiModelProperty(name="entrustStatus",value="指令状态",example="[02,03]")
+    @ApiModelProperty(name="entrustStatus",value="指令状态")
     private List<String> entrustStatus;
 
     @ApiModelProperty(name="search",value="关键字",example="12")
@@ -159,35 +158,35 @@ public class CfetsEtrIBondFirstBidFindEtrInfoRequest {
         this.search = search;
     }
 
-    public Date getIssueDateStart() {
+    public String getIssueDateStart() {
         return issueDateStart;
     }
 
-    public void setIssueDateStart(Date issueDateStart) {
+    public void setIssueDateStart(String issueDateStart) {
         this.issueDateStart = issueDateStart;
     }
 
-    public Date getIssueDateEnd() {
+    public String getIssueDateEnd() {
         return issueDateEnd;
     }
 
-    public void setIssueDateEnd(Date issueDateEnd) {
+    public void setIssueDateEnd(String issueDateEnd) {
         this.issueDateEnd = issueDateEnd;
     }
 
-    public Date getEntrustStartDate() {
+    public String getEntrustStartDate() {
         return entrustStartDate;
     }
 
-    public void setEntrustStartDate(Date entrustStartDate) {
+    public void setEntrustStartDate(String entrustStartDate) {
         this.entrustStartDate = entrustStartDate;
     }
 
-    public Date getEntrustEndDate() {
+    public String getEntrustEndDate() {
         return entrustEndDate;
     }
 
-    public void setEntrustEndDate(Date entrustEndDate) {
+    public void setEntrustEndDate(String entrustEndDate) {
         this.entrustEndDate = entrustEndDate;
     }
 }

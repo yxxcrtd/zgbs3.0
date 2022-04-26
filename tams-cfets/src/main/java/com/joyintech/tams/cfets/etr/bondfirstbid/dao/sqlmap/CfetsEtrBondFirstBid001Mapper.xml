@@ -21,33 +21,13 @@
         left join SYS_DATADICT_LIST dictbusiModel on aaa.busiModel=dictbusiModel.ITEM_CODE and dictbusiModel.DICT_CODE='BUSINESS_MODEL'
         <where>
             <if test="issueDateStart!=null and issueDateStart!='' and  issueDateEnd!=null and issueDateEnd!='' ">
-                <![CDATA[ AND aaa.issueDate >= #{issueDateStart, jdbcType=DATE} ]]>
-                <![CDATA[ AND aaa.issueDate <= #{issueDateEnd, jdbcType=DATE} ]]>
+                AND aaa.issueDate <![CDATA[>=]]> to_date(#{issueDateStart}, 'yyyy-MM-dd')
+                AND aaa.issueDate <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd')
             </if>
             <!-- 中标状态 -->
-
             <!-- 关键字模糊查询 -->
-            <if test="search != null and search != '' and search !='有效' ">
-                    (
-                    (aaa.effectiveStatusName || '|' || sdl.ITEM_VALUE || '|' || aaa.portfolioId || '|' || aaa.portfolioName
-                    || '|' || aaa.issueClass || '|' || aaa.finprodMarketId || '|' || aaa.finprodAbbr || '|' || aaa.invManagerId
-                    || '|' || aaa.entrustId || '|' || approver || '|' || aaa.REMARK || '|' || dictbusiModel.ITEM_VALUE
-                    || '|' || aaa.counterId || '|' || aaa.counterName
-                    like '%' || #{search} || '%')
-                    or to_char(aaa.execProcess,'FM99990.9990')=#{search} or  aaa.execProcess||'' =#{search}
-                    or to_char(aaa.transProcess,'FM99990.9990')=#{search} or  aaa.transProcess||'' =#{search}
-                    or to_char(aaa.etrDate,'yyyy-MM-dd')  = #{search}
-                    or to_char(aaa.etrDate,'yyyyMMdd')  = #{search}
-                    or to_char(aaa.etrDate,'yyyy-MM-dd') =#{year}||'-'||#{search}
-                    or to_char(aaa.etrDate,'yyyyMMdd') =#{year}||''||#{search}
-                    or to_char(aaa.issueDate,'yyyy-MM-dd')  = #{search}
-                    or to_char(aaa.issueDate,'yyyyMMdd')  = #{search}
-                    or aaa.totalBiddingNum ||''= #{search}
-                    or aaa.bidPrice ||''= #{search}
-                    or to_char(aaa.payEdate,'yyyy-MM-dd')  = #{search}
-                    or to_char(aaa.payEdate,'yyyyMMdd')  = #{search}
-                    )
-            </if>
+            <include refid="keywordsWhereEtr"></include>
+
         </where>
 
         order by sdl.ORDER_NO, aaa.entrustId DESC)
@@ -56,6 +36,29 @@
             order by ${sort} ${direction}
         </if>
     </select>
+    <sql id="keywordsWhereEtr">
+        <if test="search != null and search != '' and search !='有效' ">
+            AND (
+            aaa.effectiveStatusName || '|' || sdl.ITEM_VALUE || '|' || aaa.portfolioId || '|' || aaa.portfolioName
+            || '|' || aaa.issueClass || '|' || aaa.finprodMarketId || '|' || aaa.finprodAbbr || '|' || aaa.invManagerId
+            || '|' || aaa.entrustId || '|' || approver || '|' || aaa.REMARK || '|' || dictbusiModel.ITEM_VALUE
+            || '|' || aaa.counterId || '|' || aaa.counterName
+            like '%' || #{search} || '%'
+            or to_char(aaa.execProcess,'FM99990.9990')=#{search} or  aaa.execProcess||'' =#{search}
+            or to_char(aaa.transProcess,'FM99990.9990')=#{search} or  aaa.transProcess||'' =#{search}
+            or to_char(aaa.etrDate,'yyyy-MM-dd')  = #{search}
+            or to_char(aaa.etrDate,'yyyyMMdd')  = #{search}
+            or to_char(aaa.etrDate,'yyyy-MM-dd') =#{year}||'-'||#{search}
+            or to_char(aaa.etrDate,'yyyyMMdd') =#{year}||''||#{search}
+            or to_char(aaa.issueDate,'yyyy-MM-dd')  = #{search}
+            or to_char(aaa.issueDate,'yyyyMMdd')  = #{search}
+            or aaa.totalBiddingNum ||''= #{search}
+            or aaa.bidPrice ||''= #{search}
+            or to_char(aaa.payEdate,'yyyy-MM-dd')  = #{search}
+            or to_char(aaa.payEdate,'yyyyMMdd')  = #{search}
+            )
+        </if>
+    </sql>
     <sql id="onlyEtrEntrust">
         SELECT
             decode(ee.ENTRUST_STATUS,'08','流程中','有效') AS effectiveStatusName,
@@ -149,8 +152,8 @@
             AND ee.ENTRUST_ID = #{entrustId}
         </if>
         <if test="entrustStartDate!=null and entrustStartDate!='' and  entrustEndDate!=null and entrustEndDate!='' ">
-            <![CDATA[ AND ee.ENTRUST_DATE >= #{entrustStartDate, jdbcType=DATE} ]]>
-            <![CDATA[ AND ee.ENTRUST_DATE <= #{entrustStartDate, jdbcType=DATE} ]]>
+            AND ee.ENTRUST_DATE <![CDATA[>=]]> to_date(#{entrustStartDate}, 'yyyy-MM-dd')
+            AND ee.ENTRUST_DATE <![CDATA[<=]]> to_date(#{entrustEndDate}, 'yyyy-MM-dd')
         </if>
         <if test="counterIdList != null and counterIdList.size() > 0">
             AND ee.COUNTER_ID in
@@ -273,8 +276,8 @@
             AND ee.ENTRUST_ID = #{entrustId}
         </if>
         <if test="entrustStartDate!=null and entrustStartDate!='' and  entrustEndDate!=null and entrustEndDate!='' ">
-            <![CDATA[ AND ee.ENTRUST_DATE >= to_date(#{entrustStartDate},'yyyy-mm-dd') ]]>
-            <![CDATA[ AND ee.ENTRUST_DATE <= to_date(#{entrustEndDate},'yyyy-mm-dd') ]]>
+            AND ee.ENTRUST_DATE <![CDATA[>=]]> to_date(#{entrustStartDate}, 'yyyy-MM-dd')
+            AND ee.ENTRUST_DATE <![CDATA[<=]]> to_date(#{entrustEndDate}, 'yyyy-MM-dd')
         </if>
         <if test="counterIdList != null and counterIdList.size() > 0">
             AND ee.COUNTER_ID in
@@ -326,42 +329,45 @@
         left join SYS_DATADICT_LIST sdl7 on aaa.ccy = sdl.ITEM_CODE and sdl.DICT_CODE = 'CCY'
         <where>
             <if test="issueDateStart!=null and issueDateStart!='' and  issueDateEnd!=null and issueDateEnd!='' ">
-                <![CDATA[ AND aaa.issueDate >= #{issueDateStart, jdbcType=DATE} ]]>
-                <![CDATA[ AND aaa.issueDate <= #{issueDateEnd, jdbcType=DATE} ]]>
+                AND aaa.issueDate <![CDATA[>=]]> to_date(#{issueDateStart}, 'yyyy-MM-dd')
+                AND aaa.issueDate <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd')
             </if>
             <!-- 关键字模糊查询 -->
-            <if test="search != null and search != '' and search !='有效' ">
-                (
-                sdl.ITEM_VALUE like '%' || #{search} || '%' OR
-                sdl2.ITEM_VALUE like '%' || #{search} || '%' OR
-                sdl3.ITEM_VALUE like '%' || #{search} || '%' OR
-                sdl4.ITEM_VALUE like '%' || #{search} || '%' OR
-                sdl5.ITEM_VALUE like '%' || #{search} || '%' OR
-                sdl6.ITEM_VALUE like '%' || #{search} || '%' OR
-                sdl7.ITEM_VALUE like '%' || #{search} || '%' OR
-                aaa.finprodMarketId like '%' || #{search} || '%' OR
-                aaa.finprodAbbr like '%' || #{search} || '%' OR
-                aaa.planIssueAmt ||''= #{search} OR
-                to_char(aaa.issueDate,'yyyy-MM-dd')  = #{search} OR
-                to_char(aaa.payEdate,'yyyy-MM-dd')  = #{search} OR
-                to_char(aaa.issueDate,'yyyyMMdd')  = #{search} OR
-                to_char(aaa.payEdate,'yyyyMMdd')  = #{search} OR
-                aaa.issuePrice ||''= #{search} OR
-                aaa.referYield ||''= #{search} OR
-                to_char(aaa.firstConfirmDate,'yyyy-MM-dd')  = #{search} OR
-                to_char(aaa.firstConfirmDate,'yyyyMMdd')  = #{search} OR
-                aaa.minPamt ||''= #{search} OR
-                aaa.maxPamt ||''= #{search} OR
-                aaa.subRate like '%' || #{search} || '%' OR
-                aaa.subRateOrg like '%' || #{search} || '%' OR
-                aaa.debRate like '%' || #{search} || '%' OR
-                aaa.debRateOrg like '%' || #{search} || '%' OR
-                aaa.remark like '%' || #{search} || '%'
-                )
-            </if>
+            <include refid="keywordsWhereIssue"></include>
         </where>
         )
     </select>
+    <sql id="keywordsWhereIssue">
+        <if test="search != null and search != '' ">
+           AND (
+            sdl.ITEM_VALUE like '%' || #{search} || '%' OR
+            sdl2.ITEM_VALUE like '%' || #{search} || '%' OR
+            sdl3.ITEM_VALUE like '%' || #{search} || '%' OR
+            sdl4.ITEM_VALUE like '%' || #{search} || '%' OR
+            sdl5.ITEM_VALUE like '%' || #{search} || '%' OR
+            sdl6.ITEM_VALUE like '%' || #{search} || '%' OR
+            sdl7.ITEM_VALUE like '%' || #{search} || '%' OR
+            aaa.finprodMarketId like '%' || #{search} || '%' OR
+            aaa.finprodAbbr like '%' || #{search} || '%' OR
+            aaa.planIssueAmt ||''= #{search} OR
+            to_char(aaa.issueDate,'yyyy-MM-dd')  = #{search} OR
+            to_char(aaa.payEdate,'yyyy-MM-dd')  = #{search} OR
+            to_char(aaa.issueDate,'yyyyMMdd')  = #{search} OR
+            to_char(aaa.payEdate,'yyyyMMdd')  = #{search} OR
+            aaa.issuePrice ||''= #{search} OR
+            aaa.referYield ||''= #{search} OR
+            to_char(aaa.firstConfirmDate,'yyyy-MM-dd')  = #{search} OR
+            to_char(aaa.firstConfirmDate,'yyyyMMdd')  = #{search} OR
+            aaa.minPamt ||''= #{search} OR
+            aaa.maxPamt ||''= #{search} OR
+            aaa.subRate like '%' || #{search} || '%' OR
+            aaa.subRateOrg like '%' || #{search} || '%' OR
+            aaa.debRate like '%' || #{search} || '%' OR
+            aaa.debRateOrg like '%' || #{search} || '%' OR
+            aaa.remark like '%' || #{search} || '%'
+            )
+        </if>
+    </sql>
     <sql id="interfFinProductInfo">
 
     </sql>

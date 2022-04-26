@@ -83,6 +83,23 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
     }
 
     @ResponseBody
+    @PostMapping("/checkSave")
+    @ApiOperation(value = "新建/修改提交时校验", notes = "新建/修改提交时校验")
+    public Message<AjaxResult> checkSave(@RequestBody CfetsEtrBondFirstBidSaveRequest cfetsDto) {
+        try {
+            AjaxResult ajax= cfetsEtrBondFirstBid002Service.checkSave(cfetsDto);
+            if(null!=ajax){
+                return new Message<AjaxResult>().success().setData(ajax);
+            }else{
+                return new Message<AjaxResult>().success();
+            }
+        }catch (Exception e) {
+            logger.error("多组合指令新建保存/提交校验异常",e);
+            return new Message<AjaxResult>().fail().setMessage("校验失败");
+        }
+    }
+
+    @ResponseBody
     @ApiOperation(value = "多组合指令新建保存/提交", notes = "多组合指令新建保存/提交")
     @PostMapping("save")
     public Message<AjaxResult> save(@RequestBody CfetsEtrBondFirstBidSaveRequest cfetsDto) {

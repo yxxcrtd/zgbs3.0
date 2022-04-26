@@ -193,7 +193,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 List<CfetsEtrBondFirstBid002Dto> dataList = entity.getEtrInvestBondFirstBidDtos().stream()
                         .filter(dto -> StringUtil.isNotEmpty(dto.getEntrustId())).collect(Collectors.toList());
                 try {
-                    AjaxResult ar = EntrustRdsCommonAop.doListPreOccupy(dataList,  DictCodeList.平安资产类型_一级市场债.getValue(), BussinessDictCodeListRds.接口系统ID_预占批量接口.getValue(), true, null);
+                    AjaxResult ar = EntrustRdsCommonAop.doListPreOccupy(dataList, DictCodeList.平安资产类型_一级市场债.getValue(), BussinessDictCodeListRds.接口系统ID_预占批量接口.getValue(), true, null);
                     if (StringUtil.isNotEmpty(ar)) {
                         throw new BusinessException(ar.getMessage());
                     }
@@ -254,13 +254,14 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
 
     /**
      * 流程中数据作废
+     *
      * @param workflowId
      */
     private void doDeleteFlow(String workflowId) {
         CfetsEtrBondFirstBid002Dto entity = getBussinessEntityByWorkflowId(workflowId);
-        if (CollectionUtils.isNotEmpty(entity.getEtrInvestBondFirstBidDtos()))  {
-            for (CfetsEtrBondFirstBid002Dto dto: entity.getEtrInvestBondFirstBidDtos()) {
-                if(StringUtil.isNotEmpty(dto.getEntrustId())) {
+        if (CollectionUtils.isNotEmpty(entity.getEtrInvestBondFirstBidDtos())) {
+            for (CfetsEtrBondFirstBid002Dto dto : entity.getEtrInvestBondFirstBidDtos()) {
+                if (StringUtil.isNotEmpty(dto.getEntrustId())) {
                     Map<String, Object> param = new HashMap<>();
                     //删除流程中数据
                     WFlowCommonService.doCompleteFlow(workflowId);
@@ -283,6 +284,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
 
     /**
      * 流程结束后操作
+     *
      * @param dto
      * @param operateType
      */
@@ -309,7 +311,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 }
             }
             baseEtrInvestInfoService.newDelegate(entity);
-        }else {
+        } else {
             List<EtrDistribute> etrDistributeList = new ArrayList<>();
             if (StringUtil.isNotEmpty(dto.getEtrInvestPersonInfo())
                     && StringUtil.isNotEmpty(dto.getEtrInvestPersonInfo().getTrader())) {
@@ -454,9 +456,9 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 entity.setEtrEntrustAdd(etrEntrustAdd);
             }
             //指令下达时间
-            if(StringUtil.isNotEmpty(dto.getTransmitTime())){
+            if (StringUtil.isNotEmpty(dto.getTransmitTime())) {
                 etrEntrustAdd.setTransmitTime(dto.getTransmitTime());
-            }else{
+            } else {
                 etrEntrustAdd.setTransmitTime(new Date());
             }
 
@@ -657,5 +659,47 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 }
             }
         }
+    }
+
+    /**
+     * 保存、修改提交校验
+     *
+     * @param cfetsDto
+     * @return
+     */
+    public AjaxResult checkSave(CfetsEtrBondFirstBidSaveRequest cfetsDto) {
+        AjaxResult ajaxResult = new AjaxResult();
+        List<ValidMessage> messages = new ArrayList<>();
+
+        if (CollectionUtils.isNotEmpty(cfetsDto.getBiddingProductList())) {
+            for (CfetsBiddingProductDto bidDto : cfetsDto.getBiddingProductList()) {
+                //证券账户不能为空
+                if (StringUtil.isEmpty(bidDto.getSecAcctId())) {
+                    messages.add(new ValidMessage("证券账户不能为空。"));
+                }
+            }
+            //报价发行时，同一组合在列表中只能存在一条数据
+            if (StringUtil.equals(cfetsDto.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
+                List<String> portfolioIdList = cfetsDto.getBiddingProductList().stream().
+                        map(CfetsBiddingProductDto::getPortfolioId).distinct().collect(Collectors.toList());
+                if (portfolioIdList.size() != cfetsDto.getBiddingProductList().size()) {
+                    messages.add(new ValidMessage("报价发行：同一组合在列表中只能存在一条数据。"));
+                }
+            }
+
+            //招标发行/簿记建档时，同一组合同一标位在列表中只能存在一条数据
+            Map<String, List<CfetsBiddingProductDto>> secAcctIdMap = cfetsDto.getBiddingProductList().stream()
+                    .collect(Collectors.groupingBy(CfetsBiddingProductDto::getPortfolioId));
+            for (Map.Entry<String, List<CfetsBiddingProductDto>> entry : secAcctIdMap.entrySet()) {
+                List<BigDecimal> bidPriceList = entry.getValue().stream().map(CfetsBiddingProductDto::getBidPrice).distinct().collect(Collectors.toList());
+                if (bidPriceList.size() != entry.getValue().size()) {
+                    messages.add(new ValidMessage("招标发行/簿记建档:同一组合同一标位在列表中只能存在一条数据"));
+                }
+            }
+        }
+
+
+        ajaxResult.setErrorList(messages);
+        return ajaxResult;
     }
 }

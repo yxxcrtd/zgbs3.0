@@ -4,52 +4,50 @@ import com.joyintech.tams.business.common.dto.PageMode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.util.Date;
-
 /**
  * @Author: kchen
  * @Date: 2022/4/21 9:51
  */
-@ApiModel(value="一级投标待发行信息请求参数",description="一级投标待发行信息请求参数")
+@ApiModel(value = "一级投标待发行信息请求参数", description = "一级投标待发行信息请求参数")
 public class CfetsEtrIBondFirstBidFindIssueInfoRequest {
 
-    @ApiModelProperty(name="pageMode",value="分页对象",example="{pageSize: 10,pageNo: 1, sort: 'name', direction: 'asc'}")
+    @ApiModelProperty(name = "pageMode", value = "分页对象", example = "{pageSize: 10,pageNo: 1, sort: 'name', direction: 'asc'}")
     private PageMode pageMode;
 
     @ApiModelProperty(name = "finprodMarketId", value = "资产代码")
     private String finprodMarketId;
 
-    @ApiModelProperty(name="finprodId",value="金融产品代码",example="ZC1")
+    @ApiModelProperty(name = "finprodId", value = "金融产品代码", example = "ZC1")
     private String finprodId;
 
-    @ApiModelProperty(name="finprodAbbr",value="资产简称",example="ZC名")
+    @ApiModelProperty(name = "finprodAbbr", value = "资产简称", example = "ZC名")
     private String finprodAbbr;
 
-    @ApiModelProperty(name="issueClass",value="发行方式",example="报价发行/招标发行/簿记建档")
+    @ApiModelProperty(name = "issueClass", value = "发行方式", example = "01")
     private String issueClass;
 
-    @ApiModelProperty(name="issueDateStart",value="投标日/发行日开始")
-    private Date issueDateStart;
+    @ApiModelProperty(name = "issueDateStart", value = "投标日/发行日开始日期,字符串", example = "2021-12-21")
+    private String issueDateStart;
 
-    @ApiModelProperty(name="issueDateEnd",value="投标日/发行日结束")
-    private Date issueDateEnd;
+    @ApiModelProperty(name = "issueDateEnd", value = "投标日/发行日结束日期,字符串", example = "2021-12-21")
+    private String issueDateEnd;
 
-    @ApiModelProperty(name="couponSpecies",value="息票品种")
+    @ApiModelProperty(name = "couponSpecies", value = "息票品种", example = "01")
     private String couponSpecies;
 
-    @ApiModelProperty(name="intType",value="利率类型")
+    @ApiModelProperty(name = "intType", value = "利率类型", example = "01")
     private String intType;
 
-    @ApiModelProperty(name="customAssetType",value="资产分类")
+    @ApiModelProperty(name = "customAssetType", value = "资产分类")
     private String customAssetType;
 
-    @ApiModelProperty(name="search",value="关键字",example="12")
+    @ApiModelProperty(name = "search", value = "关键字", example = "12")
     private String search;
 
     @ApiModelProperty(name = "finprodType2", value = "金融产品类型（投管分类）")
     private String finprodType2;
 
-    @ApiModelProperty(name="platformDate",value="平台日",example="12")
+    @ApiModelProperty(name = "platformDate", value = "平台日", example = "12")
     private String platformDate;
 
     public PageMode getPageMode() {
@@ -116,19 +114,19 @@ public class CfetsEtrIBondFirstBidFindIssueInfoRequest {
         this.search = search;
     }
 
-    public Date getIssueDateStart() {
+    public String getIssueDateStart() {
         return issueDateStart;
     }
 
-    public void setIssueDateStart(Date issueDateStart) {
+    public void setIssueDateStart(String issueDateStart) {
         this.issueDateStart = issueDateStart;
     }
 
-    public Date getIssueDateEnd() {
+    public String getIssueDateEnd() {
         return issueDateEnd;
     }
 
-    public void setIssueDateEnd(Date issueDateEnd) {
+    public void setIssueDateEnd(String issueDateEnd) {
         this.issueDateEnd = issueDateEnd;
     }
 
