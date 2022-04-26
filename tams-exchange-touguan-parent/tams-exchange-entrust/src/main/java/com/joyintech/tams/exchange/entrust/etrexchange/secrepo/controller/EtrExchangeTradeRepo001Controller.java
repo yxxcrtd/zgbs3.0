@@ -1196,14 +1196,7 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 			for(PositionCashSecDto positionCashSecDto:requestDto.getPtlList()){
 				positionCashSecDto.setFinprodId("XN_PRODID999");
 			}
-			List<BaseMap> m = etrTradeCommonervice.queryPositionInfo(requestDto);
-			if(m.get(3)!=null){
-				m.get(3).put("name","标准券可用额度（张）");
-			}
-			if(m.get(4)!=null){
-				m.get(4).put("name","标准券总额度（张）");
-			}
-
+			List<BaseMap> m = etrTradeCommonervice.queryPositionInfoSecRepo(requestDto,"REPO");
 			return new Message<List<BaseMap>>().success().setData(m);
 		} catch (Exception e) {
 			e.printStackTrace();

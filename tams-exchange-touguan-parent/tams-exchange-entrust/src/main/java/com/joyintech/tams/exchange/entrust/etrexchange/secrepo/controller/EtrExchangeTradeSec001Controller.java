@@ -1268,7 +1268,7 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 	@ResponseBody
 	public Message<List<BaseMap>> queryPositionInfo(@RequestBody PositionCashSecRequest requestDto) {
 		try {
-			List<BaseMap> m = etrTradeCommonervice.queryPositionInfo(requestDto);
+			List<BaseMap> m = etrTradeCommonervice.queryPositionInfoSecRepo(requestDto,"SEC");
 			return new Message<List<BaseMap>>().success().setData(m);
 		} catch (Exception e) {
 			e.printStackTrace();

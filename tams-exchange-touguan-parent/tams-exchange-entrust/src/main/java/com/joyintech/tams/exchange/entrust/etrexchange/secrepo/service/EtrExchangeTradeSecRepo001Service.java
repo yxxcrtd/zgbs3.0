@@ -1527,10 +1527,11 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         // 连续竞价
         else if(StringUtil.equals(trdPriceTimeConfig.getPriceTimeType(),DictCodeListExt3.价格申报范围类型_连续竞价.getValue())){
             if(StringUtil.equals(finprodType,DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
-                if(StringUtil.equals(finProductType.getType10(), BussinessDictCodeList.行内资产三级分类_国债.getValue())
-                        ||StringUtil.equals(finProductType.getType10(), BussinessDictCodeList.行内资产三级分类_地方政府债.getValue())
-                        ||StringUtil.equals(finProductType.getType10(), BussinessDictCodeList.行内资产三级分类_政策性金融债.getValue())
-                        ||StringUtil.equals(finProductType.getType10(), BussinessDictCodeList.行内资产三级分类_政府支持机构债券.getValue())){
+                if(StringUtil.equals(finProductType.getType6(), DictCodeList.WIND一级分类_含债券一级分类等_国债.getValue())
+                        ||StringUtil.equals(finProductType.getType6(), DictCodeList.WIND一级分类_含债券一级分类等_地方政府债.getValue())
+                        ||StringUtil.equals(finProductType.getType6(), DictCodeList.WIND一级分类_含债券一级分类等_政府支持机构债.getValue())
+                        ||(StringUtil.equals(finProductType.getType6(), DictCodeList.WIND一级分类_含债券一级分类等_金融债.getValue())
+                            &&StringUtil.equals(finProductType.getType7(), DictCodeList.WIND二级分类_含债券二级分类等_政策银行债.getValue()))){
                     if(quotation!=null
                             &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(1.1),quotation.getLastPrice()))>0
                             ||checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(0.9),quotation.getLastPrice()))<0)){
