@@ -97,7 +97,7 @@
 	<!--资金账户下拉框-->
 	<select id="getTrdAcctId" resultType="com.joyintech.framework.select.SelectOptionDto">
 		select
-			 acct.ACCT_NO as id,
+			distinct acct.ACCT_NO as id,
 			info.acct_name as text
 		FROM STL_FIN_PRODUCT_ACCT acct
 		LEFT JOIN stl_capacct_info info ON acct.acct_no = info.acct_no
