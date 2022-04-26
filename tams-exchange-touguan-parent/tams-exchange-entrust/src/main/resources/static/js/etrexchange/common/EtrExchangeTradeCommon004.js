@@ -4075,53 +4075,55 @@
             Joyin.error("请先完成风险试算")
             return false;
         }
-        if ("02" === isRiskMathSoftcontrol && $('#riskTrialSpan').text() && $('#riskTrialSpan').text().trim() == '试算不通过') {
-            Joyin.error("风险试算未通过")
-            return false;
+        if ("01" === isRiskMathSoftcontrol && $('#riskTrialSpan').text() && $('#riskTrialSpan').text().trim() == '试算不通过') {
+            console.log(123);
+            Joyin.confirm("风险试算未通过,是否继续提交？", function () {
+                var checkFlag = true;
+                var object = getSearchParams();
+                //组合也需要校验
+                if (!(ps == PS_T04 || ps == PS_T46 || ps == PS_T97)) { //单组合 新股申购、配股、配债、可转债信用申购
+                    if (object.portfolioList.length == 0) {
+                        Joyin.error("请分配组合")
+                        return false;
+                    }
+                    for (var index in object.portfolioList) {
+                        var item = object.portfolioList[index];
+                        if (!item.portfolioId || !item.acctNo) {
+                            checkFlag = false;
+                        }
+                        if (!item.entrustNum) {
+                            Joyin.error("组合分配中指令数量不能为空")
+                            return false;
+                        }
+                        if (item.entrustNum % 10 != 0) {
+                            Joyin.error("指令数量，请输入数量最小交易单位10的整数倍")
+                            return false;
+                        }
+
+                    }
+                    if (!checkFlag) {
+                        Joyin.error("请填写完整组合信息")
+                        return false;
+                    }
+                    //组合是否是系列户
+                    var acctNoTemp = object.portfolioList[0].acctNo;
+                    for (var index in object.portfolioList) {
+                        var item = object.portfolioList[index];
+                        if (item.acctNo != acctNoTemp) {
+                            checkFlag = false;
+                            break;
+                        }
+                    }
+                    if (!checkFlag) {
+                        Joyin.error("系列户才能下指令")
+                        return false;
+                    }
+                }
+                saveOrSubmit('submit');
+            });
         }
 
-        var checkFlag = true;
-        var object = getSearchParams();
-        //组合也需要校验
-        if (!(ps == PS_T04 || ps == PS_T46 || ps == PS_T97)) { //单组合 新股申购、配股、配债、可转债信用申购
-            if (object.portfolioList.length == 0) {
-                Joyin.error("请分配组合")
-                return false;
-            }
-            for (var index in object.portfolioList) {
-                var item = object.portfolioList[index];
-                if (!item.portfolioId || !item.acctNo) {
-                    checkFlag = false;
-                }
-                if(!item.entrustNum){
-                    Joyin.error("组合分配中指令数量不能为空")
-                    return false;
-                }
-                if(item.entrustNum % 10 != 0){
-                    Joyin.error("指令数量，请输入数量最小交易单位10的整数倍")
-                    return false;
-                }
 
-            }
-            if (!checkFlag) {
-                Joyin.error("请填写完整组合信息")
-                return false;
-            }
-            //组合是否是系列户
-            var acctNoTemp = object.portfolioList[0].acctNo;
-            for (var index in object.portfolioList) {
-                var item = object.portfolioList[index];
-                if (item.acctNo != acctNoTemp) {
-                    checkFlag = false;
-                    break;
-                }
-            }
-            if (!checkFlag) {
-                Joyin.error("系列户才能下指令")
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
@@ -4171,17 +4173,18 @@
         }
     }
 
-    function saveOrSubmitQues(object,posSwitch){
+    function saveOrSubmitQues(object, posSwitch) {
         Joyin.ajaxJson(basePath + '/etrexchange/common/EtrExchangeTradeCommon004/checkSaveError', object,
             function (result) {
+                console.log(result);
                 if (ETR_CHECK_POS_SWITCH == '01' && posSwitch) {
                     result.data = "组合分配中可用持仓不足,请确认是否要提交";
-                }else if(rskStatus > 0){
-                    result.data = "风险试算不通过，是否继续提交";
-                }else if(result.statuCode !== 200){
+                }else if (result.statuCode !== 200) {
 
-                }else{
-                    result.data = "请确认是否要提交";
+                } else {
+                    if(result.data == null){
+                        result.data = "请确认是否要提交";
+                    }
                 }
                 Joyin.confirm(result.data, function () {
                     Joyin.ajaxJson(basePath + '/etrexchange/common/EtrExchangeTradeCommon004/buildDtoFromTodoSubmit', object,
@@ -4191,6 +4194,7 @@
                             })
                         });
                 });
+
             });
     }
 
@@ -4500,9 +4504,7 @@
         });
         // 绑定提交按钮
         $('#EtrExchangeTradeCommon004_btn_submit').click(function () {
-            if (paramCheck()) {
-                saveOrSubmit('submit');
-            }
+            paramCheck();
         });
 
         // 绑定保存按钮
