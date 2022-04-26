@@ -273,7 +273,7 @@
      */
     $(function () {
         if (typeof pageModel !== 'undefined'
-            && (pageModel === PAGE_MODEL_EDIT)) {
+            && (pageModel === PAGE_MODEL_EDIT || pageModel === PAGE_MODEL_REFERENCE)) {
             //账套和科目号不允许修改
             $("#booksetId").attr('disabled',"true");
             $("#subjectNo").attr('disabled',"true");

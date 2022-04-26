@@ -23,6 +23,13 @@ $(function () {
         },
 		searchOnInit: false,
 		cellMinWidth:100 ,
+        dblclick:function(table, data) {
+            Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+                basePath + "valuation/accounadjustmanage/subjectset/ValSubjectSet002/init",
+                "95%", "80%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
+                    booksetId:data.booksetId,
+                    subjectNo:data.subjectNo});
+        },
 		cols: [
 		    {field:'booksetId', width:120, title: 'ValSubjectSet001.booksetId'}
 		    ,{field:'subjectNo', width:100, title: 'ValSubjectSet001.subjectNo'}
@@ -49,7 +56,7 @@ $(function () {
                 "95%", "80%", {pageModel:PAGE_MODEL_EDIT,
                                 booksetId:data.booksetId,
                                 subjectNo:data.subjectNo},function(){
-                                    table.reload();
+                                    //table.reload();
                                 });
     });
 
