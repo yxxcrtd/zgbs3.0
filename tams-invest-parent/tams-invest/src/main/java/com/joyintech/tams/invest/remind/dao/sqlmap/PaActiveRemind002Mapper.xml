@@ -3513,6 +3513,52 @@ select #{R7S1} as remType,
 	</select>
 	<!--分销缴款提醒 add by chenjiaxing 20210728 end-->
 
+      <!--标准券额度不足提醒-->
+	<select id="selramindR12S1" resultType="com.joyintech.tams.invest.remind.dto.PaActiveRemind001Dto" >
+		select
+		DISTINCT
+		#{R12S1} as remType,
+		PP.portfolio_id as finprodId,
+		PP.portfolio_name as finprodName,
+		SSAI.trd_Acct_Id as trdAcctId,
+		REMINDER_SET.DEALF   dealF,
+		REMINDER_SET.CLOSF   closF,
+		case SSAI.trade_Place
+		when '03' then
+		'沪标准券可用不足'
+		when '04' then
+		'深标准券可用不足'
+		end as reminder,
+		PSPR.cdate as cdate,
+		SSAI.Trade_Place as tradePlace
+		from ptl_sec_position_rule 	PSPR
+		left join ptl_portfolio 	PP
+		on PSPR.portfolio_id = PP.portfolio_id
+		left join PTL_PORTFOLIO_AUTHORITY 	PPAU
+		on PSPR.portfolio_id = PPAU.Portfolio_Id
+		left join STL_SEC_ACCT_INFO 	SSAI
+		on PSPR.sec_acct_id = SSAI.sec_Acct_Id
+		LEFT JOIN SYS_ACTIVEREMINDER_SET REMINDER_SET
+		ON REMINDER_SET.REM_TYPE=#{R12S1}
+		where PSPR.hoding_type = 'A_001'
+		<if test="finprodId != null and !finprodId.equals('')">
+			AND PSPR.finprod_id = #{finprodId}
+		</if>
+		<if test="userId != null and userId != ''">
+			AND PPAU.user_Id = #{userId}
+		</if>
+		and PSPR.cdate = TO_DATE(#{quaryDateStr}, 'YYYY-MM-DD')
+		and PSPR.date_type = '0'
+		and <![CDATA[PSPR.amount < 0]]>
+		AND NOT EXISTS
+		(select 1
+		from SYS_ACTIVEREMINDER_INFO  SAI
+		where SAI.CDATE = PSPR.cdate
+		and SAI.REM_TYPE = #{R12S1}
+		and SAI.finprod_Id =PSPR.portfolio_id
+		and SAI.BUSINESS_PRIMARY_KEY1 = SSAI.trade_Place)
+	</select>
+
 	<select id="selramindR9S1" resultType="com.joyintech.tams.invest.remind.dto.PaActiveRemind001Dto">
 		select * from (
 		<include refid="selramindR9S1_data"/>
@@ -4007,6 +4053,48 @@ select #{R7S1} as remType,
 				AND SYS_ACTIVEREMINDER_INFO.EFFFLAG = #{noFlag}
 				AND SYS_ACTIVEREMINDER_INFO.FINPROD_ID = FP.FINPROD_MARKET_ID
 			)
+	</sql>
+
+    <!--标准券额度不足提醒-->
+	<sql id="selramindR12S1_data">
+		select
+		DISTINCT
+		#{R12S1} as 提醒类型,
+		PP.portfolio_id as 组合代码,
+		PP.portfolio_name as 组合名称,
+		SSAI.trd_Acct_Id as 资金账户,
+		case SSAI.trade_Place
+		when '03' then
+		'沪标准券可用不足'
+		when '04' then
+		'深标准券可用不足'
+		end as 提醒说明,
+		PSPR.cdate as 结果日期,
+		SSAI.Trade_Place as 交易场所
+		from ptl_sec_position_rule 	PSPR
+		left join ptl_portfolio 	PP
+		on PSPR.portfolio_id = PP.portfolio_id
+		left join PTL_PORTFOLIO_AUTHORITY 	PPAU
+		on PSPR.portfolio_id = PPAU.Portfolio_Id
+		left join STL_SEC_ACCT_INFO 	SSAI
+		on PSPR.sec_acct_id = SSAI.sec_Acct_Id
+		where PSPR.hoding_type = 'A_001'
+		<if test="finprodId != null and !finprodId.equals('')">
+			AND PSPR.finprod_id = #{finprodId}
+		</if>
+		<if test="userId != null and userId != ''">
+			AND PPAU.user_Id = #{userId}
+		</if>
+		and PSPR.cdate = TO_DATE(#{quaryDateStr}, 'YYYY-MM-DD')
+		and PSPR.date_type = '0'
+		and <![CDATA[PSPR.amount < 0]]>
+		AND NOT EXISTS
+		(select 1
+		from SYS_ACTIVEREMINDER_INFO  SAI
+		where SAI.CDATE = PSPR.cdate
+		and SAI.REM_TYPE = #{R12S1}
+		and SAI.finprod_Id =PSPR.portfolio_id
+		and SAI.BUSINESS_PRIMARY_KEY1 = SSAI.trade_Place)
 	</sql>
 
 	
