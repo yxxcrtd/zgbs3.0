@@ -34,6 +34,7 @@ import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.enums.exchange.GuaranteedEnum;
 import com.joyintech.tams.exchange.common.enums.exchange.NetOrFullPriceEnum;
 import com.joyintech.tams.exchange.common.enums.exchange.TargetTypeEnum;
+import com.joyintech.tams.exchange.common.dto.EntrustPriceAndYieldDto;
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
 import com.joyintech.tams.exchange.common.request.InstructionQueryRequest;
@@ -420,9 +421,7 @@ public class InvestmentManagement extends BaseService {
     }
 
     private List<Instruction> sortInstructionsByCreateTime(List<Instruction> instructions) {
-        return instructions.stream()
-                .sorted((o1, o2) -> DateUtil.compareDate(o2.getCreateTime(), o1.getCreateTime()))
-                .collect(Collectors.toList());
+        return instructions.stream().sorted((o1, o2) -> DateUtil.compareDate(o2.getCreateTime(), o1.getCreateTime())).collect(Collectors.toList());
     }
 
     private List<Instruction> cloneInstructions(List<Instruction> instructions) {
@@ -471,8 +470,7 @@ public class InvestmentManagement extends BaseService {
             MinPrice minPrice = minPriceService.getMinPrice(instruction, instrument);
             MinTrdUnitLimit minTrdUnitLimit = minTrdUnitLimitService.getMinTrdUnitLimit(instruction, instrument);
 
-            minPriceAndMinTrdUnitLimitBean =
-                    new MinPriceAndMinTrdUnitLimitBean(finprodMarketId, ErrorCode.SUCCESS.value, ErrorCode.SUCCESS.errorMsg);
+            minPriceAndMinTrdUnitLimitBean = new MinPriceAndMinTrdUnitLimitBean(finprodMarketId, ErrorCode.SUCCESS.value, ErrorCode.SUCCESS.errorMsg);
             minPriceAndMinTrdUnitLimitBean.setIsFullPrice(instrument.getIsFullPrice());
             // 特殊处理新债,将多条数据同时塞入
             if (ObjectUtil.isNull(minPrice)) {
@@ -1020,6 +1018,54 @@ public class InvestmentManagement extends BaseService {
         pageParam.put("tradeMarketMode", DictCodeListExt1.交易市场_二级市场.getValue());
         return pageParam;
     }
+
+
+    public void getAllPriceAndYield(Instruction instruction, EntrustPriceAndYieldDto dto, boolean isFullPrice) {
+        if (isFullPrice) {
+            getNetPriceByFullPrice(instruction, dto);
+        } else {
+            getFullPriceByNetPrice(instruction, dto);
+        }
+    }
+
+
+    public void getFullPriceByNetPrice(Instruction instruction, EntrustPriceAndYieldDto dto) {
+        Map<String, Object> pageParam = getExpireOrFullPriceOrEntrustPriceParam(dto.getEntrustVolume(), instruction);
+        pageParam.put("unitCprice", dto.getPrice());
+        String url = ServiceApplication.TRADE_SERVICE_NAME + TradeServiceURL.unitCprice;
+        logger.info("调用微服务根据净价获取全价,到期收益率, url {} pageParam {}", url, JsonUtils.getJsonFromObject(pageParam));
+        ExpireIncomeRateRet result = sendReqExpireIncomeRate(pageParam, url);
+        if (ExchangeConstant.HTTP_STATUS_CODE_OK.equals(result.getStatuCode())) {
+            dto.setNetPrice(dto.getPrice());
+            dto.setFullPrice(TradeUtils.getBigDecimal(result.getData().getUnitFprice(), dto.getRound()));
+            dto.setYield(TradeUtils.getBigDecimal(result.getData().getYield(), dto.getRound()));
+        } else {
+            logger.error("净价转换全价接口调用失败：errorMsg {}", JsonUtils.getJsonFromObject(result.getErrorList()));
+            dto.setNetPrice(dto.getPrice());
+            dto.setFullPrice(BigDecimal.ZERO);
+            dto.setYield(BigDecimal.ZERO);
+        }
+    }
+
+    public void getNetPriceByFullPrice(Instruction instruction, EntrustPriceAndYieldDto dto) {
+        Map<String, Object> pageParam = getExpireOrFullPriceOrEntrustPriceParam(dto.getEntrustVolume(), instruction);
+        pageParam.put("fpriceAmt", TradeUtils.multiply(dto.getPrice(), dto.getEntrustVolume(), 4));
+        pageParam.put("unitCprice", 0);
+        String url = ServiceApplication.TRADE_SERVICE_NAME + TradeServiceURL.fpriceAmt;
+        logger.info("调用微服务根据全价获取净价,到期收益率, url {} pageParam {}", url, JsonUtils.getJsonFromObject(pageParam));
+        ExpireIncomeRateRet result = sendReqExpireIncomeRate(pageParam, url);
+        if (ExchangeConstant.HTTP_STATUS_CODE_OK.equals(result.getStatuCode())) {
+            dto.setNetPrice(TradeUtils.getBigDecimal(result.getData().getUnitCprice(), dto.getRound()));
+            dto.setFullPrice(dto.getPrice());
+            dto.setYield(TradeUtils.getBigDecimal(result.getData().getYield(), dto.getRound()));
+        } else {
+            logger.error("净价转换全价接口调用失败：errorMsg {}", JsonUtils.getJsonFromObject(result.getErrorList()));
+            dto.setNetPrice(BigDecimal.ZERO);
+            dto.setFullPrice(dto.getPrice());
+            dto.setYield(BigDecimal.ZERO);
+        }
+    }
+
 
     /***
      * @Description: 根据净价设置全价, 到期收益率

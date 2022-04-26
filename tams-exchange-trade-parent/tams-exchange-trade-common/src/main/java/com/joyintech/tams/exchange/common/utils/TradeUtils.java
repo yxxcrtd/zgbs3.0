@@ -184,6 +184,10 @@ public class TradeUtils {
         return calculateBalance(null, entrustPrice, entrustVolume, assetType, orderInterface, null);
     }
 
+    public static BigDecimal calculateBalance(BigDecimal entrustPrice, long entrustVolume, String assetType, OrderInterface orderInterface, FuturesInstrument futuresInstrument) {
+        return calculateBalance(null, entrustPrice, entrustVolume, assetType, orderInterface, futuresInstrument);
+    }
+
     public static BigDecimal calculateBalance(String entrustBs, BigDecimal entrustPrice, long entrustVolume, String assetType, OrderInterface orderInterface) {
         return calculateBalance(entrustBs, entrustPrice, entrustVolume, assetType, orderInterface, null);
         /*//协议回购金额计算
