@@ -26,6 +26,5 @@ public interface CfetsTrdBondFirstSub002Mapper {
      * @author jiangpeng
      * @date 2022/4/20 14:16
      */
-    //TODO sql
     List<CfetsTrdBondFirstSubInfoDto> selectSubProducts(Map<String, Object> param);
 }

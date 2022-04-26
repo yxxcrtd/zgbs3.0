@@ -5,6 +5,7 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -75,6 +76,16 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
 
     @ApiModelProperty(name = "productDtos", value = "申购产品列表")
     private List<CfetsTrdBondFirstSubProductDto> productDtos;
+
+    @PrimaryKey(PrimaryKey.Field.PK_1)
+    @ApiModelProperty(name = "bidId", value = "投标编号,编辑页面/提交用", example = "111")
+    private String bidId;
+
+    @ApiModelProperty(name = "operateType", value = "操作类型,编辑页面/提交用", example = "save")
+    private String operateType;
+
+    @ApiModelProperty(name = "elementId", value = "提交要素,编辑页面/提交用", example = "save")
+    private String elementId;
 
     public String getValidStatus() {
         return validStatus;
@@ -240,6 +251,30 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
 
     public void setProductDtos(List<CfetsTrdBondFirstSubProductDto> productDtos) {
         this.productDtos = productDtos;
+    }
+
+    public String getBidId() {
+        return bidId;
+    }
+
+    public void setBidId(String bidId) {
+        this.bidId = bidId;
+    }
+
+    public String getOperateType() {
+        return operateType;
+    }
+
+    public void setOperateType(String operateType) {
+        this.operateType = operateType;
+    }
+
+    public String getElementId() {
+        return elementId;
+    }
+
+    public void setElementId(String elementId) {
+        this.elementId = elementId;
     }
 }
 

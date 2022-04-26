@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.joyintech.tams.common.base.dao.WflBidOrderMapper">
+  <resultMap id="BaseResultMap" type="com.joyintech.tams.common.base.entity.WflBidOrder">
+    <id column="BID_ID" jdbcType="VARCHAR" property="bidId" />
+    <result column="FINPROD_ID" jdbcType="VARCHAR" property="finprodId" />
+    <result column="BID_DATE" jdbcType="TIMESTAMP" property="bidDate" />
+    <result column="PAY_TYPE" jdbcType="VARCHAR" property="payType" />
+    <result column="PAY_DATE" jdbcType="TIMESTAMP" property="payDate" />
+    <result column="IS_WIN" jdbcType="VARCHAR" property="isWin" />
+    <result column="WIN_PRIN_AMT" jdbcType="DECIMAL" property="winPrinAmt" />
+    <result column="WIN_PRICE" jdbcType="DECIMAL" property="winPrice" />
+    <result column="WIN_TYPE" jdbcType="VARCHAR" property="winType" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="CREATE_USER" jdbcType="VARCHAR" property="createUser" />
+    <result column="CREATE_DEPT" jdbcType="VARCHAR" property="createDept" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="UPDATE_USER" jdbcType="VARCHAR" property="updateUser" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="OU_PARTY_ID" jdbcType="VARCHAR" property="ouPartyId" />
+    <result column="OUR_TRADER" jdbcType="VARCHAR" property="ourTrader" />
+    <result column="SUBSCRIPTION_AMOUNT" jdbcType="DECIMAL" property="subscriptionAmount" />
+    <result column="P_BID_ID" jdbcType="VARCHAR" property="pBidId" />
+    <result column="IS_CANCEL" jdbcType="VARCHAR" property="isCancel" />
+    <result column="TRADE_STATUS" jdbcType="VARCHAR" property="tradeStatus" />
+    <result column="WORKFLOW_ID" jdbcType="VARCHAR" property="workflowId" />
+    <result column="WORKFLOW_STATUS" jdbcType="VARCHAR" property="workflowStatus" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    BID_ID, FINPROD_ID, BID_DATE, PAY_TYPE, PAY_DATE, IS_WIN, WIN_PRIN_AMT, WIN_PRICE, 
+    WIN_TYPE, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, 
+    OU_PARTY_ID, OUR_TRADER, SUBSCRIPTION_AMOUNT, P_BID_ID, IS_CANCEL, TRADE_STATUS, 
+    WORKFLOW_ID, WORKFLOW_STATUS
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from WFL_BID_ORDER
+    where BID_ID = #{bidId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from WFL_BID_ORDER
+    where BID_ID = #{bidId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.WflBidOrder">
+    insert into WFL_BID_ORDER (BID_ID, FINPROD_ID, BID_DATE, 
+      PAY_TYPE, PAY_DATE, IS_WIN, 
+      WIN_PRIN_AMT, WIN_PRICE, WIN_TYPE, 
+      REMARK, CREATE_USER, CREATE_DEPT, 
+      CREATE_TIME, UPDATE_USER, UPDATE_TIME, 
+      OU_PARTY_ID, OUR_TRADER, SUBSCRIPTION_AMOUNT, 
+      P_BID_ID, IS_CANCEL, TRADE_STATUS, 
+      WORKFLOW_ID, WORKFLOW_STATUS)
+    values (#{bidId,jdbcType=VARCHAR}, #{finprodId,jdbcType=VARCHAR}, #{bidDate,jdbcType=TIMESTAMP}, 
+      #{payType,jdbcType=VARCHAR}, #{payDate,jdbcType=TIMESTAMP}, #{isWin,jdbcType=VARCHAR}, 
+      #{winPrinAmt,jdbcType=DECIMAL}, #{winPrice,jdbcType=DECIMAL}, #{winType,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{ouPartyId,jdbcType=VARCHAR}, #{ourTrader,jdbcType=VARCHAR}, #{subscriptionAmount,jdbcType=DECIMAL}, 
+      #{pBidId,jdbcType=VARCHAR}, #{isCancel,jdbcType=VARCHAR}, #{tradeStatus,jdbcType=VARCHAR}, 
+      #{workflowId,jdbcType=VARCHAR}, #{workflowStatus,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.WflBidOrder">
+    insert into WFL_BID_ORDER
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="bidId != null">
+        BID_ID,
+      </if>
+      <if test="finprodId != null">
+        FINPROD_ID,
+      </if>
+      <if test="bidDate != null">
+        BID_DATE,
+      </if>
+      <if test="payType != null">
+        PAY_TYPE,
+      </if>
+      <if test="payDate != null">
+        PAY_DATE,
+      </if>
+      <if test="isWin != null">
+        IS_WIN,
+      </if>
+      <if test="winPrinAmt != null">
+        WIN_PRIN_AMT,
+      </if>
+      <if test="winPrice != null">
+        WIN_PRICE,
+      </if>
+      <if test="winType != null">
+        WIN_TYPE,
+      </if>
+      <if test="remark != null">
+        REMARK,
+      </if>
+      <if test="createUser != null">
+        CREATE_USER,
+      </if>
+      <if test="createDept != null">
+        CREATE_DEPT,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+      <if test="updateUser != null">
+        UPDATE_USER,
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME,
+      </if>
+      <if test="ouPartyId != null">
+        OU_PARTY_ID,
+      </if>
+      <if test="ourTrader != null">
+        OUR_TRADER,
+      </if>
+      <if test="subscriptionAmount != null">
+        SUBSCRIPTION_AMOUNT,
+      </if>
+      <if test="pBidId != null">
+        P_BID_ID,
+      </if>
+      <if test="isCancel != null">
+        IS_CANCEL,
+      </if>
+      <if test="tradeStatus != null">
+        TRADE_STATUS,
+      </if>
+      <if test="workflowId != null">
+        WORKFLOW_ID,
+      </if>
+      <if test="workflowStatus != null">
+        WORKFLOW_STATUS,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="bidId != null">
+        #{bidId,jdbcType=VARCHAR},
+      </if>
+      <if test="finprodId != null">
+        #{finprodId,jdbcType=VARCHAR},
+      </if>
+      <if test="bidDate != null">
+        #{bidDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="payType != null">
+        #{payType,jdbcType=VARCHAR},
+      </if>
+      <if test="payDate != null">
+        #{payDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isWin != null">
+        #{isWin,jdbcType=VARCHAR},
+      </if>
+      <if test="winPrinAmt != null">
+        #{winPrinAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="winPrice != null">
+        #{winPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="winType != null">
+        #{winType,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createDept != null">
+        #{createDept,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="ouPartyId != null">
+        #{ouPartyId,jdbcType=VARCHAR},
+      </if>
+      <if test="ourTrader != null">
+        #{ourTrader,jdbcType=VARCHAR},
+      </if>
+      <if test="subscriptionAmount != null">
+        #{subscriptionAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="pBidId != null">
+        #{pBidId,jdbcType=VARCHAR},
+      </if>
+      <if test="isCancel != null">
+        #{isCancel,jdbcType=VARCHAR},
+      </if>
+      <if test="tradeStatus != null">
+        #{tradeStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="workflowId != null">
+        #{workflowId,jdbcType=VARCHAR},
+      </if>
+      <if test="workflowStatus != null">
+        #{workflowStatus,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.common.base.entity.WflBidOrder">
+    update WFL_BID_ORDER
+    <set>
+      <if test="finprodId != null">
+        FINPROD_ID = #{finprodId,jdbcType=VARCHAR},
+      </if>
+      <if test="bidDate != null">
+        BID_DATE = #{bidDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="payType != null">
+        PAY_TYPE = #{payType,jdbcType=VARCHAR},
+      </if>
+      <if test="payDate != null">
+        PAY_DATE = #{payDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isWin != null">
+        IS_WIN = #{isWin,jdbcType=VARCHAR},
+      </if>
+      <if test="winPrinAmt != null">
+        WIN_PRIN_AMT = #{winPrinAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="winPrice != null">
+        WIN_PRICE = #{winPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="winType != null">
+        WIN_TYPE = #{winType,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        CREATE_USER = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createDept != null">
+        CREATE_DEPT = #{createDept,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="ouPartyId != null">
+        OU_PARTY_ID = #{ouPartyId,jdbcType=VARCHAR},
+      </if>
+      <if test="ourTrader != null">
+        OUR_TRADER = #{ourTrader,jdbcType=VARCHAR},
+      </if>
+      <if test="subscriptionAmount != null">
+        SUBSCRIPTION_AMOUNT = #{subscriptionAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="pBidId != null">
+        P_BID_ID = #{pBidId,jdbcType=VARCHAR},
+      </if>
+      <if test="isCancel != null">
+        IS_CANCEL = #{isCancel,jdbcType=VARCHAR},
+      </if>
+      <if test="tradeStatus != null">
+        TRADE_STATUS = #{tradeStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="workflowId != null">
+        WORKFLOW_ID = #{workflowId,jdbcType=VARCHAR},
+      </if>
+      <if test="workflowStatus != null">
+        WORKFLOW_STATUS = #{workflowStatus,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where BID_ID = #{bidId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.WflBidOrder">
+    update WFL_BID_ORDER
+    set FINPROD_ID = #{finprodId,jdbcType=VARCHAR},
+      BID_DATE = #{bidDate,jdbcType=TIMESTAMP},
+      PAY_TYPE = #{payType,jdbcType=VARCHAR},
+      PAY_DATE = #{payDate,jdbcType=TIMESTAMP},
+      IS_WIN = #{isWin,jdbcType=VARCHAR},
+      WIN_PRIN_AMT = #{winPrinAmt,jdbcType=DECIMAL},
+      WIN_PRICE = #{winPrice,jdbcType=DECIMAL},
+      WIN_TYPE = #{winType,jdbcType=VARCHAR},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      CREATE_USER = #{createUser,jdbcType=VARCHAR},
+      CREATE_DEPT = #{createDept,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+      UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      OU_PARTY_ID = #{ouPartyId,jdbcType=VARCHAR},
+      OUR_TRADER = #{ourTrader,jdbcType=VARCHAR},
+      SUBSCRIPTION_AMOUNT = #{subscriptionAmount,jdbcType=DECIMAL},
+      P_BID_ID = #{pBidId,jdbcType=VARCHAR},
+      IS_CANCEL = #{isCancel,jdbcType=VARCHAR},
+      TRADE_STATUS = #{tradeStatus,jdbcType=VARCHAR},
+      WORKFLOW_ID = #{workflowId,jdbcType=VARCHAR},
+      WORKFLOW_STATUS = #{workflowStatus,jdbcType=VARCHAR}
+    where BID_ID = #{bidId,jdbcType=VARCHAR}
+  </update>
+</mapper>
