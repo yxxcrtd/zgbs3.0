@@ -354,7 +354,7 @@ public class TradeCallbackHelper {
         splitOrderHelper.handleSplitOrderByTrade(entrust, tradeRecord.getTradedVolume(), newTrade, unFrozenBalance, tradeRecord);
         BigDecimal unFrozenBalanceInstruction = null;
         if (Objects.nonNull(instruction)) {
-            if (instruction.getEntrustNum() > 0) {
+            if (instruction.volumeInstruction()) {
                 instruction.setEntrustLeftAmt(BigDecimal.valueOf(instruction.getEntrustLeftAmt().longValue() + tradeRecord.getTradedVolume()));
             } else {
                 //可能存在金额指令的委托不是冻结金额的，传入成交金额  ----  对于债券， 现在指令为净价，需要单独处理

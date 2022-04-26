@@ -381,7 +381,7 @@ public class TradeMsgProcessor {
                 }
             }
             // 可用数量
-            if (instruction.getEntrustNum() > 0) {
+            if (instruction.volumeInstruction()) {
                 if (instruction.getEntrustNum() < instruction.getEntrustLeftAmt().longValue() + instruction.getFrozenQuantity().longValue() + entrustVolume) {
                     orderInterface.setErrorCode(ErrorCode.INSTRUCTIONS_NUMBER_ERROR.value);
                     orderInterface.setErrorMsg(ErrorCode.INSTRUCTIONS_NUMBER_ERROR.errorMsg);
@@ -408,7 +408,7 @@ public class TradeMsgProcessor {
                 logger.info("frozen instruction EntrustAmt {} FrozenQuantity {} EntrustLeftAmt {}", instruction.getEntrustAmt(), instruction.getFrozenQuantity(), instruction.getEntrustLeftAmt());
             }
         } else if (!Strings.isNullOrEmpty(ServiceApplication.INSTRUCTION_SERVICE) && EntrustUtils.isIntentionEntrust(orderInterface.getEntrustProp())) {
-            if (instruction.getEntrustNum() > 0) {
+            if (instruction.volumeInstruction()) {
                 if (instruction.getEntrustNum() < instruction.getEntrustLeftAmt().longValue() + instruction.getFrozenQuantity().longValue() + entrustVolume) {
                     orderInterface.setErrorCode(ErrorCode.INSTRUCTIONS_NUMBER_ERROR.value);
                     orderInterface.setErrorMsg(ErrorCode.INSTRUCTIONS_NUMBER_ERROR.errorMsg);
@@ -639,7 +639,7 @@ public class TradeMsgProcessor {
             }
             logger.info("entrustResp success entrustId and entrustStatus {} -- {}", entrustDb.getId(), entrustDb.getEntrustStatus());
             if (EntrustUtils.isNoTrade(entrustDb.getEntrustProp())) {
-                if ((instruction.getEntrustNum() > 0 && instruction.getFrozenQuantity().longValue() == instruction.getEntrustNum())
+                if ((instruction.volumeInstruction() && instruction.getFrozenQuantity().longValue() == instruction.getEntrustNum())
                         || (instruction.getEntrustAmt().doubleValue() > 0 && instruction.getFrozenQuantity().doubleValue() == instruction.getEntrustAmt().doubleValue()))
                     instruction.setEntrustStatus(InstructionStatus.COMPLETE.value);
             }

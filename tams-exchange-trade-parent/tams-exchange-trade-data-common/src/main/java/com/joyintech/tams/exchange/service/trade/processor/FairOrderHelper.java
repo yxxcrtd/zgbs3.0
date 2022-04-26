@@ -106,7 +106,7 @@ public class FairOrderHelper {
         double totalVolume = 0;
         for (Instruction instruction : instructionBeanMap.values()) {
             double volume;
-            if (instruction.getEntrustNum() > 0) {
+            if (instruction.volumeInstruction()) {
                 volume = instruction.getEntrustNum() - instruction.getEntrustLeftAmt().longValue() - instruction.getFrozenQuantity().longValue();
             } else {
                 volume = TradeUtils.divide(TradeUtils.subtract(instruction.getEntrustAmt(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity(), 2), price, 2);

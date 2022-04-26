@@ -584,7 +584,8 @@ public class EntrustUtils {
 
     // 是否为数量指令
     public static boolean isVolume(Instruction instruction) {
-        return instruction.getEntrustNum() > 0;
+//        return instruction.getEntrustNum() > 0;
+        return instruction.volumeInstruction();
     }
 
     // 是否为金额指令

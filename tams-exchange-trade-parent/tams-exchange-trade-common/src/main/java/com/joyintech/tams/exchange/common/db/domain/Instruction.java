@@ -13,6 +13,7 @@ import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
 import com.joyintech.tams.exchange.common.constant.TradePlat;
 import com.joyintech.tams.exchange.common.constant.instrument.SecondAssetType;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3;
+import com.joyintech.tams.exchange.common.enums.invest.TargetTypeEnum;
 import com.joyintech.tams.exchange.common.utils.DoubleSerializerUtils;
 import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import io.swagger.annotations.ApiModel;
@@ -1314,7 +1315,7 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
     /**
      * 新债-非可转债
      */
-    public boolean inconvertibleBond() {
+    public boolean newBond() {
         return InvestmentAssetType.BOND.codeEquals(this.getAssetType())
                 && SecondAssetType.KZZ.codeNotEquals(this.getAssetType1())
                 && TradePlat.NEW_BOND.codeEquals(this.getTradePlat());
@@ -1340,8 +1341,8 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
     /**
      * 新债且全价
      */
-    public boolean inconvertibleBondAndFullPrice() {
-        return this.inconvertibleBond() && this.fullPrice();
+    public boolean newBondAndFullPrice() {
+        return this.newBond() && this.fullPrice();
     }
 
     public String complexAssertTypeWhenConvertibleBond() {
@@ -1360,10 +1361,17 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
      */
     public boolean volumeInstruction() {
         // 新债
-        if (convertibleBond()) {
-            return StrUtil.equals("01", this.getTargetType());
+        if (newBond()) {
+            return TargetTypeEnum.YES.codeEquals(this.getTargetType());
         }
         return this.getEntrustNum() > 0L;
+    }
+
+    /**
+     * 是否是金额指令
+     */
+    public boolean amtInstruction() {
+        return !volumeInstruction();
     }
 
     /**

@@ -457,7 +457,7 @@ public class PortfolioManager extends BaseService {
         BigDecimal disRate = BigDecimal.ZERO;
 
         // 订单类型：数量单，指令单
-        boolean isVolume = instruction.getEntrustNum() > 0L;
+        boolean isVolume = instruction.volumeInstruction();
         // 订单数量
         BigDecimal orderVolume = BigDecimal.valueOf(order.getEntrustVolume());
 
@@ -548,7 +548,7 @@ public class PortfolioManager extends BaseService {
     }
 
     private void coverPrice(Instruction instruction, OrderPlaceBean order) {
-        if (instruction.inconvertibleBond()) {
+        if (instruction.newBond()) {
             BigDecimal fullPrice = order.getFullPrice();
             if (ObjectUtil.isNull(fullPrice) || fullPrice.compareTo(BigDecimal.ZERO) <= 0) {
                 throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR);
@@ -558,7 +558,7 @@ public class PortfolioManager extends BaseService {
     }
 
     private void recoverPrice(Instruction instruction, List<PortfolioCalculateResponse> list, BigDecimal price) {
-        if (instruction.inconvertibleBond()) {
+        if (instruction.newBond()) {
             list.forEach(item-> item.setEntrustPrice(price));
         }
     }
@@ -932,7 +932,7 @@ public class PortfolioManager extends BaseService {
             }
 
             // 订单类型：数量单，指令单
-            boolean isVolume = ins.getEntrustNum() > 0L;
+            boolean isVolume = ins.volumeInstruction();
             // 订单数量
             BigDecimal orderVolume = BigDecimal.valueOf(context.getEntrustVolume());
             // 委托数量
