@@ -242,4 +242,14 @@
             </foreach>
         </if>
     </select>
+    <!--查询证券账户-->
+    <select id="qryPortfolioSecAcctId" resultType="java.lang.String">
+        SELECT V.SEC_ACCT_ID AS SECACCTID
+        FROM PTL_SEC_ACCT PSA, STL_SEC_ACCT_INFO V
+        LEFT JOIN FIN_PRODUCT R ON R.REGIST_ORG = V.REGIST_ORG and V.TRADE_PLACE = R.trade_market
+        WHERE PSA.ACCT_NO = V.SEC_ACCT_ID
+          AND V.SEC_ACCT_TYPE = 'SEC'
+          AND PSA.PORTFOLIO_ID = #{portfolioId}
+          AND R.FINPROD_ID = #{finprodId}
+    </select>
 </mapper>

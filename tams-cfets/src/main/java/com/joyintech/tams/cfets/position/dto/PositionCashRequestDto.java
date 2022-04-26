@@ -32,10 +32,8 @@ public class PositionCashRequestDto {
     @ApiModelProperty(name="acctTypes",value="账户现金查询账户类型集合",example="['A01','A07']")
     private List<String> acctTypes;
 
-    @ApiModelProperty(name="flowType",value="头寸信息类型",example="etr 指令 trd 交易")
-    private String flowType;
-
-    List<PositionCashSecDto>  ptlList;
+    @ApiModelProperty(name="finprodId",value="资产代码",example="xxx")
+    private String finprodId;
 
     public List<String> getPortfolioIdList() {
         return portfolioIdList;
@@ -93,19 +91,11 @@ public class PositionCashRequestDto {
         this.acctTypes = acctTypes;
     }
 
-    public String getFlowType() {
-        return flowType;
+    public String getFinprodId() {
+        return finprodId;
     }
 
-    public void setFlowType(String flowType) {
-        this.flowType = flowType;
-    }
-
-    public List<PositionCashSecDto> getPtlList() {
-        return ptlList;
-    }
-
-    public void setPtlList(List<PositionCashSecDto> ptlList) {
-        this.ptlList = ptlList;
+    public void setFinprodId(String finprodId) {
+        this.finprodId = finprodId;
     }
 }
