@@ -22,6 +22,7 @@ import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.common.base.entity.FinProductQuto;
 import com.joyintech.tams.component.business.bond.BusiFinExercisePlanService;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.*;
@@ -834,6 +835,17 @@ public class EtrExchangeTradeCommon004Controller extends BaseController {
             validList = etrExchangeBlockTrade001ValidatorService.valid(dto);
         }else{
             validList = etrExchangeTradeCommonValidatorService.valid(dto);
+            //无申购额度
+            Map<String, Object> paramMap1 = new HashMap<String, Object>();
+            paramMap1.put("finprodId", dto.getFinprodId());//金融产品代码
+            paramMap1.put("secAcctId",dto.getSecAcctId());
+            paramMap1.put("cDate",DateUtil.getSysDate());
+            paramMap1.put("portfolioId",dto.getPortfolioId());
+            List<FinProductQuto> qutos = etrExchangeTrade001CommonService.getFinProductQutoInfo(paramMap1);
+            if (qutos.size() == 0) {
+//				confirmMsg = "当前资产无申购额度，是否继续？";
+                ajax.setData("当前资产无申购额度，是否继续？");
+            }
         }
         if (!CollectionUtils.isEmpty(validList)) {
             ajax.setErrorList(validList);
