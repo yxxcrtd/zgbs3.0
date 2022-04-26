@@ -410,17 +410,29 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
     }
 
     /**
-     * 获取回购首期交易
+     * 获取回购首期质押品
      * @param fCjbh
      * @param vdate
-     * @param portfolioId
+     * @param seatNumber
+     * @param secAcctId
      * @return
      */
-    public List<FinDealPledge> getFirstRepoFinDealPledge(String fCjbh,Date vdate,String portfolioId) {
+//    public List<FinDealPledge> getFirstRepoFinDealPledge(String fCjbh,Date vdate,String portfolioId) {
+    public List<FinDealPledge> getFirstRepoFinDealPledge(String fCjbh, Date vdate, String seatNumber, String secAcctId) {
+//        Map<String,Object> queryMap = new HashMap<>();
+//        queryMap.put("fCjbh",fCjbh);
+//        queryMap.put("vdate",vdate);
+//        queryMap.put("portfolioId",portfolioId);
+        // 查询首期清算数据
+        Map<String,Object> sqQueryMap = new HashMap<>();
+        sqQueryMap.put("fCjbh", fCjbh);
+        sqQueryMap.put("vdate", vdate);
+        sqQueryMap.put("seatNumber", seatNumber);
+        sqQueryMap.put("secAcctId", secAcctId);
+        SettleTransData sqSettleTransData = exchangeTransMatchCommonMapper.getFirstRepoSettleTransData(sqQueryMap);
+        // 查询首期交易
         Map<String,Object> queryMap = new HashMap<>();
-        queryMap.put("fCjbh",fCjbh);
-        queryMap.put("vdate",vdate);
-        queryMap.put("portfolioId",portfolioId);
+        queryMap.put("fCjbh",sqSettleTransData.getTradeId());
         return exchangeTransMatchCommonMapper.getFirstRepoFinDealPledge(queryMap);
     }
 

@@ -117,7 +117,7 @@ public interface ExchangeTransMatchCommonMapper {
     SettleTransData getFirstRepoSettleTransData(Map<String, Object> paraMap);
 
     /**
-     * 获取首期交易的
+     * 获取首期交易的质押品信息
      * @param paraMap
      * @return
      */
