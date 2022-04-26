@@ -2,6 +2,9 @@ package com.joyintech.tams.business.asset.tenderbond.dao;
 
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.tams.business.asset.tenderbond.dto.*;
+import com.joyintech.tams.business.asset.tenderbond.dto.FinProductAddDto;
+import com.joyintech.tams.business.asset.tenderbond.dto.FinProductIssueDto;
+import com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset002Dto;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -100,4 +103,28 @@ public interface FinTenderBondAssetMapper {
      * @return
      */
     String selectTotleTradeId(@Param("finprodId") String finprodId);
+
+    /**
+     * 获取接口表标的数据
+     *
+     * @param param
+     * @return
+     */
+    FinTenderBondAsset002Dto getProductFromInterface(Map<String, String> param);
+
+    /**
+     * 获取接口表标的附属表数据
+     *
+     * @param param
+     * @return
+     */
+    FinProductAddDto getProductAddFromInterface(Map<String, String> param);
+
+    /**
+     * 获取接口表标的发行数据
+     *
+     * @param param
+     * @return
+     */
+    FinProductIssueDto getProductIssueFromInterface(Map<String, String> param);
 }

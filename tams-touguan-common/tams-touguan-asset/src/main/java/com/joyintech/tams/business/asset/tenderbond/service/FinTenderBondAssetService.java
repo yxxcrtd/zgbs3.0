@@ -151,10 +151,33 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         String finprodId = finTenderBondAssetMapper.selectFinprodId(param);
         if (StringUtil.isNotEmpty(finprodId)) {
             return getById(finprodId);
-        } else {//TODO 从接口中获取
-            return null;
+        } else {//从接口中获取
+            return getFromInterface(param);
         }
     }
+
+    /**
+     * 获取接口中的新债数据
+     *
+     * @param param
+     * @return
+     */
+    public FinTenderBondAsset002Dto getFromInterface(Map<String, String> param) {
+        FinTenderBondAsset002Dto dto = finTenderBondAssetMapper.getProductFromInterface(param);
+        if(dto == null) return dto;
+        //TODO 这里要将万德德类型转换未前端展示类型
+        FinProductAddDto addDto = finTenderBondAssetMapper.getProductAddFromInterface(param);
+        if(addDto != null) {
+            if(StringUtil.isNotEmpty(addDto.getCrossMarketCode())) {
+                addDto.setCrossMarket(DictCodeList.是否_是.getValue());
+            }
+            dto.setProductAddDto(addDto);
+        }
+        dto.setIssueDto(finTenderBondAssetMapper.getProductIssueFromInterface(param));
+        return dto;
+    }
+
+
 
     /**
      * 新增
@@ -168,6 +191,9 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
             } else if (StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_商业银行柜台.getValue())) {
                 dto.setCalendarId("06");
             }
+        }
+        if(Objects.isNull(dto.getIssueDto().getAddBatch())) {
+            dto.getIssueDto().setAddBatch(0l);
         }
         //1.保存金融产品标的表
         //金融产品类型_资产代码_增发批次_交易场所进行拼接
@@ -485,7 +511,22 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
                 validList.add(new ValidMessage("发行日需大于等于平台日"));
             }
             if (Objects.isNull(dto.getIssueDto().getPayDate())) {
-                validList.add(new ValidMessage("缴款日日不能为空"));
+                validList.add(new ValidMessage("缴款日不能为空"));
+            }
+            if (Objects.isNull(dto.getIssueDto().getIssuePrice())) {
+                validList.add(new ValidMessage("发行价格不能为空"));
+            }
+        }
+        if (StringUtil.isNotEmpty(dto.getIssueDto().getIssueClass()) && StringUtil.equals(dto.getIssueDto().getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue()) &&
+            StringUtil.equals(dto.getIssueDto().getIssueClass(), DictCodeListExt4.招标方式_数量招标) ) {
+            if (Objects.isNull(dto.getIssueDto().getIssuePrice())) {
+                validList.add(new ValidMessage("发行价格不能为空"));
+            }
+        }
+        if (StringUtil.isNotEmpty(dto.getIssueDto().getIssueClass()) && StringUtil.equals(dto.getIssueDto().getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue()) &&
+                (StringUtil.isNotEmpty(dto.getCouponSpecies()) && (StringUtil.equals(dto.getCouponSpecies(),DictCodeList.息票品种_贴现.getValue()) || StringUtil.equals(dto.getCouponSpecies(),DictCodeList.息票品种_零息.getValue()) ))){
+            if (Objects.isNull(dto.getIssueDto().getIssuePrice())) {
+                validList.add(new ValidMessage("参考收益率不能为空"));
             }
         }
         if (StringUtil.isNotEmpty(dto.getIssueDto().getIssueStyle()) && StringUtil.equals(dto.getIssueDto().getIssueStyle(), DictCodeListExt4.发行类型_增发)) {
