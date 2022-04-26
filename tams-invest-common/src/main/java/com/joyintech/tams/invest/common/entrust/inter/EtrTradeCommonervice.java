@@ -510,15 +510,16 @@ public class EtrTradeCommonervice extends BaseService {
                 if (linkedHashMap.get("AMOUNT") != null) {
                     BigDecimal bd = new BigDecimal(linkedHashMap.get("AMOUNT").toString()).setScale(2, BigDecimal.ROUND_HALF_UP);
                     sumAmount = sumAmount.add(bd);
-                    //债券持仓除以100
-                    if(ptList!=null&&ptList.size()>0
-                            &&StringUtil.isNotEmpty(ptList.get(0).getFinprodType2())
-                            &&StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue(),ptList.get(0).getFinprodType2())
-                            &&(StringUtil.equals(flowType,"02")||StringUtil.equals(flowType,"04"))){
-                        sumAmount=ArithmeticUtil.divide(sumAmount,100,0);
-                    }
+
                 }
             }
+        }
+        //债券持仓除以100
+        if(ptList!=null&&ptList.size()>0
+                &&StringUtil.isNotEmpty(ptList.get(0).getFinprodType2())
+                &&StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue(),ptList.get(0).getFinprodType2())
+                &&(StringUtil.equals(flowType,"02")||StringUtil.equals(flowType,"04"))){
+            sumAmount=ArithmeticUtil.divide(sumAmount,100,0);
         }
         return sumAmount;
     }
