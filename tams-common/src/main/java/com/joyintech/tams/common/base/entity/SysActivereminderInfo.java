@@ -63,22 +63,6 @@ public class SysActivereminderInfo extends BaseEntity {
     private String institutionCode;
 
     /**
-     * 业务主键1
-     */
-    private String  businessPrimaryKey1;
-
-    /**
-     * 业务主键2
-     */
-    private String  businessPrimaryKey2;
-
-    /**
-     * 业务主键3
-     */
-    private String  businessPrimaryKey3;
-
-
-    /**
      * 取得 主键
      * @return 主键
      */
@@ -246,29 +230,5 @@ public class SysActivereminderInfo extends BaseEntity {
 
     public void setInstitutionCode(String institutionCode) {
         this.institutionCode = institutionCode;
-    }
-
-    public String getBusinessPrimaryKey1() {
-        return businessPrimaryKey1;
-    }
-
-    public void setBusinessPrimaryKey1(String businessPrimaryKey1) {
-        this.businessPrimaryKey1 = businessPrimaryKey1;
-    }
-
-    public String getBusinessPrimaryKey2() {
-        return businessPrimaryKey2;
-    }
-
-    public void setBusinessPrimaryKey2(String businessPrimaryKey2) {
-        this.businessPrimaryKey2 = businessPrimaryKey2;
-    }
-
-    public String getBusinessPrimaryKey3() {
-        return businessPrimaryKey3;
-    }
-
-    public void setBusinessPrimaryKey3(String businessPrimaryKey3) {
-        this.businessPrimaryKey3 = businessPrimaryKey3;
     }
 }

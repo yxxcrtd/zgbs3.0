@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.tams.common.base.dao.MstCounterPartyMapper;
 import com.joyintech.tams.common.base.entity.MstCounterParty;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +74,9 @@ public class PrimaryBiddingManage002Service extends BaseService<PrimaryBiddingMa
     }
     public String getCounterName(Map<String, Object> map){
         MstCounterParty mstCounterParty = mstCounterPartyMapper.selectByPrimaryKey(map.get("counterId").toString());
-        return mstCounterParty.getCounterName();
+        if (StringUtil.isNotEmpty(mstCounterParty)){
+            return mstCounterParty.getCounterName();
+        }
+        return null;
     }
 }
