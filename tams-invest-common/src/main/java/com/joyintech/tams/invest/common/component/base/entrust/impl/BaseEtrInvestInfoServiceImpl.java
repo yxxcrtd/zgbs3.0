@@ -1074,6 +1074,9 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
         if (CollectionUtils.isEmpty(etrFinishStatusList)) {
             return false;
         }
+        // ZGCPCN-209:日间数据系列户多组合数据EntrustId和TradeId相同,需合并 modify by fuyongsheng 20220426 start
+        etrFinishStatusList = mergeEtrFinishStatusList(etrFinishStatusList);
+        // ZGCPCN-209:日间数据系列户多组合数据EntrustId和TradeId相同,需合并 modify by fuyongsheng 20220426 end
         // 是否日终批处理数据
         boolean isDayEndBatch = etrFinishStatusList.get(0).isDayEndBatch();
         // 遍历List<委托完成状况表Entity>，保存到“委托完成状况表”
@@ -1142,6 +1145,38 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
         }
         return false;
     }
+
+    // ZGCPCN-209:日间数据系列户多组合数据EntrustId和TradeId相同,需合并 modify by fuyongsheng 20220426 start
+    /**
+     * 合并EntrustId和TradeId相同的数据
+     * @param etrFinishStatusList
+     * @return
+     */
+    private List<EtrFinishStatusDto> mergeEtrFinishStatusList(List<EtrFinishStatusDto> etrFinishStatusList){
+        List<EtrFinishStatusDto> result = new ArrayList<>();
+        Map<String, List<EtrFinishStatusDto>> mapList = etrFinishStatusList
+                .stream()
+                .collect(Collectors.groupingBy(dto -> dto.getEntrustId() + "_" + dto.getTradeId()));
+        for(String key : mapList.keySet()){
+            List<EtrFinishStatusDto> dtos = mapList.get(key);
+            BigDecimal mergeFinishAmt = BigDecimal.ZERO;
+            BigDecimal mergeEntFinishAmt = BigDecimal.ZERO;
+            BigDecimal mergeOrderFinishAmt = BigDecimal.ZERO;
+            for(EtrFinishStatusDto dto : dtos){
+                mergeFinishAmt = ArithmeticUtil.doAdd(mergeFinishAmt, dto.getFinishAmt());
+                mergeEntFinishAmt = ArithmeticUtil.doAdd(mergeEntFinishAmt, dto.getEntFinishAmt());
+                mergeOrderFinishAmt = ArithmeticUtil.doAdd(mergeOrderFinishAmt, dto.getOrderFinishAmt());
+            }
+            EtrFinishStatusDto mergeEtrFinishStatus = new EtrFinishStatusDto();
+            BeanUtil.copyPropertiesIgnoreNull(mergeEtrFinishStatus, dtos.get(0));
+            mergeEtrFinishStatus.setFinishAmt(mergeFinishAmt);
+            mergeEtrFinishStatus.setEntFinishAmt(mergeEntFinishAmt);
+            mergeEtrFinishStatus.setOrderFinishAmt(mergeOrderFinishAmt);
+            result.add(mergeEtrFinishStatus);
+        }
+        return result;
+    }
+    // ZGCPCN-209:日间数据系列户多组合数据EntrustId和TradeId相同,需合并 modify by fuyongsheng 20220426 end
 
     /**
      * 取消完成委托 <一句话功能简述> <功能详细描述>
