@@ -29,6 +29,7 @@ import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.common.base.entity.FinExercisePlan;
 import com.joyintech.tams.common.base.entity.FinProductQuto;
+import com.joyintech.tams.common.base.entity.SppiImportData;
 import com.joyintech.tams.component.business.bond.BusiFinExercisePlanService;
 import com.joyintech.tams.component.business.common.dto.FinStockInfoDto;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
@@ -1968,5 +1969,32 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 			return new Message<MinTrdUnitLimitDto>().fail().setMessage("查询失败");
 		}
 	}
+
+	@ApiOperation(value = "查询资产是否进行了SPPI测试", notes = "查询资产是否进行了SPPI测试")
+	@PostMapping("/queryAssetIsSppiTest/{secId:.+}")
+	@ResponseBody
+	public Message<SppiImportData> queryAssetIsSppiTest(@PathVariable String secId) {
+		try {
+			SppiImportData data = etrExchangeTrade001CommonService.queryAssetIsSppiTest(secId);
+			return new Message<SppiImportData>().success().setData(data);
+		} catch (Exception e) {
+			logger.error("查询该资产是否进行了SPPI测试异常", e);
+			return new Message<SppiImportData>().fail().setMessage("查询异常");
+		}
+	}
+
+	@ApiOperation(value = "组合持有资产业务模式查询", notes = "组合持有资产业务模式查询")
+	@PostMapping("/selectAllBusModelList")
+	@ResponseBody
+	public Message<List<BaseMap>> selectAllBusModelList(@RequestBody Map<String, Object> param) {
+		try {
+			List<BaseMap> m = etrExchangeTrade001CommonService.selectAllBusModelList(param);
+			return new Message<List<BaseMap>>().success().setData(m);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new Message<List<BaseMap>>().fail().setMessage("查询失败");
+		}
+	}
+
 }
 	

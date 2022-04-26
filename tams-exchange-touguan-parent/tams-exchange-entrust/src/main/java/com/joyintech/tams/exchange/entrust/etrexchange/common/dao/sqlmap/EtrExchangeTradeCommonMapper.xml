@@ -1796,6 +1796,27 @@
          where SSAI.TRD_ACCT_ID =#{acctId,jdbcType=VARCHAR} and rownum=1
     </select>
 
+    <!--查询资产是否进行了SPPI测试-->
+    <select id="queryAssetIsSppiTest"  resultType="com.joyintech.tams.common.base.entity.SppiImportData">
+        select * from (
+        select x.test_status isSppiPass
+        from sppi_test x
+        where x.finprod_id=#{finprodId,jdbcType=VARCHAR}
+        union
+        select t.is_sppi_pass
+        from SPPI_IMPORT_DATA t
+        where t.bond_id=#{finprodId,jdbcType=VARCHAR}
+        ) where rownum=1
+    </select>
+
+    <!--未来是否有行权-->
+    <select id="countBondHasEexrPlan" resultType="java.lang.Integer">
+        select count(1)
+        from FIN_EXERCISE_PLAN
+        where
+            FINPROD_ID = #{finprodId}
+            and EXERCISE_DATE &gt; = #{sysDate,jdbcType=DATE}
+    </select>
 
 
 </mapper>

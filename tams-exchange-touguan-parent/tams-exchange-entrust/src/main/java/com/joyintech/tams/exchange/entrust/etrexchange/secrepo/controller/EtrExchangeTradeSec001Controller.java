@@ -34,7 +34,9 @@ import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.common.base.dao.SppiImportDataMapper;
 import com.joyintech.tams.common.base.entity.FinExercisePlan;
+import com.joyintech.tams.common.base.entity.SppiImportData;
 import com.joyintech.tams.component.business.bond.BusiFinExercisePlanService;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCode;
@@ -43,6 +45,7 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.entrust.common.aop.ExchangeEntrustRdsCommonAop;
+import com.joyintech.tams.exchange.entrust.etrexchange.common.dao.EtrExchangeTradeCommonMapper;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.CalcDeviationDegreeRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.CalcPriceAndYieldRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.CalcPriceAndYieldResponse;
@@ -157,6 +160,13 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 
 	@Autowired
 	private EtrExchangeTradeJj001Validator etrExchangeTradeJj001Validator;
+
+	@Autowired
+	private SppiImportDataMapper sppiImportDataMapper;
+
+	@Autowired
+	private EtrExchangeTradeCommonMapper etrExchangeTradeCommonMapper;
+
 
 	@ApiOperation(value = "场内现券下单参数", notes = "场内现券下单参数")
 	@PostMapping("/getPageParams")
@@ -670,6 +680,34 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 		}
 		if (ajax != null && !StringUtil.isEmptyList(ajax.getErrorList()) && !StringUtil.equals(dto.getOperateType(),"save")) {
 			return ajax;
+		}
+
+		//SPPI测试
+		if(StringUtil.isNotEmpty(dto.getPs()) && StringUtil.isNotEmpty(dto.getFinprodId())
+				|| StringUtil.equals(dto.getPs(),DictCodeList.交易方向_买入.getValue())) {
+			//判断是否进行了SPPI测试
+			Map<String, Object> paramsppi = new HashMap<>();
+			paramsppi.put("finprodId", dto.getFinprodId());
+			SppiImportData sppiDto = etrExchangeTradeCommonMapper.queryAssetIsSppiTest(paramsppi);
+			if (StringUtil.isNotEmpty(sppiDto)) {
+				if (StringUtil.isNotEmpty(sppiDto.getIsSppiPass()) && StringUtil.equals(sppiDto.getIsSppiPass(), "2")) {
+					//判断该资产未来是否有行权计划
+					Map<String, Object> param = new HashMap<>();
+					param.put("finprodId", dto.getFinprodId());
+					param.put("sysDate", DateUtil.platDateFromCache());
+					if (etrExchangeTradeCommonMapper.countBondHasEexrPlan(param) > 0) {
+						if (StringUtil.isNotEmpty(dto.getBusinessModel()) && StringUtil.equals(dto.getBusinessModel(), DictCodeListExt3.业务模式_收取合同约定的现金流.getValue())) {
+							SppiImportData sppiImportData = sppiImportDataMapper.selectByPrimaryKey(dto.getFinprodId());
+							if (null != sppiImportData && StringUtil.isNotEmpty(sppiImportData.getBidPriceCon())) {
+								String[] split = sppiImportData.getBidPriceCon().split(",");
+								if (dto.getPrice().compareTo(new BigDecimal(split[1])) <= 0) {
+									confirmMsg="净价不满足使权不重大购入价条件，若继续提交，业务模式会发生变更";
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 
 		AjaxResult ajaxResult = new AjaxResult();
