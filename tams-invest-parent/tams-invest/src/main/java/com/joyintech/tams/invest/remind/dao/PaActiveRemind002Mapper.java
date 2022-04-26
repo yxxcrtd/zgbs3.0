@@ -589,6 +589,16 @@ public interface PaActiveRemind002Mapper {
     /*add by chenjiaxing 分销缴款提醒 20210726 end*/
 
 
+    /**
+     *
+     *标准券额度不足提醒详情
+     * <功能详细描述>
+     * @param param 传入查询参数
+     * @return 返回查询出信息的集合
+     * @see
+     * @since 1.0
+     */
+    List<PaActiveRemind001Dto> selramindR12S1(Map<String, Object> param);
 
     /**
      *

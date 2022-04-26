@@ -110,6 +110,7 @@ public class PaActiveRemind001Service extends BaseService<PaActiveRemind001Dto> 
         param.put("R9S1", BussinessDictCodeList.提醒类型_小分类_数据修改.getValue());
         param.put("R10S1", BussinessDictCodeList.提醒类型_小分类_债券上市流通操作.getValue());
         param.put("R10S2", BussinessDictCodeList.提醒类型_小分类_资产要素登记修改.getValue());
+        param.put("R12S1", BussinessDictCodeList.提醒类型_小分类_标准券额度不足提醒.getValue());
         param.put("noFlag", BussinessDictCodeList.是否_否.getValue());
         param.put("yesFlag", BussinessDictCodeList.是否_是.getValue());
         param.put("tradeStatus_01", BussinessDictCodeList.交易状态_初始.getValue());
@@ -234,6 +235,8 @@ public class PaActiveRemind001Service extends BaseService<PaActiveRemind001Dto> 
             //分销缴款提醒
             result.putAll(searchCountR11(param));
             //add by chenjiaxing 分销缴款提醒 20210727 end
+            //标准券额度不足提醒
+            result.putAll(searchCountR12(param));
 
         }
         // 查询主动提醒数据表
@@ -557,7 +560,38 @@ public class PaActiveRemind001Service extends BaseService<PaActiveRemind001Dto> 
             return paActiveRemind001Mapper.searchCountR11S1(param);
         }
     }
+
+
+    /**
+     * 实时查询标准券额度不足提醒
+     *
+     * @param param
+     */
+    public Map<String, Object> searchCountR12(Map<String, Object> param) {
+        param.put("R12S1", BussinessDictCodeList.提醒类型_小分类_标准券额度不足提醒.getValue());
+        param.put("quaryDateStr",DateUtil.format((Date)param.get("quaryDate")));
+        boolean isShow010 = SecurityUtil.isPermitted("EtrBondBiddingResultIb001_btn_search");
+        boolean isShow020 = SecurityUtil.isPermitted("EtrBondBiddingResultEx001_btn_search");
+        String isShow01 = "false";
+        String isShow02 = "false";
+        if(isShow010){
+            isShow01 = "true";
+        }
+        if(isShow020){
+            isShow02 = "true";
+        }
+        param.put("isShow01", isShow01);
+        param.put("isShow02", isShow02);
+        Map<String, Object> temp = new HashMap<>();
+        if(StringUtil.equals(isShow01,"false") && StringUtil.equals(isShow02,"false")){
+            temp.put("R12S1", BigDecimal.ZERO);
+            return temp;
+        }else{
+            return paActiveRemind001Mapper.searchCountR12S1(param);
+        }
+    }
     //add by chenjiaxing 分销缴款提醒 20210727 end
+
 
     /**
      * 债券上市流通操作
@@ -575,5 +609,15 @@ public class PaActiveRemind001Service extends BaseService<PaActiveRemind001Dto> 
      */
     public Map<String, Object> searchCountR10S2(Map<String, Object> param) {
         return paActiveRemind001Mapper.searchCountR10S2(param);
+    }
+
+
+    /**
+     * 标准券额度不足查询资产代码
+     * @param param
+     * @return
+     */
+    public Map<String, Object> searchFinprodId(Map<String, Object> param) {
+        return paActiveRemind001Mapper.searchFinprodId(param);
     }
 }
