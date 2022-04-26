@@ -42,8 +42,8 @@ public class EtrIbBondinfoMainController extends BaseController{
         model.addAttribute("dan_etr_isshow",CacheUtil.getSysParam(BussinessConstant.SINGLE_ETR_ISSHOW));
 
         //展示投资目的或业务模式参数
-        String SHOW_INVAIM_OR_BUSSINSSMODEL = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
-        model.addAttribute("SHOW_INVAIM_OR_BUSSINSSMODEL", SHOW_INVAIM_OR_BUSSINSSMODEL);
+//        String SHOW_INVAIM_OR_BUSSINSSMODEL = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
+//        model.addAttribute("SHOW_INVAIM_OR_BUSSINSSMODEL", SHOW_INVAIM_OR_BUSSINSSMODEL);
         //展示投资目的或业务模式参数
         return super.init(model);
     }

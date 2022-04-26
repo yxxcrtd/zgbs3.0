@@ -17,7 +17,7 @@
             //付息周期
             , {field: 'calcRuleString', width: "90", title: 'IntDetailDuration.calcRuleString', sortable:false}
 //          投资目的
-            , {field: 'invAimString', width: "200", title: '投资目的/是否融入',sortable:false,visible: SHOW_INVAIM_OR_BUSSINSSMODEL=='01'?true:false}
+//             , {field: 'invAimString', width: "200", title: '投资目的/是否融入',sortable:false,visible: SHOW_INVAIM_OR_BUSSINSSMODEL=='01'?true:false}
             //持有面额
             , {field: 'qty', width: "200", title: 'IntDetailDuration.holdAmt', type: 'money', sortable:false}
             //还本金额
@@ -96,7 +96,7 @@
             cols:JSON.stringify([
                 {field: 'prinAmtTheory', width: "200", title: '还本金额', type: 'money', sortable:false}
                 , {field: 'calcRuleString', width: "90", title: '付息周期', sortable:false}
-                , {field: 'invAimString', width: "200", title: '投资目的/是否融入', sortable:false,visible: SHOW_INVAIM_OR_BUSSINSSMODEL=='01'?true:false}
+                // , {field: 'invAimString', width: "200", title: '投资目的/是否融入', sortable:false,visible: SHOW_INVAIM_OR_BUSSINSSMODEL=='01'?true:false}
                 , {field: 'vDate', width: "120", title: '计息开始日', sortable:false}
                 , {field: 'mDate', width: "120", title: '计息结束日', sortable:false}
                 , {field: 'yield', width: "150", title: '票面利率(%)', type: 'money', sortable:false}

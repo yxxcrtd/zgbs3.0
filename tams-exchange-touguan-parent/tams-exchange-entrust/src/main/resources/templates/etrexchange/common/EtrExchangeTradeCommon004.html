@@ -173,15 +173,16 @@
                             </div>
                         </div>
                         <!--add by chenjiaxing 添加投资目的字段 start-->
-                        <div th:if="${SHOW_INVAIM_OR_BUSSINSSMODEL} =='01' "  class="form-inline-wrap" style=" float: none !important; padding-top:6px !important" id="invAim_div_jj">
-                            <label class="layui-form-label " th:text="#{EtrExchangeTrade001.invAim}">投资目的</label>
-                            <div class="layui-input-inline input-inline">
-                                <select type="text" id="invAim_jj" name="invAim" class="layui-input form-input input-select" th:placeholder="#{SysCommon.placeholder}"
-                                        data-th-data-result='${INV_AIM}' allowClear="true" th:initValue="${entity?.invAim}" formatoption="false" required></select>
-                            </div>
-                        </div>
+<!--                        <div th:if="${SHOW_INVAIM_OR_BUSSINSSMODEL} =='01' "  class="form-inline-wrap" style=" float: none !important; padding-top:6px !important" id="invAim_div_jj">-->
+<!--                            <label class="layui-form-label " th:text="#{EtrExchangeTrade001.invAim}">投资目的</label>-->
+<!--                            <div class="layui-input-inline input-inline">-->
+<!--                                <select type="text" id="invAim_jj" name="invAim" class="layui-input form-input input-select" th:placeholder="#{SysCommon.placeholder}"-->
+<!--                                        data-th-data-result='${INV_AIM}' allowClear="true" th:initValue="${entity?.invAim}" formatoption="false" required></select>-->
+<!--                            </div>-->
+<!--                        </div>-->
 
-                        <div th:if="${SHOW_INVAIM_OR_BUSSINSSMODEL} =='02' "  class="form-inline-wrap" id = "businessModelDiv_jj" style="float: none !important; padding-top:6px !important">
+<!--                        <div th:if="${SHOW_INVAIM_OR_BUSSINSSMODEL} =='02' "  class="form-inline-wrap" id = "businessModelDiv_jj" style="float: none !important; padding-top:6px !important">-->
+                        <div class="form-inline-wrap" id = "businessModelDiv_jj" style="float: none !important; padding-top:6px !important">
                             <label class="layui-form-label form-label-wrap"
                                    data-th-text="#{EtrBondFirstLBidding002.businessModel}">业务模式</label>
                             <div class="layui-input-inline input-inline">
@@ -828,7 +829,7 @@
     <script th:inline="javascript" type="text/javascript">
 
         //展示投资目的或业务模式参数
-        var SHOW_INVAIM_OR_BUSSINSSMODEL =  /*[[${SHOW_INVAIM_OR_BUSSINSSMODEL}]]*/'';
+        // var SHOW_INVAIM_OR_BUSSINSSMODEL =  /*[[${SHOW_INVAIM_OR_BUSSINSSMODEL}]]*/'';
         var FINPROD_TYPE_TG_F01 = /*[[${FINPROD_TYPE_TG_F01}]]*/'';
         var FINPROD_TYPE_TG_F02 = /*[[${FINPROD_TYPE_TG_F02}]]*/'';
         var FINPROD_TYPE_TG_F03 = /*[[${FINPROD_TYPE_TG_F03}]]*/'';

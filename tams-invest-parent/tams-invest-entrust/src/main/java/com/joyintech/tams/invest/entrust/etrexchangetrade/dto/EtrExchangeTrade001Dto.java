@@ -643,6 +643,10 @@ public class EtrExchangeTrade001Dto extends EtrEntrust implements ProcessEntity{
     public String getInvAimStr(){
         return  SysDataUtil.getNameFromDataDict(DictCode.投资目的, super.getInvAim());
     }
+
+    public String getBusinessModelStr(){
+        return  SysDataUtil.getNameFromDataDict(DictCode.业务模式, super.getBusinessModel());
+    }
     //add by chenjiaxing 投资目的值转化 end
 
     public String getPriceModelStr(){

@@ -200,8 +200,8 @@ public class TrdProjectInvestTrade002Controller extends BaseController {
         model.addAttribute("GEN_PAY_ORDERS_AUTO",CacheUtil.getSysParam(BussinessConstant.GEN_PAY_ORDERS_AUTO));
         //add by lizhi 是否限制划款指令开关 2020年2月26日  end
         //展示投资目的或业务模式参数
-        String SHOW_INVAIM_OR_BUSSINSSMODEL = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
-        model.addAttribute("SHOW_INVAIM_OR_BUSSINSSMODEL", SHOW_INVAIM_OR_BUSSINSSMODEL);
+//        String SHOW_INVAIM_OR_BUSSINSSMODEL = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
+//        model.addAttribute("SHOW_INVAIM_OR_BUSSINSSMODEL", SHOW_INVAIM_OR_BUSSINSSMODEL);
         //展示投资目的或业务模式参数
 
         PageElementConfigDto pageElementConfigDto = new PageElementConfigDto();

@@ -311,19 +311,20 @@
                                 </div>
                             </div>
                             <div class="layui-form-item">
-                                <div th:if="${SHOW_INVAIM_OR_BUSSINSSMODEL} =='01'" class="form-inline-wrap">
-                                    <label class="layui-form-label form-label-wrap"
-                                           th:text="#{TrdBondInvestTrade002.invAim}">投资目的</label>
-                                    <div class="layui-input-inline input-inline">
-                                        <select required type="text" id="invAim" name="invAim"
-                                                class="layui-input form-input input-select" placeholder="请输入内容"
-                                                th:placeholder="#{SysCommon.placeholder}"
-                                                th:data-result='${INV_AIM}'
-                                                allowClear="true" formatoption="true"
-                                                th:initValue="${entity?.invAim}"></select>
-                                    </div>
-                                </div>
-                                <div th:if="${SHOW_INVAIM_OR_BUSSINSSMODEL} =='02'" class="form-inline-wrap" id="businessModelDiv">
+<!--                                <div th:if="${SHOW_INVAIM_OR_BUSSINSSMODEL} =='01'" class="form-inline-wrap">-->
+<!--                                    <label class="layui-form-label form-label-wrap"-->
+<!--                                           th:text="#{TrdBondInvestTrade002.invAim}">投资目的</label>-->
+<!--                                    <div class="layui-input-inline input-inline">-->
+<!--                                        <select required type="text" id="invAim" name="invAim"-->
+<!--                                                class="layui-input form-input input-select" placeholder="请输入内容"-->
+<!--                                                th:placeholder="#{SysCommon.placeholder}"-->
+<!--                                                th:data-result='${INV_AIM}'-->
+<!--                                                allowClear="true" formatoption="true"-->
+<!--                                                th:initValue="${entity?.invAim}"></select>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                                <div th:if="${SHOW_INVAIM_OR_BUSSINSSMODEL} =='02'" class="form-inline-wrap" id="businessModelDiv">-->
+                                <div class="form-inline-wrap" id="businessModelDiv">
                                     <label class="layui-form-label form-label-wrap"
                                            data-th-text="#{EtrBondFirstLBidding002.businessModel}">业务模式</label>
                                     <div class="layui-input-inline input-inline">
@@ -389,16 +390,16 @@
                                 </div>
                                 <!-- 资产推荐方 新增 zhuyongkang 20191023 end-->
                                 <!-- 转仓投资目的 新增 wangyang1 20191023 start-->
-                                <div th:if="${SHOW_INVAIM_OR_BUSSINSSMODEL} =='01'"  class="form-inline-wrap" id="turnInvAim_div">
-                                    <label class="layui-form-label form-label-wrap">转仓投资目的</label>
-                                    <div class="layui-input-inline input-inline">
-                                        <select type="text" id="turnInvAim" name="turnInvAim"
-                                                class="layui-input form-input input-select" placeholder="请输入内容"
-                                                th:placeholder="#{SysCommon.placeholder}"
-                                                th:data-result='${TURN_INV_AIM}'
-                                                allowClear="true" formatoption="true" th:initValue="${entity?.turnInvAim}"></select>
-                                    </div>
-                                </div>
+<!--                                <div th:if="${SHOW_INVAIM_OR_BUSSINSSMODEL} =='01'"  class="form-inline-wrap" id="turnInvAim_div">-->
+<!--                                    <label class="layui-form-label form-label-wrap">转仓投资目的</label>-->
+<!--                                    <div class="layui-input-inline input-inline">-->
+<!--                                        <select type="text" id="turnInvAim" name="turnInvAim"-->
+<!--                                                class="layui-input form-input input-select" placeholder="请输入内容"-->
+<!--                                                th:placeholder="#{SysCommon.placeholder}"-->
+<!--                                                th:data-result='${TURN_INV_AIM}'-->
+<!--                                                allowClear="true" formatoption="true" th:initValue="${entity?.turnInvAim}"></select>-->
+<!--                                    </div>-->
+<!--                                </div>-->
                                  <!-- 转仓投资目的  新增 wangyang1 20191023 end-->
                                  <div class="form-inline-wrap" id="tradeMarketCash_div">
                                     <label class="layui-form-label form-label-wrap"
@@ -1043,7 +1044,7 @@
         var procedureAmt_f = /*[[${procedureAmt_f}]]*/'';
         var settleAmt_f = /*[[${settleAmt_f}]]*/'';
         //展示投资目的或业务模式参数
-        var SHOW_INVAIM_OR_BUSSINSSMODEL =  /*[[${SHOW_INVAIM_OR_BUSSINSSMODEL}]]*/'';
+        // var SHOW_INVAIM_OR_BUSSINSSMODEL =  /*[[${SHOW_INVAIM_OR_BUSSINSSMODEL}]]*/'';
     </script>
     <script data-th-src="@{/js/component/common/TradeCommon.js}" type="text/javascript"></script>
     <script data-th-src="@{/js/component/autocoupon/AutoCoupon.js}" type="text/javascript"></script>
