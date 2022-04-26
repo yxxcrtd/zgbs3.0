@@ -1,24 +1,22 @@
-package com.joyintech.tams.exchange.common.enums.invest;
+package com.joyintech.tams.exchange.common.enums.exchange;
 
 import com.joyintech.tams.exchange.common.enums.IEnum;
 
 /**
- * 目标类型枚举
- * 指令数量单还是金额单
- *
+ * 担保/非担保枚举
  * @author swwan
- * @date 2022/4/24 - 22:28
+ * @date 2022/4/26 - 16:33
  */
-public enum TargetTypeEnum implements IEnum<String> {
+public enum GuaranteedEnum implements IEnum<String> {
 
-    YES("01", "数量"),
-    NO("02", "金额"),
-    ;
+    NON_GUARANTEED("Y", "非担保"),
+    GUARANTEED("N", "担保"),
+            ;
 
     public final String code;
     public final String description;
 
-    TargetTypeEnum(String code, String description) {
+    GuaranteedEnum(String code, String description) {
         this.code = code;
         this.description = description;
     }

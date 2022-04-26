@@ -31,13 +31,13 @@ import com.joyintech.tams.exchange.common.cache.MinTrdUnitLimitService;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.*;
 import com.joyintech.tams.exchange.common.db.domain.*;
+import com.joyintech.tams.exchange.common.enums.exchange.GuaranteedEnum;
+import com.joyintech.tams.exchange.common.enums.exchange.NetOrFullPriceEnum;
+import com.joyintech.tams.exchange.common.enums.exchange.TargetTypeEnum;
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
 import com.joyintech.tams.exchange.common.request.InstructionQueryRequest;
-import com.joyintech.tams.exchange.common.utils.EntrustUtils;
-import com.joyintech.tams.exchange.common.utils.JsonUtils;
-import com.joyintech.tams.exchange.common.utils.ListConvertUtils;
-import com.joyintech.tams.exchange.common.utils.TradeUtils;
+import com.joyintech.tams.exchange.common.utils.*;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
 import com.joyintech.tams.exchange.service.trade.check.AppointInstructionCheck;
 import com.joyintech.tams.exchange.service.trade.check.CheckResult;
@@ -232,6 +232,10 @@ public class InvestmentManagement extends BaseService {
             if (Objects.nonNull(DictCodeListExt3.from(DictCode.投管业务类型, newInstruction.getBusiTypeTg()))) {
                 newInstruction.setBusiTypeTg(DictCodeListExt3.from(DictCode.投管业务类型, newInstruction.getBusiTypeTg()).getCodeName());
             }
+            newInstruction.setIsNoGuard(EnumUtil.getDescriptionByCode(GuaranteedEnum.class, newInstruction.getIsNoGuard()));
+            newInstruction.setIsNetPrice(EnumUtil.getDescriptionByCode(NetOrFullPriceEnum.class, newInstruction.getIsNetPrice()));
+            newInstruction.setTargetType(EnumUtil.getDescriptionByCode(TargetTypeEnum.class, newInstruction.getTargetType()));
+
             newInstruction.setProgress(newInstruction.getProgress());
             newInstruction.setDealProgress(newInstruction.getDealProgress());
             newInstruction.setLeftVolume(newInstruction.getLeftVolume());
