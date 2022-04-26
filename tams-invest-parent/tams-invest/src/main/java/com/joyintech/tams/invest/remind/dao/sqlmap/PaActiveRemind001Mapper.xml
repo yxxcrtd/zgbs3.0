@@ -3605,4 +3605,36 @@ select #{R7S1} as remType,
 		<include refid="com.joyintech.tams.invest.remind.dao.PaActiveRemind002Mapper.selramindR10S2_data"/>
 		)
 	</select>
+
+	<select id="searchCountR12S1" resultType="java.util.HashMap">
+		select count(1) R12S1 from (
+		<include refid="com.joyintech.tams.invest.remind.dao.PaActiveRemind002Mapper.selramindR12S1_data"/>
+		)
+	</select>
+
+
+	<select id="searchFinprodId" resultType="java.util.HashMap">
+		SELECT *
+		FROM (
+			SELECT
+			     PTL_SEC_POSITION_RULE.FINPROD_ID
+			FROM
+			     PTL_SEC_POSITION_RULE
+			left join
+			     STL_SEC_ACCT_INFO
+			on   PTL_SEC_POSITION_RULE.sec_acct_id = STL_SEC_ACCT_INFO.Sec_Acct_Id
+			LEFT JOIN FIN_STDSEC_CONVERSE_RADIO
+			ON PTL_SEC_POSITION_RULE.FINPROD_ID = FIN_STDSEC_CONVERSE_RADIO.FINPROD_ID
+			WHERE
+			    PTL_SEC_POSITION_RULE.CDATE =  #{quaryDate}
+			AND STL_SEC_ACCT_INFO.TRADE_PLACE = #{tradePlace}
+			and ptl_sec_position_rule.hoding_type = 'A_001'
+			and ptl_sec_position_rule.date_type = '0'
+			and PTL_SEC_POSITION_RULE.PORTFOLIO_ID = #{portfolioId}
+			AND FIN_STDSEC_CONVERSE_RADIO.MDATE >= #{quaryDate}
+			AND FIN_STDSEC_CONVERSE_RADIO.VDATE &lt;= #{quaryDate}
+			ORDER BY PTL_SEC_POSITION_RULE.AMOUNT DESC)
+		WHERE ROWNUM = 1
+	</select>
+
 </mapper>
