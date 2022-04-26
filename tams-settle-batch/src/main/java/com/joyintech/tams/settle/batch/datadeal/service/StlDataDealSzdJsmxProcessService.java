@@ -12,6 +12,7 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.constant.DictCodeListStl;
+import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
 import com.joyintech.tams.settle.batch.datadeal.constant.StlDataDealProcessConstant;
 import com.joyintech.tams.settle.batch.datadeal.dao.StlDownDataDealMapper;
 import com.joyintech.tams.settle.batch.datadeal.dto.StlDownDataDealOperatorDto;
@@ -56,6 +57,9 @@ public class StlDataDealSzdJsmxProcessService {
 
 	@Autowired
 	private SettleCommonService settleCommonService;
+
+	@Autowired
+	private TrdCommonBaseService trdCommonBaseService;
 
 	@Autowired
     protected StlDownDataDealMapper stlDownDataDealMapper;
@@ -990,7 +994,7 @@ public class StlDataDealSzdJsmxProcessService {
 					        // 回购利息
 							// settleTransData.setmIntAmt(new BigDecimal(szdJsmx.getQsje()).abs().subtract(new BigDecimal(szdJsmx.getCjsl()).abs()));
 							// 查询首期清算数据
-							List<SettleTransData> sqSettleTransDatas = stlDownDataDealMapper.selectSqSettleTransDatas(
+							List<SettleTransData> sqSettleTransDatas = trdCommonBaseService.selectSqSettleTransDatas(
 									settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId(),
 									settleTransData.getVdate());
 							if(!CollectionUtils.isEmpty(sqSettleTransDatas)){
@@ -1160,7 +1164,7 @@ public class StlDataDealSzdJsmxProcessService {
 							}
 						}else if(DictCodeListExt3.质押券置换_置换方向_换入.getValue().equals(settleTransData.getTradeType())){
 							// 查询首期清算数据
-							List<SettleTransData> sqSettleTransDatas = stlDownDataDealMapper.selectSqSettleTransDatas(
+							List<SettleTransData> sqSettleTransDatas = trdCommonBaseService.selectSqSettleTransDatas(
 									settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId(),
 									settleTransData.getVdate());
 							if(!CollectionUtils.isEmpty(sqSettleTransDatas)){

@@ -1441,4 +1441,38 @@ public class TrdCommonBaseService extends BaseService {
         return trdCommonBaseMapper.getUnFinishMatchSettleTransDataNum(map);
     }
 
+    /**
+     * 查询首期清算数据
+     * @param sqcjbh 首期成交编号
+     * @param seatNumber 席位号
+     * @param secAcctId 证券账户
+     * @param vdate 起息日
+     * @return
+     */
+    public List<SettleTransData> selectSqSettleTransDatas(String sqcjbh, String seatNumber, String secAcctId, Date vdate){
+        return trdCommonBaseMapper.selectSqSettleTransDatas(sqcjbh, seatNumber, secAcctId, vdate);
+    }
+
+    /**
+     * 获取回购首期交易
+     * @param sqcjbh
+     * @param seatNumber
+     * @param secAcctId
+     * @param vdate
+     * @return
+     */
+    public TrdProductDeal getFirstRepoTrade(String sqcjbh, String seatNumber, String secAcctId, Date vdate) {
+        // 查询首期清算数据
+        List<SettleTransData> sqSettleTransDatas = trdCommonBaseMapper.selectSqSettleTransDatas(sqcjbh, seatNumber, secAcctId, vdate);
+        if(CollectionUtils.isNotEmpty(sqSettleTransDatas)){
+            // 查询首期交易
+            Map<String,Object> queryMap = new HashMap<>();
+            queryMap.put("fCjbh", sqSettleTransDatas.get(0).getTradeId());
+            return trdCommonBaseMapper.getFirstRepoTrade(queryMap);
+        }else{
+            logger.debug("【未查询到首期清算数据】sqcjbh:{}, seatNumber:{}, secAcctId:{}, vdate:{}", sqcjbh, seatNumber,
+                    secAcctId, JSON.toJSONString(vdate));
+            return new TrdProductDeal();
+        }
+    }
 }

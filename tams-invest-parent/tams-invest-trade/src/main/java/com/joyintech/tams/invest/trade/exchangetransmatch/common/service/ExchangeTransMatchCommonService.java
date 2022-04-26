@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -229,6 +230,8 @@ public class ExchangeTransMatchCommonService extends BaseService {
     private IPlatformDate iPlatformDate;
     // modify by etliu 20220222 end
 
+    @Autowired
+    private TrdCommonBaseService trdCommonBaseService;
     /**
      * 交易完成后，调用共通修改SETTLE_TRANS_TG_MAPPING，SETTLE_TRANS_DATA_TOTAL_STATUS
      * @param seqId
@@ -1213,9 +1216,9 @@ public class ExchangeTransMatchCommonService extends BaseService {
 //                                    //settleTransDataTotal.getPs(),
 //                                    DictCodeList.交易方向_买入.getValue(),
 //                                    itemList.get(0).getPortfolioId());
-                            TrdProductDeal trdProductDeal = exchangeTransMatchRepo3Service.getFirstRepoTrade(
-                                    settleTransDataTotal.getfCjbh(),settleTransDataTotal.getVdate(),
-                                    settleTransDataTotal.getSeatNumber(), settleTransDataTotal.getSecAcctId());
+                            TrdProductDeal trdProductDeal = trdCommonBaseService.getFirstRepoTrade(settleTransDataTotal.getfCjbh(),
+                                    settleTransDataTotal.getSeatNumber(), settleTransDataTotal.getSecAcctId(),
+                                    settleTransDataTotal.getVdate());
                             // GZYHTZJY-1160:查询首期交易方向是T01 modify fuyongsheng 20220119 end
                             if(StringUtil.isNotEmpty(trdProductDeal)) {
                                 FinDealPledge finDealPledge = new FinDealPledge();

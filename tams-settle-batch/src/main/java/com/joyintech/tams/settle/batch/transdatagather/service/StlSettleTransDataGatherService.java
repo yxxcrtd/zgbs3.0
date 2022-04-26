@@ -6,6 +6,7 @@ import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
+import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
 import com.joyintech.tams.settle.batch.datadeal.dao.StlDownDataDealMapper;
 import com.joyintech.tams.settle.batch.transdatagather.dao.StlSettleTransDataGatherMapper;
 import com.joyintech.tams.settle.batch.transdatagather.dto.StlSettleTransDataGatherDto;
@@ -35,6 +36,10 @@ public class StlSettleTransDataGatherService {
 
     @Autowired
     private StlDownDataDealMapper stlDownDataDealMapper;
+
+    @Autowired
+    private TrdCommonBaseService trdCommonBaseService;
+
     /**
      * @param dealDate 执行日期
      * @return 为支持重复跑批，先将上次批处理生出的数据删除。
@@ -103,6 +108,6 @@ public class StlSettleTransDataGatherService {
      * @return
      */
     public List<SettleTransData> selectSqSettleTransDatas(StlSettleTransDataGatherDto item) {
-        return stlDownDataDealMapper.selectSqSettleTransDatas(item.getfCjbh(), item.getSeatNumber(), item.getSecAcctId(), null);
+        return trdCommonBaseService.selectSqSettleTransDatas(item.getfCjbh(), item.getSeatNumber(), item.getSecAcctId(), null);
     }
 }
