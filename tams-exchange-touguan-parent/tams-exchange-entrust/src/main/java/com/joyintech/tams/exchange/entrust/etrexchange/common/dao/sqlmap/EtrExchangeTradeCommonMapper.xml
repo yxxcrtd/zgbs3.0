@@ -1821,7 +1821,7 @@
     <!--组合持有资产业务模式查询 -->
     <select id="selectAllBusModelList" parameterType="Map" resultType="com.joyintech.tams.business.common.pojo.BaseMap">
         SELECT DISTINCT
-        INV_AIM AS businessModel,
+        BUSINESS_MODEL AS businessModel,
         PORTFOLIO_ID portfolioId,
         FINPROD_ID finprodId
         FROM
@@ -1829,13 +1829,13 @@
         SELECT
         PORTFOLIO_ID,
         FINPROD_ID,
-        INV_AIM
+        BUSINESS_MODEL
         FROM
         (
         SELECT
         b.PORTFOLIO_ID,
         a.FINPROD_ID,
-        a.INV_AIM,
+        a.BUSINESS_MODEL,
         ROW_NUMBER ( ) OVER ( PARTITION BY a.TRADE_ID ORDER BY a.TRADE_DATE DESC ) rn
         FROM
         TRD_PRODUCT_DEAL a
@@ -1849,13 +1849,13 @@
         SELECT
         PORTFOLIO_ID,
         FINPROD_ID,
-        INV_AIM
+        BUSINESS_MODEL
         FROM
         (
         SELECT
         b.PORTFOLIO_ID,
         a.FINPROD_ID,
-        a.INV_AIM,
+        a.BUSINESS_MODEL,
         ROW_NUMBER ( ) OVER ( PARTITION BY a.TRADE_ID ORDER BY a.TRADE_DATE DESC ) rn
         FROM
         TRD_PRODUCT_TEMP_DEAL a
