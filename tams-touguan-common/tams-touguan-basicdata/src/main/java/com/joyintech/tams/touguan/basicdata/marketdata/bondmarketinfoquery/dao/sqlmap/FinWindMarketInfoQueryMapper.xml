@@ -4,214 +4,434 @@
 
     <select id="queryForPage"
             resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinWindMarketInfoQuery001Dto"
-            parameterType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinBondMarketInfoQueryRequest">
-        SELECT SEC_INFO.SEC_ID SECID,
-               SEC_INFO.BOND_NAME SECFULLNAME,
-               SEC_INFO.BOND_ABBREVIATION SECNAME,
-               SEC_INFO.TRADING_PLACES,
-               SEC_INFO.REGISTERED_CUSTODIAN,
-               SEC_INFO.RAISE_MODE,
-               CASE
-                   WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN RDI_RELEASE_INFO.ISSUE_METHOD
-                   ELSE RELEASE_INFO.ISSUING_METHOD END                                as ISSUING_METHOD,
+            parameterType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinWindMarketInfoQueryRequest">
+        select * from (SELECT SEC_INFO.SEC_ID secId,
+        SEC_INFO.BOND_NAME bondName,
+        SEC_INFO.BOND_ABBREVIATION bondAbbreviation,
+        SEC_INFO.TRADING_PLACES tradingPlaces,
+        SEC_INFO.REGISTERED_CUSTODIAN registeredCustodian,
+        SEC_INFO.RAISE_MODE raiseMode,
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN RDI_RELEASE_INFO.ISSUE_METHOD
+        ELSE RELEASE_INFO.ISSUING_METHOD END as issueMethod,
 
-               CASE
-                   WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN null
-                   ELSE RELEASE_INFO.BIDDING_METHOD END                                as BIDDING_METHOD,
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN null
+        ELSE RELEASE_INFO.BIDDING_METHOD END as biddingMethod,
 
-               CASE
-                   WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN null
-                   ELSE RELEASE_INFO.TENDER_TARGET END                                 as TENDER_TARGET,
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN null
+        ELSE RELEASE_INFO.TENDER_TARGET END as tenderTarget,
 
-               CASE
-                   WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN null
-                   ELSE RELEASE_INFO.ADDITIONAL_BATCHES END                            as ADDITIONAL_BATCHES,
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN null
+        ELSE RELEASE_INFO.ADDITIONAL_BATCHES END as additionalBatches,
 
-               CASE
-                   WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券')
-                       THEN ROUND(RDI_RELEASE_INFO.ISSUE_SIZE * 10000, 2)
-                   ELSE ROUND(RELEASE_INFO.ISSUE_SIZE / 10000, 2) END                  as ISSUE_SIZE,
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券')
+        THEN ROUND(RDI_RELEASE_INFO.ISSUE_SIZE * 10000, 2)
+        ELSE ROUND(RELEASE_INFO.ISSUE_SIZE / 10000, 2) END as issueSize,
 
-               CASE
-                   WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券')
-                       THEN TO_DATE(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd')
-                   ELSE TO_DATE(RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd') END             as ISSUE_DATE,
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券')
+        THEN TO_DATE(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd')
+        ELSE TO_DATE(RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd') END as issueDate,
 
-               CASE
-                   WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券')
-                       THEN TO_DATE(RDI_RELEASE_INFO.EVENT_DATE, 'yyyy-MM-dd')
-                   ELSE TO_DATE(RELEASE_INFO.PAYMENT_DEADLINE, 'yyyy-MM-dd') END       as EVENT_DATE,
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券')
+        THEN TO_DATE(RDI_RELEASE_INFO.EVENT_DATE, 'yyyy-MM-dd')
+        ELSE TO_DATE(RELEASE_INFO.PAYMENT_DEADLINE, 'yyyy-MM-dd') END as eventDate,
 
-               CASE
-                   WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN null
-                   ELSE TO_DATE(RELEASE_INFO.DEBT_REGISTRATION_DATE, 'yyyy-MM-dd') END as DEBT_REGISTRATION_DATE,
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN null
+        ELSE TO_DATE(RELEASE_INFO.DEBT_REGISTRATION_DATE, 'yyyy-MM-dd') END as debtRegistrationDate,
 
-               CASE
-                   WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN null
-                   ELSE TO_DATE(RELEASE_INFO.LISTING_DATE, 'yyyy-MM-dd') END           as LISTING_DATE,
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN null
+        ELSE TO_DATE(RELEASE_INFO.LISTING_DATE, 'yyyy-MM-dd') END as listingDate,
 
-               CASE
-                   WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN null
-                   ELSE RELEASE_INFO.LISTING_CODE END                                  as LISTING_CODE,
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN null
+        ELSE RELEASE_INFO.LISTING_CODE END as listingCode,
 
-               CASE
-                   WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN null
-                   ELSE SEC_INFO.CROSS_MARKET_CODE END                                 as CROSS_MARKET_CODE,
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN null
+        ELSE SEC_INFO.CROSS_MARKET_CODE END as crossMarketCode,
 
-               CASE
-                   WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券')
-                       THEN TO_DATE(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd')
-                   ELSE TO_DATE(RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd') END  as INTEREST_ACCRUAL_DATE,
-               SEC_INFO.VALUE_DATE,
-               SEC_INFO.EXPIRY_DATE,
-               SEC_INFO.PRIMARY_CLASSIFICATION,
-               SEC_INFO.SECONDARY_CLASSIFICATION,
-               SEC_INFO.VARIETY_OF_COUPONS,
-               SEC_INFO.INTEREST_PAYMENT_FREQUENCY,
-               SEC_INFO.RATE_TYPE,
-               SEC_INFO.CURRENCY CCY,
-               CASE
-                   WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN RDI_RELEASE_INFO.ISSUE_PX
-                   ELSE RELEASE_INFO.ISSUE_PX END                                      as ISSUE_PX,
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券')
+        THEN TO_DATE(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd')
+        ELSE TO_DATE(RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd') END as interestAccrualDate,
 
-               CASE
-                   WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券')
-                       THEN RDI_RELEASE_INFO.STIPULATION_VALUE
-                   ELSE RELEASE_INFO.STIPULATION_VALUE END                             as STIPULATION_VALUE,
+        SEC_INFO.VALUE_DATE valueDate,
+        SEC_INFO.EXPIRY_DATE expiryDate,
+        SEC_INFO.PRIMARY_CLASSIFICATION primaryClassification,
+        SEC_INFO.SECONDARY_CLASSIFICATION secondaryClassification,
+        SEC_INFO.VARIETY_OF_COUPONS varietyOfCoupons,
+        SEC_INFO.INTEREST_PAYMENT_FREQUENCY interestPaymentFrequency,
+        SEC_INFO.RATE_TYPE rateType,
+        SEC_INFO.CURRENCY,
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN RDI_RELEASE_INFO.ISSUE_PX
+        ELSE RELEASE_INFO.ISSUE_PX END as issuePx,
 
-               CASE
-                   WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券')
-                       THEN RDI_RELEASE_INFO.SINGLE_MIN_SUB_AMT * 10000
-                   ELSE ROUND(RELEASE_INFO.SINGLE_MIN_SUB_AMT / 10000, 2) END          as SINGLE_MIN_SUB_AMT,
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券')
+        THEN RDI_RELEASE_INFO.STIPULATION_VALUE
+        ELSE RELEASE_INFO.STIPULATION_VALUE END as stipulationValue,
 
-               CASE
-                   WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券')
-                       THEN RDI_RELEASE_INFO.SINGLE_MAX_SUB_AMT * 10000
-                   ELSE ROUND(RELEASE_INFO.SINGLE_MAX_SUB_AMT / 10000, 2) END          as SINGLE_MAX_SUB_AMT,
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券')
+        THEN RDI_RELEASE_INFO.SINGLE_MIN_SUB_AMT * 10000
+        ELSE ROUND(RELEASE_INFO.SINGLE_MIN_SUB_AMT / 10000, 2) END as singleMinSubAmt,
 
-               CASE
-                   WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN RDI_RELEASE_INFO.REMARK
-                   ELSE null END                                                       as REMARK
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券')
+        THEN RDI_RELEASE_INFO.SINGLE_MAX_SUB_AMT * 10000
+        ELSE ROUND(RELEASE_INFO.SINGLE_MAX_SUB_AMT / 10000, 2) END as singleMaxSubAmt,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN RDI_RELEASE_INFO.REMARK
+        ELSE null END as REMARK
         FROM INTERF_WIND_UNRELEASE_SEC_INFO SEC_INFO
-                 LEFT JOIN INTERF_WIND_RELEASE_INFO RELEASE_INFO ON SEC_INFO.SEC_ID = RELEASE_INFO.SEC_ID
-                 LEFT JOIN INTERF_RDI_RELEASE_INFO RDI_RELEASE_INFO ON RDI_RELEASE_INFO.SECURITY_ID = SEC_INFO.SEC_ID
+        LEFT JOIN INTERF_WIND_RELEASE_INFO RELEASE_INFO ON SEC_INFO.SEC_ID = RELEASE_INFO.SEC_ID
+        LEFT JOIN INTERF_RDI_RELEASE_INFO RDI_RELEASE_INFO ON RDI_RELEASE_INFO.SECURITY_ID = SEC_INFO.SEC_ID
         <where>
             SEC_INFO.VALUE_DATE  <![CDATA[ < ]]> to_date(#{platformDate}, '%Y-%m-%d')
 
             <if test="secId !=null and secId !=''">
-                AND PAYHSRCSECINFO.SECID = #{secId,jdbcType=VARCHAR}
+                AND SEC_INFO.SECID = #{secId,jdbcType=VARCHAR}
             </if>
 
             <if test="market !=null and market !=''">
-                AND PAYHSRCSECINFO.MARKET = #{market,jdbcType=VARCHAR}
+                AND SEC_INFO.MARKET = #{market,jdbcType=VARCHAR}
             </if>
 
             <if test="institution !=null and institution !=''">
-                AND PAYHSRCSECINFO.institution = #{institution,jdbcType=VARCHAR}
+                AND SEC_INFO.institution = #{institution,jdbcType=VARCHAR}
             </if>
 
             <if test="issuer !=null and issuer !=''">
-                AND PAYHSRCSECINFO.ISSUERSHORT = #{issuer,jdbcType=VARCHAR}
+                AND SEC_INFO.ISSUERSHORT = #{issuer,jdbcType=VARCHAR}
             </if>
 
             <if test="issueDateStart != null">
-                AND PAYHSRCSECINFO.PUBENDDATE >= #{issueDateStart,jdbcType=DATE}
+                AND SEC_INFO.PUBENDDATE >= #{issueDateStart,jdbcType=DATE}
             </if>
 
             <if test="issueDateEnd != null">
-                AND PAYHSRCSECINFO.PUBENDDATE <![CDATA[ <= ]]> #{issueDateEnd,jdbcType=DATE}
+                AND SEC_INFO.PUBENDDATE <![CDATA[ <= ]]> #{issueDateEnd,jdbcType=DATE}
             </if>
 
             <if test="vdateStart != null">
-                AND PAYHSRCSECINFO.VDATE >= #{vdateStart,jdbcType=DATE}
+                AND SEC_INFO.VDATE >= #{vdateStart,jdbcType=DATE}
             </if>
 
             <if test="vdateEnd != null">
-                AND PAYHSRCSECINFO.VDATE <![CDATA[ <= ]]>  #{vdateEnd,jdbcType=DATE}
+                AND SEC_INFO.VDATE <![CDATA[ <= ]]>  #{vdateEnd,jdbcType=DATE}
             </if>
 
             <if test="mdateStart != null">
-                AND PAYHSRCSECINFO.MDATE >= #{mdateStart,jdbcType=DATE}
+                AND SEC_INFO.MDATE >= #{mdateStart,jdbcType=DATE}
             </if>
 
             <if test="mdateEnd != null">
-                AND PAYHSRCSECINFO.MDATE <![CDATA[<=]]> #{mdateEnd,jdbcType=DATE}
+                AND SEC_INFO.MDATE <![CDATA[<=]]> #{mdateEnd,jdbcType=DATE}
             </if>
 
             <if test="theOryOptionPayDayStart != null">
-                AND PAYHSRCSECOPTION.THEORYOPTIONPAYDAY >= #{theOryOptionPayDayStart,jdbcType=DATE}
+                AND SEC_INFO.THEORYOPTIONPAYDAY >= #{theOryOptionPayDayStart,jdbcType=DATE}
             </if>
 
             <if test="theOryOptionPayDayEnd != null">
-                AND PAYHSRCSECOPTION.THEORYOPTIONPAYDAY <![CDATA[ <=]]> #{theOryOptionPayDayEnd,jdbcType=DATE}
+                AND SEC_INFO.THEORYOPTIONPAYDAY <![CDATA[ <=]]> #{theOryOptionPayDayEnd,jdbcType=DATE}
             </if>
 
             <if test="couponSpecies !=null and couponSpecies !=''">
-                AND PAYHSRCSECINFO.COUPONSPECIES = #{couponSpecies,jdbcType=VARCHAR}
+                AND SEC_INFO.COUPONSPECIES = #{couponSpecies,jdbcType=VARCHAR}
             </if>
 
             <if test="interestRate !=null and interestRate !=''">
-                AND PAYHSRCSECINFO.INTERESTRATE = #{interestRate,jdbcType=VARCHAR}
+                AND SEC_INFO.INTERESTRATE = #{interestRate,jdbcType=VARCHAR}
             </if>
 
             <if test="payCycle !=null and payCycle !=''">
-                AND PAYHSRCSECINFO.PAYCYCLE = #{payCycle,jdbcType=VARCHAR}
+                AND SEC_INFO.PAYCYCLE = #{payCycle,jdbcType=VARCHAR}
             </if>
 
             <if test="ccy !=null and ccy !=''">
-                AND PAYHSRCSECINFO.CCY = #{ccy,jdbcType=VARCHAR}
+                AND SEC_INFO.CCY = #{ccy,jdbcType=VARCHAR}
             </if>
 
             <if test="isSus !=null and isSus !=''">
-                AND PAYHSRCSECINFO.ISSUS = #{isSus,jdbcType=VARCHAR}
-            </if>
-
-            <if test="isSus !=null and isSus !=''">
-                AND PAYHSRCSECINFO.ISSUS = #{isSus,jdbcType=VARCHAR}
+                AND SEC_INFO.ISSUS = #{isSus,jdbcType=VARCHAR}
             </if>
 
             <if test="isRight !=null and isRight !='' and isRight == Y">
-                AND ( PAYHSRCSECINFO.CALLOPTION = 'Y' OR PAYHSRCSECINFO.PUTOPTION = 'Y')
+                AND ( SEC_INFO.CALLOPTION = 'Y' OR SEC_INFO.PUTOPTION = 'Y')
             </if>
 
             <if test="isRight !=null and isRight !='' and isRight == N">
-                AND ( PAYHSRCSECINFO.CALLOPTION = 'N' AND PAYHSRCSECINFO.PUTOPTION = 'N')
+                AND ( SEC_INFO.CALLOPTION = 'N' AND SEC_INFO.PUTOPTION = 'N')
             </if>
 
             <if test="optionType !=null and optionType !=''">
-                AND PAYHSRCSECOPTION.OPTIONTYPE = #{optionType,jdbcType=VARCHAR}
+                AND SEC_INFO.OPTIONTYPE = #{optionType,jdbcType=VARCHAR}
             </if>
 
             <if test="zxGrade !=null and zxGrade !=''">
-                AND PAYHSRCSECRATING2.RATING in (#{zxGrade,jdbcType=VARCHAR})
+                AND SEC_INFO.RATING in (#{zxGrade,jdbcType=VARCHAR})
             </if>
 
             <if test="ztGrade !=null and ztGrade !=''">
-                AND PAYHSRCSECRATING.RATING in (#{ztGrade,jdbcType=VARCHAR})
+                AND SEC_INFO.RATING in (#{ztGrade,jdbcType=VARCHAR})
             </if>
 
             <if test="search !=null and search !=''">
                 AND (
-                PAYHSRCSECINFO.SECID like '%' || #{search} || '%' OR
-                PAYHSRCSECINFO.MARKET like '%' || #{search} || '%' OR
-                PAYHSRCSECINFO.institution like '%' || #{search} || '%' OR
-                PAYHSRCSECINFO.ISSUERSHORT like '%' || #{search} || '%' OR
-                to_char(PAYHSRCSECINFO.PUBENDDATE,'yyyy-MM-dd') = #{search} OR
-                to_char(PAYHSRCSECINFO.VDATE,'yyyy-MM-dd') = #{search} OR
-                to_char(PAYHSRCSECINFO.MDATE,'yyyy-MM-dd') = #{search} OR
-                to_char(PAYHSRCSECOPTION.THEORYOPTIONPAYDAY,'yyyy-MM-dd') = #{search} OR
-                PAYHSRCSECINFO.COUPONSPECIES like '%' || #{search} || '%' OR
-                PAYHSRCSECINFO.INTERESTRATE like '%' || #{search} || '%' OR
-                PAYHSRCSECINFO.PAYCYCLE like '%' || #{search} || '%' OR
-                PAYHSRCSECINFO.CCY like '%' || #{search} || '%' OR
-                PAYHSRCSECINFO.ISSUS like '%' || #{search} || '%' OR
-                PAYHSRCSECOPTION.OPTIONTYPE like '%' || #{search} || '%' OR
-                PAYHSRCSECRATING2.RATING like '%' || #{search} || '%' OR
-                PAYHSRCSECRATING.RATING like '%' || #{search} || '%'
+                SEC_INFO.SECID like '%' || #{search} || '%' OR
+                SEC_INFO.MARKET like '%' || #{search} || '%' OR
+                SEC_INFO.institution like '%' || #{search} || '%' OR
+                SEC_INFO.ISSUERSHORT like '%' || #{search} || '%' OR
+                to_char(SEC_INFO.PUBENDDATE,'yyyy-MM-dd') = #{search} OR
+                to_char(SEC_INFO.VDATE,'yyyy-MM-dd') = #{search} OR
+                to_char(SEC_INFO.MDATE,'yyyy-MM-dd') = #{search} OR
+                to_char(SEC_INFO.THEORYOPTIONPAYDAY,'yyyy-MM-dd') = #{search} OR
+                SEC_INFO.COUPONSPECIES like '%' || #{search} || '%' OR
+                SEC_INFO.INTERESTRATE like '%' || #{search} || '%' OR
+                SEC_INFO.PAYCYCLE like '%' || #{search} || '%' OR
+                SEC_INFO.CCY like '%' || #{search} || '%' OR
+                SEC_INFO.ISSUS like '%' || #{search} || '%' OR
+                SEC_INFO.OPTIONTYPE like '%' || #{search} || '%' OR
+                SEC_INFO.RATING like '%' || #{search} || '%' OR
+                SEC_INFO.RATING like '%' || #{search} || '%'
                 )
             </if>
+        </where>)
+        ORDER BY PRIMARYCLASSIFICATION,
+                 SECONDARYCLASSIFICATION,
+                 ISSUEDATE,
+                 SECID
+    </select>
+
+
+    <select id="queryFinWindMarketForCoupons"
+            resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinWindMarketInfoQuery001Dto"
+            parameterType="Map">
+        SELECT
+        SEC_INFO.SEC_ID secId,
+        SEC_INFO.BOND_NAME bondName,
+        SEC_INFO.BOND_ABBREVIATION bondAbbreviation,
+        SEC_INFO.TRADING_PLACES tradingPlaces,
+        SEC_INFO.REGISTERED_CUSTODIAN registeredCustodian,
+        SEC_INFO.ISSUER,
+        SEC_INFO.RAISE_MODE raiseMode,
+        SEC_INFO.DOMESTIC_AND_FOREIGN domesticAndForeign,
+        SEC_INFO.IS_BONDS_WITH_RIGHTS isBondsWithRights,
+        SEC_INFO.TRADING_CALENDAR tradingCalendar,
+        SEC_INFO.SPECIAL_TERMS specialTerms,
+        RELEASE_INFO.RELEASE_TYPE releaseType,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        RDI_RELEASE_INFO.ISSUE_METHOD ELSE RELEASE_INFO.ISSUING_METHOD
+        END AS issueMethod,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        NULL ELSE RELEASE_INFO.BIDDING_METHOD
+        END AS biddingMethod,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        NULL ELSE RELEASE_INFO.TENDER_TARGET
+        END AS tenderTarget,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        NULL ELSE RELEASE_INFO.ADDITIONAL_BATCHES
+        END AS additionalBatches,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        RDI_RELEASE_INFO.ISSUE_SIZE * 10000 ELSE ROUND( RELEASE_INFO.ISSUE_SIZE / 10000, 2 )
+        END AS issueSize,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        TO_DATE(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd') ELSE TO_DATE(RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd')
+        END AS issueDate,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        TO_DATE(RDI_RELEASE_INFO.EVENT_DATE, 'yyyy-MM-dd') ELSE TO_DATE(RELEASE_INFO.PAYMENT_DEADLINE, 'yyyy-MM-dd')
+        END AS paymentDeadline,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        NULL ELSE RELEASE_INFO.DEBT_REGISTRATION_DATE
+        END AS debtRegistrationDate,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        NULL ELSE RELEASE_INFO.LISTING_DATE
+        END AS listingDate,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        NULL ELSE RELEASE_INFO.LISTING_CODE
+        END AS listingCode,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        NULL ELSE SEC_INFO.CROSS_MARKET_CODE
+        END AS crossMarketCode,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        TO_DATE(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd') ELSE TO_DATE(RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd')
+        END AS interestAccrualDate,
+
+        SEC_INFO.VALUE_DATE valueDate,
+        SEC_INFO.EXPIRY_DATE expiryDate,
+        SEC_INFO.PRIMARY_CLASSIFICATION primaryClassification,
+        SEC_INFO.SECONDARY_CLASSIFICATION secondaryClassification,
+        SEC_INFO.VARIETY_OF_COUPONS varietyOfCoupons,
+        SEC_INFO.INTEREST_PAYMENT_FREQUENCY interestPaymentFrequency,
+        SEC_INFO.RATE_TYPE rateType,
+        SEC_INFO.CURRENCY,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        RDI_RELEASE_INFO.ISSUE_PX ELSE RELEASE_INFO.ISSUE_PX
+        END AS issuePx,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        RDI_RELEASE_INFO.STIPULATION_VALUE ELSE RELEASE_INFO.STIPULATION_VALUE
+        END AS stipulationValue,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        RDI_RELEASE_INFO.SINGLE_MIN_SUB_AMT * 10000 ELSE ROUND( RELEASE_INFO.MIN_PER_TENDER_AMT / 10000, 2 )
+        END AS singleMinSubAmt,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        RDI_RELEASE_INFO.SINGLE_MAX_SUB_AMT * 10000 ELSE ROUND( RELEASE_INFO.MAX_PER_TENDER_AMT / 10000, 2 )
+        END AS singleMaxSubAmt,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        RDI_RELEASE_INFO.REMARK ELSE NULL
+        END AS remark,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        RDI_RELEASE_INFO.COUPON_RATE ELSE RELEASE_INFO.COUPON_RATE
+        END AS couponRate,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        RDI_RELEASE_INFO.BENCHMARK_CURVE_NAME ELSE RELEASE_INFO.BENCHMARK_CURVE_NAME
+        END AS benchmarkCurveName,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        RDI_RELEASE_INFO.DECIMAL_PLACES ELSE RELEASE_INFO.DECIMAL_PLACES
+        END AS decimalPlaces,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        RDI_RELEASE_INFO.SPREAD ELSE RELEASE_INFO.SPREAD
+        END AS spread,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        NULL ELSE RELEASE_INFO.ISSUE_START_TIME
+        END AS issueStartTime,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        NULL ELSE RELEASE_INFO.ISSUE_END_TIME
+        END AS issueEndTime,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        NULL ELSE RELEASE_INFO.BID_DATE
+        END AS bidDate,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        NULL ELSE RELEASE_INFO.ADDITIONAL_TENDER_DATE
+        END AS additionalTenderDate,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        RDI_RELEASE_INFO.MAX_SUB_AMT * 10000 ELSE ROUND( RELEASE_INFO.MAX_SUB_AMT / 10000, 2 )
+        END AS maxSubAmt,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        RDI_RELEASE_INFO.MIN_PER_TENDER_AMT * 10000 ELSE ROUND( RELEASE_INFO.MIN_PER_TENDER_AMT / 10000, 2 )
+        END AS minPerTenderAmt,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        RDI_RELEASE_INFO.MAX_PER_TENDER_AMT * 10000 ELSE ROUND( RELEASE_INFO.MAX_PER_TENDER_AMT / 10000, 2 )
+        END AS maxPerTenderAmt,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        RDI_RELEASE_INFO.MIN_TENDER_PX_FOR_PLAN ELSE RELEASE_INFO.MIN_TENDER_PX_FOR_PLAN
+        END AS minTenderPxForPlan,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        RDI_RELEASE_INFO.MAX_TENDER_PX_FOR_PLAN ELSE RELEASE_INFO.MAX_TENDER_PX_FOR_PLAN
+        END AS maxTenderPxForPlan,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        RDI_RELEASE_INFO.TENDER_STEP ELSE RELEASE_INFO.TENDER_STEP
+        END AS tenderStep,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        RDI_RELEASE_INFO.MEDIAN_MAX_BID_MARKED ELSE RELEASE_INFO.MEDIAN_MAX_BID_MARKED
+        END AS medianMaxBidMarked,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        RDI_RELEASE_INFO.MAX_TENDER_PX_DIFFER ELSE RELEASE_INFO.MAX_TENDER_PX_DIFFER
+        END AS maxTenderPxDiffer,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        RDI_RELEASE_INFO.CONTINUOUS_TENDER_LIMIT ELSE RELEASE_INFO.CONTINUOUS_TENDER_LIMIT
+        END AS continuousTenderLimit,
+
+        CASE
+        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
+        RDI_RELEASE_INFO.MAX_TOTAL_TENDER_AMT * 10000 ELSE ROUND( RELEASE_INFO.MAX_TOTAL_TENDER_AMT / 10000, 2 )
+        END AS maxTotalTenderAmt
+
+        FROM
+        INTERF_WIND_UNRELEASE_SEC_INFO SEC_INFO --wind一级未发行债券信息接口表
+        LEFT JOIN INTERF_WIND_RELEASE_INFO RELEASE_INFO ON SEC_INFO.SEC_ID = RELEASE_INFO.SEC_ID --wind一级未发行债券发行信息接口表
+        LEFT JOIN INTERF_RDI_RELEASE_INFO RDI_RELEASE_INFO ON RDI_RELEASE_INFO.SECURITY_ID = SEC_INFO.SEC_ID --银行间债券再发行信息接口表
+        <where>
+            SEC_INFO.VALUE_DATE  <![CDATA[ < ]]> to_date(#{platformDate}, '%Y-%m-%d')
+
+            <if test="secId !=null and secId !=''">
+                AND SEC_INFO.SEC_ID = #{secId,jdbcType=VARCHAR}
+            </if>
+
+            <if test="bondAbbreviation !=null and bondAbbreviation !=''">
+                AND SEC_INFO.BOND_ABBREVIATION = #{bondAbbreviation,jdbcType=VARCHAR}
+            </if>
+
         </where>
-        ORDER BY PRIMARY_CLASSIFICATION, SECONDARY_CLASSIFICATION
     </select>
 
 </mapper>
