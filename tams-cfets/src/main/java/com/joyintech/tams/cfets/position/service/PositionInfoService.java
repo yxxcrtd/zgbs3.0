@@ -98,6 +98,9 @@ public class PositionInfoService {
         BigDecimal realCash = BigDecimal.ZERO; // 账户现金
         BigDecimal secDesirableCash = BigDecimal.ZERO; // 证券户可取现金
 
+        if (CollectionUtils.isEmpty(portfolioIdList)) {
+            return rs;
+        }
         if (StringUtil.isEmpty(ccy)) {
             ccy = DictCodeList.币种_人民币_CNY.getValue();
         }
@@ -107,28 +110,28 @@ public class PositionInfoService {
         if (StringUtil.isEmpty(cdate)) {
             cdate = iPlatformDate.getSysDateStr();
         }
-        if (portfolioIdList != null) {
-            for (String portfolioId : portfolioIdList) {
-                BaseMap paramMap = BaseMap.newMap()
-                        .put("portfolioId", portfolioId)
-                        .put("ccy", ccy)
-                        .put("vdate", cdate)
-                        .put("calId", calId);
-                Map<String, Object> mapRst = etrCommonService.getProAvailableCash(paramMap);
 
-                if (mapRst != null) { // 指令t日可用，指令t1日可用
-                    cashT = ArithmeticUtil.doAdd(cashT, BaseMap.newMap(mapRst).getBigDecimal("cashT"));
-                    cashT1 = ArithmeticUtil.doAdd(cashT1, BaseMap.newMap(mapRst).getBigDecimal("cashT1"));
-                }
+        for (String portfolioId : portfolioIdList) {
+            BaseMap paramMap = BaseMap.newMap()
+                    .put("portfolioId", portfolioId)
+                    .put("ccy", ccy)
+                    .put("vdate", cdate)
+                    .put("calId", calId);
+            Map<String, Object> mapRst = etrCommonService.getProAvailableCash(paramMap);
 
-                PtlCashPositionFlowDto positionQueryDto = new PtlCashPositionFlowDto();
-                positionQueryDto.setPortfolioId(portfolioId);
-                positionQueryDto.setCcy(ccy);
-                positionQueryDto.setCdate(iPlatformDate.getSysDate());
-                // 实际现金（账户现金）
-                realCash = ArithmeticUtil.doAdd(realCash, basePtlCashPositionInfoService.queryUsableCashPosition(positionQueryDto));
+            if (mapRst != null) { // 指令t日可用，指令t1日可用
+                cashT = ArithmeticUtil.doAdd(cashT, BaseMap.newMap(mapRst).getBigDecimal("cashT"));
+                cashT1 = ArithmeticUtil.doAdd(cashT1, BaseMap.newMap(mapRst).getBigDecimal("cashT1"));
             }
+
+            PtlCashPositionFlowDto positionQueryDto = new PtlCashPositionFlowDto();
+            positionQueryDto.setPortfolioId(portfolioId);
+            positionQueryDto.setCcy(ccy);
+            positionQueryDto.setCdate(iPlatformDate.getSysDate());
+            // 实际现金（账户现金）
+            realCash = ArithmeticUtil.doAdd(realCash, basePtlCashPositionInfoService.queryUsableCashPosition(positionQueryDto));
         }
+
 
         BaseMap inMap = BaseMap.newMap()
                 .put("S_004", DictCodeListExt3.资产类型_汇总可用现金.getValue())
@@ -178,6 +181,7 @@ public class PositionInfoService {
 
     /**
      * 查询证券账户
+     *
      * @param map
      * @return
      */
