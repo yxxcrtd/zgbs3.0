@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_修改;
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.*;
 
 @Service
@@ -87,7 +88,9 @@ public class PositionRequestTrdConBondService {
         resultMap.put(WORK_FLOW_ID, null);
         resultMap.put("cdate", entity.getPurchDate());
         resultMap.put(CCY, entity.getCcy());
-        resultMap.put(B_TOTAL_TRADE_ID, null);
+        if(resultMap.get("decisionAct").equals(系统动作_修改.getValue())) {
+            resultMap.put(B_TOTAL_TRADE_ID, entity.getBusiCode());
+        }
 
         Map<String, String> accnoParm = new HashMap<>();
         accnoParm.put(CCY, entity.getCcy());
@@ -127,7 +130,7 @@ public class PositionRequestTrdConBondService {
 
         resultMap.put("balanceCheck", DictCodeList.是否_否.getValue());
         resultMap.put("userId", SecurityUtil.getLoginUser().getUserName());
-        resultMap.put("totalTradeId", entity.getEntrustId());
+        resultMap.put("totalTradeId", entity.getBusiCode());
         resultMap.put("flowStatus", DictCodeListExt3.流程节点_流程提交.getValue());
         resultMap.put("modelType", DictCodeListExt1.子系统代码_委托.getValue());
     }
