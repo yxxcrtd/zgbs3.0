@@ -157,6 +157,12 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
     @ApiModelProperty(name="etrInvestPersonInfo",value="投资人员信息DTO")
     private BussEtrInvestPersonInfoDto etrInvestPersonInfo;
 
+    /**
+     * 选中的数据
+     */
+    @ApiModelProperty(name="selectedItem",value="选中的数据")
+    private transient List<CfetsEtrBondFirstBid002Dto> selectedItem;
+
     public String getElementId() {
         return elementId;
     }
@@ -341,5 +347,13 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
 
     public void setEtrInvestPersonInfo(BussEtrInvestPersonInfoDto etrInvestPersonInfo) {
         this.etrInvestPersonInfo = etrInvestPersonInfo;
+    }
+
+    public List<CfetsEtrBondFirstBid002Dto> getSelectedItem() {
+        return selectedItem;
+    }
+
+    public void setSelectedItem(List<CfetsEtrBondFirstBid002Dto> selectedItem) {
+        this.selectedItem = selectedItem;
     }
 }
