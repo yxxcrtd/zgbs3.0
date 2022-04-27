@@ -791,7 +791,7 @@ public class StlDataDealSzdSjsjgProcessService {
             // 首期成交编号
             settleTransData.setfCjbh(szdSjsjg.getJgfjsm());
             // 查询首期
-            SettleTransData sqSettleTransData = stlDownDataDealMapper.selectSqSettleTransDatas(settleTransData.getfCjbh(),
+            SettleTransData sqSettleTransData = trdCommonBaseService.selectSqSettleTransDatas(settleTransData.getfCjbh(),
                     settleTransData.getSeatNumber(), settleTransData.getSecAcctId(), settleTransData.getVdate()).get(0);
 
             // 金融产品代码
