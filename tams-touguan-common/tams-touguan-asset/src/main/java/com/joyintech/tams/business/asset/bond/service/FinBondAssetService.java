@@ -1368,8 +1368,7 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
         input.setSecInfoModel(secInfoModel);
         YieldPriceOutParameter parameter = yieldByPriceCalculator.calculate(input);
         if(null != parameter){
-            yieldResult = parameter.getMatYield();
-            yieldResult = ArithmeticUtil.multiply(yieldResult, new BigDecimal(100));
+            yieldResult = parameter.getMatYield(); 
             yieldResult =  yieldResult.setScale(4, BigDecimal.ROUND_HALF_UP);
         }
         return yieldResult;
