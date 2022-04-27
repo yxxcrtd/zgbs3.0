@@ -75,6 +75,7 @@
         <result column="IS_MODIFY" property="isModify" jdbcType="VARCHAR" />
         <result column="F_CJBH" property="fCjbh" jdbcType="VARCHAR" />
         <result column="FRAGMENTARY_FUNDS" property="fragmentaryFunds" jdbcType="DECIMAL" />
+        <result column="DELIVERY_RESULT" property="deliveryResult" javaType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
         TRADE_ID TRADE_ID, CJBH CJBH, DEAL_DATE DEAL_DATE, SEC_TYPE SEC_TYPE, APPLY_TRADE_ID APPLY_TRADE_ID, 
@@ -94,7 +95,7 @@
         COMMISSION_AMT_RAW COMMISSION_AMT_RAW, TRADE_AMT_RAW TRADE_AMT_RAW, TRADE_ID_RAW TRADE_ID_RAW, 
         SEQ_NO SEQ_NO, IS_PURCH_TYPE_YX IS_PURCH_TYPE_YX, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, 
         CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME, IS_MODIFY IS_MODIFY, 
-        F_CJBH F_CJBH, FRAGMENTARY_FUNDS FRAGMENTARY_FUNDS
+        F_CJBH F_CJBH, FRAGMENTARY_FUNDS FRAGMENTARY_FUNDS, DELIVERY_RESULT DELIVERY_RESULT
     </sql>
     <sql id="Sql_All_Data" >
         select 

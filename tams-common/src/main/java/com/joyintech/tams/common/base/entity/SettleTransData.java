@@ -379,12 +379,6 @@ public class SettleTransData extends BaseEntity {
     private String fCjbh;
 
     /**
-     * 质押数量
-     */
-    @JsonSerialize(using=BigDecimalSerializer.class)
-    private BigDecimal pledgeNumber;
-
-    /**
      * 零碎份额资金
      */
     @JsonSerialize(using=BigDecimalSerializer.class)
@@ -1506,11 +1500,4 @@ public class SettleTransData extends BaseEntity {
         this.tradeType = tradeType;
     }
 
-    public BigDecimal getPledgeNumber() {
-        return pledgeNumber;
-    }
-
-    public void setPledgeNumber(BigDecimal pledgeNumber) {
-        this.pledgeNumber = pledgeNumber;
-    }
 }
