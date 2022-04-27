@@ -360,7 +360,7 @@ public class PortfolioManager extends BaseService {
             return ResultBean.error(ErrorCode.INSTRUCTIONS_NOT_EXIST);
         }
         BigDecimal orginEntrustPrice = order.getEntrustPrice();
-        // 新债，使用全价进行计算
+        // 债券，使用全价进行计算
         coverPrice(instruction, order);
         // 获取委托属性
         String entrustProp = EntrustPropUtils.getEntrustProp(instruction, order.getEntrustProp());
@@ -540,7 +540,7 @@ public class PortfolioManager extends BaseService {
             }
         }
 
-        // 新债，使用全价进行计算后恢复订单价格
+        // 债券，使用全价进行计算后恢复订单价格
         recoverPrice(instruction, list, orginEntrustPrice);
 
         log.debug("queryPortfolioCalculate() called with result => 【list = {}】", JSONUtil.toJsonStr(list));
@@ -558,7 +558,7 @@ public class PortfolioManager extends BaseService {
     }
 
     private void recoverPrice(Instruction instruction, List<PortfolioCalculateResponse> list, BigDecimal price) {
-        if (instruction.newBond()) {
+        if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())) {
             list.forEach(item-> item.setEntrustPrice(price));
         }
     }
