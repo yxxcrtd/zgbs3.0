@@ -75,7 +75,7 @@
         <result column="IS_MODIFY" property="isModify" jdbcType="VARCHAR" />
         <result column="F_CJBH" property="fCjbh" jdbcType="VARCHAR" />
         <result column="FRAGMENTARY_FUNDS" property="fragmentaryFunds" jdbcType="DECIMAL" />
-        <result column="DELIVERY_RESULT" property="deliveryResult" javaType="VARCHAR" />
+        <result column="DELIVERY_RESULT" property="deliveryResult" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
         TRADE_ID TRADE_ID, CJBH CJBH, DEAL_DATE DEAL_DATE, SEC_TYPE SEC_TYPE, APPLY_TRADE_ID APPLY_TRADE_ID, 
