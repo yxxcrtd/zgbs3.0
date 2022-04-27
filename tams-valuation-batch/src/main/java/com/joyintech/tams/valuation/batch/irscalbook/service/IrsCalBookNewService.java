@@ -21,8 +21,6 @@ import com.joyintech.tams.constant.DictCodeListRsk;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalance;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalanceSearchDto;
 import com.joyintech.tams.valuation.batch.common.accounting.service.AccountingCommonService;
-import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookAccountGenLogicNew;
-import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookCommonLogic;
 import com.joyintech.tams.valuation.batch.common.calculation.entity.CalCommonResult;
 import com.joyintech.tams.valuation.batch.common.calculation.entity.PrincipalInfo;
 import com.joyintech.tams.valuation.batch.common.calculation.entity.QuoteInfo;
@@ -35,7 +33,6 @@ import com.joyintech.tams.valuation.common.batch.finproduct.entity.*;
 import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrueNew;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.common.constants.ValDictCodeList;
-import com.joyintech.tams.valuation.common.dto.DfDealDto;
 import com.joyintech.tams.valuation.common.utils.DBUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -45,7 +42,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 /**
- * 利率互换计提账务处理（新） - processor
+ * 利率互换收付軋差估值模型批处理
  *
  * @author 殷亚
  * @version 1.0
@@ -119,10 +116,8 @@ public class IrsCalBookNewService {
                 .getValBokBooksetExtForMap(acctEntity.getBooksetId(), paramCodeList);
         // 变量.计提方式 = 账套配置表参数项_利率互换计提方式 对应的计提方式
         String calType = "";
-        String calTypetab = "";
         if (getValBokBooksetExtMap.get(ValDictCodeList.账套配置表参数项_利率互换计提方式.getValue()) != null) {
             calType = (String) getValBokBooksetExtMap.get(ValDictCodeList.账套配置表参数项_利率互换计提方式.getValue());
-            calTypetab = calType;
         }
         // 3. 处理交易
         // 3.1、循环处理计提明细
@@ -215,6 +210,7 @@ public class IrsCalBookNewService {
                     interest = ArithmeticUtil.doSub(interest, interestBlanceForYstVar);
                 } else {
                     //每日新增暂不实现
+
 
                 }
 

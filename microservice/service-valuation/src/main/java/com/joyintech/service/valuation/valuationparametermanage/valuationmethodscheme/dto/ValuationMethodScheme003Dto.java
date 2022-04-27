@@ -144,6 +144,12 @@ public class ValuationMethodScheme003Dto extends BaseEntity implements ProcessEn
      */
     private String pageModel;
 
+    /**
+     * 估值模型
+     */
+    @NotBlank(message = "估值模型不能为空！", groups = {ValidateGroupEdit.class})
+    private String valuationId;
+
     public String getValuationSource() {
         return valuationSource;
     }
@@ -302,4 +308,11 @@ public class ValuationMethodScheme003Dto extends BaseEntity implements ProcessEn
         this.listValuationMethodSchemeDto = listValuationMethodSchemeDto;
     }
 
+    public String getValuationId() {
+        return valuationId;
+    }
+
+    public void setValuationId(String valuationId) {
+        this.valuationId = valuationId;
+    }
 }
