@@ -799,11 +799,11 @@ public class SecAbsCalBookNewService {
             // 变量.本日应计利息余额
             BigDecimal tdyInterestAccBal = BigDecimal.ZERO;
             BigDecimal intAmt = BigDecimal.ZERO;
-            // ！变量.标的信息.息票品种为零息或贴现时 or 投资目的 = 以公允价值变动计量
+            // ！变量.标的信息.息票品种为零息或贴现时 or (投资目的 = 以公允价值变动计量 且 ！摊余成本法)
             if ((!DictCodeList.息票品种_零息.getValue().equals(rstBaseinfo.getCouponSpecies())
                  && !DictCodeList.息票品种_贴现.getValue().equals(rstBaseinfo.getCouponSpecies()))
-                || acctEntityEx.getInvAim().equals(
-                    DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue())) {
+                || (!isAcFlag && acctEntityEx.getInvAim().equals(
+                    DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue()))) {
                 // else if（变量.当日成本科目数量 = 0 and 变量.当日计算成本科目数量 = 0 ）
                 if (varNumAmtHappenDate.compareTo(BigDecimal.ZERO) == 0
                 		/**MODIFY BY WUJIE ON 20191217 START
