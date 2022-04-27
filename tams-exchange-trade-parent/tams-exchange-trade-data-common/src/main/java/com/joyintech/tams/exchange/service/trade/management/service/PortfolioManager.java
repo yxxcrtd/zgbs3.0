@@ -548,7 +548,7 @@ public class PortfolioManager extends BaseService {
     }
 
     private void coverPrice(Instruction instruction, OrderPlaceBean order) {
-        if (instruction.newBond()) {
+        if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())) {
             BigDecimal fullPrice = order.getFullPrice();
             if (ObjectUtil.isNull(fullPrice) || fullPrice.compareTo(BigDecimal.ZERO) <= 0) {
                 throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR);
