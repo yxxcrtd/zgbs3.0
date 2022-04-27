@@ -802,12 +802,6 @@ public class StlDataDealSzdSjsjgProcessService {
             settleTransData.setTermType(sqSettleTransData.getTermType());
             // 起息日
             settleTransData.setVdate(sqSettleTransData.getVdate());
-            // 流水号
-            settleTransData.setSeqNo(sqSettleTransData.getSeqNo());
-            // 质押数量
-            settleTransData.setPledgeNumber(sqSettleTransData.getShareAmt());
-            // 置换方向
-            settleTransData.setTradeType(sqSettleTransData.getTradeType());
             setDifferentConf(settleTransData, szdSjsjg, sqSettleTransData);
         }
         // 报价回购
@@ -1288,11 +1282,11 @@ public class StlDataDealSzdSjsjgProcessService {
                         // 质押金融产品代码  金融产品类型(投管).债券 + 清算数据Entity.证券代码 + ".SZ"
                         settleTransDataPledge.setPledgeFinprodId(DictCodeListExt1.金融产品类型_投管用_债券.getValue() + GlobalConstant.UNDER_LINE + szdSjsjg.getJgzqdm() + ".SZ");
                         // 质押数量
-                        settleTransDataPledge.setPledgeNumber(settleTransData.getPledgeNumber());
+                        settleTransDataPledge.setPledgeNumber(settleTransData.getShareAmt());
                         // 质押率
                         settleTransDataPledge.setPledgeRatio(null);
                         // 置换方向
-                        settleTransDataPledge.setDisplaceDirection(settleTransData.getPs());
+                        settleTransDataPledge.setDisplaceDirection(settleTransData.getTradeType());
                         stlDownDataDealWriteBaseDto.getSettleTransDataPledgeList().add(settleTransDataPledge);
                     }
                 }
