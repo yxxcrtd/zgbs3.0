@@ -1404,7 +1404,6 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
         PriceYieldOutParameter parameter = priceByYieldCalculator.calculate(input);
         if(null != parameter){
             priceResult = parameter.getFullPrice();
-            priceResult = ArithmeticUtil.multiply(priceResult, new BigDecimal(100));
             priceResult =  priceResult.setScale(4, BigDecimal.ROUND_HALF_UP);
         }
         return priceResult;

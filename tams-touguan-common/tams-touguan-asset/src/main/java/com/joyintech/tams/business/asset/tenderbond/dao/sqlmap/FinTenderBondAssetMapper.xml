@@ -25,11 +25,11 @@
             SELECT
             CASE WHEN <![CDATA[
                 ISSUE.ISSUE_EDATE >= TO_DATE(#{platformDate},'YYYY-MM-DD')  or
-                ISSUE.TENDER_EDATE >= TO_DATE(#{platformDate},'YYYY-MM-DD')  THEN '01'
+                PRODUCT_ADD.BID_DATE >= TO_DATE(#{platformDate},'YYYY-MM-DD')  THEN '01'
             WHEN (ISSUE.ISSUE_EDATE < TO_DATE(#{platformDate},'YYYY-MM-DD') or
-                ISSUE.TENDER_EDATE < TO_DATE(#{platformDate},'YYYY-MM-DD')) and PRODUCT.CIRCULATION_CODE is null THEN '02'
+                PRODUCT_ADD.BID_DATE < TO_DATE(#{platformDate},'YYYY-MM-DD')) and PRODUCT.CIRCULATION_CODE is null THEN '02'
             WHEN (ISSUE.ISSUE_EDATE < TO_DATE(#{platformDate},'YYYY-MM-DD') or
-                ISSUE.TENDER_EDATE < TO_DATE(#{platformDate},'YYYY-MM-DD')) and PRODUCT.CIRCULATION_CODE is not null THEN '03'
+                PRODUCT_ADD.BID_DATE < TO_DATE(#{platformDate},'YYYY-MM-DD')) and PRODUCT.CIRCULATION_CODE is not null THEN '03'
                 ]]>
             ELSE NULL END AS issueStage,
             PRODUCT_ADD.ISSUE_STATUS as issueStatus,
@@ -322,7 +322,9 @@
     <select id="selectFinprodId" resultType="java.lang.String">
         select T1.FINPROD_ID from FIN_PRODUCT T1
         where  T1.FINPROD_TYPE2 = #{finprodType2}
-            AND T1.TRADE_MARKET in(#{TRADE_PLACE_01},#{TRADE_PLACE_02})
+            <if test="TRADE_PLACE_01 != null and TRADE_PLACE_02 !=null">
+                AND T1.TRADE_MARKET in(#{TRADE_PLACE_01},#{TRADE_PLACE_02})
+            </if>
             AND T1.FINPROD_MARKET_ID=#{finprodMarketId,jdbcType=VARCHAR} AND ROWNUM=1
     </select>
 
