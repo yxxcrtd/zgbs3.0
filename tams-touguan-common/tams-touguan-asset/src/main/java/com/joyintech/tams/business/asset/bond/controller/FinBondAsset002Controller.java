@@ -478,10 +478,10 @@ public class FinBondAsset002Controller extends BaseController{
     public Message<AssetCommonInfoRequest> getyieldByPriceCalculator(@RequestBody AssetCommonInfoRequest request) {
         AssetCommonInfoRequest response = new AssetCommonInfoRequest();
         response.setCalendarId(finBondAssetService.getCalendarId(request.getTradeMarket()));
-        if (!StringUtil.isNotEmpty(request.getRate()) && StringUtil.isNotEmpty(request.getIssuePrice())) {
+        if (StringUtil.isNotEmpty(request.getPriceFlag()) && StringUtil.equals(request.getPriceFlag(),DictCodeList.是否_是.getValue())) {
             BigDecimal rate = finBondAssetService.getyieldByPriceCalculator(request);
             response.setRate(rate);
-        }else if (StringUtil.isNotEmpty(request.getRate()) && !StringUtil.isNotEmpty(request.getIssuePrice())) {
+        }else if (StringUtil.isNotEmpty(request.getRateFlag()) && StringUtil.equals(request.getRateFlag(),DictCodeList.是否_是.getValue())) {
             BigDecimal issuePrice = finBondAssetService.getPriceByYieldCalculator(request);
             response.setIssuePrice(issuePrice);
         }
