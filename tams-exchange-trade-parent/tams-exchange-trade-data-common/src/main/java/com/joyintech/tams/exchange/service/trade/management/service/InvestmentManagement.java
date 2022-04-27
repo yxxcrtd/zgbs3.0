@@ -18,6 +18,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.*;
@@ -31,10 +32,10 @@ import com.joyintech.tams.exchange.common.cache.MinTrdUnitLimitService;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.*;
 import com.joyintech.tams.exchange.common.db.domain.*;
+import com.joyintech.tams.exchange.common.dto.EntrustPriceAndYieldDto;
 import com.joyintech.tams.exchange.common.enums.exchange.GuaranteedEnum;
 import com.joyintech.tams.exchange.common.enums.exchange.NetOrFullPriceEnum;
 import com.joyintech.tams.exchange.common.enums.exchange.TargetTypeEnum;
-import com.joyintech.tams.exchange.common.dto.EntrustPriceAndYieldDto;
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
 import com.joyintech.tams.exchange.common.request.InstructionQueryRequest;
@@ -108,6 +109,11 @@ public class InvestmentManagement extends BaseService {
      */
     @Value("${application.micorservice.contextPath.single:false}")
     private boolean isSingle;
+
+    /**
+     * 指令分发检查开关：01-开启，02-关闭
+     */
+    private static final String CHECK_FILTER_SWITCH = "01";
 
     /**
      * 指令查询带条件
@@ -1181,9 +1187,12 @@ public class InvestmentManagement extends BaseService {
             Map<String, Object> data = checkResult.getData();
             if (code == 2 && CollUtil.isNotEmpty(data)) {
                 Set<String> keys = data.keySet();
-//                instructionList = instructionList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
-//                detailList = detailList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
-//                pledgeList = pledgeList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
+                final String checkSwitch = CacheUtil.getSysParam(ExchangeConstant.TRD_INSTRUCTION_APPOINT_CHECK_FILTER);
+                if (StringUtil.equals(CHECK_FILTER_SWITCH, checkSwitch)) {
+                    instructionList = instructionList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
+                    detailList = detailList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
+                    pledgeList = pledgeList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
+                }
 
                 updateAppointInstruction(records, entrustIds, Lists.newArrayList(keys.iterator()), data);
 
