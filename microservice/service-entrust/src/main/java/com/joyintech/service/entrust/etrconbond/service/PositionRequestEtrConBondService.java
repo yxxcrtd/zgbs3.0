@@ -214,7 +214,7 @@ public class PositionRequestEtrConBondService {
         resultMap.put("applyBondSecList", applyBondSecList);
         resultMap.put("userId",SecurityUtil.getLoginUser().getUserName());
         resultMap.put("totalTradeId",entity.getEntrustId());
-        resultMap.put("modelType", DictCodeListExt1.子系统代码_委托.getValue());
+        resultMap.put("modelType", DictCodeListExt1.子系统代码_交易.getValue());
         resultMap.put("flowStatus", DictCodeListExt3.流程节点_流程提交.getValue());
     }
 
