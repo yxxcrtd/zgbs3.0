@@ -2129,7 +2129,25 @@ public class KCBPTradeAgent extends TradeAgentDsp {
 	@Override
 	public List<NegotiateQuoteReceiveBean> reqNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean)
 			throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+        Map<String, String> parameters = Maps.newHashMap();
+        String market = StockCodeUtils.getMarket(negotiateQuoteQueryBean.getStockCode());
+        String accountId = negotiateQuoteQueryBean.getAccountId();
+        parameters.put("accountId", accountId);
+        parameters.put("side", negotiateQuoteQueryBean.getSide());//买卖方向
+        parameters.put("count", "1000");//请求行数
+        parameters.put("posstr", "");//定位串
+        parameters.put("tradercode", negotiateQuoteQueryBean.getTraderCode());//本方交易员代码
+        parameters.put("investorid", negotiateQuoteQueryBean.getInvestorId());//本方交易主体代码
+        parameters.put("confirmid", negotiateQuoteQueryBean.getConfirmId());//当交易主体类型为03或04时必须送值
+        if (!Strings.isNullOrEmpty(negotiateQuoteQueryBean.getStockCode()))
+            parameters.put("stkcode", StockCodeUtils.getStockCode(negotiateQuoteQueryBean.getStockCode()));//证券代码
+        logger.info("parameters {}", JsonUtils.getJsonFromObject(parameters));
+        TerminalAgentInfo agentInfo = terminalAgentInfoService.selectOne(getTerminalName(), FunctionCode.REQ_QRY_INTEGRATED_NEGOTIATE_QUOTE_RECEIVE.value);
+        agentInfo.setAccountId(accountId);
+        ResultBean resultBean = tradeAgentHelper.doRequest(agentInfo, parameters);
+        if (resultBean.getErrorCode() != ErrorCode.SUCCESS.value) {
+            return Lists.newArrayList();
+        }
+        return KCBPMsgParseHelper.parseNegotiateQuoteReceive(resultBean, market);
 	}
 }
