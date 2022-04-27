@@ -230,22 +230,6 @@ public class TradeCallbackHelper {
         tradeRecord.setPs(instruction.getTradeSide());
         tradeRecord.setBusiTypeTg(instruction.getBusiTypeTg());
         tradeRecord.setEntrustClass(instruction.getEntrustClass());
-        //协议回购
-        if (IntegratedEntrustUtils.isProtocolBack_SH(entrust.getEntrustProp())
-                || IntegratedEntrustUtils.isProtocolBack_SZ(entrust.getEntrustProp())) {
-            //到期结算金额
-            tradeRecord.setClearBalance(entrust.getBackBalance());
-        } else {
-            if (tradeRecord.getClearBalance() == null || tradeRecord.getClearBalance().compareTo(BigDecimal.ZERO) == 0) {
-                if (InvestmentAssetType.isBond(tradeRecord.getAssetType())
-                        && EntrustProp.isTrade(entrust.getEntrustProp())
-                        && Objects.nonNull(tradeRecord.getFullPrice())
-                        && tradeRecord.getFullPrice().compareTo(BigDecimal.ZERO) != 0) {
-                    //成交全价金额
-                    tradeRecord.setClearBalance(tradeRecord.getFullPrice().multiply(BigDecimal.valueOf(tradeRecord.getTradedVolume())));
-                }
-            }
-        }
 
         //获取BusinessFlag
         if (IntegratedEntrustUtils.isIntegratedEntrust(tradeRecord.getEntrustProp())) {

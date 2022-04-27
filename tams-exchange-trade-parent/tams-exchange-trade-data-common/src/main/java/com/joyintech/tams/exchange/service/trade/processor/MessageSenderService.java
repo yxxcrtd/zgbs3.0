@@ -21,6 +21,7 @@ import com.joyintech.tams.exchange.common.utils.IntegratedEntrustUtils;
 import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionPledgeService;
+import com.joyintech.tams.exchange.datacommon.db.service.InstrumentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,8 @@ public class MessageSenderService {
     private static final Logger logger = LoggerFactory.getLogger(MessageSenderService.class);
     @Autowired
     private InstructionPledgeService instructionPledgeService;
+    @Autowired
+    private InstrumentService instrumentService;
 
     /**
      * 推送成交数据
@@ -50,7 +53,7 @@ public class MessageSenderService {
     public SimpleRabbitMessage pushTradeToMQ(Trade trade, Instruction instruction, EntrustInterface entrust) {
         if (Objects.nonNull(trade) && !Strings.isNullOrEmpty(trade.getId())) {
             logger.info("pushTradeToMQ trade {}", trade.getId());
-            TradeMessage tradeMessage = TradeMessage.createTradeMessage(trade);
+            TradeMessage tradeMessage = TradeMessage.createTradeMessage(trade,entrust);
             if (Objects.nonNull(instruction) && Objects.nonNull(tradeMessage)) {
                 createTradeMsg(trade, instruction, entrust, tradeMessage);
                 //todo 期货保证金
@@ -113,12 +116,7 @@ public class MessageSenderService {
         tradeMessage.setFinprodMarketId(trade.getStockCode());
         tradeMessage.setDealVolume((double) trade.getTradedVolume());
         tradeMessage.setDealPrice(trade.getTradedPrice());
-//        tradeMessage.setDealBalance(trade.getTradedBalance());
-        if (trade.getClearBalance() != null && trade.getClearBalance().compareTo(BigDecimal.ZERO) > 0) {
-            tradeMessage.setDealBalance(trade.getClearBalance());
-        } else {
-            tradeMessage.setDealBalance(trade.getTradedBalance());
-        }
+        tradeMessage.setDealBalance(trade.getTradedBalance());
         tradeMessage.setTradingDay(trade.getTradingDay());
         tradeMessage.setAcctNo(instruction.getAcctNo());
         tradeMessage.setSecAcctId(instruction.getSecAcctId());
@@ -129,7 +127,7 @@ public class MessageSenderService {
         tradeMessage.setCcy(instruction.getCcy());
         tradeMessage.setFinprodId(instruction.getFinprodId());
         if(entrust instanceof IntegratedEntrust){
-            tradeMessage.setCounterId(((IntegratedEntrust) entrust).getLiaisonName());
+            tradeMessage.setCounterId(((IntegratedEntrust) entrust).getCounterId());
         }
 
         // 此处 if-else 是否合理？
@@ -178,6 +176,18 @@ public class MessageSenderService {
             tradeMessage.setFullPrice(
                     trade.getTradedVolume() > 0 ?
                             TradeUtils.divide(trade.getTradedBalance(), trade.getTradedVolume(), BigDecimal.ROUND_HALF_UP).doubleValue() : 0);
+        }
+
+        //协议回购
+        if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
+            //到期结算金额
+            tradeMessage.setDealBalance(entrust.getBackBalance());
+        } else if (InvestmentAssetType.isBond(trade.getAssetType())
+                && EntrustProp.isTrade(entrust.getEntrustProp())
+                && Objects.nonNull(trade.getFullPrice())
+                && trade.getFullPrice().compareTo(BigDecimal.ZERO) != 0) {
+            //成交全价金额
+            tradeMessage.setDealBalance(trade.getFullPrice().multiply(BigDecimal.valueOf(trade.getTradedVolume())));
         }
 
         // 业务类型（手工交收用）
@@ -372,9 +382,13 @@ public class MessageSenderService {
         if (InvestmentAssetType1.BIDDING_REPO.value.equals(instruction.getAssetType1())) {
             //投管要求质押式回购这里传入期限品种
             tradeMessage.setFinprodMarketId(trade.getStockName());
-        } else if (InvestmentAssetType.BOND.value.equals(instruction.getAssetType())) {
-            //投管要求债券买卖，成交价格统一填净价价格
-            tradeMessage.setDealPrice(entrust.getEntrustPrice());
+        }
+//        else if (InvestmentAssetType.BOND.value.equals(instruction.getAssetType())) {
+//            //投管要求债券买卖，成交价格统一填净价价格
+//            tradeMessage.setDealPrice(entrust.getEntrustPrice());
+//        }
+        if(entrust instanceof IntegratedEntrust){
+            tradeMessage.setCounterId(((IntegratedEntrust) entrust).getCounterId());
         }
         String finprodId = instruction.getFinprodId();
         if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
