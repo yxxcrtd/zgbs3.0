@@ -478,14 +478,19 @@ public class InvestmentManagement extends BaseService {
 
             minPriceAndMinTrdUnitLimitBean = new MinPriceAndMinTrdUnitLimitBean(finprodMarketId, ErrorCode.SUCCESS.value, ErrorCode.SUCCESS.errorMsg);
             minPriceAndMinTrdUnitLimitBean.setIsFullPrice(instrument.getIsFullPrice());
-            // 特殊处理新债,将多条数据同时塞入
+            // 特殊处理新债和质押式回购,将多条数据同时塞入
             if (ObjectUtil.isNull(minPrice)) {
                 String tradeMarket = instruction.getTradeMarket();
                 String assetType = instrument.getAssetType();
                 String assetType1 = instrument.getAssetType1();
-                MinPrice minPriceByPPCJ = minPriceService.getMinPrice(tradeMarket, 指定交易方式_匹配成交.getValue(), assetType, assetType1);
-                MinPrice minPriceByXSCJ = minPriceService.getMinPrice(tradeMarket, 指定交易方式_协商成交.getValue(), assetType, assetType1);
-                minPriceAndMinTrdUnitLimitBean.setMinPriceList(ListUtil.of(minPriceByPPCJ, minPriceByXSCJ));
+                if (InvestmentAssetType.BOND.codeEquals(assetType)) {
+                    MinPrice minPriceByPPCJ = minPriceService.getMinPrice(tradeMarket, 指定交易方式_匹配成交.getValue(), assetType, assetType1);
+                    MinPrice minPriceByXSCJ = minPriceService.getMinPrice(tradeMarket, 指定交易方式_协商成交.getValue(), assetType, assetType1);
+                    minPriceAndMinTrdUnitLimitBean.setMinPriceList(ListUtil.of(minPriceByPPCJ, minPriceByXSCJ));
+                } else if (PLEDGE_REPURCHASE.codeEquals(assetType)) {
+                    MinPrice minPriceByPPCJ = minPriceService.getMinPrice(tradeMarket, 指定交易方式_匹配成交.getValue(), assetType, assetType1);
+                    minPriceAndMinTrdUnitLimitBean.setMinPriceList(ListUtil.of(minPriceByPPCJ));
+                }
             } else {
                 minPriceAndMinTrdUnitLimitBean.setMinPriceList(ListUtil.of(minPrice));
             }
