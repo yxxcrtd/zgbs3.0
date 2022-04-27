@@ -142,6 +142,19 @@ public class ValuationMethodScheme003Dto extends BaseEntity implements ProcessEn
      */
     private String pageModel;
 
+    /**
+     * 估值模型
+     */
+    private String valuationId;
+
+    public String getValuationId() {
+        return valuationId;
+    }
+
+    public void setValuationId(String valuationId) {
+        this.valuationId = valuationId;
+    }
+
     public String getValuationSource() {
         return valuationSource;
     }

@@ -11,6 +11,9 @@
             SEC_DETAIL_TYPE as secDetailType,/** 证券细分类 **/
             INV_AIM as invAim,/** 投资目的 **/
             VALUATION_METHOD as valuationMethod,/** 估值方法 **/
+            <!-- add by yinya on 20220427 -->
+            VALUATION_ID as valuationId,/** 估值模型 **/
+            <!-- add by yinya on 20220427 -->
             VALUATION_SOURCE as valuationSource,/** 估值来源 **/
             VALUATION_PRICE as valuationPrice,/** 估值市价 **/
             VALUATION_PRICE_2 as valuationPrice2,/** 估值第二市价 **/
@@ -33,6 +36,9 @@
             SEC_DETAIL_TYPE as secDetailType,/** 证券细分类 **/
             INV_AIM as invAim,/** 投资目的 **/
             VALUATION_METHOD as valuationMethod,/** 估值方法 **/
+            <!-- add by yinya on 20220427 -->
+            VALUATION_ID as valuationId,/** 估值模型 **/
+            <!-- add by yinya on 20220427 -->
             VALUATION_SOURCE as valuationSource,/** 估值来源 **/
             VALUATION_PRICE as valuationPrice,/** 估值市价 **/
             VALUATION_PRICE_2 as valuationPrice2,/** 估值第二市价 **/
@@ -55,6 +61,9 @@
             SEC_DETAIL_TYPE ,/** 证券细分类 **/
             INV_AIM ,/** 投资目的 **/
             VALUATION_METHOD ,/** 估值方法 **/
+            <!-- add by yinya on 20220427 -->
+            VALUATION_ID ,/** 估值模型 **/
+            <!-- add by yinya on 20220427 -->
             VALUATION_SOURCE ,/** 估值来源 **/
             VALUATION_PRICE ,/** 估值第一市价 **/ 
             VALUATION_PRICE_2 ,/** 估值第二市价 **/ 
@@ -80,6 +89,9 @@
             #{secDetailType,jdbcType=VARCHAR},
             #{invAim,jdbcType=VARCHAR},
             #{valuationMethod,jdbcType=VARCHAR},
+           <!-- add by yinya on 20220427 -->
+            #{valuationId,jdbcType=VARCHAR},
+           <!-- add by yinya on 20220427 -->
             #{valuationSource,jdbcType=VARCHAR},
             #{valuationPrice,jdbcType=VARCHAR},
             #{valuationPrice2,jdbcType=VARCHAR},
@@ -126,6 +138,11 @@
             <if test="valuationSource != null" >
                 VALUATION_SOURCE = #{valuationSource,jdbcType=VARCHAR},
             </if>
+            <!-- add by yinya on 20220427 -->
+            <if test="valuationId != null" >
+                VALUATION_ID = #{valuationId,jdbcType=VARCHAR},
+            </if>
+            <!-- add by yinya on 20220427 -->
             <if test="valuationPrice != null" >
                 VALUATION_PRICE = #{valuationPrice,jdbcType=VARCHAR},
             </if>

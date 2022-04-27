@@ -297,3 +297,14 @@ AND B.PARAM_CODE = 'IRS_FLOAT_ACCR_TYPE'
 AND A.BOOKSET_ID !='00000000000000000002';
 /*****利率互换计提方式参数：现只支持倒减法 end**************************************************************************/
 
+/**利率互换的估值方案估值模型默认为模型法 start*************************************************************************/
+update bok_VAL_SCHEME_DETAIL sd set sd.VALUATION_ID='01' where sd.sec_type='04';
+--利率互换可以选择市值法
+delete from SYS_DATADICT_LIST_LINK sdll where sdll.LINKED_DICT_CODE = 'SEC_TYPE'   and sdll.DICT_CODE = 'VALUATION_METHOD' and TRIM(sdll.LINKED_ITEM_CODE) = TRIM('04') and sdll.item_code='01';
+insert into SYS_DATADICT_LIST_LINK (DICT_CODE, ITEM_CODE, LINKED_DICT_CODE, LINKED_ITEM_CODE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+values ('VALUATION_METHOD', '01', 'SEC_TYPE', '04', 'yy', null, sysdate, 'yy', sysdate);
+
+delete from SYS_DATADICT_LIST_LINK sdll where sdll.LINKED_DICT_CODE = 'SEC_TYPE'   and sdll.DICT_CODE = 'VALUATION_PRICE' and TRIM(sdll.LINKED_ITEM_CODE) = TRIM('04') and sdll.item_code='SCH';
+insert into SYS_DATADICT_LIST_LINK (DICT_CODE, ITEM_CODE, LINKED_DICT_CODE, LINKED_ITEM_CODE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+values ('VALUATION_PRICE', 'SCH', 'SEC_TYPE', '04', 'yy', null, sysdate, 'yy', sysdate);
+/**利率互换的估值方案估值模型默认为模型法 end***************************************************************************/
