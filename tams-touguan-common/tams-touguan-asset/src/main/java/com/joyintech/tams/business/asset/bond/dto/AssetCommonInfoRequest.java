@@ -25,6 +25,12 @@ import java.util.Date;
  */
 @ApiModel(value="债券标的信息查询参数",description="债券标的信息查询参数")
 public class AssetCommonInfoRequest {
+    @ApiModelProperty(name="priceFlag",value="发行价格点选标识(选中传Y)")
+    private String priceFlag;
+
+    @ApiModelProperty(name="rateFlag",value="初始利率点选标识(选中传Y)")
+    private String rateFlag;
+
     @ApiModelProperty(name="issuePrice",value="发行价格")
     private BigDecimal issuePrice;
 
@@ -100,5 +106,21 @@ public class AssetCommonInfoRequest {
 
     public void setTradeMarket(String tradeMarket) {
         this.tradeMarket = tradeMarket;
+    }
+
+    public String getPriceFlag() {
+        return priceFlag;
+    }
+
+    public void setPriceFlag(String priceFlag) {
+        this.priceFlag = priceFlag;
+    }
+
+    public String getRateFlag() {
+        return rateFlag;
+    }
+
+    public void setRateFlag(String rateFlag) {
+        this.rateFlag = rateFlag;
     }
 }
