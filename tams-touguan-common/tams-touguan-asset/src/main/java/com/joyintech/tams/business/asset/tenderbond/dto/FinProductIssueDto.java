@@ -32,7 +32,7 @@ public class FinProductIssueDto {
     /**
      * 招标标的，利率(%)/价格(元)/利差(BP)
      */
-    @ApiModelProperty(name = "tenderTarget", value = "招标标的",required = true)
+    @ApiModelProperty(name = "tenderTarget", value = "招标标的")
     private String tenderTarget;
 
     /**
@@ -57,14 +57,14 @@ public class FinProductIssueDto {
     /**
      * 发行价格
      */
-    @ApiModelProperty(name = "issuePrice", value = "发行价格",required = true)
+    @ApiModelProperty(name = "issuePrice", value = "发行价格")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal issuePrice;
 
     /**
      * 收益率，利息贴现为参考收益率，附息为票面利率
      */
-    @ApiModelProperty(name = "referYield", value = "参考收益率/票面利率",required = true)
+    @ApiModelProperty(name = "referYield", value = "参考收益率/票面利率")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal referYield;
 
@@ -227,7 +227,7 @@ public class FinProductIssueDto {
     /**
      * 付息频率,月付/季付/年付/半年付/到期一次
      */
-    @ApiModelProperty(name = "payCycle", value = "付息频率",required = true)
+    @ApiModelProperty(name = "payCycle", value = "付息频率")
     private String payCycle;
 
     /**

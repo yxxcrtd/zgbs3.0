@@ -1499,4 +1499,5 @@ public class SettleTransData extends BaseEntity {
     public void setTradeType(String tradeType) {
         this.tradeType = tradeType;
     }
+
 }

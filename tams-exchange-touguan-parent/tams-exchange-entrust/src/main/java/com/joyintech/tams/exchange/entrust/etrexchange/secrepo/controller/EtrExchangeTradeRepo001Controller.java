@@ -236,8 +236,8 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 		initPageParams.put("ACCOUNT_SPEED_01", DictCodeList.清算速度_T_0.getValue());
 		initPageParams.put("ACCOUNT_SPEED_02", DictCodeList.清算速度_T_1.getValue());
 		//展示投资目的或业务模式参数
-		String SHOW_INVAIM_OR_BUSSINSSMODEL = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
-		initPageParams.put("SHOW_INVAIM_OR_BUSSINSSMODEL", SHOW_INVAIM_OR_BUSSINSSMODEL);
+//		String SHOW_INVAIM_OR_BUSSINSSMODEL = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
+//		initPageParams.put("SHOW_INVAIM_OR_BUSSINSSMODEL", SHOW_INVAIM_OR_BUSSINSSMODEL);
 
 		// 场内交易指令画面行情区域自动刷新时间（毫秒）
 		long etrExchange_HqArea_refresh_period = 20000;
@@ -259,6 +259,32 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 		initPageParams.put("ETR_TRADE_TIME_SWITCH", CacheUtil.getSysParam("etr_trade_time_switch"));
 		initPageParams.put("ETR_CHECK_POS_SWITCH",CacheUtil.getSysParam(BussinessConstant.ETR_CHECK_POS_SWITCH));
 		return new Message<Map<String, Object>>(initPageParams).success();
+	}
+
+
+	/**
+	 *  获取流程中信息
+	 * @param workflowId
+	 * @return
+	 */
+	@ApiOperation(value = "获取流程中信息", notes = "获取流程中信息")
+	@ResponseBody
+	@PostMapping("/getApproveEntity")
+	public Message<EtrExchangeTradeSaveSecRepoRequest> getApproveEntity(@RequestBody String workflowId)
+	{
+		try{
+			workflowId = workflowId.replaceAll("\"","");
+			EtrExchangeTradeSaveSecRepoRequest entity = new EtrExchangeTradeSaveSecRepoRequest();
+			if (StringUtil.isNotEmpty(workflowId)) {
+				//流程代办checkImportData
+				entity = etrExchangeTradeSecRepo001Service.getBussinessEntityByWorkflowId(
+						workflowId);
+			}
+			return new Message<EtrExchangeTradeSaveSecRepoRequest>().success().setData(entity);
+		} catch(Exception e){
+			return new Message<EtrExchangeTradeSaveSecRepoRequest>().fail().setMessage("查询异常");
+		}
+
 	}
 
 	/**
@@ -1167,7 +1193,10 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 	@ResponseBody
 	public Message<List<BaseMap>> queryPositionInfo(@RequestBody PositionCashSecRequest requestDto) {
 		try {
-			List<BaseMap> m = etrTradeCommonervice.queryPositionInfo(requestDto);
+			for(PositionCashSecDto positionCashSecDto:requestDto.getPtlList()){
+				positionCashSecDto.setFinprodId("XN_PRODID999");
+			}
+			List<BaseMap> m = etrTradeCommonervice.queryPositionInfoSecRepo(requestDto,"REPO");
 			return new Message<List<BaseMap>>().success().setData(m);
 		} catch (Exception e) {
 			e.printStackTrace();

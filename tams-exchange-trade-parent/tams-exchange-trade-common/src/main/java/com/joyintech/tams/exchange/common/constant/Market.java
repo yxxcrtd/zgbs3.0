@@ -1,13 +1,14 @@
 package com.joyintech.tams.exchange.common.constant;
 
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.exchange.common.enums.IEnum;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public enum Market {
+public enum Market implements IEnum<String> {
 
     SZSE("深圳证券交易所", "SZ", "04"),
     SHSE("上海证券交易所", "SH", "03"),
@@ -56,9 +57,32 @@ public enum Market {
         }
     }
 
+    /**
+     * 判断是否深交所
+     */
+    public static boolean isSzMarket(String market) {
+        return StringUtil.equals(Market.SZSE.value, market);
+    }
+
+    /**
+     * 判断是否上交所
+     */
+    public static boolean isShMarket(String market) {
+        return StringUtil.equals(Market.SHSE.value, market);
+    }
+
     public static String getMarketName(String market) {
         String name = marketMap.get(market);
         return StringUtil.isNotEmpty(name) ? name : market;
     }
 
+    @Override
+    public String getCode() {
+        return value;
+    }
+
+    @Override
+    public String getDescription() {
+        return name;
+    }
 }

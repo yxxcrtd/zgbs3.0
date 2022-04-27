@@ -18,6 +18,10 @@ public class CheckParamUtils {
     }
 
     public static ErrorCode checkIntegratedEntrustParam(IntegratedEntrust integratedEntrust) {
+        if (EntrustUtils.isNewBond(integratedEntrust.getBusiTypeTg())) {
+            return getErrorCode(integratedEntrust);
+        }
+
         return getErrorCode(integratedEntrust.getUserId(), integratedEntrust.getInstructionId(), integratedEntrust.getEntrustBs(), integratedEntrust.getStockCode(), integratedEntrust.getEntrustProp(), null, integratedEntrust.getLiaisonName(), integratedEntrust.getContractId(), null, null);
     }
 
@@ -64,6 +68,52 @@ public class CheckParamUtils {
         return CheckParamUtils.checkFuturesOrderParam(market, offsetFlag, hedgeFlag);
     }
 
+    public static ErrorCode getErrorCode(IntegratedEntrust integratedEntrust) {
+        final String stockCode = integratedEntrust.getStockCode();
+        if (Strings.isNullOrEmpty(stockCode) || StockCodeUtils.getMarketAndStockCode(stockCode).length != 2) {
+            return ErrorCode.REQ_PARAMETER_STOCK_CODE_ERROR;
+        }
+        // 检查委托属性
+        if (IntegratedEntrustUtils.isNegotiatedTrade(integratedEntrust.getEntrustProp())) {
+            return ErrorCode.UN_SUPPORT_ENTRUST_PROP;
+        }
+        final String market = StockCodeUtils.getMarket(stockCode);
+        //检查本方交易员
+        if (Strings.isNullOrEmpty(integratedEntrust.getTradeId())) {
+            return ErrorCode.TRADE_NOT_EMPTY;
+        }
+        //检查本方交易商
+        if (Strings.isNullOrEmpty(integratedEntrust.getDealerId()) || Strings.isNullOrEmpty(integratedEntrust.getDealerName())) {
+            return ErrorCode.DEALER_NOT_EMPTY;
+        }
+        //检查本方交易主体
+        if (Strings.isNullOrEmpty(integratedEntrust.getInvestorId()) || Strings.isNullOrEmpty(integratedEntrust.getInvestorName())) {
+            return ErrorCode.INVESTOR_NOT_EMPTY;
+        }
+        //检查交易对手
+        if (Strings.isNullOrEmpty(integratedEntrust.getCounterId())) {
+            return ErrorCode.COUNTER_NOT_EMPTY;
+        }
+        //检查对手方交易员
+        if (Strings.isNullOrEmpty(integratedEntrust.getPropTradeId())) {
+            return ErrorCode.PROP_TRADE_NOT_EMPTY;
+        }
+        //检查对手方交易商
+        if (Strings.isNullOrEmpty(integratedEntrust.getPropDealerId()) || Strings.isNullOrEmpty(integratedEntrust.getPropDealerName())) {
+            return ErrorCode.PROP_DEALER_NOT_EMPTY;
+        }
+        //检查对手方交易主体
+        if (Strings.isNullOrEmpty(integratedEntrust.getPropInvestorId()) || Strings.isNullOrEmpty(integratedEntrust.getPropInvestorName())) {
+            return ErrorCode.PROP_INVESTOR_NOT_EMPTY;
+        }
+        //检查约定号
+        if (Strings.isNullOrEmpty(integratedEntrust.getContractId())) {
+            return ErrorCode.CONTRACT_ID_NOT_EMPTY;
+        }
+
+        return getErrorCode(integratedEntrust.getUserId(), integratedEntrust.getInstructionId(), integratedEntrust.getEntrustBs(), stockCode, integratedEntrust.getEntrustProp(), null, integratedEntrust.getLiaisonName(), integratedEntrust.getContractId(), null, null);
+    }
+
     public static boolean checkBuyUnit(OrderInterface orderInterface, long entrustVolume, int buyUnit) {
         if (buyUnit == 0) return true;
         if (entrustVolume % buyUnit != 0) {
@@ -73,4 +123,5 @@ public class CheckParamUtils {
         }
         return true;
     }
+
 }

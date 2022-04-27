@@ -5,6 +5,7 @@ import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset003Dto;
 import com.joyintech.tams.business.asset.tenderbond.service.FinTenderBondAsset003Service;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 @PageId("FinTenderBoundAsset003")
@@ -47,8 +49,20 @@ public class FinTenderBondAsset003Controller extends BaseController {
         } else {
             return Message.success("校验成功", null);
         }
-
     }
+
+    @ResponseBody
+    @PostMapping("/checkAddCoupons")
+    @ApiOperation(value = "上市流通前自动加券校验是否通过", notes = "上市流通前自动加券校验是否通过")
+    public Message checkAddCoupons(@RequestBody FinTenderBondAsset003Dto dto) {
+        FinBondAssetSaveRequest request = finTenderBoundAsset003Service.validAddCoupons(dto);
+        if (Objects.isNull(request)) {
+            return Message.success("校验成功", null);
+        } else {
+            return Message.fail("校验失败", request);
+        }
+    }
+
 
     @ResponseBody
     @PostMapping("/save")

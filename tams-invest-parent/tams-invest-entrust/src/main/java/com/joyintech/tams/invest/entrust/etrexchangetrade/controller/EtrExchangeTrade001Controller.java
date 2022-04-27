@@ -206,8 +206,8 @@ public class EtrExchangeTrade001Controller extends BaseController{
         model.addAttribute("ACCOUNT_SPEED_01", DictCodeList.清算速度_T_0.getValue());
         model.addAttribute("ACCOUNT_SPEED_02", DictCodeList.清算速度_T_1.getValue());
         //展示投资目的或业务模式参数
-        String SHOW_INVAIM_OR_BUSSINSSMODEL = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
-        model.addAttribute("SHOW_INVAIM_OR_BUSSINSSMODEL", SHOW_INVAIM_OR_BUSSINSSMODEL);
+//        String SHOW_INVAIM_OR_BUSSINSSMODEL = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
+//        model.addAttribute("SHOW_INVAIM_OR_BUSSINSSMODEL", SHOW_INVAIM_OR_BUSSINSSMODEL);
         
         // 场内交易指令画面行情区域自动刷新时间（毫秒）
         long etrExchange_HqArea_refresh_period = 20000;

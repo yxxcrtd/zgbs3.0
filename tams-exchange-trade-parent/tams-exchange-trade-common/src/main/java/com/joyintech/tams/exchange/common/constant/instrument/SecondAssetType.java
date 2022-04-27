@@ -1,11 +1,13 @@
 package com.joyintech.tams.exchange.common.constant.instrument;
 
+import com.joyintech.tams.exchange.common.enums.IEnum;
+
 /**
  * @Author: think
  * @Description: 资产二级分类
  * @Date: Created in 16:37 2020/10/22
  */
-public enum SecondAssetType {
+public enum SecondAssetType implements IEnum<String> {
     GZ("B01", "国债"),
     DFZFZ("B02", "地方政府债"),
     YHPJ("B03", "央行票据"),
@@ -33,5 +35,15 @@ public enum SecondAssetType {
     SecondAssetType(String value, String name) {
         this.name = name;
         this.value = value;
+    }
+
+    @Override
+    public String getCode() {
+        return value;
+    }
+
+    @Override
+    public String getDescription() {
+        return name;
     }
 }

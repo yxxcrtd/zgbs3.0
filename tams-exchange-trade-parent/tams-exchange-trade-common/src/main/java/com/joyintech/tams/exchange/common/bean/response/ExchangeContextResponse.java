@@ -51,6 +51,12 @@ public class ExchangeContextResponse {
     @ApiModelProperty(value = "交易端委托列表自动刷新时间(单位毫秒)")
     private String trdEntrustRefreshTime;
 
+    @ApiModelProperty(value = "非交易时间段是否禁止场内交易下单（Y：禁止 N：不禁止）")
+    private String trdTradeTimeSwitch;
+
+    @ApiModelProperty(value = "场内交易下单价格超过有效价格申报范围（01 禁止；02 仅提示；03 允许）")
+    private String trdPriceScopeControl;
+
 
     public String getUserId() {
         return userId;
@@ -154,5 +160,21 @@ public class ExchangeContextResponse {
 
     public void setTrdEntrustRefreshTime(String trdEntrustRefreshTime) {
         this.trdEntrustRefreshTime = trdEntrustRefreshTime;
+    }
+
+    public String getTrdTradeTimeSwitch() {
+        return trdTradeTimeSwitch;
+    }
+
+    public void setTrdTradeTimeSwitch(String trdTradeTimeSwitch) {
+        this.trdTradeTimeSwitch = trdTradeTimeSwitch;
+    }
+
+    public String getTrdPriceScopeControl() {
+        return trdPriceScopeControl;
+    }
+
+    public void setTrdPriceScopeControl(String trdPriceScopeControl) {
+        this.trdPriceScopeControl = trdPriceScopeControl;
     }
 }

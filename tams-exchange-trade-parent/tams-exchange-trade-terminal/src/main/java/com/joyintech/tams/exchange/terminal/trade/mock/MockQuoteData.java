@@ -1,5 +1,17 @@
 package com.joyintech.tams.exchange.terminal.trade.mock;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Strings;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.exchange.common.bean.IntegratedQuote;
+import com.joyintech.tams.exchange.common.bean.NegotiateQuoteQueryBean;
+import com.joyintech.tams.exchange.common.bean.NegotiateQuoteReceiveBean;
+import com.joyintech.tams.exchange.common.bean.TickBean;
+import com.joyintech.tams.exchange.common.constant.*;
+import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
+import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
+
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -7,19 +19,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import com.google.common.base.Strings;
-import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.exchange.common.bean.IntegratedQuote;
-import com.joyintech.tams.exchange.common.bean.NegotiateQuoteReceiveBean;
-import com.joyintech.tams.exchange.common.bean.TickBean;
-import com.joyintech.tams.exchange.common.constant.EntrustBs;
-import com.joyintech.tams.exchange.common.constant.EntrustProp;
-import com.joyintech.tams.exchange.common.constant.FullPriceConst;
-import com.joyintech.tams.exchange.common.constant.Market;
-import com.joyintech.tams.exchange.common.constant.QuoteType;
-import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
-import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
 
 public class MockQuoteData {
     private static int[] contractIds = {198, 674};
@@ -250,58 +249,89 @@ public class MockQuoteData {
         }
         return integratedQuote;
     }
-    
-    public static List<NegotiateQuoteReceiveBean> makeNegotiateQuoteReceive(String stockCode, TickBean tickBean) {
+
+    public static List<NegotiateQuoteReceiveBean> makeNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean, TickBean tickBean) {
         List<NegotiateQuoteReceiveBean> negotiateQuoteReceiveBeans = new ArrayList<>();
-        if (StringUtil.isEmpty(stockCode)) {
+        final String stockCode = negotiateQuoteQueryBean.getStockCode();
+        final String side = negotiateQuoteQueryBean.getSide();
+        final String confirmId = MoreObjects.firstNonNull(negotiateQuoteQueryBean.getConfirmId(), "111");
+        final String traderCode = MoreObjects.firstNonNull(negotiateQuoteQueryBean.getTraderCode(), "Z213611");
+        final String investorId = MoreObjects.firstNonNull(negotiateQuoteQueryBean.getInvestorId(), "132");
+        final String memberId = MoreObjects.firstNonNull(negotiateQuoteQueryBean.getMemberId(), "168");
+
+        if (StringUtil.isNotEmpty(stockCode)) {
+            NegotiateQuoteReceiveBean buy = new NegotiateQuoteReceiveBean();
+            buy.setBs(side);
+            buy.setRequestTime(DateUtil.getCurrentDateTime());
+            buy.setRequestStatus(1);
+            buy.setStockCode(stockCode);
+            buy.setStockName("债券" + StockCodeUtils.getStockCode(stockCode));
+            buy.setAmount(10000);
+            buy.setFullPrice(BigDecimal.valueOf(21.23));
+            buy.setEntrustPrice(BigDecimal.valueOf(20.22));
+            buy.setEntrustBalance(BigDecimal.valueOf(10000));
+            buy.setMemberId(memberId);
+            buy.setTraderCode(traderCode);
+            buy.setInvestorId(investorId);
+            buy.setInvestorType("2");
+            buy.setCpMemberId("167");
+            buy.setCpTraderCode("Z213612");
+            buy.setCpInvestorId("131");
+            buy.setCpInvestorType("2");
+            buy.setConfirmId(confirmId);
+            buy.setPositionStr("positionStr");
+            buy.setRemark("模拟买名称");
+            negotiateQuoteReceiveBeans.add(buy);
+
             return negotiateQuoteReceiveBeans;
         }
+
         //模拟买行情
         NegotiateQuoteReceiveBean buy = new NegotiateQuoteReceiveBean();
         buy.setBs(EntrustBs.BUY.value);
-        buy.setRequestTime(System.currentTimeMillis());
+        buy.setRequestTime(DateUtil.getCurrentDateTime());
         buy.setRequestStatus(1);
-        buy.setStockCode(stockCode);
-        buy.setStockName("模拟买名称");
+        buy.setStockCode("300739.SZ");
+        buy.setStockName("30债券39");
         buy.setAmount(10000);
-        buy.setFullPrice(BigDecimal.valueOf(100));
-        buy.setEntrustPrice(BigDecimal.valueOf(99));
-        buy.setEntrustBalance(BigDecimal.valueOf(100));
-        buy.setMemberId("memberId");
-        buy.setTraderCode("traderCode");
-        buy.setInvestorId("investorId");
+        buy.setFullPrice(BigDecimal.valueOf(21.23));
+        buy.setEntrustPrice(BigDecimal.valueOf(20.22));
+        buy.setEntrustBalance(BigDecimal.valueOf(10000));
+        buy.setMemberId(memberId);
+        buy.setTraderCode(traderCode);
+        buy.setInvestorId(investorId);
         buy.setInvestorType("2");
-        buy.setCpMemberId("cpMemberId");
-        buy.setCpTraderCode("cpTraderCode");
-        buy.setCpInvestorId("cpInvestorId");
+        buy.setCpMemberId("167");
+        buy.setCpTraderCode("Z213612");
+        buy.setCpInvestorId("131");
         buy.setCpInvestorType("2");
-        buy.setConfirmId("confirmId");
+        buy.setConfirmId(confirmId);
         buy.setPositionStr("positionStr");
-        buy.setRemark("remark");
+        buy.setRemark("模拟买名称");
         negotiateQuoteReceiveBeans.add(buy);
-        
+
         //模拟卖行情
         NegotiateQuoteReceiveBean sell = new NegotiateQuoteReceiveBean();
         sell.setBs(EntrustBs.SELL.value);
-        buy.setRequestTime(System.currentTimeMillis());
-        buy.setRequestStatus(1);
-        buy.setStockCode(stockCode);
-        buy.setStockName("模拟卖名称");
-        buy.setAmount(20000);
-        buy.setFullPrice(BigDecimal.valueOf(101));
-        buy.setEntrustPrice(BigDecimal.valueOf(100));
-        buy.setEntrustBalance(BigDecimal.valueOf(101));
-        buy.setMemberId("memberId");
-        buy.setTraderCode("traderCode");
-        buy.setInvestorId("investorId");
-        buy.setInvestorType("2");
-        buy.setCpMemberId("cpMemberId");
-        buy.setCpTraderCode("cpTraderCode");
-        buy.setCpInvestorId("cpInvestorId");
-        buy.setCpInvestorType("2");
-        buy.setConfirmId("confirmId");
-        buy.setPositionStr("positionStr");
-        buy.setRemark("remark");
+        sell.setRequestTime(DateUtil.getCurrentDateTime());
+        sell.setRequestStatus(1);
+        sell.setStockCode("300739.SZ");
+        sell.setStockName("30债券39");
+        sell.setAmount(20000);
+        sell.setFullPrice(BigDecimal.valueOf(25.23));
+        sell.setEntrustPrice(BigDecimal.valueOf(24.22));
+        sell.setEntrustBalance(BigDecimal.valueOf(20000));
+        sell.setMemberId(memberId);
+        sell.setTraderCode(traderCode);
+        sell.setInvestorId(investorId);
+        sell.setInvestorType("2");
+        sell.setCpMemberId("167");
+        sell.setCpTraderCode("Z213612");
+        sell.setCpInvestorId("131");
+        sell.setCpInvestorType("2");
+        sell.setConfirmId(confirmId);
+        sell.setPositionStr("positionStr");
+        sell.setRemark("模拟卖名称");
         negotiateQuoteReceiveBeans.add(sell);
 
         return negotiateQuoteReceiveBeans;

@@ -106,7 +106,7 @@ public class FairOrderHelper {
         double totalVolume = 0;
         for (Instruction instruction : instructionBeanMap.values()) {
             double volume;
-            if (instruction.getEntrustNum() > 0) {
+            if (instruction.volumeInstruction()) {
                 volume = instruction.getEntrustNum() - instruction.getEntrustLeftAmt().longValue() - instruction.getFrozenQuantity().longValue();
             } else {
                 volume = TradeUtils.divide(TradeUtils.subtract(instruction.getEntrustAmt(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity(), 2), price, 2);
@@ -140,7 +140,9 @@ public class FairOrderHelper {
 
     public boolean createFairOrder(Order order) {
         // 判断order是否要做公平交易
-        if (!Strings.isNullOrEmpty(order.getAlgorithmId()) || !EntrustUtils.isFairOrder(order.getEntrustProp()) || !EntrustUtils.isFairSwitchOpen(commonManagement.getFairCode())) {
+        if (!Strings.isNullOrEmpty(order.getAlgorithmId())
+                || !EntrustUtils.isFairOrder(order.getEntrustProp())
+                || !EntrustUtils.isFairSwitchOpen(commonManagement.getFairCode())) {
             return false;
         }
         if (!tradeHelper.checkCommonParam(order.getFullPrice(), order.getOrderPrice(), order.getOrderVolume(), order)) {
@@ -244,7 +246,7 @@ public class FairOrderHelper {
         double totalVolume = getFairOrderVolume(instructionBeanMap, order, volumeMap);
         double totalOrderVolume = order.getOrderVolume();
         instructionBeanMap.values().forEach(instruction -> {
-            Entrust fairEntrust = tradeHelper.convertOrderToEntrust(order, null, null, true);
+            Entrust fairEntrust = tradeHelper.convertOrderToEntrust(order);
             fairEntrust.setInstructionId(instruction.getEntrustId());
             fairEntrust.setAccountId(instruction.getAcctNo());
             fairEntrust.setOffsetFlag(DerivativeOcFlag.getOffsetFlagByDerivativeOcFlag(instruction.getDerivativeOcFlag()));

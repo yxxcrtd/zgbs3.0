@@ -725,7 +725,7 @@ public class UfxConverter {
             instrument.setExdividendFlag(ds.getString("exdividend_flag"));
             instrument.setStbtransFlag(ds.getString("stbtrans_flag"));
             instrument.setMarketLowVolume(ds.getInt("market_low_amount"));
-            instrument.setMarketHighVolume(ds.getInt("market_high_amount"));
+            instrument.setMarketHighVolume(ds.getLong("market_high_amount"));
             instrument.setBondinvFlag(ds.getString("bondinv_flag"));
             list.add(instrument);
         }

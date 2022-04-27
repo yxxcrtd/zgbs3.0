@@ -13,6 +13,7 @@ import static com.joyintech.tams.constant.DictCodeListExt3.申报类型_收盘�
 import static com.joyintech.tams.constant.DictCodeListExt3.申报类型_日均价固定价格申报;
 import static com.joyintech.tams.constant.DictCodeListExt3.申报类型_点击成交申报;
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.INTERF_TYPE_BOND002;
+import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.INTERF_TYPE_BOND003;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -69,8 +70,8 @@ public class CommonPositionEngineService {
     public String getDeliveryType(String finprodId) {
         String deliveryType = StringUtil.EMPTY;
         FinProductAdd finProductAdd = finProductAddMapper.selectByPrimaryKey(finprodId);
-        String tradePlat = finProductAdd.getTradePlat();
-        if (StringUtil.isNotEmpty(tradePlat) && tradePlat.contains(DictCodeList.交易平台_竞价撮合平台.getValue())) {
+        String isNoGuard = finProductAdd.getIsNoGuard();
+        if (StringUtil.isNotEmpty(isNoGuard) && isNoGuard.contains(DictCodeList.是否_否.getValue())) {
             deliveryType = DictCodeListExt3.结算方式_头寸引擎_净额结算.getValue();
         } else {
             deliveryType = DictCodeListExt3.结算方式_头寸引擎_RTGS.getValue();
@@ -210,8 +211,8 @@ public class CommonPositionEngineService {
      * @return
      */
     public String getExchangeTradePlatform(String entrustId, String tradePlat, String ps, String finprodId, String interfaceType){
-        // 可转债以外的债券调用头寸引擎判断逻辑使用是否非担保进行判断是竞价交易还是大宗交易
-        if(INTERF_TYPE_BOND002.equals(interfaceType)){
+        // 债券接口调用头寸引擎判断逻辑使用是否非担保进行判断是竞价交易还是大宗交易
+        if(INTERF_TYPE_BOND002.equals(interfaceType) || INTERF_TYPE_BOND003.equals(interfaceType)){
             FinProductAdd finProductAdd = finProductAddMapper.selectByPrimaryKey(finprodId);
             return DictCodeList.是否_是.getValue().equals(finProductAdd.getIsNoGuard()) ?
                     DictCodeList.交易平台_大宗交易平台.getValue() : DictCodeList.交易平台_竞价撮合平台.getValue();

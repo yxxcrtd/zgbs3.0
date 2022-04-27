@@ -1,6 +1,6 @@
 package com.joyintech.tams.exchange.service.trade.controller;
 
-import cn.hutool.extra.validation.BeanValidationResult;
+import cn.hutool.core.util.NumberUtil;
 import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.constant.EntrustBsProp;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
@@ -12,6 +12,7 @@ import com.joyintech.tams.exchange.common.domain.Message;
 import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
 import com.joyintech.tams.exchange.service.trade.management.service.OrderManagement;
+import com.joyintech.tams.exchange.service.trade.processor.check.BusinessCheckKit;
 import com.joyintech.tams.exchange.service.trade.processor.check.CommonCheckKit;
 import com.joyintech.tams.exchange.util.MasterUtil;
 import io.swagger.annotations.Api;
@@ -23,15 +24,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.util.Objects;
-
 import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_质押券出入库;
 
 @RestController("OrderController_dtx")
 @RequestMapping("/trade/joyin")
 @Api(tags = "场内交易-委托操作接口")
 public class OrderController {
+    /**
+     * 日志对象
+     */
     private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
 
     @Autowired
@@ -40,6 +41,8 @@ public class OrderController {
     private InstructionService instructionService;
     @Autowired
     private CommonCheckKit commonCheckKit;
+    @Autowired
+    private BusinessCheckKit businessCheckKit;
 
 //    /**
 //     * 查询订单信息
@@ -65,21 +68,23 @@ public class OrderController {
     @ApiOperation(value = "普通下单（竞价下单）", notes = "普通下单（竞价下单）")
     @PostMapping(value = "/order")
     public Message<OrderPlaceBean> sendOrder(@RequestBody OrderPlaceBean order) {
-        if (!MasterUtil.isMaster()) {
+        if (isSlave()) {
             return MasterUtil.postForObject(order);
         }
 
-        BeanValidationResult checkResult  = commonCheckKit.check(order);
-        if (!checkResult.isSuccess()) {
-            return new Message<>(ResultBean.error(ErrorCode.INNER_RISK_ERROR, checkResult.getErrorMessages()));
+        ResultBean checkResult = commonCheckKit.check(order);
+        if (ErrorCode.isFail(checkResult.getErrorCode())) {
+            return new Message<>(checkResult);
+        }
+        ResultBean businessCheckResult = businessCheckKit.check(order);
+        if (ErrorCode.isFail(businessCheckResult.getErrorCode())) {
+            return new Message<>(businessCheckResult);
         }
 
         Instruction instruction = instructionService.findById(order.getInstructionId());
-        if (Objects.isNull(instruction)) {
-            return new Message<>(ResultBean.error(ErrorCode.INSTRUCTIONS_NOT_EXIST, order));
-        }
+
         if (投管业务类型_质押券出入库.getValue().equals(instruction.getBusiTypeTg())) {
-            order.setEntrustPrice(order.getEntrustPrice().divide(BigDecimal.valueOf(100)));
+            order.setEntrustPrice(NumberUtil.div(order.getEntrustPrice(), 100));
         }
 
         String entrustBs = EntrustBsProp.getEntrustBs(instruction.getPs());
@@ -93,6 +98,10 @@ public class OrderController {
         return new Message<>(orderManagement.sendOrder(order.getUserId(), order));
     }
 
+    private boolean isSlave() {
+        return MasterUtil.isSlave();
+    }
+
     /**
      * 综合业务下单
      *
@@ -102,13 +111,17 @@ public class OrderController {
     @ApiOperation(value = "综合业务下单", notes = "综合业务下单")
     @PostMapping(value = "/order/integratedEntrust")
     public Message<IntegratedEntrust> sendIntegratedEntrust(@RequestBody @Validated IntegratedOrderPlaceBean order) {
-        if (!MasterUtil.isMaster()) {
+        if (isSlave()) {
             return MasterUtil.postForObject(order);
         }
 
-        BeanValidationResult checkResult  = commonCheckKit.check(order);
-        if (!checkResult.isSuccess()) {
-            return new Message<>(ResultBean.error(ErrorCode.INNER_RISK_ERROR, checkResult.getErrorMessages()));
+        ResultBean commonCheckResult = commonCheckKit.check(order);
+        if (ErrorCode.isFail(commonCheckResult.getErrorCode())) {
+            return new Message<>(commonCheckResult);
+        }
+        ResultBean businessCheckResult = businessCheckKit.check(order);
+        if (ErrorCode.isFail(businessCheckResult.getErrorCode())) {
+            return new Message<>(businessCheckResult);
         }
 
         Instruction instruction = instructionService.findById(order.getInstructionId());
@@ -140,16 +153,16 @@ public class OrderController {
     @ApiOperation(value = "委托撤单", notes = "委托撤单")
     @PostMapping(value = "/order/cancel")
     public Message<Boolean> cancelOrder(@RequestParam String userId, @RequestParam String orderId) {
-        if (!MasterUtil.isMaster()) {
+        if (isSlave()) {
             return MasterUtil.postForObject(null);
         }
         return new Message<Boolean>(orderManagement.cancelOrder(userId, orderId));
     }
 
     @ApiOperation(value = "普通委托复核", notes = "普通委托复核", hidden = true)
-    @RequestMapping(value = "/order/review", method = RequestMethod.POST)
+    @PostMapping(value = "/order/review")
     public Message<ReviewDto> sendOrderWithReview(@RequestParam String userId, @RequestBody ReviewDto dto) {
-        if (!MasterUtil.isMaster()) {
+        if (isSlave()) {
             return MasterUtil.postForObject(dto);
         }
         return new Message<>(orderManagement.sendOrderWithReview(userId, dto));
@@ -158,7 +171,7 @@ public class OrderController {
     @ApiOperation(value = "综合业务委托复核", notes = "综合业务委托复核", hidden = true)
     @PostMapping(value = "/order/integratedEntrust/review")
     public Message<TrdExchangeDto> sendOrderWithReview(@RequestParam String userId, @RequestBody TrdExchangeDto dto) {
-        if (!MasterUtil.isMaster()) {
+        if (isSlave()) {
             return MasterUtil.postForObject(dto);
         }
         return new Message<>(orderManagement.sendIntegratedEntrustWithReview(userId, dto));
@@ -174,7 +187,7 @@ public class OrderController {
     @ApiOperation(value = "算法单创建", notes = "算法单创建", hidden = true)
     @PostMapping(value = "/order/algorithm")
     public Message<Algorithm> createAlgorithm(@RequestParam String userId, @RequestBody AlgorithmPlaceBean algorithm) {
-        if (!MasterUtil.isMaster()) {
+        if (isSlave()) {
             return MasterUtil.postForObject(algorithm);
         }
         return new Message<>(orderManagement.createAlgorithm(userId, algorithm));
@@ -190,7 +203,7 @@ public class OrderController {
     @ApiOperation(value = "算法单取消", notes = "算法单取消", hidden = true)
     @PostMapping(value = "/order/algorithm/cancel")
     public Message<Algorithm> cancelAlgorithm(@RequestParam String algorithmId) {
-        if (!MasterUtil.isMaster()) {
+        if (isSlave()) {
             return MasterUtil.postForObject(null);
         }
         return new Message<>(orderManagement.cancelAlgorithm(algorithmId));

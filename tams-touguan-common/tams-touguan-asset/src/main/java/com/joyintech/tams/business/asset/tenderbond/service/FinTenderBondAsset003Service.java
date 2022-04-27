@@ -5,9 +5,13 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest;
+import com.joyintech.tams.business.asset.bond.service.FinBondAssetService;
+import com.joyintech.tams.business.asset.bond.service.FinBondAssetValidatorService;
 import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
+import com.joyintech.tams.business.common.util.ValidUtils;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.common.base.entity.FinProductAdd;
@@ -22,14 +26,15 @@ import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.shiro.crypto.hash.Hash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 新债标的服务类
@@ -63,6 +68,12 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
 
     @Resource
     private AutoPeriodCommonService autoPeriodCommonService;
+
+    @Autowired
+    private FinBondAssetService finBondAssetService;
+
+    @Autowired
+    private FinBondAssetValidatorService finBondAssetValidatorService;
 
     @Resource
     private IPlatformDate iPlatformDate;
@@ -168,6 +179,37 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
 
 
     /**
+     * 上市流通时校验是否可以自动加券
+     *
+     * @param dto
+     * @return
+     */
+    public FinBondAssetSaveRequest validAddCoupons(FinTenderBondAsset003Dto dto) {
+        List<ValidMessage> validMessages = new ArrayList<>();
+        Map<String,String> param = new HashMap();
+        param.put("finprodType2",DictCodeList.平安资产类型_债券.getValue());
+        param.put("finprodMarketId",dto.getFinprodMarketId());
+        String finproductId = finTenderBoundAssetMapper.selectFinprodId(param);
+        if(StringUtil.isEmpty(finproductId)) {
+            FinBondAssetSaveRequest request = finBondAssetService.getInterfBondDto(dto.getFinprodMarketId());
+            if (StringUtil.isNotEmpty(dto)) {
+                request.setCreditFlag("");
+                request.setFinprodMarketId(dto.getFinprodMarketId());
+                ValidUtils.valid(request,validMessages);
+                ValidUtils.valid(request.getFinProductConvertible(),validMessages);
+                ValidUtils.valid(request.getFinInterestFactorDto(),validMessages);
+                validMessages.addAll(finBondAssetValidatorService.valid(dto));
+                if(CollectionUtils.isNotEmpty(validMessages)) {
+                    return request;
+                }else {
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * 上市流通/撤销
      *
      * @param dto
@@ -178,11 +220,17 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
         if (finTenderBoundAssetService.isInProcess(dto.getFinprodMarketId(), "FinTenderBondAsset003")) {
             validMessages.add(new ValidMessage("存在流程中的数据"));
         }
+        if(StringUtil.isEmpty(dto.getOperateType())) {
+            validMessages.add(new ValidMessage("操作类型不能为空"));
+        }
+        if(StringUtil.isEmpty(dto.getIssueStage())) {
+            validMessages.add(new ValidMessage("发行阶段不能为空"));
+        }
         if (StringUtil.equals(dto.getOperateType(), OperationType.REVOKE.name())) {
-            if (dto.getListingDate().compareTo(iPlatformDate.getSysDate()) < 0) {
+            if (StringUtil.isNotEmpty(dto.getListingDate()) && dto.getListingDate().compareTo(iPlatformDate.getSysDate()) < 0) {
                 validMessages.add(new ValidMessage("上市日小于平台日不允许撤销"));
             }
-            if (!StringUtil.equals(dto.getIssueStage(), DictCodeListExt4.发行阶段_已上市.getValue())) {
+            if (Objects.nonNull(dto.getIssueStage()) && !StringUtil.equals(dto.getIssueStage(), DictCodeListExt4.发行阶段_已上市.getValue())) {
                 validMessages.add(new ValidMessage("发行阶段不为已上市的不能进行撤销"));
             }
             Integer count = finTenderBoundAssetMapper.countFinprodIdUse(dto.getFinprodId(), DictCodeList.是否_否.getValue());
@@ -190,13 +238,16 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                 validMessages.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
             }
         } else {
-            if (dto.getListingDate().compareTo(iPlatformDate.getSysDate()) < 0) {
+            if(Objects.isNull(dto.getListingDate())) {
+                validMessages.add(new ValidMessage("上市日不能为空"));
+            }
+            if (Objects.nonNull(dto.getListingDate()) && dto.getListingDate().compareTo(iPlatformDate.getSysDate()) < 0) {
                 validMessages.add(new ValidMessage("上市日需大于等于平台日"));
             }
-            if (StringUtil.equals(dto.getIssueStatus(), DictCodeListExt1.发行状态_发行失败.getValue())) {
+            if (Objects.nonNull(dto.getIssueStatus()) && StringUtil.equals(dto.getIssueStatus(), DictCodeListExt1.发行状态_发行失败.getValue())) {
                 validMessages.add(new ValidMessage("发行失败的不能进行上市流通"));
             }
-            if (!StringUtil.equals(dto.getIssueStage(), DictCodeListExt4.发行阶段_已发行.getValue())) {
+            if (Objects.nonNull(dto.getIssueStage()) && !StringUtil.equals(dto.getIssueStage(), DictCodeListExt4.发行阶段_已发行.getValue())) {
                 validMessages.add(new ValidMessage("发行阶段不为已发行的不能进行上市流通"));
             }
         }

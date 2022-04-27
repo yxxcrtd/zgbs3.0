@@ -10,16 +10,15 @@
  
 package com.joyintech.service.entrust.etrcommanddispatcher.controller;
 
-import java.util.Map;
-
+import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrCommandDispatcherTotalDto;
+import com.joyintech.service.entrust.etrcommanddispatcher.service.EtrCommandDispatcherService;
+import com.joyintech.service.entrust.etrcommanddispatcher.service.MessageSenderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrCommandDispatcherTotalDto;
-import com.joyintech.service.entrust.etrcommanddispatcher.service.EtrCommandDispatcherService;
-import com.joyintech.service.entrust.etrcommanddispatcher.service.MessageSenderService;
+import java.util.Map;
 
 /**
  * 
@@ -66,11 +65,10 @@ public class EtrCommandDispatcherController {
      * @since 1.0
      */
     @RequestMapping("/pushCommandMsg")
-    public int pushCommandMsg(@RequestBody EtrCommandDispatcherTotalDto dto)  {
+    public String pushCommandMsg(@RequestBody EtrCommandDispatcherTotalDto dto)  {
     	//放弃使用mq推送消息,采用接口调用
     	//messageSenderService.pushCommandMsgToMQ(dto);
-    	etrCommandDispatcherService.sendMessageByInf(dto);
-    	return 0;
+        return etrCommandDispatcherService.sendMessageByInf(dto);
     } 
    
 }

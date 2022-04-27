@@ -184,12 +184,12 @@
             </if>
             <if test="effeRange != null">and EFFERANGE = #{effeRange}</if>
             <if test="rangeId != null  and rangeId != ''">and RANGEID = #{rangeId}</if>
-            <if test="showInvaimOrBussinssmodel =='01'  and (pageCode=='EtrExchangeTradeJj' or pageCode=='EtrExchangeTradeFjyywzl001' or pageCode=='EtrExchangeAgreeBond002' or pageCode=='EtrExchangeBlockTrade' or pageCode=='EtrExchangeAgreRepTrade001')">
-                and COLCODE!='businessModelStr'
-            </if>
-            <if test="showInvaimOrBussinssmodel =='02'  and (pageCode=='EtrExchangeTradeJj' or pageCode=='EtrExchangeTradeFjyywzl001' or pageCode=='EtrExchangeAgreeBond002' or pageCode=='EtrExchangeBlockTrade' or pageCode=='EtrExchangeAgreRepTrade001')">
-                and COLCODE!='invAimStr'
-            </if>
+<!--            <if test="showInvaimOrBussinssmodel =='01'  and (pageCode=='EtrExchangeTradeJj' or pageCode=='EtrExchangeTradeFjyywzl001' or pageCode=='EtrExchangeAgreeBond002' or pageCode=='EtrExchangeBlockTrade' or pageCode=='EtrExchangeAgreRepTrade001' or pageCode=='etrExchangeTradeSecRepo')">-->
+<!--                and COLCODE!='businessModelStr'-->
+<!--            </if>-->
+<!--            <if test="showInvaimOrBussinssmodel =='02'  and (pageCode=='EtrExchangeTradeJj' or pageCode=='EtrExchangeTradeFjyywzl001' or pageCode=='EtrExchangeAgreeBond002' or pageCode=='EtrExchangeBlockTrade' or pageCode=='EtrExchangeAgreRepTrade001' or pageCode=='etrExchangeTradeSecRepo')">-->
+<!--                and COLCODE!='invAimStr'-->
+<!--            </if>-->
         </where>
         and STATUS = 1 order by SEQNO
     </select>

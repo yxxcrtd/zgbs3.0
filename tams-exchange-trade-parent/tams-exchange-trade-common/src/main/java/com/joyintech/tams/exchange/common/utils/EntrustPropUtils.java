@@ -41,6 +41,8 @@ public class EntrustPropUtils {
         }
         //业务类型
         final String busiTypeTg = instruction.getBusiTypeTg();
+        //申报类型
+        final String dealMode = instruction.getDealMode();
         //新债业务
         if (EntrustUtils.isNewBond(busiTypeTg)) {
             return entrustProp;
@@ -67,17 +69,17 @@ public class EntrustPropUtils {
         }
 
         //判断是否大宗交易
-        if (EntrustUtils.isBulk(busiTypeTg)) {
-            if (StringUtils.equals(DictCodeListExt3.申报类型_不指定.getValue(), instruction.getDealMode())) {
+        if (EntrustUtils.isBulk(busiTypeTg) && StrUtil.isNotEmpty(dealMode)) {
+            if (StringUtils.equals(DictCodeListExt3.申报类型_不指定.getValue(), dealMode)) {
                 return entrustProp;
             } else {
-                return decideEntrustProp(instruction.getDealMode());
+                return decideEntrustProp(dealMode);
             }
         }
 
         //判断是否协议现券
-        if (EntrustUtils.isAgreementCashBond(busiTypeTg)) {
-            return decideEntrustProp(instruction.getDealMode());
+        if (EntrustUtils.isAgreementCashBond(busiTypeTg) && StrUtil.isNotEmpty(dealMode)) {
+            return decideEntrustProp(dealMode);
         }
 
         //判断是否协议回购

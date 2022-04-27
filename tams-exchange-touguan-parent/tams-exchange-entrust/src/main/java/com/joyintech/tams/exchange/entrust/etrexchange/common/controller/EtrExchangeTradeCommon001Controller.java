@@ -29,6 +29,7 @@ import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.common.base.entity.FinExercisePlan;
 import com.joyintech.tams.common.base.entity.FinProductQuto;
+import com.joyintech.tams.common.base.entity.SppiImportData;
 import com.joyintech.tams.component.business.bond.BusiFinExercisePlanService;
 import com.joyintech.tams.component.business.common.dto.FinStockInfoDto;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
@@ -415,8 +416,8 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 		initPageParams.put("ACCOUNT_SPEED_01", DictCodeList.清算速度_T_0.getValue());
 		initPageParams.put("ACCOUNT_SPEED_02", DictCodeList.清算速度_T_1.getValue());
 		//展示投资目的或业务模式参数
-		String SHOW_INVAIM_OR_BUSSINSSMODEL = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
-		initPageParams.put("SHOW_INVAIM_OR_BUSSINSSMODEL", SHOW_INVAIM_OR_BUSSINSSMODEL);
+//		String SHOW_INVAIM_OR_BUSSINSSMODEL = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
+//		initPageParams.put("SHOW_INVAIM_OR_BUSSINSSMODEL", SHOW_INVAIM_OR_BUSSINSSMODEL);
 
 		// 场内交易指令画面行情区域自动刷新时间（毫秒）
 		long etrExchange_HqArea_refresh_period = 20000;
@@ -1968,5 +1969,32 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 			return new Message<MinTrdUnitLimitDto>().fail().setMessage("查询失败");
 		}
 	}
+
+	@ApiOperation(value = "查询资产是否进行了SPPI测试", notes = "查询资产是否进行了SPPI测试")
+	@PostMapping("/queryAssetIsSppiTest/{secId:.+}")
+	@ResponseBody
+	public Message<SppiImportData> queryAssetIsSppiTest(@PathVariable String secId) {
+		try {
+			SppiImportData data = etrExchangeTrade001CommonService.queryAssetIsSppiTest(secId);
+			return new Message<SppiImportData>().success().setData(data);
+		} catch (Exception e) {
+			logger.error("查询该资产是否进行了SPPI测试异常", e);
+			return new Message<SppiImportData>().fail().setMessage("查询异常");
+		}
+	}
+
+	@ApiOperation(value = "组合持有资产业务模式查询", notes = "组合持有资产业务模式查询")
+	@PostMapping("/selectAllBusModelList")
+	@ResponseBody
+	public Message<List<BaseMap>> selectAllBusModelList(@RequestBody Map<String, Object> param) {
+		try {
+			List<BaseMap> m = etrExchangeTrade001CommonService.selectAllBusModelList(param);
+			return new Message<List<BaseMap>>().success().setData(m);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new Message<List<BaseMap>>().fail().setMessage("查询失败");
+		}
+	}
+
 }
 	

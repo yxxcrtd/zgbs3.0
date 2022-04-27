@@ -3,10 +3,7 @@ package com.joyintech.service.basicdata.systrdconfig.service;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.service.basicdata.systrdconfig.dao.InterfSysTrdConfigMapper;
-import com.joyintech.service.basicdata.systrdconfig.dto.MinPirceDto;
-import com.joyintech.service.basicdata.systrdconfig.dto.MinTrdUnitLimitDto;
-import com.joyintech.service.basicdata.systrdconfig.dto.TrdOthCodeInfoDto;
-import com.joyintech.service.basicdata.systrdconfig.dto.TrdTimeConfigDto;
+import com.joyintech.service.basicdata.systrdconfig.dto.*;
 import com.joyintech.tams.common.base.dao.MstCounterPartyInfoMapper;
 import com.joyintech.tams.common.base.entity.MstCounterPartyInfo;
 import com.joyintech.tams.constant.*;
@@ -323,5 +320,10 @@ public class InterfSysTrdConfigService{
         returnMap.put("data",interfSysTrdConfigMapper.getPurchQuotaInfo(params));
         return returnMap;
 
+    }
+
+
+    public List<TradeInfoProResponse> getDealerTraderInfo(TradeInfoProRequest dto) {
+        return interfSysTrdConfigMapper.getDealerTraderInfo(dto);
     }
 }

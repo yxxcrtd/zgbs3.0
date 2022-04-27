@@ -468,7 +468,7 @@
             to_char(ete.entrust_date,'yyyy-MM-dd') entrustDate,
            	nvl(detail.PORTFOLIO_ID,pp.PORTFOLIO_ID) portfolioId,
             nvl(detail.PORTFOLIO_NAME,pp.PORTFOLIO_NAME) portfolioName,
-            ete.inv_aim busiModel,
+            ete.BUSINESS_MODEL busiModel,
             CASE
             WHEN eted.ASSET_TYPE = 'F07'
             AND ete.PS IN ( '03', '04', 'T56', 'T93', 'T94', 'T95', 'T96' ) THEN
@@ -614,7 +614,7 @@
         to_char(ete.entrust_date,'yyyy-MM-dd') entrustDate,
         nvl(detail.PORTFOLIO_ID,pp.PORTFOLIO_ID) portfolioId,
         nvl(detail.PORTFOLIO_NAME,pp.PORTFOLIO_NAME) portfolioName,
-        ete.inv_aim busiModel,
+        ete.BUSINESS_MODEL busiModel,
         CASE
         WHEN eted.ASSET_TYPE = 'F07'
         AND ete.PS IN ( '03', '04', 'T56', 'T93', 'T94', 'T95', 'T96' ) THEN

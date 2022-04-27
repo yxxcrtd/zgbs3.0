@@ -359,6 +359,8 @@ public class KCBPTradeAgent extends TradeAgentDsp {
      * 411032	上海债券协议回购报价申报
      * 411024	上海债券协议回购成交申报
      * 411000	债券协议回购委托申报
+     * 410677   新债 深圳 协商成交下单
+     * 410678   新债 深圳 协商成交回复
      */
     @Override
     public void integratedEntrust(IntegratedEntrust entrust) {
@@ -876,6 +878,7 @@ public class KCBPTradeAgent extends TradeAgentDsp {
         res.addAll(queryFixedIncomeEntrust0(kcbpAccount));
         res.addAll(queryProtocolBack_SH_Entrust0(kcbpAccount));
         res.addAll(queryProtocolBack_SZ_Entrust0(kcbpAccount));
+        res.addAll(queryBondNegotiate_SZ_Entrust0(kcbpAccount));
         return res;
     }
 
@@ -896,6 +899,7 @@ public class KCBPTradeAgent extends TradeAgentDsp {
         res.addAll(queryFixedIncomeTrade0(kcbpAccount));
         res.addAll(queryProtocolBack_SZ_Trade0(kcbpAccount));
         res.addAll(queryProtocolBack_SH_Trade0(kcbpAccount));
+        res.addAll(queryBondNegotiate_SZ_Trade0(kcbpAccount));
         return res;
     }
 
@@ -943,6 +947,8 @@ public class KCBPTradeAgent extends TradeAgentDsp {
         queryFixedIncomeTrade(6),
         queryProtocolBack_SZ_Trade(7),
         queryProtocolBack_SH_Trade(8),
+        queryBondNegotiate_SZ_Entrust(9),
+        queryBondNegotiate_SZ_Trade(10),
         ;
 
         private Integer code;
@@ -999,6 +1005,12 @@ public class KCBPTradeAgent extends TradeAgentDsp {
                     case queryProtocolBack_SZ_Trade:
                         queryProtocolBack_SZ_Trade(kcbpAccount);
                         return;
+                    case queryBondNegotiate_SZ_Entrust:
+                    	queryBondNegotiate_SZ_Entrust(kcbpAccount);
+                        return;
+                    case queryBondNegotiate_SZ_Trade:
+                    	queryBondNegotiate_SZ_Trade(kcbpAccount);
+                        return;
                     default:
                 }
             } catch (Exception e) {
@@ -1051,6 +1063,15 @@ public class KCBPTradeAgent extends TradeAgentDsp {
             logger.error("queryProtocolBack_SH_Trade: {} error:{}", kcbpAccount.getAccountId(), e);
         }
     }
+    
+    public void queryBondNegotiate_SZ_Trade(KCBPAccount kcbpAccount) {
+        try {
+            List<Trade> trades = queryBondNegotiate_SZ_Trade0(kcbpAccount);
+            trades.forEach(this::onTrade);
+        } catch (Exception e) {
+            logger.error("queryBondNegotiate_SZ_Trade: {} error:{}", kcbpAccount.getAccountId(), e);
+        }
+    }
 
     private void onTrade(Trade trade) {
         if (Strings.isNullOrEmpty(trade.getBrokerTradeId())) {
@@ -1095,6 +1116,19 @@ public class KCBPTradeAgent extends TradeAgentDsp {
             integratedEntrusts.forEach(this::onRtnIntegratedEntrust);
         } catch (Exception e) {
             logger.error("queryProtocolBack_SZ_Entrust: {} error:{}", kcbpAccount.getAccountId(), e);
+        }
+    }
+    
+    /**
+     * 410680  深圳现券协商成交、竞买发起、竞买应价委托查询
+     * @param kcbpAccount
+     */
+    public void queryBondNegotiate_SZ_Entrust(KCBPAccount kcbpAccount) {
+        try {
+            List<IntegratedEntrust> integratedEntrusts = queryBondNegotiate_SZ_Entrust0(kcbpAccount);
+            integratedEntrusts.forEach(this::onRtnIntegratedEntrust);
+        } catch (Exception e) {
+            logger.error("queryBondNegotiate_SZ_Entrust: {} error:{}", kcbpAccount.getAccountId(), e);
         }
     }
 
@@ -1239,6 +1273,39 @@ public class KCBPTradeAgent extends TradeAgentDsp {
         }
         return new ArrayList<>();
     }
+    
+    /**
+     * 410680	深圳现券协商成交、竞买发起、竞买应价委托查询
+     */
+    private List<IntegratedEntrust> queryBondNegotiate_SZ_Entrust0(KCBPAccount kcbpAccount) {
+        String accountId = kcbpAccount.getAccountId();
+        String beginDate = DateUtil.format(LocalDateTime.now(), "yyyyMMdd");
+        Map<String, String> parameters = Maps.newHashMap();
+        parameters.put("accountId", accountId);
+        parameters.put("market", "");
+        parameters.put("secuid", "");
+        parameters.put("fundid", "");
+        parameters.put("ordersno", "");
+        parameters.put("stkcode", "");
+        parameters.put("count", "100");
+        parameters.put("posstr", kcbpAccount.getBondNegotiate_SZ_PositionStr_Entrust());
+        parameters.put("begindate", beginDate);
+        parameters.put("enddate", beginDate);
+
+        TerminalAgentInfo agentInfo = terminalAgentInfoService.selectOne(getTerminalName(), FunctionCode.REQ_ACCOUNT_ENTRUST_REISSUE.value, "Negotiate_SZ");
+        agentInfo.setAccountId(accountId);
+        ResultBean resultBean = tradeAgentHelper.doRequest(agentInfo, parameters);
+        if (resultBean.getErrorCode() == ErrorCode.SUCCESS.value) {
+            List<Map<String, String>> resList = (List<Map<String, String>>) resultBean.getData();
+            if (resList.size() > 0) {
+                String newPositionStr = resList.get(resList.size() - 1).get("posstr");
+                kcbpAccount.setBondNegotiate_SZ_PositionStr_Entrust(newPositionStr);
+                logger.info("queryBondNegotiate_SZ_Entrust newPositionStr :{}", newPositionStr);
+            }
+            return KCBPMsgParseHelper.parseIntegratedEntrusts(resultBean, accountId, entrustIdManager);
+        }
+        return new ArrayList<>();
+    }
 
     /**
      * 410436	当日成交明细查询
@@ -1316,7 +1383,6 @@ public class KCBPTradeAgent extends TradeAgentDsp {
         parameters.put("secuid", "");
         parameters.put("fundid", "");
         parameters.put("ordersno", "");
-        parameters.put("qryflag", "1");
         parameters.put("count", "100");
 //        parameters.put("posstr", "");
         parameters.put("posstr", kcbpAccount.getProtocolBack_SZ_PositionStr_trade());
@@ -1332,6 +1398,38 @@ public class KCBPTradeAgent extends TradeAgentDsp {
                 String newPositionStr = resList.get(resList.size() - 1).get("posstr");
                 kcbpAccount.setProtocolBack_SZ_PositionStr_trade(newPositionStr);
                 logger.info("queryIncrementProtocolBack_SZ_Trade newPositionStr :{}", newPositionStr);
+            }
+            return KCBPMsgParseHelper.parseTrades(resList, accountId, entrustIdManager);
+        }
+        return new ArrayList<>();
+    }
+    
+    /**
+     * 410681	深圳现券协商成交、竞买发起、竞买应价成交查询
+     */
+    private List<Trade> queryBondNegotiate_SZ_Trade0(KCBPAccount kcbpAccount) {
+        String accountId = kcbpAccount.getAccountId();
+        String beginDate = DateUtil.format(LocalDateTime.now(), "yyyyMMdd");
+        Map<String, String> parameters = Maps.newHashMap();
+        parameters.put("accountId", accountId);
+        parameters.put("market", "0");
+        parameters.put("secuid", "");
+        parameters.put("fundid", "");
+        parameters.put("ordersno", "");
+        parameters.put("count", "100");
+        parameters.put("posstr", kcbpAccount.getBondNegotiate_SZ_PositionStr_Trade());
+        parameters.put("begindate", beginDate);
+        parameters.put("enddate", beginDate);
+
+        TerminalAgentInfo agentInfo = terminalAgentInfoService.selectOne(getTerminalName(), FunctionCode.REQ_ACCOUNT_TRADE_REISSUE.value, "Negotiate_SZ");
+        agentInfo.setAccountId(accountId);
+        ResultBean resultBean = tradeAgentHelper.doRequest(agentInfo, parameters);
+        if (resultBean.getErrorCode() == ErrorCode.SUCCESS.value) {
+            List<Map<String, String>> resList = (List<Map<String, String>>) resultBean.getData();
+            if (resList.size() > 1) {
+                String newPositionStr = resList.get(resList.size() - 1).get("posstr");
+                kcbpAccount.setBondNegotiate_SZ_PositionStr_Trade(newPositionStr);
+                logger.info("queryBondNegotiate_SZ_Trade newPositionStr :{}", newPositionStr);
             }
             return KCBPMsgParseHelper.parseTrades(resList, accountId, entrustIdManager);
         }
@@ -1575,6 +1673,14 @@ public class KCBPTradeAgent extends TradeAgentDsp {
                 entrustProp = "ProtocolBack_SZ";
 
                 buildProtocolBack_SZParameters(entrust, parameters);
+            }else if(IntegratedEntrustUtils.isNegotiateXD_SZ(entrust.getEntrustProp())) {
+            	//新债 深圳 协商成交下单 410677
+            	entrustProp = "Negotiate_XD_SZ";
+            	buildNegotiate_XD_SZParameters(entrust, parameters);
+            }else if(IntegratedEntrustUtils.isNegotiateHF_SZ(entrust.getEntrustProp())) {
+            	//新债 深圳 协商成交回复 410678
+            	entrustProp = "Negotiate_HF_SZ";
+            	buildNegotiate_HF_SZParameters(entrust, parameters);
             }
         } else {
             logger.error("unknown market {}", entrust.getMarket());
@@ -1584,6 +1690,70 @@ public class KCBPTradeAgent extends TradeAgentDsp {
             throw new RuntimeException("不支持当前委托属性，entrustProp：" + entrust.getEntrustProp());
         }
         return entrustProp;
+    }
+    
+    /**
+     * 新债 深圳 协商成交下单 410677
+     * @param entrust
+     * @param parameters
+     */
+    private void buildNegotiate_XD_SZParameters(IntegratedEntrust entrust, Map<String, String> parameters) {
+        //报价所有者类型
+        parameters.put("ownertype", entrust.getSellerNo());
+        //委托价格
+        parameters.put("orderprice", String.valueOf(entrust.getEntrustPrice()));
+        //委托数量
+        parameters.put("orderqty", String.valueOf(entrust.getEntrustVolume()));
+        //本方交易员代码
+        parameters.put("tradercode", entrust.getTradeId());
+        //本方交易主体代码
+        parameters.put("investorid", entrust.getInvestorId());
+        //对手方交易商代码
+        parameters.put("cpmemberid", entrust.getPropDealerId());
+        //对手方交易员代码
+        parameters.put("cptradercode", entrust.getPropTradeId());
+        //对手方交易主体代码
+        parameters.put("cpinvestorid", entrust.getPropInvestorId());
+        //约定号
+        parameters.put("confirmid", entrust.getContractId());
+        //备注
+        parameters.put("memo", "");
+        //风险揭示签署流水号
+        parameters.put("risksignsno", "");
+    }
+    
+    /**
+     * 新债 深圳 协商成交回复 410678
+     * @param entrust
+     * @param parameters
+     */
+    private void buildNegotiate_HF_SZParameters(IntegratedEntrust entrust, Map<String, String> parameters) {
+    	//成交申报请求编号
+        parameters.put("trdreportid", entrust.getSellerNo());//转发成交申报请求编号
+        //报价所有者类型
+        parameters.put("ownertype", entrust.getSellerNo());
+        //委托价格
+        parameters.put("orderprice", String.valueOf(entrust.getEntrustPrice()));
+        //委托数量
+        parameters.put("orderqty", String.valueOf(entrust.getEntrustVolume()));
+        //本方交易员代码
+        parameters.put("tradercode", entrust.getSellerNo());
+        //本方交易主体代码
+        parameters.put("investorid", entrust.getLiaisonTel());
+        //对手方交易商代码
+        parameters.put("cpmemberid", entrust.getPropSeatNo());
+        //对手方交易员代码
+        parameters.put("cptradercode", entrust.getLiaisonTel());
+        //对手方交易主体代码
+        parameters.put("cpinvestorid", entrust.getPropInvestorId());
+        //对手方交易主体类型
+        parameters.put("cpinvestortype", entrust.getPropInvestorId());
+        //约定号
+        parameters.put("confirmid", entrust.getContractId());
+        //备注
+        parameters.put("memo", "");
+        //风险揭示签署流水号
+        parameters.put("risksignsno", "");
     }
 
     private void buildProtocolBack_SZParameters(IntegratedEntrust entrust, Map<String, String> parameters) {

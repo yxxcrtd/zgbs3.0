@@ -297,6 +297,9 @@ public class KCBPTradeClientImpl implements ITradeRequest {
                             queryTradeApis.get(index).queryProtocolBack_SH_Entrust(kcbpAccount);
                             queryTradeApis.get(index).queryProtocolBack_SZ_Entrust(kcbpAccount);
                             queryTradeApis.get(index).queryFixedIncomeEntrust(kcbpAccount);
+                            //新债改造-深交所 协商成交
+                            queryTradeApis.get(index).queryBondNegotiate_SZ_Trade(kcbpAccount);
+                            queryTradeApis.get(index).queryBondNegotiate_SZ_Entrust(kcbpAccount);
                         }
                     });
                 }

@@ -1,11 +1,13 @@
 package com.joyintech.tams.exchange.common.constant.instrument;
 
+import com.joyintech.tams.exchange.common.enums.IEnum;
+
 /**
  * @Author: think
  * @Description: 证券子类
  * @Date: Created in 14:01 2020/10/21
  */
-public enum SubStockType {
+public enum SubStockType implements IEnum<String> {
     ZCYHZ("B001", "政策银行债"),
     SYYHZ("B002", "商业银行债"),
     SYYHCJZQ("B003", "商业银行次级债券"),
@@ -52,5 +54,15 @@ public enum SubStockType {
     SubStockType(String value, String name) {
         this.value = value;
         this.name = name;
+    }
+
+    @Override
+    public String getCode() {
+        return value;
+    }
+
+    @Override
+    public String getDescription() {
+        return name;
     }
 }

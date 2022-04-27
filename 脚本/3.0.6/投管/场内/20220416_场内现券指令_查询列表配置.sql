@@ -29,7 +29,7 @@ insert into CFG_DATATABLE_SHOW values('etrExchangeTradeSecRepo','BONDS','999999'
 insert into CFG_DATATABLE_SHOW values('etrExchangeTradeSecRepo','BONDS','999999','floating','浮动盈亏','',13,1,0,1,100,
 '{"colAlign": "right","dataType":"amount","precision":"2","supportSearch":"精确","filedType":"number"}',0,'COMM',1,0,null,null,0);
 insert into CFG_DATATABLE_SHOW values('etrExchangeTradeSecRepo','BONDS','999999','floatingPL','盈亏比例%','',14,1,0,1,100,
-'{"colAlign": "right","dataType":"amount","precision":"4","supportSearch":"精确","filedType":"number"}',0,'COMM',1,0,null,null,0);
+'{"colAlign": "right","dataType":"amount","precision":"2","supportSearch":"精确","filedType":"number"}',0,'COMM',1,0,null,null,0);
 
 --指令列表
 delete from CFG_DATATABLE_SHOW where pagecode = 'etrExchangeTradeSecRepo' and DTCODE = 'ETRINFOS';
