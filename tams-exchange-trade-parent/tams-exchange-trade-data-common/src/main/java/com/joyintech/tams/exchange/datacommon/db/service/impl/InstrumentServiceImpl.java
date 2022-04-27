@@ -1,10 +1,10 @@
 package com.joyintech.tams.exchange.datacommon.db.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import com.alibaba.fastjson.JSON;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.tams.exchange.common.bean.MinPrice;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
@@ -38,19 +38,17 @@ public class InstrumentServiceImpl extends AsyncServiceImpl<String, Instrument> 
     /**
      * 日志对象
      */
-    private static final Logger log = LoggerFactory.getLogger(InstrumentServiceImpl.class); 
-
+    private static final Logger log = LoggerFactory.getLogger(InstrumentServiceImpl.class);
+    private final Map<String, Map<String, Instrument>> marketMap = Maps.newConcurrentMap();
+    private final Map<String, Map<String, Instrument>> assetTypeMap = Maps.newConcurrentMap();
+    private final Map<String, MinPrice> minPriceMap = Maps.newConcurrentMap();
+    private final Map<String, MinTrdUnitLimit> minTrdUnitLimitMap = Maps.newConcurrentMap();
+    // 缓存合约下价差、交易上下限数据 --- 仅查询时缓存
+    private final Map<String, MinPriceAndMinTrdUnitLimitBean> minPriceAndMinTrdUnitLimitBeanMap = Maps.newConcurrentMap();
     @Autowired
     private InstrumentMapper instrumentMapper;
     @Autowired
     private FuturesInstrumentService futuresInstrumentService;
-
-    private Map<String, Map<String, Instrument>> marketMap = new ConcurrentHashMap<>();
-    private Map<String, Map<String, Instrument>> assetTypeMap = new ConcurrentHashMap<>();
-    private Map<String, MinPrice> minPriceMap = new ConcurrentHashMap<>();
-    private Map<String, MinTrdUnitLimit> minTrdUnitLimitMap = new ConcurrentHashMap<>();
-    // 缓存合约下价差、交易上下限数据 --- 仅查询时缓存
-    private Map<String, MinPriceAndMinTrdUnitLimitBean> minPriceAndMinTrdUnitLimitBeanMap = new ConcurrentHashMap<>();
 
     @Override
     public Instrument queryByInnerCode(String innerCode) {
@@ -114,7 +112,7 @@ public class InstrumentServiceImpl extends AsyncServiceImpl<String, Instrument> 
 
     @Override
     public void saveMinPrice(List<MinPrice> minPriceList) {
-        log.info("saveMinPrice() called with parameters => 【minPriceList = {}】",minPriceList);
+        log.info("saveMinPrice() called with parameters => 【minPriceList = {}】", minPriceList);
         futuresInstrumentService.clearMinPriceAndMinTrdUnitLimitCache();
         minPriceAndMinTrdUnitLimitBeanMap.clear();
         minPriceMap.clear();
@@ -135,7 +133,7 @@ public class InstrumentServiceImpl extends AsyncServiceImpl<String, Instrument> 
 
     @Override
     public void saveTrdUnitLimit(List<MinTrdUnitLimit> minTrdUnitLimitList) {
-        log.info("saveTrdUnitLimit() called with parameters => 【minTrdUnitLimitList = {}】",minTrdUnitLimitList);
+        log.info("saveTrdUnitLimit() called with parameters => 【minTrdUnitLimitList = {}】", minTrdUnitLimitList);
         futuresInstrumentService.clearMinPriceAndMinTrdUnitLimitCache();
         minPriceAndMinTrdUnitLimitBeanMap.clear();
         minTrdUnitLimitMap.clear();

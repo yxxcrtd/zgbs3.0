@@ -1417,7 +1417,7 @@ public class KCBPConverter {
                         break;
                     }
                     case "marketmaxqty": {
-                        instrument.setMarketHighVolume(Integer.parseInt(value));
+                        instrument.setMarketHighVolume(Long.parseLong(value));
                         break;
                     }
                     case "marketminqty": {
@@ -1844,7 +1844,7 @@ public class KCBPConverter {
                 //TODO 根据接口返回转换成对应bean
                 switch (columnName) {
                     case "transacttime": {//申报时间
-                    	negotiateQuoteReceiveBean.setRequestTime(Integer.parseInt(value));
+                    	negotiateQuoteReceiveBean.setRequestTime(value);
                         break;
                     }
                     case "reportstatus": {//成交申报请求状态

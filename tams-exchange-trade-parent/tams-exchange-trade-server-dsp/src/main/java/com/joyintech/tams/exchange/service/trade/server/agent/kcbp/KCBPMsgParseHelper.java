@@ -553,7 +553,7 @@ public class KCBPMsgParseHelper {
 
             instrument.setStkcodeStatus(resMap.get("stkstatus"));
             if (!Strings.isNullOrEmpty(resMap.get("marketmaxqty"))) {
-                instrument.setMarketHighVolume(Integer.parseInt(resMap.get("marketmaxqty")));
+                instrument.setMarketHighVolume(Long.parseLong(resMap.get("marketmaxqty")));
             }
             if (!Strings.isNullOrEmpty(resMap.get("marketminqty"))) {
                 instrument.setMarketLowVolume(Integer.parseInt(resMap.get("marketminqty")));

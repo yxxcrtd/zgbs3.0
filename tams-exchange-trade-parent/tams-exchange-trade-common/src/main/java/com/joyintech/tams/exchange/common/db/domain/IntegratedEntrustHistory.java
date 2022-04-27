@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.exchange.common.utils.DoubleSerializerUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
-import io.swagger.annotations.ApiModelProperty;
 import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
@@ -149,6 +148,23 @@ public class IntegratedEntrustHistory implements Serializable {
     private String tradeDate;
     private String createDateTime;
     private String entrustClass;
+
+    private String targetType;
+    private String isNoGuard;
+    private String isNetPrice;
+    private String ownerType;
+    private String investorId;
+    private String investorName;
+    private String propInvestorId;
+    private String propInvestorName;
+    private String tradeId;
+    private String dealerId;
+    private String dealerName;
+    private String counterId;
+    private String propTradeId;
+    private String propDealerId;
+    private String propDealerName;
+    private String propOwnerType;
 
     @Id
     public String getId() {
@@ -733,5 +749,133 @@ public class IntegratedEntrustHistory implements Serializable {
 
     public void setEntrustClass(String entrustClass) {
         this.entrustClass = entrustClass;
+    }
+
+    public String getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(String targetType) {
+        this.targetType = targetType;
+    }
+
+    public String getIsNoGuard() {
+        return isNoGuard;
+    }
+
+    public void setIsNoGuard(String isNoGuard) {
+        this.isNoGuard = isNoGuard;
+    }
+
+    public String getIsNetPrice() {
+        return isNetPrice;
+    }
+
+    public void setIsNetPrice(String isNetPrice) {
+        this.isNetPrice = isNetPrice;
+    }
+
+    public String getOwnerType() {
+        return ownerType;
+    }
+
+    public void setOwnerType(String ownerType) {
+        this.ownerType = ownerType;
+    }
+
+    public String getInvestorId() {
+        return investorId;
+    }
+
+    public void setInvestorId(String investorId) {
+        this.investorId = investorId;
+    }
+
+    public String getInvestorName() {
+        return investorName;
+    }
+
+    public void setInvestorName(String investorName) {
+        this.investorName = investorName;
+    }
+
+    public String getPropInvestorId() {
+        return propInvestorId;
+    }
+
+    public void setPropInvestorId(String propInvestorId) {
+        this.propInvestorId = propInvestorId;
+    }
+
+    public String getPropInvestorName() {
+        return propInvestorName;
+    }
+
+    public void setPropInvestorName(String propInvestorName) {
+        this.propInvestorName = propInvestorName;
+    }
+
+    public String getTradeId() {
+        return tradeId;
+    }
+
+    public void setTradeId(String tradeId) {
+        this.tradeId = tradeId;
+    }
+
+    public String getDealerId() {
+        return dealerId;
+    }
+
+    public void setDealerId(String dealerId) {
+        this.dealerId = dealerId;
+    }
+
+    public String getDealerName() {
+        return dealerName;
+    }
+
+    public void setDealerName(String dealerName) {
+        this.dealerName = dealerName;
+    }
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+
+    public String getPropTradeId() {
+        return propTradeId;
+    }
+
+    public void setPropTradeId(String propTradeId) {
+        this.propTradeId = propTradeId;
+    }
+
+    public String getPropDealerId() {
+        return propDealerId;
+    }
+
+    public void setPropDealerId(String propDealerId) {
+        this.propDealerId = propDealerId;
+    }
+
+    public String getPropDealerName() {
+        return propDealerName;
+    }
+
+    public void setPropDealerName(String propDealerName) {
+        this.propDealerName = propDealerName;
+    }
+
+    public String getPropOwnerType() {
+        return propOwnerType;
+    }
+
+    public void setPropOwnerType(String propOwnerType) {
+        this.propOwnerType = propOwnerType;
     }
 }

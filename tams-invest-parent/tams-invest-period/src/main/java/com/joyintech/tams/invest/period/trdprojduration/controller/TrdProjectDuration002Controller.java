@@ -159,8 +159,8 @@ public class TrdProjectDuration002Controller extends BaseController {
         setSelectOptionToModel(model, DictCode.是否, DictCode.币种, DictCode.平安划款类型);
      // 一体化对应etliu end
         //展示投资目的或业务模式参数
-        String SHOW_INVAIM_OR_BUSSINSSMODEL = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
-        model.addAttribute("SHOW_INVAIM_OR_BUSSINSSMODEL", SHOW_INVAIM_OR_BUSSINSSMODEL);
+//        String SHOW_INVAIM_OR_BUSSINSSMODEL = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
+//        model.addAttribute("SHOW_INVAIM_OR_BUSSINSSMODEL", SHOW_INVAIM_OR_BUSSINSSMODEL);
         //展示投资目的或业务模式参数
         model.addAttribute("GEN_PAY_ORDERS_AUTO", CacheUtil.getSysParam("GEN_PAY_ORDERS_AUTO"));
         model.addAttribute(GlobalConstant.ENTITY, entity);

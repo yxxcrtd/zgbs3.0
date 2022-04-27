@@ -857,6 +857,9 @@
             <if test="fragmentaryFunds != null" >
                 FRAGMENTARY_FUNDS = #{fragmentaryFunds,jdbcType=DECIMAL},
             </if>
+            <if test="deliveryResult != null" >
+                DELIVERY_RESULT = #{deliveryResult,jdbcType=DECIMAL},
+            </if>
         </set>
         where TRADE_ID = #{tradeId,jdbcType=VARCHAR}
     </update>
@@ -930,7 +933,8 @@
             UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
             IS_MODIFY = #{isModify,jdbcType=VARCHAR},
             F_CJBH = #{fCjbh,jdbcType=VARCHAR},
-            FRAGMENTARY_FUNDS = #{fragmentaryFunds,jdbcType=DECIMAL}
+            FRAGMENTARY_FUNDS = #{fragmentaryFunds,jdbcType=DECIMAL},
+            DELIVERY_RESULT = #{deliveryResult,jdbcType=VARCHAR}
         where TRADE_ID = #{tradeId,jdbcType=VARCHAR}
     </update>
 </mapper>

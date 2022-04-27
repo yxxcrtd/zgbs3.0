@@ -162,15 +162,6 @@ public interface StlDownDataDealMapper {
    List<String> getZzgFinprodId(@Param("zqdm1") String zqdm1);
 
     /**
-     * 查询首期清算数据
-     * @param sqcjbh
-     * @param seatNumber
-     * @param secAcctId
-     * @return
-     */
-    List<SettleTransData> selectSqSettleTransDatas(@Param("sqcjbh") String sqcjbh, @Param("seatNumber") String seatNumber, @Param("secAcctId") String secAcctId, @Param("vdate") Date vdate);
-
-    /**
      * 查询首期质押券信息
      * @param sqcjbh
      * @param seatNumber

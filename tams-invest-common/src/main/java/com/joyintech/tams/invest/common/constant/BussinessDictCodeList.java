@@ -281,6 +281,16 @@ public enum BussinessDictCodeList implements BaseDictCodeList {
     提醒类型_小分类_资产要素登记修改(BussinessDictCode.提醒类型_小分类,"R10S2","资产要素登记修改"),
 
     /**
+     * 标准券额度不足提醒
+     */
+    提醒类型_大分类_标准券额度不足提醒(BussinessDictCode.提醒类型_小分类,"R12","标准券额度不足提醒"),
+
+    /**
+     * 标准券额度不足提醒
+     */
+    提醒类型_小分类_标准券额度不足提醒(BussinessDictCode.提醒类型_小分类,"R12S1","标准券额度不足提醒"),
+
+    /**
      * 入库
      */
     出入库方向_入库(BussinessDictCode.出入库方向,"01","入库"),

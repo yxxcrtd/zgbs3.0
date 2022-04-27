@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -229,6 +230,8 @@ public class ExchangeTransMatchCommonService extends BaseService {
     private IPlatformDate iPlatformDate;
     // modify by etliu 20220222 end
 
+    @Autowired
+    private TrdCommonBaseService trdCommonBaseService;
     /**
      * 交易完成后，调用共通修改SETTLE_TRANS_TG_MAPPING，SETTLE_TRANS_DATA_TOTAL_STATUS
      * @param seqId
@@ -774,7 +777,9 @@ public class ExchangeTransMatchCommonService extends BaseService {
             finPledgeDisplaceResultTempList.addAll(finPledgeDisplaceResultList);
 
             //中途换券需要更新首期的质押品信息
-            List<FinDealPledge> firstFinDealPledgeList = exchangeTransMatchRepo3Service.getFirstRepoFinDealPledge(dto.getfCjbh(),dto.getVdate(),commonEntrustDto.getPortfolioId());
+//            List<FinDealPledge> firstFinDealPledgeList = exchangeTransMatchRepo3Service.getFirstRepoFinDealPledge(dto.getfCjbh(),dto.getVdate(),commonEntrustDto.getPortfolioId());
+            List<FinDealPledge> firstFinDealPledgeList = exchangeTransMatchRepo3Service.getFirstRepoFinDealPledge(
+                    dto.getfCjbh(),dto.getVdate(),dto.getSeatNumber(),dto.getSecAcctId());
             if(!StringUtil.isEmptyList(firstFinDealPledgeList)) {
                 if(StringUtil.equals(commonEntrustDto.getPs(), DictCodeListExt3.交易方向_中途换券.getValue())) {
                     // FinPledgeDisplaceResult finPledgeDisplaceResult = finPledgeDisplaceResultList.stream().findFirst().filter(result->StringUtil.equals(result.getResultType(),DictCodeListExt3.质押券置换_置换结果_置换后.getValue())).get();
@@ -1190,7 +1195,10 @@ public class ExchangeTransMatchCommonService extends BaseService {
                         FinPledgeDisplaceResult finPledgeDisplaceResult = finPledgeDisplaceResultList.stream().filter(result->StringUtil.equals(result.getResultType(),DictCodeListExt3.质押券置换_置换结果_置换前.getValue())).findFirst().get();
                         // ZGTFCP-1805 : 先filter再findFirst modify by fuyongsheng 20220324 end
                         if(StringUtil.equals(itemList.get(0).getPs(), DictCodeListExt3.交易方向_中途换券.getValue())){
-                            List<FinDealPledge> firstFinDealPledgeList = exchangeTransMatchRepo3Service.getFirstRepoFinDealPledge(settleTransDataTotal.getfCjbh(),settleTransDataTotal.getVdate(),itemList.get(0).getPortfolioId());
+//                            List<FinDealPledge> firstFinDealPledgeList = exchangeTransMatchRepo3Service.getFirstRepoFinDealPledge(settleTransDataTotal.getfCjbh(),settleTransDataTotal.getVdate(),itemList.get(0).getPortfolioId());
+                            List<FinDealPledge> firstFinDealPledgeList = exchangeTransMatchRepo3Service.getFirstRepoFinDealPledge(
+                                    settleTransDataTotal.getfCjbh(),settleTransDataTotal.getVdate(),
+                                    settleTransDataTotal.getSeatNumber(),settleTransDataTotal.getSecAcctId());
                             if(!StringUtil.isEmptyList(firstFinDealPledgeList)) {
                                 for(FinDealPledge finDealPledge:firstFinDealPledgeList) {
                                     finDealPledge.setPledgeFinprodId(finPledgeDisplaceResult.getFinprodId());
@@ -1203,11 +1211,14 @@ public class ExchangeTransMatchCommonService extends BaseService {
                         else {
                             //查询首期交易
                             // GZYHTZJY-1160:查询首期交易方向是T01 modify fuyongsheng 20220119 start
-                            TrdProductDeal trdProductDeal = exchangeTransMatchRepo3Service.getFirstRepoTrade(
-                                    settleTransDataTotal.getfCjbh(),settleTransDataTotal.getVdate(),
-                                    //settleTransDataTotal.getPs(),
-                                    DictCodeList.交易方向_买入.getValue(),
-                                    itemList.get(0).getPortfolioId());
+//                            TrdProductDeal trdProductDeal = exchangeTransMatchRepo3Service.getFirstRepoTrade(
+//                                    settleTransDataTotal.getfCjbh(),settleTransDataTotal.getVdate(),
+//                                    //settleTransDataTotal.getPs(),
+//                                    DictCodeList.交易方向_买入.getValue(),
+//                                    itemList.get(0).getPortfolioId());
+                            TrdProductDeal trdProductDeal = trdCommonBaseService.getFirstRepoTrade(settleTransDataTotal.getfCjbh(),
+                                    settleTransDataTotal.getSeatNumber(), settleTransDataTotal.getSecAcctId(),
+                                    settleTransDataTotal.getVdate());
                             // GZYHTZJY-1160:查询首期交易方向是T01 modify fuyongsheng 20220119 end
                             if(StringUtil.isNotEmpty(trdProductDeal)) {
                                 FinDealPledge finDealPledge = new FinDealPledge();

@@ -1,68 +1,39 @@
 package com.joyintech.tams.exchange.service.trade.processor.others;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.google.common.base.Strings;
-import com.joyintech.tams.exchange.common.bean.EnableQryBean;
-import com.joyintech.tams.exchange.common.bean.FuturesInstrumentCommissionRateQryBean;
-import com.joyintech.tams.exchange.common.bean.FuturesInstrumentMarginRateQryBean;
-import com.joyintech.tams.exchange.common.bean.FuturesInstrumentQryBean;
-import com.joyintech.tams.exchange.common.bean.HistoryQryBean;
-import com.joyintech.tams.exchange.common.bean.HistoryTrade;
-import com.joyintech.tams.exchange.common.bean.InstrumentQryBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedBulkCloseQuoteBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedBulkCloseQuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedBulkQuoteBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedBulkQuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedFixedIncomeQuoteBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedFixedIncomeQuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedQuote;
-import com.joyintech.tams.exchange.common.bean.IntegratedRepurchaseQuoteBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedRepurchaseQuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.NegotiateQuoteQueryBean;
-import com.joyintech.tams.exchange.common.bean.NegotiateQuoteReceiveBean;
-import com.joyintech.tams.exchange.common.bean.PledgeDiscount;
-import com.joyintech.tams.exchange.common.bean.QuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.ReissueEntrustBean;
-import com.joyintech.tams.exchange.common.bean.ReissueEntrustQryBean;
-import com.joyintech.tams.exchange.common.bean.ReissueTradeBean;
-import com.joyintech.tams.exchange.common.bean.ReissueTradeQryBean;
-import com.joyintech.tams.exchange.common.bean.ResultBean;
-import com.joyintech.tams.exchange.common.bean.StandardBonds;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.bean.bond.StandardBondBean;
 import com.joyintech.tams.exchange.common.bean.bond.StandardBondQryBean;
 import com.joyintech.tams.exchange.common.bean.investment.CapitalAccountBean;
+import com.joyintech.tams.exchange.common.bean.request.TradeInfoProRequest;
+import com.joyintech.tams.exchange.common.bean.response.TradeInfoProResponse;
 import com.joyintech.tams.exchange.common.constant.AgentType;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
+import com.joyintech.tams.exchange.common.constant.InstructionPs;
 import com.joyintech.tams.exchange.common.constant.Market;
-import com.joyintech.tams.exchange.common.db.domain.Account;
-import com.joyintech.tams.exchange.common.db.domain.Entrust;
-import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
-import com.joyintech.tams.exchange.common.db.domain.Instrument;
-import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
-import com.joyintech.tams.exchange.common.db.domain.TerminalMapping;
-import com.joyintech.tams.exchange.common.db.domain.Trade;
+import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.utils.ConvertListUtils;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
-import com.joyintech.tams.exchange.datacommon.db.service.EntrustService;
-import com.joyintech.tams.exchange.datacommon.db.service.InstrumentService;
-import com.joyintech.tams.exchange.datacommon.db.service.IntegratedEntrustService;
-import com.joyintech.tams.exchange.datacommon.db.service.TerminalMappingService;
-import com.joyintech.tams.exchange.datacommon.db.service.TradeService;
+import com.joyintech.tams.exchange.datacommon.db.service.*;
+import com.joyintech.tams.exchange.service.trade.management.service.CommonManagement;
 import com.joyintech.tams.exchange.service.trade.management.service.InvestmentManagement;
 import com.joyintech.tams.exchange.service.trade.scheduled.LoginJob;
 import com.joyintech.tams.exchange.service.trade.scheduled.quote.QuoteJob;
 import com.joyintech.tams.exchange.service.trade.server.agent.AccountManager;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgent;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgentManager;
+import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 public class TerminalHelper {
@@ -88,6 +59,8 @@ public class TerminalHelper {
     private QuoteJob quoteJob;
     @Autowired
     private TerminalMappingService terminalMappingService;
+    @Autowired
+    private CommonManagement commonManagement;
 
     private final int batchSize = 1000; // 委托成交比对时，分页发送数据大小
 
@@ -502,7 +475,7 @@ public class TerminalHelper {
                     logger.info("委托信息比对数 size {}, batchCount {}, pageNum {}", reissueEntrustBeanBatchList.size(), batchCount, pageNum);
                     tradeAgent.reqReissueEntrust(entrustsForReissue);
                 } catch (Exception e) {
-                    logger.error("reqReissueEntrust error {}",  e.getMessage(),e);
+                    logger.error("reqReissueEntrust error {}", e.getMessage(), e);
                 }
             } else {
                 logger.error("not found agent {} from accountAgents  when  reqReissueEntrust!!!", accountId);
@@ -532,7 +505,7 @@ public class TerminalHelper {
                     logger.info("成交信息比对数 size {}, batchCount {}, pageNum {}", reissueTradeBeanBatchList.size(), batchCount, pageNum);
                     tradeAgent.reqReissueTrade(tradesForReissue);
                 } catch (Exception e) {
-                    logger.error("reqReissueEntrust error {}",  e.getMessage(),e);
+                    logger.error("reqReissueEntrust error {}", e.getMessage(), e);
                 }
             } else {
                 logger.error("not found agent {} from accountAgents  when  reqReissueEntrust!!!", accountId);
@@ -633,20 +606,51 @@ public class TerminalHelper {
             logger.error("not found agent {} from accountAgents  when  FuturesInstrumentCommissionRateBean!!!", accountId);
         }
     }
-    
+
     public List<NegotiateQuoteReceiveBean> queryNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean) {
         int pageSize = negotiateQuoteQueryBean.getPageSize();
         if (pageSize > 1000) {
-        	negotiateQuoteQueryBean.setPageSize(1000);
+            negotiateQuoteQueryBean.setPageSize(1000);
+        }
+        List<NegotiateQuoteReceiveBean> list = new ArrayList<>();
+
+        final String side = negotiateQuoteQueryBean.getSide();
+        if (StringUtil.isNotEmpty(side)) {
+            negotiateQuoteQueryBean.setSide(InstructionPs.getEntrustBs(side));
         }
 
-        List<NegotiateQuoteReceiveBean> list = new ArrayList<>();
+        TradeInfoProRequest dto = new TradeInfoProRequest();
+        dto.setAcctNo(negotiateQuoteQueryBean.getAccountId());
+        dto.setTradePlace(Market.SZSE.investValue);
+        dto.setIsOur("Y");
+        List<TradeInfoProResponse> dealerTraderList = commonManagement.getDealerTraderInfo(dto);
+        if (CollectionUtils.isEmpty(dealerTraderList)) {
+            logger.error("queryNegotiateQuoteReceive error: 本方交易商、交易主体、交易员信息不存在");
+            return list;
+        }
+        TradeInfoProResponse tradeInfoProResponse = dealerTraderList.get(0);
+        if(StringUtil.isEmpty(negotiateQuoteQueryBean.getMemberId())){
+            negotiateQuoteQueryBean.setMemberId(tradeInfoProResponse.getDealerNo());
+        }
+        if(StringUtil.isEmpty(negotiateQuoteQueryBean.getInvestorId())){
+            negotiateQuoteQueryBean.setInvestorId(tradeInfoProResponse.getDealerPartyNo());
+        }
+        if(StringUtil.isEmpty(negotiateQuoteQueryBean.getTraderCode())){
+            negotiateQuoteQueryBean.setTraderCode(tradeInfoProResponse.getTraderNo());
+        }
+
         TradeAgent tradeAgent = getAgent(negotiateQuoteQueryBean.getAccountId());
         if (Objects.nonNull(tradeAgent)) {
             try {
                 List<NegotiateQuoteReceiveBean> beanList = tradeAgent.reqNegotiateQuoteReceive(negotiateQuoteQueryBean);
                 if (Objects.nonNull(beanList) && beanList.size() > 0) {
-                    list.addAll(beanList);
+                    list.addAll(beanList.stream()
+                            .filter(o -> {
+                                if (negotiateQuoteQueryBean.getRequestStatus() != 0) {
+                                    return negotiateQuoteQueryBean.getRequestStatus() == o.getRequestStatus();
+                                }
+                                return true;
+                            }).collect(Collectors.toList()));
                 }
             } catch (Exception e) {
                 logger.error("reqIntegratedFixedIncomeQuote error {}", "\r\n" + e);

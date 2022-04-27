@@ -376,8 +376,8 @@ public class TrdBondInvestTrade002Controller extends BaseController {
         model.addAttribute("isEleShow", isEleShow);
 
         //展示投资目的或业务模式参数
-        String SHOW_INVAIM_OR_BUSSINSSMODEL = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
-        model.addAttribute("SHOW_INVAIM_OR_BUSSINSSMODEL", SHOW_INVAIM_OR_BUSSINSSMODEL);
+//        String SHOW_INVAIM_OR_BUSSINSSMODEL = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
+//        model.addAttribute("SHOW_INVAIM_OR_BUSSINSSMODEL", SHOW_INVAIM_OR_BUSSINSSMODEL);
         //展示投资目的或业务模式参数
 
         model.addAttribute("userId", LoginUserUtil.getUserName());

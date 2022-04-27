@@ -53,7 +53,7 @@ public class InvestmentUtils {
 
     // 指令进度判断
     public static boolean isInstructionProcessComplete(Instruction instruction) {
-        if (instruction.getEntrustNum() > 0) {
+        if (instruction.volumeInstruction()) {
             return TradeUtils.add(instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity(), 0).longValue() == instruction.getEntrustNum();
         } else {
             return TradeUtils.add(instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity(), 2).compareTo(instruction.getEntrustAmt()) == 0;

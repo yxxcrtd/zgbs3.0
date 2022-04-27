@@ -198,8 +198,8 @@ public class TrdProjectInvestTrade003Controller extends BaseController {
         model.addAttribute("ACCT_TYPE_A07", DictCodeListExt1.资金账户类型_券商资金账户.getValue());
         this.setSelectOptionToModel(model, DictCode.业务模式);
         //展示投资目的或业务模式参数
-        String SHOW_INVAIM_OR_BUSSINSSMODEL = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
-        model.addAttribute("SHOW_INVAIM_OR_BUSSINSSMODEL", SHOW_INVAIM_OR_BUSSINSSMODEL);
+//        String SHOW_INVAIM_OR_BUSSINSSMODEL = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
+//        model.addAttribute("SHOW_INVAIM_OR_BUSSINSSMODEL", SHOW_INVAIM_OR_BUSSINSSMODEL);
         //展示投资目的或业务模式参数
         setSelectOptionToModel(model, DICT_CODES);
         model.addAttribute(GlobalConstant.ENTITY, entity);

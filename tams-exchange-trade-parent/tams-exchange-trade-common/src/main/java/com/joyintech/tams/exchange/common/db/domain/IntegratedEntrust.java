@@ -151,27 +151,66 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @Digits(integer = 10, fraction = 4)
     private long pretermYearRate;
 
-    @ApiModelProperty(required = true, name = "liaisonName", value = "联络人姓名")
-    @Size(max = 32)
-    private String liaisonName;
-
-    @ApiModelProperty(required = true, name = "liaisonTel", value = "对手方交易员ID")
-    @Size(max = 32)
-    private String liaisonTel;
-
-    @ApiModelProperty(required = true, name = "propSeatNo", value = "对手方交易商ID")
-    @Size(max = 16)
-    private String propSeatNo;
-
-    @ApiModelProperty(required = true, name = "sellerNo", value = "本方交易员ID")
+    @ApiModelProperty(required = true, name = "sellerNo", value = "本方交易员（上海协议回购），本方交易商（深圳协议回购）")
     @Size(max = 32)
     private String sellerNo;
 
-    @ApiModelProperty(required = true, name = "propSeatName", value = "对手方交易商名称")
+    @ApiModelProperty(required = true, name = "liaisonName", value = "联系人（大宗交易），对手交易员（固收借用）")
+    @Size(max = 32)
+    private String liaisonName;
+
+    @ApiModelProperty(required = true, name = "liaisonTel", value = "联系方式（大宗交易），本方交易员（固收借用），对手方交易员（上海协议回购借用）")
+    @Size(max = 32)
+    private String liaisonTel;
+
+    @ApiModelProperty(required = true, name = "propSeatNo", value = "对手方席位（大宗、深圳协议回购），对手方交易商（固收、上海协议回购借用）")
+    @Size(max = 16)
+    private String propSeatNo;
+
+    @ApiModelProperty(required = true, name = "propSeatName", value = "对手方交易商名称（上海协议回购借用）")
     @Size(max = 32)
     private String propSeatName;
 
-    @ApiModelProperty(required = true, name = "contractId", value = "交易所请求编号")
+    @ApiModelProperty(required = true, name = "ownerType", value = "报价所有者类型")
+    private String ownerType;
+
+    @ApiModelProperty(required = true, name = "tradeId", value = "本方交易员ID")
+    private String tradeId;
+
+    @ApiModelProperty(required = true, name = "dealerId", value = "本方交易商ID")
+    private String dealerId;
+
+    @ApiModelProperty(required = true, name = "dealerName", value = "本方交易商名称")
+    private String dealerName;
+
+    @ApiModelProperty(required = true, name = "investorId", value = "本方交易主体ID")
+    private String investorId;
+
+    @ApiModelProperty(required = true, name = "investorName", value = "本方交易主体名称")
+    private String investorName;
+
+    @ApiModelProperty(required = false, name = "counterId", value = "交易对手")
+    private String counterId;
+
+    @ApiModelProperty(required = true, name = "propTradeId", value = "对手方交易员")
+    private String propTradeId;
+
+    @ApiModelProperty(required = true, name = "propDealerId", value = "对手方交易商")
+    private String propDealerId;
+
+    @ApiModelProperty(required = true, name = "propDealerName", value = "对手方交易商名称")
+    private String propDealerName;
+
+    @ApiModelProperty(required = true, name = "propInvestorId", value = "对手方交易主体ID")
+    private String propInvestorId;
+
+    @ApiModelProperty(required = true, name = "propInvestorName", value = "对手方交易主体名称")
+    private String propInvestorName;
+
+    @ApiModelProperty(required = true, name = "propOwnerType", value = "对手方报价所有者类型")
+    private String propOwnerType;
+
+    @ApiModelProperty(required = true, name = "contractId", value = "交易所请求编号，约定号")
     @Size(max = 32)
     private String contractId;
 
@@ -325,10 +364,10 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @ApiModelProperty(name = "ps", value = "交易方向", hidden = true)
     private String ps;
 
-	@ApiModelProperty(name="softSkipMode",value="软控是否继续？Y：继续",example="Y")
+    @ApiModelProperty(name = "softSkipMode", value = "软控是否继续？Y：继续", example = "Y")
     private String softSkipMode;
 
-	@ApiModelProperty(name = "busiTypeTg", value = "投管业务类型")
+    @ApiModelProperty(name = "busiTypeTg", value = "投管业务类型")
     private String busiTypeTg;
     @ApiModelProperty(name = "extend1", value = "扩展信息1")
     private String extend1;
@@ -343,13 +382,20 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @ApiModelProperty(name = "entrustClass", value = "委托指令类别：01-单组合，02-多组合")
     private String entrustClass;
 
-	public String getSoftSkipMode() {
-		return softSkipMode;
-	}
+    @ApiModelProperty(name = "targetType", value = "目标类型")
+    private String targetType;
+    @ApiModelProperty(name = "isNoGuard", value = "是否非担保")
+    private String isNoGuard;
+    @ApiModelProperty(name = "isNetPrice", value = "是否净价交易")
+    private String isNetPrice;
 
-	public void setSoftSkipMode(String softSkipMode) {
-		this.softSkipMode = softSkipMode;
-	} 
+    public String getSoftSkipMode() {
+        return softSkipMode;
+    }
+
+    public void setSoftSkipMode(String softSkipMode) {
+        this.softSkipMode = softSkipMode;
+    }
 
     public boolean isNoCancelEntrust() {
         return noCancelEntrust;
@@ -988,5 +1034,133 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
 
     public void setEntrustClass(String entrustClass) {
         this.entrustClass = entrustClass;
+    }
+
+    public String getOwnerType() {
+        return ownerType;
+    }
+
+    public void setOwnerType(String ownerType) {
+        this.ownerType = ownerType;
+    }
+
+    public String getInvestorId() {
+        return investorId;
+    }
+
+    public void setInvestorId(String investorId) {
+        this.investorId = investorId;
+    }
+
+    public String getInvestorName() {
+        return investorName;
+    }
+
+    public void setInvestorName(String investorName) {
+        this.investorName = investorName;
+    }
+
+    public String getPropInvestorId() {
+        return propInvestorId;
+    }
+
+    public void setPropInvestorId(String propInvestorId) {
+        this.propInvestorId = propInvestorId;
+    }
+
+    public String getPropInvestorName() {
+        return propInvestorName;
+    }
+
+    public void setPropInvestorName(String propInvestorName) {
+        this.propInvestorName = propInvestorName;
+    }
+
+    public String getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(String targetType) {
+        this.targetType = targetType;
+    }
+
+    public String getIsNoGuard() {
+        return isNoGuard;
+    }
+
+    public void setIsNoGuard(String isNoGuard) {
+        this.isNoGuard = isNoGuard;
+    }
+
+    public String getIsNetPrice() {
+        return isNetPrice;
+    }
+
+    public void setIsNetPrice(String isNetPrice) {
+        this.isNetPrice = isNetPrice;
+    }
+
+    public String getTradeId() {
+        return tradeId;
+    }
+
+    public void setTradeId(String tradeId) {
+        this.tradeId = tradeId;
+    }
+
+    public String getDealerId() {
+        return dealerId;
+    }
+
+    public void setDealerId(String dealerId) {
+        this.dealerId = dealerId;
+    }
+
+    public String getDealerName() {
+        return dealerName;
+    }
+
+    public void setDealerName(String dealerName) {
+        this.dealerName = dealerName;
+    }
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+
+    public String getPropTradeId() {
+        return propTradeId;
+    }
+
+    public void setPropTradeId(String propTradeId) {
+        this.propTradeId = propTradeId;
+    }
+
+    public String getPropDealerId() {
+        return propDealerId;
+    }
+
+    public void setPropDealerId(String propDealerId) {
+        this.propDealerId = propDealerId;
+    }
+
+    public String getPropDealerName() {
+        return propDealerName;
+    }
+
+    public void setPropDealerName(String propDealerName) {
+        this.propDealerName = propDealerName;
+    }
+
+    public String getPropOwnerType() {
+        return propOwnerType;
+    }
+
+    public void setPropOwnerType(String propOwnerType) {
+        this.propOwnerType = propOwnerType;
     }
 }

@@ -1,22 +1,34 @@
 package com.joyintech.tams.exchange.service.trade.processor.business.price;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Lists;
 import com.joyintech.tams.exchange.common.bean.TickBean;
+import com.joyintech.tams.exchange.common.bean.dto.OpenCloseTime;
+import com.joyintech.tams.exchange.common.bean.request.BaseOrderRequest;
+import com.joyintech.tams.exchange.common.cache.TradeTimeService;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.instrument.SubStockType;
 import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
+import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
+import com.joyintech.tams.exchange.common.db.domain.Order;
 import com.joyintech.tams.exchange.common.db.domain.OrderInterface;
+import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
 import com.joyintech.tams.exchange.common.utils.IntegratedEntrustUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.List;
+
+import static com.joyintech.tams.constant.DictCodeList.*;
 
 /**
  * create By MAXX on 2020/12/17
@@ -29,25 +41,63 @@ public class PriceHelper {
     private static final Logger logger = LoggerFactory.getLogger(PriceHelper.class);
     private double buyRatio = 1.02;
     private double sellRatio = 0.98;
+    private TradeTimeService tradeTimeService;
+
+    @Autowired
+    public void setTradeTimeService(TradeTimeService tradeTimeService) {
+        this.tradeTimeService = tradeTimeService;
+    }
+
+    public String checkPrice(BaseOrderRequest order, Instruction instruction, Instrument instrument, TickBean tick) {
+        OrderInterface orderInterface = new Order();
+        orderInterface.setEntrustBs(EntrustPropUtils.getEntrustBs(instruction));
+        BigDecimal entrustPrice = order.getEntrustPrice();
+        String tradePlat = instruction.getTradePlat();
+        String entrustBussType = instruction.getEntrustBussType();
+        String priceMode = EntrustPropUtils.getEntrustProp(instruction, order.getEntrustProp());
+
+        int tradeTimeStage = getTradeTimeStage(instruction, order, instrument);
+
+        if (IntegratedEntrustUtils.isBulk(orderInterface.getEntrustProp())) {//沪深大宗交易
+            checkPriceForBulk(entrustPrice, orderInterface, instrument, tick);
+        } else if (TradePlat.NORMAL.value.equals(tradePlat)) {//沪深竞价
+            if (SubStockType.ZB.value.equals(instrument.getSubStockType())
+                    || SubStockType.ZXQYB.value.equals(instrument.getSubStockType())) {
+                checkPriceForZBA(entrustPrice, orderInterface, instrument, tick, tradeTimeStage);
+            } else if (Market.SZSE.value.equals(instrument.getMarket())
+                    && SubStockType.CYB.value.equals(instrument.getSubStockType())) {
+                checkPriceForCYB(entrustPrice, orderInterface, instrument, tick);
+            } else if (Market.SHSE.value.equals(instrument.getMarket())
+                    && SubStockType.KCB.value.equals(instrument.getSubStockType())) {
+                checkPriceForKCB(entrustPrice, orderInterface, instrument, tick, priceMode, tradeTimeStage);
+            } else if (InstructionBusiType.REPO_BIDDING.value.equals(entrustBussType)) {//债券质押式回购竞价指令
+                checkPriceForBondRepurchase(entrustPrice, orderInterface, instrument, tick, tradeTimeStage);
+            } else if (InvestmentAssetType.BOND.value.equals(instrument.getAssetType())) {
+                checkPriceForBond(entrustPrice, orderInterface, instrument, tick, tradeTimeStage);//沪深竞价平台债券交易
+            }
+        }
+        return orderInterface.getErrorMsg();
+    }
 
     //沪深竞价平台
     public boolean checkPrice(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick, String tradePlat, String entrustBussType, String priceMode) {
+        int tradeTimeStage = getTradeTimeStage();
         if (TradePlat.NORMAL.value.equals(tradePlat)) {//沪深竞价
             if (SubStockType.ZB.value.equals(instrument.getSubStockType())
                     || SubStockType.ZXQYB.value.equals(instrument.getSubStockType())) {
-                return checkPriceForZBA(entrustPrice, orderInterface, instrument, tick);
+                return checkPriceForZBA(entrustPrice, orderInterface, instrument, tick, tradeTimeStage);
             }
             if (Market.SZSE.value.equals(instrument.getMarket()) && SubStockType.CYB.value.equals(instrument.getSubStockType())) {
                 return checkPriceForCYB(entrustPrice, orderInterface, instrument, tick);
             }
             if (Market.SHSE.value.equals(instrument.getMarket()) && SubStockType.KCB.value.equals(instrument.getSubStockType())) {
-                return checkPriceForKCB(entrustPrice, orderInterface, instrument, tick, priceMode);
+                return checkPriceForKCB(entrustPrice, orderInterface, instrument, tick, priceMode, tradeTimeStage);
             }
             if (InstructionBusiType.REPO_BIDDING.value.equals(entrustBussType)) {//债券质押式回购竞价指令
-                return checkPriceForBondRepurchase(entrustPrice, orderInterface, instrument, tick);
+                return checkPriceForBondRepurchase(entrustPrice, orderInterface, instrument, tick, tradeTimeStage);
             }
             if (InvestmentAssetType.BOND.value.equals(instrument.getAssetType())) {
-                return checkPriceForBond(entrustPrice, orderInterface, instrument, tick);//沪深竞价平台债券交易
+                return checkPriceForBond(entrustPrice, orderInterface, instrument, tick, tradeTimeStage);//沪深竞价平台债券交易
             }
         } else if (IntegratedEntrustUtils.isBulk(orderInterface.getEntrustProp())) {//沪深大宗交易
             return checkPriceForBulk(entrustPrice, orderInterface, instrument, tick);
@@ -56,10 +106,37 @@ public class PriceHelper {
     }
 
     //科创板
-    private boolean checkPriceForKCB(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick, String priceMode) {
+    private boolean checkPriceForKCB(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick, String priceMode, int tradeTimeStage) {
         logger.info("沪深竞价科创板");
-        int tradeTimeStage = getTradeTimeStage();
-        if (tradeTimeStage == TradeTimeStage.THE_CONTINUOUS_AUCTION.value) {//连续竞价
+        if (tradeTimeStage != TradeTimeStage.THE_CONTINUOUS_AUCTION.value) {//连续竞价
+            return true;
+        }
+        if (InstructionPriceMode.FIXED.codeNotEquals(priceMode)) {
+            return true;
+        }
+        boolean result = false;
+        double decimalPrice = 0;
+        double ratio = 0;
+        if (EntrustBs.BUY.codeEquals(orderInterface.getEntrustBs())) {
+            decimalPrice = getBuyStandardPrice(tick);
+            if (Double.compare(decimalPrice, 0.0) > 0) {
+                ratio = buyRatio;
+                result = TradeUtils.bigThan(entrustPrice, TradeUtils.multiply(TradeUtils.getBigDecimal(decimalPrice, 4), TradeUtils.getBigDecimal(buyRatio, 4), 4));
+            }
+        } else {
+            decimalPrice = getSaleStandardPrice(tick);
+            if (Double.compare(decimalPrice, 0.0) > 0) {
+                ratio = sellRatio;
+                result = TradeUtils.lessThan(entrustPrice, TradeUtils.multiply(TradeUtils.getBigDecimal(decimalPrice, 4), TradeUtils.getBigDecimal(sellRatio, 4), 4));
+            }
+        }
+        if (result) {
+            orderInterface.setErrorCode(ErrorCode.INNER_RISK_ERROR.value);
+            orderInterface.setErrorMsg("科创板限价委托价格[" + entrustPrice + "]高于买入或低于卖出基准价格[" + decimalPrice + "]的" + (ratio * 100) + "%");
+            return false;
+        }
+        return true;
+        /*if (tradeTimeStage != TradeTimeStage.THE_CONTINUOUS_AUCTION.value) {//连续竞价
             if (InstructionPriceMode.FIXED.value.equals(priceMode)) {//限价
                 boolean result = false;
                 double decimalPrice = 0;
@@ -85,7 +162,7 @@ public class PriceHelper {
                 return true;
             }
         }
-        return true;
+        return true;*/
     }
 
     //创业板
@@ -130,19 +207,19 @@ public class PriceHelper {
             lowerLimitPrice = TradeUtils.formatDouble(Math.min(tick.getPreClosePrice() * 0.7, tick.getLowPrice()), 4);
             upperLimitPrice = TradeUtils.formatDouble(Math.max(tick.getPreClosePrice() * 1.3, tick.getHighPrice()), 4);
         }
-        if ((Double.compare(lowerLimitPrice, 0.0) > 0 && Double.compare(lowerLimitPrice, entrustPrice.doubleValue()) > 0)
+        return compareLimitPrice(entrustPrice, orderInterface, lowerLimitPrice, upperLimitPrice, instrument.getMarket());
+        /*if ((Double.compare(lowerLimitPrice, 0.0) > 0 && Double.compare(lowerLimitPrice, entrustPrice.doubleValue()) > 0)
                 || (Double.compare(upperLimitPrice, 0.0) > 0 && Double.compare(upperLimitPrice, entrustPrice.doubleValue()) < 0)) {
             orderInterface.setErrorCode(ErrorCode.INNER_RISK_ERROR.value);
             orderInterface.setErrorMsg("不满足沪深大宗交易无涨跌停场景价格限制。有效价格申报范围：[" + lowerLimitPrice + "," + upperLimitPrice + "]; 委托价格：[" + entrustPrice + "]");
             return false;
         }
-        return true;
+        return true;*/
     }
 
     //沪深竞价平台主板A股以及中小企业板
-    private boolean checkPriceForZBA(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick) {
+    private boolean checkPriceForZBA(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick, int tradeTimeStage) {
         logger.info("沪深竞价平台主板A股以及中小企业板");
-        int tradeTimeStage = getTradeTimeStage();
         double lowerLimitPrice = 0;
         double upperLimitPrice = 0;
         if (Market.SZSE.value.equals(instrument.getMarket())) {//深交所
@@ -152,7 +229,8 @@ public class PriceHelper {
                 if ((Double.compare(lowerLimitPrice, entrustPrice.doubleValue()) > 0)
                         || (Double.compare(upperLimitPrice, 0.0) > 0 && Double.compare(upperLimitPrice, entrustPrice.doubleValue()) < 0)) {
                     orderInterface.setErrorCode(ErrorCode.INNER_RISK_ERROR.value);
-                    orderInterface.setErrorMsg("不满足沪深竞价平台主板A股其它无涨跌停场景价格限制。有效价格申报范围：[" + lowerLimitPrice + "," + upperLimitPrice + "]; 委托价格：[" + entrustPrice + "]");
+                    orderInterface.setErrorMsg(dealErrorMsgByMarket(lowerLimitPrice, upperLimitPrice, instrument.getMarket()));
+//                    orderInterface.setErrorMsg("不满足沪深竞价平台主板A股其它无涨跌停场景价格限制。有效价格申报范围：[" + lowerLimitPrice + "," + upperLimitPrice + "]; 委托价格：[" + entrustPrice + "]");
                     return false;
                 }
                 return true;
@@ -168,21 +246,35 @@ public class PriceHelper {
                 upperLimitPrice = TradeUtils.formatDouble(tick.getLastPrice() * 1.1, 4);
             }
         }
-        if ((Double.compare(lowerLimitPrice, 0.0) > 0 && Double.compare(lowerLimitPrice, entrustPrice.doubleValue()) > 0)
+        return compareLimitPrice(entrustPrice, orderInterface, lowerLimitPrice, upperLimitPrice, instrument.getMarket());
+        /*if ((Double.compare(lowerLimitPrice, 0.0) > 0 && Double.compare(lowerLimitPrice, entrustPrice.doubleValue()) > 0)
                 || (Double.compare(upperLimitPrice, 0.0) > 0 && Double.compare(upperLimitPrice, entrustPrice.doubleValue()) < 0)) {
             orderInterface.setErrorCode(ErrorCode.INNER_RISK_ERROR.value);
             orderInterface.setErrorMsg("不满足沪深竞价平台主板A股其它无涨跌停场景价格限制。有效价格申报范围：[" + lowerLimitPrice + "," + upperLimitPrice + "]; 委托价格：[" + entrustPrice + "]");
             return false;
         }
-        return true;
+        return true;*/
     }
 
-    private boolean checkPriceForBondRepurchase(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick) {
+    private boolean checkPriceForBondRepurchase(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick, int tradeTimeStage) {
         logger.info("沪深竞价平台，债券质押式回购");
         double lowerLimitPrice = 0;
         double upperLimitPrice = 0;
-        int tradeTimeStage = getTradeTimeStage();
-        if (Market.SZSE.value.equals(instrument.getMarket())) {//深交所
+
+        // [0,前收盘价×200%]	[0，匹配成交最新成交价格+1%]
+        if (tradeTimeStage == TradeTimeStage.THE_OPENING_SET.value) {//开盘集合
+            upperLimitPrice = TradeUtils.formatDouble(tick.getPreClosePrice() * 2, 4);
+        } else {
+            upperLimitPrice = TradeUtils.formatDouble(tick.getLastPrice() * 1.01, 4);
+        }
+
+        if ((Double.compare(0, entrustPrice.doubleValue()) >= 0)
+                || (Double.compare(upperLimitPrice, 0.0) > 0 && Double.compare(upperLimitPrice, entrustPrice.doubleValue()) < 0)) {
+            orderInterface.setErrorMsg(dealErrorMsgByMarket(lowerLimitPrice, upperLimitPrice, instrument.getMarket()));
+            orderInterface.setErrorCode(ErrorCode.INNER_RISK_ERROR.value);
+            return false;
+        }
+        /*if (Market.SZSE.value.equals(market)) {//深交所
             if (tradeTimeStage == TradeTimeStage.THE_OPENING_SET.value) {//开盘集合
                 upperLimitPrice = TradeUtils.formatDouble(tick.getPreClosePrice() * 2, 4);
             } else {
@@ -195,7 +287,7 @@ public class PriceHelper {
                 return false;
             }
             return true;
-        } else if (Market.SHSE.value.equals(instrument.getMarket())) {//上交所
+        } else if (Market.SHSE.value.equals(market)) {//上交所
             if (tradeTimeStage != TradeTimeStage.THE_OPENING_SET.value) {//非开盘集合
                 double bidPrice1 = getBidPrice1(tick);//买一价
                 double askPrice1 = getAskPrice1(tick);//卖一价
@@ -208,43 +300,105 @@ public class PriceHelper {
             orderInterface.setErrorCode(ErrorCode.INNER_RISK_ERROR.value);
             orderInterface.setErrorMsg("不满足沪深竞价平台债券质押式回购无涨跌停场景价格限制。有效价格申报范围：[" + lowerLimitPrice + "," + upperLimitPrice + "]; 委托价格：[" + entrustPrice + "]");
             return false;
-        }
+        }*/
         return true;
     }
 
     //沪深竞价平台债券交易
-    private boolean checkPriceForBond(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick) {
+    private boolean checkPriceForBond(BigDecimal entrustPrice, OrderInterface orderInterface, Instrument instrument, TickBean tick, int tradeTimeStage) {
         logger.info("沪深竞价平台债券交易");
         double lowerLimitPrice = 0;
         double upperLimitPrice = 0;
-        int tradeTimeStage = getTradeTimeStage();
-        if (Market.SZSE.value.equals(instrument.getMarket())) {//深交所
-            if (tradeTimeStage == TradeTimeStage.THE_OPENING_SET.value) {//开盘集合
-                //非上市首日
-                lowerLimitPrice = TradeUtils.formatDouble(tick.getPreClosePrice() * 0.9, 4);
-                upperLimitPrice = TradeUtils.formatDouble(tick.getPreClosePrice() * 1.1, 4);
-            } else {
-                lowerLimitPrice = TradeUtils.formatDouble(tick.getLastPrice() * 0.9, 4);
-                upperLimitPrice = TradeUtils.formatDouble(tick.getLastPrice() * 1.1, 4);
+        String assetType1 = instrument.getAssetType1();
+        String market = instrument.getMarket();
+        double lastPrice = tick.getLastPrice();
+        double preClosePrice = tick.getPreClosePrice();
+
+        if (WIND一级分类_含债券一级分类等_可转债.getValue().equals(assetType1)) {
+            if (Market.SZSE.value.equals(market)) {//深交所
+                if (tradeTimeStage == TradeTimeStage.THE_OPENING_SET.value) {//开盘集合
+                    //非上市首日
+                    lowerLimitPrice = TradeUtils.formatDouble(preClosePrice * 0.9, 4);
+                    upperLimitPrice = TradeUtils.formatDouble(preClosePrice * 1.1, 4);
+                } else {
+                    lowerLimitPrice = TradeUtils.formatDouble(lastPrice * 0.9, 4);
+                    upperLimitPrice = TradeUtils.formatDouble(lastPrice * 1.1, 4);
+                }
+            } else if (Market.SHSE.value.equals(market)) {//上交所
+                if (tradeTimeStage == TradeTimeStage.THE_OPENING_SET.value) {//开盘集合
+                    lowerLimitPrice = TradeUtils.formatDouble(preClosePrice * 0.7, 4);
+                    upperLimitPrice = TradeUtils.formatDouble(preClosePrice * 1.5, 4);
+                } else {
+                    double bidPrice1 = getBidPrice1(tick);//买一价
+                    double askPrice1 = getAskPrice1(tick);//卖一价
+                    lowerLimitPrice = TradeUtils.formatDouble(Math.max(bidPrice1 * 0.9, ((bidPrice1 * 0.9 + askPrice1 * 1.1) / 2) * 0.7), 4);
+                    upperLimitPrice = TradeUtils.formatDouble(Math.min(askPrice1 * 1.1, ((askPrice1 * 1.1 + bidPrice1 * 0.9) / 2) * 1.3), 4);
+                }
             }
-        } else if (Market.SHSE.value.equals(instrument.getMarket())) {//上交所
+        } else {
+            // 新债
+            // 国债、政府债券、政府支持债券、政策性金融债
+            //      [前收盘价×70%,前收盘价×130%]	[匹配成交最新成交价格×90%，匹配成交最新成交价格×110%]
+            // 其他债券
+            //      [前收盘价×70%,前收盘价×130%]	[匹配成交最新成交价格×80%，匹配成交最新成交价格×120%]
+            // 使用 WIND一级分类；WIND二级分类
+            // 映射关系：国债就是国债，政府债券就是地方政府债，政府支持债券就是政府支持机构债，政策性金融债是 一级为金融债二级为政策银行债
+
             if (tradeTimeStage == TradeTimeStage.THE_OPENING_SET.value) {//开盘集合
-                lowerLimitPrice = TradeUtils.formatDouble(tick.getPreClosePrice() * 0.7, 4);
-                upperLimitPrice = TradeUtils.formatDouble(tick.getPreClosePrice() * 1.5, 4);
-            } else {
-                double bidPrice1 = getBidPrice1(tick);//买一价
-                double askPrice1 = getAskPrice1(tick);//卖一价
-                lowerLimitPrice = TradeUtils.formatDouble(Math.max(bidPrice1 * 0.9, ((bidPrice1 * 0.9 + askPrice1 * 1.1) / 2) * 0.7), 4);
-                upperLimitPrice = TradeUtils.formatDouble(Math.min(askPrice1 * 1.1, ((askPrice1 * 1.1 + bidPrice1 * 0.9) / 2) * 1.3), 4);
+                lowerLimitPrice = TradeUtils.formatDouble(preClosePrice * 0.7, 4);
+                upperLimitPrice = TradeUtils.formatDouble(preClosePrice * 1.3, 4);
+            } else if (tradeTimeStage == TradeTimeStage.THE_CONTINUOUS_AUCTION.value) {
+                if (WIND一级分类_含债券一级分类等_国债.getValue().equals(assetType1)
+                        || WIND一级分类_含债券一级分类等_地方政府债.getValue().equals(assetType1)
+                        || WIND一级分类_含债券一级分类等_政府支持机构债.getValue().equals(assetType1)
+                        || (WIND一级分类_含债券一级分类等_金融债.getValue().equals(assetType1)
+                        && WIND二级分类_含债券二级分类等_政策银行债.getValue().equals(instrument.getSubStockType()))
+                ) {
+                    lowerLimitPrice = TradeUtils.formatDouble(lastPrice * 0.9, 4);
+                    upperLimitPrice = TradeUtils.formatDouble(lastPrice * 1.1, 4);
+                } else {
+                    lowerLimitPrice = TradeUtils.formatDouble(lastPrice * 0.8, 4);
+                    upperLimitPrice = TradeUtils.formatDouble(lastPrice * 1.2, 4);
+                }
             }
+
         }
+        return compareLimitPrice(entrustPrice, orderInterface, lowerLimitPrice, upperLimitPrice, market);
+    }
+
+    private boolean compareLimitPrice(BigDecimal entrustPrice, OrderInterface orderInterface, double lowerLimitPrice, double upperLimitPrice, String market) {
         if ((Double.compare(lowerLimitPrice, 0.0) > 0 && Double.compare(lowerLimitPrice, entrustPrice.doubleValue()) > 0)
                 || (Double.compare(upperLimitPrice, 0.0) > 0 && Double.compare(upperLimitPrice, entrustPrice.doubleValue()) < 0)) {
+            orderInterface.setErrorMsg(dealErrorMsgByMarket(lowerLimitPrice, upperLimitPrice, market));
             orderInterface.setErrorCode(ErrorCode.INNER_RISK_ERROR.value);
-            orderInterface.setErrorMsg("不满足沪深竞价平台债券交易无涨跌停场景价格限制。有效价格申报范围：[" + lowerLimitPrice + "," + upperLimitPrice + "]; 委托价格：[" + entrustPrice + "]");
             return false;
         }
         return true;
+    }
+
+    private String dealErrorMsgByMarket(double lowerLimitPrice, double upperLimitPrice, String market) {
+        String errorMsg = null;
+        if (Market.SHSE.codeEquals(market)) {
+            errorMsg = StrUtil.format("委托价格在有效价格范围[{}，{}]范围之外，存在委托废单的风险，是否继续下达？", lowerLimitPrice, upperLimitPrice);
+        } else if (Market.SZSE.codeEquals(market)) {
+            errorMsg = StrUtil.format("委托价格在有效价格范围[{}，{}]范围之外，存在委托无法成交的风险，是否继续下达？", lowerLimitPrice, upperLimitPrice);
+        }
+        return errorMsg;
+    }
+
+    private int getTradeTimeStage(Instruction instruction, BaseOrderRequest order, Instrument instrument) {
+        int tradeTimeStage = -1;
+        List<OpenCloseTime> tradePeriod = tradeTimeService.getTradePeriod(instruction, order, instrument);
+        String localTime = LocalTime.now().toString();
+        boolean result = false;
+        for (OpenCloseTime openCloseTime : tradePeriod) {
+            result = DateUtil.isIn(DateUtil.parseTime(localTime), DateUtil.parseTime(openCloseTime.getOpenTime()), DateUtil.parseTime(openCloseTime.getCloseTime()));
+            if (result) {
+                tradeTimeStage = Integer.parseInt(openCloseTime.getPriceTimeType());
+                break;
+            }
+        }
+        return tradeTimeStage;
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.datacommon.cache.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.joyintech.tams.exchange.common.cache.impl.RedisCacheServiceImpl;
 import com.joyintech.tams.exchange.common.constant.DBSaveType;
 import com.joyintech.tams.exchange.common.db.domain.KeyMethodInterface;
@@ -12,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Objects;
 
 public abstract class AsyncServiceImpl<PK extends Serializable, T extends KeyMethodInterface<PK>> extends RedisCacheServiceImpl<PK, T> implements AsyncService<PK, T> {
     @Autowired
@@ -85,7 +85,8 @@ public abstract class AsyncServiceImpl<PK extends Serializable, T extends KeyMet
     public void coverCache(boolean fromRedis) {
         clearCache();
         List<T> list = fromRedis ? getAllFromRedis() : getMapper().selectByExample(null);
-        if (Objects.nonNull(list)) {
+        if (CollUtil.isNotEmpty(list)) {
+            logger.info("coverCache() called with parameters => 【className = {}, fromRedis = {}, listSize = {}】", getClassName(), fromRedis, list.size());
             updateCache(list);
         }
     }

@@ -27,5 +27,5 @@ public interface InstrumentInterface {
 
      Integer getMarketLowVolume();
 
-     Integer getMarketHighVolume();
+     Long getMarketHighVolume();
 }

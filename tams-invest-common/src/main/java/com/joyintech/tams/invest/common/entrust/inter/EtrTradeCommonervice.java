@@ -31,6 +31,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -817,4 +818,209 @@ public class EtrTradeCommonervice extends BaseService {
 
         return BigDecimal.ZERO;
     }
+
+
+    /**
+     * 场内指令，头寸信息
+     *
+     * @return
+     */
+    public List<BaseMap> queryPositionInfoSecRepo(PositionCashSecRequest requestDto,String type) {
+
+        // 条件非空校验
+        posiInfoCheckCondition(requestDto);
+
+        if (requestDto.getPtlList() == null || requestDto.getPtlList().size() == 0) {
+            return nullData();
+        }
+
+
+        // 从原投管系统取
+        BigDecimal portfolioCash = BigDecimal.ZERO; // 组合现金可用
+        BigDecimal canCash = BigDecimal.ZERO; // 现金可用
+        BigDecimal realCash = BigDecimal.ZERO; // 现金可取
+        BigDecimal canSec = BigDecimal.ZERO; // 可用持仓
+        BigDecimal realSec = BigDecimal.ZERO; // 持仓数量
+        List<PositionCashSecDto> list = requestDto.getPtlList();
+        String flowType = requestDto.getFlowType();
+
+        flowType = StringUtil.equals(FLOW_TYPE_TRD, flowType) ? "03" : "01";// 01 指令现金 02 指令持仓 03 交易现金 04 交易持仓
+
+        if (list != null) {
+            //查询组合下所有现金账户
+            List<PositionCashSecDto> sumPortfolioAcctNoList = new ArrayList<>();
+            for (PositionCashSecDto dto : list) {
+                if (StringUtil.isEmpty(dto.getCdate())) {
+                    dto.setCdate(iPlatformDate.getSysDateStr());
+                }
+                if (StringUtil.isEmpty(dto.getPortfolioId())) {
+                    continue;
+                }
+                List<String> acctTypeList = new ArrayList<>();
+                acctTypeList.add(BussinessDictCodeList.资金账户类型_托管账户.getValue());
+                acctTypeList.add(BussinessDictCodeList.资金账户类型_交易所资金账户.getValue());
+                List<PtlCapacctInfo> acctNoList = etrTrdCommonMapper.getPtlAcctInfo(dto.getPortfolioId(), acctTypeList);
+                if (!CollectionUtils.isEmpty(acctNoList)) {
+                    for (PtlCapacctInfo ptlCapacctInfo : acctNoList) {
+                        PositionCashSecDto cashSecDto = new PositionCashSecDto();
+                        BeanUtil.copyPropertiesIgnoreNull(cashSecDto, dto); //复制资产信息
+                        cashSecDto.setAcctId(ptlCapacctInfo.getAcctNo());
+                        if (StringUtil.equals(BussinessDictCodeList.资金账户类型_托管账户.getValue(), ptlCapacctInfo.getAcctType())) {
+                            cashSecDto.setHoldingType(DictCodeListExt3.资产类型_托管户可用资金.getValue());
+                        } else if (StringUtil.equals(BussinessDictCodeList.资金账户类型_交易所资金账户.getValue(), ptlCapacctInfo.getAcctType())) {
+                            cashSecDto.setHoldingType(DictCodeListExt3.资产类型_证券户可用资金.getValue());
+                        }
+                        sumPortfolioAcctNoList.add(cashSecDto);
+                    }
+                }
+            }
+            //组合资金可用 1、老资金相关表
+            BigDecimal oldPortfolioAmount=BigDecimal.ZERO;
+            if (!CollectionUtils.isEmpty(sumPortfolioAcctNoList)) {
+
+                for (PositionCashSecDto dto : sumPortfolioAcctNoList) {
+                    PositionCashSecData data = querySingleCash(dto);
+                    if (data != null && data.getCashT() != null) {
+                        oldPortfolioAmount = oldPortfolioAmount.add(data.getCashT());
+                    }
+                }
+                //组合资金可用 2、新头寸引擎
+                BigDecimal newPortfolioAmount = queryPosition(sumPortfolioAcctNoList, flowType, DictCodeListExt3.资产类型_托管户可用资金.getValue());
+                if (newPortfolioAmount != null) {
+                    portfolioCash = ArithmeticUtil.doAdd(oldPortfolioAmount,newPortfolioAmount);
+                }
+            }
+            //资金可用
+            //筛选出有资金账户的组合
+            List<PositionCashSecDto> sumAcctNoList = new ArrayList<>();
+            for (PositionCashSecDto dto : list) {
+                if (StringUtil.isNotEmpty(dto.getAcctId())) {
+                    PositionCashSecDto cashSecDto = new PositionCashSecDto();
+                    BeanUtil.copyPropertiesIgnoreNull(cashSecDto, dto); //复制资产信息
+                    sumAcctNoList.add(cashSecDto);
+                }
+            }
+            //资金可用金额
+            if (!CollectionUtils.isEmpty(sumAcctNoList) && sumAcctNoList.size() > 0) {
+                //1、老资金相关表
+//                for (PositionCashSecDto dto : list){
+//                    PositionCashSecData data=querySingleCash(dto);
+//                    if(data!=null&&data.getCashT()!=null){
+//                        canCash=canCash.add(data.getCashT());
+//                        realCash=realCash.add(data.getRealCash());
+//                    }
+//                }
+                //资金可用金额 2、新头寸引擎
+                BigDecimal newCashAmount = queryPosition(sumAcctNoList, flowType, DictCodeListExt3.资产类型_证券户可用资金.getValue());
+                if (newCashAmount != null) {
+                    canCash = canCash.add(newCashAmount);
+                }
+                BigDecimal newRealCashAmount = queryPosition(sumAcctNoList, flowType, DictCodeListExt3.资产类型_证券户可取资金.getValue());
+                if (newRealCashAmount != null) {
+                    realCash = realCash.add(newRealCashAmount);
+                }
+            }
+            //持仓可用
+            flowType = StringUtil.equals(FLOW_TYPE_TRD, flowType) ? "04" : "02";//01 指令现金 02 指令持仓 03 交易现金 04 交易持仓
+            //筛选出有资金账户的组合
+            List<PositionCashSecDto> secList = new ArrayList<>();
+            for (PositionCashSecDto dto : list) {
+                if (StringUtil.isNotEmpty(dto.getFinprodId()) && StringUtil.isNotEmpty(dto.getSecAcctId())) {
+                    PositionCashSecDto cashSecDto = new PositionCashSecDto();
+                    BeanUtil.copyPropertiesIgnoreNull(cashSecDto, dto); //复制资产信息
+                    handleSecType(cashSecDto);
+                    secList.add(cashSecDto);
+                }
+            }
+            //持仓
+            if (!CollectionUtils.isEmpty(secList) && secList.size() > 0) {
+                BigDecimal newSecAmount = queryPosition(secList, flowType, "");
+                if (newSecAmount != null) { //可用持仓
+                    newSecAmount = newSecAmount.divide(new BigDecimal(100),2, RoundingMode.HALF_UP);
+                    canSec = canSec.add(newSecAmount);
+                }
+                secList.stream().forEach(item -> {
+                    item.setHoldingType("");
+                });
+                BigDecimal newRealSecAmount = queryPosition(secList, "04", DictCodeListExt3.资产类型_资产账户持仓.getValue()); //交易持仓和从交易持仓表
+                if (newRealSecAmount != null) { //持仓数量
+                    newRealSecAmount = newRealSecAmount.divide(new BigDecimal(100),2, RoundingMode.HALF_UP);
+                    realSec = realSec.add(newRealSecAmount);
+                }
+            }
+
+        }
+        return assembleSecRepo(portfolioCash, canCash, realCash, canSec, realSec,type);
+    }
+
+
+    private List<BaseMap> assembleSecRepo(BigDecimal portfolioCash, BigDecimal canCash, BigDecimal realCash, BigDecimal canSec, BigDecimal realSec,String type) {
+        String porUsableCash = "porUsableCash", acctNoUsableCash = "acctNoUsableCash", acctNoCanCash = "acctNoCanCash", usableAmount = "usableAmount", usableSec = "usableSec";
+        // 初始化返回集合
+        List<BaseMap> resp = new ArrayList<>();
+        BaseMap bm = BaseMap.newMap(new HashMap());
+        /**
+         * 若老投管现金存在需累计
+         */
+        if (portfolioCash != null) {
+            bm.put(porUsableCash, portfolioCash);
+        } else {
+            bm.put(porUsableCash, 0);
+        }
+        if (canCash != null) {
+            bm.put(acctNoUsableCash, canCash);
+        } else {
+            bm.put(acctNoUsableCash, 0);
+        }
+        if (realCash != null) {
+            bm.put(acctNoCanCash, realCash);
+        } else {
+            bm.put(acctNoCanCash, 0);
+        }
+        if (canSec != null) {
+            bm.put(usableAmount, canSec);
+        } else {
+            bm.put(usableAmount, 0);
+        }
+        if (realSec != null) {
+            bm.put(usableSec, realSec);
+        } else {
+            bm.put(usableSec, 0);
+        }
+
+        /*组合资金可用*/
+        resp.add(BaseMap.newMap()
+                .put("field", porUsableCash)
+                .put("name", "组合资金可用（元）")
+                .put("type", "xj")
+                .put("amount", bm.get(porUsableCash)));
+
+        /*账户资金可用*/
+        resp.add(BaseMap.newMap()
+                .put("field", acctNoUsableCash)
+                .put("name", "账户资金可用（元）")
+                .put("type", "xj")
+                .put("amount", bm.get(acctNoUsableCash)));
+        /*账户资金可取*/
+        resp.add(BaseMap.newMap()
+                .put("field", acctNoCanCash)
+                .put("name", "账户资金可取（元）")
+                .put("type", "xj")
+                .put("amount", bm.get(acctNoCanCash)));
+        /*可用数量*/
+        resp.add(BaseMap.newMap()
+                .put("field", "usableAmount")
+                .put("name", StringUtil.equals(type,"REPO")?"标准券可用额度（万元）":"可用数量（万元）")
+                .put("type", "cc")
+                .put("amount", bm.get(usableAmount) == null ? 0 : bm.get(usableAmount)));
+        /*持仓数量*/
+        resp.add(BaseMap.newMap()
+                .put("field", "usableSec")
+                .put("name", StringUtil.equals(type,"REPO")?"标准券总额度（万元）":"可用数量（万元）")
+                .put("type", "cc")
+                .put("amount", bm.get(usableSec) == null ? 0 : bm.get(usableSec)));
+
+        return resp;
+    }
+
 }

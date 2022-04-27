@@ -1,9 +1,7 @@
 package com.joyintech.tams.exchange.common.cache.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -12,8 +10,15 @@ import com.joyintech.tams.exchange.common.bean.dto.OpenCloseTime;
 import com.joyintech.tams.exchange.common.bean.investment.TradeTimeBean;
 import com.joyintech.tams.exchange.common.bean.request.BaseOrderRequest;
 import com.joyintech.tams.exchange.common.cache.TradeTimeService;
+import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
 import com.joyintech.tams.exchange.common.constant.joyin.DeclarationType;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
+import com.joyintech.tams.exchange.common.db.domain.Instrument;
+import com.joyintech.tams.exchange.common.enums.invest.BoardTypeEnum;
+import com.joyintech.tams.exchange.common.enums.invest.FinprodTypeTgEnum;
+import com.joyintech.tams.exchange.common.utils.EnumUtil;
+import com.joyintech.tams.exchange.common.utils.TradePlatUtils;
+import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -32,12 +37,11 @@ import static java.util.stream.Collectors.*;
 @Service
 public class TradeTimeServiceImpl implements TradeTimeService {
 
+    public static final String DEFAULT = "defaults";
     /**
      * 日志对象
      */
-    private static final Logger log = LoggerFactory.getLogger(TradeTimeServiceImpl.class); 
-
-    public static final String DEFAULT = "defaults";
+    private static final Logger log = LoggerFactory.getLogger(TradeTimeServiceImpl.class);
     private final List<TrdPriceTimeConfig> trdPriceTimeConfigList = Lists.newArrayList();
     private final Map<String, TradeTimeBean> tradeTimeBeanMap = new ConcurrentHashMap<>();
     private final Map<String, List<OpenCloseTime>> openCloseTimeMap = new ConcurrentHashMap<>();
@@ -57,28 +61,28 @@ public class TradeTimeServiceImpl implements TradeTimeService {
 
     @Override
     public void saveInCache(List<TrdPriceTimeConfig> trdPriceTimeConfigs) {
-        log.info("saveInCache() called with parameters => 【trdPriceTimeConfigs = {}】",trdPriceTimeConfigs);
+        log.info("saveInCache() called with parameters => 【trdPriceTimeConfigs = {}】", trdPriceTimeConfigs);
         trdPriceTimeConfigList.clear();
         openCloseTimeMap.clear();
+        // 程序中的兜底方案
+        openCloseTimeMap.put(DEFAULT, ListUtil.of(
+                new OpenCloseTime(OpenCloseTime.PriceTimeTypeEnum.OPEN.getCode(), "9:15:00", "9:25:00"),
+                new OpenCloseTime(OpenCloseTime.PriceTimeTypeEnum.KEEP.getCode(), "9:30:00", "11:30:00"),
+                new OpenCloseTime(OpenCloseTime.PriceTimeTypeEnum.CLOSE.getCode(), "14:57:00", "15:30:00")
+        ));
         if (CollUtil.isEmpty(trdPriceTimeConfigs)) {
-            // 程序中的兜底方案
-            openCloseTimeMap.put(DEFAULT, ListUtil.of(
-                    new OpenCloseTime(OpenCloseTime.PriceTimeTypeEnum.OPEN.getCode(), "9:15:00", "9:25:00"),
-                    new OpenCloseTime(OpenCloseTime.PriceTimeTypeEnum.KEEP.getCode(), "9:30:00", "11:30:00"),
-                    new OpenCloseTime(OpenCloseTime.PriceTimeTypeEnum.CLOSE.getCode(), "14:57:00", "15:30:00")
-            ));
             return;
         }
 
         trdPriceTimeConfigList.addAll(trdPriceTimeConfigs);
 
-        List<OpenCloseTime> defaults = trdPriceTimeConfigs.stream()
+        /*List<OpenCloseTime> defaults = trdPriceTimeConfigs.stream()
                 .filter(item -> ObjectUtil.isEmpty(item.getAssetClassify1()))
                 .map(item -> BeanUtil.toBean(item, OpenCloseTime.class))
-                .collect(toList());
+                .collect(toList());*/
 
         Map<String, List<OpenCloseTime>> collect = trdPriceTimeConfigList.stream()
-                .filter(item -> ObjectUtil.isEmpty(item.getAssetClassify1()))
+//                .filter(item -> !ObjectUtil.isEmpty(item.getAssetClassify1()))
                 .collect(groupingBy(item -> {
                             List<String> keys = ListUtil.of(item.getAssetClassify1()
                                     , item.getAssetClassify2(),
@@ -89,8 +93,8 @@ public class TradeTimeServiceImpl implements TradeTimeService {
                         }, mapping(item -> new OpenCloseTime(item.getPriceTimeType(), item.getOpenTime(), item.getCloseTime()), toList())
                 ));
         openCloseTimeMap.putAll(collect);
-        openCloseTimeMap.put(DEFAULT, defaults);
-
+//        openCloseTimeMap.put(DEFAULT, defaults);
+        log.info("saveInCache() end with bean => 【openCloseTimeMap = {}】", openCloseTimeMap);
     }
 
     /**
@@ -101,25 +105,26 @@ public class TradeTimeServiceImpl implements TradeTimeService {
      * @return 交易时间段列表
      */
     @Override
-    public List<OpenCloseTime> getTradePeriod(Instruction instruction, BaseOrderRequest order) {
-        log.debug("getTradePeriod() called with parameters => 【instruction = {}】, 【order = {}】",instruction, order);
+    public List<OpenCloseTime> getTradePeriod(Instruction instruction, BaseOrderRequest order, Instrument instrument) {
+        log.info("getTradePeriod() called with parameters => 【instruction = {}】, 【order = {}】",instruction, order);
+        String assetType = instruction.complexAssertTypeWhenConvertibleBond();
+        if (InvestmentAssetType.STOCK.codeEquals(assetType)
+                && EnumUtil.in(instrument.getSubStockType(), BoardTypeEnum.KCB, BoardTypeEnum.CYB)) {
+            assetType = assetType + instrument.getSubStockType();
+        }
+        String assetType1 = instruction.getAssetType1();
         String entrustProp = order.getEntrustProp();
         String tradeMarket = instruction.getTradeMarket();
-        String tradePlat = instruction.getTradePlat();
-        String assetType = instruction.getAssetType();
-        String assetType1 = instruction.getAssetType1();
-        String assetType10 = instruction.getAssetType10();
-        List<String> queries = ListUtil.of(assetType
-                , assetType1,
-                entrustProp,
-                tradeMarket,
-                tradePlat);
+        String tradePlat = TradePlatUtils.trd2EtrTradePlat(instruction);
+        List<String> queries = ListUtil.of(assetType, assetType1, entrustProp, tradeMarket, tradePlat);
 
         String res = openCloseTimeMap.keySet().stream()
                 .filter(key -> diff(StrUtil.split(key, StrUtil.COMMA), queries))
                 .min(Comparator.comparing(item -> StrUtil.count(item, StrUtil.AT)))
                 .orElse(DEFAULT);
-        return openCloseTimeMap.get(res);
+        List<OpenCloseTime> openCloseTimes = openCloseTimeMap.get(res);
+        log.debug("getTradePeriod() end with result => 【key = {}, res = {}, openCloseTimes = {}】", queries, res, openCloseTimes);
+        return openCloseTimes;
     }
 
     @SuppressWarnings("unused")

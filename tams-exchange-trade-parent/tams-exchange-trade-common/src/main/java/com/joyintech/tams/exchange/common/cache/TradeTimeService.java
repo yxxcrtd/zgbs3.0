@@ -5,6 +5,7 @@ import com.joyintech.tams.exchange.common.bean.dto.OpenCloseTime;
 import com.joyintech.tams.exchange.common.bean.investment.TradeTimeBean;
 import com.joyintech.tams.exchange.common.bean.request.BaseOrderRequest;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
+import com.joyintech.tams.exchange.common.db.domain.Instrument;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public interface TradeTimeService {
 
     void saveInCache(List<TrdPriceTimeConfig> trdPriceTimeConfigs);
 
-    List<OpenCloseTime> getTradePeriod(Instruction instruction, BaseOrderRequest order);
+    List<OpenCloseTime> getTradePeriod(Instruction instruction, BaseOrderRequest order, Instrument instrument);
 
     TradeTimeBean getTradeTimeByInstructionAndEntrustProp(Instruction instruction, String assetType1, String assetType2, String entrustProp);
 }
