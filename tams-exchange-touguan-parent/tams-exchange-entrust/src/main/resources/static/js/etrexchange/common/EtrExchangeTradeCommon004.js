@@ -4179,22 +4179,36 @@
                 console.log(result);
                 if (ETR_CHECK_POS_SWITCH == '01' && posSwitch) {
                     result.data = "组合分配中可用持仓不足,请确认是否要提交";
+                    Joyin.confirm(result.data, function () {
+                        Joyin.ajaxJson(basePath + '/etrexchange/common/EtrExchangeTradeCommon004/buildDtoFromTodoSubmit', object,
+                            function (res) {
+                                WorkFlow.doSubmitList(basePath + '/etrexchange/common/EtrExchangeTradeCommon004/save', res, "EtrExchangeTrade004_btn_submit", null, function () {
+                                    JoyinUtil.disableButton("EtrExchangeTradeCommon004_btn_submit", false);
+                                })
+                            });
+                    });
                 }else if (result.statuCode !== 200) {
 
                 } else {
-                    if(result.data == null){
+                    if (result.data == null) {
                         result.data = "请确认是否要提交";
+                        Joyin.confirm(result.data, function () {
+                            Joyin.ajaxJson(basePath + '/etrexchange/common/EtrExchangeTradeCommon004/buildDtoFromTodoSubmit', object,
+                                function (res) {
+                                    WorkFlow.doSubmitList(basePath + '/etrexchange/common/EtrExchangeTradeCommon004/save', res, "EtrExchangeTrade004_btn_submit", null, function () {
+                                        JoyinUtil.disableButton("EtrExchangeTradeCommon004_btn_submit", false);
+                                    })
+                                });
+                        });
+                    } else {
+                        Joyin.ajaxJson(basePath + '/etrexchange/common/EtrExchangeTradeCommon004/buildDtoFromTodoSubmit', object,
+                            function (res) {
+                                WorkFlow.doSubmitList(basePath + '/etrexchange/common/EtrExchangeTradeCommon004/save', res, "EtrExchangeTrade004_btn_submit", null, function () {
+                                    JoyinUtil.disableButton("EtrExchangeTradeCommon004_btn_submit", false);
+                                })
+                            });
                     }
                 }
-                Joyin.confirm(result.data, function () {
-                    Joyin.ajaxJson(basePath + '/etrexchange/common/EtrExchangeTradeCommon004/buildDtoFromTodoSubmit', object,
-                        function (res) {
-                            WorkFlow.doSubmitList(basePath + '/etrexchange/common/EtrExchangeTradeCommon004/save', res, "EtrExchangeTrade004_btn_submit", null, function () {
-                                JoyinUtil.disableButton("EtrExchangeTradeCommon004_btn_submit", false);
-                            })
-                        });
-                });
-
             });
     }
 
