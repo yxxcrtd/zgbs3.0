@@ -878,6 +878,7 @@ public class KCBPTradeAgent extends TradeAgentDsp {
         res.addAll(queryFixedIncomeEntrust0(kcbpAccount));
         res.addAll(queryProtocolBack_SH_Entrust0(kcbpAccount));
         res.addAll(queryProtocolBack_SZ_Entrust0(kcbpAccount));
+        res.addAll(queryBondNegotiate_SZ_Entrust0(kcbpAccount));
         return res;
     }
 
@@ -898,6 +899,7 @@ public class KCBPTradeAgent extends TradeAgentDsp {
         res.addAll(queryFixedIncomeTrade0(kcbpAccount));
         res.addAll(queryProtocolBack_SZ_Trade0(kcbpAccount));
         res.addAll(queryProtocolBack_SH_Trade0(kcbpAccount));
+        res.addAll(queryBondNegotiate_SZ_Trade0(kcbpAccount));
         return res;
     }
 
