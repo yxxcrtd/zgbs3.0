@@ -18,16 +18,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.joyintech.tams.constant.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.common.base.entity.MstValIrs;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListRsk;
 import com.joyintech.tams.valuation.batch.investratechange.dao.InvestRateChangeMapper;
 import com.joyintech.tams.valuation.batch.investratechange.dto.InvestRateChangeReaderDto;
 import com.joyintech.tams.valuation.batch.investratechange.dto.InvestRateChangeResult;
@@ -309,7 +306,7 @@ public class InvestRateChangeProcessorService {
     		mstValIrs.setDatasourceType(DictCodeListRsk.估值来源_行内.getValue());		//数据来源行内
     		mstValIrs.setValDate(happenDate);	//估值日期
     		mstValIrs.setValuation(dfDealDto.getFudongYinkui());
-    		mstValIrs.setValmodelId("01");		//估值模型-单曲贴现
+    		mstValIrs.setValmodelId(DictCodeListExt4.利率互换估值模型_单曲贴现.getValue());		//估值模型-单曲贴现
     		mstValIrs.setCcy(dfDealDto.getCcy());		//币种
     		mstValIrs.setInputType(DictCodeListExt1.录入方式_批处理生成.getValue());
     		mstValIrsList.add(mstValIrs);

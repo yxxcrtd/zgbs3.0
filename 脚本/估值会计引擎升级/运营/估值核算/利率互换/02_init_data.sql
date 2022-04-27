@@ -9,6 +9,15 @@ values ('IRS_CLEAN_TYPE', '01', '集中清算', 1, '0', 'yy', null, sysdate, 'yy
 insert into sys_datadict_list (DICT_CODE, ITEM_CODE, ITEM_VALUE, ORDER_NO, DEFAULT_VALUE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE)
 values ('IRS_CLEAN_TYPE', '02', '多边清算', 2, '0', 'yy', null, sysdate, 'yy', sysdate, null);
 
+delete from sys_datadict d where d.dict_code='VALMODEL_ID';
+insert into sys_datadict (DICT_CODE, SYSTEM_CODE, DICT_CNNAME, DICT_ENNAME, UPDATE_FLG, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+values ('VALMODEL_ID', 'VAL', '利率互换估值模型', null, '02', 'yy', null, sysdate, 'yy', sysdate);
+delete from sys_datadict_list d where d.dict_code='IRS_CLEAN_TYPE';
+insert into sys_datadict_list (DICT_CODE, ITEM_CODE, ITEM_VALUE, ORDER_NO, DEFAULT_VALUE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE)
+values ('VALMODEL_ID', '01', '单曲贴现', 1, '0', 'yy', null, sysdate, 'yy', sysdate, null);
+insert into sys_datadict_list (DICT_CODE, ITEM_CODE, ITEM_VALUE, ORDER_NO, DEFAULT_VALUE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE)
+values ('VALMODEL_ID', '02', '收付轧差', 2, '0', 'yy', null, sysdate, 'yy', sysdate, null);
+
 
 delete from sys_datadict d where d.dict_code='RESET_SCOPE';
 insert into sys_datadict (DICT_CODE, SYSTEM_CODE, DICT_CNNAME, DICT_ENNAME, UPDATE_FLG, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
@@ -97,8 +106,8 @@ insert into val_temp_col_check_info (TMP_C_NAME, TMP_E_NAME, COL_C_NAME, COL_E_N
 values ('利率互换标的信息', 'ValIrsInfo', '期限品种', 'termKind', '1', 'Y', 50, '1', 'TERM_TYPE_IRS', 'yy', null, sysdate, 'yy', sysdate);
 insert into val_temp_col_check_info (TMP_C_NAME, TMP_E_NAME, COL_C_NAME, COL_E_NAME, COL_TYPE, IS_NULL, MAX_LENGTH, IS_EXIST, DICT_CODE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('利率互换标的信息', 'ValIrsInfo', '互换方式', 'irsType', '1', 'Y', 50, '1', 'IRS_TYPE', 'yy', null, sysdate, 'yy', sysdate);
-insert into val_temp_col_check_info (TMP_C_NAME, TMP_E_NAME, COL_C_NAME, COL_E_NAME, COL_TYPE, IS_NULL, MAX_LENGTH, IS_EXIST, DICT_CODE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-values ('利率互换标的信息', 'ValIrsInfo', '清算方式', 'irsCleanType', '1', 'Y', 50, '1', 'IRS_CLEAN_TYPE', 'yy', null, sysdate, 'yy', sysdate);
+--insert into val_temp_col_check_info (TMP_C_NAME, TMP_E_NAME, COL_C_NAME, COL_E_NAME, COL_TYPE, IS_NULL, MAX_LENGTH, IS_EXIST, DICT_CODE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+--values ('利率互换标的信息', 'ValIrsInfo', '清算方式', 'irsCleanType', '1', 'Y', 50, '1', 'IRS_CLEAN_TYPE', 'yy', null, sysdate, 'yy', sysdate);
 insert into val_temp_col_check_info (TMP_C_NAME, TMP_E_NAME, COL_C_NAME, COL_E_NAME, COL_TYPE, IS_NULL, MAX_LENGTH, IS_EXIST, DICT_CODE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('利率互换标的信息', 'ValIrsInfo', '本金收益特征', 'capiProfFeature', '1', 'Y', 50, '1', 'AMT_INCOME_TYPE', 'yy', null, sysdate, 'yy', sysdate);
 insert into val_temp_col_check_info (TMP_C_NAME, TMP_E_NAME, COL_C_NAME, COL_E_NAME, COL_TYPE, IS_NULL, MAX_LENGTH, IS_EXIST, DICT_CODE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
@@ -125,8 +134,8 @@ insert into val_temp_col_check_info (TMP_C_NAME, TMP_E_NAME, COL_C_NAME, COL_E_N
 values ('利率互换标的信息', 'ValIrsInfo', '利率重置频率', 'resetCycle', '1', 'Y', 50, '1', 'FREQUENCY_UNIT', 'yy', null, sysdate, 'yy', sysdate);
 insert into val_temp_col_check_info (TMP_C_NAME, TMP_E_NAME, COL_C_NAME, COL_E_NAME, COL_TYPE, IS_NULL, MAX_LENGTH, IS_EXIST, DICT_CODE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('利率互换标的信息', 'ValIrsInfo', '交易日历', 'calendarId', '1', 'Y', 50, '1', 'BATCH_QUARTZ_SKIP_HOLIDAY_MARKET_CAL_TYPE', 'yy', null, sysdate, 'yy', sysdate);
-insert into val_temp_col_check_info (TMP_C_NAME, TMP_E_NAME, COL_C_NAME, COL_E_NAME, COL_TYPE, IS_NULL, MAX_LENGTH, IS_EXIST, DICT_CODE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-values ('利率互换标的信息', 'ValIrsInfo', '存续期是否计息', 'isCal', '1', 'Y', 50, '1', 'YES_OR_NO', 'yy', null, sysdate, 'yy', sysdate);
+--insert into val_temp_col_check_info (TMP_C_NAME, TMP_E_NAME, COL_C_NAME, COL_E_NAME, COL_TYPE, IS_NULL, MAX_LENGTH, IS_EXIST, DICT_CODE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+--values ('利率互换标的信息', 'ValIrsInfo', '存续期是否计息', 'isCal', '1', 'Y', 50, '1', 'YES_OR_NO', 'yy', null, sysdate, 'yy', sysdate);
 insert into val_temp_col_check_info (TMP_C_NAME, TMP_E_NAME, COL_C_NAME, COL_E_NAME, COL_TYPE, IS_NULL, MAX_LENGTH, IS_EXIST, DICT_CODE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('利率互换标的信息', 'ValIrsInfo', '重置类型', 'resetType', '1', 'Y', 50, '1', 'INTRESET_TYPE', 'yy', null, sysdate, 'yy', sysdate);
 
@@ -188,13 +197,11 @@ values ('利率互换交易信息', 'ValIrsDeal', '结算费是否随交易支�
 
 /*****批处理增加利率互换批任务 start**************************************************************************/
 --任务
-delete from   sys_batch_task t where t.task_id in ('528','529','530','531');
-insert into sys_batch_task (TASK_ID, SYSTEM_CODE, TASK_NAME, FTASK_ID, BEAN_NAME, TASK_PRI, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_BATCH_START_TARGET)
-values ('528', 'VAL', '利率互换预交易账务处理', null, 'irsReadyDealTask', 35, 'yy', null,sysdate, 'yy', sysdate, null);
+delete from   sys_batch_task t where t.task_id in ('529','530','531');
 insert into sys_batch_task (TASK_ID, SYSTEM_CODE, TASK_NAME, FTASK_ID, BEAN_NAME, TASK_PRI, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_BATCH_START_TARGET)
 values ('529', 'VAL', '利率互换交易-账务明细批处理', null, 'irsTransBookTask', 40, 'yy', null,sysdate, 'yy',sysdate, null);
 insert into sys_batch_task (TASK_ID, SYSTEM_CODE, TASK_NAME, FTASK_ID, BEAN_NAME, TASK_PRI, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_BATCH_START_TARGET)
-values ('530', 'VAL', '利率互换计提-账务明细批处理', null, 'irsCalBookTask', 60, 'yy', null, sysdate, 'yy', sysdate, null);
+values ('530', 'VAL', '利率互换收付轧差估值模型', null, 'irsCalBookTask', 60, 'yy', null, sysdate, 'yy', sysdate, null);
 insert into sys_batch_task (TASK_ID, SYSTEM_CODE, TASK_NAME, FTASK_ID, BEAN_NAME, TASK_PRI, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_BATCH_START_TARGET)
 values ('531', 'VAL', '利率互换公允价值变动-账务明细批处理', null, 'irsFairValeAlterationsTask', 70, 'yy', null, sysdate, 'yy', sysdate, null);
 --整体任务调度(利率重置、批移到估值中)
@@ -202,32 +209,21 @@ delete from sys_batch_task t where t.TASK_ID='10014';
 insert into sys_batch_task (TASK_ID, SYSTEM_CODE, TASK_NAME, FTASK_ID, BEAN_NAME, TASK_PRI, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_BATCH_START_TARGET)
 values ('10014', 'VAL', '利率重置', null, 'resetRateTask', 8, 'system', null, sysdate, 'system', sysdate, null);
 
-delete from  SYS_BATCH_JOB b where b.batch_seq_no='6f8803b3aa6fbaffe050007f01003cad' and b.task_id in('528','529','530','531','10014');
-insert into SYS_BATCH_JOB (BATCH_SEQ_NO, TASK_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-values ('6f8803b3aa6fbaffe050007f01003cad', '528', 'yy', null, sysdate, 'yy', sysdate);
+delete from  SYS_BATCH_JOB b where b.batch_seq_no='6f8803b3aa6fbaffe050007f01003cad' and b.task_id in('529','530','531','10014');
 insert into SYS_BATCH_JOB (BATCH_SEQ_NO, TASK_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('6f8803b3aa6fbaffe050007f01003cad', '529', 'yy', null, sysdate, 'yy', sysdate);
 insert into SYS_BATCH_JOB (BATCH_SEQ_NO, TASK_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('6f8803b3aa6fbaffe050007f01003cad', '530', 'yy', null, sysdate, 'yy', sysdate);
 insert into SYS_BATCH_JOB (BATCH_SEQ_NO, TASK_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('6f8803b3aa6fbaffe050007f01003cad', '531', 'yy', null, sysdate, 'yy', sysdate);
-
 insert into SYS_BATCH_JOB (BATCH_SEQ_NO, TASK_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('6f8803b3aa6fbaffe050007f01003cad', '10014', 'yy', null, sysdate, 'yy', sysdate);
 
---新增业务品种利率互换预处理
-delete from SYS_DATADICT_LIST d where d.DICT_CODE='BUSI_TYPE' and d.item_code='41';
-insert into SYS_DATADICT_LIST (DICT_CODE, ITEM_CODE, ITEM_VALUE, ORDER_NO, DEFAULT_VALUE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE)
-values ('BUSI_TYPE', '41', '֤利率互换预处理', 41, '0', 'yy', null,sysdate, 'yy', sysdate, null);
 
 --配置表
 --业务类型为利率互换
 delete from SYS_DATADICT_LIST d where d.DICT_CODE='BUSI_TYPE' and d.item_code='41';
-insert into SYS_DATADICT_LIST (DICT_CODE, ITEM_CODE, ITEM_VALUE, ORDER_NO, DEFAULT_VALUE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE)
-values ('BUSI_TYPE', '41', '利率互换预处理', 41, '0', 'yy', null,sysdate, 'yy', sysdate, null);
-delete from BOK_MATCH_RLAT bm where bm.match_type='01' and bm.source in ('528','529','530','531');
-insert into BOK_MATCH_RLAT (MATCH_TYPE, ACCT_STANDARD, SOURCE, TARGET, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-values ('01', 'ALL', '528', '41', 'yy', null, sysdate, 'yy', sysdate);
+delete from BOK_MATCH_RLAT bm where bm.match_type='01' and bm.source in ('529','530','531');
 insert into BOK_MATCH_RLAT (MATCH_TYPE, ACCT_STANDARD, SOURCE, TARGET, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('01', 'ALL', '529', '13', 'yy', null, sysdate, 'yy', sysdate);
 insert into BOK_MATCH_RLAT (MATCH_TYPE, ACCT_STANDARD, SOURCE, TARGET, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
@@ -236,13 +232,7 @@ insert into BOK_MATCH_RLAT (MATCH_TYPE, ACCT_STANDARD, SOURCE, TARGET, CREATE_US
 values ('01', 'ALL', '531', '13', 'yy', null, sysdate, 'yy', sysdate);
 
 --利率互换批处理分录配置
-delete from BOK_MATCH_RLAT bm where bm.match_type='03' and bm.source in ('528','529','530','531');
---利率互换预处理 涉及凭证
-insert into BOK_MATCH_RLAT (MATCH_TYPE, ACCT_STANDARD, SOURCE, TARGET, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-values ('03', 'QY', '528', '1803', 'yy', null, sysdate, 'yy', sysdate);
-insert into BOK_MATCH_RLAT (MATCH_TYPE, ACCT_STANDARD, SOURCE, TARGET, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-values ('03', 'QY', '528', '1804', 'yy', null, sysdate, 'yy', sysdate);
-
+delete from BOK_MATCH_RLAT bm where bm.match_type='03' and bm.source in ('529','530','531');
 --利率互换交易 涉及凭证
 insert into BOK_MATCH_RLAT (MATCH_TYPE, ACCT_STANDARD, SOURCE, TARGET, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('03', 'QY', '529', '1801', 'yy', null, sysdate, 'yy', sysdate);
@@ -267,8 +257,43 @@ values ('03', 'QY', '530', '1810', 'yy', null, sysdate, 'yy', sysdate);
 insert into BOK_MATCH_RLAT (MATCH_TYPE, ACCT_STANDARD, SOURCE, TARGET, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('03', 'QY', '531', '1802', 'yy', null, sysdate, 'yy', sysdate);
 
-
-
+--科目性质配置,利率互换计提科目
+delete from bok_match_rlat m where m.match_type='02' and m.SOURCE='530';
+insert into bok_match_rlat (MATCH_TYPE, ACCT_STANDARD, SOURCE, TARGET, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+values ('02', 'QY', '530', 'YSLVHH', 'yy', 'SYSDEPT', sysdate, 'yy', sysdate);
+insert into bok_match_rlat (MATCH_TYPE, ACCT_STANDARD, SOURCE, TARGET, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+values ('02', 'QY', '530', 'YFLVHH', 'yy', 'SYSDEPT', sysdate, 'yy', sysdate);
+--科目场景配置,利率互换计提成本场景
+delete from  bok_match_rlat m where m.match_type='07' and m.SOURCE='530';
+insert into bok_match_rlat (MATCH_TYPE, ACCT_STANDARD, SOURCE, TARGET, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+values ('07', 'QY', '530', '1801', 'yy', null, sysdate, 'yy',sysdate);
+insert into bok_match_rlat (MATCH_TYPE, ACCT_STANDARD, SOURCE, TARGET, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+values ('07', 'QY', '530', '1808', 'yy', null, sysdate, 'yy', sysdate);
 /*****批处理增加利率互换批任务 end**************************************************************************/
 
+
+/*****利率互换计提方式参数：现只支持倒减法 start**************************************************************************/
+delete from   bok_bookset_ext e where e.param_code='IRS_ACCR_TYPE';
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('00000000000000000002', 'IRS_ACCR_TYPE', '01', '利率互换计提方式', '计提方式: 01：区间倒减，02：每日新增；每日新增，最后一日区间倒减', 'yy', null,sysdate, 'yy',sysdate, '01');
+INSERT INTO BOK_BOOKSET_EXT
+SELECT A.BOOKSET_ID,B.PARAM_CODE,B.PARAM_VALUE,B.PARAM_NAME,B.REMARK,
+B.CREATE_USER,B.CREATE_DEPT,B.CREATE_TIME,B.UPDATE_USER,B.UPDATE_TIME,PARAM_TYPE
+FROM BOK_BOOKSET A,BOK_BOOKSET_EXT B
+WHERE A.BOOKSET_ID_TMPL = B.BOOKSET_ID
+AND B.PARAM_CODE = 'IRS_ACCR_TYPE'
+AND A.BOOKSET_ID !='00000000000000000002';
+
+--利率互换浮动端利息计提 现只支持单利
+delete from   bok_bookset_ext e where e.param_code='IRS_FLOAT_ACCR_TYPE';
+insert into bok_bookset_ext (BOOKSET_ID, PARAM_CODE, PARAM_VALUE, PARAM_NAME, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PARAM_TYPE)
+values ('00000000000000000002', 'IRS_FLOAT_ACCR_TYPE', '01', '利率互换浮动端计提方式', '计提方式: 01：单利，02：复利', 'yy', null,sysdate, 'yy',sysdate, '01');
+INSERT INTO BOK_BOOKSET_EXT
+SELECT A.BOOKSET_ID,B.PARAM_CODE,B.PARAM_VALUE,B.PARAM_NAME,B.REMARK,
+B.CREATE_USER,B.CREATE_DEPT,B.CREATE_TIME,B.UPDATE_USER,B.UPDATE_TIME,PARAM_TYPE
+FROM BOK_BOOKSET A,BOK_BOOKSET_EXT B
+WHERE A.BOOKSET_ID_TMPL = B.BOOKSET_ID
+AND B.PARAM_CODE = 'IRS_FLOAT_ACCR_TYPE'
+AND A.BOOKSET_ID !='00000000000000000002';
+/*****利率互换计提方式参数：现只支持倒减法 end**************************************************************************/
 

@@ -906,6 +906,13 @@ public enum ValDictCodeList implements BaseDictCodeList {
     账套配置表参数项_其他综合收益计算的平准金科目(
         ValDictCode.账套配置表参数项, "OTHER_INCOME_PZJ_SUBJECT", "净值型产品认申赎场景其他综合收益计算的平准金科目"
     ),
+
+    /**
+     * 账套配置表参数项_利率互换计提方式
+     */
+    账套配置表参数项_利率互换计提方式(
+            ValDictCode.账套配置表参数项, "IRS_ACCR_TYPE", "利率互换计提方式"
+    ),
     ;
     /**
      * 对应于数据字典code

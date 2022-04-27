@@ -71,8 +71,6 @@
 
         <!-- add by yinya on 20120418 start -->
         ,IRS_TYPE
-        ,IRS_CLEAN_TYPE
-        ,IS_CAL
         <!-- add by yinya on 20120418 end -->
 
         )
@@ -96,8 +94,6 @@
 
             <!-- add by yinya on 20120418 start -->
             ,#{item.irsType,jdbcType=VARCHAR}
-            ,#{item.irsCleanType,jdbcType=VARCHAR}
-            ,#{item.isCal,jdbcType=VARCHAR}
             <!-- add by yinya on 20120418 end -->
 
         </foreach>

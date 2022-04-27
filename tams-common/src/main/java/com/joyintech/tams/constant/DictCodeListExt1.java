@@ -21,7 +21,7 @@ import java.util.Map;
 public enum DictCodeListExt1 implements BaseDictCodeList {
 	利率互换方式_收取固定(DictCode.互换方式,"IRS01","收取固定"),
 	利率互换方式_收取浮动(DictCode.互换方式,"IRS02","收取浮动"),
-
+	业务类型_利率互换预交易(DictCode.业务类型,"41","利率互换预交易"),
 	是否_是(DictCode.是否,"Y","是"),
 	是否_否(DictCode.是否,"N","否"),
 	是否_空(DictCode.是否,"NULL","空"),

@@ -52,10 +52,6 @@ public class ValIrsInfo extends BaseEntity {
     private String irsType;
 
 
-    /**
-     * 清算方式
-     */
-    private String irsCleanType;
 
     /**
      * 本金收益特征
@@ -145,18 +141,6 @@ public class ValIrsInfo extends BaseEntity {
      */
     private String observeBefUnit;
 
-    /**
-     * 存续期是否计息
-     */
-    private String isCal;
-
-    public String getIsCal() {
-        return isCal;
-    }
-
-    public void setIsCal(String isCal) {
-        this.isCal = isCal;
-    }
 
     public String getCalendarId() {
         return calendarId;
@@ -230,13 +214,6 @@ public class ValIrsInfo extends BaseEntity {
         this.irsType = irsType;
     }
 
-    public String getIrsCleanType() {
-        return irsCleanType;
-    }
-
-    public void setIrsCleanType(String irsCleanType) {
-        this.irsCleanType = irsCleanType;
-    }
 
     public String getCapiProfFeature() {
         return capiProfFeature;

@@ -43,6 +43,7 @@
         where FINPROD_ID2 = #{finprodId2,jdbcType=VARCHAR}
           and DATASOURCE_TYPE = #{datasourceType,jdbcType=VARCHAR}
           and VAL_DATE = #{valDate,jdbcType=DATE}
+          and VALMODEL_ID = #{valmodelId,jdbcType=VARCHAR}
     </delete>
     <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.MstValIrs" >
         insert into MST_VAL_IRS (FINPROD_ID2, DATASOURCE_TYPE, VAL_DATE, 

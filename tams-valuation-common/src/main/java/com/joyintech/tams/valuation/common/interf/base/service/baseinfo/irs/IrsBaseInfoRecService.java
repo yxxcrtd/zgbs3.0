@@ -220,12 +220,8 @@ public class IrsBaseInfoRecService {
         result.setCounterId(dto.getCounterId());
         //互换方式
         result.setIrsType(dto.getIrsType());
-        //利率互换清算方式
-        result.setIrsCleanType(dto.getIrsCleanType());
         //交易日历
         result.setCalendarId(dto.getCalendarId());
-        //存续期是否计息
-        result.setIsCal(dto.getIsCal());
         return result;
 
     }

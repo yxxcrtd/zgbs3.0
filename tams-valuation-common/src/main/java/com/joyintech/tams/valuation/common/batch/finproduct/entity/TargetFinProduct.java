@@ -266,7 +266,8 @@ public class TargetFinProduct {
      * 分支序号类型
      */
     private String branchType;
-    
+
+
     public String getBranchType() {
 		return branchType;
 	}
