@@ -22,11 +22,13 @@ import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.business.asset.tenderbond.dao.FinTenderBondAssetMapper;
 import com.joyintech.tams.business.asset.tenderbond.dto.*;
+import com.joyintech.tams.invest.common.asset.dao.AssetCommon002Mapper;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -59,6 +61,9 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
 
     @Resource
     private FinProductIssueMapper finProductIssueMapper;
+
+    @Autowired
+    private AssetCommon002Mapper assetCommonMapper;
 
     @Resource
     private IPlatformDate iPlatformDate;
@@ -165,7 +170,16 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
     public FinTenderBondAsset002Dto getFromInterface(Map<String, String> param) {
         FinTenderBondAsset002Dto dto = finTenderBondAssetMapper.getProductFromInterface(param);
         if(dto == null) return dto;
-        //TODO 这里要将万德德类型转换未前端展示类型
+        FinProductTypeConfig config = new FinProductTypeConfig();
+        config.setConfigType(DictCodeListExt2.配置类型_WIND分类.getValue());
+        config.setOutputValue1(dto.getType9());
+        config.setOutputValue2(dto.getType10());
+        List<FinProductTypeConfig> resultTypeList = assetCommonMapper.getAssetThreeType(config);
+        if(CollectionUtils.isNotEmpty(resultTypeList)) {
+            dto.setType9(resultTypeList.get(0).getInputValue2());
+            dto.setType10(resultTypeList.get(0).getInputValue3());
+            dto.setType11(resultTypeList.get(0).getInputValue4());
+        }
         FinProductAddDto addDto = finTenderBondAssetMapper.getProductAddFromInterface(param);
         if(addDto != null) {
             if(StringUtil.isNotEmpty(addDto.getCrossMarketCode())) {
@@ -217,11 +231,17 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         FinProductType finProductType = new FinProductType();
         BeanUtil.copyPropertiesIgnoreNull(finProductType, dto);
         finProductType.setBranch(0l);
-        //TODO 这里需要通过映射表增加type6/type7的类型
-        //finProductType.setType6(dto.getType4());
-        //finProductType.setType7(dto.getType5());
         finProductType.setType8(DictCodeListExt2.平安资产类型_一级市场债.getValue());
-
+        FinProductTypeConfig config = new FinProductTypeConfig();
+        config.setConfigType(DictCodeListExt2.配置类型_WIND分类.getValue());
+        config.setInputValue2(dto.getType9());
+        config.setInputValue3(dto.getType10());
+        config.setInputValue4(dto.getType11());
+        FinProductTypeConfig resultType = finTenderBondAssetMapper.getWindType(config);
+        if(Objects.nonNull(resultType)) {
+            finProductType.setType6(resultType.getOutputValue1());
+            finProductType.setType7(resultType.getOutputValue2());
+        }
         finProductTypeMapper.insert(finProductType);
     }
 

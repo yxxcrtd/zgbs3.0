@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.joyintech.tams.invest.batch.tenderbond.dao.FinTenderBondAssetMapper">
+<mapper namespace="com.joyintech.tams.invest.batch.tenderbond.dao.FinTenderBondAssetBatchMapper">
 
-    <select id="selectListing" resultType="com.joyintech.tams.invest.batch.tenderbond.dto.FinTenderBondAssetDto">
+    <select id="selectListing" resultType="com.joyintech.tams.invest.batch.tenderbond.dto.FinTenderBondAssetBatchDto">
         select * from (
             SELECT
                 CASE WHEN <![CDATA[
                     ISSUE.ISSUE_EDATE >= TO_DATE(#{listingDate},'YYYY-MM-DD')  or
-                             ISSUE.TENDER_EDATE >= TO_DATE(#{listingDate},'YYYY-MM-DD')  THEN '01'
+                    PRODUCT_ADD.BID_DATE >= TO_DATE(#{listingDate},'YYYY-MM-DD')  THEN '01'
                      WHEN (ISSUE.ISSUE_EDATE < TO_DATE(#{listingDate},'YYYY-MM-DD') or
-                           ISSUE.TENDER_EDATE < TO_DATE(#{listingDate},'YYYY-MM-DD')) and PRODUCT.CIRCULATION_CODE is null THEN '02'
+                           PRODUCT_ADD.BID_DATE < TO_DATE(#{listingDate},'YYYY-MM-DD')) and PRODUCT.CIRCULATION_CODE is null THEN '02'
                      WHEN (ISSUE.ISSUE_EDATE < TO_DATE(#{listingDate},'YYYY-MM-DD') or
-                           ISSUE.TENDER_EDATE < TO_DATE(#{listingDate},'YYYY-MM-DD')) and PRODUCT.CIRCULATION_CODE is not null THEN '03'
+                           PRODUCT_ADD.BID_DATE < TO_DATE(#{listingDate},'YYYY-MM-DD')) and PRODUCT.CIRCULATION_CODE is not null THEN '03'
                     ]]>
                 ELSE NULL END AS issueStage,
                 PRODUCT_ADD.ISSUE_STATUS as issueStatus,

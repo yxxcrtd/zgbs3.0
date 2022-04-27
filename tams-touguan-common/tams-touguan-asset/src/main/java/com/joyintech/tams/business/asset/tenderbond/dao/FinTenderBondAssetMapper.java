@@ -5,6 +5,7 @@ import com.joyintech.tams.business.asset.tenderbond.dto.*;
 import com.joyintech.tams.business.asset.tenderbond.dto.FinProductAddDto;
 import com.joyintech.tams.business.asset.tenderbond.dto.FinProductIssueDto;
 import com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset002Dto;
+import com.joyintech.tams.common.base.entity.FinProductTypeConfig;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -127,4 +128,11 @@ public interface FinTenderBondAssetMapper {
      * @return
      */
     FinProductIssueDto getProductIssueFromInterface(Map<String, String> param);
+
+    /**
+     * 根据行内三级分类获取wind分类
+     * @param param
+     * @return
+     */
+    FinProductTypeConfig getWindType(FinProductTypeConfig param);
 }
