@@ -1429,17 +1429,11 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
      public List<ValidMessage> checkSavePriceRange(EtrExchangeTradeSaveSecRepoRequest entity, BindingResult result) {
         try {
             // 当前系统时间
-            Date nowDate = DateUtil.platDateFromCache();
+            String nowDate = DateUtil.getDateTimestamp();
             // 业务品种
             String finprodType = null;
             // 标的信息
             FinProduct finproduct = new FinProduct();
-            Map<String, Object> map = new HashMap<>();
-            map.put("initValue", entity.getStockId());
-            Page<SelectOptionDto> dtoPage = getFinprodMarketInfo(map);
-            if (null != dtoPage && !StringUtil.isEmptyList(dtoPage.getRoot())) {
-                finproduct = BeanUtil.mapToObject((Map) dtoPage.getRoot().get(0).getObject(), FinProduct.class);
-            }
             // 检查价格
             BigDecimal checkPrice = entity.getPrice();
             // 行情信息
@@ -1449,6 +1443,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                 if(StringUtil.equals(entity.getPriceType(),DictCodeListExt3.计价方式_全价.getValue())){
                     checkPrice = entity.getFprice();
                 }
+                finproduct.setFinprodId(entity.getFinprodId());
                 finprodType = DictCodeListExt1.金融产品类型_投管用_债券.getValue();
                 finproduct.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
             }
@@ -1478,7 +1473,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
      * @return
      */
     private List<ValidMessage> checkPriceRangeCommon(String finprodType, FinProduct finproduct, EtrExchangeTradeSaveSecRepoRequest entity,
-                                                    BigDecimal checkPrice, Date nowDate, EtrExchangeTradeQuotationHqSecRepoResponse quotation) {
+                                                    BigDecimal checkPrice, String nowDate, EtrExchangeTradeQuotationHqSecRepoResponse quotation) {
         List<ValidMessage> validMessageList = new ArrayList<>();
         FinProductType finProductType = new FinProductType();
         if(finproduct!=null&&finproduct.getFinprodId()!=null){

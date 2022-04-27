@@ -655,6 +655,7 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 	@RequestMapping("check")
 	public AjaxResult check(@RequestBody EtrExchangeTradeSaveSecRepoRequest dto, BindingResult br)
 			throws Exception {
+		etrExchangeTradeSecRepo001Service.setEntrustBussType(dto);
 		AjaxResult ajax= etrExchangeTradeSecRepo001Service.checkSave(dto,br);
 		List<ValidMessage> validList = etrExchangeTradeSecRepoValidatorService.valid(dto);
 		List<ValidMessage> validListPriceRange = etrExchangeTradeSecRepo001Service.checkSavePriceRange(dto,br);

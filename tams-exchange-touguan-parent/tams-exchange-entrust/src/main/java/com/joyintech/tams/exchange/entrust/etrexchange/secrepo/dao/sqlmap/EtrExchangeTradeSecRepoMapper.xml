@@ -1709,16 +1709,23 @@
                 ASSET_CLASSIFY3 assetClassify3,
                 PRICE_TIME_TYPE priceTimeType,
                 OPEN_TIME       openTime,
-                CLOSE_TIME      closeTime
+                CLOSE_TIME      closeTime,
+                DEAL_MODE       dealMode
         from trd_price_time_config
         <where>
+            <if test="ETR_TRAD != null and ETR_TRAD != ''">
+                ETR_TRAD = #{ETR_TRAD}
+            </if>
             <if test="TRADE_PLAT != null and TRADE_PLAT != ''">
                 TRADE_PLAT = #{TRADE_PLAT}
             </if>
             <if test="TRADE_MARKET != null and TRADE_MARKET != ''">
                 and  TRADE_MARKET = #{TRADE_MARKET}
             </if>
-            <if test="assetClassify1 != null and assetClassify1 != ''">
+            <if test="DEAL_MODE != null and DEAL_MODE != ''">
+                and  DEAL_MODE = #{DEAL_MODE}
+            </if>
+            <if test="ASSET_CLASSIFY1 != null and ASSET_CLASSIFY1 != ''">
                 and  ASSET_CLASSIFY1 = #{ASSET_CLASSIFY1}
             </if>
             <if test="ASSET_CLASSIFY2 != null and ASSET_CLASSIFY2 != ''">
@@ -1728,8 +1735,8 @@
                 and  (ASSET_CLASSIFY3 = #{ASSET_CLASSIFY3} or ASSET_CLASSIFY3 is null)
             </if>
             <if test="NOW_DATE != null">
-                and   to_date((to_char(#{NOW_DATE},'yyyy-MM-dd')||' '||OPEN_TIME),'yyyy-MM-dd hh24:mi:ss') &lt;= #{NOW_DATE}
-                and   to_date((to_char(#{NOW_DATE},'yyyy-MM-dd')||' '||CLOSE_TIME),'yyyy-MM-dd hh24:mi:ss') >= #{NOW_DATE}
+                and   to_date((to_char(to_date(#{NOW_DATE},'yyyy-MM-dd hh24:mi:ss'),'yyyy-MM-dd')||' '||OPEN_TIME),'yyyy-MM-dd hh24:mi:ss') &lt;= to_date(#{NOW_DATE},'yyyy-MM-dd hh24:mi:ss')
+                and   to_date((to_char(to_date(#{NOW_DATE},'yyyy-MM-dd hh24:mi:ss'),'yyyy-MM-dd')||' '||CLOSE_TIME),'yyyy-MM-dd hh24:mi:ss') >= to_date(#{NOW_DATE},'yyyy-MM-dd hh24:mi:ss')
             </if>
         </where>
     </select>
