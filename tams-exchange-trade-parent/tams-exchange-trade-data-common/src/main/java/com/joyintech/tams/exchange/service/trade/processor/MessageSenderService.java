@@ -113,7 +113,12 @@ public class MessageSenderService {
         tradeMessage.setFinprodMarketId(trade.getStockCode());
         tradeMessage.setDealVolume((double) trade.getTradedVolume());
         tradeMessage.setDealPrice(trade.getTradedPrice());
-        tradeMessage.setDealBalance(trade.getTradedBalance());
+//        tradeMessage.setDealBalance(trade.getTradedBalance());
+        if (trade.getClearBalance() != null && trade.getClearBalance().compareTo(BigDecimal.ZERO) > 0) {
+            tradeMessage.setDealBalance(trade.getClearBalance());
+        } else {
+            tradeMessage.setDealBalance(trade.getTradedBalance());
+        }
         tradeMessage.setTradingDay(trade.getTradingDay());
         tradeMessage.setAcctNo(instruction.getAcctNo());
         tradeMessage.setSecAcctId(instruction.getSecAcctId());
