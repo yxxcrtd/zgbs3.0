@@ -1,5 +1,7 @@
 package com.joyintech.tams.business.common.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.tams.business.common.entity.CfgDataTableShow;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -68,18 +70,21 @@ public class CfetsEtrFinProductInfoResponse {
     /**
      * 资产一级分类
      */
+    @ApiModelProperty(name = "assetTypeOne", value = "资产一级分类")
     private String assetTypeOne;
 
 
     /**
      * 资产二级分类
      */
+    @ApiModelProperty(name = "assetTypeTwo", value = "资产二级分类")
     private String assetTypeTwo;
 
 
     /**
      * 资产三级分类
      */
+    @ApiModelProperty(name = "assetTypeThree", value = "资产三级分类")
     private String assetTypeThree;
 
     /**
@@ -92,12 +97,14 @@ public class CfetsEtrFinProductInfoResponse {
      * 收益率，利息贴现为参考收益率，附息为票面利率
      */
     @ApiModelProperty(name = "referYield", value = "收益率，利息贴现为参考收益率，附息为票面利率")
+    @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal referYield;
 
     /**
      * 基准利率
      */
     @ApiModelProperty(name = "basicRate", value = "基准利率")
+    @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal basicRate;
 
     /**
@@ -110,6 +117,7 @@ public class CfetsEtrFinProductInfoResponse {
      * 利差
      */
     @ApiModelProperty(name = "bp", value = "利差")
+    @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal bp;
 
     /**
@@ -146,48 +154,56 @@ public class CfetsEtrFinProductInfoResponse {
      * 每标位最低投标量
      */
     @ApiModelProperty(name = "minPerTamt", value = "每标位最低投标量")
+    @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal minPerTamt;
 
     /**
      * 每标位最高投标量
      */
     @ApiModelProperty(name = "maxPerUtamt", value = "每标位最高投标量")
+    @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal maxPerUtamt;
 
     /**
      * 单笔最低认购量
      */
     @ApiModelProperty(name = "minPamt", value = "单笔最低认购量")
+    @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal minPamt;
 
     /**
      * 单笔最高认购量
      */
     @ApiModelProperty(name = "maxPamt", value = "单笔最高认购量")
+    @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal maxPamt;
 
     /**
      * 最高认购总量
      */
     @ApiModelProperty(name = "maxTotalamt", value = "最高认购总量")
+    @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal maxTotalamt;
 
     /**
      * 最高标位
      */
     @ApiModelProperty(name = "maxTamt", value = "最高标位")
+    @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal maxTamt;
 
     /**
      * 最低标位
      */
     @ApiModelProperty(name = "minTamt", value = "最低标位")
+    @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal minTamt;
 
     /**
      * 投标步长
      */
     @ApiModelProperty(name = "tenderUnit", value = "投标步长")
+    @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal tenderUnit;
 
     /**
@@ -200,6 +216,7 @@ public class CfetsEtrFinProductInfoResponse {
      * 最高投标总量
      */
     @ApiModelProperty(name = "maxTotalTender", value = "最高投标总量")
+    @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal maxTotalTender;
 
     /**
@@ -242,6 +259,7 @@ public class CfetsEtrFinProductInfoResponse {
      * 发行价格
      */
     @ApiModelProperty(name = "issuePrice", value = "发行价格")
+    @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal issuePrice;
 
     /**
@@ -277,7 +295,7 @@ public class CfetsEtrFinProductInfoResponse {
     /**
      * 上市代码
      */
-    @ApiModelProperty(name = "tenderTarget", value = "上市代码")
+    @ApiModelProperty(name = "appearMarketId", value = "上市代码")
     private String appearMarketId;
 
     /**
@@ -290,6 +308,7 @@ public class CfetsEtrFinProductInfoResponse {
      * 计划发行量
      */
     @ApiModelProperty(name = "planIssueAmt", value = "计划发行量")
+    @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal planIssueAmt;
 
     /**
@@ -325,6 +344,7 @@ public class CfetsEtrFinProductInfoResponse {
     /**
      * 发行人
      */
+    @ApiModelProperty(name = "issuerName", value = "发行人")
     private String issuerName;
 
     /**
@@ -374,7 +394,6 @@ public class CfetsEtrFinProductInfoResponse {
      */
     @ApiModelProperty(name = "couponSpecies", value = "息票品种")
     private String couponSpecies;
-
 
     public String getTitle() {
         return title;
