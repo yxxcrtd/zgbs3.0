@@ -2,7 +2,7 @@ package com.joyintech.tams.business.common.service;
 
 
 import com.joyintech.framework.base.BaseService;
-import com.joyintech.tams.business.common.dao.CfetsEtrFinProductInfoMapper;
+import com.joyintech.tams.business.common.dao.EtrCommonFinProductInfoMapper;
 import com.joyintech.tams.business.common.dto.CfetsEtrFinProductInfoRequest;
 import com.joyintech.tams.business.common.dto.CfetsEtrFinProductInfoResponse;
 import com.joyintech.tams.business.common.entity.CfgDataTableShow;
@@ -21,11 +21,11 @@ import java.util.Objects;
  *
  * @author zhuys
  * @@date 2022年04月14日
- * @see CfetsEtrFinProductInfoService
+ * @see EtrCommonFinProductInfoService
  * @since 1.0
  */
-@Service("CommonCfetsEtrFinProductInfoService")
-public class CfetsEtrFinProductInfoService extends BaseService {
+@Service("EtrCommonFinProductInfoService")
+public class EtrCommonFinProductInfoService extends BaseService {
 
     private static String SEPARATOR = "/";
     private static String AMPERS_AND = "&";
@@ -33,7 +33,7 @@ public class CfetsEtrFinProductInfoService extends BaseService {
     private static String COMM = ",";
 
     @Autowired
-    private CfetsEtrFinProductInfoMapper cfetsEtrFinProductInfoMapper;
+    private EtrCommonFinProductInfoMapper etrCommonFinProductInfoMapper;
     @Autowired
     private CfgDataTableService cfgDataTableService;
 
@@ -46,7 +46,7 @@ public class CfetsEtrFinProductInfoService extends BaseService {
      * @return
      */
     public CfetsEtrFinProductInfoResponse findFinProductInfo(String pageCode, String dtCode, CfetsEtrFinProductInfoRequest request) {
-        CfetsEtrFinProductInfoResponse finProductInfo = cfetsEtrFinProductInfoMapper.findFinProductInfo(request);
+        CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoMapper.findFinProductInfo(request);
         if (!Objects.isNull(finProductInfo)) {
             //标题
             finProductInfo.setTitle(finProductInfo.getFinprodId() + finProductInfo.getFinprodAbbr());
