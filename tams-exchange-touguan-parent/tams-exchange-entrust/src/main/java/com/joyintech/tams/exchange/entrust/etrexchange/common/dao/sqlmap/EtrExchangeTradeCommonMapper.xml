@@ -1818,5 +1818,59 @@
             and EXERCISE_DATE &gt; = #{sysDate,jdbcType=DATE}
     </select>
 
+    <!--组合持有资产业务模式查询 -->
+    <select id="selectAllBusModelList" parameterType="Map" resultType="com.joyintech.tams.business.common.pojo.BaseMap">
+        SELECT DISTINCT
+        INV_AIM AS businessModel,
+        PORTFOLIO_ID portfolioId,
+        FINPROD_ID finprodId
+        FROM
+        (
+        SELECT
+        PORTFOLIO_ID,
+        FINPROD_ID,
+        INV_AIM
+        FROM
+        (
+        SELECT
+        b.PORTFOLIO_ID,
+        a.FINPROD_ID,
+        a.INV_AIM,
+        ROW_NUMBER ( ) OVER ( PARTITION BY a.TRADE_ID ORDER BY a.TRADE_DATE DESC ) rn
+        FROM
+        TRD_PRODUCT_DEAL a
+        LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID = b.TRADE_ID
+        WHERE
+        1 = 1
+        AND a.TRADE_DATE <![CDATA[<=]]> to_date( #{ cdate, jdbcType = VARCHAR }, 'yyyy-MM-dd' )
+        )
+        WHERE
+        rn = 1 UNION ALL
+        SELECT
+        PORTFOLIO_ID,
+        FINPROD_ID,
+        INV_AIM
+        FROM
+        (
+        SELECT
+        b.PORTFOLIO_ID,
+        a.FINPROD_ID,
+        a.INV_AIM,
+        ROW_NUMBER ( ) OVER ( PARTITION BY a.TRADE_ID ORDER BY a.TRADE_DATE DESC ) rn
+        FROM
+        TRD_PRODUCT_TEMP_DEAL a
+        LEFT JOIN TRD_PRODUCT_TEMP_DEAL_ADD b ON a.TRADE_ID = b.TRADE_ID
+        WHERE
+        1 = 1
+        AND a.TRADE_DATE = to_date( #{ cdate, jdbcType = VARCHAR }, 'yyyy-MM-dd' )
+        )
+        WHERE
+        rn = 1
+        ) TMP
+        WHERE
+        TMP.portfolioId =#{ portfolioId,jdbcType = VARCHAR }
+        AND TMP.finprodId =#{ finprodId,jdbcType = VARCHAR }
+    </select>
+
 
 </mapper>

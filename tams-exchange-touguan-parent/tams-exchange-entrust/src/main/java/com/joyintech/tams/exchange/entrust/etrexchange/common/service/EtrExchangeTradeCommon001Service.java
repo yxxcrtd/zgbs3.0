@@ -6076,11 +6076,9 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         param.put("finprodId",secId);
         return etrExchangeTradeCommonMapper.queryAssetIsSppiTest(param);
     }
-
+    //组合持有资产业务模式查询
     public List<BaseMap> selectAllBusModelList(Map<String, Object> param) {
         // 初始化返回集合
-        List<BaseMap> resp = new ArrayList<>();
-        BaseMap bm = BaseMap.newMap(new HashMap());
-        return resp;
+        return  etrExchangeTradeCommonMapper.selectAllBusModelList(param);
     }
 }
