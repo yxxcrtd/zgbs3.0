@@ -5,6 +5,7 @@ import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.r
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface FinWindMarketInfoQueryMapper {
@@ -16,4 +17,12 @@ public interface FinWindMarketInfoQueryMapper {
      * @return
      */
     List<FinWindMarketInfoQuery001Dto> queryForPage(FinBondMarketInfoQueryRequest request);
+
+    /**
+     * 债券市场信息查询
+     *
+     * @param params
+     * @return
+     */
+    FinWindMarketInfoQuery001Dto queryFinWindMarketForCoupons(Map<String, Object> params);
 }

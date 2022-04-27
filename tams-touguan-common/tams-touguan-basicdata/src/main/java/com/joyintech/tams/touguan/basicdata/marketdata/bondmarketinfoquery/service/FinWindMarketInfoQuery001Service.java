@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 待上市债券市场信息查询服务类
@@ -48,5 +49,17 @@ public class FinWindMarketInfoQuery001Service extends BaseService {
         return new Page<>(PageInfo.of(finWindMarketInfoQuery001Dtos));
     }
 
+    /**
+     * 待上市加券市场信息查询
+     *
+     * @param param
+     * @return
+     */
+    public FinWindMarketInfoQuery001Dto queryFinWindMarketForCoupons(Map<String, Object> param) {
+        logger.info("queryFinBondMarketForCoupons >> 待上市加券市场信息查询参数：{}", JSON.toJSONString(param));
+        param.put("platformDate", iPlatformDate.getSysDateStr());
+        FinWindMarketInfoQuery001Dto finWindMarketInfoQuery001Dto = finWindMarketInfoQueryMapper.queryFinWindMarketForCoupons(param);
+        return finWindMarketInfoQuery001Dto;
+    }
 
 }
