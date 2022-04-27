@@ -293,7 +293,10 @@ public class CfetsInterfService {
         quoteBody.setQuoteTransType(this.convertSystemCodeToCfetsCode("quoteTransType",
             ibuQuoteBondDto.getTradeStatus()).charAt(0)); // 10272域-操作类型(N:新增,R:修改)
         quoteBody.setClOrdID(ibuQuoteBondDto.getQuoteId()); // 11域-客户参考编号
-        quoteBody.setOrigClOrdID(ibuQuoteBondDto.getQuoteId()); // 41域-原客户参考编号
+        if(StringUtil.equals(DictCodeList.银行间上行操作类型_本方修改发送,
+                bondDialogueQuoteDto.getIbuQuoteBondDto().getExeType())){
+            quoteBody.setOrigClOrdID(ibuQuoteBondDto.getQuoteId()); // 41域-原客户参考编号
+        }
         if (StringUtil.isNotBlank(ibuQuoteBondDto.getCfetsQuoteId())) {
             quoteBody.setQuoteID(ibuQuoteBondDto.getCfetsQuoteId()); // 117域-报价编号
         }
