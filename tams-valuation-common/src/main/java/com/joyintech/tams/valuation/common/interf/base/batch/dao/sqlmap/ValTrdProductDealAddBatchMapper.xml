@@ -23,6 +23,7 @@
         <result column="EXP_CON_VALUE" property="expConValue" jdbcType="DECIMAL" />
         <result column="DEPOSIT_AMT" property="depositAmt" jdbcType="DECIMAL" />
         <result column="R_FINPROD_ID" property="rFinprodId" jdbcType="VARCHAR" />
+        <result column="ISSUE_TYPE" property="issueType" jdbcType="VARCHAR" />
     </resultMap>
    <sql id="Base_Column_List" >
         TRADE_ID TRADE_ID, PORTFOLIO_ID PORTFOLIO_ID, CUSTOM_CASH_TYPE CUSTOM_CASH_TYPE, 
@@ -39,7 +40,7 @@
             ENTRUST_ID, PAY_TYPE, CREATE_USER, 
             CREATE_DEPT, CREATE_TIME, UPDATE_USER, 
             UPDATE_TIME, MP_FINPROD_ID, MP_BRANCH,
-            EXP_CON_VALUE,DEPOSIT_AMT, R_FINPROD_ID)
+            EXP_CON_VALUE,DEPOSIT_AMT, R_FINPROD_ID, ISSUE_TYPE)
         <foreach collection="list" item="item" separator="from dual union all select" open="select * from (select "
                  close=" from dual)">
             #{item.tradeId,jdbcType=VARCHAR}, #{item.portfolioId,jdbcType=VARCHAR}, #{item.customCashType,jdbcType=VARCHAR}, 
@@ -48,7 +49,8 @@
             #{item.entrustId,jdbcType=VARCHAR}, #{item.payType,jdbcType=VARCHAR}, #{item.createUser,jdbcType=VARCHAR}, 
             #{item.createDept,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateUser,jdbcType=VARCHAR}, 
             #{item.updateTime,jdbcType=TIMESTAMP}, #{item.mpFinprodId,jdbcType=VARCHAR}, #{item.mpBranch,jdbcType=DECIMAL},
-            #{item.expConValue,jdbcType=DECIMAL},#{item.depositAmt,jdbcType=DECIMAL}, #{item.rFinprodId,jdbcType=VARCHAR}
+            #{item.expConValue,jdbcType=DECIMAL},#{item.depositAmt,jdbcType=DECIMAL}, #{item.rFinprodId,jdbcType=VARCHAR},
+            #{item.issueType,jdbcType=VARCHAR}
         </foreach>
     </insert>
 </mapper>

@@ -1138,4 +1138,23 @@
 				AND T1.INT_RATE_ID = #{intRateId}
 </select>
 
+	<select id="getConfigListByType" resultType="com.joyintech.tams.common.base.entity.FinProductTypeConfig">
+		SELECT
+			T.SEQNO,
+			T.CONFIG_TYPE,
+			T.INPUT_VALUE_1,
+			T.INPUT_VALUE_2,
+			T.INPUT_VALUE_3,
+			T.INPUT_VALUE_4,
+			T.INPUT_VALUE_5,
+			T.OUTPUT_VALUE_1,
+			T.OUTPUT_VALUE_2,
+			T.OUTPUT_VALUE_3,
+			T.OUTPUT_VALUE_4,
+			T.OUTPUT_VALUE_5,
+			T.REMARK
+		FROM FIN_PRODUCT_TYPE_CONFIG A
+		WHERE A.CONFIG_TYPE = #{configType}
+	</select>
+
 </mapper>

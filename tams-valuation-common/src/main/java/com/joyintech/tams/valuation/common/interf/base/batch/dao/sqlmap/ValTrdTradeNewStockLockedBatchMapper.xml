@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.valuation.common.interf.base.batch.dao.ValTrdTradeNewStockLockedBatchMapper" >
+    <resultMap id="BaseResultMap" type="com.joyintech.tams.common.base.entity.TrdTradeNewStockLocked" >
+        <id column="TRADE_ID" property="tradeId" jdbcType="VARCHAR" />
+        <result column="BOOKSET_ID" property="booksetId" jdbcType="VARCHAR" />
+        <result column="FINPROD_ID" property="finprodId" jdbcType="VARCHAR" />
+        <result column="CCY" property="ccy" jdbcType="VARCHAR" />
+        <result column="SHARE_AMT" property="shareAmt" jdbcType="DECIMAL" />
+        <result column="UNIT_CPRICE" property="unitCprice" jdbcType="DECIMAL" />
+        <result column="START_DATE" property="startDate" jdbcType="DATE" />
+        <result column="END_DATE" property="endDate" jdbcType="DATE" />
+        <result column="TOTAL_DAYS" property="totalDays" jdbcType="DECIMAL" />
+        <result column="EXP_DATE" property="expDate" jdbcType="DATE" />
+        <result column="M_TRADE_ID" property="mTradeId" jdbcType="VARCHAR" />
+        <result column="GEN_TYPE" property="genType" jdbcType="VARCHAR" />
+        <result column="CREATE_USER" property="createUser" jdbcType="VARCHAR" />
+        <result column="CREATE_DEPT" property="createDept" jdbcType="VARCHAR" />
+        <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
+        <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+        TRADE_ID TRADE_ID, BOOKSET_ID BOOKSET_ID, FINPROD_ID FINPROD_ID, CCY CCY, SHARE_AMT SHARE_AMT,
+        UNIT_CPRICE UNIT_CPRICE, START_DATE START_DATE, END_DATE END_DATE, TOTAL_DAYS TOTAL_DAYS,
+        EXP_DATE EXP_DATE, M_TRADE_ID M_TRADE_ID, GEN_TYPE GEN_TYPE, CREATE_USER CREATE_USER,
+        CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME
+    </sql>
+    <insert id="insertBatch" parameterType="java.util.List" >
+        insert into TRD_TRADE_NEW_STOCK_LOCKED (TRADE_ID, BOOKSET_ID, FINPROD_ID,
+            CCY, SHARE_AMT, UNIT_CPRICE,
+            START_DATE, END_DATE, TOTAL_DAYS,
+            EXP_DATE, M_TRADE_ID, GEN_TYPE,
+            CREATE_USER, CREATE_DEPT, CREATE_TIME,
+            UPDATE_USER, UPDATE_TIME)
+        <foreach collection="list" item="item" separator="from dual union all select" open="select * from (select "
+                 close=" from dual)">
+            #{item.tradeId,jdbcType=VARCHAR}, #{item.booksetId,jdbcType=VARCHAR}, #{item.finprodId,jdbcType=VARCHAR},
+            #{item.ccy,jdbcType=VARCHAR}, #{item.shareAmt,jdbcType=DECIMAL}, #{item.unitCprice,jdbcType=DECIMAL},
+            #{item.startDate,jdbcType=DATE}, #{item.endDate,jdbcType=DATE}, #{item.totalDays,jdbcType=DECIMAL},
+            #{item.expDate,jdbcType=DATE}, #{item.mTradeId,jdbcType=VARCHAR}, #{item.genType,jdbcType=VARCHAR},
+            #{item.createUser,jdbcType=VARCHAR}, #{item.createDept,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP},
+            #{item.updateUser,jdbcType=VARCHAR}, #{item.updateTime,jdbcType=TIMESTAMP}
+        </foreach>
+    </insert>
+    
+     <delete id="deleteBatch" parameterType="java.util.List" >
+             delete from TRD_TRADE_NEW_STOCK_LOCKED
+        where M_TRADE_ID IN
+             <foreach collection="list" item="item" index="index" separator="," open="("
+                      close=")">
+                 <if test="(index % 500) == 499">
+                     null) OR M_TRADE_ID in (
+                 </if>
+                 #{item.mTradeId}
+             </foreach>
+    </delete>
+
+</mapper>

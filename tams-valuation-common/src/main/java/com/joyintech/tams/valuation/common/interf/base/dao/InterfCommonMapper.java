@@ -354,4 +354,10 @@ public interface InterfCommonMapper {
      */
     MstIntRateInfo getMstIntRateInfo(Map<String,Object> paramMap);
 
+    /**
+     * 根据配置类型查询配置信息List
+     * @param configType 配置类型
+     * @return 配置信息List
+     */
+    public List<FinProductTypeConfig> getConfigListByType(@Param("configType") String configType);
 }

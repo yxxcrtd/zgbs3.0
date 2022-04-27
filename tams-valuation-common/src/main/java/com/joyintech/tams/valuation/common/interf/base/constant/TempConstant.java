@@ -383,5 +383,20 @@ public class TempConstant {
 
 
 
+    /**
+     * 股票交易
+     */
+    public static final String 股票交易= "ValStockDeal";
+
+    /**
+     * 股票上市流通
+     */
+    public static final String 股票上市流通= "ValStockCirculate";
+
+    /**
+     * 股票存续期交易
+     */
+    public static final String 股票存续期交易= "ValStockPeriodDeal";
+
 }
 

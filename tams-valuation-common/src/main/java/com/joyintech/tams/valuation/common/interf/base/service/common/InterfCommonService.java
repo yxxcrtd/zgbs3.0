@@ -7936,6 +7936,14 @@ public class InterfCommonService {
 
     }
 
+    /**
+     * 查询映射配置信息
+     * @param configType 配置类型
+     * @return
+     */
+    public List<FinProductTypeConfig> getConfigListByType(String configType){
+        return mapper.getConfigListByType(configType);
+    }
 
 
 }

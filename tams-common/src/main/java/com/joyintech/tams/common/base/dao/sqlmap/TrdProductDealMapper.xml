@@ -69,6 +69,7 @@
         <result column="IS_SWAP_TRANSACTION" property="isSwapTransaction" jdbcType="VARCHAR" />
         <result column="SEAT_ID" property="seatId" jdbcType="VARCHAR" />
         <result column="SETTLEMEN_TYPE" property="settlemenType" jdbcType="VARCHAR" />
+        <result column="ISSUE_TYPE" property="issueType" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
         TRADE_ID TRADE_ID, BUSI_TYPE BUSI_TYPE, FINPROD_ID FINPROD_ID, FINPROD_TYPE FINPROD_TYPE, 
@@ -89,7 +90,8 @@
         IS_SWAP_TRANSACTION IS_SWAP_TRANSACTION, SEAT_ID SEAT_ID, SETTLEMEN_TYPE SETTLEMEN_TYPE,
         HK_MARKET HK_MARKET, BUY_SETTLE_RATE BUY_SETTLE_RATE, SELL_SETTLE_RATE SELL_SETTLE_RATE, DEAL_AMT DEAL_AMT,
         COMMISSION COMMISSION, STAMPDUTY STAMPDUTY, TRANSACTION_LEVY TRANSACTION_LEVY, TRANSACTION_FEE TRANSACTION_FEE,
-        TRANSACTION_SYSTEM_FEE TRANSACTION_SYSTEM_FEE, SHARE_PAYMENT_FEE SHARE_PAYMENT_FEE, YESTERDAY_POSITION YESTERDAY_POSITION
+        TRANSACTION_SYSTEM_FEE TRANSACTION_SYSTEM_FEE, SHARE_PAYMENT_FEE SHARE_PAYMENT_FEE, YESTERDAY_POSITION YESTERDAY_POSITION,
+        ISSUE_TYPE ISSUE_TYPE
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -137,7 +139,7 @@
             HK_MARKET, BUY_SETTLE_RATE, SELL_SETTLE_RATE, 
             DEAL_AMT, COMMISSION, STAMPDUTY, TRANSACTION_LEVY, 
             TRANSACTION_FEE, TRANSACTION_SYSTEM_FEE, SHARE_PAYMENT_FEE, 
-            YESTERDAY_POSITION
+            YESTERDAY_POSITION, ISSUE_TYPE
             )
         values (#{tradeId,jdbcType=VARCHAR}, #{busiType,jdbcType=VARCHAR}, #{finprodId,jdbcType=VARCHAR}, 
             #{finprodType,jdbcType=VARCHAR}, #{finprodType2,jdbcType=VARCHAR}, #{branch,jdbcType=DECIMAL}, 
@@ -164,8 +166,8 @@
             #{hkMarket,jdbcType=VARCHAR}, #{buySettleRate,jdbcType=DECIMAL}, #{sellSettleRate,jdbcType=DECIMAL},
             #{dealAmt,jdbcType=DECIMAL}, #{commission,jdbcType=DECIMAL}, #{stampDuty,jdbcType=DECIMAL}, #{transactionLevy,jdbcType=DECIMAL},
             #{transactionFee,jdbcType=DECIMAL}, #{transactionSystemFee,jdbcType=DECIMAL}, #{sharePaymentFee,jdbcType=DECIMAL}, 
-            #{yesterdayPosition,jdbcType=DECIMAL}
-            )
+            #{yesterdayPosition,jdbcType=DECIMAL}, #{issueType,jdbcType=VARCHAR},
+               )
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.TrdProductDeal" >
         insert into TRD_PRODUCT_DEAL
@@ -410,6 +412,9 @@
             <if test="cancelDate != null" >
                 CANCEL_DATE,
             </if>
+            <if test="issueType != null" >
+                ISSUE_TYPE,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="tradeId != null" >
@@ -652,6 +657,9 @@
             <if test="cancelDate != null" >
                 #{cancelDate,jdbcType=DATE},
             </if>
+            <if test="issueType != null" >
+                #{issueType,jdbcType=VARCHAR},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.TrdProductDeal" >
@@ -666,7 +674,8 @@
         SALE_CODE, ACCR_NUM, TG_BUSI_TYPE, PS_PAYMENT, SPLIT_TRADE_ID, IS_SWAP_TRANSACTION, 
         SEAT_ID, SETTLEMEN_TYPE,
         HK_MARKET, BUY_SETTLE_RATE, SELL_SETTLE_RATE, DEAL_AMT, COMMISSION, STAMPDUTY,
-        TRANSACTION_LEVY, TRANSACTION_FEE, TRANSACTION_SYSTEM_FEE, SHARE_PAYMENT_FEE, YESTERDAY_POSITION)
+        TRANSACTION_LEVY, TRANSACTION_FEE, TRANSACTION_SYSTEM_FEE, SHARE_PAYMENT_FEE, YESTERDAY_POSITION,
+        ISSUE_TYPE)
         select TRADE_ID, BUSI_TYPE, FINPROD_ID, FINPROD_TYPE, FINPROD_TYPE2, 
             BRANCH, TRADE_DATE, VDATE, MDATE, SETTLE_DATE, SETTLE_SPEED, CCY, CPRICE_DATE, UNIT_CPRICE, 
             UNIT_INT, UNIT_FPRICE, PAR_VALUE, CPRICE_AMT, SHARE_AMT, PRIN_AMT, INT_AMT, FPRICE_AMT, 
@@ -678,7 +687,7 @@
             SALE_CODE, ACCR_NUM, TG_BUSI_TYPE, PS_PAYMENT, SPLIT_TRADE_ID, IS_SWAP_TRANSACTION, 
             SEAT_ID, SETTLEMEN_TYPE,
             HK_MARKET, BUY_SETTLE_RATE, SELL_SETTLE_RATE, DEAL_AMT, COMMISSION, STAMPDUTY,
-        	TRANSACTION_LEVY, TRANSACTION_FEE, TRANSACTION_SYSTEM_FEE, SHARE_PAYMENT_FEE, YESTERDAY_POSITION
+        	TRANSACTION_LEVY, TRANSACTION_FEE, TRANSACTION_SYSTEM_FEE, SHARE_PAYMENT_FEE, YESTERDAY_POSITION,ISSUE_TYPE
              from TRD_PRODUCT_DEAL
              where 1 = 1 and TRADE_ID = #{tradeId,jdbcType=VARCHAR}
     </insert>
@@ -907,6 +916,9 @@
             <if test="yesterdayPosition != null" >
                 YESTERDAY_POSITION = #{yesterdayPosition,jdbcType=DECIMAL},
             </if>
+            <if test="issueType != null" >
+                ISSUE_TYPE = #{issueType,jdbcType=VARCHAR},
+            </if>
         </set>
         where TRADE_ID = #{tradeId,jdbcType=VARCHAR}
     </update>
@@ -987,6 +999,7 @@
             SHARE_PAYMENT_FEE = #{sharePaymentFee,jdbcType=DECIMAL},
             YESTERDAY_POSITION = #{yesterdayPosition,jdbcType=DECIMAL},
             CANCEL_DATE = #{cancelDate,jdbcType=DATE}
+            ISSUE_TYPE = #{issueType,jdbcType=DATE}
         where TRADE_ID = #{tradeId,jdbcType=VARCHAR}
     </update>
     
