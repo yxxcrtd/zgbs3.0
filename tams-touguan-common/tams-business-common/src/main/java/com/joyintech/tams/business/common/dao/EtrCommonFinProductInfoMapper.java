@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
  * 债券信息mapper
  */
 @Repository
-public interface CfetsEtrFinProductInfoMapper {
+public interface EtrCommonFinProductInfoMapper {
 
 
     /**
