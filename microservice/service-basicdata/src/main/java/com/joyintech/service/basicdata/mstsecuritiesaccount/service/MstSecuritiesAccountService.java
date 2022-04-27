@@ -377,6 +377,7 @@ public class MstSecuritiesAccountService extends BaseService<MstSecuritiesAccoun
         map.put("SHARES_TRADE_PLATFORM_02", DictCodeList.交易平台_竞价撮合平台.getValue());
         map.put("SHARES_TRADE_PLATFORM_03", DictCodeList.交易平台_固定收益平台.getValue());
         map.put("SHARES_TRADE_PLATFORM_04", DictCodeList.交易平台_大宗交易平台.getValue());
+        map.put("SHARES_TRADE_PLATFORM_99", DictCodeList.交易平台_其它.getValue());
         // 交易场所
         map.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
         map.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
@@ -389,11 +390,11 @@ public class MstSecuritiesAccountService extends BaseService<MstSecuritiesAccoun
         map.put("FINPROD_OTH_CODE_TYPE_06", DictCodeListExt3.金融产品其他代码类型_配股代码.getValue());
         map.put("FINPROD_OTH_CODE_TYPE_07", DictCodeListExt3.金融产品其他代码类型_新股申购代码.getValue());
         map.put("FINPROD_TYPE_TG_F01_B14", DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue());
-        if (StringUtil.isNotEmpty(map.get("tradePlat"))
-                && StringUtil.equals(map.get("tradePlat").toString(),DictCodeList.交易平台_非交易业务指令平台.getValue())){
-            map.put("tradePlat", DictCodeList.交易平台_竞价撮合平台.getValue());
-            map.remove("SHARES_TRADE_PLATFORM_02");
-        }
+//        if (StringUtil.isNotEmpty(map.get("tradePlat"))
+//                && StringUtil.equals(map.get("tradePlat").toString(),DictCodeList.交易平台_非交易业务指令平台.getValue())){
+//            map.put("tradePlat", DictCodeList.交易平台_竞价撮合平台.getValue());
+//            map.remove("SHARES_TRADE_PLATFORM_02");
+//        }
         String entrustBussType=StringUtil.isNotEmpty(map.get("entrustBussType"))?map.get("entrustBussType").toString():"";
         if(StringUtil.isNotEmpty(entrustBussType)&&
                 (DictCodeListExt3.上农商_指令业务类型_债券回售指令.getValue().equals(entrustBussType)
@@ -430,7 +431,8 @@ public class MstSecuritiesAccountService extends BaseService<MstSecuritiesAccoun
         map.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
         map.put("FINPROD_TYPE_TG_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         map.put("FINPROD_TYPE_TG_ZYSHG", "ZYSHG");
-        map.put("CUSTOM_ASSET_TYPE_FOUR_013", DictCodeListExt3.行内资产四级分类_可转债.getValue()); // 可转债
+        map.put("type6_B14",DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue());
+//        map.put("CUSTOM_ASSET_TYPE_FOUR_013", DictCodeListExt3.行内资产四级分类_可转债.getValue()); // 可转债
         Map pageMode = (Map) map.get("pageMode");
         if(pageMode != null) { // 设置导出条数
             if(pageMode.get("pageNo")!=null){

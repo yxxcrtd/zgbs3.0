@@ -103,9 +103,9 @@
         searchOnInit: true,
         checkbox:false,
         addclick: function(row) {
-            if(SHOW_INVAIM_OR_BUSSINSSMODEL=='01'){
-                row.invAim = $('#invAim').val();
-            }
+            // if(SHOW_INVAIM_OR_BUSSINSSMODEL=='01'){
+            //     row.invAim = $('#invAim').val();
+            // }
             // else{
             //     row.businessModel = $('#businessModel').val();
             //     if($('#businessModel').val()=="Y1"){

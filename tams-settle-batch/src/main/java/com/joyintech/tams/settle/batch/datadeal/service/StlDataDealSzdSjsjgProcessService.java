@@ -11,6 +11,7 @@ import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.redisinit.dto.ImplCalendar;
+import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
 import com.joyintech.tams.settle.batch.datacreate.constant.StlDataCreateConstant;
 import com.joyintech.tams.settle.batch.datadeal.constant.StlDataDealProcessConstant;
 import com.joyintech.tams.settle.batch.datadeal.dao.StlDownDataDealMapper;
@@ -92,6 +93,9 @@ public class StlDataDealSzdSjsjgProcessService {
 
     @Autowired
     protected FinProductMapper finProductMapper;
+
+    @Autowired
+    protected TrdCommonBaseService trdCommonBaseService;
 
   /*  @Autowired
     protected ICalendar iCalendar;*/
@@ -674,7 +678,7 @@ public class StlDataDealSzdSjsjgProcessService {
                 // 起息日
                 settleTransData.setVdate(DateUtil.parse(szdSjsjg.getJgqtrq()));
                 // 查询首期
-                List<SettleTransData> sqSettleTransDatas = stlDownDataDealMapper.selectSqSettleTransDatas(
+                List<SettleTransData> sqSettleTransDatas = trdCommonBaseService.selectSqSettleTransDatas(
                         settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId(),
                         settleTransData.getVdate());
                 if(CollectionUtils.isNotEmpty(sqSettleTransDatas)){
@@ -753,7 +757,7 @@ public class StlDataDealSzdSjsjgProcessService {
             // settleTransData.setmTradeAmt(settleTransData.getPrinAmt());
             settleTransData.setmTradeAmt(abs(szdSjsjg.getJgzjje()));
             // 查询首期清算数据
-            List<SettleTransData> sqSettleTransDatas = stlDownDataDealMapper.selectSqSettleTransDatas(
+            List<SettleTransData> sqSettleTransDatas = trdCommonBaseService.selectSqSettleTransDatas(
                     settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId(),
                     settleTransData.getVdate());
             if(CollectionUtils.isNotEmpty(sqSettleTransDatas)){

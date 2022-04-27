@@ -269,6 +269,11 @@ public class EtrExchangeTradeEtrExchangeSecRepoResponse {
     @ApiModelProperty(name="expConNum",value="预计转换股数")
     private BigDecimal expConNum;
 
+    /**
+     * 交易方式
+     */
+    private String dealMode;
+
     public String getFinprodId() {
         return finprodId;
     }
@@ -789,5 +794,13 @@ public class EtrExchangeTradeEtrExchangeSecRepoResponse {
 
     public void setExpConNum(BigDecimal expConNum) {
         this.expConNum = expConNum;
+    }
+
+    public String getDealMode() {
+        return dealMode;
+    }
+
+    public void setDealMode(String dealMode) {
+        this.dealMode = dealMode;
     }
 }

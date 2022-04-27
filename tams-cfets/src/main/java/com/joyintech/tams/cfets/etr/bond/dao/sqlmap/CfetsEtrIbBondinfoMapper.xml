@@ -481,7 +481,7 @@ from
                     SELECT FINPROD_ID, PORTFOLIO_ID, INV_AIM
                     FROM (
                         select
-                        a.INV_AIM , a.TRADE_DATE ,a.FINPROD_ID,b.PORTFOLIO_ID,
+                        a.BUSINESS_MODEL as INV_AIM , a.TRADE_DATE ,a.FINPROD_ID,b.PORTFOLIO_ID,
                         ROW_NUMBER () over(
                         PARTITION BY a.TRADE_ID
                         ORDER BY a.TRADE_DATE DESC
@@ -501,7 +501,7 @@ from
                         AND a.TRADE_DATE &lt;= to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd') - 1
                     ) WHERE rn = 1
                     UNION
-                    SELECT a.FINPROD_ID, b.PORTFOLIO_ID, a.INV_AIM
+                    SELECT a.FINPROD_ID, b.PORTFOLIO_ID, a.BUSINESS_MODEL as INV_AIM
                     from TRD_PRODUCT_DEAL a
                     LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
                     WHERE 1=1
@@ -1026,7 +1026,7 @@ from
         T1.PS ps,
         NVL(T1.ENTRUST_NUM,0) / 100 shareNum,
         T1.PRICE_MODEL priceModel,
-        T1.INV_AIM as busiModel,
+        T1.BUSINESS_MODEL as busiModel,
         T1.PRICE unitPrice,
         T7.FULL_PRICE allPrice,
         T7.MATURE_YIELD*100 matureYield,
@@ -1179,7 +1179,7 @@ from
         T1.PS ps,
         NVL(T1.ENTRUST_NUM,0) / 100 shareNum,
         T1.PRICE_MODEL priceModel,
-        T1.INV_AIM as busiModel,
+        T1.BUSINESS_MODEL as busiModel,
         T1.PRICE unitPrice,
         T7.FULL_PRICE allPrice,
         T7.MATURE_YIELD*100 matureYield,

@@ -6,13 +6,33 @@ import org.hibernate.validator.constraints.NotBlank;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel(value = "我收到的协商成交行情返回报文", description = "我收到的协商成交行情返回报文")
+@ApiModel(value = "我收到的协商成交行情请求报文", description = "我收到的协商成交行情请求报文")
 public class NegotiateQuoteQueryBean {
 	
-	@ApiModelProperty(name = "requestStatus", value = "请求状态(1：待确认  3：已撤销 4：已成交 )")
+	@ApiModelProperty(name = "requestStatus", value = "请求状态(1：待确认 2：已回复 3：已撤销 4：已成交 )")
     private int requestStatus;
+
     @ApiModelProperty(name = "stockCode", value = "证券代码")
     private String stockCode;
+
+	@NotBlank(message = "买卖方向不能为空")
+    @ApiModelProperty(name = "side", value = "买卖方向")
+    private String side;
+
+//	@NotBlank(message = "本方交易员代码不能为空")
+    @ApiModelProperty(name = "traderCode", value = "本方交易员代码")
+    private String traderCode;
+
+//	@NotBlank(message = "本方交易主体代码不能为空")
+    @ApiModelProperty(name = "investorId", value = "本方交易主体代码")
+    private String investorId;
+
+//	@NotBlank(message = "本方交易商代码不能为空")
+	@ApiModelProperty(name = "memberId", value = "本方交易商代码")
+	private String memberId;
+    
+    @ApiModelProperty(name = "confirmId", value = "约定号(当交易主体类型为03或04时必须送值)")
+    private String confirmId;
     
     @ApiModelProperty(name = "exchangeType", value = "交易类别（1-上海，2-深圳）", example = "2")
     @NotBlank(message = "交易类别不能为空")
@@ -22,7 +42,7 @@ public class NegotiateQuoteQueryBean {
     @NotBlank(message = "网点账号不能为空")
     private String accountId;
 
-    @ApiModelProperty(name = "pageSize", value = "记录数", example = "100")
+    @ApiModelProperty(name = "pageSize", value = "记录数", example = "1000")
     private int pageSize;
     
 	public int getRequestStatus() {
@@ -55,5 +75,36 @@ public class NegotiateQuoteQueryBean {
 	public void setPageSize(int pageSize) {
 		this.pageSize = pageSize;
 	}
-    
+	public String getSide() {
+		return side;
+	}
+	public void setSide(String side) {
+		this.side = side;
+	}
+	public String getTraderCode() {
+		return traderCode;
+	}
+	public void setTraderCode(String traderCode) {
+		this.traderCode = traderCode;
+	}
+	public String getInvestorId() {
+		return investorId;
+	}
+	public void setInvestorId(String investorId) {
+		this.investorId = investorId;
+	}
+	public String getConfirmId() {
+		return confirmId;
+	}
+	public void setConfirmId(String confirmId) {
+		this.confirmId = confirmId;
+	}
+
+	public String getMemberId() {
+		return memberId;
+	}
+
+	public void setMemberId(String memberId) {
+		this.memberId = memberId;
+	}
 }

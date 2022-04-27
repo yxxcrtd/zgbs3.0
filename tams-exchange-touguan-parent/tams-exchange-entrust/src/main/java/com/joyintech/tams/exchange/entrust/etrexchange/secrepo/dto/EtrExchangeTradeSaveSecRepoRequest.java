@@ -770,7 +770,7 @@ public class EtrExchangeTradeSaveSecRepoRequest extends EtrEntrust implements Pr
     /**
      * 交易方式
      */
-    @ApiModelProperty(name="dealMode",value="指定交易方式",example="01")
+    @ApiModelProperty(name="dealMode",value="指定交易方式",example="0")
     private String dealMode;
 
     public String getDealMode() {

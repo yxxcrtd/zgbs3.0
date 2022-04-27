@@ -155,13 +155,15 @@ public class CfgDataTableService {
         List<CfgDataTableShow> list;
         //获取登录用户的ID
         //区分投资目的和业务模式
-        String showInvaimOrBussinssmodel =CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
+//        String showInvaimOrBussinssmodel =CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
         String userId = SecurityUtil.getLoginUser().getUserName();
         CfgDataTableShowFlag flag = cfgDataTableFlagMapper.getByPageCodeAndDtCodes(pageCode, dtCode, spcdCodes, userId);
         if (null == flag) {
-            list = cfgDataTableMapper.getBySpcdCodesshowInvaim(pageCode, dtCode, spcdCodes, EFFERANGE_NO, USER_ID,showInvaimOrBussinssmodel);
+//            list = cfgDataTableMapper.getBySpcdCodesshowInvaim(pageCode, dtCode, spcdCodes, EFFERANGE_NO, USER_ID,showInvaimOrBussinssmodel);
+            list = cfgDataTableMapper.getBySpcdCodesshowInvaim(pageCode, dtCode, spcdCodes, EFFERANGE_NO, USER_ID,null);
         } else {
-            list = cfgDataTableMapper.getBySpcdCodesshowInvaim(pageCode, dtCode, spcdCodes, EFFERANGE_IS, userId,showInvaimOrBussinssmodel);
+//            list = cfgDataTableMapper.getBySpcdCodesshowInvaim(pageCode, dtCode, spcdCodes, EFFERANGE_IS, userId,showInvaimOrBussinssmodel);
+            list = cfgDataTableMapper.getBySpcdCodesshowInvaim(pageCode, dtCode, spcdCodes, EFFERANGE_IS, userId,null);
         }
         return list;
     }

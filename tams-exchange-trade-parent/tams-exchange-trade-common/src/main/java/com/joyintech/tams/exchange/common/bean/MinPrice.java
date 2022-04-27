@@ -38,7 +38,7 @@ public class MinPrice implements Serializable {
 
     @SuppressWarnings("all")
     @ApiModelProperty(required = false, name = "minPrice", value = "最小价差")
-    private BigDecimal minPrice = new BigDecimal("0.00");
+    private BigDecimal minPrice = new BigDecimal("0.0001");
 
     @ApiModelProperty(required = false, name = "effDate", value = "生效日")
     private Date effDate;

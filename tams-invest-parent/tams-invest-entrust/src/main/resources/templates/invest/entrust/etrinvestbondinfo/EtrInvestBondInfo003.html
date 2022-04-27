@@ -161,18 +161,18 @@
                                     </div>
                                 </div>
                                 <div class="layui-form-item">
-                                    <div   th:if="${SHOW_INVAIM_OR_BUSSINSSMODEL} =='01' "  class="form-inline-wrap">
-                                        <label class="layui-form-label form-lable" data-th-text="#{EtrInvestBondInfo002.invAim}">投资目的</label>
-                                        <div class="layui-input-inline input-inline">
-                                            <select type="text" id="invAim" name="invAim"
-                                                class="layui-input form-input input-select"
-                                                data-th-data-result='${INV_AIM}' allowClear="true"
-                                                placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"
-                                                formatoption="true"
-                                                data-th-initValue="${entity?.invAim}">
-                                            </select>
-                                        </div>
-                                    </div>
+<!--                                    <div   th:if="${SHOW_INVAIM_OR_BUSSINSSMODEL} =='01' "  class="form-inline-wrap">-->
+<!--                                        <label class="layui-form-label form-lable" data-th-text="#{EtrInvestBondInfo002.invAim}">投资目的</label>-->
+<!--                                        <div class="layui-input-inline input-inline">-->
+<!--                                            <select type="text" id="invAim" name="invAim"-->
+<!--                                                class="layui-input form-input input-select"-->
+<!--                                                data-th-data-result='${INV_AIM}' allowClear="true"-->
+<!--                                                placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"-->
+<!--                                                formatoption="true"-->
+<!--                                                data-th-initValue="${entity?.invAim}">-->
+<!--                                            </select>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
                                     <!--<div th:if="${SHOW_INVAIM_OR_BUSSINSSMODEL} =='02' " class="form-inline-wrap" >
                                         <label class="layui-form-label form-label-wrap"
                                                data-th-text="#{EtrBondFirstLBidding002.businessModel}">业务模式</label>
@@ -383,7 +383,7 @@
             var entrustAmtUnit = /*[[${entrustAmtUnit}]]*/'';
             //配置单位 add by yeming 20210721 end
             //展示投资目的或业务模式参数
-            var SHOW_INVAIM_OR_BUSSINSSMODEL =  /*[[${SHOW_INVAIM_OR_BUSSINSSMODEL}]]*/'';
+            // var SHOW_INVAIM_OR_BUSSINSSMODEL =  /*[[${SHOW_INVAIM_OR_BUSSINSSMODEL}]]*/'';
             var BUSINESS_MODEL = /*[[${BUSINESS_MODEL}]]*/'';
             var PRICEMODEL_03 = /*[[${PRICEMODEL_03}]]*/'PRM03';
         </script>

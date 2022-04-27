@@ -6066,4 +6066,19 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         return busiTypePosition;
     }
 
+
+    //查询资产是否进行了SPPI测试
+    public SppiImportData queryAssetIsSppiTest(String secId) {
+        if(!StringUtil.isNotEmpty(secId)){
+            return null;
+        }
+        Map<String, Object> param =new HashMap<>();
+        param.put("finprodId",secId);
+        return etrExchangeTradeCommonMapper.queryAssetIsSppiTest(param);
+    }
+    //组合持有资产业务模式查询
+    public List<BaseMap> selectAllBusModelList(Map<String, Object> param) {
+        // 初始化返回集合
+        return  etrExchangeTradeCommonMapper.selectAllBusModelList(param);
+    }
 }

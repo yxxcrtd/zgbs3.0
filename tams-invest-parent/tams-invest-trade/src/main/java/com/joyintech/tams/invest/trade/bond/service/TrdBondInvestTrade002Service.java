@@ -2350,19 +2350,19 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
             validMessageList.add(validMessage);
         }
         // 投资目的
-        if(StringUtil.equals(CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL"),"02")){
+//        if(StringUtil.equals(CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL"),"02")){
             if (StringUtil.isBlank(dto.getInvAim())) {
                 ValidMessage validMessage = new ValidMessage("invAim",
                         getMessage("BUSS_COM_E_0038", getMessage("EtrBondFirstLBidding002.businessModel")));
                 validMessageList.add(validMessage);
             }
-        }else{
-            if (StringUtil.isBlank(dto.getInvAim())) {
-                ValidMessage validMessage = new ValidMessage("invAim",
-                        getMessage("BUSS_COM_E_0038", getMessage("EtrBondFirstLBidding002.invAim")));
-                validMessageList.add(validMessage);
-            }
-        }
+//        }else{
+//            if (StringUtil.isBlank(dto.getInvAim())) {
+//                ValidMessage validMessage = new ValidMessage("invAim",
+//                        getMessage("BUSS_COM_E_0038", getMessage("EtrBondFirstLBidding002.invAim")));
+//                validMessageList.add(validMessage);
+//            }
+//        }
         // 3.劵面总额
         if (dto.getTradeAmt() == null) {
             ValidMessage validMessage = new ValidMessage("tradeAmt",

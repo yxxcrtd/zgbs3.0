@@ -33,6 +33,7 @@ import com.joyintech.tams.invest.trade.exchangetransmatch.common.dao.ExchangeTra
 import com.joyintech.tams.invest.trade.exchangetransmatch.common.dto.CommonTrdTempDto;
 import com.joyintech.tams.invest.trade.exchangetransmatch.common.dto.ExchangeTransMatchBaseTradeDto;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -391,47 +392,33 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
      * 获取回购首期交易
      * @param fCjbh
      * @param vdate
-     * @param ps
-     * @param portfolioId
+     * @param seatNumber
+     * @param secAcctId
      * @return
      */
-    public TrdProductDeal getFirstRepoTrade(String fCjbh,Date vdate,String ps,String portfolioId) {
-        Map<String,Object> queryMap = new HashMap<>();
-        queryMap.put("fCjbh",fCjbh);
-        queryMap.put("vdate",vdate);
-        queryMap.put("ps",ps);
-        queryMap.put("portfolioId",portfolioId);
-        return exchangeTransMatchCommonMapper.getFirstRepoTrade(queryMap);
+    public TrdProductDeal getFirstRepoTrade(String fCjbh, Date vdate, String seatNumber, String secAcctId) {
+        return trdCommonBaseService.getFirstRepoTrade(fCjbh, seatNumber, secAcctId, vdate);
     }
 
     /**
-     * 获取回购首期交易
+     * 获取回购首期质押品
      * @param fCjbh
      * @param vdate
+     * @param seatNumber
+     * @param secAcctId
      * @return
      */
-    public SettleTransData getFirstRepoSettleTransData(String fCjbh,Date vdate) {
-        Map<String,Object> queryMap = new HashMap<>();
-        queryMap.put("fCjbh",fCjbh);
-        queryMap.put("vdate",vdate);
-        queryMap.put("BUSI_SCENE_CALSS_0902RS02",DictCodeListStl.业务场景分类明细_债券协议正回购_首期_买入.getValue());
-        queryMap.put("BUSI_SCENE_CALSS_0902RB01",DictCodeListStl.业务场景分类明细_债券协议逆回购_首期_买入.getValue());
-        return exchangeTransMatchCommonMapper.getFirstRepoSettleTransData(queryMap);
-    }
-
-    /**
-     * 获取回购首期交易
-     * @param fCjbh
-     * @param vdate
-     * @param portfolioId
-     * @return
-     */
-    public List<FinDealPledge> getFirstRepoFinDealPledge(String fCjbh,Date vdate,String portfolioId) {
-        Map<String,Object> queryMap = new HashMap<>();
-        queryMap.put("fCjbh",fCjbh);
-        queryMap.put("vdate",vdate);
-        queryMap.put("portfolioId",portfolioId);
-        return exchangeTransMatchCommonMapper.getFirstRepoFinDealPledge(queryMap);
+    public List<FinDealPledge> getFirstRepoFinDealPledge(String fCjbh, Date vdate, String seatNumber, String secAcctId) {
+        // 查询首期清算数据
+        List<SettleTransData> settleTransDatas = trdCommonBaseService.selectSqSettleTransDatas(fCjbh, seatNumber,
+                secAcctId, vdate);
+        if(CollectionUtils.isNotEmpty(settleTransDatas)){
+            // 查询首期交易质押品
+            Map<String,Object> queryMap = new HashMap<>();
+            queryMap.put("fCjbh",settleTransDatas.get(0).getTradeId());
+            return exchangeTransMatchCommonMapper.getFirstRepoFinDealPledge(queryMap);
+        }
+        return new ArrayList<>();
     }
 
     public TrdDealTotalAdd generateDealTotalAdd(ExchangeTransMatchCommonDto dealDto, ExchangeTransMatchCommonEntrustDto entrustDto, TrdFinProductDealTotal trdFinProductDealTotal) {
@@ -605,33 +592,6 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
 
         finProductType.setType8(DictCodeList.平安资产类型_质押式回购.getValue());
         return finProductType;
-    }
-
-    /**
-     * 生成回购质押品
-     * @param settleTransData
-     * @param trdProductDeal
-     * @return
-     */
-    public List<FinDealPledge> genFinDealPledgeList(SettleTransData settleTransData,ExchangeTransMatchCommonDto dealDto,TrdProductDeal trdProductDeal){
-        List<FinDealPledge> finDealPledgeList = new ArrayList<>();
-        SettleTransData firstSettleTransData = this.getFirstRepoSettleTransData(settleTransData.getfCjbh(),dealDto.getMpayDate());
-        if(StringUtil.isNotEmpty(firstSettleTransData)) {
-            SettleTransDataPledge firstSettleTransDataPledge = settleTransDataPledgeMapper.selectByPrimaryKey(firstSettleTransData.getTradeId());
-            if(StringUtil.isNotEmpty(firstSettleTransDataPledge)) {
-                FinDealPledge finDealPledge = new FinDealPledge();
-                finDealPledge.setFinprodId(trdProductDeal.getFinprodId());
-                finDealPledge.setBranch(trdProductDeal.getBranch());
-                finDealPledge.setPledgeFinprodId(firstSettleTransDataPledge.getPledgeFinprodId());
-                finDealPledge.setPledgeFaceValue(firstSettleTransDataPledge.getPledgeFaceValue());
-                finDealPledge.setPledgeNumber(firstSettleTransDataPledge.getPledgeNumber());
-                finDealPledge.setPledgeRatio(firstSettleTransDataPledge.getPledgeRatio());
-                finDealPledge.setPledgeAmt(ArithmeticUtil.multiply(firstSettleTransDataPledge.getPledgeFaceValue(),settleTransData.getShareAmt()));
-                finDealPledgeList.add(finDealPledge);
-            }
-        }
-
-        return finDealPledgeList;
     }
 
     // modify by etliu 20220110 start

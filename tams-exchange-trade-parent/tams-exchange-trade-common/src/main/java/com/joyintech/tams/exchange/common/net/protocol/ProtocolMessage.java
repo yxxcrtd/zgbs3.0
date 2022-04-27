@@ -54,7 +54,8 @@ public class ProtocolMessage implements Cloneable {
             try {
                 this.body = JsonUtils.getJsonFromObject(object).getBytes(charSet);
 
-                logger.debug("fc:{},dataType:{},body:{}", this.fc, this.dataType, this.body);
+                logger.debug("fc:{},dataType:{}", this.fc, this.dataType);
+//                logger.debug("fc:{},dataType:{},body:{}", this.fc, this.dataType, this.body);
             } catch (Exception e) {
                 logger.error("ProtocolMessage encode error:", e);
             }

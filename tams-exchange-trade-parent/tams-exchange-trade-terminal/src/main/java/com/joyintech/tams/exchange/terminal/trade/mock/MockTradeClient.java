@@ -364,6 +364,17 @@ public class MockTradeClient implements ITradeRequest {
             if (mockNoTradeByEntrustVolume(integratedEntrust))
                 return;
             mockTradeOrPartTradeByEntrustVolume(integratedEntrust);
+        }else if (EntrustProp.SZ_XSCJ_XD.value.equals(integratedEntrust.getEntrustProp())
+        		||EntrustProp.SZ_XSCJ_JS.value.equals(integratedEntrust.getEntrustProp())
+        		||EntrustProp.SZ_XSCJ_JJ.value.equals(integratedEntrust.getEntrustProp())) {//新债 深圳协商成交
+            integratedEntrust.setBrokerEntrustId(integratedEntrust.getId().substring(2));
+            if (mockIntegratedEntrustFailByEntrustVolume(integratedEntrust))
+                return;
+            mockTradeResponse.resIntegratedEntrust(integratedEntrust);
+            integratedEntrust.setBrokerEntrustId(integratedEntrust.getId().substring(2));
+            if (mockNoTradeByEntrustVolume(integratedEntrust))
+                return;
+            mockTradeOrPartTradeByEntrustVolume(integratedEntrust);
         } else {
             //            if (integratedEntrust.getEntrustBalance().doubleValue() == 0) {
             //                logger.info("融资金额不能为 0");
@@ -1029,9 +1040,9 @@ public class MockTradeClient implements ITradeRequest {
 	@Override
 	public void queryNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean, Long requestId) {
 		// TODO Auto-generated method stub
-        String stockCode = negotiateQuoteQueryBean.getStockCode();
+//        String stockCode = negotiateQuoteQueryBean.getStockCode();
 //        TickBean tickBean = queryQuoteTick(stockCode);
-        List<NegotiateQuoteReceiveBean> negotiateQuoteReceiveBeans = MockQuoteData.makeNegotiateQuoteReceive(stockCode, null);
+        List<NegotiateQuoteReceiveBean> negotiateQuoteReceiveBeans = MockQuoteData.makeNegotiateQuoteReceive(negotiateQuoteQueryBean, null);
         mockTradeResponse.resQueryNegotiateQuoteReceive(negotiateQuoteReceiveBeans, requestId);
 	}
 

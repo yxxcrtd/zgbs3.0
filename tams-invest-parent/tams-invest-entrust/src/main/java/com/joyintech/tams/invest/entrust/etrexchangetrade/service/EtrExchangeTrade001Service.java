@@ -2279,9 +2279,12 @@ public class EtrExchangeTrade001Service extends CommonExportService<EtrExchangeT
 								.checkIsBlank(rowData.get(11), "EtrExchangeTrade001.invAim", lineNo));
 					}
 					if (StringUtil.isBlank(confirmMsg)) {
-						// 投资目的
-						String priceModel = convertToItemCode(DictCode.投资目的.getValue(), rowData.get(11));
-						unit.setInvAim(priceModel);
+//						// 投资目的
+//						String priceModel = convertToItemCode(DictCode.投资目的.getValue(), rowData.get(11));
+//						unit.setInvAim(priceModel);
+						// 业务模式
+						String priceModel = convertToItemCode(DictCode.业务模式.getValue(), rowData.get(11));
+						unit.setBusinessModel(priceModel);
 					} else {
 						// 设置提示信息
 						promptMsg = confirmMsg;

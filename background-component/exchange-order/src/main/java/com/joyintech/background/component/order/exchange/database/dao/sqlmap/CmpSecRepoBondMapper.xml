@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.background.component.order.exchange.database.dao.CmpSecRepoBondMapper" >
+    <select id="select" resultType="com.joyintech.background.component.order.exchange.business.dto.EtrSecRepoBondDto">
+        select 
+        <include refid="com.joyintech.background.component.order.exchange.database.dao.CmpComponentCommMapper.Etr_Column_List" />
+        from ETR_ENTRUST etr
+        left join ETR_ENTRUST_ADD etrAdd
+        on etr.ENTRUST_ID = etrAdd.ENTRUST_ID
+        where etr.ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+        union all
+        select
+        <include refid="com.joyintech.background.component.order.exchange.database.dao.CmpComponentCommMapper.Etr_Column_List" />
+        from wfl_ETR_ENTRUST etr
+        left join wfl_ETR_ENTRUST_ADD etrAdd
+        on etr.ENTRUST_ID = etrAdd.ENTRUST_ID
+        where etr.ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+    </select>
+</mapper>

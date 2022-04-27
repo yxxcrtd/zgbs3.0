@@ -169,5 +169,5 @@ public interface EntrustMsgbyMQMapper {
 
     String selectPledgeId(String getvTradeId);
 
-    List<TrdProductDeal> getTrdProductDealByFTradeId(String fTradeId);
+    // List<TrdProductDeal> getTrdProductDealByFTradeId(String fTradeId);
 }

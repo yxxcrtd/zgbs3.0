@@ -19,7 +19,6 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.select.SelectDto;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
@@ -35,9 +34,10 @@ import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.common.base.dao.SppiImportDataMapper;
 import com.joyintech.tams.common.base.entity.FinExercisePlan;
+import com.joyintech.tams.common.base.entity.SppiImportData;
 import com.joyintech.tams.component.business.bond.BusiFinExercisePlanService;
-import com.joyintech.tams.component.business.common.dto.FinStockInfoDto;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
@@ -45,6 +45,7 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.entrust.common.aop.ExchangeEntrustRdsCommonAop;
+import com.joyintech.tams.exchange.entrust.etrexchange.common.dao.EtrExchangeTradeCommonMapper;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.CalcDeviationDegreeRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.CalcPriceAndYieldRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.CalcPriceAndYieldResponse;
@@ -52,10 +53,8 @@ import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeMin
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.FinprodMarketInfoRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.MinNumStepRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.MinPriceRequest;
-import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.PsOptionsRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.PtlSecAcctInfoRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.SecFaceValueRequest;
-import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.SelectOptionRequestDto;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.StdsecConverseRatioRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.hqjj.validator.EtrExchangeTradeJj001Validator;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dao.EtrExchangeTradeSecRepoMapper;
@@ -92,7 +91,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.math.BigDecimal;
@@ -103,7 +101,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -163,6 +160,13 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 
 	@Autowired
 	private EtrExchangeTradeJj001Validator etrExchangeTradeJj001Validator;
+
+	@Autowired
+	private SppiImportDataMapper sppiImportDataMapper;
+
+	@Autowired
+	private EtrExchangeTradeCommonMapper etrExchangeTradeCommonMapper;
+
 
 	@ApiOperation(value = "场内现券下单参数", notes = "场内现券下单参数")
 	@PostMapping("/getPageParams")
@@ -251,8 +255,8 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 		initPageParams.put("ACCOUNT_SPEED_01", DictCodeList.清算速度_T_0.getValue());
 		initPageParams.put("ACCOUNT_SPEED_02", DictCodeList.清算速度_T_1.getValue());
 		//展示投资目的或业务模式参数
-		String SHOW_INVAIM_OR_BUSSINSSMODEL = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
-		initPageParams.put("SHOW_INVAIM_OR_BUSSINSSMODEL", SHOW_INVAIM_OR_BUSSINSSMODEL);
+//		String SHOW_INVAIM_OR_BUSSINSSMODEL = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
+//		initPageParams.put("SHOW_INVAIM_OR_BUSSINSSMODEL", SHOW_INVAIM_OR_BUSSINSSMODEL);
 
 		// 场内交易指令画面行情区域自动刷新时间（毫秒）
 		long etrExchange_HqArea_refresh_period = 20000;
@@ -274,6 +278,39 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 		initPageParams.put("ETR_TRADE_TIME_SWITCH", CacheUtil.getSysParam("etr_trade_time_switch"));
 		initPageParams.put("ETR_CHECK_POS_SWITCH",CacheUtil.getSysParam(BussinessConstant.ETR_CHECK_POS_SWITCH));
 		return new Message<Map<String, Object>>(initPageParams).success();
+	}
+
+
+	/**
+	 *  获取流程中信息
+	 * @param workflowId
+	 * @return
+	 */
+	@ApiOperation(value = "获取流程中信息", notes = "获取流程中信息")
+	@ResponseBody
+	@PostMapping("/getApproveEntity")
+	public Message<EtrExchangeTradeSaveSecRepoRequest> getApproveEntity(@RequestBody String workflowId)
+	{
+		try{
+			workflowId = workflowId.replaceAll("\"","");
+			EtrExchangeTradeSaveSecRepoRequest entity = new EtrExchangeTradeSaveSecRepoRequest();
+			if (StringUtil.isNotEmpty(workflowId)) {
+				//流程代办checkImportData
+				entity = etrExchangeTradeSecRepo001Service.getBussinessEntityByWorkflowId(
+						workflowId);
+				//add by chenjiaxing 流程中不显示资产名称 start
+				String[] secIds = StringUtil.split(entity.getFinprodId(),"_");
+				if(secIds!=null){
+					if(secIds.length == 2 && StringUtil.isEmpty(entity.getStockId())){
+						entity.setStockId(secIds[1]);
+					}
+				}
+			}
+			return new Message<EtrExchangeTradeSaveSecRepoRequest>().success().setData(entity);
+		} catch(Exception e){
+			return new Message<EtrExchangeTradeSaveSecRepoRequest>().fail().setMessage("查询异常");
+		}
+
 	}
 
 	/**
@@ -643,6 +680,34 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 		}
 		if (ajax != null && !StringUtil.isEmptyList(ajax.getErrorList()) && !StringUtil.equals(dto.getOperateType(),"save")) {
 			return ajax;
+		}
+
+		//SPPI测试
+		if(StringUtil.isNotEmpty(dto.getPs()) && StringUtil.isNotEmpty(dto.getFinprodId())
+				|| StringUtil.equals(dto.getPs(),DictCodeList.交易方向_买入.getValue())) {
+			//判断是否进行了SPPI测试
+			Map<String, Object> paramsppi = new HashMap<>();
+			paramsppi.put("finprodId", dto.getFinprodId());
+			SppiImportData sppiDto = etrExchangeTradeCommonMapper.queryAssetIsSppiTest(paramsppi);
+			if (StringUtil.isNotEmpty(sppiDto)) {
+				if (StringUtil.isNotEmpty(sppiDto.getIsSppiPass()) && StringUtil.equals(sppiDto.getIsSppiPass(), "2")) {
+					//判断该资产未来是否有行权计划
+					Map<String, Object> param = new HashMap<>();
+					param.put("finprodId", dto.getFinprodId());
+					param.put("sysDate", DateUtil.platDateFromCache());
+					if (etrExchangeTradeCommonMapper.countBondHasEexrPlan(param) > 0) {
+						if (StringUtil.isNotEmpty(dto.getBusinessModel()) && StringUtil.equals(dto.getBusinessModel(), DictCodeListExt3.业务模式_收取合同约定的现金流.getValue())) {
+							SppiImportData sppiImportData = sppiImportDataMapper.selectByPrimaryKey(dto.getFinprodId());
+							if (null != sppiImportData && StringUtil.isNotEmpty(sppiImportData.getBidPriceCon())) {
+								String[] split = sppiImportData.getBidPriceCon().split(",");
+								if (dto.getPrice().compareTo(new BigDecimal(split[1])) <= 0) {
+									confirmMsg="净价不满足使权不重大购入价条件，若继续提交，业务模式会发生变更";
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 
 		AjaxResult ajaxResult = new AjaxResult();
@@ -1029,7 +1094,7 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 	}
 
 	/***
-	 * 取更新时间最新记录.投资目的  指令业务类型 = 数据字典.委托类型.大宗债券指令
+	 * 取更新时间最新记录.投资目的
 	 * @return
 	 */
 	@ResponseBody
@@ -1203,7 +1268,7 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 	@ResponseBody
 	public Message<List<BaseMap>> queryPositionInfo(@RequestBody PositionCashSecRequest requestDto) {
 		try {
-			List<BaseMap> m = etrTradeCommonervice.queryPositionInfo(requestDto);
+			List<BaseMap> m = etrTradeCommonervice.queryPositionInfoSecRepo(requestDto,"SEC");
 			return new Message<List<BaseMap>>().success().setData(m);
 		} catch (Exception e) {
 			e.printStackTrace();
