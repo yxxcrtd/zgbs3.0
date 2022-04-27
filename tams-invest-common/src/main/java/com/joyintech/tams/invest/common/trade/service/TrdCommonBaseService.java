@@ -1444,7 +1444,7 @@ public class TrdCommonBaseService extends BaseService {
     /**
      * 查询首期清算数据
      * @param sqcjbh 首期成交编号
-     * @param seatNumber 席位号
+     * @param seatNumber 席位号 注:seatNumber和secAcctId至少传一个
      * @param secAcctId 证券账户
      * @param vdate 起息日
      * @return
@@ -1456,7 +1456,7 @@ public class TrdCommonBaseService extends BaseService {
     /**
      * 获取回购首期交易
      * @param sqcjbh
-     * @param seatNumber
+     * @param seatNumber 注:seatNumber和secAcctId至少传一个
      * @param secAcctId
      * @param vdate
      * @return
