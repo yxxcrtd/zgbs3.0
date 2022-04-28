@@ -49,6 +49,14 @@
       and BID_PRICE = #{bidPrice,jdbcType=DECIMAL}
       and PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
   </delete>
+  <delete id="deleteByBidId" parameterType="com.joyintech.tams.common.base.entity.WflBidOrderBidPriceKey">
+    delete from WFL_BID_ORDER_BID_PRICE
+    where BID_ID = #{bidId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByWorkflowId" parameterType="com.joyintech.tams.common.base.entity.WflBidOrderBidPriceKey">
+    delete from WFL_BID_ORDER_BID_PRICE
+    where WORKFLOW_ID = #{workflowId,jdbcType=VARCHAR}
+  </delete>
   <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.WflBidOrderBidPrice">
     insert into WFL_BID_ORDER_BID_PRICE (BID_ID, ENTRUST_ID, BID_PRICE, 
       PORTFOLIO_ID, IS_WIN, WIN_PRICE, 

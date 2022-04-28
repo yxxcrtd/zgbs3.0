@@ -5,11 +5,7 @@ import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.IDGenerator;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.dto.CfetsSearchInfoRequest;
@@ -22,17 +18,13 @@ import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.systemtools.util.CommonUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.jasypt.commons.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 公共方法service
@@ -159,15 +151,33 @@ public class JoyinbusinessCommonService extends BaseService {
         param.put("roleTwo", DictCodeList.角色岗位_项目经理岗.getValue());
         return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), ()->joyinbusinessCommonMapper.getManagers(param));
     }
+
+    /**
+     * 修改 添加判断 通过流程id查询是否存在数据,存在则是退回数据需要更新历史操作记录,不存在则是新纪录,直接登录数据
+     *
+     * @param dto
+     * @return java.lang.Boolean
+     * @author jiangpeng
+     * @date 2022/4/27 9:45
+     */
     public Boolean updateCfetsOprHis(CfetsOprHisInfoRequest dto) {
         dto.setSeqNo(IDGenerator.generate(32));
         dto.setOperDate(DateUtil.platDateFromCache());
-        dto.setUserId(null!=SecurityUtil.getLoginUser()?SecurityUtil.getLoginUser().getUserName():"SYSTEM");
-        dto.setCreateUser(null!=SecurityUtil.getLoginUser()?SecurityUtil.getLoginUser().getUserName():"SYSTEM");
+        dto.setUserId(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
+        dto.setCreateUser(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
         dto.setCreateDept(CommonUtil.getDeptCode());
-        dto.setUpdateUser(null!=SecurityUtil.getLoginUser()?SecurityUtil.getLoginUser().getUserName():"SYSTEM");
-        int flag = joyinbusinessCommonMapper.insertCfetsOprHis(dto);
-        if (flag>0) {
+        dto.setUpdateUser(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
+        List<CfetsOprHisInfoRequest> wflDto = new ArrayList<>();
+        if (StringUtil.isNotEmpty(dto.getWorkflowId())) {
+            wflDto = joyinbusinessCommonMapper.findCfetsOprHisByWorkflowId(dto.getWorkflowId());
+        }
+        int flag = 0;
+        if (StringUtil.isNotEmpty(wflDto)) {
+            flag = joyinbusinessCommonMapper.updateCfetsOprHis(dto);
+        } else {
+            flag = joyinbusinessCommonMapper.insertCfetsOprHis(dto);
+        }
+        if (flag > 0) {
             return true;
         }
         return false;
@@ -454,5 +464,18 @@ public class JoyinbusinessCommonService extends BaseService {
 
     public List<String> findAllModuleIds(String userName) {
         return joyinbusinessCommonMapper.findAllModuleIds(userName);
+    }
+
+    /**
+     * 统计匹配数
+     *
+     * @param quoteId       业务编号
+     * @param confirmStatus 确认状态
+     * @return int
+     * @author jiangpeng
+     * @date 2022/4/28 17:18
+     */
+    public int countMatchInfo(String quoteId, String confirmStatus) {
+        return joyinbusinessCommonMapper.countMatchInfo(quoteId, confirmStatus);
     }
 }

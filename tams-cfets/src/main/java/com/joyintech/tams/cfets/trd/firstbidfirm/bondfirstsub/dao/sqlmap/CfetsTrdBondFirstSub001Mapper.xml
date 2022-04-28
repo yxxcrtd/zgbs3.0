@@ -38,7 +38,7 @@
                                      left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = t0.PORTFOLIO_ID
                                      <where>
                                          <if test="portfolioIds != null and portfolioIds.size()>0">
-                                             <foreach collection="portfolioIds" open="t0.PORTFOLIO_ID in(" close=")" separator="," item="item">
+                                             <foreach collection="portfolioIds" open=" t0.PORTFOLIO_ID in(" close=") " separator="," item="item">
                                                  #{item}
                                              </foreach>
                                          </if>
@@ -115,22 +115,26 @@
                 AND T.entrustStatus in ('02','03','04','05','06')
             </if>
             <if test="entrustStatus != null and entrustStatus.size()>0">
-                <foreach collection="entrustStatus" open=" AND T.entrustStatus in(" close=")" separator="," item="item">
+                AND
+                <foreach collection="entrustStatus" open=" T.entrustStatus in(" close=")" separator="," item="item">
                     #{item}
                 </foreach>
             </if>
             <if test="entrustStatus != null and entrustStatus.size()>0">
-                <foreach collection="entrustStatus" open=" AND T.entrustStatus in(" close=")" separator="," item="item">
+                AND
+                <foreach collection="entrustStatus" open=" T.entrustStatus in(" close=")" separator="," item="item">
                     #{item}
                 </foreach>
             </if>
             <if test="finprodMarketIds != null and finprodMarketIds.size()>0">
-                <foreach collection="finprodMarketIds" open=" AND T.finprodMarketId in(" close=")" separator="," item="item">
+                AND
+                <foreach collection="finprodMarketIds" open=" T.finprodMarketId in(" close=")" separator="," item="item">
                     #{item}
                 </foreach>
             </if>
             <if test="secManageAcctIds != null and secManageAcctIds.size()>0">
-                <foreach collection="secManageAcctIds" open=" AND T.secManageAcctId in(" close=")" separator="," item="item">
+                AND
+                <foreach collection="secManageAcctIds" open=" T.secManageAcctId in(" close=")" separator="," item="item">
                     #{item}
                 </foreach>
             </if>
@@ -151,7 +155,8 @@
                 /*指令代码查询*/
             </if>
             <if test="entrustIdList != null and entrustIdList.size()>0">
-                <foreach collection="entrustIdList" open=" AND T.entrustId in(" close=")" separator="," item="item">
+                AND
+                <foreach collection="entrustIdList" open=" T.entrustId in(" close=")" separator="," item="item">
                     #{item}
                 </foreach>
                 /*指令代码查询*/
@@ -241,4 +246,365 @@
         </where>
     </select>
 
+    <sql id="subInfoSql">
+        select issueStatus,
+               finprodId,
+               finprodMarketId,
+               finprodAbbr,
+               secManageAcctId,
+               secAcctName,
+               sum(subscriptionAmount) subscriptionAmount,
+               sum(payableAmount)      payableAmount,
+               sum(settFeeAmt)         settFeeAmt,
+               rate,
+               issueType,
+               issueDate,
+               payDate,
+               couponSpecies,
+               intType,
+               ouPartyId,
+               ouPartyIdAbbr,
+               issuer,
+               issuerName
+        from (
+                 select fpa.ISSUE_STATUS             issueStatus,
+                        fp.FINPROD_ID                finprodId,
+                        fp.FINPROD_MARKET_ID         finprodMarketId,
+                        fp.FINPROD_ABBR              finprodAbbr,
+                        eed.SEC_ACCT_ID              secManageAcctId,
+                        ssai.SEC_ACCT_NAME           secAcctName,
+                        bobp.SUBSCRIPTION_AMOUNT     subscriptionAmount,
+                        bobp.PAYABLE_AMOUNT          payableAmount,
+                        bobp.SETT_FEE_AMT            settFeeAmt,
+                        case
+                            when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
+                                then nvl(miri.INT_RATE, 0) + nvl(fpi.REFER_YIELD, 0)
+                            else fpi.REFER_YIELD end rate,
+                        fp.ISSUE_TYPE                issueType,
+                        fpi.ISSUE_DATE               issueDate,
+                        fpi.PAY_DATE                 payDate,
+                        fp.COUPON_SPECIES            couponSpecies,
+                        fpi.INT_TYPE                 intType,
+                        bo.OU_PARTY_ID               ouPartyId,
+                        mcci.PARTY_ABBR              ouPartyIdAbbr,
+                        fp.ISSUER                    issuer,
+                        mci.CUSTOMER_NAME            issuerName
+                 from BID_ORDER_BID_PRICE bobp
+                          left join ETR_ENTRUST_DETAIL eed
+                                    on bobp.ENTRUST_ID = eed.ENTRUST_ID and bobp.PORTFOLIO_ID = eed.PORTFOLIO_ID
+                          left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
+                          left join BID_ORDER bo on bo.BID_ID = bobp.BID_ID
+                          left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
+                          left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = bo.FINPROD_ID
+                          left join FIN_PRODUCT_ADD fpa on fpa.FINPROD_ID = fp.FINPROD_ID
+                          left join MST_INT_RATE_INFO miri on miri.INT_RATE_ID = fpi.INT_RATE_ID
+                          left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
+                          left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
+                 WHERE bo.BID_DATE = #{sysDate} AND bo.IS_CANCEL = 'N' and bo.TRADE_STATUS != '03' and bobp.BID_PRICE = 99999999
+                 union all
+                 select fpa.ISSUE_STATUS             issueStatus,
+                        fp.FINPROD_ID                finprodId,
+                        fp.FINPROD_MARKET_ID         finprodMarketId,
+                        fp.FINPROD_ABBR              finprodAbbr,
+                        eed.SEC_ACCT_ID              secManageAcctId,
+                        ssai.SEC_ACCT_NAME           secAcctName,
+                        0                            subscriptionAmount,
+                        0                            payableAmount,
+                        0                            settFeeAmt,
+                        case
+                            when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
+                                then nvl(miri.INT_RATE, 0) + nvl(fpi.REFER_YIELD, 0)
+                            else fpi.REFER_YIELD end rate,
+                        fp.ISSUE_TYPE                issueType,
+                        fpi.ISSUE_DATE               issueDate,
+                        fpi.PAY_DATE                 payDate,
+                        fp.COUPON_SPECIES            couponSpecies,
+                        fpi.INT_TYPE                 intType,
+                        wbo.OU_PARTY_ID              ouPartyId,
+                        mcci.PARTY_ABBR              ouPartyIdAbbr,
+                        fp.ISSUER                    issuer,
+                        mci.CUSTOMER_NAME            issuerName
+                 from WFL_BID_ORDER_BID_PRICE wbobp
+                          left join ETR_ENTRUST_DETAIL eed
+                                    on wbobp.ENTRUST_ID = eed.ENTRUST_ID and wbobp.PORTFOLIO_ID = eed.PORTFOLIO_ID
+                          left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
+                          left join WFL_BID_ORDER wbo on wbo.BID_ID = wbobp.BID_ID
+                          left join FIN_PRODUCT fp on fp.FINPROD_ID = wbo.FINPROD_ID
+                          left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = wbo.FINPROD_ID
+                          left join FIN_PRODUCT_ADD fpa on fpa.FINPROD_ID = fp.FINPROD_ID
+                          left join MST_INT_RATE_INFO miri on miri.INT_RATE_ID = fpi.INT_RATE_ID
+                          left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = wbo.OU_PARTY_ID
+                          left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
+                 WHERE wbo.BID_DATE = #{sysDate} and wbobp.BID_PRICE = 99999999
+             )
+        group by issueStatus, finprodId, finprodMarketId, finprodAbbr, secManageAcctId, secAcctName, rate, issueType, issueDate,
+                 payDate, couponSpecies, intType, ouPartyId, ouPartyIdAbbr, issuer, issuerName
+        order by decode(issueStatus,Null,1,'01',2,3)
+    </sql>
+
+    <sql id="listDaySubKeywordsWhere">
+        <if test="search != null and search != ''">
+            AND ( T.issueStatus || '|' || sdl_is.item_value || '|' || T.finprodId || '|' || T.finprodMarketId || '|'
+            || '|' || T.finprodAbbr || '|' || T.secManageAcctId || '|' || T.secAcctName || '|' || T.issueType
+            || sdl_ist.item_value || '|' || '|' || T.couponSpecies || '|' || sdl_cs.item_value
+            || '|' || T.intType || '|' || sdl_it.item_value || '|' || T.ouPartyId || '|' || T.ouPartyIdAbbr
+            || '|' || T.issuer || '|' || T.issuerName
+            like '%' || #{search} || '%'
+            or decode(T.subscriptionAmount,0,'0.00',to_char(T.subscriptionAmount,'FM999999999990.90'))=#{search} or to_char(T.subscriptionAmount)=#{search}
+            or decode(T.payableAmount,0,'0.00',to_char(T.payableAmount,'FM999999999990.90'))=#{search} or to_char(T.payableAmount)=#{search}
+            or decode(T.settFeeAmt,0,'0.00',to_char(T.settFeeAmt,'FM999999999990.90'))=#{search} or to_char(T.settFeeAmt)=#{search}
+            or decode(T.rate,0,'0.00',to_char(T.rate,'FM999999999990.9990'))=#{search} or to_char(T.rate)=#{search}
+            or replace(to_char(T.issueType,'yyyy-MM-dd'),'-','/')=#{search}
+            or replace(to_char(T.payDate,'yyyy-MM-dd'),'-','/')=#{search}
+            )
+        </if>
+    </sql>
+
+    <select id="listDaySub" resultType="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstDaySubDto">
+        select
+            T.issueStatus,
+            T.finprodId,
+            T.finprodMarketId,
+            T.finprodAbbr,
+            T.secManageAcctId,
+            T.secAcctName,
+            T.subscriptionAmount,
+            T.payableAmount,
+            T.settFeeAmt,
+            T.rate,
+            T.issueType,
+            T.issueDate,
+            T.payDate,
+            T.couponSpecies,
+            T.intType,
+            T.ouPartyId,
+            T.ouPartyIdAbbr,
+            T.issuer,
+            T.issuerName
+        from(
+        <include refid="subInfoSql"></include>
+        ) T
+        left join SYS_DATADICT_LIST sdl_is on T.issueStatus=sdl_es.ITEM_CODE and sdl_is.DICT_CODE='ISSUE_STATUS'
+        left join SYS_DATADICT_LIST sdl_ist on T.issueType=sdl_ist.ITEM_CODE and sdl_ist.DICT_CODE='ISSUE_CLASS'
+        left join SYS_DATADICT_LIST sdl_cs on T.couponSpecies=sdl_cs.ITEM_CODE and sdl_cs.DICT_CODE='COUPON_SPECIES'
+        left join SYS_DATADICT_LIST sdl_it on T.intType=sdl_it.ITEM_CODE and sdl_it.DICT_CODE='INT_TYPE'
+        <where>
+
+            <if test="finprodMarketIds != null and finprodMarketIds.size()>0">
+                AND
+                <foreach collection="finprodMarketIds" open=" T.finprodMarketId in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="secManageAcctIds != null and secManageAcctIds.size()>0">
+                AND
+                <foreach collection="secManageAcctIds" open=" T.secManageAcctId in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="ouParty != null and ouParty != '' ">
+                AND T.ouPartyIdAbbr = #{ouParty}
+            </if>
+            <if test="issuer != null and issuer != '' ">
+                AND T.issuerName = #{issuer}
+            </if>
+            <!-- 关键字模糊查询 -->
+            <include refid="listDaySubKeywordsWhere"></include>
+        </where>
+        <if test="pageMode != null and pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
+            order by ${pageMode.sort} ${pageMode.direction}
+        </if>
+    </select>
+
+    <select id="listDaySubDetail" resultType="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubDealDetailDto">
+        select
+            validStatus,
+            bidId,
+            subscriptionAmount,
+            payableAmount,
+            ourTrader,
+            ourTraderName,
+            bidDate
+        from (
+            select case when bo.IS_CANCEL = 'N' then '02' else '03' end      validStatus,
+                   bo.BID_ID              bidId,
+                   bo.SUBSCRIPTION_AMOUNT subscriptionAmount,
+                   bo.PAYABLE_AMOUNT      payableAmount,
+                   bo.OU_PARTY_ID         ourTrader,
+                   mcci.PARTY_ABBR        ourTraderName,
+                   bo.BID_DATE            bidDate
+            from BID_ORDER bo
+                     left join BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
+                     left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
+                     left join ETR_ENTRUST_DETAIL eed on bobp.ENTRUST_ID = eed.ENTRUST_ID and eed.PORTFOLIO_ID = bobp.PORTFOLIO_ID
+                     left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
+            where bo.TRADE_STATUS != '03'
+                <if test="finprodMarketIds != null and finprodMarketIds.size()>0">
+                    AND
+                    <foreach collection="finprodMarketIds" open=" fp.FINPROD_MARKET_ID in(" close=")" separator="," item="item">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="secManageAcctIds != null and secManageAcctIds.size()>0">
+                    AND
+                    <foreach collection="secManageAcctIds" open=" eed.SEC_ACCT_ID in(" close=")" separator="," item="item">
+                        #{item}
+                    </foreach>
+                </if>
+            union all
+            select '01'        validStatus,
+                   wbo.BID_ID              bidId,
+                   wbo.SUBSCRIPTION_AMOUNT subscriptionAmount,
+                   wbo.PAYABLE_AMOUNT      payableAmount,
+                   wbo.OU_PARTY_ID         ourTrader,
+                   mcci.PARTY_ABBR         ourTraderName,
+                   wbo.BID_DATE            bidDate
+            from WFL_BID_ORDER wbo
+                     left join WFL_BID_ORDER_BID_PRICE wbobp on wbo.BID_ID = wbobp.BID_ID
+                     left join FIN_PRODUCT fp on fp.FINPROD_ID = wbo.FINPROD_ID
+                     left join ETR_ENTRUST_DETAIL eed on wbobp.ENTRUST_ID = eed.ENTRUST_ID and eed.PORTFOLIO_ID = wbobp.PORTFOLIO_ID
+                     left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = wbo.OU_PARTY_ID
+                 <where>
+                     <if test="finprodMarketIds != null and finprodMarketIds.size()>0">
+                         AND
+                         <foreach collection="finprodMarketIds" open=" fp.FINPROD_MARKET_ID in(" close=")" separator="," item="item">
+                             #{item}
+                         </foreach>
+                     </if>
+                     <if test="secManageAcctIds != null and secManageAcctIds.size()>0">
+                         AND
+                         <foreach collection="secManageAcctIds" open=" eed.SEC_ACCT_ID in(" close=")" separator="," item="item">
+                             #{item}
+                         </foreach>
+                     </if>
+                 </where>
+                 ) order by bidDate
+    </select>
+
+    <select id="listDaySubDealDetail" resultType="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubDealDetailDto">
+        select *
+        from (
+            select case when bo.IS_CANCEL = 'N' then '02' else '03' end validStatus,
+                   fpa.ISSUE_STATUS                                     issueStatus,
+                   tfpdt.TRADE_DATE                                     dealDate,
+                   bo.FINPROD_ID                                        finprodId,
+                   fp.FINPROD_MARKET_ID                                 finprodMarketId,
+                   fp.FINPROD_ABBR                                      finprodAbbr,
+                   bobp.SEC_ACCT_ID                                     secManageAcctId,
+                   fpt.TYPE_11                                          secType,
+                   bo.SUBSCRIPTION_AMOUNT                               subscriptionAmount,
+                   bo.PAYABLE_AMOUNT                                    payableAmount,
+                   bo.SETT_FEE_AMT                                      settFeeAmt,
+                   fpi.ISSUE_PRICE                                      issuePrice,
+                   case
+                       when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
+                           then nvl(miri.INT_RATE, 0) + nvl(fpi.REFER_YIELD, 0)
+                       else fpi.REFER_YIELD end                         rate,
+                   bobp.PORTFOLIO_ID                                    portfolioId,
+                   bobp.PORTFOLIO_NAME                                  portfolioName,
+                   fpi.ISSUE_DATE                                       issueDate,
+                   fpi.PAY_DATE                                         payDate,
+                   fp.COUPON_SPECIES                                    couponSpecies,
+                   fpi.INT_TYPE                                         intType,
+                   fp.ISSUER                                            issuer,
+                   bo.OU_PARTY_ID                                       ouPartyId,
+                   mcci.PARTY_ABBR                                      ouPartyIdAbbr,
+                   fp.ISSUER                                            issuer,
+                   mci.CUSTOMER_NAME                                    issuerName,
+                   bo.BID_ID                                            tradeId,
+                   tmi.TRD_ID                                           execid,
+                   bo.REMARK                                            remark
+            from BID_ORDER bo
+                     left join (select listagg(t0.PORTFOLIO_ID, ',')
+                                               within group (order by t0.ENTRUST_ID, t0.BID_ID) AS PORTFOLIO_ID,
+                                       listagg(pp.PORTFOLIO_NAME, ',')
+                                               within group (order by t0.ENTRUST_ID, t0.BID_ID) AS PORTFOLIO_NAME,
+                                       t0.ENTRUST_ID                                               ENTRUST_ID,
+                                       t0.BID_ID                                                   BID_ID,
+                                       eed.SEC_ACCT_ID
+                                from BID_ORDER_BID_PRICE t0
+                                         left join ETR_ENTRUST_DETAIL eed
+                                                   on eed.PORTFOLIO_ID = t0.PORTFOLIO_ID and eed.ENTRUST_ID = t0.ENTRUST_ID
+                                         left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = t0.PORTFOLIO_ID
+                                where t0.BID_PRICE = 99999999
+                                group by t0.ENTRUST_ID, t0.BID_ID, eed.SEC_ACCT_ID) bobp
+                               on bo.BID_ID = bobp.BID_ID
+                     left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
+                     left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = bo.FINPROD_ID
+                     left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = bo.FINPROD_ID
+                     left join FIN_PRODUCT_ADD fpa on fpa.FINPROD_ID = bo.FINPROD_ID
+                     left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
+                     left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
+                     left join MST_INT_RATE_INFO miri on miri.INT_RATE_ID = fpi.INT_RATE_ID
+                     left join TRDQUTO_MATCH_INFO tmi on tmi.PRE_TRADE_ID = bo.BID_ID
+                     left join TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt on tfpdt.TOTLE_TRADE_ID = tmi.TRD_ID
+            where bo.TRADE_STATUS != '03'
+            <if test="entrustId != null and entrustId != '' ">
+                AND bobp.ENTRUST_ID = #{entrustId}
+            </if>
+            union all
+            select '01'                         validStatus,
+                   fpa.ISSUE_STATUS             issueStatus,
+                   tfpdt.TRADE_DATE             dealDate,
+                   bo.FINPROD_ID                finprodId,
+                   fp.FINPROD_MARKET_ID         finprodMarketId,
+                   fp.FINPROD_ABBR              finprodAbbr,
+                   bobp.SEC_ACCT_ID             secManageAcctId,
+                   fpt.TYPE_11                  secType,
+                   bo.SUBSCRIPTION_AMOUNT       subscriptionAmount,
+                   bo.PAYABLE_AMOUNT            payableAmount,
+                   bo.SETT_FEE_AMT              settFeeAmt,
+                   fpi.ISSUE_PRICE              issuePrice,
+                   case
+                       when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
+                           then nvl(miri.INT_RATE, 0) + nvl(fpi.REFER_YIELD, 0)
+                       else fpi.REFER_YIELD end rate,
+                   bobp.PORTFOLIO_ID            portfolioId,
+                   bobp.PORTFOLIO_NAME          portfolioName,
+                   fpi.ISSUE_DATE               issueDate,
+                   fpi.PAY_DATE                 payDate,
+                   fp.COUPON_SPECIES            couponSpecies,
+                   fpi.INT_TYPE                 intType,
+                   fp.ISSUER                    issuer,
+                   bo.OU_PARTY_ID               ouPartyId,
+                   mcci.PARTY_ABBR              ouPartyIdAbbr,
+                   fp.ISSUER                    issuer,
+                   mci.CUSTOMER_NAME            issuerName,
+                   bo.BID_ID                    tradeId,
+                   tmi.TRD_ID                   execid,
+                   bo.REMARK                    remark
+            from WFL_BID_ORDER bo
+                     left join (select listagg(t0.PORTFOLIO_ID, ',')
+                                               within group (order by t0.ENTRUST_ID, t0.BID_ID) AS PORTFOLIO_ID,
+                                       listagg(pp.PORTFOLIO_NAME, ',')
+                                               within group (order by t0.ENTRUST_ID, t0.BID_ID) AS PORTFOLIO_NAME,
+                                       t0.ENTRUST_ID                                               ENTRUST_ID,
+                                       t0.BID_ID                                                   BID_ID,
+                                       eed.SEC_ACCT_ID
+                                from WFL_BID_ORDER_BID_PRICE t0
+                                         left join ETR_ENTRUST_DETAIL eed
+                                                   on eed.PORTFOLIO_ID = t0.PORTFOLIO_ID and eed.ENTRUST_ID = t0.ENTRUST_ID
+                                         left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = t0.PORTFOLIO_ID
+                                where t0.BID_PRICE = 99999999
+                                group by t0.ENTRUST_ID, t0.BID_ID, eed.SEC_ACCT_ID) bobp
+                               on bo.BID_ID = bobp.BID_ID
+                     left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
+                     left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = bo.FINPROD_ID
+                     left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = bo.FINPROD_ID
+                     left join FIN_PRODUCT_ADD fpa on fpa.FINPROD_ID = bo.FINPROD_ID
+                     left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
+                     left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
+                     left join MST_INT_RATE_INFO miri on miri.INT_RATE_ID = fpi.INT_RATE_ID
+                     left join TRDQUTO_MATCH_INFO tmi on tmi.PRE_TRADE_ID = bo.BID_ID
+                     left join TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt on tfpdt.TOTLE_TRADE_ID = tmi.TRD_ID
+            <where>
+                <if test="entrustId != null and entrustId != '' ">
+                    bobp.ENTRUST_ID = #{entrustId}
+                </if>
+            </where>
+        ) T
+        <if test="pageMode != null and pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
+            order by ${pageMode.sort} ${pageMode.direction}
+        </if>
+    </select>
 </mapper>

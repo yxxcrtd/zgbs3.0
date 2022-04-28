@@ -402,6 +402,48 @@
         sysdate, #{updateUser,jdbcType=VARCHAR},sysdate
         )
     </insert>
+
+    <update id="updateCfetsOprHis" parameterType="com.joyintech.tams.common.base.entity.EtrEntrustOperHis" >
+        update ETR_ENTRUST_OPER_HIS
+        <set >
+            <if test="entrustId != null" >
+                ENTRUST_ID = #{entrustId,jdbcType=VARCHAR},
+            </if>
+            <if test="operType != null" >
+                OPER_TYPE = #{operType,jdbcType=VARCHAR},
+            </if>
+            <if test="operDate != null" >
+                OPER_DATE = #{operDate,jdbcType=DATE},
+            </if>
+            <if test="operTime != null" >
+                OPER_TIME = #{operTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="busiDes != null" >
+                BUSI_DES = #{busiDes,jdbcType=VARCHAR},
+            </if>
+            <if test="userId != null" >
+                USER_ID = #{userId,jdbcType=VARCHAR},
+            </if>
+            <if test="updateUser != null" >
+                UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="statisticalTimes != null" >
+                STATISTICAL_TIMES = #{statisticalTimes,jdbcType=DECIMAL},
+            </if>
+        </set>
+        where WORKFLOW_ID = #{workflowId,jdbcType=VARCHAR}
+    </update>
+
+    <select id="findCfetsOprHisByWorkflowId" parameterType="java.lang.String"
+            resultType="com.joyintech.tams.common.base.entity.EtrEntrustOperHis">
+        select
+        <include refid="com.joyintech.tams.common.base.dao.EtrEntrustOperHisMapper.Base_Column_List"/>
+        from ETR_ENTRUST_OPER_HIS
+        where WORKFLOW_ID = #{workflowId,jdbcType=VARCHAR}
+    </select>
     <select id="queryMySideList" resultType="com.joyintech.framework.select.SelectOptionDto">
         SELECT DISTINCT
         MST_CFETS_CUSTOMER_INFO.PARTY_ID id,
@@ -805,5 +847,13 @@
              SYS_USER A
         where A.ADMIN_FLAG = '01'
           and A.USER_NAME = #{userName, jdbcType=VARCHAR}
+    </select>
+
+    <!--统计匹配数-->
+    <select id="countMatchInfo" resultType="java.lang.Integer">
+        SELECT  COUNT(1) FROM  TRDQUTO_MATCH_INFO tmi WHERE PRE_TRADE_ID = #{quoteId}
+        <if test="confirmStatus !=null and confirmStatus !=''">
+            AND TRD_CONF_STATUS = #{confirmStatus}
+        </if>
     </select>
 </mapper>

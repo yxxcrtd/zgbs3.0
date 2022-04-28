@@ -51,6 +51,9 @@ public class CfetsOprHisInfoRequest {
     @ApiModelProperty(name="statisticalTimes",value="导出次数")
     private int statisticalTimes;
 
+    @ApiModelProperty(name="workflowId",value="工作流代码")
+    private String workflowId;
+
     public String getSeqNo() {
         return seqNo;
     }
@@ -153,5 +156,13 @@ public class CfetsOprHisInfoRequest {
 
     public void setStatisticalTimes(int statisticalTimes) {
         this.statisticalTimes = statisticalTimes;
+    }
+
+    public String getWorkflowId() {
+        return workflowId;
+    }
+
+    public void setWorkflowId(String workflowId) {
+        this.workflowId = workflowId;
     }
 }
