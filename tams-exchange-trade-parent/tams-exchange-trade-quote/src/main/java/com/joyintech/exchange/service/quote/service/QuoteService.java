@@ -44,9 +44,9 @@ public class QuoteService {
      */
     public static final String TRD_USE_MOCK_QUOTE= "TRD_USE_MOCK_QUOTE";
     /**
-     * 默认行情资产
+     * 默认MOCK行情资产
      */
-    public static final String DEFAULT_CODE = "100303.SZ";
+    public static final String TRD_DEFAULT_MOCK_QUOTE = "TRD_DEFAULT_MOCK_QUOTE";
 
     @Autowired
     private QuoteTickService quoteTickService;
@@ -77,7 +77,11 @@ public class QuoteService {
         }
         if (Objects.isNull(tickBean)) {
             if (StringUtil.equals(是否_是.getValue(), CacheUtil.getSysParam(TRD_USE_MOCK_QUOTE))) {
-                return this.getTick(DEFAULT_CODE);
+                String defaultMockQuote = CacheUtil.getSysParam(TRD_DEFAULT_MOCK_QUOTE);
+                if (StringUtil.isEmpty(defaultMockQuote)) {
+                    defaultMockQuote = "100303.SZ";
+                }
+                return this.getTick(defaultMockQuote);
             } else {
                 logger.debug("[行情服务] 获取行情失败");
                 return  new ResultBean(ErrorCode.QUOTATION_NOT_EXIST);
