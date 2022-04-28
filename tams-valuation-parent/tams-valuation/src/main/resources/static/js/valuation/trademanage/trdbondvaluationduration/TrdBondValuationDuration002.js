@@ -89,12 +89,10 @@
     var settleAmtChange = function(){
         var actInt = $('#actInt').val();
         var actCapi = $('#actCapi').val();
-       // var otherAmt = $('#otherAmt').val();
         if(actInt != null && actInt != ''
             && actCapi != null && actCapi != ''
-           //&& otherAmt != null && otherAmt != ''
         ){
-            var settleAmt = JoyinMath.doAdd(JoyinMath.doAdd(actInt, actCapi,2),2);
+            var settleAmt = JoyinMath.doAdd(actInt, actCapi,2);
             $('#settleAmt').val(settleAmt);
         }else{
             $('#settleAmt').val('');
@@ -116,10 +114,6 @@
         $('#actCapi').change(function(){
             settleAmtChange();
         });
-        // //其他费用
-        // $('#otherAmt').change(function(){
-        //     settleAmtChange();
-        // });
 
         // 绑定按钮事件
         $('#TrdBondValuationDuration002_btn_save').click(function() {
@@ -128,7 +122,6 @@
         $('#TrdBondValuationDuration002_btn_submit').click(function() {
             saveOrSubmit('submit');
         });
-
 
     });
 

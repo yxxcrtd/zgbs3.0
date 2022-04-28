@@ -204,6 +204,7 @@ public class TrdBondValuationDuration002Service extends BaseService {
             for (BokDetailId e : listValBokDetailId) {
                 listInsert.add(e);
             }
+            valBokDetailIdBatchMapper.deleteBatch(listInsert);
             valBokDetailIdBatchMapper.insertBatch(listInsert);
         }
 

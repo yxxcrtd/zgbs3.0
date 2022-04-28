@@ -183,6 +183,7 @@ public class TrdBondValuationDurationDto extends BaseEntity implements ProcessEn
         this.tradeId = tradeId;
     }
 
+    @NotEmpty(fieldName = "TrdBondValuationDuration.fundSettleDate", groups = { ValidateGroupEdit.class })
     public Date getFundSettleDate() {
         return fundSettleDate;
     }
