@@ -1,14 +1,14 @@
 package com.joyintech.tams.constant;
 
-import com.joyintech.framework.base.BaseDictCodeList;
-import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.StringUtil;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.joyintech.framework.base.BaseDictCodeList;
+import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.util.StringUtil;
 
 /**
  * 数据字典明细枚举
@@ -46,6 +46,29 @@ public enum DictCodeListExt4 implements BaseDictCodeList {
     交易方向_零碎股转现金(DictCode.交易方向,"T105","零碎股转现金"),
     配置类型_股票交易类型_TO_交易方向(DictCode.配置类型, "STOCK_TRADE_TYPE_TO_PS", "股票交易类型_TO_交易方向"),
     /** add by weipeng on 20220426：股票相关变更 end **/
+
+    /** add by zhangzewei on 20220428：股票相关变更 start **/
+    股票交易类型_买入_竞价(DictCode.股票交易类型,"01","买入（竞价）"),
+    股票交易类型_买入_大宗(DictCode.股票交易类型,"02","买入（大宗）"),
+    股票交易类型_卖出(DictCode.股票交易类型,"03","卖出"),
+    股票交易类型_要约收购(DictCode.股票交易类型,"04","要约收购"),
+    股票交易类型_港股通_现金收购(DictCode.股票交易类型,"05","港股通-现金收购"),
+    股票交易类型_要约出售(DictCode.股票交易类型,"06","要约出售"),
+    股票交易类型_配股(DictCode.股票交易类型,"07","配股"),
+    股票交易类型_增发_配售(DictCode.股票交易类型,"08","增发（配售）"),
+    股票交易类型_新股申购(DictCode.股票交易类型,"09","新股申购"),
+    股票交易类型_新股中签(DictCode.股票交易类型,"10","新股中签"),
+    股票交易类型_现金分红(DictCode.股票交易类型,"11","现金分红"),
+    股票交易类型_送股(DictCode.股票交易类型,"12","送股"),
+    股票交易类型_分红且送股(DictCode.股票交易类型,"13","分红且送股"),
+    股票交易类型_增发(DictCode.股票交易类型,"14","红利补税"),
+    股票交易类型_零碎股转现金(DictCode.股票交易类型,"15","零碎股转现金"),
+    股票交易发行方式_新股申购(DictCode.股票交易发行方式,"01","未上市-增发"),
+    股票交易发行方式_股票拆分交易(DictCode.股票交易发行方式,"02","未上市-其他"),
+    股票交易发行方式_股票合并交易(DictCode.股票交易发行方式,"03","未上市-限售"),
+    股票交易发行方式_红利补税(DictCode.股票交易发行方式,"04","未上市-新股"),
+    股票交易发行方式零碎股转现金(DictCode.股票交易发行方式,"05","已上市"),
+    /** add by zhangzewei on 20220428：股票相关变更 end **/
     ;
     /**
      * 对应于数据字典code
