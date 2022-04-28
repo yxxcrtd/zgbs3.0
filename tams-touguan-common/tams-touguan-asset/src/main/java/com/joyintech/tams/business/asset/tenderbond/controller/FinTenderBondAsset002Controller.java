@@ -8,10 +8,13 @@ import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.framework.validation.ValidUtil;
 import com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset001Dto;
+import com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset004Dto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset002Dto;
 import com.joyintech.tams.business.asset.tenderbond.service.FinTenderBondAssetService;
+import com.joyintech.tams.business.common.util.ValidUtils;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
@@ -107,7 +110,7 @@ public class FinTenderBondAsset002Controller extends BaseController {
     public Message check(@RequestBody FinTenderBondAsset002Dto dto) {
         List<ValidMessage> validMessageList = finTenderBoundAssetService.valid(dto);
         if (CollectionUtils.isNotEmpty(validMessageList)) {
-            return Message.fail("校验失败", validMessageList);
+            return Message.fail(ValidUtils.getValidMessage(validMessageList));
         } else {
             return Message.success("校验成功", null);
         }
@@ -119,7 +122,7 @@ public class FinTenderBondAsset002Controller extends BaseController {
     public Message modifyAndDeleteCheck(@RequestBody FinTenderBondAsset001Dto dto) {
         List<ValidMessage> validMessageList = finTenderBoundAssetService.modifyAndDeleteCheck(dto);
         if (CollectionUtils.isNotEmpty(validMessageList)) {
-            return Message.fail("校验失败", validMessageList);
+            return Message.fail(ValidUtils.getValidMessage(validMessageList));
         } else {
             return Message.success("校验成功", null);
         }
@@ -127,7 +130,7 @@ public class FinTenderBondAsset002Controller extends BaseController {
 
     @ResponseBody
     @PostMapping("/save")
-    @ApiOperation(value = "新债标的新建/修改/删除", notes = "新债标的新建/修改/删除")
+    @ApiOperation(value = "新债标的新建/修改", notes = "新债标的新建/修改")
     public Message<AjaxResult> save(@RequestBody FinTenderBondAsset002Dto dto) {
         ProcessParameter<FinTenderBondAsset002Dto> processParameter = new ProcessParameter<>();
         WorkFlowParameter<FinTenderBondAsset002Dto> params = new WorkFlowParameter<>();
@@ -139,10 +142,33 @@ public class FinTenderBondAsset002Controller extends BaseController {
             processParameter.setOperationType(OperationType.NEW);
         } else if (StringUtil.equals(dto.getOperateType(), OperationType.MODIFY.name())) {
             processParameter.setOperationType(OperationType.MODIFY);
-        } else {//删除时将记录取出放入流程留痕表中
-            dto = finTenderBoundAssetService.getById(dto.getFinprodId());
+        }else{
             processParameter.setOperationType(OperationType.DELETE);
         }
+        processParameter.setWorkFlowParameter(params);
+        try {
+            finTenderBoundAssetService.start(processParameter, dto);
+        } catch (Exception e) {
+            logger.error("流程发起失败", e);
+            return Message.fail("流程发起失败");
+        }
+        return Message.success("处理成功", null);
+    }
+
+    @ResponseBody
+    @PostMapping("/delete")
+    @ApiOperation(value = "新债标的删除", notes = "新债标的删除")
+    public Message<AjaxResult> delete(@RequestBody FinTenderBondAsset004Dto asset004Dto) {
+        ProcessParameter<FinTenderBondAsset002Dto> processParameter = new ProcessParameter<>();
+        WorkFlowParameter<FinTenderBondAsset002Dto> params = new WorkFlowParameter<>();
+        params.setPageId(this.getPageId());
+        params.setElementId(asset004Dto.getElementId());
+        params.setBusinessCode(FinTenderBondAsset002Dto::getFinprodMarketId);
+        params.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标债券类资产管理.getValue());
+        FinTenderBondAsset002Dto dto = finTenderBoundAssetService.getById(asset004Dto.getFinprodId());
+        dto.setRemark(asset004Dto.getRemark());
+        dto.setOperateType(OperationType.DELETE.name());
+        processParameter.setOperationType(OperationType.DELETE);
         processParameter.setWorkFlowParameter(params);
         try {
             finTenderBoundAssetService.start(processParameter, dto);

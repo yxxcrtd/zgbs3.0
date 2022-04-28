@@ -102,6 +102,20 @@ public interface JoyinbusinessCommonMapper {
      * @return
      */
     int insertCfetsOprHis(CfetsOprHisInfoRequest record);
+
+    /**
+     * 更新操作记录
+     * @param record
+     * @return
+     */
+    int updateCfetsOprHis(CfetsOprHisInfoRequest record);
+
+    /**
+     * 更新操作记录
+     * @param workflowId 流程代码
+     * @return
+     */
+    List<CfetsOprHisInfoRequest> findCfetsOprHisByWorkflowId(@Param("workflowId") String workflowId);
     /**
      * 查询本方机构列表-银行间
      * <功能详细描述>
@@ -226,4 +240,10 @@ public interface JoyinbusinessCommonMapper {
      * @since 1.0
      */
     List<SelectOptionDto> getfinprodIdForAll(Map<String, Object> param);
+    /**
+     * 统计匹配数
+     * @author jiangpeng
+     * @date 2022/4/28 17:19
+     */
+    int countMatchInfo(@Param("quoteId") String quoteId,@Param("confirmStatus") String confirmStatus);
 }

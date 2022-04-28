@@ -5,20 +5,15 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
-import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
-import com.joyintech.tams.cfets.trd.bond.dto.RiskCalRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.*;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBondFirstSub001Service;
-import com.joyintech.tams.component.business.riskrds.controller.InterfRiskRdsController;
 import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.invest.common.client.ClientData;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,7 +26,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,14 +50,38 @@ public class CfetsTrdBondFirstSub001Controller extends BaseController {
     @Autowired
     private CfetsTrdBondFirstSub001Service cfetsTrdBondFirstSub001Service;
 
+    @Autowired
+    private IPlatformDate iPlatformDate;
+
     @ApiOperation(value = "初始化参数", notes = "初始化参数")
     @PostMapping("/initParams")
     @ResponseBody
     public Message<Map<String, Object>> initParams() {
         Map<String, Object> initPageParams = new HashMap<>();
-        initPageParams.put("PS", this.getSelectDataFromDataDic(DictCode.交易方向, null));
+        // 有效状态
+        initPageParams.put("ISSUE_STATUS", this.getSelectDataFromDataDic(DictCode.发行状态, null));
+        // 发行状态
+        initPageParams.put("STATUS_VALID", this.getSelectDataFromDataDic(DictCode.有效状态, null));
+        // 委托状态_待接收
+        initPageParams.put("ENTRUST_STATUS_02", DictCodeList.委托状态_待接收.getValue());
+        // 委托状态_已接收
+        initPageParams.put("ENTRUST_STATUS_03", DictCodeList.委托状态_已接收.getValue());
+        // 委托状态_已完成
+        initPageParams.put("ENTRUST_STATUS_04", DictCodeList.委托状态_已完成.getValue());
+        // 委托状态_已退回
+        initPageParams.put("ENTRUST_STATUS_05", DictCodeList.委托状态_已退回.getValue());
+        // 债券类型
+        initPageParams.put("BOND_TYPE", this.getSelectDataFromDataDic(DictCode.行内资产四级分类, null));
+        // 系统日期
+        initPageParams.put("sysDate", iPlatformDate.getSysDateStr());
+        // 币种_人民币
+        initPageParams.put("CCY_CNY", DictCodeList.币种_人民币_CNY.getValue());
         //CMDS地址
         initPageParams.put("cmdsWebSocketUrl", cmdsWebSocketUrl);
+        //本币导出按钮配置
+        initPageParams.put("EXPORT_SHOW", CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST"));
+        // 登记页面id 用于登记撤销
+        initPageParams.put("PAGE_ID_BOND_FIRST", "TenderBondSub002");
         //刷新时间
         initPageParams.put("ibuQuoteBond_etrTable_refresh_period", CacheUtil.getSysParam("ibuQuoteBond_etrTable_refresh_period"));
         initPageParams.put("effDate", CacheUtil.getSysParam("ibuVar_quoteEffTime"));
@@ -81,6 +99,19 @@ public class CfetsTrdBondFirstSub001Controller extends BaseController {
             logger.error("查询指令列表分页数据异常", e);
             return new Message<Page<CfetsTrdBondFirstSubEntrustDto>>().fail().setMessage("查询指令列表分页数据异常");
         }
+    }
+
+
+    @ApiOperation(value = "指令列表导出", notes = "指令列表导出")
+    @ResponseBody
+    @PostMapping("exportEntrust")
+    public void exportEntrust(@RequestBody CfetsExportRequestDto requestDto, HttpServletResponse response) {
+        // 导出
+        ExcelUitl.doExport(requestDto, response, "指令列表", () -> {
+            Map<String, Object> param = requestDto.getDto(Map.class);
+            List dataList = cfetsTrdBondFirstSub001Service.listEntrust(param);
+            return dataList;
+        });
     }
 
     @ApiOperation(value = "接收指令(批量)", notes = "接收指令(批量,key=entrustIds 传字符串用逗号隔开)")
@@ -172,7 +203,7 @@ public class CfetsTrdBondFirstSub001Controller extends BaseController {
     @PostMapping("exportDaySub")
     public void exportDaySub(@RequestBody CfetsExportRequestDto requestDto, HttpServletResponse response) {
         // 导出
-        ExcelUitl.doExport(requestDto, response, "当日登记", () -> {
+        ExcelUitl.doExport(requestDto, response, "当日申购", () -> {
             Map<String, Object> param = requestDto.getDto(Map.class);
             List dataList = cfetsTrdBondFirstSub001Service.listDaySub(param);
             return dataList;
@@ -182,13 +213,13 @@ public class CfetsTrdBondFirstSub001Controller extends BaseController {
     @ApiOperation(value = "申购明细", notes = "查询申购明细列表分页数据,按证券账户+资产代码维度查询")
     @PostMapping("/pageDaySubDetail")
     @ResponseBody
-    public Message<Page<CfetsTrdBondFirstSubInfoDto>> pageDaySubDetail(@RequestBody CfetsTrdBondFirstDaySubRequest dto) {
+    public Message<Page<CfetsTrdBondFirstSubDealDetailDto>> pageDaySubDetail(@RequestBody CfetsTrdBondFirstDaySubRequest dto) {
         try {
-            Page<CfetsTrdBondFirstSubInfoDto> list = new Page<>();
-            return new Message<Page<CfetsTrdBondFirstSubInfoDto>>().success().setData(list);
+            Page<CfetsTrdBondFirstSubDealDetailDto> list = cfetsTrdBondFirstSub001Service.pageDaySubDetail(dto);
+            return new Message<Page<CfetsTrdBondFirstSubDealDetailDto>>().success().setData(list);
         } catch (Exception e) {
             logger.error("查询申购明细列表分页数据异常", e);
-            return new Message<Page<CfetsTrdBondFirstSubInfoDto>>().fail().setMessage("查询申购明细列表分页数据异常");
+            return new Message<Page<CfetsTrdBondFirstSubDealDetailDto>>().fail().setMessage("查询申购明细列表分页数据异常");
         }
     }
 
@@ -197,7 +228,7 @@ public class CfetsTrdBondFirstSub001Controller extends BaseController {
     @ResponseBody
     public Message<Page<CfetsTrdBondFirstSubDealDetailDto>> pageDaySubDealDetail(@RequestBody CfetsTrdBondFirstDaySubRequest dto) {
         try {
-            Page<CfetsTrdBondFirstSubDealDetailDto> list = new Page<>();
+            Page<CfetsTrdBondFirstSubDealDetailDto> list = cfetsTrdBondFirstSub001Service.pageDaySubDealDetail(dto);
             return new Message<Page<CfetsTrdBondFirstSubDealDetailDto>>().success().setData(list);
         } catch (Exception e) {
             logger.error("查询申购执行明细分页数据异常", e);

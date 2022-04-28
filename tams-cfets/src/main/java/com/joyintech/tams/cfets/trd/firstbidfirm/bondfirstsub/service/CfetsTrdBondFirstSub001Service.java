@@ -19,7 +19,6 @@ import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.cfets.etrdispatcher.service.CfetsEtrDispatcherService;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
-import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDayRegDto;
 import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondRegCheckRequst;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dao.CfetsTrdBondFirstSub001Mapper;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.*;
@@ -140,8 +139,23 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
      */
     public List<CfetsTrdBondFirstSubEntrustDto> listEntrust(CfetsTrdBondFirstSubEntrustRequest dto, String loginUserId) {
         Map<String, Object> pageParam = BeanUtil.object2Map(dto);
-        setParam(pageParam);
+        this.setParam(pageParam);
         logger.debug("查询指令,入参:" + JsonUtils.object2Json(pageParam));
+        return cfetsTrdBondFirstSub001Mapper.listEntrust(pageParam);
+    }
+
+    /**
+     * 查询指令列表
+     *
+     * @param dto         入参 画面元素
+     * @param loginUserId 登录用户
+     * @return java.util.List<com.joyintech.tams.cfets.bankuplink.bond.dto.EntrustDto>
+     * @author jiangpeng
+     * @date 2022/4/18 15:01
+     */
+    public List<CfetsTrdBondFirstSubEntrustDto> listEntrust(Map<String, Object> pageParam) {
+        logger.debug("查询指令,入参:" + JsonUtils.object2Json(pageParam));
+        this.setParam(pageParam);
         return cfetsTrdBondFirstSub001Mapper.listEntrust(pageParam);
     }
 
@@ -290,11 +304,7 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
         } else {
             boolean status = etrInvestInfoServiceImpl.updateDelegateStatus(entrustId, DictCodeListExt3.委托状态_待分发.getValue());
         }
-        //更新操作记录日志
-        CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
-        oprHisReq.setEntrustId(entrustId);
-        oprHisReq.setOperType(DictCodeListExt3.操作类型_放弃.getValue());
-        joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
+        // 更新履历在AOP中
         return null;
     }
 
@@ -403,12 +413,10 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
     public Page<CfetsTrdBondFirstDaySubDto> pageDaySub(CfetsTrdBondFirstDaySubRequest dto) {
         Map<String, Object> pageParam = BeanUtil.object2Map(dto);
         pageParam.put("loginUserId", LoginUserUtil.getUserName());
-        pageParam.put("platDate", iPlatformDate.getSysDateStr());
-        pageParam.put("OPR_TYPE_09", DictCodeListExt3.操作类型_导出.getValue());
-        setParam(pageParam);
-        pageParam.put("CONFIRM_STATUS_0", com.joyintech.tams.constant.DictCodeList.确认状态_未确认.getValue());
-//        return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsIbuQuoteBondMapper.listDayReg(pageParam));
-        return null;
+        pageParam.put("sysDate", iPlatformDate.getSysDateStr());
+        this.setParam(pageParam);
+        PageMode pageMode = this.setPageMode(dto.getPageMode());
+        return super.queryForPage(pageMode.getPageNo(), pageMode.getPageSize(), () -> cfetsTrdBondFirstSub001Mapper.listDaySub(pageParam));
     }
 
     /**
@@ -419,14 +427,54 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
      * @author jiangpeng
      * @date 2022/4/21 14:28
      */
-    public List<CfetsBondDayRegDto> listDaySub(Map<String, Object> pageParam) {
+    public List<CfetsTrdBondFirstDaySubDto> listDaySub(Map<String, Object> pageParam) {
         pageParam.put("loginUserId", LoginUserUtil.getUserName());
         pageParam.put("platDate", iPlatformDate.getSysDateStr());
         pageParam.put("OPR_TYPE_09", DictCodeListExt3.操作类型_导出.getValue());
-        setParam(pageParam);
+        this.setParam(pageParam);
         pageParam.put("CONFIRM_STATUS_0", com.joyintech.tams.constant.DictCodeList.确认状态_未确认.getValue());
-//        return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsIbuQuoteBondMapper.listDayReg(pageParam));
-        return null;
+        return cfetsTrdBondFirstSub001Mapper.listDaySub(pageParam);
+    }
+
+    /**
+     * 申购明细
+     *
+     * @param request
+     * @return java.util.List<com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto>
+     * @author jiangpeng
+     * @date 2022/4/26 19:30
+     */
+    public List<CfetsTrdBondFirstSubDealDetailDto> listDaySubDetail(CfetsTrdBondFirstDaySubRequest request) {
+        Map<String, Object> pageParam = BeanUtil.object2Map(request);
+        return cfetsTrdBondFirstSub001Mapper.listDaySubDetail(pageParam);
+    }
+
+    /**
+     * 申购明细
+     *
+     * @param request
+     * @return com.joyintech.framework.grid.Page<com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto>
+     * @author jiangpeng
+     * @date 2022/4/26 19:37
+     */
+    public Page<CfetsTrdBondFirstSubDealDetailDto> pageDaySubDetail(CfetsTrdBondFirstDaySubRequest request) {
+        Map<String, Object> pageParam = BeanUtil.object2Map(request);
+        PageMode pageMode = this.setPageMode(request.getPageMode());
+        return super.queryForPage(pageMode.getPageNo(), pageMode.getPageSize(), () -> cfetsTrdBondFirstSub001Mapper.listDaySubDetail(pageParam));
+    }
+
+    /**
+     * 申购执行明细
+     *
+     * @param request
+     * @return com.joyintech.framework.grid.Page<com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubDealDetailDto>
+     * @author jiangpeng
+     * @date 2022/4/26 19:36
+     */
+    public Page<CfetsTrdBondFirstSubDealDetailDto> pageDaySubDealDetail(CfetsTrdBondFirstDaySubRequest request) {
+        Map<String, Object> pageParam = BeanUtil.object2Map(request);
+        PageMode pageMode = this.setPageMode(request.getPageMode());
+        return super.queryForPage(pageMode.getPageNo(), pageMode.getPageSize(), () -> cfetsTrdBondFirstSub001Mapper.listDaySubDealDetail(pageParam));
     }
 
     /**

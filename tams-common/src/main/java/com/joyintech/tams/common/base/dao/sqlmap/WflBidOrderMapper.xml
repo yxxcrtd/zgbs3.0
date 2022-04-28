@@ -42,6 +42,10 @@
     delete from WFL_BID_ORDER
     where BID_ID = #{bidId,jdbcType=VARCHAR}
   </delete>
+  <delete id="deleteByWorkflowId" parameterType="java.lang.String">
+    delete from WFL_BID_ORDER
+    where WORKFLOW_ID = #{workflowId,jdbcType=VARCHAR}
+  </delete>
   <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.WflBidOrder">
     insert into WFL_BID_ORDER (BID_ID, FINPROD_ID, BID_DATE, 
       PAY_TYPE, PAY_DATE, IS_WIN, 

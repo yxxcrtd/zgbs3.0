@@ -13,79 +13,82 @@ import java.util.Date;
 @ApiModel(value = "当日申购", description = "当日申购列表")
 public class CfetsTrdBondFirstDaySubDto {
 
-    @ApiModelProperty(required = false, name = "issueStatus", value = "发行状态", example = "01")
+    @ApiModelProperty(name = "issueStatus", value = "发行状态", example = "01")
     private String issueStatus;
 
-    @ApiModelProperty(required = false, name = "issueStatusStr", value = "发行状态名称,显示用", example = "发行成功")
+    @ApiModelProperty(name = "issueStatusStr", value = "发行状态名称,显示用", example = "发行成功")
     private String issueStatusStr;
 
-    @ApiModelProperty(required = false, name = "finprodId", value = "资产代码,系统内代码一般不用于显示", example = "F01_001.IB")
+    @ApiModelProperty(name = "finprodId", value = "资产代码,系统内代码一般不用于显示", example = "F01_001.IB")
     private String finprodId;
 
-    @ApiModelProperty(required = false, name = "finprodMarketId", value = "市场代码,显示用代码", example = "001.IB")
+    @ApiModelProperty(name = "finprodMarketId", value = "市场代码,显示用代码", example = "001.IB")
     private String finprodMarketId;
 
-    @ApiModelProperty(required = false, name = "finprodAbbr", value = "资产简称", example = "001债券")
+    @ApiModelProperty(name = "finprodAbbr", value = "资产简称", example = "001债券")
     private String finprodAbbr;
 
-    @ApiModelProperty(required = false, name = "secManageAcctId", value = "证券账户", example = "zqzh")
+    @ApiModelProperty(name = "secManageAcctId", value = "证券账户", example = "zqzh")
     private String secManageAcctId;
 
-    @ApiModelProperty(required = false, name = "secAcctName", value = "证券账户名称,展示用")
+    @ApiModelProperty(name = "secAcctName", value = "证券账户名称,展示用")
     private String secAcctName;
 
-    @ApiModelProperty(required = true, name = "subscriptionAmount", value = "认购量", example = "1000.00")
+    @ApiModelProperty(name = "subscriptionAmount", value = "认购量", example = "1000.00")
     private BigDecimal subscriptionAmount;
 
-    @ApiModelProperty(required = true, name = "payableAmount", value = "应缴款金额", example = "1000.00")
+    @ApiModelProperty(name = "payableAmount", value = "应缴款金额", example = "1000.00")
     private BigDecimal payableAmount;
 
-    @ApiModelProperty(required = false, name = "settFeeAmt", value = "结算服务费", example = "1000.00")
+    @ApiModelProperty(name = "issuePrice", value = "发行价格", example = "99.0000")
+    private BigDecimal issuePrice;
+
+    @ApiModelProperty(name = "settFeeAmt", value = "结算服务费", example = "1000.00")
     private BigDecimal settFeeAmt;
 
-    @ApiModelProperty(required = false, name = "rate", value = "参考收益率/票面利率", example = "99.0000")
+    @ApiModelProperty(name = "rate", value = "参考收益率/票面利率", example = "99.0000")
     private BigDecimal rate;
 
-    @ApiModelProperty(required = false, name = "issueType", value = "发行方式")
+    @ApiModelProperty(name = "issueType", value = "发行方式")
     private String issueType;
 
-    @ApiModelProperty(required = false, name = "issueTypeStr", value = "发行方式名称,展示用")
+    @ApiModelProperty(name = "issueTypeStr", value = "发行方式名称,展示用")
     private String issueTypeStr;
 
-    @ApiModelProperty(required = false, name = "issueDate", value = "发行日")
+    @ApiModelProperty(name = "issueDate", value = "发行日")
     private Date issueDate;
 
-    @ApiModelProperty(required = false, name = "issueDateStr", value = "发行日格式化")
+    @ApiModelProperty(name = "issueDateStr", value = "发行日格式化")
     private String issueDateStr;
 
-    @ApiModelProperty(required = false, name = "payDate", value = "缴款日")
+    @ApiModelProperty(name = "payDate", value = "缴款日")
     private Date payDate;
 
-    @ApiModelProperty(required = false, name = "payDateStr", value = "缴款日格式化")
+    @ApiModelProperty(name = "payDateStr", value = "缴款日格式化")
     private String payDateStr;
 
-    @ApiModelProperty(required = false, name = "couponSpecies", value = "息票品种", example = "01")
+    @ApiModelProperty(name = "couponSpecies", value = "息票品种", example = "01")
     private String couponSpecies;
 
-    @ApiModelProperty(required = false, name = "couponSpeciesStr", value = "息票品种名称,展示用", example = "零息")
+    @ApiModelProperty(name = "couponSpeciesStr", value = "息票品种名称,展示用", example = "零息")
     private String couponSpeciesStr;
 
-    @ApiModelProperty(required = false, name = "intType", value = "利率类型", example = "01")
+    @ApiModelProperty(name = "intType", value = "利率类型", example = "01")
     private String intType;
 
-    @ApiModelProperty(required = false, name = "intTypeStr", value = "利率类型名称,展示用", example = "固定利率")
+    @ApiModelProperty(name = "intTypeStr", value = "利率类型名称,展示用", example = "固定利率")
     private String intTypeStr;
 
-    @ApiModelProperty(required = false, name = "ouPartyId", value = "本方id", example = "114912384")
+    @ApiModelProperty(name = "ouPartyId", value = "本方id", example = "114912384")
     private String ouPartyId;
 
-    @ApiModelProperty(required = false, name = "ouPartyIdAbbr", value = "本方简称", example = "广发银行")
+    @ApiModelProperty(name = "ouPartyIdAbbr", value = "本方简称", example = "广发银行")
     private String ouPartyIdAbbr;
 
-    @ApiModelProperty(required = false, name = "issuer", value = "发行人id", example = "001")
+    @ApiModelProperty(name = "issuer", value = "发行人id", example = "001")
     private String issuer;
 
-    @ApiModelProperty(required = false, name = "issuerName", value = "发行人名称,展示用", example = "发行人1")
+    @ApiModelProperty(name = "issuerName", value = "发行人名称,展示用", example = "发行人1")
     private String issuerName;
 
 
@@ -162,6 +165,14 @@ public class CfetsTrdBondFirstDaySubDto {
 
     public void setPayableAmount(BigDecimal payableAmount) {
         this.payableAmount = payableAmount;
+    }
+
+    public BigDecimal getIssuePrice() {
+        return issuePrice;
+    }
+
+    public void setIssuePrice(BigDecimal issuePrice) {
+        this.issuePrice = issuePrice;
     }
 
     public BigDecimal getSettFeeAmt() {

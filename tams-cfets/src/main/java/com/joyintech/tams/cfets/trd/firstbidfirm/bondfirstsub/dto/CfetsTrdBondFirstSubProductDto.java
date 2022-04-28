@@ -55,6 +55,11 @@ public class CfetsTrdBondFirstSubProductDto {
     @ApiModelProperty(name = "secAcctName", value = "证券账户名称")
     private String secAcctName;
 
+    /**
+     * 交易成员ID，21位编号
+     */
+    private String partyId;
+
     public String getEntrustId() {
         return entrustId;
     }
@@ -152,5 +157,13 @@ public class CfetsTrdBondFirstSubProductDto {
 
     public void setBusinessModelStr(String businessModelStr) {
         this.businessModelStr = businessModelStr;
+    }
+
+    public String getPartyId() {
+        return partyId;
+    }
+
+    public void setPartyId(String partyId) {
+        this.partyId = partyId;
     }
 }

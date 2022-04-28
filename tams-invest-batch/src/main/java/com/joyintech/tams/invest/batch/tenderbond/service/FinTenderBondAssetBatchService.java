@@ -1,5 +1,6 @@
 package com.joyintech.tams.invest.batch.tenderbond.service;
 
+import com.google.common.collect.Lists;
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.pojo.BaseMap;
@@ -13,6 +14,8 @@ import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.batch.tenderbond.dao.FinTenderBondAssetBatchMapper;
 import com.joyintech.tams.invest.batch.tenderbond.dto.FinTenderBondAssetBatchDto;
+import com.joyintech.tams.invest.batch.valbatchimport.common.dto.InterfPayhsrcsecinfoDto;
+import com.joyintech.tams.invest.batch.valbatchimport.common.service.CommonAutoCouponService;
 import com.joyintech.tams.invest.common.autoperiod.common.AutoPeriodCommonService;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import org.apache.commons.collections.CollectionUtils;
@@ -39,6 +42,9 @@ public class FinTenderBondAssetBatchService {
 
     @Resource
     private AutoPeriodCommonService autoPeriodCommonService;
+
+    @Resource
+    private CommonAutoCouponService commonAutoCouponService;
 
     @Resource
     private TrdFinProductDealTotalMapper trdFinProductDealTotalMapper;
@@ -166,12 +172,18 @@ public class FinTenderBondAssetBatchService {
 
 
     /**
-     * 自动加券
+     * 自动加券成功返回true,失败返回false
      *
      * @param payhsrcsecinfo
      */
     private boolean autoBondCoupon(InterfPayhsrcsecinfo payhsrcsecinfo) {
-        return false;
+        InterfPayhsrcsecinfoDto dto = new InterfPayhsrcsecinfoDto();
+        dto.setSecidList(Lists.newArrayList(payhsrcsecinfo.getSecid()));
+        InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = commonAutoCouponService.autoBondCoupon(dto);
+        if (Objects.nonNull(interfPayhsrcsecinfoDto) && CollectionUtils.isNotEmpty(interfPayhsrcsecinfoDto.getErrorBondList())) {
+            return false;
+        }
+        return true;
     }
 
     /**
