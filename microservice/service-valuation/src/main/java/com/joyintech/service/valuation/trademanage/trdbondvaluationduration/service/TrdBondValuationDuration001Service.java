@@ -61,8 +61,12 @@ public class TrdBondValuationDuration001Service extends BaseService {
         String[] psArr = null;
         if (StringUtil.isNotEmpty(ps)) {
             psArr = ps.split(",");
+            pageParam.put("psArr", psArr);
+        }else{
+            String[] psArr1 = {DictCodeList.交易方向_收息到账.getValue()
+                    ,DictCodeList.交易方向_还本到账.getValue()};
+            pageParam.put("psArr", psArr1);
         }
-        pageParam.put("psArr", psArr);
 
         // 获取数据来源
         String dataSource = (String)pageParam.get("dataSource");
