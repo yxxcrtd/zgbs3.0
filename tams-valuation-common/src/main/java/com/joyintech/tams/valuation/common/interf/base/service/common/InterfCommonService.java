@@ -23,6 +23,7 @@ import com.joyintech.tams.valuation.common.batch.finproduct.entity.InvAimDto;
 import com.joyintech.tams.valuation.common.batch.finproduct.service.FinProductCommonBatchService;
 import com.joyintech.tams.valuation.common.batch.tradecommon.dto.ValTrdProductDealInfoDto;
 import com.joyintech.tams.valuation.common.batch.tradecommon.service.ValTradeCommonService;
+import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.common.constants.ValDictCode;
 import com.joyintech.tams.valuation.common.constants.ValDictCodeList;
 import com.joyintech.tams.valuation.common.interf.base.batch.dao.ValAcctLayeringInfoBatchMapper;
@@ -2671,7 +2672,7 @@ public class InterfCommonService {
          */
         // add by weipeng on 20220408：会计引擎升级改造，若按照内部科目编码分录，则需要对应新会计引擎模板 start
         // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录
-        String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+        String accountEntryType =  CacheUtil.getSysParam(GlobalConstant.ACCOUNT_ENTRY_TYPE);
         //调用service方法进行逻辑逻辑
         if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
             if (finProductExt.getIsLayerAccount().equals(DictCodeList.是否_否.getValue())) {
@@ -6396,7 +6397,7 @@ public class InterfCommonService {
 	    		map.clear();
                 // add by weipeng on 20220408：会计引擎升级改造，若按照内部科目编码分录，则需要对应新会计引擎模板 start
                 // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录
-                String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+                String accountEntryType =  CacheUtil.getSysParam(GlobalConstant.ACCOUNT_ENTRY_TYPE);
                 //调用service方法进行逻辑逻辑
                 if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
                     map.put("BOOKSETID", InterfCommonConstant.BOOKSETID_NEW);

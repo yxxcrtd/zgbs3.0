@@ -98,7 +98,7 @@ public class BookDetailCompareIntoProcessorService {
                 key_a.setAssetId(val.getTradeId());// 交易编号
                 /**新会计引擎升级后，一个分录中可能存在基础科目性质一样的，但不能将其合并 add by yinya on 2022-03-08 start**/
                 // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录 start
-                String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+                String accountEntryType =  CacheUtil.getSysParam(GlobalConstant.ACCOUNT_ENTRY_TYPE);
                 if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
                     key_a.setBaseSubjectNature(val.getSubjectNo());//只能按科目号合并
                 }else{
@@ -150,7 +150,7 @@ public class BookDetailCompareIntoProcessorService {
                 key_c.setAssetId(val.getTradeId());// 交易编号
                 /**新会计引擎升级后，一个分录中可能存在基础科目性质一样的，但不能将其合并 add by yinya on 2022-03-08 start**/
                 // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录 start
-                String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+                String accountEntryType =  CacheUtil.getSysParam(GlobalConstant.ACCOUNT_ENTRY_TYPE);
                 if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
                     key_c.setBaseSubjectNature(val.getSubjectNo());//只能按科目号合并
                 }else{
