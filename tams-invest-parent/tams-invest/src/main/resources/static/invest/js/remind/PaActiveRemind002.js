@@ -610,6 +610,10 @@ $(function() {
                 },
                 {
                     field : 'trdAcctId',
+                    visible : false
+                },
+                {
+                    field : 'trdAcctName',
                     title : '资金账户',
                     width : 300
                 },

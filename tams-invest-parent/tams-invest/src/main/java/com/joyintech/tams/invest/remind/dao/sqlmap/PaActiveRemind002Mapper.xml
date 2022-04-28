@@ -3521,6 +3521,7 @@ select #{R7S1} as remType,
 		PP.portfolio_id as finprodId,
 		PP.portfolio_name as finprodName,
 		SSAI.trd_Acct_Id as trdAcctId,
+		SSAI.sec_acct_name as trdAcctName,
 		REMINDER_SET.DEALF   dealF,
 		REMINDER_SET.CLOSF   closF,
 		case SSAI.trade_Place
