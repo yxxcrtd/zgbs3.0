@@ -183,6 +183,9 @@ public class SecDealAccountsNewService {
         // 变量.溢折价科目余额
         param.setVarYzjSubjectAmt(BigDecimal.ZERO);
 
+        // 变量.减值准备科目余额
+        param.setVarJzzbSubjectAmt(BigDecimal.ZERO);
+
         // 变量.其他应收款-利息科目余额 = MAP（KEY：分支序号，VALUE:科目余额）
         param.setVarQtyskxSubjectAmt(new HashMap<>());
 
@@ -779,54 +782,6 @@ public class SecDealAccountsNewService {
         //金额元素.实收金额_清算款 <-		变量.交易金额_清算款
 
         accountAmountMap.put(BookConstant.DEALAMT_QSK, 交易本金);
-        BigDecimal 冲抵减值金额 = BigDecimal.ZERO;
-        /**ADD BY CAOGUO ON 20201102 减值相关修改 START **/
-        if(DictCodeListExt3.还本收息冲抵减值准备处理日_资金到账日.getValue().equals(offsetImptDateType)
-           && BigDecimal.ZERO.compareTo(param.getVarJzzbSubjectAmt()) != 0){
-
-            BigDecimal qtyskBjBalAmt = param.getVarQtyskxBJSubjectAmt().get(String.valueOf(dealNow.getBranch()));
-            //            if(qtyskBjBalAmt == null) {
-            //                SubjectBalanceSearchDto searchDao = new SubjectBalanceSearchDto();
-            //                searchDao.setBooksetId(dealNow.getBooksetId());
-            //                searchDao.setBokDetailId(dealNow.getBokDetailId());
-            //                searchDao.setHappenDate(dealNow.getHappenDate());
-            //                searchDao.setBookDate(dealNow.getBookDate());
-            //                searchDao.setTaskPri(dealNow.getTaskPri());
-            //                searchDao.setBaseSubjectNatureList(new ArrayList<String>(
-            //                        Arrays.asList(DictCodeBaseSubjectNatrueNew.清算资金往来.getValue())));
-            //                searchDao.setBranch(dealNow.getBranch());
-            //                List<SubjectBalance> listSubjectBalance = accountingCommonService.getSubjectBalanceExpectDirection(
-            //                        searchDao, DictCodeList.余额方向_借方.getValue());
-            //                SubjectBalance subjectBalance = new SubjectBalance();
-            //                if(!StringUtil.isEmptyList(listSubjectBalance)) {
-            //                    subjectBalance = listSubjectBalance.get(0);
-            //                    param.getVarQtyskxBJSubjectAmt().put(String.valueOf(dealNow.getBranch()),subjectBalance.getBalance());
-            //                }
-            //            }
-
-            LossAmtInputDto dto = this.getLossAmtInputDto(acctEntity, dealNow,
-                DictCodeListExt1.现金流一级类型_本金.getValue(),
-                /** modify by yanya on 20210301 存续期增加提前交收处理 sart**/
-                //变量.交易本金 + 变量.交易金额_清算款
-                交易本金,
-                /** modify by yanya on 20210301 存续期增加提前交收处理 end**/
-                //减值准备余额
-                param.getVarJzzbSubjectAmt(),
-                //当前EAD金额 = 变量.成本科目余额 + 变量.应计利息科目余额 + 变量.其他应收款本金汇总余额 + 变量.其他应收款利息汇总月 + 变量.逾期利息汇总余额
-                ArithmeticUtil.doAdd(param.getVarCostSubjectAmt(),
-                    param.getVarLxSubjectAmt(),
-                    param.getVarYzjSubjectAmt(),
-                    param.getVarQtyskBjSubjectSumAmt(),
-                    param.getVarQtyskLxSubjectSumAmt(),
-                    param.getVarYqfxSubjectSumAmt()),
-                //应收款余额
-                param.getVarQtyskxBJSubjectAmt().get(String.valueOf(dealNow.getBranch())));
-            冲抵减值金额 = lossCommonBatchService.calcLossAmtForDur(dto);
-        }
-        //减值准备  <- 变量.冲抵减值金额 * -1
-        accountAmountMap.put(BookConstant.IMPAMT,
-            ArithmeticUtil.round(ArithmeticUtil.multiply(冲抵减值金额,new BigDecimal(-1)), NumberEnum.MONEY));
-        /**ADD BY CAOGUO ON 20201102 减值相关修改 END **/
         // 因为与记账金额元素map的key及数量一致，故采用循环
         for (String keyNow : accountAmountMap.keySet()) {
             accountCurrencyMap.put(keyNow, dealNow.getCcy());// value值塞入当前交易币种
@@ -923,38 +878,6 @@ public class SecDealAccountsNewService {
         //param.setVarQtyskBjSubjectSumAmt(ArithmeticUtil.doSub(param.getVarQtyskBjSubjectSumAmt(),dealNow.getFpriceAmt()));
         param.setVarQtyskBjSubjectSumAmt(ArithmeticUtil.doSub(param.getVarQtyskBjSubjectSumAmt(),交易本金));
         /** modify by yanya on 20210301 存续期增加提前交收处理 end**/
-        //变量.减值准备科目余额 = 变量.减值准备科目余额 - 变量.冲减减值金额                                             
-        param.setVarJzzbSubjectAmt(ArithmeticUtil.doSub(param.getVarJzzbSubjectAmt(),冲抵减值金额));
-
-        if(BigDecimal.ZERO.compareTo(冲抵减值金额)!=0){
-            List<ValBokBookdetailBatch> valBokBookdetailBatch = resultNowNow.getValBokBookdetailBatch();
-            List<ValBokBookdetailBatch> valBokBookdetailBatchResult = new ArrayList<ValBokBookdetailBatch>();
-            for (ValBokBookdetailBatch dto : valBokBookdetailBatch) {
-                if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(dealNow.getInvAim())) {
-                    if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.摊余成本类_减值准备.getValue())) {
-                        valBokBookdetailBatchResult.add(dto);
-                    }
-                }
-                else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(dealNow.getInvAim())) {
-                    if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.其他综合收益_减值准备.getValue())) {
-                        valBokBookdetailBatchResult.add(dto);
-                    }
-                }
-            }
-            if (CollectionUtils.isNotEmpty(valBokBookdetailBatchResult)) {
-                ValBokBookdetailBatch valBokBookdetailBatchDto = valBokBookdetailBatchResult.get(0);
-                BokStatLossPosiiton bokStatLossPosiiton = lossCommonService.setLossInfoUsed(valBokBookdetailBatchDto,
-                    accountAmountMap.get(BookConstant.IMPAMT),
-                    accountAmountMap.get(BookConstant.IMPAMT+ BookConstant.BCCYAMT),
-                    param.getVarJzzbSubjectAmt(),
-                    calculationCommonService.doMultiply(NumberEnum.MONEY.getCode(), null,
-                        param.getVarJzzbSubjectAmt(), 汇率)
-                    ,dealNow.getTradeId());
-                // 统计分析明细表（资产减值）
-                returnResult.getBokStatLossPosiitonList().add(bokStatLossPosiiton);
-            }
-        }
-        /**ADD BY CAOGUO ON 20201015 END**/
     }
 
     /**
@@ -1171,35 +1094,7 @@ public class SecDealAccountsNewService {
             accountAmountMap.put(BookConstant.NETAMT_D, ArithmeticUtil.round(
                 ArithmeticUtil.multiply(varTradeAmt, new BigDecimal(-1)), NumberEnum.MONEY));
         }
-        /** modify by yanya on 20210301 存续期增加提前交收处理 end**/
-        /**ADD BY CAOGUO ON 20201102 减值相关修改 START **/
-        BigDecimal 冲抵减值金额 = BigDecimal.ZERO;
-        if(DictCodeListExt3.还本收息冲抵减值准备处理日_资金到账日.getValue().equals(offsetImptDateType)
-           && BigDecimal.ZERO.compareTo(param.getVarJzzbSubjectAmt()) != 0){
-            LossAmtInputDto dto = this.getLossAmtInputDto(acctEntity, dealNow,
-                DictCodeListExt1.现金流一级类型_利息.getValue(),
-                /** modify by yanya on 20210301 存续期增加提前交收处理 start**/
-                //发生金额 + 变量.交易金额_清算款
-                //varInterestAccBal,
-                ArithmeticUtil.doAdd(varInterestAccBal, 交易金额清算款),
-                /** modify by yanya on 20210301 存续期增加提前交收处理 end**/
-                //减值准备余额
-                param.getVarJzzbSubjectAmt(),
-                //当前EAD金额 = 变量.成本科目余额 + 变量.应计利息科目余额 + 变量.溢折价科目余额 + 变量.其他应收款本金汇总余额 + 变量.其他应收款利息汇总月 + 变量.逾期利息汇总余额
-                ArithmeticUtil.doAdd(param.getVarCostSubjectAmt(),
-                    param.getVarLxSubjectAmt(),
-                    param.getVarYzjSubjectAmt(),
-                    param.getVarQtyskBjSubjectSumAmt(),
-                    param.getVarQtyskLxSubjectSumAmt(),
-                    param.getVarYqfxSubjectSumAmt()),
-                //应收款余额
-                param.getVarQtyskxSubjectAmt().get(String.valueOf(dealNow.getBranch())));
-            冲抵减值金额 = lossCommonBatchService.calcLossAmtForDur(dto);
-        }
-        //减值准备  <- 变量.冲抵减值金额 * -1
-        accountAmountMap.put(BookConstant.IMPAMT,
-            ArithmeticUtil.round(ArithmeticUtil.multiply(冲抵减值金额,new BigDecimal(-1)), NumberEnum.MONEY));
-        /**ADD BY CAOGUO ON 20201102 减值相关修改 END **/
+
         // accountAmountMap再设置如下：
         // 通道费账务明细代码 <- 变量.交易各种费用.通道费账务明细代码
         // 通道管理费账务明细代码 <- 变量.交易各种费用.通道管理费账务明细代码
@@ -1300,39 +1195,6 @@ public class SecDealAccountsNewService {
 
         //变量.其他应收款利息汇总余额 = 变量.其他应收款利息汇总余额  -  变量.应计利息
         param.setVarQtyskLxSubjectSumAmt(ArithmeticUtil.doSub(param.getVarQtyskLxSubjectSumAmt(),varInterestAccBal));
-        //变量.减值准备科目余额 = 变量.减值准备科目余额 - 变量.冲减减值金额                                             
-        param.setVarJzzbSubjectAmt(ArithmeticUtil.doSub(param.getVarJzzbSubjectAmt(),冲抵减值金额));
-        /**ADD BY CAOGUO ON 20201102 减值相关修改 START **/
-
-        if(BigDecimal.ZERO.compareTo(冲抵减值金额)!=0){
-            List<ValBokBookdetailBatch> valBokBookdetailBatch = resultNowNow.getValBokBookdetailBatch();
-            List<ValBokBookdetailBatch> valBokBookdetailBatchResult = new ArrayList<ValBokBookdetailBatch>();
-            for (ValBokBookdetailBatch dto : valBokBookdetailBatch) {
-                if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(dealNow.getInvAim())) {
-                    if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.摊余成本类_减值准备.getValue())) {
-                        valBokBookdetailBatchResult.add(dto);
-                    }
-                }
-                else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(dealNow.getInvAim())) {
-                    if (dto.getBaseSubjectNature().equals(DictCodeBaseSubjectNatrueNew.其他综合收益_减值准备.getValue())) {
-                        valBokBookdetailBatchResult.add(dto);
-                    }
-                }
-            }
-            if (CollectionUtils.isNotEmpty(valBokBookdetailBatchResult)) {
-                ValBokBookdetailBatch valBokBookdetailBatchDto = valBokBookdetailBatchResult.get(0);
-                BokStatLossPosiiton bokStatLossPosiiton = lossCommonService.setLossInfoUsed(valBokBookdetailBatchDto,
-                    accountAmountMap.get(BookConstant.IMPAMT),
-                    accountAmountMap.get(BookConstant.IMPAMT+ BookConstant.BCCYAMT),
-                    param.getVarJzzbSubjectAmt(),
-                    calculationCommonService.doMultiply(NumberEnum.MONEY.getCode(), null,
-                        param.getVarJzzbSubjectAmt(), 汇率)
-                    ,dealNow.getTradeId());
-                // 统计分析明细表（资产减值）
-                returnResult.getBokStatLossPosiitonList().add(bokStatLossPosiiton);
-            }
-        }
-        /**ADD BY CAOGUO ON 20201102 减值相关修改 END **/
     }
 
     /**
@@ -2459,7 +2321,7 @@ public class SecDealAccountsNewService {
                 searchDao, DictCodeList.余额方向_借方.getValue());
         }
         if (listSubjectBalanceLS != null && listSubjectBalanceLS.size() > 0) {
-            // 变量.溢折价科目余额 = 科目余额
+            // 变量.减值准备科目余额 = 科目余额
             param.setVarJzzbSubjectAmt(listSubjectBalanceLS.get(0).getBalance());
         }
 
@@ -9055,56 +8917,6 @@ public class SecDealAccountsNewService {
                 ArithmeticUtil.multiply(dealNow.getShareAmt(), dealNow.getParValue()));
             varZyj = ArithmeticUtil.doAdd(varZyj, dealTypesFeeDto.getFeeAmt());
         }
-        /**ADD BY CAOGUO ON 20201015 减值相关修改 START **/
-        // 定义 变量.减值准备 = 0
-        BigDecimal varJzzb = BigDecimal.ZERO;
-        // 变量.方案明细代码
-        String schemeDetailId = null;
-        // if（交易类账务处理结果.减值阶段 = "P3买入后出现减值"）
-        if (DictCodeListExt3.阶段_买入后出现减值_P3.getValue().equals(dealNow.getLossStage())) {
-            // 定义 变量.减值后面值 = 0
-            BigDecimal varJzhmz = BigDecimal.ZERO;
-            // 定义 变量.摊余成本 = 0
-            BigDecimal varTycb = BigDecimal.ZERO;
-            // 调用减值相关共通-获取最新资产减值流水
-            Map<String, Object> trdLossParam = new HashMap<String, Object>();
-            trdLossParam.put("queryDate", acctEntity.getHappenDate());
-            trdLossParam.put("secId", rstBaseinfo.getFinprodMarketId());
-            TrdAssetLoss trdAssetLoss = lossCommonService.getTrdAssetLoss(trdLossParam);
-            // if（变量.资产减值流水DTO !=null && 变量.资产减值流水DTO.交易编号 != null）
-            if (trdAssetLoss != null && StringUtil.isNotEmpty(trdAssetLoss.getTradeId())) {
-                // 变量.方案明细代码 = 变量.资产减值流水DTO.交易编号
-                schemeDetailId = trdAssetLoss.getTradeId();
-                // 调用减值相关共通-减值计提计算(资产减值流水DTO,交易明细.交易份额 * 交易明细.单位面值)
-                BigDecimal varJzje = lossCommonService.lossProvisionCalculate(trdAssetLoss, varMz);
-                // 变量.减值后面值 = 变量.当前面值 - 上述共通返回.减值余额
-                varJzhmz = ArithmeticUtil.round(ArithmeticUtil.doSub(varMz, varJzje),
-                    NumberEnum.MONEY);
-                // if（变量.标的信息.息票品种为零息或贴现时）
-                if (DictCodeList.息票品种_零息.getValue().equals(rstBaseinfo.getCouponSpecies())
-                    || DictCodeList.息票品种_贴现.getValue().equals(rstBaseinfo.getCouponSpecies())) {
-                    // 变量.摊余成本 = 交易明细.全价总额 + 变量.交易各种费用.交易费用
-                    varTycb = ArithmeticUtil.doAdd(dealNow.getFpriceAmt(),
-                        dealTypesFeeDto.getFeeAmt());
-                }
-                else {
-                    // 调用减值相关共通-债券日间利息计算 变量.应计利息 = 上述返回.利息金额
-                    varYjlx = lossCommonService.calSecIntAmt(rstBaseinfo, dealNow.getShareAmt(),dealNow.getParValue(), acctEntity.getHappenDate());
-                    // 变量.摊余成本 = 交易明细.全价总额 - 变量.应计利息 + 变量.交易各种费用.交易费用
-                    varTycb = ArithmeticUtil.doAdd(
-                        ArithmeticUtil.doSub(dealNow.getFpriceAmt(), varYjlx),
-                        dealTypesFeeDto.getFeeAmt());
-                }
-                // 变量.溢折价 = 变量.当前面值*变量.摊余成本/变量.减值后面值-变量.当前面值
-                varZyj = ArithmeticUtil.divide(ArithmeticUtil.multiply(varMz, varTycb), varJzhmz,
-                    NumberEnum.MONEY.getCode());
-                varZyj = ArithmeticUtil.doSub(varZyj, varMz);
-                // 变量.减值准备 = 变量.摊余成本 - 变量.溢折价 - 变量.当前面值
-                varJzzb = ArithmeticUtil.doSub(varTycb, varZyj, varMz);
-            }
-
-        }
-        /**ADD BY CAOGUO ON 20201015 END**/
         // 应计利息 <- 变量.应计利息
         accountAmountMap.put(BookConstant.INTAMT, ArithmeticUtil.round(varYjlx, NumberEnum.MONEY));
 
@@ -9119,11 +8931,6 @@ public class SecDealAccountsNewService {
             accountAmountMap.put(BookConstant.DSCINC_C, ArithmeticUtil.round(
                 ArithmeticUtil.multiply(varZyj, new BigDecimal(-1)), NumberEnum.MONEY));
         }
-        /**ADD BY CAOGUO ON 20201015 减值相关修改 START **/
-        // 结算手续费账务明细代码 <- 变量.交易各种费用.结算手续费账务明细代码
-        accountAmountMap.put(BookConstant.IMPAMT,
-            varJzzb.negate());
-        /**ADD BY CAOGUO ON 20201015 END**/
 
         // accountAmountMap再设置如下
         // 印花税账务明细代码 <- 变量.交易各种费用.印花税账务明细代码
@@ -9237,10 +9044,6 @@ public class SecDealAccountsNewService {
         param.setVarYzjSubjectAmt(ArithmeticUtil.doAdd(param.getVarYzjSubjectAmt(), varZyj));
         // 变量.应计利息科目余额 = 变量.应计利息科目余额 + 变量.应计利息
         param.setVarLxSubjectAmt(ArithmeticUtil.doAdd(param.getVarLxSubjectAmt(), varYjlx));
-        /**ADD BY CAOGUO ON 20201015 减值相关修改 START **/
-        //变量.减值准备科目余额 = 变量.减值准备科目余额 + 变量.减值准备
-        param.setVarJzzbSubjectAmt(ArithmeticUtil.doAdd(param.getVarJzzbSubjectAmt(), varJzzb));
-        /**ADD BY CAOGUO ON 20201015 END**/
         // if（场景元素.在途日期 != 空）
         if (accountSceneMap.get(BookConstant.ONWAY_DATE) != null) {
             // 变量.T+1发生利息调整 += 变量.溢折价
@@ -9405,27 +9208,6 @@ public class SecDealAccountsNewService {
             // 变量.冲减应计利息 = 0
             varCjyjlx = BigDecimal.ZERO;
         }
-        /**ADD BY CAOGUO ON 20201015 减值相关修改 START **/
-        // 变量.减值使用 = 0
-        BigDecimal varJzzb = BigDecimal.ZERO;
-        LossAmtInputDto inputdto = this.getLossAmtInputDto(acctEntity, dealNow,
-            null,
-            //本次发生额 = 变量.冲减应计利息 + 变量.冲减成本 + 变量.冲减溢折价
-            ArithmeticUtil.doAdd(varCjcb,varCjyjlx,varCjzyj),
-            //减值准备余额
-            param.getVarJzzbSubjectAmt(),
-            //当前EAD金额 = 变量.成本科目余额 + 变量.应计利息科目余额 + 变量.其他应收款本金汇总余额 + 变量.其他应收款利息汇总月 + 变量.逾期利息汇总余额
-            ArithmeticUtil.doAdd(param.getVarCostSubjectAmt(),
-                param.getVarLxSubjectAmt(),param.getVarYzjSubjectAmt(),
-                param.getVarQtyskBjSubjectSumAmt(),
-                param.getVarQtyskLxSubjectSumAmt(),param.getVarYqfxSubjectSumAmt()),
-            //应收款项余额
-            null);
-        //发生份额
-        inputdto.setHappenNum(dealNow.getShareAmt());
-        //总份额
-        inputdto.setTotalNum(param.getVarCostSubjectNum());
-        varJzzb = lossCommonBatchService.calcLossAmtForDeal(inputdto);
         /**ADD BY CAOGUO ON 20201015 END**/
         // 费用处理共通
         DealTypesFeeDto dealTypesFeeDto = calculationCommonService.quaryDealTypesFeeamt(
@@ -9514,10 +9296,6 @@ public class SecDealAccountsNewService {
             accountAmountMap.put(BookConstant.DSCINC_D, ArithmeticUtil.round(
                 ArithmeticUtil.multiply(varCjzyj, new BigDecimal(-1)), NumberEnum.MONEY));
         }
-        /**ADD BY CAOGUO ON 20201016 减值相关修改 START **/
-        // 减值使用                 <-      变量.减值使用*-1
-        accountAmountMap.put(BookConstant.IMPAMT, varJzzb.negate());
-        /**ADD BY CAOGUO ON 20201016 END**/
         // accountAmountMap再设置如下
         // 印花税账务明细代码 <- 变量.交易各种费用.印花税账务明细代码
         accountSceneMap.put(BookConstant.BOK_DETAIL_STAMPTAX, dealTypesFeeDto.getStampDutyCode());
@@ -9652,10 +9430,6 @@ public class SecDealAccountsNewService {
         param.setVarLxSubjectAmt(ArithmeticUtil.subtract(param.getVarLxSubjectAmt(), varCjyjlx));
         // 变量.溢折价科目余额 = 变量.溢折价科目余额 - 变量.溢折价科目余额
         param.setVarYzjSubjectAmt(ArithmeticUtil.subtract(param.getVarYzjSubjectAmt(), varCjzyj));
-        /**ADD BY CAOGUO ON 20201016 减值相关修改 START **/
-        // 变量.减值准备科目余额 = 变量.减值准备科目余额 - 变量.减值使用
-        param.setVarJzzbSubjectAmt(ArithmeticUtil.subtract(param.getVarJzzbSubjectAmt(), varJzzb));
-        /**ADD BY CAOGUO ON 20201016 END**/
 
         // if（场景元素.在途日期 != 空）
         if (accountSceneMap.get(BookConstant.ONWAY_DATE) != null) {
@@ -10109,28 +9883,6 @@ public class SecDealAccountsNewService {
             dealTypesFeeDto.getChlGlFee(), dealTypesFeeDto.getChlXsFee(),
             dealTypesFeeDto.getChlTgFee());
         varMmjc = ArithmeticUtil.subtract(varMmjc, lxCe);
-        /**ADD BY CAOGUO ON 20201015 减值相关修改 START **/
-        // 变量.减值使用 = 0
-        BigDecimal varJzzb = BigDecimal.ZERO;
-        LossAmtInputDto inputdto = this.getLossAmtInputDto(acctEntity, dealNow,
-            null,
-            //本次发生额 = 变量.冲减应计利息 + 变量.冲减成本 + 变量.冲减溢折价
-            ArithmeticUtil.doAdd(cjCb,cjYjLx,cjYzj),
-            //减值准备余额
-            param.getVarJzzbSubjectAmt(),
-            //当前EAD金额 = 变量.成本科目余额 + 变量.应计利息科目余额 + 变量.其他应收款本金汇总余额 + 变量.其他应收款利息汇总月 + 变量.逾期利息汇总余额
-            ArithmeticUtil.doAdd(param.getVarCostSubjectAmt(),
-                param.getVarLxSubjectAmt(),param.getVarYzjSubjectAmt(),
-                param.getVarQtyskBjSubjectSumAmt(),
-                param.getVarQtyskLxSubjectSumAmt(),param.getVarYqfxSubjectSumAmt()),
-            //应收款项余额
-            null);
-        //发生份额
-        inputdto.setHappenNum(dealNow.getShareAmt());
-        //总份额
-        inputdto.setTotalNum(param.getVarCostSubjectNum());
-        varJzzb = lossCommonBatchService.calcLossAmtForDeal(inputdto);
-        /**ADD BY CAOGUO ON 20201015 END**/
         // 交易费用 <- 变量.交易各种费用.交易费用
 //        accountAmountMap.put(BookConstant.FEE, dealTypesFeeDto.getFeeAmt());
         // 印花税
@@ -10196,10 +9948,6 @@ public class SecDealAccountsNewService {
             accountAmountMap.put(BookConstant.DSCINC_D, ArithmeticUtil.round(
                 ArithmeticUtil.multiply(cjYzj, new BigDecimal(-1)), NumberEnum.MONEY));
         }
-        /**ADD BY CAOGUO ON 20201016 减值相关修改 START **/
-        // 减值使用                 <-      变量.减值使用*-1
-        accountAmountMap.put(BookConstant.IMPAMT, varJzzb.negate());
-        /**ADD BY CAOGUO ON 20201016 END**/
         // accountAmountMap再设置如下
         // 印花税账务明细代码 <- 变量.交易各种费用.印花税账务明细代码
         accountSceneMap.put(BookConstant.BOK_DETAIL_STAMPTAX, dealTypesFeeDto.getStampDutyCode());
@@ -10334,31 +10082,6 @@ public class SecDealAccountsNewService {
         param.setVarLxSubjectAmt(ArithmeticUtil.doSub(param.getVarLxSubjectAmt(), cjYjLx));
         // 变量.溢折价科目余额 = 变量.溢折价科目余额 - 变量.冲减溢折价
         param.setVarYzjSubjectAmt(ArithmeticUtil.doSub(param.getVarYzjSubjectAmt(), cjYzj));
-        /**ADD BY CAOGUO ON 20201016 减值相关修改 START **/
-        // 变量.减值准备科目余额 = 变量.减值准备科目余额 - 变量.减值使用
-        param.setVarJzzbSubjectAmt(ArithmeticUtil.subtract(param.getVarJzzbSubjectAmt(), varJzzb));
-        // if（金额元素.减值准备 ！= 0）
-        if (varJzzb.compareTo(BigDecimal.ZERO) != 0) {
-            BokStatLossPosiiton statLoss = null;
-            for (ValBokBookdetailBatch detail : resultNowNow.getValBokBookdetailBatch()) {
-                // 变量.账务明细 = 调用账务明细生成共通返回结果中 基础科目性质 ="摊余成本类资产减值"的第一条数据
-                if (DictCodeBaseSubjectNatrueNew.摊余成本类_减值准备.getValue().equals(
-                    detail.getBaseSubjectNature())) {
-                    // 调用【减值相关共通-减值使用明细数据生成】
-                    statLoss = lossCommonService.setLossInfoUsed(detail, varJzzb.negate(),
-                        accountAmountBCCYAMTMap.get(BookConstant.IMPAMT + BookConstant.BCCYAMT),
-                        param.getVarJzzbSubjectAmt(),
-                        ArithmeticUtil.multiply(param.getVarJzzbSubjectAmt(), 汇率),
-                        dealNow.getTradeId());
-                    break;
-                }
-            }
-            if (statLoss != null) {
-                // 变量.统计分析明细表（资产减值）减值使用列表.add(上述返回值)
-                returnResult.getBokStatLossPosiitonList().add(statLoss);
-            }
-        }
-        /**ADD BY CAOGUO ON 20201016 END**/
         // if（场景元素.在途日期 != 空）
         //        if (accountSceneMap.get(BookConstant.ONWAY_DATE) != null) {
         // 变量.T+1发生利息调整 -= 变量.冲减溢折价

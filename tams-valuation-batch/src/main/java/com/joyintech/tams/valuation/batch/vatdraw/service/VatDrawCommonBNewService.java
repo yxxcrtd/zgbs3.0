@@ -23,10 +23,13 @@ import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.Boo
 import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.BookCommonLogic;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.AccountDriver;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGenerateResult;
+import com.joyintech.tams.valuation.batch.common.cache.service.ChangingCacheService;
+import com.joyintech.tams.valuation.batch.common.cache.service.entity.BokSchemeConfigDto;
 import com.joyintech.tams.valuation.batch.vatdraw.dao.VatDrawCommonMapper;
 import com.joyintech.tams.valuation.batch.vatdraw.dto.BooksetTaxConfigDto;
 import com.joyintech.tams.valuation.batch.vatdraw.dto.PrdCashDto;
 import com.joyintech.tams.valuation.batch.vatdraw.dto.TaxRuleDto;
+import com.joyintech.tams.valuation.batch.vatdraw.dto.ValTaxCalConfigDto;
 import com.joyintech.tams.valuation.common.batch.finproduct.entity.CurrencyMarketDto;
 import com.joyintech.tams.valuation.common.batch.finproduct.service.FinProductCommonBatchService;
 import com.joyintech.tams.valuation.common.constants.BookConstant;
@@ -79,6 +82,9 @@ public class VatDrawCommonBNewService {
      */
     @Autowired
     private VatDrawCommonMapper vatDrawCommonMapper;
+
+    @Autowired
+    private ChangingCacheService changingCacheService;
 
     /**
      * 生成 记账元素共通
@@ -359,9 +365,16 @@ public class VatDrawCommonBNewService {
      * @see
      * @since 1.0
      */
-    public List<BooksetTaxConfigDto> queryBooksetTaxConfig(String booksetId, String configId) {
-        return vatDrawCommonMapper.queryBooksetTaxConfig(booksetId,
-            DictCodeListExt1.配置方案类型_税务方案.getValue(), configId);
+//    public List<BooksetTaxConfigDto> queryBooksetTaxConfig(String booksetId, String configId) {
+//        return vatDrawCommonMapper.queryBooksetTaxConfig(booksetId,
+//            DictCodeListExt1.配置方案类型_税务方案.getValue(), configId);
+//    }
+    public List<BokSchemeConfigDto> queryBokSchemeConfig(String booksetId, String configId) {
+        return changingCacheService.getValBokSchemeConfig(booksetId, DictCodeListExt1.配置方案类型_税务方案.getValue(), configId);
+    }
+
+    public List<ValTaxCalConfigDto> queryTaxCalConfig(String booksetId, String schemeType) {
+        return changingCacheService.getValTaxCalConfig(booksetId, schemeType);
     }
 
     /**

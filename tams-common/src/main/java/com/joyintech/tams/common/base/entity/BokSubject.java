@@ -74,6 +74,18 @@ public class BokSubject extends BokSubjectKey {
      * 币种
      */
     private String ccy;
+    /**
+     * 是否核算项
+     */
+    private String isAcc;
+
+    public String getIsAcc() {
+        return isAcc;
+    }
+
+    public void setIsAcc(String isAcc) {
+        this.isAcc = isAcc;
+    }
 
     public String getSubjectInternalCode() {
         return subjectInternalCode;

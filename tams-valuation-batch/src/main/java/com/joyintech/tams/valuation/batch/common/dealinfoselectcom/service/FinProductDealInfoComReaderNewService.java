@@ -12,6 +12,7 @@ package com.joyintech.tams.valuation.batch.common.dealinfoselectcom.service;
 
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
 import com.joyintech.framework.base.entity.SysBatchTask;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.BokMatchRlat;
 import com.joyintech.tams.common.base.entity.TrdTradeFeeDetail;
@@ -27,6 +28,7 @@ import com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dto.FinProduc
 import com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dto.FinProductDealInfoKey;
 import com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dto.FinProductDealInfoResult;
 import com.joyintech.tams.valuation.common.constants.BookConstant;
+import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 拆借交易信息查詢
@@ -92,7 +95,8 @@ public class FinProductDealInfoComReaderNewService {
         // 获取匹配关系表
         List<String> matchTypeList = new ArrayList<>();
         matchTypeList.add(DictCodeListExt1.匹配类型_任务代码_业务类型.getValue());
-        List<BokMatchRlat> valMatchRlats = accountingMethodMapper.selectValMatchRlatBySource(matchTypeList, (String)param.get("taskId"), null);
+        //List<BokMatchRlat> valMatchRlats = accountingMethodMapper.selectValMatchRlatBySource(matchTypeList, (String)param.get("taskId"), null);
+        List<BokMatchRlat> valMatchRlats = getBokMatchRlatFromCache(matchTypeList,  (String)param.get("taskId"), null);
         if (valMatchRlats != null && valMatchRlats.size() > 0) {
             sqlMap.put("target", valMatchRlats.get(0).getTarget());
         }
@@ -233,5 +237,21 @@ public class FinProductDealInfoComReaderNewService {
             valTradeFeeDetail.setIsPrepaid(finDTO.getIsPrepaid());
         }
         return valTradeFeeDetail;
+    }
+
+    public List<BokMatchRlat> getBokMatchRlatFromCache(List<String> matchTypeList, String source, String acctStandard) {
+        List<BokMatchRlat> bokMatchRlatList = (List<BokMatchRlat>) CacheUtil.getAppCache(GlobalConstant.BOK_MATCH_RLAT_CACHE_KEY, List.class);
+        return bokMatchRlatList.stream().filter(item -> {
+            if(org.apache.commons.lang3.StringUtils.isNotEmpty(source) && !org.apache.commons.lang3.StringUtils.equals(source, item.getSource())) {
+                return false;
+            }
+            if(org.apache.commons.lang3.StringUtils.isNotEmpty(acctStandard) && !org.apache.commons.lang3.StringUtils.equals(acctStandard, item.getAcctStandard())) {
+                return false;
+            }
+            if(CollectionUtils.isNotEmpty(matchTypeList) && !matchTypeList.contains(item.getMatchType())) {
+                return false;
+            }
+            return true;
+        }).collect(Collectors.toList());
     }
 }

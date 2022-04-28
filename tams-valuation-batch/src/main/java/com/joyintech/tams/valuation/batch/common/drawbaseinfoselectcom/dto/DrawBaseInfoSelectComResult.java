@@ -10,16 +10,20 @@
 
 package com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.TreeNode;
+import com.joyintech.tams.valuation.common.batch.finproduct.entity.*;
 
 /**
  * 计提基础信息取得结果DTO 〈功能详细描述〉
- * 
+ *
  * @author wudebao
  * @version 1.0 2018年5月5日
  * @see DrawBaseInfoSelectComResult
@@ -83,8 +87,109 @@ public class DrawBaseInfoSelectComResult extends NeedOperateEntity {
     private String baseSubjectNature;
 
     /**
+     * 标的信息
+     */
+    private TargetFinProduct targetFinProduct;
+
+    /**
+     * 还本信息
+     */
+    private List<TargetCashPlan> targetCashPlanList;
+
+    /**
+     * 付息信息
+     */
+    private List<TargetCashPlan> targetCashPlanIntList;
+
+    /**
+     * 标的_现金流计算规则信息
+     */
+    private List<TargetCashCalcRule> targetCashCalcRuleList;
+
+    /**
+     * 标的_现金流支付规则信息
+     */
+    private List<TargetCashPayRule> targetCashPayRuleList;
+
+    /**
+     * 标的_行权计划
+     */
+    private FinExercisePlan finExercisePlan;
+
+    /**
+     * 摊销重算配置
+     */
+    private List<BokAmoConfig> bokAmoConfigList;
+
+    /**
+     * 区间到账应计利息
+     */
+    private List<InitTrdProductDealDto> intervalArrivalAccountList;
+
+    /**
+     * 标的_附加信息
+     */
+    private FinProductAdd finProductAdd;
+
+    /**
+     * 账套金融产品估值参数
+     */
+    private BokFinProductValuationPara bokFinProductValuationPara;
+
+    /**
+     * 标的_现金流计算规则信息-收取(利率互换特殊处理)
+     * @author 殷亚
+     * @date 2022/4/27 15:36
+     * @see
+     * @version 1.0
+     */
+    private List<TargetCashCalcRule> targetCashCalcRuleListR;
+    /**
+     * 标的_现金流计算规则信息-支付(利率互换特殊处理)
+     * @author 殷亚
+     * @date 2022/4/27 15:36
+     * @see
+     * @version 1.0
+     */
+    private List<TargetCashCalcRule> targetCashCalcRuleListP;
+
+    public List<TargetCashCalcRule> getTargetCashCalcRuleListR() {
+        return targetCashCalcRuleListR;
+    }
+
+    public void setTargetCashCalcRuleListR(List<TargetCashCalcRule> targetCashCalcRuleListR) {
+        this.targetCashCalcRuleListR = targetCashCalcRuleListR;
+    }
+
+    public List<TargetCashCalcRule> getTargetCashCalcRuleListP() {
+        return targetCashCalcRuleListP;
+    }
+
+    public void setTargetCashCalcRuleListP(List<TargetCashCalcRule> targetCashCalcRuleListP) {
+        this.targetCashCalcRuleListP = targetCashCalcRuleListP;
+    }
+
+    /* @Author 殷亚
+     * @Description 金融类标的信息
+     * @Date  2022-3-21 10:45
+     * @Version 1.0
+     * @Param
+     * @Return
+     **/
+    private List<TradeInfoDto> tradeInfoDtoList;
+
+    public List<TradeInfoDto> getTradeInfoDtoList() {
+        return tradeInfoDtoList;
+    }
+
+    public void setTradeInfoDtoList(List<TradeInfoDto> tradeInfoDtoList) {
+        this.tradeInfoDtoList = tradeInfoDtoList;
+    }
+
+
+    /**
      * 取得 账套代码
-     * 
+     *
      * @return 账套代码
      */
     public String getBooksetId() {
@@ -93,7 +198,7 @@ public class DrawBaseInfoSelectComResult extends NeedOperateEntity {
 
     /**
      * 设置 账套代码
-     * 
+     *
      * @param booksetId 账套代码
      */
     public void setBooksetId(String booksetId) {
@@ -102,7 +207,7 @@ public class DrawBaseInfoSelectComResult extends NeedOperateEntity {
 
     /**
      * 取得 账务明细代码
-     * 
+     *
      * @return 账务明细代码
      */
     public String getBokDetailId() {
@@ -111,7 +216,7 @@ public class DrawBaseInfoSelectComResult extends NeedOperateEntity {
 
     /**
      * 设置 账务明细代码
-     * 
+     *
      * @param bokDetailId 账务明细代码
      */
     public void setBokDetailId(String bokDetailId) {
@@ -120,7 +225,7 @@ public class DrawBaseInfoSelectComResult extends NeedOperateEntity {
 
     /**
      * 取得 投资目的
-     * 
+     *
      * @return 投资目的
      */
     public String getInvAim() {
@@ -129,7 +234,7 @@ public class DrawBaseInfoSelectComResult extends NeedOperateEntity {
 
     /**
      * 设置 投资目的
-     * 
+     *
      * @param invAim 投资目的
      */
     public void setInvAim(String invAim) {
@@ -138,7 +243,7 @@ public class DrawBaseInfoSelectComResult extends NeedOperateEntity {
 
     /**
      * 取得 会计场景
-     * 
+     *
      * @return 会计场景
      */
     public TreeNode getBookSetTreeNode() {
@@ -147,7 +252,7 @@ public class DrawBaseInfoSelectComResult extends NeedOperateEntity {
 
     /**
      * 设置 会计场景
-     * 
+     *
      * @param bookSetTreeNode 会计场景
      */
     public void setBookSetTreeNode(TreeNode bookSetTreeNode) {
@@ -156,7 +261,7 @@ public class DrawBaseInfoSelectComResult extends NeedOperateEntity {
 
     /**
      * 取得 发生日期
-     * 
+     *
      * @return 发生日期
      */
     public Date getHappenDate() {
@@ -165,7 +270,7 @@ public class DrawBaseInfoSelectComResult extends NeedOperateEntity {
 
     /**
      * 设置 发生日期
-     * 
+     *
      * @param happenDate 发生日期
      */
     public void setHappenDate(Date happenDate) {
@@ -174,7 +279,7 @@ public class DrawBaseInfoSelectComResult extends NeedOperateEntity {
 
     /**
      * 取得 入账日期
-     * 
+     *
      * @return 入账日期
      */
     public Date getBookDate() {
@@ -183,7 +288,7 @@ public class DrawBaseInfoSelectComResult extends NeedOperateEntity {
 
     /**
      * 设置 入账日期
-     * 
+     *
      * @param bookDate 入账日期
      */
     public void setBookDate(Date bookDate) {
@@ -192,7 +297,7 @@ public class DrawBaseInfoSelectComResult extends NeedOperateEntity {
 
     /**
      * 取得 计提基础信息list
-     * 
+     *
      * @return 计提基础信息list
      */
     public List<DrawBaseInfoSelectComDTO> getListDrawBaseInfoSelectComDTO() {
@@ -201,7 +306,7 @@ public class DrawBaseInfoSelectComResult extends NeedOperateEntity {
 
     /**
      * 设置 计提基础信息list
-     * 
+     *
      * @param listDrawBaseInfoSelectComDTO 计提基础信息list
      */
     public void setListDrawBaseInfoSelectComDTO(List<DrawBaseInfoSelectComDTO> listDrawBaseInfoSelectComDTO) {
@@ -210,7 +315,7 @@ public class DrawBaseInfoSelectComResult extends NeedOperateEntity {
 
     /**
      * 获取 busiId
-     * 
+     *
      * @return busiId.
      */
     public String getBusiId() {
@@ -219,7 +324,7 @@ public class DrawBaseInfoSelectComResult extends NeedOperateEntity {
 
     /**
      * 设置 busiId
-     * 
+     *
      * @param busiId busiId
      */
     public void setBusiId(String busiId) {
@@ -272,5 +377,85 @@ public class DrawBaseInfoSelectComResult extends NeedOperateEntity {
      */
     public void setBaseSubjectNature(String baseSubjectNature) {
         this.baseSubjectNature = baseSubjectNature;
+    }
+
+    public TargetFinProduct getTargetFinProduct() {
+        return targetFinProduct;
+    }
+
+    public void setTargetFinProduct(TargetFinProduct targetFinProduct) {
+        this.targetFinProduct = targetFinProduct;
+    }
+
+    public List<TargetCashPlan> getTargetCashPlanList() {
+        return targetCashPlanList;
+    }
+
+    public void setTargetCashPlanList(List<TargetCashPlan> targetCashPlanList) {
+        this.targetCashPlanList = targetCashPlanList;
+    }
+
+    public List<TargetCashPlan> getTargetCashPlanIntList() {
+        return targetCashPlanIntList;
+    }
+
+    public void setTargetCashPlanIntList(List<TargetCashPlan> targetCashPlanIntList) {
+        this.targetCashPlanIntList = targetCashPlanIntList;
+    }
+
+    public List<TargetCashCalcRule> getTargetCashCalcRuleList() {
+        return targetCashCalcRuleList;
+    }
+
+    public void setTargetCashCalcRuleList(List<TargetCashCalcRule> targetCashCalcRuleList) {
+        this.targetCashCalcRuleList = targetCashCalcRuleList;
+    }
+
+    public List<TargetCashPayRule> getTargetCashPayRuleList() {
+        return targetCashPayRuleList;
+    }
+
+    public void setTargetCashPayRuleList(List<TargetCashPayRule> targetCashPayRuleList) {
+        this.targetCashPayRuleList = targetCashPayRuleList;
+    }
+
+    public FinExercisePlan getFinExercisePlan() {
+        return finExercisePlan;
+    }
+
+    public void setFinExercisePlan(FinExercisePlan finExercisePlan) {
+        this.finExercisePlan = finExercisePlan;
+    }
+
+    public List<BokAmoConfig> getBokAmoConfigList() {
+        return bokAmoConfigList;
+    }
+
+    public void setBokAmoConfigList(List<BokAmoConfig> bokAmoConfigList) {
+        this.bokAmoConfigList = bokAmoConfigList;
+    }
+
+    public FinProductAdd getFinProductAdd() {
+        return finProductAdd;
+    }
+
+    public void setFinProductAdd(FinProductAdd finProductAdd) {
+        this.finProductAdd = finProductAdd;
+    }
+
+    public BokFinProductValuationPara getBokFinProductValuationPara() {
+        return bokFinProductValuationPara;
+    }
+
+    public void setBokFinProductValuationPara(BokFinProductValuationPara bokFinProductValuationPara) {
+        this.bokFinProductValuationPara = bokFinProductValuationPara;
+    }
+
+    public List<InitTrdProductDealDto> getIntervalArrivalAccountList() {
+        return intervalArrivalAccountList;
+    }
+
+    public void setIntervalArrivalAccountList(List<InitTrdProductDealDto> intervalArrivalAccountList) {
+        this.intervalArrivalAccountList = intervalArrivalAccountList;
     }
 }

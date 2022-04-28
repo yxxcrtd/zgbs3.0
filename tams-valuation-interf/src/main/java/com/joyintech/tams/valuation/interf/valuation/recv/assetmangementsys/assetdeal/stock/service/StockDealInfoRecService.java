@@ -107,7 +107,6 @@ public class StockDealInfoRecService {
             ps.add(DictCodeList.交易方向_买入.getValue());
             ps.add(DictCodeListExt2.交易方向_增发.getValue());
             ps.add(DictCodeListExt2.交易方向_配股.getValue());
-            ps.add(DictCodeList.交易方向_上市流通.getValue());
             ps.add(DictCodeList.交易方向_卖出.getValue());
             ps.add(DictCodeListExt4.交易方向_股票拆分交易.getValue());
             ps.add(DictCodeListExt4.交易方向_股票合并交易.getValue());

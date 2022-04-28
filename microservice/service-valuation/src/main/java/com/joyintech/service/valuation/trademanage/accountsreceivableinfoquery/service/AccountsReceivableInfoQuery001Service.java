@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,7 +55,7 @@ public class AccountsReceivableInfoQuery001Service extends CommonExportService<A
 	        }
 	        return selectOptionDtoList;*/
 		/**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 start **/
-		String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+		String accountEntryType =  CacheUtil.getSysParam(GlobalConstant.ACCOUNT_ENTRY_TYPE);
 		pageParam.put("accountEntryType",accountEntryType);
 		/**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 end **/
     	return accountsReceivableInfoQuery001Mapper.getBdFinprodId(pageParam);
@@ -75,7 +76,7 @@ public class AccountsReceivableInfoQuery001Service extends CommonExportService<A
 	        }
 	        params.put("bdFinprodIdArr", bdFinprodIdArr);
 			/**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 start **/
-			String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+			String accountEntryType =  CacheUtil.getSysParam(GlobalConstant.ACCOUNT_ENTRY_TYPE);
 			params.put("accountEntryType",accountEntryType);
 		    /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 end **/
     	 return super.queryForPage(page, length, ()-> accountsReceivableInfoQuery001Mapper.queryPageList(params));

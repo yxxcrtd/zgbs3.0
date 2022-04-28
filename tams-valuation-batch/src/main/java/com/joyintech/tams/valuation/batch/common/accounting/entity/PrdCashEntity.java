@@ -13,6 +13,7 @@ package com.joyintech.tams.valuation.batch.common.accounting.entity;
 import java.util.Date;
 
 import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
+import com.joyintech.tams.common.base.entity.BokDetailId;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.TreeNode;
 
 /**
@@ -24,7 +25,22 @@ import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.TreeNod
  * @since 1.0
  */
 public class PrdCashEntity extends NeedOperateEntity {
+    /* @Author 殷亚
+     * @Description 增加 BokDetailId实体类属性
+     * @Date  2022-3-11 14:26
+     * @Version 1.0
+     * @Param
+     * @Return
+     **/
+    private BokDetailId bokDetailIdEntity;
 
+    public BokDetailId getBokDetailIdEntity() {
+        return bokDetailIdEntity;
+    }
+
+    public void setBokDetailIdEntity(BokDetailId bokDetailIdEntity) {
+        this.bokDetailIdEntity = bokDetailIdEntity;
+    }
     /**
      * 金融产品代码
      */

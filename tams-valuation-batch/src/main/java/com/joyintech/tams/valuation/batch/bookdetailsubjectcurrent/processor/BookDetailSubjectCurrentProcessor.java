@@ -95,7 +95,7 @@ public class BookDetailSubjectCurrentProcessor extends BaseProcessor<NeedOperate
         result.setValBokBookdetailBatch(new ArrayList<>());
         // modify by weipeng on 20220302 会计分录生成凭证通过系统参数区分新旧逻辑，保持原有逻辑不动 start
         // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录 start
-        String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+        String accountEntryType =  CacheUtil.getSysParam(GlobalConstant.ACCOUNT_ENTRY_TYPE);
         for(Entry<String, BookDetailSubjectCurrentReadResult> entry : temp.entrySet()){
             // 将返回值塞入参数中
             thisParams.put(GlobalConstant.READER_RESULT, entry.getValue());

@@ -43,6 +43,8 @@ public class SceneConfigEntry {
      */
     private String nodeValue;
 
+    private String accountSceneCode;
+
     
     /**
      * 获取 sceneNodeId
@@ -131,5 +133,13 @@ public class SceneConfigEntry {
      */
     public void setNodeValue(String nodeValue) {
         this.nodeValue = nodeValue;
+    }
+
+    public String getAccountSceneCode() {
+        return accountSceneCode;
+    }
+
+    public void setAccountSceneCode(String accountSceneCode) {
+        this.accountSceneCode = accountSceneCode;
     }
 }
