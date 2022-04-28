@@ -1,5 +1,7 @@
 package com.joyintech.tams.exchange.common.bean.investment;
 
+import com.google.common.base.MoreObjects;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -545,5 +547,54 @@ public class ReqRiskOccupy {
 
     public void setFirstIssueDealNo(String firstIssueDealNo) {
         this.firstIssueDealNo = firstIssueDealNo;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("conShareId", conShareId)
+                .add("conPrice", conPrice)
+                .add("conNum", conNum)
+                .add("varietyCode", varietyCode)
+                .add("vdate", vdate)
+                .add("mdate", mdate)
+                .add("repurchaseType", repurchaseType)
+                .add("eventDate", eventDate)
+                .add("eventId", eventId)
+                .add("portfolioCode", portfolioCode)
+                .add("assetCode", assetCode)
+                .add("pledgeAssetCodeList", pledgeAssetCodeList)
+                .add("assetType", assetType)
+                .add("assetType2", assetType2)
+                .add("ps", ps)
+                .add("amount", amount)
+                .add("priceAmt", priceAmt)
+                .add("tradeNum", tradeNum)
+                .add("netPrice", netPrice)
+                .add("allPrice", allPrice)
+                .add("unitNet", unitNet)
+                .add("assetRate", assetRate)
+                .add("eventType", eventType)
+                .add("entrustCode", entrustCode)
+                .add("trader", trader)
+                .add("manager", manager)
+                .add("deliverDate", deliverDate)
+                .add("startDate", startDate)
+                .add("endDate", endDate)
+                .add("isWarnNeedConfirm", isWarnNeedConfirm)
+                .add("isApprNeedConfirm", isApprNeedConfirm)
+                .add("preOccupyCode", preOccupyCode)
+                .add("sourceSys", sourceSys)
+                .add("counterId", counterId)
+                .add("marketCode", marketCode)
+                .add("tradePlace", tradePlace)
+                .add("ccy", ccy)
+                .add("tradeId", tradeId)
+                .add("tradeStage", tradeStage)
+                .add("revokeFlg", revokeFlg)
+                .add("seqNo", seqNo)
+                .add("entrustId", entrustId)
+                .add("firstIssueDealNo", firstIssueDealNo)
+                .toString();
     }
 }

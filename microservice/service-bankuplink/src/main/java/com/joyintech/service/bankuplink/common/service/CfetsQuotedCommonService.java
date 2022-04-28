@@ -922,6 +922,11 @@ public class CfetsQuotedCommonService extends BaseService {
      */
     public Page<SelectOptionDto> selectPortfolioId(int page, int length,
                                                    Map<String, Object> param) {
+        String initValue =(String)param.get("initValue");
+        if(StringUtil.isNotEmpty(initValue)){
+            List<String> initValueList = StringUtil.splitToList(",", initValue);
+            param.put("initValueList", initValueList);
+        }
         Page<SelectOptionDto> pageList = this.queryForPageForSelectReturn(page, length,
             () -> cfetsQuotedCommonMapper.selectPortfolioId(param));
         return pageList;

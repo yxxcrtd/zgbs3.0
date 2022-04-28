@@ -62,7 +62,7 @@
         </if>
         <choose>
             <when test="isEffFlag != null and isEffFlag.equals('01')">
-                <![CDATA[AND  DELDATE > #{sysDate} ]]>
+                <![CDATA[AND  (DELDATE > #{sysDate} ]]> or EFFDATE &lt;= #{sysDate})
             </when>
             <otherwise>
                 <![CDATA[AND  DELDATE <= #{sysDate} ]]>
