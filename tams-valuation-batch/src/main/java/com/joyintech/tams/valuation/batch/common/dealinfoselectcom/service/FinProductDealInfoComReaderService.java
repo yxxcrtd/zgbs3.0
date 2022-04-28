@@ -22,6 +22,7 @@ import com.joyintech.tams.common.base.entity.BokMatchRlat;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.dao.AccountingMethodMapper;
+import com.joyintech.tams.valuation.batch.common.cache.service.ValuationBatchCacheService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,8 +69,7 @@ public class FinProductDealInfoComReaderService {
     private BookCommonLogic bookCommonLogic;
 
     @Autowired
-    private AccountingMethodMapper accountingMethodMapper;
-
+    private ValuationBatchCacheService valuationBatchCacheService;
     /**
      * {@inheritDoc}
      */
@@ -97,7 +97,8 @@ public class FinProductDealInfoComReaderService {
         // 获取匹配关系表
         List<String> matchTypeList = new ArrayList<>();
         matchTypeList.add(DictCodeListExt1.匹配类型_任务代码_业务类型.getValue());
-        List<BokMatchRlat> valMatchRlats = accountingMethodMapper.selectValMatchRlatBySource(matchTypeList, (String)param.get("taskId"), null);
+        //List<BokMatchRlat> valMatchRlats = accountingMethodMapper.selectValMatchRlatBySource(matchTypeList, (String)param.get("taskId"), null);
+        List<BokMatchRlat> valMatchRlats = valuationBatchCacheService.getBokMatchRlatFromCache(matchTypeList, (String)param.get("taskId"), null);
         if (valMatchRlats != null && valMatchRlats.size() > 0) {
             sqlMap.put("target", valMatchRlats.get(0).getTarget());
         }

@@ -96,6 +96,13 @@ public class ValTaxCalConfigDto {
     private String condition;
 
     /**
+     * 账套
+     */
+    private String booksetId;
+
+    private String schemeType;
+
+    /**
      * 取得 配置代码
      * 
      * @return 配置代码
@@ -361,4 +368,19 @@ public class ValTaxCalConfigDto {
 		this.condition = condition;
 	}
 
+    public String getSchemeType() {
+        return schemeType;
+    }
+
+    public void setSchemeType(String schemeType) {
+        this.schemeType = schemeType;
+    }
+
+    public String getBooksetId() {
+        return booksetId;
+    }
+
+    public void setBooksetId(String booksetId) {
+        this.booksetId = booksetId;
+    }
 }

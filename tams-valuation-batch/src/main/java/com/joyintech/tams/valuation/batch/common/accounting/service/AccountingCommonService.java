@@ -21,7 +21,10 @@ import com.joyintech.tams.valuation.batch.common.accounting.dao.AccountingCommon
 import com.joyintech.tams.valuation.batch.common.accounting.dao.ValBokSubjectInfoMapper;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.*;
 import com.joyintech.tams.valuation.batch.common.base.entity.BokStatBokPositionDto;
+import com.joyintech.tams.valuation.batch.common.cache.service.ChangingCacheService;
 import com.joyintech.tams.valuation.batch.common.calculation.service.CalculationCommonService;
+import com.joyintech.tams.valuation.batch.profitandlossaccounting.dto.ProfitAndLossAccountingSubject;
+import com.joyintech.tams.valuation.common.batch.finproduct.dao.FinProductCommonMapper;
 import com.joyintech.tams.valuation.common.batch.finproduct.entity.TargetCashPlan;
 import com.joyintech.tams.valuation.common.batch.finproduct.entity.TargetFinProduct;
 import com.joyintech.tams.valuation.common.constants.BookConstant;
@@ -81,6 +84,15 @@ public class AccountingCommonService {
      */
     @Autowired
     private CalculationCommonService calculationCommonService;
+
+    /**
+     * 标的类共同mapper
+     */
+    @Autowired
+    private FinProductCommonMapper finProductCommonMapper;
+
+    @Autowired
+    private ChangingCacheService changingCacheService;
 
     /**
      * 全局变量：底层科目级别
@@ -1170,7 +1182,8 @@ public class AccountingCommonService {
      * @since 1.0
      */
     public List<String> getValSubjectNatureList(String groupId) {
-        return accountingCommonMapper.getValSubjectNatureList(groupId,null);
+        //        return accountingCommonMapper.getValSubjectNatureList(groupId,null);
+        return changingCacheService.getValSubjectNatureList(groupId);
     }
 
     /**
@@ -1183,7 +1196,9 @@ public class AccountingCommonService {
      * @since 1.0
      */
     public List<String> getValSubjectNatureListWithAcctStandardId(String groupId,String acctStandardId) {
-        return accountingCommonMapper.getValSubjectNatureList(groupId,acctStandardId);
+        //由于根本不存在其他会计准则，估值只使用会计准则_企业准则，acctStandardId传参无意义
+//        return accountingCommonMapper.getValSubjectNatureList(groupId,acctStandardId);
+        return changingCacheService.getValSubjectNatureList(groupId);
     }
 
     /**
@@ -1806,7 +1821,8 @@ public class AccountingCommonService {
      * @since 1.0
      */
     public List<BokSubject> getSubjectInfo(Map<String, Object> map) {
-        return accountingCommonMapper.getSubjectInfo(map);
+        //return accountingCommonMapper.getSubjectInfo(map);
+        return changingCacheService.getSubjectInfoList(map);
     }
     /**
      * 合并场景代码
@@ -1900,8 +1916,8 @@ public class AccountingCommonService {
      * @since 1.0
      */
     public List<BokBooksetExt> getValBokBooksetExt(String booksetId, List<String> paramCodeList) {
-
-        return accountingCommonMapper.getValBokBooksetExt(booksetId, paramCodeList);
+        //return accountingCommonMapper.getValBokBooksetExt(booksetId, paramCodeList);
+        return changingCacheService.getValBokBooksetExt(booksetId, paramCodeList);
     }
 
     /**
@@ -2242,7 +2258,8 @@ public class AccountingCommonService {
      * @since 1.0
      */
     public List<StayDrawSubprdEntity> querySubBokAcctInfo(Map<String, Object> params) {
-        return accountingCommonMapper.querySubBokAcctInfo(params);
+        //return accountingCommonMapper.querySubBokAcctInfo(params);
+        return changingCacheService.getValSubBokAcctInfo(params);
     }
 
     /**
@@ -2797,5 +2814,20 @@ public class AccountingCommonService {
         return num;
     }
     /** add by yanya on 20191203 增加债券实际成本数量查询方法 end**/
+
+    /**
+     * 查询损益结转科目
+     *
+     * @param booksetId 账套代码
+     * @param subjectTypeList 科目类型
+     * @param baseSubjectNatureList 基础科目性质1
+     * @return 损益结转科目列表
+     * @see
+     * @since 1.0
+     */
+    public List<ProfitAndLossAccountingSubject> selectPalSubject(String booksetId, List<String> subjectTypeList, List<String> baseSubjectNatureList){
+        return changingCacheService.selectPalSubject(booksetId,subjectTypeList,baseSubjectNatureList);
+
+    }
 
 }

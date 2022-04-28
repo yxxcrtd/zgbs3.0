@@ -24,6 +24,7 @@ import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.Account
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.SceneConfigEntry;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.TreeNode;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.ValBooksetTodoDto;
+import com.joyintech.tams.valuation.batch.common.cache.service.ChangingCacheService;
 import com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dto.FinProductDealInfoComDTO;
 import com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dto.FinProductDealInfoResult;
 import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto.DrawBaseInfoSelectComDTO;
@@ -36,12 +37,14 @@ import com.joyintech.tams.valuation.common.service.BookAccountCommonService;
 import com.joyintech.tams.valuation.common.utils.DataHandleUtil;
 import com.joyintech.tools.collectors.JoyinCollectors;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 记账公共类
@@ -74,6 +77,9 @@ public class BookCommonLogic {
 
     @Autowired
     private BookCommonLogicNew bookCommonLogicNew;
+
+    @Autowired
+    private ChangingCacheService changingCacheService;
 //    /**
 //     * 1
 //     */
@@ -111,8 +117,13 @@ public class BookCommonLogic {
         // 节点类型设置为“根节点”
         result.setNodeType(NodeType.根节点.getCode());
         // 根据账套代码获取节点序号
-        String nodeNo = this.findNodeNoByBooksetId(booksetId);
-        result.setNodeNo(nodeNo);
+        // 根据账套代码获取节点序号
+//        String nodeNo = this.findNodeNoByBooksetId(booksetId);
+//        result.setNodeNo(nodeNo);
+        SceneConfigEntry sceneConfig = changingCacheService.getBokSceneconfig(booksetId);
+        if(null != sceneConfig) {
+            result.setNodeNo(sceneConfig.getSceneNodeId());
+        }
         // 创建孩子节点列表，并赋值。
         List<TreeNode> children = new ArrayList<>();
         result.setChildrenNodes(children);
@@ -247,8 +258,9 @@ public class BookCommonLogic {
                     || StringUtil.isEmpty(booksetId)) {
                 return null;
             }
-            return accountingMethodMapper.getSceneSubjectConfigByNodeId(booksetId, accountSceneCodes,
-                    GlobalConstant.ACCOUNTEVENTS);
+//            return accountingMethodMapper.getSceneSubjectConfigByNodeId(booksetId, accountSceneCodes,
+//                    GlobalConstant.ACCOUNTEVENTS);
+            return changingCacheService.getSceneSubjectConfigWithNode(booksetId, accountSceneCodes);
         }
         // modify by weipeng on 20220113 会计分录生成凭证通过系统参数区分新旧逻辑，保持原有逻辑不动 end
     }
@@ -268,8 +280,9 @@ public class BookCommonLogic {
             || StringUtil.isEmpty(booksetId)) {
             return null;
         }
-        return accountingMethodMapper.getSceneConfigByNodeId(booksetId, accountSceneCodes,
-            GlobalConstant.ACCOUNTEVENTS);
+        //        return accountingMethodMapper.getSceneConfigByNodeId(booksetId, accountSceneCodes,
+//            GlobalConstant.ACCOUNTEVENTS);
+        return changingCacheService.getBokSceneconfigWithNode(booksetId, accountSceneCodes);
     }
 
     /**
@@ -297,11 +310,29 @@ public class BookCommonLogic {
      * @since 1.0
      */
     public List<BokBookset> getBooksetInfoByParam(Map<String, Object> params) {
-
         // 获取范围信息数据
-        List<BokBookset> bokBookset = accountingMethodMapper.getBooksetInfoByParam(params);
-
-        return bokBookset;
+//        List<BokBookset> bokBookset = accountingMethodMapper.getBooksetInfoByParam(params);
+//
+//        return bokBookset;
+        List<String> booksetList = (List<String>)params.get(GlobalConstant.BOOKSETS);
+        if(CollectionUtils.isNotEmpty(booksetList)) {
+            List<BokBookset> bokBookset = changingCacheService.getValBokBookset(booksetList);
+            String booksetType = (String)params.get("booksetType");
+            String acctMode = (String)params.get("acctMode");
+            String acctSubjectType = (String)params.get("acctSubjectType");
+            String acctStandard = (String)params.get("acctStandard");
+            String standardCcy = (String)params.get("standardCcy");
+            String bokSpecMode = (String)params.get("bokSpecMode");
+            return bokBookset.stream().filter(item ->
+                    (StringUtils.isEmpty(booksetType) || StringUtils.equals(item.getBooksetType(), booksetType))
+                            && (StringUtils.isEmpty(acctMode) || StringUtils.equals(item.getAcctMode(), acctMode))
+                            && (StringUtils.isEmpty(acctSubjectType) || StringUtils.equals(item.getAcctSubjectType(), acctSubjectType))
+                            && (StringUtils.isEmpty(acctStandard) || StringUtils.equals(item.getAcctStandard(), acctStandard))
+                            && (StringUtils.isEmpty(standardCcy) || StringUtils.equals(item.getStandardCcy(), standardCcy))
+                            && (StringUtils.isEmpty(bokSpecMode) || StringUtils.equals(item.getBokSpecMode(), bokSpecMode))
+            ).collect(Collectors.toList());
+        }
+        return new ArrayList<>();
     }
     
     /**
@@ -318,8 +349,9 @@ public class BookCommonLogic {
         List<String> matchTypeList = new ArrayList<String>();
         matchTypeList.add(DictCodeListExt1.匹配类型_任务代码_会计场景.getValue());
         // 获取任务代码对应的场景代码
-        List<BokMatchRlat> valMatchRlatList = accountingMethodMapper.selectValMatchRlatBySource(
-            matchTypeList, taskId, null);
+//        List<BokMatchRlat> valMatchRlatList = accountingMethodMapper.selectValMatchRlatBySource(
+//            matchTypeList, taskId, null);
+        List<BokMatchRlat> valMatchRlatList = getBokMatchRlatFromCache(matchTypeList, taskId, null);
         // 获取会计场景记账代码
         List<String> accountSceneCodes = new ArrayList<String>();
         if (valMatchRlatList != null && !valMatchRlatList.isEmpty()) {
@@ -338,13 +370,14 @@ public class BookCommonLogic {
 //            }
 //        });
         //查询帐套信息
-        List<BokBookset> bokBooksets = accountingMethodMapper.selectBookSetIdInfo(bookSetIds);
+        //List<BokBookset> bokBooksets = accountingMethodMapper.selectBookSetIdInfo(bookSetIds);
+        List<BokBookset> bokBooksets = changingCacheService.getValBokBookset(bookSetIds);
         // 账套代码对应的配张信息
         Map<String, TreeNode> treeNodeMap = new HashMap<String, TreeNode>();
         // 模板账套代码对应的配张信息
         Map<String, TreeNode> treeNodeMapTmpl = new HashMap<String, TreeNode>();
         for (BokBookset bookSetId : bokBooksets) {
-            TreeNode node = treeNodeMapTmpl.get(bookSetId.getBooksetIdTmpl());
+            TreeNode node = treeNodeMapTmpl.get(bookSetId.getBooksetIdTmpl()==null?bookSetId.getBooksetId():bookSetId.getBooksetIdTmpl());
             if (node == null) {
                 // 获取每个账套对应的 记账场景配置信息
                 node = this.loadAccountSceneConfig(accountSceneCodes,
@@ -1178,5 +1211,21 @@ public class BookCommonLogic {
      */
     public PaTrdProductDeal getPaTrdProductDeal(Map<String, Object> params) {
     	return accountingMethodMapper.getPaTrdProductDeal(params);
+    }
+
+    public List<BokMatchRlat> getBokMatchRlatFromCache(List<String> matchTypeList, String source, String acctStandard) {
+        List<BokMatchRlat> bokMatchRlatList = (List<BokMatchRlat>)CacheUtil.getAppCache(GlobalConstant.BOK_MATCH_RLAT_CACHE_KEY, List.class);
+        return bokMatchRlatList.stream().filter(item -> {
+            if(StringUtils.isNotEmpty(source) && !StringUtils.equals(source, item.getSource())) {
+                return false;
+            }
+            if(StringUtils.isNotEmpty(acctStandard) && !StringUtils.equals(acctStandard, item.getAcctStandard())) {
+                return false;
+            }
+            if(CollectionUtils.isNotEmpty(matchTypeList) && !matchTypeList.contains(item.getMatchType())) {
+                return false;
+            }
+            return true;
+        }).collect(Collectors.toList());
     }
 }

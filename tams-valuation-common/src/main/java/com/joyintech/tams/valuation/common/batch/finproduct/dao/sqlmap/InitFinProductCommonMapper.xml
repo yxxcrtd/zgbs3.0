@@ -1,0 +1,658 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.valuation.common.batch.finproduct.dao.InitFinProductCommonMapper">
+
+	<!-- 2.1查询标的信息 -->
+	<select id="getTargetFinProduct"
+		resultType="com.joyintech.tams.valuation.common.batch.finproduct.entity.TargetFinProduct"
+		parameterType="java.util.Map">
+		SELECT
+			a.FINPROD_ID AS finprodId, /**金融产品代码**/
+			a.FINPROD_TYPE AS finprodType, /**金融产品类型**/
+			a.FINPROD_TYPE2 AS finprodType2, /**金融产品类型**/
+			a.FINPROD_ABBR AS finprodAbbr, /**金融产品简称**/
+			a.FINPROD_NAME AS finprodName, /**金融产品全称**/
+			a.PROFIT_TYPE AS profitType, /**收益类型**/
+			a.COUPON_SPECIES AS couponSpecies, /**息票品种**/
+			a.CHL_FINPROD_ID AS chlFinprodId, /**通道代码**/
+			a.FINPROD_MARKET_ID AS finprodMarketId, /**市场代码**/
+			a.ISSUE_PRICE AS issuePrice, /**发行价**/
+			a.ISSUE_AMT AS issueAmt, /**发行规模**/
+			a.CCY AS ccy,	/**币种**/
+			a.BLN_AREA AS blnArea, /**境内外**/
+			a.CALENDAR_ID AS calendarId, /**交易日历**/
+			a.TRADE_MARKET AS tradeMarket, /**交易场所**/
+			a.ISSUE_TYPE AS issueType, /**发行方式**/
+			a.ISSUER AS issuer, /**发行人**/
+			a.IDATE AS idate, /**发行日**/
+			a.VDATE AS vdate, /**起息日**/
+			a.MDATE AS mdate, /**到期日**/
+			a.ACTMDATE AS actmdate, /**实际到期日**/
+			a.IS_CHL AS isChl, /**是否通道**/
+			a.IS_SUS AS isSus, /**是否永续**/
+			a.IS_RIGHT AS isRight, /**是否含权**/
+			a.EXE_DATE exeDate, /**含权债摊销日**/
+			a.P_FINPROD_ID AS pFinprodId, /**母金融产品代码**/
+			a.O_FINPROD_ID AS oFinprodId, /**原金融产品代码**/
+			ofpd.finprod_type AS oFinprodType, /**原金融产品类型**/
+			<!-- 一体化问题12：表名变更（标的类金融产品扩展表->标的类金融产品附属表）新表没有SALE_CHANNEL（销售渠道字段）该字段也没被用到 -->
+			<!-- b.SALE_CHANNEL AS saleChannel, /**销售渠道**/ -->
+			b.SALE_LAYER AS saleLayer, /**销售分层**/
+			b.SALE_PERIOD AS salePeriod, /**销售期次**/
+			a.OPERATION_TYPE AS openType, /**开放类型**/
+			
+			/* b.CARRYOVER_FREQ AS carryoverFreq,*/ /**基金结转频率**/
+			/* d.PAY_CYCLE AS carryoverFreq,*/ /**一体化项目，基金结转频率取现金流支付规则表的支付频率**/
+			null AS carryoverFreq,/**针对一体化表结构变更：【基金结转频率删除：已转移到现金流支付规则表】。由于标的关联支付规则会出现多条，导致共通方法【查询标的信息】报错，暂时【结转频率】先取空，后期确认解决。**/
+			
+			b.PUR_SPEED AS purSpeed, /**申购确认速度**/
+			b.RED_SPEED AS redSpeed, /**赎回确认速度**/
+	        b.IS_COMPOUND_INT AS isCompoundInt,
+	        /**add by yanya on 20191012 start 增加面值查询字段 start**/
+	        b.face_value AS faceValue,/**面值**/
+	        /**add by yanya on 20191012 start 增加面值查询字段 end**/
+			c.TYPE_1 AS type1, /**分类1**/
+			c.TYPE_2 AS type2, /**分类2**/
+			c.TYPE_3 AS type3, /**分类3**/
+			c.TYPE_4 AS type4, /**分类4**/
+			c.TYPE_5 AS type5, /**分类5**/
+			c.TYPE_6 AS type6, /**分类6**/
+			a.REGIST_ORG registOrg /**登记托管机构**/
+			FROM
+			FIN_PRODUCT a
+			left join FIN_PRODUCT ofpd on ofpd.finprod_id = a.finprod_id
+			LEFT JOIN FIN_PRODUCT_ADD b 
+				ON a.finprod_id = b.finprod_id
+			LEFT JOIN FIN_PRODUCT_TYPE c 
+				ON a.finprod_id = c.finprod_id
+				
+			/**LEFT JOIN FIN_CASH_PAY_RULE d ON d.FINPROD_ID = a.FINPROD_ID AND d.FINPROD_TYPE = a.FINPROD_TYPE**/
+			
+			WHERE 1=1
+			<if test="finprodIdList != null and finprodIdList.size()>0">
+				AND (a.FINPROD_ID IN
+				<foreach collection="finprodIdList" item="item"  index="index" open="(" separator="," close=")">
+					<if test="(index % 998) == 0">
+						null) OR a.FINPROD_ID IN  (
+					</if>
+					#{item}
+				</foreach>
+				)
+			</if>
+			<if test="finprodType !=null and finprodId !=''">
+				and a.finprod_Type=#{finprodType}
+			</if>
+		union all
+		SELECT
+		       a.FINPROD_ID AS finprodId, /**金融产品代码**/
+		       a.FINPROD_TYPE AS finprodType, /**金融产品类型**/
+				null as finprodType2,
+		       null AS finprodAbbr, /**金融产品简称**/
+		       null as finprodName, /**金融产品全称**/
+		       a.PROFIT_TYPE AS profitType, /**收益类型**/
+		       null AS couponSpecies, /**息票品种**/
+		       a.chl_agrt_id AS chlFinprodId, /**通道代码**/
+		       null AS finprodMarketId, /**市场代码**/
+		       null AS issuePrice, /**发行价**/
+		       null AS issueAmt, /**发行规模**/
+		       a.CCY AS ccy, /**币种**/
+		       null AS blnArea, /**境内外**/
+		       a.CALENDAR_ID AS calendarId, /**交易日历**/
+		       a.TRADE_MARKET AS tradeMarket, /**交易场所**/
+		       null AS issueType, /**发行方式**/
+		       null AS issuer, /**发行人**/
+		       null AS idate, /**发行日**/
+		       a.VDATE AS vdate, /**起息日**/
+		       a.MDATE AS mdate, /**到期日**/
+		       a.mdate AS actmdate, /**实际到期日**/
+		       null AS isChl, /**是否通道**/
+		       null AS isSus, /**是否永续**/
+		       null AS isRight, /**是否含权**/
+		       null as exeDate, /**含权债摊销日**/
+		       null AS pFinprodId, /**母金融产品代码**/
+		       null AS oFinprodId, /**原金融产品代码**/
+		       null AS oFinprodType, /**原金融产品类型**/
+			   <!-- 一体化问题12：表名变更（标的类金融产品扩展表->标的类金融产品附属表）新表没有SALE_CHANNEL（销售渠道字段）该字段也没被用到 -->
+		       <!-- null AS saleChannel, /**销售渠道**/ -->
+		       null AS saleLayer, /**销售分层**/
+		       null AS salePeriod, /**销售期次**/
+		       null AS openType, /**开放类型**/
+		       null AS carryoverFreq, /**基金结转频率**/
+		       null AS purSpeed, /**申购确认速度**/
+		       null AS redSpeed, /**赎回确认速度**/
+		       null AS isCompoundInt,
+		       /**add by yanya on 20191012 start 增加面值查询字段 start**/
+	           null AS faceValue,/**面值**/
+	           /**add by yanya on 20191012 start 增加面值查询字段 end**/
+		       c.TYPE_1 AS type1, /**分类1**/
+		       c.TYPE_2 AS type2, /**分类2**/
+		       c.TYPE_3 AS type3, /**分类3**/
+		       null AS type4, /**分类4**/
+		       null AS type5, /**分类5**/
+		       null AS type6, /**分类6**/
+		       null registOrg /**登记托管机构**/
+		    FROM
+		    FIN_trade_PRODUCT a
+		    LEFT JOIN FIN_PRODUCT_ADD b ON a.finprod_id =
+		    b.finprod_id
+		    LEFT JOIN FIN_PRODUCT_TYPE c ON a.finprod_id =
+		    c.finprod_id
+		    WHERE 1=1
+			<if test="finprodIdList != null and finprodIdList.size()>0">
+				AND (a.FINPROD_ID IN
+				<foreach collection="finprodIdList" item="item"  index="index" open="(" separator="," close=")">
+					<if test="(index % 998) == 0">
+						null) OR a.FINPROD_ID IN  (
+					</if>
+					#{item}
+				</foreach>
+				)
+			</if>
+		    <if test="finprodType !=null and finprodId !=''">
+				and a.finprod_Type=#{finprodType}
+			</if>
+		    	and a.branch= #{branch}
+
+	</select>
+
+	<!-- 2.2查询标的现金流计划list -->
+	<select id="getTargetCashPlanList"
+			resultType="com.joyintech.tams.valuation.common.batch.finproduct.entity.TargetCashPlan"
+			parameterType="java.util.Map">
+		SELECT
+		a.CASH_ID AS cashId, /**现金流代码**/
+		a.CASH_NUM AS cashNum,/**现金流序号**/
+		a.VDATE_UNADJUST AS vdateUnadjust,/**未调整的计算开始日**/
+		a.MDATE_UNADJUST AS mdateUnadjust,/**未调整的计算结束日**/
+		a.PAY_DATE_UNADJUST AS payDateUnadjust,/**未调整的计划支付日**/
+		a.VDATE AS vdate,/**调整后的计算开始日**/
+		a.MDATE AS mdate,/**调整后的计算结束日**/
+		a.PAY_DATE AS payDate,/**调整后的计划支付日**/
+		a.TERMDAYS AS termdays,/**计算周期天数**/
+		a.VDATE_Y AS vdateY,/**理论计息年度开始日**/
+		a.VDATE_TERM AS vdateTerm,/**完整周期开始日**/
+		a.MDATE_TERM AS mdateTerm,/**完整周期结束日**/
+		a.TERMDAYS_TERM termdaysTerm,/**完整周期计息天数**/
+		a.PRIN_AMT AS prinAmt,/**计划支付本金**/
+		a.IS_PAY_INT AS isPayInt,/**是否支付利息**/
+		a.INT_AMT AS intAmt,/**计划支付利息**/
+		a.CASH_AMT AS cashAmt,/**计划支付现金流**/
+		a.CASH_UNIT_TYPE AS cashUnitType,/**现金流单位**/
+		a.CALC_FUNCTION AS calcFunction,/**计息算法**/
+		a.FREQUENCY AS frequency,/**年付息次数**/
+		a.FINPROD_ID AS finprodId,/**金融产品代码**/
+		a.FINPROD_TYPE AS finprodType,/**金融产品类型**/
+		a.PAY_TYPE AS payType, /**支付方式**/
+		b.BRANCH AS branch,/**分支序号**/
+		b.CASH_TYPE_1 AS cashType1, /**现金流一级类型**/
+		b.CASH_TYPE_2 AS cashType2 /**现金流二级类型**/
+		,a.INT_PRIN_AMT intPrinAmt /**计息本金**/
+		FROM
+		FIN_CASH_PLAN a
+		LEFT JOIN FIN_CASH_INFO
+		b on a.cash_id =
+		b.cash_id
+		WHERE 1=1
+		<if test="finprodIdList != null and finprodIdList.size()>0">
+			AND (a.FINPROD_ID IN
+			<foreach collection="finprodIdList" item="item"  index="index" open="(" separator="," close=")">
+				<if test="(index % 998) == 0">
+					null) OR a.FINPROD_ID IN  (
+				</if>
+				#{item}
+			</foreach>
+			)
+		</if>
+		/**金融产品代码**/
+		<if test="cashType1 != null">
+			AND b.CASH_TYPE_1 = #{cashType1,jdbcType=VARCHAR}
+			/**现金流一级类型**/
+		</if>
+		<if test="cashType2 != null">
+			AND b.CASH_TYPE_2 = #{cashType2,jdbcType=VARCHAR}
+			/**现金流二级类型**/
+		</if>
+		<if test="payStatus != null">
+			AND a.PAY_STATUS = #{payStatus,jdbcType=VARCHAR}
+			/**是否已支付**/
+		</if>
+		<if test="cashId != null">
+			AND a.CASH_ID = #{cashId,jdbcType=VARCHAR} /**现金流代码**/
+		</if>
+		<if test="branch!=null">
+			AND B.BRANCH = #{branch}/**分支序号**/
+		</if>
+
+		ORDER BY
+		a.FINPROD_ID,b.CASH_TYPE_1,b.CASH_TYPE_2,a.VDATE ASC
+	</select>
+
+	<!-- 2.3查询标的现金流支付规则list -->
+	<select id="getTargetCashPayRuleList"
+			resultType="com.joyintech.tams.valuation.common.batch.finproduct.entity.TargetCashPayRule"
+			parameterType="java.util.Map">
+		SELECT
+		a.CASH_ID AS cashId, /**现金流代码**/
+		a.EFF_DATE AS effDate, /**生效日期**/
+		a.PAY_CYCLE AS payCycle, /**支付频率**/
+		<!-- a.TDAY_RULE AS tdayRule, /**营业日准则**/ -->
+		a.END_TDAY_RULE endTdayRule,    /*截止日营业日准则*/
+		a.PAY_TDAY_RULE payTdayRule,    /*支付日营业日准则*/
+		a.CALC_RULE AS calcRule, /**推算方式**/
+		a.FIRST_PAY_DATE AS firstPayDate, /**首次支付日**/
+		a.CASH_UNIT_TYPE AS cashUnitType, /**现金流单位**/
+		a.FINPROD_ID AS finprodId, /**金融产品代码**/
+		a.FINPROD_TYPE AS finprodType, /**金融产品类型**/
+		a.PAY_TYPE AS payType,/**支付方式**/
+		b.BRANCH AS branch,/**分支序号**/
+		b.CASH_TYPE_1 AS cashType1,/**现金流一级类型**/
+		b.CASH_TYPE_2 AS cashType2 /**现金流二级类型**/
+		FROM
+		FIN_CASH_PAY_RULE a
+		LEFT JOIN FIN_CASH_INFO b
+		on a.cash_id
+		= b.cash_id
+		WHERE 1=1
+		<if test="finprodIdList != null and finprodIdList.size()>0">
+			AND (a.FINPROD_ID IN
+			<foreach collection="finprodIdList" item="item"  index="index" open="(" separator="," close=")">
+				<if test="(index % 998) == 0">
+					null) OR a.FINPROD_ID IN  (
+				</if>
+				#{item}
+			</foreach>
+			)
+		</if>
+		/**金融产品代码**/
+		<if test="cashType1 != null">AND b.CASH_TYPE_1 = #{cashType1,jdbcType=VARCHAR}
+			/**现金流一级类型**/
+		</if>
+		<if test="cashType2 != null">AND b.CASH_TYPE_2 = #{cashType2,jdbcType=VARCHAR}
+			/**现金流二级类型**/
+		</if>
+		<if test="cashId != null">AND a.CASH_ID = #{cashId,jdbcType=VARCHAR} /**现金流代码**/
+		</if>
+		<if test="effdateEnd != null">AND #{effdateEnd,jdbcType=DATE} >= a.EFF_DATE /**生效日期**/
+		</if>
+		<if test="effdateStart != null">
+			AND (
+			EXISTS( /**筛选：查询查询日最近一条现金流支付规则。**/
+			SELECT 'X' FROM (
+			SELECT c.CASH_ID,max(c.EFF_DATE) AS maxEffDate
+			FROM FIN_CASH_PAY_RULE
+			c
+			WHERE c.EFF_DATE<![CDATA[<=]]> #{effdateStart,jdbcType=DATE}
+			GROUP BY c.CASH_ID
+			) d
+			WHERE d.CASH_ID = a.CASH_ID
+			AND d.maxEffDate = a.EFF_DATE
+			)
+			OR
+			a.EFF_DATE <![CDATA[>=]]> #{effdateStart,jdbcType=DATE}
+			)
+		</if>
+		<if test="branch!=null">
+			AND B.BRANCH = #{branch}/**分支序号**/
+		</if>
+
+		ORDER BY
+		a.FINPROD_ID,b.CASH_TYPE_1,b.CASH_TYPE_2,a.EFF_DATE ASC
+	</select>
+
+	<!-- 2.4查询标的现金流计算规则list -->
+	<select id="getTargetCashCalcRuleList"
+			resultType="com.joyintech.tams.valuation.common.batch.finproduct.entity.TargetCashCalcRule"
+			parameterType="java.util.Map">
+		SELECT
+		a.CASH_ID AS cashId, /**现金流代码**/
+		a.EFF_DATE AS effDate, /**生效日期**/
+		a.CALC_TYPE AS calcType, /**计算类型**/
+		<!-- 	      	现金流计算规则表浮动利率编号删除   by huangjian 20190103 -->
+		<!-- 		a.INT_RATE_ID AS intRateId, /**浮动利率编号**/ -->
+		a.YIELD AS yield, /**生效利率**/
+		a.BASIS AS basis, /**计息基础**/
+		a.BASE_TYPE AS baseType, /**基数类型**/
+		a.BASE_DATE_TYPE AS baseDateType, /**基数日期类型**/
+		a.FINPROD_ID AS finprodId, /**金融产品代码**/
+		a.FINPROD_TYPE AS finprodType, /**金融产品类型**/
+		a.REMARK AS remark, /**备注**/
+		b.BRANCH AS branch, /**分支序号**/
+		b.CASH_TYPE_1 AS cashType1, /**现金流一级类型**/
+		b.CASH_TYPE_2 AS cashType2 /**现金流二级类型**/
+		FROM
+		FIN_CASH_CALC_RULE a
+		LEFT JOIN FIN_CASH_INFO b ON a.cash_id = b.cash_id
+		WHERE 1=1
+		<if test="finprodIdList != null and finprodIdList.size()>0">
+			AND (a.FINPROD_ID IN
+			<foreach collection="finprodIdList" item="item"  index="index" open="(" separator="," close=")">
+				<if test="(index % 998) == 0">
+					null) OR a.FINPROD_ID IN  (
+				</if>
+				#{item}
+			</foreach>
+			)
+		</if>
+		<if test="cashType1 != null">AND b.CASH_TYPE_1 = #{cashType1,jdbcType=VARCHAR}
+			/**现金流一级类型**/
+		</if>
+		<if test="cashType2 != null">AND b.CASH_TYPE_2 = #{cashType2,jdbcType=VARCHAR}
+			/**现金流二级类型**/
+		</if>
+		<if test="cashId != null">AND a.CASH_ID = #{cashId,jdbcType=VARCHAR} /**现金流代码**/
+		</if>
+		<if test="effdateEnd != null">AND #{effdateEnd,jdbcType=DATE} >= a.EFF_DATE /**生效日期**/
+		</if>
+		<if test="effdateStart != null">
+			AND (
+			EXISTS( /**筛选：查询查询日最近一条现金流计算规则。**/
+			SELECT 'X' FROM (
+			SELECT c.CASH_ID,max(c.EFF_DATE) AS maxEffDate
+			FROM FIN_CASH_CALC_RULE
+			c
+			WHERE  c.EFF_DATE <![CDATA[<=]]>#{effdateStart,jdbcType=DATE}
+			GROUP BY c.CASH_ID
+			) d
+			WHERE d.CASH_ID = a.CASH_ID
+			AND d.maxEffDate = a.EFF_DATE
+			)
+			OR
+			a.EFF_DATE<![CDATA[>=]]> #{effdateStart,jdbcType=DATE}
+			)
+		</if>
+		<if test="branch!=null">
+			AND B.BRANCH = #{branch}/**分支序号**/
+		</if>
+
+		ORDER BY
+		a.FINPROD_ID,b.CASH_TYPE_1,b.CASH_TYPE_2,a.EFF_DATE ASC
+	</select>
+
+
+	<!-- 当前计划对应分支序号查询   -->
+	<select id="queryFinExercisePlan" resultType="com.joyintech.tams.common.base.entity.FinExercisePlan" parameterType="java.util.Map">
+		SELECT
+		CASH_ID,
+		EXERCISE_TYPE,
+		VDATE,
+		MDATE,
+		EXERCISE_DATE,
+		EXERCISE_STATUS,
+		EXERCISE_PRICE,
+		EXERCISE_REMARK,
+		FINPROD_ID,
+		FINPROD_TYPE,
+		BRANCH,
+		CREATE_USER,
+		CREATE_DEPT,
+		CREATE_TIME,
+		UPDATE_USER,
+		UPDATE_TIME
+		FROM
+		FIN_EXERCISE_PLAN
+		WHERE
+		1 = 1
+		<if test="finprodIdList != null and finprodIdList.size()>0">
+			AND (FINPROD_ID IN
+			<foreach collection="finprodIdList" item="item"  index="index" open="(" separator="," close=")">
+				<if test="(index % 998) == 0">
+					null) OR FINPROD_ID IN  (
+				</if>
+				#{item}
+			</foreach>
+			)
+		</if>
+		<if test="finprodType != null and finprodType !='' ">
+			AND FINPROD_TYPE=#{finprodType}
+		</if>
+		<if test="exerciseDate != null ">
+			AND EXERCISE_DATE <![CDATA[ > ]]> #{exerciseDate}
+		</if>
+		<if test="exerciseType != null and exerciseType !='' ">
+			AND EXERCISE_TYPE=#{exerciseType}
+		</if>
+		ORDER BY FINPROD_ID,EXERCISE_DATE ASC
+	</select>
+
+
+	<!-- 当前计划对应分支序号查询   -->
+	<select id="queryFinProductAdd" resultType="com.joyintech.tams.common.base.entity.FinProductAdd" parameterType="java.util.Map">
+		SELECT DISTINCT 
+			TEMP.finprodId as finprodId,
+			TEMP.isCashManage as isCashManage
+		FROM
+			(select
+				b.BOOKSET_ID as finprodId,
+				a.is_cash_manage as isCashManage
+			from
+				fin_product_add a
+			inner join BOK_BOOKSET b on b.ACCT_SUBJECT_TYPE = 'F16' and b.BOOKSET_ID = a.FINPROD_ID
+			where b.BOOKSET_ID in 
+				<foreach collection="booksetIdList" item="item"  index="index" open="(" separator="," close=")">
+					<if test="(index % 998) == 0">
+						null) OR b.BOOKSET_ID IN  (
+					</if>
+					#{item}
+				</foreach>
+			UNION ALL
+			select
+				d.BOOKSET_ID as finprodId,
+				a.is_cash_manage as isCashManage
+			from
+				fin_product_add a
+			inner join ptl_portfolio b on a.PORTFOLIO_ID = b.PORTFOLIO_ID
+			inner join ptl_portfolio c on c.PARENT_PORTFOLIO_ID = b.PORTFOLIO_ID
+			inner join BOK_BOOKSET d on d.ACCT_SUBJECT_TYPE = 'F18' and d.BOOKSET_ID = c.PORTFOLIO_ID
+			where d.BOOKSET_ID in 
+				<foreach collection="booksetIdList" item="item"  index="index" open="(" separator="," close=")">
+					<if test="(index % 998) == 0">
+						null) OR d.BOOKSET_ID IN  (
+					</if>
+					#{item}
+				</foreach>
+			UNION ALL
+			select
+				c.BOOKSET_ID_SON as finprodId,
+				a.is_cash_manage as isCashManage
+			from
+				fin_product_add a
+				inner join BOK_BOOKSET b on b.ACCT_SUBJECT_TYPE = 'F16' and b.BOOKSET_ID = a.FINPROD_ID
+				inner join BOK_BOOKSET_RE c on c.BOOKSET_ID = b.BOOKSET_ID
+			where c.BOOKSET_ID_SON in 
+				<foreach collection="booksetIdList" item="item"  index="index" open="(" separator="," close=")">
+					<if test="(index % 998) == 0">
+						null) OR c.BOOKSET_ID_SON IN  (
+					</if>
+					#{item}
+				</foreach>
+			UNION ALL
+			select
+				e.BOOKSET_ID_SON as finprodId,
+				a.is_cash_manage as isCashManage
+			from
+				fin_product_add a
+			inner join ptl_portfolio b on a.PORTFOLIO_ID = b.PORTFOLIO_ID
+			inner join ptl_portfolio c on c.PARENT_PORTFOLIO_ID = b.PORTFOLIO_ID
+			inner join BOK_BOOKSET d on d.ACCT_SUBJECT_TYPE = 'F18' and d.BOOKSET_ID = c.PORTFOLIO_ID
+			inner join BOK_BOOKSET_RE e on e.BOOKSET_ID = d.BOOKSET_ID
+			where e.BOOKSET_ID_SON in 
+				<foreach collection="booksetIdList" item="item"  index="index" open="(" separator="," close=")">
+					<if test="(index % 998) == 0">
+						null) OR e.BOOKSET_ID_SON IN  (
+					</if>
+					#{item}
+				</foreach>
+			) TEMP
+		ORDER BY TEMP.finprodId
+	</select>
+	
+	<select id="queryBokFinProductValuationPara" resultType="com.joyintech.tams.common.base.entity.BokFinProductValuationPara" parameterType="java.util.Map" >
+        select 
+        <include refid="com.joyintech.tams.common.base.dao.BokFinProductValuationParaMapper.Base_Column_List" />
+        from BOK_FIN_PRODUCT_VALUATION_PARA
+        where BRANCH = #{branch,jdbcType=DECIMAL}
+        ORDER BY BOKSET_ID, FINPROD_ID, BRANCH
+    </select>
+
+	<!-- 摊销重算配置查询 -->
+	<select id="getBokAmoConfig" parameterType="java.util.Map" resultType="com.joyintech.tams.common.base.entity.BokAmoConfig">
+select
+	BOOKSET_ID,
+	BUSI_ID,
+	CDATE,
+	RECAL_TYPE,
+  	DAILYDSC_YIELD
+from
+	BOK_AMO_CONFIG
+where
+	1=1
+	<if test="finprodIdList != null and finprodIdList.size()>0">
+		AND (BUSI_ID IN
+		<foreach collection="finprodIdList" item="item"  index="index" open="(" separator="," close=")">
+			<if test="(index % 998) == 0">
+				null) OR BUSI_ID IN  (
+			</if>
+			#{item}
+		</foreach>
+		)
+	</if>
+	AND	CDATE = #{cdate}
+	AND	(
+	<if test="booksetIdList != null and booksetIdList.size()>0">
+		(BOOKSET_ID IN
+		<foreach collection="booksetIdList" item="item"  index="index" open="(" separator="," close=")">
+			<if test="(index % 998) == 0">
+				null) OR BOOKSET_ID IN  (
+			</if>
+			#{item}
+		</foreach>
+		)
+	</if>
+	OR BOOKSET_ID = 'ALL')
+ORDER BY (DECODE(BOOKSET_ID ,'ALL',2,1))
+	</select>
+
+	<select id="getStage3Vaule" resultType="java.math.BigDecimal">
+    	        SELECT
+					ECL_VAULE
+				FROM
+					TRD_ASSET_LOSS
+				WHERE
+					VAL_DATE <![CDATA[ <= ]]> #{HAPPEN_DATE}
+					AND STATUS = #{TRADE_STATUS_01}
+					AND STAGE =  #{stageP3}
+					AND SEC_ID = #{secId}
+				ORDER by VAL_DATE DESC
+    </select>
+
+	<!-- 区间到账应计利息  -->
+	<select id="intervalArrivalAccount" parameterType="map" resultType="com.joyintech.tams.valuation.common.batch.finproduct.entity.InitTrdProductDealDto">
+		select a.vdate,/*起息日*/
+		a.mdate,/*到期日*/
+		a.trade_date tradeDate,
+		a.settle_date settleDate,
+		a.is_clean isClean,/*是否结清*/
+		a.finprod_id finprodId,/*金融产品代码*/
+		a.finprod_type finprodType,/*金融产品类型*/
+		a.trade_amt tradeAmt, /*交易金额*/
+		b.bookset_id booksetId
+		from trd_product_deal a
+		inner join bok_deal_accounting b
+		on a.trade_id = b.busi_no
+		where 1 = 1
+		and a.ps = 'T22'
+		<if test="booksetIdList != null and booksetIdList.size()>0">
+			AND (b.bookset_id IN
+			<foreach collection="booksetIdList" item="item"  index="index" open="(" separator="," close=")">
+				<if test="(index % 998) == 0">
+					null) OR b.bookset_id IN  (
+				</if>
+				#{item}
+			</foreach>
+			)
+		</if>
+		<if test="calDate != null">
+			and a.mdate = #{calDate,jdbcType=DATE}
+		</if>
+		<if test="finprodIdList != null and finprodIdList.size()>0">
+			AND (a.finprod_id IN
+			<foreach collection="finprodIdList" item="item"  index="index" open="(" separator="," close=")">
+				<if test="(index % 998) == 0">
+					null) OR a.finprod_id IN  (
+				</if>
+				#{item}
+			</foreach>
+			)
+		</if>
+	</select>
+
+
+	<!-- 交易信息的查询 -->
+	<select id="queryTradeInfoList"
+			resultType="com.joyintech.tams.valuation.common.batch.finproduct.entity.TradeInfoDto"
+			parameterType="map">
+		SELECT
+		b.finprod_id as finprodId,
+		b.finprod_type as finprodType,
+		b.branch as branch,
+		b.BRANCH_TYPE AS branchType, /**分支类型**/
+		b.CHL_AGRT_ID AS chlAgrtId, /**通道代码**/
+		b.PRIN AS prin, /**名义本金**/
+		b.CCY AS ccy, /**本金币种**/
+		b.VDATE AS vdate, /**起息日**/
+		b.MDATE AS mdate, /**到期日**/
+		b.TERM AS term, /**期限(天)**/
+		b.INT_TYPE AS intType, /**利率类型**/
+		b.INT_RATE AS intRate, /**固定利率**/
+		b.INT_RATE_ID AS intRateId, /**利率编号**/
+		b.BASIS AS basis, /**计息基础**/
+		b.M_PRIN_AMT AS mPrinAmt, /**到期本金**/
+		b.M_INT_AMT AS mIntAmt, /**到期利息**/
+		b.M_TRADE_AMT AS mTradeAmt, /**到期金额**/
+		b.O_FINPROD_ID AS oFinprodId, /**原金融产品代码**/
+		<!--b.O_FINPROD_TYPE AS oFinprodType, /**原金融产品类型**/-->
+
+		b.FINPROD_TYPE AS oFinprodType, /**原金融产品类型**/
+
+		d.REGIST_ORG AS registOrg, /**登记托管机构**/
+		<!-- 		b.MATCH_TYPE AS matchType, /**匹配类型**/ -->
+		c.TYPE_1 AS type1,/**分类1**/
+		c.TYPE_2 AS type2,/**分类2**/
+		c.TYPE_3 AS type3,/**分类3**/
+		c.TYPE_4 AS type4,/**分类4**/
+		c.TYPE_5 AS type5,/**分类5**/
+		c.TYPE_6 AS type6, /**分类6**/
+		b.trade_market tradeMarket, /*交易所*/
+		d.opt_fee_amt optFeeAmt,/**期权费 add by yanya on 20200208**/
+		e.se_rep_day_type seRepDayType,/*交易所回购计提天数方式*/
+		b.vpay_date vpayDate,/*首期交付日*/
+		b.mpay_date mpayDate,/*到期交付日*/
+		b.act_cap_days actCapDays, /*实际资金占用天数*/
+		b.EXC_PS excPs /*外汇交易方向*/
+		FROM
+		FIN_TRADE_PRODUCT b
+		LEFT JOIN FIN_PRODUCT_TYPE c ON
+		c.FINPROD_ID = b.FINPROD_ID
+		<!--AND c.FINPROD_TYPE = b.FINPROD_TYPE-->
+		LEFT JOIN FIN_TRADE_PRODUCT_ADD d
+		ON d.FINPROD_ID = b.FINPROD_ID
+		/** 取消该条件 by yanya on 20200208 AND d.FINPROD_TYPE = b.FINPROD_TYPE **/
+		AND b.BRANCH = d.BRANCH
+		left join fin_product_valuation_para e
+		on b.finprod_id=e.finprod_id
+		and b.branch=e.branch
+		WHERE 1=1
+		<if test="finprodIdList != null and finprodIdList.size()>0">
+			AND (b.finprod_id IN
+			<foreach collection="finprodIdList" item="item"  index="index" open="(" separator="," close=")">
+				<if test="(index % 998) == 0">
+					null) OR b.finprod_id IN  (
+				</if>
+				#{item}
+			</foreach>
+			)
+		</if>
+
+	</select>
+
+</mapper>

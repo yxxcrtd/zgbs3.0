@@ -124,26 +124,13 @@ public class IrsCalBookNewService {
         // 循环 计提基础信息列表 进行逻辑处理
         for (DrawBaseInfoSelectComDTO dto : listDrawBaseInfoSelectComDTONow) {
             // 获取标的信息.金融产品类型
-            TargetFinProduct targetFinProduct = this.getTargetFinProduct(dto.getBusiId());
+            TargetFinProduct targetFinProduct = acctEntity.getTargetFinProduct();
             Date mdateYsdWithTarget = this.getYesterday(targetFinProduct.getMdate());
-            // 调用共通设计-> 标的类共通：标的信息查询（现金流计算规则）
-            TargetSearchDto targetSearchDto = new TargetSearchDto();
-            targetSearchDto.setQueryType(ValDictCodeList.标的_现金流计算规则.getValue());
-            if (DictCodeBaseSubjectNatrueNew.应收利率互换.getValue().equals(dto.getBaseSubjectNature())) {
-                targetSearchDto.setCashType2(DictCodeListExt1.现金流二级类型_收取.getValue());
-            } else if (DictCodeBaseSubjectNatrueNew.应付利率互换.getValue().equals(dto.getBaseSubjectNature())) {
-                targetSearchDto.setCashType2(DictCodeListExt1.现金流二级类型_支付.getValue());
-            }
-            List<TargetSearchDto> queryCriteria = new ArrayList<>();
-            queryCriteria.add(targetSearchDto);
-            // 获取 现金流计算规则列表（报价列表）
-            Map<TargetSearchDto, Object> targetInfoMap = finProductCommonService.getTargetInfo(
-                    dto.getBusiId(), queryCriteria);
             List<TargetCashCalcRule> targetCashCalcRuleList = new ArrayList<TargetCashCalcRule>();
-            if (targetInfoMap != null && targetInfoMap.size() > 0
-                    && targetInfoMap.get(targetSearchDto) != null) {
-                targetCashCalcRuleList = (List<TargetCashCalcRule>) targetInfoMap.get(
-                        targetSearchDto);
+            if (DictCodeBaseSubjectNatrueNew.应收利率互换.getValue().equals(dto.getBaseSubjectNature())) {
+                targetCashCalcRuleList= acctEntity.getTargetCashCalcRuleListR();
+            } else if (DictCodeBaseSubjectNatrueNew.应付利率互换.getValue().equals(dto.getBaseSubjectNature())) {
+                targetCashCalcRuleList= acctEntity.getTargetCashCalcRuleListP();
             }
             // 3.1 利息计提
             // if (标的信息.起息日 > 计提类账务处理结果.发生日 )

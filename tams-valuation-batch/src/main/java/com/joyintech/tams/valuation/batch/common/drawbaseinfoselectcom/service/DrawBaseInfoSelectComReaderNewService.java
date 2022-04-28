@@ -6,6 +6,7 @@
 package com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.service;
 
 import com.joyintech.framework.base.entity.SysBatchTask;
+import com.joyintech.framework.util.SpringContextUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.BokMatchRlat;
 import com.joyintech.tams.constant.DictCodeList;
@@ -16,10 +17,14 @@ import com.joyintech.tams.valuation.batch.common.accountingmethod.accounting.Boo
 import com.joyintech.tams.valuation.batch.common.accountingmethod.dao.AccountingMethodMapper;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.SubjectMappingConfig;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.TreeNode;
+import com.joyintech.tams.valuation.batch.common.cache.service.ChangingCacheService;
+import com.joyintech.tams.valuation.batch.common.cache.service.ValuationBatchCacheService;
 import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dao.DrawBaseInfoSelectComNewMapper;
 import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto.DrawBaseInfoSelectComDTO;
 import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto.DrawBaseInfoSelectComResult;
+import com.joyintech.tams.valuation.batch.common.finproduct.service.InitFinProductCommonBatchService;
 import com.joyintech.tams.valuation.common.constants.BookConstant;
+import com.joyintech.tams.valuation.common.constants.InitConstant;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -38,7 +43,6 @@ import java.util.*;
 @Service
 @Scope("prototype")
 public class DrawBaseInfoSelectComReaderNewService {
-
     /**
      * 拆借计提入账批处理Mapper
      */
@@ -51,15 +55,17 @@ public class DrawBaseInfoSelectComReaderNewService {
     @Autowired
     private BookCommonLogic bookCommonLogic;
 
-    /**
-     * accountingMethodMapper
-     */
-    @Autowired
-    private AccountingMethodMapper accountingMethodMapper;
-
     @Autowired
     private BookAccountGenLogicNew bookAccountGenLogicNew;
-
+    /**
+     * 标的共通方法service
+     */
+    @Autowired
+    private InitFinProductCommonBatchService initFinProductCommonBatchService;
+    @Autowired
+    private ValuationBatchCacheService valuationBatchCacheService;
+    @Autowired
+    private ChangingCacheService changingCacheService;
     /**
      * {@inheritDoc}
      */
@@ -92,7 +98,8 @@ public class DrawBaseInfoSelectComReaderNewService {
         // drawBaseInfoSelectComMapper.selectDrawBaseInfoFromCurr(sqlMap);
         List<String> matchTypeList = new ArrayList<>();
         matchTypeList.add(DictCodeListExt1.匹配类型_任务代码_科目性质.getValue());
-        List<BokMatchRlat> valMatchRlats = accountingMethodMapper.selectValMatchRlatBySource(matchTypeList, (String)param.get("taskId"), null);
+        //List<BokMatchRlat> valMatchRlats = accountingMethodMapper.selectValMatchRlatBySource(matchTypeList, (String)param.get("taskId"), null);
+        List<BokMatchRlat> valMatchRlats = valuationBatchCacheService.getBokMatchRlatFromCache(matchTypeList, (String)param.get("taskId"), null);
         if (valMatchRlats != null && valMatchRlats.size() > 0) {
             List<String> targetList = new ArrayList<>();
             valMatchRlats.forEach(x->{
@@ -211,6 +218,11 @@ public class DrawBaseInfoSelectComReaderNewService {
 
         for (String skey : resultMap.keySet()) {
             result.add((DrawBaseInfoSelectComResult)resultMap.get(skey));
+        }
+        /**性能优化，在reder中预处理process中需要的信息**/
+        if(null != param.get(InitConstant.BATCH_FETCH_READE) && CollectionUtils.isNotEmpty(result)) {
+            DrawBaseInfoReaderParameterGenerator parameterGenerator = (DrawBaseInfoReaderParameterGenerator) SpringContextUtil.getBean((String)param.get(InitConstant.BATCH_FETCH_READE));
+            initFinProductCommonBatchService.quaryResultInfo(result, parameterGenerator);
         }
 
         return result;
