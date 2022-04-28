@@ -6,6 +6,7 @@ import com.jixu.msg.dto.JJPortfolioDto;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.common.interf.base.constant.InterfCommonConstant;
 import com.joyintech.tams.valuation.common.interf.base.service.common.InterfCommonService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValPrdInfoC;
