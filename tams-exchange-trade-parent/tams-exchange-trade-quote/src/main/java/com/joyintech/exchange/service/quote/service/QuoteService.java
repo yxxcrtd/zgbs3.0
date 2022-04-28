@@ -8,6 +8,7 @@ import com.joyintech.exchange.service.quote.enums.InterfSrcType;
 import com.joyintech.exchange.service.quote.sh.file.utils.SSEFileConverterUtil;
 import com.joyintech.exchange.service.quote.sz.binary.utils.SZSEBinaryConverterUtil;
 import com.joyintech.exchange.service.quote.utils.InterfHttpRequestUtil;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.QuoteDataProto;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
@@ -31,10 +32,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.joyintech.tams.constant.DictCodeList.是否_是;
+
 @Component
 public class QuoteService {
     private static final Logger logger = LoggerFactory.getLogger(QuoteService.class);
     private ThreadLocal<QuoteProto.TickBean.Builder> threadLocalBuilder = ThreadLocal.withInitial(QuoteProto.TickBean::newBuilder);
+
+    /**
+     * 是否使用的mock行情
+     */
+    public static final String TRD_USE_MOCK_QUOTE= "TRD_USE_MOCK_QUOTE";
+    /**
+     * 默认行情资产
+     */
+    public static final String DEFAULT_CODE = "100303.SZ";
 
     @Autowired
     private QuoteTickService quoteTickService;
@@ -64,8 +76,12 @@ public class QuoteService {
             tickBean = TickConverter.convertTick(quoteTickService.findFromRedisById(stockCode));
         }
         if (Objects.isNull(tickBean)) {
-            logger.debug("[行情服务] 获取行情失败");
-            return  new ResultBean(ErrorCode.SUCCESS);
+            if (StringUtil.equals(是否_是.getValue(), CacheUtil.getSysParam(TRD_USE_MOCK_QUOTE))) {
+                return this.getTick(DEFAULT_CODE);
+            } else {
+                logger.debug("[行情服务] 获取行情失败");
+                return  new ResultBean(ErrorCode.QUOTATION_NOT_EXIST);
+            }
         }
         logger.debug("[行情服务] 获取行情：证券代码{}，行情数据{}", stockCode, JSON.toJSONString(tickBean));
         return new ResultBean(ErrorCode.SUCCESS, tickBean);
