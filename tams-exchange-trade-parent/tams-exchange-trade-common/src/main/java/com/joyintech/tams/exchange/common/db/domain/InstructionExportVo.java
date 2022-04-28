@@ -3,6 +3,7 @@ package com.joyintech.tams.exchange.common.db.domain;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.utils.DoubleSerializerUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import io.swagger.annotations.ApiModel;
@@ -109,6 +110,9 @@ public class InstructionExportVo {
     @ApiModelProperty(required = false, name = "ps", value = "交易方向")
     @Size(max = 50)
     private String ps = "";
+
+    @ApiModelProperty( name = "tradeSide", value = "交易方向")
+    private String tradeSide;
 
     @ApiModelProperty(required = false, name = "dealMode", value = "交易方式")
     @Size(max = 50)
@@ -1049,6 +1053,22 @@ public class InstructionExportVo {
 
     public void setBusiTypeTg(String busiTypeTg) {
         this.busiTypeTg = busiTypeTg;
+    }
+
+    public String getTradeSide() {
+        if (DictCodeListExt3.投管业务类型_首期.getValue().equals(busiTypeTg)
+                || DictCodeListExt3.投管业务类型_提前购回.getValue().equals(busiTypeTg)
+                || DictCodeListExt3.投管业务类型_到期购回.getValue().equals(busiTypeTg)
+                || DictCodeListExt3.投管业务类型_到期续做.getValue().equals(busiTypeTg)
+                || DictCodeListExt3.投管业务类型_中途换券.getValue().equals(busiTypeTg)
+                || DictCodeListExt3.投管业务类型_解除质押.getValue().equals(busiTypeTg)) {
+            return firstRepoPs;
+        }
+        return ps;
+    }
+
+    public void setTradeSide(String tradeSide) {
+        this.tradeSide = tradeSide;
     }
 
     /**

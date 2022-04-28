@@ -1,5 +1,7 @@
 package com.joyintech.tams.exchange.common.bean.investment;
 
+import com.google.common.base.MoreObjects;
+
 import java.util.List;
 
 /**
@@ -32,5 +34,14 @@ public class RiskOccupyParam {
 
     public void setEventType(String eventType) {
         this.eventType = eventType;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("rskList", rskList)
+                .add("assetType", assetType)
+                .add("eventType", eventType)
+                .toString();
     }
 }
