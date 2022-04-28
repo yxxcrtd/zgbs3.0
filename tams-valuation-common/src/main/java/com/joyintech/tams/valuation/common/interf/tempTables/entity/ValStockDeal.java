@@ -231,6 +231,11 @@ public class ValStockDeal extends BaseEntity {
     private BigDecimal limitDays;
 
     /**
+     *  证券管理户
+     */
+    private String secManageAcctId;
+
+    /**
      * 取得 产品代码
      * @return 产品代码
      */
@@ -782,5 +787,13 @@ public class ValStockDeal extends BaseEntity {
 
     public void setIsTransferAmt(String isTransferAmt) {
         this.isTransferAmt = isTransferAmt;
+    }
+
+    public String getSecManageAcctId() {
+        return secManageAcctId;
+    }
+
+    public void setSecManageAcctId(String secManageAcctId) {
+        this.secManageAcctId = secManageAcctId;
     }
 }

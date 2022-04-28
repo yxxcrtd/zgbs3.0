@@ -451,6 +451,8 @@ public class StockDealTemplateRecService {
         valFinProductDeal.setMyAcctNo(dto.getMyAcctNo());
         // 发行方式
         valFinProductDeal.setIssueType(dto.getDealIssueType());
+        // 证券管理账户代码 = A.证券管理户
+        valFinProductDeal.setSecManageAcctId(dto.getSecManageAcctId());
 
         return valFinProductDeal;
     }
