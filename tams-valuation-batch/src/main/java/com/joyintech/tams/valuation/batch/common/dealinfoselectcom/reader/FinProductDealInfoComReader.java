@@ -19,6 +19,7 @@ import com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dto.FinProduc
 import com.joyintech.tams.valuation.batch.common.dealinfoselectcom.service.FinProductDealInfoComReaderNewService;
 import com.joyintech.tams.valuation.batch.common.dealinfoselectcom.service.FinProductDealInfoComReaderService;
 import com.joyintech.tams.valuation.common.constants.BookConstant;
+import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +85,7 @@ public class FinProductDealInfoComReader extends BaseReader<FinProductDealInfoRe
         }
         // add by weipeng on 20220301 会计引擎升级改造，增加辅助核算项查询 start
         // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录
-        String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+        String accountEntryType =  CacheUtil.getSysParam(GlobalConstant.ACCOUNT_ENTRY_TYPE);
         // 获取reader返回值
         if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
             listFinProductDealInfoResult = finProductDealInfoComRederNewService.execute(

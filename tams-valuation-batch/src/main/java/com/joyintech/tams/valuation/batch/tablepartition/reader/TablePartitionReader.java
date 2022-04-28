@@ -15,6 +15,7 @@ import java.util.List;
 
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.valuation.batch.common.cache.service.ValuationBatchCacheService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -36,12 +37,9 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 @Service
 @Scope("prototype")
 public class TablePartitionReader extends BaseReader<TablePartitionDto> {
-    
-    /**
-     * accountingMethodMapper
-     */
+
     @Autowired
-    private AccountingMethodMapper accountingMethodMapper;
+    private ValuationBatchCacheService valuationBatchCacheService;
 
     @Override
     public List<TablePartitionDto> createList() {
@@ -51,8 +49,9 @@ public class TablePartitionReader extends BaseReader<TablePartitionDto> {
         
         List<String> matchTypeList = new ArrayList<>();
         matchTypeList.add(DictCodeListExt1.匹配类型_任务代码_表分区场景.getValue());
-        List<BokMatchRlat> valMatchRlats = accountingMethodMapper.selectValMatchRlatBySource(
-            matchTypeList, this.getBatchExecuteInfo().getTaskId(), null);
+//        List<BokMatchRlat> valMatchRlats = accountingMethodMapper.selectValMatchRlatBySource(
+//            matchTypeList, this.getBatchExecuteInfo().getTaskId(), null);
+        List<BokMatchRlat> valMatchRlats = valuationBatchCacheService.getBokMatchRlatFromCache(matchTypeList, this.getBatchExecuteInfo().getTaskId(), null);
         valMatchRlats.forEach(x->{
             tables.add(x.getTarget());
         });

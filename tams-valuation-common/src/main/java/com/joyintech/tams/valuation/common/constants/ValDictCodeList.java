@@ -17,6 +17,12 @@ import java.util.List;
  * @since 1.0
  */
 public enum ValDictCodeList implements BaseDictCodeList {
+    /**
+     * 标的_金融类产品标的
+     */
+    标的_金融类产品标的(
+            ValDictCode.标的, "RST_TRADE_PRODUCT", "金融类产品标的"
+    ),
 	/**
 	 * 债券市价折算方式_按占比计算
 	 */

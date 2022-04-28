@@ -26,6 +26,7 @@ import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.Account
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGenerateResult;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.SubjectMappingConfig;
 import com.joyintech.tams.valuation.batch.common.base.entity.extcommon.ValBokBookdetailBatch;
+import com.joyintech.tams.valuation.batch.common.cache.service.entity.BokSchemeConfigDto;
 import com.joyintech.tams.valuation.batch.vatdraw.dao.VatDrawBNewMapper;
 import com.joyintech.tams.valuation.batch.vatdraw.dto.*;
 import com.joyintech.tams.valuation.common.batch.finproduct.service.FinProductCommonBatchService;
@@ -243,8 +244,10 @@ public class VatDrawProcessorBNewService {
         // 2.查询账套下配置
         // 2.1 查询账套下不启用场景
         // 调用共通查询 账套税务配置
-        List<BooksetTaxConfigDto> listBooksetTaxConfig = vatDrawCommonNewService.queryBooksetTaxConfig(
-            booksetId, null);
+//        List<BooksetTaxConfigDto> listBooksetTaxConfig = vatDrawCommonNewService.queryBooksetTaxConfig(
+//            booksetId, null);
+        List<BokSchemeConfigDto> listBooksetTaxConfig = vatDrawCommonNewService.queryBokSchemeConfig(
+                booksetId, null);
 
         // 查询增值税已抵扣增值额最大处理序列
         BigDecimal maxBookOrder = vatDrawNewMapper.queryMaxDeductBookOrder();
@@ -512,8 +515,10 @@ public class VatDrawProcessorBNewService {
         // 4' 处理2017-12-31日当天账务明细余额,生成初始化公允价值变动账务明细税明细和余额.
         // IF (参数.发生日期 = '2018-01-01' && 配置.是否对公允价值变动损益计税 不为空 && 配置.是否对公允价值变动损益计税 = '是')
         // 读取[已实现负差是否抵扣]配置
-        List<BooksetTaxConfigDto> listConfig = vatDrawCommonNewService.queryBooksetTaxConfig(
-            acctEntity.getBooksetId(), SFZGGYJZBDS);
+//        List<BooksetTaxConfigDto> listConfig = vatDrawCommonNewService.queryBooksetTaxConfig(
+//            acctEntity.getBooksetId(), SFZGGYJZBDS);
+          List<BokSchemeConfigDto> listConfig = vatDrawCommonNewService.queryBokSchemeConfig(
+              acctEntity.getBooksetId(), SFZGGYJZBDS);
         if ("2018-01-01".equals(DateUtil.format(happenDate))
             && CollectionUtils.isNotEmpty(listConfig)
             && DictCodeList.是否_是.getValue().equals(listConfig.get(0).getConfigValue())) {
@@ -522,8 +527,10 @@ public class VatDrawProcessorBNewService {
             baseSubjectNatureList.addAll(accountingCommonService.getValSubjectNatureList(
                 DictCodeListExt1.分组代码_公允价值查询对应科目.getValue()));
             // IF 配置.其他综合收益是否计税 不为空 && 配置.其他综合收益是否计税 = '否'
-            List<BooksetTaxConfigDto> listTaxConfigDto = vatDrawCommonNewService.queryBooksetTaxConfig(
-                acctEntity.getBooksetId(), QTZHSYSFJS);
+//            List<BooksetTaxConfigDto> listTaxConfigDto = vatDrawCommonNewService.queryBooksetTaxConfig(
+//                acctEntity.getBooksetId(), QTZHSYSFJS);
+            List<BokSchemeConfigDto> listTaxConfigDto = vatDrawCommonNewService.queryBokSchemeConfig(
+                    acctEntity.getBooksetId(), QTZHSYSFJS);
             if (CollectionUtils.isNotEmpty(listTaxConfigDto)
                 && DictCodeList.是否_是.getValue().equals(listTaxConfigDto.get(0).getConfigValue())) {
                 baseSubjectNatureList.remove(DictCodeBaseSubjectNatrue.综合收益类_公允价值变动.getValue());
@@ -3902,8 +3909,10 @@ public class VatDrawProcessorBNewService {
         BigDecimal tdyHappenAmt = BigDecimal.ZERO;
         maAmt = amtDto.getMaqrjcAmt();
         // 读取[已实现负差是否抵扣]配置
-        List<BooksetTaxConfigDto> listConfig = vatDrawCommonNewService.queryBooksetTaxConfig(
-            acctEntity.getBooksetId(), "已实现负差是否抵扣");
+//        List<BooksetTaxConfigDto> listConfig = vatDrawCommonNewService.queryBooksetTaxConfig(
+//            acctEntity.getBooksetId(), "已实现负差是否抵扣");
+        List<BokSchemeConfigDto> listConfig = vatDrawCommonNewService.queryBokSchemeConfig(
+                acctEntity.getBooksetId(), "已实现负差是否抵扣");
         // 是:
         if (CollectionUtils.isEmpty(listConfig)
             || DictCodeList.是否_是.getValue().equals(listConfig.get(0).getConfigValue())) {
@@ -4110,8 +4119,10 @@ public class VatDrawProcessorBNewService {
         // 计税发生额汇总 M
         BigDecimal M = ArithmeticUtil.doAdd(tdyBalanceSum.getTaxAmtSum(), happenAmt, maAmt);
         // 读取配置[未实现负差抵扣办法]
-        List<BooksetTaxConfigDto> listConfig = vatDrawCommonNewService.queryBooksetTaxConfig(
-            acctEntity.getBooksetId(), FLOATCALCBYDIFF);
+//        List<BooksetTaxConfigDto> listConfig = vatDrawCommonNewService.queryBooksetTaxConfig(
+//            acctEntity.getBooksetId(), FLOATCALCBYDIFF);
+        List<BokSchemeConfigDto> listConfig = vatDrawCommonNewService.queryBokSchemeConfig(
+                acctEntity.getBooksetId(), FLOATCALCBYDIFF);
         // if 实亏冲浮盈抵扣 = 浮亏抵扣
         if (CollectionUtils.isEmpty(listConfig)
             || "01".equals(listConfig.get(0).getConfigValue())) {

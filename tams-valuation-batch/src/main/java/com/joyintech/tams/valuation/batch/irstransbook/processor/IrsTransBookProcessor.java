@@ -56,7 +56,7 @@ public class IrsTransBookProcessor extends
 
         BookGenerateResult result = new BookGenerateResultWithBokSummary();
         // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录 start
-        String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+        String accountEntryType =  CacheUtil.getSysParam(GlobalConstant.ACCOUNT_ENTRY_TYPE);
         // 若按照内部科目编码分录，则需要映射分录对应科目信息 只实现新引擎的分录，旧的逻辑依然调用jixu
         if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
             //调用service方法进行逻辑逻辑

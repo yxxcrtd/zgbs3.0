@@ -197,39 +197,10 @@ public class IrsTransBookNewService {
         for (String key : accountAmountMap.keySet()) {
             accountCurrencyMap.put(key, dealNow.getCcy());
         }
-        // 初始化定义 - 存放该笔本位币记账的相关金额要素 map定义
-        Map<String, BigDecimal> accountAmountBCCYAMTMap = new HashMap<>();
-        BigDecimal 汇率 = BigDecimal.ONE;
-        // if(交易明细.币种 != 交易类账务处理结果..本位币){
-        if (!dealNow.getCcy().equals(standardCcyNow)) {
-            // 调用计算类 方法共通【汇率查询】
-            // 基础币种 = 交易明细.币种 and 报价币种 = 交易类账务处理结果.本位币 and 日期 = 交易类账务处理结果.发生日
-            List<CurrencyMarketDto> currencyMarketList = finProductCommonService.getCurrencyMarket(
-                    bookDateNow, booksetIdNow, standardCcyNow, dealNow.getCcy());
-            if (!StringUtil.isEmptyList(currencyMarketList)
-                    && currencyMarketList.get(0) != null) {
-                汇率 = currencyMarketList.get(0).getClosePrice();
-            }
-            // 本币本金金额 <- 本金金额 * 汇率 用舍位处理后的结果计算并保留2位小数
-            BigDecimal 本币本金金额 = ArithmeticUtil.round(calculationCommonService.doMultiply(
-                    accountAmountMap.get(BookConstant.COST), 汇率), NumberEnum.MONEY);
-            // 本币本金金额
-            accountAmountBCCYAMTMap.put(BookConstant.COST + BookConstant.BCCYAMT, 本币本金金额);
-
-        } else {
-            for (String key : accountAmountMap.keySet()) {
-                accountAmountBCCYAMTMap.put(key + BookConstant.BCCYAMT,
-                        accountAmountMap.get(key));
-            }
-        }
-        // 记账金额元素币种信息塞值--key是随记账本位币金额map的
-        for (String key : accountAmountBCCYAMTMap.keySet()) {
-            accountCurrencyMap.put(key, standardCcyNow);
-        }
         /** 本位币 币种 **/
         accountCurrencyMap.put(BookConstant.B_CCY, standardCcyNow);
         // 记账金额元素 putALl 随记账本位币金额map
-        accountAmountMap.putAll(accountAmountBCCYAMTMap);
+        //accountAmountMap.putAll(accountAmountBCCYAMTMap);
         // map塞入场景要素管理中
         ad.setAccountSceneMap(accountSceneMap);// 记账场景要素
         ad.setAccountAmountMap(accountAmountMap);// 记账金额要素

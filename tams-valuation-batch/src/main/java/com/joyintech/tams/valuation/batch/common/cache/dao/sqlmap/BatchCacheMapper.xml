@@ -14,4 +14,253 @@
 		 PARAM_VALUE
 		FROM SYS_PARA
     </select>
+
+    <select id="findAllBokMatchRlat" fetchSize="1000" resultType="com.joyintech.tams.common.base.entity.BokMatchRlat">
+        SELECT MATCH_TYPE, SOURCE, TARGET FROM BOK_MATCH_RLAT
+    </select>
+
+    <!-- 账套全量查询 -->
+    <select id="getAllBokBookset" resultType="com.joyintech.tams.common.base.entity.BokBookset">
+     SELECT
+        BOOKSET_ID,
+        BOOKSET_NAME,
+        BOOKSET_TYPE ,
+        ACCT_MODE,
+        BOK_SPEC_MODE ,
+        ACCT_SUBJECT_ID,
+        ACCT_SUBJECT_TYPE,
+        STANDARD_CCY,
+        BOOKSET_ID_TMPL,
+        ACCT_STANDARD,
+        START_DATE,
+        END_DATE,
+        BOOKSET_ID_TMPL
+        FROM
+        BOK_BOOKSET
+    </select>
+
+    <select id="selectAllBokSchemeConfig" resultType="com.joyintech.tams.valuation.batch.common.cache.service.entity.BokSchemeConfigDto">
+        SELECT
+            sc.CONFIG_ID,
+            sc.DICT_CODE,
+            sc.SCHEME_TYPE,
+            scv.CONFIG_VALUE,
+            plan.BOOKSET_ID
+        FROM BOK_SCHEME_CONFIG sc
+        INNER JOIN BOK_SCHEME_CONFIG_VAL scv ON scv.CONFIG_ID = sc.CONFIG_ID
+        INNER JOIN BOK_BOOKSET_PLAN plan ON scv.SCHEME_ID = plan.SCHEME_ID AND sc.SCHEME_TYPE = plan.SCHEME_TYPE
+        ORDER BY PLAN.BOOKSET_ID,sc.SCHEME_TYPE
+    </select>
+
+    <select id="selectBokSchemeConfig" resultType="com.joyintech.tams.valuation.batch.common.cache.service.entity.BokSchemeConfigDto">
+        SELECT
+        sc.CONFIG_ID,
+        sc.DICT_CODE,
+        sc.SCHEME_TYPE,
+        scv.CONFIG_VALUE,
+        plan.BOOKSET_ID
+        FROM BOK_SCHEME_CONFIG sc
+        INNER JOIN BOK_SCHEME_CONFIG_VAL scv ON scv.CONFIG_ID = sc.CONFIG_ID
+        INNER JOIN BOK_BOOKSET_PLAN plan ON scv.SCHEME_ID = plan.SCHEME_ID AND sc.SCHEME_TYPE = plan.SCHEME_TYPE
+        <where>
+            plan.BOOKSET_ID = #{booksetId}
+            AND sc.SCHEME_TYPE = #{schemeType}
+        </where>
+        ORDER BY plan.BOOKSET_ID,sc.SCHEME_TYPE
+    </select>
+
+    <select id="findAllBokSceneconfig" resultType="com.joyintech.tams.valuation.batch.common.accountingmethod.entity.SceneConfigEntry">
+        SELECT SCENE_NODE_ID, BOOKSET_ID
+        FROM BOK_SCENECONFIG
+        where (FSCENE_NODEID IS NULL OR FSCENE_NODEID = '')
+    </select>
+
+    <select id="findOneBokSceneconfig" resultType="com.joyintech.tams.valuation.batch.common.accountingmethod.entity.SceneConfigEntry">
+        SELECT SCENE_NODE_ID, BOOKSET_ID
+        FROM BOK_SCENECONFIG
+        <where>
+            BOOKSET_ID = #{booksetId}
+            AND (FSCENE_NODEID IS NULL OR FSCENE_NODEID = '')
+        </where>
+    </select>
+
+    <select id="findAllSceneConfigWithNodeId" resultType="com.joyintech.tams.valuation.batch.common.accountingmethod.entity.SceneConfigEntry">
+        SELECT BOK_SCENECONFIG.SCENE_NODE_ID "sceneNodeId",
+        BOK_SCENECONFIG.FSCENE_NODEID "fSceneNodeId",
+        BOK_SCENECONFIG.BOOKSET_ID "booksetId",
+        NVL(BOK_TABLEDICT.DICT_CODE, BOK_SCENECONFIG.NODE_ID) "nodeId",
+        BOK_SCENECONFIG.NODE_VALUE "nodeValue",
+        SCIDS.NODE_VALUE accountSceneCode
+        FROM BOK_SCENECONFIG BOK_SCENECONFIG
+        INNER JOIN BOK_SCENECONFIG SCIDS
+        ON SCIDS.BOOKSET_ID = BOK_SCENECONFIG.BOOKSET_ID
+        AND SCIDS.NODE_ID = #{ACCOUNTEVENTS}
+        AND INSTR(BOK_SCENECONFIG.SCENE_NODE_ID, SCIDS.SCENE_NODE_ID) = 1
+        LEFT JOIN BOK_TABLEDICT BOK_TABLEDICT
+        ON BOK_TABLEDICT.BOOKSET_ID = BOK_SCENECONFIG.BOOKSET_ID
+        AND BOK_TABLEDICT.DICT_ID = BOK_SCENECONFIG.NODE_ID
+        ORDER BY BOK_SCENECONFIG.SCENE_NODE_ID
+    </select>
+
+    <select id="findOneSceneConfigWithNodeId" resultType="com.joyintech.tams.valuation.batch.common.accountingmethod.entity.SceneConfigEntry">
+        SELECT BOK_SCENECONFIG.SCENE_NODE_ID "sceneNodeId",
+        BOK_SCENECONFIG.FSCENE_NODEID "fSceneNodeId",
+        BOK_SCENECONFIG.BOOKSET_ID "booksetId",
+        NVL(BOK_TABLEDICT.DICT_CODE, BOK_SCENECONFIG.NODE_ID) "nodeId",
+        BOK_SCENECONFIG.NODE_VALUE "nodeValue",
+        SCIDS.NODE_VALUE accountSceneCode
+        FROM BOK_SCENECONFIG BOK_SCENECONFIG
+        INNER JOIN BOK_SCENECONFIG SCIDS
+        ON SCIDS.BOOKSET_ID = BOK_SCENECONFIG.BOOKSET_ID
+        AND SCIDS.NODE_ID = #{ACCOUNTEVENTS}
+        AND INSTR(BOK_SCENECONFIG.SCENE_NODE_ID, SCIDS.SCENE_NODE_ID) = 1
+        LEFT JOIN BOK_TABLEDICT BOK_TABLEDICT
+        ON BOK_TABLEDICT.BOOKSET_ID = BOK_SCENECONFIG.BOOKSET_ID
+        AND BOK_TABLEDICT.DICT_ID = BOK_SCENECONFIG.NODE_ID
+        <where>
+            BOK_SCENECONFIG.BOOKSET_ID = #{booksetId}
+        </where>
+        ORDER BY BOK_SCENECONFIG.SCENE_NODE_ID
+    </select>
+
+    <select id="findAllSceneSubjectConfigByNodeId" fetchSize="1000" resultType="com.joyintech.tams.valuation.batch.common.accountingmethod.entity.AccountEntry">
+        SELECT BOK_SCENESUBJECT.SCENE_NODE_ID "sceneNodeId",
+        BOK_SCENESUBJECT.SUBJECT_NO "subjectId",
+        BOK_SCENESUBJECT.CD_FLAG "cdFlag",
+        BOK_TABLEDICT.DICT_CODE "formElement",
+        BOK_SCENESUBJECT.ACCOUNT_NET "accountNet",
+        BOK_SUBJECT.SUBJECT_NAME subjectName,
+        BOK_SUBJECT.FSUBJECT_ID fsubjectId,
+        BOK_SUBJECT.BASE_SUBJECT_NATURE "baseSubjectNature",
+        BOK_SUBJECT.SUBJECT_TYPE "subjectType",
+        BOK_SUBJECT.ACC_QUA_FLAG "accQuaFlag",
+        BOK_SUBJECT.ACC_INT_FLAG "accIntFlag",
+        BOK_SUBJECT.OVERDRAWN_FLAG "overdrawnFlag",
+        BOK_SUBJECT.GEN_DETSUB_FLAG "genDetsubFlag",
+        BOK_SUBJECT.BAL_FLAG "balFlag",
+        SCIDS.NODE_VALUE "nodeValue",
+        BOK_SCENESUBJECT.BOK_DETAIL_ID "bokDetailId",
+        BOK_SCENESUBJECT.BOOKSET_ID booksetId
+        FROM BOK_SCENESUBJECT BOK_SCENESUBJECT
+        INNER JOIN BOK_SCENECONFIG SCIDS
+        ON SCIDS.NODE_ID = #{ACCOUNTEVENTS}
+        AND SCIDS.BOOKSET_ID = BOK_SCENESUBJECT.BOOKSET_ID
+        AND INSTR(BOK_SCENESUBJECT.SCENE_NODE_ID, SCIDS.SCENE_NODE_ID) = 1
+        LEFT JOIN BOK_SUBJECT BOK_SUBJECT
+        ON BOK_SUBJECT.BOOKSET_ID = BOK_SCENESUBJECT.BOOKSET_ID
+        AND BOK_SCENESUBJECT.SUBJECT_NO = BOK_SUBJECT.SUBJECT_NO
+        LEFT JOIN BOK_TABLEDICT BOK_TABLEDICT
+        ON BOK_TABLEDICT.BOOKSET_ID = BOK_SCENESUBJECT.BOOKSET_ID
+        AND BOK_TABLEDICT.DICT_ID = BOK_SCENESUBJECT.FORM_ELE
+        ORDER BY BOK_SCENESUBJECT.SCENE_NODE_ID
+    </select>
+
+    <select id="findOneSceneSubjectConfigByNodeId" fetchSize="1000" resultType="com.joyintech.tams.valuation.batch.common.accountingmethod.entity.AccountEntry">
+        SELECT BOK_SCENESUBJECT.SCENE_NODE_ID "sceneNodeId",
+        BOK_SCENESUBJECT.SUBJECT_NO "subjectId",
+        BOK_SCENESUBJECT.CD_FLAG "cdFlag",
+        BOK_TABLEDICT.DICT_CODE "formElement",
+        BOK_SCENESUBJECT.ACCOUNT_NET "accountNet",
+        BOK_SUBJECT.SUBJECT_NAME subjectName,
+        BOK_SUBJECT.FSUBJECT_ID fsubjectId,
+        BOK_SUBJECT.BASE_SUBJECT_NATURE "baseSubjectNature",
+        BOK_SUBJECT.SUBJECT_TYPE "subjectType",
+        BOK_SUBJECT.ACC_QUA_FLAG "accQuaFlag",
+        BOK_SUBJECT.ACC_INT_FLAG "accIntFlag",
+        BOK_SUBJECT.OVERDRAWN_FLAG "overdrawnFlag",
+        BOK_SUBJECT.GEN_DETSUB_FLAG "genDetsubFlag",
+        BOK_SUBJECT.BAL_FLAG "balFlag",
+        SCIDS.NODE_VALUE "nodeValue",
+        BOK_SCENESUBJECT.BOK_DETAIL_ID "bokDetailId",
+        BOK_SCENESUBJECT.BOOKSET_ID booksetId
+        FROM BOK_SCENESUBJECT BOK_SCENESUBJECT
+        INNER JOIN BOK_SCENECONFIG SCIDS
+        ON SCIDS.NODE_ID = #{ACCOUNTEVENTS}
+        AND SCIDS.BOOKSET_ID = BOK_SCENESUBJECT.BOOKSET_ID
+        AND INSTR(BOK_SCENESUBJECT.SCENE_NODE_ID, SCIDS.SCENE_NODE_ID) = 1
+        LEFT JOIN BOK_SUBJECT BOK_SUBJECT
+        ON BOK_SUBJECT.BOOKSET_ID = BOK_SCENESUBJECT.BOOKSET_ID
+        AND BOK_SCENESUBJECT.SUBJECT_NO = BOK_SUBJECT.SUBJECT_NO
+        LEFT JOIN BOK_TABLEDICT BOK_TABLEDICT
+        ON BOK_TABLEDICT.BOOKSET_ID = BOK_SCENESUBJECT.BOOKSET_ID
+        AND BOK_TABLEDICT.DICT_ID = BOK_SCENESUBJECT.FORM_ELE
+        <where>
+            BOK_SCENESUBJECT.BOOKSET_ID = #{booksetId}
+        </where>
+        ORDER BY BOK_SCENESUBJECT.SCENE_NODE_ID
+    </select>
+
+
+    <!-- 基础科目性质查询 -->
+    <select id="getValSubjectNatureList" resultType="com.joyintech.tams.common.base.entity.BokSubjectNatureGroup" parameterType="java.util.Map">
+        SELECT
+        GROUP_ID,
+        ACCT_STANDARD_ID,
+        BASE_SUBJECT_NATURE
+        FROM BOK_SUBJECT_NATURE_GROUP
+        WHERE
+        1=1
+        <if test="groupId != null"> AND GROUP_ID = #{groupId} </if>
+        <if test="acctStandardId != null"> AND ACCT_STANDARD_ID = #{acctStandardId} </if>
+    </select>
+
+    <!-- 查询税额计提分类配置 -->
+    <select id="queryAllTaxCalConfig" fetchSize="1000" resultType="com.joyintech.tams.valuation.batch.vatdraw.dto.ValTaxCalConfigDto">
+        SELECT
+            TABLE_ID,
+            SUBJECT_NATURE,
+            VAT_TYPE,
+            CONFIG_ID,
+            TAX_P_TYPE,
+            IN_OUT,
+            INCOME_SOURCE,
+            CALC_TYPE,
+            CD_FLAG,
+            CALC_SCALE,
+            CALC_SNATURE,
+            CALC_BASE,
+            IS_CARRT,
+            INT_REPAY_HANDLE,
+            p.bookset_id,
+            p.scheme_type
+        FROM
+            TAX_BOK_CONFIG b,
+            TAX_SCHA_BOK_CONFIG c,
+            BOK_BOOKSET_PLAN p
+        WHERE
+            b.CONFIG_ID = c.BOK_CONFIG_ID
+            AND p.scheme_id = c.scheme_id
+        ORDER BY p.bookset_id
+    </select>
+
+    <!-- 查询税额计提分类配置 -->
+    <select id="queryOneTaxCalConfig" resultType="com.joyintech.tams.valuation.batch.vatdraw.dto.ValTaxCalConfigDto">
+        SELECT
+        TABLE_ID,
+        SUBJECT_NATURE,
+        VAT_TYPE,
+        CONFIG_ID,
+        TAX_P_TYPE,
+        IN_OUT,
+        INCOME_SOURCE,
+        CALC_TYPE,
+        CD_FLAG,
+        CALC_SCALE,
+        CALC_SNATURE,
+        CALC_BASE,
+        IS_CARRT,
+        INT_REPAY_HANDLE,
+        p.bookset_id,
+        p.scheme_type
+        FROM
+        TAX_BOK_CONFIG b,
+        TAX_SCHA_BOK_CONFIG c,
+        BOK_BOOKSET_PLAN p
+        WHERE
+        b.CONFIG_ID = c.BOK_CONFIG_ID
+        AND p.scheme_id = c.scheme_id
+        and p.bookset_id = #{booksetId}
+        and p.scheme_type = #{schemeType}
+        ORDER BY p.bookset_id
+    </select>
 </mapper>

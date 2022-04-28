@@ -560,7 +560,7 @@ public class BookAccountGenLogicNew {
         accountSceneMap.put("ACCOUNTEVENTS", accountDriver.getTableId());
         getAccountEntryFromTreeNode(treeNode, accountSceneMap, accountEntrys);
         // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录
-        String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+        String accountEntryType =  CacheUtil.getSysParam(GlobalConstant.ACCOUNT_ENTRY_TYPE);
 
         // 遍历步骤获取的列表，循环生成明细凭证信息
         // 先借后贷
