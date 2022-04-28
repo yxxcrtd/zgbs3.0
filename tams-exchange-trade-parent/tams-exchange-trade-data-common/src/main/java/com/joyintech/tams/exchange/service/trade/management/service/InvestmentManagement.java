@@ -1210,6 +1210,7 @@ public class InvestmentManagement extends BaseService {
                 updateAppointInstruction(records, entrustIds, Lists.newArrayList(keys.iterator()), data);
 
                 resultBean.setErrorCode(ErrorCode.APPOINT_INSTRUCTION_EXIST_PARAMETER_ERROR);
+                resultBean.setErrorMsg(JsonUtils.getJsonFromObject(data));
             } else {
                 updateAppointInstruction(records, entrustIds);
             }

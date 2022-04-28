@@ -413,6 +413,45 @@ public class EtrCommandDispatcherDto extends BaseEntity{
      */
     private String entrustBussType;
 
+    /**
+     * 计价方式
+     */
+    private String priceType;
+
+    /**
+     * 是否非担保
+     */
+    private String isNoGuard;
+
+    /**
+     * 目标类型
+     */
+    private String targetType;
+
+    public String getPriceType() {
+        return priceType;
+    }
+
+    public void setPriceType(String priceType) {
+        this.priceType = priceType;
+    }
+
+    public String getIsNoGuard() {
+        return isNoGuard;
+    }
+
+    public void setIsNoGuard(String isNoGuard) {
+        this.isNoGuard = isNoGuard;
+    }
+
+    public String getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(String targetType) {
+        this.targetType = targetType;
+    }
+
     
 
     public String getPledgeeType() {
