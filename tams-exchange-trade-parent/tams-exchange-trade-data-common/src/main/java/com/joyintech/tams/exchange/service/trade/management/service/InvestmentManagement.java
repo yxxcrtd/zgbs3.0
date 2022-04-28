@@ -70,7 +70,10 @@ import static java.util.stream.Collectors.groupingBy;
 @Component
 public class InvestmentManagement extends BaseService {
     private static final Logger logger = LoggerFactory.getLogger(InvestmentManagement.class);
-
+    /**
+     * 指令分发检查开关：01-开启，02-关闭
+     */
+    private static final String CHECK_FILTER_SWITCH = "01";
     @Autowired
     private EntrustService entrustService;
     @Autowired
@@ -103,17 +106,11 @@ public class InvestmentManagement extends BaseService {
     private MinTrdUnitLimitService minTrdUnitLimitService;
     @Autowired
     private MinPriceService minPriceService;
-
     /**
      * 是否单体服务
      */
     @Value("${application.micorservice.contextPath.single:false}")
     private boolean isSingle;
-
-    /**
-     * 指令分发检查开关：01-开启，02-关闭
-     */
-    private static final String CHECK_FILTER_SWITCH = "01";
 
     /**
      * 指令查询带条件
@@ -483,14 +480,17 @@ public class InvestmentManagement extends BaseService {
                 String tradeMarket = instruction.getTradeMarket();
                 String assetType = instrument.getAssetType();
                 String assetType1 = instrument.getAssetType1();
-                if (InvestmentAssetType.BOND.codeEquals(assetType)) {
-                    MinPrice minPriceByPPCJ = minPriceService.getMinPrice(tradeMarket, 指定交易方式_匹配成交.getValue(), assetType, assetType1);
-                    MinPrice minPriceByXSCJ = minPriceService.getMinPrice(tradeMarket, 指定交易方式_协商成交.getValue(), assetType, assetType1);
-                    minPriceAndMinTrdUnitLimitBean.setMinPriceList(ListUtil.of(minPriceByPPCJ, minPriceByXSCJ));
-                } else if (PLEDGE_REPURCHASE.codeEquals(assetType)) {
-                    MinPrice minPriceByPPCJ = minPriceService.getMinPrice(tradeMarket, 指定交易方式_匹配成交.getValue(), assetType, assetType1);
-                    minPriceAndMinTrdUnitLimitBean.setMinPriceList(ListUtil.of(minPriceByPPCJ));
+                MinPrice minPriceByPPCJ = minPriceService.getMinPrice(tradeMarket, 指定交易方式_匹配成交.getValue(), assetType, assetType1);
+                MinPrice minPriceByXSCJ = minPriceService.getMinPrice(tradeMarket, 指定交易方式_协商成交.getValue(), assetType, assetType1);
+
+                List<MinPrice> minPrices = Lists.newArrayList();
+                if (ObjectUtil.isNotNull(minPriceByPPCJ)) {
+                    minPrices.add(minPriceByPPCJ);
                 }
+                if (ObjectUtil.isNotNull(minPriceByXSCJ)) {
+                    minPrices.add(minPriceByXSCJ);
+                }
+                minPriceAndMinTrdUnitLimitBean.setMinPriceList(minPrices);
             } else {
                 minPriceAndMinTrdUnitLimitBean.setMinPriceList(ListUtil.of(minPrice));
             }
@@ -503,7 +503,15 @@ public class InvestmentManagement extends BaseService {
                 String ps = instruction.getPs();
                 MinTrdUnitLimit minTrdUnitLimitByPPCJ = minTrdUnitLimitService.getMinTrdUnitLimit(tradeMarket, 指定交易方式_匹配成交.getValue(), assetType, assetType1, subStockType, ps);
                 MinTrdUnitLimit minTrdUnitLimitByXSCJ = minTrdUnitLimitService.getMinTrdUnitLimit(tradeMarket, 指定交易方式_协商成交.getValue(), assetType, assetType1, subStockType, ps);
-                minPriceAndMinTrdUnitLimitBean.setMinTrdUnitLimitList(ListUtil.of(minTrdUnitLimitByPPCJ, minTrdUnitLimitByXSCJ));
+
+                List<MinTrdUnitLimit> minTrdUnitLimits = Lists.newArrayList();
+                if (ObjectUtil.isNotNull(minTrdUnitLimitByPPCJ)) {
+                    minTrdUnitLimits.add(minTrdUnitLimitByPPCJ);
+                }
+                if (ObjectUtil.isNotNull(minTrdUnitLimitByXSCJ)) {
+                    minTrdUnitLimits.add(minTrdUnitLimitByXSCJ);
+                }
+                minPriceAndMinTrdUnitLimitBean.setMinTrdUnitLimitList(minTrdUnitLimits);
             } else {
                 minPriceAndMinTrdUnitLimitBean.setMinTrdUnitLimitList(ListUtil.of(minTrdUnitLimit));
             }
