@@ -6,13 +6,13 @@
         select * from (
             SELECT
                 CASE WHEN <![CDATA[
-                    ISSUE.ISSUE_EDATE >= TO_DATE(#{listingDate},'YYYY-MM-DD')  or
-                    PRODUCT_ADD.BID_DATE >= TO_DATE(#{listingDate},'YYYY-MM-DD')  THEN '01'
-                     WHEN (ISSUE.ISSUE_EDATE < TO_DATE(#{listingDate},'YYYY-MM-DD') or
-                           PRODUCT_ADD.BID_DATE < TO_DATE(#{listingDate},'YYYY-MM-DD')) and PRODUCT.CIRCULATION_CODE is null THEN '02'
-                     WHEN (ISSUE.ISSUE_EDATE < TO_DATE(#{listingDate},'YYYY-MM-DD') or
-                           PRODUCT_ADD.BID_DATE < TO_DATE(#{listingDate},'YYYY-MM-DD')) and PRODUCT.CIRCULATION_CODE is not null THEN '03'
-                    ]]>
+                ISSUE.ISSUE_DATE >= #{listingDate,jdbcType=DATE} or
+                PRODUCT_ADD.BID_DATE >= #{listingDate,jdbcType=DATE}  THEN '01'
+                WHEN (ISSUE.ISSUE_DATE < #{listingDate,jdbcType=DATE} or
+                PRODUCT_ADD.BID_DATE < #{listingDate,jdbcType=DATE}) and PRODUCT.CIRCULATION_CODE is null THEN '02'
+                WHEN (ISSUE.ISSUE_DATE < #{listingDate,jdbcType=DATE} or
+                PRODUCT_ADD.BID_DATE < #{listingDate,jdbcType=DATE}) and PRODUCT.CIRCULATION_CODE is not null THEN '03'
+                ]]>
                 ELSE NULL END AS issueStage,
                 PRODUCT_ADD.ISSUE_STATUS as issueStatus,
                 PRODUCT.FINPROD_MARKET_ID as finprodMarketId,
@@ -24,10 +24,10 @@
                 ISSUE.ISSUE_CLASS as issueClass,
                 ISSUE.TENDER_TYPE as tenderType,
                 ISSUE.TENDER_TARGET as tenderTarget,
-                case when ISSUE.ISSUE_CLASS = '02' THEN ISSUE.ISSUE_SDATE else ISSUE.TENDER_SDATE end as issueDate,
-                case when PRODUCT.CIRCULATION_CODE is not null then PRODUCT.CIRCULATION_DATE else PRODUCT_ADD.LISTING_DATE end as listingDate,
-                case when PRODUCT.CIRCULATION_CODE is not null then PRODUCT2.FINPROD_MARKET_ID else PRODUCT_ADD.APPEAR_MARKET_ID end as appearMarketId,
-                case when PRODUCT.CIRCULATION_CODE is not null then PRODUCT2.FINPROD_ABBR else PRODUCT.FINPROD_ABBR end as appearMarketAbbr,
+                ISSUE.ISSUE_EDATE as issueDate,
+                PRODUCT_ADD.LISTING_DATE  as listingDate,
+                PRODUCT_ADD.APPEAR_MARKET_ID  as appearMarketId,
+                PRODUCT.FINPROD_ABBR  as appearMarketAbbr,
                 PRODUCT.VDATE as vdate,
                 PRODUCT.MDATE as mdate,
                 PRODUCT_TYPE.TYPE_9 as type9,
@@ -45,9 +45,8 @@
             LEFT JOIN FIN_PRODUCT_ISSUE ISSUE ON PRODUCT.FINPROD_ID = ISSUE.FINPROD_ID
             LEFT JOIN FIN_PRODUCT_TYPE PRODUCT_TYPE ON PRODUCT.FINPROD_ID = PRODUCT_TYPE.FINPROD_ID AND PRODUCT_TYPE.BRANCH = 0
             LEFT JOIN MST_CUSTOMER_INFO CUSTOMER_INFO ON PRODUCT.ISSUER = CUSTOMER_INFO.CUSTOMER_ID
-            LEFT JOIN FIN_PRODUCT PRODUCT2 ON PRODUCT.CIRCULATION_CODE = PRODUCT2.FINPROD_ID
             where PRODUCT.FINPROD_TYPE2=#{finprodType2,jdbcType=VARCHAR} AND PRODUCT.TRADE_MARKET in (#{TRADE_PLACE_01},#{TRADE_PLACE_02})
-                and PRODUCT_ADD.ISSUE_STATUS not in (#{ISSUE_STATUS_02}) and PRODUCT.CIRCULATION_CODE is null
+                and (PRODUCT_ADD.ISSUE_STATUS not in (#{ISSUE_STATUS_02}) or PRODUCT_ADD.ISSUE_STATUS is null) and PRODUCT.CIRCULATION_CODE is null
                 and PRODUCT_ADD.LISTING_DATE=#{listingDate,jdbcType=DATE}
         ) t where t.issueStage=#{issueStage,jdbcType=VARCHAR}
     </select>

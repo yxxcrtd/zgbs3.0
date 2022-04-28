@@ -2,6 +2,7 @@ package com.joyintech.tams.business.common.util;
 
 import com.joyintech.framework.validation.ValidMessage;
 import io.swagger.annotations.ApiModelProperty;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.Objects;
 /**
  * 根据@ApiModelProperty注解配置校验字段是否必填
  * 参考 FinTenderBondAsset002Dto
+ *
  * @author gwl
  * @date 2022/04/22
  */
@@ -22,7 +24,7 @@ public class ValidUtils {
      * @param validList
      */
     public static void valid(Object obj, List<ValidMessage> validList) {
-        if(obj == null) return;
+        if (obj == null) return;
         Field[] fields = obj.getClass().getDeclaredFields();
         if (fields == null || fields.length == 0) return;
         for (Field field : fields) {
@@ -44,4 +46,18 @@ public class ValidUtils {
             }
         }
     }
+
+    /**
+     * 获取错误消息
+     *
+     * @param validList
+     * @return
+     */
+    public static String getValidMessage(List<ValidMessage> validList) {
+        if (CollectionUtils.isEmpty(validList)) return null;
+        StringBuffer msg = new StringBuffer();
+        validList.forEach(e -> msg.append(e.getMessage()).append("<br/>"));
+        return msg.toString();
+    }
+
 }

@@ -439,6 +439,11 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         if (StringUtil.equals(operateType, OperationType.NEW.name())) {
             this.emptyCheck(dto, validList);
             if (StringUtil.isNotEmpty(dto.getFinprodMarketId()) && StringUtil.isNotEmpty(dto.getTradeMarket())) {
+                Map<String, String> param = new HashMap<>();
+                param.put("finprodMarketId", dto.getFinprodMarketId());
+                if(StringUtil.isNotEmpty(finTenderBondAssetMapper.selectFinprodId(param))) {
+                    validList.add(new ValidMessage("资产代码已存在"));
+                }
                 String finprodId = getFinprodId(dto);
                 FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
                 if (Objects.nonNull(finProduct)) { //同一资产代码只能存在一条数据
