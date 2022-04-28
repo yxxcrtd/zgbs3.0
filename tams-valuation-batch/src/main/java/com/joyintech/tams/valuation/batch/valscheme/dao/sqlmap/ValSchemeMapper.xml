@@ -116,7 +116,7 @@
 		AND VBB.SUBJECT_NO = VBBD.DETAIL_SUBJECT_NO
         /** add by weipeng on 20220331 增加估值方案落地表关联 start **/
         LEFT JOIN BOK_FINPROD_SCHEME_INFO schemeInfo
-            ON schemeInfo.BOOKSET_ID = VBS.BOOKSET_ID
+            ON schemeInfo.BOOKSET_ID = VBBD.BOOKSET_ID
             AND schemeInfo.FINPROD_ID = VBBD.DETAIL_SUBJECT_NO_TAIL
         /** add by weipeng on 20220331 增加估值方案落地表关联 end **/
 		WHERE VBB.BALANCE_DATE = #{bookDate}
