@@ -6,10 +6,12 @@
 package com.joyintech.tams.business.asset.bond.dto;
 
 import com.joyintech.tams.common.base.entity.FinCashPlan;
+import com.joyintech.tams.invest.common.asset.dto.FinCashPlanDetailDto;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 现金流计划DTO 〈功能详细描述〉
@@ -66,11 +68,17 @@ public class BondFinCashPlanDto extends FinCashPlan {
     @ApiModelProperty(name="basis",value="计息基础(必填) ")
     private String basis;
 
-    @ApiModelProperty(name="prinAmt",value="计划支付本金(必填)")
+    @ApiModelProperty(name="prinAmt",value="计划支付本金(必填)、还本面值")
     private BigDecimal prinAmt;
 
-    @ApiModelProperty(name="cashAmt",value="计划支付现金流(必填)")
+    @ApiModelProperty(name="cashAmt",value="计划支付现金流(必填)、本息和")
     private BigDecimal cashAmt;
+
+    /**
+     * 还本计划
+     */
+    @ApiModelProperty(name="lirs",value="还本计划")
+    private List<BondFinCashPlanDto> lirs;
 
     public Date getVdate() {
         return vdate;
@@ -166,5 +174,13 @@ public class BondFinCashPlanDto extends FinCashPlan {
     @Override
     public void setCashAmt(BigDecimal cashAmt) {
         this.cashAmt = cashAmt;
+    }
+
+    public List<BondFinCashPlanDto> getLirs() {
+        return lirs;
+    }
+
+    public void setLirs(List<BondFinCashPlanDto> lirs) {
+        this.lirs = lirs;
     }
 }
