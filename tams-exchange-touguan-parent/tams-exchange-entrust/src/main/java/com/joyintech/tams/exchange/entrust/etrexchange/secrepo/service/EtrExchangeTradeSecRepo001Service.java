@@ -1833,7 +1833,8 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
      */
     public BigDecimal getMinNumStep(Map<String, Object> param) {
         String ps = !StringUtil.isNotEmpty(param.get("ps")) ? "T01" : param.get("ps").toString();
-        String currentTab = param.get("currentTab") == null ? null : param.get("currentTab").toString();
+//        String currentTab = param.get("currentTab") == null ? null : param.get("currentTab").toString();
+        String currentTab = (String) param.get("dealMode")== null ? DictCodeListExt3.指定交易方式_匹配成交.getValue() : param.get("dealMode").toString();
         String finprodId = (String) param.get("finprodId");
         String finprodType2 = (String) param.get("finprodType2");
         String tradeMarket = (String) param.get("tradeMarket");
@@ -2487,7 +2488,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
     }
 
     public MinTrdUnitLimitDto getMinTrdUnitLimitPrice(EtrExchangeMiniLimitPriceRequest request) {
-        MinTrdUnitLimitDto minTrdUnitLimitDto = getInterfSysMinTrdUnit(request.getFinprodId(), request.getTradePlat(), request.getTradeMarket(), request.getFinprodType2(), request.getPs());
+        MinTrdUnitLimitDto minTrdUnitLimitDto = getInterfSysMinTrdUnit(request.getFinprodId(), StringUtil.isNotEmpty(request.getTradePlat())?request.getTradePlat():DictCodeListExt3.指定交易方式_匹配成交.getValue(), request.getTradeMarket(), request.getFinprodType2(), request.getPs());
         return minTrdUnitLimitDto;
     }
 
