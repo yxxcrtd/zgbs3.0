@@ -164,6 +164,7 @@ public class TrdPlanValuationTradeService extends CommonExportService<TrdPlanVal
      */
     public TrdPlanValuationTradeDto queryRedInfoByTradeId(String tradeId) {
         Map<String, Object> params =new HashMap<>();
+        params.put("tradeId",tradeId);
         params.put("busiType_06", DictCodeList.业务类型_货币基金交易_货基_类货基资产交易.getValue());
         params.put("busiType_07",DictCodeList.业务类型_非货币基金交易_非货基_非类货基资产交易.getValue());
         return trdPlanValuationTradeMapper.queryRedInfoByTradeId(params);
