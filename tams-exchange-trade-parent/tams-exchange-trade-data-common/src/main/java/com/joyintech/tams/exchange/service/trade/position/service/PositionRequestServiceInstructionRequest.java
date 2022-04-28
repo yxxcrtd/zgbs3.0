@@ -127,12 +127,12 @@ public class PositionRequestServiceInstructionRequest {
                 bean = new PositionRequestBaseBean(entity);
                 BigDecimal secAmount = commonPositionEngineService.getSecAmountByBondUnit(item.getEntrustNum());
                 bean.setSecAmount(secAmount);
+                BigDecimal price = Objects.isNull(entity.getFullPrice()) ? BigDecimal.ZERO : entity.getFullPrice();
                 if (交易方向_行权_回售.getValue().equals(entity.getPs())) {
-                    bean.setCashAmount(item.getEntrustAmt());
-                } else {
-                    BigDecimal fullPrice = Objects.isNull(entity.getFullPrice()) ? BigDecimal.ZERO : entity.getFullPrice();
-                    bean.setCashAmount(fullPrice.multiply(BigDecimal.valueOf(item.getEntrustNum())));
+                    price = entity.getEntrustPrice();
                 }
+                bean.setCashAmount(price.multiply(BigDecimal.valueOf(item.getEntrustNum())));
+
                 Map<String, Object> map = BeanUtil.object2Map(bean);
                 // 下单委托编号
                 map.put(ORD_ENTRUST_ID, entity.getEntrustNo());
@@ -171,7 +171,8 @@ public class PositionRequestServiceInstructionRequest {
                 bean = new PositionRequestBaseBean(entity);
                 bean.setPortfolioId(item.getPortfolioId());
                 bean.setFinprodId(null);
-                bean.setCashAmount(item.getEntrustAmt());
+                BigDecimal price = Objects.isNull(entity.getFullPrice()) ? BigDecimal.ZERO : entity.getFullPrice();
+                bean.setCashAmount(price.multiply(BigDecimal.valueOf(item.getEntrustNum())));
 
                 Map<String, Object> map = BeanUtil.object2Map(bean);
                 list.add(map);

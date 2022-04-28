@@ -1712,6 +1712,7 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
         final int SCALE = 12;
         CfetsEtrCalcAmountResponse result=new CfetsEtrCalcAmountResponse();
         result.setPrice(dto.getPrice());
+        dto.setUnitFprice(ArithmeticUtil.round(dto.getUnitFprice(),4,RoundingMode.HALF_UP));
         result.setUnitFprice(dto.getUnitFprice());
         if(StringUtil.isNotEmpty(dto.getPrice()) && StringUtil.isNotEmpty(dto.getUnitFprice())){
             //应计利息
