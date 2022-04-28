@@ -226,7 +226,20 @@ public class EtrConBondController {
         if (StringUtil.equals(OPERATE_TYPE_MODIFY, operateType)) {
             systemAct = DictCodeListExt3.系统动作_修改.getValue();
         }
-        positionRequestService.sendEtrConBondDto(dto, decisionAct, systemAct);
+        try {
+            positionRequestService.sendEtrConBondDto(dto, decisionAct, systemAct);
+        }catch (PositionException e) {
+                Message message = PositionUtil.ajaxErrorReturn(e);
+                if (StringUtil.isNotBlank(message.getMessage())) {
+                    WorkFlowUtil.showMessage(message.getMessage(), MessageType.错误消息);
+                } else {
+                    if (!StringUtil.equals("1", RequestUtil.getParam("confirmOk"))) {
+                        BaseMap bm = (BaseMap) message.getData();
+                        StringBuffer messageStr = (StringBuffer) bm.get("message");
+                        WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
+                    }
+                }
+        }
     }
 
     @Transactional

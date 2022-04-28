@@ -126,6 +126,9 @@ public class IntegratedOrderPlaceBean implements Serializable {
     @ApiModelProperty(required = true, name = "propSeatName", value = "对手方交易商名称")
     private String propSeatName;
 
+    @ApiModelProperty(required = false, name = "counterId", value = "交易对手")
+    private String counterId;
+
     @ApiModelProperty(required = true, name = "contractId", value = "交易所请求编号")
     private String contractId;
 
@@ -775,5 +778,13 @@ public class IntegratedOrderPlaceBean implements Serializable {
 
     public void setHedgeFlag(String hedgeFlag) {
 
+    }
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
     }
 }
