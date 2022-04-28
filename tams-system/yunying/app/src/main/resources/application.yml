@@ -347,14 +347,14 @@ spring:
   datasource:
     url: jdbc:oracle:thin:@//192.168.60.142:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: CVR303INIT_TEST1209
-    password: CVR303INIT_TEST1209
+    username: CVR303INIT_TEST1223
+    password: CVR303INIT_TEST1223
     reportSqlldrDatabaseName: 192.168.60.142:1521/orcl
 application:
   sqldirurl: jdbc:oracle:thin:@//192.168.60.142:1521/orcl
   driverClassName: oracle.jdbc.driver.OracleDriver
-  sqldiruserName: CVR303INIT_TEST1209
-  sqldirpassword: CVR303INIT_TEST1209
+  sqldiruserName: CVR303INIT_TEST1223
+  sqldirpassword: CVR303INIT_TEST1223
 valinterf:
   hostname: localhost
   port: 28080
@@ -376,14 +376,14 @@ base:
   datasource:
     url: jdbc:oracle:thin:@//192.168.60.142:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: CVR303INIT_TEST1209
-    password: CVR303INIT_TEST1209
+    username: CVR303INIT_TEST1223
+    password: CVR303INIT_TEST1223
 interf:
   datasource:
     url: jdbc:oracle:thin:@//192.168.60.142:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: CVR303INIT_TEST1209
-    password: CVR303INIT_TEST1209
+    username: CVR303INIT_TEST1223
+    password: CVR303INIT_TEST1223
   hostname: localhost
   port: 28080
   contextPath: /interf
@@ -391,20 +391,20 @@ stresstest:
   datasource:
     url: jdbc:oracle:thin:@//192.168.60.142:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: CVR303INIT_TEST1209
-    password: CVR303INIT_TEST1209
+    username: CVR303INIT_TEST1223
+    password: CVR303INIT_TEST1223
 wind:
   datasource:
     url: jdbc:oracle:thin:@//192.168.60.142:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: CVR303INIT_TEST1209
-    password: CVR303INIT_TEST1209
+    username: CVR303INIT_TEST1223
+    password: CVR303INIT_TEST1223
 chbsend:
   datasource:
     url: jdbc:oracle:thin:@//192.168.60.142:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: CVR303INIT_TEST1209
-    password: CVR303INIT_TEST1209
+    username: CVR303INIT_TEST1223
+    password: CVR303INIT_TEST1223
 log:
   path: /home/tams/logs/tams
   level: debug
