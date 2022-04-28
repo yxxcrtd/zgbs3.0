@@ -28,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -134,11 +133,10 @@ public class MessageSenderService {
         if (InvestmentAssetType1.BIDDING_REPO.value.equals(instruction.getAssetType1())) {
             //投管要求质押式回购这里传入期限品种
             tradeMessage.setFinprodMarketId(trade.getStockName());
+        } else if (InvestmentAssetType.BOND.value.equals(instruction.getAssetType())) {
+            //投管要求债券买卖，成交价格统一填净价价格
+            tradeMessage.setDealPrice(entrust.getEntrustPrice());
         }
-//        else if (InvestmentAssetType.BOND.value.equals(instruction.getAssetType())) {
-//            //投管要求债券买卖，成交价格统一填净价价格
-//            tradeMessage.setDealPrice(entrust.getEntrustPrice());
-//        }
 
         // 协议回购的特殊处理
         if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
@@ -187,9 +185,9 @@ public class MessageSenderService {
                 && EntrustProp.isTrade(entrust.getEntrustProp())
                 && Objects.nonNull(tradeMessage.getFullPrice())
                 && tradeMessage.getFullPrice() != 0) {
-            if (Objects.nonNull(entrust.getFullPrice()) && entrust.getFullPrice().compareTo(BigDecimal.valueOf(tradeMessage.getFullPrice())) != 0) {
+            if (entrust.getEntrustPrice().compareTo(trade.getTradedPrice()) == 0) {
                 //成交全价金额
-                tradeMessage.setDealBalance(TradeUtils.multiply(entrust.getFullPrice(), tradeMessage.getDealVolume().longValue(), 2));
+                tradeMessage.setDealBalance(TradeUtils.multiply(trade.getFullPrice(), tradeMessage.getDealVolume().longValue(), 2));
             }
         }
 
@@ -385,11 +383,10 @@ public class MessageSenderService {
         if (InvestmentAssetType1.BIDDING_REPO.value.equals(instruction.getAssetType1())) {
             //投管要求质押式回购这里传入期限品种
             tradeMessage.setFinprodMarketId(trade.getStockName());
+        } else if (InvestmentAssetType.BOND.value.equals(instruction.getAssetType())) {
+            //投管要求债券买卖，成交价格统一填净价价格
+            tradeMessage.setDealPrice(entrust.getEntrustPrice());
         }
-//        else if (InvestmentAssetType.BOND.value.equals(instruction.getAssetType())) {
-//            //投管要求债券买卖，成交价格统一填净价价格
-//            tradeMessage.setDealPrice(entrust.getEntrustPrice());
-//        }
         if (entrust instanceof IntegratedEntrust) {
             tradeMessage.setCounterId(((IntegratedEntrust) entrust).getCounterId());
         }

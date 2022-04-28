@@ -5,7 +5,6 @@ import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
 import com.joyintech.tams.exchange.common.db.domain.EntrustInterface;
 import com.joyintech.tams.exchange.common.db.domain.Trade;
-import com.joyintech.tams.exchange.common.utils.IntegratedEntrustUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 
 import java.io.Serializable;
@@ -276,9 +275,9 @@ public class TradeMessage implements Cloneable, Serializable {
                     && EntrustProp.isTrade(entrust.getEntrustProp())
                     && Objects.nonNull(tradeMessage.getFullPrice())
                     && tradeMessage.getFullPrice() != 0) {
-                if (Objects.nonNull(entrust.getFullPrice()) && entrust.getFullPrice().compareTo(BigDecimal.valueOf(tradeMessage.getFullPrice())) != 0) {
+                if (entrust.getEntrustPrice().compareTo(trade.getTradedPrice()) == 0) {
                     //成交全价金额
-                    tradeMessage.setDealBalance(TradeUtils.multiply(entrust.getFullPrice(), tradeMessage.getDealVolume().longValue(), 2));
+                    tradeMessage.setDealBalance(TradeUtils.multiply(trade.getFullPrice(), tradeMessage.getDealVolume().longValue(), 2));
                 }
             }
 
