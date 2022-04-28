@@ -82,4 +82,12 @@ public class FinWindMarketInfoQuery001Controller extends BaseController {
     public void export(@RequestBody CfetsExportRequestDto req, HttpServletResponse response) {
         ExcelUitl.doExport(req, response, "待上市债券市场信息", () -> finWindMarketInfoQuery001Service.queryForPage(req.getDto(FinWindMarketInfoQueryRequest.class)).getRoot());
     }
+
+
+    @ResponseBody
+    @PostMapping("/detail")
+    @ApiOperation(value = "待上市债券市场加券信息查询", notes = "待上市债券市场加券信息查询")
+    public Message<FinWindMarketInfoQuery001Dto> detail(@RequestBody FinWindMarketInfoQueryRequest request) {
+        return Message.success("success", finWindMarketInfoQuery001Service.queryFinWindMarketForCoupons(request));
+    }
 }

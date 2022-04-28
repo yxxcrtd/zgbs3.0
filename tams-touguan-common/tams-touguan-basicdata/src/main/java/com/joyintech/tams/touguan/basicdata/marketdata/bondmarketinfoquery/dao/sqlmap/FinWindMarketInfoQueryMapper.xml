@@ -172,7 +172,7 @@
 
     <select id="queryFinWindMarketForCoupons"
             resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinWindMarketInfoQuery001Dto"
-            parameterType="Map">
+            parameterType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinWindMarketInfoQueryRequest">
         SELECT
         SEC_INFO.SEC_ID secId,
         SEC_INFO.BOND_NAME bondName,
