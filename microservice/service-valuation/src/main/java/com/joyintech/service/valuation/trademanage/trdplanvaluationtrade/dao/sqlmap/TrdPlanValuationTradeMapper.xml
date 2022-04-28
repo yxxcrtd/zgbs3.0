@@ -136,7 +136,7 @@
 		SELECT
 			t.TRADE_ID tradeId,/**交易编号**/
 			t.F_TRADE_ID outTradeId, /*外部成交编号*/
-			Ndeal1.BOOKSET_ID prodId,/**金融产品代码**/
+			deal1.BOOKSET_ID prodId,/**金融产品代码**/
 			bok.BOOKSET_NAME prodName,/**金融产品名称**/
 			zc.FINPROD_ID  assetId, /**资产代码**/
 			zc.FINPROD_ABBR  assetAbbr,/**资产简称**/
