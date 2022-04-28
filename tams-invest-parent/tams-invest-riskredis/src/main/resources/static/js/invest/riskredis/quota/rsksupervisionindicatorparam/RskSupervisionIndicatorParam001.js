@@ -54,7 +54,7 @@ var rsk = function() {
             ,{field:'paraCode',title: 'RskSupervisionIndicatorParam001.paraCode'}
             ,{field:'paraTypeStr',sortField:"paraType",title: 'RskSupervisionIndicatorParam001.paraType'}
             ,{field:'content',title: 'RskSupervisionIndicatorParam001.content',type: "number"}
-            ,{field:'updateTimeStr', title: 'RskSupervisionIndicatorParam001.updateTime',type:'date'}
+            ,{field:'updateTime', title: 'RskSupervisionIndicatorParam001.updateTime',type:'date'}
             ,{field:'operation',width:200,title: 'SysCommon.operation', type:'action', buttons: ['edit', 'delt']}
         ]
     });
