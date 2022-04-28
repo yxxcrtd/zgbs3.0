@@ -34,7 +34,7 @@
 									<label class="layui-form-label form-lable" style="width: 22%;"
 										data-th-text="#{RskSupervisionIndicatorParam003.content}">参数值ֵ</label>
 									<div class="layui-input-inline input-inline">
-										<input type="text" class="layui-input form-input" id="content"
+										<input type="text" class="layui-input form-input" id="content" oninput="value=value.replace(/[^\d]/g,'')"
 											name="content" data-th-value="${entity?.content}"
 											data-th-placeholder="#{SysCommon.placeholder}"
 											required="required" maxlength="32" />
