@@ -1240,6 +1240,7 @@
      * 目标类型变更时联动计算委托金额
      */
     var targetTypeChange = function (init) {
+        setRiskFlag(1);
         var targetType = $("#targetType_" + currentTab).val();
         if (targetType && targetType == TARGET_CLASS_01) {
             $("#entrustNum_" + currentTab).prop("disabled", false);
@@ -1317,6 +1318,7 @@
      * 决定采用净价、全价、到期收益率的哪一个计算另外两个
      */
     var calculateFieldChange = function (init) {
+        setRiskFlag(1);
         var calculateField = $("[name=calculateField_" + currentTab + "]:radio").next(".layui-form-radioed").prev("input").val();
         // 选择的计算方式为“净价”时
         if (calculateField == SEC_CALC_MODE_01) {
@@ -2094,6 +2096,7 @@
      * 联动目标类型
      */
     var linkTargetType = function () {
+        setRiskFlag(1);
         var ps = $("#ps_" + currentTab).val();
         var finprodType2 = $("#finprodType2_" + currentTab).val();
         //配债 T97 配股 T46 T03
@@ -2180,6 +2183,7 @@
      * 联动价格模式，控制价格模式的下拉选项。
      */
     var linkDeclaType = function () {
+        setRiskFlag(1);
         var finprodType2 = $("#finprodType2_" + currentTab).val();
         var dataSource = $("#dataSource_" + currentTab).val();
         if (dataSource && dataSource == '01') {
@@ -2381,6 +2385,7 @@
         if (init || setPageItemsFlag) {
             return;
         }
+        setRiskFlag(1);
         var secId = $("#secId_" + currentTab).val();
         var finprodId = $("#finprodId_" + currentTab).val();
         var targetType = $("#targetType_" + currentTab).val();
@@ -2523,7 +2528,7 @@
         if (init || setPageItemsFlag) {
             return;
         }
-        setRiskFlag(1)
+        setRiskFlag(1);
         var finprodId = $("#finprodId_" + currentTab).val();
         // 默认使用百元券面计算
         var prinAmt = new BigNumber(100);
@@ -3893,6 +3898,7 @@
 
     //
     function linkTableEntrustNumAmt() {
+        setRiskFlag(1);
         var entrustNum = $("#entrustNum_" + currentTab).val();
         if (parseFloat(entrustNum) < 0){
             Joyin.error("指令数量不能为负数！",function(){
@@ -4463,6 +4469,10 @@
             if (parentPageModel != PAGE_MODEL_REFERENCE) {  //解决场内交易指令流程代办显示为0
                 psChange(false);
             }
+        });
+        //业务模式
+        $("#businessModel_jj,#businessModel_dz,#businessModel_gd").change(function () {
+            setRiskFlag(1);
         });
 
         // 资产代码变更时
