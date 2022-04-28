@@ -690,6 +690,7 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
         this.compactTerm = compactTerm;
     }
 
+    @Override
     public BigDecimal getBackBalance() {
         return backBalance;
     }

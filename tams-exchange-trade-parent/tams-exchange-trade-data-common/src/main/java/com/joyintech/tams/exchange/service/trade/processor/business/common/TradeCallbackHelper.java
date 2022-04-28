@@ -1,50 +1,29 @@
 package com.joyintech.tams.exchange.service.trade.processor.business.common;
 
-import static com.joyintech.tams.exchange.common.utils.TradeUtils.multiply;
+import com.google.common.base.Strings;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.exchange.common.constant.*;
+import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
+import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt1;
+import com.joyintech.tams.exchange.common.db.domain.*;
+import com.joyintech.tams.exchange.common.utils.*;
+import com.joyintech.tams.exchange.datacommon.db.service.*;
+import com.joyintech.tams.exchange.service.trade.processor.MessageSenderManagement;
+import com.joyintech.tams.exchange.service.trade.processor.account.AccountPositionHelper;
+import com.joyintech.tams.exchange.service.trade.processor.business.bond.BondHelper;
+import com.joyintech.tams.exchange.service.trade.processor.others.SplitOrderHelper;
+import com.joyintech.tams.exchange.service.trade.transaction.TransactionHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
 import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import com.google.common.base.Strings;
-import com.joyintech.tams.exchange.common.constant.BusinessFlag;
-import com.joyintech.tams.exchange.common.constant.EntrustProp;
-import com.joyintech.tams.exchange.common.constant.EntrustStatus;
-import com.joyintech.tams.exchange.common.constant.InstructionStatus;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
-import com.joyintech.tams.exchange.common.constant.TradeType;
-import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
-import com.joyintech.tams.exchange.common.db.domain.Entrust;
-import com.joyintech.tams.exchange.common.db.domain.EntrustInterface;
-import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
-import com.joyintech.tams.exchange.common.db.domain.Instruction;
-import com.joyintech.tams.exchange.common.db.domain.Instrument;
-import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
-import com.joyintech.tams.exchange.common.db.domain.Order;
-import com.joyintech.tams.exchange.common.db.domain.Trade;
-import com.joyintech.tams.exchange.common.utils.EntrustUtils;
-import com.joyintech.tams.exchange.common.utils.IntegratedEntrustUtils;
-import com.joyintech.tams.exchange.common.utils.JsonUtils;
-import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
-import com.joyintech.tams.exchange.common.utils.TradeUtils;
-import com.joyintech.tams.exchange.datacommon.db.service.EntrustService;
-import com.joyintech.tams.exchange.datacommon.db.service.FuturesInstrumentService;
-import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
-import com.joyintech.tams.exchange.datacommon.db.service.InstrumentService;
-import com.joyintech.tams.exchange.datacommon.db.service.IntegratedEntrustService;
-import com.joyintech.tams.exchange.datacommon.db.service.OrderService;
-import com.joyintech.tams.exchange.datacommon.db.service.TradeService;
-import com.joyintech.tams.exchange.service.trade.processor.MessageSenderManagement;
-import com.joyintech.tams.exchange.service.trade.processor.account.AccountPositionHelper;
-import com.joyintech.tams.exchange.service.trade.processor.business.bond.BondHelper;
-import com.joyintech.tams.exchange.service.trade.processor.others.SplitOrderHelper;
-import com.joyintech.tams.exchange.service.trade.transaction.TransactionHelper;
+import static com.joyintech.tams.exchange.common.utils.TradeUtils.multiply;
 
 @Component
 public class TradeCallbackHelper {
@@ -256,10 +235,6 @@ public class TradeCallbackHelper {
         tradeRecord.setPs(instruction.getTradeSide());
         tradeRecord.setBusiTypeTg(instruction.getBusiTypeTg());
         tradeRecord.setEntrustClass(instruction.getEntrustClass());
-        if (InvestmentAssetType.isBond(tradeRecord.getFinprodType2()) && tradeRecord.getFullPrice() != null) {
-            //成交全价金额
-            tradeRecord.setClearBalance(tradeRecord.getFullPrice().multiply(BigDecimal.valueOf(tradeRecord.getTradedVolume())));
-        }
 
         //获取BusinessFlag
         if (IntegratedEntrustUtils.isIntegratedEntrust(tradeRecord.getEntrustProp())) {
@@ -297,16 +272,16 @@ public class TradeCallbackHelper {
                 messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust);
                 return;
 //            } else if (InvestmentAssetType.isBond(instruction.getAssetType()) && TradePlat.needSettleTrade(instruction.getTradePlat())) {
-              //新债需求：判断债券哪些走手工交收，用标的是否非担保 =是 则走手工交收
+                //新债需求：判断债券哪些走手工交收，用标的是否非担保 =是 则走手工交收
             } else if (InvestmentAssetType.isBond(instruction.getAssetType()) && DictCodeList.是否_是.getValue().equals(instruction.getIsNoGuard())) {
-                Instrument instrument = instrumentService.queryByInnerCode(entrust.getStockCode());
-                if (Objects.nonNull(instrument)) {
-                    if (EntrustUtils.isSettleTrade(instrument.getTradePlat(), entrust.getEntrustProp())) {
+//                Instrument instrument = instrumentService.queryByInnerCode(entrust.getStockCode());
+//                if (Objects.nonNull(instrument)) {
+//                    if (EntrustUtils.isSettleTrade(instrument.getTradePlat(), entrust.getEntrustProp())) {
 //                        messageSenderService.pushTradeToMQForFixedIncome(tradeRecord, instruction, entrust);
-                        messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust);
-                        return;
-                    }
-                }
+                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust);
+                return;
+//                    }
+//                }
             }
 //            messageSenderService.pushTradeToMQ(tradeRecord, instruction, entrust);
             messageSenderManagement.pushTrade(tradeRecord, instruction, entrust);
@@ -322,7 +297,8 @@ public class TradeCallbackHelper {
 
     private void updateInstructionStatus(Instruction instruction) {
         if (Objects.nonNull(instruction)) {
-            if ((instruction.getEntrustLeftAmt().longValue() == (instruction.getEntrustNum()) && instruction.getEntrustNum() > 0) || (instruction.getEntrustLeftAmt().doubleValue() == (instruction.getEntrustAmt().doubleValue()) && instruction.getEntrustAmt().doubleValue() > 0))
+            if ((instruction.getEntrustLeftAmt().longValue() == (instruction.getEntrustNum()) && instruction.getEntrustNum() > 0)
+                    || (instruction.getEntrustLeftAmt().doubleValue() >= (instruction.getEntrustAmt().doubleValue()) && instruction.getEntrustAmt().doubleValue() > 0))
                 instruction.setEntrustStatus(InstructionStatus.COMPLETE.value);
         }
     }
