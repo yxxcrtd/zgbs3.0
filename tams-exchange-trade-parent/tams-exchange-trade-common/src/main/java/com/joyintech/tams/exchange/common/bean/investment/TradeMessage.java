@@ -271,14 +271,12 @@ public class TradeMessage implements Cloneable, Serializable {
             if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
                 //到期结算金额
                 tradeMessage.setDealBalance(entrust.getBackBalance());
-            } else if (InvestmentAssetType.isBond(trade.getAssetType())
+            }else if (InvestmentAssetType.isBond(trade.getAssetType())
                     && EntrustProp.isTrade(entrust.getEntrustProp())
                     && Objects.nonNull(tradeMessage.getFullPrice())
                     && tradeMessage.getFullPrice() != 0) {
-                if (entrust.getEntrustPrice().compareTo(trade.getTradedPrice()) == 0) {
-                    //成交全价金额
-                    tradeMessage.setDealBalance(TradeUtils.multiply(trade.getFullPrice(), tradeMessage.getDealVolume().longValue(), 2));
-                }
+                //成交全价金额
+                tradeMessage.setDealBalance(TradeUtils.multiply(BigDecimal.valueOf(tradeMessage.getFullPrice()), tradeMessage.getDealVolume().longValue(), 2));
             }
 
             tradeMessage.setTradingDay(trade.getTradingDay());
