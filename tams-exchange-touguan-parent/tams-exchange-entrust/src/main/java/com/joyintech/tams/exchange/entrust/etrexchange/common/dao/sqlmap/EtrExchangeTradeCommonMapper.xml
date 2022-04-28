@@ -1868,8 +1868,8 @@
         rn = 1
         ) TMP
         WHERE
-        TMP.portfolioId =#{ portfolioId,jdbcType = VARCHAR }
-        AND TMP.finprodId =#{ finprodId,jdbcType = VARCHAR }
+        TMP.PORTFOLIO_ID =#{ portfolioId,jdbcType = VARCHAR }
+        AND TMP.FINPROD_ID =#{ finprodId,jdbcType = VARCHAR }
     </select>
 
 
