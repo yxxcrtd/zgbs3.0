@@ -35,10 +35,10 @@ public class EtrCommonBondProductInfoController extends BaseController {
     private EtrCommonFinProductInfoService etrCommonFinProductInfoService;
 
     @PostMapping("/getEtrFinProductAndTableInfo/{pageCode}/{dtCode}")
-    @ApiOperation(value = "债券信息查询功能", notes = "债券信息查询功能")
+    @ApiOperation(value = "债券信息和表头查询功能", notes = "债券信息和表头查询功能")
     @ResponseBody
-    public Message<CfetsEtrFinProductInfoResponse> getEtrFinProductAndTableInfo(@PathVariable("pageCode") String pageCode,
-                                                                                @PathVariable("dtCode") String dtCode,
+    public Message<CfetsEtrFinProductInfoResponse> getEtrFinProductAndTableInfo(@PathVariable(value = "pageCode", required = false) String pageCode,
+                                                                                @PathVariable(value = "dtCode", required = false) String dtCode,
                                                                                 @RequestBody CfetsEtrFinProductInfoRequest dto) {
         try {
             CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoService.findFinProductInfo(pageCode, dtCode, dto);
@@ -49,4 +49,17 @@ public class EtrCommonBondProductInfoController extends BaseController {
         }
     }
 
+
+    @PostMapping("/getEtrFinProductInfo")
+    @ApiOperation(value = "债券信息查询功能", notes = "债券信息查询功能")
+    @ResponseBody
+    public Message<CfetsEtrFinProductInfoResponse> getEtrFinProductInfo(@RequestBody CfetsEtrFinProductInfoRequest dto) {
+        try {
+            CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoService.findFinProductInfo(null, null, dto);
+            return new Message<>(finProductInfo).success().setData(finProductInfo);
+        } catch (Exception e) {
+            logger.error("查询功能异常", e);
+            return new Message<CfetsEtrFinProductInfoResponse>().fail().setMessage("查询异常");
+        }
+    }
 }

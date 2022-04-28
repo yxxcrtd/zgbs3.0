@@ -579,4 +579,22 @@
         inner join TRD_FIN_PRODUCT_BARTER_TOTAL B on T.TOTLE_TRADE_ID=B.TRADE_ID ||'R'
         where T.FINPROD_ID=#{finprodId,jdbcType=VARCHAR} and rownum=1
     </select>
+
+    <select id="getWindType" resultType="com.joyintech.tams.common.base.entity.FinProductTypeConfig">
+        SELECT
+            OUTPUT_VALUE_1 outputValue1,
+            OUTPUT_VALUE_2 outputValue2
+        FROM FIN_PRODUCT_TYPE_CONFIG
+        WHERE CONFIG_TYPE = #{configType}
+        <if test="inputValue1 != null and inputValue1 != ''">
+            AND INPUT_VALUE_1 = #{inputValue1}
+        </if>
+        <if test="inputValue2 != null and inputValue2 != ''">
+            AND INPUT_VALUE_2 = #{inputValue2}
+        </if>
+        <if test="inputValue3 != null and inputValue3 != ''">
+            AND INPUT_VALUE_3 = #{inputValue3}
+        </if> and ROWNUM=1
+    </select>
+
 </mapper>

@@ -11,8 +11,8 @@ import com.joyintech.tams.common.base.dao.TrdFinProductBarterTotalMapper;
 import com.joyintech.tams.common.base.dao.TrdFinProductDealTotalMapper;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.*;
-import com.joyintech.tams.invest.batch.tenderbond.dao.FinTenderBondAssetMapper;
-import com.joyintech.tams.invest.batch.tenderbond.dto.FinTenderBondAssetDto;
+import com.joyintech.tams.invest.batch.tenderbond.dao.FinTenderBondAssetBatchMapper;
+import com.joyintech.tams.invest.batch.tenderbond.dto.FinTenderBondAssetBatchDto;
 import com.joyintech.tams.invest.common.autoperiod.common.AutoPeriodCommonService;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import org.apache.commons.collections.CollectionUtils;
@@ -27,15 +27,15 @@ import java.util.*;
  *
  * @author gwl
  * @version 1.0 2022年04月18日
- * @see FinTenderBondAssetService
+ * @see FinTenderBondAssetBatchService
  * @since 1.0
  */
 @Service
 @Scope("prototype")
-public class FinTenderBondAssetService {
+public class FinTenderBondAssetBatchService {
 
     @Resource
-    private FinTenderBondAssetMapper finTenderBoundAssetMapper;
+    private FinTenderBondAssetBatchMapper finTenderBoundAssetMapper;
 
     @Resource
     private AutoPeriodCommonService autoPeriodCommonService;
@@ -68,9 +68,9 @@ public class FinTenderBondAssetService {
         param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
         param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
         param.put("ISSUE_STATUS_02", DictCodeListExt1.发行状态_发行失败.getValue());
-        List<FinTenderBondAssetDto> list = finTenderBoundAssetMapper.selectListing(param);
+        List<FinTenderBondAssetBatchDto> list = finTenderBoundAssetMapper.selectListing(param);
         if (CollectionUtils.isEmpty(list)) return;
-        for (FinTenderBondAssetDto dto : list) {
+        for (FinTenderBondAssetBatchDto dto : list) {
             if (StringUtil.isNotEmpty(dto.getAppearMarketId())) {//上市代码不为空
                 param.put("finprodType2", DictCodeList.平安资产类型_债券.getValue());
                 param.put("finprodMarketId", dto.getAppearMarketId());
@@ -84,10 +84,11 @@ public class FinTenderBondAssetService {
                 //根据 资产名称、资产简称、交易场所、登记托管机构、起息日、到期日、发行人、息票品种、利率类型、币种 进行去重
                 List<InterfPayhsrcsecinfo> interList = finTenderBoundAssetMapper.getBySecId(dto.getAppearMarketId());
                 if (CollectionUtils.isNotEmpty(interList) && interList.size() == 1) {
-                    this.autoBondCoupon(interList.get(0));
-                    dto.setCirculationCode(interList.get(0).getSecid());
-                    dto.setCirculationDate(plateDate);
-                    save(dto, plateDate);
+                    if (this.autoBondCoupon(interList.get(0))) {
+                        dto.setCirculationCode(interList.get(0).getSecid());
+                        dto.setCirculationDate(plateDate);
+                        save(dto, plateDate);
+                    }
                     continue;
                 }
                 if (CollectionUtils.isNotEmpty(interList) && interList.size() > 1) {
@@ -95,18 +96,20 @@ public class FinTenderBondAssetService {
                 }
                 interList = finTenderBoundAssetMapper.getByParam(dto);
                 if (CollectionUtils.isNotEmpty(interList) && interList.size() == 1) {
-                    this.autoBondCoupon(interList.get(0));
-                    dto.setCirculationCode(interList.get(0).getSecid());
-                    dto.setCirculationDate(plateDate);
-                    save(dto, plateDate);
+                    if (this.autoBondCoupon(interList.get(0))) {
+                        dto.setCirculationCode(interList.get(0).getSecid());
+                        dto.setCirculationDate(plateDate);
+                        save(dto, plateDate);
+                    }
                 }
             } else {
                 List<InterfPayhsrcsecinfo> interList = finTenderBoundAssetMapper.getByParam(dto);
                 if (CollectionUtils.isNotEmpty(interList) && interList.size() == 1) {
-                    this.autoBondCoupon(interList.get(0));
-                    dto.setCirculationCode(interList.get(0).getSecid());
-                    dto.setCirculationDate(plateDate);
-                    save(dto, plateDate);
+                    if (this.autoBondCoupon(interList.get(0))) {
+                        dto.setCirculationCode(interList.get(0).getSecid());
+                        dto.setCirculationDate(plateDate);
+                        save(dto, plateDate);
+                    }
                 }
             }
         }
@@ -118,7 +121,7 @@ public class FinTenderBondAssetService {
      * @param dto
      * @param plateDate
      */
-    private void save(FinTenderBondAssetDto dto, Date plateDate) {
+    private void save(FinTenderBondAssetBatchDto dto, Date plateDate) {
         TrdFinProductDealTotal trdFinProductDealTotal = new TrdFinProductDealTotal();
         BussinessCodeParameter parameter = new BussinessCodeParameter();
         parameter.setCommonBusinessType(DictCodeList.共通业务类型_债券买入);
@@ -155,19 +158,20 @@ public class FinTenderBondAssetService {
         saveOperate(dto.getFinprodId(), dto.getRemark());
         //调用头寸
         BaseMap param = BaseMap.newMap().put("userId", "SYSTEM")
-                .put("totalTradeId",trdFinProductDealTotal.getTotleTradeId())
-                .put("finprodId",dto.getFinprodId())
-                .put("circulationCode",product.getCirculationCode());
+                .put("totalTradeId", trdFinProductDealTotal.getTotleTradeId())
+                .put("finprodId", dto.getFinprodId())
+                .put("circulationCode", product.getCirculationCode());
         PositionHttpRequest.sendSslt(param);
     }
 
 
     /**
      * 自动加券
+     *
      * @param payhsrcsecinfo
      */
-    private void autoBondCoupon(InterfPayhsrcsecinfo payhsrcsecinfo) {
-        //接口表使用source 和secId作为主键来进行加券
+    private boolean autoBondCoupon(InterfPayhsrcsecinfo payhsrcsecinfo) {
+        return false;
     }
 
     /**

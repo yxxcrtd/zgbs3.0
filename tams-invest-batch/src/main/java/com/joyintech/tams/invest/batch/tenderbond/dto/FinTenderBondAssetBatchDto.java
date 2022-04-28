@@ -10,7 +10,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class FinTenderBondAssetDto {
+public class FinTenderBondAssetBatchDto {
 
     @ApiModelProperty(name = "issueStage", value = "发行阶段")
     private String issueStage;

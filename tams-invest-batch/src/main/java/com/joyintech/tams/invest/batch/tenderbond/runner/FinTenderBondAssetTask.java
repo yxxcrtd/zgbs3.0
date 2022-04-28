@@ -6,7 +6,7 @@ import com.joyintech.framework.base.entity.SysBatchExecInfo;
 import com.joyintech.framework.constant.BatchDictCodeList;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.web.PlatformDate;
-import com.joyintech.tams.invest.batch.tenderbond.service.FinTenderBondAssetService;
+import com.joyintech.tams.invest.batch.tenderbond.service.FinTenderBondAssetBatchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -32,7 +32,7 @@ public class FinTenderBondAssetTask extends BatchBaseService {
     @Resource
     private PlatformDate platformDateService;
     @Resource
-    private FinTenderBondAssetService finTenderBondAssetService;
+    private FinTenderBondAssetBatchService finTenderBondAssetService;
 
     @Override
     public JobExecution execute() throws BatchException {
