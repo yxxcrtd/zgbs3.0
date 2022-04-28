@@ -1,8 +1,6 @@
 package com.joyintech.tams.invest.batch.tenderbond.service;
 
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
-import com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset003Dto;
-import com.joyintech.tams.business.asset.tenderbond.service.FinTenderBondAsset003Service;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
@@ -17,7 +15,6 @@ import com.joyintech.tams.invest.batch.tenderbond.dao.FinTenderBondAssetBatchMap
 import com.joyintech.tams.invest.batch.tenderbond.dto.FinTenderBondAssetBatchDto;
 import com.joyintech.tams.invest.common.autoperiod.common.AutoPeriodCommonService;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
-import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.service.FinBondMarketInfoQuery001Service;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -56,12 +53,6 @@ public class FinTenderBondAssetBatchService {
     private FinProductAddMapper finProductAddMapper;
 
     @Resource
-    private FinTenderBondAsset003Service finTenderBondAsset003Service;
-
-    @Resource
-    private FinBondMarketInfoQuery001Service finBondMarketInfoQuery001Service;
-
-    @Resource
     private JoyinbusinessCommonService joyinbusinessCommonService;
 
     /**
@@ -94,7 +85,6 @@ public class FinTenderBondAssetBatchService {
                 List<InterfPayhsrcsecinfo> interList = finTenderBoundAssetMapper.getBySecId(dto.getAppearMarketId());
                 if (CollectionUtils.isNotEmpty(interList) && interList.size() == 1) {
                     if (this.autoBondCoupon(interList.get(0))) {
-                        finBondMarketInfoQuery001Service.addCoupons(interList.get(0).getSecid());
                         dto.setCirculationCode(interList.get(0).getSecid());
                         dto.setCirculationDate(plateDate);
                         save(dto, plateDate);
@@ -107,7 +97,6 @@ public class FinTenderBondAssetBatchService {
                 interList = finTenderBoundAssetMapper.getByParam(dto);
                 if (CollectionUtils.isNotEmpty(interList) && interList.size() == 1) {
                     if (this.autoBondCoupon(interList.get(0))) {
-                        finBondMarketInfoQuery001Service.addCoupons(interList.get(0).getSecid());
                         dto.setCirculationCode(interList.get(0).getSecid());
                         dto.setCirculationDate(plateDate);
                         save(dto, plateDate);
@@ -117,7 +106,6 @@ public class FinTenderBondAssetBatchService {
                 List<InterfPayhsrcsecinfo> interList = finTenderBoundAssetMapper.getByParam(dto);
                 if (CollectionUtils.isNotEmpty(interList) && interList.size() == 1) {
                     if (this.autoBondCoupon(interList.get(0))) {
-                        finBondMarketInfoQuery001Service.addCoupons(interList.get(0).getSecid());
                         dto.setCirculationCode(interList.get(0).getSecid());
                         dto.setCirculationDate(plateDate);
                         save(dto, plateDate);
@@ -183,9 +171,7 @@ public class FinTenderBondAssetBatchService {
      * @param payhsrcsecinfo
      */
     private boolean autoBondCoupon(InterfPayhsrcsecinfo payhsrcsecinfo) {
-        FinTenderBondAsset003Dto dto = new FinTenderBondAsset003Dto();
-        dto.setAppearMarketId(payhsrcsecinfo.getSecid());
-        return finTenderBondAsset003Service.validAddCoupons(dto) == null ? true : false;
+        return false;
     }
 
     /**
