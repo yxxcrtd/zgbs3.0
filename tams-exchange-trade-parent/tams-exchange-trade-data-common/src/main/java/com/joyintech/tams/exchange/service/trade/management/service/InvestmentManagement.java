@@ -1207,10 +1207,8 @@ public class InvestmentManagement extends BaseService {
                     pledgeList = pledgeList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
 
                     resultBean.setErrorCode(ErrorCode.APPOINT_INSTRUCTION_EXIST_PARAMETER_ERROR);
+                    resultBean.setErrorMsg(JsonUtils.getJsonFromObject(data));
                 }
-
-                resultBean.setErrorCode(ErrorCode.APPOINT_INSTRUCTION_EXIST_PARAMETER_ERROR);
-                resultBean.setErrorMsg(JsonUtils.getJsonFromObject(data));
                 updateAppointInstruction(records, entrustIds, Lists.newArrayList(keys.iterator()), data);
             } else {
                 updateAppointInstruction(records, entrustIds);

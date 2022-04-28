@@ -507,7 +507,7 @@
             to_char(eted.payment_date,'yyyy-MM-dd') paymentDate,
             to_char(eted.listing_date,'yyyy-MM-dd')  listingDate,
             /*ete.entrust_num entrustNum,*/
-            case when #{busiTypePosition} in ('EX017','EX005') then ete.entrust_num*100
+            case when #{busiTypePosition} in ('EX017','EX005') then ete.entrust_num/100
             else ete.entrust_num
             end as entrustNum,
             /*decode(
@@ -653,7 +653,7 @@
         to_char(eted.payment_date,'yyyy-MM-dd') paymentDate,
         to_char(eted.listing_date,'yyyy-MM-dd')  listingDate,
         /*ete.entrust_num entrustNum,*/
-        case when #{busiTypePosition} in ('EX017','EX005') then ete.entrust_num*100
+        case when #{busiTypePosition} in ('EX017','EX005') then ete.entrust_num/100
         else ete.entrust_num
         end as entrustNum,
         /*decode(
@@ -766,7 +766,10 @@
         ssai.sec_acct_name secAcctId,
         ssai.TRD_ACCT_ID trdAcctId,
         tpd.FINPROD_TYPE2 finprodType2,
-        tpd.SHARE_AMT shareAmt,  <!-- 成交数量 -->
+--         tpd.SHARE_AMT shareAmt,  <!-- 成交数量 -->
+        case when EEA.BUSI_TYPE_POSITION in ('EX017','EX005') then tpd.SHARE_AMT/100
+        else tpd.SHARE_AMT
+        end as shareAmt,
         tpd.UNIT_FPRICE unitFprice,  <!-- 成交价格 -->
         tpd.FPRICE_AMT fpriceAmt,  <!-- 成交金额 -->
         to_char(tpd.CREATE_TIME,'hh24:mi:ss') tradeTime, <!-- 成交时间 -->
@@ -992,7 +995,10 @@
         TO_CHAR(T6.EXERCISE_DATE,'yyyy-MM-dd') exerciseDate,
         TO_CHAR(T6.ACT_EXERCISE_DATE,'yyyy-MM-dd') actExerciseDate,
         tpdp.TOTLE_TRADE_ID totalTradeId,
-        EE.ENTRUST_NUM entrustNum,
+--         EE.ENTRUST_NUM entrustNum,
+        case when EEA.BUSI_TYPE_POSITION in ('EX017','EX005') then ete.entrust_num/100
+        else ete.entrust_num
+        end as entrustNum,
         EE.PRICE price,
         EE.ENTRUST_AMT entrustAmt,
         EE.ENTRUST_STATUS entrustStatus,
