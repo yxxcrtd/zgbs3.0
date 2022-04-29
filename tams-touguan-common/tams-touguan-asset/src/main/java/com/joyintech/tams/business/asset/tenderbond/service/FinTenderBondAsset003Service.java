@@ -111,7 +111,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                 //金融产品实物汇总交易
                 TrdFinProductBarterTotal trdFinProductBarterTotal = new TrdFinProductBarterTotal();
                 trdFinProductBarterTotal.setTradeId(String.format("%sR", totleTradeId));
-                trdFinProductBarterTotal.setFinprodType(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+                trdFinProductBarterTotal.setFinprodType(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
                 trdFinProductBarterTotal.setFinprodId(dto.getFinprodId());
                 trdFinProductBarterTotal.setBranch(0L);
                 trdFinProductBarterTotalMapper.insert(trdFinProductBarterTotal);
@@ -147,8 +147,8 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
             BussinessCodeParameter parameter = new BussinessCodeParameter();
             parameter.setCommonBusinessType(DictCodeList.共通业务类型_债券买入);
             trdFinProductDealTotal.setTotleTradeId(autoPeriodCommonService.buildBussinessCode(parameter));
-            trdFinProductDealTotal.setFinprodType2(DictCodeListExt2.平安资产类型_一级市场债.getValue());
-            trdFinProductDealTotal.setFinprodType(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+            trdFinProductDealTotal.setFinprodType2(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+            trdFinProductDealTotal.setFinprodType(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
             trdFinProductDealTotal.setBusiType(DictCodeListExt1.平安业务类型_上市流通.getValue());
             trdFinProductDealTotal.setFinprodId(dto.getFinprodId());
             trdFinProductDealTotal.setPs(DictCodeList.交易方向_上市流通.getValue());
@@ -161,7 +161,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
             //金融产品实物汇总交易
             TrdFinProductBarterTotal trdFinProductBarterTotal = new TrdFinProductBarterTotal();
             trdFinProductBarterTotal.setTradeId(trdFinProductDealTotal.getTotleTradeId());
-            trdFinProductBarterTotal.setFinprodType(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+            trdFinProductBarterTotal.setFinprodType(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
             trdFinProductBarterTotal.setFinprodId(dto.getFinprodId());
             trdFinProductBarterTotal.setBranch(0L);
             trdFinProductBarterTotalMapper.insert(trdFinProductBarterTotal);
@@ -231,7 +231,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
      */
     public List<ValidMessage> valid(FinTenderBondAsset003Dto dto) {
         List<ValidMessage> validMessages = new ArrayList<>();
-        if (finTenderBoundAssetService.isInProcess(dto.getFinprodMarketId(), "FinTenderBondAsset003")) {
+        if (finTenderBoundAssetService.isInProcess(dto.getFinprodMarketId(), "FinTenderBondAsset003","FinTenderBondAsset002")) {
             validMessages.add(new ValidMessage("存在流程中的数据"));
         }
         if(StringUtil.isEmpty(dto.getOperateType())) {
