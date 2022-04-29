@@ -55,9 +55,9 @@ public class EntrustPropUtils {
         final String dealMode = instruction.getDealMode();
         //新债业务
         if (EntrustUtils.isNewBond(busiTypeTg)) {
-            if (StringUtil.isNotEmpty(dealMode)) {
-                return dealMode;
-            }
+//            if (StringUtil.isNotEmpty(dealMode)) {
+//                return dealMode;
+//            }
             return entrustProp;
         }
 
