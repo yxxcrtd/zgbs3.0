@@ -2,6 +2,7 @@ package com.joyintech.tams.invest.common.risktrial.dto;
 
 import java.util.Date;
 
+import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
@@ -333,6 +334,25 @@ public class RiskTrialRetDto extends BaseEntity {
 
 	public String getKriStatus() {
 		return kriStatus;
+	}
+
+	public String getKriStatusCn() {
+		if(StringUtil.equals(getKriStatus(),"0")){
+			return "正常";
+		}
+		if(StringUtil.equals(getKriStatus(),"1")){
+			return "预警";
+		}
+		if(StringUtil.equals(getKriStatus(),"2")){
+			return "审批";
+		}
+		if(StringUtil.equals(getKriStatus(),"3")){
+			return "违规";
+		}
+		if(StringUtil.equals(getKriStatus(),"4")){
+			return "异常";
+		}
+		return getKriStatus();
 	}
 
 	public void setKriStatus(String kriStatus) {
