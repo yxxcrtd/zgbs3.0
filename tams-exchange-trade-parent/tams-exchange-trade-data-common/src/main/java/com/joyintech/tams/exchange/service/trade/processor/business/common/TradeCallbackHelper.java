@@ -66,7 +66,8 @@ public class TradeCallbackHelper {
         if (Objects.isNull(tradeDb)) {
             EntrustInterface entrust = null;
             //处理大宗成交回报
-            if (IntegratedEntrustUtils.isIntegratedEntrust(tradeRecord.getEntrustProp())) {
+            if (IntegratedEntrustUtils.isIntegratedEntrust(tradeRecord.getEntrustProp())
+                || IntegratedEntrustUtils.isNegotiatedTrade(tradeRecord.getEntrustProp())) {
                 if (!Strings.isNullOrEmpty(tradeRecord.getEntrustId())) {
                     entrust = integratedEntrustService.findById(tradeRecord.getEntrustId());
                 } else if (!Strings.isNullOrEmpty(tradeRecord.getBrokerEntrustId())) {
