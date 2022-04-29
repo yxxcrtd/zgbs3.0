@@ -118,7 +118,6 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     private BigDecimal coefficient;
 
     @ApiModelProperty(name = "rateCode", value = "基准利率（浮动利率code）")
-    @JsonSerialize(using = BigDecimalSerializer.class)
     private String rateCode;
 
     @ApiModelProperty(name = "toprate", value = "利率上限")
@@ -130,7 +129,6 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     private BigDecimal bottomrate;
 
     @ApiModelProperty(name = "resetType", value = "利率调整规则")
-    @JsonSerialize(using = BigDecimalSerializer.class)
     private String resetType;
 
     @ApiModelProperty(name = "observeBefDay", value = "延后时间")

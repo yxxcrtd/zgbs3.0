@@ -9,9 +9,9 @@ import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto;
-import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinBondMarketInfoQueryRequest;
-import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.service.FinBondMarketInfoQuery001Service;
+import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.dto.FinListedBondInfoQuery001Dto;
+import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.req.FinListedBondInfoQueryRequest;
+import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.service.FinListedBondInfoQuery001Service;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +26,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Controller
-@PageId("finListedBondInfoQuery001")
+@PageId("FinListedBondInfoQuery001")
 @RequestMapping("/asset/finListedBondInfoQuery001")
 @Api(tags = "待上市债券信息查询")
 public class FinListedBondInfoQuery001Controller extends BaseController {
 
     @Autowired
-    private FinBondMarketInfoQuery001Service finBondMarketInfoQuery001Service;
+    private FinListedBondInfoQuery001Service finListedBondInfoQuery001Service;
 
     @ApiOperation(value = "初始化参数", notes = "初始化参数")
     @PostMapping("/initParams")
@@ -70,16 +70,25 @@ public class FinListedBondInfoQuery001Controller extends BaseController {
 
     @ResponseBody
     @PostMapping("/findPage")
-    @ApiOperation(value = "待上市债券信息分页查询", notes = "待上市债券信息分页查询")
-    public Message<Page<FinBondMarketInfoQuery001Dto>> findPage(@RequestBody FinBondMarketInfoQueryRequest request) {
-        return Message.success("success", finBondMarketInfoQuery001Service.queryForPage(request));
+    @ApiOperation(value = "待上市债券市场信息分页查询", notes = "待上市债券市场信息分页查询")
+    public Message<Page<FinListedBondInfoQuery001Dto>> findPage(@RequestBody FinListedBondInfoQueryRequest request) {
+        return Message.success("success", finListedBondInfoQuery001Service.queryForPage(request));
     }
 
 
     @ResponseBody
     @PostMapping(value = "/export")
-    @ApiOperation(value = "待上市债券信息列表导出", notes = "待上市债券信息列表导出")
+    @ApiOperation(value = "待上市债券市场信息列表导出", notes = "待上市债券市场信息列表导出")
     public void export(@RequestBody CfetsExportRequestDto req, HttpServletResponse response) {
-        ExcelUitl.doExport(req, response, "待上市债券信息列表", () -> finBondMarketInfoQuery001Service.queryForPage(req.getDto(FinBondMarketInfoQueryRequest.class)).getRoot());
+        ExcelUitl.doExport(req, response, "待上市债券市场信息", () -> finListedBondInfoQuery001Service.queryForPage(req.getDto(FinListedBondInfoQueryRequest.class)).getRoot());
     }
+
+
+    @ResponseBody
+    @PostMapping("/detail")
+    @ApiOperation(value = "待上市债券市场加券信息查询", notes = "待上市债券市场加券信息查询")
+    public Message<FinListedBondInfoQuery001Dto> detail(@RequestBody FinListedBondInfoQueryRequest request) {
+        return Message.success("success", finListedBondInfoQuery001Service.queryFinWindMarketForCoupons(request));
+    }
+
 }
