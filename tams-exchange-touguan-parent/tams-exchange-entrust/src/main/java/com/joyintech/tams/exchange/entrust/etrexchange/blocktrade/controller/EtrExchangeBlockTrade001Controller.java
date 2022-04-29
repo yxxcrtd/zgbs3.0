@@ -10,6 +10,7 @@
 package com.joyintech.tams.exchange.entrust.etrexchange.blocktrade.controller;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,6 +83,9 @@ public class EtrExchangeBlockTrade001Controller extends BaseController{
 
 	@Autowired
 	private EtrExchangeBlockTrade001Service etrExchangeBlockTrade001Service;
+
+	@Autowired
+	EtrExchangeTradeCommon001Service etrExchangeTrade001Service;
 
 	@Autowired
 	private EtrExchangeTradeCommon001Service etrExchangeTradeCommon001Service;
@@ -386,16 +390,29 @@ public class EtrExchangeBlockTrade001Controller extends BaseController{
 //					if (null != ajax) {
 //						break;
 //					}
+
+
+
                     List<ValidMessage> validList = etrExchangeBlockTrade001ValidatorService.valid(dto);
+
+
 					if(validList.size()>0) {
 						if (null == ajax) {
 							ajax = new AjaxResult(br);
+							ajax.setErrorList(validList);
 						}
-						ajax.setErrorList(validList);
 					}
 					if (null != ajax) {
 						break;
 					}
+				}
+				//DZ校验是否闭市
+				Boolean isNonTradingTime = etrExchangeTrade001Service.isNonTradingTime(dto);
+				if (isNonTradingTime) {
+						ajax = new AjaxResult(br);
+						List<ValidMessage> validList = new ArrayList<>();
+						validList.add(new ValidMessage("当日已闭市，不允许下指令!"));
+						ajax.setErrorList(validList);
 				}
 			}
 			if (null != ajax) {
