@@ -170,7 +170,7 @@
 		FINPROD_ID ,
 		MIN(MDATE) MDATE
 		FROM
-		FIN_CASH_PLAN fcp2 WHERE fcp2.CASH_TYPE IN('01','04') AND  <![CDATA[fcp2.MDATE >= #{dealDate,jdbcType=DATE}]]>
+		FIN_CASH_PLAN fcp2 WHERE fcp2.CASH_TYPE IN('01','04') AND  <![CDATA[fcp2.MDATE > #{dealDate,jdbcType=DATE}]]>
 		GROUP BY
 		CASH_ID ,
 		FINPROD_ID)T2
@@ -194,9 +194,9 @@
 		SELECT
 		CASH_ID,
 		FINPROD_ID ,
-		MIN(MDATE) MDATE
+		MAX(MDATE) MDATE
 		FROM
-		FIN_CASH_PLAN fcp2 WHERE fcp2.CASH_TYPE IN('01','04') AND <![CDATA[fcp2.MDATE < #{dealDate,jdbcType=DATE}]]>
+		FIN_CASH_PLAN fcp2 WHERE fcp2.CASH_TYPE IN('01','04') AND <![CDATA[fcp2.MDATE <= #{dealDate,jdbcType=DATE}]]>
 		GROUP BY
 		CASH_ID ,
 		FINPROD_ID)T2
