@@ -70,7 +70,7 @@ public class FinTenderBondAssetBatchService {
         Map<String, Object> param = new HashMap<>();
         param.put("listingDate", plateDate);
         param.put("issueStage", DictCodeListExt4.发行阶段_已发行.getValue());
-        param.put("finprodType2", DictCodeListExt2.平安资产类型_一级市场债.getValue());
+        param.put("finprodType2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
         param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
         param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
         param.put("ISSUE_STATUS_02", DictCodeListExt1.发行状态_发行失败.getValue());
@@ -132,8 +132,8 @@ public class FinTenderBondAssetBatchService {
         BussinessCodeParameter parameter = new BussinessCodeParameter();
         parameter.setCommonBusinessType(DictCodeList.共通业务类型_债券买入);
         trdFinProductDealTotal.setTotleTradeId(autoPeriodCommonService.buildBussinessCode(parameter));
-        trdFinProductDealTotal.setFinprodType2(DictCodeListExt2.平安资产类型_一级市场债.getValue());
-        trdFinProductDealTotal.setFinprodType(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+        trdFinProductDealTotal.setFinprodType2(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+        trdFinProductDealTotal.setFinprodType(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
         trdFinProductDealTotal.setBusiType(DictCodeListExt1.平安业务类型_上市流通.getValue());
         trdFinProductDealTotal.setFinprodId(dto.getFinprodId());
         trdFinProductDealTotal.setPs(DictCodeList.交易方向_上市流通.getValue());
@@ -146,7 +146,7 @@ public class FinTenderBondAssetBatchService {
         //金融产品实物汇总交易
         TrdFinProductBarterTotal trdFinProductBarterTotal = new TrdFinProductBarterTotal();
         trdFinProductBarterTotal.setTradeId(trdFinProductDealTotal.getTotleTradeId());
-        trdFinProductBarterTotal.setFinprodType(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+        trdFinProductBarterTotal.setFinprodType(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
         trdFinProductBarterTotal.setFinprodId(dto.getFinprodId());
         trdFinProductBarterTotal.setBranch(0L);
         trdFinProductBarterTotalMapper.insert(trdFinProductBarterTotal);
