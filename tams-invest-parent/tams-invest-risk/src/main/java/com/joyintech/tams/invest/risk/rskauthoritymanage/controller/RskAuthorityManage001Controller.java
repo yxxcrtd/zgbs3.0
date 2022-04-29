@@ -146,8 +146,8 @@ public class RskAuthorityManage001Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("/getUser")
-    public List<SelectOptionDto> getUser()
-         {
+    public Page<SelectOptionDto> getUser()
+    {
         return rskAuthorityManageService.getUser(RequestUtil.getPageParam());
     }
     /**

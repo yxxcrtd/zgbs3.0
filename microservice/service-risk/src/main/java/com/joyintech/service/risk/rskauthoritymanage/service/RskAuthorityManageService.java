@@ -64,9 +64,9 @@ public class RskAuthorityManageService extends BaseService<RskAuthorityManageDto
      * @see
      * @since 1.0
      */
-    public List<SelectOptionDto> getUser(Map<String, Object> param) {
+    public Page<SelectOptionDto> getUser(Map<String, Object> param,int length,int page) {
         DynamicDataSourceHolder.putDataSource(DataSourceType.OTHER);
-        List<SelectOptionDto> resultList = rskAuthorityManageMapper.getUser(param);
+        Page<SelectOptionDto> resultList = this.queryForPageForSelectReturn(page, length, () -> rskAuthorityManageMapper.getUser(param));
         DynamicDataSourceHolder.clearDataSource();
         return resultList;
     }

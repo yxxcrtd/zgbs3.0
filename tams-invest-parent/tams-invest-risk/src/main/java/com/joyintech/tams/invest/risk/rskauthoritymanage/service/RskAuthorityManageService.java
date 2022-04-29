@@ -110,8 +110,8 @@ public class RskAuthorityManageService  extends CommonExportService<RskAuthority
      * @see
      * @since 1.0
      */
-    public List<SelectOptionDto> getUser(Map<String, Object> pageParam) {
-        return restTemplate.postForList(
+    public Page<SelectOptionDto> getUser(Map<String, Object> pageParam) {
+        return restTemplate.postForPage(
             ServiceApplication.RISK_SERVICE_NAME +
             "/RskAuthorityManage/getUser",pageParam,
             SelectOptionDto.class);

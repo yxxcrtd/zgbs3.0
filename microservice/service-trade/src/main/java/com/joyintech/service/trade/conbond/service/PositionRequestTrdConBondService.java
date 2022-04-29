@@ -85,7 +85,7 @@ public class PositionRequestTrdConBondService {
         resultMap.put(TRADE_PLACE, entity.getTradeMarket());
         resultMap.put(SHARES_TRADE_PLATFORM, null);
         resultMap.put(DELIVERY_TYPE, deliveryType);
-        resultMap.put(WORK_FLOW_ID, null);
+        resultMap.put(WORK_FLOW_ID, entity.getTrdProductDeal().getWorkflowId());
         resultMap.put("cdate", entity.getPurchDate());
         resultMap.put(CCY, entity.getCcy());
         if(resultMap.get("decisionAct").equals(系统动作_修改.getValue())) {
