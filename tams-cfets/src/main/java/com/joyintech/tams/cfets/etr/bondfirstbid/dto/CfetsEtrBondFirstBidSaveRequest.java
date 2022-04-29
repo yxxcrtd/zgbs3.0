@@ -116,11 +116,19 @@ public class CfetsEtrBondFirstBidSaveRequest extends EtrEntrust implements Proce
     private String softSkipMode;
 
     /**
+     * 授信软控是否继续？Y：继续
+     */
+    @ApiModelProperty(name="creditIsContinue",value="授信软控是否继续？Y：继续",example="Y")
+    private String creditIsContinue;
+
+    /**
      * 指令日期
      */
     @ApiModelProperty(name="etrDate",value="指令日期",example="2021-07-06", required = true)
     private Date etrDate;
 
+    @ApiModelProperty(name="counterName",value="交易对手名称",example="A1")
+    private String counterName;
 
     public String getElementId() {
         return elementId;
@@ -256,5 +264,21 @@ public class CfetsEtrBondFirstBidSaveRequest extends EtrEntrust implements Proce
 
     public void setTenderDate(Date tenderDate) {
         this.tenderDate = tenderDate;
+    }
+
+    public String getCounterName() {
+        return counterName;
+    }
+
+    public void setCounterName(String counterName) {
+        this.counterName = counterName;
+    }
+
+    public String getCreditIsContinue() {
+        return creditIsContinue;
+    }
+
+    public void setCreditIsContinue(String creditIsContinue) {
+        this.creditIsContinue = creditIsContinue;
     }
 }

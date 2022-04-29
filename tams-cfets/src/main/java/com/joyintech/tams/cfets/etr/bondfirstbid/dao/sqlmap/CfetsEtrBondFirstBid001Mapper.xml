@@ -295,7 +295,7 @@
                 FROM ETR_ENTRUST a
                 LEFT JOIN ETR_ENTRUST_DETAIL eed ON a.ENTRUST_ID = eed.ENTRUST_ID
                 WHERE 1= 1
-                  AND AND a.ENTRUST_STATUS  IN ('02', '03', '04', '08', '09')
+                  AND a.ENTRUST_STATUS  IN ('02', '03', '04', '08', '09')
                   AND a.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
                   AND eed.PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
                   AND eed.INV_AIM IS NOT NULL

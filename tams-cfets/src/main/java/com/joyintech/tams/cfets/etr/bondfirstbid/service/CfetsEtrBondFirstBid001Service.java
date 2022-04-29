@@ -6,37 +6,31 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.BaseMap;
-import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.cfets.etr.bond.dao.CfetsEtrIbBondinfoMapper;
 import com.joyintech.tams.cfets.etr.bond.service.CfetsEtrIbBondinfo002Service;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dao.CfetsEtrBondFirstBid001Mapper;
-import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBid002Dto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoRequest;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIssueInfoDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIssueInfoRequest;
 import com.joyintech.tams.common.base.dao.WflEtrEntrustMapper;
 import com.joyintech.tams.common.base.entity.SppiImportData;
-import com.joyintech.tams.common.base.entity.WflEtrEntrust;
-import com.joyintech.tams.common.base.entity.WflEtrEntrustKey;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
-import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -123,10 +117,10 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
         pageParam.put("year", year);
         pageParam.put("sort", dto.getPageMode().getSort());
         pageParam.put("direction", dto.getPageMode().getDirection());
-        String userId = "li02";
+        String userId = SecurityUtil.getLoginUser().getUserName();
 
         if (StringUtils.isNotEmpty(userId)) {
-            pageParam.put("userId", "li02");
+            pageParam.put("userId", userId);
             return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsEtrBondFirstBid001Mapper.findEtrInfoPage(pageParam));
         } else {
             return null;
@@ -161,7 +155,6 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
 
         Map<String, Object> pageParam = BeanUtil.object2Map(search);
         pageParam.put("TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue());
-        pageParam.put("TRADE_MARKET_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
         pageParam.put("TRADE_MARKET_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
 
         PageHelper.startPage(search.getPageMode().getPageNo(), search.getPageMode().getPageSize());
@@ -226,82 +219,82 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
         return null;
     }
 
-    public Message<AjaxResult> closeCheckDelegate(CfetsEtrBondFirstBid002Dto dto) {
-        //对选择的数据进行check
-        AjaxResult ajaxResult = closeDelegateCheckMethod(dto);
-        return new Message<AjaxResult>().success().setData(ajaxResult);
-    }
-
-    /**
-     * 委托关闭检查
-     *
-     * @param dto
-     * @return
-     */
-    private AjaxResult closeDelegateCheckMethod(CfetsEtrBondFirstBid002Dto dto) {
-        if (CollectionUtils.isEmpty(dto.getSelectedItem())) {
-            AjaxResult res = new AjaxResult();
-            ValidMessage validMessage = new ValidMessage();
-            validMessage.setMessage(getMessage("COMMON_E_0002"));
-            res.setErrorList(Arrays.asList(validMessage));
-            return res;
-        }
-        List<CfetsEtrBondFirstBid002Dto> selectedItem = dto.getSelectedItem();
-        AjaxResult ajaxResult = new AjaxResult();
-        List<String> entrustIds = new ArrayList<>();
-        for (CfetsEtrBondFirstBid002Dto Item : selectedItem) {
-            if (StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托状态_流程中.getValue())) {
-                AjaxResult res = new AjaxResult();
-                ValidMessage validMessage = new ValidMessage();
-                validMessage.setMessage("流程中的数据不允许关闭");
-                res.setErrorList(Arrays.asList(validMessage));
-                return res;
-            }
-            if (StringUtil.isNotEmpty(Item.getEntrustId())) {
-                WflEtrEntrustKey wflEtrEntrustKey = new WflEtrEntrustKey();
-                wflEtrEntrustKey.setEntrustId(Item.getEntrustId());
-                wflEtrEntrustKey.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
-                WflEtrEntrust wflEtrEntrust = wflEtrEntrustMapper.selectByPrimaryKey(wflEtrEntrustKey);
-                if (wflEtrEntrust != null) {
-                    AjaxResult res = new AjaxResult();
-                    ValidMessage validMessage = new ValidMessage();
-                    validMessage.setMessage("存在流程中数据，无法关闭。");
-                    res.setErrorList(Arrays.asList(validMessage));
-                    return res;
-                }
-            }
-            entrustIds.add(Item.getEntrustId());
-        }
-        Map<String, Object> param = new HashMap<>();
-        param.put("entrustIds", entrustIds);
-        ajaxResult.setErrorList(entrustCheckCloseList(param));
-        return ajaxResult;
-    }
-
-    /**
-     * 委托关闭check
-     *
-     * @param param
-     * @return
-     */
-    private List<ValidMessage> entrustCheckCloseList(Map<String, Object> param) {
-        List<ValidMessage> errorList = new ArrayList<ValidMessage>();
-        @SuppressWarnings("unchecked")
-        List<String> entrustIds = (List<String>) param.get("entrustIds");
-        if (StringUtil.isNotEmpty(entrustIds)) {
-            for (String entrustId : entrustIds) {
-                String flag = "1";
-                if (StringUtil.equals("1", flag)) {
-                    errorList.add(new ValidMessage("已接收、已退回和已撤回,才能执行关闭操作！" + "指令编号：" + entrustId));
-                } else if (StringUtil.equals("2", flag)) {
-                    errorList.add(new ValidMessage("已接收指令，指令执行进度、成交进度要为0，且不存在在途委托/报价/交易，才可进行关闭。" + "指令编号：" + entrustId));
-                }
-            }
-        }
-        return errorList;
-    }
-
-    public Message<AjaxResult> closeDelegate(CfetsEtrBondFirstBid002Dto dto) {
-        return null;
-    }
+//    public Message<AjaxResult> closeCheckDelegate(CfetsEtrBondFirstBid002Dto dto) {
+//        //对选择的数据进行check
+//        AjaxResult ajaxResult = closeDelegateCheckMethod(dto);
+//        return new Message<AjaxResult>().success().setData(ajaxResult);
+//    }
+//
+//    /**
+//     * 委托关闭检查
+//     *
+//     * @param dto
+//     * @return
+//     */
+//    private AjaxResult closeDelegateCheckMethod(CfetsEtrBondFirstBid002Dto dto) {
+//        if (CollectionUtils.isEmpty(dto.getSelectedItem())) {
+//            AjaxResult res = new AjaxResult();
+//            ValidMessage validMessage = new ValidMessage();
+//            validMessage.setMessage(getMessage("COMMON_E_0002"));
+//            res.setErrorList(Arrays.asList(validMessage));
+//            return res;
+//        }
+//        List<CfetsEtrBondFirstBid002Dto> selectedItem = dto.getSelectedItem();
+//        AjaxResult ajaxResult = new AjaxResult();
+//        List<String> entrustIds = new ArrayList<>();
+//        for (CfetsEtrBondFirstBid002Dto Item : selectedItem) {
+//            if (StringUtil.equals(Item.getEntrustStatus(), BussinessDictCodeList.委托状态_流程中.getValue())) {
+//                AjaxResult res = new AjaxResult();
+//                ValidMessage validMessage = new ValidMessage();
+//                validMessage.setMessage("流程中的数据不允许关闭");
+//                res.setErrorList(Arrays.asList(validMessage));
+//                return res;
+//            }
+//            if (StringUtil.isNotEmpty(Item.getEntrustId())) {
+//                WflEtrEntrustKey wflEtrEntrustKey = new WflEtrEntrustKey();
+//                wflEtrEntrustKey.setEntrustId(Item.getEntrustId());
+//                wflEtrEntrustKey.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
+//                WflEtrEntrust wflEtrEntrust = wflEtrEntrustMapper.selectByPrimaryKey(wflEtrEntrustKey);
+//                if (wflEtrEntrust != null) {
+//                    AjaxResult res = new AjaxResult();
+//                    ValidMessage validMessage = new ValidMessage();
+//                    validMessage.setMessage("存在流程中数据，无法关闭。");
+//                    res.setErrorList(Arrays.asList(validMessage));
+//                    return res;
+//                }
+//            }
+//            entrustIds.add(Item.getEntrustId());
+//        }
+//        Map<String, Object> param = new HashMap<>();
+//        param.put("entrustIds", entrustIds);
+//        ajaxResult.setErrorList(entrustCheckCloseList(param));
+//        return ajaxResult;
+//    }
+//
+//    /**
+//     * 委托关闭check
+//     *
+//     * @param param
+//     * @return
+//     */
+//    private List<ValidMessage> entrustCheckCloseList(Map<String, Object> param) {
+//        List<ValidMessage> errorList = new ArrayList<ValidMessage>();
+//        @SuppressWarnings("unchecked")
+//        List<String> entrustIds = (List<String>) param.get("entrustIds");
+//        if (StringUtil.isNotEmpty(entrustIds)) {
+//            for (String entrustId : entrustIds) {
+//                String flag = "1";
+//                if (StringUtil.equals("1", flag)) {
+//                    errorList.add(new ValidMessage("已接收、已退回和已撤回,才能执行关闭操作！" + "指令编号：" + entrustId));
+//                } else if (StringUtil.equals("2", flag)) {
+//                    errorList.add(new ValidMessage("已接收指令，指令执行进度、成交进度要为0，且不存在在途委托/报价/交易，才可进行关闭。" + "指令编号：" + entrustId));
+//                }
+//            }
+//        }
+//        return errorList;
+//    }
+//
+//    public Message<AjaxResult> closeDelegate(CfetsEtrBondFirstBid002Dto dto) {
+//        return null;
+//    }
 }

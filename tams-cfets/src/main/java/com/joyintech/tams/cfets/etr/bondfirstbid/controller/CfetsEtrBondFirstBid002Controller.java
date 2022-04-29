@@ -64,23 +64,6 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
     @Autowired
     private BaseGetBusinessId bussGetBussinessIdService;
 
-    @ResponseBody
-    @ApiOperation(value = "多组合指令新建保存/提交校验", notes = "多组合指令新建保存/提交校验")
-    @PostMapping("check")
-    public Message<AjaxResult> check(@RequestBody CfetsEtrBondFirstBidSaveRequest cfetsDto)
-            throws Exception {
-        try {
-            AjaxResult ajax = cfetsEtrBondFirstBid002Service.check(cfetsDto);
-            if (null != ajax) {
-                return new Message<AjaxResult>().success().setData(ajax);
-            } else {
-                return new Message<AjaxResult>().success();
-            }
-        } catch (Exception e) {
-            logger.error("多组合指令新建保存/提交校验异常", e);
-            return new Message<AjaxResult>().fail().setMessage("校验失败");
-        }
-    }
 
     @ResponseBody
     @PostMapping("/checkSave")
@@ -106,9 +89,7 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
 
         if (StringUtil.equals(cfetsDto.getOperateType(), OperationType.MODIFY.name())
                 && (StringUtil.equals(cfetsDto.getIssueClass(), DictCodeListExt4.新债_发行方式_招标发行.getValue())
-                || StringUtil.equals(cfetsDto.getIssueClass(), DictCodeListExt4.新债_发行方式_簿记建档.getValue())
-        )
-        ) {
+                || StringUtil.equals(cfetsDto.getIssueClass(), DictCodeListExt4.新债_发行方式_簿记建档.getValue()))) {
             //根据指令代码获取指令信息
             EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(cfetsDto.getEntrustId());
             //风控通过且投标量没有改高，不走流程直接更新原指令信息

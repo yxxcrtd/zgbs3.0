@@ -5,13 +5,16 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.tams.business.common.dto.CfetsEtrFinProductInfoRequest;
+import com.joyintech.tams.business.common.dto.CfetsEtrFinProductInfoResponse;
 import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.service.EtrCommonFinProductInfoService;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbdoRiskcalRequest;
-import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBid002Dto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoRequest;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIssueInfoDto;
@@ -19,7 +22,6 @@ import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIs
 import com.joyintech.tams.cfets.etr.bondfirstbid.service.CfetsEtrBondFirstBid001Service;
 import com.joyintech.tams.common.base.entity.SppiImportData;
 import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeListExt1;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -58,12 +60,15 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
     @Value("${cmdsWebSocketUrl}")
     private String cmdsWebSocketUrl;
 
+    @Autowired
+    private EtrCommonFinProductInfoService etrCommonFinProductInfoService;
+
+
     @ApiOperation(value = "查询页面初始化参数", notes = "查询页面初始化参数")
     @PostMapping("/getPageParams")
     @ResponseBody
     public Message<Map<String, Object>> getPageParams() {
         Map<String, Object> initPageParams = new HashMap<>();
-        initPageParams.put("FINPROD_TYPE_TG_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
 
         //一级投标指令画面待发行信息区域自动刷新时间(ms)
         initPageParams.put("cfetsEtrBondFirstBidInfo_issueTable_refresh_period", CacheUtil.getSysParam("cfetsEtrBondFirstBidInfo_issueTable_refresh_period"));
@@ -71,10 +76,10 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
         initPageParams.put("cfetsEtrBondFirstBidInfo_etrTable_refresh_period", CacheUtil.getSysParam("cfetsEtrBondFirstBidInfo_etrTable_refresh_period"));
 
         //CMDS地址
-        initPageParams.put("cmdsWebSocketUrl", cmdsWebSocketUrl);
-        initPageParams.put("NEED_WORKFLOW", true);
-        initPageParams.put("SHARES_TRADE_MARKET_02", DictCodeListExt1.交易市场_二级市场.getValue());
-        initPageParams.put("platDate", DateUtil.platDateFromCache());
+//        initPageParams.put("cmdsWebSocketUrl", cmdsWebSocketUrl);
+//        initPageParams.put("NEED_WORKFLOW", true);
+//        initPageParams.put("SHARES_TRADE_MARKET_02", DictCodeListExt1.交易市场_二级市场.getValue());
+//        initPageParams.put("platDate", DateUtil.platDateFromCache());
 
         //风险
         initPageParams.put("riskMathSwitch", CacheUtil.getSysParam("risk_math_switch"));
@@ -88,6 +93,10 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
         initPageParams.put("FIRST_BID_STATUS", this.getSelectDataFromDataDic(DictCode.一级投标中标状态, null));
         initPageParams.put("BUSINESS_MODEL", this.getSelectDataFromDataDic(DictCode.业务模式, null));
 
+        //当前平台日
+        initPageParams.put("platDate", DateUtil.platDateFromCache());
+        //当前用户
+        initPageParams.put("userId", SecurityUtil.getLoginUser().getUserName());
         //pageId
         initPageParams.put("pageId", this.getPageId());
         return new Message<Map<String, Object>>(initPageParams).success();
@@ -244,18 +253,33 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
         }
     }
 
-    @PostMapping("closeCheck")
-    @ApiOperation(value = "关闭委托check", notes = "关闭委托check")
+    @PostMapping("/getEtrFinProductInfo/{finprodId:.+}")
+    @ApiOperation(value = "债券信息查询功能", notes = "债券信息查询功能")
     @ResponseBody
-    public Message<AjaxResult> closeDelegateCheck(@RequestBody CfetsEtrBondFirstBid002Dto dto) throws Exception{
-        return cfetsEtrBondFirstBid001Service.closeCheckDelegate(dto);
+    public Message<CfetsEtrFinProductInfoResponse> getEtrFinProductInfo(@PathVariable String finprodId) {
+        try {
+            CfetsEtrFinProductInfoRequest dto = new CfetsEtrFinProductInfoRequest();
+            dto.setFinprodId(finprodId);
+            CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoService.findFinProductInfo(null, null, dto);
+            return new Message<>(finProductInfo).success().setData(finProductInfo);
+        } catch (Exception e) {
+            logger.error("查询功能异常", e);
+            return new Message<CfetsEtrFinProductInfoResponse>().fail().setMessage("查询异常");
+        }
     }
 
-    @PostMapping("close")
-    @ApiOperation(value = "关闭委托", notes = "关闭委托")
-    @ResponseBody
-    public Message<AjaxResult> closeDelegate(@RequestBody CfetsEtrBondFirstBid002Dto dto) throws Exception {
-        return cfetsEtrBondFirstBid001Service.closeDelegate(dto);
-    }
+//    @PostMapping("closeCheck")
+//    @ApiOperation(value = "关闭委托check", notes = "关闭委托check")
+//    @ResponseBody
+//    public Message<AjaxResult> closeDelegateCheck(@RequestBody CfetsEtrBondFirstBid002Dto dto) throws Exception{
+//        return cfetsEtrBondFirstBid001Service.closeCheckDelegate(dto);
+//    }
+//
+//    @PostMapping("close")
+//    @ApiOperation(value = "关闭委托", notes = "关闭委托")
+//    @ResponseBody
+//    public Message<AjaxResult> closeDelegate(@RequestBody CfetsEtrBondFirstBid002Dto dto) throws Exception {
+//        return cfetsEtrBondFirstBid001Service.closeDelegate(dto);
+//    }
 
 }
