@@ -57,6 +57,7 @@
 			c.TYPE_4 AS type4, /**分类4**/
 			c.TYPE_5 AS type5, /**分类5**/
 			c.TYPE_6 AS type6, /**分类6**/
+		    c.TYPE_18 as type18, /**分类18**/
 			a.REGIST_ORG registOrg /**登记托管机构**/
 			FROM
 			FIN_PRODUCT a
@@ -130,6 +131,7 @@
 		       null AS type4, /**分类4**/
 		       null AS type5, /**分类5**/
 		       null AS type6, /**分类6**/
+		       c.TYPE_18 as type18, /**分类18**/
 		       null registOrg /**登记托管机构**/
 		    FROM
 		    FIN_trade_PRODUCT a

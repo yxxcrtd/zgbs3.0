@@ -29,7 +29,10 @@ import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto.DrawB
 import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto.DrawBaseInfoSelectComResult;
 import com.joyintech.tams.valuation.batch.common.finproduct.service.FinProductCommonService;
 import com.joyintech.tams.valuation.batch.investratechange.dto.InvestRateChangeResult;
-import com.joyintech.tams.valuation.common.batch.finproduct.entity.*;
+import com.joyintech.tams.valuation.common.batch.finproduct.entity.TargetCashCalcRule;
+import com.joyintech.tams.valuation.common.batch.finproduct.entity.TargetCashPlan;
+import com.joyintech.tams.valuation.common.batch.finproduct.entity.TargetFinProduct;
+import com.joyintech.tams.valuation.common.batch.finproduct.entity.TradeInfoDto;
 import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrueNew;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.common.constants.ValDictCodeList;
@@ -105,7 +108,6 @@ public class IrsCalBookNewService {
         // 1.1 定义变量
         BigDecimal costBalance = BigDecimal.ZERO;// 变量.成本科目余额
         BigDecimal interest = BigDecimal.ZERO;// 变量.应收利息
-        BigDecimal costNum = BigDecimal.ZERO;// 变量.数量
         BigDecimal interestBlanceForYstVar = BigDecimal.ZERO;// 变量.应收利息前一日余额
         // 账套核算参数查询
         List<String> paramCodeList = new ArrayList<String>();
@@ -146,7 +148,6 @@ public class IrsCalBookNewService {
                             DictCodeBaseSubjectNatrueNew.应收利率互换.getValue(), taskPri);
                     costBalance = subjectBalance.getBalance();
                     // 变量.当日成本科目数量
-                    costNum = subjectBalance.getNum();
                     interestBlanceForYstVar = this.getSubjectBalance(dto.getBooksetId(),
                             dto.getBokDetailId(), happenDateNow, bookDateNow,
                             DictCodeList.余额方向_借方.getValue(), DictCodeBaseSubjectNatrueNew.利率互换应收利息.getValue(),
@@ -157,7 +158,6 @@ public class IrsCalBookNewService {
                             DictCodeBaseSubjectNatrueNew.应付利率互换.getValue(), taskPri);
                     costBalance = subjectBalance.getBalance();
                     // 变量.当日成本科目数量
-                    costNum = subjectBalance.getNum();
                     interestBlanceForYstVar = this.getSubjectBalance(dto.getBooksetId(),
                             dto.getBokDetailId(), happenDateNow, bookDateNow,
                             DictCodeList.余额方向_借方.getValue(), DictCodeBaseSubjectNatrueNew.利率互换应付利息.getValue(),
@@ -232,7 +232,7 @@ public class IrsCalBookNewService {
             mstValIrs.setDatasourceType(DictCodeListRsk.估值来源_行内.getValue());//数据来源行内
             mstValIrs.setValDate(happenDate);	//估值日期
             mstValIrs.setValuation(dfDealDto.getIntrest());
-            mstValIrs.setValmodelId(DictCodeListExt4.利率互换估值模型_收付轧差.getValue());		//估值模型-收付轧差
+            mstValIrs.setValmodelId(DictCodeListExt4.利率互换估值模型_应收应付轧差.getValue());		//估值模型-收付轧差
             mstValIrs.setCcy(dfDealDto.getCcy());		//币种
             mstValIrs.setInputType(DictCodeListExt1.录入方式_批处理生成.getValue());
             mstValIrsList.add(mstValIrs);
@@ -447,36 +447,6 @@ public class IrsCalBookNewService {
         Date yesterday = calendar.getTime();// 获得前一天
 
         return yesterday;
-    }
-
-    /**
-     * 获取标的基本信息
-     *
-     * @param bokDetailId 账务明细代码
-     * @return TargetFinProduct 标的基本信息
-     * @see
-     * @since 1.0
-     */
-    private TargetFinProduct getTargetFinProduct(String bokDetailId) {
-        // 定义查询list
-        List<TargetSearchDto> targetSearchDtoList = new ArrayList<TargetSearchDto>();
-        // 定义查询类型 实体类
-        TargetSearchDto targetSearchDto = new TargetSearchDto();
-        targetSearchDto.setQueryType(ValDictCodeList.标的_信息.getValue());
-        // 查询实体类塞入查询实体类List中
-        targetSearchDtoList.add(targetSearchDto);
-
-        // 获取标的信息
-        Map<TargetSearchDto, Object> targetMap = finProductCommonService.getTargetInfo(bokDetailId,
-                targetSearchDtoList);
-        TargetFinProduct targetFinProduct = (TargetFinProduct) targetMap.get(targetSearchDto);
-
-        // 确保不为null
-        if (targetFinProduct == null) {
-            targetFinProduct = new TargetFinProduct();
-        }
-
-        return targetFinProduct;
     }
 
 }

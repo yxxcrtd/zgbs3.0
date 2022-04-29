@@ -22,6 +22,7 @@ import com.joyintech.framework.util.StringUtil;
  * @since 1.0
  */
 public enum DictCodeBaseSubjectNatrueNew implements IDictCode {
+    利率互换公允价值变动("LVHH_GYJZBD"),
     /**
      * 应收利率互换
      */

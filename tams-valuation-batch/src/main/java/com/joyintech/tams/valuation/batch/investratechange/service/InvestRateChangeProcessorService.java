@@ -306,7 +306,7 @@ public class InvestRateChangeProcessorService {
     		mstValIrs.setDatasourceType(DictCodeListRsk.估值来源_行内.getValue());		//数据来源行内
     		mstValIrs.setValDate(happenDate);	//估值日期
     		mstValIrs.setValuation(dfDealDto.getFudongYinkui());
-    		mstValIrs.setValmodelId(DictCodeListExt4.利率互换估值模型_单曲贴现.getValue());		//估值模型-单曲贴现
+    		mstValIrs.setValmodelId(DictCodeListExt4.利率互换估值模型_DCF现金流折现.getValue());		//估值模型-单曲贴现
     		mstValIrs.setCcy(dfDealDto.getCcy());		//币种
     		mstValIrs.setInputType(DictCodeListExt1.录入方式_批处理生成.getValue());
     		mstValIrsList.add(mstValIrs);

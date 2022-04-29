@@ -448,6 +448,10 @@ public class BookCommonLogic {
         // 账务明细代码1->交易类账务处理结果.账务明细代码
         accountSceneMap.put(BookConstant.BOK_DETAIL_ID1,
             getValBokDetailId(dto.getFinprodId(), param.getBokDetailId(), null,dto.getCcy()));
+        accountSceneMap.put(BookConstant.BOK_DETAIL_TRADEFEE,
+                getValBokDetailId(dto.getFinprodId(), param.getBokDetailId(), null,dto.getCcy()));
+        accountSceneMap.put(BookConstant.BOK_DETAIL_SETTLEMENTFEE,
+                getValBokDetailId(dto.getFinprodId(), param.getBokDetailId(), null,dto.getCcy()));
         // 账务明细代码2 ->交易明细.本方资金账户 == null? Null:调用账务明细代码共通（交易明细.本方资金账户,“现金类”)
         if (dto.getMyAcctNo() != null) {
             accountSceneMap.put(BookConstant.BOK_DETAIL_ID2,

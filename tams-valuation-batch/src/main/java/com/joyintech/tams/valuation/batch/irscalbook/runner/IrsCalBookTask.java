@@ -19,6 +19,7 @@ import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.reader.Dr
 import com.joyintech.tams.valuation.batch.investratechange.writer.InvestRateChangeWriter;
 import com.joyintech.tams.valuation.batch.irscalbook.processor.IrsCalBookProcessor;
 import com.joyintech.tams.valuation.batch.irscalbook.service.IrsReaderParameterGenerator;
+import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.common.constants.InitConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,6 +85,7 @@ public class IrsCalBookTask extends BatchBaseService  {
         
         // 设置此task的序列任务公用的params参数
         Map<String, Object> params = new HashMap<>();
+        params.put(GlobalConstant.BATCH_INFO, this.getBatchExecuteInfo());
         params.put(InitConstant.BATCH_FETCH_READE, IrsReaderParameterGenerator.BEAN_NAME);
         // 各步骤设置参数
         step1Reader.setParams(params);
