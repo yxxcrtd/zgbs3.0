@@ -22,10 +22,10 @@ public interface StlSettleTransDataGatherMapper {
 
     /**
      * 查询数据
-     * @param param 查询参数
+     * @param map 查询参数
      * @return 交易编号列表
      */
-    List<StlSettleTransDataGatherDto> selectNeedTotalDataList(@Param("dealDate")Date dealDate,@Param("matchStatus")String matchStatus,@Param("checkResult1")String checkResult1,@Param("checkResult3")String checkResult3,@Param("PS_T05")String PS_T05);
+    List<StlSettleTransDataGatherDto> selectNeedTotalDataList(Map<String,Object> map);
 
     int batchInsetSettleTransDataTotal(@Param("inputList") List<SettleTransDataTotal> inputList);
 
