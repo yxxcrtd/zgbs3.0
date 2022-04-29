@@ -45,7 +45,12 @@
 			t.TRADE_AMT redConfirmAmt,/**确认金额**/
 			t.SHARE_AMT redConfirmNum,/**确认数量**/
 			t.UNIT_CPRICE redUnitValue,/**单位净值**/
-			t.MY_ACCT_NO  redMyAcctNo/**资金账户**/
+			t.MY_ACCT_NO  redMyAcctNo,/**资金账户**/
+			t.TRADE_DATE subConfirmDate,/**确认日期**/
+			t.TRADE_AMT subConfirmAmt,/**确认金额**/
+			t.SHARE_AMT subConfirmNum,/**确认数量**/
+			t.INT_AMT raiseInterest,/**募集期利息**/
+			t.MY_ACCT_NO  subConfirmMyAcctNo/**资金账户**/
 		FROM TRD_PRODUCT_DEAL t
 		LEFT JOIN TRD_PRODUCT_DEAL_ADD d on t.TRADE_ID = d.TRADE_ID
 		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
