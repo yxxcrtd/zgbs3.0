@@ -135,6 +135,7 @@ public class BondFinInterestFactorDto {
      * 净投资收益率
      */
     private BigDecimal investRate;
+
     private BigDecimal Rate;
     /**
      * 现金流信息entity

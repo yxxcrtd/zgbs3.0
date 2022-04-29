@@ -60,6 +60,9 @@ public class FinTenderBondAsset001Dto extends BaseDto {
     @ApiModelProperty(name = "issuer", value = "发行人")
     private String issuer;
 
+    @ApiModelProperty(name = "issuerName", value = "发行人名称")
+    private String issuerName;
+
     @ApiModelProperty(name = "issueType", value = "募集方式")
     private String issueType;
 
@@ -218,7 +221,11 @@ public class FinTenderBondAsset001Dto extends BaseDto {
     }
 
     public String getIssueStageValue() {
-        return SysDataUtil.getNameFromDataDict(DictCode.发行阶段, this.issueStage);
+        if(this.issueStage != null){
+            return SysDataUtil.getNameFromDataDict(DictCode.发行阶段, this.issueStage);
+        }else{
+            return issueStageValue;
+        }
     }
 
     public void setIssueStageValue(String issueStageValue) {
@@ -306,7 +313,7 @@ public class FinTenderBondAsset001Dto extends BaseDto {
     }
 
     public String getIssueTypeValue() {
-        return SysDataUtil.getNameFromDataDict(DictCode.发行方式, this.issueType);
+        return SysDataUtil.getNameFromDataDict(DictCode.募集方式, this.issueType);
     }
 
     public void setIssueTypeValue(String issueTypeValue) {
@@ -370,7 +377,7 @@ public class FinTenderBondAsset001Dto extends BaseDto {
     }
 
     public String getIssueStyleValue() {
-        return SysDataUtil.getNameFromDataDict(DictCode.发行类型, this.tenderTarget);
+        return SysDataUtil.getNameFromDataDict(DictCode.发行类型, this.issueStyle);
     }
 
     public void setIssueStyleValue(String issueStyleValue) {
@@ -506,7 +513,7 @@ public class FinTenderBondAsset001Dto extends BaseDto {
     }
 
     public String getIntTypeValue() {
-        return SysDataUtil.getNameFromDataDict(DictCode.利率类型, this.tenderTarget);
+        return SysDataUtil.getNameFromDataDict(DictCode.利率类型, this.intType);
     }
 
     public void setIntTypeValue(String intTypeValue) {
@@ -679,5 +686,13 @@ public class FinTenderBondAsset001Dto extends BaseDto {
 
     public void setOperateType(String operateType) {
         this.operateType = operateType;
+    }
+
+    public String getIssuerName() {
+        return issuerName;
+    }
+
+    public void setIssuerName(String issuerName) {
+        this.issuerName = issuerName;
     }
 }

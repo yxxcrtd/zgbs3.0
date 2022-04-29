@@ -18,6 +18,9 @@ public class CfetsTrdBondFirstSubInitRequest {
     @ApiModelProperty(name = "workflowId", value = "工作流代码", example = "104123904810")
     private String workflowId;
 
+    @ApiModelProperty(name = "bidId", value = "交易编号,申购交易查看", example = "104123904810")
+    private String bidId;
+
     public List<CfetsTrdBondFirstSubEntrustDto> getEntrustDtos() {
         return entrustDtos;
     }
@@ -32,5 +35,13 @@ public class CfetsTrdBondFirstSubInitRequest {
 
     public void setWorkflowId(String workflowId) {
         this.workflowId = workflowId;
+    }
+
+    public String getBidId() {
+        return bidId;
+    }
+
+    public void setBidId(String bidId) {
+        this.bidId = bidId;
     }
 }

@@ -81,11 +81,17 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
     @ApiModelProperty(name = "bidId", value = "投标编号,编辑页面/提交用", example = "111")
     private String bidId;
 
-    @ApiModelProperty(name = "operateType", value = "操作类型,编辑页面/提交用", example = "save")
+    @ApiModelProperty(name = "operateType", value = "操作类型,编辑页面/提交用", example = "NEW")
     private String operateType;
 
-    @ApiModelProperty(name = "elementId", value = "提交要素,编辑页面/提交用", example = "save")
+    @ApiModelProperty(name = "elementId", value = "提交要素,编辑页面/提交用", example = "TenderBondSub002_btn_save")
     private String elementId;
+
+    @ApiModelProperty(name = "softSkipMode", value = "是否忽略头寸软控,编辑页面/提交用", example = "Y")
+    private String softSkipMode;
+
+    @ApiModelProperty(name = "systemAct", value = "头寸_系统动作,编辑页面/提交用", example = "Y")
+    private String systemAct;
 
     public String getValidStatus() {
         return validStatus;
@@ -99,7 +105,7 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
         if (StringUtil.isEmpty(getValidStatus())) {
             return StringUtil.EMPTY;
         }
-        return SysDataUtil.getNameFromDataDict(DictCode.有效状态, getValidStatus());
+        return SysDataUtil.getNameFromDataDict(DictCode.交易流程状态, getValidStatus());
     }
 
     public void setValidStatusStr(String validStatusStr) {
@@ -275,6 +281,22 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
 
     public void setElementId(String elementId) {
         this.elementId = elementId;
+    }
+
+    public String getSoftSkipMode() {
+        return softSkipMode;
+    }
+
+    public void setSoftSkipMode(String softSkipMode) {
+        this.softSkipMode = softSkipMode;
+    }
+
+    public String getSystemAct() {
+        return systemAct;
+    }
+
+    public void setSystemAct(String systemAct) {
+        this.systemAct = systemAct;
     }
 }
 

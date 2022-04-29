@@ -22,11 +22,13 @@ import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.business.asset.tenderbond.dao.FinTenderBondAssetMapper;
 import com.joyintech.tams.business.asset.tenderbond.dto.*;
+import com.joyintech.tams.invest.common.asset.dao.AssetCommon002Mapper;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -59,6 +61,9 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
 
     @Resource
     private FinProductIssueMapper finProductIssueMapper;
+
+    @Autowired
+    private AssetCommon002Mapper assetCommonMapper;
 
     @Resource
     private IPlatformDate iPlatformDate;
@@ -95,7 +100,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
      */
     public Page<FinTenderBondAsset001Dto> selectForPage(FinTenderBondAssetSearch search) {
         search.setPlatformDate(iPlatformDate.getSysDateStr());
-        search.setFinprodType2(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+        search.setFinprodType2(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
         PageHelper.startPage(search.getPageMode().getPageNo(), search.getPageMode().getPageSize());
         List<FinTenderBondAsset001Dto> list = finTenderBondAssetMapper.selectForPage(search);
         return new Page<>(PageInfo.of(list));
@@ -144,7 +149,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
      */
     public FinTenderBondAsset002Dto addCoupons(String finprodMarketId) {
         Map<String, String> param = new HashMap<>();
-        param.put("finprodType2", DictCodeListExt2.平安资产类型_一级市场债.getValue());
+        param.put("finprodType2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
         param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
         param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
         param.put("finprodMarketId", finprodMarketId);
@@ -165,7 +170,16 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
     public FinTenderBondAsset002Dto getFromInterface(Map<String, String> param) {
         FinTenderBondAsset002Dto dto = finTenderBondAssetMapper.getProductFromInterface(param);
         if(dto == null) return dto;
-        //TODO 这里要将万德德类型转换未前端展示类型
+        FinProductTypeConfig config = new FinProductTypeConfig();
+        config.setConfigType(DictCodeListExt2.配置类型_WIND分类.getValue());
+        config.setOutputValue1(dto.getType9());
+        config.setOutputValue2(dto.getType10());
+        List<FinProductTypeConfig> resultTypeList = assetCommonMapper.getAssetThreeType(config);
+        if(CollectionUtils.isNotEmpty(resultTypeList)) {
+            dto.setType9(resultTypeList.get(0).getInputValue2());
+            dto.setType10(resultTypeList.get(0).getInputValue3());
+            dto.setType11(resultTypeList.get(0).getInputValue4());
+        }
         FinProductAddDto addDto = finTenderBondAssetMapper.getProductAddFromInterface(param);
         if(addDto != null) {
             if(StringUtil.isNotEmpty(addDto.getCrossMarketCode())) {
@@ -197,8 +211,8 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         }
         //1.保存金融产品标的表
         //金融产品类型_资产代码_增发批次_交易场所进行拼接
-        dto.setFinprodType2(DictCodeListExt2.平安资产类型_一级市场债.getValue());
-        dto.setFinprodType(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+        dto.setFinprodType2(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+        dto.setFinprodType(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
         dto.setFinprodId(getFinprodId(dto));
         FinProduct finProduct = new FinProduct();
         BeanUtil.copyPropertiesIgnoreNull(finProduct, dto);
@@ -217,11 +231,17 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         FinProductType finProductType = new FinProductType();
         BeanUtil.copyPropertiesIgnoreNull(finProductType, dto);
         finProductType.setBranch(0l);
-        //TODO 这里需要通过映射表增加type6/type7的类型
-        //finProductType.setType6(dto.getType4());
-        //finProductType.setType7(dto.getType5());
         finProductType.setType8(DictCodeListExt2.平安资产类型_一级市场债.getValue());
-
+        FinProductTypeConfig config = new FinProductTypeConfig();
+        config.setConfigType(DictCodeListExt2.配置类型_WIND分类.getValue());
+        config.setInputValue2(dto.getType9());
+        config.setInputValue3(dto.getType10());
+        config.setInputValue4(dto.getType11());
+        FinProductTypeConfig resultType = finTenderBondAssetMapper.getWindType(config);
+        if(Objects.nonNull(resultType)) {
+            finProductType.setType6(resultType.getOutputValue1());
+            finProductType.setType7(resultType.getOutputValue2());
+        }
         finProductTypeMapper.insert(finProductType);
     }
 
@@ -277,7 +297,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
      * @return
      */
     public Page<SelectOptionDto> getFinprodIdForSelect(Map<String, Object> param) {
-        param.put("finprodType2", DictCodeListExt2.平安资产类型_一级市场债.getValue());
+        param.put("finprodType2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
         param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
         param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
         param.put("platDate", DateUtil.platDateFromCache());
@@ -293,7 +313,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
      * @return
      */
     public Page<SelectOptionDto> getAppearMarketIdForSelect(Map<String, Object> param) {
-        param.put("finprodType2", DictCodeListExt2.平安资产类型_一级市场债.getValue());
+        param.put("finprodType2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
         param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
         param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
         param.put("platDate", DateUtil.platDateFromCache());
@@ -419,6 +439,11 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         if (StringUtil.equals(operateType, OperationType.NEW.name())) {
             this.emptyCheck(dto, validList);
             if (StringUtil.isNotEmpty(dto.getFinprodMarketId()) && StringUtil.isNotEmpty(dto.getTradeMarket())) {
+                Map<String, String> param = new HashMap<>();
+                param.put("finprodMarketId", dto.getFinprodMarketId());
+                if(StringUtil.isNotEmpty(finTenderBondAssetMapper.selectFinprodId(param))) {
+                    validList.add(new ValidMessage("资产代码已存在"));
+                }
                 String finprodId = getFinprodId(dto);
                 FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
                 if (Objects.nonNull(finProduct)) { //同一资产代码只能存在一条数据
@@ -474,7 +499,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
      */
     public String getFinprodId(FinTenderBondAsset002Dto dto) {
         String[] arr = dto.getFinprodMarketId().split("\\.");
-        return String.format("%s_%s_%d_%s_%s.%s", DictCodeListExt2.平安资产类型_一级市场债.getValue(), arr[0],
+        return String.format("%s_%s_%d_%s_%s.%s", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue(), arr[0],
                 dto.getIssueDto().getAddBatch(), dto.getTradeMarket(), DateUtil.format(dto.getProductAddDto().getBidDate(), "yyyyMMdd"), arr[1]);
     }
 

@@ -188,7 +188,7 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
         }
         //add by yujiaping 2021-1-6 解决ZGBS-139 计划类净值型卖出交易提交后（流程中），没有占用资产可用持仓 start
         else if ((DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue().equals(deal.getFinprodType2())
-                && (DictCodeList.收益类型_净值型.getValue().equals(profitType)))             
+                && (DictCodeList.收益类型_净值型.getValue().equals(profitType)))
               && (DictCodeList.交易方向_卖出.getValue().equals(deal.getPs())
                 /*|| DictCodeList.交易方向_赎回.getValue().equals(deal.getPs())*/)) {
                  resultDto.setCdate(deal.getTradeDate());
@@ -299,7 +299,7 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
 
         /*
          * 1 输入金融产品交易Entity.金融产品类型（投管分类）in (“正回购”,“逆回购”) and 金融产品交易Entity.交易场所 = 数据字典缓存.交易场所.银行间 and 金融产品交易Entity.交易方向 in （“到期”）
-         *  
+         *
          */
         else if ((正回购_逆回购.contains(deal.getFinprodType2()) && DictCodeListExt1.交易场所_银行间.getValue().equals(deal.getTradeMarket())
                   && DictCodeList.交易方向_到期.getValue().equals(deal.getPs())) ) {
@@ -336,11 +336,11 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
             /**** 回购释放头寸处理*****chenlei1*add***end **/
             return result;
         }
-        /* 
+        /*
          * 2 输入金融产品交易Entity.金融产品类型（投管分类）in (“拆入”,“拆出”) and 金融产品交易Entity.交易方向 in （“到期”）
          *
          */
-        else if (拆入_拆出.contains(deal.getFinprodType2()) && 
+        else if (拆入_拆出.contains(deal.getFinprodType2()) &&
         		(DictCodeList.交易方向_到期.getValue().equals(deal.getPs()) || DictCodeList.交易方向_卖出.getValue().equals(deal.getPs()) ) ) {
               resultDto.setCdate(deal.getSettleDate());
               resultDto.setAmount(ArithmeticUtil.multiply(deal.getShareAmt(), new BigDecimal(-1)));
@@ -367,7 +367,7 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                           result.add(resultDto);
                       }
                   }
-        
+
               }
               else {
                   result.add(resultDto);
@@ -400,7 +400,7 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
             if (!DictCodeList.交易方向_赎回确认.getValue().equals(deal.getPs()) && !DictCodeList.交易方向_赎回.getValue().equals(deal.getPs())){
                 resultDto.setCdate(deal.getTradeDate());
                 resultDto.setAmount(ArithmeticUtil.multiply(deal.getShareAmt(), new BigDecimal(-1)));
-                result.add(resultDto);    
+                result.add(resultDto);
             }
             if (inputDto.getPositionType().equals(DictCodeList.持仓类型_可用.getValue()) && DictCodeList.交易方向_赎回.getValue().equals(deal.getPs())) {
                 resultDto.setCdate(deal.getTradeDate());
@@ -1153,6 +1153,8 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
             resultDto.setOrderId(stlPayOrder.getOrderId());
             // 流程id
             resultDto.setWorkflowId(stlPayOrder.getWorkflowId());
+            // 指令代码
+            resultDto.setEntrustId(dealAdd.getEntrustId());
             // 金融产品交易Entity.金融产品代码
             String chlId = null;
             if (StringUtil.isNotEmpty(deal.getChlId())) {
@@ -1275,7 +1277,7 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                 resultDto.setSplitType(DictCodeListExt3.拆分标识_已拆分.getValue());
                 result.add(resultDto);
                 return result;
-            } 
+            }
             /*
              * 输入金融产品交易Entity.金融产品类型（投管分类）= 数据字典缓存.金融产品类型（投管分类).债券 and 金融产品交易Entity.交易场所 ！= 数据字典缓存.交易场所.银行间 and 金融产品交易Entity.交易方向 in （“买入”）and 金融产品交易Entity.交易平台
              * in （“场内交易”） and 输入划款指令Entity.账户类型=数据字典.账户类型.交易所资金账户
@@ -1674,6 +1676,18 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                 return result;
             }
             //add by  liutf 20200108 end
+            // add by jiangpeng on 20220428 新增一级申购业务处理 start
+            else if (DictCodeList.持仓类型_可用.getValue().equals(inputDto.getPositionType())
+                    && DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(deal.getFinprodType2())
+                    && "ISSUE_CLASS_01".equals(assetType2)// 发行方式 报价发行
+                    && StringUtil.equals(DictCodeList.交易方向_买入.getValue(), deal.getPs())) {
+                resultDto.setCdate(stlPayOrder.getSettleDate());
+                // 扣减现金 应缴款金额
+                resultDto.setAmount(ArithmeticUtil.multiply(stlPayOrder.getSettleAmt(), new BigDecimal(-1)));
+                result.add(resultDto);
+                return result;
+            }
+            // add by jiangpeng on 20220428 新增一级申购业务处理 end
 
             // 2 只插入“实际”
             if (DictCodeList.持仓类型_实际.getValue().equals(inputDto.getPositionType())) {

@@ -15,11 +15,12 @@
         <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
         <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
         <result column="STATISTICAL_TIMES" property="statisticalTimes" jdbcType="DECIMAL" />
+        <result column="WORKFLOW_ID" property="workflowId" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
         SEQ_NO SEQ_NO, ENTRUST_ID ENTRUST_ID, OPER_TYPE OPER_TYPE, OPER_DATE OPER_DATE, OPER_TIME OPER_TIME, 
         BUSI_DES BUSI_DES, USER_ID USER_ID, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, 
-        CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME, STATISTICAL_TIMES STATISTICAL_TIMES
+        CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME, STATISTICAL_TIMES STATISTICAL_TIMES,WORKFLOW_ID
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -46,12 +47,12 @@
             OPER_DATE, OPER_TIME, BUSI_DES, 
             USER_ID, CREATE_USER, CREATE_DEPT, 
             CREATE_TIME, UPDATE_USER, UPDATE_TIME, 
-            STATISTICAL_TIMES)
+            STATISTICAL_TIMES,WORKFLOW_ID)
         values (#{seqNo,jdbcType=VARCHAR}, #{entrustId,jdbcType=VARCHAR}, #{operType,jdbcType=VARCHAR}, 
             #{operDate,jdbcType=DATE}, #{operTime,jdbcType=TIMESTAMP}, #{busiDes,jdbcType=VARCHAR}, 
             #{userId,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, 
             #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
-            #{statisticalTimes,jdbcType=DECIMAL})
+            #{statisticalTimes,jdbcType=DECIMAL}, #{workflowId,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.EtrEntrustOperHis" >
         insert into ETR_ENTRUST_OPER_HIS
@@ -95,6 +96,9 @@
             <if test="statisticalTimes != null" >
                 STATISTICAL_TIMES,
             </if>
+            <if test="workflowId != null" >
+                WORKFLOW_ID,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="seqNo != null" >
@@ -135,6 +139,9 @@
             </if>
             <if test="statisticalTimes != null" >
                 #{statisticalTimes,jdbcType=DECIMAL},
+            </if>
+            <if test="workflowId != null" >
+                #{workflowId,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>
@@ -178,6 +185,9 @@
             <if test="statisticalTimes != null" >
                 STATISTICAL_TIMES = #{statisticalTimes,jdbcType=DECIMAL},
             </if>
+            <if test="workflowId != null" >
+                WORKFLOW_ID = #{workflowId,jdbcType=VARCHAR},
+            </if>
         </set>
         where SEQ_NO = #{seqNo,jdbcType=VARCHAR}
     </update>
@@ -191,7 +201,8 @@
             USER_ID = #{userId,jdbcType=VARCHAR},
             UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
             UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
-            STATISTICAL_TIMES = #{statisticalTimes,jdbcType=DECIMAL}
+            STATISTICAL_TIMES = #{statisticalTimes,jdbcType=DECIMAL},
+            WORKFLOW_ID = #{workflowId,jdbcType=VARCHAR}
         where SEQ_NO = #{seqNo,jdbcType=VARCHAR}
     </update>
 </mapper>

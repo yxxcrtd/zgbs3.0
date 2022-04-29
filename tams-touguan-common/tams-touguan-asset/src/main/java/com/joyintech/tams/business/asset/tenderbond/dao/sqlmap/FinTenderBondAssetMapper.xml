@@ -24,11 +24,11 @@
         SELECT  * from (
             SELECT
             CASE WHEN <![CDATA[
-                ISSUE.ISSUE_EDATE >= TO_DATE(#{platformDate},'YYYY-MM-DD')  or
+                ISSUE.ISSUE_DATE >= TO_DATE(#{platformDate},'YYYY-MM-DD')  or
                 PRODUCT_ADD.BID_DATE >= TO_DATE(#{platformDate},'YYYY-MM-DD')  THEN '01'
-            WHEN (ISSUE.ISSUE_EDATE < TO_DATE(#{platformDate},'YYYY-MM-DD') or
+            WHEN (ISSUE.ISSUE_DATE < TO_DATE(#{platformDate},'YYYY-MM-DD') or
                 PRODUCT_ADD.BID_DATE < TO_DATE(#{platformDate},'YYYY-MM-DD')) and PRODUCT.CIRCULATION_CODE is null THEN '02'
-            WHEN (ISSUE.ISSUE_EDATE < TO_DATE(#{platformDate},'YYYY-MM-DD') or
+            WHEN (ISSUE.ISSUE_DATE < TO_DATE(#{platformDate},'YYYY-MM-DD') or
                 PRODUCT_ADD.BID_DATE < TO_DATE(#{platformDate},'YYYY-MM-DD')) and PRODUCT.CIRCULATION_CODE is not null THEN '03'
                 ]]>
             ELSE NULL END AS issueStage,
@@ -38,13 +38,14 @@
             PRODUCT.TRADE_MARKET as tradeMarket,
             PRODUCT.REGIST_ORG as registOrg,
             PRODUCT.ISSUER as issuer ,
+            CUSTOMER_INFO.CUSTOMER_NAME as issuerName ,
             PRODUCT.ISSUE_TYPE as issueType,
             ISSUE.ISSUE_CLASS as issueClass,
             ISSUE.TENDER_TYPE as tenderType,
             ISSUE.TENDER_TARGET as tenderTarget,
             ISSUE.ISSUE_STYLE as issueStyle,
             round(ISSUE.PLAN_ISSUE_AMT/100000000,2) as planIssueAmt,
-            case when ISSUE.ISSUE_CLASS = '02' THEN ISSUE.ISSUE_SDATE else ISSUE.TENDER_SDATE end as issueDate,
+            nvl(ISSUE.ISSUE_DATE,PRODUCT_ADD.BID_DATE) as issueDate,
             ISSUE.PAY_EDATE as payEdate,
             ISSUE.ASSIGN_REGDATE as assignRegdate,
             case when PRODUCT.CIRCULATION_CODE is not null then PRODUCT.CIRCULATION_DATE else PRODUCT_ADD.LISTING_DATE end as listingDate,
@@ -321,7 +322,10 @@
 
     <select id="selectFinprodId" resultType="java.lang.String">
         select T1.FINPROD_ID from FIN_PRODUCT T1
-        where  T1.FINPROD_TYPE2 = #{finprodType2}
+        where  1=1
+            <if test="finprodType2 !=null and finprodType2 !=''">
+                AND T1.FINPROD_TYPE2 = #{finprodType2}
+            </if>
             <if test="TRADE_PLACE_01 != null and TRADE_PLACE_02 !=null">
                 AND T1.TRADE_MARKET in(#{TRADE_PLACE_01},#{TRADE_PLACE_02})
             </if>
@@ -579,4 +583,22 @@
         inner join TRD_FIN_PRODUCT_BARTER_TOTAL B on T.TOTLE_TRADE_ID=B.TRADE_ID ||'R'
         where T.FINPROD_ID=#{finprodId,jdbcType=VARCHAR} and rownum=1
     </select>
+
+    <select id="getWindType" resultType="com.joyintech.tams.common.base.entity.FinProductTypeConfig">
+        SELECT
+            OUTPUT_VALUE_1 outputValue1,
+            OUTPUT_VALUE_2 outputValue2
+        FROM FIN_PRODUCT_TYPE_CONFIG
+        WHERE CONFIG_TYPE = #{configType}
+        <if test="inputValue1 != null and inputValue1 != ''">
+            AND INPUT_VALUE_1 = #{inputValue1}
+        </if>
+        <if test="inputValue2 != null and inputValue2 != ''">
+            AND INPUT_VALUE_2 = #{inputValue2}
+        </if>
+        <if test="inputValue3 != null and inputValue3 != ''">
+            AND INPUT_VALUE_3 = #{inputValue3}
+        </if> and ROWNUM=1
+    </select>
+
 </mapper>

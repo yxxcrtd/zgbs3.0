@@ -23,6 +23,7 @@ import com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset003Dto
 import com.joyintech.tams.invest.common.autoperiod.common.AutoPeriodCommonService;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.service.FinBondMarketInfoQuery001Service;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
@@ -75,6 +76,9 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
     @Autowired
     private FinBondAssetValidatorService finBondAssetValidatorService;
 
+    @Autowired
+    private FinBondMarketInfoQuery001Service finBondMarketInfoQuery001Service;
+
     @Resource
     private IPlatformDate iPlatformDate;
 
@@ -82,6 +86,17 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
     public String generateTitle(FinTenderBondAsset003Dto entity, OperationType operationType) {
         return String.format("资产代码(%s) 资产简称(%s) 上市流通", StringUtil.isEmpty(entity.getFinprodMarketId()) ? "" : entity.getFinprodMarketId(),
                 StringUtil.isEmpty(entity.getFinprodAbbr()) ? "" : entity.getFinprodAbbr());
+    }
+
+    @Override
+    public void doInsert(FinTenderBondAsset003Dto entity, OperationType type) {
+        Map<String,String> param = new HashMap();
+        param.put("finprodType2",DictCodeList.平安资产类型_债券.getValue());
+        param.put("finprodMarketId",entity.getAppearMarketId());
+        String finproductId = finTenderBoundAssetMapper.selectFinprodId(param);
+        if(StringUtil.isEmpty(finproductId)) {//执行加券
+            finBondMarketInfoQuery001Service.addCoupons(entity.getAppearMarketId());
+        }
     }
 
     @Override
@@ -96,7 +111,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                 //金融产品实物汇总交易
                 TrdFinProductBarterTotal trdFinProductBarterTotal = new TrdFinProductBarterTotal();
                 trdFinProductBarterTotal.setTradeId(String.format("%sR", totleTradeId));
-                trdFinProductBarterTotal.setFinprodType(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+                trdFinProductBarterTotal.setFinprodType(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
                 trdFinProductBarterTotal.setFinprodId(dto.getFinprodId());
                 trdFinProductBarterTotal.setBranch(0L);
                 trdFinProductBarterTotalMapper.insert(trdFinProductBarterTotal);
@@ -132,8 +147,8 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
             BussinessCodeParameter parameter = new BussinessCodeParameter();
             parameter.setCommonBusinessType(DictCodeList.共通业务类型_债券买入);
             trdFinProductDealTotal.setTotleTradeId(autoPeriodCommonService.buildBussinessCode(parameter));
-            trdFinProductDealTotal.setFinprodType2(DictCodeListExt2.平安资产类型_一级市场债.getValue());
-            trdFinProductDealTotal.setFinprodType(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+            trdFinProductDealTotal.setFinprodType2(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+            trdFinProductDealTotal.setFinprodType(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
             trdFinProductDealTotal.setBusiType(DictCodeListExt1.平安业务类型_上市流通.getValue());
             trdFinProductDealTotal.setFinprodId(dto.getFinprodId());
             trdFinProductDealTotal.setPs(DictCodeList.交易方向_上市流通.getValue());
@@ -146,7 +161,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
             //金融产品实物汇总交易
             TrdFinProductBarterTotal trdFinProductBarterTotal = new TrdFinProductBarterTotal();
             trdFinProductBarterTotal.setTradeId(trdFinProductDealTotal.getTotleTradeId());
-            trdFinProductBarterTotal.setFinprodType(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+            trdFinProductBarterTotal.setFinprodType(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
             trdFinProductBarterTotal.setFinprodId(dto.getFinprodId());
             trdFinProductBarterTotal.setBranch(0L);
             trdFinProductBarterTotalMapper.insert(trdFinProductBarterTotal);
@@ -160,7 +175,6 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
             productAdd.setFinprodId(dto.getFinprodId());
             productAdd.setIssueStatus(DictCodeListExt1.发行状态_发行成功.getValue());
             finProductAddMapper.updateForTenderBound(productAdd);
-            //TODO 这里处理加券
             finTenderBoundAssetService.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_上市流通);
             //调用头寸
             BaseMap param = BaseMap.newMap().put("userId", SecurityUtil.getLoginUser().getUserName())
@@ -188,17 +202,17 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
         List<ValidMessage> validMessages = new ArrayList<>();
         Map<String,String> param = new HashMap();
         param.put("finprodType2",DictCodeList.平安资产类型_债券.getValue());
-        param.put("finprodMarketId",dto.getFinprodMarketId());
+        param.put("finprodMarketId",dto.getAppearMarketId());
         String finproductId = finTenderBoundAssetMapper.selectFinprodId(param);
         if(StringUtil.isEmpty(finproductId)) {
-            FinBondAssetSaveRequest request = finBondAssetService.getInterfBondDto(dto.getFinprodMarketId());
+            FinBondAssetSaveRequest request = finBondAssetService.getInterfBondDto(dto.getAppearMarketId());
             if (StringUtil.isNotEmpty(dto)) {
                 request.setCreditFlag("");
-                request.setFinprodMarketId(dto.getFinprodMarketId());
+                request.setFinprodMarketId(dto.getAppearMarketId());
                 ValidUtils.valid(request,validMessages);
                 ValidUtils.valid(request.getFinProductConvertible(),validMessages);
                 ValidUtils.valid(request.getFinInterestFactorDto(),validMessages);
-                validMessages.addAll(finBondAssetValidatorService.valid(dto));
+                validMessages.addAll(finBondAssetValidatorService.valid(request));
                 if(CollectionUtils.isNotEmpty(validMessages)) {
                     return request;
                 }else {
@@ -217,7 +231,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
      */
     public List<ValidMessage> valid(FinTenderBondAsset003Dto dto) {
         List<ValidMessage> validMessages = new ArrayList<>();
-        if (finTenderBoundAssetService.isInProcess(dto.getFinprodMarketId(), "FinTenderBondAsset003")) {
+        if (finTenderBoundAssetService.isInProcess(dto.getFinprodMarketId(), "FinTenderBondAsset003","FinTenderBondAsset002")) {
             validMessages.add(new ValidMessage("存在流程中的数据"));
         }
         if(StringUtil.isEmpty(dto.getOperateType())) {

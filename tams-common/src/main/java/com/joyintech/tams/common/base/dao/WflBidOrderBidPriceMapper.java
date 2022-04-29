@@ -8,6 +8,10 @@ import org.springframework.stereotype.Repository;
 public interface WflBidOrderBidPriceMapper {
     int deleteByPrimaryKey(WflBidOrderBidPriceKey key);
 
+    int deleteByBidId(String BidId);
+
+    int deleteByWorkflowId(String workflowId);
+
     int insert(WflBidOrderBidPrice record);
 
     int insertSelective(WflBidOrderBidPrice record);

@@ -5,63 +5,33 @@
     <select id="queryForPage"
             resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinWindMarketInfoQuery001Dto"
             parameterType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinWindMarketInfoQueryRequest">
-        select * from (SELECT SEC_INFO.SEC_ID secId,
+        SELECT * FROM (
+        SELECT SEC_INFO.SEC_ID secId,
         SEC_INFO.BOND_NAME bondName,
         SEC_INFO.BOND_ABBREVIATION bondAbbreviation,
         SEC_INFO.TRADING_PLACES tradingPlaces,
         SEC_INFO.REGISTERED_CUSTODIAN registeredCustodian,
         SEC_INFO.RAISE_MODE raiseMode,
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN RDI_RELEASE_INFO.ISSUE_METHOD
-        ELSE RELEASE_INFO.ISSUING_METHOD END as issueMethod,
+        <!-- 发行方式 -->
+        nvl(RDI_RELEASE_INFO.ISSUE_METHOD ,RELEASE_INFO.ISSUING_METHOD) as issueMethod,
 
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN null
-        ELSE RELEASE_INFO.BIDDING_METHOD END as biddingMethod,
+        RELEASE_INFO.BIDDING_METHOD as biddingMethod,
+        RELEASE_INFO.TENDER_TARGET as tenderTarget,
+        RELEASE_INFO.ADDITIONAL_BATCHES as additionalBatches,
 
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN null
-        ELSE RELEASE_INFO.TENDER_TARGET END as tenderTarget,
+        nvl(RDI_RELEASE_INFO.ISSUE_SIZE * 10000 , ROUND(RELEASE_INFO.ISSUE_SIZE / 10000, 2)) as issueSize,
 
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN null
-        ELSE RELEASE_INFO.ADDITIONAL_BATCHES END as additionalBatches,
+        nvl(TO_DATE(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd')) as issueDate,
 
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券')
-        THEN ROUND(RDI_RELEASE_INFO.ISSUE_SIZE * 10000, 2)
-        ELSE ROUND(RELEASE_INFO.ISSUE_SIZE / 10000, 2) END as issueSize,
+        nvl(TO_DATE(RDI_RELEASE_INFO.EVENT_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.PAYMENT_DEADLINE, 'yyyy-MM-dd'))  as eventDate,
 
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券')
-        THEN TO_DATE(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd')
-        ELSE TO_DATE(RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd') END as issueDate,
+        TO_DATE(RELEASE_INFO.DEBT_REGISTRATION_DATE, 'yyyy-MM-dd') as debtRegistrationDate,
 
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券')
-        THEN TO_DATE(RDI_RELEASE_INFO.EVENT_DATE, 'yyyy-MM-dd')
-        ELSE TO_DATE(RELEASE_INFO.PAYMENT_DEADLINE, 'yyyy-MM-dd') END as eventDate,
+        TO_DATE(RELEASE_INFO.LISTING_DATE, 'yyyy-MM-dd') as listingDate,
+        RELEASE_INFO.LISTING_CODE as listingCode,
+        SEC_INFO.CROSS_MARKET_CODE as crossMarketCode,
 
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN null
-        ELSE TO_DATE(RELEASE_INFO.DEBT_REGISTRATION_DATE, 'yyyy-MM-dd') END as debtRegistrationDate,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN null
-        ELSE TO_DATE(RELEASE_INFO.LISTING_DATE, 'yyyy-MM-dd') END as listingDate,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN null
-        ELSE RELEASE_INFO.LISTING_CODE END as listingCode,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN null
-        ELSE SEC_INFO.CROSS_MARKET_CODE END as crossMarketCode,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券')
-        THEN TO_DATE(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd')
-        ELSE TO_DATE(RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd') END as interestAccrualDate,
+        nvl(TO_DATE(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd')) as interestAccrualDate,
 
         SEC_INFO.VALUE_DATE valueDate,
         SEC_INFO.EXPIRY_DATE expiryDate,
@@ -71,28 +41,13 @@
         SEC_INFO.INTEREST_PAYMENT_FREQUENCY interestPaymentFrequency,
         SEC_INFO.RATE_TYPE rateType,
         SEC_INFO.CURRENCY,
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN RDI_RELEASE_INFO.ISSUE_PX
-        ELSE RELEASE_INFO.ISSUE_PX END as issuePx,
 
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券')
-        THEN RDI_RELEASE_INFO.STIPULATION_VALUE
-        ELSE RELEASE_INFO.STIPULATION_VALUE END as stipulationValue,
+        nvl(RDI_RELEASE_INFO.ISSUE_PX, RELEASE_INFO.ISSUE_PX) as issuePx,
+        nvl(RDI_RELEASE_INFO.STIPULATION_VALUE, RELEASE_INFO.STIPULATION_VALUE) as  stipulationValue,
 
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券')
-        THEN RDI_RELEASE_INFO.SINGLE_MIN_SUB_AMT * 10000
-        ELSE ROUND(RELEASE_INFO.SINGLE_MIN_SUB_AMT / 10000, 2) END as singleMinSubAmt,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券')
-        THEN RDI_RELEASE_INFO.SINGLE_MAX_SUB_AMT * 10000
-        ELSE ROUND(RELEASE_INFO.SINGLE_MAX_SUB_AMT / 10000, 2) END as singleMaxSubAmt,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION in ('同业存单', '证券公司短期融资券') THEN RDI_RELEASE_INFO.REMARK
-        ELSE null END as REMARK
+        nvl(RDI_RELEASE_INFO.SINGLE_MIN_SUB_AMT * 10000, ROUND(RELEASE_INFO.SINGLE_MAX_SUB_AMT / 10000, 2)) as singleMinSubAmt,
+        nvl(RDI_RELEASE_INFO.SINGLE_MAX_SUB_AMT * 10000, ROUND(RELEASE_INFO.SINGLE_MAX_SUB_AMT / 10000, 2)) as singleMaxSubAmt,
+        RDI_RELEASE_INFO.REMARK as REMARK
         FROM INTERF_WIND_UNRELEASE_SEC_INFO SEC_INFO
         LEFT JOIN INTERF_WIND_RELEASE_INFO RELEASE_INFO ON SEC_INFO.SEC_ID = RELEASE_INFO.SEC_ID
         LEFT JOIN INTERF_RDI_RELEASE_INFO RDI_RELEASE_INFO ON RDI_RELEASE_INFO.SECURITY_ID = SEC_INFO.SEC_ID
@@ -217,7 +172,7 @@
 
     <select id="queryFinWindMarketForCoupons"
             resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinWindMarketInfoQuery001Dto"
-            parameterType="Map">
+            parameterType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinWindMarketInfoQueryRequest">
         SELECT
         SEC_INFO.SEC_ID secId,
         SEC_INFO.BOND_NAME bondName,
@@ -232,65 +187,22 @@
         SEC_INFO.SPECIAL_TERMS specialTerms,
         RELEASE_INFO.RELEASE_TYPE releaseType,
 
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        RDI_RELEASE_INFO.ISSUE_METHOD ELSE RELEASE_INFO.ISSUING_METHOD
-        END AS issueMethod,
+        nvl(RDI_RELEASE_INFO.ISSUE_METHOD,RELEASE_INFO.ISSUING_METHOD) as issueMethod,
 
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        NULL ELSE RELEASE_INFO.BIDDING_METHOD
-        END AS biddingMethod,
+        RELEASE_INFO.BIDDING_METHOD  as biddingMethod,
+        RELEASE_INFO.TENDER_TARGET as tenderTarget,
+        RELEASE_INFO.ADDITIONAL_BATCHES  as  additionalBatches,
 
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        NULL ELSE RELEASE_INFO.TENDER_TARGET
-        END AS tenderTarget,
+        nvl(RDI_RELEASE_INFO.ISSUE_SIZE * 100000000, ROUND(RELEASE_INFO.ISSUE_SIZE, 2)) as issueSize,
+        nvl(TO_DATE(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd'))as issueDate,
+        nvl(TO_DATE(RDI_RELEASE_INFO.EVENT_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.PAYMENT_DEADLINE, 'yyyy-MM-dd')) as eventDate,
+        RELEASE_INFO.DEBT_REGISTRATION_DATE AS debtRegistrationDate,
 
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        NULL ELSE RELEASE_INFO.ADDITIONAL_BATCHES
-        END AS additionalBatches,
+        RELEASE_INFO.LISTING_DATE AS listingDate,
+        RELEASE_INFO.LISTING_CODE AS listingCode,
+        SEC_INFO.CROSS_MARKET_CODE AS crossMarketCode,
 
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        RDI_RELEASE_INFO.ISSUE_SIZE * 10000 ELSE ROUND( RELEASE_INFO.ISSUE_SIZE / 10000, 2 )
-        END AS issueSize,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        TO_DATE(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd') ELSE TO_DATE(RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd')
-        END AS issueDate,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        TO_DATE(RDI_RELEASE_INFO.EVENT_DATE, 'yyyy-MM-dd') ELSE TO_DATE(RELEASE_INFO.PAYMENT_DEADLINE, 'yyyy-MM-dd')
-        END AS paymentDeadline,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        NULL ELSE RELEASE_INFO.DEBT_REGISTRATION_DATE
-        END AS debtRegistrationDate,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        NULL ELSE RELEASE_INFO.LISTING_DATE
-        END AS listingDate,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        NULL ELSE RELEASE_INFO.LISTING_CODE
-        END AS listingCode,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        NULL ELSE SEC_INFO.CROSS_MARKET_CODE
-        END AS crossMarketCode,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        TO_DATE(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd') ELSE TO_DATE(RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd')
-        END AS interestAccrualDate,
+        nvl(TO_DATE(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd')) as interestAccrualDate,
 
         SEC_INFO.VALUE_DATE valueDate,
         SEC_INFO.EXPIRY_DATE expiryDate,
@@ -301,125 +213,41 @@
         SEC_INFO.RATE_TYPE rateType,
         SEC_INFO.CURRENCY,
 
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        RDI_RELEASE_INFO.ISSUE_PX ELSE RELEASE_INFO.ISSUE_PX
-        END AS issuePx,
+        nvl(RDI_RELEASE_INFO.ISSUE_PX, RELEASE_INFO.ISSUE_PX) as issuePx,
+        nvl(RDI_RELEASE_INFO.STIPULATION_VALUE, RELEASE_INFO.STIPULATION_VALUE) as stipulationValue,
 
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        RDI_RELEASE_INFO.STIPULATION_VALUE ELSE RELEASE_INFO.STIPULATION_VALUE
-        END AS stipulationValue,
+        nvl(RDI_RELEASE_INFO.SINGLE_MIN_SUB_AMT * 100000000, RELEASE_INFO.MIN_PER_TENDER_AMT) as singleMinSubAmt,
+        nvl(RDI_RELEASE_INFO.SINGLE_MAX_SUB_AMT * 100000000, RELEASE_INFO.MAX_PER_TENDER_AMT) as singleMaxSubAmt,
 
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        RDI_RELEASE_INFO.SINGLE_MIN_SUB_AMT * 10000 ELSE ROUND( RELEASE_INFO.MIN_PER_TENDER_AMT / 10000, 2 )
-        END AS singleMinSubAmt,
+        RDI_RELEASE_INFO.REMARK AS remark,
 
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        RDI_RELEASE_INFO.SINGLE_MAX_SUB_AMT * 10000 ELSE ROUND( RELEASE_INFO.MAX_PER_TENDER_AMT / 10000, 2 )
-        END AS singleMaxSubAmt,
+        nvl(RDI_RELEASE_INFO.COUPON_RATE, RELEASE_INFO.COUPON_RATE) as couponRate,
+        nvl(RDI_RELEASE_INFO.BENCHMARK_CURVE_NAME, RELEASE_INFO.BENCHMARK_CURVE_NAME) as benchmarkCurveName,
+        nvl(RDI_RELEASE_INFO.DECIMAL_PLACES, RELEASE_INFO.DECIMAL_PLACES) as decimalPlaces,
+        nvl(RDI_RELEASE_INFO.SPREAD, RELEASE_INFO.SPREAD) as spread,
 
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        RDI_RELEASE_INFO.REMARK ELSE NULL
-        END AS remark,
+        RELEASE_INFO.ISSUE_START_TIME AS issueStartTime,
+        RELEASE_INFO.ISSUE_END_TIME AS issueEndTime,
+        RELEASE_INFO.BID_DATE  as bidDate,
+        RELEASE_INFO.ADDITIONAL_TENDER_DATE  as additionalTenderDate,
 
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        RDI_RELEASE_INFO.COUPON_RATE ELSE RELEASE_INFO.COUPON_RATE
-        END AS couponRate,
+        nvl(RDI_RELEASE_INFO.MAX_SUB_AMT * 100000000, RELEASE_INFO.MAX_SUB_AMT) as maxSubAmt,
+        nvl(RDI_RELEASE_INFO.MIN_PER_TENDER_AMT * 100000000, RELEASE_INFO.MIN_PER_TENDER_AMT) as minPerTenderAmt,
+        nvl(RDI_RELEASE_INFO.MAX_PER_TENDER_AMT * 100000000, RELEASE_INFO.MAX_PER_TENDER_AMT) as maxPerTenderAmt,
 
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        RDI_RELEASE_INFO.BENCHMARK_CURVE_NAME ELSE RELEASE_INFO.BENCHMARK_CURVE_NAME
-        END AS benchmarkCurveName,
+        nvl(RDI_RELEASE_INFO.MIN_TENDER_PX_FOR_PLAN, RELEASE_INFO.MIN_TENDER_PX_FOR_PLAN) as minTenderPxForPlan,
+        nvl(RDI_RELEASE_INFO.MAX_TENDER_PX_FOR_PLAN, RELEASE_INFO.MAX_TENDER_PX_FOR_PLAN) as maxTenderPxForPlan,
+        nvl(RDI_RELEASE_INFO.TENDER_STEP, RELEASE_INFO.TENDER_STEP) as tenderStep,
 
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        RDI_RELEASE_INFO.DECIMAL_PLACES ELSE RELEASE_INFO.DECIMAL_PLACES
-        END AS decimalPlaces,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        RDI_RELEASE_INFO.SPREAD ELSE RELEASE_INFO.SPREAD
-        END AS spread,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        NULL ELSE RELEASE_INFO.ISSUE_START_TIME
-        END AS issueStartTime,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        NULL ELSE RELEASE_INFO.ISSUE_END_TIME
-        END AS issueEndTime,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        NULL ELSE RELEASE_INFO.BID_DATE
-        END AS bidDate,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        NULL ELSE RELEASE_INFO.ADDITIONAL_TENDER_DATE
-        END AS additionalTenderDate,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        RDI_RELEASE_INFO.MAX_SUB_AMT * 10000 ELSE ROUND( RELEASE_INFO.MAX_SUB_AMT / 10000, 2 )
-        END AS maxSubAmt,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        RDI_RELEASE_INFO.MIN_PER_TENDER_AMT * 10000 ELSE ROUND( RELEASE_INFO.MIN_PER_TENDER_AMT / 10000, 2 )
-        END AS minPerTenderAmt,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        RDI_RELEASE_INFO.MAX_PER_TENDER_AMT * 10000 ELSE ROUND( RELEASE_INFO.MAX_PER_TENDER_AMT / 10000, 2 )
-        END AS maxPerTenderAmt,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        RDI_RELEASE_INFO.MIN_TENDER_PX_FOR_PLAN ELSE RELEASE_INFO.MIN_TENDER_PX_FOR_PLAN
-        END AS minTenderPxForPlan,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        RDI_RELEASE_INFO.MAX_TENDER_PX_FOR_PLAN ELSE RELEASE_INFO.MAX_TENDER_PX_FOR_PLAN
-        END AS maxTenderPxForPlan,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        RDI_RELEASE_INFO.TENDER_STEP ELSE RELEASE_INFO.TENDER_STEP
-        END AS tenderStep,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        RDI_RELEASE_INFO.MEDIAN_MAX_BID_MARKED ELSE RELEASE_INFO.MEDIAN_MAX_BID_MARKED
-        END AS medianMaxBidMarked,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        RDI_RELEASE_INFO.MAX_TENDER_PX_DIFFER ELSE RELEASE_INFO.MAX_TENDER_PX_DIFFER
-        END AS maxTenderPxDiffer,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        RDI_RELEASE_INFO.CONTINUOUS_TENDER_LIMIT ELSE RELEASE_INFO.CONTINUOUS_TENDER_LIMIT
-        END AS continuousTenderLimit,
-
-        CASE
-        WHEN SEC_INFO.SECONDARY_CLASSIFICATION IN ( '同业存单', '证券公司短期融资券' ) THEN
-        RDI_RELEASE_INFO.MAX_TOTAL_TENDER_AMT * 10000 ELSE ROUND( RELEASE_INFO.MAX_TOTAL_TENDER_AMT / 10000, 2 )
-        END AS maxTotalTenderAmt
+        nvl(RDI_RELEASE_INFO.MEDIAN_MAX_BID_MARKED, RELEASE_INFO.MEDIAN_MAX_BID_MARKED) as medianMaxBidMarked,
+        nvl(RDI_RELEASE_INFO.MAX_TENDER_PX_DIFFER, RELEASE_INFO.MAX_TENDER_PX_DIFFER) as maxTenderPxDiffer,
+        nvl(RDI_RELEASE_INFO.CONTINUOUS_TENDER_LIMIT, RELEASE_INFO.CONTINUOUS_TENDER_LIMIT) as continuousTenderLimit,
+        nvl(RDI_RELEASE_INFO.MAX_TOTAL_TENDER_AMT * 100000000, RELEASE_INFO.MAX_TOTAL_TENDER_AMT) as maxTotalTenderAmt
 
         FROM
         INTERF_WIND_UNRELEASE_SEC_INFO SEC_INFO --wind一级未发行债券信息接口表
         LEFT JOIN INTERF_WIND_RELEASE_INFO RELEASE_INFO ON SEC_INFO.SEC_ID = RELEASE_INFO.SEC_ID --wind一级未发行债券发行信息接口表
-        LEFT JOIN INTERF_RDI_RELEASE_INFO RDI_RELEASE_INFO ON RDI_RELEASE_INFO.SECURITY_ID = SEC_INFO.SEC_ID --银行间债券再发行信息接口表
+        LEFT JOIN (SELECT * FROM INTERF_RDI_RELEASE_INFO where SECURITY_TYPE in('CD','14')) RDI_RELEASE_INFO ON RDI_RELEASE_INFO.SECURITY_ID = SEC_INFO.SEC_ID --银行间债券再发行信息接口表
         <where>
             SEC_INFO.VALUE_DATE  <![CDATA[ < ]]> to_date(#{platformDate}, '%Y-%m-%d')
 

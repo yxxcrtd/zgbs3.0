@@ -84,8 +84,8 @@ public class FinWindMarketInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "issueDate", value = "发行日")
     private Date issueDate;
 
-    @ApiModelProperty(name = "paymentDeadline", value = "缴款截止日")
-    private Date paymentDeadline;
+    @ApiModelProperty(name = "eventDate", value = "缴款截止日")
+    private Date eventDate;
 
     @ApiModelProperty(name = "debtRegistrationDate", value = "债权债务登记日")
     private Date debtRegistrationDate;
@@ -370,12 +370,12 @@ public class FinWindMarketInfoQuery001Dto extends BaseDto {
         this.issueDate = issueDate;
     }
 
-    public Date getPaymentDeadline() {
-        return paymentDeadline;
+    public Date getEventDate() {
+        return eventDate;
     }
 
-    public void setPaymentDeadline(Date paymentDeadline) {
-        this.paymentDeadline = paymentDeadline;
+    public void setEventDate(Date eventDate) {
+        this.eventDate = eventDate;
     }
 
     public Date getDebtRegistrationDate() {

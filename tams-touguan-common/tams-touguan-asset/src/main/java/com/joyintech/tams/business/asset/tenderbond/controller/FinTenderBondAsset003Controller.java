@@ -9,6 +9,7 @@ import com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset003Dto;
 import com.joyintech.tams.business.asset.tenderbond.service.FinTenderBondAsset003Service;
+import com.joyintech.tams.business.common.util.ValidUtils;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -45,7 +46,7 @@ public class FinTenderBondAsset003Controller extends BaseController {
     public Message check(@RequestBody FinTenderBondAsset003Dto dto) {
         List<ValidMessage> validMessageList = finTenderBoundAsset003Service.valid(dto);
         if (CollectionUtils.isNotEmpty(validMessageList)) {
-            return Message.fail("校验失败", validMessageList);
+            return Message.fail(ValidUtils.getValidMessage(validMessageList));
         } else {
             return Message.success("校验成功", null);
         }
