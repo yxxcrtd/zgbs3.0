@@ -431,6 +431,19 @@ public class EntrCommandDispatcherDto extends BaseEntity{
      */
     private String targetType;
 
+    /**
+     * 是否净价
+     */
+    private String isNetPrice;
+
+    public String getIsNetPrice() {
+        return isNetPrice;
+    }
+
+    public void setIsNetPrice(String isNetPrice) {
+        this.isNetPrice = isNetPrice;
+    }
+
     public String getPriceType() {
         return priceType;
     }
