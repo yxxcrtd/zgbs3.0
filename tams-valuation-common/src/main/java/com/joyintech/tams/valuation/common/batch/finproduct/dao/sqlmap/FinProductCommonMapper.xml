@@ -715,6 +715,7 @@
 		vsd.SEC_DETAIL_TYPE AS secDetailType,
 		vsd.INV_AIM AS invAim,
 		vsd.VALUATION_METHOD AS valuationMethod,
+		vsd.VALUATION_ID as valuationId,
 		vsd.VALUATION_PRICE AS valuationPrice,
 		vsd.VALUATION_PRICE_2 AS valuationPrice2,
 		vsd.QUOTA_DIGIT AS quotaDigit,
@@ -1524,6 +1525,26 @@ AND	fin.BRANCH = 0
 	<select id="getfinprodType2" resultType="java.lang.String">
 		select finprod_type2  from fin_cash_plan where finprod_id = #{finprodId}
 		and rownum=1
+	</select>
+
+
+	<select id="getMarketPriceForIrs" resultType="com.joyintech.tams.common.base.entity.MstValIrs"
+			parameterType="java.util.Map">
+		SELECT VAL_DATE valDate,
+		       VALUATION valuation,
+		       CCY ccy,
+			   DATASOURCE_TYPE datasourceType,
+			   VALMODEL_ID valmodelId
+		FROM MST_VAL_IRS mvi
+		WHERE mvi.FINPROD_ID2 = #{finprodId}
+		   AND mvi.VAL_DATE <![CDATA[<=]]> #{happenDate}
+		<if test="datasourceType != null and datasourceType !='' ">
+			and mvi.DATASOURCE_TYPE = #{datasourceType}
+		</if>
+		<if test="valmodelId != null and valmodelId !='' ">
+			and mvi.VALMODEL_ID = #{valmodelId}
+		</if>
+		ORDER BY VAL_DATE DESC
 	</select>
 
 </mapper>

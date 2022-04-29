@@ -31,8 +31,8 @@ public enum DictCodeListExt4 implements BaseDictCodeList {
     其他综合收益计算的平准金科目_计入损益平准金(DictCode.其他综合收益计算的平准金科目,"02","计入损益平准金-其他综合收益"),
     /** add by weipeng on 20220411：现金管理类产品改造升级 end **/
 
-    利率互换估值模型_单曲贴现(DictCode.利率互换估值模型,"01","01"),
-    利率互换估值模型_收付轧差(DictCode.利率互换估值模型,"02","02"),
+    利率互换估值模型_DCF现金流折现(DictCode.利率互换估值模型,"01","01"),
+    利率互换估值模型_应收应付轧差(DictCode.利率互换估值模型,"02","02"),
 
     /** add by weipeng on 20220426：股票相关变更 start **/
     股票持仓类型_新股(DictCode.股票持仓类型,"01","新股"),

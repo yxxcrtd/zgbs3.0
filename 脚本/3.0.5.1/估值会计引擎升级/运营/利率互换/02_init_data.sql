@@ -12,11 +12,11 @@ values ('IRS_CLEAN_TYPE', '02', '多边清算', 2, '0', 'yy', null, sysdate, 'yy
 delete from sys_datadict d where d.dict_code='VALMODEL_ID';
 insert into sys_datadict (DICT_CODE, SYSTEM_CODE, DICT_CNNAME, DICT_ENNAME, UPDATE_FLG, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('VALMODEL_ID', 'VAL', '利率互换估值模型', null, '02', 'yy', null, sysdate, 'yy', sysdate);
-delete from sys_datadict_list d where d.dict_code='IRS_CLEAN_TYPE';
+delete from sys_datadict_list d where d.dict_code='VALMODEL_ID';
 insert into sys_datadict_list (DICT_CODE, ITEM_CODE, ITEM_VALUE, ORDER_NO, DEFAULT_VALUE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE)
-values ('VALMODEL_ID', '01', '单曲贴现', 1, '0', 'yy', null, sysdate, 'yy', sysdate, null);
+values ('VALMODEL_ID', '01', 'DCF现金流折现', 1, '0', 'yy', null, sysdate, 'yy', sysdate, null);
 insert into sys_datadict_list (DICT_CODE, ITEM_CODE, ITEM_VALUE, ORDER_NO, DEFAULT_VALUE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE)
-values ('VALMODEL_ID', '02', '收付轧差', 2, '0', 'yy', null, sysdate, 'yy', sysdate, null);
+values ('VALMODEL_ID', '02', '应收应付轧差', 2, '0', 'yy', null, sysdate, 'yy', sysdate, null);
 
 
 delete from sys_datadict d where d.dict_code='RESET_SCOPE';
@@ -25,6 +25,7 @@ values ('RESET_SCOPE', 'VAL', '利率重置品种范围', null, '02', 'yy', null
 delete from sys_datadict_list d where d.dict_code='RESET_SCOPE';
 insert into sys_datadict_list (DICT_CODE, ITEM_CODE, ITEM_VALUE, ORDER_NO, DEFAULT_VALUE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE)
 values ('RESET_SCOPE', 'F14', '利率互换', 1, '0', 'yy', null, sysdate, 'yy', sysdate, null);
+
 
 /*****数据字典 end**************************************************************************/
 
@@ -257,6 +258,12 @@ values ('03', 'QY', '530', '1810', 'yy', null, sysdate, 'yy', sysdate);
 insert into BOK_MATCH_RLAT (MATCH_TYPE, ACCT_STANDARD, SOURCE, TARGET, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('03', 'QY', '531', '1802', 'yy', null, sysdate, 'yy', sysdate);
 
+--利率互换公允价值变动 涉及成本科目
+delete from bok_match_rlat m where m.match_type='02' and m.SOURCE='531';
+insert into bok_match_rlat (MATCH_TYPE, ACCT_STANDARD, SOURCE, TARGET, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+values ('02', 'QY', '531', 'YSLVHH', 'yy', 'SYSDEPT', sysdate, 'yy', sysdate);
+
+
 --科目性质配置,利率互换计提科目
 delete from bok_match_rlat m where m.match_type='02' and m.SOURCE='530';
 insert into bok_match_rlat (MATCH_TYPE, ACCT_STANDARD, SOURCE, TARGET, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
@@ -269,6 +276,12 @@ insert into bok_match_rlat (MATCH_TYPE, ACCT_STANDARD, SOURCE, TARGET, CREATE_US
 values ('07', 'QY', '530', '1801', 'yy', null, sysdate, 'yy',sysdate);
 insert into bok_match_rlat (MATCH_TYPE, ACCT_STANDARD, SOURCE, TARGET, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('07', 'QY', '530', '1808', 'yy', null, sysdate, 'yy', sysdate);
+--科目场景配置,利率互换公允价值成本场景
+delete from  bok_match_rlat m where m.match_type='07' and m.SOURCE='531';
+insert into bok_match_rlat (MATCH_TYPE, ACCT_STANDARD, SOURCE, TARGET, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+values ('07', 'QY', '531', '1801', 'yy', null, sysdate, 'yy',sysdate);
+insert into bok_match_rlat (MATCH_TYPE, ACCT_STANDARD, SOURCE, TARGET, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+values ('07', 'QY', '531', '1808', 'yy', null, sysdate, 'yy', sysdate);
 /*****批处理增加利率互换批任务 end**************************************************************************/
 
 
@@ -298,13 +311,21 @@ AND A.BOOKSET_ID !='00000000000000000002';
 /*****利率互换计提方式参数：现只支持倒减法 end**************************************************************************/
 
 /**利率互换的估值方案估值模型默认为模型法 start*************************************************************************/
-update bok_VAL_SCHEME_DETAIL sd set sd.VALUATION_ID='01' where sd.sec_type='04';
+update bok_VAL_SCHEME_DETAIL sd set sd.VALUATION_ID='01',sd.QUOTA_DIGIT=4,sd.PRICE_TAIL_MODE='03',sd.VALUATION_SOURCE='BAK' where sd.sec_type='04';
+
+delete from sys_datadict_list sd where sd.dict_code='VALUATION_PRICE' and sd.item_code='BAK';
+insert into sys_datadict_list (DICT_CODE, ITEM_CODE, ITEM_VALUE, ORDER_NO, DEFAULT_VALUE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE)
+values ('VALUATION_PRICE', 'BAK', '行内估值', 12, '0', 'yy', null, sysdate, 'system',sysdate, null);
+
 --利率互换可以选择市值法
 delete from SYS_DATADICT_LIST_LINK sdll where sdll.LINKED_DICT_CODE = 'SEC_TYPE'   and sdll.DICT_CODE = 'VALUATION_METHOD' and TRIM(sdll.LINKED_ITEM_CODE) = TRIM('04') and sdll.item_code='01';
 insert into SYS_DATADICT_LIST_LINK (DICT_CODE, ITEM_CODE, LINKED_DICT_CODE, LINKED_ITEM_CODE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('VALUATION_METHOD', '01', 'SEC_TYPE', '04', 'yy', null, sysdate, 'yy', sysdate);
 
-delete from SYS_DATADICT_LIST_LINK sdll where sdll.LINKED_DICT_CODE = 'SEC_TYPE'   and sdll.DICT_CODE = 'VALUATION_PRICE' and TRIM(sdll.LINKED_ITEM_CODE) = TRIM('04') and sdll.item_code='SCH';
+delete from SYS_DATADICT_LIST_LINK sdll where sdll.LINKED_DICT_CODE = 'SEC_TYPE'   and sdll.DICT_CODE = 'VALUATION_PRICE' and TRIM(sdll.LINKED_ITEM_CODE) = TRIM('04') and sdll.item_code in('SCH','BAK');
 insert into SYS_DATADICT_LIST_LINK (DICT_CODE, ITEM_CODE, LINKED_DICT_CODE, LINKED_ITEM_CODE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('VALUATION_PRICE', 'SCH', 'SEC_TYPE', '04', 'yy', null, sysdate, 'yy', sysdate);
+insert into SYS_DATADICT_LIST_LINK (DICT_CODE, ITEM_CODE, LINKED_DICT_CODE, LINKED_ITEM_CODE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+values ('VALUATION_PRICE', 'BAK', 'SEC_TYPE', '04', 'yy', null, sysdate, 'yy', sysdate);
+
 /**利率互换的估值方案估值模型默认为模型法 end***************************************************************************/

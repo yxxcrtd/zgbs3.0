@@ -243,6 +243,12 @@ public class ValuationMethodScheme003Controller extends BaseController {
 			if(StringUtils.isEmpty(dto.getValuationId())) {
 				bindingResult.rejectValue("valuationId", "NotBlank", "估值模型不能为空！");
 			}
+			if(dto.getQuotaDigit() == null) {
+				bindingResult.rejectValue("quotaDigit", "NotBlank", "行情位数不能为空！");
+			}
+			if(StringUtils.isEmpty(dto.getPriceTailMode())) {
+				bindingResult.rejectValue("priceTailMode", "NotBlank", "行情尾数处理方式不能为空！");
+			}
 		}
 
 

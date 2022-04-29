@@ -261,13 +261,23 @@ $(function () {
             $("#quotaDigit").val("");
             $("#priceTailMode").val("").trigger("change");
             $("#priceClass").val("");
+
+            //选择模型法的时候
+            if (valMethod == '05') {
+                $("#c_valuationId").show();
+                $("#c_quotaDigit").show();
+                $("#c_priceTailMode").show();
+                //模型法市价来源为行内
+                $("#valuationPrice").val("BAK").trigger("change");
+                $("#valuationPrice").attr("disabled", false);
+
+            } else {
+                $("#c_valuationId").hide();
+                $("#c_quotaDigit").hide();
+                $("#c_priceTailMode").hide();
+            }
         }
 
-        if (valMethod == '05') {
-            $("#c_valuationId").show();
-        } else {
-            $("#c_valuationId").hide();
-        }
 
     };
 

@@ -2214,4 +2214,39 @@ public class FinProductCommonService {
         return  finProductCommonMapper.getfinprodType2(finprodId);
     }
 
+    /**
+     * 估值查詢-利率互換
+     * @author 殷亚
+     * @date 2022/4/28 15:49
+     * @param map
+     * @return com.joyintech.tams.common.base.entity.MstValIrs
+     * @see
+     * @version 1.0
+     */
+    public MstValIrs getIrsMarketPrice(Map<String, Object> map,BigDecimal quotaDigit,String priceTailMode) {
+        MstValIrs mstValIrs = new MstValIrs();
+        List<MstValIrs> list = finProductCommonMapper.getMarketPriceForIrs(map);
+        if(!CollectionUtils.isEmpty(list)){
+            mstValIrs=list.get(0);
+            if (quotaDigit != null) {
+                RoundingMode roundingMode = null;
+                if(DictCodeList.估值舍入规则_四舍五入.getValue().equals(priceTailMode)){
+                    roundingMode = RoundingMode.HALF_UP;
+                }
+                else if(DictCodeList.估值舍入规则_舍位.getValue().equals(priceTailMode)){
+                    roundingMode = RoundingMode.DOWN;
+                }
+                else if(DictCodeList.估值舍入规则_进位.getValue().equals(priceTailMode)){
+                    roundingMode = RoundingMode.UP;
+                }
+                mstValIrs.setValuation(ArithmeticUtil.round(mstValIrs.getValuation(),
+                        quotaDigit.intValue(), roundingMode));
+            }
+
+
+        }
+        return mstValIrs;
+    }
+
+
 }
