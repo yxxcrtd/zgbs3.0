@@ -10,23 +10,26 @@
  
 package com.joyintech.tams.valuation.common.service;
 
-import java.util.List;
-import java.util.Map;
-
 import com.joyintech.framework.util.EncryptUtil;
-import com.joyintech.tams.constant.DictCodeListTableId;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.entity.BokBookdetailCurrent;
+import com.joyintech.tams.common.base.entity.BokDetailId;
+import com.joyintech.tams.common.base.entity.BokSubject;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.systemtools.service.SystemToolService;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.valuation.common.constants.SubjectConfigCode;
+import com.joyintech.tams.valuation.common.dao.BookAccountCommonMapper;
+import com.joyintech.tams.valuation.common.dto.SubjectMappingConfigDto;
+import com.joyintech.tams.valuation.common.utils.FelAnalysisUtil;
+import com.joyintech.tams.valuation.common.utils.ValStringUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.common.base.entity.BokBookdetailCurrent;
-import com.joyintech.tams.common.base.entity.BokDetailId;
-import com.joyintech.tams.valuation.common.dao.BookAccountCommonMapper;
-import com.joyintech.tams.valuation.common.utils.ValStringUtil;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 〈一句话功能简述〉
@@ -250,4 +253,96 @@ public class BookAccountCommonService {
 	public List<BokDetailId> queryBokDetailIdList(Map<String, Object> map) {
 		return bookAccountCommonMapper.queryBokDetailIdList(map);
 	}
+
+    /**
+     * 根据辅助核算项匹配查找对应科目
+     * @param listBokSubject 科目信息列表
+     * @param subjectMappingConfigDto 辅助核算项
+     * @param ccy 币种
+     * @return
+     */
+    public BokSubject getSubjectByInnerCode(List<BokSubject> listBokSubject, SubjectMappingConfigDto subjectMappingConfigDto){
+        BokSubject bokSubject = null;
+        if(CollectionUtils.isEmpty(listBokSubject)){
+            return bokSubject;
+        }
+        // 定义 变量.资产辅助核算项 封装辅助核算项为map对象
+        Map<String, Object> params = initMappingParams(subjectMappingConfigDto);
+        // 定义 变量.默认辅助核算项 封装辅助核算项为map对象
+        Map<String, Object> paramsDefualt = initMappingParams(subjectMappingConfigDto);
+        // 增加辅助核算项默认（DEFAULT) = 是(Y)
+        paramsDefualt.put(SubjectConfigCode.默认.getValue(), DictCodeList.是否_是.getValue());
+        // 定义 变量.默认科目
+        BokSubject bokSubjectDefault = null;
+        // 若只有一条记录，则直接取值
+        if(listBokSubject.size() == 1){
+            bokSubject = listBokSubject.get(0);
+        }
+        else{
+            for(BokSubject item : listBokSubject){
+                // 根据变量.资产辅助核算
+                // 项通过辅助核算项表达式匹配
+                //  科目内部科目编码不为空 且 科目内部科目编码匹配辅助核算项
+                if (StringUtil.isNotEmpty(item.getSubjectHandFelCode()) &&
+                    FelAnalysisUtil.booleanValue(item.getSubjectHandFelCode(), params)
+                ) {
+                    bokSubject = item;
+                    break;
+                }
+                // 比较科目与默认辅助核算项，获取默认DEFAULT=='Y'的科目,即默认科目
+                if (StringUtil.isNotEmpty(item.getSubjectHandFelCode()) &&
+                    FelAnalysisUtil.booleanValue(item.getSubjectHandFelCode(), paramsDefualt)
+                ) {
+                    // 默认科目 = 匹配科目
+                    bokSubjectDefault = item;
+                }
+            }
+        }
+        // 若科目信息为空，则说明未匹配对应科目信息，取默认科目
+        if(bokSubject ==null){
+            bokSubject = bokSubjectDefault;
+        }
+        return bokSubject;
+    }
+
+    /**
+     * 初始化
+     * @param mappingConfig
+     * @return
+     */
+    public Map<String,Object> initMappingParams(SubjectMappingConfigDto mappingConfig){
+        Map<String, Object> params = new HashMap<>();
+        if(mappingConfig == null){
+            return params;
+        }
+        params.put(SubjectConfigCode.证券品种.getValue(), mappingConfig.getSecType());
+        params.put(SubjectConfigCode.债券类型.getValue(), mappingConfig.getAssetType());
+        params.put(SubjectConfigCode.存款类资产类型.getValue(), mappingConfig.getAssetType());
+        params.put(SubjectConfigCode.基金类型.getValue(), mappingConfig.getAssetType());
+        params.put(SubjectConfigCode.回购标的类型.getValue(), mappingConfig.getAssetType());
+        // add by weipeng on 20220408：计划类净值型、货币型、利率型以及项目类资产全部默认场外
+        if(StringUtil.equals(DictCodeListExt1.证券品种_计划类资产_净值型.getValue(), mappingConfig.getSecType())
+           || StringUtil.equals(DictCodeListExt1.证券品种_计划类资产_货币型.getValue(), mappingConfig.getSecType())
+           || StringUtil.equals(DictCodeListExt1.证券品种_计划类资产_收益型.getValue(), mappingConfig.getSecType())
+           || StringUtil.equals(DictCodeListExt1.证券品种_项目类资产.getValue(), mappingConfig.getSecType())){
+            params.put(SubjectConfigCode.估值交易市场.getValue(), DictCodeListExt1.估值交易市场_场外.getValue());
+        }
+        else{
+            params.put(SubjectConfigCode.估值交易市场.getValue(), mappingConfig.getTradeMarket());
+        }
+        params.put(SubjectConfigCode.交易市场.getValue(), mappingConfig.getTradeMarket());
+        //        params.put(SubjectConfigCode.交易对手.getValue(), mappingConfig.getTradeMarket());
+        params.put(SubjectConfigCode.账户类型.getValue(), mappingConfig.getAccountType());
+        params.put(SubjectConfigCode.费用类型.getValue(), mappingConfig.getFeeType());
+        params.put(SubjectConfigCode.税类型.getValue(), mappingConfig.getTaxType());
+        if(StringUtil.isNotEmpty(mappingConfig.getFinanceOrgName())){
+            params.put(SubjectConfigCode.金融机构简称.getValue(), FinanceOrgEnum.getEnumByName(mappingConfig.getFinanceOrgName()).getValue());
+        }
+        params.put(SubjectConfigCode.回购类型.getValue(), mappingConfig.getTargetBackType());
+        params.put(SubjectConfigCode.现金流二级类型.getValue(), mappingConfig.getCashType2());
+        params.put(SubjectConfigCode.登记托管机构.getValue(), mappingConfig.getRegistOrg());
+        params.put(SubjectConfigCode.账户细分类.getValue(), mappingConfig.getAcctDetailType());
+        params.put(SubjectConfigCode.投资目的.getValue(), mappingConfig.getInvAim());
+        return params;
+    }
 }

@@ -154,6 +154,8 @@
 			LEFT JOIN BOK_FINPROD_SCHEME_INFO schemeInfo
 				ON schemeInfo.BOOKSET_ID = A.BOOKSET_ID
 				AND schemeInfo.FINPROD_ID = C.BUSI_ID
+				AND schemeInfo.VDATE <![CDATA[ <= ]]> #{HAPPEN_DATE}
+				AND NVL(schemeInfo.MDATE,TO_DATE('2099-12-31','yyyy-MM-dd')) <![CDATA[ >= ]]> #{HAPPEN_DATE}
 			/** add by weipeng on 20220331 增加估值方案落地表关联 end **/
 			WHERE 1=1
 			AND (E.HAPPEN_DATE <![CDATA[ < ]]> A.HAPPEN_DATE

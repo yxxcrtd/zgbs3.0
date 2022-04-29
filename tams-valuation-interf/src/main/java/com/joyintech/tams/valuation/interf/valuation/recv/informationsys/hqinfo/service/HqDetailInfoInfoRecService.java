@@ -79,6 +79,12 @@ public class HqDetailInfoInfoRecService {
     @Autowired
     private ValStockQuotationRecService valStockQuotationRecService;
     /** add by yanya on 20210831 增加股票行情接口 end**/
+
+    /** add by weipeng on 20220428 增加股票流动性折扣信息、指数行情信息接口 start**/
+    @Autowired
+    private ValStockLiquidDiscountInfoRecService valStockLiquidDiscountInfoRecService;
+    /** add by weipeng on 20220428 增加股票流动性折扣信息、指数行情信息接口 end**/
+
     /**
      * <一句话功能简述>
      * <功能 详细描述>
@@ -156,6 +162,15 @@ public class HqDetailInfoInfoRecService {
             rtnResult = outsideCommitteeQuotationTemplateRecService.execute(templateSourceFlgDTO,acctEntity);
         }
         /** add by wangqidong on 20181101 title 委外行情 end**/
+
+        /** add by weipeng on 20220428 增加股票流动性折扣信息、指数行情信息接口 start**/
+        else if (TempConstant.股票流动性折扣信息.equals(acctEntity.getDtoName())){
+            rtnResult = valStockLiquidDiscountInfoRecService.execute(templateSourceFlgDTO, acctEntity);
+        }
+        else if (TempConstant.股票指数行情信息.equals(acctEntity.getDtoName())){
+            rtnResult = valStockQuotationRecService.execute(templateSourceFlgDTO, acctEntity);
+        }
+        /** add by weipeng on 20220428 增加股票流动性折扣信息、指数行情信息接口 end**/
         rtnResult.setParamMap(paramMap);
         return new HqDetailInfoProcessorResult(rtnResult);
     }

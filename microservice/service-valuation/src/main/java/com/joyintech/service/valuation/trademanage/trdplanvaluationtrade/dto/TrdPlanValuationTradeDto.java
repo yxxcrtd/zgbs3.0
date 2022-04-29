@@ -299,6 +299,11 @@ public class TrdPlanValuationTradeDto extends BaseEntity implements ProcessEntit
     @JsonSerialize(using= BigDecimalSerializer.class)
     private BigDecimal tradeAmtArrive;
 
+    /**
+     * 数据来源
+     */
+    private String dataSource;
+
     public String getOperateType() {
         return operateType;
     }
@@ -699,5 +704,11 @@ public class TrdPlanValuationTradeDto extends BaseEntity implements ProcessEntit
         this.tradeAmtArrive = tradeAmtArrive;
     }
 
+    public String getDataSource() {
+        return dataSource;
+    }
 
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
+    }
 }

@@ -1,27 +1,21 @@
 package com.joyintech.tams.valuation.common.interf.base.util;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import com.joyintech.tams.constant.DictCodeListExt1;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
 import com.joyintech.framework.base.intf.DataDict;
 import com.joyintech.framework.base.intf.DataDictItem;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.common.base.entity.TempCheckInfo;
 import com.joyintech.tams.common.base.entity.ValInterflog;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.interf.base.constant.FinalString;
 import com.joyintech.tams.valuation.common.interf.base.constant.TempConstant;
 import com.joyintech.tams.valuation.common.utils.ValStringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.lang.reflect.Field;
+import java.util.*;
 
 @Service
 public class InterfHelper {
@@ -671,6 +665,18 @@ public class InterfHelper {
         temp.setColCcyName("ccy");
         temp.setColChlId("channelId");
         prdNameMap.put(TempConstant.场外期权交易, temp);
+
+        temp = new TempCheckInfo();
+        temp.setDtoEname(TempConstant.利率互换标的信息);
+        prdNameMap.put(TempConstant.利率互换标的信息, temp);
+
+        temp = new TempCheckInfo();
+        temp.setDtoEname(TempConstant.利率互换交易信息);
+        temp.setColprdName("prodId");
+        temp.setInvestType("INVEST");
+        temp.setColCcyName("ccy");
+        temp.setColChlId("channelId");
+        prdNameMap.put(TempConstant.利率互换交易信息, temp);
              
         return prdNameMap;
     }

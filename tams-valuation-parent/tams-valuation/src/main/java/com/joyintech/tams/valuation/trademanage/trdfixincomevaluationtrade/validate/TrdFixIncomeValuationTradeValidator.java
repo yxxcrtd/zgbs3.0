@@ -41,7 +41,7 @@ public class TrdFixIncomeValuationTradeValidator implements BeanValidator {
         if(dto.getOperateType().equals("submit") || dto.getOperateType().equals("save")){
             //交割日期必须大于等于交易日期；
             if(StringUtil.isNotEmpty(dto.getTradeDate())){
-                if(!(DateUtil.compareDate(dto.getEffDate(), dto.getTradeDate())==1)){
+                if(!(DateUtil.compareDate(dto.getEffDate(), dto.getTradeDate())>=0)){
                     String msg = this.getMessage("交割日期必须大于等于交易日期");
                     validMessageList.add(new ValidMessage(msg));
                 }

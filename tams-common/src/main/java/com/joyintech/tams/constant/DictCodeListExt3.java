@@ -1914,6 +1914,7 @@ public enum DictCodeListExt3 implements BaseDictCodeList {
     投管业务类型_中途换券(DictCode.投管业务类型,"EX014","中途换券"),
     投管业务类型_解除质押(DictCode.投管业务类型,"EX015","解除质押"),
     投管业务类型_协议现券(DictCode.投管业务类型,"EX016","协议现券"),
+    共通业务类型_利率互换交易(DictCode.共通业务类型,"TRD53","利率互换交易"),
 	
 	场内多组合分配方式_单笔数量(DictCode.场内多组合分配方式,"01","单笔数量"),
     场内多组合分配方式_单笔金额(DictCode.场内多组合分配方式,"02","单笔金额"),

@@ -149,7 +149,7 @@
 											<input type="text" id="tradeDate" name="tradeDate" required
 												   class="layui-input form-input input-dateSelect" placeholder="请输入内容"
 												   data-th-placeholder="#{SysCommon.placeholder}"
-												   data-th-value='${#dates.format(entity?.tradeDate,"yyyy-MM-dd")}'>
+											       data-th-value='${#dates.format(entity?.tradeDate?:iPlatformDate,"yyyy-MM-dd")}'>
 										</div>
 									</div>
 									<div class="form-inline-wrap">
@@ -159,19 +159,9 @@
 											<input type="text" id="effDate" name="effDate" required
 												   class="layui-input form-input input-dateSelect" placeholder="请输入内容"
 												   data-th-placeholder="#{SysCommon.placeholder}"
-												   data-th-value='${#dates.format(entity?.effDate,"yyyy-MM-dd")}'>
+												   data-th-value='${#dates.format(entity?.effDate?:iPlatformDate,"yyyy-MM-dd")}'>
 										</div>
 									</div>
-<!--									<div class="form-inline-wrap">-->
-<!--										<label class="layui-form-label form-lable"-->
-<!--											   data-th-text="#{TrdFixIncomeValuationTrade.fundSettleDate}">资金交收日期</label>-->
-<!--										<div class="layui-input-inline input-inline">-->
-<!--											<input type="text" id="fundSettleDate" name="fundSettleDate" required-->
-<!--												   class="layui-input form-input input-dateSelect" placeholder="请输入内容"-->
-<!--												   data-th-placeholder="#{SysCommon.placeholder}"-->
-<!--												   data-th-value='${#dates.format(entity?.fundSettleDate,"yyyy-MM-dd")}'>-->
-<!--										</div>-->
-<!--									</div>-->
 									<div class="form-inline-wrap">
 										<label class="layui-form-label form-lable"
 											   data-th-text="#{TrdFixIncomeValuationTrade.capital}">本金金额</label>

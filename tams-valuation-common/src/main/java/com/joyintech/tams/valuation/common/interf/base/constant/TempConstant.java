@@ -363,5 +363,52 @@ public class TempConstant {
      */
     public static final String 自定义现金流交易= "ValCashflowTrade";
 
+    /**
+     * 利率互换标的信息
+     */
+    public static final String 利率互换标的信息= "ValIrsInfo";
+    /**
+     * 利率互换付息计划
+     */
+    public static final String 利率互换付息计划= "ValIrsCashPlan";
+    /**
+     * 利率互换交易信息
+     */
+    public static final String 利率互换交易信息= "ValIrsDeal";
+    /**
+     * 利率互换存续期交易
+     */
+    public static final String 利率互换存续期交易= "ValIrsPerIodDeal";
+
+
+
+
+    /**
+     * 股票交易
+     */
+    public static final String 股票交易= "ValStockDeal";
+
+    /**
+     * 股票上市流通
+     */
+    public static final String 股票上市流通= "ValStockCirculate";
+
+    /**
+     * 股票存续期交易
+     */
+    public static final String 股票存续期交易= "ValStockPeriodDeal";
+
+    /**
+     * 股票流动性折扣信息
+     * add by weipeng on 20220428
+     */
+    public static final String 股票流动性折扣信息="ValStockLiquidDiscountInfo";
+
+    /**
+     * 股票指数行情信息
+     * add by weipeng on 20220428
+     */
+    public static final String 股票指数行情信息="ValStockIndicatorQuotationInfo";
+
 }
 

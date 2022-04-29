@@ -2,6 +2,37 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.joyintech.tams.valuation.batch.common.accounting.dao.AccountingCommonMapper">
 
+	<resultMap type="com.joyintech.tams.valuation.batch.common.accounting.entity.StayDrawSubprdEntity" id="selByKeyResult">
+		<id column="BOOKSET_ID" property="booksetId"/>
+		<id column="LAYERING_ID" property="layeringId"/>
+		<id column="BUSI_DETAIL_TYPE" property="busiDetailType"/>
+		<result column="LAYERING_NAME"  property="layeringName"/>
+		<result column="F_LAYERING_ID"  property="fLayeringId"/>
+		<result column="BOK_DETAIL_ID"  property="bokDetailId"/>
+		<result column="BUSI_ID"  property="busiId"/>
+		<result column="VDATE"  property="vdate"/>
+		<!--		<result column="mdate"  property="mdate"/>-->
+		<result column="CALENDAR_ID"  property="calendarId"/>
+		<result column="BRANCH"  property="branch"/>
+		<result column="LEV"  property="lev"/>
+		<result column="CUR_LEV"  property="curLev"/>
+		<result column="S_BRANCH"  property="sBranch"/>
+
+		<association property="bokDetailIdEntity" javaType="com.joyintech.tams.common.base.entity.BokDetailId">
+			<result column="BOOKSET_ID1"  property="booksetId"/>
+			<result column="BOK_DETAIL_ID1"  property="bokDetailId"/>
+			<result column="BUSI_ID1"  property="busiId"/>
+			<result column="BUSI_DETAIL_TYPE1"  property="busiDetailType"/>
+			<result column="INV_AIM1"  property="invAim"/>
+			<result column="SEC_MANAGE_ACCT_ID1"  property="secManageAcctId"/>
+			<result column="TRADE_ID1"  property="tradeId"/>
+			<result column="DETAIL_SUBJECT_NO_TAIL1"  property="detailSubjectNoTail"/>
+			<result column="DETAIL_SUBNAME_TAIL1"  property="detailSubnameTail"/>
+			<result column="BRANCH1"  property="branch"/>
+			<result column="CCY1"  property="ccy"/>
+		</association>
+	</resultMap>
+
 	<!-- 根据条件删除 账务明细（历史表） 数据 -->
 	<delete id="deleteBookDetailAll" parameterType="java.util.Map">
 		DELETE
@@ -539,33 +570,43 @@
     
     <!-- 对应科目查询 -->
     <select id="getCorrespondSubject" parameterType="java.util.Map" resultType="com.joyintech.tams.valuation.batch.common.accounting.entity.CorrespondSubjectEntity">
-    WITH TMP AS(
-    	SELECT SCENE_NODE_ID
-    	FROM BOK_SCENESUBJECT
-    	WHERE SUBJECT_NO = #{subjectNo}
-    	AND BOOKSET_ID = #{booksetId}
-    )
-    SELECT
-    	TEMP.*
-    FROM(
-    	SELECT 
-    		b.SUBJECT_NO,
-    		b.BASE_SUBJECT_NATURE,
-    		ROW_NUMBER() OVER(PARTITION BY b.BASE_SUBJECT_NATURE
-	                ORDER BY b.SUBJECT_NO ASC) AS rowno
-    	FROM BOK_SCENESUBJECT a,TMP,BOK_SUBJECT b
-    	WHERE  TMP.SCENE_NODE_ID like a.SCENE_NODE_ID  || '%'
-    	AND a.BOOKSET_ID = #{booksetId}
-    	AND a.BOOKSET_ID = b.BOOKSET_ID
-    	AND a.SUBJECT_NO = b.SUBJECT_NO
-    	AND b.BASE_SUBJECT_NATURE IN (
-	    	<foreach collection="baseSubjectNature" item="item" separator=",">
-		    	#{item}
-	    	</foreach>
-    	)
-    ) TEMP
-    WHERE TEMP.rowno = 1
+		SELECT
+			C.SUBJECT_NO,
+			C.BASE_SUBJECT_NATURE
+		FROM BOK_BUSS_DETSUB a
+		INNER JOIN BOK_BOOKSET b
+			ON B.BOOKSET_ID = A.BOOKSET_ID
+		INNER JOIN BOK_SUBJECT C
+			ON  C.BOOKSET_ID = B.BOOKSET_ID_TMPL
+			AND A.FSUBJECT_ID = C.SUBJECT_NO
+		WHERE  A.BOOKSET_ID = #{booksetId}
+		AND A.DETAIL_SUBJECT_NO_TAIL = #{detailSubjectNoTail}
+		AND C.BASE_SUBJECT_NATURE IN (
+		<foreach collection="baseSubjectNature" item="item" separator=",">
+			#{item}
+		</foreach>
+		)
     </select>
+
+	<!-- 对应科目查询 -->
+	<select id="getCorrespondSubjectNew" parameterType="java.util.Map" resultType="com.joyintech.tams.valuation.batch.common.accounting.entity.CorrespondSubjectEntity">
+		SELECT
+		C.SUBJECT_NO,
+		C.SUBJECT_INTERNAL_CODE as baseSubjectNature
+		FROM BOK_BUSS_DETSUB a
+		INNER JOIN BOK_BOOKSET b
+		ON B.BOOKSET_ID = A.BOOKSET_ID
+		INNER JOIN BOK_SUBJECT C
+		ON  C.BOOKSET_ID = B.BOOKSET_ID_TMPL
+		AND A.FSUBJECT_ID = C.SUBJECT_NO
+		WHERE  A.BOOKSET_ID = #{booksetId}
+		AND A.DETAIL_SUBJECT_NO_TAIL = #{detailSubjectNoTail}
+		AND C.SUBJECT_INTERNAL_CODE IN (
+		<foreach collection="baseSubjectNature" item="item" separator=",">
+			#{item}
+		</foreach>
+		)
+	</select>
     
     <!-- 交易最新账务查询 -->
     <select id="searchNewestBook" parameterType="java.util.Map" resultType="com.joyintech.tams.valuation.batch.common.accounting.entity.BookNewestInfoDto">
@@ -1350,4 +1391,73 @@ FROM
 			)
 		  AND a.HAPPEN_DATE <![CDATA[>=]]> #{BOOKSET_DATE}
 	</delete>
+
+	<!-- 账套参数查询 -->
+	<select id="getBokBooksetExt" resultType="com.joyintech.tams.common.base.entity.BokBooksetExt">
+		select
+		BOOKSET_ID,PARAM_CODE,PARAM_VALUE,PARAM_NAME
+		from
+		BOK_BOOKSET_EXT
+		where
+		BOOKSET_ID = #{booksetId} AND PARAM_CODE = #{paramCode}
+	</select>
+
+
+	<!-- 账套分层子结构全量查询 -->
+	<select id="queryAllSubBokAcctInfo" fetchSize="1000"  resultMap="selByKeyResult">
+		SELECT INFO.BOOKSET_ID,
+			INFO.LAYERING_ID,
+			INFO.LAYERING_NAME,
+			INFO.F_LAYERING_ID,
+			INFO.BOK_DETAIL_ID,
+			INFO.BUSI_ID,
+			INFO.BUSI_DETAIL_TYPE,
+			INFO.VDATE,
+			INFO.MDATE,
+			INFO.CALENDAR_ID,
+			INFO.BRANCH,
+			INFO.LEV,
+			INFO.CUR_LEV,
+			INFO.S_BRANCH,
+			BDI.BOOKSET_ID AS BOOKSET_ID1,
+			BDI.BOK_DETAIL_ID AS BOK_DETAIL_ID1,
+			BDI.BUSI_ID AS BUSI_ID1,
+			BDI.BUSI_DETAIL_TYPE AS BUSI_DETAIL_TYPE1,
+			BDI.INV_AIM AS INV_AIM1,
+			BDI.SEC_MANAGE_ACCT_ID AS SEC_MANAGE_ACCT_ID1,
+			BDI.TRADE_ID AS TRADE_ID1,
+			BDI.DETAIL_SUBJECT_NO_TAIL AS DETAIL_SUBJECT_NO_TAIL1,
+			BDI.DETAIL_SUBNAME_TAIL AS DETAIL_SUBNAME_TAIL1,
+			BDI.BRANCH AS BRANCH1,
+			BDI.CCY AS CCY1
+		FROM BOK_ACCT_LAYERING_INFO INFO
+		LEFT JOIN BOK_DETAIL_ID BDI
+		ON INFO.BOK_DETAIL_ID = BDI.BOK_DETAIL_ID
+		AND INFO.BOOKSET_ID=BDI.BOOKSET_ID
+		where 1=1
+	</select>
+
+	<!-- 账套配置全量查询 -->
+	<select id="getAllBokBooksetExt" fetchSize="1000" resultType="com.joyintech.tams.common.base.entity.BokBooksetExt">
+		select
+			BOOKSET_ID,PARAM_CODE,PARAM_VALUE,PARAM_NAME
+		from
+			BOK_BOOKSET_EXT
+		ORDER BY
+			BOOKSET_ID,PARAM_CODE,PARAM_VALUE
+	</select>
+
+	<!-- 账套科目全量查询 -->
+	<select id="getAllBokSubject" fetchSize="1000"  resultType="com.joyintech.tams.common.base.entity.BokSubject">
+		select
+			BOOKSET_ID,SUBJECT_NO,SUBJECT_NAME,FSUBJECT_ID,BAL_FLAG,SUBJECT_TYPE,SUBJECT_LEVEL,
+			ACC_QUA_FLAG,ACC_INT_FLAG,OVERDRAWN_FLAG,GEN_DETSUB_FLAG,BASE_SUBJECT_NATURE,INV_AIM,SEC_MANAGE_ACCT_ID,
+			IS_ACC,SUBJECT_INTERNAL_CODE,SUBJECT_HAND_FEL_CODE,CCY
+		from
+			BOK_SUBJECT
+		ORDER BY
+			BOOKSET_ID, SUBJECT_NO
+	</select>
+
+
 </mapper>

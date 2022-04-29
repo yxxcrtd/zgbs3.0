@@ -15,14 +15,14 @@ import java.util.Date;
 
 /**
  * 标的查询 - 查询交易信息Dto 
- * 
+ *
  * @author niuqianyu
  * @version 1.0 2018年6月1日
  * @see TradeInfoDto
  * @since 1.0
  */
 public class TradeInfoDto {
-    
+
 //	/**
 //	 * 交易编号
 //	 */
@@ -31,18 +31,18 @@ public class TradeInfoDto {
 //	 * 业务类型
 //	 */
 //	private String busiType;
-//	/**
-//	 * 金融产品代码
-//	 */
-//	private String finprodId;
-//	/**
-//	 * 金融产品类型
-//	 */
-//	private String finprodType;
-//	/**
-//	 * 分支序号
-//	 */
-//	private int branch;
+	/**
+	 * 金融产品代码
+	 */
+	private String finprodId;
+	/**
+	 * 金融产品类型
+	 */
+	private String finprodType;
+	/**
+	 * 分支序号
+	 */
+	private int branch;
 //	/**
 //	 * 交易日
 //	 */
@@ -135,6 +135,7 @@ public class TradeInfoDto {
 //	 * 是否结清
 //	 */
 //	private String isClean;
+
 	/**
 	 * 分支类型
 	 */
@@ -208,42 +209,42 @@ public class TradeInfoDto {
 	 */
 	private String type1;
 	/**
-     * 分类2
-     */
-    private String type2;
-    /**
-     * 分类3
-     */
-    private String type3;
-    /**
-     * 分类4
-     */
-    private String type4;
-    /**
-     * 分类5
-     */
-    private String type5;
-    /**
-     * 分类6
-     */
-    private String type6;
+	 * 分类2
+	 */
+	private String type2;
+	/**
+	 * 分类3
+	 */
+	private String type3;
+	/**
+	 * 分类4
+	 */
+	private String type4;
+	/**
+	 * 分类5
+	 */
+	private String type5;
+	/**
+	 * 分类6
+	 */
+	private String type6;
 
-    /**
-     * 登记托管机构
-     */
-    private String registOrg;
-    
-    /**
-     * 外汇交易方向
-     */
-    private String excPs;
+	/**
+	 * 登记托管机构
+	 */
+	private String registOrg;
+
+	/**
+	 * 外汇交易方向
+	 */
+	private String excPs;
 
 	/**
 	 * 期权费
 	 */
-    private BigDecimal optFeeAmt;
-    
-    
+	private BigDecimal optFeeAmt;
+
+
 //	/**
 //	 *  取得 交易编号
 //	 *  @return 交易编号
@@ -276,53 +277,53 @@ public class TradeInfoDto {
 //	   this.busiType = busiType;
 //	}
 //
-//	/**
-//	 *  取得 金融产品代码
-//	 *  @return 金融产品代码
-//	 */
-//	public String getFinprodId() {
-//	   return finprodId;
-//	}
-//
-//	/**
-//	 *  设置 金融产品代码
-//	 *  @param finprodId 金融产品代码
-//	 */
-//	public void setFinprodId( String finprodId)  {
-//	   this.finprodId = finprodId;
-//	}
-//
-//	/**
-//	 *  取得 金融产品类型
-//	 *  @return 金融产品类型
-//	 */
-//	public String getFinprodType() {
-//	   return finprodType;
-//	}
-//
-//	/**
-//	 *  设置 金融产品类型
-//	 *  @param finprodType 金融产品类型
-//	 */
-//	public void setFinprodType( String finprodType)  {
-//	   this.finprodType = finprodType;
-//	}
-//
-//	/**
-//	 *  取得 分支序号
-//	 *  @return 分支序号
-//	 */
-//	public int getBranch() {
-//	   return branch;
-//	}
-//
-//	/**
-//	 *  设置 分支序号
-//	 *  @param branch 分支序号
-//	 */
-//	public void setBranch( int branch)  {
-//	   this.branch = branch;
-//	}
+	/**
+	 *  取得 金融产品代码
+	 *  @return 金融产品代码
+	 */
+	public String getFinprodId() {
+		return finprodId;
+	}
+
+	/**
+	 *  设置 金融产品代码
+	 *  @param finprodId 金融产品代码
+	 */
+	public void setFinprodId( String finprodId)  {
+		this.finprodId = finprodId;
+	}
+
+	/**
+	 *  取得 金融产品类型
+	 *  @return 金融产品类型
+	 */
+	public String getFinprodType() {
+		return finprodType;
+	}
+
+	/**
+	 *  设置 金融产品类型
+	 *  @param finprodType 金融产品类型
+	 */
+	public void setFinprodType( String finprodType)  {
+		this.finprodType = finprodType;
+	}
+
+	/**
+	 *  取得 分支序号
+	 *  @return 分支序号
+	 */
+	public int getBranch() {
+		return branch;
+	}
+
+	/**
+	 *  设置 分支序号
+	 *  @param branch 分支序号
+	 */
+	public void setBranch( int branch)  {
+		this.branch = branch;
+	}
 //
 //	/**
 //	 *  取得 交易日
@@ -697,7 +698,7 @@ public class TradeInfoDto {
 	 *  @return 分支类型
 	 */
 	public String getBranchType() {
-	   return branchType;
+		return branchType;
 	}
 
 	/**
@@ -705,7 +706,7 @@ public class TradeInfoDto {
 	 *  @param branchType 分支类型
 	 */
 	public void setBranchType( String branchType)  {
-	   this.branchType = branchType;
+		this.branchType = branchType;
 	}
 
 	/**
@@ -713,7 +714,7 @@ public class TradeInfoDto {
 	 *  @return 通道代码
 	 */
 	public String getChlAgrtId() {
-	   return chlAgrtId;
+		return chlAgrtId;
 	}
 
 	/**
@@ -721,7 +722,7 @@ public class TradeInfoDto {
 	 *  @param chlAgrtId 通道代码
 	 */
 	public void setChlAgrtId( String chlAgrtId)  {
-	   this.chlAgrtId = chlAgrtId;
+		this.chlAgrtId = chlAgrtId;
 	}
 
 	/**
@@ -729,7 +730,7 @@ public class TradeInfoDto {
 	 *  @return 名义本金
 	 */
 	public BigDecimal getPrin() {
-	   return prin;
+		return prin;
 	}
 
 	/**
@@ -737,7 +738,7 @@ public class TradeInfoDto {
 	 *  @param prin 名义本金
 	 */
 	public void setPrin( BigDecimal prin)  {
-	   this.prin = prin;
+		this.prin = prin;
 	}
 
 	/**
@@ -745,7 +746,7 @@ public class TradeInfoDto {
 	 *  @return 本金币种
 	 */
 	public String getCcy() {
-	   return ccy;
+		return ccy;
 	}
 
 	/**
@@ -753,7 +754,7 @@ public class TradeInfoDto {
 	 *  @param ccy 本金币种
 	 */
 	public void setCcy( String ccy)  {
-	   this.ccy = ccy;
+		this.ccy = ccy;
 	}
 
 	/**
@@ -761,7 +762,7 @@ public class TradeInfoDto {
 	 *  @return 起息日
 	 */
 	public Date getVdate() {
-	   return vdate;
+		return vdate;
 	}
 
 	/**
@@ -769,7 +770,7 @@ public class TradeInfoDto {
 	 *  @param vdate 起息日
 	 */
 	public void setVdate( Date vdate)  {
-	   this.vdate = vdate;
+		this.vdate = vdate;
 	}
 
 	/**
@@ -777,7 +778,7 @@ public class TradeInfoDto {
 	 *  @return 到期日
 	 */
 	public Date getMdate() {
-	   return mdate;
+		return mdate;
 	}
 
 	/**
@@ -785,7 +786,7 @@ public class TradeInfoDto {
 	 *  @param mdate 到期日
 	 */
 	public void setMdate( Date mdate)  {
-	   this.mdate = mdate;
+		this.mdate = mdate;
 	}
 
 	/**
@@ -793,7 +794,7 @@ public class TradeInfoDto {
 	 *  @return 期限(天)
 	 */
 	public int getTerm() {
-	   return term;
+		return term;
 	}
 
 	/**
@@ -801,7 +802,7 @@ public class TradeInfoDto {
 	 *  @param term 期限(天)
 	 */
 	public void setTerm( int term)  {
-	   this.term = term;
+		this.term = term;
 	}
 
 	/**
@@ -809,7 +810,7 @@ public class TradeInfoDto {
 	 *  @return 利率类型
 	 */
 	public String getIntType() {
-	   return intType;
+		return intType;
 	}
 
 	/**
@@ -817,7 +818,7 @@ public class TradeInfoDto {
 	 *  @param intType 利率类型
 	 */
 	public void setIntType( String intType)  {
-	   this.intType = intType;
+		this.intType = intType;
 	}
 
 	/**
@@ -825,7 +826,7 @@ public class TradeInfoDto {
 	 *  @return 固定利率
 	 */
 	public BigDecimal getIntRate() {
-	   return intRate;
+		return intRate;
 	}
 
 	/**
@@ -833,7 +834,7 @@ public class TradeInfoDto {
 	 *  @param intRate 固定利率
 	 */
 	public void setIntRate( BigDecimal intRate)  {
-	   this.intRate = intRate;
+		this.intRate = intRate;
 	}
 
 	/**
@@ -841,7 +842,7 @@ public class TradeInfoDto {
 	 *  @return 利率编号
 	 */
 	public String getIntRateId() {
-	   return intRateId;
+		return intRateId;
 	}
 
 	/**
@@ -849,7 +850,7 @@ public class TradeInfoDto {
 	 *  @param intRateId 利率编号
 	 */
 	public void setIntRateId( String intRateId)  {
-	   this.intRateId = intRateId;
+		this.intRateId = intRateId;
 	}
 
 	/**
@@ -857,7 +858,7 @@ public class TradeInfoDto {
 	 *  @return 计息基础
 	 */
 	public String getBasis() {
-	   return basis;
+		return basis;
 	}
 
 	/**
@@ -865,7 +866,7 @@ public class TradeInfoDto {
 	 *  @param basis 计息基础
 	 */
 	public void setBasis( String basis)  {
-	   this.basis = basis;
+		this.basis = basis;
 	}
 
 	/**
@@ -873,7 +874,7 @@ public class TradeInfoDto {
 	 *  @return 到期本金
 	 */
 	public BigDecimal getMPrinAmt() {
-	   return mPrinAmt;
+		return mPrinAmt;
 	}
 
 	/**
@@ -881,7 +882,7 @@ public class TradeInfoDto {
 	 *  @param mPrinAmt 到期本金
 	 */
 	public void setMPrinAmt( BigDecimal mPrinAmt)  {
-	   this.mPrinAmt = mPrinAmt;
+		this.mPrinAmt = mPrinAmt;
 	}
 
 	/**
@@ -889,7 +890,7 @@ public class TradeInfoDto {
 	 *  @return 到期利息
 	 */
 	public BigDecimal getMIntAmt() {
-	   return mIntAmt;
+		return mIntAmt;
 	}
 
 	/**
@@ -897,7 +898,7 @@ public class TradeInfoDto {
 	 *  @param mIntAmt 到期利息
 	 */
 	public void setMIntAmt( BigDecimal mIntAmt)  {
-	   this.mIntAmt = mIntAmt;
+		this.mIntAmt = mIntAmt;
 	}
 
 	/**
@@ -905,7 +906,7 @@ public class TradeInfoDto {
 	 *  @return 到期金额
 	 */
 	public BigDecimal getMTradeAmt() {
-	   return mTradeAmt;
+		return mTradeAmt;
 	}
 
 	/**
@@ -913,7 +914,7 @@ public class TradeInfoDto {
 	 *  @param mTradeAmt 到期金额
 	 */
 	public void setMTradeAmt( BigDecimal mTradeAmt)  {
-	   this.mTradeAmt = mTradeAmt;
+		this.mTradeAmt = mTradeAmt;
 	}
 
 	/**
@@ -921,7 +922,7 @@ public class TradeInfoDto {
 	 *  @return 原金融产品代码
 	 */
 	public String getOFinprodId() {
-	   return oFinprodId;
+		return oFinprodId;
 	}
 
 	/**
@@ -929,7 +930,7 @@ public class TradeInfoDto {
 	 *  @param oFinprodId 原金融产品代码
 	 */
 	public void setOFinprodId( String oFinprodId)  {
-	   this.oFinprodId = oFinprodId;
+		this.oFinprodId = oFinprodId;
 	}
 
 	/**
@@ -937,7 +938,7 @@ public class TradeInfoDto {
 	 *  @return 原金融产品类型
 	 */
 	public String getOFinprodType() {
-	   return oFinprodType;
+		return oFinprodType;
 	}
 
 	/**
@@ -945,7 +946,7 @@ public class TradeInfoDto {
 	 *  @param oFinprodType 原金融产品类型
 	 */
 	public void setOFinprodType( String oFinprodType)  {
-	   this.oFinprodType = oFinprodType;
+		this.oFinprodType = oFinprodType;
 	}
 
 	/**
@@ -953,7 +954,7 @@ public class TradeInfoDto {
 	 *  @return 匹配类型
 	 */
 	public String getMatchType() {
-	   return matchType;
+		return matchType;
 	}
 
 	/**
@@ -961,132 +962,132 @@ public class TradeInfoDto {
 	 *  @param matchType 匹配类型
 	 */
 	public void setMatchType( String matchType)  {
-	   this.matchType = matchType;
+		this.matchType = matchType;
 	}
 
-    
-    /**
-     * 获取 type1
-     * @return type1.
-     */
-    public String getType1() {
-        return type1;
-    }
 
-    
-    /**
-     * 设置 type1
-     * @param type1 type1
-     */
-    public void setType1(String type1) {
-        this.type1 = type1;
-    }
+	/**
+	 * 获取 type1
+	 * @return type1.
+	 */
+	public String getType1() {
+		return type1;
+	}
 
-    
-    /**
-     * 获取 type2
-     * @return type2.
-     */
-    public String getType2() {
-        return type2;
-    }
 
-    
-    /**
-     * 设置 type2
-     * @param type2 type2
-     */
-    public void setType2(String type2) {
-        this.type2 = type2;
-    }
+	/**
+	 * 设置 type1
+	 * @param type1 type1
+	 */
+	public void setType1(String type1) {
+		this.type1 = type1;
+	}
 
-    
-    /**
-     * 获取 type3
-     * @return type3.
-     */
-    public String getType3() {
-        return type3;
-    }
 
-    
-    /**
-     * 设置 type3
-     * @param type3 type3
-     */
-    public void setType3(String type3) {
-        this.type3 = type3;
-    }
+	/**
+	 * 获取 type2
+	 * @return type2.
+	 */
+	public String getType2() {
+		return type2;
+	}
 
-    
-    /**
-     * 获取 type4
-     * @return type4.
-     */
-    public String getType4() {
-        return type4;
-    }
 
-    
-    /**
-     * 设置 type4
-     * @param type4 type4
-     */
-    public void setType4(String type4) {
-        this.type4 = type4;
-    }
+	/**
+	 * 设置 type2
+	 * @param type2 type2
+	 */
+	public void setType2(String type2) {
+		this.type2 = type2;
+	}
 
-    
-    /**
-     * 获取 type5
-     * @return type5.
-     */
-    public String getType5() {
-        return type5;
-    }
 
-    
-    /**
-     * 设置 type5
-     * @param type5 type5
-     */
-    public void setType5(String type5) {
-        this.type5 = type5;
-    }
+	/**
+	 * 获取 type3
+	 * @return type3.
+	 */
+	public String getType3() {
+		return type3;
+	}
 
-    
-    /**
-     * 获取 type6
-     * @return type6.
-     */
-    public String getType6() {
-        return type6;
-    }
 
-    
-    /**
-     * 设置 type6
-     * @param type6 type6
-     */
-    public void setType6(String type6) {
-        this.type6 = type6;
-    }
-	
-    /**
-     * 取得 登记托管机构
-     * @return 登记托管机构
-     */
-    public String getRegistOrg() {
-        return registOrg;
-    }
+	/**
+	 * 设置 type3
+	 * @param type3 type3
+	 */
+	public void setType3(String type3) {
+		this.type3 = type3;
+	}
 
-    /**
-     * 设置 登记托管机构
-     * @param registOrg 登记托管机构
-     */
-    public void setRegistOrg(String registOrg) {
-        this.registOrg = registOrg == null ? null : registOrg.trim();
-    }
+
+	/**
+	 * 获取 type4
+	 * @return type4.
+	 */
+	public String getType4() {
+		return type4;
+	}
+
+
+	/**
+	 * 设置 type4
+	 * @param type4 type4
+	 */
+	public void setType4(String type4) {
+		this.type4 = type4;
+	}
+
+
+	/**
+	 * 获取 type5
+	 * @return type5.
+	 */
+	public String getType5() {
+		return type5;
+	}
+
+
+	/**
+	 * 设置 type5
+	 * @param type5 type5
+	 */
+	public void setType5(String type5) {
+		this.type5 = type5;
+	}
+
+
+	/**
+	 * 获取 type6
+	 * @return type6.
+	 */
+	public String getType6() {
+		return type6;
+	}
+
+
+	/**
+	 * 设置 type6
+	 * @param type6 type6
+	 */
+	public void setType6(String type6) {
+		this.type6 = type6;
+	}
+
+	/**
+	 * 取得 登记托管机构
+	 * @return 登记托管机构
+	 */
+	public String getRegistOrg() {
+		return registOrg;
+	}
+
+	/**
+	 * 设置 登记托管机构
+	 * @param registOrg 登记托管机构
+	 */
+	public void setRegistOrg(String registOrg) {
+		this.registOrg = registOrg == null ? null : registOrg.trim();
+	}
 
 
 
@@ -1173,21 +1174,21 @@ public class TradeInfoDto {
 		this.tradeMarket = tradeMarket;
 	}
 
-    /**
-     * 获取 excPs
-     * @return excPs.
-     */
-    public String getExcPs() {
-        return excPs;
-    }
+	/**
+	 * 获取 excPs
+	 * @return excPs.
+	 */
+	public String getExcPs() {
+		return excPs;
+	}
 
-    /**
-     * 设置 excPs
-     * @param excPs excPs
-     */
-    public void setExcPs(String excPs) {
-        this.excPs = excPs;
-    }
+	/**
+	 * 设置 excPs
+	 * @param excPs excPs
+	 */
+	public void setExcPs(String excPs) {
+		this.excPs = excPs;
+	}
 
 	/**
 	 * 获取 期权费

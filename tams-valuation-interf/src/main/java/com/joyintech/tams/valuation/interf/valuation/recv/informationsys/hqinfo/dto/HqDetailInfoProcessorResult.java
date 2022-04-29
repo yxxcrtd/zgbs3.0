@@ -85,6 +85,22 @@ public class HqDetailInfoProcessorResult extends BaseEntity {
     private List<FinExercisePlan> finExercisePlanList = new ArrayList<FinExercisePlan>();
     /** add by dongjun on 20181011 title:债券行权计划 end**/
 
+    /** add by yanya on 20210831 增加股票行情接口 start**/
+    List<MstSharePrice> valShareInfo = new ArrayList<>();
+    /** add by yanya on 20210831 增加股票行情接口 end**/
+
+    /** add by weipeng on 20220428 增加股票流动性折扣信息、指数行情 start**/
+    /**
+     * 股票流动性折扣信息
+     */
+    List<MstStockLiquidDiscountInfo> mstStockLiquidDiscountInfoList = new ArrayList<>();
+
+    /**
+     * 指数行情信息
+     */
+    List<MstIndicatorQuotation> mstIndicatorQuotationList = new ArrayList<>();
+    /** add by weipeng on 20220428 增加股票流动性折扣信息、指数行情 end**/
+
     /**
      * 重载构造方法 从valuation-common中返回的result重新赋值
      * 
@@ -105,6 +121,11 @@ public class HqDetailInfoProcessorResult extends BaseEntity {
         /** add by yanya on 20210831 增加股票行情接口 start**/
         this.setValShareInfo(result.getValShareInfo());
         /** add by yanya on 20210831 增加股票行情接口 end**/
+
+        /** add by weipeng on 20220428 增加股票流动性折扣信息、指数行情 start**/
+        this.setMstStockLiquidDiscountInfoList(result.getMstStockLiquidDiscountInfoList());
+        this.setMstIndicatorQuotationList(result.getMstIndicatorQuotationList());
+        /** add by weipeng on 20220428 增加股票流动性折扣信息、指数行情 end**/
     }
 
     
@@ -329,8 +350,6 @@ public class HqDetailInfoProcessorResult extends BaseEntity {
    /** add by dongjun on 20181011 title:债券行权计划 end**/
 
     /** add by yanya on 20210831 增加股票行情接口 start**/
-    List<MstSharePrice> valShareInfo = new ArrayList<>();
-
     public List<MstSharePrice> getValShareInfo() {
         return valShareInfo;
     }
@@ -339,4 +358,20 @@ public class HqDetailInfoProcessorResult extends BaseEntity {
         this.valShareInfo = valShareInfo;
     }
     /** add by yanya on 20210831 增加股票行情接口 end**/
+
+    public List<MstStockLiquidDiscountInfo> getMstStockLiquidDiscountInfoList() {
+        return mstStockLiquidDiscountInfoList;
+    }
+
+    public void setMstStockLiquidDiscountInfoList(List<MstStockLiquidDiscountInfo> mstStockLiquidDiscountInfoList) {
+        this.mstStockLiquidDiscountInfoList = mstStockLiquidDiscountInfoList;
+    }
+
+    public List<MstIndicatorQuotation> getMstIndicatorQuotationList() {
+        return mstIndicatorQuotationList;
+    }
+
+    public void setMstIndicatorQuotationList(List<MstIndicatorQuotation> mstIndicatorQuotationList) {
+        this.mstIndicatorQuotationList = mstIndicatorQuotationList;
+    }
 }

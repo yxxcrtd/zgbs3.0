@@ -409,7 +409,10 @@ public class PlannedBuyTradeTemplateRecService {
         /** 投资目的  add by libingyan on 20210125 start */
         valFinProductDeal.setInvAim(dto.getInvAim());
         /** 投资目的  add by libingyan on 20210125 end  */
-
+        /*add by sunshuaishuai 交易管理 20220325 start*/
+        //资金账户
+        valFinProductDeal.setMyAcctNo(dto.getMyAcctNo());
+        /*add by sunshuaishuai 20220325 end*/
         return valFinProductDeal;
     }
 

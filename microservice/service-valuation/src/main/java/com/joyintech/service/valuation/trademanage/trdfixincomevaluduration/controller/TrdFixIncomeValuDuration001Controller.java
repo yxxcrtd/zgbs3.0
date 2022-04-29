@@ -41,58 +41,6 @@ public class TrdFixIncomeValuDuration001Controller extends BaseController {
     private TrdFixIncomeValuDuration001Service trdFixIncomeValuDuration001Service;
 
     /**
-     * 产品代码下拉框
-     *
-     * @return 返回的数据
-     * @exception Exception
-     *                异常
-     * @since 1.0
-     */
-    @PostMapping("findPortfolioId/{page}/{length}")
-    public Page<SelectOptionDto> findPortfolioId(@RequestBody Map<String,Object> map,
-                                           @PathVariable("page") int page, @PathVariable("length") int length) {
-        return trdFixIncomeValuDuration001Service.findPortfolioId(page,length,map);
-    }
-
-    /**
-     * 资产代码下拉框
-     */
-    @PostMapping("findFinprodId/{page}/{length}")
-    public Page<SelectOptionDto> findFinprodId(@RequestBody Map<String,Object> map,
-                                               @PathVariable("page") int page, @PathVariable("length") int length) {
-        return trdFixIncomeValuDuration001Service.findFinprodId(page,length,map);
-    }
-
-
-
-    /**
-     * 回调函数 操作具体 new delete update <功能详细描述>
-     *
-     * @see
-     * @since 1.0
-     */
-    @Transactional
-    @DTXTransaction
-    @PostMapping("/doComplete/{type}")
-    public void doComplete(@RequestBody TrdFixIncomeValuDuration001Dto dto, @PathVariable("type") String type) {
-        dto.setOperateType(type);
-        trdFixIncomeValuDuration001Service.doComplete(dto);
-    }
-
-
-
-    /**
-     * 策略代码生成
-     * @see
-     * @since 1.0
-     */
-    @PostMapping("createPlanTradeId")
-    public String createPlanTradeId() {
-        return trdFixIncomeValuDuration001Service.createPlanTradeId();
-    }
-
-
-    /**
      * 查询 支持分页 <功能详细描述>
      *
      * @since 1.0
@@ -103,20 +51,6 @@ public class TrdFixIncomeValuDuration001Controller extends BaseController {
             throws Exception {
         return trdFixIncomeValuDuration001Service.selectForPage(page, length, param);
     }
-
-
-    /**
-     * 不分页数据查询  导出
-     *
-     * @param param
-     * @return
-     * @throws Exception
-     */
-    @PostMapping("/queryPageList")
-    public List<TrdFixIncomeValuDuration001Dto> queryPageList(@RequestBody Map<String, Object> param){
-        return trdFixIncomeValuDuration001Service.queryPageList(param);
-    }
-
 
     /**
      * 根据交易编号查询对象

@@ -72,6 +72,9 @@ public class TrdBondValuationDuration002Controller extends BaseController {
 
         String tradeId = getParam("tradeId");
 
+        //平台日
+        model.addAttribute("iPlatformDate", DateUtil.parse(DateUtil.getSysDate()));
+
         if(StringUtil.isNotEmpty(workflowId)){
             TrdBondValuationDurationDto entity= trdBondValuationDuration002Service.getBussinessEntityByWorkflowId(workflowId);
             if(!StringUtil.isNotEmpty(entity.getTradeId())){

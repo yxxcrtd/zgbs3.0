@@ -90,8 +90,8 @@ spring:
   profiles: dev
   datasource:
     url: jdbc:oracle:thin:@//192.168.60.142:1521/orcl
-    username: CVR303INIT_TEST1209
-    password: CVR303INIT_TEST1209
+    username: CVR303INIT_TEST1223
+    password: CVR303INIT_TEST1223
     validationQuery: SELECT 1 FROM DUAL
     initialSize: 10
     maxWaitMillis: -1
@@ -125,9 +125,9 @@ spring:
 base:
   datasource:
     driverClassName: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.60.142)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.60.142)(PORT=1521))(LOAD_BALANCE=no)(FAILOVER=on))(CONNECT_DATA=(SERVICE_NAME=orcl)))
-    username: CVR303INIT_TEST1209
-    password: CVR303INIT_TEST1209
+    url: jdbc:oracle:thin:@//192.168.60.142:1521/orcl
+    username: CVR303INIT_TEST1223
+    password: CVR303INIT_TEST1223
     validationQuery: SELECT 1 FROM DUAL
     initialSize: 10
     maxTotal: 100

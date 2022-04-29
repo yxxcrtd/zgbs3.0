@@ -905,7 +905,7 @@ public class CashFlowsStatement001Service extends CommonExportService<CashFlowsS
                 String key4 = 汇总指标6;
                 Map<String, Object> queryMap = new HashMap<String, Object>();
                 /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 start **/
-                String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+                String accountEntryType =  CacheUtil.getSysParam(GlobalConstant.ACCOUNT_ENTRY_TYPE);
                 queryMap.put("accountEntryType",accountEntryType);
                 /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 end **/
                 int thisYear = DateUtil.getYear(pageParam.get("thisTermMdate").toString());
@@ -928,7 +928,7 @@ public class CashFlowsStatement001Service extends CommonExportService<CashFlowsS
                 String key4 = 汇总指标6;
                 Map<String, Object> queryMap = new HashMap<String, Object>();
                 /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 start **/
-                String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+                String accountEntryType =  CacheUtil.getSysParam(GlobalConstant.ACCOUNT_ENTRY_TYPE);
                 queryMap.put("accountEntryType",accountEntryType);
                 /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 end **/
                 int lastYear = DateUtil.getYear(pageParam.get("lastTermMdate").toString());
@@ -953,7 +953,7 @@ public class CashFlowsStatement001Service extends CommonExportService<CashFlowsS
                 String key4 = 汇总指标6;
                 Map<String, Object> queryMap = new HashMap<String, Object>();
                 /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 start **/
-                String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+                String accountEntryType =  CacheUtil.getSysParam(GlobalConstant.ACCOUNT_ENTRY_TYPE);
                 queryMap.put("accountEntryType",accountEntryType);
                 /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 end **/
                 int thisYear = DateUtil.getYear(pageParam.get("thisTermMdate").toString());
@@ -975,7 +975,7 @@ public class CashFlowsStatement001Service extends CommonExportService<CashFlowsS
                 String key4 = 汇总指标6;
                 Map<String, Object> queryMap = new HashMap<String, Object>();
                 /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 start **/
-                String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+                String accountEntryType =  CacheUtil.getSysParam(GlobalConstant.ACCOUNT_ENTRY_TYPE);
                 queryMap.put("accountEntryType",accountEntryType);
                 /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 end **/
                 int lastYear = DateUtil.getYear(pageParam.get("lastTermMdate").toString());
@@ -1053,7 +1053,7 @@ public class CashFlowsStatement001Service extends CommonExportService<CashFlowsS
         if (rules.length == 2 && 手工凭证.equals(rules[0])) {
             Map<String, Object> queryMap = new HashMap<String, Object>();
             /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 start **/
-            String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+            String accountEntryType =  CacheUtil.getSysParam(GlobalConstant.ACCOUNT_ENTRY_TYPE);
             queryMap.put("accountEntryType",accountEntryType);
             /**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 end **/
             queryMap.put("booksetId", pageParam.get("booksetId"));

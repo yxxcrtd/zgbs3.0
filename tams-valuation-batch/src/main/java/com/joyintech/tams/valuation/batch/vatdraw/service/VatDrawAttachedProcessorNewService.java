@@ -24,6 +24,7 @@ import com.joyintech.tams.constant.DictCodeListTableId;
 import com.joyintech.tams.systemtools.util.CommonUtil;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGenerateResult;
 import com.joyintech.tams.valuation.batch.common.base.entity.extcommon.ValBokBookdetailBatch;
+import com.joyintech.tams.valuation.batch.common.cache.service.entity.BokSchemeConfigDto;
 import com.joyintech.tams.valuation.batch.vatdraw.dao.VatDrawAttachedMapper;
 import com.joyintech.tams.valuation.batch.vatdraw.dao.VatDrawMapper;
 import com.joyintech.tams.valuation.batch.vatdraw.dto.AddTaxRuleDto;
@@ -249,7 +250,9 @@ public class VatDrawAttachedProcessorNewService {
         // 6.1 单日全提
         // 读取配置[是否预估利息收入增值税附加]
         // 
-        List<BooksetTaxConfigDto> listConfig = vatDrawCommonNewService.queryBooksetTaxConfig(
+//        List<BooksetTaxConfigDto> listConfig = vatDrawCommonNewService.queryBooksetTaxConfig(
+//                booksetId, "ISCALCINTALT");
+        List<BokSchemeConfigDto> listConfig = vatDrawCommonNewService.queryBokSchemeConfig(
                 booksetId, "ISCALCINTALT");
         // 定义 计税基数M1 = 预估利息收入计税余额 + 预估红利收入计税余额 + 预估价差收入计税余额
         BigDecimal M1 = BigDecimal.ZERO;
@@ -267,14 +270,15 @@ public class VatDrawAttachedProcessorNewService {
             M1 = ArithmeticUtil.doAdd(NumberEnum.MONEY.getCode(), null, tdyTaxAmt1, tdyTaxAmt2);
         }
         // 读取配置[是否预估公允价值变动增值税附加]
-        listConfig = vatDrawCommonNewService.queryBooksetTaxConfig(booksetId, "ISCALCFLOATALT");
+        //listConfig = vatDrawCommonNewService.queryBooksetTaxConfig(booksetId, "ISCALCFLOATALT");
+        listConfig = vatDrawCommonNewService.queryBokSchemeConfig(booksetId, "ISCALCINTALT");
         // 是的场合
         if (CollectionUtils.isEmpty(listConfig) || DictCodeList.是否_是.getValue().equals(listConfig.get(0).getConfigValue())) {
             // 定义 预估价差收入计税余额
             M2 = tdyTaxBalanceSumMap.get(
                     DictCodeList.增值税类型_价差收入.getValue() + DictCodeList.增值税_确认类型_预估计税.getValue()).getTaxAmt();
             // 计税基数M2 = 计税基数M2 + 预估价差收入计税余额
-            M1 = ArithmeticUtil.doAdd(NumberEnum.MONEY.getCode(), null, M, M2);
+            M1 = ArithmeticUtil.doAdd(NumberEnum.MONEY.getCode(), null, M1, M2);
         }
 
         // 共通元素设置
@@ -505,7 +509,9 @@ public class VatDrawAttachedProcessorNewService {
             tdyTaxBalanceSum.setIncomeAmtAll(taxBase);
 
             BigDecimal happenAmt = BigDecimal.ZERO;
-            List<BooksetTaxConfigDto> listConfig = vatDrawCommonNewService.queryBooksetTaxConfig(
+//            List<BooksetTaxConfigDto> listConfig = vatDrawCommonNewService.queryBooksetTaxConfig(
+//                    acctEntity.getBooksetId(), TAX_CARRYOVER_CYCLE);
+            List<BokSchemeConfigDto> listConfig = vatDrawCommonNewService.queryBokSchemeConfig(
                     acctEntity.getBooksetId(), TAX_CARRYOVER_CYCLE);
             String circle = DictCodeList.频率_季.getValue();
             if (listConfig != null && listConfig.size() > 0) {

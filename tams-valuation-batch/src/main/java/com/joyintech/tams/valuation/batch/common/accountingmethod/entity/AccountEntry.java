@@ -109,6 +109,8 @@ public class AccountEntry {
      */
     private List<BokSubject> bokSubjectList;
 
+    private String nodeValue;
+
     /**
      * 获取 sceneNodeId
      * 
@@ -399,5 +401,13 @@ public class AccountEntry {
      */
     public void setDictSource(String dictSource) {
         this.dictSource = dictSource;
+    }
+
+    public String getNodeValue() {
+        return nodeValue;
+    }
+
+    public void setNodeValue(String nodeValue) {
+        this.nodeValue = nodeValue;
     }
 }

@@ -172,6 +172,11 @@ public class TrdOutRightRepoValuationTrade001Dto extends WflTrdProductDeal imple
     private String elementId;
 
     /**
+     * 到期标识 （用于识别是否做过到期交易）
+     */
+    private String dealFlag;
+
+    /**
      * 买断式回购交易实体类
      */
     private List<TrdOutRightRepoValuationTrade001Dto> selectedItem;
@@ -461,5 +466,13 @@ public class TrdOutRightRepoValuationTrade001Dto extends WflTrdProductDeal imple
 
     public void setCounterId(String counterId) {
         this.counterId = counterId;
+    }
+
+    public String getDealFlag() {
+        return dealFlag;
+    }
+
+    public void setDealFlag(String dealFlag) {
+        this.dealFlag = dealFlag;
     }
 }

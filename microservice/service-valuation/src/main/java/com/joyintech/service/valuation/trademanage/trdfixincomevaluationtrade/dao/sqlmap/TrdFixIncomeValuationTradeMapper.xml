@@ -6,7 +6,7 @@
 		SELECT
 			t.TRADE_ID tradeId,/**交易编号**/
 			t.F_TRADE_ID outTradeId,    /*外部成交编号*/
-			NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) prodId,/**金融产品代码**/
+			deal1.BOOKSET_ID prodId,/**金融产品代码**/
 			bok.BOOKSET_NAME prodName,/**金融产品名称**/
 			zc.FINPROD_ID  assetId, /**资产代码**/
 			zc.FINPROD_ABBR  assetName,/**资产简称**/
@@ -19,16 +19,14 @@
 			t.INT_AMT intAmt,/**应收利息总额**/
 			t.UNIT_CPRICE*100 cprice,/**净价**/
 			t.CCY ccy,/**币种**/
-			stl.SETTLE_AMT settleAmt,/**结算金额**/
-			nvl(t.MY_ACCT_NO,stl.MY_ACCT_NO) myAcctNo,/**资金账户**/
+			t.FPRICE_AMT settleAmt,/**结算金额**/
+			t.MY_ACCT_NO myAcctNo,/**资金账户**/
 			d.GEN_TYPE dataSource /**数据来源**/
 		FROM TRD_PRODUCT_DEAL t
 		LEFT JOIN TRD_PRODUCT_DEAL_ADD d on t.TRADE_ID = d.TRADE_ID
 		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
-		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE =#{BUSI_TYPE_09} AND STL.ORDER_TYPE NOT LIKE 'N%'
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal1 on deal1.BUSI_NO = t.TRADE_ID
-		LEFT JOIN BOK_DEAL_ACCOUNTING deal2 ON stl.ORDER_ID = deal2.BUSI_NO
-		LEFT JOIN BOK_BOOKSET bok on (bok.BOOKSET_ID = deal1.BOOKSET_ID) OR (bok.BOOKSET_ID = deal2.BOOKSET_ID)
+		LEFT JOIN BOK_BOOKSET bok on bok.BOOKSET_ID = deal1.BOOKSET_ID
 		where
 		t.BUSI_TYPE =#{BUSI_TYPE_09}
 		and  t.FINPROD_TYPE = #{FINPRODUCT_TYPE_F17}
@@ -36,7 +34,7 @@
 			and t.TRADE_ID like  concat(concat('%',#{tradeId}),'%')
 		</if>
 		<if test="finprodIdArr != null and finprodIdArr.length > 0">
-			and NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) IN
+			and deal1.BOOKSET_ID IN
 			<foreach collection="finprodIdArr" item="finprodId" open="( " close=" )" separator=",">
 				#{finprodId}
 			</foreach>
@@ -72,7 +70,7 @@
 		select
 			t.TRADE_ID tradeId,/**交易编号**/
 			t.F_TRADE_ID outTradeId,    /*外部成交编号*/
-			NVL(deal1.BOOKSET_ID,deal2.BOOKSET_ID) prodId,/**金融产品代码**/
+			deal1.BOOKSET_ID prodId,/**金融产品代码**/
 			bok.BOOKSET_NAME prodName,/**金融产品名称**/
 			zc.FINPROD_ID  assetId, /**资产代码**/
 			zc.FINPROD_ABBR  assetName,/**资产简称**/
@@ -86,13 +84,11 @@
 			t.UNIT_CPRICE*100 cprice,/**净价**/
 			t.CCY ccy,/**币种**/
 			(t.CPRICE_AMT+t.INT_AMT) settleAmt,/**结算金额**/
-			nvl(t.MY_ACCT_NO,stl.MY_ACCT_NO) myAcctNo/**资金账户**/
+			t.MY_ACCT_NO myAcctNo/**资金账户**/
 		FROM TRD_PRODUCT_DEAL t
 		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
-		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE =#{BUSI_TYPE_09} AND STL.ORDER_TYPE NOT LIKE 'N%'
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal1 on deal1.BUSI_NO = t.TRADE_ID
-		LEFT JOIN BOK_DEAL_ACCOUNTING deal2 ON stl.ORDER_ID = deal2.BUSI_NO
-		LEFT JOIN BOK_BOOKSET bok on (bok.BOOKSET_ID = deal1.BOOKSET_ID) OR (bok.BOOKSET_ID = deal2.BOOKSET_ID)
+		LEFT JOIN BOK_BOOKSET bok on bok.BOOKSET_ID = deal1.BOOKSET_ID
 		where
 		t.BUSI_TYPE =#{BUSI_TYPE_09}
 		and  t.FINPROD_TYPE = #{FINPRODUCT_TYPE_F17}

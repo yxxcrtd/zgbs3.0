@@ -64,6 +64,19 @@ public class FinCashInfo extends BaseEntity {
     private String collectType;
 
     /**
+     * 利率类型:不入表，只为了判断利率互换的现金流
+     */
+    private String rateType;
+
+    public String getRateType() {
+        return rateType;
+    }
+
+    public void setRateType(String rateType) {
+        this.rateType = rateType;
+    }
+
+    /**
      * 取得 现金流代码，MD5(业务代码+(char)256+业务类型+(char)256+分支序号+(char)256+现金流二级类型)
      * @return 现金流代码，MD5(业务代码+(char)256+业务类型+(char)256+分支序号+(char)256+现金流二级类型)
      */

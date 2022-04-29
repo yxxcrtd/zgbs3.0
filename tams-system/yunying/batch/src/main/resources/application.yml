@@ -169,14 +169,14 @@ spring:
     timeout: 20000
   datasource:
     url: jdbc:oracle:thin:@192.168.60.142:1521/orcl
-    username: CVR303INIT_DEV1223
-    password: CVR303INIT_DEV1223
+    username: CVR303INIT_TEST1223
+    password: CVR303INIT_TEST1223
     reportSqlldrDatabaseName: 192.168.60.142:1521/orcl #sqlldr用数据库连接，必须保持这种格式
 #应用配置
 application:
   sqldirurl: jdbc:oracle:thin:@//192.168.60.142:1521/orcl
-  sqldiruserName: CVR303INIT_DEV1223
-  sqldirpassword: CVR303INIT_DEV1223
+  sqldiruserName: CVR303INIT_TEST1223
+  sqldirpassword: CVR303INIT_TEST1223
   loadbalance: false
   micorservice:
     contextPath:
@@ -209,19 +209,19 @@ application:
 base:
   datasource:
     url: jdbc:oracle:thin:@192.168.60.142:1521/orcl
-    username: CVR303INIT_DEV1223
-    password: CVR303INIT_DEV1223
+    username: CVR303INIT_TEST1223
+    password: CVR303INIT_TEST1223
 #interf数据源配置
 interf:  
    datasource:
     url: jdbc:oracle:thin:@192.168.60.142:1521/orcl
-    username: CVR303INIT_DEV1223
-    password: CVR303INIT_DEV1223
+    username: CVR303INIT_TEST1223
+    password: CVR303INIT_TEST1223
 chbsend:
   datasource:
     url: jdbc:oracle:thin:@//192.168.60.142:1521/orcl
-    username: CVR303INIT_DEV1223
-    password: CVR303INIT_DEV1223
+    username: CVR303INIT_TEST1223
+    password: CVR303INIT_TEST1223
 #日志路径配置
 log:
   path: /home/tams/logs/batch

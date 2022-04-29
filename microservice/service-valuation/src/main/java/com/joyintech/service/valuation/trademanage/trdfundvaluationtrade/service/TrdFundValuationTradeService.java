@@ -14,11 +14,14 @@ import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.service.valuation.component.common.constants.BussinessDictCodeList;
 import com.joyintech.service.valuation.trademanage.bond.dao.TrdBondTradeMapper;
 import com.joyintech.service.valuation.trademanage.trdfundvaluationtrade.dao.TrdFundValuationTradeMapper;
 import com.joyintech.service.valuation.trademanage.trdfundvaluationtrade.dto.TrdFundTradeResult;
 import com.joyintech.service.valuation.trademanage.trdfundvaluationtrade.dto.TrdFundValuationTradeDto;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.valuation.common.interf.base.batch.dao.*;
 import com.joyintech.tams.valuation.common.interf.base.service.common.InterfCommonService;
@@ -116,8 +119,18 @@ public class TrdFundValuationTradeService extends CommonExportService<TrdFundVal
         String[] psArr = null;
         if (StringUtil.isNotEmpty(ps)) {
             psArr = ps.split(",");
+            pageParam.put("psArr", psArr);
+        }else{
+            String[] psArr1 = {DictCodeList.交易方向_买入.getValue()
+                    ,DictCodeList.交易方向_卖出.getValue()
+                    ,DictCodeList.交易方向_申购.getValue()
+                    ,DictCodeList.交易方向_申购确认.getValue()
+                    ,DictCodeList.交易方向_认购确认.getValue()
+                    ,DictCodeList.交易方向_赎回确认.getValue()
+                    ,DictCodeList.交易方向_赎回到账.getValue()
+                    ,DictCodeList.交易方向_认购.getValue()};
+            pageParam.put("psArr", psArr1);
         }
-        pageParam.put("psArr", psArr);
 
         // 获取交易方向
         String tradeMarket = (String)pageParam.get("tradeMarket");
@@ -128,71 +141,60 @@ public class TrdFundValuationTradeService extends CommonExportService<TrdFundVal
         }
         pageParam.put("tradeMarketArr", tradeMarketArr);
 
+        // 获取数据来源
+        String dataSource = (String)pageParam.get("dataSource");
+        // 数据来源多选，转为数组
+        String[] dataSourceArr = null;
+        if (StringUtil.isNotEmpty(dataSource)) {
+            dataSourceArr = dataSource.split(",");
+        }
+        pageParam.put("dataSourceArr", dataSourceArr);
+
+        //传递默认值
+        pageParam.put("busiType_06",DictCodeList.业务类型_货币基金交易_货基_类货基资产交易.getValue());
+        pageParam.put("busiType_07",DictCodeList.业务类型_非货币基金交易_非货基_非类货基资产交易.getValue());
+        pageParam.put("finprodType", DictCodeListExt1.金融产品类型_基金.getValue());
+        pageParam.put("PS_T01", DictCodeList.交易方向_买入.getValue());
+        pageParam.put("PS_T02", DictCodeList.交易方向_卖出.getValue());
+        pageParam.put("PS_T04", DictCodeList.交易方向_申购.getValue());
+        pageParam.put("PS_T05", DictCodeList.交易方向_申购确认.getValue());
+        pageParam.put("PS_T18", DictCodeList.交易方向_认购确认.getValue());
+        pageParam.put("PS_T19", DictCodeList.交易方向_赎回确认.getValue());
+        pageParam.put("PS_T24", DictCodeList.交易方向_赎回到账.getValue());
+        pageParam.put("PS_T52", DictCodeList.交易方向_认购.getValue());
+        pageParam.put("YES_NO_Y",DictCodeList.是否_是.getValue());
+        pageParam.put("YES_NO_N",DictCodeList.是否_否.getValue());
+        pageParam.put("FEE_TYPE_B05", BussinessDictCodeList.费用类型_佣金.getValue());
+
         return super.queryForPage(page,length,()-> trdFundValuationTradeMapper.selectDeal(pageParam));
     }
 
-
-    /**
-     * 策略代码生成
-     *
-     * @return
-     * @see
-     * @since 1.0
-     */
-    public String createPlanTradeId() {
-        String tradeId = null;
-        while (true) {
-            // 获取自增数
-            String nextId = this.getNextId("FUNDTRADEID_SEQUENCE");
-            //平台日
-            String dateStr= DateUtil.format(iPlatformDate.getSysDate(),DateUtil.DEFAULT_OTHER_FORMAT);//yyyyMMdd
-            // 拼接
-            tradeId = "JY"+"FUND"+dateStr+ nextId;
-            // 查询是否重复
-            int num = trdFundValuationTradeMapper.selectCountByTradeId(tradeId);
-            // 如果自增的策略代码不存在，则跳出循环
-            if (num==0) {
-                break;
-            }
-        }
-        return tradeId;
-    }
-
-    /**
-     * 获取自增序列值
-     *
-     * @param sequenceName 序列名
-     * @return
-     */
-    public String getNextId(String sequenceName) {
-        return trdFundValuationTradeMapper.getNextId(sequenceName);
-    }
-
-    /**
-     * 根据条件查询所有
-     *
-     * @param params
-     * @return
-     * @see
-     * @since 1.0
-     */
-    public List<TrdFundValuationTradeDto> findAll(Map<String, Object> params) {
-        return trdFundValuationTradeMapper.selectDeal(params);
-    }
-
     public TrdFundValuationTradeDto queryTradeInfoByTradeId(Map<String, Object> params) {
+        params.put("busiType_06",DictCodeList.业务类型_货币基金交易_货基_类货基资产交易.getValue());
+        params.put("busiType_07",DictCodeList.业务类型_非货币基金交易_非货基_非类货基资产交易.getValue());
+        params.put("YES_NO_Y",DictCodeList.是否_是.getValue());
+        params.put("YES_NO_N",DictCodeList.是否_否.getValue());
+        params.put("FEE_TYPE_B05", BussinessDictCodeList.费用类型_佣金.getValue());
         return trdFundValuationTradeMapper.queryTradeInfoByTradeId(params);
     }
 
     public TrdFundValuationTradeDto queryRedInfoByTradeId(String tradeId) {
-        return trdFundValuationTradeMapper.queryRedInfoByTradeId(tradeId);
+        Map<String, Object> params = new HashMap<>();
+        params.put("tradeId",tradeId);
+        params.put("busiType_06",DictCodeList.业务类型_货币基金交易_货基_类货基资产交易.getValue());
+        params.put("busiType_07",DictCodeList.业务类型_非货币基金交易_非货基_非类货基资产交易.getValue());
+        return trdFundValuationTradeMapper.queryRedInfoByTradeId(params);
     }
 
     /**
      * 赎回到账双击明细页面
      */
     public TrdFundValuationTradeDto queryRedInfoByOutTradeId(String tradeId) {
-        return trdFundValuationTradeMapper.queryRedInfoByOutTradeId(tradeId);
+        Map<String, Object> params = new HashMap<>();
+        params.put("tradeId",tradeId);
+        params.put("busiType_06",DictCodeList.业务类型_货币基金交易_货基_类货基资产交易.getValue());
+        params.put("busiType_07",DictCodeList.业务类型_非货币基金交易_非货基_非类货基资产交易.getValue());
+        return trdFundValuationTradeMapper.queryRedInfoByOutTradeId(params);
     }
 
     /**

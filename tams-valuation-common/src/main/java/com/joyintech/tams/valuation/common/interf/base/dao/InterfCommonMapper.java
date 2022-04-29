@@ -10,33 +10,16 @@
  
 package com.joyintech.tams.valuation.common.interf.base.dao;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.ibatis.annotations.Param;
-import org.springframework.stereotype.Repository;
-
-import com.joyintech.tams.common.base.entity.BokBankSceConfig;
-import com.joyintech.tams.common.base.entity.BokBooksetCapacctInfo;
-import com.joyintech.tams.common.base.entity.BokBooksetExt;
-import com.joyintech.tams.common.base.entity.BokBooksetPlan;
-import com.joyintech.tams.common.base.entity.BokSceneconfig;
-import com.joyintech.tams.common.base.entity.BokScenesubject;
-import com.joyintech.tams.common.base.entity.BokSchemeAssetConfig;
-import com.joyintech.tams.common.base.entity.BokSubject;
-import com.joyintech.tams.common.base.entity.BokTabledict;
-import com.joyintech.tams.common.base.entity.BokTablelist;
-import com.joyintech.tams.common.base.entity.FinCashCalcRule;
-import com.joyintech.tams.common.base.entity.FinCashInfo;
-import com.joyintech.tams.common.base.entity.FinProductClass;
-import com.joyintech.tams.common.base.entity.FinTradeProduct;
-import com.joyintech.tams.common.base.entity.StlFinProductAcct;
-import com.joyintech.tams.common.base.entity.StlOrdersMapping;
-import com.joyintech.tams.common.base.entity.TrdProductDeal;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.valuation.common.interf.base.dto.ProductDealDto;
 import com.joyintech.tams.valuation.common.interf.base.dto.TargetFinProduct;
 import com.joyintech.tams.valuation.common.interf.base.dto.ValBooksetInfoDto;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface InterfCommonMapper {
@@ -112,7 +95,7 @@ public interface InterfCommonMapper {
     /**
      * 通过账套代码和科目号查询账套科目信息
      * 
-     * @param booksetId
+     * @param valBokSubject
      * @return
      */
     BokSubject getValBokSubject(BokSubject valBokSubject);
@@ -359,4 +342,22 @@ public interface InterfCommonMapper {
      * @return
      */
     public String getFinanceProductSecType(FinProductClass finProductClass);
+
+    /**
+     * 挂钩标的利率查询
+     * @author 殷亚
+     * @date 2022/4/25 9:49
+     * @param paramMap
+     * @return com.joyintech.tams.valuation.common.interf.base.dto.MstIntRateInfo
+     * @see
+     * @version 1.0
+     */
+    MstIntRateInfo getMstIntRateInfo(Map<String,Object> paramMap);
+
+    /**
+     * 根据配置类型查询配置信息List
+     * @param configType 配置类型
+     * @return 配置信息List
+     */
+    public List<FinProductTypeConfig> getConfigListByType(@Param("configType") String configType);
 }

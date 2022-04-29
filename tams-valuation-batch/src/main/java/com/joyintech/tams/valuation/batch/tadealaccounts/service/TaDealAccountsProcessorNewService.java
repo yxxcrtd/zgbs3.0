@@ -250,22 +250,22 @@ public class TaDealAccountsProcessorNewService {
                 if (qtzhsyNow.compareTo(BigDecimal.ZERO) > 0) {
                     if(DictCodeListExt4.其他综合收益计算的平准金科目_计入申赎.getValue().equals(otherPzjCalcType)){
                         // 金额元素.其他综合收益-申赎= 变量.其他综合收益
-                        accountAmountMap.put(BookConstant.OTHER_INCOME_C, qtzhsyNow);
+                        accountAmountMap.put(BookConstant.OTHER_INCOME_D, qtzhsyNow);
                     }
                     else{
                         // 金额元素.其他综合收益-申赎= 变量.其他综合收益
-                        accountAmountMap.put(BookConstant.PLGAIN_OTHER_INCOME_C, qtzhsyNow);
+                        accountAmountMap.put(BookConstant.PLGAIN_OTHER_INCOME_D, qtzhsyNow);
                     }
                 }
                 else {
                     // 金额元素.其他综合收益-申赎 = 变量.其他综合收益*-1
                     if(DictCodeListExt4.其他综合收益计算的平准金科目_计入申赎.getValue().equals(otherPzjCalcType)){
                         // 金额元素.其他综合收益-申赎= 变量.其他综合收益
-                        accountAmountMap.put(BookConstant.OTHER_INCOME_D, qtzhsyNow.negate());
+                        accountAmountMap.put(BookConstant.OTHER_INCOME_C, qtzhsyNow.negate());
                     }
                     else{
                         // 金额元素.其他综合收益-申赎= 变量.其他综合收益
-                        accountAmountMap.put(BookConstant.PLGAIN_OTHER_INCOME_D, qtzhsyNow.negate());
+                        accountAmountMap.put(BookConstant.PLGAIN_OTHER_INCOME_C, qtzhsyNow.negate());
                     }
                 }
                 // 金额元素.未实现损益平准金
@@ -355,22 +355,22 @@ public class TaDealAccountsProcessorNewService {
                 if (qtzhsyNow.compareTo(BigDecimal.ZERO) > 0) {
                     if(DictCodeListExt4.其他综合收益计算的平准金科目_计入申赎.getValue().equals(otherPzjCalcType)){
                         // 金额元素.其他综合收益-申赎= 变量.其他综合收益
-                        accountAmountMap.put(BookConstant.OTHER_INCOME_C, qtzhsyNow);
+                        accountAmountMap.put(BookConstant.OTHER_INCOME_D, qtzhsyNow);
                     }
                     else{
                         // 金额元素.其他综合收益-申赎= 变量.其他综合收益
-                        accountAmountMap.put(BookConstant.PLGAIN_OTHER_INCOME_C, qtzhsyNow);
+                        accountAmountMap.put(BookConstant.PLGAIN_OTHER_INCOME_D, qtzhsyNow);
                     }
                 }
                 else {
                     // 金额元素.其他综合收益-申赎 = 变量.其他综合收益*-1
                     if(DictCodeListExt4.其他综合收益计算的平准金科目_计入申赎.getValue().equals(otherPzjCalcType)){
                         // 金额元素.其他综合收益-申赎= 变量.其他综合收益
-                        accountAmountMap.put(BookConstant.OTHER_INCOME_D, qtzhsyNow.negate());
+                        accountAmountMap.put(BookConstant.OTHER_INCOME_C, qtzhsyNow.negate());
                     }
                     else{
                         // 金额元素.其他综合收益-申赎= 变量.其他综合收益
-                        accountAmountMap.put(BookConstant.PLGAIN_OTHER_INCOME_D, qtzhsyNow.negate());
+                        accountAmountMap.put(BookConstant.PLGAIN_OTHER_INCOME_C, qtzhsyNow.negate());
                     }
                 }
 
@@ -452,22 +452,22 @@ public class TaDealAccountsProcessorNewService {
                 if (qtzhsyNow.compareTo(BigDecimal.ZERO) > 0) {
                     if(DictCodeListExt4.其他综合收益计算的平准金科目_计入申赎.getValue().equals(otherPzjCalcType)){
                         // 金额元素.其他综合收益-申赎= 变量.其他综合收益
-                        accountAmountMap.put(BookConstant.OTHER_INCOME_C, qtzhsyNow);
+                        accountAmountMap.put(BookConstant.OTHER_INCOME_D, qtzhsyNow);
                     }
                     else{
                         // 金额元素.其他综合收益-申赎= 变量.其他综合收益
-                        accountAmountMap.put(BookConstant.PLGAIN_OTHER_INCOME_C, qtzhsyNow);
+                        accountAmountMap.put(BookConstant.PLGAIN_OTHER_INCOME_D, qtzhsyNow);
                     }
                 }
                 else {
                     // 金额元素.其他综合收益-申赎 = 变量.其他综合收益*-1
                     if(DictCodeListExt4.其他综合收益计算的平准金科目_计入申赎.getValue().equals(otherPzjCalcType)){
                         // 金额元素.其他综合收益-申赎= 变量.其他综合收益
-                        accountAmountMap.put(BookConstant.OTHER_INCOME_D, qtzhsyNow.negate());
+                        accountAmountMap.put(BookConstant.OTHER_INCOME_C, qtzhsyNow.negate());
                     }
                     else{
                         // 金额元素.其他综合收益-申赎= 变量.其他综合收益
-                        accountAmountMap.put(BookConstant.PLGAIN_OTHER_INCOME_D, qtzhsyNow.negate());
+                        accountAmountMap.put(BookConstant.PLGAIN_OTHER_INCOME_C, qtzhsyNow.negate());
                     }
                 }
                 // 金额元素.未实现损益平准金

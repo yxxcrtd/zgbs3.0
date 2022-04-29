@@ -1,4 +1,4 @@
-package com.joyintech.tams.valuation.batch.common.util;
+package com.joyintech.tams.valuation.common.utils;
 
 import com.greenpineyu.fel.FelEngine;
 import com.greenpineyu.fel.FelEngineImpl;
@@ -16,7 +16,7 @@ import java.util.Map;
  * @author Zim
  * @time 2016年6月21日 下午1:13:36
  */
-public class ExpressionUtil {
+public class FelAnalysisUtil {
 
     private final static FelEngine FEL = new FelEngineImpl();
 

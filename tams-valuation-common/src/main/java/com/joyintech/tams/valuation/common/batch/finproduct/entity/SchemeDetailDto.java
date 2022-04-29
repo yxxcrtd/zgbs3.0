@@ -91,6 +91,19 @@ public class SchemeDetailDto {
     private String priceTailMode;
 
     /**
+     * 估值模型
+     */
+    private String valuationId;
+
+    public String getValuationId() {
+        return valuationId;
+    }
+
+    public void setValuationId(String valuationId) {
+        this.valuationId = valuationId;
+    }
+
+    /**
      * 取得 方案明细代码
      * 
      * @return 方案明细代码

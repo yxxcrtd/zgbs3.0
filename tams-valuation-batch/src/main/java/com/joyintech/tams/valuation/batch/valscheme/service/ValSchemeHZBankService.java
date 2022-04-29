@@ -237,12 +237,12 @@ public class ValSchemeHZBankService extends CommonExportService<ValSchemeBatchDt
                 && BookConstant.MAX_SUBJECT_LEVEL.equals(dto.getSubjectLevel())) {
                 // 变量.科目信息列表-摊余成本类利息调整 = 调用账务类共通【对应科目查询（参数.账套代码，基础科目性质列表{摊余成本类利息调整}，变量.科目明细.上级科目号）】
                 List<CorrespondSubjectEntity> 利息调整科目数据 = accountingCommonService.getCorrespondSubject(
-                    dto.getFsubjectNo(), booksetId,
+                    dto.getDetailSubjectNoTail(), booksetId,
                     Arrays.asList(DictCodeBaseSubjectNatrue.摊余成本类利息调整.getValue()));
                 //add jinmaodong 20201019 减值相关设计变更 START
                 // 变量.科目信息列表-摊余成本类资产减值 = 调用账务类共通【对应科目查询（参数.账套代码，基础科目性质列表{摊余成本类利息调整}，变量.科目明细.上级科目号）】
                 List<CorrespondSubjectEntity> 资产减值科目数据 = accountingCommonService.getCorrespondSubject(
-                    dto.getFsubjectNo(), booksetId,
+                    dto.getDetailSubjectNoTail(), booksetId,
                     Arrays.asList(DictCodeBaseSubjectNatrue.摊余成本类资产减值.getValue()));
                 
                 ValSchemeBatchDto 资产减值明细 = null;
@@ -397,7 +397,7 @@ public class ValSchemeHZBankService extends CommonExportService<ValSchemeBatchDt
 
                 // 变量.科目信息列表 = 调用账务类共通【对应科目查询（参数.账套代码，基础科目性质列表{公允价值损益类-公允价值变动}，变量.科目明细.上级科目号）】
                 List<CorrespondSubjectEntity> 科目信息列表 = accountingCommonService.getCorrespondSubject(
-                    dto.getFsubjectNo(), booksetId,
+                    dto.getDetailSubjectNoTail(), booksetId,
                     Arrays.asList(DictCodeBaseSubjectNatrue.公允价值损益类_公允价值变动.getValue()));
                 // 变量.公允价值明细 = 科目明细Map.get(变量.科目信息列表.get（0）.科目号,变量.科目明细.四级科目号尾号)
                 ValSchemeBatchDto 公允价值明细 = null;
@@ -434,7 +434,7 @@ public class ValSchemeHZBankService extends CommonExportService<ValSchemeBatchDt
                     && BookConstant.MAX_SUBJECT_LEVEL.equals(dto.getSubjectLevel())){
                 //变量.科目信息列表 = 调用账务类共通【对应科目查询（参数.账套代码，基础科目性质列表{公允价值变动}，变量.科目明细.上级科目号）】
                 List<CorrespondSubjectEntity> 科目信息列表 = accountingCommonService.getCorrespondSubject(
-                        dto.getFsubjectNo(), booksetId,
+                        dto.getDetailSubjectNoTail(), booksetId,
                         Arrays.asList(DictCodeBaseSubjectNatrue.公允价值变动.getValue()));
                 // 变量.公允价值明细 = 科目明细Map.get(变量.科目信息列表.get（0）.科目号,变量.科目明细.四级科目号尾号)
                 ValSchemeBatchDto 公允价值明细 = null;
@@ -470,7 +470,7 @@ public class ValSchemeHZBankService extends CommonExportService<ValSchemeBatchDt
                      && BookConstant.MAX_SUBJECT_LEVEL.equals(dto.getSubjectLevel())) {
                 // 变量.科目信息列表 = 调用账务类共通【对应科目查询】
                 List<CorrespondSubjectEntity> 科目信息列表 = accountingCommonService.getCorrespondSubject(
-                    dto.getFsubjectNo(), booksetId,
+                    dto.getDetailSubjectNoTail(), booksetId,
                     Arrays.asList(DictCodeBaseSubjectNatrue.综合收益类利息调整.getValue(),
                         DictCodeBaseSubjectNatrue.综合收益类_公允价值变动.getValue()));
                 ValSchemeBatchDto 利息调整明细 = null;
@@ -540,7 +540,7 @@ public class ValSchemeHZBankService extends CommonExportService<ValSchemeBatchDt
                 DictCodeBaseSubjectNatrue.基金投资_成本.getValue())
                      && BookConstant.MAX_SUBJECT_LEVEL.equals(dto.getSubjectLevel())) {
                 List<CorrespondSubjectEntity> 科目信息列表 = accountingCommonService.getCorrespondSubject(
-                    dto.getFsubjectNo(), booksetId,
+                    dto.getDetailSubjectNoTail(), booksetId,
                     Arrays.asList(DictCodeBaseSubjectNatrue.基金投资_估值增值.getValue()));
                 ValSchemeBatchDto 公允价值明细 = CollectionUtils.isEmpty(科目信息列表) ? null : 科目明细集合.get(
                     科目信息列表.get(0).getSubjectNo() + dto.getDetailSubjectNoTail());
@@ -577,7 +577,7 @@ public class ValSchemeHZBankService extends CommonExportService<ValSchemeBatchDt
                 DictCodeBaseSubjectNatrue.公允价值损益类_计划类资产_成本.getValue())
                      && BookConstant.MAX_SUBJECT_LEVEL.equals(dto.getSubjectLevel())) {
                 List<CorrespondSubjectEntity> 科目信息列表 = accountingCommonService.getCorrespondSubject(
-                    dto.getFsubjectNo(), booksetId,
+                    dto.getDetailSubjectNoTail(), booksetId,
                     Arrays.asList(DictCodeBaseSubjectNatrue.公允价值损益类_计划类资产_公允价值变动.getValue()));
                 ValSchemeBatchDto 公允价值明细 = CollectionUtils.isEmpty(科目信息列表) ? null : 科目明细集合.get(
                     科目信息列表.get(0).getSubjectNo() + dto.getDetailSubjectNoTail());
@@ -612,7 +612,7 @@ public class ValSchemeHZBankService extends CommonExportService<ValSchemeBatchDt
                      && BookConstant.MAX_SUBJECT_LEVEL.equals(dto.getSubjectLevel())) {
                 // 变量.科目信息列表 = 调用账务类共通【对应科目查询（参数.账套代码，基础科目性质列表{计划类资产-利息调整}，变量.科目明细.上级科目号）】
                 List<CorrespondSubjectEntity> 科目信息列表 = accountingCommonService.getCorrespondSubject(
-                    dto.getFsubjectNo(), booksetId,
+                    dto.getDetailSubjectNoTail(), booksetId,
                     Arrays.asList(DictCodeBaseSubjectNatrue.计划类资产_利息调整.getValue()));
                 // 变量.利息调整明细 = 科目明细Map.get(变量.科目信息列表.get（0）.科目号,变量.科目明细.四级科目号尾号)
                 ValSchemeBatchDto 利息调整明细 = CollectionUtils.isEmpty(科目信息列表) ? null : 科目明细集合.get(
@@ -647,7 +647,7 @@ public class ValSchemeHZBankService extends CommonExportService<ValSchemeBatchDt
 
                     // 变量.科目信息列表 = 调用账务类共通【对应科目查询（参数.账套代码，基础科目性质列表{公允价值损益类-公允价值变动}，变量.科目明细.上级科目号）】
                     List<CorrespondSubjectEntity> 科目信息列表 = accountingCommonService.getCorrespondSubject(
-                        dto.getFsubjectNo(), booksetId,
+                        dto.getDetailSubjectNoTail(), booksetId,
                         Arrays.asList(DictCodeBaseSubjectNatrue.公允价值类计划类收益型资产_公允价值变动.getValue()));
                     // 变量.公允价值明细 = 科目明细Map.get(变量.科目信息列表.get（0）.科目号,变量.科目明细.四级科目号尾号)
                     ValSchemeBatchDto 公允价值明细 = null;
@@ -682,7 +682,7 @@ public class ValSchemeHZBankService extends CommonExportService<ValSchemeBatchDt
                          && BookConstant.MAX_SUBJECT_LEVEL.equals(dto.getSubjectLevel())) {
                 // 变量.科目信息列表 = 调用账务类共通【对应科目查询】
                 List<CorrespondSubjectEntity> 科目信息列表 = accountingCommonService.getCorrespondSubject(
-                    dto.getFsubjectNo(), booksetId,
+                    dto.getDetailSubjectNoTail(), booksetId,
                     Arrays.asList(DictCodeBaseSubjectNatrue.综合收益类计划类收益型资产_利息调整.getValue(),
                         DictCodeBaseSubjectNatrue.综合收益类计划类收益型资产_公允价值变动.getValue()));
                 ValSchemeBatchDto 利息调整明细 = null;
@@ -754,7 +754,7 @@ public class ValSchemeHZBankService extends CommonExportService<ValSchemeBatchDt
                     && BookConstant.MAX_SUBJECT_LEVEL.equals(dto.getSubjectLevel())){
                 //变量.科目信息列表 = 调用账务类共通【对应科目查询（参数.账套代码，基础科目性质列表{股票-公允价值变动}，变量.科目明细.上级科目号）】
                 List<CorrespondSubjectEntity> 科目信息列表 = accountingCommonService.getCorrespondSubject(
-                        dto.getFsubjectNo(), booksetId,
+                        dto.getDetailSubjectNoTail(), booksetId,
                         Arrays.asList(DictCodeBaseSubjectNatrue.股票_公允价值变动.getValue()));
 
                 //变量.公允价值明细 = 科目明细Map.get(变量.科目信息列表.get（0）.科目号,变量.科目明细.四级科目号尾号)

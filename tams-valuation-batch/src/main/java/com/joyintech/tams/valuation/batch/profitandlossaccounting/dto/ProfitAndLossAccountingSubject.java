@@ -12,6 +12,14 @@ package com.joyintech.tams.valuation.batch.profitandlossaccounting.dto;
 
 
 public class ProfitAndLossAccountingSubject {
+    public ProfitAndLossAccountingSubject(String subjectNo,String baseSubjectNature ){
+        this.subjectNo=subjectNo;
+        this.baseSubjectNature=baseSubjectNature;
+    }
+
+    public ProfitAndLossAccountingSubject(){
+
+    }
     /**
      * 科目号
      */

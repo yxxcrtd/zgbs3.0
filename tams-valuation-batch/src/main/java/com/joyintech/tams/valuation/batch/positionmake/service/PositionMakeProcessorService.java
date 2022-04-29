@@ -619,7 +619,7 @@ public class PositionMakeProcessorService {
 		Map<String, SubjectNatureFeeTypeInfo> subjectNatureFeeTypeMap = new HashMap<String, SubjectNatureFeeTypeInfo>();
 		if (subjectNatureList != null && !subjectNatureList.isEmpty()) {
 			/**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 start **/
-			String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+			String accountEntryType =  CacheUtil.getSysParam(GlobalConstant.ACCOUNT_ENTRY_TYPE);
 			/**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 end **/
 			List<SubjectNatureFeeTypeInfo> subjectNatureFeeTypeInfoList = positionMakeWithoutDispatchMapper.getSubjectNatureFeeTypeInfo(
 				subjectNatureList,accountEntryType);
@@ -1129,7 +1129,7 @@ public class PositionMakeProcessorService {
 		//删除已有头寸  add by xr end
 		//1.查询应收款科目余额信息
 		/**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 start **/
-		String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+		String accountEntryType =  CacheUtil.getSysParam(GlobalConstant.ACCOUNT_ENTRY_TYPE);
 		sqlMap.put("accountEntryType",accountEntryType);
 		/**add by yinya on 2022-03-24 新会计引擎升级，科目体系有变更，科目性质需要增加旧科目体系的兼容 end **/
 		List<PtlSecReceivablesDto> dealList = positionMakeWithoutDispatchMapper.getPtlSecReceivablesList(sqlMap);

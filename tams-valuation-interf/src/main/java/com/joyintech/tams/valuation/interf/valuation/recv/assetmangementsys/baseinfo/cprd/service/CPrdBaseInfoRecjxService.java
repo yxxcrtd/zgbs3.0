@@ -6,6 +6,7 @@ import com.jixu.msg.dto.JJPortfolioDto;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.common.interf.base.constant.InterfCommonConstant;
 import com.joyintech.tams.valuation.common.interf.base.service.common.InterfCommonService;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValPrdInfoC;
@@ -65,7 +66,7 @@ public class CPrdBaseInfoRecjxService {
     	jjPortfolioDto.setStandard_ccy(dto.getCcy());
 		// add by weipeng on 20220408：会计引擎升级改造，若按照内部科目编码分录，则需要对应新会计引擎模板 start
 		// 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录
-		String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+		String accountEntryType =  CacheUtil.getSysParam(GlobalConstant.ACCOUNT_ENTRY_TYPE);
 		//调用service方法进行逻辑逻辑
 		if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
 			//账套模板

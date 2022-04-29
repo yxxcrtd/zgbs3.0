@@ -10,7 +10,8 @@ $(function(){
             tradeDateBegin: $("#tradeDate").startDate(),
             tradeDateEnd: $("#tradeDate").endDate(),
             tradeMarket:$('#tradeMarket').val(),
-            ps: $('#ps').val()
+            ps: $('#ps').val(),
+            dataSource:$.trim($('#dataSource').val())
         }
     };
     
@@ -59,9 +60,11 @@ $(function(){
             ,{field:'subFee', width:150, title: '认购费',type:'money'}
             ,{field:'purFee', width:150, title: '申购费',type:'money'}
             ,{field:'redFee', width:150, title: '赎回费',type:'money'}
-            ,{field:'brokerage', width:150, title: '经手费',type:'money'}
             ,{field:'commission', width:150, title: '净佣金',type:'money'}
+            ,{field:'commissionPay',type:"money", title: '应付佣金',width:150}
             ,{field:'trdMyAcctNo', title: '资金账户',width:180}
+            ,{field:'dataSourceStr', title: '数据来源',sortField:"dataSource",width:150}
+            ,{field:'dataSource', title: '数据来源',visible:false}
             ,{field:'operation', title: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操 作', fixed:'right',width : 120,
                 align : 'center',type : 'action', buttons : [ 'edit', 'delt' ]}
         ]
@@ -119,21 +122,11 @@ $(function(){
     });
 
     /**
-     * 导出事件
+     * 导出选中的表格数据
      */
     var exportExcel = function() {
-        if (table != null && table != '') {
-            var selArr = table.getAllCheckedRows();
-            var datas = JSON.stringify(selArr);
-        }
-        if (!selArr || selArr.length == 0) {
-            var paramObj = getPageParams();
-            Joyin.exportExcel('export', paramObj);
-        } else {
-            Joyin.exportExcel('export', {
-                datas : datas
-            });
-        }
+        var paramObj = getPageParams();//请求参数json格式
+        Joyin.exportExcel('export', paramObj);//导出（共通）
     };
     
     /**

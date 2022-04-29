@@ -20,6 +20,7 @@ import com.joyintech.tams.valuation.common.interf.base.constant.InterfCommonCons
 import com.joyintech.tams.valuation.common.interf.base.dto.*;
 import com.joyintech.tams.valuation.common.interf.base.service.common.InterfCommonService;
 import com.joyintech.tams.valuation.common.interf.base.service.common.TemplateAnalysisForXMLService;
+import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValBotAstTrade;
 import com.joyintech.tams.valuation.common.interf.tempTables.entity.ValFundMnfRedAffirm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -165,10 +166,13 @@ public class FundMoneyFundRedeemConfirmDealRecService {
             
             List<TrdTradeFeeDetail> listfeeDetail = this.getValTradeFeeDetail(item,valFinProductDeal);
             listValTradeFeeDetail.addAll(listfeeDetail);
-            
+
+            /*modify by sunshuaishuai 20220415 交易管理：录入界面的资金账户 start*/
             //结算指令
-            Map<String, Object> map = interfCommonService.instructionGenerate(valFinProductDeal, 
-            		item.getProdId(), interfProductDealBookCommonDto.getAcctSubjectType(),null);
+            StlOrders stlOrders = this.getStlOrders(item,valFinProductDeal);
+            Map<String, Object> map = interfCommonService.instructionGenerate_Interf(valFinProductDeal,stlOrders,
+                    item.getProdId(), interfProductDealBookCommonDto.getAcctSubjectType(),null);
+            /*modify by sunshuaishuai 20220415 交易管理：录入界面的资金账户 end*/
             if(map.get("ORDERS")!=null){
             	listValOrders.addAll((List<StlOrders>)map.get("ORDERS"));
             }
@@ -383,8 +387,14 @@ public class FundMoneyFundRedeemConfirmDealRecService {
 //        result.setHasOrder(dto.getIsClean());
         // 创建时间 = 系统时间
         result.setCreateTime(dto.getCreateTime());
+        /*modify by sunshuaishuai 20220414 判断生成方式是接口接入还是画面录入 start*/
         //生成方式
-        result.setGenType(com.joyintech.tams.constant.DictCodeListExt1.生成方式_接口接入.getValue());
+        if(StringUtil.isNotEmpty(dto.getDataSource())){
+            result.setGenType(dto.getDataSource());
+        }else {
+            result.setGenType(com.joyintech.tams.constant.DictCodeListExt1.生成方式_接口接入.getValue());
+        }
+        /*modify by sunshuaishuai 20220414 判断生成方式是接口接入还是画面录入 end*/
         return result;
     }
     /**
@@ -426,4 +436,25 @@ public class FundMoneyFundRedeemConfirmDealRecService {
         }
         return listValTradeFeeDetail;
     }
+
+    /*add by sunshuaishuai 20220415 交易管理：录入界面的资金账户 start*/
+    /**
+     * 接收 结算指令信息
+     * @param dto
+     * @return
+     */
+    private StlOrders getStlOrders(ValFundMnfRedAffirm dto, TrdProductDeal valFinProductDeal){
+        StlOrders result = new StlOrders();
+        //modify by yanya on 20210204 判定为空包含空字符
+        //if(dto.getMyAcctNo() == null && dto.getCounterAcctNo() == null){
+        if(StringUtil.isEmpty(dto.getMyAcctNo()) ){
+            return null;
+        }
+        result.setMyAcctNo(dto.getMyAcctNo());
+        //result.setCounterAcctNo(dto.getCounterAcctNo());
+        result.setSettleDate(valFinProductDeal.getSettleDate());
+        result.setSettleAmt(valFinProductDeal.getTradeAmt());
+        return result;
+    }
+    /*add by sunshuaishuai 20220415 交易管理：录入界面的资金账户 end*/
 }

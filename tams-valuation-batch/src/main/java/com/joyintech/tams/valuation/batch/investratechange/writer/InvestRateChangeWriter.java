@@ -46,6 +46,7 @@ public class InvestRateChangeWriter extends BaseWriter<NeedToWriteEntity> {
 				mstValIrsKey.setFinprodId2(mstValIrs.getFinprodId2());
 				mstValIrsKey.setValDate(mstValIrs.getValDate());
 				mstValIrsKey.setDatasourceType(mstValIrs.getDatasourceType());
+				mstValIrsKey.setValmodelId(mstValIrs.getValmodelId());
 				mstValIrsMapper.deleteByPrimaryKey(mstValIrsKey);
 				mstValIrsMapper.insertSelective(mstValIrs);
 			}

@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.joyintech.tams.valuation.common.interf.base.batch.dao.ValTrdProductDealAddBatchMapper" >
     <resultMap id="BaseResultMap" type="com.joyintech.tams.common.base.entity.TrdProductDealAdd">
-         <id column="TRADE_ID" property="tradeId" jdbcType="VARCHAR" />
+        <id column="TRADE_ID" property="tradeId" jdbcType="VARCHAR" />
         <result column="PORTFOLIO_ID" property="portfolioId" jdbcType="VARCHAR" />
         <result column="CUSTOM_CASH_TYPE" property="customCashType" jdbcType="VARCHAR" />
         <result column="GEN_TYPE" property="genType" jdbcType="VARCHAR" />
@@ -24,7 +24,7 @@
         <result column="DEPOSIT_AMT" property="depositAmt" jdbcType="DECIMAL" />
         <result column="R_FINPROD_ID" property="rFinprodId" jdbcType="VARCHAR" />
     </resultMap>
-   <sql id="Base_Column_List" >
+    <sql id="Base_Column_List" >
         TRADE_ID TRADE_ID, PORTFOLIO_ID PORTFOLIO_ID, CUSTOM_CASH_TYPE CUSTOM_CASH_TYPE, 
         GEN_TYPE GEN_TYPE, PUR_CFM_DATE PUR_CFM_DATE, RED_CFM_DATE RED_CFM_DATE, REG_DATE REG_DATE, 
         REG_DATE_AMT REG_DATE_AMT, BONUS_CFM_DATE BONUS_CFM_DATE, ENTRUST_ID ENTRUST_ID, 
@@ -33,20 +33,20 @@
         DEPOSIT_AMT DEPOSIT_AMT, R_FINPROD_ID R_FINPROD_ID
     </sql>
     <insert id="insertBatch" parameterType="java.util.List" >
-        insert into TRD_PRODUCT_DEAL_ADD (TRADE_ID, PORTFOLIO_ID, CUSTOM_CASH_TYPE, 
-            GEN_TYPE, PUR_CFM_DATE, RED_CFM_DATE, 
-            REG_DATE, REG_DATE_AMT, BONUS_CFM_DATE, 
-            ENTRUST_ID, PAY_TYPE, CREATE_USER, 
-            CREATE_DEPT, CREATE_TIME, UPDATE_USER, 
-            UPDATE_TIME, MP_FINPROD_ID, MP_BRANCH,
-            EXP_CON_VALUE,DEPOSIT_AMT, R_FINPROD_ID)
+        insert into TRD_PRODUCT_DEAL_ADD (TRADE_ID, PORTFOLIO_ID, CUSTOM_CASH_TYPE,
+        GEN_TYPE, PUR_CFM_DATE, RED_CFM_DATE,
+        REG_DATE, REG_DATE_AMT, BONUS_CFM_DATE,
+        ENTRUST_ID, PAY_TYPE, CREATE_USER,
+        CREATE_DEPT, CREATE_TIME, UPDATE_USER,
+        UPDATE_TIME, MP_FINPROD_ID, MP_BRANCH,
+        EXP_CON_VALUE,DEPOSIT_AMT, R_FINPROD_ID)
         <foreach collection="list" item="item" separator="from dual union all select" open="select * from (select "
                  close=" from dual)">
-            #{item.tradeId,jdbcType=VARCHAR}, #{item.portfolioId,jdbcType=VARCHAR}, #{item.customCashType,jdbcType=VARCHAR}, 
-            #{item.genType,jdbcType=VARCHAR}, #{item.purCfmDate,jdbcType=DATE}, #{item.redCfmDate,jdbcType=DATE}, 
-            #{item.regDate,jdbcType=DATE}, #{item.regDateAmt,jdbcType=DECIMAL}, #{item.bonusCfmDate,jdbcType=DATE}, 
-            #{item.entrustId,jdbcType=VARCHAR}, #{item.payType,jdbcType=VARCHAR}, #{item.createUser,jdbcType=VARCHAR}, 
-            #{item.createDept,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateUser,jdbcType=VARCHAR}, 
+            #{item.tradeId,jdbcType=VARCHAR}, #{item.portfolioId,jdbcType=VARCHAR}, #{item.customCashType,jdbcType=VARCHAR},
+            #{item.genType,jdbcType=VARCHAR}, #{item.purCfmDate,jdbcType=DATE}, #{item.redCfmDate,jdbcType=DATE},
+            #{item.regDate,jdbcType=DATE}, #{item.regDateAmt,jdbcType=DECIMAL}, #{item.bonusCfmDate,jdbcType=DATE},
+            #{item.entrustId,jdbcType=VARCHAR}, #{item.payType,jdbcType=VARCHAR}, #{item.createUser,jdbcType=VARCHAR},
+            #{item.createDept,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateUser,jdbcType=VARCHAR},
             #{item.updateTime,jdbcType=TIMESTAMP}, #{item.mpFinprodId,jdbcType=VARCHAR}, #{item.mpBranch,jdbcType=DECIMAL},
             #{item.expConValue,jdbcType=DECIMAL},#{item.depositAmt,jdbcType=DECIMAL}, #{item.rFinprodId,jdbcType=VARCHAR}
         </foreach>

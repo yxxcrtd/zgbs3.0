@@ -10,6 +10,7 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
 import com.joyintech.tams.valuation.common.interf.base.dto.PlannedAssetDealCommonResult;
 import com.joyintech.tams.valuation.common.interf.base.service.assetdeal.mngasset.PlannedPeriodTradeTemplateRecService;
@@ -42,19 +43,6 @@ public class TrdFixIncomeValuDuration002Service extends BaseService<TrdFixIncome
                 param, TrdFixIncomeValuDuration001Dto.class);
     }
 
-
-    /**
-     * 策略代码生成
-     *
-     * @see
-     * @since 1.0
-     */
-    public String createPlanTradeId() {
-        return restTemplate.postForObject(
-                ServiceApplication.VALUATION_SERVICE_NAME + "/TrdFixIncomeValuDuration001/createPlanTradeId",
-                null, String.class);
-
-    }
     /**
      * {@inheritDoc}
      */
@@ -78,20 +66,16 @@ public class TrdFixIncomeValuDuration002Service extends BaseService<TrdFixIncome
         //设置接口参数
         Map<String,Object> params = new HashMap<>();
         List<String> prodIds = new ArrayList<>();
-        prodIds.add(dto.getPortfolioId());
+        prodIds.add(dto.getProdId());
         params.put("INTERF_BOOKSETID",prodIds);
         params.put("VAL_MODEL","INTERF_MODEL_SINGLE");
 
         List<ValMngPeriodTrade> listValMngPeriodTrade = new ArrayList<>();
         ValMngPeriodTrade entity = new ValMngPeriodTrade();
         BeanUtil.copyPropertiesIgnoreNull(entity,dto);
-//        entity.setFundSettleDate(DateUtil.parse(dto.getFundSettleDate()));
         //比较界面和接口字段差异，并手动给接口字段赋值
-        entity.setProdId(dto.getPortfolioId());
-        entity.setTradeId(dto.getTradeId());  //交易编号
-        entity.setAssetId(dto.getFinprodMarketId());  //资产代码
-        entity.setAssetName(dto.getFinprodName()); //资产名称
         entity.setDataActionSign("01");//数据动作标志
+        entity.setMdate(dto.getTradeDate()); //实际支付日  (取交易日)
         //交易方向转换
         if(DictCodeList.交易方向_收息到账.getValue().equals(dto.getPs())){
             dto.setPs(DictCodeList.交易方向_收息.getValue());
@@ -104,32 +88,24 @@ public class TrdFixIncomeValuDuration002Service extends BaseService<TrdFixIncome
         }else{
             entity.setIsInt("N");//是否还本带息 交易方向为还本，应收利息是否为0，不为0，IsInt为Y
         }
-        //查询债券的划
+        //查询债券的付息计划
         Map<String,Object> hashMap = new HashMap<>();
         hashMap.put("finprodId",entity.getAssetId());
+        hashMap.put("mdate",DateUtil.format(entity.getMdate()));
         List<FinCashPlanDto> list = getFinCashPlanByProductId(hashMap);
         if(!StringUtil.isEmptyList(list)){
             entity.setVdate(list.get(0).getVdate());//计息开始日 根据标的信息查询
-            entity.setMdate(list.get(0).getMdate());//计息结束日 根据标的信息查询
         }else{
             entity.setVdate(DateUtil.parse(DateUtil.getSysDate()));//计息开始日 根据标的信息查询
-            entity.setMdate(DateUtil.parse(DateUtil.getSysDate()));//计息结束日 根据标的信息查询
         }
-//        entity.setVdate(new Date()); //计息开始日
-//        entity.setMdate(new Date()); //计息结束日
-//        entity.setPlanPayDate(dto.getTradeDate()); //计划
-        entity.setPayDate(dto.getTradeDate()); //实际支付日  (取交易日)
-        entity.setActInt(dto.getActInt()); //实收利息
-        entity.setActCapi(dto.getActCapi()); //实收本金
+
         entity.setDealAmt(dto.getActInt().add(dto.getActCapi())); //交易金额=实收本金+实收利息
-        entity.setInvAim(dto.getInvAim()); //投资目的=会计分类
-        entity.setParValue(new BigDecimal(0)); //单位面值
-        entity.setSettleDate(dto.getSettleDate()); //交割日 =settleDate
-        entity.setIsClean2(dto.getIsClean2());//是否结清
-        entity.setCcy(dto.getCcy());//币种
-        entity.setTradeId(null);  //交易编号
-        entity.setIsClean("Y");//有无清算指令
-        entity.setMyAcctNo(dto.getTrdAcctId()); //资金账户
+        entity.setPayDate(dto.getSettleDate());
+        entity.setParValue(new BigDecimal(100)); //单位面值
+        entity.setIsClean("N");//有无清算指令
+
+        //设置数据来源：画面录入
+        entity.setDataSource(DictCodeListExt1.生成方式_画面录入.getValue());
 
         listValMngPeriodTrade.add(entity);
         Map<String, Object> map = plannedPeriodTradeTemplateRecService.handleListValMngPeriodTrade(listValMngPeriodTrade,new Date(),params,null);

@@ -13,30 +13,56 @@
 			t.PS              ps,/**交易方向**/
 			t.TRADE_MARKET    tradeMarket,/**交易场所**/
 			t.TRADE_DATE      tradeDate,/**交易日期**/
-			CASE WHEN t.PS in('T01','T02') THEN t.PRIN_AMT
+			CASE WHEN t.PS in(#{PS_T01},#{PS_T02}) THEN t.PRIN_AMT
 			ELSE t.TRADE_AMT END AS tradeAmt,/**成交金额**/
 			t.SHARE_AMT dealNum,/**成交数量**/
 			t.CCY             ccy,/**币种**/
 			stl.SETTLE_DATE    settleDate,/**结算日期**/
-			CASE t.PS WHEN 'T18' THEN t.FEE_AMT ELSE 0 END  subFee,/**认购费**/
-			CASE t.PS WHEN 'T05' THEN t.FEE_AMT ELSE 0 END  purFee,/**申购费**/
-			CASE t.PS WHEN 'T19' THEN t.FEE_AMT ELSE 0 END  redFee,/**赎回费**/
-			CASE t.PS WHEN 'T24' THEN t.TRADE_AMT ELSE 0 END tradeAmtArrive,/*到账金额*/
-			nvl(ttfd.FEE_AMT,0)  brokerage,/**经手费**/
+			CASE t.PS WHEN #{PS_T18} THEN t.FEE_AMT ELSE 0 END  subFee,/**认购费**/
+			CASE t.PS WHEN #{PS_T05} THEN t.FEE_AMT ELSE 0 END  purFee,/**申购费**/
+			CASE t.PS WHEN #{PS_T19} THEN t.FEE_AMT ELSE 0 END  redFee,/**赎回费**/
+			CASE t.PS WHEN #{PS_T24} THEN t.TRADE_AMT ELSE 0 END tradeAmtArrive,/*到账金额*/
+			nvl(ttfd.FEE_AMT,0)  commissionPay,/**应付佣金**/
 			nvl(ttfd2.FEE_AMT,0)  commission,/**佣金**/
-			nvl(t.MY_ACCT_NO,stl.MY_ACCT_NO)    trdMyAcctNo/**资金账户**/
+			t.MY_ACCT_NO   trdMyAcctNo,/**资金账户**/
+			d.GEN_TYPE dataSource, /**数据来源**/
+			t.TRADE_AMT   settleAmt,/**结算金额**/
+			t.TRADE_DATE applyDate,/**申请日期**/
+			stl.SETTLE_DATE subSettleDate,/**结算日期**/
+			t.TRADE_AMT applyAmt,/**申请金额**/
+			t.MY_ACCT_NO subMyAcctNo,/**资金账户**/
+			t.TRADE_DATE purApplyDate,/**申请日期**/
+			stl.SETTLE_DATE purSettleDate,/**结算日期**/
+			t.TRADE_AMT purApplyAmt,/**申请金额**/
+			t.MY_ACCT_NO purMyAcctNo,/**资金账户**/
+			t.TRADE_DATE purConfirmDate,/**确认日期**/
+			t.TRADE_AMT purConfirmAmt,/**确认金额**/
+			t.SHARE_AMT purConfirmNum,/**确认数量**/
+			t.UNIT_CPRICE purUnitValue,/**单位净值**/
+			t.INT_AMT interestIncome,/**利息收入**/
+			t.MY_ACCT_NO   purConfirmMyAcctNo,/**资金账户**/
+			t.TRADE_DATE      redConfirmDate,/**确认日期**/
+			t.TRADE_AMT redConfirmAmt,/**确认金额**/
+			t.SHARE_AMT redConfirmNum,/**确认数量**/
+			t.UNIT_CPRICE redUnitValue,/**单位净值**/
+			t.MY_ACCT_NO  redMyAcctNo,/**资金账户**/
+			t.TRADE_DATE subConfirmDate,/**确认日期**/
+			t.TRADE_AMT subConfirmAmt,/**确认金额**/
+			t.SHARE_AMT subConfirmNum,/**确认数量**/
+			t.INT_AMT raiseInterest,/**募集期利息**/
+			t.MY_ACCT_NO  subConfirmMyAcctNo/**资金账户**/
 		FROM TRD_PRODUCT_DEAL t
+		LEFT JOIN TRD_PRODUCT_DEAL_ADD d on t.TRADE_ID = d.TRADE_ID
 		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
-		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE  in( '06','07') AND STL.ORDER_TYPE NOT LIKE 'N%'
+		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE  in( #{busiType_06},#{busiType_07}) AND STL.ORDER_TYPE NOT LIKE 'N%'
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal1 on deal1.BUSI_NO = t.TRADE_ID
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal2 ON stl.ORDER_ID = deal2.BUSI_NO
 		LEFT JOIN BOK_BOOKSET bok on (bok.BOOKSET_ID = deal1.BOOKSET_ID) OR (bok.BOOKSET_ID = deal2.BOOKSET_ID)
-		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd ON ttfd.TRADE_ID = t.TRADE_ID AND ttfd.FEE_TYPE = 'B01'
-		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd2 ON ttfd2.TRADE_ID = t.TRADE_ID AND ttfd2.FEE_TYPE = 'B05'
+		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd ON ttfd.TRADE_ID = t.TRADE_ID AND ttfd.FEE_TYPE = #{FEE_TYPE_B05} and ttfd.IS_PAY_WITH_TRADE=#{YES_NO_N}
+		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd2 ON ttfd2.TRADE_ID = t.TRADE_ID AND ttfd2.FEE_TYPE = #{FEE_TYPE_B05} and ttfd2.IS_PAY_WITH_TRADE=#{YES_NO_Y}
 		where
-		t.BUSI_TYPE in ('06','07')
-		AND t.FINPROD_TYPE = 'F06'
-		AND t.PS IN('T01','T02','T04','T05','T18','T19','T24','T52')
+		t.BUSI_TYPE in (#{busiType_06},#{busiType_07})
+		AND t.FINPROD_TYPE = #{finprodType}
 		<if test="tradeId !=null and tradeId !='' ">
 			and t.TRADE_ID like  concat(concat('%',#{tradeId}),'%')
 		</if>
@@ -47,7 +73,7 @@
 			</foreach>
 		</if>
 		<if test="assetIdArr != null and assetIdArr.length > 0">
-			and zc.FINPROD_MARKET_ID IN
+			and zc.FINPROD_ID IN
 			<foreach collection="assetIdArr" item="assetId" open="( " close=" )" separator=",">
 				#{assetId}
 			</foreach>
@@ -70,20 +96,14 @@
 				#{tradeMarket}
 			</foreach>
 		</if>
+		<if test="dataSourceArr != null and dataSourceArr.length > 0">
+			AND d.GEN_TYPE IN
+			<foreach collection="dataSourceArr" item="dataSource" open="( " close=" )" separator=",">
+				#{dataSource}
+			</foreach>
+		</if>
 		order by t.TRADE_ID desc
 	</select>
-
-    <select id="getNextId" resultType="java.lang.String">
-		SELECT REPLACE(LPAD(${sequenceName}.NEXTVAL, 4), ' ', '0') FROM DUAL
-	</select>
-
-
-    <select id="selectCountByTradeId" resultType="java.lang.Integer" parameterType="java.lang.String" >
-        select
-        count(1)
-        from TRD_PRODUCT_DEAL
-        where TRADE_ID = #{tradeId,jdbcType=VARCHAR}
-    </select>
 
 	<select id="queryTradeInfoByTradeId" resultType="com.joyintech.service.valuation.trademanage.trdfundvaluationtrade.dto.TrdFundValuationTradeDto">
 		SELECT
@@ -102,8 +122,8 @@
 				t.PRIN_AMT tradeAmt,/**成交金额**/
 				t.SHARE_AMT dealNum,/**成交数量**/
 				nvl(t.MY_ACCT_NO,stl.MY_ACCT_NO)    trdMyAcctNo,/**资金账户**/
-				ttfd.FEE_AMT  brokerage,/**经手费**/
-				ttfd2.FEE_AMT  commission,/**佣金**/
+				nvl(ttfd.FEE_AMT,0)  commissionPay,/**应付佣金**/
+				nvl(ttfd2.FEE_AMT,0)  commission,/**佣金**/
 			    t.TRADE_AMT   settleAmt/**结算金额**/
 			</if>
 			<if test="ps == 'T52' ">/*认购*/
@@ -145,14 +165,14 @@
 			</if>
 		FROM TRD_PRODUCT_DEAL t
 		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
-		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE  in( '06','07') AND STL.ORDER_TYPE NOT LIKE 'N%'
+		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE  in(#{busiType_06},#{busiType_07}) AND STL.ORDER_TYPE NOT LIKE 'N%'
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal1 on deal1.BUSI_NO = t.TRADE_ID
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal2 ON stl.ORDER_ID = deal2.BUSI_NO
 		LEFT JOIN BOK_BOOKSET bok on (bok.BOOKSET_ID = deal1.BOOKSET_ID) OR (bok.BOOKSET_ID = deal2.BOOKSET_ID)
-		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd ON ttfd.TRADE_ID = t.TRADE_ID AND ttfd.FEE_TYPE = 'B01'
-		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd2 ON ttfd2.TRADE_ID = t.TRADE_ID AND ttfd2.FEE_TYPE = 'B05'
+		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd ON ttfd.TRADE_ID = t.TRADE_ID AND ttfd.FEE_TYPE = #{FEE_TYPE_B05} and ttfd.IS_PAY_WITH_TRADE=#{YES_NO_N}
+		LEFT JOIN TRD_TRADE_FEE_DETAIL ttfd2 ON ttfd2.TRADE_ID = t.TRADE_ID AND ttfd2.FEE_TYPE = #{FEE_TYPE_B05} and ttfd2.IS_PAY_WITH_TRADE=#{YES_NO_Y}
 		where
-			t.BUSI_TYPE in ('06','07')
+			t.BUSI_TYPE in (#{busiType_06},#{busiType_07})
 			and t.TRADE_ID  = #{tradeId,jdbcType=VARCHAR}
 			and rownum=1
 
@@ -179,12 +199,12 @@
 			nvl(t.MY_ACCT_NO,stl.MY_ACCT_NO)  redMyAcctNo/**资金账户**/
 		FROM TRD_PRODUCT_DEAL t
 		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
-		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE  in( '06','07') AND STL.ORDER_TYPE NOT LIKE 'N%'
+		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE  in(#{busiType_06},#{busiType_07}) AND STL.ORDER_TYPE NOT LIKE 'N%'
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal1 on deal1.BUSI_NO = t.TRADE_ID
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal2 ON stl.ORDER_ID = deal2.BUSI_NO
 		LEFT JOIN BOK_BOOKSET bok on (bok.BOOKSET_ID = deal1.BOOKSET_ID) OR (bok.BOOKSET_ID = deal2.BOOKSET_ID)
 		where
-		t.BUSI_TYPE in ('06','07')
+		t.BUSI_TYPE in (#{busiType_06},#{busiType_07})
 		and t.TRADE_ID  = #{tradeId,jdbcType=VARCHAR}
 		and rownum=1
 
@@ -212,12 +232,12 @@
 		FROM TRD_PRODUCT_DEAL t
 		LEFT JOIN TRD_PRODUCT_DEAL tpd ON t.F_TRADE_ID  = tpd.TRADE_ID
 		LEFT JOIN FIN_PRODUCT zc on zc.finprod_id = t.finprod_id
-		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE  in( '06','07') AND STL.ORDER_TYPE NOT LIKE 'N%'
+		LEFT JOIN STL_ORDERS stl ON stl.TRADE_ID = t.TRADE_ID AND stl.BUSI_TYPE  in(#{busiType_06},#{busiType_07}) AND STL.ORDER_TYPE NOT LIKE 'N%'
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal1 on deal1.BUSI_NO = t.TRADE_ID
 		LEFT JOIN BOK_DEAL_ACCOUNTING deal2 ON stl.ORDER_ID = deal2.BUSI_NO
 		LEFT JOIN BOK_BOOKSET bok on (bok.BOOKSET_ID = deal1.BOOKSET_ID) OR (bok.BOOKSET_ID = deal2.BOOKSET_ID)
 		where
-		t.BUSI_TYPE in ('06','07')
+		t.BUSI_TYPE in (#{busiType_06},#{busiType_07})
 		and t.TRADE_ID  = #{tradeId,jdbcType=VARCHAR}
 		and rownum=1
 

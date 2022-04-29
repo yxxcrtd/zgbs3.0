@@ -24,6 +24,7 @@ import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.Account
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.SceneConfigEntry;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.TreeNode;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.ValBooksetTodoDto;
+import com.joyintech.tams.valuation.batch.common.cache.service.ChangingCacheService;
 import com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dto.FinProductDealInfoComDTO;
 import com.joyintech.tams.valuation.batch.common.dealinfoselectcom.dto.FinProductDealInfoResult;
 import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto.DrawBaseInfoSelectComDTO;
@@ -54,14 +55,10 @@ import java.util.stream.Collectors;
  */
 @Service
 public class BookCommonLogicNew {
-    /**
-     * AccountingMethodMapper
-     */
-    @Autowired
-    private AccountingMethodNewMapper accountingMethodNewMapper;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
-
+    @Autowired
+    private ChangingCacheService changingCacheService;
     /**
      * 根据会计场景代码获取某账套下的场景分支配置信息
      *
@@ -78,8 +75,9 @@ public class BookCommonLogicNew {
             return null;
         }
         List<AccountEntry> accountEntries= new ArrayList<>();
-        accountEntries = accountingMethodNewMapper.getSceneSubjectConfigByNodeId(booksetId, accountSceneCodes,
-                GlobalConstant.ACCOUNTEVENTS);
+//        accountEntries = accountingMethodNewMapper.getSceneSubjectConfigByNodeId(booksetId, accountSceneCodes,
+//                GlobalConstant.ACCOUNTEVENTS);
+        accountEntries = changingCacheService.getSceneSubjectConfigWithNode(booksetId, accountSceneCodes);
         // 估值会计引擎升级，查询分录下基础科目性质对应所有的科目信息
         // 定义 变量.内部科目编码集合
         List<String> listSubjectInternalCode = new ArrayList<>();
@@ -95,7 +93,8 @@ public class BookCommonLogicNew {
         params.put("booksetId", booksetId);
         params.put("listSubjectInternalCode", listSubjectInternalCode);
         params.put("isAcc", DictCodeList.是否_是.getValue());
-        List<BokSubject> subjectList =  accountingMethodNewMapper.getSubjectByInternalCode(params);
+        //List<BokSubject> subjectList =  accountingMethodNewMapper.getSubjectByInternalCode(params);
+        List<BokSubject> subjectList =  changingCacheService.getSubjectByInternalCode(params);
         // 定义 变量.科目Map = 科目按照内部科目编码进行分组
         if(CollectionUtils.isNotEmpty(subjectList)){
             Map<String, List<BokSubject>> subjectMap= subjectList.stream().collect(Collectors.groupingBy(BokSubject :: getSubjectInternalCode));

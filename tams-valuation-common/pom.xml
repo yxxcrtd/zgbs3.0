@@ -51,6 +51,11 @@
 			<artifactId>joda-time</artifactId>
 			<version>2.9.9</version>
 		</dependency>
+		<dependency>
+			<groupId>org.eweb4j</groupId>
+			<artifactId>fel</artifactId>
+			<version>0.8</version>
+		</dependency>
         <dependency>
             <groupId>com.joyintech</groupId>
             <artifactId>tams-calculation</artifactId>

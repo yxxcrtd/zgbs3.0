@@ -10,12 +10,7 @@
 
 package com.joyintech.tams.valuation.common.interf.base.service.common;
 
-import java.lang.reflect.Method;
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.*;
 import com.google.common.collect.Maps;
-
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
@@ -28,6 +23,7 @@ import com.joyintech.tams.valuation.common.batch.finproduct.entity.InvAimDto;
 import com.joyintech.tams.valuation.common.batch.finproduct.service.FinProductCommonBatchService;
 import com.joyintech.tams.valuation.common.batch.tradecommon.dto.ValTrdProductDealInfoDto;
 import com.joyintech.tams.valuation.common.batch.tradecommon.service.ValTradeCommonService;
+import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.common.constants.ValDictCode;
 import com.joyintech.tams.valuation.common.constants.ValDictCodeList;
 import com.joyintech.tams.valuation.common.interf.base.batch.dao.ValAcctLayeringInfoBatchMapper;
@@ -2676,7 +2672,7 @@ public class InterfCommonService {
          */
         // add by weipeng on 20220408：会计引擎升级改造，若按照内部科目编码分录，则需要对应新会计引擎模板 start
         // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录
-        String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+        String accountEntryType =  CacheUtil.getSysParam(GlobalConstant.ACCOUNT_ENTRY_TYPE);
         //调用service方法进行逻辑逻辑
         if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
             if (finProductExt.getIsLayerAccount().equals(DictCodeList.是否_否.getValue())) {
@@ -3202,7 +3198,7 @@ public class InterfCommonService {
     /**
      * 账套信息(根据产品代码) _分层产品
      * 
-     * @param prodid
+     * @param prodId
      * @return List<BokBookset>
      */
     public List<ValBooksetInfoDto> getBokBooksetByProdId_Layering(String prodId) {
@@ -4216,6 +4212,27 @@ public class InterfCommonService {
 
             }
             /**add by yinya on 2022-01-08 结算指令自动映射指令类型的检查项 end**/
+
+
+            /**add by yinya on 2022-04-25 利率互换浮动端首期利率检查 start**/
+            if(TempConstant.利率互换标的信息.equals(tmpEName)){
+                String tradeId = InterfHelper.getObjectFieldValue(object, "tradeId");
+                String vdate = InterfHelper.getObjectFieldValue(object, "vdate");
+                String linkRate = InterfHelper.getObjectFieldValue(object, "linkRate");
+                Map<String,Object> paramMap = new HashMap<String, Object>();
+                paramMap.put("sysDate",vdate);
+                paramMap.put("intRateId", linkRate);
+                MstIntRateInfo mstIntRateInfo = this.getMstIntRateInfo(paramMap);
+
+                if(mstIntRateInfo==null){
+                    ischeck = false;
+                    checkError.append("交易编号："+tradeId
+                            +" 浮动挂钩利率："+linkRate
+                            +" 生效日："+vdate
+                            +" 未匹配利率，请检查利率信息【MST_INT_RATE_INFO】");
+                }
+            }
+            /**add by yinya on 2022-04-25 利率互换浮动端首期利率检查 end**/
 
     		if(ischeck){
     			rstlist.add(object);
@@ -5490,6 +5507,107 @@ public class InterfCommonService {
             return;
         }
 
+        if(TempConstant.利率互换交易信息.equals(tmpEName)){
+            //1.查询还本到账交易
+            parmas = new HashMap<String,Object>();
+            parmas.put("createTime", interfDate);
+            parmas.put("createUser", InterfCommonConstant.接口_默认用户);
+            parmas.put("busiType", paramMap.get("busiType"));
+            parmas.put("IS_CHL", isChl);
+            parmas.put("TMP_E_NAME", tmpEName);
+            List<TrdProductDeal> dealList_hb = this.queryUnDelDeal(parmas);
+            if(dealList_hb == null || dealList_hb.size()==0){
+                List<TrdProductDeal> totalList = this.queryDelChlFeeDeal(unDelDealList);
+                if(totalList != null && totalList.size()>0){
+                    unDelDealList.addAll(totalList);
+                }
+                this.deleteFinprodDealByTradeId(unDelDealList);
+                return;
+            }
+            unDelDealList.addAll(dealList_hb);
+
+            //查询还本到账拆分生成的收息到账交易
+            parmas = new HashMap<String,Object>();
+            parmas.put("createTime", interfDate);
+            parmas.put("createUser", InterfCommonConstant.接口_默认用户);
+            parmas.put("ftradeList", dealList_hb);
+            parmas.put("IS_CHL", isChl);
+            parmas.put("TMP_E_NAME", tmpEName);
+            List<TrdProductDeal> dealList_fx = this.queryUnDelDeal(parmas);
+            if(dealList_fx == null || dealList_fx.size()==0){
+                List<TrdProductDeal> totalList = this.queryDelChlFeeDeal(unDelDealList);
+                if(totalList != null && totalList.size()>0){
+                    unDelDealList.addAll(totalList);
+                }
+                this.deleteFinprodDealByTradeId(unDelDealList);
+                return;
+            }
+
+            Map<String, TrdProductDeal> hbMap = new HashMap<String, TrdProductDeal>();
+            for(TrdProductDeal d :dealList_hb){
+                hbMap.put(d.getfTradeId(), d);
+            }
+
+            List<TrdProductDeal> fxList = new ArrayList<TrdProductDeal>();
+            for(TrdProductDeal deal :dealList_fx){
+                if(hbMap.get(deal.getfTradeId())!=null){
+                    fxList.add(deal);
+                }
+            }
+            if(fxList!=null && fxList.size()>0){
+                unDelDealList.addAll(fxList);
+            }
+            List<TrdProductDeal> totalList = this.queryDelChlFeeDeal(unDelDealList);
+            if(totalList != null && totalList.size()>0){
+                unDelDealList.addAll(totalList);
+            }
+            this.deleteFinprodDealByTradeId(unDelDealList);
+            return;
+        }
+
+        if(TempConstant.利率互换存续期交易.equals(tmpEName)){
+            parmas = new HashMap<String,Object>();
+            parmas.put("createTime", interfDate);
+            parmas.put("createUser", InterfCommonConstant.接口_默认用户);
+            parmas.put("ftradeList", unDelDealList);
+            parmas.put("fpsList", paramMap.get("fpsList"));
+            parmas.put("IS_CHL", isChl);
+            parmas.put("TMP_E_NAME", tmpEName);
+            List<TrdProductDeal> dealhb = this.queryUnDelDeal(parmas);
+            if(dealhb==null || dealhb.size()==0){
+                List<TrdProductDeal> totalList = this.queryDelChlFeeDeal(unDelDealList);
+                if(totalList != null && totalList.size()>0){
+                    unDelDealList.addAll(totalList);
+                }
+                this.deleteFinprodDealByTradeId(unDelDealList);
+                return;
+            }
+            Map<String, TrdProductDeal> hbMap = new HashMap<String, TrdProductDeal>();
+            for(TrdProductDeal d :dealhb){
+                hbMap.put(d.getfTradeId(), d);
+            }
+            List<TrdProductDeal> delList = new ArrayList<TrdProductDeal>();
+            for(TrdProductDeal deal :unDelDealList){
+                if(hbMap.get(deal.getfTradeId())==null){
+                    delList.add(deal);
+                }
+            }
+            if(delList!=null && delList.size()>0){
+                List<TrdProductDeal> totalList = this.queryDelChlFeeDeal(delList);
+                if(totalList != null && totalList.size()>0){
+                    delList.addAll(totalList);
+                }
+                this.deleteFinprodDealByTradeId(delList);
+                return;
+            }
+            List<TrdProductDeal> totalList = this.queryDelChlFeeDeal(unDelDealList);
+            if(totalList != null && totalList.size()>0){
+                unDelDealList.addAll(totalList);
+            }
+            this.deleteFinprodDealByTradeId(unDelDealList);
+            return;
+        }
+
         // modify by weipeng : 增加原交易编号判空处理，若取不到原交易，则不进行删除衍生交易处理
         if(!CollectionUtils.isEmpty(unDelDealList)){
             parmas = new HashMap<String,Object>();
@@ -6279,7 +6397,7 @@ public class InterfCommonService {
 	    		map.clear();
                 // add by weipeng on 20220408：会计引擎升级改造，若按照内部科目编码分录，则需要对应新会计引擎模板 start
                 // 获取系统参数：会计分录类型：01 按科目分录；02 按内部科目编码分录
-                String accountEntryType =  CacheUtil.getSysParam("ACCOUNT_ENTRY_TYPE");
+                String accountEntryType =  CacheUtil.getSysParam(GlobalConstant.ACCOUNT_ENTRY_TYPE);
                 //调用service方法进行逻辑逻辑
                 if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
                     map.put("BOOKSETID", InterfCommonConstant.BOOKSETID_NEW);
@@ -6712,7 +6830,7 @@ public class InterfCommonService {
     }
     /**
      * 子账套信息更新(根据账套信息)
-     * @param BokBookset 账套信息
+     * @param bokBookset 账套信息
      * @return 账套日期：BokBooksetDate
      */
     
@@ -7438,7 +7556,7 @@ public class InterfCommonService {
     
     /**
      * 查询附加税税则中的附加税类型
-     * @param finprodId 金融产品代码
+     * @param listFinprodId 金融产品代码
      * @param finprodType 金融产品类型
      * @param queryDate 查询日期
      * @return 缴纳附加税相关附加税类型
@@ -7803,5 +7921,30 @@ public class InterfCommonService {
         String valclas = mapper.getFinanceProductSecType(finProductClass);
         return valclas;
     }
+
+    /**
+     * 挂钩标的利率查询
+     * @author 殷亚
+     * @date 2022/4/25 9:50
+     * @param paramMap
+     * @return com.joyintech.tams.valuation.common.interf.base.dto.MstIntRateInfo
+     * @see
+     * @version 1.0
+     */
+    public MstIntRateInfo getMstIntRateInfo(Map<String,Object> paramMap){
+        MstIntRateInfo mstIntRateInfo=mapper.getMstIntRateInfo(paramMap);
+        return mstIntRateInfo;
+
+    }
+
+    /**
+     * 查询映射配置信息
+     * @param configType 配置类型
+     * @return
+     */
+    public List<FinProductTypeConfig> getConfigListByType(String configType){
+        return mapper.getConfigListByType(configType);
+    }
+
 
 }

@@ -322,6 +322,17 @@ public class TrdFundValuationTradeDto extends BaseEntity implements ProcessEntit
     @JsonSerialize(using= BigDecimalSerializer.class)
     private BigDecimal tradeAmtArrive;
 
+    /**
+     * 应付佣金
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal commissionPay;
+
+    /**
+     * 数据来源
+     */
+    private String dataSource;
+
     public String getOperateType() {
         return operateType;
     }
@@ -810,6 +821,36 @@ public class TrdFundValuationTradeDto extends BaseEntity implements ProcessEntit
         return this.getCommission()==null?"0.00":decimalFormat.format(this.getCommission().setScale(2,BigDecimal.ROUND_HALF_UP));
     }
 
+    public BigDecimal getCommissionPay() {
+        return commissionPay;
+    }
 
+    public void setCommissionPay(BigDecimal commissionPay) {
+        this.commissionPay = commissionPay;
+    }
+
+    public String getCommissionPayStr() {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00#");
+        return this.getCommissionPay()==null?"0.00":decimalFormat.format(this.getCommissionPay().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    /**
+     * 取得 数据来源str
+     *
+     * @return 交易方向
+     */
+    public String getDataSourceStr() {
+        return StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.生成方式, dataSource))?
+                SysDataUtil.getNameFromDataDict(DictCode.生成方式, dataSource):dataSource;
+    }
 }
 

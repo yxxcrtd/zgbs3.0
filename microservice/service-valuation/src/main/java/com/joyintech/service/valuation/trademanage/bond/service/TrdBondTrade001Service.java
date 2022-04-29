@@ -100,6 +100,13 @@ public class TrdBondTrade001Service extends BaseService {
         pageParam.put("PS_T05", DictCodeList.交易方向_申购确认.getValue());
         pageParam.put("PS_T39", DictCodeList.交易方向_行权_赎回.getValue());
 
+        pageParam.put("FEE_TYPE_B01",BussinessDictCodeList.费用类型_经手费.getValue());
+        pageParam.put("FEE_TYPE_B05",BussinessDictCodeList.费用类型_佣金.getValue());
+        pageParam.put("FEE_TYPE_B06",BussinessDictCodeList.费用类型_交易手续费.getValue());
+        pageParam.put("FEE_TYPE_B07",BussinessDictCodeList.费用类型_结算费.getValue());
+        pageParam.put("FEE_TYPE_B08",BussinessDictCodeList.费用类型_结算手续费.getValue());
+        pageParam.put("YES_NO_Y",DictCodeList.是否_是.getValue());
+        pageParam.put("YES_NO_N",DictCodeList.是否_否.getValue());
         return this.queryForPage(page, length,
                 () -> trdBondTradeMapper.selectDeal(pageParam));
     }

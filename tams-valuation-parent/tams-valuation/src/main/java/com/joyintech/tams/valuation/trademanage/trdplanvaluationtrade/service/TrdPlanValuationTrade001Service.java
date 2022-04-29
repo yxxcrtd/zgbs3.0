@@ -11,9 +11,12 @@
 package com.joyintech.tams.valuation.trademanage.trdplanvaluationtrade.service;
 
 import com.joyintech.framework.export.CommonExportService;
+import com.joyintech.framework.export.ExportParam;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.jdbc.enums.DataSourceType;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
+import com.joyintech.tams.valuation.trademanage.trdfixincomevaluationtrade.dto.TrdFixIncomeValuationTradeDto;
 import com.joyintech.tams.valuation.trademanage.trdplanvaluationtrade.dto.TrdPlanValuationTradeDto;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
@@ -45,6 +48,20 @@ public class TrdPlanValuationTrade001Service extends CommonExportService<TrdPlan
                 pageParam, TrdPlanValuationTradeDto.class);
     }
 
+    @Override
+    protected void buildExportParam(ExportParam exportParam) {
+        exportParam.config("com/joyintech/tams/valuation/trademanage/trdplanvaluationtrade/conf/export.xml")
+                .dataSource(DataSourceType.MASERT);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Page<TrdPlanValuationTradeDto> selectPageData(Map<String, Object> selectParam) {
+        return selectForPage(selectParam);
+    }
+
     /**
      * 工作流（留痕处理进行的操作）
      */
@@ -53,21 +70,4 @@ public class TrdPlanValuationTrade001Service extends CommonExportService<TrdPlan
         String action = "delete";
         restTemplate.postForObject(ServiceApplication.VALUATION_SERVICE_NAME+"/TrdPlanValuationTrade/" + action, entity, Integer.class);
     }
-
-
-    /**
-     * 根据条件查询所有
-     *
-     * @param params
-     * @return
-     * @see
-     * @since 1.0
-     */
-    public List<TrdPlanValuationTradeDto> findAll(Map<String, Object> params) {
-        return restTemplate.postForList(ServiceApplication.VALUATION_SERVICE_NAME + "/TrdPlanValuationTrade/findAll",
-                params, TrdPlanValuationTradeDto.class);
-
-    }
-
-
 }
