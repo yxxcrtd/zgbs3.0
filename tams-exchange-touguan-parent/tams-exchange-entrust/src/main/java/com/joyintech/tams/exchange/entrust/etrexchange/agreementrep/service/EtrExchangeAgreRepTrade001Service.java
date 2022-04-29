@@ -368,9 +368,6 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         EtrPledge etrPledge = new EtrPledge();
         etrEntrustAdd.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
         //除首期以外的指令，指令表的存储，金融产品代码存储首期对应的交易编号
-        if (!交易方向_首期.getValue().equals(entity.getPs())){
-            entity.setFinprodId(getFinprodIdNoFirst(entity));
-        }
         // 构造单组合单资产DTO
         EtrSinglePortfolioDto etrSinglePortfolioDto = getEtrSinglePortfolio(entity);
         //协议回购首期指令
@@ -2006,6 +2003,9 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         }else{
         	etrSinglePortfolioDto.setStockId(dto.getRepSecId());// 证券代码
             etrSinglePortfolioDto.setFinprodId(dto.getFinprodId());// 证券代码对应的金融产品代码
+        }
+        if (!交易方向_首期.getValue().equals(dto.getPs())){
+            etrSinglePortfolioDto.setFinprodId(getFinprodIdNoFirst(dto));
         }
         etrSinglePortfolioDto.setSecAcctId(dto.getSecAcctId());// 证券账户
         etrSinglePortfolioDto.setDealCurAcct(dto.getAcctNo());// 资金账户
