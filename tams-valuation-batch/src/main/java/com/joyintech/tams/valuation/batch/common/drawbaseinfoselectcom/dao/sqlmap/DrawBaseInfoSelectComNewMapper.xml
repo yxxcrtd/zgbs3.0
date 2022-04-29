@@ -83,7 +83,10 @@
 			/** add by weipeng on 20220331 增加估值方案落地表关联 end **/
 		    <!-- ADD BY chufengjie ON 20210926 FOR 估值核算系统VAS3.0-930-基线需求 Start  -->
 			<!-- add by caoguo  on 20201019 start remark:资产减值 -->
-			,(SELECT COUNT(1)
+		    /** add by weipeng on 20220429 : 增加方案收益类型，暂时用产品收益类型判断 start**/
+		    ,A.ACCT_MODE AS schProfitType
+			/** add by weipeng on 20220429 : 增加方案收益类型，暂时用产品收益类型判断 end**/
+		,(SELECT COUNT(1)
 				FROM TRD_ASSET_LOSS TT
 				WHERE TT.SEC_ID = MR.SEC_ID
 				AND TT.VAL_DATE = MR.VAL_DATE
@@ -116,6 +119,7 @@
 				E.HAPPEN_DATE,
 				E.BASE_SUBJECT_NATURE,
 				F.STANDARD_CCY,
+				F.ACCT_MODE,
 				E.MDATE,
 				A.IS_BACK_VALUE
 				,E.ONWAY_DATE

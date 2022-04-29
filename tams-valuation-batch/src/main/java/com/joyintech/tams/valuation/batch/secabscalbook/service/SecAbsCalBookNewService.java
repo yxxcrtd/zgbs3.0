@@ -171,6 +171,7 @@ public class SecAbsCalBookNewService {
             returnResult.setBokStatLossPosiitonList(new ArrayList<BokStatLossPosiiton>());
         }
         /**ADD BY CAOGUO ON 20201016 END**/
+
         
         for (DrawBaseInfoSelectComDTO acctEntityEx : acctEntityList) {
 
@@ -265,9 +266,6 @@ public class SecAbsCalBookNewService {
                 searchPayinfo) == null ? null : (List<TargetCashPayRule>)targetSearchMap.get(
                 searchPayinfo);
 
-            // 是否使用摊余成本法计算
-            boolean isAcFlag =true;
-
             // 1.2 百元券面处理
             varFaceValue = finProductCommonService.getFaceValue(acctEntityEx.getBusiId(),
                 acctEntity.getHappenDate());
@@ -286,10 +284,6 @@ public class SecAbsCalBookNewService {
             List<String> natureList = new ArrayList<String>();
             if (DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(
                 acctEntity.getInvAim())) {
-                // 若采用的非摊余成本法，则是否使用摊余成本法计算 = false
-                if(!acctEntityEx.getIsAcMethod()){
-                    isAcFlag = false;
-                }
                 buyTableId = DictCodeListTableId.会计场景代码_公允价值损益类债券_买入.getValue();
                 natureList.add(DictCodeBaseSubjectNatrueNew.公允价值损益类_成本.getValue());
             }
@@ -329,13 +323,6 @@ public class SecAbsCalBookNewService {
                 acctEntityEx.getInvAim())) {
                 searchDao.setBaseSubjectNatureList(new ArrayList<String>(
                     Arrays.asList(DictCodeBaseSubjectNatrueNew.综合收益类_利息调整.getValue())));
-                listSubjectBalanceEX = accountingCommonService.getSubjectBalanceExpectDirection(
-                    searchDao, DictCodeList.余额方向_借方.getValue());
-            }
-            else if(isAcFlag && DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(
-                acctEntityEx.getInvAim())) {
-                searchDao.setBaseSubjectNatureList(new ArrayList<String>(
-                    Arrays.asList(DictCodeBaseSubjectNatrueNew.公允价值损益类_利息调整.getValue())));
                 listSubjectBalanceEX = accountingCommonService.getSubjectBalanceExpectDirection(
                     searchDao, DictCodeList.余额方向_借方.getValue());
             }
@@ -405,9 +392,6 @@ public class SecAbsCalBookNewService {
                 tableId = DictCodeListTableId.会计场景代码_公允价值损益类债券_买入.getValue();
                 baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.公允价值损益类_成本.getValue());
                 baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.公允价值损益类_应计利息.getValue());
-                if(isAcFlag) {
-                    baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.公允价值损益类_利息调整.getValue());
-                }
             }
             else if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(acctEntity.getInvAim())) {
                 tableId = DictCodeListTableId.会计场景代码_摊余成本类债券_买入.getValue();
@@ -799,11 +783,11 @@ public class SecAbsCalBookNewService {
             // 变量.本日应计利息余额
             BigDecimal tdyInterestAccBal = BigDecimal.ZERO;
             BigDecimal intAmt = BigDecimal.ZERO;
-            // ！变量.标的信息.息票品种为零息或贴现时 or (投资目的 = 以公允价值变动计量 且 ！摊余成本法)
+            // ！变量.标的信息.息票品种为零息或贴现时 or (投资目的 = 以公允价值变动计量)
             if ((!DictCodeList.息票品种_零息.getValue().equals(rstBaseinfo.getCouponSpecies())
                  && !DictCodeList.息票品种_贴现.getValue().equals(rstBaseinfo.getCouponSpecies()))
-                || (!isAcFlag && acctEntityEx.getInvAim().equals(
-                    DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue()))) {
+                || acctEntityEx.getInvAim().equals(
+                    DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue())) {
                 // else if（变量.当日成本科目数量 = 0 and 变量.当日计算成本科目数量 = 0 ）
                 if (varNumAmtHappenDate.compareTo(BigDecimal.ZERO) == 0
                 		/**MODIFY BY WUJIE ON 20191217 START
@@ -944,7 +928,8 @@ public class SecAbsCalBookNewService {
             boolean 折溢价为零计算标识 = false;
 
             // 持有目的! = 以公允价值变动计量 ---> 改为估值方法只要是摊余成本法时
-            if (isAcFlag) {
+            if (!acctEntityEx.getInvAim().equals(
+                DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue())) {
                 // else if（变量.当日成本科目数量 = 0 and 变量.当日计算成本科目数量 = 0 ）
                 if (varNumAmtHappenDate.compareTo(BigDecimal.ZERO) == 0
                 		/**MODIFY BY WUJIE ON 20191216 START
@@ -1499,7 +1484,6 @@ public class SecAbsCalBookNewService {
      * @param varInterestAccBal 应计利息余额
      * @param varFaceValue 百元面值
      * @param newCash 最新报价
-     * @param isAcFlag 是否摊余成本法计算
      * @return SecDscYieldOutParameter
      * @see
      * @since 1.0
@@ -1747,7 +1731,6 @@ public class SecAbsCalBookNewService {
                                                          DrawBaseInfoSelectComDTO acctEntityEx,
                                                          Date calcDate) {
 
-        boolean isAcFlag = acctEntityEx.getIsAcMethod();
         SecSubjectBalanceDto dto = new SecSubjectBalanceDto();
         // 变量.百元券面面值
         BigDecimal varFaceValue = BigDecimal.valueOf(100);
@@ -1819,13 +1802,6 @@ public class SecAbsCalBookNewService {
             listSubjectBalanceEX = accountingCommonService.getSubjectBalanceExpectDirection(
                 searchDao, DictCodeList.余额方向_借方.getValue());
         }
-        else if (DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(
-            acctEntity.getInvAim()) && isAcFlag) {
-            searchDao.setBaseSubjectNatureList(new ArrayList<String>(
-                Arrays.asList(DictCodeBaseSubjectNatrueNew.公允价值损益类_利息调整.getValue())));
-            listSubjectBalanceEX = accountingCommonService.getSubjectBalanceExpectDirection(
-                searchDao, DictCodeList.余额方向_借方.getValue());
-        }
         if (listSubjectBalanceEX != null && listSubjectBalanceEX.size() > 0) {
             // 变量.溢折价科目余额 = 科目余额
             varSpilledPriceAccBal = listSubjectBalanceEX.get(0).getBalance();
@@ -1867,9 +1843,6 @@ public class SecAbsCalBookNewService {
             tableId = DictCodeListTableId.会计场景代码_公允价值损益类债券_买入.getValue();
             baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.公允价值损益类_成本.getValue());
             baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.公允价值损益类_应计利息.getValue());
-            if(isAcFlag){
-                baseSubjectNatureList.add(DictCodeBaseSubjectNatrueNew.公允价值损益类_利息调整.getValue());
-            }
         }
         else if (DictCodeListExt1.投资目的_摊余成本类.getValue().equals(acctEntity.getInvAim())) {
             tableId = DictCodeListTableId.会计场景代码_摊余成本类债券_买入.getValue();
@@ -1917,9 +1890,7 @@ public class SecAbsCalBookNewService {
                 if (DictCodeBaseSubjectNatrueNew.摊余成本类_利息调整.getValue().equals(
                     var.getBaseSubjectNature())
                     || DictCodeBaseSubjectNatrueNew.综合收益类_利息调整.getValue().equals(
-                        var.getBaseSubjectNature())
-                    || (isAcFlag && DictCodeBaseSubjectNatrueNew.公允价值损益类_利息调整.getValue().equals(
-                        var.getBaseSubjectNature()))) {
+                        var.getBaseSubjectNature())) {
                     // 变量.账务明细.借贷方向为借时
                     if (DictCodeList.借贷方向_借.getValue().equals(var.getCdFlag())) {
                         // 变量.当日计算摊销溢折价科目余额 -= 变量.账务明细.原币发生额
@@ -1987,9 +1958,7 @@ public class SecAbsCalBookNewService {
                 if (DictCodeBaseSubjectNatrueNew.摊余成本类_利息调整.getValue().equals(
                     var.getBaseSubjectNature())
                     || DictCodeBaseSubjectNatrueNew.综合收益类_利息调整.getValue().equals(
-                        var.getBaseSubjectNature())
-                    || (isAcFlag &&DictCodeBaseSubjectNatrueNew.公允价值损益类_利息调整.getValue().equals(
-                    var.getBaseSubjectNature()))) {
+                        var.getBaseSubjectNature())) {
                     // 变量.账务明细.借贷方向为借时
                     if (DictCodeList.借贷方向_借.getValue().equals(var.getCdFlag())) {
                         // 变量.当日计算摊销溢折价科目余额 -= 变量.账务明细.原币发生额

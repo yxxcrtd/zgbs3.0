@@ -94,6 +94,12 @@ public class FinProductDealInfoResult extends NeedOperateEntity {
     private String stage;
 
     /**
+     * add by weipeng on 20220429：债券计提区分货币型产品和非货币型产品
+     * 估值方案收益类型
+     */
+    private String schProfitType;
+
+    /**
      * 取得 账套代码
      *
      * @return 账套代码
@@ -305,5 +311,21 @@ public class FinProductDealInfoResult extends NeedOperateEntity {
 
     public void setIsCashManage(String isCashManage) {
         this.isCashManage = isCashManage;
+    }
+
+    /**
+     * 获取 估值方案收益类型
+     * @return 估值方案收益类型
+     */
+    public String getSchProfitType() {
+        return schProfitType;
+    }
+
+    /**
+     * 设置 估值方案收益类型
+     * @param schProfitType 估值方案收益类型
+     */
+    public void setSchProfitType(String schProfitType) {
+        this.schProfitType = schProfitType;
     }
 }

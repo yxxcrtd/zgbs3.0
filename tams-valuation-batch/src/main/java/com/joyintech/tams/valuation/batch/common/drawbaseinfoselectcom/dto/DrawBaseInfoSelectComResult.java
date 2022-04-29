@@ -10,16 +10,17 @@
 
 package com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto;
 
-import java.math.BigDecimal;
+import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
+import com.joyintech.tams.common.base.entity.BokAmoConfig;
+import com.joyintech.tams.common.base.entity.BokFinProductValuationPara;
+import com.joyintech.tams.common.base.entity.FinExercisePlan;
+import com.joyintech.tams.common.base.entity.FinProductAdd;
+import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.TreeNode;
+import com.joyintech.tams.valuation.common.batch.finproduct.entity.*;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-
-import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
-import com.joyintech.tams.common.base.entity.*;
-import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.TreeNode;
-import com.joyintech.tams.valuation.common.batch.finproduct.entity.*;
 
 /**
  * 计提基础信息取得结果DTO 〈功能详细描述〉
@@ -153,21 +154,6 @@ public class DrawBaseInfoSelectComResult extends NeedOperateEntity {
      */
     private List<TargetCashCalcRule> targetCashCalcRuleListP;
 
-    public List<TargetCashCalcRule> getTargetCashCalcRuleListR() {
-        return targetCashCalcRuleListR;
-    }
-
-    public void setTargetCashCalcRuleListR(List<TargetCashCalcRule> targetCashCalcRuleListR) {
-        this.targetCashCalcRuleListR = targetCashCalcRuleListR;
-    }
-
-    public List<TargetCashCalcRule> getTargetCashCalcRuleListP() {
-        return targetCashCalcRuleListP;
-    }
-
-    public void setTargetCashCalcRuleListP(List<TargetCashCalcRule> targetCashCalcRuleListP) {
-        this.targetCashCalcRuleListP = targetCashCalcRuleListP;
-    }
 
     /* @Author 殷亚
      * @Description 金融类标的信息
@@ -178,13 +164,12 @@ public class DrawBaseInfoSelectComResult extends NeedOperateEntity {
      **/
     private List<TradeInfoDto> tradeInfoDtoList;
 
-    public List<TradeInfoDto> getTradeInfoDtoList() {
-        return tradeInfoDtoList;
-    }
 
-    public void setTradeInfoDtoList(List<TradeInfoDto> tradeInfoDtoList) {
-        this.tradeInfoDtoList = tradeInfoDtoList;
-    }
+    /**
+     * add by weipeng on 20220429：债券计提区分货币型产品和非货币型产品
+     * 估值方案收益类型
+     */
+    private String schProfitType;
 
 
     /**
@@ -457,5 +442,37 @@ public class DrawBaseInfoSelectComResult extends NeedOperateEntity {
 
     public void setIntervalArrivalAccountList(List<InitTrdProductDealDto> intervalArrivalAccountList) {
         this.intervalArrivalAccountList = intervalArrivalAccountList;
+    }
+
+    public List<TargetCashCalcRule> getTargetCashCalcRuleListR() {
+        return targetCashCalcRuleListR;
+    }
+
+    public void setTargetCashCalcRuleListR(List<TargetCashCalcRule> targetCashCalcRuleListR) {
+        this.targetCashCalcRuleListR = targetCashCalcRuleListR;
+    }
+
+    public List<TargetCashCalcRule> getTargetCashCalcRuleListP() {
+        return targetCashCalcRuleListP;
+    }
+
+    public void setTargetCashCalcRuleListP(List<TargetCashCalcRule> targetCashCalcRuleListP) {
+        this.targetCashCalcRuleListP = targetCashCalcRuleListP;
+    }
+
+    public List<TradeInfoDto> getTradeInfoDtoList() {
+        return tradeInfoDtoList;
+    }
+
+    public void setTradeInfoDtoList(List<TradeInfoDto> tradeInfoDtoList) {
+        this.tradeInfoDtoList = tradeInfoDtoList;
+    }
+
+    public String getSchProfitType() {
+        return schProfitType;
+    }
+
+    public void setSchProfitType(String schProfitType) {
+        this.schProfitType = schProfitType;
     }
 }
