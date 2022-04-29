@@ -82,6 +82,12 @@ public class TradeQueryBean implements Serializable {
     @ApiModelProperty(value = "成交时间")
     private Date createTime;
 
+    @ApiModelProperty(name = "deliveryResult", value = "交收状态")
+    private String deliveryResult;
+
+    @ApiModelProperty(name = "deliverySchedule", value = "交收进度")
+    private String deliverySchedule;
+
     /**
      * ///////////////////////////////////查询无用字段
      */
@@ -584,5 +590,21 @@ public class TradeQueryBean implements Serializable {
 
     public void setEntrustBsStr(String entrustBsStr) {
         this.entrustBsStr = entrustBsStr;
+    }
+
+    public String getDeliveryResult() {
+        return deliveryResult;
+    }
+
+    public void setDeliveryResult(String deliveryResult) {
+        this.deliveryResult = deliveryResult;
+    }
+
+    public String getDeliverySchedule() {
+        return deliverySchedule;
+    }
+
+    public void setDeliverySchedule(String deliverySchedule) {
+        this.deliverySchedule = deliverySchedule;
     }
 }

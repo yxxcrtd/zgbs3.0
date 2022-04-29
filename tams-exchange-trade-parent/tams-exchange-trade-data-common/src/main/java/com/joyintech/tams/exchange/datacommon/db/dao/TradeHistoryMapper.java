@@ -25,6 +25,8 @@ public interface TradeHistoryMapper extends IMybatisMapper<TradeHistory, String,
 
     List<TradeQueryBean> selectTradeByPage(TradeQryBean tradeQryBean);
 
+    List<TradeQueryBean> selectHistoryTradeByPage(TradeQryBean tradeQryBean);
+
     int updateByExampleSelective(@Param("record") TradeHistory record, @Param("example") TradeHistoryExample example);
 
     int updateByExample(@Param("record") TradeHistory record, @Param("example") TradeHistoryExample example);

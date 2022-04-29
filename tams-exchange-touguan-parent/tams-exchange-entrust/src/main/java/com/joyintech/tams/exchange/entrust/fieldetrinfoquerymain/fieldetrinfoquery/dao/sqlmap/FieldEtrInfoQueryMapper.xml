@@ -854,6 +854,8 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         <result column="SEC_ACCT_ID" property="secAcctId" jdbcType="VARCHAR"/>
         <result column="TRADE_PLAT" property="tradePlat" jdbcType="VARCHAR"/>
         <result column="FINPROD_TYPE2" property="finprodType2" jdbcType="VARCHAR"/>
+        <result column="DELIVERY_RESULT" property="deliveryResult" jdbcType="VARCHAR"/>
+        <result column="DELIVERY_SCHEDULE" property="deliverySchedule" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Query_Column_List">
@@ -886,24 +888,104 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         b.PORTFOLIO_NAME,b.SEC_ACCT_ID,b.TRADE_PLAT,b.FINPROD_TYPE2,b.PS as ENTRUST_BS
     </sql>
 
-    <select id="queryTrade2Touguan" resultMap="TradeResultMap" parameterType="java.lang.String">
+    <!--<select id="queryTrade2Touguan" resultMap="TradeResultMap" parameterType="java.lang.String">
         select* from(
             select
             <include refid="Query_Column_List"/>
             FROM T_TRADE a left join T_INSTRUCTION b on a.INSTRUCTION_ID =b.ENTRUST_ID
             where
-            <!--a.ENTRUST_TYPE=0 and-->
+            &lt;!&ndash;a.ENTRUST_TYPE=0 and&ndash;&gt;
             a.INSTRUCTION_ID = #{instructionId,jdbcType=VARCHAR}
             UNION ALL
             select
             <include refid="Query_Column_List"/>
             FROM T_TRADEHISTORY a left join T_INSTRUCTION b on a.INSTRUCTION_ID =b.ENTRUST_ID
             where
-            <!--a.ENTRUST_TYPE=0 and-->
+            &lt;!&ndash;a.ENTRUST_TYPE=0 and&ndash;&gt;
             a.INSTRUCTION_ID = #{instructionId,jdbcType=VARCHAR}
        ) t
         /* where t.ENTRUST_TYPE = '0'*/
         order by t.TRADING_DAY desc,t.TRADE_TIME desc
+    </select>-->
+    <select id="queryTrade2Touguan" resultMap="TradeResultMap" parameterType="java.lang.String">
+	SELECT DISTINCT A.*, EE.ENTRUST_TYPE, PP.PORTFOLIO_NAME, SCI.ACCT_NAME
+	  FROM (
+	  SELECT decode(TT.INSTRUCTION_ID, NULL, TTH.INSTRUCTION_ID)   INSTRUCTION_ID,
+			 STD.APPLY_TRADE_ID                                    BROKER_ENTRUST_ID,
+			 STD.CJBH                                              BROKER_TRADE_ID,
+			 STD.TRADE_MARKET                                      MARKET_STR,
+			 FP.FINPROD_MARKET_ID                                  STOCK_CODE,
+			 FP.FINPROD_ABBR                                       STOCK_NAME,
+			 DECODE(TT.PS, NULL, TTH.PS)                           ENTRUST_BS_STR,
+			 DECODE(TT.TRADED_VOLUME, NULL, TTH.TRADED_VOLUME)     TRADED_VOLUME,
+			 DECODE(TT.TRADED_PRICE, NULL, TTH.TRADED_PRICE)       TRADED_PRICE,
+			 DECODE(TT.CLEAR_BALANCE, NULL, TTH.CLEAR_BALANCE)     TRADED_BALANCE,
+			 DECODE(TT.TRADING_DAY, NULL, TTH.TRADING_DAY)         TRADING_DAY,
+			 DECODE(TT.TRADE_TIME, NULL, TTH.TRADE_TIME)           TRADE_TIME,
+			 CASE
+			   WHEN STD.DELIVERY_RESULT IS NULL THEN '未交收'
+			   WHEN STD.DELIVERY_RESULT = '01'  THEN '正常交收'
+			   WHEN STD.DELIVERY_RESULT = '02'  THEN '部分交收'  
+			   WHEN STD.DELIVERY_RESULT = '03'  THEN '交收失败' 
+			   WHEN STD.DELIVERY_RESULT = '04'  THEN '未交收' 
+			 END                                                   DELIVERY_RESULT,
+			 CASE
+			   WHEN STD.DELIVERY_RESULT IS NULL THEN '0'
+			   WHEN STD.DELIVERY_RESULT = '04' THEN  '0'
+			   ELSE STD.SHARE_AMT / TT.TRADED_VOLUME || '%'
+			 END                                                   DELIVERY_SCHEDULE,
+			 TTH.FINANCE_ACCOUNT                                   FINANCE_ACCOUNT          
+		FROM SETTLE_TRANS_DATA STD
+		LEFT JOIN T_TRADE TT ON (TT.BROKER_TRADE_ID = STD.CJBH AND TT.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TT.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))
+		LEFT JOIN T_TRADEHISTORY TTH ON (TTH.BROKER_TRADE_ID = STD.CJBH AND TTH.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TTH.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))
+		LEFT JOIN FIN_PRODUCT FP ON STD.FINPROD_ID = FP.FINPROD_ID
+	   WHERE STD.DELIVERY_RESULT IN ('01', '02', '03')
+		 AND ((STD.PS = 'T56' AND STD.TRADE_MARKET = '03' AND STD.BUSI_SCENE_CALSS NOT IN ('0902RB02', '0902RS03'))
+                OR (STD.PS = 'T56' AND STD.TRADE_MARKET = '04') OR (STD.PS != 'T56'))
+	  UNION
+	  SELECT TT.INSTRUCTION_ID                                     INSTRUCTION_ID,
+			 TT.BROKER_ENTRUST_ID                                  BROKER_ENTRUST_ID,
+			 TT.BROKER_TRADE_ID                                    BROKER_TRADE_ID,
+			 CASE
+			   WHEN TT.MARKET = 'SH' THEN '上海证券交易所'
+			   WHEN TT.MARKET = 'SZ' THEN '深圳证券交易所'
+			   ELSE NULL
+			 END                                                   MARKET_STR,
+			 TT.STOCK_CODE                                         STOCK_CODE,
+			 TT.STOCK_NAME                                         STOCK_NAME,
+			 TT.PS                                                 ENTRUST_BS_STR,
+			 TT.TRADED_VOLUME                                      TRADED_VOLUME,
+			 TT.TRADED_PRICE                                       TRADED_PRICE,
+			 TT.CLEAR_BALANCE                                      CLEAR_BALANCE,
+			 TT.TRADING_DAY                                        TRADING_DAY,
+			 TT.TRADE_TIME                                         TRADE_TIME,
+			 CASE
+			   WHEN STD.DELIVERY_RESULT IS NULL THEN '未交收'
+			   WHEN STD.DELIVERY_RESULT = '01'  THEN '正常交收'
+			   WHEN STD.DELIVERY_RESULT = '02'  THEN '部分交收'  
+			   WHEN STD.DELIVERY_RESULT = '03'  THEN '交收失败' 
+			   WHEN STD.DELIVERY_RESULT = '04'  THEN '未交收' 
+			 END                                                   DELIVERY_RESULT,
+			 CASE
+			   WHEN STD.DELIVERY_RESULT IS NULL THEN '0'
+			   WHEN STD.DELIVERY_RESULT = '04' THEN '0'
+			   ELSE STD.SHARE_AMT / TT.TRADED_VOLUME || '%'
+			 END                                                   DELIVERY_SCHEDULE,
+			 TT.FINANCE_ACCOUNT                                    FINANCE_ACCOUNT
+		FROM SETTLE_TRANS_DATA STD
+		LEFT JOIN T_TRADE TT
+		  ON TT.BROKER_TRADE_ID = STD.CJBH
+		 AND TT.SEC_ACCT_ID = STD.SEC_ACCT_ID
+		 AND STD.DELIVERY_RESULT IN ('02', '03')
+		 AND TT.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD')
+		 AND ((STD.PS = 'T56' AND STD.TRADE_MARKET = '03' AND STD.BUSI_SCENE_CALSS NOT IN ('0902RB02', '0902RS03'))
+                OR (STD.PS = 'T56' AND STD.TRADE_MARKET = '04') OR (STD.PS != 'T56'))
+	) A 
+	  LEFT JOIN STL_CAPACCT_INFO SCI ON A.FINANCE_ACCOUNT = SCI.ACCT_NO
+	  LEFT JOIN ETR_ENTRUST EE ON A.INSTRUCTION_ID = EE.ENTRUST_ID
+	  LEFT JOIN ETR_ENTRUST_DETAIL EED ON EE.ENTRUST_ID = EED.ENTRUST_ID
+	  LEFT JOIN PTL_PORTFOLIO PP ON EED.PORTFOLIO_ID = PP.PORTFOLIO_ID
+    WHERE A.INSTRUCTION_ID = #{instructionId,jdbcType=VARCHAR}
     </select>
 
     <select id="getEtrDispatcherExeListInfo"
