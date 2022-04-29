@@ -346,7 +346,7 @@ public class PortfolioManager extends BaseService {
     /**
      * 组合计算
      *
-     * @param order     下单对象
+     * @param order    下单对象
      * @param infoFlag 是否查询组合信息
      * @return 组合计算结果
      */
@@ -360,7 +360,7 @@ public class PortfolioManager extends BaseService {
             return ResultBean.error(ErrorCode.INSTRUCTIONS_NOT_EXIST);
         }
         BigDecimal orginEntrustPrice = order.getEntrustPrice();
-        // 新债，使用全价进行计算
+        // 债券交易类，使用全价进行计算
         coverPrice(instruction, order);
         // 获取委托属性
         String entrustProp = EntrustPropUtils.getEntrustProp(instruction, order.getEntrustProp());
@@ -434,7 +434,7 @@ public class PortfolioManager extends BaseService {
             ResultBean tickBean = quoteService.getTick(order.getStockCode());
 //            QuoteProto.TickBean tick = quoteTickService.getTickFromCache(order.getStockCode());
             if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
-                TickBean tick = (TickBean)tickBean.getData();
+                TickBean tick = (TickBean) tickBean.getData();
                 if (order.getEntrustBs().equals(EntrustBs.SELL.value)) {
                     price = TradeUtils.getBigDecimal(tick.getLowerLimitPrice(), 4);
                 } else {
@@ -457,7 +457,7 @@ public class PortfolioManager extends BaseService {
         BigDecimal disRate = BigDecimal.ZERO;
 
         // 订单类型：数量单，指令单
-        boolean isVolume = instruction.getEntrustNum() > 0L;
+        boolean isVolume = instruction.volumeInstruction();
         // 订单数量
         BigDecimal orderVolume = BigDecimal.valueOf(order.getEntrustVolume());
 
@@ -540,26 +540,29 @@ public class PortfolioManager extends BaseService {
             }
         }
 
-        // 新债，使用全价进行计算后恢复订单价格
-        recoverPrice(instruction, list, orginEntrustPrice);
+        // 债券交易类，使用全价进行计算后恢复订单价格
+        recoverPrice(instruction, list, orginEntrustPrice, entrustProp);
 
         log.debug("queryPortfolioCalculate() called with result => 【list = {}】", JSONUtil.toJsonStr(list));
         return ResultBean.success(list);
     }
 
     private void coverPrice(Instruction instruction, OrderPlaceBean order) {
-        if (instruction.inconvertibleBond()) {
+        String entrustProp = EntrustPropUtils.getEntrustProp(instruction, order.getEntrustProp());
+        if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())
+                && !EntrustUtils.isNoTrade(entrustProp)) {
             BigDecimal fullPrice = order.getFullPrice();
             if (ObjectUtil.isNull(fullPrice) || fullPrice.compareTo(BigDecimal.ZERO) <= 0) {
-                throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR);
+                throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, StrUtil.format("参数不正确 【fullPrice = {}】", fullPrice));
             }
             order.setEntrustPrice(fullPrice);
         }
     }
 
-    private void recoverPrice(Instruction instruction, List<PortfolioCalculateResponse> list, BigDecimal price) {
-        if (instruction.inconvertibleBond()) {
-            list.forEach(item-> item.setEntrustPrice(price));
+    private void recoverPrice(Instruction instruction, List<PortfolioCalculateResponse> list, BigDecimal price, String entrustProp) {
+        if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())
+                && !EntrustUtils.isNoTrade(entrustProp)) {
+            list.forEach(item -> item.setEntrustPrice(price));
         }
     }
 
@@ -606,7 +609,7 @@ public class PortfolioManager extends BaseService {
         // 行情数据
         ResultBean tickBean = quoteService.getTick(bean.getStockCode());
         if (ErrorCode.isFail(tickBean.getErrorCode())) {
-            TickBean tick = (TickBean)tickBean.getData();
+            TickBean tick = (TickBean) tickBean.getData();
 //        QuoteProto.TickBean tick = quoteTickService.getTickFromCache(bean.getStockCode());
 //        if (Objects.isNull(tick)) {
             log.warn("未找到行情信息: stockId [{}]", instruction.getFinprodMarketId());
@@ -641,7 +644,7 @@ public class PortfolioManager extends BaseService {
         }
 
         // 获取公平交易相关指令
-        TickBean tick = (TickBean)tickBean.getData();
+        TickBean tick = (TickBean) tickBean.getData();
         List<PortfolioInstructionContextDto> fairList = getFairList(bean, instruction, tick, result);
         log.debug(JSONUtil.toJsonStr(fairList));
 
@@ -932,7 +935,7 @@ public class PortfolioManager extends BaseService {
             }
 
             // 订单类型：数量单，指令单
-            boolean isVolume = ins.getEntrustNum() > 0L;
+            boolean isVolume = ins.volumeInstruction();
             // 订单数量
             BigDecimal orderVolume = BigDecimal.valueOf(context.getEntrustVolume());
             // 委托数量

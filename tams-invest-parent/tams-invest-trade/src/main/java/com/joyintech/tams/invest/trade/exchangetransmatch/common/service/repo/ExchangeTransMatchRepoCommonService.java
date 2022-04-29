@@ -33,6 +33,7 @@ import com.joyintech.tams.invest.trade.exchangetransmatch.common.dao.ExchangeTra
 import com.joyintech.tams.invest.trade.exchangetransmatch.common.dto.CommonTrdTempDto;
 import com.joyintech.tams.invest.trade.exchangetransmatch.common.dto.ExchangeTransMatchBaseTradeDto;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -396,32 +397,28 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
      * @return
      */
     public TrdProductDeal getFirstRepoTrade(String fCjbh, Date vdate, String seatNumber, String secAcctId) {
-        // 查询首期清算数据
-        Map<String,Object> sqQueryMap = new HashMap<>();
-        sqQueryMap.put("fCjbh", fCjbh);
-        sqQueryMap.put("vdate", vdate);
-        sqQueryMap.put("seatNumber", seatNumber);
-        sqQueryMap.put("secAcctId", secAcctId);
-        SettleTransData sqSettleTransData = exchangeTransMatchCommonMapper.getFirstRepoSettleTransData(sqQueryMap);
-        // 查询首期交易
-        Map<String,Object> queryMap = new HashMap<>();
-        queryMap.put("fCjbh",sqSettleTransData.getTradeId());
-        return exchangeTransMatchCommonMapper.getFirstRepoTrade(queryMap);
+        return trdCommonBaseService.getFirstRepoTrade(fCjbh, seatNumber, secAcctId, vdate);
     }
 
     /**
-     * 获取回购首期交易
+     * 获取回购首期质押品
      * @param fCjbh
      * @param vdate
-     * @param portfolioId
+     * @param seatNumber
+     * @param secAcctId
      * @return
      */
-    public List<FinDealPledge> getFirstRepoFinDealPledge(String fCjbh,Date vdate,String portfolioId) {
-        Map<String,Object> queryMap = new HashMap<>();
-        queryMap.put("fCjbh",fCjbh);
-        queryMap.put("vdate",vdate);
-        queryMap.put("portfolioId",portfolioId);
-        return exchangeTransMatchCommonMapper.getFirstRepoFinDealPledge(queryMap);
+    public List<FinDealPledge> getFirstRepoFinDealPledge(String fCjbh, Date vdate, String seatNumber, String secAcctId) {
+        // 查询首期清算数据
+        List<SettleTransData> settleTransDatas = trdCommonBaseService.selectSqSettleTransDatas(fCjbh, seatNumber,
+                secAcctId, vdate);
+        if(CollectionUtils.isNotEmpty(settleTransDatas)){
+            // 查询首期交易质押品
+            Map<String,Object> queryMap = new HashMap<>();
+            queryMap.put("fCjbh",settleTransDatas.get(0).getTradeId());
+            return exchangeTransMatchCommonMapper.getFirstRepoFinDealPledge(queryMap);
+        }
+        return new ArrayList<>();
     }
 
     public TrdDealTotalAdd generateDealTotalAdd(ExchangeTransMatchCommonDto dealDto, ExchangeTransMatchCommonEntrustDto entrustDto, TrdFinProductDealTotal trdFinProductDealTotal) {

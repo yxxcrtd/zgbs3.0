@@ -1382,4 +1382,31 @@
                     AND stdt.SEQ_ID = A2.SEQ_ID
             )
     </select>
+
+    <select id="selectSqSettleTransDatas" resultType="com.joyintech.tams.common.base.entity.SettleTransData">
+        SELECT
+        <include refid="com.joyintech.tams.common.base.dao.SettleTransDataMapper.Base_Column_List" />
+        FROM
+        SETTLE_TRANS_DATA
+        WHERE
+        CJBH = #{sqcjbh, jdbcType=VARCHAR}
+        <if test="seatNumber != null and seatNumber != ''">
+            AND SEAT_NUMBER = #{seatNumber, jdbcType=VARCHAR}
+        </if>
+        <if test="secAcctId != null and secAcctId != ''">
+            AND SEC_ACCT_ID = #{secAcctId, jdbcType=VARCHAR}
+        </if>
+        <if test="vdate != null">
+            AND VDATE = #{vdate, jdbcType=DATE}
+        </if>
+    </select>
+
+    <select id="getFirstRepoTrade" resultType="com.joyintech.tams.common.base.entity.TrdProductDeal">
+        SELECT A.* FROM TRD_PRODUCT_DEAL A
+            INNER JOIN TRD_PRODUCT_DEAL_ADD B
+            ON A.TRADE_ID  = B.TRADE_ID
+        WHERE A.F_TRADE_ID = #{fCjbh}
+          AND A.IS_CANCEL = 'N'
+          AND A.TRADE_STATUS = '01'
+    </select>
 </mapper>

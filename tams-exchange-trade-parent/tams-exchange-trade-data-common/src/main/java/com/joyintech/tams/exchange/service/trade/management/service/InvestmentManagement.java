@@ -18,6 +18,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.*;
@@ -31,13 +32,14 @@ import com.joyintech.tams.exchange.common.cache.MinTrdUnitLimitService;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.*;
 import com.joyintech.tams.exchange.common.db.domain.*;
+import com.joyintech.tams.exchange.common.dto.EntrustPriceAndYieldDto;
+import com.joyintech.tams.exchange.common.enums.exchange.GuaranteedEnum;
+import com.joyintech.tams.exchange.common.enums.exchange.NetOrFullPriceEnum;
+import com.joyintech.tams.exchange.common.enums.exchange.TargetTypeEnum;
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
 import com.joyintech.tams.exchange.common.request.InstructionQueryRequest;
-import com.joyintech.tams.exchange.common.utils.EntrustUtils;
-import com.joyintech.tams.exchange.common.utils.JsonUtils;
-import com.joyintech.tams.exchange.common.utils.ListConvertUtils;
-import com.joyintech.tams.exchange.common.utils.TradeUtils;
+import com.joyintech.tams.exchange.common.utils.*;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
 import com.joyintech.tams.exchange.service.trade.check.AppointInstructionCheck;
 import com.joyintech.tams.exchange.service.trade.check.CheckResult;
@@ -68,7 +70,10 @@ import static java.util.stream.Collectors.groupingBy;
 @Component
 public class InvestmentManagement extends BaseService {
     private static final Logger logger = LoggerFactory.getLogger(InvestmentManagement.class);
-
+    /**
+     * 指令分发检查开关：01-开启，02-关闭
+     */
+    private static final String CHECK_FILTER_SWITCH = "01";
     @Autowired
     private EntrustService entrustService;
     @Autowired
@@ -101,7 +106,6 @@ public class InvestmentManagement extends BaseService {
     private MinTrdUnitLimitService minTrdUnitLimitService;
     @Autowired
     private MinPriceService minPriceService;
-
     /**
      * 是否单体服务
      */
@@ -232,6 +236,10 @@ public class InvestmentManagement extends BaseService {
             if (Objects.nonNull(DictCodeListExt3.from(DictCode.投管业务类型, newInstruction.getBusiTypeTg()))) {
                 newInstruction.setBusiTypeTg(DictCodeListExt3.from(DictCode.投管业务类型, newInstruction.getBusiTypeTg()).getCodeName());
             }
+            newInstruction.setIsNoGuard(EnumUtil.getDescriptionByCode(GuaranteedEnum.class, newInstruction.getIsNoGuard()));
+            newInstruction.setIsNetPrice(EnumUtil.getDescriptionByCode(NetOrFullPriceEnum.class, newInstruction.getIsNetPrice()));
+            newInstruction.setTargetType(EnumUtil.getDescriptionByCode(TargetTypeEnum.class, newInstruction.getTargetType()));
+
             newInstruction.setProgress(newInstruction.getProgress());
             newInstruction.setDealProgress(newInstruction.getDealProgress());
             newInstruction.setLeftVolume(newInstruction.getLeftVolume());
@@ -416,9 +424,7 @@ public class InvestmentManagement extends BaseService {
     }
 
     private List<Instruction> sortInstructionsByCreateTime(List<Instruction> instructions) {
-        return instructions.stream()
-                .sorted((o1, o2) -> DateUtil.compareDate(o2.getCreateTime(), o1.getCreateTime()))
-                .collect(Collectors.toList());
+        return instructions.stream().sorted((o1, o2) -> DateUtil.compareDate(o2.getCreateTime(), o1.getCreateTime())).collect(Collectors.toList());
     }
 
     private List<Instruction> cloneInstructions(List<Instruction> instructions) {
@@ -467,17 +473,24 @@ public class InvestmentManagement extends BaseService {
             MinPrice minPrice = minPriceService.getMinPrice(instruction, instrument);
             MinTrdUnitLimit minTrdUnitLimit = minTrdUnitLimitService.getMinTrdUnitLimit(instruction, instrument);
 
-            minPriceAndMinTrdUnitLimitBean =
-                    new MinPriceAndMinTrdUnitLimitBean(finprodMarketId, ErrorCode.SUCCESS.value, ErrorCode.SUCCESS.errorMsg);
+            minPriceAndMinTrdUnitLimitBean = new MinPriceAndMinTrdUnitLimitBean(finprodMarketId, ErrorCode.SUCCESS.value, ErrorCode.SUCCESS.errorMsg);
             minPriceAndMinTrdUnitLimitBean.setIsFullPrice(instrument.getIsFullPrice());
-            // 特殊处理新债,将多条数据同时塞入
+            // 特殊处理新债和质押式回购,将多条数据同时塞入
             if (ObjectUtil.isNull(minPrice)) {
                 String tradeMarket = instruction.getTradeMarket();
                 String assetType = instrument.getAssetType();
                 String assetType1 = instrument.getAssetType1();
                 MinPrice minPriceByPPCJ = minPriceService.getMinPrice(tradeMarket, 指定交易方式_匹配成交.getValue(), assetType, assetType1);
                 MinPrice minPriceByXSCJ = minPriceService.getMinPrice(tradeMarket, 指定交易方式_协商成交.getValue(), assetType, assetType1);
-                minPriceAndMinTrdUnitLimitBean.setMinPriceList(ListUtil.of(minPriceByPPCJ, minPriceByXSCJ));
+
+                List<MinPrice> minPrices = Lists.newArrayList();
+                if (ObjectUtil.isNotNull(minPriceByPPCJ)) {
+                    minPrices.add(minPriceByPPCJ);
+                }
+                if (ObjectUtil.isNotNull(minPriceByXSCJ)) {
+                    minPrices.add(minPriceByXSCJ);
+                }
+                minPriceAndMinTrdUnitLimitBean.setMinPriceList(minPrices);
             } else {
                 minPriceAndMinTrdUnitLimitBean.setMinPriceList(ListUtil.of(minPrice));
             }
@@ -490,7 +503,15 @@ public class InvestmentManagement extends BaseService {
                 String ps = instruction.getPs();
                 MinTrdUnitLimit minTrdUnitLimitByPPCJ = minTrdUnitLimitService.getMinTrdUnitLimit(tradeMarket, 指定交易方式_匹配成交.getValue(), assetType, assetType1, subStockType, ps);
                 MinTrdUnitLimit minTrdUnitLimitByXSCJ = minTrdUnitLimitService.getMinTrdUnitLimit(tradeMarket, 指定交易方式_协商成交.getValue(), assetType, assetType1, subStockType, ps);
-                minPriceAndMinTrdUnitLimitBean.setMinTrdUnitLimitList(ListUtil.of(minTrdUnitLimitByPPCJ, minTrdUnitLimitByXSCJ));
+
+                List<MinTrdUnitLimit> minTrdUnitLimits = Lists.newArrayList();
+                if (ObjectUtil.isNotNull(minTrdUnitLimitByPPCJ)) {
+                    minTrdUnitLimits.add(minTrdUnitLimitByPPCJ);
+                }
+                if (ObjectUtil.isNotNull(minTrdUnitLimitByXSCJ)) {
+                    minTrdUnitLimits.add(minTrdUnitLimitByXSCJ);
+                }
+                minPriceAndMinTrdUnitLimitBean.setMinTrdUnitLimitList(minTrdUnitLimits);
             } else {
                 minPriceAndMinTrdUnitLimitBean.setMinTrdUnitLimitList(ListUtil.of(minTrdUnitLimit));
             }
@@ -1017,6 +1038,54 @@ public class InvestmentManagement extends BaseService {
         return pageParam;
     }
 
+
+    public void getAllPriceAndYield(Instruction instruction, EntrustPriceAndYieldDto dto, boolean isFullPrice) {
+        if (isFullPrice) {
+            getNetPriceByFullPrice(instruction, dto);
+        } else {
+            getFullPriceByNetPrice(instruction, dto);
+        }
+    }
+
+
+    public void getFullPriceByNetPrice(Instruction instruction, EntrustPriceAndYieldDto dto) {
+        Map<String, Object> pageParam = getExpireOrFullPriceOrEntrustPriceParam(dto.getEntrustVolume(), instruction);
+        pageParam.put("unitCprice", dto.getPrice());
+        String url = ServiceApplication.TRADE_SERVICE_NAME + TradeServiceURL.unitCprice;
+        logger.info("调用微服务根据净价获取全价,到期收益率, url {} pageParam {}", url, JsonUtils.getJsonFromObject(pageParam));
+        ExpireIncomeRateRet result = sendReqExpireIncomeRate(pageParam, url);
+        if (ExchangeConstant.HTTP_STATUS_CODE_OK.equals(result.getStatuCode())) {
+            dto.setNetPrice(dto.getPrice());
+            dto.setFullPrice(TradeUtils.getBigDecimal(result.getData().getUnitFprice(), dto.getRound()));
+            dto.setYield(TradeUtils.getBigDecimal(result.getData().getYield(), dto.getRound()));
+        } else {
+            logger.error("净价转换全价接口调用失败：errorMsg {}", JsonUtils.getJsonFromObject(result.getErrorList()));
+            dto.setNetPrice(dto.getPrice());
+            dto.setFullPrice(BigDecimal.ZERO);
+            dto.setYield(BigDecimal.ZERO);
+        }
+    }
+
+    public void getNetPriceByFullPrice(Instruction instruction, EntrustPriceAndYieldDto dto) {
+        Map<String, Object> pageParam = getExpireOrFullPriceOrEntrustPriceParam(dto.getEntrustVolume(), instruction);
+        pageParam.put("fpriceAmt", TradeUtils.multiply(dto.getPrice(), dto.getEntrustVolume(), 4));
+        pageParam.put("unitCprice", 0);
+        String url = ServiceApplication.TRADE_SERVICE_NAME + TradeServiceURL.fpriceAmt;
+        logger.info("调用微服务根据全价获取净价,到期收益率, url {} pageParam {}", url, JsonUtils.getJsonFromObject(pageParam));
+        ExpireIncomeRateRet result = sendReqExpireIncomeRate(pageParam, url);
+        if (ExchangeConstant.HTTP_STATUS_CODE_OK.equals(result.getStatuCode())) {
+            dto.setNetPrice(TradeUtils.getBigDecimal(result.getData().getUnitCprice(), dto.getRound()));
+            dto.setFullPrice(dto.getPrice());
+            dto.setYield(TradeUtils.getBigDecimal(result.getData().getYield(), dto.getRound()));
+        } else {
+            logger.error("净价转换全价接口调用失败：errorMsg {}", JsonUtils.getJsonFromObject(result.getErrorList()));
+            dto.setNetPrice(BigDecimal.ZERO);
+            dto.setFullPrice(dto.getPrice());
+            dto.setYield(BigDecimal.ZERO);
+        }
+    }
+
+
     /***
      * @Description: 根据净价设置全价, 到期收益率
      * @Param: instruction, entrust
@@ -1131,13 +1200,16 @@ public class InvestmentManagement extends BaseService {
             Map<String, Object> data = checkResult.getData();
             if (code == 2 && CollUtil.isNotEmpty(data)) {
                 Set<String> keys = data.keySet();
-//                instructionList = instructionList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
-//                detailList = detailList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
-//                pledgeList = pledgeList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
+                final String checkSwitch = CacheUtil.getSysParam(ExchangeConstant.TRD_INSTRUCTION_APPOINT_CHECK_FILTER);
+                if (StringUtil.equals(CHECK_FILTER_SWITCH, checkSwitch)) {
+                    instructionList = instructionList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
+                    detailList = detailList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
+                    pledgeList = pledgeList.stream().filter(o -> !keys.contains(o.getEntrustId())).collect(Collectors.toList());
 
+                    resultBean.setErrorCode(ErrorCode.APPOINT_INSTRUCTION_EXIST_PARAMETER_ERROR);
+                    resultBean.setErrorMsg(JsonUtils.getJsonFromObject(data));
+                }
                 updateAppointInstruction(records, entrustIds, Lists.newArrayList(keys.iterator()), data);
-
-                resultBean.setErrorCode(ErrorCode.APPOINT_INSTRUCTION_EXIST_PARAMETER_ERROR);
             } else {
                 updateAppointInstruction(records, entrustIds);
             }

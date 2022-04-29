@@ -65,7 +65,7 @@ public class QuoteService {
         }
         if (Objects.isNull(tickBean)) {
             logger.debug("[行情服务] 获取行情失败");
-            return  new ResultBean(ErrorCode.QUOTATION_NOT_EXIST);
+            return  new ResultBean(ErrorCode.SUCCESS);
         }
         logger.debug("[行情服务] 获取行情：证券代码{}，行情数据{}", stockCode, JSON.toJSONString(tickBean));
         return new ResultBean(ErrorCode.SUCCESS, tickBean);

@@ -236,8 +236,8 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 		initPageParams.put("ACCOUNT_SPEED_01", DictCodeList.清算速度_T_0.getValue());
 		initPageParams.put("ACCOUNT_SPEED_02", DictCodeList.清算速度_T_1.getValue());
 		//展示投资目的或业务模式参数
-		String SHOW_INVAIM_OR_BUSSINSSMODEL = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
-		initPageParams.put("SHOW_INVAIM_OR_BUSSINSSMODEL", SHOW_INVAIM_OR_BUSSINSSMODEL);
+//		String SHOW_INVAIM_OR_BUSSINSSMODEL = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
+//		initPageParams.put("SHOW_INVAIM_OR_BUSSINSSMODEL", SHOW_INVAIM_OR_BUSSINSSMODEL);
 
 		// 场内交易指令画面行情区域自动刷新时间（毫秒）
 		long etrExchange_HqArea_refresh_period = 20000;
@@ -670,6 +670,7 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 	@RequestMapping("check")
 	public AjaxResult check(@RequestBody EtrExchangeTradeSaveSecRepoRequest dto, BindingResult br)
 			throws Exception {
+		etrExchangeTradeSecRepo001Service.setEntrustBussType(dto);
 		AjaxResult ajax= etrExchangeTradeSecRepo001Service.checkSave(dto,br);
 		List<ValidMessage> validList = etrExchangeTradeSecRepoValidatorService.valid(dto);
 		List<ValidMessage> validListPriceRange = etrExchangeTradeSecRepo001Service.checkSavePriceRange(dto,br);
@@ -1196,14 +1197,7 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 			for(PositionCashSecDto positionCashSecDto:requestDto.getPtlList()){
 				positionCashSecDto.setFinprodId("XN_PRODID999");
 			}
-			List<BaseMap> m = etrTradeCommonervice.queryPositionInfo(requestDto);
-			if(m.get(3)!=null){
-				m.get(3).put("name","标准券可用额度（张）");
-			}
-			if(m.get(4)!=null){
-				m.get(4).put("name","标准券总额度（张）");
-			}
-
+			List<BaseMap> m = etrTradeCommonervice.queryPositionInfoSecRepo(requestDto,"REPO");
 			return new Message<List<BaseMap>>().success().setData(m);
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -3,6 +3,10 @@ package com.joyintech.tams.exchange.common.db.domain;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.constant.TradePlat;
+import com.joyintech.tams.exchange.common.constant.instrument.SecondAssetType;
+import com.joyintech.tams.exchange.common.enums.exchange.TargetTypeEnum;
 import com.joyintech.tams.exchange.common.utils.DoubleSerializerUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import io.swagger.annotations.ApiModel;
@@ -43,7 +47,7 @@ public class InstructionExportVo {
     private String entrustId = "";
 
     @ApiModelProperty(required = false, name = "portfolioId", value = "组合代码")
-    @Size(max = 32)
+    @Size(max = 200)
     private String portfolioId = "";
 
     @ApiModelProperty(required = false, name = "portfolioName", value = "组合名称")
@@ -382,9 +386,16 @@ public class InstructionExportVo {
 
     private String dealProgress;
 
-    private long leftVolume;
+    private Long leftVolume;
 
     private BigDecimal leftAmount;
+
+    @ApiModelProperty(name = "targetType", value = "目标类型")
+    private String targetType;
+    @ApiModelProperty(name = "isNoGuard", value = "是否非担保")
+    private String isNoGuard;
+    @ApiModelProperty(name = "isNetPrice", value = "是否净价交易")
+    private String isNetPrice;
 
     @Id
     public String getEntrustId() {
@@ -1051,6 +1062,30 @@ public class InstructionExportVo {
         this.busiTypeTg = busiTypeTg;
     }
 
+    public String getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(String targetType) {
+        this.targetType = targetType;
+    }
+
+    public String getIsNoGuard() {
+        return isNoGuard;
+    }
+
+    public void setIsNoGuard(String isNoGuard) {
+        this.isNoGuard = isNoGuard;
+    }
+
+    public String getIsNetPrice() {
+        return isNetPrice;
+    }
+
+    public void setIsNetPrice(String isNetPrice) {
+        this.isNetPrice = isNetPrice;
+    }
+
     /**
      * 执行进度
      */
@@ -1061,7 +1096,7 @@ public class InstructionExportVo {
 
         BigDecimal total = TradeUtils.add(getEntrustLeftAmt(), getFrozenQuantity(), 2);
         Double progress;
-        if (getEntrustNum() > 0) {
+        if (volumeInstruction()) {
             progress = TradeUtils.divide(total, getEntrustNum(), 4).doubleValue();
         } else if (TradeUtils.bigThanZero(getEntrustAmt())) {
             progress = TradeUtils.divide(total, getEntrustAmt(), 4);
@@ -1086,7 +1121,7 @@ public class InstructionExportVo {
         }
 
         Double progress;
-        if (getEntrustNum() > 0) {
+        if (volumeInstruction()) {
             progress = TradeUtils.divide(getEntrustLeftAmt(), getEntrustNum(), 4).doubleValue();
         } else if (TradeUtils.bigThanZero(getEntrustAmt())) {
             progress = TradeUtils.divide(getEntrustLeftAmt(), getEntrustAmt(), 4);
@@ -1104,18 +1139,18 @@ public class InstructionExportVo {
     /**
      * 剩余数量
      */
-    public long getLeftVolume() {
+    public Long getLeftVolume() {
         if (Objects.nonNull(this.leftVolume)) {
             return this.leftVolume;
         }
 
-        if (getEntrustNum() > 0) {
+        if (volumeInstruction()) {
             return getEntrustNum() - getEntrustLeftAmt().longValue() - getFrozenQuantity().longValue();
         }
         return 0L;
     }
 
-    public void setLeftVolume(long leftVolume) {
+    public void setLeftVolume(Long leftVolume) {
         this.leftVolume = leftVolume;
     }
 
@@ -1127,7 +1162,7 @@ public class InstructionExportVo {
             return this.leftAmount;
         }
 
-        if (TradeUtils.bigThanZero(getEntrustAmt())) {
+        if (amtInstruction()) {
             return TradeUtils.subtract(getEntrustAmt(), getEntrustLeftAmt(), getFrozenQuantity(), 2);
         }
         return BigDecimal.ZERO;
@@ -1135,5 +1170,32 @@ public class InstructionExportVo {
 
     public void setLeftAmount(BigDecimal leftAmount) {
         this.leftAmount = leftAmount;
+    }
+
+    /**
+     * 是否是数量指令
+     */
+    public boolean volumeInstruction() {
+        // 新债
+        if (newBond()) {
+            return TargetTypeEnum.YES.codeEquals(this.getTargetType());
+        }
+        return this.getEntrustNum() > 0L;
+    }
+
+    /**
+     * 是否是金额指令
+     */
+    public boolean amtInstruction() {
+        return !volumeInstruction();
+    }
+
+    /**
+     * 新债-非可转债
+     */
+    public boolean newBond() {
+        return InvestmentAssetType.BOND.codeEquals(this.getAssetType())
+                && SecondAssetType.KZZ.codeNotEquals(this.getAssetType1())
+                && TradePlat.NEW_BOND.codeEquals(this.getTradePlat());
     }
 }

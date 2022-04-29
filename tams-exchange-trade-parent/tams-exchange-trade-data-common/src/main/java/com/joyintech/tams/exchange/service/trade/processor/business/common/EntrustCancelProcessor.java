@@ -220,7 +220,7 @@ public class EntrustCancelProcessor {
             }
             //非大宗意向申报
             if (!EntrustUtils.isIntentionEntrust(entrust.getEntrustProp())) {
-                if (instruction.getEntrustNum() > 0) {
+                if (instruction.volumeInstruction()) {
                     instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() - unFrozenVolume));
                 } else if (instruction.getEntrustAmt().doubleValue() > 0) {
                     if (instruction.getFrozenQuantity().doubleValue() > 0) {
@@ -234,7 +234,7 @@ public class EntrustCancelProcessor {
             }
             //大宗意向申报
             else if (EntrustUtils.isIntentionEntrust(entrust.getEntrustProp())) {
-                if (instruction.getEntrustNum() > 0) {
+                if (instruction.volumeInstruction()) {
                     instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() - unFrozenVolume));
                 } else if (instruction.getEntrustAmt().doubleValue() > 0) {
                     if (instruction.getFrozenQuantity().doubleValue() > 0) {

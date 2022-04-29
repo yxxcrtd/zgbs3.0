@@ -305,27 +305,6 @@
         </where>
     </select>
 
-    <select id="getFirstRepoTrade" resultType="com.joyintech.tams.common.base.entity.TrdProductDeal">
-            SELECT A.* FROM TRD_PRODUCT_DEAL A
-            INNER JOIN TRD_PRODUCT_DEAL_ADD B
-            ON A.TRADE_ID  = B.TRADE_ID
-            WHERE A.F_TRADE_ID = #{fCjbh}
-            AND A.IS_CANCEL = 'N'
-            AND A.TRADE_STATUS = '01'
-    </select>
-
-    <select id="getFirstRepoSettleTransData" resultType="com.joyintech.tams.common.base.entity.SettleTransData">
-        select
-            A.*
-        from
-            SETTLE_TRANS_DATA A
-        WHERE
-            A.CJBH = #{fCjbh}
-            AND A.DEAL_DATE = #{vdate,jdbcType=DATE}
-            AND A.SEAT_NUMBER = #{seatNumber}
-            AND A.SEC_ACCT_ID = #{secAcctId}
-    </select>
-
     <select id="getFirstRepoFinDealPledge" resultType="com.joyintech.tams.common.base.entity.FinDealPledge">
         select A.*
           from FIN_DEAL_PLEDGE A
@@ -334,8 +313,8 @@
          INNER JOIN TRD_PRODUCT_DEAL_ADD C
             ON B.TRADE_ID = C.TRADE_ID
          WHERE B.F_TRADE_ID = #{fCjbh}
-           AND B.VDATE = #{vdate}
-           AND C.PORTFOLIO_ID = #{portfolioId}
+           <!--AND B.VDATE = #{vdate}
+           AND C.PORTFOLIO_ID = #{portfolioId}-->
     </select>
 
     <select id="getFinPledgeDisplaceResult" resultType = "com.joyintech.tams.common.base.entity.FinPledgeDisplaceResult">

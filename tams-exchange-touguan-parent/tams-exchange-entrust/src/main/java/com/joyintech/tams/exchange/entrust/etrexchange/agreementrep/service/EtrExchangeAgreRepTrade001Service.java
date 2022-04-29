@@ -11,9 +11,6 @@
 package com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.service;
 
 
-import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_修改;
-import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_新建;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
@@ -91,6 +88,8 @@ import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
+
+import static com.joyintech.tams.constant.DictCodeListExt3.*;
 
 
 /**
@@ -368,6 +367,10 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         List<EtrPledge> list = new ArrayList<>();
         EtrPledge etrPledge = new EtrPledge();
         etrEntrustAdd.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
+        //除首期以外的指令，指令表的存储，金融产品代码存储首期对应的交易编号
+        if (!交易方向_首期.getValue().equals(entity.getPs())){
+            entity.setFinprodId(getFinprodIdNoFirst(entity));
+        }
         // 构造单组合单资产DTO
         EtrSinglePortfolioDto etrSinglePortfolioDto = getEtrSinglePortfolio(entity);
         //协议回购首期指令
@@ -2577,5 +2580,18 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             oprHisReq.setOperType(DictCodeListExt3.操作类型_导出.getValue());
         }
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
+    }
+
+    //获取首期交易编号
+    private String getFinprodIdNoFirst(EtrExchangeAgreRepTrade001Dto dto){
+        String tradeId="";
+        TrdProductDeal trdProductDeal=trdCommonBaseService.getFirstRepoTrade(dto.getIntiTradeId(),
+                "", dto.getSecAcctId(),
+                DateUtil.parse(dto.getVdate()));
+        if(trdProductDeal!=null){
+            tradeId=trdProductDeal.getTradeId();
+        }
+        return tradeId;
+
     }
 }

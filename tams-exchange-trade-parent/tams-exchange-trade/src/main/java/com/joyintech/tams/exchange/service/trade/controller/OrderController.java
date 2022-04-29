@@ -72,10 +72,10 @@ public class OrderController {
             return MasterUtil.postForObject(order);
         }
 
-        /*ResultBean checkResult = commonCheckKit.check(order);
+        ResultBean checkResult = commonCheckKit.check(order);
         if (ErrorCode.isFail(checkResult.getErrorCode())) {
             return new Message<>(checkResult);
-        }*/
+        }
         ResultBean businessCheckResult = businessCheckKit.check(order);
         if (ErrorCode.isFail(businessCheckResult.getErrorCode())) {
             return new Message<>(businessCheckResult);
@@ -115,10 +115,10 @@ public class OrderController {
             return MasterUtil.postForObject(order);
         }
 
-        /*ResultBean commonCheckResult = commonCheckKit.check(order);
+        ResultBean commonCheckResult = commonCheckKit.check(order);
         if (ErrorCode.isFail(commonCheckResult.getErrorCode())) {
             return new Message<>(commonCheckResult);
-        }*/
+        }
         ResultBean businessCheckResult = businessCheckKit.check(order);
         if (ErrorCode.isFail(businessCheckResult.getErrorCode())) {
             return new Message<>(businessCheckResult);

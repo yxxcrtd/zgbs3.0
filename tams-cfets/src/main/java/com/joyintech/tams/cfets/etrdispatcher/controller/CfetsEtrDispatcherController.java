@@ -14,6 +14,7 @@ import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectDto;
 import com.joyintech.framework.select.SelectOptionDto;
@@ -299,6 +300,8 @@ public class CfetsEtrDispatcherController extends BaseController {
                 cfetsEtrDispatcherService.doDispatcherDeal(pageParam);
                 return new Message<AjaxResult>().success().setMessage("分发成功");
             }
+        }catch(BusinessException e1){
+            return new Message<AjaxResult>().fail().setMessage(e1.getMessage());
         } catch (Exception e) {
             logger.error("分发异常", e);
             return new Message<AjaxResult>().fail().setMessage("分发异常");

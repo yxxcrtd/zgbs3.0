@@ -1,37 +1,14 @@
 package com.joyintech.service.trade.entrustmsgbymq.service;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.util.*;
-
 import com.alibaba.fastjson.JSON;
-import com.joyintech.framework.util.*;
-import com.joyintech.tams.common.base.dao.*;
-import com.joyintech.tams.common.base.entity.*;
-import com.joyintech.tams.systemtools.interf.IPlatformDate;
-import com.joyintech.tams.invest.common.position.dao.CommonPtlPositionMapper;
-import com.joyintech.tams.invest.common.position.dto.EtrEntrustAddDto;
-import com.joyintech.tams.invest.common.position.dto.FinTradeProductDto;
-import com.joyintech.tams.invest.common.position.dto.PositionBaseData;
-import com.joyintech.tams.invest.common.position.dto.PostionParameter;
-import com.joyintech.tams.invest.common.position.service.CommonPositionService;
-import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
-import com.joyintech.workflow.engine.constant.OperationType;
-import org.codehaus.plexus.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.framework.util.*;
 import com.joyintech.service.trade.bond.dto.TrdBondInvestTradeDto;
 import com.joyintech.service.trade.bond.service.TrdBondCalcService;
 import com.joyintech.service.trade.entrustmsgbymq.dao.EntrustMsgbyMQMapper;
 import com.joyintech.service.trade.entrustmsgbymq.dto.TrdTempDto;
+import com.joyintech.tams.common.base.dao.*;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.common.service.DateCalService;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommService;
@@ -54,10 +31,26 @@ import com.joyintech.tams.invest.common.dto.etr.EtrPositionHoldDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.tams.invest.common.dto.trade.entrust.EtrFinishStatusDto;
+import com.joyintech.tams.invest.common.position.dto.EtrEntrustAddDto;
+import com.joyintech.tams.invest.common.position.dto.FinTradeProductDto;
+import com.joyintech.tams.invest.common.position.dto.PositionBaseData;
+import com.joyintech.tams.invest.common.position.service.CommonPositionService;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
+import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.*;
 
 /**
  *
@@ -222,6 +215,8 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
     private FinProductMapper finProductMapper;
     // add by etliu 20220225 end
 
+    @Autowired
+    private TrdProductDealMapper trdProductDealMapper;
     /**
      * 成交数据预清算
      *
@@ -385,6 +380,8 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         }
         // 回购拆借方向
         if (etrEntrust != null){
+            // 协议回购非首期指令的finProdId存的是首期交易编号
+            finprodId = etrEntrust.getFinprodId();
             trdTempDto.setFinprodType2(etrEntrust.getFinprodType2());
         }else {
             trdTempDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
@@ -394,9 +391,9 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         EtrEntrustAddDto etrEntrustAddDto = new EtrEntrustAddDto();
         if (etrEntrustAdd != null){
             BeanUtil.copyPropertiesIgnoreNull(etrEntrustAddDto,etrEntrustAdd);
-            if (etrEntrustAdd.getTradeId() != null) {
-                finprodId = etrEntrustAdd.getTradeId();
-            }
+//            if (etrEntrustAdd.getTradeId() != null) {
+//                finprodId = etrEntrustAdd.getTradeId();
+//            }
         }
         positionBaseData.setEtrEntrustAddDto(etrEntrustAddDto);
         // 首期主键为空
@@ -405,10 +402,10 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         }
 
         // add by etliu 20220116 start
-        String hgsqFinprodId = trdCommonBaseService.selectHgsqFinprodId(trdTempDto.getPortfolioId(), finprodId);
-        if (StringUtil.isNotBlank(hgsqFinprodId)) {
-            finprodId = hgsqFinprodId;
-        }
+//        String hgsqFinprodId = trdCommonBaseService.selectHgsqFinprodId(trdTempDto.getPortfolioId(), finprodId);
+//        if (StringUtil.isNotBlank(hgsqFinprodId)) {
+//            finprodId = hgsqFinprodId;
+//        }
         // add by etliu 20220116 end
         // 首期信息
         trdTempDto.setFinprodId(finprodId);
@@ -1824,11 +1821,20 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
             List<FinDealPledge> finDealPledgeList = entrustMsgbyMQMapper.getFinDealPledgeList(keyMap);
             // ZGTFCP-1882: 质押品表的tradeId有时登录的是交易编号 modify by fuyongsheng 20220325 start
             if(CollectionUtils.isEmpty(finDealPledgeList)){
-                List<TrdProductDeal> trdProductDeals = entrustMsgbyMQMapper.getTrdProductDealByFTradeId(infContractDetailfile.getvTradeId());
-                if(!CollectionUtils.isEmpty(trdProductDeals)){
-                    keyMap.put("vTradeId",trdProductDeals.get(0).getTradeId());
-                    finDealPledgeList = entrustMsgbyMQMapper.getFinDealPledgeList(keyMap);
+                // 修改查询首期交易逻辑 modify by fuyongsheng 20220426 start
+                // List<TrdProductDeal> trdProductDeals = entrustMsgbyMQMapper.getTrdProductDealByFTradeId(infContractDetailfile.getvTradeId());
+//                if(!CollectionUtils.isEmpty(trdProductDeals)){
+//                    keyMap.put("vTradeId",trdProductDeals.get(0).getTradeId());
+//                    finDealPledgeList = entrustMsgbyMQMapper.getFinDealPledgeList(keyMap);
+//                }
+                if(null != firstFinTradeProduct){
+                    TrdProductDeal trdProductDeal = trdProductDealMapper.selectByPrimaryKey(firstFinTradeProduct.getFinprodId());
+                    if(null != trdProductDeal){
+                        keyMap.put("vTradeId", trdProductDeal.getTradeId());
+                        finDealPledgeList = entrustMsgbyMQMapper.getFinDealPledgeList(keyMap);
+                    }
                 }
+                // 修改查询首期交易逻辑 modify by fuyongsheng 20220426 end
             }
             // ZGTFCP-1882: 质押品表的tradeId有时登录的是交易编号 modify by fuyongsheng 20220325 end
             List<FinPledgeDispDetailTemp> finPledgeDispDetailTempList = new ArrayList<>();

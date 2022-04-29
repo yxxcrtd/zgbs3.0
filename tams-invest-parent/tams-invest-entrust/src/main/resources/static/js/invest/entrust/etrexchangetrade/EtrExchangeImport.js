@@ -139,7 +139,8 @@
         , {field:'vdate', title: 'EtrExchangeTrade003.vdate',type:'date', width : 120,sortField:'VDATE'}//持仓成本
         , {field:'mdate', title: 'EtrExchangeTrade003.mdate',type:'date', width : 120,sortField:'MDATE'}//最新价
         //add by chenjiaxing 20210830 导入添加投资目的 start
-        , {field:'invAimStr', title: 'EtrExchangeTrade001.invAim', width : 240,sortable: false}
+        // , {field:'invAimStr', title: 'EtrExchangeTrade001.invAim', width : 240,sortable: false}
+        , {field:'businessModelStr', title: 'EtrExchangeTrade001.businessModel', width : 240,sortable: false}
         //add by chenjiaxing 20210830 导入添加投资目的 end
     ];
 

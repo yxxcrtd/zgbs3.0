@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class NewBondCheckStrategy implements IBusinessCheckStrategy {
     @Override
     public boolean support(Instruction instruction) {
-        return instruction.inconvertibleBond();
+        return instruction.newBond();
     }
 
     @Override

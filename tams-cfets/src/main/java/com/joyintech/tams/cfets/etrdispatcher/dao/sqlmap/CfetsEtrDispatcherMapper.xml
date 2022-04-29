@@ -685,7 +685,7 @@
                                eted.ASSET_TYPE1 paBussType,
                                CASE WHEN det.PORTFOLIO_ID IS NULL THEN ete.PORTFOLIO_ID ELSE det.PORTFOLIO_ID END AS portfolioId,
                                pp.portfolio_name portfolioName,
-                               ete.inv_aim busiModel,
+                               ete.BUSINESS_MODEL busiModel,
                                fp.finprod_market_id finprodMarketId,
                                fp.finprod_abbr finprodAbbr,
                                ete.trade_market tradeMarket,
@@ -769,7 +769,7 @@
                                eted.ASSET_TYPE1 paBussType,
                                CASE WHEN det.PORTFOLIO_ID IS NULL THEN ete.PORTFOLIO_ID ELSE det.PORTFOLIO_ID END AS portfolioId,
                                pp.portfolio_name portfolioName,
-                               ete.inv_aim busiModel,
+                               ete.BUSINESS_MODEL busiModel,
                                fp.finprod_market_id finprodMarketId,
                                fp.finprod_abbr finprodAbbr,
                                ete.trade_market tradeMarket,
@@ -1424,7 +1424,7 @@
         to_char(ete.entrust_date,'yyyy-MM-dd') entrustDate,
         CASE WHEN det.PORTFOLIO_ID IS NULL THEN ete.PORTFOLIO_ID ELSE det.PORTFOLIO_ID END AS portfolioId,
         pp.portfolio_name portfolioName,
-        ete.inv_aim busiModel,
+        ete.BUSINESS_MODEL busiModel,
         NVL(fp.finprod_market_id,ete.STOCK_ID) finprodMarketId,
         nvl(fp.finprod_abbr,ete.finprod_id) finprodAbbr,
         ete.trade_market tradeMarket,
@@ -1447,7 +1447,7 @@
         to_char(eted.payment_date,'yyyy-MM-dd') paymentDate,
         to_char(eted.listing_date,'yyyy-MM-dd')  listingDate,
         /*ete.entrust_num entrustNum,*/
-        case when eted.BUSI_TYPE_POSITION='EX017' THEN round(ete.entrust_num/100,4)
+        case when eted.BUSI_TYPE_POSITION in ('EX017','EX005') THEN round(ete.entrust_num/100,4)
         when ete.ps in ('T68','T69') THEN round(ete.entrust_num/100,4)
         else ete.entrust_num end entrustNum,
         <!--ete.entrust_amt entrustAmt,
@@ -1456,7 +1456,7 @@
         eted.ASSET_TYPE,
         'F01',
         /*decode(ete.PS,'T03',ete.ENTRUST_AMT,NVL(ete.ENTRUST_NUM * 100, 0 )),*/
-        decode(ete.PS,'T03',ete.ENTRUST_AMT,'03',ete.ENTRUST_AMT/100,'04',ete.ENTRUST_AMT/100,ete.ENTRUST_AMT,'T68',ete.ENTRUST_AMT/100,'T68',ete.ENTRUST_AMT/100,NVL(ete.ENTRUST_NUM * 100, 0 )),
+        decode(ete.PS,'T03',ete.ENTRUST_AMT,'03',ete.ENTRUST_AMT/100,'04',ete.ENTRUST_AMT/100,'T68',ete.ENTRUST_AMT/100,NVL(ete.ENTRUST_NUM * 100, 0 )),
         'F10',
         NVL( ete.ENTRUST_NUM * 100, 0 ),
         NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
@@ -1533,7 +1533,7 @@
         to_char(ete.entrust_date,'yyyy-MM-dd') entrustDate,
         CASE WHEN det.PORTFOLIO_ID IS NULL THEN ete.PORTFOLIO_ID ELSE det.PORTFOLIO_ID END AS portfolioId,
         pp.portfolio_name portfolioName,
-        ete.inv_aim busiModel,
+        ete.BUSINESS_MODEL busiModel,
         NVL(fp.finprod_market_id,ete.STOCK_ID) finprodMarketId,
         nvl(fp.finprod_abbr,ete.finprod_id) finprodAbbr,
         ete.trade_market tradeMarket,
@@ -1555,7 +1555,10 @@
         mci.CUSTOMER_NAME mainConsignee,
         to_char(eted.payment_date,'yyyy-MM-dd') paymentDate,
         to_char(eted.listing_date,'yyyy-MM-dd')  listingDate,
-        ete.entrust_num entrustNum,
+--         ete.entrust_num entrustNum,
+        case when eted.BUSI_TYPE_POSITION in ('EX017','EX005') THEN round(ete.entrust_num/100,4)
+        when ete.ps in ('T68','T69') THEN round(ete.entrust_num/100,4)
+        else ete.entrust_num end entrustNum,
         <!--ete.entrust_amt entrustAmt,
            按照列表查询价格修改 -->
         decode(

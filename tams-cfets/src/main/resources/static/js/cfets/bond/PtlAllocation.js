@@ -33,10 +33,12 @@
         ,{field:'fpriceAmt', width:150, title: '全价总额（元）',sortable: false,type:'number', digit:2,visible:ps!='T03'?true:false}
         ,{field:'businessModel', width:100, title: '业务模式', sortable: false
             ,editOption:{type:'select',id:"businessModel",formatoption:true,result:BUSINESS_MODEL}
-            , visible:SHOW_INVAIM_OR_BUSSINSSMODEL=='02' && ps!='T03'?true:false }
+            // , visible:SHOW_INVAIM_OR_BUSSINSSMODEL=='02' && ps!='T03'?true:false }
+            , visible: ps!='T03'?true:false }
         ,{field:'priceModel', width:100, title: '价格模式', sortable: false, edit:true
             ,editOption:{type:'select',id:"priceModel",formatoption:true,result:BUSINESS_MODEL}
-            , visible:SHOW_INVAIM_OR_BUSSINSSMODEL=='02'?true:false }
+            // , visible:SHOW_INVAIM_OR_BUSSINSSMODEL=='02'?true:false }
+            , visible:true }
         ,{field:'secAcctName', width:150, title: '证券账户',sortable: false}
         ,{field:'price', width:120, title: '净价(元)',sortable: false,type:'number', digit:2}
         ,{field:'unitFprice', width:120, title: '全价(元)',sortable: false,type:'number', digit:2,visible:ps=='T03'?true:false}

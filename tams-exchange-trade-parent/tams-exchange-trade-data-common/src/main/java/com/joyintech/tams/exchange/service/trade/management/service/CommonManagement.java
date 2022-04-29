@@ -22,6 +22,7 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.system.syspara.dto.SysParaSet001Dto;
 import com.joyintech.system.syspara.service.SysParaSet001Service;
 import com.joyintech.tams.common.base.entity.TrdPriceTimeConfig;
+import com.joyintech.tams.common.util.JacksonUtil;
 import com.joyintech.tams.exchange.common.bean.MinPrice;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
@@ -44,6 +45,7 @@ import com.joyintech.tams.exchange.common.db.domain.ServiceNode;
 import com.joyintech.tams.exchange.common.domain.Message;
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
+import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.datacommon.db.dao.TrdPriceTimeConfigByManualMapper;
 import com.joyintech.tams.exchange.datacommon.db.service.FuturesInstrumentService;
 import com.joyintech.tams.exchange.datacommon.db.service.InstrumentService;
@@ -584,7 +586,7 @@ public class CommonManagement extends BaseService {
         Map<String, Object> params = BeanUtil.object2Map(dto);
         String url = ServiceApplication.BASIC_DATA_SERVICE + TradeServiceURL.getDealerTraderInfo;
         logger.info("doPost() called with parameters => 【url = {}】, 【params = {}】", url, params);
-        List<TradeInfoProResponse> list = Lists.newArrayList();
+        List<Object> list = Lists.newArrayList();
         try {
             if (isSingle) {
                 list.addAll(simpleRestTemplate.postForObject(url, params, List.class));
@@ -594,7 +596,7 @@ public class CommonManagement extends BaseService {
         } catch (Exception e) {
             logger.error("doPost() called with exception => 【url = {}】, 【params = {}】", url, params, e);
         }
-        return list;
+        return JsonUtils.getObjectListFromJson(JsonUtils.getJsonFromObject(list),TradeInfoProResponse.class);
     }
 
     /**

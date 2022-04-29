@@ -139,7 +139,8 @@
         , {field:'vdate', title: 'EtrExchangeTrade003.vdate',type:'date', width : 120,sortField:'VDATE'}//持仓成本
         , {field:'mdate', title: 'EtrExchangeTrade003.mdate',type:'date', width : 120,sortField:'MDATE'}//最新价
         //add by chenjiaxing 20210830 导入添加投资目的 start
-        , {field:'invAimStr', title: 'EtrExchangeTrade001.invAim', width : 240,sortable: false}
+        // , {field:'invAimStr', title: 'EtrExchangeTrade001.invAim', width : 240,sortable: false}
+        , {field:'businessModelStr', title: 'EtrExchangeTrade001.businessModel', width : 240,sortable: false}
         //add by chenjiaxing 20210830 导入添加投资目的 end
     ];
 
@@ -179,7 +180,8 @@
                 url: JoyinUtil.getRealPath('/invest/entrust/etrexchangetrade/EtrExchangeTrade001/selectCounterIdByCounterType')
             }
         }
-        , {field: 'invAim', title: 'EtrAssetConfigTransfer002.invAim', width: 100,edit:true,editOption:{type:'select',formatoption:true,showField: 'text',result: INV_AIM}}
+        // , {field: 'invAim', title: 'EtrAssetConfigTransfer002.invAim', width: 100,edit:true,editOption:{type:'select',formatoption:true,showField: 'text',result: INV_AIM}}
+        , {field: 'businessModel', title: 'EtrAssetConfigTransfer002.businessModel', width: 100,edit:true,editOption:{type:'select',formatoption:true,showField: 'text',result: BUSINESS_MODEL}}
         , {field: 'seatId', title: 'EtrExchangeTrade001.seatId', width: 120, sortable: false}
         , {field: 'agreeOnId', title: 'EtrExchangeTrade001.agreeOnId', width: 120, sortable: false}
         , {field:'vdate', title: 'EtrExchangeTrade003.vdate',type:'date', width : 120,sortField:'VDATE'}//委托开始日
@@ -215,7 +217,8 @@
         , {field: 'accAvailablePos', title: 'EtrBrowDepoInfo003.etrAvailablePosition', type: 'number', width: 150, sortable: false}
         , {field: 'counterId', title: 'EtrExchangeTrade001.counterId', width: 120, sortable: false}
         , {field: 'counterTrader', title: 'EtrExchangeTrade001.counterTrader', width: 120, sortable: false}
-        , {field: 'invAim', title: 'EtrAssetConfigTransfer002.invAim', width: 100,edit:true,editOption:{type:'select',formatoption:true,showField: 'text',result: INV_AIM}}
+        // , {field: 'invAim', title: 'EtrAssetConfigTransfer002.invAim', width: 100,edit:true,editOption:{type:'select',formatoption:true,showField: 'text',result: INV_AIM}}
+        , {field: 'businessModel', title: 'EtrAssetConfigTransfer002.businessModel', width: 100,edit:true,editOption:{type:'select',formatoption:true,showField: 'text',result: BUSINESS_MODEL}}
         , {field: 'trader', title: 'EtrExchangeTrade001.traders', width: 120, sortable: false}
         , {field: 'agreeOnId', title: 'EtrExchangeTrade001.agreeOnId', width: 120, sortable: false}
         , {field:'vdate', title: 'EtrExchangeTrade003.vdate',type:'date', width : 120,sortField:'VDATE'}//委托开始日

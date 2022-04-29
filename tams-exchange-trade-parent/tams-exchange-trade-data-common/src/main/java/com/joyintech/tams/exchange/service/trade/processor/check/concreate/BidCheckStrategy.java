@@ -3,7 +3,7 @@ package com.joyintech.tams.exchange.service.trade.processor.check.concreate;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.TickBean;
 import com.joyintech.tams.exchange.common.bean.request.BaseOrderRequest;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.constant.InstructionPs;
 import com.joyintech.tams.exchange.common.constant.TradePlat;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
@@ -29,7 +29,7 @@ public class BidCheckStrategy implements IBusinessCheckStrategy {
     @Override
     public boolean support(Instruction instruction) {
         return TradePlat.NORMAL.codeEquals(instruction.getTradePlat())
-                && EnumUtil.in(instruction.getAssetType(), InvestmentAssetType.BOND, InvestmentAssetType.FUND, InvestmentAssetType.STOCK);
+                && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL, InstructionPs.POSITIVEREPO, InstructionPs.REVERSEDREPO);
     }
 
     @Override

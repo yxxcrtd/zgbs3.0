@@ -1,10 +1,14 @@
 package com.joyintech.tams.exchange.common.bean.investment;
 
 import com.joyintech.tams.exchange.common.constant.BusinessFlag;
+import com.joyintech.tams.exchange.common.constant.EntrustProp;
+import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.db.domain.EntrustInterface;
 import com.joyintech.tams.exchange.common.db.domain.Trade;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 
 public class TradeMessage extends BasicMessage {
@@ -255,7 +259,7 @@ public class TradeMessage extends BasicMessage {
 
     private static TradeMessage templateMessage = new TradeMessage();
 
-    public static TradeMessage createTradeMessage(Trade trade) {
+    public static TradeMessage createTradeMessage(Trade trade, EntrustInterface entrust) {
         TradeMessage tradeMessage;
         try {
             tradeMessage = (TradeMessage) templateMessage.clone();
@@ -268,13 +272,20 @@ public class TradeMessage extends BasicMessage {
             tradeMessage.setFinprodMarketId(trade.getStockCode());
             tradeMessage.setDealVolume((double) trade.getTradedVolume());
             tradeMessage.setDealPrice(trade.getTradedPrice());
-            if (trade.getClearBalance() != null && trade.getClearBalance().compareTo(BigDecimal.ZERO) > 0) {
-                tradeMessage.setDealBalance(trade.getClearBalance());
-            } else {
-                tradeMessage.setDealBalance(trade.getTradedBalance());
-            }
+            tradeMessage.setDealBalance(trade.getTradedBalance());
             if (!BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
                 tradeMessage.setFullPrice(trade.getTradedVolume() > 0 ? TradeUtils.divide(trade.getTradedBalance(), trade.getTradedVolume(), 4).doubleValue() : 0);
+            }
+            //协议回购
+            if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
+                //到期结算金额
+                tradeMessage.setDealBalance(entrust.getBackBalance());
+            } else if (InvestmentAssetType.isBond(trade.getAssetType())
+                    && EntrustProp.isTrade(entrust.getEntrustProp())
+                    && Objects.nonNull(tradeMessage.getFullPrice())
+                    && tradeMessage.getFullPrice() != 0) {
+                //成交全价金额
+                tradeMessage.setDealBalance(TradeUtils.multiply(BigDecimal.valueOf(tradeMessage.getFullPrice()), tradeMessage.getDealVolume().longValue(), 2));
             }
             tradeMessage.setTradingDay(trade.getTradingDay());
         } catch (CloneNotSupportedException e) {

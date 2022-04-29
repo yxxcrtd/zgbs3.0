@@ -407,4 +407,21 @@ public interface PaActiveRemind001Mapper {
      * @return
      */
     Map<String, Object> searchCountR10S2(Map<String, Object> param);
+
+
+    /**
+     查询标准券额度不足 R12S1数量
+     * @param param
+     * @return
+     */
+    Map<String, Object> searchCountR12S1(Map<String, Object> param);
+
+
+    /**
+     * 标准券额度不足提醒查询资产代码
+     * @param param
+     * @return
+     */
+    Map<String, Object> searchFinprodId(Map<String, Object> param);
+
 }
