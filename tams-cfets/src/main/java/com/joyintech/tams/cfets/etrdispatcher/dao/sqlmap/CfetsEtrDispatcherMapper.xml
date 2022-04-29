@@ -1073,6 +1073,24 @@
         where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
     </delete>
 
+    <!-- 查询已分发交易员数据 -->
+    <select id="getDispatcherTraderList" resultType="java.lang.String">
+        SELECT ed.TRADER FROM
+        ETR_ENTRUST ee
+        LEFT JOIN ETR_DISTRIBUTE ed ON ed.ENTRUST_ID  = ee.ENTRUST_ID
+        WHERE ee.FINPROD_ID  = #{finprodId,jdbcType=VARCHAR}
+          AND ee.ENTRUST_STATUS  = #{entrustStatus,jdbcType=VARCHAR}
+    </select>
+
+    <!-- 查询未选择指令 -->
+    <select id="getDispatcherEntrustIdList" resultType="java.lang.String">
+        SELECT ee.ENTRUST_ID FROM
+        ETR_ENTRUST ee
+        LEFT JOIN ETR_DISTRIBUTE ed ON ed.ENTRUST_ID  = ee.ENTRUST_ID
+        WHERE ee.FINPROD_ID  = #{finprodId,jdbcType=VARCHAR}
+          AND ee.ENTRUST_STATUS  = #{entrustStatus,jdbcType=VARCHAR}
+    </select>
+
     <!-- 交易员与工作量列表查询 -->
     <select id="getEtrTraderAndWorkloadList" resultType="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTraderListRequest">
         SELECT

@@ -21,7 +21,14 @@ import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.*;
+import com.joyintech.framework.util.ArithmeticUtil;
+import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.IDGenerator;
+import com.joyintech.framework.util.RequestUtil;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.service.entrust.etrbondfirstlbidding.dao.EtrBondFirstLBiddingMapper;
 import com.joyintech.service.entrust.etrbondfirstlbidding.dto.EtrBondFirstLBiddingDto;
@@ -36,17 +43,48 @@ import com.joyintech.tams.business.common.dto.CommonSearchInfoRequest;
 import com.joyintech.tams.business.common.entity.CfgDataTableShow;
 import com.joyintech.tams.business.common.entity.CfgReadonlyFormShow;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
-import com.joyintech.tams.cfets.etrdispatcher.dao.CfetsEtrDispatcherMapper;
-import com.joyintech.tams.cfets.etrdispatcher.dto.*;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtribRepoInfo003Dto;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsPledgeBondInfoDto;
 import com.joyintech.tams.cfets.etr.repo.service.CfetsEtrIbRepoinfoService;
-import com.joyintech.tams.common.base.dao.*;
-import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.cfets.etrdispatcher.dao.CfetsEtrDispatcherMapper;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherAutoRequest;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealRequest;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherExeListInfoResponse;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherInfoExcResponse;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherInfoOtcResponse;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherInfoResponse;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherInvResponse;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherResponse;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTradeListRequest;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTradeListResponse;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTraderAuthListResponse;
+import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTraderListRequest;
+import com.joyintech.tams.common.base.dao.AutoDispenseRightMapper;
+import com.joyintech.tams.common.base.dao.EtrAutoDispenseRuleDetailMapper;
+import com.joyintech.tams.common.base.dao.EtrAutoDispenseRuleMapper;
+import com.joyintech.tams.common.base.dao.EtrDistributeMapper;
+import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
+import com.joyintech.tams.common.base.dao.FinProductMapper;
+import com.joyintech.tams.common.base.dao.PtlPortfolioMapper;
+import com.joyintech.tams.common.base.entity.AutoDispenseRight;
+import com.joyintech.tams.common.base.entity.EtrAutoDispenseRule;
+import com.joyintech.tams.common.base.entity.EtrAutoDispenseRuleDetail;
+import com.joyintech.tams.common.base.entity.EtrDistribute;
+import com.joyintech.tams.common.base.entity.EtrDistributeKey;
+import com.joyintech.tams.common.base.entity.EtrEntrust;
+import com.joyintech.tams.common.base.entity.EtrEntrustBidPrice;
+import com.joyintech.tams.common.base.entity.FinProduct;
+import com.joyintech.tams.common.base.entity.PtlPortfolio;
+import com.joyintech.tams.common.base.entity.User;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.business.riskrds.constant.InterfUtil;
 import com.joyintech.tams.component.business.riskrds.constant.PageFieldToInterfFactory;
-import com.joyintech.tams.constant.*;
+import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.CommonUtil;
 import com.joyintech.tams.invest.common.client.ClientData;
 import com.joyintech.tams.invest.common.component.base.entrust.impl.BaseEtrInvestInfoServiceImpl;
@@ -63,19 +101,28 @@ import com.joyintech.tams.invest.common.util.DictCodeUtil;
 import com.joyintech.tams.invest.entrust.common.service.EtrCommonService;
 import com.joyintech.tams.invest.trade.common.aop.TradeRdsCommonAop;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -189,6 +236,9 @@ public class CfetsEtrDispatcherService extends BaseService {
     private EtrBondFirstLBiddingService etrBondFirstLBiddingService;
     @Autowired
     private EtrCommonService etrCommonService;
+
+    @Autowired
+    private FinProductMapper finProductMapper;
 
     /**
      * 指令列表分页查询
@@ -821,6 +871,54 @@ public class CfetsEtrDispatcherService extends BaseService {
     }
 
     /**
+     * 点击分发按钮check
+     *
+     * @param pageParam
+     * @return Message<AjaxResult>
+     * @author sjj
+     */
+    public AjaxResult doDispatcherCheck(Map<String, Object> pageParam) {
+        AjaxResult ajaxResult = new AjaxResult();
+        List<ValidMessage> errorList = new ArrayList<ValidMessage>();
+        List<String> entrustIdList = StringUtil.splitToList(",", (String) pageParam.get("entrustId"));
+        List<String> newTraders = StringUtil.splitToList(",", (String) pageParam.get("traders"));
+        List<CfetsEtrDispatcherResponse> etrDispatcherList = new ArrayList<>();
+
+        if (CollectionUtils.isEmpty(entrustIdList)) {
+            errorList.add(new ValidMessage(getMessage("BUSS_COM_E_0026")));
+        } else {
+            pageParam.put("entrustIdList", entrustIdList);
+            List<String> list = cfetsEtrDispatcherMapper.doDispatcherCheck(pageParam);
+            for (String entrustStatu : list) {
+                if (!(StringUtil.equals(entrustStatu, DictCodeList.委托状态_待接收.getValue()) || StringUtil.equals(entrustStatu, DictCodeListExt3.委托状态_待分发.getValue())
+                )) {
+                    errorList.add(new ValidMessage("", getMessage("TRD_W_0001", SysDataUtil.getNameFromDataDict(DictCode.委托状态, entrustStatu), "分发")));
+                }
+            }
+        }
+        List<String> finprodIdList = StringUtil.splitToList(",", (String) pageParam.get("finprodId")).stream()
+                .distinct().collect(Collectors.toList());
+        for (String finprodId : finprodIdList) {
+            FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
+            if (!DictCodeListExt2.平安资产类型_一级市场债.getValue().equals(finProduct.getFinprodType2())) {
+                break;
+            }
+            CfetsEtrDispatcherResponse etrDispatcherDto = new CfetsEtrDispatcherResponse();
+            List<String> traderList = cfetsEtrDispatcherMapper.getDispatcherTraderList(finprodId, DictCodeList.委托状态_待接收.getValue());
+            if (CollectionUtils.isNotEmpty(traderList)) {
+                errorList.add(new ValidMessage(getMessage("同一投标日的债券["+finprodId+"]一级投标已有分发记录，是否将已分发记录的交易员也调整为交易员"+newTraders.toString()+" ！")));
+            }
+            etrDispatcherDto.setTraderList(traderList);
+            etrDispatcherDto.setFinprodId(finprodId);
+            etrDispatcherList.add(etrDispatcherDto);
+
+        }
+        ajaxResult.setErrorList(errorList);
+        ajaxResult.setData(etrDispatcherList);
+        return ajaxResult;
+    }
+
+    /**
      * 获取联想文本框交易员的查询方法
      *
      * @param pageParam param
@@ -852,36 +950,21 @@ public class CfetsEtrDispatcherService extends BaseService {
         List<ValidMessage> errorList = new ArrayList<ValidMessage>();
         List<String> tradersList = StringUtil.splitToList(",", (String) pageParam.get("traders"));
         List<String> finprodType2List = StringUtil.splitToList(",", (String) pageParam.get("finprodType2"));
-//        List<String> bussBidDateList=StringUtil.splitToList(GlobalConstant.COMMA, (String)pageParam.get("bussBidDate"));
+        List<String> finprodIdList = StringUtil.splitToList(",", (String) pageParam.get("finprodId"));
         if (tradersList.isEmpty()) {
             errorList.add(new ValidMessage(getMessage("TRD_W_0002")));
-        } else {
-            for (String finprodType2 : finprodType2List) {
-                if (finprodType2.equals(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue()) && tradersList.size() > 1) {
-                    errorList.add(new ValidMessage(getMessage("一级投标债券只能分发给一个交易员")));
-                    break;
+        }
+        for (String finprodId : finprodIdList) {
+            List<String> traders = cfetsEtrDispatcherMapper.getDispatcherTraderList(finprodId, DictCodeList.委托状态_已接收.getValue());
+            if (CollectionUtils.isNotEmpty(traders)) {
+                traders.stream().sorted();
+                tradersList.stream().sorted();
+                if (!traders.toString().equals(tradersList.toString())) {
+                    errorList.add(new ValidMessage(getMessage("同一投标日的债券一级投标已有交易员接收，必须分给交易员"+traders.toString())));
                 }
             }
-//            //TODO 待后续存在开发一级市场投标
-//            if(!finprodType2List.isEmpty()&&!bussBidDateList.isEmpty()){
-//                for (int i = 0; i < finprodType2List.size(); i++)  {
-//                    if(StringUtil.equals(finprodType2List.get(i), DictCodeListExt2.平安资产类型_一级市场债.getValue())&&!StringUtil.equals(bussBidDateList.get(i).trim(),"undefined")){
-//                        dto.setBussBidDate(bussBidDateList.get(i));
-//                        dto.setFinprodMarketId(finprodMarketIdsList.get(i));
-//                        List<TrdCommandDispatcher001Dto> listTraders=trdCommandDispatcher001Service.getTraders(dto);
-//                        if(!listTraders.isEmpty()){
-//                            for (TrdCommandDispatcher001Dto list2 : listTraders) {
-//                                if(!StringUtil.equals(list2.getTrader(),dto.getDealers())&&StringUtil.isNotEmpty(list2)){
-//                                    errorList.add(new ValidMessage(this.getMessage("TRD_I_0004")+list2.getTrader()));
-//                                    result.setErrorList(errorList);
-//                                    return result;
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
         }
+
         ajaxResult.setErrorList(errorList);
         ajaxResult.setMessage(errorList.toString());
         return ajaxResult;
@@ -1664,5 +1747,71 @@ public class CfetsEtrDispatcherService extends BaseService {
             return ptlPortfolios.stream().map(r -> r.getPortfolioName()).collect(Collectors.joining(","));
         }
         return "";
+    }
+
+    /**
+     * 查询未选择指令
+     * @param cfetsDto
+     * @return
+     */
+    public List<CfetsEtrDispatcherResponse> getDispatcherTraderList(CfetsEtrDispatcherDealRequest cfetsDto) {
+        List<CfetsEtrDispatcherResponse> etrDispatcherList = new ArrayList<>();
+        List<String> finprodIdList = StringUtil.splitToList(",", cfetsDto.getFinprodId()).stream().distinct().collect(Collectors.toList());
+
+        for (String finprodId : finprodIdList) {
+            FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
+            if (!DictCodeListExt2.平安资产类型_一级市场债.getValue().equals(finProduct.getFinprodType2())) {
+                break;
+            }
+            CfetsEtrDispatcherResponse etrDispatcherDto = new CfetsEtrDispatcherResponse();
+            //资产存在已分发的已接收记录,返回对应的交易员信息且交易员信息不可修改
+            List<String> traderList1 = cfetsEtrDispatcherMapper.getDispatcherTraderList(finprodId, DictCodeList.委托状态_已接收.getValue());
+            if (CollectionUtils.isNotEmpty(traderList1)) {
+                etrDispatcherDto.setFinprodId(finprodId);
+                etrDispatcherDto.setTraderList(traderList1);
+                etrDispatcherDto.setReadOnlyField(DictCodeList.是否_否.getValue());
+            } else {
+                //资产存在已分发的待接收记录,返回对应的交易员信息且交易员信息可修改
+                List<String> traderList2 = cfetsEtrDispatcherMapper.getDispatcherTraderList(finprodId, DictCodeList.委托状态_待接收.getValue());
+                if (CollectionUtils.isNotEmpty(traderList2)) {
+                    etrDispatcherDto.setFinprodId(finprodId);
+                    etrDispatcherDto.setTraderList(traderList2);
+                    etrDispatcherDto.setReadOnlyField(DictCodeList.是否_是.getValue());
+                }
+            }
+            etrDispatcherList.add(etrDispatcherDto);
+        }
+        return etrDispatcherList;
+    }
+
+    /**
+     * 查询未选择指令
+     * @param cfetsDto
+     * @return
+     */
+    public List<CfetsEtrDispatcherResponse> getDispatcherEntrustIdList(CfetsEtrDispatcherDealRequest cfetsDto) {
+
+        List<CfetsEtrDispatcherResponse> etrDispatcherList = new ArrayList<>();
+        List<String> finprodIdList = StringUtil.splitToList(",", cfetsDto.getFinprodId()).stream().distinct().collect(Collectors.toList());
+        List<String> entrustIdList = StringUtil.splitToList(",", cfetsDto.getEntrustId());
+        for (String finprodId : finprodIdList) {
+            FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
+            if (!DictCodeListExt2.平安资产类型_一级市场债.getValue().equals(finProduct.getFinprodType2())) {
+                break;
+            }
+            CfetsEtrDispatcherResponse etrDispatcherDto = new CfetsEtrDispatcherResponse();
+            List<String> unSelectEntrustIds = new ArrayList<>();
+            List<String> entrustIds = cfetsEtrDispatcherMapper.getDispatcherEntrustIdList(finprodId, DictCodeListExt3.委托状态_待分发.getValue());
+            for (String entrustId : entrustIds) {
+                if (!entrustIdList.contains(entrustId)) {
+                    unSelectEntrustIds.add(entrustId);
+                }
+            }
+            etrDispatcherDto.setEntrustIdList(unSelectEntrustIds);
+            etrDispatcherDto.setFinprodId(finprodId);
+
+            etrDispatcherList.add(etrDispatcherDto);
+        }
+        return etrDispatcherList;
     }
 }

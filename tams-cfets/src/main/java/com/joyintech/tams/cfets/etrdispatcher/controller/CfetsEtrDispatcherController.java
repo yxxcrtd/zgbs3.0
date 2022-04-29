@@ -251,6 +251,31 @@ public class CfetsEtrDispatcherController extends BaseController {
 
     }
 
+//    /**
+//     * 点击分发按钮check
+//     *
+//     * @param cfetsDto br
+//     * @return Message<AjaxResult>
+//     * @author sjj
+//     */
+//    @ResponseBody
+//    @ApiOperation(value = "分发check", notes = "分发check")
+//    @PostMapping("doDispatcherCheck")
+//    public Message<AjaxResult> doDispatcherCheck(@RequestBody CommonSearchInfoRequest cfetsDto, BindingResult br)
+//            throws Exception {
+//        //提交check
+//        Map<String, Object> pageParam = BeanUtil.object2Map(cfetsDto);
+//        AjaxResult ajaxResult = cfetsEtrDispatcherService.doDispatcherCheck(pageParam, br);
+//        if (!StringUtil.isEmptyList(ajaxResult.getErrorList())) {
+//            return new Message<AjaxResult>().fail().setMessage(ajaxResult.getMessage());
+//        } else {
+//            //选择交易员
+//            List<SelectOptionDto> userList = cfetsEtrDispatcherService.getUsers(pageParam);
+//            ajaxResult.setData(userList);
+//            return new Message<AjaxResult>().success().setData(ajaxResult);
+//        }
+//    }
+
     /**
      * 点击分发按钮check
      *
@@ -261,18 +286,60 @@ public class CfetsEtrDispatcherController extends BaseController {
     @ResponseBody
     @ApiOperation(value = "分发check", notes = "分发check")
     @PostMapping("doDispatcherCheck")
-    public Message<AjaxResult> doDispatcherCheck(@RequestBody CommonSearchInfoRequest cfetsDto, BindingResult br)
+    public Message<AjaxResult> doDispatcherCheck(@RequestBody CfetsEtrDispatcherDealRequest cfetsDto)
             throws Exception {
-        //提交check
-        Map<String, Object> pageParam = BeanUtil.object2Map(cfetsDto);
-        AjaxResult ajaxResult = cfetsEtrDispatcherService.doDispatcherCheck(pageParam, br);
-        if (!StringUtil.isEmptyList(ajaxResult.getErrorList())) {
-            return new Message<AjaxResult>().fail().setMessage(ajaxResult.getMessage());
-        } else {
-            //选择交易员
-            List<SelectOptionDto> userList = cfetsEtrDispatcherService.getUsers(pageParam);
-            ajaxResult.setData(userList);
-            return new Message<AjaxResult>().success().setData(ajaxResult);
+        try {
+            //提交check
+            Map<String, Object> pageParam = BeanUtil.object2Map(cfetsDto);
+            AjaxResult ajaxResult = cfetsEtrDispatcherService.doDispatcherCheck(pageParam);
+            if (null != ajaxResult) {
+                return new Message<AjaxResult>().success().setData(ajaxResult);
+            } else {
+                return new Message<AjaxResult>().success();
+            }
+        } catch (Exception e) {
+            logger.error("一级投标指令分发check异常", e);
+            return new Message<AjaxResult>().fail().setMessage("一级投标指令分发check异常");
+        }
+    }
+
+    /**
+     * 查询已分发交易员数据
+     * @param cfetsDto
+     * @return
+     * @throws Exception
+     */
+    @ApiOperation(value = "查询已分发交易员数据", notes = "查询已分发交易员数据")
+    @PostMapping("/getDispatcherTraderList")
+    @ResponseBody
+    public Message<List<CfetsEtrDispatcherResponse>> getDispatcherTraderList(@RequestBody CfetsEtrDispatcherDealRequest cfetsDto)
+            throws Exception {
+        try {
+            List<CfetsEtrDispatcherResponse> list = cfetsEtrDispatcherService.getDispatcherTraderList(cfetsDto);
+            return new Message<List<CfetsEtrDispatcherResponse>>().success().setData(list);
+        } catch (Exception e) {
+            logger.error("查询已分发交易员数据异常", e);
+            return new Message<List<CfetsEtrDispatcherResponse>>().fail().setMessage("查询已分发交易员数据异常");
+        }
+    }
+
+    /**
+     * 查询未选择指令
+     * @param cfetsDto
+     * @return
+     * @throws Exception
+     */
+    @ApiOperation(value = "查询未选择指令", notes = "查询未选择指令")
+    @PostMapping("/getDispatcherEntrustIdList")
+    @ResponseBody
+    public Message<List<CfetsEtrDispatcherResponse>> getDispatcherEntrustIdList(@RequestBody CfetsEtrDispatcherDealRequest cfetsDto)
+            throws Exception {
+        try {
+            List<CfetsEtrDispatcherResponse> list = cfetsEtrDispatcherService.getDispatcherEntrustIdList(cfetsDto);
+            return new Message<List<CfetsEtrDispatcherResponse>>().success().setData(list);
+        } catch (Exception e) {
+            logger.error("查询已分发交易员数据异常", e);
+            return new Message<List<CfetsEtrDispatcherResponse>>().fail().setMessage("查询已分发交易员数据异常");
         }
     }
 
