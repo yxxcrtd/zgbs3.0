@@ -2,6 +2,8 @@ package com.joyintech.tams.exchange.common.constant;
 
 import com.joyintech.tams.exchange.common.enums.IEnum;
 
+import com.joyintech.framework.util.StringUtil;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,6 +39,9 @@ public enum InvestorType implements IEnum<String> {
     }
 
     public static String getInvestorTypeName(String value) {
+        if(StringUtil.isEmpty(value)){
+            return value;
+        }
         return REQUEST_STATUS_MAP.get(value).getName();
     }
 
