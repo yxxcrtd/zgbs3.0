@@ -220,14 +220,7 @@ public class TradeCallbackHelper {
         tradeRecord.setTransCode(entrust.getBrokerEntrustId());
         tradeRecord.setCreateTime(now);
         tradeRecord.setUpdateTime(now);
-        if(Objects.isNull(tradeRecord.getFullPrice()) ||tradeRecord.getFullPrice().compareTo(BigDecimal.ZERO)==0){
-            if(entrust.getEntrustPrice().compareTo(tradeRecord.getTradedPrice()) == 0){
-                tradeRecord.setFullPrice(bondHelper.getFullPriceByTradePrice(tradeRecord, entrust.getIsFullPrice(), instruction));
-            }else {
-                tradeRecord.setFullPrice(tradeRecord.getTradedPrice());
-            }
-        }
-
+        tradeRecord.setFullPrice(bondHelper.getFullPriceByTradePrice(tradeRecord, entrust.getIsFullPrice(), instruction));
         tradeRecord.setPortfolioName(instruction.getPortfolioName());
         tradeRecord.setSecAcctId(instruction.getSecAcctId());
         tradeRecord.setSecAcctName(instruction.getSecAcctName());

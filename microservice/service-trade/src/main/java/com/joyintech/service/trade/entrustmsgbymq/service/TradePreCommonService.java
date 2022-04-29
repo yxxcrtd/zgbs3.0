@@ -62,6 +62,9 @@ public class TradePreCommonService {
                         BigDecimal tradeAmtSingleSum=BigDecimal.ZERO;
                         BigDecimal shareAmtSingleSum=BigDecimal.ZERO;
                         BigDecimal settleAmtSingleSum=BigDecimal.ZERO;
+
+                        List<BaseTradeProductDealDto> baseTradeProductDealDtoListMuilt=new ArrayList<>();
+
                         for(int i=0;i<etrEntrustDetailList.size();i++){
                             EtrEntrustDetail etrEntrustDetail=etrEntrustDetailList.get(i);
                             TrdProductDeal trdProductDealMuilt= item.getTrdProductDeal();
@@ -92,7 +95,7 @@ public class TradePreCommonService {
                                     trdProductDealMuilt.getPortfolioId(), trdProductDealMuilt.getTradeMarket()));
                             // ZGCPCN-198:对系列户交易赋值对应的证券管理账户 modify by fuyongsheng 20220425 end
                             trdProductDealAddMuilt.setPortfolioId(etrEntrustDetail.getPortfolioId());
-                            List<BaseTradeProductDealDto> baseTradeProductDealDtoListMuilt=new ArrayList<>();
+                            // List<BaseTradeProductDealDto> baseTradeProductDealDtoListMuilt=new ArrayList<>();
                             BaseTradeProductDealDto baseTradeProductDealDtoMuilt=new BaseTradeProductDealDto();
                             BeanUtil.copyPropertiesIgnoreNull(baseTradeProductDealDtoMuilt,item);
                             baseTradeProductDealDtoMuilt.setTrdProductDeal(trdProductDealMuilt);
@@ -115,11 +118,17 @@ public class TradePreCommonService {
                                 baseTradeProductDealDtoMuilt.setStlPayOrdersList(Arrays.asList(stlPayOrdersDtoMuilt));
                             }
                             baseTradeProductDealDtoListMuilt.add(baseTradeProductDealDtoMuilt);
-                            FinProductTradeDto finProductTradeDtoMuilt=new FinProductTradeDto();
-                            BeanUtil.copyPropertiesIgnoreNull(finProductTradeDtoMuilt,finProductTradeDto);
-                            finProductTradeDtoMuilt.setBaseTradeProductDealDtos(baseTradeProductDealDtoListMuilt);
-                            finProductTradeDtoList.add(finProductTradeDtoMuilt);
+                            // ZGCPCN-209:修改系列户多组合指令拆分交易对象组装 modify by fuyongsheng 20220429 start
+//                            FinProductTradeDto finProductTradeDtoMuilt=new FinProductTradeDto();
+//                            BeanUtil.copyPropertiesIgnoreNull(finProductTradeDtoMuilt,finProductTradeDto);
+//                            finProductTradeDtoMuilt.setBaseTradeProductDealDtos(baseTradeProductDealDtoListMuilt);
+//                            finProductTradeDtoList.add(finProductTradeDtoMuilt);
                         }
+                        FinProductTradeDto finProductTradeDtoMuilt=new FinProductTradeDto();
+                        BeanUtil.copyPropertiesIgnoreNull(finProductTradeDtoMuilt,finProductTradeDto);
+                        finProductTradeDtoMuilt.setBaseTradeProductDealDtos(baseTradeProductDealDtoListMuilt);
+                        finProductTradeDtoList.add(finProductTradeDtoMuilt);
+                        // ZGCPCN-209:修改系列户多组合指令拆分交易对象组装 modify by fuyongsheng 20220429 end
                     }
                 });
                 for(int i=0;i<finProductTradeDtoList.size();i++){

@@ -92,6 +92,9 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 	@Autowired
 	private IPlatformDate iPlatformDate;
 
+	@Autowired
+	EtrExchangeTradeCommon001Service etrExchangeTrade001Service;
+
 	/**
 	 * 业务编号组件
 	 */
@@ -1020,6 +1023,14 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 						break;
 					}
 				}
+				//DZ校验是否闭市
+				Boolean isNonTradingTime = etrExchangeTrade001Service.isNonTradingTime(dto);
+				if (isNonTradingTime) {
+					ajax = new AjaxResult(br);
+					List<ValidMessage> validList = new ArrayList<>();
+					validList.add(new ValidMessage("当日已闭市，不允许下指令!"));
+					ajax.setErrorList(validList);
+				}
 			}
 			if (null != ajax) {
 				return new Message<AjaxResult>().success().setData(ajax);
@@ -1064,7 +1075,7 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 			Map<String, Object> pageParam = new HashMap<String, Object>();
 			Date sysDate = DateUtil.platDateFromCache();
 			pageParam.put("date", DateUtil.format(sysDate));
-			pageParam.put("secId", dto.getStockId());
+			pageParam.put("secId", dto.getStockId() == null? "":dto.getStockId());
 			String price = etrExchangeTrade001CommonService.qryMstBondMarketPrice(pageParam);
 			if (StringUtils.isNotEmpty(price)) {
 				BigDecimal bigPrice = new BigDecimal(price);

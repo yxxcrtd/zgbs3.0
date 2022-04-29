@@ -185,10 +185,8 @@ public class MessageSenderService {
                 && EntrustProp.isTrade(entrust.getEntrustProp())
                 && Objects.nonNull(tradeMessage.getFullPrice())
                 && tradeMessage.getFullPrice() != 0) {
-            if (entrust.getEntrustPrice().compareTo(trade.getTradedPrice()) == 0) {
-                //成交全价金额
-                tradeMessage.setDealBalance(TradeUtils.multiply(trade.getFullPrice(), tradeMessage.getDealVolume().longValue(), 2));
-            }
+            //成交全价金额
+            tradeMessage.setDealBalance(TradeUtils.multiply(BigDecimal.valueOf(tradeMessage.getFullPrice()), tradeMessage.getDealVolume().longValue(), 2));
         }
 
         // 业务类型（手工交收用）
