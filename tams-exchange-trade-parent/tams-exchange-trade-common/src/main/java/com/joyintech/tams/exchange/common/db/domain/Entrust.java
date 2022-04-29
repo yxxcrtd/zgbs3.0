@@ -225,8 +225,7 @@ public class Entrust extends BaseEntity implements Serializable, EntrustInterfac
     private int count;
 
     @ApiModelProperty(name = "isFullPrice", value = "全价（Y:是 ， N：否）")
-    @NotNull
-    private String isFullPrice;//Y:是 ， N：否
+    private String isFullPrice;
 
     @ApiModelProperty(name = "reportNo", value = "报文ID 柜台报盘编号")
     @Size(max = 32)
@@ -290,8 +289,6 @@ public class Entrust extends BaseEntity implements Serializable, EntrustInterfac
     private String targetType;
     @ApiModelProperty(name = "isNoGuard", value = "是否非担保")
     private String isNoGuard;
-    @ApiModelProperty(name = "isNetPrice", value = "是否净价交易")
-    private String isNetPrice;
 
     public boolean isNoCancelEntrust() {
         return noCancelEntrust;
@@ -820,14 +817,6 @@ public class Entrust extends BaseEntity implements Serializable, EntrustInterfac
 
     public void setIsNoGuard(String isNoGuard) {
         this.isNoGuard = isNoGuard;
-    }
-
-    public String getIsNetPrice() {
-        return isNetPrice;
-    }
-
-    public void setIsNetPrice(String isNetPrice) {
-        this.isNetPrice = isNetPrice;
     }
 
     public static Entrust getTemplateEntrust() {

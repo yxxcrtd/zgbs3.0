@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.exchange.common.utils.DoubleSerializerUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
+import io.swagger.annotations.ApiModelProperty;
 import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
@@ -113,7 +114,7 @@ public class OrderHistory implements Serializable {
 
     private String targetType;
     private String isNoGuard;
-    private String isNetPrice;
+    private String isFullPrice;
 
     @Id
     public String getId() {
@@ -572,11 +573,11 @@ public class OrderHistory implements Serializable {
         this.isNoGuard = isNoGuard;
     }
 
-    public String getIsNetPrice() {
-        return isNetPrice;
+    public String getIsFullPrice() {
+        return isFullPrice;
     }
 
-    public void setIsNetPrice(String isNetPrice) {
-        this.isNetPrice = isNetPrice;
+    public void setIsFullPrice(String isFullPrice) {
+        this.isFullPrice = isFullPrice;
     }
 }

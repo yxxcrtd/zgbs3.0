@@ -7,7 +7,7 @@ alter table T_ORDER add IS_NO_GUARD VARCHAR2(50);
 comment on column T_ORDER.IS_NO_GUARD is '是否非担保';
 
 alter table T_ORDER add IS_NET_PRICE VARCHAR2(50);
-comment on column T_ORDER.IS_NET_PRICE is '是否净价交易';
+comment on column T_ORDER.IS_FULL_PRICE is '是否全价';
 
 
 /**历史订单表新增字段**/
@@ -18,4 +18,4 @@ alter table T_ORDERHISTORY add IS_NO_GUARD VARCHAR2(50);
 comment on column T_ORDERHISTORY.IS_NO_GUARD is '是否非担保';
 
 alter table T_ORDERHISTORY add IS_NET_PRICE VARCHAR2(50);
-comment on column T_ORDERHISTORY.IS_NET_PRICE is '是否净价交易';
+comment on column T_ORDERHISTORY.IS_FULL_PRICE is '是否全价';

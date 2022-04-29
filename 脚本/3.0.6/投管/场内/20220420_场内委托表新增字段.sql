@@ -7,7 +7,7 @@ alter table T_ENTRUST add IS_NO_GUARD VARCHAR2(50);
 comment on column T_ENTRUST.IS_NO_GUARD is '是否非担保';
 
 alter table T_ENTRUST add IS_NET_PRICE VARCHAR2(50);
-comment on column T_ENTRUST.IS_NET_PRICE is '是否净价交易';
+comment on column T_ENTRUST.IS_FULL_PRICE is '是否全价';
 
 /**历史委托表新增字段**/
 alter table T_ENTRUSTHISTORY add TARGET_TYPE VARCHAR2(50);
@@ -17,7 +17,7 @@ alter table T_ENTRUSTHISTORY add IS_NO_GUARD VARCHAR2(50);
 comment on column T_ENTRUSTHISTORY.IS_NO_GUARD is '是否非担保';
 
 alter table T_ENTRUSTHISTORY add IS_NET_PRICE VARCHAR2(50);
-comment on column T_ENTRUSTHISTORY.IS_NET_PRICE is '是否净价交易';
+comment on column T_ENTRUSTHISTORY.IS_FULL_PRICE is '是否全价';
 
 
 /**综合委托表新增字段**/
@@ -28,7 +28,7 @@ alter table T_INTEGRATED_ENTRUST add IS_NO_GUARD VARCHAR2(50);
 comment on column T_INTEGRATED_ENTRUST.IS_NO_GUARD is '是否非担保';
 
 alter table T_INTEGRATED_ENTRUST add IS_NET_PRICE VARCHAR2(50);
-comment on column T_INTEGRATED_ENTRUST.IS_NET_PRICE is '是否净价交易';
+comment on column T_INTEGRATED_ENTRUST.IS_FULL_PRICE is '是否全价';
 
 alter table T_INTEGRATED_ENTRUST add OWNER_TYPE VARCHAR2(50);
 comment on column T_INTEGRATED_ENTRUST.OWNER_TYPE is '报价所有者类型';
@@ -54,7 +54,7 @@ alter table T_INTEGRATED_ENTRUSTHISTORY add IS_NO_GUARD VARCHAR2(50);
 comment on column T_INTEGRATED_ENTRUSTHISTORY.IS_NO_GUARD is '是否非担保';
 
 alter table T_INTEGRATED_ENTRUSTHISTORY add IS_NET_PRICE VARCHAR2(50);
-comment on column T_INTEGRATED_ENTRUSTHISTORY.IS_NET_PRICE is '是否净价交易';
+comment on column T_INTEGRATED_ENTRUSTHISTORY.IS_FULL_PRICE is '是否全价';
 
 alter table T_INTEGRATED_ENTRUSTHISTORY add OWNER_TYPE VARCHAR2(50);
 comment on column T_INTEGRATED_ENTRUSTHISTORY.OWNER_TYPE is '报价所有者类型';

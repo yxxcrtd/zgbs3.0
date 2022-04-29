@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.joyintech.exchange.service.quote.service.QuoteService;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.BusinessResultException;
 import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.bean.investment.ReqRiskTrigger;
@@ -666,7 +667,7 @@ public class TradeHelper {
         logger.info("开始创建订单 {}", JsonUtils.getJsonFromObject(dto));
         Order order = Order.createOrder(dto);
         Instrument instrument = instrumentService.queryByInnerCode(order.getStockCode());
-        //        order.setIsFullPrice(instrument.getIsFullPrice());
+//        order.setIsFullPrice(instrument.getIsFullPrice());
         FuturesInstrument futuresInstrument = futuresInstrumentService.queryByInnerCode(order.getStockCode());
         if (!createOrderByInstrument(order, instrument, futuresInstrument)) {
             return order;
@@ -675,6 +676,7 @@ public class TradeHelper {
         if (!checkInstruction(instruction, order)) {
             return order;
         }
+
         //科创板更新委托属性
         if (Objects.nonNull(instrument) && SubStockType.KCB.value.equals(instrument.getSubStockType())
                 && DictCodeListExt2.价格模式_收盘价固定价格.getValue().equals(instruction.getPriceMode())) {
@@ -684,8 +686,17 @@ public class TradeHelper {
         commonCheckHelper.marketPriceCheck(order, instrument, instruction);
 
         String tradingDay = commonManagement.getTradingDay();
+
+        BigDecimal orderPrice = order.getOrderPrice();
+        if (StringUtil.equals("Y", instruction.getIsNetPrice())) {
+            order.setIsFullPrice(FullPriceConst.NET_PRICE.value);
+        } else {
+            order.setIsFullPrice(FullPriceConst.FULL_PRICE.value);
+            orderPrice = order.getFullPrice();
+        }
+
         // 指令检查(包括状态,日期,接收人) 价格限定
-        ErrorCode errorCode = commonCheckHelper.instructionCheck(instruction, order, order.getOrderPrice(), tradingDay);
+        ErrorCode errorCode = commonCheckHelper.instructionCheck(instruction, order, orderPrice, tradingDay);
         if (!ErrorCode.isSuccess(errorCode.value)) {
             logger.info("内部指令信息检查未通过：instructionId [{}] error:{}-{}", dto.getInstructionId(), errorCode.value, errorCode.errorMsg);
             order.setErrorCode(errorCode.value);
@@ -716,6 +727,8 @@ public class TradeHelper {
         order.setBusiTypeTg(instruction.getBusiTypeTg());
         order.setConNum(instruction.getConNum());
         order.setEntrustClass(instruction.getEntrustClass());
+        order.setTargetType(instruction.getTargetType());
+        order.setIsNoGuard(instruction.getIsNoGuard());
 
         //1.公平下单
         if (fairOrderHelper.createFairOrder(order)) {
@@ -1204,7 +1217,17 @@ public class TradeHelper {
         createOrderByInstrument(integratedEntrust, instrument, null);
         String tradingDay = commonManagement.getTradingDay();
         Instruction instruction = instructionService.findById(integratedEntrust.getInstructionId());
-        ErrorCode errorCode = commonCheckHelper.instructionCheck(instruction, integratedEntrust, integratedEntrust.getEntrustPrice(), tradingDay);
+
+        BigDecimal entrustPrice = integratedEntrust.getEntrustPrice();
+        if (StringUtil.equals("Y", instruction.getIsNetPrice())) {
+            integratedEntrust.setIsFullPrice(FullPriceConst.NET_PRICE.value);
+        } else {
+            integratedEntrust.setIsFullPrice(FullPriceConst.FULL_PRICE.value);
+
+            entrustPrice = integratedEntrust.getFullPrice();
+        }
+
+        ErrorCode errorCode = commonCheckHelper.instructionCheck(instruction, integratedEntrust, entrustPrice, tradingDay);
         if (ErrorCode.isSuccess(errorCode.value)) {
             Date now = new Date(System.currentTimeMillis());
             integratedEntrust.setEntrustStatus(EntrustStatus.CREATED.value);

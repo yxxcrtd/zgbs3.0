@@ -77,13 +77,13 @@ public class FairOrderHelper {
     private double getFairOrderVolume(Map<String, Instruction> instructionBeanMap, Order order, Map<String, Double> volumeMap) {
         BigDecimal price = order.getOrderPrice();
         Instrument instrument = instrumentService.queryByInnerCode(order.getStockCode());
-        if (EntrustUtils.isFullPrice(instrument, order.getAssetType(), order.getEntrustProp(), order.getIsFullPrice())) {
-            // 指令金额计算为净价
-//            price = order.getFullPrice();
-            order.setIsFullPrice(FullPriceConst.FULL_PRICE.value);
-        } else {
-            order.setIsFullPrice(FullPriceConst.NET_PRICE.value);
-        }
+//        if (EntrustUtils.isFullPrice(instrument, order.getAssetType(), order.getEntrustProp(), order.getIsFullPrice())) {
+//            // 指令金额计算为净价
+////            price = order.getFullPrice();
+//            order.setIsFullPrice(FullPriceConst.FULL_PRICE.value);
+//        } else {
+//            order.setIsFullPrice(FullPriceConst.NET_PRICE.value);
+//        }
         if (!order.getEntrustProp().equals(EntrustProp.NORMAL.value)) {
             ResultBean tickBean = quoteService.getTick(order.getStockCode());
             if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
