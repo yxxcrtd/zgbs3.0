@@ -1,5 +1,7 @@
 package com.joyintech.tams.exchange.common.constant;
 
+import com.joyintech.tams.exchange.common.enums.IEnum;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,7 +11,7 @@ import java.util.Map;
  * @author lifangpeng
  * @date 2022/4/24 18:44
  */
-public enum InvestorType {
+public enum InvestorType implements IEnum<String> {
 
     SELF_SUPPORT("自营", "1"),
     ASSET_MANAGEMENT("资管", "2"),
@@ -52,5 +54,16 @@ public enum InvestorType {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+
+    @Override
+    public String getCode() {
+        return value;
+    }
+
+    @Override
+    public String getDescription() {
+        return name;
     }
 }
