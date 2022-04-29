@@ -2293,6 +2293,12 @@ public class SecDealAccountsNewService {
             listSubjectBalanceEX = accountingCommonService.getSubjectBalanceExpectDirection(
                 searchDao, DictCodeList.余额方向_借方.getValue());
         }
+        if (DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(acctEntity.getInvAim())) {
+            searchDao.setBaseSubjectNatureList(new ArrayList<String>(
+                Arrays.asList(DictCodeBaseSubjectNatrueNew.公允价值损益类_利息调整.getValue())));
+            listSubjectBalanceEX = accountingCommonService.getSubjectBalanceExpectDirection(
+                searchDao, DictCodeList.余额方向_借方.getValue());
+        }
         else if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(
             acctEntity.getInvAim())) {
             searchDao.setBaseSubjectNatureList(new ArrayList<String>(
