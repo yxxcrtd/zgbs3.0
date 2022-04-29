@@ -140,8 +140,6 @@ public class OrderController {
         logger.info("综合业务下单：委托属性（entrustProp）转换：{} ==> {}", integratedEntrust.getEntrustProp(), entrustProp);
         integratedEntrust.setEntrustProp(entrustProp);
 
-        integratedEntrust.setEntrustVolume(integratedEntrust.getEntrustVolume() / 100);
-
         return new Message<>(orderManagement.sendIntegratedEntrust(integratedEntrust.getUserId(), integratedEntrust));
     }
 
