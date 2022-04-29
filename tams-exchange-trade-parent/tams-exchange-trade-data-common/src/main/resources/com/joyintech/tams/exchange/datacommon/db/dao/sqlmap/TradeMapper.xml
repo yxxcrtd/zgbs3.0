@@ -101,6 +101,8 @@
         <result column="EXTEND1" property="extend1" jdbcType="VARCHAR"/>
         <result column="EXTEND2" property="extend2" jdbcType="VARCHAR"/>
         <result column="ENTRUST_CLASS" property="entrustClass" jdbcType="VARCHAR"/>
+        <result column="DELIVERY_RESULT" property="deliveryResult" jdbcType="VARCHAR"/>
+        <result column="DELIVERY_SCHEDULE" property="deliverySchedule" jdbcType="VARCHAR"/>
     </resultMap>
 
     <resultMap id="TradeResultMap" type="com.joyintech.tams.exchange.common.bean.TradeQueryDto">
@@ -230,7 +232,19 @@
         a.DISCOUNT, a.TRANS_CODE, a.PROP_SEAT_NO,  a.TRADING_DAY, a.LOCAL_ENTRUST_ID, a.BROKER_ENTRUST_ID, a.BROKER_TRADE_ID,
         a.REPORT_NO, a.CREATE_TIME, a.UPDATE_TIME, a.OFFSET_FLAG, a.HEDGE_FLAG, a.PORTFOLIO_ID, a.FULL_PRICE,
         a.ENTRUST_BS,a.PORTFOLIO_NAME,a.SEC_ACCT_ID,a.SEC_ACCT_NAME, a.TRADE_PLAT,a.FINPROD_TYPE2,a.INV_MANAGER_ID,a.PS,
-        a.BUSI_TYPE_TG,a.EXTEND1,a.EXTEND2, a.ENTRUST_CLASS
+        a.BUSI_TYPE_TG,a.EXTEND1,a.EXTEND2, a.ENTRUST_CLASS,
+		CASE
+		   WHEN STD.DELIVERY_RESULT IS NULL THEN '未交收'
+		   WHEN STD.DELIVERY_RESULT = '01'  THEN '正常交收'
+		   WHEN STD.DELIVERY_RESULT = '02'  THEN '部分交收'  
+		   WHEN STD.DELIVERY_RESULT = '03'  THEN '交收失败' 
+		   WHEN STD.DELIVERY_RESULT = '04'  THEN '未交收' 
+		 END                                                   DELIVERY_RESULT,
+		 CASE
+		   WHEN STD.DELIVERY_RESULT IS NULL THEN '0'
+		   WHEN STD.DELIVERY_RESULT = '04' THEN  '0'
+		   ELSE STD.SHARE_AMT / A.TRADED_VOLUME || '%'
+		 END                                                   DELIVERY_SCHEDULE
     </sql>
     <sql id="queryCondition2">
         <where>
@@ -332,13 +346,31 @@
     </select>
     <!--GZYHTZJY-126:修改查询语句,关联资产表,获取正确的资产简称 fuyongsheng 20211030 edit end-->
 
-    <select id="selectTradeByPage" resultMap="QueryResultMap"
+    <!--<select id="selectTradeByPage" resultMap="QueryResultMap"
             parameterType="com.joyintech.tams.exchange.common.bean.TradeQryBean">
         SELECT
         <include refid="Query_Column_List"/>
         FROM T_TRADE a
         <include refid="queryCondition2"/>
         order by CREATE_TIME desc
+    </select>-->
+
+    <select id="selectTradeByPage" resultMap="QueryResultMap" parameterType="com.joyintech.tams.exchange.common.bean.TradeQryBean">
+    SELECT
+      <include refid="Query_Column_List"/>
+      FROM T_TRADE A
+      LEFT JOIN SETTLE_TRANS_DATA STD
+             ON A.BROKER_TRADE_ID = STD.CJBH
+            AND A.SEC_ACCT_ID = STD.SEC_ACCT_ID
+            AND A.Trading_Day = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD')
+            AND STD.DELIVERY_RESULT IN ('01', '02', '03')
+            AND ((STD.PS = 'T56' AND STD.TRADE_MARKET = '03' AND STD.BUSI_SCENE_CALSS NOT IN ('0902RB02', '0902RS03'))
+                  OR (STD.PS = 'T56' AND STD.TRADE_MARKET = '04') OR (STD.PS != 'T56'))
+      LEFT JOIN STL_CAPACCT_INFO SCI ON A.FINANCE_ACCOUNT = SCI.ACCT_NO
+      LEFT JOIN ETR_ENTRUST_DETAIL EED ON A.INSTRUCTION_ID = EED.ENTRUST_ID
+      LEFT JOIN PTL_PORTFOLIO PP ON EED.PORTFOLIO_ID = PP.PORTFOLIO_ID
+    <include refid="queryCondition2"/>
+    ORDER BY A.CREATE_TIME DESC
     </select>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
