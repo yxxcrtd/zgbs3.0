@@ -115,6 +115,11 @@ public class TamsSystemApplication extends WebApplication {
 	}
 
 	@Bean
+	public Docket etrBond() {
+		return SwaggerConfig.createDocket("本币业务指令-债券", "com.joyintech.tams.cfets.etr.bond");
+	}
+
+	@Bean
 	public Docket bondMarketInfoQuery() {
 		return SwaggerConfig.createDocket("债券市场信息查询", "com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery");
 	}
