@@ -174,6 +174,9 @@ public class FinProductDealInfoComReaderNewService {
                     booksetTreeNodeMap.get(finDTO.getBooksetId()));
                 newFinProductDealInfoResult.setStandardCcy(finDTO.getStandardCcy());
                 newFinProductDealInfoResult.setAcctStandard(finDTO.getAcctStandard());
+                /** add by weipeng on 20220429 : 增加方案收益类型 start**/
+                newFinProductDealInfoResult.setSchProfitType(finDTO.getSchProfitType());
+                /** add by weipeng on 20220429 : 增加方案收益类型 end**/
                 newFinProductDealInfoResult.getListFinProductDealInfoComDTO().add(finDTO);
                 resultMap.put(strKey, newFinProductDealInfoResult);
             }

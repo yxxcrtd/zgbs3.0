@@ -11,7 +11,7 @@
 package com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto;
 
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.SubjectMappingConfig;
 
 import java.math.BigDecimal;
@@ -132,6 +132,12 @@ public class DrawBaseInfoSelectComDTO {
      * 估值方法
      */
     private String valuationMethod;
+
+    /**
+     * add by weipeng on 20220429：债券计提区分货币型产品和非货币型产品
+     * 估值方案收益类型
+     */
+    private String schProfitType;
 
     /**
      * 获取 taskId
@@ -514,11 +520,31 @@ public class DrawBaseInfoSelectComDTO {
      * @return 是否使用摊余成本法
      */
     public boolean getIsAcMethod(){
-        if(StringUtil.equals(DictCodeListExt1.估值方法_摊余成本法.getValue(), this.getValuationMethod())){
+//        if(StringUtil.equals(DictCodeListExt1.估值方法_摊余成本法.getValue(), this.getValuationMethod())){
+//            return true;
+//        }
+        // modify by weipeng on 20220429：通过方案类型是否货币型判断
+        if(StringUtil.equals(DictCodeList.收益类型_货币型.getValue(), this.getSchProfitType())){
             return true;
         }
         else{
             return false;
         }
+    }
+
+    /**
+     * 获取 估值方案收益类型
+     * @return 估值方案收益类型
+     */
+    public String getSchProfitType() {
+        return schProfitType;
+    }
+
+    /**
+     * 设置 估值方案收益类型
+     * @param schProfitType 估值方案收益类型
+     */
+    public void setSchProfitType(String schProfitType) {
+        this.schProfitType = schProfitType;
     }
 }

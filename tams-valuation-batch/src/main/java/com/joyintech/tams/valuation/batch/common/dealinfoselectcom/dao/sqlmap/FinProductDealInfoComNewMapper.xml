@@ -81,6 +81,9 @@
 			/** add by weipeng on 20220331 增加估值方案落地表关联 start **/
 			,schemeInfo.VALUATION_METHOD
 			/** add by weipeng on 20220331 增加估值方案落地表关联 end **/
+			/** add by weipeng on 20220429 : 增加方案收益类型，暂时用产品收益类型判断 start**/
+			,M.ACCT_MODE AS schProfitType
+			/** add by weipeng on 20220429 : 增加方案收益类型，暂时用产品收益类型判断 end**/
 		FROM 
 			BOK_BATCH_TASK_TODO D
 			INNER JOIN BOK_BOOKSET M

@@ -13,9 +13,11 @@ package com.joyintech.tams.valuation.batch.secabscalbook.processor;
 import com.joyintech.batch.batchbase.baseclass.BaseProcessor;
 import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
 import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.valuation.batch.common.accountingmethod.entity.BookGenerateResultWithBokSummary;
 import com.joyintech.tams.valuation.batch.common.drawbaseinfoselectcom.dto.DrawBaseInfoSelectComResult;
+import com.joyintech.tams.valuation.batch.secabscalbook.service.MoneyProdSecAbsCalBookNewService;
 import com.joyintech.tams.valuation.batch.secabscalbook.service.SecAbsCalBookNewService;
 import com.joyintech.tams.valuation.batch.secabscalbook.service.SecAbsCalBookService;
 import com.joyintech.tams.valuation.common.constants.GlobalConstant;
@@ -49,6 +51,12 @@ public class SecAbsCalBookProcessor extends BaseProcessor<NeedOperateEntity, Boo
     @Autowired
     private SecAbsCalBookNewService secAbsCalBookNewService;
 
+    /**
+     * processor方法的 Service
+     */
+    @Autowired
+    private MoneyProdSecAbsCalBookNewService moneyProdSecAbsCalBookNewService;
+
     @Override
 	public BookGenerateResultWithBokSummary process(NeedOperateEntity items) throws Exception {
 		//获取reader方法的返回值
@@ -65,7 +73,14 @@ public class SecAbsCalBookProcessor extends BaseProcessor<NeedOperateEntity, Boo
         // 若按照内部科目编码分录，则需要映射分录对应科目信息
         //调用service方法进行逻辑逻辑
         if(DictCodeListExt4.会计分录类型_按内部科目编码分录.getValue().equals(accountEntryType)){
-            result = secAbsCalBookNewService.execute(thisParams);
+            // 若是货币型方案，调用货币型产品债券计提方法
+            if(DictCodeList.收益类型_货币型.getValue().equals(acctEntity.getSchProfitType())){
+                result = moneyProdSecAbsCalBookNewService.execute(thisParams);
+            }
+            // 否则，走非货币型计提方法
+            else{
+                result = secAbsCalBookNewService.execute(thisParams);
+            }
         }
         else{
             result = secAbsCalBookService.execute(thisParams);

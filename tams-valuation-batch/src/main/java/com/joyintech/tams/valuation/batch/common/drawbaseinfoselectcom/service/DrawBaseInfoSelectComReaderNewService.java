@@ -206,6 +206,9 @@ public class DrawBaseInfoSelectComReaderNewService {
                 drawBaseInfoSelectComResult.setHappenDate((Date)param.get(BookConstant.HAPPEN_DATE));
                 drawBaseInfoSelectComResult.setBookSetTreeNode(booksetTreeNodeMap.get(currDTO.getBooksetId()));
                 drawBaseInfoSelectComResult.setBusiId(currDTO.getBusiId());
+                /** add by weipeng on 20220429 : 增加方案收益类型 start**/
+                drawBaseInfoSelectComResult.setSchProfitType(currDTO.getSchProfitType());
+                /** add by weipeng on 20220429 : 增加方案收益类型 end**/
                 drawBaseInfoSelectComResult.getListDrawBaseInfoSelectComDTO().add(currDTO);
                 resultMap.put(strKey, drawBaseInfoSelectComResult);
             }
