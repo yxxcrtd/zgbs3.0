@@ -53,7 +53,7 @@
         T1.PRICE END price
         /* ,T1.ENTRUST_AMT*NVL(T1.PRICE,1) ENTRUST_AMT*/
         ,T1.ENTRUST_AMT entrustAmt
-        ,CASE WHEN T1.PS IN ('03','04') THEN NULL ELSE T1.ENTRUST_NUM END entrustNum
+        ,CASE WHEN T1.PS IN ('03','04') THEN NULL ELSE round(T1.ENTRUST_NUM/100,2) END entrustNum
         ,T1.VDATE
         ,T1.MDATE
         ,T2.FULL_PRICE as fprice
@@ -196,7 +196,7 @@
         T1.PRICE END price
         /* ,T1.ENTRUST_AMT*NVL(T1.PRICE,1) ENTRUST_AMT*/
         ,T1.ENTRUST_AMT entrustAmt
-        ,CASE WHEN T1.PS IN ('03','04') THEN NULL ELSE T1.ENTRUST_NUM END entrustNum
+        ,CASE WHEN T1.PS IN ('03','04') THEN NULL ELSE round(T1.ENTRUST_NUM/100,2) END entrustNum
         ,T1.VDATE
         ,T1.MDATE
         ,T2.FULL_PRICE as fprice
