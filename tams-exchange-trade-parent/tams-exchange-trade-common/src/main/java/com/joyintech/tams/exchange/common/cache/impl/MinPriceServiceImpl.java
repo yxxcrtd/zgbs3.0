@@ -122,7 +122,6 @@ public class MinPriceServiceImpl implements MinPriceService {
         for (int i = 0, len = sources.size(); i < len; i++) {
             String s = sources.get(i);
             String d = targets.get(i);
-            //  兼容 tradPlat 02,03,04 情况
             if (!StrUtil.AT.equals(s) && !s.equals(d)) {
                 return false;
             }

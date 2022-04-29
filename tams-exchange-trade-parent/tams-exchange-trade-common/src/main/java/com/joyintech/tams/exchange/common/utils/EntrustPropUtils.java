@@ -34,6 +34,16 @@ public class EntrustPropUtils {
         return EntrustBsProp.getEntrustBs(instruction.getPs());
     }
 
+    /**
+     * 获取委托属性，处理前端可能传入的 FI9-1
+     * @param instruction   指令对象
+     * @param entrustProp   订单上的委托属性
+     * @return  委托属性
+     */
+    public static String getEntrustPropWithHandleNewBond(Instruction instruction, String entrustProp) {
+        return getEntrustProp(instruction, entrustProp).split(StrUtil.DASHED)[0];
+    }
+
 
     public static String getEntrustProp(Instruction instruction, String entrustProp) {
         if (null == instruction) {
