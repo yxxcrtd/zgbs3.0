@@ -31,12 +31,13 @@
         delete from MST_SHARE_PRICE
         where 1=1
         <if test='list != null and list.size()>0'>
-            AND ( CONCAT(SHARES_ID, TO_CHAR(DEAL_DATE,'yyyyMMdd')) IN
+            AND (
+                (SHARES_ID, DEAL_DATE) IN
                 <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
                     <if test="(index % 1000) == 999">
-                        null) OR CONCAT(SHARES_ID, TO_CHAR(DEAL_DATE,'yyyyMMdd')) in (
+                        (null, null)) OR (SHARES_ID, DEAL_DATE) in (
                     </if>
-                    CONCAT(#{item.sharesId,jdbcType=VARCHAR}, TO_CHAR(#{item.dealDate,jdbcType=VARCHAR},'yyyyMMdd'))
+                    (#{item.sharesId,jdbcType=VARCHAR}, #{item.dealDate,jdbcType=DATE})
                 </foreach>
             )
         </if>

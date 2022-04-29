@@ -398,5 +398,17 @@ public class TempConstant {
      */
     public static final String 股票存续期交易= "ValStockPeriodDeal";
 
+    /**
+     * 股票流动性折扣信息
+     * add by weipeng on 20220428
+     */
+    public static final String 股票流动性折扣信息="ValStockLiquidDiscountInfo";
+
+    /**
+     * 股票指数行情信息
+     * add by weipeng on 20220428
+     */
+    public static final String 股票指数行情信息="ValStockIndicatorQuotationInfo";
+
 }
 
