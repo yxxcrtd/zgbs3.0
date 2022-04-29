@@ -2,10 +2,12 @@ package com.joyintech.tams.exchange.common.cache.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.joyintech.tams.exchange.common.bean.MinPrice;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.cache.MinTrdUnitLimitService;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
@@ -77,7 +79,15 @@ public class MinTrdUnitLimitServiceImpl implements MinTrdUnitLimitService {
         String assetType1 = instrument.getAssetType1();
         String subStockType = instrument.getSubStockType();
         String ps = instruction.getPs();
-        return getMinTrdUnitLimit(tradeMarket, tradePlat, assetType, assetType1, subStockType, ps);
+
+        MinTrdUnitLimit minTrdUnitLimit = getMinTrdUnitLimit(tradeMarket, tradePlat, assetType, assetType1, subStockType, ps);
+        if (ObjectUtil.isNull(minTrdUnitLimit)) {
+            String dealMode = instruction.getDealMode();
+            if (StrUtil.isNotEmpty(dealMode)) {
+                minTrdUnitLimit = getMinTrdUnitLimit(tradeMarket, dealMode, assetType, assetType1, subStockType, ps);
+            }
+        }
+        return minTrdUnitLimit;
     }
 
     /**
