@@ -144,12 +144,12 @@ public class FinBondAssetValidatorService implements BeanValidator{
                 }
             }
             if(dto.getTradeMarket ().equals ("03") || dto.getTradeMarket ().equals ("04")){
-                if(dto.getIsNetprice () == null || dto.getIsNetprice () == ""){
-                    resultList.add(new ValidMessage(getMessage("是否净价交易不能为空")));
-                }
-                if(dto.getTradePlat () == null || dto.getTradePlat () == ""){
-                    resultList.add(new ValidMessage(getMessage("允许交易的平台不能为空")));
-                }
+//                if(dto.getIsNetprice () == null || dto.getIsNetprice () == ""){
+//                    resultList.add(new ValidMessage(getMessage("是否净价交易不能为空")));
+//                }
+//                if(dto.getTradePlat () == null || dto.getTradePlat () == ""){
+//                    resultList.add(new ValidMessage(getMessage("允许交易的平台不能为空")));
+//                }
             }
             // 获取对应画面的page
             Page page = CacheUtil.getPage("FinBondTargetAsset002");
@@ -238,12 +238,12 @@ public class FinBondAssetValidatorService implements BeanValidator{
                     getMessage("BUSS_COM_E_0038", getMessage("FinBondTargetAsset002.cityBondLev"))));
         }
         //是否展示资产四五级分类
-        if(StringUtil.equals(CacheUtil.getSysParam("IS_SHOW_TYPE"),"01") &&  (StringUtil.equals(dto.getOperateType(), "save") ||  StringUtil.equals(dto.getOperateType(), "submit"))) {
-        	if(StringUtil.isEmpty(dto.getType11())) {
-        		resultList.add(new ValidMessage("type11",
-                        getMessage("COMMON_E_0057", getMessage("FinBondTargetAsset002.type11"))));
-        	}
-        }
+//        if(StringUtil.equals(CacheUtil.getSysParam("IS_SHOW_TYPE"),"01") &&  (StringUtil.equals(dto.getOperateType(), "save") ||  StringUtil.equals(dto.getOperateType(), "submit"))) {
+//        	if(StringUtil.isEmpty(dto.getType11())) {
+//        		resultList.add(new ValidMessage("type11",
+//                        getMessage("COMMON_E_0057", getMessage("FinBondTargetAsset002.type11"))));
+//        	}
+//        }
         // 如果是新增或者修改 则校验 一级市场投标债券  不在流程中 校验pk2
         // modify by wj 20200819 BS-757 【投资交易-新发行债权标的】一级市场投标债券可以加挂到两个债券标的上
         if(StringUtil.equals(dto.getPageModel(), GlobalConstant.DETAIL_PAGE_MODEL_NEW) || StringUtil.equals(dto.getPageModel(), GlobalConstant.DETAIL_PAGE_MODEL_EDIT)) {
