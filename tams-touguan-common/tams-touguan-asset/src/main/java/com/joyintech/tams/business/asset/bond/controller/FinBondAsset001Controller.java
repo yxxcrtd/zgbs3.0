@@ -309,7 +309,7 @@ public class FinBondAsset001Controller extends BaseController{
         }
         ProcessParameter<FinBondAssetSaveRequest> processParameter = new ProcessParameter<FinBondAssetSaveRequest>();
         WorkFlowParameter<FinBondAssetSaveRequest> params = new WorkFlowParameter<FinBondAssetSaveRequest>();
-        params.setPageId("FinBondTargetAsset002");
+        params.setPageId("FinBondAsset002");
         params.setElementId(dto.getElementId());
         params.setBusinessCode(item -> item.getFinprodMarketId());
         params.setBusinessType(DictCodeList.共通业务类型_债券类资产信息.getValue());

@@ -11,6 +11,7 @@
 package com.joyintech.tams.business.asset.bond.dao;
 
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.tams.common.base.entity.SysUploadFileInfo;
 import com.joyintech.tams.business.asset.bond.dto.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.invest.asset.common.dto.FinAssetRateAdjDto;
@@ -220,4 +221,8 @@ public interface FinBondAssetMapper {
 	int deleteCashCalcRuleByCashId(FinCashCalcRuleKey key);
 
 	List<FinAssetRateAdjResponse> selectInitAssetRateAdj(Map<String, Object> param);
+
+	int insertFileSelective(SysUploadFileInfo var1);
+
+	int updateFileByPrimaryKey(SysUploadFileInfo var1);
 }

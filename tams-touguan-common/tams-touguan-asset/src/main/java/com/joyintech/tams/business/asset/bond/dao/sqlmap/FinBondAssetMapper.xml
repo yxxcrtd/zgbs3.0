@@ -1286,4 +1286,82 @@
         </where>
         order by T1.EFF_DATE ASC
     </select>
+
+    <insert id="insertFileSelective" parameterType="com.joyintech.tams.common.base.entity.SysUploadFileInfo" >
+        insert into SYS_UPLOAD_FILE_INFO
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="seqNo != null" >
+                SEQ_NO,
+            </if>
+            <if test="fileName != null" >
+                FILE_NAME,
+            </if>
+            <if test="path != null" >
+                PATH,
+            </if>
+            <if test="businessId != null" >
+                BUSINESS_ID,
+            </if>
+            <if test="createUser != null" >
+                CREATE_USER,
+            </if>
+            <if test="createTime != null" >
+                CREATE_TIME,
+            </if>
+            <if test="updateUser != null" >
+                UPDATE_USER,
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="seqNo != null" >
+                #{seqNo,jdbcType=VARCHAR},
+            </if>
+            <if test="fileName != null" >
+                #{fileName,jdbcType=VARCHAR},
+            </if>
+            <if test="path != null" >
+                #{path,jdbcType=VARCHAR},
+            </if>
+            <if test="businessId != null" >
+                #{businessId,jdbcType=VARCHAR},
+            </if>
+            <if test="createUser != null" >
+                #{createUser,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null" >
+                #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateFileByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.SysUploadFileInfo" >
+        update SYS_UPLOAD_FILE_INFO
+        <set >
+            <if test="fileName != null" >
+                FILE_NAME = #{fileName,jdbcType=VARCHAR},
+            </if>
+            <if test="path != null" >
+                PATH = #{path,jdbcType=VARCHAR},
+            </if>
+            <if test="businessId != null" >
+                BUSINESS_ID = #{businessId,jdbcType=VARCHAR},
+            </if>
+            <if test="updateUser != null" >
+                UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where SEQ_NO = #{seqNo,jdbcType=VARCHAR}
+    </update>
 </mapper>

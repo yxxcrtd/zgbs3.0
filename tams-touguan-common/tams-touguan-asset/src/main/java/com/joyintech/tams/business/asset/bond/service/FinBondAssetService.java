@@ -10,18 +10,14 @@
 
 package com.joyintech.tams.business.asset.bond.service;
 
-import com.joyintech.calculation.CalculatorFactory;
-import com.joyintech.calculation.bonds.cash.ForwadCashCalculator;
-import com.joyintech.calculation.bonds.constant.GlobalConstant;
-import com.joyintech.calculation.bonds.constant.SecIntSchCalMethod;
 import com.joyintech.calculation.bonds.constant.Variety;
-import com.joyintech.calculation.bonds.yield.YieldByPriceForDisCalculator;
 import com.joyintech.calculation.shell.PriceByYieldCalculator;
 import com.joyintech.calculation.shell.YieldByPriceCalculator;
 import com.joyintech.calculation.shell.param.*;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.dto.UploadFile;
+import com.joyintech.framework.file.SafelyFile;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.select.SelectOptionDto;
@@ -42,7 +38,6 @@ import com.joyintech.tams.component.business.basicdata.dto.BusiFinProductRatingD
 import com.joyintech.tams.component.business.basicdata.service.BusiProductRatingService;
 import com.joyintech.tams.component.business.bond.BusiFinBondRatingInfoService;
 import com.joyintech.tams.component.business.bond.BusiFinExercisePlanService;
-import com.joyintech.tams.component.business.bond.dto.BusiFinBondRatingInfoDto;
 import com.joyintech.tams.component.business.bond.dto.BusiFinExercisePlanDto;
 import com.joyintech.tams.component.business.common.dto.InterfPayhsrcsecinfoDto;
 import com.joyintech.tams.component.business.common.service.CommonAutoCouponService;
@@ -54,25 +49,28 @@ import com.joyintech.tams.component.business.report.asset.bond.BussFinBondRepInf
 import com.joyintech.tams.component.business.report.asset.project.BussRepEquityInfoService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
-import com.joyintech.tams.invest.asset.common.dto.*;
+import com.joyintech.tams.invest.asset.common.dto.BaseFinProductBaseInfoDto;
 import com.joyintech.tams.invest.asset.common.service.AssetCommonService;
 import com.joyintech.tams.invest.common.asset.dto.FinCashPlanDto;
 import com.joyintech.tams.invest.common.calculator.AdjustedTradeDayCal;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
-import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.service.InvestInterfCommService;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
+import org.aspectj.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -128,21 +126,6 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
     private BusiFinExercisePlanService busiFinExercisePlanService;
 
     /**
-     * 业务--评级信息
-     */
-    @Autowired(required = false)
-    private BusiFinBondRatingInfoService busiFinBondRatingInfoService;
-    /**
-     * 业务--中债报送
-     */
-    @Autowired(required = false)
-    private BussFinBondRepInfoService bussFinBondRepInfoService;
-    /**
-     * 权益类--中债报送
-     */
-    @Autowired(required = false)
-    private BussRepEquityInfoService bussRepEquityInfoService;
-    /**
      * 附件
      */
     @Autowired(required = false)
@@ -172,18 +155,6 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
 
     @Autowired(required = false)
     private FinBondAssetMapper finBondAssetMapper;
-
-    @Autowired(required = false)
-    private RepAssetBondMapper repAssetBondMapper;
-
-    @Autowired
-    private RepAssetDeptMapper repAssetDeptMapper;
-
-    @Autowired
-    private RepAssetOtherMapper repAssetOtherMapper;
-
-    @Autowired
-    private RepAssetEquityMapper repAssetEquityMapper;
 
     @Autowired(required = false)
     private FinProductConvertibleMapper finProductConvertibleMapper;
@@ -708,7 +679,9 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
 //        finProductType.setType6(dto.getType4());
 //        finProductType.setType7(dto.getType5());
         finProductType.setType8(DictCodeList.平安资产类型_债券.getValue());
-
+        finProductType.setType9(dto.getTypeTwo());
+        finProductType.setType10(dto.getTypeThree());
+        finProductType.setType11(dto.getTypeFour());
         //金融产品附属表entity
         FinProductAdd finProductAdd = new FinProductAdd();
         BeanUtil.copyPropertiesIgnoreNull(finProductAdd, dto);
@@ -730,9 +703,10 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
         //转债信息
         FinProductConvertible finProductConvertible = new FinProductConvertible();
         finProductConvertible.setConFinprodId(dto.getFinprodId());
-        BeanUtil.copyPropertiesIgnoreNull(finProductConvertible, dto.getFinProductConvertible());
-        dto.setProductConvertible(finProductConvertible);
-
+        if (StringUtil.isNotEmpty(dto.getFinProductConvertible())) {
+            BeanUtil.copyPropertiesIgnoreNull(finProductConvertible, dto.getFinProductConvertible());
+            dto.setProductConvertible(finProductConvertible);
+        }
         //现金流信息Entity-本金
         FinCashInfo finCashInfoPrincipal = encapFinCashInfo(dto, DictCodeListExt1.现金流一级类型_本金.getValue(), DictCodeListExt1.现金流二级类型_本金.getValue(), branch);
         //现金流信息Entity-利息
@@ -789,6 +763,7 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
         finCashPayRule.setFirstPayDate(finPayInterestStdInfoDto.getFirstPayDate());
         finCashPayRule.setCashUnitType(DictCodeList.现金流单位_百元法.getValue());
         finCashPayRule.setFinprodId(dto.getFinprodId());
+        finCashPayRule.setBranch(branch);
         finCashPayRule.setFinprodType(DictCodeListExt1.金融产品类型_债券.getValue());
         finCashPayRule.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         finCashPayRule.setPayType(DictCodeList.支付方式_现金.getValue());
@@ -843,7 +818,7 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
                 BondFinCashPlanDto bondFinCashPlanDto = invRepays.get(i);
                 FinCashPlan invRepay = new FinCashPlan();
                 BeanUtil.copyPropertiesIgnoreNull(invRepay,bondFinCashPlanDto);
-                invRepay.setCashId(finCashInfoInterest.getCashId());
+                invRepay.setCashId(finCashInfoPrincipal.getCashId());
                 invRepay.setCashNum((long) (i + 1));
                 if(DateUtil.compareDate(bondFinCashPlanDto.getMdate(), dto.getMdate())==0){
                     invRepay.setCashType(DictCodeList.现金流类型_到期还本.getValue());
@@ -1563,5 +1538,29 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
             }
         }
         return null;
+    }
+
+
+    public SysUploadFileInfo getUploadFileInfo(MultipartFile file) throws IOException {
+        String newfileName = file.getName()+"_"+DateUtil.format(DateUtil.now(),DateUtil.DATETIME_FORMAT_WITH_SSS_YEAR1);
+        // 本地路径
+        String localPath = CacheUtil.getSysParam("upload_file_path") + File.separator;
+        String nowDateStr =DateUtil.format(DateUtil.now(),DateUtil.DEFAULT_DATE_FORMAT_EN);
+        List<String> nowDateList = StringUtil.splitToList("-",nowDateStr);
+        String newPath = localPath + nowDateList.get(0) + File.separator
+                + nowDateList.get(1)  + File.separator + nowDateList.get(2)+ File.separator+newfileName;
+        File folder = new SafelyFile(newPath);
+        //  生成文件夹
+        if (!folder.exists()){
+            folder.mkdir();
+        }
+        FileUtils.copyInputStreamToFile(file.getInputStream(),folder);
+        SysUploadFileInfo fileInfo = new SysUploadFileInfo();
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+        fileInfo.setSeqNo(uuid);
+        fileInfo.setFileName(file.getName());
+        fileInfo.setPath(newPath);
+        finBondAssetMapper.insertFileSelective(fileInfo);
+        return fileInfo;
     }
 }

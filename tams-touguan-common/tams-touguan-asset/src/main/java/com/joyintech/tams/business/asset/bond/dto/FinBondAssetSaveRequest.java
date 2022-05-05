@@ -32,6 +32,7 @@ import com.joyintech.tams.component.business.riskrds.dto.PageModel;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.asset.common.dto.BaseFinProductBaseInfoDto;
 import com.joyintech.tams.invest.common.dto.MstFileInputParameter;
+import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -45,7 +46,7 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @PageId("FinBondAsset002")
 @ApiModel(value="债券新建画面表单",description="债券新建画面表单")
-public class FinBondAssetSaveRequest extends BaseEntity implements ITableRow,ProcessEntity{
+public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity{
 
     /**
      * <意义，目的和功能，以及可能被用到的地方>
@@ -57,6 +58,12 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ITableRow,Pro
      */
     @ApiModelProperty(name="operateType",value="操作类型",example="submit/save", required = true)
     private String operateType;
+
+    /**
+     * 操作类型
+     */
+    @ApiModelProperty(name="operateStatus",value="操作状态",required = true)
+    private String operateStatus;
 
     @ApiModelProperty(name="elementId",value="按钮id",example="FinBondAsset002_btn_submit/FinBondAsset002_btn_save")
     private String elementId;
@@ -72,6 +79,9 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ITableRow,Pro
 
     @ApiModelProperty(name="finprodMarketId",value="资产代码",required=true)
     private String finprodMarketId;
+
+    @ApiModelProperty(name="tradeMarketId",value="债券代码后缀",required=true)
+    private String tradeMarketId;
 
     @ApiModelProperty(name="finprodName",value="资产名称",required=true)
     private String finprodName;
@@ -106,13 +116,10 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ITableRow,Pro
     @ApiModelProperty(name="issuer",value="发行人",required=true)
     private String issuer;
 
-    @ApiModelProperty(name="type9",value="资产一级分类",required=true)
     private String type9;
 
-    @ApiModelProperty(name="type10",value="资产二级分类",required=true)
     private String type10;
 
-    @ApiModelProperty(name="type11",value="资产三级分类",required=true)
     private String type11;
 
     @ApiModelProperty(name="issueType",value="募集方式",required=true)
@@ -194,6 +201,14 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ITableRow,Pro
     @ApiModelProperty(name="finProductIssueList",value="发行信息")
     private List<BondFinProductIssueDto> finProductIssueList;
 
+    @ApiModelProperty(name="typeTwo",value="资产一级分类" ,required=true)
+    private String typeTwo;
+
+    @ApiModelProperty(name="typeThree",value="资产二级分类",required=true)
+    private String typeThree;
+
+    @ApiModelProperty(name="typeFour",value="资产三级分类",required=true)
+    private String typeFour;
 
     /**
      * 选择数据
@@ -1574,6 +1589,7 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ITableRow,Pro
         this.remark = remark;
     }
 
+    @PrimaryKey(PrimaryKey.Field.PK_1)
     public String getFinprodMarketId() {
         return finprodMarketId;
     }
@@ -1983,4 +1999,43 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ITableRow,Pro
         this.productConvertible = productConvertible;
     }
 
+    public String getTypeTwo() {
+        return typeTwo;
+    }
+
+    public void setTypeTwo(String typeTwo) {
+        this.typeTwo = typeTwo;
+    }
+
+    public String getTypeThree() {
+        return typeThree;
+    }
+
+    public void setTypeThree(String typeThree) {
+        this.typeThree = typeThree;
+    }
+
+    public String getTypeFour() {
+        return typeFour;
+    }
+
+    public void setTypeFour(String typeFour) {
+        this.typeFour = typeFour;
+    }
+
+    public String getTradeMarketId() {
+        return tradeMarketId;
+    }
+
+    public void setTradeMarketId(String tradeMarketId) {
+        this.tradeMarketId = tradeMarketId;
+    }
+
+    public String getOperateStatus() {
+        return operateStatus;
+    }
+
+    public void setOperateStatus(String operateStatus) {
+        this.operateStatus = operateStatus;
+    }
 }
