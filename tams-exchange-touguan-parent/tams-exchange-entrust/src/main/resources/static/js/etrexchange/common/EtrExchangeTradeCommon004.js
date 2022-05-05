@@ -652,6 +652,8 @@
                         if (flag <= 0) {
                             minPriceObj = filter[i];
                         }
+                    }else{
+                        minPriceObj = filter[i];
                     }
                     if (minPriceObj) {
                         var minPrice = minPriceObj.minPrice;
