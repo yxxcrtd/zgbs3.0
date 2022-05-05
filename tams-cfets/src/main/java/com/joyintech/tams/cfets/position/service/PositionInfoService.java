@@ -144,14 +144,14 @@ public class PositionInfoService {
 
         //调用新头寸引擎查询证券户可取现金
         if (StringUtil.isNotEmpty(finprodId)) {
-            String flowType = "03";// 01 指令现金 02 指令持仓 03 交易现金 04 交易持仓
+            String flowType = "01";// 01 指令现金 02 指令持仓 03 交易现金 04 交易持仓
             //筛选出有资金账户的组合
             List<PositionCashSecDto> sumAcctNoList = new ArrayList<>();
             for (String portfolioId : portfolioIdList) {
                 Map<String, String> secIdMap = new HashMap<String, String>();
                 map.put("portfolioId", portfolioId);
                 map.put("finprodId", finprodId);
-                String secAcctId = qryPortfolioSecAcctId(secIdMap);// 证券账户
+                String secAcctId = qryPortfolioSecAcctId(map);// 证券账户
                 if (StringUtil.isNotEmpty(secAcctId)) {
                     PositionCashSecDto positionCashSecDto = new PositionCashSecDto();
                     positionCashSecDto.setCcy(ccy);
