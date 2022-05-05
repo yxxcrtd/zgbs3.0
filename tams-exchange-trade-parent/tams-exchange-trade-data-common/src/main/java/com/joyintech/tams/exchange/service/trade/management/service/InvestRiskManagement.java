@@ -213,7 +213,7 @@ public class InvestRiskManagement extends BaseService {
                 instructionId, entrust.getEntrustPrice(), entrust.getFullPrice(), entrustVolume);
 
         List<ReqRiskTrigger> list = Lists.newArrayList();
-        ReqRiskTrigger reqRiskOccupy;
+        int portfolioNum = calculateList.size();
         for (PortfolioCalculateResponse calculateResponse : calculateList) {
             list.add(createReqRiskExamine(entrust, instruction, calculateResponse, portfolioNum));
         }
@@ -411,14 +411,13 @@ public class InvestRiskManagement extends BaseService {
                 instructionId, entrust.getEntrustPrice(), entrust.getFullPrice(), entrustVolume);
 
         List<ReqRiskOccupy> list = Lists.newArrayList();
-        ReqRiskOccupy reqRiskOccupy;
+        int portfolioNum = calculateList.size();
         for (PortfolioCalculateResponse item : calculateList) {
             if (CHECK_FLAG.equals(checkOrRelease)) {
                 list.add(createReqRiskOccupy2RiskCheck(entrust, instruction, item, portfolioNum));
             } else {
                 list.add(createReqRiskOccupy2RiskRelease(entrust, instruction, item, portfolioNum));
             }
-            list.add(reqRiskOccupy);
         }
         return list;
     }
