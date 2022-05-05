@@ -586,6 +586,14 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
                     etrEntrustBidPriceMapper.insertSelective(etrEntrustBidPrice);
                 }
             }
+
+            // 保存List<委托明细表>
+            if (CollectionUtils.isNotEmpty(dto.getEtrEntrustDetailList())) {
+                for (EtrEntrustDetail etrEntrustDetail : dto.getEtrEntrustDetailList()) {
+                    etrEntrustDetailMapper.insertSelective(etrEntrustDetail);
+                }
+            }
+
             return true;
         }
         return false;

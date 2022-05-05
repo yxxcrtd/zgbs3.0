@@ -87,6 +87,12 @@
             <if test="updateTime != null" >
                 UPDATE_TIME,
             </if>
+            <if test="invAim != null" >
+                INV_AIM,
+            </if>
+            <if test="secAcctId != null" >
+                SEC_ACCT_ID,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="entrustId != null" >
@@ -121,6 +127,12 @@
             </if>
             <if test="updateTime != null" >
                 #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="invAim != null" >
+                #{invAim,jdbcType=VARCHAR},
+            </if>
+            <if test="secAcctId != null" >
+                #{secAcctId,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>

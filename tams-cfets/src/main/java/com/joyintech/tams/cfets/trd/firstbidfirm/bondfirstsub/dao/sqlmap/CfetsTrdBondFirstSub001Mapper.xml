@@ -23,7 +23,7 @@
                eed.PORTFOLIO_NAME                       portfolioName,
                eea.SEC_ACCT_ID                          secManageAcctId,
                ssai.SEC_ACCT_NAME                       secAcctName,
-               ee.INV_AIM                               businessModel,
+               eed.INV_AIM                              businessModel,
                su.REAL_NAME                             invManagerName,
                ee.ENTRUST_DATE                          entrustDate,
                to_char(eea.TRANSMIT_TIME, 'hh24:mi:ss') transmitTime,
@@ -33,17 +33,17 @@
         from ETR_ENTRUST ee
                  left join (select listagg(t0.PORTFOLIO_ID, ',') within group (order by t0.ENTRUST_ID)   AS PORTFOLIO_ID,
                                    listagg(pp.PORTFOLIO_NAME, ',') within group (order by t0.ENTRUST_ID) AS PORTFOLIO_NAME,
-                                   t0.ENTRUST_ID                                                            ENTRUST_ID
+                                   t0.ENTRUST_ID,t0.INV_AIM
                             from ETR_ENTRUST_DETAIL t0
-                                     left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = t0.PORTFOLIO_ID
-                                     <where>
-                                         <if test="portfolioIds != null and portfolioIds.size()>0">
-                                             <foreach collection="portfolioIds" open=" t0.PORTFOLIO_ID in(" close=") " separator="," item="item">
-                                                 #{item}
-                                             </foreach>
-                                         </if>
-                                     </where>
-                            group by t0.ENTRUST_ID) eed
+                             left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = t0.PORTFOLIO_ID
+                             <where>
+                                 <if test="portfolioIds != null and portfolioIds.size()>0">
+                                     <foreach collection="portfolioIds" open=" t0.PORTFOLIO_ID in(" close=") " separator="," item="item">
+                                         #{item}
+                                     </foreach>
+                                 </if>
+                             </where>
+                            group by t0.ENTRUST_ID,t0.INV_AIM) eed
                            on ee.ENTRUST_ID = eed.ENTRUST_ID
                  left join ETR_ENTRUST_ADD eea on ee.ENTRUST_ID = eea.ENTRUST_ID
                  left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eea.SEC_ACCT_ID
@@ -59,7 +59,7 @@
                  left join FIN_PRODUCT fp on fp.FINPROD_ID = ee.FINPROD_ID
                  left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = ee.FINPROD_ID
                  left join SYS_USER su on su.USER_NAME = ee.INV_MANAGER_ID
-        where fp.ISSUE_TYPE = #{ISSUE_CLASS_01}
+        where fpi.ISSUE_CLASS = #{ISSUE_CLASS_01}
 	    order by decode(ee.ENTRUST_STATUS, '04', 2, '05', 3, '06', 4, 1) asc,fpi.ISSUE_DATE,ee.ENTRUST_DATE,eea.TRANSMIT_TIME
     </sql>
 
@@ -110,7 +110,11 @@
          (<include refid="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dao.CfetsTrdBondFirstSub001Mapper.listEntrustSql" />) T
         left join SYS_DATADICT_LIST sdl_es on T.entrustStatus=sdl_es.ITEM_CODE and sdl_es.DICT_CODE='ENTRUST_STATUS'
         left join SYS_DATADICT_LIST sdl_bm on T.businessModel=sdl_bm.ITEM_CODE and sdl_bm.DICT_CODE='BUSINESS_MODEL'
+        LEFT JOIN ETR_DISTRIBUTE ed ON ed.ENTRUST_ID = T.entrustId
         <where>
+            <if test="loginUserId != null and loginUserId != '' ">
+                AND ed.TRADER = #{loginUserId}
+            </if>
             <if test="entrustStatus == null or entrustStatus == '' ">
                 AND T.entrustStatus in ('02','03','04','05','06')
             </if>
@@ -192,7 +196,7 @@
         <id property="finprodId" column="finprodId"/>
         <id property="finprodMarketId" column="finprodMarketId"/>
         <id property="finprodAbbr" column="finprodAbbr"/>
-        <id property="issueType" column="issueType"/>
+        <id property="issueClass" column="issueClass"/>
         <id property="issueDate" column="issueDate"/>
         <id property="payDate" column="payDate"/>
         <id property="issuePrice" column="issuePrice"/>
@@ -217,7 +221,7 @@
              , ee.FINPROD_ID        finprodId
              , fp.FINPROD_MARKET_ID finprodMarketId
              , fp.FINPROD_ABBR      finprodAbbr
-             , fp.ISSUE_TYPE        issueType
+             , fpi.ISSUE_CLASS      issueClass
              , fpi.ISSUE_DATE       issueDate
              , fpi.PAY_DATE         payDate
              , fpi.ISSUE_PRICE      issuePrice
@@ -240,7 +244,7 @@
                  left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = eed.PORTFOLIO_ID
         <where>
             <if test="entrustId != null and entrustId != '' ">
-                ENTRUST_ID = #{entrustId}
+                eed.ENTRUST_ID = #{entrustId}
                 /*指令代码查询*/
             </if>
         </where>
@@ -257,7 +261,7 @@
                sum(payableAmount)      payableAmount,
                sum(settFeeAmt)         settFeeAmt,
                rate,
-               issueType,
+               issueClass,
                issueDate,
                payDate,
                couponSpecies,
@@ -280,7 +284,7 @@
                             when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
                                 then nvl(miri.INT_RATE, 0) + nvl(fpi.REFER_YIELD, 0)
                             else fpi.REFER_YIELD end rate,
-                        fp.ISSUE_TYPE                issueType,
+                        fpi.ISSUE_CLASS              issueClass,
                         fpi.ISSUE_DATE               issueDate,
                         fpi.PAY_DATE                 payDate,
                         fp.COUPON_SPECIES            couponSpecies,
@@ -315,7 +319,7 @@
                             when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
                                 then nvl(miri.INT_RATE, 0) + nvl(fpi.REFER_YIELD, 0)
                             else fpi.REFER_YIELD end rate,
-                        fp.ISSUE_TYPE                issueType,
+                        fpi.ISSUE_CLASS             issueClass,
                         fpi.ISSUE_DATE               issueDate,
                         fpi.PAY_DATE                 payDate,
                         fp.COUPON_SPECIES            couponSpecies,
@@ -337,7 +341,7 @@
                           left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
                  WHERE wbo.BID_DATE = #{sysDate} and wbobp.BID_PRICE = 99999999
              )
-        group by issueStatus, finprodId, finprodMarketId, finprodAbbr, secManageAcctId, secAcctName, rate, issueType, issueDate,
+        group by issueStatus, finprodId, finprodMarketId, finprodAbbr, secManageAcctId, secAcctName, rate, issueClass, issueDate,
                  payDate, couponSpecies, intType, ouPartyId, ouPartyIdAbbr, issuer, issuerName
         order by decode(issueStatus,Null,1,'01',2,3)
     </sql>
@@ -345,7 +349,7 @@
     <sql id="listDaySubKeywordsWhere">
         <if test="search != null and search != ''">
             AND ( T.issueStatus || '|' || sdl_is.item_value || '|' || T.finprodId || '|' || T.finprodMarketId || '|'
-            || '|' || T.finprodAbbr || '|' || T.secManageAcctId || '|' || T.secAcctName || '|' || T.issueType
+            || '|' || T.finprodAbbr || '|' || T.secManageAcctId || '|' || T.secAcctName || '|' || T.issueClass
             || sdl_ist.item_value || '|' || '|' || T.couponSpecies || '|' || sdl_cs.item_value
             || '|' || T.intType || '|' || sdl_it.item_value || '|' || T.ouPartyId || '|' || T.ouPartyIdAbbr
             || '|' || T.issuer || '|' || T.issuerName
@@ -354,7 +358,7 @@
             or decode(T.payableAmount,0,'0.00',to_char(T.payableAmount,'FM999999999990.90'))=#{search} or to_char(T.payableAmount)=#{search}
             or decode(T.settFeeAmt,0,'0.00',to_char(T.settFeeAmt,'FM999999999990.90'))=#{search} or to_char(T.settFeeAmt)=#{search}
             or decode(T.rate,0,'0.00',to_char(T.rate,'FM999999999990.9990'))=#{search} or to_char(T.rate)=#{search}
-            or replace(to_char(T.issueType,'yyyy-MM-dd'),'-','/')=#{search}
+            or replace(to_char(T.issueClass,'yyyy-MM-dd'),'-','/')=#{search}
             or replace(to_char(T.payDate,'yyyy-MM-dd'),'-','/')=#{search}
             )
         </if>
@@ -372,7 +376,7 @@
             T.payableAmount,
             T.settFeeAmt,
             T.rate,
-            T.issueType,
+            T.issueClass,
             T.issueDate,
             T.payDate,
             T.couponSpecies,
@@ -384,8 +388,8 @@
         from(
         <include refid="subInfoSql"></include>
         ) T
-        left join SYS_DATADICT_LIST sdl_is on T.issueStatus=sdl_es.ITEM_CODE and sdl_is.DICT_CODE='ISSUE_STATUS'
-        left join SYS_DATADICT_LIST sdl_ist on T.issueType=sdl_ist.ITEM_CODE and sdl_ist.DICT_CODE='ISSUE_CLASS'
+        left join SYS_DATADICT_LIST sdl_is on T.issueStatus=sdl_is.ITEM_CODE and sdl_is.DICT_CODE='ISSUE_STATUS'
+        left join SYS_DATADICT_LIST sdl_ist on T.issueClass=sdl_ist.ITEM_CODE and sdl_ist.DICT_CODE='ISSUE_CLASS'
         left join SYS_DATADICT_LIST sdl_cs on T.couponSpecies=sdl_cs.ITEM_CODE and sdl_cs.DICT_CODE='COUPON_SPECIES'
         left join SYS_DATADICT_LIST sdl_it on T.intType=sdl_it.ITEM_CODE and sdl_it.DICT_CODE='INT_TYPE'
         <where>

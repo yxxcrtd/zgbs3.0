@@ -62,6 +62,8 @@ public class CfetsTrdBondFirstSub001Controller extends BaseController {
         initPageParams.put("ISSUE_STATUS", this.getSelectDataFromDataDic(DictCode.发行状态, null));
         // 发行状态
         initPageParams.put("STATUS_VALID", this.getSelectDataFromDataDic(DictCode.有效状态, null));
+        // 债券类型
+        initPageParams.put("BOND_TYPE", this.getSelectDataFromDataDic(DictCode.行内资产四级分类, null));
         // 委托状态_待接收
         initPageParams.put("ENTRUST_STATUS_02", DictCodeList.委托状态_待接收.getValue());
         // 委托状态_已接收
@@ -70,16 +72,14 @@ public class CfetsTrdBondFirstSub001Controller extends BaseController {
         initPageParams.put("ENTRUST_STATUS_04", DictCodeList.委托状态_已完成.getValue());
         // 委托状态_已退回
         initPageParams.put("ENTRUST_STATUS_05", DictCodeList.委托状态_已退回.getValue());
-        // 债券类型
-        initPageParams.put("BOND_TYPE", this.getSelectDataFromDataDic(DictCode.行内资产四级分类, null));
         // 系统日期
         initPageParams.put("sysDate", iPlatformDate.getSysDateStr());
         // 币种_人民币
         initPageParams.put("CCY_CNY", DictCodeList.币种_人民币_CNY.getValue());
         //CMDS地址
         initPageParams.put("cmdsWebSocketUrl", cmdsWebSocketUrl);
-        //本币导出按钮配置
-        initPageParams.put("EXPORT_SHOW", CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST"));
+        // 系统参数 【是否支持CSTP下行接口_一级申购】
+        initPageParams.put("IS_SUPPORT_CSTP_FLAG_BONDFIRST", CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST"));
         // 登记页面id 用于登记撤销
         initPageParams.put("PAGE_ID_BOND_FIRST", "TenderBondSub002");
         //刷新时间

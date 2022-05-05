@@ -17,8 +17,11 @@ public class CfetsEtrIBondFirstBidFindEtrInfoRequest {
     @ApiModelProperty(name="pageMode",value="分页对象",example="{pageSize: 10,pageNo: 1, sort: 'name', direction: 'asc'}")
     private PageMode pageMode;
 
-    @ApiModelProperty(name="portfolioId",value="组合名称",example="A1")
+    @ApiModelProperty(name="portfolioId",value="组合代码",example="A1")
     private String portfolioId;
+
+    @ApiModelProperty(name="portfolioName",value="组合名称",example="A1")
+    private String portfolioName;
 
     @ApiModelProperty(name="finprodId",value="资产代码",example="ZC1")
     private String finprodId;
@@ -118,14 +121,6 @@ public class CfetsEtrIBondFirstBidFindEtrInfoRequest {
         this.entrustId = entrustId;
     }
 
-    public String getFirstBidStatus() {
-        return firstBidStatus;
-    }
-
-    public void setFirstBidStatus(String firstBidStatus) {
-        this.firstBidStatus = firstBidStatus;
-    }
-
     public String getCounterId() {
         return counterId;
     }
@@ -188,5 +183,21 @@ public class CfetsEtrIBondFirstBidFindEtrInfoRequest {
 
     public void setEntrustEndDate(String entrustEndDate) {
         this.entrustEndDate = entrustEndDate;
+    }
+
+    public String getPortfolioName() {
+        return portfolioName;
+    }
+
+    public void setPortfolioName(String portfolioName) {
+        this.portfolioName = portfolioName;
+    }
+
+    public String getFirstBidStatus() {
+        return firstBidStatus;
+    }
+
+    public void setFirstBidStatus(String firstBidStatus) {
+        this.firstBidStatus = firstBidStatus;
     }
 }

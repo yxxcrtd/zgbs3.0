@@ -473,6 +473,11 @@ public class FinProductAdd extends BaseEntity {
     private String oldDelistingDate;
 
     /**
+     * 上市日是否来源交易
+     */
+    private String listingDateFromTrade;
+
+    /**
      * 取得 金融产品代码
      * @return 金融产品代码
      */
@@ -1930,5 +1935,23 @@ public class FinProductAdd extends BaseEntity {
      */
     public void setOldDelistingDate(String oldDelistingDate) {
         this.oldDelistingDate = oldDelistingDate;
+    }
+
+    /**
+     * 获取 上市日是否来源交易
+     *
+     * @return listingDateFromTrade 上市日是否来源交易
+     */
+    public String getListingDateFromTrade() {
+        return listingDateFromTrade;
+    }
+
+    /**
+     * 设置 上市日是否来源交易
+     *
+     * @param listingDateFromTrade 上市日是否来源交易
+     */
+    public void setListingDateFromTrade(String listingDateFromTrade) {
+        this.listingDateFromTrade = listingDateFromTrade;
     }
 }

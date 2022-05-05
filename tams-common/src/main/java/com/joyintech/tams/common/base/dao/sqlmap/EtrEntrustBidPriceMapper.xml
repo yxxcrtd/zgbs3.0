@@ -72,6 +72,9 @@
             <if test="updateTime != null" >
                 UPDATE_TIME,
             </if>
+            <if test="portfolioId != null" >
+                PORTFOLIO_ID,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="entrustId != null" >
@@ -97,6 +100,9 @@
             </if>
             <if test="updateTime != null" >
                 #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="portfolioId != null" >
+                #{portfolioId,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>

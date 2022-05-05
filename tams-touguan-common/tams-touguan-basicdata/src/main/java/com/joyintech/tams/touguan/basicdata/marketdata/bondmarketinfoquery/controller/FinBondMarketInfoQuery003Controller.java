@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.List;
 
 @Controller
-@PageId("finBondMarketInfoQuery003")
+@PageId("FinBondMarketInfoQuery003")
 @RequestMapping("/asset/finBondMarketInfoQuery003")
 @Api(tags = "债券市场信息加券")
 public class FinBondMarketInfoQuery003Controller extends BaseController {

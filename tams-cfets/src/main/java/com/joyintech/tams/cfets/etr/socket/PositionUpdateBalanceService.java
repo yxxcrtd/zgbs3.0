@@ -1,5 +1,6 @@
 package com.joyintech.tams.cfets.etr.socket;
 
+import com.joyintech.framework.listener.AppStartupListener;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.cfets.etr.bond.dao.WebSocketMapper;
@@ -9,8 +10,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ApplicationContextEvent;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.ContextStoppedEvent;
 import org.springframework.stereotype.Component;
 
 import java.text.MessageFormat;
@@ -24,7 +30,7 @@ import java.util.concurrent.Executors;
  * mq消息发送与监听实现类
  */
 @Component
-public class PositionUpdateBalanceService implements ApplicationListener<ContextRefreshedEvent> {
+public class PositionUpdateBalanceService implements  ApplicationListener<ApplicationEvent>  {
     private static Logger logger = LoggerFactory.getLogger(PositionUpdateBalanceService.class);
 
     private static final String TABLE_NAME ="tableName";
@@ -37,6 +43,7 @@ public class PositionUpdateBalanceService implements ApplicationListener<Context
     private static final String AMOUNT="AMOUNT";
     private static final String SEC_ACCT_ID = "SEC_ACCT_ID";
     private static final String FINPROD_ID="FINPROD_ID";
+    private static final int INIT_TREAD_NUMBER= 2;
 
 
     private static RabbitTemplate rabbitTemplate;
@@ -57,21 +64,41 @@ public class PositionUpdateBalanceService implements ApplicationListener<Context
 
     public static String QUEUE_POSITION_UPDATE = "queue.position.update.balance";
 
-    private  ExecutorService fixedThreadPool = Executors.newFixedThreadPool(10);
+    private  ExecutorService fixedThreadPool = Executors.newFixedThreadPool(INIT_TREAD_NUMBER);
 
     private static boolean start=true;
+
+    private static boolean stop=false;
+
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+    public void onApplicationEvent(ApplicationEvent applicationEvent) {
+        if(applicationEvent instanceof ContextRefreshedEvent){
+            logger.info("启动头寸余额检测");
+            star();
+        }else if(applicationEvent instanceof ContextClosedEvent ||applicationEvent instanceof ContextStoppedEvent){
+            logger.info("关闭头寸余额检测");
+            stop = true;
+            fixedThreadPool.shutdown();
+            logger.info("关闭头寸线程池");
+        }
+    }
+
+    public void star(){
         if(start){
-            logger.info("监听余额队列启动！");
-            fixedThreadPool.submit(new Runnable() {
-                @Override
-                public void run() {
-                    while (true){
-                        receive();
+            logger.info("监听余额队列启动开始！");
+            for(int i=0;i<INIT_TREAD_NUMBER;i++){
+                fixedThreadPool.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        while (!stop){
+                            receive();
+                        }
+                        logger.info("头寸监听线程结束");
+//                        Thread.currentThread().interrupt();
                     }
-                }
-            });
+                });
+            }
+            logger.info("监听余额队列启动结束！");
             start=false;
         }
     }
@@ -229,4 +256,7 @@ public class PositionUpdateBalanceService implements ApplicationListener<Context
 
         }
     }
+
+
+
 }

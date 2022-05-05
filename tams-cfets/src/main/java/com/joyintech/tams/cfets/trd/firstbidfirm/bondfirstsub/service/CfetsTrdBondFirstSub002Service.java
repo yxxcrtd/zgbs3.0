@@ -208,7 +208,9 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                 }
             }
         }
-        ajaxResult.setErrorList(errorList);
+        if (StringUtil.isNotEmpty(errorList)) {
+            ajaxResult.setErrorList(errorList);
+        }
         return ajaxResult;
     }
 
@@ -231,6 +233,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         });
         param.put("entrustIdList", entrustIdList);
         List<CfetsTrdBondFirstSubInfoDto> listTmp = cfetsTrdBondFirstSub002Mapper.selectSubProducts(param);
+        cfetsTrdBondFirstSubInfoDto = listTmp.get(0);
         // 数据为空或查询结果大于1 返回空值
         if (CollectionUtils.isEmpty(listTmp)
                 || CollectionUtils.isEmpty(cfetsTrdBondFirstSubInfoDto.getProductDtos())
@@ -238,7 +241,6 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             logger.debug("初始化申购页面,查询结果数:" + listTmp.size());
             return null;
         }
-        cfetsTrdBondFirstSubInfoDto = listTmp.get(0);
         //2.汇总认购量 由各组合指令自动带入，默认为各组合指令的剩余指令额度，可修改，修改后不得高于各组合指令的剩余指令额度
         cfetsTrdBondFirstSubInfoDto.setSubscriptionAmount(BigDecimal.ZERO);
         // 本方校验错误类型 0 符合要求 1 存在不同机构 2 存在机构为空
@@ -324,6 +326,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         calRequest.setPs(DictCodeList.交易方向_买入.getValue());
         calRequest.setSecManageAcctId(dto.getProductDtos().get(0).getSecManageAcctId());
         calRequest.setShareAmt(dto.getSubscriptionAmount());
+        calRequest.setFinprodId(dto.getFinprodId());
         List<TrdTradeFeeDetail> trdTradeFeeDetails = ibuQuoteBondCalService.calFee(calRequest);
         if (CollectionUtils.isNotEmpty(trdTradeFeeDetails)) {
             trdTradeFeeDetails.forEach(item -> {

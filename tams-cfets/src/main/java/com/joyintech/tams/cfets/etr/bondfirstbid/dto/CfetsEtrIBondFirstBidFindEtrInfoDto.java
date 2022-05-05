@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 一级投标指令查询请求参数
+ * 一级投标指令查询结果
  * @Author: kchen
  * @Date: 2022/4/20 11:22
  */
@@ -47,11 +47,11 @@ public class CfetsEtrIBondFirstBidFindEtrInfoDto {
     @ApiModelProperty(name="issueClass",value="发行方式",example="报价发行/招标发行/簿记建档")
     private String issueClass;
 
-    @ApiModelProperty(name="issueDate",value="投标日/发行日",example="2021-10-27")
+    @ApiModelProperty(name="issueDate",value="投标日/发行日")
     private Date issueDate;
 
     @ApiModelProperty(name="totalBiddingNum",value="汇总投标券面总额")
-    private String totalBiddingNum;
+    private BigDecimal totalBiddingNum;
 
     @ApiModelProperty(name="bidPrice",value="投标标位",example="1")
     private BigDecimal bidPrice;
@@ -82,6 +82,9 @@ public class CfetsEtrIBondFirstBidFindEtrInfoDto {
 
     @ApiModelProperty(name="remark",value="备注",example="A1")
     private String remark;
+
+    @ApiModelProperty(name="businessModel",value="业务模式",example="A1")
+    private String businessModel;
 
     @ApiModelProperty(name="execFinishAmt",value="已完成指令额度",example="1")
     private BigDecimal execFinishAmt;
@@ -186,11 +189,11 @@ public class CfetsEtrIBondFirstBidFindEtrInfoDto {
         this.issueClass = issueClass;
     }
 
-    public String getTotalBiddingNum() {
+    public BigDecimal getTotalBiddingNum() {
         return totalBiddingNum;
     }
 
-    public void setTotalBiddingNum(String totalBiddingNum) {
+    public void setTotalBiddingNum(BigDecimal totalBiddingNum) {
         this.totalBiddingNum = totalBiddingNum;
     }
 
@@ -320,5 +323,13 @@ public class CfetsEtrIBondFirstBidFindEtrInfoDto {
 
     public void setEtrDate(Date etrDate) {
         this.etrDate = etrDate;
+    }
+
+    public String getBusinessModel() {
+        return businessModel;
+    }
+
+    public void setBusinessModel(String businessModel) {
+        this.businessModel = businessModel;
     }
 }

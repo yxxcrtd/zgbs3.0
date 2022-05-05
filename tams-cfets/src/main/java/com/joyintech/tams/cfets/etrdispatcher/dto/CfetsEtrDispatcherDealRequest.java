@@ -1,6 +1,5 @@
 package com.joyintech.tams.cfets.etrdispatcher.dto;
 
-import com.joyintech.tams.business.common.dto.PageMode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -32,6 +31,9 @@ public class CfetsEtrDispatcherDealRequest {
 
     @ApiModelProperty(name="rekReason",value="退回原因",example="A1",required = true)
     private String rekReason;
+
+    @ApiModelProperty(name = "finprodId", value = "产品编码", example = "字符串1")
+    private String finprodId;
 
     public String getEntrustId() {
         return entrustId;
@@ -79,6 +81,15 @@ public class CfetsEtrDispatcherDealRequest {
 
     public void setRekReason(String rekReason) {
         this.rekReason = rekReason;
+    }
+
+
+    public String getFinprodId() {
+        return finprodId;
+    }
+
+    public void setFinprodId(String finprodId) {
+        this.finprodId = finprodId;
     }
 }
 

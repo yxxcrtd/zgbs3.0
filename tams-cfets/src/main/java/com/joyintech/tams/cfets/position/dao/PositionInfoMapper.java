@@ -33,4 +33,11 @@ public interface PositionInfoMapper {
      * @return
      */
     Map queryTrdPosition(Map RequestDto);
+
+    /**
+     * 查询证券账户
+     * @param map
+     * @return
+     */
+    String qryPortfolioSecAcctId(Map<String, String> map);
 }

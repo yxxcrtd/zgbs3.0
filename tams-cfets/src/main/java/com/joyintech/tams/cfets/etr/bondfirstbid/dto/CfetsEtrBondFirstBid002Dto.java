@@ -6,6 +6,7 @@ import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.common.base.entity.SysUploadFileInfo;
 import com.joyintech.tams.component.business.trade.dto.BussEtrInvestPersonInfoDto;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
+import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -104,6 +105,7 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
      * 多组合汇总指令ID
      */
     @ApiModelProperty(name="totalEtrustId",value="多组合汇总指令ID")
+    @PrimaryKey(value= PrimaryKey.Field.PK_1)
     private String totalEtrustId;
 
     /**
@@ -156,6 +158,12 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
     @Valid
     @ApiModelProperty(name="etrInvestPersonInfo",value="投资人员信息DTO")
     private BussEtrInvestPersonInfoDto etrInvestPersonInfo;
+
+    /**
+     * 选中的数据
+     */
+    @ApiModelProperty(name="selectedItem",value="选中的数据")
+    private transient List<CfetsEtrBondFirstBid002Dto> selectedItem;
 
     public String getElementId() {
         return elementId;
@@ -341,5 +349,13 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
 
     public void setEtrInvestPersonInfo(BussEtrInvestPersonInfoDto etrInvestPersonInfo) {
         this.etrInvestPersonInfo = etrInvestPersonInfo;
+    }
+
+    public List<CfetsEtrBondFirstBid002Dto> getSelectedItem() {
+        return selectedItem;
+    }
+
+    public void setSelectedItem(List<CfetsEtrBondFirstBid002Dto> selectedItem) {
+        this.selectedItem = selectedItem;
     }
 }

@@ -5,6 +5,7 @@ import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.file.SafelyFile;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.select.SelectDto;
@@ -12,10 +13,12 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.asset.bond.dto.*;
+import com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset002Dto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ValidUtils;
 import com.joyintech.tams.common.base.entity.FinCashPlan;
 import com.joyintech.tams.common.base.entity.MstBondCreditRating;
+import com.joyintech.tams.common.base.entity.SysUploadFileInfo;
 import com.joyintech.tams.component.business.asset.BussFinRepaymentService;
 import com.joyintech.tams.component.business.asset.FinPayInterestStdInfoService;
 import com.joyintech.tams.component.business.asset.dto.BussFinRepaymentDto;
@@ -33,7 +36,9 @@ import com.joyintech.tams.invest.common.asset.dto.FinCashPlanDetailDto;
 import com.joyintech.tams.invest.common.asset.dto.FinCashPlanDto;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
+import com.joyintech.tams.invest.common.dto.MstFileInputParameter;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
@@ -41,10 +46,15 @@ import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
+import org.aspectj.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.*;
@@ -76,9 +86,6 @@ public class FinBondAsset002Controller extends BaseController{
     
     @Autowired
     private CommonBusinessService commonBusinessService;
-
-    @Autowired
-    private BusiFinBondRatingInfoService busiFinBondRatingInfoService;
 
     @Autowired
     private FinBondAssetValidatorService finBondAssetValidatorService;
@@ -256,7 +263,8 @@ public class FinBondAsset002Controller extends BaseController{
             return new Message<AjaxResult>().fail().setData(new AjaxResult(br));
         }
         //生成金融产品代码
-        if(StringUtil.equals(dto.getPageModel(), GlobalConstant.DETAIL_PAGE_MODEL_NEW)){
+        dto.setFinprodMarketId(dto.getFinprodMarketId()+dto.getTradeMarketId());
+        if (StringUtil.equals(dto.getOperateStatus(), OperationType.NEW.name())) {
             dto = finBondAssetService.getFinprodId(dto);
         }
         //文件信息
@@ -272,7 +280,7 @@ public class FinBondAsset002Controller extends BaseController{
         WorkFlowParameter<FinBondAssetSaveRequest> params = new WorkFlowParameter<FinBondAssetSaveRequest>();
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
-        params.setBusinessCode(dto.getFinprodMarketId());
+        params.setBusinessCode(FinBondAssetSaveRequest::getFinprodMarketId);
         params.setBusinessType(DictCodeList.共通业务类型_债券类资产信息.getValue());
         // 设置流程业务说明
         params.setComment(entity -> {
@@ -283,6 +291,13 @@ public class FinBondAsset002Controller extends BaseController{
         });
         // 给参数变成ProcessParameter而非WorkFlowParameter
         ProcessParameter<FinBondAssetSaveRequest> parameter = new ProcessParameter<FinBondAssetSaveRequest>();
+        if (StringUtil.equals(dto.getOperateStatus(), OperationType.NEW.name())) {
+            parameter.setOperationType(OperationType.NEW);
+        } else if (StringUtil.equals(dto.getOperateStatus(), OperationType.MODIFY.name())) {
+            parameter.setOperationType(OperationType.MODIFY);
+        }else{
+            parameter.setOperationType(OperationType.DELETE);
+        }
         parameter.setWorkFlowParameter(params);
         // 系统页面表IS_NEED_WORKFLOW 是否走流程，01-是，02-否
         //封装标的类金融产品基础组件需要的DTO
@@ -541,7 +556,7 @@ public class FinBondAsset002Controller extends BaseController{
     @ApiOperation(value = "生成付息计划", notes = "生成付息计划")
     @ResponseBody
     @PostMapping(value = "/generationPlan")
-    public Message<List<BondFinCashPlanDto>> generationPlan(@RequestBody BondFinPayInterestStdInfoRequest dto){
+    public Message<BondFinPayInterestStdInfoResponse> generationPlan(@RequestBody BondFinPayInterestStdInfoRequest dto){
         try {
             // 修改查看初始化
             String finprodId = dto.getFinprodId();
@@ -549,6 +564,7 @@ public class FinBondAsset002Controller extends BaseController{
             List<BondFinCashPlanDto> invList = new ArrayList<>();
             Date maxTradeDate = commonBusinessService.getMaxTradeDate(finprodId);
             dto.setCalendarId(finBondAssetService.getCalendarId(dto.getTradeMarket()));
+            dto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
             if(StringUtil.equals(dto.getAdjPlanFlag(), DictCodeList.共通业务类型_付息计划调整.getValue())){
                 dto.setFinprodType2(dto.getAdjPlanFlag());
             }
@@ -583,14 +599,15 @@ public class FinBondAsset002Controller extends BaseController{
             for (FinCashPlanDto finCashPlan:finCashPlanList){
                 BondFinCashPlanDto bondFinCashPlanDto = new BondFinCashPlanDto();
                 BeanUtil.copyPropertiesIgnoreNull(bondFinCashPlanDto,finCashPlan);
-                List<BondFinCashPlanDto> lirs = new ArrayList<>();
-                for (FinCashPlanDetailDto lirsEntity: finCashPlan.getLirs()) {
+                invList.add(bondFinCashPlanDto);
+            }
+            List<BondFinCashPlanDto> lirs = new ArrayList<>();
+            if (CollectionUtils.isNotEmpty(finCashPlanList)) {
+                for (FinCashPlanDetailDto lirsEntity : finCashPlanList.get(0).getLirs()) {
                     BondFinCashPlanDto lirsDto = new BondFinCashPlanDto();
                     BeanUtil.copyPropertiesIgnoreNull(lirsDto, lirsEntity);
                     lirs.add(lirsDto);
                 }
-                bondFinCashPlanDto.setLirs(lirs);
-                invList.add(bondFinCashPlanDto);
             }
             //排序
             Collections.sort(invList, new Comparator<BondFinCashPlanDto>() {
@@ -599,9 +616,12 @@ public class FinBondAsset002Controller extends BaseController{
                     return o1.getVdate().compareTo(o2.getVdate());
                 }
             });
-            return new Message<List<BondFinCashPlanDto>>().success().setData(invList);
+            BondFinPayInterestStdInfoResponse  response = new BondFinPayInterestStdInfoResponse();
+            response.setInvScheduleList(invList);
+            response.setInvRepayList(lirs);
+            return new Message<BondFinPayInterestStdInfoResponse>().success().setData(response);
         }catch (Exception e){
-            return new Message<List<BondFinCashPlanDto>>().fail().setMessage("付息计划生成异常");
+            return new Message<BondFinPayInterestStdInfoResponse>().fail().setMessage("付息计划生成异常");
         }
     }
 
@@ -683,6 +703,27 @@ public class FinBondAsset002Controller extends BaseController{
             }
         });
         return finCashPlanList;
+    }
+
+    /**
+     * 附件上传
+     * @param file  入参
+     * @return 处理结果
+     * @throws IOException 异常信息
+     */
+    @ApiOperation(value = "附件上传", notes = "附件上传")
+    @ResponseBody
+    @PostMapping(value = "/UploadFile")
+    public Message<SysUploadFileInfo> UploadFile(MultipartFile file) {
+        try {
+            if (StringUtil.isNotEmpty(file)) {
+                SysUploadFileInfo fileInfo = finBondAssetService.getUploadFileInfo(file);
+                return new Message<SysUploadFileInfo>().success().setData(fileInfo);
+            }
+        }catch (Exception e){
+            return new Message<SysUploadFileInfo>().fail().setMessage("文件上传异常");
+        }
+        return null;
     }
 
 }
