@@ -119,9 +119,14 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
     private static final String pageCode = "TenderBondSub";
 
     /**
-     * 页面设置区域id
+     * 页面设置区域id-表格
      */
     private static final String dtCode = "ETRDETINFOLIST";
+
+    /**
+     * 页面设置区域id-表单
+     */
+    private static final String formDtCode = "ETRDETINFO";
 
     /**
      * 通用设置 默认999999
@@ -500,9 +505,10 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
         param.put("ISSUE_CLASS_01", DictCodeListExt4.新债_发行方式_报价发行.getValue());
         param.put("TRADE_STATUS03", DictCodeListExt1.交易状态_撤销.getValue());
         param.put("YN_N", DictCodeListExt1.是否_否.getValue());
+        param.put("entrustIdList",param.get("entrustIds"));
         String loginUserId = LoginUserUtil.getUserName();
         // 测试代码
-        if ("admin".equals(loginUserId)) {
+        if ("admin".equals(loginUserId)||StringUtil.isNotEmpty(loginUserId)) {
             loginUserId = "jp";
         }
         param.put("loginUserId", loginUserId);
@@ -537,7 +543,7 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
         //页面id
         String pageCode = this.pageCode;
         //区域id
-        String dtCode = this.dtCode;
+        String dtCode = this.formDtCode;
         if (CollectionUtils.isEmpty(spcdCodeList)) {
             spcdCodeList = new ArrayList<>();
         }

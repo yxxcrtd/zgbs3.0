@@ -14,6 +14,7 @@ import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.*;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBondFirstSub001Service;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -72,6 +73,8 @@ public class CfetsTrdBondFirstSub001Controller extends BaseController {
         initPageParams.put("ENTRUST_STATUS_04", DictCodeList.委托状态_已完成.getValue());
         // 委托状态_已退回
         initPageParams.put("ENTRUST_STATUS_05", DictCodeList.委托状态_已退回.getValue());
+        // 资金账户类型_托管账户
+        initPageParams.put("acctType_A01", BussinessDictCodeList.资金账户类型_托管账户.getValue());
         // 系统日期
         initPageParams.put("sysDate", iPlatformDate.getSysDateStr());
         // 币种_人民币
@@ -83,7 +86,7 @@ public class CfetsTrdBondFirstSub001Controller extends BaseController {
         // 登记页面id 用于登记撤销
         initPageParams.put("PAGE_ID_BOND_FIRST", "TenderBondSub002");
         //刷新时间
-        initPageParams.put("ibuQuoteBond_etrTable_refresh_period", CacheUtil.getSysParam("ibuQuoteBond_etrTable_refresh_period"));
+        initPageParams.put("ibuQuoteBondFirst_etrTable_refresh_period", CacheUtil.getSysParam("ibuQuoteBond_etrTable_refresh_period"));
         initPageParams.put("effDate", CacheUtil.getSysParam("ibuVar_quoteEffTime"));
         return new Message<>(initPageParams).success();
     }

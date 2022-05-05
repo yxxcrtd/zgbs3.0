@@ -4,6 +4,7 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.entity.ProcessMark;
+import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
@@ -232,6 +233,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             entrustIdList.add(item.getEntrustId());
         });
         param.put("entrustIdList", entrustIdList);
+        this.setParam(param);
         List<CfetsTrdBondFirstSubInfoDto> listTmp = cfetsTrdBondFirstSub002Mapper.selectSubProducts(param);
         cfetsTrdBondFirstSubInfoDto = listTmp.get(0);
         // 数据为空或查询结果大于1 返回空值
@@ -264,6 +266,40 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         this.calAmtAndFee(cfetsTrdBondFirstSubInfoDto);
         logger.debug("初始化申购页面,结果:" + JsonUtils.object2Json(cfetsTrdBondFirstSubInfoDto));
         return cfetsTrdBondFirstSubInfoDto;
+    }
+
+    /**
+     * 添加或删除申购产品列表数据
+     *
+     * @param request 页面元素
+     * @return com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto
+     * @author jiangpeng
+     * @date 2022/5/5 16:08
+     */
+    public CfetsTrdBondFirstSubInfoDto addOrDelList(CfetsTrdBondFirstSubInfoDto request) {
+        // 本方校验错误类型 0 符合要求 1 存在不同机构 2 存在机构为空
+        int errorType = 0;
+        String partyId = null;
+        String isSupportCstpFlagBondfirst = CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST");
+        for (CfetsTrdBondFirstSubProductDto product : request.getProductDtos()) {
+            request.setSubscriptionAmount(ArithmeticUtil.doAdd(request.getSubscriptionAmount(), product.getSubscriptionAmount()));
+            if (StringUtil.isEmpty(product.getPartyId())) {
+                errorType = 2;
+            }
+            if (StringUtil.isNotEmpty(partyId) && !StringUtil.equals(partyId, product.getPartyId()) && errorType != 2) {
+                errorType = 1;
+            }
+            partyId = product.getPartyId();
+        }
+        if (errorType == 0) {
+            request.setOuPartyId(partyId);
+        }
+        // 【应缴款金额】=发行价格*认购量*10000/100 【结算服务费】，根据银行间债券交易费用规则计算
+        this.calAmtAndFee(request);
+        // 自动分配
+        request.setProductDtos(this.autoAllocation(request));
+        logger.debug("初始化申购页面,结果:" + JsonUtils.object2Json(request));
+        return request;
     }
 
     /**
@@ -348,6 +384,10 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      */
     public List<CfetsTrdBondFirstSubProductDto> autoAllocation(CfetsTrdBondFirstSubInfoDto autoRequest) {
         logger.debug("自动分配,入参:" + JsonUtils.object2Json(autoRequest));
+        if (StringUtil.isEmpty(autoRequest.getDipType())) {
+            logger.debug("自动分配,分配方式为空");
+            return new ArrayList<>();
+        }
         BigDecimal subscriptionAmount = autoRequest.getSubscriptionAmount();
         // 剩余指令额度不为0的数据
         List<CfetsTrdBondFirstSubProductDto> list = new ArrayList<>();
@@ -526,7 +566,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                     feeAmountDetail = feeTailDifference;
                 }
             }
-            if (BigDecimalUtil.isZero(item.getSubscriptionAmount()) || item.getSubscriptionAmount() == null) {
+            if (item.getSubscriptionAmount() == null || BigDecimalUtil.isZero(item.getSubscriptionAmount())) {
                 // 认购量为0时,不分配应缴款金额和结算服务费
                 payableAmountDetail = BigDecimal.ZERO;
                 feeAmountDetail = BigDecimal.ZERO;
@@ -1009,6 +1049,12 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         param.put("ISSUE_CLASS_01", DictCodeListExt4.新债_发行方式_报价发行.getValue());
         param.put("TRADE_STATUS03", DictCodeListExt1.交易状态_撤销.getValue());
         param.put("YN_N", DictCodeListExt1.是否_否.getValue());
+        String loginUserId = LoginUserUtil.getUserName();
+        // 测试代码
+        if ("admin".equals(loginUserId) || StringUtil.isNotEmpty(loginUserId)) {
+            loginUserId = "jp";
+        }
+        param.put("loginUserId", loginUserId);
     }
 
     /**
@@ -1099,7 +1145,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                     break;
                 }
                 // 认购量为0时,不分配应缴款金额和结算服务费
-                if (BigDecimalUtil.isZero(item.getSubscriptionAmount()) || item.getSubscriptionAmount() == null) {
+                if (item.getSubscriptionAmount() == null || BigDecimalUtil.isZero(item.getSubscriptionAmount())) {
                     continue;
                 }
                 // 应缴款金额分配值
