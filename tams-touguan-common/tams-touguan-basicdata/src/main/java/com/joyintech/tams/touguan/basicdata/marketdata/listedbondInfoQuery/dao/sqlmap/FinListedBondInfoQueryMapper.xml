@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dao.FinWindMarketInfoQueryMapper">
+<mapper namespace="com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dao.FinListedBondInfoQueryMapper">
 
     <select id="queryForPage"
-            resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinWindMarketInfoQuery001Dto"
-            parameterType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinWindMarketInfoQueryRequest">
+            resultType="com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.dto.FinListedBondInfoQuery001Dto"
+            parameterType="com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.req.FinListedBondInfoQueryRequest">
         SELECT * FROM (
         SELECT SEC_INFO.SEC_ID secId,
         SEC_INFO.BOND_NAME bondName,
@@ -21,9 +21,11 @@
 
         nvl(RDI_RELEASE_INFO.ISSUE_SIZE * 10000 , ROUND(RELEASE_INFO.ISSUE_SIZE / 10000, 2)) as issueSize,
 
-        nvl(TO_DATE(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd')) as issueDate,
+        nvl(TO_DATE(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd')) as
+        issueDate,
 
-        nvl(TO_DATE(RDI_RELEASE_INFO.EVENT_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.PAYMENT_DEADLINE, 'yyyy-MM-dd'))  as eventDate,
+        nvl(TO_DATE(RDI_RELEASE_INFO.EVENT_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.PAYMENT_DEADLINE, 'yyyy-MM-dd')) as
+        eventDate,
 
         TO_DATE(RELEASE_INFO.DEBT_REGISTRATION_DATE, 'yyyy-MM-dd') as debtRegistrationDate,
 
@@ -31,7 +33,8 @@
         RELEASE_INFO.LISTING_CODE as listingCode,
         SEC_INFO.CROSS_MARKET_CODE as crossMarketCode,
 
-        nvl(TO_DATE(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd')) as interestAccrualDate,
+        nvl(TO_DATE(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.INTEREST_ACCRUAL_DATE,
+        'yyyy-MM-dd')) as interestAccrualDate,
 
         SEC_INFO.VALUE_DATE valueDate,
         SEC_INFO.EXPIRY_DATE expiryDate,
@@ -43,10 +46,12 @@
         SEC_INFO.CURRENCY,
 
         nvl(RDI_RELEASE_INFO.ISSUE_PX, RELEASE_INFO.ISSUE_PX) as issuePx,
-        nvl(RDI_RELEASE_INFO.STIPULATION_VALUE, RELEASE_INFO.STIPULATION_VALUE) as  stipulationValue,
+        nvl(RDI_RELEASE_INFO.STIPULATION_VALUE, RELEASE_INFO.STIPULATION_VALUE) as stipulationValue,
 
-        nvl(RDI_RELEASE_INFO.SINGLE_MIN_SUB_AMT * 10000, ROUND(RELEASE_INFO.SINGLE_MAX_SUB_AMT / 10000, 2)) as singleMinSubAmt,
-        nvl(RDI_RELEASE_INFO.SINGLE_MAX_SUB_AMT * 10000, ROUND(RELEASE_INFO.SINGLE_MAX_SUB_AMT / 10000, 2)) as singleMaxSubAmt,
+        nvl(RDI_RELEASE_INFO.SINGLE_MIN_SUB_AMT * 10000, ROUND(RELEASE_INFO.SINGLE_MAX_SUB_AMT / 10000, 2)) as
+        singleMinSubAmt,
+        nvl(RDI_RELEASE_INFO.SINGLE_MAX_SUB_AMT * 10000, ROUND(RELEASE_INFO.SINGLE_MAX_SUB_AMT / 10000, 2)) as
+        singleMaxSubAmt,
         RDI_RELEASE_INFO.REMARK as REMARK
         FROM INTERF_WIND_UNRELEASE_SEC_INFO SEC_INFO
         LEFT JOIN INTERF_WIND_RELEASE_INFO RELEASE_INFO ON SEC_INFO.SEC_ID = RELEASE_INFO.SEC_ID
@@ -162,17 +167,18 @@
                 SEC_INFO.RATING like '%' || #{search} || '%'
                 )
             </if>
-        </where>)
+        </where>
+        )
         ORDER BY PRIMARYCLASSIFICATION,
-                 SECONDARYCLASSIFICATION,
-                 ISSUEDATE,
-                 SECID
+        SECONDARYCLASSIFICATION,
+        ISSUEDATE,
+        SECID
     </select>
 
 
     <select id="queryFinWindMarketForCoupons"
-            resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinWindMarketInfoQuery001Dto"
-            parameterType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinWindMarketInfoQueryRequest">
+            resultType="com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.dto.FinListedBondInfoQuery001Dto"
+            parameterType="com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.req.FinListedBondInfoQueryRequest">
         SELECT
         SEC_INFO.SEC_ID secId,
         SEC_INFO.BOND_NAME bondName,
@@ -186,15 +192,17 @@
         SEC_INFO.TRADING_CALENDAR tradingCalendar,
         SEC_INFO.SPECIAL_TERMS specialTerms,
         RELEASE_INFO.RELEASE_TYPE releaseType,
+        RDI_RELEASE_INFO.FACE_VALUE faceValue,
+        RDI_RELEASE_INFO.DAY_COUNT dayCount,
 
         nvl(RDI_RELEASE_INFO.ISSUE_METHOD,RELEASE_INFO.ISSUING_METHOD) as issueMethod,
 
-        RELEASE_INFO.BIDDING_METHOD  as biddingMethod,
+        RELEASE_INFO.BIDDING_METHOD as biddingMethod,
         RELEASE_INFO.TENDER_TARGET as tenderTarget,
-        RELEASE_INFO.ADDITIONAL_BATCHES  as  additionalBatches,
+        RELEASE_INFO.ADDITIONAL_BATCHES as additionalBatches,
 
         nvl(RDI_RELEASE_INFO.ISSUE_SIZE * 100000000, ROUND(RELEASE_INFO.ISSUE_SIZE, 2)) as issueSize,
-        nvl(TO_DATE(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd'))as issueDate,
+        nvl(TO_DATE(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd')) as issueDate,
         nvl(TO_DATE(RDI_RELEASE_INFO.EVENT_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.PAYMENT_DEADLINE, 'yyyy-MM-dd')) as eventDate,
         RELEASE_INFO.DEBT_REGISTRATION_DATE AS debtRegistrationDate,
 
@@ -202,7 +210,8 @@
         RELEASE_INFO.LISTING_CODE AS listingCode,
         SEC_INFO.CROSS_MARKET_CODE AS crossMarketCode,
 
-        nvl(TO_DATE(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd')) as interestAccrualDate,
+        nvl(TO_DATE(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.INTEREST_ACCRUAL_DATE,
+        'yyyy-MM-dd')) as interestAccrualDate,
 
         SEC_INFO.VALUE_DATE valueDate,
         SEC_INFO.EXPIRY_DATE expiryDate,
@@ -228,8 +237,8 @@
 
         RELEASE_INFO.ISSUE_START_TIME AS issueStartTime,
         RELEASE_INFO.ISSUE_END_TIME AS issueEndTime,
-        RELEASE_INFO.BID_DATE  as bidDate,
-        RELEASE_INFO.ADDITIONAL_TENDER_DATE  as additionalTenderDate,
+        RELEASE_INFO.BID_DATE as bidDate,
+        RELEASE_INFO.ADDITIONAL_TENDER_DATE as additionalTenderDate,
 
         nvl(RDI_RELEASE_INFO.MAX_SUB_AMT * 100000000, RELEASE_INFO.MAX_SUB_AMT) as maxSubAmt,
         nvl(RDI_RELEASE_INFO.MIN_PER_TENDER_AMT * 100000000, RELEASE_INFO.MIN_PER_TENDER_AMT) as minPerTenderAmt,
@@ -247,19 +256,56 @@
         FROM
         INTERF_WIND_UNRELEASE_SEC_INFO SEC_INFO --wind一级未发行债券信息接口表
         LEFT JOIN INTERF_WIND_RELEASE_INFO RELEASE_INFO ON SEC_INFO.SEC_ID = RELEASE_INFO.SEC_ID --wind一级未发行债券发行信息接口表
-        LEFT JOIN (SELECT * FROM INTERF_RDI_RELEASE_INFO where SECURITY_TYPE in('CD','14')) RDI_RELEASE_INFO ON RDI_RELEASE_INFO.SECURITY_ID = SEC_INFO.SEC_ID --银行间债券再发行信息接口表
+        LEFT JOIN (SELECT * FROM INTERF_RDI_RELEASE_INFO where SECURITY_TYPE in('CD','14')) RDI_RELEASE_INFO ON
+        RDI_RELEASE_INFO.SECURITY_ID = SEC_INFO.SEC_ID --银行间债券再发行信息接口表
         <where>
-            SEC_INFO.VALUE_DATE  <![CDATA[ < ]]> to_date(#{platformDate}, '%Y-%m-%d')
+            SEC_INFO.VALUE_DATE  <![CDATA[ < ]]> to_date(#{platformDate}, 'yyyy-MM-dd')
 
             <if test="secId !=null and secId !=''">
                 AND SEC_INFO.SEC_ID = #{secId,jdbcType=VARCHAR}
             </if>
 
-            <if test="bondAbbreviation !=null and bondAbbreviation !=''">
-                AND SEC_INFO.BOND_ABBREVIATION = #{bondAbbreviation,jdbcType=VARCHAR}
+            <if test="secName !=null and secName !=''">
+                AND SEC_INFO.BOND_ABBREVIATION = #{secName,jdbcType=VARCHAR}
             </if>
 
         </where>
     </select>
 
+    <select id="getWindType" resultType="com.joyintech.tams.common.base.entity.FinProductTypeConfig">
+        SELECT
+        SEQNO,
+        CONFIG_TYPE configType,
+        INPUT_VALUE_1 inputValue1,
+        INPUT_VALUE_1 inputValue2,
+        INPUT_VALUE_1 inputValue3,
+        INPUT_VALUE_1 inputValue4,
+        INPUT_VALUE_1 inputValue5,
+        OUTPUT_VALUE_1 outputValue1,
+        OUTPUT_VALUE_2 outputValue2,
+        OUTPUT_VALUE_3 outputValue3,
+        OUTPUT_VALUE_4 outputValue4,
+        OUTPUT_VALUE_5 outputValue5
+        FROM FIN_PRODUCT_TYPE_CONFIG
+        WHERE CONFIG_TYPE = #{configType}
+        <if test="inputValue1 != null and inputValue1 != ''">
+            AND INPUT_VALUE_1 = #{inputValue1}
+        </if>
+        <if test="inputValue2 != null and inputValue2 != ''">
+            AND INPUT_VALUE_2 = #{inputValue2}
+        </if>
+        <if test="inputValue3 != null and inputValue3 != ''">
+            AND INPUT_VALUE_3 = #{inputValue3}
+        </if>
+        <if test="outputValue1 != null and outputValue1 != ''">
+            AND OUTPUT_VALUE_1 = #{outputValue1}
+        </if>
+        <if test="outputValue2 != null and outputValue2 != ''">
+            AND OUTPUT_VALUE_2 = #{outputValue2}
+        </if>
+        <if test="outputValue3 != null and outputValue3 != ''">
+            AND OUTPUT_VALUE_3 = #{outputValue3}
+        </if>
+        and ROWNUM = 1
+    </select>
 </mapper>

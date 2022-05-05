@@ -1,4 +1,4 @@
-package com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto;
+package com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.dto.BaseDto;
@@ -14,11 +14,11 @@ import java.util.Date;
  *
  * @author zhuys
  * @version 1.0 2022年4月18日
- * @see FinWindMarketInfoQuery001Dto
+ * @see FinListedBondInfoQuery001Dto
  * @since 1.0
  */
 @ApiModel(value = "待上市债券市场列表信息查看", description = "待上市债券市场列表信息查看")
-public class FinWindMarketInfoQuery001Dto extends BaseDto {
+public class FinListedBondInfoQuery001Dto extends BaseDto {
 
     @ApiModelProperty(name = "secId", value = "债券ID/资产代码")
     private String secId;
@@ -91,7 +91,7 @@ public class FinWindMarketInfoQuery001Dto extends BaseDto {
     private Date debtRegistrationDate;
 
     @ApiModelProperty(name = "listingDate", value = "上市日")
-    private String listingDate;
+    private Date listingDate;
 
     @ApiModelProperty(name = "listingCode", value = "上市代码")
     private String listingCode;
@@ -201,6 +201,15 @@ public class FinWindMarketInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "maxTotalTenderAmt", value = "最高投标总量")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal maxTotalTenderAmt;
+
+    @ApiModelProperty(name = "faceValue", value = "面值")
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal faceValue;
+
+    @ApiModelProperty(name = "dayCount", value = "计息基准")
+    private String dayCount;
+
+
 
     public String getSecId() {
         return secId;
@@ -386,11 +395,11 @@ public class FinWindMarketInfoQuery001Dto extends BaseDto {
         this.debtRegistrationDate = debtRegistrationDate;
     }
 
-    public String getListingDate() {
+    public Date getListingDate() {
         return listingDate;
     }
 
-    public void setListingDate(String listingDate) {
+    public void setListingDate(Date listingDate) {
         this.listingDate = listingDate;
     }
 
@@ -648,5 +657,21 @@ public class FinWindMarketInfoQuery001Dto extends BaseDto {
 
     public void setMaxTotalTenderAmt(BigDecimal maxTotalTenderAmt) {
         this.maxTotalTenderAmt = maxTotalTenderAmt;
+    }
+
+    public BigDecimal getFaceValue() {
+        return faceValue;
+    }
+
+    public void setFaceValue(BigDecimal faceValue) {
+        this.faceValue = faceValue;
+    }
+
+    public String getDayCount() {
+        return dayCount;
+    }
+
+    public void setDayCount(String dayCount) {
+        this.dayCount = dayCount;
     }
 }

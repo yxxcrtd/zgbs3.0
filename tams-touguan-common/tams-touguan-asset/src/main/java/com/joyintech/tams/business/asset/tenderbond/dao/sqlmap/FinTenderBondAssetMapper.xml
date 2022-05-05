@@ -60,7 +60,7 @@
             PRODUCT_TYPE.TYPE_11 as type11,
             PRODUCT.COUPON_SPECIES as couponSpecies,
             PRODUCT.CCY as ccy,
-            PRODUCT.ISSUE_PRICE as issuePrice,
+            ISSUE.ISSUE_PRICE as issuePrice,
             ISSUE.INT_TYPE as intType,
             ISSUE.PAY_CYCLE as payCycle,
             ISSUE.REFER_YIELD as referYield ,

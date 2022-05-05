@@ -103,6 +103,8 @@
         <result column="EXTEND1" property="extend1" jdbcType="VARCHAR"/>
         <result column="EXTEND2" property="extend2" jdbcType="VARCHAR"/>
         <result column="ENTRUST_CLASS" property="entrustClass" jdbcType="VARCHAR"/>
+        <result column="DELIVERY_RESULT" property="deliveryResult" jdbcType="VARCHAR"/>
+        <result column="DELIVERY_SCHEDULE" property="deliverySchedule" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Example_Where_Clause">
@@ -248,6 +250,53 @@
         from T_TRADEHISTORY a left join T_INSTRUCTION_HISTORY b on a.INSTRUCTION_ID =b.ENTRUST_ID
         <include refid="queryCondition2"/>
         order by CREATE_TIME desc
+    </select>
+    <select id="selectHistoryTradeByPage" resultMap="QueryResultMap" parameterType="com.joyintech.tams.exchange.common.bean.TradeQryBean">
+	SELECT decode(TT.INSTRUCTION_ID, NULL, A.INSTRUCTION_ID)   INSTRUCTION_ID,
+		   STD.APPLY_TRADE_ID                                  BROKER_ENTRUST_ID,
+		   STD.CJBH                                            BROKER_TRADE_ID,
+		   TT.PORTFOLIO_NAME                                   PORTFOLIO_NAME,
+		   SCI.ACCT_NAME                                       ACCOUNT_NAME,
+		   STD.TRADE_MARKET                                    MARKET_STR,
+		   FP.FINPROD_MARKET_ID                                STOCK_CODE,
+		   FP.FINPROD_ABBR                                     STOCK_NAME,
+		   EE.ENTRUST_CLASS                                    BUSI_TYPE_TGSTR,
+		   DECODE(TT.PS, NULL, A.PS)                           ENTRUST_BSSTR,
+		   DECODE(TT.TRADED_VOLUME, NULL, A.TRADED_VOLUME)     TRADED_VOLUME,
+		   DECODE(TT.TRADED_PRICE, NULL, A.TRADED_PRICE)       TRADED_PRICE,
+		   DECODE(TT.CLEAR_BALANCE, NULL, A.CLEAR_BALANCE)     TRADED_BALANCE,
+		   DECODE(TT.TRADING_DAY, NULL, A.TRADING_DAY)         TRADING_DAY,
+		   DECODE(TT.TRADE_TIME, NULL, A.TRADE_TIME)           DEAL_TIME,
+		   CASE
+			  WHEN STD.DELIVERY_RESULT IS NULL THEN '未交收'
+			  WHEN STD.DELIVERY_RESULT = '01'  THEN '正常交收'
+			  WHEN STD.DELIVERY_RESULT = '02'  THEN '部分交收'  
+			  WHEN STD.DELIVERY_RESULT = '03'  THEN '交收失败' 
+			  WHEN STD.DELIVERY_RESULT = '04'  THEN '未交收' 
+			END                                                DELIVERY_RESULT,
+			CASE
+			  WHEN STD.DELIVERY_RESULT IS NULL THEN '0'
+			  WHEN STD.DELIVERY_RESULT = '04' THEN  '0'
+			  ELSE STD.SHARE_AMT / TT.TRADED_VOLUME || '%'
+			END                                                DELIVERY_SCHEDULE
+	  FROM SETTLE_TRANS_DATA STD
+	  LEFT JOIN T_TRADE TT ON (TT.BROKER_TRADE_ID = STD.TRADE_ID AND TT.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TT.TRADE_TIME = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))
+	  LEFT JOIN T_TRADEHISTORY A ON (A.BROKER_TRADE_ID = STD.CJBH AND A.SEC_ACCT_ID = STD.SEC_ACCT_ID AND A.TRADE_TIME = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))
+	  LEFT JOIN FIN_PRODUCT FP ON STD.FINPROD_ID = FP.FINPROD_ID
+	  LEFT JOIN STL_CAPACCT_INFO SCI ON STD.ACCT_NO = SCI.ACCT_NO
+	  LEFT JOIN ETR_ENTRUST EE ON TT.INSTRUCTION_ID = EE.ENTRUST_ID
+	  LEFT JOIN ETR_ENTRUST_DETAIL EED ON EE.ENTRUST_ID = EED.ENTRUST_ID
+	  LEFT JOIN PTL_PORTFOLIO PP ON EED.PORTFOLIO_ID = PP.PORTFOLIO_ID
+	 WHERE STD.DELIVERY_RESULT IN ('01', '02', '03')
+	   AND ((STD.PS = 'T56' AND STD.TRADE_MARKET = '03' AND STD.BUSI_SCENE_CALSS NOT IN ('0902RB02', '0902RS03'))
+                OR (STD.PS = 'T56' AND STD.TRADE_MARKET = '04') OR (STD.PS != 'T56'))
+        <if test="startDay != null and startDay != ''">
+            AND TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD') &gt;= #{startDay}
+        </if>
+        <if test="endDay != null and endDay != ''">
+            AND TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD') &lt;= #{endDay}
+        </if>
+       order by STD.CREATE_TIME desc
     </select>
 
     <delete id="deleteByExample" parameterType="com.joyintech.tams.exchange.common.db.domain.TradeHistoryExample">

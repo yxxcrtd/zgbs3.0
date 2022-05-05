@@ -49,11 +49,11 @@ public class CfetsTrdBondFirstDaySubDto {
     @ApiModelProperty(name = "rate", value = "参考收益率/票面利率", example = "99.0000")
     private BigDecimal rate;
 
-    @ApiModelProperty(name = "issueType", value = "发行方式")
-    private String issueType;
+    @ApiModelProperty(name = "issueClass", value = "发行方式")
+    private String issueClass;
 
-    @ApiModelProperty(name = "issueTypeStr", value = "发行方式名称,展示用")
-    private String issueTypeStr;
+    @ApiModelProperty(name = "issueClassStr", value = "发行方式名称,展示用")
+    private String issueClassStr;
 
     @ApiModelProperty(name = "issueDate", value = "发行日")
     private Date issueDate;
@@ -191,23 +191,23 @@ public class CfetsTrdBondFirstDaySubDto {
         this.rate = rate;
     }
 
-    public String getIssueType() {
-        return issueType;
+    public String getIssueClass() {
+        return issueClass;
     }
 
-    public void setIssueType(String issueType) {
-        this.issueType = issueType;
+    public void setIssueClass(String issueClass) {
+        this.issueClass = issueClass;
     }
 
-    public String getIssueTypeStr() {
-        if (StringUtil.isEmpty(getIssueType())) {
+    public String getIssueClassStr() {
+        if (StringUtil.isEmpty(getIssueClass())) {
             return StringUtil.EMPTY;
         }
-        return SysDataUtil.getNameFromDataDict(DictCode.发行方式, getIssueType());
+        return SysDataUtil.getNameFromDataDict(DictCode.新债_发行方式, getIssueClass());
     }
 
-    public void setIssueTypeStr(String issueTypeStr) {
-        this.issueTypeStr = issueTypeStr;
+    public void setIssueClassStr(String issueClassStr) {
+        this.issueClassStr = issueClassStr;
     }
 
     public Date getIssueDate() {

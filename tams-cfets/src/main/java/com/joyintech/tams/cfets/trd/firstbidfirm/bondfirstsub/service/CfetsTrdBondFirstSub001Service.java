@@ -121,7 +121,7 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
     /**
      * 页面设置区域id
      */
-    private static final String dtCode = "ETRDETINFO";
+    private static final String dtCode = "ETRDETINFOLIST";
 
     /**
      * 通用设置 默认999999
@@ -147,8 +147,7 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
     /**
      * 查询指令列表
      *
-     * @param dto         入参 画面元素
-     * @param loginUserId 登录用户
+     * @param pageParam 入参
      * @return java.util.List<com.joyintech.tams.cfets.bankuplink.bond.dto.EntrustDto>
      * @author jiangpeng
      * @date 2022/4/18 15:01
@@ -501,6 +500,12 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
         param.put("ISSUE_CLASS_01", DictCodeListExt4.新债_发行方式_报价发行.getValue());
         param.put("TRADE_STATUS03", DictCodeListExt1.交易状态_撤销.getValue());
         param.put("YN_N", DictCodeListExt1.是否_否.getValue());
+        String loginUserId = LoginUserUtil.getUserName();
+        // 测试代码
+        if ("admin".equals(loginUserId)) {
+            loginUserId = "jp";
+        }
+        param.put("loginUserId", loginUserId);
     }
 
     /**
@@ -514,8 +519,8 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
         if (pageMode == null) {
             pageMode = new PageMode();
         }
-        int pageNo = StringUtil.isNotEmpty(pageMode.getPageNo()) ? pageMode.getPageNo() : 1;//默认第一页
-        int pageSize = StringUtil.isNotEmpty(pageMode.getPageSize()) ? pageMode.getPageSize() : 10;//默认每页10条
+        int pageNo = StringUtil.isNotEmpty(pageMode.getPageNo()) && pageMode.getPageNo() != 0 ? pageMode.getPageNo() : 1;//默认第一页
+        int pageSize = StringUtil.isNotEmpty(pageMode.getPageSize()) && pageMode.getPageSize() != 0 ? pageMode.getPageSize() : 10;//默认每页10条
         pageMode.setPageNo(pageNo);
         pageMode.setPageSize(pageSize);
         return pageMode;
