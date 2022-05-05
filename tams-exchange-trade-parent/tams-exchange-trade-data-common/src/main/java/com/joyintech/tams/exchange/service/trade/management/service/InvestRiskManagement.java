@@ -215,13 +215,12 @@ public class InvestRiskManagement extends BaseService {
         List<ReqRiskTrigger> list = Lists.newArrayList();
         ReqRiskTrigger reqRiskOccupy;
         for (PortfolioCalculateResponse calculateResponse : calculateList) {
-            reqRiskOccupy = createReqRiskExamine(entrust, instruction, calculateResponse);
-            list.add(reqRiskOccupy);
+            list.add(createReqRiskExamine(entrust, instruction, calculateResponse, portfolioNum));
         }
         return list;
     }
 
-    private ReqRiskTrigger createReqRiskExamine(EntrustInterface entrust, Instruction instruction, PortfolioCalculateResponse calculateResponse) {
+    private ReqRiskTrigger createReqRiskExamine(EntrustInterface entrust, Instruction instruction, PortfolioCalculateResponse calculateResponse, int portfolioNum) {
 
         String instructionId = instruction.getId();
         String tradeId = instruction.getTradeId();
@@ -236,7 +235,11 @@ public class InvestRiskManagement extends BaseService {
         String entrustProp = entrust.getEntrustProp();
 
         ReqRiskTrigger reqRiskExamine = new ReqRiskTrigger();
-        reqRiskExamine.setEntrustCode(instructionId);
+        if (portfolioNum > 1) {
+            reqRiskExamine.setEntrustCode(StrUtil.format("{}-{}", instructionId, portfolioId));
+        } else {
+            reqRiskExamine.setEntrustCode(instructionId);
+        }
         String eventDate = convertDateFormat(entrust.getTradingDay());
         reqRiskExamine.setEventDate(eventDate);
         reqRiskExamine.setEventId(StrUtil.format("{}-{}-{}", instructionId, portfolioId, id));
@@ -411,16 +414,16 @@ public class InvestRiskManagement extends BaseService {
         ReqRiskOccupy reqRiskOccupy;
         for (PortfolioCalculateResponse item : calculateList) {
             if (CHECK_FLAG.equals(checkOrRelease)) {
-                reqRiskOccupy = createReqRiskOccupy2RiskCheck(entrust, instruction, item);
+                list.add(createReqRiskOccupy2RiskCheck(entrust, instruction, item, portfolioNum));
             } else {
-                reqRiskOccupy = createReqRiskOccupy2RiskRelease(entrust, instruction, item);
+                list.add(createReqRiskOccupy2RiskRelease(entrust, instruction, item, portfolioNum));
             }
             list.add(reqRiskOccupy);
         }
         return list;
     }
 
-    private ReqRiskOccupy createReqRiskOccupy2RiskCheck(OrderInterface entrust, Instruction instruction, PortfolioCalculateResponse calculateResponse) {
+    private ReqRiskOccupy createReqRiskOccupy2RiskCheck(OrderInterface entrust, Instruction instruction, PortfolioCalculateResponse calculateResponse, int portfolioNum) {
         logger.debug("createReqRiskOccupy2RiskCheck() called with parameters => 【entrust = {}】, 【instruction = {}】, 【calculateResponse = {}】", entrust, instruction, calculateResponse);
         ReqRiskOccupy reqRiskOccupy = new ReqRiskOccupy();
 
@@ -440,7 +443,11 @@ public class InvestRiskManagement extends BaseService {
         reqRiskOccupy.setTradeNum(entrustNum);
         reqRiskOccupy.setPriceAmt(entrustPrice);
 
-        reqRiskOccupy.setEntrustCode(instructionId);
+        if (portfolioNum > 1) {
+            reqRiskOccupy.setEntrustCode(StrUtil.format("{}-{}", instructionId, portfolioId));
+        } else {
+            reqRiskOccupy.setEntrustCode(instructionId);
+        }
         reqRiskOccupy.setEventDate(convertDateFormat(entrust.getTradingDay()));
         reqRiskOccupy.setEventId(StrUtil.format("{}-{}-{}", instructionId, portfolioId, id));
         reqRiskOccupy.setPortfolioCode(portfolioId);
@@ -518,9 +525,9 @@ public class InvestRiskManagement extends BaseService {
         return reqRiskOccupy;
     }
 
-    private ReqRiskOccupy createReqRiskOccupy2RiskRelease(OrderInterface order, Instruction instruction, PortfolioCalculateResponse calculateResponse) {
+    private ReqRiskOccupy createReqRiskOccupy2RiskRelease(OrderInterface order, Instruction instruction, PortfolioCalculateResponse calculateResponse, int portfolioNum) {
         logger.debug("createReqRiskOccupy2RiskRelease() called with parameters => 【order = {}】, 【instruction = {}】, 【calculateResponse = {}】", order, instruction, calculateResponse);
-        ReqRiskOccupy reqRiskOccupy = createReqRiskOccupy2RiskCheck(order, instruction, calculateResponse);
+        ReqRiskOccupy reqRiskOccupy = createReqRiskOccupy2RiskCheck(order, instruction, calculateResponse, portfolioNum);
 
         String instructionId = instruction.getEntrustId();
 
