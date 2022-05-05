@@ -21,7 +21,6 @@ import com.joyintech.tams.exchange.common.utils.IntegratedEntrustUtils;
 import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionPledgeService;
-import com.joyintech.tams.exchange.datacommon.db.service.InstrumentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +36,6 @@ public class MessageSenderService {
     private static final Logger logger = LoggerFactory.getLogger(MessageSenderService.class);
     @Autowired
     private InstructionPledgeService instructionPledgeService;
-    @Autowired
-    private InstrumentService instrumentService;
 
     /**
      * 推送成交数据
