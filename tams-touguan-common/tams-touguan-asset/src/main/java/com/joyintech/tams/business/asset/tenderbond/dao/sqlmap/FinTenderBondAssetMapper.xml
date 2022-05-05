@@ -60,7 +60,7 @@
             PRODUCT_TYPE.TYPE_11 as type11,
             PRODUCT.COUPON_SPECIES as couponSpecies,
             PRODUCT.CCY as ccy,
-            PRODUCT.ISSUE_PRICE as issuePrice,
+            ISSUE.ISSUE_PRICE as issuePrice,
             ISSUE.INT_TYPE as intType,
             ISSUE.PAY_CYCLE as payCycle,
             ISSUE.REFER_YIELD as referYield ,
@@ -423,20 +423,18 @@
     <select id="getAppearMarketIdForSelect" resultMap="finprodIdMap">
         select t.* from (
             SELECT
-                case when PRODUCT.CIRCULATION_CODE is not null then PRODUCT2.FINPROD_MARKET_ID else PRODUCT_ADD.APPEAR_MARKET_ID end as id,
-                case when PRODUCT.CIRCULATION_CODE is not null then PRODUCT2.FINPROD_ABBR else PRODUCT.FINPROD_ABBR end as text,
+                PRODUCT.FINPROD_MARKET_ID as id,
+                PRODUCT.FINPROD_ABBR as text,
                 PRODUCT.TRADE_MARKET,
                 PRODUCT.VDATE,
                 PRODUCT.MDATE,
                 PRODUCT.FINPROD_TYPE2
             FROM FIN_PRODUCT PRODUCT
-            LEFT JOIN FIN_PRODUCT_ADD PRODUCT_ADD ON PRODUCT.FINPROD_ID = PRODUCT_ADD.FINPROD_ID
-            LEFT JOIN FIN_PRODUCT PRODUCT2 ON PRODUCT.CIRCULATION_CODE = PRODUCT2.FINPROD_ID
         ) t
         <where>
             AND t.VDATE <![CDATA[<=]]> #{platDate,jdbcType=DATE}
             AND t.MDATE <![CDATA[>=]]> #{platDate,jdbcType=DATE}
-            AND t.TRADE_MARKET in(#{TRADE_PLACE_01},#{TRADE_PLACE_02})
+            AND t.FINPROD_TYPE2=#{finprodType2}
             <if test="initValue != null and !initValue.equals('')">
                 and t.id = #{initValue}
             </if>

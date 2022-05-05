@@ -9,6 +9,7 @@ import java.util.List;
 
 /**
  * 当日申购相关操作检查入参
+ * workflowParameter 工作流参数  operType|users|roles|submit|pageId|elementId|isTodoList
  *
  * @author jiangpeng
  * @date 2022/4/27 10:10
@@ -22,7 +23,7 @@ public class CfetsBondFirstSubCheckRequst extends BaseEntity implements ProcessE
     @ApiModelProperty(name = "cfetsBondFirstSubCheckDetaileRequsts", value = "入参明细", required = true)
     private List<CfetsBondFirstSubCheckDetaileRequst> cfetsBondFirstSubCheckDetaileRequsts;
 
-    @ApiModelProperty(name = "isSure", value = "是否确认取消匹配,点击确认后传值,没有确认则不需要,Y",example = "Y")
+    @ApiModelProperty(name = "isSure", value = "是否确认取消匹配,点击确认后传值,没有确认则不需要,Y", example = "Y")
     private String isSure;
 
     public String getRemark() {

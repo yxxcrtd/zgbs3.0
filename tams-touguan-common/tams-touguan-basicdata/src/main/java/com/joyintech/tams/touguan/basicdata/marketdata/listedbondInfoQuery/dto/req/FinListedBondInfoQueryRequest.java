@@ -1,4 +1,4 @@
-package com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req;
+package com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.req;
 
 import com.joyintech.tams.business.common.dto.PageMode;
 import io.swagger.annotations.ApiModel;
@@ -11,17 +11,20 @@ import java.util.Date;
  *
  * @author zhuys
  * @version 1.0 2022年4月11日
- * @see FinWindMarketInfoQueryRequest
+ * @see FinListedBondInfoQueryRequest
  * @since 1.0
  */
 @ApiModel(value = "待上市债券市场信息查询条件", description = "待上市债券市场信息查询条件")
-public class FinWindMarketInfoQueryRequest {
+public class FinListedBondInfoQueryRequest {
 
     @ApiModelProperty(name = "pageMode", value = "分页对象", example = "{pageSize: 10,pageNo: 1, sort: 'name', direction: 'asc'}")
     private PageMode pageMode;
 
     @ApiModelProperty(name = "secId", value = "债券ID/资产代码")
     private String secId;
+
+    @ApiModelProperty(name = "secName", value = "资产简称")
+    private String secName;
 
     @ApiModelProperty(name = "market", value = "市场")
     private String market;
@@ -302,5 +305,13 @@ public class FinWindMarketInfoQueryRequest {
 
     public void setSearch(String search) {
         this.search = search;
+    }
+
+    public String getSecName() {
+        return secName;
+    }
+
+    public void setSecName(String secName) {
+        this.secName = secName;
     }
 }

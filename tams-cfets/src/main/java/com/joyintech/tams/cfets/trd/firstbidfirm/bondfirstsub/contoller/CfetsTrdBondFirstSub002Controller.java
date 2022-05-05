@@ -7,7 +7,6 @@ import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.tams.business.common.pojo.Message;
@@ -19,10 +18,7 @@ import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBo
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBondFirstSub002Service;
 import com.joyintech.tams.cfets.trd.repo.service.CfetsRepoQuotedPrice004Service;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
-import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.component.business.riskrds.controller.InterfRiskRdsController;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.client.ClientData;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
@@ -45,7 +41,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -318,6 +313,7 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
         params.setComment(entity -> finalStr);
         processParameter.setWorkFlowParameter(params);
         processParameter.setOperationType(OperationType.NEW);
+        processParameter.setPageId(params.getPageId());
         try {
             String msg = cfetsTrdBondFirstSub002Service.start(processParameter, dto);
             return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
@@ -330,14 +326,14 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
 
     @ApiOperation(value = "当日申购撤销检查", notes = "当日申购撤销检查")
     @ResponseBody
-    @RequestMapping("/checkDaySubRevokeCheck")
+    @PostMapping("/checkDaySubRevokeCheck")
     public Message<AjaxResult> checkDaySubRevokeCheck(@RequestBody CfetsBondFirstSubCheckRequst requst) {
         return new Message<AjaxResult>().success().setData(cfetsTrdBondFirstSub002Service.checkDayRegRevokeCheck(requst));
     }
 
     @ApiOperation(value = "当日申购撤销", notes = "当日申购撤销")
     @ResponseBody
-    @RequestMapping("subRevoke")
+    @PostMapping("subRevoke")
     public Message<AjaxResult> subRevoke(@RequestBody CfetsBondFirstSubCheckRequst requst) throws WorkFlowException {
         //前后台转换
         AjaxResult ajaxResult = cfetsTrdBondFirstSub002Service.checkDayRegRevokeCheck(requst);
@@ -363,6 +359,7 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
         workFlowParameter.setBusinessCode(CfetsTrdBondFirstSubInfoDto::getBidId);
         workFlowParameter.setBusinessType(BussinessDictCodeList.共同业务类型_中标结果确认.getValue());
         workFlowParameter.setComment(entity -> "申购编号 (" + entity.getBidId() + ")");
+        processParameter.setPageId(workFlowParameter.getPageId());
         processParameter.setWorkFlowParameter(workFlowParameter);
         processParameter.setOperationType(OperationType.REVOKE);
         String msg = cfetsTrdBondFirstSub002Service.start(processParameter,

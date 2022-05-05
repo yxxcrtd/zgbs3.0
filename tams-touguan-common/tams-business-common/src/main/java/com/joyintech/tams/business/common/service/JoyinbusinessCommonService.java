@@ -21,6 +21,7 @@ import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.systemtools.util.CommonUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jasypt.commons.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -180,7 +181,7 @@ public class JoyinbusinessCommonService extends BaseService {
             wflDto = joyinbusinessCommonMapper.findCfetsOprHisByWorkflowId(dto.getWorkflowId());
         }
         int flag = 0;
-        if (StringUtil.isNotEmpty(wflDto)) {
+        if (CollectionUtils.isNotEmpty(wflDto)) {
             flag = joyinbusinessCommonMapper.updateCfetsOprHis(dto);
         } else {
             flag = joyinbusinessCommonMapper.insertCfetsOprHis(dto);

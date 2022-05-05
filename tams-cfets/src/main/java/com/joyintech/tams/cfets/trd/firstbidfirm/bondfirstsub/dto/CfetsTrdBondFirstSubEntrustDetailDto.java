@@ -29,11 +29,11 @@ public class CfetsTrdBondFirstSubEntrustDetailDto {
     @ApiModelProperty(required = false, name = "finprodAbbr", value = "资产简称")
     private String finprodAbbr;
 
-    @ApiModelProperty(required = false, name = "issueType", value = "发行方式")
-    private String issueType;
+    @ApiModelProperty(required = false, name = "issueClass", value = "发行方式")
+    private String issueClass;
 
-    @ApiModelProperty(required = false, name = "issueTypeStr", value = "发行方式名称,展示用")
-    private String issueTypeStr;
+    @ApiModelProperty(required = false, name = "issueClassStr", value = "发行方式名称,展示用")
+    private String issueClassStr;
 
     @ApiModelProperty(required = false, name = "issueDate", value = "发行日")
     private Date issueDate;
@@ -190,23 +190,23 @@ public class CfetsTrdBondFirstSubEntrustDetailDto {
         this.remark = remark;
     }
 
-    public String getIssueType() {
-        return issueType;
+    public String getIssueClass() {
+        return issueClass;
     }
 
-    public void setIssueType(String issueType) {
-        this.issueType = issueType;
+    public void setIssueClass(String issueClass) {
+        this.issueClass = issueClass;
     }
 
-    public String getIssueTypeStr() {
-        if (StringUtil.isEmpty(getIssueType())) {
+    public String getIssueClassStr() {
+        if (StringUtil.isEmpty(getIssueClass())) {
             return StringUtil.EMPTY;
         }
-        return SysDataUtil.getNameFromDataDict(DictCode.发行方式, getIssueType());
+        return SysDataUtil.getNameFromDataDict(DictCode.新债_发行方式, getIssueClass());
     }
 
-    public void setIssueTypeStr(String issueTypeStr) {
-        this.issueTypeStr = issueTypeStr;
+    public void setIssueClassStr(String issueClassStr) {
+        this.issueClassStr = issueClassStr;
     }
 
     public BigDecimal getIssuePrice() {

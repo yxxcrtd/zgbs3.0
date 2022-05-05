@@ -130,6 +130,12 @@ public class TamsSystemApplication extends WebApplication {
 		return SwaggerConfig.createDocket("公共债券信息查询", "com.joyintech.tams.business.common");
 	}
 
+
+	@Bean
+	public Docket listedbondInfoQuery() {
+		return SwaggerConfig.createDocket("待上市债券市场信息查询", "com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery");
+	}
+
 	public static void main(String[] args) throws Exception {
     	initLog();
     	initSpring(args);

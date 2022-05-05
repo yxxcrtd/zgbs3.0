@@ -313,7 +313,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
      * @return
      */
     public Page<SelectOptionDto> getAppearMarketIdForSelect(Map<String, Object> param) {
-        param.put("finprodType2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+        param.put("finprodType2", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
         param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
         param.put("platDate", DateUtil.platDateFromCache());
@@ -499,8 +499,13 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
      */
     public String getFinprodId(FinTenderBondAsset002Dto dto) {
         String[] arr = dto.getFinprodMarketId().split("\\.");
-        return String.format("%s_%s_%d_%s_%s.%s", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue(), arr[0],
-                dto.getIssueDto().getAddBatch(), dto.getTradeMarket(), DateUtil.format(dto.getProductAddDto().getBidDate(), "yyyyMMdd"), arr[1]);
+       if(StringUtil.equals(dto.getIssueDto().getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
+           return String.format("%s_%s_%d_%s_%s.%s", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue(), arr[0],
+                   dto.getIssueDto().getAddBatch(), dto.getTradeMarket(), DateUtil.format(dto.getIssueDto().getIssueDate(), "yyyyMMdd"), arr[1]);
+       }else {
+           return String.format("%s_%s_%d_%s_%s.%s", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue(), arr[0],
+                   dto.getIssueDto().getAddBatch(), dto.getTradeMarket(), DateUtil.format(dto.getProductAddDto().getBidDate(), "yyyyMMdd"), arr[1]);
+       }
     }
 
 

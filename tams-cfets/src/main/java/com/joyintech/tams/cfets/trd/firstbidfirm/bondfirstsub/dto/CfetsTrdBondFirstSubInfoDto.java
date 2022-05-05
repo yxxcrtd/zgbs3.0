@@ -14,6 +14,13 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * 一级申购信息 页面展示及提交用
+ * workflowParameter 工作流参数  operType|users|roles|submit|pageId|elementId|isTodoList
+ *
+ * @author jiangpeng
+ * @date 2022/4/29 10:54
+ */
 @ApiModel(value = "交易信息", description = "一级申购信息")
 public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEntity {
 
