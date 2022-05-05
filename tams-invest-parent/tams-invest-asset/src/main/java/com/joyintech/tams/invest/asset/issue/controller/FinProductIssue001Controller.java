@@ -9,8 +9,6 @@ import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.invest.asset.bond.dto.FinBondTargetAssetDto;
-import com.joyintech.tams.invest.asset.issue.service.FinProductIssueService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,10 +35,6 @@ public class FinProductIssue001Controller extends BaseController {
             DictCode.行内资产二级分类, DictCode.行内资产三级分类, DictCode.行内资产四级分类, DictCode.行内资产五级分类,
             // 新增行内五级分类 wangguiqi 2019-07-23 end
             DictCode.WIND一级分类_含债券一级分类等, DictCode.WIND二级分类_含债券二级分类等, DictCode.是否, DictCode.币种};
-
-
-    @Autowired
-    private FinProductIssueService finProductIssueService;
 
     @Override
     public String init(Model model) {
