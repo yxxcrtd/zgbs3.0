@@ -26,11 +26,19 @@
         PRODUCT.CCY cyy,
         PRODUCT.CAPI_INCOME_FEATURE capiIncomeFeature,
         PRODUCT_ADD.IS_AUTO_UPDATE isAutoUpdate,
-        PRODUCT.ISSUE_PRICE issuePrice,
+        ISSUE.ISSUE_PRICE issuePrice,
         PRODUCT.REMARK,
         ISSUE.INT_TYPE intType,
         ISSUE.PAY_CYCLE payCycle,
-        ISSUE.REFER_YIELD referYield,
+        case
+        when PRODUCT.COUPON_SPECIES = '01' AND  ISSUE.INT_TYPE = '01' THEN
+        ISSUE.REFER_YIELD
+        when PRODUCT.COUPON_SPECIES = '01' AND  ISSUE.INT_TYPE = '02' THEN
+        (ISSUE.BP + RATE_INFO.INT_RATE)
+        when PRODUCT.COUPON_SPECIES IN ('02', '03', '04') THEN
+        ISSUE.REFER_YIELD
+        else ISSUE.REFER_YIELD
+        end as referYield,
         RATE_INFO.INT_RATE basicRate,
         ISSUE.RATE_GRADE rateGrade,
         ISSUE.BP bp,
