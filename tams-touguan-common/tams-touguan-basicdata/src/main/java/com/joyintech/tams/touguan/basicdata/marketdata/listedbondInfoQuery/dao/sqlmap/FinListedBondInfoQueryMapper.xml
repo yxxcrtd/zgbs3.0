@@ -21,20 +21,17 @@
 
         nvl(RDI_RELEASE_INFO.ISSUE_SIZE * 10000 , ROUND(RELEASE_INFO.ISSUE_SIZE / 10000, 2)) as issueSize,
 
-        nvl(TO_DATE(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd')) as
-        issueDate,
+        nvl( to_char(RDI_RELEASE_INFO.ISSUE_DATE,'yyyy-mm-dd hh:mm:ss'), to_char(RELEASE_INFO.ISSUE_DATE,'yyyy-mm-dd hh:mm:ss')) AS issueDate,
 
-        nvl(TO_DATE(RDI_RELEASE_INFO.EVENT_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.PAYMENT_DEADLINE, 'yyyy-MM-dd')) as
-        eventDate,
+        nvl( to_char(RDI_RELEASE_INFO.EVENT_DATE,'yyyy-mm-dd hh:mm:ss'), to_char(RELEASE_INFO.PAYMENT_DEADLINE,'yyyy-mm-dd hh:mm:ss')) AS eventDate,
 
-        TO_DATE(RELEASE_INFO.DEBT_REGISTRATION_DATE, 'yyyy-MM-dd') as debtRegistrationDate,
+        RELEASE_INFO.DEBT_REGISTRATION_DATE as debtRegistrationDate,
 
-        TO_DATE(RELEASE_INFO.LISTING_DATE, 'yyyy-MM-dd') as listingDate,
+        RELEASE_INFO.LISTING_DATE  as listingDate,
         RELEASE_INFO.LISTING_CODE as listingCode,
         SEC_INFO.CROSS_MARKET_CODE as crossMarketCode,
 
-        nvl(TO_DATE(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.INTEREST_ACCRUAL_DATE,
-        'yyyy-MM-dd')) as interestAccrualDate,
+        nvl( to_char(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE,'yyyy-mm-dd hh:mm:ss'), to_char(RELEASE_INFO.INTEREST_ACCRUAL_DATE,'yyyy-mm-dd hh:mm:ss')) AS interestAccrualDate,
 
         SEC_INFO.VALUE_DATE valueDate,
         SEC_INFO.EXPIRY_DATE expiryDate,
@@ -57,7 +54,7 @@
         LEFT JOIN INTERF_WIND_RELEASE_INFO RELEASE_INFO ON SEC_INFO.SEC_ID = RELEASE_INFO.SEC_ID
         LEFT JOIN INTERF_RDI_RELEASE_INFO RDI_RELEASE_INFO ON RDI_RELEASE_INFO.SECURITY_ID = SEC_INFO.SEC_ID
         <where>
-            SEC_INFO.VALUE_DATE  <![CDATA[ < ]]> to_date(#{platformDate}, '%Y-%m-%d')
+            SEC_INFO.VALUE_DATE  <![CDATA[ < ]]> to_date(#{platformDate}, 'yyyy-MM-dd')
 
             <if test="secId !=null and secId !=''">
                 AND SEC_INFO.SECID = #{secId,jdbcType=VARCHAR}
@@ -149,9 +146,8 @@
 
             <if test="search !=null and search !=''">
                 AND (
-                SEC_INFO.SECID like '%' || #{search} || '%' OR
+                SEC_INFO.SEC_ID like '%' || #{search} || '%' OR
                 SEC_INFO.MARKET like '%' || #{search} || '%' OR
-                SEC_INFO.institution like '%' || #{search} || '%' OR
                 SEC_INFO.ISSUERSHORT like '%' || #{search} || '%' OR
                 to_char(SEC_INFO.PUBENDDATE,'yyyy-MM-dd') = #{search} OR
                 to_char(SEC_INFO.VDATE,'yyyy-MM-dd') = #{search} OR
