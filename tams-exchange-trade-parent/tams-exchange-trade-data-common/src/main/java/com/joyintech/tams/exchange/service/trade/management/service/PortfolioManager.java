@@ -457,6 +457,8 @@ public class PortfolioManager extends BaseService {
         boolean isVolume = instruction.getEntrustNum() > 0L;
         // 订单数量
         BigDecimal orderVolume = BigDecimal.valueOf(bean.getEntrustVolume());
+        // 订单金额
+        BigDecimal orderAmt = NumberUtil.mul(price, orderVolume);
 
         for (InstructionDetail detail : instructionDetails) {
             calculateResponse = new PortfolioCalculateResponse();
@@ -471,10 +473,12 @@ public class PortfolioManager extends BaseService {
             calculateResponse.setFinprodName(instruction.getFinprodName());
             calculateResponse.setDisRate(detail.getDisRate());
             calculateResponse.setEntrustProp(entrustProp);
-            calculateResponse.setInstructionLeftAmt(isVolume ? BigDecimal.ZERO : ArithmeticUtil.subtract(ArithmeticUtil.subtract(instruction.getEntrustAmt(), instruction.getEntrustLeftAmt()), instruction.getFrozenQuantity()));
-            calculateResponse.setInstructionLeftNum(isVolume ? instruction.getEntrustNum() - instruction.getEntrustLeftAmt().longValue() - instruction.getFrozenQuantity().longValue() : 0L);
-            calculateResponse.setInstructionTotalAmt(instruction.getEntrustAmt());
-            calculateResponse.setInstructionTotalNum(instruction.getEntrustNum());
+//            calculateResponse.setInstructionLeftAmt(isVolume ? BigDecimal.ZERO : ArithmeticUtil.subtract(ArithmeticUtil.subtract(instruction.getEntrustAmt(), instruction.getEntrustLeftAmt()), instruction.getFrozenQuantity()));
+//            calculateResponse.setInstructionLeftNum(isVolume ? instruction.getEntrustNum() - instruction.getEntrustLeftAmt().longValue() - instruction.getFrozenQuantity().longValue() : 0L);
+//            calculateResponse.setInstructionTotalAmt(instruction.getEntrustAmt());
+            calculateResponse.setInstructionTotalNum(detail.getEntrustAmt().longValue());
+//            calculateResponse.setInstructionTotalNum(instruction.getEntrustNum());
+            calculateResponse.setInstructionTotalNum(detail.getEntrustNum().longValue());
             if (Objects.nonNull(bean.getFullPrice())) {
                 calculateResponse.setFullPrice(bean.getFullPrice());
             }
@@ -535,6 +539,14 @@ public class PortfolioManager extends BaseService {
             for (PortfolioCalculateResponse response : list) {
                 response.setConNum(totalConNum * response.getEntrustNum() / instruction.getEntrustNum());
             }
+        }
+
+        // 处理指令剩余数量、指令剩余金额
+        BigDecimal leftAmt = isVolume ? BigDecimal.ZERO : NumberUtil.sub(instruction.getEntrustAmt(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity());
+        long leftNum = isVolume ? NumberUtil.sub(instruction.getEntrustNum(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity()).longValue() : 0L;
+        for (PortfolioCalculateResponse item : list) {
+            calculateResponse.setInstructionLeftAmt(NumberUtil.div(NumberUtil.mul(leftAmt, orderAmt), item.getEntrustAmt()));
+            calculateResponse.setInstructionLeftNum(NumberUtil.div(NumberUtil.mul(leftNum, orderVolume), item.getEntrustNum()).longValue());
         }
 
         log.debug("queryPortfolioCalculate() called with result => 【list = {}】", JSONUtil.toJsonStr(list));
