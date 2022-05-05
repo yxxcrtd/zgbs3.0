@@ -675,7 +675,6 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 			if(StringUtil.equals(priceScopeControllEtr,"02")){
 				for(ValidMessage validMessage:validListPriceRange){
 					confirmMsg += validMessage.getMessage();
-					confirmMsg += "<br />";
 				}
 			}
 		}

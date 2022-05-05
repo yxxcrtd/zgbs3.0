@@ -652,7 +652,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         //增加调用头寸引擎代码end
     }
 
-    private void doDeleteFlow(String workflowId) {
+    public void doDeleteFlow(String workflowId) {
         Map<String, Object> param = new HashMap<>();
         param.put("workflowId", workflowId);
         restTemplate.postForObject(
@@ -660,7 +660,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                 Boolean.class);
     }
 
-    private void doInsertFlow(EtrExchangeTradeSaveSecRepoRequest dto) {
+    public void doInsertFlow(EtrExchangeTradeSaveSecRepoRequest dto) {
         BaseEtrInvestInfoDto entity = buildMultiEtrFlow(dto);
         dto.setAssetType2(entity.getEtrEntrustAdd().getAssetType1());
         // 设置指令创建来源
@@ -1487,7 +1487,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         if(finproduct!=null){
             paraMap.put("ASSET_CLASSIFY1",finproduct.getFinprodType2());
         }else{
-            paraMap.put("ASSET_CLASSIFY1","ZYSHG");
+            paraMap.put("ASSET_CLASSIFY1","F07");
 
         }
         if(StringUtil.isNotEmpty(entity.getDealMode())){
@@ -1505,14 +1505,14 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         // 开盘集合竞价
         else if(StringUtil.equals(trdPriceTimeConfig.getPriceTimeType(),DictCodeListExt3.价格申报范围类型_开盘集合竞价.getValue())){
             if(StringUtil.equals(finprodType,DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
-                if(quotation!=null
+                if(quotation!=null&&quotation.getPreClosePrice()!=null
                         &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(1.3),quotation.getPreClosePrice()))>0
                             ||checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(0.7),quotation.getPreClosePrice()))<0)){
                     validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
                 }
             }
             else if(StringUtil.equals(finprodType,DictCodeList.回购类型_质押式竞价回购.getValue())){
-                if(quotation!=null
+                if(quotation!=null&&quotation.getPreClosePrice()!=null
                         &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(2),quotation.getPreClosePrice()))>0
                         ||checkPrice.compareTo(BigDecimal.ZERO)<0)){
                     validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
@@ -1527,13 +1527,13 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                         ||StringUtil.equals(finProductType.getType6(), DictCodeList.WIND一级分类_含债券一级分类等_政府支持机构债.getValue())
                         ||(StringUtil.equals(finProductType.getType6(), DictCodeList.WIND一级分类_含债券一级分类等_金融债.getValue())
                             &&StringUtil.equals(finProductType.getType7(), DictCodeList.WIND二级分类_含债券二级分类等_政策银行债.getValue()))){
-                    if(quotation!=null
+                    if(quotation!=null&&quotation.getLastPrice()!=null
                             &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(1.1),quotation.getLastPrice()))>0
                             ||checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(0.9),quotation.getLastPrice()))<0)){
                         validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
                     }
                 }else{
-                    if(quotation!=null
+                    if(quotation!=null&&quotation.getLastPrice()!=null
                             &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(1.2),quotation.getLastPrice()))>0
                             ||checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(0.8),quotation.getLastPrice()))<0)){
                         validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
@@ -1541,7 +1541,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                 }
             }
             else if(StringUtil.equals(finprodType,DictCodeList.回购类型_质押式竞价回购.getValue())){
-                if(quotation!=null
+                if(quotation!=null&&quotation.getLastPrice()!=null
                         &&(checkPrice.compareTo(ArithmeticUtil.doAdd(new BigDecimal(0.01),quotation.getLastPrice()))>0
                         ||checkPrice.compareTo(BigDecimal.ZERO)<0)){
                     validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
@@ -2436,7 +2436,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         return dto;
     }
 
-    private void doInsertBackupQuery(EtrExchangeTradeSaveSecRepoRequest dto) {
+    public void doInsertBackupQuery(EtrExchangeTradeSaveSecRepoRequest dto) {
         BaseEtrInvestInfoDto entity = buildMultiEtrFlow(dto);
         WFlowCommonService.inserBackuptWithQuery(entity);
     }

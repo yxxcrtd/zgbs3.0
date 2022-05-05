@@ -1,6 +1,8 @@
 package com.joyintech.tams.business.common.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
+import com.joyintech.framework.exception.MessageException;
 import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.pojo.Message;
@@ -107,28 +109,41 @@ public class JoyinTamsWorkFlowController  {
 
 	@ApiOperation(value = "经办人代办中保存", notes = "/common/workflow/handlerSave?taskId=CfetsEtrBondInfo001&processInstanceId=CfetsEtrBondInfo001_btn_submit")
 	@PostMapping("/handlerSave")
-	public Message<List<?>> handlerSave(){
+	public Message<AjaxResult>  handlerSave(){
 		try {
 			String taskId = request.getParameter("taskId");
 			String processInstanceId = request.getParameter("processInstanceId");
 			if (StringUtils.isEmpty(taskId)) {
-				return new Message<List<?>>().fail().setMessage("taskId参数不能为null");
+				return new Message<AjaxResult> ().fail().setMessage("taskId参数不能为null");
 			}
 			if (StringUtils.isEmpty(processInstanceId)) {
-				return new Message<List<?>>().fail().setMessage("processInstanceId参数不能为null");
+				return new Message<AjaxResult> ().fail().setMessage("processInstanceId参数不能为null");
 			}
 //			JSONObject businessInfo = new JSONObject(map);
 			AjaxResult ajaxResult = workFlowController.doModify();
-			return new Message<List<?>>().success(StringUtil.isNotEmpty(ajaxResult.getMessage())?ajaxResult.getMessage():"保存成功");
+			return new Message<AjaxResult> ().success(StringUtil.isNotEmpty(ajaxResult.getMessage())?ajaxResult.getMessage():"保存成功");
 		} catch (Exception e) {
+			if(e.getCause() instanceof MessageException){
+				AjaxResult ajaxResult = new AjaxResult();
+				MessageException messageException =  (MessageException) e.getCause();
+				if(messageException.getMessageType()!=null&&StringUtil.equals("confirm",messageException.getMessageType().getCode())){
+					ajaxResult.setMessageType(MessageType.确认消息);
+					ajaxResult.setData(messageException.getMessage());
+					return new Message<AjaxResult>().success().setData(ajaxResult);
+				}else{
+					ajaxResult.setMessageType(MessageType.错误消息);
+					ajaxResult.setData(messageException.getMessage());
+					return new Message<AjaxResult>().success().setData(ajaxResult);
+				}
+			}
 			logger.error("保存异常", e);
-			return new Message<List<?>>().fail().setMessage("保存异常");
+			return new Message<AjaxResult>().fail().setMessage("保存异常");
 		}
 	}
 
 	@ApiOperation(value = "经办人代办中提交", notes = "/common/workflow/handlerSave?taskId=CfetsEtrBondInfo001&processInstanceId=CfetsEtrBondInfo001_btn_submit")
 	@PostMapping("/handlerSubmit")
-	public Message<List<?>> handlerSubmit(){
+	public Message<AjaxResult>  handlerSubmit(){
 		try {
 			//			status: A
 			//			createUser: 1689
@@ -151,22 +166,35 @@ public class JoyinTamsWorkFlowController  {
 			String pageId = request.getParameter("pageId");
 			String elementId = request.getParameter("elementId");
 			if (StringUtils.isEmpty(pageId)) {
-				return new Message<List<?>>().fail().setMessage("pageId参数不能为null");
+				return new Message<AjaxResult> ().fail().setMessage("pageId参数不能为null");
 			}
 			if (StringUtils.isEmpty(elementId)) {
-				return new Message<List<?>>().fail().setMessage("elementId参数不能为null");
+				return new Message<AjaxResult> ().fail().setMessage("elementId参数不能为null");
 			}
 			if (StringUtils.isEmpty(taskId)) {
-				return new Message<List<?>>().fail().setMessage("taskId参数不能为null");
+				return new Message<AjaxResult> ().fail().setMessage("taskId参数不能为null");
 			}
 			if (StringUtils.isEmpty(processInstanceId)) {
-				return new Message<List<?>>().fail().setMessage("processInstanceId参数不能为null");
+				return new Message<AjaxResult> ().fail().setMessage("processInstanceId参数不能为null");
 			}
 			AjaxResult ajaxResult = workFlowController.submit(request.getParameter("users"),request.getParameter("roles"));
-			return new Message<List<?>>().success(StringUtil.isNotEmpty(ajaxResult.getMessage())?ajaxResult.getMessage():"提交成功");
-		} catch (Exception e) {
+			return new Message<AjaxResult> ().success(StringUtil.isNotEmpty(ajaxResult.getMessage())?ajaxResult.getMessage():"提交成功");
+		} catch (Exception e){
+			if(e.getCause() instanceof MessageException){
+				AjaxResult ajaxResult = new AjaxResult();
+				MessageException messageException =  (MessageException) e.getCause();
+				if(messageException.getMessageType()!=null&&StringUtil.equals("confirm",messageException.getMessageType().getCode())){
+					ajaxResult.setMessageType(MessageType.确认消息);
+					ajaxResult.setData(messageException.getMessage());
+					return new Message<AjaxResult>().success().setData(ajaxResult);
+				}else{
+					ajaxResult.setMessageType(MessageType.错误消息);
+					ajaxResult.setData(messageException.getMessage());
+					return new Message<AjaxResult>().success().setData(ajaxResult);
+				}
+			}
 			logger.error("提交异常", e);
-			return new Message<List<?>>().fail().setMessage("提交异常");
+			return new Message<AjaxResult> ().fail().setMessage("提交异常");
 		}
 	}
 //    @Autowired(required=false)
