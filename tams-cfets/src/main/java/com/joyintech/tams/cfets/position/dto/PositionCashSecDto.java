@@ -1,32 +1,46 @@
 package com.joyintech.tams.cfets.position.dto;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * 组合数据集
  */
 public class PositionCashSecDto {
 
+    @ApiModelProperty(name = "portfolioId", value = "组合代码", example = "AAA")
     private String portfolioId; // 组合代码
 
-    private String acctId ; // 资金账号
+    @ApiModelProperty(name = "acctId", value = "资金账号", example = "111")
+    private String acctId; // 资金账号
 
-    private String secAcctId  ; // 证券管理账户查询持仓时必传
+    @ApiModelProperty(name = "secAcctId", value = "证券管理账户查询持仓时必传", example = "111")
+    private String secAcctId; // 证券管理账户查询持仓时必传
 
-    private String cdate  ; // 日期
+    @ApiModelProperty(name = "cdate", value = "日期", example = "2022-05-05")
+    private String cdate; // 日期
 
-    private String finprodId ; // 资产代码 查询持仓时必传
+    @ApiModelProperty(name = "finprodId", value = "资产代码 查询持仓时必传", example = "F01_11.IB")
+    private String finprodId; // 资产代码 查询持仓时必传
 
+    @ApiModelProperty(name = "dateType", value = "处理速度", example = "")
     private String dateType; // 处理速度
-    
+
+    @ApiModelProperty(name = "ps", value = "委托方向", example = "")
     private String ps; //委托方向
 
+    @ApiModelProperty(name = "tradeMarket", value = "交易场所 查询资金时必传", example = "01")
     private String tradeMarket; //交易场所 查询资金时必传
 
+    @ApiModelProperty(name = "ccy", value = "币种", example = "CNY")
     private String ccy; //币种
 
+    @ApiModelProperty(name = "holdingType", value = "持仓类型", example = "A01")
     private String holdingType;//持仓类型
 
+    @ApiModelProperty(name = "tradePlat", value = "交易平台 可用持仓必传 非交易", example = "")
     private String tradePlat; //交易平台 可用持仓必传 非交易:
 
+    @ApiModelProperty(name = "finprodType2", value = "资产类型投管 可用持仓必传", example = "F01")
     private String finprodType2; //资产类型投管 可用持仓必传
 
 

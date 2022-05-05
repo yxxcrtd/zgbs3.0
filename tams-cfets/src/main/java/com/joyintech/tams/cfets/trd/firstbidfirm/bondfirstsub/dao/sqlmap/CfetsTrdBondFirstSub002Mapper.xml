@@ -38,7 +38,7 @@
     select fp.FINPROD_ID,
            fp.FINPROD_MARKET_ID,
            fp.FINPROD_ABBR,
-           fp.ISSUE_PRICE,
+           fpi.ISSUE_PRICE,
            fp.COUPON_SPECIES,
            fpi.INT_TYPE,
            case
@@ -56,7 +56,8 @@
            eed.INV_AIM,
            eed.SEC_ACCT_ID,
            ssai.SEC_ACCT_NAME,
-           IPAR.PARTY_ID
+           IPAR.PARTY_ID,
+           (select distinct TRADER_ID from MST_CFETS_CUSTOMER_TRADER mcct inner join SYS_USER su on mcct.TRADER_ID = su.SSO_USER_ID where USER_NAME = #{loginUserId}) OUR_TRADER
         from FIN_PRODUCT fp
              left join FIN_PRODUCT_ISSUE fpi
                        on fp.FINPROD_ID = fpi.FINPROD_ID
@@ -79,6 +80,12 @@
                 </foreach>
                 /*指令代码查询*/
             </if>
+            <if test="existEntrustIds != null and existEntrustIds.size()>0">
+                <foreach collection="entrustIdList" open=" eed.ENTRUST_ID not in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+                /*指令代码查询*/
+            </if>
         </where>
     </select>
 
@@ -91,7 +98,7 @@
                mcci.PARTY_ABBR                                                     ouPartyIdAbbr,
                bo.OUR_TRADER,
                mcct.TRADER_NAME                                                    ourTraderName,
-               fp.ISSUE_PRICE,
+               fpi.ISSUE_PRICE,
                case
                    when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
                        then nvl(miri.INT_RATE, 0) + nvl(fpi.REFER_YIELD, 0)
@@ -137,7 +144,7 @@
                mcci.PARTY_ABBR                                                     ouPartyIdAbbr,
                bo.OUR_TRADER,
                mcct.TRADER_NAME                                                    ourTraderName,
-               fp.ISSUE_PRICE,
+               fpi.ISSUE_PRICE,
                case
                    when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
                        then nvl(miri.INT_RATE, 0) + nvl(fpi.REFER_YIELD, 0)

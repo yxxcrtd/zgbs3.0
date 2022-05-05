@@ -112,17 +112,13 @@
         left join SYS_DATADICT_LIST sdl_bm on T.businessModel=sdl_bm.ITEM_CODE and sdl_bm.DICT_CODE='BUSINESS_MODEL'
         LEFT JOIN ETR_DISTRIBUTE ed ON ed.ENTRUST_ID = T.entrustId
         <where>
+            <!-- 关键字模糊查询 -->
+            <include refid="keywordsWhere"></include>
             <if test="loginUserId != null and loginUserId != '' ">
                 AND ed.TRADER = #{loginUserId}
             </if>
-            <if test="entrustStatus == null or entrustStatus == '' ">
+            <if test="entrustStatus == null">
                 AND T.entrustStatus in ('02','03','04','05','06')
-            </if>
-            <if test="entrustStatus != null and entrustStatus.size()>0">
-                AND
-                <foreach collection="entrustStatus" open=" T.entrustStatus in(" close=")" separator="," item="item">
-                    #{item}
-                </foreach>
             </if>
             <if test="entrustStatus != null and entrustStatus.size()>0">
                 AND
@@ -132,7 +128,7 @@
             </if>
             <if test="finprodMarketIds != null and finprodMarketIds.size()>0">
                 AND
-                <foreach collection="finprodMarketIds" open=" T.finprodMarketId in(" close=")" separator="," item="item">
+                <foreach collection="finprodMarketIds" open=" T.finprodId in(" close=")" separator="," item="item">
                     #{item}
                 </foreach>
             </if>
@@ -142,16 +138,16 @@
                     #{item}
                 </foreach>
             </if>
-            <if test="issueDateStart != null and issueDateStart != '' ">
+            <if test="issueDateStart != null and !issueDateStart.isEmpty() ">
                 AND T.issueDate >= to_date(#{entrustDateStart}, 'yyyy-MM-dd')
             </if>
-            <if test="issueDateEnd != null and issueDateEnd != '' ">
+            <if test="issueDateEnd != null and !issueDateEnd.isEmpty() ">
                 AND T.issueDate <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd')
             </if>
-            <if test="entrustDateStart != null and entrustDateStart != '' ">
+            <if test="entrustDateStart != null and !entrustDateStart.isEmpty() ">
                 AND T.entrustDate >= to_date(#{entrustDateStart}, 'yyyy-MM-dd')
             </if>
-            <if test="entrustDateEnd != null and entrustDateEnd != '' ">
+            <if test="entrustDateEnd != null and !entrustDateEnd.isEmpty() ">
                 AND T.entrustDate <![CDATA[<=]]> to_date(#{entrustDateEnd}, 'yyyy-MM-dd')
             </if>
             <if test="entrustId != null and entrustId != '' ">
@@ -165,8 +161,6 @@
                 </foreach>
                 /*指令代码查询*/
             </if>
-            <!-- 关键字模糊查询 -->
-            <include refid="keywordsWhere"></include>
         </where>
         <if test="pageMode != null and pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
             order by ${pageMode.sort} ${pageMode.direction}
