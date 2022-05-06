@@ -5894,6 +5894,55 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         return etrExchangeTradeCommonMapper.selectWflEntrustDetail(dto);
     }
 
+    //投管业务类型
+    public String genBusiTypeTg(EtrExchangeTradeSaveRequest dto) {
+        //投管业务类型
+        String busiTypePosition = String.valueOf("");
+        if (dto.getTradePlat().equals(DictCodeList.交易平台_竞价撮合平台.getValue())) {
+            busiTypePosition=DictCodeListExt3.投管业务类型_竞价交易.getValue();
+        }
+        if (dto.getTradePlat().equals(DictCodeList.交易平台_大宗交易平台.getValue())) {
+            busiTypePosition=DictCodeListExt3.投管业务类型_大宗交易.getValue();
+        }
+        if (dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue()) /*&& dto.getTradePlat().equals(DictCodeList.交易平台_竞价撮合平台.getValue())*/) {
+            if (StringUtils.equals(dto.getPs(), DictCodeList.交易方向_行权_回售.getValue())) {
+                busiTypePosition=DictCodeListExt3.投管业务类型_行权.getValue();
+            } else if (StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_配债.getValue())) {
+                dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_配债指令.getValue());
+                busiTypePosition=DictCodeListExt3.投管业务类型_配债.getValue();
+            } else if (StringUtils.equals(dto.getPs(), DictCodeList.交易方向_申购.getValue())) {
+                busiTypePosition=DictCodeListExt3.投管业务类型_可转债申购.getValue();
+            } else if (StringUtils.equals(dto.getPs(), DictCodeListExt1.交易方向_债转股.getValue())) {
+                busiTypePosition=DictCodeListExt3.投管业务类型_新股申购.getValue();
+            } else if (StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_质押券入库.getValue()) || StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_质押券出库.getValue())) {
+                busiTypePosition=DictCodeListExt3.投管业务类型_质押券出入库.getValue();
+            }
+        }
+        if (dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_股票.getValue()) && dto.getTradePlat().equals(DictCodeList.交易平台_竞价撮合平台.getValue())) {
+            // add  start
+            if (StringUtils.equals(dto.getPs(), DictCodeListExt2.交易方向_配股.getValue())) {
+                busiTypePosition=DictCodeListExt3.投管业务类型_配股.getValue();
+            } else if (StringUtils.equals(dto.getPs(), DictCodeList.交易方向_申购.getValue())) {
+                busiTypePosition=DictCodeListExt3.投管业务类型_新股申购.getValue();
+            }
+        }
+        if (dto.getTradePlat().equals(DictCodeList.交易平台_固定收益平台.getValue())) {
+            busiTypePosition=DictCodeListExt3.投管业务类型_协议现券.getValue();
+        }
+        dto.setBusiTypePosition(busiTypePosition);
+        return busiTypePosition;
+    }
+
+    //查询资产是否进行了SPPI测试
+    public SppiImportData queryAssetIsSppiTest(String secId) {
+        if(!StringUtil.isNotEmpty(secId)){
+            return null;
+        }
+        Map<String, Object> param =new HashMap<>();
+        param.put("finprodId",secId);
+        return etrExchangeTradeCommonMapper.queryAssetIsSppiTest(param);
+    }
+
     //来自代办提交封装对象
     public EtrExchangeTradeSaveRequest buildDtoFromTodoSubmit(EtrExchangeTradeSaveRequest dto) {
         String businessType = setEntrustBussType(dto);
@@ -6043,5 +6092,10 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         BigDecimal b=new BigDecimal(208.00);
 
         System.out.println(ArithmeticUtil.divide(a, b, 0, RoundingMode.DOWN));
+    }
+    //组合持有资产业务模式查询
+    public List<BaseMap> selectAllBusModelList(Map<String, Object> param) {
+        // 初始化返回集合
+        return  etrExchangeTradeCommonMapper.selectAllBusModelList(param);
     }
 }

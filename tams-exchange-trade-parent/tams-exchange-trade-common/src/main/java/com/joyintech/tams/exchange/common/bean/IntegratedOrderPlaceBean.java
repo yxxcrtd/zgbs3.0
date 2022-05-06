@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.Digits;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -145,8 +146,6 @@ public class IntegratedOrderPlaceBean implements Serializable {
     @ApiModelProperty(required = true, name = "investorName", value = "本方交易主体名称")
     private String investorName;
 
-    @ApiModelProperty(required = false, name = "counterId", value = "交易对手")
-    private String counterId;
 
     @ApiModelProperty(required = true, name = "propTradeId", value = "对手方交易员")
     private String propTradeId;
@@ -860,13 +859,6 @@ public class IntegratedOrderPlaceBean implements Serializable {
         this.investorName = investorName;
     }
 
-    public String getCounterId() {
-        return counterId;
-    }
-
-    public void setCounterId(String counterId) {
-        this.counterId = counterId;
-    }
 
     public String getPropTradeId() {
         return propTradeId;

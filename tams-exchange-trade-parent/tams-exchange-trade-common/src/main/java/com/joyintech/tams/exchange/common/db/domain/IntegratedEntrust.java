@@ -178,7 +178,6 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @ApiModelProperty(required = false, name = "counterId", value = "交易对手")
     private String counterId;
 
-    @ApiModelProperty(required = true, name = "contractId", value = "交易所请求编号")
     @ApiModelProperty(required = true, name = "ownerType", value = "报价所有者类型")
     private String ownerType;
 
@@ -197,8 +196,6 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @ApiModelProperty(required = true, name = "investorName", value = "本方交易主体名称")
     private String investorName;
 
-    @ApiModelProperty(required = false, name = "counterId", value = "交易对手")
-    private String counterId;
 
     @ApiModelProperty(required = true, name = "propTradeId", value = "对手方交易员")
     private String propTradeId;
@@ -1132,13 +1129,6 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
         this.dealerName = dealerName;
     }
 
-    public String getCounterId() {
-        return counterId;
-    }
-
-    public void setCounterId(String counterId) {
-        this.counterId = counterId;
-    }
 
     public String getPropTradeId() {
         return propTradeId;

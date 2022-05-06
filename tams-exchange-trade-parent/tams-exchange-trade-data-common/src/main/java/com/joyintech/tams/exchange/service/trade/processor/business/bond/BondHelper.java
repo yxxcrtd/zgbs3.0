@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.service.trade.processor.business.bond;
 
+import com.joyintech.exchange.service.quote.service.QuoteService;
 import com.joyintech.tams.exchange.common.bean.MinPrice;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
@@ -36,7 +37,7 @@ public class BondHelper {
     //    @Autowired
 //    private QuoteTickService quoteTickService;
     @Autowired
-    private QuoteTickService quoteTickService;
+    private QuoteService quoteService;
     @Autowired
     private InstrumentService instrumentService;
     @Autowired

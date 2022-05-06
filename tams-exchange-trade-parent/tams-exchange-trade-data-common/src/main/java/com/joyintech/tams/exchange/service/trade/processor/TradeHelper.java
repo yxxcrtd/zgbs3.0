@@ -58,6 +58,7 @@ import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_质押�
 import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_质押券出库;
 import static com.joyintech.tams.exchange.common.constant.EntrustProp.*;
 import static com.joyintech.tams.exchange.common.constant.OthCodeType.*;
+import static com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1.NEGOTIATED_REPO;
 
 @Service
 public class TradeHelper {
@@ -94,7 +95,7 @@ public class TradeHelper {
 //    @Autowired
 //    private QuoteTickService quoteTickService;
     @Autowired
-    private QuoteTickService quoteTickService;
+    private QuoteService quoteService;
     @Autowired
     private ReviewManagement reviewManagement;
     @Autowired
@@ -1206,7 +1207,7 @@ public class TradeHelper {
             }
             FuturesInstrument futuresInstrument = futuresInstrumentService.queryByInnerCode(integratedEntrust.getStockCode());
             // 债券质押式协议回购，entrustBalance为入参，不计算覆盖
-            if (!NEGOTIATED_REPO.value.equals(instruction.getAssetType1())) {
+            if (!NEGOTIATED_REPO.equals(instruction.getAssetType1())) {
                 // 计算委托金额
                 BigDecimal entrustBalance = TradeUtils.calculateBalance(integratedEntrust.getEntrustBs(), integratedEntrust.getEntrustPrice(), integratedEntrust.getEntrustVolume(), integratedEntrust.getAssetType(), integratedEntrust, futuresInstrument);
                 integratedEntrust.setEntrustBalance(entrustBalance);

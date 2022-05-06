@@ -6,12 +6,25 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.joyintech.framework.rabbitmq.annotation.MessageSender;
 import com.joyintech.framework.rabbitmq.entity.SimpleRabbitMessage;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.exchange.common.bean.investment.BasicMessage;
 import com.joyintech.tams.exchange.common.bean.investment.ProgressMessage;
 import com.joyintech.tams.exchange.common.bean.investment.TradeMessage;
+import com.joyintech.tams.exchange.common.constant.BusinessFlag;
+import com.joyintech.tams.exchange.common.constant.EntrustBs;
+import com.joyintech.tams.exchange.common.constant.EntrustProp;
+import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.constant.instruction.BusinessType;
+import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
+import com.joyintech.tams.exchange.common.db.domain.*;
+import com.joyintech.tams.exchange.common.utils.IntegratedEntrustUtils;
 import com.joyintech.tams.exchange.common.utils.JsonUtils;
+import com.joyintech.tams.exchange.common.utils.TradeUtils;
+import com.joyintech.tams.exchange.datacommon.db.service.InstructionPledgeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -57,6 +70,7 @@ public class MessageSenderService {
             return defaultRabbitMessage;
         }
         return null;
+    }
     public SimpleRabbitMessage pushTradeToMQ(BasicMessage basicMessage) {
         logger.info("pushTradeToMQ() called with parameters => 【tradeMessage = {}】", JSON.toJSONString(basicMessage));
         if (Objects.isNull(basicMessage)) {
@@ -90,16 +104,16 @@ public class MessageSenderService {
                 || StringUtil.isEmpty(trade.getId())
                 || Objects.isNull(instruction)) {
             logger.error("[pushTradeToMQForFixedIncome] check parameter failed");
-    public SimpleRabbitMessage pushTradeToMQForFixedIncome(BasicMessage basicMessage) {
-        logger.info("pushTradeToMQForFixedIncome() called with parameters => 【tradeMessage = {}】", JSON.toJSONString(basicMessage));
-        if (Objects.isNull(basicMessage)) {
             return null;
         }
+
+        TradeMessage tradeMessage = createTradeMsg(trade, instruction, entrust);
+
         SimpleRabbitMessage defaultRabbitMessage = new SimpleRabbitMessage();
-        defaultRabbitMessage.setId(basicMessage.getId());
-        String tradeMessageJson = JsonUtils.getJsonFromObject(basicMessage);
+        defaultRabbitMessage.setId(trade.getId());
+        String tradeMessageJson = JsonUtils.getJsonFromObject(tradeMessage);
         defaultRabbitMessage.setMessage(tradeMessageJson);
-        logger.info("推送手工交收成交消息 {}", tradeMessageJson);
+        logger.info("推送手工交收成交消息 {}", JsonUtils.getJsonFromObject(tradeMessageJson));
 
         return defaultRabbitMessage;
 
