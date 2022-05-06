@@ -391,8 +391,6 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     private String targetType;
     @ApiModelProperty(name = "isNoGuard", value = "是否非担保")
     private String isNoGuard;
-    @ApiModelProperty(name = "isNetPrice", value = "是否净价交易")
-    private String isNetPrice;
 
     public String getSoftSkipMode() {
         return softSkipMode;
@@ -695,6 +693,7 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
         this.compactTerm = compactTerm;
     }
 
+    @Override
     public BigDecimal getBackBalance() {
         return backBalance;
     }
@@ -1095,14 +1094,6 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
 
     public void setIsNoGuard(String isNoGuard) {
         this.isNoGuard = isNoGuard;
-    }
-
-    public String getIsNetPrice() {
-        return isNetPrice;
-    }
-
-    public void setIsNetPrice(String isNetPrice) {
-        this.isNetPrice = isNetPrice;
     }
 
     public String getTradeId() {

@@ -280,14 +280,13 @@ public class TradeMessage extends BasicMessage {
             if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
                 //到期结算金额
                 tradeMessage.setDealBalance(entrust.getBackBalance());
-            }else if (InvestmentAssetType.isBond(trade.getAssetType())
+            } else if (InvestmentAssetType.isBond(trade.getAssetType())
                     && EntrustProp.isTrade(entrust.getEntrustProp())
                     && Objects.nonNull(tradeMessage.getFullPrice())
                     && tradeMessage.getFullPrice() != 0) {
                 //成交全价金额
                 tradeMessage.setDealBalance(TradeUtils.multiply(BigDecimal.valueOf(tradeMessage.getFullPrice()), tradeMessage.getDealVolume().longValue(), 2));
             }
-
             tradeMessage.setTradingDay(trade.getTradingDay());
         } catch (CloneNotSupportedException e) {
             return null;

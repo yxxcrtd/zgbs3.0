@@ -4,6 +4,7 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dto.TradeInfoProRequest;
 import com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dto.TradeInfoProResponse;
 import com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dto.TradeInfoProSaveRequest;
+import com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dto.TraderInfoDto;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,14 +15,14 @@ public interface TradeInfoProMapper {
 
     /**
      * 查询交易商名称
-     * @param map
+     * @param
      * @return
      */
-    List<SelectOptionDto> getCustomerName(Map<String, Object> map);
+    List<SelectOptionDto> getCustomerName();
 
     int deleteSelectedItem(TradeInfoProSaveRequest dto);
 
-    TradeInfoProResponse getDealerTraderInfo(TradeInfoProRequest dto);
+    List<TradeInfoProResponse> getDealerTraderInfo(Map<String, Object> pageParam);
 
     String findCustomerIdByDealerName(String dealerName);
 
@@ -36,4 +37,18 @@ public interface TradeInfoProMapper {
     int insertDealer(TradeInfoProSaveRequest dto);
 
     int insertDealerDetails(TradeInfoProSaveRequest dto);
+
+    int updateByCustomerId(TradeInfoProSaveRequest dto);
+
+    int existsDealer(TradeInfoProSaveRequest dto);
+
+    int existsDealerAndTradeMarket(TradeInfoProSaveRequest dto);
+
+    List<TraderInfoDto> findTrader(TradeInfoProResponse tradeInfoProResponse);
+
+    int updateDetails(TradeInfoProSaveRequest dto);
+
+    int updateDetailsSJ(TradeInfoProSaveRequest dto);
+
+    int deleteTraderSJ(TradeInfoProSaveRequest dto);
 }

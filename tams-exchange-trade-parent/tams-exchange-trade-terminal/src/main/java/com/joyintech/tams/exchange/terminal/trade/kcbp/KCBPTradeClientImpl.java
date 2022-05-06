@@ -288,18 +288,20 @@ public class KCBPTradeClientImpl implements ITradeRequest {
                 if (poolExecutors.size() > 1 && queryTradeApis.size() > 1) {
                     poolExecutors.get(index).submit(() -> {
                         if (kcbpTradeApi.getStatus(kcbpAccount.getAccountId()) == AccountLoginStatus.TRADING.value) {
+                            queryTradeApis.get(index).queryIncrementEntrust(kcbpAccount);
+                            queryTradeApis.get(index).queryProtocolBack_SH_Entrust(kcbpAccount);
+                            queryTradeApis.get(index).queryProtocolBack_SZ_Entrust(kcbpAccount);
+                            queryTradeApis.get(index).queryFixedIncomeEntrust(kcbpAccount);
+
                             queryTradeApis.get(index).queryIncrementTrade(kcbpAccount);
                             queryTradeApis.get(index).queryFixedIncomeTrade(kcbpAccount);
                             queryTradeApis.get(index).queryProtocolBack_SZ_Trade(kcbpAccount);
                             queryTradeApis.get(index).queryProtocolBack_SH_Trade(kcbpAccount);
                             queryTradeApis.get(index).queryRTGSStatus(kcbpAccount);
-                            queryTradeApis.get(index).queryIncrementEntrust(kcbpAccount);
-                            queryTradeApis.get(index).queryProtocolBack_SH_Entrust(kcbpAccount);
-                            queryTradeApis.get(index).queryProtocolBack_SZ_Entrust(kcbpAccount);
-                            queryTradeApis.get(index).queryFixedIncomeEntrust(kcbpAccount);
+
                             //新债改造-深交所 协商成交
-                            queryTradeApis.get(index).queryBondNegotiate_SZ_Trade(kcbpAccount);
                             queryTradeApis.get(index).queryBondNegotiate_SZ_Entrust(kcbpAccount);
+                            queryTradeApis.get(index).queryBondNegotiate_SZ_Trade(kcbpAccount);
                         }
                     });
                 }

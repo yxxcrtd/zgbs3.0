@@ -486,8 +486,6 @@ public class PositionRequestTradeRestService {
         TrdProductDeal trdProductDeal = entity.getTrdProductDeal();
         TrdProductDealAdd trdProductDealAdd = entity.getTrdProductDealAdd();
         String accountNo = baseAssetCashPositionCommMapper.queryAccountNo(trdProductDealTotal.getSecManageAcctId());
-        // 业务类型
-        resultMap.put("busiType", DictCodeListExt3.头寸业务类型_债券存续期交易.getValue());
         // 业务动作
         resultMap.put("busiAct", DictCodeListExt3.业务动作_成交匹配.getValue());
         // ZGTFCP-1608:还本到账/收息到账交易方向转换 modify by fuyongsheng 20220322 start
@@ -520,16 +518,16 @@ public class PositionRequestTradeRestService {
         pltMap.put("tradeId", trdProductDeal.getTradeId());
         pltMap.put("etrId", null);
         pltMap.put("ordEntrustId", null);
-        pltMap.put("etrSecAmount", null);
+        pltMap.put("etrSecAmount", BigDecimal.ZERO);
         pltMap.put("ordId", null);
-        pltMap.put("ordSecAmount", null);
+        pltMap.put("ordSecAmount", BigDecimal.ZERO);
         pltMap.put("cashAcctId", accountNo);
         pltMap.put("secAcctId", trdProductDealTotal.getSecManageAcctId());
         pltMap.put("secAmount", trdProductDeal.getShareAmt());
         pltMap.put("cashAmount", trdProductDeal.getTradeAmt());
         pltMap.put("invAim", trdProductDeal.getInvAim());
-        pltMap.put("integrateSecAmount", new BigDecimal(0));
-        pltMap.put("ownSecAmount", null);
+        pltMap.put("integrateSecAmount", BigDecimal.ZERO);
+        pltMap.put("ownSecAmount", BigDecimal.ZERO);
         ptlList.add(pltMap);
         resultMap.put("ptlList", ptlList);
     }

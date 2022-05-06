@@ -3,6 +3,7 @@ package com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dto;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.validation.annotation.ValidLogic;
+import com.joyintech.tams.business.common.dto.PageMode;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -10,6 +11,9 @@ import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(value="交易商信息维护请求参数",description="交易商信息维护请求参数")
 public class TradeInfoProRequest {
+
+    @ApiModelProperty(name="pageMode",value="分页对象",example="{pageSize: 10,pageNo: 1, sort: 'name', direction: 'asc'}")
+    private PageMode pageMode;
 
     @ApiModelProperty(name="isOur",value="本方标识",example="A1", required = true)
     private String isOur;
@@ -120,4 +124,13 @@ public class TradeInfoProRequest {
     public void setDealerPartyName(String dealerPartyName) {
         this.dealerPartyName = dealerPartyName;
     }
+
+    public PageMode getPageMode() {
+        return pageMode;
+    }
+
+    public void setPageMode(PageMode pageMode) {
+        this.pageMode = pageMode;
+    }
+
 }

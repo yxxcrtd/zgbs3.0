@@ -41,21 +41,40 @@
                 on A.TRADE_ID= F.TRADE_ID
         where
             A.DEAL_DATE = #{dealDate,jdbcType=DATE}
-          <!--/*and C.CHECK_RESULT in (#{checkResult1},#{checkResult3})*/-->
-          and (E.MATCH_STATUS is null or E.MATCH_STATUS = #{matchStatus})
-          <!--ZGZGST-4261:存续期数据无需登录SETTLE_TRANS_DATA_TOTAL表 fuyongsheng modify 20211221 start-->
-          <!--and A.APPLY_TRADE_ID is not null-->
-          <!--GNS-862:配股配债有可能APPLY_TRADE_ID is NULL modify by fuyongsheng 20220217 start-->
-          and (A.APPLY_TRADE_ID is not null OR ((B.REPO_TYPE = #{REPO_TYPE_H02} AND A.PS!= #{PS_T07}) OR A.PS = #{PS_T46} OR A.PS = #{PS_T97}))
+            <!--/*and C.CHECK_RESULT in (#{checkResult1},#{checkResult3})*/-->
+            and (E.MATCH_STATUS is null or E.MATCH_STATUS = #{matchStatus})
+            <!--ZGZGST-4261:存续期数据无需登录SETTLE_TRANS_DATA_TOTAL表 fuyongsheng modify 20211221 start-->
+            <!--and A.APPLY_TRADE_ID is not null-->
+            <!--GNS-862:配股配债有可能APPLY_TRADE_ID is NULL modify by fuyongsheng 20220217 start-->
+            <!--and (A.APPLY_TRADE_ID is not null OR ((B.REPO_TYPE = 'H02' AND A.PS!= 'T07') OR A.PS = 'T46' OR A.PS = 'T97'))-->
+            and (A.APPLY_TRADE_ID is not null OR (A.PS = 'T46' OR A.PS = 'T97'))
+            <!--剔除无需生成total数据-->
+            AND NOT EXISTS (
+                SELECT
+                   1
+                FROM
+                    SETTLE_TRANS_DATA tmp1
+                WHERE
+                    tmp1.TRADE_ID = A.TRADE_ID
+                    AND (
+                        <!--剔除竞价回购存续期、协议回购逆回购到期数据-->
+                        tmp1.BUSI_SCENE_CALSS IN (#{BUSI_SCENE_CLASS_0902RB02},#{BUSI_SCENE_CLASS_0901RB02},#{BUSI_SCENE_CLASS_0901RS04})
+                        <!--剔除债券存续期数据-->
+                        OR (tmp1.FINPROD_TYPE = #{FINPROD_TYPE_TG_F01} AND tmp1.PS IN(#{PS_T39},#{PS_T07},#{PS_T08},#{PS_T09}))
+                        <!--剔除申购确认、现金分红、红利再投、除权登记数据-->
+                        OR (tmp1.PS IN (#{PS_T05},#{PS_T11},#{PS_T12},#{PS_T13}))
+                    )
+            )
           <!--GNS-862:配股配债有可能APPLY_TRADE_ID is NULL modify by fuyongsheng 20220217 end-->
           <!--ZGZGST-4261:存续期数据无需登录SETTLE_TRANS_DATA_TOTAL表 fuyongsheng modify 20211221 end-->
           <!--/*AND EXISTS  (
                 SELECT 1 FROM stl_sec_recon_detail ssrd
                 where ssrd.TRADE_ID = A.TRADE_ID)*/-->
-            and A.PS !=#{PS_T05}
             <!--筛选交收成功和部分交收的数据 add by fuyongsheng 20220418 start-->
             and A.DELIVERY_RESULT IN (#{DELIVERY_RESULT_01}, #{DELIVERY_RESULT_02})
             <!--筛选交收成功和部分交收的数据 add by fuyongsheng 20220418 end-->
+          <!--and A.PS !=#{PS_T05}-->
+
     </select>
 
     <insert id="batchInsetSettleTransDataTotal">

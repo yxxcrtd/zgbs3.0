@@ -1,35 +1,26 @@
 package com.joyintech.tams.exchange.service.trade.management.service;
 
+import com.google.common.collect.Maps;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.tams.exchange.common.bean.*;
+import com.joyintech.tams.exchange.common.cache.QuoteTickService;
+import com.joyintech.tams.exchange.common.constant.*;
+import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
+import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
+import com.joyintech.tams.exchange.common.request.EntrustQueryRequest;
+import com.joyintech.tams.exchange.common.utils.EnumUtil;
+import com.joyintech.tams.exchange.common.utils.TickConverter;
+import com.joyintech.tams.exchange.datacommon.db.service.FuturesInstrumentService;
+import com.joyintech.tams.exchange.service.trade.processor.others.TerminalHelper;
+import com.joyintech.tams.exchange.service.trade.scheduled.quote.QuoteJob;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
-import com.google.common.collect.Maps;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.tams.exchange.common.constant.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import com.joyintech.tams.exchange.common.bean.IntegratedBulkCloseQuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedBulkQuoteBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedBulkQuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedFixedIncomeQuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedQuote;
-import com.joyintech.tams.exchange.common.bean.IntegratedRepurchaseQuoteBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedRepurchaseQuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.NegotiateQuoteQueryBean;
-import com.joyintech.tams.exchange.common.bean.NegotiateQuoteSendBean;
-import com.joyintech.tams.exchange.common.bean.ResultBean;
-import com.joyintech.tams.exchange.common.cache.QuoteTickService;
-import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
-import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
-import com.joyintech.tams.exchange.common.request.EntrustQueryRequest;
-import com.joyintech.tams.exchange.common.utils.TickConverter;
-import com.joyintech.tams.exchange.datacommon.db.service.FuturesInstrumentService;
-import com.joyintech.tams.exchange.service.trade.processor.others.TerminalHelper;
-import com.joyintech.tams.exchange.service.trade.scheduled.quote.QuoteJob;
 
 /**
  * @ClassName IntegratedQuoteManagement
@@ -167,10 +158,12 @@ public class IntegratedQuoteManagement {
         negotiateQuoteSendBean.setConfirmId(integratedEntrust.getContractId());
         negotiateQuoteSendBean.setPositionStr(integratedEntrust.getPositionStr());
         negotiateQuoteSendBean.setRemark(integratedEntrust.getRemark());
-        negotiateQuoteSendBean.setRequestStatusStr(RequestStatus.getRequestStatusName(negotiateQuoteSendBean.getRequestStatus()));
+        String requestStatusName = EnumUtil.getDescriptionByCode(RequestStatus.class, negotiateQuoteSendBean.getRequestStatus());
+        negotiateQuoteSendBean.setRequestStatusStr(requestStatusName);
         negotiateQuoteSendBean.setBsStr(EntrustBs.isBuy(negotiateQuoteSendBean.getBs()) ? EntrustBs.BUY.name : EntrustBs.SELL.name);
-        negotiateQuoteSendBean.setInvestorTypeStr(InvestorType.getInvestorTypeName(negotiateQuoteSendBean.getInvestorType()));
-        negotiateQuoteSendBean.setCpInvestorTypeStr(InvestorType.getInvestorTypeName(negotiateQuoteSendBean.getInvestorType()));
+        String investorTypeName = EnumUtil.getDescriptionByCode(InvestorType.class, negotiateQuoteSendBean.getInvestorType());
+        negotiateQuoteSendBean.setInvestorTypeStr(investorTypeName);
+        negotiateQuoteSendBean.setCpInvestorTypeStr(investorTypeName);
     }
 }
 

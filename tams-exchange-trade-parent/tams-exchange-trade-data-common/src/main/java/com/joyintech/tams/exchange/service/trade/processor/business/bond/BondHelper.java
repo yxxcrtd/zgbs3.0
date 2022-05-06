@@ -34,7 +34,7 @@ import java.util.Objects;
 public class BondHelper {
     private static final Logger logger = LoggerFactory.getLogger(BondHelper.class);
 
-    //    @Autowired
+//    @Autowired
 //    private QuoteTickService quoteTickService;
     @Autowired
     private QuoteService quoteService;
@@ -173,13 +173,14 @@ public class BondHelper {
 
     // 债券净价成交转换为全价处理
     public BigDecimal getFullPriceByTradePrice(Trade trade, String isFullPrice, Instruction instruction) {
-        if (!InvestmentAssetType.isBond(instruction.getAssetType())) {
-            return BigDecimal.ZERO;
-        }
+        if (!InvestmentAssetType.isBond(instruction.getAssetType())) return BigDecimal.ZERO;
         if (IntegratedEntrustUtils.isProtocolBack(trade.getEntrustProp()) || trade.getTradedPrice().doubleValue() == 0) {
             return trade.getTradedPrice();
         }
         // 对于金证和金仕达柜台 -- 净价报单 净价成交。 ufx按照委托中isFullPrice区分 净价成交 全价成交
+//        Account account = accountManager.getAccountById(trade.getAccountId());
+        // 对于金证和金仕达柜台 -- 净价报单 净价成交。
+        // ufx按照委托中isFullPrice区分 净价成交 全价成交
 //        Account account = accountManager.getAccountById(trade.getAccountId());
         // 净价成交 转换为 全价
 //        if (Objects.nonNull(account) && AgentType.isNetPriceTrade(account.getAgentType())
@@ -188,6 +189,23 @@ public class BondHelper {
 //            logger.info("getFullPriceByTradePrice  trade fullPrice {}", price);
 //            return price;
 //        }
+        if (!EntrustUtils.isFullPrice(instruction.getAssetType(), trade.getEntrustProp(), isFullPrice)) {
+//        if (Objects.nonNull(account) && AgentType.isNetPriceTrade(account.getAgentType())
+//                || (!EntrustUtils.isFullPrice(instruction.getAssetType(), trade.getEntrustProp(), isFullPrice))) {
+//            BigDecimal price = investmentManagement.queryFullPriceByEntrustPriceFromInvest(trade.getTradedPrice(), trade.getTradedVolume(), instruction, getPriceRoundByPriceStep(instrumentService.queryByInnerCode(instruction.getFinprodMarketId())));
+//            logger.info("getFullPriceByTradePrice  trade fullPrice {}", price);
+//            return price;
+//        }
+        }
+        /*
+         * 新债调整
+         * 1、净价品种
+         * 委托记录中：委托价格（净价），买入冻结金额（全价），成交金额（全价）
+         * 成交记录中：委托价格（净价），成交价格（净价），成交金额（全价），实时冻结解冻金额（全价）
+         * 2、全价品种(可转债-全价品种)
+         * 委托记录中：委托价格（全价），买入冻结金额（全价），成交金额（全价）
+         * 成交记录中：委托价格（全价），成交价格（全价），成交金额（全价），实时冻结解冻金额（全价）
+         */
         if (!EntrustUtils.isFullPrice(instruction.getAssetType(), trade.getEntrustProp(), isFullPrice)) {
             BigDecimal price = investmentManagement.queryFullPriceByEntrustPriceFromInvest(trade.getTradedPrice(), trade.getTradedVolume(), instruction, getPriceRoundByPriceStep(instrumentService.queryByInnerCode(instruction.getFinprodMarketId())));
             logger.info("getFullPriceByTradePrice  trade fullPrice {}", price);

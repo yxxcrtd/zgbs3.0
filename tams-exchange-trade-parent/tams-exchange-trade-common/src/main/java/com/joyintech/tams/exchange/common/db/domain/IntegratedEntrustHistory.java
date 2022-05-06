@@ -151,7 +151,7 @@ public class IntegratedEntrustHistory implements Serializable {
 
     private String targetType;
     private String isNoGuard;
-    private String isNetPrice;
+    private String isFullPrice;
     private String ownerType;
     private String investorId;
     private String investorName;
@@ -767,12 +767,12 @@ public class IntegratedEntrustHistory implements Serializable {
         this.isNoGuard = isNoGuard;
     }
 
-    public String getIsNetPrice() {
-        return isNetPrice;
+    public String getIsFullPrice() {
+        return isFullPrice;
     }
 
-    public void setIsNetPrice(String isNetPrice) {
-        this.isNetPrice = isNetPrice;
+    public void setIsFullPrice(String isFullPrice) {
+        this.isFullPrice = isFullPrice;
     }
 
     public String getOwnerType() {

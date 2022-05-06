@@ -147,6 +147,12 @@ public class PaActiveRemind001Dto extends RskSupervisionRiskAnalyzeDto  {
     private String trdAcctId;
 
     /**
+     * 资金账户名称
+     *
+     */
+    private String trdAcctName;
+
+    /**
      * 交易场所
      *
      */
@@ -182,6 +188,14 @@ public class PaActiveRemind001Dto extends RskSupervisionRiskAnalyzeDto  {
 
     public String getTradePlace() {
         return tradePlace;
+    }
+
+    public String getTrdAcctName() {
+        return trdAcctName;
+    }
+
+    public void setTrdAcctName(String trdAcctName) {
+        this.trdAcctName = trdAcctName;
     }
 
     public void setTradePlace(String tradePlace) {

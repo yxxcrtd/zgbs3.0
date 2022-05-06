@@ -76,7 +76,7 @@
         <result column="ENTRUST_CLASS" property="entrustClass" jdbcType="VARCHAR"/>
         <result column="TARGET_TYPE" property="targetType" jdbcType="VARCHAR"/>
         <result column="IS_NO_GUARD" property="isNoGuard" jdbcType="VARCHAR"/>
-        <result column="IS_NET_PRICE" property="isNetPrice" jdbcType="VARCHAR"/>
+        <result column="IS_FULL_PRICE" property="isFullPrice" jdbcType="VARCHAR"/>
         <result column="OWNER_TYPE" property="ownerType" jdbcType="VARCHAR"/>
         <result column="INVESTOR_ID" property="investorId" jdbcType="VARCHAR"/>
         <result column="INVESTOR_NAME" property="investorName" jdbcType="VARCHAR"/>
@@ -166,7 +166,7 @@
         <result column="ENTRUST_CLASS" property="entrustClass" jdbcType="VARCHAR"/>
         <result column="TARGET_TYPE" property="targetType" jdbcType="VARCHAR"/>
         <result column="IS_NO_GUARD" property="isNoGuard" jdbcType="VARCHAR"/>
-        <result column="IS_NET_PRICE" property="isNetPrice" jdbcType="VARCHAR"/>
+        <result column="IS_FULL_PRICE" property="isFullPrice" jdbcType="VARCHAR"/>
         <result column="OWNER_TYPE" property="ownerType" jdbcType="VARCHAR"/>
         <result column="INVESTOR_ID" property="investorId" jdbcType="VARCHAR"/>
         <result column="INVESTOR_NAME" property="investorName" jdbcType="VARCHAR"/>
@@ -253,7 +253,7 @@
     CANCEL_TIME, ERROR_CODE, ERROR_MSG, TRADING_DAY, LOCAL_ENTRUST_ID, BROKER_ENTRUST_ID, 
     IP_MAC, REMARK, CREATE_TIME, UPDATE_TIME, ENTRUST_STATUS, ORIG_ENTRUST_ID, INTEGRATED_ENTRUST_ID, REPORT_NO, OPERATE_USER,
     PORTFOLIO_NAME,SEC_ACCT_ID,SEC_ACCT_NAME,TRADE_PLAT,FINPROD_TYPE2, INV_MANAGER_ID,PS,BUSI_TYPE_TG, EXTEND1, EXTEND2,
-    ENTRUST_CLASS,TARGET_TYPE,IS_NO_GUARD,IS_NET_PRICE,OWNER_TYPE,INVESTOR_ID,INVESTOR_NAME,
+    ENTRUST_CLASS,TARGET_TYPE,IS_NO_GUARD,IS_FULL_PRICE,OWNER_TYPE,INVESTOR_ID,INVESTOR_NAME,
     PROP_INVESTOR_ID,PROP_INVESTOR_NAME,TRADE_ID,DEALER_ID,DEALER_NAME,COUNTER_ID,PROP_TRADE_ID,PROP_DEALER_ID,
     PROP_DEALER_NAME,PROP_OWNER_TYPE
     </sql>
@@ -270,7 +270,7 @@
         ERROR_MSG, TRADING_DAY, LOCAL_ENTRUST_ID, BROKER_ENTRUST_ID,IP_MAC, REMARK, CREATE_TIME, UPDATE_TIME,
         ENTRUST_STATUS, ORIG_ENTRUST_ID, ENTRUST_ID AS INTEGRATED_ENTRUST_ID, REPORT_NO, OPERATE_USER,
         PORTFOLIO_NAME,SEC_ACCT_ID,SEC_ACCT_NAME,TRADE_PLAT,FINPROD_TYPE2, INV_MANAGER_ID,PS,BUSI_TYPE_TG,
-        EXTEND1, EXTEND2, ENTRUST_CLASS,NULL AS TARGET_TYPE,NULL AS IS_NO_GUARD,NULL AS IS_NET_PRICE,NULL AS OWNER_TYPE,
+        EXTEND1, EXTEND2, ENTRUST_CLASS,NULL AS TARGET_TYPE,NULL AS IS_NO_GUARD,NULL AS IS_FULL_PRICE,NULL AS OWNER_TYPE,
         NULL AS INVESTOR_ID,NULL AS INVESTOR_NAME,NULL AS PROP_INVESTOR_ID,NULL AS PROP_INVESTOR_NAME,
         NULL AS TRADE_ID,NULL AS DEALER_ID,NULL AS DEALER_NAME,NULL AS COUNTER_ID,NULL AS PROP_TRADE_ID,
         NULL AS PROP_DEALER_ID,NULL AS PROP_DEALER_NAME,NULL AS PROP_OWNER_TYPE
@@ -288,7 +288,7 @@
     a.IP_MAC, a.REMARK, a.CREATE_TIME,a.UPDATE_TIME, a.ENTRUST_STATUS, a.ORIG_ENTRUST_ID, a.INTEGRATED_ENTRUST_ID,
     a.REPORT_NO, a.OPERATE_USER,a.ENTRUST_BS,
     a.PORTFOLIO_NAME,a.SEC_ACCT_ID,a.SEC_ACCT_NAME,a.TRADE_PLAT,a.FINPROD_TYPE2,a.INV_MANAGER_ID,a.PS,a.BUSI_TYPE_TG,
-    a.EXTEND1,a.EXTEND2,a.ENTRUST_CLASS,a.TARGET_TYPE,a.IS_NO_GUARD,a.IS_NET_PRICE,a.OWNER_TYPE,
+    a.EXTEND1,a.EXTEND2,a.ENTRUST_CLASS,a.TARGET_TYPE,a.IS_NO_GUARD,a.IS_FULL_PRICE,a.OWNER_TYPE,
     a.INVESTOR_ID,a.INVESTOR_NAME, a.PROP_INVESTOR_ID,a.PROP_INVESTOR_NAME,a.TRADE_ID,a.DEALER_ID,a.DEALER_NAME,
     a.COUNTER_ID,a.PROP_TRADE_ID,a.PROP_DEALER_ID,a.PROP_DEALER_NAME,a.PROP_OWNER_TYPE
     </sql>
@@ -305,7 +305,7 @@
         a.ERROR_MSG, a.TRADING_DAY, a.LOCAL_ENTRUST_ID, a.BROKER_ENTRUST_ID,a.IP_MAC, a.REMARK, a.CREATE_TIME, a.UPDATE_TIME,
         a.ENTRUST_STATUS, a.ORIG_ENTRUST_ID, a.ENTRUST_ID AS INTEGRATED_ENTRUST_ID, a.REPORT_NO, a.OPERATE_USER, a.ENTRUST_BS,
         a.PORTFOLIO_NAME,a.SEC_ACCT_ID,a.SEC_ACCT_NAME,a.TRADE_PLAT,a.FINPROD_TYPE2,a.INV_MANAGER_ID,a.PS,
-        a.BUSI_TYPE_TG,a.EXTEND1,a.EXTEND2,a.ENTRUST_CLASS,NULL AS TARGET_TYPE,NULL AS IS_NO_GUARD,NULL AS IS_NET_PRICE,
+        a.BUSI_TYPE_TG,a.EXTEND1,a.EXTEND2,a.ENTRUST_CLASS,NULL AS TARGET_TYPE,NULL AS IS_NO_GUARD,NULL AS IS_FULL_PRICE,
         NULL AS OWNER_TYPE,NULL AS INVESTOR_ID,NULL AS INVESTOR_NAME, NULL AS PROP_INVESTOR_ID,NULL AS PROP_INVESTOR_NAME,
         NULL AS TRADE_ID,NULL AS DEALER_ID,NULL AS DEALER_NAME,NULL AS COUNTER_ID,NULL AS PROP_TRADE_ID,
         NULL AS PROP_DEALER_ID,NULL AS PROP_DEALER_NAME,NULL AS PROP_OWNER_TYPE
@@ -501,7 +501,7 @@
                                                  OPERATE_USER, PORTFOLIO_NAME, SEC_ACCT_ID, SEC_ACCT_NAME,
                                                  TRADE_PLAT, FINPROD_TYPE2, INV_MANAGER_ID, PS,
                                                  BUSI_TYPE_TG, EXTEND1, EXTEND2, ENTRUST_CLASS,
-                                                 TARGET_TYPE, IS_NO_GUARD, IS_NET_PRICE, OWNER_TYPE,
+                                                 TARGET_TYPE, IS_NO_GUARD, IS_FULL_PRICE, OWNER_TYPE,
                                                  INVESTOR_ID, INVESTOR_NAME, PROP_INVESTOR_ID, PROP_INVESTOR_NAME,
                                                  TRADE_ID, DEALER_ID, DEALER_NAME, COUNTER_ID, PROP_TRADE_ID,
                                                  PROP_DEALER_ID, PROP_DEALER_NAME, PROP_OWNER_TYPE)
@@ -535,7 +535,7 @@
         #{invManagerId,jdbcType=VARCHAR}, #{ps,jdbcType=VARCHAR}, #{busiTypeTg,jdbcType=VARCHAR},
         #{extend1,jdbcType=VARCHAR}, #{extend2,jdbcType=VARCHAR}, #{entrustClass,jdbcType=VARCHAR},
         #{targetType,jdbcType=VARCHAR}, #{isNoGuard,jdbcType=VARCHAR},
-        #{isNetPrice,jdbcType=VARCHAR}, #{ownerType,jdbcType=VARCHAR}, #{investorId,jdbcType=VARCHAR},
+        #{isFullPrice,jdbcType=VARCHAR}, #{ownerType,jdbcType=VARCHAR}, #{investorId,jdbcType=VARCHAR},
         #{investorName,jdbcType=VARCHAR}, #{propInvestorId,jdbcType=VARCHAR}, #{propInvestorName,jdbcType=VARCHAR},
         #{tradeId,jdbcType=VARCHAR}, #{dealerId,jdbcType=VARCHAR}, #{dealerName,jdbcType=VARCHAR},
         #{counterId,jdbcType=VARCHAR}, #{propTradeId,jdbcType=VARCHAR}, #{propDealerId,jdbcType=VARCHAR},
@@ -599,7 +599,7 @@
             #{record.entrustClass,jdbcType=VARCHAR},
             #{record.targetType,jdbcType=VARCHAR},
             #{record.isNoGuard,jdbcType=VARCHAR},
-            #{record.isNetPrice,jdbcType=VARCHAR},
+            #{record.isFullPrice,jdbcType=VARCHAR},
             #{record.ownerType,jdbcType=VARCHAR},
             #{record.investorId,jdbcType=VARCHAR},
             #{record.investorName,jdbcType=VARCHAR},
@@ -804,8 +804,8 @@
             <if test="isNoGuard != null">
                 IS_NO_GUARD,
             </if>
-            <if test="isNetPrice != null">
-                IS_NET_PRICE,
+            <if test="isFullPrice != null">
+                IS_FULL_PRICE,
             </if>
             <if test="ownerType != null">
                 OWNER_TYPE,
@@ -1033,8 +1033,8 @@
             <if test="isNoGuard != null">
                 #{isNoGuard,jdbcType=VARCHAR},
             </if>
-            <if test="isNetPrice != null">
-                #{isNetPrice,jdbcType=VARCHAR},
+            <if test="isFullPrice != null">
+                #{isFullPrice,jdbcType=VARCHAR},
             </if>
             <if test="ownerType != null">
                 #{ownerType,jdbcType=VARCHAR},
@@ -1307,8 +1307,8 @@
             <if test="record.isNoGuard != null">
                 IS_NO_GUARD = #{record.isNoGuard,jdbcType=VARCHAR},
             </if>
-            <if test="record.isNetPrice != null">
-                IS_NET_PRICE = #{record.isNetPrice,jdbcType=VARCHAR},
+            <if test="record.isFullPrice != null">
+                IS_FULL_PRICE = #{record.isFullPrice,jdbcType=VARCHAR},
             </if>
             <if test="record.ownerType != null">
                 OWNER_TYPE = #{record.ownerType,jdbcType=VARCHAR},
@@ -1429,7 +1429,7 @@
         ENTRUST_CLASS = #{record.entrustClass,jdbcType=VARCHAR},
         TARGET_TYPE = #{record.targetType,jdbcType=VARCHAR},
         IS_NO_GUARD = #{record.isNoGuard,jdbcType=VARCHAR},
-        IS_NET_PRICE = #{record.isNetPrice,jdbcType=VARCHAR},
+        IS_FULL_PRICE = #{record.isFullPrice,jdbcType=VARCHAR},
         OWNER_TYPE = #{record.ownerType,jdbcType=VARCHAR},
         INVESTOR_ID = #{record.investorId,jdbcType=VARCHAR},
         INVESTOR_NAME = #{record.investorName,jdbcType=VARCHAR},
@@ -1667,8 +1667,8 @@
             <if test="isNoGuard != null">
                 IS_NO_GUARD = #{isNoGuard,jdbcType=VARCHAR},
             </if>
-            <if test="isNetPrice != null">
-                IS_NET_PRICE = #{isNetPrice,jdbcType=VARCHAR},
+            <if test="isFullPrice != null">
+                IS_FULL_PRICE = #{isFullPrice,jdbcType=VARCHAR},
             </if>
             <if test="ownerType != null">
                 OWNER_TYPE = #{ownerType,jdbcType=VARCHAR},
@@ -1787,7 +1787,7 @@
             ENTRUST_CLASS         = #{entrustClass,jdbcType=VARCHAR},
             TARGET_TYPE           = #{targetType,jdbcType=VARCHAR},
             IS_NO_GUARD           = #{isNoGuard,jdbcType=VARCHAR},
-            IS_NET_PRICE          = #{isNetPrice,jdbcType=VARCHAR},
+            IS_FULL_PRICE         = #{isFullPrice,jdbcType=VARCHAR},
             OWNER_TYPE            = #{ownerType,jdbcType=VARCHAR},
             INVESTOR_ID           = #{investorId,jdbcType=VARCHAR},
             INVESTOR_NAME         = #{investorName,jdbcType=VARCHAR},

@@ -255,7 +255,7 @@
         ON
         ETR_ENTRUST.ENTRUST_ID = ETR_ENTRUST_ADD.ENTRUST_ID
         LEFT JOIN OPT_TARGET_INFO ON ETR_ENTRUST_ADD.ASSET_TYPE_10 = OPT_TARGET_INFO.TARGET_ID
-        LEFT JOIN
+        INNER JOIN
         PTL_PORTFOLIO_AUTHORITY
         ON
         PTL_PORTFOLIO.PORTFOLIO_ID = PTL_PORTFOLIO_AUTHORITY.PORTFOLIO_ID
@@ -277,10 +277,10 @@
         GROUP BY ENTRUST_ID) T7 ON ETR_ENTRUST.ENTRUST_ID = T7.ENTRUST_ID
         LEFT JOIN(SELECT ENTRUST_ID, SUM(FINISH_AMT) AS FINISH_AMT
         FROM ETR_FINISH_STATUS
-        LEFT JOIN (SELECT DISTINCT T3.TRADE_ID
+        INNER JOIN (SELECT DISTINCT T3.TRADE_ID
         FROM TRDQUTO_MATCH_INFO T1
-        LEFT JOIN REG_FIN_PRODUCT_DEAL_TOTAL T2 ON T1.PRE_TRADE_ID = T2.TOTLE_TRADE_ID
-        LEFT JOIN TRD_PRODUCT_DEAL T3 ON T3.TOTLE_TRADE_ID = T1.TRD_ID
+        INNER JOIN REG_FIN_PRODUCT_DEAL_TOTAL T2 ON T1.PRE_TRADE_ID = T2.TOTLE_TRADE_ID
+        INNER JOIN TRD_PRODUCT_DEAL T3 ON T3.TOTLE_TRADE_ID = T1.TRD_ID
         WHERE TRD_CONF_STATUS = '1') REG
         ON REG.TRADE_ID = ETR_FINISH_STATUS.TRADE_ID
         GROUP BY ENTRUST_ID) T6 ON ETR_ENTRUST.ENTRUST_ID = T6.ENTRUST_ID
@@ -846,7 +846,7 @@
         tpd.UNIT_CPRICE fCprice,
         tpd.YIELD * 100 fYield,
         tpd.FPRICE_AMT vTradeAmt,
-        FTP.M_TRADE_AMT mTradeAmt,
+        FTP.M_TRADE_AMT mSettleAmt,
         nvl(fpt.TYPE_6,wtpdo.DL_TYPE) paBussType,
         fpt.TYPE_9 assetType1,
         fpt.TYPE_10 assetType10,
@@ -1476,7 +1476,7 @@
         eted.ASSET_TYPE,
         'F01',
         /*decode(ete.PS,'T03',ete.ENTRUST_AMT,NVL(ete.ENTRUST_NUM * 100, 0 )),*/
-        decode(ete.TRADE_MARKET,'03',ete.ENTRUST_AMT,'04',ete.ENTRUST_AMT,NVL(ete.ENTRUST_NUM * 100, 0 )),
+        decode(ete.PS,'T03',ete.ENTRUST_AMT,'03',ete.ENTRUST_AMT/100,'04',ete.ENTRUST_AMT/100,ete.ENTRUST_AMT,'T68',ete.ENTRUST_AMT/100,'T68',ete.ENTRUST_AMT/100,NVL(ete.ENTRUST_NUM * 100, 0 )),
         'F10',
         NVL( ete.ENTRUST_NUM * 100, 0 ),
         NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
@@ -1575,7 +1575,10 @@
         mci.CUSTOMER_NAME mainConsignee,
         to_char(eted.payment_date,'yyyy-MM-dd') paymentDate,
         to_char(eted.listing_date,'yyyy-MM-dd')  listingDate,
-        ete.entrust_num entrustNum,
+<!--         ete.entrust_num entrustNum,-->
+        case when eted.BUSI_TYPE_POSITION in ('EX017','EX005') THEN round(ete.entrust_num/100,4)
+        when ete.ps in ('T68','T69') THEN round(ete.entrust_num/100,4)
+        else ete.entrust_num end entrustNum,
         <!--ete.entrust_amt entrustAmt,
            按照列表查询价格修改 -->
         decode(

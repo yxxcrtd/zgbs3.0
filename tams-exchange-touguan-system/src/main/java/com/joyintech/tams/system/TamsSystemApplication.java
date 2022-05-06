@@ -37,7 +37,12 @@ public class TamsSystemApplication extends WebApplication {
 		return SwaggerConfig.createDocket("场内交易", "com.joyintech.tams.exchange.entrust.etrexchange");
 
 	}
-	
+
+	@Bean
+	public Docket dataTradeInfoDocket() {
+		return SwaggerConfig.createDocket("交易商信息维护", "com.joyintech.tams.exchange.basicdata.bussiness.traderinfo");
+
+	}
 
 
 	public static void main(String[] args) throws Exception {
