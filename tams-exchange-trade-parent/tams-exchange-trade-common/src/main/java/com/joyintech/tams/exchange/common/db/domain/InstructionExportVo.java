@@ -1,8 +1,10 @@
 package com.joyintech.tams.exchange.common.db.domain;
 
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
 import com.joyintech.tams.exchange.common.constant.TradePlat;
 import com.joyintech.tams.exchange.common.constant.instrument.SecondAssetType;
@@ -1113,6 +1115,7 @@ public class InstructionExportVo {
         if (StrUtil.isNotEmpty(this.progress)) {
             return this.progress;
         }
+        return TradeUtils.percentFormat(this.calcPercent(this.executeAmt()));
 
         BigDecimal total = TradeUtils.add(getEntrustLeftAmt(), getFrozenQuantity(), 2);
         Double progress;
@@ -1156,6 +1159,15 @@ public class InstructionExportVo {
         this.dealProgress = dealProgress;
     }
 
+    private BigDecimal calcPercent(BigDecimal amt) {
+        if (this.getEntrustNum() == 0L && BigDecimal.ZERO.compareTo(this.getEntrustAmt()) == 0) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal percent = this.volumeInstruction() ? NumberUtil.div(amt, this.getEntrustNum())
+                : NumberUtil.div(amt, this.getEntrustAmt());
+        return NumberUtil.round(NumberUtil.min(BigDecimal.ONE, percent), 4);
+    }
+
     /**
      * 剩余数量
      */
@@ -1182,8 +1194,8 @@ public class InstructionExportVo {
             return this.leftAmount;
         }
 
-        if (amtInstruction()) {
-            return TradeUtils.subtract(getEntrustAmt(), getEntrustLeftAmt(), getFrozenQuantity(), 2);
+        if (TradeUtils.bigThanZero(getEntrustAmt())) {
+            return NumberUtil.round(NumberUtil.sub(getEntrustAmt(), getEntrustLeftAmt(), getFrozenQuantity()),2);
         }
         return BigDecimal.ZERO;
     }
@@ -1192,14 +1204,21 @@ public class InstructionExportVo {
         this.leftAmount = leftAmount;
     }
 
+
+
+    /**
+     * 新债-非可转债
+     */
+    public boolean newBond() {
+        return InvestmentAssetType.BOND.codeEquals(this.getAssetType())
+                && SecondAssetType.KZZ.codeNotEquals(this.getAssetType1())
+                && TradePlat.NEW_BOND.codeEquals(this.getTradePlat());
+    }
+
     /**
      * 是否是数量指令
      */
     public boolean volumeInstruction() {
-        // 新债
-        if (newBond()) {
-            return TargetTypeEnum.YES.codeEquals(this.getTargetType());
-        }
         return this.getEntrustNum() > 0L;
     }
 
@@ -1211,11 +1230,9 @@ public class InstructionExportVo {
     }
 
     /**
-     * 新债-非可转债
+     * 已执行数量/金额
      */
-    public boolean newBond() {
-        return InvestmentAssetType.BOND.codeEquals(this.getAssetType())
-                && SecondAssetType.KZZ.codeNotEquals(this.getAssetType1())
-                && TradePlat.NEW_BOND.codeEquals(this.getTradePlat());
+    public BigDecimal executeAmt() {
+        return NumberUtil.add(this.getEntrustLeftAmt(), this.getFrozenQuantity());
     }
 }

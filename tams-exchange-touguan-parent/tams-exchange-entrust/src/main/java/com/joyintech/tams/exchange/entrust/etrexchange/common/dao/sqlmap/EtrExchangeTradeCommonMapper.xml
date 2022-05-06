@@ -1884,5 +1884,9 @@
         AND TMP.FINPROD_ID =#{ finprodId,jdbcType = VARCHAR }
     </select>
 
+    <delete id="deleteRskIsupTrial">
+        delete from RSK_ISUP_TRIAL
+        where TRADE_ID = #{entrustId, jdbcType=VARCHAR}
+    </delete>
 
 </mapper>

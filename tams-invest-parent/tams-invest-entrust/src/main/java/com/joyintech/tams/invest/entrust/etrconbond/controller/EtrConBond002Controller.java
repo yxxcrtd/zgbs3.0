@@ -5,6 +5,8 @@ import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.exception.MessageException;
+import com.joyintech.framework.exception.RestTemplateException;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
@@ -273,7 +275,12 @@ public class EtrConBond002Controller extends BaseController {
                       + entity.getFinprodMarketId()
                       );
         processParameter.setWorkFlowParameter(params);
-        String msg = etrConBondService.start(processParameter, dto);
+        String msg = "";
+        try {
+           msg = etrConBondService.start(processParameter, dto);
+        }catch (RestTemplateException e){
+            throw new MessageException(e.getMessage(),MessageType.错误消息);
+        }
         return new AjaxResult(msg);
     }
 }
