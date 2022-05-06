@@ -1550,7 +1550,7 @@
         a.FINPROD_ID ,
         a.INV_AIM ,
         a.PS ,
-        a.UNIT_CPRICE AS PRICE,
+        nvl(a.UNIT_CPRICE,0) AS PRICE,
         a.SHARE_AMT AS AMT
         from TRD_PRODUCT_DEAL a
         LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
@@ -1580,7 +1580,7 @@
         a.FINPROD_ID ,
         a.INV_AIM ,
         a.PS ,
-        a.UNIT_CPRICE AS PRICE,
+        nvl(a.UNIT_CPRICE,0) AS PRICE,
         a.SHARE_AMT AS AMT
         from TRD_PRODUCT_TEMP_DEAL a
         LEFT JOIN TRD_PRODUCT_TEMP_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
