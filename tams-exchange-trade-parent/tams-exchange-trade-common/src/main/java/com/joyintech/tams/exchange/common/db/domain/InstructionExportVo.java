@@ -1116,18 +1116,6 @@ public class InstructionExportVo {
             return this.progress;
         }
         return TradeUtils.percentFormat(this.calcPercent(this.executeAmt()));
-
-        BigDecimal total = TradeUtils.add(getEntrustLeftAmt(), getFrozenQuantity(), 2);
-        Double progress;
-        if (volumeInstruction()) {
-            progress = TradeUtils.divide(total, getEntrustNum(), 4).doubleValue();
-        } else if (TradeUtils.bigThanZero(getEntrustAmt())) {
-            progress = TradeUtils.divide(total, getEntrustAmt(), 4);
-        } else {
-            progress = 0D;
-        }
-
-        return TradeUtils.percentFormat(progress);
     }
 
     public void setProgress(String progress) {
@@ -1142,17 +1130,7 @@ public class InstructionExportVo {
         if (StrUtil.isNotEmpty(this.dealProgress)) {
             return this.dealProgress;
         }
-
-        Double progress;
-        if (volumeInstruction()) {
-            progress = TradeUtils.divide(getEntrustLeftAmt(), getEntrustNum(), 4).doubleValue();
-        } else if (TradeUtils.bigThanZero(getEntrustAmt())) {
-            progress = TradeUtils.divide(getEntrustLeftAmt(), getEntrustAmt(), 4);
-        } else {
-            progress = 0D;
-        }
-
-        return TradeUtils.percentFormat(progress);
+        return TradeUtils.percentFormat(this.calcPercent(this.getEntrustLeftAmt()));
     }
 
     public void setDealProgress(String dealProgress) {
