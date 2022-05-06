@@ -1,8 +1,10 @@
 package com.joyintech.tams.exchange.common.db.domain;
 
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.utils.DoubleSerializerUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
@@ -664,6 +666,12 @@ public class InstructionExportVo {
     }
 
     public String getEntrustStatus() {
+        if (DictCodeList.委托状态_已接收.getValue().equals(entrustStatus)) {
+            if (BigDecimal.ONE.compareTo(this.calcPercent(this.executeAmt())) == 0) {
+                return "已执行";
+            }
+            return "待执行";
+        }
         return entrustStatus;
     }
 
@@ -1078,18 +1086,7 @@ public class InstructionExportVo {
         if (StrUtil.isNotEmpty(this.progress)) {
             return this.progress;
         }
-
-        BigDecimal total = TradeUtils.add(getEntrustLeftAmt(), getFrozenQuantity(), 2);
-        Double progress;
-        if (getEntrustNum() > 0) {
-            progress = TradeUtils.divide(total, getEntrustNum(), 4).doubleValue();
-        } else if (TradeUtils.bigThanZero(getEntrustAmt())) {
-            progress = TradeUtils.divide(total, getEntrustAmt(), 4);
-        } else {
-            progress = 0D;
-        }
-
-        return TradeUtils.percentFormat(progress);
+        return TradeUtils.percentFormat(this.calcPercent(this.executeAmt()));
     }
 
     public void setProgress(String progress) {
@@ -1104,21 +1101,20 @@ public class InstructionExportVo {
         if (StrUtil.isNotEmpty(this.dealProgress)) {
             return this.dealProgress;
         }
-
-        Double progress;
-        if (getEntrustNum() > 0) {
-            progress = TradeUtils.divide(getEntrustLeftAmt(), getEntrustNum(), 4).doubleValue();
-        } else if (TradeUtils.bigThanZero(getEntrustAmt())) {
-            progress = TradeUtils.divide(getEntrustLeftAmt(), getEntrustAmt(), 4);
-        } else {
-            progress = 0D;
-        }
-
-        return TradeUtils.percentFormat(progress);
+        return TradeUtils.percentFormat(this.calcPercent(this.getEntrustLeftAmt()));
     }
 
     public void setDealProgress(String dealProgress) {
         this.dealProgress = dealProgress;
+    }
+
+    private BigDecimal calcPercent(BigDecimal amt) {
+        if (this.getEntrustNum() == 0L && BigDecimal.ZERO.compareTo(this.getEntrustAmt()) == 0) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal percent = this.volumeInstruction() ? NumberUtil.div(amt, this.getEntrustNum())
+                : NumberUtil.div(amt, this.getEntrustAmt());
+        return NumberUtil.round(NumberUtil.min(BigDecimal.ONE, percent), 4);
     }
 
     /**
@@ -1129,8 +1125,8 @@ public class InstructionExportVo {
             return this.leftVolume;
         }
 
-        if (getEntrustNum() > 0) {
-            return getEntrustNum() - getEntrustLeftAmt().longValue() - getFrozenQuantity().longValue();
+        if (this.volumeInstruction()) {
+            return NumberUtil.sub(getEntrustNum(), getEntrustLeftAmt(), getFrozenQuantity()).longValue();
         }
         return 0L;
     }
@@ -1148,12 +1144,33 @@ public class InstructionExportVo {
         }
 
         if (TradeUtils.bigThanZero(getEntrustAmt())) {
-            return TradeUtils.subtract(getEntrustAmt(), getEntrustLeftAmt(), getFrozenQuantity(), 2);
+            return NumberUtil.round(NumberUtil.sub(getEntrustAmt(), getEntrustLeftAmt(), getFrozenQuantity()),2);
         }
         return BigDecimal.ZERO;
     }
 
     public void setLeftAmount(BigDecimal leftAmount) {
         this.leftAmount = leftAmount;
+    }
+
+    /**
+     * 是否是数量指令
+     */
+    public boolean volumeInstruction() {
+        return this.getEntrustNum() > 0L;
+    }
+
+    /**
+     * 是否是金额指令
+     */
+    public boolean amtInstruction() {
+        return !volumeInstruction();
+    }
+
+    /**
+     * 已执行数量/金额
+     */
+    public BigDecimal executeAmt() {
+        return NumberUtil.add(this.getEntrustLeftAmt(), this.getFrozenQuantity());
     }
 }
