@@ -185,8 +185,8 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                 PositionHttpRequest.sendSslt(param);
             } catch (PositionException e) {
                 logger.error("处理失败-头寸处理异常", e);
-                WorkFlowUtil.showMessage("头寸处理异常,请检查头寸日期", MessageType.错误消息);
-                throw new PositionException(e);
+                //WorkFlowUtil.showMessage("头寸处理异常,请检查头寸日期", MessageType.错误消息);
+                //throw new PositionException(e);
             }
         }
     }
