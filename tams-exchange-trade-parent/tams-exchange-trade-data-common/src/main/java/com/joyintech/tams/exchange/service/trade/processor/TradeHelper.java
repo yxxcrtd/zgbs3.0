@@ -1170,7 +1170,7 @@ public class TradeHelper {
     /**
      * 判断是否公平交易
      */
-    private boolean isFairTransaction(OrderPlaceBean orderPlaceBean, Instruction instruction) {
+    public boolean isFairTransaction(OrderPlaceBean orderPlaceBean, Instruction instruction) {
         if (!Strings.isNullOrEmpty(orderPlaceBean.getAlgorithmId())
                 || !EntrustUtils.isFairOrder(orderPlaceBean.getEntrustProp())
                 || !EntrustUtils.isFairSwitchOpen(commonManagement.getFairCode())) {
@@ -1200,7 +1200,7 @@ public class TradeHelper {
     public void fillEntrustPriceAndAmt(OrderPlaceBean orderPlaceBean, PositionInstructionRequest instructionClone) {
         String entrustProp = orderPlaceBean.getEntrustProp();
         //公平交易
-        if (isFairTransaction(orderPlaceBean, instructionClone)) {
+        /*if (isFairTransaction(orderPlaceBean, instructionClone)) {
             logger.info("公平交易头寸检查...");
             if (EntrustProp.isMarketPrice(entrustProp)) {
                 //取行情涨跌停价
@@ -1209,9 +1209,9 @@ public class TradeHelper {
                 instructionClone.setEntrustNum(orderPlaceBean.getEntrustVolume());
                 instructionClone.setEntrustPrice(orderPlaceBean.getEntrustPrice());
             }
-        }
+        }*/
         //批量委托
-        else if (isBatchTransaction(orderPlaceBean)) {
+        /*else*/ if (isBatchTransaction(orderPlaceBean)) {
             logger.info("批量委托头寸检查...");
             BatchInfo batchInfo = orderPlaceBean.getBatchInfo();
             //下单笔数

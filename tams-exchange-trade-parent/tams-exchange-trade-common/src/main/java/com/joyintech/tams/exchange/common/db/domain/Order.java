@@ -259,6 +259,9 @@ public class Order implements Serializable, Cloneable, OrderInterface, KeyMethod
     @ApiModelProperty(name = "entrustClass", value = "委托指令类别：01-单组合，02-多组合")
     private String entrustClass;
 
+    @ApiModelProperty(name="softSkipMode",value="软控是否继续？Y：继续",example="Y")
+    private String softSkipMode;
+
     public Order() {
         this.orderPrice = new BigDecimal("0.00");
         this.orderBalance = new BigDecimal("0.00");
@@ -748,6 +751,14 @@ public class Order implements Serializable, Cloneable, OrderInterface, KeyMethod
         return "";
     }
 
+    public String getSoftSkipMode() {
+        return softSkipMode;
+    }
+
+    public void setSoftSkipMode(String softSkipMode) {
+        this.softSkipMode = softSkipMode;
+    }
+
     public static Order getTemplateOrder() {
         return templateOrder;
     }
@@ -776,6 +787,7 @@ public class Order implements Serializable, Cloneable, OrderInterface, KeyMethod
             newOrder.setOffsetFlag(orderPlaceBean.getOffsetFlag());
             newOrder.setHedgeFlag(orderPlaceBean.getHedgeFlag());
             newOrder.setFullPrice(orderPlaceBean.getFullPrice() == null ? new BigDecimal("0.00") : orderPlaceBean.getFullPrice());
+            newOrder.setSoftSkipMode(orderPlaceBean.getSoftSkipMode());
             return newOrder;
         } catch (Exception e) {
         }
