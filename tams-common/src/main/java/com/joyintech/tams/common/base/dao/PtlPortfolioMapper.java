@@ -1,12 +1,11 @@
 package com.joyintech.tams.common.base.dao;
 
-import java.util.List;
-import java.util.Map;
-
+import com.joyintech.tams.common.base.entity.PtlPortfolio;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
-import com.joyintech.tams.common.base.entity.PtlPortfolio;
+import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface PtlPortfolioMapper {
@@ -31,5 +30,7 @@ public interface PtlPortfolioMapper {
 	List<Map<String,Object>> getRiskInfoByPortfolioId(Map<String,Object> param);
 
     List<PtlPortfolio> selectPortfolioByIds(@Param("portfolioIds") List<String> portfolioIds);
+
+    List<PtlPortfolio> selectAllPortfolio();
 
 }

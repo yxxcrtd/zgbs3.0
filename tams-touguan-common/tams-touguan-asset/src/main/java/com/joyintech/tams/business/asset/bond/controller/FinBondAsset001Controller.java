@@ -15,6 +15,7 @@ import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.asset.bond.dto.*;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import com.joyintech.tams.business.asset.bond.service.FinBondAssetService;
 import com.joyintech.tams.business.asset.bond.service.FinBondAssetValidatorService;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import io.swagger.annotations.Api;
@@ -92,6 +94,9 @@ public class FinBondAsset001Controller extends BaseController{
     @Autowired
     private MstWorkflowCommonService mstWorkflowCommonService;
 
+    @Autowired
+    private IPlatformDate iPlatformDate;
+
     @ApiOperation(value="查询页面初始化参数", notes = "查询页面初始化参数")
     @PostMapping("/init")
     @ResponseBody
@@ -110,6 +115,7 @@ public class FinBondAsset001Controller extends BaseController{
         model.put("REGIST_ORG", this.getSelectDataFromDataDic(DictCode.登记托管机构, null));
         model.put("MAIN_GRADE_RESULT", this.getSelectDataFromDataDic(DictCode.评级结果, null));
         model.put("FINPROD_TYPE_TG_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+        model.put("iPlatformDate", iPlatformDate.getSysDateStr());
         model.put("isShowType", CacheUtil.getSysParam("IS_SHOW_TYPE")==null?"01":CacheUtil.getSysParam("IS_SHOW_TYPE"));
         //是否新增债券查询条件添加004控制  modify by liupeilin 2020-01-15  begin
         model.put("YES",DictCodeList.是否_是.getValue());

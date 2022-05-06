@@ -165,6 +165,12 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
     @ApiModelProperty(name="selectedItem",value="选中的数据")
     private transient List<CfetsEtrBondFirstBid002Dto> selectedItem;
 
+    /**
+     * 交易对手名称
+     */
+    @ApiModelProperty(name="counterName",value="交易对手名称")
+    private String counterName;
+
     public String getElementId() {
         return elementId;
     }
@@ -357,5 +363,13 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
 
     public void setSelectedItem(List<CfetsEtrBondFirstBid002Dto> selectedItem) {
         this.selectedItem = selectedItem;
+    }
+
+    public String getCounterName() {
+        return counterName;
+    }
+
+    public void setCounterName(String counterName) {
+        this.counterName = counterName;
     }
 }

@@ -4,7 +4,10 @@ import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.ArithmeticUtil;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
@@ -14,6 +17,7 @@ import com.joyintech.tams.cfets.etr.bondfirstbid.service.CfetsEtrBondFirstBid002
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
+import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
@@ -23,6 +27,7 @@ import com.joyintech.tams.invest.entrust.common.aop.EntrustRdsCommonAop;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
+import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -36,7 +41,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 一级投标指令新增/修改
@@ -63,6 +70,38 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
      */
     @Autowired
     private BaseGetBusinessId bussGetBussinessIdService;
+
+    @ResponseBody
+    @PostMapping("/initParam")
+    @ApiOperation(value = "新建/修改/查看页面初始化", notes = "新建/修改/查看页面初始化")
+    public Message<Map<String, Object>> init() {
+        Map<String, Object> params = new HashMap<>();
+        String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
+        boolean todoList = false;
+        CfetsEtrBondFirstBid002Dto entity = new CfetsEtrBondFirstBid002Dto();
+        // 待办中过来
+        if (!WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotEmpty(workflowId)) {
+            todoList = true;
+            entity = cfetsEtrBondFirstBid002Service.getBussinessEntityByWorkflowId(workflowId);
+        } else {//来自新增或者修改
+
+        }
+        //数据字典初始化数据
+        params.put("BUSINESS_MODEL", this.getSelectDataFromDataDic(DictCode.业务模式, null));
+
+        params.put(GlobalConstant.ENTITY, entity);
+        //pageId
+        params.put("pageId", this.getPageId());
+        //当前平台日
+        params.put("platDate", DateUtil.platDateFromCache());
+        //当前用户
+        params.put("userId", SecurityUtil.getLoginUser().getUserName());
+        //流程id
+        params.put("workflowId", workflowId);
+        //是否流程中打开
+        params.put("todoList", todoList);
+        return new Message<Map<String, Object>>(params).success();
+    }
 
 
     @ResponseBody
