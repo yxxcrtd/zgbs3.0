@@ -368,6 +368,7 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
         String action = StringUtil.EMPTY;
 
         if (OperationType.DELETE.equals(type)) {
+            action = ENTRUST_RECORD_DELETE;
             doCompleteDelete(entity);
         } else {
             entity = encapBaseFinProductBaseInfoList(entity);
@@ -378,11 +379,14 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
                 //从待办中进入的无法判断是否新建还是编辑
                 if (selectCountByfinprodId(DictCodeList.平安资产类型_债券.getValue() +
                         "_" + entity.getFinprodMarketId()) > 0) {
+                    action = ENTRUST_RECORD_UPDATE;
                     doCompleteUpdate(entity);
                 } else {
+                    action = ENTRUST_RECORD_INSERT;
                     doCompleteInsert(entity);
                 }
             } else {
+                action = ENTRUST_RECORD_UPDATE;
                 doCompleteUpdate(entity);
             }
         }
@@ -647,10 +651,11 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
         //标的类金融产品entity
         FinProduct finProduct = new FinProduct();
         BeanUtil.copyPropertiesIgnoreNull(finProduct, dto);
+        finProduct.setIssuePrice(dto.getIssuePrice());
         //期限
         finProduct.setTermDays(DateUtil.getBetweenDayNumber(dto.getVdate(), dto.getMdate()));
         finProduct.setIssueAmt(ArithmeticUtil.multiply(dto.getIssueAmt(), new BigDecimal("100000000")));
-        finProduct.setTradeMarket(this.getCalendarId(dto.getTradeMarket()));
+        finProduct.setCalendarId(this.getCalendarId(dto.getTradeMarket()));
         // 一体化对应etliu start
         // 债券新建画面，入库时，标的类金融产品表的含权债摊销日字段，当含权债时，登数据字典【含权债摊销日.最近行权日】
         if (StringUtil.equals(DictCodeList.是否_是.getValue(), finProduct.getIsRight())) {
@@ -692,9 +697,10 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
 //        }
         //----add by jjpei 20190727 添加投资性质----end----
         //转债信息
-        FinProductConvertible finProductConvertible = new FinProductConvertible();
-        finProductConvertible.setConFinprodId(dto.getFinprodId());
-        if (StringUtil.isNotEmpty(dto.getFinProductConvertible())) {
+        if (StringUtil.isNotEmpty(dto.getFinProductConvertible()) &&
+        StringUtil.isNotEmpty(dto.getFinProductConvertible().getConPrice())) {
+            FinProductConvertible finProductConvertible = new FinProductConvertible();
+            finProductConvertible.setConFinprodId(dto.getFinprodId());
             BeanUtil.copyPropertiesIgnoreNull(finProductConvertible, dto.getFinProductConvertible());
             dto.setProductConvertible(finProductConvertible);
         }
@@ -839,7 +845,7 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
             for (BondFinExercisePlanDto finExercisePlanDto: finExercisePlanList){
                 FinExercisePlan finExercisePlan = new FinExercisePlan();
                 BeanUtil.copyPropertiesIgnoreNull(finExercisePlan,finExercisePlanDto);
-                finExercisePlan.setCashId(finCashInfoInterest.getCashId());
+                finExercisePlan.setCashId(finCashInfoPrincipal.getCashId());
                 finExercisePlan.setFinprodId(dto.getFinprodId());
                 finExercisePlan.setFinprodType(DictCodeListExt1.金融产品类型_债券.getValue());
                 finExercisePlan.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());

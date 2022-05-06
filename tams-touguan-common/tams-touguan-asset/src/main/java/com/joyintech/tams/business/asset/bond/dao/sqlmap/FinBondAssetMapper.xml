@@ -270,7 +270,7 @@
             T1.IDATE IDATE,
             T1.VDATE VDATE,
             T1.MDATE MDATE,
-            T1.DELISTING_DATE DELISTING_DATE,
+            T1.DELISTING_DATE delistingDate,
             NVl(T1.ISSUE_AMT,0)/100000000 ISSUE_AMT,
             T1.ISSUER ISSUER,
             T3.TYPE_9 TYPE_9,
@@ -313,7 +313,10 @@
             T1.REMARK REMARK,
             NVL(T4.CIRCULATION_DATE,T7.LISTING_DATE)  listingDate,
             T10.CASH_ID interestCashId,
-            T11.CASH_ID principalCashId
+            T11.CASH_ID principalCashId,
+            T13.PAY_CYCLE  payCycle,
+            T13.PAY_TDAY_RULE  payTdayRule,
+            T13.CALC_RULE  calcRule
         FROM FIN_PRODUCT T1
         LEFT JOIN FIN_PRODUCT_ADD T2
         ON		T2.FINPROD_ID = T1.FINPROD_ID
@@ -1042,7 +1045,7 @@
         </where>
     </select>
 
-    <select id="getCommonSearchTabInfoQueryOperate" resultType="com.joyintech.tams.business.asset.bond.dto.SearchInfoOperateListResponse">
+    <select id="getSearchTabInfoQueryOperate" resultType="com.joyintech.tams.business.asset.bond.dto.SearchInfoOperateListResponse">
         SELECT rownum SEQ_NO,t.* from (select
                his.ENTRUST_ID,
                FP.FINPROD_ABBR,
@@ -1081,7 +1084,7 @@
         T1.BASE_TYPE,
         T1.BASE_DATE_TYPE,
         T1.BASIS,
-        T1.YIELD*100 YIELD,
+        T1.YIELD YIELD,
         T1.IS_INITIAL,
         T1.BRANCH,
         T2.CASH_ID,

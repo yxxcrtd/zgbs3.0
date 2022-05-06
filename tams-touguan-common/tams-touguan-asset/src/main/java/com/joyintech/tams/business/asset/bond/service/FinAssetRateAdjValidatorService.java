@@ -14,9 +14,9 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.BeanValidator;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.asset.bond.dto.FinAssetRateAdjResponse;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.invest.asset.common.dto.FinAssetRateAdjDto;
 import com.joyintech.tams.invest.asset.common.service.AssetCommonService;
 import com.joyintech.tams.invest.common.asset.dto.AssetCommonInfoDto;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
@@ -48,9 +48,9 @@ public class FinAssetRateAdjValidatorService implements BeanValidator{
     @Override
     public List<ValidMessage> valid(Object value) {
         List<ValidMessage> resultList = new ArrayList<ValidMessage>();
-        FinAssetRateAdjDto dto = (FinAssetRateAdjDto)value;
+        FinAssetRateAdjResponse dto = (FinAssetRateAdjResponse)value;
         Set<Date> set = new  HashSet<Date>();Set<String> setForChannel = new  HashSet<String>();
-        if(StringUtil.equals(dto.getType(), "01")){
+        if(StringUtil.equals(dto.getCouponSpecies(), "01")){
             Map<String,Object> map = new HashMap<String,Object>();
             map.put("finprodId", dto.getFinprodId());
             map.put("cashType", DictCodeListExt1.现金流二级类型_利息.getValue());
@@ -70,7 +70,7 @@ public class FinAssetRateAdjValidatorService implements BeanValidator{
             }
         }
         if(null!=dto.getSelectedItem()&&!dto.getSelectedItem().isEmpty()){
-            for(FinAssetRateAdjDto entity:dto.getSelectedItem()){
+            for(FinAssetRateAdjResponse entity:dto.getSelectedItem()){
                 if(null==entity.getEffDate()){
                     resultList.add(new ValidMessage("effDate",
                         getMessage("COMMON_E_0057", getMessage("FinAssetRateAdj001.effDate"))));
