@@ -14,7 +14,6 @@ import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
@@ -31,7 +30,6 @@ import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.common.base.dao.EtrEntrustBackupMapper;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
-import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
@@ -154,8 +152,9 @@ public class EtrConBondController {
     @DTXTransaction
     @PostMapping("recall")
     public boolean recallDelegate(@RequestBody EtrConBondDto dto) throws IllegalAccessException, InvocationTargetException {
+        log.info("recall() called with parameters => 【dto = {}】", JsonUtils.object2Json(dto));
         boolean result = service.recallDelegate(dto);
-//        positionRequestService.sendRevoke(dto);
+        //positionRequestService.sendRevoke(dto);
         return result;
     }
 
@@ -171,6 +170,7 @@ public class EtrConBondController {
     @DTXTransaction
     @GetMapping("close")
     public boolean closeDelegate(String entrustId, String closeWay) {
+        log.info("close() called with parameters => 【entrustId = {}】", entrustId);
         boolean result = service.closeDelegate(entrustId, closeWay);
         positionRequestService.sendClose(entrustId, closeWay);
         return result;
@@ -210,8 +210,8 @@ public class EtrConBondController {
     @Transactional
     @DTXTransaction
     @PostMapping("doInsert")
-    public void doInsert(@RequestBody EtrConBondDto dto){
-        log.debug("doInsert() called with parameters => 【dto = {}】", JsonUtils.object2Json(dto));
+    public void doInsert(@RequestBody EtrConBondDto dto) {
+        log.info("doInsert() called with parameters => 【dto = {}】", JsonUtils.object2Json(dto));
 
         String operateType = dto.getOperateType();
         WFlowCommonService.doInsertFlow(operateType, service.initBaseDto(dto));
@@ -226,15 +226,14 @@ public class EtrConBondController {
         if (StringUtil.equals(OPERATE_TYPE_MODIFY, operateType)) {
             systemAct = DictCodeListExt3.系统动作_修改.getValue();
         }
-        dto.setSoftSkipMode(DictCodeList.是否_是.getValue());
         positionRequestService.sendEtrConBondDto(dto, decisionAct, systemAct);
     }
 
     @Transactional
     @DTXTransaction
     @PostMapping("doUpdate")
-    public void doUpdate(@RequestBody EtrConBondDto dto){
-        log.debug("doUpdate() called with parameters => 【dto = {}】",JsonUtils.object2Json(dto));
+    public void doUpdate(@RequestBody EtrConBondDto dto) {
+        log.info("doUpdate() called with parameters => 【dto = {}】", JsonUtils.object2Json(dto));
 
         String operateType = dto.getOperateType();
         WFlowCommonService.doUpdateFlow(operateType, service.initBaseDto(dto));
@@ -278,7 +277,7 @@ public class EtrConBondController {
         }
         try {
             dto.setPositionSeqno(null);
-            positionRequestService.sendEtrConBondDto(dto,decisionAct,systemAct);
+            positionRequestService.sendEtrConBondDto(dto, decisionAct, systemAct);
         } catch (PositionException e) {
             Message message = PositionUtil.ajaxErrorReturn(e);
             if (StringUtil.isNotBlank(message.getMessage())) {
@@ -298,8 +297,21 @@ public class EtrConBondController {
     @DTXTransaction
     @PostMapping("doBack")
     public void doBack(@RequestBody EtrConBondDto dto) {
+        log.info("doBack() called with parameters => 【dto = {}】", JsonUtils.object2Json(dto));
         WFlowCommonService.doBackFlow(dto.getWorkflowId(), dto.getEntrustId());
-        positionRequestService.sendDelete(dto);
+//        positionRequestService.sendDelete(dto);
+    }
+
+    @Transactional
+    @DTXTransaction
+    @PostMapping("doDelete")
+    public void doDelete(@RequestBody Map<String, Object> param) {
+        log.info("doDelete() called with parameters => 【param = {}】", param);
+        final String workflowId = (String) param.get("workflowId");
+        WFlowCommonService.deleteFlow(workflowId);
+        EtrConBondDto entity = new EtrConBondDto();
+        entity.setWorkflowId(workflowId);
+        positionRequestService.sendDelete(entity);
     }
 
     /**
@@ -315,6 +327,7 @@ public class EtrConBondController {
     @DTXTransaction
     @GetMapping("delete")
     public boolean deleteDelegate(String entrustId) {
+        log.info("delete() called with parameters => 【entrustId = {}】", entrustId);
         return service.deleteDelegate(entrustId);
     }
 

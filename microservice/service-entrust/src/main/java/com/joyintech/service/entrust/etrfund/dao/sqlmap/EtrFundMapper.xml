@@ -591,6 +591,7 @@
         LEFT JOIN FIN_PRODUCT_TYPE ON FIN_PRODUCT.FINPROD_ID = FIN_PRODUCT_TYPE.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ADD ON FIN_PRODUCT.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
         <include refid="getFinprodMarketIdWhere"></include>
+        AND FIN_PRODUCT.MDATE > sysdate
         <if test="ps != null and ps != ''">
             <if test="ps == PS_T04 or ps == PS_T06 ">
                 AND  (FIN_PRODUCT_TYPE.TYPE_6 != #{FUND_ASSET_TYPE_F02} OR (FIN_PRODUCT_TYPE.TYPE_6 = #{FUND_ASSET_TYPE_F02}

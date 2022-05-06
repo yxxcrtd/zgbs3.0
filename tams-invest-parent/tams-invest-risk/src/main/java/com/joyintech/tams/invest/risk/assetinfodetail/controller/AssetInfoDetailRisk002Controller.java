@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.framework.util.CacheUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +82,8 @@ public class AssetInfoDetailRisk002Controller extends BaseController {
 
         String assetUuid = this.getParam("assetUuid");
         String dataStatus = this.getParam("dataStatus");
-        String issuepartyid= CommonUtil.selectBankCode();
+//        String issuepartyid= CommonUtil.selectBankCode();
+        String issuepartyid= CacheUtil.getSysParam("SVR_ISSUE_PARTY_ID");
         String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
         String jsonObject = JSONObject.toJSONString(assetInfoDetailRisk001Service.getDataListLink());
         model.addAttribute("AssetTypeListLink", jsonObject);

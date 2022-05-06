@@ -256,6 +256,10 @@ public class EtrBrowDepoInfoDto extends EtrEntrust implements ProcessEntity{
         return SysDataUtil.getNameFromDataDict(DictCode.交易方向, super.getPs());
     }
 
+    public String getPayFreqStr(){
+        return SysDataUtil.getNameFromDataDict(DictCode.频率, getPayFreq());
+    }
+
     /**
      * 取得 组合代码
      * @return 组合代码

@@ -1024,6 +1024,10 @@ public class PtlManagementInfo001Service extends BaseService<PtlManagementInfoDt
         bussCommonMapperDelegateService.deleteByPrimaryKey(PtlValParamMapper.class, portfolioId);
         deleteUserId(portfolioId);
         deleteFinCashInfoByFinprodId(portfolioId);
+
+        //删除组合时同步删除银行间账户组合关系（IBU_PORTFOLIO_ACCT_RELA）
+        ptlManagementInfo001Mapper.deleteByPortfolioId(portfolioId);
+
         return "Success";
     }
 

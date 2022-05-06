@@ -530,4 +530,12 @@ public interface PtlManagementInfo001Mapper {
 
     List<PtlAuthInfoDto> getPtlAuthInfo(Map<String, Object> param);
 
+    /**
+     * 删除组合时同步删除银行间账户组合关系（IBU_PORTFOLIO_ACCT_RELA）
+     * @param portfolioId 组合管理实体类
+     * @return 是否
+     * @see
+     * @since 1.0
+     */
+    int deleteByPortfolioId(String portfolioId);
 }

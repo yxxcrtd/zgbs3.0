@@ -303,11 +303,11 @@ public class EtrExchangeTradeEtrExchangeCommonResponse {
      * @see
      * @since 1.0
      */
-    public BigDecimal getImplementPercentAge(){
+    public String getImplementPercentAge(){
         if(StringUtil.isNotEmpty(implementPercent)){
-            return implementPercent.multiply(new BigDecimal(100));
+            return (implementPercent.multiply(new BigDecimal(100))).setScale(2, BigDecimal.ROUND_HALF_UP).toString();
         }else{
-            return new BigDecimal(0);
+            return "0";
         }
     }
 

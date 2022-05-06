@@ -241,6 +241,7 @@
                     $('#entrustAmt').attr("disabled",false);
                     $('#entrustNum_div').hide();
                     $('#entrustNum').val('');
+                    $('#entrustAmt').attr('disabled',false);
                     $('#assetAvailablePosition_div').hide();
                     $('#carryAmt_div').hide();
                     $('#entrustAmt_div2').hide();

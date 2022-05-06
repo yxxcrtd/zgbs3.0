@@ -29,7 +29,7 @@ public class PortfolioCalculateResponse {
     private String acctNo;
 
     @JsonProperty("fullPrice")
-    private String fullPrice;
+    private BigDecimal fullPrice;
 
     @JsonProperty("priceMode")
     private String priceMode;
@@ -83,7 +83,7 @@ public class PortfolioCalculateResponse {
      *
      * @return portfolioInfo
      */
-    @ApiModelProperty(required = true, value = "组合信息")
+    @ApiModelProperty(value = "组合信息")
     public PortfolioInfoResponse getPortfolioInfo() {
         return portfolioInfo;
     }
@@ -102,7 +102,7 @@ public class PortfolioCalculateResponse {
      *
      * @return portfolioName
      */
-    @ApiModelProperty(required = true, value = "组合名称")
+    @ApiModelProperty(value = "组合名称")
     public String getPortfolioName() {
         return portfolioName;
     }
@@ -121,7 +121,7 @@ public class PortfolioCalculateResponse {
      *
      * @return portfolioId
      */
-    @ApiModelProperty(required = true, value = "组合代码")
+    @ApiModelProperty(value = "组合代码")
     public String getPortfolioId() {
         return portfolioId;
     }
@@ -140,7 +140,7 @@ public class PortfolioCalculateResponse {
      *
      * @return finprodName
      */
-    @ApiModelProperty(required = true, value = "资产名称")
+    @ApiModelProperty(value = "资产名称")
     public String getFinprodName() {
         return finprodName;
     }
@@ -159,7 +159,7 @@ public class PortfolioCalculateResponse {
      *
      * @return acctNo
      */
-    @ApiModelProperty(required = true, value = "资金账户")
+    @ApiModelProperty(value = "资金账户")
     public String getAcctNo() {
         return acctNo;
     }
@@ -168,7 +168,7 @@ public class PortfolioCalculateResponse {
         this.acctNo = acctNo;
     }
 
-    public PortfolioCalculateResponse fullPrice(String fullPrice) {
+    public PortfolioCalculateResponse fullPrice(BigDecimal fullPrice) {
         this.fullPrice = fullPrice;
         return this;
     }
@@ -178,12 +178,12 @@ public class PortfolioCalculateResponse {
      *
      * @return fullPrice
      */
-    @ApiModelProperty(required = true, value = "资金账户")
-    public String getFullPrice() {
+    @ApiModelProperty(value = "全价")
+    public BigDecimal getFullPrice() {
         return fullPrice;
     }
 
-    public void setFullPrice(String fullPrice) {
+    public void setFullPrice(BigDecimal fullPrice) {
         this.fullPrice = fullPrice;
     }
 
@@ -197,7 +197,7 @@ public class PortfolioCalculateResponse {
      *
      * @return priceMode
      */
-    @ApiModelProperty(required = true, value = "价格模式")
+    @ApiModelProperty(value = "价格模式")
     public String getPriceMode() {
         return priceMode;
     }
@@ -211,7 +211,7 @@ public class PortfolioCalculateResponse {
      *
      * @return priceModeStr
      */
-    @ApiModelProperty(required = true, value = "价格模式含义")
+    @ApiModelProperty(value = "价格模式含义")
     public String getPriceModeStr() {
         if (StringUtil.isEmpty(priceMode)) {
             return null;
@@ -233,7 +233,7 @@ public class PortfolioCalculateResponse {
      *
      * @return instructionId
      */
-    @ApiModelProperty(required = true, value = "指令代码")
+    @ApiModelProperty(value = "指令代码")
     public String getInstructionId() {
         return instructionId;
     }
@@ -252,7 +252,7 @@ public class PortfolioCalculateResponse {
      *
      * @return finprodMarketId
      */
-    @ApiModelProperty(required = true, value = "资产代码")
+    @ApiModelProperty(value = "资产代码")
     public String getFinprodMarketId() {
         return finprodMarketId;
     }
@@ -271,7 +271,7 @@ public class PortfolioCalculateResponse {
      *
      * @return entrustAmt
      */
-    @ApiModelProperty(required = true, value = "委托金额")
+    @ApiModelProperty(value = "委托金额")
     public BigDecimal getEntrustAmt() {
         return entrustAmt;
     }
@@ -290,7 +290,7 @@ public class PortfolioCalculateResponse {
      *
      * @return entrustPrice
      */
-    @ApiModelProperty(required = true, value = "委托价格")
+    @ApiModelProperty(value = "委托价格")
     public BigDecimal getEntrustPrice() {
         return entrustPrice;
     }
@@ -309,7 +309,7 @@ public class PortfolioCalculateResponse {
      *
      * @return entrustProp
      */
-    @ApiModelProperty(required = true, value = "委托模式")
+    @ApiModelProperty(value = "委托模式")
     public String getEntrustProp() {
         return entrustProp;
     }
@@ -328,7 +328,7 @@ public class PortfolioCalculateResponse {
      *
      * @return instructionTotalAmt
      */
-    @ApiModelProperty(required = true, value = "指令总金额")
+    @ApiModelProperty(value = "指令总金额")
     public BigDecimal getInstructionTotalAmt() {
         return instructionTotalAmt;
     }
@@ -347,7 +347,7 @@ public class PortfolioCalculateResponse {
      *
      * @return instructionTotalNum
      */
-    @ApiModelProperty(required = true, value = "指令总数量")
+    @ApiModelProperty(value = "指令总数量")
     public Long getInstructionTotalNum() {
         return instructionTotalNum;
     }
@@ -366,7 +366,7 @@ public class PortfolioCalculateResponse {
      *
      * @return instructionLeftAmt
      */
-    @ApiModelProperty(required = true, value = "指令剩余金额")
+    @ApiModelProperty(value = "指令剩余金额")
     public BigDecimal getInstructionLeftAmt() {
         return instructionLeftAmt;
     }
@@ -385,7 +385,7 @@ public class PortfolioCalculateResponse {
      *
      * @return disRate
      */
-    @ApiModelProperty(required = true, value = "分配比例")
+    @ApiModelProperty(value = "分配比例")
     public BigDecimal getDisRate() {
         return disRate;
     }
@@ -404,7 +404,7 @@ public class PortfolioCalculateResponse {
      *
      * @return entrustNum
      */
-    @ApiModelProperty(required = true, value = "委托数量")
+    @ApiModelProperty(value = "委托数量")
     public Long getEntrustNum() {
         return entrustNum;
     }
@@ -423,7 +423,7 @@ public class PortfolioCalculateResponse {
      *
      * @return conNum
      */
-    @ApiModelProperty(required = true, value = "转股数量")
+    @ApiModelProperty(value = "转股数量")
     public Long getConNum() {
         return conNum;
     }
@@ -442,7 +442,7 @@ public class PortfolioCalculateResponse {
      *
      * @return instructionLeftNum
      */
-    @ApiModelProperty(required = true, value = "指令剩余数量")
+    @ApiModelProperty(value = "指令剩余数量")
     @NotNull
 
 

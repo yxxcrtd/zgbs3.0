@@ -152,7 +152,7 @@
                     portfolioId:$('#portfolioId').val(),
                     ccy:$('#ccy').val()
             };
-            Joyin.ajax(basePath + 'invest/portfolio/ptlfundallocation/PtlFundAllocation002/getAmount', data, function(result) {//数据验证
+            Joyin.ajax(basePath + 'invest/portfolio/ptlfundallocation/PtlFundAllocation002/getActAmount', data, function(result) {//数据验证
                 if (result && result != ''){
                     $('#' + acctAmountId).val(result).trigger('blur');
                 } else {

@@ -47,7 +47,7 @@ public class CommonCheckHelper {
     //    @Autowired
 //    private QuoteTickService quoteTickService;
     @Autowired
-    private QuoteService quoteService;
+    private QuoteTickService quoteTickService;
     @Autowired
     private InstrumentService instrumentService;
     @Autowired

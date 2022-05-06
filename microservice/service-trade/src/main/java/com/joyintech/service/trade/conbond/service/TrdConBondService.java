@@ -10,20 +10,6 @@
 
 package com.joyintech.service.trade.conbond.service;
 
-import java.lang.reflect.InvocationTargetException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.joyintech.system.base.entity.SysWflBusinessList;
-import com.joyintech.workflow.engine.constant.OperationType;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
@@ -32,34 +18,10 @@ import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.trade.conbond.dao.TrdConBondMapper;
 import com.joyintech.service.trade.conbond.dto.TrdConBondDto;
-import com.joyintech.tams.common.base.dao.PaTrdFinProductDealTotalMapper;
-import com.joyintech.tams.common.base.dao.PaTrdProductDealMapper;
-import com.joyintech.tams.common.base.dao.StlPayOrdersMapper;
-import com.joyintech.tams.common.base.dao.TrdDealTotalAddMapper;
-import com.joyintech.tams.common.base.dao.TrdFinProductDealTotalMapper;
-import com.joyintech.tams.common.base.dao.TrdProductDealAddMapper;
-import com.joyintech.tams.common.base.dao.TrdProductDealMapper;
-import com.joyintech.tams.common.base.dao.WflPaTrdFinDealTotalMapper;
-import com.joyintech.tams.common.base.dao.WflPaTrdProductDealMapper;
-import com.joyintech.tams.common.base.dao.WflStlPayOrdersMapper;
-import com.joyintech.tams.common.base.dao.WflTrdDealTotalAddMapper;
-import com.joyintech.tams.common.base.dao.WflTrdFinProductDealTotalMapper;
-import com.joyintech.tams.common.base.dao.WflTrdProductDealAddMapper;
-import com.joyintech.tams.common.base.dao.WflTrdProductDealMapper;
-import com.joyintech.tams.common.base.entity.PaTrdFinProductDealTotal;
-import com.joyintech.tams.common.base.entity.PtlTrade;
-import com.joyintech.tams.common.base.entity.StlPayOrders;
-import com.joyintech.tams.common.base.entity.TrdDealTotalAdd;
-import com.joyintech.tams.common.base.entity.TrdFinProductDealTotal;
-import com.joyintech.tams.common.base.entity.TrdProductDeal;
-import com.joyintech.tams.common.base.entity.TrdProductDealAdd;
-import com.joyintech.tams.common.base.entity.WflPaTrdFinDealTotal;
-import com.joyintech.tams.common.base.entity.WflPaTrdProductDeal;
-import com.joyintech.tams.common.base.entity.WflStlPayOrders;
-import com.joyintech.tams.common.base.entity.WflTrdDealTotalAdd;
-import com.joyintech.tams.common.base.entity.WflTrdFinProductDealTotal;
-import com.joyintech.tams.common.base.entity.WflTrdProductDeal;
-import com.joyintech.tams.common.base.entity.WflTrdProductDealAdd;
+import com.joyintech.system.base.dao.SysWflBusinessListMapper;
+import com.joyintech.system.base.entity.SysWflBusinessList;
+import com.joyintech.tams.common.base.dao.*;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
@@ -71,6 +33,17 @@ import com.joyintech.tams.invest.common.dto.MstFileInputParameter;
 import com.joyintech.tams.invest.common.service.MapperDelegateService;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.dto.AllTradeCommonInputDto;
+import com.joyintech.workflow.engine.constant.OperationType;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
+import java.util.*;
+
+import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_修改;
+import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_新建;
 
 /**
  * 可转债交易Service
@@ -164,6 +137,9 @@ public class TrdConBondService extends BaseService {
 
     @Autowired
     private PositionRequestTrdConBondService positionRequestService;
+
+    @Autowired
+    private SysWflBusinessListMapper sysWflBusinessListMapper;
 
     /**
      * 分页查询
@@ -420,7 +396,14 @@ public class TrdConBondService extends BaseService {
             String decisionAct = DictCodeListExt3.系统动作_新建.getValue();
             String systemAct = DictCodeListExt3.系统动作_新建.getValue();
             if (StringUtil.equals(entity.getOperateType(), "modify")) {
-                systemAct = DictCodeListExt3.系统动作_修改.getValue();
+                systemAct = DictCodeListExt3.系统动作_新建.getValue();
+                decisionAct = DictCodeListExt3.系统动作_修改.getValue();
+            }else {
+                SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey(entity.getWorkflowId());
+                if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
+                    systemAct = 系统动作_新建.getValue();
+                    decisionAct = 系统动作_修改.getValue();
+                }
             }
             positionRequestService.sendTrdConBondDto(entity,decisionAct,systemAct);
         }else{

@@ -382,7 +382,7 @@
             var repoterm = $('#termDays').val();
             var re = /^[0-9]*$/;
             var tradeMarket = $('#tradeMarket').val();
-            if($('#tradeMarket').val()=='01'||$('#tradeMarket').val()==''){
+            if($('#tradeMarket').val()=='01'||$('#tradeMarket').val()=='09'||$('#tradeMarket').val()==''){
                 if(repoterm && re.test(repoterm)){
                     var vdate = $('#vdateAdd').val();
                     if(vdate){

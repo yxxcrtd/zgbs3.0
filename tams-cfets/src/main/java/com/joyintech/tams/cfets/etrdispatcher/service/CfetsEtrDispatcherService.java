@@ -21,14 +21,7 @@ import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.IDGenerator;
-import com.joyintech.framework.util.RequestUtil;
-import com.joyintech.framework.util.StringUtil;
-import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.service.entrust.etrbondfirstlbidding.dao.EtrBondFirstLBiddingMapper;
 import com.joyintech.service.entrust.etrbondfirstlbidding.dto.EtrBondFirstLBiddingDto;
@@ -80,11 +73,7 @@ import com.joyintech.tams.common.base.entity.User;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.business.riskrds.constant.InterfUtil;
 import com.joyintech.tams.component.business.riskrds.constant.PageFieldToInterfFactory;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.CommonUtil;
 import com.joyintech.tams.invest.common.client.ClientData;
 import com.joyintech.tams.invest.common.component.base.entrust.impl.BaseEtrInvestInfoServiceImpl;
@@ -108,6 +97,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 
 import java.math.BigDecimal;
@@ -1645,6 +1636,14 @@ public class CfetsEtrDispatcherService extends BaseService {
         if(StringUtil.isNotEmpty(fieldResponseDto) && DictCodeListExt3.投管业务类型_新股申购.equals(fieldResponseDto.getBusiTypePosition())){
             fieldResponseDto.setPriceModel(StringUtil.EMPTY);
         }
+        String showInvaimOrBussinssmodel = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
+        if(null != showInvaimOrBussinssmodel && showInvaimOrBussinssmodel.equals("02")){
+            infoForm.forEach(field->{
+                if(field.getColname().equals("投资目的")){
+                    field.setColname("业务模式");
+                }
+            });
+        }
         resultData.put(dtCode + "_form", infoForm);
         resultData.put(dtCode + "_data", fieldResponseDto);
         return resultData;
@@ -1667,6 +1666,8 @@ public class CfetsEtrDispatcherService extends BaseService {
         pageParam.put("YESORNO_YES", DictCodeList.是否_是.getValue());
         List<String> entrustIdList = StringUtil.splitToList(",", (String) pageParam.get("entrustId"));
         pageParam.put("sysDateStr", platformDateImpl.getSysDateStr());
+        pageParam.put("SHOW_INVAIM_OR_BUSSINSSMODEL", CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL"));
+
         if (StringUtil.isBlank(dto.getEntrustId()) || entrustIdList.size() > 1) {
             return new CfetsEtrDispatcherInfoExcResponse();
         } else {
@@ -1728,6 +1729,13 @@ public class CfetsEtrDispatcherService extends BaseService {
                 } else if (StringUtil.equals(DictCodeList.平安资产类型_质押式回购.getValue(), dto.getFinprodType2())
                         && StringUtil.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_竞价交易.getValue())) {
                     fieldResponseDto.setUnitPrice(ArithmeticUtil.multiply(fieldResponseDto.getUnitPrice(), BigDecimal.valueOf(100)));
+                }
+                ////将投资经理转为真实姓名
+                if (StringUtil.isNotEmpty(fieldResponseDto.getInvManagerId())) {
+                    User user1 = cfetsEtrDispatcherMapper.getRealNameByUserName(fieldResponseDto.getInvManagerId());
+                    if (StringUtil.isNotEmpty(user1)) {
+                        fieldResponseDto.setInvManagerId(user1.getRealName());
+                    }
                 }
             }
             return fieldResponseDto;

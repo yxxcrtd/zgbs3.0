@@ -682,9 +682,12 @@ public class EtrFundService extends CommonExportService<EtrFundDto> implements B
                 dto.setChlIdName(null);
             }
             // 备注
-            dto.setRemark(data.get(12).toString().trim());
+            dto.setRemark(data.get(11).toString().trim());
             // 转入资产代码，转入资产名称, 转入金融产品代码
-            dto.setChangeToFinprodMarketId(data.get(13).toString().trim());
+            //dto.setChangeToFinprodMarketId(data.get(13).toString().trim());
+            if (StringUtil.isNotBlank(data.get(12).toString())) {
+                dto.setChangeToFinprodMarketId(data.get(12).toString().trim());
+            }
             if(StringUtil.isNotEmpty(dto.getChangeToFinprodMarketId())) {
                 Map<String, Object> mapcTfinprod = new HashMap<String, Object>();
                 mapcTfinprod.put("initValue", dto.getChangeToFinprodMarketId());

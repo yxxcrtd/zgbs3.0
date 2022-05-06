@@ -124,9 +124,9 @@ public class EtrFundValidator implements EtrCommonValidator {
                     errorList.add(new ValidMessage("vdate", getMessage("ETR_X_005")));
                 }
             }
-            if(!StringUtil.isNotEmpty(etrFundDto.getBussEtrInvestPersonInfoDto().getCounterId())){
-                errorList.add(new ValidMessage("bussEtrInvestPersonInfoDto.counterId", "请输入交易对手"));
-            }
+//            if(!StringUtil.isNotEmpty(etrFundDto.getBussEtrInvestPersonInfoDto().getCounterId())){
+//                errorList.add(new ValidMessage("bussEtrInvestPersonInfoDto.counterId", "请输入交易对手"));
+//            }
             /*if(!StringUtil.isNotEmpty(etrFundDto.getCcy())){
                 errorList.add(new ValidMessage("ccy", "请输入币种"));
             }*/
@@ -269,9 +269,9 @@ public class EtrFundValidator implements EtrCommonValidator {
                     errorList.add(new ValidMessage("vdate", getMessage("ETR_X_005")));
                 }
             }
-            if(!StringUtil.isNotEmpty(etrFundDto.getBussEtrInvestPersonInfoDto().getCounterId())){
-                errorList.add(new ValidMessage("bussEtrInvestPersonInfoDto.counterId", "请输入交易对手"));
-            }
+//            if(!StringUtil.isNotEmpty(etrFundDto.getBussEtrInvestPersonInfoDto().getCounterId())){
+//                errorList.add(new ValidMessage("bussEtrInvestPersonInfoDto.counterId", "请输入交易对手"));
+//            }
             if(!StringUtil.isNotEmpty(etrFundDto.getCcy())){
                 errorList.add(new ValidMessage("ccy", getMessage("ETR_X_012", getMessage("EtrFund001.ccy"))));
             }

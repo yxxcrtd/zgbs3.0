@@ -15,19 +15,15 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.jdbc.datasource.DataSource;
 import com.joyintech.framework.jdbc.enums.DataSourceType;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.ModelDictCodeList;
 import com.joyintech.tams.valuation.common.constants.ServiceApplication;
-import com.joyintech.tams.valuation.valuationparametermanage.valuationmethodscheme.dto.SelectPageOptionDto;
 import com.joyintech.tams.valuation.valuationparametermanage.valuationmethodscheme.dto.ValuationMethodScheme001Dto;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -176,9 +172,9 @@ public class ValuationMethodScheme001Service extends CommonExportService<Valuati
 		String invAim = (String) param.get("invAim");//投资目的
 		String valuationMethod = (String) param.get("valuationMethod");//估值方法
 		if(StringUtils.isNotEmpty(invAim) && StringUtils.isNotEmpty(valuationMethod)
-				&& (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(invAim)
+				&& (DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue().equals(invAim)
 				&& DictCodeListExt1.估值方法_市值法.getValue().equals(valuationMethod)) ||
-				(DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(invAim) &&(DictCodeListExt1.估值方法_市值法.getValue().equals(valuationMethod)
+				(DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue().equals(invAim) &&(DictCodeListExt1.估值方法_市值法.getValue().equals(valuationMethod)
 						|| DictCodeListExt1.估值方法_市值成本孰低法.getValue().equals(valuationMethod)))
 		){
 			for (int i = 0; i < selectOptionDtoList.size(); i++) {

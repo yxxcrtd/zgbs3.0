@@ -175,6 +175,17 @@ public class EtrPlanAssetN002Controller extends BaseController {
         return etrPlanAssetNService.getProAvailableCash(param);
     }
     /**
+     * 查询净值
+     */
+    @ResponseBody
+    @RequestMapping("/getValue")
+    public double getValue(@RequestBody Map<String, Object> map){
+        String sysdate = DateUtil.getSysDate();
+        DateUtil.format(DateUtil.parse(sysdate));
+        map.put("sysdate",sysdate);
+        return etrPlanAssetNService.getValue(map);
+    }
+    /**
      * 
      * 组合可用持仓查询
      * <功能详细描述>

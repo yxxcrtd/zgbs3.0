@@ -374,7 +374,11 @@ public class InvestDealRevokeService {
      */
     private void positionHttpRequestBatchClose(Map<String, Object> param){
         // 撤销日间成交交易调用新头寸接口 add by fuyongsheng 20220308 start
-        // 查询日间成交交易
+        // 查询场内日间成交交易
+        // add by fuyongsheng 20220426 start
+        param.put("TRADE_MARKET_03", BussinessDictCodeList.交易场所_上海证券交易所.getValue());
+        param.put("TRADE_MARKET_04", BussinessDictCodeList.交易场所_深圳证券交易所.getValue());
+        // add by fuyongsheng 20220426 end
         List<TrdProductTempDeal> trdProductTempDeals = investDealRevokeMapper.getTrdProductTempDeals(param);
         if(!CollectionUtils.isEmpty(trdProductTempDeals)){
             // 日间成交撤销

@@ -3436,10 +3436,7 @@
     <update id="updateIbuByPrimaryKeySelective">
         update IBU_QUOTE_BOND t
         set t.trade_status = #{tradeStatus}
-        where t.quote_id in
-        (select tmi.pre_trade_id
-        from trdquto_match_info tmi
-        where tmi.trd_id =#{totleTradeId,jdbcType=VARCHAR})
+        where t.quote_id = #{totleTradeId,jdbcType=VARCHAR}
     </update>
 
     <update id="updateIbuRepoByPrimaryKeySelective">

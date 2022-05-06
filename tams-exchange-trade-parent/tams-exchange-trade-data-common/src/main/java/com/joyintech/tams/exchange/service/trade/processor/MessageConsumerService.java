@@ -1,11 +1,11 @@
 package com.joyintech.tams.exchange.service.trade.processor;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Strings;
 import com.joyintech.framework.rabbitmq.entity.SimpleRabbitMessage;
 import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.StringUtil;
 import com.joyintech.redis.core.base.PipeReadService;
 import com.joyintech.redis.core.data.RedisHash;
 import com.joyintech.tams.exchange.common.bean.investment.EntrustOpeBean;
@@ -34,6 +34,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class MessageConsumerService {
@@ -84,10 +85,12 @@ public class MessageConsumerService {
             // 存储抵押券信息
             Set<String> instructionPledgeIdSet = new HashSet<>();
             Set<String> instructionDetailIdSet = new HashSet<>();
-            if (Objects.nonNull(pledgeList))
+            if (Objects.nonNull(pledgeList)) {
                 pledgeList.forEach(instructionPledge -> instructionPledgeIdSet.add(instructionPledge.getEntrustId()));
-            if (Objects.nonNull(detailList))
+            }
+            if (Objects.nonNull(detailList)) {
                 detailList.forEach(instructionDetail -> instructionDetailIdSet.add(instructionDetail.getEntrustId()));
+            }
             // 处理指令信息，并清除过期指令下的抵押券信息
             processInstructions(instructionEtrEntrustList, instructionPledgeIdSet, instructionDetailIdSet);
             // 处理抵押券信息
@@ -96,25 +99,35 @@ public class MessageConsumerService {
             logger.warn("receive or handle rabbitMessage error {}", e);
         }
     }
-    
+
     public void processInstructionsPortfolio(List<Instruction> instructionEtrEntrustList, List<InstructionDetail> detailList) {
-    	for(Instruction instruction:instructionEtrEntrustList) {
-    		if("02".equals(instruction.getEntrustClass())) {
-    			String portfolioId = "";
-    			String portfolioName = "";
-    			for(InstructionDetail instructionDetail:detailList) {
-    				if(StringUtil.isNotEmpty(portfolioId)) {
-    					portfolioId = portfolioId+","+instructionDetail.getPortfolioId();
-    					portfolioName = portfolioName+","+instructionDetail.getPortfolioName();
-    				}else {
-    					portfolioId = instructionDetail.getPortfolioId();
-    					portfolioName = instructionDetail.getPortfolioName();
-    				}
-    			}
-    			instruction.setPortfolioId(portfolioId);
-    			instruction.setPortfolioName(portfolioName);
-    		}
-    	}
+        for (Instruction instruction : instructionEtrEntrustList) {
+            if ("02".equals(instruction.getEntrustClass())) {
+                String portfolioId = detailList.stream()
+                        .filter(item -> item.getEntrustId().equals(instruction.getEntrustId()))
+                        .map(InstructionDetail::getPortfolioId)
+                        .collect(Collectors.joining(StrUtil.COMMA));
+                String portfolioName = detailList.stream()
+                        .filter(item -> item.getEntrustId().equals(instruction.getEntrustId()))
+                        .map(InstructionDetail::getPortfolioName)
+                        .collect(Collectors.joining(StrUtil.COMMA));
+
+                /*String portfolioId = "";
+                String portfolioName = "";
+
+                for (InstructionDetail instructionDetail : detailList) {
+                    if (StringUtil.isNotEmpty(portfolioId)) {
+                        portfolioId = portfolioId + "," + instructionDetail.getPortfolioId();
+                        portfolioName = portfolioName + "," + instructionDetail.getPortfolioName();
+                    } else {
+                        portfolioId = instructionDetail.getPortfolioId();
+                        portfolioName = instructionDetail.getPortfolioName();
+                    }
+                }*/
+                instruction.setPortfolioId(portfolioId);
+                instruction.setPortfolioName(portfolioName);
+            }
+        }
     }
 
     public void processInstructions(List<Instruction> instructionEtrEntrustList, Set<String> instructionPledgeIdSet, Set<String> instructionDetailIdSet) {
@@ -220,11 +233,13 @@ public class MessageConsumerService {
                         removeInstructionList.add(instructionFormCache);
                     }
                     List<InstructionPledge> instructionPledges = instructionPledgeService.queryInstructionPledgesByInstructionId(instruction.getEntrustId());
-                    if (Objects.nonNull(instructionPledges))
+                    if (Objects.nonNull(instructionPledges)) {
                         removeInstructionIdSet.add(instruction.getEntrustId());
+                    }
                     List<InstructionDetail> instructionDetails = instructionDetailService.queryInstructionDetailsByInstructionId(instruction.getEntrustId());
-                    if (Objects.nonNull(instructionDetails))
+                    if (Objects.nonNull(instructionDetails)) {
                         removeInstructionIdSet.add(instruction.getEntrustId());
+                    }
                 }
             });
             if (removeInstructionList.size() > 0) {
@@ -255,8 +270,9 @@ public class MessageConsumerService {
             instructionPledgeService.deleteInstructionPledgesByInstructionsIds(instructionIdSet);
             // 重新存储抵押券信息
             pledgeList.forEach(instructionPledge -> {
-                if (instructionIdSet.contains(instructionPledge.getEntrustId()))
+                if (instructionIdSet.contains(instructionPledge.getEntrustId())) {
                     instructionPledgeService.asyncUpdate(instructionPledge);
+                }
             });
         }
     }
@@ -266,8 +282,9 @@ public class MessageConsumerService {
             instructionDetailService.deleteInstructionDetailsByInstructionsIds(instructionIdSet);
             // 重新存储多组合委托明细信息
             detailList.forEach(instructionDetail -> {
-                if (instructionIdSet.contains(instructionDetail.getEntrustId()))
+                if (instructionIdSet.contains(instructionDetail.getEntrustId())) {
                     instructionDetailService.asyncUpdate(instructionDetail);
+                }
             });
         }
     }
@@ -282,10 +299,8 @@ public class MessageConsumerService {
                 || DictCodeListExt3.投管业务类型_解除质押.getValue().equals(busiTypeTg)) {
             return true;
         } else if (DictCodeListExt3.投管业务类型_竞价交易.getValue().equals(busiTypeTg)) {
-            if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(instruction.getAssetType())
-                    && InvestmentAssetType1.BIDDING_REPO.value.equals(instruction.getAssetType1())) {
-                return true;
-            }
+            return InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(instruction.getAssetType())
+                    && InvestmentAssetType1.BIDDING_REPO.value.equals(instruction.getAssetType1());
         }
 
         return false;

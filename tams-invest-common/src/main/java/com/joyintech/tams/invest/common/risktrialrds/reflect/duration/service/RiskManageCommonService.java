@@ -118,7 +118,7 @@ public class RiskManageCommonService {
 				if(!CollectionUtils.isEmpty(assetInfoMap)) {
 					for (String key : assetInfoMap.keySet()) {
 						if (StringUtil.equals(assetInfoMap.get(key).getAssetType(), DictCodeList.平安资产类型_债券.getValue())) {
-							if(StringUtil.equals(systemParam.getInvAim(), DictCodeListExt1.投资目的_摊余成本类.getValue())) {
+							if(StringUtil.equals(systemParam.getInvAim(), DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue())) {
 								Map<String, Map<String, Object>> paramValMap = RiskUtil.changeRedisValueToMap(paramValSrv.readAll(Arrays.asList(证券估价市价)));
 								BigDecimal 成本法总价格减数 = 成本法总价格;// 成本法总价格+画面一笔持仓-画面一笔现金，抵捎掉ArithmeticUtil.doAdd(成本法总价格, systemParam.getTradeAmt());
 								BigDecimal 公允总价格被减数 = ArithmeticUtil.doAdd(公允总价格, StringUtil.isNotEmpty(paramValMap.get(证券估价市价)) ? ArithmeticUtil.multiply(convert(paramValMap.get(证券估价市价).get(key), BigDecimal.class, obj -> new BigDecimal(obj.toString())), StringUtil.isNotEmpty(systemParam.getTradeNum()) ? systemParam.getTradeNum() : BigDecimal.ZERO) : ArithmeticUtil.multiply(new BigDecimal(100), StringUtil.isNotEmpty(systemParam.getTradeNum()) ? systemParam.getTradeNum() : BigDecimal.ZERO));

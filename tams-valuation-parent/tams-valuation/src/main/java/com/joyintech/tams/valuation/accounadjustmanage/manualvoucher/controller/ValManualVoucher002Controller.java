@@ -92,9 +92,9 @@ public class ValManualVoucher002Controller extends BaseController {
         List<SelectOptionDto> invOptions = new ArrayList<>();
         // 取债券相关投资目的
         for (SelectOptionDto item : options) {
-            if (DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(item.getId())
-                    || DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(item.getId())
-                    || DictCodeListExt1.投资目的_摊余成本类.getValue().equals(item.getId())) {
+            if (DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue().equals(item.getId())
+                    || DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue().equals(item.getId())
+                    || DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue().equals(item.getId())) {
                 invOptions.add(item);
             }
         }

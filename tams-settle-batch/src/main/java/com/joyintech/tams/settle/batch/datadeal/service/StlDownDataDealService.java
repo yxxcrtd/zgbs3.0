@@ -5,7 +5,6 @@ import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.SettleBatchPara;
 import com.joyintech.tams.common.base.entity.SettleTransData;
-import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.settle.batch.datadeal.dao.StlDownDataDealMapper;
@@ -86,10 +85,10 @@ public class StlDownDataDealService {
         dealParam.setCalculateField("fpriceAmt");
         dealParam.setFpriceAmt(settleTransData.getFpriceAmt());
         // dealParam.setIntAmt(settleTransData.getIntAmt());
-        dealParam.setInvAim(DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue());
+        dealParam.setInvAim(DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue());
         String profitType = stlDataDealProcessCommonService.getPortfolioProfitType(settleTransData.getPortfolioId());
         if (!StringUtil.equals(profitType, DictCodeList.收益类型_净值型.getValue())) {
-        	dealParam.setInvAim(DictCodeListExt1.投资目的_摊余成本类.getValue());
+        	dealParam.setInvAim(DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue());
         }
         
         // 调用债券交易计算逻辑

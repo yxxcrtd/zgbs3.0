@@ -200,7 +200,7 @@ public class TrdOutRightRepoTrade003Controller extends BaseController {
 		// 交易市场_二级市场
 		model.addAttribute("TRADE_PLACE_SEC", DictCodeListExt1.交易市场_二级市场.getValue());
 		// 投资目的_摊余成本类
-		model.addAttribute("INV_AIM_TC", DictCodeListExt1.投资目的_摊余成本类.getValue());
+		model.addAttribute("INV_AIM_TC", DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue());
 		// 回购拆借方向_正回购
 		model.addAttribute("BACK_LEND_DIRECTION_03", DictCodeList.回购拆借方向_正回购.getValue());
 		// 回购拆借方向_逆回购

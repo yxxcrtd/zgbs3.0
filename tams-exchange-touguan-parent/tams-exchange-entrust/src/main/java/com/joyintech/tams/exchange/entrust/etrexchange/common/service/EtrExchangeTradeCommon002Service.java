@@ -129,8 +129,8 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
                 param.put("PS_T49", DictCodeListExt3.交易方向_债转股.getValue());
                 param.put("PS_T97", DictCodeListExt3.交易方向_配债.getValue());
                 param.put("PS_T04", DictCodeList.交易方向_申购.getValue());
-                param.put("TRADE_PLACE_03", BussinessDictCodeList.交易场所_深圳证券交易所.getValue());
-                param.put("TRADE_PLACE_04", BussinessDictCodeList.交易场所_上海证券交易所.getValue());
+                param.put("TRADE_PLACE_03", BussinessDictCodeList.交易场所_上海证券交易所.getValue());
+                param.put("TRADE_PLACE_04", BussinessDictCodeList.交易场所_深圳证券交易所.getValue());
                 param.put("search_isNumberFlag", CommonUtil.isNumeric(dto.getSearch()));
                 if (StringUtil.isNotEmpty((String) param.get("finprodMarketIds"))) {
                     param.put("finprodMarketIds", StringUtil.splitToList(GlobalConstant.COMMA, param.get("finprodMarketIds").toString()));
@@ -139,6 +139,8 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
                 }
                 param.put("A_001", DictCodeListExt3.资产类型_资产账户持仓.getValue());
                 param.put("NO_TRADE_BUSINESS_ETR", TempConstant.NO_TRADE_BUSINESS_ETR);
+                param.put("SHARES_TRADE_PLATFORM_03", DictCodeList.交易平台_固定收益平台.getValue());
+                param.put("TYPE_6", DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue());
                 // 浮动盈亏计算修改 modify by yufei 20200806 start
                 //Page<EtrExchangeTradePositionsCommonResponse> result = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> etrExchangeTradeCommonMapper.findPositionsPage(param));
                 Page<EtrExchangeTradePositionsCommonResponse> result = new Page<>();

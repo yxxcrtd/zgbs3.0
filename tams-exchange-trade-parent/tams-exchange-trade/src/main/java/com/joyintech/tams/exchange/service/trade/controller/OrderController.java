@@ -1,5 +1,7 @@
 package com.joyintech.tams.exchange.service.trade.controller;
 
+import com.google.common.collect.Maps;
+import com.joyintech.framework.util.StringUtil;
 import cn.hutool.core.util.NumberUtil;
 import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.constant.EntrustBsProp;
@@ -10,6 +12,7 @@ import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
 import com.joyintech.tams.exchange.common.domain.Message;
 import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
+import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
 import com.joyintech.tams.exchange.service.trade.management.service.OrderManagement;
 import com.joyintech.tams.exchange.service.trade.processor.check.BusinessCheckKit;
@@ -25,6 +28,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_质押券出入库;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 @RestController("OrderController_dtx")
 @RequestMapping("/trade/joyin")
@@ -130,6 +137,12 @@ public class OrderController {
         BeanUtils.copyProperties(order, integratedEntrust);
         if (DictCodeListExt3.投管业务类型_解除质押.getValue().equals(instruction.getBusiTypeTg()) && order.getEntrustVolume() == 0) {
             integratedEntrust.setEntrustVolume(instruction.getEntrustNum());
+        }
+
+        if(StringUtil.isNotEmpty(orderPlaceBean.getCounterId())){
+            Map<String, Object> extend2 = Maps.newHashMap();
+            extend2.put("counterId", orderPlaceBean.getCounterId());
+            integratedEntrust.setExtend2(JsonUtils.getJsonFromObject(extend2));
         }
 
         String entrustBs = EntrustPropUtils.getEntrustBs(instruction);

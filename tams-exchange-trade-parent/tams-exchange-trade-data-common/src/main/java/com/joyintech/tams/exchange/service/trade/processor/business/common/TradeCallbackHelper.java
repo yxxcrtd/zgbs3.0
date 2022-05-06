@@ -256,10 +256,6 @@ public class TradeCallbackHelper {
         tradeRecord.setPs(instruction.getTradeSide());
         tradeRecord.setBusiTypeTg(instruction.getBusiTypeTg());
         tradeRecord.setEntrustClass(instruction.getEntrustClass());
-        if (InvestmentAssetType.isBond(tradeRecord.getFinprodType2()) && tradeRecord.getFullPrice() != null) {
-            //成交全价金额
-            tradeRecord.setClearBalance(tradeRecord.getFullPrice().multiply(BigDecimal.valueOf(tradeRecord.getTradedVolume())));
-        }
 
         //获取BusinessFlag
         if (IntegratedEntrustUtils.isIntegratedEntrust(tradeRecord.getEntrustProp())) {

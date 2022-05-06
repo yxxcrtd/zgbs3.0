@@ -38,6 +38,10 @@ public enum InvestmentAssetType implements IEnum<String> {
         return InvestmentAssetType.BOND.value.equals(assetType);
     }
 
+    public static boolean isPledgeRepurchase(String assetType) {
+        return InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(assetType);
+    }
+
     public static boolean isFutures(String assetType) {
         return InvestmentAssetType.FUTURES.value.equals(assetType);
     }

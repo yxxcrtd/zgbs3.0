@@ -58,7 +58,6 @@ import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_质押�
 import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_质押券出库;
 import static com.joyintech.tams.exchange.common.constant.EntrustProp.*;
 import static com.joyintech.tams.exchange.common.constant.OthCodeType.*;
-import static com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1.NEGOTIATED_REPO;
 
 @Service
 public class TradeHelper {
@@ -92,10 +91,10 @@ public class TradeHelper {
     private MsgReceiverManager msgReceiverManager;
     @Autowired
     private EntrustManagement entrustManagement;
-    //    @Autowired
+//    @Autowired
 //    private QuoteTickService quoteTickService;
     @Autowired
-    private QuoteService quoteService;
+    private QuoteTickService quoteTickService;
     @Autowired
     private ReviewManagement reviewManagement;
     @Autowired
@@ -185,12 +184,12 @@ public class TradeHelper {
     }
 
     public Entrust convertOrderToEntrust(Order order, BatchInfo batchInfo) {
-        return convertOrderToEntrust(order, batchInfo, null);
+        return convertOrderToEntrust(order, batchInfo, null, false);
     }
 
-//    public Entrust convertOrderToEntrust(Order order, BatchInfo batchInfo, boolean copyFlag) {
-//        return convertOrderToEntrust(order, batchInfo, null, copyFlag);
-//    }
+    public Entrust convertOrderToEntrust(Order order, BatchInfo batchInfo, boolean copyFlag) {
+        return convertOrderToEntrust(order, batchInfo, null, copyFlag);
+    }
 
     public void handleEntrust(EntrustInterface entrust, Instruction instruction, int msgType) {
         logger.info("准备通过风控：instruction {}  entrust {}", instruction.getEntrustId(), entrust.getId());
@@ -855,21 +854,6 @@ public class TradeHelper {
             } else if (TradeUtils.lessThan(order.getEntrustPrice(), TradeUtils.getBigDecimal(tick.getLowerLimitPrice(), round))) {
                 order.setOrderPrice(TradeUtils.getBigDecimal(tick.getLowerLimitPrice(), round));
             }
-
-            //资产类型是债券，处理净价、全价
-            if (InvestmentAssetType.isBond(order.getAssetType())) {
-                EntrustPriceAndYieldDto dto = new EntrustPriceAndYieldDto();
-                dto.setPrice(order.getOrderPrice());
-                dto.setEntrustVolume(order.getOrderVolume());
-                dto.setRound(round);
-
-                //判断是否全价交易
-                boolean isFullPrice = FullPriceConst.FULL_PRICE.value.equals(order.getIsFullPrice());
-                investmentManagement.getAllPriceAndYield(instruction, dto, isFullPrice);
-                order.setOrderPrice(dto.getNetPrice());
-                order.setFullPrice(dto.getFullPrice());
-                order.setExpireYearRate(dto.getYield());
-            }
         }
     }
 
@@ -1237,6 +1221,7 @@ public class TradeHelper {
             integratedEntrust.setPs(instruction.getTradeSide());
             integratedEntrust.setBusiTypeTg(instruction.getBusiTypeTg());
             integratedEntrust.setEntrustClass(instruction.getEntrustClass());
+            integratedEntrust.setAccountName(instruction.getAcctName());
 
             integratedEntrustService.asyncUpdate(integratedEntrust);
             handleWorkflow(null, integratedEntrust, workflow);
@@ -1316,7 +1301,7 @@ public class TradeHelper {
         order.setUserId(orderPlaceBean.getUserId());
         order.setAssetType(instruction.getAssetType());
         Map<String, Instruction> instructionBeanMap = getInstructionBeans(order);
-        return MapUtils.isNotEmpty(instructionBeanMap);
+        return MapUtils.isNotEmpty(instructionBeanMap) && instructionBeanMap.size() > 1;
     }
 
     /**

@@ -280,7 +280,9 @@ public class CfetsPortfolioAcctRela001Dto extends IbuPortfolioAcctRela implement
      * 
      * @return portfolioIdOld.
      */
-    @PrimaryKey(value = Field.PK_3)
+    // TISHKS-1003:去除组合代码旧值的PK3注解 modify by fuyongsheng 20220505 start
+    // @PrimaryKey(value = Field.PK_3)
+    // TISHKS-1003:去除组合代码旧值的PK3注解 modify by fuyongsheng 20220505 end
     public String getPortfolioIdOld() {
         return portfolioIdOld;
     }

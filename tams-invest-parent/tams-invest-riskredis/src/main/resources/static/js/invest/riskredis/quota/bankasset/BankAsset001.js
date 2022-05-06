@@ -45,7 +45,7 @@ $(function() {
          */
         cols:[
              {field:'valStatusStr', title: 'BankAsset001.valStatus',sortField:'valStatus'}//有效状态
-             ,{field:'insitituteCode', title: 'BankAsset001.customerId'}//主体代码
+            ,{field:'customerId', title: 'BankAsset001.customerId'}//主体代码
              ,{field:'customerId', title: 'BankAsset001.customerId', visible: false}//主体代码
             ,{field:'customerName', title: 'BankAsset001.customerName'}//主体名称
             ,{field:'netValue',title: 'BankAsset001.netValue'}//净资产(亿元)
