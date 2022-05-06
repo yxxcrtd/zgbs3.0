@@ -34,7 +34,7 @@ public class BigDecimalUtil {
     }
 
     /**
-     * 判断输入数是否为0
+     * 判断输入数是否为0,输入为空时返回false
      *
      * @param a 输入
      * @return boolean 为零返回true,否则返回false
@@ -42,6 +42,9 @@ public class BigDecimalUtil {
      * @date 2022/4/24 9:58
      */
     public static boolean isZero(BigDecimal a) {
+        if (a == null) {
+            return false;
+        }
         return a.compareTo(BigDecimal.ZERO) == 0;
     }
 }

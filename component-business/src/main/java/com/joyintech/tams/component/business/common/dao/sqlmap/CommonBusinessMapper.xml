@@ -511,4 +511,8 @@
             </if>
         </where>
     </select>
+
+    <select id="getMstRateInfo" resultType="com.joyintech.tams.component.business.common.dto.AssetCommonInvRateAdjustDto">
+        select EFF_DATE effDate,INT_RATE yield from MST_INT_RATE_INFO where INT_RATE_ID = #{indexId,jdbcType=VARCHAR}
+    </select>
 </mapper>

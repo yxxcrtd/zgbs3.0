@@ -290,7 +290,7 @@
             T5.CON_FINPROD_ID CON_FINPROD_ID,
             T5.CON_VDATE CON_VDATE,
             T5.CON_PRICE CON_PRICE,
-            100/T13.CON_PRICE CON_PROPORTION,
+            100/T5.CON_PRICE CON_PROPORTION,
             T5.RESALE_PRICE RESALE_PRICE,
             T5.REDEEM_PRICE REDEEM_PRICE,
             T5.CON_VDATE CON_VDATE,
@@ -306,12 +306,12 @@
             T16.RESET_TYPE    RESET_TYPE,
             T16.OBSERVE_BEF_DAY OBSERVE_BEF_DAY,
             T16.OBSERVE_BEF_UNIT OBSERVE_BEF_UNIT,
-            T16.FIRST_CONFIRM_DATE FIRST_CONFIRM_DATE
+            T16.FIRST_CONFIRM_DATE FIRST_CONFIRM_DATE,
             T12.BASIS BASIS,
             T12.MARKET_BASIS MARKET_BASIS,
             T12.BASIS intpayRule,
             T1.REMARK REMARK,
-            NVL(T4.CIRCULATION_DATE,T7.LISTING_DATE)
+            NVL(T4.CIRCULATION_DATE,T7.LISTING_DATE)  listingDate,
             T10.CASH_ID interestCashId,
             T11.CASH_ID principalCashId
         FROM FIN_PRODUCT T1
@@ -464,6 +464,7 @@
             and tpd.Is_Cancel = 'N'
             and tpd.FINPROD_ID = #{finprodId}
     </select>
+
     <select id = "selectCountByfinprodId" resultType="java.lang.Integer">
         SELECT
             count( * )
@@ -1364,4 +1365,112 @@
         </set>
         where SEQ_NO = #{seqNo,jdbcType=VARCHAR}
     </update>
+
+    <select id="getFinPayInterestStdInfoByProductId"  parameterType="Map" resultType="com.joyintech.tams.component.business.asset.dto.FinPayInterestStdInfoDto">
+        SELECT
+        <include refid="com.joyintech.tams.common.base.dao.AssetComonFieldMapper.FinCashInfo_Base_Column_List" />
+        ,T2.FINPROD_ID FINPROD_ID
+        , T2.FINPROD_TYPE FINPROD_TYPE
+        , T2.FINPROD_TYPE2 FINPROD_TYPE2
+        , T2.FINPROD_ABBR FINPROD_ABBR
+        , T2.FINPROD_NAME FINPROD_NAME
+        , T2.COUPON_SPECIES
+        , T3.EFF_DATE EFF_DATE
+        , T3.PAY_CYCLE_VAL PAY_CYCLE_VAL
+        , T3.PAY_CYCLE PAY_CYCLE
+        , T3.DAY_TYPE DAY_TYPE
+        , T3.DAY_VALUE DAY_VALUE
+        , T3.END_TDAY_RULE END_TDAY_RULE
+        , T3.PAY_TDAY_RULE PAY_TDAY_RULE
+        , T3.CALC_RULE CALC_RULE
+        , T3.FIRST_PAY_DATE FIRST_PAY_DATE
+        , T3.CASH_UNIT_TYPE CASH_UNIT_TYPE
+        ,T3.REMARK  REMARK
+        ,T3.PAY_MONTH
+        FROM
+        FIN_CASH_INFO T1
+        LEFT JOIN FIN_PRODUCT T2 ON T2.FINPROD_ID = T1.FINPROD_ID
+        LEFT JOIN FIN_CASH_PAY_RULE T3 ON T3.CASH_ID = T1.CASH_ID
+        <if test="vdate != null and vdate != ''">
+            AND T3.EFF_DATE  = to_date ( #{vdate}, 'yyyy-mm-dd' )
+        </if>
+        <where>
+            <if test="finprodId != null and finprodId != ''">
+                AND T1.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+            </if>
+            <if test="cashType != null and cashType != ''">
+                AND T1.CASH_TYPE_2 = #{cashType,jdbcType=VARCHAR}
+            </if>
+            <if test="finprodType != null and finprodType != ''">
+                AND T1.FINPROD_TYPE = #{finprodType,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+    <select id="getRepayWithoutIntByProductId"  parameterType="Map"
+            resultType="java.lang.String">
+        SELECT
+        T4.IS_PAY_INT
+        FROM
+        FIN_CASH_INFO T1
+        LEFT JOIN FIN_PRODUCT T2 ON T2.FINPROD_ID = T1.FINPROD_ID
+        LEFT JOIN FIN_CASH_PLAN T4 on T4.CASH_ID =T1.CASH_ID
+        where T2.MDATE=T4.MDATE
+        <if test="finprodId != null and finprodId != ''">
+            AND T1.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+        </if>
+        <if test="cashType != null and cashType != ''">
+            AND T1.CASH_TYPE_2 = #{cashType,jdbcType=VARCHAR}
+        </if>
+    </select>
+
+    <select id="getfinExercisePlanByProductId" parameterType="Map" resultType="com.joyintech.tams.common.base.entity.FinExercisePlan">
+        SELECT
+        T1.CASH_ID
+        ,T1.EXERCISE_TYPE
+        ,T1.VDATE
+        ,T1.MDATE
+        ,T1.EXERCISE_DATE
+        <!-- 增加实际行权日 add by renping 20190927 start -->
+        ,T1.ACT_EXERCISE_DATE
+        <!-- 增加实际行权日 add by renping 20190927 start -->
+        ,T1.EXERCISE_PRICE
+        ,T1.EXERCISE_REMARK
+        ,T1.FINPROD_ID
+        ,T1.FINPROD_TYPE
+        ,T1.FINPROD_TYPE2
+        ,T1.BRANCH
+        ,CASE
+        WHEN ( SELECT count( * ) count FROM TRD_PRODUCT_DEAL T3
+        <where>
+            <!-- 增加实际行权日 modify by renping 20191020 start -->
+            T3.SETTLE_DATE = T1.ACT_EXERCISE_DATE
+            <!-- 增加实际行权日 modify by renping 20191020 end -->
+            AND T3.TRADE_STATUS = '01' AND (T3.IS_CANCEL='N' or T3.IS_CANCEL IS NULL)
+            <if test="finprodId != null and finprodId != ''">
+                AND T3.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+            </if>
+            <if test="psT03 != null and psT03 != ''">
+                <!-- 一体化对应etliu -->
+                <!-- AND T3.PS = #{psT03,jdbcType=VARCHAR} -->
+                AND (T3.PS = #{psT03,jdbcType=VARCHAR} or T3.PS = #{psT39,jdbcType=VARCHAR})
+            </if>
+        </where>
+        <![CDATA[) > 0 ]]>
+        THEN #{execType02,jdbcType=VARCHAR} ELSE #{execType01,jdbcType=VARCHAR}
+        END AS EXERCISE_STATUS
+
+        FROM
+        FIN_EXERCISE_PLAN T1
+        inner JOIN FIN_CASH_INFO T2 ON T1.CASH_ID = T2.CASH_ID  AND T1.FINPROD_ID=T2.FINPROD_ID
+        <if test="cashType2 != null and cashType2 != ''">
+            AND T2.CASH_TYPE_2 = #{cashType2,jdbcType=VARCHAR}
+        </if>
+        <where>
+            <if test="finprodId != null and finprodId != ''">
+                AND T1.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+            </if>
+        </where>
+        order by T1.EXERCISE_DATE asc
+    </select>
 </mapper>

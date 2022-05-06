@@ -153,11 +153,12 @@ public class FinBondAsset003Controller extends BaseController{
      * @see
      * @since 1.0
      */
+    @ApiOperation(value="初始化利率调整列表", notes = "初始化利率调整列表")
     @ResponseBody
-    @RequestMapping("findPage")
-    public Page<FinAssetRateAdjResponse> selectAll(FinAssetRateAdjRequest request){
+    @PostMapping("/findPage")
+    public Message<Page<FinAssetRateAdjResponse>> selectAll(@RequestBody FinAssetRateAdjRequest request){
         Page<FinAssetRateAdjResponse> page = finBondAsset002Service.selectForPage(request);
-        return page;
+        return new Message<Page<FinAssetRateAdjResponse>>().success().setData(page);
     }
     
     
@@ -169,8 +170,9 @@ public class FinBondAsset003Controller extends BaseController{
      * @see
      * @since 1.0
      */
+    @ApiOperation(value="该资产是否有交易数据check", notes = "该资产是否有交易数据check")
     @ResponseBody
-    @RequestMapping("isTransInAssetCheck")
+    @PostMapping("/isTransInAssetCheck")
     public Boolean isTransInAssetCheck(@RequestBody FinAssetRateAdjRequest request) {
         if(commonBusinessService.isTransInAsset(request.getFinprodId())!=0){
             return true;
@@ -186,8 +188,9 @@ public class FinBondAsset003Controller extends BaseController{
      * @see
      * @since 1.0
      */
+    @ApiOperation(value="保存check", notes = "保存check")
     @ResponseBody
-    @RequestMapping("check")
+    @PostMapping("/check")
     public AjaxResult check(@RequestBody FinAssetRateAdjResponse response, BindingResult result) {
         List<ValidMessage> validMessages = finAssetRateAdjValidatorService.valid(response);
         if (CollectionUtils.isNotEmpty(validMessages)){
@@ -207,11 +210,12 @@ public class FinBondAsset003Controller extends BaseController{
      * @see
      * @since 1.0
      */
+    @ApiOperation(value="保存", notes = "保存")
     @ResponseBody
-    @RequestMapping(PAGE_SAVE)
-    public AjaxResult save(@RequestBody FinAssetRateAdjResponse dto, BindingResult br) throws WorkFlowException {
+    @PostMapping(PAGE_SAVE)
+    public Message<AjaxResult> save(@RequestBody FinAssetRateAdjResponse dto, BindingResult br) throws WorkFlowException {
         if (br.hasErrors()) {
-            return new AjaxResult(br);
+            return Message.fail("保存错误",new AjaxResult(br));
         }
         WorkFlowParameter<FinAssetRateAdjResponse> params = new WorkFlowParameter<FinAssetRateAdjResponse>();
         params.setPageId(this.getPageId());
@@ -240,6 +244,6 @@ public class FinBondAsset003Controller extends BaseController{
         parameter.setWorkFlowParameter(params);
         // 系统页面表IS_NEED_WORKFLOW 是否走流程，01-是，02-否
         String msg = finBondAsset002Service.start(parameter, dto);
-        return new AjaxResult(msg);
+        return Message.fail(msg,new AjaxResult(msg));
     }
 }

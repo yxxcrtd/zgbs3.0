@@ -15,6 +15,7 @@ import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.asset.bond.dto.*;
 import com.joyintech.tams.business.common.pojo.Message;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import com.joyintech.tams.business.asset.bond.service.FinBondAssetService;
 import com.joyintech.tams.business.asset.bond.service.FinBondAssetValidatorService;
+import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -251,15 +253,16 @@ public class FinBondAsset001Controller extends BaseController{
         if(null!=request.getSelectedItem()&&!request.getSelectedItem().isEmpty()){
             for(FinBondAssetSaveRequest entity : request.getSelectedItem()) {
                 WflValidInputParameter parameter = new WflValidInputParameter();
-                parameter.setPageId("FinBondTargetAsset002");
-                parameter.setBusinessDataPk2(request.getFinprodId());
+                parameter.setPageId("FinBondAsset002");
+                parameter.setBusinessDataPk2(entity.getFinprodMarketId());
                 if (mstWorkflowCommonService.isInWflProcess(parameter)) {
                     errorList.add(new ValidMessage("", getMessage("所选资产存在流程中的数据！,不可修改!")));
                     break;
                 }
             }
             for(FinBondAssetSaveRequest entity : request.getSelectedItem()) {
-                if(finBondAssetService.selectCountByfinprodId(entity.getFinprodId())==0){
+                String finProdId = commonBusinessService.getFinProdId(entity.getFinprodMarketId(),DictCodeListExt1.金融产品类型_投管用_债券.getValue(),null);
+                if(finBondAssetService.selectCountByfinprodId(finProdId)==0){
                     errorList.add(new ValidMessage("",
                             getMessage("该数据已被删除!")));
                     break;
@@ -273,16 +276,19 @@ public class FinBondAsset001Controller extends BaseController{
             return new Message<AjaxResult>().success().setData(wr);
         }
         if(null != commonBusinessService){
-            if(commonBusinessService.isTransInAsset((String)param.get("finprodId"))>0&&(DictCodeList.是否_否.getCodeName().equals(isRightStr))){
-                JoyinMessage ms = new JoyinMessage(getMessage("FIN_ASSET_W_0002"),
-                        MessageType.确认消息);
-                joyinMessages.add(ms);
-                wr.setJoyinMessages(joyinMessages);
-                return new Message<AjaxResult>().success().setData(wr);
-            }
-            else{
-                return new Message<AjaxResult>().success().setData(wr);
-            }
+//            for(FinBondAssetSaveRequest entity : request.getSelectedItem()) {
+//                String finProdId = commonBusinessService.getFinProdId(entity.getFinprodMarketId(), DictCodeListExt1.金融产品类型_投管用_债券.getValue(), null);
+//                if (commonBusinessService.isTransInAsset(finProdId) > 0 && (DictCodeList.是否_否.getCodeName().equals(isRightStr))) {
+//                    JoyinMessage ms = new JoyinMessage(getMessage("FIN_ASSET_W_0002"),
+//                            MessageType.确认消息);
+//                    joyinMessages.add(ms);
+//                    wr.setJoyinMessages(joyinMessages);
+//                    return new Message<AjaxResult>().success().setData(wr);
+//                } else {
+//                    return new Message<AjaxResult>().success().setData(wr);
+//                }
+//            }
+            return new Message<AjaxResult>().success().setData(wr);
         }
         else{
             return new Message<AjaxResult>().success().setData(wr);
@@ -320,17 +326,18 @@ public class FinBondAsset001Controller extends BaseController{
                 getMessage("FinBondTargetAsset002.finprodName")+GlobalConstant.OPEN_PARENTHESIS+
                 entity.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS);
         });
+        processParameter.setOperationType(OperationType.DELETE);
         processParameter.setWorkFlowParameter(params);
         //债券交易自动加券、上市流通交易自动加券，加的券没有在留痕表存值，导致删除报错特殊处理
         String msg =null;
         ProcessMark pk = new ProcessMark();
         pk.setPageId("FinBondAsset002");
-        pk.setBusinessDataPk1(dto.getSelectedItem().get(0).getFinprodId());
+        pk.setBusinessDataPk1(dto.getSelectedItem().get(0).getFinprodMarketId());
         FinBondAssetSaveRequest temp = finBondAssetService.getBussinessEntityByPk(pk);
         if (null == temp || null == temp.getFinPayInterestStdInfoDto()) {
-            dto = finBondAssetService.getBondDto(dto.getSelectedItem().get(0).getFinprodId());
+            dto = finBondAssetService.getBondDto(dto.getSelectedItem().get(0).getFinprodMarketId());
             //查询业务表资产信息
-            FinBondAssetSaveRequest request = finBondAssetService.getFinPlanList(dto.getFinprodId());
+            FinBondAssetSaveRequest request = finBondAssetService.getFinPlanList(dto.getFinprodMarketId());
             if(request != null){
                 //资产信息
                 dto.setBaseFinProductBaseInfoList(request.getBaseFinProductBaseInfoList());
@@ -352,29 +359,9 @@ public class FinBondAsset001Controller extends BaseController{
                         finCashPlanRayList.add(finCashPlanRayDto);
                     }
                 }
-                dto.getFinPayInterestStdInfoDto().setInvScheduleList(finCashPlanList);
-//                dto.setBussFinRepaymentDto(bussFinRepaymentDto);
-//                dto.getBussFinRepaymentDto().setFinCashPlanList(finCashPlanRayList);
-//                dto.setFinCashCalcRuleList(request.getBaseFinProductBaseInfoList().get(0).getFinCashCalcRuleList());
-//                //中债信息
-//                dto.setBaseRepAssetDeptInfoDto(request.getBaseRepAssetDeptInfoDto());
-//                dto.setBaseRepAssetEquityInfoDto(request.getBaseRepAssetEquityInfoDto());
-//                dto.setBaseRepOtherDto(request.getBaseRepOtherDto());
-//                dto.setBaseRepBondAssetInfoDto(request.getBaseRepBondAssetInfoDto());
-//                BussFinBondRepInfoDto bussFinBondRepInfoDto =new BussFinBondRepInfoDto();
-//                BussRepEquityInfoDto bussRepEquityInfoDto =new BussRepEquityInfoDto();
-//                if(request.getBaseRepBondAssetInfoDto()!= null
-//                        && request.getBaseRepBondAssetInfoDto().getRepAssetBondList() !=null
-//                            && request.getBaseRepBondAssetInfoDto().getRepAssetBondList().size() > 0){
-//                    BeanUtils.copyProperties(request.getBaseRepBondAssetInfoDto().getRepAssetBondList().get(0),bussFinBondRepInfoDto);
-//                }
-//                if(request.getBaseRepAssetEquityInfoDto()!= null
-//                        && request.getBaseRepAssetEquityInfoDto().getRepAssetEquityList() !=null
-//                        && request.getBaseRepAssetEquityInfoDto().getRepAssetEquityList().size() > 0){
-//                    BeanUtils.copyProperties(request.getBaseRepAssetEquityInfoDto().getRepAssetEquityList().get(0),bussRepEquityInfoDto);
-//                }
-//                dto.setBussFinBondRepInfoDto(bussFinBondRepInfoDto);
-//                dto.setBussRepEquityInfoDto(bussRepEquityInfoDto);
+                if (StringUtil.isNotEmpty(dto.getFinPayInterestStdInfoDto())) {
+                    dto.getFinPayInterestStdInfoDto().setInvScheduleList(finCashPlanList);
+                }
             }
             msg = finBondAssetService.start(processParameter,dto);
         }else{

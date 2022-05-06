@@ -2038,4 +2038,5 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
     public void setOperateStatus(String operateStatus) {
         this.operateStatus = operateStatus;
     }
+
 }

@@ -14,6 +14,7 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.tams.common.base.entity.SysUploadFileInfo;
 import com.joyintech.tams.business.asset.bond.dto.*;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.component.business.asset.dto.FinPayInterestStdInfoDto;
 import com.joyintech.tams.invest.asset.common.dto.FinAssetRateAdjDto;
 import com.joyintech.tams.invest.common.dto.common.FinAssetIntInfo;
 import com.joyintech.tams.invest.common.dto.period.trdbondduration.TrdBondDurationDto;
@@ -37,8 +38,7 @@ public interface FinBondAssetMapper {
 
 	List<FinBondAssetResponse> queryForPage(Map<String, Object> pageParam);
 
-	FinBondAssetSaveRequest getBasicInfo(@Param("finprodId") String finprodId
-			, @Param("finprodType2") String finprodType2);
+	FinBondAssetSaveRequest getBasicInfo(Map<String, Object> param);
 
 	// 债券新建新增快捷录入功能 add by renping 20191010 end
 	int selectCountByfinprodMarketId(@Param("finprodMarketId") String finprodMarketId);
@@ -225,4 +225,15 @@ public interface FinBondAssetMapper {
 	int insertFileSelective(SysUploadFileInfo var1);
 
 	int updateFileByPrimaryKey(SysUploadFileInfo var1);
+
+	FinPayInterestStdInfoDto getFinPayInterestStdInfoByProductId(@Param("finprodId") String finprodId,
+																 @Param("vdate") String vdate, @Param("cashType") String cashType,
+																 @Param("finprodType") String finprodType);
+	/**根据金融产品代码查询是否还本不带息
+	 **/
+	String getRepayWithoutIntByProductId(@Param("finprodId") String finprodId,
+										 @Param("cashType") String cashType);
+
+	List<FinExercisePlan> getfinExercisePlanByProductId(Map<String, Object> param);
+
 }

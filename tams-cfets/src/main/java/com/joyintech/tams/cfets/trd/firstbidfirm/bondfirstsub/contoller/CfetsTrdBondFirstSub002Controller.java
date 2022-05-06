@@ -5,13 +5,14 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.base.entity.ProcessMark;
+import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.JsonUtils;
+import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
+import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealQuoteCommonDto;
+import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealRegisterQuoteDto;
 import com.joyintech.tams.cfets.trd.bond.dto.RiskCalRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.*;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBondFirstSub001Service;
@@ -19,13 +20,18 @@ import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBo
 import com.joyintech.tams.cfets.trd.repo.service.CfetsRepoQuotedPrice004Service;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.riskrds.controller.InterfRiskRdsController;
+import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.invest.common.client.ClientData;
+import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
+import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
@@ -40,6 +46,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -85,10 +92,46 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
      * @date 2022/4/22 10:56
      */
     @Override
-    @ApiOperation(value = "初始化页面", notes = "初始化页面")
+    @ApiOperation(value = "审批初始化", notes = "审批页面初始化")
     @PostMapping("/init")
     @ResponseBody
     public String init(Model model) {
+        // 有效状态
+        model.addAttribute("ISSUE_STATUS", this.getSelectDataFromDataDic(DictCode.发行状态, null));
+        // 发行状态
+        model.addAttribute("STATUS_VALID", this.getSelectDataFromDataDic(DictCode.有效状态, null));
+        // 债券类型
+        model.addAttribute("BOND_TYPE", this.getSelectDataFromDataDic(DictCode.行内资产四级分类, null));
+        // 委托状态_待接收
+        model.addAttribute("ENTRUST_STATUS_02", DictCodeList.委托状态_待接收.getValue());
+        // 委托状态_已接收
+        model.addAttribute("ENTRUST_STATUS_03", DictCodeList.委托状态_已接收.getValue());
+        // 委托状态_已完成
+        model.addAttribute("ENTRUST_STATUS_04", DictCodeList.委托状态_已完成.getValue());
+        // 委托状态_已退回
+        model.addAttribute("ENTRUST_STATUS_05", DictCodeList.委托状态_已退回.getValue());
+        // 资金账户类型_托管账户
+        model.addAttribute("acctType_A01", BussinessDictCodeList.资金账户类型_托管账户.getValue());
+        // 系统日期
+        model.addAttribute("sysDate", iPlatformDate.getSysDateStr());
+        // 币种_人民币
+        model.addAttribute("CCY_CNY", DictCodeList.币种_人民币_CNY.getValue());
+        // 系统参数 【是否支持CSTP下行接口_一级申购】
+        model.addAttribute("IS_SUPPORT_CSTP_FLAG_BONDFIRST", CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST"));
+        // 登记页面id 用于登记撤销
+        model.addAttribute("PAGE_ID_BOND_FIRST", "TenderBondSub002");
+        //刷新时间
+        model.addAttribute("ibuQuoteBondFirst_etrTable_refresh_period", CacheUtil.getSysParam("ibuQuoteBond_etrTable_refresh_period"));
+        model.addAttribute("effDate", CacheUtil.getSysParam("ibuVar_quoteEffTime"));
+        CfetsTrdBondFirstSubInfoDto cfetsTrdBondFirstSubInfoDto = new CfetsTrdBondFirstSubInfoDto();
+        if (StringUtil.equals(this.getParam("workflowStatus"), BussinessDictCodeList.交易流程状态_流程中.getValue())
+                || (!WorkFlowUtil.isNotFromToDoList() && com.joyintech.framework.util.StringUtil.isNotBlank(getParam(GlobalConstant.WORKFLOW_ID)))) {
+            cfetsTrdBondFirstSubInfoDto = cfetsTrdBondFirstSub002Service.getBussinessEntityByWorkflowId(getParam(GlobalConstant.WORKFLOW_ID));
+            model.addAttribute(GlobalConstant.WORKFLOW_ID,getParam(GlobalConstant.WORKFLOW_ID));
+        }
+        model.addAttribute("quotaPageModel","new");
+        //卖空模式
+        model.addAttribute(GlobalConstant.ENTITY, cfetsTrdBondFirstSubInfoDto);
         return super.init(model);
     }
 
@@ -137,6 +180,19 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
         } catch (Exception e) {
             logger.error("指令查询明细添加异常", e);
             return new Message<Page<CfetsTrdBondFirstSubEntrustDto>>().fail().setMessage("指令查询明细添加异常");
+        }
+    }
+
+
+    @ApiOperation(value = "申购列表新增或删除", notes = "申购列表新增或删除")
+    @PostMapping("/addOrDelList")
+    @ResponseBody
+    public Message<CfetsTrdBondFirstSubInfoDto> addOrDelList(@RequestBody CfetsTrdBondFirstSubInfoDto request) {
+        CfetsTrdBondFirstSubInfoDto cfetsBondDealQuoteCommonDto = cfetsTrdBondFirstSub002Service.addOrDelList(request);
+        if (StringUtil.isNotEmpty(cfetsBondDealQuoteCommonDto)) {
+            return new Message<CfetsTrdBondFirstSubInfoDto>().success().setData(cfetsBondDealQuoteCommonDto);
+        } else {
+            return new Message<CfetsTrdBondFirstSubInfoDto>().fail().setMessage("申购交易执行初始化异常");
         }
     }
 

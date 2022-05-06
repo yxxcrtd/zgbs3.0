@@ -48,7 +48,7 @@ public class CfetsTrdBondFirstSubEntrustRequest {
     @ApiModelProperty(name = "search", value = "关键词")
     private String search;
 
-    @ApiModelProperty(name = "existEntrustIds ", value = "etrAddSearch接口,已存在的指令代码,用于过滤申购产品列表中已添加的指令", example = "[01,02]")
+    @ApiModelProperty(name = "existEntrustIds", value = "etrAddSearch接口,已存在的指令代码,用于过滤申购产品列表中已添加的指令", example = "[WTBOND2022041801,WTBOND2022041802]")
     private List<String> existEntrustIds;
 
     public PageMode getPageMode() {
@@ -158,5 +158,13 @@ public class CfetsTrdBondFirstSubEntrustRequest {
 
     public void setIssueDateEnd(String issueDateEnd) {
         this.issueDateEnd = issueDateEnd;
+    }
+
+    public List<String> getExistEntrustIds() {
+        return existEntrustIds;
+    }
+
+    public void setExistEntrustIds(List<String> existEntrustIds) {
+        this.existEntrustIds = existEntrustIds;
     }
 }
