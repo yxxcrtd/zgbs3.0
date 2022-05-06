@@ -466,27 +466,6 @@ public class FinBondAsset002Controller extends BaseController{
         return new Message<Boolean>().success().setData(false);
     }
 
-//    /**
-//     * 初始化评级信息
-//     * <功能详细描述>
-//     * @return
-//     * @see
-//     * @since 1.0
-//     */
-//    @ApiOperation(value = "初始化评级信息", notes = "初始化评级信息")
-//    @ResponseBody
-//    @PostMapping("/getFinBondRatingDto")
-//    public Message<List<MstBondCreditRating>> getFinBondRatingDto(@RequestBody FinBondAssetInsertRequest request) {
-//        List<MstBondCreditRating> mstBondCreditRatingList = new ArrayList<MstBondCreditRating>();
-//        Map<String,Object> ztparam = new HashMap<String,Object>();
-//        //主体为发行人（债券类资产）
-//        if(StringUtil.isNotEmpty(request.getIssuer())) {
-//            ztparam.put("oCode", request.getIssuer());
-//            mstBondCreditRatingList.addAll(busiFinBondRatingInfoService.getmstBondCreditRatingByOcode(ztparam));
-//        }
-//        return new Message<List<MstBondCreditRating>>().success().setData(mstBondCreditRatingList);
-//    }
-//
     /**
      *
      * <功能详细描述>
@@ -538,17 +517,19 @@ public class FinBondAsset002Controller extends BaseController{
      * @see
      * @since 1.0
      */
+    @ApiOperation(value = "生成付息计划check", notes = "生成付息计划check")
     @ResponseBody
-    @RequestMapping("checkGenerationPlan")
-    public AjaxResult checkGenerationPlan(@RequestBody BondFinPayInterestStdInfoDto previewParam,
+    @PostMapping("/checkGenerationPlan")
+    public Message<AjaxResult> checkGenerationPlan(@RequestBody BondFinPayInterestStdInfoRequest previewParam,
                             BindingResult result) {
         if (result != null && result.hasErrors()) {
-            AjaxResult resultList=new AjaxResult(result);
-            List<ValidMessage> validMessages = finBondAssetService.checkGenerationPlan(previewParam);
-            resultList.setErrorList(validMessages);
-            return resultList;
+            return Message.success("生成付息计划check",new AjaxResult());
         }
-        return new AjaxResult();
+        AjaxResult resultList=new AjaxResult(result);
+        List<ValidMessage> validMessages = finBondAssetService.checkGenerationPlan(previewParam);
+        validMessages.addAll(finBondAssetService.valid(previewParam));
+        resultList.setErrorList(validMessages);
+        return Message.success("生成付息计划check",resultList);
     }
 
     /**
