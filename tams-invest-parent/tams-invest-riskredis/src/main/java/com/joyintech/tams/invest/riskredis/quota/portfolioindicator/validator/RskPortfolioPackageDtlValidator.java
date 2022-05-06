@@ -42,6 +42,9 @@ public class RskPortfolioPackageDtlValidator implements BeanValidator{
         RskPortfolioPackageDtlDto dto = (RskPortfolioPackageDtlDto)value;
         List<RskPortfolioPackageDtlImp> rskPortfolioPackageDtlList = dto.getRskPortfolioPackageDtlList();
         if(null!=rskPortfolioPackageDtlList&&!rskPortfolioPackageDtlList.isEmpty()){
+            if (rskPortfolioPackageDtlList.size() == 1){
+                resultList.add(new ValidMessage("组合数据要大于1!"));
+            }
             for(RskPortfolioPackageDtl entity:rskPortfolioPackageDtlList){
             	 //组合成分不可为空
                 if(StringUtil.isEmpty(entity.getPortfolioId())){

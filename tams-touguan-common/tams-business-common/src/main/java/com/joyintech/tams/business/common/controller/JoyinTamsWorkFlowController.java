@@ -1,16 +1,22 @@
 package com.joyintech.tams.business.common.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
+import com.joyintech.framework.exception.MessageException;
+import com.joyintech.framework.util.RequestUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.workflow.engine.controller.WorkFlowController;
 import com.joyintech.workflow.engine.service.UserSelectService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.activiti.engine.impl.util.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -100,7 +106,97 @@ public class JoyinTamsWorkFlowController  {
             return new Message<List<?>>().fail().setMessage("查询审批人员失败");
         }
 	}
-	
+
+	@ApiOperation(value = "经办人代办中保存", notes = "/common/workflow/handlerSave?taskId=CfetsEtrBondInfo001&processInstanceId=CfetsEtrBondInfo001_btn_submit")
+	@PostMapping("/handlerSave")
+	public Message<AjaxResult>  handlerSave(){
+		try {
+			String taskId = request.getParameter("taskId");
+			String processInstanceId = request.getParameter("processInstanceId");
+			if (StringUtils.isEmpty(taskId)) {
+				return new Message<AjaxResult> ().fail().setMessage("taskId参数不能为null");
+			}
+			if (StringUtils.isEmpty(processInstanceId)) {
+				return new Message<AjaxResult> ().fail().setMessage("processInstanceId参数不能为null");
+			}
+//			JSONObject businessInfo = new JSONObject(map);
+			AjaxResult ajaxResult = workFlowController.doModify();
+			return new Message<AjaxResult> ().success(StringUtil.isNotEmpty(ajaxResult.getMessage())?ajaxResult.getMessage():"保存成功");
+		} catch (Exception e) {
+			if(e.getCause() instanceof MessageException){
+				AjaxResult ajaxResult = new AjaxResult();
+				MessageException messageException =  (MessageException) e.getCause();
+				if(messageException.getMessageType()!=null&&StringUtil.equals("confirm",messageException.getMessageType().getCode())){
+					ajaxResult.setMessageType(MessageType.确认消息);
+					ajaxResult.setData(messageException.getMessage());
+					return new Message<AjaxResult>().success().setData(ajaxResult);
+				}else{
+					ajaxResult.setMessageType(MessageType.错误消息);
+					ajaxResult.setData(messageException.getMessage());
+					return new Message<AjaxResult>().success().setData(ajaxResult);
+				}
+			}
+			logger.error("保存异常", e);
+			return new Message<AjaxResult>().fail().setMessage("保存异常");
+		}
+	}
+
+	@ApiOperation(value = "经办人代办中提交", notes = "/common/workflow/handlerSave?taskId=CfetsEtrBondInfo001&processInstanceId=CfetsEtrBondInfo001_btn_submit")
+	@PostMapping("/handlerSubmit")
+	public Message<AjaxResult>  handlerSubmit(){
+		try {
+			//			status: A
+			//			createUser: 1689
+			//			createTime: 2021-12-21 00:00:00:000
+			//			processInstanceId: 9fbb79f7-c489-11ec-9325-38baf86c2a06
+			//			workflowId: 00000000000000000000000000052467
+			//			taskId: 9fbbc829-c489-11ec-9325-38baf86c2a06
+			//			type: submit
+			//			comment:
+			//			users: 1690
+			//			roles:
+			//			businessInfo: {"finprodId":"F06_TESTJJ001.OF","tempTrmFundType":"","oldFinprodMarketId":"TESTJJ001.OF","seqno":"","creditMstId":"","pfhId":"","hapCreditAmt":"","creditFlag":"N","tradeMarketId":".OF","finprodAbbr":"TESTJJ001","finprodName":"TESTJJ001","type9":"07","type10":"23","type11":"032","type12":"032","fundType":"F02","secondType":"01","idate":"2021-12-21","vdate":"2021-12-21","mdate":"","tradeMarket":"09","manager":"SCJG000000000985","purSpeed":"0","redSpeed":"0","calendarId":"01","investNature":"01","ccy":"CNY","toffStrdate":"2021-12-21","toffEnddate":"2021-12-21","purRedId":"","graFundType":"","purRedAbbr":"","purStartLow":"","redStartLow":"","etfMinPrunit":"","faceValue":"","pFinprodId":"","pMarketId":"","postOrg":"","fundMangerName":"","remark":"","finprodMarketId":"TESTJJ001.OF","capiIncomeFeature":"N","isCompoundInt":"","trmFundAbbr":"","trmFundType":"","etfType":"","bussRepFundInfoDto":{"profitType":"","repGovInvestFor":"","repIndustry":"","repIndustryLevel2":"","repRegistOrg":"","repFundInvestAsset":"","repFundCompName":"","repTrustPartyName":"","repInvestStage":"","repPartyType3":"","repPartyType1":"02","repInstitSize":"","repPartyType2":"","repTradeMarket":"","repMngPartyName":"","repRemark":"","finprodType2":"F06"},"pageModel":"1","draftOption":"","operateType":"submit","pageId":"FinFundTarget002","finprodType2":"F06","fileArray":[],"workflowParameter":"modify|1690||1|FinFundTarget002|FinFundTarget002_btn_submit|true","todoListFlag":true,"operType":"modify","users":"1690","roles":"","elementId":"FinFundTarget002_btn_submit","submit":"1","isTodoList":true}
+			//			elementIdForLog: btnSubmit_wfl
+			//			pageIdForLog: FinFundTarget002
+			//			isTodoList: true
+			//			users: users
+			//			roles: roles
+			String taskId = request.getParameter("taskId");
+			String processInstanceId = request.getParameter("processInstanceId");
+			String pageId = request.getParameter("pageId");
+			String elementId = request.getParameter("elementId");
+			if (StringUtils.isEmpty(pageId)) {
+				return new Message<AjaxResult> ().fail().setMessage("pageId参数不能为null");
+			}
+			if (StringUtils.isEmpty(elementId)) {
+				return new Message<AjaxResult> ().fail().setMessage("elementId参数不能为null");
+			}
+			if (StringUtils.isEmpty(taskId)) {
+				return new Message<AjaxResult> ().fail().setMessage("taskId参数不能为null");
+			}
+			if (StringUtils.isEmpty(processInstanceId)) {
+				return new Message<AjaxResult> ().fail().setMessage("processInstanceId参数不能为null");
+			}
+			AjaxResult ajaxResult = workFlowController.submit(request.getParameter("users"),request.getParameter("roles"));
+			return new Message<AjaxResult> ().success(StringUtil.isNotEmpty(ajaxResult.getMessage())?ajaxResult.getMessage():"提交成功");
+		} catch (Exception e){
+			if(e.getCause() instanceof MessageException){
+				AjaxResult ajaxResult = new AjaxResult();
+				MessageException messageException =  (MessageException) e.getCause();
+				if(messageException.getMessageType()!=null&&StringUtil.equals("confirm",messageException.getMessageType().getCode())){
+					ajaxResult.setMessageType(MessageType.确认消息);
+					ajaxResult.setData(messageException.getMessage());
+					return new Message<AjaxResult>().success().setData(ajaxResult);
+				}else{
+					ajaxResult.setMessageType(MessageType.错误消息);
+					ajaxResult.setData(messageException.getMessage());
+					return new Message<AjaxResult>().success().setData(ajaxResult);
+				}
+			}
+			logger.error("提交异常", e);
+			return new Message<AjaxResult> ().fail().setMessage("提交异常");
+		}
+	}
 //    @Autowired(required=false)
 //    private BaseGetBusinessId bussGetBussinessIdService;
 //    @Autowired

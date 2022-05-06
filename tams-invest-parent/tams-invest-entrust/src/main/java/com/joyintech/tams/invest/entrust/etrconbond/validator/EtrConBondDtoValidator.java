@@ -108,7 +108,7 @@ public class EtrConBondDtoValidator implements EtrCommonValidator {
         String confirmMsg = "";
         String changeLineMark = "<br/>";
         //如果头寸不足时
-        if (dto.getProAvailableCash().compareTo(dto.getPurchBondTotal()) < 0){
+        /*if (dto.getProAvailableCash().compareTo(dto.getPurchBondTotal()) < 0){
             confirmMsg = "组合可用现金不足,当前最多可用金额为:<br/>" +
                     dto.getProAvailableCash() + "，请确认是否继续？";
         }
@@ -118,7 +118,7 @@ public class EtrConBondDtoValidator implements EtrCommonValidator {
             }
             confirmMsg +="通道可用现金不足,当前最多可用金额为:<br/>" +
                     dto.getChannelAvailableCash() + "，请确认是否继续？";
-        }
+        }*/
         if (StringUtil.isNotBlank(confirmMsg)) {
             AjaxResult wr = new AjaxResult();
             wr.setData(confirmMsg);

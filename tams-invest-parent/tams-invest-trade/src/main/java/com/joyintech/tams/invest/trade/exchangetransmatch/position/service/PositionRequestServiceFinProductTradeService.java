@@ -147,7 +147,7 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
 
         resultMap.put(FINPROD_ID, dealEntity.getFinprodId());
         String deliveryType = commonPositionEngineService.getDeliveryType(dealEntity.getFinprodId());
-        resultMap.put(SETTLE_SPEED, commonPositionEngineService.parseSettleSpreed((String) resultMap.get(DELIVERY_TYPE)));
+        resultMap.put(SETTLE_SPEED, commonPositionEngineService.parseSettleSpreed(deliveryType));
         resultMap.put(TRADE_PLACE, dealEntity.getTradeMarket());
         resultMap.put(DELIVERY_TYPE, deliveryType);
         resultMap.put(WORK_FLOW_ID, dealEntity.getWorkflowId());

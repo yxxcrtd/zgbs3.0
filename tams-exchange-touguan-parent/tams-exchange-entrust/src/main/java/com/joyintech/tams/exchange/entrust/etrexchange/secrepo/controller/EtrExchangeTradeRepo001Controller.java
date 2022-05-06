@@ -62,6 +62,8 @@ import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dao.EtrExchangeTr
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradePortfolioSecRepoRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradeQuotationHqSecRepoResponse;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradeSaveSecRepoRequest;
+import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradeSecRepoSaveRepoRequest;
+import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.service.EtrExchangeTradeRepo001Service;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.service.EtrExchangeTradeSecRepo001Service;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.service.EtrExchangeTradeSecRepoValidatorService;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
@@ -137,32 +139,17 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 	private EtrExchangeTradeSecRepo001Service etrExchangeTradeSecRepo001Service;
 
 	@Autowired
-	private BusiFinExercisePlanService busiFinExercisePlanService;
+	private EtrExchangeTradeRepo001Service etrExchangeTradeRepo001Service;
 
 	public static final String ENTRUST_RECORD_NEW = "new";
 
 	public static final String ENTRUST_RECORD_MODIFY = "modify";
-
-	@Value("${quote.flag:false}")
-	private boolean useInterfQuoteFlag;
-
-	@Value("${quote.ws.host}")
-	private String wsHost;
-
-	@Value("${quote.ws.url}")
-	private String wsUrl;
-
-	@Autowired
-	private EtrExchangeTradeSecRepoMapper etrExchangeTradeSecRepoMapper;
 
 	@Autowired
 	private EtrTradeCommonervice etrTradeCommonervice;
 
 	@Autowired
 	private EtrExchangeTradeSecRepoValidatorService etrExchangeTradeSecRepoValidatorService;
-
-	@Autowired
-	private EtrExchangeTradeJj001Validator etrExchangeTradeJj001Validator;
 
 	@ApiOperation(value = "场内现券通用质押式回购下单参数", notes = "场内现券通用质押式回购下单参数")
 	@PostMapping("/getPageParams")
@@ -479,30 +466,6 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 		}
 	}
 
-//	/**
-//	 * 查询资产对应组合的可用持仓信息
-//	 *
-//	 * @param dto
-//	 * @return 可用持仓
-//	 * @author dubaojun
-//	 */
-//	@ApiOperation(value = "查询资产对应组合的可用持仓信息", notes = "查询资产对应组合的可用持仓信息")
-//	@ResponseBody
-//	@PostMapping("/selectAvailableNum")
-//	public Message<String> selectAvailableNum(@RequestBody AvailableEtrSecPositionRequest dto){
-//		try{
-//			Map<String, Object> param = BeanUtil.object2Map(dto);
-//			BigDecimal availableNum = etrExchangeTradeSecRepo001Service.selectAvailableNum(param);
-//			if(availableNum == null) {
-//				availableNum= BigDecimal.ZERO;
-//			}
-//			String availableNumStr=availableNum.setScale(2,RoundingMode.HALF_UP).toString();
-//			return new Message<>(availableNumStr);
-//		} catch (Exception e) {
-//			logger.error("查询功能异常", e);
-//			return new Message<String>().fail().setMessage("查询异常");
-//		}
-//	}
 	/**
 	 * 查询资产对应组合的可用持仓信息
 	 *
@@ -670,6 +633,7 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 	@RequestMapping("check")
 	public AjaxResult check(@RequestBody EtrExchangeTradeSaveSecRepoRequest dto, BindingResult br)
 			throws Exception {
+		etrExchangeTradeSecRepo001Service.setEntrustBussType(dto);
 		AjaxResult ajax= etrExchangeTradeSecRepo001Service.checkSave(dto,br);
 		List<ValidMessage> validList = etrExchangeTradeSecRepoValidatorService.valid(dto);
 		List<ValidMessage> validListPriceRange = etrExchangeTradeSecRepo001Service.checkSavePriceRange(dto,br);
@@ -689,7 +653,6 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 			if(StringUtil.equals(priceScopeControllEtr,"02")){
 				for(ValidMessage validMessage:validListPriceRange){
 					confirmMsg += validMessage.getMessage();
-					confirmMsg += "<br />";
 				}
 			}
 		}
@@ -725,7 +688,7 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 	@ApiOperation(value = "保存提交", notes = "保存提交")
 	@PostMapping("save")
 	@ResponseBody
-	public Message<AjaxResult> save(@RequestBody EtrExchangeTradeSaveSecRepoRequest dto, BindingResult br){
+	public Message<AjaxResult> save(@RequestBody EtrExchangeTradeSecRepoSaveRepoRequest dto, BindingResult br){
 		try {
 			if (br.hasErrors()) {
 				return new Message<AjaxResult>().fail().setData(new AjaxResult(br));
@@ -766,8 +729,8 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 								return new Message<AjaxResult>().success().setData(ar);
 							}
 						}
-						ProcessParameter<EtrExchangeTradeSaveSecRepoRequest> processParameter = new ProcessParameter<EtrExchangeTradeSaveSecRepoRequest>();
-						WorkFlowParameter<EtrExchangeTradeSaveSecRepoRequest> params = new WorkFlowParameter<EtrExchangeTradeSaveSecRepoRequest>();
+						ProcessParameter<EtrExchangeTradeSecRepoSaveRepoRequest> processParameter = new ProcessParameter<EtrExchangeTradeSecRepoSaveRepoRequest>();
+						WorkFlowParameter<EtrExchangeTradeSecRepoSaveRepoRequest> params = new WorkFlowParameter<EtrExchangeTradeSecRepoSaveRepoRequest>();
 						params.setPageId(dto.getPageId());
 						params.setElementId(dto.getElementId());
 						params.setBusinessType(businessType);
@@ -777,13 +740,13 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 								+ "-" + "业务类型" + "(" + tempBusinessTypeName + ")-"
 								+ "平台日" + "(" + DateUtil.format(iPlatformDate.getSysDate()) + ")");
 						processParameter.setWorkFlowParameter(params);
-						msg = etrExchangeTradeSecRepo001Service.start(processParameter, dto);
+						msg = etrExchangeTradeRepo001Service.start(processParameter, dto);
 					}
 					//多组合指令
 					else {
-						List<EtrExchangeTradeSaveSecRepoRequest> etrExchangeTrade001DtoList = new ArrayList<>();
+						List<EtrExchangeTradeSecRepoSaveRepoRequest> etrExchangeTrade001DtoList = new ArrayList<>();
 						for(EtrExchangeTradePortfolioSecRepoRequest item:dto.getPortfolioList()) {
-							EtrExchangeTradeSaveSecRepoRequest etrExchangeTrade001Dto = etrExchangeTradeSecRepo001Service.genEtrExchangeTradeSaveSecRepoRequest(dto,item);
+							EtrExchangeTradeSecRepoSaveRepoRequest etrExchangeTrade001Dto = etrExchangeTradeRepo001Service.genEtrExchangeTradeSecRepoSaveRepoRequest(dto,item);
 							etrExchangeTrade001Dto.setFinprodType2(DictCodeList.平安资产类型_质押式回购.getValue());
 							if (!StringUtil.isNotEmpty(etrExchangeTrade001Dto.getEntrustId())) {
 								BussinessCodeParameter param = etrExchangeTradeSecRepo001Service.genBussinessCodeParameter(dto);
@@ -817,8 +780,8 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 									(etrExchangeTrade001Dto, list) -> etrExchangeTrade001Dto.setRiskTrialRetDto(list));
 							// ----------预占功能 end----------
 						}
-						ProcessParameter<EtrExchangeTradeSaveSecRepoRequest> processParameter = new ProcessParameter<EtrExchangeTradeSaveSecRepoRequest>();
-						WorkFlowParameter<EtrExchangeTradeSaveSecRepoRequest> params = etrExchangeTradeSecRepo001Service.getWorkFlowParameter(dto);
+						ProcessParameter<EtrExchangeTradeSecRepoSaveRepoRequest> processParameter = new ProcessParameter<EtrExchangeTradeSecRepoSaveRepoRequest>();
+						WorkFlowParameter<EtrExchangeTradeSecRepoSaveRepoRequest> params = new WorkFlowParameter<EtrExchangeTradeSecRepoSaveRepoRequest>();
 						params.setPageId(dto.getPageId());
 						params.setElementId(dto.getElementId());
 						params.setBusinessType(businessType);
@@ -827,7 +790,7 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 								+ "-" + "业务类型" + "(" + dto.getBusinessTypeName() + ")-"
 								+ "平台日" + "(" + DateUtil.format(iPlatformDate.getSysDate()) + ")");
 						processParameter.setWorkFlowParameter(params);
-						msg = etrExchangeTradeSecRepo001Service.start(processParameter, etrExchangeTrade001DtoList.toArray(new EtrExchangeTradeSaveSecRepoRequest[etrExchangeTrade001DtoList.size()]));
+						msg = etrExchangeTradeRepo001Service.start(processParameter, etrExchangeTrade001DtoList.toArray(new EtrExchangeTradeSecRepoSaveRepoRequest[etrExchangeTrade001DtoList.size()]));
 					}
 					return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
 				}else{
@@ -837,9 +800,9 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 							dto.setEntrustId(code);
 						}
 						//业务编号生成规则参数
-						ProcessParameter<EtrExchangeTradeSaveSecRepoRequest> processParameter = new ProcessParameter<EtrExchangeTradeSaveSecRepoRequest>();
-						WorkFlowParameter<EtrExchangeTradeSaveSecRepoRequest> params = etrExchangeTradeSecRepo001Service.getWorkFlowParameter(dto);
-						params.setPageId(dto.getPageId());
+						ProcessParameter<EtrExchangeTradeSecRepoSaveRepoRequest> processParameter = new ProcessParameter<EtrExchangeTradeSecRepoSaveRepoRequest>();
+						WorkFlowParameter<EtrExchangeTradeSecRepoSaveRepoRequest> params = new WorkFlowParameter<EtrExchangeTradeSecRepoSaveRepoRequest>();
+					params.setPageId(dto.getPageId());
 						params.setElementId(dto.getElementId());
 						params.setBusinessType(businessType);
 						params.setBusinessCode(dto.getEntrustId());
@@ -848,7 +811,7 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 								+ "-" + "业务类型"+ "(" + entity.getBusinessTypeName() + ")-"
 								+ "平台日" + "(" + DateUtil.format(iPlatformDate.getSysDate()) + ")");
 						processParameter.setWorkFlowParameter(params);
-						msg = etrExchangeTradeSecRepo001Service.start(processParameter, dto);
+						msg = etrExchangeTradeRepo001Service.start(processParameter, dto);
 						return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
 					}
 
@@ -896,9 +859,9 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 				dto.setPortfolioId(item.getPortfolioId()); //让指令分发能查出来
 				// ----------add by zhangrui1 20200703 预占功能 start----------
 				if (StringUtil.equals(BussinessConstant.SUBMIT, dto.getOperateType())) {
-					List<EtrExchangeTradeSaveSecRepoRequest> etrExchangeTrade001DtoList = new ArrayList<>();
+					List<EtrExchangeTradeSecRepoSaveRepoRequest> etrExchangeTrade001DtoList = new ArrayList<>();
 					for(EtrExchangeTradePortfolioSecRepoRequest item2:dto.getPortfolioList()) {
-						EtrExchangeTradeSaveSecRepoRequest etrExchangeTrade001Dto = etrExchangeTradeSecRepo001Service.genEtrExchangeTradeSaveSecRepoRequest(dto,item2);
+						EtrExchangeTradeSecRepoSaveRepoRequest etrExchangeTrade001Dto = etrExchangeTradeRepo001Service.genEtrExchangeTradeSecRepoSaveRepoRequest(dto,item2);
 						if (dto.getPs().equals(DictCodeListExt3.交易方向_正回购.getValue())) {
 							etrExchangeTrade001Dto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue());
 						} else if (dto.getPs().equals(DictCodeListExt3.交易方向_逆回购.getValue())) {
@@ -937,8 +900,8 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 					ExchangeEntrustRdsCommonAop.riskListToChildren(dto.getRiskTrialRetDto(), etrExchangeTrade001DtoList,
 							(etrExchangeTrade001Dto, list) -> etrExchangeTrade001Dto.setRiskTrialRetDto(list));
 				}
-				ProcessParameter<EtrExchangeTradeSaveSecRepoRequest> processParameter = new ProcessParameter<EtrExchangeTradeSaveSecRepoRequest>();
-				WorkFlowParameter<EtrExchangeTradeSaveSecRepoRequest> params = new WorkFlowParameter<EtrExchangeTradeSaveSecRepoRequest>();
+				ProcessParameter<EtrExchangeTradeSecRepoSaveRepoRequest> processParameter = new ProcessParameter<EtrExchangeTradeSecRepoSaveRepoRequest>();
+				WorkFlowParameter<EtrExchangeTradeSecRepoSaveRepoRequest> params = new WorkFlowParameter<EtrExchangeTradeSecRepoSaveRepoRequest>();
 				params.setPageId(dto.getPageId());
 				params.setElementId(dto.getElementId());
 				params.setBusinessType(businessType);
@@ -948,7 +911,7 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 						+ "平台日" + "(" + DateUtil.format(iPlatformDate.getSysDate()) + ")");
 				processParameter.setWorkFlowParameter(params);
 				try {
-		        	msg = etrExchangeTradeSecRepo001Service.start(processParameter, dto);
+		        	msg = etrExchangeTradeRepo001Service.start(processParameter, dto);
 		            AjaxResult m =new AjaxResult(msg);
 		            return new Message<AjaxResult>().success().setData(m);
 		        }catch (Exception e) {
@@ -958,9 +921,9 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 			}
 			//多组合指令
 			else {
-				List<EtrExchangeTradeSaveSecRepoRequest> etrExchangeTrade001DtoList = new ArrayList<>();
+				List<EtrExchangeTradeSecRepoSaveRepoRequest> etrExchangeTrade001DtoList = new ArrayList<>();
 				for(EtrExchangeTradePortfolioSecRepoRequest item:dto.getPortfolioList()) {
-					EtrExchangeTradeSaveSecRepoRequest etrExchangeTrade001Dto = etrExchangeTradeSecRepo001Service.genEtrExchangeTradeSaveSecRepoRequest(dto,item);
+					EtrExchangeTradeSecRepoSaveRepoRequest etrExchangeTrade001Dto = etrExchangeTradeRepo001Service.genEtrExchangeTradeSecRepoSaveRepoRequest(dto,item);
 					if (dto.getPs().equals(DictCodeListExt3.交易方向_正回购.getValue())) {
 						etrExchangeTrade001Dto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue());
 					} else if (dto.getPs().equals(DictCodeListExt3.交易方向_逆回购.getValue())) {
@@ -1001,8 +964,8 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 				}
 				// ----------预占功能 end----------
 
-				ProcessParameter<EtrExchangeTradeSaveSecRepoRequest> processParameter = new ProcessParameter<EtrExchangeTradeSaveSecRepoRequest>();
-				WorkFlowParameter<EtrExchangeTradeSaveSecRepoRequest> params = etrExchangeTradeSecRepo001Service.getWorkFlowParameter(dto);
+				ProcessParameter<EtrExchangeTradeSecRepoSaveRepoRequest> processParameter = new ProcessParameter<EtrExchangeTradeSecRepoSaveRepoRequest>();
+				WorkFlowParameter<EtrExchangeTradeSecRepoSaveRepoRequest> params = new WorkFlowParameter<EtrExchangeTradeSecRepoSaveRepoRequest>();
 				params.setPageId(dto.getPageId());
 				params.setElementId(dto.getElementId());
 				params.setBusinessType(businessType);
@@ -1012,7 +975,7 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 						+ "平台日" + "(" + DateUtil.format(iPlatformDate.getSysDate()) + ")");
 				processParameter.setWorkFlowParameter(params);
 				try {
-					msg = etrExchangeTradeSecRepo001Service.start(processParameter, etrExchangeTrade001DtoList.toArray(new EtrExchangeTradeSaveSecRepoRequest[etrExchangeTrade001DtoList.size()]));
+					msg = etrExchangeTradeRepo001Service.start(processParameter, etrExchangeTrade001DtoList.toArray(new EtrExchangeTradeSecRepoSaveRepoRequest[etrExchangeTrade001DtoList.size()]));
 		            AjaxResult m =new AjaxResult(msg);
 		            return new Message<AjaxResult>().success().setData(m);
 		        }catch (Exception e) {

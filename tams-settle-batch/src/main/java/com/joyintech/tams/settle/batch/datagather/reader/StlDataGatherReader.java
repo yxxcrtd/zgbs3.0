@@ -218,6 +218,8 @@ public abstract class StlDataGatherReader extends BaseReader<InvestTradeReaderDt
     private List<InvestTradeReaderDto> getBondPurConfirSettleTransData(Map<String, Object> searchParam){
         InvestTradeReaderDto investTradeReaderDto = new InvestTradeReaderDto();
         List<SettleTransDataDto> settleTransDataResult = new ArrayList<>();
+        // 业务类型
+        searchParam.put("finprodTypes", Arrays.asList(DictCodeListExt1.金融产品类型_投管用_债券.getValue()));
         searchParam.put("PS_T04", DictCodeList.交易方向_申购.getValue());
         searchParam.put("IS_CANCEL_N", DictCodeList.是否_否.getValue());
         searchParam.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());

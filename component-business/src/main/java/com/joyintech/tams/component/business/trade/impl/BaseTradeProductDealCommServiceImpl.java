@@ -6,7 +6,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSON;
 import com.joyintech.tams.invest.common.component.base.trade.BaseTradeProductDealService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -97,6 +100,10 @@ import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommSer
  */
 @Service
 public class BaseTradeProductDealCommServiceImpl extends BaseService implements BaseTradeProductDealCommService {
+    /**
+     * 日志
+     */
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * 业务共通组件.资产头寸现金持仓共通组件
@@ -193,6 +200,7 @@ public class BaseTradeProductDealCommServiceImpl extends BaseService implements 
      */
     @Override
     public CommonResult execute(FinProductTradeDto finProductTradeDto) {
+        logger.debug("【金融产品交易共通业务逻辑处理开始】,finProductTradeDto:{}", JSON.toJSONString(finProductTradeDto));
         if (finProductTradeDto == null) {
             return new CommonResult(CommonResult.FAILD, "没有数据需要处理");
         }

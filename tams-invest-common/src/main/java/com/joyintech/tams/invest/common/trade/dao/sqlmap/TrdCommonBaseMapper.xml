@@ -1390,8 +1390,12 @@
         SETTLE_TRANS_DATA
         WHERE
         CJBH = #{sqcjbh, jdbcType=VARCHAR}
-        AND SEAT_NUMBER = #{seatNumber, jdbcType=VARCHAR}
-        AND SEC_ACCT_ID = #{secAcctId, jdbcType=VARCHAR}
+        <if test="seatNumber != null and seatNumber != ''">
+            AND SEAT_NUMBER = #{seatNumber, jdbcType=VARCHAR}
+        </if>
+        <if test="secAcctId != null and secAcctId != ''">
+            AND SEC_ACCT_ID = #{secAcctId, jdbcType=VARCHAR}
+        </if>
         <if test="vdate != null">
             AND VDATE = #{vdate, jdbcType=DATE}
         </if>

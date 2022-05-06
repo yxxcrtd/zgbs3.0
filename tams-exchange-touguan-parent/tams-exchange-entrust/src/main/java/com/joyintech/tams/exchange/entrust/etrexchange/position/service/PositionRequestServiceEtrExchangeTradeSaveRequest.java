@@ -249,6 +249,9 @@ public class PositionRequestServiceEtrExchangeTradeSaveRequest {
         resultMap.put(INTERFACE_TYPE, INTERF_TYPE_BOND003);
         resultMap.put(BUSI_ACT, 业务动作_投资指令.getValue());
         resultMap.put(DELIVERY_TYPE, commonPositionEngineService.getDeliveryType(entity.getFinprodId()));
+        if ((DictCodeListExt3.结算方式_头寸引擎_RTGS.getValue()).equals(resultMap.get(DELIVERY_TYPE))&&(DictCodeListExt1.交易场所_深圳证券交易所.getValue()).equals(resultMap.get(TRADE_PLACE))) {//头寸引擎深交所RTGS都是大宗交易
+            resultMap.put(SHARES_TRADE_PLATFORM, DictCodeList.交易平台_大宗交易平台.getValue());
+        }
         resultMap.put(SETTLE_SPEED, commonPositionEngineService.parseSettleSpreed((String) resultMap.get(DELIVERY_TYPE)));
 
         String ps = entity.getPs();

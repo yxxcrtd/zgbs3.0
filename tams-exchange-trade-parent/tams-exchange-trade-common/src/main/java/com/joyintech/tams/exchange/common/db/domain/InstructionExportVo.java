@@ -1,12 +1,15 @@
 package com.joyintech.tams.exchange.common.db.domain;
 
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
 import com.joyintech.tams.exchange.common.constant.TradePlat;
 import com.joyintech.tams.exchange.common.constant.instrument.SecondAssetType;
 import com.joyintech.tams.exchange.common.enums.exchange.TargetTypeEnum;
+import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.utils.DoubleSerializerUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import io.swagger.annotations.ApiModel;
@@ -113,6 +116,9 @@ public class InstructionExportVo {
     @ApiModelProperty(required = false, name = "ps", value = "交易方向")
     @Size(max = 50)
     private String ps = "";
+
+    @ApiModelProperty( name = "tradeSide", value = "交易方向")
+    private String tradeSide;
 
     @ApiModelProperty(required = false, name = "dealMode", value = "交易方式")
     @Size(max = 50)
@@ -386,7 +392,7 @@ public class InstructionExportVo {
 
     private String dealProgress;
 
-    private Long leftVolume;
+    private long leftVolume;
 
     private BigDecimal leftAmount;
 
@@ -1062,6 +1068,22 @@ public class InstructionExportVo {
         this.busiTypeTg = busiTypeTg;
     }
 
+    public String getTradeSide() {
+        if (DictCodeListExt3.投管业务类型_首期.getValue().equals(busiTypeTg)
+                || DictCodeListExt3.投管业务类型_提前购回.getValue().equals(busiTypeTg)
+                || DictCodeListExt3.投管业务类型_到期购回.getValue().equals(busiTypeTg)
+                || DictCodeListExt3.投管业务类型_到期续做.getValue().equals(busiTypeTg)
+                || DictCodeListExt3.投管业务类型_中途换券.getValue().equals(busiTypeTg)
+                || DictCodeListExt3.投管业务类型_解除质押.getValue().equals(busiTypeTg)) {
+            return firstRepoPs;
+        }
+        return ps;
+    }
+
+    public void setTradeSide(String tradeSide) {
+        this.tradeSide = tradeSide;
+    }
+
     public String getTargetType() {
         return targetType;
     }
@@ -1093,18 +1115,7 @@ public class InstructionExportVo {
         if (StrUtil.isNotEmpty(this.progress)) {
             return this.progress;
         }
-
-        BigDecimal total = TradeUtils.add(getEntrustLeftAmt(), getFrozenQuantity(), 2);
-        Double progress;
-        if (volumeInstruction()) {
-            progress = TradeUtils.divide(total, getEntrustNum(), 4).doubleValue();
-        } else if (TradeUtils.bigThanZero(getEntrustAmt())) {
-            progress = TradeUtils.divide(total, getEntrustAmt(), 4);
-        } else {
-            progress = 0D;
-        }
-
-        return TradeUtils.percentFormat(progress);
+        return TradeUtils.percentFormat(this.calcPercent(this.executeAmt()));
     }
 
     public void setProgress(String progress) {
@@ -1119,21 +1130,20 @@ public class InstructionExportVo {
         if (StrUtil.isNotEmpty(this.dealProgress)) {
             return this.dealProgress;
         }
-
-        Double progress;
-        if (volumeInstruction()) {
-            progress = TradeUtils.divide(getEntrustLeftAmt(), getEntrustNum(), 4).doubleValue();
-        } else if (TradeUtils.bigThanZero(getEntrustAmt())) {
-            progress = TradeUtils.divide(getEntrustLeftAmt(), getEntrustAmt(), 4);
-        } else {
-            progress = 0D;
-        }
-
-        return TradeUtils.percentFormat(progress);
+        return TradeUtils.percentFormat(this.calcPercent(this.getEntrustLeftAmt()));
     }
 
     public void setDealProgress(String dealProgress) {
         this.dealProgress = dealProgress;
+    }
+
+    private BigDecimal calcPercent(BigDecimal amt) {
+        if (this.getEntrustNum() == 0L && BigDecimal.ZERO.compareTo(this.getEntrustAmt()) == 0) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal percent = this.volumeInstruction() ? NumberUtil.div(amt, this.getEntrustNum())
+                : NumberUtil.div(amt, this.getEntrustAmt());
+        return NumberUtil.round(NumberUtil.min(BigDecimal.ONE, percent), 4);
     }
 
     /**
@@ -1162,8 +1172,8 @@ public class InstructionExportVo {
             return this.leftAmount;
         }
 
-        if (amtInstruction()) {
-            return TradeUtils.subtract(getEntrustAmt(), getEntrustLeftAmt(), getFrozenQuantity(), 2);
+        if (TradeUtils.bigThanZero(getEntrustAmt())) {
+            return NumberUtil.round(NumberUtil.sub(getEntrustAmt(), getEntrustLeftAmt(), getFrozenQuantity()),2);
         }
         return BigDecimal.ZERO;
     }
@@ -1172,14 +1182,21 @@ public class InstructionExportVo {
         this.leftAmount = leftAmount;
     }
 
+
+
+    /**
+     * 新债-非可转债
+     */
+    public boolean newBond() {
+        return InvestmentAssetType.BOND.codeEquals(this.getAssetType())
+                && SecondAssetType.KZZ.codeNotEquals(this.getAssetType1())
+                && TradePlat.NEW_BOND.codeEquals(this.getTradePlat());
+    }
+
     /**
      * 是否是数量指令
      */
     public boolean volumeInstruction() {
-        // 新债
-        if (newBond()) {
-            return TargetTypeEnum.YES.codeEquals(this.getTargetType());
-        }
         return this.getEntrustNum() > 0L;
     }
 
@@ -1191,11 +1208,9 @@ public class InstructionExportVo {
     }
 
     /**
-     * 新债-非可转债
+     * 已执行数量/金额
      */
-    public boolean newBond() {
-        return InvestmentAssetType.BOND.codeEquals(this.getAssetType())
-                && SecondAssetType.KZZ.codeNotEquals(this.getAssetType1())
-                && TradePlat.NEW_BOND.codeEquals(this.getTradePlat());
+    public BigDecimal executeAmt() {
+        return NumberUtil.add(this.getEntrustLeftAmt(), this.getFrozenQuantity());
     }
 }

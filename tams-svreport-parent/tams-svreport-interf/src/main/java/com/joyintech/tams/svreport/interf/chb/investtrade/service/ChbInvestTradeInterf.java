@@ -127,8 +127,8 @@ public class ChbInvestTradeInterf  extends BaseInterfService {
 		// 开关：上游资产交易数据接入是否自动生成产品买通道交易(01：自动生成 02：不自动生成)
 		String isAutoGeneChlDeal = SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_IS_AUTOGENE_CHLDEAL);
 		// 发行机构代码
-		//String issueId = SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_ISSUE_PARTY_ID);
-		String issueId = CommonUtil.selectBankCode();
+		String issueId = SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_ISSUE_PARTY_ID);
+//		String issueId = CommonUtil.selectBankCode();
 		Map<String,ChbInvestTrade> spAssetMap=new HashMap<String,ChbInvestTrade>();
 		if(DictCodeList.是否_中债_否.getValue().equals(isChlBtm)){
 			String isCalLoadRate =  SvrDataUtil.getSysParam("IS_CAL_LOADRATE");

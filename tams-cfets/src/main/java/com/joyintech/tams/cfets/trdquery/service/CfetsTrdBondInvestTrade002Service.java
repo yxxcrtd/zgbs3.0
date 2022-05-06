@@ -6,6 +6,7 @@
 package com.joyintech.tams.cfets.trdquery.service;
 
 import com.google.common.collect.Lists;
+import com.joyintech.background.component.uplink.interbank.business.dto.BaseQuoteDto;
 import com.joyintech.calculation.CalculatorFactory;
 import com.joyintech.calculation.bonds.PaperIrReset;
 import com.joyintech.calculation.bonds.SecIntSchedule;
@@ -33,6 +34,7 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.service.bankuplink.common.service.CfetsQuotedCommonService;
 import com.joyintech.system.base.dao.SysUploadFileInfoMapper;
 import com.joyintech.system.base.entity.SysUploadFileInfo;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
@@ -352,6 +354,9 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
 
     @Autowired
     private CfetsManualSettleMapper cfetsManualSettleMapper;
+
+    @Autowired
+    private CfetsQuotedCommonService cfetsQuotedCommonService;
 
     // 交易份额小数保留位数
     private int decimalPlaces_4 = 4;
@@ -1220,6 +1225,10 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
             paramMap.put("totleTradeId", totleTradeId);
             paramMap.put("tradeStatus", BussinessDictCodeList.银行间上行报价状态_已撤销.getValue());
             cfetsTrdQueryMapper.updateIbuByPrimaryKeySelective(paramMap);
+            // 删除指令完成度
+            BaseQuoteDto baseQuoteDto = new BaseQuoteDto();
+            baseQuoteDto.setQuoteId(totleTradeId);
+            cfetsQuotedCommonService.deleteByQuoteId(baseQuoteDto);
             paramMap.put("exeId", exeId);
             paramMap.put("remark", DictCodeListExt3.交收状态_交收失败.getCodeName());
             cfetsTrdQueryMapper.updateInterfTradSecdealByTradeId(paramMap);

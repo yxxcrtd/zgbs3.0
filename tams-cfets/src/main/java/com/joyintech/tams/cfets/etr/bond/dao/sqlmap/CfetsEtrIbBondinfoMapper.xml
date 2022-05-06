@@ -1360,7 +1360,7 @@ from
         A.PORTFOLIO_NAME  portfolioName
         from
         PTL_PORTFOLIO A
-        where A.PORTFOLIO_ID = #{entrustId}
+        where A.PORTFOLIO_ID = #{portfolioId}
         and rownum=1
     </select>
     <!-- 是否节假日 -->

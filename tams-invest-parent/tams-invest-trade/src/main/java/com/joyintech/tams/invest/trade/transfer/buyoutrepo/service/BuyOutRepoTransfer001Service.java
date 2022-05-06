@@ -762,9 +762,9 @@ public class BuyOutRepoTransfer001Service extends CommonExportService<BuyOutRepo
         param.put("portfolioId", input.getPortfolioId());
         param.put("ps", entity.getPs());
         param.put("isWithInvAim", true);
-        param.put("INV_AIM_AC", DictCodeListExt1.投资目的_摊余成本类.getValue());
-        param.put("INV_AIM_FVOCI", DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue());
-        param.put("INV_AIM_FVTPL", DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue());
+        param.put("INV_AIM_AC", DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue());
+        param.put("INV_AIM_FVOCI", DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue());
+        param.put("INV_AIM_FVTPL", DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue());
         param.put("chlId", entity.getChlId());
         param.put("secAcctId", entity.getSecManageAcctId());
         return simpleRestTemplate.postForList(

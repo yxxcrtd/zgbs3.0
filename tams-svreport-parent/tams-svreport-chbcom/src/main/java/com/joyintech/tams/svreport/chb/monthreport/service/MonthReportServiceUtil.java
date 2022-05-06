@@ -3,6 +3,8 @@ package com.joyintech.tams.svreport.chb.monthreport.service;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.system.base.entity.SysInstitution;
+import com.joyintech.tams.common.svreport.chb.constant.SVReportGlobalConstant;
+import com.joyintech.tams.common.svreport.chb.util.SvrDataUtil;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.report.common.util.ChbDeadlineUtil;
 import com.joyintech.tams.report.system.instregbankcode.dao.SysInstRegBankCode001Mapper;
@@ -161,10 +163,10 @@ public class MonthReportServiceUtil {
 
 	
 	public String[] getRegistCode(String orgCode){
-        //String issuePartyId = SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_ISSUE_PARTY_ID);
-		String issuePartyId =CommonUtil.selectBankCode();
-        //String  issuePartyName = SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_ISSUE_PARTY_NAME);
-		String  issuePartyName=CommonUtil.selectBankCodeName();
+        String issuePartyId = SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_ISSUE_PARTY_ID);
+//		String issuePartyId =CommonUtil.selectBankCode();
+        String  issuePartyName = SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_ISSUE_PARTY_NAME);
+//		String  issuePartyName=CommonUtil.selectBankCodeName();
 		// 发行机构代码取值
         if(null!=orgCode){
         	Map<String,Object> param = new HashMap<>();

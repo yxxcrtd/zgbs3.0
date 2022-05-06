@@ -20,7 +20,6 @@ import com.joyintech.tams.exchange.entrust.common.aop.ExchangeEntrustRdsCommonAo
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeTradePortfolioRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeTradeSaveRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.service.EtrExchangeTradeCommon001Service;
-import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
@@ -361,6 +360,7 @@ public AjaxResult save(@RequestBody EtrExchangeTradeSaveRequest allDto, BindingR
 			if(dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue()) && dto.getTradePlat().equals(DictCodeList.交易平台_固定收益平台.getValue())){
 				param.setCommonBusinessExtType(DictCodeListExt3.fromDictCodeList(DictCodeListExt3.共通业务类型_上交所固定收益平台现券交易指令));
 			}
+			dto.setFromEtrExchange("Y");
 			//add end
 			String code = bussGetBussinessIdService != null ? bussGetBussinessIdService.buildBussinessCode(param) : IDGenerator.generate();
 			dto.setEntrustId(code);
@@ -401,7 +401,7 @@ public AjaxResult save(@RequestBody EtrExchangeTradeSaveRequest allDto, BindingR
 
         }
 		// add by zhangrui1 start
-		AjaxResult ar = ExchangeEntrustRdsCommonAop.doListPreOccupy(getPageId(), dtoList,
+		AjaxResult ar = ExchangeEntrustRdsCommonAop.doListPreOccupy("EtrExchangeTradeMulti001", dtoList,
 			BussinessDictCodeListRds.接口系统ID_预占批量接口.getValue());
 		if (null != ar) {
 			return ar;

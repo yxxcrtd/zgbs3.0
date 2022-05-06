@@ -452,11 +452,11 @@
             <if test="exerYield != null" >
                 #{exerYield,jdbcType=DECIMAL},
             </if>
-            <if test="invAim != null" >
-                #{invAim,jdbcType=VARCHAR},
-            </if>
             <if test="businessModel != null" >
                 #{businessModel,jdbcType=VARCHAR},
+            </if>
+            <if test="invAim != null" >
+                #{invAim,jdbcType=VARCHAR},
             </if>
             <if test="deliveryType != null" >
                 #{deliveryType,jdbcType=VARCHAR},

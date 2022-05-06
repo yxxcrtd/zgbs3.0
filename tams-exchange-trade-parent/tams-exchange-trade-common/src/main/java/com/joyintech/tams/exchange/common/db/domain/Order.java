@@ -222,7 +222,7 @@ public class Order implements Serializable, Cloneable, OrderInterface, KeyMethod
     private int count;
 
     @ApiModelProperty(name = "isFullPrice", value = "全价(Y:是 ， N：否)")
-    private String isFullPrice;//  Y:是 ， N：否
+    private String isFullPrice;
 
     @ApiModelProperty(name = "offsetFlag", value = "冲正标识")
     private String offsetFlag;
@@ -263,8 +263,6 @@ public class Order implements Serializable, Cloneable, OrderInterface, KeyMethod
     private String targetType;
     @ApiModelProperty(name = "isNoGuard", value = "是否非担保")
     private String isNoGuard;
-    @ApiModelProperty(name = "isNetPrice", value = "是否净价交易")
-    private String isNetPrice;
 
     public Order() {
         this.orderPrice = new BigDecimal("0.00");
@@ -484,6 +482,7 @@ public class Order implements Serializable, Cloneable, OrderInterface, KeyMethod
         return isFullPrice;
     }
 
+    @Override
     public void setIsFullPrice(String isFullPrice) {
         this.isFullPrice = isFullPrice;
     }
@@ -758,14 +757,6 @@ public class Order implements Serializable, Cloneable, OrderInterface, KeyMethod
 
     public void setIsNoGuard(String isNoGuard) {
         this.isNoGuard = isNoGuard;
-    }
-
-    public String getIsNetPrice() {
-        return isNetPrice;
-    }
-
-    public void setIsNetPrice(String isNetPrice) {
-        this.isNetPrice = isNetPrice;
     }
 
     public String getPriceMode() {

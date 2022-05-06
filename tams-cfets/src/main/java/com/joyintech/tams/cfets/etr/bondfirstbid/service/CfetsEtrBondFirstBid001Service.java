@@ -2,40 +2,63 @@ package com.joyintech.tams.cfets.etr.bondfirstbid.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.joyintech.background.component.common.pack.common.util.ArithmeticUtil;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.SecurityUtil;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
+import com.joyintech.tams.business.common.dto.CfetsEtrFinProductInfoRequest;
+import com.joyintech.tams.business.common.dto.CfetsEtrFinProductInfoResponse;
 import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.business.common.service.EtrCommonFinProductInfoService;
 import com.joyintech.tams.cfets.etr.bond.dao.CfetsEtrIbBondinfoMapper;
 import com.joyintech.tams.cfets.etr.bond.service.CfetsEtrIbBondinfo002Service;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dao.CfetsEtrBondFirstBid001Mapper;
+import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsBiddingProductDto;
+import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBid002Dto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoRequest;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIssueInfoDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIssueInfoRequest;
+import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
+import com.joyintech.tams.common.base.dao.EtrEntrustBidPriceMapper;
+import com.joyintech.tams.common.base.dao.EtrEntrustDetailMapper;
+import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
+import com.joyintech.tams.common.base.dao.FinProductMapper;
+import com.joyintech.tams.common.base.dao.PtlPortfolioMapper;
+import com.joyintech.tams.common.base.dao.WflEtrEntrustAddMapper;
 import com.joyintech.tams.common.base.dao.WflEtrEntrustMapper;
+import com.joyintech.tams.common.base.entity.EtrEntrust;
+import com.joyintech.tams.common.base.entity.EtrEntrustBidPrice;
+import com.joyintech.tams.common.base.entity.EtrEntrustDetail;
+import com.joyintech.tams.common.base.entity.PtlPortfolio;
 import com.joyintech.tams.common.base.entity.SppiImportData;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 一级投标指令
@@ -63,6 +86,34 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
      */
     @Autowired
     private WflEtrEntrustMapper wflEtrEntrustMapper;
+
+    @Autowired
+    private EtrEntrustMapper etrEntrustMapper;
+
+    @Autowired
+    private EtrEntrustAddMapper etrEntrustAddMapper;
+
+    @Autowired
+    private WflEtrEntrustAddMapper wflEtrEntrustAddMapper;
+
+    @Autowired
+    private EtrEntrustBidPriceMapper etrEntrustBidPriceMapper;
+
+    @Autowired
+    private EtrEntrustDetailMapper etrEntrustDetailMapper;
+
+    @Autowired
+    private EtrCommonFinProductInfoService etrCommonFinProductInfoService;
+
+    @Autowired
+    private PtlPortfolioMapper ptlPortfolioMapper;
+
+    @Autowired
+    private JoyinbusinessCommonMapper joyinbusinessCommonMapper;
+
+    @Autowired
+    private FinProductMapper finProductMapper;
+
 
 
     /**
@@ -102,7 +153,7 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
         if (StringUtil.isNotEmpty(invManagerId)) {
             pageParam.put("invManagerIdList", StringUtil.splitToList(GlobalConstant.COMMA, invManagerId));
         }
-        //投资经理
+        //交易对手
         String counterId = (String) pageParam.get("counterId");
         if (StringUtil.isNotEmpty(counterId)) {
             pageParam.put("counterIdList", StringUtil.splitToList(GlobalConstant.COMMA, counterId));
@@ -151,7 +202,7 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
      */
     public Page<CfetsEtrIBondFirstBidFindIssueInfoDto> findIssueInfoPage(CfetsEtrIBondFirstBidFindIssueInfoRequest search) {
         search.setPlatformDate(iPlatformDate.getSysDateStr());
-        search.setFinprodType2(DictCodeListExt2.平安资产类型_一级市场债.getValue());
+        search.setFinprodType2(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
 
         Map<String, Object> pageParam = BeanUtil.object2Map(search);
         pageParam.put("TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue());
@@ -217,6 +268,95 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
             }
         }
         return null;
+    }
+
+    /**
+     * 根据指令代码查询指令新建信息查看界面
+     * @param entrustId
+     * @return
+     */
+    public CfetsEtrBondFirstBid002Dto getEtrEntrustInfo(String entrustId) {
+        CfetsEtrBondFirstBid002Dto dto = new CfetsEtrBondFirstBid002Dto();
+
+        //查询指令信息
+        EtrEntrust etrEntrust = cfetsEtrBondFirstBid001Mapper.selectEntrustById(entrustId);
+        if (etrEntrust == null ) {
+            return dto;
+        }
+        //查询所有组合信息
+        List<PtlPortfolio> ptlPortfolios = ptlPortfolioMapper.selectAllPortfolio();
+        Map<String, String> ptlPortfolioMap = ptlPortfolios.stream()
+                .collect(Collectors.toMap(PtlPortfolio::getPortfolioId,PtlPortfolio::getPortfolioName));
+        //查询所有的对手方
+        List<SelectOptionDto> counterDtos = joyinbusinessCommonMapper.queryCounterPartyList(null);
+        Map<String, String> counterMap = counterDtos.stream()
+                .collect(Collectors.toMap(SelectOptionDto::getId,SelectOptionDto::getText));
+
+        dto.setFinprodId(etrEntrust.getFinprodId());
+        dto.setEntrustDate(etrEntrust.getEntrustDate());
+        dto.setCounterId(etrEntrust.getCounterId());
+        dto.setCounterName(counterMap.get(etrEntrust.getCounterId()));
+        dto.setRemark(etrEntrust.getRemark());
+
+        //查询资产信息
+        CfetsEtrFinProductInfoRequest productInfoRequest = new CfetsEtrFinProductInfoRequest();
+        productInfoRequest.setFinprodId(etrEntrust.getFinprodId());
+        CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoService.findFinProductInfo(null, null, productInfoRequest);
+
+        dto.setIssueClass(finProductInfo.getIssueClass());
+        dto.setTenderTarget(finProductInfo.getTenderTarget());
+        dto.setFinprodAbbr(finProductInfo.getFinprodAbbr());
+
+        List<CfetsBiddingProductDto> biddingProductList = new ArrayList<>();
+        //查询指令明细信息
+        List<EtrEntrustDetail> etrEntrustDetails = cfetsEtrBondFirstBid001Mapper.selectEntrustDetailById(entrustId);
+
+        if (StringUtil.equals(finProductInfo.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
+            dto.setIssueDate(finProductInfo.getIssueDate());
+            dto.setPayDate(finProductInfo.getPayDate());
+
+            for (EtrEntrustDetail detail : etrEntrustDetails) {
+                CfetsBiddingProductDto productDto = new CfetsBiddingProductDto();
+                productDto.setPortfolioId(detail.getPortfolioId());
+                productDto.setPortfolioName(ptlPortfolioMap.get(detail.getPortfolioId()));
+                productDto.setBusinessModel(detail.getInvAim());
+                productDto.setBidPrinAmt(ArithmeticUtil.multiply(detail.getEntrustNum(), BigDecimal.valueOf(100)));
+
+                biddingProductList.add(productDto);
+            }
+        } else {
+            if (finProductInfo.getIssueDate() != null) {
+                dto.setIssueDate(finProductInfo.getIssueDate());
+            } else {
+                dto.setTenderSdate(finProductInfo.getTenderSdate());
+                dto.setTenderEdate(finProductInfo.getTenderEdate());
+            }
+            dto.setPayEdate(finProductInfo.getPayEdate());
+
+            //查询指令标位信息
+            List<EtrEntrustBidPrice> bidPrices = cfetsEtrBondFirstBid001Mapper.selectBidPriceById(entrustId);
+            for (EtrEntrustBidPrice bidPrice : bidPrices) {
+                CfetsBiddingProductDto productDto = new CfetsBiddingProductDto();
+                productDto.setPortfolioId(bidPrice.getPortfolioId());
+                productDto.setPortfolioName(ptlPortfolioMap.get(bidPrice.getPortfolioId()));
+                productDto.setBidPrice(bidPrice.getBidPrice());
+                productDto.setBidPrinAmt(ArithmeticUtil.multiply(bidPrice.getBidPrinAmt(), BigDecimal.valueOf(100)));
+                EtrEntrustDetail etrEntrustDetail = etrEntrustDetails.stream()
+                        .filter(x -> Objects.equals(x.getPortfolioId(),bidPrice.getPortfolioId())).findFirst().orElse(null);
+                if (etrEntrustDetail != null) {
+                    productDto.setBusinessModel(etrEntrustDetail.getInvAim());
+                    productDto.setPortfolioTotalBidPrinAmt(ArithmeticUtil.multiply(etrEntrustDetail.getEntrustNum(), BigDecimal.valueOf(100)));
+                }
+
+                biddingProductList.add(productDto);
+            }
+
+        }
+
+        dto.setBiddingProductList(biddingProductList);
+
+        return dto;
+
     }
 
 //    public Message<AjaxResult> closeCheckDelegate(CfetsEtrBondFirstBid002Dto dto) {

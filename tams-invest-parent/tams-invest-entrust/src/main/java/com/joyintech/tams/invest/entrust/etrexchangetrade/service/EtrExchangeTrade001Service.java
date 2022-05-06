@@ -2310,10 +2310,10 @@ public class EtrExchangeTrade001Service extends CommonExportService<EtrExchangeT
 							}
 							if (StringUtils.isEmpty(confirmMsg)) {
 								if (DictCodeListExt2.价格模式_指定价格.getValue().equals(priceModel)) {
-									confirmMsg = etrCommonService.StringAddByBr(confirmMsg, this.getMessage("ETR_ST_007", lineNo));
+									/*confirmMsg = etrCommonService.StringAddByBr(confirmMsg, this.getMessage("ETR_ST_007", lineNo));
 									promptMsg = etrCommonService.StringAddByBr(promptMsg, confirmMsg);
-									confirmMsg = "";
-									//unit.setPriceModel(DictCodeListExt2.价格模式_限价指令.getValue());
+									confirmMsg = "";*/
+									unit.setPriceModel(DictCodeListExt2.价格模式_限价指令.getValue());
 								} else {
 									unit.setPriceModel(priceModel);
 								}
@@ -2710,6 +2710,12 @@ public class EtrExchangeTrade001Service extends CommonExportService<EtrExchangeT
 							BigDecimal vailableNum = selectAvailableNum(mapSec);
 							if (StringUtil.isNotEmpty(vailableNum)) {
 								unit.setAccAvailablePos(vailableNum);
+								if(vailableNum.compareTo(new BigDecimal(0))<1){
+									confirmMsg ="可用持仓不足(行号为" + lineNo + ")。";
+									promptMsg = etrCommonService.StringAddByBr(promptMsg, confirmMsg);
+									// 清空confirmMsg
+									confirmMsg = "";
+								}
 							}
 							unit.setTradePlat(DictCodeList.交易平台_竞价撮合平台.getValue());
 							settleEntrustType(unit);

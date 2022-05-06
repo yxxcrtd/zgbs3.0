@@ -251,4 +251,15 @@ public class PtlFundAllocationController {
     public int doDeleteNew(@RequestBody PtlFundAllocationDto ptlFundAllocationDto) {
         return ptlFundAllocationService.doDeleteNew(ptlFundAllocationDto);
     }
+    /**
+     * 获取实际现金余额
+     * @param map 请求参数
+     * @return 现金余额
+     * @see
+     * @since 1.0
+     */
+    @PostMapping("/getActAmount")
+    public BigDecimal getActAmount(@RequestBody Map<String,Object> map){
+        return ptlFundAllocationService.getActAmount(map);
+    }
 }

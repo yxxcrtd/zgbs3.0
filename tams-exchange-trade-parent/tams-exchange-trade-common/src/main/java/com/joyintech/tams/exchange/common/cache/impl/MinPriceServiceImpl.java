@@ -2,6 +2,7 @@ package com.joyintech.tams.exchange.common.cache.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -79,7 +80,16 @@ public class MinPriceServiceImpl implements MinPriceService {
         String tradePlat = TradePlatUtils.trd2EtrTradePlat(instruction);
         String assetType = instrument.getAssetType();
         String assetType1 = instrument.getAssetType1();
-        return getMinPrice(tradeMarket, tradePlat, assetType, assetType1);
+
+        MinPrice minPrice = getMinPrice(tradeMarket, tradePlat, assetType, assetType1);
+        if (ObjectUtil.isNull(minPrice)) {
+            String dealMode = instruction.getDealMode();
+            if (StrUtil.isNotEmpty(dealMode)) {
+                minPrice = getMinPrice(tradeMarket, dealMode, assetType, assetType1);
+            }
+        }
+        return minPrice;
+
     }
 
     /**
@@ -122,7 +132,6 @@ public class MinPriceServiceImpl implements MinPriceService {
         for (int i = 0, len = sources.size(); i < len; i++) {
             String s = sources.get(i);
             String d = targets.get(i);
-            //  兼容 tradPlat 02,03,04 情况
             if (!StrUtil.AT.equals(s) && !s.equals(d)) {
                 return false;
             }

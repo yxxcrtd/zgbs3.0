@@ -57,7 +57,7 @@ public class EtrAssetConfigTransfer002Controller extends BaseController {
     public String init(Model model) {
         this.setSelectOptionToModel(model,new DictCode[]{DictCode.金融产品类型_投管用,DictCode.发行方式,DictCode.投资目的});
         model.addAttribute("FINPROD_TYPE_TG_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
-        model.addAttribute("INV_AIM_FVTPL", DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue());
+        model.addAttribute("INV_AIM_FVTPL", DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue());
         model.addAttribute("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
         model.addAttribute("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
         model.addAttribute("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());

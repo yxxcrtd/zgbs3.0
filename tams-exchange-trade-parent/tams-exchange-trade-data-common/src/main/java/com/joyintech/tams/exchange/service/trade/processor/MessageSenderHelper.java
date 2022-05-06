@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.service.trade.processor;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.investment.TradeMessage;
 import com.joyintech.tams.exchange.common.constant.BusinessFlag;
@@ -12,6 +13,7 @@ import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.utils.IntegratedEntrustUtils;
+import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionPledgeService;
 import org.slf4j.Logger;
@@ -20,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -33,8 +36,8 @@ public class MessageSenderHelper {
     @Autowired
     private InstructionPledgeService instructionPledgeService;
 
-    public TradeMessage createTradeMessage(Trade trade, Instruction instruction, EntrustInterface entrust){
-        TradeMessage tradeMessage = TradeMessage.createTradeMessage(trade);
+    public TradeMessage createTradeMessage(Trade trade, Instruction instruction, EntrustInterface entrust) {
+        TradeMessage tradeMessage = TradeMessage.createTradeMessage(trade, entrust);
         //委托数量
         tradeMessage.setEntrustVolume((double) entrust.getEntrustVolume());
         if (Objects.nonNull(instruction) && Objects.nonNull(tradeMessage)) {
@@ -64,6 +67,9 @@ public class MessageSenderHelper {
         } else if (InvestmentAssetType.BOND.value.equals(instruction.getAssetType())) {
             //投管要求债券买卖，成交价格统一填净价价格
             tradeMessage.setDealPrice(entrust.getEntrustPrice());
+        }
+        if (entrust instanceof IntegratedEntrust) {
+            tradeMessage.setCounterId(((IntegratedEntrust) entrust).getCounterId());
         }
         String finprodId = instruction.getFinprodId();
         if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
@@ -105,7 +111,6 @@ public class MessageSenderHelper {
         tradeMessage.setDealPrice(trade.getTradedPrice());
         tradeMessage.setDealBalance(trade.getTradedBalance());
         tradeMessage.setTradingDay(trade.getTradingDay());
-//        tradeMessage.setAcctNo(instruction.getAcctNo());
         tradeMessage.setSecAcctId(instruction.getSecAcctId());
         tradeMessage.setPortfolioId(instruction.getPortfolioId());
         tradeMessage.setTradeMarket(instruction.getTradeMarket());
@@ -115,6 +120,11 @@ public class MessageSenderHelper {
         tradeMessage.setFinprodId(instruction.getFinprodId());
         //委托数量
         tradeMessage.setEntrustVolume((double) entrust.getEntrustVolume());
+
+        if (entrust instanceof IntegratedEntrust) {
+            tradeMessage.setCounterId(((IntegratedEntrust) entrust).getCounterId());
+        }
+
         // 此处 if-else 是否合理？
         if (InvestmentAssetType1.BIDDING_REPO.value.equals(instruction.getAssetType1())) {
             //投管要求质押式回购这里传入期限品种
@@ -152,11 +162,35 @@ public class MessageSenderHelper {
             }
         } else {
             // 非协议回购的特殊处理
-            tradeMessage.setFullPrice(trade.getTradedVolume() > 0 ? TradeUtils.divide(trade.getTradedBalance(), trade.getTradedVolume(), BigDecimal.ROUND_HALF_UP).doubleValue() : 0);
+            tradeMessage.setFullPrice(trade.getTradedVolume() > 0 ?
+                    TradeUtils.divide(trade.getTradedBalance(), trade.getTradedVolume(), BigDecimal.ROUND_HALF_UP).doubleValue() : 0);
         }
+
+        //协议回购
+        if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
+            //到期结算金额
+            tradeMessage.setDealBalance(entrust.getBackBalance());
+        } else if (InvestmentAssetType.isBond(trade.getAssetType())
+                && EntrustProp.isTrade(entrust.getEntrustProp())
+                && Objects.nonNull(tradeMessage.getFullPrice())
+                && tradeMessage.getFullPrice() != 0) {
+            //成交全价金额
+            tradeMessage.setDealBalance(TradeUtils.multiply(BigDecimal.valueOf(tradeMessage.getFullPrice()), tradeMessage.getDealVolume().longValue(), 2));
+        }
+
         // 业务类型（手工交收用）
         String busiType = handleBusiType(trade, instruction, entrust);
         tradeMessage.setBusiType(busiType);
+
+        String extend2 = trade.getExtend2();
+        Map<String, Object> map;
+        if (StringUtil.isNotEmpty(extend2)) {
+            map = JsonUtils.getObjectFromJson(extend2, Map.class);
+        } else {
+            map = Maps.newHashMap();
+        }
+        map.put("busiType", busiType);
+        trade.setExtend2(JsonUtils.getJsonFromObject(map));
 
         return tradeMessage;
     }

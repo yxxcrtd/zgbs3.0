@@ -125,7 +125,7 @@ public class EntrustHistory implements Serializable {
 
     private String targetType;
     private String isNoGuard;
-    private String isNetPrice;
+    private String isFullPrice;
 
     @Id
     public String getId() {
@@ -624,11 +624,11 @@ public class EntrustHistory implements Serializable {
         this.isNoGuard = isNoGuard;
     }
 
-    public String getIsNetPrice() {
-        return isNetPrice;
+    public String getIsFullPrice() {
+        return isFullPrice;
     }
 
-    public void setIsNetPrice(String isNetPrice) {
-        this.isNetPrice = isNetPrice;
+    public void setIsFullPrice(String isFullPrice) {
+        this.isFullPrice = isFullPrice;
     }
 }

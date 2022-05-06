@@ -27,7 +27,6 @@ import com.joyintech.tams.valuation.valuationparametermanage.valuationmethodsche
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -122,7 +121,7 @@ public class ValuationMethodScheme003Service extends CommonExportService<Valuati
 		//当投资目的为  收取合同现金流量为目的[AC]时，估值方法默认只可选择摊余成本法；
 		String invAim =param.get("invAim").toString();
 		String secType = param.get("secType").toString();
-		if(StringUtil.equals(invAim,DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue())){//FVTPL
+		if(StringUtil.equals(invAim,DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue())){//FVTPL
 			if(StringUtil.equals(secType,DictCodeListExt1.证券品种_债券.getValue())
 					|| StringUtil.equals(secType,DictCodeListExt1.证券品种_其他债权类.getValue())){
 				SelectOptionDto zqOptionDto = new SelectOptionDto();
@@ -158,7 +157,7 @@ public class ValuationMethodScheme003Service extends CommonExportService<Valuati
 				zqOptionDto.setText(DictCodeListExt1.估值方法_成本法.getCodeName());
 				linkSelectOption.add(zqOptionDto);
 			}
-		}else if(StringUtil.equals(invAim,DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue())){//FVOCI
+		}else if(StringUtil.equals(invAim,DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue())){//FVOCI
 			if(StringUtil.equals(secType,DictCodeListExt1.证券品种_债券.getValue())){
 				SelectOptionDto zqOptionDto = new SelectOptionDto();
 				zqOptionDto.setId(DictCodeListExt1.估值方法_市值法.getValue());
@@ -182,7 +181,7 @@ public class ValuationMethodScheme003Service extends CommonExportService<Valuati
 				zqOptionDto.setText(DictCodeListExt1.估值方法_摊余成本法.getCodeName());
 				linkSelectOption.add(zqOptionDto);
 			}
-		}else if(StringUtil.equals(invAim,DictCodeListExt1.投资目的_摊余成本类.getValue())){ //AC
+		}else if(StringUtil.equals(invAim,DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue())){ //AC
 			if(StringUtil.equals(secType,DictCodeListExt1.证券品种_债券.getValue())
 			      || StringUtil.equals(secType,DictCodeListExt1.证券品种_其他债权类.getValue())
 				  || StringUtil.equals(secType,DictCodeListExt1.证券品种_计划类资产_收益型.getValue())){

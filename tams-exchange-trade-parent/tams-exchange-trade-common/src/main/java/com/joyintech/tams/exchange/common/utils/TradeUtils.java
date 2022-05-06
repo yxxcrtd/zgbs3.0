@@ -245,7 +245,7 @@ public class TradeUtils {
     /**
      * 转为百分比格式
      */
-    public static String percentFormat(Double d) {
+    public static String percentFormat(BigDecimal d) {
         NumberFormat percent = NumberFormat.getPercentInstance();
         percent.setMaximumFractionDigits(2);
         return percent.format(d);

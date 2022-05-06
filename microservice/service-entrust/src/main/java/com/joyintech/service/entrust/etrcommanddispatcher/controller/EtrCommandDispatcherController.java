@@ -68,7 +68,7 @@ public class EtrCommandDispatcherController {
     public String pushCommandMsg(@RequestBody EtrCommandDispatcherTotalDto dto)  {
     	//放弃使用mq推送消息,采用接口调用
     	//messageSenderService.pushCommandMsgToMQ(dto);
-        return etrCommandDispatcherService.sendMessageByInf(dto);
+    	return etrCommandDispatcherService.sendMessageByInf(dto);
     } 
    
 }

@@ -225,9 +225,9 @@ public class TrdCommonBaseService extends BaseService {
         paramMap.put("searchDate", searchDate);
         paramMap.put("isWithInvAim", isWithInvAim);
 
-        paramMap.put("INV_AIM_AC", DictCodeListExt1.投资目的_摊余成本类.getValue());
-        paramMap.put("INV_AIM_FVOCI", DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue());
-        paramMap.put("INV_AIM_FVTPL", DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue());
+        paramMap.put("INV_AIM_AC", DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue());
+        paramMap.put("INV_AIM_FVOCI", DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue());
+        paramMap.put("INV_AIM_FVTPL", DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue());
 
         paramMap.put("POSITION_TYPE_04", DictCodeList.持仓类型_质押.getValue());
         paramMap.put("TARGET_BACK_TYPE_H02", DictCodeList.回购类型_质押式竞价回购.getValue());
@@ -1331,8 +1331,6 @@ public class TrdCommonBaseService extends BaseService {
                     portfolioDto.setEtrSecAmount(etrEntrustDetail.getEntrustAmt());
                     ratio = ArithmeticUtil.divide(etrEntrustDetail.getEntrustAmt(), etrEntrust.getEntrustAmt(), 8, RoundingMode.HALF_UP);
                 }
-                // 本方券面总额
-                portfolioDto.setOwnSecAmount(portfolioDto.getSecAmount());
                 // 交易金额
                 portfolioDto.setCashAmount(ArithmeticUtil.multiply(infContractDetailfile.getTradeAmt(), ratio));
                 if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(etrEntrust.getFinprodType2())){
@@ -1346,11 +1344,15 @@ public class TrdCommonBaseService extends BaseService {
                     // 下单券面总额
                     portfolioDto.setOrdSecAmount(ArithmeticUtil.multiply(orderInfoDto.getEntrustVolume(), ratio));
                 }
+                // ZGCPCN-126:更改本方券总额赋值 modify by fuyongsheng 20220420 start
+                // 本方券面总额
+                portfolioDto.setOwnSecAmount(portfolioDto.getSecAmount());
+                // ZGCPCN-126:更改本方券总额赋值 modify by fuyongsheng 20220420 end
                 // 标准券券面总额
                 BigDecimal standardSecAmount = ArithmeticUtil.multiply(infContractDetailfile.getShareAmt().multiply(converseRadio)
                         .multiply(百元券面), ratio);
                 BigDecimal standardSecAmountTemp = ArithmeticUtil.divide(standardSecAmount, new BigDecimal(100),0, RoundingMode.DOWN);
-                portfolioDto.setStandardSecAmount(ArithmeticUtil.multiply(standardSecAmount, new BigDecimal(100)));
+                portfolioDto.setStandardSecAmount(ArithmeticUtil.multiply(standardSecAmountTemp, new BigDecimal(100)));
                 // 融入券券面总额
                 portfolioDto.setIntegrateSecAmount(BigDecimal.ZERO);
                 portfolioDtos.add(portfolioDto);
@@ -1444,7 +1446,7 @@ public class TrdCommonBaseService extends BaseService {
     /**
      * 查询首期清算数据
      * @param sqcjbh 首期成交编号
-     * @param seatNumber 席位号
+     * @param seatNumber 席位号 注:seatNumber和secAcctId至少传一个
      * @param secAcctId 证券账户
      * @param vdate 起息日
      * @return
@@ -1456,7 +1458,7 @@ public class TrdCommonBaseService extends BaseService {
     /**
      * 获取回购首期交易
      * @param sqcjbh
-     * @param seatNumber
+     * @param seatNumber 注:seatNumber和secAcctId至少传一个
      * @param secAcctId
      * @param vdate
      * @return

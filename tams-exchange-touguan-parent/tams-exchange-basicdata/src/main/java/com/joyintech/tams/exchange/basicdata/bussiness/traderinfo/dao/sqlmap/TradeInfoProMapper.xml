@@ -17,10 +17,24 @@
             UPDATE_USER, UPDATE_TIME)
         values (#{seqNo,jdbcType=VARCHAR}, #{customerId,jdbcType=VARCHAR}, #{dealerNo,jdbcType=VARCHAR},
             #{dealerPartyNo,jdbcType=VARCHAR}, #{dealerPartyType,jdbcType=VARCHAR}, #{dealerPartyName,jdbcType=VARCHAR},
-            #{traderNo,jdbcType=VARCHAR}, #{traderName,jdbcType=VARCHAR}, #{isOur,jdbcType=VARCHAR},
+            #{traderNo,jdbcType=VARCHAR}, #{trader,jdbcType=VARCHAR}, #{isOur,jdbcType=VARCHAR},
             #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
             #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
     </insert>
+    <update id="updateByCustomerId" parameterType="com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dto.TradeInfoProSaveRequest">
+        update  MST_DEALER_INFO set DEALER_NO = #{dealerNo,jdbcType=VARCHAR}, TRADE_MARKET = #{tradeMarket,jdbcType=VARCHAR} where CUSTOMER_ID = #{customerId,jdbcType=VARCHAR} and DEALER_NO = #{dealNoPre,jdbcType=VARCHAR}
+    </update>
+    <update id="updateDetails">
+
+          update  MST_DEALER_DETAIL_INFO set  DEALER_PARTY_TYPE = #{dealerPartyType} , DEALER_PARTY_NAME = #{dealerPartyName} ,
+                  DEALER_PARTY_NO = #{dealerPartyNo} ,
+                  TRADER_NAME = #{trader,jdbcType=VARCHAR} ,TRADER_NO = #{traderNo,jdbcType=VARCHAR},IS_OUR = #{isOur,jdbcType=VARCHAR} where CUSTOMER_ID = #{customerId,jdbcType=VARCHAR} and DEALER_PARTY_NO = #{dealerPartyNoPre,jdbcType=VARCHAR} and TRADER_NO = #{traderNoPre,jdbcType=VARCHAR}
+    </update>
+    <update id="updateDetailsSJ">
+         update  MST_DEALER_DETAIL_INFO set
+                  TRADER_NAME = #{trader,jdbcType=VARCHAR} ,TRADER_NO = #{traderNo,jdbcType=VARCHAR},IS_OUR = #{isOur,jdbcType=VARCHAR}
+                   where CUSTOMER_ID = #{customerId,jdbcType=VARCHAR} and TRADER_NO = #{traderNoPre,jdbcType=VARCHAR}
+    </update>
 
 
     <select id="getCustomerName" resultType="com.joyintech.framework.select.SelectOptionDto">
@@ -43,26 +57,20 @@
     <select id="getDealerTraderInfo"
             resultType="com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dto.TradeInfoProResponse">
         select
-               mdi.DEALER_NO,
+        distinct
+               mdi.DEALER_NO dealerNo,
                mdi.TRADE_MARKET tradeMarket,
-                mci.CUSTOMER_ABBR dealerName,
-               MDDI.DEALER_PARTY_NO,
-               MDDI.DEALER_PARTY_TYPE,
-               MDDI.DEALER_PARTY_NAME,
-               MDDI.TRADER_NO ,
-               MDDI.TRADER_NAME ,
-               MDDI.IS_OUR
+               mci.CUSTOMER_ID customerId,
+                mci.CUSTOMER_NAME dealerName
     from
                MST_DEALER_INFO mdi
-    LEFT JOIN  MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO
+    left JOIN  MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO
                and MDDI.CUSTOMER_ID=mdi.CUSTOMER_ID
     left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = mdi.CUSTOMER_ID
-    left join MST_SALE_DEPARTMENT MSD on MDDI.CUSTOMER_ID =MSD.BROKER_ID
-    LEFT JOIN STL_CAPACCT_INFO SCI ON MSD.SALE_DEPID = SCI.OWN_DEPT
-    left join STL_SEC_ACCT_INFO SSAI on SCI.ACCT_NO = SSAI.TRD_ACCT_ID
+
     <where>
-        <if test="tradePlace != null and tradePlace != ''">
-            mdi.TRADE_MARKET = #{tradePlace}
+        <if test="tradeMarket != null and tradeMarket != ''">
+            mdi.TRADE_MARKET = #{tradeMarket}
         </if>
         <if test="acctNo != null and acctNo != ''">
         and  SSAI.TRD_ACCT_ID = #{acctNo}
@@ -71,10 +79,10 @@
         and MDDI.IS_OUR = #{isOur}
         </if>
         <if test="dealerNo != null and dealerNo != ''">
-        and mdi.DEALER_NO = #{dealerNo}
+        and mdi.CUSTOMER_ID = #{dealerNo}
         </if>
         <if test="dealerName != null and dealerName != ''">
-            and mci.CUSTOMER_ABBR like concat(concat('%',#{dealerName}),'%')
+            and mci.CUSTOMER_NAME like concat(concat('%',#{dealerName}),'%')
         </if>
         <if test="traderNo != null and traderNo != ''">
             and MDDI.TRADER_NO like concat(concat('%',#{traderNo}),'%')
@@ -96,6 +104,27 @@
     <select id="hasDealerDetails" resultType="java.lang.Integer">
         select count(*) from MST_DEALER_DETAIL_INFO WHERE CUSTOMER_ID = #{customerId}
     </select>
+    <select id="existsDealer" resultType="java.lang.Integer">
+        select count (*) from MST_DEALER_INFO where CUSTOMER_ID=#{dealerName} and DEALER_NO = #{dealerNo}
+    </select>
+    <select id="existsDealerAndTradeMarket" resultType="java.lang.Integer">
+        select count (*) from MST_DEALER_INFO where CUSTOMER_ID=#{dealerName} and TRADE_MARKET = #{tradeMarket}
+    </select>
+    <select id="findTrader"
+            resultType="com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dto.TraderInfoDto">
+             select
+               MDDI.DEALER_PARTY_NO,
+               MDDI.DEALER_PARTY_TYPE,
+               MDDI.DEALER_PARTY_NAME,
+               MDDI.TRADER_NO ,
+               MDDI.TRADER_NAME trader,
+               MDDI.IS_OUR
+          from
+               MST_DEALER_INFO mdi
+          inner JOIN  MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO
+               and MDDI.CUSTOMER_ID=mdi.CUSTOMER_ID
+          where mdi.CUSTOMER_ID = #{customerId} and mdi.DEALER_NO = #{dealerNo}
+    </select>
 
 
     <delete id="deleteSelectedItem">
@@ -115,7 +144,11 @@
         delete from MST_DEALER_DETAIL_INFO where  CUSTOMER_ID = #{customerId}
     </delete>
     <delete id="deleteTrader">
-        delete from MST_DEALER_DETAIL_INFO where CUSTOMER_ID = #{customerId} and DEALER_PARTY_NO = #{dealerPartyNo} and TRADER_NO = #{traderNo}
+        delete from MST_DEALER_DETAIL_INFO where CUSTOMER_ID = #{dealerName} and DEALER_PARTY_NO = #{dealerPartyNo} and TRADER_NO = #{traderNo}
+    </delete>
+    <delete id="deleteTraderSJ">
+            delete from MST_DEALER_DETAIL_INFO where CUSTOMER_ID = #{dealerName}
+            and TRADER_NO = #{traderNo}
     </delete>
 
 </mapper>

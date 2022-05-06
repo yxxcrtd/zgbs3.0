@@ -5,10 +5,8 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.autoperiod.common.dao.PeriodCommonMapper;
 import com.joyintech.tams.invest.common.autoperiod.common.service.InvestPeriodCommonService;
 import com.joyintech.service.period.trdstockbonus.dao.TrdStockBonusMapper;
@@ -276,7 +274,16 @@ public class TrdStockBonusService extends BaseService<TrdStockBonusDto>{
 	 * @return
 	 */
 	public List<FinAssetIntInfo> findDividDetailInfo(String busiCode) {
-		return trdStockBonusMapper.findDividDetailInfo(busiCode);
+		// ZGCPCN-232:通过开关控制查询新老头寸,默认查询新头寸 modify by fuyongsheng 20220426 start
+		// 新老头寸开关(Y:新头寸,N:老头寸)
+		String newSecPositionSwitch = CacheUtil.getSysParam("NEW_SEC_POSITION_SWITCH");
+		// 开关配置N查老头存
+		if(DictCodeList.是否_否.getValue().equals(newSecPositionSwitch)){
+			return trdStockBonusMapper.findDividDetailInfo(busiCode);
+		}else{ // 默认查新头寸
+			return trdStockBonusMapper.findNewPositionDividDetailInfo(busiCode);
+		}
+		// ZGCPCN-232:通过开关控制查询新老头寸,默认查询新头寸 modify by fuyongsheng 20220426 end
 	}
 
 	/**
@@ -285,7 +292,16 @@ public class TrdStockBonusService extends BaseService<TrdStockBonusDto>{
 	 * @return
 	 */
 	public List<FinAssetIntInfo> findProcessDividInfo(String busiCode) {
-		return trdStockBonusMapper.findProcessDividInfo(busiCode);
+		// ZGCPCN-232:通过开关控制查询新老头寸,默认查询新头寸 modify by fuyongsheng 20220426 start
+		// 新老头寸开关(Y:新头寸,N:老头寸)
+		String newSecPositionSwitch = CacheUtil.getSysParam("NEW_SEC_POSITION_SWITCH");
+		// 开关配置N查老头存
+		if(DictCodeList.是否_否.getValue().equals(newSecPositionSwitch)){
+			return trdStockBonusMapper.findProcessDividInfo(busiCode);
+		}else{ // 默认查新头寸
+			return trdStockBonusMapper.findNewPositionProcessDividInfo(busiCode);
+		}
+		// ZGCPCN-232:通过开关控制查询新老头寸,默认查询新头寸 modify by fuyongsheng 20220426 end
 	}
 
 	/**

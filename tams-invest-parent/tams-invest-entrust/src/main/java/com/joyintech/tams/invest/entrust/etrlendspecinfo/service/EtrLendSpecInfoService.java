@@ -783,7 +783,10 @@ public class EtrLendSpecInfoService extends CommonExportService<EtrLendSpecInfoD
                 // 委托金额(元)非空
                 confirmMsg = etrCommonService.StringAddByBr(confirmMsg,
                     etrCommonService.checkIsBlank(rowData.get(7).toString(), "EtrLendSpecInfo001.entrustAmt", lineNo));
-                // 委托金额(元)是数值
+                // 清算速度非空
+                confirmMsg = etrCommonService.StringAddByBr(confirmMsg, etrCommonService.checkIsBlank(
+                        rowData.get(12).toString(), "EtrLendSpecInfo001.settleSpreed", lineNo));
+            // 委托金额(元)是数值
 //                confirmMsg = etrCommonService.StringAddByBr(confirmMsg,
 //                    etrCommonService.checkIsNumber(rowData.get(7).toString(), "EtrLendSpecInfo001.entrustAmt", lineNo));
                 // 委托金额(元)是大于0

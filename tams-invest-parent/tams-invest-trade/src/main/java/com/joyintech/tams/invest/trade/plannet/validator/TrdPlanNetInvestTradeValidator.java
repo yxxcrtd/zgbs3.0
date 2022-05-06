@@ -123,13 +123,18 @@ public class TrdPlanNetInvestTradeValidator implements TradeCommonValidator {
                         errorList.add(new ValidMessage("tradeAmt", this.getMessage("BUSS_COM_E_0038", this.getMessage("TrdFundInvestTrade002.tradeAmt"))));
                     }
                 }
-                else if (StringUtil.equals(dto.getPs(),
-                    DictCodeList.交易方向_赎回.getValue())) {
+                if (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_赎回.getValue())) {
                     if (shareAmt == null && tradeAmt == null) {
                         errorList.add(new ValidMessage("shareAmt", this.getMessage("BUSS_COM_E_0038", this.getMessage("TrdPlanNetInvestTrade003.tradeAmtSha"))));
                     }
                 }
-
+                // TISHKS-776 交易份额提交申请时未作必填校验，为空时提交，进入审批报系统异常 modify by huwei1 20220505 start
+                if (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_买入.getValue())) {
+                    if (null == shareAmt) {
+                        errorList.add(new ValidMessage("shareAmt", this.getMessage("BUSS_COM_E_0038", this.getMessage("TrdPlanNetInvestTrade003.tradeSha"))));
+                    }
+                }
+                // TISHKS-776 交易份额提交申请时未作必填校验，为空时提交，进入审批报系统异常 modify by huwei1 20220505 end
                 //dto内已经有过校验，无需重复校验
 //                if (tradeAmt != null && tradeAmt.compareTo(zero) == -1) {
 //                    errorList.add(new ValidMessage("tradeAmt", this.getMessage("BUSS_COM_E_0004", this.getMessage("TrdFundInvestTrade002.tradeAmt"),"0")));
@@ -277,12 +282,19 @@ public class TrdPlanNetInvestTradeValidator implements TradeCommonValidator {
                     if (tradeAmt == null) {
                         errorList.add(new ValidMessage("tradeAmt", this.getMessage("BUSS_COM_E_0038", this.getMessage("TrdFundInvestTrade002.tradeAmt"))));
                     }
-                } else if (StringUtil.equals(dto.getPs(),
-                        DictCodeList.交易方向_赎回.getValue())) {
+                }
+                if (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_赎回.getValue())) {
                     if (shareAmt == null && tradeAmt == null) {
                         errorList.add(new ValidMessage("shareAmt", this.getMessage("BUSS_COM_E_0038", this.getMessage("TrdPlanNetInvestTrade003.tradeAmtSha"))));
                     }
                 }
+                // TISHKS-776 交易份额提交申请时未作必填校验，为空时提交，进入审批报系统异常 modify by huwei1 20220505 start
+                if (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_买入.getValue())) {
+                    if (null == shareAmt) {
+                        errorList.add(new ValidMessage("shareAmt", this.getMessage("BUSS_COM_E_0038", this.getMessage("TrdPlanNetInvestTrade003.tradeSha"))));
+                    }
+                }
+                // TISHKS-776 交易份额提交申请时未作必填校验，为空时提交，进入审批报系统异常 modify by huwei1 20220505 end
 
                 //解决点击提交提示语有重复的问题
                 //dto内已经有了校验，无需重复进行校验

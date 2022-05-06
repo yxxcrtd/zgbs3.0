@@ -67,7 +67,7 @@
 		}
 		
         var name = '#'+entityName+'_counterId';
-        if(single == "1"){
+        if(single == "1" && pageId != 'EtrFund002'){
             $(name).attr('required',true);
         }
         if (pageId == 'EtrConBond002'){

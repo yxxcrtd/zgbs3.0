@@ -1756,6 +1756,13 @@ public class CreditLinesUpdateImpl extends CreditLinesUpdateAbs {
                 return null;
             }
         }
+        // TISHKS-947:子期次占用母计划额度 modify by fuyongsheng 20220506 start
+        if(StringUtil.isNotEmpty(inputDto.getFinprodType2()) && DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue().equals(
+                inputDto.getFinprodType2())){
+            String finprodId = creditLinesDealsMapper.getJHLFinprodId(inputDto.getFinprodId());
+            inputDto.setFinprodId(finprodId);
+        }
+        // TISHKS-947:子期次占用母计划额度 modify by fuyongsheng 20220506 end
         // 处理结果记录，输出参数实体
         CreditLinesOutputDto outputDto = new CreditLinesOutputDto();
         // 单个处理结果放入集合

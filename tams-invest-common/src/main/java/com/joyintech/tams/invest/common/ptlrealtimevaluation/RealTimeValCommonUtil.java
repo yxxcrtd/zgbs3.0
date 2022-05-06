@@ -1011,7 +1011,7 @@ public class RealTimeValCommonUtil {
 				if ((StringUtil.equals(资产基本信息.getFinProduct().getCouponSpecies(), DictCodeList.息票品种_零息.getValue())
 						|| StringUtil.equals(资产基本信息.getFinProduct().getCouponSpecies(),
 						DictCodeList.息票品种_贴现.getValue()))
-						&& StringUtil.equals(投资目的2, DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue())) {
+						&& StringUtil.equals(投资目的2, DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue())) {
 					// 组合资产估值扩展.资产价值 = (组合资产估值扩展.摊销总成本+当日应计利息+公允价值变动+待清算资金)*变量.汇率,fixed WZZGBS-596BUG,待清算款为负增加到负债类合计 add by zhouxiuping
 					if(mockPtlSecValuationDto.getDelayPayAmt()!=null && mockPtlSecValuationDto.getDelayPayAmt().compareTo(BigDecimal.ZERO)>=0) {
 						mockPtlSecValuationDto

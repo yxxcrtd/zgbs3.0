@@ -58,6 +58,7 @@
                         WHERE
                              PARA_CODE = SS.PARA_CODE
                         AND  INSTITUTION_CODE = SS.INSTITUTION_CODE
+						AND VALID_DATE <![CDATA[ <= ]]> to_date(#{sysDate},'yyyy-mm-dd')
                         GROUP BY
                             PARA_CODE,INSTITUTION_CODE )
                    <!--wangyang1 二级法人改造 start -->

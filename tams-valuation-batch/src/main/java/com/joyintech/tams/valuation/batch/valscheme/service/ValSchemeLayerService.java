@@ -35,7 +35,6 @@ import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListNatureGroup;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.CorrespondSubjectEntity;
@@ -390,7 +389,7 @@ public class ValSchemeLayerService extends CommonExportService<ValSchemeBatchDto
                     bokAssetMarketInfo.setMarketCode(finProduct.getFinprodMarketId());
                 }
                 // 变量.资产行情信息DTO.投资目的 = 摊余成本类
-                bokAssetMarketInfo.setInvAim(DictCodeListExt1.投资目的_摊余成本类.getValue());
+                bokAssetMarketInfo.setInvAim(DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue());
                 // 变量.资产行情信息DTO.市价 = 变量.市价
                 bokAssetMarketInfo.setMarketPrice(行情价格);
                 // 变量.资产行情信息DTO.是否来源于行情数据
