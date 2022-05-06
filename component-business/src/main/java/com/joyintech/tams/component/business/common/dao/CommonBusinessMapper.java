@@ -9,13 +9,10 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import com.joyintech.tams.common.base.entity.PtlCapacctInfo;
+import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.component.business.common.dto.AssetCommonInvRateAdjustDto;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
-
-import com.joyintech.tams.common.base.entity.MstExchargeQuote;
-import com.joyintech.tams.common.base.entity.StlDvpOrders;
-import com.joyintech.tams.common.base.entity.StlPayOrders;
 
 /**
  * 业务共通组件.资产头寸现金持仓共通组件的Mapper
@@ -96,4 +93,7 @@ public interface CommonBusinessMapper {
      * @return
      */
 	int isTraDirector(Map<String,Object> param);
+
+    List<AssetCommonInvRateAdjustDto> getMstRateInfo(@Param("indexId")String indexId);
+
 }

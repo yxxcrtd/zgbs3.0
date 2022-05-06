@@ -116,9 +116,9 @@ public class FinBondAsset003Controller extends BaseController{
      * @since 1.0
      */
     @ApiOperation(value="初始化数据查询", notes = "查询页面初始化参数")
-    @PostMapping( "/initAssetRateAdjInfo")
+    @PostMapping( "/selectList")
     @ResponseBody
-    public List<FinAssetRateAdjResponse> initInfo(@RequestBody FinAssetRateAdjRequest request) throws ParseException {
+    public Message<List<FinAssetRateAdjResponse>> initInfo(@RequestBody FinAssetRateAdjRequest request) throws ParseException {
         String finprodId = request.getFinprodId();
         String workflowId = request.getWorkflowId();
         String finprodType2 = request.getFinprodType2();
@@ -142,25 +142,9 @@ public class FinBondAsset003Controller extends BaseController{
                     finAssetRateAdjList = finBondAsset002Service.getfinAssetRateAdjByProductId(paramMap);
                 }
             }
-        return finAssetRateAdjList;
+        return Message.success("初始化数据查询",finAssetRateAdjList);
     }
-    
-    /**
-     * 初始化利率调整列表
-     * <功能详细描述>
-     * @return
-     * @throws Exception
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("findPage")
-    public Page<FinAssetRateAdjResponse> selectAll(FinAssetRateAdjRequest request){
-        Page<FinAssetRateAdjResponse> page = finBondAsset002Service.selectForPage(request);
-        return page;
-    }
-    
-    
+
     /**
      * 该资产是否有交易数据check
      * <功能详细描述>
@@ -169,13 +153,14 @@ public class FinBondAsset003Controller extends BaseController{
      * @see
      * @since 1.0
      */
+    @ApiOperation(value="该资产是否有交易数据check", notes = "该资产是否有交易数据check")
     @ResponseBody
-    @RequestMapping("isTransInAssetCheck")
-    public Boolean isTransInAssetCheck(@RequestBody FinAssetRateAdjRequest request) {
+    @PostMapping("/isTransInAssetCheck")
+    public Message<Boolean> isTransInAssetCheck(@RequestBody FinAssetRateAdjRequest request) {
         if(commonBusinessService.isTransInAsset(request.getFinprodId())!=0){
-            return true;
+            return Message.success("该资产是否有交易数据check",true);
         }
-        return false;
+        return  Message.success("该资产是否有交易数据check",false);
     }
     
     /**
@@ -186,16 +171,17 @@ public class FinBondAsset003Controller extends BaseController{
      * @see
      * @since 1.0
      */
+    @ApiOperation(value="保存check", notes = "保存check")
     @ResponseBody
-    @RequestMapping("check")
-    public AjaxResult check(@RequestBody FinAssetRateAdjResponse response, BindingResult result) {
+    @PostMapping("/check")
+    public Message<AjaxResult> check(@RequestBody FinAssetRateAdjResponse response, BindingResult result) {
         List<ValidMessage> validMessages = finAssetRateAdjValidatorService.valid(response);
         if (CollectionUtils.isNotEmpty(validMessages)){
             AjaxResult ajax = new AjaxResult();
             ajax.setErrorList(validMessages);
-            return ajax;
+            return Message.success("保存check报错",ajax);
         }
-        return commonCheck(result, response.getOperateType());
+        return Message.success("保存check",commonCheck(result, response.getOperateType()));
     }
     
     /**
@@ -207,16 +193,17 @@ public class FinBondAsset003Controller extends BaseController{
      * @see
      * @since 1.0
      */
+    @ApiOperation(value="保存", notes = "保存")
     @ResponseBody
-    @RequestMapping(PAGE_SAVE)
-    public AjaxResult save(@RequestBody FinAssetRateAdjResponse dto, BindingResult br) throws WorkFlowException {
+    @PostMapping(PAGE_SAVE)
+    public Message<AjaxResult> save(@RequestBody FinAssetRateAdjResponse dto, BindingResult br) throws WorkFlowException {
         if (br.hasErrors()) {
-            return new AjaxResult(br);
+            return Message.fail("保存错误",new AjaxResult(br));
         }
         WorkFlowParameter<FinAssetRateAdjResponse> params = new WorkFlowParameter<FinAssetRateAdjResponse>();
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
-        params.setBusinessCode(dto.getFinprodMarketId());
+        params.setBusinessCode(FinAssetRateAdjResponse::getFinprodId);
         if(StringUtil.equals(dto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_存款.getValue())){
             params.setBusinessType(DictCodeList.共通业务类型_存款类资产利率调整.getValue());
         }else if(StringUtil.equals(dto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
@@ -240,6 +227,6 @@ public class FinBondAsset003Controller extends BaseController{
         parameter.setWorkFlowParameter(params);
         // 系统页面表IS_NEED_WORKFLOW 是否走流程，01-是，02-否
         String msg = finBondAsset002Service.start(parameter, dto);
-        return new AjaxResult(msg);
+        return Message.fail(msg,new AjaxResult(msg));
     }
 }

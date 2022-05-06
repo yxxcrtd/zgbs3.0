@@ -362,8 +362,14 @@ public class FinBondAsset002Controller extends BaseController{
     @ResponseBody
     @PostMapping("/getBasicInfo")
     public Message<FinBondAssetSaveRequest> getBasicInfo(@RequestBody FinBondAssetInsertRequest request){
+        String finprodId = null;
+        if (StringUtil.isNotEmpty(request.getFinprodId())){
+            finprodId = request.getFinprodId();
+        }else{
+            finprodId = request.getFinprodMarketId();
+        }
         FinBondAssetSaveRequest resultDto = finBondAssetService.getBasicInfos(
-                request.getFinprodId(),null);
+                finprodId,null);
         return new Message<FinBondAssetSaveRequest>().success().setData(resultDto);
     }
 
@@ -562,14 +568,17 @@ public class FinBondAsset002Controller extends BaseController{
             String finprodId = dto.getFinprodId();
             // 付息计划
             List<BondFinCashPlanDto> invList = new ArrayList<>();
-            Date maxTradeDate = commonBusinessService.getMaxTradeDate(finprodId);
+            Date maxTradeDate = null;
+            if(StringUtil.isNotEmpty(finprodId)) {
+                maxTradeDate = commonBusinessService.getMaxTradeDate(finprodId);
+                // 生付息成计划
+                dto.setMaxTradeDate(maxTradeDate);
+            }
             dto.setCalendarId(finBondAssetService.getCalendarId(dto.getTradeMarket()));
             dto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
             if(StringUtil.equals(dto.getAdjPlanFlag(), DictCodeList.共通业务类型_付息计划调整.getValue())){
                 dto.setFinprodType2(dto.getAdjPlanFlag());
             }
-            // 生付息成计划
-            dto.setMaxTradeDate(maxTradeDate);
             FinPayInterestStdInfoDto finPayInterestStdInfoDto= new FinPayInterestStdInfoDto();
             BeanUtil.copyPropertiesIgnoreNull(finPayInterestStdInfoDto,dto);
             BondFinInterestFactorDto bondFinInterestFactorDto = dto.getFinInterestFactorDto();
@@ -621,6 +630,7 @@ public class FinBondAsset002Controller extends BaseController{
             response.setInvRepayList(lirs);
             return new Message<BondFinPayInterestStdInfoResponse>().success().setData(response);
         }catch (Exception e){
+            e.printStackTrace();
             return new Message<BondFinPayInterestStdInfoResponse>().fail().setMessage("付息计划生成异常");
         }
     }

@@ -1,5 +1,7 @@
 package com.joyintech.tams.business.asset.tenderbond.dto;
 
+import com.joyintech.framework.base.BaseEntity;
+import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -7,7 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
  * 新债标的删除dto
  */
 @ApiModel(value="FinTenderBondAsset004Dto",description="新债标的删除dto")
-public class FinTenderBondAsset004Dto  {
+public class FinTenderBondAsset004Dto extends BaseEntity implements ProcessEntity {
     /**
      * 金融产品代码
      */

@@ -96,7 +96,7 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
     private String registOrg;
 
     @ApiModelProperty(name="issuePrice",value="发行价格",required=true)
-    private String issuePrice;
+    private BigDecimal issuePrice;
 
     @ApiModelProperty(name="idate",value="发行日",required=true)
     private Date idate;
@@ -1437,11 +1437,11 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
         this.registOrg = registOrg;
     }
 
-    public String getIssuePrice() {
+    public BigDecimal getIssuePrice() {
         return issuePrice;
     }
 
-    public void setIssuePrice(String issuePrice) {
+    public void setIssuePrice(BigDecimal issuePrice) {
         this.issuePrice = issuePrice;
     }
 
@@ -1797,6 +1797,10 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
      */
     private String principalCashId;
 
+    private String calcRule;
+
+    private String payTdayRule;
+
     /**
      * 上市日
      */
@@ -2037,5 +2041,21 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
 
     public void setOperateStatus(String operateStatus) {
         this.operateStatus = operateStatus;
+    }
+
+    public String getCalcRule() {
+        return calcRule;
+    }
+
+    public void setCalcRule(String calcRule) {
+        this.calcRule = calcRule;
+    }
+
+    public String getPayTdayRule() {
+        return payTdayRule;
+    }
+
+    public void setPayTdayRule(String payTdayRule) {
+        this.payTdayRule = payTdayRule;
     }
 }

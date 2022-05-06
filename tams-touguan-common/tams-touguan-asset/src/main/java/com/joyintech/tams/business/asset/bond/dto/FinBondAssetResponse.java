@@ -327,7 +327,7 @@ public class FinBondAssetResponse {
     }
 
     public String getType11Str() {
-        return type11Str;
+        return SysDataUtil.getNameFromDataDict(DictCode.行内资产四级分类, this.getType11());
     }
 
     public void setType11Str(String type11Str) {

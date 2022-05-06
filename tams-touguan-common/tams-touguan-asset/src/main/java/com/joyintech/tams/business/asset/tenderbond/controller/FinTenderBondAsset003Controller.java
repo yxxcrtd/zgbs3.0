@@ -31,8 +31,8 @@ import java.util.List;
 import java.util.Objects;
 
 @Controller
-@PageId("FinTenderBoundAsset003")
-@RequestMapping("/asset/tenderBoundAsset003")
+@PageId("FinTenderBondAsset003")
+@RequestMapping("/asset/tenderBondAsset003")
 @Api(tags = "新债标的上市流通")
 public class FinTenderBondAsset003Controller extends BaseController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -84,6 +84,7 @@ public class FinTenderBondAsset003Controller extends BaseController {
         try {
             finTenderBoundAsset003Service.start(processParameter, dto);
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error("新债标的流程发起失败", e);
             return Message.fail("流程发起失败");
         }

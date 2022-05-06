@@ -103,23 +103,6 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
     private AssetCommonService assetCommonService;
 
     /**
-     * 业务组件--计息要素
-     */
-    @Autowired(required = false)
-    private FinInterestFactorService finInterestFactorService;
-
-    /**
-     * 业务--付息信息
-     */
-    @Autowired(required = false)
-    private FinPayInterestStdInfoService finPayInterestStdInfoService;
-
-    /**
-     * 业务--还本信息
-     */
-    @Autowired(required = false)
-    private BussFinRepaymentService bussFinRepaymentService;
-    /**
      * 业务--行权计划
      */
     @Autowired(required = false)
@@ -385,6 +368,7 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
         String action = StringUtil.EMPTY;
 
         if (OperationType.DELETE.equals(type)) {
+            action = ENTRUST_RECORD_DELETE;
             doCompleteDelete(entity);
         } else {
             entity = encapBaseFinProductBaseInfoList(entity);
@@ -395,11 +379,14 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
                 //从待办中进入的无法判断是否新建还是编辑
                 if (selectCountByfinprodId(DictCodeList.平安资产类型_债券.getValue() +
                         "_" + entity.getFinprodMarketId()) > 0) {
+                    action = ENTRUST_RECORD_UPDATE;
                     doCompleteUpdate(entity);
                 } else {
+                    action = ENTRUST_RECORD_INSERT;
                     doCompleteInsert(entity);
                 }
             } else {
+                action = ENTRUST_RECORD_UPDATE;
                 doCompleteUpdate(entity);
             }
         }
@@ -577,10 +564,10 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
         map.put("TRADE_PLACE_04",DictCodeListExt1.交易场所_深圳证券交易所.getValue());
         if(Objects.isNull(finprodType)){
             map.put("finprodType",DictCodeListExt1.金融产品类型_投管用_债券.getValue());
-            dto = finBondAssetMapper.getBasicInfo(finprodId, DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+            dto = finBondAssetMapper.getBasicInfo(map);
         } else {
             map.put("finprodType",finprodType);
-            dto = finBondAssetMapper.getBasicInfo(finprodId, finprodType);
+            dto = finBondAssetMapper.getBasicInfo(map);
         }
         if(null!=dto){
             //转债信息
@@ -595,23 +582,31 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
             BondFinPayInterestStdInfoDto finPayInterestStdInfoDto = new BondFinPayInterestStdInfoDto();
             BeanUtil.copyPropertiesIgnoreNull(finPayInterestStdInfoDto,dto);
             map.put("cashId",dto.getInterestCashId());
-            List<BondFinCashPlanDto> invScheduleList = finBondAssetMapper.selectInvScheduleList(map);
-            finPayInterestStdInfoDto.setInvScheduleList(invScheduleList);
-            dto.setFinPayInterestStdInfoDto(finPayInterestStdInfoDto);
+            if (StringUtil.isNotEmpty(dto.getInterestCashId())) {
+                List<BondFinCashPlanDto> invScheduleList = finBondAssetMapper.selectInvScheduleList(map);
+                finPayInterestStdInfoDto.setInvScheduleList(invScheduleList);
+                dto.setFinPayInterestStdInfoDto(finPayInterestStdInfoDto);
+            }
             //付息信息
             map.put("cashId",dto.getPrincipalCashId());
-            List<BondFinCashPlanDto> invRepayList = finBondAssetMapper.selectInvScheduleList(map);
-            dto.setInvRepayList(invRepayList);
+            if (StringUtil.isNotEmpty(dto.getPrincipalCashId())) {
+                List<BondFinCashPlanDto> invRepayList = finBondAssetMapper.selectInvScheduleList(map);
+                dto.setInvRepayList(invRepayList);
+            }
             //行权计划
             map.put("cashId",dto.getPrincipalCashId());
-            List<BondFinExercisePlanDto>  finExercisePlanList = finBondAssetMapper.selectFinExercisePlanList(map);
-            dto.setFinExercisePlanList(finExercisePlanList);
+            if (StringUtil.isNotEmpty(dto.getPrincipalCashId())) {
+                List<BondFinExercisePlanDto> finExercisePlanList = finBondAssetMapper.selectFinExercisePlanList(map);
+                dto.setFinExercisePlanList(finExercisePlanList);
+            }
             //发行方式
             FinProductIssue finProductIssue = finProductIssueMapper.selectByPrimaryKey(dto.getFinprodId());
             List<BondFinProductIssueDto> finProductIssueList = new ArrayList<>();
             BondFinProductIssueDto bondFinProductIssueDto = new BondFinProductIssueDto();
             BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto,dto);
-            BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto,finProductIssue);
+            if (StringUtil.isNotEmpty(finProductIssue)) {
+                BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto, finProductIssue);
+            }
             finProductIssueList.add(bondFinProductIssueDto);
             dto.setFinProductIssueList(finProductIssueList);
 
@@ -656,10 +651,11 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
         //标的类金融产品entity
         FinProduct finProduct = new FinProduct();
         BeanUtil.copyPropertiesIgnoreNull(finProduct, dto);
+        finProduct.setIssuePrice(dto.getIssuePrice());
         //期限
         finProduct.setTermDays(DateUtil.getBetweenDayNumber(dto.getVdate(), dto.getMdate()));
         finProduct.setIssueAmt(ArithmeticUtil.multiply(dto.getIssueAmt(), new BigDecimal("100000000")));
-        finProduct.setTradeMarket(this.getCalendarId(dto.getTradeMarket()));
+        finProduct.setCalendarId(this.getCalendarId(dto.getTradeMarket()));
         // 一体化对应etliu start
         // 债券新建画面，入库时，标的类金融产品表的含权债摊销日字段，当含权债时，登数据字典【含权债摊销日.最近行权日】
         if (StringUtil.equals(DictCodeList.是否_是.getValue(), finProduct.getIsRight())) {
@@ -701,9 +697,10 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
 //        }
         //----add by jjpei 20190727 添加投资性质----end----
         //转债信息
-        FinProductConvertible finProductConvertible = new FinProductConvertible();
-        finProductConvertible.setConFinprodId(dto.getFinprodId());
-        if (StringUtil.isNotEmpty(dto.getFinProductConvertible())) {
+        if (StringUtil.isNotEmpty(dto.getFinProductConvertible()) &&
+        StringUtil.isNotEmpty(dto.getFinProductConvertible().getConPrice())) {
+            FinProductConvertible finProductConvertible = new FinProductConvertible();
+            finProductConvertible.setConFinprodId(dto.getFinprodId());
             BeanUtil.copyPropertiesIgnoreNull(finProductConvertible, dto.getFinProductConvertible());
             dto.setProductConvertible(finProductConvertible);
         }
@@ -848,7 +845,7 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
             for (BondFinExercisePlanDto finExercisePlanDto: finExercisePlanList){
                 FinExercisePlan finExercisePlan = new FinExercisePlan();
                 BeanUtil.copyPropertiesIgnoreNull(finExercisePlan,finExercisePlanDto);
-                finExercisePlan.setCashId(finCashInfoInterest.getCashId());
+                finExercisePlan.setCashId(finCashInfoPrincipal.getCashId());
                 finExercisePlan.setFinprodId(dto.getFinprodId());
                 finExercisePlan.setFinprodType(DictCodeListExt1.金融产品类型_债券.getValue());
                 finExercisePlan.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
@@ -1126,15 +1123,17 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
         bondTargetDto.setMstBondCreditRatingList(ratingList);
         // 现金流计算规则
         // 根据主键获取业务实体--付息信息
-        FinPayInterestStdInfoDto finPayInterestStdInfoDto = finPayInterestStdInfoService.getFinPayInterestStdInfoByProductId(
+        FinPayInterestStdInfoDto finPayInterestStdInfoDto = this.getFinPayInterestStdInfoByProductId(
             bondTargetDto.getFinprodId(), bondTargetDto.getvdateStr(),
             DictCodeListExt1.现金流二级类型_利息.getValue(), DictCodeListExt1.现金流业务类型_金融产品.getValue());
         BondFinPayInterestStdInfoDto bondFinPayInterestStdInfoDto = new BondFinPayInterestStdInfoDto();
-        BeanUtil.copyPropertiesIgnoreNull(bondFinPayInterestStdInfoDto,finPayInterestStdInfoDto);
-        bondTargetDto.setFinPayInterestStdInfoDto(bondFinPayInterestStdInfoDto);
+        if (StringUtil.isNotEmpty(finPayInterestStdInfoDto)) {
+            BeanUtil.copyPropertiesIgnoreNull(bondFinPayInterestStdInfoDto, finPayInterestStdInfoDto);
+            bondTargetDto.setFinPayInterestStdInfoDto(bondFinPayInterestStdInfoDto);
+        }
         // 现金流支付规则
         BussFinRepaymentDto bussFinRepaymentDto = new BussFinRepaymentDto();
-        finPayInterestStdInfoDto = finPayInterestStdInfoService.getFinPayInterestStdInfoByProductId(
+        finPayInterestStdInfoDto = this.getFinPayInterestStdInfoByProductId(
             bondTargetDto.getFinprodId(), bondTargetDto.getvdateStr(),
             DictCodeListExt1.现金流二级类型_本金.getValue(), DictCodeListExt1.现金流业务类型_金融产品.getValue());
         if (null != finPayInterestStdInfoDto) {
@@ -1148,7 +1147,7 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
         param.put("cashType2", DictCodeListExt1.现金流二级类型_本金.getValue());
         param.put("execType01", DictCodeList.行权状态_未行权.getValue());
         param.put("execType02", DictCodeList.行权状态_已行权.getValue());
-        List<FinExercisePlan> finExercisePlanList = busiFinExercisePlanService.getfinExercisePlanByProductId(
+        List<FinExercisePlan> finExercisePlanList = this.getfinExercisePlanByProductId(
             param);
         BusiFinExercisePlanDto busiFinExercisePlanDto = new BusiFinExercisePlanDto();
         busiFinExercisePlanDto.setFinExercisePlanList(finExercisePlanList);
@@ -1175,6 +1174,22 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
         return bondTargetDto;
     }
     // 债券新建新增快捷录入功能 add by renping 20191010 end
+
+    public List<FinExercisePlan> getfinExercisePlanByProductId(Map<String,Object> map){
+        String psT39 = DictCodeList.交易方向_行权_赎回.getValue();
+         return finBondAssetMapper.getfinExercisePlanByProductId(map);
+    }
+
+    public FinPayInterestStdInfoDto getFinPayInterestStdInfoByProductId(String finprodId, String vdate, String cashType,
+                                                                        String finprodType) {
+        FinPayInterestStdInfoDto finPayInterestStdInfoDto= finBondAssetMapper.getFinPayInterestStdInfoByProductId(finprodId, vdate, cashType,
+                finprodType);
+        if(finPayInterestStdInfoDto!=null && cashType.equals(DictCodeListExt1.现金流二级类型_本金.getValue())){
+            String repayWithoutInt =finBondAssetMapper.getRepayWithoutIntByProductId(finprodId,cashType);
+            finPayInterestStdInfoDto.setIsPayInt(repayWithoutInt);//界面是否还本不带息
+        }
+        return finPayInterestStdInfoDto;
+    }
 
     /**
      * 获取新建界面的以及市场投标债券代码联想下拉框
@@ -1229,13 +1244,14 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
     /**
      * 查询业务表资产信息
      *
-     * @param finprodId 资产代码
+     * @param finprodMarketId 资产代码
      * @return 资产付息等现金流信息
      * @see
      * @since 1.0
      */
-    public FinBondAssetSaveRequest getFinPlanList(String finprodId) {
+    public FinBondAssetSaveRequest getFinPlanList(String finprodMarketId) {
         FinBondAssetSaveRequest dto =new FinBondAssetSaveRequest();
+        String finprodId = commonBusinessService.getFinProdId(finprodMarketId,DictCodeListExt1.金融产品类型_投管用_债券.getValue(),null);
         BaseFinProductBaseInfoDto baseFinProductBaseInfoDto =new BaseFinProductBaseInfoDto();
         List<BaseFinProductBaseInfoDto> baseFinProductBaseInfoList =new ArrayList<BaseFinProductBaseInfoDto>();
         baseFinProductBaseInfoList.add(baseFinProductBaseInfoDto);
@@ -1542,7 +1558,11 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
 
 
     public SysUploadFileInfo getUploadFileInfo(MultipartFile file) throws IOException {
-        String newfileName = file.getName()+"_"+DateUtil.format(DateUtil.now(),DateUtil.DATETIME_FORMAT_WITH_SSS_YEAR1);
+        if (StringUtil.isNotEmpty(file.getOriginalFilename())){
+            return null;
+        }
+        List<String> fileNameList = StringUtil.splitToList(".",file.getOriginalFilename());
+        String newfileName = fileNameList.get(0)+"_"+DateUtil.format(DateUtil.now(),DateUtil.DATETIME_FORMAT_WITH_SSS_YEAR1)+"."+fileNameList.get(1);
         // 本地路径
         String localPath = CacheUtil.getSysParam("upload_file_path") + File.separator;
         String nowDateStr =DateUtil.format(DateUtil.now(),DateUtil.DEFAULT_DATE_FORMAT_EN);
@@ -1558,7 +1578,7 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
         SysUploadFileInfo fileInfo = new SysUploadFileInfo();
         String uuid = UUID.randomUUID().toString().replace("-", "");
         fileInfo.setSeqNo(uuid);
-        fileInfo.setFileName(file.getName());
+        fileInfo.setFileName(file.getOriginalFilename());
         fileInfo.setPath(newPath);
         finBondAssetMapper.insertFileSelective(fileInfo);
         return fileInfo;
