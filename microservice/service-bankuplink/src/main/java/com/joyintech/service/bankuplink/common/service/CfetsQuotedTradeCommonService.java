@@ -10,14 +10,8 @@ import com.joyintech.service.bankuplink.common.util.BusinessTypeUtil;
 import com.joyintech.service.bankuplink.common.util.MarketIndicatorUtil;
 import com.joyintech.service.bankuplink.common.util.OrgTypeUtil;
 import com.joyintech.service.bankuplink.common.util.ProdTypeUtil;
-import com.joyintech.tams.common.base.dao.InterfCstpTradeMapper;
-import com.joyintech.tams.common.base.dao.InterfOpicsTradRepoMapper;
-import com.joyintech.tams.common.base.dao.InterfTradRepoasstMapper;
-import com.joyintech.tams.common.base.dao.InterfTradSecdealMapper;
-import com.joyintech.tams.common.base.entity.InterfCstpTrade;
-import com.joyintech.tams.common.base.entity.InterfOpicsTradRepo;
-import com.joyintech.tams.common.base.entity.InterfTradRepoasst;
-import com.joyintech.tams.common.base.entity.InterfTradSecdeal;
+import com.joyintech.tams.common.base.dao.*;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
@@ -54,6 +48,9 @@ public class CfetsQuotedTradeCommonService{
      */
     @Autowired
     private InterfCstpTradeMapper mapper;
+
+    @Autowired
+    private InterfCstpBjfxjgMapper interfCstpBjfxjgMapper;
 
     /**
      * 接口处理cstp
@@ -117,7 +114,7 @@ public class CfetsQuotedTradeCommonService{
      */
     @Autowired
     private CstpSecAutoTradeService secAutoTradeService;
-    
+
     // 异步方法检查数据库中外部报价编号的最大等待时间（毫秒）
     @Value("${application.quote.resp.maxWaitTime:3000}")
     private int maxWaitTime;
@@ -134,7 +131,7 @@ public class CfetsQuotedTradeCommonService{
         catch (InterruptedException e) {
             e.printStackTrace();
         }
-        
+
         ResultBaseDto resultBaseDto = new ResultBaseDto(true);
         InterfCstpTrade iCstpTrade = new InterfCstpTrade();
         try{
@@ -193,6 +190,38 @@ public class CfetsQuotedTradeCommonService{
         }catch (Exception e){
             resultBaseDto.setErrMsg(e.getMessage());
             //logger.error(e.getMessage());
+            throw new Exception(e);
+        }
+        return resultBaseDto;
+    }
+
+    /**
+     * 一级申购 cstp交易入库
+     */
+    @Transactional(rollbackFor = { Exception.class })
+    @DTXTransaction
+    public ResultBaseDto insertBidCstpTrade(InterfCstpBjfxjg entity) throws Exception {
+        try {
+            Thread.sleep(maxWaitTime);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        ResultBaseDto resultBaseDto = new ResultBaseDto(true);
+        try {
+            entity.setTrdId(IDGenerator.generate());
+            // 插入cstp交易表
+            interfCstpBjfxjgMapper.insertSelective(entity);
+            getLogger().info("银行间下行成交处理业务数据线程开启");
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    secAutoTradeService.secAutoBidTrade(entity, resultBaseDto);
+                }
+            });
+            thread.start();
+        } catch (Exception e) {
+            resultBaseDto.setErrMsg(e.getMessage());
             throw new Exception(e);
         }
         return resultBaseDto;

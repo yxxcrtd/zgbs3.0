@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.joyintech.tams.common.base.dao.InterfCstpBjfxjgMapper">
+  <resultMap id="BaseResultMap" type="com.joyintech.tams.common.base.entity.InterfCstpBjfxjg">
+    <result column="INSTRUMENT_ID" jdbcType="VARCHAR" property="instrumentId" />
+    <result column="INSTRUMENT_SHORT_NAME" jdbcType="VARCHAR" property="instrumentShortName" />
+    <result column="INSTRUMENT_FULL_NAME" jdbcType="VARCHAR" property="instrumentFullName" />
+    <result column="ISSUER" jdbcType="VARCHAR" property="issuer" />
+    <result column="ISSUER_21_FIRM_ID" jdbcType="VARCHAR" property="issuer21FirmId" />
+    <result column="ISSUE_PRICE" jdbcType="DECIMAL" property="issuePrice" />
+    <result column="SPREAD" jdbcType="DECIMAL" property="spread" />
+    <result column="COUPON_RATE" jdbcType="DECIMAL" property="couponRate" />
+    <result column="REAL_ISSUESIZE" jdbcType="DECIMAL" property="realIssuesize" />
+    <result column="INSTRUMENT_STATUS" jdbcType="CHAR" property="instrumentStatus" />
+    <result column="INSTRUMENT_TYPE" jdbcType="VARCHAR" property="instrumentType" />
+    <result column="FAILURE_REASONS" jdbcType="VARCHAR" property="failureReasons" />
+    <result column="MESSAGE_TYPE" jdbcType="VARCHAR" property="messageType" />
+    <result column="ISSUE_METHOD" jdbcType="CHAR" property="issueMethod" />
+    <result column="COUPON_RATE_TYPE" jdbcType="CHAR" property="couponRateType" />
+    <result column="DATA_CATEGORY_INDICATOR" jdbcType="CHAR" property="dataCategoryIndicator" />
+    <result column="FULL_CHINESE_NAME_OF_SUBSCRIBE" jdbcType="VARCHAR" property="fullChineseNameOfSubscribe" />
+    <result column="SUBSCRIBE_INSTITUTION_ID" jdbcType="VARCHAR" property="subscribeInstitutionId" />
+    <result column="SUBSCRIPTION_AMOUNT" jdbcType="DECIMAL" property="subscriptionAmount" />
+    <result column="ACTUAL_FEE" jdbcType="DECIMAL" property="actualFee" />
+    <result column="SUBSCRIPTION_TIME" jdbcType="VARCHAR" property="subscriptionTime" />
+    <result column="SUBMIT_USER" jdbcType="VARCHAR" property="submitUser" />
+    <result column="CURRENCY" jdbcType="VARCHAR" property="currency" />
+    <result column="TRD_ID" jdbcType="VARCHAR" property="trdId" />
+  </resultMap>
+  <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.InterfCstpBjfxjg">
+    insert into INTERF_CSTP_BJFXJG (INSTRUMENT_ID, INSTRUMENT_SHORT_NAME, 
+      INSTRUMENT_FULL_NAME, ISSUER, ISSUER_21_FIRM_ID, 
+      ISSUE_PRICE, SPREAD, COUPON_RATE, 
+      REAL_ISSUESIZE, INSTRUMENT_STATUS, INSTRUMENT_TYPE, 
+      FAILURE_REASONS, MESSAGE_TYPE, ISSUE_METHOD, 
+      COUPON_RATE_TYPE, DATA_CATEGORY_INDICATOR, FULL_CHINESE_NAME_OF_SUBSCRIBE, 
+      SUBSCRIBE_INSTITUTION_ID, SUBSCRIPTION_AMOUNT, 
+      ACTUAL_FEE, SUBSCRIPTION_TIME, SUBMIT_USER, 
+      CURRENCY, TRD_ID)
+    values (#{instrumentId,jdbcType=VARCHAR}, #{instrumentShortName,jdbcType=VARCHAR}, 
+      #{instrumentFullName,jdbcType=VARCHAR}, #{issuer,jdbcType=VARCHAR}, #{issuer21FirmId,jdbcType=VARCHAR}, 
+      #{issuePrice,jdbcType=DECIMAL}, #{spread,jdbcType=DECIMAL}, #{couponRate,jdbcType=DECIMAL}, 
+      #{realIssuesize,jdbcType=DECIMAL}, #{instrumentStatus,jdbcType=CHAR}, #{instrumentType,jdbcType=VARCHAR}, 
+      #{failureReasons,jdbcType=VARCHAR}, #{messageType,jdbcType=VARCHAR}, #{issueMethod,jdbcType=CHAR}, 
+      #{couponRateType,jdbcType=CHAR}, #{dataCategoryIndicator,jdbcType=CHAR}, #{fullChineseNameOfSubscribe,jdbcType=VARCHAR}, 
+      #{subscribeInstitutionId,jdbcType=VARCHAR}, #{subscriptionAmount,jdbcType=DECIMAL}, 
+      #{actualFee,jdbcType=DECIMAL}, #{subscriptionTime,jdbcType=VARCHAR}, #{submitUser,jdbcType=VARCHAR}, 
+      #{currency,jdbcType=VARCHAR}, #{trdId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.InterfCstpBjfxjg">
+    insert into INTERF_CSTP_BJFXJG
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="instrumentId != null">
+        INSTRUMENT_ID,
+      </if>
+      <if test="instrumentShortName != null">
+        INSTRUMENT_SHORT_NAME,
+      </if>
+      <if test="instrumentFullName != null">
+        INSTRUMENT_FULL_NAME,
+      </if>
+      <if test="issuer != null">
+        ISSUER,
+      </if>
+      <if test="issuer21FirmId != null">
+        ISSUER_21_FIRM_ID,
+      </if>
+      <if test="issuePrice != null">
+        ISSUE_PRICE,
+      </if>
+      <if test="spread != null">
+        SPREAD,
+      </if>
+      <if test="couponRate != null">
+        COUPON_RATE,
+      </if>
+      <if test="realIssuesize != null">
+        REAL_ISSUESIZE,
+      </if>
+      <if test="instrumentStatus != null">
+        INSTRUMENT_STATUS,
+      </if>
+      <if test="instrumentType != null">
+        INSTRUMENT_TYPE,
+      </if>
+      <if test="failureReasons != null">
+        FAILURE_REASONS,
+      </if>
+      <if test="messageType != null">
+        MESSAGE_TYPE,
+      </if>
+      <if test="issueMethod != null">
+        ISSUE_METHOD,
+      </if>
+      <if test="couponRateType != null">
+        COUPON_RATE_TYPE,
+      </if>
+      <if test="dataCategoryIndicator != null">
+        DATA_CATEGORY_INDICATOR,
+      </if>
+      <if test="fullChineseNameOfSubscribe != null">
+        FULL_CHINESE_NAME_OF_SUBSCRIBE,
+      </if>
+      <if test="subscribeInstitutionId != null">
+        SUBSCRIBE_INSTITUTION_ID,
+      </if>
+      <if test="subscriptionAmount != null">
+        SUBSCRIPTION_AMOUNT,
+      </if>
+      <if test="actualFee != null">
+        ACTUAL_FEE,
+      </if>
+      <if test="subscriptionTime != null">
+        SUBSCRIPTION_TIME,
+      </if>
+      <if test="submitUser != null">
+        SUBMIT_USER,
+      </if>
+      <if test="currency != null">
+        CURRENCY,
+      </if>
+      <if test="trdId != null">
+        TRD_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="instrumentId != null">
+        #{instrumentId,jdbcType=VARCHAR},
+      </if>
+      <if test="instrumentShortName != null">
+        #{instrumentShortName,jdbcType=VARCHAR},
+      </if>
+      <if test="instrumentFullName != null">
+        #{instrumentFullName,jdbcType=VARCHAR},
+      </if>
+      <if test="issuer != null">
+        #{issuer,jdbcType=VARCHAR},
+      </if>
+      <if test="issuer21FirmId != null">
+        #{issuer21FirmId,jdbcType=VARCHAR},
+      </if>
+      <if test="issuePrice != null">
+        #{issuePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="spread != null">
+        #{spread,jdbcType=DECIMAL},
+      </if>
+      <if test="couponRate != null">
+        #{couponRate,jdbcType=DECIMAL},
+      </if>
+      <if test="realIssuesize != null">
+        #{realIssuesize,jdbcType=DECIMAL},
+      </if>
+      <if test="instrumentStatus != null">
+        #{instrumentStatus,jdbcType=CHAR},
+      </if>
+      <if test="instrumentType != null">
+        #{instrumentType,jdbcType=VARCHAR},
+      </if>
+      <if test="failureReasons != null">
+        #{failureReasons,jdbcType=VARCHAR},
+      </if>
+      <if test="messageType != null">
+        #{messageType,jdbcType=VARCHAR},
+      </if>
+      <if test="issueMethod != null">
+        #{issueMethod,jdbcType=CHAR},
+      </if>
+      <if test="couponRateType != null">
+        #{couponRateType,jdbcType=CHAR},
+      </if>
+      <if test="dataCategoryIndicator != null">
+        #{dataCategoryIndicator,jdbcType=CHAR},
+      </if>
+      <if test="fullChineseNameOfSubscribe != null">
+        #{fullChineseNameOfSubscribe,jdbcType=VARCHAR},
+      </if>
+      <if test="subscribeInstitutionId != null">
+        #{subscribeInstitutionId,jdbcType=VARCHAR},
+      </if>
+      <if test="subscriptionAmount != null">
+        #{subscriptionAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="actualFee != null">
+        #{actualFee,jdbcType=DECIMAL},
+      </if>
+      <if test="subscriptionTime != null">
+        #{subscriptionTime,jdbcType=VARCHAR},
+      </if>
+      <if test="submitUser != null">
+        #{submitUser,jdbcType=VARCHAR},
+      </if>
+      <if test="currency != null">
+        #{currency,jdbcType=VARCHAR},
+      </if>
+      <if test="trdId != null">
+        #{trdId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <resultMap id="BaseResultMap" type="com.joyintech.tams.common.base.entity.InterfCstpBjfxjg">
+    <result column="INSTRUMENT_ID" jdbcType="VARCHAR" property="instrumentId" />
+    <result column="INSTRUMENT_SHORT_NAME" jdbcType="VARCHAR" property="instrumentShortName" />
+    <result column="INSTRUMENT_FULL_NAME" jdbcType="VARCHAR" property="instrumentFullName" />
+    <result column="ISSUER" jdbcType="VARCHAR" property="issuer" />
+    <result column="ISSUER_21_FIRM_ID" jdbcType="VARCHAR" property="issuer21FirmId" />
+    <result column="ISSUE_PRICE" jdbcType="DECIMAL" property="issuePrice" />
+    <result column="SPREAD" jdbcType="DECIMAL" property="spread" />
+    <result column="COUPON_RATE" jdbcType="DECIMAL" property="couponRate" />
+    <result column="REAL_ISSUESIZE" jdbcType="DECIMAL" property="realIssuesize" />
+    <result column="INSTRUMENT_STATUS" jdbcType="CHAR" property="instrumentStatus" />
+    <result column="INSTRUMENT_TYPE" jdbcType="VARCHAR" property="instrumentType" />
+    <result column="FAILURE_REASONS" jdbcType="VARCHAR" property="failureReasons" />
+    <result column="MESSAGE_TYPE" jdbcType="VARCHAR" property="messageType" />
+    <result column="ISSUE_METHOD" jdbcType="CHAR" property="issueMethod" />
+    <result column="COUPON_RATE_TYPE" jdbcType="CHAR" property="couponRateType" />
+    <result column="DATA_CATEGORY_INDICATOR" jdbcType="CHAR" property="dataCategoryIndicator" />
+    <result column="FULL_CHINESE_NAME_OF_SUBSCRIBE" jdbcType="VARCHAR" property="fullChineseNameOfSubscribe" />
+    <result column="SUBSCRIBE_INSTITUTION_ID" jdbcType="VARCHAR" property="subscribeInstitutionId" />
+    <result column="SUBSCRIPTION_AMOUNT" jdbcType="DECIMAL" property="subscriptionAmount" />
+    <result column="ACTUAL_FEE" jdbcType="DECIMAL" property="actualFee" />
+    <result column="SUBSCRIPTION_TIME" jdbcType="VARCHAR" property="subscriptionTime" />
+    <result column="SUBMIT_USER" jdbcType="VARCHAR" property="submitUser" />
+    <result column="CURRENCY" jdbcType="VARCHAR" property="currency" />
+  </resultMap>
+  <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.InterfCstpBjfxjg">
+    insert into INTERF_CSTP_BJFXJG (INSTRUMENT_ID, INSTRUMENT_SHORT_NAME, 
+      INSTRUMENT_FULL_NAME, ISSUER, ISSUER_21_FIRM_ID, 
+      ISSUE_PRICE, SPREAD, COUPON_RATE, 
+      REAL_ISSUESIZE, INSTRUMENT_STATUS, INSTRUMENT_TYPE, 
+      FAILURE_REASONS, MESSAGE_TYPE, ISSUE_METHOD, 
+      COUPON_RATE_TYPE, DATA_CATEGORY_INDICATOR, FULL_CHINESE_NAME_OF_SUBSCRIBE, 
+      SUBSCRIBE_INSTITUTION_ID, SUBSCRIPTION_AMOUNT, 
+      ACTUAL_FEE, SUBSCRIPTION_TIME, SUBMIT_USER, 
+      CURRENCY)
+    values (#{instrumentId,jdbcType=VARCHAR}, #{instrumentShortName,jdbcType=VARCHAR}, 
+      #{instrumentFullName,jdbcType=VARCHAR}, #{issuer,jdbcType=VARCHAR}, #{issuer21FirmId,jdbcType=VARCHAR}, 
+      #{issuePrice,jdbcType=DECIMAL}, #{spread,jdbcType=DECIMAL}, #{couponRate,jdbcType=DECIMAL}, 
+      #{realIssuesize,jdbcType=DECIMAL}, #{instrumentStatus,jdbcType=CHAR}, #{instrumentType,jdbcType=VARCHAR}, 
+      #{failureReasons,jdbcType=VARCHAR}, #{messageType,jdbcType=VARCHAR}, #{issueMethod,jdbcType=CHAR}, 
+      #{couponRateType,jdbcType=CHAR}, #{dataCategoryIndicator,jdbcType=CHAR}, #{fullChineseNameOfSubscribe,jdbcType=VARCHAR}, 
+      #{subscribeInstitutionId,jdbcType=VARCHAR}, #{subscriptionAmount,jdbcType=DECIMAL}, 
+      #{actualFee,jdbcType=DECIMAL}, #{subscriptionTime,jdbcType=VARCHAR}, #{submitUser,jdbcType=VARCHAR}, 
+      #{currency,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.InterfCstpBjfxjg">
+    insert into INTERF_CSTP_BJFXJG
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="instrumentId != null">
+        INSTRUMENT_ID,
+      </if>
+      <if test="instrumentShortName != null">
+        INSTRUMENT_SHORT_NAME,
+      </if>
+      <if test="instrumentFullName != null">
+        INSTRUMENT_FULL_NAME,
+      </if>
+      <if test="issuer != null">
+        ISSUER,
+      </if>
+      <if test="issuer21FirmId != null">
+        ISSUER_21_FIRM_ID,
+      </if>
+      <if test="issuePrice != null">
+        ISSUE_PRICE,
+      </if>
+      <if test="spread != null">
+        SPREAD,
+      </if>
+      <if test="couponRate != null">
+        COUPON_RATE,
+      </if>
+      <if test="realIssuesize != null">
+        REAL_ISSUESIZE,
+      </if>
+      <if test="instrumentStatus != null">
+        INSTRUMENT_STATUS,
+      </if>
+      <if test="instrumentType != null">
+        INSTRUMENT_TYPE,
+      </if>
+      <if test="failureReasons != null">
+        FAILURE_REASONS,
+      </if>
+      <if test="messageType != null">
+        MESSAGE_TYPE,
+      </if>
+      <if test="issueMethod != null">
+        ISSUE_METHOD,
+      </if>
+      <if test="couponRateType != null">
+        COUPON_RATE_TYPE,
+      </if>
+      <if test="dataCategoryIndicator != null">
+        DATA_CATEGORY_INDICATOR,
+      </if>
+      <if test="fullChineseNameOfSubscribe != null">
+        FULL_CHINESE_NAME_OF_SUBSCRIBE,
+      </if>
+      <if test="subscribeInstitutionId != null">
+        SUBSCRIBE_INSTITUTION_ID,
+      </if>
+      <if test="subscriptionAmount != null">
+        SUBSCRIPTION_AMOUNT,
+      </if>
+      <if test="actualFee != null">
+        ACTUAL_FEE,
+      </if>
+      <if test="subscriptionTime != null">
+        SUBSCRIPTION_TIME,
+      </if>
+      <if test="submitUser != null">
+        SUBMIT_USER,
+      </if>
+      <if test="currency != null">
+        CURRENCY,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="instrumentId != null">
+        #{instrumentId,jdbcType=VARCHAR},
+      </if>
+      <if test="instrumentShortName != null">
+        #{instrumentShortName,jdbcType=VARCHAR},
+      </if>
+      <if test="instrumentFullName != null">
+        #{instrumentFullName,jdbcType=VARCHAR},
+      </if>
+      <if test="issuer != null">
+        #{issuer,jdbcType=VARCHAR},
+      </if>
+      <if test="issuer21FirmId != null">
+        #{issuer21FirmId,jdbcType=VARCHAR},
+      </if>
+      <if test="issuePrice != null">
+        #{issuePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="spread != null">
+        #{spread,jdbcType=DECIMAL},
+      </if>
+      <if test="couponRate != null">
+        #{couponRate,jdbcType=DECIMAL},
+      </if>
+      <if test="realIssuesize != null">
+        #{realIssuesize,jdbcType=DECIMAL},
+      </if>
+      <if test="instrumentStatus != null">
+        #{instrumentStatus,jdbcType=CHAR},
+      </if>
+      <if test="instrumentType != null">
+        #{instrumentType,jdbcType=VARCHAR},
+      </if>
+      <if test="failureReasons != null">
+        #{failureReasons,jdbcType=VARCHAR},
+      </if>
+      <if test="messageType != null">
+        #{messageType,jdbcType=VARCHAR},
+      </if>
+      <if test="issueMethod != null">
+        #{issueMethod,jdbcType=CHAR},
+      </if>
+      <if test="couponRateType != null">
+        #{couponRateType,jdbcType=CHAR},
+      </if>
+      <if test="dataCategoryIndicator != null">
+        #{dataCategoryIndicator,jdbcType=CHAR},
+      </if>
+      <if test="fullChineseNameOfSubscribe != null">
+        #{fullChineseNameOfSubscribe,jdbcType=VARCHAR},
+      </if>
+      <if test="subscribeInstitutionId != null">
+        #{subscribeInstitutionId,jdbcType=VARCHAR},
+      </if>
+      <if test="subscriptionAmount != null">
+        #{subscriptionAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="actualFee != null">
+        #{actualFee,jdbcType=DECIMAL},
+      </if>
+      <if test="subscriptionTime != null">
+        #{subscriptionTime,jdbcType=VARCHAR},
+      </if>
+      <if test="submitUser != null">
+        #{submitUser,jdbcType=VARCHAR},
+      </if>
+      <if test="currency != null">
+        #{currency,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+</mapper>
