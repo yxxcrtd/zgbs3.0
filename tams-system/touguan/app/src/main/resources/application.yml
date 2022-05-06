@@ -171,7 +171,8 @@ shiro:
     /invest/trade/bond/TrdBondInvestTrade002/secAutoTrade,/invest/trade/trdrepotrade/TrdRepoTrade002/repoAutoTrade,/cstp/match/*,/CfetsQuotedCommon/**,
     /InterfSysTrdConfig/**,/interf/risk/**,/EtrTradeSysInterf/**,/MstCaptialAccount/**,/MstSaleDepartment/**,/TrdBondInvestTrade/**,/AssetDeclarationCodeMaintenance/**,/ptlmanagementinfo/**,/InterfSysPara/**,/MstMarketCalendarInfo/**,
     /TrdExchangeWorkflow/**,/invest/trade/bond/TrdBondInvestTrade002/**,/invest/trade/trdrepotrade/TrdRepoTrade002/**,/invest/trade/forwex/TrdForwexInvestTrade002/**,/invest/trade/api/**,
-    /CfetsRepoDealQuotedPrice001/selectEtrReByQuoteId,/core/getAssetFiveType,/common/trdcommonbase/insertFinProductCashData,/common/entrustcommonbase/finishEntrust,/TrdRepoTrade/selectPreTradeId,/FinProjectTargetAsset/insert,/component/**,/FinProductRating/**,/common/joyinbusinessCommon,/svreport/interf/file/CreateZHXPFile/createFile
+    /CfetsRepoDealQuotedPrice001/selectEtrReByQuoteId,/core/getAssetFiveType,/common/trdcommonbase/insertFinProductCashData,/common/entrustcommonbase/finishEntrust,/TrdRepoTrade/selectPreTradeId,/FinProjectTargetAsset/insert,/component/**,/FinProductRating/**,
+    /common/joyinbusinessCommon/**,/svreport/interf/file/CreateZHXPFile/createFile
 specialsyspara:
   parakey: AUTHORIZE_LIMIT||PRICE_CAL_TYPE||portfolio_handle_userid||settle_acct_name||settle_acct_no||prod_tru_acct_no||prod_tru_acct_name||lending_acct_no||lending_acct_name
 #页面特殊参数取值
@@ -326,9 +327,9 @@ application:
 flag: false
 
 #头寸引擎地址
-positionUrl: http://192.168.70.146:2667/dsp
+positionUrl: http://192.168.90.244:2667/dsp
 #监听头寸余额地址
-webSocketUrl: ws://192.168.90.244:2667/dsp/positionTopic
+webSocketUrl: ws://192.168.70.146:2667/dsp/positionTopic
 #监听键值
 webSocketKey: "[{\"table\":\"ETR_CASH_POSITION\",\"hodingTypes\":[]}, {\"table\":\"PTL_CASH_POSITION\",\"hodingTypes\":[]}, {\"table\":\"ETR_SEC_POSITION\",\"hodingTypes\":[]}, {\"table\":\"PTL_SEC_POSITION\",\"hodingTypes\":[]}]"
 #监听市场行情最新净价
@@ -356,19 +357,19 @@ spring:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008_MFX
-    password: BS303INIT_TEST1008_MFX
+    username: BS303INIT_EXCHANGE0106
+    password: BS303INIT_EXCHANGE0106
     reportSqlldrDatabaseName: 192.168.70.245:1521/orcl
   rabbitmq:
     # 需求环境使用mq配置如下
-    addresses: 192.168.90.119:5672
+    addresses: 192.168.90.243:5672
     username: rbmq
     password: rbmq
 application:
   sqldirurl: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
   driverClassName: oracle.jdbc.driver.OracleDriver
-  sqldiruserName: BS303INIT_TEST1008_MFX
-  sqldirpassword: BS303INIT_TEST1008_MFX
+  sqldiruserName: BS303INIT_EXCHANGE0106
+  sqldirpassword: BS303INIT_EXCHANGE0106
 shiro:
   ssoEnable: false  #是否开启sso验证，可以和joyinsso 统一登录配套使用。如果没有统一登录，但为true的话，就不校验密码
   #  loginUrl: http://127.0.0.1:1667/joyinsso/login.html#/login    ##统一登录页面，当有统一登录时配置成统一登录的访问地址
@@ -385,31 +386,31 @@ shiro:
     /CfetsRepoDealQuotedPrice001/selectEtrReByQuoteId,/core/getAssetFiveType,/common/trdcommonbase/insertFinProductCashData,/common/entrustcommonbase/finishEntrust,/TrdRepoTrade/selectPreTradeId,/joyin/**,/trade/joyin/**,
     /interf/refreshCache,/interf/execute,/interf/ziguanSysUserInfo,/interf/xp,/interf/xp/**,/interf/zg,/interf/zg/**,/FinProjectTargetAsset/insert,/FinAssetRateAdj/getFinAssetRateAdjByCashId,
     /cfets/**,/common/workflow/**,/common/config/**,/component/**,/FinProductRating/**,/svreport/interf/file/CreateZHXPFile/createFile,
-    /EtrAgreRepTrade/getEntrustInfoByTradeId,/trade/joyin/**,/EntrustMsgbyMQ/**
+    /EtrAgreRepTrade/getEntrustInfoByTradeId,/trade/joyin/**
 base:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008_MFX
-    password: BS303INIT_TEST1008_MFX
+    username: BS303INIT_EXCHANGE0106
+    password: BS303INIT_EXCHANGE0106
 interf:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008_MFX
-    password: BS303INIT_TEST1008_MFX
+    username: BS303INIT_EXCHANGE0106
+    password: BS303INIT_EXCHANGE0106
 stresstest:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008_MFX
-    password: BS303INIT_TEST1008_MFX
+    username: BS303INIT_EXCHANGE0106
+    password: BS303INIT_EXCHANGE0106
 wind:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008_MFX
-    password: BS303INIT_TEST1008_MFX
+    username: BS303INIT_EXCHANGE0106
+    password: BS303INIT_EXCHANGE0106
 log:
   path: /home/tams/logs/tams/touguan
   level: debug
@@ -470,6 +471,17 @@ trade:
     risk:
       alive: 5000
       capacity: 128
+
+quote:
+  flag: false #是否使用接口平台行情，true 是，false 否
+  ws:
+    host: ws://192.168.90.208:16667/dsp
+    url: /exchange
+  http:
+    host: http://192.168.90.208:1668/dsp
+    url: /datarouter/http/json/callTrigger
+    gpCode: GZYH
+    triggerCode: GZ_HQ_SH
 agent:
   active: false #是否对接接口平台，true-是，false-否
   terminal:
