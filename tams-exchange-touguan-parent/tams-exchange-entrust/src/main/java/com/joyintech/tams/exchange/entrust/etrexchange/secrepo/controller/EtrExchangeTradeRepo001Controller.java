@@ -1016,6 +1016,8 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 	@ResponseBody
 	@RequestMapping("/getInterfSysMinPriceAll")
 	public List<MinPirceDto> getInterfSysMinPriceAll(@RequestBody Map<String, Object> param) {
+		// 默认匹配成交
+		param.put("tradePlat",DictCodeListExt3.指定交易方式_匹配成交.getValue());
 		List<MinPirceDto> minPirceList = etrExchangeTradeSecRepo001Service.getInterfSysMinPriceAll(param);
 		return minPirceList;
 	}
@@ -1144,6 +1146,8 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 	public Message<List<MinPirceDto>> getMinPrice(@RequestBody MinPriceRequest request) {
 		try{
 			Map<String,Object> param= JsonUtils.object2Map(request);
+			// 默认匹配成交
+			param.put("tradePlat",DictCodeListExt3.指定交易方式_匹配成交.getValue());
 			List<MinPirceDto> minPirceList = etrExchangeTradeSecRepo001Service.getInterfSysMinPriceAll(param);
 			return new Message<List<MinPirceDto>>().success().setData(minPirceList);
 		}catch (Exception e){
@@ -1171,6 +1175,8 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 	@ResponseBody
 	public Message<MinTrdUnitLimitDto> getMinTrdUnitLimit(@RequestBody EtrExchangeMiniLimitPriceRequest request){
 		try {
+			// 默认匹配成交
+			request.setTradePlat(DictCodeListExt3.指定交易方式_匹配成交.getValue());
 			MinTrdUnitLimitDto minNum= etrExchangeTradeSecRepo001Service.getMinTrdUnitLimitPrice(request);
 			return new Message<MinTrdUnitLimitDto>().success().setData(minNum);
 		} catch (Exception e) {
