@@ -13,6 +13,9 @@ import java.util.Date;
 @ApiModel(value = "申购执行明细", description = "申购执行明细列表,申购明细列表")
 public class CfetsTrdBondFirstSubDealDetailDto {
 
+    @ApiModelProperty(name = "bidId", value = "投标编号", example = "01")
+    private String bidId;
+
     @ApiModelProperty(name = "validStatus", value = "有效状态", example = "01")
     private String validStatus;
 
@@ -129,6 +132,14 @@ public class CfetsTrdBondFirstSubDealDetailDto {
 
     @ApiModelProperty(name = "bidDateStr", value = "投标日(申购时间)格式化")
     private String bidDateStr;
+
+    public String getBidId() {
+        return bidId;
+    }
+
+    public void setBidId(String bidId) {
+        this.bidId = bidId;
+    }
 
     public String getValidStatus() {
         return validStatus;

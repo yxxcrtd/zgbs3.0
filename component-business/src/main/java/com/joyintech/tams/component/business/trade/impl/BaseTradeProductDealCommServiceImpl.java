@@ -831,6 +831,7 @@ public class BaseTradeProductDealCommServiceImpl extends BaseService implements 
                 // GNS-949:增加是否工作流数据标识 modify by fuyongsheng 20220227 start
                 cashInputDto.setNotWorkflow(finProductTradeDto.isNotWorkflow());
                 // GNS-949:增加是否工作流数据标识 modify by fuyongsheng 20220227 end
+                cashInputDto.setTrdProductDealAdd(baseTradeProductDealDto.getTrdProductDealAdd());
                 if (是否处理持仓) {
                     List<PtlCashPositionFlowDto> resultList = assetPositionsCashCommServiceImpl.cashDeal(cashInputDto);//现金处理详细
 //                    if (持仓类型 == DictCodeList.持仓类型_可用

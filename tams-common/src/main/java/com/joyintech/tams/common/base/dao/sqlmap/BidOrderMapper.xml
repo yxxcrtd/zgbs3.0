@@ -50,7 +50,7 @@
       CREATE_TIME, UPDATE_USER, UPDATE_TIME,
       OU_PARTY_ID, OUR_TRADER, SUBSCRIPTION_AMOUNT,
       PAYABLE_AMOUNT, SETT_FEE_AMT, P_BID_ID,
-      IS_CANCEL, TRADE_STATUS)
+      IS_CANCEL, TRADE_STATUS,DIP_TYPE)
     values (#{bidId,jdbcType=VARCHAR}, #{finprodId,jdbcType=VARCHAR}, #{bidDate,jdbcType=TIMESTAMP},
       #{payType,jdbcType=VARCHAR}, #{payDate,jdbcType=TIMESTAMP}, #{isWin,jdbcType=VARCHAR},
       #{winPrinAmt,jdbcType=DECIMAL}, #{winPrice,jdbcType=DECIMAL}, #{winType,jdbcType=VARCHAR},
@@ -58,7 +58,7 @@
       #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP},
       #{ouPartyId,jdbcType=VARCHAR}, #{ourTrader,jdbcType=VARCHAR}, #{subscriptionAmount,jdbcType=DECIMAL},
       #{payableAmount,jdbcType=DECIMAL}, #{settFeeAmt,jdbcType=DECIMAL}, #{pBidId,jdbcType=VARCHAR},
-      #{isCancel,jdbcType=VARCHAR}, #{tradeStatus,jdbcType=VARCHAR})
+      #{isCancel,jdbcType=VARCHAR}, #{tradeStatus,jdbcType=VARCHAR}, #{dipType,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.BidOrder">
     insert into BID_ORDER
@@ -132,6 +132,9 @@
       <if test="tradeStatus != null">
         TRADE_STATUS,
       </if>
+      <if test="dipType != null">
+        DIP_TYPE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="bidId != null">
@@ -202,6 +205,9 @@
       </if>
       <if test="tradeStatus != null">
         #{tradeStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="dipType != null">
+        #{dipType,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -274,6 +280,9 @@
       <if test="tradeStatus != null">
         TRADE_STATUS = #{tradeStatus,jdbcType=VARCHAR},
       </if>
+      <if test="dipType != null">
+        DIP_TYPE = #{dipType,jdbcType=VARCHAR},
+      </if>
     </set>
     where BID_ID = #{bidId,jdbcType=VARCHAR}
   </update>
@@ -300,7 +309,8 @@
       SETT_FEE_AMT = #{settFeeAmt,jdbcType=DECIMAL},
       P_BID_ID = #{pBidId,jdbcType=VARCHAR},
       IS_CANCEL = #{isCancel,jdbcType=VARCHAR},
-      TRADE_STATUS = #{tradeStatus,jdbcType=VARCHAR}
+      TRADE_STATUS = #{tradeStatus,jdbcType=VARCHAR},
+      DIP_TYPE = #{dipType,jdbcType=VARCHAR}
     where BID_ID = #{bidId,jdbcType=VARCHAR}
   </update>
 </mapper>

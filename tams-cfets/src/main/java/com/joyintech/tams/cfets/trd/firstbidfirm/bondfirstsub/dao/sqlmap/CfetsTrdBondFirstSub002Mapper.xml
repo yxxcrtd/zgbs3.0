@@ -17,6 +17,7 @@
         <id property="subscriptionAmount" column="subscriptionAmount"/>
         <id property="payableAmount" column="payableAmount" />
         <id property="settFeeAmt" column="settFeeAmt"/>
+        <id property="dipType" column="dipType"/>
         <collection property="productDtos" ofType="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubProductDto"
                     javaType="java.util.ArrayList" >
             <result column="ENTRUST_ID" property="entrustId" jdbcType="VARCHAR" />
@@ -52,7 +53,7 @@
            eed.PORTFOLIO_ID,
            pp.PORTFOLIO_NAME,
            nvl(eed.ENTRUST_NUM, 0) - nvl(bobp.SUBSCRIPTION_AMOUNT,0)             avaNum,
-           nvl(eed.ENTRUST_NUM, 0) - nvl(bobp.SUBSCRIPTION_AMOUNT,0)             subscriptionAmount,
+           nvl(eed.ENTRUST_NUM, 0) - nvl(bobp.SUBSCRIPTION_AMOUNT,0)             SUBSCRIPTION_AMOUNT,
            eed.INV_AIM,
            eed.SEC_ACCT_ID,
            ssai.SEC_ACCT_NAME,
@@ -118,7 +119,8 @@
                bobp.SETT_FEE_AMT,
                eed.INV_AIM,
                eed.SEC_ACCT_ID,
-               ssai.SEC_ACCT_NAME
+               ssai.SEC_ACCT_NAME,
+               bo.dip_Type dipType
         from BID_ORDER bo
                  left join BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
                  left join PTL_PORTFOLIO pp on bobp.PORTFOLIO_ID = pp.PORTFOLIO_ID
@@ -164,7 +166,8 @@
                bobp.SETT_FEE_AMT,
                eed.INV_AIM,
                eed.SEC_ACCT_ID,
-               ssai.SEC_ACCT_NAME
+               ssai.SEC_ACCT_NAME,
+               bo.dip_Type dipType
         from WFL_BID_ORDER bo
                  left join WFL_BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
                  left join PTL_PORTFOLIO pp on bobp.PORTFOLIO_ID = pp.PORTFOLIO_ID
@@ -219,7 +222,7 @@
     <select id="selectEtrAvaNum" resultType="java.math.BigDecimal">
         select eed.ENTRUST_NUM*100 - sumSubAmt
         from (
-            select sum(T.subAmt) sumSubAmt,T.ENTRUST_ID, T.SEC_ACCT_ID
+            select sum(T.subAmt) sumSubAmt,T.ENTRUST_ID, T.PORTFOLIO_ID
             from (
                      select nvl(bobp.SUBSCRIPTION_AMOUNT,0) subAmt, bobp.ENTRUST_ID, bobp.PORTFOLIO_ID
                      from BID_ORDER bo
@@ -231,7 +234,7 @@
                      from Wfl_BID_ORDER wbo
                               left join Wfl_BID_ORDER_BID_PRICE wbobp on wbo.BID_ID = wbobp.BID_ID
                  ) T
-                     group by T.ENTRUST_ID, T.SEC_ACCT_ID
+                     group by T.ENTRUST_ID, T.PORTFOLIO_ID
         )T1 left join ETR_ENTRUST_DETAIL eed
                     on T1.PORTFOLIO_ID = eed.PORTFOLIO_ID and T1.ENTRUST_ID = eed.ENTRUST_ID
         where T1.ENTRUST_ID = #{entrustId} and T1.PORTFOLIO_ID = #{protfolioId}

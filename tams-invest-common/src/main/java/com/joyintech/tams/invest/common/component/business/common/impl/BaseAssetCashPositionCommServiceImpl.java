@@ -1154,7 +1154,9 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
             // 流程id
             resultDto.setWorkflowId(stlPayOrder.getWorkflowId());
             // 指令代码
+            if(StringUtil.isNotEmpty(dealAdd)){
             resultDto.setEntrustId(dealAdd.getEntrustId());
+            }
             // 金融产品交易Entity.金融产品代码
             String chlId = null;
             if (StringUtil.isNotEmpty(deal.getChlId())) {

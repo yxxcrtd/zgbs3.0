@@ -54,7 +54,7 @@
       CREATE_TIME, UPDATE_USER, UPDATE_TIME, 
       OU_PARTY_ID, OUR_TRADER, SUBSCRIPTION_AMOUNT, 
       P_BID_ID, IS_CANCEL, TRADE_STATUS, 
-      WORKFLOW_ID, WORKFLOW_STATUS)
+      WORKFLOW_ID, WORKFLOW_STATUS,DIP_TYPE)
     values (#{bidId,jdbcType=VARCHAR}, #{finprodId,jdbcType=VARCHAR}, #{bidDate,jdbcType=TIMESTAMP}, 
       #{payType,jdbcType=VARCHAR}, #{payDate,jdbcType=TIMESTAMP}, #{isWin,jdbcType=VARCHAR}, 
       #{winPrinAmt,jdbcType=DECIMAL}, #{winPrice,jdbcType=DECIMAL}, #{winType,jdbcType=VARCHAR}, 
@@ -62,7 +62,7 @@
       #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
       #{ouPartyId,jdbcType=VARCHAR}, #{ourTrader,jdbcType=VARCHAR}, #{subscriptionAmount,jdbcType=DECIMAL}, 
       #{pBidId,jdbcType=VARCHAR}, #{isCancel,jdbcType=VARCHAR}, #{tradeStatus,jdbcType=VARCHAR}, 
-      #{workflowId,jdbcType=VARCHAR}, #{workflowStatus,jdbcType=VARCHAR})
+      #{workflowId,jdbcType=VARCHAR}, #{workflowStatus,jdbcType=VARCHAR}, #{dipType,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.WflBidOrder">
     insert into WFL_BID_ORDER
@@ -136,6 +136,9 @@
       <if test="workflowStatus != null">
         WORKFLOW_STATUS,
       </if>
+      <if test="dipType != null">
+        DIP_TYPE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="bidId != null">
@@ -206,6 +209,9 @@
       </if>
       <if test="workflowStatus != null">
         #{workflowStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="dipType != null">
+        #{dipType,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -278,6 +284,9 @@
       <if test="workflowStatus != null">
         WORKFLOW_STATUS = #{workflowStatus,jdbcType=VARCHAR},
       </if>
+      <if test="dipType != null">
+        DIP_TYPE = #{dipType,jdbcType=VARCHAR},
+      </if>
     </set>
     where BID_ID = #{bidId,jdbcType=VARCHAR}
   </update>
@@ -304,7 +313,8 @@
       IS_CANCEL = #{isCancel,jdbcType=VARCHAR},
       TRADE_STATUS = #{tradeStatus,jdbcType=VARCHAR},
       WORKFLOW_ID = #{workflowId,jdbcType=VARCHAR},
-      WORKFLOW_STATUS = #{workflowStatus,jdbcType=VARCHAR}
+      WORKFLOW_STATUS = #{workflowStatus,jdbcType=VARCHAR},
+      DIP_TYPE = #{dipType,jdbcType=VARCHAR}
     where BID_ID = #{bidId,jdbcType=VARCHAR}
   </update>
 </mapper>
