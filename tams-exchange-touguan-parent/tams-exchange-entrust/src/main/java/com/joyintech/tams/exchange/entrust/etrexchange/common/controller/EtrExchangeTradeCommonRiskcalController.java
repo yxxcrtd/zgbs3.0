@@ -118,6 +118,9 @@ public class EtrExchangeTradeCommonRiskcalController extends BaseController{
                  || StringUtil.equals(dto.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())) {
                 resultArrList=interfRiskRdsController.doInfBatchData(dataMap,"0", "RSK002","F07");
             }
+            else if (StringUtil.equals(dto.getFinprodType2(),"ZYSHG")) {
+                resultArrList=interfRiskRdsController.doInfBatchData(dataMap,"0", "RSK002","F07");
+            }
             result.setRiskMathFlag("02");
             Boolean forbidFlag=false;
             Boolean cluflag=true;

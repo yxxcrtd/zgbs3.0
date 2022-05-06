@@ -374,7 +374,8 @@ public class ExchangeEntrustRdsCommonAop {
             return DictCodeList.平安资产类型_买断式回购.getValue();
         }
         if (CommonUtil.isType(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式正回购)
-            || CommonUtil.isType(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购)) {
+            || CommonUtil.isType(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购)
+                || StringUtil.equals(finprodType2, "ZYSHG")) {
             return DictCodeList.平安资产类型_质押式回购.getValue();
         }
         return assetType;
