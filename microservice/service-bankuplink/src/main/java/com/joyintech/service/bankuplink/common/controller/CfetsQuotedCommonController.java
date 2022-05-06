@@ -15,9 +15,9 @@ import com.joyintech.background.component.uplink.interbank.common.DictCodeList;
 import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.service.bankuplink.common.dto.CfetsQuotedTradeCommonDto;
@@ -26,21 +26,16 @@ import com.joyintech.service.bankuplink.common.service.CfetsQuotedCommonService;
 import com.joyintech.service.bankuplink.common.service.CfetsQuotedTradeCommonService;
 import com.joyintech.service.bankuplink.ibu.service.IbuComponentReceiveService;
 import com.joyintech.service.bankuplink.repo.dto.CfetsRepoDealQuotedPrice003Dto;
-import com.joyintech.system.base.entity.SysUser;
 import com.joyintech.system.base.entity.SysUserAdd;
+import com.joyintech.tams.common.base.entity.InterfCstpBjfxjg;
 import com.joyintech.tams.invest.common.service.DateCalCommonService;
-
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 /**
  * 银行间上行共通Controller
@@ -499,6 +494,33 @@ public class CfetsQuotedCommonController {
             }});
         service.execute(thread);
 //        thread.start();
+        return resultBaseDto;
+    }
+
+
+    /**
+     * 一级申购下行成交数据
+     * @author jiangpeng
+     * @date 2022/5/6 16:46
+     * @param map
+     * @return com.joyintech.background.component.uplink.interbank.business.dto.ResultBaseDto
+     */
+    @PostMapping("receiveFirstBondCfetsTradeDialogueRequest")
+    public ResultBaseDto receiveFirstBond(@RequestBody Map<String,Object> map) throws Exception {
+        ResultBaseDto resultBaseDto = new ResultBaseDto(true);
+        logger.info("银行间一级申购下行成交处理业务数据线程开启" + map.toString());
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    InterfCstpBjfxjg cfetsQuotedTradeFirstBondDto = (InterfCstpBjfxjg) JsonUtils.map2entity(map, InterfCstpBjfxjg.class);
+                    cfetsQuotedTradeCommonService.insertBidCstpTrade(cfetsQuotedTradeFirstBondDto);
+                } catch (Exception e) {
+                    logger.error("CSTP下行匹配异常：", e);
+                }
+            }
+        });
+        service.execute(thread);
         return resultBaseDto;
     }
     

@@ -79,8 +79,6 @@ public class CfetsTrdBondFirstSub001Controller extends BaseController {
         initPageParams.put("sysDate", iPlatformDate.getSysDateStr());
         // 币种_人民币
         initPageParams.put("CCY_CNY", DictCodeList.币种_人民币_CNY.getValue());
-        //CMDS地址
-        initPageParams.put("cmdsWebSocketUrl", cmdsWebSocketUrl);
         // 系统参数 【是否支持CSTP下行接口_一级申购】
         initPageParams.put("IS_SUPPORT_CSTP_FLAG_BONDFIRST", CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST"));
         // 登记页面id 用于登记撤销

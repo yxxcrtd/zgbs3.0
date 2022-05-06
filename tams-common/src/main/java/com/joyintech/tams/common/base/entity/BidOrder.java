@@ -109,6 +109,11 @@ public class BidOrder extends BaseEntity {
     private String workflowId;
 
     /**
+     * 分配方式
+     */
+    private String dipType;
+
+    /**
      * 数据状态
      */
     private String workflowStatus;
@@ -471,5 +476,13 @@ public class BidOrder extends BaseEntity {
      */
     public void setWorkflowStatus(String workflowStatus) {
         this.workflowStatus = workflowStatus == null ? null : workflowStatus.trim();
+    }
+
+    public String getDipType() {
+        return dipType;
+    }
+
+    public void setDipType(String dipType) {
+        this.dipType = dipType;
     }
 }

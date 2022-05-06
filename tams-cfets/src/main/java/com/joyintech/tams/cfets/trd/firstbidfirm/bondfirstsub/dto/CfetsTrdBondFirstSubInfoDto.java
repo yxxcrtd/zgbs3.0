@@ -84,6 +84,9 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
     @ApiModelProperty(name = "productDtos", value = "申购产品列表")
     private List<CfetsTrdBondFirstSubProductDto> productDtos;
 
+    @ApiModelProperty(name = "entrustDtos", value = "指令列表 addOrDelList接口新增指令时必传")
+    private List<CfetsTrdBondFirstSubEntrustDto> entrustDtos;
+
     @PrimaryKey(PrimaryKey.Field.PK_1)
     @ApiModelProperty(name = "bidId", value = "投标编号,编辑页面/提交用", example = "111")
     private String bidId;
@@ -264,6 +267,14 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
 
     public void setProductDtos(List<CfetsTrdBondFirstSubProductDto> productDtos) {
         this.productDtos = productDtos;
+    }
+
+    public List<CfetsTrdBondFirstSubEntrustDto> getEntrustDtos() {
+        return entrustDtos;
+    }
+
+    public void setEntrustDtos(List<CfetsTrdBondFirstSubEntrustDto> entrustDtos) {
+        this.entrustDtos = entrustDtos;
     }
 
     public String getBidId() {
