@@ -744,9 +744,9 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 					}
 					//多组合指令
 					else {
-						List<EtrExchangeTradeSaveSecRepoRequest> etrExchangeTrade001DtoList = new ArrayList<>();
+						List<EtrExchangeTradeSecRepoSaveRepoRequest> etrExchangeTrade001DtoList = new ArrayList<>();
 						for(EtrExchangeTradePortfolioSecRepoRequest item:dto.getPortfolioList()) {
-							EtrExchangeTradeSaveSecRepoRequest etrExchangeTrade001Dto = etrExchangeTradeSecRepo001Service.genEtrExchangeTradeSaveSecRepoRequest(dto,item);
+							EtrExchangeTradeSecRepoSaveRepoRequest etrExchangeTrade001Dto = etrExchangeTradeRepo001Service.genEtrExchangeTradeSecRepoSaveRepoRequest(dto,item);
 							etrExchangeTrade001Dto.setFinprodType2(DictCodeList.平安资产类型_质押式回购.getValue());
 							if (!StringUtil.isNotEmpty(etrExchangeTrade001Dto.getEntrustId())) {
 								BussinessCodeParameter param = etrExchangeTradeSecRepo001Service.genBussinessCodeParameter(dto);
@@ -859,9 +859,9 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 				dto.setPortfolioId(item.getPortfolioId()); //让指令分发能查出来
 				// ----------add by zhangrui1 20200703 预占功能 start----------
 				if (StringUtil.equals(BussinessConstant.SUBMIT, dto.getOperateType())) {
-					List<EtrExchangeTradeSaveSecRepoRequest> etrExchangeTrade001DtoList = new ArrayList<>();
+					List<EtrExchangeTradeSecRepoSaveRepoRequest> etrExchangeTrade001DtoList = new ArrayList<>();
 					for(EtrExchangeTradePortfolioSecRepoRequest item2:dto.getPortfolioList()) {
-						EtrExchangeTradeSaveSecRepoRequest etrExchangeTrade001Dto = etrExchangeTradeSecRepo001Service.genEtrExchangeTradeSaveSecRepoRequest(dto,item2);
+						EtrExchangeTradeSecRepoSaveRepoRequest etrExchangeTrade001Dto = etrExchangeTradeRepo001Service.genEtrExchangeTradeSecRepoSaveRepoRequest(dto,item2);
 						if (dto.getPs().equals(DictCodeListExt3.交易方向_正回购.getValue())) {
 							etrExchangeTrade001Dto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue());
 						} else if (dto.getPs().equals(DictCodeListExt3.交易方向_逆回购.getValue())) {
@@ -921,9 +921,9 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 			}
 			//多组合指令
 			else {
-				List<EtrExchangeTradeSaveSecRepoRequest> etrExchangeTrade001DtoList = new ArrayList<>();
+				List<EtrExchangeTradeSecRepoSaveRepoRequest> etrExchangeTrade001DtoList = new ArrayList<>();
 				for(EtrExchangeTradePortfolioSecRepoRequest item:dto.getPortfolioList()) {
-					EtrExchangeTradeSaveSecRepoRequest etrExchangeTrade001Dto = etrExchangeTradeSecRepo001Service.genEtrExchangeTradeSaveSecRepoRequest(dto,item);
+					EtrExchangeTradeSecRepoSaveRepoRequest etrExchangeTrade001Dto = etrExchangeTradeRepo001Service.genEtrExchangeTradeSecRepoSaveRepoRequest(dto,item);
 					if (dto.getPs().equals(DictCodeListExt3.交易方向_正回购.getValue())) {
 						etrExchangeTrade001Dto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue());
 					} else if (dto.getPs().equals(DictCodeListExt3.交易方向_逆回购.getValue())) {

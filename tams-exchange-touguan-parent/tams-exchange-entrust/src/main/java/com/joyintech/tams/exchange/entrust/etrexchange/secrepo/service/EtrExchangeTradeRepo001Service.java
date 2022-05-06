@@ -16,11 +16,12 @@ import com.joyintech.background.component.order.exchange.common.dto.EtrParameter
 import com.joyintech.background.component.order.exchange.common.dto.EtrSinglePortfolioDto;
 import com.joyintech.background.component.order.exchange.common.service.impl.EtrComponentFactory;
 import com.joyintech.framework.ajax.MessageType;
-import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.entity.ProcessMark;
+import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.SpringContextUtil;
@@ -52,6 +53,7 @@ import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.entrust.etrexchange.position.service.PositionRequestServiceEtrExchangeTradeSaveSecRepoRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dao.EtrExchangeTradeSecRepoMapper;
+import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradePortfolioSecRepoRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradeSecRepoSaveRepoRequest;
 import com.joyintech.tams.invest.common.component.base.entrust.BaseEtrInvestInfoService;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
@@ -85,7 +87,7 @@ import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_新建;
  * @since 1.0
  */
 @Service("etrExchangeTradeRepo001Service")
-public class EtrExchangeTradeRepo001Service extends BaseService implements BaseProcessService<EtrExchangeTradeSecRepoSaveRepoRequest> {
+public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExchangeTradeSecRepoSaveRepoRequest> implements BaseProcessService<EtrExchangeTradeSecRepoSaveRepoRequest> {
 
     @Autowired
     private IPlatformDate iPlatformDate;
@@ -474,6 +476,26 @@ public class EtrExchangeTradeRepo001Service extends BaseService implements BaseP
             positionRequestService.sendDelete(entity);
         }
         //增加调用头寸引擎代码end
+    }
+
+    public EtrExchangeTradeSecRepoSaveRepoRequest genEtrExchangeTradeSecRepoSaveRepoRequest(EtrExchangeTradeSecRepoSaveRepoRequest dto, EtrExchangeTradePortfolioSecRepoRequest multiPtl001Dto) {
+        EtrExchangeTradeSecRepoSaveRepoRequest etrExchangeTrade001Dto = new EtrExchangeTradeSecRepoSaveRepoRequest();
+        BeanUtil.copyPropertiesIgnoreNull(etrExchangeTrade001Dto, dto);
+        etrExchangeTrade001Dto.setPortfolioId(multiPtl001Dto.getPortfolioId());
+        etrExchangeTrade001Dto.setAcctNo(multiPtl001Dto.getAcctNo());
+        etrExchangeTrade001Dto.setSecAcctId(multiPtl001Dto.getSecAcctId());
+        etrExchangeTrade001Dto.setEntrustAmt(multiPtl001Dto.getEntrustAmt());
+        etrExchangeTrade001Dto.setEntrustNum(multiPtl001Dto.getEntrustNum());
+        etrExchangeTrade001Dto.setAccAvailableCash(multiPtl001Dto.getAccAvailableCash());
+        etrExchangeTrade001Dto.setAccAvailablePos(multiPtl001Dto.getAccAvailablePos());
+        etrExchangeTrade001Dto.setTargetType(dto.getTargetType());
+        etrExchangeTrade001Dto.setMdate(DateUtil.parse(DateUtil.format(dto.getEntrustDate(), DateUtil.DEFAULT_DATE_FORMAT_EN)));
+        etrExchangeTrade001Dto.setVdate(DateUtil.parse(DateUtil.format(dto.getEntrustDate(), DateUtil.DEFAULT_DATE_FORMAT_EN)));
+        etrExchangeTrade001Dto.setStockId(dto.getStockId());
+        etrExchangeTrade001Dto.setEntrustDate(DateUtil.parse(DateUtil.format(dto.getEntrustDate(), DateUtil.DEFAULT_DATE_FORMAT_EN)));
+        etrExchangeTrade001Dto.setOptType(dto.getOptType());
+
+        return etrExchangeTrade001Dto;
     }
 
 }

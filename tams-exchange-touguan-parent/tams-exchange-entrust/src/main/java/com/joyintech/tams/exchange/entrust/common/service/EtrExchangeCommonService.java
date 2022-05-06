@@ -20,6 +20,7 @@ import com.joyintech.tams.component.business.common.service.DateCalService;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepTrade001Dto;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeTradeSaveRequest;
+import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradeSaveSecRepoRequest;
 import com.joyintech.tams.invest.common.component.base.group.BasePtlSecPositionInfoService;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
@@ -912,6 +913,34 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
             }
 
         }
+        if (object instanceof EtrExchangeTradeSaveSecRepoRequest){
+            EtrExchangeTradeSaveSecRepoRequest inputDto = (EtrExchangeTradeSaveSecRepoRequest) object;
+            // 债券指令
+            if (inputDto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue())
+                    && (StringUtil.equals(DictCodeList.交易方向_买入.getValue(),inputDto.getPs()))){
+                creditLinesInputDto = new CreditLinesInputDto();
+                creditLinesInputDto.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
+                creditLinesInputDto.setTradeId(inputDto.getEntrustId());
+                creditLinesInputDto.setFinprodId(inputDto.getFinprodId());
+                creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+                creditLinesInputDto.setTradeDate(inputDto.getVdate());
+                creditLinesInputDto.setTradeStatus(status);
+                creditLinesInputDto.setPs(DictCodeList.交易方向_买入.getValue());
+                creditLinesInputDto.setCounterId(inputDto.getCounterId());
+                creditLinesInputDto.setShareAmt(inputDto.getEntrustNum());
+                //最新面值
+                BigDecimal newFaceValue = creditLinesDealsMapper.getFaceValue(creditLinesInputDto);
+                if (newFaceValue == null){
+                    newFaceValue = new BigDecimal(100);
+                }
+                if (creditLinesInputDto.getShareAmt() != null) {
+                    creditLinesInputDto.setTradeAmt(newFaceValue.multiply(creditLinesInputDto.getShareAmt()));
+                }else {
+                    creditLinesInputDto.setTradeAmt(inputDto.getEntrustAmt());
+                }
+            }
+        }
+
         // 校验是否需要调用接口
         boolean isCallCreditInterf = checkCallCreditInterf(creditLinesInputDto,status,method);
         if (isCallCreditInterf){

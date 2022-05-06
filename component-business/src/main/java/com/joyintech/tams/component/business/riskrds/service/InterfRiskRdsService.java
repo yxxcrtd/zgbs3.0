@@ -2970,7 +2970,8 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
         else if(StringUtil.equals(DictCodeList.平安资产类型_质押式回购.getValue(),v.getAssetType())
                 && (StringUtil.isNotEmpty(dataMap.get("isEnabled")) && StringUtil.equals(dataMap.get("isEnabled"),"01"))
                 && (StringUtil.isNotEmpty(dataMap.get("finprodType2")) && (StringUtil.equals(dataMap.get("finprodType2"),DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())
-                || StringUtil.equals(dataMap.get("finprodType2"),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())))
+                || StringUtil.equals(dataMap.get("finprodType2"),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
+                || StringUtil.equals(dataMap.get("finprodType2"),"ZYSHG")))
                 &&StringUtil.isNotEmpty(dataMap.get("bussTrdTransfenpeiDto"))){
             ((List)dataMap.get("bussTrdTransfenpeiDto")).forEach(en->{
                 Map<String, Object> dataReMap=new HashMap<>();
