@@ -24,13 +24,15 @@
         SELECT  * from (
             SELECT
             CASE WHEN <![CDATA[
-                ISSUE.ISSUE_DATE >= TO_DATE(#{platformDate},'YYYY-MM-DD')  or
-                PRODUCT_ADD.BID_DATE >= TO_DATE(#{platformDate},'YYYY-MM-DD')  THEN '01'
+            ISSUE.ISSUE_DATE >= TO_DATE(#{platformDate},'YYYY-MM-DD') or
+            ISSUE.TENDER_EDATE >= TO_DATE(#{platformDate},'YYYY-MM-DD')  THEN '01'
+            WHEN ((ISSUE.ISSUE_DATE < TO_DATE(#{platformDate},'YYYY-MM-DD') or
+            ISSUE.TENDER_EDATE < TO_DATE(#{platformDate},'YYYY-MM-DD')) and PRODUCT.CIRCULATION_CODE is null) or
+            (PRODUCT.CIRCULATION_CODE is not null and PRODUCT_ADD.LISTING_DATE <TO_DATE(#{platformDate},'YYYY-MM-DD')) THEN '02'
             WHEN (ISSUE.ISSUE_DATE < TO_DATE(#{platformDate},'YYYY-MM-DD') or
-                PRODUCT_ADD.BID_DATE < TO_DATE(#{platformDate},'YYYY-MM-DD')) and PRODUCT.CIRCULATION_CODE is null THEN '02'
-            WHEN (ISSUE.ISSUE_DATE < TO_DATE(#{platformDate},'YYYY-MM-DD') or
-                PRODUCT_ADD.BID_DATE < TO_DATE(#{platformDate},'YYYY-MM-DD')) and PRODUCT.CIRCULATION_CODE is not null THEN '03'
-                ]]>
+            ISSUE.TENDER_EDATE < TO_DATE(#{platformDate},'YYYY-MM-DD')) and PRODUCT.CIRCULATION_CODE is not null
+            and  PRODUCT_ADD.LISTING_DATE >= TO_DATE(#{platformDate},'YYYY-MM-DD') THEN '03'
+            ]]>
             ELSE NULL END AS issueStage,
             PRODUCT_ADD.ISSUE_STATUS as issueStatus,
             PRODUCT.FINPROD_MARKET_ID as finprodMarketId,
