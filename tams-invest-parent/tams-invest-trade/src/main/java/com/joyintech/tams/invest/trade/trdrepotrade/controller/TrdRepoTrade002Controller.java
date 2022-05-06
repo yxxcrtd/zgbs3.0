@@ -588,6 +588,13 @@ public class TrdRepoTrade002Controller extends BaseController {
             err.setMessage(this.getMessage("TRD_E_0019"), MessageType.错误消息);
             return err;
 		}
+		// TISHKS-672:CLONE - 【交易管理】【场内交易】【场内质押式回购交易】新建页面，必填字段没有必填校验 start
+		if (null == dto.getVpayDate() || null == dto.getMpayDate()) {
+            AjaxResult err= new AjaxResult();
+            err.setMessage(this.getMessage("TRD_E_0021"), MessageType.错误消息);
+            return err;
+        }
+        // TISHKS-672:CLONE - 【交易管理】【场内交易】【场内质押式回购交易】新建页面，必填字段没有必填校验 end
         // 到期日如果是节假日 要提醒
         confirmMsg += trdRepoTrade002Service.checkConfirm(dto, result);
 //        if (result != null && result.hasErrors()) {
