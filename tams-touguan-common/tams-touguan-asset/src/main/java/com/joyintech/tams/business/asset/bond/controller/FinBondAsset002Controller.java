@@ -127,7 +127,7 @@ public class FinBondAsset002Controller extends BaseController{
        initPageParams.put("BASIS", this.getSelectDataFromDataDic(DictCode.计息基础, null));
        initPageParams.put("EXEC_TYPE", this.getSelectDataFromDataDic(DictCode.行权状态, null));
        initPageParams.put("EXEC_MODE", this.getSelectDataFromDataDic(DictCode.行权方式, null));
-       initPageParams.put("ISSUE_CLASS", this.getSelectDataFromDataDic(DictCode.发行方式, null));
+       initPageParams.put("ISSUE_CLASS", this.getSelectDataFromDataDic(DictCode.新债_发行方式, null));
        initPageParams.put("TENDER_TYPE", this.getSelectDataFromDataDic(DictCode.招标方式, null));
        initPageParams.put("ISSUE_STYLE", this.getSelectDataFromDataDic(DictCode.发行类型, null));
        initPageParams.put("SECRATE_DATA", this.getSelectDataFromDataDic(DictCode.利率行情, null));
@@ -731,6 +731,7 @@ public class FinBondAsset002Controller extends BaseController{
                 return new Message<SysUploadFileInfo>().success().setData(fileInfo);
             }
         }catch (Exception e){
+            e.printStackTrace();
             return new Message<SysUploadFileInfo>().fail().setMessage("文件上传异常");
         }
         return null;

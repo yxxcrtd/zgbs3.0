@@ -1,6 +1,7 @@
 package com.joyintech.tams.business.asset.bond.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.export.paginator.domain.ITableRow;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.tams.common.base.entity.FinCashCalcRule;
@@ -24,6 +25,7 @@ import java.util.List;
  * @see FinAssetRateAdjResponse
  * @since 1.0
  */
+@PageId("FinBondAsset003")
 @ApiModel(value="利率调整信息查询返回参数",description="利率调整信息查询返回参数")
 public class FinAssetRateAdjResponse  extends FinCashCalcRule implements ITableRow, ProcessEntity {
 
@@ -161,7 +163,7 @@ public class FinAssetRateAdjResponse  extends FinCashCalcRule implements ITableR
         this.isInitial = isInitial;
     }
 
-    @PrimaryKey(Field.PK_1)
+    @PrimaryKey(PrimaryKey.Field.PK_1)
     public String getFinprodId() {
         return finprodId;
     }

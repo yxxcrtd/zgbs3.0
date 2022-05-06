@@ -26,6 +26,7 @@ import com.joyintech.tams.business.asset.bond.dto.FinAssetRateAdjResponse;
 import com.joyintech.tams.business.asset.bond.service.FinAssetRateAdjValidatorService;
 import com.joyintech.tams.business.asset.bond.service.FinBondAsset002Service;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
@@ -201,32 +202,22 @@ public class FinBondAsset003Controller extends BaseController{
             return Message.fail("保存错误",new AjaxResult(br));
         }
         WorkFlowParameter<FinAssetRateAdjResponse> params = new WorkFlowParameter<FinAssetRateAdjResponse>();
-        params.setPageId(this.getPageId());
+        params.setPageId("FinBondAsset003");
         params.setElementId(dto.getElementId());
         params.setBusinessCode(FinAssetRateAdjResponse::getFinprodId);
-        if(StringUtil.equals(dto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_存款.getValue())){
-            params.setBusinessType(DictCodeList.共通业务类型_存款类资产利率调整.getValue());
-        }else if(StringUtil.equals(dto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
-            params.setBusinessType(DictCodeList.共通业务类型_债券类资产利率调整.getValue());
-        }else if(StringUtil.equals(dto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue())){
-            params.setBusinessType(DictCodeList.共通业务类型_计划类资产利率调整.getValue());
-        }else if(StringUtil.equals(dto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_项目类资产.getValue())){
-            params.setBusinessType(DictCodeList.共通业务类型_项目类利率调整.getValue());
-        }else if(StringUtil.equals(dto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_通道.getValue())){
-            params.setBusinessType(DictCodeList.共通业务类型_通道利率调整.getValue());
-        }
+        params.setBusinessType(DictCodeList.共通业务类型_债券类资产利率调整.getValue());
         // 设置流程业务说明
         params.setComment(entity -> {
             return WorkFlowUtil.concatComment(getMessage("FinAssetRateAdj001.finprodId")+
                 GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodMarketId()+GlobalConstant.CLOSE_PARENTHESIS,
-                getMessage("FinAssetRateAdj001.finprodName")+GlobalConstant.OPEN_PARENTHESIS+
-                entity.getFinprodName()+GlobalConstant.CLOSE_PARENTHESIS);
+                getMessage("FinAssetRateAdj001.finprodName")+GlobalConstant.OPEN_PARENTHESIS);
         });
         // 给参数变成ProcessParameter而非WorkFlowParameter
         ProcessParameter<FinAssetRateAdjResponse> parameter = new ProcessParameter<FinAssetRateAdjResponse>();
+        parameter.setOperationType(OperationType.NEW);
         parameter.setWorkFlowParameter(params);
         // 系统页面表IS_NEED_WORKFLOW 是否走流程，01-是，02-否
         String msg = finBondAsset002Service.start(parameter, dto);
-        return Message.fail(msg,new AjaxResult(msg));
+        return Message.success(msg,new AjaxResult(msg));
     }
 }
