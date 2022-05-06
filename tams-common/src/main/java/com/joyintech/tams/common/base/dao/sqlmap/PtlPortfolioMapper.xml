@@ -269,4 +269,10 @@
             #{item}
         </foreach>
     </select>
+
+    <select id="selectAllPortfolio" resultMap="BaseResultMap">
+        select
+        <include refid="com.joyintech.tams.common.base.dao.PtlPortfolioMapper.Base_Column_List" />
+        from PTL_PORTFOLIO
+    </select>
 </mapper>

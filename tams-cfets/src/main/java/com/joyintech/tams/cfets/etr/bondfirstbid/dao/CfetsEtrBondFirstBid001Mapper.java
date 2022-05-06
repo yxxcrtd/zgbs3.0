@@ -12,6 +12,11 @@ package com.joyintech.tams.cfets.etr.bondfirstbid.dao;
 
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIssueInfoDto;
+import com.joyintech.tams.common.base.entity.EtrEntrust;
+import com.joyintech.tams.common.base.entity.EtrEntrustAdd;
+import com.joyintech.tams.common.base.entity.EtrEntrustBidPrice;
+import com.joyintech.tams.common.base.entity.EtrEntrustDetail;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -43,4 +48,32 @@ public interface CfetsEtrBondFirstBid001Mapper {
      * @return
      */
     List<CfetsEtrIBondFirstBidFindIssueInfoDto> findIssueInfoPage(Map<String, Object> pageParam);
+
+    /**
+     * 查询指令明细信息
+     * @param entrustId
+     * @return
+     */
+    List<EtrEntrustBidPrice> selectBidPriceById(@Param("entrustId") String entrustId);
+
+    /**
+     * 查询指令标位信息
+     * @param entrustId
+     * @return
+     */
+    List<EtrEntrustDetail> selectEntrustDetailById(@Param("entrustId") String entrustId);
+
+    /**
+     * 查询指令信息
+     * @param entrustId
+     * @return
+     */
+    EtrEntrust selectEntrustById(@Param("entrustId") String entrustId);
+
+    /**
+     * 查询指令附属表信息
+     * @param entrustId
+     * @return
+     */
+    EtrEntrustAdd selectEntrustAddById(@Param("entrustId")String entrustId);
 }

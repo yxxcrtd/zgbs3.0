@@ -114,7 +114,7 @@ public interface CfetsEtrIbBondinfoMapper {
 
     Map queryPositionByEtrInfo(Map RequestDto);
 
-    PtlPortfolio findPtlInfo(String portfolioId);
+    PtlPortfolio findPtlInfo(@Param("portfolioId") String portfolioId);
     String getIsHoliday(@Param("cdate") Date cdate,@Param("calendarId") String calendarId);
 
     List<CfetsBussCombDistribtBaseDto> queryCfetsBussCombDisList(Map pageParam);

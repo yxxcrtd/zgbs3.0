@@ -15,6 +15,8 @@ import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.EtrCommonFinProductInfoService;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbdoRiskcalRequest;
+import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
+import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBid002Dto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoRequest;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIssueInfoDto;
@@ -36,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -231,6 +234,36 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
     @PostMapping("doRiskcal")
     public Message<AjaxResult> doRiskcal(@RequestBody CfetsEtrIbdoRiskcalRequest dto) throws Exception {
         AjaxResult ajaxResult = new AjaxResult();
+        CfetsEtribdoRiskcalResponse result=new CfetsEtribdoRiskcalResponse();
+
+        result.setStdrtninfo("处理成功");
+        result.setRiskTrialSpan("试算通过");
+        result.setRiskMathFlag("02");
+        List<CfetsEtribdoRiskcalResponse> resultlist=new ArrayList<>();
+        CfetsEtribdoRiskcalResponse list1 = new CfetsEtribdoRiskcalResponse();
+        list1.setKriCode("72ed1f74da2c4e23bb7ad4a2bc0b04f3");
+        list1.setPortfolioCode("1221yq");
+        list1.setPortfolioName("1221yq预期简称");
+        list1.setKriCode("流动性管理类");
+        list1.setAssetName("08国债02");
+        list1.setForbiddenLn("<5%");
+        list1.setWarningLine("");
+        list1.setApproveLine("");
+        list1.setKriValue("0%");
+        list1.setOldValue("0%");
+        list1.setKriTrend("不变");
+        list1.setKriStatus("3");
+        list1.setKriStatusCn("违规");
+        list1.setKriName("每只现金管理类产品持有不低于该产品资产净值5%的现金、国债、中央银行票据、政策性金融债券");
+        list1.setGroupId("0");
+        list1.setKriType("LIMIT_FLUID");
+        list1.setKriExpr("((0-100000.0)+100000)/100000000");
+        list1.setKriOldExpr("(0+0)/100000000");
+
+        resultlist.add(list1);
+        result.setRiskcalReturnList(resultlist);
+
+        ajaxResult.setData(result);
         return new Message<AjaxResult>().success().setData(ajaxResult);
     }
 
@@ -261,10 +294,27 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
             CfetsEtrFinProductInfoRequest dto = new CfetsEtrFinProductInfoRequest();
             dto.setFinprodId(finprodId);
             CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoService.findFinProductInfo(null, null, dto);
+            if (finProductInfo == null) {
+                finProductInfo = new CfetsEtrFinProductInfoResponse();
+                finProductInfo.setTitle("标的信息未维护");
+            }
             return new Message<>(finProductInfo).success().setData(finProductInfo);
         } catch (Exception e) {
             logger.error("查询功能异常", e);
             return new Message<CfetsEtrFinProductInfoResponse>().fail().setMessage("查询异常");
+        }
+    }
+
+    @PostMapping("/getEtrEntrustInfo/{entrustId:.+}")
+    @ApiOperation(value = "指令信息查看查询", notes = "根据指令代码查询指令新建信息查看界面")
+    @ResponseBody
+    public Message<CfetsEtrBondFirstBid002Dto> getEtrEntrustInfo(@PathVariable String entrustId) {
+        try {
+            CfetsEtrBondFirstBid002Dto dto = cfetsEtrBondFirstBid001Service.getEtrEntrustInfo(entrustId);
+            return new Message<CfetsEtrBondFirstBid002Dto>().success().setData(dto);
+        } catch (Exception e) {
+            logger.error("查询功能异常", e);
+            return new Message<CfetsEtrBondFirstBid002Dto>().fail().setMessage("查询异常");
         }
     }
 
