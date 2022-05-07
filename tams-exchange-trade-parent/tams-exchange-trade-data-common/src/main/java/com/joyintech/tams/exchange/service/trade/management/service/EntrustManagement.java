@@ -223,6 +223,19 @@ public class EntrustManagement extends BaseService {
             entrust = integratedEntrustService.findById(entrustId);
         }
         if (Objects.nonNull(entrust)) {
+            if (EntrustUtils.isNoTrade(entrust.getEntrustProp())) {
+                // 上交所 【转股、配债、配股、申购】不可撤，【回售】可撤
+                // 深交所 【申购】不可撤，【转股、配债、配股、回售】可撤
+                if (!((EntrustProp.CHANGE_TO_STOCK.value.equals(entrust.getEntrustProp())
+                        || EntrustProp.ALLOTMENT.value.equals(entrust.getEntrustProp())
+                        || EntrustProp.PS.value.equals(entrust.getEntrustProp()))
+                        && Market.SZSE.value.equals(entrust.getMarket()))
+                        && !EntrustProp.HS.value.equals(entrust.getEntrustProp())) {
+                    logger.error("该类业务不可撤单：entrustProp={}", entrust.getEntrustProp());
+                    return new ResultBean(ErrorCode.CANCEL_ENTRUST_BUSI_ERROR);
+                }
+            }
+
             if (EntrustUtils.hasNoCancelEntrust(entrust.getEntrustStatus())) {
                 logger.info("entrust entrustStatus is {} ,no cancelEntrust", entrust.getEntrustStatus());
                 return new ResultBean(ErrorCode.CANCEL_ENTRUST_STATUS_ERROR);
@@ -649,9 +662,9 @@ public class EntrustManagement extends BaseService {
     /**
      * 查询配股申购等代码
      *
-     * @param entrustProp   委托属性
-     * @param instruction   指令
-     * @return  申报等代码
+     * @param entrustProp 委托属性
+     * @param instruction 指令
+     * @return 申报等代码
      */
     public String getOthCodeFromInvestment(@NotBlank String entrustProp, @NotNull Instruction instruction) {
         String othCode = instruction.getFinprodMarketId();
