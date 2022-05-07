@@ -43,7 +43,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.joyintech.tams.exchange.common.constant.EntrustProp.*;
-import static com.joyintech.tams.exchange.common.constant.EntrustProp.ETF_APPLY;
 import static com.joyintech.tams.exchange.common.constant.OthCodeType.*;
 
 @Component
@@ -223,17 +222,9 @@ public class EntrustManagement extends BaseService {
             entrust = integratedEntrustService.findById(entrustId);
         }
         if (Objects.nonNull(entrust)) {
-            if (EntrustUtils.isNoTrade(entrust.getEntrustProp())) {
-                // 上交所 【转股、配债、配股、申购】不可撤，【回售】可撤
-                // 深交所 【申购】不可撤，【转股、配债、配股、回售】可撤
-                if (!((EntrustProp.CHANGE_TO_STOCK.value.equals(entrust.getEntrustProp())
-                        || EntrustProp.ALLOTMENT.value.equals(entrust.getEntrustProp())
-                        || EntrustProp.PS.value.equals(entrust.getEntrustProp()))
-                        && Market.SZSE.value.equals(entrust.getMarket()))
-                        && !EntrustProp.HS.value.equals(entrust.getEntrustProp())) {
-                    logger.error("该类业务不可撤单：entrustProp={}", entrust.getEntrustProp());
-                    return new ResultBean(ErrorCode.CANCEL_ENTRUST_BUSI_ERROR);
-                }
+            if (!canCancelEntrust(entrust)) {
+                logger.error("该类业务不可撤单：entrustProp={}，market={}", entrust.getEntrustProp(), entrust.getMarket());
+                return new ResultBean(ErrorCode.CANCEL_ENTRUST_BUSI_ERROR);
             }
 
             if (EntrustUtils.hasNoCancelEntrust(entrust.getEntrustStatus())) {
@@ -246,6 +237,41 @@ public class EntrustManagement extends BaseService {
             return new ResultBean(ErrorCode.SUCCESS);
         }
         return new ResultBean(ErrorCode.REQ_PARAMETER_ERROR);
+    }
+
+    /**
+     * 债回售：委托当日，允许撤单；
+     * 网上申购：委托申报确认不允许撤单；
+     * 配股：上交所委托申报确认后，不允许撤单；深交所委托申报确认后，允许撤单；
+     * 配债：上交所委托申报确认后，不允许撤单；深交所委托申报确认后，允许撤单；
+     * 债转股：上交所未经交易所确认的委托可以撤单，已确认委托不允许撤单；深交所当日均可以撤单；
+     */
+    private boolean canCancelEntrust(EntrustInterface entrust) {
+        final String entrustProp = entrust.getEntrustProp();
+        if (EntrustUtils.isNoTrade(entrustProp)) {
+            //债回售：委托当日，允许撤单；
+            if (EntrustProp.HS.value.equals(entrustProp)) {
+                return true;
+            }
+            //网上申购：委托申报确认不允许撤单；
+            if (EntrustProp.APPLY.value.equals(entrustProp)) {
+                return false;
+            }
+            //配股：上交所委托申报确认后，不允许撤单；深交所委托申报确认后，允许撤单；
+            //配债：上交所委托申报确认后，不允许撤单；深交所委托申报确认后，允许撤单；
+            //债转股：上交所未经交易所确认的委托可以撤单，已确认委托不允许撤单；深交所当日均可以撤单；
+            if (EntrustProp.CHANGE_TO_STOCK.value.equals(entrustProp)
+                    || EntrustProp.ALLOTMENT.value.equals(entrustProp)
+                    || EntrustProp.PS.value.equals(entrustProp)) {
+                if (Market.SZSE.value.equals(entrust.getMarket())) {
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public ResultBean cancelExceptionEntrust(String userId, String userName, String entrustId) {
