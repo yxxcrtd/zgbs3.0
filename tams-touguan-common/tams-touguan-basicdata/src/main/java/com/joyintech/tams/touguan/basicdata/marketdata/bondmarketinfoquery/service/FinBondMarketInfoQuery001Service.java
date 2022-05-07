@@ -82,14 +82,16 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         if (Objects.isNull(finListedBondInfoQuery001Dto)) {
             finListedBondInfoQuery001Dto = finListedBondInfoQuery001Service.queryFinWindMarketForCoupons(request);
         }
-        //付息计划信息
-        HashMap<String, Object> map = new HashMap<>(2);
-        map.put("secId", secId);
-        List<FinBondMarketCashPlanDto> finBondMarketCashPlanDtos = finBondMarketInfoQueryMapper.queryFinBondMarketCashPlan(map);
-        finListedBondInfoQuery001Dto.setBondMarketCashPlanDtos(finBondMarketCashPlanDtos);
-        //行权计划信息
-        List<FinBondPayHSrcSecOptionDto> finBondPayHSrcSecOptionDtos = finBondMarketInfoQueryMapper.queryFinBondPayHSrcSecOption(map);
-        finListedBondInfoQuery001Dto.setBondPayHSrcSecOptionDtos(finBondPayHSrcSecOptionDtos);
+        if(Objects.nonNull(finListedBondInfoQuery001Dto)){
+            //付息计划信息
+            HashMap<String, Object> map = new HashMap<>(2);
+            map.put("secId", secId);
+            List<FinBondMarketCashPlanDto> finBondMarketCashPlanDtos = finBondMarketInfoQueryMapper.queryFinBondMarketCashPlan(map);
+            finListedBondInfoQuery001Dto.setBondMarketCashPlanDtos(finBondMarketCashPlanDtos);
+            //行权计划信息
+            List<FinBondPayHSrcSecOptionDto> finBondPayHSrcSecOptionDtos = finBondMarketInfoQueryMapper.queryFinBondPayHSrcSecOption(map);
+            finListedBondInfoQuery001Dto.setBondPayHSrcSecOptionDtos(finBondPayHSrcSecOptionDtos);
+        }
         return finListedBondInfoQuery001Dto;
     }
 

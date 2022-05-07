@@ -1,17 +1,20 @@
 package com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.controller;
 
+import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoDetailQueryDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinBondMarketInfoQueryRequest;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.service.FinBondMarketInfoQuery001Service;
+import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.dto.FinListedBondInfoQuery001Dto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +22,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -85,7 +90,16 @@ public class FinBondMarketInfoQuery001Controller extends BaseController {
     @ResponseBody
     @PostMapping("/detailInfo")
     @ApiOperation(value = "债券市场信息查看", notes = "债券市场信息查看")
-    public Message<FinBondMarketInfoDetailQueryDto> detailInfo(@RequestParam("secId") String secId) {
-        return Message.success("success", finBondMarketInfoQuery001Service.detailInfo(secId));
+    public Message<AjaxResult> detailInfo(@RequestParam("secId") String secId) {
+        AjaxResult ar = new AjaxResult();
+        FinListedBondInfoQuery001Dto dto = finBondMarketInfoQuery001Service.detailInfo(secId);
+        if (StringUtil.isNotEmpty(dto)) {
+            ar.setData(dto);
+        } else {
+            List<ValidMessage> errList = new ArrayList<>();
+            errList.add(new ValidMessage("资产代码不存在."));
+            ar.setData(errList);
+        }
+        return new Message<AjaxResult>().success().setData(ar);
     }
 }
