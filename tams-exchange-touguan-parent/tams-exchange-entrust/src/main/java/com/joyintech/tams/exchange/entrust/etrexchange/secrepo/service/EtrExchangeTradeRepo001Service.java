@@ -70,6 +70,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -332,6 +333,7 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
     public void doUpdate(EtrExchangeTradeSecRepoSaveRepoRequest entity) {
         // nothing to do just for aspect
         Map<String, Object> map = new HashMap<>();
+        calcAmt(entity);
         // 新增交易对手席位
         if (StringUtil.isNotEmpty(entity.getCounterId()) && StringUtil.isNotEmpty(entity.getSeatId())) {
             map.put("counterId", entity.getCounterId());
@@ -415,6 +417,17 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
         }
     }
 
+    private void calcAmt(EtrExchangeTradeSecRepoSaveRepoRequest entity) {
+        entity.setPrice(entity.getRepoRate());
+        entity.setEntrustAmt(ArithmeticUtil.multiply(entity.getRepoAmt(),new BigDecimal(10000)));
+        entity.setEntrustNum(ArithmeticUtil.divide(entity.getEntrustAmt(),new BigDecimal(100),2, RoundingMode.HALF_UP));
+        for (EtrExchangeTradePortfolioSecRepoRequest item : entity.getPortfolioList()) {
+            item.setPrice(item.getRepoRate());
+            item.setEntrustAmt(ArithmeticUtil.multiply(item.getRepoAmt(),new BigDecimal(10000)));
+            item.setEntrustNum(ArithmeticUtil.divide(item.getEntrustAmt(),new BigDecimal(100),2, RoundingMode.HALF_UP));
+        }
+    }
+
     /**
      * 流程判断
      */
@@ -448,6 +461,7 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
         if ("save".equals(entity.getOperateType())) {
             return;
         }
+        calcAmt(entity);
         //退回的移到备份表
         etrExchangeTradeSecRepo001Service.doInsertBackupQuery(entity);
 
