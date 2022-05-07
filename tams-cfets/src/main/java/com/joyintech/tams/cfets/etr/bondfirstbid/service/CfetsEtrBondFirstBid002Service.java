@@ -384,13 +384,14 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             etrEntrust.setEntrustAmt(null);
             etrEntrust.setEntrustNum(dto.getTotalBiddingNum().divide(new BigDecimal(100)));
             etrEntrust.setPs(DictCodeList.交易方向_买入.getValue());
-
+            //委托附属表
+            EtrEntrustAdd etrEntrustAdd = new EtrEntrustAdd();
             if (StringUtil.equals(dto.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
-                EtrEntrustAdd etrEntrustAdd = new EtrEntrustAdd();
-                etrEntrustAdd.setEntrustId(dto.getEntrustId());
                 etrEntrustAdd.setSecAcctId(dto.getSecAcctId());
-                entity.setEtrEntrustAdd(etrEntrustAdd);
             }
+            etrEntrustAdd.setEntrustId(dto.getEntrustId());
+            etrEntrustAdd.setAssetType(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+            entity.setEtrEntrustAdd(etrEntrustAdd);
 
             //委托投标标位表
             List<EtrEntrustBidPrice> bidPriceList = new ArrayList<>();
@@ -456,12 +457,14 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 etrEntrust.setEntrustDate(iPlatformDate.getSysDate());
             }
 
+            //委托附属表
             EtrEntrustAdd etrEntrustAdd = new EtrEntrustAdd();
             if (StringUtil.equals(dto.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
                 etrEntrustAdd.setSecAcctId(dto.getSecAcctId());
-                etrEntrustAdd.setEntrustId(dto.getEntrustId());
-                entity.setEtrEntrustAdd(etrEntrustAdd);
             }
+            etrEntrustAdd.setEntrustId(dto.getEntrustId());
+            etrEntrustAdd.setAssetType(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+            entity.setEtrEntrustAdd(etrEntrustAdd);
             //指令下达时间
             if (StringUtil.isNotEmpty(dto.getTransmitTime())) {
                 etrEntrustAdd.setTransmitTime(dto.getTransmitTime());
