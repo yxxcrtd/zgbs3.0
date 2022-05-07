@@ -21,6 +21,7 @@ import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.service.bankuplink.common.dto.CfetsQuotedTradeCommonDto;
+import com.joyintech.service.bankuplink.common.dto.CfetsQuotedTradeFirstBondDto;
 import com.joyintech.service.bankuplink.common.framework.thread.JoyinThreadPoolExecutor;
 import com.joyintech.service.bankuplink.common.service.CfetsQuotedCommonService;
 import com.joyintech.service.bankuplink.common.service.CfetsQuotedTradeCommonService;
@@ -513,7 +514,7 @@ public class CfetsQuotedCommonController {
             @Override
             public void run() {
                 try {
-                    InterfCstpBjfxjg cfetsQuotedTradeFirstBondDto = (InterfCstpBjfxjg) JsonUtils.map2entity(map, InterfCstpBjfxjg.class);
+                    CfetsQuotedTradeFirstBondDto cfetsQuotedTradeFirstBondDto = (CfetsQuotedTradeFirstBondDto) JsonUtils.map2entity(map, CfetsQuotedTradeFirstBondDto.class);
                     cfetsQuotedTradeCommonService.insertBidCstpTrade(cfetsQuotedTradeFirstBondDto);
                 } catch (Exception e) {
                     logger.error("CSTP下行匹配异常：", e);

@@ -123,15 +123,18 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
         //刷新时间
         model.addAttribute("ibuQuoteBondFirst_etrTable_refresh_period", CacheUtil.getSysParam("ibuQuoteBond_etrTable_refresh_period"));
         model.addAttribute("effDate", CacheUtil.getSysParam("ibuVar_quoteEffTime"));
-        CfetsTrdBondFirstSubInfoDto cfetsTrdBondFirstSubInfoDto = new CfetsTrdBondFirstSubInfoDto();
-        if (StringUtil.equals(this.getParam("workflowStatus"), BussinessDictCodeList.交易流程状态_流程中.getValue())
-                || (!WorkFlowUtil.isNotFromToDoList() && com.joyintech.framework.util.StringUtil.isNotBlank(getParam(GlobalConstant.WORKFLOW_ID)))) {
-            cfetsTrdBondFirstSubInfoDto = cfetsTrdBondFirstSub002Service.getBussinessEntityByWorkflowId(getParam(GlobalConstant.WORKFLOW_ID));
-            model.addAttribute(GlobalConstant.WORKFLOW_ID,getParam(GlobalConstant.WORKFLOW_ID));
+
+        //流程id
+        String workflowId = "null".equals(getParam(GlobalConstant.WORKFLOW_ID)) ? null : getParam(GlobalConstant.WORKFLOW_ID);
+        String isFromToDoList = getParam("isFromToDoList");
+        CfetsTrdBondFirstSubInfoDto entity = new CfetsTrdBondFirstSubInfoDto();
+        if (StringUtil.isNotEmpty(workflowId)) {
+            entity = cfetsTrdBondFirstSub002Service.getBussinessEntityByWorkflowId(workflowId);
+            model.addAttribute(GlobalConstant.WORKFLOW_ID, getParam(GlobalConstant.WORKFLOW_ID));
         }
-        model.addAttribute("quotaPageModel","new");
+        model.addAttribute("quotaPageModel", "new");
         //卖空模式
-        model.addAttribute(GlobalConstant.ENTITY, cfetsTrdBondFirstSubInfoDto);
+        model.addAttribute(GlobalConstant.ENTITY, entity);
         return super.init(model);
     }
 

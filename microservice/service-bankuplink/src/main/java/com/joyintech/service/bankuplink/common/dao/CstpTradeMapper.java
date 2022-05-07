@@ -154,6 +154,17 @@ public interface CstpTradeMapper {
      * 根据成交编号，查询下行成交匹配关系
      */
     TrdConfirmMatchDto selectMatchDtoByExecId(@Param("execid") String execid);
+
+    /**
+     * 根据下行交易编号，查询下行成交匹配关系
+     *
+     * @param cstpTradeId 下行交易编号
+     * @return com.joyintech.service.bankuplink.common.dto.TrdConfirmMatchDto
+     * @author jiangpeng
+     * @date 2022/5/7 9:19
+     */
+    TrdConfirmMatchDto selectMatchDtoByCstpTradeId(@Param("cstpTradeId") String cstpTradeId);
+
     /**
      * 根据登记编号，查询登记信息
      */

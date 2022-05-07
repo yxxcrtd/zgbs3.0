@@ -200,23 +200,25 @@ public class CfetsQuotedTradeCommonService{
      */
     @Transactional(rollbackFor = { Exception.class })
     @DTXTransaction
-    public ResultBaseDto insertBidCstpTrade(InterfCstpBjfxjg entity) throws Exception {
+    public ResultBaseDto insertBidCstpTrade(CfetsQuotedTradeFirstBondDto entity) throws Exception {
         try {
             Thread.sleep(maxWaitTime);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
+        InterfCstpBjfxjg interfCstpBjfxjg = new InterfCstpBjfxjg();
+        this.handleiCstpBidTrade(interfCstpBjfxjg, entity);
         ResultBaseDto resultBaseDto = new ResultBaseDto(true);
         try {
-            entity.setTrdId(IDGenerator.generate());
+            // 生成
+            interfCstpBjfxjg.setTrdId(cstpMapper.selectDealNo(DateUtil.formatDate(getSysDate()), getPrefix(isSubSystem)));
             // 插入cstp交易表
-            interfCstpBjfxjgMapper.insertSelective(entity);
+            interfCstpBjfxjgMapper.insertSelective(interfCstpBjfxjg);
             getLogger().info("银行间下行成交处理业务数据线程开启");
             Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    secAutoTradeService.secAutoBidTrade(entity, resultBaseDto);
+                    secAutoTradeService.secAutoBidTrade(interfCstpBjfxjg, resultBaseDto);
                 }
             });
             thread.start();
@@ -225,6 +227,75 @@ public class CfetsQuotedTradeCommonService{
             throw new Exception(e);
         }
         return resultBaseDto;
+    }
+
+    /**
+     * 报文---实体封装(一级申购)
+     */
+    private void handleiCstpBidTrade(InterfCstpBjfxjg interfCstpBjfxjg, CfetsQuotedTradeFirstBondDto entity) {
+        BeanUtil.copyPropertiesIgnoreNull(interfCstpBjfxjg, entity);
+//        iCstpTrade.setTrademethod(entity.getTradeMethod());
+//        iCstpTrade.setSettltype(entity.getSettlType());
+//        iCstpTrade.setDealtranstype(entity.getDealTransType());
+//        iCstpTrade.setClordid(entity.getClOrdID());
+//        iCstpTrade.setReference(entity.getReference());
+//        iCstpTrade.setDatacategoryindicator(entity.getDataCategoryIndicator());
+//        iCstpTrade.setContingencyindicator(entity.getContingencyIndicator());
+//        //交易日期
+//        iCstpTrade.setTradedate(entity.getTradeDate());
+//        iCstpTrade.setTradetime(entity.getTradeTime());
+//        iCstpTrade.setSettldate(entity.getSettlDate());
+//        iCstpTrade.setRemarkindicator(entity.getRemarkIndicator());
+//        //行权收益率 到期收益率
+//        if(StringUtil.isNotEmpty(entity.getNoStipulations())){
+//            entity.getNoStipulations().forEach(item -> {
+//                if(StringUtil.equals(item.getStipulationType(),"Yield2")){
+//                    iCstpTrade.setYield2(ArithmeticUtil.divide(item.getStipulationValue(),new BigDecimal(100),6));
+//                }
+//                if(StringUtil.equals(item.getStipulationType(),"StrikeYield")){
+//                    iCstpTrade.setStrikeyield(ArithmeticUtil.divide(item.getStipulationValue(),new BigDecimal(100),6));
+//                }
+//            });
+//        }
+//        if(StringUtil.equals(entity.getMarketIndicator(),MarketIndicatorUtil.MARKETINDICATOR_BOND)){
+//            iCstpTrade.setBusinesstype(BusinessTypeUtil.BUSINESSTYPE_BOND);
+//            if(null!=entity.getPrice()){
+//                iCstpTrade.setPrice(entity.getPrice().setScale(4,RoundingMode.HALF_UP));
+//            }
+//            if(null!=entity.getDirtyPrice()){
+//                iCstpTrade.setDirtyprice(entity.getDirtyPrice().setScale(4,RoundingMode.HALF_UP));
+//            }
+//            iCstpTrade.setTradetype(entity.getTradeType());
+//            iCstpTrade.setTermtomaturity(entity.getTermToMaturity());
+//        }
+//        else if(StringUtil.equals(entity.getMarketIndicator(),MarketIndicatorUtil.MARKETINDICATOR_REPO)){
+//            iCstpTrade.setBusinesstype(BusinessTypeUtil.BUSINESSTYPE_REPO);
+//            iCstpTrade.setCashholdingdays(entity.getCashHoldingDays());
+//            iCstpTrade.setTradelimitdays(entity.getTradeLimitDays());
+//            iCstpTrade.setSettlcurramt2(entity.getSettlCurrAmt2());
+//            iCstpTrade.setUnderlyingsymbol(entity.getUnderlyingSymbol());
+//            iCstpTrade.setUnderlyingsecurityid(entity.getSecurityID());
+//            if(null!=entity.getPrice()){
+//                iCstpTrade.setPrice(ArithmeticUtil.divide(entity.getPrice(),new BigDecimal(100),6));
+//            }
+//            iCstpTrade.setSettldate2(entity.getSettlDate2());
+//            //处理跨托管交易本金
+//            if(!StringUtil.isEmptyList(entity.getNoCrossCustodians())){
+//                entity.setIsKtg("Y");
+//                entity.getNoCrossCustodians().forEach(item -> {
+//                    if(StringUtil.equals(item.getCrossCustodianInstitutionName(), OrgTypeUtil.CB)){
+//                        iCstpTrade.setCbFpriceAmt(item.getCrossCustodianTradeAmt());
+//                        return;
+//                    }
+//                    if(StringUtil.equals(item.getCrossCustodianInstitutionName(),OrgTypeUtil.SC)){
+//                        iCstpTrade.setScFpriceAmt(item.getCrossCustodianTradeAmt());
+//                        return;
+//                    }
+//                });
+//            }
+//        }
+//        //处理交易员信息
+//        处理交易员信息(iCstpTrade,entity);
     }
 
     /**

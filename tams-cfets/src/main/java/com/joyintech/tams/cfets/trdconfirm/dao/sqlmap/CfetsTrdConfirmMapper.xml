@@ -1943,6 +1943,12 @@
         from trdquto_match_info t
         where t.exe_id=#{execid,jdbcType=VARCHAR} and  t.match_status is null
     </select>
+
+    <select id="selectMatchDtoByCstpTradeId" parameterType="String"  resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmMatchDto">
+        select t.pre_trade_id as preTradeId
+        from trdquto_match_info t
+        where t.CSTP_TRADE_ID=#{cstpTradeId,jdbcType=VARCHAR} and  t.match_status ='01' and rownum=1
+    </select>
     <select id="selectRegDtoByPrimaryKey"  resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmRegInfoListResponse">
         select reg.trade_date as tradeDate,
         reg.finprod_id as finprodId,
@@ -2056,6 +2062,65 @@
         and fprepo.finprod_type='F01'
         where itr.tradeid=#{execid,jdbcType=VARCHAR}
         order by fprepo.finprod_id
+    </select>
+
+    <select id="selectBidDtoByPrimaryKey"  resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmRegInfoListResponse">
+        select bo.BID_ID
+        from BID_ORDER bo
+            left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
+            left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = bo.FINPROD_ID
+            where bo.TRADE_STATUS = '01' and bo.IS_CANCEL = 'N'
+                AND NOT EXISTS (SELECT 1 FROM trdquto_match_info match where bo.BID_ID = match.PRE_TRADE_ID)
+                <if test="totleTradeId != null and totleTradeId != ''">
+                    and bo.BID_ID=#{totleTradeId,jdbcType=VARCHAR}
+                </if>
+                <if test="finprodType2 != null and finprodType2 != ''">
+                    and fp.finprod_type2 = #{finprodType2,jdbcType=VARCHAR}
+                </if>
+                <if test="tradeDate != null and tradeDate != ''">
+                    and to_char(bo.BID_DATE,'yyyy-MM-dd') = #{tradeDate,jdbcType=VARCHAR}
+                </if>
+                <if test="finprodMarketId != null and finprodMarketId != ''">
+                    and fp.finprod_market_id = #{finprodMarketId,jdbcType=VARCHAR}
+                </if>
+                <if test="ouPartyId != null and ouPartyId != ''">
+                    and bo.OU_PARTY_ID = #{ouPartyId,jdbcType=VARCHAR}
+                </if>
+                <if test="subscriptionAmount != null">
+                    and bo.SUBSCRIPTION_AMOUNT = #{subscriptionAmount,jdbcType=DECIMAL}
+                </if>
+                <if test="couponRate != null">
+                    and fpi.REFER_YIELD = #{couponRate,jdbcType=DECIMAL}
+                </if>
+                <if test="spread != null">
+                    and fpi.BP = #{spread,jdbcType=DECIMAL}
+                </if>
+                <if test="issuePrice != null">
+                    and fp.ISSUE_PRICE = #{issuePrice,jdbcType=DECIMAL}
+                </if>
+                <if test="ourTrader != null and ourTrader != ''">
+                    and bo.OUR_TRADER = #{ourTrader,jdbcType=VARCHAR}
+                </if>
+                <if test="payableAmount != null">
+                    and bo.PAYABLE_AMOUNT = #{payableAmount,DECIMAL=VARCHAR}
+                </if>
+    </select>
+
+    <select id="selectWflBidDataByFinprodId" resultType="java.lang.String">
+        select ENTRUST_ID trdId from WFL_ETR_ENTRUST where FINPROD_ID = #{finprodId,DECIMAL=VARCHAR} and FINPROD_TYPE2 = 'F32'
+        union all
+        select BID_ID trdId from WFL_BID_ORDER where FINPROD_ID = #{finprodId,DECIMAL=VARCHAR}
+    </select>
+
+    <select id="selectIssueInfoByFinprodId" resultType="com.joyintech.tams.common.base.entity.FinProductAdd">
+        select finprod_id,ISSUE_STATUS  from FIN_PRODUCT_ADD  where FINPROD_ID = #{finprodId,DECIMAL=VARCHAR} and ROWNUM = 1
+    </select>
+
+    <select id="selectIssueInfoByFinprodId">
+        select count(*)
+        from ETR_FINISH_STATUS efs
+                 inner join ETR_ENTRUST ee on ee.ENTRUST_ID = efs.ENTRUST_ID
+        where ee.FINPROD_ID = #{finprodId,DECIMAL=VARCHAR} and efs.ENT_FINISH_AMT is not null and efs.ENT_FINISH_AMT > 0
     </select>
 
 </mapper>

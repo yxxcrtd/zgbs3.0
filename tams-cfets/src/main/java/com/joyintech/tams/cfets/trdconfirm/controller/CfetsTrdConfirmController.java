@@ -267,4 +267,25 @@ public class CfetsTrdConfirmController extends BaseController {
         });
     }
 
+    @ResponseBody
+    @ApiOperation(value = "交易执行-发行失败", notes = "交易执行-发行失败")
+    @PostMapping("issuingFail")
+    public Message<AjaxResult> issuingFail(@RequestBody CfetsTrdConfirmRegInfoListResponse dto) throws Exception {
+        //对选择的数据进行check
+        AjaxResult ajax = cfetsTrdConfirmService.issuingFailCheckMethod(dto);
+        if (null != ajax && !StringUtil.isEmptyList(ajax.getErrorList())) {
+            return new Message<AjaxResult>().success().setData(ajax);
+        }
+        try {
+            AjaxResult ajaxResult = cfetsTrdConfirmService.issuingFailMethod(dto);
+            if (null != ajaxResult && !StringUtil.isEmptyList(ajaxResult.getErrorList())) {
+                return new Message<AjaxResult>().success().setData(ajaxResult);
+            } else {
+                return new Message<AjaxResult>().success().setData(new AjaxResult("发行失败成功"));
+            }
+        } catch (Exception e) {
+            logger.error("交易执行-发行失败数据异常", e);
+            return new Message<AjaxResult>().fail().setMessage("发行失败数据异常");
+        }
+    }
 }
