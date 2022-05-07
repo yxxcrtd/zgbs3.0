@@ -28,8 +28,10 @@ import com.joyintech.workflow.engine.annotation.PrimaryKey.Field;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -773,11 +775,13 @@ public class EtrExchangeTradeSaveRequest extends EtrEntrust implements ProcessEn
     }
     public List<EtrExchangeTradePortfolioRequest> getTradeMultiPtl001Dtos(){
         List<EtrExchangeTradePortfolioRequest> tradeMultiPtl001Dtos=this.portfolioList;
-        tradeMultiPtl001Dtos.stream().forEach(item->{
-            if(StringUtil.equals(item.getIsMulti(), DictCodeList.是否_是.getValue())) {
-                item.setEntrustId(item.getEntrustId()+"-"+item.getPortfolioId());
-            }
-        });
+        if(!CollectionUtils.isEmpty(tradeMultiPtl001Dtos)){
+            tradeMultiPtl001Dtos.stream().forEach(item->{
+                if(StringUtil.equals(item.getIsMulti(), DictCodeList.是否_是.getValue())) {
+                    item.setEntrustId(item.getEntrustId()+"-"+item.getPortfolioId());
+                }
+            });
+        }
         return  tradeMultiPtl001Dtos;
     }
 
