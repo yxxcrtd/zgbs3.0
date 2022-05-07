@@ -37,11 +37,28 @@ public interface CfgDataTableFlagMapper {
 
     /**
      * 查询数据表格设置记录，查询到数据表示用户已设置，否则用户未设置
-     * @param pageCodes
+     *
+     * @param pageCode
      * @param dtCode
+     * @param spcdCodes
      * @param rangeId
-     * @return
+     * @return com.joyintech.tams.business.common.entity.CfgDataTableShowFlag
+     * @author jiangpeng
+     * @date 2022/5/7 13:36
      */
     CfgDataTableShowFlag getByPageCodeAndDtCodes(@Param("pageCode") String pageCode, @Param("dtCode") String dtCode,
                                                  @Param("spcdCodes") List<String> spcdCodes, @Param("rangeId") String rangeId);
+
+    /**
+     * 删除用户自定义设置
+     *
+     * @param pageCode
+     * @param dtCode
+     * @param spcdCodes
+     * @param rangeId
+     * @author jiangpeng
+     * @date 2022/5/7 13:36
+     */
+    void deleteDataTables(@Param("pageCode") String pageCode, @Param("dtCode") String dtCode,
+                          @Param("spcdCodes") List<String> spcdCodes, @Param("rangeId") String rangeId);
 }

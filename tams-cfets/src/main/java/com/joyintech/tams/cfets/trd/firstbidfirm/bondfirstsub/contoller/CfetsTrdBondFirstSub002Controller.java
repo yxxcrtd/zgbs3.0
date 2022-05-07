@@ -91,11 +91,11 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
      * @author jiangpeng
      * @date 2022/4/22 10:56
      */
-    @Override
     @ApiOperation(value = "审批初始化", notes = "审批页面初始化")
-    @PostMapping("/init")
+    @PostMapping("/initPage")
     @ResponseBody
-    public String init(Model model) {
+    public String initPage() {
+        Model model = null;
         // 有效状态
         model.addAttribute("ISSUE_STATUS", this.getSelectDataFromDataDic(DictCode.发行状态, null));
         // 发行状态

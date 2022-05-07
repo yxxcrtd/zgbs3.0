@@ -51,5 +51,20 @@
           and EFFERANGE = 1
     </delete>
 
+    <delete id="deleteDataTables" parameterType="String">
+        delete
+        from CFG_DATATABLE_SHOW
+        where PAGECODE = #{pageCode}
+          and DTCODE = #{dtCode}
+        <if test="spcdCodes != null and spcdCodes.size() > 0 ">
+            AND SPCDCODE IN
+            <foreach collection="spcdCodes" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+          and RANGEID = #{rangeId}
+          and EFFERANGE = 1
+    </delete>
+
 
 </mapper>

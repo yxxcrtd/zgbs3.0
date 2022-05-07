@@ -11,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -90,11 +87,16 @@ public class CfgDataTableService {
         CfgDataTableShow dataTableShow = dataTableShowList.get(0);
         String pageCode = dataTableShow.getPageCode();
         String dtCode = dataTableShow.getDtCode();
-        String spcdCode = dataTableShow.getSpcdCode();
-        CfgDataTableShowFlag flag = cfgDataTableFlagMapper.getByPageCodeAndDtCode(pageCode, dtCode, spcdCode, userId);
+        List<String> spcdCodes = new ArrayList<>();
+        dataTableShowList.forEach(data -> {
+            if (!spcdCodes.contains(data.getSpcdCode())) {
+                spcdCodes.add(data.getSpcdCode());
+            }
+        });
+        CfgDataTableShowFlag flag = cfgDataTableFlagMapper.getByPageCodeAndDtCodes(pageCode, dtCode, spcdCodes, userId);
         if (null != flag) {
             //删除用户原有自定义设置
-            cfgDataTableFlagMapper.deleteDataTable(pageCode, dtCode, spcdCode, userId);
+            cfgDataTableFlagMapper.deleteDataTables(pageCode, dtCode, spcdCodes, userId);
             //新增用户修改后设置
             for (int i = 0; i < dataTableShowList.size(); i++) {
                 CfgDataTableShow data = dataTableShowList.get(i);
@@ -113,14 +115,16 @@ public class CfgDataTableService {
             data.setRangeId(userId);
         }
         cfgDataTableMapper.insertCfgDataTableBatch(dataTableShowList);
-        CfgDataTableShowFlag showFlag = new CfgDataTableShowFlag();
-        showFlag.setEffeRange(1);
-        showFlag.setPageCode(pageCode);
-        showFlag.setDtCode(dtCode);
-        showFlag.setRangeId(userId);
-        showFlag.setSpcdCode(spcdCode);
-        showFlag.setUpdateTime(DateUtil.format(new Date(), DateUtil.DEFAULT_DATETIME_FORMAT));
-        cfgDataTableFlagMapper.insertCfgDataTableFlag(showFlag);
+        spcdCodes.forEach(spcdCode -> {
+            CfgDataTableShowFlag showFlag = new CfgDataTableShowFlag();
+            showFlag.setEffeRange(1);
+            showFlag.setPageCode(pageCode);
+            showFlag.setDtCode(dtCode);
+            showFlag.setRangeId(userId);
+            showFlag.setSpcdCode(spcdCode);
+            showFlag.setUpdateTime(DateUtil.format(new Date(), DateUtil.DEFAULT_DATETIME_FORMAT));
+            cfgDataTableFlagMapper.insertCfgDataTableFlag(showFlag);
+        });
     }
 
     /**
