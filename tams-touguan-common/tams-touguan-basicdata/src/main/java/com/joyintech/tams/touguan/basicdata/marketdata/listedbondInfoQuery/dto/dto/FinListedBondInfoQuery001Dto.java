@@ -136,6 +136,10 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal issuePx;
 
+    @ApiModelProperty(name = "issueAmt", value = "发行金额（亿元）")
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal issueAmt;
+
     @ApiModelProperty(name = "stipulationValue", value = "参考收益率")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal stipulationValue;
@@ -223,6 +227,9 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
 
     @ApiModelProperty(name = "capiIncomeFeature", value = "保本标识")
     private String capiIncomeFeature;
+
+    @ApiModelProperty(name = "delistingDate", value = "摘牌日")
+    private Date delistingDate;
 
 
     @ApiModelProperty(name = "finBondPayHSrcSecOptionDto", value = "行权计划信息")
@@ -742,5 +749,21 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
 
     public void setBondMarketCashPlanDtos(List<FinBondMarketCashPlanDto> bondMarketCashPlanDtos) {
         this.bondMarketCashPlanDtos = bondMarketCashPlanDtos;
+    }
+
+    public BigDecimal getIssueAmt() {
+        return issueAmt;
+    }
+
+    public void setIssueAmt(BigDecimal issueAmt) {
+        this.issueAmt = issueAmt;
+    }
+
+    public Date getDelistingDate() {
+        return delistingDate;
+    }
+
+    public void setDelistingDate(Date delistingDate) {
+        this.delistingDate = delistingDate;
     }
 }
