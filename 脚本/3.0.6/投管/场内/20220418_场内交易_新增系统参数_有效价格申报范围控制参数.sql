@@ -1,3 +1,0 @@
-delete from sys_para where system_code = 'TRD' and para_code = 'trd_price_scope_control';
-INSERT INTO SYS_PARA (SYSTEM_CODE, PARA_CODE, PARAM_VALUE, DATA_TYPE, DATA_SCOPE, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE, UPDATE_FLG)
-VALUES ('TRD', 'trd_price_scope_control', '01', '01', '01,02,03', '场内交易下单价格超过有效价格申报范围（01 禁止；02 仅提示；03 允许）', 'system', null, sysdate, 'system', sysdate, null, '01');

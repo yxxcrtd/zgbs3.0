@@ -1,4 +1,0 @@
-
-alter table WFL_ETR_ENTRUST_ADD ADD (PRICE_TYPE VARCHAR2(50));
-
-comment on column WFL_ETR_ENTRUST_ADD.PRICE_TYPE is '计价方式';
