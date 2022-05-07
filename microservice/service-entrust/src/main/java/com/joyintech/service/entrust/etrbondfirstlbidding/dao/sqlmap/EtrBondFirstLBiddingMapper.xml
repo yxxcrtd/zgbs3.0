@@ -388,6 +388,7 @@
 	<!--获取新建界面的组合代码联想下拉框框 -->
 	<select id="getentrustIdAdd" resultType="com.joyintech.framework.select.SelectOptionDto">
 		SELECT
+		distinct
 		T1.PORTFOLIO_ID id,
 		T1.PORTFOLIO_NAME text,
 		T1.PROFIT_TYPE object
@@ -397,13 +398,17 @@
 		PTL_PORTFOLIO_AUTHORITY T2
 		ON
 		T1.PORTFOLIO_ID = T2.PORTFOLIO_ID
-		AND T2.USER_ID = #{userId}
+		<!--AND T2.USER_ID = #{userId}-->
 		<where>
+			<if test="userIsNoOrOn == null or userIsNoOrOn.equals('')">
+				and T2.USER_ID = #{userId}
+			</if>
 			<if test="initValue != null and !initValue.equals('')">
 				and T1.PORTFOLIO_ID = #{initValue}
 			</if>
 			<if test="search != null and !search.equals('')">
-				and T1.PORTFOLIO_ID like concat('%',concat(#{search},'%'))
+				and (T1.PORTFOLIO_ID like concat('%',concat(#{search},'%'))
+				or T1.PORTFOLIO_NAME like concat('%',concat(#{search},'%')) )
 			</if>
 			<if test="portType != null and portType != ''">
 				AND T1.PORTFOLIO_TYPE IN (#{portType}, #{portType1})
