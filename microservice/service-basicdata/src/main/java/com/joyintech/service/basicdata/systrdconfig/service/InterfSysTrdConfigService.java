@@ -1,5 +1,6 @@
 package com.joyintech.service.basicdata.systrdconfig.service;
 
+import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.service.basicdata.systrdconfig.dao.InterfSysTrdConfigMapper;
@@ -54,12 +55,16 @@ public class InterfSysTrdConfigService{
             map.put("assetType","F07");
         }
         if (map.get("finprodId")!=null && map.get("finprodId")!=""){
-            Map<String,Object> map1 = interfSysTrdConfigMapper.getFinProdInfo(map);
-            map.put("tradeMarket",map1.get("TRADE_MARKET"));
-            map.put("assetType",map1.get("TYPE_8"));
-            map.put("assetType1",map1.get("TYPE_6"));
-            map.put("assetType2",map1.get("TYPE_7"));
-
+            if(StringUtil.equals(map.get("assetType"),"F07")){
+                Map<String,Object> map2 = interfSysTrdConfigMapper.getMstRepoProductInfo(map);
+                map.put("tradeMarket",map2.get("TRADE_MARKET"));
+            }else{
+                Map<String,Object> map1 = interfSysTrdConfigMapper.getFinProdInfo(map);
+                map.put("tradeMarket",map1.get("TRADE_MARKET"));
+                map.put("assetType",map1.get("TYPE_8"));
+                map.put("assetType1",map1.get("TYPE_6"));
+                map.put("assetType2",map1.get("TYPE_7"));
+            }
         }
         returnMap.put("errorCode",0);
         returnMap.put("errorMsg","成功");

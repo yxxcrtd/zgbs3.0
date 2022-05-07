@@ -1,1 +1,0 @@
-UPDATE SYS_PARA T SET T.PARAM_VALUE = 'Y' WHERE T.PARA_CODE = 'is_auto_generate_negate_deal';

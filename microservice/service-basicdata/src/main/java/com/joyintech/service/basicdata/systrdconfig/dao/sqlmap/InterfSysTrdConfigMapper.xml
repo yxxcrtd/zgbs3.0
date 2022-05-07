@@ -591,4 +591,14 @@
         </where>
     </select>
 
+    <select id="getMstRepoProductInfo" resultType="map">
+        select
+        T1.TRADE_MARKET,
+        T1.TERM_TYPE
+        FROM MST_REPO_PRODUCT T1
+        WHERE
+        T1.MARKET_ID = #{finprodId}
+    </select>
+
+
 </mapper>
