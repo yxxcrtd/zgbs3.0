@@ -287,7 +287,8 @@ public class TradeCallbackHelper {
 
     private void updateInstructionStatus(Instruction instruction) {
         if (Objects.nonNull(instruction)) {
-            if ((instruction.getEntrustLeftAmt().longValue() == (instruction.getEntrustNum()) && instruction.getEntrustNum() > 0) || (instruction.getEntrustLeftAmt().doubleValue() == (instruction.getEntrustAmt().doubleValue()) && instruction.getEntrustAmt().doubleValue() > 0))
+            if ((instruction.getEntrustLeftAmt().longValue() == (instruction.getEntrustNum()) && instruction.getEntrustNum() > 0)
+                    || (instruction.getEntrustAmt().doubleValue() > 0 && instruction.getEntrustLeftAmt().doubleValue() == instruction.getEntrustAmt().doubleValue()))
                 instruction.setEntrustStatus(InstructionStatus.COMPLETE.value);
         }
     }

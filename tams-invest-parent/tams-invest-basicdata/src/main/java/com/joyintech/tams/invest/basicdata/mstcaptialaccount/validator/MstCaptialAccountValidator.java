@@ -107,53 +107,9 @@ public class MstCaptialAccountValidator implements BeanValidator{
                         //当“账户性质”为非银行账户时，“开户网点/大额支付行号”非必填,当“币种”不是人民币时，“开户网点/大额支付行号”非必填。
                         errorList.add(new ValidMessage("largePayno", getMessage("COMMON_E_0057",getMessage("MstCaptialAccount002.accountOutlet"))));
                     }
-                    
-                    if(StringUtil.isNotEmpty(dto.getIsCalint())) {
-                        if(StringUtil.equals(dto.getIsCalint(), DictCodeList.是否_是.getValue())){
-                            if(!StringUtil.isNotEmpty(dto.getEffectDate())) {
-                                //生效日不能为空
-                                errorList.add(new ValidMessage("effectDate", getMessage("COMMON_E_0057",getMessage("MstCaptialAccount002.effectDate"))));  
-                            }
-                            
-                            if(!StringUtil.isNotEmpty(dto.getBasis())) {
-                                //计息基础不能为空
-                                errorList.add(new ValidMessage("basis", getMessage("COMMON_E_0057",getMessage("MstCaptialAccount002.basis"))));  
-                            }
-                            
-                            if(StringUtil.isNotEmpty(dto.getRateType())) {
-                                if(StringUtil.equals(dto.getRateType(), DictCodeList.利率类型_固定利率.getValue())) {
-                                    //利率不能为空
-                                    if(!StringUtil.isNotEmpty(dto.getRate())) {
-                                        errorList.add(new ValidMessage("rate", getMessage("COMMON_E_0057",getMessage("MstCaptialAccount002.rate"))));  
-                                    }
-                                } else if(StringUtil.equals(dto.getRateType(), DictCodeList.利率类型_浮动利率.getValue())) {
-                                    //浮动利率不能为空
-                                    if(!StringUtil.isNotEmpty(dto.getIndexId())) {
-                                        errorList.add(new ValidMessage("indexId", getMessage("COMMON_E_0057",
-                                            getMessage("MstCaptialAccount002.currentRate"))));  
-                                    }
-                                    //系数不能为空
-                                    if(!StringUtil.isNotEmpty(dto.getCoefficient())) {
-                                        errorList.add(new ValidMessage("coefficient", getMessage("COMMON_E_0057",
-                                            getMessage("MstCaptialAccount002.coefficient"))));  
-                                    }
-                                    //利差不能为空
-                                    if(!StringUtil.isNotEmpty(dto.getSpreadRate())) {
-                                        errorList.add(new ValidMessage("spreadRate", getMessage("COMMON_E_0057",
-                                            getMessage("MstCaptialAccount002.spreadRate"))));  
-                                    }
-                                }
-                            } else {
-                                errorList.add(new ValidMessage("rateType", getMessage("COMMON_E_0057",
-                                    getMessage("MstCaptialAccount002.rateType"))));   
-                            }
-                        }
-    
-                    } else {
-                        errorList.add(new ValidMessage("isCalint", getMessage("COMMON_E_0057",
-                            getMessage("MstCaptialAccount002.isCalint")))); 
-                    }
-                    
+
+                    // 校验利息
+                    this.checkIsCalint(dto, errorList);
                 }
                 else if(StringUtil.equals(dto.getPageModel(), GlobalConstant.DETAIL_PAGE_MODEL_EDIT)){
                     if(!StringUtil.equals(dto.getCcy(), "CNY")){
@@ -162,6 +118,10 @@ public class MstCaptialAccountValidator implements BeanValidator{
                                 getMessage("MstCaptialAccount002.swiftCode"))));
                         }
                     }
+                    // TISHKS-1189:增加利息校验 modify by fuyongsheng 20220507 start
+                    // 校验利息
+                    this.checkIsCalint(dto, errorList);
+                    // TISHKS-1189:增加利息校验 modify by fuyongsheng 20220507 end
                 }
                 
                if(StringUtil.isNotEmpty(dto.getAccountType())
@@ -294,6 +254,59 @@ public class MstCaptialAccountValidator implements BeanValidator{
         }
 		
         return errorList;
+    }
+
+    /**
+     * 校验利息
+     * @param dto
+     * @param errorList
+     */
+    private void checkIsCalint(MstCaptialAccountDto dto, List<ValidMessage> errorList){
+        if(StringUtil.isNotEmpty(dto.getIsCalint())) {
+            if(StringUtil.equals(dto.getIsCalint(), DictCodeList.是否_是.getValue())){
+                if(!StringUtil.isNotEmpty(dto.getEffectDate())) {
+                    //生效日不能为空
+                    errorList.add(new ValidMessage("effectDate", getMessage("COMMON_E_0057",getMessage("MstCaptialAccount002.effectDate"))));
+                }
+
+                if(!StringUtil.isNotEmpty(dto.getBasis())) {
+                    //计息基础不能为空
+                    errorList.add(new ValidMessage("basis", getMessage("COMMON_E_0057",getMessage("MstCaptialAccount002.basis"))));
+                }
+
+                if(StringUtil.isNotEmpty(dto.getRateType())) {
+                    if(StringUtil.equals(dto.getRateType(), DictCodeList.利率类型_固定利率.getValue())) {
+                        //利率不能为空
+                        if(!StringUtil.isNotEmpty(dto.getRate())) {
+                            errorList.add(new ValidMessage("rate", getMessage("COMMON_E_0057",getMessage("MstCaptialAccount002.rate"))));
+                        }
+                    } else if(StringUtil.equals(dto.getRateType(), DictCodeList.利率类型_浮动利率.getValue())) {
+                        //浮动利率不能为空
+                        if(!StringUtil.isNotEmpty(dto.getIndexId())) {
+                            errorList.add(new ValidMessage("indexId", getMessage("COMMON_E_0057",
+                                    getMessage("MstCaptialAccount002.currentRate"))));
+                        }
+                        //系数不能为空
+                        if(!StringUtil.isNotEmpty(dto.getCoefficient())) {
+                            errorList.add(new ValidMessage("coefficient", getMessage("COMMON_E_0057",
+                                    getMessage("MstCaptialAccount002.coefficient"))));
+                        }
+                        //利差不能为空
+                        if(!StringUtil.isNotEmpty(dto.getSpreadRate())) {
+                            errorList.add(new ValidMessage("spreadRate", getMessage("COMMON_E_0057",
+                                    getMessage("MstCaptialAccount002.spreadRate"))));
+                        }
+                    }
+                } else {
+                    errorList.add(new ValidMessage("rateType", getMessage("COMMON_E_0057",
+                            getMessage("MstCaptialAccount002.rateType"))));
+                }
+            }
+
+        } else {
+            errorList.add(new ValidMessage("isCalint", getMessage("COMMON_E_0057",
+                    getMessage("MstCaptialAccount002.isCalint"))));
+        }
     }
 
 }

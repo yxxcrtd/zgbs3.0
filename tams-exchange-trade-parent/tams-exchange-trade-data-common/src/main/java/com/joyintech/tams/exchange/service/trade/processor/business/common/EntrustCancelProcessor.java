@@ -223,7 +223,8 @@ public class EntrustCancelProcessor {
                 } else if (instruction.getEntrustAmt().doubleValue() > 0) {
                     if (instruction.getFrozenQuantity().doubleValue() > 0) {
                         // 金额指令全部以净价处理， 需要重新计算指令金额冻结
-                        unFrozenBalance = bondHelper.calculateBalanceForInstruction(entrust.getEntrustProp(), entrust.getAssetType(), entrust.getEntrustPrice(), unFrozenVolume, unFrozenBalance);
+//                        unFrozenBalance = bondHelper.calculateBalanceForInstruction(entrust.getEntrustProp(), entrust.getAssetType(), entrust.getEntrustPrice(), unFrozenVolume, unFrozenBalance);
+                        unFrozenBalance = bondHelper.calculateBalanceForInstruction(entrust, unFrozenVolume, unFrozenBalance);
                         instruction.setFrozenQuantity(TradeUtils.subtract(instruction.getFrozenQuantity(), (unFrozenBalanceInstructionTrade == null && !isFromTrade) ? unFrozenBalance : unFrozenBalanceInstructionTrade, 2));
                     } else {
                         instruction.setFrozenQuantity(BigDecimal.valueOf(0.00));
@@ -237,7 +238,8 @@ public class EntrustCancelProcessor {
                 } else if (instruction.getEntrustAmt().doubleValue() > 0) {
                     if (instruction.getFrozenQuantity().doubleValue() > 0) {
                         // 金额指令全部以净价处理， 需要重新计算指令金额冻结
-                        unFrozenBalance = bondHelper.calculateBalanceForInstruction(entrust.getEntrustProp(), entrust.getAssetType(), entrust.getEntrustPrice(), unFrozenVolume, unFrozenBalance);
+//                        unFrozenBalance = bondHelper.calculateBalanceForInstruction(entrust.getEntrustProp(), entrust.getAssetType(), entrust.getEntrustPrice(), unFrozenVolume, unFrozenBalance);
+                        unFrozenBalance = bondHelper.calculateBalanceForInstruction(entrust, unFrozenVolume, unFrozenBalance);
                         instruction.setFrozenQuantity(TradeUtils.subtract(instruction.getFrozenQuantity(), (unFrozenBalanceInstructionTrade == null && !isFromTrade) ? unFrozenBalance : unFrozenBalanceInstructionTrade, 2));
                     } else {
                         instruction.setFrozenQuantity(BigDecimal.valueOf(0.00));
