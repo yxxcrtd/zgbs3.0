@@ -180,10 +180,10 @@ public abstract class PbcReportProdTotalService extends PbcExportService  {
 
 		ChbOrgRegistBankCode bankCode = CommonUtil.getUserBank();
 
-		//String code = SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_ISSUE_PARTY_ID);
-		String  code=CommonUtil.selectBankCode();
-		//String name =SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_ISSUE_PARTY_NAME);
-		String  name=CommonUtil.selectBankCodeName();
+		String code = SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_ISSUE_PARTY_ID);
+//		String  code=CommonUtil.selectBankCode();
+		String name =SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_ISSUE_PARTY_NAME);
+//		String  name=CommonUtil.selectBankCodeName();
 		if(null!=bankCode){
 			code = bankCode.getRegistBankCode();
 			name = bankCode.getBelongInstitutionName();
@@ -545,10 +545,10 @@ public abstract class PbcReportProdTotalService extends PbcExportService  {
     
     
     public String[] getRegistCode(String orgCode){
-        //String issuePartyId = SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_ISSUE_PARTY_ID);
-		String issuePartyId =  CommonUtil.selectBankCode();
-        //String  issuePartyName = SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_ISSUE_PARTY_NAME);
-		String  issuePartyName = CommonUtil.selectBankCodeName();
+        String issuePartyId = SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_ISSUE_PARTY_ID);
+//		String issuePartyId =  CommonUtil.selectBankCode();
+        String  issuePartyName = SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_ISSUE_PARTY_NAME);
+//		String  issuePartyName = CommonUtil.selectBankCodeName();
         // 发行机构代码取值
         if(null!=orgCode){
         	Map<String,Object> param = new HashMap<>();

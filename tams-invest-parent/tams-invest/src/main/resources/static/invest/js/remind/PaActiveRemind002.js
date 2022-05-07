@@ -610,6 +610,10 @@ $(function() {
                 },
                 {
                     field : 'trdAcctId',
+                    visible : false
+                },
+                {
+                    field : 'trdAcctName',
                     title : '资金账户',
                     width : 300
                 },
@@ -963,7 +967,7 @@ $(function() {
                 }
             }, false);
 
-            var  urlPara = "?finprodId=" + finprodId + "&remType=" + remType;
+            var  urlPara = "?finprodId=" + finprodId + "&portfolioId=" + id +"&ps=T68";
             url = 'home.html#/instructions/notradeorder?a=a';
             lable='\u975e\u4ea4\u6613\u4e49\u52a1\u6307\u4ee4';
             var urls = "";

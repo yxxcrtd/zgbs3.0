@@ -735,8 +735,11 @@ public class EtrProjectService extends CommonExportService<EtrProjectDto> implem
         confirmMsg = etrCommonService.StringAddByBr(confirmMsg, etrCommonService.checkIsBlank(data, labelName, indexId));
         //判断是否是数值
         confirmMsg = etrCommonService.StringAddByBr(confirmMsg, etrCommonService.checkIsNumber(data, labelName, indexId));
-        //判断是否大于0
-        confirmMsg = etrCommonService.StringAddByBr(confirmMsg, etrCommonService.checkIsGtZero(data, labelName, indexId));
+        //判断是否大于0,如果不是数值就不用判断是否大于0。
+        if(etrCommonService.checkIsNumber(data, labelName, indexId).equals("")){
+            confirmMsg = etrCommonService.StringAddByBr(confirmMsg, etrCommonService.checkIsGtZero(data, labelName, indexId));
+
+        }
         return confirmMsg;
     }
 

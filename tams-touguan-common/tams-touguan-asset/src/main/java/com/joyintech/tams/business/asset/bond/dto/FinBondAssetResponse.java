@@ -159,8 +159,11 @@ public class FinBondAssetResponse {
     @ApiModelProperty(name="crossMarketCode",value="跨市场代码")
     private String crossMarketCode;
 
-    @ApiModelProperty(name="conceptType",value="概念标识")
+    @ApiModelProperty(name="conceptType",value="概念标识Code")
     private String conceptType;
+
+    @ApiModelProperty(name="conceptTypeStr",value="概念标识")
+    private String conceptTypeStr;
 
     @ApiModelProperty(name="mGradeResult",value="主体评级code")
     private String mGradeResult;
@@ -327,7 +330,7 @@ public class FinBondAssetResponse {
     }
 
     public String getType11Str() {
-        return type11Str;
+        return SysDataUtil.getNameFromDataDict(DictCode.行内资产四级分类, this.getType11());
     }
 
     public void setType11Str(String type11Str) {
@@ -632,5 +635,13 @@ public class FinBondAssetResponse {
 
     public void setConceptType(String conceptType) {
         this.conceptType = conceptType;
+    }
+
+    public String getConceptTypeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.概念标识, this.getConceptType());
+    }
+
+    public void setConceptTypeStr(String conceptTypeStr) {
+        this.conceptTypeStr = conceptTypeStr;
     }
 }

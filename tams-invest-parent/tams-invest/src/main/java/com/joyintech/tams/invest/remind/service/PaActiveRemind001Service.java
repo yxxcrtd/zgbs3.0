@@ -570,25 +570,7 @@ public class PaActiveRemind001Service extends BaseService<PaActiveRemind001Dto> 
     public Map<String, Object> searchCountR12(Map<String, Object> param) {
         param.put("R12S1", BussinessDictCodeList.提醒类型_小分类_标准券额度不足提醒.getValue());
         param.put("quaryDateStr",DateUtil.format((Date)param.get("quaryDate")));
-        boolean isShow010 = SecurityUtil.isPermitted("EtrBondBiddingResultIb001_btn_search");
-        boolean isShow020 = SecurityUtil.isPermitted("EtrBondBiddingResultEx001_btn_search");
-        String isShow01 = "false";
-        String isShow02 = "false";
-        if(isShow010){
-            isShow01 = "true";
-        }
-        if(isShow020){
-            isShow02 = "true";
-        }
-        param.put("isShow01", isShow01);
-        param.put("isShow02", isShow02);
-        Map<String, Object> temp = new HashMap<>();
-        if(StringUtil.equals(isShow01,"false") && StringUtil.equals(isShow02,"false")){
-            temp.put("R12S1", BigDecimal.ZERO);
-            return temp;
-        }else{
-            return paActiveRemind001Mapper.searchCountR12S1(param);
-        }
+        return paActiveRemind001Mapper.searchCountR12S1(param);
     }
     //add by chenjiaxing 分销缴款提醒 20210727 end
 

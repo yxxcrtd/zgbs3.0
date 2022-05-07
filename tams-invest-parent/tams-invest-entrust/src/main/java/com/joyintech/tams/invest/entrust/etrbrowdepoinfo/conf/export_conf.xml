@@ -3,23 +3,23 @@
     <Worksheet javaBean="com.joyintech.tams.invest.entrust.etrbrowdepoinfo.dto.EtrBrowDepoInfoDto">
         <Row>
             <Cell order="1" name="状态">entrustStatusStr</Cell>
-            <Cell order="2" name="组合代码">portfolioId</Cell>
-            <Cell order="3" name="组合名称">portfolioName</Cell>
-            <Cell order="4" name="资产二级分类">assetType1Str</Cell>
-            <Cell order="4" name="资产三级分类">assetType10Str</Cell>
-            <Cell order="4" name="资产四级分类">assetType11Str</Cell>
-            <Cell order="5" name="市场代码">finprodMarketId</Cell>
-            <Cell order="6" name="资产名称">finprodName</Cell>
-            <Cell order="7" name="交易方向">psStr</Cell>
-            <Cell order="8" name="利率">price</Cell>
-            <Cell order="9" name="付息频率">payFreq</Cell>
-            <Cell order="10" name="币种">ccyStr</Cell>
-            <Cell order="11" name="委托开始日">vdate</Cell>
-            <Cell order="12" name="委托结束日">mdate</Cell>
-            <Cell order="13" name="委托金额">entrustAmtStr</Cell>
-            <Cell order="14" name="已完成额度">finishAmt</Cell>
-            <Cell order="15" name="交易完成度">transactioncom</Cell>
-            <Cell order="16" name="当前处理人">nextUser</Cell>
+            <Cell order="2" name="投资经理">invManagerId</Cell>
+            <Cell order="3" name="组合代码">portfolioId</Cell>
+            <Cell order="4" name="组合名称">portfolioName</Cell>
+            <Cell order="5" name="资产二级分类">assetType1Str</Cell>
+            <Cell order="6" name="资产三级分类">assetType10Str</Cell>
+            <Cell order="7" name="资产四级分类">assetType11Str</Cell>
+            <Cell order="8" name="市场代码">finprodMarketId</Cell>
+            <Cell order="9" name="资产名称">finprodName</Cell>
+            <Cell order="10" name="交易方向">psStr</Cell>
+            <Cell order="11" name="利率">price</Cell>
+            <Cell order="12" name="付息频率">payFreq</Cell>
+            <Cell order="13" name="币种">ccyStr</Cell>
+            <Cell order="14" name="委托开始日">vdate</Cell>
+            <Cell order="15" name="委托结束日">mdate</Cell>
+            <Cell order="16" name="委托金额">entrustAmtStr</Cell>
+            <Cell order="17" name="已完成额度">finishAmt</Cell>
+            <Cell order="18" name="交易完成度">transactioncom</Cell>
         </Row>
     </Worksheet>
 </Workbook>

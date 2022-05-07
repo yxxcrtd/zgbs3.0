@@ -408,6 +408,9 @@ public class CommonAutoCouponService extends BaseService{
                     }
                 }
                 // 20200819 债券自动加券优化-判断城投债级别 wangwei end
+
+                finProductAdd.setIsNetprice(interfPayhsrcsecinfo.getIsNetprice());
+
                 baseFinProductBaseInfoDto.setFinProductAdd(finProductAdd);
                 //new金融产品分类
                 FinProductType finProductType = new FinProductType();

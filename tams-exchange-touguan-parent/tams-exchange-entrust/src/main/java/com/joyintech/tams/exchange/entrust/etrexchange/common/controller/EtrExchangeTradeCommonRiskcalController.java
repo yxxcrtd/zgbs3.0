@@ -36,10 +36,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 交易所指令交易风险试算
@@ -118,6 +115,9 @@ public class EtrExchangeTradeCommonRiskcalController extends BaseController{
                  || StringUtil.equals(dto.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())) {
                 resultArrList=interfRiskRdsController.doInfBatchData(dataMap,"0", "RSK002","F07");
             }
+            else if (StringUtil.equals(dto.getFinprodType2(),"ZYSHG")) {
+                resultArrList=interfRiskRdsController.doInfBatchData(dataMap,"0", "RSK002","F07");
+            }
             result.setRiskMathFlag("02");
             Boolean forbidFlag=false;
             Boolean cluflag=true;
@@ -154,6 +154,15 @@ public class EtrExchangeTradeCommonRiskcalController extends BaseController{
                                 cluflag=false;
                                 resultArr.getBody().put("rskStatus","3");
                                 result.setRskStatus("3");
+                            }
+                            List<LinkedHashMap<String, Object>> rskList = (List<LinkedHashMap<String, Object>>) resultArr.getBody().get("RSK_LIST");
+                            if (!StringUtil.isEmptyList(rskList)) {
+                                for(LinkedHashMap<String, Object> tempMap:rskList){
+                                    if (StringUtil.equals(tempMap.get("kriStatus"),"4")) {
+                                        cluflag=false;
+                                        break;
+                                    }
+                                }
                             }
                         }else{
                             cluflag=false;

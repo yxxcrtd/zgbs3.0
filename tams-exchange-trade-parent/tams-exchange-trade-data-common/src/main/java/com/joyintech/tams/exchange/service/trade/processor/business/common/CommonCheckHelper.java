@@ -263,7 +263,8 @@ public class CommonCheckHelper {
             logger.error("指令的结束日[{}]小于平台日[{}]", INSTRUCTION_DATE_FORMAT.get().format(instruction.getMdate()), tradingDay);
             return ErrorCode.INSTRUCTION_END_DATE_ERROR;
         }
-        if (instruction.getPriceMode().equals(InstructionPriceMode.SPECIFIED.value) && !TradeUtils.equals(orderPrice, instruction.getEntrustPrice()) || (instruction.getPriceMode().equals(InstructionPriceMode.FIXED.value) && checkPriceFixed(order, instruction.getEntrustPrice(), orderPrice))) {
+        if (instruction.getPriceMode().equals(InstructionPriceMode.SPECIFIED.value) && !TradeUtils.equals(orderPrice, instruction.getEntrustPrice())
+                || (instruction.getPriceMode().equals(InstructionPriceMode.FIXED.value) && checkPriceFixed(order, instruction.getEntrustPrice(), orderPrice))) {
             return ErrorCode.INSTRUCTIONS_PRICE_ERROR;
         }
         if (InvestmentAssetType.FUTURES.value.equals(instruction.getAssetType())) {

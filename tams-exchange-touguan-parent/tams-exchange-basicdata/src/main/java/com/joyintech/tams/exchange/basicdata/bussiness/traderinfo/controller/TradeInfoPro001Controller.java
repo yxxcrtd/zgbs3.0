@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.controller;
 
+import com.joyintech.background.component.common.pack.common.grid.Page;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
@@ -68,7 +69,7 @@ public class TradeInfoPro001Controller extends BaseController {
     @ResponseBody
     public Message<Map<String, Object>> getPageParams001() {
         Map<String, Object> initPageParams = new HashMap<>();
-        initPageParams.put("TRADE_PLACE", this.getSelectDataFromDataDic(DictCode.交易场所, null));
+//        initPageParams.put("TRADE_PLACE", this.getSelectDataFromDataDic(DictCode.交易场所, null));
 
         Date platformDate = DateUtil.platDateFromCache();
         initPageParams.put("iPlatformDate", DateUtil.format(platformDate));
@@ -78,6 +79,12 @@ public class TradeInfoPro001Controller extends BaseController {
 
         initPageParams.put("TRADE_MARKET_03", DictCodeList.交易流通场所_上海证券交易所.getValue());
         initPageParams.put("TRADE_MARKET_04", DictCodeList.交易流通场所_深圳证券交易所.getValue());
+        SelectDto selectDto = this.getSelectDataFromDataDic(DictCode.交易场所, null);
+                List<SelectOptionDto> jys = selectDto.getOptions().stream().filter(option -> {
+            return StringUtil.equals(option.getId(), DictCodeListExt3.交易场所_上海证券交易所.getValue())
+                    || StringUtil.equals(option.getId(), DictCodeListExt3.交易场所_深圳证券交易所.getValue());
+        }).collect(Collectors.toList());
+        initPageParams.put("TRADE_PLACE", JsonUtils.objectArray2Json(jys.toArray()));
         return new Message<Map<String, Object>>(initPageParams).success();
     }
 
@@ -85,10 +92,10 @@ public class TradeInfoPro001Controller extends BaseController {
     @ApiOperation(value = "获取交易商名称", notes = "获取交易商名称")
     @ResponseBody
     @PostMapping("/getCustomerName")
-    public Message<List<SelectOptionDto>> getCustomerName(@RequestBody TradeInfoProRequest dto){
+    public Message<List<SelectOptionDto>> getCustomerName(){
         try {
-            Map<String, Object> map = BeanUtil.object2Map(dto);
-            List<SelectOptionDto> tempList= tradeInfoPro001Service.getCustomerName(map);
+//            Map<String, Object> map = BeanUtil.object2Map(dto);
+            List<SelectOptionDto> tempList= tradeInfoPro001Service.getCustomerName();
             return new Message<List<SelectOptionDto>>().success().setData(tempList);
         } catch (Exception e) {
             logger.error("查询功能异常", e);
@@ -99,13 +106,13 @@ public class TradeInfoPro001Controller extends BaseController {
     @ApiOperation(value = "交易商信息查询", notes = "交易商信息查询")
     @ResponseBody
     @PostMapping("/getDealerTraderInfo")
-    public Message<TradeInfoProResponse> selectTraderInfo(@RequestBody TradeInfoProRequest dto ){
+    public Message<Page<TradeInfoProResponse>> selectTraderInfo(@RequestBody TradeInfoProRequest dto ){
         try {
-            TradeInfoProResponse tradeInfoProResponse= tradeInfoPro001Service.getDealerTraderInfo(dto);
-            return new Message<TradeInfoProResponse>().success().setData(tradeInfoProResponse);
+            Page<TradeInfoProResponse> page= tradeInfoPro001Service.getDealerTraderInfo(dto);
+            return new Message<Page<TradeInfoProResponse>>().success().setData(page);
         } catch (Exception e) {
             logger.error("查询功能异常", e);
-            return new Message<TradeInfoProResponse>().fail().setMessage("查询异常");
+            return new Message<Page<TradeInfoProResponse>>().fail().setMessage("查询异常");
         }
     }
 
@@ -120,16 +127,16 @@ public class TradeInfoPro001Controller extends BaseController {
     public Message deleteDealer(@RequestBody TradeInfoProSaveRequest dto){
         String dealerName = dto.getDealerName();
              //根据页面上交易商名称查找客户代码
-              String customerId = tradeInfoPro001Service.findCustomerIdByDealerName(dealerName);
-              dto.setCustomerId(customerId);
+//              String customerId = tradeInfoPro001Service.findCustomerIdByDealerName(dealerName);
+              dto.setCustomerId(dealerName);
 
         try{
               deleteDealer1(dto);
 //             int count = tradeInfoPro001Service.deleteDealer(dto);
-             if (tradeInfoPro001Service.hasDealerDetails(customerId)>0){
+             if (tradeInfoPro001Service.hasDealerDetails(dealerName)>0){
                  //删除该交易商对应的详情信息
 //                 tradeInfoPro001Service.deleteDealerDetails(customerId);
-                 deleteDealerDetails1(customerId);
+                 deleteDealerDetails1(dealerName);
              }
              return new Message().success();
         }catch (Exception e){
@@ -160,12 +167,17 @@ public class TradeInfoPro001Controller extends BaseController {
     public Message deleteTrader(@RequestBody TradeInfoProSaveRequest dto){
         String dealerName = dto.getDealerName();
         //根据页面上交易商名称查找客户代码
-        String customerId = tradeInfoPro001Service.findCustomerIdByDealerName(dealerName);
-        dto.setCustomerId(customerId);
+//        String customerId = tradeInfoPro001Service.findCustomerIdByDealerName(dealerName);
+        dto.setCustomerId(dealerName);
         String dealerPartyNo =  dto.getDealerPartyNo();
         try{
+            if (StringUtil.equals(dto.getTradeMarket(),"03")){
+                tradeInfoPro001Service.deleteTraderSJ(dto);
+            }else if(StringUtil.equals(dto.getTradeMarket(),"04")){
                 //删除交易主体和交易员信息
                 tradeInfoPro001Service.deleteTrader(dto);
+            }
+
             return new Message().success();
         }catch (Exception e){
             logger.error("删除功能异常", e);
@@ -183,10 +195,18 @@ public class TradeInfoPro001Controller extends BaseController {
     public Message insertDealer (@RequestBody TradeInfoProSaveRequest dto){
         TradeInfoProSaveRequest tradeInfoProSaveRequest = new TradeInfoProSaveRequest();
         BeanUtil.copyPropertiesIgnoreNull(tradeInfoProSaveRequest,dto);
+//        String dealerName = dto.getDealerName();
+//        //根据页面上交易商名称查找客户代码
+//        String customerId = tradeInfoPro001Service.findCustomerIdByDealerName(dealerName);//客户代码，交易商代码不能改
+        dto.setCustomerId(dto.getDealerName());
         try{
+            if(existsDealer(tradeInfoProSaveRequest)>0){
+                return new Message().fail().setMessage("交易商名称和交易商代码已存在，请勿重复插入！");
+            }else if (existsDealerAndTradeMarket(tradeInfoProSaveRequest)>0){
+                return new Message().fail().setMessage("交易商和交易商场所不能重复！");
+            }
             //新增交易商信息
              insertDealer1(dto);
-//            tradeInfoPro001Service.insertDealer(dto);
             return new Message().success();
         }catch (Exception e){
             logger.error("新增功能异常", e);
@@ -208,16 +228,31 @@ public class TradeInfoPro001Controller extends BaseController {
     public Message insertDealerDetails (@RequestBody TradeInfoProSaveRequest dto){
         TradeInfoProSaveRequest tradeInfoProSaveRequest = new TradeInfoProSaveRequest();
         BeanUtil.copyPropertiesIgnoreNull(tradeInfoProSaveRequest,dto);
+//        String dealerName = dto.getDealerName();
+//        //根据页面上交易商名称查找客户代码
+//        String customerId = tradeInfoPro001Service.findCustomerIdByDealerName(dealerName);//客户代码，交易商代码不能改
+        tradeInfoProSaveRequest.setCustomerId(dto.getDealerName());
+        BussinessCodeParameter param = new BussinessCodeParameter();
+        String seqNo = bussGetBussinessIdService !=null ? bussGetBussinessIdService.buildBussinessCode(param): IDGenerator.generate();
+        tradeInfoProSaveRequest.setSeqNo(seqNo);
         try{
-            //新增交易商详情信息
-            insertDealerDetails1(dto);
-//            tradeInfoPro001Service.insertDealerDetails(dto);
-            return new Message().success();
+               //新增交易商详情信息
+               insertDealerDetails1(tradeInfoProSaveRequest);
+               return new Message().success();
+
         }catch (Exception e){
-            logger.error("删除功能异常", e);
-            return new Message().fail().setMessage("删除异常");
+            logger.error("新增功能异常", e);
+            return new Message().fail().setMessage("新增异常");
 
         }
+    }
+
+    private int existsDealerAndTradeMarket(TradeInfoProSaveRequest dto) {
+        return tradeInfoPro001Service.existsDealerAndTradeMarket(dto);
+    }
+
+    private int existsDealer(TradeInfoProSaveRequest dto) {
+        return tradeInfoPro001Service.existsDealer(dto);
     }
 
     private int insertDealerDetails1(TradeInfoProSaveRequest dto) {
@@ -235,11 +270,18 @@ public class TradeInfoPro001Controller extends BaseController {
         String dealerName = dto.getDealerName();
         //根据页面上交易商名称查找客户代码
         String customerId = tradeInfoPro001Service.findCustomerIdByDealerName(dealerName);//客户代码，交易商代码不能改
+        dto.setCustomerId(dealerName);
         try{
-              deleteDealer1(dto);
-              TradeInfoProSaveRequest tradeInfoProSaveRequest = new TradeInfoProSaveRequest();
-              BeanUtil.copyPropertiesIgnoreNull(tradeInfoProSaveRequest,dto);
-              insertDealer1(tradeInfoProSaveRequest);
+            if(existsDealer(dto)>0){
+                return new Message().fail().setMessage("交易商名称和交易商代码不能重复！");
+            }else if (existsDealerAndTradeMarket(dto)>0){
+                return new Message().fail().setMessage("交易商和交易商场所不能重复！");
+            }
+//              deleteDealer1(dto);
+//              TradeInfoProSaveRequest tradeInfoProSaveRequest = new TradeInfoProSaveRequest();
+//              BeanUtil.copyPropertiesIgnoreNull(tradeInfoProSaveRequest,dto);
+//              insertDealer1(tradeInfoProSaveRequest);
+            tradeInfoPro001Service.updateByCustomerId(dto);
               return new Message().success();
         }catch (Exception e){
               logger.error("修改功能异常", e);
@@ -256,17 +298,27 @@ public class TradeInfoPro001Controller extends BaseController {
     @ResponseBody
     @PostMapping("editDealerDetails")
     public Message editDealerDetails (@RequestBody TradeInfoProSaveRequest dto){
-        String dealerName = dto.getDealerName();
-        //根据页面上交易商名称查找客户代码
-        String customerId = tradeInfoPro001Service.findCustomerIdByDealerName(dealerName);//客户代码，交易商代码不能改
+//        String dealerName = dto.getDealerName();
+//        //根据页面上交易商名称查找客户代码
+//        String customerId = tradeInfoPro001Service.findCustomerIdByDealerName(dealerName);//客户代码，交易商代码不能改
         try{
-            deleteDealerDetails1(customerId);
-            TradeInfoProSaveRequest tradeInfoProSaveRequest = new TradeInfoProSaveRequest();
-            BeanUtil.copyPropertiesIgnoreNull(tradeInfoProSaveRequest,dto);
-            BussinessCodeParameter param = new BussinessCodeParameter();
-            String seqNo = bussGetBussinessIdService !=null ? bussGetBussinessIdService.buildBussinessCode(param): IDGenerator.generate();
-            tradeInfoProSaveRequest.setSeqNo(seqNo);
-            insertDealerDetails1(tradeInfoProSaveRequest);
+//            deleteDealerDetails1(dealerName);
+//            TradeInfoProSaveRequest tradeInfoProSaveRequest = new TradeInfoProSaveRequest();
+//            BeanUtil.copyPropertiesIgnoreNull(tradeInfoProSaveRequest,dto);
+//            BussinessCodeParameter param = new BussinessCodeParameter();
+//            String seqNo = bussGetBussinessIdService !=null ? bussGetBussinessIdService.buildBussinessCode(param): IDGenerator.generate();
+//            tradeInfoProSaveRequest.setSeqNo(seqNo);
+//            insertDealerDetails1(tradeInfoProSaveRequest);
+            int n = 0;
+            if (StringUtil.equals(dto.getTradeMarket(),"03")){
+                 n = tradeInfoPro001Service.updateDetailsSJ(dto);
+            }else if(StringUtil.equals(dto.getTradeMarket(),"04")){
+                 n =tradeInfoPro001Service.updateDetails(dto);
+            }
+
+            if (n == 0){
+                return new Message().fail().setMessage("您还没修改！");
+            }
             return new Message().success();
         }catch (Exception e){
             logger.error("修改功能异常", e);

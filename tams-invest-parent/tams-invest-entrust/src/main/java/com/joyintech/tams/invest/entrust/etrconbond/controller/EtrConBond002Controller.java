@@ -1,13 +1,18 @@
 package com.joyintech.tams.invest.entrust.etrconbond.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.exception.MessageException;
+import com.joyintech.framework.exception.RestTemplateException;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
+import com.joyintech.tams.common.base.dao.FinProductMapper;
+import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
@@ -17,6 +22,7 @@ import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
+import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.invest.entrust.common.aop.EntrustRdsCommonAop;
 import com.joyintech.tams.invest.entrust.common.controller.EtrCommonController;
 import com.joyintech.tams.invest.entrust.etrconbond.dto.EtrConBondDto;
@@ -59,6 +65,9 @@ public class EtrConBond002Controller extends BaseController {
 
     @Autowired
     private EtrConBondDtoValidator etrConBondDtoValidator;
+
+    @Autowired
+    private FinProductMapper finProductMapper;
 
     @Override
     public String init(Model model) {
@@ -118,10 +127,10 @@ public class EtrConBond002Controller extends BaseController {
         model.addAttribute("MY_SUP_TIME_TYPE_02", DictCodeListExt1.监督时分_委托监控.getValue());
         model.addAttribute("fintype", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         model.addAttribute("etrPs", DictCodeList.交易方向_申购.getValue());
-        model.addAttribute("INV_AIM_default", DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue());
-        model.addAttribute("PURCH_MODLE_default", DictCodeListExt2.申购方式_网下申购.getValue());
+        model.addAttribute("INV_AIM_default", DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue());
         //配置单位 add by yeming 20210721 start
         model.addAttribute("entrustAmtUnit", CacheUtil.getSysParam("entrustAmtUnit"));
+        model.addAttribute("PURCH_MODLE_default", DictCodeListExt2.申购方式_网下申购.getValue());
         //配置单位 add by yeming 20210721 end
         PageElementConfigDto pageElementConfigDto = new PageElementConfigDto();
         pageElementConfigDto.setPageId("BaseRiskMathComm");
@@ -189,6 +198,17 @@ public class EtrConBond002Controller extends BaseController {
         if (result != null && result.hasErrors()) {
             return new AjaxResult(result);
         }
+        //可转债网下申购 组合下没有托管户资金账户异常提醒 ZGTFCP-2299
+        if(StringUtil.equals(dto.getOperateType(),"save") || StringUtil.equals(dto.getOperateType(),"submit")){
+            FinProduct finProduct = finProductMapper.selectByPrimaryKey(dto.getFinprodId());
+            if(null != finProduct && DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(finProduct.getFinprodType2()) && DictCodeList.交易方向_申购.getValue().equals(dto.getPs())
+             && DictCodeListExt2.申购方式_线下申购.getValue().equals(dto.getPurchModle())){
+                String accNo = EtrCommonCashPositionDealService.select组合托管户(dto.getPortfolioId(), dto.getCcy(), DictCodeListExt2.资金账户类型_托管户.getValue());
+                if(null == accNo){
+                    return new AjaxResult("用户组合下没有绑定托管户资金账户", MessageType.错误消息);
+                }
+            }
+        }
         if ((StringUtil.equals(dto.getOperateType(),"save") || StringUtil.equals(dto.getOperateType(),"submit"))
                 && (result==null?null:result.getErrorCount()) == 0) {
             AjaxResult ajaxResult = etrConBondDtoValidator.checkConfirmInfo(dto);
@@ -221,7 +241,7 @@ public class EtrConBond002Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("save")
-    public AjaxResult save(@Validated({ValidateGroupEdit.class}) @RequestBody EtrConBondDto dto, BindingResult br) throws Exception {
+    public AjaxResult save(@RequestBody EtrConBondDto dto, BindingResult br) throws Exception {
         if (br.hasErrors()) {
             return new AjaxResult(br);
         }
@@ -255,7 +275,12 @@ public class EtrConBond002Controller extends BaseController {
                       + entity.getFinprodMarketId()
                       );
         processParameter.setWorkFlowParameter(params);
-        String msg = etrConBondService.start(processParameter, dto);
+        String msg = "";
+        try {
+           msg = etrConBondService.start(processParameter, dto);
+        }catch (RestTemplateException e){
+            throw new MessageException(e.getMessage(),MessageType.错误消息);
+        }
         return new AjaxResult(msg);
     }
 }

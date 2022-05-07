@@ -70,11 +70,13 @@ public class CommonPositionEngineService {
     public String getDeliveryType(String finprodId) {
         String deliveryType = StringUtil.EMPTY;
         FinProductAdd finProductAdd = finProductAddMapper.selectByPrimaryKey(finprodId);
-        String isNoGuard = finProductAdd.getIsNoGuard();
-        if (StringUtil.isNotEmpty(isNoGuard) && isNoGuard.contains(DictCodeList.是否_否.getValue())) {
-            deliveryType = DictCodeListExt3.结算方式_头寸引擎_净额结算.getValue();
-        } else {
-            deliveryType = DictCodeListExt3.结算方式_头寸引擎_RTGS.getValue();
+        if(finProductAdd!=null){
+            String isNoGuard = finProductAdd.getIsNoGuard();
+            if (StringUtil.isNotEmpty(isNoGuard) && isNoGuard.contains(DictCodeList.是否_否.getValue())) {
+                deliveryType = DictCodeListExt3.结算方式_头寸引擎_净额结算.getValue();
+            } else {
+                deliveryType = DictCodeListExt3.结算方式_头寸引擎_RTGS.getValue();
+            }
         }
         return deliveryType;
     }
@@ -91,7 +93,7 @@ public class CommonPositionEngineService {
      * @return 清算速度
      */
     public String parseSettleSpreed(String deliveryType) {
-        String settleSpreed = BussinessDictCodeList.清算速度_T加1.getValue();
+        String settleSpreed = BussinessDictCodeList.清算速度_T加1.getCodeName();
         if (DictCodeListExt3.结算方式_头寸引擎_净额结算.getValue().equals(deliveryType)) {
             settleSpreed = BussinessDictCodeList.清算速度_T加1.getValue();
         } else if ((DictCodeListExt3.结算方式_头寸引擎_RTGS.getValue()).equals(deliveryType)) {

@@ -14,9 +14,9 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.BeanValidator;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.asset.bond.dto.FinAssetRateAdjResponse;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.invest.asset.common.dto.FinAssetRateAdjDto;
 import com.joyintech.tams.invest.asset.common.service.AssetCommonService;
 import com.joyintech.tams.invest.common.asset.dto.AssetCommonInfoDto;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
@@ -40,7 +40,7 @@ public class FinAssetRateAdjValidatorService implements BeanValidator{
     private IPlatformDate iPlatformDate;
     
     @Autowired
-    private AssetCommonService assetCommonService;
+    private FinBondAsset002Service finBondAsset002Service;
 
     /**
      * {@inheritDoc}
@@ -48,13 +48,13 @@ public class FinAssetRateAdjValidatorService implements BeanValidator{
     @Override
     public List<ValidMessage> valid(Object value) {
         List<ValidMessage> resultList = new ArrayList<ValidMessage>();
-        FinAssetRateAdjDto dto = (FinAssetRateAdjDto)value;
+        FinAssetRateAdjResponse dto = (FinAssetRateAdjResponse)value;
         Set<Date> set = new  HashSet<Date>();Set<String> setForChannel = new  HashSet<String>();
-        if(StringUtil.equals(dto.getType(), "01")){
+        if(StringUtil.equals(dto.getCouponSpecies(), "01")){
             Map<String,Object> map = new HashMap<String,Object>();
             map.put("finprodId", dto.getFinprodId());
             map.put("cashType", DictCodeListExt1.现金流二级类型_利息.getValue());
-            AssetCommonInfoDto assetCommonInfoDto  = assetCommonService.getAssetInfoToRateAdj(map);
+            AssetCommonInfoDto assetCommonInfoDto  =  finBondAsset002Service.getAssetInfoToRateAdj(map);
             if(null!=assetCommonInfoDto){
                 if(StringUtil.equals(assetCommonInfoDto.getIntType(), DictCodeList.利率类型_浮动利率.getValue())){
                     /*resultList.add(new ValidMessage("",
@@ -70,7 +70,7 @@ public class FinAssetRateAdjValidatorService implements BeanValidator{
             }
         }
         if(null!=dto.getSelectedItem()&&!dto.getSelectedItem().isEmpty()){
-            for(FinAssetRateAdjDto entity:dto.getSelectedItem()){
+            for(FinAssetRateAdjResponse entity:dto.getSelectedItem()){
                 if(null==entity.getEffDate()){
                     resultList.add(new ValidMessage("effDate",
                         getMessage("COMMON_E_0057", getMessage("FinAssetRateAdj001.effDate"))));
@@ -117,7 +117,8 @@ public class FinAssetRateAdjValidatorService implements BeanValidator{
                         }
                         // add by leipeng 20190626 【债券类资产】：利率调整生效日大于债券的到期日没有做时间判断
                         //add 活期存款到期日非必填，添加非空判断
-                        AssetCommonInfoDto basedto = assetCommonService.getMdateByFinproId(dto.getFinprodId());
+//                        AssetCommonInfoDto basedto = assetCommonService.getMdateByFinproId(dto.getFinprodId());
+                        AssetCommonInfoDto basedto = finBondAsset002Service.getMdateByFinproId(dto.getFinprodId());
                         if (StringUtil.isNotEmpty(basedto) && DateUtil.compareDate(entity.getEffDate(), basedto.getMdate()) == 1) {
                             resultList.add(new ValidMessage("", getMessage("FIN_ASSET_E_0019")));
                         }

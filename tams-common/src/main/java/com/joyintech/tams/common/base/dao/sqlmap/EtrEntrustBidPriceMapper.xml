@@ -10,10 +10,11 @@
         <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
         <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
         <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+        <result column="PORTFOLIO_ID" property="portfolioId" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
         ENTRUST_ID ENTRUST_ID, BID_PRICE BID_PRICE, BID_PRIN_AMT BID_PRIN_AMT, CREATE_USER CREATE_USER, 
-        CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME
+        CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME, PORTFOLIO_ID PORTFOLIO_ID
     </sql>
     <sql id="Sql_All_Data" >
         select 

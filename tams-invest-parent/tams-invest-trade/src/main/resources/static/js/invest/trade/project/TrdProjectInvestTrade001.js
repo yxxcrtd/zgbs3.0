@@ -150,6 +150,12 @@
                 return;
             }
             var object = rows[0];
+            // /* CQTZJYUAT-305 内部转仓只能撤销卖出交易 add by kongzhifang 20211207 start */
+            // if(object.psString == '买入'){
+            //     Joyin.alert('内部转仓只能撤销卖出交易，买入自动撤销')
+            //     return;
+            // }
+            // /* CQTZJYUAT-305 内部转仓只能撤销卖出交易 add by kongzhifang 20211207 end */
             object.operateType = "revoke";
             Joyin.ajax(basePath + 'invest/trade/project/TrdProjectInvestTrade001/revokeCheck', object, function (result) {
                 var resdata = result.data;

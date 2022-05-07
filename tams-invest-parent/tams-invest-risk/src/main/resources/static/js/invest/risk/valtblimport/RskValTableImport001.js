@@ -286,6 +286,10 @@ function checkDate(dateStr) {
         object.operateType = "sava";
         object.pageModel = pageModel;
         var fileInfo = getFileName();
+        if(fileInfo.length==0){
+            Joyin.error("未导入文件。");
+            return;
+        }
         if(typeof fileInfo[0] != 'undefined'){
             object.valTableFileName = fileInfo[0].fileName;
         }

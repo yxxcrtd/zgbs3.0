@@ -504,7 +504,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
                    dto.getIssueDto().getAddBatch(), dto.getTradeMarket(), DateUtil.format(dto.getIssueDto().getIssueDate(), "yyyyMMdd"), arr[1]);
        }else {
            return String.format("%s_%s_%d_%s_%s.%s", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue(), arr[0],
-                   dto.getIssueDto().getAddBatch(), dto.getTradeMarket(), DateUtil.format(dto.getProductAddDto().getBidDate(), "yyyyMMdd"), arr[1]);
+                   dto.getIssueDto().getAddBatch(), dto.getTradeMarket(), DateUtil.format(dto.getIssueDto().getIssueSdate(), "yyyyMMdd"), arr[1]);
        }
     }
 

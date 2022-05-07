@@ -101,7 +101,7 @@ public class IntegratedEntrustServiceImpl extends AsyncServiceImpl<String, Integ
                 IntegratedEntrust entrust = e.getValue();
                 if (!EntrustType.CANCEL.value.equals(entrust.getEntrustType())
                         && statusList.contains(String.valueOf(entrust.getEntrustStatus()))
-                        && ptlAuthList.contains(entrust.getPortfolioId())) {
+                        /*&& ptlAuthList.contains(entrust.getPortfolioId())*/) {
                     entrustList.add(entrust);
                 }
             }

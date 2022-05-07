@@ -966,4 +966,28 @@ public class PtlFundAllocationService extends BaseService<PtlFundAllocationDto> 
         }
         return 1;
     }
+    /**
+     * 获取现金实际余额
+     *
+     * @param map 请求参数
+     * @return 现金实际余额
+     * @see
+     * @since 1.0
+     */
+    public BigDecimal getActAmount(Map<String, Object> map) {
+        PtlCashPositionFlowDto ptlCashPositionFlowDto = new PtlCashPositionFlowDto();
+        BigDecimal amount = null;
+        try {
+            ptlCashPositionFlowDto = (PtlCashPositionFlowDto)JsonUtils.map2entity(map, PtlCashPositionFlowDto.class);
+            List<String> acctTypeList = new ArrayList<>();
+            acctTypeList.add(DictCodeListExt1.资金账户类型_产品托管户.getValue());
+            acctTypeList.add(DictCodeListExt1.资金账户类型_券商资金账户.getValue());
+            ptlCashPositionFlowDto.setAcctType(acctTypeList);
+            amount = basePtlCashPositionInfoService.queryActCashPosition(ptlCashPositionFlowDto);
+        }
+        catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
+        return amount;
+    }
 }

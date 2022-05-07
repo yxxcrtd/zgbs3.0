@@ -142,6 +142,20 @@ public class EtrExchangeTradeCommonValidatorService implements EtrExchangeCommon
 	@Override
 	public List<ValidMessage> bussValid(Object value) {
 		List<ValidMessage> errorList = new ArrayList<>();
+		EtrExchangeTradeSaveRequest dto = (EtrExchangeTradeSaveRequest) value;
+		if (StringUtil.equals(dto.getCurrentTab(),"gd")) {
+			if (dto.getOperateType().equals("save") || dto.getOperateType().equals("submit")) {
+				if (StringUtil.equals(CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL"), "02")) {
+					if (!StringUtil.isNotEmpty(dto.getBusinessModel())) {
+						errorList.add(new ValidMessage("businessModel", "请输入业务模式"));
+					}
+				} else {
+					if (!StringUtil.isNotEmpty(dto.getInvAim())) {
+						errorList.add(new ValidMessage("invAim", this.getMessage("ETR_ERROR_0060")));
+					}
+				}
+			}
+		}
 		return errorList;
 	}
 }

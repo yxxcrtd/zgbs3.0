@@ -25,6 +25,7 @@
     <sql id="onlyRegInfo">
         select   '有效' as effectiveStatusName,
         decode(reg.finprod_type2,'F01','01','F02','02','F03','02') as finprodType2,
+        fpt.TYPE_9 as assetType,
         decode(reg.finprod_type2,'F01',reg.finprod_id,reg.term_type) as finprodId,
         decode(reg.finprod_type2,'F01',fp.finprod_market_id,reg.term_type) as finprodMarketId,
         fp.finprod_abbr as finprodAbbr,
@@ -74,6 +75,7 @@
         on reg.totle_trade_id=regAdd.Totle_Trade_Id
         left join fin_product fp
         on fp.finprod_id=reg.finprod_id
+        left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = fp.FINPROD_ID
         inner join
         (
         select regdeal.totle_trade_id,wm_concat(regdeal.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName
@@ -142,6 +144,122 @@
                 #{item}
             </foreach>
         </if>
+        union all
+        select * from (
+            select '有效'                 effectiveStatusName,
+            '03'                         finprodType2,
+            fpt.TYPE_9 as assetType,
+            bo.FINPROD_ID                finprodId,
+            fp.FINPROD_MARKET_ID         finprodMarketId,
+            fp.finprod_abbr       as     finprodAbbr,
+            'T01'                        ps,
+            fp.TRADE_MARKET              tradeMarket,
+            null                         settleSpeed,
+            deal.SEC_ACCT_ID             secManageAcctId,
+            stlinfo.sec_acct_name as     secManageAcctIdName,
+            null                         faceValue,
+            TO_CHAR(ROUND((case
+                when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
+                then nvl(miri.INT_RATE, 0) + nvl(fpi.REFER_YIELD, 0)
+                else nvl(fpi.REFER_YIELD, 0) end)*100, 4), 'FM990.0000') || '%' tradeYield,
+            null                         termDays,
+            bo.PAYABLE_AMOUNT            tradeAmt,
+            bo.BID_ID                    busiCode,
+            bo.OUR_TRADER                trader,
+            bo.BID_DATE                  tradeDate,
+            null                         counterId,
+            null                         counterIdName,
+            deal.portfolioId      as     portfolioIds,
+            deal.portfolioName    as     portfolioNames,
+            null                         quoteType,
+            bo.REMARK                    remark,
+            bo.BID_ID                    totleTradeId,
+            '01'                         effectiveStatus,
+            '01'                         regStatus,
+            '04'                  as     dealType,
+            bo.BID_DATE                  settleDate,
+            null                  as     deliveryType,
+            null                  as     vsettleDate,
+            null                  as     msettleDate,
+            null                  as     pledgeFinprodIds,
+            null                  as     pledgeRatios,
+            null                  as     pledgeFaceValues,
+            null                  as     execid,
+            null                         calMode,
+            null                  as     unitCprice,
+            null                  as     yield,
+            null                  as     exerYield,
+            null                  as     rate,
+            null                  as     mtradeAmt
+            from BID_ORDER bo
+            left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
+            left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = fp.FINPROD_ID
+            left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = bo.FINPROD_ID
+            left join MST_INT_RATE_INFO miri on miri.INT_RATE_ID = fpi.INT_RATE_ID
+            inner join
+            (
+            select listagg(bobp.PORTFOLIO_ID, ',') within group (order by bobp.BID_ID) AS portfolioId,
+            listagg(pp.PORTFOLIO_NAME, ',') within group (order by bobp.BID_ID) AS portfolioName,
+            bobp.BID_ID,
+            eed.SEC_ACCT_ID
+            from BID_ORDER_BID_PRICE bobp
+            left join ptl_portfolio pp on bobp.portfolio_id = pp.portfolio_id
+            left join ETR_ENTRUST_DETAIL eed
+            on eed.ENTRUST_ID = bobp.ENTRUST_ID and bobp.PORTFOLIO_ID = eed.PORTFOLIO_ID
+            where 1=1
+            <if test="portfolioIdList != null and portfolioIdList.size() > 0">
+                AND bobp.portfolio_id in
+                <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            group by bobp.BID_ID, eed.SEC_ACCT_ID
+            ) deal on deal.BID_ID = bo.BID_ID
+            left join stl_sec_acct_info stlinfo on deal.SEC_ACCT_ID = stlinfo.sec_acct_id
+            where bo.BID_DATE= #{sysDate,jdbcType=DATE} and bo.trade_status='01' and bo.is_cancel='N'
+            AND NOT EXISTS (SELECT 1 FROM trdquto_match_info match where bo.BID_ID=match.pre_trade_id)
+            <if test="userId != null and userId != ''">
+                and bo.OUR_TRADER = #{userId}
+            </if>
+            <if test="finprodIdList != null and finprodIdList.size() > 0">
+                AND bo.finprod_id in
+                <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="tradeMarket != null and !tradeMarket.equals('')">
+                AND fp.TRADE_MARKET=#{tradeMarket,jdbcType=VARCHAR}
+            </if>
+            <if test="secAcctIdList != null and secAcctIdList.size() > 0">
+                AND deal.SEC_ACCT_ID in
+                <foreach collection="secAcctIdList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="busiCode != null and busiCode != ''">
+                AND bo.BID_ID like '%' || #{busiCode,jdbcType=VARCHAR} || '%'
+            </if>
+            <if test="dealType != null and dealType != ''">
+                AND '04'= #{dealType,jdbcType=VARCHAR}
+            </if>
+            <if test="counterIdList!=null  and counterIdList.size() > 0 ">
+                AND bo.OU_PARTY_ID IN
+                <foreach collection="counterIdList" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+        )
+        <where>
+            <if test="ps != null and !ps.equals('')">
+                AND ps=#{ps}
+            </if>
+            <if test="finprodType2List != null and finprodType2List.size() > 0">
+                AND finprod_type2 in
+                <foreach collection="finprodType2List" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
     </sql>
     <sql id="vagueQueryWhere">
         <where>
@@ -245,7 +363,8 @@
     </select>
     <sql id="onlyIbuInfo">
         select  '有效' as effectiveStatusName,
-        '01' as finprodType2,
+        '01'    finprodType2,
+        fpt.TYPE_9 as assetType,
         ib.finprod_id as finprodId,
         fp.finprod_market_id as finprodMarketId,
         fp.finprod_abbr as finprodAbbr,
@@ -294,6 +413,7 @@
         and  ibd.trade_status='07'
         left join fin_product fp
         on ib.finprod_id=fp.finprod_id
+        left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = fp.FINPROD_ID
         inner join(
         select ir.quote_id,wm_concat(ir.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName
         from ibu_quote_etr_re ir
@@ -366,7 +486,8 @@
         </if>
         union all
         select  '有效' as effectiveStatusName,
-        '02' as finprodType2,
+        '02'    finprodType2,
+        null as assetType,
         ic.term_type as finprodId,
         ic.term_type as finprodMarketId,
         null as finprodAbbr,
@@ -1783,6 +1904,14 @@
         where ic.TRADE_STATUS='07'
         <if test="totleTradeId != null and totleTradeId != ''">
             AND ic.quote_id =#{totleTradeId,jdbcType=VARCHAR}
+        </if>
+        union all
+        select
+        bo.BID_ID  as totleTradeId
+        from BID_ORDER bo
+        where bo.trade_status='01' and bo.is_cancel='N'
+        <if test="totleTradeId != null and totleTradeId != ''">
+            AND bo.BID_ID =#{totleTradeId,jdbcType=VARCHAR}
         </if>
     </select>
     <select id="findAllSecPtlsList" resultType="com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto" parameterType="java.lang.String" >

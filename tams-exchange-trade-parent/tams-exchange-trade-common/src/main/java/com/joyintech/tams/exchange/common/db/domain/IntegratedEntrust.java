@@ -3,7 +3,10 @@ package com.joyintech.tams.exchange.common.db.domain;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.exchange.common.constant.BatchPriceMode;
 import com.joyintech.tams.exchange.common.utils.DoubleSerializerUtils;
+import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -15,6 +18,7 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Map;
 
 @ApiModel(value = "综合业务下单响应报文", description = "综合业务下单响应报文")
 public class IntegratedEntrust extends BaseEntity implements Serializable, EntrustInterface, KeyMethodInterface<String> {
@@ -159,17 +163,20 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @Size(max = 32)
     private String liaisonName;
 
-    @ApiModelProperty(required = true, name = "liaisonTel", value = "联系方式（大宗交易），本方交易员（固收借用），对手方交易员（上海协议回购借用）")
+    @ApiModelProperty(required = true, name = "liaisonTel", value = "对手方交易员ID")
     @Size(max = 32)
     private String liaisonTel;
 
-    @ApiModelProperty(required = true, name = "propSeatNo", value = "对手方席位（大宗、深圳协议回购），对手方交易商（固收、上海协议回购借用）")
+    @ApiModelProperty(required = true, name = "propSeatNo", value = "对手方交易商ID")
     @Size(max = 16)
     private String propSeatNo;
 
     @ApiModelProperty(required = true, name = "propSeatName", value = "对手方交易商名称（上海协议回购借用）")
     @Size(max = 32)
     private String propSeatName;
+
+    @ApiModelProperty(required = false, name = "counterId", value = "交易对手")
+    private String counterId;
 
     @ApiModelProperty(required = true, name = "ownerType", value = "报价所有者类型")
     private String ownerType;
@@ -189,8 +196,6 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @ApiModelProperty(required = true, name = "investorName", value = "本方交易主体名称")
     private String investorName;
 
-    @ApiModelProperty(required = false, name = "counterId", value = "交易对手")
-    private String counterId;
 
     @ApiModelProperty(required = true, name = "propTradeId", value = "对手方交易员")
     private String propTradeId;
@@ -364,10 +369,10 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @ApiModelProperty(name = "ps", value = "交易方向", hidden = true)
     private String ps;
 
-    @ApiModelProperty(name = "softSkipMode", value = "软控是否继续？Y：继续", example = "Y")
+	@ApiModelProperty(name="softSkipMode",value="软控是否继续？Y：继续",example="Y")
     private String softSkipMode;
 
-    @ApiModelProperty(name = "busiTypeTg", value = "投管业务类型")
+	@ApiModelProperty(name = "busiTypeTg", value = "投管业务类型")
     private String busiTypeTg;
     @ApiModelProperty(name = "extend1", value = "扩展信息1")
     private String extend1;
@@ -386,16 +391,14 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     private String targetType;
     @ApiModelProperty(name = "isNoGuard", value = "是否非担保")
     private String isNoGuard;
-    @ApiModelProperty(name = "isNetPrice", value = "是否净价交易")
-    private String isNetPrice;
 
     public String getSoftSkipMode() {
         return softSkipMode;
     }
 
-    public void setSoftSkipMode(String softSkipMode) {
-        this.softSkipMode = softSkipMode;
-    }
+	public void setSoftSkipMode(String softSkipMode) {
+		this.softSkipMode = softSkipMode;
+	} 
 
     public boolean isNoCancelEntrust() {
         return noCancelEntrust;
@@ -690,6 +693,7 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
         this.compactTerm = compactTerm;
     }
 
+    @Override
     public BigDecimal getBackBalance() {
         return backBalance;
     }
@@ -1092,14 +1096,6 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
         this.isNoGuard = isNoGuard;
     }
 
-    public String getIsNetPrice() {
-        return isNetPrice;
-    }
-
-    public void setIsNetPrice(String isNetPrice) {
-        this.isNetPrice = isNetPrice;
-    }
-
     public String getTradeId() {
         return tradeId;
     }
@@ -1124,13 +1120,6 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
         this.dealerName = dealerName;
     }
 
-    public String getCounterId() {
-        return counterId;
-    }
-
-    public void setCounterId(String counterId) {
-        this.counterId = counterId;
-    }
 
     public String getPropTradeId() {
         return propTradeId;
@@ -1162,5 +1151,21 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
 
     public void setPropOwnerType(String propOwnerType) {
         this.propOwnerType = propOwnerType;
+    }
+
+    public String getCounterId() {
+        if(StringUtil.isNotEmpty(counterId)){
+            return counterId;
+        }
+        if (StringUtil.isNotEmpty(extend2) && extend2.contains("counterId")) {
+            Map map = JsonUtils.getObjectFromJson(extend2, Map.class);
+            return (String)map.get("counterId");
+        }
+
+        return "";
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
     }
 }

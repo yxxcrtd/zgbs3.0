@@ -14,6 +14,7 @@ package com.joyintech.tams.svreport.chb.astvalueregist.service;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.export.ExportParam;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.dao.BaseMapper;
@@ -136,7 +137,8 @@ public class ChbAstValueRegist001Service extends SvrCommonExportService<ChbAstVa
 		Page<ChbAstValueRegist001Dto> page = null;
 		//add by leipeng 20200628
 //		pageParam.put("orgCode", CommonUtil.getTreeInstCode());
-		String issuePartyId = CommonUtil.selectBankCode();
+//		String issuePartyId = CommonUtil.selectBankCode();
+		String issuePartyId = CacheUtil.getSysParam("SVR_ISSUE_PARTY_ID");
         if (pageParam.get(GlobalConstant.PARAM_PAGE) != null
                 && pageParam.get(GlobalConstant.PARAM_LENGTH) != null){
     		int pagenum = Integer.parseInt(pageParam.get(GlobalConstant.PARAM_PAGE).toString());
@@ -342,8 +344,8 @@ public class ChbAstValueRegist001Service extends SvrCommonExportService<ChbAstVa
         //update by leipeng 20191221 修改导出为框架导出
     	Page<ChbAstValueRegist001Dto> page = null;
     	//update by leipeng 20200701 资产多法人改造
-    	String issuePartyId = CommonUtil.selectBankCode();
-
+//    	String issuePartyId = CommonUtil.selectBankCode();
+		String issuePartyId = CacheUtil.getSysParam("SVR_ISSUE_PARTY_ID");
  		List<String>  orgCode = (List<String>) pageParam.get("orgCode");
 		 int pagenum = Integer.parseInt(pageParam.get(GlobalConstant.PARAM_PAGE).toString());
 	     int legth = Integer.parseInt(pageParam.get(GlobalConstant.PARAM_LENGTH).toString());
@@ -792,7 +794,8 @@ public class ChbAstValueRegist001Service extends SvrCommonExportService<ChbAstVa
 		}else{
 			// modify by zhangliang 20210315 直连报送全量查询 start
 			dealSearchParam(param);
-			String issuePartyId = CommonUtil.selectBankCode();
+//			String issuePartyId = CommonUtil.selectBankCode();
+			String issuePartyId = CacheUtil.getSysParam("SVR_ISSUE_PARTY_ID");
 			if(CommonUtil.isBAmodel()){
 				list = chbAstValueRegist001Mapper.searchPageEx(param);
 				list.forEach(item -> {

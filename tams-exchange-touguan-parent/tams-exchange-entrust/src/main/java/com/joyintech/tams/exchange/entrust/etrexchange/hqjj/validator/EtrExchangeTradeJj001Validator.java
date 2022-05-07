@@ -436,6 +436,11 @@ public class EtrExchangeTradeJj001Validator implements EtrCommonValidator {
 //				}
 			}
 
+			Boolean isNonTradingTime = etrExchangeTrade001Service.isNonTradingTime(dto);
+			if (isNonTradingTime) {
+				errorList.add(new ValidMessage("当日已闭市，不允许下指令"));
+			}
+
 //			//配股配债权益数量check
 //			if (DictCodeListExt2.交易方向_配股.getValue().equals(dto.getPs())||DictCodeListExt3.交易方向_配债.getValue().equals(dto.getPs())) {
 //				Map<String, Object> param = new HashMap<String, Object>();

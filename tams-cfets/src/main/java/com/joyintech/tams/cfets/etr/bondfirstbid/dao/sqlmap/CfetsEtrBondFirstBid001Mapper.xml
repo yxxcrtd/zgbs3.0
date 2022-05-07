@@ -435,9 +435,7 @@
         <where>
             PRODUCT.FINPROD_TYPE2=#{finprodType2,jdbcType=VARCHAR}
             AND PRODUCT.TRADE_MARKET in (#{TRADE_MARKET_01,jdbcType=VARCHAR}, #{TRADE_MARKET_02,jdbcType=VARCHAR}) <!-- 限制为银行间和商业柜台-->
-            AND PRODUCT_ADD.ISSUE_STATUS != '02' <!-- 限制为发行状态不为发行失败-->
-            AND ISSUE.ISSUE_DATE >= TO_DATE(#{platformDate},'YYYY-MM-DD')
-            AND ISSUE.TENDER_EDATE >= TO_DATE(#{platformDate},'YYYY-MM-DD')
+            AND (PRODUCT_ADD.ISSUE_STATUS != '02' OR PRODUCT_ADD.ISSUE_STATUS IS NULL ) <!-- 限制为发行状态不为发行失败-->
             <if test="finprodMarketId !=null and finprodMarketId !=''">
                 AND PRODUCT.FINPROD_MARKET_ID=#{finprodMarketId,jdbcType=VARCHAR}
             </if>
@@ -456,5 +454,69 @@
         </where>
 
     </sql>
+    <select id="selectEntrustById" resultType="com.joyintech.tams.common.base.entity.EtrEntrust" parameterType="java.lang.String" >
+        select
+            ENTRUST_ID entrustId, PORTFOLIO_ID portfolioId, FINPROD_ID finprodId, FINPROD_TYPE2 finprodType2,
+            TRADE_MARKET tradeMarket, TRADE_PLAT tradePlat, TRADE_MARKET_MODE tradeMarketMode,
+            PS ps, CCY ccy, INV_AIM invAim, COUNTER_ID counterId, IS_OUT_TRADE isOutTrade,
+            COUNTER_TRADER counterTrader, CONTACT_INFO contactInfo, ENTRUST_DATE entrustDate,
+            VDATE vdate, MDATE mdate, ENTRUST_AMT entrustAmt, ENTRUST_NUM entrustNum, AVAILABLE_NUM availableNum,
+            PRO_AVAILABLE_CASH proAvailableCash, ACC_AVAILABLE_CASH accAvailableCash, ENTRUST_STATUS entrustStatus,
+            PRICE price, IS_ACCURATE isAccurate, INV_MANAGER_ID invManagerId, CALENDAR_ID calendarId,
+            REMARK remark, CREATE_USER createUser, CREATE_DEPT createDept, CREATE_TIME createTime,
+            UPDATE_USER updateUser, UPDATE_TIME updateTime, CHL_ID chlId, SALE_CODE saleCode,
+            PRICE_MODEL priceModel, ENTRUST_TYPE entrustType, STOCK_ID stockId, ENTRUST_CLASS entrustClass ,BUSINESS_MODEL businessModel
+        from ETR_ENTRUST
+        where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+        UNION
+        select
+            ENTRUST_ID entrustId, PORTFOLIO_ID portfolioId, FINPROD_ID finprodId, FINPROD_TYPE2 finprodType2,
+            TRADE_MARKET tradeMarket, TRADE_PLAT tradePlat, TRADE_MARKET_MODE tradeMarketMode,
+            PS ps, CCY ccy, INV_AIM invAim, COUNTER_ID counterId, IS_OUT_TRADE isOutTrade,
+            COUNTER_TRADER counterTrader, CONTACT_INFO contactInfo, ENTRUST_DATE entrustDate,
+            VDATE vdate, MDATE mdate, ENTRUST_AMT entrustAmt, ENTRUST_NUM entrustNum, AVAILABLE_NUM availableNum,
+            PRO_AVAILABLE_CASH proAvailableCash, ACC_AVAILABLE_CASH accAvailableCash, ENTRUST_STATUS entrustStatus,
+            PRICE price, IS_ACCURATE isAccurate, INV_MANAGER_ID invManagerId, CALENDAR_ID calendarId,
+            REMARK remark, CREATE_USER createUser, CREATE_DEPT createDept, CREATE_TIME createTime,
+            UPDATE_USER updateUser, UPDATE_TIME updateTime, CHL_ID chlId, SALE_CODE saleCode,
+            PRICE_MODEL priceModel, ENTRUST_TYPE entrustType, STOCK_ID stockId, ENTRUST_CLASS entrustClass ,BUSINESS_MODEL businessModel
+        from WFL_ETR_ENTRUST
+        where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+    </select>
 
+    <select id="selectEntrustAddById" resultType="com.joyintech.tams.common.base.entity.EtrEntrustAdd" parameterType="java.lang.String" >
+        select
+            ENTRUST_ID entrustId, SEC_ACCT_ID secAcctId
+        from ETR_ENTRUST_ADD
+        where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+        UNION
+        select
+            ENTRUST_ID entrustId, SEC_ACCT_ID secAcctId
+        from WFL_ETR_ENTRUST_ADD
+        where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+    </select>
+    <select id="selectBidPriceById" resultType="com.joyintech.tams.common.base.entity.EtrEntrustBidPrice" parameterType="java.lang.String" >
+        SELECT ENTRUST_ID entrustId, BID_PRICE bidPrice, BID_PRIN_AMT bidPrinAmt, CREATE_USER createUser, CREATE_DEPT createDept,
+               CREATE_TIME createTime, UPDATE_USER updateUser, UPDATE_TIME updateTime, PORTFOLIO_ID portfolioId
+        FROM ETR_ENTRUST_BID_PRICE
+        where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+        UNION
+        SELECT ENTRUST_ID entrustId, BID_PRICE bidPrice, BID_PRIN_AMT bidPrinAmt, CREATE_USER createUser, CREATE_DEPT createDept,
+               CREATE_TIME createTime, UPDATE_USER updateUser, UPDATE_TIME updateTime, PORTFOLIO_ID portfolioId
+        FROM WFL_ETR_ENTRUST_BID_PRICE
+        where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+    </select>
+    <select id="selectEntrustDetailById" resultType="com.joyintech.tams.common.base.entity.EtrEntrustDetail" parameterType="java.lang.String" >
+        SELECT ENTRUST_ID entrustId, PORTFOLIO_ID portfolioId, DIS_RATE disRate, ENTRUST_AMT entrustAmt, ENTRUST_NUM entrustNum,
+               TARGET_TYPE targetType, CREATE_USER createUser, CREATE_DEPT createDept, CREATE_TIME createTime, UPDATE_USER updateUser,
+               UPDATE_TIME updateTime, INV_AIM invAim, SEC_ACCT_ID secAcctId
+        FROM ETR_ENTRUST_DETAIL
+        where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+        UNION
+        SELECT ENTRUST_ID entrustId, PORTFOLIO_ID portfolioId, DIS_RATE disRate, ENTRUST_AMT entrustAmt, ENTRUST_NUM entrustNum,
+               TARGET_TYPE targetType, CREATE_USER createUser, CREATE_DEPT createDept, CREATE_TIME createTime, UPDATE_USER updateUser,
+               UPDATE_TIME updateTime, INV_AIM invAim, SEC_ACCT_ID secAcctId
+        FROM WFL_ETR_ENTRUST_DETAIL
+        where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+    </select>
 </mapper>

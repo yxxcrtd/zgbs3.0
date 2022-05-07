@@ -398,10 +398,10 @@ public class SysInstRegBankCode001Service extends CommonExportService<SysInstReg
     
     
     public String[] getRegistCode(String orgCode){
-       // String issuePartyId = SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_ISSUE_PARTY_ID);
-        String issuePartyId = CommonUtil.selectBankCode();
-        //String  issuePartyName = SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_ISSUE_PARTY_NAME);
-        String  issuePartyName=CommonUtil.selectBankCodeName();
+        String issuePartyId = SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_ISSUE_PARTY_ID);
+//        String issuePartyId = CommonUtil.selectBankCode();
+        String  issuePartyName = SvrDataUtil.getSysParam(SVReportGlobalConstant.SVR_ISSUE_PARTY_NAME);
+//        String  issuePartyName=CommonUtil.selectBankCodeName();
         // 发行机构代码取值
         if(null!=orgCode){
         	Map<String,Object> param = new HashMap<>();

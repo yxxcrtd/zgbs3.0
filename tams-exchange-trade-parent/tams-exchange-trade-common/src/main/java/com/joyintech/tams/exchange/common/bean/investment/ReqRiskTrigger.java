@@ -6,46 +6,182 @@ import java.math.BigDecimal;
  * 触发风险请求bean
  */
 public class ReqRiskTrigger {
-    private String conShareId;//转股代码
-    private BigDecimal conPrice;//转股价格
-    private BigDecimal conNum;//转股数量
+
+    /**
+     * 转股代码
+     */
+    private String conShareId;
+
+    /**
+     * 转股价格
+     */
+    private BigDecimal conPrice;
+
+    /**
+     * 转股数量
+     */
+    private BigDecimal conNum;
+
+    /**
+     * 系统资产细类(没有资产代码必填)
+     */
     private String assetType2;
+
+    /**
+     * 回购类型
+     */
     private String repurchaseType;
+
+    /**
+     * 交易币种
+     */
     private String ccy;
+
+    /**
+     * 交易场所
+     */
     private String tradePlace;
+
+    /**
+     * 系统资产大类(没有资产代码必填)
+     */
     private String assetType;
+
+    /**
+     * 交易日期
+     */
     private String eventDate;
+
+    /**
+     * 交易代码
+     */
     private String eventId;
 
+    /**
+     * 产品代码
+     */
     private String portfolioCode;
+
+    /**
+     * 委托开始日
+     */
     private String startDate;
+
+    /**
+     * 委托结束日
+     */
     private String endDate;
     private String tradeDate;
+
+    /**
+     * 交割日
+     */
     private String deliveryDate;
+
+    /**
+     * 交易方向
+     */
     private String ps;
+
+    /**
+     * 资产代码（有资产代码必填）
+     */
     private String assetCode;
+
+    /**
+     * 资产名称
+     */
     private String assetName;
     private String market;
+
+    /**
+     * 金额
+     */
     private BigDecimal amount;
+
+    /**
+     * 价格
+     */
     private BigDecimal priceAmt;
+
+    /**
+     * 交易数量
+     */
     private Long tradeNum;
+
+    /**
+     * 净价
+     */
     private BigDecimal netPrice;
+
+    /**
+     * 全价
+     */
     private BigDecimal allPrice;
+
+    /**
+     * 单位净值
+     */
     private BigDecimal unitNet;
+
+    /**
+     * 资产利率
+     */
     private BigDecimal assetRate;
+
+    /**
+     * 交易员
+     */
     private String trader;
+
+    /**
+     * 投资经理
+     */
     private String manager;
+
+    /**
+     * 审批发起人
+     */
     private String createUser;
+
+    /**
+     * 审批人
+     */
     private String approveUser;
+
+    /**
+     * 市场代码
+     */
     private String marketCode;
+
+    /**
+     * 事件类型
+     */
     private String eventType;
 
+    /**
+     * 期限品种
+     */
     private String varietyCode;
+
+    /**
+     * 起息日
+     */
     private String vdate;
+
+    /**
+     * 到期日
+     */
     private String mdate;
-    private String firstIssueDealNo; // 成交编号  协议回购非首期必填
 
+    /**
+     * 成交编号  协议回购非首期必填
+     */
+    private String firstIssueDealNo;
 
+    /**
+     * 资管委托编号
+     */
     private String entrustCode;
 
     public String getEventId() {

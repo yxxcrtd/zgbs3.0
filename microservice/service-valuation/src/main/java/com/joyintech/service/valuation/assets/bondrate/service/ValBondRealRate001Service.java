@@ -10,23 +10,19 @@
 
 package com.joyintech.service.valuation.assets.bondrate.service;
 
-import java.util.List;
-import java.util.Map;
-
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.service.valuation.assets.bondrate.dao.ValBondRealRate001Mapper;
 import com.joyintech.service.valuation.assets.bondrate.dto.ValBondRealRate001Dto;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * 债券实际利率查询
@@ -57,14 +53,14 @@ public class ValBondRealRate001Service extends CommonExportService<ValBondRealRa
      */
     public Page<ValBondRealRate001Dto> findPage(int page, int length, Map<String, Object> params){
         params.put("finprodType", DictCodeListExt1.金融产品类型_债券.getValue());
-        params.put("invAim", DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue());
+        params.put("invAim", DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue());
         return super.queryForPageForSelectReturn(page, length, () -> valBondRealRate001Mapper.findPage(params));
     }
     
     
     public List<ValBondRealRate001Dto> findAll(Map<String, Object> params){
             params.put("finprodType", DictCodeListExt1.金融产品类型_债券.getValue());
-            params.put("invAim", DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue());
+            params.put("invAim", DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue());
             return valBondRealRate001Mapper.findPage(params);
         }
 

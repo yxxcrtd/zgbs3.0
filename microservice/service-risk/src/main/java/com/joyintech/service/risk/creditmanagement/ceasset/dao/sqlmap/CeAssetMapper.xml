@@ -139,6 +139,19 @@
 			<if test="customerId !=null and customerId != ''">
 				AND a.FINPROD_ID = #{customerId,jdbcType=VARCHAR}
 			</if>
+			<!--TISHKS-947:过滤计划类利率型资产期次管理中的期次维度 modify by fuyongsheng 20220506 start-->
+			AND NOT EXISTS (
+				SELECT
+					1
+				FROM
+					FIN_PRODUCT fp
+				WHERE
+					fp.FINPROD_ID = a.FINPROD_ID
+					AND fp.FINPROD_TYPE = 'F17'
+					AND fp.FINPROD_TYPE2 = 'F17'
+					AND fp.P_FINPROD_ID IS NOT NULL
+			)
+			<!--TISHKS-947:过滤计划类利率型资产期次管理中的期次维度 modify by fuyongsheng 20220506 end-->
 		</where>
 	</select>
 	<!-- modify by gaopeng 20191015 end 修改过滤条件 -->

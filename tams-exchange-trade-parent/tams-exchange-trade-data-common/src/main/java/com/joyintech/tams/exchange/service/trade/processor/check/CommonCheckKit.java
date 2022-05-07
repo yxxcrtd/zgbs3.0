@@ -300,7 +300,8 @@ public class CommonCheckKit extends BaseCheckKit {
     @SuppressWarnings("unused")
     private void checkPriceStep(BaseOrderRequest order, Instruction instruction) throws BusinessResultException {
         BigDecimal entrustPrice = order.getEntrustPrice();
-        BigDecimal priceStep = NumberUtil.null2Zero(instruction.queryMinPrice(order.getEntrustProp()));
+        String entrustProp = EntrustPropUtils.getEntrustPropWithHandleNewBond(instruction, order.getEntrustProp());
+        BigDecimal priceStep = NumberUtil.null2Zero(instruction.queryMinPrice(entrustProp));
         if (priceStep.compareTo(BigDecimal.ZERO) <= 0) {
             throw new BusinessResultException(ErrorCode.INNER_RISK_ERROR,
                     StrUtil.format("无法获取最小价格变动单位"));
@@ -312,7 +313,8 @@ public class CommonCheckKit extends BaseCheckKit {
     }
 
     private MinTrdUnitLimit getMinTrdUnitLimit(BaseOrderRequest order, Instruction instruction) {
-        MinTrdUnitLimit minTrdUnitLimit = instruction.queryMinTrdUnitLimit(order.getEntrustProp());
+        String entrustProp = EntrustPropUtils.getEntrustPropWithHandleNewBond(instruction, order.getEntrustProp());
+        MinTrdUnitLimit minTrdUnitLimit = instruction.queryMinTrdUnitLimit(entrustProp);
         if (ObjectUtil.isNull(minTrdUnitLimit)) {
             throw new BusinessResultException(ErrorCode.INNER_RISK_ERROR,
                     StrUtil.format("无法获取交易所交易属性"));

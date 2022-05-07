@@ -105,6 +105,7 @@ public class EtrPlanAssetC002Controller extends BaseController {
         if (!WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotEmpty(workflowId)) {
             EtrPlanAssetCDto dto = etrPlanAssetCService.getBussinessEntityByWorkflowId(
                 workflowId);
+            dto.setProfitType(DictCodeList.收益类型_货币型.getValue());
             model.addAttribute(GlobalConstant.ENTITY, dto);
             model.addAttribute("riskTrialRetDto", JsonUtils.object2Json(dto.getRiskTrialRetDto()));
             model.addAttribute("person_entity", JsonUtils.object2Json(dto.getEtrInvestPersonInfo()));
@@ -121,6 +122,7 @@ public class EtrPlanAssetC002Controller extends BaseController {
             if (dto.getEntrustNum2() == null) {
                 dto.setEntrustNum2(dto.getEntrustNum());
             }
+            dto.setProfitType(DictCodeList.收益类型_货币型.getValue());
             model.addAttribute(GlobalConstant.ENTITY, dto);
             model.addAttribute("tradeId", dto.getEntrustId());
             model.addAttribute("person_entity", JsonUtils.object2Json(dto.getEtrInvestPersonInfo()));

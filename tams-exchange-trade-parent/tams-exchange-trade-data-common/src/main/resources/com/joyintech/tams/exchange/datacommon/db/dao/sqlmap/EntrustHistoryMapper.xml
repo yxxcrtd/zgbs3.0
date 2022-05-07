@@ -63,7 +63,7 @@
         <result column="EXPIRE_YEAR_RATE" property="expireYearRate" jdbcType="NUMERIC"/>
         <result column="TARGET_TYPE" property="targetType" jdbcType="VARCHAR"/>
         <result column="IS_NO_GUARD" property="isNoGuard" jdbcType="VARCHAR"/>
-        <result column="IS_NET_PRICE" property="isNetPrice" jdbcType="VARCHAR"/>
+        <result column="IS_FULL_PRICE" property="isFullPrice" jdbcType="VARCHAR"/>
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
@@ -134,7 +134,7 @@
     IP_MAC, REMARK, CREATE_TIME, UPDATE_TIME, ENTRUST_STATUS, ORIG_ENTRUST_ID, ENTRUST_ID, REPORT_NO, OPERATE_USRE,
     OFFSET_FLAG, HEDGE_FLAG,PORTFOLIO_NAME,SEC_ACCT_ID,SEC_ACCT_NAME,TRADE_PLAT,FINPROD_TYPE2,
     INV_MANAGER_ID,PS,BUSI_TYPE_TG, EXTEND1, EXTEND2,CON_NUM,ENTRUST_CLASS,EXPIRE_YEAR_RATE,
-    TARGET_TYPE,IS_NO_GUARD,IS_NET_PRICE
+    TARGET_TYPE,IS_NO_GUARD,IS_FULL_PRICE
     </sql>
     <select id="selectByExample" resultMap="BaseResultMap"
             parameterType="com.joyintech.tams.exchange.common.db.domain.EntrustHistoryExample">
@@ -185,7 +185,7 @@
                                       ENTRUST_ID, REPORT_NO, OPERATE_USER, OFFSET_FLAG, HEDGE_FLAG,
                                       PORTFOLIO_NAME, SEC_ACCT_ID, SEC_ACCT_NAME, TRADE_PLAT,
                                       FINPROD_TYPE2, INV_MANAGER_ID, PS, BUSI_TYPE_TG, EXTEND1, EXTEND2,
-                                      CON_NUM, ENTRUST_CLASS, EXPIRE_YEAR_RATE, TARGET_TYPE, IS_NO_GUARD, IS_NET_PRICE)
+                                      CON_NUM, ENTRUST_CLASS, EXPIRE_YEAR_RATE, TARGET_TYPE, IS_NO_GUARD, IS_FULL_PRICE)
     </sql>
     <insert id="insert" parameterType="com.joyintech.tams.exchange.common.db.domain.EntrustHistory">
         <include refid="entrustHistoryFiled"/>
@@ -210,7 +210,7 @@
         #{invManagerId,jdbcType=VARCHAR}, #{ps,jdbcType=VARCHAR}, #{busiTypeTg,jdbcType=VARCHAR},
         #{extend1,jdbcType=VARCHAR}, #{extend2,jdbcType=VARCHAR}, #{conNum,jdbcType=NUMERIC},
         #{entrustClass,jdbcType=VARCHAR}, #{expireYearRate,jdbcType=NUMERIC}, #{targetType,jdbcType=VARCHAR},
-        #{isNoGuard,jdbcType=VARCHAR}, #{isNetPrice,jdbcType=VARCHAR})
+        #{isNoGuard,jdbcType=VARCHAR}, #{isFullPrice,jdbcType=VARCHAR})
     </insert>
 
     <insert id="insertBatch" parameterType="com.joyintech.tams.exchange.common.db.domain.EntrustHistory">
@@ -262,7 +262,7 @@
             #{record.expireYearRate,jdbcType=NUMERIC},
             #{record.targetType,jdbcType=VARCHAR},
             #{record.isNoGuard,jdbcType=VARCHAR},
-            #{record.isNetPrice,jdbcType=VARCHAR}
+            #{record.isFullPrice,jdbcType=VARCHAR}
         </foreach>
     </insert>
 
@@ -427,8 +427,8 @@
             <if test="isNoGuard != null">
                 IS_NO_GUARD,
             </if>
-            <if test="isNetPrice != null">
-                IS_NET_PRICE,
+            <if test="isFullPrice != null">
+                IS_FULL_PRICE,
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -590,8 +590,8 @@
             <if test="isNoGuard != null">
                 #{isNoGuard,jdbcType=VARCHAR},
             </if>
-            <if test="isNetPrice != null">
-                #{isNetPrice,jdbcType=VARCHAR},
+            <if test="isFullPrice != null">
+                #{isFullPrice,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>
@@ -793,8 +793,8 @@
             <if test="record.isNoGuard != null">
                 IS_NO_GUARD = #{record.isNoGuard,jdbcType=VARCHAR},
             </if>
-            <if test="record.isNetPrice != null">
-                IS_NET_PRICE = #{record.isNetPrice,jdbcType=VARCHAR},
+            <if test="record.isFullPrice != null">
+                IS_FULL_PRICE = #{record.isFullPrice,jdbcType=VARCHAR},
             </if>
         </set>
         <if test="_parameter != null">
@@ -863,7 +863,7 @@
         EXPIRE_YEAR_RATE = #{record.expireYearRate,jdbcType=NUMERIC},
         TARGET_TYPE = #{record.targetType,jdbcType=VARCHAR},
         IS_NO_GUARD = #{record.isNoGuard,jdbcType=VARCHAR},
-        IS_NET_PRICE = #{record.isNetPrice,jdbcType=VARCHAR}
+        IS_FULL_PRICE = #{record.isFullPrice,jdbcType=VARCHAR}
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
         </if>
@@ -1050,8 +1050,8 @@
             <if test="isNoGuard != null">
                 IS_NO_GUARD = #{isNoGuard,jdbcType=VARCHAR},
             </if>
-            <if test="isNetPrice != null">
-                IS_NET_PRICE = #{isNetPrice,jdbcType=VARCHAR},
+            <if test="isFullPrice != null">
+                IS_FULL_PRICE = #{isFullPrice,jdbcType=VARCHAR},
             </if>
         </set>
         where ID = #{id,jdbcType=VARCHAR}
@@ -1117,7 +1117,7 @@
             EXPIRE_YEAR_RATE  = #{expireYearRate,jdbcType=NUMERIC},
             TARGET_TYPE       = #{targetType, jdbcType= VARCHAR},
             IS_NO_GUARD       = #{isNoGuard,jdbcType=VARCHAR},
-            IS_NET_PRICE      = #{isNetPrice,jdbcType=VARCHAR}
+            IS_FULL_PRICE     = #{isFullPrice,jdbcType=VARCHAR}
         where ID = #{id,jdbcType=VARCHAR}
     </update>
 </mapper>

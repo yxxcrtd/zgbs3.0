@@ -38,7 +38,7 @@ import java.util.List;
  * @see EtrExchangeTradeSaveSecRepoRequest
  * @since 1.0
  */
-@PageId("EtrExchangeTradeSecRepo004")
+@PageId("etrExchangeTradeSec")
 @ValidLogic(targetClass = EtrExchangeTradeSecRepo001Validator.class , groups = {ValidateGroupEdit.class,
     ValidateGroupDelete.class})
 @ApiModel(value="指令下单表单",description="指令下单表单")

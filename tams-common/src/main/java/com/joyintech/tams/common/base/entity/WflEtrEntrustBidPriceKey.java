@@ -18,6 +18,11 @@ public class WflEtrEntrustBidPriceKey extends BaseEntity {
     private BigDecimal bidPrice;
 
     /**
+     * 组合ID
+     */
+    private String portfolioId;
+
+    /**
      * 取得 委托代码
      * @return 委托代码
      */
@@ -47,5 +52,13 @@ public class WflEtrEntrustBidPriceKey extends BaseEntity {
      */
     public void setBidPrice(BigDecimal bidPrice) {
         this.bidPrice = bidPrice;
+    }
+
+    public String getPortfolioId() {
+        return portfolioId;
+    }
+
+    public void setPortfolioId(String portfolioId) {
+        this.portfolioId = portfolioId;
     }
 }

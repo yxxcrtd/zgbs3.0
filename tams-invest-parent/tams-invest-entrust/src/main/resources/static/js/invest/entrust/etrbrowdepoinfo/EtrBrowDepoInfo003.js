@@ -46,7 +46,7 @@
         , {field: 'finprodAbbr', title: 'EtrBrowDepoInfo001.finprodId', width: 150, sortable: false}
         , {field: 'psStr', title: 'EtrBrowDepoInfo001.ps', width: 150, sortable: false}
         , {field: 'ccyStr', title: 'EtrBrowDepoInfo001.ccy', width: 120, sortable: false}
-        , {field: 'entrustAmt', title: 'EtrBrowDepoInfo003.entrustAmt', width: 120, sortable: false}
+        , {field: 'entrustAmt', title: 'EtrBrowDepoInfo003.entrustAmt', width: 120, sortable: false,type: 'number',digit: 2}
         , {field: 'price', title: 'EtrBrowDepoInfo003.price', width:100, type:'number', sortable: false}
         , {field: 'dateStartStr', title: 'EtrBrowDepoInfo001.vdate', width: 120, sortable: false}
         , {field: 'dateEndStr', title: 'EtrBrowDepoInfo001.mdate', width: 120, sortable: false}

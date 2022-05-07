@@ -1,5 +1,7 @@
 package com.joyintech.tams.exchange.common.constant;
 
+import com.joyintech.tams.exchange.common.enums.IEnum;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,7 +11,7 @@ import java.util.Map;
  * @author lifangpeng
  * @date 2022/4/24 18:31
  */
-public enum RequestStatus {
+public enum RequestStatus implements IEnum<Integer> {
 
     WAIT_CONFIRM("待确认", 1),
     REPLIED("已回复", 2),
@@ -54,5 +56,16 @@ public enum RequestStatus {
 
     public void setValue(int value) {
         this.value = value;
+    }
+
+
+    @Override
+    public Integer getCode() {
+        return value;
+    }
+
+    @Override
+    public String getDescription() {
+        return name;
     }
 }

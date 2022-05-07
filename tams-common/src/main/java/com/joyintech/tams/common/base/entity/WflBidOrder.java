@@ -104,6 +104,11 @@ public class WflBidOrder extends BaseEntity {
     private String workflowStatus;
 
     /**
+     * 分配方式
+     */
+    private String dipType;
+
+    /**
      * 投标编号
      *
      * @return BID_ID 投标编号
@@ -426,5 +431,13 @@ public class WflBidOrder extends BaseEntity {
      */
     public void setWorkflowStatus(String workflowStatus) {
         this.workflowStatus = workflowStatus == null ? null : workflowStatus.trim();
+    }
+
+    public String getDipType() {
+        return dipType;
+    }
+
+    public void setDipType(String dipType) {
+        this.dipType = dipType;
     }
 }

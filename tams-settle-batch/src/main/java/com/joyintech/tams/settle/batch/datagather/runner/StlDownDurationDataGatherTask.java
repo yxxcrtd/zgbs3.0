@@ -25,6 +25,7 @@ import com.joyintech.tams.settle.batch.datagather.reader.repo.StlDataGatherRepoD
 import com.joyintech.tams.settle.batch.datagather.writer.StlDataGatherWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -107,7 +108,9 @@ public class StlDownDurationDataGatherTask extends BatchBaseService {
         Integer unFinishMatchNum = trdCommonBaseService.getUnFinishMatchSettleTransDataNum(date);
         if(unFinishMatchNum > 0){
             logger.debug("当日未完全成交匹配数量大于0,批处理退出。");
-            return null;
+            JobExecution result = new JobExecution(1l);
+            result.setStatus(BatchStatus.STOPPED);
+            return result;
         }
         JobExecution jobExecution = batchBuilder.init(this)
             .batch("fund2", stlDataGatherFund2Reader, stlDataGatherFund2Processor, stlDataGatherWriter)

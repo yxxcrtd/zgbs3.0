@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeListExt3;
@@ -9409,8 +9410,10 @@ public class PbcMonthAssetReportService  extends BaseService{
 
     public String[] getRegistCode(String orgCode){
         // String issuePartyId = CommonUtil.selectBankCode();
-        String issuePartyId = CommonUtil.selectBankCode();
-        String  issuePartyName = CommonUtil.selectBankCode();
+//        String issuePartyId = CommonUtil.selectBankCode();
+//        String  issuePartyName = CommonUtil.selectBankCode();
+        String issuePartyId = CacheUtil.getSysParam("SVR_ISSUE_PARTY_ID");
+        String issuePartyName = CacheUtil.getSysParam("SVR_ISSUE_PARTY_NAME");
         // 发行机构代码取值
         if(null!=orgCode){
             Map<String,Object> param = new HashMap<>();

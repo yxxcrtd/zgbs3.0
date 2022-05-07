@@ -144,6 +144,10 @@ public class EtrBondFirstLBiddingDtoValidator implements BeanValidator{
 //                }
 //            }
             // delete by renping 改为共通处理 2019-08-22 end
+            if (StringUtil.isNotEmpty(dto) && !StringUtil.isNotEmpty(dto.getInvAim()) ) {
+                errorList.add(new ValidMessage("invAim",  "请输入投资目的！"));
+
+            }
             BussEtrInvestPersonInfoDto personDto =  dto.getEtrInvestPersonInfo();
             if (StringUtil.isNotEmpty(personDto) && !StringUtil.isNotEmpty(personDto.getCounterId()) ) {
                 errorList.add(new ValidMessage("etrInvestPersonInfo.counterId",  "请输入交易对手！"));

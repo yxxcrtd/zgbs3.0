@@ -415,6 +415,7 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
      * @date 2022/4/21 14:28
      */
     public Page<CfetsTrdBondFirstDaySubDto> pageDaySub(CfetsTrdBondFirstDaySubRequest dto) {
+        logger.debug("当日申购,入参:" + JsonUtils.object2Json(dto));
         Map<String, Object> pageParam = BeanUtil.object2Map(dto);
         pageParam.put("loginUserId", LoginUserUtil.getUserName());
         pageParam.put("sysDate", iPlatformDate.getSysDateStr());
@@ -432,6 +433,7 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
      * @date 2022/4/21 14:28
      */
     public List<CfetsTrdBondFirstDaySubDto> listDaySub(Map<String, Object> pageParam) {
+        logger.debug("当日申购,入参:" + JsonUtils.object2Json(pageParam));
         pageParam.put("loginUserId", LoginUserUtil.getUserName());
         pageParam.put("platDate", iPlatformDate.getSysDateStr());
         pageParam.put("OPR_TYPE_09", DictCodeListExt3.操作类型_导出.getValue());
@@ -449,6 +451,7 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
      * @date 2022/4/26 19:30
      */
     public List<CfetsTrdBondFirstSubDealDetailDto> listDaySubDetail(CfetsTrdBondFirstDaySubRequest request) {
+        logger.debug("申购明细,入参:" + JsonUtils.object2Json(request));
         Map<String, Object> pageParam = BeanUtil.object2Map(request);
         return cfetsTrdBondFirstSub001Mapper.listDaySubDetail(pageParam);
     }
@@ -462,6 +465,7 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
      * @date 2022/4/26 19:37
      */
     public Page<CfetsTrdBondFirstSubDealDetailDto> pageDaySubDetail(CfetsTrdBondFirstDaySubRequest request) {
+        logger.debug("申购明细,入参:" + JsonUtils.object2Json(request));
         Map<String, Object> pageParam = BeanUtil.object2Map(request);
         PageMode pageMode = this.setPageMode(request.getPageMode());
         return super.queryForPage(pageMode.getPageNo(), pageMode.getPageSize(), () -> cfetsTrdBondFirstSub001Mapper.listDaySubDetail(pageParam));
@@ -476,22 +480,10 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
      * @date 2022/4/26 19:36
      */
     public Page<CfetsTrdBondFirstSubDealDetailDto> pageDaySubDealDetail(CfetsTrdBondFirstDaySubRequest request) {
+        logger.debug("申购执行明细,入参:" + JsonUtils.object2Json(request));
         Map<String, Object> pageParam = BeanUtil.object2Map(request);
         PageMode pageMode = this.setPageMode(request.getPageMode());
         return super.queryForPage(pageMode.getPageNo(), pageMode.getPageSize(), () -> cfetsTrdBondFirstSub001Mapper.listDaySubDealDetail(pageParam));
-    }
-
-    /**
-     * 当日申购撤销检查
-     *
-     * @param cfetsBondRegCheckRequst
-     * @return com.joyintech.framework.ajax.AjaxResult
-     * @author jiangpeng
-     * @date 2022/4/21 14:28
-     */
-    public AjaxResult checkDayRegRevokeCheck(CfetsBondRegCheckRequst cfetsBondRegCheckRequst) {
-        AjaxResult ajaxResult = new AjaxResult();
-        return ajaxResult;
     }
 
     /**

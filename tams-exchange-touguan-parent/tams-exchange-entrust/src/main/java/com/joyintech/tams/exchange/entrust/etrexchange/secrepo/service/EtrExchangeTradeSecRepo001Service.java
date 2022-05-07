@@ -57,7 +57,6 @@ import com.joyintech.tams.component.base.core.MstWorkflowCommonService;
 import com.joyintech.tams.component.base.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.base.entrust.BusiAutoEtrDispService;
-import com.joyintech.tams.component.business.common.dto.FinStockInfoDto;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.*;
@@ -74,7 +73,6 @@ import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTr
 import com.joyintech.tams.exchange.entrust.etrexchange.position.service.PositionRequestServiceEtrExchangeTradeSaveSecRepoRequest;
 import com.joyintech.tams.invest.common.asset.dto.FinCashPlanDto;
 import com.joyintech.tams.invest.common.component.base.entrust.BaseEtrInvestInfoService;
-import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.dto.BaseEtrInvestInfoDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
@@ -652,7 +650,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         //增加调用头寸引擎代码end
     }
 
-    private void doDeleteFlow(String workflowId) {
+    public void doDeleteFlow(String workflowId) {
         Map<String, Object> param = new HashMap<>();
         param.put("workflowId", workflowId);
         restTemplate.postForObject(
@@ -660,7 +658,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                 Boolean.class);
     }
 
-    private void doInsertFlow(EtrExchangeTradeSaveSecRepoRequest dto) {
+    public void doInsertFlow(EtrExchangeTradeSaveSecRepoRequest dto) {
         BaseEtrInvestInfoDto entity = buildMultiEtrFlow(dto);
         dto.setAssetType2(entity.getEtrEntrustAdd().getAssetType1());
         // 设置指令创建来源
@@ -1429,17 +1427,11 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
      public List<ValidMessage> checkSavePriceRange(EtrExchangeTradeSaveSecRepoRequest entity, BindingResult result) {
         try {
             // 当前系统时间
-            Date nowDate = DateUtil.platDateFromCache();
+            String nowDate = DateUtil.getDateTimestamp();
             // 业务品种
             String finprodType = null;
             // 标的信息
             FinProduct finproduct = new FinProduct();
-            Map<String, Object> map = new HashMap<>();
-            map.put("initValue", entity.getStockId());
-            Page<SelectOptionDto> dtoPage = getFinprodMarketInfo(map);
-            if (null != dtoPage && !StringUtil.isEmptyList(dtoPage.getRoot())) {
-                finproduct = BeanUtil.mapToObject((Map) dtoPage.getRoot().get(0).getObject(), FinProduct.class);
-            }
             // 检查价格
             BigDecimal checkPrice = entity.getPrice();
             // 行情信息
@@ -1449,6 +1441,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                 if(StringUtil.equals(entity.getPriceType(),DictCodeListExt3.计价方式_全价.getValue())){
                     checkPrice = entity.getFprice();
                 }
+                finproduct.setFinprodId(entity.getFinprodId());
                 finprodType = DictCodeListExt1.金融产品类型_投管用_债券.getValue();
                 finproduct.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
             }
@@ -1478,7 +1471,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
      * @return
      */
     private List<ValidMessage> checkPriceRangeCommon(String finprodType, FinProduct finproduct, EtrExchangeTradeSaveSecRepoRequest entity,
-                                                    BigDecimal checkPrice, Date nowDate, EtrExchangeTradeQuotationHqSecRepoResponse quotation) {
+                                                    BigDecimal checkPrice, String nowDate, EtrExchangeTradeQuotationHqSecRepoResponse quotation) {
         List<ValidMessage> validMessageList = new ArrayList<>();
         FinProductType finProductType = new FinProductType();
         if(finproduct!=null&&finproduct.getFinprodId()!=null){
@@ -1492,7 +1485,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         if(finproduct!=null){
             paraMap.put("ASSET_CLASSIFY1",finproduct.getFinprodType2());
         }else{
-            paraMap.put("ASSET_CLASSIFY1","ZYSHG");
+            paraMap.put("ASSET_CLASSIFY1","F07");
 
         }
         if(StringUtil.isNotEmpty(entity.getDealMode())){
@@ -1510,14 +1503,14 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         // 开盘集合竞价
         else if(StringUtil.equals(trdPriceTimeConfig.getPriceTimeType(),DictCodeListExt3.价格申报范围类型_开盘集合竞价.getValue())){
             if(StringUtil.equals(finprodType,DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
-                if(quotation!=null
+                if(quotation!=null&&quotation.getPreClosePrice()!=null
                         &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(1.3),quotation.getPreClosePrice()))>0
                             ||checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(0.7),quotation.getPreClosePrice()))<0)){
                     validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
                 }
             }
             else if(StringUtil.equals(finprodType,DictCodeList.回购类型_质押式竞价回购.getValue())){
-                if(quotation!=null
+                if(quotation!=null&&quotation.getPreClosePrice()!=null
                         &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(2),quotation.getPreClosePrice()))>0
                         ||checkPrice.compareTo(BigDecimal.ZERO)<0)){
                     validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
@@ -1532,13 +1525,13 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                         ||StringUtil.equals(finProductType.getType6(), DictCodeList.WIND一级分类_含债券一级分类等_政府支持机构债.getValue())
                         ||(StringUtil.equals(finProductType.getType6(), DictCodeList.WIND一级分类_含债券一级分类等_金融债.getValue())
                             &&StringUtil.equals(finProductType.getType7(), DictCodeList.WIND二级分类_含债券二级分类等_政策银行债.getValue()))){
-                    if(quotation!=null
+                    if(quotation!=null&&quotation.getLastPrice()!=null
                             &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(1.1),quotation.getLastPrice()))>0
                             ||checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(0.9),quotation.getLastPrice()))<0)){
                         validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
                     }
                 }else{
-                    if(quotation!=null
+                    if(quotation!=null&&quotation.getLastPrice()!=null
                             &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(1.2),quotation.getLastPrice()))>0
                             ||checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(0.8),quotation.getLastPrice()))<0)){
                         validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
@@ -1546,7 +1539,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                 }
             }
             else if(StringUtil.equals(finprodType,DictCodeList.回购类型_质押式竞价回购.getValue())){
-                if(quotation!=null
+                if(quotation!=null&&quotation.getLastPrice()!=null
                         &&(checkPrice.compareTo(ArithmeticUtil.doAdd(new BigDecimal(0.01),quotation.getLastPrice()))>0
                         ||checkPrice.compareTo(BigDecimal.ZERO)<0)){
                     validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
@@ -1652,7 +1645,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         BigDecimal entrustNum = this.toBigDecimal(param.get("entrustNum"));
         String ps = param.get("ps") == null ? null : param.get("ps").toString();
 //        String currentTab = param.get("currentTab") == null ? null : param.get("currentTab").toString();
-        String currentTab = (String) param.get("dealMode");
+        String currentTab = param.get("dealMode")== null ? DictCodeListExt3.指定交易方式_协商成交.getValue() : param.get("dealMode").toString();
         BigDecimal entrustPrice = this.toBigDecimal(param.get("entrustPrice"));
         String targetType = (String) param.get("targetType");
         String finprodId = (String) param.get("finprodId");
@@ -1838,7 +1831,8 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
      */
     public BigDecimal getMinNumStep(Map<String, Object> param) {
         String ps = !StringUtil.isNotEmpty(param.get("ps")) ? "T01" : param.get("ps").toString();
-        String currentTab = param.get("currentTab") == null ? null : param.get("currentTab").toString();
+//        String currentTab = param.get("currentTab") == null ? null : param.get("currentTab").toString();
+        String currentTab = StringUtil.isNotEmpty(param.get("currentTab")) ? param.get("currentTab").toString():DictCodeListExt3.指定交易方式_协商成交.getValue() ;
         String finprodId = (String) param.get("finprodId");
         String finprodType2 = (String) param.get("finprodType2");
         String tradeMarket = (String) param.get("tradeMarket");
@@ -2440,7 +2434,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         return dto;
     }
 
-    private void doInsertBackupQuery(EtrExchangeTradeSaveSecRepoRequest dto) {
+    public void doInsertBackupQuery(EtrExchangeTradeSaveSecRepoRequest dto) {
         BaseEtrInvestInfoDto entity = buildMultiEtrFlow(dto);
         WFlowCommonService.inserBackuptWithQuery(entity);
     }
@@ -2492,7 +2486,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
     }
 
     public MinTrdUnitLimitDto getMinTrdUnitLimitPrice(EtrExchangeMiniLimitPriceRequest request) {
-        MinTrdUnitLimitDto minTrdUnitLimitDto = getInterfSysMinTrdUnit(request.getFinprodId(), request.getTradePlat(), request.getTradeMarket(), request.getFinprodType2(), request.getPs());
+        MinTrdUnitLimitDto minTrdUnitLimitDto = getInterfSysMinTrdUnit(request.getFinprodId(), StringUtil.isNotEmpty(request.getTradePlat())?request.getTradePlat():DictCodeListExt3.指定交易方式_协商成交.getValue(), request.getTradeMarket(), request.getFinprodType2(), request.getPs());
         return minTrdUnitLimitDto;
     }
 

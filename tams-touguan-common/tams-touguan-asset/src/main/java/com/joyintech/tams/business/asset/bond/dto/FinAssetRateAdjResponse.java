@@ -1,12 +1,14 @@
 package com.joyintech.tams.business.asset.bond.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.joyintech.framework.base.BaseEntity;
+import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.export.paginator.domain.ITableRow;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.tams.common.base.entity.FinCashCalcRule;
 import com.joyintech.tams.common.base.entity.FinCashPlan;
 import com.joyintech.tams.common.base.entity.PaFinCashCalcRule;
+import com.joyintech.workflow.engine.annotation.PrimaryKey;
+import com.joyintech.workflow.engine.annotation.PrimaryKey.Field;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -23,6 +25,7 @@ import java.util.List;
  * @see FinAssetRateAdjResponse
  * @since 1.0
  */
+@PageId("FinBondAsset003")
 @ApiModel(value="利率调整信息查询返回参数",description="利率调整信息查询返回参数")
 public class FinAssetRateAdjResponse  extends FinCashCalcRule implements ITableRow, ProcessEntity {
 
@@ -63,7 +66,6 @@ public class FinAssetRateAdjResponse  extends FinCashCalcRule implements ITableR
     @ApiModelProperty(name="finprodType2",value="资产类")
     private String finprodType2;
 
-
     @ApiModelProperty(name="selectedItem",value="选择数据")
     private List<FinAssetRateAdjResponse> selectedItem;
 
@@ -76,6 +78,8 @@ public class FinAssetRateAdjResponse  extends FinCashCalcRule implements ITableR
     private String cashId;
 
     private String basis;
+
+    private String couponSpecies;
 
     @ApiModelProperty(name="paFinCashCalcRuleList",value="计算规则扩展")
     private List<PaFinCashCalcRule> paFinCashCalcRuleList;
@@ -159,6 +163,7 @@ public class FinAssetRateAdjResponse  extends FinCashCalcRule implements ITableR
         this.isInitial = isInitial;
     }
 
+    @PrimaryKey(PrimaryKey.Field.PK_1)
     public String getFinprodId() {
         return finprodId;
     }
@@ -259,5 +264,13 @@ public class FinAssetRateAdjResponse  extends FinCashCalcRule implements ITableR
 
     public void setInvestRate(BigDecimal investRate) {
         this.investRate = investRate;
+    }
+
+    public String getCouponSpecies() {
+        return couponSpecies;
+    }
+
+    public void setCouponSpecies(String couponSpecies) {
+        this.couponSpecies = couponSpecies;
     }
 }

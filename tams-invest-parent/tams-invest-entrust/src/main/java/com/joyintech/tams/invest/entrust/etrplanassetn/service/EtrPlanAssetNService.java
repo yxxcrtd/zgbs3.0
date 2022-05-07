@@ -809,4 +809,10 @@ public class EtrPlanAssetNService extends CommonExportService<EtrPlanAssetNDto> 
         confirmMsg = etrCommonService.StringAddByBr(confirmMsg, etrCommonService.checkIsGtZero(data, labelName, indexId));
         return confirmMsg;
     }
+
+    public double getValue(Map map) {
+        return restTemplate.postForObject(
+                ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrPlanAssetN/getValue",map,
+                double.class);
+    }
 }

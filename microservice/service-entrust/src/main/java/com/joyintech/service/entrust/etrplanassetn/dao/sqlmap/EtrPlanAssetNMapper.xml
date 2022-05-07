@@ -554,4 +554,17 @@
 			COUNTER_ID = #{counterId}
 		</where>
 	</select>
+
+	<select id="getValue" resultType="java.lang.Double">
+		select
+			NVL(C.VALUATION,0)   value
+		from
+			MST_CUSTOMER_INFO A,
+			FIN_PRODUCT B,
+			FIN_PRODUCT_VALUATION C
+		WHERE C.FINPROD_ID = B.FINPROD_MARKET_ID
+		  AND B.MANAGER = A.CUSTOMER_ID(+)
+		  AND B.FINPROD_MARKET_ID = #{finprodId}
+		  AND C.VAL_DATE =to_date(#{sysdate},'yyyy-MM-dd')
+	</select>
 </mapper>

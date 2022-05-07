@@ -140,7 +140,13 @@ public enum DictCodeListExt1 implements BaseDictCodeList {
 	投资目的_公允价值变动计入当期损益(DictCode.投资目的,"FVTPL","公允价值变动计入当期损益"),
 	投资目的_摊余成本类(DictCode.投资目的,"AC","摊余成本类"),
 	投资目的_公允价值变动计入其他综合收益(DictCode.投资目的,"FVOCI","公允价值变动计入其他综合收益"),
+	投资目的_以出售该金融资产为目的(DictCode.投资目的,"FVTPL","以出售该金融资产为目的"),
+	投资目的_以收取该金融资产合同现金流量为目的(DictCode.投资目的,"AC","以收取该金融资产合同现金流量为目的"),
+	投资目的_以收取该合同现金流量及出售金融资产为目的(DictCode.投资目的,"FVOCI","以收取该合同现金流量及出售金融资产为目的"),
 	投资目的_卖空(DictCode.投资目的,"SELL","卖空"),
+	投资目的_套期保值(DictCode.投资目的,"HEDGING","套期保值"),
+	投资目的_投资(DictCode.投资目的,"INVEST","投资"),
+
 	销售模式_直销(DictCode.销售模式,"01","直销"),
 	销售模式_代销(DictCode.销售模式,"02","代销"),
 	销售模式_委托(DictCode.销售模式,"03","委托"),
@@ -1920,6 +1926,7 @@ public enum DictCodeListExt1 implements BaseDictCodeList {
 	// 从DictCodeList.java移过来，超过65535的限制了 end
 	登记资产类型_债券(DictCode.登记资产类型,"01","债券"),
 	登记资产类型_质押式回购(DictCode.登记资产类型,"02","质押式回购"),
+	登记资产类型_一级申购(DictCode.登记资产类型,"03","一级申购"),
 	CSTP资产类型_债券(DictCode.CSTP资产类型,"BOND","债券"),
 	;
 

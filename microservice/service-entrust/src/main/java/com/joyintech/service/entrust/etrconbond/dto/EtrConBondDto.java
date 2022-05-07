@@ -14,7 +14,6 @@ import com.joyintech.service.entrust.etrbondfirstlbidding.dto.BussEtrInvestPerso
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.common.base.entity.SysUploadFileInfo;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
-import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
@@ -452,19 +451,19 @@ public class EtrConBondDto extends EtrEntrust {
         this.nextUser = nextUser;
     }
 
-    public Long getPositionSeqno() {
-        return positionSeqno;
-    }
-
-    public void setPositionSeqno(Long positionSeqno) {
-        this.positionSeqno = positionSeqno;
-    }
-
     public String getSoftSkipMode() {
         return softSkipMode;
     }
 
     public void setSoftSkipMode(String softSkipMode) {
         this.softSkipMode = softSkipMode;
+    }
+
+    public Long getPositionSeqno() {
+        return positionSeqno;
+    }
+
+    public void setPositionSeqno(Long positionSeqno) {
+        this.positionSeqno = positionSeqno;
     }
 }

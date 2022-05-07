@@ -39,6 +39,8 @@ public class TradeInfoProSaveRequest extends BaseEntity implements ProcessEntity
     @ApiModelProperty(name="dealerNo",value="交易商代码",example="A1", required = true)
     private String dealerNo;
 
+    @ApiModelProperty(name="dealNoPre",value="修改前交易商代码",example="A1")
+    private String dealNoPre;
 
     @ApiModelProperty(name="dealerPartyNo",value="交易主体代码",example="A1", required = true)
     private String dealerPartyNo;
@@ -60,6 +62,10 @@ public class TradeInfoProSaveRequest extends BaseEntity implements ProcessEntity
 
     @ApiModelProperty(name="selectedItem",value="选中数据",example="A1,A2..", required = true)
     private List<TradeInfoProSaveRequest> selectedItem;
+    @ApiModelProperty(name="dealerPartyNoPre",value="修改前交易主体代码",example="A1")
+    private String dealerPartyNoPre;
+    @ApiModelProperty(name="traderNoPre",value="修改前交易对手代码",example="A1")
+    private String traderNoPre;
 
     public String getOperateType() {
         return operateType;
@@ -187,5 +193,29 @@ public class TradeInfoProSaveRequest extends BaseEntity implements ProcessEntity
 
     public void setSeqNo(String seqNo) {
         this.seqNo = seqNo;
+    }
+
+    public String getDealNoPre() {
+        return dealNoPre;
+    }
+
+    public void setDealNoPre(String dealNoPre) {
+        this.dealNoPre = dealNoPre;
+    }
+
+    public String getDealerPartyNoPre() {
+        return dealerPartyNoPre;
+    }
+
+    public void setDealerPartyNoPre(String dealerPartyNoPre) {
+        this.dealerPartyNoPre = dealerPartyNoPre;
+    }
+
+    public String getTraderNoPre() {
+        return traderNoPre;
+    }
+
+    public void setTraderNoPre(String traderNoPre) {
+        this.traderNoPre = traderNoPre;
     }
 }

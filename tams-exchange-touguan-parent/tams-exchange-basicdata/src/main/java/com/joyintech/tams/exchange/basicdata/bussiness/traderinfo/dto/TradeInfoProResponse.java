@@ -1,8 +1,12 @@
 package com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dto;
 
 
+import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.invest.common.util.SysDataUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
+import java.util.List;
 
 @ApiModel(value="交易商信息维护返回参数",description="交易商信息维护返回参数")
 public class TradeInfoProResponse {
@@ -10,11 +14,18 @@ public class TradeInfoProResponse {
     @ApiModelProperty(name="dealer",value="交易商",example="A1", required = true)
     private String dealer;
 
+
+    @ApiModelProperty(name="customerId",value="客户代码",example="A1", required = true)
+    private String customerId;
+
     @ApiModelProperty(name="tradeMarket",value="交易场所",example="A1", required = true)
     private String tradeMarket;
 
     @ApiModelProperty(name="dealerNo",value="交易商代码",example="A1", required = true)
     private String dealerNo;
+
+    @ApiModelProperty(name="dealerName",value="交易商名称",example="A1", required = true)
+    private String dealerName;
 
     @ApiModelProperty(name="dealerPartyNo",value="交易主体代码",example="A1", required = true)
     private String dealerPartyNo;
@@ -34,6 +45,13 @@ public class TradeInfoProResponse {
     @ApiModelProperty(name="isOur",value="本方标识",example="A1", required = true)
     private String isOur;
 
+    @ApiModelProperty(name="traderList",value="交易主体信息")
+    private List<TraderInfoDto> traderInfoDtoList;
+
+
+    public String getTradeMarketStr(){
+        return SysDataUtil.getNameFromDataDict(DictCode.交易流通场所, this.getTradeMarket());
+    }
     public String getDealer() {
         return dealer;
     }
@@ -60,6 +78,10 @@ public class TradeInfoProResponse {
 
     public String getDealerPartyType() {
         return dealerPartyType;
+    }
+
+    public String getDealerPartyTypeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.交易主体类型, this.getDealerPartyType());
     }
 
     public void setDealerPartyType(String dealerPartyType) {
@@ -96,5 +118,37 @@ public class TradeInfoProResponse {
 
     public void setIsOur(String isOur) {
         this.isOur = isOur;
+    }
+
+    public String getDealerName() {
+        return dealerName;
+    }
+
+    public void setDealerName(String dealerName) {
+        this.dealerName = dealerName;
+    }
+
+    public String getDealerPartyNo() {
+        return dealerPartyNo;
+    }
+
+    public void setDealerPartyNo(String dealerPartyNo) {
+        this.dealerPartyNo = dealerPartyNo;
+    }
+
+    public List<TraderInfoDto> getTraderInfoDtoList() {
+        return traderInfoDtoList;
+    }
+
+    public void setTraderInfoDtoList(List<TraderInfoDto> traderInfoDtoList) {
+        this.traderInfoDtoList = traderInfoDtoList;
+    }
+
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
     }
 }

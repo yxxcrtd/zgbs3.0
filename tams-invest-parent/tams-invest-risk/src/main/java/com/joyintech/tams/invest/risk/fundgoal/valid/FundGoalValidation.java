@@ -40,9 +40,15 @@ public class FundGoalValidation  implements BeanValidator {
                 resultList.add(new ValidMessage("该资产在此投向维护日已有记录，不可再新增"));
             }
         }
-        if(DateUtil.compareDate(fundGoalDto.getGoalDate(),fundGoalDto.getNextPubDate())>0){
-            resultList.add(new ValidMessage("下一投向公布日早于投向维护日不允许提交"));
+        // TISHKS-666:下一投向公布日早于或等于投向维护日不允许提交 modify by fuyongsheng 20220505 start
+//        if(DateUtil.compareDate(fundGoalDto.getGoalDate(),fundGoalDto.getNextPubDate())>0){
+//            resultList.add(new ValidMessage("下一投向公布日早于投向维护日不允许提交"));
+//        }
+        if(DateUtil.compareDate(fundGoalDto.getGoalDate(),fundGoalDto.getNextPubDate())>=0){
+            resultList.add(new ValidMessage("下一投向公布日早于或等于投向维护日不允许提交"));
         }
+        // TISHKS-666:下一投向公布日早于或等于投向维护日不允许提交 modify by fuyongsheng 20220505 end
+
         if (fundGoalDto.getbEquityPer()!=null&&fundGoalDto.getbEquityPer().compareTo(new BigDecimal(0))<0){
             resultList.add(new ValidMessage("权益类占比不能小于0"));
         }
