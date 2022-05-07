@@ -13,12 +13,14 @@ package com.joyintech.tams.exchange.entrust.etrexchange.common.dto;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.framework.validation.annotation.ValidLogic;
 import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.exchange.entrust.etrexchange.hqjj.validator.EtrExchangeTradeJj001Validator;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
@@ -232,6 +234,7 @@ public class EtrExchangeTradeSaveRequest extends EtrEntrust implements ProcessEn
     List<EtrExchangeTradePortfolioRequest> portfolioList;
 
     List<EtrExchangeTradePortfolioRequest> tradeMultiPtl001Dtos; //待办提交风险试算结果保存需要
+
 
     /**
      * 组合名称
@@ -756,8 +759,13 @@ public class EtrExchangeTradeSaveRequest extends EtrEntrust implements ProcessEn
     public void setCurrentTab(String currentTab) {
         this.currentTab = currentTab;
     }
-
     public List<EtrExchangeTradePortfolioRequest> getTradeMultiPtl001Dtos(){
-        return  this.portfolioList;
+        List<EtrExchangeTradePortfolioRequest> tradeMultiPtl001Dtos=this.portfolioList;
+        tradeMultiPtl001Dtos.stream().forEach(item->{
+            if(StringUtil.equals(item.getIsMulti(), DictCodeList.是否_是.getValue())) {
+                item.setEntrustId(item.getEntrustId()+"-"+item.getPortfolioId());
+            }
+        });
+        return  tradeMultiPtl001Dtos;
     }
 }

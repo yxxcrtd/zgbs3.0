@@ -75,7 +75,6 @@ public class CfetsPortfolioAcctRela002Controller extends BaseController {
 		} else {
 			CfetsPortfolioAcctRela001Dto dto = new CfetsPortfolioAcctRela001Dto();
 			dto.setCfetsAcctType(BussinessDictCodeList.账户来源_理财.getValue());
-            dto.setPortfolioId("ZUHE1689,wlceshi001");
             model.addAttribute("entity", dto);
 		}
 		return super.init(model);

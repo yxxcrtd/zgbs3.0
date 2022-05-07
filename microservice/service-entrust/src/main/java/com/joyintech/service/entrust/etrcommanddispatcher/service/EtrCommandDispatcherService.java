@@ -1,26 +1,24 @@
 package com.joyintech.service.entrust.etrcommanddispatcher.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import com.alibaba.fastjson.JSON;
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
+import com.joyintech.framework.base.BaseService;
+import com.joyintech.service.entrust.etrcommanddispatcher.dao.EtrCommandDispatcherMapper;
+import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrCommandDispatcherDto;
+import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrCommandDispatcherTotalDto;
 import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrEntrustDetailDto;
-import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrTradePledgeDto;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSON;
-import com.joyintech.framework.base.BaseService;
-import com.joyintech.service.entrust.etrcommanddispatcher.dao.EtrCommandDispatcherMapper;
-import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrCommandDispatcherDto;
-import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrCommandDispatcherTotalDto;
-import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrTradePledgeDto;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.invest.common.constant.ServiceApplication;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 

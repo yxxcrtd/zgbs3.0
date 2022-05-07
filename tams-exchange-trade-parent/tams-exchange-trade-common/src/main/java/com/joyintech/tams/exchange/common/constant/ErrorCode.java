@@ -92,6 +92,9 @@ public enum ErrorCode {
 
     ENTRUST_PROP_NOT_EXIT(1020, "委托属性不存在"),
 
+    CANCEL_ENTRUST_BUSI_ERROR(1021, "该类业务不可撤单"),
+
+
     /**
      * 2001 —— 3000终端错误号
      */

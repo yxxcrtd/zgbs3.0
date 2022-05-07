@@ -377,5 +377,6 @@ public interface EtrExchangeTradeCommonMapper {
 
 	Map findTandardRate(Map<String, Object> pageParam);
 
+	int deleteRskIsupTrial(String entrustId);
 
 }

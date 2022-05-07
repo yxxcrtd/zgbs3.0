@@ -390,7 +390,9 @@ public class MstSecuritiesAccountDto extends StlSecAcctInfo implements ITableRow
      */
     @Override
     @NotEmpty(fieldName = "MstSecuritiesAccount001.secAcctName", groups = {ValidateGroupEdit.class})
-    @Length(fieldName = "MstSecuritiesAccount001.secAcctName", max = 30, groups = {ValidateGroupEdit.class})
+    // TISHKS-538:【重庆已安排】CLONE - 【清算交收】【账户管理】【证券账户管理】新建页面，证券账户名称长度不够 modify by huwei 2022/5/7 start
+    @Length(fieldName = "MstSecuritiesAccount001.secAcctName", max = 60, groups = {ValidateGroupEdit.class})
+    // TISHKS-538:【重庆已安排】CLONE - 【清算交收】【账户管理】【证券账户管理】新建页面，证券账户名称长度不够 modify by huwei 2022/5/7 end
     public String getSecAcctName() {
         return super.getSecAcctName();
     }

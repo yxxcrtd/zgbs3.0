@@ -21,6 +21,11 @@
             <Cell order="16" name="备注">remark</Cell>
             <Cell order="17" name="交易对手">counterName</Cell>
             <Cell order="18" name="是否转仓">isOutTradeStr</Cell>
+            <!--TISHKS-531:CLONE - 【交易管理】【交易管理】【交易查询】导出表格列表要素缺少“交易价格”、“利率%”、“银行间成交编号” modify by huwei 2022/5/7 start-->
+            <Cell order="19" name="交易价格">tradePrice</Cell>
+            <Cell order="20" name="利率%">rate</Cell>
+            <Cell order="21" name="银行间成交编号">fTradeId</Cell>
+            <!--TISHKS-531:CLONE - 【交易管理】【交易管理】【交易查询】导出表格列表要素缺少“交易价格”、“利率%”、“银行间成交编号” modify by huwei 2022/5/7 end-->
         </Row>
     </Worksheet>
 </Workbook>

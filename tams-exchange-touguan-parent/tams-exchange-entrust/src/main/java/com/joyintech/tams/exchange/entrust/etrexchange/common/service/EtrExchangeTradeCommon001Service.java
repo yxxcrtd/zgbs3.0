@@ -2088,10 +2088,12 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         if (baseEtrCashPositionCommService != null && (DictCodeList.委托状态_待接收.getValue().equals(entity.getEntrustStatus())
                 || DictCodeListExt3.委托状态_待分发.getValue().equals(entity.getEntrustStatus()))) {
             baseEtrCashPositionCommService.entrustCloseExecute(entity.getEntrustId(), DictCodeList.是否_是.getValue());
-//			positionRequestService.sendRevoke(entity);
+			positionRequestService.sendRevoke(entity);
         }
         //处理履历
         updateCfetsOprHis(entity.getEntrustId(), "revoke");
+        //撤回删除风险试算
+        etrExchangeTradeCommonMapper.deleteRskIsupTrial(entity.getEntrustId());
 //        restTemplate.postForObject(
 //                ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrExchangeTrade/entrustRevoke",entity,
 //                Integer.class);
@@ -5939,6 +5941,12 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
             dto.setCreateDept(LoginUserUtil.getDeptCode());// 用户部门
             dto.setCreateTime(new Date());// 创建时间
             dto.setPortfolioId(item.getPortfolioId()); //让指令分发能查出来
+            String entrustId=dto.getEntrustId();
+            dto.getPortfolioList().stream().forEach(itemTemp->{
+                itemTemp.setEntrustId(entrustId);
+                itemTemp.setIsMulti(DictCodeList.是否_是.getValue());
+            });
+
         }
         //多组合指令
         else {

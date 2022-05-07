@@ -237,8 +237,12 @@
      * 画面加载完成
      */
     $(function() {
-        $('#ExchangeTransMatch001_btn_reset').hide();
-        $('#ExchangeTransMatch001_btn_search').hide();
+        // TISHKS-828:修改查询重置按钮隐藏方式,占据页面空间 modify by fuyongsheng 20220505 start
+        // $('#ExchangeTransMatch001_btn_reset').hide();
+        // $('#ExchangeTransMatch001_btn_search').hide();
+        document.getElementById("ExchangeTransMatch001_btn_reset").style.visibility = "hidden";
+        document.getElementById("ExchangeTransMatch001_btn_search").style.visibility = "hidden";
+        // TISHKS-828:修改查询重置按钮隐藏方式,占据页面空间 modify by fuyongsheng 20220505 end
 
         $('#ExchangeTransMatch001_btn_export').click(function() {
             exportExcelQueDing();

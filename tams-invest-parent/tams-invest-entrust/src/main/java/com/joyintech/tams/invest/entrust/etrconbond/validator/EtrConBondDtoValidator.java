@@ -91,7 +91,7 @@ public class EtrConBondDtoValidator implements EtrCommonValidator {
                 errorList.add(new ValidMessage( this.getMessage("ETR_CB_002")));
             }
             //若不允许提交，当申购类型为优先配售且组合可用现金不足，无法提交委托；
-            if (StringUtil.isNotEmpty(dto.getProAvailableCash())
+            /*if (StringUtil.isNotEmpty(dto.getProAvailableCash())
                     && StringUtil.isNotEmpty(dto.getPurchBondTotal())
                     && dto.getProAvailableCash().compareTo(dto.getPurchBondTotal()) < 0){
                 if (StringUtil.isNotEmpty(CacheUtil.getSysParam(BussinessConstant.CHECK_CASH_SWITCH))
@@ -99,7 +99,7 @@ public class EtrConBondDtoValidator implements EtrCommonValidator {
                         && StringUtil.equals(dto.getPurchType(), DictCodeListExt2.申购类型_优先配售.getValue())){
                     errorList.add(new ValidMessage(this.getMessage("ETR_CB_003")));
                 }
-            }
+            }*/
         }
         return errorList;
     }

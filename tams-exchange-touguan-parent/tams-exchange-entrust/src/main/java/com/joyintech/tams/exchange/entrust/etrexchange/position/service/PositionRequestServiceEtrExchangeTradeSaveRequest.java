@@ -27,6 +27,7 @@ import static com.joyintech.tams.invest.common.position.constant.PositionCommonC
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.OWN_SEC_AMOUNT;
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.POSITION_ETR_PAGE;
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.POSITION_TYPE_ETR;
+import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.POSITION_TYPE_TRD;
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.PS;
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.PTL_CASH_LIST;
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.PTL_LIST;
@@ -154,11 +155,9 @@ public class PositionRequestServiceEtrExchangeTradeSaveRequest {
      * @param entity
      */
     public void sendRevoke(EtrExchangeTradeOperateRequest entity) {
-        // 撤回不调用头寸
-        return;
-//        log.info("sendRevoke() called with parameters => 【entity = {}】", JsonUtils.object2Json(entity));
-//        String busiType = commonPositionEngineService.getPositionBusiType(entity.getFinprodType2(), entity.getPs(), null);
-//        PositionHttpRequest.dorevoke(entity.getEntrustId(), POSITION_TYPE_TRD, busiType, entity.getPs());
+        log.info("sendRevoke() called with parameters => 【entity = {}】", JsonUtils.object2Json(entity));
+        String busiType = commonPositionEngineService.getPositionBusiType(entity.getFinprodType2(), entity.getPs(), null);
+        PositionHttpRequest.dorevoke(entity.getEntrustId(), POSITION_TYPE_TRD, busiType, entity.getPs());
     }
 
     /**

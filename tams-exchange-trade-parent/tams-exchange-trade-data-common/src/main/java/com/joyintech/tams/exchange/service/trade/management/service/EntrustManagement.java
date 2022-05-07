@@ -43,7 +43,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.joyintech.tams.exchange.common.constant.EntrustProp.*;
-import static com.joyintech.tams.exchange.common.constant.EntrustProp.ETF_APPLY;
 import static com.joyintech.tams.exchange.common.constant.OthCodeType.*;
 
 @Component
@@ -223,6 +222,11 @@ public class EntrustManagement extends BaseService {
             entrust = integratedEntrustService.findById(entrustId);
         }
         if (Objects.nonNull(entrust)) {
+            if (!canCancelEntrust(entrust)) {
+                logger.error("该类业务不可撤单：entrustProp={}，market={}", entrust.getEntrustProp(), entrust.getMarket());
+                return new ResultBean(ErrorCode.CANCEL_ENTRUST_BUSI_ERROR);
+            }
+
             if (EntrustUtils.hasNoCancelEntrust(entrust.getEntrustStatus())) {
                 logger.info("entrust entrustStatus is {} ,no cancelEntrust", entrust.getEntrustStatus());
                 return new ResultBean(ErrorCode.CANCEL_ENTRUST_STATUS_ERROR);
@@ -233,6 +237,41 @@ public class EntrustManagement extends BaseService {
             return new ResultBean(ErrorCode.SUCCESS);
         }
         return new ResultBean(ErrorCode.REQ_PARAMETER_ERROR);
+    }
+
+    /**
+     * 债回售：委托当日，允许撤单；
+     * 网上申购：委托申报确认不允许撤单；
+     * 配股：上交所委托申报确认后，不允许撤单；深交所委托申报确认后，允许撤单；
+     * 配债：上交所委托申报确认后，不允许撤单；深交所委托申报确认后，允许撤单；
+     * 债转股：上交所未经交易所确认的委托可以撤单，已确认委托不允许撤单；深交所当日均可以撤单；
+     */
+    private boolean canCancelEntrust(EntrustInterface entrust) {
+        final String entrustProp = entrust.getEntrustProp();
+        if (EntrustUtils.isNoTrade(entrustProp)) {
+            //债回售：委托当日，允许撤单；
+            if (EntrustProp.HS.value.equals(entrustProp)) {
+                return true;
+            }
+            //网上申购：委托申报确认不允许撤单；
+            if (EntrustProp.APPLY.value.equals(entrustProp)) {
+                return false;
+            }
+            //配股：上交所委托申报确认后，不允许撤单；深交所委托申报确认后，允许撤单；
+            //配债：上交所委托申报确认后，不允许撤单；深交所委托申报确认后，允许撤单；
+            //债转股：上交所未经交易所确认的委托可以撤单，已确认委托不允许撤单；深交所当日均可以撤单；
+            if (EntrustProp.CHANGE_TO_STOCK.value.equals(entrustProp)
+                    || EntrustProp.ALLOTMENT.value.equals(entrustProp)
+                    || EntrustProp.PS.value.equals(entrustProp)) {
+                if (Market.SZSE.value.equals(entrust.getMarket())) {
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public ResultBean cancelExceptionEntrust(String userId, String userName, String entrustId) {
@@ -649,9 +688,9 @@ public class EntrustManagement extends BaseService {
     /**
      * 查询配股申购等代码
      *
-     * @param entrustProp   委托属性
-     * @param instruction   指令
-     * @return  申报等代码
+     * @param entrustProp 委托属性
+     * @param instruction 指令
+     * @return 申报等代码
      */
     public String getOthCodeFromInvestment(@NotBlank String entrustProp, @NotNull Instruction instruction) {
         String othCode = instruction.getFinprodMarketId();

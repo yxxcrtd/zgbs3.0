@@ -2528,6 +2528,15 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                 infRiskRdsDto.setEntrustCode(entrust.getEntrustId());
                 infRiskRdsDto.setPreOccupyCode(entrust.getEntrustId());
             }
+            // TISHKS-1012:entrsutDate为null没有取到对应的委托预占数据 modify by fuyongsheng 20220506 start
+            else if (null == entrsutDate){
+                EtrEntrust entrust = AllTradeCommonUtil.findEntrustInfo(finDto.getbTradeId());
+                if (entrust != null && StringUtil.isNotEmpty(entrust.getEntrustId())) {
+                    infRiskRdsDto.setEntrustCode(entrust.getEntrustId());
+                    infRiskRdsDto.setPreOccupyCode(entrust.getEntrustId());
+                }
+            }
+            // TISHKS-1012:entrsutDate为null没有取到对应的委托预占数据 modify by fuyongsheng 20220506 end
         }
         // add by zhangrui1 赎回确认日期不在指令日期时不使用指令编号 end
         // add by zhangrui1 货币型资产净值为1 start

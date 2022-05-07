@@ -14,6 +14,7 @@ import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
@@ -28,10 +29,17 @@ import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustBackupMapper;
+import com.joyintech.tams.common.base.dao.WflEtrEntrustAddMapper;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
+import com.joyintech.tams.common.base.entity.EtrEntrustAdd;
+import com.joyintech.tams.common.base.entity.WflEtrEntrustAdd;
+import com.joyintech.tams.common.base.entity.WflEtrEntrustAddKey;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.invest.common.dto.BaseEtrInvestInfoDto;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +79,12 @@ public class EtrConBondController {
 
     @Autowired
     private EtrEntrustBackupMapper etrEntrustBackupMapper;
+
+    @Autowired
+    private EtrEntrustAddMapper etrEntrustAddMapper;
+
+    @Autowired
+    private WflEtrEntrustAddMapper wflEtrEntrustAddMapper;
 
     public static final String OPERATE_TYPE_SAVE = "save";
     public static final String OPERATE_TYPE_SUBMIT = "submit";
@@ -228,17 +242,8 @@ public class EtrConBondController {
         }
         try {
             positionRequestService.sendEtrConBondDto(dto, decisionAct, systemAct);
-        }catch (PositionException e) {
-                Message message = PositionUtil.ajaxErrorReturn(e);
-                if (StringUtil.isNotBlank(message.getMessage())) {
-                    WorkFlowUtil.showMessage(message.getMessage(), MessageType.错误消息);
-                } else {
-                    if (!StringUtil.equals("1", RequestUtil.getParam("confirmOk"))) {
-                        BaseMap bm = (BaseMap) message.getData();
-                        StringBuffer messageStr = (StringBuffer) bm.get("message");
-                        WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
-                    }
-                }
+        }catch (PositionException e){
+            WorkFlowUtil.showMessage(e.getMessage(),MessageType.错误消息);
         }
     }
 
@@ -311,7 +316,26 @@ public class EtrConBondController {
     @PostMapping("doBack")
     public void doBack(@RequestBody EtrConBondDto dto) {
         log.info("doBack() called with parameters => 【dto = {}】", JsonUtils.object2Json(dto));
+        BaseEtrInvestInfoDto baseEtrInvestInfoDto = new BaseEtrInvestInfoDto();
+        baseEtrInvestInfoDto.setWorkFlowId(dto.getWorkflowId());
+        baseEtrInvestInfoDto.setEtrEntrust(dto);
+
+        EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(dto.getEntrustId());
+        if(null == etrEntrustAdd) {
+            etrEntrustAdd = new EtrEntrustAdd();
+            etrEntrustAdd.setEntrustId(dto.getEntrustId());
+            WflEtrEntrustAddKey key = new WflEtrEntrustAddKey();
+            key.setEntrustId(dto.getEntrustId());
+            key.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
+            WflEtrEntrustAdd wflEtrEntrustAdd = wflEtrEntrustAddMapper.selectByPrimaryKey(key);
+            if(null != wflEtrEntrustAdd) {
+                BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, wflEtrEntrustAdd);
+            }
+        }
+        baseEtrInvestInfoDto.setEtrEntrustAdd(etrEntrustAdd);
+        WFlowCommonService.inserBackuptWithQuery(baseEtrInvestInfoDto);
         WFlowCommonService.doBackFlow(dto.getWorkflowId(), dto.getEntrustId());
+        WFlowCommonService.doInsertFlow(dto.getOperateType(),baseEtrInvestInfoDto);
 //        positionRequestService.sendDelete(dto);
     }
 

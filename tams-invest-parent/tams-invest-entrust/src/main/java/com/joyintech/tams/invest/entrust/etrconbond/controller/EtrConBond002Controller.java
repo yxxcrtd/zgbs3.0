@@ -5,12 +5,20 @@ import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.exception.MessageException;
+import com.joyintech.framework.exception.RestTemplateException;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
+import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.service.PositionHttpRequest;
+import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
+import com.joyintech.tams.common.base.dao.PtlPortfolioMapper;
 import com.joyintech.tams.common.base.entity.FinProduct;
+import com.joyintech.tams.common.base.entity.PtlPortfolio;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
@@ -43,6 +51,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -66,6 +75,8 @@ public class EtrConBond002Controller extends BaseController {
 
     @Autowired
     private FinProductMapper finProductMapper;
+
+    private static PtlPortfolioMapper ptlPortfolioMapper;
 
     @Override
     public String init(Model model) {
@@ -239,9 +250,9 @@ public class EtrConBond002Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("save")
-    public AjaxResult save(@RequestBody EtrConBondDto dto, BindingResult br) throws Exception {
+    public Message<AjaxResult> save(@RequestBody EtrConBondDto dto, BindingResult br) throws Exception {
         if (br.hasErrors()) {
-            return new AjaxResult(br);
+            return new Message<AjaxResult>().fail().setData(new AjaxResult(br));
         }
         if(!StringUtil.isNotEmpty(dto.getEntrustId())){
             BussinessCodeParameter param = new BussinessCodeParameter();
@@ -255,7 +266,7 @@ public class EtrConBond002Controller extends BaseController {
                     BussinessDictCodeListRds.接口系统ID_预占接口.getValue(),
                     DictCodeList.平安资产类型_债券.getValue());
             if (StringUtil.isNotEmpty(ar)) {
-                return ar;
+                return new Message<AjaxResult>().success().setData(ar);
             }
         }
         // ----------add by yushilong 20200721 预占功能 end----------
@@ -273,7 +284,86 @@ public class EtrConBond002Controller extends BaseController {
                       + entity.getFinprodMarketId()
                       );
         processParameter.setWorkFlowParameter(params);
-        String msg = etrConBondService.start(processParameter, dto);
-        return new AjaxResult(msg);
+        String msg = "";
+        try {
+           msg = etrConBondService.start(processParameter, dto);
+           AjaxResult m =new AjaxResult(msg);
+           return new Message<AjaxResult>().success().setData(m);
+        }catch (RestTemplateException e){
+            return this.ajaxErrorReturn(e);
+            //throw new MessageException(e.getMessage(),MessageType.错误消息);
+        }
+    }
+
+
+    public static Message ajaxErrorReturn(Exception e) {
+        String message = e.getMessage();
+        if (StringUtil.isNotEmpty(message)){
+            String[] arr = message.split("\\|");
+            if(arr != null && arr.length == 2){
+                String[] arr1 = arr[0].split("\\:");
+                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, arr1[1]) ||
+                        StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, arr1[1])) {
+                    // 头寸返回对象
+                    BaseMap data = JsonUtils.json2Object(arr[1], BaseMap.class);
+
+                    StringBuffer strb = null;
+                    Map responseMap_data = (Map) data.get("data");
+                    if (responseMap_data != null) {
+                        strb = new StringBuffer("【<br/>");
+                        List checkResults = (List) responseMap_data.get("checkResults");
+                        if (checkResults != null) {
+                            for (int i = 0; i < checkResults.size(); i++) {
+                                BaseMap flow = BaseMap.newMap((Map) checkResults.get(i));
+                                BigDecimal CHECKBALANCE = flow.getBigDecimal("CHECKBALANCE");
+                                String UNIT = flow.getString("UNIT");
+                                String PORTFOLIO_ID = flow.getString("PORTFOLIO_ID");
+                                String HODING_TYPE = flow.getString("HODING_TYPE");
+                                PtlPortfolio obj = ptlPortfolioMapper.selectByPrimaryKey(PORTFOLIO_ID);
+                                String portfolioName = "";
+                                if (obj != null) {
+                                    portfolioName = obj.getPortfolioName();
+                                }else{
+                                    portfolioName=PORTFOLIO_ID;
+                                }
+                                strb.append(PORTFOLIO_ID);
+                                strb.append("(");
+                                strb.append(portfolioName);
+                                strb.append(")");
+//                                strb.append(CHECKBALANCE.toPlainString());
+                                strb.append("【");
+                                strb.append(SysDataUtil.getNameFromDataDict(DictCode.头寸资产类型, HODING_TYPE));
+                                strb.append("】余额不足，当前余额为：").append(CHECKBALANCE.toPlainString()).append(UNIT.toString());
+                                if ((i + 1) == checkResults.size()) {
+                                    strb.append("<br/>");
+                                } else {
+                                    strb.append("；<br/>");
+                                }
+                            }
+                        }
+                    }
+                    if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, arr1[1])) {
+                        strb.append("】，请确认是否继续？");
+                        /**
+                         * 余额不足，软控确认
+                         */
+                        BaseMap bm = BaseMap.newMap()
+                                .put("code", arr1[1])
+                                .put("message", strb)
+                                .put("data", data);
+                        return new Message().success().setData(bm);
+                    } else {
+                        strb.append("】");
+                        /**
+                         * 余额不足，硬控提示
+                         */
+                        return new Message().fail().setMessage(strb.toString());
+                    }
+                }
+            }else {
+                return new Message().fail().setMessage(message).setData(null);
+            }
+        }
+        return new Message().fail().setMessage("无返回信息，未知异常").setData(null);
     }
 }
