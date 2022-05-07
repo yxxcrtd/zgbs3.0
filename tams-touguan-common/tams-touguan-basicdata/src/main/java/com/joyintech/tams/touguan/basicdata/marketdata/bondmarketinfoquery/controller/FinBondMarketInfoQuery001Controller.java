@@ -98,7 +98,7 @@ public class FinBondMarketInfoQuery001Controller extends BaseController {
         } else {
             List<ValidMessage> errList = new ArrayList<>();
             errList.add(new ValidMessage("资产代码不存在."));
-            ar.setData(errList);
+            ar.setErrorList(errList);
         }
         return new Message<AjaxResult>().success().setData(ar);
     }
