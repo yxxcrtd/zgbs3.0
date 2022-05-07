@@ -431,7 +431,7 @@ INSERT INTO SYS_PAGE_DICTLIST (PAGE_ID, SUB_PAGE_ID, DICT_ID, DICT_ITEM_VAL, DIC
 VALUES ('FinTenderBondAsset002', '999999', 'CUSTOM_ASSET_TYPE_FOUR', '011', null, null, 'admin', null, sysdate, 'admin', sysdate, null);
 
 --增加操作类型
-delete from SYS_PAGE_DICTLIST where PAGE_ID='OPR_TYPE' and DICT_ID in ('17','18','19','20');
+delete from SYS_DATADICT_LIST where  DICT_CODE='OPR_TYPE' and ITEM_CODE in ('17','18','19','20');
 insert into SYS_DATADICT_LIST values ('OPR_TYPE','17','自动加券','6','0','system','',sysdate, 'system',sysdate,null);
 insert into SYS_DATADICT_LIST values ('OPR_TYPE','18','上市流通','6','0','system','',sysdate, 'system',sysdate,null);
 insert into SYS_DATADICT_LIST values ('OPR_TYPE','19','上市流通撤销','6','0','system','',sysdate, 'system',sysdate,null);

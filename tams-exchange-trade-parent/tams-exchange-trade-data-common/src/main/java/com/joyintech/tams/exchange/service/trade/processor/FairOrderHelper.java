@@ -1,19 +1,29 @@
 package com.joyintech.tams.exchange.service.trade.processor;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.joyintech.exchange.service.quote.service.QuoteService;
+import com.joyintech.tams.business.common.exception.PositionException;
+import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.TickBean;
 import com.joyintech.tams.exchange.common.bean.WorkflowBean;
 import com.joyintech.tams.exchange.common.bean.investment.ReqRiskTrigger;
 import com.joyintech.tams.exchange.common.bean.investment.RiskOccupyBean;
-import com.joyintech.tams.exchange.common.cache.QuoteTickService;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
 import com.joyintech.tams.exchange.common.db.domain.*;
-import com.joyintech.tams.exchange.common.proto.QuoteProto;
+import com.joyintech.tams.exchange.common.exception.PositionExchangeException;
+import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
 import com.joyintech.tams.exchange.common.utils.InvestmentUtils;
 import com.joyintech.tams.exchange.common.utils.JsonUtils;
@@ -23,6 +33,7 @@ import com.joyintech.tams.exchange.service.trade.management.service.CommonManage
 import com.joyintech.tams.exchange.service.trade.management.service.InvestRiskManagement;
 import com.joyintech.tams.exchange.service.trade.management.service.InvestmentManagement;
 import com.joyintech.tams.exchange.service.trade.management.service.ReviewManagement;
+import com.joyintech.tams.exchange.service.trade.position.service.PositionRequestServiceInstructionRequest;
 import com.joyintech.tams.exchange.service.trade.processor.business.bond.BondHelper;
 import com.joyintech.tams.exchange.service.trade.processor.msg.MsgType;
 import com.joyintech.tams.exchange.service.trade.processor.msg.TradeMsgReceiver;
@@ -52,7 +63,7 @@ public class FairOrderHelper {
     private InvestRiskManagement investRiskManagement;
     @Autowired
     private TradeHelper tradeHelper;
-//    @Autowired
+    //    @Autowired
 //    private QuoteTickService quoteTickService;
     @Autowired
     private QuoteService quoteService;
@@ -69,6 +80,8 @@ public class FairOrderHelper {
 
     @Autowired
     private FuturesInstrumentService futuresInstrumentService;
+    @Autowired
+    private PositionRequestServiceInstructionRequest positionRequestServiceInstructionRequest;
 
     private int getRealVolume(double totalVolume, double totalOrderVolume, double leftVolume, int unit) {
         return (int) TradeUtils.formatDouble(totalOrderVolume * leftVolume / totalVolume, -unit, RoundingMode.UP);
@@ -87,7 +100,7 @@ public class FairOrderHelper {
         if (!order.getEntrustProp().equals(EntrustProp.NORMAL.value)) {
             ResultBean tickBean = quoteService.getTick(order.getStockCode());
             if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
-                TickBean tick = (TickBean)tickBean.getData();
+                TickBean tick = (TickBean) tickBean.getData();
 //            QuoteProto.TickBean tickBean = quoteTickService.getTickFromCache(order.getStockCode());
 //            if (Objects.nonNull(tickBean)) {
                 price = order.getEntrustBs().equals(EntrustBs.BUY.value) ? TradeUtils.getBigDecimal(tick.getUpperLimitPrice(), 4) : TradeUtils.getBigDecimal(tick.getLowerLimitPrice(), 4);
@@ -179,7 +192,7 @@ public class FairOrderHelper {
             if (EntrustProp.isMarketPrice(order.getEntrustProp())) {
                 ResultBean tickBean = quoteService.getTick(order.getStockCode());
                 if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
-                    TickBean tick = (TickBean)tickBean.getData();
+                    TickBean tick = (TickBean) tickBean.getData();
 //                QuoteProto.TickBean tick = quoteTickService.getTickFromCache(order.getStockCode());
 //                if (Objects.nonNull(tick)) {
                     double lowerLimitPrice = TradeUtils.formatDouble(tick.getLowerLimitPrice(), 4);
@@ -302,6 +315,7 @@ public class FairOrderHelper {
             order.setErrorMsg(ErrorCode.NOT_EXIST_FAIR_INSTRUCTION_ERROR.msg());
             return;
         }
+        checkPosition(fairEntrusts.values(), order);
         List<EntrustInterface> param = new ArrayList<>(fairEntrusts.values());
         List<ReqRiskTrigger> parameterList = new ArrayList<ReqRiskTrigger>(param.size());
         RiskOccupyBean riskOccupyBean = investRiskManagement.riskCheck(param, parameterList);
@@ -318,6 +332,54 @@ public class FairOrderHelper {
                 entrust.setErrorMsg(riskOccupyBean.getMessage());
             });
             entrustService.asyncUpdate(fairEntrusts.values());
+        }
+    }
+
+    //头寸引擎余额检查
+    @SuppressWarnings("rawtypes")
+    private void checkPosition(Collection<Entrust> entrusts, Order order) {
+        PositionException exception = null;
+        List<String> errorMessages = Lists.newArrayList();
+        for (Entrust entrust : entrusts) {
+            String instructionId = entrust.getInstructionId();
+            Instruction instruction = instructionService.findById(instructionId);
+            PositionInstructionRequest instructionClone = new PositionInstructionRequest();
+            BeanUtil.copyProperties(instruction, instructionClone);
+            instructionClone.setSoftSkipMode(order.getSoftSkipMode());
+
+            logger.info("公平交易头寸检查 => 【instructionId = {}】", instructionId);
+            instructionClone.setEntrustAmt(entrust.getEntrustPrice().multiply(BigDecimal.valueOf(entrust.getEntrustVolume())));
+            instructionClone.setEntrustNum(entrust.getEntrustVolume());
+            instructionClone.setEntrustPrice(entrust.getEntrustPrice());
+            instructionClone.setFullPrice(entrust.getFullPrice());
+            instructionClone.setEntrustNo(instruction.getEntrustId());
+            instructionClone.setEntrustProp(entrust.getEntrustProp());
+
+            try {
+                positionRequestServiceInstructionRequest.sendRequest(instructionClone, DictCodeListExt3.业务动作_交易下单.getValue(), DictCodeListExt3.系统动作_检查.getValue(), DictCodeListExt3.系统动作_新建.getValue());
+            } catch (PositionException e) {
+                exception = e;
+                Message message = PositionUtil.ajaxErrorReturn(e);
+                Message innerMessage = Convert.convert(Message.class, message.getData());
+                // 拼接软控信息
+                if ("000".equals(message.getCode()) && "300".equals(innerMessage.getCode())) {
+                    errorMessages.add(innerMessage.getMessage().replace("，请确认是否继续？", ""));
+                }
+            } finally {
+                if (ObjectUtil.isNotNull(exception)) {
+                    // 非软控异常，抛出
+                    Message message = PositionUtil.ajaxErrorReturn(exception);
+                    if (!"000".equals(message.getCode())) {
+                        throw exception;
+                    }
+                }
+            }
+        }
+        if (CollUtil.isNotEmpty(errorMessages)) {
+            String errorMessage = Joiner.on(StrUtil.COMMA).join(errorMessages) + "，请确认是否继续？";
+            Message message = new Message("300", errorMessage, errorMessage);
+            PositionExchangeException positionExchangeException = PositionExchangeException.create(message);
+            throw positionExchangeException;
         }
     }
 }

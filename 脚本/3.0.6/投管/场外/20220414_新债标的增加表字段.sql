@@ -10,6 +10,4 @@ COMMENT ON COLUMN "FIN_PRODUCT_ADD"."LISTING_DATE_FROM_TRADE" IS '上市日是�
 
 --FIN_PRODUCT增加表字段
 ALTER TABLE FIN_PRODUCT ADD CIRCULATION_DATE Date;
-COMMENT ON COLUMN "FIN_PRODUCT"."CIRCULATION_DATE" IS '上市流通日'; <if test="listingDateFromTrade != null" >
-                listingDateFromTrade,
-            </if>
+COMMENT ON COLUMN "FIN_PRODUCT"."CIRCULATION_DATE" IS '上市流通日';
