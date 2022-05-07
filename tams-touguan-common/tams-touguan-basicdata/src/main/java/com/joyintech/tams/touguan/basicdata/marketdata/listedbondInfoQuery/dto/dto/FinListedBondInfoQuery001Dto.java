@@ -3,11 +3,14 @@ package com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.dto.BaseDto;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketCashPlanDto;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondPayHSrcSecOptionDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 待上市债券市场列表信息查看DTO
@@ -87,6 +90,9 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "eventDate", value = "缴款截止日")
     private Date eventDate;
 
+    @ApiModelProperty(name = "payDate", value = "缴款日")
+    private Date payDate;
+
     @ApiModelProperty(name = "debtRegistrationDate", value = "债权债务登记日")
     private Date debtRegistrationDate;
 
@@ -110,6 +116,9 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
 
     @ApiModelProperty(name = "secondaryClassification", value = "二级分类")
     private String secondaryClassification;
+
+    @ApiModelProperty(name = "threearyClassification", value = "三级分类")
+    private String threearyClassification;
 
     @ApiModelProperty(name = "varietyOfCoupons", value = "息票品种")
     private String varietyOfCoupons;
@@ -209,6 +218,18 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "dayCount", value = "计息基准")
     private String dayCount;
 
+    @ApiModelProperty(name = "isAutoUpdate", value = "是否允许资讯数据覆盖")
+    private String isAutoUpdate;
+
+    @ApiModelProperty(name = "capiIncomeFeature", value = "保本标识")
+    private String capiIncomeFeature;
+
+
+    @ApiModelProperty(name = "finBondPayHSrcSecOptionDto", value = "行权计划信息")
+    private List<FinBondPayHSrcSecOptionDto> bondPayHSrcSecOptionDtos;
+
+    @ApiModelProperty(name = "bondMarketCashPlanDtos", value = "付息计划信息")
+    private List<FinBondMarketCashPlanDto> bondMarketCashPlanDtos;
 
 
     public String getSecId() {
@@ -673,5 +694,53 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
 
     public void setDayCount(String dayCount) {
         this.dayCount = dayCount;
+    }
+
+    public Date getPayDate() {
+        return payDate;
+    }
+
+    public void setPayDate(Date payDate) {
+        this.payDate = payDate;
+    }
+
+    public String getThreearyClassification() {
+        return threearyClassification;
+    }
+
+    public void setThreearyClassification(String threearyClassification) {
+        this.threearyClassification = threearyClassification;
+    }
+
+    public String getIsAutoUpdate() {
+        return isAutoUpdate;
+    }
+
+    public void setIsAutoUpdate(String isAutoUpdate) {
+        this.isAutoUpdate = isAutoUpdate;
+    }
+
+    public String getCapiIncomeFeature() {
+        return capiIncomeFeature;
+    }
+
+    public void setCapiIncomeFeature(String capiIncomeFeature) {
+        this.capiIncomeFeature = capiIncomeFeature;
+    }
+
+    public List<FinBondPayHSrcSecOptionDto> getBondPayHSrcSecOptionDtos() {
+        return bondPayHSrcSecOptionDtos;
+    }
+
+    public void setBondPayHSrcSecOptionDtos(List<FinBondPayHSrcSecOptionDto> bondPayHSrcSecOptionDtos) {
+        this.bondPayHSrcSecOptionDtos = bondPayHSrcSecOptionDtos;
+    }
+
+    public List<FinBondMarketCashPlanDto> getBondMarketCashPlanDtos() {
+        return bondMarketCashPlanDtos;
+    }
+
+    public void setBondMarketCashPlanDtos(List<FinBondMarketCashPlanDto> bondMarketCashPlanDtos) {
+        this.bondMarketCashPlanDtos = bondMarketCashPlanDtos;
     }
 }

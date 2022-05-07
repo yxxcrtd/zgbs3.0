@@ -84,15 +84,29 @@ public class FinListedBondInfoQuery001Service extends BaseService {
     }
 
     /**
-     * 待上市加券市场信息查询
+     * 待上市接口加券市场信息查询
      *
      * @param request
      * @return
      */
     public FinListedBondInfoQuery001Dto queryFinWindMarketForCoupons(FinListedBondInfoQueryRequest request) {
-        logger.info("queryFinBondMarketForCoupons >> 待上市加券市场信息查询参数：{}", JSON.toJSONString(request));
+        logger.info("queryFinBondMarketForCoupons >> 待上市接口加券市场信息查询参数：{}", JSON.toJSONString(request));
         request.setPlatformDate(iPlatformDate.getSysDateStr());
         FinListedBondInfoQuery001Dto finListedBondInfoQuery001Dto = finListedBondInfoQueryMapper.queryFinWindMarketForCoupons(request);
+        return finListedBondInfoQuery001Dto;
+    }
+
+
+    /**
+     * 待上市加券市场信息查询
+     *
+     * @param request
+     * @return
+     */
+    public FinListedBondInfoQuery001Dto queryFinProductForCoupons(FinListedBondInfoQueryRequest request) {
+        logger.info("queryFinProductForCoupons >> 待上市加券市场信息查询参数：{}", JSON.toJSONString(request));
+        request.setPlatformDate(iPlatformDate.getSysDateStr());
+        FinListedBondInfoQuery001Dto finListedBondInfoQuery001Dto = finListedBondInfoQueryMapper.queryFinProductForCoupons(request);
         return finListedBondInfoQuery001Dto;
     }
 
