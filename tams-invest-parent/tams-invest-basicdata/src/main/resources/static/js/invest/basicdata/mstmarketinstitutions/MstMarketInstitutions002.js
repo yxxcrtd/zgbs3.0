@@ -17,10 +17,19 @@ $(function() {
         Joyin.ajaxJson(basePath + 'invest/basicdata/mstmarketinstitutions/MstMarketInstitutions002/check', object, function(result) {
             Joyin.confirm(result.data, function() {
                 if(operateType === 'save') {
-                    WorkFlow.doSaveList(basePath + 'invest/basicdata/mstmarketinstitutions/MstMarketInstitutions002/save', object, "MstMarketInstitutions002_btn_save");
+                    WorkFlow.doSaveList(basePath + 'invest/basicdata/mstmarketinstitutions/MstMarketInstitutions002/save', object, "MstMarketInstitutions002_btn_save",null,function () {
+						debugger;
+                    	if (CLOSE_FUNC_NAME && typeof parent[CLOSE_FUNC_NAME] === 'function') {
+							parent[CLOSE_FUNC_NAME]();
+						}
+					});
                 }
                 else {
-                    WorkFlow.doSubmitList(basePath + 'invest/basicdata/mstmarketinstitutions/MstMarketInstitutions002/save', object, "MstMarketInstitutions002_btn_submit");
+                    WorkFlow.doSubmitList(basePath + 'invest/basicdata/mstmarketinstitutions/MstMarketInstitutions002/save', object, "MstMarketInstitutions002_btn_submit",null,function () {
+						if (CLOSE_FUNC_NAME && typeof parent[CLOSE_FUNC_NAME] === 'function') {
+							parent[CLOSE_FUNC_NAME]();
+						}
+					});
                 }
             });
         });
@@ -76,6 +85,10 @@ $(function() {
     $('#MstMarketInstitutions002_btn_submit').click(function() {
         saveOrSubmit('submit');
     });
+
+    if(CLOSE_FUNC_NAME) {//如果是从其他页面打开则隐藏关闭按钮
+    	$("#MstMarketInstitutions002_btn_cancel").hide();
+	}
     
     /**
      * BECIF

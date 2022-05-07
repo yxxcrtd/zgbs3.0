@@ -508,13 +508,14 @@
     </div>
     <div layout:fragment="script">
         <script data-th-inline="javascript" type="text/javascript">
-                                    var REPORT_YEAR = /*[[${REPORT_YEAR}]]*/'';
-                                    var LONG_SHORT_TERM = /*[[${LONG_SHORT_TERM}]]*/'';
-                                    var MAIN_GRADE_RESULT = /*[[${MAIN_GRADE_RESULT}]]*/'';
-                                    var RATING_OUTLOOK = /*[[${RATING_OUTLOOK}]]*/'';
-                                    var CHANGE_DIRECTION = /*[[${CHANGE_DIRECTION}]]*/'';
-                                    var GRADE_PARTY = /*[[${GRADE_PARTY}]]*/'';
-                                </script>
+            var REPORT_YEAR = /*[[${REPORT_YEAR}]]*/'';
+            var LONG_SHORT_TERM = /*[[${LONG_SHORT_TERM}]]*/'';
+            var MAIN_GRADE_RESULT = /*[[${MAIN_GRADE_RESULT}]]*/'';
+            var RATING_OUTLOOK = /*[[${RATING_OUTLOOK}]]*/'';
+            var CHANGE_DIRECTION = /*[[${CHANGE_DIRECTION}]]*/'';
+            var GRADE_PARTY = /*[[${GRADE_PARTY}]]*/'';
+            var CLOSE_FUNC_NAME = /*[[${closeFuncName}]]*/'';
+        </script>
         <script data-th-src="@{/js/invest/basicdata/mstmarketinstitutions/MstMarketInstitutions002.js}" type="text/javascript"></script>
     </div>
 </body>
