@@ -16,6 +16,7 @@ import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.system.base.dao.SysUploadFileInfoMapper;
 import com.joyintech.tams.business.asset.bond.dao.FinBondAssetMapper;
 import com.joyintech.tams.business.asset.bond.dto.*;
+import com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset002Dto;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.common.base.dao.*;
@@ -621,9 +622,9 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
             BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto,dto);
             if (StringUtil.isNotEmpty(finProductIssue)) {
                 BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto, finProductIssue);
+                finProductIssueList.add(bondFinProductIssueDto);
+                dto.setFinProductIssueList(finProductIssueList);
             }
-            finProductIssueList.add(bondFinProductIssueDto);
-            dto.setFinProductIssueList(finProductIssueList);
             List<SysUploadFileInfo> uploadInfo = joyinFSMapper.getUploadInfo(dto.getFinprodId());
             MstFileInputParameter mstFileInputParameter = new MstFileInputParameter();
             mstFileInputParameter.setFileList(uploadInfo);
@@ -1535,14 +1536,16 @@ public class FinBondAssetService extends BaseService implements BaseProcessServi
                     }
                     if(null!=finCashPlanEntity.getPrinAmt()){
                         prinAmtSum = prinAmtSum.add(new BigDecimal(finCashPlanEntity.getPrinAmt().toString()));
+                    }else{
+                        resultList.add(new ValidMessage("",
+                                getMessage("COMMON_E_0057", getMessage("BussFinRepayment.prinAmt"))));
+                        return resultList;
                     }
                 }
                 //债券类资产(还本计划列表中的还本面额/百元之和必须==100)
-                if(StringUtil.equals(dto.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
-                    if(prinAmtSum.compareTo(new BigDecimal("100"))!=0){
-                        resultList.add(new ValidMessage("",
-                                getMessage("BUSS_COM_E_0048", getMessage("BussFinRepayment.cashAmt.sumCheck"),"100")));
-                    }
+                if(prinAmtSum.compareTo(new BigDecimal("100"))!=0){
+                    resultList.add(new ValidMessage("",
+                            getMessage("BUSS_COM_E_0048", getMessage("BussFinRepayment.cashAmt.sumCheck"),"100")));
                 }
             }
         }

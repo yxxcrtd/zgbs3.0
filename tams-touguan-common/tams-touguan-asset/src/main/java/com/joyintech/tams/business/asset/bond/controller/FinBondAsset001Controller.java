@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import com.joyintech.tams.business.asset.bond.service.FinBondAssetService;
 import com.joyintech.tams.business.asset.bond.service.FinBondAssetValidatorService;
+import com.joyintech.tams.invest.asset.bond.dto.FinBondTargetAssetDto;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
@@ -321,19 +322,28 @@ public class FinBondAsset001Controller extends BaseController{
         }
         ProcessParameter<FinBondAssetSaveRequest> processParameter = new ProcessParameter<FinBondAssetSaveRequest>();
         WorkFlowParameter<FinBondAssetSaveRequest> params = new WorkFlowParameter<FinBondAssetSaveRequest>();
+        FinBondAssetSaveRequest entity = new FinBondAssetSaveRequest();
+        List<FinBondAssetSaveRequest> selectedItem = new ArrayList<>();
+        entity.setElementId(dto.getElementId());
+        for (FinBondAssetSaveRequest saveRequest:dto.getSelectedItem()){
+            String finProdId = commonBusinessService.getFinProdId(saveRequest.getFinprodMarketId(), DictCodeListExt1.金融产品类型_投管用_债券.getValue(), null);
+            FinBondAssetSaveRequest request = finBondAssetService.getBasicInfos(finProdId, null);
+            selectedItem.add(request);
+        }
+        entity.setSelectedItem(selectedItem);
         params.setPageId("FinBondAsset002");
-        params.setElementId(dto.getElementId());
-        params.setBusinessCode(item -> item.getFinprodMarketId());
+        params.setElementId(entity.getElementId());
+        params.setBusinessCode(FinBondAssetSaveRequest::getFinprodMarketId);
         params.setBusinessType(DictCodeList.共通业务类型_债券类资产信息.getValue());
         // 设置流程业务说明, entity即传入的dto
-        params.setComment(entity -> {
+        params.setComment(entity1 -> {
             return WorkFlowUtil.concatComment(getMessage("FinBondTargetAsset002.finprodId")+
-                GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodMarketId()+GlobalConstant.CLOSE_PARENTHESIS);
+                GlobalConstant.OPEN_PARENTHESIS+entity1.getFinprodMarketId()+GlobalConstant.CLOSE_PARENTHESIS);
         });
         processParameter.setOperationType(OperationType.DELETE);
         processParameter.setWorkFlowParameter(params);
         String msg = finBondAssetService.start(processParameter,
-            dto.getSelectedItem().toArray(new FinBondAssetSaveRequest[dto.getSelectedItem().size()]));
+                entity.getSelectedItem().toArray(new FinBondAssetSaveRequest[entity.getSelectedItem().size()]));
         return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
     }
     
