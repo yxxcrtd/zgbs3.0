@@ -19,12 +19,20 @@ public interface FinListedBondInfoQueryMapper {
     List<FinListedBondInfoQuery001Dto> queryForPage(FinListedBondInfoQueryRequest request);
 
     /**
-     * 债券市场信息查询
+     * 接口债券市场信息查询
      *
      * @param request
      * @return
      */
     FinListedBondInfoQuery001Dto queryFinWindMarketForCoupons(FinListedBondInfoQueryRequest request);
+
+    /**
+     * 债券市场信息查询
+     *
+     * @param request
+     * @return
+     */
+    FinListedBondInfoQuery001Dto queryFinProductForCoupons(FinListedBondInfoQueryRequest request);
 
     /**
      * 根据行内三级分类获取wind分类

@@ -6,7 +6,6 @@ import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
-import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.entity.FinProduct;
@@ -15,10 +14,12 @@ import com.joyintech.tams.component.business.common.service.CommonAutoCouponServ
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dao.FinBondMarketInfoQueryMapper;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketCashPlanDto;
-import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoDetailQueryDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondPayHSrcSecOptionDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinBondMarketInfoQueryRequest;
+import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.dto.FinListedBondInfoQuery001Dto;
+import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.req.FinListedBondInfoQueryRequest;
+import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.service.FinListedBondInfoQuery001Service;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,8 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
 
     @Resource
     private CommonAutoCouponService commonAutoCouponService;
+    @Resource
+    private FinListedBondInfoQuery001Service finListedBondInfoQuery001Service;
     @Resource
     private FinBondMarketInfoQueryMapper finBondMarketInfoQueryMapper;
     @Resource
@@ -70,29 +73,24 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
      * @param secId
      * @return
      */
-    public FinBondMarketInfoDetailQueryDto detailInfo(String secId) {
+    public FinListedBondInfoQuery001Dto detailInfo(String secId) {
         logger.info("detailInfo >> 债券市场详情信息查询参数：secId：【{}】", secId);
-        FinBondMarketInfoQueryRequest request = new FinBondMarketInfoQueryRequest();
+        FinListedBondInfoQueryRequest request = new FinListedBondInfoQueryRequest();
         request.setSecId(secId);
         request.setPlatformDate(iPlatformDate.getSysDateStr());
-        //查询债券市场信息
-        List<FinBondMarketInfoQuery001Dto> bondMarketInfoQuery004Dtos = finBondMarketInfoQueryMapper.queryForPage(request);
-        if (CollectionUtils.isEmpty(bondMarketInfoQuery004Dtos)) {
-            logger.info("detailInfo >> 债券市场详情信息查询为空! secId:【{}】", secId);
-            return null;
+        FinListedBondInfoQuery001Dto finListedBondInfoQuery001Dto = finListedBondInfoQuery001Service.queryFinProductForCoupons(request);
+        if (Objects.isNull(finListedBondInfoQuery001Dto)) {
+            finListedBondInfoQuery001Dto = finListedBondInfoQuery001Service.queryFinWindMarketForCoupons(request);
         }
-        FinBondMarketInfoDetailQueryDto detailQueryDto = new FinBondMarketInfoDetailQueryDto();
-        FinBondMarketInfoQuery001Dto finBondMarketInfoQuery001Dto = bondMarketInfoQuery004Dtos.get(0);
-        BeanUtil.copyPropertiesIgnoreNull(detailQueryDto, finBondMarketInfoQuery001Dto);
         //付息计划信息
         HashMap<String, Object> map = new HashMap<>(2);
         map.put("secId", secId);
         List<FinBondMarketCashPlanDto> finBondMarketCashPlanDtos = finBondMarketInfoQueryMapper.queryFinBondMarketCashPlan(map);
-        detailQueryDto.setBondMarketCashPlanDtos(finBondMarketCashPlanDtos);
+        finListedBondInfoQuery001Dto.setBondMarketCashPlanDtos(finBondMarketCashPlanDtos);
         //行权计划信息
         List<FinBondPayHSrcSecOptionDto> finBondPayHSrcSecOptionDtos = finBondMarketInfoQueryMapper.queryFinBondPayHSrcSecOption(map);
-        detailQueryDto.setBondPayHSrcSecOptionDtos(finBondPayHSrcSecOptionDtos);
-        return detailQueryDto;
+        finListedBondInfoQuery001Dto.setBondPayHSrcSecOptionDtos(finBondPayHSrcSecOptionDtos);
+        return finListedBondInfoQuery001Dto;
     }
 
     /**
