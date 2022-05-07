@@ -27,6 +27,12 @@ public class CfetsEtrIBondFirstBidFindIssueInfoDto {
     @ApiModelProperty(name="issueClass",value="发行方式",example="报价发行/招标发行/簿记建档")
     private String issueClass;
 
+    @ApiModelProperty(name="tenderType",value="招标方式")
+    private String tenderType;
+
+    @ApiModelProperty(name="issueStyle",value="发行类型")
+    private String issueStyle;
+
     @ApiModelProperty(name="planIssueAmt",value="计划发行量")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal planIssueAmt;
@@ -322,5 +328,21 @@ public class CfetsEtrIBondFirstBidFindIssueInfoDto {
 
     public void setDebRateOrg(String debRateOrg) {
         this.debRateOrg = debRateOrg;
+    }
+
+    public String getTenderType() {
+        return tenderType;
+    }
+
+    public void setTenderType(String tenderType) {
+        this.tenderType = tenderType;
+    }
+
+    public String getIssueStyle() {
+        return issueStyle;
+    }
+
+    public void setIssueStyle(String issueStyle) {
+        this.issueStyle = issueStyle;
     }
 }

@@ -102,6 +102,12 @@
                     #{item}
                 </foreach>
             </if>
+            <if test="registOrgList != null and registOrgList.size() > 0">
+                AND T.registOrg IN
+                <foreach collection="registOrgList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
             <if test="ccyList != null and ccyList.size() > 0">
                 AND T.ccy IN
                 <foreach collection="ccyList" item="item" open="(" close=")" separator=",">
@@ -171,6 +177,12 @@
             <if test="issuerList != null and issuerList.size() > 0">
                 AND T.issuer in
                 <foreach collection="issuerList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="crossMarketCodeList != null and crossMarketCodeList.size() > 0">
+                AND T.crossMarketCode in
+                <foreach collection="crossMarketCodeList" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
             </if>
@@ -347,17 +359,13 @@
         AND		T11.BRANCH = 0
         AND		T11.CASH_TYPE_1 = #{CASH_TYPE_1_01}
         AND		T11.CASH_TYPE_2 = #{CASH_TYPE_2_C01}
-        LEFT JOIN (	SELECT  CALC_TYPE, YIELD, BASIS , MARKET_BASIS, FINPROD_ID,CASH_ID FROM (
-        SELECT ROW_NUMBER() OVER(PARTITION BY T12.CASH_ID ORDER BY T12.CASH_ID,T12.EFF_DATE DESC) RANK,
-        T12.CALC_TYPE, T12.YIELD, T12.BASIS , T12.MARKET_BASIS, T12.FINPROD_ID,T12.CASH_ID
-        FROM FIN_CASH_CALC_RULE T12
-        WHERE  T12.FINPROD_TYPE = #{FINPROD_TYPE_F01}
+        LEFT JOIN  FIN_CASH_CALC_RULE T12
+        ON  T12.FINPROD_ID = T1.FINPROD_ID
+        AND T12.FINPROD_TYPE = #{FINPROD_TYPE_F01}
         AND	T12.FINPROD_TYPE2 = #{FINPROD_TYPE_F01}
         AND	T12.BRANCH = 0
-        AND T12.EFF_DATE <![CDATA[<=]]> TO_DATE(#{platformDate},'YYYY-MM-DD')
-        ) WHERE RANK=1 ) T12
-        ON T12.FINPROD_ID = T1.FINPROD_ID
-        AND		T12.CASH_ID = T10.CASH_ID
+        AND	T12.CASH_ID = T10.CASH_ID
+        AND	T12.IS_INITIAL = 'Y'
         LEFT JOIN FIN_CASH_PAY_RULE T13
         ON	 T13.FINPROD_ID = T1.FINPROD_ID
         AND	 T13.FINPROD_TYPE = #{FINPROD_TYPE_F01}
@@ -1229,7 +1237,7 @@
     </delete>
 
     <delete id="deleteFinCashCalcRule">
-        delete from FIN_CASH_CALC_RULE where FINPROD_ID =#{finprodId}
+        delete from FIN_CASH_CALC_RULE where FINPROD_ID =#{finprodId} and IS_INITIAL = 'Y'
     </delete>
 
     <delete id="deleteFinCashPayRule">

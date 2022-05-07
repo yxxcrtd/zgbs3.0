@@ -268,6 +268,75 @@
         </where>
     </select>
 
+
+    <select id="queryFinProductForCoupons"
+            resultType="com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.dto.FinListedBondInfoQuery001Dto"
+            parameterType="com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.req.FinListedBondInfoQueryRequest">
+        SELECT
+        PRODUCT.FINPROD_ID SECID,
+        PRODUCT.FINPROD_ABBR bondAbbreviation,
+        PRODUCT.FINPROD_NAME bondName,
+        PRODUCT.TRADE_MARKET tradingPlaces,
+        PRODUCT.REGIST_ORG registeredCustodian,
+        PRODUCT.ISSUER,
+        PRODUCT.ISSUE_TYPE issueType,
+        PRODUCT.VDATE valueDate,
+        PRODUCT.MDATE expiryDate,
+        PRODUCT_TYPE.TYPE_9 primaryClassification,
+        PRODUCT_TYPE.TYPE_10 secondaryClassification,
+        PRODUCT_TYPE.TYPE_11 threearyClassification,
+        PRODUCT.COUPON_SPECIES varietyOfCoupons,
+        ISSUE.INT_TYPE interestRate,
+        ISSUE.PAY_CYCLE interestPaymentFrequency,
+        PRODUCT.CCY currency,
+        PRODUCT.CAPI_INCOME_FEATURE capiIncomeFeature,
+        PRODUCT_ADD.IS_AUTO_UPDATE isAutoUpdate,
+        ISSUE.ISSUE_CLASS issueMethod,
+        ISSUE.TENDER_TYPE biddingMethod,
+        ISSUE.TENDER_TARGET tenderTarget,
+        ISSUE.PLAN_ISSUE_AMT issueSize,
+        ISSUE.ISSUE_STYLE releaseType,
+        ISSUE.ADD_BATCH additionalBatches,
+        ISSUE.ISSUE_PRICE issuePx,
+        ISSUE.REFER_YIELD stipulationValue,
+        ISSUE.REFER_YIELD couponRate,
+        ISSUE.RATE_GRADE benchmarkCurveName,
+        ISSUE.RATE_GRADE  decimalPlaces,
+        ISSUE.BP spread,
+        ISSUE.ISSUE_DATE issueDate,
+        ISSUE.PAY_DATE payDate,
+        ISSUE.FIRST_CONFIRM_DATE interestAccrualDate,
+        ISSUE.ISSUE_SDATE issueStartTime,
+        ISSUE.ISSUE_EDATE issueEndTime,
+        ISSUE.TENDER_SDATE bidDate,
+        ISSUE.TENDER_EDATE additionalTenderDate,
+        ISSUE.PAY_EDATE eventDate,
+        ISSUE.ASSIGN_REGDATE debtRegistrationDate,
+        PRODUCT_ADD.LISTING_DATE listingDate,
+        PRODUCT.FINPROD_MARKET_ID listingCode,
+        ISSUE.MIN_PAMT singleMinSubAmt,
+        ISSUE.MAX_PAMT singleMaxSubAmt,
+        ISSUE.MAX_TOTALAMT maxSubAmt,
+        ISSUE.MIN_PER_TAMT minPerTenderAmt,
+        ISSUE.MAX_PER_UTAMT maxPerTenderAmt,
+        ISSUE.MIN_TAMT minTenderPxForPlan,
+        ISSUE.MAX_TAMT maxTenderPxForPlan,
+        ISSUE.TENDER_UNIT tenderStep,
+        ISSUE.MAX_TENDER_UNIT medianMaxBidMarked,
+        ISSUE.MAX_TENDER_PLUS maxTenderPxDiffer,
+        ISSUE.SERI_Y_N continuousTenderLimit,
+        ISSUE.MAX_TOTAL_TENDER maxTotalTenderAmt
+        FROM
+        FIN_PRODUCT PRODUCT
+        LEFT JOIN FIN_PRODUCT_ADD PRODUCT_ADD ON PRODUCT.FINPROD_ID = PRODUCT_ADD.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE ISSUE ON PRODUCT.FINPROD_ID = ISSUE.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_TYPE PRODUCT_TYPE ON PRODUCT.FINPROD_ID = PRODUCT_TYPE.FINPROD_ID AND PRODUCT_TYPE.BRANCH = 0
+        where PRODUCT.FINPROD_TYPE2 = 'F01'
+        AND PRODUCT.TRADE_MARKET in ('01','02')
+        AND (PRODUCT.FINPROD_ID = #{secId,jdbcType=VARCHAR} or PRODUCT.FINPROD_MARKET_ID = #{secId,jdbcType=VARCHAR})
+        AND rownum = 1
+    </select>
+
     <select id="getWindType" resultType="com.joyintech.tams.common.base.entity.FinProductTypeConfig">
         SELECT
         SEQNO,

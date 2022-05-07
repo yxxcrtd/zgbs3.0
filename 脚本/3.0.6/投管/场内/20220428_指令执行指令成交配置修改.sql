@@ -1,4 +1,4 @@
-delete from CFG_DATATABLE_SHOW where PAGECODE = 'FieldEtrDispatcher'  and DTCODE='FieldEtrDispatcherDealInfo' and COLNAME = '交收状态';
+delete from CFG_DATATABLE_SHOW where PAGECODE = 'FieldEtrDispatcher'  and DTCODE='FieldEtrDispatcherDealInfo' and COLCODE = 'deliveryResult';
 
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY) VALUES ('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', 'EX001', 'deliveryResult', '交收状态', null, 13, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, null, null, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY) VALUES ('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', 'EX002', 'deliveryResult', '交收状态', null, 13, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, null, null, 0);
@@ -19,7 +19,7 @@ INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DI
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY) VALUES ('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', 'EX017', 'deliveryResult', '交收状态', null, 13, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, null, null, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY) VALUES ('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', 'EX018', 'deliveryResult', '交收状态', null, 13, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, null, null, 0);
 
-delete from CFG_DATATABLE_SHOW where PAGECODE = 'FieldEtrDispatcher'  and DTCODE='FieldEtrDispatcherDealInfo' and COLNAME = '交收进度%';
+delete from CFG_DATATABLE_SHOW where PAGECODE = 'FieldEtrDispatcher'  and DTCODE='FieldEtrDispatcherDealInfo' and COLCODE = 'deliverySchedule';
 
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY) VALUES ('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', 'EX001', 'deliverySchedule', '交收进度%', null, 13, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, null, null, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY) VALUES ('FieldEtrDispatcher', 'FieldEtrDispatcherDealInfo', 'EX002', 'deliverySchedule', '交收进度%', null, 13, 1, 0, 0, 100, '{"colAlign": "left"}', 0, 'COMM', 1, 0, null, null, 0);

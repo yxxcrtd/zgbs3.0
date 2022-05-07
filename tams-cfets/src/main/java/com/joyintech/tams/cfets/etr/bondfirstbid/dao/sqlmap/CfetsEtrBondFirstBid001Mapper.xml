@@ -409,7 +409,9 @@
             MCI.CUSTOMER_NAME as subRateOrg,
             ZX.RATING as debRate,
             MCIT.CUSTOMER_NAME as debRateOrg,
-            PRODUCT.REMARK as remark
+            PRODUCT.REMARK as remark,
+            ISSUE.TENDER_TYPE as tenderType,
+            ISSUE.ISSUE_STYLE as issueStyle
 
         FROM FIN_PRODUCT PRODUCT
         LEFT JOIN FIN_PRODUCT_ADD PRODUCT_ADD ON PRODUCT.FINPROD_ID = PRODUCT_ADD.FINPROD_ID

@@ -1,17 +1,19 @@
 package com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.controller;
 
+import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoDetailQueryDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinBondMarketInfoQueryRequest;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.service.FinBondMarketInfoQuery001Service;
+import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.dto.FinListedBondInfoQuery001Dto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,7 +87,13 @@ public class FinBondMarketInfoQuery001Controller extends BaseController {
     @ResponseBody
     @PostMapping("/detailInfo")
     @ApiOperation(value = "债券市场信息查看", notes = "债券市场信息查看")
-    public Message<FinBondMarketInfoDetailQueryDto> detailInfo(@RequestParam("secId") String secId) {
-        return Message.success("success", finBondMarketInfoQuery001Service.detailInfo(secId));
+    public Message<FinListedBondInfoQuery001Dto> detailInfo(@RequestParam("secId") String secId) {
+        AjaxResult ar = new AjaxResult();
+        FinListedBondInfoQuery001Dto dto = finBondMarketInfoQuery001Service.detailInfo(secId);
+        if (StringUtil.isNotEmpty(dto)) {
+            return Message.success("success", dto);
+        } else {
+            return Message.fail("资产代码不存在.");
+        }
     }
 }

@@ -64,6 +64,9 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "secType2", value = "二级分类")
     private String secType2;
 
+    @ApiModelProperty(name = "secType3", value = "三级分类")
+    private String secType3;
+
     @ApiModelProperty(name = "issueType", value = "募集方式")
     private String issueType;
 
@@ -126,6 +129,12 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "bottomrate", value = "利率下限")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal bottomrate;
+
+    @ApiModelProperty(name = "capiIncomeFeature", value = "保本标识")
+    private String capiIncomeFeature;
+
+    @ApiModelProperty(name = "isAutoUpdate", value = "是否允许资讯数据覆盖")
+    private String isAutoUpdate;
 
     @ApiModelProperty(name = "resetType", value = "利率调整规则")
     private String resetType;
@@ -592,5 +601,13 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
 
     public void setCcy(String ccy) {
         this.ccy = ccy;
+    }
+
+    public String getSecType3() {
+        return secType3;
+    }
+
+    public void setSecType3(String secType3) {
+        this.secType3 = secType3;
     }
 }

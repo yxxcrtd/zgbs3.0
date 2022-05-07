@@ -305,49 +305,6 @@ public class FinBondAsset002Controller extends BaseController{
         return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
     }
 
-    /**
-     * 新建时根据市场代码查询wind接口债券信息
-     * 
-     * @param request request
-     * @return
-     * @throws ParseException
-     * @see
-     * @since 1.0
-     */
-    @ApiOperation(value = "新建时根据市场代码查询wind接口债券信息", notes = "新建时根据市场代码查询wind接口债券信息")
-    @ResponseBody
-    @PostMapping("/getInterfBondDto")
-    public Message<AjaxResult> getInterfBondDto(@RequestBody FinBondAssetInsertRequest request)
-        throws ParseException {
-        AjaxResult ar = new AjaxResult();
-        // 债券新建新增快捷录入功能 add by renping 20191010 start
-        String finprodMarketId = request.getFinprodMarketId();
-        FinBondAssetSaveRequest dto = finBondAssetService.getBondDto(
-                request.getFinprodMarketId() + request.getTradeMarketId());
-        if (StringUtil.isNotEmpty(dto)) {
-            dto.setFinprodMarketId(request.getFinprodMarketId());
-            //快录时不带出上市代码
-            dto.setAppearMarketId(null);
-            //债券快录时不考虑  授信
-            dto.setCreditFlag("");
-            ar.setData(dto);
-        }else {
-            dto = finBondAssetService.getInterfBondDto(request.getFinprodMarketId() + request.getTradeMarketId());
-            if (StringUtil.isNotEmpty(dto)) {
-                //债券快录时不考虑  授信
-                dto.setCreditFlag("");
-                dto.setFinprodMarketId(finprodMarketId);
-                ar.setData(dto);
-            } else {
-                // 债券新建新增快捷录入功能 add by renping 20191010 end
-                List<ValidMessage> errList = new ArrayList<>();
-                errList.add(new ValidMessage(this.getMessage("COMMON_E_0008",
-                        this.getMessage("FinBondAsset002.finprodId"))));
-                ar.setData(errList);
-            }
-        }
-        return new Message<AjaxResult>().success().setData(ar);
-    }
 
     /**
      * 新建时根据市场代码查询wind接口债券信息
@@ -390,81 +347,81 @@ public class FinBondAsset002Controller extends BaseController{
         return new Message<Page<SelectOptionDto>>().success().setData(page);
     }
 
-
-    /**
-     * 是否纳入净额结算
-     */
-    @ApiOperation(value = "获取是否纳入净额结算", notes = "获取是否纳入净额结算")
-    @ResponseBody
-    @PostMapping("/getIsNetSett")
-    private Message<AjaxResult> getIsNetSett(@RequestBody FinBondAssetInsertRequest request) {
-        Map<String,String> map=new HashMap<String,String> ();
-        AjaxResult ar = new AjaxResult();
-        String finprodMarketId = request.getFinprodMarketId();
-        String tradeMarket = request.getTradeMarket();
-        String type9 = request.getType9();
-        String isPpb = request.getIsPpb();
-        String isNetSett=StringUtil.EMPTY;
-        String tradePlat=StringUtil.EMPTY;
-        if(StringUtil.equals(DictCodeListExt1.交易场所_上海证券交易所.getValue(), tradeMarket)){
-            // 全额结算 标识
-            boolean settleFlag = false;
-            // 判断债券代码 是否在 139000-139999代码段债券、123000-123499代码段债券 范围内
-            String secid = finprodMarketId;
-            if(finprodMarketId.contains (".")){
-                secid=finprodMarketId.substring(0,finprodMarketId.indexOf("."));
-            }
-            Pattern pattern=Pattern.compile("^-?\\d+(\\.\\d+)?$");
-            //是否属于139000-139999代码段债券
-            if(pattern.matcher(secid).matches()) {
-                Long l = Long.parseLong(secid);
-                if ((l > 139000 && l < 139999) || (l > 123000 && l < 123499)) {
-                    settleFlag = true;
-                }
-            }
-            //全额结算 : 私募债 || 139000-139999代码段债券、123000-123499代码段债券 || 资产支持证券
-            if(StringUtil.equals(isPpb, "Y") || settleFlag || StringUtil.equals(BussinessDictCodeList.WIND一级分类_含债券一级分类等_资产支持证券.getValue(), type9)){
-                isNetSett="N";
-                tradePlat=DictCodeList.交易平台_固定收益平台.getValue();
-            }else{
-                //以上情况都不符合则为纳入净额结算标准范围的债券
-                isNetSett="Y";
-                tradePlat=DictCodeList.交易平台_固定收益平台.getValue()+","+DictCodeList.交易平台_竞价撮合平台.getValue()+","+DictCodeList.交易平台_大宗交易平台.getValue();
-            }
-        }else if(StringUtil.equals(DictCodeListExt1.交易场所_深圳证券交易所.getValue(), tradeMarket)){
-            //全额结算: 私募债 || 资产支持证券
-            if(StringUtil.equals(isPpb, "Y") || StringUtil.equals(BussinessDictCodeList.WIND一级分类_含债券一级分类等_资产支持证券.getValue(), type9)){
-                isNetSett="N";
-                tradePlat=DictCodeList.交易平台_综合协议交易平台.getValue();
-            }else{
-                isNetSett="Y";
-                tradePlat=DictCodeList.交易平台_竞价撮合平台.getValue()+","+DictCodeList.交易平台_综合协议交易平台.getValue();
-            }
-        }
-        map.put("isNetSett", isNetSett);
-        map.put("tradePlat", tradePlat);
-        ar.setData (map);
-        return new Message<AjaxResult>().success().setData(ar);
-    }
-
-    /**
-     * add by xxg 20210721
-     * 根据产品代码得到起息日和到期日
-     */
-    @ApiOperation(value = "根据产品代码得到起息日和到期日", notes = "根据产品代码得到起息日和到期日")
-    @ResponseBody
-    @PostMapping("/isSameMdateAndVdate")
-    public Message<Boolean> isSameMdateAndVdate(@RequestBody FinBondAssetInsertRequest request){
-        //债券标的   债券修改或新建，关联一级市场债券时，若关联的一级债券起息日、到期日与资产起息日、到期日不一致，需要进行提醒
-        FinBondAssetSaveRequest dto = finBondAssetService.getMdateAndVdate(request.getoFinprodId());
-        if (null != dto.getVdate() && null != dto.getMdate()) {
-            if (DateUtil.compareDate(dto.getMdate(), request.getMdate()) != 0
-                    || DateUtil.compareDate(dto.getVdate(), request.getVdate()) != 0) {
-                return new Message<Boolean>().success().setData(true);
-            }
-        }
-        return new Message<Boolean>().success().setData(false);
-    }
+//
+//    /**
+//     * 是否纳入净额结算
+//     */
+//    @ApiOperation(value = "获取是否纳入净额结算", notes = "获取是否纳入净额结算")
+//    @ResponseBody
+//    @PostMapping("/getIsNetSett")
+//    private Message<AjaxResult> getIsNetSett(@RequestBody FinBondAssetInsertRequest request) {
+//        Map<String,String> map=new HashMap<String,String> ();
+//        AjaxResult ar = new AjaxResult();
+//        String finprodMarketId = request.getFinprodMarketId();
+//        String tradeMarket = request.getTradeMarket();
+//        String type9 = request.getType9();
+//        String isPpb = request.getIsPpb();
+//        String isNetSett=StringUtil.EMPTY;
+//        String tradePlat=StringUtil.EMPTY;
+//        if(StringUtil.equals(DictCodeListExt1.交易场所_上海证券交易所.getValue(), tradeMarket)){
+//            // 全额结算 标识
+//            boolean settleFlag = false;
+//            // 判断债券代码 是否在 139000-139999代码段债券、123000-123499代码段债券 范围内
+//            String secid = finprodMarketId;
+//            if(finprodMarketId.contains (".")){
+//                secid=finprodMarketId.substring(0,finprodMarketId.indexOf("."));
+//            }
+//            Pattern pattern=Pattern.compile("^-?\\d+(\\.\\d+)?$");
+//            //是否属于139000-139999代码段债券
+//            if(pattern.matcher(secid).matches()) {
+//                Long l = Long.parseLong(secid);
+//                if ((l > 139000 && l < 139999) || (l > 123000 && l < 123499)) {
+//                    settleFlag = true;
+//                }
+//            }
+//            //全额结算 : 私募债 || 139000-139999代码段债券、123000-123499代码段债券 || 资产支持证券
+//            if(StringUtil.equals(isPpb, "Y") || settleFlag || StringUtil.equals(BussinessDictCodeList.WIND一级分类_含债券一级分类等_资产支持证券.getValue(), type9)){
+//                isNetSett="N";
+//                tradePlat=DictCodeList.交易平台_固定收益平台.getValue();
+//            }else{
+//                //以上情况都不符合则为纳入净额结算标准范围的债券
+//                isNetSett="Y";
+//                tradePlat=DictCodeList.交易平台_固定收益平台.getValue()+","+DictCodeList.交易平台_竞价撮合平台.getValue()+","+DictCodeList.交易平台_大宗交易平台.getValue();
+//            }
+//        }else if(StringUtil.equals(DictCodeListExt1.交易场所_深圳证券交易所.getValue(), tradeMarket)){
+//            //全额结算: 私募债 || 资产支持证券
+//            if(StringUtil.equals(isPpb, "Y") || StringUtil.equals(BussinessDictCodeList.WIND一级分类_含债券一级分类等_资产支持证券.getValue(), type9)){
+//                isNetSett="N";
+//                tradePlat=DictCodeList.交易平台_综合协议交易平台.getValue();
+//            }else{
+//                isNetSett="Y";
+//                tradePlat=DictCodeList.交易平台_竞价撮合平台.getValue()+","+DictCodeList.交易平台_综合协议交易平台.getValue();
+//            }
+//        }
+//        map.put("isNetSett", isNetSett);
+//        map.put("tradePlat", tradePlat);
+//        ar.setData (map);
+//        return new Message<AjaxResult>().success().setData(ar);
+//    }
+//
+//    /**
+//     * add by xxg 20210721
+//     * 根据产品代码得到起息日和到期日
+//     */
+//    @ApiOperation(value = "根据产品代码得到起息日和到期日", notes = "根据产品代码得到起息日和到期日")
+//    @ResponseBody
+//    @PostMapping("/isSameMdateAndVdate")
+//    public Message<Boolean> isSameMdateAndVdate(@RequestBody FinBondAssetInsertRequest request){
+//        //债券标的   债券修改或新建，关联一级市场债券时，若关联的一级债券起息日、到期日与资产起息日、到期日不一致，需要进行提醒
+//        FinBondAssetSaveRequest dto = finBondAssetService.getMdateAndVdate(request.getoFinprodId());
+//        if (null != dto.getVdate() && null != dto.getMdate()) {
+//            if (DateUtil.compareDate(dto.getMdate(), request.getMdate()) != 0
+//                    || DateUtil.compareDate(dto.getVdate(), request.getVdate()) != 0) {
+//                return new Message<Boolean>().success().setData(true);
+//            }
+//        }
+//        return new Message<Boolean>().success().setData(false);
+//    }
 
     /**
      *
@@ -478,7 +435,7 @@ public class FinBondAsset002Controller extends BaseController{
     @PostMapping("/getyieldByPriceCalculator")
     public Message<AssetCommonInfoRequest> getyieldByPriceCalculator(@RequestBody AssetCommonInfoRequest request) {
         AssetCommonInfoRequest response = new AssetCommonInfoRequest();
-        response.setCalendarId(finBondAssetService.getCalendarId(request.getTradeMarket()));
+        request.setCalendarId(finBondAssetService.getCalendarId(request.getTradeMarket()));
         if (StringUtil.isNotEmpty(request.getPriceFlag()) && StringUtil.equals(request.getPriceFlag(),DictCodeList.是否_是.getValue())) {
             BigDecimal rate = finBondAssetService.getyieldByPriceCalculator(request);
             response.setRate(rate);
@@ -589,6 +546,7 @@ public class FinBondAsset002Controller extends BaseController{
             for (FinCashPlanDto finCashPlan:finCashPlanList){
                 BondFinCashPlanDto bondFinCashPlanDto = new BondFinCashPlanDto();
                 BeanUtil.copyPropertiesIgnoreNull(bondFinCashPlanDto,finCashPlan);
+                bondFinCashPlanDto.setLirs(null);
                 invList.add(bondFinCashPlanDto);
             }
             List<BondFinCashPlanDto> lirs = new ArrayList<>();
@@ -596,6 +554,8 @@ public class FinBondAsset002Controller extends BaseController{
                 for (FinCashPlanDetailDto lirsEntity : finCashPlanList.get(0).getLirs()) {
                     BondFinCashPlanDto lirsDto = new BondFinCashPlanDto();
                     BeanUtil.copyPropertiesIgnoreNull(lirsDto, lirsEntity);
+                    lirsDto.setPayDate(lirsDto.getMdate());
+                    lirsDto.setPrinAmt(dto.getIssueAmt());
                     lirs.add(lirsDto);
                 }
             }
@@ -718,4 +678,25 @@ public class FinBondAsset002Controller extends BaseController{
         return null;
     }
 
+    /**
+     * 附件删除
+     * @param file  入参
+     * @return 处理结果
+     * @throws IOException 异常信息
+     */
+    @ApiOperation(value = "附件删除", notes = "附件删除")
+    @ResponseBody
+    @PostMapping(value = "/deleteFile")
+    public Message<AjaxResult> UploadFile(SysUploadFileInfo file) {
+        try {
+            if (StringUtil.isNotEmpty(file)) {
+                AjaxResult ajaxResult = finBondAssetService.delFileInfo(file);
+                return new Message<AjaxResult>().success().setData(ajaxResult);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return new Message<AjaxResult>().fail().setMessage("文件删除异常");
+        }
+        return null;
+    }
 }
