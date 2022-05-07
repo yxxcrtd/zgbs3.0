@@ -328,52 +328,12 @@ public class FinBondAsset001Controller extends BaseController{
         // 设置流程业务说明, entity即传入的dto
         params.setComment(entity -> {
             return WorkFlowUtil.concatComment(getMessage("FinBondTargetAsset002.finprodId")+
-                GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodMarketId()+GlobalConstant.CLOSE_PARENTHESIS+
-                getMessage("FinBondTargetAsset002.finprodName")+GlobalConstant.OPEN_PARENTHESIS+
-                entity.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS);
+                GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodMarketId()+GlobalConstant.CLOSE_PARENTHESIS);
         });
         processParameter.setOperationType(OperationType.DELETE);
         processParameter.setWorkFlowParameter(params);
-        //债券交易自动加券、上市流通交易自动加券，加的券没有在留痕表存值，导致删除报错特殊处理
-        String msg =null;
-        ProcessMark pk = new ProcessMark();
-        pk.setPageId("FinBondAsset002");
-        pk.setBusinessDataPk1(dto.getSelectedItem().get(0).getFinprodMarketId());
-        FinBondAssetSaveRequest temp = finBondAssetService.getBussinessEntityByPk(pk);
-        if (null == temp || null == temp.getFinPayInterestStdInfoDto()) {
-            dto = finBondAssetService.getBondDto(dto.getSelectedItem().get(0).getFinprodMarketId());
-            //查询业务表资产信息
-            FinBondAssetSaveRequest request = finBondAssetService.getFinPlanList(dto.getFinprodMarketId());
-            if(request != null){
-                //资产信息
-                dto.setBaseFinProductBaseInfoList(request.getBaseFinProductBaseInfoList());
-                //待办事项中直接从FinPayInterestStdInfoDto取现金流计划
-                List<BondFinCashPlanDto> finCashPlanList =new ArrayList<BondFinCashPlanDto>();
-                //还本现金流
-                List<BondFinCashPlanDto> finCashPlanRayList =new ArrayList<BondFinCashPlanDto>();
-                BussFinRepaymentDto bussFinRepaymentDto =new BussFinRepaymentDto();
-                for(FinCashPlan finCashPlan : request.getBaseFinProductBaseInfoList().get(0).getFinCashPlanList()){
-                    if(null == finCashPlan.getPrinAmt()){
-                        BondFinCashPlanDto finCashPlanDto =new BondFinCashPlanDto();
-                        BeanUtils.copyProperties(finCashPlan,finCashPlanDto);
-                        finCashPlanList.add(finCashPlanDto);
-                    }else{
-                        BondFinCashPlanDto finCashPlanRayDto =new BondFinCashPlanDto();
-                        BeanUtils.copyProperties(finCashPlan,bussFinRepaymentDto);
-                        bussFinRepaymentDto.setIsPayIntFlag(DictCodeList.是否_否.getValue());
-                        BeanUtils.copyProperties(finCashPlan,finCashPlanRayDto);
-                        finCashPlanRayList.add(finCashPlanRayDto);
-                    }
-                }
-                if (StringUtil.isNotEmpty(dto.getFinPayInterestStdInfoDto())) {
-                    dto.getFinPayInterestStdInfoDto().setInvScheduleList(finCashPlanList);
-                }
-            }
-            msg = finBondAssetService.start(processParameter,dto);
-        }else{
-            msg = finBondAssetService.start(processParameter,
-                dto.getSelectedItem().toArray(new FinBondAssetSaveRequest[dto.getSelectedItem().size()]));
-        }
+        String msg = finBondAssetService.start(processParameter,
+            dto.getSelectedItem().toArray(new FinBondAssetSaveRequest[dto.getSelectedItem().size()]));
         return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
     }
     
