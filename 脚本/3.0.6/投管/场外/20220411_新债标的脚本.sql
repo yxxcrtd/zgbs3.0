@@ -1,17 +1,17 @@
 --菜单页面
-DELETE FROM SYS_MENU WHERE SYS_MENU.MENU_ID = 'ASSET_MANAGEMENT_001_002_015' AND SYS_MENU.REMARK = '新债标的';
+DELETE FROM SYS_MENU WHERE MENU_ID = 'ASSET_MANAGEMENT_001_002_015';
 INSERT INTO SYS_MENU (MENU_ID, SYSTEM_CODE, ICON, PARENT_MENU_ID, PAGE_ID, ORDER_NO, IS_SPREAD, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 VALUES ('ASSET_MANAGEMENT_001_002_015', 'FIN', null, 'ASSET_MANAGEMENT_001_002', 'FinTenderBondAsset001', 15, '02', '新债标的', 'system', null, SYSDATE, 'system', SYSDATE);
 
-DELETE FROM SYS_PAGE WHERE SYS_PAGE.PAGE_ID = 'FinTenderBondAsset001' AND SYS_PAGE.REMARK = '新债标的';
+DELETE FROM SYS_PAGE WHERE PAGE_ID = 'FinTenderBondAsset001';
 INSERT INTO SYS_PAGE (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 VALUES ('FinTenderBondAsset001', 'FIN', '/home.html#/bondmaintain/newbonetargets?a=a', 'vue', 'ASSET_MANAGEMENT_001_002_015', null, null, '02', '01', '新债标的', 'system', null, SYSDATE, 'system', SYSDATE);
 
-DELETE FROM SYS_PAGE WHERE SYS_PAGE.PAGE_ID = 'FinTenderBondAsset002' AND SYS_PAGE.REMARK = '新债标的新建';
+DELETE FROM SYS_PAGE WHERE PAGE_ID = 'FinTenderBondAsset002';
 INSERT INTO SYS_PAGE (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 VALUES ('FinTenderBondAsset002', 'FIN', '/home.html#/bondmaintain/newbonetargets?a=a', 'vue', null, null, null, '02', '01', '新债标的新建', 'system', null, SYSDATE, 'system', SYSDATE);
 
-DELETE FROM SYS_PAGE WHERE SYS_PAGE.PAGE_ID = 'FinTenderBondAsset003' AND SYS_PAGE.REMARK = '新债标的上市流通';
+DELETE FROM SYS_PAGE WHERE PAGE_ID = 'FinTenderBondAsset003';
 INSERT INTO SYS_PAGE (PAGE_ID, SYSTEM_CODE, PAGE_URL, PAGE_FILE, MENU_ID, HEIGHT, WIDTH, IS_HP_SELECT, IS_NEED_WORKFLOW, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 VALUES ('FinTenderBondAsset003', 'FIN', '/home.html#/bondmaintain/newbonetargets?a=a', 'vue', null, null, null, '02', '01', '新债标的上市流通', 'system', null, SYSDATE, 'system', SYSDATE);
 
@@ -431,7 +431,7 @@ INSERT INTO SYS_PAGE_DICTLIST (PAGE_ID, SUB_PAGE_ID, DICT_ID, DICT_ITEM_VAL, DIC
 VALUES ('FinTenderBondAsset002', '999999', 'CUSTOM_ASSET_TYPE_FOUR', '011', null, null, 'admin', null, sysdate, 'admin', sysdate, null);
 
 --增加操作类型
-delete from SYS_PAGE_DICTLIST where PAGE_ID='OPR_TYPE' and DICT_ID in ('17','18','19','20');
+delete from SYS_DATADICT_LIST where  DICT_CODE='OPR_TYPE' and ITEM_CODE in ('17','18','19','20');
 insert into SYS_DATADICT_LIST values ('OPR_TYPE','17','自动加券','6','0','system','',sysdate, 'system',sysdate,null);
 insert into SYS_DATADICT_LIST values ('OPR_TYPE','18','上市流通','6','0','system','',sysdate, 'system',sysdate,null);
 insert into SYS_DATADICT_LIST values ('OPR_TYPE','19','上市流通撤销','6','0','system','',sysdate, 'system',sysdate,null);

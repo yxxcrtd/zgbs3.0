@@ -46,6 +46,7 @@ import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
+import org.thymeleaf.util.StringUtils;
 
 /**
  * 市场机构信息新建
@@ -137,20 +138,34 @@ public class MstMarketInstitutions002Controller extends BaseController{
         
         //String operationType = getParam("");
         String workflowId = getParam("workflowId");
-        if (WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotEmpty(customerId)) {
-            Map<String, Object> map = new HashMap<String, Object>();
-            map.put("customerId", customerId);
-            MstMarketInstitutionsDto mstMarketInstitutionsDto = mstMarketInstitutionsService.selectDetail(map);
-            model.addAttribute("entity", mstMarketInstitutionsDto);
+        String insitituteCode = getParam("insitituteCode");
+        String closeFuncName = getParam("closeFuncName");
+        if(StringUtils.isEmpty(closeFuncName)) {
+            if (WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotEmpty(customerId)) {
+                Map<String, Object> map = new HashMap<String, Object>();
+                map.put("customerId", customerId);
+                MstMarketInstitutionsDto mstMarketInstitutionsDto = mstMarketInstitutionsService.selectDetail(map);
+                model.addAttribute("entity", mstMarketInstitutionsDto);
+            } else if (!WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotEmpty(workflowId)) {
+                MstMarketInstitutionsDto mstMarketInstitutionsDto = mstMarketInstitutionsService.getBussinessEntityByWorkflowId(workflowId);
+                model.addAttribute("entity", mstMarketInstitutionsDto);
+                model.addAttribute("workflowId", workflowId);
+            }
+            if (StringUtil.isEmpty(customerId) && StringUtil.isEmpty(workflowId)) {
+
+            }
+        }else {//增加债券/新债页面打开发行人新增页面
+            Map<String,Object> map =  mstMarketInstitutionsService.autoAddInstitutions(insitituteCode);
+            if(Objects.nonNull(map.get("data"))) {
+                model.addAttribute("entity",map.get("data"));
+            }else {
+                MstMarketInstitutionsDto dto = new MstMarketInstitutionsDto();
+                dto.setInsitituteCode(insitituteCode);
+                model.addAttribute("entity",dto);
+            }
+            model.addAttribute("insitituteCode",insitituteCode);
+            model.addAttribute("closeFuncName",closeFuncName);
         }
-        else if(!WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotEmpty(workflowId)){
-            MstMarketInstitutionsDto mstMarketInstitutionsDto = mstMarketInstitutionsService.getBussinessEntityByWorkflowId(workflowId);
-            model.addAttribute("entity", mstMarketInstitutionsDto);
-            model.addAttribute("workflowId", workflowId);
-        }
-        if (StringUtil.isEmpty(customerId) && StringUtil.isEmpty(workflowId)) {
-            
-        } 
         return super.init(model);
     }
     
