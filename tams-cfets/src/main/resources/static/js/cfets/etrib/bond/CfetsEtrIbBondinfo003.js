@@ -429,6 +429,9 @@
     });
 
     var init = function () {
+        if(!!query("#finprodName").val()){
+            query("#finprodName").attr("disabled", true);
+        }
         query("#calculateField_price").prop('checked', true);
         layui.form.render('radio');
         if (calculateField) {

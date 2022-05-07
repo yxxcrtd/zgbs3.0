@@ -30,6 +30,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -760,7 +761,7 @@ public class EtrExchangeTradeSaveRequest extends EtrEntrust implements ProcessEn
         this.currentTab = currentTab;
     }
     public List<EtrExchangeTradePortfolioRequest> getTradeMultiPtl001Dtos(){
-        List<EtrExchangeTradePortfolioRequest> tradeMultiPtl001Dtos=this.portfolioList;
+        List<EtrExchangeTradePortfolioRequest> tradeMultiPtl001Dtos=this.portfolioList == null ? new ArrayList<>() : this.portfolioList;
         tradeMultiPtl001Dtos.stream().forEach(item->{
             if(StringUtil.equals(item.getIsMulti(), DictCodeList.是否_是.getValue())) {
                 item.setEntrustId(item.getEntrustId()+"-"+item.getPortfolioId());
