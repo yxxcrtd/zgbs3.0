@@ -271,4 +271,25 @@
 		SELECT CALENDAR_ID code,CALENDAR_NAME name,CALENDAR_NAME shortName,CALENDAR_ID hidCode FROM MST_CALENDAR_INFO
 		where IS_TRADE_CALENDAR  = #{isTradeCalendar}
 </select>
+
+    <!--TISHKS-725:增加日历类型是否被使用校验 modify by fuyongsheng 20220507 start-->
+    <select id="hasCalendarName" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM (
+            SELECT
+                DISTINCT CALENDAR_NAME
+            FROM
+                FIN_PRODUCT fp
+            LEFT JOIN
+                MST_CALENDAR_INFO mci ON fp.CALENDAR_ID = mci.CALENDAR_ID
+            UNION
+            SELECT
+                DISTINCT mci.CALENDAR_NAME
+            FROM
+                FIN_TRADE_PRODUCT ftp
+            LEFT JOIN MST_CALENDAR_INFO mci ON ftp.CALENDAR_ID = mci.CALENDAR_ID
+        )aa
+        WHERE aa.CALENDAR_NAME = #{calendarName}
+    </select>
+    <!--TISHKS-725:增加日历类型是否被使用校验 modify by fuyongsheng 20220507 end-->
 </mapper>   
