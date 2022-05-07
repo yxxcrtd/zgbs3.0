@@ -6,7 +6,6 @@ import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
@@ -22,9 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -90,16 +87,13 @@ public class FinBondMarketInfoQuery001Controller extends BaseController {
     @ResponseBody
     @PostMapping("/detailInfo")
     @ApiOperation(value = "债券市场信息查看", notes = "债券市场信息查看")
-    public Message<AjaxResult> detailInfo(@RequestParam("secId") String secId) {
+    public Message<FinListedBondInfoQuery001Dto> detailInfo(@RequestParam("secId") String secId) {
         AjaxResult ar = new AjaxResult();
         FinListedBondInfoQuery001Dto dto = finBondMarketInfoQuery001Service.detailInfo(secId);
         if (StringUtil.isNotEmpty(dto)) {
-            ar.setData(dto);
+            return Message.success("success", dto);
         } else {
-            List<ValidMessage> errList = new ArrayList<>();
-            errList.add(new ValidMessage("资产代码不存在."));
-            ar.setErrorList(errList);
+            return Message.fail("资产代码不存在.");
         }
-        return new Message<AjaxResult>().success().setData(ar);
     }
 }
