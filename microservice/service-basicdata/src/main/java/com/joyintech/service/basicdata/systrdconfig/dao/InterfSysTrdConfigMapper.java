@@ -84,4 +84,6 @@ public interface InterfSysTrdConfigMapper {
     List<PurchQuotaInfoDto> getPurchQuotaInfo(Map<String, Object> params);
 
     List<TradeInfoProResponse> getDealerTraderInfo(TradeInfoProRequest dto);
+
+    Map<String, Object> getMstRepoProductInfo(Map<String,Object> map);
 }
