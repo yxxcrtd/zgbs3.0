@@ -16,6 +16,7 @@ import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.business.asset.bond.dto.FinAssetRateAdjRequest;
 import com.joyintech.tams.business.asset.bond.dto.FinAssetRateAdjResponse;
+import com.joyintech.tams.invest.common.asset.dto.AssetCommonInfoDto;
 import com.joyintech.tams.invest.common.asset.dto.RateAdjDto;
 import com.joyintech.tams.invest.common.asset.service.RateAdjService;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
@@ -27,7 +28,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,8 +41,8 @@ import java.util.Map;
 /**
  * 利率调整 〈功能详细描述〉
  *
- * @author zhangnian
- * @version 1.0 2018年10月11日
+ * @author wangyang1
+ * @version 1.0 2022年4月19日
  * @see FinBondAsset002Service
  * @since 1.0
  */
@@ -200,7 +204,7 @@ public class FinBondAsset002Service extends BaseService implements BaseProcessSe
 				}
 			}
             // 生效利率
-            BigDecimal yield = ArithmeticUtil.divide(entity.getYield(), new BigDecimal(100), 14);
+            BigDecimal yield = ArithmeticUtil.round(entity.getYield(), 14, RoundingMode.HALF_UP);
             PaFinCashCalcRule paFinCashCalcRule = new PaFinCashCalcRule();
             FinCashCalcRule finCashCalcRule = new FinCashCalcRule();
             BeanUtil.copyPropertiesIgnoreNull(finCashCalcRule, entity);
@@ -304,6 +308,14 @@ public class FinBondAsset002Service extends BaseService implements BaseProcessSe
 
     public List<FinAssetRateAdjResponse> selectInitAssetRateAdj(Map<String,Object> param){
         return finBondAssetMapper.selectInitAssetRateAdj(param);
+    }
+
+    public AssetCommonInfoDto getMdateByFinproId(String finprodId){
+        return finBondAssetMapper.getMdateByFinproId(finprodId);
+    }
+
+    public AssetCommonInfoDto getAssetInfoToRateAdj(@RequestBody Map<String, Object> param){
+        return finBondAssetMapper.getAssetInfoToRateAdj(param);
     }
 
 }

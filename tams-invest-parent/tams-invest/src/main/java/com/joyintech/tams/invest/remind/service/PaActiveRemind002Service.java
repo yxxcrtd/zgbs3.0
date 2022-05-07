@@ -539,25 +539,7 @@ public class PaActiveRemind002Service extends BaseService<PaActiveRemind001Dto> 
         String smallCategory = (String)param.get("smallCategory");
         param.put("R12S1", BussinessDictCodeList.提醒类型_小分类_标准券额度不足提醒.getValue());
         param.put("userId", LoginUserUtil.getUserName());
-        if(StringUtil.isEmpty(smallCategory) || StringUtil.equals(smallCategory, BussinessDictCodeList.提醒类型_小分类_标准券额度不足提醒.getValue())) {
-            boolean isShow010 = SecurityUtil.isPermitted("EtrBondBiddingResultIb001_btn_search");
-            boolean isShow020 = SecurityUtil.isPermitted("EtrBondBiddingResultEx001_btn_search");
-            String isShow01 = "false";
-            String isShow02 = "false";
-            if(isShow010){
-                isShow01 = "true";
-            }
-            if(isShow020){
-                isShow02 = "true";
-            }
-            param.put("isShow01", isShow01);
-            param.put("isShow02", isShow02);
-            if(StringUtil.equals(isShow01,"false") && StringUtil.equals(isShow02,"false")){
-
-            }else{
-                dto.addAll(paActiveRemind002Mapper.selramindR12S1(param));
-            }
-        }
+        dto.addAll(paActiveRemind002Mapper.selramindR12S1(param));
     }
 
     /**

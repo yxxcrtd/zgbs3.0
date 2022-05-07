@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrdispatcher.dto;
 
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.common.base.entity.EtrEntrustBidPrice;
 import com.joyintech.tams.constant.DictCode;
@@ -167,7 +168,7 @@ public class FieldEtrDispatcherInfoResponse extends FieldEtrDispatcherBaseInfo {
     public void setPledgeStandardNumber(BigDecimal pledgeStandardNumber) {
         this.pledgeStandardNumber = pledgeStandardNumber;
     }
-    
+
     public BigDecimal getOldPledgeRatio() {
         return oldPledgeRatio;
     }
@@ -223,7 +224,7 @@ public class FieldEtrDispatcherInfoResponse extends FieldEtrDispatcherBaseInfo {
     public void setPledgeNumber(BigDecimal pledgeNumber) {
         this.pledgeNumber = pledgeNumber;
     }
-    
+
     public String getVpayDate() {
         return vpayDate;
     }
@@ -239,7 +240,7 @@ public class FieldEtrDispatcherInfoResponse extends FieldEtrDispatcherBaseInfo {
     public void setMpayDate(String mpayDate) {
         this.mpayDate = mpayDate;
     }
-    
+
     public BigDecimal getmIntAmt() {
         return mIntAmt;
     }
@@ -255,7 +256,7 @@ public class FieldEtrDispatcherInfoResponse extends FieldEtrDispatcherBaseInfo {
     public void setmTradeAmt(BigDecimal mTradeAmt) {
         this.mTradeAmt = mTradeAmt;
     }
-    
+
     public BigDecimal getPledgeRatio() {
         return pledgeRatio;
     }
@@ -303,7 +304,7 @@ public class FieldEtrDispatcherInfoResponse extends FieldEtrDispatcherBaseInfo {
     public void setSecType(String secType) {
         this.secType = secType;
     }
-    
+
     public String getBusiPs() {
         return busiPs;
     }
@@ -541,7 +542,11 @@ public class FieldEtrDispatcherInfoResponse extends FieldEtrDispatcherBaseInfo {
     }
 
     public String getOtherBusiModel() {
-        return SysDataUtil.getNameFromDataDict(DictCode.业务模式, super.getBusiModel());
+        String flag = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
+        if("02".equals(flag)){
+            return SysDataUtil.getNameFromDataDict(DictCode.业务模式, super.getBusiModel());
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.投资目的, super.getBusiModel());
     }
 
     /**
@@ -600,7 +605,7 @@ public class FieldEtrDispatcherInfoResponse extends FieldEtrDispatcherBaseInfo {
     public void setIsRight(String isRight) {
         this.isRight = isRight;
     }
-    
+
     public String getBusiTypePositionStr() {
         return SysDataUtil.getNameFromDataDict(DictCode.投管业务类型, this.getBusiTypePosition());
     }

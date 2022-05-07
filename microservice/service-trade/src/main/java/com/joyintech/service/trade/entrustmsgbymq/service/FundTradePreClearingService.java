@@ -376,7 +376,7 @@ public class FundTradePreClearingService extends BaseService<InfContractDetailfi
 		positionRequestTradeReportService.sendTradeReportPositionRequest(trdTempDto);
 
 		// 处理头寸
-		tradePreCommonService.executePosition(finProductTradeDto);
+		tradePreCommonService.executePosition(finProductTradeDto, infContractDetailfile.getAcctNo());
 		// ZGTFCP-1499:重新封装基础对象，调用头寸公共方法 modify by fuyongsheng 20220325 end
 	}
 

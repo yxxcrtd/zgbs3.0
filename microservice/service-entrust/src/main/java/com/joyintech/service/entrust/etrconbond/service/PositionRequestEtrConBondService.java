@@ -4,9 +4,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.IDGenerator;
-import com.joyintech.framework.util.StringUtil;
-import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.JsonUtils;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.entrust.etrconbond.dao.EtrConBondMapper;
 import com.joyintech.service.entrust.etrconbond.dto.EtrConBondDto;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
@@ -23,7 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.joyintech.tams.constant.DictCodeListExt2.申购类型_普通申购;
 import static com.joyintech.tams.constant.DictCodeListExt3.业务动作_投资指令;
@@ -81,17 +83,18 @@ public class PositionRequestEtrConBondService {
      * @param entity
      */
     public void sendClose(String entrustId, String closeWay) {
-        /*
-        Map<String, Object> resultMap = new HashMap<>();
-        resultMap.put("userId", SecurityUtil.getLoginUser().getUserName());
-//        resultMap.put("totalTradeId", entity.getWorkflowId());
-        resultMap.put("modelType", "ETR");
-        resultMap.put("busiType", DictCodeListExt3.头寸业务类型_网下申购.getValue());
-        resultMap.put("ps", DictCodeList.交易方向_申购.getValue());
-        resultMap.put("decisionAct", DictCodeListExt3.系统动作_关闭.getValue());
-        resultMap.put("systemAct", DictCodeListExt3.系统动作_关闭.getValue());
-        resultMap.put("closeId", entrustId);
-        PositionHttpRequest.batchClose(resultMap);**/
+//        Map<String, Object> resultMap = new HashMap<>();
+//        resultMap.put("userId", SecurityUtil.getLoginUser().getUserName());
+////        resultMap.put("totalTradeId", entity.getWorkflowId());
+//        resultMap.put("modelType", "ETR");
+//        resultMap.put("busiType", DictCodeListExt3.头寸业务类型_网下申购.getValue());
+//        resultMap.put("ps", DictCodeList.交易方向_申购.getValue());
+//        resultMap.put("decisionAct", DictCodeListExt3.系统动作_关闭.getValue());
+//        resultMap.put("systemAct", DictCodeListExt3.系统动作_关闭.getValue());
+//        resultMap.put("closeId", entrustId);
+//
+//        log.info("sendClose() called with parameters => 【entity = {}】", JsonUtils.object2Json(resultMap));
+//        PositionHttpRequest.batchClose(resultMap);
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("userId", SecurityUtil.getLoginUser().getUserName());
         resultMap.put("totalTradeId", IDGenerator.generate(32));
@@ -108,7 +111,6 @@ public class PositionRequestEtrConBondService {
 
         list.add(map);
         resultMap.put("data",list);
-        log.info("sendClose() called with parameters => 【entity = {}】", JsonUtils.object2Json(resultMap));
         PositionHttpRequest.batchClose(resultMap);
     }
 
@@ -137,7 +139,7 @@ public class PositionRequestEtrConBondService {
 
         resultMap.put("workFlowId", entity.getWorkflowId());
         // 日期
-        resultMap.put("cdate", DateUtil.format(entity.getVdate()));
+        resultMap.put("cdate", entity.getEntrustDate());
         // 币种
         if (StringUtils.isNotEmpty(entity.getCcy())) {
             resultMap.put(CCY, entity.getCcy());
@@ -164,15 +166,22 @@ public class PositionRequestEtrConBondService {
         ptlCash.put("tradeId", null);
         ptlCash.put("etrId", entity.getEntrustId());
         ptlCash.put("secAmount", entity.getEntrustNum());
-        BigDecimal entrustAmt = entity.getEntrustAmt();
-        BigDecimal cashAmount = BigDecimal.ZERO;
-        if (Objects.isNull(entrustAmt) || BigDecimal.ZERO.compareTo(entrustAmt) > -1) {
-            BigDecimal entrustPrice = Objects.isNull(entity.getPrice()) ? new BigDecimal(0) : entity.getPrice();
-            cashAmount = cashAmount.add(entity.getEntrustNum().multiply(entrustPrice));
-        } else {
-            cashAmount = cashAmount.add(entrustAmt);
+//        BigDecimal entrustAmt = entity.getEntrustAmt();
+//        BigDecimal cashAmount = BigDecimal.ZERO;
+//        if (Objects.isNull(entrustAmt) || BigDecimal.ZERO.compareTo(entrustAmt) > -1) {
+//            BigDecimal entrustPrice = Objects.isNull(entity.getPrice()) ? new BigDecimal(0) : entity.getPrice();
+//            cashAmount = cashAmount.add(entity.getEntrustNum().multiply(entrustPrice));
+//        } else {
+//            cashAmount = cashAmount.add(entrustAmt);
+//        }
+        //网下申购，普通申购传50万，优先配售用券面总额
+        if (StringUtil.isNotBlank(entity.getPurchType()) && StringUtil.equals(entity.getPurchType(), DictCodeListExt2.申购类型_优先配售.getValue())) {
+            ptlCash.put("cashAmount", entity.getPurchBondTotal());
+        }else {
+            ptlCash.put("cashAmount", new BigDecimal("500000"));
         }
-        ptlCash.put("cashAmount", cashAmount);
+
+//        ptlCash.put("cashAmount", cashAmount);
         ptlCashList.add(ptlCash);
         resultMap.put("ptlCashList", ptlCashList);
 
@@ -201,19 +210,12 @@ public class PositionRequestEtrConBondService {
         applyBondSec.put("secAmount", commonPositionEngineService.getSecAmountByBondUnit(entity.getEntrustNum()));
         applyBondSec.put("cashAmount", null);
         applyBondSecList.add(applyBondSec);
+        resultMap.put("balanceCheck",DictCodeListExt1.是否_否.getValue());
         resultMap.put("applyBondSecList", applyBondSecList);
-
-        //余额校验
-        String balanceCheck = DictCodeList.是否_是.getValue();
-        if (StringUtil.isNotEmpty(entity.getSoftSkipMode()) && StringUtil.equals(entity.getSoftSkipMode(), DictCodeList.是否_是.getValue())) {
-            balanceCheck = DictCodeList.是否_否.getValue();
-        }
-
-        resultMap.put("balanceCheck", balanceCheck);
-        resultMap.put("userId", SecurityUtil.getLoginUser().getUserName());
+        resultMap.put("userId",SecurityUtil.getLoginUser().getUserName());
         resultMap.put("totalTradeId",entity.getEntrustId());
-        resultMap.put("flowStatus", DictCodeListExt3.流程节点_流程提交.getValue());
         resultMap.put("modelType", DictCodeListExt1.子系统代码_委托.getValue());
+        resultMap.put("flowStatus", DictCodeListExt3.流程节点_流程提交.getValue());
     }
 
     /**

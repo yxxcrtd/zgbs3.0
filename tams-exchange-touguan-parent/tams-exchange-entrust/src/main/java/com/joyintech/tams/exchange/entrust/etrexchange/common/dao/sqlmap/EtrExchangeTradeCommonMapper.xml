@@ -429,6 +429,7 @@
             FIN_PRODUCT FP
         ON
             TEMP.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_TYPE FPT ON FPT.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN
             PTL_PORTFOLIO PP
         ON
@@ -481,9 +482,20 @@
         ) invaim on invaim.FINPROD_ID=TEMP.FINPROD_ID and invaim.PORTFOLIO_ID=TEMP.PORTFOLIO_ID
         WHERE
         FP.TRADE_MARKET IN (#{TRADE_PLACE_03}, #{TRADE_PLACE_04})
-        <if test="tradePlat != null and tradePlat !='' and tradePlat==NO_TRADE_BUSINESS_ETR">
-            AND FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR}
-        </if>
+        <choose>
+            <when test="tradePlat != null and tradePlat !='' and tradePlat== '03'.toString()">
+                AND FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR} AND  FPT.TYPE_6=#{TYPE_6,jdbcType=VARCHAR}  AND FP.TRADE_MARKET=#{TRADE_PLACE_03}   <!-- 可债券、上交所 -->
+            </when>
+            <when test="tradePlat != null and tradePlat != '' and tradePlat == '02'.toString()">
+                AND ( (FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR} AND  FPT.TYPE_6=#{TYPE_6,jdbcType=VARCHAR}) or (FP.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}))) <!-- 可债券 、股票 、基金 -->
+            </when>
+            <when test="tradePlat != null and tradePlat != '' and tradePlat == '04'.toString()">
+                AND ( (FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR} AND  FPT.TYPE_6=#{TYPE_6,jdbcType=VARCHAR}) or (FP.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}))) <!-- 可债券 、股票 、基金 -->
+            </when>
+            <otherwise>
+                AND FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR}  <!--  债券 -->
+            </otherwise>
+        </choose>
         <if test="portfolioIdList != null and portfolioIdList.size()>0">
             <foreach collection="portfolioIdList" open="AND TEMP.PORTFOLIO_ID IN (" item="portfolioId" separator="," close=")">
                     #{portfolioId,jdbcType=VARCHAR}
@@ -1542,7 +1554,7 @@
         a.FINPROD_ID ,
         a.INV_AIM ,
         a.PS ,
-        a.UNIT_CPRICE AS PRICE,
+        nvl(a.UNIT_CPRICE,0) AS PRICE,
         a.SHARE_AMT AS AMT
         from TRD_PRODUCT_DEAL a
         LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
@@ -1572,7 +1584,7 @@
         a.FINPROD_ID ,
         a.INV_AIM ,
         a.PS ,
-        a.UNIT_CPRICE AS PRICE,
+        nvl(a.UNIT_CPRICE,0) AS PRICE,
         a.SHARE_AMT AS AMT
         from TRD_PRODUCT_TEMP_DEAL a
         LEFT JOIN TRD_PRODUCT_TEMP_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
@@ -1821,7 +1833,7 @@
     <!--组合持有资产业务模式查询 -->
     <select id="selectAllBusModelList" parameterType="Map" resultType="com.joyintech.tams.business.common.pojo.BaseMap">
         SELECT DISTINCT
-        INV_AIM AS businessModel,
+        BUSINESS_MODEL AS businessModel,
         PORTFOLIO_ID portfolioId,
         FINPROD_ID finprodId
         FROM
@@ -1829,13 +1841,13 @@
         SELECT
         PORTFOLIO_ID,
         FINPROD_ID,
-        INV_AIM
+        BUSINESS_MODEL
         FROM
         (
         SELECT
         b.PORTFOLIO_ID,
         a.FINPROD_ID,
-        a.INV_AIM,
+        a.BUSINESS_MODEL,
         ROW_NUMBER ( ) OVER ( PARTITION BY a.TRADE_ID ORDER BY a.TRADE_DATE DESC ) rn
         FROM
         TRD_PRODUCT_DEAL a
@@ -1849,13 +1861,13 @@
         SELECT
         PORTFOLIO_ID,
         FINPROD_ID,
-        INV_AIM
+        BUSINESS_MODEL
         FROM
         (
         SELECT
         b.PORTFOLIO_ID,
         a.FINPROD_ID,
-        a.INV_AIM,
+        a.BUSINESS_MODEL,
         ROW_NUMBER ( ) OVER ( PARTITION BY a.TRADE_ID ORDER BY a.TRADE_DATE DESC ) rn
         FROM
         TRD_PRODUCT_TEMP_DEAL a
@@ -1868,9 +1880,13 @@
         rn = 1
         ) TMP
         WHERE
-        TMP.portfolioId =#{ portfolioId,jdbcType = VARCHAR }
-        AND TMP.finprodId =#{ finprodId,jdbcType = VARCHAR }
+        TMP.PORTFOLIO_ID =#{ portfolioId,jdbcType = VARCHAR }
+        AND TMP.FINPROD_ID =#{ finprodId,jdbcType = VARCHAR }
     </select>
 
+    <delete id="deleteRskIsupTrial">
+        delete from RSK_ISUP_TRIAL
+        where TRADE_ID = #{entrustId, jdbcType=VARCHAR}
+    </delete>
 
 </mapper>

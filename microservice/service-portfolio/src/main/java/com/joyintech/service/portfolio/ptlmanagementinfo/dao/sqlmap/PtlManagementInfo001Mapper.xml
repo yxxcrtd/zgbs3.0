@@ -1274,4 +1274,8 @@
 		</where>
 	</select>
 
+	<delete id="deleteByPortfolioId" parameterType="java.lang.String" >
+		delete from IBU_PORTFOLIO_ACCT_RELA
+		where PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+	</delete>
 </mapper>

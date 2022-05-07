@@ -146,6 +146,9 @@
                 $('#entrustNum').change();
         }
 //      计划类净值型指令，交易方向为卖出，保存后在待办事项中查看，委托金额可输入不置灰，与新建界面不一致 add by yujinfa end
+        $('#finprodId').change();
+        $('#entrustAmt').change();
+        $('#entrustNum').change();
     }
     /**
      * 画星星
@@ -373,6 +376,16 @@
             }
          // 画星星
             star();
+            if ($('#finprodId').val()) {
+                if ((ps == T01 || ps == T04 || ps == T06 || ps == T02)) {
+                    Joyin.ajaxJson(basePath + 'invest/entrust/etrplanassetn/EtrPlanAssetN002/getValue', {finprodId: $('#finprodId').val()}, function (result) {
+                        if (result && $('#entrustAmt').val()) {
+                            $('#entrustNum').val($('#entrustAmt').val() / result);
+                        }
+
+                    });
+                }
+            }
         });
         /**
          * 委托份额
@@ -392,6 +405,17 @@
                 }else{
                     $('#entrustNum').attr("disabled",false);
                     $('#entrustNum').attr('required',true);
+                }
+                if ($('#finprodId').val()) {
+                    Joyin.ajaxJson(basePath + 'invest/entrust/etrplanassetn/EtrPlanAssetN002/getValue', {finprodId: $('#finprodId').val()}, function (result) {
+                        if (result && $('#entrustAmt').val()) {
+                            $('#entrustNum').val($('#entrustAmt').val() / result);
+                        }
+                        if (result && $('#entrustNum').val()) {
+                            $('#entrustAmt').val($('#entrustNum').val() * result);
+                        }
+
+                    });
                 }
             }
          // 画星星

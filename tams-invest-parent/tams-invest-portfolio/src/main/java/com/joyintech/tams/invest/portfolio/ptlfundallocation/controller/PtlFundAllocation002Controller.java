@@ -309,4 +309,17 @@ public class PtlFundAllocation002Controller extends BaseController {
         String msg = ptlFundAllocation002Service.start(processParameter, dto);
         return new AjaxResult(msg);
     }
+
+    /**
+     * 获取账户实际余额
+     *
+     * @return 账户余额
+     * @see
+     * @since 1.0
+     */
+    @RequestMapping("/getActAmount")
+    @ResponseBody
+    public BigDecimal getActAmount() {
+        return ptlFundAllocation002Service.getActAmount(RequestUtil.getPageParam());
+    }
 }

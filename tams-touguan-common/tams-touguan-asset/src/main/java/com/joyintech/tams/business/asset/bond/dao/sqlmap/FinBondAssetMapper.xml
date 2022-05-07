@@ -347,18 +347,23 @@
         AND		T11.BRANCH = 0
         AND		T11.CASH_TYPE_1 = #{CASH_TYPE_1_01}
         AND		T11.CASH_TYPE_2 = #{CASH_TYPE_2_C01}
-        LEFT JOIN FIN_CASH_CALC_RULE T12
-        ON		T12.FINPROD_ID = T1.FINPROD_ID
-        AND		T12.FINPROD_TYPE = #{FINPROD_TYPE_F01}
-        AND		T12.FINPROD_TYPE2 = #{FINPROD_TYPE_F01}
-        AND		T12.BRANCH = 0
+        LEFT JOIN (	SELECT  CALC_TYPE, YIELD, BASIS , MARKET_BASIS, FINPROD_ID,CASH_ID FROM (
+        SELECT ROW_NUMBER() OVER(PARTITION BY T12.CASH_ID ORDER BY T12.CASH_ID,T12.EFF_DATE DESC) RANK,
+        T12.CALC_TYPE, T12.YIELD, T12.BASIS , T12.MARKET_BASIS, T12.FINPROD_ID,T12.CASH_ID
+        FROM FIN_CASH_CALC_RULE T12
+        WHERE  T12.FINPROD_TYPE = #{FINPROD_TYPE_F01}
+        AND	T12.FINPROD_TYPE2 = #{FINPROD_TYPE_F01}
+        AND	T12.BRANCH = 0
+        AND T12.EFF_DATE <![CDATA[<=]]> TO_DATE(#{platformDate},'YYYY-MM-DD')
+        ) WHERE RANK=1 ) T12
+        ON T12.FINPROD_ID = T1.FINPROD_ID
         AND		T12.CASH_ID = T10.CASH_ID
         LEFT JOIN FIN_CASH_PAY_RULE T13
-        ON		T13.FINPROD_ID = T1.FINPROD_ID
-        AND		T13.FINPROD_TYPE = #{FINPROD_TYPE_F01}
-        AND		T13.FINPROD_TYPE2 = #{FINPROD_TYPE_F01}
-        AND		T13.BRANCH = 0
-        AND		T13.CASH_ID = T10.CASH_ID
+        ON	 T13.FINPROD_ID = T1.FINPROD_ID
+        AND	 T13.FINPROD_TYPE = #{FINPROD_TYPE_F01}
+        AND	 T13.FINPROD_TYPE2 = #{FINPROD_TYPE_F01}
+        AND	 T13.BRANCH = 0
+        AND	 T13.CASH_ID = T10.CASH_ID
         LEFT JOIN FIN_RATE_INFO T16
         ON	 T16.FINPROD_ID = T1.FINPROD_ID
         AND	 T16.FINPROD_TYPE = #{FINPROD_TYPE_F01}
@@ -1058,11 +1063,11 @@
                     ELSE SU.real_name
                    END AS userId
            from ETR_ENTRUST_OPER_HIS his
-                    LEFT JOIN FIN_PRODUCT FP ON his.ENTRUST_ID = FP.ENTRUST_ID
+                    LEFT JOIN FIN_PRODUCT FP ON his.ENTRUST_ID = FP.FINPROD_ID
                     LEFT JOIN REG_FIN_PRODUCT_DEAL_TOTAL reg on reg.TOTLE_TRADE_ID= his.ENTRUST_ID
                     LEFT JOIN ibu_quote_bond iqb on iqb.QUOTE_ID= his.ENTRUST_ID
                     LEFT JOIN SYS_USER SU ON his.user_id = SU.user_name
-                    LEFT JOIN SYS_USER SU2 ON EE.CREATE_USER = SU2.user_name
+                    LEFT JOIN SYS_USER SU2 ON FP.CREATE_USER = SU2.user_name
                     LEFT JOIN SYS_USER SUR ON reg.CREATE_USER = SUR.user_name
                     LEFT JOIN SYS_USER SUB ON iqb.CREATE_USER = SUB.user_name
            WHERE his.entrust_id = #{entrustId}
@@ -1476,4 +1481,34 @@
         </where>
         order by T1.EXERCISE_DATE asc
     </select>
+
+    <select id="getMdateByFinproId" resultType="com.joyintech.tams.invest.common.asset.dto.AssetCommonInfoDto">
+        SELECT T1.MDATE
+        FROM FIN_PRODUCT T1
+        WHERE (T1.FINPROD_ID = #{finprodId} OR
+               T1.FINPROD_MARKET_ID =  #{finprodId} )
+    </select>
+
+    <select id="getAssetInfoToRateAdj" resultType="com.joyintech.tams.invest.common.asset.dto.AssetCommonInfoDto">
+        SELECT
+        T1.COUPON_SPECIES,
+        T3.INT_TYPE
+        FROM
+        FIN_PRODUCT T1
+        LEFT JOIN FIN_CASH_INFO T2 ON T2.FINPROD_ID = T1.FINPROD_ID
+        <if test="cashType != null and cashType != ''">
+            AND T2.CASH_TYPE_2 = #{cashType,jdbcType=VARCHAR}
+        </if>
+        LEFT JOIN FIN_RATE_INFO T3 ON T3.CASH_ID = T2.CASH_ID
+        AND T3.EFF_DATE = T1.VDATE
+        <where>
+            <if test="finprodId != null and finprodId != ''">
+                AND T1.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+    <update id="deleteFileByBussinessId" >
+        delete from SYS_UPLOAD_FILE_INFO  where BUSINESS_ID = #{finprodId,jdbcType=VARCHAR},
+    </update>
 </mapper>

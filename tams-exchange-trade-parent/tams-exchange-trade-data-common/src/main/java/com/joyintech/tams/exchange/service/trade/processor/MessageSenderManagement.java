@@ -163,7 +163,7 @@ public class MessageSenderManagement extends BaseService {
                 if (pushType == 1) {
                     messageSenderService.pushTradeToMQ(basicMessage);
                 } else if (pushType == 2) {
-                    messageSenderService.pushTradeToMQForFixedIncome(basicMessage);
+                    //messageSenderService.pushTradeToMQForFixedIncome(basicMessage);
                 } else if (pushType == 3) {
                     messageSenderService.pushProgressToMQ(basicMessage);
                 } else {

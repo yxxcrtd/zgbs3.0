@@ -436,7 +436,7 @@
         FROM
         STL_SEC_ACCT_INFO
         WHERE NVL(STL_SEC_ACCT_INFO.sec_acct_type, 'SEC') = 'SEC'/*只查询证券账户*/
-        <if test="search != null and !search.equals('') and tradePlat==SHARES_TRADE_PLATFORM_02">
+        <if test="search != null and !search.equals('')">
             AND (SEC_ACCT_ID like concat('%',concat(#{search},'%')) OR SEC_ACCT_NAME like concat('%',concat(#{search},'%')))
         </if>
         <if test="initValue != null and initValue != ''">
@@ -521,61 +521,6 @@
 
     <!-- 证券代码 -->
     <select id="getFinprodMarketInfoNewUi" resultMap="secAcctInfo">
-        <!-- 质押式回购代码与期限品种映射关系 -->
-        <!--with ZYSHG as
-        (select '204001.SH' as item_code, 'GC001' as item_value
-        from dual
-        union
-        select '204002.SH' as item_code, 'GC002' as item_value
-        from dual
-        union
-        select '204003.SH' as item_code, 'GC003' as item_value
-        from dual
-        union
-        select '204004.SH' as item_code, 'GC004' as item_value
-        from dual
-        union
-        select '204007.SH' as item_code, 'GC007' as item_value
-        from dual
-        union
-        select '204014.SH' as item_code, 'GC014' as item_value
-        from dual
-        union
-        select '204028.SH' as item_code, 'GC028' as item_value
-        from dual
-        union
-        select '204091.SH' as item_code, 'GC091' as item_value
-        from dual
-        union
-        select '204182.SH' as item_code, 'GC182' as item_value
-        from dual
-        union
-        select '131810.SZ' as item_code, 'R-001' as item_value
-        from dual
-        union
-        select '131811.SZ' as item_code, 'R-002' as item_value
-        from dual
-        union
-        select '131800.SZ' as item_code, 'R-003' as item_value
-        from dual
-        union
-        select '131809.SZ' as item_code, 'R-004' as item_value
-        from dual
-        union
-        select '131801.SZ' as item_code, 'R-007' as item_value
-        from dual
-        union
-        select '131802.SZ' as item_code, 'R-014' as item_value
-        from dual
-        union
-        select '131803.SZ' as item_code, 'R-028' as item_value
-        from dual
-        union
-        select '131805.SZ' as item_code, 'R-091' as item_value
-        from dual
-        union
-        select '131806.SZ' as item_code, 'R-182' as item_value
-        from dual)-->
         select distinct t.finprod_market_id as id,
         t.finprod_name as text,
         '${acctTradeMarket}' as parentId,
@@ -591,7 +536,7 @@
         t.FACE_VALUE,
         t.IS_NETPRICE
         from (
-        <if test="tradePlat != null and tradePlat != '' and (tradePlat==SHARES_TRADE_PLATFORM_02 or tradePlat==SHARES_TRADE_PLATFORM_99)">
+        <if test="tradePlat != null and tradePlat != '' and tradePlat.equals('02') or tradePlat == null or tradePlat == ''">
             select t.oth_code  as finprod_market_id,
             t.oth_code || '|' || v.finprod_abbr || decode(t.oth_type,#{FINPROD_OTH_CODE_TYPE_05},'配债',#{FINPROD_OTH_CODE_TYPE_06},'配股',#{FINPROD_OTH_CODE_TYPE_07},'新股申购') as finprod_name,
             t.oth_type oth_code_type,
@@ -613,7 +558,11 @@
             on va.finprod_id = v.finprod_id
             left join fin_product_type r
             on v.FINPROD_ID = r.FINPROD_ID
+            and ((v.finprod_type2 = 'F01' and r.type_6='B14') or v.finprod_type2 != 'F01')
             where t.branch = 0
+            <if test="tradePlat == null and tradePlat == '' ">
+                and  v.finprod_type2='F01' or v.finprod_type2='F01' and t.oth_type=#{FINPROD_OTH_CODE_TYPE_05}
+            </if>
             <if test="tradePlat != null and tradePlat != '' and tradePlat==SHARES_TRADE_PLATFORM_99">
               and   t.oth_type=#{FINPROD_OTH_CODE_TYPE_05}
             </if>
@@ -659,45 +608,6 @@
                 and a.finprod_type2 in (#{FINPROD_TYPE_TG_F01})<!--  债券 -->
             </otherwise>
         </choose>
-        <!--<if test="tradePlat != null and tradePlat != '' and (tradePlat == '02'.toString())">
-            union
-            select distinct a.item_code as finprod_market_id,
-            a.item_code  || '|' || a.item_value as finprod_name,
-            null as oth_code_type,
-            #{FINPROD_TYPE_TG_ZYSHG} as finprod_type2,
-            a.item_value as finprod_id,
-            case when a.item_value in ('GC001',
-            'GC002',
-            'GC003',
-            'GC004',
-            'GC007',
-            'GC014',
-            'GC028',
-            'GC091',
-            'GC182') then #{TRADE_PLACE_03}
-            when a.item_value IN ('R-001',
-            'R-002',
-            'R-003',
-            'R-004',
-            'R-007',
-            'R-014',
-            'R-028',
-            'R-091',
-            'R-182',
-            'RC001',
-            'RC003',
-            'RC007') then #{TRADE_PLACE_04}
-            else null end as trade_market,
-            a.item_code AS MARKET_ID,
-            null AS BOARD,
-            null AS TYPE_6,
-            null AS TYPE_7,
-            null AS IS_NET_SETT,
-            null AS mdate,
-            null AS FACE_VALUE,
-            null AS IS_NETPRICE
-            from ZYSHG a
-        </if>-->
         ) t
         <where>
             <if test="finprodType2 != null and finprodType2 != ''">

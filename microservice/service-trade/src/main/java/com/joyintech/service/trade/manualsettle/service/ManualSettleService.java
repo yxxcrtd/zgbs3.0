@@ -7,6 +7,7 @@ import com.joyintech.framework.util.*;
 import com.joyintech.service.trade.entrustmsgbymq.dao.EntrustMsgbyMQMapper;
 import com.joyintech.service.trade.entrustmsgbymq.dto.TrdTempDto;
 import com.joyintech.service.trade.entrustmsgbymq.service.TradePreClearingService;
+import com.joyintech.service.trade.entrustmsgbymq.service.TradePreCommonService;
 import com.joyintech.service.trade.exchange.dto.Entrust;
 import com.joyintech.service.trade.manualsettle.dao.ManualSettleMapper;
 import com.joyintech.service.trade.manualsettle.dto.ManualSettleDto;
@@ -80,6 +81,12 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
 
     @Autowired
     private TradePreClearingService tradePreClearingService;
+
+    @Autowired
+    private TradePreCommonService tradePreCommonService;
+
+    @Autowired
+    private TrdManualSettleInfoMapper trdManualSettleInfoMapper;
 
     @Autowired
     private TrdCommonBaseService trdCommonBaseService;
@@ -280,7 +287,11 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
             }else {
                 // 调用业务组件.【金融产品交易共通.交易产品接口】,写入[实际]的组合持仓流水及现金流水
                 finProductTradeDto.setNeedHandleFinishEntrust(true);
-                baseTradeProductDealCommService.execute(finProductTradeDto);
+                // ZGCPCN-198:手工交收处理头寸系列户多组合指令需拆分 modify by fuyongsheng 20220425 start
+                // baseTradeProductDealCommService.execute(finProductTradeDto);
+                TrdManualSettleInfo trdManualSettleInfo = trdManualSettleInfoMapper.selectByPrimaryKey(dto.getSettleSeqNo());
+                tradePreCommonService.executePosition(finProductTradeDto, trdManualSettleInfo.getAcctNo());
+                // ZGCPCN-198:手工交收处理头寸系列户多组合指令需拆分 modify by fuyongsheng 20220425 end
             }
             //针对回溯  删除交收及回溯的流水
             if(StringUtil.equals(dto.getPageModel(),DictCodeListExt3.交收操作类型_回溯.getValue())){
@@ -391,7 +402,17 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
             //String[] partsDate = DateUtil.format(dto.getSettleDate()).split("-");
             //String[] partsTime = hms.split(":");
             //GregorianCalendar gc = new GregorianCalendar(Integer.parseInt(partsDate[0]),Integer.parseInt(partsDate[1]),Integer.parseInt(partsDate[2]),Integer.parseInt(partsTime[0]),Integer.parseInt(partsTime[1]),Integer.parseInt(partsTime[2]));
-            flow.setSettleTime(new Date());
+            // ZGCPCN-86:交收日期需要使用平台日的准确时间,通过平台日的日期拼接当前时间的时分秒 modify by fuyongsheng 20220420 start
+            // flow.setSettleTime(new Date());
+            Calendar now = Calendar.getInstance();
+            Calendar plat = Calendar.getInstance();
+            Date sysDate = DateUtil.platDateFromCache();// 获取平台日期
+            plat.setTime(sysDate);
+            plat.set(Calendar.HOUR_OF_DAY, now.get(Calendar.HOUR_OF_DAY));
+            plat.set(Calendar.MINUTE, now.get(Calendar.MINUTE));
+            plat.set(Calendar.SECOND, now.get(Calendar.SECOND));
+            flow.setSettleTime(plat.getTime());
+            // ZGCPCN-86:交收日期需要使用平台日的准确时间,通过平台日的日期拼接当前时间的时分秒 modify by fuyongsheng 20220420 end
             flow.setFinprodId(dto.getFinprodId());
             flow.setSettleNum(dto.getSettleNum());
             flow.setSettleAmt(dto.getSettleAmt());

@@ -177,7 +177,7 @@ public class CfetsTrdQueryService extends BaseService{
      * @return
      */
     public Map<String, Object> findRegInfo(String pageCode, String dtCode, String spcdCode, CfetsTrdQueryRegInfoListResponse dto) {
-        //spcdCode 01现券买卖 02 回售 03 回购
+        //spcdCode 01现券买卖 02 回售 03 回购 04 一级申购
         Map<String, Object> resultData = new HashMap<>();
         if(StringUtil.isBlank(spcdCode)){
             return resultData;

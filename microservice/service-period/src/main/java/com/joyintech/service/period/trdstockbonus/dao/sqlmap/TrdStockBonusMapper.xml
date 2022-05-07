@@ -551,6 +551,38 @@
 		GROUP BY T1.FINPROD_ID,T1.SHARE_AMT, T1.FPRICE_AMT,T2.PORTFOLIO_ID, T2.REG_DATE, T2.REG_DATE_AMT,T3.PORTFOLIO_NAME,psp.sec_acct_id,T3.INVEST_YESORNO
 	</select>
 
+	<select id="findNewPositionDividDetailInfo" resultType="com.joyintech.tams.invest.common.dto.common.FinAssetIntInfo">
+		SELECT
+			T1.FINPROD_ID,
+			T1.SHARE_AMT,
+			T1.FPRICE_AMT,
+			T2.PORTFOLIO_ID,
+			psp.sec_acct_id secAcctId,
+			<!--增加字段 是否投资组合-->
+			T3.INVEST_YESORNO investYesorno,
+			<!--增加字段 是否投资组合-->
+			T2.REG_DATE,
+			T2.REG_DATE_AMT,
+			T3.PORTFOLIO_NAME
+		FROM
+		    TRD_PRODUCT_DEAL T1,
+			TRD_PRODUCT_DEAL_ADD T2,
+			PTL_PORTFOLIO T3,
+			ptl_sec_position_rule psp
+		WHERE
+			T1.TOTLE_TRADE_ID = #{TOTLE_TRADE_ID}
+			AND T1.TRADE_ID = T2.TRADE_ID
+			AND T2.PORTFOLIO_ID = T3.PORTFOLIO_ID
+			and psp.cdate = T2.reg_date
+			and T1.finprod_id = psp.finprod_id
+			and psp.amount = T2.REG_DATE_AMT
+			and nvl(T3.PARENT_PORTFOLIO_ID,'null') = 'null'
+			and T2.PORTFOLIO_ID = psp.PORTFOLIO_ID
+			AND psp.HODING_TYPE = 'A_001'
+			AND psp.DATE_TYPE = 0
+		GROUP BY T1.FINPROD_ID,T1.SHARE_AMT, T1.FPRICE_AMT,T2.PORTFOLIO_ID, T2.REG_DATE, T2.REG_DATE_AMT,T3.PORTFOLIO_NAME,psp.sec_acct_id,T3.INVEST_YESORNO
+	</select>
+
     <select id="findProcessDividInfo" resultType="com.joyintech.tams.invest.common.dto.common.FinAssetIntInfo">
         SELECT
 		  T1.FINPROD_ID,
@@ -577,6 +609,37 @@
 		and nvl(T3.PARENT_PORTFOLIO_ID,'null') = 'null'
 		GROUP BY T1.FINPROD_ID,T1.SHARE_AMT, T1.FPRICE_AMT,T2.PORTFOLIO_ID, T2.REG_DATE, T2.REG_DATE_AMT,T3.PORTFOLIO_NAME,psp.sec_acct_id,T3.INVEST_YESORNO
     </select>
+
+	<select id="findNewPositionProcessDividInfo" resultType="com.joyintech.tams.invest.common.dto.common.FinAssetIntInfo">
+		SELECT
+			T1.FINPROD_ID,
+			T1.SHARE_AMT,
+			T1.FPRICE_AMT,
+			T2.PORTFOLIO_ID,
+			psp.sec_acct_id secAcctId,
+			<!--增加字段 是否投资组合-->
+			T3.INVEST_YESORNO investYesorno,
+			<!--增加字段 是否投资组合-->
+			T2.REG_DATE,
+			T2.REG_DATE_AMT,
+			T3.PORTFOLIO_NAME
+		FROM
+			WFL_TRD_PRODUCT_DEAL T1,
+			WFL_TRD_PRODUCT_DEAL_ADD T2,
+			PTL_PORTFOLIO T3,
+			ptl_sec_position_rule psp
+		WHERE
+			T1.TOTLE_TRADE_ID = #{TOTLE_TRADE_ID}
+			AND T1.TRADE_ID = T2.TRADE_ID
+			AND T2.PORTFOLIO_ID = T3.PORTFOLIO_ID
+			and psp.cdate = T2.reg_date
+			and T1.finprod_id = psp.finprod_id
+			and psp.amount = T2.REG_DATE_AMT
+			and nvl(T3.PARENT_PORTFOLIO_ID,'null') = 'null'
+			AND psp.HODING_TYPE = 'A_001'
+			AND psp.DATE_TYPE = 0
+		GROUP BY T1.FINPROD_ID,T1.SHARE_AMT, T1.FPRICE_AMT,T2.PORTFOLIO_ID, T2.REG_DATE, T2.REG_DATE_AMT,T3.PORTFOLIO_NAME,psp.sec_acct_id,T3.INVEST_YESORNO
+	</select>
 
 	<select id="findividInfo" resultType="com.joyintech.tams.invest.common.dto.common.FinAssetIntInfo">
 		 SELECT

@@ -40,7 +40,9 @@
         END AS otherPs,
         ETR_ENTRUST_ADD.BUSI_PS busiPs,
         ETR_ENTRUST.TRADE_MARKET tradeMarket,
-        decode(ETR_ENTRUST_ADD.ASSET_TYPE,'F01',decode(ETR_ENTRUST.PS,'T03',ETR_ENTRUST.ENTRUST_AMT, NVL(ETR_ENTRUST.ENTRUST_NUM * 100,0)),'F10',NVL(ETR_ENTRUST.ENTRUST_NUM *
+        /*decode(ETR_ENTRUST_ADD.ASSET_TYPE,'F01',decode(ETR_ENTRUST.PS,'T03',ETR_ENTRUST.ENTRUST_AMT, NVL(ETR_ENTRUST.ENTRUST_NUM * 100,0)),'F10',NVL(ETR_ENTRUST.ENTRUST_NUM *
+        100,0),'F17',NVL(ETR_ENTRUST.ENTRUST_NUM *100,0),NVL(ETR_ENTRUST.ENTRUST_AMT,ETR_ENTRUST.ENTRUST_NUM)) entrustAmt,*/
+        decode(ETR_ENTRUST_ADD.ASSET_TYPE,'F01',nvl(ETR_ENTRUST.ENTRUST_AMT,nvl(ETR_ENTRUST.ENTRUST_NUM * 100,0)),'F10',NVL(ETR_ENTRUST.ENTRUST_NUM *
         100,0),'F17',NVL(ETR_ENTRUST.ENTRUST_NUM *100,0),NVL(ETR_ENTRUST.ENTRUST_AMT,ETR_ENTRUST.ENTRUST_NUM)) entrustAmt,
         decode(ETR_ENTRUST_ADD.ASSET_TYPE,'F01',NVL(ETR_FINISH_STATUSA.FINISH_AMT * 100,0),'F10',NVL(ETR_FINISH_STATUSA.FINISH_AMT *
         100,0),'F17',NVL(ETR_FINISH_STATUSA.FINISH_AMT * 100,0),NVL(ETR_FINISH_STATUSA.FINISH_AMT,0)) finishAmt,
@@ -1541,7 +1543,7 @@
               AND fscr.VDATE &lt;= to_date(#{sysDateStr},'yyyy-mm-dd') AND fscr.MDATE >= to_date(#{sysDateStr},'yyyy-mm-dd')
         LEFT JOIN ( SELECT ENTRUST_ID, wm_concat ( PORTFOLIO_ID ) PORTFOLIO_ID FROM ETR_ENTRUST_DETAIL GROUP BY ENTRUST_ID ) det ON det.ENTRUST_ID = ete.ENTRUST_ID
         left join MST_COUNTER_PARTY mcpdata on ete.COUNTER_ID = mcpdata.COUNTER_ID
-        LEFT JOIN FIN_PRODUCT T7 ON ete.STOCK_ID = T7.FINPROD_MARKET_ID
+        LEFT JOIN FIN_PRODUCT T7 ON ete.STOCK_ID = T7.FINPROD_MARKET_ID and ete.FINPROD_TYPE2 = T7.FINPROD_TYPE2
         WHERE ete.entrust_id = #{entrustId}
         AND ( fscr.VDATE  = ( select max(VDATE) from FIN_STDSEC_CONVERSE_RADIO fscr1
         where fscr1.FINPROD_ID= fscr.FINPROD_ID and fscr1.BRANCH = fscr.BRANCH )  OR fscr.VDATE IS NULL )
@@ -1574,13 +1576,17 @@
         mci.CUSTOMER_NAME mainConsignee,
         to_char(eted.payment_date,'yyyy-MM-dd') paymentDate,
         to_char(eted.listing_date,'yyyy-MM-dd')  listingDate,
-        ete.entrust_num entrustNum,
+<!--         ete.entrust_num entrustNum,-->
+        case when eted.BUSI_TYPE_POSITION in ('EX017','EX005') THEN round(ete.entrust_num/100,4)
+        when ete.ps in ('T68','T69') THEN round(ete.entrust_num/100,4)
+        else ete.entrust_num end entrustNum,
         <!--ete.entrust_amt entrustAmt,
            按照列表查询价格修改 -->
         decode(
         eted.ASSET_TYPE,
         'F01',
-        NVL( ete.ENTRUST_NUM * 100, 0 ),
+        /*decode(ete.PS,'T03',ete.ENTRUST_AMT,NVL(ete.ENTRUST_NUM * 100, 0 )),*/
+        decode(ete.TRADE_MARKET,'03',ete.ENTRUST_AMT,'04',ete.ENTRUST_AMT,NVL(ete.ENTRUST_NUM * 100, 0 )),
         'F10',
         NVL( ete.ENTRUST_NUM * 100, 0 ),
         NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
@@ -1646,7 +1652,7 @@
               AND fscr.VDATE &lt;= to_date(#{sysDateStr},'yyyy-mm-dd') AND fscr.MDATE >= to_date(#{sysDateStr},'yyyy-mm-dd')
         LEFT JOIN ( SELECT ENTRUST_ID, wm_concat ( PORTFOLIO_ID ) PORTFOLIO_ID FROM WFL_ETR_ENTRUST_DETAIL GROUP BY ENTRUST_ID ) det ON det.ENTRUST_ID = ete.ENTRUST_ID
         left join MST_COUNTER_PARTY mcpdata on ete.COUNTER_ID = mcpdata.COUNTER_ID
-        LEFT JOIN FIN_PRODUCT T7 ON ete.STOCK_ID = T7.FINPROD_MARKET_ID
+        LEFT JOIN FIN_PRODUCT T7 ON ete.STOCK_ID = T7.FINPROD_MARKET_ID and ete.FINPROD_TYPE2 = T7.FINPROD_TYPE2
         WHERE ete.entrust_id = #{entrustId}
     </select>
 

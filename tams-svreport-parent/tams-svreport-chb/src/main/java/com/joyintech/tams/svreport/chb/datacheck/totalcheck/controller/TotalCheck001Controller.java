@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.tams.systemtools.util.CommonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,8 +138,10 @@ public class TotalCheck001Controller extends BaseController {
     @RequestMapping("/getIssuePartyidList")
     @ResponseBody
     public List<SelectOptionDto> getIssuePartyidList() {
-        String issuePartyId = CommonUtil.selectBankCode();
-        String issuePartyName = CommonUtil.selectBankCode();
+//        String issuePartyId = CommonUtil.selectBankCode();
+//        String issuePartyName = CommonUtil.selectBankCode();
+        String issuePartyName = CacheUtil.getSysParam("SVR_ISSUE_PARTY_NAME");
+        String issuePartyId = CacheUtil.getSysParam("SVR_ISSUE_PARTY_ID");
         List<SelectOptionDto> dtoList = new ArrayList<SelectOptionDto>();
         SelectOptionDto issueParty = new SelectOptionDto();
         issueParty.setId(issuePartyId);

@@ -930,6 +930,9 @@ public class PeriodCommonService extends BaseService {
                     creditLinesInputDto.setTradeAmt(inputDto.getReturnAmount());
                     creditLinesInputDto.setTradeId(inputDto.getBusiCode());
                     creditLinesInputDto.setTradeDate(DateUtil.parse(inputDto.getArrivalDate()));
+                    // TISHKS-947:子期次占用母计划额度 modify by fuyongsheng 20220506 start
+                    creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue());
+                    // TISHKS-947:子期次占用母计划额度 modify by fuyongsheng 20220506 end
                 }
             }
             // 计划类利率存续期-红利再投

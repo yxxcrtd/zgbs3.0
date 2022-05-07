@@ -136,6 +136,7 @@ public class BondFinCashPlanDto extends FinCashPlan {
         this.basis = basis;
     }
 
+    @ApiModelProperty(name="maxTradeDate",value="最大交易日期")
     private Date maxTradeDate;
 
     private Date oldMdate;

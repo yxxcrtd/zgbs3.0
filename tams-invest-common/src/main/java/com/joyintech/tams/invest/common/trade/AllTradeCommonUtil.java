@@ -2160,11 +2160,11 @@ public class AllTradeCommonUtil {
 			PtlPortfolio ptlPortfolio = ptlPortfolioMapper.selectByPrimaryKey(portfolioId);
 			if (null != ptlPortfolio && StringUtils.isNotEmpty(ptlPortfolio.getProfitType())) {
 				if (DictCodeList.收益类型_货币型.getValue().equals(ptlPortfolio.getProfitType())) {
-					return DictCodeListExt1.投资目的_摊余成本类.getValue();
+					return DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue();
 				}
 			}
 		}
-		return DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue();
+		return DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue();
 	}
 	// add by lijie2 20200910 投资目的取值逻辑 end
 

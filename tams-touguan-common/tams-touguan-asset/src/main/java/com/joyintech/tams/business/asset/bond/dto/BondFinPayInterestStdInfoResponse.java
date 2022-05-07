@@ -60,4 +60,5 @@ public class BondFinPayInterestStdInfoResponse {
     public void setInvRepayList(List<BondFinCashPlanDto> invRepayList) {
         this.invRepayList = invRepayList;
     }
+
 }

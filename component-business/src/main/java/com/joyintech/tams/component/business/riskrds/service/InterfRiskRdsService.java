@@ -2528,6 +2528,15 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                 infRiskRdsDto.setEntrustCode(entrust.getEntrustId());
                 infRiskRdsDto.setPreOccupyCode(entrust.getEntrustId());
             }
+            // TISHKS-1012:entrsutDate为null没有取到对应的委托预占数据 modify by fuyongsheng 20220506 start
+            else if (null == entrsutDate){
+                EtrEntrust entrust = AllTradeCommonUtil.findEntrustInfo(finDto.getbTradeId());
+                if (entrust != null && StringUtil.isNotEmpty(entrust.getEntrustId())) {
+                    infRiskRdsDto.setEntrustCode(entrust.getEntrustId());
+                    infRiskRdsDto.setPreOccupyCode(entrust.getEntrustId());
+                }
+            }
+            // TISHKS-1012:entrsutDate为null没有取到对应的委托预占数据 modify by fuyongsheng 20220506 end
         }
         // add by zhangrui1 赎回确认日期不在指令日期时不使用指令编号 end
         // add by zhangrui1 货币型资产净值为1 start
@@ -2961,7 +2970,8 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
         else if(StringUtil.equals(DictCodeList.平安资产类型_质押式回购.getValue(),v.getAssetType())
                 && (StringUtil.isNotEmpty(dataMap.get("isEnabled")) && StringUtil.equals(dataMap.get("isEnabled"),"01"))
                 && (StringUtil.isNotEmpty(dataMap.get("finprodType2")) && (StringUtil.equals(dataMap.get("finprodType2"),DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())
-                || StringUtil.equals(dataMap.get("finprodType2"),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())))
+                || StringUtil.equals(dataMap.get("finprodType2"),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
+                || StringUtil.equals(dataMap.get("finprodType2"),"ZYSHG")))
                 &&StringUtil.isNotEmpty(dataMap.get("bussTrdTransfenpeiDto"))){
             ((List)dataMap.get("bussTrdTransfenpeiDto")).forEach(en->{
                 Map<String, Object> dataReMap=new HashMap<>();

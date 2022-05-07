@@ -6,7 +6,6 @@ import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
-import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
@@ -328,7 +327,7 @@ public class PositionMakeReader extends BaseReader<PositionMakeReaderResult> {
                         /** added by weipeng T+1债券在T日推送了债券信息，推送了数量以及清算款科目，摊余总成本推送为0，债券在这里特殊处理 start **/
                         if(DictCodeListExt1.金融产品类型_债券.getValue().equals(dto.getFinprodType())){
                             // 若是公允价值变动损益类，直接成本重新赋值
-                            if(DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue().equals(dto.getInvAim())){
+                            if(DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue().equals(dto.getInvAim())){
                                 // 组合资产信息ENTITY.摊余总成本 = B表ENTITY.摊余总成本
                                 dto.setDscCostAmt(item.getDscCostAmt());
                                 // 组合资产信息ENTITY.摊余总成本_本位币= 成本ENTITY.摊余总成本_本位币
@@ -342,10 +341,10 @@ public class PositionMakeReader extends BaseReader<PositionMakeReaderResult> {
                             }
                             else{
                                 List<String> subjectNatureList = new ArrayList<String>();
-                                if(DictCodeListExt1.投资目的_摊余成本类.getValue().equals(dto.getInvAim())){
+                                if(DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue().equals(dto.getInvAim())){
                                     subjectNatureList = Arrays.asList(DictCodeBaseSubjectNatrue.摊余成本类利息调整.getValue());
                                 }
-                                else if(DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue().equals(dto.getInvAim())){
+                                else if(DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue().equals(dto.getInvAim())){
                                     subjectNatureList = Arrays.asList(DictCodeBaseSubjectNatrue.综合收益类利息调整.getValue());
                                 }
                                 // 调用共通【账务类共通方法】，科目余额查询-期待方向

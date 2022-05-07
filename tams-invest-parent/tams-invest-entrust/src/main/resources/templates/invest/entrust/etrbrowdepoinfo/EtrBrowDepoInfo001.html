@@ -55,7 +55,8 @@
                         <div class="layui-input-inline input-inline">
                             <select id="type9" name="type9" class="layui-input form-input input-select"
                                 data-th-placeholder="#{SysCommon.placeholder}" multiple
-                                data-th-data-result='${CUSTOM_ASSET_TYPE_TWO}'></select>
+                                    data-th-data-result='${CUSTOM_ASSET_TYPE_TWO}'
+                                    childrenIds="type10"></select>
                         </div>
                     </div>
                     <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
@@ -63,7 +64,10 @@
                         <div class="layui-input-inline input-inline">
                             <select id="type10" name="type10" class="layui-input form-input input-select"
                                 data-th-placeholder="#{SysCommon.placeholder}" multiple
-                                data-th-data-result='${CUSTOM_ASSET_TYPE_THREE}'></select>
+                                    data-th-data-result='${CUSTOM_ASSET_TYPE_THREE}'
+                                    formatoption=true
+                                    parentIds="type9" data-th-childrenIds="${isShowType} eq '01' ? 'type11' : 'repAssetType'"></select>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -73,7 +77,8 @@
                         <div class="layui-input-inline input-inline">
                             <select id="type11" name="type11" class="layui-input form-input input-select"
                                 data-th-placeholder="#{SysCommon.placeholder}" multiple
-                                data-th-data-result='${CUSTOM_ASSET_TYPE_FOUR}'></select>
+                                data-th-data-result='${CUSTOM_ASSET_TYPE_FOUR}'
+                                parentIds="type10"></select>
                         </div>
                     </div>
                     <!-- 新增资产二、三四、级分类 王贵奇 2019/8/1 结束-->

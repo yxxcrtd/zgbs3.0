@@ -295,4 +295,10 @@ public class EtrPlanAssetNController  {
     public String getCounterName(String counterId){
         return etrPlanAssetNService.getCounterName(counterId);
     }
+
+
+    @PostMapping("getValue")
+    public double getValue(@RequestBody Map map){
+        return etrPlanAssetNService.getValue(map);
+    }
 }

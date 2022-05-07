@@ -22,12 +22,12 @@
 				</div>
 			</div>
 			<div class="layui-form-item">
-				<div class="form-inline-wrap" style="width: 45%">
+				<div class="form-inline-wrap" style="width:30%">
 					<label class="layui-form-label form-label-wrap"
-						data-th-text="#{RskSupervisionIndicator002.startDate}"
-						style="width: 29% !important">有效区间</label>
+						   data-th-text="#{RskSupervisionIndicator002.endDate}"
+						   style="width: 30% !important">有效区间</label>
 					<div class="layui-input-inline input-inline"
-						style="width: 54% !important">
+						 style="width: 70% !important">
 						<input style="float: left; margin-right: 5px" type="text"
 							id="startDate" name="rskPortfolioIndicatorDto.startDate"
 							data-th-value='${#dates.format(entity?.rskPortfolioIndicatorDto?.startDate,"yyyy-MM-dd")}'

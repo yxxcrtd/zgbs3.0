@@ -21,7 +21,6 @@ import com.joyintech.service.entrust.common.dao.EntrustCommonPersonSelectMapper;
 import com.joyintech.service.entrust.common.service.EntrustCommonPersonSelectService;
 import com.joyintech.service.entrust.etrinvestbondinfo.dao.EtrInvestBondInfoMapper;
 import com.joyintech.service.entrust.etrinvestbondinfo.dto.EtrInvestBondInfoDto;
-import com.joyintech.service.entrust.etrplanassetc.dto.EtrPlanAssetCDto;
 import com.joyintech.tams.common.base.entity.EtrDistribute;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.common.base.entity.EtrEntrustAdd;
@@ -29,7 +28,6 @@ import com.joyintech.tams.component.base.entrust.BusiAutoEtrDispService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
-import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.invest.common.component.base.core.MstFileCommonService;
 import com.joyintech.tams.invest.common.component.base.entrust.BaseEtrInvestInfoService;
@@ -44,8 +42,6 @@ import com.joyintech.tams.invest.common.pagemenusplit.PageMenuSplitUtil;
 import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
@@ -702,7 +698,7 @@ public class EtrInvestBondInfoService extends BaseService<EtrInvestBondInfoDto> 
      * @author jiangpeng
      */
     public BigDecimal getLastPriceByPara(Map<String, Object> param) {
-        if (StringUtil.equals(DictCodeListExt1.投资目的_摊余成本类.getValue(), (String) param.get("invAim"))) {
+        if (StringUtil.equals(DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue(), (String) param.get("invAim"))) {
             return etrInvestBondInfoMapper.getLastDSCPriceByPara(param);
         } else {
             return etrInvestBondInfoMapper.getLastPriceByPara(param);

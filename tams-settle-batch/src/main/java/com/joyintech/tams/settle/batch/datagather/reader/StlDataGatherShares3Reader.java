@@ -79,8 +79,7 @@ public class StlDataGatherShares3Reader extends StlDataGatherReader {
     @Override
     protected void setSearchParam(Map<String, Object> searchParam) {
         // 交易方向列表
-        searchParam.put("psList",
-                Arrays.asList(DictCodeList.交易方向_现金分红.getValue(), DictCodeList.交易方向_红利再投.getValue()));
+        searchParam.put("psList", Arrays.asList(DictCodeList.交易方向_申购确认.getValue()));
     }
 
     @Override

@@ -1014,7 +1014,8 @@ public class BeforeSubErrorCheck {
     	StringBuffer errMsgSb = new StringBuffer();
     	//发行机构代码
         String issueParthId = dataMap.get("ISSUE_PARTY_ID");
-        String bankCode = CommonUtil.selectBankCode();
+//        String bankCode = CommonUtil.selectBankCode();
+        String bankCode = CacheUtil.getSysParam("SVR_ISSUE_PARTY_ID");
         if(!bankCode.equals(issueParthId)){
         	 errMsgSb.append("发行机构代码:" + issueParthId +"必须与登记银行代码相同");
              errMsgSb.append(GlobalConstant.VERTICAL_LINE);

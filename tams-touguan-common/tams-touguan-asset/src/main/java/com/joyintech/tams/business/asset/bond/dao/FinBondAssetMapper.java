@@ -16,6 +16,7 @@ import com.joyintech.tams.business.asset.bond.dto.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.asset.dto.FinPayInterestStdInfoDto;
 import com.joyintech.tams.invest.asset.common.dto.FinAssetRateAdjDto;
+import com.joyintech.tams.invest.common.asset.dto.AssetCommonInfoDto;
 import com.joyintech.tams.invest.common.dto.common.FinAssetIntInfo;
 import com.joyintech.tams.invest.common.dto.period.trdbondduration.TrdBondDurationDto;
 import org.apache.ibatis.annotations.Param;
@@ -236,4 +237,9 @@ public interface FinBondAssetMapper {
 
 	List<FinExercisePlan> getfinExercisePlanByProductId(Map<String, Object> param);
 
+	AssetCommonInfoDto getMdateByFinproId(@Param("finprodId")String finprodId);
+
+	AssetCommonInfoDto getAssetInfoToRateAdj(Map<String, Object> param);
+
+	int deleteFileByBussinessId(@Param("finprodId") String finprodId);
 }

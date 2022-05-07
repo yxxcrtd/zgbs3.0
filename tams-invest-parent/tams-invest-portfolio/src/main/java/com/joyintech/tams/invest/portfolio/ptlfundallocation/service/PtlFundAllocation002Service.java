@@ -312,4 +312,14 @@ public class PtlFundAllocation002Service extends CommonExportService<PtlFundAllo
 
         return dto;
     }
+
+    /**
+     * 获取账户余额
+     * @return 账户余额
+     * @see
+     * @since 1.0
+     */
+    public BigDecimal getActAmount(Map<String,Object> map){
+        return restTemplate.postForObject(ServiceApplication.PORTFOLIO_SERVICE_NAME + "/PtlFundAllocation/getActAmount", map, BigDecimal.class);
+    }
 }

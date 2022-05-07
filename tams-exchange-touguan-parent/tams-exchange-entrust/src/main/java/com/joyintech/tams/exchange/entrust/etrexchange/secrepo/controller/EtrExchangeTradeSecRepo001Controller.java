@@ -1097,6 +1097,7 @@ public class EtrExchangeTradeSecRepo001Controller extends BaseController{
 	@RequestMapping("check")
 	public AjaxResult check(@RequestBody EtrExchangeTradeSaveSecRepoRequest dto, BindingResult br)
 			throws Exception {
+		etrExchangeTradeSecRepo001Service.setEntrustBussType(dto);
 		AjaxResult ajax= etrExchangeTradeSecRepo001Service.checkSave(dto,br);
 		List<ValidMessage> validList = etrExchangeTradeSecRepoValidatorService.valid(dto);
 //		List<ValidMessage> validListBussValid = etrExchangeTradeJj001Validator.bussValid(dto);
@@ -1120,7 +1121,6 @@ public class EtrExchangeTradeSecRepo001Controller extends BaseController{
 			if(StringUtil.equals(priceScopeControllEtr,"02")){
 				for(ValidMessage validMessage:validListPriceRange){
 					confirmMsg += validMessage.getMessage();
-					confirmMsg += "<br />";
 				}
 			}
 		}

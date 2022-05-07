@@ -731,6 +731,9 @@ public class EtrTradeCommonervice extends BaseService {
 
     //可用可用持仓类型
     public void handleSecType(PositionCashSecDto dto) {
+        if(StringUtil.equals(DictCodeList.交易平台_综合协议交易平台.getValue(),dto.getTradePlat())){
+            dto.setTradePlat(DictCodeList.交易平台_大宗交易平台.getValue());
+        }
         String holdingType = "";
         if (StringUtil.isNotEmpty(dto.getFinprodId())
                 && StringUtil.isNotEmpty(dto.getFinprodType2())

@@ -276,6 +276,7 @@ public class PositionHttpRequest {
         if(message == null){
             throw new PositionException("头寸返回数据为空！");
         }
+        logger.info("返回头寸报文: {}",message);
         if (!StringUtil.equals("success", message.get("code"))){
             if(StringUtil.equals("FL0007", message.get("code"))){
                 throw new PositionException(CODE_BUSI_RK + "|" + message.get("message"));

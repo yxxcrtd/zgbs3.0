@@ -13,7 +13,6 @@ import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
-import com.joyintech.tams.invest.bankuplink.reponew.dto.CfetsRepoDealQuotedPr001Dto;
 import com.joyintech.tams.invest.bankuplink.reponew.dto.CfetsRepoDealQuotedPr006Dto;
 import com.joyintech.tams.invest.common.component.base.core.BaseGetBussinessId;
 import com.joyintech.tams.invest.common.component.base.group.BasePtlSecPositionInfoService;
@@ -565,9 +564,9 @@ public class CfetsRepoDealQuotedPr006Service extends BaseService<CfetsRepoDealQu
         param.put("portfolioId", input.getPortfolioId());
         param.put("ps", input.getPs());
         param.put("isWithInvAim", true);
-        param.put("INV_AIM_AC", DictCodeListExt1.投资目的_摊余成本类.getValue());
-        param.put("INV_AIM_FVOCI", DictCodeListExt1.投资目的_公允价值变动计入其他综合收益.getValue());
-        param.put("INV_AIM_FVTPL", DictCodeListExt1.投资目的_公允价值变动计入当期损益.getValue());
+        param.put("INV_AIM_AC", DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue());
+        param.put("INV_AIM_FVOCI", DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue());
+        param.put("INV_AIM_FVTPL", DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue());
         param.put("secAcctId", input.getSecAcctId());
         param.put("chlId", input.getChlId());
         if(isNegate) {
