@@ -92,7 +92,7 @@ public class CfetsEtrFinProductInfoService extends BaseService {
                     .toString();
         }
 
-        if (DictCodeListExt4.发行类型_首发.getValue().equals(issueStyle) || DictCodeListExt4.发行类型_首发.getValue().equals(issueStyle)) {
+        if (DictCodeListExt4.发行类型_增发.getValue().equals(issueStyle)) {
             return sb.append(BASE_SPCD_CODE)
                     .append(COMM)
                     .append(DictCodeListExt4.新债_发行方式_招标发行.getValue())
