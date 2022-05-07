@@ -2434,6 +2434,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         Map<String, BigDecimal> resultMap = new HashMap<>();
         BigDecimal entrustAmt = this.toBigDecimal(param.get("entrustAmt"));
         BigDecimal entrustNum = this.toBigDecimal(param.get("entrustNum"));
+        BigDecimal fprice = this.toBigDecimal(param.get("fprice") == null ? entrustNum : param.get("fprice"));
         String ps = param.get("ps") == null ? null : param.get("ps").toString();
         String currentTab = param.get("currentTab") == null ? null : param.get("currentTab").toString();
         BigDecimal entrustPrice = this.toBigDecimal(param.get("entrustPrice"));
@@ -2452,7 +2453,12 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         }
         String tradeMarket = (String) param.get("tradeMarket");
         if (StringUtil.equals(targetType, DictCodeListExt3.目标类型_金额.getValue())) {
-            entrustNum = ArithmeticUtil.divide(entrustAmt, entrustPrice, 0, RoundingMode.DOWN);
+            // 竞价、大宗、协议现券待办中的目标类型=数量，金额=全价*数量，如果目标类型=金额，数量=金额/全价
+            if(StringUtils.equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue(),finprodType2)){
+                entrustNum = ArithmeticUtil.divide(entrustAmt, fprice, 0, RoundingMode.DOWN);
+            }else {
+                entrustNum = ArithmeticUtil.divide(entrustAmt, entrustPrice, 0, RoundingMode.DOWN);
+            }
         }
 
         if (null != param.get("minTrdUnitLimitDto")) {
@@ -2486,7 +2492,12 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         // rs == 0 entrustNum等于0 例如：entrustNum = 0.00
         // rs == 1 entrustNum大于0 例如：entrustNum = 10.00
         if (StringUtil.equals(targetType, DictCodeListExt3.目标类型_数量.getValue())) {
-            entrustAmt = ArithmeticUtil.multiply(entrustNum, entrustPrice);
+            // 竞价、大宗、协议现券待办中的目标类型=数量，金额=全价*数量，如果目标类型=金额，数量=金额/全价
+            if(StringUtils.equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue(),finprodType2)){
+                entrustAmt = ArithmeticUtil.multiply(entrustNum, fprice);
+            }else {
+                entrustAmt = ArithmeticUtil.multiply(entrustNum, entrustPrice);
+            }
             if (StringUtils.equals(DictCodeListExt3.交易方向_质押券入库.getValue(), ps) ||
                     StringUtils.equals(DictCodeListExt3.交易方向_质押券出库.getValue(), ps)) {
                 if (null != entrustAmt) {//entrustAmt 代表标准券数量
