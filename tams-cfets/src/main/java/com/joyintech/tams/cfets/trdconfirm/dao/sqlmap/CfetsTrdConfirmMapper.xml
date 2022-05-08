@@ -2102,25 +2102,25 @@
                     and bo.OUR_TRADER = #{ourTrader,jdbcType=VARCHAR}
                 </if>
                 <if test="payableAmount != null">
-                    and bo.PAYABLE_AMOUNT = #{payableAmount,DECIMAL=VARCHAR}
+                    and bo.PAYABLE_AMOUNT = #{payableAmount,jdbcType=DECIMAL}
                 </if>
     </select>
 
     <select id="selectWflBidDataByFinprodId" resultType="java.lang.String">
-        select ENTRUST_ID trdId from WFL_ETR_ENTRUST where FINPROD_ID = #{finprodId,DECIMAL=VARCHAR} and FINPROD_TYPE2 = 'F32'
+        select ENTRUST_ID trdId from WFL_ETR_ENTRUST where FINPROD_ID = #{finprodId,jdbcType=VARCHAR} and FINPROD_TYPE2 = 'F32'
         union all
-        select BID_ID trdId from WFL_BID_ORDER where FINPROD_ID = #{finprodId,DECIMAL=VARCHAR}
+        select BID_ID trdId from WFL_BID_ORDER where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
     </select>
 
     <select id="selectIssueInfoByFinprodId" resultType="com.joyintech.tams.common.base.entity.FinProductAdd">
-        select finprod_id,ISSUE_STATUS  from FIN_PRODUCT_ADD  where FINPROD_ID = #{finprodId,DECIMAL=VARCHAR} and ROWNUM = 1
+        select finprod_id,ISSUE_STATUS  from FIN_PRODUCT_ADD  where FINPROD_ID = #{finprodId,jdbcType=VARCHAR} and ROWNUM = 1
     </select>
 
-    <select id="selectIssueInfoByFinprodId">
+    <select id="selectCountEtrFinshByFinprodId">
         select count(*)
         from ETR_FINISH_STATUS efs
                  inner join ETR_ENTRUST ee on ee.ENTRUST_ID = efs.ENTRUST_ID
-        where ee.FINPROD_ID = #{finprodId,DECIMAL=VARCHAR} and efs.ENT_FINISH_AMT is not null and efs.ENT_FINISH_AMT > 0
+        where ee.FINPROD_ID = #{finprodId,jdbcType=VARCHAR} and efs.ENT_FINISH_AMT is not null and efs.ENT_FINISH_AMT > 0
     </select>
 
 </mapper>
