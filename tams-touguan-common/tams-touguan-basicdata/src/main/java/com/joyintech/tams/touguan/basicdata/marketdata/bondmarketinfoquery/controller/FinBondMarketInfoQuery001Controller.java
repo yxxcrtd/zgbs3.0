@@ -99,7 +99,7 @@ public class FinBondMarketInfoQuery001Controller extends BaseController {
     @ResponseBody
     @PostMapping("/bondMarketInfo")
     @ApiOperation(value = "债券市场信息查看(接口数据)", notes = "债券市场信息查看(接口数据)")
-    public Message<FinBondMarketInfoQuery001Dto> queryFinBondMarketForCoupons(@RequestParam("secId") String secId) {
+    public Message<FinBondMarketInfoDetailQueryDto> queryFinBondMarketForCoupons(@RequestParam("secId") String secId) {
         FinBondMarketInfoDetailQueryDto dto = finBondMarketInfoQuery001Service.queryFinBondMarketForCoupons(secId);
         if (StringUtil.isNotEmpty(dto)) {
             return Message.success("success", dto);

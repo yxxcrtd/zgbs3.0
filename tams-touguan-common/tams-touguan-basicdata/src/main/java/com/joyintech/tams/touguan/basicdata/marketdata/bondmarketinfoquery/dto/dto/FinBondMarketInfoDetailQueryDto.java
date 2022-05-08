@@ -218,13 +218,16 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "zxGradeOrgId", value = "债项评级机构")
     private String zxGradeOrgId;
 
+    @ApiModelProperty(name = "conceptTypes", value = "概念板块")
+    private List<String> conceptTypes;
+
     @ApiModelProperty(name = "finBondPayHSrcSecOptionDto", value = "行权计划信息")
     private List<FinBondPayHSrcSecOptionDto> bondPayHSrcSecOptionDtos;
 
     @ApiModelProperty(name = "bondMarketCashPlanDtos", value = "付息计划信息")
     private List<FinBondMarketCashPlanDto> bondMarketCashPlanDtos;
 
-    @ApiModelProperty(name="bondMarketInvRepayDtos",value="还本计划信息")
+    @ApiModelProperty(name = "bondMarketInvRepayDtos", value = "还本计划信息")
     private List<FinBondMarketCashPlanDto> bondMarketInvRepayDtos;
 
     public String getSecId() {
@@ -745,5 +748,13 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     public void setBondMarketInvRepayDtos(List<FinBondMarketCashPlanDto> bondMarketInvRepayDtos) {
         this.bondMarketInvRepayDtos = bondMarketInvRepayDtos;
+    }
+
+    public List<String> getConceptTypes() {
+        return conceptTypes;
+    }
+
+    public void setConceptTypes(List<String> conceptTypes) {
+        this.conceptTypes = conceptTypes;
     }
 }
