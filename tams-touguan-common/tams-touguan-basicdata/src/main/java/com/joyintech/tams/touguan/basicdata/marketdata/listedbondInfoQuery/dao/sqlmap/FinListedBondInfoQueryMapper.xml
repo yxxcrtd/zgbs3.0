@@ -326,7 +326,8 @@
         ISSUE.MAX_TENDER_PLUS maxTenderPxDiffer,
         ISSUE.SERI_Y_N continuousTenderLimit,
         ISSUE.MAX_TOTAL_TENDER maxTotalTenderAmt,
-        PRODUCT.DELISTING_DATE delistingDate
+        PRODUCT.DELISTING_DATE delistingDate,
+        PRODUCT.ISSUE_AMT issueAmt
         FROM
         FIN_PRODUCT PRODUCT
         LEFT JOIN FIN_PRODUCT_ADD PRODUCT_ADD ON PRODUCT.FINPROD_ID = PRODUCT_ADD.FINPROD_ID

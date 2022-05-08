@@ -60,7 +60,7 @@ public class FinBondMarketCashPlanDto extends BaseDto {
     /**
      * 理论支付日
      */
-    @ApiModelProperty(name = "secId", value = "债券ID")
+    @ApiModelProperty(name = "interestpayday", value = "理论支付日")
     private Date interestpayday;
 
     /**

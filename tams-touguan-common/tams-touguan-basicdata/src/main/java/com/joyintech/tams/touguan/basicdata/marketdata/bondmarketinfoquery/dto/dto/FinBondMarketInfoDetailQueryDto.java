@@ -39,6 +39,9 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "institution", value = "登记托管机构")
     private String institution;
 
+    @ApiModelProperty(name = "institutionText", value = "登记托管机构说明")
+    private String institutionText;
+
     @ApiModelProperty(name = "issuePrice", value = "发行价格")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal issuePrice;
@@ -56,6 +59,22 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal issueAmt;
 
+    @ApiModelProperty(name = "delistingDate", value = "摘牌日")
+    private Date delistingDate;
+
+    @ApiModelProperty(name = "valueDate", value = "估值日")
+    private Date valueDate;
+
+    @ApiModelProperty(name = "calloption", value = "是否可赎回,Y是N否")
+    private String calloption;
+
+    @ApiModelProperty(name = "putoption", value = "是否可回售,Y是N否")
+    private String putoption;
+
+    @ApiModelProperty(name = "marketAmt", value = "债券市场余额")
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal marketAmt;
+
     @ApiModelProperty(name = "issuerName", value = "发行人")
     private String issuerName;
 
@@ -64,6 +83,9 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     @ApiModelProperty(name = "secType2", value = "二级分类")
     private String secType2;
+
+    @ApiModelProperty(name = "secType3", value = "三级分类")
+    private String secType3;
 
     @ApiModelProperty(name = "issueType", value = "募集方式")
     private String issueType;
@@ -82,6 +104,18 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     @ApiModelProperty(name = "isRight", value = "是否含权债")
     private String isRight;
+
+    @ApiModelProperty(name = "isAutoUpdate", value = "是否允许资讯数据覆盖")
+    private String isAutoUpdate;
+
+    @ApiModelProperty(name = "cityInvestSecChb", value = "是否城投债（中债）")
+    private String cityInvestSecChb;
+
+    @ApiModelProperty(name = "isGreenBond", value = "是否绿色债")
+    private String isGreenBond;
+
+    @ApiModelProperty(name = "baseRateAccuracy", value = "基准利率精度")
+    private String baseRateAccuracy;
 
     @ApiModelProperty(name = "cyy", value = "币种")
     private String cyy;
@@ -189,6 +223,9 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     @ApiModelProperty(name = "bondMarketCashPlanDtos", value = "付息计划信息")
     private List<FinBondMarketCashPlanDto> bondMarketCashPlanDtos;
+
+    @ApiModelProperty(name="bondMarketInvRepayDtos",value="还本计划信息")
+    private List<FinBondMarketCashPlanDto> bondMarketInvRepayDtos;
 
     public String getSecId() {
         return secId;
@@ -612,5 +649,101 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     public void setBondPayHSrcSecOptionDtos(List<FinBondPayHSrcSecOptionDto> bondPayHSrcSecOptionDtos) {
         this.bondPayHSrcSecOptionDtos = bondPayHSrcSecOptionDtos;
+    }
+
+    public String getInstitutionText() {
+        return institutionText;
+    }
+
+    public void setInstitutionText(String institutionText) {
+        this.institutionText = institutionText;
+    }
+
+    public Date getDelistingDate() {
+        return delistingDate;
+    }
+
+    public void setDelistingDate(Date delistingDate) {
+        this.delistingDate = delistingDate;
+    }
+
+    public Date getValueDate() {
+        return valueDate;
+    }
+
+    public void setValueDate(Date valueDate) {
+        this.valueDate = valueDate;
+    }
+
+    public String getCalloption() {
+        return calloption;
+    }
+
+    public void setCalloption(String calloption) {
+        this.calloption = calloption;
+    }
+
+    public String getPutoption() {
+        return putoption;
+    }
+
+    public void setPutoption(String putoption) {
+        this.putoption = putoption;
+    }
+
+    public BigDecimal getMarketAmt() {
+        return marketAmt;
+    }
+
+    public void setMarketAmt(BigDecimal marketAmt) {
+        this.marketAmt = marketAmt;
+    }
+
+    public String getSecType3() {
+        return secType3;
+    }
+
+    public void setSecType3(String secType3) {
+        this.secType3 = secType3;
+    }
+
+    public String getIsAutoUpdate() {
+        return isAutoUpdate;
+    }
+
+    public void setIsAutoUpdate(String isAutoUpdate) {
+        this.isAutoUpdate = isAutoUpdate;
+    }
+
+    public String getCityInvestSecChb() {
+        return cityInvestSecChb;
+    }
+
+    public void setCityInvestSecChb(String cityInvestSecChb) {
+        this.cityInvestSecChb = cityInvestSecChb;
+    }
+
+    public String getIsGreenBond() {
+        return isGreenBond;
+    }
+
+    public void setIsGreenBond(String isGreenBond) {
+        this.isGreenBond = isGreenBond;
+    }
+
+    public String getBaseRateAccuracy() {
+        return baseRateAccuracy;
+    }
+
+    public void setBaseRateAccuracy(String baseRateAccuracy) {
+        this.baseRateAccuracy = baseRateAccuracy;
+    }
+
+    public List<FinBondMarketCashPlanDto> getBondMarketInvRepayDtos() {
+        return bondMarketInvRepayDtos;
+    }
+
+    public void setBondMarketInvRepayDtos(List<FinBondMarketCashPlanDto> bondMarketInvRepayDtos) {
+        this.bondMarketInvRepayDtos = bondMarketInvRepayDtos;
     }
 }

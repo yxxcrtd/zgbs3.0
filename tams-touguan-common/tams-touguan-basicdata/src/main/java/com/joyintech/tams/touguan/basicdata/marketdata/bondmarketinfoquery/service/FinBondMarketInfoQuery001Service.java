@@ -11,9 +11,11 @@ import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.component.business.common.dto.InterfPayhsrcsecinfoDto;
 import com.joyintech.tams.component.business.common.service.CommonAutoCouponService;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dao.FinBondMarketInfoQueryMapper;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketCashPlanDto;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoDetailQueryDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondPayHSrcSecOptionDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinBondMarketInfoQueryRequest;
@@ -82,14 +84,14 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         if (Objects.isNull(finListedBondInfoQuery001Dto)) {
             finListedBondInfoQuery001Dto = finListedBondInfoQuery001Service.queryFinWindMarketForCoupons(request);
         }
-        if(Objects.nonNull(finListedBondInfoQuery001Dto)){
+        if (Objects.nonNull(finListedBondInfoQuery001Dto)) {
             //付息计划信息
-            HashMap<String, Object> map = new HashMap<>(2);
-            map.put("secId", secId);
-            List<FinBondMarketCashPlanDto> finBondMarketCashPlanDtos = finBondMarketInfoQueryMapper.queryFinBondMarketCashPlan(map);
+            Map<String, Object> param = new HashMap<>(1);
+            param.put("secId", secId);
+            List<FinBondMarketCashPlanDto> finBondMarketCashPlanDtos = finBondMarketInfoQueryMapper.queryFinBondMarketCashPlan(param);
             finListedBondInfoQuery001Dto.setBondMarketCashPlanDtos(finBondMarketCashPlanDtos);
             //行权计划信息
-            List<FinBondPayHSrcSecOptionDto> finBondPayHSrcSecOptionDtos = finBondMarketInfoQueryMapper.queryFinBondPayHSrcSecOption(map);
+            List<FinBondPayHSrcSecOptionDto> finBondPayHSrcSecOptionDtos = finBondMarketInfoQueryMapper.queryFinBondPayHSrcSecOption(secId);
             finListedBondInfoQuery001Dto.setBondPayHSrcSecOptionDtos(finBondPayHSrcSecOptionDtos);
         }
         return finListedBondInfoQuery001Dto;
@@ -130,16 +132,35 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
     /**
      * 加券市场信息查询
      *
-     * @param param
+     * @param secId
      * @return
      */
-    public FinBondMarketInfoQuery001Dto queryFinBondMarketForCoupons(Map<String, Object> param) {
-        logger.info("queryFinBondMarketForCoupons >> 加券市场信息查询参数：{}", JSON.toJSONString(param));
-        FinBondMarketInfoQuery001Dto finBondMarketInfoQuery001Dto = finBondMarketInfoQueryMapper.queryFinBondMarketForCoupons(param);
-        if (Objects.nonNull(finBondMarketInfoQuery001Dto)) {
-
+    public FinBondMarketInfoDetailQueryDto queryFinBondMarketForCoupons(String secId) {
+        logger.info("queryFinBondMarketForCoupons >> 加券市场信息查询参数：{}", secId);
+        Map<String, Object> param = new HashMap<>(2);
+        param.put("secId", secId);
+        param.put("platformDate", iPlatformDate.getSysDateStr());
+        FinBondMarketInfoDetailQueryDto detailQueryDto = finBondMarketInfoQueryMapper.queryFinBondMarketForCoupons(param);
+        if (Objects.nonNull(detailQueryDto)) {
+            //行权计划信息
+            List<FinBondPayHSrcSecOptionDto> finBondPayHSrcSecOptionDtos = finBondMarketInfoQueryMapper.queryFinBondPayHSrcSecOption(secId);
+            detailQueryDto.setBondPayHSrcSecOptionDtos(finBondPayHSrcSecOptionDtos);
+            //付息计划信息
+            List<String> scheduTypeList = Lists.newArrayList();
+            scheduTypeList.add(DictCodeList.现金流类型_到期收息.getValue());
+            scheduTypeList.add(DictCodeList.现金流类型_中间收息.getValue());
+            param.put("scheduTypeList", scheduTypeList);
+            List<FinBondMarketCashPlanDto> finBondMarketCashPlanDtos = finBondMarketInfoQueryMapper.queryFinBondMarketCashPlan(param);
+            detailQueryDto.setBondMarketCashPlanDtos(finBondMarketCashPlanDtos);
+            //还本计划信息
+            scheduTypeList = Lists.newArrayList();
+            scheduTypeList.add(DictCodeList.现金流类型_到期还本.getValue());
+            scheduTypeList.add(DictCodeList.现金流类型_中间还本.getValue());
+            param.put("scheduTypeList", scheduTypeList);
+            List<FinBondMarketCashPlanDto> bondMarketInvRepayDtos = finBondMarketInfoQueryMapper.queryFinBondMarketCashPlan(param);
+            detailQueryDto.setBondMarketInvRepayDtos(bondMarketInvRepayDtos);
         }
-        return finBondMarketInfoQuery001Dto;
+        return detailQueryDto;
     }
 
 
