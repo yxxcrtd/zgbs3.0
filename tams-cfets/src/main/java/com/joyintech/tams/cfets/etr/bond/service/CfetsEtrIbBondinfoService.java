@@ -2306,7 +2306,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         // 调用投资委托组件的更新委托状态接口，将委托状态设置为"已撤回"
         boolean flag = etrInvestInfoServiceImpl.updateDelegateStatus(entity.getEtrEntrust().getEntrustId(),
                 entity.getEtrEntrust().getEntrustStatus());
-        if(StringUtil.equals(dto.getAssetType(),DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())){
+        if(!StringUtil.equals(dto.getAssetType(),DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())){
             if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))){
                 //插入旧头寸
                 if (baseEtrCashPositionCommService != null) {

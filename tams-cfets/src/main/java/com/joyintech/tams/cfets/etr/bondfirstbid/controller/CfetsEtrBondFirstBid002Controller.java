@@ -110,8 +110,8 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
     @ApiOperation(value = "新建/修改提交时校验", notes = "新建/修改提交时校验")
     public Message<AjaxResult> checkSave(@RequestBody CfetsEtrBondFirstBidSaveRequest cfetsDto) {
         try {
-            //AjaxResult ajax= cfetsEtrBondFirstBid002Service.checkSave(cfetsDto);
-            AjaxResult ajax= new AjaxResult();
+            AjaxResult ajax= cfetsEtrBondFirstBid002Service.checkSave(cfetsDto);
+            //AjaxResult ajax= new AjaxResult();
             if(null!=ajax){
                 return new Message<AjaxResult>().success().setData(ajax);
             }else{

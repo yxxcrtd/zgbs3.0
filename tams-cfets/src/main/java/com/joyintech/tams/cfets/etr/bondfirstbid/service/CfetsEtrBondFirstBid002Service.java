@@ -6,6 +6,7 @@ import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.export.CommonExportService;
+import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.RequestUtil;
@@ -561,8 +562,8 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             dto.setEntrustDate(cfetsDto.getEtrDate());
             dto.setFinprodAbbr(fp.getFinprodAbbr());
         }
-        //dto.setInvManagerId(SecurityUtil.getLoginUser().getUserName());
-        dto.setInvManagerId("li02");
+        dto.setInvManagerId(SecurityUtil.getLoginUser().getUserName());
+        //dto.setInvManagerId("li02");
         dto.setEntrustNum(cfetsDto.getTotalBiddingNum());
         dto.setTradeMarketMode(DictCodeListExt1.交易市场_一级市场.getValue());
         dto.setElementId(cfetsDto.getElementId());

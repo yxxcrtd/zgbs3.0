@@ -56,7 +56,7 @@
             or to_char(aaa.issueDate,'yyyy-MM-dd')  = #{search}
             or to_char(aaa.issueDate,'yyyyMMdd')  = #{search}
             or aaa.totalBiddingNum ||''= #{search}
-            or aaa.bidPrice ||''= #{search}
+            or aaa.bidPriceStr ||''= #{search}
             or to_char(aaa.payEdate,'yyyy-MM-dd')  = #{search}
             or to_char(aaa.payEdate,'yyyyMMdd')  = #{search}
             )
@@ -112,7 +112,8 @@
             TO_CHAR(ee.ENTRUST_DATE, 'yyyy-MM-dd')  as etrDateStr
 
         FROM ETR_ENTRUST ee
-        LEFT JOIN (SELECT ENTRUST_ID,PORTFOLIO_ID  FROM ETR_ENTRUST_DETAIL GROUP BY ENTRUST_ID, PORTFOLIO_ID ) det2 ON det2.ENTRUST_ID  = ee.ENTRUST_ID
+        LEFT JOIN (select  ENTRUST_ID ,PORTFOLIO_ID from(select ol.ENTRUST_ID,ol.PORTFOLIO_ID, row_number() OVER(PARTITION BY ol.ENTRUST_ID ORDER BY ol.ENTRUST_ID) ds
+        from ETR_ENTRUST_DETAIL ol where ol.ENTRUST_ID is not null) where ds = 1   ) det2 ON det2.ENTRUST_ID  = ee.ENTRUST_ID
         INNER JOIN PTL_PORTFOLIO_AUTHORITY PPA ON det2.PORTFOLIO_ID = PPA.PORTFOLIO_ID
         <if test="userId != null and userId != ''">
             AND PPA.USER_ID = #{userId}
@@ -171,6 +172,12 @@
         </if>
         <if test="entrustId != null and entrustId != ''">
             AND ee.ENTRUST_ID = #{entrustId}
+        </if>
+        <if test="entrustStatus != null and entrustStatus.size() > 0">
+            AND ee.ENTRUST_STATUS in
+            <foreach collection="entrustStatus" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
         </if>
         <if test="entrustStartDate!=null and entrustStartDate!='' and  entrustEndDate!=null and entrustEndDate!='' ">
             AND ee.ENTRUST_DATE <![CDATA[>=]]> to_date(#{entrustStartDate}, 'yyyy-MM-dd')
@@ -233,7 +240,8 @@
             TO_CHAR(ee.ENTRUST_DATE, 'yyyy-MM-dd')  as etrDateStr
 
         FROM WFL_ETR_ENTRUST ee
-        LEFT JOIN (SELECT ENTRUST_ID,PORTFOLIO_ID  FROM WFL_ETR_ENTRUST_DETAIL GROUP BY ENTRUST_ID, PORTFOLIO_ID ) det2 ON det2.ENTRUST_ID  = ee.ENTRUST_ID
+        LEFT JOIN (select  ENTRUST_ID ,PORTFOLIO_ID from(select ol.ENTRUST_ID,ol.PORTFOLIO_ID, row_number() OVER(PARTITION BY ol.ENTRUST_ID ORDER BY ol.ENTRUST_ID) ds
+        from WFL_ETR_ENTRUST_DETAIL ol where ol.ENTRUST_ID is not null) where ds = 1   ) det2 ON det2.ENTRUST_ID  = ee.ENTRUST_ID
         INNER JOIN PTL_PORTFOLIO_AUTHORITY PPA ON det2.PORTFOLIO_ID = PPA.PORTFOLIO_ID
         <if test="userId != null and userId != ''">
             AND PPA.USER_ID = #{userId}
@@ -314,6 +322,12 @@
         <if test="entrustId != null and entrustId != ''">
             AND ee.ENTRUST_ID = #{entrustId}
         </if>
+        <if test="entrustStatus != null and entrustStatus.size() > 0">
+            AND ee.ENTRUST_STATUS in
+            <foreach collection="entrustStatus" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
         <if test="entrustStartDate!=null and entrustStartDate!='' and  entrustEndDate!=null and entrustEndDate!='' ">
             AND ee.ENTRUST_DATE <![CDATA[>=]]> to_date(#{entrustStartDate}, 'yyyy-MM-dd')
             AND ee.ENTRUST_DATE <![CDATA[<=]]> to_date(#{entrustEndDate}, 'yyyy-MM-dd')
@@ -358,6 +372,7 @@
             resultType="com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIssueInfoDto">
         select * from (select aaa.* from (
             <include refid="finProductInfo"></include>
+
         ) aaa
         left join SYS_DATADICT_LIST sdl on aaa.issueClass = sdl.ITEM_CODE and sdl.DICT_CODE = 'ISSUE_CLASS'
         left join SYS_DATADICT_LIST sdl2 on aaa.couponSpecies = sdl.ITEM_CODE and sdl.DICT_CODE = 'COUPON_SPECIES'
@@ -370,6 +385,12 @@
             <if test="issueDateStart!=null and issueDateStart!='' and  issueDateEnd!=null and issueDateEnd!='' ">
                 AND aaa.issueDate <![CDATA[>=]]> to_date(#{issueDateStart}, 'yyyy-MM-dd')
                 AND aaa.issueDate <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd')
+            </if>
+            <if test="issueStage != null and issueStage.size() > 0">
+                AND aaa.issueStage in
+                <foreach collection="issueStage" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
             </if>
             <!-- 关键字模糊查询 -->
             <include refid="keywordsWhereIssue"></include>
@@ -409,6 +430,7 @@
     </sql>
     <sql id = "interfFinProductInfo">
         SELECT
+            '02' AS issueStage,
             SEC_INFO.SEC_ID finprodMarketId,
             SEC_INFO.BOND_ABBREVIATION finprodAbbr,
             null as finprodId,
@@ -436,9 +458,9 @@
             RDI_RELEASE_INFO.REMARK as remark,
             RELEASE_INFO.BIDDING_METHOD as tenderType,
             RELEASE_INFO.RELEASE_TYPE as issueStyle,
-            TO_CHAR(nvl(RDI_RELEASE_INFO.ISSUE_DATE, RELEASE_INFO.ISSUE_DATE), 'yyyy-MM-dd')  AS issueDateStr,
-            TO_CHAR(nvl(RDI_RELEASE_INFO.EVENT_DATE, RELEASE_INFO.PAYMENT_DEADLINE), 'yyyy-MM-dd')  AS payEdateStr,
-            TO_CHAR(nvl(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, RELEASE_INFO.INTEREST_ACCRUAL_DATE), 'yyyy-MM-dd')  AS firstConfirmDateStr
+            nvl(TO_CHAR(RDI_RELEASE_INFO.ISSUE_DATE,'yyyy-MM-dd'), TO_CHAR(RELEASE_INFO.ISSUE_DATE,'yyyy-MM-dd'))  AS issueDateStr,
+            nvl(TO_CHAR(RDI_RELEASE_INFO.EVENT_DATE,'yyyy-MM-dd'), TO_CHAR( RELEASE_INFO.PAYMENT_DEADLINE,'yyyy-MM-dd'))  AS payEdateStr,
+            nvl(TO_CHAR(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE,'yyyy-MM-dd'), TO_CHAR(RELEASE_INFO.INTEREST_ACCRUAL_DATE,'yyyy-MM-dd'))  AS firstConfirmDateStr
 
         FROM INTERF_WIND_UNRELEASE_SEC_INFO SEC_INFO
         LEFT JOIN INTERF_WIND_RELEASE_INFO RELEASE_INFO ON SEC_INFO.SEC_ID = RELEASE_INFO.SEC_ID
@@ -464,6 +486,12 @@
     </sql>
     <sql id="finProductInfo">
         SELECT
+            CASE WHEN <![CDATA[
+                ISSUE.ISSUE_DATE >= TO_DATE(#{platformDate},'YYYY-MM-DD') or
+                             ISSUE.TENDER_EDATE >= TO_DATE(#{platformDate},'YYYY-MM-DD')  THEN '01'
+                     WHEN PRODUCT_ADD.LISTING_DATE >= TO_DATE(#{platformDate},'YYYY-MM-DD') THEN '02'
+                ]]>
+            ELSE NULL END AS issueStage,
             PRODUCT.FINPROD_MARKET_ID as finprodMarketId,
             PRODUCT.FINPROD_ABBR as finprodAbbr,
             PRODUCT.FINPROD_ID as finprodId,

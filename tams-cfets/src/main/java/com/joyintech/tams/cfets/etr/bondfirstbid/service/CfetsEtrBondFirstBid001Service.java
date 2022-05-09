@@ -212,6 +212,12 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
         pageParam.put("TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue());
         pageParam.put("TRADE_MARKET_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
 
+        List<String> statusList = search.getIssueStage();
+        if (!StringUtil.isEmptyList(statusList) && statusList.contains("all")) {
+            search.setIssueStage(null);
+            pageParam.put("issueStage", null);
+        }
+
         PageHelper.startPage(search.getPageMode().getPageNo(), search.getPageMode().getPageSize());
         List<CfetsEtrIBondFirstBidFindIssueInfoDto> list = cfetsEtrBondFirstBid001Mapper.findIssueInfoPage(pageParam);
         return new Page<>(PageInfo.of(list));
@@ -322,6 +328,7 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
             dto.setPayEdate(finProductInfo.getPayEdate());
             dto.setCounterId(etrEntrust.getCounterId());
             dto.setCounterName(counterMap.get(etrEntrust.getCounterId()));
+            dto.setTenderTarget(finProductInfo.getTenderTarget());
         }
 
         dto.setFinprodAbbr(finProductInfo.getFinprodAbbr());
