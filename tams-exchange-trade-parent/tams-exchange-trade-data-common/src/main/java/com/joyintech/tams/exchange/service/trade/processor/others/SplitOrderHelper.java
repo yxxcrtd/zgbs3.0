@@ -89,7 +89,11 @@ public class SplitOrderHelper {
                 return entrustList;
             }
             Instruction instruction = instructionService.findById(entrust.getInstructionId());
-            MinTrdUnitLimit minTrdUnitLimit = instrumentService.getMinTrdUnitLimit(entrust.getTradePlat(), entrust.getMarket(), instrument, instruction.getPs());
+            MinTrdUnitLimit minTrdUnitLimit = instruction.queryMinTrdUnitLimit(entrust.getEntrustProp());
+            if (Objects.isNull(minTrdUnitLimit)) {
+                logger.error("交易上下限数据不存在，不进行拆单操作：instructionId={}", entrust.getInstructionId());
+                return entrustList;
+            }
             long totalVolume = entrust.getEntrustVolume();
             if (EntrustProp.isMarketPrice(entrust.getEntrustProp())) {
 //                long marketHighVolume = instrument.getMarketHighVolume();
