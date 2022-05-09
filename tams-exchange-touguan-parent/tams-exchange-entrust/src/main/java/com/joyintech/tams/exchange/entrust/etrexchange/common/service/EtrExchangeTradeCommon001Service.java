@@ -2093,7 +2093,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         //处理履历
         updateCfetsOprHis(entity.getEntrustId(), "revoke");
         //撤回删除风险试算
-        etrExchangeTradeCommonMapper.deleteRskIsupTrial(entity.getEntrustId());
+        //etrExchangeTradeCommonMapper.deleteRskIsupTrial(entity.getEntrustId());
 //        restTemplate.postForObject(
 //                ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrExchangeTrade/entrustRevoke",entity,
 //                Integer.class);
