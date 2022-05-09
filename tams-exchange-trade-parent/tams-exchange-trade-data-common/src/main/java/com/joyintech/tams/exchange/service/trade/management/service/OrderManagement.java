@@ -1,8 +1,10 @@
 package com.joyintech.tams.exchange.service.trade.management.service;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Strings;
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.constant.DictCodeListExt3;
@@ -80,7 +82,7 @@ public class OrderManagement extends BaseService {
         if (checkMsg.value != ErrorCode.SUCCESS.value)
             return new ResultBean(checkMsg, orderPlaceBean);
         String uniqueCheck = commonCheckHelper.checkApplyEntrust(orderPlaceBean.getEntrustProp(), orderPlaceBean.getAccountId(), orderPlaceBean.getStockCode(), orderPlaceBean.getInstructionId());
-        if (Objects.nonNull(uniqueCheck))
+        if (StrUtil.isNotEmpty(uniqueCheck))
             return new ResultBean(ErrorCode.ACCOUNT_APPLY_NOT_UNIQUE.value, ErrorCode.ACCOUNT_APPLY_NOT_UNIQUE.errorMsg + ":" + uniqueCheck, orderPlaceBean);
 
         try {
@@ -141,7 +143,7 @@ public class OrderManagement extends BaseService {
         if (checkMsg.value != ErrorCode.SUCCESS.value)
             return new ResultBean(checkMsg, integratedEntrust);
         String uniqueCheck = commonCheckHelper.checkApplyEntrust(integratedEntrust.getEntrustProp(), integratedEntrust.getAccountId(), integratedEntrust.getStockCode(), integratedEntrust.getInstructionId());
-        if (Objects.nonNull(uniqueCheck))
+        if (StrUtil.isNotEmpty(uniqueCheck))
             return new ResultBean(ErrorCode.INSTRUCTION_APPLY_NOT_UNIQUE.value, ErrorCode.INSTRUCTION_APPLY_NOT_UNIQUE.errorMsg + ":" + uniqueCheck, integratedEntrust);
         //头寸引擎余额检查---start
         try {
@@ -189,7 +191,7 @@ public class OrderManagement extends BaseService {
         if (checkMsg.value != ErrorCode.SUCCESS.value)
             return new ResultBean(checkMsg, dto);
         String uniqueCheck = commonCheckHelper.checkApplyEntrust(dto.getEntrustProp(), dto.getAccountId(), dto.getStockCode(), dto.getInstructionId());
-        if (Objects.nonNull(uniqueCheck))
+        if (StrUtil.isNotEmpty(uniqueCheck))
             return new ResultBean(ErrorCode.ACCOUNT_APPLY_NOT_UNIQUE.value, ErrorCode.ACCOUNT_APPLY_NOT_UNIQUE.errorMsg + ":" + uniqueCheck, dto);
         Order order = tradeHelper.handleOrderWithReview(dto);
         return new ResultBean(order.getErrorCode(), order.getErrorMsg());
@@ -201,7 +203,7 @@ public class OrderManagement extends BaseService {
         if (checkMsg.value != ErrorCode.SUCCESS.value)
             return new ResultBean(checkMsg, dto);
         String uniqueCheck = commonCheckHelper.checkApplyEntrust(dto.getEntrustProp(), dto.getAccountId(), dto.getStockCode(), dto.getInstructionId());
-        if (Objects.nonNull(uniqueCheck))
+        if (StrUtil.isNotEmpty(uniqueCheck))
             return new ResultBean(ErrorCode.INSTRUCTION_APPLY_NOT_UNIQUE.value, ErrorCode.INSTRUCTION_APPLY_NOT_UNIQUE.errorMsg + ":" + uniqueCheck, dto);
         IntegratedEntrust entrust = tradeHelper.handleIntegratedEntrustWithReview(dto);
         return new ResultBean(entrust.getErrorCode(), entrust.getErrorMsg());

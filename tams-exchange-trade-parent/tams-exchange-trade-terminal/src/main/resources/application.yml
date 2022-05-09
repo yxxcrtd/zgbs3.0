@@ -2,7 +2,7 @@ server:
   port: 8889
 agent:
   servers: 127.0.0.1:9190
-  name: kcbp
+  name: default
   type: mock #mock #ufx #KDGateway #ufx #kcbp
   query:
     interval: 1000

@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.service.trade.processor.business.common;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.google.common.base.Strings;
 import com.joyintech.exchange.service.quote.service.QuoteService;
@@ -8,20 +9,20 @@ import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.TickBean;
 import com.joyintech.tams.exchange.common.bean.investment.TradeTimeBean;
-import com.joyintech.tams.exchange.common.cache.QuoteTickService;
 import com.joyintech.tams.exchange.common.cache.TradeTimeService;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.instrument.SubStockType;
 import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
 import com.joyintech.tams.exchange.common.constant.joyin.Switches;
 import com.joyintech.tams.exchange.common.db.domain.*;
-import com.joyintech.tams.exchange.common.proto.QuoteProto;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.EntrustService;
+import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
 import com.joyintech.tams.exchange.datacommon.db.service.InstrumentService;
 import com.joyintech.tams.exchange.datacommon.db.service.IntegratedEntrustService;
 import com.joyintech.tams.exchange.service.trade.management.service.CommonManagement;
+import com.joyintech.tams.exchange.service.trade.processor.InvestInterfaceHelper;
 import com.joyintech.tams.exchange.service.trade.processor.business.price.PriceHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,36 +34,36 @@ import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.Objects;
-import java.util.Optional;
 
 @Component
 public class CommonCheckHelper {
     private static final Logger logger = LoggerFactory.getLogger(CommonCheckHelper.class);
-
-    @Autowired
-    private EntrustService entrustService;
-    @Autowired
-    private IntegratedEntrustService integratedEntrustService;
-//    @Autowired
-//    private QuoteTickService quoteTickService;
-    @Autowired
-    private QuoteService quoteService;
-    @Autowired
-    private InstrumentService instrumentService;
-
     private static final ThreadLocal<SimpleDateFormat> INSTRUCTION_DATE_FORMAT = new ThreadLocal<SimpleDateFormat>() {
         @Override
         protected SimpleDateFormat initialValue() {
             return new SimpleDateFormat("yyyyMMdd");
         }
     };
-
+    @Autowired
+    private EntrustService entrustService;
+    @Autowired
+    private IntegratedEntrustService integratedEntrustService;
+    //    @Autowired
+//    private QuoteTickService quoteTickService;
+    @Autowired
+    private QuoteService quoteService;
+    @Autowired
+    private InstrumentService instrumentService;
     @Autowired
     private TradeTimeService tradeTimeService;
     @Autowired
     private PriceHelper priceHelper;
     @Autowired
     private CommonManagement commonManagement;
+    @Autowired
+    private InvestInterfaceHelper investInterfaceHelper;
+    @Autowired
+    private InstructionService instructionService;
 
     // modify by swwan TISHKS-263 闭市校验无效 20211216 start
 
@@ -181,27 +182,34 @@ public class CommonCheckHelper {
         //申购与配售只能申报一次
         if (EntrustProp.APPLY.value.equals(entrustProp)
                 || EntrustProp.PS.value.equals(entrustProp)) {
-            Optional<Entrust> entrustOptional = entrustService.queryEntrustByAccountId(accountId).stream()
-                    .filter(entrust -> entrust.getEntrustProp().equals(entrustProp)
-                            && (entrust.getEntrustStatus() == EntrustStatus.REPORTED.value
-                            || entrust.getEntrustStatus() == EntrustStatus.PENDING_APPROVAL.value
-                            || entrust.getEntrustStatus() == EntrustStatus.PENDING_REVIEW.value)
-                            && entrust.getStockCode().equals(stockCode)).findAny();
-            if (entrustOptional.isPresent()) {
-                return entrustOptional.get().getId();
-            }
+            Instruction instruction = instructionService.findById(instructionId);
+            String declarationCodeWithMarketSuffix = investInterfaceHelper.queryDeclarationCodeWithMarketSuffix(instruction.getFinprodId(), entrustProp, instruction.getFinprodMarketId());
+            return entrustService.queryEntrustByAccountId(accountId).stream()
+                    .filter(item -> filterUniqueEntrustByEntrustStatusAndStockCodeAndEntrustProp(entrustProp, declarationCodeWithMarketSuffix, item))
+                    .map(Entrust::getId)
+                    .findFirst()
+                    .orElse(StrUtil.EMPTY);
         } else if (EntrustProp.SH_REPURCHASE_RENEWAL.value.equals(entrustProp)) {
             //到期续做只能做一次;在途或已成时，不能再报
-            Optional<IntegratedEntrust> entrustOptional = integratedEntrustService.queryIntegratedEntrustByInstructionId(instructionId).stream()
+            return integratedEntrustService.queryIntegratedEntrustByInstructionId(instructionId).stream()
                     .filter(entrust -> entrust.getEntrustProp().equals(entrustProp)
                             && (EntrustStatus.PART_TRADED_CANCELED.value > entrust.getEntrustStatus()
-                            || entrust.getEntrustStatus() == EntrustStatus.SUCCEEDED.value)).findAny();
-            if (entrustOptional.isPresent()) {
-                return entrustOptional.get().getId();
-            }
+                            || entrust.getEntrustStatus() == EntrustStatus.SUCCEEDED.value))
+                    .map(IntegratedEntrust::getId)
+                    .findFirst()
+                    .orElse(StrUtil.EMPTY);
         }
-        return null;
+        return StrUtil.EMPTY;
     }
+
+    private boolean filterUniqueEntrustByEntrustStatusAndStockCodeAndEntrustProp(String entrustProp, String stockCode, Entrust entrust) {
+        return entrust.getEntrustProp().equals(entrustProp)
+                && entrust.getStockCode().equals(stockCode)
+                && (entrust.getEntrustStatus() == EntrustStatus.REPORTED.value
+                || entrust.getEntrustStatus() == EntrustStatus.PENDING_APPROVAL.value
+                || entrust.getEntrustStatus() == EntrustStatus.PENDING_REVIEW.value);
+    }
+
 
     public boolean checkCommonParam(BigDecimal entrustPrice, long entrustVolume, OrderInterface orderInterface, Instrument instrument, String tradePlat, String instructionPs, BigDecimal entrustBalance, String entrustBussType, String priceMode) {
         if (EntrustBs.BUY.value.equals(orderInterface.getEntrustBs())
@@ -221,7 +229,7 @@ public class CommonCheckHelper {
             }
             ResultBean tickBean = quoteService.getTick(orderInterface.getStockCode());
             if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
-                TickBean tick = (TickBean)tickBean.getData();
+                TickBean tick = (TickBean) tickBean.getData();
 //            QuoteProto.TickBean tick = quoteTickService.getTickFromCache(orderInterface.getStockCode());
 //            if (Objects.nonNull(tick)) {
                 double lowerLimitPrice = TradeUtils.formatDouble(tick.getLowerLimitPrice(), 4);
@@ -333,7 +341,7 @@ public class CommonCheckHelper {
         if (EntrustProp.isMarketPrice(order.getEntrustProp())) {
             ResultBean tickBean = quoteService.getTick(order.getStockCode());
             if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
-                TickBean tick = (TickBean)tickBean.getData();
+                TickBean tick = (TickBean) tickBean.getData();
 //            QuoteProto.TickBean tick = quoteTickService.getTickFromCache(order.getStockCode());
 //            if (Objects.nonNull(tick)) {
                 if (order.getEntrustBs().equals(EntrustBs.SELL.value)) {

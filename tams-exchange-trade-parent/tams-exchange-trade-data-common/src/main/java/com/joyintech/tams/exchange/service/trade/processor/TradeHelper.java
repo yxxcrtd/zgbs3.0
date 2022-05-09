@@ -1,7 +1,9 @@
 package com.joyintech.tams.exchange.service.trade.processor;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.joyintech.exchange.service.quote.service.QuoteService;
@@ -10,14 +12,12 @@ import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.bean.investment.ReqRiskTrigger;
 import com.joyintech.tams.exchange.common.bean.investment.RiskOccupyBean;
 import com.joyintech.tams.exchange.common.bean.terminal.RTGSStatusBean;
-import com.joyintech.tams.exchange.common.cache.QuoteTickService;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.instrument.SubStockType;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt2;
 import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
 import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
 import com.joyintech.tams.exchange.common.db.domain.*;
-import com.joyintech.tams.exchange.common.proto.QuoteProto;
 import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
 import com.joyintech.tams.exchange.common.utils.*;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
@@ -64,7 +64,8 @@ import static com.joyintech.tams.exchange.common.constant.OthCodeType.*;
 @Service
 public class TradeHelper {
     private static final Logger logger = LoggerFactory.getLogger(TradeHelper.class);
-
+    @Autowired
+    FuturesInstrumentService futuresInstrumentService;
     @Autowired
     private TradeAgentManager tradeAgentManager;
     @Autowired
@@ -77,8 +78,6 @@ public class TradeHelper {
     private IntegratedEntrustService integratedEntrustService;
     @Autowired
     private InstrumentService instrumentService;
-    @Autowired
-    FuturesInstrumentService futuresInstrumentService;
     @Autowired
     private InvestmentManagement investmentManagement;
     @Autowired
@@ -93,7 +92,7 @@ public class TradeHelper {
     private MsgReceiverManager msgReceiverManager;
     @Autowired
     private EntrustManagement entrustManagement;
-//    @Autowired
+    //    @Autowired
 //    private QuoteTickService quoteTickService;
     @Autowired
     private QuoteService quoteService;
@@ -519,7 +518,7 @@ public class TradeHelper {
         }
         ResultBean tickBean = quoteService.getTick(entrust.getStockCode());
         if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
-            TickBean tick = (TickBean)tickBean.getData();
+            TickBean tick = (TickBean) tickBean.getData();
 //        QuoteProto.TickBean tick = quoteTickService.findFromRedisById(entrust.getStockCode());
 //        if (Objects.nonNull(tick)) {
             double lowerLimitPrice = TradeUtils.formatDouble(tick.getLowerLimitPrice(), 4);
@@ -825,7 +824,7 @@ public class TradeHelper {
         }
         ResultBean tickBean = quoteService.getTick(order.getStockCode());
         if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
-            TickBean tick = (TickBean)tickBean.getData();
+            TickBean tick = (TickBean) tickBean.getData();
 //        QuoteProto.TickBean tick = quoteTickService.findFromRedisById(order.getStockCode());
 //        if (Objects.nonNull(tick)) {
             if (batchInfo.getPriceMode() == BatchPriceMode.BID_OFFSET.value) {
@@ -870,7 +869,7 @@ public class TradeHelper {
         }
         ResultBean tickBean = quoteService.getTick(entrust.getStockCode());
         if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
-            TickBean tick = (TickBean)tickBean.getData();
+            TickBean tick = (TickBean) tickBean.getData();
 //        QuoteProto.TickBean tick = quoteTickService.findFromRedisById(entrust.getStockCode());
 //        if (Objects.nonNull(tick)) {
             if (batchInfo.getPriceMode() == BatchPriceMode.BID_OFFSET.value) {
@@ -1211,7 +1210,8 @@ public class TradeHelper {
             }
         }*/
         //批量委托
-        /*else*/ if (isBatchTransaction(orderPlaceBean)) {
+        /*else*/
+        if (isBatchTransaction(orderPlaceBean)) {
             logger.info("批量委托头寸检查...");
             BatchInfo batchInfo = orderPlaceBean.getBatchInfo();
             //下单笔数
@@ -1265,7 +1265,7 @@ public class TradeHelper {
     public void fillQuotePrice(OrderPlaceBean orderPlaceBean, PositionInstructionRequest instructionClone) {
         ResultBean tickBean = quoteService.getTick(orderPlaceBean.getStockCode());
         if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
-            TickBean tick = (TickBean)tickBean.getData();
+            TickBean tick = (TickBean) tickBean.getData();
 //        QuoteProto.TickBean tick = quoteTickService.getTickFromCache(orderPlaceBean.getStockCode());
 //        if (Objects.nonNull(tick)) {
             if (orderPlaceBean.getEntrustBs().equals(EntrustBs.SELL.value)) {
@@ -1292,7 +1292,7 @@ public class TradeHelper {
             if (EntrustProp.isMarketPrice(order.getEntrustProp())) {
                 ResultBean tickBean = quoteService.getTick(order.getStockCode());
                 if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
-                    TickBean tick = (TickBean)tickBean.getData();
+                    TickBean tick = (TickBean) tickBean.getData();
 //                QuoteProto.TickBean tick = quoteTickService.getTickFromCache(order.getStockCode());
 //                if (Objects.nonNull(tick)) {
                     double lowerLimitPrice = TradeUtils.formatDouble(tick.getLowerLimitPrice(), 4);
