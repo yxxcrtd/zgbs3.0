@@ -1,6 +1,6 @@
 (function () {
-	
-	/**
+    var operation;
+    /**
 	 * 回购期限
 	 */
 	var repoTermChangeAction = function(){
@@ -1263,8 +1263,11 @@
                                'calendarId': calendarId,
                                'tradeDate': mdate
                             }, function (date) {
-                               $("#mdate").val(date).trigger('change');
-                               if(vdate&&($('#tradeMarket').val() == TRADE_PLACE_01)){
+                                // TISHKS-810: modify by fuyongsheng 20220509 start
+                                // $("#mdate").val(date).trigger('change');
+                                $("#mdate").val(date);
+                                // TISHKS-810: modify by fuyongsheng 20220509 end
+                                if(vdate&&($('#tradeMarket').val() == TRADE_PLACE_01)){
                                    caculateDays($("#vdate").val(),$("#mdate").val());
                                }
                             });
@@ -1291,7 +1294,10 @@
                                'calendarId': calendarId,
                                'tradeDate': vdate
                             }, function (date) {
-                               $("#vdate").val(date).trigger('change');
+                                // TISHKS-810: modify by fuyongsheng 20220509 start
+                               //$("#vdate").val(date).trigger('change');
+                                $("#vdate").val(date);
+                                // TISHKS-810: modify by fuyongsheng 20220509 end
                                 vmdateOnChangeCalcDate($('#vdate').val(),$('#vpayDate'));
                                if(mdate&&($('#tradeMarket').val() == TRADE_PLACE_01)){
                                    caculateDays($("#vdate").val(),$("#mdate").val());
@@ -2041,28 +2047,16 @@
         $('#TrdRepoTrade002_btn_submit').click(function () {
             saveOrSubmit('submit');
         });
-        $('#tradeMarket').on("change", function () {
-            if(isFromCstp){
-                return;
-            }
-        	//add by gaopeng 20191112 选择交易场所时清空证券账户  start
-        	$("#secAcctId").val('').trigger('change');
-        	//add by gaopeng 20191112 选择交易场所时清空证券账户  end
-                tradeMarketChangeCalendarId();
-                // 交易场所、回购类型、交易方向改变时
-                tradeMarketOnChange(true);
-                // add by wangguoxian 费用设置 20190807 start
-                calFee();
-                changeTradeAmtAndFee();
-                // add by wangguoxian 费用设置 20190807 end
-        });
+
         $('#repoType').on("change", function () {
             if(isFromCstp){
                 return;
             }
                 // 交易场所、回购类型、交易方向改变时
                 repoTypeOnChange();
+            if(operation != 'calendarId') {
                 settleSpeedChangeAction();
+            }
         });
         $('#ps').on("change", function () {
                 // 交易场所、回购类型、交易方向改变时
@@ -2107,7 +2101,7 @@
                 vpayDateChangeByvdate();
                 vdateChange();
                 /*vpayDateChangeByvdate();*/
-                vdateChange();
+                // vdateChange();
         });
         $('#mdate').on("change", function () {
             // TISHKS-253:校验日期格式 fuyongsheng 20211105 add start
@@ -2134,8 +2128,23 @@
                 /*vmdateOnChangeCalcDate($('#mdate').val(),$('#mpayDate'));*/
                 /*vpayDateChangeByvdate();*/
         });
+        // $('#tradeMarket').on("change", function () {
+        //         tradeMarketChangeCalendarId();
+        // });
         $('#tradeMarket').on("change", function () {
-                tradeMarketChangeCalendarId();
+            if(isFromCstp){
+                return;
+            }
+            //add by gaopeng 20191112 选择交易场所时清空证券账户  start
+            $("#secAcctId").val('').trigger('change');
+            //add by gaopeng 20191112 选择交易场所时清空证券账户  end
+            tradeMarketChangeCalendarId();
+            // 交易场所、回购类型、交易方向改变时
+            tradeMarketOnChange(true);
+            // add by wangguoxian 费用设置 20190807 start
+            calFee();
+            changeTradeAmtAndFee();
+            // add by wangguoxian 费用设置 20190807 end
         });
 
 
@@ -2279,6 +2288,7 @@
 		$('#calendarId').on("change", function () {
            // 日历更新重新算 起息日
             settleSpeedChangeAction();
+            operation = 'calendarId';
         });
 
 		// add by wangguoxian 费用设置 20190807 start
