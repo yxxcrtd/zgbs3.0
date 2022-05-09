@@ -90,6 +90,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
 
     @Override
     public void doInsert(FinTenderBondAsset003Dto entity, OperationType type) {
+        if(type == OperationType.REVOKE) return;
         Map<String,String> param = new HashMap();
         param.put("finprodType2",DictCodeList.平安资产类型_债券.getValue());
         param.put("finprodMarketId",entity.getAppearMarketId());
@@ -101,7 +102,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
 
     @Override
     public void doComplete(FinTenderBondAsset003Dto dto, OperationType type) {
-        if (StringUtil.equals(OperationType.REVOKE.name(), type)) {
+        if (OperationType.REVOKE == type) {
             String totleTradeId = finTenderBoundAssetMapper.selectTotleTradeId(dto.getFinprodId());
             if (StringUtil.isNotEmpty(totleTradeId)) {
                 TrdFinProductDealTotal total = new TrdFinProductDealTotal();
