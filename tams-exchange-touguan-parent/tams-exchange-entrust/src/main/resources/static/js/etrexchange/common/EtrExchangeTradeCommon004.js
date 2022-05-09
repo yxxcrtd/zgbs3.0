@@ -1302,9 +1302,15 @@
             //质押券出入库不展示投资目的
             var ps = $("#ps_" + currentTab).val();
             if (ps == PS_T68 || ps == PS_T69 || ps == PS_T04 || ps == PS_T49 || ps == PS_T03) {
-                $("#invAim_div_" + currentTab).hide();
+                //$("#invAim_div_" + currentTab).hide();
+                $("#businessModelDiv_"+ currentTab).hide();
             } else {
-                $("#invAim_div_" + currentTab).show();
+                //$("#invAim_div_" + currentTab).show();
+                $("#businessModelDiv_"+ currentTab).show();
+                if(ps == PS_T02){
+                    $("#businessModel_" + currentTab).val("").trigger('change');
+                    $("#businessModel_" + currentTab).prop("disabled", true);
+                }
             }
             // linkFindSecAmountInfo();
         }
