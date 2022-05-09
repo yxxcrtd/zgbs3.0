@@ -109,6 +109,27 @@ public class RskSupervisionIndividuationDto extends BaseEntity implements ITable
      */
     @JsonSerialize(using=BigDecimalSerializer.class)
     private BigDecimal valueEnd;
+
+	/**
+	 * 日期选项(起)
+	 */
+	private String dateStr;
+
+	/**
+	 * 日期选项(末)
+	 */
+	private String dateEnd;
+
+	/**
+	 * 日期单位(起)
+	 */
+	private String dateUnitStr;
+
+	/**
+	 * 日期单位(末)
+	 */
+	private String dateUnitEnd;
+
     /**
      * 剔除编号
      */
@@ -426,6 +447,35 @@ public class RskSupervisionIndividuationDto extends BaseEntity implements ITable
 		this.indType = indType;
 	}
 
-	
-	
+	public String getDateStr() {
+		return dateStr;
+	}
+
+	public void setDateStr(String dateStr) {
+		this.dateStr = dateStr;
+	}
+
+	public String getDateEnd() {
+		return dateEnd;
+	}
+
+	public void setDateEnd(String dateEnd) {
+		this.dateEnd = dateEnd;
+	}
+
+	public String getDateUnitStr() {
+		return dateUnitStr;
+	}
+
+	public void setDateUnitStr(String dateUnitStr) {
+		this.dateUnitStr = dateUnitStr;
+	}
+
+	public String getDateUnitEnd() {
+		return dateUnitEnd;
+	}
+
+	public void setDateUnitEnd(String dateUnitEnd) {
+		this.dateUnitEnd = dateUnitEnd;
+	}
 }

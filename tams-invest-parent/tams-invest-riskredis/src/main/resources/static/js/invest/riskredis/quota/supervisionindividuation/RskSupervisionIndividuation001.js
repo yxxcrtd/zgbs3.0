@@ -24,7 +24,8 @@
 			indId:indId,
 			prtBagId: $('#prtBagId').val(),
 			index:index,
-			workflowId:$("#workflowId").val()
+			workflowId:$("#workflowId").val(),
+			portfolioLevel:portfolioLevel
         }
     };
     
@@ -49,7 +50,7 @@
               {field: 'conditionId',visible: false}
             ,{field:'conditionItemStr', sortable:false,width:220 , title: 'RskSupervisionIndividuation001.ruleName'}//条件项
             ,{field:'controlTypeStr', sortable:false,width:220 , title: 'RskSupervisionIndividuation001.controlType'}//控制类型
-            ,{field:'value', width:300 ,sortable:false, title: 'RskSupervisionIndividuation001.value',render: transferValue}//数值
+            ,{field:'value', width:440 ,sortable:false, title: 'RskSupervisionIndividuation001.value',render: transferValue}//数值
             , {field: 'operation', width: 100, title: 'SysCommon.operation', type: 'action',
                 buttons: ['delt','edit']
             }
@@ -400,7 +401,9 @@
             "80%", "80%",data,function(result) {
         					if(result){
         						var row = {conditionItemStr:result.conditionItemStr,controlTypeStr:result.controlTypeStr,conditionId:result.conditionId,
-										valueStr:result.valueStr,valueEnd:result.valueEnd,conditionItem:result.conditionItem,controlType:result.controlType};
+										valueStr:result.valueStr,valueEnd:result.valueEnd,conditionItem:result.conditionItem,controlType:result.controlType,
+										dateStr:result.dateStr,dateEnd:result.dateEnd,dateUnitStr:result.dateUnitStr,dateUnitEnd:result.dateUnitEnd,
+										dateStrStr:result.dateStrStr,dateEndStr:result.dateEndStr,dateUnitStrStr:result.dateUnitStrStr,dateUnitEndStr:result.dateUnitEndStr};
 								//var selArr = row];
 								//setTimeout(function(){$('#dataTable').data("joyintable").addRow(selArr);},2000);
 					        	dataTable.deleteRow(index);
@@ -449,35 +452,61 @@
      * 绑定删除事件
      */
     dataTable.bind('click', '.delt', function(data, index) {
-    	dataTable.deleteRow(index);
+		var processModel = data.processModel;
+		if(processModel == PROCESSMODEL_RULE){
+			Joyin.error(JoyinUtil.getMessage("RSKRDS_W_0079"));
+			return;
+		}else{
+			dataTable.deleteRow(index);
+		}
     });
     /**
      * 绑定删除事件
      */
     dataTable1.bind('click', '.delt', function(data, index) {
-    	
-    	dataTable1.deleteRow(index);
+		var processModel = data.processModel;
+		if(processModel == PROCESSMODEL_RULE){
+			Joyin.error(JoyinUtil.getMessage("RSKRDS_W_0079"));
+			return;
+		}else{
+			dataTable1.deleteRow(index);
+		}
     });
     /**
      * 绑定删除事件
      */
     dataTable2.bind('click', '.delt', function(data, index) {
-    	
-    	dataTable2.deleteRow(index);
+		var processModel = data.processModel;
+		if(processModel == PROCESSMODEL_RULE){
+			Joyin.error(JoyinUtil.getMessage("RSKRDS_W_0079"));
+			return;
+		}else{
+			dataTable2.deleteRow(index);
+		}
     });
     /**
      * 绑定删除事件
      */
     dataTable3.bind('click', '.delt', function(data, index) {
-    	
-    	dataTable3.deleteRow(index);
+		var processModel = data.processModel;
+		if(processModel == PROCESSMODEL_RULE){
+			Joyin.error(JoyinUtil.getMessage("RSKRDS_W_0079"));
+			return;
+		}else{
+			dataTable3.deleteRow(index);
+		}
     });
     /**
      * 绑定删除事件
      */
     dataTable4.bind('click', '.delt', function(data, index) {
-    	
-    	dataTable4.deleteRow(index);
+		var processModel = data.processModel;
+		if(processModel == PROCESSMODEL_RULE){
+			Joyin.error(JoyinUtil.getMessage("RSKRDS_W_0079"));
+			return;
+		}else{
+			dataTable4.deleteRow(index);
+		}
     });
 	/**
 	 * 绑定删除事件
@@ -513,7 +542,13 @@
 	 * 绑定删除事件
 	 */
 	dataTable5_2.bind('click', '.delt', function(data, index) {
-		dataTable5_2.deleteRow(index);
+		var processModel = data.processModel;
+		if(processModel == PROCESSMODEL_RULE){
+			Joyin.error(JoyinUtil.getMessage("RSKRDS_W_0079"));
+			return;
+		}else{
+			dataTable5_2.deleteRow(index);
+		}
 	});
     /**
      * 绑定编辑事件
@@ -553,22 +588,38 @@
         
     });*/
     function transferValue(data, type, row, meta){
-    	if(row.valueEnd){
-    		if(row.conditionItem==CONDITION_ITEM_03){
-    			var dStr = new Date(parseInt(row.valueStr));
-    			var dEnd = new Date(parseInt(row.valueEnd));
-    			return dStr.format("yyyy-MM-dd")+"-"+dEnd.format("yyyy-MM-dd")
-    		}else if(row.conditionItem==CONDITION_ITEM_02){
-    			return row.valueStr+"元"+"-"+row.valueEnd+"元";
-    		}
-    		return row.valueStr+"万元"+"-"+row.valueEnd+"万元";
-    	}else{
-    		if(row.conditionItem==CONDITION_ITEM_02){
-    			return row.valueStr+"元";
-    		}
-    		return row.valueStr+"万元";
-    	}
-    	return "";
+		//启用时间
+		if(row.conditionItem==CONDITION_ITEM_04){
+			var startStr = row.dateStrStr + "前" + row.valueStr + "个" + row.dateUnitStrStr;
+			var endStr = row.dateEndStr + "后" + row.valueEnd + "个" + row.dateUnitEndStr
+
+			if(row.valueStr && row.valueEnd){
+				return startStr + "至" + endStr;
+			}else{
+				if(row.valueStr){
+					return startStr + "开始启用";
+				}else if(row.valueEnd){
+					return "至" + endStr + "停止使用";
+				}
+			}
+		}else{
+			if(row.valueEnd){
+				if(row.conditionItem==CONDITION_ITEM_03){
+					var dStr = new Date(parseInt(row.valueStr));
+					var dEnd = new Date(parseInt(row.valueEnd));
+					return dStr.format("yyyy-MM-dd")+"-"+dEnd.format("yyyy-MM-dd")
+				}else if(row.conditionItem==CONDITION_ITEM_02){
+					return row.valueStr+"元"+"-"+row.valueEnd+"元";
+				}
+				return row.valueStr+"万元"+"-"+row.valueEnd+"万元";
+			}else{
+				if(row.conditionItem==CONDITION_ITEM_02){
+					return row.valueStr+"元";
+				}
+				return row.valueStr+"万元";
+			}
+		}
+		return "";
     }
 	/*
       初始化单位与阈值方向
@@ -770,7 +821,9 @@
     	            	flag = true;
     	            	if(result){
     	            		var row = {conditionItemStr:result.conditionItemStr,controlTypeStr:result.controlTypeStr,conditionId:result.conditionId,
-        	    					valueStr:result.valueStr,valueEnd:result.valueEnd,conditionItem:result.conditionItem,controlType:result.controlType};
+        	    					valueStr:result.valueStr,valueEnd:result.valueEnd,conditionItem:result.conditionItem,controlType:result.controlType,
+									dateStr:result.dateStr,dateEnd:result.dateEnd,dateUnitStr:result.dateUnitStr,dateUnitEnd:result.dateUnitEnd,
+									dateStrStr:result.dateStrStr,dateEndStr:result.dateEndStr,dateUnitStrStr:result.dateUnitStrStr,dateUnitEndStr:result.dateUnitEndStr};
         	    			//var selArr = row];
         	    			//setTimeout(function(){$('#dataTable').data("joyintable").addRow(selArr);},2000);
         	    			dataTable.addRow(row);

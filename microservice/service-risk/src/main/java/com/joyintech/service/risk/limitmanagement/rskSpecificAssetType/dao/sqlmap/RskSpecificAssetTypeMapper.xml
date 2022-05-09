@@ -31,7 +31,10 @@
         T1.IS_CREDIT_ASSET,
         T2.FINPROD_ABBR finprodName,
         T2.FINPROD_MARKET_ID,
-        T1.IS_FLOW_LIMITED isFlowLimited
+        T1.IS_FLOW_LIMITED isFlowLimited,
+        T1.IS_LIQUIDITY1,
+        T1.IS_LIQUIDITY2,
+        T1.IS_LIQUIDITY3
         FROM
         RSK_SPECIFIC_ASSET_TYPE T1
         LEFT JOIN FIN_PRODUCT T2 ON T1.FINPROD_ID = T2.FINPROD_ID
@@ -85,7 +88,10 @@
             T1.IS_CREDIT_ASSET IS_CREDIT_ASSET,
             T2.FINPROD_ABBR finprodName,
             T2.FINPROD_MARKET_ID,
-            T1.IS_FLOW_LIMITED   isFlowLimited
+            T1.IS_FLOW_LIMITED   isFlowLimited,
+            T1.IS_LIQUIDITY1 IS_LIQUIDITY1,
+            T1.IS_LIQUIDITY2 IS_LIQUIDITY2,
+            T1.IS_LIQUIDITY3 IS_LIQUIDITY3
         FROM
             RSK_SPECIFIC_ASSET_TYPE T1
             LEFT JOIN FIN_PRODUCT  T2 ON T1.FINPROD_ID  = T2.FINPROD_ID

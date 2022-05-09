@@ -18,7 +18,8 @@
     <sql id="Base_Column_List" >
         CONDITION_ID CONDITION_ID, PRT_BAG_ID PRT_BAG_ID, IND_ID IND_ID, CONDITION_ITEM CONDITION_ITEM, 
         CONTROL_TYPE CONTROL_TYPE, VALUE_STR VALUE_STR, VALUE_END VALUE_END, CREATE_USER CREATE_USER, 
-        CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME
+        CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME,
+        DATE_STR DATE_STR,DATE_END DATE_END,DATE_UNIT_STR DATE_UNIT_STR,DATE_UNIT_END DATE_UNIT_END
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -44,12 +45,14 @@
         insert into RSK_INDIVID_CONDITION (CONDITION_ID, PRT_BAG_ID, IND_ID, 
             CONDITION_ITEM, CONTROL_TYPE, VALUE_STR, 
             VALUE_END, CREATE_USER, CREATE_DEPT, 
-            CREATE_TIME, UPDATE_USER, UPDATE_TIME
+            CREATE_TIME, UPDATE_USER, UPDATE_TIME,
+            DATE_STR, DATE_END, DATE_UNIT_STR, DATE_UNIT_END
             )
         values (#{conditionId,jdbcType=VARCHAR}, #{prtBagId,jdbcType=VARCHAR}, #{indId,jdbcType=VARCHAR}, 
             #{conditionItem,jdbcType=VARCHAR}, #{controlType,jdbcType=VARCHAR}, #{valueStr,jdbcType=DECIMAL}, 
             #{valueEnd,jdbcType=DECIMAL}, #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, 
-            #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
+            #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP},
+            #{dateStr,jdbcType=VARCHAR}, #{dateEnd,jdbcType=VARCHAR}, #{dateUnitStr,jdbcType=VARCHAR}, #{dateUnitEnd,jdbcType=VARCHAR}
             )
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.RskIndividCondition" >
@@ -90,6 +93,18 @@
             </if>
             <if test="updateTime != null" >
                 UPDATE_TIME,
+            </if>
+            <if test="dateStr != null" >
+                DATE_STR,
+            </if>
+            <if test="dateEnd != null" >
+                DATE_END,
+            </if>
+            <if test="dateUnitStr != null" >
+                DATE_UNIT_STR,
+            </if>
+            <if test="dateUnitEnd != null" >
+                DATE_UNIT_END,
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -134,10 +149,10 @@
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.RskIndividCondition" >
         insert into RSK_INDIVID_CONDITION(CONDITION_ID, PRT_BAG_ID, IND_ID, CONDITION_ITEM, 
         CONTROL_TYPE, VALUE_STR, VALUE_END, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, 
-        UPDATE_TIME)
+        UPDATE_TIME, DATE_STR, DATE_END, DATE_UNIT_STR, DATE_UNIT_END)
         select CONDITION_ID, PRT_BAG_ID, IND_ID, CONDITION_ITEM, 
             CONTROL_TYPE, VALUE_STR, VALUE_END, CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, 
-            #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME
+            #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME,DATE_STR, DATE_END, DATE_UNIT_STR, DATE_UNIT_END
              from RSK_INDIVID_CONDITION
              where 1 = 1 and CONDITION_ID = #{conditionId,jdbcType=VARCHAR}
     </insert>
@@ -167,6 +182,18 @@
             </if>
             <if test="updateTime != null" >
                 UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="dateStr != null" >
+                DATE_STR = #{dateStr,jdbcType=VARCHAR},
+            </if>
+            <if test="dateEnd != null" >
+                DATE_END = #{dateEnd,jdbcType=VARCHAR},
+            </if>
+            <if test="dateUnitStr != null" >
+                DATE_UNIT_STR = #{dateUnitStr,jdbcType=VARCHAR},
+            </if>
+            <if test="dateUnitEnd != null" >
+                DATE_UNIT_END = #{dateUnitEnd,jdbcType=VARCHAR},
             </if>
         </set>
         where CONDITION_ID = #{conditionId,jdbcType=VARCHAR}

@@ -131,6 +131,12 @@ public class RskSupervisionIndividuationController {
         return rskSupervisionIndividuationService.queryUniteIndIdList(param);
     }
 
+    @PostMapping("/queryUniteIndIdList_RULE")
+    public List<SelectOptionDto> queryUniteIndIdList_RULE(@RequestBody Map<String, Object> param)
+            throws Exception {
+        return rskSupervisionIndividuationService.queryUniteIndIdList_RULE(param);
+    }
+
     @PostMapping("/queryFinprodIdList/{page}/{length}")
     public Page<SelectOptionDto> queryFinprodIdList(@RequestBody Map<String, Object> param,@PathVariable("page") int page, @PathVariable("length") int length)
     {

@@ -25,7 +25,7 @@
         TYPE_4 TYPE_4, FINPROD_ID FINPROD_ID, IS_BADASSET IS_BADASSET, IS_UNLISTEDEQUITY IS_UNLISTEDEQUITY, 
         IS_REGULATION IS_REGULATION, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, 
         UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME, IS_CREDIT_ASSET IS_CREDIT_ASSET, 
-        IS_FLOW_LIMITED IS_FLOW_LIMITED
+        IS_FLOW_LIMITED IS_FLOW_LIMITED,IS_LIQUIDITY1 IS_LIQUIDITY1,IS_LIQUIDITY2 IS_LIQUIDITY2,IS_LIQUIDITY3 IS_LIQUIDITY3
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -53,13 +53,14 @@
             FINPROD_ID, IS_BADASSET, IS_UNLISTEDEQUITY, 
             IS_REGULATION, CREATE_USER, CREATE_DEPT, 
             CREATE_TIME, UPDATE_USER, UPDATE_TIME, 
-            IS_CREDIT_ASSET, IS_FLOW_LIMITED)
+            IS_CREDIT_ASSET, IS_FLOW_LIMITED, IS_LIQUIDITY1, IS_LIQUIDITY2, IS_LIQUIDITY3)
         values (#{specificId,jdbcType=VARCHAR}, #{branch,jdbcType=DECIMAL}, #{type1,jdbcType=VARCHAR}, 
             #{type2,jdbcType=VARCHAR}, #{type3,jdbcType=VARCHAR}, #{type4,jdbcType=VARCHAR}, 
             #{finprodId,jdbcType=VARCHAR}, #{isBadasset,jdbcType=VARCHAR}, #{isUnlistedequity,jdbcType=VARCHAR}, 
             #{isRegulation,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, 
             #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
-            #{isCreditAsset,jdbcType=VARCHAR}, #{isFlowLimited,jdbcType=VARCHAR})
+            #{isCreditAsset,jdbcType=VARCHAR}, #{isFlowLimited,jdbcType=VARCHAR},
+            #{isLiquidity1,jdbcType=VARCHAR}, #{isLiquidity2,jdbcType=VARCHAR}, #{isLiquidity3,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.RskSpecificAssetType" >
         insert into RSK_SPECIFIC_ASSET_TYPE
@@ -115,6 +116,15 @@
             <if test="isFlowLimited != null" >
                 IS_FLOW_LIMITED,
             </if>
+            <if test="isLiquidity1 != null" >
+                IS_LIQUIDITY1,
+            </if>
+            <if test="isLiquidity2 != null" >
+                IS_LIQUIDITY2,
+            </if>
+            <if test="isLiquidity3 != null" >
+                IS_LIQUIDITY3,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="specificId != null" >
@@ -168,15 +178,25 @@
             <if test="isFlowLimited != null" >
                 #{isFlowLimited,jdbcType=VARCHAR},
             </if>
+            <if test="isLiquidity1 != null" >
+                #{isLiquidity1,jdbcType=VARCHAR},
+            </if>
+            <if test="isLiquidity2 != null" >
+                #{isLiquidity2,jdbcType=VARCHAR},
+            </if>
+            <if test="isLiquidity3 != null" >
+                #{isLiquidity3,jdbcType=VARCHAR},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.RskSpecificAssetType" >
         insert into RSK_SPECIFIC_ASSET_TYPE(SPECIFIC_ID, BRANCH, TYPE_1, TYPE_2, TYPE_3, 
         TYPE_4, FINPROD_ID, IS_BADASSET, IS_UNLISTEDEQUITY, IS_REGULATION, CREATE_USER, CREATE_DEPT, 
-        CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_CREDIT_ASSET, IS_FLOW_LIMITED)
+        CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_CREDIT_ASSET, IS_FLOW_LIMITED, IS_LIQUIDITY1, IS_LIQUIDITY2, IS_LIQUIDITY3)
         select SPECIFIC_ID, BRANCH, TYPE_1, TYPE_2, TYPE_3, 
             TYPE_4, FINPROD_ID, IS_BADASSET, IS_UNLISTEDEQUITY, IS_REGULATION, CREATE_USER, CREATE_DEPT, 
-            CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME, IS_CREDIT_ASSET, IS_FLOW_LIMITED
+            CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME, IS_CREDIT_ASSET, IS_FLOW_LIMITED,
+            IS_LIQUIDITY1, IS_LIQUIDITY2, IS_LIQUIDITY3
              from RSK_SPECIFIC_ASSET_TYPE
              where 1 = 1 and SPECIFIC_ID = #{specificId,jdbcType=VARCHAR}
     </insert>
@@ -222,6 +242,15 @@
             <if test="isFlowLimited != null" >
                 IS_FLOW_LIMITED = #{isFlowLimited,jdbcType=VARCHAR},
             </if>
+            <if test="isLiquidity1 != null" >
+                IS_LIQUIDITY1 = #{isLiquidity1,jdbcType=VARCHAR},
+            </if>
+            <if test="isLiquidity2 != null" >
+                IS_LIQUIDITY2 = #{isLiquidity2,jdbcType=VARCHAR},
+            </if>
+            <if test="isLiquidity3 != null" >
+                IS_LIQUIDITY3 = #{isLiquidity3,jdbcType=VARCHAR},
+            </if>
         </set>
         where SPECIFIC_ID = #{specificId,jdbcType=VARCHAR}
     </update>
@@ -239,7 +268,10 @@
             UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
             UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
             IS_CREDIT_ASSET = #{isCreditAsset,jdbcType=VARCHAR},
-            IS_FLOW_LIMITED = #{isFlowLimited,jdbcType=VARCHAR}
+            IS_FLOW_LIMITED = #{isFlowLimited,jdbcType=VARCHAR},
+            IS_LIQUIDITY1 = #{isLiquidity1,jdbcType=VARCHAR},
+            IS_LIQUIDITY2 = #{isLiquidity2,jdbcType=VARCHAR},
+            IS_LIQUIDITY3 = #{isLiquidity3,jdbcType=VARCHAR}
         where SPECIFIC_ID = #{specificId,jdbcType=VARCHAR}
     </update>
 </mapper>

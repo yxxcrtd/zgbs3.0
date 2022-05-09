@@ -10,6 +10,7 @@
 
 package com.joyintech.tams.invest.product.productelement.netvalueproduct.validator;
 
+import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.base.intf.Page;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.util.CacheUtil;
@@ -28,6 +29,7 @@ import com.joyintech.tams.component.business.prod.dto.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.invest.common.asset.util.AssetCommonUtil;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.service.InvDataCheckService;
 import com.joyintech.tams.invest.product.productelement.anaplerotic.dto.FinProductAnapleroticInfoDto;
@@ -802,6 +804,38 @@ public class FinNetValueProductBuild002Validator implements BeanValidator {
                 }
             }
         }
+
+        /* 单一投资者持有上限≥50%且非现金管理类产品时，调用共同方法校验投资周期  add by kongzhifang on 2022-03-02 start */
+        if(entity.getBussFinProductSaleParamDto() != null) {
+            BigDecimal holdingMax = entity.getBussFinProductSaleParamDto().getSingleInvestorholdingMax();
+
+            if (DictCodeList.是否_否.getValue().equals(entity.getIsCashManage())
+                    && (holdingMax != null && holdingMax.compareTo(BigDecimal.valueOf(50)) >= 0)) {
+
+                //申购计划
+                List<FinOpenPlan> openPlanList = entity.getBussFinProductOpenPlanDto().getFinOpenPlanList();
+                //赎回计划
+                List<FinOpenPlan> openPlanRedList = new ArrayList<>();
+
+                if (entity.getBussFinProductOpenPlanRedDto() != null) {
+                    openPlanRedList = entity.getBussFinProductOpenPlanRedDto().getFinOpenPlanList();
+                }
+
+                Integer compareResulit = AssetCommonUtil.comparePtlCycle(openPlanList, entity.getBussFinProductOpenPlanDto(), openPlanRedList, entity.getBussFinProductOpenPlanRedDto(), 90);
+
+                if (compareResulit != null && compareResulit.equals(-1)) {
+                    validList.add(new ValidMessage("bussFinProductOpenPlanRedDto.finOpenPlanList",
+                            "允许单一投资者持有份额超过总份额50%的，定期开放周期不得低于90天，请检查！"));
+                }
+            }
+
+            if(!DictCodeListExt1.募集方式_公募.getValue().equals(entity.getIssueType())
+                    &&StringUtil.isEmpty(entity.getBussFinProductSaleParamDto().getIsFaceSingleInvestor())){
+                validList.add(new ValidMessage("bussFinProductSaleParamDto.isFaceSingleInvestor",
+                        getMessage("FIN_PROD_E_0001",getMessage("BussFinProductSaleParam.isFaceSingleInvestor"))));
+            }
+        }
+        /* 单一投资者持有上限≥50%且非现金管理类产品时，调用共同方法校验投资周期  add by kongzhifang on 2022-03-02 end */
 
         if (StringUtil.equals(entity.getConfirmFlag(), DictCodeList.是否_是.getValue())) {
             // 根据排期金融产品代码查询排期信息

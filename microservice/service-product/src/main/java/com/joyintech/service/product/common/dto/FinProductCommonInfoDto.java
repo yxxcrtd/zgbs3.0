@@ -300,6 +300,21 @@ public class FinProductCommonInfoDto extends FinProduct{
      * 产品设计系列名称
      */
     private String prdDesignName;
+
+    /**
+     *
+     * 说明书是否披露风险标志
+     */
+    private String directDisclosureRiskFlag;
+
+    public String getDirectDisclosureRiskFlag() {
+        return directDisclosureRiskFlag;
+    }
+
+    public void setDirectDisclosureRiskFlag(String directDisclosureRiskFlag) {
+        this.directDisclosureRiskFlag = directDisclosureRiskFlag;
+    }
+
     /**
      * add by wm 期限类别
      */

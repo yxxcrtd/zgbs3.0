@@ -297,7 +297,7 @@ public class BussFinProductOpenPlanCommonRateController extends BaseController {
                 }
 	        }
         }else{
-        	if (!StringUtil.equals(dto.getProfitType(),"03") && !StringUtil.isNotEmpty(dto.getCpriceRule()) && !StringUtil.equals("FinProductBuild002",dto.getPageId())) {
+        	if ((!StringUtil.equals(dto.getProfitType(),"03")&&!StringUtil.equals(dto.getProfitType(),"02")) && !StringUtil.isNotEmpty(dto.getCpriceRule()) && !StringUtil.equals("FinProductBuild002",dto.getPageId())) {
 	            wr.appendMessage(new ValidMessage("bussFinProductOpenPlanDto_cpriceRule",
 	                getMessage("BUSS_COM_E_0038", getMessage("FinProductOpenRule.cpriceRule"))));
 	        }

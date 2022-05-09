@@ -627,6 +627,18 @@ public class InterfAssetInfo extends BaseEntity implements IAssetInfo {
     public String getIsFlowLimited() {
         return null;
     }
+    @Override
+    public String getIsLiquidity1() {
+        return null;
+    }
+    @Override
+    public String getIsLiquidity2() {
+        return null;
+    }
+    @Override
+    public String getIsLiquidity3() {
+        return null;
+    }
     // add by zhangrui1 增加资产属性:是否流动性受限 end
 
     // add by zhangrui1 增加资产属性:机构主体类型 start
@@ -641,6 +653,48 @@ public class InterfAssetInfo extends BaseEntity implements IAssetInfo {
 
     @Override
     public String getType11() {
+        return null;
+    }
+
+    @Override
+    public String getType12() {
+        return null;
+    }
+    @Override
+    public String getStockShareType() {
+        return null;
+    }
+    @Override
+    public String getStockTradeStatus() {
+        return null;
+    }
+    @Override
+    public Date getAstLastRedempDate() {
+        return null;
+    }
+
+    @Override
+    public Date getAstLastRebackDate() {
+        return null;
+    }
+
+    @Override
+    public Date getAstLastPayDate() {
+        return null;
+    }
+
+    @Override
+    public String getIsSevenDayCashable() {
+        return null;
+    }
+
+    @Override
+    public String getIsOpenEveryDay() {
+        return null;
+    }
+
+    @Override
+    public String getIsBadAsset() {
         return null;
     }
 }

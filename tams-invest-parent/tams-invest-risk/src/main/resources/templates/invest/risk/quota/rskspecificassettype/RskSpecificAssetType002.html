@@ -8,20 +8,21 @@
 <body>
 <div layout:fragment="content" id="RskSpecificAssetType002_DIV">
     <style type="text/css">
-        .form-inline-wrap1{
-            display: inline-block;
-            float: left;
-            width: 60%;
-            padding-top: 10px;
-        }
         .form-inline-wrap{
             display: inline-block;
             float: left;
-            width: 40%;
-            padding-top: 10px;
+            width: 40%!important;
         }
-        .input-inline1{
-            max-width: 154px;
+        .form-inline-wrap1{
+            display: inline-block;
+            float: left;
+            width: 40%!important;
+        }
+        .layui-form-item{
+            padding-left:15%;
+        }
+        .pl{
+            padding-left:20%;
         }
     </style>
         <form class="layui-form joyin-form-wrap"
@@ -31,11 +32,11 @@
             <input type="text" id="specificId" name="specificId"
                    class="layui-input form-input" data-th-value="${entity?.specificId}"
                    style="display: none">
-                <div class="layui-form-item">
+                <div class="layui-form-item pl">
                     <div class="form-inline-wrap">
-                        <label class="layui-form-label form-label-wrap"
+                        <label class="layui-form-label form-label-wrap" style="width:15%!important;text-align:left;"
                                data-th-text="#{RskSpecificAssetType001.finprodName}">资产简称</label>
-                        <div class="layui-input-inline input-inline">
+                        <div class="layui-input-inline input-inline" style="width:61%!important;">
                             <select id="finprodMarketId" name="finprodMarketId"
                                     class="layui-input form-input input-select"
                                     data-th-placeholder="#{SysCommon.placeholder}" allowClear="true"
@@ -45,112 +46,109 @@
                         </div>
                     </div>
                     <div class="form-inline-wrap1">
-                        <label class="layui-form-label form-label-wrap"
+                        <label class="layui-form-label form-label-wrap" style="width:15%!important;text-align:left;"
                                data-th-text="#{RskSpecificAssetType001.finprodId}">资产代码</label>
-                        <div class="layui-input-inline input-inline1">
+                        <div class="layui-input-inline input-inline" style="width:61%!important;">
                             <input type="text" id="assetCode" name="assetCode" disabled="disabled"
                                    class="layui-input form-input" placeholder="请输入内容"
                                    data-th-placeholder="#{SysCommon.placeholder}"
                                    data-th-value="${entity?.finprodMarketId}">
                         </div>
                     </div>
-                        <!--20210812 fuyongsheng删除 start-->
-<!--                    <div class="form-inline-wrap">-->
-<!--                        <label class="layui-form-label form-label-wrap"-->
-<!--                               data-th-text="#{RskSpecificAssetType001.type1}">资产一级类型</label>-->
-<!--                        <div class="layui-input-inline input-inline">-->
-<!--                            <select id="type1" name="type1"-->
-<!--                                    th:initValue="*{entity?.type1}"-->
-<!--                                    class="layui-input form-input input-select"-->
-<!--                                    placeholder="请输入内容" childrenids="type2"-->
-<!--                                    data-th-placeholder="#{SysCommon.placeholder}"-->
-<!--                                    data-th-data-result="${RSK_AUTHORIZE_TYPE1}">-->
-<!--                            </select>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                    <div class="form-inline-wrap">-->
-<!--                        <label class="layui-form-label form-label-wrap"-->
-<!--                               data-th-text="#{RskSpecificAssetType001.type2}">资产二级类型</label>-->
-<!--                        <div class="layui-input-inline input-inline">-->
-<!--                            <select id="type2" name="type2"-->
-<!--                                    th:initValue="*{entity?.type2}"-->
-<!--                                    class="layui-input form-input input-select"-->
-<!--                                    childrenids="type3" parentids="type1"-->
-<!--                                    placeholder="请输入内容"-->
-<!--                                    data-th-placeholder="#{SysCommon.placeholder}"-->
-<!--                                    data-th-data-result="${RSK_AUTHORIZE_TYPE2}">-->
-<!--                            </select>-->
-<!--                        </div>-->
-<!--                    </div>-->
-                    <!--20210812 fuyongsheng删除 end-->
                 </div>
                 <div class="layui-form-item">
-                    <!--20210812 fuyongsheng删除 start-->
-<!--                    <div class="form-inline-wrap">-->
-<!--                        <label class="layui-form-label form-label-wrap"-->
-<!--                               data-th-text="#{RskSpecificAssetType001.type3}">资产三级类型</label>-->
-<!--                        <div class="layui-input-inline input-inline">-->
-<!--                            <select id="type3" name="type3"-->
-<!--                                    th:initValue="*{entity?.type3}"-->
-<!--                                    class="layui-input form-input input-select"-->
-<!--                                    childrenids="type4" parentids="type2"-->
-<!--                                    placeholder="请输入内容"-->
-<!--                                    data-th-placeholder="#{SysCommon.placeholder}"-->
-<!--                                    data-th-data-result="${RSK_AUTHORIZE_TYPE3}">-->
-<!--                            </select>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                    <div class="form-inline-wrap">-->
-<!--                        <label class="layui-form-label form-label-wrap"-->
-<!--                               data-th-text="#{RskSpecificAssetType001.type4}">业务类型</label>-->
-<!--                        <div class="layui-input-inline input-inline">-->
-<!--                            <select id="type4" name="type4"-->
-<!--                                    th:initValue="*{entity?.type4}"-->
-<!--                                    class="layui-input form-input input-select"-->
-<!--                                    parentids="type3"-->
-<!--                                    placeholder="请输入内容"-->
-<!--                                    data-th-placeholder="#{SysCommon.placeholder}"-->
-<!--                                    data-th-data-result="${RSK_AUTHORIZE_TYPE4}">-->
-<!--                            </select>-->
-<!--                        </div>-->
-<!--                    </div>-->
-                    <!--20210812 fuyongsheng删除 end-->
                     <div class="form-inline-wrap">
-                        <label class="layui-form-label form-label-wrap"
+                        <label class="layui-form-label form-label-wrap" style="width:76%!important;text-align:left;font-weight: bold;"
+                               data-th-text="#{RskSpecificAssetType001.title1}">监管综合相关类型</label>
+                    </div>
+                </div>
+                <div class="layui-form-item pl">
+                    <div class="form-inline-wrap" id="isFlowLimited_div">
+                        <label class="layui-form-label form-label-wrap" style="width:76%!important;text-align:left;">是否流动性受限</label>
+                        <div class="layui-input-inline input-inline" style="width:20%!important;">
+                            <input type="checkbox" id="isFlowLimited" name="isFlowLimited"
+                                   lay-skin="switch" data-th-value="${YES}"
+                                   lay-text="是|否" data-th-checked="${YES_OR_NO_Y} ==${entity?.isFlowLimited}">
+                        </div>
+                    </div>
+                    <div class="form-inline-wrap1">
+                        <label class="layui-form-label form-label-wrap" style="text-align:left;width: 96%;">涉及监管文件：规范现金管理类产品；流动性管理办法</label>
+                    </div>
+                </div>
+                <div class="layui-form-item pl">
+                    <div class="form-inline-wrap">
+                        <label class="layui-form-label form-label-wrap" style="width:76%!important;text-align:left;"
+                               data-th-text="#{RskSpecificAssetType001.isRegulation}">是否国务院银行业监督管理机构另有规定</label>
+                        <div class="layui-input-inline input-inline" style="width:20%!important;">
+                            <input type="checkbox" id="isRegulation" name="isRegulation"
+                                   lay-skin="switch" data-th-value="${YES}" lay-text="是|否"
+                                   data-th-checked="${YES_OR_NO_Y} ==${entity?.isRegulation}">
+                        </div>
+                    </div>
+                    <div class="form-inline-wrap1">
+                        <label class="layui-form-label form-label-wrap" style="text-align:left;width: 96%;">涉及监管文件：资管新规；理财新规</label>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="form-inline-wrap">
+                        <label class="layui-form-label form-label-wrap" style="width:76%!important;text-align:left;font-weight: bold;"
+                               data-th-text="#{RskSpecificAssetType001.title2}">流动性管理办法相关类型</label>
+                    </div>
+                </div>
+                <div class="layui-form-item pl">
+                    <div class="form-inline-wrap">
+                        <label class="layui-form-label form-label-wrap" style="width:76%!important;text-align:left;"
+                               data-th-text="#{RskSpecificAssetType001.isLiquidity1}">是否无活跃交易市场且需要采用估值技术确定公允价值资产</label>
+                        <div class="layui-input-inline input-inline" style="width:20%!important;">
+                            <input type="checkbox" id="isLiquidity1" name="isLiquidity1"
+                                   lay-skin="switch" data-th-value="${YES}" lay-text="是|否"
+                                   data-th-checked="${YES_OR_NO_Y} ==${entity?.isLiquidity1}">
+                        </div>
+                    </div>
+                    <div class="form-inline-wrap1">
+                        <label class="layui-form-label form-label-wrap" style="width:76%!important;text-align:left;"
+                               data-th-text="#{RskSpecificAssetType001.isLiquidity2}">是否不具备活跃交易市场或者在活跃市场中无报价，且不能采用估值技术可靠计量公允价值的</label>
+                        <div class="layui-input-inline input-inline" style="width:20%!important;">
+                            <input type="checkbox" id="isLiquidity2" name="isLiquidity2"
+                                   lay-skin="switch" data-th-value="${YES}" lay-text="是|否"
+                                   data-th-checked="${YES_OR_NO_Y} ==${entity?.isLiquidity2}">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item pl">
+                    <div class="form-inline-wrap">
+                        <label class="layui-form-label form-label-wrap" style="width:76%!important;text-align:left;"
+                               data-th-text="#{RskSpecificAssetType001.isLiquidity3}">是否7个工作日可变现资产</label>
+                        <div class="layui-input-inline input-inline" style="width:20%!important;">
+                            <input type="checkbox" id="isLiquidity3" name="isLiquidity3"
+                                   lay-skin="switch" data-th-value="${YES}" lay-text="是|否"
+                                   data-th-checked="${YES_OR_NO_Y} ==${entity?.isLiquidity3}">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="form-inline-wrap">
+                        <label class="layui-form-label form-label-wrap" style="width:76%!important;text-align:left;font-weight: bold;"
+                               data-th-text="#{RskSpecificAssetType001.title3}">理财新规相关类型</label>
+                    </div>
+                </div>
+                <div class="layui-form-item pl">
+                    <div class="form-inline-wrap">
+                        <label class="layui-form-label form-label-wrap" style="width:76%!important;text-align:left;"
                                data-th-text="#{RskSpecificAssetType001.isBadasset}">是否不良资产及其受（收）益权</label>
-                        <div class="layui-input-inline input-inline">
+                        <div class="layui-input-inline input-inline" style="width:20%!important;">
                             <input type="checkbox" id="isBadasset" name="isBadasset"
                                    lay-skin="switch" data-th-value="${YES}" lay-text="是|否"
                                    data-th-checked="${YES_OR_NO_Y} ==${entity?.isBadasset}">
                         </div>
                     </div>
                     <div class="form-inline-wrap1">
-                        <label class="layui-form-label form-label-wrap"
-                               data-th-text="#{RskSpecificAssetType001.isRegulation}">是否国务院银行业监督管理机构另有规定</label>
-                        <div class="layui-input-inline input-inline">
-                            <input type="checkbox" id="isRegulation" name="isRegulation"
-                                   lay-skin="switch" data-th-value="${YES}" lay-text="是|否"
-                                   data-th-checked="${YES_OR_NO_Y} ==${entity?.isRegulation}">
-                        </div>
-                    </div>
-                </div>
-                <div class="layui-form-item">
-                    <div class="form-inline-wrap">
-                        <label class="layui-form-label form-label-wrap"
+                        <label class="layui-form-label form-label-wrap" style="width:76%!important;text-align:left;"
                                data-th-text="#{RskSpecificAssetType001.isCreditAsset}">是否信贷资产及其受（收）益权</label>
-                        <div class="layui-input-inline input-inline">
+                        <div class="layui-input-inline input-inline" style="width:20%!important;">
                             <input type="checkbox" id="isCreditAsset" name="isCreditAsset"
                                    lay-skin="switch" data-th-value="${YES}" lay-text="是|否"
                                    data-th-checked="${YES_OR_NO_Y} ==${entity?.isCreditAsset}">
-                        </div>
-                    </div>
-
-                    <div class="form-inline-wrap1" id="isFlowLimited_div">
-                        <label class="layui-form-label form-label-wrap">是否流动性受限</label>
-                        <div class="layui-input-inline input-inline">
-                            <input type="checkbox" id="isFlowLimited" name="isFlowLimited"
-                                   lay-skin="switch" data-th-value="${YES}"
-                                   lay-text="是|否" data-th-checked="${YES_OR_NO_Y} ==${entity?.isFlowLimited}">
                         </div>
                     </div>
                 </div>

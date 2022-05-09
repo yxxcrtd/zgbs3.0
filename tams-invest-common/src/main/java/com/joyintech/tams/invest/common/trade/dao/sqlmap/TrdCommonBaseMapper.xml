@@ -1001,11 +1001,15 @@
         WHERE B_TRADE_ID = #{tradeIdL} and TRADE_STATUS = #{JYZT_CS} and IS_CANCEL != #{SF_S}
     </select>
     <select id="queryRTradeId" resultType="java.lang.String">
+        /**原查询条件用的or不走索引,查询奇慢，现改为union all**/
         SELECT NVL(TOTLE_TRADE_ID, R_TRADE_ID) FROM TRD_PRODUCT_DEAL
-        WHERE (R_TRADE_ID IS NOT NULL AND TRADE_ID = #{tradeId})
-        OR (TRADE_ID IN (
+        WHERE R_TRADE_ID IS NOT NULL AND TRADE_ID = #{tradeId}
+        union all
+        SELECT NVL(TOTLE_TRADE_ID, R_TRADE_ID) FROM TRD_PRODUCT_DEAL
+        where
+        TRADE_ID IN (
             SELECT RTRIM(R_TRADE_ID, 'R') FROM TRD_PRODUCT_DEAL WHERE TOTLE_TRADE_ID = #{tradeId} AND R_TRADE_ID IS NOT NULL
-        ))
+        )
     </select>
 
     <select id="selectEntrustInfo" resultMap="com.joyintech.tams.common.base.dao.EtrEntrustMapper.BaseResultMap">

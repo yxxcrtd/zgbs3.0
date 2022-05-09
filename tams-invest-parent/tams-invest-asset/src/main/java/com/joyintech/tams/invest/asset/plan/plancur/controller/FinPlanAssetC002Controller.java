@@ -94,6 +94,8 @@ public class FinPlanAssetC002Controller extends BaseController{
         model.addAttribute("FUND_ASSET_TYPE_F01", DictCodeList.基金类资产类型_货币基金.getValue());
         model.addAttribute("PLAN_ASSET_TYPE_N02", DictCodeList.计划类资产一级分类_信托产品.getValue());
         model.addAttribute("FINPROD_TYPE_TG_F17", DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue());
+        model.addAttribute("PROFIT_TYPE_02", DictCodeList.收益类型_收益型.getValue());
+        model.addAttribute("YES", DictCodeList.是否_是.getValue());
         String finprodId = getParam("finprodId");
 //        add by zhuyongkang 20191012 start
         String finprodMarketId=getParam("finprodMarketId");
@@ -117,6 +119,7 @@ public class FinPlanAssetC002Controller extends BaseController{
                 finPlanAssetCDto.setFjId(finPlanAssetCDto.getFinprodId());
             }
             model.addAttribute("entity",finPlanAssetCDto);
+            model.addAttribute("finprodId", finprodId);
         }
         else if(WorkFlowUtil.isNotFromToDoList() && !StringUtil.isNotEmpty(finprodId)){
           //新建界面初始化

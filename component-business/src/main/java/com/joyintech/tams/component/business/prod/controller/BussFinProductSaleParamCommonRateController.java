@@ -68,8 +68,9 @@ public class BussFinProductSaleParamCommonRateController extends BaseController 
     public String init(Model model) {
         this.setSelectOptionToModel(model, DictCode.销售渠道, DictCode.销售区域_中债,
         		DictCode.币种钞汇标志,DictCode.募集方式,DictCode.销售部门,
-        		DictCode.币种,DictCode.目标客户类型);
+        		DictCode.币种,DictCode.目标客户类型,DictCode.是否);
         model.addAttribute("YES_OR_NO_Y", DictCodeList.是否_是.getValue());
+        model.addAttribute("YES_OR_NO_N", DictCodeList.是否_否.getValue());
         model.addAttribute("NOTE_EXCHANGE_FLAG_01", "01");
         // 父画面传入的pageId
         model.addAttribute(GlobalConstant.PAGE_ID, this.getParam(GlobalConstant.PAGE_ID));

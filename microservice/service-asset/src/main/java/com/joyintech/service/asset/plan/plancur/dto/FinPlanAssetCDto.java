@@ -21,6 +21,7 @@ import com.joyintech.tams.common.base.entity.PtlPortfolio;
 import com.joyintech.tams.common.base.entity.RepAssetOther;
 import com.joyintech.tams.common.base.entity.SysUploadFileInfo;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.service.product.common.dto.BussFinProductOpenPlanDto;
 
 /**
  * 〈一句话功能简述〉 〈功能详细描述〉
@@ -331,6 +332,23 @@ public class FinPlanAssetCDto extends FinProduct {
         this.recommenderName = recommender == null ? null : recommenderName.trim();
     }
     // 增加推荐方与推荐费率 add by renping 20191014 end
+
+    /**
+     * 是否每日开放申赎
+     */
+    private String isOpenEveryDay;
+
+    /**
+     * {@linkplain}
+     */
+    @Valid
+    private BussFinProductOpenPlanDto bussFinProductOpenPlanDto;
+    /**
+     * add by zhangweiqi
+     */
+    @Valid
+    private BussFinProductOpenPlanDto bussFinProductOpenPlanRedDto;
+
     /**
      * 获取 operateType
      * 
@@ -933,5 +951,37 @@ public class FinPlanAssetCDto extends FinProduct {
 
     public void setDataSource(String dataSource) {
         this.dataSource = dataSource;
+    }
+
+    public String getIsOpenEveryDay() {
+        return isOpenEveryDay;
+    }
+
+    public void setIsOpenEveryDay(String isOpenEveryDay) {
+        this.isOpenEveryDay = isOpenEveryDay;
+    }
+
+    /**
+     * 获取 bussFinProductOpenPlanDto
+     * @return bussFinProductOpenPlanDto.
+     */
+    public BussFinProductOpenPlanDto getBussFinProductOpenPlanDto() {
+        return bussFinProductOpenPlanDto;
+    }
+
+    /**
+     * 设置 bussFinProductOpenPlanDto
+     * @param bussFinProductOpenPlanDto bussFinProductOpenPlanDto
+     */
+    public void setBussFinProductOpenPlanDto(BussFinProductOpenPlanDto bussFinProductOpenPlanDto) {
+        this.bussFinProductOpenPlanDto = bussFinProductOpenPlanDto;
+    }
+
+    public BussFinProductOpenPlanDto getBussFinProductOpenPlanRedDto() {
+        return bussFinProductOpenPlanRedDto;
+    }
+
+    public void setBussFinProductOpenPlanRedDto(BussFinProductOpenPlanDto bussFinProductOpenPlanRedDto) {
+        this.bussFinProductOpenPlanRedDto = bussFinProductOpenPlanRedDto;
     }
 }

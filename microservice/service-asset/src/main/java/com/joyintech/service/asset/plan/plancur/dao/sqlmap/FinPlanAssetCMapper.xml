@@ -181,6 +181,7 @@
         B.TYPE_10 type10,
         B.TYPE_11 type11,
         B.TYPE_12 type12,
+        C.IS_OPEN_EVERYDAY isOpenEveryDay,
          <!--添加分类字段9-12 lishuping 2018/7/18 end-->
 		<!-- 增加推荐方与推荐费率 add by renping 20191014 start -->
 		FPR.RECOMMENDER recommender,

@@ -300,6 +300,8 @@
 			c.ETF_TYPE,
 			c.ETF_MIN_PRUNIT,
 			c.FUND_MANGER_NAME fundMangerName,
+			c.IS_SEVEN_DAY_CASHABLE isSevenDayCashable,
+			c.OPEN_TYPE openType,
 			a.P_FINPROD_ID,
 			aa.FINPROD_MARKET_ID pMarketId
 			 <!--场内基金 add by 张年  20191106  end-->
