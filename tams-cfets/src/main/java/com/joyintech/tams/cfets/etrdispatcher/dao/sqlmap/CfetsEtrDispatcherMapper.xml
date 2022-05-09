@@ -1477,7 +1477,7 @@
         eted.ASSET_TYPE,
         'F01',
         /*decode(ete.PS,'T03',ete.ENTRUST_AMT,NVL(ete.ENTRUST_NUM * 100, 0 )),*/
-        decode(ete.PS,'T03',ete.ENTRUST_AMT,'03',ete.ENTRUST_AMT/100,'04',ete.ENTRUST_AMT/100,ete.ENTRUST_AMT,'T68',ete.ENTRUST_AMT/100,'T68',ete.ENTRUST_AMT/100,NVL(ete.ENTRUST_NUM * 100, 0 )),
+        decode(ete.PS,'T03',ete.ENTRUST_AMT,'03',ete.ENTRUST_AMT/100,'04',ete.ENTRUST_AMT/100,'T68',ete.ENTRUST_AMT/100,NVL(ete.ENTRUST_NUM * 100, 0 )),
         'F10',
         NVL( ete.ENTRUST_NUM * 100, 0 ),
         NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
@@ -1582,11 +1582,20 @@
         else ete.entrust_num end entrustNum,
         <!--ete.entrust_amt entrustAmt,
            按照列表查询价格修改 -->
-        decode(
+        <!--decode(
         eted.ASSET_TYPE,
         'F01',
         /*decode(ete.PS,'T03',ete.ENTRUST_AMT,NVL(ete.ENTRUST_NUM * 100, 0 )),*/
         decode(ete.TRADE_MARKET,'03',ete.ENTRUST_AMT,'04',ete.ENTRUST_AMT,NVL(ete.ENTRUST_NUM * 100, 0 )),
+        'F10',
+        NVL( ete.ENTRUST_NUM * 100, 0 ),
+        NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
+        ) entrustAmt,-->
+        decode(
+        eted.ASSET_TYPE,
+        'F01',
+        /*decode(ete.PS,'T03',ete.ENTRUST_AMT,NVL(ete.ENTRUST_NUM * 100, 0 )),*/
+        decode(ete.PS,'T03',ete.ENTRUST_AMT,'03',ete.ENTRUST_AMT/100,'04',ete.ENTRUST_AMT/100,'T68',ete.ENTRUST_AMT/100,NVL(ete.ENTRUST_NUM * 100, 0 )),
         'F10',
         NVL( ete.ENTRUST_NUM * 100, 0 ),
         NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
