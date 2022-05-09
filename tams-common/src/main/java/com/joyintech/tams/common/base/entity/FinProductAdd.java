@@ -478,6 +478,30 @@ public class FinProductAdd extends BaseEntity {
     private String listingDateFromTrade;
 
     /**
+     *
+     * 说明书是否披露风险标志
+     */
+    private String directDisclosureRiskFlag;
+
+    /**
+     * 是否每日开放申赎
+     */
+    private String isOpenEveryDay;
+
+    /**
+     * 是否每日开放申赎
+     */
+    private String isSevenDayCashable;
+
+    public String getDirectDisclosureRiskFlag() {
+        return directDisclosureRiskFlag;
+    }
+
+    public void setDirectDisclosureRiskFlag(String directDisclosureRiskFlag) {
+        this.directDisclosureRiskFlag = directDisclosureRiskFlag;
+    }
+
+    /**
      * 取得 金融产品代码
      * @return 金融产品代码
      */
@@ -1953,5 +1977,21 @@ public class FinProductAdd extends BaseEntity {
      */
     public void setListingDateFromTrade(String listingDateFromTrade) {
         this.listingDateFromTrade = listingDateFromTrade;
+    }
+
+    public String getIsOpenEveryDay() {
+        return isOpenEveryDay;
+    }
+
+    public void setIsOpenEveryDay(String isOpenEveryDay) {
+        this.isOpenEveryDay = isOpenEveryDay;
+    }
+
+    public String getIsSevenDayCashable() {
+        return isSevenDayCashable;
+    }
+
+    public void setIsSevenDayCashable(String isSevenDayCashable) {
+        this.isSevenDayCashable = isSevenDayCashable;
     }
 }

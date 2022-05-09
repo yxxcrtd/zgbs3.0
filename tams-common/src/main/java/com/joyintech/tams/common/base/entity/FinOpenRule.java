@@ -71,6 +71,16 @@ public class FinOpenRule extends FinOpenRuleKey {
     private String openDaysType;
 
     /**
+     * 申购确认速度
+     */
+    private Long purSpeed;
+
+    /**
+     * 赎回确认速度
+     */
+    private Long redSpeed;
+
+    /**
      * 取得 开放模式，定期开放、高频开放、周期开放
      * @return 开放模式，定期开放、高频开放、周期开放
      */
@@ -277,5 +287,37 @@ public class FinOpenRule extends FinOpenRuleKey {
      */
     public void setOpenDaysType(String openDaysType) {
         this.openDaysType = openDaysType == null ? null : openDaysType.trim();
+    }
+
+    /**
+     * 取得 申购确认速度
+     * @return 申购确认速度
+     */
+    public Long getPurSpeed() {
+        return purSpeed;
+    }
+
+    /**
+     * 设置 申购确认速度
+     * @param purSpeed 申购确认速度
+     */
+    public void setPurSpeed(Long purSpeed) {
+        this.purSpeed = purSpeed;
+    }
+
+    /**
+     * 取得 赎回确认速度
+     * @return 赎回确认速度
+     */
+    public Long getRedSpeed() {
+        return redSpeed;
+    }
+
+    /**
+     * 设置 赎回确认速度
+     * @param redSpeed 赎回确认速度
+     */
+    public void setRedSpeed(Long redSpeed) {
+        this.redSpeed = redSpeed;
     }
 }

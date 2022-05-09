@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.joyintech.framework.grid.Page;
+import com.joyintech.tams.invest.common.CommonUtil;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeRds;
 import com.joyintech.tams.invest.riskredis.quota.superviseindicator.dto.RskSupervisionIndicator002Dto;
 import com.joyintech.tams.invest.riskredis.quota.superviseindicator.service.RskSupervisionIndicator002Service;
@@ -67,6 +68,7 @@ public class RskSupervisionIndividuation001Controller extends BaseController{
 		setSelectOptionToModel(model, DICT_CODES);
 		Map<String,Object > uniteMap=new HashMap<>();
 		String indvId = this.getParam("indId");
+		String processModel = this.getParam("processModel");
 		if(StringUtil.isNotEmpty(this.getParam("workflowId"))){
 			RskSupervisionIndividuationDto dto = rskSupervisionIndividuation001Service.getBussinessEntityByWorkflowId((String)this.getParam("workflowId"));
 			model.addAttribute("entity", dto);
@@ -78,31 +80,46 @@ public class RskSupervisionIndividuation001Controller extends BaseController{
             indvId = dto.getIndId();
             // add by zhangrui1 end
 		}else{
-			String portfolioId = this.getParam("portfolioId");
+			String prtBagId = StringUtil.EMPTY;
+			if(CommonUtil.isType(processModel, BussinessDictCodeListRds.处理类型_规则)){
+				prtBagId = this.getParam("ruleId");
+			}else{
+				prtBagId = this.getParam("portfolioId");
+			}
 			String indId = this.getParam("indId");
-			model.addAttribute("prtBagId", portfolioId);
+			model.addAttribute("prtBagId", prtBagId);
 			model.addAttribute("indId", indId);
 			model.addAttribute("IND_TYPE", rskSupervisionIndividuation001Service.getIndType(indId));
 			RskSupervisionIndividuationDto dto = new RskSupervisionIndividuationDto();
 			dto.setIndId(indId);
-			dto.setPrtBagId(portfolioId);
+			dto.setPrtBagId(prtBagId);
 			dto.setIndType(rskSupervisionIndividuation001Service.getIndType(indId));
 			model.addAttribute("entity", dto);
 			uniteMap.put("indId",this.getParam("indId"));
-			uniteMap.put("prtBagId",this.getParam("portfolioId"));
+			uniteMap.put("prtBagId",prtBagId);
 		}
 		if(StringUtil.equals(this.getParam("portfolioLevel"), BussinessDictCodeListRds.组合层次_单组合.getValue())){
 			String vdate = rskSupervisionIndividuation001Service.getVdate(this.getParam("portfolioId"));
 			model.addAttribute("VDATE", vdate);
 		}
-
-		model.addAttribute("UNITE_SOURCE", JsonUtils.objectArray2Json(rskSupervisionIndividuation001Service.queryUniteIndIdList(uniteMap).toArray()));
+		model.addAttribute("portfolioLevel", this.getParam("portfolioLevel"));//组合层次
+		if(CommonUtil.isType(processModel, BussinessDictCodeListRds.处理类型_规则)){
+			model.addAttribute("UNITE_SOURCE", JsonUtils.objectArray2Json(rskSupervisionIndividuation001Service.queryUniteIndIdList_RULE(uniteMap).toArray()));
+		}else{
+			model.addAttribute("UNITE_SOURCE", JsonUtils.objectArray2Json(rskSupervisionIndividuation001Service.queryUniteIndIdList(uniteMap).toArray()));
+		}
 		model.addAttribute("NONE", BussinessDictCodeListRds.单位_无.getValue());
+		model.addAttribute("CONDITION_ITEM_04", BussinessDictCodeListRds.条件项_启用时间.getValue());
 		model.addAttribute("CONDITION_ITEM_03", BussinessDictCodeListRds.条件项_建仓期时间.getValue());
 		model.addAttribute("CONDITION_ITEM_02", BussinessDictCodeListRds.条件项_单位净值控制.getValue());
+		model.addAttribute("PROCESSMODEL_RULE", BussinessDictCodeListRds.处理类型_规则.getValue());
 		//-------add by 裴家俊 2019-12-03----获取阈值方向与单位 start---------------
         if (StringUtil.isNotEmpty(indvId)) {
-		model.addAttribute("yzInfo", rskSupervisionIndicator002Service.getBussinessEntityByIndId(indvId));
+			if(CommonUtil.isType(processModel, BussinessDictCodeListRds.处理类型_规则)){
+				model.addAttribute("yzInfo", rskSupervisionIndicator002Service.getBussinessEntityByIndId_RULE(indvId));
+			}else{
+				model.addAttribute("yzInfo", rskSupervisionIndicator002Service.getBussinessEntityByIndId(indvId));
+			}
         }
 		//-------add by 裴家俊 2019-12-03----获取阈值方向与单位  end---------------
 		return super.init(model);

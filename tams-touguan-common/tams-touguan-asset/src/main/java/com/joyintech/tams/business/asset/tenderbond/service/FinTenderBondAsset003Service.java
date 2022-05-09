@@ -125,14 +125,8 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                 productAdd.setFinprodId(dto.getFinprodId());
                 productAdd.setIssueStatus(null);
                 finProductAddMapper.updateForTenderBound(productAdd);
-                //TODO 调用撤销头寸
-                BaseMap param = BaseMap.newMap().put("userId", SecurityUtil.getLoginUser().getUserName())
-                        .put("totalTradeId", totleTradeId)
-                        .put("finprodId", dto.getFinprodId())
-                        .put("circulationCode", product.getCirculationCode());
-                //PositionHttpRequest.sendSslt(param);
                 try {
-                    //PositionHttpRequest.sendSslt(param);
+                    PositionHttpRequest.dorevoke(totleTradeId, DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_上市流通.getValue(), DictCodeList.交易方向_上市流通.getValue());
                 } catch (PositionException e) {
                     logger.error("交收失败-头寸处理异常", e);
                     WorkFlowUtil.showMessage("头寸处理异常,请检查头寸日期", MessageType.错误消息);
@@ -141,6 +135,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                 finTenderBoundAssetService.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_上市流通撤销);
             }
         } else {
+            FinProduct product1 = finProductMapper.selectByPrimaryKey(dto.getFinprodId());
             //1、记录交易信息
             //金融产品交易汇总表
             TrdFinProductDealTotal trdFinProductDealTotal = new TrdFinProductDealTotal();
@@ -155,7 +150,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
             trdFinProductDealTotal.setIsCancel(DictCodeList.是否_否.getValue());
             trdFinProductDealTotal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
             trdFinProductDealTotal.setTradeDate(iPlatformDate.getSysDate());
-            trdFinProductDealTotal.setCcy(DictCodeList.币种_人民币_CNY.getValue());
+            trdFinProductDealTotal.setCcy(product1.getCcy());
             trdFinProductDealTotal.setBranch(0L);
             trdFinProductDealTotalMapper.insert(trdFinProductDealTotal);
             //金融产品实物汇总交易
@@ -177,12 +172,21 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
             finProductAddMapper.updateForTenderBound(productAdd);
             finTenderBoundAssetService.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_上市流通);
             //调用头寸
-            BaseMap param = BaseMap.newMap().put("userId", SecurityUtil.getLoginUser().getUserName())
+            BaseMap param = BaseMap.newMap().put("userId", "SYSTEM")
                     .put("totalTradeId", trdFinProductDealTotal.getTotleTradeId())
                     .put("finprodId", dto.getFinprodId())
-                    .put("circulationCode", product.getCirculationCode());
+                    .put("marketFinprodId", product.getCirculationCode())
+                    .put("modelType",DictCodeListExt1.子系统代码_交易.getValue())
+                    .put("busiType",DictCodeListExt3.头寸业务类型_上市流通.getValue())
+                    .put("busiAct",DictCodeListExt3.业务动作_上市.getValue())
+                    .put("ps",DictCodeList.交易方向_上市流通.getValue())
+                    .put("systemAct",DictCodeListExt3.系统动作_新建.getValue())
+                    .put("cdate",iPlatformDate.getSysDate())
+                    .put("ccy",product1.getCcy())
+                    .put("balanceCheck",DictCodeList.是否_否.getValue())
+                    .put("interfaceType","Bond001");
             try {
-                PositionHttpRequest.sendSslt(param);
+                PositionHttpRequest.send(param);
             } catch (PositionException e) {
                 logger.error("处理失败-头寸处理异常", e);
                 //WorkFlowUtil.showMessage("头寸处理异常,请检查头寸日期", MessageType.错误消息);
@@ -190,6 +194,17 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
             }
         }
     }
+
+    /**
+     * 根据id返回上市流通信息
+     *
+     * @param finprodId
+     * @return
+     */
+    public FinTenderBondAsset003Dto getById(String finprodId) {
+        return finTenderBoundAssetMapper.getByFinProductId(finprodId);
+    }
+
 
 
     /**
@@ -231,7 +246,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
      */
     public List<ValidMessage> valid(FinTenderBondAsset003Dto dto) {
         List<ValidMessage> validMessages = new ArrayList<>();
-        if (finTenderBoundAssetService.isInProcess(dto.getFinprodMarketId(), "FinTenderBondAsset003","FinTenderBondAsset002")) {
+        if (StringUtil.isEmpty(dto.getWorkflowId()) && finTenderBoundAssetService.isInProcess(dto.getFinprodMarketId(), "FinTenderBondAsset003","FinTenderBondAsset002")) {
             validMessages.add(new ValidMessage("存在流程中的数据"));
         }
         if(StringUtil.isEmpty(dto.getOperateType())) {
@@ -247,7 +262,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
             if (Objects.nonNull(dto.getIssueStage()) && !StringUtil.equals(dto.getIssueStage(), DictCodeListExt4.发行阶段_已上市.getValue())) {
                 validMessages.add(new ValidMessage("发行阶段不为已上市的不能进行撤销"));
             }
-            Integer count = finTenderBoundAssetMapper.countFinprodIdUse(dto.getFinprodId(), DictCodeList.是否_否.getValue());
+            Integer count = finTenderBoundAssetMapper.countFinprodIdUse(dto.getFinprodId(), DictCodeList.是否_否.getValue(),DictCodeList.是否_否.getValue());
             if (Objects.nonNull(count) && count > 0) {
                 validMessages.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
             }

@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.joyintech.tams.invest.common.redisinit.dao.RskRedisInitMapper">
+    <sql id="linkAstType">
+        AND (REGEXP_INSTR(RSAT.TYPE_1||'_'||RSAT.TYPE_2||'_'||RSAT.TYPE_3||'_'||RSAT.TYPE_4 ,
+                FPT.TYPE_9||'_'||FPT.TYPE_10||'_'||FPT.TYPE_11||'_'||FPT.TYPE_12) &gt;= 1
+                OR FPT.FINPROD_ID = RSAT.FINPROD_ID)
+    </sql>
     <select id="getPtlPortfolioData"  parameterType="Map" resultType="com.joyintech.tams.invest.common.redisinit.dto.ImplPortf">
         select m.PORTFOLIO_ID  portfolioId,
         m.PORTFOLIO_TYPE portfolioType,
@@ -20,9 +25,8 @@
         left join REP_PROD_INFO x on m.PORTFOLIO_ID=x.PROD_ID
         left join FIN_PRODUCT n on m.PORTFOLIO_ID=n.FINPROD_ID
         <where>
-            <![CDATA[  m.MDATE + 30 >to_date('${valDate}','yyyy-MM-dd') ]]>
             <if test="paramIdList != null and paramIdList.size() > 0">
-               and m.PORTFOLIO_ID in
+               m.PORTFOLIO_ID in
                 <foreach collection="paramIdList" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
@@ -46,16 +50,136 @@
              GROUP BY FINPROD_ID,CALC_TYPE
         )
         <!-- add by zhangrui1 增加资产属性 end -->
+        <!-- add by jjpei 增加债券项目类资产最新还本与付息日，计划类资产最新赎回日及股票行情交易状态 start -->
+        ,FIN_CASH_PLAN_COST AS  (
+            /**还本计划**/
+            SELECT
+            CASH_ID,FINPROD_ID ,PAY_DATE
+            FROM
+            FIN_CASH_PLAN fop
+            WHERE
+            fop.FINPROD_TYPE2 IN ('F01','F18') AND EXISTS (
+            SELECT 1 FROM FIN_CASH_INFO fop2 WHERE fop2.CASH_TYPE_1 = '01' AND fop2.CASH_TYPE_2 ='C01' AND fop.CASH_ID =fop2.CASH_ID
+            )
+        )
+        ,FIN_CASH_PLAN_RATE AS  (
+            /**付息计划**/
+            SELECT
+            CASH_ID,FINPROD_ID , PAY_DATE
+            FROM
+            FIN_CASH_PLAN fop
+            WHERE
+            fop.FINPROD_TYPE2 IN ('F01','F18')  AND EXISTS (
+            SELECT 1 FROM FIN_CASH_INFO fop2 WHERE fop2.CASH_TYPE_1 = '02' AND fop2.CASH_TYPE_2 ='C02' AND fop.CASH_ID =fop2.CASH_ID
+            )
+        )
+        ,COST_AST_PAYDATE AS (
+            /**距还本支付日在7个交易日以内的债券项目类资产**/
+            SELECT FINPROD_ID,PAY_DATE FROM (
+            SELECT m.FINPROD_ID,M.VDATE,y.PAY_DATE,NVL(M.CALENDAR_ID,'01') CALENDAR_ID ,rank() over(PARTITION BY m.FINPROD_ID ORDER BY y.PAY_DATE asc) AS rowno
+            from FIN_PRODUCT m
+            INNER JOIN  FIN_CASH_PLAN_COST y ON y.FINPROD_ID=m.FINPROD_ID
+            WHERE y.PAY_DATE &gt;=to_date('${valDate}','yyyy-MM-dd')  ORDER BY y.PAY_DATE ASC
+            ) WHERE  rowno=1
+        )
+        ,RATE_AST_PAYDATE AS (
+            /**距付息支付日在7个交易日以内的债券项目类资产**/
+            SELECT FINPROD_ID,PAY_DATE FROM (
+            SELECT m.FINPROD_ID,M.VDATE,y.PAY_DATE,NVL(M.CALENDAR_ID,'01') CALENDAR_ID ,rank() over(PARTITION BY m.FINPROD_ID ORDER BY y.PAY_DATE asc) AS rowno
+            from FIN_PRODUCT m
+            INNER JOIN  FIN_CASH_PLAN_RATE y ON y.FINPROD_ID=m.FINPROD_ID
+            WHERE y.PAY_DATE &gt;=to_date('${valDate}','yyyy-MM-dd')  ORDER BY y.PAY_DATE ASC
+            ) WHERE  rowno=1
+        )
+        ,FIN_OPEN_PLAN_AST AS  (
+            /**申购开放(这里三个union是为了取的顺序赎回优先,无赎回则取申购)**/
+            SELECT
+            CASH_ID,FINPROD_ID , OPEN_VDATE
+            FROM
+            FIN_OPEN_PLAN fop
+            WHERE
+            fop.FINPROD_ID LIKE 'F17_%' AND fop.OPEN_TYPE = '01' AND NOT EXISTS (
+            SELECT 1 FROM FIN_OPEN_PLAN fop2 WHERE fop2.OPEN_TYPE = '02' AND fop.CASH_ID =fop2.CASH_ID
+            )
+            /**赎回开放**/
+            UNION ALL
+            SELECT
+            CASH_ID, FINPROD_ID ,OPEN_VDATE
+            FROM
+            FIN_OPEN_PLAN fop
+            WHERE
+            fop.FINPROD_ID LIKE 'F17_%' AND fop.OPEN_TYPE = '02'
+            /**申赎同频**/
+            UNION ALL
+            SELECT
+            CASH_ID,fop.FINPROD_ID , OPEN_VDATE
+            FROM
+            FIN_OPEN_PLAN fop
+            WHERE
+            fop.FINPROD_ID LIKE 'F17_%' AND fop.OPEN_TYPE = '03'
+        )
+        ,PLAN_AST_REPDATE AS (
+            /**距可赎回日在10个交易日以上计划类资产(高频开放)**/
+            select n.FINPROD_ID,MDATE AS OPEN_VDATE
+            from FIN_PRODUCT m
+            INNER JOIN FIN_CASH_INFO n ON n.FINPROD_ID = m.FINPROD_ID and m.FINPROD_TYPE2='F17' AND n.CASH_TYPE_1 = '01' AND n.CASH_TYPE_2 = 'C01'
+            INNER JOIN FIN_OPEN_RULE r ON r.CASH_ID = n.CASH_ID AND r.OPEN_MODE = '02'
+            /**距可赎回日在10个交易日以上计划类资产(非高频开放)**/
+            UNION ALL
+            SELECT FINPROD_ID,OPEN_VDATE FROM (
+            SELECT m.FINPROD_ID,M.VDATE,y.OPEN_VDATE,NVL(M.CALENDAR_ID,'01') CALENDAR_ID ,rank() over(PARTITION BY m.FINPROD_ID ORDER BY y.OPEN_VDATE asc) AS rowno
+            from FIN_PRODUCT m
+            INNER JOIN  FIN_CASH_INFO n ON n.FINPROD_ID=m.FINPROD_ID  AND n.CASH_TYPE_1='01' AND n.CASH_TYPE_2='C01' AND M.FINPROD_TYPE2 ='F17'
+            INNER JOIN  FIN_OPEN_PLAN_AST y ON y.CASH_ID=n.CASH_ID
+            WHERE y.OPEN_VDATE &gt;=to_date('${valDate}','yyyy-MM-dd')  ORDER BY y.OPEN_VDATE ASC
+            ) WHERE  rowno=1
+        )
+        ,STOCK_WIND_DATE AS (
+            SELECT DISTINCT m1.SHARES_ID,m1.TRADE_STATUS FROM mst_share_price m1 WHERE NOT EXISTS (
+            SELECT 1 FROM mst_share_price m2 WHERE m1.SHARES_ID =m2.SHARES_ID AND m1.DEAL_DATE &lt;m2.DEAL_DATE AND m2.DEAL_DATE &lt;=to_date('${valDate}','yyyy-MM-dd')
+            )
+        )
+        <!-- add by jjpei 增加股票行情交易状态 end -->
         <!-- add by zhangrui1 增加资产属性:是否流动性受限 start -->
         , FLOW_LIMITED_ASSET AS (
             -- 流动性受限资产
             SELECT FPT.FINPROD_ID, 'Y' IS_FLOW_LIMITED FROM FIN_PRODUCT_TYPE FPT
             WHERE EXISTS (
-                SELECT 1 FROM RSK_SPECIFIC_ASSET_TYPE RSAT WHERE RSAT.IS_FLOW_LIMITED = 'Y' 
-                AND (REGEXP_INSTR(RSAT.TYPE_1||'_'||RSAT.TYPE_2||'_'||RSAT.TYPE_3||'_'||RSAT.TYPE_4 ,
-                FPT.TYPE_9||'_'||FPT.TYPE_10||'_'||FPT.TYPE_11||'_'||FPT.TYPE_12) &gt;= 1
-                OR FPT.FINPROD_ID = RSAT.FINPROD_ID)
+                SELECT 1 FROM RSK_SPECIFIC_ASSET_TYPE RSAT WHERE RSAT.IS_FLOW_LIMITED = 'Y'
+                <include refid="linkAstType"/>
             ) AND FPT.TYPE_9||'_'||FPT.TYPE_10||'_'||FPT.TYPE_11||'_'||FPT.TYPE_12 != '___'
+        )
+        , IS_LIQUIDITY1_ASSET AS (
+        -- 是否无活跃交易市场
+        SELECT FPT.FINPROD_ID, 'Y' IS_LIQUIDITY1 FROM FIN_PRODUCT_TYPE FPT
+        WHERE EXISTS (
+        SELECT 1 FROM RSK_SPECIFIC_ASSET_TYPE RSAT WHERE RSAT.IS_LIQUIDITY1 = 'Y'
+        <include refid="linkAstType"/>
+        ) AND FPT.TYPE_9||'_'||FPT.TYPE_10||'_'||FPT.TYPE_11||'_'||FPT.TYPE_12 != '___'
+        )
+        , IS_LIQUIDITY2_ASSET AS (
+        -- 是否不具备活跃交易市场
+        SELECT FPT.FINPROD_ID, 'Y' IS_LIQUIDITY2 FROM FIN_PRODUCT_TYPE FPT
+        WHERE EXISTS (
+        SELECT 1 FROM RSK_SPECIFIC_ASSET_TYPE RSAT WHERE RSAT.IS_LIQUIDITY2 = 'Y'
+        <include refid="linkAstType"/>
+        ) AND FPT.TYPE_9||'_'||FPT.TYPE_10||'_'||FPT.TYPE_11||'_'||FPT.TYPE_12 != '___'
+        )
+        , IS_LIQUIDITY3_ASSET AS (
+        -- 是否7个工作日可变现资产
+        SELECT FPT.FINPROD_ID, 'Y' IS_LIQUIDITY3 FROM FIN_PRODUCT_TYPE FPT
+        WHERE EXISTS (
+        SELECT 1 FROM RSK_SPECIFIC_ASSET_TYPE RSAT WHERE RSAT.IS_LIQUIDITY3 = 'Y'
+        <include refid="linkAstType"/>
+        ) AND FPT.TYPE_9||'_'||FPT.TYPE_10||'_'||FPT.TYPE_11||'_'||FPT.TYPE_12 != '___'
+        )
+        , IS_LIQUIDITY4_ASSET AS (
+        -- 是否不良资产
+        SELECT FPT.FINPROD_ID, 'Y' IS_BADASSET FROM FIN_PRODUCT_TYPE FPT
+        WHERE EXISTS (
+        SELECT 1 FROM RSK_SPECIFIC_ASSET_TYPE RSAT WHERE RSAT.IS_BADASSET = 'Y'
+        <include refid="linkAstType"/>
+        ) AND FPT.TYPE_9||'_'||FPT.TYPE_10||'_'||FPT.TYPE_11||'_'||FPT.TYPE_12 != '___'
         )
         <!-- add by zhangrui1 增加资产属性:是否流动性受限 end -->
         select
@@ -70,14 +194,25 @@
         m.TRADE_MARKET tradeMarket,
         m.ISSUE_TYPE issueType,
         n.INVEST_NATURE investNature,
+        n.IS_SEVEN_DAY_CASHABLE isSevenDayCashable,
+        n.IS_OPEN_EVERYDAY isOpenEveryDay,
         y.TYPE_4 type4,
         y.TYPE_5 type5,
         y.TYPE_8 type6,
         y.TYPE_6 type7,
         y.TYPE_7 typeSeven,
         y.TYPE_9 type9,
-        y.TYPE_10 type10,y.TYPE_11 type11,
+        y.TYPE_10 type10,
+        y.TYPE_11 type11,
+        y.TYPE_12 type12,
         s.REP_ASSET_TYPE repAssetDept,
+        <!-- add by 裴家俊 流动性风险增加部分属性 start -->
+        RAE.REP_SHARES_TYPE stockShareType,
+        swd.TRADE_STATUS stockTradeStatus,
+        pard.OPEN_VDATE astLastRedempDate,
+        cap.PAY_DATE astLastRebackDate,
+        rap.PAY_DATE astLastPayDate,
+        <!-- add by 裴家俊 流动性风险增加部分属性 end -->
         ZtPingji.GRADE_RESULT  bodyGradeType,
         ZxPingji.GRADE_RESULT  bondGradeType,
         m.ISSUER_CODE as issuerCode,
@@ -94,6 +229,10 @@
         <!-- add by etliu 增加资产属性:是否可提前支取 20200821 end -->
         <!-- add by zhangrui1 增加资产属性:是否流动性受限 start -->
         , NVL(RSAT.IS_FLOW_LIMITED, 'N') isFlowLimited
+        , NVL(RSAT1.IS_LIQUIDITY1, 'N') isLiquidity1
+        , NVL(RSAT2.IS_LIQUIDITY2, 'N') isLiquidity2
+        , NVL(RSAT3.IS_LIQUIDITY3, 'N') isLiquidity3
+        , NVL(RSAT4.IS_BADASSET, 'N') isBadAsset
         <!-- add by zhangrui1 增加资产属性:是否流动性受限 end -->
         <!-- add by zhangrui1 增加资产属性:机构主体类型 start -->
         , MCIA.CUSTOMER_OBJ_TYPE customerObjType
@@ -110,16 +249,27 @@
                 ELSE null end as ISSUER_CODE from  FIN_PRODUCT) m
         inner join FIN_PRODUCT_ADD n on m.FINPROD_ID=n.FINPROD_ID
         inner join FIN_PRODUCT_TYPE y on m.FINPROD_ID=y.FINPROD_ID and y.BRANCH='0'
+        <!-- add by 裴家俊 流动性风险增加部分属性 start -->
+        left join STOCK_WIND_DATE swd on m.FINPROD_MARKET_ID=swd.SHARES_ID and m.FINPROD_TYPE2='F10'
+        left join PLAN_AST_REPDATE pard on pard.FINPROD_ID=m.FINPROD_ID
+        left join COST_AST_PAYDATE cap on cap.FINPROD_ID=m.FINPROD_ID
+        left join RATE_AST_PAYDATE rap on rap.FINPROD_ID=m.FINPROD_ID
+        <!-- add by 裴家俊 流动性风险增加部分属性 end -->
         <!-- add by etliu 增加资产属性:是否可提前支取 20200821 start -->
         left join PA_FIN_PRODUCT PFP on m.FINPROD_ID = PFP.FINPROD_ID
         <!-- add by etliu 增加资产属性:是否可提前支取 20200821 end -->
         <!-- add by zhangrui1 增加资产属性:是否流动性受限 start -->
         left join FLOW_LIMITED_ASSET RSAT on m.FINPROD_ID = RSAT.FINPROD_ID
+        left join IS_LIQUIDITY1_ASSET RSAT1 on m.FINPROD_ID = RSAT1.FINPROD_ID
+        left join IS_LIQUIDITY2_ASSET RSAT2 on m.FINPROD_ID = RSAT2.FINPROD_ID
+        left join IS_LIQUIDITY3_ASSET RSAT3 on m.FINPROD_ID = RSAT3.FINPROD_ID
+        left join IS_LIQUIDITY4_ASSET RSAT4 on m.FINPROD_ID = RSAT4.FINPROD_ID
         <!-- add by zhangrui1 增加资产属性:是否流动性受限 end -->
         <!-- add by zhangrui1 增加资产属性:机构主体类型 start -->
         LEFT JOIN MST_CUSTOMER_INFO_ADD MCIA ON MCIA.CUSTOMER_ID = m.ISSUER_CODE
         <!-- add by zhangrui1 增加资产属性:机构主体类型 end -->
         left join REP_ASSET_DEPT s on m.FINPROD_ID=s.REP_FINPROD_ID
+        left JOIN REP_ASSET_EQUITY RAE ON RAE.REP_FINPROD_ID =m.FINPROD_ID
         <![CDATA[ left join (SELECT LIST_LEVEL,LIST_DETAIL_ID FROM (SELECT n.LIST_LEVEL,m.LIST_DETAIL_ID,rank() over( partition BY LIST_DETAIL_ID ORDER BY LIST_LEVEL) AS rowno
         FROM  RSK_ACCESS_LIST_DETAIL m INNER JOIN RSK_ACCESS_LIST n ON m.LIST_ID =n.LIST_ID AND m.LIST_DETAIL_ID IS NOT null
         AND m.LIST_DATE <=to_date('${valDate}','yyyy-MM-dd') AND n.LIST_LEVEL IN ('01','02') AND m.LIST_DETAIL_TYPE='02') WHERE rowno=1
@@ -150,8 +300,8 @@
 
         select
         m.FINPROD_ID  finprodId,
-        decode(y.TYPE_8, 'F07', '交易型资产_债券质押式回购_' , 'F08', '交易型资产_拆借_', '交易型资产_衍生品交易_') || m.FINPROD_ID finprodAbbr,
-        decode(y.TYPE_8, 'F07', '交易型资产_债券质押式回购_' , 'F08', '交易型资产_拆借_', '交易型资产_衍生品交易_') || m.FINPROD_ID finprodName,
+        decode(y.TYPE_8, 'F07', '交易型资产_债券质押式回购_' , 'F08', '交易型资产_拆借_', 'F10', '交易型资产_债券买断式回购_', '交易型资产_衍生品交易_') || m.FINPROD_ID finprodAbbr,
+        decode(y.TYPE_8, 'F07', '交易型资产_债券质押式回购_' , 'F08', '交易型资产_拆借_', 'F10', '交易型资产_债券买断式回购_', '交易型资产_衍生品交易_') || m.FINPROD_ID finprodName,
         m.VDATE,
         m.MDATE,
         m.PROFIT_TYPE profitType,
@@ -160,14 +310,23 @@
         m.TRADE_MARKET tradeMarket,
         null issueType,
         decode(y.TYPE_8, 'F07', decode(y.TYPE_7, '04', '01', ''), 'F08', decode(y.TYPE_7, '02', '01', ''), '03') investNature,
+        null isSevenDayCashable,
+        null isOpenEveryDay,
         y.TYPE_4 type4,
         y.TYPE_5 type5,
         y.TYPE_8 type6,
         y.TYPE_7 type7,
         y.TYPE_7 typeSeven,
         y.TYPE_9 type9,
-        y.TYPE_10 type10,y.TYPE_11 type11,
+        y.TYPE_10 type10,
+        y.TYPE_11 type11,
+        y.TYPE_12 type12,
         s.REP_ASSET_TYPE repAssetDept,
+        RAE.REP_SHARES_TYPE stockShareType,
+        null as stockTradeStatus,
+        null as astLastRedempDate,
+        null as astLastRebackDate,
+        null as astLastPayDate,
         null as bodyGradeType,
         null as bondGradeType,
         null as relOrgCode,
@@ -184,6 +343,10 @@
         <!-- add by etliu 增加资产属性:是否可提前支取 20200821 end -->
         <!-- add by zhangrui1 增加资产属性:是否流动性受限 start -->
         , null isFlowLimited
+        , null isLiquidity1
+        , null isLiquidity2
+        , null isLiquidity3
+        , null isBadAsset
         <!-- add by zhangrui1 增加资产属性:是否流动性受限 end -->
         <!-- add by zhangrui1 增加资产属性:机构主体类型 start -->
         , null customerObjType
@@ -192,6 +355,7 @@
         from FIN_TRADE_PRODUCT m
         <![CDATA[ inner join FIN_PRODUCT_TYPE y on m.FINPROD_ID=y.FINPROD_ID and m.BRANCH='0' and y.BRANCH='0' and m.FINPROD_TYPE <> 'F21' ]]>
         left join REP_ASSET_DEPT s on m.FINPROD_ID=s.REP_FINPROD_ID
+        left JOIN REP_ASSET_EQUITY RAE ON RAE.REP_FINPROD_ID =m.FINPROD_ID
         <where>
           mdate &gt;= to_date('${valDate}','yyyy-MM-dd')
             <if test="paramIdList != null and paramIdList.size() > 0">
@@ -293,7 +457,7 @@
         IS_HOLIDAY isHoliday
         from MST_HOLIDAY
         <where>
-            CDATE>=to_date('${valDate}','yyyy-MM-dd') and CDATE &lt;=add_months(to_date('${valDate}','yyyy-MM-dd'), 12)
+            CDATE>=add_months(to_date('${valDate}','yyyy-MM-dd'), -12) and CDATE &lt;=add_months(to_date('${valDate}','yyyy-MM-dd'), 12)
             <if test="paramIdList != null and paramIdList.size() > 0">
              and   CALENDAR_ID in
                 <foreach collection="paramIdList" item="item" open="(" close=")" separator=",">

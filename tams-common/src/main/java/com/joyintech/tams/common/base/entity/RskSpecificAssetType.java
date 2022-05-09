@@ -64,6 +64,21 @@ public class RskSpecificAssetType extends BaseEntity {
     private String isFlowLimited;
 
     /**
+     * 是否无活跃交易市场且需要采用估值技术确定公允价值资产
+     */
+    private String isLiquidity1;
+
+    /**
+     * 是否不具备活跃交易市场或者在活跃市场中无报价
+     */
+    private String isLiquidity2;
+
+    /**
+     * 是否7个工作日可变现资产
+     */
+    private String isLiquidity3;
+
+    /**
      * 取得 特殊资产类型ID
      * @return 特殊资产类型ID
      */
@@ -253,5 +268,29 @@ public class RskSpecificAssetType extends BaseEntity {
      */
     public void setIsFlowLimited(String isFlowLimited) {
         this.isFlowLimited = isFlowLimited == null ? null : isFlowLimited.trim();
+    }
+
+    public String getIsLiquidity1() {
+        return isLiquidity1;
+    }
+
+    public void setIsLiquidity1(String isLiquidity1) {
+        this.isLiquidity1 = isLiquidity1;
+    }
+
+    public String getIsLiquidity2() {
+        return isLiquidity2;
+    }
+
+    public void setIsLiquidity2(String isLiquidity2) {
+        this.isLiquidity2 = isLiquidity2;
+    }
+
+    public String getIsLiquidity3() {
+        return isLiquidity3;
+    }
+
+    public void setIsLiquidity3(String isLiquidity3) {
+        this.isLiquidity3 = isLiquidity3;
     }
 }

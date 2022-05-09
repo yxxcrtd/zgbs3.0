@@ -640,6 +640,7 @@
 		FIN_PRODUCT_ADD.IS_LAY isLay,
 		FIN_PRODUCT_ADD.LAY_TYPE layType,
 		FIN_PRODUCT_ADD.PROFIT_FLAG profitFlag,
+		FIN_PRODUCT_ADD.DIRECT_DISCLOSURE_RISK_FLAG directDisclosureRiskFlag,
 		FIN_PRODUCT.ENTRUST_TYPE entrustType,
 		FIN_PRODUCT.ENTRUSTER entruster,
 		FIN_RATE_INFO.RATE * 100 yield,
@@ -1439,6 +1440,7 @@
 		FIN_PRODUCT_ADD.DEAL_MODE dealMode,
 		FIN_PRODUCT.PROFIT_TYPE profitType,
 		FIN_PRODUCT_ADD.PROD_MANAGER prodManager,
+		FIN_PRODUCT_ADD.INVEST_MANAGER investManager,
 		FIN_PRODUCT.issue_type issueType,/*add by yejiejie 2019-2-11*/
 		<!-- 一体化对应etliu -->
 		<!-- FIN_RATE_INFO.RATE_TYPE rateType, -->
@@ -2061,6 +2063,7 @@
 		PA_FIN_PRODUCT.DEAL_MODE dealMode,
 		FIN_PRODUCT.PROFIT_TYPE profitType,
 		FIN_PRODUCT_ADD.PROD_MANAGER prodManager,
+		FIN_PRODUCT_ADD.INVEST_MANAGER investManager,
 		FIN_PRODUCT.issue_type issueType,/*add by yejiejie 2019-2-11*/
 		<!-- 一体化对应etliu -->
 		<!-- FIN_RATE_INFO.RATE_TYPE rateType, -->
@@ -2916,5 +2919,15 @@
 		where fcpr.finprod_id = #{finprodid}
 			--and fcpr.pay_type is not null
 		   	and rownum = 1
+	</select>
+
+	<select id = "getLastMdateByFinprodid" resultType="java.util.Date">
+		SELECT MIN(A.OPEN_DATE_STR) LASTMDATE
+		FROM FIN_OPEN_PLAN A
+				 left join FIN_PRODUCT B
+						   on NVL(B.P_FINPROD_ID, B.FINPROD_ID) = A.FINPROD_ID
+							   and B.FINPROD_TYPE2 ='F16' AND B.OPERATION_TYPE = '02'
+		where A.FINPROD_ID = #{finProdId,jdbcType=VARCHAR}
+		  and A.OPEN_DATE_END > #{lastvdate,jdbcType = DATE}
 	</select>
 </mapper>

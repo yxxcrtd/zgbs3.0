@@ -315,6 +315,16 @@ public class FinFundTargetDto extends FinProduct implements ProcessEntity {
     private String fundMangerName;
 
     /**
+     * 是否7日可变现资产
+     */
+    private String isSevenDayCashable;
+
+    /**
+     * 开放类型
+     */
+    private String openType;
+
+    /**
      * 获取 creditFlag
      * @return creditFlag.
      */
@@ -973,5 +983,21 @@ public class FinFundTargetDto extends FinProduct implements ProcessEntity {
 
     public void setFundMangerName(String fundMangerName) {
         this.fundMangerName = fundMangerName;
+    }
+
+    public String getIsSevenDayCashable() {
+        return isSevenDayCashable;
+    }
+
+    public void setIsSevenDayCashable(String isSevenDayCashable) {
+        this.isSevenDayCashable = isSevenDayCashable;
+    }
+
+    public String getOpenType() {
+        return openType;
+    }
+
+    public void setOpenType(String openType) {
+        this.openType = openType;
     }
 }

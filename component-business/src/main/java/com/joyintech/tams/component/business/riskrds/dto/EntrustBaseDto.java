@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.common.base.entity.TrdProductDeal;
+import com.joyintech.tams.invest.common.dto.common.BussRepoSecDto;
 
 import java.math.BigDecimal;
 
@@ -68,5 +69,15 @@ public class EntrustBaseDto extends EtrEntrust {
 
 	public void setfSettleAmt(BigDecimal fSettleAmt) {
 		this.fSettleAmt = fSettleAmt;
+	}
+
+	private BussRepoSecDto bussRepoSec;
+
+	public BussRepoSecDto getBussRepoSec() {
+		return bussRepoSec;
+	}
+
+	public void setBussRepoSec(BussRepoSecDto bussRepoSec) {
+		this.bussRepoSec = bussRepoSec;
 	}
 }

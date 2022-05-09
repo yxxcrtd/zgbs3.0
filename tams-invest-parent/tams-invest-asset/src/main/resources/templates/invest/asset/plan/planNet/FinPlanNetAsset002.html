@@ -46,6 +46,10 @@
 											data-th-value="${entity?.hapCreditAmt}" style="display: none">
 										<input type="text" id="creditFlag" name="creditFlag" style="display: none"
 											data-th-value="${entity?.creditFlag}">
+										<input type="hidden" id="profitType"   value="01"/>
+										<input type="hidden" id="dealMode"   value="01"/>
+										<input type="hidden" id="operationType"   value="01"/>
+										<input type="hidden" id="FinPlanNetAsset002_profitType"   value="01"/>
 										<!-- <div class=" form-inline-wrap">
 											<label class="layui-form-label form-label-wrap"
 												data-th-text="#{FinPlanNetAsset002.cmsId}">出账编号</label>
@@ -311,6 +315,7 @@
 													class="layui-input form-input input-dateSelect"
 													placeholder="请选择时间"
 													data-th-value="${#dates.format(entity?.mdate,'yyyy-MM-dd')}"
+													required="required"
 													data-th-placeholder="#{SysCommon.placeholder}"
 												>
 											</div>
@@ -517,10 +522,30 @@
 											</div>
 											<!-- 增加[增信措施、基金经理姓名] by caozhenming 20210715 end -->
 										</div>
+										<div class="layui-form-item">
+											<div class="form-inline-wrap">
+												<label class="layui-form-label form-label-wrap"
+													   data-th-text="#{FinPlanNetAsset002.isOpenEveryDay}">是否每日开放申赎</label>
+												<div class="layui-input-inline input-inline">
+													<select type="text" id="isOpenEveryDay" name="isOpenEveryDay"
+															class="layui-input form-input input-select"
+															formatoption="true" allowClear="true"
+															data-th-initValue='${entity?.isOpenEveryDay?:YES}'
+															required="required" placeholder="请输入内容"
+															data-th-data-result='${YES_OR_NO}'
+															data-th-placeholder="#{SysCommon.placeholder}">
+													</select>
+												</div>
+											</div>
+										</div>
 										<!-- 增加合同号，预警线，止损线，业务基准，法审编号，超额分成方式by赵东东 2019.9.29 end -->
 								</div>	
 							</div>
 						</div>
+						<!-- 开放计划共通 -->
+						<div class="page-component"
+							 th:data-path="@{/component/prod/BussFinProductOpenPlanCommonRate/init}"
+							 th:data-params="|{bussFinProductOpenPlanDto: 'bussFinProductOpenPlanDto',bussFinProductOpenPlanRedDto: 'bussFinProductOpenPlanRedDto', pageId: '${pageId}', workflowId: '${workflowId}', finprodId: '${finprodId}',profitType:'profitType', dealMode: 'dealMode', operationType: 'operationType', vdate: 'vdate', mdate: 'mdate', tradCalender: 'calendarId', raiseStrDate: 'FinNetValueProductBuild002_firstSaleVdate', raiseEndDate: 'FinNetValueProductBuild002_firstSaleMdate', purConfDays: 'FinNetValueProductBuild002_purSpeed', isCycle: 'FinNetValueProductBuild002_isCycle', closeTerm: 'FinNetValueProductBuild002_closeDays',pageModel: '${pageModel}'}|"></div>
                         <!-- 增加推荐方与推荐费率 add by renping 20191014 start -->
 						<!-- 资产推荐方及费率信息 -->
 						<div id="bussFinRecomment" class="page-component"
@@ -603,6 +628,8 @@
 			var CE_MODEL = /*[[${CE_MODEL}]]*/'02';
 			var FINPROD_TYPE_TG_F17 = /*[[${FINPROD_TYPE_TG_F17}]]*/'';
 			var IS_SHOW_TYPE = /*[[${isShowType}]]*/'01';
+			var PROFIT_TYPE_02 = /*[[${PROFIT_TYPE_02}]]*/'02'; // 数据字典.收益类型_预期收益
+			var YES = /*[[${YES}]]*/'Y'; // 数据字典.是否_是
 		</script>
 		<script data-th-src="@{/js/component/asset/BussAssetFiveType.js}" type="text/javascript"></script>
 		<script data-th-src="@{/js/component/common/util.js}" type="text/javascript"></script>

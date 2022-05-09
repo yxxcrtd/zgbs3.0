@@ -273,6 +273,7 @@ WHERE
         END) transMode,*/
         B.PUR_SPEED,
         B.RED_SPEED,
+        B.IS_OPEN_EVERYDAY isOpenEveryDay,
         <!--update by zhangnian 20190916 end-->
         B.CREDIT_ENHANCE_MEASURE creditEnhanceMeasure,
         B.FUND_MANGER_NAME fundMangerName,

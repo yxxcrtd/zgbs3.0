@@ -55,11 +55,9 @@ public class FinTenderBondAsset002Controller extends BaseController {
     public Message<Map<String, Object>> init() {
         Map<String, Object> params = new HashMap<>();
         String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
-        boolean todoList = false;
         FinTenderBondAsset002Dto entity = new FinTenderBondAsset002Dto();
         // 待办中过来
-        if (!WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotEmpty(workflowId)) {
-            todoList = true;
+        if (StringUtil.isNotEmpty(workflowId)) {
             entity = finTenderBoundAssetService.getBussinessEntityByWorkflowId(workflowId);
             params.put("businessId", entity.getFinprodMarketId());
         } else {//来自新增或者修改
@@ -100,7 +98,7 @@ public class FinTenderBondAsset002Controller extends BaseController {
         //流程id
         params.put("workflowId", workflowId);
         //是否流程中打开
-        params.put("todoList", todoList);
+        params.put("todoList", getParam("todoList"));
         return Message.success("校验成功", params);
     }
 

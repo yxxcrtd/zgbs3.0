@@ -10,7 +10,8 @@
         	openType: $('#issueMode').val(),
         	profitType: $('#profitType').val(),
         	portfolioType: $('#portfolioType').val(),
-        	ptlBagId:ptlBagId
+        	ptlBagId:ptlBagId,
+            isRule:isRule
         }
     };
     /**

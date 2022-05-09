@@ -4,6 +4,19 @@
 	layout:decorator="~{layout/default}">
 <head>
 <title data-th-text="#{RskSupervisionIndividuation002}">新增条件</title>
+	<style>
+		.line24{
+			padding:1px 15px 9px 15px;
+		}
+		.line24 i{
+			height:12px;
+		}
+		.time-line{
+			float: left;
+			width: 35px !important;
+			line-height: 25px;
+		}
+	</style>
 </head>
 <body>
 	<div layout:fragment="content">
@@ -19,7 +32,7 @@
 			<div class="pro-module">
 				<div class="pro-module-item">
 					<div class="layui-form-item" style="margin-left: 20px">
-						<label class="layui-form-label line24"
+						<label class="layui-form-label line24" style="width: 10% !important"
 							data-th-text="#{RskSupervisionIndividuation002.ruleName}">条件项</label>
 						<div class="layui-input-inline input-inline"
 							style="width: 70% !important">
@@ -32,7 +45,7 @@
 						</div>
 					</div>
 					<div class="layui-form-item" style="margin-left: 20px;">
-						<label class="layui-form-label line24"
+						<label class="layui-form-label line24" style="width: 10% !important"
 							data-th-text="#{RskSupervisionIndividuation002.controlType}">控制类型</label>
 						<div class="layui-input-inline input-inline"
 							style="width: 70% !important">
@@ -46,7 +59,7 @@
 					</div>
 					<div class="layui-form-item"
 						style="margin-bottom: 8px; margin-left: 20px">
-						<label class="layui-form-label line24"
+						<label class="layui-form-label line24" style="width: 10% !important"
 							data-th-text="#{RskSupervisionIndividuation002.value}">数值</label>
 						<div id="valueRangeDiv">
 							<div class="layui-input-inline input-inline"
@@ -107,6 +120,71 @@
 									placeholder="请输入内容" required />
 							</div>
 						</div>
+						<div id="onDateRangeDiv">
+							<div class="time-line">
+								<span style="margin: 0px 2px 0px 2px">前置</span>
+							</div>
+							<div class="layui-input-inline input-inline" style="width: 14% !important">
+								<select id="dateStr" name="dateStr" required="required"
+										class="layui-input form-input input-select"
+										data-th-placeholder="#{SysCommon.placeholder}"
+										data-th-initValue="${entity?.dateStr}"
+										data-th-data-result='${DATE_OPTIONS}'>
+								</select>
+							</div>
+							<div style="float: left;width: 20px !important;" class="text-center">
+								<span style="margin: 0px 2px 0px 2px;font-size: 18px;">-</span>
+							</div>
+							<div class="layui-input-inline input-inline" style="width: 80px !important;">
+								<input type="text" id="valueStr4" name="valueStr4"
+									   class="layui-input form-input text-number"
+									   style="display: inline-block;"
+									   placeholder="请输入内容" data-textrange="0" maxlength=3
+									   data-th-value='${entity?.valueStr}'
+									   data-th-placeholder="#{SysCommon.placeholder}" required />
+							</div>
+							<div class="layui-input-inline input-inline" style="width: 100px !important">
+								<select id="dateUnitStr" name="dateUnitStr" required="required"
+										class="layui-input form-input input-select"
+										data-th-placeholder="#{SysCommon.placeholder}"
+										data-th-initValue="${entity?.dateUnitStr}"
+										data-th-data-result='${DIS_DATE_TYPE}'>
+								</select>
+							</div>
+							<div class="text-center time-line">
+								<span style="margin: 0px 2px 0px 2px">至</span>
+							</div>
+							<div class="time-line">
+								<span style="margin: 0px 2px 0px 2px">后置</span>
+							</div>
+							<div class="layui-input-inline input-inline" style="width: 14% !important">
+								<select id="dateEnd" name="dateEnd" required="required"
+										class="layui-input form-input input-select"
+										data-th-placeholder="#{SysCommon.placeholder}"
+										data-th-initValue="${entity?.dateEnd}"
+										data-th-data-result='${DATE_OPTIONS}'>
+								</select>
+							</div>
+							<div style="float: left;width: 20px !important;" class="text-center">
+								<span style="margin: 0px 2px 0px 2px;font-size: 18px;">+</span>
+							</div>
+							<div class="layui-input-inline input-inline" style="width: 80px !important">
+								<input type="text" id="valueEnd4" name="valueEnd4"
+									   class="layui-input form-input text-number"
+									   style="display: inline-block;"
+									   placeholder="请输入内容" data-textrange="0" maxlength=3
+									   data-th-value='${entity?.valueEnd}'
+									   data-th-placeholder="#{SysCommon.placeholder}" required />
+							</div>
+							<div class="layui-input-inline input-inline" style="width: 100px !important">
+								<select id="dateUnitEnd" name="dateUnitEnd" required="required"
+										class="layui-input form-input input-select"
+										data-th-placeholder="#{SysCommon.placeholder}"
+										data-th-initValue="${entity?.dateUnitEnd}"
+										data-th-data-result='${DIS_DATE_TYPE}'>
+								</select>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -123,10 +201,19 @@
 	<div layout:fragment="script">
 		<script data-th-inline="javascript" type="text/javascript">
 			var CONTROL_TYPE_05 = /*[[${CONTROL_TYPE_05}]]*/'';//范围控制
+			var CONDITION_ITEM_04 = /*[[${CONDITION_ITEM_04}]]*/'';//启用时间
 			var CONDITION_ITEM_03 = /*[[${CONDITION_ITEM_03}]]*/'';//建仓期时间
 			var CONDITION_ITEM_02 = /*[[${CONDITION_ITEM_02}]]*/'';//单位净值控制
+			var DIS_DATE_TYPE_01 = /*[[${DIS_DATE_TYPE_01}]]*/'';//工作日
+			var DIS_DATE_TYPE_02 = /*[[${DIS_DATE_TYPE_02}]]*/'';//自然日
 			var entity = /*[[${entity}]]*/'';
 			var VDATE = /*[[${VDATE}]]*/'';
+			var OPTION1 = /*[[${OPTION1}]]*/'';
+			var OPTION2 = /*[[${OPTION2}]]*/'';
+			var OPTION3 = /*[[${OPTION3}]]*/'';
+			var OPTION4 = /*[[${OPTION4}]]*/'';
+			var OPTION5 = /*[[${OPTION5}]]*/'';
+			var OPTION6 = /*[[${OPTION6}]]*/'';
 		</script>
 
 		<script

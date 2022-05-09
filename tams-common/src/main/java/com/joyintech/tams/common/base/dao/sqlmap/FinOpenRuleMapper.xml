@@ -22,13 +22,16 @@
         <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
         <result column="CPRICE_RULE" property="cpriceRule" jdbcType="VARCHAR" />
         <result column="OPEN_DAYS_TYPE" property="openDaysType" jdbcType="VARCHAR" />
+        <result column="PUR_SPEED" property="purSpeed" jdbcType="DECIMAL" />
+        <result column="RED_SPEED" property="redSpeed" jdbcType="DECIMAL" />
     </resultMap>
     <sql id="Base_Column_List" >
         CASH_ID CASH_ID, OPEN_TYPE OPEN_TYPE, OPEN_MODE OPEN_MODE, OPEN_DAYS OPEN_DAYS, OPEN_CYCLE OPEN_CYCLE, 
         OPEN_CYCLE_UNIT OPEN_CYCLE_UNIT, DAY_TYPE DAY_TYPE, DAY_VALUE DAY_VALUE, CALC_METHOD CALC_METHOD, 
         FIRST_OPEN_DATE FIRST_OPEN_DATE, TRADEDAY_RULE TRADEDAY_RULE, HDAY_OPEN_FLAG HDAY_OPEN_FLAG, 
         CALC_RULE CALC_RULE, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, 
-        UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME, CPRICE_RULE CPRICE_RULE, OPEN_DAYS_TYPE OPEN_DAYS_TYPE
+        UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME, CPRICE_RULE CPRICE_RULE, OPEN_DAYS_TYPE OPEN_DAYS_TYPE,
+        PUR_SPEED PUR_SPEED, RED_SPEED RED_SPEED
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -59,14 +62,16 @@
             FIRST_OPEN_DATE, TRADEDAY_RULE, HDAY_OPEN_FLAG, 
             CALC_RULE, CREATE_USER, CREATE_DEPT, 
             CREATE_TIME, UPDATE_USER, UPDATE_TIME, 
-            CPRICE_RULE, OPEN_DAYS_TYPE)
+            CPRICE_RULE, OPEN_DAYS_TYPE, PUR_SPEED,
+            RED_SPEED)
         values (#{cashId,jdbcType=VARCHAR}, #{openType,jdbcType=VARCHAR}, #{openMode,jdbcType=VARCHAR}, 
             #{openDays,jdbcType=DECIMAL}, #{openCycle,jdbcType=DECIMAL}, #{openCycleUnit,jdbcType=VARCHAR}, 
             #{dayType,jdbcType=VARCHAR}, #{dayValue,jdbcType=VARCHAR}, #{calcMethod,jdbcType=VARCHAR}, 
             #{firstOpenDate,jdbcType=DATE}, #{tradedayRule,jdbcType=VARCHAR}, #{hdayOpenFlag,jdbcType=VARCHAR}, 
             #{calcRule,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, 
             #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
-            #{cpriceRule,jdbcType=VARCHAR}, #{openDaysType,jdbcType=VARCHAR})
+            #{cpriceRule,jdbcType=VARCHAR}, #{openDaysType,jdbcType=VARCHAR}, #{purSpeed,jdbcType=DECIMAL},
+            #{redSpeed,jdbcType=DECIMAL})
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.FinOpenRule" >
         insert into FIN_OPEN_RULE
@@ -131,6 +136,12 @@
             <if test="openDaysType != null" >
                 OPEN_DAYS_TYPE,
             </if>
+            <if test="purSpeed != null" >
+                PUR_SPEED,
+            </if>
+            <if test="redSpeed != null" >
+                RED_SPEED,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="cashId != null" >
@@ -193,17 +204,23 @@
             <if test="openDaysType != null" >
                 #{openDaysType,jdbcType=VARCHAR},
             </if>
+            <if test="purSpeed != null" >
+                #{purSpeed,jdbcType=DECIMAL},
+            </if>
+            <if test="redSpeed != null" >
+                #{redSpeed,jdbcType=DECIMAL},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.FinOpenRule" >
         insert into FIN_OPEN_RULE(CASH_ID, OPEN_TYPE, OPEN_MODE, OPEN_DAYS, OPEN_CYCLE, OPEN_CYCLE_UNIT, 
         DAY_TYPE, DAY_VALUE, CALC_METHOD, FIRST_OPEN_DATE, TRADEDAY_RULE, HDAY_OPEN_FLAG, 
         CALC_RULE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, CPRICE_RULE, 
-        OPEN_DAYS_TYPE)
+        OPEN_DAYS_TYPE, PUR_SPEED, RED_SPEED)
         select CASH_ID, OPEN_TYPE, OPEN_MODE, OPEN_DAYS, OPEN_CYCLE, OPEN_CYCLE_UNIT, 
             DAY_TYPE, DAY_VALUE, CALC_METHOD, FIRST_OPEN_DATE, TRADEDAY_RULE, HDAY_OPEN_FLAG, 
             CALC_RULE, CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME, CPRICE_RULE, 
-            OPEN_DAYS_TYPE
+            OPEN_DAYS_TYPE, PUR_SPEED, RED_SPEED
              from FIN_OPEN_RULE
              where 1 = 1 and CASH_ID = #{cashId,jdbcType=VARCHAR} and OPEN_TYPE = #{openType,jdbcType=VARCHAR}
     </insert>
@@ -255,6 +272,12 @@
             <if test="openDaysType != null" >
                 OPEN_DAYS_TYPE = #{openDaysType,jdbcType=VARCHAR},
             </if>
+            <if test="purSpeed != null" >
+                PUR_SPEED = #{purSpeed,jdbcType=DECIMAL},
+            </if>
+            <if test="redSpeed != null" >
+                RED_SPEED = #{redSpeed,jdbcType=DECIMAL},
+            </if>
         </set>
         where CASH_ID = #{cashId,jdbcType=VARCHAR}
           and OPEN_TYPE = #{openType,jdbcType=VARCHAR}
@@ -275,7 +298,9 @@
             UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
             UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
             CPRICE_RULE = #{cpriceRule,jdbcType=VARCHAR},
-            OPEN_DAYS_TYPE = #{openDaysType,jdbcType=VARCHAR}
+            OPEN_DAYS_TYPE = #{openDaysType,jdbcType=VARCHAR},
+            PUR_SPEED = #{purSpeed,jdbcType=DECIMAL},
+            RED_SPEED = #{redSpeed,jdbcType=DECIMAL}
         where CASH_ID = #{cashId,jdbcType=VARCHAR}
           and OPEN_TYPE = #{openType,jdbcType=VARCHAR}
     </update>

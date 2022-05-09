@@ -51,7 +51,7 @@ public class FinPlanProfitAssetController {
      */
     @GetMapping("getFinProdMarketId")
     public List<SuggestDto> getFinProdMarketId(String finprodMarketId)
-    {
+        throws Exception {
         return finPlanProfitAssetService.getFinProdMarketId(finprodMarketId);
     }
     /**
@@ -65,7 +65,7 @@ public class FinPlanProfitAssetController {
      */
     @PostMapping("findPage/{page}/{length}")
     public Page<FinPlanProfitAssetDto> selectAll(@RequestBody Map<String, Object> param,
-                                                 @PathVariable("page") int page, @PathVariable("length") int length) {
+                                                 @PathVariable("page") int page, @PathVariable("length") int length) throws Exception {
         return finPlanProfitAssetService.selectForPage(page, length, param);
     }
     
@@ -78,7 +78,7 @@ public class FinPlanProfitAssetController {
     @DTXTransaction
     @PostMapping("delete")
     public void delete(@RequestBody FinPlanProfitAssetDto dto)
-    {
+        throws Exception {
         finPlanProfitAssetService.delete(dto);
     }
     /**
@@ -90,7 +90,7 @@ public class FinPlanProfitAssetController {
     @DTXTransaction
     @PostMapping("insert")
     public void insert(@RequestBody FinPlanProfitAssetDto dto)
-    {
+            throws Exception {
         finPlanProfitAssetService.insert(dto);
     }
 
@@ -103,7 +103,7 @@ public class FinPlanProfitAssetController {
     @DTXTransaction
     @PostMapping("update")
     public void update(@RequestBody FinPlanProfitAssetDto dto)
-    {
+            throws Exception {
         finPlanProfitAssetService.update(dto);
     }
     /**

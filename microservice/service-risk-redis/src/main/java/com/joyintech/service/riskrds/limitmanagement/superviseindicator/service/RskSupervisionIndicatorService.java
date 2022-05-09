@@ -202,6 +202,17 @@ public class RskSupervisionIndicatorService extends BaseService<RskSupervisionIn
     }
 
     /**
+     * 查询监督指标
+     *
+     * @param map
+     * @return
+     * @since 1.0
+     */
+    public RskSupervisionIndicator002Dto querySuperIndicatorInfoByIndId_RULE(Map<String, Object> map) {
+        return rskSupervisionIndicatorMapper.querySuperIndicatorInfoByIndId_RULE(map);
+    }
+
+    /**
      * 查询组合关联指标
      * 
      * @param map

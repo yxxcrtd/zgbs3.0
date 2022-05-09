@@ -1,9 +1,6 @@
 package com.joyintech.tams.invest.common.risktrialrds.dao;
 
-import com.joyintech.tams.common.base.entity.PtlPortfolioValuation;
-import com.joyintech.tams.common.base.entity.RskIndividAssetDel;
-import com.joyintech.tams.common.base.entity.RskIndividSpecialStage;
-import com.joyintech.tams.common.base.entity.RskIndividUnite;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.invest.common.risktrialrds.dto.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -35,6 +32,8 @@ public interface RiskTrialCommMapper {
 	List<RiskIndividConditionDto> getRiskIndividCondition();
 
 	List<PtlPortfolioValuation> getPortfValuation(@Param(value = "valDate") String valDate);
+
+	List<FinOpenPlan> getPortfOpenPlan(@Param(value = "valDate") String valDate);
 
 	List<RskIndividSpecialStage> getRiskIndividSpecialStage(@Param(value = "valDate") String valDate, @Param(value = "uniteType") String uniteType);
 

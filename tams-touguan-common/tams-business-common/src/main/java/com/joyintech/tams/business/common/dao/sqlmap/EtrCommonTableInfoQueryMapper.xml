@@ -11,7 +11,7 @@
 		to_char( his.OPER_TIME, 'hh24:mi:ss' ) OPER_TIME,
 		his.BUSI_DES,
 	    CASE WHEN his.OPER_TYPE = '01' THEN
-                nvl(SU2.real_name,nvl(SUR.REAL_NAME,SUB.REAL_NAME))
+                nvl(nvl(SU2.real_name,nvl(SUR.REAL_NAME,SUB.REAL_NAME)),SU.real_name)
 	         ELSE SU.real_name
 		END AS userId
         from ETR_ENTRUST_OPER_HIS his

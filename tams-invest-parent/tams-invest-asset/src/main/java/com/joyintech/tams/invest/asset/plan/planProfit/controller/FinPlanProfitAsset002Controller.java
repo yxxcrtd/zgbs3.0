@@ -116,6 +116,7 @@ public class FinPlanProfitAsset002Controller extends BaseController{
                 DictCode.资产_负债二级类别,
                 DictCode.投资性质,
                 DictCode.资产来源,
+                DictCode.是否,
                 DictCode.资产来源条线,
                 DictCode.增信措施);
         model.addAttribute("FINPROD_TYPE_TG_F17",DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue());
@@ -123,6 +124,8 @@ public class FinPlanProfitAsset002Controller extends BaseController{
         model.addAttribute("INT_ASSET_TYPE", DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue());
         model.addAttribute("YES", DictCodeList.是否_是.getValue());
         model.addAttribute("ASSET_TYPE_PARENTPLAN", DictCodeListExt1.金融产品类型_投管用_母资管计划.getValue());
+        model.addAttribute("PROFIT_TYPE_02", DictCodeList.收益类型_收益型.getValue());
+        model.addAttribute("YES", DictCodeList.是否_是.getValue());
         String finprodId = getParam("finprodId");
         /* 增加快捷录入 add by zhuyongkang 2019/10/12 start*/
         String finprodMarketId=getParam("finprodMarketId");
@@ -167,6 +170,7 @@ public class FinPlanProfitAsset002Controller extends BaseController{
                     }
                 }
                 model.addAttribute("entity",finPlanAssetRInfo);
+                model.addAttribute("finprodId", finprodId);
             }
         }
         model.addAttribute("publicOffPlan", DictCodeList.计划类资产二级分类_公募计划.getValue());
