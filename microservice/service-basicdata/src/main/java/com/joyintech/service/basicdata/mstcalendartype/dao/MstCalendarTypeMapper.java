@@ -13,6 +13,7 @@ package com.joyintech.service.basicdata.mstcalendartype.dao;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import com.joyintech.framework.select.SelectOptionDto;
@@ -156,4 +157,8 @@ public interface MstCalendarTypeMapper {
      * @since 1.0
      */
     List<SuggestDto> getTradeCalendarName(Map<String, Object> map);
+
+    // TISHKS-725:增加日历类型是否被使用校验 modify by fuyongsheng 20220507 start
+    Integer hasCalendarName(@Param("calendarName") String calendarName);
+    // TISHKS-725:增加日历类型是否被使用校验 modify by fuyongsheng 20220507 end
 }
