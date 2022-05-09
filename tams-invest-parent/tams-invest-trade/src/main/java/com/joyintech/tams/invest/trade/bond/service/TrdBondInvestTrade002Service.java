@@ -1949,7 +1949,12 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
                 exchangeTransMatchCommonService.transactionRecord(entity.getDealSqeId(),trdFinProductDealTotal.getTotleTradeId(),operationType);
             }
             if(StringUtil.isNotEmpty(entity.getBondFirstSign()) && StringUtil.equals("01",entity.getBondFirstSign())){
-                sendPositionMethod(entity);
+                // ZGCPCN-252:银行间和场内公用代码,银行间改造新头寸,目前场内尚未支持,后续支持再处理 modify by fuyongsheng 20220509 start
+                if(!DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(entity.getTradeMarket())
+                        && !DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(entity.getTradeMarket())){
+                    sendPositionMethod(entity);
+                }
+                // ZGCPCN-252:银行间和场内公用代码,银行间改造新头寸,目前场内尚未支持,后续支持再处理 modify by fuyongsheng 20220509 end
             }
         }
         // 撤销
@@ -2006,9 +2011,13 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
 
             exchangeTransMatchCommonService.transactionRecord(entity.getDealSqeId(),entity.getTotleTradeId(),OperationType.REVOKE);
             if(StringUtil.isNotEmpty(entity.getBondFirstSign()) && StringUtil.equals("01",entity.getBondFirstSign())){
-                PositionHttpRequest.dorevoke(entity.getTotleTradeId(),DictCodeListExt1.子系统代码_交易.getValue(),DictCodeListExt3.头寸业务类型_债券一级投标.getValue(),entity.getPs());
+                // ZGCPCN-252:银行间和场内公用代码,银行间改造新头寸,目前场内尚未支持,后续支持再处理 modify by fuyongsheng 20220509 start
+                if(!DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(entity.getTradeMarket())
+                        && !DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(entity.getTradeMarket())){
+                    PositionHttpRequest.dorevoke(entity.getTotleTradeId(),DictCodeListExt1.子系统代码_交易.getValue(),DictCodeListExt3.头寸业务类型_债券一级投标.getValue(),entity.getPs());
+                }
+                // ZGCPCN-252:银行间和场内公用代码,银行间改造新头寸,目前场内尚未支持,后续支持再处理 modify by fuyongsheng 20220509 end
             }
-
         }
         // 如果中标结果进来 add by gejiaao 2019年8月6日 start
 //        if (StringUtil.isNotEmpty(entity.getBondFirstSign())) {
