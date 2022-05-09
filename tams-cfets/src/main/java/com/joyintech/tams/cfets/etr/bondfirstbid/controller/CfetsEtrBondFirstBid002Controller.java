@@ -19,6 +19,7 @@ import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
@@ -109,7 +110,8 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
     @ApiOperation(value = "新建/修改提交时校验", notes = "新建/修改提交时校验")
     public Message<AjaxResult> checkSave(@RequestBody CfetsEtrBondFirstBidSaveRequest cfetsDto) {
         try {
-            AjaxResult ajax= cfetsEtrBondFirstBid002Service.checkSave(cfetsDto);
+            //AjaxResult ajax= cfetsEtrBondFirstBid002Service.checkSave(cfetsDto);
+            AjaxResult ajax= new AjaxResult();
             if(null!=ajax){
                 return new Message<AjaxResult>().success().setData(ajax);
             }else{
@@ -126,7 +128,7 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
     @PostMapping("save")
     public Message<AjaxResult> save(@RequestBody CfetsEtrBondFirstBidSaveRequest cfetsDto) {
 
-        if (StringUtil.equals(cfetsDto.getOperateType(), OperationType.MODIFY.name())
+        if (StringUtil.isNotEmpty(cfetsDto.getEntrustId())
                 && (StringUtil.equals(cfetsDto.getIssueClass(), DictCodeListExt4.新债_发行方式_招标发行.getValue())
                 || StringUtil.equals(cfetsDto.getIssueClass(), DictCodeListExt4.新债_发行方式_簿记建档.getValue()))) {
             //根据指令代码获取指令信息
@@ -164,7 +166,7 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
         try {
             if (StringUtil.equals(BussinessConstant.SUBMIT, allDto.getOperateType())) {
                 AjaxResult ar = EntrustRdsCommonAop.doListPreOccupy(
-                        dataList, DictCodeList.平安资产类型_一级市场债.getValue(),
+                        dataList, DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue(),
                         BussinessDictCodeListRds.接口系统ID_预占批量接口.getValue(),
                         true, null);
                 if (StringUtil.isNotEmpty(ar)) {

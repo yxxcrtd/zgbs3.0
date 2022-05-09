@@ -207,6 +207,20 @@ public class CfetsEtrFinProductInfoResponse {
     private BigDecimal tenderUnit;
 
     /**
+     * 最大投标标位数
+     */
+    @ApiModelProperty(name = "maxTenderUnit", value = "最大投标标位数")
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal maxTenderUnit;
+
+    /**
+     * 最大投标标位差
+     */
+    @ApiModelProperty(name = "maxTenderPlus", value = "最大投标标位差")
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal maxTenderPlus;
+
+    /**
      * 连续投标限制
      */
     @ApiModelProperty(name = "seriYN", value = "连续投标限制")
@@ -875,5 +889,21 @@ public class CfetsEtrFinProductInfoResponse {
 
     public void setIntType(String intType) {
         this.intType = intType;
+    }
+
+    public BigDecimal getMaxTenderUnit() {
+        return maxTenderUnit;
+    }
+
+    public void setMaxTenderUnit(BigDecimal maxTenderUnit) {
+        this.maxTenderUnit = maxTenderUnit;
+    }
+
+    public BigDecimal getMaxTenderPlus() {
+        return maxTenderPlus;
+    }
+
+    public void setMaxTenderPlus(BigDecimal maxTenderPlus) {
+        this.maxTenderPlus = maxTenderPlus;
     }
 }

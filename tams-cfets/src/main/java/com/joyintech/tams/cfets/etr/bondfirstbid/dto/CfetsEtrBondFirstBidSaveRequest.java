@@ -116,6 +116,12 @@ public class CfetsEtrBondFirstBidSaveRequest extends EtrEntrust implements Proce
     private String softSkipMode;
 
     /**
+     * 是否修改 Y：修改
+     */
+    @ApiModelProperty(name="isModify",value="是否修改？Y：修改",example="Y")
+    private String isModify;
+
+    /**
      * 授信软控是否继续？Y：继续
      */
     @ApiModelProperty(name="creditIsContinue",value="授信软控是否继续？Y：继续",example="Y")
@@ -280,5 +286,13 @@ public class CfetsEtrBondFirstBidSaveRequest extends EtrEntrust implements Proce
 
     public void setCreditIsContinue(String creditIsContinue) {
         this.creditIsContinue = creditIsContinue;
+    }
+
+    public String getIsModify() {
+        return isModify;
+    }
+
+    public void setIsModify(String isModify) {
+        this.isModify = isModify;
     }
 }
