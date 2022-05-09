@@ -47,7 +47,7 @@
             ISSUE.TENDER_TARGET as tenderTarget,
             ISSUE.ISSUE_STYLE as issueStyle,
             round(ISSUE.PLAN_ISSUE_AMT/100000000,2) as planIssueAmt,
-            nvl(ISSUE.ISSUE_DATE,PRODUCT_ADD.BID_DATE) as issueDate,
+            nvl(ISSUE.ISSUE_DATE,ISSUE.TENDER_SDATE) as issueDate,
             ISSUE.PAY_EDATE as payEdate,
             ISSUE.ASSIGN_REGDATE as assignRegdate,
             case when PRODUCT.CIRCULATION_CODE is not null then PRODUCT.CIRCULATION_DATE else PRODUCT_ADD.LISTING_DATE end as listingDate,
@@ -126,19 +126,19 @@
                 AND ISSUE.ISSUE_STYLE=#{issueStyle,jdbcType=VARCHAR}
             </if>
             <if test="type9List != null and type9List.size() > 0">
-                AND PRODUCT_TYPE.type9 in
+                AND PRODUCT_TYPE.type_9 in
                 <foreach collection="type9List" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
             </if>
             <if test="type10List != null and type10List.size() > 0">
-                AND PRODUCT_TYPE.type10 in
+                AND PRODUCT_TYPE.type_10 in
                 <foreach collection="type10List" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
             </if>
             <if test="type11List != null and type11List.size() > 0">
-                AND PRODUCT_TYPE.type11 in
+                AND PRODUCT_TYPE.type_11 in
                 <foreach collection="type11List" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
@@ -621,8 +621,7 @@
 
     <select id="selectTotleTradeId" resultType="java.lang.String">
         select T.TOTLE_TRADE_ID from TRD_FIN_PRODUCT_DEAL_TOTAL T
-        inner join TRD_FIN_PRODUCT_BARTER_TOTAL B on T.TOTLE_TRADE_ID=B.TRADE_ID ||'R'
-        where T.FINPROD_ID=#{finprodId,jdbcType=VARCHAR} and rownum=1
+        where T.FINPROD_ID=#{finprodId,jdbcType=VARCHAR} and T.IS_CANCEL='N' and rownum=1
     </select>
 
     <select id="getWindType" resultType="com.joyintech.tams.common.base.entity.FinProductTypeConfig">

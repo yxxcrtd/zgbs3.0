@@ -30,3 +30,7 @@ values ('preBatchCheckGrp', '88616', 'system', '', sysdate, 'system', sysdate);
 delete from sys_datadict_list where DICT_CODE ='CHECK_POINT' and ITEM_CODE='88616';
 insert into sys_datadict_list (DICT_CODE, ITEM_CODE, ITEM_VALUE, ORDER_NO, DEFAULT_VALUE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE)
 values ('CHECK_POINT', '88616', '日终是否自动上市流通', 13, '0', 'system', '', sysdate, 'system', sysdate, '');
+
+delete from CFG_DATATABLE_SHOW where PAGECODE='FinTenderBondAsset001' and DTCODE='FinTenderBondAsset001List' and SPCDCODE='999999' and RANGEID='COMM' and COLCODE='finprodMarketId';
+INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
+VALUES ('FinTenderBondAsset001', 'FinTenderBondAsset001List', '999999', 'finprodMarketId', '资产代码', null, 3, 1, 0, 1, 100, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, null, null, 1);
