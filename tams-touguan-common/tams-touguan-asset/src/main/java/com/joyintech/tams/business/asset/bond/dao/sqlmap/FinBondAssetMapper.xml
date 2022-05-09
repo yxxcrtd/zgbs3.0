@@ -1517,6 +1517,6 @@
     </select>
 
     <update id="deleteFileByBussinessId" >
-        delete from SYS_UPLOAD_FILE_INFO  where BUSINESS_ID = #{finprodId,jdbcType=VARCHAR},
+        delete from SYS_UPLOAD_FILE_INFO  where BUSINESS_ID = #{finprodId,jdbcType=VARCHAR}
     </update>
 </mapper>

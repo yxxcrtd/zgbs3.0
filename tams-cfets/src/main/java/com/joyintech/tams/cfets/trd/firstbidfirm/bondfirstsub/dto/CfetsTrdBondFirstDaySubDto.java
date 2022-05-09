@@ -47,7 +47,7 @@ public class CfetsTrdBondFirstDaySubDto {
     private BigDecimal settFeeAmt;
 
     @ApiModelProperty(name = "rate", value = "参考收益率/票面利率", example = "99.0000")
-    private BigDecimal rate;
+    private String rate;
 
     @ApiModelProperty(name = "issueClass", value = "发行方式")
     private String issueClass;
@@ -183,11 +183,11 @@ public class CfetsTrdBondFirstDaySubDto {
         this.settFeeAmt = settFeeAmt;
     }
 
-    public BigDecimal getRate() {
+    public String getRate() {
         return rate;
     }
 
-    public void setRate(BigDecimal rate) {
+    public void setRate(String rate) {
         this.rate = rate;
     }
 

@@ -1,6 +1,5 @@
 package com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.controller;
 
-import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
@@ -10,6 +9,7 @@ import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoDetailQueryDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinBondMarketInfoQueryRequest;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.service.FinBondMarketInfoQuery001Service;
@@ -88,7 +88,6 @@ public class FinBondMarketInfoQuery001Controller extends BaseController {
     @PostMapping("/detailInfo")
     @ApiOperation(value = "债券市场信息查看", notes = "债券市场信息查看")
     public Message<FinListedBondInfoQuery001Dto> detailInfo(@RequestParam("secId") String secId) {
-        AjaxResult ar = new AjaxResult();
         FinListedBondInfoQuery001Dto dto = finBondMarketInfoQuery001Service.detailInfo(secId);
         if (StringUtil.isNotEmpty(dto)) {
             return Message.success("success", dto);
@@ -96,4 +95,17 @@ public class FinBondMarketInfoQuery001Controller extends BaseController {
             return Message.fail("资产代码不存在.");
         }
     }
+
+    @ResponseBody
+    @PostMapping("/bondMarketInfo")
+    @ApiOperation(value = "债券市场信息查看(接口数据)", notes = "债券市场信息查看(接口数据)")
+    public Message<FinBondMarketInfoDetailQueryDto> queryFinBondMarketForCoupons(@RequestParam("secId") String secId) {
+        FinBondMarketInfoDetailQueryDto dto = finBondMarketInfoQuery001Service.queryFinBondMarketForCoupons(secId);
+        if (StringUtil.isNotEmpty(dto)) {
+            return Message.success("success", dto);
+        } else {
+            return Message.fail("资产代码不存在.");
+        }
+    }
+
 }

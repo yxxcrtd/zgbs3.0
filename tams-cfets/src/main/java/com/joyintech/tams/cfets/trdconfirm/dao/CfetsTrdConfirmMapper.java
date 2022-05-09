@@ -1,9 +1,9 @@
 package com.joyintech.tams.cfets.trdconfirm.dao;
 
 
-
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbBondinfoDto;
 import com.joyintech.tams.cfets.trdconfirm.dto.*;
+import com.joyintech.tams.common.base.entity.FinProductAdd;
 import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -193,6 +193,17 @@ public interface CfetsTrdConfirmMapper {
      * 根据成交编号，查询下行成交匹配关系
      */
     CfetsTrdConfirmMatchDto selectMatchDtoByExecId(@Param("execid") String execid);
+
+
+    /**
+     * 根据下行交易编号，查询下行成交匹配关系
+     *
+     * @param cstpTradeId 下行交易编号
+     * @return com.joyintech.service.bankuplink.common.dto.TrdConfirmMatchDto
+     * @author jiangpeng
+     * @date 2022/5/7 9:19
+     */
+    CfetsTrdConfirmMatchDto selectMatchDtoByCstpTradeId(@Param("cstpTradeId") String cstpTradeId);
     /**
      * 根据登记编号，查询登记信息
      */
@@ -210,4 +221,34 @@ public interface CfetsTrdConfirmMapper {
      * @return
      */
     List<CfetsTrdConfirmCstpInfoListResponse> findAllCstpPledgesList(@Param("execid") String execid);
+
+    /**
+     * 根据交易编号,查询一级申购交易数据
+     */
+    List<CfetsTrdConfirmRegInfoListResponse> selectBidDtoByPrimaryKey(Map<String, Object> map);
+    /**
+     * 根据资产代码查询指令/申购流程中数据
+     * @author jiangpeng
+     * @date 2022/5/7 19:10
+     * @param finprodId
+     * @return java.util.List<java.lang.String>
+     */
+    List<String> selectWflBidDataByFinprodId(@Param("finprodId") String finprodId);
+    /**
+     * 根据资产代码查询资产发行状态
+     * @author jiangpeng
+     * @date 2022/5/7 19:10
+     * @param finprodId 资产代码
+     * @return java.util.List<java.lang.String>
+     */
+    FinProductAdd selectIssueInfoByFinprodId(@Param("finprodId") String finprodId);
+
+    /**
+     * 根据资产代码查询指令执行完成表
+     * @author jiangpeng
+     * @date 2022/5/7 19:52
+     * @param finprodId
+     * @return int
+     */
+    int selectCountEtrFinshByFinprodId(@Param("finprodId") String finprodId);
 }

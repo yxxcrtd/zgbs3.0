@@ -1,7 +1,6 @@
 package com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.joyintech.framework.base.dto.BaseDto;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -18,7 +17,14 @@ import java.util.Date;
  * @since 1.0
  */
 @ApiModel(value = "债券市场行权计划信息", description = "债券市场行权计划信息")
-public class FinBondPayHSrcSecOptionDto extends BaseDto {
+public class FinBondPayHSrcSecOptionDto {
+
+
+    /**
+     * 行权状态
+     */
+    @ApiModelProperty(name="optionStatus",value="行权状态")
+    private String optionStatus;
 
     /**
      * 行权申请起始日
@@ -118,5 +124,13 @@ public class FinBondPayHSrcSecOptionDto extends BaseDto {
 
     public void setOptionClause(String optionClause) {
         this.optionClause = optionClause;
+    }
+
+    public String getOptionStatus() {
+        return optionStatus;
+    }
+
+    public void setOptionStatus(String optionStatus) {
+        this.optionStatus = optionStatus;
     }
 }
