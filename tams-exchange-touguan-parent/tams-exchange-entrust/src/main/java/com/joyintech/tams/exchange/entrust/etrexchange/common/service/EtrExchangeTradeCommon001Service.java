@@ -712,6 +712,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         etrSinglePortfolioDto.setTradeMarket(dto.getTradeMarket());// 交易场所
         etrSinglePortfolioDto.setTradePlat(dto.getTradePlat());// 交易平台
         etrSinglePortfolioDto.setBusinessModel(dto.getBusinessModel());
+        etrSinglePortfolioDto.setBusiTypePosition(dto.getBusiTypePosition());
         /*
          * if 画面.交易平台 = 数据字典.交易平台.大宗交易平台 and 画面.交易场所 = 数据字典.交易场所.深圳证券交易所
          * 交易平台 = 数据字典.交易平台.综合协议平台
