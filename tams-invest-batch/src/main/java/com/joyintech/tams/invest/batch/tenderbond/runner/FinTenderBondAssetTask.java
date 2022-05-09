@@ -51,7 +51,9 @@ public class FinTenderBondAssetTask extends BatchBaseService {
             finTenderBondAssetService.execute(batchDate);
             result.setStatus(BatchStatus.COMPLETED);
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error("自动上市流通跑批失败",e);
+            throw new BatchException(e.getMessage());
         }
         return result;
     }
