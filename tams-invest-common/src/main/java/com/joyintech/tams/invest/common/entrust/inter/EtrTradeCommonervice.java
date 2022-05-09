@@ -1019,7 +1019,7 @@ public class EtrTradeCommonervice extends BaseService {
         /*持仓数量*/
         resp.add(BaseMap.newMap()
                 .put("field", "usableSec")
-                .put("name", StringUtil.equals(type,"REPO")?"标准券总额度（万元）":"可用数量（万元）")
+                .put("name", StringUtil.equals(type,"REPO")?"标准券总额度（万元）":"持仓数量（万元）")
                 .put("type", "cc")
                 .put("amount", bm.get(usableSec) == null ? 0 : bm.get(usableSec)));
 
