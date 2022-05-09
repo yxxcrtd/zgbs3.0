@@ -135,7 +135,9 @@
                         </if>
                         #{item}
                     </foreach>
-                    )) or (select COUNT(1) from FIN_DEAL_PLEDGE fdp where wtpd.trade_id = fdp.FINPROD_ID
+                    ))
+                    <!--TISHKS-694:修改抵押品代码查询条件 modify by fuyongsheng 20220509 start-->
+                    <!--or (select COUNT(1) from FIN_DEAL_PLEDGE fdp where wtpd.trade_id = fdp.FINPROD_ID
                     AND (fdp.PLEDGE_FINPROD_ID IN
                     <foreach collection="finprodIdList" item="item" index="index" open="("
                              close=")" separator=",">
@@ -144,7 +146,9 @@
                         </if>
                         #{item}
                     </foreach>
-                    )) = 0)
+                    )) = 0-->
+                    <!--TISHKS-694:修改抵押品代码查询条件 modify by fuyongsheng 20220509 end-->
+                    )
                 </if>
                     <if test="entrustId != null and entrustId != ''">
                         AND wtpda.ENTRUST_ID like CONCAT('%', CONCAT(#{entrustId}, '%'))
@@ -258,7 +262,9 @@
                             </if>
                             #{item}
                         </foreach>
-                     )) or (select COUNT(1) from FIN_DEAL_PLEDGE fdp where tpd.trade_id = fdp.FINPROD_ID
+                     ))
+                        <!--TISHKS-694:修改抵押品代码查询条件 modify by fuyongsheng 20220509 start-->
+                        <!--or (select COUNT(1) from FIN_DEAL_PLEDGE fdp where tpd.trade_id = fdp.FINPROD_ID
                         AND (fdp.PLEDGE_FINPROD_ID IN
                         <foreach collection="finprodIdList" item="item" index="index" open="("
                                  close=")" separator=",">
@@ -267,7 +273,9 @@
                             </if>
                             #{item}
                         </foreach>
-                        )) = 0)
+                        )) = 0-->
+                        <!--TISHKS-694:修改抵押品代码查询条件 modify by fuyongsheng 20220509 end-->
+                    )
                     </if>
                     <if test="entrustId != null and entrustId != ''">
                         AND tpda.ENTRUST_ID like CONCAT('%', CONCAT(#{entrustId}, '%'))
@@ -385,7 +393,10 @@
                         )
                     </if>
                 <if test="finprodIdList != null and finprodIdList.size() > 0">
-                    and ( tpd.trade_id in (select fdp.FINPROD_ID from FIN_DEAL_PLEDGE fdp where tpd.trade_id = fdp.FINPROD_ID
+                    <!--TISHKS-694:修改抵押品代码查询条件 modify by fuyongsheng 20220509 start-->
+                    <!--and ( tpd.trade_id in (select fdp.FINPROD_ID from FIN_DEAL_PLEDGE fdp where tpd.trade_id = fdp.FINPROD_ID-->
+                    and ( concat(tpd.trade_id ,'R') in (select fdp.FINPROD_ID from FIN_DEAL_PLEDGE fdp where concat(tpd.trade_id,'R') = fdp.FINPROD_ID
+                    <!--TISHKS-694:修改抵押品代码查询条件 modify by fuyongsheng 20220509 end-->
                     AND (fdp.PLEDGE_FINPROD_ID IN
                     <foreach collection="finprodIdList" item="item" index="index" open="("
                              close=")" separator=",">
@@ -394,7 +405,9 @@
                         </if>
                         #{item}
                     </foreach>
-                    )) or (select COUNT(1) from FIN_DEAL_PLEDGE fdp where tpd.trade_id = fdp.FINPROD_ID
+                    ))
+                    <!--TISHKS-694:修改抵押品代码查询条件 modify by fuyongsheng 20220509 start-->
+                    <!--or (select COUNT(1) from FIN_DEAL_PLEDGE fdp where tpd.trade_id = fdp.FINPROD_ID
                     AND (fdp.PLEDGE_FINPROD_ID IN
                     <foreach collection="finprodIdList" item="item" index="index" open="("
                              close=")" separator=",">
@@ -403,7 +416,9 @@
                         </if>
                         #{item}
                     </foreach>
-                    )) = 0)
+                    )) = 0-->
+                    <!--TISHKS-694:修改抵押品代码查询条件 modify by fuyongsheng 20220509 end-->
+                    )
                 </if>
                     <if test="entrustId != null and entrustId != ''">
                         AND tpda.ENTRUST_ID like CONCAT('%', CONCAT(#{entrustId}, '%'))
