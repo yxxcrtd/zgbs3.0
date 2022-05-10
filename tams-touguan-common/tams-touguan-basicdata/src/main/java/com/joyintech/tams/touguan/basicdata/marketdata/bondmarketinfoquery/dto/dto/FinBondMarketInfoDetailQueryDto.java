@@ -24,7 +24,7 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "secId", value = "债券ID/资产代码")
     private String secId;
 
-    @ApiModelProperty(name = "secName", value = "资产简称")
+    @ApiModelProperty(name = "secName", value = "债券简称")
     private String secName;
 
     @ApiModelProperty(name = "secFullName", value = "债券全称")
@@ -117,8 +117,8 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "baseRateAccuracy", value = "基准利率精度")
     private String baseRateAccuracy;
 
-    @ApiModelProperty(name = "cyy", value = "币种")
-    private String cyy;
+    @ApiModelProperty(name = "ccy", value = "币种")
+    private String ccy;
 
     @ApiModelProperty(name = "faceValue", value = "面额")
     @JsonSerialize(using = BigDecimalSerializer.class)
@@ -139,7 +139,7 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "interestRate", value = "利率类型")
     private String interestRate;
 
-    @ApiModelProperty(name = "paperir", value = "票面利率(%)")
+    @ApiModelProperty(name = "paperir", value = "票面利率")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal paperir;
 
@@ -202,6 +202,9 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     @ApiModelProperty(name = "crossMarketCode", value = "跨市场代码")
     private String crossMarketCode;
+
+    @ApiModelProperty(name = "basisStyle", value = "利息分配方式")
+    private String basisStyle;
 
     @ApiModelProperty(name = "calendarId", value = "交易日历")
     private String calendarId;
@@ -388,14 +391,6 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     public void setIsRight(String isRight) {
         this.isRight = isRight;
-    }
-
-    public String getCyy() {
-        return cyy;
-    }
-
-    public void setCyy(String cyy) {
-        this.cyy = cyy;
     }
 
     public BigDecimal getFaceValue() {
@@ -756,5 +751,21 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     public void setConceptTypes(List<String> conceptTypes) {
         this.conceptTypes = conceptTypes;
+    }
+
+    public String getBasisStyle() {
+        return basisStyle;
+    }
+
+    public void setBasisStyle(String basisStyle) {
+        this.basisStyle = basisStyle;
+    }
+
+    public String getCcy() {
+        return ccy;
+    }
+
+    public void setCcy(String ccy) {
+        this.ccy = ccy;
     }
 }
