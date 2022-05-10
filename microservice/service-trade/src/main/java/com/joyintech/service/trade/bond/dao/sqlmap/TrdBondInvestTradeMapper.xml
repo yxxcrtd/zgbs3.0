@@ -22,6 +22,7 @@
         <result column="ASSET_RECOMMAND_ORG"       property="assetRecommandOrg"       jdbcType="VARCHAR" />
         <result column="CHL_NAME"       property="chlFinprodId"       jdbcType="VARCHAR" />
         <!-- 推荐方 新增 zhuyongkang 20191023 start -->
+        <result column="INSTITUTION_NAME"       property="institutionName"       jdbcType="VARCHAR" />
     </resultMap>
 
     <select id="selectDeal" resultMap="trdBondInvestTradeResultMap">
@@ -68,11 +69,13 @@
                 wtpda.DEVIATION,
                 wtpd.UNIT_CPRICE,
                 <!-- mbvi.LAST_PERIOD endDays1,-->
-                wtpda.ASSET_RECOMMAND_ORG
+                wtpda.ASSET_RECOMMAND_ORG,
+                SI.INSTITUTION_NAME
               from WFL_TRD_FIN_PRODUCT_DEAL_TOTAL wtpd
                 <if test="finprodId != null and finprodId != ''">
                     LEFT JOIN TEMP tp ON wtpd.FINPROD_ID = tp.FINPROD_ID
                 </if>
+                LEFT JOIN SYS_INSTITUTION SI ON wtpd.INSTITUTION_CODE = SI.INSTITUTION_CODE
 			  	LEFT JOIN wfl_trd_product_deal  wDeal on wDeal.TOTLE_TRADE_ID = wtpd.TOTLE_TRADE_ID
                 LEFT JOIN WFL_TRD_DEAL_TOTAL_ADD wtpda on wtpd.TOTLE_TRADE_ID = wtpda.TOTLE_TRADE_ID
                 LEFT JOIN FIN_PRODUCT fp on fp.FINPROD_ID = wtpd.FINPROD_ID
@@ -231,11 +234,13 @@
                 wtpd.UNIT_CPRICE,
 
                 <!-- mbvi.LAST_PERIOD endDays1,  -->
-                wtpda.ASSET_RECOMMAND_ORG
+                wtpda.ASSET_RECOMMAND_ORG,
+                SI.INSTITUTION_NAME
               from TRD_FIN_PRODUCT_DEAL_TOTAL wtpd
                 <if test="finprodId != null and finprodId != ''">
                     LEFT JOIN TEMP tp ON wtpd.FINPROD_ID = tp.FINPROD_ID
                 </if>
+                LEFT JOIN SYS_INSTITUTION SI ON wtpd.INSTITUTION_CODE = SI.INSTITUTION_CODE
                 LEFT JOIN TRD_DEAL_TOTAL_ADD wtpda on wtpd.TOTLE_TRADE_ID = wtpda.TOTLE_TRADE_ID
                 LEFT JOIN FIN_PRODUCT fp on fp.FINPROD_ID = wtpd.FINPROD_ID
                 LEFT JOIN FIN_PRODUCT fp1 on fp1.FINPROD_ID = wtpd.CHL_ID
@@ -391,11 +396,13 @@
                 wtpd.UNIT_CPRICE,
 
                <!--  mbvi.LAST_PERIOD endDays1, -->
-                wtpda.ASSET_RECOMMAND_ORG
+                wtpda.ASSET_RECOMMAND_ORG,
+                SI.INSTITUTION_NAME
               from TRD_FIN_PRODUCT_DEAL_TOTAL wtpd
                 <if test="finprodId != null and finprodId != ''">
                     LEFT JOIN TEMP tp ON wtpd.FINPROD_ID = tp.FINPROD_ID
                 </if>
+                LEFT JOIN SYS_INSTITUTION SI ON wtpd.INSTITUTION_CODE = SI.INSTITUTION_CODE
                 left join TRD_DEAL_TOTAL_ADD wtpda on wtpd.TOTLE_TRADE_ID = wtpda.TOTLE_TRADE_ID
                 left join FIN_PRODUCT fp on fp.FINPROD_ID = wtpd.FINPROD_ID
                 LEFT JOIN FIN_PRODUCT fp1 on fp1.FINPROD_ID = wtpd.CHL_ID

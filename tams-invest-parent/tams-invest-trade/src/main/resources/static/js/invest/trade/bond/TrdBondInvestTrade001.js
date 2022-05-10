@@ -68,7 +68,8 @@
                 }
         	}
         	,{field:'portfolioName', sortField:'PORTFOLIO_NAME',width:140, title: 'TrdBondInvestTrade001.portfolioName', visible: false}
-        	,{field:'finprodId',sortField:'FINPROD_MARKET_ID', width:180, title: 'TrdBondInvestTrade001.finprodId',
+            ,{field:'institutionName', sortField:'INSTITUTION_NAME',width:140, title: '机构名称'}
+            ,{field:'finprodId',sortField:'FINPROD_MARKET_ID', width:180, title: 'TrdBondInvestTrade001.finprodId',
                 render : function(data, type, row, meta) {
                     return "<a class='finprodId-link' style='cursor: pointer;'>" + row.finprodId + "</a>";
                 }
