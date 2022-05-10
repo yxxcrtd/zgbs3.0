@@ -2294,7 +2294,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         BussinessCodeParameter param = new BussinessCodeParameter();
         param.setCommonBusinessExtType(DictCodeListExt3.fromDictCodeList(DictCodeListExt3.共通业务类型_场内债券现券指令));
         if (DictCodeListExt3.交易方向_正回购.getValue().equals(dto.getPs())
-                || DictCodeListExt3.交易方向_逆回购.getValue().equals(dto.getPs())){
+                || DictCodeListExt3.交易方向_逆回购.getValue().equals(dto.getPs())||(StringUtil.equals("",dto.getPs())&&StringUtil.equals("etrExchangeTradeRepo",dto.getPageId()))){
             param.setCommonBusinessExtType(DictCodeListExt3.fromDictCodeList(DictCodeListExt3.共通业务类型_场内通用质押式回购指令));
         }
         return param;
