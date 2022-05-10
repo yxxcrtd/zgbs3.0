@@ -54,7 +54,7 @@
         ELSE T1.PRICE END price
         /* ,T1.ENTRUST_AMT*NVL(T1.PRICE,1) ENTRUST_AMT*/
         ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN NULL ELSE T1.ENTRUST_AMT END entrustAmt
-        ,T1.ENTRUST_NUM entrustNum
+        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN round(T1.ENTRUST_NUM/100,2) ELSE T1.ENTRUST_NUM END entrustNum
         ,T1.VDATE
         ,T1.MDATE
         ,T2.FULL_PRICE as fprice
@@ -197,7 +197,7 @@
         WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN NULL
         ELSE T1.PRICE END price
         ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN NULL ELSE T1.ENTRUST_AMT END entrustAmt
-        ,T1.ENTRUST_NUM entrustNum
+        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN round(T1.ENTRUST_NUM/100,2) ELSE T1.ENTRUST_NUM END entrustNum
         ,T1.VDATE
         ,T1.MDATE
         ,T2.FULL_PRICE as fprice
