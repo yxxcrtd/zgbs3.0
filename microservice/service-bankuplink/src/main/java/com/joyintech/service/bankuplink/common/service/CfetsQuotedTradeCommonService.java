@@ -200,25 +200,21 @@ public class CfetsQuotedTradeCommonService{
      */
     @Transactional(rollbackFor = { Exception.class })
     @DTXTransaction
-    public ResultBaseDto insertBidCstpTrade(CfetsQuotedTradeFirstBondDto entity) throws Exception {
+    public ResultBaseDto insertBidCstpTrade(String trdId) throws Exception {
         try {
             Thread.sleep(maxWaitTime);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        InterfCstpBjfxjg interfCstpBjfxjg = new InterfCstpBjfxjg();
-        this.handleiCstpBidTrade(interfCstpBjfxjg, entity);
         ResultBaseDto resultBaseDto = new ResultBaseDto(true);
         try {
-            // 生成
-            interfCstpBjfxjg.setTrdId(cstpMapper.selectDealNo(DateUtil.formatDate(getSysDate()), getPrefix(isSubSystem)));
-            // 插入cstp交易表
-            interfCstpBjfxjgMapper.insertSelective(interfCstpBjfxjg);
             getLogger().info("银行间下行成交处理业务数据线程开启");
+            InterfCstpBjfxjg interfCstpBjfxjg = interfCstpBjfxjgMapper.selectByPrimaryKey(trdId);
+            InterfCstpBjfxjg finalInterfCstpBjfxjg = interfCstpBjfxjg;
             Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    secAutoTradeService.secAutoBidTrade(interfCstpBjfxjg, resultBaseDto);
+                    secAutoTradeService.secAutoBidTrade(finalInterfCstpBjfxjg, resultBaseDto);
                 }
             });
             thread.start();

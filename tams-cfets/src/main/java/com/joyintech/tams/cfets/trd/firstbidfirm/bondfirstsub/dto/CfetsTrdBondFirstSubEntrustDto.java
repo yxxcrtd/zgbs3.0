@@ -12,99 +12,104 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 import java.util.Date;
+
 /**
  * 指令列表
+ *
  * @author jiangpeng
  * @date 2022/4/22 10:06
  */
 @ApiModel(value = "指令列表", description = "一级申购指令列表")
 public class CfetsTrdBondFirstSubEntrustDto {
 
-    @ApiModelProperty(required = false, name = "entrustStatus", value = "指令状态", example = "04")
+    @ApiModelProperty(name = "entrustStatus", value = "指令状态", example = "04")
     private String entrustStatus;
 
-    @ApiModelProperty(required = false, name = "entrustStatusStr", value = "指令状态名称,展示用", example = "已完成")
+    @ApiModelProperty(name = "entrustStatusStr", value = "指令状态名称,展示用", example = "已完成")
     private String entrustStatusStr;
 
-    @ApiModelProperty(required = false, name = "finishAmt", value = "已完成额度", example = "1000.00")
+    @ApiModelProperty(name = "finishAmt", value = "已完成额度", example = "1000.00")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal finishAmt;
 
-    @ApiModelProperty(required = false, name = "transactioncom", value = "执行进度", example = "50.00")
+    @ApiModelProperty(name = "transactioncom", value = "执行进度", example = "50.00")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal transactioncom;
 
-    @ApiModelProperty(required = false, name = "finishDealAmt", value = "已成交额度", example = "1000.00")
+    @ApiModelProperty(name = "finishDealAmt", value = "已成交额度", example = "1000.00")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal finishDealAmt;
 
-    @ApiModelProperty(required = false, name = "tradeFinishPercent", value = "成交进度", example = "50.00")
+    @ApiModelProperty(name = "tradeFinishPercent", value = "成交进度", example = "50.00")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal tradeFinishPercent;
 
-    @ApiModelProperty(required = false, name = "entrustNum", value = "指令额度、券面总额", example = "1000.00")
+    @ApiModelProperty(name = "entrustNum", value = "指令额度、券面总额", example = "1000.00")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal entrustNum;
 
-    @ApiModelProperty(required = false, name = "finprodId", value = "资产代码,系统内代码一般不用于显示",example = "F01_aa.IB")
+    @ApiModelProperty(name = "finprodId", value = "资产代码,系统内代码一般不用于显示", example = "F01_aa.IB")
     private String finprodId;
 
-    @ApiModelProperty(required = false, name = "finprodMarketId", value = "市场代码,显示用代码",example = "aa.IB")
+    @ApiModelProperty(name = "finprodMarketId", value = "市场代码,显示用代码", example = "aa.IB")
     private String finprodMarketId;
 
-    @ApiModelProperty(required = false, name = "finprodAbbr", value = "资产简称",example = "债券aa")
+    @ApiModelProperty(name = "finprodAbbr", value = "资产简称", example = "债券aa")
     private String finprodAbbr;
 
-    @ApiModelProperty(required = false, name = "issueDate", value = "发行日")
+    @ApiModelProperty(name = "issueDate", value = "发行日")
     private Date issueDate;
 
-    @ApiModelProperty(required = false, name = "issueDateStr", value = "发行日格式化,展示用")
+    @ApiModelProperty(name = "issueDateStr", value = "发行日格式化,展示用")
     private String issueDateStr;
 
-    @ApiModelProperty(required = false, name = "payDate", value = "缴款日")
+    @ApiModelProperty(name = "payDate", value = "缴款日")
     private Date payDate;
 
-    @ApiModelProperty(required = false, name = "payDateStr", value = "缴款日格式化,展示用")
+    @ApiModelProperty(name = "payDateStr", value = "缴款日格式化,展示用")
     private String payDateStr;
 
-    @ApiModelProperty(required = false, name = "portfolioId", value = "组合代码",example = "A")
+    @ApiModelProperty(name = "portfolioId", value = "组合代码", example = "A")
     private String portfolioId;
 
-    @ApiModelProperty(required = false, name = "portfolioName", value = "组合名称",example = "组合A")
+    @ApiModelProperty(name = "portfolioName", value = "组合名称", example = "组合A")
     private String portfolioName;
 
-    @ApiModelProperty(required = false, name = "secManageAcctId", value = "证券账户",example = "zqzh")
+    @ApiModelProperty(name = "secManageAcctId", value = "证券账户", example = "zqzh")
     private String secManageAcctId;
 
-    @ApiModelProperty(required = false, name = "secAcctName", value = "证券账户名称,展示用")
+    @ApiModelProperty(name = "secAcctName", value = "证券账户名称,展示用")
     private String secAcctName;
 
-    @ApiModelProperty(required = false, name = "businessModel", value = "业务模式代码",example = "AC")
+    @ApiModelProperty(name = "businessModel", value = "业务模式代码", example = "AC")
     private String businessModel;
 
-    @ApiModelProperty(required = false, name = "businessModelStr", value = "业务模式名称,展示用")
+    @ApiModelProperty(name = "businessModelStr", value = "业务模式名称,展示用")
     private String businessModelStr;
 
-    @ApiModelProperty(required = false, name = "invManagerName", value = "投资经理",example = "张三")
+    @ApiModelProperty(name = "invManagerName", value = "投资经理", example = "张三")
     private String invManagerName;
 
-    @ApiModelProperty(required = false, name = "entrustDate", value = "指令日期")
+    @ApiModelProperty(name = "entrustDate", value = "指令日期")
     private Date entrustDate;
 
-    @ApiModelProperty(required = false, name = "entrustDateStr", value = "指令日期格式化,展示用")
+    @ApiModelProperty(name = "entrustDateStr", value = "指令日期格式化,展示用")
     private String entrustDateStr;
 
-    @ApiModelProperty(name = "transmitTime", value = "指令下达时间",example = "11:23:45")
+    @ApiModelProperty(name = "transmitTime", value = "指令下达时间", example = "11:23:45")
     private String transmitTime;
 
-    @ApiModelProperty(required = false, name = "entrustId", value = "指令代码",example = "WTBOND202204191858")
+    @ApiModelProperty(name = "entrustId", value = "指令代码", example = "WTBOND202204191858")
     private String entrustId;
 
-    @ApiModelProperty(required = false, name = "remark", value = "备注")
+    @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
 
-    @ApiModelProperty(required = false, name = "avaNum", value = "剩余指令额度",example = "1000.00")
+    @ApiModelProperty(name = "avaNum", value = "剩余指令额度", example = "1000.00")
     private BigDecimal avaNum;
+
+    @ApiModelProperty(name = "avaDealAmt", value = "剩余成交额度", example = "1000.00")
+    private BigDecimal avaDealAmt;
 
     public Date getIssueDate() {
         return issueDate;
@@ -334,6 +339,13 @@ public class CfetsTrdBondFirstSubEntrustDto {
         this.finprodId = finprodId;
     }
 
+    public BigDecimal getAvaDealAmt() {
+        return avaDealAmt;
+    }
+
+    public void setAvaDealAmt(BigDecimal avaDealAmt) {
+        this.avaDealAmt = avaDealAmt;
+    }
 }
 
 

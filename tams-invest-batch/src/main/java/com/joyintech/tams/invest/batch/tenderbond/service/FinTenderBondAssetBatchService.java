@@ -79,51 +79,65 @@ public class FinTenderBondAssetBatchService {
         param.put("ISSUE_STATUS_02", DictCodeListExt1.发行状态_发行失败.getValue());
         List<FinTenderBondAssetBatchDto> list = finTenderBoundAssetMapper.selectListing(param);
         if (CollectionUtils.isEmpty(list)) return;
-        for (FinTenderBondAssetBatchDto dto : list) {
-            if(isInProcess(dto.getFinprodMarketId(),"FinTenderBondAsset002","FinTenderBondAsset003")) {
-                continue;
+        List<Long> seqNoList = new ArrayList<>();
+        try {
+            for (FinTenderBondAssetBatchDto dto : list) {
+                if (isInProcess(dto.getFinprodMarketId(), "FinTenderBondAsset002", "FinTenderBondAsset003")) {
+                    continue;
+                }
+                if (StringUtil.isNotEmpty(dto.getAppearMarketId())) {//上市代码不为空
+                    param.put("finprodType2", DictCodeList.平安资产类型_债券.getValue());
+                    param.put("finprodMarketId", dto.getAppearMarketId());
+                    FinProduct product = finTenderBoundAssetMapper.selectProduct(param);
+                    if (Objects.nonNull(product)) {
+                        dto.setCirculationCode(product.getFinprodMarketId());
+                        dto.setCirculationDate(plateDate);
+                        save(dto, plateDate, seqNoList);
+                        continue;
+                    }
+                    //根据 资产名称、资产简称、交易场所、登记托管机构、起息日、到期日、发行人、息票品种、利率类型、币种 进行去重
+                    List<InterfPayhsrcsecinfo> interList = finTenderBoundAssetMapper.getBySecId(dto.getAppearMarketId());
+                    if (CollectionUtils.isNotEmpty(interList) && interList.size() == 1) {
+                        if (this.autoBondCoupon(interList.get(0))) {
+                            dto.setCirculationCode(interList.get(0).getSecid());
+                            dto.setCirculationDate(plateDate);
+                            save(dto, plateDate, seqNoList);
+                        }
+                        continue;
+                    }
+                    if (CollectionUtils.isNotEmpty(interList) && interList.size() > 1) {
+                        continue;
+                    }
+                    interList = finTenderBoundAssetMapper.getByParam(dto);
+                    if (CollectionUtils.isNotEmpty(interList) && interList.size() == 1) {
+                        if (this.autoBondCoupon(interList.get(0))) {
+                            dto.setCirculationCode(interList.get(0).getSecid());
+                            dto.setCirculationDate(plateDate);
+                            save(dto, plateDate, seqNoList);
+                        }
+                    }
+                } else {
+                    List<InterfPayhsrcsecinfo> interList = finTenderBoundAssetMapper.getByParam(dto);
+                    if (CollectionUtils.isNotEmpty(interList) && interList.size() == 1) {
+                        if (this.autoBondCoupon(interList.get(0))) {
+                            dto.setCirculationCode(interList.get(0).getSecid());
+                            dto.setCirculationDate(plateDate);
+                            save(dto, plateDate, seqNoList);
+                        }
+                    }
+                }
             }
-            if (StringUtil.isNotEmpty(dto.getAppearMarketId())) {//上市代码不为空
-                param.put("finprodType2", DictCodeList.平安资产类型_债券.getValue());
-                param.put("finprodMarketId", dto.getAppearMarketId());
-                FinProduct product = finTenderBoundAssetMapper.selectProduct(param);
-                if (Objects.nonNull(product)) {
-                    dto.setCirculationCode(product.getFinprodMarketId());
-                    dto.setCirculationDate(plateDate);
-                    save(dto, plateDate);
-                    continue;
-                }
-                //根据 资产名称、资产简称、交易场所、登记托管机构、起息日、到期日、发行人、息票品种、利率类型、币种 进行去重
-                List<InterfPayhsrcsecinfo> interList = finTenderBoundAssetMapper.getBySecId(dto.getAppearMarketId());
-                if (CollectionUtils.isNotEmpty(interList) && interList.size() == 1) {
-                    if (this.autoBondCoupon(interList.get(0))) {
-                        dto.setCirculationCode(interList.get(0).getSecid());
-                        dto.setCirculationDate(plateDate);
-                        save(dto, plateDate);
-                    }
-                    continue;
-                }
-                if (CollectionUtils.isNotEmpty(interList) && interList.size() > 1) {
-                    continue;
-                }
-                interList = finTenderBoundAssetMapper.getByParam(dto);
-                if (CollectionUtils.isNotEmpty(interList) && interList.size() == 1) {
-                    if (this.autoBondCoupon(interList.get(0))) {
-                        dto.setCirculationCode(interList.get(0).getSecid());
-                        dto.setCirculationDate(plateDate);
-                        save(dto, plateDate);
-                    }
-                }
-            } else {
-                List<InterfPayhsrcsecinfo> interList = finTenderBoundAssetMapper.getByParam(dto);
-                if (CollectionUtils.isNotEmpty(interList) && interList.size() == 1) {
-                    if (this.autoBondCoupon(interList.get(0))) {
-                        dto.setCirculationCode(interList.get(0).getSecid());
-                        dto.setCirculationDate(plateDate);
-                        save(dto, plateDate);
-                    }
+        } catch (Exception e) {
+            if (CollectionUtils.isNotEmpty(seqNoList)) {
+                String errorMsg = new String();
+                seqNoList.forEach(i -> {
+                    PositionHttpRequest.sendRevoke(i + "", DictCodeListExt1.子系统代码_交易.getValue(), errorMsg);
+                });
+                if (StringUtil.isNotEmpty(errorMsg)) {
+                    throw new RuntimeException("上市流通批处理失败,头寸冲正失败");
                 }
             }
+            throw new RuntimeException("上市流通批处理失败");
         }
     }
 
@@ -155,7 +169,7 @@ public class FinTenderBondAssetBatchService {
      * @param dto
      * @param plateDate
      */
-    private void save(FinTenderBondAssetBatchDto dto, Date plateDate) {
+    private void save(FinTenderBondAssetBatchDto dto, Date plateDate, List<Long> seqList) {
         TrdFinProductDealTotal trdFinProductDealTotal = new TrdFinProductDealTotal();
         BussinessCodeParameter parameter = new BussinessCodeParameter();
         parameter.setCommonBusinessType(DictCodeList.共通业务类型_债券买入);
@@ -190,20 +204,29 @@ public class FinTenderBondAssetBatchService {
         finProductAddMapper.updateForTenderBound(productAdd);
         //记录操作日志
         saveOperate(dto.getFinprodMarketId(), dto.getRemark());
+        long seqNo = (long) Arrays.deepHashCode(new Object[]{trdFinProductDealTotal.getTotleTradeId(), DictCodeListExt1.子系统代码_交易.getValue(), new Date().getTime(), Thread.currentThread().getId()});
         //调用头寸
+        Map<String,String> params = new HashMap();
+        params.put("finprodType2",DictCodeList.平安资产类型_债券.getValue());
+        params.put("finprodMarketId",dto.getAppearMarketId());
+        String finproductId = finTenderBoundAssetMapper.selectFinprodId(params);
         BaseMap param = BaseMap.newMap().put("userId", "SYSTEM")
                 .put("totalTradeId", trdFinProductDealTotal.getTotleTradeId())
-                .put("finprodId", dto.getFinprodId())
-                .put("marketFinprodId", product.getCirculationCode())
-                .put("modelType",DictCodeListExt1.子系统代码_交易.getValue())
-                .put("busiType",DictCodeListExt3.头寸业务类型_上市流通.getValue())
-                .put("busiAct",DictCodeListExt3.业务动作_上市.getValue())
-                .put("ps",DictCodeList.交易方向_上市流通.getValue())
-                .put("systemAct",DictCodeListExt3.系统动作_新建.getValue())
-                .put("cdate",plateDate)
-                .put("ccy",dto.getCcy())
-                .put("balanceCheck",DictCodeList.是否_否.getValue())
-                .put("interfaceType","Bond001");
+                .put("marketFinprodId", finproductId)
+                .put("listingFinprodId", dto.getFinprodId())
+                .put("modelType", DictCodeListExt1.子系统代码_交易.getValue())
+                .put("busiType", DictCodeListExt3.头寸业务类型_上市流通.getValue())
+                .put("busiAct", DictCodeListExt3.业务动作_上市.getValue())
+                .put("ps", DictCodeList.交易方向_上市流通.getValue())
+                .put("systemAct", DictCodeListExt3.系统动作_新建.getValue())
+                .put("cdate", plateDate)
+                .put("ccy", dto.getCcy())
+                .put("balanceCheck", DictCodeList.是否_否.getValue())
+                .put("interfaceType", "Bond001")
+                .put("tradePlace", dto.getTradeMarket())
+                .put("decisionAct", DictCodeListExt3.系统动作_新建.getValue())
+                .put("PositionSeqno", seqNo);
+        seqList.add(seqNo);
         PositionHttpRequest.send(param);
     }
 

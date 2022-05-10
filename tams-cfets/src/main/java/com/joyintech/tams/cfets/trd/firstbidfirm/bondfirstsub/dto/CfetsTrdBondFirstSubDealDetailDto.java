@@ -247,11 +247,10 @@ public class CfetsTrdBondFirstSubDealDetailDto {
     }
 
     public String getSecTypeStr() {
-        //TODO 参数字典
         if (StringUtil.isEmpty(getSecType())) {
             return StringUtil.EMPTY;
         }
-        return SysDataUtil.getNameFromDataDict(DictCode.有效状态, getSecType());
+        return SysDataUtil.getNameFromDataDict(DictCode.行内资产四级分类, getSecType());
     }
 
     public void setSecTypeStr(String secTypeStr) {

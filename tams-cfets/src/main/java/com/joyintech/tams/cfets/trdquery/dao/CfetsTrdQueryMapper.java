@@ -5,6 +5,7 @@ package com.joyintech.tams.cfets.trdquery.dao;
 
 import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleInfoOtherListRespond;
 import com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto;
+import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmExecFirstBondInfoResponse;
 import com.joyintech.tams.cfets.trdquery.dto.*;
 import com.joyintech.tams.common.base.entity.RegFinProductDealTotal;
 import org.apache.ibatis.annotations.Param;
@@ -41,6 +42,12 @@ public interface CfetsTrdQueryMapper {
      * @return
      */
     CfetsTrdQueryRegInfoListResponse selectRegFormDataByKey(Map<String, Object> pageParam);
+    /**
+     * 根据主键查询一级申购登记信息
+     * @param pageParam
+     * @return
+     */
+    CfetsTrdConfirmExecFirstBondInfoResponse selectBidFormDataByKey(Map<String, Object> pageParam);
 
     /**
      * 组合分配信息List

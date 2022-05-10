@@ -58,7 +58,7 @@ public interface CfetsTrdBondFirstSub002Mapper {
      * @author jiangpeng
      * @date 2022/4/26 13:48
      */
-    int updateBidOrderBidPrice(@Param("bidId") String bidId, @Param("remark") String remark);
+    int updateBidOrderBidPrice(@Param("bidId") String bidId);
 
     /**
      * 资产+证券账户维度下流程中、有效的申购记录认购量之和需

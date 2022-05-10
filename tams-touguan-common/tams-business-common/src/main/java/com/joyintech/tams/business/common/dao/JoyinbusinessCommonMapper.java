@@ -246,4 +246,14 @@ public interface JoyinbusinessCommonMapper {
      * @date 2022/4/28 17:19
      */
     int countMatchInfo(@Param("quoteId") String quoteId,@Param("confirmStatus") String confirmStatus);
+
+    /**
+     * 查询产品资金账户
+     *
+     * @param param
+     * @return java.lang.String
+     * @author jiangpeng
+     * @date 2021/12/13 16:14
+     */
+    String qryPortfolioCashAcctId(Map<String, Object> param);
 }

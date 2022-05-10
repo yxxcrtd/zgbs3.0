@@ -438,7 +438,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         list.sort(Comparator.comparing(CfetsTrdBondFirstSubProductDto::getAvaNum));
         // 1.按比例分配
         //按比例分配
-        if (StringUtil.equals(autoRequest.getDipType(), "140")) {
+        if (StringUtil.equals(autoRequest.getDipType(), "143")) {
             list = this.propDistribution(subscriptionAmount, list);
         }
         // 2.平均分配
@@ -834,7 +834,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             // 老头寸处理
             this.dealOldPosition(entity, false);
             try {
-                newEntity = WorkFlowUtil.getBusinessObjectFromRequest(CfetsBondDealRegisterQuoteDto.class, true);
+                newEntity = WorkFlowUtil.getBusinessObjectFromRequest(CfetsTrdBondFirstSubInfoDto.class, true);
                 // 工作流ID
                 newEntity.setWorkflowId(entity.getWorkflowId());
                 newEntity.setStatus(entity.getStatus());
@@ -909,9 +909,6 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     public AjaxResult checkDayRegRevokeCheck(CfetsBondFirstSubCheckRequst requst) {
         AjaxResult ajaxResult = new AjaxResult();
         List<ValidMessage> errorList = new ArrayList<>();
-        if (StringUtil.isEmpty(requst.getRemark())) {
-            errorList.add(new ValidMessage("撤销原因不能为空"));
-        }
         String msg = "";
         for (CfetsBondFirstSubCheckDetaileRequst item : requst.getCfetsBondFirstSubCheckDetaileRequsts()) {
             //如已有撤销数据在流程中，不允许进行再次进行撤销
@@ -929,7 +926,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                 msg += item.getBidId() + "存在已匹配待确认记录，是否确认撤销?/n";
             }
             //如勾选数据发行状态不为空不可撤销
-            if (StringUtil.isEmpty(item.getIssueStatus())) {
+            if (StringUtil.isNotEmpty(item.getIssueStatus())) {
                 errorList.add(new ValidMessage(item.getBidId() + "发行状态不为空不可撤销"));
             }
         }
@@ -1041,7 +1038,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         // 更新撤销的原交易数据
         if (type.equals(OperationType.REVOKE) || type.equals(OperationType.DELETE)) {
             cfetsTrdBondFirstSub002Mapper.updateBidOrder(entity.getBidId(), entity.getRemark());
-            cfetsTrdBondFirstSub002Mapper.updateBidOrderBidPrice(entity.getBidId(), entity.getRemark());
+            cfetsTrdBondFirstSub002Mapper.updateBidOrderBidPrice(entity.getBidId());
         }
     }
 
@@ -1057,18 +1054,18 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             List<EtrFinishStatusDto> etrFinishStatusDtos = new ArrayList<>();
             Map<String, EtrFinishStatusDto> etrFinishStatusDtoMap = new HashMap<>();
             for (CfetsTrdBondFirstSubProductDto productDto : productDtos) {
-                EtrFinishStatusDto status;
+                EtrFinishStatusDto status = new EtrFinishStatusDto();
                 // 考虑到存在多组合指令的情况
                 if (etrFinishStatusDtoMap.get(productDto.getEntrustId()) != null) {
                     status = etrFinishStatusDtoMap.get(productDto.getEntrustId());
                     status.setEntFinishAmt(ArithmeticUtil.doAdd(status.getEntFinishAmt(), productDto.getSubscriptionAmount()));
                 } else {
-                    status = new EtrFinishStatusDto();
                     status.setEntrustId(productDto.getEntrustId());
                     status.setTradeId(dto.getBidId());
                     status.setFinishDate(dto.getTradeDate());
                     status.setEntFinishAmt(productDto.getSubscriptionAmount());
                     status.setTrader(dto.getOurTrader());
+                    etrFinishStatusDtoMap.put(productDto.getEntrustId(),status);
                 }
             }
             for (Map.Entry<String, EtrFinishStatusDto> map : etrFinishStatusDtoMap.entrySet()) {
@@ -1096,10 +1093,6 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         param.put("TRADE_STATUS03", DictCodeListExt1.交易状态_撤销.getValue());
         param.put("YN_N", DictCodeListExt1.是否_否.getValue());
         String loginUserId = LoginUserUtil.getUserName();
-        // 测试代码
-        if ("admin".equals(loginUserId) || StringUtil.isNotEmpty(loginUserId)) {
-            loginUserId = "jp";
-        }
         param.put("loginUserId", loginUserId);
     }
 
@@ -1410,9 +1403,6 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      * @date 2021/12/24 10:12
      */
     private void sendPositionMethod(CfetsTrdBondFirstSubInfoDto entity, boolean isSubmit, String confirmOk) {
-        if (isSubmit) {
-            return;
-        }
         List<CfetsBondPortfolioCashRequest> ptlList = new ArrayList<>();
 
         for (CfetsTrdBondFirstSubProductDto productDto : entity.getProductDtos()) {
@@ -1422,14 +1412,23 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             posport.setEtrId(productDto.getEntrustId());
             posport.setTradeId(entity.getBidId());
             if (StringUtil.isNotEmpty(productDto.getSecManageAcctId())) {
-                posport.setCashAcctId(productDto.getSecManageAcctId()); // 证券户
+                posport.setSecAcctId(productDto.getSecManageAcctId()); // 证券户
+            }
+            if (StringUtil.isNotEmpty(productDto.getPortfolioId())) {
+                Map<String, Object> map = new HashMap<String, Object>();
+                map.put("portfolioId", productDto.getPortfolioId());
+                map.put("acctType", BussinessDictCodeList.资金账户类型_托管账户.getValue());
+                String cashAcctId = joyinbusinessCommonService.qryPortfolioCashAcctId(map);
+                if (StringUtil.isNotEmpty(cashAcctId)) {
+                    posport.setCashAcctId(cashAcctId); // 托管户
+                }
             }
             posport.setCashAmount(productDto.getSubscriptionAmount());
             ptlList.add(posport);
         }
         //调用头寸
         CfetsBondPositionRequest req = new CfetsBondPositionRequest();
-        req.setInterfaceType("BOND001");//报文类型
+        req.setInterfaceType("Bond001");//报文类型
         req.setUserId(SecurityUtil.getLoginUser().getUserName());
         req.setTotalTradeId(entity.getBidId());
         req.setFlowStatus(DictCodeListExt3.流程节点_流程提交.getValue());

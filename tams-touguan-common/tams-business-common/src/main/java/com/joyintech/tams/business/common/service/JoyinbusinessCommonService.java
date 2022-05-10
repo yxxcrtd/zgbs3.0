@@ -28,12 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 公共方法service
@@ -91,7 +86,7 @@ public class JoyinbusinessCommonService extends BaseService {
     public Page<SelectOptionDto> getfinprodIdForAdd(CfetsSearchInfoRequest dto) {
         Map<String, Object> param =new HashMap<>();
         param.put("search",dto.getSearch());
-        param.put("assestType", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+        param.put("assestType", Arrays.asList(DictCodeListExt1.金融产品类型_投管用_债券.getValue(),DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue()));
         param.put("TRADE_PLACE_01",DictCodeListExt1.交易场所_银行间.getValue());
         param.put("TRADE_PLACE_02",DictCodeListExt1.交易场所_商业银行柜台.getValue());
         param.put("platDate",DateUtil.platDateFromCache());
@@ -486,5 +481,17 @@ public class JoyinbusinessCommonService extends BaseService {
      */
     public int countMatchInfo(String quoteId, String confirmStatus) {
         return joyinbusinessCommonMapper.countMatchInfo(quoteId, confirmStatus);
+    }
+
+    /**
+     * 查询产品资金账户
+     *
+     * @param map
+     * @return java.lang.String
+     * @author jiangpeng
+     * @date 2021/12/13 16:09
+     */
+    public String qryPortfolioCashAcctId(Map<String, Object> map) {
+        return joyinbusinessCommonMapper.qryPortfolioCashAcctId(map);
     }
 }
