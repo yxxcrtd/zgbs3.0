@@ -46,6 +46,7 @@ public class RskSupervisionPortfPoint005Controller extends BaseController {
     	this.setSelectOptionToModel(model, DICT_CODES);
     	model.addAttribute("ptlBagId", getParam("ptlBagId"));
     	model.addAttribute("ptlBagName", getParam("ptlBagName"));
+        model.addAttribute("isRule", getParam("isRule"));
         return super.init(model);
     }
    

@@ -101,8 +101,10 @@ public class FinPlanNetAsset002Controller extends BaseController{
         		DictCode.行内资产五级分类,DictCode.资产_负债二级类别,
         // 新增行内五级分类 zhangpuyu 2019-7-25 end
             DictCode.计划类资产二级分类,DictCode.清算速度,DictCode.币种,DictCode.资金实际投向,
-            DictCode.本金收益特征,DictCode.投资性质,DictCode.增信措施);
+            DictCode.本金收益特征,DictCode.投资性质,DictCode.是否,DictCode.增信措施);
         model.addAttribute("FINPROD_TYPE_TG_F17",DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue());
+        model.addAttribute("PROFIT_TYPE_02", DictCodeList.收益类型_收益型.getValue());
+        model.addAttribute("YES", DictCodeList.是否_是.getValue());
         String finprodId = getParam("finprodId");
         // 增加快捷录入功能 by 赵东东 2019.10.12 start 
         String finprodMarketId = getParam("finprodMarketId");
@@ -134,6 +136,7 @@ public class FinPlanNetAsset002Controller extends BaseController{
                 finPlanAssetNInfo.setPageModel(getParam("pageModel"));     
             }
             model.addAttribute("entity",finPlanAssetNInfo);
+            model.addAttribute("finprodId", finprodId);
         }
         else if(!WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotEmpty(workflowId)){
             // 根据工作流与留痕处理提供的共通方法获取业务实体

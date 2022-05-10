@@ -26,7 +26,7 @@ public class BusinessCheckEx002 implements IBusinessCheck {
         Instruction instruction = chainBean.getInstruction();
         //债券大宗交易
         if (InvestmentAssetType.isBond(instruction.getAssetType())) {
-            if (!SubStockType.KZZ.value.equals(instruction.getAssetType1())) {
+            if (!SubStockType.KZZ.value.trim().equals(instruction.getAssetType1())) {
                 checkRsp.put("assetType1", "债券大宗交易只支持可转债");
             }
 

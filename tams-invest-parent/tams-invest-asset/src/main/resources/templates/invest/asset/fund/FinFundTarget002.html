@@ -559,6 +559,32 @@
 								</div>
 								<!-- 增加[基金经理姓名] by caozhenming 20210715 end -->
 							</div>
+							<div class="layui-form-item">
+								<div class=" form-inline-wrap">
+									<label class="layui-form-label form-label-wrap"
+										   data-th-text="#{FinFundTarget002.issueMode}">开放类型</label>
+									<div class="layui-input-inline input-inline">
+										<input type="text" id="openType" name="openType" required="required"
+											   class="layui-input form-input input-checkbox"
+											   data-th-data-result="${ISSUE_MODE}"
+											   data-th-initvalue="${entity?.openType}"/>
+									</div>
+								</div>
+								<div class=" form-inline-wrap">
+									<label class="layui-form-label form-label-wrap"
+										   data-th-text="#{FinFundTarget002.isSevenDayCashable}">是否7日可变现资产</label>
+									<div class="layui-input-inline input-inline">
+										<select type="text" id="isSevenDayCashable" name="isSevenDayCashable"
+												class="layui-input form-input input-select"
+												formatoption="true" allowClear="true"
+												data-th-initValue='${entity?.isSevenDayCashable}'
+												placeholder="请输入内容"
+												data-th-data-result='${YES_OR_NO}'
+												data-th-placeholder="#{SysCommon.placeholder}">
+										</select>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>

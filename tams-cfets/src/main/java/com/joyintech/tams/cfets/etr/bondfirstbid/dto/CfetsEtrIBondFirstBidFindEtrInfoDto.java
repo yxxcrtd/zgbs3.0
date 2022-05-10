@@ -1,5 +1,8 @@
 package com.joyintech.tams.cfets.etr.bondfirstbid.dto;
 
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.tams.constant.DictCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -35,6 +38,9 @@ public class CfetsEtrIBondFirstBidFindEtrInfoDto {
     @ApiModelProperty(name="firstBidStatus",value="中标状态",example="A1")
     private String firstBidStatus;
 
+    @ApiModelProperty(name="firstBidStatusStr",value="中标状态名称",example="A1")
+    private String firstBidStatusStr;
+
     @ApiModelProperty(name="finprodId",value="资产代码Id",example="ZC1")
     private String finprodId;
 
@@ -47,8 +53,14 @@ public class CfetsEtrIBondFirstBidFindEtrInfoDto {
     @ApiModelProperty(name="issueClass",value="发行方式",example="报价发行/招标发行/簿记建档")
     private String issueClass;
 
+    @ApiModelProperty(name="issueClassStr",value="发行方式名称")
+    private String issueClassStr;
+
     @ApiModelProperty(name="issueDate",value="投标日/发行日")
     private Date issueDate;
+
+    @ApiModelProperty(name="issueDateStr",value="投标日/发行日字符串")
+    private String issueDateStr;
 
     @ApiModelProperty(name="totalBiddingNum",value="汇总投标券面总额")
     private BigDecimal totalBiddingNum;
@@ -56,8 +68,14 @@ public class CfetsEtrIBondFirstBidFindEtrInfoDto {
     @ApiModelProperty(name="bidPrice",value="投标标位",example="1")
     private BigDecimal bidPrice;
 
+    @ApiModelProperty(name="bidPriceStr",value="投标标位字符串",example="1")
+    private String bidPriceStr;
+
     @ApiModelProperty(name="payEdate",value="缴款截止日")
     private Date payEdate;
+
+    @ApiModelProperty(name="payEdateStr",value="缴款截止日字符串")
+    private String payEdateStr;
 
     @ApiModelProperty(name="portfolioId",value="组合代码",example="A1")
     private String portfolioId;
@@ -65,11 +83,20 @@ public class CfetsEtrIBondFirstBidFindEtrInfoDto {
     @ApiModelProperty(name="portfolioName",value="组合名称",example="名称A1")
     private String portfolioName;
 
+    @ApiModelProperty(name="busiModel",value="业务模式Code",example="01")
+    private String busiModel;
+
+    @ApiModelProperty(name="busiModelStr",value="业务模式",example="01")
+    private String busiModelStr;
+
     @ApiModelProperty(name="invManagerId",value="投资经理",example="A1")
     private String invManagerId;
 
     @ApiModelProperty(name="etrDate",value="指令日期",example="2021-07-06")
     private Date etrDate;
+
+    @ApiModelProperty(name="etrDateStr",value="指令日期字符串",example="2021-07-06")
+    private String etrDateStr;
 
     @ApiModelProperty(name="counterId",value="交易对手",example="A1")
     private String counterId;
@@ -126,8 +153,12 @@ public class CfetsEtrIBondFirstBidFindEtrInfoDto {
     }
 
     public String getEntrustStatusName() {
-        return entrustStatusName;
+        if (StringUtil.isEmpty(getEntrustStatus())) {
+            return null;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.委托状态, getEntrustStatus());
     }
+
 
     public void setEntrustStatusName(String entrustStatusName) {
         this.entrustStatusName = entrustStatusName;
@@ -331,5 +362,79 @@ public class CfetsEtrIBondFirstBidFindEtrInfoDto {
 
     public void setBusinessModel(String businessModel) {
         this.businessModel = businessModel;
+    }
+
+    public String getFirstBidStatusStr() {
+        if (StringUtil.isEmpty(getFirstBidStatus())) {
+            return "-";
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.一级投标中标状态, getFirstBidStatus());
+    }
+
+    public void setFirstBidStatusStr(String firstBidStatusStr) {
+        this.firstBidStatusStr = firstBidStatusStr;
+    }
+
+    public String getIssueClassStr() {
+        if (StringUtil.isEmpty(getIssueClass())) {
+            return null;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.新债_发行方式, getIssueClass());
+    }
+
+    public void setIssueClassStr(String issueClassStr) {
+        this.issueClassStr = issueClassStr;
+    }
+
+    public String getBusiModel() {
+        return busiModel;
+    }
+
+    public void setBusiModel(String busiModel) {
+        this.busiModel = busiModel;
+    }
+
+    public String getBusiModelStr() {
+        if (StringUtil.isEmpty(getBusiModel())) {
+            return null;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.业务模式, getBusiModel());
+    }
+
+
+    public void setBusiModelStr(String busiModelStr) {
+        this.busiModelStr = busiModelStr;
+    }
+
+    public String getIssueDateStr() {
+        return issueDateStr;
+    }
+
+    public void setIssueDateStr(String issueDateStr) {
+        this.issueDateStr = issueDateStr;
+    }
+
+    public String getPayEdateStr() {
+        return payEdateStr;
+    }
+
+    public void setPayEdateStr(String payEdateStr) {
+        this.payEdateStr = payEdateStr;
+    }
+
+    public String getEtrDateStr() {
+        return etrDateStr;
+    }
+
+    public void setEtrDateStr(String etrDateStr) {
+        this.etrDateStr = etrDateStr;
+    }
+
+    public String getBidPriceStr() {
+        return bidPriceStr;
+    }
+
+    public void setBidPriceStr(String bidPriceStr) {
+        this.bidPriceStr = bidPriceStr;
     }
 }

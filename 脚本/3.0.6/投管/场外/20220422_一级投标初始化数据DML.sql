@@ -1,7 +1,8 @@
 -- 一级投标指令页面刷新参数
+delete from sys_para where SYSTEM_CODE = 'INV' and PARA_CODE in ('cfetsEtrBondFirstBid_issueTable_refresh_period ','cfetsEtrBondFirstBid_etrTable_refresh_period ');
 delete from sys_para where SYSTEM_CODE = 'INV' and PARA_CODE in ('cfetsEtrBondFirstBid_issueTable_refresh_period','cfetsEtrBondFirstBid_etrTable_refresh_period');
-insert into sys_para (SYSTEM_CODE, PARA_CODE, PARAM_VALUE, DATA_TYPE, DATA_SCOPE, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE, UPDATE_FLG) values ('INV', 'cfetsEtrBondFirstBid_issueTable_refresh_period ', '120000', '01', null, '一级投标指令画面待发行信息列表区域自动刷新时间(ms)', 'system', null, sysdate, 'system', sysdate, null, '01');
-insert into sys_para (SYSTEM_CODE, PARA_CODE, PARAM_VALUE, DATA_TYPE, DATA_SCOPE, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE, UPDATE_FLG) values ('INV', 'cfetsEtrBondFirstBid_etrTable_refresh_period ', '120000', '01', null, '一级投标指令画面指令列表区域自动刷新时间(ms)', 'system', null, sysdate, 'system', sysdate, null, '01');
+insert into sys_para (SYSTEM_CODE, PARA_CODE, PARAM_VALUE, DATA_TYPE, DATA_SCOPE, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE, UPDATE_FLG) values ('INV', 'cfetsEtrBondFirstBid_issueTable_refresh_period', '120000', '01', null, '一级投标指令画面待发行信息列表区域自动刷新时间(ms)', 'system', null, sysdate, 'system', sysdate, null, '01');
+insert into sys_para (SYSTEM_CODE, PARA_CODE, PARAM_VALUE, DATA_TYPE, DATA_SCOPE, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE, UPDATE_FLG) values ('INV', 'cfetsEtrBondFirstBid_etrTable_refresh_period', '120000', '01', null, '一级投标指令画面指令列表区域自动刷新时间(ms)', 'system', null, sysdate, 'system', sysdate, null, '01');
 -- 新增一级投标中标状态
 DELETE from SYS_DATADICT where DICT_CODE in ('FIRST_BID_STATUS');
 INSERT INTO SYS_DATADICT(DICT_CODE, SYSTEM_CODE, DICT_CNNAME, DICT_ENNAME, UPDATE_FLG, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES('FIRST_BID_STATUS', 'TG', '一级投标中标状态', NULL, '02', 'system', NULL, SYSDATE, 'system', SYSDATE);
@@ -39,23 +40,23 @@ VALUES('CfetsEtrBondFirstBid001', 'ISSUES', '999999', 'finprodId', '资产代码
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
 VALUES('CfetsEtrBondFirstBid001', 'ISSUES', '999999', 'finprodAbbr', '资产简称', NULL, 2, 1, 0, 1, 100, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
-VALUES('CfetsEtrBondFirstBid001', 'ISSUES', '999999', 'issueClass', '发行方式', NULL, 3, 1, 0, 1, 100, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, NULL, NULL, 1);
+VALUES('CfetsEtrBondFirstBid001', 'ISSUES', '999999', 'issueClassStr', '发行方式', NULL, 3, 1, 0, 1, 100, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, NULL, NULL, 1);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
 VALUES('CfetsEtrBondFirstBid001', 'ISSUES', '999999', 'planIssueAmt', '计划发行量(亿元)', NULL, 4, 1, 0, 1, 100, '{"colAlign": "right","dataType":"amount","precision":"4","supportSearch":"精确"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
-VALUES('CfetsEtrBondFirstBid001', 'ISSUES', '999999', 'issueDate', '投标日/发行日', 'secType1', 5, 1, 0, 1, 100, '{"colAlign": "left","supportSearch":"精确"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
+VALUES('CfetsEtrBondFirstBid001', 'ISSUES', '999999', 'issueDateStr', '投标日/发行日', 'secType1', 5, 1, 0, 1, 100, '{"colAlign": "left","supportSearch":"精确"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
-VALUES('CfetsEtrBondFirstBid001', 'ISSUES', '999999', 'payEdate', '缴款截止日', NULL, 6, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"精确"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
+VALUES('CfetsEtrBondFirstBid001', 'ISSUES', '999999', 'payEdateStr', '缴款截止日', NULL, 6, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"精确"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
-VALUES('CfetsEtrBondFirstBid001', 'ISSUES', '999999', 'couponSpecies', '息票品种', NULL, 7, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
+VALUES('CfetsEtrBondFirstBid001', 'ISSUES', '999999', 'couponSpeciesStr', '息票品种', NULL, 7, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
-VALUES('CfetsEtrBondFirstBid001', 'ISSUES', '999999', 'intType', '利率类型', NULL, 8, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
+VALUES('CfetsEtrBondFirstBid001', 'ISSUES', '999999', 'intTypeStr', '利率类型', NULL, 8, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
 VALUES('CfetsEtrBondFirstBid001', 'ISSUES', '999999', 'issuePrice', '发行价格(元)', NULL, 9, 1, 0, 1, 110, '{"colAlign": "right","dataType":"amount","precision":"4","supportSearch":"精确"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
 VALUES('CfetsEtrBondFirstBid001', 'ISSUES', '999999', 'referYield', '参考收益率/票面利率', NULL, 10, 1, 0, 1, 110, '{"colAlign": "right","dataType":"amount","precision":"4","supportSearch":"精确"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
-VALUES('CfetsEtrBondFirstBid001', 'ISSUES', '999999', 'firstConfirmDate', '首次利率确定日', NULL, 11, 1, 0, 1, 100, '{"colAlign": "left","supportSearch":"精确"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
+VALUES('CfetsEtrBondFirstBid001', 'ISSUES', '999999', 'firstConfirmDateStr', '首次利率确定日', NULL, 11, 1, 0, 1, 100, '{"colAlign": "left","supportSearch":"精确"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
 VALUES('CfetsEtrBondFirstBid001', 'ISSUES', '999999', 'minPamt', '单笔/标位最低量(亿元)', NULL, 12, 1, 0, 1, 110, '{"colAlign": "right","dataType":"amount","precision":"4","supportSearch":"精确"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
@@ -63,7 +64,7 @@ VALUES('CfetsEtrBondFirstBid001', 'ISSUES', '999999', 'maxPamt', '单笔/标位�
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
 VALUES('CfetsEtrBondFirstBid001', 'ISSUES', '999999', 'ztGrade', '主体评级', NULL, 14, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
-VALUES('CfetsEtrBondFirstBid001', 'ISSUES', '999999', 'cyy', '币种', NULL, 15, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
+VALUES('CfetsEtrBondFirstBid001', 'ISSUES', '999999', 'ccyValue', '币种', NULL, 15, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
 VALUES('CfetsEtrBondFirstBid001', 'ISSUES', '999999', 'type11Value', '资产类型', NULL, 16, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 --  配置列表字段一级投标指令
@@ -77,31 +78,31 @@ VALUES('CfetsEtrBondFirstBid001', 'ETRINFOS', '999999', 'execProcess', '执行�
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
 VALUES('CfetsEtrBondFirstBid001', 'ETRINFOS', '999999', 'transProcess', '成交进度(%)', NULL, 4, 1, 1, 1, 100, '{"colAlign": "right","dataType":"amount","precision":"2","supportSearch":"精确"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
-VALUES('CfetsEtrBondFirstBid001', 'ETRINFOS', '999999', 'firstBidStatus', '中标状态', 'secType1', 5, 1, 1, 1, 100, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
+VALUES('CfetsEtrBondFirstBid001', 'ETRINFOS', '999999', 'firstBidStatusStr', '中标状态', 'NULL', 5, 1, 1, 1, 100, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
-VALUES('CfetsEtrBondFirstBid001', 'ETRINFOS', '999999', 'finprodId', '资产代码', NULL, 6, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
+VALUES('CfetsEtrBondFirstBid001', 'ETRINFOS', '999999', 'finprodMarketId', '资产代码', NULL, 6, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
 VALUES('CfetsEtrBondFirstBid001', 'ETRINFOS', '999999', 'finprodAbbr', '资产简称', NULL, 7, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
-VALUES('CfetsEtrBondFirstBid001', 'ETRINFOS', '999999', 'issueClass', '发行方式', NULL, 8, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
+VALUES('CfetsEtrBondFirstBid001', 'ETRINFOS', '999999', 'issueClassStr', '发行方式', NULL, 8, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
-VALUES('CfetsEtrBondFirstBid001', 'ETRINFOS', '999999', 'issueDate', '投标日/发行日', NULL, 9, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"精确"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
+VALUES('CfetsEtrBondFirstBid001', 'ETRINFOS', '999999', 'issueDateStr', '投标日/发行日', NULL, 9, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"精确"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
 VALUES('CfetsEtrBondFirstBid001', 'ETRINFOS', '999999', 'totalBiddingNum', '投标券面总额(万元)', NULL, 10, 1, 0, 1, 110, '{"colAlign": "right","dataType":"amount","precision":"4","supportSearch":"精确"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
-VALUES('CfetsEtrBondFirstBid001', 'ETRINFOS', '999999', 'bidPrice', '投标标位', NULL, 11, 1, 0, 1, 100, '{"colAlign": "right","dataType":"amount","precision":"4","supportSearch":"精确"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
+VALUES('CfetsEtrBondFirstBid001', 'ETRINFOS', '999999', 'bidPriceStr', '投标标位', NULL, 11, 1, 0, 1, 100, '{"colAlign": "right","dataType":"amount","precision":"4","supportSearch":"精确"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
-VALUES('CfetsEtrBondFirstBid001', 'ETRINFOS', '999999', 'payEdate', '缴款截止日', NULL, 12, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"精确"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
+VALUES('CfetsEtrBondFirstBid001', 'ETRINFOS', '999999', 'payEdateStr', '缴款截止日', NULL, 12, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"精确"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
 VALUES('CfetsEtrBondFirstBid001', 'ETRINFOS', '999999', 'portfolioId', '组合代码', NULL, 13, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
 VALUES('CfetsEtrBondFirstBid001', 'ETRINFOS', '999999', 'portfolioName', '组合名称', NULL, 14, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
-VALUES('CfetsEtrBondFirstBid001', 'ETRINFOS', '999999', 'busiModel', '业务模式', NULL, 15, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
+VALUES('CfetsEtrBondFirstBid001', 'ETRINFOS', '999999', 'busiModelStr', '业务模式', NULL, 15, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
 VALUES('CfetsEtrBondFirstBid001', 'ETRINFOS', '999999', 'invManagerId', '投资经理', NULL, 16, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
-VALUES('CfetsEtrBondFirstBid001', 'ETRINFOS', '999999', 'etrDate', '指令日期', NULL, 17, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"精确"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
+VALUES('CfetsEtrBondFirstBid001', 'ETRINFOS', '999999', 'etrDateStr', '指令日期', NULL, 17, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"精确"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)
 VALUES('CfetsEtrBondFirstBid001', 'ETRINFOS', '999999', 'entrustId', '指令代码', NULL, 18, 1, 0, 1, 110, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, NULL, NULL, 0);
 INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY)

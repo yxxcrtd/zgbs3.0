@@ -115,12 +115,16 @@ implements BaseProcessService<RskSupervisionIndividuationDto> {
 	private RskSupervisionIndividuationDto getEntity(RskSupervisionIndividuationDto entity) {
 		if(!StringUtil.isEmptyList(entity.getConditionList())){
         	for(RskIndividConditionDto e:entity.getConditionList()){
+				//条件设置重置主键
+				e.setConditionId(IDGenerator.generate());
         		e.setPrtBagId(entity.getPrtBagId());
         		e.setIndId(entity.getIndId());
         	}
         }
         if(!StringUtil.isEmptyList(entity.getSpecialAssetList())){
         	for(RskIndividSpecialAssetDto e:entity.getSpecialAssetList()){
+				//特殊资产阶段重置主键
+				e.setUniteId(IDGenerator.generate());
         		if(!StringUtil.isNotEmpty(e.getUniteType())){
         			e.setUniteType(BussinessDictCodeListRds.阶段类型_特殊资产阶段.getValue());
         		}
@@ -130,6 +134,8 @@ implements BaseProcessService<RskSupervisionIndividuationDto> {
         }
         if(!StringUtil.isEmptyList(entity.getSpecialStageList())){
         	for(RskIndividSpecialStageDto e:entity.getSpecialStageList()){
+				//特殊阶段重置主键
+				e.setUniteId(IDGenerator.generate());
         		if(!StringUtil.isNotEmpty(e.getUniteType())){
         			e.setUniteType(BussinessDictCodeListRds.阶段类型_特殊阶段.getValue());
         		}
@@ -139,17 +145,21 @@ implements BaseProcessService<RskSupervisionIndividuationDto> {
         }
         if(!StringUtil.isEmptyList(entity.getAssetDelList())){
         	for(RskIndividAssetDelDto e:entity.getAssetDelList()){
-        		if(!StringUtil.isNotEmpty(e.getDelId())){
-        			e.setDelId(IDGenerator.generate());
-        		}
+				//剔除资产重置主键
+				e.setDelId(IDGenerator.generate());
+//        		if(!StringUtil.isNotEmpty(e.getDelId())){
+//        			e.setDelId(IDGenerator.generate());
+//        		}
         	}
         }
 		if(!StringUtil.isEmptyList(entity.getUniteList())){
 			List<RskIndividUniteDto> listUnite = new ArrayList<RskIndividUniteDto>();
 			for(RskIndividUniteDto e:entity.getUniteList()){
-				if(!StringUtil.isNotEmpty(e.getUniteId())){
-        			e.setUniteId(IDGenerator.generate());
-        		}
+				//联合设置重置主键
+				e.setUniteId(IDGenerator.generate());
+//				if(!StringUtil.isNotEmpty(e.getUniteId())){
+//        			e.setUniteId(IDGenerator.generate());
+//        		}
 				//获取选中的指标编号
 				List<String> indIdList = StringUtil.splitToList(",", e.getUniteIndId());
 				//获取自己的指标编号
@@ -169,6 +179,11 @@ implements BaseProcessService<RskSupervisionIndividuationDto> {
 
 	public List<SelectOptionDto> queryUniteIndIdList(Map<String, Object> pageParam) {
 		return restTemplate.postForList(ServiceApplication.RISK_RDS_SERVICE_NAME + "/RskSupervisionIndividuation/queryUniteIndIdList",
+				pageParam, SelectOptionDto.class);
+	}
+
+	public List<SelectOptionDto> queryUniteIndIdList_RULE(Map<String, Object> pageParam) {
+		return simpleRestTemplate.postForList(ServiceApplication.RISK_RDS_SERVICE_NAME + "/RskSupervisionIndividuation/queryUniteIndIdList_RULE",
 				pageParam, SelectOptionDto.class);
 	}
 

@@ -47,4 +47,28 @@ public class BigDecimalUtil {
         }
         return a.compareTo(BigDecimal.ZERO) == 0;
     }
+
+    /**
+     * n 是否是 m 的整数倍
+     *
+     * @param n
+     * @param m
+     * @return
+     */
+    public static boolean isIntegerMultiples(BigDecimal n, BigDecimal m) {
+        if (n == null || m == null) {
+            return false;
+        }
+
+        if (BigDecimal.ZERO.compareTo(m) == 0) {
+            return false;
+        }
+
+        BigDecimal[] dr = n.divideAndRemainder(m);
+        if (dr[1].signum() == 0) {
+            return true;
+        }
+        return false;
+    }
+
 }

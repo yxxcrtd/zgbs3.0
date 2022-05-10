@@ -32,10 +32,10 @@ public class BusinessCheckEx017 implements IBusinessCheck {
         if (!InvestmentAssetType.isBond(instruction.getAssetType())) {
             checkRsp.put("assetType", "现券交易只支持债券");
         }
-        if (SubStockType.KZZ.value.equals(instruction.getAssetType1())) {
+        if (SubStockType.KZZ.value.trim().equals(instruction.getAssetType1())) {
             checkRsp.put("assetType1", "现券交易只支持非可转债");
         }
-        if (!EntrustProp.isNewBondTrade(instruction.getDealMode())) {
+        if (StringUtil.isNotEmpty(instruction.getDealMode()) && !EntrustProp.isNewBondTrade(instruction.getDealMode())) {
             checkRsp.put("dealMode", "成交方式只支持匹配成交或协商成交");
         }
 

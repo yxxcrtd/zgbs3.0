@@ -2615,6 +2615,18 @@ public enum BussinessDictCodeListRds implements BaseDictCodeList {
      */
     分类维度_投资性质(BussinessDictCodeRds.分类维度,"04","投资性质"),
     /**
+     *  分类维度_开放周期
+     */
+    分类维度_开放周期(BussinessDictCodeRds.分类维度,"05","开放周期"),
+    /**
+     *  分类维度_是否面向单一投资者
+     */
+    分类维度_是否面向单一投资者(BussinessDictCodeRds.分类维度,"06","是否面向单一投资者"),
+    /**
+     *  分类维度_说明书是否披露风险标志
+     */
+    分类维度_说明书是否披露风险标志(BussinessDictCodeRds.分类维度,"07","说明书是否披露风险标志"),
+    /**
      *  使用状态_启用
      */
     使用状态_启用(BussinessDictCodeRds.使用状态,"01","启用"),
@@ -3840,6 +3852,8 @@ public enum BussinessDictCodeListRds implements BaseDictCodeList {
             BussinessDictCodeRds.指标参数实现类型, "CUSTOM", "自定义"
     ), 条件项_建仓期时间(
             BussinessDictCodeRds.条件项, "03", "建仓期时间"
+    ), 条件项_启用时间(
+            BussinessDictCodeRds.条件项, "04", "启用时间"
     ), 条件项_单位净值控制(
             BussinessDictCodeRds.条件项, "02", "单位净值控制"
     ), 条件项_资产净值控制(
@@ -5699,6 +5713,70 @@ public enum BussinessDictCodeListRds implements BaseDictCodeList {
     ,共通业务类型_商业银行净资产维护(
             BussinessDictCodeRds.共通业务类型, "RSK37", "商业银行净资产维护"
     )
+    /**
+     * 开放周期_小于90天
+     */
+    ,开放周期_小于90天(BussinessDictCodeRds.开放周期,"01","小于90天")
+    /**
+     * 开放周期_大于等于90天
+     */
+    ,开放周期_大于等于90天(BussinessDictCodeRds.开放周期,"02","大于等于90天")
+    /**
+     * 处理类型_规则
+     */
+    ,处理类型_规则(BussinessDictCodeRds.处理类型,"RULE","规则")
+    /**
+     * 处理类型_组合包
+     */
+    ,处理类型_组合包(BussinessDictCodeRds.处理类型,"PRT","组合包")
+    /**
+     * 日期选项_申购开始日
+     */
+    ,日期选项_申购开始日(BussinessDictCodeRds.日期选项,"01","申购开始日")
+    /**
+     * 日期选项_申购开始日
+     */
+    ,日期选项_申购结束日(BussinessDictCodeRds.日期选项,"02","申购结束日")
+    /**
+     * 日期选项_申购开始日
+     */
+    ,日期选项_申购确认日(BussinessDictCodeRds.日期选项,"03","申购确认日")
+    /**
+     * 日期选项_申购开始日
+     */
+    ,日期选项_赎回开始日(BussinessDictCodeRds.日期选项,"04","赎回开始日")
+    /**
+     * 日期选项_申购开始日
+     */
+    ,日期选项_赎回结束日(BussinessDictCodeRds.日期选项,"05","赎回结束日")
+    /**
+     * 日期选项_申购开始日
+     */
+    ,日期选项_赎回确认日(BussinessDictCodeRds.日期选项,"06","赎回确认日")
+    /**
+     * 日期类型_信批_工作日
+     */
+    ,日期类型_信批_工作日(BussinessDictCodeRds.日期类型_信批,"01","工作日")
+    /**
+     * 日期类型_信批_自然日
+     */
+    ,日期类型_信批_自然日(BussinessDictCodeRds.日期类型_信批,"02","自然日")
+    /**
+     * 是否面向单一投资者_是
+     */
+    ,是否面向单一投资者_是(BussinessDictCodeRds.是否面向单一投资者,"Y","是")
+    /**
+     * 是否面向单一投资者_否
+     */
+    ,是否面向单一投资者_否(BussinessDictCodeRds.是否面向单一投资者,"N","否")
+    /**
+     * 说明书是否披露风险标志_是
+     */
+    ,说明书是否披露风险标志_是(BussinessDictCodeRds.说明书是否披露风险标志,"Y","是")
+    /**
+     * 说明书是否披露风险标志_否
+     */
+    ,说明书是否披露风险标志_否(BussinessDictCodeRds.说明书是否披露风险标志,"N","否")
   ;
 
 

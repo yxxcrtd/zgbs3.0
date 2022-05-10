@@ -1,18 +1,26 @@
 $(function() {
-    var columns = [
-        {field:'specificId', visible: false}
+    var columns = [[
+        {title: '基本信息',align:'center',sortable: false, colspan: 2}
+        ,{title: '监管综合相关类型',align:'center',sortable: false, colspan: 2}
+        ,{title: '流动性管理办法相关类型',align:'center',sortable: false, colspan: 3}
+        ,{title: '理财新规相关类型',align:'center',sortable: false, colspan: 2}
+        ,{field:'specificId', visible: false}
         ,{field:'type1Name', visible: false}
         ,{field:'type2Name', visible: false}
         ,{field:'type3Name', visible: false}
         ,{field:'type4Name', visible: false}
-        ,{field:'finprodMarketId', sortField:"FINPROD_MARKET_ID", width:165 , title: 'RskSpecificAssetType001.finprodId'}
+        ,{field:'operation', title: 'SysCommon.operation',rowspan: 2, type:'action', buttons: ['edit']}
+    ],[
+        {field:'finprodMarketId', sortField:"FINPROD_MARKET_ID", width:165 , title: 'RskSpecificAssetType001.finprodId'}
         ,{field:'finprodName', sortField:"FINPROD_NAME", width:165 , title: 'RskSpecificAssetType001.finprodName'}
-        ,{field:'isBadassetName', sortField:"IS_BADASSET", width:185 , title: 'RskSpecificAssetType001.isBadasset'}
-        ,{field:'isRegulationName', sortField:"IS_REGULATION", width:190 , title: 'RskSpecificAssetType001.isRegulation'}
-        ,{field:'isCreditAssetName', sortField:"IS_CREDIT_ASSET", width:190 , title: 'RskSpecificAssetType001.isCreditAsset'}
-        ,{field:'isFlowLimitedStr', sortField:"IS_FLOW_LIMITED", width:190 , title: '是否流动性受限'}
-        ,{field:'operation', title: 'SysCommon.operation', type:'action', buttons: ['edit', 'delt']}
-    ];
+        ,{field:'isFlowLimitedStr', sortField:"IS_FLOW_LIMITED", width:165 , title: '是否流动性受限'}
+        ,{field:'isRegulationName', sortField:"IS_REGULATION", width:165 , title: 'RskSpecificAssetType001.isRegulation'}
+        ,{field:'isLiquidity1Name', sortField:"IS_LIQUIDITY1", width:165 , title: 'RskSpecificAssetType001.isLiquidity1'}
+        ,{field:'isLiquidity2Name', sortField:"IS_LIQUIDITY2", width:165 , title: 'RskSpecificAssetType001.isLiquidity2'}
+        ,{field:'isLiquidity3Name', sortField:"IS_LIQUIDITY3", width:165 , title: 'RskSpecificAssetType001.isLiquidity3'}
+        ,{field:'isBadassetName', sortField:"IS_BADASSET", width:165 , title: 'RskSpecificAssetType001.isBadasset'}
+        ,{field:'isCreditAssetName', sortField:"IS_CREDIT_ASSET", width:165 , title: 'RskSpecificAssetType001.isCreditAsset'}
+    ]];
     /**
      * 获取查询参数
      */
@@ -51,9 +59,10 @@ $(function() {
         dblclick:function(table, data) {
             Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
                 basePath + "invest/risk/quota/rskspecificassettype/RskSpecificAssetType002/init",
-                "95%", "90%", {pageModel:PAGE_MODEL_REFERENCE,specificId:data.specificId});
+                "85%", "85%", {pageModel:PAGE_MODEL_REFERENCE,specificId:data.specificId});
         },
 
+        isMulti:true,
         cols:columns
     });
     /**
@@ -64,7 +73,7 @@ $(function() {
         Joyin.ajaxJson(basePath + 'invest/risk/quota/rskspecificassettype/RskSpecificAssetType001/check', data, function(result) {
             Joyin.dialog(JoyinUtil.getLabel("RskSpecificAssetType001"),
                 basePath + "invest/risk/quota/rskspecificassettype/RskSpecificAssetType002/init",
-                "95%", "90%",data,function() {
+                "85%", "85%",data,function() {
                     table.reload();
                 });
 

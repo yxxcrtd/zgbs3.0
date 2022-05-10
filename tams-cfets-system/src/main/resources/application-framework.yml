@@ -173,7 +173,7 @@ shiro:
     /InterfSysTrdConfig/**,/interf/risk/**,/EtrTradeSysInterf/**,/MstCaptialAccount/**,/MstSaleDepartment/**,/TrdBondInvestTrade/**,/AssetDeclarationCodeMaintenance/**,/ptlmanagementinfo/**,/InterfSysPara/**,/MstMarketCalendarInfo/**,
     /TrdExchangeWorkflow/**,/invest/trade/bond/TrdBondInvestTrade002/**,/invest/trade/trdrepotrade/TrdRepoTrade002/**,/invest/trade/forwex/TrdForwexInvestTrade002/**,/invest/trade/api/**,
     /CfetsRepoDealQuotedPrice001/selectEtrReByQuoteId,/core/getAssetFiveType,/common/trdcommonbase/insertFinProductCashData,/common/entrustcommonbase/finishEntrust,/TrdRepoTrade/selectPreTradeId,/FinProjectTargetAsset/insert,
-    /cfets/**,/common/workflow/**,/common/config/**,/component/**,/FinProductRating/**,/BussSettleOrderComm/**,/core/**,/common/cfetsEtrBondProductInfo/**
+    /cfets/**,/common/workflow/**,/common/config/**,/component/**,/FinProductRating/**,/BussSettleOrderComm/**,/core/**,/common/cfetsEtrBondProductInfo/**,/asset/finBondMarketInfoQuery003/**
 
 specialsyspara:
   parakey: AUTHORIZE_LIMIT||PRICE_CAL_TYPE||portfolio_handle_userid||settle_acct_name||settle_acct_no||prod_tru_acct_no||prod_tru_acct_name||lending_acct_no||lending_acct_name
@@ -374,7 +374,7 @@ shiro:
     /TrdExchangeWorkflow/**,/invest/trade/bond/TrdBondInvestTrade002/**,/invest/trade/trdrepotrade/TrdRepoTrade002/**,/invest/trade/forwex/TrdForwexInvestTrade002/**,/invest/trade/api/**,/commonPosition/**,
     /CfetsRepoDealQuotedPrice001/selectEtrReByQuoteId,/core/getAssetFiveType,/common/trdcommonbase/insertFinProductCashData,/common/entrustcommonbase/finishEntrust,/TrdRepoTrade/selectPreTradeId,/joyin/**,
     /interf/refreshCache,/interf/execute,/interf/ziguanSysUserInfo,/interf/xp,/interf/xp/**,/interf/zg,/interf/zg/**,/FinProjectTargetAsset/insert,/FinAssetRateAdj/getFinAssetRateAdjByCashId,
-    /cfets/**,/common/workflow/**,/common/config/**,/component/**,/FinProductRating/**,/common/joyinbusinessCommon/**,/cfets/bankuplink/bond/IbuQuoteBond/**,/cfets/bond/IbuQuoteBond004/**,/BussSettleOrderComm/**,/core/**,/common/cfetsEtrBondProductInfo/**
+    /cfets/**,/common/workflow/**,/common/config/**,/component/**,/FinProductRating/**,/common/joyinbusinessCommon/**,/cfets/bankuplink/bond/IbuQuoteBond/**,/cfets/bond/IbuQuoteBond004/**,/BussSettleOrderComm/**,/core/**,/common/cfetsEtrBondProductInfo/**,/asset/finBondMarketInfoQuery003/**
 base:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
@@ -512,7 +512,7 @@ shiro:
     /InterfSysTrdConfig/**,/interf/risk/**,/EtrTradeSysInterf/**,/MstCaptialAccount/**,/MstSaleDepartment/**,/TrdBondInvestTrade/**,/AssetDeclarationCodeMaintenance/**,/ptlmanagementinfo/**,/InterfSysPara/**,/MstMarketCalendarInfo/**,
     /TrdExchangeWorkflow/**,/invest/trade/bond/TrdBondInvestTrade002/**,/invest/trade/trdrepotrade/TrdRepoTrade002/**,/invest/trade/forwex/TrdForwexInvestTrade002/**,/invest/trade/api/**,/commonPosition/**,
     /CfetsRepoDealQuotedPrice001/selectEtrReByQuoteId,/core/getAssetFiveType,/common/trdcommonbase/insertFinProductCashData,/common/entrustcommonbase/finishEntrust,/TrdRepoTrade/selectPreTradeId,/joyin/**,
-    /interf/refreshCache,/interf/execute,/interf/ziguanSysUserInfo,/cfets/**,/common/workflow/**,/common/config/**,/component/**,/common/cfetsEtrBondProductInfo/**
+    /interf/refreshCache,/interf/execute,/interf/ziguanSysUserInfo,/cfets/**,/common/workflow/**,/common/config/**,/component/**,/common/cfetsEtrBondProductInfo/**,/asset/finBondMarketInfoQuery003/**
 base:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
@@ -648,7 +648,7 @@ shiro:
     /InterfSysTrdConfig/**,/interf/risk/**,/EtrTradeSysInterf/**,/MstCaptialAccount/**,/MstSaleDepartment/**,/TrdBondInvestTrade/**,/AssetDeclarationCodeMaintenance/**,/ptlmanagementinfo/**,/InterfSysPara/**,/MstMarketCalendarInfo/**,
     /TrdExchangeWorkflow/**,/invest/trade/bond/TrdBondInvestTrade002/**,/invest/trade/trdrepotrade/TrdRepoTrade002/**,/invest/trade/forwex/TrdForwexInvestTrade002/**,/invest/trade/api/**,/commonPosition/**,
     /CfetsRepoDealQuotedPrice001/selectEtrReByQuoteId,/core/getAssetFiveType,/common/trdcommonbase/insertFinProductCashData,/common/entrustcommonbase/finishEntrust,/TrdRepoTrade/selectPreTradeId,/joyin/**,
-    /interf/refreshCache,/interf/execute,/interf/ziguanSysUserInfo,/cfets/**,/common/workflow/**,/common/config/**,/component/**,/common/cfetsEtrBondProductInfo/**
+    /interf/refreshCache,/interf/execute,/interf/ziguanSysUserInfo,/cfets/**,/common/workflow/**,/common/config/**,/component/**,/common/cfetsEtrBondProductInfo/**,/asset/finBondMarketInfoQuery003/**
 base:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl

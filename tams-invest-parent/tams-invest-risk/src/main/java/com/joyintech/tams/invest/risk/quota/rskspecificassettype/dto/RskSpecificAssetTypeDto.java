@@ -158,4 +158,16 @@ public class RskSpecificAssetTypeDto extends RskSpecificAssetType implements ITa
     public String getIsCreditAssetName(){
         return SysDataUtil.getNameFromDataDict(DictCode.是否, this.getIsCreditAsset());
     }
+
+    public String getIsLiquidity1Name(){
+        return SysDataUtil.getNameFromDataDict(DictCode.是否, this.getIsLiquidity1());
+    }
+
+    public String getIsLiquidity2Name(){
+        return SysDataUtil.getNameFromDataDict(DictCode.是否, this.getIsLiquidity2());
+    }
+
+    public String getIsLiquidity3Name(){
+        return SysDataUtil.getNameFromDataDict(DictCode.是否, this.getIsLiquidity3());
+    }
 }

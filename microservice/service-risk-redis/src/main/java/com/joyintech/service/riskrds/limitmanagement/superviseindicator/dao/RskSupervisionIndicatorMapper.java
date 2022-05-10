@@ -52,7 +52,9 @@ public interface RskSupervisionIndicatorMapper {
     void updateIsEnabled(RskSupervisionIndicator002Dto dto);
     
     RskSupervisionIndicator002Dto querySuperIndicatorInfoByIndId(Map<String, Object> param);
-    
+
+    RskSupervisionIndicator002Dto querySuperIndicatorInfoByIndId_RULE(Map<String, Object> param);
+
     List<RskPortfolioIndicatorDto> queryPortfIndicatorInfoByIndId(Map<String, Object> param);
     
     RskSupervisionIndicatorParamDto searchAssetTypeByParam(@Param("indParamId") String indParamId);

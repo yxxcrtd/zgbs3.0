@@ -230,8 +230,7 @@ public interface CfetsEtrDispatcherMapper {
     /**
      * 查询未选择指令
      * @param finprodId
-     * @param entrustStatus
      * @return
      */
-    List<String> getDispatcherEntrustIdList(String finprodId, String entrustStatus);
+    List<String> getDispatcherEntrustIdList(@Param("finprodId") String finprodId, @Param("statusList") List<String> statusList);
 }

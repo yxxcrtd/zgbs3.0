@@ -41,6 +41,7 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import com.joyintech.tams.common.base.entity.FinOpenPlan;
 
 /**
  * 日间批处理生成reader相关业务处理
@@ -179,12 +180,16 @@ public class RiskTrialDayTimeReaderService extends BaseService {
      */
     private void dealBasicProducer(InvestTradeTrialInput investTradeTrialInput,List<RiskTrialDayTimeReaderResult> resultList){
         List<PtlPortfolioValuation>  riskPortfValList=new ArrayList<>();
+        //---流动性风险改造 start---
+        List<FinOpenPlan>  riskPortOpenPlanList=new ArrayList<>();
+        //---流动性风险改造 end---
         investTradeTrialInput.setNextDate(DateUtil.addDay(DateUtil.parse(investTradeTrialInput.getValDate()),1));
         List<SupervisionTargetDto> taskList = riskTrialCommMapper.getPortfIndTask(investTradeTrialInput);
         //查询所有的个性化条件设置信息
         List<RiskIndividConditionDto>  riskIndividConditionDtoList =  riskTrialCommMapper.getRiskIndividCondition();
         if(!StringUtil.isEmptyList(riskIndividConditionDtoList)){
             riskPortfValList =  riskTrialCommMapper.getPortfValuation(investTradeTrialInput.getValDate());
+            riskPortOpenPlanList =  riskTrialCommMapper.getPortfOpenPlan(investTradeTrialInput.getValDate());
         }
         for(SupervisionTargetDto portfolioPoint : taskList) {
             RiskTrialDayTimeReaderResult riskTrialDayTimeReaderResult=new RiskTrialDayTimeReaderResult();
@@ -206,7 +211,7 @@ public class RiskTrialDayTimeReaderService extends BaseService {
            if(portfolioPoint.getPortfolioLevel().equals(BussinessDictCodeListRds.组合层次_单组合.getValue())) {
                List<RiskIndividConditionDto>  riskIndividCondSubList =riskIndividConditionDtoList.stream().filter(item->item.getPrtBagId().equals(portfolioPoint.getPortfolioId())&&item.getIndId().equals(portfolioPoint.getIndId())).collect(Collectors.toList()) ;
                List<PtlPortfolioValuation> ptlPortValList=riskPortfValList.stream().filter(item->item.getPortfolioId().equals(portfolioPoint.getPortfolioId())).collect(Collectors.toList());
-               boolean divZcFlag=true; boolean divDwFlag=true;boolean divJcFlag=false;
+               boolean divZcFlag=true; boolean divDwFlag=true;boolean divJcFlag=false;boolean divQyFlag=false;
                for(RiskIndividConditionDto dto:riskIndividCondSubList){
                   /* if(dto.getConditionItem().equals(BussinessDictCodeListRds.条件项_资产净值控制.getValue())&&!StringUtil.isEmptyList(ptlPortValList)){
                        divZcFlag =  RiskUtil.compareNumberVal("NUM",dto.getControlType(), ArithmeticUtil.multiply(dto.getValueStr(),new BigDecimal(10000)),ArithmeticUtil.multiply(dto.getValueEnd(),new BigDecimal(10000)),ptlPortValList.get(0).getTdyAssetNetvalue());
@@ -220,7 +225,10 @@ public class RiskTrialDayTimeReaderService extends BaseService {
                        divJcFlag = RiskUtil.compareNumberVal("DATE",BussinessDictCodeListRds.控制类型_范围控制.getValue(),dto.getValueStr(),dto.getValueEnd(),supDate);
                    }
                }
-               if(!divZcFlag||!divDwFlag||divJcFlag){
+               //---流动性风险改造 start---
+               divQyFlag=RiskUtil.filterEnableTime(riskIndividConditionDtoList,riskPortOpenPlanList,portfolioPoint.getPortfolioId(),portfolioPoint.getIndId(),supDate);
+               //---流动性风险改造 end---
+               if(!divZcFlag||!divDwFlag||divJcFlag||!divQyFlag){
                    continue;//跳过当前，执行下一个
                }
             }
