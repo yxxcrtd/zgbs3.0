@@ -109,7 +109,7 @@
                 </foreach>
                 )
             </if>
-
+            and ROWNUM = 1
         </where>
     </select>
 
