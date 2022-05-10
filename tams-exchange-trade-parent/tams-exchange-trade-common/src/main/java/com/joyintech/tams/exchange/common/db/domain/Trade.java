@@ -134,7 +134,6 @@ public class Trade implements Serializable, KeyMethodInterface<String> {
     @ApiModelProperty(value = "全价价格")
     private BigDecimal fullPrice;
 
-    @NotNull
     @Digits(integer = 20, fraction = 4)
     @JsonSerialize(using = DoubleSerializerUtils.class)
     @ApiModelProperty(value = "净价金额")

@@ -193,6 +193,12 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
     @ApiModelProperty(name = "finprodMarketId", value = "市场代码")
     private String finprodMarketId;
 
+    /**
+     * 系统动作
+     */
+    @ApiModelProperty(name = "systemAct", value = "系统动作")
+    private String systemAct;
+
     public String getElementId() {
         return elementId;
     }
@@ -417,5 +423,13 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
 
     public void setReferYield(BigDecimal referYield) {
         this.referYield = referYield;
+    }
+
+    public String getSystemAct() {
+        return systemAct;
+    }
+
+    public void setSystemAct(String systemAct) {
+        this.systemAct = systemAct;
     }
 }

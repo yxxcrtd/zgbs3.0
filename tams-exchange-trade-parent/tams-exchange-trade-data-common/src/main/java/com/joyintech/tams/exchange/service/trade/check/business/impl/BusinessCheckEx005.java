@@ -27,12 +27,15 @@ public class BusinessCheckEx005 implements IBusinessCheck {
     public void check(CheckChainBean chainBean) {
         Map<String, Object> checkRsp = chainBean.getCheckRsp();
         Instruction instruction = chainBean.getInstruction();
-        if (!StringUtil.equals(InvestmentAssetType.PLEDGE_REPURCHASE.value, instruction.getAssetType())) {
-            checkRsp.put("assetType", "质押券出入库只支持债券");
-        }
         String ps = instruction.getPs();
         if (!DictCodeListExt2.交易方向_质押券入库.getValue().equals(ps) && !DictCodeListExt2.交易方向_质押券出库.getValue().equals(ps)) {
             checkRsp.put("ps", "质押券出入库交易方向只支持质押入库或质押出库");
+        }
+        if (DictCodeListExt2.交易方向_质押券入库.getValue().equals(ps) && !StringUtil.equals(InvestmentAssetType.BOND.value, instruction.getAssetType())) {
+            checkRsp.put("assetType", "质押入库只支持债券资产[F01]");
+        }
+        if (DictCodeListExt2.交易方向_质押券出库.getValue().equals(ps) && !StringUtil.equals(InvestmentAssetType.PLEDGE_REPURCHASE.value, instruction.getAssetType())) {
+            checkRsp.put("assetType", "质押出库只支持质押式回购资产[F07]");
         }
         if (instruction.getEntrustNum() == 0) {
             checkRsp.put("entrustNum", "质押券数量不能为空或0");

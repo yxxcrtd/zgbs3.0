@@ -10,6 +10,8 @@ import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -199,6 +201,17 @@ public class TradeQueryBean implements Serializable {
 
     private String tradeDate;
     private String dealTime;
+
+    @JsonSerialize(using = DoubleSerializerUtils.class)
+    @ApiModelProperty(value = "净价价格")
+    private BigDecimal netPrice;
+
+    @JsonSerialize(using = DoubleSerializerUtils.class)
+    @ApiModelProperty(value = "净价金额")
+    private BigDecimal netBalance;
+
+    @ApiModelProperty(name = "isFullPrice", value = "是否全价（Y:是 ， N：否）")
+    private String isFullPrice;
 
     public TradeQueryBean() {
         this.tradedBalance = new BigDecimal("0.00");
@@ -710,5 +723,29 @@ public class TradeQueryBean implements Serializable {
 
     public void setDeliverySchedule(String deliverySchedule) {
         this.deliverySchedule = deliverySchedule;
+    }
+
+    public BigDecimal getNetPrice() {
+        return netPrice;
+    }
+
+    public void setNetPrice(BigDecimal netPrice) {
+        this.netPrice = netPrice;
+    }
+
+    public BigDecimal getNetBalance() {
+        return netBalance;
+    }
+
+    public void setNetBalance(BigDecimal netBalance) {
+        this.netBalance = netBalance;
+    }
+
+    public String getIsFullPrice() {
+        return isFullPrice;
+    }
+
+    public void setIsFullPrice(String isFullPrice) {
+        this.isFullPrice = isFullPrice;
     }
 }

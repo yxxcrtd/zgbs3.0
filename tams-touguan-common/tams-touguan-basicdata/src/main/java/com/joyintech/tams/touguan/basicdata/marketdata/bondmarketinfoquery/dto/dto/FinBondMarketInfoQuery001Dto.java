@@ -610,4 +610,28 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
     public void setSecType3(String secType3) {
         this.secType3 = secType3;
     }
+
+    public String getCapiIncomeFeature() {
+        return capiIncomeFeature;
+    }
+
+    public void setCapiIncomeFeature(String capiIncomeFeature) {
+        this.capiIncomeFeature = capiIncomeFeature;
+    }
+
+    public String getIsAutoUpdate() {
+        return isAutoUpdate;
+    }
+
+    public void setIsAutoUpdate(String isAutoUpdate) {
+        this.isAutoUpdate = isAutoUpdate;
+    }
+
+    public FinProductConvertibleDto getFinProductConvertibleDto() {
+        return finProductConvertibleDto;
+    }
+
+    public void setFinProductConvertibleDto(FinProductConvertibleDto finProductConvertibleDto) {
+        this.finProductConvertibleDto = finProductConvertibleDto;
+    }
 }
