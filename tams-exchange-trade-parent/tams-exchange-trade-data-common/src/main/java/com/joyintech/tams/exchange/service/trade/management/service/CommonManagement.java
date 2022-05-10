@@ -213,6 +213,8 @@ public class CommonManagement extends BaseService {
         response.setBondTradedUnit("01");
         // moddify by etliu 20220301 end
 
+        response.setTrdNewBondQuotationTypeControl(CacheUtil.getSysParam(ExchangeConstant.TRD_NEW_BOND_QUOTATION_TYPE_CONTROL));
+
         response.setTrdInstructionRefreshTime(CacheUtil.getSysParam(ExchangeConstant.TRD_INSTRUCTION_REFRESH_TIME));
         response.setTrdQuoteRefreshTime(CacheUtil.getSysParam(ExchangeConstant.TRD_QUOTE_REFRESH_TIME));
         response.setTrdEntrustRefreshTime(CacheUtil.getSysParam(ExchangeConstant.TRD_ENTRUST_REFRESH_TIME));
