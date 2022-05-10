@@ -136,6 +136,7 @@
 	 	A.*
 	 FROM 
 	 	CREDIT_ASSETPOOL A
+       	INNER JOIN CREDIT_LINES B ON A.SEQNO = B.CUSTOMER_ID AND to_char(B.VDATE,'yyyy-MM-dd') = #{vdate}
         where A.ASSETPOOL_NAME = #{customerName,jdbcType=VARCHAR}
     </select>
     

@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.common.base.entity.CreditLines;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.dto.UploadFile;
@@ -127,6 +128,11 @@ public class CreditLinesAstGrpDto  extends CreditLines implements ITableRow,Proc
     public Date getVdate(){
         return super.getVdate();
     }
+
+	@PrimaryKey(value=Field.PK_4)
+    public String getVdateStr(){
+    	return DateUtil.format(super.getVdate());
+	}
     
     
     /**
