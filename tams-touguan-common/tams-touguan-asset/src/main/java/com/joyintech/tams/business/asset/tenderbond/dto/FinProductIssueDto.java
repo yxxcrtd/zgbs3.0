@@ -1,7 +1,9 @@
 package com.joyintech.tams.business.asset.tenderbond.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.json.CustomDateDeserialize;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -337,6 +339,7 @@ public class FinProductIssueDto {
         return issueDate;
     }
 
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setIssueDate(Date issueDate) {
         this.issueDate = issueDate;
     }
@@ -345,6 +348,7 @@ public class FinProductIssueDto {
         return payDate;
     }
 
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setPayDate(Date payDate) {
         this.payDate = payDate;
     }
@@ -353,6 +357,7 @@ public class FinProductIssueDto {
         return firstConfirmDate;
     }
 
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setFirstConfirmDate(Date firstConfirmDate) {
         this.firstConfirmDate = firstConfirmDate;
     }
@@ -361,6 +366,7 @@ public class FinProductIssueDto {
         return issueSdate;
     }
 
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setIssueSdate(Date issueSdate) {
         this.issueSdate = issueSdate;
     }
@@ -369,6 +375,7 @@ public class FinProductIssueDto {
         return issueEdate;
     }
 
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setIssueEdate(Date issueEdate) {
         this.issueEdate = issueEdate;
     }
@@ -377,6 +384,7 @@ public class FinProductIssueDto {
         return tenderSdate;
     }
 
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setTenderSdate(Date tenderSdate) {
         this.tenderSdate = tenderSdate;
     }
@@ -385,6 +393,7 @@ public class FinProductIssueDto {
         return tenderEdate;
     }
 
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setTenderEdate(Date tenderEdate) {
         this.tenderEdate = tenderEdate;
     }
@@ -393,6 +402,7 @@ public class FinProductIssueDto {
         return payEdate;
     }
 
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setPayEdate(Date payEdate) {
         this.payEdate = payEdate;
     }
@@ -401,6 +411,7 @@ public class FinProductIssueDto {
         return assignRegdate;
     }
 
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setAssignRegdate(Date assignRegdate) {
         this.assignRegdate = assignRegdate;
     }

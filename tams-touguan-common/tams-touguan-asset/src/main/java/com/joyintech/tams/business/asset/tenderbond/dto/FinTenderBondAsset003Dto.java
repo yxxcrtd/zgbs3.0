@@ -1,7 +1,9 @@
 package com.joyintech.tams.business.asset.tenderbond.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
+import com.joyintech.framework.json.CustomDateDeserialize;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
@@ -196,7 +198,7 @@ public class FinTenderBondAsset003Dto extends BaseEntity implements ProcessEntit
     public Date getIssueDate() {
         return issueDate;
     }
-
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setIssueDate(Date issueDate) {
         this.issueDate = issueDate;
     }
@@ -205,6 +207,7 @@ public class FinTenderBondAsset003Dto extends BaseEntity implements ProcessEntit
         return vdate;
     }
 
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setVdate(Date vdate) {
         this.vdate = vdate;
     }
@@ -213,6 +216,7 @@ public class FinTenderBondAsset003Dto extends BaseEntity implements ProcessEntit
         return mdate;
     }
 
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setMdate(Date mdate) {
         this.mdate = mdate;
     }
@@ -237,6 +241,7 @@ public class FinTenderBondAsset003Dto extends BaseEntity implements ProcessEntit
         return listingDate;
     }
 
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setListingDate(Date listingDate) {
         this.listingDate = listingDate;
     }

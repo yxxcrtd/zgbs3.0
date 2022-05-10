@@ -1,6 +1,8 @@
 package com.joyintech.tams.business.asset.tenderbond.dto;
 
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.joyintech.framework.json.CustomDateDeserialize;
 import com.joyintech.tams.business.common.dto.PageMode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -200,7 +202,7 @@ public class FinTenderBondAssetSearch {
     public Date getIssueDateStart() {
         return issueDateStart;
     }
-
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setIssueDateStart(Date issueDateStart) {
         this.issueDateStart = issueDateStart;
     }
@@ -208,7 +210,7 @@ public class FinTenderBondAssetSearch {
     public Date getIssueDateEnd() {
         return issueDateEnd;
     }
-
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setIssueDateEnd(Date issueDateEnd) {
         this.issueDateEnd = issueDateEnd;
     }
@@ -216,7 +218,7 @@ public class FinTenderBondAssetSearch {
     public Date getPayEdateStart() {
         return payEdateStart;
     }
-
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setPayEdateStart(Date payEdateStart) {
         this.payEdateStart = payEdateStart;
     }
@@ -224,7 +226,7 @@ public class FinTenderBondAssetSearch {
     public Date getPayEdateEnd() {
         return payEdateEnd;
     }
-
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setPayEdateEnd(Date payEdateEnd) {
         this.payEdateEnd = payEdateEnd;
     }
@@ -232,7 +234,7 @@ public class FinTenderBondAssetSearch {
     public Date getListingDateStart() {
         return listingDateStart;
     }
-
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setListingDateStart(Date listingDateStart) {
         this.listingDateStart = listingDateStart;
     }
@@ -240,7 +242,7 @@ public class FinTenderBondAssetSearch {
     public Date getListingDateEnd() {
         return listingDateEnd;
     }
-
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setListingDateEnd(Date listingDateEnd) {
         this.listingDateEnd = listingDateEnd;
     }
@@ -248,7 +250,7 @@ public class FinTenderBondAssetSearch {
     public Date getVdateStart() {
         return vdateStart;
     }
-
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setVdateStart(Date vdateStart) {
         this.vdateStart = vdateStart;
     }
@@ -256,7 +258,7 @@ public class FinTenderBondAssetSearch {
     public Date getVdateEnd() {
         return vdateEnd;
     }
-
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setVdateEnd(Date vdateEnd) {
         this.vdateEnd = vdateEnd;
     }
@@ -264,7 +266,7 @@ public class FinTenderBondAssetSearch {
     public Date getMdateStart() {
         return mdateStart;
     }
-
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setMdateStart(Date mdateStart) {
         this.mdateStart = mdateStart;
     }
@@ -272,7 +274,7 @@ public class FinTenderBondAssetSearch {
     public Date getMdateEnd() {
         return mdateEnd;
     }
-
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setMdateEnd(Date mdateEnd) {
         this.mdateEnd = mdateEnd;
     }
