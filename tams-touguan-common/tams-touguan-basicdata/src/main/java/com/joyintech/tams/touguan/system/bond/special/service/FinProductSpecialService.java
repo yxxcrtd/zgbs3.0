@@ -53,28 +53,6 @@ public class FinProductSpecialService extends BaseService<FinProductSpecialDto> 
     @Autowired
     private IPlatformDate iPlatformDate;
 
-    @Override
-    public void doComplete(FinProductSpecialDto entity, OperationType type) {
-        if (type == OperationType.NEW) {
-
-        } else if (type == OperationType.MODIFY) {
-
-        }
-    }
-
-    /**
-     * 处理发起流程逻辑
-     *
-     * @param dto
-     * @param type
-     */
-    @Override
-    public void doInsert(FinProductSpecialDto dto, OperationType type) {
-        if ("save".equals(dto.getOperateType())) {
-            return;
-        }
-    }
-
     /**
      * 特殊债券信息分页查询
      *
@@ -105,6 +83,28 @@ public class FinProductSpecialService extends BaseService<FinProductSpecialDto> 
      */
     public Integer countFinprodIdProcessing(String finprodId) {
         return finProductSpecialAssetMapper.countFinprodIdProcessing(finprodId, iPlatformDate.getSysDate());
+    }
+
+    @Override
+    public void doComplete(FinProductSpecialDto entity, OperationType type) {
+        if (type == OperationType.NEW) {
+
+        } else if (type == OperationType.MODIFY) {
+
+        }
+    }
+
+    /**
+     * 处理发起流程逻辑
+     *
+     * @param dto
+     * @param type
+     */
+    @Override
+    public void doInsert(FinProductSpecialDto dto, OperationType type) {
+        if ("save".equals(dto.getOperateType())) {
+            return;
+        }
     }
 
 
@@ -150,6 +150,7 @@ public class FinProductSpecialService extends BaseService<FinProductSpecialDto> 
                 List<FinProductSpecialImportDto> finProductSpecialImportDtos = convertToBean(dataList);
 
                 for (int i = 0; i < finProductSpecialImportDtos.size(); i++) {
+                    int j = i + 2;
 
 //                    提示：{0}必须输入（行号为{1}）。
 //                    有{2}条记录导入失败。请确认是否继续？
@@ -161,7 +162,7 @@ public class FinProductSpecialService extends BaseService<FinProductSpecialDto> 
                     if (DictCodeList.是否_否.getCodeName().equals(finProductSpecialImportDto.getIsDefaultBondIndicator())
                             && DictCodeList.是否_否.getCodeName().equals(finProductSpecialImportDto.getIsAbs())
                             && DictCodeList.是否_否.getCodeName().equals(finProductSpecialImportDto.getIsSpecialDebt())) {
-                        result.setMessage("第" + (i + 2) + "行特殊债券标识至少其中一个为是!", MessageType.错误消息);
+                        result.setMessage(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_MAXIMUM_SIZE", j), MessageType.错误消息);
                         return result;
                     }
                 }
