@@ -6,24 +6,24 @@ create table INTERF_RDI_BOND_CREDIT_RATING
     CREDIT_VALIDITY_FROM CHAR(8),
     CREDIT_VALIDITY_TO   CHAR(8)
 )
-/
+;
 
 comment on table INTERF_RDI_BOND_CREDIT_RATING is '银行间债券信用评级'
-/
+;
 
 comment on column INTERF_RDI_BOND_CREDIT_RATING.SECURITY_ID is '债券代码'
-/
+;
 
 comment on column INTERF_RDI_BOND_CREDIT_RATING.CREDIT_RATING_AGENCY is '信用评级机构'
-/
+;
 
 comment on column INTERF_RDI_BOND_CREDIT_RATING.CREDIT_RATING is '信用评级'
-/
+;
 
 comment on column INTERF_RDI_BOND_CREDIT_RATING.CREDIT_VALIDITY_FROM is '信用等级有效起始日 格式：YYYYMMDD'
-/
+;
 
 comment on column INTERF_RDI_BOND_CREDIT_RATING.CREDIT_VALIDITY_TO is '信用等级有效终止日 格式：YYYYMMDD'
-/
+;
 
 
