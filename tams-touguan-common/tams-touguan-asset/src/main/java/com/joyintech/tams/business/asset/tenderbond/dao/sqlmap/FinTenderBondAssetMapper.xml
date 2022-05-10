@@ -216,7 +216,7 @@
                 </foreach>
             </if>
             <if test="search !=null and search !=''">
-                (
+                and (
                     E1.ITEM_VALUE like '%' || #{search} || '%' OR
                     E2.ITEM_VALUE like '%' || #{search} || '%' OR
                     E3.ITEM_VALUE like '%' || #{search} || '%' OR
