@@ -159,8 +159,12 @@
         CONDITION_ITEM as conditionItem,
         CONTROL_TYPE as controlType,
         VALUE_STR as valueStr,
-        VALUE_END as valueEnd
-        from RSK_INDIVID_CONDITION
+        VALUE_END as valueEnd,
+		DATE_STR as dateStr,
+		DATE_END as dateEnd,
+		DATE_UNIT_STR as dateUnitStr,
+		DATE_UNIT_END as dateUnitEnd
+		from RSK_INDIVID_CONDITION_VIEW
     </select>
 
 	<select id="getPortfValuation" resultType="com.joyintech.tams.common.base.entity.PtlPortfolioValuation">
@@ -174,6 +178,25 @@
 		) m ON t.PORTFOLIO_ID=m.PORTFOLIO_ID AND t.CDATE=m.CDATE
     </select>
 
+	<select id="getPortfOpenPlan" resultType="com.joyintech.tams.common.base.entity.FinOpenPlan">
+		/** 高频开放**/
+		select n.PORTFOLIO_ID as finprodId,to_date('${valDate}','yyyy-MM-dd') AS OPEN_DATE_STR,to_date('${valDate}','yyyy-MM-dd') AS OPEN_DATE_END,
+	   	to_date('${valDate}','yyyy-MM-dd') AS OPEN_VDATE,r.OPEN_TYPE from PTL_PORTFOLIO m
+	 	INNER JOIN PA_PTL_PORTFOLIO n ON m.PORTFOLIO_ID=n.PORTFOLIO_ID AND n.OPEN_TYPE='02'
+	 	INNER JOIN FIN_CASH_INFO n ON n.FINPROD_ID = 'F16_' || m.PORTFOLIO_ID AND n.CASH_TYPE_1 = '01' AND n.CASH_TYPE_2 = 'C01'
+	 	INNER JOIN FIN_OPEN_RULE r ON r.CASH_ID = n.CASH_ID AND r.OPEN_MODE = '02'
+		/** 定期或周期开放（区间最近一次）**/
+		UNION
+		SELECT PORTFOLIO_ID finprodId,OPEN_DATE_STR,OPEN_DATE_END,OPEN_VDATE,OPEN_TYPE FROM
+		(
+			SELECT m.PORTFOLIO_ID,y.OPEN_DATE_STR,y.OPEN_DATE_END,y.OPEN_VDATE,y.OPEN_TYPE,rank() over(PARTITION BY m.PORTFOLIO_ID,y.OPEN_TYPE ORDER BY y.OPEN_VDATE asc) AS rowno  from PTL_PORTFOLIO m
+		 	INNER JOIN  FIN_CASH_INFO n ON n.FINPROD_ID='F16_'||m.PORTFOLIO_ID  AND n.CASH_TYPE_1='01' AND n.CASH_TYPE_2='C01'
+		 	INNER JOIN  FIN_OPEN_PLAN y ON y.CASH_ID=n.CASH_ID
+		 	INNER JOIN  PA_PTL_PORTFOLIO s  on m.PORTFOLIO_ID=s.PORTFOLIO_ID AND s.OPEN_TYPE='02'
+			WHERE  y.OPEN_VDATE>=to_date('${valDate}','yyyy-MM-dd')  ORDER BY y.OPEN_VDATE ASC
+		) WHERE  rowno=1
+	</select>
+
 	<select id="getRiskIndividSpecialStage" resultType="com.joyintech.tams.common.base.entity.RskIndividSpecialStage">
 		select
 		 UNITE_ID uniteId,
@@ -185,7 +208,7 @@
 		 WARN_COND warnCond,
 		 APPROVE_COND approveCond,
 		 FOUL_COND foulCond
-		from RSK_INDIVID_SPECIAL_STAGE
+		from RSK_INDIVID_SPECIAL_STAGE_VIEW
 		<where>
 			UNITE_TYPE=#{uniteType}
 			<if test="valDate != null and valDate != '' "><![CDATA[
@@ -200,7 +223,7 @@
 		UNITE_ID as uniteId,
 		PRT_BAG_ID as prtBagId,
 		IND_ID as indId
-		from RSK_INDIVID_UNITE
+		from RSK_INDIVID_UNITE_VIEW
 	</select>
 
 	<select id="getRiskIndividAstDel" resultType="com.joyintech.tams.common.base.entity.RskIndividAssetDel">
@@ -211,7 +234,7 @@
 		START_DATE startDate,
 		END_DATE endDate,
 		FINPROD_ID finprodId
-		from RSK_INDIVID_ASSET_DEL
+		from RSK_INDIVID_ASSET_DEL_VIEW
 		<where>
 			<if test="valDate != null and valDate != '' "><![CDATA[
 				 START_DATE <= to_date('${valDate}','yyyy-MM-dd')

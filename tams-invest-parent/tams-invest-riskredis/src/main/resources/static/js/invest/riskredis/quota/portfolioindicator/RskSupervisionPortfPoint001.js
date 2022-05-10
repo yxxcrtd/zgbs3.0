@@ -188,7 +188,7 @@
         cols:[
              {field:'indId', width:150 , visible: false}
             ,{field:'portfolioId', width:150 , visible: false}
-            ,{field:'portfolioLevel', width:250 , title: 'RskSupervisionPortfPoint001.portfolioLevel',visible: false}
+            ,{field:'portfolioLevel', width:150 , title: 'RskSupervisionPortfPoint001.portfolioLevel',visible: false}
             ,{field:'indName', width:250 , title: 'RskSupervisionPortfPoint001.indName',
             	render : function(data, type, row, meta) {
                     return '<i style="color:#0078F0;font-style: normal;cursor: pointer;" class="indName">'+data+'</a>';

@@ -39,7 +39,7 @@ public class BussFinProductOpenPlanValidator implements BeanValidator {
     public List<ValidMessage> valid(Object value) {
         BussFinProductOpenPlanDto dto = (BussFinProductOpenPlanDto)value;
         List<ValidMessage> resultList = new ArrayList<ValidMessage>();
-        if (StringUtil.equals(DictCodeList.开放类型_开放式.getValue() ,dto.getOperationType()) && StringUtil.equals(dto.getPageId(), "FinProductBuild002") || StringUtil.equals(dto.getPageId(), "FinNetValueProductBuild002")){
+        if (StringUtil.equals(DictCodeList.开放类型_开放式.getValue() ,dto.getOperationType()) && StringUtil.equals(dto.getPageId(), "FinProductBuild002") || StringUtil.equals(dto.getPageId(), "FinNetValueProductBuild002")|| StringUtil.equals(dto.getPageId(), "FinPlanNetAsset002")|| StringUtil.equals(dto.getPageId(), "FinPlanAssetC002")|| StringUtil.equals(dto.getPageId(), "FinPlanProfitAsset002")){
             // 开放模式
             if (StringUtil.isNotEmpty(dto.getOpenMode())) {
                 if (StringUtil.equals(DictCodeList.开放类型_开放式.getValue() ,dto.getOperationType()) 

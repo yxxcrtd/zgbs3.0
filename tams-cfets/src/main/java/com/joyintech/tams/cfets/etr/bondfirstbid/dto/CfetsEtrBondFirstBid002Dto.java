@@ -1,6 +1,8 @@
 package com.joyintech.tams.cfets.etr.bondfirstbid.dto;
 
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.common.base.entity.SysUploadFileInfo;
@@ -40,6 +42,20 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
      */
     @ApiModelProperty(name="issueClass",value="发行方式")
     private String issueClass;
+
+    /**
+     * 发行价格
+     */
+    @ApiModelProperty(name = "issuePrice", value = "发行价格")
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal issuePrice;
+
+    /**
+     * 收益率，利息贴现为参考收益率，附息为票面利率
+     */
+    @ApiModelProperty(name = "referYield", value = "收益率，利息贴现为参考收益率，附息为票面利率")
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal referYield;
 
     /**
      *  招标标的
@@ -170,6 +186,12 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
      */
     @ApiModelProperty(name="counterName",value="交易对手名称")
     private String counterName;
+
+    /**
+     * 市场代码
+     */
+    @ApiModelProperty(name = "finprodMarketId", value = "市场代码")
+    private String finprodMarketId;
 
     public String getElementId() {
         return elementId;
@@ -371,5 +393,29 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
 
     public void setCounterName(String counterName) {
         this.counterName = counterName;
+    }
+
+    public String getFinprodMarketId() {
+        return finprodMarketId;
+    }
+
+    public void setFinprodMarketId(String finprodMarketId) {
+        this.finprodMarketId = finprodMarketId;
+    }
+
+    public BigDecimal getIssuePrice() {
+        return issuePrice;
+    }
+
+    public void setIssuePrice(BigDecimal issuePrice) {
+        this.issuePrice = issuePrice;
+    }
+
+    public BigDecimal getReferYield() {
+        return referYield;
+    }
+
+    public void setReferYield(BigDecimal referYield) {
+        this.referYield = referYield;
     }
 }

@@ -380,6 +380,34 @@ public class ImplAsset extends FinProduct implements IAssetInfo {
     private String isFlowLimited;
 
     /**
+     * 是否无活跃交易市场
+     */
+    private String isLiquidity1;
+    /**
+     * 是否不具备活跃交易市场
+     */
+    private String isLiquidity2;
+    /**
+     * 是否7个工作日可变现资产
+     */
+    private String isLiquidity3;
+
+    /**
+     * 标的是否7日可变现
+     */
+    private String isSevenDayCashable;
+
+    /**
+     * 是否每日开放申赎
+     */
+    private String isOpenEveryDay;
+
+    /**
+     * 是否不良资产
+     */
+    private String isBadAsset;
+
+    /**
      * 获取 是否流动性受限
      * 
      * @return 是否流动性受限.
@@ -395,6 +423,54 @@ public class ImplAsset extends FinProduct implements IAssetInfo {
      */
     public void setIsFlowLimited(String isFlowLimited) {
         this.isFlowLimited = isFlowLimited;
+    }
+
+    /**
+     * 获取 是否无活跃交易市场
+     * @return 是否无活跃交易市场
+     */
+    public String getIsLiquidity1() {
+        return isLiquidity1;
+    }
+
+    /**
+     * 设置 是否无活跃交易市场
+     * @param isLiquidity1 是否无活跃交易市场
+     */
+    public void setIsLiquidity1(String isLiquidity1) {
+        this.isLiquidity1 = isLiquidity1;
+    }
+
+    /**
+     * 获取 是否不具备活跃交易市场
+     * @return 是否不具备活跃交易市场
+     */
+    public String getIsLiquidity2() {
+        return isLiquidity2;
+    }
+
+    /**
+     * 设置 是否不具备活跃交易市场
+     * @param isLiquidity2 是否不具备活跃交易市场
+     */
+    public void setIsLiquidity2(String isLiquidity2) {
+        this.isLiquidity2= isLiquidity2;
+    }
+
+    /**
+     * 获取 是否7个工作日可变现资产
+     * @return 是否7个工作日可变现资产
+     */
+    public String getIsLiquidity3() {
+        return isLiquidity3;
+    }
+
+    /**
+     * 设置 是否7个工作日可变现资产
+     * @param isLiquidity3 是否7个工作日可变现资产
+     */
+    public void setIsLiquidity3(String isLiquidity3) {
+        this.isLiquidity3 = isLiquidity3;
     }
     // add by zhangrui1 增加资产属性:是否流动性受限 end
     // add by zhangrui1 增加资产属性:机构主体类型 start
@@ -439,9 +515,39 @@ public class ImplAsset extends FinProduct implements IAssetInfo {
     }
 
     /**
-     * 行内四级类型
+     * 行内三级类型
      */
     private String  type11;
+
+    /**
+     * 行内业务类型
+     */
+    private String  type12;
+
+    /**
+     * 股票类型
+     */
+    private String  stockShareType;
+
+    /**
+     * 股票交易状态
+     */
+    private String  stockTradeStatus;
+
+    /**
+     * 计划类资产最新赎回日
+     */
+    private Date astLastRedempDate;
+
+    /**
+     * 资产最新还本日
+     */
+    private Date astLastRebackDate;
+
+    /**
+     * 资产最新付息日
+     */
+    private Date astLastPayDate;
 
     @Override
     public String getType11() {
@@ -450,5 +556,86 @@ public class ImplAsset extends FinProduct implements IAssetInfo {
 
     public void setType11(String type11) {
         this.type11 = type11;
+    }
+
+    @Override
+    public String getType12() {
+        return type12;
+    }
+
+    public void setType12(String type12) {
+        this.type12 = type12;
+    }
+
+    @Override
+    public String getStockShareType() {
+        return stockShareType;
+    }
+
+    public void setStockShareType(String stockShareType) {
+        this.stockShareType = stockShareType;
+    }
+
+    @Override
+    public String getStockTradeStatus() {
+        return stockTradeStatus;
+    }
+
+    public void setStockTradeStatus(String stockTradeStatus) {
+        this.stockTradeStatus = stockTradeStatus;
+    }
+
+    @Override
+    public Date getAstLastRedempDate() {
+        return astLastRedempDate;
+    }
+
+    public void setAstLastRedempDate(Date astLastRedempDate) {
+        this.astLastRedempDate = astLastRedempDate;
+    }
+
+    @Override
+    public Date getAstLastRebackDate() {
+        return astLastRebackDate;
+    }
+
+    public void setAstLastRebackDate(Date astLastRebackDate) {
+        this.astLastRebackDate = astLastRebackDate;
+    }
+
+    @Override
+    public Date getAstLastPayDate() {
+        return astLastPayDate;
+    }
+
+    public void setAstLastPayDate(Date astLastPayDate) {
+        this.astLastPayDate = astLastPayDate;
+    }
+
+    @Override
+    public String getIsSevenDayCashable() {
+        return isSevenDayCashable;
+    }
+
+    public void setIsSevenDayCashable(String isSevenDayCashable) {
+        this.isSevenDayCashable = isSevenDayCashable;
+    }
+
+    @Override
+    public String getIsOpenEveryDay() {
+        return isOpenEveryDay;
+    }
+
+    public void setIsOpenEveryDay(String isOpenEveryDay) {
+        this.isOpenEveryDay = isOpenEveryDay;
+    }
+
+    @Override
+    public String getIsBadAsset() {
+        return isBadAsset;
+    }
+
+    public void setIsBadAsset(String isBadAsset) {
+        this.isBadAsset = isBadAsset;
     }
 }

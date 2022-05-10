@@ -971,7 +971,7 @@
             AND T1.CHL_ID = #{chlId}
         </if>
         <!-- AND (T1.PORTFOLIO_ID = #{portfolioId} or t3.PORTFOLIO_ID = #{portfolioId}) -->
-        AND T1.MDATE > TO_DATE(#{mDate}, 'yyyy-MM-dd')
+        AND T1.MDATE > TO_DATE(#{mDate,jdbcType=VARCHAR}, 'yyyy-MM-dd')
         union all
         SELECT COUNT(1) cc
         FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL T1
@@ -986,7 +986,7 @@
             AND T1.CHL_ID = #{chlId}
         </if>
         <!-- AND (T1.PORTFOLIO_ID = #{portfolioId} or t3.PORTFOLIO_ID = #{portfolioId}) -->
-        AND T1.MDATE > TO_DATE(#{mDate}, 'yyyy-MM-dd')
+        AND T1.MDATE > TO_DATE(#{mDate,jdbcType=VARCHAR}, 'yyyy-MM-dd')
         )
     </select>
 

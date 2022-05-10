@@ -148,6 +148,15 @@
             	$('#vdate').attr("disabled",true);
             	$('#ccy').attr("disabled",true);
             }
+            var openType = $("#openType").val();
+            //封闭式
+            if(openType == '01'){
+                $('#isSevenDayCashable').attr("disabled",false).trigger('change');
+                $('#isSevenDayCashable').attr("required",true);
+            }else{
+                $('#isSevenDayCashable').attr("disabled",true).trigger('change');
+                $('#isSevenDayCashable').attr("required",false);
+            }
         }
     	if($("#creditFlag").val() == 'Y'){
     		$("#actualCreditProvid").attr("required", true).trigger('change');
@@ -507,6 +516,22 @@
             	}
         	}
         	star();
+        });
+        $('#openType').change(function(){
+            if(pageModel != PAGE_MODEL_REFERENCE){
+                var openType = $("#openType").val();
+                //封闭式
+                if(openType == '01'){
+                    $('#isSevenDayCashable').attr("disabled",false);
+                    $('#isSevenDayCashable').val('').trigger('change');
+                    $('#isSevenDayCashable').attr("required",true);
+                }else{
+                    $('#isSevenDayCashable').attr("disabled",true);
+                    $('#isSevenDayCashable').val('').trigger('change');
+                    $('#isSevenDayCashable').attr("required",false);
+                }
+            }
+            star();
         });
         $("#pflsh").change(function(){
         	var str = $('#pflsh').select2('data')[0].object.split(',');

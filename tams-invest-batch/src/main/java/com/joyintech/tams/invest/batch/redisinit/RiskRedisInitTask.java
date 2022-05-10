@@ -118,6 +118,8 @@ public class RiskRedisInitTask extends BatchBaseService{
             implCond.setDel(false);
             //默认更新指标参数值
             implCond.setIsUpdParVal(true);
+            //默认加上参数中间值
+            implCond.setLoadOffset(true);
             batchSucMap=riskRedisInitService.execute(implCond);
             if(StringUtil.isNotEmpty(batchSucMap.get("redisErrorMessageList"))){
                 StringBuffer logError=new StringBuffer();

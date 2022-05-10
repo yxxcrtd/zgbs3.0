@@ -1,0 +1,3 @@
+/**风险指标:定期开放周期不低于90天的公募理财产品，应当在开放日及开放日前7个工作日内持有不低于该理财产品资产净值5%的现金或者到期日在一年以内的国债、中央银行票据和政策性金融债券**/
+ DELETE FROM RSK_ISUP_INDICATOR WHERE IND_ID='3f219bc189f941cb9ba8e81a25a60e22';
+ INSERT INTO RSK_ISUP_INDICATOR VALUES('3f219bc189f941cb9ba8e81a25a60e22','定期开放周期不低于90天的公募理财产品，应当在开放日及开放日前7个工作日内持有不低于该理财产品资产净值5%的现金或者到期日在一年以内的国债、中央银行票据和政策性金融债券(穿透后)','LIMIT_FLUID','(${XJGMCTH}+${XJGZZYYHPJZCXJRZQGMCTH})/${CPJZCJZ}','SUPERVISION','01,02,03','DAYTIME,DAYEND','','{"threshold_1":{"op":"<","value":"5.5","unit":"PERCENT","is_model":"02"}}','{"threshold_1":{"op":"<","unit":"PERCENT","is_model":"02"}}','{"threshold_1":{"op":"<","value":"5","unit":"PERCENT","is_model":"02"}}','N','','01','','system',null,sysdate,'system',sysdate,'02','','01','Y');

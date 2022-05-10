@@ -396,7 +396,8 @@ public class TradeMsgProcessor {
             // 可用额度
             if (instruction.getEntrustAmt().doubleValue() > 0) {
                 // 金额指令全部以净价处理， 需要重新计算指令金额冻结
-                BigDecimal instructionBalance = bondHelper.calculateBalanceForInstruction(orderInterface.getEntrustProp(), orderInterface.getAssetType(), orderInterface.getEntrustPrice(), orderInterface.getEntrustVolume(), entrustBalance);
+//                BigDecimal instructionBalance = bondHelper.calculateBalanceForInstruction(orderInterface.getEntrustProp(), orderInterface.getAssetType(), orderInterface.getEntrustPrice(), orderInterface.getEntrustVolume(), entrustBalance);
+                BigDecimal instructionBalance = bondHelper.calculateBalanceForInstruction(orderInterface, orderInterface.getEntrustVolume(), entrustBalance);
                 if (TradeUtils.lessThan(instruction.getEntrustAmt(), TradeUtils.add(instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity(), instructionBalance, 2))) {
                     orderInterface.setErrorCode(ErrorCode.INSTRUCTIONS_BALANCE_ERROR.value);
                     orderInterface.setErrorMsg(ErrorCode.INSTRUCTIONS_BALANCE_ERROR.errorMsg);
@@ -422,7 +423,8 @@ public class TradeMsgProcessor {
             }
             if (instruction.getEntrustAmt().doubleValue() > 0) {
                 // 金额指令全部以净价处理， 需要重新计算指令金额冻结
-                BigDecimal instructionBalance = bondHelper.calculateBalanceForInstruction(orderInterface.getEntrustProp(), orderInterface.getAssetType(), orderInterface.getEntrustPrice(), orderInterface.getEntrustVolume(), entrustBalance);
+//                BigDecimal instructionBalance = bondHelper.calculateBalanceForInstruction(orderInterface.getEntrustProp(), orderInterface.getAssetType(), orderInterface.getEntrustPrice(), orderInterface.getEntrustVolume(), entrustBalance);
+                BigDecimal instructionBalance = bondHelper.calculateBalanceForInstruction(orderInterface, orderInterface.getEntrustVolume(), entrustBalance);
                 if (TradeUtils.lessThan(instruction.getEntrustAmt(), TradeUtils.add(instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity(), instructionBalance, 2))) {
                     orderInterface.setErrorCode(ErrorCode.INSTRUCTIONS_BALANCE_ERROR.value);
                     orderInterface.setErrorMsg(ErrorCode.INSTRUCTIONS_BALANCE_ERROR.errorMsg);

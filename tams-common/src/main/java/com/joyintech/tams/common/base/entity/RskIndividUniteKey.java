@@ -19,6 +19,11 @@ public class RskIndividUniteKey extends BaseEntity {
     private String indId;
 
     /**
+     * 处理类型
+     */
+    private String processModel;
+
+    /**
      * 取得 联合设置编号
      * @return 联合设置编号
      */
@@ -64,5 +69,13 @@ public class RskIndividUniteKey extends BaseEntity {
      */
     public void setIndId(String indId) {
         this.indId = indId == null ? null : indId.trim();
+    }
+
+    public String getProcessModel() {
+        return processModel;
+    }
+
+    public void setProcessModel(String processModel) {
+        this.processModel = processModel;
     }
 }

@@ -34,6 +34,8 @@ $(function() {
         object.selectedItem = table.getAllRows();
         for (var i = 0; i < object.selectedItem.length; i++){
     		object.selectedItem[i].paramNum = i+1;
+            object.selectedItem[i].ruleId = object.ruleId;
+            object.selectedItem[i].ruleName = object.ruleName;
     	}
         object.selectedItem.map(function(v) {
         	if(v.classifyDimensionVal) {

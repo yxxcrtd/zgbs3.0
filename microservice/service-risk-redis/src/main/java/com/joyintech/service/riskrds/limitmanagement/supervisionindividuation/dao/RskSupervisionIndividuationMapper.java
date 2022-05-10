@@ -25,6 +25,8 @@ public interface RskSupervisionIndividuationMapper {
 
 	List<SelectOptionDto> queryUniteIndIdList(Map<String, Object> param);
 
+	List<SelectOptionDto> queryUniteIndIdList_RULE(Map<String, Object> param);
+
 	List<RskIndividConditionDto> selectIndividuationForPage(Map<String, Object> param);
 
 	List<RskIndividUniteDto> selectUniteForPage(Map<String, Object> param);

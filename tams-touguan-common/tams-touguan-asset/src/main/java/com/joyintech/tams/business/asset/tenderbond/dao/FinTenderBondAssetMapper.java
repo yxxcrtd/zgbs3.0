@@ -5,6 +5,7 @@ import com.joyintech.tams.business.asset.tenderbond.dto.*;
 import com.joyintech.tams.business.asset.tenderbond.dto.FinProductAddDto;
 import com.joyintech.tams.business.asset.tenderbond.dto.FinProductIssueDto;
 import com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset002Dto;
+import com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset003Dto;
 import com.joyintech.tams.common.base.entity.FinProductTypeConfig;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import org.apache.ibatis.annotations.Param;
@@ -79,7 +80,7 @@ public interface FinTenderBondAssetMapper {
      * @param finprodId
      * @return
      */
-    Integer countFinprodIdUse(@Param("finprodId") String finprodId, @Param("isCancel") String isCancel);
+    Integer countFinprodIdUse(@Param("finprodId") String finprodId, @Param("isCancel") String isCancel,@Param("ps") String ps);
 
     /**
      * 判断是否存在上市流通交易数据
@@ -135,4 +136,12 @@ public interface FinTenderBondAssetMapper {
      * @return
      */
     FinProductTypeConfig getWindType(FinProductTypeConfig param);
+
+    /**
+     * 获取上市流通数据
+     *
+     * @param finprodId
+     * @return
+     */
+    FinTenderBondAsset003Dto getByFinProductId(@Param("finprodId") String finprodId);
 }

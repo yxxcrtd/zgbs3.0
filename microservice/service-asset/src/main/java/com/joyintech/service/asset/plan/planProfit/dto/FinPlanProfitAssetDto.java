@@ -14,6 +14,8 @@ import com.joyintech.tams.invest.common.dto.MstFileInputParameter;
 
 import java.math.BigDecimal;
 import java.util.List;
+import com.joyintech.service.product.common.dto.BussFinProductOpenPlanDto;
+import javax.validation.Valid;
 
 /**
  * 〈一句话功能简述〉 〈功能详细描述〉
@@ -202,6 +204,22 @@ private RepAssetOther repAssetOther;
      * 资产/负债类别
      */
     private String repAssetType;
+
+    /**
+     * 是否每日开放申赎
+     */
+    private String isOpenEveryDay;
+
+    /**
+     * {@linkplain}
+     */
+    @Valid
+    private BussFinProductOpenPlanDto bussFinProductOpenPlanDto;
+    /**
+     * add by zhangweiqi
+     */
+    @Valid
+    private BussFinProductOpenPlanDto bussFinProductOpenPlanRedDto;
 
 	/**
 	 * 获取 type9
@@ -1386,5 +1404,37 @@ private RepAssetOther repAssetOther;
      */
     public void setFundMangerName(String fundMangerName) {
         this.fundMangerName = fundMangerName;
+    }
+
+    public String getIsOpenEveryDay() {
+        return isOpenEveryDay;
+    }
+
+    public void setIsOpenEveryDay(String isOpenEveryDay) {
+        this.isOpenEveryDay = isOpenEveryDay;
+    }
+
+    /**
+     * 获取 bussFinProductOpenPlanDto
+     * @return bussFinProductOpenPlanDto.
+     */
+    public BussFinProductOpenPlanDto getBussFinProductOpenPlanDto() {
+        return bussFinProductOpenPlanDto;
+    }
+
+    /**
+     * 设置 bussFinProductOpenPlanDto
+     * @param bussFinProductOpenPlanDto bussFinProductOpenPlanDto
+     */
+    public void setBussFinProductOpenPlanDto(BussFinProductOpenPlanDto bussFinProductOpenPlanDto) {
+        this.bussFinProductOpenPlanDto = bussFinProductOpenPlanDto;
+    }
+
+    public BussFinProductOpenPlanDto getBussFinProductOpenPlanRedDto() {
+        return bussFinProductOpenPlanRedDto;
+    }
+
+    public void setBussFinProductOpenPlanRedDto(BussFinProductOpenPlanDto bussFinProductOpenPlanRedDto) {
+        this.bussFinProductOpenPlanRedDto = bussFinProductOpenPlanRedDto;
     }
 }

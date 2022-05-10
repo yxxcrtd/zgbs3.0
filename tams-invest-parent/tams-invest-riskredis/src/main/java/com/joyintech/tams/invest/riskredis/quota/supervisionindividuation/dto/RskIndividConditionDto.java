@@ -16,4 +16,16 @@ public class RskIndividConditionDto extends RskIndividCondition{
 	public String getControlTypeStr() {
 		return SysDataUtil.getNameFromDataDict(BussinessDictCodeRds.控制类型, super.getControlType());
 	}
+	public String getDateStrStr(){
+		return SysDataUtil.getNameFromDataDict(BussinessDictCodeRds.日期选项, super.getDateStr());
+	}
+	public String getDateEndStr(){
+		return SysDataUtil.getNameFromDataDict(BussinessDictCodeRds.日期选项, super.getDateEnd());
+	}
+	public String getDateUnitStrStr(){
+		return SysDataUtil.getNameFromDataDict(BussinessDictCodeRds.日期类型_信批, super.getDateUnitStr());
+	}
+	public String getDateUnitEndStr(){
+		return SysDataUtil.getNameFromDataDict(BussinessDictCodeRds.日期类型_信批, super.getDateUnitEnd());
+	}
 }

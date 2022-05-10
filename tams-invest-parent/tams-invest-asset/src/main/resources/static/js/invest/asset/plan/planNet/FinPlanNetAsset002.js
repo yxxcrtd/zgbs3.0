@@ -172,6 +172,66 @@ var QueryFunc=function(){
         }
 
         //add by  zhangnian 20191021 end
+        //计划类资产添加开放计划 add by kongzhifang 2022-03-04 start
+        // 开放计划
+        if (object.bussFinProductOpenPlanDto){
+            if (object.bussFinProductOpenPlanDto.dayOfWeek){
+                object.bussFinProductOpenPlanDto.dayOfWeek = object.bussFinProductOpenPlanDto.dayOfWeek.join(',');
+            }
+            if (object.bussFinProductOpenPlanDto.dayOfMonth){
+                object.bussFinProductOpenPlanDto.dayOfMonth = object.bussFinProductOpenPlanDto.dayOfMonth.join(',');
+            }
+            if (object.bussFinProductOpenPlanDto.workdayOfMonth){
+                object.bussFinProductOpenPlanDto.workdayOfMonth = object.bussFinProductOpenPlanDto.workdayOfMonth.join(',');
+            }
+            if (!object.bussFinProductOpenPlanDto.hdayOpenFlag) {
+                object.bussFinProductSaleParamDto.hdayOpenFlag = 'N';
+            }
+            if(object.operationType) {
+                object.bussFinProductOpenPlanDto.operationType = object.operationType;//发行方式不为空时，将发行方式传递到开放计划DTO里
+            }
+            //add by wm 2019-11-26 开放计划月选第几周报错修复 start
+            if (object.bussFinProductOpenPlanDto.weekOfMonth){
+                object.bussFinProductOpenPlanDto.weekOfMonth = object.bussFinProductOpenPlanDto.weekOfMonth.join(',');
+            }
+            if (object.bussFinProductOpenPlanDto.workdayOfWeek){
+                object.bussFinProductOpenPlanDto.workdayOfWeek = object.bussFinProductOpenPlanDto.workdayOfWeek.join(',');
+            }
+            //add by wm 2019-11-26 开放计划月选第几周报错修复 end
+        }
+        var openMode ="";
+        if (object.bussFinProductOpenPlanDto){
+            openMode =object.bussFinProductOpenPlanDto.openMode;//add by zlp 20190314 高频开发不校验开放计划
+        }
+        if(openMode!='02'&&!BussFinProductOpenPlan.chkOpenPlan()) return false;//add by zhangweiqi 开放计划元素调整后重新生成计划
+        // 赎回开放计划 add by yejiejie
+        if (object.bussFinProductOpenPlanRedDto){
+            var openRedMode = object.bussFinProductOpenPlanRedDto.openMode;
+            if(openMode!='02'&&object.dealMode != DISPOSE_PATTERN_10&&!BussFinProductOpenPlan.chkRedOpenPlan()){
+                return false;
+            }
+            if (object.bussFinProductOpenPlanRedDto.dayOfWeek){
+                object.bussFinProductOpenPlanRedDto.dayOfWeek = object.bussFinProductOpenPlanRedDto.dayOfWeek.join(',');
+            }
+            if (object.bussFinProductOpenPlanRedDto.dayOfMonth){
+                object.bussFinProductOpenPlanRedDto.dayOfMonth = object.bussFinProductOpenPlanRedDto.dayOfMonth.join(',');
+            }
+            if (object.bussFinProductOpenPlanRedDto.workdayOfMonth){
+                object.bussFinProductOpenPlanRedDto.workdayOfMonth = object.bussFinProductOpenPlanRedDto.workdayOfMonth.join(',');
+            }
+            if (!object.bussFinProductOpenPlanRedDto.hdayOpenFlag) {
+                object.bussFinProductOpenPlanRedDto.hdayOpenFlag = 'N';
+            }
+            //add by wm 2019-11-26 开放计划月选第几周报错修复 start
+            if (object.bussFinProductOpenPlanRedDto.weekOfMonth){
+                object.bussFinProductOpenPlanRedDto.weekOfMonth = object.bussFinProductOpenPlanRedDto.weekOfMonth.join(',');
+            }
+            if (object.bussFinProductOpenPlanRedDto.workdayOfWeek){
+                object.bussFinProductOpenPlanRedDto.workdayOfWeek = object.bussFinProductOpenPlanRedDto.workdayOfWeek.join(',');
+            }
+            //add by wm 2019-11-26 开放计划月选第几周报错修复 end
+        }
+        //计划类资产添加开放计划 add by kongzhifang 2022-03-04 end
         Joyin.ajaxJson(basePath + 'invest/asset/plan/planNet/FinPlanNetAsset002/check', object, function(result) {
             Joyin.ajaxJson(basePath + 'invest/asset/common/isHoliday', {
                 mdate: object.mdate,
@@ -209,6 +269,15 @@ var QueryFunc=function(){
             $('#repAssetType').trigger('change');
         }
     }
+
+    var initOperationType = function (){
+        if($('#isOpenEveryDay').val() == 'N'){
+            $('#operationType').val('02').trigger('change');
+        }else{
+            $('#operationType').val('01').trigger('change');
+        }
+    }
+
     var init = function(){
     	//如果授信模式=='02'，则显示批复号和实际授信主体
     	if(CE_MODEL == '02'){
@@ -341,6 +410,18 @@ var QueryFunc=function(){
         $('#repAssetType').change(function(){
             showReportInfo();
         });
+
+        initOperationType();
+
+        //添加是否每日开放申赎字段修改事件
+        $('#isOpenEveryDay').change(function (){
+            if($('#isOpenEveryDay').val() == 'N'){
+                $('#operationType').val('02').trigger('change');
+            }else{
+                $('#operationType').val('01').trigger('change');
+            }
+        });
+
     });
 }());
 

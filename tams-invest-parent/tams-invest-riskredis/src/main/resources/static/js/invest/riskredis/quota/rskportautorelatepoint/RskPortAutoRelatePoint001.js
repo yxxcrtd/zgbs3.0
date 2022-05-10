@@ -27,7 +27,10 @@ $(function () {
     // var nodeId = '';
     //获取查询参数
     var getSearchParams = function () {
-        return {ruleId: ruleId,indName:$("#indName").val()};
+        return {
+            ruleId: ruleId,
+            indName:$("#indName").val()
+        };
     };
     //树加载
     loadTree();
@@ -56,7 +59,7 @@ $(function () {
     $("body").on('click', ".node_modify", null, function () {
         var thisRuleId = $(this).attr('ruleid');
         var thisRuleName = $(this).attr('rulename');
-        Joyin.ajaxJson(basePath + 'invest/riskredis/quota/rskportautorelatepoint/RskPortAutoRelatePoint002/check', {pageModel:PAGE_MODEL_EDIT,ruleId:thisRuleId,operateType: 'edit'}, function(result) {
+        Joyin.ajaxJson(basePath + 'invest/riskredis/quota/rskportautorelatepoint/RskPortAutoRelatePoint002/check', {pageModel:PAGE_MODEL_EDIT,ruleId:thisRuleId,ruleName:thisRuleName,operateType: 'edit'}, function(result) {
             Joyin.dialog(JoyinUtil.getLabel("RskPortAutoRelatePoint002.edit"),
                 basePath + "invest/riskredis/quota/rskportautorelatepoint/RskPortAutoRelatePoint002/init",
                 "85%", "80%", {pageModel:PAGE_MODEL_EDIT,id:thisRuleId,name:thisRuleName},
@@ -67,14 +70,26 @@ $(function () {
                 });
          });
     })
+
+    //映射名称查看事件
+    $("body").on('click', ".node_search", null, function () {
+        var thisRuleId = $(this).attr('ruleid');
+        var thisRuleName = $(this).attr('rulename');
+        Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+            basePath + "invest/riskredis/quota/rskportautorelatepoint/RskPortAutoRelatePoint002/init",
+            "85%", "80%", {pageModel:PAGE_MODEL_REFERENCE,id:thisRuleId,name:thisRuleName}
+        );
+    })
+
     //映射名称删除事件
     $("body").on('click', ".node_delete", null, function () {
         var thisRuleId = $(this).attr('ruleid');
+        var thisRuleName = $(this).attr('rulename');
         //获取该删除节点的参数
         var getData=function(){
-            return {ruleId:thisRuleId}
+            return {ruleId:thisRuleId,ruleName:thisRuleName}
         }
-        var object = {selectedItem:[getData()],operateType :"delete",ruleId:thisRuleId};
+        var object = {selectedItem:[getData()],operateType :"delete",ruleId:thisRuleId,ruleName:thisRuleName};
         Joyin.ajaxJson(basePath + 'invest/riskredis/quota/rskportautorelatepoint/RskPortAutoRelatePoint002/check', object, function(result) {
             Joyin.confirm(JoyinUtil.getMessage("COMMON_C_0001",JoyinUtil.getLabel("SysCommon.delete")), function(){
             	WorkFlow.doDeleteList(basePath + 'invest/riskredis/quota/rskportautorelatepoint/RskPortAutoRelatePoint002/delete', object,
@@ -86,6 +101,21 @@ $(function () {
             });
         });
     })
+
+    //绑定规则包双击事件
+    $("body").on('dblclick','.mixtree-node',function(event){
+        event.stopPropagation();
+        var jqBtn = $(this);
+        var jqDiv = jqBtn.closest('div');
+        jqDiv.siblings().removeClass('active');
+        jqDiv.addClass('active');
+        Joyin.dialog("规则包【"+jqDiv.attr('rulename')+"】成分查看",
+            JoyinUtil.getRealPath("invest/riskredis/quota/portfolioindicator/RskSupervisionPortfPoint005/init"),
+            "90%", "90%",{ptlBagId:jqDiv.attr('ruleid'),ptlBagName:jqDiv.attr('rulename'),isRule:"Y"}
+
+        );
+    });
+
     /**
      * 定义数据表格
      */
@@ -116,6 +146,11 @@ $(function () {
             ,{field:'foulCond', title: 'RskPortAutoRelatePoint001.foulCond',render: RskQuotaCommon.transferWarnFoul}
             ,{field:'approveCond', title: 'RskPortAutoRelatePoint001.approveCond',render: RskQuotaCommon.transferWarnFoul}
             //, {field: 'nextIndexTypeStr', sortField:"nextIndexType",title: 'RskPortAutoRelatePoint001.nextIndexType'}
+            ,{field:'set', sortable:false, title: 'RskPortAutoRelatePoint001.supervisionindividuation',
+                render : function(data, type, row, meta) {
+                    return '<i style="color:#0078F0;font-style: normal;cursor: pointer;" class="set">'+'设置'+'</i>';
+                }
+            }
             , {field: 'operation', width: 100, title: 'SysCommon.operation', type: 'action',
                 buttons: ['delt']
             }]
@@ -145,8 +180,20 @@ $(function () {
                                     });
             })
     });
-    
-    
+
+    /**
+     * 绑定设置事件
+     */
+    table.bind('click', '.set', function(data, index) {
+        data.pageModel = PAGE_MODEL_NEW;
+        data.processModel = "RULE";
+        Joyin.dialog(JoyinUtil.getLabel("RskSupervisionIndividuation001"),
+            basePath + "invest/riskredis/quota/supervisionindividuation/RskSupervisionIndividuation001/init",
+            "90%", "90%",data,function() {
+                table.reload();
+            });
+    })
+
     /**
      * 绑定删除事件
      */

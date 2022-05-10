@@ -184,6 +184,12 @@ public class InterfRiskRdsDto implements IRiskRds {
     }
 
     /**
+     * 回购期限
+     */
+    @JsonSerialize(using=BigDecimalSerializer.class)
+    private BigDecimal repoTerm;
+
+    /**
      * 交易员
      */
     private String trader;
@@ -362,6 +368,12 @@ public class InterfRiskRdsDto implements IRiskRds {
     public void setIsVirtual(String isVirtual) {
         this.isVirtual = isVirtual;
     }
+
+    /**
+     * 金额(无利息)
+     */
+    @JsonSerialize(using= BigDecimalSerializer.class)
+    private BigDecimal amountEx;
 
     /**
      * 交易币种
@@ -1141,6 +1153,22 @@ public class InterfRiskRdsDto implements IRiskRds {
         this.ignoreStatus = ignoreStatus;
     }
 
+    public BigDecimal getAmountEx() {
+        return amountEx;
+    }
+
+    public void setAmountEx(BigDecimal amountEx) {
+        this.amountEx = amountEx;
+    }
+
+    public BigDecimal getRepoTerm() {
+        return repoTerm;
+    }
+
+    public void setRepoTerm(BigDecimal repoTerm) {
+        this.repoTerm = repoTerm;
+    }
+
     /**
      * 获取 instCode
      * @return instCode.
@@ -1256,5 +1284,31 @@ public class InterfRiskRdsDto implements IRiskRds {
 
     public void setBetweenDate(long betweenDate) {
         this.betweenDate = betweenDate;
+    }
+
+    /**
+     * 抵押品代码
+     */
+    private String pledgedCode;
+
+    public String getPledgedCode() {
+        return pledgedCode;
+    }
+
+    public void setPledgedCode(String pledgedCode) {
+        this.pledgedCode = pledgedCode;
+    }
+
+    /**
+     * 是否锁定(股票交易)
+     */
+    private String withLockPeriod;
+
+    public String getWithLockPeriod() {
+        return withLockPeriod;
+    }
+
+    public void setWithLockPeriod(String withLockPeriod) {
+        this.withLockPeriod = withLockPeriod;
     }
 }

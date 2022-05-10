@@ -44,6 +44,31 @@ public class RskIndividCondition extends BaseEntity {
     private BigDecimal valueEnd;
 
     /**
+     * 日期选项(起)
+     */
+    private String dateStr;
+
+    /**
+     * 日期选项(末)
+     */
+    private String dateEnd;
+
+    /**
+     * 日期单位(起)
+     */
+    private String dateUnitStr;
+
+    /**
+     * 日期单位(末)
+     */
+    private String dateUnitEnd;
+
+    /**
+     * 处理类型
+     */
+    private String processModel;
+
+    /**
      * 取得 条件设置编号
      * @return 条件设置编号
      */
@@ -153,5 +178,45 @@ public class RskIndividCondition extends BaseEntity {
      */
     public void setValueEnd(BigDecimal valueEnd) {
         this.valueEnd = valueEnd;
+    }
+
+    public String getDateStr() {
+        return dateStr;
+    }
+
+    public void setDateStr(String dateStr) {
+        this.dateStr = dateStr;
+    }
+
+    public String getDateEnd() {
+        return dateEnd;
+    }
+
+    public void setDateEnd(String dateEnd) {
+        this.dateEnd = dateEnd;
+    }
+
+    public String getDateUnitStr() {
+        return dateUnitStr;
+    }
+
+    public void setDateUnitStr(String dateUnitStr) {
+        this.dateUnitStr = dateUnitStr;
+    }
+
+    public String getDateUnitEnd() {
+        return dateUnitEnd;
+    }
+
+    public void setDateUnitEnd(String dateUnitEnd) {
+        this.dateUnitEnd = dateUnitEnd;
+    }
+
+    public String getProcessModel() {
+        return processModel;
+    }
+
+    public void setProcessModel(String processModel) {
+        this.processModel = processModel;
     }
 }
