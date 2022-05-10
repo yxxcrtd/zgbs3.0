@@ -2,7 +2,9 @@ package com.joyintech.tams.business.common.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.business.common.entity.CfgDataTableShow;
+import com.joyintech.tams.constant.DictCode;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
@@ -906,4 +908,36 @@ public class CfetsEtrFinProductInfoResponse {
     public void setMaxTenderPlus(BigDecimal maxTenderPlus) {
         this.maxTenderPlus = maxTenderPlus;
     }
+
+    public String getCouponSpeciesStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.息票品种, this.getCouponSpecies());
+    }
+
+    public String getIntTypeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.利率类型, this.getIntType());
+    }
+
+    public String getPayCycleStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.频率, this.getPayCycle());
+    }
+
+    public String getIssueTypeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.发行方式, this.getIssueType());
+    }
+
+
+    public String getTenderTypeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.招标方式, this.getTenderType());
+    }
+
+    public String getTenderTargetStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.招标标的, this.getTenderTarget());
+    }
+
+
+    public String getIssueStyleStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.发行类型, this.getIssueStyle());
+    }
+
+
 }
