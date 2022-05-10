@@ -158,6 +158,17 @@ public class TradeHistory implements Serializable {
 
     private String entrustClass;
 
+    @JsonSerialize(using = DoubleSerializerUtils.class)
+    @ApiModelProperty(value = "净价价格")
+    private BigDecimal netPrice;
+
+    @JsonSerialize(using = DoubleSerializerUtils.class)
+    @ApiModelProperty(value = "净价金额")
+    private BigDecimal netBalance;
+
+    @ApiModelProperty(name = "isFullPrice", value = "是否全价（Y:是 ， N：否）")
+    private String isFullPrice;
+
     @Id
     public String getId() {
         return id;
@@ -558,5 +569,29 @@ public class TradeHistory implements Serializable {
 
     public void setEntrustClass(String entrustClass) {
         this.entrustClass = entrustClass;
+    }
+
+    public BigDecimal getNetPrice() {
+        return netPrice;
+    }
+
+    public void setNetPrice(BigDecimal netPrice) {
+        this.netPrice = netPrice;
+    }
+
+    public BigDecimal getNetBalance() {
+        return netBalance;
+    }
+
+    public void setNetBalance(BigDecimal netBalance) {
+        this.netBalance = netBalance;
+    }
+
+    public String getIsFullPrice() {
+        return isFullPrice;
+    }
+
+    public void setIsFullPrice(String isFullPrice) {
+        this.isFullPrice = isFullPrice;
     }
 }

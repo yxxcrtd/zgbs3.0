@@ -34,7 +34,7 @@ import java.util.Objects;
 public class BondHelper {
     private static final Logger logger = LoggerFactory.getLogger(BondHelper.class);
 
-//    @Autowired
+    //    @Autowired
 //    private QuoteTickService quoteTickService;
     @Autowired
     private QuoteService quoteService;
@@ -88,7 +88,7 @@ public class BondHelper {
             }
             ResultBean tickBean = quoteService.getTick(orderInterface.getStockCode());
             if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
-                TickBean tick = (TickBean)tickBean.getData();
+                TickBean tick = (TickBean) tickBean.getData();
 //            QuoteProto.TickBean tick = quoteTickService.getTickFromCache(orderInterface.getStockCode());
 //            if (Objects.nonNull(tick)) {
                 double lowerLimitPrice = TradeUtils.formatDouble(tick.getLowerLimitPrice(), 4);
@@ -207,7 +207,6 @@ public class BondHelper {
 //
 //        return trade.getTradedPrice();
 //    }
-
     public BigDecimal getFullPriceByTradePrice(Trade trade, String isFullPrice, Instruction instruction) {
         if (!InvestmentAssetType.isBond(instruction.getAssetType())) {
             return BigDecimal.ZERO;
@@ -231,6 +230,12 @@ public class BondHelper {
         }
 
         return trade.getTradedPrice();
+    }
+
+    public BigDecimal getNetPriceByFullPrice(Trade trade,Instruction instruction) {
+        BigDecimal price = investmentManagement.queryEntrustPriceByFullPriceFromInvest(trade.getFullPrice(), trade.getTradedVolume(), instruction, getPriceRoundByPriceStep(instrumentService.queryByInnerCode(instruction.getFinprodMarketId())));
+        logger.info("getNetPriceByFullPrice  trade fullPrice {}", price);
+        return price;
     }
 
     public BigDecimal calculateBalanceForInstruction(String entrustProp, String assetType, BigDecimal entrustPrice, long volume, BigDecimal balance) {
