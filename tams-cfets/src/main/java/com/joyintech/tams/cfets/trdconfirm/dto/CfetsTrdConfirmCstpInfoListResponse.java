@@ -76,6 +76,9 @@ public class CfetsTrdConfirmCstpInfoListResponse {
     @ApiModelProperty(name="tradeYield",value="成交价%",example="1")
     private BigDecimal tradeYield;
 
+    @ApiModelProperty(name="tradeYieldStr",value="成交价+单位",example="1")
+    private String tradeYieldStr;
+
 
     @ApiModelProperty(name="termDays",value="期限（天）",example="1")
     private BigDecimal termDays;
@@ -251,6 +254,19 @@ public class CfetsTrdConfirmCstpInfoListResponse {
 
     public void setTradeYield(BigDecimal tradeYield) {
         this.tradeYield = tradeYield;
+    }
+
+    public String getTradeYieldStr() {
+        String unit = this.tradeYieldStr == null ? "" : this.tradeYieldStr;
+        String tradeYield = "";
+        if (getTradeYield() != null) {
+            tradeYield = getTradeYield().toPlainString();
+        }
+        return tradeYield + unit;
+    }
+
+    public void setTradeYieldStr(String tradeYieldStr) {
+        this.tradeYieldStr = tradeYieldStr;
     }
 
     public BigDecimal getTermDays() {

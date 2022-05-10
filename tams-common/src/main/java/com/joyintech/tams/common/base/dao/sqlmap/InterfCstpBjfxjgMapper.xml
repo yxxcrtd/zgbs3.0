@@ -27,6 +27,43 @@
     <result column="CURRENCY" jdbcType="VARCHAR" property="currency" />
     <result column="TRD_ID" jdbcType="VARCHAR" property="trdId" />
   </resultMap>
+  <sql id="Base_Column_List" >
+        instrument_id,
+       instrument_short_name,
+       instrument_full_name,
+       issuer,
+       issuer_21_firm_id,
+       issue_price,
+       spread,
+       coupon_rate,
+       real_issuesize,
+       instrument_status,
+       instrument_type,
+       failure_reasons,
+       message_type,
+       issue_method,
+       coupon_rate_type,
+       data_category_indicator,
+       full_chinese_name_of_subscribe,
+       subscribe_institution_id,
+       subscription_amount,
+       actual_fee,
+       subscription_time,
+       submit_user,
+       currency,
+       trd_id
+    </sql>
+  <sql id="Sql_All_Data" >
+    select
+    <include refid="com.joyintech.tams.common.base.dao.AssetDailyInfoMapper.Base_Column_List" />
+    from INTERF_CSTP_BJFXJG
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.joyintech.tams.common.base.entity.InterfCstpBjfxjg" >
+    select
+    <include refid="com.joyintech.tams.common.base.dao.AssetDailyInfoMapper.Base_Column_List" />
+    from INTERF_CSTP_BJFXJG
+    where trd_id = #{trdId,jdbcType=VARCHAR}
+  </select>
   <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.InterfCstpBjfxjg">
     insert into INTERF_CSTP_BJFXJG (INSTRUMENT_ID, INSTRUMENT_SHORT_NAME, 
       INSTRUMENT_FULL_NAME, ISSUER, ISSUER_21_FIRM_ID, 

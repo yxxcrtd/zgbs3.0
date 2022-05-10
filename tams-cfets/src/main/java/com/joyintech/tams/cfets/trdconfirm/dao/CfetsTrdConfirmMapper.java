@@ -3,6 +3,7 @@ package com.joyintech.tams.cfets.trdconfirm.dao;
 
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbBondinfoDto;
 import com.joyintech.tams.cfets.trdconfirm.dto.*;
+import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.common.base.entity.FinProductAdd;
 import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
 import org.apache.ibatis.annotations.Param;
@@ -34,6 +35,13 @@ public interface CfetsTrdConfirmMapper {
      * @return
      */
     CfetsTrdConfirmRegInfoListResponse selectRegInfoByKey(String totleTradeId);
+
+    /**
+     * 根据主键查询一级申购登记信息
+     * @param pageParam
+     * @return
+     */
+    CfetsTrdConfirmRegInfoListResponse selecBidInfoByKey(String totleTradeId);
     /**
      * 根据主键查询债券报价信息
      * @param pageParam
@@ -112,6 +120,12 @@ public interface CfetsTrdConfirmMapper {
      */
     List<CfetsTrdConfirmExecBondInfoResponse> findAllTrdBondList(Map<String, Object> pageParam);
     /**
+     * 查询所有匹配确认-执行一级申购数据
+     * @param pageParam
+     * @return
+     */
+    List<CfetsTrdConfirmExecFirstBondInfoResponse> findAllTrdBidList(Map<String, Object> pageParam);
+    /**
      * 查询所有匹配确认-执行质押式数据
      * @param pageParam
      * @return
@@ -123,6 +137,12 @@ public interface CfetsTrdConfirmMapper {
      * @return
      */
     List<CfetsTrdConfirmCstpBondInfoResponse> findAllCstpBondList(Map<String, Object> pageParam);
+    /**
+     * 匹配确认列表-cstp成交一级申购数据分页查询
+     * @param pageParam
+     * @return
+     */
+    List<CfetsTrdConfirmExecFirstBondInfoResponse> findAllCstpBidList(Map<String, Object> pageParam);
     /**
      * 匹配确认列表-cstp成交质押式分页查询
      * @param pageParam
@@ -244,11 +264,11 @@ public interface CfetsTrdConfirmMapper {
     FinProductAdd selectIssueInfoByFinprodId(@Param("finprodId") String finprodId);
 
     /**
-     * 根据资产代码查询指令执行完成表
+     * 根据资产代码查询指令信息
      * @author jiangpeng
      * @date 2022/5/7 19:52
-     * @param finprodId
+     * @param finprodIds 资产代码列表
      * @return int
      */
-    int selectCountEtrFinshByFinprodId(@Param("finprodId") String finprodId);
+    List<EtrEntrust> selectEtrEntrustEByFinprodId(@Param("finprodIds") List<String> finprodIds);
 }
