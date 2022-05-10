@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.business.asset.protect.dao.CreditProtectionCertificateMapper">
+    <select id="queryForPage" resultType="com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateDto" parameterType="Map">
+        SELECT
+            fp.FINPROD_ID finprodId,
+            fp.FINPROD_MARKET_ID finprodMarketId, <!-- 资产代码-->
+            fp.FINPROD_ABBR finprodAbbr,          <!-- 资产简称-->
+            fp.FINPROD_NAME finprodName,					<!-- 资产名称 -->
+            fp.TRADE_MARKET tradeMarket,
+            sdl3.item_value tradeMarketStr,				<!-- 交易场所-->
+            fpa.ISSUERSHORT issueRshortStr,				<!-- 创立机构-->
+            fpa.NOM_CAPI issueAmt,								<!-- 名义本金总额-->
+            fpa.PROTECT_OBJECT protectObject,			<!-- 保护对象-->
+            sdl4.item_value protectObjectStr,
+            fpa.REF_SEC_FEATURES refSecFeatures,  <!-- 参考债项特征-->
+            fpa.REF_SEC refSec,										<!-- 参考债项-->
+            fpa.REF_ENTITY refEntity,							<!-- 参考实体-->
+            fp.MDATE mDate,												<!-- 到期日-->
+            fp.VDATE vDate,												<!-- 起始日-->
+            fpa.GRACE_PERIOD gracePeriod,					<!-- 宽限期（天）	-->
+            fpa.BOOK_BUILDING_DATE pledgeDeadlineDate,<!-- 簿记建档日	-->
+            fpa.PAY_DATE payDate,									<!-- 缴款日	-->
+            fpa.LISTING_DATE listingDate,					<!-- 上市流通日	-->
+            fp.CALENDAR_ID calendarId,						<!-- 交易日历		-->
+            fp.ISSUE_PRICE issuePrice,						<!-- 创设价格（元）-->
+            fccr.BASIS ratebasic,									<!-- 计费年度天数	-->
+            fpa.SETTLE_METHOD settleMethod,			<!-- 结算方式		-->
+            sdl2.item_value settleMethodStr,
+            fpa.IS_ALLOW_OVERWRITE isOrNoStr			<!-- 是否允许wind覆盖	-->
+        FROM
+            FIN_PRODUCT fp
+            LEFT JOIN FIN_PRODUCT_ADD fpa ON fp.FINPROD_ID = fpa.FINPROD_ID
+            LEFT JOIN FIN_CASH_INFO fci ON fci.FINPROD_ID = fp.FINPROD_ID
+            LEFT JOIN FIN_CASH_CALC_RULE fccr ON fccr.FINPROD_ID = fp.FINPROD_ID AND fccr.CASH_ID = fci.CASH_ID
+            LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='SETTLE_METHOD' and sdl2.item_code = fpa.SETTLE_METHOD
+            LEFT JOIN SYS_DATADICT_LIST sdl3 on sdl3.dict_code ='TRADE_PLACE' and sdl3.item_code = fp.TRADE_MARKET
+            LEFT JOIN SYS_DATADICT_LIST sdl4 on sdl4.dict_code ='PROTECT_OBJECT' and sdl4.item_code = fpa.PROTECT_OBJECT
+        <where>
+            <if test="finprodType2 != null and finprodType2 != ''">
+                AND fp.FINPROD_TYPE2 = #{finprodType2}
+            </if>
+            <if test="finprodIdList != null and finprodIdList.size() > 0">
+                AND (fp.FINPROD_MARKET_ID IN
+                <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+                )
+            </if>
+            <if test="refEntity != null and refEntity != ''">
+                AND fpa.REF_ENTITY = #{refEntity}
+            </if>
+            <if test="refSec != null and refSec.size() > 0">
+                AND (fpa.REF_SEC IN
+                <foreach collection="refSec" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+                )
+            </if>
+            <if test="issueRshortStr != null and issueRshortStr != ''">
+                AND fpa.ISSUERSHORT = #{issueRshortStr}
+            </if>
+            <if test="vdateStart != null and vdateStart != ''">
+                <![CDATA[AND  fp.vdate >= TO_DATE(#{vdateStart},'YYYY-MM-DD') ]]>
+            </if>
+            <if test="vdateEnd != null and vdateEnd != ''">
+                <![CDATA[AND  fp.vdate <= TO_DATE(#{vdateEnd},'YYYY-MM-DD')]]>
+            </if>
+            <if test="mdateStart != null and mdateStart != ''">
+                <![CDATA[AND  fp.mdate >= TO_DATE(#{mdateStart},'YYYY-MM-DD')]]>
+            </if>
+            <if test="mdateEnd != null and mdateEnd != ''">
+                <![CDATA[AND  fp.mdate <= TO_DATE(#{mdateEnd},'YYYY-MM-DD')]]>
+            </if>
+            <include refid="vagueQueryWhere"></include>
+        </where>
+        ORDER BY
+            fp.FINPROD_ID
+    </select>
+
+    <sql id="vagueQueryWhere">
+        <if test="search != null and search != '' and search !='有效' ">
+              AND  (
+                sdl3.ITEM_VALUE like '%' || #{search} || '%'
+                or sdl4.ITEM_VALUE like '%' || #{search} || '%'
+                OR fp.FINPROD_ID like '%' || #{search} || '%'
+                OR fp.FINPROD_MARKET_ID like '%' || #{search} || '%'
+                OR fp.FINPROD_ABBR like '%' || #{search} || '%'
+                OR fp.FINPROD_NAME like '%' || #{search} || '%'
+                OR fpa.ISSUERSHORT like '%' || #{search} || '%'
+                OR fpa.NOM_CAPI like '%' || #{search} || '%'
+                OR fpa.PROTECT_OBJECT like '%' || #{search} || '%'
+                OR fpa.REF_SEC_FEATURES like '%' || #{search} || '%'
+                OR fpa.REF_SEC like '%' || #{search} || '%'
+                OR fpa.REF_ENTITY like '%' || #{search} || '%'
+                OR fpa.GRACE_PERIOD like '%' || #{search} || '%'
+                OR fp.CALENDAR_ID||'' like '%' || #{search} || '%'
+                OR fp.ISSUE_PRICE||'' like '%' || #{search} || '%'
+                OR fccr.BASIS||'' like '%' || #{search} || '%'
+                OR sdl2.item_value||'' like '%' || #{search} || '%'
+                OR TO_CHAR(fp.MDATE,'yyyy-MM-dd') ||''= #{search}
+                OR TO_CHAR(fp.VDATE,'yyyy-MM-dd') ||''= #{search}
+                OR TO_CHAR(fpa.PAY_DATE,'yyyy-MM-dd') ||''= #{search}
+                OR TO_CHAR(fpa.LISTING_DATE,'yyyy-MM-dd') ||''= #{search}
+                OR TO_CHAR(fpa.BOOK_BUILDING_DATE,'yyyy-MM-dd') ||''= #{search}
+                )
+        </if>
+    </sql>
+</mapper>

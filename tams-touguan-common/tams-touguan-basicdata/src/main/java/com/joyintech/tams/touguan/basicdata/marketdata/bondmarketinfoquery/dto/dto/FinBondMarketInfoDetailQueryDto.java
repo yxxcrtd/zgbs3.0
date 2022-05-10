@@ -24,7 +24,7 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "secId", value = "债券ID/资产代码")
     private String secId;
 
-    @ApiModelProperty(name = "secName", value = "资产简称")
+    @ApiModelProperty(name = "secName", value = "债券简称")
     private String secName;
 
     @ApiModelProperty(name = "secFullName", value = "债券全称")
@@ -38,6 +38,9 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     @ApiModelProperty(name = "institution", value = "登记托管机构")
     private String institution;
+
+    @ApiModelProperty(name = "institutionText", value = "登记托管机构说明")
+    private String institutionText;
 
     @ApiModelProperty(name = "issuePrice", value = "发行价格")
     @JsonSerialize(using = BigDecimalSerializer.class)
@@ -56,6 +59,22 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal issueAmt;
 
+    @ApiModelProperty(name = "delistingDate", value = "摘牌日")
+    private Date delistingDate;
+
+    @ApiModelProperty(name = "valueDate", value = "估值日")
+    private Date valueDate;
+
+    @ApiModelProperty(name = "calloption", value = "是否可赎回,Y是N否")
+    private String calloption;
+
+    @ApiModelProperty(name = "putoption", value = "是否可回售,Y是N否")
+    private String putoption;
+
+    @ApiModelProperty(name = "marketAmt", value = "债券市场余额")
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal marketAmt;
+
     @ApiModelProperty(name = "issuerName", value = "发行人")
     private String issuerName;
 
@@ -64,6 +83,15 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     @ApiModelProperty(name = "secType2", value = "二级分类")
     private String secType2;
+
+    @ApiModelProperty(name = "secType3", value = "三级分类")
+    private String secType3;
+
+    @ApiModelProperty(name = "primaryClassification", value = "wind一级分类")
+    private String primaryClassification;
+
+    @ApiModelProperty(name = "secondaryClassification", value = "wind二级分类")
+    private String secondaryClassification;
 
     @ApiModelProperty(name = "issueType", value = "募集方式")
     private String issueType;
@@ -83,8 +111,20 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "isRight", value = "是否含权债")
     private String isRight;
 
-    @ApiModelProperty(name = "cyy", value = "币种")
-    private String cyy;
+    @ApiModelProperty(name = "isAutoUpdate", value = "是否允许资讯数据覆盖")
+    private String isAutoUpdate;
+
+    @ApiModelProperty(name = "cityInvestSecChb", value = "是否城投债（中债）")
+    private String cityInvestSecChb;
+
+    @ApiModelProperty(name = "isGreenBond", value = "是否绿色债")
+    private String isGreenBond;
+
+    @ApiModelProperty(name = "baseRateAccuracy", value = "基准利率精度")
+    private String baseRateAccuracy;
+
+    @ApiModelProperty(name = "ccy", value = "币种")
+    private String ccy;
 
     @ApiModelProperty(name = "faceValue", value = "面额")
     @JsonSerialize(using = BigDecimalSerializer.class)
@@ -105,7 +145,7 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "interestRate", value = "利率类型")
     private String interestRate;
 
-    @ApiModelProperty(name = "paperir", value = "票面利率(%)")
+    @ApiModelProperty(name = "paperir", value = "票面利率")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal paperir;
 
@@ -169,6 +209,9 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "crossMarketCode", value = "跨市场代码")
     private String crossMarketCode;
 
+    @ApiModelProperty(name = "basisStyle", value = "利息分配方式")
+    private String basisStyle;
+
     @ApiModelProperty(name = "calendarId", value = "交易日历")
     private String calendarId;
 
@@ -184,11 +227,17 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "zxGradeOrgId", value = "债项评级机构")
     private String zxGradeOrgId;
 
+    @ApiModelProperty(name = "conceptTypes", value = "概念板块")
+    private List<String> conceptTypes;
+
     @ApiModelProperty(name = "finBondPayHSrcSecOptionDto", value = "行权计划信息")
     private List<FinBondPayHSrcSecOptionDto> bondPayHSrcSecOptionDtos;
 
     @ApiModelProperty(name = "bondMarketCashPlanDtos", value = "付息计划信息")
     private List<FinBondMarketCashPlanDto> bondMarketCashPlanDtos;
+
+    @ApiModelProperty(name = "bondMarketInvRepayDtos", value = "还本计划信息")
+    private List<FinBondMarketCashPlanDto> bondMarketInvRepayDtos;
 
     public String getSecId() {
         return secId;
@@ -348,14 +397,6 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     public void setIsRight(String isRight) {
         this.isRight = isRight;
-    }
-
-    public String getCyy() {
-        return cyy;
-    }
-
-    public void setCyy(String cyy) {
-        this.cyy = cyy;
     }
 
     public BigDecimal getFaceValue() {
@@ -612,5 +653,141 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     public void setBondPayHSrcSecOptionDtos(List<FinBondPayHSrcSecOptionDto> bondPayHSrcSecOptionDtos) {
         this.bondPayHSrcSecOptionDtos = bondPayHSrcSecOptionDtos;
+    }
+
+    public String getInstitutionText() {
+        return institutionText;
+    }
+
+    public void setInstitutionText(String institutionText) {
+        this.institutionText = institutionText;
+    }
+
+    public Date getDelistingDate() {
+        return delistingDate;
+    }
+
+    public void setDelistingDate(Date delistingDate) {
+        this.delistingDate = delistingDate;
+    }
+
+    public Date getValueDate() {
+        return valueDate;
+    }
+
+    public void setValueDate(Date valueDate) {
+        this.valueDate = valueDate;
+    }
+
+    public String getCalloption() {
+        return calloption;
+    }
+
+    public void setCalloption(String calloption) {
+        this.calloption = calloption;
+    }
+
+    public String getPutoption() {
+        return putoption;
+    }
+
+    public void setPutoption(String putoption) {
+        this.putoption = putoption;
+    }
+
+    public BigDecimal getMarketAmt() {
+        return marketAmt;
+    }
+
+    public void setMarketAmt(BigDecimal marketAmt) {
+        this.marketAmt = marketAmt;
+    }
+
+    public String getSecType3() {
+        return secType3;
+    }
+
+    public void setSecType3(String secType3) {
+        this.secType3 = secType3;
+    }
+
+    public String getIsAutoUpdate() {
+        return isAutoUpdate;
+    }
+
+    public void setIsAutoUpdate(String isAutoUpdate) {
+        this.isAutoUpdate = isAutoUpdate;
+    }
+
+    public String getCityInvestSecChb() {
+        return cityInvestSecChb;
+    }
+
+    public void setCityInvestSecChb(String cityInvestSecChb) {
+        this.cityInvestSecChb = cityInvestSecChb;
+    }
+
+    public String getIsGreenBond() {
+        return isGreenBond;
+    }
+
+    public void setIsGreenBond(String isGreenBond) {
+        this.isGreenBond = isGreenBond;
+    }
+
+    public String getBaseRateAccuracy() {
+        return baseRateAccuracy;
+    }
+
+    public void setBaseRateAccuracy(String baseRateAccuracy) {
+        this.baseRateAccuracy = baseRateAccuracy;
+    }
+
+    public List<FinBondMarketCashPlanDto> getBondMarketInvRepayDtos() {
+        return bondMarketInvRepayDtos;
+    }
+
+    public void setBondMarketInvRepayDtos(List<FinBondMarketCashPlanDto> bondMarketInvRepayDtos) {
+        this.bondMarketInvRepayDtos = bondMarketInvRepayDtos;
+    }
+
+    public List<String> getConceptTypes() {
+        return conceptTypes;
+    }
+
+    public void setConceptTypes(List<String> conceptTypes) {
+        this.conceptTypes = conceptTypes;
+    }
+
+    public String getBasisStyle() {
+        return basisStyle;
+    }
+
+    public void setBasisStyle(String basisStyle) {
+        this.basisStyle = basisStyle;
+    }
+
+    public String getCcy() {
+        return ccy;
+    }
+
+    public void setCcy(String ccy) {
+        this.ccy = ccy;
+    }
+
+    public String getPrimaryClassification() {
+        return primaryClassification;
+    }
+
+    public void setPrimaryClassification(String primaryClassification) {
+        this.primaryClassification = primaryClassification;
+    }
+
+    public String getSecondaryClassification() {
+        return secondaryClassification;
+    }
+
+    public void setSecondaryClassification(String secondaryClassification) {
+        this.secondaryClassification = secondaryClassification;
     }
 }

@@ -80,12 +80,13 @@ implements BaseProcessService<RskPortAutoRelatePointDto> {
 						logger.info("---------规则未匹配到指标------------");
 						return;
 					}
-					List<String> portIdList=bussRuleService.matchRulePort(dto);
+					List<String> portIdList=bussRuleService.queryRuleRelPort(dto);
+					portIdList=StringUtil.isEmptyList(portIdList)?bussRuleService.matchRulePort(dto):portIdList;
 					if(StringUtil.isEmptyList(portIdList)){
-						logger.info("---------规则未匹配到产品------------");
+						logger.info("---------规则[\"+dto.getRuleId()+\"]未匹配到产品------------");
 						return;
 					}
-					logger.info("--------->匹配到产品数："+portIdList.size()+"<----------");
+					logger.info("--------->规则[\"+dto.getRuleId()+\"]匹配到产品数："+portIdList.size()+"<----------");
 
 					logger.info("----------->异步自动关联开始--------------");
 					bussRuleService.relatePortIndicator(portIdList,indIdListNew);

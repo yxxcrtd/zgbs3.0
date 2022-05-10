@@ -57,6 +57,9 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
     @ApiModelProperty(name = "referenceRate", value = "参考收益率", example = "99.0000")
     private BigDecimal referenceRate;
 
+    @ApiModelProperty(name = "referenceRateStr", value = "参考收益率,当带入资产的息票品种为附息-浮动利率时，显示字段参考收益率，文本，形式为：基准利率+利差BP", example = "个人活期+1")
+    private String referenceRateStr;
+
     @ApiModelProperty(name = "rate", value = "票面利率", example = "99.0000")
     private BigDecimal rate;
 
@@ -192,6 +195,14 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
 
     public void setReferenceRate(BigDecimal referenceRate) {
         this.referenceRate = referenceRate;
+    }
+
+    public String getReferenceRateStr() {
+        return referenceRateStr;
+    }
+
+    public void setReferenceRateStr(String referenceRateStr) {
+        this.referenceRateStr = referenceRateStr;
     }
 
     public BigDecimal getRate() {

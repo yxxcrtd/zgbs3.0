@@ -712,6 +712,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         etrSinglePortfolioDto.setTradeMarket(dto.getTradeMarket());// 交易场所
         etrSinglePortfolioDto.setTradePlat(dto.getTradePlat());// 交易平台
         etrSinglePortfolioDto.setBusinessModel(dto.getBusinessModel());
+        etrSinglePortfolioDto.setBusiTypePosition(dto.getBusiTypePosition());
         /*
          * if 画面.交易平台 = 数据字典.交易平台.大宗交易平台 and 画面.交易场所 = 数据字典.交易场所.深圳证券交易所
          * 交易平台 = 数据字典.交易平台.综合协议平台
@@ -2093,7 +2094,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         //处理履历
         updateCfetsOprHis(entity.getEntrustId(), "revoke");
         //撤回删除风险试算
-        etrExchangeTradeCommonMapper.deleteRskIsupTrial(entity.getEntrustId());
+        //etrExchangeTradeCommonMapper.deleteRskIsupTrial(entity.getEntrustId());
 //        restTemplate.postForObject(
 //                ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrExchangeTrade/entrustRevoke",entity,
 //                Integer.class);
@@ -2794,11 +2795,13 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
     private String getTradePlat(String currentTab, String tradeMarket) {
         String tradePlat = DictCodeList.交易平台_竞价撮合平台.getValue();
         if (StringUtils.isNotEmpty(currentTab)) {
+//            if (("dz".equals(currentTab) || currentTab.equals(DictCodeList.交易平台_大宗交易平台.getValue()))
+//                    && DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(tradeMarket)) {
+//                tradePlat = DictCodeList.交易平台_综合协议交易平台.getValue();
+//            } else
             if (("dz".equals(currentTab) || currentTab.equals(DictCodeList.交易平台_大宗交易平台.getValue()))
-                    && DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(tradeMarket)) {
-                tradePlat = DictCodeList.交易平台_综合协议交易平台.getValue();
-            } else if (("dz".equals(currentTab) || currentTab.equals(DictCodeList.交易平台_大宗交易平台.getValue()))
-                    && DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(tradeMarket)) {
+                    && (DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(tradeMarket) ||
+                    DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(tradeMarket))) {
                 tradePlat = DictCodeList.交易平台_大宗交易平台.getValue();
             } else if ("gd".equals(currentTab) || currentTab.equals(DictCodeList.交易平台_固定收益平台.getValue())) {
                 tradePlat = DictCodeList.交易平台_固定收益平台.getValue();

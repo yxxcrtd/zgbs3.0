@@ -1,6 +1,5 @@
 package com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.controller;
 
-import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
@@ -10,6 +9,7 @@ import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoDetailQueryDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinBondMarketInfoQueryRequest;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.service.FinBondMarketInfoQuery001Service;
@@ -60,6 +60,10 @@ public class FinBondMarketInfoQuery001Controller extends BaseController {
         initPageParams.put("TDAY_RULE", this.getSelectDataFromDataDic(DictCode.营业日准则, null));
         initPageParams.put("CALC_RULE", this.getSelectDataFromDataDic(DictCode.推算方式, null));
         initPageParams.put("CASH_CLASS_TYPE", this.getSelectDataFromDataDic(DictCode.现金流类型, null));
+        initPageParams.put("SVR_BASIS_TYPE", this.getSelectDataFromDataDic(DictCode.基准利率, null));
+        initPageParams.put("SVR_GUA_TYPE", this.getSelectDataFromDataDic(DictCode.担保方式, null));
+        initPageParams.put("CONCEPT_TYPE", this.getSelectDataFromDataDic(DictCode.概念标识, null));
+
         //导出
         initPageParams.put("EXPORT_SHOW", CacheUtil.getSysParam("EXPORT_SHOW"));
         //刷新时间
@@ -88,7 +92,6 @@ public class FinBondMarketInfoQuery001Controller extends BaseController {
     @PostMapping("/detailInfo")
     @ApiOperation(value = "债券市场信息查看", notes = "债券市场信息查看")
     public Message<FinListedBondInfoQuery001Dto> detailInfo(@RequestParam("secId") String secId) {
-        AjaxResult ar = new AjaxResult();
         FinListedBondInfoQuery001Dto dto = finBondMarketInfoQuery001Service.detailInfo(secId);
         if (StringUtil.isNotEmpty(dto)) {
             return Message.success("success", dto);
@@ -96,4 +99,17 @@ public class FinBondMarketInfoQuery001Controller extends BaseController {
             return Message.fail("资产代码不存在.");
         }
     }
+
+    @ResponseBody
+    @PostMapping("/bondMarketInfo")
+    @ApiOperation(value = "债券市场信息查看(接口数据)", notes = "债券市场信息查看(接口数据)")
+    public Message<FinBondMarketInfoDetailQueryDto> queryFinBondMarketForCoupons(@RequestParam("secId") String secId) {
+        FinBondMarketInfoDetailQueryDto dto = finBondMarketInfoQuery001Service.queryFinBondMarketForCoupons(secId);
+        if (StringUtil.isNotEmpty(dto)) {
+            return Message.success("success", dto);
+        } else {
+            return Message.fail("资产代码不存在.");
+        }
+    }
+
 }

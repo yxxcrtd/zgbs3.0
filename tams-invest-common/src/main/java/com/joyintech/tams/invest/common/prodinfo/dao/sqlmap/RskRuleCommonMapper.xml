@@ -3,16 +3,19 @@
 <mapper
 	namespace="com.joyintech.tams.invest.common.prodinfo.dao.RskRuleCommonMapper">
 
-   <select id="getRulePoolConfig" parameterType="java.lang.String" resultType="com.joyintech.tams.common.base.entity.RskRulePoolConfig">
+   <select id="getRulePoolConfig" parameterType="java.lang.String" resultType="com.joyintech.tams.invest.common.prodinfo.dto.IRskRulePoolConfig">
 	   select m.RULE_ID,m.CLASSIFY_DIMENSION,m.CLASSIFY_DIMENSION_VAL,m.LINK_SIGN from RSK_RULE_POOL_CONFIG m
 			 where m.RULE_ID=#{code} order by m.PARAM_NUM DESC
    </select>
 
 	<select id="getMatchPortData" parameterType="Map" resultType="java.lang.String">
-		select m.PORTFOLIO_ID from PTL_PORTFOLIO m LEFT JOIN PA_PTL_PORTFOLIO n ON m.PORTFOLIO_ID=n.PORTFOLIO_ID
-			 where ${sqlWhere} and  MDATE>to_date('${valDate}','yyyy-MM-dd') AND PORTFOLIO_TYPE IN ('01','02')
+		select PTL_PORTFOLIO.PORTFOLIO_ID from PTL_PORTFOLIO
+		LEFT JOIN PA_PTL_PORTFOLIO  ON PTL_PORTFOLIO.PORTFOLIO_ID=PA_PTL_PORTFOLIO.PORTFOLIO_ID
+		LEFT JOIN PRD_SALE_PARAM ON 'F16_'||PTL_PORTFOLIO.PORTFOLIO_ID=PRD_SALE_PARAM.FINPROD_ID
+		LEFT JOIN FIN_PRODUCT_ADD ON 'F16_'||PTL_PORTFOLIO.PORTFOLIO_ID=FIN_PRODUCT_ADD.FINPROD_ID
+		where ${sqlWhere} and MDATE>to_date('${valDate}','yyyy-MM-dd') AND PORTFOLIO_TYPE IN ('01','02')
 		<if test='isHas =="Y"'>
-			 and m.PORTFOLIO_ID not in (select distinct  PORTFOLIO_ID from RSK_PORTFOLIO_INDICATOR)
+			 and PTL_PORTFOLIO.PORTFOLIO_ID not in (select distinct  PORTFOLIO_ID from RSK_PORTFOLIO_INDICATOR)
 		</if>
 	</select>
 
@@ -29,7 +32,21 @@
 				</foreach>
 			</if>
 		</where>
+	</select>
 
+	<select id="selectRuleRelPort" parameterType="java.util.List" resultType="java.lang.String">
+		SELECT
+		DISTINCT PORTFOLIO_ID
+		FROM
+		RSK_RULE_PORTFOLIO
+		<where>
+			<if test="list != null and list.size() > 0">
+				and RULE_ID in
+				<foreach collection="list" item="item" open="(" close=")" separator=",">
+					#{item}
+				</foreach>
+			</if>
+		</where>
 	</select>
 
 
@@ -39,7 +56,64 @@
 				(PORTFOLIO_ID= #{item.portfolioId} and IND_ID= #{item.indId})
 			</foreach>
 	</delete>
-	
+
+	<delete id="deleteRulePort" parameterType="map" >
+		delete from RSK_RULE_PORTFOLIO
+		<where>
+			RULE_ID = #{ruleId,jdbcType=VARCHAR}
+			<if test="list != null and list.size() > 0">
+				and PORTFOLIO_ID in
+				<foreach collection="list" item="item" open="(" close=")" separator=",">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+	</delete>
+
+	<delete id="deleteRulePortReverse" parameterType="map" >
+		delete from RSK_RULE_PORTFOLIO
+		<where>
+			<if test="ruleList != null and ruleList.size() > 0">
+				RULE_ID not in
+				<foreach collection="ruleList" item="item" open="(" close=")" separator=",">
+					#{item}
+				</foreach>
+			</if>
+			<if test="portList != null and portList.size() > 0">
+				and PORTFOLIO_ID in
+				<foreach collection="portList" item="item" open="(" close=")" separator=",">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+	</delete>
+
+	<insert id="insertRskRulePortBatchList" parameterType="java.util.List">
+		insert into RSK_RULE_PORTFOLIO (RULE_ID,PORTFOLIO_ID,
+		CREATE_USER, CREATE_DEPT, CREATE_TIME,
+		UPDATE_USER, UPDATE_TIME)
+		select
+		t1.ruleId,
+		t1.portfolioId,
+		t1.createUser,
+		t1.createDept,
+		t1.createTime,
+		t1.updateUser,
+		t1.updateTime
+		from (
+		<foreach collection="list" item="info" separator="union all">
+			select
+			#{info.ruleId,jdbcType=VARCHAR} ruleId,
+			#{info.portfolioId,jdbcType=VARCHAR} portfolioId,
+			#{info.createUser,jdbcType=VARCHAR} createUser,
+			#{info.createDept,jdbcType=VARCHAR} createDept,
+			#{info.createTime,jdbcType=TIMESTAMP} createTime,
+			#{info.updateUser,jdbcType=VARCHAR} updateUser,
+			#{info.updateTime,jdbcType=TIMESTAMP} updateTime
+			from DUAL
+		</foreach>
+		)t1
+	</insert>
 
 	<insert id="insertBatchList" parameterType="java.util.List">
 		insert into RSK_PORTFOLIO_INDICATOR (PORTFOLIO_ID, IND_ID, PORTFOLIO_LEVEL,

@@ -50,7 +50,8 @@
 		<!--添加三四级分类查询字段 lishuping 2019/7/29 start-->
 		fpt.TYPE_9,
 		fpt.TYPE_10,
-		fpt.TYPE_11
+		fpt.TYPE_11,
+		prod.MDATE
 		<!--添加三四级分类查询字段 lishuping 2019/7/29 end-->
 		FROM (
 		<trim prefixOverrides="UNION ALL">
@@ -125,6 +126,8 @@
 		) tpd
 		LEFT JOIN FIN_PRODUCT fp ON fp.FINPROD_ID = tpd.FINPROD_ID
 		LEFT JOIN FIN_PRODUCT_TYPE fpt ON fpt.FINPROD_ID = fp.FINPROD_ID
+		LEFT JOIN FIN_PRODUCT prod ON prod.FINPROD_MARKET_ID = tpd.PORTFOLIO_ID
+		and prod.finprod_type2 = 'F16'
 		<where>
 			fp.FINPROD_TYPE2 = #{COMMON_BUSINESS_TYPE_TRD02}
 			AND fp.PROFIT_TYPE= #{PROFIT_TYPE}

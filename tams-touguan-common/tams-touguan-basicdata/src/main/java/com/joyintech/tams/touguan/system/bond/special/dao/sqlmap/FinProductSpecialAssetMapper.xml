@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.touguan.system.bond.special.dao.FinProductSpecialAssetMapper">
+
+    <select id="queryForPage"
+            resultType="com.joyintech.tams.touguan.system.bond.special.dto.FinProductSpecialDto"
+            parameterType="com.joyintech.tams.touguan.system.bond.special.dto.req.FinProductSpecialQueryRequest">
+        SELECT * FROM (
+          SELECT
+              SPECIAL.FINPROD_MARKET_ID finprodMarketId,
+              SPECIAL.IS_ABS isAbs,
+              SPECIAL.IS_SPECIAL_DEBT isSpecialDebt,
+              SPECIAL.IS_DEFAULT_BOND_INDICATOR isDefaultBondIndicator,
+              SPECIAL.INPUT_TYPE inputType,
+              PRODUCT.FINPROD_ABBR finprodAbbr
+          FROM
+              FIN_PRODUCT_SPECIAL SPECIAL
+                  INNER JOIN FIN_PRODUCT PRODUCT ON SPECIAL.FINPROD_MARKET_ID = PRODUCT.FINPROD_MARKET_ID
+          UNION
+          SELECT
+              SPECIAL.FINPROD_MARKET_ID finprodMarketId,
+              SPECIAL.IS_ABS isAbs,
+              SPECIAL.IS_SPECIAL_DEBT isSpecialDebt,
+              SPECIAL.IS_DEFAULT_BOND_INDICATOR isDefaultBondIndicator,
+              SPECIAL.INPUT_TYPE inputType,
+              INTERF.SECNAME finprodAbbr
+          FROM
+              FIN_PRODUCT_SPECIAL SPECIAL
+                  INNER JOIN INTERF_PAYHSRCSECINFO INTERF ON SPECIAL.FINPROD_MARKET_ID = INTERF.SECID
+          WHERE
+                  INTERF.SECID NOT IN ( SELECT FINPROD_MARKET_ID FROM FIN_PRODUCT WHERE FINPROD_TYPE2 = 'F01' AND TRADE_MARKET = '01' )
+        )
+    </select>
+
+    <select id="querySelectOption"
+            resultType="com.joyintech.tams.touguan.system.bond.special.dto.FinProductSpecialSelectOptionDto"
+            parameterType="com.joyintech.tams.touguan.system.bond.special.dto.req.FinProductSpecialSelectOptionQueryRequest">
+        SELECT
+            *
+        FROM
+            (
+                SELECT
+                    FINPROD_MARKET_ID finprodMarketId,
+                    FINPROD_ABBR finprodAbbr
+                FROM
+                    FIN_PRODUCT
+                WHERE
+                        FINPROD_MARKET_ID NOT IN ( SELECT FINPROD_MARKET_ID FROM FIN_PRODUCT_SPECIAL )
+                  AND FINPROD_TYPE2 = 'F01'
+                  AND TRADE_MARKET = '01'
+                UNION
+                SELECT
+                    SECID FINPROD_MARKET_ID,
+                    SECNAME FINPROD_ABBR
+                FROM
+                    INTERF_PAYHSRCSECINFO PAYHSRCSECINFO
+                        LEFT JOIN FIN_PRODUCT_SPECIAL SPECIAL ON PAYHSRCSECINFO.SECID = SPECIAL.FINPROD_MARKET_ID
+                WHERE
+                        PAYHSRCSECINFO.SECID NOT IN ( SELECT FINPROD_MARKET_ID FROM FIN_PRODUCT WHERE FINPROD_TYPE2 = 'F01' AND TRADE_MARKET = '01' )
+                  AND PAYHSRCSECINFO.MARKET = '01'
+                  AND PAYHSRCSECINFO.SECID NOT IN ( SELECT FINPROD_MARKET_ID FROM FIN_PRODUCT_SPECIAL )
+            )
+        <where>
+            <if test="search !=null and search !=''">
+                AND
+                (
+                finprodMarketId LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                OR
+                finprodAbbr LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                )
+            </if>
+        </where>
+    </select>
+
+    <select id="countFinprodIdProcessing" resultType="java.lang.Integer">
+        select sum(qty) from (
+        select count(1) as qty from ETR_ENTRUST where FINPROD_ID=#{finprodId}
+        AND ENTRUST_DATE = to_date(#{iPlatformDate},'yyyy-MM-dd')
+        union all
+        select count(1) as qty from WFL_ETR_ENTRUST where FINPROD_ID = #{finprodId}
+          AND ENTRUST_DATE = to_date(#{iPlatformDate},'yyyy-MM-dd')
+        )
+    </select>
+
+</mapper>

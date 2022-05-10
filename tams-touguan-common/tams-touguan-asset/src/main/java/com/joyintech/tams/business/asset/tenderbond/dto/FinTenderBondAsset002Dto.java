@@ -6,6 +6,8 @@ import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.json.CustomDateDeserialize;
+import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.tams.constant.DictCode;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
@@ -112,6 +114,12 @@ public class FinTenderBondAsset002Dto extends BaseEntity implements ProcessEntit
      */
     @ApiModelProperty(name="tradeMarket",value="交易场所",required = true)
     private String tradeMarket;
+
+    /**
+     * 交易场所
+     */
+    @ApiModelProperty(name="tradeMarketValue",value="交易场所字典值")
+    private String tradeMarketValue;
 
     /**
      * 交易日历
@@ -251,6 +259,9 @@ public class FinTenderBondAsset002Dto extends BaseEntity implements ProcessEntit
     @ApiModelProperty(name="registOrg",value="登记托管机构",required = true)
     private String registOrg;
 
+    @ApiModelProperty(name="registOrg",value="登记托管机构字典值")
+    private String registOrgValue;
+
     /**
      * 含权债摊销日
      */
@@ -361,6 +372,9 @@ public class FinTenderBondAsset002Dto extends BaseEntity implements ProcessEntit
      */
     @ApiModelProperty(name="elementId",value="要素id")
     private String elementId;
+
+    @ApiModelProperty(name = "calModel", value = "参考收益率:rate,发行价格:price")
+    private String calModel;
 
     /**
      * 取得 金融产品代码
@@ -1203,5 +1217,37 @@ public class FinTenderBondAsset002Dto extends BaseEntity implements ProcessEntit
 
     public void setType11(String type11) {
         this.type11 = type11;
+    }
+
+    public String getTradeMarketValue() {
+        return SysDataUtil.getNameFromDataDict(DictCode.交易场所, this.tradeMarket);
+    }
+
+    public void setTradeMarketValue(String tradeMarketValue) {
+        this.tradeMarketValue = tradeMarketValue;
+    }
+
+    public String getOperationType() {
+        return operationType;
+    }
+
+    public void setOperationType(String operationType) {
+        this.operationType = operationType;
+    }
+
+    public String getRegistOrgValue() {
+        return SysDataUtil.getNameFromDataDict(DictCode.登记托管机构, this.registOrg);
+    }
+
+    public void setRegistOrgValue(String registOrgValue) {
+        this.registOrgValue = registOrgValue;
+    }
+
+    public String getCalModel() {
+        return calModel;
+    }
+
+    public void setCalModel(String calModel) {
+        this.calModel = calModel;
     }
 }

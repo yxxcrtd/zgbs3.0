@@ -13,21 +13,25 @@ package com.joyintech.tams.invest.common.prodinfo.impl;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.common.base.entity.RskIsupTrial;
 import com.joyintech.tams.common.base.entity.RskPortfolioIndicator;
-import com.joyintech.tams.common.base.entity.RskRulePoolConfig;
+import com.joyintech.tams.common.base.entity.RskRulePortfolio;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.invest.common.CommonUtil;
 import com.joyintech.tams.invest.common.batchList.service.BatchListService;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.prodinfo.BussRuleService;
 import com.joyintech.tams.invest.common.prodinfo.dao.RskRuleCommonMapper;
 import com.joyintech.tams.invest.common.prodinfo.dto.IPtlRule;
+import com.joyintech.tams.invest.common.prodinfo.dto.IRskRulePoolConfig;
 import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
-import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -57,22 +61,12 @@ public class BussRuleImplService extends BaseService implements BussRuleService<
      */
     @Override
     public List<String> matchRulePort(IPtlRule ruleData) {
-        List<String> portList =new ArrayList<>();
         //查询规则信息，按参数序号倒序排列
-        List<RskRulePoolConfig> resultList=rskRuleCommonMapper.getRulePoolConfig(ruleData.getRuleId());
+        List<IRskRulePoolConfig> resultList=rskRuleCommonMapper.getRulePoolConfig(ruleData.getRuleId());
         if(StringUtil.isEmptyList(resultList)){
             return new ArrayList<String>();
         }
-        String sqlWhere=StringUtil.EMPTY;
-        //系统内处理为（（A∪B）∩C）∪D，由外向内逐层处理
-        for(RskRulePoolConfig dto:resultList){
-            String column=RiskUtil.getTableColumn(dto.getClassifyDimension());
-            sqlWhere=RiskUtil.getTableColumnSql(dto.getLinkSign(),column,dto.getClassifyDimensionVal(),sqlWhere);
-        }
-        //查询符合规则的组合且在组合关联指标表中已有的组合排除，即之前已绑定的不用再管了(现改成不排除)
-        Date platDate=platformDate.getSysDate();
-        portList= rskRuleCommonMapper.getMatchPortData(sqlWhere,ruleData.getRemoveHasPort(),DateUtil.format(StringUtil.isNotEmpty(platDate) ? platDate : new Date()));
-        return portList;
+        return matchCommonRule(resultList);
     }
 
     /**
@@ -81,8 +75,7 @@ public class BussRuleImplService extends BaseService implements BussRuleService<
      * @return
      */
     @Override
-    public <T extends RskRulePoolConfig> List<String>  matchRulePortForPage(List<T> resultList) {
-        List<String> portList =new ArrayList<>();
+    public <T extends IRskRulePoolConfig> List<String>  matchRulePortForPage(List<T> resultList) {
         if(StringUtil.isEmptyList(resultList)){
             return new ArrayList<String>();
         }
@@ -93,15 +86,26 @@ public class BussRuleImplService extends BaseService implements BussRuleService<
                 return o2.getParamNum().compareTo(o1.getParamNum());
             }
         });
-        //List<RskRulePoolConfig> resultList=rskRuleCommonMapper.getRulePoolConfig(ruleData.getRuleId());
+        return matchCommonRule(resultList);
+    }
+
+    private <T extends IRskRulePoolConfig> List<String> matchCommonRule(List<T> resultList){
+        List<String> portList =new ArrayList<>();
+        Date platDate=platformDate.getSysDate();
         String sqlWhere=StringUtil.EMPTY;
         //系统内处理为（（A∪B）∩C）∪D，由外向内逐层处理
-        for(RskRulePoolConfig dto:resultList){
-            String column=RiskUtil.getTableColumn(dto.getClassifyDimension());
-            sqlWhere=RiskUtil.getTableColumnSql(dto.getLinkSign(),column,dto.getClassifyDimensionVal(),sqlWhere);
+        for(IRskRulePoolConfig dto:resultList){
+            //---流动性风险改造过滤开放周期 start---
+            if(CommonUtil.isType(dto.getClassifyDimension(),BussinessDictCodeListRds.分类维度_开放周期)){
+                portList= rskRuleCommonMapper.getMatchPortData(RiskUtil.getTableColumn(DictCodeListExt1.分类维度_开放类型.getValue())
+                        +"='"+ DictCodeList.开放类型_开放式.getValue()+"'",BussinessDictCodeListRds.是否_否.getValue(),DateUtil.format(StringUtil.isNotEmpty(platDate) ? platDate : new Date()));
+                sqlWhere=dto.getPoolSql(portList,sqlWhere);
+            }else {
+                sqlWhere=dto.getPoolSql(portList,sqlWhere);
+            }
+            //---流动性风险改造过滤开放周期 end---
         }
         //查询符合规则的组合且在组合关联指标表中已有的组合排除，即之前已绑定的不用再管了(现改成不排除)
-        Date platDate=platformDate.getSysDate();
         portList= rskRuleCommonMapper.getMatchPortData(sqlWhere,BussinessDictCodeListRds.是否_否.getValue(),DateUtil.format(StringUtil.isNotEmpty(platDate) ? platDate : new Date()));
         return portList;
     }
@@ -115,6 +119,18 @@ public class BussRuleImplService extends BaseService implements BussRuleService<
     public List<String> queryRuleRelInd(IPtlRule ruleData) {
         List<String> ruleIdList=Arrays.asList(ruleData).stream().map(IPtlRule::getRuleId).collect(Collectors.toList());
         List<String> indIdList=rskRuleCommonMapper.selectRuleRelInd(ruleIdList);
+        return indIdList;
+    }
+
+    /**
+     * 根据规则ID获取关联的组合
+     * @param ruleData
+     * @return
+     */
+    @Override
+    public List<String> queryRuleRelPort(IPtlRule ruleData) {
+        List<String> ruleIdList=Arrays.asList(ruleData).stream().map(IPtlRule::getRuleId).collect(Collectors.toList());
+        List<String> indIdList=rskRuleCommonMapper.selectRuleRelPort(ruleIdList);
         return indIdList;
     }
 
@@ -138,6 +154,31 @@ public class BussRuleImplService extends BaseService implements BussRuleService<
         rskRuleCommonMapper.insertBatchList(list);
     }
 
+    @Override
+    public void insertRulePortList(List<String> portList, List<String> ruleList, Supplier<List<String>> supplier) {
+        if(StringUtil.isEmptyList(portList)||StringUtil.isEmptyList(ruleList)){
+            return;
+        }
+        //是否从组合维度出发的,非空代表从组合维度出发，空代表从规则维度出发
+        List<String> isPortCondList=supplier.get();
+        if(!StringUtil.isEmptyList(isPortCondList)){
+            //从组合维度出发的需删除匹配规则之外其它规则与该组合的关联关系
+            rskRuleCommonMapper.deleteRulePortReverse(ruleList,portList);
+        }
+        ruleList.forEach(ruleId->{
+            List<RskRulePortfolio> list=new ArrayList<>();
+            portList.forEach(item->{
+                RskRulePortfolio rskPort=new RskRulePortfolio();
+                rskPort.setRuleId(ruleId);
+                rskPort.setPortfolioId(item);
+                list.add(rskPort);
+            });
+            //删除操作
+            rskRuleCommonMapper.deleteRulePort(ruleId,isPortCondList);
+            rskRuleCommonMapper.insertRskRulePortBatchList(list);
+        });
+    }
+
     /**
      * 删除组合关联指标
      * @param list
@@ -155,4 +196,5 @@ public class BussRuleImplService extends BaseService implements BussRuleService<
             }
         }
     }
+
 }

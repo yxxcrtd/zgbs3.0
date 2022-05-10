@@ -18,6 +18,7 @@ import com.joyintech.tams.invest.batch.valbatchimport.common.dto.InterfPayhsrcse
 import com.joyintech.tams.invest.batch.valbatchimport.common.service.CommonAutoCouponService;
 import com.joyintech.tams.invest.common.autoperiod.common.AutoPeriodCommonService;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
+import com.joyintech.tams.invest.common.dto.valuationusemerge.WflValidInputParameter;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -73,10 +74,15 @@ public class FinTenderBondAssetBatchService {
         param.put("finprodType2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
         param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
         param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
+        param.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
+        param.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
         param.put("ISSUE_STATUS_02", DictCodeListExt1.发行状态_发行失败.getValue());
         List<FinTenderBondAssetBatchDto> list = finTenderBoundAssetMapper.selectListing(param);
         if (CollectionUtils.isEmpty(list)) return;
         for (FinTenderBondAssetBatchDto dto : list) {
+            if(isInProcess(dto.getFinprodMarketId(),"FinTenderBondAsset002","FinTenderBondAsset003")) {
+                continue;
+            }
             if (StringUtil.isNotEmpty(dto.getAppearMarketId())) {//上市代码不为空
                 param.put("finprodType2", DictCodeList.平安资产类型_债券.getValue());
                 param.put("finprodMarketId", dto.getAppearMarketId());
@@ -122,6 +128,28 @@ public class FinTenderBondAssetBatchService {
     }
 
     /**
+     * 判断是否在流程中
+     *
+     * @param pk1
+     * @return
+     */
+    public Boolean isInProcess(String pk1, String... pageId) {
+        if (com.joyintech.framework.util.StringUtil.isEmpty(pk1)) return Boolean.FALSE;
+        WflValidInputParameter wflValidInputParameter = null;
+        for (String str : pageId) {
+            wflValidInputParameter = new WflValidInputParameter();
+            wflValidInputParameter.setPageId(str);
+            wflValidInputParameter.setBusinessDataPk1(pk1);
+            wflValidInputParameter.setSeachMode("01");
+            List<String> result = finTenderBoundAssetMapper.getBusinessData(wflValidInputParameter);
+            if (CollectionUtils.isNotEmpty(result)) {
+                return Boolean.TRUE;
+            }
+        }
+        return Boolean.FALSE;
+    }
+
+    /**
      * 数据入库
      *
      * @param dto
@@ -161,13 +189,22 @@ public class FinTenderBondAssetBatchService {
         productAdd.setIssueStatus(DictCodeListExt1.发行状态_发行成功.getValue());
         finProductAddMapper.updateForTenderBound(productAdd);
         //记录操作日志
-        saveOperate(dto.getFinprodId(), dto.getRemark());
+        saveOperate(dto.getFinprodMarketId(), dto.getRemark());
         //调用头寸
         BaseMap param = BaseMap.newMap().put("userId", "SYSTEM")
                 .put("totalTradeId", trdFinProductDealTotal.getTotleTradeId())
                 .put("finprodId", dto.getFinprodId())
-                .put("circulationCode", product.getCirculationCode());
-        PositionHttpRequest.sendSslt(param);
+                .put("marketFinprodId", product.getCirculationCode())
+                .put("modelType",DictCodeListExt1.子系统代码_交易.getValue())
+                .put("busiType",DictCodeListExt3.头寸业务类型_上市流通.getValue())
+                .put("busiAct",DictCodeListExt3.业务动作_上市.getValue())
+                .put("ps",DictCodeList.交易方向_上市流通.getValue())
+                .put("systemAct",DictCodeListExt3.系统动作_新建.getValue())
+                .put("cdate",plateDate)
+                .put("ccy",dto.getCcy())
+                .put("balanceCheck",DictCodeList.是否_否.getValue())
+                .put("interfaceType","Bond001");
+        PositionHttpRequest.send(param);
     }
 
 
@@ -195,7 +232,7 @@ public class FinTenderBondAssetBatchService {
     public void saveOperate(String tradeId, String remark) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(tradeId);
-        oprHisReq.setOperType(DictCodeListExt3.操作类型_新建.getValue());
+        oprHisReq.setOperType(DictCodeListExt3.操作类型_上市流通.getValue());
         oprHisReq.setBusiDes(remark);
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }

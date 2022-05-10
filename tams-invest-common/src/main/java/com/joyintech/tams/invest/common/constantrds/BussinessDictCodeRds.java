@@ -2637,6 +2637,26 @@ public enum BussinessDictCodeRds implements com.joyintech.framework.base.BaseDic
     商业银行净资产维护_有效状态(
             "BANK_ASSET_STATUS"
     ),
+    /**
+     * 	开放周期
+     */
+    开放周期("OPEN_CYCLE"),
+    /**
+     * 	处理类型
+     */
+    处理类型("PROCESS_MODEL"),
+    /**
+     * 	日期选项
+     */
+    日期选项("DATE_OPTIONS"),
+    /**
+     * 	是否面向单一投资者
+     */
+    是否面向单一投资者("IS_SINGLE_INVESTOR"),
+    /**
+     * 	说明书是否披露风险标志
+     */
+    说明书是否披露风险标志("IS_RISK_FLAG"),
     ;
     /**
      * 对应于数据字典code

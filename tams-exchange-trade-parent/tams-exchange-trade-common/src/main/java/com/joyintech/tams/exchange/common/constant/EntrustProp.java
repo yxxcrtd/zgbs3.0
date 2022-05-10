@@ -1,9 +1,11 @@
 package com.joyintech.tams.exchange.common.constant;
 
+import com.joyintech.tams.exchange.common.enums.IEnum;
+
 import java.util.HashSet;
 import java.util.Set;
 
-public enum EntrustProp {
+public enum EntrustProp implements IEnum<String> {
     //根据恒生柜台转入可能使用的值
     NORMAL("限价", "0"),
     ALLOTMENT("配股", "1"),
@@ -98,6 +100,7 @@ public enum EntrustProp {
     SZ_XSCJ_XD("协商成交下单", "FI9-1"),
     SZ_XSCJ_JS("协商成交接受", "FI9-2"),
     SZ_XSCJ_JJ("协商成交拒绝", "FI9-3"),
+    UN_MAKE_SURE("未指令", null),
 
     //期货市价
     FTDC_OPT_ANYPRICE("任意价", "FU1"),
@@ -243,6 +246,16 @@ public enum EntrustProp {
     }
 
     public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getCode() {
+        return value;
+    }
+
+    @Override
+    public String getDescription() {
         return name;
     }
 }

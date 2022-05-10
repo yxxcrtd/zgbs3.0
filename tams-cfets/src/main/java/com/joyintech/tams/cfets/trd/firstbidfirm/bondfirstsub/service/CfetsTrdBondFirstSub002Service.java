@@ -338,14 +338,18 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      * @date 2022/4/27 18:39
      */
     public CfetsTrdBondFirstSubInfoDto viewPage(CfetsTrdBondFirstSubInitRequest request) {
-        logger.debug("初始化申购页面,入参:" + JsonUtils.object2Json(request));
+        logger.debug("初始化申购查看页面,入参:" + JsonUtils.object2Json(request));
+        if(StringUtil.isEmpty(request.getBidId())){
+            logger.debug("初始化申购查看页面,交易编号为空");
+            return null;
+        }
         CfetsTrdBondFirstSubInfoDto cfetsTrdBondFirstSubInfoDto = new CfetsTrdBondFirstSubInfoDto();
         Map<String, Object> pageParam = BeanUtil.object2Map(request);
         List<CfetsTrdBondFirstSubInfoDto> listTmp = cfetsTrdBondFirstSub002Mapper.viewPage(pageParam);
         if (StringUtil.isNotEmpty(listTmp)) {
             cfetsTrdBondFirstSubInfoDto = listTmp.get(0);
         }
-        logger.debug("初始化申购页面,入参:" + JsonUtils.object2Json(cfetsTrdBondFirstSubInfoDto));
+        logger.debug("初始化申购查看页面,结果:" + JsonUtils.object2Json(cfetsTrdBondFirstSubInfoDto));
         return cfetsTrdBondFirstSubInfoDto;
     }
 
@@ -762,6 +766,9 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         if ("save".equals(entity.getOperateType())) {
             return;
         }
+        if (!StringUtil.isNotEmpty(entity.getTradeDate())) {
+            entity.setTradeDate(DateUtil.parse(iPlatformDate.getSysDateStr()));
+        }
         logger.debug("处理发起流程逻辑,入参:" + JsonUtils.object2Json(entity));
         if (!type.equals(OperationType.REVOKE) && !type.equals(OperationType.DELETE)) {
             this.insertWflData(entity);
@@ -783,6 +790,9 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     @Override
     public void doUpdate(CfetsTrdBondFirstSubInfoDto entity) {
         Map<String, Object> map = new HashMap<>();
+        if (!StringUtil.isNotEmpty(entity.getTradeDate())) {
+            entity.setTradeDate(DateUtil.parse(iPlatformDate.getSysDateStr()));
+        }
         logger.debug("退回或保存后提交,入参:" + JsonUtils.object2Json(entity));
         if (!StringUtil.equals("revoke", entity.getOperateType()) && !StringUtil.equals("delete", entity.getOperateType())) {
             // 先删除流程中数据
@@ -846,6 +856,9 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      */
     @Override
     public void doComplete(CfetsTrdBondFirstSubInfoDto entity, OperationType type) {
+        if (!StringUtil.isNotEmpty(entity.getTradeDate())) {
+            entity.setTradeDate(DateUtil.parse(iPlatformDate.getSysDateStr()));
+        }
         logger.debug("处理生效逻辑,入参:" + JsonUtils.object2Json(entity));
         this.deleteWflData(entity.getBidId());
         this.insertData(entity, type);
@@ -966,7 +979,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         // 投标日期=交易日
         wflBidOrder.setBidDate(entity.getTradeDate());
         wflBidOrder.setIsCancel(DictCodeList.是否_否.getValue());
-        wflBidOrder.setTradeStatus(DictCodeListExt1.画面数据状态_新建.getValue());
+        wflBidOrder.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
         wflBidOrder.setWorkflowStatus(DictCodeList.数据状态_新建.getValue());
         wflBidOrderMapper.insertSelective(wflBidOrder);
         for (CfetsTrdBondFirstSubProductDto item : entity.getProductDtos()) {
@@ -975,7 +988,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             wflBidOrderBidPrice.setBidPrice(new BigDecimal(99999999));//主键必传,用99999999做区分
             wflBidOrderBidPrice.setBidId(entity.getBidId());
             wflBidOrderBidPrice.setIsCancel(DictCodeList.是否_否.getValue());
-            wflBidOrderBidPrice.setTradeStatus(DictCodeListExt1.画面数据状态_新建.getValue());
+            wflBidOrderBidPrice.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
             wflBidOrderBidPrice.setWorkflowStatus(DictCodeList.数据状态_新建.getValue());
             wflBidOrderBidPriceMapper.insertSelective(wflBidOrderBidPrice);
         }
@@ -991,7 +1004,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     private void insertData(CfetsTrdBondFirstSubInfoDto entity, OperationType type) {
         BidOrder bidOrder = new BidOrder();
         BeanUtil.copyPropertiesIgnoreNull(bidOrder, entity);
-        if (!type.equals(OperationType.REVOKE) && !type.equals(OperationType.DELETE)) {
+        if (type.equals(OperationType.REVOKE) || type.equals(OperationType.DELETE)) {
             // 撤销数据处理
             bidOrder.setBidId(StringUtil.join(entity.getBidId(), "R"));
             bidOrder.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
@@ -1003,6 +1016,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         } else {
             // 投标日期=交易日
             bidOrder.setBidDate(entity.getTradeDate());
+            bidOrder.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
             bidOrder.setIsCancel(DictCodeList.是否_否.getValue());
         }
         bidOrderMapper.insertSelective(bidOrder);
@@ -1241,7 +1255,9 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             errorList.add(new ValidMessage("发行价格不可为空!"));
         }
         // 参考收益率
-        if (!StringUtil.isNotEmpty(dto.getReferenceRate()) && !StringUtil.isNotEmpty(dto.getRate())) {
+        if (!StringUtil.isNotEmpty(dto.getReferenceRateStr())
+                && StringUtil.isNotEmpty(dto.getReferenceRate())
+                && !StringUtil.isNotEmpty(dto.getRate())) {
             errorList.add(new ValidMessage("参考收益率/票面利率不可为空!"));
         }
         // 认购量

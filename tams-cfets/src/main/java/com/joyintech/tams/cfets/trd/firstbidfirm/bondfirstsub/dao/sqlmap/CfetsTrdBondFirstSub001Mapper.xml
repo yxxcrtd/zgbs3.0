@@ -276,8 +276,8 @@
                         bobp.SETT_FEE_AMT            settFeeAmt,
                         case
                             when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
-                                then nvl(miri.INT_RATE, 0) + nvl(fpi.REFER_YIELD, 0)
-                            else fpi.REFER_YIELD end rate,
+                                then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP, 0)
+                            else to_char(fpi.REFER_YIELD,'FM999999999990.9990') end rate,
                         fpi.ISSUE_CLASS              issueClass,
                         fpi.ISSUE_DATE               issueDate,
                         fpi.PAY_DATE                 payDate,
@@ -295,10 +295,10 @@
                           left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
                           left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = bo.FINPROD_ID
                           left join FIN_PRODUCT_ADD fpa on fpa.FINPROD_ID = fp.FINPROD_ID
-                          left join MST_INT_RATE_INFO miri on miri.INT_RATE_ID = fpi.INT_RATE_ID
+                          left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
                           left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
                           left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
-                 WHERE bo.BID_DATE = #{sysDate} AND bo.IS_CANCEL = 'N' and bo.TRADE_STATUS != '03' and bobp.BID_PRICE = 99999999
+                 WHERE bo.BID_DATE = to_date(#{sysDate},'yyyy-mm-dd') AND bo.IS_CANCEL = 'N' and bo.TRADE_STATUS != '03' and bobp.BID_PRICE = 99999999
                  union all
                  select fpa.ISSUE_STATUS             issueStatus,
                         fp.FINPROD_ID                finprodId,
@@ -311,8 +311,8 @@
                         0                            settFeeAmt,
                         case
                             when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
-                                then nvl(miri.INT_RATE, 0) + nvl(fpi.REFER_YIELD, 0)
-                            else fpi.REFER_YIELD end rate,
+                                then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP, 0)
+                            else to_char(fpi.REFER_YIELD,'FM999999999990.9990') end rate,
                         fpi.ISSUE_CLASS             issueClass,
                         fpi.ISSUE_DATE               issueDate,
                         fpi.PAY_DATE                 payDate,
@@ -330,10 +330,10 @@
                           left join FIN_PRODUCT fp on fp.FINPROD_ID = wbo.FINPROD_ID
                           left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = wbo.FINPROD_ID
                           left join FIN_PRODUCT_ADD fpa on fpa.FINPROD_ID = fp.FINPROD_ID
-                          left join MST_INT_RATE_INFO miri on miri.INT_RATE_ID = fpi.INT_RATE_ID
+                          left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
                           left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = wbo.OU_PARTY_ID
                           left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
-                 WHERE wbo.BID_DATE = #{sysDate} and wbobp.BID_PRICE = 99999999
+                 WHERE wbo.BID_DATE = to_date(#{sysDate},'yyyy-mm-dd') and wbobp.BID_PRICE = 99999999
              )
         group by issueStatus, finprodId, finprodMarketId, finprodAbbr, secManageAcctId, secAcctName, rate, issueClass, issueDate,
                  payDate, couponSpecies, intType, ouPartyId, ouPartyIdAbbr, issuer, issuerName
@@ -494,10 +494,10 @@
                    bo.PAYABLE_AMOUNT                                    payableAmount,
                    bo.SETT_FEE_AMT                                      settFeeAmt,
                    fpi.ISSUE_PRICE                                      issuePrice,
-                   case
-                       when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
-                           then nvl(miri.INT_RATE, 0) + nvl(fpi.REFER_YIELD, 0)
-                       else fpi.REFER_YIELD end                         rate,
+                    case
+                        when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
+                            then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP, 0)
+                        else to_char(fpi.REFER_YIELD,'FM999999999990.9990') end rate,
                    bobp.PORTFOLIO_ID                                    portfolioId,
                    bobp.PORTFOLIO_NAME                                  portfolioName,
                    fpi.ISSUE_DATE                                       issueDate,
@@ -532,7 +532,7 @@
                      left join FIN_PRODUCT_ADD fpa on fpa.FINPROD_ID = bo.FINPROD_ID
                      left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
                      left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
-                     left join MST_INT_RATE_INFO miri on miri.INT_RATE_ID = fpi.INT_RATE_ID
+                     left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
                      left join TRDQUTO_MATCH_INFO tmi on tmi.PRE_TRADE_ID = bo.BID_ID
                      left join TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt on tfpdt.TOTLE_TRADE_ID = tmi.TRD_ID
             where bo.TRADE_STATUS != '03'
@@ -552,10 +552,10 @@
                    bo.PAYABLE_AMOUNT            payableAmount,
                    bo.SETT_FEE_AMT              settFeeAmt,
                    fpi.ISSUE_PRICE              issuePrice,
-                   case
-                       when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
-                           then nvl(miri.INT_RATE, 0) + nvl(fpi.REFER_YIELD, 0)
-                       else fpi.REFER_YIELD end rate,
+                    case
+                        when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
+                            then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP, 0)
+                        else to_char(fpi.REFER_YIELD,'FM999999999990.9990') end rate,
                    bobp.PORTFOLIO_ID            portfolioId,
                    bobp.PORTFOLIO_NAME          portfolioName,
                    fpi.ISSUE_DATE               issueDate,
@@ -590,7 +590,7 @@
                      left join FIN_PRODUCT_ADD fpa on fpa.FINPROD_ID = bo.FINPROD_ID
                      left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
                      left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
-                     left join MST_INT_RATE_INFO miri on miri.INT_RATE_ID = fpi.INT_RATE_ID
+                     left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
                      left join TRDQUTO_MATCH_INFO tmi on tmi.PRE_TRADE_ID = bo.BID_ID
                      left join TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt on tfpdt.TOTLE_TRADE_ID = tmi.TRD_ID
             <where>

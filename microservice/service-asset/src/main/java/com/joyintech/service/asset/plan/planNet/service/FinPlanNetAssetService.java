@@ -23,6 +23,7 @@ import com.joyintech.service.asset.plan.planNet.dao.FinPlanNetAssetMapper;
 import com.joyintech.service.asset.plan.planNet.dto.BussRepAssetMngProdInfo;
 import com.joyintech.service.asset.plan.planNet.dto.BussRepOutInvestAgrInfo;
 import com.joyintech.service.asset.plan.planNet.dto.FinPlanNetAssetDto;
+import com.joyintech.service.product.common.dto.BussFinProductOpenPlanDto;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.base.core.BaseFinProductBaseInfoService;
@@ -36,6 +37,8 @@ import com.joyintech.tams.component.base.report.dto.BaseRepTrustInvestModeInfoDt
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.invest.common.CommonUtil;
+import org.apache.commons.codec.binary.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -274,7 +277,7 @@ public class FinPlanNetAssetService extends BaseService<FinPlanNetAssetDto> {
      * @see
      * @since 1.0
      */
-    public void insert(FinPlanNetAssetDto dto) {
+    public void insert(FinPlanNetAssetDto dto) throws Exception{
         //构建标的类金融产品dto
         BaseFinProductBaseInfoDto baseFinProductBaseInfoDto = new BaseFinProductBaseInfoDto();
         baseFinProductBaseInfoDto.setFinProduct(dto.getFinProduct());
@@ -294,6 +297,10 @@ public class FinPlanNetAssetService extends BaseService<FinPlanNetAssetDto> {
                 dto.getBussFinRecommentDto().getFinProductRecommentList());
         }
         // 增加推荐方与推荐费率 add by renping 20191014 end
+
+        // 开放计划（需要在浮动管理费前生成）
+        this.procFinProductOpenPlan(dto, baseFinProductBaseInfoDto);
+
         List<BaseFinProductBaseInfoDto> list = new ArrayList<>();
         list.add(baseFinProductBaseInfoDto);
         //调用标的类金融产品基础组件进行插入
@@ -380,7 +387,7 @@ public class FinPlanNetAssetService extends BaseService<FinPlanNetAssetDto> {
      * @see
      * @since 1.0
      */
-    public void update(FinPlanNetAssetDto dto) {
+    public void update(FinPlanNetAssetDto dto) throws Exception{
         //构建标的类金融产品dto
         BaseFinProductBaseInfoDto baseFinProductBaseInfoDto = new BaseFinProductBaseInfoDto();
         baseFinProductBaseInfoDto.setFinProduct(dto.getFinProduct());
@@ -403,6 +410,9 @@ public class FinPlanNetAssetService extends BaseService<FinPlanNetAssetDto> {
         List<String> finprodIdList = new ArrayList<>();
         finprodIdList.add(dto.getFinProduct().getFinprodId());
         List<BaseFinProductBaseInfoDto> list = new ArrayList<>();
+
+        // 开放计划（需要在浮动管理费前生成）
+        this.procFinProductOpenPlan(dto, baseFinProductBaseInfoDto);
         list.add(baseFinProductBaseInfoDto);
         //调用标的类金融产品基础组件进行修改
         baseFinProductBaseInfoService.update(finprodIdList,list);
@@ -563,4 +573,177 @@ public class FinPlanNetAssetService extends BaseService<FinPlanNetAssetDto> {
         return finPlanNetAssetMapper.getFinprodId(finprodMarketId);
     }
      // 增加查询资产代码 by 赵东东 2019.10.12  end
+
+    /**
+     * 处理开放计划相关数据生成
+     * <功能详细描述>
+     * @param finProductCommonInfoDto
+     * @param baseFinProductBaseInfoDto
+     * @param finProductCommonInfoDto
+     * @throws Exception
+     * @see
+     * @since 1.0
+     */
+    private void procFinProductOpenPlan(FinPlanNetAssetDto dto,
+                                        BaseFinProductBaseInfoDto baseFinProductBaseInfoDto)
+            throws Exception {
+        if (dto.getBussFinProductOpenPlanDto() != null) {
+            // 现金流信息dtolist-->本金
+            String cashId_amt = CommonUtil.generateCashFlowCode(
+                    baseFinProductBaseInfoDto.getFinProduct().getFinprodId(),
+                    DictCodeListExt1.现金流业务类型_金融产品.getValue(), 0L,
+                    DictCodeListExt1.现金流二级类型_本金.getValue());
+            // FinCashInfo finCashInfo_amt = new FinCashInfo();
+            // BeanUtil.copyProperties(finCashInfo_amt, dto);
+            // finCashInfo_amt.setCashId(cashId_amt);
+            // finCashInfo_amt.setCashType1(DictCodeListExt1.现金流一级类型_本金.getValue());
+            // finCashInfo_amt.setCashType2(DictCodeListExt1.现金流二级类型_本金.getValue());
+            // finCashInfo_amt.setCcy(dto.getCcy());
+            // finCashInfo_amt.setFinprodId(baseFinProductBaseInfoDto.getFinProduct().getFinprodId());
+            // finCashInfo_amt.setFinprodType(DictCodeListExt1.现金流业务类型_金融产品.getValue());
+            // finCashInfo_amt.setBranch(0L);
+            // finCashInfo_amt.setIsCalc(DictCodeList.是否_是.getValue());
+            // baseFinProductBaseInfoDto.getFinCashInfoList().add(finCashInfo_amt);
+
+            // 开放规则dtolist
+            BussFinProductOpenPlanDto bussFinProductOpenPlanDto = dto.getBussFinProductOpenPlanDto();
+            FinOpenRule finOpenRule = new FinOpenRule();
+            BeanUtil.copyProperties(finOpenRule, dto);
+            finOpenRule.setCashId(cashId_amt);
+            finOpenRule.setPurSpeed(bussFinProductOpenPlanDto.getPurSpeed());
+            // update zhangweiqi 申赎类型从界面取值
+            finOpenRule.setOpenType(bussFinProductOpenPlanDto.getOpenType());
+            // finOpenRule.setOpenType(DictCodeList.申赎开放类型_申赎开放.getValue());
+            finOpenRule.setCpriceRule(bussFinProductOpenPlanDto.getCpriceRule());// add zhangweiqi
+            // 新增净值日规则
+            finOpenRule.setOpenMode(bussFinProductOpenPlanDto.getOpenMode());
+            finOpenRule.setOpenDays(bussFinProductOpenPlanDto.getOpenDays());
+            finOpenRule.setOpenCycle(bussFinProductOpenPlanDto.getOpenCycle());
+            finOpenRule.setOpenCycleUnit(bussFinProductOpenPlanDto.getOpenCycleUnit());
+            if (StringUtil.isNotEmpty(bussFinProductOpenPlanDto.getDayOfWeek())) {
+                finOpenRule.setDayType(DictCodeListExt1.日期类型_周几.getValue());
+                finOpenRule.setDayValue(bussFinProductOpenPlanDto.getDayOfWeek());
+            }
+            else if (StringUtil.isNotEmpty(bussFinProductOpenPlanDto.getDayOfMonth())) {
+                finOpenRule.setDayType(DictCodeListExt1.日期类型_第几自然日.getValue());
+                finOpenRule.setDayValue(bussFinProductOpenPlanDto.getDayOfMonth());
+            }
+            else if (StringUtil.isNotEmpty(bussFinProductOpenPlanDto.getWorkdayOfMonth())) {
+                finOpenRule.setDayType(DictCodeListExt1.日期类型_第几工作日.getValue());
+                finOpenRule.setDayValue(bussFinProductOpenPlanDto.getWorkdayOfMonth());
+            }
+            // 第几周周几
+            else if (StringUtil.isNotEmpty(bussFinProductOpenPlanDto.getWeekOfMonth())
+                    && StringUtil.isNotEmpty(bussFinProductOpenPlanDto.getWorkdayOfWeek())) {
+                finOpenRule.setDayType(DictCodeListExt1.日期类型_第几周周几.getValue());
+                finOpenRule.setDayValue(bussFinProductOpenPlanDto.getWeekOfMonth() + ";"
+                        + bussFinProductOpenPlanDto.getWorkdayOfWeek());
+            }
+            finOpenRule.setCalcMethod(bussFinProductOpenPlanDto.getCalcMethod());
+            finOpenRule.setFirstOpenDate(bussFinProductOpenPlanDto.getFirstOpenDate());
+            finOpenRule.setTradedayRule(bussFinProductOpenPlanDto.getTradedayRule());
+            finOpenRule.setHdayOpenFlag(bussFinProductOpenPlanDto.getHdayOpenFlag());
+            finOpenRule.setCalcRule(bussFinProductOpenPlanDto.getCalcRule());
+            finOpenRule.setOpenDaysType(bussFinProductOpenPlanDto.getOpenDaysType());
+            baseFinProductBaseInfoDto.setFinOpenRuleList(new ArrayList<>());
+            baseFinProductBaseInfoDto.getFinOpenRuleList().add(finOpenRule);
+
+            // 开放计划dtolist
+            baseFinProductBaseInfoDto.setFinOpenPlanList(new ArrayList<>());
+            if (!StringUtil.isEmptyList(bussFinProductOpenPlanDto.getFinOpenPlanList())) {
+                for (FinOpenPlan finOpenPlan : bussFinProductOpenPlanDto.getFinOpenPlanList()) {
+                    finOpenPlan.setCashId(cashId_amt);
+                    // update zhangweiqi 申赎类型从界面取值
+                    finOpenPlan.setOpenType(bussFinProductOpenPlanDto.getOpenType());
+                    // finOpenPlan.setOpenType(DictCodeList.申赎开放类型_申赎开放.getValue());
+                    finOpenPlan.setOpenDateStrUn(finOpenPlan.getOpenDateStr());
+                    finOpenPlan.setOpenDateEndUn(finOpenPlan.getOpenDateEnd());
+                    finOpenPlan.setOpenVdateUn(finOpenPlan.getOpenVdate());
+                    finOpenPlan.setOpenMdateUn(finOpenPlan.getOpenMdate());
+                    finOpenPlan.setOpenNdate(finOpenPlan.getOpenNdate());// add zhangweiqi 净值日
+                    finOpenPlan.setFinprodId(
+                            baseFinProductBaseInfoDto.getFinProduct().getFinprodId());
+                    finOpenPlan.setBranch(0L);
+                    finOpenPlan.setOpenStatus(DictCodeList.开放状态_开放.getValue());
+                    baseFinProductBaseInfoDto.getFinOpenPlanList().add(finOpenPlan);
+                }
+            }
+            // add by zhangweiqi 增加赎回的逻辑 begin
+            //周期型产品无赎回计划
+            if (!StringUtils.equals(bussFinProductOpenPlanDto.getOpenType(),
+                    DictCodeList.申赎开放类型_申赎开放.getValue())) {
+                // 开放计划
+                if (dto.getBussFinProductOpenPlanRedDto() != null) {
+                    // 开放规则dtolist
+                    BussFinProductOpenPlanDto bussFinProductOpenPlanRedDto = dto.getBussFinProductOpenPlanRedDto();
+                    FinOpenRule finOpenRuleRed = new FinOpenRule();
+                    BeanUtil.copyProperties(finOpenRuleRed, bussFinProductOpenPlanRedDto);
+                    finOpenRuleRed.setCashId(cashId_amt);
+                    finOpenRuleRed.setOpenType(DictCodeList.申赎开放类型_赎回开放.getValue());
+                    finOpenRuleRed.setCpriceRule(bussFinProductOpenPlanRedDto.getCpriceRule());// add
+                    // zhangweiqi
+                    // 新增净值日规则
+                    finOpenRuleRed.setOpenMode(bussFinProductOpenPlanRedDto.getOpenMode());
+                    finOpenRuleRed.setOpenDays(bussFinProductOpenPlanRedDto.getOpenDays());
+                    finOpenRuleRed.setOpenCycle(bussFinProductOpenPlanRedDto.getOpenCycle());
+                    finOpenRuleRed.setOpenCycleUnit(
+                            bussFinProductOpenPlanRedDto.getOpenCycleUnit());
+                    if (StringUtil.isNotEmpty(bussFinProductOpenPlanRedDto.getDayOfWeek())) {
+                        finOpenRuleRed.setDayType(DictCodeListExt1.日期类型_周几.getValue());
+                        finOpenRuleRed.setDayValue(bussFinProductOpenPlanRedDto.getDayOfWeek());
+                    }
+                    else if (StringUtil.isNotEmpty(bussFinProductOpenPlanRedDto.getDayOfMonth())) {
+                        finOpenRuleRed.setDayType(DictCodeListExt1.日期类型_第几自然日.getValue());
+                        finOpenRuleRed.setDayValue(bussFinProductOpenPlanRedDto.getDayOfMonth());
+                    }
+                    else if (StringUtil.isNotEmpty(
+                            bussFinProductOpenPlanRedDto.getWorkdayOfMonth())) {
+                        finOpenRuleRed.setDayType(DictCodeListExt1.日期类型_第几工作日.getValue());
+                        finOpenRuleRed.setDayValue(
+                                bussFinProductOpenPlanRedDto.getWorkdayOfMonth());
+                    }
+                    // 第几周周几
+                    else if (StringUtil.isNotEmpty(bussFinProductOpenPlanRedDto.getWeekOfMonth())
+                            && StringUtil.isNotEmpty(
+                            bussFinProductOpenPlanRedDto.getWorkdayOfWeek())) {
+                        finOpenRuleRed.setDayType(DictCodeListExt1.日期类型_第几周周几.getValue());
+                        finOpenRuleRed.setDayValue(
+                                bussFinProductOpenPlanRedDto.getWeekOfMonth() + ";"
+                                        + bussFinProductOpenPlanRedDto.getWorkdayOfWeek());
+                    }
+                    finOpenRuleRed.setCalcMethod(bussFinProductOpenPlanRedDto.getCalcMethod());
+                    finOpenRuleRed.setFirstOpenDate(
+                            bussFinProductOpenPlanRedDto.getFirstOpenDate());
+                    finOpenRuleRed.setTradedayRule(bussFinProductOpenPlanRedDto.getTradedayRule());
+                    finOpenRuleRed.setHdayOpenFlag(bussFinProductOpenPlanRedDto.getHdayOpenFlag());
+                    finOpenRuleRed.setCalcRule(bussFinProductOpenPlanRedDto.getCalcRule());
+                    finOpenRuleRed.setOpenDaysType(bussFinProductOpenPlanRedDto.getOpenDaysType());
+                    baseFinProductBaseInfoDto.getFinOpenRuleList().add(finOpenRuleRed);
+
+                    // 开放计划dtolist
+                    if (!StringUtil.isEmptyList(
+                            bussFinProductOpenPlanRedDto.getFinOpenPlanList())) {
+                        for (FinOpenPlan finOpenPlanRed : bussFinProductOpenPlanRedDto.getFinOpenPlanList()) {
+                            finOpenPlanRed.setCashId(cashId_amt);
+                            finOpenPlanRed.setOpenType(DictCodeList.申赎开放类型_赎回开放.getValue());
+                            finOpenPlanRed.setOpenDateStrUn(finOpenPlanRed.getOpenDateStr());
+                            finOpenPlanRed.setOpenDateEndUn(finOpenPlanRed.getOpenDateEnd());
+                            finOpenPlanRed.setOpenVdateUn(finOpenPlanRed.getOpenVdate());
+                            finOpenPlanRed.setOpenMdateUn(finOpenPlanRed.getOpenMdate());
+                            finOpenPlanRed.setOpenNdate(finOpenPlanRed.getOpenNdate());// add
+                            // zhangweiqi
+                            // 净值日
+                            finOpenPlanRed.setFinprodId(
+                                    baseFinProductBaseInfoDto.getFinProduct().getFinprodId());
+                            finOpenPlanRed.setBranch(0L);
+                            finOpenPlanRed.setOpenStatus(DictCodeList.开放状态_开放.getValue());
+                            baseFinProductBaseInfoDto.getFinOpenPlanList().add(finOpenPlanRed);
+                        }
+                    }
+                }
+
+            }
+            // add by zhangweiqi 增加赎回的逻辑 end
+        }
+    }
 }

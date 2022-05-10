@@ -29,6 +29,16 @@ public class AssetGenerateEntry extends FinProduct {
      */
     private String type12;
 
+    /**
+     * 交易编号
+     */
+    private String tradeId;
+
+    /**
+     * 是否锁定
+     */
+    private String withLockPeriod;
+
     public String getFaceValue() {
         return faceValue;
     }
@@ -51,5 +61,21 @@ public class AssetGenerateEntry extends FinProduct {
 
     public void setType12(String type12) {
         this.type12 = type12;
+    }
+
+    public String getTradeId() {
+        return tradeId;
+    }
+
+    public void setTradeId(String tradeId) {
+        this.tradeId = tradeId;
+    }
+
+    public String getWithLockPeriod() {
+        return withLockPeriod;
+    }
+
+    public void setWithLockPeriod(String withLockPeriod) {
+        this.withLockPeriod = withLockPeriod;
     }
 }

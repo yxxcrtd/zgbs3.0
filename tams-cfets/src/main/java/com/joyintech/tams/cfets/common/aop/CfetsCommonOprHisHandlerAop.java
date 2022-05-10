@@ -59,7 +59,10 @@ public class CfetsCommonOprHisHandlerAop {
     @AfterReturning("insertPoint() || updatePoint()")
     public void updateCfetsOprHis(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        OperationType operationType = (OperationType) args[1];
+        OperationType operationType = OperationType.NEW;
+        if (args.length > 1) {
+            operationType = (OperationType) args[1];
+        }
         Map<String, Object> resultMap = cfetsCommonOprHisHandlerAopService.getCfetsOprHisInfo(args[0], operationType);
         String trdId = (String) resultMap.get("trdId");
         String busiDes = (String) resultMap.get("busiDes");

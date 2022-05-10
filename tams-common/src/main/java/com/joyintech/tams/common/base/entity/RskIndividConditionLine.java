@@ -64,6 +64,11 @@ public class RskIndividConditionLine extends BaseEntity {
     private String isBagCalc;
 
     /**
+     * 处理类型
+     */
+    private String processModel;
+
+    /**
      * 取得 条件设置编号
      * @return 条件设置编号
      */
@@ -237,5 +242,13 @@ public class RskIndividConditionLine extends BaseEntity {
      */
     public void setIsBagCalc(String isBagCalc) {
         this.isBagCalc = isBagCalc == null ? null : isBagCalc.trim();
+    }
+
+    public String getProcessModel() {
+        return processModel;
+    }
+
+    public void setProcessModel(String processModel) {
+        this.processModel = processModel;
     }
 }

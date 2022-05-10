@@ -4,6 +4,8 @@ import com.joyintech.tams.business.common.dto.PageMode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.List;
+
 /**
  * @Author: kchen
  * @Date: 2022/4/21 9:51
@@ -49,6 +51,9 @@ public class CfetsEtrIBondFirstBidFindIssueInfoRequest {
 
     @ApiModelProperty(name = "platformDate", value = "平台日", example = "12")
     private String platformDate;
+
+    @ApiModelProperty(name = "issueStage", value = "发行阶段")
+    private List<String> issueStage;
 
     public PageMode getPageMode() {
         return pageMode;
@@ -152,5 +157,13 @@ public class CfetsEtrIBondFirstBidFindIssueInfoRequest {
 
     public void setFinprodMarketId(String finprodMarketId) {
         this.finprodMarketId = finprodMarketId;
+    }
+
+    public List<String> getIssueStage() {
+        return issueStage;
+    }
+
+    public void setIssueStage(List<String> issueStage) {
+        this.issueStage = issueStage;
     }
 }

@@ -12,6 +12,7 @@ package com.joyintech.service.portfolio.ptlmanagementinfo.dao;
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.tams.invest.common.prodinfo.dto.IRskRulePoolConfig;
 import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.service.portfolio.ptlmanagementinfo.dto.*;
 import com.joyintech.tams.common.base.entity.*;
@@ -375,7 +376,7 @@ public interface PtlManagementInfo001Mapper {
      * 查询所有的规则包
      * @return
      */
-    List<RskRulePoolConfig> selectPtlRuleAll();
+    List<IRskRulePoolConfig> selectPtlRuleAll();
 
     /**
      * 查询是否匹配当前组合

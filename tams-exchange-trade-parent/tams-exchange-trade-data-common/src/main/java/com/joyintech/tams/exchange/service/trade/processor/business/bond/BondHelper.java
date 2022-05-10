@@ -34,7 +34,7 @@ import java.util.Objects;
 public class BondHelper {
     private static final Logger logger = LoggerFactory.getLogger(BondHelper.class);
 
-//    @Autowired
+    //    @Autowired
 //    private QuoteTickService quoteTickService;
     @Autowired
     private QuoteService quoteService;
@@ -88,7 +88,7 @@ public class BondHelper {
             }
             ResultBean tickBean = quoteService.getTick(orderInterface.getStockCode());
             if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
-                TickBean tick = (TickBean)tickBean.getData();
+                TickBean tick = (TickBean) tickBean.getData();
 //            QuoteProto.TickBean tick = quoteTickService.getTickFromCache(orderInterface.getStockCode());
 //            if (Objects.nonNull(tick)) {
                 double lowerLimitPrice = TradeUtils.formatDouble(tick.getLowerLimitPrice(), 4);
@@ -151,51 +151,68 @@ public class BondHelper {
     }
 
     // 债券成交全价处理 ------> 需求确认后恢复为全价
+//    public BigDecimal handleTradePriceByFullPrice(Trade trade, String isFullPrice, Instruction instruction) {
+//        if (IntegratedEntrustUtils.isProtocolBack(trade.getEntrustProp()) || trade.getTradedPrice().doubleValue() == 0) {
+//            return trade.getTradedBalance();
+//        }
+//        // 对于金证和金仕达柜台 -- 净价报单 净价成交。 ufx按照委托中isFullPrice区分 净价成交 全价成交
+//        Account account = accountManager.getAccountById(trade.getAccountId());
+//        // 净价成交不需要处理
+//        if (Objects.nonNull(account) && AgentType.isNetPriceTrade(account.getAgentType())) {
+//            return trade.getTradedBalance();
+//        }
+//        if (Objects.nonNull(instruction) && EntrustUtils.isFullPrice(instruction.getAssetType(), trade.getEntrustProp(), isFullPrice)) {
+//            logger.info("债券全价成交回报价格和成交金额处理，brokerEntrustId {} brokerTradeId {} tradePrice {} tradeBalance {}", trade.getBrokerEntrustId(), trade.getBrokerTradeId(), trade.getTradedPrice(), trade.getTradedBalance());
+//            BigDecimal price = investmentManagement.queryEntrustPriceByFullPriceFromInvest(trade.getTradedPrice(), trade.getTradedVolume(), instruction, getPriceRoundByPriceStep(instrumentService.queryByInnerCode(instruction.getFinprodMarketId())));
+//            BigDecimal calculateBalance = TradeUtils.multiply(price, trade.getTradedVolume(), 2);
+//            logger.info("全价转换为净价完成，brokerEntrustId {} brokerTradeId {} tradePrice {} calculateBalance {} tradeVolume {}", trade.getBrokerEntrustId(), trade.getBrokerTradeId(), price, calculateBalance, trade.getTradedVolume());
+//            return calculateBalance;
+//        }
+//        return trade.getTradedBalance();
+//    }
+
     public BigDecimal handleTradePriceByFullPrice(Trade trade, String isFullPrice, Instruction instruction) {
         if (IntegratedEntrustUtils.isProtocolBack(trade.getEntrustProp()) || trade.getTradedPrice().doubleValue() == 0) {
             return trade.getTradedBalance();
         }
-        // 对于金证和金仕达柜台 -- 净价报单 净价成交。 ufx按照委托中isFullPrice区分 净价成交 全价成交
-        Account account = accountManager.getAccountById(trade.getAccountId());
-        // 净价成交不需要处理
-        if (Objects.nonNull(account) && AgentType.isNetPriceTrade(account.getAgentType())) {
-            return trade.getTradedBalance();
-        }
-        if (Objects.nonNull(instruction) && EntrustUtils.isFullPrice(instruction.getAssetType(), trade.getEntrustProp(), isFullPrice)) {
-            logger.info("债券全价成交回报价格和成交金额处理，brokerEntrustId {} brokerTradeId {} tradePrice {} tradeBalance {}", trade.getBrokerEntrustId(), trade.getBrokerTradeId(), trade.getTradedPrice(), trade.getTradedBalance());
-            BigDecimal price = investmentManagement.queryEntrustPriceByFullPriceFromInvest(trade.getTradedPrice(), trade.getTradedVolume(), instruction, getPriceRoundByPriceStep(instrumentService.queryByInnerCode(instruction.getFinprodMarketId())));
-            BigDecimal calculateBalance = TradeUtils.multiply(price, trade.getTradedVolume(), 2);
-            logger.info("全价转换为净价完成，brokerEntrustId {} brokerTradeId {} tradePrice {} calculateBalance {} tradeVolume {}", trade.getBrokerEntrustId(), trade.getBrokerTradeId(), price, calculateBalance, trade.getTradedVolume());
-            return calculateBalance;
+
+        if (!EntrustUtils.isFullPrice(instruction.getAssetType(), trade.getEntrustProp(), isFullPrice)) {
+            BigDecimal price = investmentManagement.queryFullPriceByEntrustPriceFromInvest(trade.getTradedPrice(), trade.getTradedVolume(), instruction, getPriceRoundByPriceStep(instrumentService.queryByInnerCode(instruction.getFinprodMarketId())));
+            logger.info("handleTradePriceByFullPrice  trade fullPrice {}", price);
+            return TradeUtils.multiply(price, trade.getTradedVolume(), 2);
         }
         return trade.getTradedBalance();
     }
 
-    // 债券净价成交转换为全价处理
+    /**
+     * 债券净价成交转换为全价处理
+     */
+//    public BigDecimal getFullPriceByTradePrice(Trade trade, String isFullPrice, Instruction instruction) {
+//        if (!InvestmentAssetType.isBond(instruction.getAssetType())) {
+//            return BigDecimal.ZERO;
+//        }
+//        if (IntegratedEntrustUtils.isProtocolBack(trade.getEntrustProp()) || trade.getTradedPrice().doubleValue() == 0) {
+//            return trade.getTradedPrice();
+//        }
+//        // 对于金证和金仕达柜台 -- 净价报单 净价成交。
+//        // ufx按照委托中isFullPrice区分 净价成交 全价成交
+//        Account account = accountManager.getAccountById(trade.getAccountId());
+//        // 净价成交 转换为 全价
+//        if (Objects.nonNull(account) && AgentType.isNetPriceTrade(account.getAgentType())
+//                || (!EntrustUtils.isFullPrice(instruction.getAssetType(), trade.getEntrustProp(), isFullPrice))) {
+//            BigDecimal price = investmentManagement.queryFullPriceByEntrustPriceFromInvest(trade.getTradedPrice(), trade.getTradedVolume(), instruction, getPriceRoundByPriceStep(instrumentService.queryByInnerCode(instruction.getFinprodMarketId())));
+//            logger.info("getFullPriceByTradePrice  trade fullPrice {}", price);
+//            return price;
+//        }
+//
+//        return trade.getTradedPrice();
+//    }
     public BigDecimal getFullPriceByTradePrice(Trade trade, String isFullPrice, Instruction instruction) {
-        if (!InvestmentAssetType.isBond(instruction.getAssetType())) return BigDecimal.ZERO;
+        if (!InvestmentAssetType.isBond(instruction.getAssetType())) {
+            return BigDecimal.ZERO;
+        }
         if (IntegratedEntrustUtils.isProtocolBack(trade.getEntrustProp()) || trade.getTradedPrice().doubleValue() == 0) {
             return trade.getTradedPrice();
-        }
-        // 对于金证和金仕达柜台 -- 净价报单 净价成交。 ufx按照委托中isFullPrice区分 净价成交 全价成交
-//        Account account = accountManager.getAccountById(trade.getAccountId());
-        // 对于金证和金仕达柜台 -- 净价报单 净价成交。
-        // ufx按照委托中isFullPrice区分 净价成交 全价成交
-//        Account account = accountManager.getAccountById(trade.getAccountId());
-        // 净价成交 转换为 全价
-//        if (Objects.nonNull(account) && AgentType.isNetPriceTrade(account.getAgentType())
-//                || (!EntrustUtils.isFullPrice(instruction.getAssetType(), trade.getEntrustProp(), isFullPrice))) {
-//            BigDecimal price = investmentManagement.queryFullPriceByEntrustPriceFromInvest(trade.getTradedPrice(), trade.getTradedVolume(), instruction, getPriceRoundByPriceStep(instrumentService.queryByInnerCode(instruction.getFinprodMarketId())));
-//            logger.info("getFullPriceByTradePrice  trade fullPrice {}", price);
-//            return price;
-//        }
-        if (!EntrustUtils.isFullPrice(instruction.getAssetType(), trade.getEntrustProp(), isFullPrice)) {
-//        if (Objects.nonNull(account) && AgentType.isNetPriceTrade(account.getAgentType())
-//                || (!EntrustUtils.isFullPrice(instruction.getAssetType(), trade.getEntrustProp(), isFullPrice))) {
-//            BigDecimal price = investmentManagement.queryFullPriceByEntrustPriceFromInvest(trade.getTradedPrice(), trade.getTradedVolume(), instruction, getPriceRoundByPriceStep(instrumentService.queryByInnerCode(instruction.getFinprodMarketId())));
-//            logger.info("getFullPriceByTradePrice  trade fullPrice {}", price);
-//            return price;
-//        }
         }
         /*
          * 新债调整
@@ -215,6 +232,12 @@ public class BondHelper {
         return trade.getTradedPrice();
     }
 
+    public BigDecimal getNetPriceByFullPrice(Trade trade,Instruction instruction) {
+        BigDecimal price = investmentManagement.queryEntrustPriceByFullPriceFromInvest(trade.getFullPrice(), trade.getTradedVolume(), instruction, getPriceRoundByPriceStep(instrumentService.queryByInnerCode(instruction.getFinprodMarketId())));
+        logger.info("getNetPriceByFullPrice  trade fullPrice {}", price);
+        return price;
+    }
+
     public BigDecimal calculateBalanceForInstruction(String entrustProp, String assetType, BigDecimal entrustPrice, long volume, BigDecimal balance) {
         //协议回购金额计算
         if (IntegratedEntrustUtils.isProtocolBack(entrustProp)) {
@@ -227,6 +250,22 @@ public class BondHelper {
         //债券指令 全部按照净价处理
         if (InvestmentAssetType.BOND.value.equals(assetType)) {
             return TradeUtils.multiply(entrustPrice, volume, 2);
+        }
+        return balance;
+    }
+
+    public BigDecimal calculateBalanceForInstruction(OrderInterface orderInterface, long entrustVolume, BigDecimal balance) {
+        //协议回购金额计算
+        if (IntegratedEntrustUtils.isProtocolBack(orderInterface.getEntrustProp())) {
+            return balance;
+        }
+        // 质押式竞价回购，金额计算
+        if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(orderInterface.getAssetType())) {
+            return new BigDecimal(entrustVolume * 100).setScale(2, BigDecimal.ROUND_HALF_UP);
+        }
+        //债券指令全部按照全价处理
+        if (InvestmentAssetType.BOND.value.equals(orderInterface.getAssetType())) {
+            return TradeUtils.multiply(orderInterface.getFullPrice(), entrustVolume, 2);
         }
         return balance;
     }

@@ -137,6 +137,13 @@ public class RskSupervisionIndividuationService extends BaseService {
         return rskSupervisionIndividuationMapper.queryUniteIndIdList(param);
     }
 
+    public List<SelectOptionDto> queryUniteIndIdList_RULE(Map<String, Object> param) {
+        if(StringUtil.isNotEmpty(param.get("initValue"))){
+            param.put("initValue",RiskUtil.convertPortfCode(param.get("initValue").toString().replaceAll(" ","")));
+        }
+        return rskSupervisionIndividuationMapper.queryUniteIndIdList_RULE(param);
+    }
+
     public List<RskIndividUniteDto> findPageForUnite(Map<String, Object> param) {
     	List<RskIndividUniteDto> list = rskSupervisionIndividuationMapper.selectUniteForPage(param);
     	/*if(!StringUtil.isEmptyList(list)){

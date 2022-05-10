@@ -58,6 +58,11 @@ public class RskIndividSpecialStage extends BaseEntity implements IColBaseCond {
     private String foulCond;
 
     /**
+     * 处理类型
+     */
+    private String processModel;
+
+    /**
      * 取得 特殊阶段编号
      * @return 特殊阶段编号
      */
@@ -219,5 +224,13 @@ public class RskIndividSpecialStage extends BaseEntity implements IColBaseCond {
      */
     public void setFoulCond(String foulCond) {
         this.foulCond = foulCond == null ? null : foulCond.trim();
+    }
+
+    public String getProcessModel() {
+        return processModel;
+    }
+
+    public void setProcessModel(String processModel) {
+        this.processModel = processModel;
     }
 }

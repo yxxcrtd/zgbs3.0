@@ -786,9 +786,13 @@ public class RiskRedisInitServiceImpl extends BaseService implements RiskRedisIn
 
         //查询所有的个性化条件设置信息
         List<PtlPortfolioValuation>  riskPortfValList=new ArrayList<>();
+        //---流动性风险改造 start---
+        List<FinOpenPlan>  riskPortOpenPlanList=new ArrayList<>();
+        //---流动性风险改造 end---
         List<RiskIndividConditionDto>  riskIndividConditionDtoList =  riskTrialCommMapper.getRiskIndividCondition();
         if(!StringUtil.isEmptyList(riskIndividConditionDtoList)){
             riskPortfValList =  riskTrialCommMapper.getPortfValuation(mapPass.get("valDate").toString());
+            riskPortOpenPlanList =  riskTrialCommMapper.getPortfOpenPlan(mapPass.get("valDate").toString());
         }
         // add by zhangrui1 自定义条件阈值 start
         List<String> ptlList = new ArrayList<>();
@@ -823,9 +827,12 @@ public class RiskRedisInitServiceImpl extends BaseService implements RiskRedisIn
                 HashSet<String> indSetList=new HashSet<>();
                 //循环处理当前组合下的关联指标来调用个性化条件设置，以便排除不符合条件的指标
                 for(String item:indSetListFilter){
-                    if(filterDividCondition(riskIndividConditionDtoList,riskPortfValList,implPtlInd,item,cond.getPlateDate())){
+                    //---流动性风险改造 start---
+                    if(filterDividCondition(riskIndividConditionDtoList,riskPortfValList,implPtlInd,item,cond.getPlateDate())
+                            &&RiskUtil.filterEnableTime(riskIndividConditionDtoList,riskPortOpenPlanList,implPtlInd.getPortfolioId(),item,cond.getPlateDate())){
                         indSetList.add(item);
                     }
+                    //---流动性风险改造 end---
                 }
                 //if(indSetList.size()>0) {
                 ptlIndicatorMap.put(implPtlInd.getPortfolioId(), indSetList);

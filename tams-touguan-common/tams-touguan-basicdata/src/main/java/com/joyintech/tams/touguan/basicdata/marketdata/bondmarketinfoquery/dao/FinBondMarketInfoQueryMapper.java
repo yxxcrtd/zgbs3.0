@@ -1,9 +1,11 @@
 package com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dao;
 
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketCashPlanDto;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoDetailQueryDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondPayHSrcSecOptionDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinBondMarketInfoQueryRequest;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -23,18 +25,18 @@ public interface FinBondMarketInfoQueryMapper {
     /**
      * 债券付息信息
      *
-     * @param param
+     * @param params
      * @return
      */
-    List<FinBondMarketCashPlanDto> queryFinBondMarketCashPlan(Map<String, Object> param);
+    List<FinBondMarketCashPlanDto> queryFinBondMarketCashPlan(Map<String, Object> params);
 
     /**
      * 债券行权信息
      *
-     * @param param
+     * @param secId
      * @return
      */
-    List<FinBondPayHSrcSecOptionDto> queryFinBondPayHSrcSecOption(Map<String, Object> param);
+    List<FinBondPayHSrcSecOptionDto> queryFinBondPayHSrcSecOption(@Param("secId") String secId);
 
     /**
      * 债券信息查询
@@ -42,5 +44,5 @@ public interface FinBondMarketInfoQueryMapper {
      * @param param
      * @return
      */
-    FinBondMarketInfoQuery001Dto queryFinBondMarketForCoupons(Map<String, Object> param);
+    FinBondMarketInfoDetailQueryDto queryFinBondMarketForCoupons(Map<String, Object> param);
 }

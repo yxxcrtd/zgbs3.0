@@ -11,6 +11,7 @@
 package com.joyintech.tams.cfets.etrdispatcher.service;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.JoyinMessage;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.base.intf.DataDictItem;
@@ -1756,68 +1757,106 @@ public class CfetsEtrDispatcherService extends BaseService {
     }
 
     /**
-     * 查询未选择指令
+     * 一级投标指令分发校验
      * @param cfetsDto
      * @return
      */
-    public List<CfetsEtrDispatcherResponse> getDispatcherTraderList(CfetsEtrDispatcherDealRequest cfetsDto) {
+    public AjaxResult getDispatcherFirstBid(CfetsEtrDispatcherDealRequest cfetsDto) {
+        AjaxResult ajaxResult = new AjaxResult();
+        List<ValidMessage> errorList = new ArrayList<ValidMessage>();
+        List<JoyinMessage> joyinMessages = new ArrayList<>();
+        List<String> finprodIdListFirst = new ArrayList<>();
+        List<String> finprodIdListAlready = new ArrayList<>();
         List<CfetsEtrDispatcherResponse> etrDispatcherList = new ArrayList<>();
-        List<String> finprodIdList = StringUtil.splitToList(",", cfetsDto.getFinprodId()).stream().distinct().collect(Collectors.toList());
 
-        for (String finprodId : finprodIdList) {
-            FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
-            if (!DictCodeListExt2.平安资产类型_一级市场债.getValue().equals(finProduct.getFinprodType2())) {
-                break;
-            }
-            CfetsEtrDispatcherResponse etrDispatcherDto = new CfetsEtrDispatcherResponse();
-            //资产存在已分发的已接收记录,返回对应的交易员信息且交易员信息不可修改
-            List<String> traderList1 = cfetsEtrDispatcherMapper.getDispatcherTraderList(finprodId, DictCodeList.委托状态_已接收.getValue());
-            if (CollectionUtils.isNotEmpty(traderList1)) {
-                etrDispatcherDto.setFinprodId(finprodId);
-                etrDispatcherDto.setTraderList(traderList1);
-                etrDispatcherDto.setReadOnlyField(DictCodeList.是否_否.getValue());
-            } else {
-                //资产存在已分发的待接收记录,返回对应的交易员信息且交易员信息可修改
-                List<String> traderList2 = cfetsEtrDispatcherMapper.getDispatcherTraderList(finprodId, DictCodeList.委托状态_待接收.getValue());
-                if (CollectionUtils.isNotEmpty(traderList2)) {
-                    etrDispatcherDto.setFinprodId(finprodId);
-                    etrDispatcherDto.setTraderList(traderList2);
-                    etrDispatcherDto.setReadOnlyField(DictCodeList.是否_是.getValue());
-                }
-            }
-            etrDispatcherList.add(etrDispatcherDto);
-        }
-        return etrDispatcherList;
-    }
-
-    /**
-     * 查询未选择指令
-     * @param cfetsDto
-     * @return
-     */
-    public List<CfetsEtrDispatcherResponse> getDispatcherEntrustIdList(CfetsEtrDispatcherDealRequest cfetsDto) {
-
-        List<CfetsEtrDispatcherResponse> etrDispatcherList = new ArrayList<>();
         List<String> finprodIdList = StringUtil.splitToList(",", cfetsDto.getFinprodId()).stream().distinct().collect(Collectors.toList());
         List<String> entrustIdList = StringUtil.splitToList(",", cfetsDto.getEntrustId());
+
         for (String finprodId : finprodIdList) {
-            FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
-            if (!DictCodeListExt2.平安资产类型_一级市场债.getValue().equals(finProduct.getFinprodType2())) {
-                break;
-            }
-            CfetsEtrDispatcherResponse etrDispatcherDto = new CfetsEtrDispatcherResponse();
-            List<String> unSelectEntrustIds = new ArrayList<>();
-            List<String> entrustIds = cfetsEtrDispatcherMapper.getDispatcherEntrustIdList(finprodId, DictCodeListExt3.委托状态_待分发.getValue());
-            for (String entrustId : entrustIds) {
-                if (!entrustIdList.contains(entrustId)) {
-                    unSelectEntrustIds.add(entrustId);
+            List<String> statusList = new ArrayList<>();
+            statusList.add(DictCodeList.委托状态_待接收.getValue());
+            statusList.add(DictCodeList.委托状态_已接收.getValue());
+            List<String> entrustIdAlready = cfetsEtrDispatcherMapper.getDispatcherEntrustIdList(finprodId, statusList);
+            if (CollectionUtils.isNotEmpty(entrustIdAlready)) {
+                finprodIdListAlready.add(finprodId);
+            }else {
+                statusList.clear();
+                statusList.add(DictCodeListExt3.委托状态_待分发.getValue());
+                List<String> entrustIdFirst = cfetsEtrDispatcherMapper.getDispatcherEntrustIdList(finprodId, statusList);
+                if (CollectionUtils.isNotEmpty(entrustIdFirst)) {
+                    finprodIdListFirst.add(finprodId);
                 }
             }
-            etrDispatcherDto.setEntrustIdList(unSelectEntrustIds);
-            etrDispatcherDto.setFinprodId(finprodId);
-
-            etrDispatcherList.add(etrDispatcherDto);
         }
-        return etrDispatcherList;
+
+        if (CollectionUtils.isNotEmpty(finprodIdListFirst) && CollectionUtils.isNotEmpty(finprodIdListAlready)) {
+            errorList.add(new ValidMessage(getMessage("选择的资产不能同时存在首次分发和已分发数据,请重新选择。首次分发资产["
+                    + finprodIdListFirst.toString() + "],已分发资产[" + finprodIdListAlready.toString() + "]")));
+            ajaxResult.setErrorList(errorList);
+            return ajaxResult;
+        }
+        //首次分发资产 返回未勾选指令信息
+        if (CollectionUtils.isNotEmpty(finprodIdListFirst)){
+            for (String finprodId : finprodIdListFirst) {
+                FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
+                if (!DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(finProduct.getFinprodType2())) {
+                    break;
+                }
+                CfetsEtrDispatcherResponse etrDispatcherDto = new CfetsEtrDispatcherResponse();
+                List<String> unSelectEntrustIds = new ArrayList<>();
+                List<String> statusList = new ArrayList<>();
+                statusList.add(DictCodeListExt3.委托状态_待分发.getValue());
+                List<String> entrustIds = cfetsEtrDispatcherMapper.getDispatcherEntrustIdList(finprodId, statusList);
+                for (String entrustId : entrustIds) {
+                    if (!entrustIdList.contains(entrustId)) {
+                        unSelectEntrustIds.add(entrustId);
+                    }
+                }
+                etrDispatcherDto.setEntrustIdList(unSelectEntrustIds);
+                etrDispatcherDto.setFinprodId(finprodId);
+                etrDispatcherList.add(etrDispatcherDto);
+            }
+            StringBuffer buffer = new StringBuffer();
+            if (CollectionUtils.isNotEmpty(etrDispatcherList)) {
+                for (CfetsEtrDispatcherResponse response : etrDispatcherList) {
+                    buffer.append("是否确认将该债券["+response.getFinprodId()+"]所有的投标指令均分发给此交易员？本次未选择的指令:"+response.getEntrustIdList().toString()+"\n");
+                }
+            }
+            ajaxResult.setMessage(buffer.toString());
+            ajaxResult.setData(etrDispatcherList);
+            return ajaxResult;
+        }
+
+        //已分发资产 返回交易员信息
+        if (CollectionUtils.isNotEmpty(finprodIdListAlready)) {
+            for (String finprodId : finprodIdListAlready) {
+                FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
+                if (!DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(finProduct.getFinprodType2())) {
+                    break;
+                }
+                CfetsEtrDispatcherResponse etrDispatcherDto = new CfetsEtrDispatcherResponse();
+                //资产存在已分发的已接收记录,返回对应的交易员信息且交易员信息不可修改
+                List<String> traderList1 = cfetsEtrDispatcherMapper.getDispatcherTraderList(finprodId, DictCodeList.委托状态_已接收.getValue());
+                if (CollectionUtils.isNotEmpty(traderList1)) {
+                    etrDispatcherDto.setFinprodId(finprodId);
+                    etrDispatcherDto.setTraderList(traderList1);
+                    etrDispatcherDto.setReadOnlyField(DictCodeList.是否_否.getValue());
+                } else {
+                    //资产存在已分发的待接收记录,返回对应的交易员信息且交易员信息可修改
+                    List<String> traderList2 = cfetsEtrDispatcherMapper.getDispatcherTraderList(finprodId, DictCodeList.委托状态_待接收.getValue());
+                    if (CollectionUtils.isNotEmpty(traderList2)) {
+                        etrDispatcherDto.setFinprodId(finprodId);
+                        etrDispatcherDto.setTraderList(traderList2);
+                        etrDispatcherDto.setReadOnlyField(DictCodeList.是否_是.getValue());
+                    }
+                }
+                etrDispatcherList.add(etrDispatcherDto);
+            }
+            ajaxResult.setData(etrDispatcherList);
+            return ajaxResult;
+        }
+
+        return ajaxResult;
+
     }
 }

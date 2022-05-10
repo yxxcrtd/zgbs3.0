@@ -38,6 +38,11 @@ public class RskIndividAssetDel extends BaseEntity implements IColBaseCond {
     private String finprodId;
 
     /**
+     * 处理类型
+     */
+    private String processModel;
+
+    /**
      * 取得 剔除编号
      * @return 剔除编号
      */
@@ -133,5 +138,13 @@ public class RskIndividAssetDel extends BaseEntity implements IColBaseCond {
      */
     public void setFinprodId(String finprodId) {
         this.finprodId = finprodId == null ? null : finprodId.trim();
+    }
+
+    public String getProcessModel() {
+        return processModel;
+    }
+
+    public void setProcessModel(String processModel) {
+        this.processModel = processModel;
     }
 }

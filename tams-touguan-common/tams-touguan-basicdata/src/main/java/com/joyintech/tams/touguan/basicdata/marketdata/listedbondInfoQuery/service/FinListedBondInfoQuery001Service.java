@@ -104,7 +104,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
      * @return
      */
     public FinListedBondInfoQuery001Dto queryFinProductForCoupons(FinListedBondInfoQueryRequest request) {
-        logger.info("queryFinProductForCoupons >> 待上市加券市场信息查询参数：{}", JSON.toJSONString(request));
+        logger.info("queryFinProductForCoupons >> 加券市场信息查询参数：{}", JSON.toJSONString(request));
         request.setPlatformDate(iPlatformDate.getSysDateStr());
         FinListedBondInfoQuery001Dto finListedBondInfoQuery001Dto = finListedBondInfoQueryMapper.queryFinProductForCoupons(request);
         return finListedBondInfoQuery001Dto;

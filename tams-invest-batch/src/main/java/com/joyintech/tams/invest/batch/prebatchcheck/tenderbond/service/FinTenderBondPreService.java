@@ -47,9 +47,11 @@ public class FinTenderBondPreService {
         List<SysPrebatchResultDetail> details = new ArrayList<>();
         param.put("listingDate", dto.getCheckDate());
         param.put("issueStage", DictCodeListExt4.发行阶段_已发行.getValue());
-        param.put("finprodType2", DictCodeListExt2.平安资产类型_一级市场债.getValue());
+        param.put("finprodType2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
         param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
         param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
+        param.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
+        param.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
         param.put("ISSUE_STATUS_02", DictCodeListExt1.发行状态_发行失败.getValue());
         List<SysPrebatchResultDetail> details1 = finTenderBoundPreMapper.selectPreList(param);
         if (!StringUtil.isEmptyList(details1)) {
@@ -82,8 +84,9 @@ public class FinTenderBondPreService {
         }
         param.put("checkDate", dto.getCheckDate());
         List<SysPrebatchResultDetail> details = new ArrayList<>();
+        param.put("listingDate", dto.getCheckDate());
         param.put("issueStage", DictCodeListExt4.发行阶段_已发行.getValue());
-        param.put("finprodType2", DictCodeListExt2.平安资产类型_一级市场债.getValue());
+        param.put("finprodType2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
         param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
         param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
         param.put("ISSUE_STATUS_02", DictCodeListExt1.发行状态_发行失败.getValue());

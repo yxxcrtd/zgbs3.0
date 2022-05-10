@@ -12,6 +12,7 @@
         <id property="ourTraderName" column="ourTraderName"/>
         <id property="issuePrice" column="ISSUE_PRICE"/>
         <id property="referenceRate" column="referenceRate"/>
+        <id property="referenceRateStr" column="referenceRateStr"/>
         <id property="rate" column="rate"/>
         <id property="remark" column="remark"/>
         <id property="subscriptionAmount" column="subscriptionAmount"/>
@@ -44,8 +45,9 @@
            fpi.INT_TYPE,
            case
                when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
-                   then nvl(miri.INT_RATE, 0) + nvl(fpi.REFER_YIELD, 0)
-               when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD end referenceRate/*当带入资产的息票品种为零息/贴现时，显示字段参考收益率,当带入资产的息票品种为附息-浮动利率时，显示字段参考收益率*/,
+                   then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP, 0) end referenceRateStr/*,当带入资产的息票品种为附息-浮动利率时，显示字段参考收益率*/,
+           case
+               when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD end referenceRate/*当带入资产的息票品种为零息/贴现时，显示字段参考收益率*/,
            case
                when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
                    then fpi.REFER_YIELD end                                    rate/*当带入资产的息票品种为利随本清/附息-固定利率时，显示字段票面利率*/,
@@ -62,7 +64,7 @@
         from FIN_PRODUCT fp
              left join FIN_PRODUCT_ISSUE fpi
                        on fp.FINPROD_ID = fpi.FINPROD_ID
-             left join MST_INT_RATE_INFO miri on miri.INT_RATE_ID = fpi.INT_RATE_ID
+             left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
              left join ETR_ENTRUST ee on ee.FINPROD_ID = fp.FINPROD_ID
              left join ETR_ENTRUST_DETAIL eed on eed.ENTRUST_ID = ee.ENTRUST_ID
              left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = eed.PORTFOLIO_ID
@@ -102,8 +104,9 @@
                fpi.ISSUE_PRICE,
                case
                    when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
-                       then nvl(miri.INT_RATE, 0) + nvl(fpi.REFER_YIELD, 0)
-                   when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD end referenceRate/*当带入资产的息票品种为零息/贴现时，显示字段参考收益率,当带入资产的息票品种为附息-浮动利率时，显示字段参考收益率*/,
+                       then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP, 0) end referenceRateStr/*,当带入资产的息票品种为附息-浮动利率时，显示字段参考收益率*/,
+               case
+                   when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD end referenceRate/*当带入资产的息票品种为零息/贴现时，显示字段参考收益率*/,
                case
                    when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
                        then fpi.REFER_YIELD end                                    rate/*当带入资产的息票品种为利随本清/附息-固定利率时，显示字段票面利率*/,
@@ -127,7 +130,7 @@
                  left join ETR_ENTRUST_DETAIL eed on bobp.ENTRUST_ID = eed.ENTRUST_ID and bobp.PORTFOLIO_ID = eed.PORTFOLIO_ID
                  left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
                  left join FIN_PRODUCT_ISSUE fpi on fp.FINPROD_ID = fpi.FINPROD_ID
-                 left join MST_INT_RATE_INFO miri on miri.INT_RATE_ID = fpi.INT_RATE_ID
+                 left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
                  left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
                  left join MST_CFETS_CUSTOMER_TRADER mcct on mcct.TRADER_ID = bo.OUR_TRADER
                  left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
@@ -149,8 +152,9 @@
                fpi.ISSUE_PRICE,
                case
                    when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
-                       then nvl(miri.INT_RATE, 0) + nvl(fpi.REFER_YIELD, 0)
-                   when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD end referenceRate/*当带入资产的息票品种为零息/贴现时，显示字段参考收益率,当带入资产的息票品种为附息-浮动利率时，显示字段参考收益率*/,
+                       then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP, 0) end referenceRateStr/*,当带入资产的息票品种为附息-浮动利率时，显示字段参考收益率*/,
+               case
+                   when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD end referenceRate/*当带入资产的息票品种为零息/贴现时，显示字段参考收益率*/,
                case
                    when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
                        then fpi.REFER_YIELD end                                    rate/*当带入资产的息票品种为利随本清/附息-固定利率时，显示字段票面利率*/,
@@ -174,7 +178,7 @@
                  left join ETR_ENTRUST_DETAIL eed on bobp.ENTRUST_ID = eed.ENTRUST_ID and bobp.PORTFOLIO_ID = eed.PORTFOLIO_ID
                  left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
                  left join FIN_PRODUCT_ISSUE fpi on fp.FINPROD_ID = fpi.FINPROD_ID
-                 left join MST_INT_RATE_INFO miri on miri.INT_RATE_ID = fpi.INT_RATE_ID
+                 left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
                  left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
                  left join MST_CFETS_CUSTOMER_TRADER mcct on mcct.TRADER_ID = bo.OUR_TRADER
                  left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
@@ -220,8 +224,9 @@
     </select>
 
     <select id="selectEtrAvaNum" resultType="java.math.BigDecimal">
-        select eed.ENTRUST_NUM*100 - sumSubAmt
-        from (
+        select eed.ENTRUST_NUM*100 - nvl(T1.sumSubAmt,0)
+        from ETR_ENTRUST_DETAIL eed
+        left join(
             select sum(T.subAmt) sumSubAmt,T.ENTRUST_ID, T.PORTFOLIO_ID
             from (
                      select nvl(bobp.SUBSCRIPTION_AMOUNT,0) subAmt, bobp.ENTRUST_ID, bobp.PORTFOLIO_ID
@@ -235,9 +240,8 @@
                               left join Wfl_BID_ORDER_BID_PRICE wbobp on wbo.BID_ID = wbobp.BID_ID
                  ) T
                      group by T.ENTRUST_ID, T.PORTFOLIO_ID
-        )T1 left join ETR_ENTRUST_DETAIL eed
-                    on T1.PORTFOLIO_ID = eed.PORTFOLIO_ID and T1.ENTRUST_ID = eed.ENTRUST_ID
-        where T1.ENTRUST_ID = #{entrustId} and T1.PORTFOLIO_ID = #{protfolioId}
+        )T1 on T1.PORTFOLIO_ID = eed.PORTFOLIO_ID and T1.ENTRUST_ID = eed.ENTRUST_ID
+        where eed.ENTRUST_ID = #{entrustId} and eed.PORTFOLIO_ID = #{protfolioId}
     </select>
 
     <delete id="deleteByPreTradeId" parameterType="java.lang.String" >

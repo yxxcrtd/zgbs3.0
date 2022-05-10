@@ -3,6 +3,7 @@ package com.joyintech.tams.cfets.common.controller;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.tams.cfets.trdconfirm.service.CfetsTrdConfirm001Service;
 import com.joyintech.tams.cfets.trdconfirm.service.CfetsTrdConfirmService;
+import com.joyintech.tams.common.base.entity.InterfCstpBjfxjg;
 import com.joyintech.tams.common.base.entity.InterfCstpTrade;
 import com.joyintech.tams.common.base.entity.InterfOpicsTradRepo;
 import com.joyintech.tams.common.base.entity.InterfTradSecdeal;
@@ -66,11 +67,15 @@ public class CfetsIbuQuoteBatchCommonController {
             InterfCstpTrade interfCstpTrade = JsonUtils.json2Object(JsonUtils.object2Json(parm.get("interfCstpTrade")), InterfCstpTrade.class);
             if(parm.containsKey("interfTradSecdeal")){
                 InterfTradSecdeal interfTradSecdeal = JsonUtils.json2Object(JsonUtils.object2Json(parm.get("interfTradSecdeal")), InterfTradSecdeal.class);
-                cfetsTrdConfirmService.cstpAutoMatchMethod(interfTradSecdeal,null,interfCstpTrade);
+                cfetsTrdConfirmService.cstpAutoMatchMethod(interfTradSecdeal, null, null, interfCstpTrade);
             }
             if(parm.containsKey("interfOpicsTradRepo")){
                 InterfOpicsTradRepo interfOpicsTradRepo = JsonUtils.json2Object(JsonUtils.object2Json(parm.get("interfOpicsTradRepo")), InterfOpicsTradRepo.class);
-                cfetsTrdConfirmService.cstpAutoMatchMethod(null,interfOpicsTradRepo,interfCstpTrade);
+                cfetsTrdConfirmService.cstpAutoMatchMethod(null, interfOpicsTradRepo, null, interfCstpTrade);
+            }
+            if(parm.containsKey("interfCstpBjfxjg")){
+                InterfCstpBjfxjg interfCstpBjfxjg = JsonUtils.json2Object(JsonUtils.object2Json(parm.get("interfCstpBjfxjg")), InterfCstpBjfxjg.class);
+                cfetsTrdConfirmService.cstpAutoMatchMethod(null, null, interfCstpBjfxjg, null);
             }
         }
         catch (Exception e){

@@ -282,7 +282,8 @@
 	nvl(totalDeal.TRADE_AMT,0) tradeAmt,
 	totalDeal.CCY ccy,
 	totalDeal.TRADE_DATE tradeDate,
-	totalDeal.REMARK remark
+	totalDeal.REMARK remark,
+	prod.MDATE mdate
 	<if test="status == null or !status.equals(validStatus_01)">
 		FROM TRD_FIN_PRODUCT_DEAL_TOTAL totalDeal
 		left JOIN TRD_PRODUCT_DEAL  deal on totalDeal.TOTLE_TRADE_ID=deal.TOTLE_TRADE_ID
@@ -299,6 +300,8 @@
 	LEFT JOIN FIN_PRODUCT FIN ON totalDeal.FINPROD_ID = FIN.FINPROD_ID
 	LEFT JOIN FIN_PRODUCT fp1 on fp1.FINPROD_ID = totalDeal.CHL_ID
 	LEFT JOIN FIN_PRODUCT_TYPE FINTYPE ON FIN.FINPROD_ID = FINTYPE.FINPROD_ID
+	LEFT JOIN FIN_PRODUCT prod ON prod.FINPROD_MARKET_ID = totalDeal.PORTFOLIO_ID
+	and prod.finprod_type2 = 'F16'
 	<where>
 		PP.INVEST_YESORNO = 'Y'
 		AND totalDeal.PS in (#{ps_shengou},#{ps_shuhui},#{PS_T75})

@@ -57,11 +57,11 @@ public class MessageSenderManagement extends BaseService {
     @Value("${application.micorservice.contextPath.single:false}")
     private boolean isSingle;
 
-    @Value("${trd-info-push-mode:01}")
-    private String trdInfoPushMode;
+    @Value("${trd-info-push-mode:1}")
+    private int trdInfoPushMode;
 
-    private static final String MQ = "01";
-    private static final String INTERFACE = "02";
+    private static final int MQ = 1;
+    private static final int INTERFACE = 2;
 
     /**
      * 成交推送
@@ -154,16 +154,17 @@ public class MessageSenderManagement extends BaseService {
     }
 
     private void sendMessage(RecordLog recordLog, BasicMessage basicMessage, int pushType) {
-        //消息推送方式:01-MQ；02-接口
+        //消息推送方式trdInfoPushMode:1-MQ；2-接口
+        //消息推送方式pushType:1-成交；2-手工交收；3-指令进度
         logger.info("【sendMessage】 parameters：pushType={}，trdInfoPushMode={}，basicMessage={}", pushType, trdInfoPushMode, JsonUtils.getJsonFromObject(basicMessage));
         //推送MQ
-        if (StringUtil.isEmpty(trdInfoPushMode) || StringUtil.equals(trdInfoPushMode, MQ)) {
+        if (trdInfoPushMode == 0 || trdInfoPushMode == MQ) {
             try {
                 recordLog.setStatus(1);
                 if (pushType == 1) {
                     messageSenderService.pushTradeToMQ(basicMessage);
                 } else if (pushType == 2) {
-                    //messageSenderService.pushTradeToMQForFixedIncome(basicMessage);
+                    messageSenderService.pushTradeToMQForFixedIncome(basicMessage);
                 } else if (pushType == 3) {
                     messageSenderService.pushProgressToMQ(basicMessage);
                 } else {
@@ -178,7 +179,7 @@ public class MessageSenderManagement extends BaseService {
             }
         }
         //推送接口
-        else if (StringUtil.equals(trdInfoPushMode, INTERFACE)) {
+        else if (trdInfoPushMode == INTERFACE) {
             Message<String> result = null;
             if (pushType == 1) {
                 result = sendMessage(basicMessage, TradeServiceURL.pushTrade);
