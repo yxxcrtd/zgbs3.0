@@ -20,6 +20,8 @@
     <result column="OU_PARTY_ID" jdbcType="VARCHAR" property="ouPartyId" />
     <result column="OUR_TRADER" jdbcType="VARCHAR" property="ourTrader" />
     <result column="SUBSCRIPTION_AMOUNT" jdbcType="DECIMAL" property="subscriptionAmount" />
+    <result column="PAYABLE_AMOUNT" jdbcType="DECIMAL" property="payableAmount" />
+    <result column="SETT_FEE_AMT" jdbcType="DECIMAL" property="settFeeAmt" />
     <result column="P_BID_ID" jdbcType="VARCHAR" property="pBidId" />
     <result column="IS_CANCEL" jdbcType="VARCHAR" property="isCancel" />
     <result column="TRADE_STATUS" jdbcType="VARCHAR" property="tradeStatus" />
@@ -60,7 +62,8 @@
       #{winPrinAmt,jdbcType=DECIMAL}, #{winPrice,jdbcType=DECIMAL}, #{winType,jdbcType=VARCHAR}, 
       #{remark,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, 
       #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{ouPartyId,jdbcType=VARCHAR}, #{ourTrader,jdbcType=VARCHAR}, #{subscriptionAmount,jdbcType=DECIMAL}, 
+      #{ouPartyId,jdbcType=VARCHAR}, #{ourTrader,jdbcType=VARCHAR}, #{subscriptionAmount,jdbcType=DECIMAL},
+      #{payableAmount,jdbcType=DECIMAL}, #{settFeeAmt,jdbcType=DECIMAL},
       #{pBidId,jdbcType=VARCHAR}, #{isCancel,jdbcType=VARCHAR}, #{tradeStatus,jdbcType=VARCHAR}, 
       #{workflowId,jdbcType=VARCHAR}, #{workflowStatus,jdbcType=VARCHAR}, #{dipType,jdbcType=VARCHAR})
   </insert>
@@ -120,6 +123,12 @@
       </if>
       <if test="subscriptionAmount != null">
         SUBSCRIPTION_AMOUNT,
+      </if>
+      <if test="payableAmount != null">
+        PAYABLE_AMOUNT,
+      </if>
+      <if test="settFeeAmt != null">
+        SETT_FEE_AMT,
       </if>
       <if test="pBidId != null">
         P_BID_ID,
@@ -195,6 +204,12 @@
       <if test="subscriptionAmount != null">
         #{subscriptionAmount,jdbcType=DECIMAL},
       </if>
+      <if test="payableAmount != null">
+        #{payableAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="settFeeAmt != null">
+        #{settFeeAmt,jdbcType=DECIMAL},
+      </if>
       <if test="pBidId != null">
         #{pBidId,jdbcType=VARCHAR},
       </if>
@@ -269,6 +284,12 @@
       <if test="subscriptionAmount != null">
         SUBSCRIPTION_AMOUNT = #{subscriptionAmount,jdbcType=DECIMAL},
       </if>
+      <if test="payableAmount != null">
+        PAYABLE_AMOUNT = #{payableAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="settFeeAmt != null">
+        SETT_FEE_AMT = #{settFeeAmt,jdbcType=DECIMAL},
+      </if>
       <if test="pBidId != null">
         P_BID_ID = #{pBidId,jdbcType=VARCHAR},
       </if>
@@ -309,6 +330,8 @@
       OU_PARTY_ID = #{ouPartyId,jdbcType=VARCHAR},
       OUR_TRADER = #{ourTrader,jdbcType=VARCHAR},
       SUBSCRIPTION_AMOUNT = #{subscriptionAmount,jdbcType=DECIMAL},
+      PAYABLE_AMOUNT = #{payableAmount,jdbcType=DECIMAL},
+      SETT_FEE_AMT = #{settFeeAmt,jdbcType=DECIMAL},
       P_BID_ID = #{pBidId,jdbcType=VARCHAR},
       IS_CANCEL = #{isCancel,jdbcType=VARCHAR},
       TRADE_STATUS = #{tradeStatus,jdbcType=VARCHAR},

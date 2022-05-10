@@ -79,6 +79,16 @@ public class WflBidOrder extends BaseEntity {
     private BigDecimal subscriptionAmount;
 
     /**
+     * 应缴款金额
+     */
+    private BigDecimal payableAmount;
+
+    /**
+     * 结算服务费
+     */
+    private BigDecimal settFeeAmt;
+
+    /**
      * 前置投标编
      */
     private String pBidId;
@@ -341,6 +351,22 @@ public class WflBidOrder extends BaseEntity {
      */
     public void setSubscriptionAmount(BigDecimal subscriptionAmount) {
         this.subscriptionAmount = subscriptionAmount;
+    }
+
+    public BigDecimal getPayableAmount() {
+        return payableAmount;
+    }
+
+    public void setPayableAmount(BigDecimal payableAmount) {
+        this.payableAmount = payableAmount;
+    }
+
+    public BigDecimal getSettFeeAmt() {
+        return settFeeAmt;
+    }
+
+    public void setSettFeeAmt(BigDecimal settFeeAmt) {
+        this.settFeeAmt = settFeeAmt;
     }
 
     /**

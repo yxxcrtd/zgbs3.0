@@ -54,8 +54,8 @@
            eed.ENTRUST_ID,
            eed.PORTFOLIO_ID,
            pp.PORTFOLIO_NAME,
-           nvl(eed.ENTRUST_NUM, 0) - nvl(bobp.SUBSCRIPTION_AMOUNT,0)             avaNum,
-           nvl(eed.ENTRUST_NUM, 0) - nvl(bobp.SUBSCRIPTION_AMOUNT,0)             SUBSCRIPTION_AMOUNT,
+           nvl(eed.ENTRUST_NUM*100, 0) - nvl(bobp.SUBSCRIPTION_AMOUNT,0)             avaNum,
+           nvl(eed.ENTRUST_NUM*100, 0) - nvl(bobp.SUBSCRIPTION_AMOUNT,0)             SUBSCRIPTION_AMOUNT,
            eed.INV_AIM,
            eed.SEC_ACCT_ID,
            ssai.SEC_ACCT_NAME,
@@ -117,7 +117,7 @@
                bobp.PORTFOLIO_ID,
                pp.PORTFOLIO_NAME,
                bobp.SUBSCRIPTION_AMOUNT,
-               nvl(eed.ENTRUST_NUM, 0) - nvl(bobp1.SUBSCRIPTION_AMOUNT, 0)         avaNum,
+               nvl(eed.ENTRUST_NUM*100, 0) - nvl(bobp1.SUBSCRIPTION_AMOUNT, 0)         avaNum,
                bobp.PAYABLE_AMOUNT,
                bobp.SETT_FEE_AMT,
                eed.INV_AIM,
@@ -165,7 +165,7 @@
                bobp.PORTFOLIO_ID,
                pp.PORTFOLIO_NAME,
                bobp.SUBSCRIPTION_AMOUNT,
-               nvl(eed.ENTRUST_NUM, 0) - nvl(bobp1.SUBSCRIPTION_AMOUNT, 0)         avaNum,
+               nvl(eed.ENTRUST_NUM*100, 0) - nvl(bobp1.SUBSCRIPTION_AMOUNT, 0)         avaNum,
                bobp.PAYABLE_AMOUNT,
                bobp.SETT_FEE_AMT,
                eed.INV_AIM,
@@ -196,7 +196,7 @@
     </update>
 
     <update id="updateBidOrderBidPrice">
-        UPDATE BID_ORDER_BID_PRICE SET IS_CANCEL  = 'Y' ,REMARK = #{remark} WHERE BID_ID  = #{bidId}
+        UPDATE BID_ORDER_BID_PRICE SET IS_CANCEL  = 'Y' WHERE BID_ID  = #{bidId}
     </update>
 
     <select id="selectSumSubAmtBySecAcctIdAndFin" resultType="java.math.BigDecimal">
