@@ -1,7 +1,8 @@
 -- 一级投标指令页面刷新参数
+delete from sys_para where SYSTEM_CODE = 'INV' and PARA_CODE in ('cfetsEtrBondFirstBid_issueTable_refresh_period ','cfetsEtrBondFirstBid_etrTable_refresh_period ');
 delete from sys_para where SYSTEM_CODE = 'INV' and PARA_CODE in ('cfetsEtrBondFirstBid_issueTable_refresh_period','cfetsEtrBondFirstBid_etrTable_refresh_period');
-insert into sys_para (SYSTEM_CODE, PARA_CODE, PARAM_VALUE, DATA_TYPE, DATA_SCOPE, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE, UPDATE_FLG) values ('INV', 'cfetsEtrBondFirstBid_issueTable_refresh_period ', '120000', '01', null, '一级投标指令画面待发行信息列表区域自动刷新时间(ms)', 'system', null, sysdate, 'system', sysdate, null, '01');
-insert into sys_para (SYSTEM_CODE, PARA_CODE, PARAM_VALUE, DATA_TYPE, DATA_SCOPE, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE, UPDATE_FLG) values ('INV', 'cfetsEtrBondFirstBid_etrTable_refresh_period ', '120000', '01', null, '一级投标指令画面指令列表区域自动刷新时间(ms)', 'system', null, sysdate, 'system', sysdate, null, '01');
+insert into sys_para (SYSTEM_CODE, PARA_CODE, PARAM_VALUE, DATA_TYPE, DATA_SCOPE, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE, UPDATE_FLG) values ('INV', 'cfetsEtrBondFirstBid_issueTable_refresh_period', '120000', '01', null, '一级投标指令画面待发行信息列表区域自动刷新时间(ms)', 'system', null, sysdate, 'system', sysdate, null, '01');
+insert into sys_para (SYSTEM_CODE, PARA_CODE, PARAM_VALUE, DATA_TYPE, DATA_SCOPE, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE, UPDATE_FLG) values ('INV', 'cfetsEtrBondFirstBid_etrTable_refresh_period', '120000', '01', null, '一级投标指令画面指令列表区域自动刷新时间(ms)', 'system', null, sysdate, 'system', sysdate, null, '01');
 -- 新增一级投标中标状态
 DELETE from SYS_DATADICT where DICT_CODE in ('FIRST_BID_STATUS');
 INSERT INTO SYS_DATADICT(DICT_CODE, SYSTEM_CODE, DICT_CNNAME, DICT_ENNAME, UPDATE_FLG, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES('FIRST_BID_STATUS', 'TG', '一级投标中标状态', NULL, '02', 'system', NULL, SYSDATE, 'system', SYSDATE);
