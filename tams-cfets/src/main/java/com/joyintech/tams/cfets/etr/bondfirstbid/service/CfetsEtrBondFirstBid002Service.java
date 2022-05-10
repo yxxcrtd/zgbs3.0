@@ -467,6 +467,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             etrEntrust.setEntrustAmt(null);
             etrEntrust.setEntrustNum(dto.getTotalBiddingNum().divide(new BigDecimal(100)));
             etrEntrust.setPs(DictCodeList.交易方向_买入.getValue());
+            etrEntrust.setEntrustClass(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue());
             //委托附属表
             EtrEntrustAdd etrEntrustAdd = new EtrEntrustAdd();
             if (StringUtil.equals(dto.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
@@ -536,6 +537,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             BeanUtil.copyProperties(etrEntrust, dto);
             etrEntrust.setEntrustNum(dto.getTotalBiddingNum().divide(new BigDecimal(100)));
             etrEntrust.setPs(DictCodeList.交易方向_买入.getValue());
+            etrEntrust.setEntrustClass(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue());
             if (etrEntrust.getEntrustDate() == null) {
                 etrEntrust.setEntrustDate(iPlatformDate.getSysDate());
             }
