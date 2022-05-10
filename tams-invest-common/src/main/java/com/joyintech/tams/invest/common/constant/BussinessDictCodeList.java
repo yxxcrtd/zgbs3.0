@@ -5042,6 +5042,9 @@ public enum BussinessDictCodeList implements BaseDictCodeList {
 
     共同业务类型_中标结果维护(BussinessDictCode.共同业务类型, "TRD61", "中标结果维护"),
 
+    特殊债券信息业务类型(BussinessDictCode.共同业务类型, "TRD62", "特殊债券信息"),
+
+
 
     缴款状态_流程中(BussinessDictCode.缴款状态, "01", "流程中"),
     缴款状态_待二级交易(BussinessDictCode.缴款状态, "02", "待二级交易"),

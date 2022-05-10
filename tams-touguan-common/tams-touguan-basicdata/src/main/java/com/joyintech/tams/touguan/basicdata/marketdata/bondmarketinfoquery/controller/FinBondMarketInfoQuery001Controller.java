@@ -60,6 +60,10 @@ public class FinBondMarketInfoQuery001Controller extends BaseController {
         initPageParams.put("TDAY_RULE", this.getSelectDataFromDataDic(DictCode.营业日准则, null));
         initPageParams.put("CALC_RULE", this.getSelectDataFromDataDic(DictCode.推算方式, null));
         initPageParams.put("CASH_CLASS_TYPE", this.getSelectDataFromDataDic(DictCode.现金流类型, null));
+        initPageParams.put("SVR_BASIS_TYPE", this.getSelectDataFromDataDic(DictCode.基准利率, null));
+        initPageParams.put("SVR_GUA_TYPE", this.getSelectDataFromDataDic(DictCode.担保方式, null));
+        initPageParams.put("CONCEPT_TYPE", this.getSelectDataFromDataDic(DictCode.概念标识, null));
+
         //导出
         initPageParams.put("EXPORT_SHOW", CacheUtil.getSysParam("EXPORT_SHOW"));
         //刷新时间

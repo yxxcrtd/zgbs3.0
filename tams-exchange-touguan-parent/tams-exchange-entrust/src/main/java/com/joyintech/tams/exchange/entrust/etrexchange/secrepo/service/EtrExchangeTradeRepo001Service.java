@@ -167,6 +167,7 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
     @Override
     public void doComplete(EtrExchangeTradeSecRepoSaveRepoRequest dto, OperationType arg1) {
         // TODO Auto-generated method stub
+        calcAmt(dto);
         Map<String, Object> map = new HashMap<>();
         // 新增交易对手席位
         if (StringUtil.isNotEmpty(dto.getCounterId()) && StringUtil.isNotEmpty(dto.getSeatId())) {
