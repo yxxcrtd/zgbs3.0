@@ -53,6 +53,18 @@
         ) t where t.issueStage=#{issueStage,jdbcType=VARCHAR}
     </select>
 
+    <select id="selectFinprodId" resultType="java.lang.String">
+        select T1.FINPROD_ID from FIN_PRODUCT T1
+        where  1=1
+        <if test="finprodType2 !=null and finprodType2 !=''">
+            AND T1.FINPROD_TYPE2 = #{finprodType2}
+        </if>
+        <if test="TRADE_PLACE_01 != null and TRADE_PLACE_02 !=null">
+            AND T1.TRADE_MARKET in(#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04})
+        </if>
+        AND T1.FINPROD_MARKET_ID=#{finprodMarketId,jdbcType=VARCHAR} AND ROWNUM=1
+    </select>
+
     <select id="getBusinessData" parameterType="com.joyintech.tams.invest.common.dto.valuationusemerge.WflValidInputParameter" resultType="java.lang.String">
         select pm.STATUS status
         from SYS_DATA_PROCESS_MARK pm
