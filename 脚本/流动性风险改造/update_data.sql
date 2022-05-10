@@ -162,9 +162,3 @@ insert into sys_page_dictlist (PAGE_ID, SUB_PAGE_ID, DICT_ID, DICT_ITEM_VAL, DIC
 values ('FinPlanProfitAsset002', 'BussFinProductOpenPlan', 'TDAY_RULE', '04', null, null, 'system', null, sysdate, 'system', sysdate);
 
 /** 计划类资产新增开放计划界面下拉框联动规则 add by kongzhifang on 2022-03-14 end **/
-
-/** 逻辑删除无效的计划类净值型标的非空数据检查规则配置规则 add by quzhi on 2022-03-17 begin **/
-UPDATE CHB_DATACHECK_RULE_INV t1 SET t1.STATUS = 'D'
-WHERE NOT EXISTS(SELECT 1 FROM CHB_DATACHECK_CONDITION_INV t2 WHERE t1.CHECKRULEID = t2.CHECKRULEID)
-AND t1.STATUS = 'E' AND t1.PAGE_ID = 'FinPlanNetAsset002' AND t1.CHECKMETHOD = 'isNotEmpty' AND t1.SRCPROPERTY ='bussRepFundInfoDto.repRemark';
-/** 逻辑删除无效的计划类净值型标的非空数据检查规则配置规则 add by quzhi on 2022-03-17 end **/
