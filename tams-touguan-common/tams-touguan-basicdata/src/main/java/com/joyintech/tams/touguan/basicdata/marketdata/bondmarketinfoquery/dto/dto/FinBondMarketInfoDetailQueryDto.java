@@ -87,6 +87,12 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "secType3", value = "三级分类")
     private String secType3;
 
+    @ApiModelProperty(name = "primaryClassification", value = "wind一级分类")
+    private String primaryClassification;
+
+    @ApiModelProperty(name = "secondaryClassification", value = "wind二级分类")
+    private String secondaryClassification;
+
     @ApiModelProperty(name = "issueType", value = "募集方式")
     private String issueType;
 
@@ -767,5 +773,21 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     public void setCcy(String ccy) {
         this.ccy = ccy;
+    }
+
+    public String getPrimaryClassification() {
+        return primaryClassification;
+    }
+
+    public void setPrimaryClassification(String primaryClassification) {
+        this.primaryClassification = primaryClassification;
+    }
+
+    public String getSecondaryClassification() {
+        return secondaryClassification;
+    }
+
+    public void setSecondaryClassification(String secondaryClassification) {
+        this.secondaryClassification = secondaryClassification;
     }
 }
