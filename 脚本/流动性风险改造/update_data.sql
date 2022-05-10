@@ -117,8 +117,7 @@ INSERT INTO RSK_BUSINESS_REDIS_CONFIG(COMMON_BUSINESS_TYPE, PARA_CODE, REDIS_MOD
 VALUES('MST23', 'YPBKTZZQ', NULL, 'system', '001', sysdate, 'system', sysdate);
 -------------瞿志  20220310 redis功能模块影响参数设置 end----------------------------
 
-/** 计划类资产新增开放计划界面下拉框联动规则 add by kongzhifang on 2022-03-14 start **/
-
+-------------计划类资产新增开放计划界面下拉框联动规则 add by kongzhifang on 2022-03-14 start----------------------------
 delete from sys_page_dictlist where PAGE_ID = 'FinPlanNetAsset002' and SUB_PAGE_ID = 'BussFinProductOpenPlan';
 
 insert into sys_page_dictlist (PAGE_ID, SUB_PAGE_ID, DICT_ID, DICT_ITEM_VAL, DICT_ITEM_VAL_CNNAME, DICT_ITEM_VAL_DEFAULT, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
@@ -160,5 +159,4 @@ values ('FinPlanProfitAsset002', 'BussFinProductOpenPlan', 'TDAY_RULE', '02', nu
 
 insert into sys_page_dictlist (PAGE_ID, SUB_PAGE_ID, DICT_ID, DICT_ITEM_VAL, DICT_ITEM_VAL_CNNAME, DICT_ITEM_VAL_DEFAULT, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
 values ('FinPlanProfitAsset002', 'BussFinProductOpenPlan', 'TDAY_RULE', '04', null, null, 'system', null, sysdate, 'system', sysdate);
-
-/** 计划类资产新增开放计划界面下拉框联动规则 add by kongzhifang on 2022-03-14 end **/
+-------------计划类资产新增开放计划界面下拉框联动规则 add by kongzhifang on 2022-03-14 end----------------------------

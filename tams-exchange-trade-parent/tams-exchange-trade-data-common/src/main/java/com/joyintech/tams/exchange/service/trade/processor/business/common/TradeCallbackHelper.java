@@ -67,7 +67,7 @@ public class TradeCallbackHelper {
             EntrustInterface entrust = null;
             //处理大宗成交回报
             if (IntegratedEntrustUtils.isIntegratedEntrust(tradeRecord.getEntrustProp())
-                || IntegratedEntrustUtils.isNegotiatedTrade(tradeRecord.getEntrustProp())) {
+                    || IntegratedEntrustUtils.isNegotiatedTrade(tradeRecord.getEntrustProp())) {
                 if (!Strings.isNullOrEmpty(tradeRecord.getEntrustId())) {
                     entrust = integratedEntrustService.findById(tradeRecord.getEntrustId());
                 } else if (!Strings.isNullOrEmpty(tradeRecord.getBrokerEntrustId())) {
@@ -226,7 +226,7 @@ public class TradeCallbackHelper {
         tradeRecord.setTransCode(entrust.getBrokerEntrustId());
         tradeRecord.setCreateTime(now);
         tradeRecord.setUpdateTime(now);
-        tradeRecord.setFullPrice(bondHelper.getFullPriceByTradePrice(tradeRecord, entrust.getIsFullPrice(), instruction));
+//        tradeRecord.setFullPrice(bondHelper.getFullPriceByTradePrice(tradeRecord, entrust.getIsFullPrice(), instruction));
         tradeRecord.setPortfolioName(instruction.getPortfolioName());
         tradeRecord.setSecAcctId(instruction.getSecAcctId());
         tradeRecord.setSecAcctName(instruction.getSecAcctName());
@@ -237,6 +237,20 @@ public class TradeCallbackHelper {
         tradeRecord.setBusiTypeTg(instruction.getBusiTypeTg());
         tradeRecord.setEntrustClass(instruction.getEntrustClass());
 
+        //债券交易处理
+        if (InvestmentAssetType.BOND.value.equals(entrust.getAssetType())) {
+            //是否全价交易
+            tradeRecord.setIsFullPrice(entrust.getIsFullPrice());
+            //成交全价
+            tradeRecord.setFullPrice(bondHelper.getFullPriceByTradePrice(tradeRecord, entrust.getIsFullPrice(), instruction));
+            //成交净价
+            tradeRecord.setNetPrice(bondHelper.getNetPriceByFullPrice(tradeRecord, instruction));
+            //成交净价金额
+            tradeRecord.setNetBalance(multiply(tradeRecord.getNetPrice(), tradeRecord.getTradedVolume(), 2));
+            //成交全价金额
+            tradeRecord.setClearBalance(multiply(tradeRecord.getFullPrice(), tradeRecord.getTradedVolume(), 2));
+        }
+
         //获取BusinessFlag
         if (IntegratedEntrustUtils.isIntegratedEntrust(tradeRecord.getEntrustProp())) {
             if (IntegratedEntrustUtils.isFixedIncome(tradeRecord.getEntrustProp())) {
@@ -245,6 +259,7 @@ public class TradeCallbackHelper {
                 tradeRecord.setBusinessFlag(BusinessFlag.BULK.value);
             } else if (IntegratedEntrustUtils.isProtocolBack_SH(tradeRecord.getEntrustProp()) || IntegratedEntrustUtils.isProtocolBack_SZ(tradeRecord.getEntrustProp())) {
                 tradeRecord.setBusinessFlag(BusinessFlag.PROTOCOL_BACK.value);
+                tradeRecord.setClearBalance(entrust.getBackBalance());
             } else {
                 logger.info("tradeRecord has not found businessFlag brokerEntrustId is {}", tradeRecord.getBrokerEntrustId());
             }
@@ -297,10 +312,14 @@ public class TradeCallbackHelper {
     }
 
     private void updateInstructionStatus(Instruction instruction) {
-        if (Objects.nonNull(instruction)) {
-            if ((instruction.getEntrustLeftAmt().longValue() == (instruction.getEntrustNum()) && instruction.getEntrustNum() > 0)
-                    || (instruction.getEntrustLeftAmt().doubleValue() >= (instruction.getEntrustAmt().doubleValue()) && instruction.getEntrustAmt().doubleValue() > 0))
-                instruction.setEntrustStatus(InstructionStatus.COMPLETE.value);
+        if (Objects.isNull(instruction)) {
+            return;
+        }
+        //数量单比较数量，金额单比较金额
+        if ((instruction.getEntrustNum() > 0 && instruction.getEntrustLeftAmt().longValue() == instruction.getEntrustNum())
+                || (instruction.getEntrustAmt().doubleValue() > 0 && instruction.getEntrustLeftAmt().doubleValue() == instruction.getEntrustAmt().doubleValue())
+        ) {
+            instruction.setEntrustStatus(InstructionStatus.COMPLETE.value);
         }
     }
 
@@ -334,7 +353,8 @@ public class TradeCallbackHelper {
             if (instruction.volumeInstruction()) {
                 instruction.setEntrustLeftAmt(BigDecimal.valueOf(instruction.getEntrustLeftAmt().longValue() + tradeRecord.getTradedVolume()));
             } else {
-                //可能存在金额指令的委托不是冻结金额的，传入成交金额  ----  对于债券， 现在指令为净价，需要单独处理
+                ////可能存在金额指令的委托不是冻结金额的，传入成交金额  ----  对于债券， 现在指令为净价，需要单独处理
+                //取成交金额（对于债券取全价金额）
                 unFrozenBalanceInstruction = bondHelper.handleTradePriceByFullPrice(tradeRecord, entrust.getIsFullPrice(), instruction);
                 instruction.setEntrustLeftAmt(TradeUtils.add(instruction.getEntrustLeftAmt(), unFrozenBalanceInstruction, 2));
                 //解冻金额判断，最后一笔需要释放所有解冻
