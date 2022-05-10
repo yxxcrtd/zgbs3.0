@@ -1635,14 +1635,14 @@ public class CfetsEtrDispatcherService extends BaseService {
         if(StringUtil.isNotEmpty(fieldResponseDto) && DictCodeListExt3.投管业务类型_新股申购.equals(fieldResponseDto.getBusiTypePosition())){
             fieldResponseDto.setPriceModel(StringUtil.EMPTY);
         }
-        String showInvaimOrBussinssmodel = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
-        if(null != showInvaimOrBussinssmodel && showInvaimOrBussinssmodel.equals("02")){
-            infoForm.forEach(field->{
-                if(field.getColname().equals("投资目的")){
-                    field.setColname("业务模式");
-                }
-            });
-        }
+//        String showInvaimOrBussinssmodel = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
+//        if(null != showInvaimOrBussinssmodel && showInvaimOrBussinssmodel.equals("02")){
+//            infoForm.forEach(field->{
+//                if(field.getColname().equals("投资目的")){
+//                    field.setColname("业务模式");
+//                }
+//            });
+//        }
         resultData.put(dtCode + "_form", infoForm);
         resultData.put(dtCode + "_data", fieldResponseDto);
         return resultData;
@@ -1665,7 +1665,7 @@ public class CfetsEtrDispatcherService extends BaseService {
         pageParam.put("YESORNO_YES", DictCodeList.是否_是.getValue());
         List<String> entrustIdList = StringUtil.splitToList(",", (String) pageParam.get("entrustId"));
         pageParam.put("sysDateStr", platformDateImpl.getSysDateStr());
-        pageParam.put("SHOW_INVAIM_OR_BUSSINSSMODEL", CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL"));
+//        pageParam.put("SHOW_INVAIM_OR_BUSSINSSMODEL", CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL"));
 
         if (StringUtil.isBlank(dto.getEntrustId()) || entrustIdList.size() > 1) {
             return new CfetsEtrDispatcherInfoExcResponse();
