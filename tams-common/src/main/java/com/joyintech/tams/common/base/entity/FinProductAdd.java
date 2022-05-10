@@ -493,6 +493,11 @@ public class FinProductAdd extends BaseEntity {
      */
     private String isSevenDayCashable;
 
+    /**
+     * 开放类型
+     */
+    private String openType;
+
     public String getDirectDisclosureRiskFlag() {
         return directDisclosureRiskFlag;
     }
@@ -1993,5 +1998,13 @@ public class FinProductAdd extends BaseEntity {
 
     public void setIsSevenDayCashable(String isSevenDayCashable) {
         this.isSevenDayCashable = isSevenDayCashable;
+    }
+
+    public String getOpenType() {
+        return openType;
+    }
+
+    public void setOpenType(String openType) {
+        this.openType = openType;
     }
 }
