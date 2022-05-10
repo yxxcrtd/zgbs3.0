@@ -747,66 +747,68 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                     }
                 }
             }
+            if (StringUtil.equals(cfetsDto.getIssueClass(), DictCodeListExt4.新债_发行方式_招标发行.getValue()) ||
+                    StringUtil.equals(cfetsDto.getIssueClass(), DictCodeListExt4.新债_发行方式_簿记建档.getValue())) {
+                //校验标位信息
+                if (StringUtil.isNotEmpty(cfetsDto.getFinprodId())) {
+                    //查询债券信息
+                    CfetsEtrFinProductInfoRequest dto = new CfetsEtrFinProductInfoRequest();
+                    dto.setFinprodId(cfetsDto.getFinprodId());
+                    CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoService.findFinProductInfo(null, null, dto);
 
-            //校验标位信息
-            if (StringUtil.isNotEmpty(cfetsDto.getFinprodId())) {
-                //查询债券信息
-                CfetsEtrFinProductInfoRequest dto = new CfetsEtrFinProductInfoRequest();
-                dto.setFinprodId(cfetsDto.getFinprodId());
-                CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoService.findFinProductInfo(null, null, dto);
-
-                Map<String, List<CfetsBiddingProductDto>> portfolioIdMap = cfetsDto.getBiddingProductList().stream()
-                        .collect(Collectors.groupingBy(CfetsBiddingProductDto::getPortfolioId));
-                for (Map.Entry<String, List<CfetsBiddingProductDto>> entry : portfolioIdMap.entrySet()) {
-                    List<BigDecimal> bidPriceSort = entry.getValue().stream().map(CfetsBiddingProductDto::getBidPrice).sorted().collect(Collectors.toList());
-                    if (CollectionUtils.isNotEmpty(bidPriceSort)) {
-                        //根据标的信息校验标位
-                        //最低标位 最低标位的大于等于该字段值
-                        if (finProductInfo.getMinTamt() != null) {
-                            if (bidPriceSort.get(0).compareTo(finProductInfo.getMinTamt()) == -1) {
-                                messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
+                    Map<String, List<CfetsBiddingProductDto>> portfolioIdMap = cfetsDto.getBiddingProductList().stream()
+                            .collect(Collectors.groupingBy(CfetsBiddingProductDto::getPortfolioId));
+                    for (Map.Entry<String, List<CfetsBiddingProductDto>> entry : portfolioIdMap.entrySet()) {
+                        List<BigDecimal> bidPriceSort = entry.getValue().stream().map(CfetsBiddingProductDto::getBidPrice).sorted().collect(Collectors.toList());
+                        if (CollectionUtils.isNotEmpty(bidPriceSort)) {
+                            //根据标的信息校验标位
+                            //最低标位 最低标位的大于等于该字段值
+                            if (finProductInfo.getMinTamt() != null) {
+                                if (bidPriceSort.get(0).compareTo(finProductInfo.getMinTamt()) == -1) {
+                                    messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
+                                }
                             }
-                        }
-                        //最高标位 最高标位的小于等于该字段值
-                        if (finProductInfo.getMaxTamt() != null) {
-                            if (finProductInfo.getMaxTamt().compareTo(bidPriceSort.get(bidPriceSort.size() - 1)) == -1) {
-                                messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
-                            }
-                        }
-
-                        //最大投标标位数 标位个数小于等于该字段值
-                        if (finProductInfo.getMaxTenderUnit() != null) {
-                            if (finProductInfo.getMaxTenderUnit().compareTo(BigDecimal.valueOf(bidPriceSort.size())) == -1) {
-                                messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
-                            }
-
-                        }
-
-                        //最大投标标位差 最高标位减去最低标位的差的绝对值小于等于该字段值
-                        if (finProductInfo.getMaxTenderPlus() != null) {
-                            BigDecimal subNum = bidPriceSort.get(bidPriceSort.size() - 1).subtract(bidPriceSort.get(0));
-                            if (finProductInfo.getMaxTenderPlus().compareTo(subNum) == -1) {
-                                messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
-                            }
-                        }
-
-                        //投标步长  标位需要时投标步长的整数倍
-                        if (finProductInfo.getTenderUnit() != null && BigDecimal.ZERO.compareTo(finProductInfo.getTenderUnit()) != 0) {
-                            for (BigDecimal bidPrice : bidPriceSort) {
-                                if (!BigDecimalUtil.isIntegerMultiples(bidPrice, finProductInfo.getTenderUnit())) {
+                            //最高标位 最高标位的小于等于该字段值
+                            if (finProductInfo.getMaxTamt() != null) {
+                                if (finProductInfo.getMaxTamt().compareTo(bidPriceSort.get(bidPriceSort.size() - 1)) == -1) {
                                     messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
                                 }
                             }
 
-                        }
+                            //最大投标标位数 标位个数小于等于该字段值
+                            if (finProductInfo.getMaxTenderUnit() != null) {
+                                if (finProductInfo.getMaxTenderUnit().compareTo(BigDecimal.valueOf(bidPriceSort.size())) == -1) {
+                                    messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
+                                }
 
-                        //连续投标限制
-                        if (StringUtil.isNotEmpty(finProductInfo.getSeriYN()) && DictCodeList.是否_是.getValue().equals(finProductInfo.getSeriYN())) {
+                            }
 
+                            //最大投标标位差 最高标位减去最低标位的差的绝对值小于等于该字段值
+                            if (finProductInfo.getMaxTenderPlus() != null) {
+                                BigDecimal subNum = bidPriceSort.get(bidPriceSort.size() - 1).subtract(bidPriceSort.get(0));
+                                if (finProductInfo.getMaxTenderPlus().compareTo(subNum) == -1) {
+                                    messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
+                                }
+                            }
+
+                            //投标步长  标位需要时投标步长的整数倍
+                            if (finProductInfo.getTenderUnit() != null && BigDecimal.ZERO.compareTo(finProductInfo.getTenderUnit()) != 0) {
+                                for (BigDecimal bidPrice : bidPriceSort) {
+                                    if (!BigDecimalUtil.isIntegerMultiples(bidPrice, finProductInfo.getTenderUnit())) {
+                                        messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
+                                    }
+                                }
+
+                            }
+
+                            //连续投标限制
+                            if (StringUtil.isNotEmpty(finProductInfo.getSeriYN()) && DictCodeList.是否_是.getValue().equals(finProductInfo.getSeriYN())) {
+
+                            }
                         }
                     }
-                }
 
+                }
             }
 
         }
