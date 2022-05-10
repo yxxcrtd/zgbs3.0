@@ -2795,11 +2795,13 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
     private String getTradePlat(String currentTab, String tradeMarket) {
         String tradePlat = DictCodeList.交易平台_竞价撮合平台.getValue();
         if (StringUtils.isNotEmpty(currentTab)) {
+//            if (("dz".equals(currentTab) || currentTab.equals(DictCodeList.交易平台_大宗交易平台.getValue()))
+//                    && DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(tradeMarket)) {
+//                tradePlat = DictCodeList.交易平台_综合协议交易平台.getValue();
+//            } else
             if (("dz".equals(currentTab) || currentTab.equals(DictCodeList.交易平台_大宗交易平台.getValue()))
-                    && DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(tradeMarket)) {
-                tradePlat = DictCodeList.交易平台_综合协议交易平台.getValue();
-            } else if (("dz".equals(currentTab) || currentTab.equals(DictCodeList.交易平台_大宗交易平台.getValue()))
-                    && DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(tradeMarket)) {
+                    && (DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(tradeMarket) ||
+                    DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(tradeMarket))) {
                 tradePlat = DictCodeList.交易平台_大宗交易平台.getValue();
             } else if ("gd".equals(currentTab) || currentTab.equals(DictCodeList.交易平台_固定收益平台.getValue())) {
                 tradePlat = DictCodeList.交易平台_固定收益平台.getValue();
