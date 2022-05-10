@@ -126,12 +126,14 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                 productAdd.setFinprodId(dto.getFinprodId());
                 productAdd.setIssueStatus(null);
                 finProductAddMapper.updateForTenderBound(productAdd);
-                try {
-                    PositionHttpRequest.dorevoke(totleTradeId, DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_上市流通.getValue(), DictCodeList.交易方向_上市流通.getValue());
-                } catch (PositionException e) {
-                    logger.error("交收失败-头寸处理异常", e);
-                    WorkFlowUtil.showMessage("头寸处理异常,请检查头寸日期", MessageType.错误消息);
-                    throw new PositionException(e);
+                if(dto.getListingDate().compareTo(iPlatformDate.getSysDate()) == 0) {//只有当上市日期和平台日相等的时候才会发撤销头寸
+                    try {
+                        PositionHttpRequest.dorevoke(totleTradeId, DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_上市流通.getValue(), DictCodeList.交易方向_上市流通.getValue());
+                    } catch (PositionException e) {
+                        logger.error("交收失败-头寸处理异常", e);
+                        WorkFlowUtil.showMessage("头寸处理异常,请检查头寸日期", MessageType.错误消息);
+                        throw new PositionException(e);
+                    }
                 }
                 finTenderBoundAssetService.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_上市流通撤销);
             }
@@ -172,26 +174,28 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
             productAdd.setIssueStatus(DictCodeListExt1.发行状态_发行成功.getValue());
             finProductAddMapper.updateForTenderBound(productAdd);
             finTenderBoundAssetService.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_上市流通);
-            //调用头寸
-            BaseMap param = BaseMap.newMap().put("userId", "SYSTEM")
-                    .put("totalTradeId", trdFinProductDealTotal.getTotleTradeId())
-                    .put("finprodId", dto.getFinprodId())
-                    .put("marketFinprodId", product.getCirculationCode())
-                    .put("modelType",DictCodeListExt1.子系统代码_交易.getValue())
-                    .put("busiType",DictCodeListExt3.头寸业务类型_上市流通.getValue())
-                    .put("busiAct",DictCodeListExt3.业务动作_上市.getValue())
-                    .put("ps",DictCodeList.交易方向_上市流通.getValue())
-                    .put("systemAct",DictCodeListExt3.系统动作_新建.getValue())
-                    .put("cdate",iPlatformDate.getSysDate())
-                    .put("ccy",product1.getCcy())
-                    .put("balanceCheck",DictCodeList.是否_否.getValue())
-                    .put("interfaceType","Bond001");
-            try {
-                PositionHttpRequest.send(param);
-            } catch (PositionException e) {
-                logger.error("处理失败-头寸处理异常", e);
-                //WorkFlowUtil.showMessage("头寸处理异常,请检查头寸日期", MessageType.错误消息);
-                //throw new PositionException(e);
+            if(dto.getListingDate().compareTo(iPlatformDate.getSysDate()) == 0) {//只有当上市日和平台日相等时才发头寸
+                //调用头寸
+                BaseMap param = BaseMap.newMap().put("userId", "SYSTEM")
+                        .put("totalTradeId", trdFinProductDealTotal.getTotleTradeId())
+                        .put("finprodId", dto.getFinprodId())
+                        .put("marketFinprodId", product.getCirculationCode())
+                        .put("modelType", DictCodeListExt1.子系统代码_交易.getValue())
+                        .put("busiType", DictCodeListExt3.头寸业务类型_上市流通.getValue())
+                        .put("busiAct", DictCodeListExt3.业务动作_上市.getValue())
+                        .put("ps", DictCodeList.交易方向_上市流通.getValue())
+                        .put("systemAct", DictCodeListExt3.系统动作_新建.getValue())
+                        .put("cdate", iPlatformDate.getSysDate())
+                        .put("ccy", product1.getCcy())
+                        .put("balanceCheck", DictCodeList.是否_否.getValue())
+                        .put("interfaceType", "Bond001");
+                try {
+                    PositionHttpRequest.send(param);
+                } catch (PositionException e) {
+                    logger.error("处理失败-头寸处理异常", e);
+                    WorkFlowUtil.showMessage("头寸处理异常,请检查头寸日期", MessageType.错误消息);
+                    throw new PositionException(e);
+                }
             }
         }
     }
