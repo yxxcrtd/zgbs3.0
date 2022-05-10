@@ -278,6 +278,12 @@ public class FinFundTargetValidator implements BeanValidator {
             }
        }
         //add by yjp 20210507 TISHKBS-2101 到期日<发行日/起息日，可正常提交，没有校验 end
+        if(StringUtil.equals(dto.getOpenType(),DictCodeList.开放类型_封闭式.getValue())){
+            if(StringUtil.isEmpty(dto.getIsSevenDayCashable())){
+                resultList.add(new ValidMessage("isSevenDayCashable",
+                        getMessage("COMMON_E_0057", getMessage("FinFundTarget002.isSevenDayCashable"))));
+            }
+        }
         return resultList;
     }
 

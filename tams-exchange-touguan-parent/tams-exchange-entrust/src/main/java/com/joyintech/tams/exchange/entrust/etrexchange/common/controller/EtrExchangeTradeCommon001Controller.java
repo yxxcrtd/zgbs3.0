@@ -2026,9 +2026,9 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 	}
 
 	@ApiOperation(value = "查询资产是否进行了SPPI测试", notes = "查询资产是否进行了SPPI测试")
-	@PostMapping("/queryAssetIsSppiTest/{secId:.+}")
+	@PostMapping("/queryAssetIsSppiTest")
 	@ResponseBody
-	public Message<SppiImportData> queryAssetIsSppiTest(@PathVariable String secId) {
+	public Message<SppiImportData> queryAssetIsSppiTest(@RequestParam(value = "secId") String secId) {
 		try {
 			SppiImportData data = etrExchangeTrade001CommonService.queryAssetIsSppiTest(secId);
 			return new Message<SppiImportData>().success().setData(data);
