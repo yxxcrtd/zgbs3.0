@@ -149,9 +149,9 @@ public class PositionInfoService {
             List<PositionCashSecDto> sumAcctNoList = new ArrayList<>();
             for (String portfolioId : portfolioIdList) {
                 Map<String, String> secIdMap = new HashMap<String, String>();
-                map.put("portfolioId", portfolioId);
-                map.put("finprodId", finprodId);
-                String secAcctId = qryPortfolioSecAcctId(map);// 证券账户
+                secIdMap.put("portfolioId", portfolioId);
+                secIdMap.put("finprodId", finprodId);
+                String secAcctId = qryPortfolioSecAcctId(secIdMap);// 证券账户
                 if (StringUtil.isNotEmpty(secAcctId)) {
                     PositionCashSecDto positionCashSecDto = new PositionCashSecDto();
                     positionCashSecDto.setCcy(ccy);
