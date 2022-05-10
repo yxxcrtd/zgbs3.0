@@ -47,7 +47,7 @@ import java.util.Map;
  * @since 1.0
  */
 @Service
-public class FinBondAsset002Service extends BaseService implements BaseProcessService<FinAssetRateAdjResponse> {
+public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse> implements BaseProcessService<FinAssetRateAdjResponse> {
     /**
      * 日志
      */
@@ -138,7 +138,7 @@ public class FinBondAsset002Service extends BaseService implements BaseProcessSe
         List<FinCashCalcRule> finCashCalcRuleList = new ArrayList<FinCashCalcRule>();
         dto.getSelectedItem().forEach(entity -> {
             // 生效利率
-            BigDecimal yield = ArithmeticUtil.divide(entity.getYield(), new BigDecimal(100), 14);
+            BigDecimal yield = entity.getYield();
             PaFinCashCalcRule paFinCashCalcRule = new PaFinCashCalcRule();
             FinCashCalcRule finCashCalcRule = new FinCashCalcRule();
             BeanUtil.copyPropertiesIgnoreNull(finCashCalcRule, entity);

@@ -246,7 +246,8 @@ public class FinBondAssetValidatorService implements BeanValidator{
 //        }
         // 如果是新增或者修改 则校验 一级市场投标债券  不在流程中 校验pk2
         // modify by wj 20200819 BS-757 【投资交易-新发行债权标的】一级市场投标债券可以加挂到两个债券标的上
-        if(StringUtil.equals(dto.getPageModel(), GlobalConstant.DETAIL_PAGE_MODEL_NEW) || StringUtil.equals(dto.getPageModel(), GlobalConstant.DETAIL_PAGE_MODEL_EDIT)) {
+        if(StringUtil.equals(dto.getPageModel(), GlobalConstant.DETAIL_PAGE_MODEL_NEW)
+                || StringUtil.equals(dto.getPageModel(), GlobalConstant.DETAIL_PAGE_MODEL_EDIT)) {
             if(StringUtil.isNotEmpty(dto.getoFinprodId())) {
                 // 选择的时候 已校验 已被别的债券占用的一级市场投标债券不会展示 所以只需要过滤流程中的判断。
                 WflValidInputParameter parameter = new WflValidInputParameter();

@@ -19,6 +19,7 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.asset.bond.dto.*;
+import com.joyintech.tams.business.asset.bond.service.FinBondAsset001Service;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.common.base.entity.FinCashPlan;
@@ -87,6 +88,9 @@ public class FinBondAsset001Controller extends BaseController{
     private FinBondAssetService finBondAssetService;
 
     @Autowired
+    private FinBondAsset001Service finBondAsset001Service;
+
+    @Autowired
     private FinBondAssetValidatorService finBondAssetValidatorService;
 
     @Autowired
@@ -142,7 +146,7 @@ public class FinBondAsset001Controller extends BaseController{
     @PostMapping("findPage")
     public Message<Page<FinBondAssetResponse>> findPage(@RequestBody FinBondAssetRequest request) {
         try {
-            Page<FinBondAssetResponse> page = finBondAssetService.selectForPage(request);
+            Page<FinBondAssetResponse> page = finBondAsset001Service.selectForPage(request);
             return new Message<Page<FinBondAssetResponse>>().success().setData(page);
         }catch (Exception e) {
             logger.error("查询债券标的信息分页数据异常",e);
@@ -163,7 +167,7 @@ public class FinBondAsset001Controller extends BaseController{
     public Message<Page<SelectOptionDto>> getAssetId(@RequestBody SelectOptionCommonRequest request){
         try {
 
-            Page<SelectOptionDto> page = finBondAssetService.getAssetId(request);
+            Page<SelectOptionDto> page = finBondAsset001Service.getAssetId(request);
             return new Message<Page<SelectOptionDto>>().success().setData(page);
         }catch (Exception e) {
             logger.error("债券简称下拉框数据异常",e);
@@ -184,7 +188,7 @@ public class FinBondAsset001Controller extends BaseController{
     @PostMapping("getIssuerId")
     public Message<Page<SelectOptionDto>> getIssuerId(@RequestBody SelectOptionCommonRequest request){
         try {
-            Page<SelectOptionDto> page = finBondAssetService.getIssuerId(request);
+            Page<SelectOptionDto> page = finBondAsset001Service.getIssuerId(request);
             return new Message<Page<SelectOptionDto>>().success().setData(page);
         }catch (Exception e) {
             logger.error("查询发行人的联想下拉框数据异常",e);
@@ -205,7 +209,7 @@ public class FinBondAsset001Controller extends BaseController{
     @PostMapping("getCrossMarketCode")
     public Message<Page<SelectOptionDto>> getCrossMarketCode(@RequestBody SelectOptionCommonRequest request){
         try {
-            Page<SelectOptionDto> page = finBondAssetService.getCrossMarketCode(request);
+            Page<SelectOptionDto> page = finBondAsset001Service.getCrossMarketCode(request);
             return new Message<Page<SelectOptionDto>>().success().setData(page);
         }catch (Exception e) {
             logger.error("跨市场代码联想下拉框数据异常",e);
@@ -361,7 +365,7 @@ public class FinBondAsset001Controller extends BaseController{
         // 导出
         ExcelUitl.doExport(requestDto, response, "债券标的", () -> {
             FinBondAssetRequest dto = requestDto.getDto(FinBondAssetRequest.class);
-            List<FinBondAssetResponse> dataList = finBondAssetService.selectForPage(dto).getRoot();
+            List<FinBondAssetResponse> dataList = finBondAsset001Service.selectForPage(dto).getRoot();
             for(FinBondAssetResponse data:dataList){
                 finBondAssetService.updateCfetsOprHis(data.getFinprodId(),"export");
             }
@@ -383,7 +387,7 @@ public class FinBondAsset001Controller extends BaseController{
     @ResponseBody
     public Message<Page<SearchInfoOperateListResponse>> getSearchTabInfoQueryOperate(@RequestBody SearchOperateListRequest dto){
         try {
-            Page<SearchInfoOperateListResponse> page = finBondAssetService.getSearchTabInfoQueryOperate(dto);
+            Page<SearchInfoOperateListResponse> page = finBondAsset001Service.getSearchTabInfoQueryOperate(dto);
             return new Message<Page<SearchInfoOperateListResponse>>().success().setData(page);
         } catch (Exception e) {
             logger.error("查询操作记录分页数据异常", e);
