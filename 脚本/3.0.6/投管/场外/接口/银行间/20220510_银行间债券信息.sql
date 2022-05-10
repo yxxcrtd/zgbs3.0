@@ -5,7 +5,7 @@ create table INTERF_RDI_BOND_INFO
     SECURITY_ID              VARCHAR2(20),
     SECURITY_TYPE_ID         VARCHAR2(20),
     TERM_TO_MATURITY_STRING  VARCHAR2(20),
-    PARTY_SUB_PERSON         VARCHAR2(20)
+    PARTY_SUB_PERSON         VARCHAR2(20),
     PARTY_SUB_ID             VARCHAR2(20),
     ISSUE_SIZE               NUMBER(10, 2),
     ISSUE_PX                 NUMBER(6, 2),
