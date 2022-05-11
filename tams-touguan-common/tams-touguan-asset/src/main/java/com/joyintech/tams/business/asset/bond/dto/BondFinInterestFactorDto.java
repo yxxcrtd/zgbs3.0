@@ -99,10 +99,10 @@ public class BondFinInterestFactorDto {
     @ApiModelProperty(name="firstConfirmDate",value="首次利率确定日(条件必填)")
     private Date firstConfirmDate;
 
-    @ApiModelProperty(name="basis",value="发行人计息基础",example = "A/360，A/365",required=true)
+    @ApiModelProperty(name="basis",value="发行人计息基础",example = "A/360，A/365")
     private String basis;
 
-    @ApiModelProperty(name="marketBasis",value="交易市场计息基础",required=true)
+    @ApiModelProperty(name="marketBasis",value="交易市场计息基础")
     private String marketBasis;
 
     /**

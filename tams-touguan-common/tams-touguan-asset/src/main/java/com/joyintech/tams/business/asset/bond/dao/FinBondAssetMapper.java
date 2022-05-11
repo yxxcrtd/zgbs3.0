@@ -15,6 +15,7 @@ import com.joyintech.tams.common.base.entity.SysUploadFileInfo;
 import com.joyintech.tams.business.asset.bond.dto.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.asset.dto.FinPayInterestStdInfoDto;
+import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.invest.asset.common.dto.FinAssetRateAdjDto;
 import com.joyintech.tams.invest.common.asset.dto.AssetCommonInfoDto;
 import com.joyintech.tams.invest.common.dto.common.FinAssetIntInfo;
@@ -248,4 +249,5 @@ public interface FinBondAssetMapper {
 
 	Date getMaxTradeDate(@Param("finprodId") String finProdId);
 
+	List<String> getBusinessData(WflValidInputParameter parameter);
 }

@@ -75,49 +75,56 @@ public class FinBondAssetValidatorService implements BeanValidator{
             if (DictCodeList.息票品种_附息.getValue().equals(dto.getFinInterestFactorDto().getCouponSpecies())
                     && DictCodeList.息票品种_利随本清.getValue().equals(dto.getFinInterestFactorDto().getCouponSpecies())) {
                 if((dto.getFinInterestFactorDto().getCalcType() ==null)) {
-                    resultList.add(new ValidMessage(getMessage("息票品种为附息或利随本清时，利率类型不能为空!")));
+                    resultList.add(new ValidMessage("息票品种为附息或利随本清时，利率类型不能为空!"));
                 }else{
 //                    利率类型为浮动利率时，基准利率精度、基准利率、系数、利差、基准利率调整规则、首次利率确定日为空
                     if (StringUtil.equals(dto.getFinInterestFactorDto().getCalcType(), DictCodeList.利率类型_浮动利率.getValue())){
                         if (!StringUtil.isNotEmpty(dto.getFinInterestFactorDto().getBenchmarkIdAccuracy())){
-                            resultList.add(new ValidMessage(getMessage("利率类型为浮动利率时，基准利率精度不能为空!")));
+                            resultList.add(new ValidMessage("利率类型为浮动利率时，基准利率精度不能为空!"));
                         }
                         if (!StringUtil.isNotEmpty(dto.getFinInterestFactorDto().getBasicRate())){
-                            resultList.add(new ValidMessage(getMessage("利率类型为浮动利率时，基准利率不能为空!")));
+                            resultList.add(new ValidMessage("利率类型为浮动利率时，基准利率不能为空!"));
                         }
                         if (!StringUtil.isNotEmpty(dto.getFinInterestFactorDto().getCoefficient())){
-                            resultList.add(new ValidMessage(getMessage("利率类型为浮动利率时，系数不能为空!")));
+                            resultList.add(new ValidMessage("利率类型为浮动利率时，系数不能为空!"));
                         }
                         if (!StringUtil.isNotEmpty(dto.getFinInterestFactorDto().getSpreadRate())){
-                            resultList.add(new ValidMessage(getMessage("利率类型为浮动利率时，利差不能为空!")));
+                            resultList.add(new ValidMessage("利率类型为浮动利率时，利差不能为空!"));
                         }
                         if (!StringUtil.isNotEmpty(dto.getFinInterestFactorDto().getResetType())){
-                            resultList.add(new ValidMessage(getMessage("利率类型为浮动利率时，基准利率调整规则不能为空!")));
+                            resultList.add(new ValidMessage("利率类型为浮动利率时，基准利率调整规则不能为空!"));
                         }else{
                             //基准利率调整规则为基准利率变动后固定间隔生效时，延后时间和延后时间单位为空
                             if (StringUtil.equals(dto.getFinInterestFactorDto().getResetType(),DictCodeList.重置类型_基准利率调整规则_基准利率变动后固定间隔生效.getValue())){
                                 if (!StringUtil.isNotEmpty(dto.getFinInterestFactorDto().getObserveBefDay())){
-                                    resultList.add(new ValidMessage(getMessage("基准利率调整规则为基准利率变动后固定间隔生效时，延后时间不能为空。")));
+                                    resultList.add(new ValidMessage("基准利率调整规则为基准利率变动后固定间隔生效时，延后时间不能为空。"));
                                 }
                                 if (!StringUtil.isNotEmpty(dto.getFinInterestFactorDto().getObserveBefUnit())){
-                                    resultList.add(new ValidMessage(getMessage("基准利率调整规则为基准利率变动后固定间隔生效时，延后时间单位不能为空。")));
+                                    resultList.add(new ValidMessage("基准利率调整规则为基准利率变动后固定间隔生效时，延后时间单位不能为空。"));
                                 }
                             }
                         }
                         if (!StringUtil.isNotEmpty(dto.getFinInterestFactorDto().getFirstConfirmDate())){
-                            resultList.add(new ValidMessage(getMessage("利率类型为浮动利率时，首次利率确定日不能为空!")));
+                            resultList.add(new ValidMessage("利率类型为浮动利率时，首次利率确定日不能为空!"));
                         }
                     }
                 }
 
                 if((dto.getFinInterestFactorDto().getYield() ==null)) {
-                    resultList.add(new ValidMessage(getMessage("息票品种为附息或利随本清时，初始利率不能为空!")));
+                    resultList.add(new ValidMessage("息票品种为附息或利随本清时，初始利率不能为空!"));
                 }
 
                 if((dto.getInvRepayList() ==null)) {
-                    resultList.add(new ValidMessage(getMessage("息票品种为附息或利随本清时，还本计划不能为空!")));
+                    resultList.add(new ValidMessage("息票品种为附息或利随本清时，还本计划不能为空!"));
                 }
-
+                if (DictCodeList.息票品种_附息.getValue().equals(dto.getFinInterestFactorDto().getCouponSpecies())){
+                    if (dto.getFinInterestFactorDto().getMarketBasis()== null){
+                        resultList.add(new ValidMessage("息票品种为附息时，交易市场计息基础不能为空!"));
+                    }
+                    if (dto.getFinInterestFactorDto().getBasis()== null){
+                        resultList.add(new ValidMessage("息票品种为附息时，发行人计息基础不能为空!"));
+                    }
+                }
             }
 
             if (DictCodeList.息票品种_零息.getValue().equals(dto.getFinInterestFactorDto().getCouponSpecies())
@@ -169,7 +176,6 @@ public class FinBondAssetValidatorService implements BeanValidator{
         if (StringUtil.equals(dto.getOperateType(), "delete")) {
             if(null!=dto.getSelectedItem()&&!dto.getSelectedItem().isEmpty()){
                 for(FinBondAssetSaveRequest entity : dto.getSelectedItem()){
-                    //只要存在债券交易就不可以删除债券资料，否则债券查询页面查询不到资产信息并报错，暂时修改债券资产，后续再考虑是否一并修改
                     if(commonBusinessService.isTransInAssetTwo(entity.getFinprodId())!=0){
                         resultList.add(new ValidMessage("",
                             getMessage("资产存在交易,不可删除!")));
