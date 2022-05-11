@@ -1516,7 +1516,25 @@
         </where>
     </select>
 
-    <update id="deleteFileByBussinessId" >
+    <delete id="deleteFileByBussinessId" >
         delete from SYS_UPLOAD_FILE_INFO  where BUSINESS_ID = #{finprodId,jdbcType=VARCHAR}
-    </update>
+    </delete>
+
+    <select id = "isTransInAsset" resultType="java.lang.Integer">
+        SELECT
+            SUM (num)
+        FROM(
+                SELECT COUNT(TRADE_ID) num
+                FROM TRD_PRODUCT_DEAL
+                WHERE FINPROD_ID = #{finprodId}
+                  AND TRADE_STATUS = '01' AND (IS_CANCEL='N' or IS_CANCEL IS NULL)
+                  AND PS NOT IN ('T09','T08','T07','T27','T30','T33')
+                UNION ALL
+                SELECT COUNT(TRADE_ID) num
+                FROM WFL_TRD_PRODUCT_DEAL
+                WHERE FINPROD_ID = #{finprodId}
+                  AND PS NOT IN ('T09','T08','T07','T27','T30','T33')
+            )
+    </select>
+
 </mapper>

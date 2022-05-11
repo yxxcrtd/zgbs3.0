@@ -1452,4 +1452,8 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         ajaxResult.setMessage("删除成功");
         return ajaxResult;
     }
+
+    public int isTransInAsset(String finProdId) {
+       return finBondAssetMapper.isTransInAsset(finProdId);
+    }
 }

@@ -217,6 +217,11 @@ public class FinBondAsset002Controller extends BaseController{
             if (StringUtil.isNotEmpty(workflowId)) {
                 //流程代办checkImportData
                 entity = finBondAssetService.getBussinessEntityByWorkflowId(workflowId);
+                if (StringUtil.isNotEmpty(entity)){
+                    entity.setType9(entity.getTypeTwo());
+                    entity.setType10(entity.getTypeThree());
+                    entity.setType11(entity.getTypeFour());
+                }
             }
             return new Message<FinBondAssetSaveRequest>().success().setData(entity);
         } catch(Exception e){
@@ -309,9 +314,9 @@ public class FinBondAsset002Controller extends BaseController{
         params.setBusinessType(DictCodeList.共通业务类型_债券类资产信息.getValue());
         // 设置流程业务说明
         params.setComment(entity -> {
-            return WorkFlowUtil.concatComment(getMessage("FinBondAsset002.finprodId")+
+            return WorkFlowUtil.concatComment("债券代码"+
                 GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodMarketId(), GlobalConstant.CLOSE_PARENTHESIS+
-                getMessage("FinBondAsset002.finprodName")+GlobalConstant.OPEN_PARENTHESIS+
+                "债券名称"+GlobalConstant.OPEN_PARENTHESIS+
                 entity.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS);
         });
         // 给参数变成ProcessParameter而非WorkFlowParameter

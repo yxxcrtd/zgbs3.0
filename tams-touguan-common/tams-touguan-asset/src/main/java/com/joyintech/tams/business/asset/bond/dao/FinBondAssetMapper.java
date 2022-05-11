@@ -242,4 +242,6 @@ public interface FinBondAssetMapper {
 	AssetCommonInfoDto getAssetInfoToRateAdj(Map<String, Object> param);
 
 	int deleteFileByBussinessId(@Param("finprodId") String finprodId);
+
+	int isTransInAsset(@Param("finprodId") String finProdId);
 }
