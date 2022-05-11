@@ -35,7 +35,7 @@ public class FinBondMarketInfoQuery003Controller extends BaseController {
         if (CollectionUtils.isNotEmpty(validMessageList)) {
             return Message.fail("加券失败", validMessageList);
         } else {
-            return Message.success("加券成功", null);
+            return Message.success("加券成功", validMessageList);
         }
     }
 }
