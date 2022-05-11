@@ -2,11 +2,14 @@ package com.joyintech.service.basicdata.systrdconfig.service;
 
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.service.basicdata.systrdconfig.dao.InterfSysTrdConfigMapper;
 import com.joyintech.service.basicdata.systrdconfig.dto.*;
 import com.joyintech.tams.common.base.dao.MstCounterPartyInfoMapper;
+import com.joyintech.tams.common.base.dao.SppiImportDataMapper;
 import com.joyintech.tams.common.base.entity.MstCounterPartyInfo;
+import com.joyintech.tams.common.base.entity.SppiImportData;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
@@ -37,6 +40,13 @@ public class InterfSysTrdConfigService{
     //平台日组件
     @Autowired
     IPlatformDate iPlatformDateImpl;
+
+    @Autowired
+    private SppiImportDataMapper sppiImportDataMapper;
+
+
+
+
 
 
 
@@ -330,5 +340,47 @@ public class InterfSysTrdConfigService{
 
     public List<TradeInfoProResponse> getDealerTraderInfo(TradeInfoProRequest dto) {
         return interfSysTrdConfigMapper.getDealerTraderInfo(dto);
+    }
+
+    public Map<String, Object> getBidPriceConInfo(Map<String, Object> params) {
+        Map<String, Object> resultMap = new HashMap<>();
+        if (params.get("ps") == null || params.get("finprodId") == null  || params.get("businessModel") == null || params.get("price") == null){
+            resultMap.put("status",1);
+            resultMap.put("message","参数缺失");
+            return resultMap;
+        }
+        String ps = params.get("ps").toString();
+        String finprodId = params.get("finprodId").toString();
+        String businessModel = params.get("businessModel").toString();
+        String price = params.get("price").toString();
+        if(StringUtil.equals(ps,DictCodeList.交易方向_买入.getValue())) {
+            Map<String, Object> paramsppi = new HashMap<>();
+            paramsppi.put("finprodId", finprodId);
+            SppiImportData sppiDto = interfSysTrdConfigMapper.queryAssetIsSppiTest(paramsppi);
+            if (com.joyintech.framework.util.StringUtil.isNotEmpty(sppiDto)) {
+                if (com.joyintech.framework.util.StringUtil.isNotEmpty(sppiDto.getIsSppiPass()) && com.joyintech.framework.util.StringUtil.equals(sppiDto.getIsSppiPass(), "2")) {
+                    //判断该资产未来是否有行权计划
+                    Map<String, Object> param = new HashMap<>();
+                    param.put("finprodId", finprodId);
+                    param.put("sysDate", DateUtil.platDateFromCache());
+                    if (interfSysTrdConfigMapper.countBondHasEexrPlan(param) > 0) {
+                        if (com.joyintech.framework.util.StringUtil.isNotEmpty(businessModel) && com.joyintech.framework.util.StringUtil.equals(businessModel, DictCodeListExt3.业务模式_收取合同约定的现金流.getValue())) {
+                            SppiImportData sppiImportData = sppiImportDataMapper.selectByPrimaryKey(finprodId);
+                            if (null != sppiImportData && com.joyintech.framework.util.StringUtil.isNotEmpty(sppiImportData.getBidPriceCon())) {
+                                String[] split = sppiImportData.getBidPriceCon().split(",");
+                                if (new BigDecimal(price).compareTo(new BigDecimal(split[1])) <= 0) {
+                                    resultMap.put("status",1);
+                                    resultMap.put("message","净价不满足使权不重大购入价条件，若继续提交，业务模式会发生变更");
+                                    return resultMap;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        resultMap.put("status",0);
+        resultMap.put("message","成功");
+        return resultMap;
     }
 }
