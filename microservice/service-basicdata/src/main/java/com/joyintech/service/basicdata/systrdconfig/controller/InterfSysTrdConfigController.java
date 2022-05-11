@@ -239,4 +239,13 @@ public class InterfSysTrdConfigController{
     public List<TradeInfoProResponse> selectTraderInfo(@RequestBody TradeInfoProRequest dto ){
         return  interfSysTrdConfigService.getDealerTraderInfo(dto);
     }
+
+
+    /**
+     * 债券现券买入指令提交校验时对于使权不重大的购入价条件判断
+     */
+    @PostMapping("getBidPriceConInfo")
+    public Map<String,Object> getBidPriceConInfo(@RequestBody Map<String,Object> params){
+        return interfSysTrdConfigService.getBidPriceConInfo(params);
+    }
 }
