@@ -89,7 +89,10 @@ public class CfetsTrdConfirmRegInfoListResponse{
     private BigDecimal faceValue;
 
     @ApiModelProperty(name="tradeYield",value="成交价",example="1")
-    private String tradeYield;
+    private BigDecimal tradeYield;
+
+    @ApiModelProperty(name="tradeYieldStr",value="成交价显示",example="1")
+    private String tradeYieldStr;
 
     @ApiModelProperty(name="termDays",value="期限（天）",example="1")
     private BigDecimal termDays;
@@ -614,12 +617,20 @@ public class CfetsTrdConfirmRegInfoListResponse{
         this.faceValue = faceValue;
     }
 
-    public String getTradeYield() {
+    public BigDecimal getTradeYield() {
         return tradeYield;
     }
 
-    public void setTradeYield(String tradeYield) {
+    public void setTradeYield(BigDecimal tradeYield) {
         this.tradeYield = tradeYield;
+    }
+
+    public String getTradeYieldStr() {
+        return this.tradeYieldStr;
+    }
+
+    public void setTradeYieldStr(String tradeYieldStr) {
+        this.tradeYieldStr = tradeYieldStr;
     }
 
     public BigDecimal getTermDays() {

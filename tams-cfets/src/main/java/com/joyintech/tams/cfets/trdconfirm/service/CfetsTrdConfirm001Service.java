@@ -20,14 +20,15 @@ import com.joyintech.service.bankuplink.common.dto.TrdBondInvestTradeDto;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
-import com.joyintech.tams.cfets.trd.repo.service.CfetsRepoQuotedPrice004Service;
-import com.joyintech.tams.cfets.manualsettle.dao.CfetsManualSettleMapper;
+import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.cfets.etr.bond.dao.CfetsEtrIbBondinfoMapper;
 import com.joyintech.tams.cfets.etr.bond.dto.*;
 import com.joyintech.tams.cfets.etr.bond.service.CfetsEtribBondInfo003Service;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPosPortfolioCashRequest;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPosPortfolioSecRequest;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPositionRequest;
+import com.joyintech.tams.cfets.manualsettle.dao.CfetsManualSettleMapper;
+import com.joyintech.tams.cfets.trd.repo.service.CfetsRepoQuotedPrice004Service;
 import com.joyintech.tams.cfets.trdconfirm.dao.CfetsTrdConfirmMapper;
 import com.joyintech.tams.cfets.trdconfirm.dto.*;
 import com.joyintech.tams.common.base.dao.*;
@@ -47,6 +48,7 @@ import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.component.base.entrust.dto.BaseEtrFinishAmtDto;
 import com.joyintech.tams.invest.common.component.base.entrust.impl.BaseEtrInvestInfoServiceImpl;
+import com.joyintech.tams.invest.common.component.base.entrust.impl.dao.BaseEtrInvestInfoMapper;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
@@ -64,6 +66,7 @@ import com.joyintech.tams.invest.common.service.InvestInterfCommService;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 import com.joyintech.tams.invest.common.trade.dto.AllTradeCommonInputDto;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
+import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommService;
 import com.joyintech.tams.invest.common.trade.service.PreTrdCommonBaseService;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.invest.interf.service.InterfComponentService;
@@ -128,6 +131,8 @@ public class CfetsTrdConfirm001Service extends BaseService{
     private TrdProductDealAddPreMapper trdProductDealAddPreMapper;
     @Autowired(required = false)
     private FinProductMapper finProductMapper;
+    @Autowired(required = false)
+    private FinProductAddMapper finProductAddMapper;
     @Autowired(required = false)
     private StlSecAcctInfoMapper stlSecAcctInfoMapper;
     @Autowired
@@ -204,6 +209,18 @@ public class CfetsTrdConfirm001Service extends BaseService{
 
     @Autowired
     BaseAssetCashPositionCommMapper baseAssetCashPositionCommMapper;
+
+    @Autowired(required = false)
+    private BaseEtrCashPositionCommService baseEtrCashPositionCommService;
+
+    /**
+     * 委托指令Mapper
+     */
+    @Autowired
+    private EtrEntrustMapper etrEntrustMapper;
+
+    @Autowired
+    private BaseEtrInvestInfoMapper baseEtrInvestInfoMapper;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -1993,4 +2010,55 @@ public class CfetsTrdConfirm001Service extends BaseService{
         PositionHttpRequest.send(req);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @DTXTransaction
+    public void issuingFailMethod(List<String> finprodIds) {
+        logger.debug("发行失败,资产代码:" + JsonUtils.object2Json(finprodIds));
+        finprodIds.forEach(finprodId -> {
+            FinProductAdd finProductAdd = new FinProductAdd();
+            finProductAdd.setFinprodId(finprodId);
+            finProductAdd.setIssueStatus(DictCodeListExt1.发行状态_发行失败.getValue());
+            finProductAddMapper.updateByPrimaryKeySelective(finProductAdd);
+        });
+        // 查询指令 entrustAmt字段存已完成额度
+        List<EtrEntrust> etrEntrusts = cfetsTrdConfirmMapper.selectEtrEntrustEByFinprodId(finprodIds);
+        logger.debug("发行失败,更新指令状态:" + JsonUtils.object2Json(etrEntrusts));
+        etrEntrusts.forEach(etrEntrust -> {
+            // 指令完成额度为0 则关闭指令
+            if (BigDecimalUtil.isZero(etrEntrust.getEntrustAmt())) {
+                EtrEntrust record = new EtrEntrust();
+                record.setEntrustId(etrEntrust.getEntrustId());
+                record.setEntrustStatus(etrEntrust.getEntrustStatus());
+                record.setRemark(etrEntrust.getRemark());
+                // 调用投资委托组件的更新委托状态接口，将委托状态设置为“已关闭”
+                String tempEntrustStatu = record.getEntrustStatus();// 获取该委托原始状态，防止后续更改成关闭
+                record.setEntrustStatus(DictCodeList.委托状态_已关闭.getValue());
+                if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
+                    //插入旧头寸
+                    if (baseEtrCashPositionCommService != null && DictCodeList.委托状态_已接收.getValue().equals(tempEntrustStatu)) {
+                        baseEtrCashPositionCommService.entrustCloseExecute(record.getEntrustId(), DictCodeList.是否_是.getValue());
+                    }
+                }
+                String remark = record.getRemark() == null ? "指令关闭原因：发行失败" : record.getRemark().concat("指令关闭原因：发行失败");
+                record.setRemark(remark);
+                logger.debug("发行失败,关闭指令状态:" + JsonUtils.object2Json(record));
+                etrEntrustMapper.updateByPrimaryKeySelective(record);
+                // 修改委托指令分发表中值 add by yangwenjun 20201209
+                baseEtrInvestInfoMapper.updatEetrDistribute(etrEntrust);
+            } else {
+                //指令完成额度不为0 完成指令
+                EtrEntrust record = new EtrEntrust();
+                record.setEntrustId(etrEntrust.getEntrustId());
+                record.setEntrustStatus(etrEntrust.getEntrustStatus());
+                record.setRemark(etrEntrust.getRemark());
+                // 调用投资委托组件的更新委托状态接口，将委托状态设置为“已完成”
+                String tempEntrustStatu = record.getEntrustStatus();// 获取该委托原始状态，防止后续更改成关闭
+                record.setEntrustStatus(DictCodeList.委托状态_已完成.getValue());
+                logger.debug("发行失败,完成指令状态:" + JsonUtils.object2Json(record));
+                etrEntrustMapper.updateByPrimaryKeySelective(record);
+                // 修改委托指令分发表中值 add by yangwenjun 20201209
+                baseEtrInvestInfoMapper.updatEetrDistribute(etrEntrust);
+            }
+        });
+    }
 }

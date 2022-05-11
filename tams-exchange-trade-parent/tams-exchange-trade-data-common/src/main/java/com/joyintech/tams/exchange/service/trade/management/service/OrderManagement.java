@@ -114,7 +114,7 @@ public class OrderManagement extends BaseService {
         } else if (tradeHelper.isFairTransaction(orderPlaceBean, instructionClone)) { //公平交易
             return;
         } else {
-            tradeHelper.fillEntrustPriceAndAmt(orderPlaceBean, instructionClone);
+            tradeHelper.fillEntrustPriceAndAmt(orderPlaceBean, instructionClone, instruction);
         }
         instructionClone.setEntrustNo(instruction.getEntrustId());
         instructionClone.setEntrustProp(orderPlaceBean.getEntrustProp());

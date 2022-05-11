@@ -520,11 +520,11 @@ public class CfetsEtrDispatcherInfoExcResponse extends CfetsEtrDispatcherExcInfo
     }
 
     public String getOtherBusiModel() {
-        String flag = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
-        if("02".equals(flag)){
+//        String flag = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
+//        if("02".equals(flag)){
             return SysDataUtil.getNameFromDataDict(DictCode.业务模式, super.getBusiModel());
-        }
-        return SysDataUtil.getNameFromDataDict(DictCode.投资目的, super.getBusiModel());
+//        }
+//        return SysDataUtil.getNameFromDataDict(DictCode.投资目的, super.getBusiModel());
     }
 
     /**

@@ -3,6 +3,8 @@ package com.joyintech.tams.exchange.common;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.domain.Message;
 
+import java.util.Objects;
+
 public class BusinessResultException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
@@ -62,5 +64,13 @@ public class BusinessResultException extends RuntimeException {
 
     public static BusinessResultException create(ErrorCode errorCode, String message) {
         return new BusinessResultException(errorCode, message);
+    }
+
+    public Message<Object> toMessage() {
+        if (Objects.nonNull(resultMessage)) {
+            return resultMessage;
+        }
+
+        return new Message<Object>(errorCode.value() + "", errorCode.getDescription());
     }
 }

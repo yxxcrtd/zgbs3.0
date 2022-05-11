@@ -15,6 +15,15 @@ import java.util.Map;
  */
 @Repository
 public interface FinTenderBondAssetBatchMapper {
+
+    /**
+     * 查询金融产品代码
+     *
+     * @param param
+     * @return
+     */
+    String selectFinprodId(Map<String, String> param);
+
     /**
      * 查询待上市流通的新债
      * @param param

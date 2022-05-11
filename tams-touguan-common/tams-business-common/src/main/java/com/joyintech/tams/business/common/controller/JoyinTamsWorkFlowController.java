@@ -3,6 +3,7 @@ package com.joyintech.tams.business.common.controller;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.exception.MessageException;
+import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.pojo.Message;
@@ -144,6 +145,7 @@ public class JoyinTamsWorkFlowController  {
 	@ApiOperation(value = "经办人代办中提交", notes = "/common/workflow/handlerSave?taskId=CfetsEtrBondInfo001&processInstanceId=CfetsEtrBondInfo001_btn_submit")
 	@PostMapping("/handlerSubmit")
 	public Message<AjaxResult>  handlerSubmit(){
+		logger.debug("经办人代办中提交,入参:" + JsonUtils.object2Json(request.getParameterMap()));
 		try {
 			//			status: A
 			//			createUser: 1689

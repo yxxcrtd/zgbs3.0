@@ -175,11 +175,15 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
             finProductAddMapper.updateForTenderBound(productAdd);
             finTenderBoundAssetService.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_上市流通);
             if(dto.getListingDate().compareTo(iPlatformDate.getSysDate()) == 0) {//只有当上市日和平台日相等时才发头寸
+                Map<String,String> params = new HashMap();
+                params.put("finprodType2",DictCodeList.平安资产类型_债券.getValue());
+                params.put("finprodMarketId",dto.getAppearMarketId());
+                String finproductId = finTenderBoundAssetMapper.selectFinprodId(params);
                 //调用头寸
-                BaseMap param = BaseMap.newMap().put("userId", "SYSTEM")
+                BaseMap param = BaseMap.newMap().put("userId", StringUtil.getOrElse(SecurityUtil.getLoginUser().getUserName(),"SYSTEM"))
                         .put("totalTradeId", trdFinProductDealTotal.getTotleTradeId())
-                        .put("finprodId", dto.getFinprodId())
-                        .put("marketFinprodId", product.getCirculationCode())
+                        .put("marketFinprodId", finproductId)
+                        .put("listingFinprodId", product.getFinprodId())
                         .put("modelType", DictCodeListExt1.子系统代码_交易.getValue())
                         .put("busiType", DictCodeListExt3.头寸业务类型_上市流通.getValue())
                         .put("busiAct", DictCodeListExt3.业务动作_上市.getValue())
@@ -188,7 +192,9 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                         .put("cdate", iPlatformDate.getSysDate())
                         .put("ccy", product1.getCcy())
                         .put("balanceCheck", DictCodeList.是否_否.getValue())
-                        .put("interfaceType", "Bond001");
+                        .put("interfaceType", "Bond001")
+                        .put("tradePlace",product1.getTradeMarket())
+                        .put("decisionAct",DictCodeListExt3.系统动作_新建.getValue());
                 try {
                     PositionHttpRequest.send(param);
                 } catch (PositionException e) {
