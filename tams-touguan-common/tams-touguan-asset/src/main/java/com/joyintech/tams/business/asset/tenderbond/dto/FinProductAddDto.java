@@ -407,6 +407,12 @@ public class FinProductAddDto {
     private String isPpb;
 
     /**
+     * 是否允许资讯数据覆盖
+     */
+    @ApiModelProperty(name = "isAllowOverwrite", value = "是否允许资讯数据覆盖")
+    private String isAllowOverwrite;
+
+    /**
      * 交易平台
      */
     @ApiModelProperty(name = "tradePlat", value = "交易平台")
@@ -1718,6 +1724,14 @@ public class FinProductAddDto {
      */
     public void setIsPpb(String isPpb) {
         this.isPpb = isPpb == null ? null : isPpb.trim();
+    }
+
+    public String getIsAllowOverwrite() {
+        return isAllowOverwrite;
+    }
+
+    public void setIsAllowOverwrite(String isAllowOverwrite) {
+        this.isAllowOverwrite = isAllowOverwrite;
     }
 
     /**

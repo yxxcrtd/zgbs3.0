@@ -99,7 +99,7 @@ public class RiskUtil {
 	private static Map<String,String> classifyDimensionMap= new HashMap<String, String>() {
 		{
 			put(DictCodeListExt1.分类维度_收益类型.getValue(),"PROFIT_TYPE");
-			put(DictCodeListExt1.分类维度_开放类型.getValue(),"OPEN_TYPE");
+			put(DictCodeListExt1.分类维度_开放类型.getValue(),"PA_PTL_PORTFOLIO.OPEN_TYPE");
 			put(DictCodeListExt1.分类维度_募集方式.getValue(),"RAISE_TYPE");
 			put(DictCodeListExt1.分类维度_投资性质.getValue(),"PA_PTL_PORTFOLIO.INVEST_NATURE");
 			put(BussinessDictCodeListRds.分类维度_是否面向单一投资者.getValue(),"IS_FACE_SINGLEINVESTOR");

@@ -3,6 +3,7 @@ package com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.cont
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
@@ -12,10 +13,13 @@ import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoDetailQueryDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinBondMarketInfoQueryRequest;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.SelectOptionCommonRequest;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.service.FinBondMarketInfoQuery001Service;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.dto.FinListedBondInfoQuery001Dto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +33,8 @@ import java.util.Map;
 @RequestMapping("/asset/finBondMarketInfoQuery001")
 @Api(tags = "债券市场信息查询")
 public class FinBondMarketInfoQuery001Controller extends BaseController {
+
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private FinBondMarketInfoQuery001Service finBondMarketInfoQuery001Service;
@@ -109,6 +115,19 @@ public class FinBondMarketInfoQuery001Controller extends BaseController {
             return Message.success("success", dto);
         } else {
             return Message.fail("资产代码不存在.");
+        }
+    }
+
+    @ApiOperation(value = "债券简称的联想下拉框", notes = "债券简称的联想下拉框")
+    @ResponseBody
+    @PostMapping("getAssetId")
+    public Message<Page<SelectOptionDto>> getAssetId(@RequestBody SelectOptionCommonRequest request) {
+        try {
+            Page<SelectOptionDto> page = finBondMarketInfoQuery001Service.getAssetId(request);
+            return new Message<Page<SelectOptionDto>>().success().setData(page);
+        } catch (Exception e) {
+            logger.error("债券简称下拉框数据异常", e);
+            return new Message<Page<SelectOptionDto>>().fail().setMessage("债券简称的联想下拉框异常");
         }
     }
 
