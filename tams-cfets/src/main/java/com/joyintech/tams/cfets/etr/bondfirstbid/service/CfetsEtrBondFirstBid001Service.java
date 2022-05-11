@@ -245,6 +245,12 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
         //币种
         pageParam.put("ccy", "CNY");
 
+        //资产类型
+        String finprodId = (String) pageParam.get("finprodId");
+        if (StringUtil.isNotEmpty(finprodId)) {
+            pageParam.put("finprodIdList", StringUtil.splitToList(GlobalConstant.COMMA, finprodId));
+        }
+
         PageHelper.startPage(search.getPageMode().getPageNo(), search.getPageMode().getPageSize());
         List<CfetsEtrIBondFirstBidFindIssueInfoDto> list = cfetsEtrBondFirstBid001Mapper.findIssueInfoPage(pageParam);
         return new Page<>(PageInfo.of(list));

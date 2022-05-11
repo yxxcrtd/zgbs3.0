@@ -382,7 +382,13 @@
         left join SYS_DATADICT_LIST sdl6 on aaa.type11 = sdl.ITEM_CODE and sdl.DICT_CODE = 'CUSTOM_ASSET_TYPE_FOUR'
         left join SYS_DATADICT_LIST sdl7 on aaa.ccy = sdl.ITEM_CODE and sdl.DICT_CODE = 'CCY'
         <where>
-            aaa.filterDate  <![CDATA[>=]]> to_date(#{issueDateStart}, 'yyyy-MM-dd')
+            aaa.filterDate  <![CDATA[>=]]> to_date(#{platformDate}, 'yyyy-MM-dd')
+            <if test="finprodIdList != null and finprodIdList.size() > 0">
+                AND aaa.finprodId in
+                <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
             <if test="issueDateStart!=null and issueDateStart!='' and  issueDateEnd!=null and issueDateEnd!='' ">
                 AND aaa.issueDate <![CDATA[>=]]> to_date(#{issueDateStart}, 'yyyy-MM-dd')
                 AND aaa.issueDate <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd')
