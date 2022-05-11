@@ -398,12 +398,12 @@ public class PortfolioManager extends BaseService {
 
                 infoResponse = new PortfolioInfoResponse();
                 infoResponse.setPortfolioId(item.getPortfolioId());
-                infoResponse.setProAvailablePositionT0((BigDecimal) baseMapList.get(3).get(AMOUNT));
-                infoResponse.setProAvailablePositionT1(null);
-                infoResponse.setProAvailableCashT0((BigDecimal) baseMapList.get(0).get(AMOUNT));
-                infoResponse.setProAvailableCashT1(null);
-                infoResponse.setSecManageAvailableCashT0((BigDecimal) baseMapList.get(1).get(AMOUNT));
-                infoResponse.setSecManageAvailableCashT1(null);
+                infoResponse.setProAvailablePositionT0((ObjectUtil.isNotNull(baseMapList.get(3).get(AMOUNT))) ? (BigDecimal) baseMapList.get(3).get(AMOUNT) : BigDecimal.ZERO);
+                infoResponse.setProAvailablePositionT1(BigDecimal.ZERO);
+                infoResponse.setProAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(0).get(AMOUNT))) ? (BigDecimal) baseMapList.get(0).get(AMOUNT) : BigDecimal.ZERO);
+                infoResponse.setProAvailableCashT1(BigDecimal.ZERO);
+                infoResponse.setSecManageAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(1).get(AMOUNT))) ? (BigDecimal) baseMapList.get(1).get(AMOUNT) : BigDecimal.ZERO);
+                infoResponse.setSecManageAvailableCashT1(BigDecimal.ZERO);
 
                 portfolioInfoResponseMap.put(infoResponse.getPortfolioId(), infoResponse);
             }
