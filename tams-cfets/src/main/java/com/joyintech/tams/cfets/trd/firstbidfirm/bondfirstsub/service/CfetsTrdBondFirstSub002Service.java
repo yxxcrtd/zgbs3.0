@@ -1256,6 +1256,12 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         // 认购量
         if (!StringUtil.isNotEmpty(dto.getSubscriptionAmount())) {
             errorList.add(new ValidMessage("认购量不可为空!"));
+        } else if (BigDecimalUtil.ACompareToB(dto.getSubscriptionAmount(), new BigDecimal(1000), 4) < 0) {//认购量需要大于1000
+            errorList.add(new ValidMessage("认购量需要大于0.1万元!"));
+        }
+        // 结算手续费 需要大于零
+        if (BigDecimalUtil.ACompareToB(dto.getSettFeeAmt(), BigDecimal.ZERO, 4) < 0) {
+            errorList.add(new ValidMessage("结算手续费不允许为负数!"));
         }
         // 应缴款金额
         if (!StringUtil.isNotEmpty(dto.getPayableAmount())) {
