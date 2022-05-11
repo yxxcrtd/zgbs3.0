@@ -2153,7 +2153,8 @@
                     $("#entrustNum_label_" + currentTab).text("指令数量").append($star.clone());
                     $("#entrustAmt_label_" + currentTab).text("标准券数量").append($star.clone());
                     $("#entrustPriceUnit_" + currentTab).text("%");
-                    $("#entrustAmtUnit_" + currentTab).text("张");
+                    $("#entrustAmtUnit_" + currentTab).text("万元");
+                    $("#entrustNumUnit_" + currentTab).text("万元");
 
                     // var entrustAmt = $("#standardBondVolume_" + currentTab).val();
                     // $("#entrustAmt_" + currentTab).val(Math.floor(new Number(entrustAmt)));
@@ -2367,6 +2368,10 @@
                     $("#entrustNumUnit_" + currentTab).text("张");
                 }
                 //债券交易数量单位 edit by yeming 20210729 end
+                if(ps == PS_T68 || ps == PS_T69) {
+                    $("#entrustAmtUnit_" + currentTab).text("万元");
+                    $("#entrustNumUnit_" + currentTab).text("万元");
+                }
             }
         }
         // if 画面.金融产品类型（债券） = 质押式回购
@@ -3308,8 +3313,17 @@
                 $("#targetType_div_" + currentTab).hide();
             }
 
-            if (finprodType2 == FINPROD_TYPE_TG_F01) {
-                $("#entrustNumUnit_" + currentTab).text("张");
+            if (finprodType2 == FINPROD_TYPE_TG_F01 && (ps == PS_T68 || ps == PS_T69)) {
+                $("#entrustAmtUnit_" + currentTab).text("万元");
+                $("#entrustNumUnit_" + currentTab).text("万元");
+                var entrustAmt = $("#entrustAmt_" + currentTab).val();
+                if(entrustAmt){
+                    $("#entrustAmt_" + currentTab).val(entrustAmt/100);
+                }
+                var entrustNum = $("#entrustNum_" + currentTab).val();
+                if(entrustNum){
+                    $("#entrustNum_" + currentTab).val(entrustNum/100);
+                }
             }
 
 
@@ -4162,6 +4176,15 @@
         //         return;
         //     }
         // }
+        if(object.finprodType2 == FINPROD_TYPE_TG_F01 && (object.ps == PS_T68 || object.ps == PS_T69)){
+            if(object.entrustNum){
+                object.entrustNum = object.entrustNum * 100;
+            }
+            if(object.entrustAmt){
+                object.entrustAmt = object.entrustAmt * 100;
+            }
+        }
+
         //TODO 风险和授信
         if (object.operateType === 'save') {
             Joyin.confirm("请确认是否要保存", function () {
