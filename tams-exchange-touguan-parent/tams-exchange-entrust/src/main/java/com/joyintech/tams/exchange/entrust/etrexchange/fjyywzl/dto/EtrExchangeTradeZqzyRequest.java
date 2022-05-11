@@ -41,6 +41,8 @@ public class EtrExchangeTradeZqzyRequest {
     @ApiModelProperty(name="pageMode",value="分页对象",example="{pageSize: 10,pageNo: 1, sort: 'name', direction: 'asc'}")
     private PageMode pageMode;
 
+    private String finprodMarketId;
+
     public PageMode getPageMode() {
         return pageMode;
     }
@@ -57,6 +59,14 @@ public class EtrExchangeTradeZqzyRequest {
     public String getDirection() {
         return pageMode.getDirection();
 
+    }
+
+    public String getFinprodMarketId() {
+        return finprodMarketId;
+    }
+
+    public void setFinprodMarketId(String finprodMarketId) {
+        this.finprodMarketId = finprodMarketId;
     }
 
     public String getSearch() {
