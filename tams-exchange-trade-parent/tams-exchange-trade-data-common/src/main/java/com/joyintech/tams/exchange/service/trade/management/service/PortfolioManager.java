@@ -348,7 +348,7 @@ public class PortfolioManager extends BaseService {
     /**
      * 组合计算
      *
-     * @param bean    下单对象
+     * @param bean     下单对象
      * @param infoFlag 是否查询组合信息
      * @return 组合计算结果
      */
@@ -550,8 +550,8 @@ public class PortfolioManager extends BaseService {
         BigDecimal leftAmt = isVolume ? BigDecimal.ZERO : NumberUtil.sub(instruction.getEntrustAmt(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity());
         long leftNum = isVolume ? NumberUtil.sub(instruction.getEntrustNum(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity()).longValue() : 0L;
         for (PortfolioCalculateResponse item : list) {
-            calculateResponse.setInstructionLeftAmt(NumberUtil.div(NumberUtil.mul(leftAmt, item.getEntrustAmt()), orderAmt));
-            calculateResponse.setInstructionLeftNum(NumberUtil.div(leftNum * item.getEntrustNum(), orderVolume).longValue());
+            calculateResponse.setInstructionLeftAmt(orderAmt.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : NumberUtil.div(NumberUtil.mul(leftAmt, item.getEntrustAmt()), orderAmt));
+            calculateResponse.setInstructionLeftNum(orderVolume.compareTo(BigDecimal.ZERO) == 0 ? 0 : NumberUtil.div(leftNum * item.getEntrustNum(), orderVolume).longValue());
         }
         // 债券交易类，使用全价进行计算后恢复订单价格
 //        recoverPrice(instruction, list, orginEntrustPrice, entrustProp);

@@ -5,10 +5,11 @@ import com.joyintech.tams.exchange.common.bean.MinPrice;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.TickBean;
-import com.joyintech.tams.exchange.common.cache.QuoteTickService;
 import com.joyintech.tams.exchange.common.constant.*;
-import com.joyintech.tams.exchange.common.db.domain.*;
-import com.joyintech.tams.exchange.common.proto.QuoteProto;
+import com.joyintech.tams.exchange.common.db.domain.Instruction;
+import com.joyintech.tams.exchange.common.db.domain.Instrument;
+import com.joyintech.tams.exchange.common.db.domain.OrderInterface;
+import com.joyintech.tams.exchange.common.db.domain.Trade;
 import com.joyintech.tams.exchange.common.utils.CheckParamUtils;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
 import com.joyintech.tams.exchange.common.utils.IntegratedEntrustUtils;
@@ -224,7 +225,9 @@ public class BondHelper {
          * 成交记录中：委托价格（全价），成交价格（全价），成交金额（全价），实时冻结解冻金额（全价）
          */
         if (!EntrustUtils.isFullPrice(instruction.getAssetType(), trade.getEntrustProp(), isFullPrice)) {
-            BigDecimal price = investmentManagement.queryFullPriceByEntrustPriceFromInvest(trade.getTradedPrice(), trade.getTradedVolume(), instruction, getPriceRoundByPriceStep(instrumentService.queryByInnerCode(instruction.getFinprodMarketId())));
+            BigDecimal minPrice = instruction.queryMinPrice(trade.getEntrustProp());
+            int round = Objects.isNull(minPrice) ? 4 : minPrice.scale();
+            BigDecimal price = investmentManagement.queryFullPriceByEntrustPriceFromInvest(trade.getTradedPrice(), trade.getTradedVolume(), instruction, round);
             logger.info("getFullPriceByTradePrice  trade fullPrice {}", price);
             return price;
         }
@@ -232,9 +235,11 @@ public class BondHelper {
         return trade.getTradedPrice();
     }
 
-    public BigDecimal getNetPriceByFullPrice(Trade trade,Instruction instruction) {
-        BigDecimal price = investmentManagement.queryEntrustPriceByFullPriceFromInvest(trade.getFullPrice(), trade.getTradedVolume(), instruction, getPriceRoundByPriceStep(instrumentService.queryByInnerCode(instruction.getFinprodMarketId())));
-        logger.info("getNetPriceByFullPrice  trade fullPrice {}", price);
+    public BigDecimal getNetPriceByFullPrice(Trade trade, Instruction instruction) {
+        BigDecimal minPrice = instruction.queryMinPrice(trade.getEntrustProp());
+        int round = Objects.isNull(minPrice) ? 4 : minPrice.scale();
+        BigDecimal price = investmentManagement.queryEntrustPriceByFullPriceFromInvest(trade.getFullPrice(), trade.getTradedVolume(), instruction, round);
+        logger.info("getNetPriceByFullPrice  trade netPrice {}", price);
         return price;
     }
 

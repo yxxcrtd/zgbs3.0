@@ -556,6 +556,9 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         ValidUtils.valid(dto.getProductAddDto(), validList);
         ValidUtils.valid(dto.getIssueDto(), validList);
         if (Objects.isNull(dto.getIssueDto())) return;
+        if(Objects.nonNull(dto.getVdate()) && Objects.nonNull(dto.getMdate()) && dto.getVdate().compareTo(dto.getMdate()) >= 0) {
+            validList.add(new ValidMessage("起息日不能大于到期日"));
+        }
         if (StringUtil.isNotEmpty(dto.getIssueDto().getIssueClass()) && (StringUtil.equals(dto.getIssueDto().getIssueClass(), DictCodeListExt4.新债_发行方式_招标发行.getValue()) ||
                 StringUtil.equals(dto.getIssueDto().getIssueClass(), DictCodeListExt4.新债_发行方式_簿记建档.getValue()))) {
             if (StringUtil.isEmpty(dto.getIssueDto().getTenderTarget())) {
