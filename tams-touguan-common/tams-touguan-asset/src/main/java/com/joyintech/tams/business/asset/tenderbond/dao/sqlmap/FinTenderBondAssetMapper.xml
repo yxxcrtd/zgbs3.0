@@ -309,7 +309,6 @@
     <select id="getProductAddFromInterface" resultType="com.joyintech.tams.business.asset.tenderbond.dto.FinProductAddDto">
         SELECT
             sec.CROSS_MARKET_CODE as crossMarketCode,
-            ri.BIDDING_METHOD as bidDate,
             ri.LISTING_DATE as listingDate,
             ri.LISTING_CODE as appearMarketId
         FROM INTERF_WIND_UNRELEASE_SEC_INFO sec
@@ -332,12 +331,12 @@
             nvl(pri.BENCHMARK_CURVE_NAME,ri.BENCHMARK_CURVE_NAME) as intRateId,
             nvl(pri.DECIMAL_PLACES,ri.DECIMAL_PLACES) as rateGrade,
             nvl(pri.SPREAD,ri.SPREAD) as bp,
-            nvl(pri.ISSUE_DATE,ri.ISSUE_DATE) as issueDate,
-            nvl(pri.EVENT_DATE,ri.EVENT_DATE) as payDate,
-            nvl(pri.INTEREST_ACCRUAL_DATE,ri.INTEREST_ACCRUAL_DATE) as firstConfirmDate,
+            nvl(to_date(pri.ISSUE_DATE,'yyyy-mm-dd'),ri.ISSUE_DATE) as issueDate,
+            nvl(to_date(pri.EVENT_DATE,'yyyy-mm-dd'),ri.EVENT_DATE) as payDate,
+            nvl(to_date(pri.INTEREST_ACCRUAL_DATE,'yyyy-mm-dd'),ri.INTEREST_ACCRUAL_DATE) as firstConfirmDate,
             ri.ISSUE_START_TIME as issueSdate,
             ri.ISSUE_END_TIME as issueEdate,
-            nvl(pri.EVENT_DATE,ri.PAYMENT_DEADLINE) as payEdate,
+            nvl(to_date(pri.EVENT_DATE,'yyyy-mm-dd'),ri.PAYMENT_DEADLINE) as payEdate,
             ri.DEBT_REGISTRATION_DATE as assignRegdate,
             nvl(pri.SINGLE_MIN_SUB_AMT * 100000000,ri.SINGLE_MIN_SUB_AMT) as minPamt,
             nvl(pri.SINGLE_MAX_SUB_AMT * 100000000,ri.SINGLE_MAX_SUB_AMT) as maxPamt,
@@ -352,7 +351,9 @@
             nvl(pri.CONTINUOUS_TENDER_LIMIT,ri.CONTINUOUS_TENDER_LIMIT) as seriYN,
             nvl(pri.MAX_TOTAL_TENDER_AMT * 100000000,ri.MAX_TOTAL_TENDER_AMT) as maxTotalTender,
             sec.RATE_TYPE as intType,
-            pri.COUPON_PAYMENT_FREQUENCY as payCycle
+            pri.COUPON_PAYMENT_FREQUENCY as payCycle,
+            ri.BID_DATE as  tenderSdate,
+            ri.BID_DATE as tenderEdate
         FROM INTERF_WIND_RELEASE_INFO ri
         LEFT JOIN INTERF_WIND_UNRELEASE_SEC_INFO sec on ri.SEC_ID = sec.SEC_ID
         LEFT JOIN (select * from INTERF_RDI_RELEASE_INFO where SECURITY_TYPE in ('CD','14'))  pri ON pri.SECURITY_ID = ri.SEC_ID

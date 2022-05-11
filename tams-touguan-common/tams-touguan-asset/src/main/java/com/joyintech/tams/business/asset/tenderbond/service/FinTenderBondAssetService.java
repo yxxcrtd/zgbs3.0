@@ -207,12 +207,14 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
             dto.setType11(resultTypeList.get(0).getInputValue4());
         }
         FinProductAddDto addDto = finTenderBondAssetMapper.getProductAddFromInterface(param);
+        addDto.setIsAutoUpdate(DictCodeList.是否_否.getValue());
         if(addDto != null) {
             if(StringUtil.isNotEmpty(addDto.getCrossMarketCode())) {
                 addDto.setCrossMarket(DictCodeList.是否_是.getValue());
             }
             dto.setProductAddDto(addDto);
         }
+        dto.setCapiIncomeFeature(DictCodeList.是否_否.getValue());
         dto.setIssueDto(finTenderBondAssetMapper.getProductIssueFromInterface(param));
         return dto;
     }
