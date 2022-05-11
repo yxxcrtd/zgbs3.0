@@ -3656,7 +3656,6 @@
                             if(businessModel == ''){
                                 Joyin.error("请选择业务模式");
                                 dateTable.deleteRow(data.LAY_TABLE_INDEX);
-                                return;
                             }else{
                                 Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
                                     if(result.data.businessModel){
