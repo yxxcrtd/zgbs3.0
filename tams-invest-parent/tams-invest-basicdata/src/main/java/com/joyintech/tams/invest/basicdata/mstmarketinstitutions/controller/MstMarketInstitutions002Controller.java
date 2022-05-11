@@ -161,7 +161,7 @@ public class MstMarketInstitutions002Controller extends BaseController {
                 dto.setIsIssuer(DictCodeList.是否_是.getValue());
                 model.addAttribute("entity", map.get("data"));
             } else {
-                String regex = "^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{3,40}";
+                String regex = "^[0-9A-Za-z]{1,40}";
                 MstMarketInstitutionsDto dto = new MstMarketInstitutionsDto();
                 dto.setIsIssuer(DictCodeList.是否_是.getValue());
                 if (StringUtil.isNotEmpty(insitituteCode)) {

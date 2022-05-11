@@ -125,7 +125,7 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
     @ApiModelProperty(name="issueType",value="募集方式",required=true)
     private String issueType;
 
-    @ApiModelProperty(name="isSus",value="是否永续",required=true)
+    @ApiModelProperty(name="isSus",value="是否永续")
     private String isSus;
 
     @ApiModelProperty(name="isRight",value="是否含权债",required=true)

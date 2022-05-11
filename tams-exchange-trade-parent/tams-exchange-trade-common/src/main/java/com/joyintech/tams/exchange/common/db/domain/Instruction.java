@@ -188,9 +188,18 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
     @JsonSerialize(using = DoubleSerializerUtils.class)
     private BigDecimal entrustAmt = new BigDecimal("0.00");
 
-    @ApiModelProperty(required = false, name = "entrustNum", value = "委托数量")
+    @ApiModelProperty(required = false, name = "entrustNum", value = "指令数量")
     @Digits(integer = 30, fraction = 4)
     private long entrustNum = 0;
+
+    @ApiModelProperty(name = "entrustNumView", value = "指令数量(展示)")
+    private BigDecimal entrustNumView;
+
+    @ApiModelProperty(name = "leftVolume", value = "剩余数量")
+    private long leftVolume;
+
+    @ApiModelProperty(name = "leftVolumeView", value = "剩余数量(展示)")
+    private BigDecimal leftVolumeView;
 
     @ApiModelProperty(required = false, name = "entrustStatus", value = "委托状态")
     @Size(max = 50)
@@ -1124,6 +1133,30 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
 
     public void setIsNetPrice(String isNetPrice) {
         this.isNetPrice = isNetPrice;
+    }
+
+    public BigDecimal getEntrustNumView() {
+        return entrustNumView;
+    }
+
+    public void setEntrustNumView(BigDecimal entrustNumView) {
+        this.entrustNumView = entrustNumView;
+    }
+
+    public long getLeftVolume() {
+        return leftVolume;
+    }
+
+    public void setLeftVolume(long leftVolume) {
+        this.leftVolume = leftVolume;
+    }
+
+    public BigDecimal getLeftVolumeView() {
+        return leftVolumeView;
+    }
+
+    public void setLeftVolumeView(BigDecimal leftVolumeView) {
+        this.leftVolumeView = leftVolumeView;
     }
 
     public String getTradeSide() {

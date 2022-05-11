@@ -57,6 +57,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -439,6 +440,33 @@ public class InvestmentManagement extends BaseService {
             if (投管业务类型_质押券出入库.getValue().equals(instruction.getBusiTypeTg())) {
                 instruction.setEntrustPrice(NumberUtil.mul(instruction.getEntrustPrice(), 100));
             }
+
+            fillEntrustNumViewAndLeftVolumeView(instruction);
+        }
+    }
+
+    private void fillEntrustNumViewAndLeftVolumeView(Instruction instruction) {
+        if (instruction.volumeInstruction()) {
+            long frozenQuantity = instruction.getFrozenQuantity() == null ? 0 : instruction.getFrozenQuantity().longValue();
+            long entrustLeftAmt = instruction.getEntrustLeftAmt() == null ? 0 : instruction.getEntrustLeftAmt().longValue();
+            long entrustNum = instruction.getEntrustNum();
+            //计算剩余数量=指令数量-冻结数量-成交数量
+            long leftVolume = entrustNum - frozenQuantity - entrustLeftAmt;
+            if (投管业务类型_质押券出入库.getValue().equals(instruction.getBusiTypeTg()) ||
+                    投管业务类型_现券交易.getValue().equals(instruction.getBusiTypeTg())) {
+                //计算指令数量（展示）
+                instruction.setEntrustNumView(BigDecimal.valueOf(entrustNum).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+                instruction.setLeftVolume(leftVolume);
+                instruction.setLeftVolumeView(BigDecimal.valueOf(leftVolume).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+            }else {
+                instruction.setEntrustNumView(BigDecimal.valueOf(entrustNum));
+                instruction.setLeftVolume(leftVolume);
+                instruction.setLeftVolumeView(BigDecimal.valueOf(leftVolume));
+            }
+        } else {
+            instruction.setEntrustNumView(BigDecimal.ZERO);
+            instruction.setLeftVolume(0);
+            instruction.setLeftVolumeView(BigDecimal.ZERO);
         }
     }
 

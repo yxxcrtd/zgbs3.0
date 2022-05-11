@@ -3626,42 +3626,96 @@
                     var ps = $("#ps_" + currentTab).val();
                     if (ps == PS_T68 || ps == PS_T69 || ps == PS_T02 || ps == PS_T49 || ps == PS_T03) {
                         if(ps == PS_T02){ //卖出
-                            Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
-                                if(result.length == 2){
-                                    Joyin.error("组合持有该资产存在多个业务模式,不允许卖出");
-                                    dateTable.deleteRow(data.LAY_TABLE_INDEX);
-                                    return;
-                                }else{
-                                    if(result.data){
-                                        $("#businessModel_" + currentTab).textSelect('setValue', result.data.businessModel);
+                            if(dateTable.getAllRows().length >=2){
+                                Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
+                                    if(result.data.length == 2){
+                                        Joyin.error("组合持有该资产存在多个业务模式，不允许委托方向"+ps);
+                                        dateTable.deleteRow(data.LAY_TABLE_INDEX);
+                                        return;
+                                    }else if(result.data.length == 1){
+                                        $("#businessModel_" + currentTab).textSelect('setValue', result.data[0].BUSINESSMODEL);
                                     }else{
-                                        Joyin.error("组合无该资产持仓数据");
+                                        Joyin.error("组合无选择业务模式的资产持仓");
                                         dateTable.deleteRow(data.LAY_TABLE_INDEX);
                                         return;
                                     }
-                                }
-                            });
+                                })
+                            }else{
+                                Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
+                                    if(result.data.length == 2){
+                                        Joyin.error("组合持有该资产存在多个业务模式,不允许卖出");
+                                        dateTable.deleteRow(data.LAY_TABLE_INDEX);
+                                        return;
+                                    }else{
+                                        if(result.data.length == 1){
+                                            $("#businessModel_" + currentTab).textSelect('setValue', result.data[0].BUSINESSMODEL);
+                                        }else{
+                                            Joyin.error("组合无该资产持仓数据");
+                                            dateTable.deleteRow(data.LAY_TABLE_INDEX);
+                                            return;
+                                        }
+                                    }
+                                });
+                            }
                         }else{
-                            Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
-                                if(result.length == 2){
-                                    Joyin.error("组合持有该资产存在多个业务模式，不允许委托方向"+ps);
-                                    dateTable.deleteRow(data.LAY_TABLE_INDEX);
-                                    return;
-                                }
-                            })
+                            if(dateTable.getAllRows().length >=2){
+                                Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
+                                    if(result.data.length == 2){
+                                        Joyin.error("组合持有该资产存在多个业务模式，不允许委托方向"+ps);
+                                        dateTable.deleteRow(data.LAY_TABLE_INDEX);
+                                        return;
+                                    }else if(result.data.length == 1){
+                                        $("#businessModel_" + currentTab).textSelect('setValue', result.data[0].BUSINESSMODEL);
+                                    }else{
+                                        Joyin.error("组合无选择业务模式的资产持仓");
+                                        dateTable.deleteRow(data.LAY_TABLE_INDEX);
+                                        return;
+                                    }
+                                })
+                            }else {
+                                Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
+                                    if(result.data.length == 2){
+                                        Joyin.error("组合持有该资产存在多个业务模式，不允许委托方向"+ps);
+                                        dateTable.deleteRow(data.LAY_TABLE_INDEX);
+                                        return;
+                                    }
+                                })
+                            }
                         }
                     } else {
                         if(ps == PS_T01){
                             var businessModel = $("#businessModel_" + currentTab).val();
-                            if(businessModel == ''){
-                                Joyin.error("请选择业务模式");
-                                dateTable.deleteRow(data.LAY_TABLE_INDEX);
-                            }else{
+                            if(dateTable.getAllRows().length >=2){
                                 Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
-                                    if(result.data.businessModel){
-                                        $("#businessModel_" + currentTab).textSelect('setValue', result.data.businessModel);
+                                    if(result.data.length != 0){
+                                        if(result.data[0].BUSINESSMODEL != businessModel){
+                                            Joyin.error("业务模式与组合最新持仓业务模式不一致");
+                                            dateTable.deleteRow(data.LAY_TABLE_INDEX);
+                                        }
                                     }
-                                });
+                                })
+                            }else{
+                                if(businessModel == ''){
+                                    Joyin.error("请选择业务模式");
+                                    dateTable.deleteRow(data.LAY_TABLE_INDEX);
+                                }else{
+                                    Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
+                                        if(result.data.length != 0){
+                                            var secId = $("#secId_" + currentTab).val();
+                                            var param2 = {};
+                                            param2.secId = secId;
+                                            Joyin.ajaxSync(basePath + 'invest/entrust/etrexchangetrade/EtrExchangeTrade001/IsBondAsset', param2, function(result1) {
+                                                if(result.data[0].BUSINESSMODEL == 'AC' && result1.data=='3'){
+                                                    $("#businessModel_" + currentTab).val("FVTPL").trigger('change');
+                                                    $("#businessModel_" + currentTab).prop("disabled", true);
+                                                }else{
+                                                    $("#businessModel_" + currentTab).textSelect('setValue', result.data[0].BUSINESSMODEL);
+                                                    $("#businessModel_" + currentTab).prop("disabled", true);
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
                             }
                         }
                     }

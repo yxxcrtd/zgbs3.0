@@ -302,8 +302,8 @@ public class EtrConBond002Controller extends BaseController {
             String[] arr = message.split("\\|");
             if(arr != null && arr.length == 2){
                 String[] arr1 = arr[0].split("\\:");
-                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, arr1[1]) ||
-                        StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, arr1[1])) {
+                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, arr1[1].trim()) ||
+                        StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, arr1[1].trim())) {
                     // 头寸返回对象
                     BaseMap data = JsonUtils.json2Object(arr[1], BaseMap.class);
 
@@ -342,13 +342,13 @@ public class EtrConBond002Controller extends BaseController {
                             }
                         }
                     }
-                    if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, arr1[1])) {
+                    if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, arr1[1].trim())) {
                         strb.append("】，请确认是否继续？");
                         /**
                          * 余额不足，软控确认
                          */
                         BaseMap bm = BaseMap.newMap()
-                                .put("code", arr1[1])
+                                .put("code", arr1[1].trim())
                                 .put("message", strb)
                                 .put("data", data);
                         return new Message().success().setData(bm);

@@ -392,6 +392,22 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @ApiModelProperty(name = "isNoGuard", value = "是否非担保")
     private String isNoGuard;
 
+    @ApiModelProperty(name = "entrustVolumeView", value = "委托数量(展示)")
+    @Digits(integer = 20, fraction = 2)
+    private BigDecimal entrustVolumeView;
+
+    @ApiModelProperty(name = "frozenVolumeView", value = "冻结数量(展示)")
+    @Digits(integer = 20, fraction = 2)
+    private BigDecimal frozenVolumeView;
+
+    @ApiModelProperty(name = "tradedVolumeView", value = "已成交数量(展示)")
+    @Digits(integer = 20, fraction = 2)
+    private BigDecimal tradedVolumeView;
+
+    @ApiModelProperty(name = "cancelVolumeView", value = "撤单数量(展示)")
+    @Digits(integer = 20, fraction = 2)
+    private BigDecimal cancelVolumeView;
+
     public String getSoftSkipMode() {
         return softSkipMode;
     }
@@ -564,6 +580,7 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     public void setEntrustVolume(long entrustVolume) {
         this.entrustVolume = entrustVolume;
     }
+
 
     public BigDecimal getEntrustPrice() {
         return entrustPrice;
@@ -1167,5 +1184,37 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
 
     public void setCounterId(String counterId) {
         this.counterId = counterId;
+    }
+
+    public BigDecimal getEntrustVolumeView() {
+        return entrustVolumeView;
+    }
+
+    public void setEntrustVolumeView(BigDecimal entrustVolumeView) {
+        this.entrustVolumeView = entrustVolumeView;
+    }
+
+    public BigDecimal getFrozenVolumeView() {
+        return frozenVolumeView;
+    }
+
+    public void setFrozenVolumeView(BigDecimal frozenVolumeView) {
+        this.frozenVolumeView = frozenVolumeView;
+    }
+
+    public BigDecimal getTradedVolumeView() {
+        return tradedVolumeView;
+    }
+
+    public void setTradedVolumeView(BigDecimal tradedVolumeView) {
+        this.tradedVolumeView = tradedVolumeView;
+    }
+
+    public BigDecimal getCancelVolumeView() {
+        return cancelVolumeView;
+    }
+
+    public void setCancelVolumeView(BigDecimal cancelVolumeView) {
+        this.cancelVolumeView = cancelVolumeView;
     }
 }
