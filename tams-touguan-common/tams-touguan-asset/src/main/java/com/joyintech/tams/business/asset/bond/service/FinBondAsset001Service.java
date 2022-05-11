@@ -148,6 +148,7 @@ public class FinBondAsset001Service extends BaseService{
     public Page<FinBondAssetResponse> selectForPage(FinBondAssetRequest request) {
         Map<String, Object> pageParam = BeanUtil.object2Map(request);
         pageParam.put("finprodType2", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+        pageParam.put("FINPROD_TYPE_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         pageParam.put("cashType",DictCodeListExt1.现金流二级类型_利息.getValue());
         pageParam.put("finprodType", DictCodeListExt1.现金流业务类型_金融产品.getValue());//现金流业务类型
         if (CollectionUtils.isNotEmpty(request.getIdate())) {

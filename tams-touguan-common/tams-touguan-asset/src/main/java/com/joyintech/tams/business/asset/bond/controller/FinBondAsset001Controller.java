@@ -345,6 +345,7 @@ public class FinBondAsset001Controller extends BaseController{
             FinBondAssetSaveRequest request = finBondAssetService.getBasicInfos(finProdId, null);
             selectedItem.add(request);
         }
+        entity.setOperateType(OperationType.DELETE.name());
         entity.setSelectedItem(selectedItem);
         params.setPageId("FinBondAsset002");
         params.setElementId(entity.getElementId());

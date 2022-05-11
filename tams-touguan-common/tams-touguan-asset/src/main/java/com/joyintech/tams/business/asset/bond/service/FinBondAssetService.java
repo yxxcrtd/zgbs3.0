@@ -1456,4 +1456,8 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
     public int isTransInAsset(String finProdId) {
        return finBondAssetMapper.isTransInAsset(finProdId);
     }
+
+    public Date getMaxTradeDate(String finprodId) {
+        return finBondAssetMapper.getMaxTradeDate(finprodId);
+    }
 }

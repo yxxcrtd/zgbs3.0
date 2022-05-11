@@ -24,6 +24,7 @@ import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,7 +121,11 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
     public FinAssetRateAdjResponse encapFinAssetRateAdjDto(FinAssetRateAdjResponse dto) {
         // 重新查询计算规则、计算规则扩展初始化信息
         Map<String, Object> param = new HashMap<String, Object>();
-        param.put("finprodId", dto.getFinprodId());
+        if (StringUtil.isNotEmpty(dto.getFinprodId())) {
+            param.put("finprodId", dto.getFinprodId());
+        }else if (CollectionUtils.isNotEmpty(dto.getSelectedItem())) {
+            param.put("finprodId", dto.getSelectedItem().get(0).getFinprodId());
+        }
         param.put("finprodType", DictCodeListExt1.现金流业务类型_金融产品.getValue());
         param.put("cashType1", DictCodeListExt1.现金流一级类型_利息.getValue());
         param.put("cashType2", DictCodeListExt1.现金流二级类型_利息.getValue());
@@ -148,6 +153,9 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
             finCashCalcRule.setBaseType(baseType);
             finCashCalcRule.setBaseDateType(baseDateType);
             finCashCalcRule.setBasis(basis);
+            if (!StringUtil.isNotEmpty(entity.getIsInitial())){
+                entity.setIsInitial(DictCodeList.是否_否.getValue());
+            }
             finCashCalcRule.setBranch(branch);
             finCashCalcRule.setYield(yield);
             paFinCashCalcRule.setCashId(cashId);
@@ -179,7 +187,11 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
         List<FinCashCalcRule> finCashCalcRuleList = new ArrayList<FinCashCalcRule>();
         List<PaFinCashCalcRule> paFinCashCalcRuleList = new ArrayList<PaFinCashCalcRule>();
         Map<String, Object> param = new HashMap<String, Object>();
-        param.put("finprodId", dto.getFinprodId());
+        if (StringUtil.isNotEmpty(dto.getFinprodId())) {
+            param.put("finprodId", dto.getFinprodId());
+        }else if (CollectionUtils.isNotEmpty(dto.getSelectedItem())) {
+            param.put("finprodId", dto.getSelectedItem().get(0).getFinprodId());
+        }
         param.put("finprodType", DictCodeListExt1.金融产品类型_通道.getValue());
         List<FinAssetRateAdjResponse> finAssetRateAdjList = selectInitAssetRateAdj(param);
         String cashId = finAssetRateAdjList.get(0).getCashId();
@@ -208,7 +220,7 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
             PaFinCashCalcRule paFinCashCalcRule = new PaFinCashCalcRule();
             FinCashCalcRule finCashCalcRule = new FinCashCalcRule();
             BeanUtil.copyPropertiesIgnoreNull(finCashCalcRule, entity);
-            finCashCalcRule.setFinprodId(dto.getFinprodId());
+            finCashCalcRule.setFinprodId(entity.getFinprodId());
             finCashCalcRule.setFinprodType(DictCodeListExt1.金融产品类型_通道.getValue());
             finCashCalcRule.setFinprodType2(finprodType2);
             finCashCalcRule.setCashId(cashId);
@@ -216,6 +228,9 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
             finCashCalcRule.setBaseType(baseType);
             finCashCalcRule.setBaseDateType(baseDateType);
             finCashCalcRule.setBasis(basis);
+            if (!StringUtil.isNotEmpty(entity.getIsInitial())){
+                entity.setIsInitial(DictCodeList.是否_否.getValue());
+            }
             finCashCalcRule.setBranch(branch);
             finCashCalcRule.setYield(yield);
             paFinCashCalcRule.setCashId(cashId);

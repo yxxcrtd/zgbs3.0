@@ -203,7 +203,7 @@ public class FinBondAsset002Controller extends BaseController{
 
     /**
      *  获取流程中信息
-     * @param getApproveEntity
+     * @param request
      * @return
      */
     @ApiOperation(value = "获取流程中信息", notes = "获取流程中信息")
@@ -534,11 +534,14 @@ public class FinBondAsset002Controller extends BaseController{
         try {
             // 修改查看初始化
             String finprodId = dto.getFinprodId();
+            if(!StringUtil.isNotEmpty(finprodId) && StringUtil.isNotEmpty(dto.getFinprodMarketId())) {
+                finprodId = commonBusinessService.getFinProdId(dto.getFinprodMarketId(),DictCodeListExt1.金融产品类型_投管用_债券.getValue(),null);
+            }
             // 付息计划
             List<BondFinCashPlanDto> invList = new ArrayList<>();
             Date maxTradeDate = null;
             if(StringUtil.isNotEmpty(finprodId)) {
-                maxTradeDate = commonBusinessService.getMaxTradeDate(finprodId);
+                maxTradeDate = finBondAssetService.getMaxTradeDate(finprodId);
                 // 生付息成计划
                 dto.setMaxTradeDate(maxTradeDate);
             }

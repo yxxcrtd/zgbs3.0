@@ -60,13 +60,13 @@
         </if>
         LEFT JOIN FIN_RATE_INFO T6 ON T6.CASH_ID = T5.CASH_ID
         AND T6.EFF_DATE = T1.VDATE
-        left join (select FINPROD_ID, max(eff_date) as EFF_DATE
-        from FIN_CASH_CALC_RULE
-        group by FINPROD_ID
-        ) tempT8
-        on T1.FINPROD_ID = tempT8.FINPROD_ID
-        LEFT JOIN FIN_CASH_CALC_RULE T8 ON T8.FINPROD_ID=tempT8.FINPROD_ID AND T8.EFF_DATE = tempT8.EFF_DATE
-        and T8.CASH_ID = T5.CASH_ID
+        LEFT JOIN  FIN_CASH_CALC_RULE T8
+        ON  T8.FINPROD_ID = T1.FINPROD_ID
+        AND T8.FINPROD_TYPE = #{FINPROD_TYPE_F01}
+        AND	T8.FINPROD_TYPE2 = #{FINPROD_TYPE_F01}
+        AND	T8.BRANCH = 0
+        AND	T8.CASH_ID = T5.CASH_ID
+        AND	T8.IS_INITIAL = 'Y'
         LEFT JOIN MST_CUSTOMER_INFO_ADD T7 ON T7.CUSTOMER_ID = T3.CUSTOMER_ID
         LEFT JOIN FIN_CASH_PAY_RULE T9 ON T9.CASH_ID = T8.CASH_ID AND T8.EFF_DATE = T9.EFF_DATE
         LEFT JOIN (select A.FINPROD_ID,max(A.EXERCISE_DATE) EXERCISE_DATE,A.EXERCISE_TYPE
@@ -88,7 +88,8 @@
         FROM MST_BOND_CREDIT_RATING MBCR
         WHERE MBCR.O_TYPE = '02' AND MBCR.GRADE_DATE <![CDATA[<=]]> TO_DATE(#{platDate},'YYYY-MM-DD')
         ) WHERE RANK=1) BR ON T1.FINPROD_MARKET_ID = BR.ASSET_CODE
-        LEFT JOIN MST_CUSTOMER_INFO T11 ON T11.CUSTOMER_ID=BR.GRADE_ORG_ID) T
+        LEFT JOIN MST_CUSTOMER_INFO T11 ON T11.CUSTOMER_ID=BR.GRADE_ORG_ID
+        where T1.FINPROD_TYPE2 = #{finprodType2}) T
         <where>
             <if test="finprodIdList != null and finprodIdList.size() > 0">
                 AND (T.finprodMarketId IN
@@ -1537,4 +1538,19 @@
             )
     </select>
 
+    <select id="getMaxTradeDate" resultType="java.util.Date">
+        SELECT
+            Max(TRADE_DATE) TRADE_DATE
+        FROM(
+                SELECT Max(TRADE_DATE) TRADE_DATE
+                FROM TRD_PRODUCT_DEAL
+                WHERE FINPROD_ID = #{finprodId} AND TRADE_STATUS = '01' AND (IS_CANCEL='N' or IS_CANCEL IS NULL)
+                  and BUSI_TYPE not in ('24')/*过滤债券预交易数据*/
+                UNION ALL
+                SELECT Max(TRADE_DATE) TRADE_DATE
+                FROM WFL_TRD_PRODUCT_DEAL
+                WHERE FINPROD_ID = #{finprodId}
+                  and BUSI_TYPE not in ('24')/*过滤债券预交易数据*/
+            )
+    </select>
 </mapper>
