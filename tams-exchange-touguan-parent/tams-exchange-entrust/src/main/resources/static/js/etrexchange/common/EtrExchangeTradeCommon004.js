@@ -3627,13 +3627,13 @@
                     if (ps == PS_T68 || ps == PS_T69 || ps == PS_T02 || ps == PS_T49 || ps == PS_T03) {
                         if(ps == PS_T02){ //卖出
                             Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
-                                if(result.length == 2){
+                                if(result.data.length == 2){
                                     Joyin.error("组合持有该资产存在多个业务模式,不允许卖出");
                                     dateTable.deleteRow(data.LAY_TABLE_INDEX);
                                     return;
                                 }else{
-                                    if(result.data){
-                                        $("#businessModel_" + currentTab).textSelect('setValue', result.data.businessModel);
+                                    if(result.data.length == 1){
+                                        $("#businessModel_" + currentTab).textSelect('setValue', result.data[0].BUSINESSMODEL);
                                     }else{
                                         Joyin.error("组合无该资产持仓数据");
                                         dateTable.deleteRow(data.LAY_TABLE_INDEX);
@@ -3643,7 +3643,7 @@
                             });
                         }else{
                             Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
-                                if(result.length == 2){
+                                if(result.data.length == 2){
                                     Joyin.error("组合持有该资产存在多个业务模式，不允许委托方向"+ps);
                                     dateTable.deleteRow(data.LAY_TABLE_INDEX);
                                     return;
@@ -3658,8 +3658,19 @@
                                 dateTable.deleteRow(data.LAY_TABLE_INDEX);
                             }else{
                                 Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
-                                    if(result.data.businessModel){
-                                        $("#businessModel_" + currentTab).textSelect('setValue', result.data.businessModel);
+                                    if(result.data.length != 0){
+                                        var secId = $("#secId_" + currentTab).val();
+                                        var param2 = {};
+                                        param2.secId = secId;
+                                        Joyin.ajaxSync(basePath + 'invest/entrust/etrexchangetrade/EtrExchangeTrade001/IsBondAsset', param2, function(result1) {
+                                            if(result.data[0].BUSINESSMODEL == 'AC' && result1.data=='3'){
+                                                $("#businessModel_" + currentTab).val("FVTPL").trigger('change');
+                                                $("#businessModel_" + currentTab).prop("disabled", true);
+                                            }else{
+                                                $("#businessModel_" + currentTab).textSelect('setValue', result.data[0].BUSINESSMODEL);
+                                                $("#businessModel_" + currentTab).prop("disabled", true);
+                                            }
+                                        });
                                     }
                                 });
                             }
