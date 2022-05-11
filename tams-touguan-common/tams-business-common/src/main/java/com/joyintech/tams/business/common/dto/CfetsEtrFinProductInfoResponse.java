@@ -939,5 +939,9 @@ public class CfetsEtrFinProductInfoResponse {
         return SysDataUtil.getNameFromDataDict(DictCode.发行类型, this.getIssueStyle());
     }
 
+    public String getBondTypeStr(){
+        return SysDataUtil.getNameFromDataDict(DictCode.行内资产三级分类, this.getBondType());
+    }
+
 
 }
