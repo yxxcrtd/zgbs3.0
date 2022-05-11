@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 public class TraderInfoDto {
 
+    private String seqNo;
     private String dealerPartyNo;
 
     private String dealerPartyType;
@@ -67,5 +68,13 @@ public class TraderInfoDto {
     }
     public String getDealerPartyTypeStr() {
         return SysDataUtil.getNameFromDataDict(DictCode.交易主体类型, this.getDealerPartyType());
+    }
+
+    public String getSeqNo() {
+        return seqNo;
+    }
+
+    public void setSeqNo(String seqNo) {
+        this.seqNo = seqNo;
     }
 }

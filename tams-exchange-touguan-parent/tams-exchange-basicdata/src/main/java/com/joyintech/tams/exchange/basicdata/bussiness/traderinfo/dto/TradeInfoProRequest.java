@@ -15,6 +15,9 @@ public class TradeInfoProRequest {
     @ApiModelProperty(name="pageMode",value="分页对象",example="{pageSize: 10,pageNo: 1, sort: 'name', direction: 'asc'}")
     private PageMode pageMode;
 
+    @ApiModelProperty(name="seqNo",value="流水号",example="A1", required = true)
+    private String seqNo;
+
     @ApiModelProperty(name="isOur",value="本方标识",example="A1", required = true)
     private String isOur;
 
@@ -133,4 +136,11 @@ public class TradeInfoProRequest {
         this.pageMode = pageMode;
     }
 
+    public String getSeqNo() {
+        return seqNo;
+    }
+
+    public void setSeqNo(String seqNo) {
+        this.seqNo = seqNo;
+    }
 }
