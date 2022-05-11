@@ -224,7 +224,8 @@ public class EntrustManagement extends BaseService {
         entrustList.forEach(o -> {
             IntegratedEntrust entrust = new IntegratedEntrust();
             BeanUtils.copyProperties(o, entrust);
-            if (投管业务类型_大宗交易.getValue().equals(entrust.getBusiTypeTg()) && InvestmentAssetType.isBond(entrust.getAssetType())) {
+            if ((投管业务类型_大宗交易.getValue().equals(entrust.getBusiTypeTg()) && InvestmentAssetType.isBond(entrust.getAssetType()))
+                    || 投管业务类型_协议现券.getValue().equals(entrust.getBusiTypeTg())) {
                 //可转债券大宗交易、协议现券 委托价格展示全价
                 entrust.setEntrustPrice(entrust.getFullPrice());
             }
