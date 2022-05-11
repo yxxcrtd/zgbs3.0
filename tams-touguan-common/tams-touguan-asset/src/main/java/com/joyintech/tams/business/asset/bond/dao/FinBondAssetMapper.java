@@ -22,6 +22,7 @@ import com.joyintech.tams.invest.common.dto.period.trdbondduration.TrdBondDurati
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -242,4 +243,9 @@ public interface FinBondAssetMapper {
 	AssetCommonInfoDto getAssetInfoToRateAdj(Map<String, Object> param);
 
 	int deleteFileByBussinessId(@Param("finprodId") String finprodId);
+
+	int isTransInAsset(@Param("finprodId") String finProdId);
+
+	Date getMaxTradeDate(@Param("finprodId") String finProdId);
+
 }

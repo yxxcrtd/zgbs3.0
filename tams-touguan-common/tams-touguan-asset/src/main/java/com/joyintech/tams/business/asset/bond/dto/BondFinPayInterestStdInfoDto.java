@@ -132,6 +132,23 @@ public class BondFinPayInterestStdInfoDto extends BaseEntity {
     private Date maxTradeDate;
 
     /**
+     * 是否还本计划生成计划回调付息计划
+     */
+    @ApiModelProperty(name="iscallbackPayByRepay",value="是否还本计划生成计划回调付息计划")
+    private String iscallbackPayByRepay;
+
+    /**
+     * 是否重新计算利息
+     */
+    @ApiModelProperty(name="isAgainCalInt",value="是否重新计算利息(生成计划传false、确认按钮传true)")
+    private String isAgainCalInt;
+
+    /**
+     * 是否计划区间利息计算
+     */
+    @ApiModelProperty(name="isSubAmtCal",value="是否计划区间利息计算(默认传false)")
+    private String isSubAmtCal;
+    /**
      * 现金流支付规则
      */
     private FinCashPayRule finCashPayRule;
@@ -198,5 +215,29 @@ public class BondFinPayInterestStdInfoDto extends BaseEntity {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getIscallbackPayByRepay() {
+        return iscallbackPayByRepay;
+    }
+
+    public void setIscallbackPayByRepay(String iscallbackPayByRepay) {
+        this.iscallbackPayByRepay = iscallbackPayByRepay;
+    }
+
+    public String getIsAgainCalInt() {
+        return isAgainCalInt;
+    }
+
+    public void setIsAgainCalInt(String isAgainCalInt) {
+        this.isAgainCalInt = isAgainCalInt;
+    }
+
+    public String getIsSubAmtCal() {
+        return isSubAmtCal;
+    }
+
+    public void setIsSubAmtCal(String isSubAmtCal) {
+        this.isSubAmtCal = isSubAmtCal;
     }
 }
