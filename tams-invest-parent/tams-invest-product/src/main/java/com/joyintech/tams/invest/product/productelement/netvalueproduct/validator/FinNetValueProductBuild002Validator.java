@@ -821,7 +821,7 @@ public class FinNetValueProductBuild002Validator implements BeanValidator {
                     openPlanRedList = entity.getBussFinProductOpenPlanRedDto().getFinOpenPlanList();
                 }
 
-                Integer compareResulit = AssetCommonUtil.comparePtlCycle(openPlanList, entity.getBussFinProductOpenPlanDto(), openPlanRedList, entity.getBussFinProductOpenPlanRedDto(), 90);
+                Integer compareResulit = AssetCommonUtil.comparePtlCycle(openPlanList, entity.getBussFinProductOpenPlanDto(), openPlanRedList, entity.getBussFinProductOpenPlanRedDto(), 90, entity.getVdate());
 
                 if (compareResulit != null && compareResulit.equals(-1)) {
                     validList.add(new ValidMessage("bussFinProductOpenPlanRedDto.finOpenPlanList",
