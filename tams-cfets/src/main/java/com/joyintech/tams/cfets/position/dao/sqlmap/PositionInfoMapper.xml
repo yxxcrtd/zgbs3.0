@@ -252,4 +252,21 @@
           AND PSA.PORTFOLIO_ID = #{portfolioId}
           AND R.FINPROD_ID = #{finprodId}
     </select>
+
+    <!--查询券商账户-->
+    <select id="qryPortfolioSecAcctIdAll" resultType="java.lang.String">
+        SELECT DISTINCT
+            B.TRD_ACCT_ID id
+        FROM
+            PTL_SEC_ACCT A
+        INNER JOIN
+            STL_SEC_ACCT_INFO B ON A.ACCT_NO = B.SEC_ACCT_ID
+        inner join STL_CAPACCT_INFO C on B.TRD_ACCT_ID = C.ACCT_NO
+        <where>
+            B.TRADE_PLACE IN ('03','04')
+            <if test="portfolioId != null and !portfolioId.isEmpty()">
+                AND A.PORTFOLIO_ID = #{portfolioId}
+            </if>
+        </where>
+    </select>
 </mapper>

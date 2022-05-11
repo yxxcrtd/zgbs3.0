@@ -541,6 +541,11 @@
         and #{STATUS_VALID_04}= #{effectiveStatus,jdbcType=VARCHAR}
 
     </select>
+
+    <select id="selectBidFormDataByKey"
+            resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmExecFirstBondInfoResponse">
+
+    </select>
     <select id="selectRegTableFenPeiInfoList"
             resultType="com.joyintech.tams.cfets.trdquery.dto.CfetsPortfolioIdFenPeiInfoResponse">
         select reg.entrust_id as entrustId,
