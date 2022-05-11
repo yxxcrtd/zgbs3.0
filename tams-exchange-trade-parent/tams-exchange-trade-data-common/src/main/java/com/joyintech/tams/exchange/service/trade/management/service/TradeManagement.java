@@ -26,11 +26,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.*;
 
 @Component
 public class TradeManagement {
@@ -141,18 +144,23 @@ public class TradeManagement {
                 .collect(Collectors.toList());
         // modify by swwan ZGTFCP-606 只要是交易员下单操作过的都应该能查到 end
         setFutureStockCode(list);
-        List<Trade> trades = fillTradePrice(list);
+        List<Trade> trades = fillTradeInfo(list);
         return ResultBean.success(trades);
     }
 
-    private List<Trade> fillTradePrice(List<Trade> tradeList) {
+    private List<Trade> fillTradeInfo(List<Trade> tradeList) {
         List<Trade> entrusts = Lists.newArrayListWithCapacity(tradeList.size());
         tradeList.forEach(o -> {
             Trade trade = new Trade();
             BeanUtils.copyProperties(o, trade);
-            if ("EX005".equals(trade.getBusiTypeTg())) {
-                trade.setBondVolume(trade.getTradedPrice().multiply(BigDecimal.valueOf(trade.getTradedVolume())).longValue());
+            if (投管业务类型_质押券出入库.getValue().equals(trade.getBusiTypeTg())) {
+                trade.setTradedVolumeView(BigDecimal.valueOf(trade.getTradedVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+                trade.setBondVolume(trade.getTradedPrice().multiply(BigDecimal.valueOf(trade.getTradedVolume())).divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP));
                 trade.setTradedPrice(trade.getTradedPrice().multiply(BigDecimal.valueOf(100)));
+            } else if (投管业务类型_现券交易.getValue().equals(trade.getBusiTypeTg())) {
+                trade.setTradedVolumeView(BigDecimal.valueOf(trade.getTradedVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+            }else if (投管业务类型_通用式质押回购.getValue().equals(trade.getBusiTypeTg())) {
+                trade.setTradedBalance(trade.getTradedBalance().divide(BigDecimal.valueOf(10000), 2, RoundingMode.HALF_UP));
             }
             entrusts.add(trade);
         });
