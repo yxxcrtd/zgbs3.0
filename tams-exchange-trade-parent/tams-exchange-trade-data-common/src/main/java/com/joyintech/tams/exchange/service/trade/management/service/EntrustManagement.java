@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 import static com.joyintech.tams.exchange.common.constant.EntrustProp.*;
 import static com.joyintech.tams.exchange.common.constant.EntrustProp.ETF_APPLY;
 import static com.joyintech.tams.exchange.common.constant.OthCodeType.*;
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.*;
 
 @Component
 public class EntrustManagement extends BaseService {
@@ -169,7 +170,7 @@ public class EntrustManagement extends BaseService {
         entrustList.forEach(o -> {
             Entrust entrust = new Entrust();
             BeanUtils.copyProperties(o, entrust);
-            if ("EX005".equals(entrust.getBusiTypeTg())) {
+            if (投管业务类型_质押券出入库.getValue().equals(entrust.getBusiTypeTg())) {
                 entrust.setEntrustPrice(entrust.getEntrustPrice().multiply(BigDecimal.valueOf(100)));
             }
             entrusts.add(entrust);
@@ -192,14 +193,16 @@ public class EntrustManagement extends BaseService {
             entrustList = entrustList.stream().filter(entrust -> !EntrustType.CANCEL.value.equals(entrust.getEntrustType())/* && ptlAuthList.contains(entrust.getPortfolioId())*/)
                     .sorted((o1, o2) -> DateUtil.compareDate(o2.getCreateTime(), o1.getCreateTime()))
                     .collect(Collectors.toList());
-            return new ResultBean(ErrorCode.SUCCESS, entrustList);
+            List<IntegratedEntrust> integratedEntrusts = fillIntegratedEntrustPrice(entrustList);
+            return new ResultBean(ErrorCode.SUCCESS, integratedEntrusts);
         }
         if (!Strings.isNullOrEmpty(instructionId)) {
             List<IntegratedEntrust> entrustList = integratedEntrustService.queryIntegratedEntrustByInstructionId(instructionId);
             entrustList = entrustList.stream().filter(entrust -> !EntrustType.CANCEL.value.equals(entrust.getEntrustType())/* && ptlAuthList.contains(entrust.getPortfolioId())*/)
                     .sorted((o1, o2) -> DateUtil.compareDate(o2.getCreateTime(), o1.getCreateTime()))
                     .collect(Collectors.toList());
-            return new ResultBean(ErrorCode.SUCCESS, entrustList);
+            List<IntegratedEntrust> integratedEntrusts = fillIntegratedEntrustPrice(entrustList);
+            return new ResultBean(ErrorCode.SUCCESS, integratedEntrusts);
         }
         List<IntegratedEntrust> entrustList = integratedEntrustService.queryByUserId(userId);
         if (!Strings.isNullOrEmpty(accountId)) {
@@ -212,7 +215,22 @@ public class EntrustManagement extends BaseService {
                     .collect(Collectors.toList());
         }
         // modify by swwan ZGTFCP-606 只要是交易员下单操作过的都应该能查到 end
-        return new ResultBean(ErrorCode.SUCCESS, entrustList);
+        List<IntegratedEntrust> integratedEntrusts = fillIntegratedEntrustPrice(entrustList);
+        return new ResultBean(ErrorCode.SUCCESS, integratedEntrusts);
+    }
+
+    private List<IntegratedEntrust> fillIntegratedEntrustPrice(List<IntegratedEntrust> entrustList) {
+        List<IntegratedEntrust> entrusts = Lists.newArrayListWithCapacity(entrustList.size());
+        entrustList.forEach(o -> {
+            IntegratedEntrust entrust = new IntegratedEntrust();
+            BeanUtils.copyProperties(o, entrust);
+            if (投管业务类型_大宗交易.getValue().equals(entrust.getBusiTypeTg()) && InvestmentAssetType.isBond(entrust.getAssetType())) {
+                //可转债券大宗交易、协议现券 委托价格展示全价
+                entrust.setEntrustPrice(entrust.getFullPrice());
+            }
+            entrusts.add(entrust);
+        });
+        return entrusts;
     }
 
     public ResultBean cancelEntrust(String userId, String entrustId) {
@@ -649,9 +667,9 @@ public class EntrustManagement extends BaseService {
     /**
      * 查询配股申购等代码
      *
-     * @param entrustProp   委托属性
-     * @param instruction   指令
-     * @return  申报等代码
+     * @param entrustProp 委托属性
+     * @param instruction 指令
+     * @return 申报等代码
      */
     public String getOthCodeFromInvestment(@NotBlank String entrustProp, @NotNull Instruction instruction) {
         String othCode = instruction.getFinprodMarketId();
