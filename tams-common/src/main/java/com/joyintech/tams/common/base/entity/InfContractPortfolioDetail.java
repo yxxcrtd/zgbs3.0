@@ -1,20 +1,9 @@
 package com.joyintech.tams.common.base.entity;
 
-import com.joyintech.framework.base.BaseEntity;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class InfContractPortfolioDetail extends BaseEntity {
-    /**
-     * 流水号
-     */
-    private String seqno;
-
-    /**
-     * 组合代码
-     */
-    private String portfolioId;
-
+public class InfContractPortfolioDetail extends InfContractPortfolioDetailKey {
     /**
      * 组合名称
      */
@@ -54,22 +43,6 @@ public class InfContractPortfolioDetail extends BaseEntity {
     private String updateUser;
 
     private Date updateTime;
-
-    public String getSeqno() {
-        return seqno;
-    }
-
-    public void setSeqno(String seqno) {
-        this.seqno = seqno == null ? null : seqno.trim();
-    }
-
-    public String getPortfolioId() {
-        return portfolioId;
-    }
-
-    public void setPortfolioId(String portfolioId) {
-        this.portfolioId = portfolioId == null ? null : portfolioId.trim();
-    }
 
     public String getPortfolioName() {
         return portfolioName;

@@ -170,4 +170,11 @@ public interface EntrustMsgbyMQMapper {
     String selectPledgeId(String getvTradeId);
 
     // List<TrdProductDeal> getTrdProductDealByFTradeId(String fTradeId);
+
+    /**
+     * 查询下单组合明细数据
+     * @param seqNo
+     * @return
+     */
+    List<InfContractPortfolioDetail> getInfContractPortfolioDetails(String seqNo);
 }

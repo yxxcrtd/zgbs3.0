@@ -3,7 +3,7 @@
 <mapper namespace="com.joyintech.tams.common.base.dao.InfContractPortfolioDetailMapper">
   <resultMap id="BaseResultMap" type="com.joyintech.tams.common.base.entity.InfContractPortfolioDetail">
     <id column="SEQNO" jdbcType="VARCHAR" property="seqno" />
-    <result column="PORTFOLIO_ID" jdbcType="VARCHAR" property="portfolioId" />
+    <id column="PORTFOLIO_ID" jdbcType="VARCHAR" property="portfolioId" />
     <result column="PORTFOLIO_NAME" jdbcType="VARCHAR" property="portfolioName" />
     <result column="SHARE_AMT" jdbcType="DECIMAL" property="shareAmt" />
     <result column="TRADE_AMT" jdbcType="DECIMAL" property="tradeAmt" />
@@ -20,18 +20,20 @@
     SEQNO, PORTFOLIO_ID, PORTFOLIO_NAME, SHARE_AMT, TRADE_AMT, ENTRUST_NUM, ENTRUST_AMT, 
     TARGET_TYPE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME
   </sql>
-  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+  <select id="selectByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.InfContractPortfolioDetailKey" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from BS303INIT_TEST1008_MFX.INF_CONTRACT_PORTFOLIO_DETAIL
+    from INF_CONTRACT_PORTFOLIO_DETAIL
     where SEQNO = #{seqno,jdbcType=VARCHAR}
+      and PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
-    delete from BS303INIT_TEST1008_MFX.INF_CONTRACT_PORTFOLIO_DETAIL
+  <delete id="deleteByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.InfContractPortfolioDetailKey">
+    delete from INF_CONTRACT_PORTFOLIO_DETAIL
     where SEQNO = #{seqno,jdbcType=VARCHAR}
+      and PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
   </delete>
   <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.InfContractPortfolioDetail">
-    insert into BS303INIT_TEST1008_MFX.INF_CONTRACT_PORTFOLIO_DETAIL (SEQNO, PORTFOLIO_ID, PORTFOLIO_NAME, 
+    insert into INF_CONTRACT_PORTFOLIO_DETAIL (SEQNO, PORTFOLIO_ID, PORTFOLIO_NAME,
       SHARE_AMT, TRADE_AMT, ENTRUST_NUM, 
       ENTRUST_AMT, TARGET_TYPE, CREATE_USER, 
       CREATE_DEPT, CREATE_TIME, UPDATE_USER, 
@@ -43,7 +45,7 @@
       #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.InfContractPortfolioDetail">
-    insert into BS303INIT_TEST1008_MFX.INF_CONTRACT_PORTFOLIO_DETAIL
+    insert into INF_CONTRACT_PORTFOLIO_DETAIL
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="seqno != null">
         SEQNO,
@@ -128,11 +130,8 @@
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.common.base.entity.InfContractPortfolioDetail">
-    update BS303INIT_TEST1008_MFX.INF_CONTRACT_PORTFOLIO_DETAIL
+    update INF_CONTRACT_PORTFOLIO_DETAIL
     <set>
-      <if test="portfolioId != null">
-        PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR},
-      </if>
       <if test="portfolioName != null">
         PORTFOLIO_NAME = #{portfolioName,jdbcType=VARCHAR},
       </if>
@@ -168,11 +167,11 @@
       </if>
     </set>
     where SEQNO = #{seqno,jdbcType=VARCHAR}
+      and PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.InfContractPortfolioDetail">
-    update BS303INIT_TEST1008_MFX.INF_CONTRACT_PORTFOLIO_DETAIL
-    set PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR},
-      PORTFOLIO_NAME = #{portfolioName,jdbcType=VARCHAR},
+    update INF_CONTRACT_PORTFOLIO_DETAIL
+    set PORTFOLIO_NAME = #{portfolioName,jdbcType=VARCHAR},
       SHARE_AMT = #{shareAmt,jdbcType=DECIMAL},
       TRADE_AMT = #{tradeAmt,jdbcType=DECIMAL},
       ENTRUST_NUM = #{entrustNum,jdbcType=DECIMAL},
@@ -184,5 +183,6 @@
       UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
       UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
     where SEQNO = #{seqno,jdbcType=VARCHAR}
+      and PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
   </update>
 </mapper>
