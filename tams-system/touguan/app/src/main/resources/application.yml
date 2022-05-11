@@ -503,7 +503,7 @@ url:
   batch: http://192.168.90.243:8084/main/about/refreshCache
 
 #消息推送方式:1-MQ；2-接口(开发使用)
-trd-info-push-mode: 2
+trd-info-push-mode: 1
 
 ---
 spring:
