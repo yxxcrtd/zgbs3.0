@@ -170,7 +170,7 @@ public class MessageSenderManagement extends BaseService {
                 } else {
                     logger.error("不支持当前推送业务：pushType={}", pushType);
                     recordLog.setStatus(2);
-                    recordLog.setRemark("不支持当前推送业务");
+                    recordLog.setRemark("不支持当前推送业务:pushType=" + pushType);
                 }
             } catch (Exception e) {
                 logger.error("推送MQ失败：【{}】", JsonUtils.getJsonFromObject(basicMessage));
@@ -180,7 +180,7 @@ public class MessageSenderManagement extends BaseService {
         }
         //推送接口
         else if (trdInfoPushMode == INTERFACE) {
-            Message<String> result = null;
+            Message<Object> result = null;
             if (pushType == 1) {
                 result = sendMessage(basicMessage, TradeServiceURL.pushTrade);
             } else if (pushType == 2) {
@@ -190,7 +190,7 @@ public class MessageSenderManagement extends BaseService {
             } else {
                 logger.error("不支持当前推送业务：pushType={}", pushType);
                 recordLog.setStatus(2);
-                recordLog.setRemark("不支持当前推送业务");
+                recordLog.setRemark("不支持当前推送业务:pushType=" + pushType);
             }
 
             if (Objects.nonNull(result)) {
@@ -205,19 +205,19 @@ public class MessageSenderManagement extends BaseService {
                 recordLog.setRemark("推送接口失败");
             }
         } else {
-            logger.error("不支持当前推送方式：trdInfoPushMode={}", trdInfoPushMode);
+            logger.error("不支持当前推送方式：pushMode={}", trdInfoPushMode);
             recordLog.setStatus(2);
-            recordLog.setRemark("不支持当前推送方式");
+            recordLog.setRemark("不支持当前推送方式：pushMode=" + trdInfoPushMode);
         }
         recordLogService.update(recordLog);
     }
 
-    private Message<String> sendMessage(Object msg, String url) {
+    private Message<Object> sendMessage(Object msg, String url) {
         try {
             String sendUrl = ServiceApplication.TRADE_SERVICE_NAME + url;
             Map<String, Object> param = Maps.newHashMap();
             param.put("mesInfo", JsonUtils.getJsonFromObject(msg));
-            Message<String> result;
+            Message<Object> result;
             if (isSingle) {
                 result = simpleRestTemplate.postForObject(sendUrl, param, Message.class);
             } else {
@@ -227,7 +227,7 @@ public class MessageSenderManagement extends BaseService {
             return result;
         } catch (Exception e) {
             logger.error("【推送消息】接口失败，" + e.getMessage(), e);
-            return new Message<>(ResultBean.error(ErrorCode.API_RETURN_ERROR));
+            return new Message<Object>(ResultBean.error(ErrorCode.API_RETURN_ERROR));
         }
     }
 
