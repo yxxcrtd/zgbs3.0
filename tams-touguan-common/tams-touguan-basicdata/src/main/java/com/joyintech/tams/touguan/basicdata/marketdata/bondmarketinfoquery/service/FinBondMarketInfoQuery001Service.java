@@ -108,7 +108,7 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
      */
     public List<ValidMessage> addCoupons(String secId) {
         logger.info("addCoupons >> 债券市场加券参数：secId：【{}】", secId);
-        FinProduct finProduct = finProductMapper.selectByPrimaryKey(secId);
+        FinProduct finProduct = finProductMapper.selectByFinprodMarketId(secId);
         List<ValidMessage> validMessages = new ArrayList<>();
         if (finProduct != null) {
             validMessages.add(new ValidMessage("该债券信息在系统中已存在，无法加券！"));
