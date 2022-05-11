@@ -341,7 +341,7 @@ public class FinNetValueProductBuild002Dto extends FinProduct implements Process
      */
     private String directDisclosureRiskFlag;
 
-    @NotEmpty(fieldName = "FinProductBuild002.directDisclosureRiskFlag")
+    //@NotEmpty(fieldName = "FinProductBuild002.directDisclosureRiskFlag")
     public String getDirectDisclosureRiskFlag() {
         return directDisclosureRiskFlag;
     }
