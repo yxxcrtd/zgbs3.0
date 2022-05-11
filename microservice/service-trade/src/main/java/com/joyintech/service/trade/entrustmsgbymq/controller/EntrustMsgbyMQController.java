@@ -30,9 +30,9 @@ public class EntrustMsgbyMQController {
 
 
     @PostMapping("/processFanout")
-    public Message processFanout(@RequestBody Map<String, Object> map) {
+    public Message<Object> processFanout(@RequestBody Map<String, Object> map) {
         String tradeMessageStr = (String) map.get("mesInfo");
-        Message message = new Message();
+        Message<Object> message = new Message<>();
         try {
             TradeMessage tradeMessage = JSON.parseObject(tradeMessageStr, TradeMessage.class);
             if (tradeMessage != null) {
@@ -51,9 +51,9 @@ public class EntrustMsgbyMQController {
     }
 
     @PostMapping("/processManualSettleTrade")
-    public Message processManualSettleTrade(@RequestBody Map<String, Object> map) {
+    public Message<Object> processManualSettleTrade(@RequestBody Map<String, Object> map) {
         String tradeMessageStr = (String) map.get("mesInfo");
-        Message message = new Message();
+        Message<Object> message = new Message<>();
         try {
             TradeMessage tradeMessage = JSON.parseObject(tradeMessageStr, TradeMessage.class);
             if (tradeMessage != null) {
@@ -71,9 +71,9 @@ public class EntrustMsgbyMQController {
     }
 
     @PostMapping("/updateOrderFinishAmt")
-    public Message updateOrderFinishAmt(@RequestBody Map<String, Object> map) {
+    public Message<Object> updateOrderFinishAmt(@RequestBody Map<String, Object> map) {
         String tradeMessageStr = (String) map.get("mesInfo");
-        Message message = new Message();
+        Message<Object> message = new Message<>();
         try {
             OrderFinishAmtMessage tradeMessage = JSON.parseObject(tradeMessageStr, OrderFinishAmtMessage.class);
             if (tradeMessage != null) {

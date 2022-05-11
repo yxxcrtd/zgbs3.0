@@ -20,7 +20,7 @@ import java.util.List;
  * @see FinListedBondInfoQuery001Dto
  * @since 1.0
  */
-@ApiModel(value = "债券市场列表信息查看", description = "债券市场列表信息查看")
+@ApiModel(value = "债券市场列表详情信息查看", description = "债券市场列表详情信息查看")
 public class FinListedBondInfoQuery001Dto extends BaseDto {
 
     @ApiModelProperty(name = "secId", value = "债券ID/资产代码")
@@ -231,14 +231,12 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "delistingDate", value = "摘牌日")
     private Date delistingDate;
 
-
     @ApiModelProperty(name = "finBondPayHSrcSecOptionDto", value = "行权计划信息")
     private List<FinBondPayHSrcSecOptionDto> bondPayHSrcSecOptionDtos;
 
     @ApiModelProperty(name = "bondMarketCashPlanDtos", value = "付息计划信息")
     private List<FinBondMarketCashPlanDto> bondMarketCashPlanDtos;
-
-
+    
     public String getSecId() {
         return secId;
     }

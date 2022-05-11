@@ -1,6 +1,7 @@
 package com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
@@ -40,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -332,8 +334,8 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
         List<CfetsTrdBondFirstSubEntrustDto> cfetsTrdBondFirstSubEntrustDtos = cfetsTrdBondFirstSub001Mapper.listEntrust(param);
         if (CollectionUtils.isNotEmpty(cfetsTrdBondFirstSubEntrustDtos)) {
             cfetsTrdBondFirstSubEntrustDtos.forEach(item -> {
-                if (StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_待接收.getValue())
-                        || (StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_待接收.getValue()) && item.getTransactioncom().compareTo(BigDecimal.ZERO) != 0)) {
+                if (/*StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_待接收.getValue())
+                        ||*/ (StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已接收.getValue()) && item.getTransactioncom().compareTo(BigDecimal.ZERO) != 0)) {
                     errorList.add(new ValidMessage("只可对待分发或者已接收执行进度为0的指令执行退回操作!"));
                 }
                 param.put("entrustId", item.getEntrustId());
@@ -357,6 +359,8 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
      * @author jiangpeng
      * @date 2022/4/21 14:28
      */
+    @Transactional(rollbackFor = Exception.class)
+    @DTXTransaction
     public AjaxResult entrustRefuce(Map<String, Object> param) {
         param.put("rekReason", (String) param.get("remark"));
         return cfetsEtrDispatcherService.refuseEntrust(param);
@@ -499,10 +503,6 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
         param.put("YN_N", DictCodeListExt1.是否_否.getValue());
         param.put("entrustIdList",param.get("entrustIds"));
         String loginUserId = LoginUserUtil.getUserName();
-        // 测试代码
-        if ("admin".equals(loginUserId)||StringUtil.isNotEmpty(loginUserId)) {
-            loginUserId = "jp";
-        }
         param.put("loginUserId", loginUserId);
     }
 

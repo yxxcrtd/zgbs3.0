@@ -2,219 +2,297 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.joyintech.service.riskrds.limitmanagement.supervisionindividuation.dao.RskSupervisionIndividuationMapper">
 	<sql id="sql1">
-	A.CONDITION_ID conditionId,
+		A.CONDITION_ID conditionId,
 	A.CONDITION_ITEM conditionItem,
 	A.CONTROL_TYPE controlType,
 	A.VALUE_STR valueStr,
-	A.VALUE_END valueEnd
+	A.VALUE_END valueEnd,
+	A.DATE_STR,
+	A.DATE_END,
+	A.DATE_UNIT_STR,
+	A.DATE_UNIT_END
 	</sql>
 	<sql id="sql5">
-	B.UNITE_ID uniteId,
+		B.UNITE_ID uniteId,
 	B.UNITE_IND_ID uniteIndId,
 	B.REMARK remark
 	</sql>
-	
+
 	<select id="selectIndividuationForPage" resultType="com.joyintech.service.riskrds.limitmanagement.supervisionindividuation.dto.RskIndividConditionDto">
-	select 
-	<include refid="sql1" />
-	from RSK_INDIVID_CONDITION A
-	<where>
-	A.PRT_BAG_ID = #{prtBagId,jdbcType=VARCHAR}
-	AND A.IND_ID = #{indId,jdbcType=VARCHAR}
-	</where>
+		select
+		<include refid="sql1" />
+		<choose>
+			<when test="portfolioLevel != null and portfolioLevel != '' and portfolioLevel =='01'">
+				,A.PROCESS_MODEL
+				from RSK_INDIVID_CONDITION_VIEW  A
+			</when>
+			<otherwise>
+				from RSK_INDIVID_CONDITION A
+			</otherwise>
+		</choose>
+		<where>
+			A.PRT_BAG_ID = #{prtBagId,jdbcType=VARCHAR}
+			AND A.IND_ID = #{indId,jdbcType=VARCHAR}
+		</where>
 	</select>
 	<select id="selectUniteForPage" resultType="com.joyintech.service.riskrds.limitmanagement.supervisionindividuation.dto.RskIndividUniteDto">
-	select 
-	LISTAGG(t.IND_ID,',') WITHIN GROUP(ORDER BY t.IND_ID) uniteIndId,
-	t.UNITE_ID uniteId,
-	t.REMARK remark
-	from RSK_INDIVID_UNITE t
-	where t.UNITE_ID in (select UNITE_ID from RSK_INDIVID_UNITE
-		where PRT_BAG_ID=#{prtBagId,jdbcType=VARCHAR} and IND_ID=#{indId,jdbcType=VARCHAR}) 
-		and t.IND_ID!=#{indId,jdbcType=VARCHAR} group by t.UNITE_ID,t.REMARK
+		select
+		LISTAGG(t.IND_ID,',') WITHIN GROUP(ORDER BY t.IND_ID) uniteIndId,
+		t.UNITE_ID uniteId,
+		t.REMARK remark
+		<choose>
+			<when test="portfolioLevel != null and portfolioLevel != '' and portfolioLevel =='01'">
+				,t.PROCESS_MODEL processModel
+				from RSK_INDIVID_UNITE_VIEW  t
+			</when>
+			<otherwise>
+				from RSK_INDIVID_UNITE t
+			</otherwise>
+		</choose>
+		where t.UNITE_ID in (select UNITE_ID
+		<choose>
+			<when test="portfolioLevel != null and portfolioLevel != '' and portfolioLevel =='01'">
+				from RSK_INDIVID_UNITE_VIEW
+			</when>
+			<otherwise>
+				from RSK_INDIVID_UNITE
+			</otherwise>
+		</choose>
+		where PRT_BAG_ID=#{prtBagId,jdbcType=VARCHAR} and IND_ID=#{indId,jdbcType=VARCHAR})
+		and t.IND_ID!=#{indId,jdbcType=VARCHAR} and PRT_BAG_ID=#{prtBagId,jdbcType=VARCHAR}
+		<choose>
+			<when test="portfolioLevel != null and portfolioLevel != '' and portfolioLevel =='01'">
+				group by t.UNITE_ID,t.REMARK,t.PROCESS_MODEL
+			</when>
+			<otherwise>
+				group by t.UNITE_ID,t.REMARK
+			</otherwise>
+		</choose>
 	</select>
 	<select id="findPageForAssetDel" resultType="com.joyintech.service.riskrds.limitmanagement.supervisionindividuation.dto.RskIndividAssetDelDto">
-	select 
-	A.DEL_ID delId,
-	A.START_DATE startDate,
-	A.END_DATE endDate,
-	A.FINPROD_ID finprodId,
-	B.FINPROD_NAME finprodName
-	from 
-	RSK_INDIVID_ASSET_DEL A
-	left join FIN_PRODUCT B on A.FINPROD_ID = B.FINPROD_ID
-	<where>
-	A.PRT_BAG_ID = #{prtBagId,jdbcType=VARCHAR}
-	AND A.IND_ID = #{indId,jdbcType=VARCHAR}
-	</where>
+		select
+		A.DEL_ID delId,
+		A.START_DATE startDate,
+		A.END_DATE endDate,
+		A.FINPROD_ID finprodId,
+		nvl(B.FINPROD_NAME,B.FINPROD_ABBR) finprodName
+		<choose>
+			<when test="portfolioLevel != null and portfolioLevel != '' and portfolioLevel =='01'">
+				,A.PROCESS_MODEL processModel
+				from RSK_INDIVID_ASSET_DEL_VIEW A
+			</when>
+			<otherwise>
+				from RSK_INDIVID_ASSET_DEL A
+			</otherwise>
+		</choose>
+		left join FIN_PRODUCT B on A.FINPROD_ID = B.FINPROD_ID
+		<where>
+			A.PRT_BAG_ID = #{prtBagId,jdbcType=VARCHAR}
+			AND A.IND_ID = #{indId,jdbcType=VARCHAR}
+		</where>
 	</select>
-	
+
 	<delete id="deleteAllCondition" parameterType="com.joyintech.tams.common.base.entity.RskIndividCondition">
 		delete from RSK_INDIVID_CONDITION
 		where PRT_BAG_ID = #{prtBagId,jdbcType=VARCHAR}
-		and IND_ID = #{indId,jdbcType=VARCHAR}
+		  and IND_ID = #{indId,jdbcType=VARCHAR}
 	</delete>
 	<delete id="deleteAllUnite" parameterType="com.joyintech.service.riskrds.limitmanagement.supervisionindividuation.dto.RskSupervisionIndividuationDto">
 		delete from RSK_INDIVID_UNITE t1
-		where 
-		t1.UNITE_ID in (select distinct t2.UNITE_ID from RSK_INDIVID_UNITE t2
-		where t2.PRT_BAG_ID = #{prtBagId,jdbcType=VARCHAR}
-		and t2.IND_ID = #{indId,jdbcType=VARCHAR}
-		)
+		where
+				t1.UNITE_ID in (select distinct t2.UNITE_ID from RSK_INDIVID_UNITE t2
+								where t2.PRT_BAG_ID = #{prtBagId,jdbcType=VARCHAR}
+								  and t2.IND_ID = #{indId,jdbcType=VARCHAR}
+			)
 	</delete>
 	<delete id="deleteAllAssetDel" parameterType="com.joyintech.service.riskrds.limitmanagement.supervisionindividuation.dto.RskSupervisionIndividuationDto">
 		delete from RSK_INDIVID_ASSET_DEL
 		where PRT_BAG_ID = #{prtBagId,jdbcType=VARCHAR}
-		and IND_ID = #{indId,jdbcType=VARCHAR}
+		  and IND_ID = #{indId,jdbcType=VARCHAR}
 	</delete>
 	<delete id="deleteAllSpecialStage" parameterType="com.joyintech.service.riskrds.limitmanagement.supervisionindividuation.dto.RskSupervisionIndividuationDto">
 		delete from RSK_INDIVID_SPECIAL_STAGE
 		where PRT_BAG_ID = #{prtBagId,jdbcType=VARCHAR}
-		and IND_ID = #{indId,jdbcType=VARCHAR}
+		  and IND_ID = #{indId,jdbcType=VARCHAR}
 	</delete>
 	<select id="queryUniteIndIdList" resultType="com.joyintech.framework.select.SelectOptionDto">
-	select 
-	A.IND_ID id,
-	B.IND_NAME text
-	from RSK_PORTFOLIO_INDICATOR A
-	left join RSK_ISUP_INDICATOR B on A.IND_ID = B.IND_ID
-	<where>
-	A.IND_ID != #{indId}
-	and A.PORTFOLIO_ID = #{prtBagId}
-	<!-- modify by wangshuang 修复字段超长造成的系统异常 start -->
-	<if test="initValue != null and initValue != ''">
-		and A.IND_ID in ${initValue}
-	</if>
-	<!-- modify by wangshuang 修复字段超长造成的系统异常 end -->
-	<if test="search != null and search != ''">
-		and A.IND_ID like concat('%',concat(#{search,jdbcType=VARCHAR},'%'))
-		</if>
-	</where> 
+		select
+		A.IND_ID id,
+		B.IND_NAME text
+		from RSK_PORTFOLIO_INDICATOR A
+		left join RSK_ISUP_INDICATOR B on A.IND_ID = B.IND_ID
+		<where>
+			A.IND_ID != #{indId}
+			and A.PORTFOLIO_ID = #{prtBagId}
+			<!-- modify by wangshuang 修复字段超长造成的系统异常 start -->
+			<if test="initValue != null and initValue != ''">
+				and A.IND_ID in ${initValue}
+			</if>
+			<!-- modify by wangshuang 修复字段超长造成的系统异常 end -->
+			<if test="search != null and search != ''">
+				and A.IND_ID like concat('%',concat(#{search,jdbcType=VARCHAR},'%'))
+			</if>
+		</where>
+	</select>
+	<select id="queryUniteIndIdList_RULE" resultType="com.joyintech.framework.select.SelectOptionDto">
+		select
+		A.IND_ID id,
+		B.IND_NAME text
+		from RSK_RULE_INDICATOR A
+		left join RSK_ISUP_INDICATOR B on A.IND_ID = B.IND_ID
+		<where>
+			A.IND_ID != #{indId}
+			and A.RULE_ID = #{prtBagId}
+			<!-- modify by wangshuang 修复字段超长造成的系统异常 start -->
+			<if test="initValue != null and initValue != ''">
+				and A.IND_ID in ${initValue}
+			</if>
+			<!-- modify by wangshuang 修复字段超长造成的系统异常 end -->
+			<if test="search != null and search != ''">
+				and A.IND_ID like concat('%',concat(#{search,jdbcType=VARCHAR},'%'))
+			</if>
+		</where>
 	</select>
 	<select id="queryFinprodIdList" resultType="com.joyintech.framework.select.SelectOptionDto">
-	select 
-	A.FINPROD_ID id,
-	A.FINPROD_NAME text
-	from FIN_PRODUCT A
-	<where>
-		A.FINPROD_TYPE !='F16'
-		<if test="search != null and search != ''">
-		and A.FINPROD_ID like concat('%',concat(#{search,jdbcType=VARCHAR},'%'))
-		</if>
-		<if test="initValue != null and initValue != ''">
-		and A.FINPROD_ID = #{initValue}
-		</if>
-	</where>
+		select
+		A.FINPROD_ID id,
+		A.FINPROD_NAME text
+		from FIN_PRODUCT A
+		<where>
+			A.FINPROD_TYPE !='F16'
+			<if test="search != null and search != ''">
+				and A.FINPROD_ID like concat('%',concat(#{search,jdbcType=VARCHAR},'%'))
+			</if>
+			<if test="initValue != null and initValue != ''">
+				and A.FINPROD_ID = #{initValue}
+			</if>
+		</where>
 	</select>
-	
+
 	<select id="findPageForSpecial" resultType="com.joyintech.service.riskrds.limitmanagement.supervisionindividuation.dto.RskIndividSpecialStageDto">
-	select 
-	UNITE_ID uniteId,
-	UNITE_TYPE uniteType,
-	START_DATE startDate,
-	END_DATE endDate,
-	WARN_COND warnCond,
-	APPROVE_COND approveCond,
-	FOUL_COND foulCond
-	from RSK_INDIVID_SPECIAL_STAGE
-	<where>
-	IND_ID = #{indId,jdbcType=VARCHAR}
-	and PRT_BAG_ID = #{prtBagId,jdbcType=VARCHAR}
-	and FINPROD_ID is null
-	</where>
+		select
+		UNITE_ID uniteId,
+		UNITE_TYPE uniteType,
+		START_DATE startDate,
+		END_DATE endDate,
+		WARN_COND warnCond,
+		APPROVE_COND approveCond,
+		FOUL_COND foulCond
+		<choose>
+			<when test="portfolioLevel != null and portfolioLevel != '' and portfolioLevel =='01'">
+				,PROCESS_MODEL processModel
+				from RSK_INDIVID_SPECIAL_STAGE_VIEW
+			</when>
+			<otherwise>
+				from RSK_INDIVID_SPECIAL_STAGE
+			</otherwise>
+		</choose>
+		<where>
+			IND_ID = #{indId,jdbcType=VARCHAR}
+			and PRT_BAG_ID = #{prtBagId,jdbcType=VARCHAR}
+			and FINPROD_ID is null
+		</where>
 	</select>
-	
+
 	<select id="findPageForSpecialAsset" resultType="com.joyintech.service.riskrds.limitmanagement.supervisionindividuation.dto.RskIndividSpecialAssetDto">
-	select 
-	A.UNITE_ID uniteId,
-	A.START_DATE startDate,
-	A.UNITE_TYPE uniteType,
-	A.END_DATE endDate,
-	A.WARN_COND warnCond,
-	A.APPROVE_COND approveCond,
-	A.FOUL_COND foulCond,
-	A.FINPROD_ID finprodId,
-	B.FINPROD_NAME finprodName
-	from RSK_INDIVID_SPECIAL_STAGE A
-	left join FIN_PRODUCT B on A.FINPROD_ID = B.FINPROD_ID
-	<where>
-	A.IND_ID = #{indId,jdbcType=VARCHAR}
-	and A.PRT_BAG_ID = #{prtBagId,jdbcType=VARCHAR}
-	and A.FINPROD_ID is not null
-	</where>
+		select
+		A.UNITE_ID uniteId,
+		A.START_DATE startDate,
+		A.UNITE_TYPE uniteType,
+		A.END_DATE endDate,
+		A.WARN_COND warnCond,
+		A.APPROVE_COND approveCond,
+		A.FOUL_COND foulCond,
+		A.FINPROD_ID finprodId,
+		nvl(B.FINPROD_NAME,B.FINPROD_ABBR) finprodName
+		<choose>
+			<when test="portfolioLevel != null and portfolioLevel != '' and portfolioLevel =='01'">
+				,A.PROCESS_MODEL processModel
+				from RSK_INDIVID_SPECIAL_STAGE_VIEW A
+			</when>
+			<otherwise>
+				from RSK_INDIVID_SPECIAL_STAGE A
+			</otherwise>
+		</choose>
+		left join FIN_PRODUCT B on A.FINPROD_ID = B.FINPROD_ID
+		<where>
+			A.IND_ID = #{indId,jdbcType=VARCHAR}
+			and A.PRT_BAG_ID = #{prtBagId,jdbcType=VARCHAR}
+			and A.FINPROD_ID is not null
+		</where>
 	</select>
 	<select id="getIndType" resultType="java.lang.String">
-	select 
-	IND_TYPE indType
-	from RSK_ISUP_INDICATOR
-	where IND_ID = #{indId,jdbcType=VARCHAR}
+		select
+			IND_TYPE indType
+		from RSK_ISUP_INDICATOR
+		where IND_ID = #{indId,jdbcType=VARCHAR}
 	</select>
 	<select id="getFinprodId" resultType="com.joyintech.framework.select.SelectOptionDto">
-	select 
-	FINPROD_ID id,
-	FINPROD_MARKET_ID text,
-	FINPROD_NAME object
-	from FIN_PRODUCT
-	<where>
-		FINPROD_TYPE !='F16'
-	<if test="search != null and search != ''">
-	 and FINPROD_ID like concat('%',concat(#{search,jdbcType=VARCHAR},'%'))
-	</if>
-	<if test="initValue != null and initValue != ''">
-	and FINPROD_ID = #{initValue}
-	</if>
-	</where>
+		select
+		FINPROD_ID id,
+		FINPROD_MARKET_ID text,
+		FINPROD_NAME object
+		from FIN_PRODUCT
+		<where>
+			FINPROD_TYPE !='F16'
+			<if test="search != null and search != ''">
+				and FINPROD_ID like concat('%',concat(#{search,jdbcType=VARCHAR},'%'))
+			</if>
+			<if test="initValue != null and initValue != ''">
+				and FINPROD_ID = #{initValue}
+			</if>
+		</where>
 	</select>
-	
+
 	<select id="queryForSpecial" resultType="com.joyintech.service.riskrds.limitmanagement.supervisionindividuation.dto.RskIndividSpecialStageDto">
-	select 
-	UNITE_ID uniteId,
-	UNITE_TYPE uniteType,
-	START_DATE startDate,
-	END_DATE endDate,
-	WARN_COND warnCond,
-	APPROVE_COND approveCond,
-	FOUL_COND foulCond
-	from RSK_INDIVID_SPECIAL_STAGE
-	<where>
-	UNITE_ID = #{uniteId,jdbcType=VARCHAR}
-	</where>
+		select
+		UNITE_ID uniteId,
+		UNITE_TYPE uniteType,
+		START_DATE startDate,
+		END_DATE endDate,
+		WARN_COND warnCond,
+		APPROVE_COND approveCond,
+		FOUL_COND foulCond
+		from RSK_INDIVID_SPECIAL_STAGE
+		<where>
+			UNITE_ID = #{uniteId,jdbcType=VARCHAR}
+		</where>
 	</select>
-	
+
 	<select id="queryForAsset" resultType="com.joyintech.service.riskrds.limitmanagement.supervisionindividuation.dto.RskIndividSpecialAssetDto">
-	select 
-	A.UNITE_ID uniteId,
-	A.START_DATE startDate,
-	A.UNITE_TYPE uniteType,
-	A.END_DATE endDate,
-	A.WARN_COND warnCond,
-	A.APPROVE_COND approveCond,
-	A.FOUL_COND foulCond,
-	A.FINPROD_ID finprodId,
-	B.FINPROD_NAME finprodName
-	from RSK_INDIVID_SPECIAL_STAGE A
-	left join FIN_PRODUCT B on A.FINPROD_ID = B.FINPROD_ID
-	<where>
-	A.UNITE_ID = #{uniteId,jdbcType=VARCHAR}
-	</where>
+		select
+		A.UNITE_ID uniteId,
+		A.START_DATE startDate,
+		A.UNITE_TYPE uniteType,
+		A.END_DATE endDate,
+		A.WARN_COND warnCond,
+		A.APPROVE_COND approveCond,
+		A.FOUL_COND foulCond,
+		A.FINPROD_ID finprodId,
+		B.FINPROD_NAME finprodName
+		from RSK_INDIVID_SPECIAL_STAGE A
+		left join FIN_PRODUCT B on A.FINPROD_ID = B.FINPROD_ID
+		<where>
+			A.UNITE_ID = #{uniteId,jdbcType=VARCHAR}
+		</where>
 	</select>
-	
+
 	<select id="getIndName" resultType="java.lang.String">
-	select 
-	B.IND_NAME indName
-	from RSK_ISUP_INDICATOR B 
-	<where>
-	B.IND_ID = #{indId}
-	</where>
+		select
+		B.IND_NAME indName
+		from RSK_ISUP_INDICATOR B
+		<where>
+			B.IND_ID = #{indId}
+		</where>
 	</select>
-	
+
 	<select id="getVdate" resultType="java.lang.String">
-	select 
-	VDATE
-	from PTL_PORTFOLIO
-	<where>
-	PORTFOLIO_ID = #{portfolioId}
-	</where>
+		select
+		VDATE
+		from PTL_PORTFOLIO
+		<where>
+			PORTFOLIO_ID = #{portfolioId}
+		</where>
 	</select>
 	<select id="findAll" resultType="com.joyintech.tams.common.base.entity.RskIndividConditionCustom">
 		<include refid="com.joyintech.tams.common.base.dao.RskIndividConditionCustomMapper.Sql_All_Data"></include>
@@ -229,14 +307,14 @@
 	</select>
 	<select id="checkExistsUsing" resultType="java.lang.Integer">
 		SELECT COUNT(1) FROM RSK_INDIVID_CONDITION_LINE T
-		INNER JOIN RSK_INDIVID_CONDITION_CUSTOM T1
-			ON T.CONDITION_ITEM = T1.CONDITION_ITEM
+								 INNER JOIN RSK_INDIVID_CONDITION_CUSTOM T1
+											ON T.CONDITION_ITEM = T1.CONDITION_ITEM
 		WHERE T1.CONDITION_ITEM = #{conditionItem}
 	</select>
 	<select id="queryConditionList" resultType="com.joyintech.framework.select.SelectOptionDto">
 		SELECT
-			A.CONDITION_ITEM ID,
-			A.CONDITION_NAME TEXT
+		A.CONDITION_ITEM ID,
+		A.CONDITION_NAME TEXT
 		FROM RSK_INDIVID_CONDITION_CUSTOM A
 		<where>
 			<if test="search != null and search != ''">
@@ -249,7 +327,19 @@
 		</where>
 	</select>
 	<select id="findAllCustomizedItem" resultType="com.joyintech.tams.common.base.entity.RskIndividConditionLine">
-		<include refid="com.joyintech.tams.common.base.dao.RskIndividConditionLineMapper.Sql_All_Data"></include>
+		select
+		CONDITION_ID CONDITION_ID, PRT_BAG_ID PRT_BAG_ID, IND_ID IND_ID, CONDITION_ITEM CONDITION_ITEM,
+		CONTROL_TYPE CONTROL_TYPE, VALUE_STR VALUE_STR, VALUE_END VALUE_END, WARN_COND WARN_COND,
+		APPROVE_COND APPROVE_COND, FOUL_COND FOUL_COND, IS_BAG_CALC IS_BAG_CALC
+		<choose>
+			<when test="portfolioLevel != null and portfolioLevel != '' and portfolioLevel =='01'">
+				,PROCESS_MODEL PROCESS_MODEL
+				from RSK_IND_CONDITION_LINE_VIEW  t
+			</when>
+			<otherwise>
+				from RSK_INDIVID_CONDITION_LINE t
+			</otherwise>
+		</choose>
 		<where>
 			PRT_BAG_ID = #{prtBagId,jdbcType=VARCHAR}
 			AND IND_ID = #{indId,jdbcType=VARCHAR}
@@ -257,12 +347,17 @@
 	</select>
 	<delete id="deleteAllConditionLines">
 		DELETE FROM RSK_INDIVID_CONDITION_LINE WHERE PRT_BAG_ID = #{prtBagId,jdbcType=VARCHAR}
-		AND IND_ID = #{indId,jdbcType=VARCHAR}
+												 AND IND_ID = #{indId,jdbcType=VARCHAR}
 	</delete>
 	<select id="findPortfolioByPackId" resultType="java.lang.String">
 		SELECT T.PORTFOLIO_ID FROM RSK_PORTFOLIO_PACKAGE_DTL T
-	 	INNER JOIN RSK_PORTFOLIO_PACKAGE T1
-		ON T.PTL_BAG_ID = T1.PTL_BAG_ID
+									   INNER JOIN RSK_PORTFOLIO_PACKAGE T1
+												  ON T.PTL_BAG_ID = T1.PTL_BAG_ID
 		WHERE T.PTL_BAG_ID = #{prtBagId,jdbcType=VARCHAR}
+	</select>
+	<select id="findPortfolioByRuleId" resultType="java.lang.String">
+		select DISTINCT m.PORTFOLIO_ID  FROM RSK_RULE_PORTFOLIO m where exists (
+				select 1 from RSK_RULE_INDICATOR n where n.IND_ID = #{indId,jdbcType=VARCHAR} and m.RULE_ID=n.RULE_ID
+			) and m.PORTFOLIO_ID =#{prtBagId,jdbcType=VARCHAR}
 	</select>
 </mapper>

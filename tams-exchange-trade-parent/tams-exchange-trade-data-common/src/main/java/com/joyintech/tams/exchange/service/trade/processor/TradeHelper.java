@@ -93,7 +93,7 @@ public class TradeHelper {
     private MsgReceiverManager msgReceiverManager;
     @Autowired
     private EntrustManagement entrustManagement;
-//    @Autowired
+    //    @Autowired
 //    private QuoteTickService quoteTickService;
     @Autowired
     private QuoteService quoteService;
@@ -1339,23 +1339,15 @@ public class TradeHelper {
     /**
      * 填充价格和金额
      */
-    public void fillEntrustPriceAndAmt(OrderPlaceBean orderPlaceBean, PositionInstructionRequest instructionClone) {
+    public void fillEntrustPriceAndAmt(OrderPlaceBean orderPlaceBean, PositionInstructionRequest instructionClone,
+                                       Instruction instruction) {
         String entrustProp = orderPlaceBean.getEntrustProp();
-        //公平交易
-        /*if (isFairTransaction(orderPlaceBean, instructionClone)) {
-            logger.info("公平交易头寸检查...");
-            if (EntrustProp.isMarketPrice(entrustProp)) {
-                instructionClone.setEntrustNum(orderPlaceBean.getEntrustVolume());
-                //取行情涨跌停价
-                this.fillQuotePrice(orderPlaceBean, instructionClone);
-            } else {
-                instructionClone.setEntrustNum(orderPlaceBean.getEntrustVolume());
-                instructionClone.setEntrustPrice(orderPlaceBean.getEntrustPrice());
-                instructionClone.setFullPrice(orderPlaceBean.getFullPrice());
-            }
-        }*/
-        //批量委托
-        /*else*/ if (isBatchTransaction(orderPlaceBean)) {
+
+        //价格精度
+        BigDecimal minPrice = instruction.queryMinPrice(entrustProp);
+        int round = Objects.isNull(minPrice) ? 4 : minPrice.scale();
+
+        if (isBatchTransaction(orderPlaceBean)) {
             logger.info("批量委托头寸检查...");
             BatchInfo batchInfo = orderPlaceBean.getBatchInfo();
             //下单笔数
@@ -1364,26 +1356,54 @@ public class TradeHelper {
             int beginVolume = batchInfo.getBeginVolume();
             //数量偏移
             int volumeOffset = batchInfo.getVolumeOffset();
+            //价格偏移
+            BigDecimal priceOffset = batchInfo.getPriceOffset() == null ? BigDecimal.ZERO : batchInfo.getPriceOffset();
+
             //价格类型
             int priceMode = batchInfo.getPriceMode();
             int total = (entrustTimes - 1) * entrustTimes / 2;
             //批量总数量
             int totalVolume = beginVolume * entrustTimes + volumeOffset * total;
             instructionClone.setEntrustNum(totalVolume);
+
+            //起始价格
+            BigDecimal beginPrice;
             if (BatchPriceMode.FIX_AND_INCREASE.value == priceMode) {
                 //起始价格
-                BigDecimal beginPrice = batchInfo.getBeginPrice();
-                //价格偏移
-                BigDecimal priceOffset = batchInfo.getPriceOffset() == null ? BigDecimal.ZERO : batchInfo.getPriceOffset();
-                //平均价格
-                BigDecimal totalPrice = beginPrice.multiply(BigDecimal.valueOf(entrustTimes)).add(priceOffset.multiply(BigDecimal.valueOf(total)));
-                BigDecimal averagePrice = totalPrice.divide(BigDecimal.valueOf(entrustTimes), 4, RoundingMode.HALF_UP);
-                instructionClone.setEntrustPrice(averagePrice);
+                beginPrice = batchInfo.getBeginPrice();
+            } else {
+                //取行情涨跌停价
+                beginPrice = this.queryQuotePrice(orderPlaceBean);
+            }
+            BigDecimal totalEntrustAmt = BigDecimal.ZERO;
+            for (int i = 0; i < entrustTimes; i++) {
+                int entrustVolume = beginVolume + volumeOffset * i;
+                BigDecimal entrustPrice = beginPrice.add(priceOffset.multiply(BigDecimal.valueOf(i)));
+                totalEntrustAmt = totalEntrustAmt.add(entrustPrice.multiply(BigDecimal.valueOf(entrustVolume)));
+            }
+            //指令金额
+            instructionClone.setEntrustAmt(totalEntrustAmt);
 
-                //资产类型是债券
+            //平均价格
+            BigDecimal averagePrice = totalEntrustAmt.divide(BigDecimal.valueOf(totalVolume), round, RoundingMode.HALF_UP);
+            instructionClone.setEntrustPrice(averagePrice);
+        }
+        //市价
+        else if (EntrustProp.isMarketPrice(entrustProp)) {
+            logger.info("市价交易头寸检查...");
+            instructionClone.setEntrustNum(orderPlaceBean.getEntrustVolume());
+            //取行情涨跌停价
+            BigDecimal quotePrice = this.queryQuotePrice(orderPlaceBean);
+            instructionClone.setEntrustPrice(quotePrice);
+            instructionClone.setEntrustAmt(instructionClone.getEntrustPrice().multiply(BigDecimal.valueOf(instructionClone.getEntrustNum())));
+        }
+
+        if (instructionClone.getEntrustPrice() == null) {
+            throw BusinessResultException.create(ErrorCode.REQ_PARAMETER_ERROR, "委托价格取值为空");
+        }
+
+        //资产类型是债券
 //                if (InvestmentAssetType.isBond(instructionClone.getAssetType())) {
-//                    Instrument instrument = instrumentService.queryByInnerCode(orderPlaceBean.getStockCode());
-//                    int round = bondHelper.getPriceRoundByPriceStep(instrument);
 //                    EntrustPriceAndYieldDto dto = new EntrustPriceAndYieldDto();
 //                    dto.setPrice(averagePrice);
 //                    dto.setEntrustVolume(instructionClone.getEntrustNum());
@@ -1395,32 +1415,16 @@ public class TradeHelper {
 //                    instructionClone.setEntrustPrice(dto.getNetPrice());
 //                    instructionClone.setFullPrice(dto.getFullPrice());
 //                }
-            } else {
-                //取行情涨跌停价
-                this.fillQuotePrice(orderPlaceBean, instructionClone);
-            }
-        }
-        //市价
-        else if (EntrustProp.isMarketPrice(entrustProp)) {
-            logger.info("市价交易头寸检查...");
-            instructionClone.setEntrustNum(orderPlaceBean.getEntrustVolume());
-            //取行情涨跌停价
-            this.fillQuotePrice(orderPlaceBean, instructionClone);
-        }
-
-        if (instructionClone.getEntrustPrice() == null) {
-            throw BusinessResultException.create(ErrorCode.REQ_PARAMETER_ERROR, "委托价格取值为空");
-        }
 
         if (InvestmentAssetType.isBond(instructionClone.getAssetType()) && instructionClone.getEntrustPrice() != null) {
             //获取全价
             BigDecimal fullPrice = expireIncomeRateHelper.calculateFullPrice(instructionClone);
             instructionClone.setFullPrice(fullPrice);
         }
-        instructionClone.setEntrustAmt(instructionClone.getEntrustPrice().multiply(BigDecimal.valueOf(instructionClone.getEntrustNum())));
+
     }
 
-    public void fillQuotePrice(OrderPlaceBean orderPlaceBean, PositionInstructionRequest instructionClone) {
+    public BigDecimal queryQuotePrice(OrderPlaceBean orderPlaceBean) {
         ResultBean tickBean = quoteService.getTick(orderPlaceBean.getStockCode());
         if (ErrorCode.isSuccess(tickBean.getErrorCode())) {
             TickBean tick = (TickBean) tickBean.getData();
@@ -1432,23 +1436,7 @@ public class TradeHelper {
             } else {
                 entrustPrice = TradeUtils.getBigDecimal(tick.getUpperLimitPrice(), 4);
             }
-            instructionClone.setEntrustPrice(entrustPrice);
-
-            //资产类型是债券
-//            if (InvestmentAssetType.isBond(instructionClone.getAssetType())) {
-//                Instrument instrument = instrumentService.queryByInnerCode(orderPlaceBean.getStockCode());
-//                int round = bondHelper.getPriceRoundByPriceStep(instrument);
-//                EntrustPriceAndYieldDto dto = new EntrustPriceAndYieldDto();
-//                dto.setPrice(entrustPrice);
-//                dto.setEntrustVolume(instructionClone.getEntrustNum());
-//                dto.setRound(round);
-//
-//                //判断是否全价交易
-//                boolean isFullPrice = FullPriceConst.FULL_PRICE.value.equals(instrument.getIsFullPrice());
-//                investmentManagement.getAllPriceAndYield(instruction, dto, isFullPrice);
-//                instructionClone.setEntrustPrice(dto.getNetPrice());
-//                instructionClone.setFullPrice(dto.getFullPrice());
-//            }
+            return entrustPrice;
         } else {
             throw BusinessResultException.create(ErrorCode.QUOTATION_NOT_EXIST, "未获取到当前资产行情信息");
         }

@@ -33,6 +33,7 @@ import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -48,6 +49,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -91,51 +93,91 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
      * @author jiangpeng
      * @date 2022/4/22 10:56
      */
-    @ApiOperation(value = "审批初始化", notes = "审批页面初始化")
+    @ApiOperation(value = "审批初始化", notes = "审批页面初始化 入参 workflowId isFromToDoList")
     @PostMapping("/initPage")
     @ResponseBody
-    public String initPage() {
-        Model model = null;
+    public Message<Map<String, Object>> initPage(@RequestBody Map<String, Object> map) {
+        Map<String, Object> initPageParams = new HashMap<>();
         // 有效状态
-        model.addAttribute("ISSUE_STATUS", this.getSelectDataFromDataDic(DictCode.发行状态, null));
+        initPageParams.put("ISSUE_STATUS", this.getSelectDataFromDataDic(DictCode.发行状态, null));
         // 发行状态
-        model.addAttribute("STATUS_VALID", this.getSelectDataFromDataDic(DictCode.有效状态, null));
+        initPageParams.put("STATUS_VALID", this.getSelectDataFromDataDic(DictCode.有效状态, null));
         // 债券类型
-        model.addAttribute("BOND_TYPE", this.getSelectDataFromDataDic(DictCode.行内资产四级分类, null));
+        initPageParams.put("BOND_TYPE", this.getSelectDataFromDataDic(DictCode.行内资产四级分类, null));
         // 委托状态_待接收
-        model.addAttribute("ENTRUST_STATUS_02", DictCodeList.委托状态_待接收.getValue());
+        initPageParams.put("ENTRUST_STATUS_02", DictCodeList.委托状态_待接收.getValue());
         // 委托状态_已接收
-        model.addAttribute("ENTRUST_STATUS_03", DictCodeList.委托状态_已接收.getValue());
+        initPageParams.put("ENTRUST_STATUS_03", DictCodeList.委托状态_已接收.getValue());
         // 委托状态_已完成
-        model.addAttribute("ENTRUST_STATUS_04", DictCodeList.委托状态_已完成.getValue());
+        initPageParams.put("ENTRUST_STATUS_04", DictCodeList.委托状态_已完成.getValue());
         // 委托状态_已退回
-        model.addAttribute("ENTRUST_STATUS_05", DictCodeList.委托状态_已退回.getValue());
+        initPageParams.put("ENTRUST_STATUS_05", DictCodeList.委托状态_已退回.getValue());
         // 资金账户类型_托管账户
-        model.addAttribute("acctType_A01", BussinessDictCodeList.资金账户类型_托管账户.getValue());
+        initPageParams.put("acctType_A01", BussinessDictCodeList.资金账户类型_托管账户.getValue());
         // 系统日期
-        model.addAttribute("sysDate", iPlatformDate.getSysDateStr());
+        initPageParams.put("sysDate", iPlatformDate.getSysDateStr());
         // 币种_人民币
-        model.addAttribute("CCY_CNY", DictCodeList.币种_人民币_CNY.getValue());
+        initPageParams.put("CCY_CNY", DictCodeList.币种_人民币_CNY.getValue());
         // 系统参数 【是否支持CSTP下行接口_一级申购】
-        model.addAttribute("IS_SUPPORT_CSTP_FLAG_BONDFIRST", CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST"));
+        initPageParams.put("IS_SUPPORT_CSTP_FLAG_BONDFIRST", CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST"));
         // 登记页面id 用于登记撤销
-        model.addAttribute("PAGE_ID_BOND_FIRST", "TenderBondSub002");
+        initPageParams.put("PAGE_ID_BOND_FIRST", "TenderBondSub002");
         //刷新时间
-        model.addAttribute("ibuQuoteBondFirst_etrTable_refresh_period", CacheUtil.getSysParam("ibuQuoteBond_etrTable_refresh_period"));
-        model.addAttribute("effDate", CacheUtil.getSysParam("ibuVar_quoteEffTime"));
+        initPageParams.put("ibuQuoteBondFirst_etrTable_refresh_period", CacheUtil.getSysParam("ibuQuoteBond_etrTable_refresh_period"));
+        initPageParams.put("effDate", CacheUtil.getSysParam("ibuVar_quoteEffTime"));
 
         //流程id
-        String workflowId = "null".equals(getParam(GlobalConstant.WORKFLOW_ID)) ? null : getParam(GlobalConstant.WORKFLOW_ID);
+        String workflowId = "null".equals(map.get(GlobalConstant.WORKFLOW_ID)) ? null : (String) map.get(GlobalConstant.WORKFLOW_ID);
         String isFromToDoList = getParam("isFromToDoList");
-        CfetsTrdBondFirstSubInfoDto entity = new CfetsTrdBondFirstSubInfoDto();
         if (StringUtil.isNotEmpty(workflowId)) {
-            entity = cfetsTrdBondFirstSub002Service.getBussinessEntityByWorkflowId(workflowId);
-            model.addAttribute(GlobalConstant.WORKFLOW_ID, getParam(GlobalConstant.WORKFLOW_ID));
+            CfetsTrdBondFirstSubInfoDto entity = cfetsTrdBondFirstSub002Service.getBussinessEntityByWorkflowId(workflowId);
+            test(entity);
+            initPageParams.put(GlobalConstant.WORKFLOW_ID, workflowId);
+            initPageParams.put(GlobalConstant.ENTITY, entity);
         }
-        model.addAttribute("quotaPageModel", "new");
-        //卖空模式
-        model.addAttribute(GlobalConstant.ENTITY, entity);
-        return super.init(model);
+        return new Message<Map<String, Object>>(initPageParams).success();
+    }
+
+    /**
+     * 风险试算测试
+     * @author jiangpeng
+     * @date 2022/5/9 10:42
+     * @param entity
+     */
+    private void test(CfetsTrdBondFirstSubInfoDto entity){
+        CfetsEtribdoRiskcalResponse riskcalResponse = entity.getRiskcalResponse();
+        if(StringUtil.isNotEmpty(riskcalResponse)){
+            return;
+        }
+        riskcalResponse = new CfetsEtribdoRiskcalResponse();
+        riskcalResponse.setRiskMathFlag("02");
+        riskcalResponse.setRiskTrialSpan("试算不通过");
+        riskcalResponse.setStdrtninfo("处理成功");
+        List<CfetsEtribdoRiskcalResponse> riskcalReturnList = new ArrayList<>();
+        CfetsEtribdoRiskcalResponse riskcal = new CfetsEtribdoRiskcalResponse();
+        riskcal.setKriCode("80434e46d8bd490cb75b2418bfe53b02");
+        riskcal.setPortfolioCode("AAA1");
+        riskcal.setPortfolioName("AAA1");
+        riskcal.setKriTypeCn("流动性管理类");
+        riskcal.setAssetName("A1");
+        riskcal.setWarningLine(">=2700000.0000万元");
+        riskcal.setApproveLine(">=3000000.0000万元");
+        riskcal.setForbiddenLn("<10%");
+        riskcal.setKriValue("<10%");
+        riskcal.setOldValue("<10%");
+        riskcal.setKriTrend("向好");
+        riskcal.setKriStatus("03");
+        riskcal.setTotalConclu("试算不通过");
+        riskcal.setKriStatusCn("3");
+        riskcal.setKriName("3");
+        riskcal.setKriType("3");
+        riskcal.setKriExpr("3");
+        riskcal.setKriOldExpr("3");
+        riskcalReturnList.add(riskcal);
+        riskcal.setKriCode("80434e46d8bd490cb75b2418bfe51b02");
+        riskcalReturnList.add(riskcal);
+        riskcalResponse.setRiskcalReturnList(riskcalReturnList);
+        entity.setRiskcalResponse(riskcalResponse);
     }
 
 
@@ -242,7 +284,7 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
     @ApiOperation(value = "风险试算check", notes = "风险试算check")
     @PostMapping("doRiskcalCheck")
     public Message<AjaxResult> doRiskcalCheck(@RequestBody RiskCalRequest riskCalRequest) {
-        AjaxResult ajaxResult = cfetsTrdBondFirstSub002Service.riskCheckNotEmpty(riskCalRequest);
+        AjaxResult ajaxResult = null/*cfetsTrdBondFirstSub002Service.riskCheckNotEmpty(riskCalRequest)*/;
         return new Message<AjaxResult>().success().setData(ajaxResult);
     }
 
@@ -252,69 +294,69 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
     public Message<AjaxResult> doRiskcal(@RequestBody RiskCalRequest riskCalRequest) {
         CfetsEtribdoRiskcalResponse result = new CfetsEtribdoRiskcalResponse();
         try {
-            AjaxResult ajaxResult = cfetsTrdBondFirstSub002Service.riskCheckNotEmpty(riskCalRequest);
-            if (CollectionUtils.isNotEmpty(ajaxResult.getErrorList())) {
-                return new Message<AjaxResult>().success().setData(ajaxResult);
-            }
-            Map<String, Object> dataMap = cfetsTrdBondFirstSub002Service.doRiskcalPackage(riskCalRequest);
-            List<String> resultArrList = interfRiskRdsController.doInfBatchData(dataMap, "0", "RSK002", "F01");
-            result.setRiskMathFlag("02");
-            boolean forbidFlag = false;
-            boolean cluflag = true;
-            //是否全部正常
-            boolean allNormalFlag = true;
-            List<CfetsEtribdoRiskcalResponse> resultlist = new ArrayList<>();
-            if (!StringUtil.isEmptyList(resultArrList)) {
-                for (String row : resultArrList) {
-                    ClientData resultArr = JsonUtils.json2Object(row, ClientData.class);
-                    if (StringUtil.isNotEmpty(resultArr) && StringUtil.isNotEmpty(resultArr.getHead())
-                            && StringUtil.isNotEmpty(resultArr.getHead().get("std400msgt"))
-                    ) {
-                        if (StringUtil.equals(resultArr.getHead().get("std400msgt"), "E")) {
-                            return new Message<AjaxResult>().fail().setMessage(resultArr.getHead().get("stdrtninfo").toString());
-                        }
-                    }
-                    if (!StringUtil.isNotEmpty(resultArr) || !StringUtil.isNotEmpty(resultArr.getBody())
-                            || !StringUtil.isNotEmpty(resultArr.getBody().get("RSK_LIST"))
-                            || !StringUtil.isNotEmpty(resultArr.getBody().get("rskStatus"))) {
-                        return new Message<AjaxResult>().success().setMessage("无");
-                    }
-                    List<Map<String, Object>> riskList = (List<Map<String, Object>>) resultArr.getBody().get("RSK_LIST");
-                    for (Map<String, Object> map : riskList) {
-                        if (allNormalFlag && !StringUtil.equals(map.get("kriStatus"), "0")) {
-                            allNormalFlag = false;
-                        }
-                        if (StringUtil.equals(map.get("kriStatus"), "0") && !StringUtil.equals(map.get("kriTrend"), "向好")) {
-                            forbidFlag = true;
-                        }
-//                        map.put("kriStatusCn", cfetsEtrIbBondinfoService.getKriStatusCnByKriStatus(map.get("kriStatus").toString()));
-                        resultlist.add(BeanUtil.mapToObject(map, CfetsEtribdoRiskcalResponse.class));
-                    }
-                    if (!allNormalFlag) {
-                        result.setRiskcalReturnList(resultlist);
-                    }
-                    result.setStdrtninfo(resultArr.getHead().get("stdrtninfo").toString());
-                    //当置为不通过时就不再进来了
-                    if (cluflag) {
-                        if (!StringUtil.equals(resultArr.getBody().get("rskStatus"), "3")) {
-                            if (StringUtil.equals(resultArr.getBody().get("rskStatus"), "4") && forbidFlag) {
-                                cluflag = false;
-                                resultArr.getBody().put("rskStatus", "3");
-                                result.setRskStatus("3");
-                            }
-                        } else {
-                            cluflag = false;
-                        }
-                        if (!cluflag) {
-                            result.setRiskTrialSpan("试算不通过");
-                        } else {
-                            result.setRiskTrialSpan("试算通过");
-                        }
-                    }
-
-                }
-
-            }
+//            AjaxResult ajaxResult = cfetsTrdBondFirstSub002Service.riskCheckNotEmpty(riskCalRequest);
+//            if (CollectionUtils.isNotEmpty(ajaxResult.getErrorList())) {
+//                return new Message<AjaxResult>().success().setData(ajaxResult);
+//            }
+//            Map<String, Object> dataMap = cfetsTrdBondFirstSub002Service.doRiskcalPackage(riskCalRequest);
+//            List<String> resultArrList = interfRiskRdsController.doInfBatchData(dataMap, "0", "RSK002", "F01");
+//            result.setRiskMathFlag("02");
+//            boolean forbidFlag = false;
+//            boolean cluflag = true;
+//            //是否全部正常
+//            boolean allNormalFlag = true;
+//            List<CfetsEtribdoRiskcalResponse> resultlist = new ArrayList<>();
+//            if (!StringUtil.isEmptyList(resultArrList)) {
+//                for (String row : resultArrList) {
+//                    ClientData resultArr = JsonUtils.json2Object(row, ClientData.class);
+//                    if (StringUtil.isNotEmpty(resultArr) && StringUtil.isNotEmpty(resultArr.getHead())
+//                            && StringUtil.isNotEmpty(resultArr.getHead().get("std400msgt"))
+//                    ) {
+//                        if (StringUtil.equals(resultArr.getHead().get("std400msgt"), "E")) {
+//                            return new Message<AjaxResult>().fail().setMessage(resultArr.getHead().get("stdrtninfo").toString());
+//                        }
+//                    }
+//                    if (!StringUtil.isNotEmpty(resultArr) || !StringUtil.isNotEmpty(resultArr.getBody())
+//                            || !StringUtil.isNotEmpty(resultArr.getBody().get("RSK_LIST"))
+//                            || !StringUtil.isNotEmpty(resultArr.getBody().get("rskStatus"))) {
+//                        return new Message<AjaxResult>().success().setMessage("无");
+//                    }
+//                    List<Map<String, Object>> riskList = (List<Map<String, Object>>) resultArr.getBody().get("RSK_LIST");
+//                    for (Map<String, Object> map : riskList) {
+//                        if (allNormalFlag && !StringUtil.equals(map.get("kriStatus"), "0")) {
+//                            allNormalFlag = false;
+//                        }
+//                        if (StringUtil.equals(map.get("kriStatus"), "0") && !StringUtil.equals(map.get("kriTrend"), "向好")) {
+//                            forbidFlag = true;
+//                        }
+////                        map.put("kriStatusCn", cfetsEtrIbBondinfoService.getKriStatusCnByKriStatus(map.get("kriStatus").toString()));
+//                        resultlist.add(BeanUtil.mapToObject(map, CfetsEtribdoRiskcalResponse.class));
+//                    }
+//                    if (!allNormalFlag) {
+//                        result.setRiskcalReturnList(resultlist);
+//                    }
+//                    result.setStdrtninfo(resultArr.getHead().get("stdrtninfo").toString());
+//                    //当置为不通过时就不再进来了
+//                    if (cluflag) {
+//                        if (!StringUtil.equals(resultArr.getBody().get("rskStatus"), "3")) {
+//                            if (StringUtil.equals(resultArr.getBody().get("rskStatus"), "4") && forbidFlag) {
+//                                cluflag = false;
+//                                resultArr.getBody().put("rskStatus", "3");
+//                                result.setRskStatus("3");
+//                            }
+//                        } else {
+//                            cluflag = false;
+//                        }
+//                        if (!cluflag) {
+//                            result.setRiskTrialSpan("试算不通过");
+//                        } else {
+//                            result.setRiskTrialSpan("试算通过");
+//                        }
+//                    }
+//
+//                }
+//
+//            }
             AjaxResult m = new AjaxResult();
             m.setData(result);
             return new Message<AjaxResult>().success().setData(m);

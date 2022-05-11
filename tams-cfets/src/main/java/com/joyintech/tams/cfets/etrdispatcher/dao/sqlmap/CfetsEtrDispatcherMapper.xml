@@ -5,7 +5,7 @@
     <select id="findAllEtrDispatcherCommon" parameterType="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTradeListRequest"
             resultType="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTradeListResponse">
         SELECT * FROM (SELECT T.* FROM(
-        SELECT
+        SELECT distinct
         ETR_ENTRUST_ADD.TARGET_TYPE,
         #{effectFlag} effectFlag,
         ETR_ENTRUST_ADD.ASSET_TYPE1  assetType1,
@@ -1091,7 +1091,13 @@
         ETR_ENTRUST ee
         LEFT JOIN ETR_DISTRIBUTE ed ON ed.ENTRUST_ID  = ee.ENTRUST_ID
         WHERE ee.FINPROD_ID  = #{finprodId,jdbcType=VARCHAR}
-          AND ee.ENTRUST_STATUS  = #{entrustStatus,jdbcType=VARCHAR}
+        AND ee.ENTRUST_STATUS in
+        <if test="statusList != null and statusList.size() > 0">
+            AND
+            <foreach collection="statusList" item="entrustStatus" open="ee.ENTRUST_STATUS IN (" close=")" separator=",">
+                #{entrustStatus,jdbcType=VARCHAR}
+            </foreach>
+        </if>
     </select>
 
     <!-- 交易员与工作量列表查询 -->
@@ -1457,7 +1463,7 @@
         ete.entrust_num/100 shareNum,
         eted.our_ent_num/100 entrustOwnNum,
         eted.lendin_ent_num integrateSecAmount,
-        case when eted.ASSET_TYPE = 'F07' and eted.ASSET_TYPE1 = 'H01' then ete.price * 100 else ete.price end as unitPrice,
+        case when eted.ASSET_TYPE = 'F07' and eted.ASSET_TYPE1 in ('H01','H02') then ete.price * 100 else ete.price end as unitPrice,
         eted.full_price allPrice,
         eted.mature_yield*100 matureYield,
         eted.exer_yield*100 exerYield,
@@ -1468,20 +1474,28 @@
         to_char(eted.payment_date,'yyyy-MM-dd') paymentDate,
         to_char(eted.listing_date,'yyyy-MM-dd')  listingDate,
         /*ete.entrust_num entrustNum,*/
-        case when eted.BUSI_TYPE_POSITION='EX017' THEN round(ete.entrust_num/100,4)
+        case when eted.BUSI_TYPE_POSITION in ('EX017','EX005')  THEN round(ete.entrust_num/100,4)
         when ete.ps in ('T68','T69') THEN round(ete.entrust_num/100,4)
         else ete.entrust_num end entrustNum,
         <!--ete.entrust_amt entrustAmt,
         按照列表查询价格修改 -->
-        decode(
-        eted.ASSET_TYPE,
-        'F01',
-        /*decode(ete.PS,'T03',ete.ENTRUST_AMT,NVL(ete.ENTRUST_NUM * 100, 0 )),*/
-        decode(ete.PS,'T03',ete.ENTRUST_AMT,'03',ete.ENTRUST_AMT/100,'04',ete.ENTRUST_AMT/100,ete.ENTRUST_AMT,'T68',ete.ENTRUST_AMT/100,'T68',ete.ENTRUST_AMT/100,NVL(ete.ENTRUST_NUM * 100, 0 )),
-        'F10',
-        NVL( ete.ENTRUST_NUM * 100, 0 ),
-        NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
-        ) entrustAmt,
+--         decode(
+--         eted.ASSET_TYPE,
+--         'F01',
+--         /*decode(ete.PS,'T03',ete.ENTRUST_AMT,NVL(ete.ENTRUST_NUM * 100, 0 )),*/
+--         decode(ete.PS,'T03',ete.ENTRUST_AMT,'03',ete.ENTRUST_AMT/100,'04',ete.ENTRUST_AMT/100,'T68',ete.ENTRUST_AMT/100,NVL(ete.ENTRUST_NUM * 100, 0 )),
+--         'F10',
+--         NVL( ete.ENTRUST_NUM * 100, 0 ),
+--         'F07',
+--         nvl(ete.ENTRUST_AMT/10000,0),
+--         NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
+--         ) entrustAmt,
+        case
+        when #{busiTypePosition} = 'EX018' then round(nvl(ete.ENTRUST_AMT,0)/10000,3)
+        when eted.ASSET_TYPE = 'F01' then NVL( ete.ENTRUST_NUM * ete.PRICE, 0 )
+        when eted.ASSET_TYPE = 'F10' then NVL( ete.ENTRUST_NUM * 100, 0 )
+        else NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
+        end as entrustAmt,
         eted.deal_mode dealMode,
         eted.term_type termType,
         to_char(eted.MDATE,'yyyy-MM-dd') || ' - ' || to_char(eted.MDATE2,'yyyy-MM-dd') as dueDate,
@@ -1566,7 +1580,7 @@
         ete.entrust_num/100 shareNum,
         eted.our_ent_num/100 entrustOwnNum,
         eted.lendin_ent_num integrateSecAmount,
-        case when eted.ASSET_TYPE = 'F07' and eted.ASSET_TYPE1 = 'H01' then ete.price * 100 else ete.price end as unitPrice,
+        case when eted.ASSET_TYPE = 'F07' and eted.ASSET_TYPE1 in ('H01','H02') then ete.price * 100 else ete.price end as unitPrice,
         eted.full_price allPrice,
         eted.mature_yield*100 matureYield,
         eted.exer_yield*100 exerYield,
@@ -1582,7 +1596,7 @@
         else ete.entrust_num end entrustNum,
         <!--ete.entrust_amt entrustAmt,
            按照列表查询价格修改 -->
-        decode(
+        <!--decode(
         eted.ASSET_TYPE,
         'F01',
         /*decode(ete.PS,'T03',ete.ENTRUST_AMT,NVL(ete.ENTRUST_NUM * 100, 0 )),*/
@@ -1590,7 +1604,24 @@
         'F10',
         NVL( ete.ENTRUST_NUM * 100, 0 ),
         NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
-        ) entrustAmt,
+        ) entrustAmt,-->
+--         decode(
+--         eted.ASSET_TYPE,
+--         'F01',
+--         /*decode(ete.PS,'T03',ete.ENTRUST_AMT,NVL(ete.ENTRUST_NUM * 100, 0 )),*/
+--         decode(ete.PS,'T03',ete.ENTRUST_AMT,'03',ete.ENTRUST_AMT/100,'04',ete.ENTRUST_AMT/100,'T68',ete.ENTRUST_AMT/100,NVL(ete.ENTRUST_NUM * 100, 0 )),
+--         'F10',
+--         NVL( ete.ENTRUST_NUM * 100, 0 ),
+--         'F07',
+--         nvl(ete.ENTRUST_AMT/10000,0),
+--         NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
+--         ) entrustAmt,
+        case
+        when #{busiTypePosition} = 'EX018' then round(nvl(ete.ENTRUST_AMT,0)/10000,3)
+        when eted.ASSET_TYPE = 'F01' then NVL( ete.ENTRUST_NUM * ete.PRICE, 0 )
+        when eted.ASSET_TYPE = 'F10' then NVL( ete.ENTRUST_NUM * 100, 0 )
+        else NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
+        end as entrustAmt,
         eted.deal_mode dealMode,
         eted.term_type termType,
         to_char(eted.MDATE,'yyyy-MM-dd') || ' - ' || to_char(eted.MDATE2,'yyyy-MM-dd') as dueDate,

@@ -47,10 +47,57 @@
             LEFT JOIN FIN_PRODUCT_ISSUE ISSUE ON PRODUCT.FINPROD_ID = ISSUE.FINPROD_ID
             LEFT JOIN FIN_PRODUCT_TYPE PRODUCT_TYPE ON PRODUCT.FINPROD_ID = PRODUCT_TYPE.FINPROD_ID AND PRODUCT_TYPE.BRANCH = 0
             LEFT JOIN MST_CUSTOMER_INFO CUSTOMER_INFO ON PRODUCT.ISSUER = CUSTOMER_INFO.CUSTOMER_ID
-            where PRODUCT.FINPROD_TYPE2=#{finprodType2,jdbcType=VARCHAR} AND PRODUCT.TRADE_MARKET in (#{TRADE_PLACE_01},#{TRADE_PLACE_02})
+            where PRODUCT.FINPROD_TYPE2=#{finprodType2,jdbcType=VARCHAR} AND PRODUCT.TRADE_MARKET in (#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04})
                 and (PRODUCT_ADD.ISSUE_STATUS not in (#{ISSUE_STATUS_02}) or PRODUCT_ADD.ISSUE_STATUS is null) and PRODUCT.CIRCULATION_CODE is null
                 and PRODUCT_ADD.LISTING_DATE=#{listingDate,jdbcType=DATE}
         ) t where t.issueStage=#{issueStage,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectFinprodId" resultType="java.lang.String">
+        select T1.FINPROD_ID from FIN_PRODUCT T1
+        where  1=1
+        <if test="finprodType2 !=null and finprodType2 !=''">
+            AND T1.FINPROD_TYPE2 = #{finprodType2}
+        </if>
+        <if test="TRADE_PLACE_01 != null and TRADE_PLACE_02 !=null">
+            AND T1.TRADE_MARKET in(#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04})
+        </if>
+        AND T1.FINPROD_MARKET_ID=#{finprodMarketId,jdbcType=VARCHAR} AND ROWNUM=1
+    </select>
+
+    <select id="getBusinessData" parameterType="com.joyintech.tams.invest.common.dto.valuationusemerge.WflValidInputParameter" resultType="java.lang.String">
+        select pm.STATUS status
+        from SYS_DATA_PROCESS_MARK pm
+        inner join (
+        select
+        max(HIS_NO)	       HIS_NO,
+        WORKFLOW_ID
+        from SYS_DATA_PROCESS_MARK
+        <where>
+            <if test="pageId != null and pageId !=''">
+                PAGE_ID = #{pageId}
+            </if>
+        </where>
+        group by  WORKFLOW_ID
+        ) tempHis on  pm.HIS_NO = tempHis.HIS_NO and pm.WORKFLOW_ID = tempHis.WORKFLOW_ID
+        <where>
+            <if test="seachMode != null and seachMode !='' and seachMode == '01'.toString()">
+                pm.status in ('A','U','P')
+            </if>
+            <if test="pageId != null and pageId !=''">
+                and pm.PAGE_ID = #{pageId}
+            </if>
+            <if test="businessDataPk1 != null and businessDataPk1 !=''">
+                and pm.BUSINESS_DATA_PK1 = #{businessDataPk1}
+            </if>
+            <if test="businessDataPk2 != null and businessDataPk2 !=''">
+                and pm.BUSINESS_DATA_PK2 = #{businessDataPk2}
+            </if>
+            <if test="workflowId != null and workflowId !=''">
+                and pm.WORKFLOW_ID != #{workflowId}
+            </if>
+        </where>
+        order by pm.create_time desc
     </select>
 
     <select id="selectProduct" resultType="com.joyintech.tams.common.base.entity.FinProduct">

@@ -133,6 +133,9 @@ public class CfetsTrdConfirmTrdCstpMatchResponse {
     @ApiModelProperty(name="totleTradeId",value="汇总登记编号",example="字符串1")
     private String totleTradeId;
 
+    @ApiModelProperty(name="cstpTradeId",value="下行交易编号",example="字符串1")
+    private String cstpTradeId;
+
     @ApiModelProperty(name="selectedItem",value="流水号",example="字符串1")
     private transient List<CfetsTrdConfirmTrdCstpMatchResponse> selectedItem;
 
@@ -402,6 +405,14 @@ public class CfetsTrdConfirmTrdCstpMatchResponse {
 
     public void setTotleTradeId(String totleTradeId) {
         this.totleTradeId = totleTradeId;
+    }
+
+    public String getCstpTradeId() {
+        return cstpTradeId;
+    }
+
+    public void setCstpTradeId(String cstpTradeId) {
+        this.cstpTradeId = cstpTradeId;
     }
 
     public String getCounterIdName() {

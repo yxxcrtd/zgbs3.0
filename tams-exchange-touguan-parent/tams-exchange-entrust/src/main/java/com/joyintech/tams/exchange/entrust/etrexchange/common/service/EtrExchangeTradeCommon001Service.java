@@ -256,6 +256,10 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
     private MstWorkflowCommonService mstWorkflowCommonService;
 
 
+    @Autowired
+    private EtrExchangeTradeCommon001Service etrExchangeTrade001CommonService;
+
+
     /**
      * {@inheritDoc}
      */
@@ -2795,11 +2799,13 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
     private String getTradePlat(String currentTab, String tradeMarket) {
         String tradePlat = DictCodeList.交易平台_竞价撮合平台.getValue();
         if (StringUtils.isNotEmpty(currentTab)) {
+//            if (("dz".equals(currentTab) || currentTab.equals(DictCodeList.交易平台_大宗交易平台.getValue()))
+//                    && DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(tradeMarket)) {
+//                tradePlat = DictCodeList.交易平台_综合协议交易平台.getValue();
+//            } else
             if (("dz".equals(currentTab) || currentTab.equals(DictCodeList.交易平台_大宗交易平台.getValue()))
-                    && DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(tradeMarket)) {
-                tradePlat = DictCodeList.交易平台_综合协议交易平台.getValue();
-            } else if (("dz".equals(currentTab) || currentTab.equals(DictCodeList.交易平台_大宗交易平台.getValue()))
-                    && DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(tradeMarket)) {
+                    && (DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(tradeMarket) ||
+                    DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(tradeMarket))) {
                 tradePlat = DictCodeList.交易平台_大宗交易平台.getValue();
             } else if ("gd".equals(currentTab) || currentTab.equals(DictCodeList.交易平台_固定收益平台.getValue())) {
                 tradePlat = DictCodeList.交易平台_固定收益平台.getValue();
@@ -5332,7 +5338,23 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
      * @date 2021/12/25 0013
      */
     public List<EtrExchangeTradeSaveRequest> selectEtrPortfolioList(EtrExchangeTradeSaveRequest dto) {
-        return etrExchangeTradeCommonMapper.selectEntrustDetail(dto);
+        List<EtrExchangeTradeSaveRequest> list= etrExchangeTradeCommonMapper.selectEntrustDetail(dto);
+        if(!CollectionUtils.isEmpty(list)){
+            return list;
+        }else{
+            ProcessMark processMark = new ProcessMark();
+            processMark.setBusinessDataPk1(dto.getEntrustId());
+            String workflowId = WorkflowContext.getProcessMarkService().getLastWorkflowId(processMark);
+            EtrExchangeTradeSaveRequest  entity = etrExchangeTrade001CommonService.getBussinessEntityByWorkflowId(workflowId);
+            List<EtrExchangeTradePortfolioRequest> portlist=entity.getPortfolioList();
+            List<EtrExchangeTradeSaveRequest> tradeList=new ArrayList<>();
+            for(EtrExchangeTradePortfolioRequest port:portlist){
+                EtrExchangeTradeSaveRequest etrExchangeTrade001Dto = new EtrExchangeTradeSaveRequest();
+                BeanUtil.copyPropertiesIgnoreNull(etrExchangeTrade001Dto, port);
+                tradeList.add(etrExchangeTrade001Dto);
+            }
+            return tradeList;
+        }
     }
 
     /**

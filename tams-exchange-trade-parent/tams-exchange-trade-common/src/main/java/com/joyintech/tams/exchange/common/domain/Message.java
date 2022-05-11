@@ -48,6 +48,11 @@ public class Message<T> implements Serializable {
         }
     }
 
+    public Message(String code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+
     public Message(String code, String message, T data) {
         this.code = code;
         this.message = message;

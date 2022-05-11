@@ -4,10 +4,13 @@
         <Row>
             <Cell order="1" name="资产代码">finprodMarketId</Cell>
             <Cell order="2" name="资产名称">finprodName</Cell>
-            <Cell order="3" name="是否不良资产及其受（收）益权">isBadassetName</Cell>
+            <Cell order="3" name="是否流动性受限">isFlowLimitedStr</Cell>
             <Cell order="4" name="是否国务院银行业监督管理机构另有规定">isRegulationName</Cell>
-            <Cell order="5" name="是否信贷资产及其受（收）益权">isCreditAssetName</Cell>
-            <Cell order="6" name="是否流动性受限">isFlowLimitedStr</Cell>
+            <Cell order="5" name="是否无活跃交易市场且需要采用估值技术确定公允价值资产">isLiquidity1Name</Cell>
+            <Cell order="6" name="是否不具备活跃交易市场或者在活跃市场中无报价，且不能采用估值技术可靠计量公允价值的">isLiquidity2Name</Cell>
+            <Cell order="7" name="是否7个工作日可变现资产">isLiquidity3Name</Cell>
+            <Cell order="8" name="是否不良资产及其受（收）益权">isBadassetName</Cell>
+            <Cell order="9" name="是否信贷资产及其受（收）益权">isCreditAssetName</Cell>
   		</Row>
     </Worksheet>
 </Workbook>

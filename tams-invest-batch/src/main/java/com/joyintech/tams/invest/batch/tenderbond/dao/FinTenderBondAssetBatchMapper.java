@@ -3,6 +3,7 @@ package com.joyintech.tams.invest.batch.tenderbond.dao;
 import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.common.base.entity.InterfPayhsrcsecinfo;
 import com.joyintech.tams.invest.batch.tenderbond.dto.FinTenderBondAssetBatchDto;
+import com.joyintech.tams.invest.common.dto.valuationusemerge.WflValidInputParameter;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -14,6 +15,15 @@ import java.util.Map;
  */
 @Repository
 public interface FinTenderBondAssetBatchMapper {
+
+    /**
+     * 查询金融产品代码
+     *
+     * @param param
+     * @return
+     */
+    String selectFinprodId(Map<String, String> param);
+
     /**
      * 查询待上市流通的新债
      * @param param
@@ -27,6 +37,14 @@ public interface FinTenderBondAssetBatchMapper {
      * @return
      */
     FinProduct selectProduct(Map<String,Object> param);
+
+    /**
+     * 根据查询参数查询留痕表数据
+     *
+     * @param wflValidInputParameter
+     * @return
+     */
+    List<String> getBusinessData(WflValidInputParameter wflValidInputParameter);
 
     /**
      * 查询债券接口表债券数据

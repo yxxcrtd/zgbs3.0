@@ -1,7 +1,11 @@
 package com.joyintech.tams.business.asset.tenderbond.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
+import com.joyintech.framework.json.CustomDateDeserialize;
+import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.tams.constant.DictCode;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
@@ -71,7 +75,7 @@ public class FinTenderBondAsset003Dto extends BaseEntity implements ProcessEntit
      * 发行日
      */
     @ApiModelProperty(name="idate",value="发行日")
-    private Date idate;
+    private Date issueDate;
 
     /**
      * 起息日
@@ -126,6 +130,10 @@ public class FinTenderBondAsset003Dto extends BaseEntity implements ProcessEntit
      */
     @ApiModelProperty(name="elementId",value="要素id")
     private String elementId;
+
+    private String registOrgValue;
+
+    private String tradeMarketValue;
 
 
     public String getFinprodId() {
@@ -187,18 +195,19 @@ public class FinTenderBondAsset003Dto extends BaseEntity implements ProcessEntit
         this.addBatch = addBatch;
     }
 
-    public Date getIdate() {
-        return idate;
+    public Date getIssueDate() {
+        return issueDate;
     }
-
-    public void setIdate(Date idate) {
-        this.idate = idate;
+    @JsonDeserialize(using = CustomDateDeserialize.class)
+    public void setIssueDate(Date issueDate) {
+        this.issueDate = issueDate;
     }
 
     public Date getVdate() {
         return vdate;
     }
 
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setVdate(Date vdate) {
         this.vdate = vdate;
     }
@@ -207,6 +216,7 @@ public class FinTenderBondAsset003Dto extends BaseEntity implements ProcessEntit
         return mdate;
     }
 
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setMdate(Date mdate) {
         this.mdate = mdate;
     }
@@ -231,6 +241,7 @@ public class FinTenderBondAsset003Dto extends BaseEntity implements ProcessEntit
         return listingDate;
     }
 
+    @JsonDeserialize(using = CustomDateDeserialize.class)
     public void setListingDate(Date listingDate) {
         this.listingDate = listingDate;
     }
@@ -281,6 +292,22 @@ public class FinTenderBondAsset003Dto extends BaseEntity implements ProcessEntit
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public void setTradeMarketValue(String tradeMarketValue) {
+        this.tradeMarketValue = tradeMarketValue;
+    }
+
+    public String getTradeMarketValue() {
+        return SysDataUtil.getNameFromDataDict(DictCode.交易场所, this.tradeMarket);
+    }
+
+    public String getRegistOrgValue() {
+        return SysDataUtil.getNameFromDataDict(DictCode.登记托管机构, this.registOrg);
+    }
+
+    public void setRegistOrgValue(String registOrgValue) {
+        this.registOrgValue = registOrgValue;
     }
 
     /**

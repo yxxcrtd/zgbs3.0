@@ -274,7 +274,7 @@
 		        loadonce: true,
 		        rowno: true,
 		        /**20200305 add by taoran 净值化产品，收益型产品，支持添加 删除开放区间 start*/
-		        addbtn: parentPageId == 'FinNetValueProductBuild002' || parentPageId == 'FinProductBuild002',
+		        addbtn: parentPageId == 'FinNetValueProductBuild002' || parentPageId == 'FinProductBuild002' || parentPageId == 'FinPlanNetAsset002' || parentPageId == 'FinPlanProfitAsset002'|| parentPageId == 'FinPlanAssetC002',
 		        /**20200305 add by taoran 净值化产品，收益型产品，支持添加 删除开放区间 end*/
 		        done: function() {
 
@@ -318,7 +318,7 @@
 					,{field:'openVdate', title: 'FinProductOpenRule.table.openCycleVdateEx',sortable:false, type:'date',width : 300,edit: true}
 					,{field:'openNdate', title: 'FinProductOpenRule.table.openNdateEx', sortable:false, type:'date',width : 300 , visible: $('#' + profitType).val() === PROFIT_TYPE_01, edit:true }
 					/**20200305 add by taoran 净值化产品，收益型产品，支持添加 删除开放区间 start*/
-					,{field:'operation', title: 'SysCommon.operation', type:'action', buttons: ['delt'],visible:parentPageId == 'FinNetValueProductBuild002' || parentPageId == 'FinProductBuild002'}
+					,{field:'operation', title: 'SysCommon.operation', type:'action', buttons: ['delt'],visible:parentPageId == 'FinNetValueProductBuild002' || parentPageId == 'FinProductBuild002' || parentPageId == 'FinPlanNetAsset002' || parentPageId == 'FinPlanProfitAsset002'|| parentPageId == 'FinPlanAssetC002'}
 					/**20200305 add by taoran 净值化产品，收益型产品，支持添加 删除开放区间 end*/
 				]
 		    });
@@ -856,7 +856,7 @@
 					getElementByRedId('calcMethod').prop('disabled', true).val('03').trigger('change');
 				}
     		}
-			if (parentPageId == 'FinProductBuild002'||parentPageId === 'FinNetValueProductBuild002'||parentPageId === 'FinOpenPlanMaintenance002'){
+			if (parentPageId == 'FinProductBuild002'||parentPageId === 'FinNetValueProductBuild002'||parentPageId === 'FinOpenPlanMaintenance002' || parentPageId === 'FinPlanNetAsset002' || parentPageId === 'FinPlanProfitAsset002' || parentPageId === 'FinPlanAssetC002'){
 		    		openPlanFinprodId = input_finprodId;
 		    		table.table ? table.reload() : table.load();
 		    		tableRed.table ? tableRed.reload() : tableRed.load();
@@ -1434,14 +1434,16 @@
 	        getElementByRedId('calcRule').val('');
 	        return;
 	    }
-	    if(getElementByRedId('calcRule').val() === CALC_METHOD_01){
-	        getElementByRedId('tradedayRule').val(TDAY_RULE_02).trigger('change').prop('disabled', true);
-	    } else {
-	    	//TISHKBS-1393 start
-	    	getElementByRedId('tradedayRule').prop('disabled', false);
-	        //getElementByRedId('tradedayRule').val('').trigger('change').prop('disabled', false);
-	    	//TISHKBS-1393 end
-	    }
+		if (pageModel != PAGE_MODEL_REFERENCE) {
+			if (getElementByRedId('calcRule').val() === CALC_METHOD_01) {
+				getElementByRedId('tradedayRule').val(TDAY_RULE_02).trigger('change').prop('disabled', true);
+			} else {
+				//TISHKBS-1393 start
+				getElementByRedId('tradedayRule').prop('disabled', false);
+				//getElementByRedId('tradedayRule').val('').trigger('change').prop('disabled', false);
+				//TISHKBS-1393 end
+			}
+		}
 	}
 	var calcRuleChange = function(){
 	//debugger;
@@ -1450,16 +1452,18 @@
 	        getElementById('calcRule').val('');
 	        return;
 	    }
-	    if(getElementById('calcRule').val() === CALC_METHOD_01){
-	        if(pageModel != PAGE_MODEL_REFERENCE){
-	            getElementById('tradedayRule').val(TDAY_RULE_02).trigger('change').prop('disabled', true);
-	        }
-        } else {
-        	//TISHKBS-1393 start
+		if (pageModel != PAGE_MODEL_REFERENCE) {
+			if (getElementById('calcRule').val() === CALC_METHOD_01) {
+				if (pageModel != PAGE_MODEL_REFERENCE) {
+					getElementById('tradedayRule').val(TDAY_RULE_02).trigger('change').prop('disabled', true);
+				}
+			} else {
+				//TISHKBS-1393 start
 //        	getElementById('tradedayRule').val(TDAY_RULE_02).trigger('change').prop('disabled', false);
-            getElementById('tradedayRule').prop('disabled', false);
-            //TISHKBS-1393 end
-        }
+				getElementById('tradedayRule').prop('disabled', false);
+				//TISHKBS-1393 end
+			}
+		}
 	}
 	
 	var preview = function(){
@@ -1530,6 +1534,9 @@
     		$('#bussOpenPlandiv').hide();  
     	}
     	//add 收益型产品不显示预览 20191119 yzg end
+		if(parentPageId === 'FinPlanNetAsset002'||parentPageId === 'FinPlanProfitAsset002'||parentPageId === 'FinPlanAssetC002'){
+			$('#bussOpenPlandiv').hide();
+		}
     	
     	$('#bussOpenPlan_btn_preview').click(function() {
         	preview();
@@ -1708,6 +1715,8 @@
 		if(pageModel != PAGE_MODEL_NEW ){
 			
 		sameFlagChange();
+		}else{
+			getElementById('sameFLag').prop("checked",true).trigger("change");
 		}
 		 // 父画面收益类型联动事件
 		$('#' + profitType).change(profitTypeChangeEx);
@@ -1720,9 +1729,16 @@
         
         /**20200305 add by taoran 净值型产品，开放计划，确认天数不应支持T+0 start*/
         $('#bussFinProductOpenPlanDto_purSpeed').change(function(){
-			if(parentPageId == 'FinNetValueProductBuild002' && $('#FinNetValueProductBuild002_profitType').val() 
+			if((parentPageId == 'FinNetValueProductBuild002'||parentPageId == 'FinPlanNetAsset002'||parentPageId == 'FinPlanProfitAsset002'||parentPageId == 'FinPlanAssetC002') && $('#FinNetValueProductBuild002_profitType').val()
 					== '01' && $('#bussFinProductOpenPlanDto_purSpeed').val() == '0'){
 				$('#bussFinProductOpenPlanDto_purSpeed').val('1');
+			}
+		});
+
+		$('#bussFinProductOpenPlanRedDto_redSpeed').change(function(){
+			if((parentPageId == 'FinNetValueProductBuild002'||parentPageId == 'FinPlanNetAsset002'||parentPageId == 'FinPlanProfitAsset002'||parentPageId == 'FinPlanAssetC002') && $('#FinNetValueProductBuild002_profitType').val()
+				== '01' && $('#bussFinProductOpenPlanRedDto_redSpeed').val() == '0'){
+				$('#bussFinProductOpenPlanRedDto_redSpeed').val('1');
 			}
 		});
         /**20200305 add by taoran 净值型产品，开放计划，确认天数不应支持T+0 end*/

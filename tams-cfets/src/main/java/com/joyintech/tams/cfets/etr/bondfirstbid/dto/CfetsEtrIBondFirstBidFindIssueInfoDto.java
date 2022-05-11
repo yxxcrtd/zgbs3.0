@@ -2,6 +2,10 @@ package com.joyintech.tams.cfets.etr.bondfirstbid.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -27,6 +31,9 @@ public class CfetsEtrIBondFirstBidFindIssueInfoDto {
     @ApiModelProperty(name="issueClass",value="发行方式",example="报价发行/招标发行/簿记建档")
     private String issueClass;
 
+    @ApiModelProperty(name="issueClassStr",value="发行方式名称")
+    private String issueClassStr;
+
     @ApiModelProperty(name="tenderType",value="招标方式")
     private String tenderType;
 
@@ -40,14 +47,26 @@ public class CfetsEtrIBondFirstBidFindIssueInfoDto {
     @ApiModelProperty(name="issueDate",value="投标日/发行日")
     private Date issueDate;
 
+    @ApiModelProperty(name="issueDateStr",value="投标日/发行日字符串")
+    private String issueDateStr;
+
     @ApiModelProperty(name="payEdate",value="缴款截止日")
     private Date payEdate;
+
+    @ApiModelProperty(name="payEdateStr",value="缴款截止日字符串")
+    private String payEdateStr;
 
     @ApiModelProperty(name="couponSpecies",value="息票品种")
     private String couponSpecies;
 
+    @ApiModelProperty(name="couponSpeciesStr",value="息票品种名称")
+    private String couponSpeciesStr;
+
     @ApiModelProperty(name="intType",value="利率类型")
     private String intType;
+
+    @ApiModelProperty(name="intTypeStr",value="利率类型名称")
+    private String intTypeStr;
 
     @ApiModelProperty(name="issuePrice",value="发行价格")
     private BigDecimal issuePrice;
@@ -58,6 +77,9 @@ public class CfetsEtrIBondFirstBidFindIssueInfoDto {
     @ApiModelProperty(name="firstConfirmDate",value="首次利率确定日")
     private Date firstConfirmDate;
 
+    @ApiModelProperty(name="firstConfirmDateStr",value="首次利率确定日字符串")
+    private String firstConfirmDateStr;
+
     @ApiModelProperty(name="minPamt",value="单笔/标位最低量")
     private BigDecimal minPamt;
 
@@ -67,8 +89,11 @@ public class CfetsEtrIBondFirstBidFindIssueInfoDto {
     @ApiModelProperty(name = "ztGrade", value = "主体评级")
     private String ztGrade;
 
-    @ApiModelProperty(name = "cyy", value = "币种")
-    private String cyy;
+    @ApiModelProperty(name = "ccy", value = "币种")
+    private String ccy;
+
+    @ApiModelProperty(name = "ccyValue", value = "币种字典值")
+    private String ccyValue;
 
     @ApiModelProperty(name = "type9", value = "资产一级分类")
     private String type9;
@@ -218,12 +243,20 @@ public class CfetsEtrIBondFirstBidFindIssueInfoDto {
         this.ztGrade = ztGrade;
     }
 
-    public String getCyy() {
-        return cyy;
+    public String getCcy() {
+        return ccy;
     }
 
-    public void setCyy(String cyy) {
-        this.cyy = cyy;
+    public void setCcy(String ccy) {
+        this.ccy = ccy;
+    }
+
+    public String getCcyValue() {
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.币种, this.ccy);
+    }
+
+    public void setCcyValue(String ccyValue) {
+        this.ccyValue = ccyValue;
     }
 
     public String getType9() {
@@ -234,28 +267,12 @@ public class CfetsEtrIBondFirstBidFindIssueInfoDto {
         this.type9 = type9;
     }
 
-    public String getType9Value() {
-        return type9Value;
-    }
-
-    public void setType9Value(String type9Value) {
-        this.type9Value = type9Value;
-    }
-
     public String getType10() {
         return type10;
     }
 
     public void setType10(String type10) {
         this.type10 = type10;
-    }
-
-    public String getType10Value() {
-        return type10Value;
-    }
-
-    public void setType10Value(String type10Value) {
-        this.type10Value = type10Value;
     }
 
     public String getType11() {
@@ -266,8 +283,24 @@ public class CfetsEtrIBondFirstBidFindIssueInfoDto {
         this.type11 = type11;
     }
 
+    public String getType9Value() {
+        return SysDataUtil.getNameFromDataDict(DictCode.行内资产二级分类, this.type9);
+    }
+
+    public void setType9Value(String type9Value) {
+        this.type9Value = type9Value;
+    }
+
+    public String getType10Value() {
+        return SysDataUtil.getNameFromDataDict(DictCode.行内资产三级分类, this.type10);
+    }
+
+    public void setType10Value(String type10Value) {
+        this.type10Value = type10Value;
+    }
+
     public String getType11Value() {
-        return type11Value;
+        return SysDataUtil.getNameFromDataDict(DictCode.行内资产四级分类, this.type11);
     }
 
     public void setType11Value(String type11Value) {
@@ -344,5 +377,62 @@ public class CfetsEtrIBondFirstBidFindIssueInfoDto {
 
     public void setIssueStyle(String issueStyle) {
         this.issueStyle = issueStyle;
+    }
+
+    public String getIssueClassStr() {
+        if (StringUtil.isEmpty(getIssueClass())) {
+            return null;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.新债_发行方式, getIssueClass());
+    }
+
+    public void setIssueClassStr(String issueClassStr) {
+        this.issueClassStr = issueClassStr;
+    }
+
+    public String getIssueDateStr() {
+        return issueDateStr;
+    }
+
+    public void setIssueDateStr(String issueDateStr) {
+        this.issueDateStr = issueDateStr;
+    }
+
+    public String getPayEdateStr() {
+        return payEdateStr;
+    }
+
+    public void setPayEdateStr(String payEdateStr) {
+        this.payEdateStr = payEdateStr;
+    }
+
+    public String getCouponSpeciesStr() {
+        if (StringUtil.isEmpty(getCouponSpecies())) {
+            return null;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.息票品种, getCouponSpecies());
+    }
+
+    public void setCouponSpeciesStr(String couponSpeciesStr) {
+        this.couponSpeciesStr = couponSpeciesStr;
+    }
+
+    public String getIntTypeStr() {
+        if (StringUtil.isEmpty(getIntType())) {
+            return null;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.利率类型, getIntType());
+    }
+
+    public void setIntTypeStr(String intTypeStr) {
+        this.intTypeStr = intTypeStr;
+    }
+
+    public String getFirstConfirmDateStr() {
+        return firstConfirmDateStr;
+    }
+
+    public void setFirstConfirmDateStr(String firstConfirmDateStr) {
+        this.firstConfirmDateStr = firstConfirmDateStr;
     }
 }

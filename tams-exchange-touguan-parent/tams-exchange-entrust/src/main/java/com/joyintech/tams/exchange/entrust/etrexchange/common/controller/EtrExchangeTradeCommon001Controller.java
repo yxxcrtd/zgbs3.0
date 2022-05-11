@@ -652,6 +652,8 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 		initPageParams.put("SHARES_TRADE_PLATFORM_03", DictCodeList.交易平台_固定收益平台.getValue());
 		initPageParams.put("SHARES_TRADE_PLATFORM_04", DictCodeList.交易平台_大宗交易平台.getValue());
 		initPageParams.put("SHARES_TRADE_PLATFORM_05", DictCodeList.交易平台_综合协议交易平台.getValue());
+		initPageParams.put("SHARES_TRADE_PLATFORM_99", DictCodeList.交易平台_其它.getValue());
+
 		// 金融产品其他代码类型
 		initPageParams.put("FINPROD_OTH_CODE_TYPE_06", DictCodeListExt3.金融产品其他代码类型_配股代码.getValue());
 		initPageParams.put("FINPROD_OTH_CODE_TYPE_05", DictCodeListExt3.金融产品其他代码类型_配债代码.getValue());
@@ -2024,9 +2026,9 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 	}
 
 	@ApiOperation(value = "查询资产是否进行了SPPI测试", notes = "查询资产是否进行了SPPI测试")
-	@PostMapping("/queryAssetIsSppiTest/{secId:.+}")
+	@PostMapping("/queryAssetIsSppiTest")
 	@ResponseBody
-	public Message<SppiImportData> queryAssetIsSppiTest(@PathVariable String secId) {
+	public Message<SppiImportData> queryAssetIsSppiTest(@RequestParam(value = "secId") String secId) {
 		try {
 			SppiImportData data = etrExchangeTrade001CommonService.queryAssetIsSppiTest(secId);
 			return new Message<SppiImportData>().success().setData(data);

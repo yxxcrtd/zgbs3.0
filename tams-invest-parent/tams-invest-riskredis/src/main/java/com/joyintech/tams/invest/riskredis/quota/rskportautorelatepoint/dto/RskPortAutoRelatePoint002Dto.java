@@ -1,16 +1,21 @@
 package com.joyintech.tams.invest.riskredis.quota.rskportautorelatepoint.dto;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.export.paginator.domain.ITableRow;
+import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.annotation.Length;
 import com.joyintech.framework.validation.annotation.ValidLogic;
 import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.common.base.entity.RskRuleInfo;
+import com.joyintech.tams.common.base.entity.RskRulePoolConfig;
 import com.joyintech.tams.invest.common.prodinfo.dto.IPtlRule;
+import com.joyintech.tams.invest.common.prodinfo.dto.IRskRulePoolConfig;
 import com.joyintech.tams.invest.riskredis.quota.rskportautorelatepoint.valid.RskPortAutoRelatePoint002Validator;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.annotation.PrimaryKey.Field;
@@ -65,13 +70,13 @@ public class RskPortAutoRelatePoint002Dto extends RskRuleInfo implements ITableR
      */
     private List<RskPortAutoRelatePoint002Dto> selectedItem;
 
-    @PrimaryKey(Field.PK_1)
 	public String getRuleId() {
 		return StringUtil.isNotEmpty(super.getRuleId())
 				?super.getRuleId():StringUtil.EMPTY;
 	}
     @Override
 	@Length(fieldName = "RskPortAutoRelatePoint002.ruleName", max = 60,groups={ValidateGroupEdit.class})
+	@PrimaryKey(Field.PK_1)
 	public String getRuleName() {
 		return super.getRuleName();
 	}
@@ -146,7 +151,17 @@ public class RskPortAutoRelatePoint002Dto extends RskRuleInfo implements ITableR
 	public void setSelectedItem(List<RskPortAutoRelatePoint002Dto> selectedItem) {
 		this.selectedItem = selectedItem;
 	}
-    
-	
+
+	public List<String> matchPortfolioInfo(Function<List<IRskRulePoolConfig>,List<String>> function){
+		// 循环插入规则入池
+		List<IRskRulePoolConfig> ruleList=new ArrayList<>();
+		for (RskPortAutoRelatePoint002Dto e : getSelectedItem()) {
+			IRskRulePoolConfig rskRulePoolConfig = new IRskRulePoolConfig();
+			BeanUtil.copyPropertiesIgnoreNull(rskRulePoolConfig, e);
+			rskRulePoolConfig.setRuleId(getRuleId());
+			ruleList.add(rskRulePoolConfig);
+		}
+		return function.apply(ruleList);
+	}
 
 }

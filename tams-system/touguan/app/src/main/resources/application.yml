@@ -327,7 +327,7 @@ application:
 flag: false
 
 #头寸引擎地址
-positionUrl: http://192.168.90.244:2667/dsp
+positionUrl: http://192.168.70.146:2667/dsp
 #监听头寸余额地址
 webSocketUrl: ws://192.168.70.146:2667/dsp/positionTopic
 #监听键值
@@ -362,7 +362,7 @@ spring:
     reportSqlldrDatabaseName: 192.168.70.245:1521/orcl
   rabbitmq:
     # 需求环境使用mq配置如下
-    addresses: 192.168.90.243:5672
+    addresses: 192.168.90.119:5672
     username: rbmq
     password: rbmq
 application:
@@ -386,7 +386,7 @@ shiro:
     /CfetsRepoDealQuotedPrice001/selectEtrReByQuoteId,/core/getAssetFiveType,/common/trdcommonbase/insertFinProductCashData,/common/entrustcommonbase/finishEntrust,/TrdRepoTrade/selectPreTradeId,/joyin/**,/trade/joyin/**,
     /interf/refreshCache,/interf/execute,/interf/ziguanSysUserInfo,/interf/xp,/interf/xp/**,/interf/zg,/interf/zg/**,/FinProjectTargetAsset/insert,/FinAssetRateAdj/getFinAssetRateAdjByCashId,
     /cfets/**,/common/workflow/**,/common/config/**,/component/**,/FinProductRating/**,/svreport/interf/file/CreateZHXPFile/createFile,
-    /EtrAgreRepTrade/getEntrustInfoByTradeId,/trade/joyin/**
+    /EtrAgreRepTrade/getEntrustInfoByTradeId,/trade/joyin/**,/EntrustMsgbyMQ/**
 base:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
@@ -502,8 +502,8 @@ position:
 url:
   batch: http://192.168.90.243:8084/main/about/refreshCache
 
-#消息推送方式:01-MQ；02-接口  开发使用
-trd-info-push-mode: 02
+#消息推送方式:1-MQ；2-接口(开发使用)
+trd-info-push-mode: 1
 
 ---
 spring:
@@ -528,7 +528,7 @@ spring:
     reportSqlldrDatabaseName: 192.168.70.245:1521/orcl
   rabbitmq:
     # 需求环境使用mq配置如下
-    addresses: 192.168.60.111:5672
+    addresses: 192.168.90.119:5672
     username: rbmq
     password: rbmq
 application:
@@ -664,7 +664,7 @@ spring:
     reportSqlldrDatabaseName: 192.168.70.245:1521/orcl
   rabbitmq:
     # 需求环境使用mq配置如下
-    addresses: 192.168.60.111:5672
+    addresses: 192.168.90.119:5672
     username: rbmq
     password: rbmq
 application:

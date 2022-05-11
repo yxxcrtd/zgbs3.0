@@ -2,6 +2,7 @@ package com.joyintech.tams.cfets.position.dao;
 
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -40,4 +41,11 @@ public interface PositionInfoMapper {
      * @return
      */
     String qryPortfolioSecAcctId(Map<String, String> map);
+
+    /**
+     * 查询证券账户
+     * @param map
+     * @return
+     */
+    List<String> qryPortfolioSecAcctIdAll(Map<String, String> map);
 }

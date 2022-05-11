@@ -231,7 +231,7 @@
 	</delete>
 	<delete id="deleteEntrustDetail" parameterType="java.lang.String" >
 		DELETE FROM ETR_ENTRUST_DETAIL
-		WHERE ENTRUST_ID  = #{workflowId, jdbcType=VARCHAR}
+		WHERE ENTRUST_ID  = #{entrustId, jdbcType=VARCHAR}
 	</delete>
 
 </mapper>

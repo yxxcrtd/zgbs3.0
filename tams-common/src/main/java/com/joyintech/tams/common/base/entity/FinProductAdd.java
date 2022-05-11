@@ -478,6 +478,74 @@ public class FinProductAdd extends BaseEntity {
     private String listingDateFromTrade;
 
     /**
+     *
+     * 说明书是否披露风险标志
+     */
+    private String directDisclosureRiskFlag;
+
+    /**
+     * 是否每日开放申赎
+     */
+    private String isOpenEveryDay;
+
+    /**
+     * 是否每日开放申赎
+     */
+    private String isSevenDayCashable;
+
+    /**
+     * 开放类型
+     */
+    private String openType;
+
+    /**
+     *保护对象
+     */
+    private String protectObject;
+    /**
+     * 参考实体
+     */
+    private String refEntity;
+    /**
+     * 参考债项
+     */
+    private String refSec;
+    /**
+     * 参考债项特征
+     */
+    private String refSecFeatures;
+    /**
+     * 宽限期
+     */
+    private Long gracePeriod;
+    /**
+     * 簿记建档日
+     */
+    private Date bookBuildingDate;
+    /**
+     * 缴款日
+     */
+    private Date payDate;
+    /**
+     * 名义本金总额
+     */
+    @JsonSerialize(using=BigDecimalSerializer.class)
+    private BigDecimal nomCapi;
+    /**
+     * 结算方式
+     */
+    private String settleMethod;
+
+
+    public String getDirectDisclosureRiskFlag() {
+        return directDisclosureRiskFlag;
+    }
+
+    public void setDirectDisclosureRiskFlag(String directDisclosureRiskFlag) {
+        this.directDisclosureRiskFlag = directDisclosureRiskFlag;
+    }
+
+    /**
      * 取得 金融产品代码
      * @return 金融产品代码
      */
@@ -1953,5 +2021,101 @@ public class FinProductAdd extends BaseEntity {
      */
     public void setListingDateFromTrade(String listingDateFromTrade) {
         this.listingDateFromTrade = listingDateFromTrade;
+    }
+
+    public String getIsOpenEveryDay() {
+        return isOpenEveryDay;
+    }
+
+    public void setIsOpenEveryDay(String isOpenEveryDay) {
+        this.isOpenEveryDay = isOpenEveryDay;
+    }
+
+    public String getIsSevenDayCashable() {
+        return isSevenDayCashable;
+    }
+
+    public void setIsSevenDayCashable(String isSevenDayCashable) {
+        this.isSevenDayCashable = isSevenDayCashable;
+    }
+
+    public String getOpenType() {
+        return openType;
+    }
+
+    public void setOpenType(String openType) {
+        this.openType = openType;
+    }
+
+    public String getProtectObject() {
+        return protectObject;
+    }
+
+    public void setProtectObject(String protectObject) {
+        this.protectObject = protectObject;
+    }
+
+    public String getRefEntity() {
+        return refEntity;
+    }
+
+    public void setRefEntity(String refEntity) {
+        this.refEntity = refEntity;
+    }
+
+    public String getRefSec() {
+        return refSec;
+    }
+
+    public void setRefSec(String refSec) {
+        this.refSec = refSec;
+    }
+
+    public String getRefSecFeatures() {
+        return refSecFeatures;
+    }
+
+    public void setRefSecFeatures(String refSecFeatures) {
+        this.refSecFeatures = refSecFeatures;
+    }
+
+    public Long getGracePeriod() {
+        return gracePeriod;
+    }
+
+    public void setGracePeriod(Long gracePeriod) {
+        this.gracePeriod = gracePeriod;
+    }
+
+    public Date getBookBuildingDate() {
+        return bookBuildingDate;
+    }
+
+    public void setBookBuildingDate(Date bookBuildingDate) {
+        this.bookBuildingDate = bookBuildingDate;
+    }
+
+    public Date getPayDate() {
+        return payDate;
+    }
+
+    public void setPayDate(Date payDate) {
+        this.payDate = payDate;
+    }
+
+    public BigDecimal getNomCapi() {
+        return nomCapi;
+    }
+
+    public void setNomCapi(BigDecimal nomCapi) {
+        this.nomCapi = nomCapi;
+    }
+
+    public String getSettleMethod() {
+        return settleMethod;
+    }
+
+    public void setSettleMethod(String settleMethod) {
+        this.settleMethod = settleMethod;
     }
 }

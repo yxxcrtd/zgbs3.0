@@ -749,6 +749,7 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                 if(DictCodeList.是否_否.getValue().equals(newSecPositionSwitch)) {
                     return super.queryForPage(page, length, () -> dayEndAccountMapper.selectPage1(param));
                 }else{// 默认查新头寸
+                    param.put("cash_hodingType", DictCodeListExt3.资产类型_证券户可用资金.getValue());
                     param.put("hodingType", DictCodeListExt3.资产类型_资产账户持仓.getValue());
                     param.put("dateType", StlDataGatherConstant.DATE_TYPE_T_0);
                     return super.queryForPage(page, length, () -> dayEndAccountMapper.selectPageNew1(param));
@@ -763,6 +764,7 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                 if(DictCodeList.是否_否.getValue().equals(newSecPositionSwitch)) {
                     return  super.queryForPage(page, length, () -> dayEndAccountMapper.selectPage2(param));
                 }else{// 默认查新头寸
+                    param.put("cash_hodingType", DictCodeListExt3.资产类型_证券户可用资金.getValue());
                     param.put("hodingType", DictCodeListExt3.资产类型_资产账户持仓.getValue());
                     param.put("dateType", StlDataGatherConstant.DATE_TYPE_T_0);
                     return  super.queryForPage(page, length, () -> dayEndAccountMapper.selectPageNew2(param));
@@ -773,6 +775,7 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
         if(DictCodeList.是否_否.getValue().equals(newSecPositionSwitch)) {
             return super.queryForPage(page, length, () -> dayEndAccountMapper.selectPage(param));
         }else{// 默认查新头寸
+            param.put("cash_hodingType", DictCodeListExt3.资产类型_证券户可用资金.getValue());
             param.put("hodingType", DictCodeListExt3.资产类型_资产账户持仓.getValue());
             param.put("dateType", StlDataGatherConstant.DATE_TYPE_T_0);
             return super.queryForPage(page, length, () -> dayEndAccountMapper.selectPageNew(param));

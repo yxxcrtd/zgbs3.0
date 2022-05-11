@@ -330,6 +330,7 @@ CASH_OUT_NO = #{cmsId}
 		<!-- 查询子计划的投资性质 yjm start 20190906  -->
 		DECODE(A.P_FINPROD_ID, NULL,  B.INVEST_NATURE,B2.INVEST_NATURE) investNature,
 		<!-- 查询子计划的投资性质 yjm end 20190906  -->
+		B.IS_OPEN_EVERYDAY isOpenEveryDay,
 		C.TRIAL_NO,
 		A.CONTRACT_NO,
 		REP_ASSET_DEPT.REP_ASSET_TYPE

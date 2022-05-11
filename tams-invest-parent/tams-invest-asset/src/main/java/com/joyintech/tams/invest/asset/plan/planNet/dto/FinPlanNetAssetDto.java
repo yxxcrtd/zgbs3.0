@@ -24,6 +24,7 @@ import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.asset.dto.BussFinRecommentDto;
 import com.joyintech.tams.component.business.core.dto.FileCommonDto;
+import com.joyintech.tams.component.business.prod.dto.BussFinProductOpenPlanDto;
 import com.joyintech.tams.component.business.project.dto.BussParticipantInfoDto;
 import com.joyintech.tams.component.business.report.asset.plan.dto.BussRepAssetMngProdInfo;
 import com.joyintech.tams.component.business.report.asset.trust.dto.BussRepOutInvestAgrInfo;
@@ -411,6 +412,22 @@ public class FinPlanNetAssetDto extends FinProduct implements ProcessEntity{
     private String repAssetType;
 
     /**
+     * 是否每日开放申赎
+     */
+    private String isOpenEveryDay;
+
+    /**
+     * {@linkplain}
+     */
+    @Valid
+    private BussFinProductOpenPlanDto bussFinProductOpenPlanDto;
+    /**
+     * add by zhangweiqi
+     */
+    @Valid
+    private BussFinProductOpenPlanDto bussFinProductOpenPlanRedDto;
+
+    /**
      * 增信措施
      */
     private String creditEnhanceMeasure;
@@ -551,7 +568,7 @@ public class FinPlanNetAssetDto extends FinProduct implements ProcessEntity{
      * 取得 到期日
      * @return 到期日
      */
-    //@NotEmpty(fieldName = "FinPlanNetAsset002.mDate",groups={ValidateGroupEdit.class})
+    @NotEmpty(fieldName = "FinPlanNetAsset002.mDate",groups={ValidateGroupEdit.class})
     public Date getMdate() {
         return super.getMdate();
     }
@@ -1519,5 +1536,38 @@ public class FinPlanNetAssetDto extends FinProduct implements ProcessEntity{
      */
     public void setFundMangerName(String fundMangerName) {
         this.fundMangerName = fundMangerName;
+    }
+
+    @NotEmpty(fieldName = "FinPlanNetAsset002.isOpenEveryDay",groups={ValidateGroupEdit.class})
+    public String getIsOpenEveryDay() {
+        return isOpenEveryDay;
+    }
+
+    public void setIsOpenEveryDay(String isOpenEveryDay) {
+        this.isOpenEveryDay = isOpenEveryDay;
+    }
+
+    /**
+     * 获取 bussFinProductOpenPlanDto
+     * @return bussFinProductOpenPlanDto.
+     */
+    public BussFinProductOpenPlanDto getBussFinProductOpenPlanDto() {
+        return bussFinProductOpenPlanDto;
+    }
+
+    /**
+     * 设置 bussFinProductOpenPlanDto
+     * @param bussFinProductOpenPlanDto bussFinProductOpenPlanDto
+     */
+    public void setBussFinProductOpenPlanDto(BussFinProductOpenPlanDto bussFinProductOpenPlanDto) {
+        this.bussFinProductOpenPlanDto = bussFinProductOpenPlanDto;
+    }
+
+    public BussFinProductOpenPlanDto getBussFinProductOpenPlanRedDto() {
+        return bussFinProductOpenPlanRedDto;
+    }
+
+    public void setBussFinProductOpenPlanRedDto(BussFinProductOpenPlanDto bussFinProductOpenPlanRedDto) {
+        this.bussFinProductOpenPlanRedDto = bussFinProductOpenPlanRedDto;
     }
 }

@@ -111,6 +111,7 @@ $(function() {
         //     type1Change();
         // });
         if(pageModel !=PAGE_MODEL_NEW){
+            $('#finprodMarketId').prop('disabled',true);
             if($('#finprodMarketId').val()){
                 $('#finprodMarketId').trigger('change');
             }

@@ -24,7 +24,7 @@ public class ExchangeConstant {
     public static final String ETR_TRADE_TIME_SWITCH = "etr_trade_time_switch";
     public static final String BOND_TRADED_UNIT = "bond_traded_unit";
     public static final String TRD_INSTRUCTION_APPOINT_CHECK_FILTER = "trd_instruction_appoint_check_filter";
-
+    public static final String TRD_NEW_BOND_QUOTATION_TYPE_CONTROL = "trd_new_bond_quotation_type_control";
 
     public static final String HTTP_STATUS_CODE_OK = "200";
     public static final String HTTP_STATUS_CODE_INTERNAL_SERVER_ERROR = "500";

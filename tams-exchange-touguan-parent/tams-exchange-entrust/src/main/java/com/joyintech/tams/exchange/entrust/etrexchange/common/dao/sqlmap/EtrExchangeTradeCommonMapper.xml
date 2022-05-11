@@ -49,11 +49,12 @@
         ,c1.acctName as dealCurAcctName
         ,T1.PRICE_MODEL priceModel
         ,T2.DEAL_MODE as declaType
-        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}, #{PS_03}, #{PS_04}) THEN T1.PRICE * 100 ELSE
-        T1.PRICE END price
+        ,CASE WHEN T1.PS IN (#{PS_03}, #{PS_04}) THEN T1.PRICE * 100
+        WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN NULL
+        ELSE T1.PRICE END price
         /* ,T1.ENTRUST_AMT*NVL(T1.PRICE,1) ENTRUST_AMT*/
-        ,T1.ENTRUST_AMT entrustAmt
-        ,T1.ENTRUST_NUM entrustNum
+        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN NULL ELSE T1.ENTRUST_AMT END entrustAmt
+        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN round(T1.ENTRUST_NUM/100,2) ELSE T1.ENTRUST_NUM END entrustNum
         ,T1.VDATE
         ,T1.MDATE
         ,T2.FULL_PRICE as fprice
@@ -81,7 +82,7 @@
         ,T1.STOCK_ID
         ,T2.EXP_CON_NUM
         ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN T1.PRICE * 100  END discountRate
-        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN T1.ENTRUST_AMT/100  END standardBondVolume
+        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN T1.ENTRUST_AMT  END standardBondVolume
         FROM
         ETR_ENTRUST T1
         INNER JOIN ETR_ENTRUST_ADD T2 ON
@@ -191,10 +192,12 @@
         ,c1.acctName as dealCurAcctName
         ,T1.PRICE_MODEL priceModel
         ,T2.DEAL_MODE as declaType
-        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}, #{PS_03}, #{PS_04}) THEN T1.PRICE * 100 ELSE T1.PRICE END price
+        ,CASE WHEN T1.PS IN (#{PS_03}, #{PS_04}) THEN T1.PRICE * 100
         /* ,T1.ENTRUST_AMT*NVL(T1.PRICE,1) ENTRUST_AMT*/
-        ,T1.ENTRUST_AMT entrustAmt
-        ,T1.ENTRUST_NUM entrustNum
+        WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN NULL
+        ELSE T1.PRICE END price
+        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN NULL ELSE T1.ENTRUST_AMT END entrustAmt
+        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN round(T1.ENTRUST_NUM/100,2) ELSE T1.ENTRUST_NUM END entrustNum
         ,T1.VDATE
         ,T1.MDATE
         ,T2.FULL_PRICE as fprice
@@ -222,7 +225,7 @@
         ,T1.STOCK_ID
         ,T2.EXP_CON_NUM
         ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN T1.PRICE * 100  END discountRate
-        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN T1.ENTRUST_AMT/100  END standardBondVolume
+        ,CASE WHEN T1.PS IN (#{PS_T68}, #{PS_T69}) THEN T1.ENTRUST_AMT  END standardBondVolume
         FROM
         WFL_ETR_ENTRUST T1
         INNER JOIN WFL_ETR_ENTRUST_ADD T2 ON

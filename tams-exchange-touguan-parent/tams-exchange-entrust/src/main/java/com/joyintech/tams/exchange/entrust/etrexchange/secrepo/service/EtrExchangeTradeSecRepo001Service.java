@@ -2283,7 +2283,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_债券现券交易指令.getValue());
         String businessType = DictCodeListExt3.共通业务类型_场内债券现券指令.getValue();
         if (DictCodeListExt3.交易方向_正回购.getValue().equals(dto.getPs())
-                || DictCodeListExt3.交易方向_逆回购.getValue().equals(dto.getPs())){
+                || DictCodeListExt3.交易方向_逆回购.getValue().equals(dto.getPs())||(StringUtil.equals("",dto.getPs())&&StringUtil.equals("etrExchangeTradeRepo",dto.getPageId()))){
             businessType = DictCodeListExt3.共通业务类型_场内通用质押式回购指令.getValue();
             dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_通用式质押回购指令.getValue());
         }
@@ -2294,7 +2294,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         BussinessCodeParameter param = new BussinessCodeParameter();
         param.setCommonBusinessExtType(DictCodeListExt3.fromDictCodeList(DictCodeListExt3.共通业务类型_场内债券现券指令));
         if (DictCodeListExt3.交易方向_正回购.getValue().equals(dto.getPs())
-                || DictCodeListExt3.交易方向_逆回购.getValue().equals(dto.getPs())){
+                || DictCodeListExt3.交易方向_逆回购.getValue().equals(dto.getPs())||(StringUtil.equals("",dto.getPs())&&StringUtil.equals("etrExchangeTradeRepo",dto.getPageId()))){
             param.setCommonBusinessExtType(DictCodeListExt3.fromDictCodeList(DictCodeListExt3.共通业务类型_场内通用质押式回购指令));
         }
         return param;

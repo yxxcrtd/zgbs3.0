@@ -514,8 +514,8 @@ public class CfetsQuotedCommonController {
             @Override
             public void run() {
                 try {
-                    CfetsQuotedTradeFirstBondDto cfetsQuotedTradeFirstBondDto = (CfetsQuotedTradeFirstBondDto) JsonUtils.map2entity(map, CfetsQuotedTradeFirstBondDto.class);
-                    cfetsQuotedTradeCommonService.insertBidCstpTrade(cfetsQuotedTradeFirstBondDto);
+                    String trdId = (String) map.get("trdId");
+                    cfetsQuotedTradeCommonService.insertBidCstpTrade(trdId);
                 } catch (Exception e) {
                     logger.error("CSTP下行匹配异常：", e);
                 }

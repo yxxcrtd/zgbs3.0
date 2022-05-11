@@ -4,6 +4,7 @@ import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
@@ -105,6 +106,9 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
 
     @ApiModelProperty(name = "systemAct", value = "头寸_系统动作,编辑页面/提交用", example = "Y")
     private String systemAct;
+
+    @ApiModelProperty(name = "riskcalResponse", value = "风险实体类")
+    private CfetsEtribdoRiskcalResponse riskcalResponse;
 
     public String getValidStatus() {
         return validStatus;
@@ -326,6 +330,14 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
 
     public void setSystemAct(String systemAct) {
         this.systemAct = systemAct;
+    }
+
+    public CfetsEtribdoRiskcalResponse getRiskcalResponse() {
+        return riskcalResponse;
+    }
+
+    public void setRiskcalResponse(CfetsEtribdoRiskcalResponse riskcalResponse) {
+        this.riskcalResponse = riskcalResponse;
     }
 }
 

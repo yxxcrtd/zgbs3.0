@@ -54,6 +54,10 @@
 											data-th-value="${entity?.hapCreditAmt}" style="display: none">
 										<input type="text" id="creditFlag" name="creditFlag" style="display: none"
 											data-th-value="${creditFlag}">
+										<input type="hidden" id="profitType"   value="03"/>
+										<input type="hidden" id="dealMode"   value="01"/>
+										<input type="hidden" id="operationType"   value="01"/>
+										<input type="hidden" id="FinPlanAssetC002_profitType"   value="03"/>
 										<!-- <div class=" form-inline-wrap">
                                             <label class="layui-form-label form-label-wrap"
                                                 data-th-text="#{FinPlanAssetC002.cmsId}">出账编号</label>
@@ -516,6 +520,22 @@
 											</div>
 										</div>
 									</div>
+									<div class="layui-form-item">
+										<div class=" form-inline-wrap">
+											<label class="layui-form-label form-label-wrap"
+												   data-th-text="#{FinPlanAssetC002.isOpenEveryDay}">是否每日开放申赎</label>
+											<div class="layui-input-inline input-inline">
+												<select type="text" id="isOpenEveryDay" name="isOpenEveryDay"
+														class="layui-input form-input input-select"
+														formatoption="true" allowClear="true"
+														data-th-initValue='${entity?.isOpenEveryDay?:YES}'
+														required="required" placeholder="请输入内容"
+														data-th-data-result='${YES_OR_NO}'
+														data-th-placeholder="#{SysCommon.placeholder}">
+												</select>
+											</div>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -525,6 +545,10 @@
 							<!--th:data-path="@{/component/project/BussParticipantInfo/init}"-->
 							<!--th:data-params="|{entityName:'bussParticipantInfoDto',finprodId:PAGE_finprodId,workflowId:'${workflowId}', pageId:'${pageId}'}|"></div>-->
 						<!--隐藏通道信息 zhuyongkang 2019/09/30 end-->
+						<!-- 开放计划共通 -->
+						<div class="page-component"
+							 th:data-path="@{/component/prod/BussFinProductOpenPlanCommonRate/init}"
+							 th:data-params="|{bussFinProductOpenPlanDto: 'bussFinProductOpenPlanDto',bussFinProductOpenPlanRedDto: 'bussFinProductOpenPlanRedDto', pageId: '${pageId}', workflowId: '${workflowId}', finprodId: '${finprodId}',profitType:'profitType', dealMode: 'dealMode', operationType: 'operationType', vdate: 'vdate', mdate: 'mdate', tradCalender: 'calendarId', raiseStrDate: 'FinNetValueProductBuild002_firstSaleVdate', raiseEndDate: 'FinNetValueProductBuild002_firstSaleMdate', purConfDays: 'FinNetValueProductBuild002_purSpeed', isCycle: 'FinNetValueProductBuild002_isCycle', closeTerm: 'FinNetValueProductBuild002_closeDays',pageModel: '${pageModel}'}|"></div>
 						<!-- 分红计划组件 -->
                         <!--修改快录时分红计划要素带不出来问题 by zhuyongkang-->
                         <div class="page-component"
@@ -584,6 +608,8 @@
             var FINPROD_TYPE_TG_F17 = /*[[${FINPROD_TYPE_TG_F17}]]*/'';
             var CE_MODEL = /*[[${CE_MODEL}]]*/'02';
             var IS_SHOW_TYPE = /*[[${isShowType}]]*/'01';
+			var PROFIT_TYPE_02 = /*[[${PROFIT_TYPE_02}]]*/'02'; // 数据字典.收益类型_预期收益
+			var YES = /*[[${YES}]]*/'Y'; // 数据字典.是否_是
             var bussRepAssetMngProdInfo_repYieldFlag = /*[[${entity?.bussRepAssetMngProdInfo?.repYieldFlag}]]*/'';
             var bussRepAssetMngProdInfo_repIsCtrlBottom =  /*[[${entity?.bussRepAssetMngProdInfo?.repIsCtrlBottom}]]*/'';
             var ISChongQing = /*[[${ISChongQing}]]*/'';//重庆个性化隐藏

@@ -66,7 +66,7 @@ public class FinBondMarketCashPlanDto extends BaseDto {
     /**
      * 当期利率
      */
-    @ApiModelProperty(name = "secId", value = "债券ID")
+    @ApiModelProperty(name = "couponrate", value = "当期利率")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal couponrate;
 

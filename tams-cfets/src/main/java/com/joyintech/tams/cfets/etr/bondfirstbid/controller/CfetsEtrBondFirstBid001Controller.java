@@ -17,6 +17,7 @@ import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbdoRiskcalRequest;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBid002Dto;
+import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBidReqDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoRequest;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIssueInfoDto;
@@ -74,9 +75,9 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
         Map<String, Object> initPageParams = new HashMap<>();
 
         //一级投标指令画面待发行信息区域自动刷新时间(ms)
-        initPageParams.put("cfetsEtrBondFirstBidInfo_issueTable_refresh_period", CacheUtil.getSysParam("cfetsEtrBondFirstBidInfo_issueTable_refresh_period"));
+        initPageParams.put("cfetsEtrBondFirstBid_issueTable_refresh_period", CacheUtil.getSysParam("cfetsEtrBondFirstBid_issueTable_refresh_period"));
         //一级投标指令画面指令列表区域自动刷新时间(ms)
-        initPageParams.put("cfetsEtrBondFirstBidInfo_etrTable_refresh_period", CacheUtil.getSysParam("cfetsEtrBondFirstBidInfo_etrTable_refresh_period"));
+        initPageParams.put("cfetsEtrBondFirstBid_etrTable_refresh_period", CacheUtil.getSysParam("cfetsEtrBondFirstBid_etrTable_refresh_period"));
 
         //CMDS地址
 //        initPageParams.put("cmdsWebSocketUrl", cmdsWebSocketUrl);
@@ -315,6 +316,27 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
         } catch (Exception e) {
             logger.error("查询功能异常", e);
             return new Message<CfetsEtrBondFirstBid002Dto>().fail().setMessage("查询异常");
+        }
+    }
+
+    @ResponseBody
+    @ApiOperation(value = "修改委托", notes = "修改委托")
+    @PostMapping("modifyDelegate")
+    public Message<AjaxResult> modifyDelegate(@RequestBody CfetsEtrBondFirstBidReqDto dto) throws Exception {
+        //对选择的数据进行check
+        AjaxResult ajaxResult = cfetsEtrBondFirstBid001Service.modifyDelegateCheckMethod(dto);
+        if (!StringUtil.isEmptyList(ajaxResult.getErrorList())) {
+            return new Message<AjaxResult>().fail().setData(ajaxResult);
+        }
+        try {
+            CfetsEtrBondFirstBidReqDto item = dto.getSelectedItem().get(0);
+            CfetsEtrBondFirstBid002Dto result = cfetsEtrBondFirstBid001Service.getEtrEntrustInfo(item.getEntrustId());
+            AjaxResult m =new AjaxResult();
+            m.setData(result);
+            return new Message<AjaxResult>().success().setData(m);
+        } catch (Exception e) {
+            logger.error("查询功能异常", e);
+            return new Message<AjaxResult>().fail().setMessage("查询异常");
         }
     }
 

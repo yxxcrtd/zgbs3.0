@@ -36,11 +36,17 @@
         stlinfo.sec_acct_name as secManageAcctIdName,
         decode(reg.finprod_type2,'F01',reg.face_value/10000,null)   as faceValue,
         case when reg.finprod_type2='F01'
+        then decode(regAdd.CAL_MODE,'01',ROUND(reg.unit_cprice,4),
+        '02',ROUND(reg.yield*100,4),'FM990.0000',
+        '03',ROUND(reg.exer_yield*100,4))
+        when reg.finprod_type2 in ('F02','F03') then ROUND(reg.rate*100,4)
+        else null end as tradeYield,
+        case when reg.finprod_type2='F01'
         then decode(regAdd.CAL_MODE,'01',TO_CHAR(ROUND(reg.unit_cprice,4),'FM990.0000'),
                                     '02',TO_CHAR(ROUND(reg.yield*100,4),'FM990.0000') ||'%',
                                     '03',TO_CHAR(ROUND(reg.exer_yield*100,4),'FM990.0000')||'%')
         when reg.finprod_type2 in ('F02','F03') then  TO_CHAR(ROUND(reg.rate*100,4),'FM990.0000') ||'%'
-        else null end as tradeYield,
+        else null end as tradeYieldStr,
         reg.repo_term as termDays,
         reg.trade_amt as tradeAmt,
         reg.totle_trade_id as busiCode,
@@ -158,10 +164,16 @@
             deal.SEC_ACCT_ID             secManageAcctId,
             stlinfo.sec_acct_name as     secManageAcctIdName,
             null                         faceValue,
-            TO_CHAR(ROUND((case
-                when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
-                then nvl(miri.INT_RATE, 0) + nvl(fpi.REFER_YIELD, 0)
-                else nvl(fpi.REFER_YIELD, 0) end)*100, 4), 'FM990.0000') || '%' tradeYield,
+            case
+                when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02' then nvl(fpi.BP, 0)
+                when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD
+                when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
+                then fpi.REFER_YIELD end                                    tradeYield,
+            case
+                when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02' then nvl(fpi.BP, 0)||'BP'
+                when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD || '%'
+                when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
+                then fpi.REFER_YIELD || '%' end                                    tradeYieldStr,
             null                         termDays,
             bo.PAYABLE_AMOUNT            tradeAmt,
             bo.BID_ID                    busiCode,
@@ -274,7 +286,7 @@
                     || '|' || dictdealType.ITEM_VALUE  || '|' || dictquote.ITEM_VALUE  || '|' || aaa.remark
                     like '%' || #{search} || '%')
                     or to_char(aaa.faceValue,'FM9999999999999990.90')=#{search} or to_char(aaa.faceValue)=#{search}
-                    or aaa.tradeYield=#{search} or  aaa.tradeYield =#{search}||'%'
+                    or aaa.tradeYieldStr=#{search} or  aaa.tradeYieldStr =#{search}||'%'
                     or aaa.termDays||'' =#{search}
                     or to_char(aaa.tradeAmt,'FM9999999999999990.90')=#{search} or to_char(aaa.tradeAmt)=#{search}
                     or to_char(aaa.tradeDate,'yyyy-MM-dd')=#{search}
@@ -374,10 +386,14 @@
         ib.sec_manage_acct_id as secManageAcctId,
         stlinfo.sec_acct_name as secManageAcctIdName,
         ib.share_amt/100 as faceValue,
+        decode(ibd.CALCULATE_FIELD,'01',ROUND(ibd.unit_cprice,4),
+                                    '02',ROUND(ibd.yield*100,4),
+                                    '03',ROUND(ibd.exer_yield*100,4),
+                                    ROUND(ibd.yield*100,4)) as tradeYield,
         decode(ibd.CALCULATE_FIELD,'01',TO_CHAR(ROUND(ibd.unit_cprice,4),'FM990.0000'),
-                                    '02',TO_CHAR(ROUND(ibd.yield*100,4),'FM990.0000') ||'%',
-                                    '03',TO_CHAR(ROUND(ibd.exer_yield*100,4),'FM990.0000')||'%',
-                                    TO_CHAR(ROUND(ibd.yield*100,4),'FM990.0000') ||'%') as tradeYield,
+        '02',TO_CHAR(ROUND(ibd.yield*100,4),'FM990.0000') ||'%',
+        '03',TO_CHAR(ROUND(ibd.exer_yield*100,4),'FM990.0000')||'%',
+        TO_CHAR(ROUND(ibd.yield*100,4),'FM990.0000') ||'%') as tradeYieldStr,
         null as termDays,
         ibd.fprice_amt as tradeAmt,
         ib.cfets_quote_id as busiCode,
@@ -497,7 +513,8 @@
         ic.sec_manage_acct_id as secManageAcctId,
         stlinfo.sec_acct_name as secManageAcctIdName,
         null as faceValue,
-        TO_CHAR(ROUND(ic.rate*100,4),'FM990.0000') ||'%' as tradeYield,
+        ROUND(ic.rate*100,4) as tradeYield,
+        TO_CHAR(ROUND(ic.rate*100,4),'FM990.0000') ||'%' as tradeYieldStr,
         ic.term as termDays,
         ic.fprice_amt as tradeAmt,
         ic.cfets_quote_id as busiCode,
@@ -677,6 +694,78 @@
         left join fin_product fp on fp.finprod_id=reg.finprod_id
         left join reg_fin_product_deal_total_add regAdd on reg.totle_trade_id=regAdd.Totle_Trade_Id
         where reg.totle_trade_id= #{totleTradeId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selecBidInfoByKey" resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmRegInfoListResponse">
+        select 'F32'                as finprodType2,
+       bo.finprod_id        as finprodId,
+       fp.finprod_market_id as finprodMarketId,
+       fp.finprod_abbr      as finprodAbbr,
+       'T01'                as ps,
+       fp.trade_market      as tradeMarket,
+       null                 as settleSpeed,
+       bobp.SEC_ACCT_ID     as secManageAcctId,
+       null                 as faceValue,
+       null                 as tradeYield,
+       null                 as termDays,
+       bo.PAYABLE_AMOUNT    as tradeAmt,
+       bo.BID_ID            as busiCode,
+       bo.OUR_TRADER        as trader,
+       bo.BID_DATE          as tradeDate,
+       null                 as counterTrader,
+       null                 as quoteType,
+       bo.remark            as remark,
+       bo.BID_ID            as totleTradeId,
+       bo.BID_DATE          as settleDate,
+       null                 as cpriceAmt,
+       null                 as yield,
+       null                 as exerYield,
+       bo.ou_party_id       as ouPartyId,
+       bo.OUR_TRADER        as ouTraderId,
+       null                 as counterId,
+       null                 as ourShareAmt,
+       null                 as lendinShareAmt,
+       null                 as ourFpriceAmt,
+       null                 as lendinFpriceAmt,
+       null                 as ourCpriceAmt,
+       null                 as lendinCpriceAmt,
+       null                 as ownIntAmt,
+       null                 as lendinIntAmt,
+       fp.CCY               as ccy,
+       null                 as unitCprice,
+       null                 as unitInt,
+       null                 as unitFprice,
+       null                 as parValue,
+       null                 as intAmt,
+       null                 as fpriceAmt,
+       null                 as shareAmt,
+       null                 as deliveryType,
+       null                 as mdeliveryType,
+       null                 as settCcy,
+       null                 as clearType,
+       null                 as acctId,
+       null                 as invAim,
+       null                 as tradeMarketMode,
+       null                 as rate,
+       null                 as repoTerm,
+       null                 as termType,
+       null                 as disFaceValue,
+       null                 as termType,
+       null                 as vsettleDate,
+       null                 as msettleDate,
+       null                 as mintAmt,
+       null                 as mtradeAmt,
+       null                 as actRepoTerm,
+       null                 as tgBusiType,
+       bo.trade_status      as tradeStatus,
+       bo.P_BID_ID          as ptradeId
+       from BID_ORDER bo
+                 left join fin_product fp on fp.finprod_id = bo.finprod_id
+                 left join (select distinct t1.BID_ID, t2.SEC_ACCT_ID
+                            from BID_ORDER_BID_PRICE t1
+                                     left join ETR_ENTRUST_DETAIL t2
+                                               on t1.ENTRUST_ID = t2.ENTRUST_ID and t1.PORTFOLIO_ID = t2.PORTFOLIO_ID) bobp on bo.BID_ID = bobp.BID_ID
+       where bo.BID_ID = #{totleTradeId, jdbcType= VARCHAR}
     </select>
     <select id="selectIbuInfoByKey" resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmRegInfoListResponse">
         select
@@ -1021,6 +1110,7 @@
         stlinfo.sec_acct_name as acctNoName,
         I.LASTQTY/10000 as lastqty,
         decode(I.BUSINESSTYPE, 'BOND', I.yield2*100, 'REPO', I.PRICE*100) tradeYield,
+        null tradeYieldStr,
         I.TRADELIMITDAYS termDays,
         decode(I.BUSINESSTYPE, 'BOND', I.SETTLCURRAMT, 'REPO', DECODE(I.MARKETINDICATOR, 9, I.TRADECASHAMT, 10, I.SETTLCURRAMT))  as tradeAmt,
         I.quoteid as quoteid,
@@ -1127,6 +1217,101 @@
         <if test="userId != null and userId != ''">
             and (su.USER_NAME= #{userId} or su.USER_NAME is null)
         </if>
+
+        union all
+        select distinct null                    as                                   execid,
+                'BID'                           as                                   businesstype,
+                fp.finprod_id                   as                                   finprodId,
+                icb.INSTRUMENT_ID               as                                   finprodMarketId,
+                icb.INSTRUMENT_SHORT_NAME       as                                   finprodAbbr,
+                'T01'                           as                                   ps,
+                null                                                                 settleSpeed,
+                null                            as                                   acctNo,
+                null                            as                                   acctNoName,
+                icb.SUBSCRIPTION_AMOUNT * 10000 as                                   lastqty,
+                case
+                    when icb.ISSUE_PRICE is not null then icb.ISSUE_PRICE
+                    when icb.SPREAD is not null then icb.SPREAD
+                    when icb.COUPON_RATE is not null then icb.COUPON_RATE  end tradeYield,
+                case
+                when icb.ISSUE_PRICE is not null then  '元'
+                when icb.SPREAD is not null then  'BP'
+                when icb.COUPON_RATE is not null then  '%' end tradeYieldStr,
+                null                                                                 termDays,
+                icb.ACTUAL_FEE                  as                                   tradeAmt,
+                null                            as                                   quoteid,
+                icb.SUBSCRIBE_INSTITUTION_ID    as                                   traderid,
+                mccit.PARTY_ABBR                as                                   traderidName,
+                icb.SUBMIT_USER                                                      trader,
+                null                            as                                   counterId,
+                null                            as                                   counterIdName,
+                null                            as                                   clearType,
+                to_date(substr(icb.SUBSCRIPTION_TIME,0,10),'yyyy-MM-dd')             tradeDate,
+                icb.FAILURE_REASONS             as                                   remark,
+                icb.TRD_ID                      as                                   cstpTradeId,
+                null                            as                                   deliveryType,
+                null                            as                                   vsettleDate,
+                null                            as                                   msettleDate,
+                null                            as                                   settleDate,
+                null                            as                                   pledgeFinprodIds,
+                null                            as                                   pledgeRatios,
+                null                            as                                   pledgeFaceValues,
+                null                            as                                   mtradeAmt
+        from INTERF_CSTP_BJFXJG icb
+                 left join fin_product fp
+                           on icb.INSTRUMENT_ID = fp.finprod_market_id
+                               and fp.finprod_type = 'F01'
+                 LEFT JOIN SYS_USER_ADD sua ON icb.SUBMIT_USER = sua.IBU_TRADER
+                 LEFT JOIN SYS_USER su ON sua.USER_ID = su.USER_ID
+                 LEFT JOIN MST_CFETS_CUSTOMER_INFO mccit ON icb.SUBSCRIBE_INSTITUTION_ID = mccit.party_customer_id
+        where NOT EXISTS(SELECT 1 FROM trdquto_match_info match where icb.TRD_ID = match.CSTP_TRADE_ID)
+        and   to_date(substr(icb.SUBSCRIPTION_TIME,0,10),'yyyy-MM-dd')= #{sysDate,jdbcType=DATE}
+        <if test="regAssetType != null  and regAssetType!='' ">
+            AND 'BID' = #{regAssetType,jdbcType=VARCHAR}
+        </if>
+        <if test="finprodIdList != null and finprodIdList.size() > 0">
+            AND (icb.INSTRUMENT_ID  in
+            <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+            or icb.INSTRUMENT_ID in
+            <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                CONCAT(#{item},'.IB')
+            </foreach>
+            or fp.finprod_id in
+            <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="ps != null and !''.equals(ps)">
+            and 'T01' = #{ps,jdbcType=VARCHAR}
+        </if>
+        <if test="execid != null and !''.equals(execid)">
+            and 1 = 2
+        </if>
+        <if test="quoteid != null and !''.equals(quoteid)">
+            and 1 = 2
+        </if>
+        <if test="traderidList!=null and traderidList.size() > 0">
+            AND icb.SUBSCRIBE_INSTITUTION_ID IN
+            <foreach collection="traderidList" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="counterTraderList!=null and counterTraderList.size() > 0">
+            AND 1 = 2
+        </if>
+        <if test="settleSpeed!=null and settleSpeed!='' ">
+            and 1 = 2
+        </if>
+        <if test="acctNoList!=null  and acctNoList.size() > 0 ">
+            AND 1 = 2
+        </if>
+        <if test="userId != null and userId != ''">
+            and (su.USER_NAME= #{userId} or su.USER_NAME is null)
+        </if>
+
         )aaa
         left join SYS_DATADICT_LIST sdl on aaa.businesstype=sdl.ITEM_CODE and sdl.DICT_CODE='CSTP_BUSINESS_TYPE'
         left join SYS_DATADICT_LIST dictps on aaa.PS=dictps.ITEM_CODE and dictps.DICT_CODE='PS'
@@ -1212,6 +1397,7 @@
         m.match_type as matchType,
         reg.totle_trade_id as busiCode,
         m.exe_id as execid,
+        m.CSTP_TRADE_ID as cstpTradeId,
         decode(reg.finprod_type2,'F01','BOND','REPO') as finprodType2,
         decode(reg.finprod_type2,'F01','债券','质押式回购') as finprodType2Name,
         fp.finprod_id as finprodId,
@@ -1287,7 +1473,7 @@
         on nvl(ts.OURDEPOSITACCOUNTNUMBER,tr.OURDEPOSITACCOUNTNUMBER)=stlinfo.sec_acct_id
         LEFT JOIN MST_COUNTER_PARTY t1 on t1.counter_id=reg.counter_id
 
-        where 1=1  and reg.trade_date= #{sysDate,jdbcType=DATE} and reg.ps in ('T01','T02','03','04')
+        where reg.trade_date= #{sysDate,jdbcType=DATE} and reg.ps in ('T01','T02','03','04')
         <if test="userId != null and userId != ''">
             and reg.ou_trader_id= #{userId}
         </if>
@@ -1343,6 +1529,7 @@
         m.match_type as matchType,
         nvl(ib.cfets_quote_id,ic.cfets_quote_id) as busiCode,
         m.exe_id as execid,
+        m.CSTP_TRADE_ID as cstpTradeId,
         ct.BUSINESSTYPE as finprodType2,
         decode(ct.BUSINESSTYPE,'BOND','债券','REPO','质押式回购') as finprodType2Name,
         fp.finprod_id as finprodId,
@@ -1467,6 +1654,81 @@
             <foreach collection="counterIdList" item="item" separator="," open="(" close=")">
                 #{item}
             </foreach>
+        </if>
+        <if test="trdConfStatusList!=null  and trdConfStatusList.size() > 0 ">
+            AND m.trd_conf_status IN
+            <foreach collection="trdConfStatusList" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        union all
+        select distinct m.seqno               as seqno,
+                m.match_type          as matchType,
+                bo.BID_ID             as busiCode,
+                m.exe_id              as execid,
+                m.CSTP_TRADE_ID as cstpTradeId,
+                'BID'                 as finprodType2,
+                '一级申购'              as finprodType2Name,
+                fp.finprod_id         as finprodId,
+                fp.finprod_market_id  as finprodMarketId,
+                fp.finprod_abbr       as finprodAbbr,
+                'T01'                 as ps,
+                null                  as settleSpeed,
+                deal.SEC_ACCT_ID      as secManageAcctId,
+                stlinfo.sec_acct_name as secManageAcctIdName,
+                null                  as printAmt,
+                null                  as tradeYield,
+                null                  as termDays,
+                bo.PAYABLE_AMOUNT     as tradeAmt,
+                bo.BID_DATE           as tradeDate,
+                deal.portfolioId      as portfolioIds,
+                deal.portfolioName    as portfolioNames,
+                null                  as trdFeeAmt,
+                bo.SETT_FEE_AMT       as settleFeeAmt,
+                null                  as counterId,
+                null                  as counterIdName,
+                null                  as quoteType,
+                m.trd_conf_status     as trdConfStatus,
+                m.match_status        as matchStatus,
+                '04'                  as dealType,
+                m.pre_trade_id        as totleTradeId
+        from trdquto_match_info m
+             inner join BID_ORDER bo on m.pre_trade_id = bo.BID_ID
+             left join fin_product fp on bo.finprod_id = fp.finprod_id
+             inner join(select bobp.BID_ID,
+                               eed.SEC_ACCT_ID,
+                               wm_concat(bobp.portfolio_id) as portfolioId,
+                               wm_concat(pp.portfolio_name)    portfolioName
+                        from BID_ORDER_BID_PRICE bobp
+                                 left join ptl_portfolio pp on bobp.portfolio_id = pp.portfolio_id
+                                 left join ETR_ENTRUST_DETAIL eed on eed.ENTRUST_ID = bobp.ENTRUST_ID and eed.PORTFOLIO_ID = bobp.PORTFOLIO_ID
+                        where 1 = 1
+                        group by bobp.BID_ID,eed.SEC_ACCT_ID) deal on bo.BID_ID = deal.BID_ID
+             left join INTERF_CSTP_BJFXJG icb on icb.TRD_ID = m.CSTP_TRADE_ID
+             left join stl_sec_acct_info stlinfo
+                       on deal.SEC_ACCT_ID = stlinfo.sec_acct_id
+        where bo.BID_DATE = #{sysDate,jdbcType=DATE}
+        <if test="userId != null and userId != ''">
+            and bo.OUR_TRADER= #{userId}
+        </if>
+        <if test="finprodIdList != null and finprodIdList.size() > 0">
+            AND bo.finprod_id  in
+            <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="secAcctIdList!=null  and secAcctIdList.size() > 0 ">
+            AND icb.SUBMIT_USER IN
+            <foreach collection="secAcctIdList" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="busiCode != null and !''.equals(busiCode)">
+            and bo.BID_ID LIKE CONCAT('%',CONCAT(#{busiCode},'%'))
+        </if>
+        <if test="matchType != null and matchType != ''">
+            and m.match_type= #{matchType}
         </if>
         <if test="trdConfStatusList!=null  and trdConfStatusList.size() > 0 ">
             AND m.trd_conf_status IN
@@ -1628,6 +1890,65 @@
         order by ${sort} ${direction}
     </if>
     </select>
+
+    <select id="findAllTrdBidList" resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmExecFirstBondInfoResponse">
+        select * from (
+            select bo.BID_ID                        busiCode
+                 ,'04'                              busiType
+                 , bo.BID_DATE                      tradeDate
+                 , fp.FINPROD_ID                    finprodId
+                 , fp.FINPROD_MARKET_ID             finprodMarketId
+                 , fp.FINPROD_ABBR                  finprodAbbr
+                 , deal.SEC_ACCT_ID                 secManageAcctId
+                 , stlinfo.SEC_ACCT_NAME            secManageAcctIdName
+
+                 , bo.SUBSCRIPTION_AMOUNT           subscriptionAmount
+                 , bo.PAYABLE_AMOUNT                payableAmount
+                 , bo.SETT_FEE_AMT                  settFeeAmt
+                 , portfolioId
+                 , portfolioName
+                 , fp.ISSUE_PRICE                   issuePrice
+                 , case
+                       when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
+                           then nvl(fpi.BP, 0)
+                       when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD
+                       when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
+                           then fpi.REFER_YIELD end rate
+                 , fpi.ISSUE_DATE                   issueDate
+                 , fpi.PAY_DATE                     payDate
+                 , fp.COUPON_SPECIES                couponRateType
+                 , fp.ISSUE_TYPE                    ratetype
+                 , fp.CCY                           ccy
+                 , bo.OU_PARTY_ID                   ouPartyId
+                 , mcci.PARTY_ABBR                  ouPartyIdAbbr
+                 , bo.OUR_TRADER                    ourTrader
+                 , mcct.TRADER_NAME                 ourTraderName
+                 , bo.REMARK                        remark
+            from BID_ORDER bo
+                     left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
+                     left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = bo.FINPROD_ID
+                     left join (select bobp.BID_ID,
+                                       eed.SEC_ACCT_ID,
+                                       wm_concat(bobp.portfolio_id) as portfolioId,
+                                       wm_concat(pp.portfolio_name)    portfolioName
+                                from BID_ORDER_BID_PRICE bobp
+                                         left join ETR_ENTRUST_DETAIL eed
+                                                   on eed.ENTRUST_ID = bobp.ENTRUST_ID and bobp.PORTFOLIO_ID = eed.PORTFOLIO_ID
+                                         left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = bobp.PORTFOLIO_ID
+                                group by bobp.BID_ID, eed.SEC_ACCT_ID
+                                ) deal on deal.BID_ID = bo.BID_ID
+                     left join stl_sec_acct_info stlinfo
+                               on deal.SEC_ACCT_ID = stlinfo.sec_acct_id
+                     left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
+                     left join MST_CFETS_CUSTOMER_TRADER mcct on mcct.TRADER_ID = bo.OUR_TRADER
+            where bo.BID_ID=#{busiCode,jdbcType=VARCHAR}
+        )
+        <!--前端传入排序字段-->
+        <if test="sort != null and sort != '' and direction != null and direction != ''">
+            order by ${sort} ${direction}
+        </if>
+    </select>
+
     <select id="findAllTrdRepoList" resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmExecRepoInfoResponse">
         select * from (
         select reg.totle_trade_id as busiCode,
@@ -1790,6 +2111,56 @@
             order by ${sort} ${direction}
         </if>
     </select>
+
+    <select id="findAllCstpBidList" resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmExecFirstBondInfoResponse">
+    select * from (
+        select icb.TRD_ID                                                  execid
+             , fp.FINPROD_ID                                               finprodId
+             , icb.INSTRUMENT_ID                                           finprodMarketId
+             , icb.INSTRUMENT_SHORT_NAME                                   finprodAbbr
+             , icb.ISSUE_METHOD                                            issuetype
+             , deal.SEC_ACCT_ID                                            secManageAcctId
+             , stlinfo.SEC_ACCT_NAME                                       secManageAcctIdName
+             , icb.SUBSCRIPTION_AMOUNT                                     subscriptionAmount
+             , icb.ACTUAL_FEE                                              payableAmount
+             , bo.SETT_FEE_AMT                                             settFeeAmt
+             , icb.ISSUE_PRICE                                             issuePrice
+             , icb.SPREAD                                                  bp
+             , icb.COUPON_RATE                                             rate
+             , icb.COUPON_RATE_TYPE                                        couponRateType
+             , fp.ccy                                                      ccy
+             , icb.ISSUER                                                  issuer
+             , mcci1.PARTY_ABBR                                            issuerName
+             , icb.SUBSCRIBE_INSTITUTION_ID                                ouPartyId
+             , mcci.PARTY_ABBR                                             ouPartyIdAbbr
+             , icb.SUBMIT_USER                                             ourTrader
+             , mcct.TRADER_NAME                                            ourTraderName
+             , to_date(substr(icb.SUBSCRIPTION_TIME, 0, 10), 'yyyy-MM-dd') tradeDate
+             , null                                                        remark
+        from INTERF_CSTP_BJFXJG icb
+                 left join FIN_PRODUCT fp on icb.INSTRUMENT_ID = fp.FINPROD_MARKET_ID
+                 left join TRDQUTO_MATCH_INFO tmi on tmi.CSTP_TRADE_ID = icb.TRD_ID
+                 left join
+             BID_ORDER bo on bo.BID_ID = tmi.PRE_TRADE_ID
+                 left join (select distinct bobp.BID_ID,
+                                            eed.SEC_ACCT_ID
+                            from BID_ORDER_BID_PRICE bobp
+                                     left join ETR_ENTRUST_DETAIL eed
+                                               on eed.ENTRUST_ID = bobp.ENTRUST_ID and
+                                                  bobp.PORTFOLIO_ID = eed.PORTFOLIO_ID) deal on deal.BID_ID = bo.BID_ID
+                 left join stl_sec_acct_info stlinfo
+                           on deal.SEC_ACCT_ID = stlinfo.sec_acct_id
+                 left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = icb.SUBSCRIBE_INSTITUTION_ID
+                 left join MST_CFETS_CUSTOMER_INFO mcci1 on mcci1.PARTY_ID = icb.ISSUER_21_FIRM_ID
+                 left join MST_CFETS_CUSTOMER_TRADER mcct on mcct.TRADER_ID = icb.SUBMIT_USER
+            where icb.TRD_ID=#{exeid,jdbcType=VARCHAR}
+        )
+        <!--前端传入排序字段-->
+        <if test="sort != null and sort != '' and direction != null and direction != ''">
+            order by ${sort} ${direction}
+        </if>
+    </select>
+
     <select id="findAllCstpRepoList" resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmCstpRepoInfoResponse">
         select * from (
         select distinct tr.oritradeid as execid,
@@ -2116,11 +2487,18 @@
         select finprod_id,ISSUE_STATUS  from FIN_PRODUCT_ADD  where FINPROD_ID = #{finprodId,jdbcType=VARCHAR} and ROWNUM = 1
     </select>
 
-    <select id="selectCountEtrFinshByFinprodId">
-        select count(*)
-        from ETR_FINISH_STATUS efs
-                 inner join ETR_ENTRUST ee on ee.ENTRUST_ID = efs.ENTRUST_ID
-        where ee.FINPROD_ID = #{finprodId,jdbcType=VARCHAR} and efs.ENT_FINISH_AMT is not null and efs.ENT_FINISH_AMT > 0
+    <select id="selectEtrEntrustEByFinprodId" resultType="com.joyintech.tams.common.base.entity.EtrEntrust">
+        select ee.ENTRUST_ID,nvl(efs.finishAmt,0) ENTRUST_AMT,ee.ENTRUST_STATUS,ee.REMARK
+        from ETR_ENTRUST ee
+        left join (select ENTRUST_ID, sum(ENT_FINISH_AMT) finishAmt from ETR_FINISH_STATUS group by ENTRUST_ID) efs
+        on ee.ENTRUST_ID = efs.ENTRUST_ID
+        where ee.ENTRUST_STATUS in ('03','02')
+        <if test="finprodIds != null and finprodIds.size() > 0">
+            AND ee.FINPROD_ID in
+            <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
     </select>
 
 </mapper>

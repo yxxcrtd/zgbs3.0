@@ -18,6 +18,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *  持仓返回
@@ -331,7 +333,15 @@ public class EtrExchangeTradePositionsSecRepoResponse {
      */
     public String getBusinessModelStr(){
         if(StringUtil.isNotEmpty(getBusinessModel())){
-            return SysDataUtil.getNameFromDataDict(DictCode.业务模式,getBusinessModel());
+            Set<String> resList = new HashSet<>();
+            String[] values = getBusinessModel().split(",");
+            for (String value : values) {
+                String nameFromDataDict = SysDataUtil.getNameFromDataDict(DictCode.业务模式, value);
+                if(null != nameFromDataDict){
+                    resList.add(nameFromDataDict);
+                }
+            }
+            return resList.isEmpty() ? "" : String.join(",",resList);
         }
         else {
             return "";

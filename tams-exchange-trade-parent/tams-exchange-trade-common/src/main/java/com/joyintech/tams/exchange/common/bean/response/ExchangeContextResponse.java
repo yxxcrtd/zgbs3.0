@@ -57,6 +57,9 @@ public class ExchangeContextResponse {
     @ApiModelProperty(value = "场内交易下单价格超过有效价格申报范围（01 禁止；02 仅提示；03 允许）")
     private String trdPriceScopeControl;
 
+    @ApiModelProperty(value = "场内新债默认行情类型控制：01-匹配成交，02-协商成交，03-点击成交，04-询价成交，05-竞买成交")
+    private String trdNewBondQuotationTypeControl;
+
 
     public String getUserId() {
         return userId;
@@ -176,5 +179,13 @@ public class ExchangeContextResponse {
 
     public void setTrdPriceScopeControl(String trdPriceScopeControl) {
         this.trdPriceScopeControl = trdPriceScopeControl;
+    }
+
+    public String getTrdNewBondQuotationTypeControl() {
+        return trdNewBondQuotationTypeControl;
+    }
+
+    public void setTrdNewBondQuotationTypeControl(String trdNewBondQuotationTypeControl) {
+        this.trdNewBondQuotationTypeControl = trdNewBondQuotationTypeControl;
     }
 }

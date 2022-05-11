@@ -123,16 +123,26 @@ public class Trade implements Serializable, KeyMethodInterface<String> {
     @ApiModelProperty(value = "成交价格")
     private BigDecimal tradedPrice;
 
+    @Digits(integer = 20, fraction = 4)
+    @JsonSerialize(using = DoubleSerializerUtils.class)
+    @ApiModelProperty(value = "净价价格")
+    private BigDecimal netPrice;
+
     @NotNull
     @Digits(integer = 20, fraction = 4)
     @JsonSerialize(using = DoubleSerializerUtils.class)
     @ApiModelProperty(value = "全价价格")
     private BigDecimal fullPrice;
 
+    @Digits(integer = 20, fraction = 4)
+    @JsonSerialize(using = DoubleSerializerUtils.class)
+    @ApiModelProperty(value = "净价金额")
+    private BigDecimal netBalance;
+
     @NotNull
     @Digits(integer = 20, fraction = 4)
     @JsonSerialize(using = DoubleSerializerUtils.class)
-    @ApiModelProperty(value = "清算金额")
+    @ApiModelProperty(value = "清算金额，全价金额")
     private BigDecimal clearBalance;
 
     @NotNull
@@ -236,6 +246,9 @@ public class Trade implements Serializable, KeyMethodInterface<String> {
     private String dealTime;
 
     private String entrustClass;
+
+    @ApiModelProperty(name = "isFullPrice", value = "是否全价（Y:是 ， N：否）")
+    private String isFullPrice;
 
     public Trade() {
         this.tradedBalance = new BigDecimal("0.00");
@@ -414,6 +427,22 @@ public class Trade implements Serializable, KeyMethodInterface<String> {
 
     public void setTradedPrice(BigDecimal tradedPrice) {
         this.tradedPrice = tradedPrice;
+    }
+
+    public BigDecimal getNetPrice() {
+        return netPrice;
+    }
+
+    public void setNetPrice(BigDecimal netPrice) {
+        this.netPrice = netPrice;
+    }
+
+    public BigDecimal getNetBalance() {
+        return netBalance;
+    }
+
+    public void setNetBalance(BigDecimal netBalance) {
+        this.netBalance = netBalance;
     }
 
     public BigDecimal getClearBalance() {
@@ -686,5 +715,13 @@ public class Trade implements Serializable, KeyMethodInterface<String> {
 
     public void setEntrustClass(String entrustClass) {
         this.entrustClass = entrustClass;
+    }
+
+    public String getIsFullPrice() {
+        return isFullPrice;
+    }
+
+    public void setIsFullPrice(String isFullPrice) {
+        this.isFullPrice = isFullPrice;
     }
 }

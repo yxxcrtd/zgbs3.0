@@ -3,6 +3,7 @@ package com.joyintech.tams.exchange.service.trade.controller;
 import com.google.common.collect.Maps;
 import com.joyintech.framework.util.StringUtil;
 import cn.hutool.core.util.NumberUtil;
+import com.joyintech.tams.exchange.common.BusinessResultException;
 import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.constant.EntrustBsProp;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
@@ -28,10 +29,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_质押券出入库;
-import java.math.BigDecimal;
-import java.util.HashMap;
+
 import java.util.Map;
-import java.util.Objects;
 
 @RestController("OrderController_dtx")
 @RequestMapping("/trade/joyin")
@@ -74,18 +73,22 @@ public class OrderController {
      */
     @ApiOperation(value = "普通下单（竞价下单）", notes = "普通下单（竞价下单）")
     @PostMapping(value = "/order")
-    public Message<OrderPlaceBean> sendOrder(@RequestBody OrderPlaceBean order) {
+    public Message<Object> sendOrder(@RequestBody OrderPlaceBean order) {
         if (isSlave()) {
             return MasterUtil.postForObject(order);
         }
 
-        ResultBean checkResult = commonCheckKit.check(order);
-        if (ErrorCode.isFail(checkResult.getErrorCode())) {
-            return new Message<>(checkResult);
-        }
-        ResultBean businessCheckResult = businessCheckKit.check(order);
-        if (ErrorCode.isFail(businessCheckResult.getErrorCode())) {
-            return new Message<>(businessCheckResult);
+        try {
+            ResultBean checkResult = commonCheckKit.check(order);
+            if (ErrorCode.isFail(checkResult.getErrorCode())) {
+                return new Message<>(checkResult);
+            }
+            ResultBean businessCheckResult = businessCheckKit.check(order);
+            if (ErrorCode.isFail(businessCheckResult.getErrorCode())) {
+                return new Message<>(businessCheckResult);
+            }
+        } catch (BusinessResultException e) {
+            return e.toMessage();
         }
 
         Instruction instruction = instructionService.findById(order.getInstructionId());
@@ -117,18 +120,22 @@ public class OrderController {
      */
     @ApiOperation(value = "综合业务下单", notes = "综合业务下单")
     @PostMapping(value = "/order/integratedEntrust")
-    public Message<IntegratedEntrust> sendIntegratedEntrust(@RequestBody @Validated IntegratedOrderPlaceBean order) {
+    public Message<Object> sendIntegratedEntrust(@RequestBody @Validated IntegratedOrderPlaceBean order) {
         if (isSlave()) {
             return MasterUtil.postForObject(order);
         }
 
-        ResultBean commonCheckResult = commonCheckKit.check(order);
-        if (ErrorCode.isFail(commonCheckResult.getErrorCode())) {
-            return new Message<>(commonCheckResult);
-        }
-        ResultBean businessCheckResult = businessCheckKit.check(order);
-        if (ErrorCode.isFail(businessCheckResult.getErrorCode())) {
-            return new Message<>(businessCheckResult);
+        try {
+            ResultBean commonCheckResult = commonCheckKit.check(order);
+            if (ErrorCode.isFail(commonCheckResult.getErrorCode())) {
+                return new Message<>(commonCheckResult);
+            }
+            ResultBean businessCheckResult = businessCheckKit.check(order);
+            if (ErrorCode.isFail(businessCheckResult.getErrorCode())) {
+                return new Message<>(businessCheckResult);
+            }
+        } catch (BusinessResultException e) {
+            return e.toMessage();
         }
 
         Instruction instruction = instructionService.findById(order.getInstructionId());
@@ -139,7 +146,7 @@ public class OrderController {
             integratedEntrust.setEntrustVolume(instruction.getEntrustNum());
         }
 
-        if(StringUtil.isNotEmpty(order.getCounterId())){
+        if (StringUtil.isNotEmpty(order.getCounterId())) {
             Map<String, Object> extend2 = Maps.newHashMap();
             extend2.put("counterId", order.getCounterId());
             integratedEntrust.setExtend2(JsonUtils.getJsonFromObject(extend2));

@@ -57,11 +57,11 @@ public class MessageSenderManagement extends BaseService {
     @Value("${application.micorservice.contextPath.single:false}")
     private boolean isSingle;
 
-    @Value("${trd-info-push-mode:01}")
-    private String trdInfoPushMode;
+    @Value("${trd-info-push-mode:1}")
+    private int trdInfoPushMode;
 
-    private static final String MQ = "01";
-    private static final String INTERFACE = "02";
+    private static final int MQ = 1;
+    private static final int INTERFACE = 2;
 
     /**
      * 成交推送
@@ -154,22 +154,23 @@ public class MessageSenderManagement extends BaseService {
     }
 
     private void sendMessage(RecordLog recordLog, BasicMessage basicMessage, int pushType) {
-        //消息推送方式:01-MQ；02-接口
+        //消息推送方式trdInfoPushMode:1-MQ；2-接口
+        //消息推送方式pushType:1-成交；2-手工交收；3-指令进度
         logger.info("【sendMessage】 parameters：pushType={}，trdInfoPushMode={}，basicMessage={}", pushType, trdInfoPushMode, JsonUtils.getJsonFromObject(basicMessage));
         //推送MQ
-        if (StringUtil.isEmpty(trdInfoPushMode) || StringUtil.equals(trdInfoPushMode, MQ)) {
+        if (trdInfoPushMode == 0 || trdInfoPushMode == MQ) {
             try {
                 recordLog.setStatus(1);
                 if (pushType == 1) {
                     messageSenderService.pushTradeToMQ(basicMessage);
                 } else if (pushType == 2) {
-                    //messageSenderService.pushTradeToMQForFixedIncome(basicMessage);
+                    messageSenderService.pushTradeToMQForFixedIncome(basicMessage);
                 } else if (pushType == 3) {
                     messageSenderService.pushProgressToMQ(basicMessage);
                 } else {
                     logger.error("不支持当前推送业务：pushType={}", pushType);
                     recordLog.setStatus(2);
-                    recordLog.setRemark("不支持当前推送业务");
+                    recordLog.setRemark("不支持当前推送业务:pushType=" + pushType);
                 }
             } catch (Exception e) {
                 logger.error("推送MQ失败：【{}】", JsonUtils.getJsonFromObject(basicMessage));
@@ -178,8 +179,8 @@ public class MessageSenderManagement extends BaseService {
             }
         }
         //推送接口
-        else if (StringUtil.equals(trdInfoPushMode, INTERFACE)) {
-            Message<String> result = null;
+        else if (trdInfoPushMode == INTERFACE) {
+            Message<Object> result = null;
             if (pushType == 1) {
                 result = sendMessage(basicMessage, TradeServiceURL.pushTrade);
             } else if (pushType == 2) {
@@ -189,7 +190,7 @@ public class MessageSenderManagement extends BaseService {
             } else {
                 logger.error("不支持当前推送业务：pushType={}", pushType);
                 recordLog.setStatus(2);
-                recordLog.setRemark("不支持当前推送业务");
+                recordLog.setRemark("不支持当前推送业务:pushType=" + pushType);
             }
 
             if (Objects.nonNull(result)) {
@@ -204,19 +205,19 @@ public class MessageSenderManagement extends BaseService {
                 recordLog.setRemark("推送接口失败");
             }
         } else {
-            logger.error("不支持当前推送方式：trdInfoPushMode={}", trdInfoPushMode);
+            logger.error("不支持当前推送方式：pushMode={}", trdInfoPushMode);
             recordLog.setStatus(2);
-            recordLog.setRemark("不支持当前推送方式");
+            recordLog.setRemark("不支持当前推送方式：pushMode=" + trdInfoPushMode);
         }
         recordLogService.update(recordLog);
     }
 
-    private Message<String> sendMessage(Object msg, String url) {
+    private Message<Object> sendMessage(Object msg, String url) {
         try {
             String sendUrl = ServiceApplication.TRADE_SERVICE_NAME + url;
             Map<String, Object> param = Maps.newHashMap();
             param.put("mesInfo", JsonUtils.getJsonFromObject(msg));
-            Message<String> result;
+            Message<Object> result;
             if (isSingle) {
                 result = simpleRestTemplate.postForObject(sendUrl, param, Message.class);
             } else {
@@ -226,7 +227,7 @@ public class MessageSenderManagement extends BaseService {
             return result;
         } catch (Exception e) {
             logger.error("【推送消息】接口失败，" + e.getMessage(), e);
-            return new Message<>(ResultBean.error(ErrorCode.API_RETURN_ERROR));
+            return new Message<Object>(ResultBean.error(ErrorCode.API_RETURN_ERROR));
         }
     }
 

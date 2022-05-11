@@ -356,6 +356,11 @@ public class MstMarketInstitutionsService extends CommonExportService<MstMarketI
      */
     public Map<String, Object> autoAddInstitutions(String insitituteCode) {
         Map<String, Object> result = new HashMap<>();
+        if(StringUtil.isEmpty(insitituteCode)) {
+            result.put("errorCode", 0);
+            result.put("message", "匹配失败");
+            return result;
+        }
         MstMarketInstitutionsDto mstDto = restTemplate.getForObject(
                 ServiceApplication.BASICDATA_SERVICE_NAME + "/MstMarketInstitutions/autoAddInstitutions?insitituteCode=" + insitituteCode, MstMarketInstitutionsDto.class);
         if (Objects.nonNull(mstDto) && mstDto.getDealFlag() == 1) {

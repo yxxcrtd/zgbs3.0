@@ -2306,12 +2306,15 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         // 调用投资委托组件的更新委托状态接口，将委托状态设置为"已撤回"
         boolean flag = etrInvestInfoServiceImpl.updateDelegateStatus(entity.getEtrEntrust().getEntrustId(),
                 entity.getEtrEntrust().getEntrustStatus());
-        if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))){
-            //插入旧头寸
-            if (baseEtrCashPositionCommService != null) {
-                baseEtrCashPositionCommService.entrustCloseExecute(entity.getEtrEntrust().getEntrustId(),DictCodeList.是否_是.getValue());
+        if(!StringUtil.equals(dto.getAssetType(),DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())){
+            if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))){
+                //插入旧头寸
+                if (baseEtrCashPositionCommService != null) {
+                    baseEtrCashPositionCommService.entrustCloseExecute(entity.getEtrEntrust().getEntrustId(),DictCodeList.是否_是.getValue());
+                }
             }
         }
+
         //更新操作记录日志
         CfetsOprHisInfoRequest oprHisReq=new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(dto.getEntrustId());
@@ -2525,6 +2528,9 @@ public class CfetsEtrIbBondinfoService extends BaseService{
             String assetType = DictCodeList.平安资产类型_债券.getValue();
             if(StringUtil.equals(dto.getAssetType(),DictCodeList.平安资产类型_质押式回购.getValue())){
                 assetType = DictCodeList.平安资产类型_质押式回购.getValue();
+            }
+            if(StringUtil.equals(dto.getAssetType(),DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())){
+                assetType = DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue();
             }
             EntrustRdsCommonAop.doListPreOccupy(dtolist, assetType,
                     BussinessDictCodeListRds.接口系统ID_预占释放批量接口.getValue(), false, null);

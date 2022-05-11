@@ -160,6 +160,15 @@ public class RskSupervisionIndicatorController {
 	public RskSupervisionIndicator002Dto querySuperIndicatorInfoByIndId(@RequestBody Map<String, Object> map) {
 		return rskSupervisionIndicatorService.querySuperIndicatorInfoByIndId(map);
 	}
+	/**
+	 * 监督指标信息获取
+	 * @param indId 指标代码
+	 * @return PrdValParam
+	 */
+	@PostMapping("querySuperIndicatorInfoByIndId_RULE")
+	public RskSupervisionIndicator002Dto querySuperIndicatorInfoByIndId_RULE(@RequestBody Map<String, Object> map) {
+		return rskSupervisionIndicatorService.querySuperIndicatorInfoByIndId_RULE(map);
+	}
     /**
 	 * 查询组合关联指标
 	 * @param indId 指标代码
