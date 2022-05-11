@@ -25,6 +25,9 @@ public class CfetsEtrIBondFirstBidFindIssueInfoRequest {
     @ApiModelProperty(name = "finprodAbbr", value = "资产简称", example = "ZC名")
     private String finprodAbbr;
 
+    @ApiModelProperty(name="tradeMarket",value="交易场所")
+    private String tradeMarket;
+
     @ApiModelProperty(name = "issueClass", value = "发行方式", example = "01")
     private String issueClass;
 
@@ -41,7 +44,16 @@ public class CfetsEtrIBondFirstBidFindIssueInfoRequest {
     private String intType;
 
     @ApiModelProperty(name = "customAssetType", value = "资产分类")
-    private String customAssetType;
+    private List<List<String>> customAssetType;
+
+    @ApiModelProperty(name = "type9List", value = "资产一级分类")
+    private List<String> type9List;
+
+    @ApiModelProperty(name = "type10List", value = "资产二级分类")
+    private List<String> type10List;
+
+    @ApiModelProperty(name = "type11List", value = "资产三级分类")
+    private List<String> type11List;
 
     @ApiModelProperty(name = "search", value = "关键字", example = "12")
     private String search;
@@ -103,11 +115,11 @@ public class CfetsEtrIBondFirstBidFindIssueInfoRequest {
         this.intType = intType;
     }
 
-    public String getCustomAssetType() {
+    public List<List<String>> getCustomAssetType() {
         return customAssetType;
     }
 
-    public void setCustomAssetType(String customAssetType) {
+    public void setCustomAssetType(List<List<String>> customAssetType) {
         this.customAssetType = customAssetType;
     }
 
@@ -165,5 +177,37 @@ public class CfetsEtrIBondFirstBidFindIssueInfoRequest {
 
     public void setIssueStage(List<String> issueStage) {
         this.issueStage = issueStage;
+    }
+
+    public List<String> getType9List() {
+        return type9List;
+    }
+
+    public void setType9List(List<String> type9List) {
+        this.type9List = type9List;
+    }
+
+    public List<String> getType10List() {
+        return type10List;
+    }
+
+    public void setType10List(List<String> type10List) {
+        this.type10List = type10List;
+    }
+
+    public List<String> getType11List() {
+        return type11List;
+    }
+
+    public void setType11List(List<String> type11List) {
+        this.type11List = type11List;
+    }
+
+    public String getTradeMarket() {
+        return tradeMarket;
+    }
+
+    public void setTradeMarket(String tradeMarket) {
+        this.tradeMarket = tradeMarket;
     }
 }

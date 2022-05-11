@@ -5,85 +5,90 @@ import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.Date;
 
 /**
  * @Author: kchen
  * @Date: 2022/4/21 9:51
  */
-@ApiModel(value="一级投标待发行信息列表",description="一级投标待发行信息列表")
+@ApiModel(value = "一级投标待发行信息列表", description = "一级投标待发行信息列表")
 public class CfetsEtrIBondFirstBidFindIssueInfoDto {
 
-    @ApiModelProperty(name="finprodId",value="金融产品代码",example="ZC1")
+    @ApiModelProperty(name = "finprodId", value = "金融产品代码", example = "ZC1")
     private String finprodId;
 
     @ApiModelProperty(name = "finprodMarketId", value = "资产代码")
     private String finprodMarketId;
 
-    @ApiModelProperty(name="finprodAbbr",value="资产简称",example="ZC名")
+    @ApiModelProperty(name = "finprodAbbr", value = "资产简称", example = "ZC名")
     private String finprodAbbr;
 
-    @ApiModelProperty(name="issueClass",value="发行方式",example="报价发行/招标发行/簿记建档")
+    @ApiModelProperty(name = "issueClass", value = "发行方式", example = "报价发行/招标发行/簿记建档")
     private String issueClass;
 
-    @ApiModelProperty(name="issueClassStr",value="发行方式名称")
+    @ApiModelProperty(name = "issueClassStr", value = "发行方式名称")
     private String issueClassStr;
 
-    @ApiModelProperty(name="tenderType",value="招标方式")
+    @ApiModelProperty(name = "tenderType", value = "招标方式")
     private String tenderType;
 
-    @ApiModelProperty(name="issueStyle",value="发行类型")
+    @ApiModelProperty(name = "issueStyle", value = "发行类型")
     private String issueStyle;
 
-    @ApiModelProperty(name="planIssueAmt",value="计划发行量")
+    @ApiModelProperty(name = "planIssueAmt", value = "计划发行量")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal planIssueAmt;
 
-    @ApiModelProperty(name="issueDate",value="投标日/发行日")
+    @ApiModelProperty(name = "issueDate", value = "投标日/发行日")
     private Date issueDate;
 
-    @ApiModelProperty(name="issueDateStr",value="投标日/发行日字符串")
+    @ApiModelProperty(name = "issueDateStr", value = "投标日/发行日字符串")
     private String issueDateStr;
 
-    @ApiModelProperty(name="payEdate",value="缴款截止日")
+    @ApiModelProperty(name = "payEdate", value = "缴款截止日")
     private Date payEdate;
 
-    @ApiModelProperty(name="payEdateStr",value="缴款截止日字符串")
+    @ApiModelProperty(name = "payEdateStr", value = "缴款截止日字符串")
     private String payEdateStr;
 
-    @ApiModelProperty(name="couponSpecies",value="息票品种")
+    @ApiModelProperty(name = "couponSpecies", value = "息票品种")
     private String couponSpecies;
 
-    @ApiModelProperty(name="couponSpeciesStr",value="息票品种名称")
+    @ApiModelProperty(name = "couponSpeciesStr", value = "息票品种名称")
     private String couponSpeciesStr;
 
-    @ApiModelProperty(name="intType",value="利率类型")
+    @ApiModelProperty(name = "intType", value = "利率类型")
     private String intType;
 
-    @ApiModelProperty(name="intTypeStr",value="利率类型名称")
+    @ApiModelProperty(name = "intTypeStr", value = "利率类型名称")
     private String intTypeStr;
 
-    @ApiModelProperty(name="issuePrice",value="发行价格")
+    @ApiModelProperty(name = "issuePrice", value = "发行价格")
     private BigDecimal issuePrice;
 
-    @ApiModelProperty(name="referYield",value="参考收益率/票面利率")
+    @ApiModelProperty(name = "referYield", value = "参考收益率/票面利率")
     private BigDecimal referYield;
 
-    @ApiModelProperty(name="firstConfirmDate",value="首次利率确定日")
+    @ApiModelProperty(name = "referYieldStr", value = "参考收益率/票面利率(含单位)")
+    private String referYieldStr;
+
+    @ApiModelProperty(name = "firstConfirmDate", value = "首次利率确定日")
     private Date firstConfirmDate;
 
-    @ApiModelProperty(name="firstConfirmDateStr",value="首次利率确定日字符串")
+    @ApiModelProperty(name = "firstConfirmDateStr", value = "首次利率确定日字符串")
     private String firstConfirmDateStr;
 
-    @ApiModelProperty(name="minPamt",value="单笔/标位最低量")
+    @ApiModelProperty(name = "minPamt", value = "单笔/标位最低量")
     private BigDecimal minPamt;
 
-    @ApiModelProperty(name="maxPamt",value="单笔/标位最高量")
+    @ApiModelProperty(name = "maxPamt", value = "单笔/标位最高量")
     private BigDecimal maxPamt;
 
     @ApiModelProperty(name = "ztGrade", value = "主体评级")
@@ -118,6 +123,9 @@ public class CfetsEtrIBondFirstBidFindIssueInfoDto {
 
     @ApiModelProperty(name = "tradeMarket", value = "交易场所")
     private String tradeMarket;
+
+    @ApiModelProperty(name = "tradeMarketStr", value = "交易场所名称")
+    private String tradeMarketStr;
 
     @ApiModelProperty(name = "subRate", value = "主体评级")
     private String subRate;
@@ -434,5 +442,36 @@ public class CfetsEtrIBondFirstBidFindIssueInfoDto {
 
     public void setFirstConfirmDateStr(String firstConfirmDateStr) {
         this.firstConfirmDateStr = firstConfirmDateStr;
+    }
+
+    public String getReferYieldStr() {
+        if (getReferYield() == null) {
+            return null;
+        }
+        if (StringUtil.equals(getCouponSpecies(), DictCodeList.息票品种_附息.getValue())
+                && StringUtil.equals(getIntType(), DictCodeList.利率类型_浮动利率.getValue())) {
+            DecimalFormat decimalFormat = new DecimalFormat("0.0000#");
+            return decimalFormat.format(getReferYield()) + " BP";
+        } else {
+            BigDecimal value = getReferYield().setScale(4, BigDecimal.ROUND_HALF_UP);
+            DecimalFormat decimalFormat = new DecimalFormat("0.0000#");
+            return decimalFormat.format(value) + " %";
+        }
+
+    }
+
+    public void setReferYieldStr(String referYieldStr) {
+        this.referYieldStr = referYieldStr;
+    }
+
+    public String getTradeMarketStr() {
+        if (StringUtil.isEmpty(getTradeMarket())) {
+            return null;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.交易场所, getTradeMarket());
+    }
+
+    public void setTradeMarketStr(String tradeMarketStr) {
+        this.tradeMarketStr = tradeMarketStr;
     }
 }
