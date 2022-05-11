@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.joyintech.tams.common.base.dao.InfContractPortfolioDetailMapper">
+  <resultMap id="BaseResultMap" type="com.joyintech.tams.common.base.entity.InfContractPortfolioDetail">
+    <id column="SEQNO" jdbcType="VARCHAR" property="seqno" />
+    <result column="PORTFOLIO_ID" jdbcType="VARCHAR" property="portfolioId" />
+    <result column="PORTFOLIO_NAME" jdbcType="VARCHAR" property="portfolioName" />
+    <result column="SHARE_AMT" jdbcType="DECIMAL" property="shareAmt" />
+    <result column="TRADE_AMT" jdbcType="DECIMAL" property="tradeAmt" />
+    <result column="ENTRUST_NUM" jdbcType="DECIMAL" property="entrustNum" />
+    <result column="ENTRUST_AMT" jdbcType="DECIMAL" property="entrustAmt" />
+    <result column="TARGET_TYPE" jdbcType="VARCHAR" property="targetType" />
+    <result column="CREATE_USER" jdbcType="VARCHAR" property="createUser" />
+    <result column="CREATE_DEPT" jdbcType="VARCHAR" property="createDept" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="UPDATE_USER" jdbcType="VARCHAR" property="updateUser" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    SEQNO, PORTFOLIO_ID, PORTFOLIO_NAME, SHARE_AMT, TRADE_AMT, ENTRUST_NUM, ENTRUST_AMT, 
+    TARGET_TYPE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from BS303INIT_TEST1008_MFX.INF_CONTRACT_PORTFOLIO_DETAIL
+    where SEQNO = #{seqno,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from BS303INIT_TEST1008_MFX.INF_CONTRACT_PORTFOLIO_DETAIL
+    where SEQNO = #{seqno,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.InfContractPortfolioDetail">
+    insert into BS303INIT_TEST1008_MFX.INF_CONTRACT_PORTFOLIO_DETAIL (SEQNO, PORTFOLIO_ID, PORTFOLIO_NAME, 
+      SHARE_AMT, TRADE_AMT, ENTRUST_NUM, 
+      ENTRUST_AMT, TARGET_TYPE, CREATE_USER, 
+      CREATE_DEPT, CREATE_TIME, UPDATE_USER, 
+      UPDATE_TIME)
+    values (#{seqno,jdbcType=VARCHAR}, #{portfolioId,jdbcType=VARCHAR}, #{portfolioName,jdbcType=VARCHAR}, 
+      #{shareAmt,jdbcType=DECIMAL}, #{tradeAmt,jdbcType=DECIMAL}, #{entrustNum,jdbcType=DECIMAL}, 
+      #{entrustAmt,jdbcType=DECIMAL}, #{targetType,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, 
+      #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.InfContractPortfolioDetail">
+    insert into BS303INIT_TEST1008_MFX.INF_CONTRACT_PORTFOLIO_DETAIL
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="seqno != null">
+        SEQNO,
+      </if>
+      <if test="portfolioId != null">
+        PORTFOLIO_ID,
+      </if>
+      <if test="portfolioName != null">
+        PORTFOLIO_NAME,
+      </if>
+      <if test="shareAmt != null">
+        SHARE_AMT,
+      </if>
+      <if test="tradeAmt != null">
+        TRADE_AMT,
+      </if>
+      <if test="entrustNum != null">
+        ENTRUST_NUM,
+      </if>
+      <if test="entrustAmt != null">
+        ENTRUST_AMT,
+      </if>
+      <if test="targetType != null">
+        TARGET_TYPE,
+      </if>
+      <if test="createUser != null">
+        CREATE_USER,
+      </if>
+      <if test="createDept != null">
+        CREATE_DEPT,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+      <if test="updateUser != null">
+        UPDATE_USER,
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="seqno != null">
+        #{seqno,jdbcType=VARCHAR},
+      </if>
+      <if test="portfolioId != null">
+        #{portfolioId,jdbcType=VARCHAR},
+      </if>
+      <if test="portfolioName != null">
+        #{portfolioName,jdbcType=VARCHAR},
+      </if>
+      <if test="shareAmt != null">
+        #{shareAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="tradeAmt != null">
+        #{tradeAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="entrustNum != null">
+        #{entrustNum,jdbcType=DECIMAL},
+      </if>
+      <if test="entrustAmt != null">
+        #{entrustAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="targetType != null">
+        #{targetType,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createDept != null">
+        #{createDept,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.common.base.entity.InfContractPortfolioDetail">
+    update BS303INIT_TEST1008_MFX.INF_CONTRACT_PORTFOLIO_DETAIL
+    <set>
+      <if test="portfolioId != null">
+        PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR},
+      </if>
+      <if test="portfolioName != null">
+        PORTFOLIO_NAME = #{portfolioName,jdbcType=VARCHAR},
+      </if>
+      <if test="shareAmt != null">
+        SHARE_AMT = #{shareAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="tradeAmt != null">
+        TRADE_AMT = #{tradeAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="entrustNum != null">
+        ENTRUST_NUM = #{entrustNum,jdbcType=DECIMAL},
+      </if>
+      <if test="entrustAmt != null">
+        ENTRUST_AMT = #{entrustAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="targetType != null">
+        TARGET_TYPE = #{targetType,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        CREATE_USER = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createDept != null">
+        CREATE_DEPT = #{createDept,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where SEQNO = #{seqno,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.InfContractPortfolioDetail">
+    update BS303INIT_TEST1008_MFX.INF_CONTRACT_PORTFOLIO_DETAIL
+    set PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR},
+      PORTFOLIO_NAME = #{portfolioName,jdbcType=VARCHAR},
+      SHARE_AMT = #{shareAmt,jdbcType=DECIMAL},
+      TRADE_AMT = #{tradeAmt,jdbcType=DECIMAL},
+      ENTRUST_NUM = #{entrustNum,jdbcType=DECIMAL},
+      ENTRUST_AMT = #{entrustAmt,jdbcType=DECIMAL},
+      TARGET_TYPE = #{targetType,jdbcType=VARCHAR},
+      CREATE_USER = #{createUser,jdbcType=VARCHAR},
+      CREATE_DEPT = #{createDept,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+      UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+    where SEQNO = #{seqno,jdbcType=VARCHAR}
+  </update>
+</mapper>
