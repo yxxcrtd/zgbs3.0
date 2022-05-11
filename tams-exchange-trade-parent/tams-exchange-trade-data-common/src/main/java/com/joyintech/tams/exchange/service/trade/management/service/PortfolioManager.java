@@ -348,7 +348,7 @@ public class PortfolioManager extends BaseService {
     /**
      * 组合计算
      *
-     * @param bean    下单对象
+     * @param bean     下单对象
      * @param infoFlag 是否查询组合信息
      * @return 组合计算结果
      */
@@ -398,12 +398,12 @@ public class PortfolioManager extends BaseService {
 
                 infoResponse = new PortfolioInfoResponse();
                 infoResponse.setPortfolioId(item.getPortfolioId());
-                infoResponse.setProAvailablePositionT0((BigDecimal) baseMapList.get(3).get(AMOUNT));
-                infoResponse.setProAvailablePositionT1(null);
-                infoResponse.setProAvailableCashT0((BigDecimal) baseMapList.get(0).get(AMOUNT));
-                infoResponse.setProAvailableCashT1(null);
-                infoResponse.setSecManageAvailableCashT0((BigDecimal) baseMapList.get(1).get(AMOUNT));
-                infoResponse.setSecManageAvailableCashT1(null);
+                infoResponse.setProAvailablePositionT0((ObjectUtil.isNotNull(baseMapList.get(3).get(AMOUNT))) ? (BigDecimal) baseMapList.get(3).get(AMOUNT) : BigDecimal.ZERO);
+                infoResponse.setProAvailablePositionT1(BigDecimal.ZERO);
+                infoResponse.setProAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(0).get(AMOUNT))) ? (BigDecimal) baseMapList.get(0).get(AMOUNT) : BigDecimal.ZERO);
+                infoResponse.setProAvailableCashT1(BigDecimal.ZERO);
+                infoResponse.setSecManageAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(1).get(AMOUNT))) ? (BigDecimal) baseMapList.get(1).get(AMOUNT) : BigDecimal.ZERO);
+                infoResponse.setSecManageAvailableCashT1(BigDecimal.ZERO);
 
                 portfolioInfoResponseMap.put(infoResponse.getPortfolioId(), infoResponse);
             }
@@ -550,8 +550,8 @@ public class PortfolioManager extends BaseService {
         BigDecimal leftAmt = isVolume ? BigDecimal.ZERO : NumberUtil.sub(instruction.getEntrustAmt(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity());
         long leftNum = isVolume ? NumberUtil.sub(instruction.getEntrustNum(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity()).longValue() : 0L;
         for (PortfolioCalculateResponse item : list) {
-            calculateResponse.setInstructionLeftAmt(NumberUtil.div(NumberUtil.mul(leftAmt, item.getEntrustAmt()), orderAmt));
-            calculateResponse.setInstructionLeftNum(NumberUtil.div(leftNum * item.getEntrustNum(), orderVolume).longValue());
+            calculateResponse.setInstructionLeftAmt(orderAmt.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : NumberUtil.div(NumberUtil.mul(leftAmt, item.getEntrustAmt()), orderAmt));
+            calculateResponse.setInstructionLeftNum(orderVolume.compareTo(BigDecimal.ZERO) == 0 ? 0 : NumberUtil.div(leftNum * item.getEntrustNum(), orderVolume).longValue());
         }
         // 债券交易类，使用全价进行计算后恢复订单价格
 //        recoverPrice(instruction, list, orginEntrustPrice, entrustProp);

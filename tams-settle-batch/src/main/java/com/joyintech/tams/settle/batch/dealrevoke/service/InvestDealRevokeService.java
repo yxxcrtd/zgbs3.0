@@ -142,6 +142,13 @@ public class InvestDealRevokeService {
         List<String> totalTradeIdTgMs = investDealRevokeMapper.selectTotalTradeIdTgM(param);
 
 
+        //删除交收结果表（交收成功的交易对应的交收结果删除）
+        param.put("totalTradeIdList", totalTradeIdTgMs);
+        param.put("DELIVERY_STATUS_02",DictCodeListExt3.交收状态_已交收.getValue());
+        List<String>  manualSettleIdTgMs = investDealRevokeMapper.selectManualSettleIdTgM(param);
+        investDealRevokeMapper.deleteManualSetDetailBySettleId(manualSettleIdTgMs);
+        investDealRevokeMapper.deleteManualSettleInfoBySettleId(manualSettleIdTgMs);
+
         param.put("psList",  Arrays.asList(DictCodeList.交易方向_上市流通.getValue()));
         param.put("busiType", DictCodeList.共通业务类型_债券类资产交易.getValue());
         // GNS-957:上市流通日期取当天 modify by fuyongsheng 20220224 start

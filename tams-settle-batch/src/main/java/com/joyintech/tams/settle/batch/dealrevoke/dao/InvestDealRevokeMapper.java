@@ -216,4 +216,15 @@ public interface InvestDealRevokeMapper {
      */
     List<TrdFinProductDealTotal> selectSubTotalTradeData(Map<String, Object> param);
     // modify by etliu 20220227 end
+
+    /**
+     * 查询交收成功的交易对应的交收结果
+     * @param param 查询参数
+     * @return 交收编号列表
+     */
+    List<String> selectManualSettleIdTgM(Map<String, Object> param);
+
+    //删除交收结果表（交收成功的交易对应的交收结果删除）
+    void deleteManualSetDetailBySettleId(@Param("settleIds") List<String> manualSettleIdTgMs);
+    void deleteManualSettleInfoBySettleId(@Param("settleIds") List<String> manualSettleIdTgMs);
 }

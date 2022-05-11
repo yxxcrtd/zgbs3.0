@@ -1052,4 +1052,53 @@ FROM TRD_PRODUCT_DEAL A
         </if>
     </select>
     <!--add by fuyongsheng 20220322 end-->
+
+    <select id="selectManualSettleIdTgM" resultType="java.lang.String">
+        select SETTLE_SEQ_NO
+        from TRD_BANK_MANUAL_SETTLE_INFO
+        where
+        SETTLE_STATUS = #{DELIVERY_STATUS_02}
+        <if test="dealDateStr != null">
+            AND TO_CHAR(SETTLE_DATE, 'yyyy-MM-dd') = #{dealDateStr,jdbcType=VARCHAR}
+        </if>
+        <if test="totalTradeIdList != null and totalTradeIdList.size() > 0">
+            <foreach collection="totalTradeIdList" item="totalTradeId" open="AND SETTLE_SEQ_NO IN (" close=")" separator=",">
+                #{totalTradeId,jdbcType=VARCHAR}
+            </foreach>
+        </if>
+    </select>
+
+    <delete id="deleteManualSetDetailBySettleId" parameterType="java.util.List">
+        DELETE FROM
+        TRD_BANK_MANUAL_SET_DETAIL
+        <choose>
+            <when  test="settleIds != null and settleIds.size() > 0">
+                <where>
+                    <foreach collection="settleIds" item="item" open="SETTLE_SEQ_NO IN (" close=")" separator=",">
+                        #{item,jdbcType=VARCHAR}
+                    </foreach>
+                </where>
+            </when>
+            <otherwise>
+                where 1>2
+            </otherwise>
+        </choose>
+    </delete>
+
+    <delete id="deleteManualSettleInfoBySettleId" parameterType="java.util.List">
+        DELETE FROM
+        TRD_BANK_MANUAL_SETTLE_INFO
+        <choose>
+            <when  test="settleIds != null and settleIds.size() > 0">
+                <where>
+                    <foreach collection="settleIds" item="item" open="SETTLE_SEQ_NO IN (" close=")" separator=",">
+                        #{item,jdbcType=VARCHAR}
+                    </foreach>
+                </where>
+            </when>
+            <otherwise>
+                where 1>2
+            </otherwise>
+        </choose>
+    </delete>
 </mapper>

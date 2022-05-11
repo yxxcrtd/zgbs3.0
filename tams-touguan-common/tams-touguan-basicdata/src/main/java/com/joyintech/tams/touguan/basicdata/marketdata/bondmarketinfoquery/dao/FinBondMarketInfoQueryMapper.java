@@ -1,5 +1,6 @@
 package com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dao;
 
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketCashPlanDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoDetailQueryDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto;
@@ -45,4 +46,12 @@ public interface FinBondMarketInfoQueryMapper {
      * @return
      */
     FinBondMarketInfoDetailQueryDto queryFinBondMarketForCoupons(Map<String, Object> param);
+
+    /**
+     * 债券信息下拉框查询
+     *
+     * @param param
+     * @return
+     */
+    List<SelectOptionDto> getAssetId(Map<String, Object> param);
 }

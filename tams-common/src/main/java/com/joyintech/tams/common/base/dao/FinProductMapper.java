@@ -17,6 +17,8 @@ public interface FinProductMapper {
 
     FinProduct selectByPrimaryKey(String finprodId);
 
+    FinProduct selectByFinprodMarketId(String finprodMarketId);
+
     int updateByPrimaryKeySelective(FinProduct record);
 
     int updateByPrimaryKey(FinProduct record);

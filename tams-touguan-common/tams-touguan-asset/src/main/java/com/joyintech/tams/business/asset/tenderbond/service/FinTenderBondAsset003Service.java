@@ -182,8 +182,8 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                 //调用头寸
                 BaseMap param = BaseMap.newMap().put("userId", StringUtil.getOrElse(SecurityUtil.getLoginUser().getUserName(),"SYSTEM"))
                         .put("totalTradeId", trdFinProductDealTotal.getTotleTradeId())
-                        .put("marketFinprodId", finproductId)
-                        .put("listingFinprodId", product.getFinprodId())
+                        .put("afterListingFinprodId", finproductId)
+                        .put("beforeListingFinprodId", product.getFinprodId())
                         .put("modelType", DictCodeListExt1.子系统代码_交易.getValue())
                         .put("busiType", DictCodeListExt3.头寸业务类型_上市流通.getValue())
                         .put("busiAct", DictCodeListExt3.业务动作_上市.getValue())
@@ -194,7 +194,13 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                         .put("balanceCheck", DictCodeList.是否_否.getValue())
                         .put("interfaceType", "Bond001")
                         .put("tradePlace",product1.getTradeMarket())
-                        .put("decisionAct",DictCodeListExt3.系统动作_新建.getValue());
+                        .put("decisionAct",DictCodeListExt3.系统动作_新建.getValue())
+                        .put("isListingGenerate",DictCodeList.是否_是.getValue());
+                if(product1.getTradeMarket().equals(DictCodeListExt1.交易场所_银行间.getValue()) || product1.getTradeMarket().equals(DictCodeListExt1.交易场所_商业银行柜台.getValue())) {
+                    param.put("interfaceType", "Bond001");
+                }else {
+                    param.put("interfaceType", "Bond002");
+                }
                 try {
                     PositionHttpRequest.send(param);
                 } catch (PositionException e) {

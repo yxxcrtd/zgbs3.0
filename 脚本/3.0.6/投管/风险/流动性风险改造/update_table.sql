@@ -504,3 +504,9 @@ COMMENT ON COLUMN FIN_OPEN_RULE.RED_SPEED IS '赎回确认速度';
 -------------裴家俊  20220326 修改指标名称字段长度 start-----------
 alter table RSK_ISUP_INDICATOR MODIFY(IND_NAME VARCHAR2(512));
 -------------裴家俊  20220326 修改指标名称字段长度 end-----------
+
+-------------瞿志  20220511 修改事件代码字段长度 start-----------
+alter table RSK_EVENT MODIFY(EVENT_CODE VARCHAR2(50));
+alter table RSK_EVENT_ITEM_RULE MODIFY(EVENT_CODE VARCHAR2(50));
+alter table RSK_EVENT_PARA_REL MODIFY(EVENT_CODE VARCHAR2(50));
+-------------瞿志  20220511 修改事件代码字段长度 end-----------

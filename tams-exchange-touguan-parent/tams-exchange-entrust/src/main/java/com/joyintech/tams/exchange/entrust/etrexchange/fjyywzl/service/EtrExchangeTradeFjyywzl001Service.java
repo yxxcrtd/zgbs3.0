@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.entrust.etrexchange.fjyywzl.service;
 
+import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.SecurityUtil;
@@ -145,6 +146,12 @@ public class EtrExchangeTradeFjyywzl001Service extends CommonExportService<EtrEx
             pageParam.put("date", DateUtil.parse((String) pageParam.get("date")));
         } else {
             pageParam.put("date", iPlatformDate.getSysDate());
+        }
+
+        if(StringUtil.isNotEmpty(pageParam.get("finprodMarketId"))){
+            pageParam.put("finprodIdList",
+                    StringUtil.splitToList(GlobalConstant.COMMA, pageParam.get("finprodMarketId").toString()));
+            pageParam.put("finprodMarketId",null);
         }
     }
 

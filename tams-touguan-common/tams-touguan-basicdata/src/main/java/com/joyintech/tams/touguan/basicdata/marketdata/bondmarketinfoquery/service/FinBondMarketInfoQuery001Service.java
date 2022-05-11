@@ -6,6 +6,8 @@ import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.entity.FinProduct;
@@ -19,6 +21,7 @@ import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.d
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondPayHSrcSecOptionDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.FinBondMarketInfoQueryRequest;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.SelectOptionCommonRequest;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.dto.FinListedBondInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.req.FinListedBondInfoQueryRequest;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.service.FinListedBondInfoQuery001Service;
@@ -105,7 +108,7 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
      */
     public List<ValidMessage> addCoupons(String secId) {
         logger.info("addCoupons >> 债券市场加券参数：secId：【{}】", secId);
-        FinProduct finProduct = finProductMapper.selectByPrimaryKey(secId);
+        FinProduct finProduct = finProductMapper.selectByFinprodMarketId(secId);
         List<ValidMessage> validMessages = new ArrayList<>();
         if (finProduct != null) {
             validMessages.add(new ValidMessage("该债券信息在系统中已存在，无法加券！"));
@@ -164,4 +167,21 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
     }
 
 
+    /**
+     * 查询债券资产代码
+     * <p>
+     * <功能详细描述>
+     *
+     * @param request
+     * @return
+     * @see
+     * @since 1.0
+     */
+    public Page<SelectOptionDto> getAssetId(SelectOptionCommonRequest request) {
+        Map<String, Object> param = BeanUtil.object2Map(request);
+        Page<SelectOptionDto> page = super.queryForPage(request.getPageMode().getPageNo(),
+                request.getPageMode().getPageSize(),
+                () -> finBondMarketInfoQueryMapper.getAssetId(param));
+        return page;
+    }
 }

@@ -212,8 +212,8 @@ public class FinTenderBondAssetBatchService {
         String finproductId = finTenderBoundAssetMapper.selectFinprodId(params);
         BaseMap param = BaseMap.newMap().put("userId", "SYSTEM")
                 .put("totalTradeId", trdFinProductDealTotal.getTotleTradeId())
-                .put("marketFinprodId", finproductId)
-                .put("listingFinprodId", dto.getFinprodId())
+                .put("afterListingFinprodId", finproductId)
+                .put("beforeListingFinprodId", dto.getFinprodId())
                 .put("modelType", DictCodeListExt1.子系统代码_交易.getValue())
                 .put("busiType", DictCodeListExt3.头寸业务类型_上市流通.getValue())
                 .put("busiAct", DictCodeListExt3.业务动作_上市.getValue())
@@ -225,7 +225,13 @@ public class FinTenderBondAssetBatchService {
                 .put("interfaceType", "Bond001")
                 .put("tradePlace", dto.getTradeMarket())
                 .put("decisionAct", DictCodeListExt3.系统动作_新建.getValue())
-                .put("PositionSeqno", seqNo);
+                .put("PositionSeqno", seqNo)
+                .put("isListingGenerate",DictCodeList.是否_是.getValue());
+        if(dto.getTradeMarket().equals(DictCodeListExt1.交易场所_银行间.getValue()) || dto.getTradeMarket().equals(DictCodeListExt1.交易场所_商业银行柜台.getValue())) {
+            param.put("interfaceType", "Bond001");
+        }else {
+            param.put("interfaceType", "Bond002");
+        }
         seqList.add(seqNo);
         PositionHttpRequest.send(param);
     }
