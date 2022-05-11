@@ -37,6 +37,9 @@ public class BondFinPayInterestStdInfoRequest extends FinCashPayRule {
      */
     private static final long serialVersionUID = 1L;
 
+    @ApiModelProperty(name="finprodMarketId",value="资产代码",required=true)
+    private String finprodMarketId;
+
     /**
      * 是否还本计划生成计划回调付息计划
      */
@@ -308,5 +311,13 @@ public class BondFinPayInterestStdInfoRequest extends FinCashPayRule {
     @Override
     public void setCalcRule(String calcRule) {
         this.calcRule = calcRule;
+    }
+
+    public String getFinprodMarketId() {
+        return finprodMarketId;
+    }
+
+    public void setFinprodMarketId(String finprodMarketId) {
+        this.finprodMarketId = finprodMarketId;
     }
 }

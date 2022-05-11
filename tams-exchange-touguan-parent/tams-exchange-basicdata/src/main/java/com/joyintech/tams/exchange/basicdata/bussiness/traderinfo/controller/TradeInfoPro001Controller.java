@@ -203,7 +203,7 @@ public class TradeInfoPro001Controller extends BaseController {
             if(existsDealer(tradeInfoProSaveRequest)>0){
                 return new Message().fail().setMessage("交易商名称和交易商代码已存在，请勿重复插入！");
             }else if (existsDealerAndTradeMarket(tradeInfoProSaveRequest)>0){
-                return new Message().fail().setMessage("交易商和交易商场所不能重复！");
+                return new Message().fail().setMessage("交易商和交易场所不能重复！");
             }
             //新增交易商信息
              insertDealer1(dto);
@@ -275,7 +275,7 @@ public class TradeInfoPro001Controller extends BaseController {
             if(existsDealer(dto)>0){
                 return new Message().fail().setMessage("交易商名称和交易商代码不能重复！");
             }else if (existsDealerAndTradeMarket(dto)>0){
-                return new Message().fail().setMessage("交易商和交易商场所不能重复！");
+                return new Message().fail().setMessage("交易商和交易场所不能重复！");
             }
 //              deleteDealer1(dto);
 //              TradeInfoProSaveRequest tradeInfoProSaveRequest = new TradeInfoProSaveRequest();

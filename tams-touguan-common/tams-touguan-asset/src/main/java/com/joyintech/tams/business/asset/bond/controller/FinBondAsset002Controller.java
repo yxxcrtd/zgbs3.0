@@ -99,7 +99,7 @@ public class FinBondAsset002Controller extends BaseController{
     @ApiOperation(value="新建页面初始化参数", notes = "新建页面初始化参数")
     @PostMapping("/getInitPageParams")
     @ResponseBody
-    public Message<Map<String,Object>> getInitPageParams(@RequestBody FinBondAssetInsertRequest request){
+    public Message<Map<String,Object>> getInitPageParams(){
         //初始化基本信息画面数据字典
        Map<String,Object> initPageParams = new HashMap<>();
        initPageParams.put("TRADE_PLACE", this.getSelectDataFromDataDic(DictCode.交易场所, null));
@@ -132,9 +132,9 @@ public class FinBondAsset002Controller extends BaseController{
        initPageParams.put("ISSUE_STYLE", this.getSelectDataFromDataDic(DictCode.发行类型, null));
        initPageParams.put("SECRATE_DATA", this.getSelectDataFromDataDic(DictCode.利率行情, null));
        initPageParams.put("TENDER_TARGET", this.getSelectDataFromDataDic(DictCode.招标标的, null));
-       String finprodId = request.getFinprodId();
-       String finprodType = request.getFinprodType();
-       String workflowId = request.getWorkflowId();
+       String finprodId = getParam("finprodId");
+       String finprodType = getParam("finprodType");
+       String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
        initPageParams.put("YES",DictCodeList.是否_是.getValue());
        initPageParams.put("isTradeCalendar",DictCodeList.是否_是.getValue());
         /* add by zhangpuyu 2019/20/24 start */
@@ -169,7 +169,7 @@ public class FinBondAsset002Controller extends BaseController{
             }
            initPageParams.put("entity", finBondAssetDto);
         }//来自于代办
-        else if(!WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotEmpty(workflowId)){
+        else if( StringUtil.isNotEmpty(workflowId)){
             //根据工作流与留痕处理提供的共通方法获取业务实体
             FinBondAssetSaveRequest finBondAssetDto = finBondAssetService.getBussinessEntityByWorkflowId(workflowId);
             //commonBusinessService.setTradeMarketId(finBondAssetDto,model);
@@ -202,6 +202,35 @@ public class FinBondAsset002Controller extends BaseController{
     }
 
     /**
+     *  获取流程中信息
+     * @param request
+     * @return
+     */
+    @ApiOperation(value = "获取流程中信息", notes = "获取流程中信息")
+    @ResponseBody
+    @PostMapping("/getApproveEntity")
+    public Message<FinBondAssetSaveRequest> getApproveEntity(@RequestBody FinBondAssetInsertRequest request)
+    {
+        try{
+            String workflowId = request.getWorkflowId();
+            FinBondAssetSaveRequest entity = new FinBondAssetSaveRequest();
+            if (StringUtil.isNotEmpty(workflowId)) {
+                //流程代办checkImportData
+                entity = finBondAssetService.getBussinessEntityByWorkflowId(workflowId);
+                if (StringUtil.isNotEmpty(entity)){
+                    entity.setType9(entity.getTypeTwo());
+                    entity.setType10(entity.getTypeThree());
+                    entity.setType11(entity.getTypeFour());
+                }
+            }
+            return new Message<FinBondAssetSaveRequest>().success().setData(entity);
+        } catch(Exception e){
+            e.printStackTrace();
+            return new Message<FinBondAssetSaveRequest>().fail().setMessage("查询异常");
+        }
+    }
+
+    /**
      * 债券报送二级分类所有的资产负债类别不应该出现 1001:现金及活期存款，配置参数太多，通过代码控制
      * @return
      */
@@ -219,6 +248,7 @@ public class FinBondAsset002Controller extends BaseController{
         }
         return null;
     }
+
     /**
      * check--保存
      * @param dto
@@ -284,9 +314,9 @@ public class FinBondAsset002Controller extends BaseController{
         params.setBusinessType(DictCodeList.共通业务类型_债券类资产信息.getValue());
         // 设置流程业务说明
         params.setComment(entity -> {
-            return WorkFlowUtil.concatComment(getMessage("FinBondAsset002.finprodId")+
+            return WorkFlowUtil.concatComment("债券代码"+
                 GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodMarketId(), GlobalConstant.CLOSE_PARENTHESIS+
-                getMessage("FinBondAsset002.finprodName")+GlobalConstant.OPEN_PARENTHESIS+
+                "债券名称"+GlobalConstant.OPEN_PARENTHESIS+
                 entity.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS);
         });
         // 给参数变成ProcessParameter而非WorkFlowParameter
@@ -504,11 +534,14 @@ public class FinBondAsset002Controller extends BaseController{
         try {
             // 修改查看初始化
             String finprodId = dto.getFinprodId();
+            if(!StringUtil.isNotEmpty(finprodId) && StringUtil.isNotEmpty(dto.getFinprodMarketId())) {
+                finprodId = commonBusinessService.getFinProdId(dto.getFinprodMarketId(),DictCodeListExt1.金融产品类型_投管用_债券.getValue(),null);
+            }
             // 付息计划
             List<BondFinCashPlanDto> invList = new ArrayList<>();
             Date maxTradeDate = null;
             if(StringUtil.isNotEmpty(finprodId)) {
-                maxTradeDate = commonBusinessService.getMaxTradeDate(finprodId);
+                maxTradeDate = finBondAssetService.getMaxTradeDate(finprodId);
                 // 生付息成计划
                 dto.setMaxTradeDate(maxTradeDate);
             }
@@ -576,24 +609,24 @@ public class FinBondAsset002Controller extends BaseController{
         }
     }
 
-    /**
-     * 生成还本信息check
-     * <功能详细描述>
-     * @param previewParam
-     * @param result
-     * @return
-     * @see
-     * @since 1.0
-     */
-    @ResponseBody
-    @RequestMapping("checkRepaymentPlan")
-    public AjaxResult checkRepaymentPlan(@RequestBody BondBussFinRepaymentDto previewParam,
-                            BindingResult result) {
-        if (result != null && result.hasErrors()) {
-            return new AjaxResult(result);
-        }
-        return new AjaxResult();
-    }
+//    /**
+//     * 生成还本信息check
+//     * <功能详细描述>
+//     * @param previewParam
+//     * @param result
+//     * @return
+//     * @see
+//     * @since 1.0
+//     */
+//    @ResponseBody
+//    @RequestMapping("checkRepaymentPlan")
+//    public AjaxResult checkRepaymentPlan(@RequestBody BondBussFinRepaymentDto previewParam,
+//                            BindingResult result) {
+//        if (result != null && result.hasErrors()) {
+//            return new AjaxResult(result);
+//        }
+//        return new AjaxResult();
+//    }
 
     /**
      * 还本信息

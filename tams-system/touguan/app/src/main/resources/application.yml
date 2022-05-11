@@ -362,7 +362,7 @@ spring:
     reportSqlldrDatabaseName: 192.168.70.245:1521/orcl
   rabbitmq:
     # 需求环境使用mq配置如下
-    addresses: 192.168.90.243:5672
+    addresses: 192.168.90.119:5672
     username: rbmq
     password: rbmq
 application:
@@ -528,7 +528,7 @@ spring:
     reportSqlldrDatabaseName: 192.168.70.245:1521/orcl
   rabbitmq:
     # 需求环境使用mq配置如下
-    addresses: 192.168.60.111:5672
+    addresses: 192.168.90.119:5672
     username: rbmq
     password: rbmq
 application:
@@ -664,7 +664,7 @@ spring:
     reportSqlldrDatabaseName: 192.168.70.245:1521/orcl
   rabbitmq:
     # 需求环境使用mq配置如下
-    addresses: 192.168.60.111:5672
+    addresses: 192.168.90.119:5672
     username: rbmq
     password: rbmq
 application:
