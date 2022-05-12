@@ -254,10 +254,15 @@ public class TradeInfoPro001Controller extends BaseController {
             }
         }
         try{
+               //一个交易商只能维护一个 本方交易员
+            if (existsOur(tradeInfoProSaveRequest)>0){
+                return new Message().fail().setMessage("一个交易商只能维护一个本方交易员!");
+            }
             //上交所新增交易主体时，同一交易商+交易场所下，交易员代码应不允许重复
                if(StringUtil.equals(dto.getTradeMarket(),"03")&& existsTrader(tradeInfoProSaveRequest)>0){
                    return new Message().fail().setMessage("交易员代码不允许重复!");
                }
+
                //新增交易商详情信息
                insertDealerDetails1(tradeInfoProSaveRequest);
                return new Message().success();
@@ -267,6 +272,10 @@ public class TradeInfoPro001Controller extends BaseController {
             return new Message().fail().setMessage("新增异常");
 
         }
+    }
+
+    private int existsOur(TradeInfoProSaveRequest dto) {
+        return tradeInfoPro001Service.existsOur(dto);
     }
 
     private int existsTrader(TradeInfoProSaveRequest dto) {

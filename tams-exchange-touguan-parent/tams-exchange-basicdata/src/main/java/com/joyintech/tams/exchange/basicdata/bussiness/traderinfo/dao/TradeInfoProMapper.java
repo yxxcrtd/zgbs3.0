@@ -53,4 +53,6 @@ public interface TradeInfoProMapper {
     int deleteTraderSJ(TradeInfoProSaveRequest dto);
 
     int existsTrader(TradeInfoProSaveRequest dto);
+
+    int existsOur(TradeInfoProSaveRequest dto);
 }
