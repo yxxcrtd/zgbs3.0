@@ -20,7 +20,7 @@ import java.util.Date;
  * @see BondFinProductConvertibleDto
  * @since 1.0
  */
-@ApiModel(value="转股信息",description="转债信息")
+@ApiModel(value="转债信息",description="转债信息")
 public class BondFinProductConvertibleDto extends FinProductConvertible {
 
     @ApiModelProperty(name="finprodId",value="金融产品代码")

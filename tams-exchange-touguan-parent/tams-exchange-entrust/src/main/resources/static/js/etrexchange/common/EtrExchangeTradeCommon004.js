@@ -2413,6 +2413,7 @@
         //债券交易数量单位 add by yeming 20210729 end
         var entrustAmt = $("#entrustAmt_" + currentTab).val();
         var entrustPrice = $("#entrustPrice_" + currentTab).val();
+        var fprice = $("#fprice_" + currentTab).val();
         var ps = $("#ps_" + currentTab).val();
         var board = $("#board_" + currentTab).val();
         //var calculateField = $("[name=calculateField_" + currentTab + "]:radio").next(".layui-form-radioed").prev("input").val();
@@ -2448,8 +2449,10 @@
             if (targetType) {
                 if (declarePriceFlag) {
                     $.extend(param, {entrustPrice: formatPrice(entrustPrice)});
+                    $.extend(param, {fprice: formatPrice(fprice)});
                 } else {
                     $.extend(param, {entrustPrice: entrustPrice});
+                    $.extend(param, {fprice: formatPrice(fprice)});
                 }
                 ajaxCalcEntrustNumAndAmt(param);
             }
@@ -2856,6 +2859,7 @@
                         $("#price_" + currentTab).val(lastPrice);
                         $("#deviationDegree").text("");
                         $.extend(param, {entrustPrice: lastPrice});
+                        $.extend(param, {fprice: $("#fprice_" + currentTab).val()});
                     } else if (param.finprodType2 == FINPROD_TYPE_TG_F06 || param.finprodType2 == FINPROD_TYPE_TG_F10) {
                         if (param.ps == PS_T01) {//市价指令股票、基金买入 价格按涨停价计算风控、头寸
                             var upperLimitPrice = formatPrice(result.upperLimitPrice);

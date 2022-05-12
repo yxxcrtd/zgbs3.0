@@ -131,6 +131,11 @@
          inner join MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO AND MDI.CUSTOMER_ID = MDDI.CUSTOMER_ID
          WHERE mdi.CUSTOMER_ID = #{customerId} AND MDI.DEALER_NO = #{dealerNo} and mddi.TRADER_NO = #{traderNo}
     </select>
+    <select id="existsOur" resultType="java.lang.Integer">
+        select count(1) from MST_DEALER_INFO mdi
+         inner join MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO AND MDI.CUSTOMER_ID = MDDI.CUSTOMER_ID
+         where mdi.CUSTOMER_ID = #{customerId} AND MDI.DEALER_NO = #{dealerNo} and mddi.IS_OUR = 'Y'
+    </select>
 
 
     <delete id="deleteSelectedItem">

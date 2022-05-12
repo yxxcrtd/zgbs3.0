@@ -250,4 +250,8 @@ public interface FinBondAssetMapper {
 	Date getMaxTradeDate(@Param("finprodId") String finProdId);
 
 	List<String> getBusinessData(WflValidInputParameter parameter);
+
+    List<SelectOptionDto> getFinProdMarketIdList(Map<String, Object> param);
+
+	FinProductTypeConfig getWindType(Map<String, Object> paramCinfig);
 }

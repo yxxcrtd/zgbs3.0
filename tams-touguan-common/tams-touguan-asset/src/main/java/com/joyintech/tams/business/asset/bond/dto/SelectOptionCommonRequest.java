@@ -39,6 +39,10 @@ public class SelectOptionCommonRequest {
     @ApiModelProperty(name="param",value="参数",example="A1")
     private String param;
 
+
+    @ApiModelProperty(name="conFinprodId",value="正股代码",example="A1")
+    private String conFinprodId;
+
     public String getSearch() {
         return search;
     }
@@ -109,5 +113,13 @@ public class SelectOptionCommonRequest {
 
     public void setParam(String param) {
         this.param = param;
+    }
+
+    public String getConFinprodId() {
+        return conFinprodId;
+    }
+
+    public void setConFinprodId(String conFinprodId) {
+        this.conFinprodId = conFinprodId;
     }
 }
