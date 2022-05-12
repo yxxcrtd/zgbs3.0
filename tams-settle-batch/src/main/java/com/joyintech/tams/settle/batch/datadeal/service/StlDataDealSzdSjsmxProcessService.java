@@ -626,13 +626,13 @@ public class StlDataDealSzdSjsmxProcessService {
         // 金融产品类型(投管分类)
         settleTransData.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
         // 非担保交收
-        if(StringUtil.equals(StlDataDealProcessConstant.SJSMX_JSFS_N, szdSjsmx.getMxjsfs())){
+        if(StringUtil.equals(DictCodeListStl.交收方式_非担保.getValue(), szdSjsmx.getMxjsfs())){
             // 业务场景明细分类
             settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券_分销_通知.getValue());
             // 交收结果
             settleTransData.setDeliveryResult(DictCodeListExt4.交收结果_交收通知.getValue());
-        }else {
             // 担保交收
+        }else if(StringUtil.equals(DictCodeListStl.交收方式_担保.getValue(), szdSjsmx.getMxjsfs())){
             // 业务场景明细分类
             settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券_分销_结果.getValue());
         }
