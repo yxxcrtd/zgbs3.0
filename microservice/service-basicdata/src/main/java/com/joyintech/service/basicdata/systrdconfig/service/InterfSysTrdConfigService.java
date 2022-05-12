@@ -383,4 +383,12 @@ public class InterfSysTrdConfigService{
         resultMap.put("message","成功");
         return resultMap;
     }
+
+    public Map<String, Object> getSppiTestInfo(Map<String, Object> params) {
+        Map<String,Object> returnMap = new HashMap<String,Object>();
+        returnMap.put("errorCode",0);
+        returnMap.put("errorMsg","成功");
+        returnMap.put("data",interfSysTrdConfigMapper.queryAssetIsSppiTest(params));
+        return returnMap;
+    }
 }
