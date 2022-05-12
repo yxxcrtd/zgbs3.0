@@ -13,7 +13,7 @@
             ON A.ACCT_NO = B.SEC_ACCT_ID
             <if test="finprodMarketIdList != null and finprodMarketIdList.size()>0">
                 LEFT JOIN FIN_PRODUCT FP
-                ON FP.FINPROD_ID IN (
+                ON FP.FINPROD_MARKET_ID IN (
                 <foreach item="item" index="index" collection="finprodMarketIdList" separator=",">
                     #{item}
                 </foreach>
