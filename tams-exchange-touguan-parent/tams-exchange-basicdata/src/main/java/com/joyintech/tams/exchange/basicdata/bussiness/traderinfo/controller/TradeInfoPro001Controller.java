@@ -136,7 +136,7 @@ public class TradeInfoPro001Controller extends BaseController {
              if (tradeInfoPro001Service.hasDealerDetails(dealerName)>0){
                  //删除该交易商对应的详情信息
 //                 tradeInfoPro001Service.deleteDealerDetails(customerId);
-                 deleteDealerDetails1(dealerName);
+                 deleteDealerDetails1(dto);
              }
              return new Message().success();
         }catch (Exception e){
@@ -152,8 +152,8 @@ public class TradeInfoPro001Controller extends BaseController {
     }
 
 
-    private int deleteDealerDetails1(String customerId) {
-        return tradeInfoPro001Service.deleteDealerDetails(customerId);
+    private int deleteDealerDetails1(TradeInfoProSaveRequest dto) {
+        return tradeInfoPro001Service.deleteDealerDetails(dto);
     }
     /**
      * 删除交易主体和交易员信息
@@ -236,6 +236,10 @@ public class TradeInfoPro001Controller extends BaseController {
         String seqNo = bussGetBussinessIdService !=null ? bussGetBussinessIdService.buildBussinessCode(param): IDGenerator.generate();
         tradeInfoProSaveRequest.setSeqNo(seqNo);
         try{
+            //上交所新增交易主体时，同一交易商+交易场所下，交易员代码应不允许重复
+               if(StringUtil.equals(dto.getTradeMarket(),"03")&& existsTrader(tradeInfoProSaveRequest)>0){
+                   return new Message().fail().setMessage("交易员代码不允许重复!");
+               }
                //新增交易商详情信息
                insertDealerDetails1(tradeInfoProSaveRequest);
                return new Message().success();
@@ -245,6 +249,10 @@ public class TradeInfoPro001Controller extends BaseController {
             return new Message().fail().setMessage("新增异常");
 
         }
+    }
+
+    private int existsTrader(TradeInfoProSaveRequest dto) {
+        return tradeInfoPro001Service.existsTrader(dto);
     }
 
     private int existsDealerAndTradeMarket(TradeInfoProSaveRequest dto) {

@@ -1,6 +1,7 @@
 package com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
@@ -249,7 +250,13 @@ public class CfetsTrdBondFirstSubEntrustDto {
         if (StringUtil.isEmpty(getBusinessModel())) {
             return StringUtil.EMPTY;
         }
-        return SysDataUtil.getNameFromDataDict(DictCode.业务模式, getBusinessModel());
+        String businessModel = getBusinessModel();
+        String[] businessModels = businessModel.split(GlobalConstant.COMMA);
+        String businessModelStr = "";
+        for (String str : businessModels) {
+            businessModelStr += SysDataUtil.getNameFromDataDict(DictCode.业务模式, str);
+        }
+        return businessModelStr;
     }
 
     public void setBusinessModelStr(String businessModelStr) {

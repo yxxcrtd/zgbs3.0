@@ -126,6 +126,11 @@
                and MDDI.CUSTOMER_ID=mdi.CUSTOMER_ID
           where mdi.CUSTOMER_ID = #{customerId} and mdi.DEALER_NO = #{dealerNo}
     </select>
+    <select id="existsTrader" resultType="java.lang.Integer">
+         select count(1) from MST_DEALER_INFO mdi
+         inner join MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO AND MDI.CUSTOMER_ID = MDDI.CUSTOMER_ID
+         WHERE mdi.CUSTOMER_ID = #{customerId} AND MDI.DEALER_NO = #{dealerNo} and mddi.TRADER_NO = #{traderNo}
+    </select>
 
 
     <delete id="deleteSelectedItem">
@@ -142,7 +147,7 @@
         and DEALER_NO = #{dealerNo}
     </delete>
     <delete id="deleteDealerDetails">
-        delete from MST_DEALER_DETAIL_INFO where  CUSTOMER_ID = #{customerId}
+        delete from MST_DEALER_DETAIL_INFO where  CUSTOMER_ID = #{customerId} and DEALER_NO = #{dealerNo}
     </delete>
     <delete id="deleteTrader">
         delete from MST_DEALER_DETAIL_INFO where  SEQ_NO = #{seqNo,jdbcType=VARCHAR}
