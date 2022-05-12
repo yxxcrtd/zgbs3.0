@@ -970,27 +970,11 @@
                 or FINPROD_ABBR like concat(concat('%',#{search}),'%')
                 or FINPROD_NAME like concat(concat('%',#{search}),'%'))
             </if>
-            <if test="finprodType2 != null and finprodType2.size() > 0">
-                AND FINPROD_TYPE2 in
-                <foreach collection="finprodType2" item="item" open="(" close=")" separator=",">
+            <if test="tradeMarkets != null and tradeMarkets.size() > 0">
+                AND TRADE_MARKET in
+                <foreach collection="tradeMarkets" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
-            </if>
-            <if test="child != null and (!child or child == 'false')">
-                AND P_FINPROD_ID IS NULL
-            </if>
-            <if test="profitType != null and profitType != ''">
-                and PROFIT_TYPE = #{profitType,jdbcType=VARCHAR}
-            </if>
-        </where>
-        union all
-        SELECT SECID id, SECNAME text,MARKET2 object
-        FROM INTERF_PAYHSRCSECINFO
-        <where>
-            SECID NOT IN (select FINPROD_MARKET_ID from FIN_PRODUCT where FINPROD_TYPE2 = 'F01')
-            <if test="search != null and search != ''">
-                and (SECID like concat(concat('%',#{search}),'%')
-                or SECNAME like concat(concat('%',#{search}),'%'))
             </if>
         </where>
     </select>

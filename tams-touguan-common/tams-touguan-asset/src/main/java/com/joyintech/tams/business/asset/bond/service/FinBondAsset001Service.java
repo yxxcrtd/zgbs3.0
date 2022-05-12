@@ -191,14 +191,12 @@ public class FinBondAsset001Service extends BaseService{
         Map<String, Object> param = BeanUtil.object2Map(request);
         param.put("FINPROD_TYPE_TG_ZQ", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         //增加母资管计划筛选条件
-        if (StringUtil.isNotEmpty(param.get("finprodType2"))) {
-            if(StringUtil.equals(param.get("finprodType2"), DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue())){
-                param.put("finprodType2", StringUtil.splitToList(null, param.get("finprodType2").toString()+","+DictCodeListExt1.金融产品类型_投管用_母资管计划.getValue()));
-            }else{
-                param.put("finprodType2", StringUtil.splitToList(null, param.get("finprodType2").toString()));
-            }
-        }else {
-            param.put("finprodType2",null);
+        if (null!=request.getTradeMarket() && (StringUtil.equals(request.getTradeMarket(),DictCodeListExt1.交易场所_上海证券交易所.getValue())
+        || StringUtil.equals(request.getTradeMarket(),DictCodeListExt1.交易场所_深圳证券交易所.getValue()))){
+            List<String> tradeMarkets = new ArrayList<>();
+            tradeMarkets.add(DictCodeListExt1.交易场所_银行间.getValue());
+            tradeMarkets.add(DictCodeListExt1.交易场所_商业银行柜台.getValue());
+            param.put("tradeMarkets", tradeMarkets);
         }
         Page<SelectOptionDto> page = super.queryForPage(request.getPageMode().getPageNo(),
                 request.getPageMode().getPageSize(),
