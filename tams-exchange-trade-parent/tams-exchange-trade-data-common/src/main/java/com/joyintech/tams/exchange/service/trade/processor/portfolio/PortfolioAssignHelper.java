@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.service.trade.processor.portfolio;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -78,9 +79,9 @@ public class PortfolioAssignHelper {
     public ResultBean queryPortfolioAssign(String instructionId, PortfolioDetailBusiTypeEnum busiType, final BigDecimal orginVolume, final BigDecimal orginPrice, final String orginProp) {
         log.info("queryPortfolioAssign() called with parameters => 【instructionId = {}】, 【busiType = {}】, 【orginVolume = {}】, 【orginPrice = {}】, 【orginProp = {}】", instructionId, busiType, orginVolume, orginPrice, orginProp);
 
-        // 待分配数量/金额错误
+        // 待分配数量
         if (TradeUtils.lessThanZero(orginVolume)) {
-            log.warn("待分配数量/金额错误 => 【orginVolume = {}】", orginVolume);
+            log.warn("待分配数量 => 【orginVolume = {}】", orginVolume);
             return ResultBean.error(ErrorCode.REQ_PARAMETER_ERROR);
         }
 
@@ -93,8 +94,12 @@ public class PortfolioAssignHelper {
 
         // 获取多组合
         List<InstructionDetail> instructionDetails = instructionDetailService.queryInstructionDetailsByInstructionId(instructionId);
-        // 排序，以保证尾插分配稳定
-        instructionDetails.sort(Comparator.comparing(InstructionDetail::getPortfolioId));
+        if (CollUtil.isEmpty(instructionDetails)) {
+            log.warn("未找到指令组合明细: instructionId [{}]", instructionId);
+            return ResultBean.error(ErrorCode.INSTRUCTION_DETAILS_NOT_EXIST);
+        }
+        // 排序，先按组合的委托数量排序，再按组合代码排序
+        instructionDetails.sort(Comparator.comparing(InstructionDetail::getEntrustNum).thenComparing(InstructionDetail::getPortfolioId));
 
         // 获取委托属性
         String entrustProp = EntrustPropUtils.getEntrustProp(instruction, orginProp);
@@ -128,38 +133,55 @@ public class PortfolioAssignHelper {
             price = BigDecimal.valueOf(100L);
         }
 
-        /*if (CollUtil.isEmpty(instructionDetails)) {
-            // 单组合时处理
-            InstructionDetail instructionDetail = new InstructionDetail();
-            instructionDetail.setEntrustId(instruction.getEntrustId());
-            instructionDetail.setPortfolioId(instruction.getPortfolioId());
-            instructionDetail.setPortfolioName(instruction.getPortfolioName());
-            instructionDetail.setDisRate(BigDecimal.valueOf(1.00));
-            instructionDetail.setEntrustAmt(instruction.getEntrustAmt());
-            instructionDetail.setEntrustNum(new BigDecimal(instruction.getEntrustNum()));
-            instructionDetail.setTargetType(instruction.getEntrustNum() == 0 ? "02" : "01");
-            instructionDetails.add(instructionDetail);
-        } else if (instructionDetails.size() == 1) {
-            InstructionDetail instructionDetail = instructionDetails.get(0);
-            if (instructionDetail.getDisRate() == null || instructionDetail.getDisRate().compareTo(new BigDecimal("0")) == 0) {
-                instructionDetail.setDisRate(BigDecimal.valueOf(1.00));
-            }
-        }*/
-
-        BigDecimal volume = orginVolume;
-
         // 历史明细
         List<PortfolioDetail> portfolioDetails = portfolioDetailByManualMapper.selectListByInstructionAndBusiType(instructionId, busiType.getCode());
         log.info("查询的历史组合分配明细：{}", portfolioDetails);
         // 历史数量
         BigDecimal historyVolume = portfolioDetails.stream().map(PortfolioDetail::getTargetNum).reduce(BigDecimal.ZERO, BigDecimal::add);
         // 订单数量
-        BigDecimal totalVolume = NumberUtil.add(volume, historyVolume);
+        BigDecimal totalVolume = NumberUtil.add(orginVolume, historyVolume);
+        // 指令委托数量
+        BigDecimal instructionVolume = instructionDetails.stream().map(InstructionDetail::getEntrustNum).reduce(BigDecimal.ZERO, BigDecimal::add);
 
         // 计算结果列表
         List<PortfolioDetail> list = ListUtil.list(false);
+        PortfolioDetail portfolioDetail;
+
+        // 组合明细中的委托数量
+        BigDecimal currVolume;
+        // 分配给组合的委托数量
+        BigDecimal assignVolume;
+
+        for (int i = 0, len = instructionDetails.size(); i < len; i++) {
+
+            InstructionDetail detail = instructionDetails.get(i);
+            portfolioDetail = new PortfolioDetail();
+
+            portfolioDetail.setInstructionId(instructionId);
+            portfolioDetail.setPortfolioId(detail.getPortfolioId());
+            portfolioDetail.setPortfolioName(detail.getPortfolioName());
+            portfolioDetail.setTargetType(detail.getTargetType());
+            portfolioDetail.setBusiStatus(PortfolioDetailBusiStatusEnum.CONFIRM.getCode());
+            portfolioDetail.setBusiType(busiType.getCode());
+            list.add(portfolioDetail);
+
+            if (i == len - 1) {
+                portfolioDetail.setTargetNum(totalVolume);
+                break;
+            }
+            currVolume = detail.getEntrustNum();
+            assignVolume = NumberUtil.div(NumberUtil.mul(currVolume, totalVolume), instructionVolume, 0);
+            assignVolume = TradeUtils.subtractMod(assignVolume, minStep);
+            portfolioDetail.setTargetNum(assignVolume);
+            // 更新指令委托总数
+            instructionVolume = instructionVolume.subtract(currVolume);
+            // 更新待分配的总数
+            totalVolume = totalVolume.subtract(assignVolume);
+        }
+
+
         // 计算结果
-        PortfolioDetail portfolioDetail = null;
+        /*PortfolioDetail portfolioDetail = null;
         BigDecimal entrustVolume = BigDecimal.ZERO;
         BigDecimal entrustAmt = BigDecimal.ZERO;
 
@@ -200,7 +222,7 @@ public class PortfolioAssignHelper {
                 maxItem.getPortfolioName(), maxItem.getPortfolioId(),
                 maxItem.getTargetNum(), tailVolume, tailAmt);
         maxItem.setTargetNum(tailVolume);
-        maxItem.setTargetAmt(tailAmt);
+        maxItem.setTargetAmt(tailAmt);*/
 
         //历史明细
         Map<String, List<PortfolioDetail>> map = portfolioDetails.stream().collect(Collectors.groupingBy(PortfolioDetail::getPortfolioId));
