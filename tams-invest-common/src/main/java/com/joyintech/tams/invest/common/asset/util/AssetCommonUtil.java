@@ -39,6 +39,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -302,14 +303,15 @@ public class AssetCommonUtil {
      * @param purRule   画面传过来的申购基本要素
      * @param repPlanList   画面传过来的赎回计划
      * @param repRule   画面传过来的赎回基本要素
+     * @param prodInfo  画面传过来的基本要素
      * @param compare   比如判断是否大于90天，传90
      * @param <T>
      * @param <K>
      * @return  备注 小于返回-1，等于返回0，大于返回1
      */
-    public static <T extends FinOpenPlan,K extends FinOpenRule> Integer comparePtlCycle(List<T> purPlanList,K purRule,
-                                                                                        List<T> repPlanList,K repRule,Integer compare, Date vdate){
-        if((Objects.isNull(purRule)&&Objects.isNull(repRule))||null==compare){
+    public static <T extends FinOpenPlan,K extends FinOpenRule,V extends FinProduct> Integer comparePtlCycle(List<T> purPlanList,K purRule,
+                                                                                        List<T> repPlanList,K repRule,V prodInfo,Integer compare){
+        if((Objects.isNull(purRule)&&Objects.isNull(repRule))||null==compare||null==prodInfo){
             return null;
         }
         if(!checkNull(purPlanList,purRule)||!checkNull(purPlanList,purRule)){
@@ -330,7 +332,7 @@ public class AssetCommonUtil {
             return BigDecimal.ONE.compareTo(new BigDecimal(compare));
         }
         //获取投资周期
-        Long days=getPtlInvestPeriod(repPlanList,repRule,vdate);
+        Long days=getPtlInvestPeriod(repPlanList,()->prodInfo.getVdate());
         return null==days?null:days.compareTo(compare.longValue());
     }
 
@@ -340,7 +342,7 @@ public class AssetCommonUtil {
      * @param compare 比如判断是否大于90天，传90
      * @return 备注 KEY 产品代码 VALUE：小于返回-1，等于返回0，大于返回1
      */
-    public static Map<String,Integer> comparePtlCycle(List<String> ptlList,Integer compare, Date vdate){
+    public static Map<String,Integer> comparePtlCycle(List<String> ptlList,Integer compare){
         if(StringUtil.isEmptyList(ptlList)||null==compare){
             return null;
         }
@@ -376,7 +378,7 @@ public class AssetCommonUtil {
             if(CollectionUtils.isEmpty(ptlPlanMap)||StringUtil.isEmptyList(ptlPlanMap.get(k))){
                 retMap.put(k,null);
             }
-            Long days=getPtlInvestPeriod(ptlPlanMap.get(k),vRuleList.get(0),vdate);
+            Long days=getPtlInvestPeriod(ptlPlanMap.get(k),()->getAssetInfo(DictCodeListExt1.金融产品类型_投管用_理财产品.getValue()+GlobalConstant.UNDER_LINE+k,obj->obj.getVdate()));
             retMap.put(k,null==days?null:days.compareTo(compare.longValue()));
         });
         return retMap;
@@ -391,19 +393,18 @@ public class AssetCommonUtil {
      * 以【开放计划信息】模块中【推算方法】字段的信息确定开始日，进而确定周期。
      * 则以【起息日】字段作为“开始日”，用第1条记录的【赎回确认日】减去“开始日”确定周期，无【赎回确认日】时采用【申购确认日】进行计算
      */
-    public static <T extends FinOpenPlan,F extends FinOpenRule> Long getPtlInvestPeriod(List<T> tPlanList,F tRule,Date vdate){
+    public static <T extends FinOpenPlan,F extends FinOpenRule> Long getPtlInvestPeriod(List<T> tPlanList,Supplier<Date> supplier){
         if(StringUtil.isEmptyList(tPlanList)){
             return null;
         }
         //处理开放计划只有一条的情况
         if(1==tPlanList.size()){
-            if(StringUtil.isNotEmpty(vdate)){
-                return DateUtil.getBetweenDayNumber(vdate,
-                        tPlanList.get(0).getOpenVdate());
-            }else{
-                return DateUtil.getBetweenDayNumber(getAssetInfo(tPlanList.get(0).getFinprodId(),obj->obj.getVdate()),
+            if(StringUtil.isBlank(tPlanList.get(0).getFinprodId())){
+                return DateUtil.getBetweenDayNumber(supplier.get(),
                         tPlanList.get(0).getOpenVdate());
             }
+            return DateUtil.getBetweenDayNumber(getAssetInfo(tPlanList.get(0).getFinprodId(),obj->obj.getVdate()),
+                    tPlanList.get(0).getOpenVdate());
         }
         //若是1条以上则用后一条计划减去前一条再取最小值
         List<Long> daysList = new ArrayList<>();
