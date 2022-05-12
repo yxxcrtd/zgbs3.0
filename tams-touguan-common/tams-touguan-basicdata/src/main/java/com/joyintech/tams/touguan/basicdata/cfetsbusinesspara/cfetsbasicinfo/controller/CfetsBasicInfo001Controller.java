@@ -8,6 +8,7 @@ import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.common.ExcelValidDto;
@@ -61,7 +62,7 @@ public class CfetsBasicInfo001Controller extends BaseController {
     @ResponseBody
     public Message<Map<String, Object>> init() {
         Map<String, Object> model = new HashMap<>(1);
-        model.put("YES_NO", DictCodeList.是否_是.getValue());
+        model.put("YES_OR_NO", this.getSelectDataFromDataDic(DictCode.是否, null));
         return new Message<>(model).success();
     }
 
