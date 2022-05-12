@@ -350,8 +350,7 @@ public abstract class StlDataGatherReader extends BaseReader<InvestTradeReaderDt
                         //变量.汇总成交明细dto.成交编号_原始:				回购时，为成交数据明细.成交编号；其他，为变量.temp_当前成交数据明细数据list第一条数据的对应字段
                         settleTransDataTotal.setTradeIdRaw(settleTransDataDtoInit.getTradeIdRaw());
                         //变量.汇总成交明细dto.单位净价:				∑全价总额/∑交易份额
-                        settleTransDataTotal.setUnitCprice(ArithmeticUtil.divide( settleTransDataDtoGroupList.stream().map(ele -> null == ele.getFpriceAmt() ? BigDecimal.ZERO : ele.getFpriceAmt() )
-                                .reduce(BigDecimal.ZERO, BigDecimal::add), settleTransDataDtoGroupList.stream().map(ele -> null == ele.getShareAmt() ? BigDecimal.ZERO : ele.getShareAmt() ).reduce(BigDecimal.ZERO, BigDecimal::add),2));
+                        settleTransDataTotal.setUnitCprice(ArithmeticUtil.divide(settleTransDataTotal.getFpriceAmt(), settleTransDataTotal.getShareAmt(),2));
                     }
                     settleTransDataTotals.add(settleTransDataTotal);
                 }
