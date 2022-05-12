@@ -31,6 +31,7 @@ import com.joyintech.tams.component.business.common.service.CommonAutoCouponServ
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.common.service.DateCalService;
 import com.joyintech.tams.component.business.core.dto.FileCommonDto;
+import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.MstFileCommonService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -420,6 +421,9 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             //付息信息
             BondFinPayInterestStdInfoDto finPayInterestStdInfoDto = new BondFinPayInterestStdInfoDto();
             BeanUtil.copyPropertiesIgnoreNull(finPayInterestStdInfoDto,dto);
+            if(StringUtil.isNotEmpty(finPayInterestStdInfoDto)) {
+                finPayInterestStdInfoDto.setMaxTradeDate(this.getMaxTradeDate(dto.getFinprodId()));
+            }
             map.put("cashId",dto.getInterestCashId());
             if (StringUtil.isNotEmpty(dto.getInterestCashId())) {
                 List<BondFinCashPlanDto> invScheduleList = finBondAssetMapper.selectInvScheduleList(map);
@@ -1459,5 +1463,13 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
 
     public Date getMaxTradeDate(String finprodId) {
         return finBondAssetMapper.getMaxTradeDate(finprodId);
+    }
+
+    public boolean isInWflProcess(WflValidInputParameter parameter) {
+            List<String> result = finBondAssetMapper.getBusinessData(parameter);
+            if (CollectionUtils.isNotEmpty(result)) {
+                return Boolean.TRUE;
+            }
+            return Boolean.FALSE;
     }
 }

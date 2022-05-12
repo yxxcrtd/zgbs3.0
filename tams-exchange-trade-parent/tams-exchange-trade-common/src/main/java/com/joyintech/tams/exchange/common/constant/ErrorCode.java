@@ -42,6 +42,8 @@ public enum ErrorCode implements IEnum<Integer> {
 
     DB_ERROR(100, "数据库返回错误"),
 
+    CHECK_ERROR(101, "校验失败"),
+
     INNER_RISK_ERROR(200, "内部风控检查错误"),
 
     MASTER_TOKEN_DISABLE(300, "主从模式关闭"),

@@ -77,10 +77,7 @@ public class FinBondAsset002Controller extends BaseController{
 
     @Autowired
     private FinBondAssetService finBondAssetService;
-    
-    @Autowired
-    private IPlatformDate iPlatformDate;
-    
+
     @Autowired 
     private FileAttachmentProcess fileAttachmentProcess;
     
@@ -537,6 +534,10 @@ public class FinBondAsset002Controller extends BaseController{
             if(!StringUtil.isNotEmpty(finprodId) && StringUtil.isNotEmpty(dto.getFinprodMarketId())) {
                 finprodId = commonBusinessService.getFinProdId(dto.getFinprodMarketId(),DictCodeListExt1.金融产品类型_投管用_债券.getValue(),null);
             }
+            if (StringUtil.isNotEmpty(dto.getFinInterestFactorDto()) &&
+                    StringUtil.isNotEmpty(dto.getFinInterestFactorDto().getYield()) ){
+                dto.getFinInterestFactorDto().setYield(ArithmeticUtil.multiply(dto.getFinInterestFactorDto().getYield(),BigDecimal.valueOf(100)));
+            }
             // 付息计划
             List<BondFinCashPlanDto> invList = new ArrayList<>();
             Date maxTradeDate = null;
@@ -579,16 +580,23 @@ public class FinBondAsset002Controller extends BaseController{
             for (FinCashPlanDto finCashPlan:finCashPlanList){
                 BondFinCashPlanDto bondFinCashPlanDto = new BondFinCashPlanDto();
                 BeanUtil.copyPropertiesIgnoreNull(bondFinCashPlanDto,finCashPlan);
+                bondFinCashPlanDto.setRangeYield(ArithmeticUtil.divide(bondFinCashPlanDto.getRangeYield(),BigDecimal.valueOf(100),4));
                 bondFinCashPlanDto.setLirs(null);
                 invList.add(bondFinCashPlanDto);
             }
+            //还本计划
+            BussFinRepaymentDto bussFinRepaymentDto = new BussFinRepaymentDto();
+            BeanUtil.copyPropertiesIgnoreNull(bussFinRepaymentDto, finPayInterestStdInfoDto);
+            finPayInterestStdInfoDto.setEndTdayRule(DictCodeList.营业日准则_不调整.getValue());
+            bussFinRepaymentDto.setFinPayInterestStdInfoDto(finPayInterestStdInfoDto);
+            List<FinCashPlanDto> finCashPlans = bussFinRepaymentService.createAssetRePaymentPlan(bussFinRepaymentDto);
             List<BondFinCashPlanDto> lirs = new ArrayList<>();
-            if (CollectionUtils.isNotEmpty(finCashPlanList)) {
-                for (FinCashPlanDetailDto lirsEntity : finCashPlanList.get(0).getLirs()) {
+            if (CollectionUtils.isNotEmpty(finCashPlans)) {
+                for (FinCashPlanDto lirsEntity : finCashPlans) {
                     BondFinCashPlanDto lirsDto = new BondFinCashPlanDto();
                     BeanUtil.copyPropertiesIgnoreNull(lirsDto, lirsEntity);
-                    lirsDto.setPayDate(lirsDto.getMdate());
-                    lirsDto.setPrinAmt(dto.getIssueAmt());
+                    lirsDto.setCashAmt(lirsEntity.getCashAmt());
+                    lirsDto.setLirs(null);
                     lirs.add(lirsDto);
                 }
             }
@@ -599,94 +607,21 @@ public class FinBondAsset002Controller extends BaseController{
                     return o1.getVdate().compareTo(o2.getVdate());
                 }
             });
+            Collections.sort(lirs, new Comparator<BondFinCashPlanDto>() {
+                @Override
+                public int compare(BondFinCashPlanDto o1, BondFinCashPlanDto o2) {
+                    return o1.getVdate().compareTo(o2.getVdate());
+                }
+            });
             BondFinPayInterestStdInfoResponse  response = new BondFinPayInterestStdInfoResponse();
             response.setInvScheduleList(invList);
             response.setInvRepayList(lirs);
+            response.setMaxTradeDate(maxTradeDate);
             return new Message<BondFinPayInterestStdInfoResponse>().success().setData(response);
         }catch (Exception e){
             e.printStackTrace();
             return new Message<BondFinPayInterestStdInfoResponse>().fail().setMessage("付息计划生成异常");
         }
-    }
-
-//    /**
-//     * 生成还本信息check
-//     * <功能详细描述>
-//     * @param previewParam
-//     * @param result
-//     * @return
-//     * @see
-//     * @since 1.0
-//     */
-//    @ResponseBody
-//    @RequestMapping("checkRepaymentPlan")
-//    public AjaxResult checkRepaymentPlan(@RequestBody BondBussFinRepaymentDto previewParam,
-//                            BindingResult result) {
-//        if (result != null && result.hasErrors()) {
-//            return new AjaxResult(result);
-//        }
-//        return new AjaxResult();
-//    }
-
-    /**
-     * 还本信息
-     * <功能详细描述>
-     * @return
-     * @throws ParseException
-     * @see
-     * @since 1.0
-     */
-    @RequestMapping(value = "/generationRepaymentPlan")
-    @ResponseBody
-    public List<BondFinCashPlanDto> generationRepaymentPlan(@RequestBody BondBussFinRepaymentDto finRepaymentDto) throws ParseException {
-        BussFinRepaymentDto dto = new BussFinRepaymentDto();
-        BeanUtil.copyPropertiesIgnoreNull(dto,finRepaymentDto);
-        List<BondFinCashPlanDto> finCashPlanList = new ArrayList<BondFinCashPlanDto>();
-        List<? extends FinCashPlan> findinvList = new ArrayList<FinCashPlan>();
-        //初始化--修改、查看、代办
-        String finprodId = dto.getFinprodId();
-        String workFlowId = dto.getWorkflowId();
-        Date maxTradeDate = commonBusinessService.getMaxTradeDate(finprodId);
-        if(StringUtil.equals(dto.getAdjPlanFlag(), DictCodeList.共通业务类型_付息计划调整.getValue())){
-            dto.setFinprodType2(dto.getAdjPlanFlag());
-        }
-        FinInterestFactorDto finInterestFactorDto = new FinInterestFactorDto();
-        BeanUtil.copyPropertiesIgnoreNull(finInterestFactorDto,finRepaymentDto.getFinInterestFactorDto());
-        dto.setFinInterestFactorDto(finInterestFactorDto);
-        FinPayInterestStdInfoDto finPayInterestStdInfoDto = new FinPayInterestStdInfoDto();
-        BeanUtil.copyPropertiesIgnoreNull(finPayInterestStdInfoDto,finRepaymentDto.getFinPayInterestStdInfoDto());
-        dto.setFinPayInterestStdInfoDto(finPayInterestStdInfoDto);
-            //生成还本计划
-          List<FinCashPlanDto> finCashPlans = bussFinRepaymentService.createAssetRePaymentPlan(dto);
-          for (FinCashPlanDto finCashPlan:finCashPlans){
-              BondFinCashPlanDto bondFinCashPlanDto = new BondFinCashPlanDto();
-              BeanUtil.copyPropertiesIgnoreNull(finCashPlan,bondFinCashPlanDto);
-              finCashPlanList.add(bondFinCashPlanDto);
-          }
-        //快捷录入
-        if(!StringUtil.equals(dto.getPageModel(),GlobalConstant.DETAIL_PAGE_MODEL_NEW)) {            //交易中的计划不可以维护
-            if (null != maxTradeDate) {
-                if (null != finCashPlanList && !finCashPlanList.isEmpty()) {
-                    for (BondFinCashPlanDto entity : finCashPlanList) {
-                        if (DateUtil.compareDate(entity.getMdate(), maxTradeDate) < 1) {
-                            entity.setUpdateFlg("02");
-                        } else {
-                            entity.setUpdateFlg("01");
-                        }
-                        entity.setMaxTradeDate(maxTradeDate);
-                        entity.setOldMdate(entity.getMdate());
-                    }
-                }
-            }
-        }
-        //排序
-        Collections.sort(finCashPlanList, new Comparator<BondFinCashPlanDto>() {
-            @Override
-            public int compare(BondFinCashPlanDto o1, BondFinCashPlanDto o2) {
-                return o1.getMdate().compareTo(o2.getMdate());
-            }
-        });
-        return finCashPlanList;
     }
 
     /**

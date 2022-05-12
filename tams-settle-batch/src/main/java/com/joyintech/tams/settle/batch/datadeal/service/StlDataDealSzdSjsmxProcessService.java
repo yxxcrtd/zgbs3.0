@@ -6,7 +6,9 @@ import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.constant.DictCodeListStl;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.settle.batch.datadeal.constant.StlDataDealProcessConstant;
 import com.joyintech.tams.settle.batch.datadeal.dao.StlDownDataDealMapper;
 import com.joyintech.tams.settle.batch.datadeal.dto.StlDownDataDealOperatorDto;
@@ -172,6 +174,11 @@ public class StlDataDealSzdSjsmxProcessService {
             setBondDeal(szdSjsmx, settleTransData);
             // 交易份额
             settleTransData.setShareAmt(abs(szdSjsmx.getMxqssl()));
+            // 清算速度
+            settleTransData.setSettleSpeed(0L);
+            if (DateUtil.compareDate(settleTransData.getTradeDate(), settleTransData.getSettleDate()) != 0){
+                settleTransData.setSettleSpeed(1L);
+            }
             // 全价总额
             settleTransData.setFpriceAmt(abs(szdSjsmx.getMxqsbj()));
             if ("B14".equals(getFinProductTypeType6(settleTransData))) {
@@ -272,6 +279,11 @@ public class StlDataDealSzdSjsmxProcessService {
             settleTransData.setUnitCprice(szdSjsmx.getMxcjjg());
             // 交易方向、业务场景明细分类
             setSharesDeal(szdSjsmx, settleTransData);
+            // 清算速度
+            settleTransData.setSettleSpeed(0L);
+            if (DateUtil.compareDate(settleTransData.getTradeDate(), settleTransData.getSettleDate()) != 0){
+                settleTransData.setSettleSpeed(1L);
+            }
             return true;
         }));
     }
@@ -386,7 +398,6 @@ public class StlDataDealSzdSjsmxProcessService {
                     continue;
                 }
             }
-
             StlDownDataDealWriteBaseDto stlDownDataDealWriteBaseDto = new StlDownDataDealWriteBaseDto();
             stlDownDataDealWriteBaseDto.setSettleTransData(settleTransData);
             if (settleTransDataAdd != null && StringUtil.isNotEmpty(settleTransData.getTradeId())) {
@@ -398,6 +409,7 @@ public class StlDataDealSzdSjsmxProcessService {
             settleTransTgMapping.setTradeId(settleTransData.getTradeId());//  业务流水号
             stlDownDataDealWriteBaseDto.setSettleTransTgMapping(settleTransTgMapping);
             stlDownDataDealWriteDto.getStlDownDataDealWriteBaseDtoList().add(stlDownDataDealWriteBaseDto);
+
         }
         return stlDownDataDealWriteDto;
     }
@@ -597,8 +609,34 @@ public class StlDataDealSzdSjsmxProcessService {
                 settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券_债券买入.getValue());
             }
         }
+        // 债券分销
+        if (StringUtil.equals(StlDataDealProcessConstant.SJSMX_YWLB_JY02, szdSjsmx.getMxywlb())&&(StringUtil.equals(StlDataDealProcessConstant.SJSMX_JYFS_01, szdSjsmx.getMxjyfs()))) {
+            handleSzdSjsmx(settleTransData,szdSjsmx);
+        }
     }
 
+    // 债券分销
+    private void handleSzdSjsmx(SettleTransData settleTransData, SzdSjsmx szdSjsmx) {
+        // 交易方向
+        settleTransData.setPs(DictCodeList.交易方向_买入.getValue());
+        // 金融产品代码
+        settleTransData.setFinprodId(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue()+szdSjsmx.getMxzqdm()+".SZ");
+        // 金融产品类型(估值核算)
+        settleTransData.setFinprodType(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
+        // 金融产品类型(投管分类)
+        settleTransData.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
+        // 非担保交收
+        if(StringUtil.equals(StlDataDealProcessConstant.SJSMX_JSFS_N, szdSjsmx.getMxjsfs())){
+            // 业务场景明细分类
+            settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券_分销_通知.getValue());
+            // 交收结果
+            settleTransData.setDeliveryResult(DictCodeListExt4.交收结果_交收通知.getValue());
+        }else {
+            // 担保交收
+            // 业务场景明细分类
+            settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券_分销_结果.getValue());
+        }
+    }
     /**
      * 股票交易时设置交易方向和业务场景明细
      * @param szdSjsmx

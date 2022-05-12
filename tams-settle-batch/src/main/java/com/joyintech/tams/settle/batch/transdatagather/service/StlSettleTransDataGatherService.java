@@ -3,11 +3,7 @@ package com.joyintech.tams.settle.batch.transdatagather.service;
 import com.joyintech.tams.common.base.dao.SettleTransDataTotalAddMapper;
 import com.joyintech.tams.common.base.dao.SettleTransDataTotalMapper;
 import com.joyintech.tams.common.base.entity.*;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt3;
-import com.joyintech.tams.constant.DictCodeListStl;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
 import com.joyintech.tams.settle.batch.datadeal.dao.StlDownDataDealMapper;
@@ -62,8 +58,9 @@ public class StlSettleTransDataGatherService {
         map.put("checkResult1", DictCodeListExt3.对账状态结果_一致.getValue());
         map.put("checkResult3", DictCodeListExt3.对账状态结果_手工完成.getValue());
         map.put("REPO_TYPE_H02", DictCodeList.回购类型_质押式竞价回购.getValue());
-        map.put("DELIVERY_RESULT_01", "01");
-        map.put("DELIVERY_RESULT_02", "02");
+        map.put("DELIVERY_RESULT_01", DictCodeListExt4.交收结果_正常交收.getValue());
+        map.put("DELIVERY_RESULT_02", DictCodeListExt4.交收结果_部分交收.getValue());
+        map.put("DELIVERY_RESULT_05", DictCodeListExt4.交收结果_交收通知.getValue());
         map.put("dealDate", dealDate);
         // 债券存续期
         map.put("FINPROD_TYPE_TG_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());

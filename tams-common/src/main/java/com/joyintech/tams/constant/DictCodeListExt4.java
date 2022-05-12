@@ -47,6 +47,7 @@ public enum DictCodeListExt4 implements BaseDictCodeList {
     交收结果_部分交收(DictCode.交收结果,"02","部分交收"),
     交收结果_交收失败(DictCode.交收结果,"03","交收失败"),
     交收结果_未交收(DictCode.交收结果,"04","未交收"),
+    交收结果_交收通知(DictCode.交收结果,"05","交收通知"),
     //20220413 add by gwl end
     行内资产三级分类_金融债(DictCode.行内资产三级分类,"69","金融债"),
     行内资产三级分类_可转债(DictCode.行内资产三级分类,"70","可转债"),

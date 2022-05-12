@@ -7,10 +7,7 @@ import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt3;
-import com.joyintech.tams.constant.DictCodeListStl;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.settle.batch.datadeal.service.StlDownDataDealService;
 import com.joyintech.tams.settle.batch.datagather.constant.StlDataGatherConstant;
 import com.joyintech.tams.settle.batch.datagather.dao.StlDataGatherMapper;
@@ -58,8 +55,8 @@ public abstract class StlDataGatherReader extends BaseReader<InvestTradeReaderDt
             Map<String, Object> searchParam = new HashMap<>(4);
             setSearchParam(searchParam);
             searchParam.put("dealDate", execInfo.getExecuteDate());
-            searchParam.put("DELIVERY_RESULT_01", "01");
-            searchParam.put("DELIVERY_RESULT_02", "02");
+            searchParam.put("DELIVERY_RESULT_01", DictCodeListExt4.交收结果_正常交收.getValue());
+            searchParam.put("DELIVERY_RESULT_02", DictCodeListExt4.交收结果_部分交收.getValue());
             // 债券存续期
             if(searchParam.containsKey("readerType") && StringUtil.equals(searchParam.get("readerType"),
                     StlDataGatherConstant.BOND_DURATION)){

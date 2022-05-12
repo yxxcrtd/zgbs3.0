@@ -97,9 +97,6 @@ public class FinBondAsset001Controller extends BaseController{
     private CommonBusinessService commonBusinessService;
 
     @Autowired
-    private MstWorkflowCommonService mstWorkflowCommonService;
-
-    @Autowired
     private IPlatformDate iPlatformDate;
 
     @ApiOperation(value="查询页面初始化参数", notes = "查询页面初始化参数")
@@ -238,10 +235,12 @@ public class FinBondAsset001Controller extends BaseController{
             for (FinBondAssetSaveRequest entity : dto.getSelectedItem()) {
                 WflValidInputParameter parameter = new WflValidInputParameter();
                 parameter.setPageId("FinBondAsset002");
-                parameter.setBusinessDataPk2(entity.getFinprodMarketId());
-                if (mstWorkflowCommonService.isInWflProcess(parameter)) {
-                    errorList.add(new ValidMessage("", getMessage("所选资产存在流程中的数据！,不可修改!")));
-                    break;
+                parameter.setBusinessDataPk1(entity.getFinprodMarketId());
+                if (finBondAssetService.isInWflProcess(parameter)) {
+                    errorList.add(new ValidMessage("", getMessage("所选资产存在流程中的数据！,不可删除!")));
+                    res.setErrorList(errorList);
+                    res.setMessageType(MessageType.错误消息);
+                    return new Message<AjaxResult>().success().setData(res);
                 }
             }
         }
@@ -272,14 +271,17 @@ public class FinBondAsset001Controller extends BaseController{
         //判断是否存在交易
         List<JoyinMessage> joyinMessages = new ArrayList<>();
         List<ValidMessage> errorList = new ArrayList<ValidMessage>();
+        AjaxResult wr = new AjaxResult();
         if(null!=request.getSelectedItem()&&!request.getSelectedItem().isEmpty()){
             for(FinBondAssetSaveRequest entity : request.getSelectedItem()) {
                 WflValidInputParameter parameter = new WflValidInputParameter();
                 parameter.setPageId("FinBondAsset002");
-                parameter.setBusinessDataPk2(entity.getFinprodMarketId());
-                if (mstWorkflowCommonService.isInWflProcess(parameter)) {
+                parameter.setBusinessDataPk1(entity.getFinprodMarketId());
+                if (finBondAssetService.isInWflProcess(parameter)) {
                     errorList.add(new ValidMessage("", getMessage("所选资产存在流程中的数据！,不可修改!")));
-                    break;
+                    wr.setErrorList(errorList);
+                    wr.setMessageType(MessageType.错误消息);
+                    return new Message<AjaxResult>().success().setData(wr);
                 }
             }
             for(FinBondAssetSaveRequest entity : request.getSelectedItem()) {
@@ -287,12 +289,13 @@ public class FinBondAsset001Controller extends BaseController{
                 if(finBondAssetService.selectCountByfinprodId(finProdId)==0){
                     errorList.add(new ValidMessage("",
                             getMessage("该数据已被删除!")));
-                    break;
+                    wr.setErrorList(errorList);
+                    wr.setMessageType(MessageType.错误消息);
+                    return new Message<AjaxResult>().success().setData(wr);
                 }
             }
         }
         String isRightStr = request.getIsRight();
-        AjaxResult wr = new AjaxResult();
         if (CollectionUtils.isNotEmpty(errorList)){
             wr.setErrorList(errorList);
             return new Message<AjaxResult>().success().setData(wr);

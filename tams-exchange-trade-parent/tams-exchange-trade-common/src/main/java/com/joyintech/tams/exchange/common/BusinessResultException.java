@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.common;
 
+import cn.hutool.core.util.StrUtil;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.domain.Message;
 
@@ -71,6 +72,7 @@ public class BusinessResultException extends RuntimeException {
             return resultMessage;
         }
 
-        return new Message<Object>(errorCode.value() + "", errorCode.getDescription());
+        return new Message<>(StrUtil.format("{} {}{}", errorCode.getCode(), errorCode.getDescription()
+                , StrUtil.isNotEmpty(getMessage()) ? StrUtil.COLON + getMessage() : null));
     }
 }

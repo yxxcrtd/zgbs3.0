@@ -33,6 +33,13 @@ public class BondFinPayInterestStdInfoResponse {
      */
     private static final long serialVersionUID = 1L;
 
+
+    /**
+     * 最大交易日
+     */
+    @ApiModelProperty(name="maxTradeDate",value="最大交易日")
+    private Date  maxTradeDate;
+
     /**
      * 付息计划
      */
@@ -61,4 +68,11 @@ public class BondFinPayInterestStdInfoResponse {
         this.invRepayList = invRepayList;
     }
 
+    public Date getMaxTradeDate() {
+        return maxTradeDate;
+    }
+
+    public void setMaxTradeDate(Date maxTradeDate) {
+        this.maxTradeDate = maxTradeDate;
+    }
 }
