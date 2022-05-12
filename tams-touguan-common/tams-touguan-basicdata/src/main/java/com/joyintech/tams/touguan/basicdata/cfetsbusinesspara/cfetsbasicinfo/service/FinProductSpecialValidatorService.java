@@ -60,7 +60,7 @@ public class FinProductSpecialValidatorService implements BeanValidator {
         }
         //判断特殊资产维护是否存在流程中数据
         WflValidInputParameter parameter = new WflValidInputParameter();
-        parameter.setPageId("FinProductSpecial001");
+        parameter.setPageId("CfetsBasicInfo001");
         parameter.setBusinessDataPk1(dto.getFinprodMarketId());
         ProcessMark dataEntityFromProcessMark = mstWorkflowCommonService.getDataEntityFromProcessMark(parameter);
         if (Objects.nonNull(dataEntityFromProcessMark)) {

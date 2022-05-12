@@ -93,7 +93,7 @@ public class CfetsBasicInfo001Controller extends BaseController {
         ProcessParameter<FinProductSpecialDto> processParameter = new ProcessParameter<>();
         WorkFlowParameter<FinProductSpecialDto> params = new WorkFlowParameter<>();
         // 页面id
-        params.setPageId("FinProductSpecial001");
+        params.setPageId("CfetsBasicInfo001");
         params.setElementId(dto.getElementId());
         params.setBusinessType(BussinessDictCodeList.特殊债券信息业务类型.getValue());
         params.setBusinessCode(dto.getFinprodMarketId());

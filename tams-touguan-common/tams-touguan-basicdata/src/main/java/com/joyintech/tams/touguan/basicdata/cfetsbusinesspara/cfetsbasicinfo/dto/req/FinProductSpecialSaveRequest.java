@@ -7,7 +7,7 @@ import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@PageId("FinProductSpecial001")
+@PageId("CfetsBasicInfo001")
 @ApiModel(value = "特殊债券信息画面表单", description = "特殊债券信息画面表单")
 public class FinProductSpecialSaveRequest extends BaseEntity implements ProcessEntity {
 
