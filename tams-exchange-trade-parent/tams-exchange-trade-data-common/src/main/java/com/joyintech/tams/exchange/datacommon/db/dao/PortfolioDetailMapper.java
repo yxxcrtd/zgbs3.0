@@ -3,6 +3,7 @@ package com.joyintech.tams.exchange.datacommon.db.dao;
 import com.joyintech.tams.exchange.common.db.domain.PortfolioDetail;
 import com.joyintech.tams.exchange.common.db.domain.PortfolioDetailExample;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ import java.util.List;
  * @author swwan
  * @date 2022/5/11 - 9:44
  */
+@Repository
 public interface PortfolioDetailMapper extends IMybatisMapper<PortfolioDetail, String, PortfolioDetailExample> {
     long countByExample(PortfolioDetailExample example);
 

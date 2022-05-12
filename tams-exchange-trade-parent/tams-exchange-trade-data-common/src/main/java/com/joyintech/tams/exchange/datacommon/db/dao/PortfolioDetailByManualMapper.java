@@ -2,6 +2,7 @@ package com.joyintech.tams.exchange.datacommon.db.dao;
 
 import com.joyintech.tams.exchange.common.db.domain.PortfolioDetail;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -9,6 +10,7 @@ import java.util.List;
  * @author swwan
  * @date 2022/5/10 - 22:29
  */
+@Repository
 public interface PortfolioDetailByManualMapper {
 
     /**
@@ -25,5 +27,11 @@ public interface PortfolioDetailByManualMapper {
      * 更新业务状态为确认
      */
     int updateBusiStatusByBusiId(@Param("busiId")String busiId);
+
+
+    /**
+     * 根据业务编号和业务类型查询明细
+     */
+    List<PortfolioDetail> selectListByBusiIdAndBusiType(@Param("busiId")String busiId, @Param("busiType")String busiType);
 
 }

@@ -8,6 +8,7 @@ import com.joyintech.tams.exchange.common.db.domain.Trade;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -40,6 +41,11 @@ public class TradeMessage extends BasicMessage {
     private String counterId;     // 交易对手
     private BigDecimal pledgeRatio;     // 折算比例%
     private Double entrustVolume;      // 委托数量
+
+    /**
+     * 下单组合明细数据消息
+     */
+    private List<PortfolioTradeMessage> portfolioTradeMessages;
 
     public String getEntrustId() {
         return entrustId;
@@ -255,6 +261,14 @@ public class TradeMessage extends BasicMessage {
 
     public void setEntrustVolume(Double entrustVolume) {
         this.entrustVolume = entrustVolume;
+    }
+
+    public List<PortfolioTradeMessage> getPortfolioTradeMessages() {
+        return portfolioTradeMessages;
+    }
+
+    public void setPortfolioTradeMessages(List<PortfolioTradeMessage> portfolioTradeMessages) {
+        this.portfolioTradeMessages = portfolioTradeMessages;
     }
 
     private static TradeMessage templateMessage = new TradeMessage();

@@ -49,4 +49,13 @@
           and BUSI_TYPE = #{busiType, jdbcType=VARCHAR}
           and BUSI_STATUS = '2'
     </select>
+
+    <select id="selectListByBusiIdAndBusiType" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from T_PORTFOLIO_DETAIL
+        where BUSI_ID = #{busiId,jdbcType=VARCHAR}
+        and BUSI_TYPE = #{busiType, jdbcType=VARCHAR}
+        and BUSI_STATUS = '2'
+    </select>
 </mapper>

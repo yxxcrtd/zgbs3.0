@@ -1,18 +1,27 @@
 package com.joyintech.tams.exchange.service.trade.processor.business.common;
 
 import com.google.common.base.Strings;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.exchange.common.bean.ResultBean;
+import com.joyintech.tams.exchange.common.bean.investment.PortfolioTradeMessage;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
-import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt1;
 import com.joyintech.tams.exchange.common.db.domain.*;
-import com.joyintech.tams.exchange.common.utils.*;
+import com.joyintech.tams.exchange.common.enums.exchange.PortfolioDetailBusiTypeEnum;
+import com.joyintech.tams.exchange.common.utils.IntegratedEntrustUtils;
+import com.joyintech.tams.exchange.common.utils.JsonUtils;
+import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
+import com.joyintech.tams.exchange.common.utils.TradeUtils;
+import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailByManualMapper;
+import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailMapper;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
 import com.joyintech.tams.exchange.service.trade.processor.MessageSenderManagement;
 import com.joyintech.tams.exchange.service.trade.processor.account.AccountPositionHelper;
 import com.joyintech.tams.exchange.service.trade.processor.business.bond.BondHelper;
 import com.joyintech.tams.exchange.service.trade.processor.others.SplitOrderHelper;
+import com.joyintech.tams.exchange.service.trade.processor.portfolio.PortfolioAssignHelper;
 import com.joyintech.tams.exchange.service.trade.transaction.TransactionHelper;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +30,9 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.joyintech.tams.exchange.common.utils.TradeUtils.multiply;
 
@@ -67,7 +78,7 @@ public class TradeCallbackHelper {
             EntrustInterface entrust = null;
             //处理大宗成交回报
             if (IntegratedEntrustUtils.isIntegratedEntrust(tradeRecord.getEntrustProp())
-                || IntegratedEntrustUtils.isNegotiatedTrade(tradeRecord.getEntrustProp())) {
+                    || IntegratedEntrustUtils.isNegotiatedTrade(tradeRecord.getEntrustProp())) {
                 if (!Strings.isNullOrEmpty(tradeRecord.getEntrustId())) {
                     entrust = integratedEntrustService.findById(tradeRecord.getEntrustId());
                 } else if (!Strings.isNullOrEmpty(tradeRecord.getBrokerEntrustId())) {
@@ -267,10 +278,18 @@ public class TradeCallbackHelper {
             }
             // 若指令全部完成，则更新指令状态为已完成
             updateInstructionStatus(instruction);
+
+            //组装成交组合分配
+            List<PortfolioTradeMessage> portfolioTradeMessages = buildPortfolioTradeMessage(entrust, tradeRecord, instruction);
+            if (CollectionUtils.isEmpty(portfolioTradeMessages)) {
+                logger.error("成交组合分配，不推送成交数据");
+                return;
+            }
+
             // 是否需要手工交收
             if (IntegratedEntrustUtils.isProtocolBack(tradeRecord.getEntrustProp())) {//协议回购
 //                messageSenderService.pushTradeToMQForFixedIncome(tradeRecord, instruction, entrust);
-                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust);
+                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust, portfolioTradeMessages);
                 return;
 //            } else if (InvestmentAssetType.isBond(instruction.getAssetType()) && TradePlat.needSettleTrade(instruction.getTradePlat())) {
                 //新债需求：判断债券哪些走手工交收，用标的是否非担保 =是 则走手工交收
@@ -279,13 +298,13 @@ public class TradeCallbackHelper {
 //                if (Objects.nonNull(instrument)) {
 //                    if (EntrustUtils.isSettleTrade(instrument.getTradePlat(), entrust.getEntrustProp())) {
 //                        messageSenderService.pushTradeToMQForFixedIncome(tradeRecord, instruction, entrust);
-                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust);
+                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust, portfolioTradeMessages);
                 return;
 //                    }
 //                }
             }
 //            messageSenderService.pushTradeToMQ(tradeRecord, instruction, entrust);
-            messageSenderManagement.pushTrade(tradeRecord, instruction, entrust);
+            messageSenderManagement.pushTrade(tradeRecord, instruction, entrust, portfolioTradeMessages);
         } else if (tradeRecord.getTradeType() == TradeType.INVALID.value) {
             if (entrust.getEntrustStatus() == EntrustStatus.INVALID.value) {
                 logger.info("委托已通过委托回报废单处理，忽略废单成交");
@@ -295,6 +314,59 @@ public class TradeCallbackHelper {
             entrustCancelProcessor.processCancelByTrade(entrust, tradeRecord, order, instruction);
         }
     }
+
+    @Autowired
+    private PortfolioAssignHelper portfolioAssignHelper;
+    @Autowired
+    private PortfolioDetailByManualMapper portfolioDetailByManualMapper;
+    @Autowired
+    private PortfolioDetailMapper portfolioDetailMapper;
+
+    /**
+     * 组装成交组合分配
+     */
+    private List<PortfolioTradeMessage> buildPortfolioTradeMessage(EntrustInterface entrust, Trade trade, Instruction instruction) {
+        List<PortfolioTradeMessage> portfolioTradeMessages = Lists.newArrayList();
+
+        //1、调用通用分配接口，构建成交组合分配
+        List<PortfolioDetail> list = Lists.newArrayList();
+        ResultBean resultBean = portfolioAssignHelper.queryPortfolioAssign(instruction.getEntrustId(), PortfolioDetailBusiTypeEnum.TRADE,
+                BigDecimal.valueOf(trade.getTradedVolume()), trade.getTradedPrice(), trade.getEntrustProp());
+        if (ErrorCode.SUCCESS.value() == resultBean.getErrorCode()) {
+            list.addAll((List<PortfolioDetail>) resultBean.getData());
+        } else {
+            logger.warn("构建成交组合分配失败：【instructionId={}】,【brokerTradeId={}】,【entrustId={}】",
+                    instruction.getEntrustId(), trade.getBrokerTradeId(), entrust.getId());
+            return portfolioTradeMessages;
+        }
+
+        //2、保存 成交组合分配
+        list.forEach(detail -> portfolioDetailMapper.insert(detail));
+
+        //3、查询成交对应委托下单的组合分配
+        List<PortfolioDetail> portfolioDetails = portfolioDetailByManualMapper.selectListByBusiIdAndBusiType(entrust.getId(), PortfolioDetailBusiTypeEnum.ORDER.getCode());
+        Map<String, PortfolioDetail> detailMap = portfolioDetails.stream().collect(Collectors.toMap(PortfolioDetail::getPortfolioId, o -> o));
+
+        //4、组装成交组合分配
+        for (PortfolioDetail detail : list) {
+            PortfolioTradeMessage portfolioTradeMessage = new PortfolioTradeMessage();
+            portfolioTradeMessage.setBusiId(trade.getId());
+            portfolioTradeMessage.setPortfolioId(detail.getPortfolioId());
+            portfolioTradeMessage.setPortfolioName(detail.getPortfolioName());
+            portfolioTradeMessage.setTradeNum(detail.getTargetNum());
+            portfolioTradeMessage.setTradeAmt(detail.getTargetAmt());
+            portfolioTradeMessage.setTargetType(detail.getTargetType());
+
+            PortfolioDetail portfolioDetail = detailMap.get(detail.getPortfolioId());
+            portfolioTradeMessage.setEntrustNum(portfolioDetail.getTargetNum());
+            portfolioTradeMessage.setEntrustAmt(portfolioDetail.getTargetAmt());
+
+            portfolioTradeMessages.add(portfolioTradeMessage);
+        }
+
+        return portfolioTradeMessages;
+    }
+
 
     private void updateInstructionStatus(Instruction instruction) {
         if (Objects.nonNull(instruction)) {
