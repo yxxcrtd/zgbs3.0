@@ -4254,6 +4254,10 @@
             });
         }
 
+        if(ps == PS_T68 || ps == PS_T69){
+            saveOrSubmit('submit');
+        }
+
 
     }
 
