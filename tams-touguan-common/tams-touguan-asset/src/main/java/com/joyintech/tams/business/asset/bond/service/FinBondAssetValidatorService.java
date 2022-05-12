@@ -17,8 +17,10 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.BeanValidator;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.asset.bond.dto.BondFinCashPlanDto;
 import com.joyintech.tams.business.asset.bond.dto.BondFinExercisePlanDto;
 import com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest;
+import com.joyintech.tams.common.base.entity.FinCashPlan;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
@@ -31,9 +33,8 @@ import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * 债券标的信息业务验证
@@ -73,7 +74,7 @@ public class FinBondAssetValidatorService implements BeanValidator{
             }
             // 资产必须有还本计划
             if (DictCodeList.息票品种_附息.getValue().equals(dto.getFinInterestFactorDto().getCouponSpecies())
-                    && DictCodeList.息票品种_利随本清.getValue().equals(dto.getFinInterestFactorDto().getCouponSpecies())) {
+                    || DictCodeList.息票品种_利随本清.getValue().equals(dto.getFinInterestFactorDto().getCouponSpecies())) {
                 if((dto.getFinInterestFactorDto().getCalcType() ==null)) {
                     resultList.add(new ValidMessage("息票品种为附息或利随本清时，利率类型不能为空!"));
                 }else{
@@ -125,10 +126,31 @@ public class FinBondAssetValidatorService implements BeanValidator{
                         resultList.add(new ValidMessage("息票品种为附息时，发行人计息基础不能为空!"));
                     }
                 }
+                if(null!=dto.getFinPayInterestStdInfoDto() && null!=dto.getFinPayInterestStdInfoDto().getInvScheduleList()
+                        &&!dto.getFinPayInterestStdInfoDto().getInvScheduleList().isEmpty()){
+                    for(FinCashPlan finCashPlanEntity:dto.getFinPayInterestStdInfoDto().getInvScheduleList()){
+                        if(null==finCashPlanEntity.getVdate()){
+                            resultList.add(new ValidMessage("",
+                                    getMessage("COMMON_E_0057", getMessage("BussFinRepayment.vdate"))));
+
+                            break;
+                        }
+                        if(null==finCashPlanEntity.getMdate()){
+                            resultList.add(new ValidMessage("",
+                                    getMessage("COMMON_E_0057", getMessage("BussFinRepayment.mdate"))));
+                            break;
+                        }
+                        if(DateUtil.compareDate(finCashPlanEntity.getVdate(),finCashPlanEntity.getMdate())<0){
+                            resultList.add(new ValidMessage(
+                                    "付息计划,计息开始日不可以大于计息结束日"));
+                            break;
+                        }
+                    }
+                }
             }
 
             if (DictCodeList.息票品种_零息.getValue().equals(dto.getFinInterestFactorDto().getCouponSpecies())
-                && DictCodeList.息票品种_贴现.getValue().equals(dto.getFinInterestFactorDto().getCouponSpecies())){
+                || DictCodeList.息票品种_贴现.getValue().equals(dto.getFinInterestFactorDto().getCouponSpecies())){
                 if((dto.getFinInterestFactorDto().getYield() ==null)) {
                     resultList.add(new ValidMessage(getMessage("息票品种为附息或利随本清时，初始利率不能为空!")));
                 }

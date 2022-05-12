@@ -1296,6 +1296,11 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                             }
                         }
                     }
+                    if(DateUtil.compareDate(finCashPlanEntity.getVdate(),finCashPlanEntity.getMdate())<0){
+                        resultList.add(new ValidMessage(
+                                "付息计划,计息开始日不可以大于计息结束日"));
+                        return resultList;
+                    }
                     if (StringUtil.isNotEmpty(dto.getMaxTradeDate())) {
                         if (DateUtil.compareDate(finCashPlanEntity.getVdate(), dto.getMaxTradeDate()) > 0) {
                             resultList.add(new ValidMessage(
