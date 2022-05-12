@@ -1286,9 +1286,9 @@ public class TrdCommonBaseService extends BaseService {
             return new ArrayList<>();
         }
         if(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue().equals(etrEntrust.getEntrustClass())){ // 多组合指令
-            this.handleMultiPortfolioEntrust(infContractDetailfile, portfolioDetails, etrEntrust, converseRadio, 百元券面);
+            portfolioDtos = this.handleMultiPortfolioEntrust(infContractDetailfile, portfolioDetails, etrEntrust, converseRadio, 百元券面);
         }else{ // 单组合指令
-            this.handleSinglePortfolioEntrust(infContractDetailfile, portfolioDetails, etrEntrust, converseRadio, 百元券面);
+            portfolioDtos = this.handleSinglePortfolioEntrust(infContractDetailfile, portfolioDetails, etrEntrust, converseRadio, 百元券面);
         }
         logger.debug("【组合计算分配结果】portfolioDtos: {}", JSON.toJSONString(portfolioDtos));
         return portfolioDtos;
