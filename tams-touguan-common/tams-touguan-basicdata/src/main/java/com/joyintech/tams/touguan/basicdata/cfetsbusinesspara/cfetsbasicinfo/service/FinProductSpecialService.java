@@ -1,4 +1,4 @@
-package com.joyintech.tams.touguan.system.bond.special.service;
+package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.service;
 
 import com.google.common.collect.Lists;
 import com.joyintech.framework.base.BaseService;
@@ -10,17 +10,18 @@ import com.joyintech.tams.common.base.entity.FinProductSpecial;
 import com.joyintech.tams.common.base.entity.WflFinProductSpecial;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.dto.common.ExcelValidDto;
+import com.joyintech.tams.invest.common.util.ExcelUtil;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
-import com.joyintech.tams.touguan.system.bond.special.dao.FinProductSpecialAssetMapper;
-import com.joyintech.tams.touguan.system.bond.special.dto.FinProductSpecialDto;
-import com.joyintech.tams.touguan.system.bond.special.dto.FinProductSpecialImportDto;
-import com.joyintech.tams.touguan.system.bond.special.dto.FinProductSpecialSelectOptionDto;
-import com.joyintech.tams.touguan.system.bond.special.dto.req.FinProductSpecialQueryRequest;
-import com.joyintech.tams.touguan.system.bond.special.dto.req.FinProductSpecialSelectOptionQueryRequest;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dao.FinProductSpecialAssetMapper;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.FinProductSpecialDto;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.FinProductSpecialSelectOptionDto;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.req.FinProductSpecialQueryRequest;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.req.FinProductSpecialSelectOptionQueryRequest;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,8 +52,7 @@ public class FinProductSpecialService extends BaseService<FinProductSpecialDto> 
      * @return
      */
     public Page<FinProductSpecialDto> queryForPage(FinProductSpecialQueryRequest request) {
-        Page<FinProductSpecialDto> pageList = super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(),
-                () -> finProductSpecialAssetMapper.queryForPage(request));
+        Page<FinProductSpecialDto> pageList = super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> finProductSpecialAssetMapper.queryForPage(request));
         return pageList;
     }
 
@@ -79,11 +79,10 @@ public class FinProductSpecialService extends BaseService<FinProductSpecialDto> 
 
     @Override
     public void doComplete(FinProductSpecialDto entity, OperationType type) {
-        if (type == OperationType.NEW) {
-
-        } else if (type == OperationType.MODIFY) {
-
-        }
+        //记录业务表
+        insertData(entity);
+        //记录流程表
+        insertWflData(entity);
     }
 
     /**
@@ -94,9 +93,7 @@ public class FinProductSpecialService extends BaseService<FinProductSpecialDto> 
      */
     @Override
     public void doInsert(FinProductSpecialDto dto, OperationType type) {
-        if ("save".equals(dto.getOperateType())) {
-            return;
-        }
+        insertData(dto);
     }
 
 
@@ -130,7 +127,13 @@ public class FinProductSpecialService extends BaseService<FinProductSpecialDto> 
      * @param fileName
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public List<ExcelValidDto> importData(String fileName) {
+        List<List<String>> dataList = ExcelUtil.getDataList(fileName);
+        List<FinProductSpecialDto> finProductSpecialDtos = convertToBean(dataList);
+        finProductSpecialDtos.stream().forEach(finProductSpecialDto -> {
+            doComplete(finProductSpecialDto, null);
+        });
         List<ExcelValidDto> excelValidDtos = Lists.newArrayList();
         return excelValidDtos;
     }
@@ -141,12 +144,11 @@ public class FinProductSpecialService extends BaseService<FinProductSpecialDto> 
      * @param dataList
      * @return
      */
-    private List<FinProductSpecialImportDto> convertToBean(List<List<String>> dataList) {
-        List<FinProductSpecialImportDto> entities = new ArrayList<>();
+    private List<FinProductSpecialDto> convertToBean(List<List<String>> dataList) {
+        List<FinProductSpecialDto> entities = new ArrayList<>();
         for (int i = 0; i < dataList.size(); i++) {
             List<String> list = dataList.get(i);
-            FinProductSpecialImportDto entity = new FinProductSpecialImportDto();
-            entity.setSerialNumber(list.get(0));
+            FinProductSpecialDto entity = new FinProductSpecialDto();
             entity.setFinprodMarketId(list.get(1));
             entity.setFinprodAbbr(list.get(2));
             entity.setIsAbs(list.get(3));

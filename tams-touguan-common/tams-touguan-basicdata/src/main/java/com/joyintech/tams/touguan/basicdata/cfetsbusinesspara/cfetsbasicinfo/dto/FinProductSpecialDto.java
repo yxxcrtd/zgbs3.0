@@ -1,7 +1,6 @@
-package com.joyintech.tams.touguan.system.bond.special.dto;
+package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto;
 
 import com.joyintech.framework.base.BaseEntity;
-import com.joyintech.tams.component.business.riskrds.dto.PageModel;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
@@ -33,9 +32,6 @@ public class FinProductSpecialDto extends BaseEntity implements ProcessEntity {
 
     @ApiModelProperty(name = "pageId", value = "画面ID", example = "FinBondAsset002")
     private String pageId;
-
-    @ApiModelProperty(name = "pageModel", value = "分页对象")
-    private PageModel pageModel;
 
     /**
      * 债券代码
@@ -144,14 +140,6 @@ public class FinProductSpecialDto extends BaseEntity implements ProcessEntity {
 
     public void setPageId(String pageId) {
         this.pageId = pageId;
-    }
-
-    public PageModel getPageModel() {
-        return pageModel;
-    }
-
-    public void setPageModel(PageModel pageModel) {
-        this.pageModel = pageModel;
     }
 
     public String getFinprodAbbr() {

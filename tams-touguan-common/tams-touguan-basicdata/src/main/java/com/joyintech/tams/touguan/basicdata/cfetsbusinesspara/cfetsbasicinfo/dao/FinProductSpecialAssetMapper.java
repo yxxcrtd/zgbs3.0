@@ -1,9 +1,9 @@
-package com.joyintech.tams.touguan.system.bond.special.dao;
+package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dao;
 
-import com.joyintech.tams.touguan.system.bond.special.dto.FinProductSpecialDto;
-import com.joyintech.tams.touguan.system.bond.special.dto.FinProductSpecialSelectOptionDto;
-import com.joyintech.tams.touguan.system.bond.special.dto.req.FinProductSpecialQueryRequest;
-import com.joyintech.tams.touguan.system.bond.special.dto.req.FinProductSpecialSelectOptionQueryRequest;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.FinProductSpecialDto;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.FinProductSpecialSelectOptionDto;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.req.FinProductSpecialQueryRequest;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.req.FinProductSpecialSelectOptionQueryRequest;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 

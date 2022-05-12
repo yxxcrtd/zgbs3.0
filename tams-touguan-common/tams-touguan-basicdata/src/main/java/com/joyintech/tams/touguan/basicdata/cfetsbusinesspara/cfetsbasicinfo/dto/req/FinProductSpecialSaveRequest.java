@@ -1,4 +1,4 @@
-package com.joyintech.tams.touguan.system.bond.special.dto.req;
+package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.req;
 
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;

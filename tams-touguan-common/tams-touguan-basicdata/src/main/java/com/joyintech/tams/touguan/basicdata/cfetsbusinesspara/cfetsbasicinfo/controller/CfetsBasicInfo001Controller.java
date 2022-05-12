@@ -1,4 +1,4 @@
-package com.joyintech.tams.touguan.system.bond.special.controller;
+package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.joyintech.framework.ajax.AjaxResult;
@@ -11,12 +11,12 @@ import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.common.ExcelValidDto;
-import com.joyintech.tams.touguan.system.bond.special.dto.FinProductSpecialDto;
-import com.joyintech.tams.touguan.system.bond.special.dto.FinProductSpecialSelectOptionDto;
-import com.joyintech.tams.touguan.system.bond.special.dto.req.FinProductSpecialQueryRequest;
-import com.joyintech.tams.touguan.system.bond.special.dto.req.FinProductSpecialSelectOptionQueryRequest;
-import com.joyintech.tams.touguan.system.bond.special.service.FinProductSpecialService;
-import com.joyintech.tams.touguan.system.bond.special.service.FinProductSpecialValidatorService;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.service.FinProductSpecialService;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.service.FinProductSpecialValidatorService;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.FinProductSpecialDto;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.FinProductSpecialSelectOptionDto;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.req.FinProductSpecialQueryRequest;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.req.FinProductSpecialSelectOptionQueryRequest;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -43,10 +43,10 @@ import java.util.Map;
  * @date 2022-05-06
  */
 @Controller
-@PageId("FinProductSpecial001")
-@RequestMapping("/system/bond/FinProductSpecial001")
+@PageId("CfetsBasicInfo001")
+@RequestMapping("/business/param/CfetsBasicInfo001")
 @Api(tags = "银行间基础信息-特殊债券信息")
-public class FinProductSpecial001Controller extends BaseController {
+public class CfetsBasicInfo001Controller extends BaseController {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
