@@ -199,12 +199,4 @@
 <!--		where F_TRADE_ID = #{fTradeId,jdbcType=VARCHAR}-->
 <!--	</select>-->
 
-	<select id="getInfContractPortfolioDetails" resultType="com.joyintech.tams.common.base.entity.InfContractPortfolioDetail">
-		select
-			<include refid="com.joyintech.tams.common.base.dao.InfContractPortfolioDetail.Base_Column_List" />
-		from
-			INF_CONTRACT_PORTFOLIO_DETAIL
-		where
-			SEQNO = #{seqNo,jdbcType=VARCHAR}
-	</select>
 </mapper>

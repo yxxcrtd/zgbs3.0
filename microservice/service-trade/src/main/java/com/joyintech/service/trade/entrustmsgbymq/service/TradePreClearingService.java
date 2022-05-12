@@ -223,7 +223,7 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         // 判断是否是多组合系列户指令
         if(tradePreCommonService.isMultiPortFolioEntrust(infContractDetailfile.getEntrustId())){
             String totalTradeId = null;
-            List<InfContractPortfolioDetail> details = entrustMsgbyMQMapper.getInfContractPortfolioDetails(infContractDetailfile.getSeqno());
+            List<InfContractPortfolioDetail> details = trdCommonBaseService.getInfContractPortfolioDetails(infContractDetailfile.getSeqno());
             if(!CollectionUtils.isEmpty(details)){
                 for(InfContractPortfolioDetail detail : details){
                     TrdTempDto trdTempDto = new TrdTempDto();
