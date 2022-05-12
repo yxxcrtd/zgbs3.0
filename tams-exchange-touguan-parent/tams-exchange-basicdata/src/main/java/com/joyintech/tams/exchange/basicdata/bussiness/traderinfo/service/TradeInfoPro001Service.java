@@ -132,4 +132,8 @@ public class TradeInfoPro001Service extends BaseService implements BaseProcessSe
     public int existsTrader(TradeInfoProSaveRequest dto) {
         return tradeInfoProMapper.existsTrader(dto);
     }
+
+    public int existsOur(TradeInfoProSaveRequest dto) {
+        return tradeInfoProMapper.existsOur(dto);
+    }
 }

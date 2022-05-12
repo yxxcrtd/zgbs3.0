@@ -1,5 +1,6 @@
 package com.joyintech.tams.business.common.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.util.SysDataUtil;
@@ -443,6 +444,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.finprodName = finprodName;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getIssueSdate() {
         return issueSdate;
     }
@@ -451,6 +453,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.issueSdate = issueSdate;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getIssueEdate() {
         return issueEdate;
     }
@@ -459,6 +462,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.issueEdate = issueEdate;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getAssignRegdate() {
         return assignRegdate;
     }
@@ -507,6 +511,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.maxPamt = maxPamt;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getSettleDate() {
         return settleDate;
     }
@@ -515,6 +520,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.settleDate = settleDate;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getPayEdate() {
         return payEdate;
     }
@@ -539,6 +545,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.issueStyle = issueStyle;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getIssueDate() {
         return issueDate;
     }
@@ -555,6 +562,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.tenderType = tenderType;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getOnmarketDate() {
         return onmarketDate;
     }
@@ -781,6 +789,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.bp = bp;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getListingDate() {
         return listingDate;
     }
@@ -837,6 +846,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.maxTotalTender = maxTotalTender;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getTenderSdate() {
         return tenderSdate;
     }
@@ -845,6 +855,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.tenderSdate = tenderSdate;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getTenderEdate() {
         return tenderEdate;
     }
@@ -853,6 +864,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.tenderEdate = tenderEdate;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getPayDate() {
         return payDate;
     }
@@ -861,6 +873,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.payDate = payDate;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getFirstConfirmDate() {
         return firstConfirmDate;
     }

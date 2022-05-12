@@ -68,6 +68,7 @@ import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -332,6 +333,11 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
 
     @Override
     public void doUpdate(EtrExchangeTradeSecRepoSaveRepoRequest entity) {
+
+        if(StringUtil.isEmpty(entity.getPortfolioId()) && !CollectionUtils.isEmpty(entity.getPortfolioList())){
+            entity.setPortfolioId(entity.getPortfolioList().get(0).getPortfolioId());
+        }
+
         // nothing to do just for aspect
         Map<String, Object> map = new HashMap<>();
         calcAmt(entity);

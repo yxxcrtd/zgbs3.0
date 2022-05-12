@@ -248,4 +248,15 @@ public class InterfSysTrdConfigController{
     public Map<String,Object> getBidPriceConInfo(@RequestBody Map<String,Object> params){
         return interfSysTrdConfigService.getBidPriceConInfo(params);
     }
+
+
+    /**
+     * SPi测试
+     * @param params
+     * @return
+     */
+    @PostMapping("getSppiTestInfo")
+    public Map<String,Object> getSppiTestInfo(@RequestBody Map<String,Object> params){
+        return interfSysTrdConfigService.getSppiTestInfo(params);
+    }
 }

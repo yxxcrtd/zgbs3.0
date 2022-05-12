@@ -329,8 +329,8 @@
 								<select th:id="|${entityName}_isFaceSingleInvestor|"
 										th:name="|${entityName}.isFaceSingleInvestor|"
 										class="layui-input form-input input-select"
+										th:initValue="${entity?.isFaceSingleInvestor}"
 										data-th-data-result="${YES_OR_NO}"
-										data-th-initValue="${entity?.isFaceSingleInvestor?:YES_OR_NO_N}"
 										data-th-placeholder="#{SysCommon.placeholder}" required>
 								</select>
 							</div>

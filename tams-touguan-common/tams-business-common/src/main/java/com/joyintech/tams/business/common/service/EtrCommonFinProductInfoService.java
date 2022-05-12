@@ -47,7 +47,7 @@ public class EtrCommonFinProductInfoService extends BaseService {
      */
     public CfetsEtrFinProductInfoResponse findFinProductInfo(String pageCode, String dtCode, CfetsEtrFinProductInfoRequest request) {
         CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoMapper.findFinProductInfo(request);
-        if (!Objects.isNull(finProductInfo)) {
+        if (Objects.nonNull(finProductInfo)) {
             //标题
             finProductInfo.setTitle(finProductInfo.getFinprodId() + finProductInfo.getFinprodAbbr());
             //评级信息

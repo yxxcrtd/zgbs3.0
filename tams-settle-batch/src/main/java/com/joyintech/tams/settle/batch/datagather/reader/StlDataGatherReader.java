@@ -2,6 +2,7 @@ package com.joyintech.tams.settle.batch.datagather.reader;
 
 
 import com.joyintech.batch.batchbase.baseclass.BaseReader;
+import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
@@ -17,6 +18,7 @@ import com.joyintech.tams.settle.batch.datagather.dto.SettleTransDataDto;
 import com.joyintech.tams.settle.batch.datagather.service.StlDataGatherService;
 import com.joyintech.tools.collectors.JoyinCollectors;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
@@ -258,7 +260,104 @@ public abstract class StlDataGatherReader extends BaseReader<InvestTradeReaderDt
     private List<InvestTradeReaderDto> getBondFirstBiddingData(Map<String, Object> searchParam){
         InvestTradeReaderDto investTradeReaderDto = new InvestTradeReaderDto();
         List<SettleTransDataTotal> settleTransDataTotals = new ArrayList<>();
-        // todo 处理逻辑
+
+        searchParam.put("DELIVERY_RESULT_05", DictCodeListExt4.交收结果_交收通知.getValue());
+        searchParam.put("PS_T01", DictCodeList.交易方向_买入.getValue());
+        searchParam.put("SETTLE_MODE_02", DictCodeListStl.交收方式_非担保.getValue());
+        searchParam.put("FINPROD_TYPE_TG_F32",DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+        searchParam.put("ACCOUNT_SPEED_01", DictCodeList.清算速度_T_0.getValue());
+        List<SettleTransDataDto> settleTransDataList = stlDataGatherMapper.selectSettleTransData8(searchParam);
+        if(CollectionUtils.isNotEmpty(settleTransDataList)){
+            Map<String,List<SettleTransDataDto>> settleTransDataGroupMap = settleTransDataList.stream().collect(Collectors.groupingBy(item -> item.getApplyTradeId()));
+            if(MapUtils.isNotEmpty(settleTransDataGroupMap)){
+                for(Map.Entry<String,List<SettleTransDataDto>> item : settleTransDataGroupMap.entrySet()){
+
+                    List<SettleTransDataDto> settleTransDataDtoGroupList = item.getValue();
+                    if(CollectionUtils.isEmpty(settleTransDataDtoGroupList)){
+                        continue;
+                    }
+                    SettleTransDataTotal settleTransDataTotal = new SettleTransDataTotal();
+                    SettleTransDataDto settleTransDataDtoInit = settleTransDataDtoGroupList.get(0);
+                    if(settleTransDataDtoGroupList.size() == 1){
+                        BeanUtil.copyPropertiesIgnoreNull(settleTransDataTotal,settleTransDataDtoInit);
+                        settleTransDataTotal.setUnitCprice(ArithmeticUtil.divide( settleTransDataTotal.getFpriceAmt(), settleTransDataTotal.getShareAmt(),2));
+                    }else{
+                        //变量.汇总成交明细dto.单位利息:				空
+                        //变量.汇总成交明细dto.单位全价:				空
+                        //变量.汇总成交明细dto.净价总额:				空
+                        //变量.汇总成交明细dto.单位面值:				空
+                        //变量.汇总成交明细dto.交易日期:				变量.temp_当前成交数据明细数据list第一条数据的对应字段
+                        settleTransDataTotal.setTradeDate(settleTransDataDtoInit.getTradeDate());
+                        //变量.汇总成交明细dto.交易份额:				∑temp_当前成交数据明细数据list所有数据的对应字段
+                        settleTransDataTotal.setShareAmt(settleTransDataDtoGroupList.stream().map(ele -> ele.getShareAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                        //变量.汇总成交明细dto.交易本金:				∑temp_当前成交数据明细数据list所有数据的对应字段
+                        settleTransDataTotal.setPrinAmt(settleTransDataDtoGroupList.stream().map(ele -> ele.getPrinAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                        //变量.汇总成交明细dto.利息总额:				∑temp_当前成交数据明细数据list所有数据的对应字段
+                        settleTransDataTotal.setIntAmt(settleTransDataDtoGroupList.stream().map(ele -> ele.getIntAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                        //变量.汇总成交明细dto.全价总额:				∑temp_当前成交数据明细数据list所有数据的对应字段
+                        settleTransDataTotal.setFpriceAmt(settleTransDataDtoGroupList.stream().map(ele -> ele.getFpriceAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                        //变量.汇总成交明细dto.印花税:				∑temp_当前成交数据明细数据list所有数据的对应字段
+                        settleTransDataTotal.setStampFee(settleTransDataDtoGroupList.stream().map(ele -> ele.getStampFee()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                        //变量.汇总成交明细dto.经手费:				∑temp_当前成交数据明细数据list所有数据的对应字段
+                        settleTransDataTotal.setJsfAmt(settleTransDataDtoGroupList.stream().map(ele -> ele.getJsfAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                        //变量.汇总成交明细dto.过户费:				∑temp_当前成交数据明细数据list所有数据的对应字段
+                        settleTransDataTotal.setGhfAmt(settleTransDataDtoGroupList.stream().map(ele -> ele.getGhfAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                        //变量.汇总成交明细dto.证管费:				∑temp_当前成交数据明细数据list所有数据的对应字段
+                        settleTransDataTotal.setZgfAmt(settleTransDataDtoGroupList.stream().map(ele -> ele.getZgfAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                        //变量.汇总成交明细dto.手续费:				∑temp_当前成交数据明细数据list所有数据的对应字段
+                        settleTransDataTotal.setSxfAmt(settleTransDataDtoGroupList.stream().map(ele -> ele.getSxfAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                        //变量.汇总成交明细dto.结算费:				∑temp_当前成交数据明细数据list所有数据的对应字段
+                        settleTransDataTotal.setSettleFee(settleTransDataDtoGroupList.stream().map(ele -> ele.getSettleFee()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                        //变量.汇总成交明细dto.佣金:				∑temp_当前成交数据明细数据list所有数据的对应字段
+                        settleTransDataTotal.setCommissionAmt(settleTransDataDtoGroupList.stream().map(ele -> ele.getCommissionAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                        //变量.汇总成交明细dto.佣金是否随交易支付:				变量.temp_当前成交数据明细数据list第一条数据的对应字段
+                        settleTransDataTotal.setIsPayWithTrade(settleTransDataDtoInit.getIsPayWithTrade());
+                        //变量.汇总成交明细dto.交易金额:				∑temp_当前成交数据明细数据list所有数据的对应字段
+                        settleTransDataTotal.setTradeAmt(settleTransDataDtoGroupList.stream().map(ele -> ele.getTradeAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                        //变量.汇总成交明细dto.交易方向:				变量.temp_当前成交数据明细数据list第一条数据的对应字段
+                        settleTransDataTotal.setPs(settleTransDataDtoInit.getPs());
+                        //变量.汇总成交明细dto.交易场所:				变量.temp_当前成交数据明细数据list第一条数据的对应字段
+                        settleTransDataTotal.setTradeMarket(settleTransDataDtoInit.getTradeMarket());
+                        //变量.汇总成交明细dto.交易市场:				变量.temp_当前成交数据明细数据list第一条数据的对应字段
+                        settleTransDataTotal.setTradeMarketMode(settleTransDataDtoInit.getTradeMarketMode());
+                        //变量.汇总成交明细dto.交易平台:				变量.temp_当前成交数据明细数据list第一条数据的对应字段
+                        settleTransDataTotal.setTradePlat(settleTransDataDtoInit.getTradePlat());
+                        //变量.汇总成交明细dto.席位号:				变量.temp_当前成交数据明细数据list第一条数据的对应字段
+                        settleTransDataTotal.setSeatNumber(settleTransDataDtoInit.getSeatNumber());
+                        //变量.汇总成交明细dto.证券账户:				变量.temp_当前成交数据明细数据list第一条数据的对应字段
+                        settleTransDataTotal.setSecAcctId(settleTransDataDtoInit.getSecAcctId());
+                        //变量.汇总成交明细dto.资金账户:				变量.temp_当前成交数据明细数据list第一条数据的对应字段
+                        settleTransDataTotal.setAcctNo(settleTransDataDtoInit.getAcctNo());
+                        //变量.汇总成交明细dto.业务场景分类:				变量.temp_当前成交数据明细数据list第一条数据的对应字段
+                        settleTransDataTotal.setBusiSceneCalss(settleTransDataDtoInit.getBusiSceneCalss());
+                        //变量.汇总成交明细dto.交收方式:				变量.temp_当前成交数据明细数据list第一条数据的对应字段
+                        settleTransDataTotal.setSettleMode(settleTransDataDtoInit.getSettleMode());
+                        //变量.汇总成交明细dto.印花税_原始:				∑temp_当前成交数据明细数据list所有数据的对应字段
+                        settleTransDataTotal.setStampFeeRaw(settleTransDataDtoGroupList.stream().map(ele -> ele.getStampFeeRaw()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                        //变量.汇总成交明细dto.经手费_原始:				∑temp_当前成交数据明细数据list所有数据的对应字段
+                        settleTransDataTotal.setJsfAmtRaw(settleTransDataDtoGroupList.stream().map(ele -> ele.getJsfAmtRaw()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                        //变量.汇总成交明细dto.过户费_原始:				∑temp_当前成交数据明细数据list所有数据的对应字段
+                        settleTransDataTotal.setGhfAmtRaw(settleTransDataDtoGroupList.stream().map(ele -> ele.getGhfAmtRaw()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                        //变量.汇总成交明细dto.证管费_原始:				∑temp_当前成交数据明细数据list所有数据的对应字段
+                        settleTransDataTotal.setZgfAmtRaw(settleTransDataDtoGroupList.stream().map(ele -> ele.getZgfAmtRaw()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                        //变量.汇总成交明细dto.手续费_原始:				∑temp_当前成交数据明细数据list所有数据的对应字段
+                        settleTransDataTotal.setSxfAmtRaw(settleTransDataDtoGroupList.stream().map(ele -> ele.getSxfAmtRaw()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                        //变量.汇总成交明细dto.结算费_原始:				∑temp_当前成交数据明细数据list所有数据的对应字段
+                        settleTransDataTotal.setSettleFeeRaw(settleTransDataDtoGroupList.stream().map(ele -> ele.getSettleFeeRaw()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                        //变量.汇总成交明细dto.佣金_原始:				∑temp_当前成交数据明细数据list所有数据的对应字段
+                        settleTransDataTotal.setCommissionAmtRaw(settleTransDataDtoGroupList.stream().map(ele -> ele.getCommissionAmtRaw()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                        //变量.汇总成交明细dto.交易金额_原始:				∑temp_当前成交数据明细数据list所有数据的对应字段
+                        settleTransDataTotal.setTradeAmtRaw(settleTransDataDtoGroupList.stream().map(ele -> ele.getTradeAmtRaw()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                        //变量.汇总成交明细dto.成交编号_原始:				回购时，为成交数据明细.成交编号；其他，为变量.temp_当前成交数据明细数据list第一条数据的对应字段
+                        settleTransDataTotal.setTradeIdRaw(settleTransDataDtoInit.getTradeIdRaw());
+                        //变量.汇总成交明细dto.单位净价:				∑全价总额/∑交易份额
+                        settleTransDataTotal.setUnitCprice(ArithmeticUtil.divide( settleTransDataTotal.getFpriceAmt(), settleTransDataTotal.getShareAmt(),2));
+                    }
+                    settleTransDataTotals.add(settleTransDataTotal);
+                }
+            }
+        }
+
         investTradeReaderDto.setSettleTransDataTotalList(settleTransDataTotals);
         List<InvestTradeReaderDto> result = new ArrayList<>();
         result.add(investTradeReaderDto);
