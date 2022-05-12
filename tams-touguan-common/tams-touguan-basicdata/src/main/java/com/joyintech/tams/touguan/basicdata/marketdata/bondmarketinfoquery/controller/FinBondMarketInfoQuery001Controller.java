@@ -60,7 +60,7 @@ public class FinBondMarketInfoQuery001Controller extends BaseController {
         initPageParams.put("CYY", this.getSelectDataFromDataDic(DictCode.币种, null));
         initPageParams.put("MAIN_GRADE_RESULT", this.getSelectDataFromDataDic(DictCode.评级结果, null));
         initPageParams.put("BASE_RATE_ACCURACY", this.getSelectDataFromDataDic(DictCode.基准利率精度, null));
-        initPageParams.put("RESET_TYPE", this.getSelectDataFromDataDic(DictCode.重置类型, null));
+        initPageParams.put("RESET_TYPE", this.getSelectDataFromDataDic(DictCode.重置类型_基准利率调整规则, null));
         initPageParams.put("ADVANCE_OBSERV_UNIT", this.getSelectDataFromDataDic(DictCode.提前观察单位_延后时间单位, null));
         initPageParams.put("INTPAY_RULE", this.getSelectDataFromDataDic(DictCode.利息分配方式, null));
         initPageParams.put("TDAY_RULE", this.getSelectDataFromDataDic(DictCode.营业日准则, null));
