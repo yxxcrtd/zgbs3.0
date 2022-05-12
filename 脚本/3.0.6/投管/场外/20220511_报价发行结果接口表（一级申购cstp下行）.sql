@@ -1,11 +1,4 @@
-declare
-      num   number;
-begin
-      select count(1) into num from user_tables where TABLE_NAME = 'INTERF_CSTP_BJFXJG';
-      if   num=1   then
-          execute immediate 'DROP TABLE INTERF_CSTP_BJFXJG';
-      end   if;
-end;
+DROP TABLE INTERF_CSTP_BJFXJG;
 
 /*==============================================================*/
 /* Table: INTERF_CSTP_BJFXJG                                    */
