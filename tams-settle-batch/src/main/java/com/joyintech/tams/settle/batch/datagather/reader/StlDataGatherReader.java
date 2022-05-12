@@ -343,7 +343,7 @@ public abstract class StlDataGatherReader extends BaseReader<InvestTradeReaderDt
                         //变量.汇总成交明细dto.手续费_原始:				∑temp_当前成交数据明细数据list所有数据的对应字段
                         settleTransDataTotal.setSxfAmtRaw(settleTransDataDtoGroupList.stream().map(ele -> ele.getSxfAmtRaw()).reduce(BigDecimal.ZERO, BigDecimal::add));
                         //变量.汇总成交明细dto.结算费_原始:				∑temp_当前成交数据明细数据list所有数据的对应字段
-                        settleTransDataTotal.setJsfAmtRaw(settleTransDataDtoGroupList.stream().map(ele -> ele.getJsfAmtRaw()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                        settleTransDataTotal.setSettleFeeRaw(settleTransDataDtoGroupList.stream().map(ele -> ele.getSettleFeeRaw()).reduce(BigDecimal.ZERO, BigDecimal::add));
                         //变量.汇总成交明细dto.佣金_原始:				∑temp_当前成交数据明细数据list所有数据的对应字段
                         settleTransDataTotal.setCommissionAmtRaw(settleTransDataDtoGroupList.stream().map(ele -> ele.getCommissionAmtRaw()).reduce(BigDecimal.ZERO, BigDecimal::add));
                         //变量.汇总成交明细dto.交易金额_原始:				∑temp_当前成交数据明细数据list所有数据的对应字段
