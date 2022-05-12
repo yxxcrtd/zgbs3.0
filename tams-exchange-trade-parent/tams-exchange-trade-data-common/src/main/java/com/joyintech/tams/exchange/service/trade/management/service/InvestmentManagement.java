@@ -1380,7 +1380,7 @@ public class InvestmentManagement extends BaseService {
             handleInstructionSetTradersInfo(instruction, instructions);
             // 1. 设置交易平台字段（非交易类）
             handleInstructionSetTradePlat(instruction);
-            // 5. 设置交易价格字段（协议回购，竞价回购，不包括质押式出入库）
+            // 5. 设置交易价格字段（协议回购，通用质押式回购，不包括质押式出入库）
             handleInstructionSetPrice(instruction);
             // 2. 设置创建时间和更新时间字段
             handleInstructionSetCreateAndUpdateTime(instruction, now);
@@ -1578,7 +1578,7 @@ public class InvestmentManagement extends BaseService {
     }
 
     private void handleInstructionSetPrice(Instruction instruction) {
-        //如果是协议回购、质押式回购 回购利率乘以100
+        //如果是协议回购、通用质押式回购 回购利率乘以100
         if (isPledge(instruction)) {
             instruction.setEntrustPrice(NumberUtil.mul(instruction.getEntrustPrice(), 100));
         }
@@ -1596,9 +1596,7 @@ public class InvestmentManagement extends BaseService {
             return true;
         }
 
-        return 投管业务类型_竞价交易.getValue().equals(busiTypeTg)
-                && PLEDGE_REPURCHASE.value.equals(instruction.getAssetType())
-                && BIDDING_REPO.value.equals(instruction.getAssetType1());
+        return 投管业务类型_通用式质押回购.getValue().equals(busiTypeTg);
     }
 
     private void handleInstructionSetTradePlat(Instruction instruction) {
