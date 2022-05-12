@@ -12,6 +12,7 @@ public enum PortfolioDetailBusiStatusEnum implements IEnum<String> {
 
     INITIAL("1", "初始"),
     CONFIRM("2", "确认"),
+    INVALID("3", "无效"),
     ;
 
     private final String code;
