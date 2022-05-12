@@ -1639,7 +1639,7 @@
 		</where>
 	</select>
 
-	<select id="selectSettleTransData8" resultType="com.joyintech.tams.settle.batch.datagather.dto.SettleTransDataDto">
+	<select id="selectBondFirstBiddingData" resultType="com.joyintech.tams.settle.batch.datagather.dto.SettleTransDataDto">
 		select
 		<include refid="settleTransDataSql"></include>
 		<where>

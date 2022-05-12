@@ -525,7 +525,8 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                         decisionAct = 系统动作_新建.getValue();
                     }
                 }
-                if (StringUtil.equals("1", RequestUtil.getParam("confirmOk"))) {
+                String confirmOk = RequestUtil.getParam("confirmOk");
+                if (StringUtil.equals("1", confirmOk) || StringUtil.equals("1",entity.getConfirmOk())) {
                     entity.setSoftSkipMode("Y");
                 }
                 try {
