@@ -282,14 +282,12 @@ public abstract class StlDataGatherReader extends BaseReader<InvestTradeReaderDt
                         BeanUtil.copyPropertiesIgnoreNull(settleTransDataTotal,settleTransDataDtoInit);
                         settleTransDataTotal.setUnitCprice(ArithmeticUtil.divide( settleTransDataTotal.getFpriceAmt(), settleTransDataTotal.getShareAmt(),2));
                     }else{
-                        SettleTransDataDto tempSettleTransDataDto = new SettleTransDataDto();
-                        BeanUtil.copyPropertiesIgnoreNull(tempSettleTransDataDto,settleTransDataDtoInit);
                         //变量.汇总成交明细dto.单位利息:				空
                         //变量.汇总成交明细dto.单位全价:				空
                         //变量.汇总成交明细dto.净价总额:				空
                         //变量.汇总成交明细dto.单位面值:				空
                         //变量.汇总成交明细dto.交易日期:				变量.temp_当前成交数据明细数据list第一条数据的对应字段
-                        settleTransDataTotal.setTradeDate(tempSettleTransDataDto.getTradeDate());
+                        settleTransDataTotal.setTradeDate(settleTransDataDtoInit.getTradeDate());
                         //变量.汇总成交明细dto.交易份额:				∑temp_当前成交数据明细数据list所有数据的对应字段
                         settleTransDataTotal.setShareAmt(settleTransDataDtoGroupList.stream().map(ele -> ele.getShareAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
                         //变量.汇总成交明细dto.交易本金:				∑temp_当前成交数据明细数据list所有数据的对应字段
