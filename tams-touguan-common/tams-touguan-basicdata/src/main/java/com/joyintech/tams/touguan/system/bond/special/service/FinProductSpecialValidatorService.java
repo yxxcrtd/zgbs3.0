@@ -1,13 +1,18 @@
 package com.joyintech.tams.touguan.system.bond.special.service;
 
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
+import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.validation.BeanValidator;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.invest.common.util.ExcelUtil;
+import com.joyintech.tams.touguan.system.bond.special.dto.FinProductSpecialImportDto;
 import com.joyintech.tams.touguan.system.bond.special.dto.req.FinProductSpecialSaveRequest;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +29,9 @@ import java.util.Objects;
 @Component
 public class FinProductSpecialValidatorService implements BeanValidator {
 
+    private static final String NO_INFO_SHOW_OUT = "noInfoShowOut";
 
+    private static final Integer IMPORT_MAXIMUM_SIZE = 100;
     @Autowired
     private MstWorkflowCommonService mstWorkflowCommonService;
     @Autowired
@@ -65,5 +72,91 @@ public class FinProductSpecialValidatorService implements BeanValidator {
             resultList.add(new ValidMessage(getMessage("存在有效或流程中的当日指令及交易数据，不允许修改!")));
         }
         return resultList;
+    }
+
+
+    /**
+     * 文件校验
+     *
+     * @param fileName
+     * @return
+     */
+    public AjaxResult checkConfirmMsgForImportData(String fileName) {
+        List<List<String>> dataList = ExcelUtil.getDataList(fileName);
+        AjaxResult result = new AjaxResult();
+        if (!com.joyintech.framework.util.StringUtil.isEmptyList(dataList)) {
+            if (CollectionUtils.isNotEmpty(dataList)) {
+                if (dataList.size() > IMPORT_MAXIMUM_SIZE) {
+                    result.setMessage("单次最多导入100条！", MessageType.错误消息);
+                    return result;
+                }
+                //对象转换
+                List<FinProductSpecialImportDto> finProductSpecialImportDtos = convertToBean(dataList);
+                Integer failNum = 0;
+                StringBuilder allErrorMsg = new StringBuilder();
+                StringBuilder allConfirmErrorMsg = new StringBuilder();
+                for (int i = 0; i < finProductSpecialImportDtos.size(); i++) {
+                    int j = i + 2;
+                    FinProductSpecialImportDto finProductSpecialImportDto = finProductSpecialImportDtos.get(i);
+                    if (DictCodeList.是否_否.getCodeName().equals(finProductSpecialImportDto.getIsDefaultBondIndicator()) && DictCodeList.是否_否.getCodeName().equals(finProductSpecialImportDto.getIsAbs()) && DictCodeList.是否_否.getCodeName().equals(finProductSpecialImportDto.getIsSpecialDebt())) {
+                        result.setMessage(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_MAXIMUM_SIZE", String.valueOf(j)), MessageType.错误消息);
+                        return result;
+                    }
+
+                    //确认消息
+                    StringBuilder confirmErrorMsg = new StringBuilder();
+                    //错误消息
+                    StringBuilder errorMsg = new StringBuilder();
+                    if (com.joyintech.framework.util.StringUtil.isBlank(finProductSpecialImportDto.getIsSpecialDebt())) {
+                        confirmErrorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_REQUIRED", "是否特殊债", String.valueOf(j))).append("\n");
+                    }
+                    if (com.joyintech.framework.util.StringUtil.isBlank(finProductSpecialImportDto.getIsAbs())) {
+                        confirmErrorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_REQUIRED", "是否资产支持证券", String.valueOf(j))).append("\n");
+                    }
+                    if (com.joyintech.framework.util.StringUtil.isBlank(finProductSpecialImportDto.getIsDefaultBondIndicator())) {
+                        confirmErrorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_REQUIRED", "是否到期违约债", String.valueOf(j))).append("\n");
+                    }
+                    if (com.joyintech.framework.util.StringUtil.isBlank(finProductSpecialImportDto.getFinprodMarketId()) && com.joyintech.framework.util.StringUtil.isBlank(finProductSpecialImportDto.getFinprodAbbr())) {
+                        confirmErrorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_REQUIRED", "债券代码/债券代码", String.valueOf(j))).append("\n");
+                    }
+                    if (com.joyintech.framework.util.StringUtil.isNotBlank(confirmErrorMsg)) {
+                        allConfirmErrorMsg.append(confirmErrorMsg);
+                        failNum++;
+                    }
+                }
+                if (com.joyintech.framework.util.StringUtil.isNotBlank(allConfirmErrorMsg)) {
+                    allConfirmErrorMsg.append(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_FAIL", String.valueOf(failNum)));
+                    result.setMessage(allConfirmErrorMsg.toString(), MessageType.确认消息);
+                    return result;
+                }
+            } else {
+                result.setData(NO_INFO_SHOW_OUT);
+            }
+        } else {
+            result.setMessage("文件内容无有效数据！", MessageType.错误消息);
+        }
+        return result;
+    }
+
+    /**
+     * 导入数据转换
+     *
+     * @param dataList
+     * @return
+     */
+    private List<FinProductSpecialImportDto> convertToBean(List<List<String>> dataList) {
+        List<FinProductSpecialImportDto> entities = new ArrayList<>();
+        for (int i = 0; i < dataList.size(); i++) {
+            List<String> list = dataList.get(i);
+            FinProductSpecialImportDto entity = new FinProductSpecialImportDto();
+            entity.setSerialNumber(list.get(0));
+            entity.setFinprodMarketId(list.get(1));
+            entity.setFinprodAbbr(list.get(2));
+            entity.setIsAbs(list.get(3));
+            entity.setIsSpecialDebt(list.get(4));
+            entity.setIsDefaultBondIndicator(list.get(5));
+            entities.add(entity);
+        }
+        return entities;
     }
 }

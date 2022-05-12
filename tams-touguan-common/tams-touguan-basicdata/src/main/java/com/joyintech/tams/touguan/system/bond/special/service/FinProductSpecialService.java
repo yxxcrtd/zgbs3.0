@@ -1,19 +1,15 @@
 package com.joyintech.tams.touguan.system.bond.special.service;
 
 import com.google.common.collect.Lists;
-import com.joyintech.framework.ajax.AjaxResult;
-import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.dao.FinProductSpecialMapper;
 import com.joyintech.tams.common.base.dao.WflFinProductSpecialMapper;
 import com.joyintech.tams.common.base.entity.FinProductSpecial;
 import com.joyintech.tams.common.base.entity.WflFinProductSpecial;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.dto.common.ExcelValidDto;
-import com.joyintech.tams.invest.common.util.ExcelUtil;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.touguan.system.bond.special.dao.FinProductSpecialAssetMapper;
 import com.joyintech.tams.touguan.system.bond.special.dto.FinProductSpecialDto;
@@ -23,12 +19,12 @@ import com.joyintech.tams.touguan.system.bond.special.dto.req.FinProductSpecialQ
 import com.joyintech.tams.touguan.system.bond.special.dto.req.FinProductSpecialSelectOptionQueryRequest;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 债券特殊信息service
@@ -38,11 +34,6 @@ import java.util.List;
  */
 @Service
 public class FinProductSpecialService extends BaseService<FinProductSpecialDto> implements BaseProcessService<FinProductSpecialDto> {
-
-    private static final String NO_INFO_SHOW_OUT = "noInfoShowOut";
-
-    private static final Integer IMPORT_MAXIMUM_SIZE = 100;
-
 
     @Autowired
     private FinProductSpecialAssetMapper finProductSpecialAssetMapper;
@@ -60,7 +51,8 @@ public class FinProductSpecialService extends BaseService<FinProductSpecialDto> 
      * @return
      */
     public Page<FinProductSpecialDto> queryForPage(FinProductSpecialQueryRequest request) {
-        Page<FinProductSpecialDto> pageList = super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> finProductSpecialAssetMapper.queryForPage(request));
+        Page<FinProductSpecialDto> pageList = super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(),
+                () -> finProductSpecialAssetMapper.queryForPage(request));
         return pageList;
     }
 
@@ -133,50 +125,6 @@ public class FinProductSpecialService extends BaseService<FinProductSpecialDto> 
     }
 
     /**
-     * 文件校验
-     *
-     * @param fileName
-     * @return
-     */
-    public AjaxResult checkConfirmMsgForImportData(String fileName) {
-        List<List<String>> dataList = ExcelUtil.getDataList(fileName);
-        AjaxResult result = new AjaxResult();
-        if (!StringUtil.isEmptyList(dataList)) {
-            if (CollectionUtils.isNotEmpty(dataList)) {
-                if (dataList.size() > IMPORT_MAXIMUM_SIZE) {
-                    result.setMessage("单次最多导入100条！", MessageType.错误消息);
-                    return result;
-                }
-                List<FinProductSpecialImportDto> finProductSpecialImportDtos = convertToBean(dataList);
-
-                for (int i = 0; i < finProductSpecialImportDtos.size(); i++) {
-                    int j = i + 2;
-
-//                    提示：{0}必须输入（行号为{1}）。
-//                    有{2}条记录导入失败。请确认是否继续？
-//                    0：文件中为空的列
-//                    1：行号
-//                    2：错误记录条数
-
-                    FinProductSpecialImportDto finProductSpecialImportDto = finProductSpecialImportDtos.get(i);
-                    if (DictCodeList.是否_否.getCodeName().equals(finProductSpecialImportDto.getIsDefaultBondIndicator())
-                            && DictCodeList.是否_否.getCodeName().equals(finProductSpecialImportDto.getIsAbs())
-                            && DictCodeList.是否_否.getCodeName().equals(finProductSpecialImportDto.getIsSpecialDebt())) {
-                        result.setMessage(this.getMessage("FIN_PRODUCT_SPECIAL_IMPORT_MAXIMUM_SIZE", j), MessageType.错误消息);
-                        return result;
-                    }
-                }
-
-            } else {
-                result.setData(NO_INFO_SHOW_OUT);
-            }
-        } else {
-            result.setMessage("文件内容无有效数据！", MessageType.错误消息);
-        }
-        return result;
-    }
-
-    /**
      * 文件导入
      *
      * @param fileName
@@ -207,5 +155,26 @@ public class FinProductSpecialService extends BaseService<FinProductSpecialDto> 
             entities.add(entity);
         }
         return entities;
+    }
+
+    /**
+     * 根据债券简称查询债券代码
+     *
+     * @param finProdAbbr
+     * @return
+     */
+    private String queryFinProdMarketIdByAbbr(String finProdAbbr) {
+        FinProductSpecialSelectOptionQueryRequest request = new FinProductSpecialSelectOptionQueryRequest();
+        request.setSearch(finProdAbbr);
+        FinProductSpecialSelectOptionDto finProductSpecialSelectOptionDto = finProductSpecialAssetMapper.querySampleFinProduct(request);
+        if (Objects.nonNull(finProductSpecialSelectOptionDto)) {
+            return finProductSpecialSelectOptionDto.getFinprodMarketId();
+        } else {
+            finProductSpecialSelectOptionDto = finProductSpecialAssetMapper.querySampleInterf(request);
+            if (Objects.nonNull(finProductSpecialSelectOptionDto)) {
+                return finProductSpecialSelectOptionDto.getFinprodMarketId();
+            }
+        }
+        return null;
     }
 }

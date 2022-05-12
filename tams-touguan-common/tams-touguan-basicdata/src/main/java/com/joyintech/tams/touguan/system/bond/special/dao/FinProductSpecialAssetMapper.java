@@ -44,4 +44,22 @@ public interface FinProductSpecialAssetMapper {
      * @return
      */
     Integer countFinprodIdProcessing(@Param("finprodId") String finprodId, @Param("iPlatformDate") Date iPlatformDate);
+
+    /**
+     * 接口表简单数据查询
+     *
+     * @param request
+     * @return
+     */
+    FinProductSpecialSelectOptionDto querySampleInterf(FinProductSpecialSelectOptionQueryRequest request);
+
+    /**
+     * 业务表简单数据查询
+     *
+     * @param request
+     * @return
+     */
+    FinProductSpecialSelectOptionDto querySampleFinProduct(FinProductSpecialSelectOptionQueryRequest request);
+
+
 }
