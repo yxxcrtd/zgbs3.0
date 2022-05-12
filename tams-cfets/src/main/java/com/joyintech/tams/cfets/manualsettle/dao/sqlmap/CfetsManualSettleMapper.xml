@@ -13,6 +13,8 @@
             to_char(T1.SETTLE_DATE,'yyyy-MM-dd') settleDate,
             nvl(T2.FINPROD_MARKET_ID,rfpd.TERM_TYPE) finprodMarketId,
             T2.FINPROD_ABBR finprodAbbr,
+            FIN_PRODUCT_TYPE.TYPE_9                                                     assetType,
+            sdl7.ITEM_VALUE                                                             assetTypeStr,
             T1.FINPROD_TYPE2 finprodType2,
             sdl1.item_value finprodType2Str,
             btm.busi_type tgBusiType,
@@ -40,7 +42,7 @@
             T8.SETTLE_SEQ_NO settleSeqNo,
             T1.FINPROD_ID finprodId,
             T1.CCY ccy,
-            decode(T1.PS,#{PS_T07},'04',#{PS_T08},'04',#{PS_T09},'04',#{PS_T39},'03',#{PS_T03},'01',#{PS_T01},'02',#{PS_T02},'02','02') spcdCode,
+            decode(T1.PS,#{PS_T07},'04',#{PS_T08},'04',#{PS_T09},'04',#{PS_T39},'03',#{PS_T03},'01',#{PS_T01},decode(T1.TG_BUSI_TYPE, #{PINAN_BUSINESS_TYPE_180}, '06', '02'),#{PS_T02},decode(T1.TG_BUSI_TYPE, #{PINAN_BUSINESS_TYPE_180}, '06', '02'),'02') spcdCode,
             '' remark,
             nvl(regAdd.CAL_MODE,ibuDet.CALCULATE_FIELD) as calMode
         FROM TRD_FIN_PRODUCT_DEAL_TOTAL T1
@@ -58,12 +60,23 @@
         LEFT JOIN INF_PAY_ORDERS_STATUS T10 ON T9.ORDER_ID = T10.ORDER_ID
         LEFT JOIN SYS_DATADICT_LIST sdl on sdl.dict_code ='DELIVERY_STATUS' and sdl.item_code = T8.Settle_Status
         LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='PINAN_ASSET_TYPE' and sdl1.item_code = FIN_PRODUCT_TYPE.TYPE_8
-        LEFT JOIN (select INPUT_VALUE_1 as Finprod_Type_Tg,INPUT_VALUE_2 as ps,OUTPUT_VALUE_1 as busi_type from FIN_PRODUCT_TYPE_CONFIG where CONFIG_TYPE='BUSI_TYPE_MAPPING') btm ON FIN_PRODUCT_TYPE.TYPE_8 = btm.Finprod_Type_Tg AND T3.Ps = btm.ps
+        LEFT JOIN FIN_PRODUCT_ISSUE fpi ON T1.FINPROD_ID = fpi.FINPROD_ID
+        LEFT JOIN (select INPUT_VALUE_1  as Finprod_Type_Tg,
+        INPUT_VALUE_2  as ps,
+        INPUT_VALUE_3  as issueClass,
+        OUTPUT_VALUE_1 as busi_type
+        from FIN_PRODUCT_TYPE_CONFIG
+        where CONFIG_TYPE = 'BUSI_TYPE_MAPPING') btm
+        ON FIN_PRODUCT_TYPE.TYPE_8 = btm.Finprod_Type_Tg AND T1.Ps = btm.ps
+        AND ((btm.Finprod_Type_Tg = 'F17' and btm.issueClass = fpi.ISSUE_CLASS) or
+        btm.Finprod_Type_Tg != 'F17')
         LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='BUSI_TYPE_POSITION' and sdl2.item_code = btm.busi_type
         LEFT JOIN SYS_DATADICT_LIST sdl3 on sdl3.dict_code ='PS' and sdl3.item_code = T1.PS
         LEFT JOIN SYS_DATADICT_LIST sdl4 on sdl4.dict_code ='TRADE_PLACE' and sdl4.item_code = T1.TRADE_MARKET
         LEFT JOIN SYS_DATADICT_LIST sdl5 on sdl5.dict_code ='SHARES_TRADE_PLATFORM' and sdl5.item_code = T1.TRADE_PLAT
         LEFT JOIN SYS_DATADICT_LIST sdl6 on sdl6.dict_code ='SHARES_TRADE_MARKET' and sdl6.item_code = T1.TRADE_MARKET_MODE
+        LEFT JOIN SYS_DATADICT_LIST sdl7
+        on sdl7.dict_code = 'CUSTOM_ASSET_TYPE_TWO' and sdl7.item_code = FIN_PRODUCT_TYPE.TYPE_9
         left join trdquto_match_info match on T1.totle_trade_id=match.trd_id
         left join reg_fin_product_deal_total_add regAdd on match.PRE_TRADE_ID=regAdd.totle_trade_id
         left join ibu_quote_bond_det ibuDet on match.PRE_TRADE_ID=ibuDet.QUOTE_ID and ibuDet.TRADE_STATUS='07'
@@ -72,7 +85,7 @@
                 #{PINAN_BUSINESS_TYPE_35},#{PINAN_BUSINESS_TYPE_36},#{PINAN_BUSINESS_TYPE_37},
                 #{PINAN_BUSINESS_TYPE_20},#{PINAN_BUSINESS_TYPE_51},#{PINAN_BUSINESS_TYPE_52},
                 #{PINAN_BUSINESS_TYPE_74},#{PINAN_BUSINESS_TYPE_75},#{PINAN_BUSINESS_TYPE_76},#{PINAN_BUSINESS_TYPE_77},
-                #{PINAN_BUSINESS_TYPE_105},#{PINAN_BUSINESS_TYPE_106},#{PINAN_BUSINESS_TYPE_107},#{PINAN_BUSINESS_TYPE_108})
+                #{PINAN_BUSINESS_TYPE_105},#{PINAN_BUSINESS_TYPE_106},#{PINAN_BUSINESS_TYPE_107},#{PINAN_BUSINESS_TYPE_108},#{PINAN_BUSINESS_TYPE_180})
         AND	T1.TRADE_STATUS =#{TRADE_STATUS_01}
         AND T1.Is_Cancel =#{isCalcN}
         <![CDATA[ AND T1.SETTLE_DATE >= #{settleDateStart}]]>
@@ -137,7 +150,7 @@
             T1.TRADE_MARKET_MODE,
             sdl6.item_value,
             T8.SETTLE_SEQ_NO,
-            nvl(regAdd.CAL_MODE,ibuDet.CALCULATE_FIELD)
+            nvl(regAdd.CAL_MODE,ibuDet.CALCULATE_FIELD), FIN_PRODUCT_TYPE.TYPE_9, sdl7.ITEM_VALUE,T1.TG_BUSI_TYPE
         union all
         SELECT
             #{DELIVERY_STATUS_01} settleStatus,
@@ -147,6 +160,8 @@
             to_char(T1.SETTLE_DATE,'yyyy-MM-dd') settleDate,
             nvl(T2.FINPROD_MARKET_ID,rfpd.TERM_TYPE) finprodMarketId,
             T2.FINPROD_ABBR finprodAbbr,
+            FIN_PRODUCT_TYPE.TYPE_9                                                     assetType,
+            sdl7.ITEM_VALUE                                                             assetTypeStr,
             T1.FINPROD_TYPE2 finprodType2,
             sdl1.item_value finprodType2Str,
             btm.busi_type tgBusiType,
@@ -174,7 +189,7 @@
             T8.SETTLE_SEQ_NO settleSeqNo,
             T1.FINPROD_ID finprodId,
             T1.CCY ccy,
-            decode(T1.PS,#{PS_T07},'04',#{PS_T08},'04',#{PS_T09},'04',#{PS_T39},'03',#{PS_T03},'01',#{PS_T01},'02',#{PS_T02},'02','02') spcdCode,
+            decode(T1.PS,#{PS_T07},'04',#{PS_T08},'04',#{PS_T09},'04',#{PS_T39},'03',#{PS_T03},'01',#{PS_T01},decode(T1.TG_BUSI_TYPE, #{PINAN_BUSINESS_TYPE_180}, '06', '02'),#{PS_T02},decode(T1.TG_BUSI_TYPE, #{PINAN_BUSINESS_TYPE_180}, '06', '02'),'02') spcdCode,
             '' remark,
             nvl(regAdd.CAL_MODE,ibuDet.CALCULATE_FIELD) as calMode
         FROM TRD_PRODUCT_TEMP_DEAL_TOTAL T1
@@ -192,12 +207,23 @@
         LEFT JOIN INF_PAY_ORDERS_STATUS T10 ON T9.ORDER_ID = T10.ORDER_ID
         LEFT JOIN SYS_DATADICT_LIST sdl on sdl.dict_code ='DELIVERY_STATUS' and sdl.item_code = T8.Settle_Status
         LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='PINAN_ASSET_TYPE' and sdl1.item_code = FIN_PRODUCT_TYPE.TYPE_8
-        LEFT JOIN (select INPUT_VALUE_1 as Finprod_Type_Tg,INPUT_VALUE_2 as ps,OUTPUT_VALUE_1 as busi_type from FIN_PRODUCT_TYPE_CONFIG where CONFIG_TYPE='BUSI_TYPE_MAPPING') btm ON FIN_PRODUCT_TYPE.TYPE_8 = btm.Finprod_Type_Tg AND T3.Ps = btm.ps
+        LEFT JOIN FIN_PRODUCT_ISSUE fpi ON T1.FINPROD_ID = fpi.FINPROD_ID
+        LEFT JOIN (select INPUT_VALUE_1  as Finprod_Type_Tg,
+        INPUT_VALUE_2  as ps,
+        INPUT_VALUE_3  as issueClass,
+        OUTPUT_VALUE_1 as busi_type
+        from FIN_PRODUCT_TYPE_CONFIG
+        where CONFIG_TYPE = 'BUSI_TYPE_MAPPING') btm
+        ON FIN_PRODUCT_TYPE.TYPE_8 = btm.Finprod_Type_Tg AND T1.Ps = btm.ps
+        AND ((btm.Finprod_Type_Tg = 'F17' and btm.issueClass = fpi.ISSUE_CLASS) or
+        btm.Finprod_Type_Tg != 'F17')
         LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='BUSI_TYPE_POSITION' and sdl2.item_code = btm.busi_type
         LEFT JOIN SYS_DATADICT_LIST sdl3 on sdl3.dict_code ='PS' and sdl3.item_code = T1.PS
         LEFT JOIN SYS_DATADICT_LIST sdl4 on sdl4.dict_code ='TRADE_PLACE' and sdl4.item_code = T1.TRADE_MARKET
         LEFT JOIN SYS_DATADICT_LIST sdl5 on sdl5.dict_code ='SHARES_TRADE_PLATFORM' and sdl5.item_code = T1.TRADE_PLAT
         LEFT JOIN SYS_DATADICT_LIST sdl6 on sdl6.dict_code ='SHARES_TRADE_MARKET' and sdl6.item_code = T1.TRADE_MARKET_MODE
+        LEFT JOIN SYS_DATADICT_LIST sdl7
+        on sdl7.dict_code = 'CUSTOM_ASSET_TYPE_TWO' and sdl7.item_code = FIN_PRODUCT_TYPE.TYPE_9
         left join trdquto_match_info match on T1.totle_trade_id=match.trd_id
         left join reg_fin_product_deal_total_add regAdd on match.PRE_TRADE_ID=regAdd.totle_trade_id
         left join ibu_quote_bond_det ibuDet on match.PRE_TRADE_ID=ibuDet.QUOTE_ID and ibuDet.TRADE_STATUS='07'
@@ -206,7 +232,7 @@
         #{PINAN_BUSINESS_TYPE_35},#{PINAN_BUSINESS_TYPE_36},#{PINAN_BUSINESS_TYPE_37},
         #{PINAN_BUSINESS_TYPE_20},#{PINAN_BUSINESS_TYPE_51},#{PINAN_BUSINESS_TYPE_52},
         #{PINAN_BUSINESS_TYPE_74},#{PINAN_BUSINESS_TYPE_75},#{PINAN_BUSINESS_TYPE_76},#{PINAN_BUSINESS_TYPE_77},
-        #{PINAN_BUSINESS_TYPE_105},#{PINAN_BUSINESS_TYPE_106},#{PINAN_BUSINESS_TYPE_107},#{PINAN_BUSINESS_TYPE_108})
+        #{PINAN_BUSINESS_TYPE_105},#{PINAN_BUSINESS_TYPE_106},#{PINAN_BUSINESS_TYPE_107},#{PINAN_BUSINESS_TYPE_108},#{PINAN_BUSINESS_TYPE_180})
         AND	T1.TRADE_STATUS =#{TRADE_STATUS_01}
         AND T1.Is_Cancel =#{isCalcN}
         <![CDATA[ AND T1.SETTLE_DATE >= #{settleDateStart}]]>
@@ -271,7 +297,7 @@
         T1.TRADE_MARKET_MODE,
         sdl6.item_value,
         T8.SETTLE_SEQ_NO,
-        nvl(regAdd.CAL_MODE,ibuDet.CALCULATE_FIELD)
+        nvl(regAdd.CAL_MODE,ibuDet.CALCULATE_FIELD), FIN_PRODUCT_TYPE.TYPE_9, sdl7.ITEM_VALUE,T1.TG_BUSI_TYPE
         union all
         </if>
         SELECT
@@ -282,6 +308,8 @@
             to_char(T0.SETTLE_DATE,'yyyy-MM-dd') settleDate,
             nvl(T2.FINPROD_MARKET_ID,rfpd.TERM_TYPE) finprodMarketId,
             T2.FINPROD_ABBR finprodAbbr,
+            FIN_PRODUCT_TYPE.TYPE_9                                                     assetType,
+            sdl7.ITEM_VALUE                                                             assetTypeStr,
             T1.FINPROD_TYPE2 finprodType2,
             sdl1.item_value finprodType2Str,
             btm.busi_type tgBusiType,
@@ -309,7 +337,7 @@
             T0.SETTLE_SEQ_NO settleSeqNo,
             T0.FINPROD_ID finprodId,
             T1.CCY ccy,
-            decode(T1.PS,#{PS_T07},'04',#{PS_T08},'04',#{PS_T09},'04',#{PS_T39},'03',#{PS_T03},'01',#{PS_T01},'02',#{PS_T02},'02','02') spcdCode,
+            decode(T1.PS,#{PS_T07},'04',#{PS_T08},'04',#{PS_T09},'04',#{PS_T39},'03',#{PS_T03},'01',#{PS_T01},decode(T1.TG_BUSI_TYPE, #{PINAN_BUSINESS_TYPE_180}, '06', '02'),#{PS_T02},decode(T1.TG_BUSI_TYPE, #{PINAN_BUSINESS_TYPE_180}, '06', '02'),'02') spcdCode,
             T0.REMARK remark,
             nvl(regAdd.CAL_MODE,ibuDet.CALCULATE_FIELD) as calMode
         FROM TRD_BANK_MANUAL_SETTLE_INFO T0
@@ -327,12 +355,23 @@
         LEFT JOIN INF_PAY_ORDERS_STATUS T10 ON T9.ORDER_ID = T10.ORDER_ID
         LEFT JOIN SYS_DATADICT_LIST sdl on sdl.dict_code ='DELIVERY_STATUS' and sdl.item_code = T0.Settle_Status
         LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='PINAN_ASSET_TYPE' and sdl1.item_code = FIN_PRODUCT_TYPE.TYPE_8
-        LEFT JOIN (select INPUT_VALUE_1 as Finprod_Type_Tg,INPUT_VALUE_2 as ps,OUTPUT_VALUE_1 as busi_type from FIN_PRODUCT_TYPE_CONFIG where CONFIG_TYPE='BUSI_TYPE_MAPPING') btm ON FIN_PRODUCT_TYPE.TYPE_8 = btm.Finprod_Type_Tg AND NVL(T3.Ps,T1.ps) = btm.ps
+        LEFT JOIN FIN_PRODUCT_ISSUE fpi ON T1.FINPROD_ID = fpi.FINPROD_ID
+        LEFT JOIN (select INPUT_VALUE_1  as Finprod_Type_Tg,
+        INPUT_VALUE_2  as ps,
+        INPUT_VALUE_3  as issueClass,
+        OUTPUT_VALUE_1 as busi_type
+        from FIN_PRODUCT_TYPE_CONFIG
+        where CONFIG_TYPE = 'BUSI_TYPE_MAPPING') btm
+        ON FIN_PRODUCT_TYPE.TYPE_8 = btm.Finprod_Type_Tg AND T1.Ps = btm.ps
+        AND ((btm.Finprod_Type_Tg = 'F17' and btm.issueClass = fpi.ISSUE_CLASS) or
+        btm.Finprod_Type_Tg != 'F17')
         LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='BUSI_TYPE_POSITION' and sdl2.item_code = btm.busi_type
         LEFT JOIN SYS_DATADICT_LIST sdl3 on sdl3.dict_code ='PS' and sdl3.item_code = T1.PS
         LEFT JOIN SYS_DATADICT_LIST sdl4 on sdl4.dict_code ='TRADE_PLACE' and sdl4.item_code = T1.TRADE_MARKET
         LEFT JOIN SYS_DATADICT_LIST sdl5 on sdl5.dict_code ='SHARES_TRADE_PLATFORM' and sdl5.item_code = T1.TRADE_PLAT
         LEFT JOIN SYS_DATADICT_LIST sdl6 on sdl6.dict_code ='SHARES_TRADE_MARKET' and sdl6.item_code = T1.TRADE_MARKET_MODE
+        LEFT JOIN SYS_DATADICT_LIST sdl7
+        on sdl7.dict_code = 'CUSTOM_ASSET_TYPE_TWO' and sdl7.item_code = FIN_PRODUCT_TYPE.TYPE_9
         left join trdquto_match_info match on T1.totle_trade_id=match.trd_id
         left join reg_fin_product_deal_total_add regAdd on match.PRE_TRADE_ID=regAdd.totle_trade_id
         left join ibu_quote_bond_det ibuDet on match.PRE_TRADE_ID=ibuDet.QUOTE_ID and ibuDet.TRADE_STATUS='07'
@@ -407,7 +446,7 @@
             T1.TRADE_MARKET_MODE,
             sdl6.item_value,
             T0.REMARK,
-            nvl(regAdd.CAL_MODE,ibuDet.CALCULATE_FIELD))t
+            nvl(regAdd.CAL_MODE,ibuDet.CALCULATE_FIELD), FIN_PRODUCT_TYPE.TYPE_9, sdl7.ITEM_VALUE,T1.TG_BUSI_TYPE)t
         left join SYS_DATADICT_LIST sdl on sdl.DICT_CODE='SETTLE_STATUS' and t.cleanStatus=sdl.ITEM_CODE
         where 1=1
         <if test="cleanStatus != null and cleanStatus!='' ">
@@ -436,7 +475,7 @@
                 OR replace(t.settleDate,'-','/')=#{year}||'/'||#{search}
                 OR t.finprodMarketId like '%' || #{search} || '%'
                 OR t.finprodAbbr like '%' || #{search} || '%'
-                OR T.finprodType2Str like '%' || #{search} || '%'
+                OR T.assetTypeStr like '%' || #{search} || '%'
                 OR T.psStr like '%' || #{search} || '%'
                 OR t.settleNum||'' = #{search}
                 OR t.settleAmt||'' = #{search}
@@ -564,6 +603,24 @@
         LEFT JOIN ETR_FINISH_STATUS efs ON ee.Entrust_Id = efs.entrust_id AND TPD.TRADE_ID = efs.trade_id
         LEFT JOIN STL_SEC_ACCT_INFO ssai ON tpd.sec_manage_acct_id = ssai.SEC_ACCT_ID
         where TPD.TOTLE_TRADE_ID = #{tradeId} and TPD.Trade_Status='01'
+    </select>
+
+    <select id="findBidPortIntFenPeiInfoList" resultType="com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto">
+        SELECT ROWNUM             rowNums,
+               TPDA.Entrust_Id    entrustId,
+               pp.PORTFOLIO_NAME  portfolioName,
+               TPD.SHARE_AMT      qtyd,
+               ttft1.fee_amt      jsFeeAmt,
+               EE.BUSINESS_MODEL  busiTypePosition,
+               ssai.sec_acct_name secAcctId
+        FROM TRD_PRODUCT_DEAL TPD
+                 INNER JOIN TRD_PRODUCT_DEAL_ADD TPDA on TPD.TRADE_ID = TPDA.TRADE_ID
+                 LEFT JOIN PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = TPDA.PORTFOLIO_ID
+                 LEFT JOIN TRD_TRADE_FEE_DETAIL ttft1 ON tpd.trade_id = ttft1.trade_id AND ttft1.fee_type = #{feeType08}
+                 LEFT JOIN ETR_ENTRUST ee ON TPDA.Entrust_Id = ee.entrust_id
+                 LEFT JOIN STL_SEC_ACCT_INFO ssai ON tpd.sec_manage_acct_id = ssai.SEC_ACCT_ID
+        where TPD.TOTLE_TRADE_ID = #{tradeId}
+          and TPD.Trade_Status = '01'
     </select>
 
     <select id="findTempPortIntFenPeiInfoList" resultType="com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto">
@@ -1313,6 +1370,52 @@
         AND T1.TRADE_STATUS = #{TRADE_STATUS01}
     </select>
 
+    <select id="findManualSettleInfoBid" resultType="com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleInfoOtherListRespond">
+        SELECT distinct T4.FINPROD_MARKET_ID                                 finprodMarketId,
+                T4.FINPROD_ABBR                                      finprodAbbr,
+                T1.PS                                                ps,
+                TO_CHAR(T1.TRADE_DATE, 'yyyy-MM-dd')                 tradeDate,
+                TO_CHAR(T1.SETTLE_DATE, 'yyyy-MM-dd')                settleDate,
+                T1.CCY                                               ccy,
+                T1.REMARK                                            remark,
+                TO_CHAR(bo.BID_DATE, 'yyyy-MM-dd')                   regDate,
+                T1.SHARE_AMT*100                                     qty,
+                bo.SETT_FEE_AMT                                      jsFeeAmt,
+                T1.Trade_Amt                                         tradeAmt,
+                T1.TRADE_MARKET                                      tradeMarket,
+                T1.TRADE_MARKET_MODE                                 tradeMarketMode,
+                T1.TRADE_PLAT                                        tradePlat,
+                T7.EXE_ID                                            tradeId,
+                NVL(T9.PARTY_ABBR, T5.OU_PARTY_ID)                   ouPartyId,
+                COALESCE(sua.IBU_TRADER, T10.REAL_NAME, T1.TRADER)   ouTraderId,
+                sdl.item_value                                       spanTextOne,
+                T4.COUPON_SPECIES                                    couponSpecies,
+                fpi.INT_TYPE                                         intType,
+                fpi.ISSUE_DATE                                       issueDate,
+                fpi.PAY_DATE                                         payDate,
+                fpi.ISSUE_PRICE                                      issuePrice,
+                T4.ISSUER                                            issuer,
+                fpi.REFER_YIELD                                      matureYield,
+                T1.TRADE_PLAT                                        tradePlat,
+                mci.CUSTOMER_NAME                                    issuerName
+            FROM TRD_FIN_PRODUCT_DEAL_TOTAL T1
+                     LEFT JOIN PA_TRD_FIN_PRODUCT_DEAL_TOTAL T3 ON T1.TOTLE_TRADE_ID = T3.TOTLE_TRADE_ID
+                     LEFT JOIN FIN_PRODUCT T4 ON T1.FINPROD_ID = T4.FINPROD_ID
+                     left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = T4.ISSUER
+                     left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = T1.FINPROD_ID
+                     LEFT JOIN TRD_DEAL_TOTAL_ADD T5 ON T1.TOTLE_TRADE_ID = T5.TOTLE_TRADE_ID
+                     LEFT JOIN TRDQUTO_MATCH_INFO T7 ON T7.Trd_Id = T1.TOTLE_TRADE_ID
+                     LEFT JOIN BID_ORDER bo ON bo.BID_ID = T7.PRE_TRADE_ID
+                     LEFT JOIN MST_CFETS_CUSTOMER_INFO T9 ON T9.PARTY_ID = T5.OU_PARTY_ID
+                     LEFT JOIN SYS_USER T10 ON T10.USER_NAME = T1.TRADER
+                     LEFT JOIN SYS_USER_ADD sua ON sua.USER_ID = T10.USER_ID
+                     LEFT JOIN MST_CFETS_CUSTOMER_TRADER T12 ON T12.trader_id = T1.COUNTER_TRADER
+                     LEFT JOIN sys_datadict_list sdl
+                               ON sdl.dict_code = 'DISTRIBUTION' and sdl.item_code = bo.DIP_TYPE
+            WHERE T1.TOTLE_TRADE_ID = #{tradeId}
+              AND T1.TRADE_STATUS = #{TRADE_STATUS01}
+    </select>
+
     <select id="findTempManualSettleInfoOther" resultType="com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleInfoOtherListRespond">
         SELECT
             distinct
@@ -1650,6 +1753,33 @@
         TRDQUTO_MATCH_INFO T3
         WHERE
         T3.PRE_TRADE_ID = T1.TOTLE_TRADE_ID)
+        UNION ALL
+        SELECT
+        T2.ENTRUST_ID
+        FROM
+        BID_ORDER T1
+        INNER JOIN BID_ORDER_BID_PRICE T2 ON
+        T1.BID_ID = T2.BID_ID
+        <if test="entrustIdList != null and entrustIdList.size() > 0">
+            and T2.ENTRUST_ID  in
+            <foreach collection="entrustIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="entrustIds != null and entrustIds.size() > 0">
+            and T2.ENTRUST_ID  in
+            <foreach collection="entrustIds" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        WHERE T1.TRADE_STATUS = '01' AND (T1.IS_CANCEL IS NULL OR T1.IS_CANCEL = 'N')
+        and NOT EXISTS (
+        SELECT
+        1
+        FROM
+        TRDQUTO_MATCH_INFO T3
+        WHERE
+        T3.PRE_TRADE_ID = T1.BID_ID)
         UNION ALL
         SELECT
         T2.ENTRUST_ID

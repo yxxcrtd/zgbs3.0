@@ -163,7 +163,7 @@
             null                         settleSpeed,
             deal.SEC_ACCT_ID             secManageAcctId,
             stlinfo.sec_acct_name as     secManageAcctIdName,
-            null                         faceValue,
+            bo.SUBSCRIPTION_AMOUNT       faceValue,
             case
                 when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02' then nvl(fpi.BP, 0)
                 when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD
@@ -207,7 +207,9 @@
             left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
             left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = fp.FINPROD_ID
             left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = bo.FINPROD_ID
-            left join MST_INT_RATE_INFO miri on miri.INT_RATE_ID = fpi.INT_RATE_ID
+            left join (select INT_RATE_ID,row_number() over(partition by INT_RATE_ID order by INT_RATE_ID,EFF_DATE desc) as rn
+            from MST_INT_RATE_INFO
+            where  EFF_DATE <![CDATA[<=]]> #{sysDate,jdbcType=DATE}) miri on miri.INT_RATE_ID = fpi.INT_RATE_ID and miri.rn = 1
             inner join
             (
             select listagg(bobp.PORTFOLIO_ID, ',') within group (order by bobp.BID_ID) AS portfolioId,
@@ -705,7 +707,7 @@
        fp.trade_market      as tradeMarket,
        null                 as settleSpeed,
        bobp.SEC_ACCT_ID     as secManageAcctId,
-       null                 as faceValue,
+       bo.SUBSCRIPTION_AMOUNT   as faceValue,
        null                 as tradeYield,
        null                 as termDays,
        bo.PAYABLE_AMOUNT    as tradeAmt,
@@ -716,13 +718,13 @@
        null                 as quoteType,
        bo.remark            as remark,
        bo.BID_ID            as totleTradeId,
-       bo.BID_DATE          as settleDate,
+       fpi.PAY_DATE         as settleDate,
        null                 as cpriceAmt,
        null                 as yield,
        null                 as exerYield,
        bo.ou_party_id       as ouPartyId,
        bo.OUR_TRADER        as ouTraderId,
-       null                 as counterId,
+       fp.ISSUER            as counterId,
        null                 as ourShareAmt,
        null                 as lendinShareAmt,
        null                 as ourFpriceAmt,
@@ -758,9 +760,11 @@
        null                 as actRepoTerm,
        null                 as tgBusiType,
        bo.trade_status      as tradeStatus,
-       bo.P_BID_ID          as ptradeId
+       bo.P_BID_ID          as ptradeId,
+       bo.SETT_FEE_AMT      as settleFeeAmt
        from BID_ORDER bo
                  left join fin_product fp on fp.finprod_id = bo.finprod_id
+                 left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = bo.FINPROD_ID
                  left join (select distinct t1.BID_ID, t2.SEC_ACCT_ID
                             from BID_ORDER_BID_PRICE t1
                                      left join ETR_ENTRUST_DETAIL t2
@@ -1025,6 +1029,80 @@
         left join Reg_Fin_Product_Deal_Add regAdd
         on reg.trade_id=regAdd.trade_id
         where totle_trade_id= #{totleTradeId,jdbcType=VARCHAR}
+    </select>
+    <select id="findAllBidDealList" resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsRegFinProductDealDto" parameterType="java.lang.String" >
+        select bobp.ENTRUST_ID          as tradeId,
+               'TRD60'                  as busiType,
+               bobp.ENTRUST_ID          as entrustId,
+               bobp.PORTFOLIO_ID        as portfolioId,
+               bo.FINPROD_ID            as finprodId,
+               'F32'                    as finprodType,
+               'F32'                    as finprodType2,
+               '0'                      as branch,
+               null                     as marketId,
+               'T01'                    as ps,
+               bo.BID_DATE              as tradeDate,
+               bo.OU_PARTY_ID           as ouPartyId,
+               bo.OUR_TRADER            as ouTraderId,
+               fp.ISSUER                as counterId,
+               null                     as counterTrader,
+               fp.CCY                   as ccy,
+               null                     as settleSpeed,
+               fpi.PAY_DATE             as settleDate,
+               null                     as unitCprice,
+               null                     as yield,
+               null                     as exerYield,
+               null                     as unitInt,
+               null                     as unitFprice,
+               null                     as parValue,
+               null                     as cpriceAmt,
+               null                     as intAmt,
+               null                     as fpriceAmt,
+               null                     as shareAmt,
+               null                     as deliveryType,
+               null                     as mdeliveryType,
+               bobp.PAYABLE_AMOUNT      as tradeAmt,
+               null                     as clearType,
+               eed.SEC_ACCT_ID          as secManageAcctId,
+               null                     as acctId,
+               eed.INV_AIM              as invAim,
+               null                     as tradeMarket,
+               null                     as tradeMarketMode,
+               null                     as rate,
+               null                     as repoTerm,
+               null                     as termType,
+               bobp.SUBSCRIPTION_AMOUNT as faceValue,
+               null                     as disFaceValue,
+               null                     as repoType,
+               null                     as vsettleDate,
+               null                     as msettleDate,
+               null                     as actRepoTerm,
+               null                     as mintAmt,
+               bobp.PAYABLE_AMOUNT      as mtradeAmt,
+               '180'                    as tgBusiType,
+               bobp.TRADE_STATUS        as tradeStatus,
+               bobp.P_BID_ID            as ptradeId,
+               bobp.IS_CANCEL           as isCancel,
+               'Y'                      as isOutTrade,
+               null                     as ftradeId,
+               bobp.BID_ID              as totleTradeId,
+               bo.REMARK                as remark,
+               null                     as ourShareAmt,
+               null                     as lendinShareAmt,
+               null                     as ourFpriceAmt,
+               null                     as lendinFpriceAmt,
+               null                     as ourCpriceAmt,
+               null                     as lendinCpriceAmt,
+               null                     as ownIntAmt,
+               null                     as lendinIntAmt,
+               bobp.SETT_FEE_AMT        as settleFeeAmt
+        from BID_ORDER_BID_PRICE bobp
+                 left join BID_ORDER bo
+                           on bo.BID_ID = bobp.BID_ID
+                 left join ETR_ENTRUST_DETAIL eed on eed.ENTRUST_ID = bobp.ENTRUST_ID and eed.PORTFOLIO_ID = bobp.PORTFOLIO_ID
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
+                 left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = bo.FINPROD_ID
+        where bobp.BID_ID = #{totleTradeId, jdbcType= VARCHAR}
     </select>
     <select id="findAllRegFeeDetailInfoList" resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmRegFeeInfoDto">
         select reg.trade_id as tradeId,
@@ -2495,7 +2573,7 @@
         where ee.ENTRUST_STATUS in ('03','02')
         <if test="finprodIds != null and finprodIds.size() > 0">
             AND ee.FINPROD_ID in
-            <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+            <foreach collection="finprodIds" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
         </if>

@@ -15,6 +15,9 @@ import java.math.BigDecimal;
 @ApiModel(value = "申购产品列表", description = "一级申购指令信息-申购产品列表")
 public class CfetsTrdBondFirstSubProductDto {
 
+    @ApiModelProperty(name = "index", value = "序号", example = "1")
+    private String index;
+
     @ApiModelProperty(name = "entrustId", value = "指令代码", example = "WTBOND202204191858")
     private String entrustId;
 
@@ -59,6 +62,14 @@ public class CfetsTrdBondFirstSubProductDto {
      * 交易成员ID，21位编号
      */
     private String partyId;
+
+    public String getIndex() {
+        return index;
+    }
+
+    public void setIndex(String index) {
+        this.index = index;
+    }
 
     public String getEntrustId() {
         return entrustId;

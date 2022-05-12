@@ -32,6 +32,7 @@
             <result column="SEC_ACCT_ID" property="secManageAcctId" jdbcType="VARCHAR" />
             <result column="SEC_ACCT_NAME" property="secAcctName" jdbcType="VARCHAR" />
             <result column="PARTY_ID" property="partyId" jdbcType="VARCHAR" />
+            <result column="rn" property="index" jdbcType="VARCHAR" />
         </collection>
     </resultMap>
 
@@ -123,7 +124,8 @@
                eed.INV_AIM,
                eed.SEC_ACCT_ID,
                ssai.SEC_ACCT_NAME,
-               bo.dip_Type dipType
+               bo.dip_Type dipType,
+               ROWNUM rn
         from BID_ORDER bo
                  left join BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
                  left join PTL_PORTFOLIO pp on bobp.PORTFOLIO_ID = pp.PORTFOLIO_ID
@@ -171,7 +173,8 @@
                eed.INV_AIM,
                eed.SEC_ACCT_ID,
                ssai.SEC_ACCT_NAME,
-               bo.dip_Type dipType
+               bo.dip_Type dipType,
+               ROWNUM rn
         from WFL_BID_ORDER bo
                  left join WFL_BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
                  left join PTL_PORTFOLIO pp on bobp.PORTFOLIO_ID = pp.PORTFOLIO_ID

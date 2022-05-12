@@ -53,6 +53,10 @@ public class CfetsCommonOprHisHandlerAop {
     protected void receiveEntrustPoint() {
     }
 
+    @Pointcut("execution(* com.joyintech.tams.cfets..*.*.entrustRefuce(..))")
+    protected void entrustRefucePoint() {
+    }
+
     /**
      * 提交及更新时更新细操作履历表
      */
@@ -99,6 +103,22 @@ public class CfetsCommonOprHisHandlerAop {
         String type = DictCodeListExt3.操作类型_接收.getValue();
         if (StringUtil.isNotEmpty(busiDes) && StringUtil.isNotEmpty(type)) {
             entrustIds.forEach(entrustId -> this.updateCfetsOprHis(busiDes, entrustId, type, null));
+        }
+    }
+
+    /**
+     * 退回指令时更新细操作履历表
+     */
+    @AfterReturning(value = "entrustRefucePoint()")
+    public void updateCfetsOprHisForRntrustRefucePoint(JoinPoint joinPoint) throws BusinessException {
+        Object[] args = joinPoint.getArgs();
+        Map param = (Map) args[0];
+        List<String> entrustIdList = com.joyintech.framework.util.StringUtil.splitToList(",", (String) param.get("entrustId"));
+        String busiDes = (String) param.get("rekReason");
+        String type = DictCodeListExt3.操作类型_退回.getValue();
+        //更新操作记录日志
+        if (StringUtil.isNotEmpty(busiDes) && StringUtil.isNotEmpty(type)) {
+            entrustIdList.forEach(entrustId -> this.updateCfetsOprHis(busiDes, entrustId, type, null));
         }
     }
 
