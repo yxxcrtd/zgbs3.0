@@ -167,7 +167,7 @@ public class CommonCheckKit extends BaseCheckKit {
         if (!result) {
             StringBuilder builder = StrUtil.builder();
             tradePeriod.forEach(item -> builder.append(item.getOpenTime()).append("~").append(item.getCloseTime()).append(StrUtil.COMMA));
-            throw new BusinessResultException(ErrorCode.INNER_RISK_ERROR,
+            throw new BusinessResultException(ErrorCode.CHECK_ERROR,
                     StrUtil.format("当前时间[{}],不允许委托,允许委托时间段为：[{}]",
                             localTime, StrUtil.removeSuffix(builder.toString(), StrUtil.COMMA)));
         }
@@ -212,8 +212,9 @@ public class CommonCheckKit extends BaseCheckKit {
         Integer minStep = minTrdUnitLimit.getMinStep();
         accountPositionHelper.checkLooseStocksByPosition(orderInterface, entrustVolume, minStep);
         if (StrUtil.isNotEmpty(orderInterface.getErrorMsg())) {
-            throw new BusinessResultException(ErrorCode.INNER_RISK_ERROR,
-                    StrUtil.format("持仓检查未通过，{}", orderInterface.getErrorMsg()));
+            String errorMsg = StrUtil.format("持仓检查未通过[{}]", orderInterface.getErrorMsg());
+            log.error(errorMsg);
+            throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
         }
     }
 
@@ -224,14 +225,16 @@ public class CommonCheckKit extends BaseCheckKit {
         int minStep = minTrdUnitLimit.getMinStep();
 
         if (minStep <= 0) {
-            throw new BusinessResultException(ErrorCode.INNER_RISK_ERROR,
-                    StrUtil.format("获取最小交易单位异常 => 【minStep = {}】", minStep));
+            String errorMsg = StrUtil.format("获取的最小交易单位[{}]异常", minStep);
+            log.error(errorMsg);
+            throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
         }
 
         if (EntrustBs.isBuy(entrustBs)
                 && entrustVolume % minStep != 0) {
-            throw new BusinessResultException(ErrorCode.INNER_RISK_ERROR,
-                    StrUtil.format("委托数量[{}]不符合最小买入单位[{}]整数倍", entrustVolume, minStep));
+            String errorMsg = StrUtil.format("委托数量[{}]不符合最小买入单位[{}]整数倍", entrustVolume, minStep);
+            log.error(errorMsg);
+            throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
         }
     }
 
@@ -251,9 +254,10 @@ public class CommonCheckKit extends BaseCheckKit {
         }
         if (lowerLimitPrice.compareTo(entrustPrice) > 0
                 || upperLimitPrice.compareTo(entrustPrice) < 0) {
-            throw new BusinessResultException(ErrorCode.INNER_RISK_ERROR,
-                    StrUtil.format("委托价格[{}]不符合涨跌停价限制：跌停价[{}]~涨停价[{}]",
-                            entrustPrice, lowerLimitPrice, upperLimitPrice));
+            String errorMsg = StrUtil.format("委托价格[{}]不符合涨跌停价限制：跌停价[{}]~涨停价[{}]",
+                    entrustPrice, lowerLimitPrice, upperLimitPrice);
+            log.error(errorMsg);
+            throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
         }
     }
 
@@ -291,9 +295,10 @@ public class CommonCheckKit extends BaseCheckKit {
 
         BigDecimal minAmt = minTrdUnitLimit.getMinAmt();
         if (entrustVolume < minNum && entrustBalance.compareTo(minAmt) < 0) {
-            throw new BusinessResultException(ErrorCode.INNER_RISK_ERROR,
-                    StrUtil.format("委托数量[{}]不符合最小买入数量限制[{}],委托金额[{}]不符合最小买入金额限制[{}]",
-                            entrustVolume, minNum, entrustBalance, minAmt));
+            String errorMsg = StrUtil.format("委托数量[{}]不符合最小买入数量限制[{}],委托金额[{}]不符合最小买入金额限制[{}]",
+                    entrustVolume, minNum, entrustBalance, minAmt);
+            log.error(errorMsg);
+            throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
         }
     }
 
@@ -303,12 +308,14 @@ public class CommonCheckKit extends BaseCheckKit {
         String entrustProp = EntrustPropUtils.getEntrustPropWithHandleNewBond(instruction, order.getEntrustProp());
         BigDecimal priceStep = NumberUtil.null2Zero(instruction.queryMinPrice(entrustProp));
         if (priceStep.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessResultException(ErrorCode.INNER_RISK_ERROR,
-                    StrUtil.format("无法获取最小价格变动单位"));
+            String errorMsg = StrUtil.format("无法获取最小价格变动单位");
+            log.error(errorMsg);
+            throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
         }
         if ((entrustPrice.divideAndRemainder(priceStep))[1].compareTo(BigDecimal.ZERO) != 0) {
-            throw new BusinessResultException(ErrorCode.INNER_RISK_ERROR,
-                    StrUtil.format("委托价格[{}]不符合最小价格变动单位[{}]的整数倍", entrustPrice, priceStep));
+            String errorMsg = StrUtil.format("委托价格[{}]不符合最小价格变动单位[{}]的整数倍", entrustPrice, priceStep);
+            log.error(errorMsg);
+            throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
         }
     }
 
@@ -316,8 +323,9 @@ public class CommonCheckKit extends BaseCheckKit {
         String entrustProp = EntrustPropUtils.getEntrustPropWithHandleNewBond(instruction, order.getEntrustProp());
         MinTrdUnitLimit minTrdUnitLimit = instruction.queryMinTrdUnitLimit(entrustProp);
         if (ObjectUtil.isNull(minTrdUnitLimit)) {
-            throw new BusinessResultException(ErrorCode.INNER_RISK_ERROR,
-                    StrUtil.format("无法获取交易所交易属性"));
+            String errorMsg = StrUtil.format("无法获取交易所交易属性");
+            log.error(errorMsg);
+            throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
         }
         return minTrdUnitLimit;
     }

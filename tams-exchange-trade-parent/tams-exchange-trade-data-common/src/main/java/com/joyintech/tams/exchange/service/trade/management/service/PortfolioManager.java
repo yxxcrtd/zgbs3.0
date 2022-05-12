@@ -459,7 +459,7 @@ public class PortfolioManager extends BaseService {
         BigDecimal disRate = BigDecimal.ZERO;
 
         // 订单类型：数量单，指令单
-        boolean isVolume = instruction.getEntrustNum() > 0L;
+        boolean isVolume = instruction.volumeInstruction();
         // 订单数量
         BigDecimal orderVolume = BigDecimal.valueOf(bean.getEntrustVolume());
         // 订单金额
