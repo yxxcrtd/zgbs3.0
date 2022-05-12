@@ -1,149 +1,186 @@
 package com.joyintech.tams.cfets.manualsettle.dto;
 
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 银行间手工交收无组合分配信息返回参数DTO
+ *
  * @author sjj
  * @version 1.0 2021年11月18日
  * @see CfetsManualSettleInfoOtherListRespond
  * @since 1.0
  */
 
-@ApiModel(value="银行间手工交收无组合分配信息返回参数",description="银行间手工交收无组合分配信息返回参数")
+@ApiModel(value = "银行间手工交收无组合分配信息返回参数", description = "银行间手工交收无组合分配信息返回参数")
 public class CfetsManualSettleInfoOtherListRespond {
 
-    @ApiModelProperty(name="portfolioId",value="组合代码",example="A1")
+    @ApiModelProperty(name = "portfolioId", value = "组合代码", example = "A1")
     private String portfolioId;
 
-    @ApiModelProperty(name="portfolioName",value="组合名称",example="A1")
+    @ApiModelProperty(name = "portfolioName", value = "组合名称", example = "A1")
     private String portfolioName;
 
-    @ApiModelProperty(name="finprodMarketId",value="资产代码",example="字符串1")
+    @ApiModelProperty(name = "finprodMarketId", value = "资产代码", example = "字符串1")
     private String finprodMarketId;
 
-    @ApiModelProperty(name="finprodAbbr",value="资产简称",example="字符串1")
+    @ApiModelProperty(name = "finprodAbbr", value = "资产简称", example = "字符串1")
     private String finprodAbbr;
 
-    @ApiModelProperty(name="ps",value="交易方向CODE",example="A1")
+    @ApiModelProperty(name = "ps", value = "交易方向CODE", example = "A1")
     private String ps;
 
-    @ApiModelProperty(name="finprodType2",value="资产类型CODE",example="A1")
+    @ApiModelProperty(name = "finprodType2", value = "资产类型CODE", example = "A1")
     private String finprodType2;
 
-    @ApiModelProperty(name="tradePlat",value="交易市场",example="A1")
+    @ApiModelProperty(name = "tradePlat", value = "交易市场", example = "A1")
     private String tradePlat;
 
-    @ApiModelProperty(name="tradeDate",value="成交日期",example="A1")
+    @ApiModelProperty(name = "tradeDate", value = "成交日期", example = "A1")
     private String tradeDate;
 
-    @ApiModelProperty(name="settleDate",value="结算日期",example="A1")
+    @ApiModelProperty(name = "settleDate", value = "结算日期", example = "A1")
     private String settleDate;
 
     //理论付息信息
-    @ApiModelProperty(name="qty",value="券面总额",example="A1")
+    @ApiModelProperty(name = "qty", value = "券面总额", example = "A1")
     private BigDecimal qty;
 
-    @ApiModelProperty(name="unitPrice",value="净价",example="100")
+    @ApiModelProperty(name = "unitPrice", value = "净价", example = "100")
     private BigDecimal unitPrice;
 
-    @ApiModelProperty(name="unitInt",value="应计利息（元）",example="100")
+    @ApiModelProperty(name = "unitInt", value = "应计利息（元）", example = "100")
     private BigDecimal unitInt;
 
-    @ApiModelProperty(name="allPrice",value="全价",example="100")
+    @ApiModelProperty(name = "allPrice", value = "全价", example = "100")
     private BigDecimal allPrice;
 
-    @ApiModelProperty(name="cpriceAmt",value="净价总额",example="100")
+    @ApiModelProperty(name = "cpriceAmt", value = "净价总额", example = "100")
     private BigDecimal cpriceAmt;
 
-    @ApiModelProperty(name="intAmt",value="应计利息总额（元）",example="100")
+    @ApiModelProperty(name = "intAmt", value = "应计利息总额（元）", example = "100")
     private BigDecimal intAmt;
 
-    @ApiModelProperty(name="fpriceAmt",value="全价总额",example="1000000")
+    @ApiModelProperty(name = "fpriceAmt", value = "全价总额", example = "1000000")
     private BigDecimal fpriceAmt;
 
-    @ApiModelProperty(name="tradeAmt",value="交易金额",example="1000000")
+    @ApiModelProperty(name = "tradeAmt", value = "交易金额", example = "1000000")
     private BigDecimal tradeAmt;
 
-    @ApiModelProperty(name="matureYield",value="到期收益率",example="1000000")
+    @ApiModelProperty(name = "matureYield", value = "到期收益率", example = "1000000")
     private BigDecimal matureYield;
 
-    @ApiModelProperty(name="exeYield",value="行权收益率",example="1000000")
+    @ApiModelProperty(name = "exeYield", value = "行权收益率", example = "1000000")
     private BigDecimal exeYield;
 
-    @ApiModelProperty(name="settleSpeed",value="清算速度",example="字符串1")
+    @ApiModelProperty(name = "settleSpeed", value = "清算速度", example = "字符串1")
     private String settleSpeed;
 
-    @ApiModelProperty(name="ccy",value="币种",example="CNY")
+    @ApiModelProperty(name = "ccy", value = "币种", example = "CNY")
     private String ccy;
 
-    @ApiModelProperty(name="remark",value="备注",example="A1")
+    @ApiModelProperty(name = "remark", value = "备注", example = "A1")
     private String remark;
 
-    @ApiModelProperty(name="regDate",value="登记日期",example="字符串1")
+    @ApiModelProperty(name = "regDate", value = "登记日期", example = "字符串1")
     private String regDate;
 
-    @ApiModelProperty(name="jyFeeAmt",value="交易手续费",example="1000000")
+    @ApiModelProperty(name = "jyFeeAmt", value = "交易手续费", example = "1000000")
     private BigDecimal jyFeeAmt;
 
-    @ApiModelProperty(name="jsFeeAmt",value="结算手续费",example="1000000")
+    @ApiModelProperty(name = "jsFeeAmt", value = "结算手续费", example = "1000000")
     private BigDecimal jsFeeAmt;
 
-    @ApiModelProperty(name="shRate",value="赎回比例",example="1000000")
+    @ApiModelProperty(name = "shRate", value = "赎回比例", example = "1000000")
     private BigDecimal shRate;
 
-    @ApiModelProperty(name="tradeMarket",value="交易场所",example="字符串1")
+    @ApiModelProperty(name = "tradeMarket", value = "交易场所", example = "字符串1")
     private String tradeMarket;
 
-    @ApiModelProperty(name="tradeMarketMode",value="一级市场/二级市场",example="字符串1")
+    @ApiModelProperty(name = "tradeMarketMode", value = "一级市场/二级市场", example = "字符串1")
     private String tradeMarketMode;
 
-    @ApiModelProperty(name="deliveryType",value="结算方式",example="字符串1")
-    private String  deliveryType;
+    @ApiModelProperty(name = "deliveryType", value = "结算方式", example = "字符串1")
+    private String deliveryType;
 
-    @ApiModelProperty(name="clearType",value="清算类型",example="字符串1")
+    @ApiModelProperty(name = "clearType", value = "清算类型", example = "字符串1")
     private String clearType;
 
-    @ApiModelProperty(name="ouPartyId",value="本方",example="字符串1")
+    @ApiModelProperty(name = "ouPartyId", value = "本方", example = "字符串1")
     private String ouPartyId;
 
-    @ApiModelProperty(name="ouTraderId",value="本方银行间交易员",example="字符串1")
+    @ApiModelProperty(name = "ouTraderId", value = "本方银行间交易员", example = "字符串1")
     private String ouTraderId;
 
-    @ApiModelProperty(name="counterId",value="对手方",example="字符串1")
+    @ApiModelProperty(name = "counterId", value = "对手方", example = "字符串1")
     private String counterId;
 
-    @ApiModelProperty(name="counterTrade",value="对手方交易员",example="字符串1")
+    @ApiModelProperty(name = "counterTrade", value = "对手方交易员", example = "字符串1")
     private String counterTrade;
 
-    @ApiModelProperty(name="spanTextOne",value="分配方式",example="字符串1")
+    @ApiModelProperty(name = "spanTextOne", value = "分配方式", example = "字符串1")
     private String spanTextOne;
 
-    @ApiModelProperty(name="exerciseDate",value="理论行权日",example="字符串1")
+    @ApiModelProperty(name = "exerciseDate", value = "理论行权日", example = "字符串1")
     private String exerciseDate;
 
-    @ApiModelProperty(name="actExerciseDate",value="实际行权日",example="字符串1")
+    @ApiModelProperty(name = "actExerciseDate", value = "实际行权日", example = "字符串1")
     private String actExerciseDate;
 
-    @ApiModelProperty(name="exerciseDate1",value="理论行权日",example="字符串1")
+    @ApiModelProperty(name = "exerciseDate1", value = "理论行权日", example = "字符串1")
     private String exerciseDate1;
 
-    @ApiModelProperty(name="actExerciseDate1",value="实际行权日",example="字符串1")
+    @ApiModelProperty(name = "actExerciseDate1", value = "实际行权日", example = "字符串1")
     private String actExerciseDate1;
 
-    @ApiModelProperty(name="tradeId",value="成交编号",example="字符串1")
+    @ApiModelProperty(name = "tradeId", value = "成交编号", example = "字符串1")
     private String tradeId;
 
-    @ApiModelProperty(name="isRight",value="是否含权",example="A1")
+    @ApiModelProperty(name = "isRight", value = "是否含权", example = "A1")
     private String isRight;
 
-    @ApiModelProperty(name="accountPosition",value="账户持仓",example="99.99")
+    @ApiModelProperty(name = "accountPosition", value = "账户持仓", example = "99.99")
     private BigDecimal accountPosition;
+
+    @ApiModelProperty(name = "couponSpecies", value = "息票品种", example = "01")
+    private String couponSpecies;
+
+    @ApiModelProperty(name = "couponSpeciesStr", value = "息票品种名称,展示用", example = "零息")
+    private String couponSpeciesStr;
+
+    @ApiModelProperty(name = "intType", value = "利率类型", example = "01")
+    private String intType;
+
+    @ApiModelProperty(name = "intTypeStr", value = "利率类型名称,展示用", example = "固定利率")
+    private String intTypeStr;
+
+    @ApiModelProperty(name = "issueDate", value = "发行日")
+    private Date issueDate;
+
+    @ApiModelProperty(name = "issueDateStr", value = "发行日格式化")
+    private String issueDateStr;
+
+    @ApiModelProperty(name = "payDate", value = "缴款日")
+    private Date payDate;
+
+    @ApiModelProperty(name = "payDateStr", value = "缴款日格式化")
+    private String payDateStr;
+
+    @ApiModelProperty(name = "issuer", value = "发行人id", example = "001")
+    private String issuer;
+
+    @ApiModelProperty(name = "issuerName", value = "发行人名称,展示用", example = "发行人1")
+    private String issuerName;
+
+    @ApiModelProperty(name = "issuePrice", value = "发行价格", example = "99.0000")
+    private BigDecimal issuePrice;
 
     public String getSpanTextOneStr() {
         return SysDataUtil.getNameFromDataDict(DictCode.分配方式, this.getSpanTextOne());
@@ -519,5 +556,105 @@ public class CfetsManualSettleInfoOtherListRespond {
 
     public void setAccountPosition(BigDecimal accountPosition) {
         this.accountPosition = accountPosition;
+    }
+
+    public String getCouponSpecies() {
+        return couponSpecies;
+    }
+
+    public void setCouponSpecies(String couponSpecies) {
+        this.couponSpecies = couponSpecies;
+    }
+
+    public String getCouponSpeciesStr() {
+        if (StringUtil.isEmpty(getCouponSpecies())) {
+            return StringUtil.EMPTY;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.息票品种, getCouponSpecies());
+    }
+
+    public void setCouponSpeciesStr(String couponSpeciesStr) {
+        this.couponSpeciesStr = couponSpeciesStr;
+    }
+
+    public String getIntType() {
+        return intType;
+    }
+
+    public void setIntType(String intType) {
+        this.intType = intType;
+    }
+
+    public String getIntTypeStr() {
+        if (StringUtil.isEmpty(getIntType())) {
+            return StringUtil.EMPTY;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.利率类型, getIntType());
+    }
+
+    public void setIntTypeStr(String intTypeStr) {
+        this.intTypeStr = intTypeStr;
+    }
+
+    public Date getIssueDate() {
+        return issueDate;
+    }
+
+    public void setIssueDate(Date issueDate) {
+        this.issueDate = issueDate;
+    }
+
+    public String getIssueDateStr() {
+        if (null != this.getIssueDate()) {
+            return DateUtil.format(this.getIssueDate());
+        }
+        return issueDateStr;
+    }
+
+    public void setIssueDateStr(String issueDateStr) {
+        this.issueDateStr = issueDateStr;
+    }
+
+    public Date getPayDate() {
+        return payDate;
+    }
+
+    public void setPayDate(Date payDate) {
+        this.payDate = payDate;
+    }
+
+    public String getPayDateStr() {
+        if (null != this.getPayDate()) {
+            return DateUtil.format(this.getPayDate());
+        }
+        return payDateStr;
+    }
+
+    public void setPayDateStr(String payDateStr) {
+        this.payDateStr = payDateStr;
+    }
+
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
+    }
+
+    public String getIssuerName() {
+        return issuerName;
+    }
+
+    public void setIssuerName(String issuerName) {
+        this.issuerName = issuerName;
+    }
+
+    public BigDecimal getIssuePrice() {
+        return issuePrice;
+    }
+
+    public void setIssuePrice(BigDecimal issuePrice) {
+        this.issuePrice = issuePrice;
     }
 }

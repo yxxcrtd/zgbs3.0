@@ -1151,13 +1151,6 @@ public class CfetsEtrDispatcherService extends BaseService {
                     }
                 }
 
-                //更新操作记录日志
-                CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
-                oprHisReq.setEntrustId(entrustId);
-                oprHisReq.setOperType(DictCodeListExt3.操作类型_退回.getValue());
-                oprHisReq.setBusiDes((String) pageParam.get("rekReason"));
-                joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
-
                 Map<String, Object> param = new HashMap<>();
                 param.put("entrustId", entrustId);
                 param.put("isAutoReceive", null);

@@ -1,4 +1,4 @@
-package com.joyintech.tams.touguan.system.bond.special.service;
+package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.service;
 
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.ajax.AjaxResult;
@@ -10,8 +10,8 @@ import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.util.ExcelUtil;
-import com.joyintech.tams.touguan.system.bond.special.dto.FinProductSpecialImportDto;
-import com.joyintech.tams.touguan.system.bond.special.dto.req.FinProductSpecialSaveRequest;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.req.FinProductSpecialSaveRequest;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.FinProductSpecialImportDto;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -42,16 +42,16 @@ public class FinProductSpecialValidatorService implements BeanValidator {
         List<ValidMessage> resultList = new ArrayList<>();
         FinProductSpecialSaveRequest dto = (FinProductSpecialSaveRequest) value;
         if (StringUtil.isBlank(dto.getFinprodMarketId())) {
-            resultList.add(new ValidMessage(getMessage("{债券代码}字段必填!")));
+            resultList.add(new ValidMessage(getMessage("【债券代码】必填!")));
         }
         if (StringUtil.isBlank(dto.getIsAbs())) {
-            resultList.add(new ValidMessage(getMessage("{是否资产支持证券}字段必填!")));
+            resultList.add(new ValidMessage(getMessage("【是否资产支持证券】必填!")));
         }
         if (StringUtil.isBlank(dto.getIsSpecialDebt())) {
-            resultList.add(new ValidMessage(getMessage("{是否特殊债}字段必填!")));
+            resultList.add(new ValidMessage(getMessage("【是否特殊债】必填!")));
         }
         if (StringUtil.isBlank(dto.getIsDefaultBondIndicator())) {
-            resultList.add(new ValidMessage(getMessage("{是否到期违约债}字段必填!")));
+            resultList.add(new ValidMessage(getMessage("【是否到期违约债】必填!")));
         }
         if (DictCodeList.是否_否.getValue().equals(dto.getIsDefaultBondIndicator())
                 && DictCodeList.是否_否.getValue().equals(dto.getIsAbs())
@@ -60,7 +60,7 @@ public class FinProductSpecialValidatorService implements BeanValidator {
         }
         //判断特殊资产维护是否存在流程中数据
         WflValidInputParameter parameter = new WflValidInputParameter();
-        parameter.setPageId("FinProductSpecial001");
+        parameter.setPageId("CfetsBasicInfo001");
         parameter.setBusinessDataPk1(dto.getFinprodMarketId());
         ProcessMark dataEntityFromProcessMark = mstWorkflowCommonService.getDataEntityFromProcessMark(parameter);
         if (Objects.nonNull(dataEntityFromProcessMark)) {

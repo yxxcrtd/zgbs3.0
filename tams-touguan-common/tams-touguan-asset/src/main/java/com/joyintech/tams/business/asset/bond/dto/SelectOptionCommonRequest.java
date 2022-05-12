@@ -122,4 +122,6 @@ public class SelectOptionCommonRequest {
     public void setConFinprodId(String conFinprodId) {
         this.conFinprodId = conFinprodId;
     }
+
+
 }

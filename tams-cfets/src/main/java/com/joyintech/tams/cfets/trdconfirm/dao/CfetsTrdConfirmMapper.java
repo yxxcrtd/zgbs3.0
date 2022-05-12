@@ -70,6 +70,13 @@ public interface CfetsTrdConfirmMapper {
     List<CfetsRegFinProductDealDto> findAllRegDealList(String totleTradeId);
 
     /**
+     * 查询所有一级申购明细数据
+     * @param pageParam
+     * @return
+     */
+    List<CfetsRegFinProductDealDto> findAllBidDealList(String totleTradeId);
+
+    /**
      * 查询所以报价明细数据
      * @param totleTradeId
      * @return

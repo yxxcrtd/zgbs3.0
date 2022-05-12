@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.joyintech.tams.touguan.system.bond.special.dao.FinProductSpecialAssetMapper">
+<mapper namespace="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dao.FinProductSpecialAssetMapper">
 
     <select id="queryForPage"
-            resultType="com.joyintech.tams.touguan.system.bond.special.dto.FinProductSpecialDto"
-            parameterType="com.joyintech.tams.touguan.system.bond.special.dto.req.FinProductSpecialQueryRequest">
+            resultType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.FinProductSpecialDto"
+            parameterType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.req.FinProductSpecialQueryRequest">
         SELECT *
         FROM (
                  SELECT SPECIAL.FINPROD_MARKET_ID         finprodMarketId,
@@ -30,8 +30,8 @@
     </select>
 
     <select id="querySelectOption"
-            resultType="com.joyintech.tams.touguan.system.bond.special.dto.FinProductSpecialSelectOptionDto"
-            parameterType="com.joyintech.tams.touguan.system.bond.special.dto.req.FinProductSpecialSelectOptionQueryRequest">
+            resultType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.FinProductSpecialSelectOptionDto"
+            parameterType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.req.FinProductSpecialSelectOptionQueryRequest">
         SELECT
         *
         FROM
@@ -87,8 +87,8 @@
 
 
     <select id="querySampleInterf"
-            resultType="com.joyintech.tams.touguan.system.bond.special.dto.FinProductSpecialSelectOptionDto"
-            parameterType="com.joyintech.tams.touguan.system.bond.special.dto.req.FinProductSpecialSelectOptionQueryRequest">
+            resultType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.FinProductSpecialSelectOptionDto"
+            parameterType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.req.FinProductSpecialSelectOptionQueryRequest">
         SELECT SECID finprodMarketId, SECNAME finprodAbbr
         from INTERF_PAYHSRCSECINFO
         WHERE SECNAME = #{search};
@@ -96,8 +96,8 @@
 
 
     <select id="querySampleFinProduct"
-            resultType="com.joyintech.tams.touguan.system.bond.special.dto.FinProductSpecialSelectOptionDto"
-            parameterType="com.joyintech.tams.touguan.system.bond.special.dto.req.FinProductSpecialSelectOptionQueryRequest">
+            resultType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.FinProductSpecialSelectOptionDto"
+            parameterType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.req.FinProductSpecialSelectOptionQueryRequest">
         SELECT FINPROD_ID finprodMarketId, FINPROD_ABBR finprodAbbr
         from FIN_PRODUCT
         where FINPROD_ABBR = #{search};

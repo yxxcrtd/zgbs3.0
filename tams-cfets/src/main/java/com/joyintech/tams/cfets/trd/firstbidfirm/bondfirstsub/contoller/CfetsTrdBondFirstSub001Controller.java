@@ -73,6 +73,8 @@ public class CfetsTrdBondFirstSub001Controller extends BaseController {
         initPageParams.put("ENTRUST_STATUS_04", DictCodeList.委托状态_已完成.getValue());
         // 委托状态_已退回
         initPageParams.put("ENTRUST_STATUS_05", DictCodeList.委托状态_已退回.getValue());
+        // 委托状态_已关闭
+        initPageParams.put("ENTRUST_STATUS_06", DictCodeList.委托状态_已关闭.getValue());
         // 资金账户类型_托管账户
         initPageParams.put("acctType_A01", BussinessDictCodeList.资金账户类型_托管账户.getValue());
         // 系统日期

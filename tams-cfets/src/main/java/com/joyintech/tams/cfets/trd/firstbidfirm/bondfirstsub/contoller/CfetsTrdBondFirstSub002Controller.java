@@ -131,7 +131,7 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
         String isFromToDoList = getParam("isFromToDoList");
         if (StringUtil.isNotEmpty(workflowId)) {
             CfetsTrdBondFirstSubInfoDto entity = cfetsTrdBondFirstSub002Service.getBussinessEntityByWorkflowId(workflowId);
-            test(entity);
+//            test(entity);
             initPageParams.put(GlobalConstant.WORKFLOW_ID, workflowId);
             initPageParams.put(GlobalConstant.ENTITY, entity);
         }
@@ -144,41 +144,41 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
      * @date 2022/5/9 10:42
      * @param entity
      */
-    private void test(CfetsTrdBondFirstSubInfoDto entity){
-        CfetsEtribdoRiskcalResponse riskcalResponse = entity.getRiskcalResponse();
-        if(StringUtil.isNotEmpty(riskcalResponse)){
-            return;
-        }
-        riskcalResponse = new CfetsEtribdoRiskcalResponse();
-        riskcalResponse.setRiskMathFlag("02");
-        riskcalResponse.setRiskTrialSpan("试算不通过");
-        riskcalResponse.setStdrtninfo("处理成功");
-        List<CfetsEtribdoRiskcalResponse> riskcalReturnList = new ArrayList<>();
-        CfetsEtribdoRiskcalResponse riskcal = new CfetsEtribdoRiskcalResponse();
-        riskcal.setKriCode("80434e46d8bd490cb75b2418bfe53b02");
-        riskcal.setPortfolioCode("AAA1");
-        riskcal.setPortfolioName("AAA1");
-        riskcal.setKriTypeCn("流动性管理类");
-        riskcal.setAssetName("A1");
-        riskcal.setWarningLine(">=2700000.0000万元");
-        riskcal.setApproveLine(">=3000000.0000万元");
-        riskcal.setForbiddenLn("<10%");
-        riskcal.setKriValue("<10%");
-        riskcal.setOldValue("<10%");
-        riskcal.setKriTrend("向好");
-        riskcal.setKriStatus("03");
-        riskcal.setTotalConclu("试算不通过");
-        riskcal.setKriStatusCn("3");
-        riskcal.setKriName("3");
-        riskcal.setKriType("3");
-        riskcal.setKriExpr("3");
-        riskcal.setKriOldExpr("3");
-        riskcalReturnList.add(riskcal);
-        riskcal.setKriCode("80434e46d8bd490cb75b2418bfe51b02");
-        riskcalReturnList.add(riskcal);
-        riskcalResponse.setRiskcalReturnList(riskcalReturnList);
-        entity.setRiskcalResponse(riskcalResponse);
-    }
+//    private void test(CfetsTrdBondFirstSubInfoDto entity){
+//        CfetsEtribdoRiskcalResponse riskcalResponse = entity.getRiskcalResponse();
+//        if(StringUtil.isNotEmpty(riskcalResponse)){
+//            return;
+//        }
+//        riskcalResponse = new CfetsEtribdoRiskcalResponse();
+//        riskcalResponse.setRiskMathFlag("02");
+//        riskcalResponse.setRiskTrialSpan("试算不通过");
+//        riskcalResponse.setStdrtninfo("处理成功");
+//        List<CfetsEtribdoRiskcalResponse> riskcalReturnList = new ArrayList<>();
+//        CfetsEtribdoRiskcalResponse riskcal = new CfetsEtribdoRiskcalResponse();
+//        riskcal.setKriCode("80434e46d8bd490cb75b2418bfe53b02");
+//        riskcal.setPortfolioCode("AAA1");
+//        riskcal.setPortfolioName("AAA1");
+//        riskcal.setKriTypeCn("流动性管理类");
+//        riskcal.setAssetName("A1");
+//        riskcal.setWarningLine(">=2700000.0000万元");
+//        riskcal.setApproveLine(">=3000000.0000万元");
+//        riskcal.setForbiddenLn("<10%");
+//        riskcal.setKriValue("<10%");
+//        riskcal.setOldValue("<10%");
+//        riskcal.setKriTrend("向好");
+//        riskcal.setKriStatus("03");
+//        riskcal.setTotalConclu("试算不通过");
+//        riskcal.setKriStatusCn("3");
+//        riskcal.setKriName("3");
+//        riskcal.setKriType("3");
+//        riskcal.setKriExpr("3");
+//        riskcal.setKriOldExpr("3");
+//        riskcalReturnList.add(riskcal);
+//        riskcal.setKriCode("80434e46d8bd490cb75b2418bfe51b02");
+//        riskcalReturnList.add(riskcal);
+//        riskcalResponse.setRiskcalReturnList(riskcalReturnList);
+//        entity.setRiskcalResponse(riskcalResponse);
+//    }
 
 
     @ApiOperation(value = "申购初始化检查", notes = "点击申购按钮、指令查询明细页面点击确认调用")
