@@ -24,6 +24,14 @@
                 AND aaa.issueDate <![CDATA[>=]]> to_date(#{issueDateStart}, 'yyyy-MM-dd')
                 AND aaa.issueDate <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd')
             </if>
+            <!-- 组合匹配 -->
+            <if test="portfolioIdList != null and portfolioIdList.size()>0">
+                AND
+                <foreach item="item" index="index" collection="portfolioIdList" separator="OR">
+                    (INSTR(aaa.portfolioId,concat(#{item},','))>0 OR  INSTR(aaa.portfolioId,concat(#{item},','))>0 OR aaa.portfolioId = #{item} )
+                </foreach>
+
+            </if>
             <!-- 中标状态 -->
             <if test="firstBidStatus != null and firstBidStatus != ''">
                 AND aaa.firstBidStatus = #{firstBidStatus}
@@ -83,7 +91,14 @@
             ELSE fpi.ISSUE_DATE
             END AS issueDate,
             ee.ENTRUST_NUM/100 totalBiddingNum,
-            T1.BID_PRICE bidPriceStr,
+            CASE WHEN  fpi.ISSUE_CLASS = '01' THEN
+                case
+                when fp.COUPON_SPECIES = '01' AND  fpi.INT_TYPE = '02' THEN
+                SDLDATA.ITEM_VALUE || '+' || to_char(fpi.bp * 10000 ,'FM9999999999999990.9000') || ' BP'
+                else to_char(fpi.REFER_YIELD * 100 ,'FM9999999999999990.9000') || ' %'
+                end
+            ELSE T1.BID_PRICE
+            END AS bidPriceStr,
             CASE
                 WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
                     fpi.PAY_EDATE
@@ -121,6 +136,7 @@
         LEFT JOIN FIN_PRODUCT fp ON fp.FINPROD_ID = ee.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ADD fpa ON fpa.FINPROD_ID = ee.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ISSUE fpi ON fpi.FINPROD_ID = fp.FINPROD_ID
+        LEFT JOIN (select * from  SYS_DATADICT_LIST where DICT_CODE='SECRATE_DATA') SDLDATA on fpi.INT_RATE_ID = SDLDATA.ITEM_CODE
         LEFT JOIN ETR_FINISH_STATUS efs ON efs.ENTRUST_ID = ee.ENTRUST_ID
         LEFT JOIN MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
         LEFT JOIN (
@@ -146,12 +162,6 @@
 	    AND ee.ENTRUST_NUM IS NOT NULL
         AND ee.TRADE_MARKET IN ( #{TRADE_MARKET_01},#{TRADE_MARKET_02})
         AND ee.FINPROD_TYPE2 = #{FINPROD_TYPE2}
-        <if test="portfolioIdList != null and portfolioIdList.size() > 0">
-            AND ee.PORTFOLIO_ID IN
-            <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
-                #{item}
-            </foreach>
-        </if>
         <if test="finprodIdList != null and finprodIdList.size() > 0">
             AND fp.FINPROD_ID in
             <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
@@ -211,7 +221,14 @@
                 ELSE fpi.ISSUE_DATE
                 END AS issueDate,
             ee.ENTRUST_NUM/100 totalBiddingNum,
-            T1.BID_PRICE bidPriceStr,
+            CASE WHEN  fpi.ISSUE_CLASS = '01' THEN
+                case
+                when fp.COUPON_SPECIES = '01' AND  fpi.INT_TYPE = '02' THEN
+                SDLDATA.ITEM_VALUE || '+' || to_char(fpi.bp * 10000 ,'FM9999999999999990.9000') || ' BP'
+                else to_char(fpi.REFER_YIELD * 100 ,'FM9999999999999990.9000') || ' %'
+                end
+            ELSE T1.BID_PRICE
+            END AS bidPriceStr,
             CASE
                 WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
                     fpi.PAY_EDATE
@@ -249,6 +266,7 @@
         LEFT JOIN FIN_PRODUCT fp ON fp.FINPROD_ID = ee.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ADD fpa ON fpa.FINPROD_ID = ee.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ISSUE fpi ON fpi.FINPROD_ID = fp.FINPROD_ID
+        LEFT JOIN (select * from  SYS_DATADICT_LIST where DICT_CODE='SECRATE_DATA') SDLDATA on fpi.INT_RATE_ID = SDLDATA.ITEM_CODE
         LEFT JOIN ETR_FINISH_STATUS efs ON efs.ENTRUST_ID = ee.ENTRUST_ID
         LEFT JOIN MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
         LEFT JOIN (
@@ -295,12 +313,6 @@
 	    AND ee.ENTRUST_NUM IS NOT NULL
         AND ee.TRADE_MARKET IN ( #{TRADE_MARKET_01},#{TRADE_MARKET_02})
         AND ee.FINPROD_TYPE2 = #{FINPROD_TYPE2}
-        <if test="portfolioIdList != null and portfolioIdList.size() > 0">
-            AND ee.PORTFOLIO_ID IN
-            <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
-                #{item}
-            </foreach>
-        </if>
         <if test="finprodIdList != null and finprodIdList.size() > 0">
             AND fp.FINPROD_ID in
             <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
@@ -422,7 +434,7 @@
             to_char(aaa.issueDate,'yyyyMMdd')  = #{search} OR
             to_char(aaa.payEdate,'yyyyMMdd')  = #{search} OR
             aaa.issuePrice ||''= #{search} OR
-            aaa.referYield ||''= #{search} OR
+            aaa.referYieldStr ||''= #{search} OR
             to_char(aaa.firstConfirmDate,'yyyy-MM-dd')  = #{search} OR
             to_char(aaa.firstConfirmDate,'yyyyMMdd')  = #{search} OR
             aaa.minPamt ||''= #{search} OR
@@ -519,14 +531,10 @@
             ISSUE.INT_TYPE as intType,
             ISSUE.ISSUE_PRICE as issuePrice,
             case
-                when PRODUCT.COUPON_SPECIES = '01' AND  ISSUE.INT_TYPE = '01' THEN
-                    ISSUE.REFER_YIELD
                 when PRODUCT.COUPON_SPECIES = '01' AND  ISSUE.INT_TYPE = '02' THEN
-                    miri.INT_RATE
-                when PRODUCT.COUPON_SPECIES IN ('02', '03', '04') THEN
-                    ISSUE.REFER_YIELD
-                else ISSUE.REFER_YIELD
-                end as referYield,
+                    SDLDATA.ITEM_VALUE || '+' || to_char(ISSUE.bp * 10000 ,'FM9999999999999990.90') || ' BP'
+                else to_char(ISSUE.REFER_YIELD * 100 ,'FM9999999999999990.9000') || ' %'
+                end as referYieldStr,
             ISSUE.FIRST_CONFIRM_DATE firstConfirmDate,
             round(ISSUE.MIN_PER_TAMT/100000000,2) as minPamt,
             round(ISSUE.MAX_PER_UTAMT/100000000,2) as maxPamt,
@@ -572,6 +580,7 @@
                         ) WHERE RANK=1
         ) ZX ON PRODUCT.FINPROD_MARKET_ID = ZX.ASSET_CODE
         LEFT JOIN MST_CUSTOMER_INFO MCIT ON MCIT.CUSTOMER_ID=ZX.GRADE_ORG_ID
+        LEFT JOIN (select * from  SYS_DATADICT_LIST where DICT_CODE='SECRATE_DATA') SDLDATA on ISSUE.INT_RATE_ID = SDLDATA.ITEM_CODE
         <where>
             PRODUCT.FINPROD_TYPE2=#{finprodType2,jdbcType=VARCHAR}
             AND PRODUCT.TRADE_MARKET in ('01','02','03','04') <!-- 限制为银行间和商业柜台,上交所和深交所-->
