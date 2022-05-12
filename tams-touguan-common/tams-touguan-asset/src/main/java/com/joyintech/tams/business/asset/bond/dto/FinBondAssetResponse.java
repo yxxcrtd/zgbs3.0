@@ -106,7 +106,7 @@ public class FinBondAssetResponse {
     private BigDecimal rate;
 
     @ApiModelProperty(name="basisRate",value="基准利率")
-    private BigDecimal basisRate;
+    private String basisRate;
 
     @ApiModelProperty(name="basisRateRatio",value="基准利率系数")
     private BigDecimal basisRateRatio;
@@ -393,11 +393,11 @@ public class FinBondAssetResponse {
         this.rate = rate;
     }
 
-    public BigDecimal getBasisRate() {
+    public String getBasisRate() {
         return basisRate;
     }
 
-    public void setBasisRate(BigDecimal basisRate) {
+    public void setBasisRate(String basisRate) {
         this.basisRate = basisRate;
     }
 
