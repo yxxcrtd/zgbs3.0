@@ -227,6 +227,30 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "zxGradeOrgId", value = "债项评级机构")
     private String zxGradeOrgId;
 
+    @ApiModelProperty(name = "isNetprice", value = "是否净价交易")
+    private String isNetprice;
+
+    @ApiModelProperty(name = "conFinprodId", value = "正股代码")
+    private String conFinprodId;
+
+    @ApiModelProperty(name = "conShareId", value = "转股代码")
+    private String conShareId;
+
+    @ApiModelProperty(name = "conVdate", value = "转股起始日")
+    private Date conVdate;
+
+    @ApiModelProperty(name = "conPrice", value = "转股价格")
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal conPrice;
+
+    @ApiModelProperty(name = "resalePrice", value = "回售触发价")
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal resalePrice;
+
+    @ApiModelProperty(name = "redeemPrice", value = "赎回触发价")
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal redeemPrice;
+
     @ApiModelProperty(name = "conceptTypes", value = "概念板块")
     private List<String> conceptTypes;
 
@@ -789,5 +813,61 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     public void setSecondaryClassification(String secondaryClassification) {
         this.secondaryClassification = secondaryClassification;
+    }
+
+    public String getIsNetprice() {
+        return isNetprice;
+    }
+
+    public void setIsNetprice(String isNetprice) {
+        this.isNetprice = isNetprice;
+    }
+
+    public String getConFinprodId() {
+        return conFinprodId;
+    }
+
+    public void setConFinprodId(String conFinprodId) {
+        this.conFinprodId = conFinprodId;
+    }
+
+    public String getConShareId() {
+        return conShareId;
+    }
+
+    public void setConShareId(String conShareId) {
+        this.conShareId = conShareId;
+    }
+
+    public Date getConVdate() {
+        return conVdate;
+    }
+
+    public void setConVdate(Date conVdate) {
+        this.conVdate = conVdate;
+    }
+
+    public BigDecimal getConPrice() {
+        return conPrice;
+    }
+
+    public void setConPrice(BigDecimal conPrice) {
+        this.conPrice = conPrice;
+    }
+
+    public BigDecimal getResalePrice() {
+        return resalePrice;
+    }
+
+    public void setResalePrice(BigDecimal resalePrice) {
+        this.resalePrice = resalePrice;
+    }
+
+    public BigDecimal getRedeemPrice() {
+        return redeemPrice;
+    }
+
+    public void setRedeemPrice(BigDecimal redeemPrice) {
+        this.redeemPrice = redeemPrice;
     }
 }
