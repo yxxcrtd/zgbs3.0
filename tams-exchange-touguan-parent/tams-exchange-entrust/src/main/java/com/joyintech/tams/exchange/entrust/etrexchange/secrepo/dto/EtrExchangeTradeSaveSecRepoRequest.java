@@ -143,6 +143,21 @@ public class EtrExchangeTradeSaveSecRepoRequest extends EtrEntrust implements Pr
      */
     private String trader;
 
+
+    private String confirmOk;
+
+    public String getConfirmOk() {
+        return confirmOk;
+    }
+
+    public void setConfirmOk(String confirmOk) {
+        this.confirmOk = confirmOk;
+    }
+
+    public void setDeclaTypeStr(String declaTypeStr) {
+        this.declaTypeStr = declaTypeStr;
+    }
+
     @Override
     public BigDecimal getAccAvailableCash() {
         return accAvailableCash;
