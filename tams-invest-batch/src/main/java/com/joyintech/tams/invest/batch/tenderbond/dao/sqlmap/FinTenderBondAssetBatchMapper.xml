@@ -3,129 +3,217 @@
 <mapper namespace="com.joyintech.tams.invest.batch.tenderbond.dao.FinTenderBondAssetBatchMapper">
 
     <select id="selectListing" resultType="com.joyintech.tams.invest.batch.tenderbond.dto.FinTenderBondAssetBatchDto">
-        select * from (
-            SELECT
-                CASE WHEN <![CDATA[
+        select *
+        from (
+                 SELECT CASE
+                            WHEN <![CDATA[
                 ISSUE.ISSUE_DATE >= #{listingDate,jdbcType=DATE} or
-                ISSUE.TENDER_EDATE >= #{listingDate,jdbcType=DATE}  THEN '01'
-                WHEN ((ISSUE.ISSUE_DATE < #{listingDate,jdbcType=DATE} or
-                ISSUE.TENDER_EDATE < #{listingDate,jdbcType=DATE}) and PRODUCT.CIRCULATION_CODE is null) or
-                (PRODUCT.CIRCULATION_CODE is not null and PRODUCT_ADD.LISTING_DATE <#{listingDate,jdbcType=DATE}) THEN '02'
-                WHEN (ISSUE.ISSUE_DATE < #{listingDate,jdbcType=DATE} or
-                ISSUE.TENDER_EDATE < #{listingDate,jdbcType=DATE}) and PRODUCT.CIRCULATION_CODE is not null
-                and  PRODUCT_ADD.LISTING_DATE >= #{listingDate,jdbcType=DATE} THEN '03'
+                                    ISSUE.TENDER_EDATE >= #{listingDate,jdbcType=DATE} THEN '01'
+                            WHEN ((ISSUE.ISSUE_DATE < #{listingDate,jdbcType=DATE} or
+                                   ISSUE.TENDER_EDATE < #{listingDate,jdbcType=DATE}) and
+                                  PRODUCT.CIRCULATION_CODE is null) or
+                                 (PRODUCT.CIRCULATION_CODE is not null and
+                                  PRODUCT_ADD.LISTING_DATE > #{listingDate,jdbcType=DATE}) THEN '02'
+                            WHEN (ISSUE.ISSUE_DATE < #{listingDate,jdbcType=DATE} or
+                                  ISSUE.TENDER_EDATE < #{listingDate,jdbcType=DATE}) and
+                                 PRODUCT.CIRCULATION_CODE is not null
+                                and PRODUCT_ADD.LISTING_DATE <= #{listingDate,jdbcType=DATE} THEN '03'
                 ]]>
-                ELSE NULL END AS issueStage,
-                PRODUCT_ADD.ISSUE_STATUS as issueStatus,
-                PRODUCT.FINPROD_MARKET_ID as finprodMarketId,
-                PRODUCT.FINPROD_ABBR as finprodAbbr,
-                PRODUCT.TRADE_MARKET as tradeMarket,
-                PRODUCT.REGIST_ORG as registOrg,
-                PRODUCT.ISSUER as issuer ,
-                PRODUCT.ISSUE_TYPE as issueType,
-                ISSUE.ISSUE_CLASS as issueClass,
-                ISSUE.TENDER_TYPE as tenderType,
-                ISSUE.TENDER_TARGET as tenderTarget,
-                ISSUE.ISSUE_EDATE as issueDate,
-                PRODUCT_ADD.LISTING_DATE  as listingDate,
-                PRODUCT_ADD.APPEAR_MARKET_ID  as appearMarketId,
-                PRODUCT.FINPROD_ABBR  as appearMarketAbbr,
-                PRODUCT.VDATE as vdate,
-                PRODUCT.MDATE as mdate,
-                PRODUCT_TYPE.TYPE_9 as type9,
-                PRODUCT_TYPE.TYPE_10 as type10,
-                PRODUCT_TYPE.TYPE_11 as type11,
-                PRODUCT.COUPON_SPECIES as couponSpecies,
-                PRODUCT.CCY as ccy,
-                PRODUCT.ISSUE_PRICE as issuePrice,
-                ISSUE.INT_TYPE as intType,
-                PRODUCT.REMARK as remark,
-                PRODUCT.FINPROD_ID as finprodId,
-                PRODUCT.FINPROD_NAME as finprodName
-            FROM FIN_PRODUCT PRODUCT
-            LEFT JOIN FIN_PRODUCT_ADD PRODUCT_ADD ON PRODUCT.FINPROD_ID = PRODUCT_ADD.FINPROD_ID
-            LEFT JOIN FIN_PRODUCT_ISSUE ISSUE ON PRODUCT.FINPROD_ID = ISSUE.FINPROD_ID
-            LEFT JOIN FIN_PRODUCT_TYPE PRODUCT_TYPE ON PRODUCT.FINPROD_ID = PRODUCT_TYPE.FINPROD_ID AND PRODUCT_TYPE.BRANCH = 0
-            LEFT JOIN MST_CUSTOMER_INFO CUSTOMER_INFO ON PRODUCT.ISSUER = CUSTOMER_INFO.CUSTOMER_ID
-            where PRODUCT.FINPROD_TYPE2=#{finprodType2,jdbcType=VARCHAR} AND PRODUCT.TRADE_MARKET in (#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04})
-                and (PRODUCT_ADD.ISSUE_STATUS not in (#{ISSUE_STATUS_02}) or PRODUCT_ADD.ISSUE_STATUS is null) and PRODUCT.CIRCULATION_CODE is null
-                and PRODUCT_ADD.LISTING_DATE=#{listingDate,jdbcType=DATE}
-        ) t where t.issueStage=#{issueStage,jdbcType=VARCHAR}
+                ELSE NULL END            AS issueStage,
+                        PRODUCT_ADD.ISSUE_STATUS     as issueStatus,
+                        PRODUCT.FINPROD_MARKET_ID    as finprodMarketId,
+                        PRODUCT.FINPROD_ABBR         as finprodAbbr,
+                        PRODUCT.TRADE_MARKET         as tradeMarket,
+                        PRODUCT.REGIST_ORG           as registOrg,
+                        PRODUCT.ISSUER               as issuer,
+                        PRODUCT.ISSUE_TYPE           as issueType,
+                        ISSUE.ISSUE_CLASS            as issueClass,
+                        ISSUE.TENDER_TYPE            as tenderType,
+                        ISSUE.TENDER_TARGET          as tenderTarget,
+                        ISSUE.ISSUE_EDATE            as issueDate,
+                        PRODUCT_ADD.LISTING_DATE     as listingDate,
+                        PRODUCT_ADD.APPEAR_MARKET_ID as appearMarketId,
+                        PRODUCT.FINPROD_ABBR         as appearMarketAbbr,
+                        PRODUCT.VDATE                as vdate,
+                        PRODUCT.MDATE                as mdate,
+                        PRODUCT_TYPE.TYPE_9          as type9,
+                        PRODUCT_TYPE.TYPE_10         as type10,
+                        PRODUCT_TYPE.TYPE_11         as type11,
+                        PRODUCT.COUPON_SPECIES       as couponSpecies,
+                        PRODUCT.CCY                  as ccy,
+                        PRODUCT.ISSUE_PRICE          as issuePrice,
+                        ISSUE.INT_TYPE               as intType,
+                        PRODUCT.REMARK               as remark,
+                        PRODUCT.FINPROD_ID           as finprodId,
+                        PRODUCT.FINPROD_NAME         as finprodName
+                 FROM FIN_PRODUCT PRODUCT
+                          LEFT JOIN FIN_PRODUCT_ADD PRODUCT_ADD ON PRODUCT.FINPROD_ID = PRODUCT_ADD.FINPROD_ID
+                          LEFT JOIN FIN_PRODUCT_ISSUE ISSUE ON PRODUCT.FINPROD_ID = ISSUE.FINPROD_ID
+                          LEFT JOIN FIN_PRODUCT_TYPE PRODUCT_TYPE
+                                    ON PRODUCT.FINPROD_ID = PRODUCT_TYPE.FINPROD_ID AND PRODUCT_TYPE.BRANCH = 0
+                          LEFT JOIN MST_CUSTOMER_INFO CUSTOMER_INFO ON PRODUCT.ISSUER = CUSTOMER_INFO.CUSTOMER_ID
+                 where PRODUCT.FINPROD_TYPE2 = #{finprodType2,jdbcType=VARCHAR}
+                   AND PRODUCT.TRADE_MARKET in
+                       (#{TRADE_PLACE_01}, #{TRADE_PLACE_02}, #{TRADE_PLACE_03}, #{TRADE_PLACE_04})
+                   and (PRODUCT_ADD.ISSUE_STATUS not in (#{ISSUE_STATUS_02}) or PRODUCT_ADD.ISSUE_STATUS is null)
+                   and PRODUCT.CIRCULATION_CODE is null
+                   and PRODUCT_ADD.LISTING_DATE = #{listingDate,jdbcType=DATE}
+             ) t
+        where t.issueStage = #{issueStage,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectCompleteList" resultType="com.joyintech.tams.invest.batch.tenderbond.dto.FinTenderBondAssetBatchDto">
+         SELECT
+                PRODUCT_ADD.ISSUE_STATUS     as issueStatus,
+                PRODUCT.FINPROD_MARKET_ID    as finprodMarketId,
+                PRODUCT.FINPROD_ABBR         as finprodAbbr,
+                PRODUCT.TRADE_MARKET         as tradeMarket,
+                PRODUCT.REGIST_ORG           as registOrg,
+                PRODUCT.ISSUER               as issuer,
+                PRODUCT.ISSUE_TYPE           as issueType,
+                ISSUE.ISSUE_CLASS            as issueClass,
+                ISSUE.TENDER_TYPE            as tenderType,
+                ISSUE.TENDER_TARGET          as tenderTarget,
+                ISSUE.ISSUE_EDATE            as issueDate,
+                PRODUCT_ADD.LISTING_DATE     as listingDate,
+                PRODUCT_ADD.APPEAR_MARKET_ID as appearMarketId,
+                PRODUCT.FINPROD_ABBR         as appearMarketAbbr,
+                PRODUCT.VDATE                as vdate,
+                PRODUCT.MDATE                as mdate,
+                PRODUCT_TYPE.TYPE_9          as type9,
+                PRODUCT_TYPE.TYPE_10         as type10,
+                PRODUCT_TYPE.TYPE_11         as type11,
+                PRODUCT.COUPON_SPECIES       as couponSpecies,
+                PRODUCT.CCY                  as ccy,
+                PRODUCT.ISSUE_PRICE          as issuePrice,
+                ISSUE.INT_TYPE               as intType,
+                PRODUCT.REMARK               as remark,
+                PRODUCT.FINPROD_ID           as finprodId,
+                PRODUCT.FINPROD_NAME         as finprodName,
+                t.TRADE_ID as totleTradeId
+         FROM FIN_PRODUCT PRODUCT
+         LEFT JOIN FIN_PRODUCT_ADD PRODUCT_ADD ON PRODUCT.FINPROD_ID = PRODUCT_ADD.FINPROD_ID
+         LEFT JOIN FIN_PRODUCT_ISSUE ISSUE ON PRODUCT.FINPROD_ID = ISSUE.FINPROD_ID
+         LEFT JOIN FIN_PRODUCT_TYPE PRODUCT_TYPE ON PRODUCT.FINPROD_ID = PRODUCT_TYPE.FINPROD_ID AND PRODUCT_TYPE.BRANCH = 0
+         inner join (select t.TRADE_ID, FINPROD_ID from TRD_FIN_PRODUCT_BARTER_TOTAL t
+         inner join  TRD_FIN_PRODUCT_DEAL_TOTAL l on t.TRADE_ID=l.TOTLE_TRADE_ID
+         where l.IS_CANCEL='N') t on PRODUCT.FINPROD_ID=t.FINPROD_ID
+         where PRODUCT.FINPROD_TYPE2 = #{finprodType2,jdbcType=VARCHAR}
+           AND PRODUCT.TRADE_MARKET in (#{TRADE_PLACE_01}, #{TRADE_PLACE_02}, #{TRADE_PLACE_03}, #{TRADE_PLACE_04})
+           and PRODUCT_ADD.ISSUE_STATUS = #{ISSUE_STATUS_01}
+           and PRODUCT.CIRCULATION_CODE is not null
+           and PRODUCT_ADD.LISTING_DATE = #{listingDate,jdbcType=DATE}
     </select>
 
     <select id="selectFinprodId" resultType="java.lang.String">
         select T1.FINPROD_ID from FIN_PRODUCT T1
-        where  1=1
+        where 1=1
         <if test="finprodType2 !=null and finprodType2 !=''">
-            AND T1.FINPROD_TYPE2 = #{finprodType2}
+            AND T1.FINPROD_TYPE2 =
+            #{finprodType2}
         </if>
         <if test="TRADE_PLACE_01 != null and TRADE_PLACE_02 !=null">
-            AND T1.TRADE_MARKET in(#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04})
+            AND T1.TRADE_MARKET in(
+            #{TRADE_PLACE_01},
+            #{TRADE_PLACE_02},
+            #{TRADE_PLACE_03},
+            #{TRADE_PLACE_04}
+            )
         </if>
         AND T1.FINPROD_MARKET_ID=#{finprodMarketId,jdbcType=VARCHAR} AND ROWNUM=1
     </select>
 
-    <select id="getBusinessData" parameterType="com.joyintech.tams.invest.common.dto.valuationusemerge.WflValidInputParameter" resultType="java.lang.String">
+    <select id="getBusinessData"
+            parameterType="com.joyintech.tams.invest.common.dto.valuationusemerge.WflValidInputParameter"
+            resultType="java.lang.String">
         select pm.STATUS status
         from SYS_DATA_PROCESS_MARK pm
         inner join (
         select
-        max(HIS_NO)	       HIS_NO,
+        max(HIS_NO) HIS_NO,
         WORKFLOW_ID
         from SYS_DATA_PROCESS_MARK
         <where>
             <if test="pageId != null and pageId !=''">
-                PAGE_ID = #{pageId}
+                PAGE_ID =
+                #{pageId}
             </if>
         </where>
-        group by  WORKFLOW_ID
-        ) tempHis on  pm.HIS_NO = tempHis.HIS_NO and pm.WORKFLOW_ID = tempHis.WORKFLOW_ID
+        group by WORKFLOW_ID
+        ) tempHis on pm.HIS_NO = tempHis.HIS_NO and pm.WORKFLOW_ID = tempHis.WORKFLOW_ID
         <where>
             <if test="seachMode != null and seachMode !='' and seachMode == '01'.toString()">
                 pm.status in ('A','U','P')
             </if>
             <if test="pageId != null and pageId !=''">
-                and pm.PAGE_ID = #{pageId}
+                and pm.PAGE_ID =
+                #{pageId}
             </if>
             <if test="businessDataPk1 != null and businessDataPk1 !=''">
-                and pm.BUSINESS_DATA_PK1 = #{businessDataPk1}
+                and pm.BUSINESS_DATA_PK1 =
+                #{businessDataPk1}
             </if>
             <if test="businessDataPk2 != null and businessDataPk2 !=''">
-                and pm.BUSINESS_DATA_PK2 = #{businessDataPk2}
+                and pm.BUSINESS_DATA_PK2 =
+                #{businessDataPk2}
             </if>
             <if test="workflowId != null and workflowId !=''">
-                and pm.WORKFLOW_ID != #{workflowId}
+                and pm.WORKFLOW_ID !=
+                #{workflowId}
             </if>
         </where>
         order by pm.create_time desc
     </select>
 
     <select id="selectProduct" resultType="com.joyintech.tams.common.base.entity.FinProduct">
-        select * from FIN_PRODUCT
-        where FINPROD_MARKET_ID=#{finprodMarketId,jdbcType=VARCHAR}
-            AND TRADE_MARKET in (#{TRADE_PLACE_01},#{TRADE_PLACE_02})
-            AND FINPROD_TYPE2=#{finprodType2,jdbcType=VARCHAR}
+        select *
+        from FIN_PRODUCT
+        where FINPROD_MARKET_ID = #{finprodMarketId,jdbcType=VARCHAR}
+          AND TRADE_MARKET in (#{TRADE_PLACE_01}, #{TRADE_PLACE_02})
+          AND FINPROD_TYPE2 = #{finprodType2,jdbcType=VARCHAR}
     </select>
 
     <!-- 资产名称、资产简称、交易场所、登记托管机构、起息日、到期日、发行人、息票品种、利率类型、币种 进行去重 -->
     <select id="getBySecId" resultType="com.joyintech.tams.common.base.entity.InterfPayhsrcsecinfo">
-        SELECT SECFULLNAME,SECNAME,MARKET2,INSTITUTION,VDATE,MDATE,ISSUERSHORT,COUPONSPECIES,INTERESTRATE,CCY,MAX(SOURCE) SOURCE
-        from INTERF_PAYHSRCSECINFO WHERE SECID = #{finprodMarketId,jdbcType=VARCHAR}
-        group by SECFULLNAME,SECNAME,MARKET2,INSTITUTION,VDATE,MDATE,ISSUERSHORT,COUPONSPECIES,INTERESTRATE,CCY
+        SELECT SECFULLNAME,
+               SECNAME,
+               MARKET2,
+               INSTITUTION,
+               VDATE,
+               MDATE,
+               ISSUERSHORT,
+               COUPONSPECIES,
+               INTERESTRATE,
+               CCY,
+               MAX(SOURCE) SOURCE
+        from INTERF_PAYHSRCSECINFO
+        WHERE SECID = #{finprodMarketId,jdbcType=VARCHAR}
+        group by SECFULLNAME, SECNAME, MARKET2, INSTITUTION, VDATE, MDATE, ISSUERSHORT, COUPONSPECIES, INTERESTRATE, CCY
     </select>
 
     <select id="getByParam" resultType="com.joyintech.tams.common.base.entity.InterfPayhsrcsecinfo">
-        SELECT SECID,SECFULLNAME,SECNAME,MARKET2,INSTITUTION,VDATE,MDATE,ISSUERSHORT,COUPONSPECIES,INTERESTRATE,CCY,SOURCE
+        SELECT SECID,
+               SECFULLNAME,
+               SECNAME,
+               MARKET2,
+               INSTITUTION,
+               VDATE,
+               MDATE,
+               ISSUERSHORT,
+               COUPONSPECIES,
+               INTERESTRATE,
+               CCY,
+               SOURCE
         from INTERF_PAYHSRCSECINFO
-        WHERE SECFULLNAME=#{finprodName,jdbcType=VARCHAR}
-          and SECNAME=#{finprodAbbr,jdbcType=VARCHAR}
-          and MARKET2=#{tradeMarket,jdbcType=VARCHAR}
-          and INSTITUTION=#{registOrg,jdbcType=VARCHAR}
-          and VDATE=#{vdate,jdbcType=DATE}
-          and MDATE=#{mdate,jdbcType=DATE}
-          and ISSUERSHORT=#{issuer,jdbcType=VARCHAR}
-          and COUPONSPECIES=#{couponSpecies,jdbcType=VARCHAR}
-          and INTERESTRATE=#{intType,jdbcType=VARCHAR}
-          and CCY=#{ccy,jdbcType=VARCHAR}
+        WHERE SECFULLNAME = #{finprodName,jdbcType=VARCHAR}
+          and SECNAME = #{finprodAbbr,jdbcType=VARCHAR}
+          and MARKET2 = #{tradeMarket,jdbcType=VARCHAR}
+          and INSTITUTION = #{registOrg,jdbcType=VARCHAR}
+          and VDATE = #{vdate,jdbcType=DATE}
+          and MDATE = #{mdate,jdbcType=DATE}
+          and ISSUERSHORT = #{issuer,jdbcType=VARCHAR}
+          and COUPONSPECIES = #{couponSpecies,jdbcType=VARCHAR}
+          and INTERESTRATE = #{intType,jdbcType=VARCHAR}
+          and CCY = #{ccy,jdbcType=VARCHAR}
     </select>
 </mapper>

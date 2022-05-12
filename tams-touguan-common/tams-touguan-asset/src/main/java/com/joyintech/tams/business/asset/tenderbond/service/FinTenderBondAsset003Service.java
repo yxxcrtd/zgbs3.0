@@ -273,11 +273,14 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
             validMessages.add(new ValidMessage("发行阶段不能为空"));
         }
         if (StringUtil.equals(dto.getOperateType(), OperationType.REVOKE.name())) {
-            if (StringUtil.isNotEmpty(dto.getListingDate()) && dto.getListingDate().compareTo(iPlatformDate.getSysDate()) < 0) {
-                validMessages.add(new ValidMessage("上市日小于平台日不允许撤销"));
-            }
-            if (Objects.nonNull(dto.getIssueStage()) && !StringUtil.equals(dto.getIssueStage(), DictCodeListExt4.发行阶段_已上市.getValue())) {
-                validMessages.add(new ValidMessage("发行阶段不为已上市的不能进行撤销"));
+            if(!(StringUtil.isNotEmpty(dto.getIssueStatus()) && StringUtil.equals(dto.getIssueStatus(),DictCodeListExt1.发行状态_发行成功.getValue())
+                    && StringUtil.equals(dto.getIssueStage(), DictCodeListExt4.发行阶段_已发行.getValue()))) {
+                if (StringUtil.isNotEmpty(dto.getListingDate()) && dto.getListingDate().compareTo(iPlatformDate.getSysDate()) < 0) {
+                    validMessages.add(new ValidMessage("上市日小于平台日不允许撤销"));
+                }
+                if (Objects.nonNull(dto.getIssueStage()) && !StringUtil.equals(dto.getIssueStage(), DictCodeListExt4.发行阶段_已上市.getValue())) {
+                    validMessages.add(new ValidMessage("发行阶段不为已上市的不能进行撤销"));
+                }
             }
             Integer count = finTenderBoundAssetMapper.countFinprodIdUse(dto.getFinprodId(), DictCodeList.是否_否.getValue(),DictCodeList.是否_否.getValue());
             if (Objects.nonNull(count) && count > 0) {
@@ -295,6 +298,9 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
             }
             if (Objects.nonNull(dto.getIssueStage()) && !StringUtil.equals(dto.getIssueStage(), DictCodeListExt4.发行阶段_已发行.getValue())) {
                 validMessages.add(new ValidMessage("发行阶段不为已发行的不能进行上市流通"));
+            }
+            if (Objects.nonNull(dto.getIssueStatus()) && StringUtil.equals(dto.getIssueStatus(), DictCodeListExt1.发行状态_发行成功.getValue())) {
+                validMessages.add(new ValidMessage("发行状态为发行成功的不能再次进行上市流通"));
             }
         }
         return validMessages;

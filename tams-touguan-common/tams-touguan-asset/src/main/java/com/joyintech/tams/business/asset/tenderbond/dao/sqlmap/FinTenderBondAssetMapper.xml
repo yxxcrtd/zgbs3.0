@@ -28,10 +28,10 @@
             ISSUE.TENDER_EDATE >= TO_DATE(#{platformDate},'YYYY-MM-DD')  THEN '01'
             WHEN ((ISSUE.ISSUE_DATE < TO_DATE(#{platformDate},'YYYY-MM-DD') or
             ISSUE.TENDER_EDATE < TO_DATE(#{platformDate},'YYYY-MM-DD')) and PRODUCT.CIRCULATION_CODE is null) or
-            (PRODUCT.CIRCULATION_CODE is not null and PRODUCT_ADD.LISTING_DATE <TO_DATE(#{platformDate},'YYYY-MM-DD')) THEN '02'
+            (PRODUCT.CIRCULATION_CODE is not null and PRODUCT_ADD.LISTING_DATE > TO_DATE(#{platformDate},'YYYY-MM-DD')) THEN '02'
             WHEN (ISSUE.ISSUE_DATE < TO_DATE(#{platformDate},'YYYY-MM-DD') or
             ISSUE.TENDER_EDATE < TO_DATE(#{platformDate},'YYYY-MM-DD')) and PRODUCT.CIRCULATION_CODE is not null
-            and  PRODUCT_ADD.LISTING_DATE >= TO_DATE(#{platformDate},'YYYY-MM-DD') THEN '03'
+            and  PRODUCT_ADD.LISTING_DATE <= TO_DATE(#{platformDate},'YYYY-MM-DD') THEN '03'
             ]]>
             ELSE NULL END AS issueStage,
             PRODUCT_ADD.ISSUE_STATUS as issueStatus,
@@ -63,6 +63,8 @@
             PRODUCT.COUPON_SPECIES as couponSpecies,
             PRODUCT.CCY as ccy,
             ISSUE.ISSUE_PRICE as issuePrice,
+            ISSUE.INT_RATE_ID as intRateId,
+            ISSUE.BP as bp,
             ISSUE.INT_TYPE as intType,
             ISSUE.PAY_CYCLE as payCycle,
             ISSUE.REFER_YIELD as referYield ,
@@ -73,7 +75,10 @@
             ZX.RATING as debRate,
             MCIT.CUSTOMER_NAME as debRateOrg,
             PRODUCT.REMARK as remark,
-            PRODUCT.FINPROD_ID as finprodId
+            PRODUCT.FINPROD_ID as finprodId,
+            case when (PRODUCT.COUPON_SPECIES='"01"'  or ISSUE.INT_TYPE='02' )
+            then SDL.ITEM_VALUE || '+' || to_char(ISSUE.bp * 10000 ,'FM9999999999999990.9000') || 'BP'
+            else to_char(ISSUE.REFER_YIELD * 100 ,'FM9999999999999990.9000') end as rate
         FROM FIN_PRODUCT PRODUCT
         LEFT JOIN FIN_PRODUCT_ADD PRODUCT_ADD ON PRODUCT.FINPROD_ID = PRODUCT_ADD.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ISSUE ISSUE ON PRODUCT.FINPROD_ID = ISSUE.FINPROD_ID
@@ -96,6 +101,7 @@
             ) WHERE RANK=1
         ) ZX ON PRODUCT.FINPROD_MARKET_ID = ZX.ASSET_CODE
         LEFT JOIN MST_CUSTOMER_INFO MCIT ON MCIT.CUSTOMER_ID=ZX.GRADE_ORG_ID
+        LEFT JOIN (select * from  SYS_DATADICT_LIST where DICT_CODE='SECRATE_DATA') SDL on ISSUE.INT_RATE_ID = SDL.ITEM_CODE
         <where> PRODUCT.FINPROD_TYPE2=#{finprodType2,jdbcType=VARCHAR}
               AND PRODUCT.TRADE_MARKET in ('01','02','03','04') <!-- 限制为银行间和商业柜台,上海和甚至交易所-->
             <if test="finprodMarketId !=null and finprodMarketId !=''">
@@ -246,7 +252,7 @@
                     t.planIssueAmt ||''= #{search} OR
                     t.planIssueAmt ||''= #{search} OR
                     t.issuePrice ||''= #{search} OR
-                    t.referYield ||''= #{search} OR
+                    t.rate ||''= #{search} OR
                     t.minPerTamt ||''= #{search} OR
                     t.maxPerUtamt ||''= #{search} OR
                     to_char(t.issueDate,'yyyy-MM-dd')  = #{search} OR

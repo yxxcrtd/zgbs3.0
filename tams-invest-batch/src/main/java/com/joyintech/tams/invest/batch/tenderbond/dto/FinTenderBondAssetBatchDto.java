@@ -137,6 +137,8 @@ public class FinTenderBondAssetBatchDto {
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
 
+    private String totleTradeId;
+
     public String getIssueStage() {
         return issueStage;
     }
@@ -455,5 +457,13 @@ public class FinTenderBondAssetBatchDto {
 
     public void setFinprodName(String finprodName) {
         this.finprodName = finprodName;
+    }
+
+    public String getTotleTradeId() {
+        return totleTradeId;
+    }
+
+    public void setTotleTradeId(String totleTradeId) {
+        this.totleTradeId = totleTradeId;
     }
 }
