@@ -34,7 +34,7 @@ public class IRskRulePoolConfig extends RskRulePoolConfig {
         if(CommonUtil.isType(getClassifyDimension(), BussinessDictCodeListRds.分类维度_开放周期)) {
             Integer compare= RiskUtil.openCycleMap.get(getClassifyDimensionVal());
             if(null!=compare){
-                Map<String,Integer> ptlCycleMap= AssetCommonUtil.comparePtlCycle(portList,compare,null);
+                Map<String,Integer> ptlCycleMap= AssetCommonUtil.comparePtlCycle(portList,compare);
                 if(!CollectionUtils.isEmpty(ptlCycleMap)) {
                     //使用迭代器删除防止修改modCount属性。导致抛出异常java.util.ConcurrentModificationException
                     Iterator<String> iterator = portList.iterator();
