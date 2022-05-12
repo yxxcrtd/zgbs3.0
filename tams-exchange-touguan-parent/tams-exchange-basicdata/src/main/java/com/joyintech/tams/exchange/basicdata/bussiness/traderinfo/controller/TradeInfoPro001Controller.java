@@ -255,23 +255,33 @@ public class TradeInfoPro001Controller extends BaseController {
         }
         try{
                //一个交易商只能维护一个 本方交易员
-            if (existsOur(tradeInfoProSaveRequest)>0){
+            if (existsOur(tradeInfoProSaveRequest)>0 && StringUtil.equals(tradeInfoProSaveRequest.getIsOur(),"Y")){
                 return new Message().fail().setMessage("一个交易商只能维护一个本方交易员!");
             }
             //上交所新增交易主体时，同一交易商+交易场所下，交易员代码应不允许重复
-               if(StringUtil.equals(dto.getTradeMarket(),"03")&& existsTrader(tradeInfoProSaveRequest)>0){
+            if(StringUtil.equals(dto.getTradeMarket(),"03")&& existsTrader(tradeInfoProSaveRequest)>0){
                    return new Message().fail().setMessage("交易员代码不允许重复!");
-               }
+            }
+            //深交所交易主体类型为机构经济/个人经济时，交易主体代码应只允许维护一条
+            if(StringUtil.equals(dto.getTradeMarket(),"04")&&(StringUtil.equals(dto.getDealerPartyType(),"03")||StringUtil.equals(dto.getDealerPartyType(),"04"))){
+                 if (existsDealerParty(dto)>0){
+                     return new Message().fail().setMessage("深交所交易主体类型为机构经济或个人经济时,交易主体代码应只允许维护一条!");
+                 }
+            }
 
                //新增交易商详情信息
-               insertDealerDetails1(tradeInfoProSaveRequest);
-               return new Message().success();
+            insertDealerDetails1(tradeInfoProSaveRequest);
+            return new Message().success();
 
         }catch (Exception e){
             logger.error("新增功能异常", e);
             return new Message().fail().setMessage("新增异常");
 
         }
+    }
+
+    private int existsDealerParty(TradeInfoProSaveRequest dto) {
+        return tradeInfoPro001Service.existsDealerParty(dto);
     }
 
     private int existsOur(TradeInfoProSaveRequest dto) {
