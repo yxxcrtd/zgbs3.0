@@ -1362,7 +1362,7 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
     public boolean volumeInstruction() {
         // 新债
         if (newBond()) {
-            return TargetTypeEnum.YES.codeEquals(this.getTargetType());
+            return TargetTypeEnum.VOLUME.codeEquals(this.getTargetType());
         }
         return this.getEntrustNum() > 0L;
     }

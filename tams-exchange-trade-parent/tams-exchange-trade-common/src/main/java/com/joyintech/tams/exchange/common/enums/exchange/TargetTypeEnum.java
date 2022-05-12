@@ -11,12 +11,12 @@ import com.joyintech.tams.exchange.common.enums.IEnum;
  */
 public enum TargetTypeEnum implements IEnum<String> {
 
-    YES("01", "数量"),
-    NO("02", "金额"),
+    VOLUME("01", "数量"),
+    AMT("02", "金额"),
     ;
 
-    public final String code;
-    public final String description;
+    private final String code;
+    private final String description;
 
     TargetTypeEnum(String code, String description) {
         this.code = code;

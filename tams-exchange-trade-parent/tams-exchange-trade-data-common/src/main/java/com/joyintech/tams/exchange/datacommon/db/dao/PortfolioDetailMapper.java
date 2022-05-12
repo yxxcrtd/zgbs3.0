@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * @author swwan
- * @date 2022/5/10 - 22:29
+ * @date 2022/5/11 - 9:44
  */
 public interface PortfolioDetailMapper extends IMybatisMapper<PortfolioDetail, String, PortfolioDetailExample> {
     long countByExample(PortfolioDetailExample example);

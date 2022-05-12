@@ -5,7 +5,8 @@ import com.joyintech.tams.exchange.common.db.domain.PortfolioDetail;
 import com.joyintech.tams.exchange.datacommon.cache.AsyncService;
 
 import java.util.List;
-    /**
+
+/**
  * @author swwan
  * @date 2022/5/10 - 22:29
  */
@@ -26,9 +27,9 @@ public interface PortfolioDetailService extends AsyncService<String, PortfolioDe
 
     PortfolioDetail selectByPrimaryKey(String id);
 
-    int updateByExampleSelective(PortfolioDetail record,PortfolioDetailExample example);
+    int updateByExampleSelective(PortfolioDetail record, PortfolioDetailExample example);
 
-    int updateByExample(PortfolioDetail record,PortfolioDetailExample example);
+    int updateByExample(PortfolioDetail record, PortfolioDetailExample example);
 
     int updateByPrimaryKeySelective(PortfolioDetail record);
 

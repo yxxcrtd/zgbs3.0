@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * @author swwan
- * @date 2022/5/10 - 22:29
+ * @date 2022/5/11 - 9:44
  */
 public class PortfolioDetailExample {
     protected String orderByClause;
@@ -19,20 +19,20 @@ public class PortfolioDetailExample {
         oredCriteria = new ArrayList<>();
     }
 
-    public void setOrderByClause(String orderByClause) {
-        this.orderByClause = orderByClause;
-    }
-
     public String getOrderByClause() {
         return orderByClause;
     }
 
-    public void setDistinct(boolean distinct) {
-        this.distinct = distinct;
+    public void setOrderByClause(String orderByClause) {
+        this.orderByClause = orderByClause;
     }
 
     public boolean isDistinct() {
         return distinct;
+    }
+
+    public void setDistinct(boolean distinct) {
+        this.distinct = distinct;
     }
 
     public List<Criteria> getOredCriteria() {
@@ -386,6 +386,76 @@ public class PortfolioDetailExample {
 
         public Criteria andBusiStatusNotBetween(String value1, String value2) {
             addCriterion("BUSI_STATUS not between", value1, value2, "busiStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andInstructionIdIsNull() {
+            addCriterion("INSTRUCTION_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andInstructionIdIsNotNull() {
+            addCriterion("INSTRUCTION_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andInstructionIdEqualTo(String value) {
+            addCriterion("INSTRUCTION_ID =", value, "instructionId");
+            return (Criteria) this;
+        }
+
+        public Criteria andInstructionIdNotEqualTo(String value) {
+            addCriterion("INSTRUCTION_ID <>", value, "instructionId");
+            return (Criteria) this;
+        }
+
+        public Criteria andInstructionIdGreaterThan(String value) {
+            addCriterion("INSTRUCTION_ID >", value, "instructionId");
+            return (Criteria) this;
+        }
+
+        public Criteria andInstructionIdGreaterThanOrEqualTo(String value) {
+            addCriterion("INSTRUCTION_ID >=", value, "instructionId");
+            return (Criteria) this;
+        }
+
+        public Criteria andInstructionIdLessThan(String value) {
+            addCriterion("INSTRUCTION_ID <", value, "instructionId");
+            return (Criteria) this;
+        }
+
+        public Criteria andInstructionIdLessThanOrEqualTo(String value) {
+            addCriterion("INSTRUCTION_ID <=", value, "instructionId");
+            return (Criteria) this;
+        }
+
+        public Criteria andInstructionIdLike(String value) {
+            addCriterion("INSTRUCTION_ID like", value, "instructionId");
+            return (Criteria) this;
+        }
+
+        public Criteria andInstructionIdNotLike(String value) {
+            addCriterion("INSTRUCTION_ID not like", value, "instructionId");
+            return (Criteria) this;
+        }
+
+        public Criteria andInstructionIdIn(List<String> values) {
+            addCriterion("INSTRUCTION_ID in", values, "instructionId");
+            return (Criteria) this;
+        }
+
+        public Criteria andInstructionIdNotIn(List<String> values) {
+            addCriterion("INSTRUCTION_ID not in", values, "instructionId");
+            return (Criteria) this;
+        }
+
+        public Criteria andInstructionIdBetween(String value1, String value2) {
+            addCriterion("INSTRUCTION_ID between", value1, value2, "instructionId");
+            return (Criteria) this;
+        }
+
+        public Criteria andInstructionIdNotBetween(String value1, String value2) {
+            addCriterion("INSTRUCTION_ID not between", value1, value2, "instructionId");
             return (Criteria) this;
         }
 
@@ -744,38 +814,6 @@ public class PortfolioDetailExample {
 
         private String typeHandler;
 
-        public String getCondition() {
-            return condition;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-
-        public Object getSecondValue() {
-            return secondValue;
-        }
-
-        public boolean isNoValue() {
-            return noValue;
-        }
-
-        public boolean isSingleValue() {
-            return singleValue;
-        }
-
-        public boolean isBetweenValue() {
-            return betweenValue;
-        }
-
-        public boolean isListValue() {
-            return listValue;
-        }
-
-        public String getTypeHandler() {
-            return typeHandler;
-        }
-
         protected Criterion(String condition) {
             super();
             this.condition = condition;
@@ -810,6 +848,38 @@ public class PortfolioDetailExample {
 
         protected Criterion(String condition, Object value, Object secondValue) {
             this(condition, value, secondValue, null);
+        }
+
+        public String getCondition() {
+            return condition;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public Object getSecondValue() {
+            return secondValue;
+        }
+
+        public boolean isNoValue() {
+            return noValue;
+        }
+
+        public boolean isSingleValue() {
+            return singleValue;
+        }
+
+        public boolean isBetweenValue() {
+            return betweenValue;
+        }
+
+        public boolean isListValue() {
+            return listValue;
+        }
+
+        public String getTypeHandler() {
+            return typeHandler;
         }
     }
 }

@@ -40,6 +40,8 @@ public enum ErrorCode implements IEnum<Integer> {
 
     INSTRUCTION_APPLY_NOT_UNIQUE(25, "只能进行一次该申报"),
 
+    MIN_TRD_UNIT_LIMIT_ERROR(26, "交易属性错误"),
+
     DB_ERROR(100, "数据库返回错误"),
 
     INNER_RISK_ERROR(200, "内部风控检查错误"),
@@ -169,6 +171,8 @@ public enum ErrorCode implements IEnum<Integer> {
     INSTRUCTIONS_DERIVATIVE_BS_OC_ERROR(4030, "指令中衍生品买卖方向和开平仓标志不能为空"),
 
     INSTRUCTIONS_DERIVATIVE_BS_OC_NOT_MATCH_ERROR(4031, "指令中衍生品买卖方向和开平标志不匹配"),
+
+    INSTRUCTION_DETAILS_NOT_EXIST(4032, "指令组合明细不存在"),
 
     INSTRUCTION_PLEDGE_NUMBER_ERROR(4050, "抵押券数量错误"),
 

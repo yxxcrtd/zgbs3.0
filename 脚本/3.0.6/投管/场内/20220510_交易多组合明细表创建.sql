@@ -13,12 +13,13 @@ create table T_PORTFOLIO_DETAIL
         primary key,
     BUSI_TYPE      varchar2(8)  not null,
     BUSI_ID        varchar2(32) not null,
-    BUSI_STATUS    varchar2(8),
-    PORTFOLIO_ID   varchar2(64),
-    PORTFOLIO_NAME varchar2(64),
+    BUSI_STATUS    varchar2(8)  not null,
+    INSTRUCTION_ID varchar2(64) not null,
+    PORTFOLIO_ID   varchar2(64) not null,
+    PORTFOLIO_NAME varchar2(64) not null,
     TARGET_AMT     NUMBER(30, 2) default 0,
     TARGET_NUM     NUMBER(30, 2) default 0,
-    TARGET_TYPE    varchar2(8)
+    TARGET_TYPE    varchar2(8)  not null
 )
 /
 
@@ -29,6 +30,8 @@ comment on column T_PORTFOLIO_DETAIL.BUSI_TYPE is '业务类型：1 下单；2 �
 comment on column T_PORTFOLIO_DETAIL.BUSI_ID is '业务ID'
 /
 comment on column T_PORTFOLIO_DETAIL.BUSI_STATUS is '业务状态：1 初始；2 确认'
+/
+comment on column T_PORTFOLIO_DETAIL.INSTRUCTION_ID is '指令ID'
 /
 comment on column T_PORTFOLIO_DETAIL.PORTFOLIO_ID is '组合ID'
 /

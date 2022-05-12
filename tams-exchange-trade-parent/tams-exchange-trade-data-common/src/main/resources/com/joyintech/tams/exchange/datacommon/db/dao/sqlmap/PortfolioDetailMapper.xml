@@ -8,6 +8,7 @@
     <result column="BUSI_TYPE" jdbcType="VARCHAR" property="busiType" />
     <result column="BUSI_ID" jdbcType="VARCHAR" property="busiId" />
     <result column="BUSI_STATUS" jdbcType="VARCHAR" property="busiStatus" />
+    <result column="INSTRUCTION_ID" jdbcType="VARCHAR" property="instructionId" />
     <result column="PORTFOLIO_ID" jdbcType="VARCHAR" property="portfolioId" />
     <result column="PORTFOLIO_NAME" jdbcType="VARCHAR" property="portfolioName" />
     <result column="TARGET_AMT" jdbcType="DECIMAL" property="targetAmt" />
@@ -76,8 +77,8 @@
   </sql>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    ID, BUSI_TYPE, BUSI_ID, BUSI_STATUS, PORTFOLIO_ID, PORTFOLIO_NAME, TARGET_AMT, TARGET_NUM, 
-    TARGET_TYPE
+    ID, BUSI_TYPE, BUSI_ID, BUSI_STATUS, INSTRUCTION_ID, PORTFOLIO_ID, PORTFOLIO_NAME, 
+    TARGET_AMT, TARGET_NUM, TARGET_TYPE
   </sql>
   <select id="selectByExample" parameterType="com.joyintech.tams.exchange.common.db.domain.PortfolioDetailExample" resultMap="BaseResultMap">
     <!--@mbg.generated-->
@@ -119,13 +120,13 @@
       select T_PORTFOLIO_DETAIL_ID_SEQ.nextval from dual
     </selectKey>
     insert into T_PORTFOLIO_DETAIL (ID, BUSI_TYPE, BUSI_ID, 
-      BUSI_STATUS, PORTFOLIO_ID, PORTFOLIO_NAME, 
-      TARGET_AMT, TARGET_NUM, TARGET_TYPE
-      )
+      BUSI_STATUS, INSTRUCTION_ID, PORTFOLIO_ID, 
+      PORTFOLIO_NAME, TARGET_AMT, TARGET_NUM, 
+      TARGET_TYPE)
     values (#{id,jdbcType=VARCHAR}, #{busiType,jdbcType=VARCHAR}, #{busiId,jdbcType=VARCHAR}, 
-      #{busiStatus,jdbcType=VARCHAR}, #{portfolioId,jdbcType=VARCHAR}, #{portfolioName,jdbcType=VARCHAR}, 
-      #{targetAmt,jdbcType=DECIMAL}, #{targetNum,jdbcType=DECIMAL}, #{targetType,jdbcType=VARCHAR}
-      )
+      #{busiStatus,jdbcType=VARCHAR}, #{instructionId,jdbcType=VARCHAR}, #{portfolioId,jdbcType=VARCHAR}, 
+      #{portfolioName,jdbcType=VARCHAR}, #{targetAmt,jdbcType=DECIMAL}, #{targetNum,jdbcType=DECIMAL}, 
+      #{targetType,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.joyintech.tams.exchange.common.db.domain.PortfolioDetail">
     <!--@mbg.generated-->
@@ -143,6 +144,9 @@
       </if>
       <if test="busiStatus != null">
         BUSI_STATUS,
+      </if>
+      <if test="instructionId != null">
+        INSTRUCTION_ID,
       </if>
       <if test="portfolioId != null">
         PORTFOLIO_ID,
@@ -170,6 +174,9 @@
       </if>
       <if test="busiStatus != null">
         #{busiStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="instructionId != null">
+        #{instructionId,jdbcType=VARCHAR},
       </if>
       <if test="portfolioId != null">
         #{portfolioId,jdbcType=VARCHAR},
@@ -211,6 +218,9 @@
       <if test="record.busiStatus != null">
         BUSI_STATUS = #{record.busiStatus,jdbcType=VARCHAR},
       </if>
+      <if test="record.instructionId != null">
+        INSTRUCTION_ID = #{record.instructionId,jdbcType=VARCHAR},
+      </if>
       <if test="record.portfolioId != null">
         PORTFOLIO_ID = #{record.portfolioId,jdbcType=VARCHAR},
       </if>
@@ -238,6 +248,7 @@
       BUSI_TYPE = #{record.busiType,jdbcType=VARCHAR},
       BUSI_ID = #{record.busiId,jdbcType=VARCHAR},
       BUSI_STATUS = #{record.busiStatus,jdbcType=VARCHAR},
+      INSTRUCTION_ID = #{record.instructionId,jdbcType=VARCHAR},
       PORTFOLIO_ID = #{record.portfolioId,jdbcType=VARCHAR},
       PORTFOLIO_NAME = #{record.portfolioName,jdbcType=VARCHAR},
       TARGET_AMT = #{record.targetAmt,jdbcType=DECIMAL},
@@ -259,6 +270,9 @@
       </if>
       <if test="busiStatus != null">
         BUSI_STATUS = #{busiStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="instructionId != null">
+        INSTRUCTION_ID = #{instructionId,jdbcType=VARCHAR},
       </if>
       <if test="portfolioId != null">
         PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR},
@@ -284,6 +298,7 @@
     set BUSI_TYPE = #{busiType,jdbcType=VARCHAR},
       BUSI_ID = #{busiId,jdbcType=VARCHAR},
       BUSI_STATUS = #{busiStatus,jdbcType=VARCHAR},
+      INSTRUCTION_ID = #{instructionId,jdbcType=VARCHAR},
       PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR},
       PORTFOLIO_NAME = #{portfolioName,jdbcType=VARCHAR},
       TARGET_AMT = #{targetAmt,jdbcType=DECIMAL},
@@ -308,6 +323,11 @@
       <trim prefix="BUSI_STATUS = case" suffix="end,">
         <foreach collection="list" index="index" item="item">
           when ID = #{item.id,jdbcType=VARCHAR} then #{item.busiStatus,jdbcType=VARCHAR}
+        </foreach>
+      </trim>
+      <trim prefix="INSTRUCTION_ID = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          when ID = #{item.id,jdbcType=VARCHAR} then #{item.instructionId,jdbcType=VARCHAR}
         </foreach>
       </trim>
       <trim prefix="PORTFOLIO_ID = case" suffix="end,">

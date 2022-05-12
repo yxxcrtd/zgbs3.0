@@ -14,41 +14,55 @@ public class PortfolioDetail implements Serializable, KeyMethodInterface<String>
     private static final long serialVersionUID = 1L;
     @ApiModelProperty(value = "主键ID")
     private String id;
+
     /**
      * 业务类型：1 下单；2 撤单；3 成交
      */
     @ApiModelProperty(value = "业务类型：1 下单；2 撤单；3 成交")
     private String busiType;
+
     /**
      * 业务ID
      */
     @ApiModelProperty(value = "业务ID")
     private String busiId;
+
     /**
      * 业务状态：1 初始；2 确认
      */
     @ApiModelProperty(value = "业务状态：1 初始；2 确认")
     private String busiStatus;
+
+    /**
+     * 指令ID
+     */
+    @ApiModelProperty(value = "指令ID")
+    private String instructionId;
+
     /**
      * 组合ID
      */
     @ApiModelProperty(value = "组合ID")
     private String portfolioId;
+
     /**
      * 组合名称
      */
     @ApiModelProperty(value = "组合名称")
     private String portfolioName;
+
     /**
      * 目标金额
      */
     @ApiModelProperty(value = "目标金额")
     private BigDecimal targetAmt;
+
     /**
      * 目标数量
      */
     @ApiModelProperty(value = "目标数量")
     private BigDecimal targetNum;
+
     /**
      * 目标类型：01 数量；02 金额
      */
@@ -85,6 +99,14 @@ public class PortfolioDetail implements Serializable, KeyMethodInterface<String>
 
     public void setBusiStatus(String busiStatus) {
         this.busiStatus = busiStatus == null ? null : busiStatus.trim();
+    }
+
+    public String getInstructionId() {
+        return instructionId;
+    }
+
+    public void setInstructionId(String instructionId) {
+        this.instructionId = instructionId == null ? null : instructionId.trim();
     }
 
     public String getPortfolioId() {
@@ -137,6 +159,7 @@ public class PortfolioDetail implements Serializable, KeyMethodInterface<String>
         sb.append(", busiType=").append(busiType);
         sb.append(", busiId=").append(busiId);
         sb.append(", busiStatus=").append(busiStatus);
+        sb.append(", instructionId=").append(instructionId);
         sb.append(", portfolioId=").append(portfolioId);
         sb.append(", portfolioName=").append(portfolioName);
         sb.append(", targetAmt=").append(targetAmt);
