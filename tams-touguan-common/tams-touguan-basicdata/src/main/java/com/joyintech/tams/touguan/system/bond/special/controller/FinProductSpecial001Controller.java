@@ -8,10 +8,11 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.common.ExcelValidDto;
-import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.touguan.system.bond.special.dto.FinProductSpecialDto;
+import com.joyintech.tams.touguan.system.bond.special.dto.FinProductSpecialSelectOptionDto;
 import com.joyintech.tams.touguan.system.bond.special.dto.req.FinProductSpecialQueryRequest;
 import com.joyintech.tams.touguan.system.bond.special.dto.req.FinProductSpecialSelectOptionQueryRequest;
 import com.joyintech.tams.touguan.system.bond.special.service.FinProductSpecialService;
@@ -31,7 +32,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 特殊债券信息
@@ -42,7 +45,7 @@ import java.util.List;
 @Controller
 @PageId("FinProductSpecial001")
 @RequestMapping("/system/bond/FinProductSpecial001")
-@Api(tags = "特殊债券信息")
+@Api(tags = "银行间基础信息-特殊债券信息")
 public class FinProductSpecial001Controller extends BaseController {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
@@ -51,8 +54,16 @@ public class FinProductSpecial001Controller extends BaseController {
     private FinProductSpecialService finProductSpecialService;
     @Autowired
     private FinProductSpecialValidatorService finProductSpecialValidatorService;
-    @Autowired
-    private IPlatformDate iPlatformDate;
+
+
+    @ApiOperation(value = "查询页面初始化参数", notes = "查询页面初始化参数")
+    @PostMapping("/init")
+    @ResponseBody
+    public Message<Map<String, Object>> init() {
+        Map<String, Object> model = new HashMap<>(1);
+        model.put("YES_NO", DictCodeList.是否_是.getValue());
+        return new Message<>(model).success();
+    }
 
     @ResponseBody
     @PostMapping("/findPage")
@@ -66,7 +77,7 @@ public class FinProductSpecial001Controller extends BaseController {
     @ResponseBody
     @PostMapping("/selectOption")
     @ApiOperation(value = "特殊债券信息简单查询", notes = "特殊债券信息简单查询")
-    public Message<Page<FinProductSpecialDto>> selectOption(@RequestBody FinProductSpecialSelectOptionQueryRequest request) {
+    public Message<Page<FinProductSpecialSelectOptionDto>> selectOption(@RequestBody FinProductSpecialSelectOptionQueryRequest request) {
         logger.info("特殊债券信息简单查询参数：{}", JSON.toJSONString(request));
         return Message.success("success", finProductSpecialService.querySelectOption(request));
     }
@@ -128,8 +139,8 @@ public class FinProductSpecial001Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping(value = "checkConfirmMsgForImportData")
-    public AjaxResult checkConfirmMsgForImportData(String fileName)  {
-        return finProductSpecialService.checkConfirmMsgForImportData(fileName);
+    public AjaxResult checkConfirmMsgForImportData(String fileName) {
+        return finProductSpecialValidatorService.checkConfirmMsgForImportData(fileName);
     }
 
     /**
