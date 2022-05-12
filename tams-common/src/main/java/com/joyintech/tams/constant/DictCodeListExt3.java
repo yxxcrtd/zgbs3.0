@@ -1995,7 +1995,7 @@ public enum DictCodeListExt3 implements BaseDictCodeList {
     交易场所_境外交易场所(DictCode.交易场所,"10","境外交易场所"),
     交易场所_北京金融资产交易所(DictCode.交易场所,"11","北京金融资产交易所"),
     交易场所_香港联合交易所(DictCode.交易场所,"12","香港联合交易所"),
-
+    共通业务类型_一级市场债中标结果维护(DictCode.共通业务类型,"TRD61","一级市场债中标结果维护"),
     ;
     /**
      * 对应于数据字典code
