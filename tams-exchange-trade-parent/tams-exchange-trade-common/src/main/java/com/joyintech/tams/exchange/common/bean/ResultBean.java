@@ -122,4 +122,12 @@ public class ResultBean {
     public static ResultBean error(int errorCode, String errorMsg, Object data) {
         return new ResultBean(errorCode, errorMsg, data);
     }
+
+    public boolean isSuccess() {
+        return ErrorCode.isSuccess(this.getErrorCode());
+    }
+
+    public boolean isFail() {
+        return !isSuccess();
+    }
 }

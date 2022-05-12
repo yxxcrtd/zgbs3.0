@@ -233,7 +233,8 @@ public class PortfolioAssignHelper {
             detail.setTargetAmt(NumberUtil.round(NumberUtil.mul(detail.getTargetNum(), price), AMT_SCALE));
         }
 
-        log.debug("queryPortfolioAssign() called with result => 【list = {}】", list);
-        return ResultBean.success(list);
+        Map<String, PortfolioDetail> portfolioDetailMap = list.stream().collect(Collectors.toMap(PortfolioDetail::getPortfolioId, item -> item, (o1, o2) -> o1));
+        log.debug("queryPortfolioAssign() called with result => 【portfolioDetailMap = {}】", portfolioDetailMap);
+        return ResultBean.success(portfolioDetailMap);
     }
 }
