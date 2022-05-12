@@ -236,7 +236,6 @@
         left join SYS_DATADICT_LIST sdl_gpb on ss.bGradeOrgId=sdl_gpb.ITEM_CODE and sdl_gpb.DICT_CODE='GRADE_PARTY'
         <!-- 关键字模糊查询 -->
         <include refid="keywordsWhere"></include>)
-     /*  order by ss.type9, ss.type10,ss.type11,ss.vdate,ss.tradeMarket)*/
         <!--前端传入排序字段-->
         <if test="sort != null and sort != '' and direction != null and direction != ''">
             order by ${sort} ${direction}

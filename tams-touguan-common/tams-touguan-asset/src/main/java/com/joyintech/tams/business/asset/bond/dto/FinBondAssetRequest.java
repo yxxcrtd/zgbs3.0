@@ -33,6 +33,9 @@ public class FinBondAssetRequest {
     @ApiModelProperty(name="finprodId",value="资产简称",example="A1")
     private String finprodId;
 
+    @ApiModelProperty(name="finprodMarketId",value="资产简称",example="A1")
+    private String finprodMarketId;
+
     @ApiModelProperty(name="pageMode",value="分页对象")
     private PageMode pageMode;
 
@@ -387,5 +390,13 @@ public class FinBondAssetRequest {
 
     public void setTradeMarketId(String tradeMarketId) {
         this.tradeMarketId = tradeMarketId;
+    }
+
+    public String getFinprodMarketId() {
+        return finprodMarketId;
+    }
+
+    public void setFinprodMarketId(String finprodMarketId) {
+        this.finprodMarketId = finprodMarketId;
     }
 }
