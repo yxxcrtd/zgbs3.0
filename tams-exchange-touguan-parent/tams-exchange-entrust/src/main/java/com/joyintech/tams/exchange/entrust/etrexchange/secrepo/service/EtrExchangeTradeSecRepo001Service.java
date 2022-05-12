@@ -1449,6 +1449,11 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                 finprodType = DictCodeList.回购类型_质押式竞价回购.getValue();
                 finproduct = null;
                 entity.setDealMode(DictCodeListExt3.指定交易方式_匹配成交.getValue());
+                if(StringUtil.equals(entity.getPriceModel(),DictCodeListExt2.价格模式_市价指令.getValue())){
+                    checkPrice = BigDecimal.ZERO;
+                }else if(entity.getRepoRate() != null && StringUtil.equals(entity.getPriceModel(),DictCodeListExt2.价格模式_限价指令.getValue())){
+                    checkPrice = ArithmeticUtil.divide(entity.getRepoRate(),new BigDecimal("100"),2,RoundingMode.HALF_UP);
+                }
             }
             //
             List<ValidMessage> validMessageList = checkPriceRangeCommon(finprodType,finproduct,entity,checkPrice,nowDate,quotation);
