@@ -338,4 +338,13 @@ public class FinBondAsset001Service extends BaseService{
         }
     }
 
+    public Page<SelectOptionDto> getFinprodMarketIdList(SelectOptionCommonRequest request) {
+        Map<String,Object> param = new HashMap<String,Object>();
+        param.put("FINPROD_TYPE_TG_F10", DictCodeListExt1.金融产品类型_投管用_股票.getValue());
+        param.put("search", request.getSearch());
+        Page<SelectOptionDto> page = super.queryForPage(request.getPageMode().getPageNo(),
+                request.getPageMode().getPageSize(),
+                () -> finBondAssetMapper.getFinProdMarketIdList(param));
+        return page;
+    }
 }

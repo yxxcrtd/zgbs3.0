@@ -1072,7 +1072,7 @@
                     ELSE SU.real_name
                    END AS userId
            from ETR_ENTRUST_OPER_HIS his
-                    LEFT JOIN FIN_PRODUCT FP ON his.ENTRUST_ID = FP.FINPROD_ID
+                    LEFT JOIN FIN_PRODUCT FP ON his.ENTRUST_ID = FP.FINPROD_MARKET_ID
                     LEFT JOIN REG_FIN_PRODUCT_DEAL_TOTAL reg on reg.TOTLE_TRADE_ID= his.ENTRUST_ID
                     LEFT JOIN ibu_quote_bond iqb on iqb.QUOTE_ID= his.ENTRUST_ID
                     LEFT JOIN SYS_USER SU ON his.user_id = SU.user_name
@@ -1587,5 +1587,39 @@
             </if>
         </where>
         order by pm.create_time desc
+    </select>
+
+    <select id="getFinProdMarketIdList" resultType="com.joyintech.framework.select.SelectOptionDto">
+        select
+        FINPROD_MARKET_ID as id ,
+        FINPROD_NAME as text
+        from
+        FIN_PRODUCT
+        where
+        1=1
+        and FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F10,jdbcType=VARCHAR}
+        <if test="search != null and search != ''">
+            and (FINPROD_MARKET_ID like concat(concat('%',#{search}),'%')
+            or FINPROD_ABBR like concat(concat('%',#{search}),'%')
+            or FINPROD_NAME like concat(concat('%',#{search}),'%')
+            )
+        </if>
+    </select>
+
+    <select id="getWindType" resultType="com.joyintech.tams.common.base.entity.FinProductTypeConfig">
+        SELECT
+        OUTPUT_VALUE_1 outputValue1,
+        OUTPUT_VALUE_2 outputValue2
+        FROM FIN_PRODUCT_TYPE_CONFIG
+        WHERE CONFIG_TYPE = #{configType}
+        <if test="inputValue1 != null and inputValue1 != ''">
+            AND INPUT_VALUE_1 = #{inputValue1}
+        </if>
+        <if test="inputValue2 != null and inputValue2 != ''">
+            AND INPUT_VALUE_2 = #{inputValue2}
+        </if>
+        <if test="inputValue3 != null and inputValue3 != ''">
+            AND INPUT_VALUE_3 = #{inputValue3}
+        </if> and ROWNUM=1
     </select>
 </mapper>

@@ -44,8 +44,8 @@ public class FinBondAssetInsertRequest {
     @ApiModelProperty(name="tradeMarket",value="交易市场(方法:getIsNetSett(选填))")
     private String tradeMarket;
 
-    @ApiModelProperty(name="type9",value="行内一级类型(方法:getIsNetSett(选填))")
-    private String type9;
+    @ApiModelProperty(name="type10",value="行内二级类型(方法:getIsNetSett(选填))")
+    private String type10;
 
     @ApiModelProperty(name="isPpb",value="是否私募债(方法:getIsNetSett(选填))")
     private String isPpb;
@@ -142,12 +142,12 @@ public class FinBondAssetInsertRequest {
         this.tradeMarket = tradeMarket;
     }
 
-    public String getType9() {
-        return type9;
+    public String getType10() {
+        return type10;
     }
 
-    public void setType9(String type9) {
-        this.type9 = type9;
+    public void setType10(String type10) {
+        this.type10 = type10;
     }
 
     public String getIsPpb() {
