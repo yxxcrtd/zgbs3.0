@@ -424,7 +424,7 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
         }
     }
 
-    private void calcAmt(EtrExchangeTradeSecRepoSaveRepoRequest entity) {
+    public void calcAmt(EtrExchangeTradeSecRepoSaveRepoRequest entity) {
         entity.setPrice(entity.getRepoRate());
         entity.setEntrustAmt(ArithmeticUtil.multiply(entity.getRepoAmt(),new BigDecimal(10000)));
         entity.setEntrustNum(ArithmeticUtil.divide(entity.getEntrustAmt(),new BigDecimal(100),2, RoundingMode.HALF_UP));
