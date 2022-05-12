@@ -33,9 +33,13 @@
         from ETR_ENTRUST ee
                  left join (select listagg(t0.PORTFOLIO_ID, ',') within group (order by t0.ENTRUST_ID)   AS PORTFOLIO_ID,
                                    listagg(pp.PORTFOLIO_NAME, ',') within group (order by t0.ENTRUST_ID) AS PORTFOLIO_NAME,
-                                   t0.ENTRUST_ID,t0.INV_AIM
+                                   listagg(t0.INV_AIM, ',') within group (order by t0.ENTRUST_ID)        AS INV_AIM,
+                                   listagg(sdl_bs.ITEM_VALUE, ',') within group (order by t0.ENTRUST_ID)   AS businessModelStr,
+                                   t0.ENTRUST_ID
                             from ETR_ENTRUST_DETAIL t0
                              left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = t0.PORTFOLIO_ID
+                            left join SYS_DATADICT_LIST sdl_bs
+                            on t0.INV_AIM = sdl_bs.ITEM_CODE and sdl_bs.DICT_CODE = 'BUSINESSMODEL'
                              <where>
                                  <if test="portfolioIds != null and portfolioIds.size()>0">
                                      <foreach collection="portfolioIds" open=" t0.PORTFOLIO_ID in(" close=") " separator="," item="item">
@@ -43,7 +47,7 @@
                                      </foreach>
                                  </if>
                              </where>
-                            group by t0.ENTRUST_ID,t0.INV_AIM) eed
+                            group by t0.ENTRUST_ID) eed
                            on ee.ENTRUST_ID = eed.ENTRUST_ID
                  left join ETR_ENTRUST_ADD eea on ee.ENTRUST_ID = eea.ENTRUST_ID
                  left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eea.SEC_ACCT_ID
