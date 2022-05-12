@@ -363,7 +363,7 @@ public class PortfolioManager extends BaseService {
         }
         BigDecimal orginEntrustPrice = bean.getEntrustPrice();
         // 债券交易类，使用全价进行计算
-//        coverPrice(instruction, order);
+        coverPrice(instruction, bean);
         // 获取委托属性
         String entrustProp = EntrustPropUtils.getEntrustProp(instruction, bean.getEntrustProp());
 
