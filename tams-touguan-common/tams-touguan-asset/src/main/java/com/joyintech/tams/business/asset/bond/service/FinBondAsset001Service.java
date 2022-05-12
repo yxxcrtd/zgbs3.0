@@ -70,74 +70,10 @@ import java.util.*;
 @Service
 public class FinBondAsset001Service extends BaseService{
 
-    @Autowired
-    private CommonAutoCouponService commonAutoService;
-
-
-    @Autowired
-    private CommonBusinessService commonBusinessService;
-
-     /**
-     * 共通--资产
-     */
-    @Autowired
-    private AssetCommonService assetCommonService;
-
-    /**
-     * 业务--行权计划
-     */
-    @Autowired(required = false)
-    private BusiFinExercisePlanService busiFinExercisePlanService;
-
-    /**
-     * 附件
-     */
-    @Autowired(required = false)
-    private MstFileCommonService fileCommonService;
-    /**
-     * 产品评级共通
-     */
-    @Autowired(required = false)
-    private BusiProductRatingService busiProductRatingService;
-
-    // 债券新建新增快捷录入功能 add by renping 20191010 start
-    /**
-     * FileAttachmentProcess
-     */
-    @Autowired(required = false)
-    private FileAttachmentProcess fileAttachmentProcess;
-    // 债券新建新增快捷录入功能 add by renping 20191010 end
-
-    @Autowired(required = false)
-    private FinProductMapper finProductMapper;
-
 
     @Autowired(required = false)
     private FinBondAssetMapper finBondAssetMapper;
 
-    /**
-     * 基础--中债报送(资产)
-     */
-    @Autowired(required = false)
-    private JoyinbusinessCommonService joyinbusinessCommonService;
-
-    @Autowired
-    private DateCalService dateCalService;
-
-    @Autowired
-    private MstCustomerInfoMapper mstCustomerInfoMapper;
-
-    @Autowired
-    private MstCustomerInfoAddMapper mstCustomerInfoAddMapper;
-
-    @Autowired
-    private JoyinFSMapper joyinFSMapper;
-
-    public static final String ENTRUST_RECORD_INSERT = "insert";
-
-    public static final String ENTRUST_RECORD_UPDATE = "update";
-
-    public static final String ENTRUST_RECORD_DELETE = "delete";
     /**
      * 使用给定的sqlID检索分页数据。返回类型是Service的泛型。
      *
@@ -255,14 +191,12 @@ public class FinBondAsset001Service extends BaseService{
         Map<String, Object> param = BeanUtil.object2Map(request);
         param.put("FINPROD_TYPE_TG_ZQ", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         //增加母资管计划筛选条件
-        if (StringUtil.isNotEmpty(param.get("finprodType2"))) {
-            if(StringUtil.equals(param.get("finprodType2"), DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue())){
-                param.put("finprodType2", StringUtil.splitToList(null, param.get("finprodType2").toString()+","+DictCodeListExt1.金融产品类型_投管用_母资管计划.getValue()));
-            }else{
-                param.put("finprodType2", StringUtil.splitToList(null, param.get("finprodType2").toString()));
-            }
-        }else {
-            param.put("finprodType2",null);
+        if (null!=request.getTradeMarket() && (StringUtil.equals(request.getTradeMarket(),DictCodeListExt1.交易场所_上海证券交易所.getValue())
+        || StringUtil.equals(request.getTradeMarket(),DictCodeListExt1.交易场所_深圳证券交易所.getValue()))){
+            List<String> tradeMarkets = new ArrayList<>();
+            tradeMarkets.add(DictCodeListExt1.交易场所_银行间.getValue());
+            tradeMarkets.add(DictCodeListExt1.交易场所_商业银行柜台.getValue());
+            param.put("tradeMarkets", tradeMarkets);
         }
         Page<SelectOptionDto> page = super.queryForPage(request.getPageMode().getPageNo(),
                 request.getPageMode().getPageSize(),
@@ -338,4 +272,13 @@ public class FinBondAsset001Service extends BaseService{
         }
     }
 
+    public Page<SelectOptionDto> getFinprodMarketIdList(SelectOptionCommonRequest request) {
+        Map<String,Object> param = new HashMap<String,Object>();
+        param.put("FINPROD_TYPE_TG_F10", DictCodeListExt1.金融产品类型_投管用_股票.getValue());
+        param.put("search", request.getSearch());
+        Page<SelectOptionDto> page = super.queryForPage(request.getPageMode().getPageNo(),
+                request.getPageMode().getPageSize(),
+                () -> finBondAssetMapper.getFinProdMarketIdList(param));
+        return page;
+    }
 }

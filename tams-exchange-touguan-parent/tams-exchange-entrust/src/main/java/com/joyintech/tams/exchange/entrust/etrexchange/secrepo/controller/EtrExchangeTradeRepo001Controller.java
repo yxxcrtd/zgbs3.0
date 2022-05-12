@@ -816,6 +816,7 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 					}
 
 			}
+			etrExchangeTradeRepo001Service.calcAmt(dto); //回购利率、回购数量、回购金额转换
 			Map<String,List<EtrExchangeTradePortfolioSecRepoRequest>> groupMap= dto.getPortfolioList().stream().collect(
 					Collectors.groupingBy(item->item.getAcctNo()));			//如果分组Map，key的数量>1,说明是多组合指令，key的数量=1,则为系列户指令
 			if(groupMap.keySet().size() == 1 && dto.getPortfolioList().size()>1) {

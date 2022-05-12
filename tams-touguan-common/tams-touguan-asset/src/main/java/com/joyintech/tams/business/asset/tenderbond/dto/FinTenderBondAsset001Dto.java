@@ -4,13 +4,16 @@ package com.joyintech.tams.business.asset.tenderbond.dto;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.dto.BaseDto;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 
 /**
@@ -182,6 +185,16 @@ public class FinTenderBondAsset001Dto extends BaseDto {
     @ApiModelProperty(name = "referYield", value = "收益率，利息贴现为参考收益率，附息为票面利率")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal referYield;
+
+    @ApiModelProperty(name = "intRateId", value = "行情代码")
+    private String intRateId;
+
+    @ApiModelProperty(name = "rate", value = "参考收益率")
+    private String rate;
+
+    @ApiModelProperty(name = "bp", value = "利差")
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal bp;
 
     @ApiModelProperty(name = "minPerTamt", value = "每标位最低投标量")
     @JsonSerialize(using = BigDecimalSerializer.class)
@@ -694,5 +707,29 @@ public class FinTenderBondAsset001Dto extends BaseDto {
 
     public void setIssuerName(String issuerName) {
         this.issuerName = issuerName;
+    }
+
+    public String getIntRateId() {
+        return intRateId;
+    }
+
+    public void setIntRateId(String intRateId) {
+        this.intRateId = intRateId;
+    }
+
+    public BigDecimal getBp() {
+        return bp;
+    }
+
+    public void setBp(BigDecimal bp) {
+        this.bp = bp;
+    }
+
+    public String getRate() {
+        return rate;
+    }
+
+    public void setRate(String rate) {
+        this.rate = rate;
     }
 }

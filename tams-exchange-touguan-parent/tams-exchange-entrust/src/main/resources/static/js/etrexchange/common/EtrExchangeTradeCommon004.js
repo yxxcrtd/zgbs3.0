@@ -1991,6 +1991,7 @@
      * 质押券出入库
      */
     var linkToConverseRatio = function () {
+        scale = 0;
         var ps = $("#ps_" + currentTab).val();
         //设置默认小数位
         $("#entrustPrice_" + currentTab).attr("data-textrange", scale);
@@ -2075,6 +2076,9 @@
             othCodeType = FINPROD_OTH_CODE_TYPE_06;
         } else if (ps == PS_T04) {
             othCodeType = FINPROD_OTH_CODE_TYPE_07;
+        }
+        if(ps == PS_T68 || ps == PS_T69){
+            scale = 0;
         }
         //设置默认小数位
         $("#entrustPrice_" + currentTab).attr("data-textrange", scale);
@@ -2413,6 +2417,7 @@
         //债券交易数量单位 add by yeming 20210729 end
         var entrustAmt = $("#entrustAmt_" + currentTab).val();
         var entrustPrice = $("#entrustPrice_" + currentTab).val();
+        var fprice = $("#fprice_" + currentTab).val();
         var ps = $("#ps_" + currentTab).val();
         var board = $("#board_" + currentTab).val();
         //var calculateField = $("[name=calculateField_" + currentTab + "]:radio").next(".layui-form-radioed").prev("input").val();
@@ -2448,8 +2453,10 @@
             if (targetType) {
                 if (declarePriceFlag) {
                     $.extend(param, {entrustPrice: formatPrice(entrustPrice)});
+                    $.extend(param, {fprice: formatPrice(fprice)});
                 } else {
                     $.extend(param, {entrustPrice: entrustPrice});
+                    $.extend(param, {fprice: formatPrice(fprice)});
                 }
                 ajaxCalcEntrustNumAndAmt(param);
             }
@@ -2514,7 +2521,7 @@
             if (result.entrustAmt) {
                 var entrustAmt = result.entrustAmt;
                 if ((finprodType2 == FINPROD_TYPE_TG_F01 || finprodType2 == FINPROD_TYPE_TG_ZYSHG) && (ps == PS_T68 || ps == PS_T69)) {
-                    entrustAmt = Math.floor(new Number(entrustAmt));
+                    // entrustAmt = Math.floor(new Number(entrustAmt));
                     $("#entrustAmt_" + currentTab).val(entrustAmt);
                 } else {
                     $("#entrustAmt_" + currentTab).val(entrustAmt).trigger('blur');
@@ -2856,6 +2863,7 @@
                         $("#price_" + currentTab).val(lastPrice);
                         $("#deviationDegree").text("");
                         $.extend(param, {entrustPrice: lastPrice});
+                        $.extend(param, {fprice: $("#fprice_" + currentTab).val()});
                     } else if (param.finprodType2 == FINPROD_TYPE_TG_F06 || param.finprodType2 == FINPROD_TYPE_TG_F10) {
                         if (param.ps == PS_T01) {//市价指令股票、基金买入 价格按涨停价计算风控、头寸
                             var upperLimitPrice = formatPrice(result.upperLimitPrice);
@@ -3317,6 +3325,7 @@
                 $("#entrustAmtUnit_" + currentTab).text("万元");
                 $("#entrustNumUnit_" + currentTab).text("万元");
                 var entrustAmt = $("#entrustAmt_" + currentTab).val();
+                $("#entrustPrice_" + currentTab).attr("data-textrange", 0);
                 if(entrustAmt){
                     $("#entrustAmt_" + currentTab).val(entrustAmt/100);
                 }

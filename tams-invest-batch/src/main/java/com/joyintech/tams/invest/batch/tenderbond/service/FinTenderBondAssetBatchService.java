@@ -68,19 +68,22 @@ public class FinTenderBondAssetBatchService {
      * @param plateDate
      */
     public void execute(Date plateDate) {
-        Map<String, Object> param = new HashMap<>();
-        param.put("listingDate", plateDate);
-        param.put("issueStage", DictCodeListExt4.发行阶段_已发行.getValue());
-        param.put("finprodType2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
-        param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
-        param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
-        param.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
-        param.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
-        param.put("ISSUE_STATUS_02", DictCodeListExt1.发行状态_发行失败.getValue());
-        List<FinTenderBondAssetBatchDto> list = finTenderBoundAssetMapper.selectListing(param);
-        if (CollectionUtils.isEmpty(list)) return;
         List<Long> seqNoList = new ArrayList<>();
         try {
+            //处理已经手动上市流通但未到上市日的情况
+            this.dealCompleteListing(plateDate, seqNoList);
+            //正常的已发行的待上市流通的记录
+            Map<String, Object> param = new HashMap<>();
+            param.put("listingDate", plateDate);
+            param.put("issueStage", DictCodeListExt4.发行阶段_已发行.getValue());
+            param.put("finprodType2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+            param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
+            param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
+            param.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
+            param.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
+            param.put("ISSUE_STATUS_02", DictCodeListExt1.发行状态_发行失败.getValue());
+            List<FinTenderBondAssetBatchDto> list = finTenderBoundAssetMapper.selectListing(param);
+            if (CollectionUtils.isEmpty(list)) return;
             for (FinTenderBondAssetBatchDto dto : list) {
                 if (isInProcess(dto.getFinprodMarketId(), "FinTenderBondAsset002", "FinTenderBondAsset003")) {
                     continue;
@@ -138,6 +141,24 @@ public class FinTenderBondAssetBatchService {
                 }
             }
             throw new RuntimeException("上市流通批处理失败");
+        }
+    }
+
+    /**
+     * 处理已经完成上市流通，但未发头寸的记录
+     */
+    private void dealCompleteListing(Date plateDate, List<Long> seqList) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("listingDate", plateDate);
+        param.put("finprodType2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+        param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
+        param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
+        param.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
+        param.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
+        param.put("ISSUE_STATUS_01", DictCodeListExt1.发行状态_发行成功.getValue());
+        List<FinTenderBondAssetBatchDto> list = finTenderBoundAssetMapper.selectCompleteList(param);
+        if (CollectionUtils.isNotEmpty(list)) {
+            list.forEach(e -> this.sendPosition(e, plateDate, seqList));
         }
     }
 
@@ -204,14 +225,21 @@ public class FinTenderBondAssetBatchService {
         finProductAddMapper.updateForTenderBound(productAdd);
         //记录操作日志
         saveOperate(dto.getFinprodMarketId(), dto.getRemark());
-        long seqNo = (long) Arrays.deepHashCode(new Object[]{trdFinProductDealTotal.getTotleTradeId(), DictCodeListExt1.子系统代码_交易.getValue(), new Date().getTime(), Thread.currentThread().getId()});
+        //发送头寸
+        dto.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
+        this.sendPosition(dto, plateDate, seqList);
+    }
+
+
+    private void sendPosition(FinTenderBondAssetBatchDto dto, Date plateDate, List<Long> seqList) {
+        long seqNo = (long) Arrays.deepHashCode(new Object[]{dto.getTotleTradeId(), DictCodeListExt1.子系统代码_交易.getValue(), new Date().getTime(), Thread.currentThread().getId()});
         //调用头寸
-        Map<String,String> params = new HashMap();
-        params.put("finprodType2",DictCodeList.平安资产类型_债券.getValue());
-        params.put("finprodMarketId",dto.getAppearMarketId());
+        Map<String, String> params = new HashMap();
+        params.put("finprodType2", DictCodeList.平安资产类型_债券.getValue());
+        params.put("finprodMarketId", dto.getAppearMarketId());
         String finproductId = finTenderBoundAssetMapper.selectFinprodId(params);
         BaseMap param = BaseMap.newMap().put("userId", "SYSTEM")
-                .put("totalTradeId", trdFinProductDealTotal.getTotleTradeId())
+                .put("totalTradeId", dto.getTotleTradeId())
                 .put("afterListingFinprodId", finproductId)
                 .put("beforeListingFinprodId", dto.getFinprodId())
                 .put("modelType", DictCodeListExt1.子系统代码_交易.getValue())
@@ -226,10 +254,10 @@ public class FinTenderBondAssetBatchService {
                 .put("tradePlace", dto.getTradeMarket())
                 .put("decisionAct", DictCodeListExt3.系统动作_新建.getValue())
                 .put("PositionSeqno", seqNo)
-                .put("isListingGenerate",DictCodeList.是否_是.getValue());
-        if(dto.getTradeMarket().equals(DictCodeListExt1.交易场所_银行间.getValue()) || dto.getTradeMarket().equals(DictCodeListExt1.交易场所_商业银行柜台.getValue())) {
+                .put("isListingGenerate", DictCodeList.是否_是.getValue());
+        if (dto.getTradeMarket().equals(DictCodeListExt1.交易场所_银行间.getValue()) || dto.getTradeMarket().equals(DictCodeListExt1.交易场所_商业银行柜台.getValue())) {
             param.put("interfaceType", "Bond001");
-        }else {
+        } else {
             param.put("interfaceType", "Bond002");
         }
         seqList.add(seqNo);

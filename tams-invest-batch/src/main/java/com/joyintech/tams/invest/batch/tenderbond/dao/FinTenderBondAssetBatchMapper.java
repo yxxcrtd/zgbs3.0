@@ -32,6 +32,14 @@ public interface FinTenderBondAssetBatchMapper {
     List<FinTenderBondAssetBatchDto> selectListing(Map<String,Object> param);
 
     /**
+     * 查询已上市流通的新债
+     * @param param
+     * @return
+     */
+    List<FinTenderBondAssetBatchDto> selectCompleteList(Map<String,Object> param);
+
+
+    /**
      * 查询标的
      * @param param
      * @return

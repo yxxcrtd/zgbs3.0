@@ -4,6 +4,7 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.entity.ProcessMark;
+import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
@@ -21,10 +22,7 @@ import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondMapper;
-import com.joyintech.tams.cfets.trd.bond.dto.CalRequest;
-import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealRegisterQuoteDto;
-import com.joyintech.tams.cfets.trd.bond.dto.PtlAllocationDto;
-import com.joyintech.tams.cfets.trd.bond.dto.RiskCalRequest;
+import com.joyintech.tams.cfets.trd.bond.dto.*;
 import com.joyintech.tams.cfets.trd.bond.service.IbuQuoteBondCalService;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dao.CfetsTrdBondFirstSub001Mapper;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dao.CfetsTrdBondFirstSub002Mapper;
@@ -876,6 +874,62 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     }
 
     /**
+     * 根据交易表数据组装dto
+     *
+     * @param bidId
+     * @return com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto
+     * @author jiangpeng
+     * @date 2022/5/12 15:08
+     */
+    public CfetsTrdBondFirstSubInfoDto prepareDto(String bidId) {
+        CfetsTrdBondFirstSubInfoDto entity = new CfetsTrdBondFirstSubInfoDto();
+        BidOrder bidOrder = bidOrderMapper.selectByPrimaryKey(bidId);
+        BeanUtil.copyPropertiesIgnoreNull(entity, bidOrder);
+        entity.setTradeDate(bidOrder.getBidDate());
+        List<BidOrderBidPrice> list = bidOrderBidPriceMapper.selectListByPrimaryKey(bidId);
+        List<CfetsTrdBondFirstSubProductDto> productDtos = new ArrayList<>();
+        for (BidOrderBidPrice item : list) {
+            CfetsTrdBondFirstSubProductDto productDto = new CfetsTrdBondFirstSubProductDto();
+            BeanUtil.copyPropertiesIgnoreNull(item, productDto);
+            productDtos.add(productDto);
+        }
+        entity.setProductDtos(productDtos);
+        return entity;
+    }
+
+    /**
+     * 撤销，共外部调用
+     *
+     * @param totleTradeId
+     * @param remark
+     * @param isNeedDealPosition
+     * @param tgBusiType
+     * @author jiangpeng
+     * @date 2022/5/12 14:53
+     */
+    public void dorevoke(String totleTradeId, String remark, Boolean isNeedDealPosition, String tgBusiType) {
+        CfetsTrdBondFirstSubInfoDto entity = this.prepareDto(totleTradeId);
+        entity.setBidId(totleTradeId);
+        this.insertData(entity, OperationType.REVOKE);
+        try {
+            if (isNeedDealPosition) {
+                // 匹配取消
+                cfetsTrdBondFirstSub002Mapper.deleteByPreTradeId(entity.getBidId());
+                PositionHttpRequest.dorevoke(entity.getBidId(), DictCodeListExt1.子系统代码_交易.getValue(),
+                        DictCodeListExt3.头寸业务类型_债券一级申购.getValue(), DictCodeList.交易方向_买入.getValue());
+            }
+            // 老头寸处理
+            this.dealOldPosition(entity, true);
+            //处理指令执行进度
+            this.insertEtrFinishStatus(entity, OperationType.REVOKE);
+        } catch (PositionException e) {
+            e.printStackTrace();
+            Message message = PositionUtil.ajaxErrorReturn(e);
+            throw new BusinessException("MSG:" + message.getMessage());
+        }
+    }
+
+    /**
      * 退回
      *
      * @param entity 页面元素
@@ -1401,7 +1455,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     }
 
     /**
-     * TODO 头寸处理
+     * 头寸处理
      *
      * @param cfetsRepoDealRegisterQuoteDto
      * @param cfetsRepoDealDbDto

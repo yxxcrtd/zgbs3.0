@@ -12,6 +12,7 @@ import com.joyintech.framework.file.SafelyFile;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.asset.bond.dao.FinBondAssetMapper;
@@ -35,6 +36,7 @@ import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.MstFileCommonService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.asset.common.dto.BaseFinProductBaseInfoDto;
 import com.joyintech.tams.invest.asset.common.service.AssetCommonService;
@@ -227,7 +229,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             //功能暂未测试
         }
         //处理履历
-        updateCfetsOprHis(entity.getFinprodId(), action);
+        updateCfetsOprHis(entity.getFinprodMarketId(), action);
     }
 
     private void doCompleteInsert(FinBondAssetSaveRequest entity) {
@@ -519,8 +521,16 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         FinProductType finProductType = new FinProductType();
         BeanUtil.copyPropertiesIgnoreNull(finProductType, dto);
         finProductType.setBranch(branch);
-//        finProductType.setType6(dto.getType4());
-//        finProductType.setType7(dto.getType5());
+        Map<String,Object> paramCinfig = new HashMap<>();
+        paramCinfig.put("configType",DictCodeListExt2.配置类型_WIND分类.getValue());
+        paramCinfig.put("inputValue2",dto.getType9());
+        paramCinfig.put("inputValue3",dto.getType10());
+        paramCinfig.put("inputValue4",dto.getType11());
+        FinProductTypeConfig resultType = finBondAssetMapper.getWindType(paramCinfig);
+        if(Objects.nonNull(resultType)) {
+            finProductType.setType6(resultType.getOutputValue1());
+            finProductType.setType7(resultType.getOutputValue2());
+        }
         finProductType.setType8(DictCodeList.平安资产类型_债券.getValue());
         finProductType.setType9(dto.getTypeTwo());
         finProductType.setType10(dto.getTypeThree());
@@ -1286,6 +1296,11 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                             }
                         }
                     }
+                    if(DateUtil.compareDate(finCashPlanEntity.getVdate(),finCashPlanEntity.getMdate())<0){
+                        resultList.add(new ValidMessage(
+                                "付息计划,计息开始日不可以大于计息结束日"));
+                        return resultList;
+                    }
                     if (StringUtil.isNotEmpty(dto.getMaxTradeDate())) {
                         if (DateUtil.compareDate(finCashPlanEntity.getVdate(), dto.getMaxTradeDate()) > 0) {
                             resultList.add(new ValidMessage(
@@ -1472,4 +1487,5 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             }
             return Boolean.FALSE;
     }
+
 }

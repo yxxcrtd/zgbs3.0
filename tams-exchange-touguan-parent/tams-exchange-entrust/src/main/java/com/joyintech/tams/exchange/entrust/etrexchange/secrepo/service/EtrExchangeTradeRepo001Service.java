@@ -424,7 +424,7 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
         }
     }
 
-    private void calcAmt(EtrExchangeTradeSecRepoSaveRepoRequest entity) {
+    public void calcAmt(EtrExchangeTradeSecRepoSaveRepoRequest entity) {
         entity.setPrice(entity.getRepoRate());
         entity.setEntrustAmt(ArithmeticUtil.multiply(entity.getRepoAmt(),new BigDecimal(10000)));
         entity.setEntrustNum(ArithmeticUtil.divide(entity.getEntrustAmt(),new BigDecimal(100),2, RoundingMode.HALF_UP));
@@ -468,7 +468,7 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
         if ("save".equals(entity.getOperateType())) {
             return;
         }
-        calcAmt(entity);
+        //calcAmt(entity);  //save中已经算过l
         //退回的移到备份表
         etrExchangeTradeSecRepo001Service.doInsertBackupQuery(entity);
 
@@ -515,7 +515,7 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
         etrExchangeTrade001Dto.setStockId(dto.getStockId());
         etrExchangeTrade001Dto.setEntrustDate(DateUtil.parse(DateUtil.format(dto.getEntrustDate(), DateUtil.DEFAULT_DATE_FORMAT_EN)));
         etrExchangeTrade001Dto.setOptType(dto.getOptType());
-
+        etrExchangeTrade001Dto.setRepoAmt(multiPtl001Dto.getRepoAmt());
         return etrExchangeTrade001Dto;
     }
 

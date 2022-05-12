@@ -269,5 +269,5 @@ public interface StlDataGatherMapper {
      * @param searchParam
      * @return
      */
-    List<SettleTransDataDto> selectSettleTransData8(Map<String, Object> searchParam);
+    List<SettleTransDataDto> selectBondFirstBiddingData(Map<String, Object> searchParam);
 }

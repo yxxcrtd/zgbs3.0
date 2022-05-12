@@ -92,6 +92,7 @@ public enum DictCodeListExt4 implements BaseDictCodeList {
     WIND二级分类_含债券二级分类等_外国金融机构债(DictCode.WIND二级分类_含债券二级分类等,"26","外国金融机构债"),
     WIND二级分类_含债券二级分类等_外国公司债(DictCode.WIND二级分类_含债券二级分类等,"27","外国公司债"),
     WIND二级分类_含债券二级分类等_外国其他债券(DictCode.WIND二级分类_含债券二级分类等,"28","外国其他债券"),
+    平安业务类型_一级申购(DictCode.平安业务类型,"180","一级申购"),
     ;
     /**
      * 对应于数据字典code

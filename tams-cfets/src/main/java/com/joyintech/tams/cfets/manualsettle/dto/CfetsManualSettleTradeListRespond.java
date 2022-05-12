@@ -42,10 +42,16 @@ public class CfetsManualSettleTradeListRespond {
     @ApiModelProperty(name="finprodAbbr",value="资产简称",example="字符串1")
     private String finprodAbbr;
 
-    @ApiModelProperty(name="finprodType2",value="资产类型CODE",example="A1")
+    @ApiModelProperty(name="assetType",value="资产类型CODE",example="A1")
+    private String assetType;
+
+    @ApiModelProperty(name="assetTypeStr",value="资产类型",example="A1")
+    private String assetTypeStr;
+
+    @ApiModelProperty(name="finprodType2",value="业务类型_投管",example="A1")
     private String finprodType2;
 
-    @ApiModelProperty(name="finprodType2Str",value="资产类型",example="A1")
+    @ApiModelProperty(name="finprodType2Str",value="业务类型_投管",example="A1")
     private String finprodType2Str;
 
     @ApiModelProperty(name="tgBusiType",value="业务类型CODE",example="A1")
@@ -179,6 +185,22 @@ public class CfetsManualSettleTradeListRespond {
 
     public void setFinprodAbbr(String finprodAbbr) {
         this.finprodAbbr = finprodAbbr;
+    }
+
+    public String getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
+    }
+
+    public String getAssetTypeStr() {
+        return assetTypeStr;
+    }
+
+    public void setAssetTypeStr(String assetTypeStr) {
+        this.assetTypeStr = assetTypeStr;
     }
 
     public String getFinprodType2() {
