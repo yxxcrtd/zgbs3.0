@@ -53,6 +53,12 @@ public class CfetsBiddingProductDto {
     @ApiModelProperty(name="secManageAcctId",value="证券托管户",example="1")
     private String secAcctId;
 
+    /**
+     * 资金账户
+     */
+    @ApiModelProperty(name="acctNo",value="资金账户",example="A1", required = true)
+    private String acctNo;
+
     public String getPortfolioId() {
         return portfolioId;
     }
@@ -107,5 +113,13 @@ public class CfetsBiddingProductDto {
 
     public void setSecAcctId(String secAcctId) {
         this.secAcctId = secAcctId;
+    }
+
+    public String getAcctNo() {
+        return acctNo;
+    }
+
+    public void setAcctNo(String acctNo) {
+        this.acctNo = acctNo;
     }
 }

@@ -6,6 +6,8 @@ import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.SecurityUtil;
+import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.business.common.dto.CfetsEtrFinProductInfoRequest;
@@ -22,6 +24,7 @@ import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEt
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoRequest;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIssueInfoDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIssueInfoRequest;
+import com.joyintech.tams.cfets.etr.bondfirstbid.dto.PtlSecAcctInfoRequest;
 import com.joyintech.tams.cfets.etr.bondfirstbid.service.CfetsEtrBondFirstBid001Service;
 import com.joyintech.tams.common.base.entity.SppiImportData;
 import com.joyintech.tams.constant.DictCode;
@@ -96,6 +99,10 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
         initPageParams.put("INT_TYPE", this.getSelectDataFromDataDic(DictCode.利率类型, null));
         initPageParams.put("FIRST_BID_STATUS", this.getSelectDataFromDataDic(DictCode.一级投标中标状态, null));
         initPageParams.put("BUSINESS_MODEL", this.getSelectDataFromDataDic(DictCode.业务模式, null));
+        initPageParams.put("CUSTOM_ASSET_TYPE_TWO", this.getSelectDataFromDataDic(DictCode.行内资产二级分类, null));
+        initPageParams.put("CUSTOM_ASSET_TYPE_THREE", this.getSelectDataFromDataDic(DictCode.行内资产三级分类, null));
+        initPageParams.put("CUSTOM_ASSET_TYPE_FOUR", this.getSelectDataFromDataDic(DictCode.行内资产四级分类, null));
+        initPageParams.put("TRADE_PLACE", this.getSelectDataFromDataDic(DictCode.交易场所, null));
 
         //当前平台日
         initPageParams.put("platDate", DateUtil.platDateFromCache());
@@ -134,6 +141,20 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
             return new Message<Page<CfetsEtrIBondFirstBidFindIssueInfoDto>>().fail().setMessage("查询待发行信息分页数据异常");
         }
 
+    }
+
+    @ApiOperation(value = "获取组合资产账户列表", notes = "获取组合资产账户列表")
+    @ResponseBody
+    @PostMapping("/getPtlSecAcctInfo")
+    public Message<List<SelectOptionDto>> getPtlSecAcctInfo(@RequestBody PtlSecAcctInfoRequest dto){
+        try {
+            Map<String, Object> map = BeanUtil.object2Map(dto);
+            List<SelectOptionDto> tempList= cfetsEtrBondFirstBid001Service.getPtlSecAcctInfo(map);
+            return new Message<List<SelectOptionDto>>().success().setData(tempList);
+        } catch (Exception e) {
+            logger.error("查询功能异常", e);
+            return new Message<List<SelectOptionDto>>().fail().setMessage("查询异常");
+        }
     }
 
     @PostMapping(value = "/exportEtrInfo")
@@ -204,31 +225,6 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
         }
     }
 
-//    @ApiOperation(value = "一级投标指令组合关联信息", notes = "一级投标指令组合关联信息")
-//    @PostMapping("/queryPortfolioRelationInfo/{portfolioId}/{finprodId:.+}")
-//    @ResponseBody
-//    public Message<CfetsEtrPortfolioInfoDto> queryPortfolioRelationInfo(@PathVariable("portfolioId") String portfolioId, @PathVariable String finprodId) {
-//        try {
-//            CfetsEtrPortfolioInfoDto cfetsEtrPortfolioInfoDto = new CfetsEtrPortfolioInfoDto();
-//            cfetsEtrPortfolioInfoDto.setPortfolioId(portfolioId);
-//            cfetsEtrPortfolioInfoDto.setFinprodId(finprodId);
-//            //业务模式
-//            String businessModel = cfetsEtrBondFirstBid001Service.findInvAim(portfolioId, finprodId);
-//            if (StringUtil.isNotEmpty(businessModel)) {
-//                cfetsEtrPortfolioInfoDto.setBusinessModel(businessModel);
-//            }
-//            //证券账户
-//            String secAcctId = cfetsEtrBondFirstBid001Service.queryPortfolioSecAcctId(portfolioId, finprodId);
-//            if (StringUtil.isNotEmpty(secAcctId)) {
-//                cfetsEtrPortfolioInfoDto.setSecAcctId(secAcctId);
-//            }
-//
-//            return new Message<CfetsEtrPortfolioInfoDto>().success().setData(cfetsEtrPortfolioInfoDto);
-//        } catch (Exception e) {
-//            logger.error("查询一级投标指令组合关联信息", e);
-//            return new Message<CfetsEtrPortfolioInfoDto>().fail().setMessage("查询一级投标指令组合关联信息");
-//        }
-//    }
 
     @ResponseBody
     @ApiOperation(value = "风险试算", notes = "风险试算")
