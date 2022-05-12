@@ -77,7 +77,7 @@ public class CfetsBasicInfo001Controller extends BaseController {
 
     @ResponseBody
     @PostMapping("/selectOption")
-    @ApiOperation(value = "特殊债券信息简单查询", notes = "特殊债券信息简单查询")
+    @ApiOperation(value = "特殊债券信息下拉框信息查询", notes = "特殊债券信息下拉框信息查询")
     public Message<Page<FinProductSpecialSelectOptionDto>> selectOption(@RequestBody FinProductSpecialSelectOptionQueryRequest request) {
         logger.info("特殊债券信息简单查询参数：{}", JsonUtils.object2Json(request));
         return Message.success("success", finProductSpecialService.querySelectOption(request));
