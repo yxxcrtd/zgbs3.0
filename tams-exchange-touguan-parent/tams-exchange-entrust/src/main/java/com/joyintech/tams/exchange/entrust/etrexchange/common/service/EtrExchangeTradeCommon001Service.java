@@ -2508,13 +2508,14 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
                 if (null != entrustAmt) {//entrustAmt 代表标准券数量
                     // modify by etliu 20220303 start
                     // 质押式回购出入库计算时，原公式：标准券数量=质押数量*标准折算率，改成：标准券数量=质押数量*标准折算率*面值/100  ---需求张琼
-                    BigDecimal 百元券面 = trdCommonBaseService.getFaceValue(finprodId, DateUtil.platDateFromCache());
-                    if (百元券面 == null) {
-                        百元券面 = BigDecimal.valueOf(100);
-                    }
-                    entrustAmt = entrustAmt.multiply(百元券面).divide(BigDecimal.valueOf(100));
+//                    BigDecimal 百元券面 = trdCommonBaseService.getFaceValue(finprodId, DateUtil.platDateFromCache());
+//                    if (百元券面 == null) {
+//                        百元券面 = BigDecimal.valueOf(100);
+//                    }
+//                    entrustAmt = entrustAmt.multiply(百元券面).divide(BigDecimal.valueOf(100));
                     // modify by etliu 20220303 end
-                    entrustAmt = new BigDecimal(entrustAmt.intValue());
+                    entrustAmt = entrustNum.multiply(entrustPrice).setScale(4,RoundingMode.HALF_UP);
+//                    entrustAmt = new BigDecimal(entrustAmt.intValue());
                 }
             }
         }/* else {

@@ -1991,6 +1991,7 @@
      * 质押券出入库
      */
     var linkToConverseRatio = function () {
+        scale = 0;
         var ps = $("#ps_" + currentTab).val();
         //设置默认小数位
         $("#entrustPrice_" + currentTab).attr("data-textrange", scale);
@@ -2075,6 +2076,9 @@
             othCodeType = FINPROD_OTH_CODE_TYPE_06;
         } else if (ps == PS_T04) {
             othCodeType = FINPROD_OTH_CODE_TYPE_07;
+        }
+        if(ps == PS_T68 || ps == PS_T69){
+            scale = 0;
         }
         //设置默认小数位
         $("#entrustPrice_" + currentTab).attr("data-textrange", scale);
@@ -2517,7 +2521,7 @@
             if (result.entrustAmt) {
                 var entrustAmt = result.entrustAmt;
                 if ((finprodType2 == FINPROD_TYPE_TG_F01 || finprodType2 == FINPROD_TYPE_TG_ZYSHG) && (ps == PS_T68 || ps == PS_T69)) {
-                    entrustAmt = Math.floor(new Number(entrustAmt));
+                    // entrustAmt = Math.floor(new Number(entrustAmt));
                     $("#entrustAmt_" + currentTab).val(entrustAmt);
                 } else {
                     $("#entrustAmt_" + currentTab).val(entrustAmt).trigger('blur');
@@ -3321,6 +3325,7 @@
                 $("#entrustAmtUnit_" + currentTab).text("万元");
                 $("#entrustNumUnit_" + currentTab).text("万元");
                 var entrustAmt = $("#entrustAmt_" + currentTab).val();
+                $("#entrustPrice_" + currentTab).attr("data-textrange", 0);
                 if(entrustAmt){
                     $("#entrustAmt_" + currentTab).val(entrustAmt/100);
                 }
