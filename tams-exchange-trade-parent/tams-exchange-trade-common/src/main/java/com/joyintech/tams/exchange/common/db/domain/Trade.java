@@ -239,8 +239,12 @@ public class Trade implements Serializable, KeyMethodInterface<String> {
     private String extend2;
 
     @Digits(integer = 20, fraction = 0)
-    @ApiModelProperty(value = "标准券数量")
-    private long bondVolume;
+    @ApiModelProperty(value = "折合标准券(展示)")
+    private BigDecimal bondVolume;
+
+    @ApiModelProperty(name = "tradedVolumeView", value = "成交数量(展示)")
+    @Digits(integer = 20, fraction = 2)
+    private BigDecimal tradedVolumeView;
 
     private String tradeDate;
     private String dealTime;
@@ -685,12 +689,20 @@ public class Trade implements Serializable, KeyMethodInterface<String> {
         this.extend2 = extend2;
     }
 
-    public long getBondVolume() {
+    public BigDecimal getBondVolume() {
         return bondVolume;
     }
 
-    public void setBondVolume(long bondVolume) {
+    public void setBondVolume(BigDecimal bondVolume) {
         this.bondVolume = bondVolume;
+    }
+
+    public BigDecimal getTradedVolumeView() {
+        return tradedVolumeView;
+    }
+
+    public void setTradedVolumeView(BigDecimal tradedVolumeView) {
+        this.tradedVolumeView = tradedVolumeView;
     }
 
     public String getTradeDate() {

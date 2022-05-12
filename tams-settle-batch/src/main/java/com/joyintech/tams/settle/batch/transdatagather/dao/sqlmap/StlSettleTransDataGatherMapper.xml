@@ -65,13 +65,19 @@
                         OR (tmp1.PS IN (#{PS_T05},#{PS_T11},#{PS_T12},#{PS_T13}))
                     )
             )
+            AND (
+                ( A.DELIVERY_RESULT IN (#{DELIVERY_RESULT_01}, #{DELIVERY_RESULT_02}) AND A.FINPROD_TYPE NOT IN ('F01','F10','F32') )
+                OR ( A.DELIVERY_RESULT IN (#{DELIVERY_RESULT_01}, #{DELIVERY_RESULT_02}) AND A.FINPROD_TYPE NOT IN ('F01','F10','F32')
+                     AND (A.SETTLE_MODE = '01' OR (A.SETTLE_MODE = '02' AND A.SETTLE_SPEED = 'T+0')) )
+                OR ( A.DELIVERY_RESULT = #{DELIVERY_RESULT_05} AND A.FINPROD_TYPE IN ('F01','F10','F32') AND A.SETTLE_MODE = '01' AND A.SETTLE_SPEED = 'T+1' )
+            )
           <!--GNS-862:配股配债有可能APPLY_TRADE_ID is NULL modify by fuyongsheng 20220217 end-->
           <!--ZGZGST-4261:存续期数据无需登录SETTLE_TRANS_DATA_TOTAL表 fuyongsheng modify 20211221 end-->
           <!--/*AND EXISTS  (
                 SELECT 1 FROM stl_sec_recon_detail ssrd
                 where ssrd.TRADE_ID = A.TRADE_ID)*/-->
             <!--筛选交收成功和部分交收的数据 add by fuyongsheng 20220418 start-->
-            and A.DELIVERY_RESULT IN (#{DELIVERY_RESULT_01}, #{DELIVERY_RESULT_02})
+            <!--and A.DELIVERY_RESULT IN (#{DELIVERY_RESULT_01}, #{DELIVERY_RESULT_02})-->
             <!--筛选交收成功和部分交收的数据 add by fuyongsheng 20220418 end-->
           <!--and A.PS !=#{PS_T05}-->
 

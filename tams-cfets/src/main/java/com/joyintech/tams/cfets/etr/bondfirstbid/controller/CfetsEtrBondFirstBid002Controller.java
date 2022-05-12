@@ -28,7 +28,6 @@ import com.joyintech.tams.invest.entrust.common.aop.EntrustRdsCommonAop;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
-import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -72,20 +71,20 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
     @Autowired
     private BaseGetBusinessId bussGetBussinessIdService;
 
+
     @ResponseBody
     @PostMapping("/initParam")
     @ApiOperation(value = "新建/修改/查看页面初始化", notes = "新建/修改/查看页面初始化")
     public Message<Map<String, Object>> init() {
         Map<String, Object> params = new HashMap<>();
-        String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
+        //String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
+        String workflowId = "00000000000000000000000000044663";
         boolean todoList = false;
         CfetsEtrBondFirstBid002Dto entity = new CfetsEtrBondFirstBid002Dto();
         // 待办中过来
-        if (!WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotEmpty(workflowId)) {
+        if (StringUtil.isNotEmpty(workflowId)) {
             todoList = true;
             entity = cfetsEtrBondFirstBid002Service.getBussinessEntityByWorkflowId(workflowId);
-        } else {//来自新增或者修改
-
         }
         //数据字典初始化数据
         params.put("BUSINESS_MODEL", this.getSelectDataFromDataDic(DictCode.业务模式, null));

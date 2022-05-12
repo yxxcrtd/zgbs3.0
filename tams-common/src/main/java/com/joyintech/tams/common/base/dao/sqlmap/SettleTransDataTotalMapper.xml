@@ -136,7 +136,7 @@
             TRADE_AMT_RAW, TRADE_ID_RAW, SEQ_NO, 
             IS_PURCH_TYPE_YX, CREATE_USER, CREATE_DEPT, 
             CREATE_TIME, UPDATE_USER, UPDATE_TIME, 
-            F_CJBH)
+            F_CJBH,DELIVERY_RESULT)
         values (#{seqId,jdbcType=VARCHAR}, #{dealDate,jdbcType=DATE}, #{secType,jdbcType=VARCHAR}, 
             #{applyTradeId,jdbcType=VARCHAR}, #{finprodId,jdbcType=VARCHAR}, #{finprodType,jdbcType=VARCHAR}, 
             #{finprodType2,jdbcType=VARCHAR}, #{branch,jdbcType=DECIMAL}, #{busiType,jdbcType=VARCHAR}, 
@@ -160,7 +160,7 @@
             #{tradeAmtRaw,jdbcType=DECIMAL}, #{tradeIdRaw,jdbcType=VARCHAR}, #{seqNo,jdbcType=VARCHAR}, 
             #{isPurchTypeYx,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, 
             #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
-            #{fCjbh,jdbcType=VARCHAR})
+            #{fCjbh,jdbcType=VARCHAR}, #{deliveryResult, jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.SettleTransDataTotal" >
         insert into SETTLE_TRANS_DATA_TOTAL

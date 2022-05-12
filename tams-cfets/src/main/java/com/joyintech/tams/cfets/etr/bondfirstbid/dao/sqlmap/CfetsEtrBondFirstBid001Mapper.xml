@@ -382,6 +382,13 @@
         left join SYS_DATADICT_LIST sdl6 on aaa.type11 = sdl.ITEM_CODE and sdl.DICT_CODE = 'CUSTOM_ASSET_TYPE_FOUR'
         left join SYS_DATADICT_LIST sdl7 on aaa.ccy = sdl.ITEM_CODE and sdl.DICT_CODE = 'CCY'
         <where>
+            aaa.filterDate  <![CDATA[>=]]> to_date(#{platformDate}, 'yyyy-MM-dd')
+            <if test="finprodIdList != null and finprodIdList.size() > 0">
+                AND aaa.finprodId in
+                <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
             <if test="issueDateStart!=null and issueDateStart!='' and  issueDateEnd!=null and issueDateEnd!='' ">
                 AND aaa.issueDate <![CDATA[>=]]> to_date(#{issueDateStart}, 'yyyy-MM-dd')
                 AND aaa.issueDate <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd')
@@ -492,6 +499,11 @@
                      WHEN PRODUCT_ADD.LISTING_DATE >= TO_DATE(#{platformDate},'YYYY-MM-DD') THEN '02'
                 ]]>
             ELSE NULL END AS issueStage,
+            CASE
+                WHEN PRODUCT_ADD.LISTING_DATE IS NOT NULL THEN PRODUCT_ADD.LISTING_DATE
+                WHEN ISSUE.ISSUE_DATE IS NOT NULL THEN ISSUE.ISSUE_DATE
+                ELSE ISSUE.TENDER_EDATE
+                END AS filterDate,
             PRODUCT.FINPROD_MARKET_ID as finprodMarketId,
             PRODUCT.FINPROD_ABBR as finprodAbbr,
             PRODUCT.FINPROD_ID as finprodId,
@@ -505,12 +517,12 @@
             ISSUE.PAY_EDATE as payEdate,
             PRODUCT.COUPON_SPECIES as couponSpecies,
             ISSUE.INT_TYPE as intType,
-            PRODUCT.ISSUE_PRICE as issuePrice,
+            ISSUE.ISSUE_PRICE as issuePrice,
             case
                 when PRODUCT.COUPON_SPECIES = '01' AND  ISSUE.INT_TYPE = '01' THEN
                     ISSUE.REFER_YIELD
                 when PRODUCT.COUPON_SPECIES = '01' AND  ISSUE.INT_TYPE = '02' THEN
-                    (ISSUE.BP + miri.INT_RATE)
+                    miri.INT_RATE
                 when PRODUCT.COUPON_SPECIES IN ('02', '03', '04') THEN
                     ISSUE.REFER_YIELD
                 else ISSUE.REFER_YIELD
@@ -532,7 +544,7 @@
             ISSUE.TENDER_TYPE as tenderType,
             ISSUE.ISSUE_STYLE as issueStyle,
             case
-            when ISSUE.ISSUE_CLASS IN ('02', '03')  THEN
+            when ISSUE.ISSUE_CLASS IN ('01')  THEN
                 TO_CHAR(ISSUE.ISSUE_DATE, 'yyyy-MM-dd')
             else TO_CHAR(PRODUCT_ADD.BID_DATE, 'yyyy-MM-dd')
             end as issueDateStr,
@@ -543,7 +555,7 @@
         LEFT JOIN FIN_PRODUCT_ADD PRODUCT_ADD ON PRODUCT.FINPROD_ID = PRODUCT_ADD.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ISSUE ISSUE ON PRODUCT.FINPROD_ID = ISSUE.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_TYPE PRODUCT_TYPE ON PRODUCT.FINPROD_ID = PRODUCT_TYPE.FINPROD_ID
-        LEFT JOIN MST_INT_RATE_INFO miri ON miri.INT_RATE_ID  = ISSUE.INT_RATE_ID
+        LEFT JOIN MST_INT_RATE_INFO miri ON miri.INT_RATE_ID  = ISSUE.INT_RATE_ID AND miri.EFF_DATE >= TO_DATE(#{platformDate},'YYYY-MM-DD')
         LEFT JOIN (	SELECT ASSET_CODE,RATING,GRADE_ORG_ID FROM (
                     SELECT ROW_NUMBER() OVER(PARTITION BY BRATING.O_CODE ORDER BY BRATING.O_CODE,BRATING.GRADE_DATE DESC
                         ,BRATING.GRADE_RESULT DESC) RANK,BRATING.O_CODE AS ASSET_CODE,BRATING.GRADE_RESULT AS RATING,BRATING.GRADE_ORG_ID as GRADE_ORG_ID
@@ -562,7 +574,7 @@
         LEFT JOIN MST_CUSTOMER_INFO MCIT ON MCIT.CUSTOMER_ID=ZX.GRADE_ORG_ID
         <where>
             PRODUCT.FINPROD_TYPE2=#{finprodType2,jdbcType=VARCHAR}
-            AND PRODUCT.TRADE_MARKET in (#{TRADE_MARKET_01,jdbcType=VARCHAR}, #{TRADE_MARKET_02,jdbcType=VARCHAR}) <!-- 限制为银行间和商业柜台-->
+            AND PRODUCT.TRADE_MARKET in ('01','02','03','04') <!-- 限制为银行间和商业柜台,上交所和深交所-->
             AND (PRODUCT_ADD.ISSUE_STATUS != '02' OR PRODUCT_ADD.ISSUE_STATUS IS NULL ) <!-- 限制为发行状态不为发行失败-->
             <if test="finprodMarketId !=null and finprodMarketId !=''">
                 AND PRODUCT.FINPROD_MARKET_ID=#{finprodMarketId,jdbcType=VARCHAR}
@@ -578,6 +590,30 @@
             </if>
             <if test="customAssetType !=null and customAssetType !=''">
                 AND PRODUCT_TYPE.TYPE_11=#{customAssetType,jdbcType=VARCHAR}
+            </if>
+            <if test="type9List != null and type9List.size() > 0">
+                AND PRODUCT_TYPE.type_9 in
+                <foreach collection="type9List" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="type10List != null and type10List.size() > 0">
+                AND PRODUCT_TYPE.type_10 in
+                <foreach collection="type10List" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="type11List != null and type11List.size() > 0">
+                AND PRODUCT_TYPE.type_11 in
+                <foreach collection="type11List" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="ccy !=null and ccy !=''">
+                AND PRODUCT.CCY=#{ccy,jdbcType=VARCHAR}
+            </if>
+            <if test="tradeMarket !=null and tradeMarket !=''">
+                AND PRODUCT.TRADE_MARKET=#{tradeMarket,jdbcType=VARCHAR}
             </if>
         </where>
 

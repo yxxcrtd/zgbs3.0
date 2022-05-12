@@ -134,7 +134,7 @@
         F.PRICE_TYPE priceType,
         F.TARGET_TYPE targetType,
 		FRA.IS_NO_GUARD isNoGuard,
-        decode(F.PRICE_TYPE,'01','N','Y') isNetPrice
+        decode(F.PRICE_TYPE,'01','Y','02','N','') isNetPrice
 		FROM ETR_ENTRUST A
 		LEFT JOIN PTL_PORTFOLIO B ON A.PORTFOLIO_ID=B.PORTFOLIO_ID
 		LEFT JOIN FIN_PRODUCT C ON A.FINPROD_ID=C.FINPROD_ID

@@ -29,16 +29,13 @@ import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
-import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
-import com.joyintech.tams.common.base.dao.EtrEntrustBackupMapper;
-import com.joyintech.tams.common.base.dao.WflEtrEntrustAddMapper;
-import com.joyintech.tams.common.base.entity.EtrEntrust;
-import com.joyintech.tams.common.base.entity.EtrEntrustAdd;
-import com.joyintech.tams.common.base.entity.WflEtrEntrustAdd;
-import com.joyintech.tams.common.base.entity.WflEtrEntrustAddKey;
+import com.joyintech.tams.common.base.dao.*;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.invest.common.constant.BussinessDictCode;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.BaseEtrInvestInfoDto;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.slf4j.Logger;
@@ -85,6 +82,12 @@ public class EtrConBondController {
 
     @Autowired
     private WflEtrEntrustAddMapper wflEtrEntrustAddMapper;
+
+    @Autowired
+    private EtrEntrustMapper etrEntrustMapper;
+
+    @Autowired
+    private WflEtrEntrustMapper wflEtrEntrustMapper;
 
     public static final String OPERATE_TYPE_SAVE = "save";
     public static final String OPERATE_TYPE_SUBMIT = "submit";
@@ -318,7 +321,23 @@ public class EtrConBondController {
         log.info("doBack() called with parameters => 【dto = {}】", JsonUtils.object2Json(dto));
         BaseEtrInvestInfoDto baseEtrInvestInfoDto = new BaseEtrInvestInfoDto();
         baseEtrInvestInfoDto.setWorkFlowId(dto.getWorkflowId());
-        baseEtrInvestInfoDto.setEtrEntrust(dto);
+
+        EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(dto.getEntrustId());
+        if(null == etrEntrust) {
+            etrEntrust = new EtrEntrust();
+            etrEntrust.setEntrustId(dto.getEntrustId());
+            WflEtrEntrustKey key = new WflEtrEntrustKey();
+            key.setEntrustId(dto.getEntrustId());
+            key.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
+            WflEtrEntrust wflEtrEntrust = wflEtrEntrustMapper.selectByPrimaryKey(key);
+            if(null != wflEtrEntrust) {
+                BeanUtil.copyPropertiesIgnoreNull(etrEntrust, wflEtrEntrust);
+            }
+        }
+
+        etrEntrust.setEntrustStatus(BussinessDictCodeList.委托状态_已退回.getValue());
+
+        baseEtrInvestInfoDto.setEtrEntrust(etrEntrust);
 
         EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(dto.getEntrustId());
         if(null == etrEntrustAdd) {

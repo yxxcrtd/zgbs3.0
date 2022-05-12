@@ -308,7 +308,7 @@ public class AssetCommonUtil {
      * @return  备注 小于返回-1，等于返回0，大于返回1
      */
     public static <T extends FinOpenPlan,K extends FinOpenRule> Integer comparePtlCycle(List<T> purPlanList,K purRule,
-                                                                                        List<T> repPlanList,K repRule,Integer compare){
+                                                                                        List<T> repPlanList,K repRule,Integer compare, Date vdate){
         if((Objects.isNull(purRule)&&Objects.isNull(repRule))||null==compare){
             return null;
         }
@@ -330,7 +330,7 @@ public class AssetCommonUtil {
             return BigDecimal.ONE.compareTo(new BigDecimal(compare));
         }
         //获取投资周期
-        Long days=getPtlInvestPeriod(repPlanList,repRule);
+        Long days=getPtlInvestPeriod(repPlanList,repRule,vdate);
         return null==days?null:days.compareTo(compare.longValue());
     }
 
@@ -340,7 +340,7 @@ public class AssetCommonUtil {
      * @param compare 比如判断是否大于90天，传90
      * @return 备注 KEY 产品代码 VALUE：小于返回-1，等于返回0，大于返回1
      */
-    public static Map<String,Integer> comparePtlCycle(List<String> ptlList,Integer compare){
+    public static Map<String,Integer> comparePtlCycle(List<String> ptlList,Integer compare, Date vdate){
         if(StringUtil.isEmptyList(ptlList)||null==compare){
             return null;
         }
@@ -376,7 +376,7 @@ public class AssetCommonUtil {
             if(CollectionUtils.isEmpty(ptlPlanMap)||StringUtil.isEmptyList(ptlPlanMap.get(k))){
                 retMap.put(k,null);
             }
-            Long days=getPtlInvestPeriod(ptlPlanMap.get(k),vRuleList.get(0));
+            Long days=getPtlInvestPeriod(ptlPlanMap.get(k),vRuleList.get(0),vdate);
             retMap.put(k,null==days?null:days.compareTo(compare.longValue()));
         });
         return retMap;
@@ -391,14 +391,19 @@ public class AssetCommonUtil {
      * 以【开放计划信息】模块中【推算方法】字段的信息确定开始日，进而确定周期。
      * 则以【起息日】字段作为“开始日”，用第1条记录的【赎回确认日】减去“开始日”确定周期，无【赎回确认日】时采用【申购确认日】进行计算
      */
-    public static <T extends FinOpenPlan,F extends FinOpenRule> Long getPtlInvestPeriod(List<T> tPlanList,F tRule){
+    public static <T extends FinOpenPlan,F extends FinOpenRule> Long getPtlInvestPeriod(List<T> tPlanList,F tRule,Date vdate){
         if(StringUtil.isEmptyList(tPlanList)){
             return null;
         }
         //处理开放计划只有一条的情况
         if(1==tPlanList.size()){
-            return DateUtil.getBetweenDayNumber(getAssetInfo(tPlanList.get(0).getFinprodId(),obj->obj.getVdate()),
-                    tPlanList.get(0).getOpenVdate());
+            if(StringUtil.isNotEmpty(vdate)){
+                return DateUtil.getBetweenDayNumber(vdate,
+                        tPlanList.get(0).getOpenVdate());
+            }else{
+                return DateUtil.getBetweenDayNumber(getAssetInfo(tPlanList.get(0).getFinprodId(),obj->obj.getVdate()),
+                        tPlanList.get(0).getOpenVdate());
+            }
         }
         //若是1条以上则用后一条计划减去前一条再取最小值
         List<Long> daysList = new ArrayList<>();

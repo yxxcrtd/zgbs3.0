@@ -37,6 +37,7 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
     @ApiModelProperty(name="operateType",value="操作类型")
     private String operateType;
 
+
     /**
      *  发行方式
      */

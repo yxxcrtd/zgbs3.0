@@ -7,6 +7,7 @@ import com.joyintech.tams.common.base.entity.SettleBatchPara;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.settle.batch.datadeal.service.StlDownDataDealService;
 import com.joyintech.tams.settle.batch.datagather.constant.StlDataGatherConstant;
@@ -62,8 +63,8 @@ public class StlDataGatherShares2Reader extends StlDataGatherReader {
         searchParam.put("portfolioIdList", portfolioIdList);
         setSearchParam(searchParam);
         searchParam.put("dealDate", execInfo.getExecuteDate());
-        searchParam.put("DELIVERY_RESULT_01", "01");
-        searchParam.put("DELIVERY_RESULT_02", "02");
+        searchParam.put("DELIVERY_RESULT_01", DictCodeListExt4.交收结果_正常交收.getValue());
+        searchParam.put("DELIVERY_RESULT_02", DictCodeListExt4.交收结果_部分交收.getValue());
         searchParam.put("TRADE_MARKET_03", BussinessDictCodeList.交易场所_上海证券交易所.getValue());
         searchParam.put("TRADE_MARKET_04", BussinessDictCodeList.交易场所_深圳证券交易所.getValue());
         searchParam.put("PS_T12", DictCodeList.交易方向_红利再投.getValue());

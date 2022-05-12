@@ -14,6 +14,8 @@ public class TradeInfoProResponse {
     @ApiModelProperty(name="dealer",value="交易商",example="A1", required = true)
     private String dealer;
 
+    @ApiModelProperty(name="seqNo",value="流水号",example="A1", required = true)
+    private String seqNo;
 
     @ApiModelProperty(name="customerId",value="客户代码",example="A1", required = true)
     private String customerId;
@@ -150,5 +152,13 @@ public class TradeInfoProResponse {
 
     public void setCustomerId(String customerId) {
         this.customerId = customerId;
+    }
+
+    public String getSeqNo() {
+        return seqNo;
+    }
+
+    public void setSeqNo(String seqNo) {
+        this.seqNo = seqNo;
     }
 }

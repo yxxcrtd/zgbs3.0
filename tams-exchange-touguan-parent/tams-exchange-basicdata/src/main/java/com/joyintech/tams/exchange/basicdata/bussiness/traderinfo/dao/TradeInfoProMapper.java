@@ -30,7 +30,7 @@ public interface TradeInfoProMapper {
 
     int hasDealerDetails(String customerId);
 
-    int deleteDealerDetails(String customerId);
+    int deleteDealerDetails(TradeInfoProSaveRequest dto);
 
     int deleteTrader(TradeInfoProSaveRequest dto);
 
@@ -51,4 +51,6 @@ public interface TradeInfoProMapper {
     int updateDetailsSJ(TradeInfoProSaveRequest dto);
 
     int deleteTraderSJ(TradeInfoProSaveRequest dto);
+
+    int existsTrader(TradeInfoProSaveRequest dto);
 }

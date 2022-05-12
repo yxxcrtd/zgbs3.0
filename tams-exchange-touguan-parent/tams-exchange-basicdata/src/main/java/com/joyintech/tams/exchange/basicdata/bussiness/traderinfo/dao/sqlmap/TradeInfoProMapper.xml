@@ -28,12 +28,12 @@
 
           update  MST_DEALER_DETAIL_INFO set  DEALER_PARTY_TYPE = #{dealerPartyType} , DEALER_PARTY_NAME = #{dealerPartyName} ,
                   DEALER_PARTY_NO = #{dealerPartyNo} ,
-                  TRADER_NAME = #{trader,jdbcType=VARCHAR} ,TRADER_NO = #{traderNo,jdbcType=VARCHAR},IS_OUR = #{isOur,jdbcType=VARCHAR} where CUSTOMER_ID = #{customerId,jdbcType=VARCHAR} and DEALER_PARTY_NO = #{dealerPartyNoPre,jdbcType=VARCHAR} and TRADER_NO = #{traderNoPre,jdbcType=VARCHAR}
+                  TRADER_NAME = #{trader,jdbcType=VARCHAR} ,TRADER_NO = #{traderNo,jdbcType=VARCHAR},IS_OUR = #{isOur,jdbcType=VARCHAR} where SEQ_NO = #{seqNo,jdbcType=VARCHAR}
     </update>
     <update id="updateDetailsSJ">
          update  MST_DEALER_DETAIL_INFO set
                   TRADER_NAME = #{trader,jdbcType=VARCHAR} ,TRADER_NO = #{traderNo,jdbcType=VARCHAR},IS_OUR = #{isOur,jdbcType=VARCHAR}
-                   where CUSTOMER_ID = #{customerId,jdbcType=VARCHAR} and TRADER_NO = #{traderNoPre,jdbcType=VARCHAR}
+                   where SEQ_NO = #{seqNo,jdbcType=VARCHAR}
     </update>
 
 
@@ -113,6 +113,7 @@
     <select id="findTrader"
             resultType="com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dto.TraderInfoDto">
              select
+               MDDI.SEQ_NO seqNo,
                MDDI.DEALER_PARTY_NO,
                MDDI.DEALER_PARTY_TYPE,
                MDDI.DEALER_PARTY_NAME,
@@ -124,6 +125,11 @@
           inner JOIN  MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO
                and MDDI.CUSTOMER_ID=mdi.CUSTOMER_ID
           where mdi.CUSTOMER_ID = #{customerId} and mdi.DEALER_NO = #{dealerNo}
+    </select>
+    <select id="existsTrader" resultType="java.lang.Integer">
+         select count(1) from MST_DEALER_INFO mdi
+         inner join MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO AND MDI.CUSTOMER_ID = MDDI.CUSTOMER_ID
+         WHERE mdi.CUSTOMER_ID = #{customerId} AND MDI.DEALER_NO = #{dealerNo} and mddi.TRADER_NO = #{traderNo}
     </select>
 
 
@@ -141,14 +147,13 @@
         and DEALER_NO = #{dealerNo}
     </delete>
     <delete id="deleteDealerDetails">
-        delete from MST_DEALER_DETAIL_INFO where  CUSTOMER_ID = #{customerId}
+        delete from MST_DEALER_DETAIL_INFO where  CUSTOMER_ID = #{customerId} and DEALER_NO = #{dealerNo}
     </delete>
     <delete id="deleteTrader">
-        delete from MST_DEALER_DETAIL_INFO where CUSTOMER_ID = #{dealerName} and DEALER_PARTY_NO = #{dealerPartyNo} and TRADER_NO = #{traderNo}
+        delete from MST_DEALER_DETAIL_INFO where  SEQ_NO = #{seqNo,jdbcType=VARCHAR}
     </delete>
     <delete id="deleteTraderSJ">
-            delete from MST_DEALER_DETAIL_INFO where CUSTOMER_ID = #{dealerName}
-            and TRADER_NO = #{traderNo}
+            delete from MST_DEALER_DETAIL_INFO where  SEQ_NO = #{seqNo,jdbcType=VARCHAR}
     </delete>
 
 </mapper>

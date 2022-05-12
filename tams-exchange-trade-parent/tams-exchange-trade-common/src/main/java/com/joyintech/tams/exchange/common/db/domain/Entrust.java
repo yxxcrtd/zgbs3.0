@@ -157,7 +157,7 @@ public class Entrust extends BaseEntity implements Serializable, EntrustInterfac
     @JsonSerialize(using = DoubleSerializerUtils.class)
     private BigDecimal tradedPrice;
 
-    @ApiModelProperty(name = "cancelVolume", value = "撤销数量")
+    @ApiModelProperty(name = "cancelVolume", value = "撤单数量")
     @NotNull
     @Digits(integer = 20, fraction = 0)
     private long cancelVolume;
@@ -289,6 +289,26 @@ public class Entrust extends BaseEntity implements Serializable, EntrustInterfac
     private String targetType;
     @ApiModelProperty(name = "isNoGuard", value = "是否非担保")
     private String isNoGuard;
+
+    @ApiModelProperty(name = "entrustVolumeView", value = "委托数量(展示)")
+    @Digits(integer = 20, fraction = 2)
+    private BigDecimal entrustVolumeView;
+
+    @ApiModelProperty(name = "frozenVolumeView", value = "冻结数量(展示)")
+    @Digits(integer = 20, fraction = 2)
+    private BigDecimal frozenVolumeView;
+
+    @ApiModelProperty(name = "tradedVolumeView", value = "已成交数量(展示)")
+    @Digits(integer = 20, fraction = 2)
+    private BigDecimal tradedVolumeView;
+
+    @ApiModelProperty(name = "cancelVolumeView", value = "撤单数量(展示)")
+    @Digits(integer = 20, fraction = 2)
+    private BigDecimal cancelVolumeView;
+
+    @ApiModelProperty(name = "bondVolume", value = "折合标准券(展示)")
+    @Digits(integer = 20, fraction = 4)
+    private BigDecimal bondVolume;
 
     public boolean isNoCancelEntrust() {
         return noCancelEntrust;
@@ -817,6 +837,46 @@ public class Entrust extends BaseEntity implements Serializable, EntrustInterfac
 
     public void setIsNoGuard(String isNoGuard) {
         this.isNoGuard = isNoGuard;
+    }
+
+    public BigDecimal getEntrustVolumeView() {
+        return entrustVolumeView;
+    }
+
+    public void setEntrustVolumeView(BigDecimal entrustVolumeView) {
+        this.entrustVolumeView = entrustVolumeView;
+    }
+
+    public BigDecimal getFrozenVolumeView() {
+        return frozenVolumeView;
+    }
+
+    public void setFrozenVolumeView(BigDecimal frozenVolumeView) {
+        this.frozenVolumeView = frozenVolumeView;
+    }
+
+    public BigDecimal getTradedVolumeView() {
+        return tradedVolumeView;
+    }
+
+    public void setTradedVolumeView(BigDecimal tradedVolumeView) {
+        this.tradedVolumeView = tradedVolumeView;
+    }
+
+    public BigDecimal getCancelVolumeView() {
+        return cancelVolumeView;
+    }
+
+    public void setCancelVolumeView(BigDecimal cancelVolumeView) {
+        this.cancelVolumeView = cancelVolumeView;
+    }
+
+    public BigDecimal getBondVolume() {
+        return bondVolume;
+    }
+
+    public void setBondVolume(BigDecimal bondVolume) {
+        this.bondVolume = bondVolume;
     }
 
     public static Entrust getTemplateEntrust() {
