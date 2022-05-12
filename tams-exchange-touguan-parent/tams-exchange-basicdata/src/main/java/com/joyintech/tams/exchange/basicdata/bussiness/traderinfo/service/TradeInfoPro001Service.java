@@ -84,8 +84,8 @@ public class TradeInfoPro001Service extends BaseService implements BaseProcessSe
         return tradeInfoProMapper.hasDealerDetails(customerId);
     }
 
-    public int deleteDealerDetails(String customerId) {
-        return tradeInfoProMapper.deleteDealerDetails(customerId);
+    public int deleteDealerDetails(TradeInfoProSaveRequest dto) {
+        return tradeInfoProMapper.deleteDealerDetails(dto);
     }
 
     @Override
@@ -127,5 +127,9 @@ public class TradeInfoPro001Service extends BaseService implements BaseProcessSe
 
     public int deleteTraderSJ(TradeInfoProSaveRequest dto) {
         return tradeInfoProMapper.deleteTraderSJ(dto);
+    }
+
+    public int existsTrader(TradeInfoProSaveRequest dto) {
+        return tradeInfoProMapper.existsTrader(dto);
     }
 }
