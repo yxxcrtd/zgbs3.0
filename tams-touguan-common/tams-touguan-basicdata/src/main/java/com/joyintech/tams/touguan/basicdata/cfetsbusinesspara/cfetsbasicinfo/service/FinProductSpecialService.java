@@ -81,8 +81,6 @@ public class FinProductSpecialService extends BaseService<FinProductSpecialDto> 
     public void doComplete(FinProductSpecialDto entity, OperationType type) {
         //记录业务表
         insertData(entity);
-        //记录流程表
-        insertWflData(entity);
     }
 
     /**
@@ -93,7 +91,8 @@ public class FinProductSpecialService extends BaseService<FinProductSpecialDto> 
      */
     @Override
     public void doInsert(FinProductSpecialDto dto, OperationType type) {
-        insertData(dto);
+        //记录流程表
+        insertWflData(dto);
     }
 
 
