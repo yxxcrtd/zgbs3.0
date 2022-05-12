@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Objects;
 
 @ApiModel(value = "委托信息", description = "委托信息")
 public class EntrustQueryBean implements Serializable {
@@ -895,7 +896,11 @@ public class EntrustQueryBean implements Serializable {
         if (StringUtil.isEmpty(tradePlat)) {
             return null;
         }
-        return DictCodeList.from(DictCode.交易平台, tradePlat).getCodeName();
+        DictCodeList dictCode = DictCodeList.from(DictCode.交易平台, tradePlat);
+        if (Objects.nonNull(dictCode)) {
+            return dictCode.getCodeName();
+        }
+        return tradePlat;
     }
 
     public void setTradePlatStr(String tradePlatStr) {
@@ -906,7 +911,11 @@ public class EntrustQueryBean implements Serializable {
         if (StringUtil.isEmpty(finprodType2)) {
             return null;
         }
-        return DictCodeListExt1.from(DictCode.金融产品类型, finprodType2).getCodeName();
+        DictCodeListExt1 dictCode = DictCodeListExt1.from(DictCode.金融产品类型, finprodType2);
+        if (Objects.nonNull(dictCode)) {
+            return dictCode.getCodeName();
+        }
+        return finprodType2;
     }
 
     public void setFinprodType2Str(String finprodType2Str) {
@@ -917,7 +926,11 @@ public class EntrustQueryBean implements Serializable {
         if (StringUtil.isEmpty(ps)) {
             return null;
         }
-        return DictCodeListExt2.from(DictCode.交易方向, ps).getCodeName();
+        DictCodeListExt2 dictCode = DictCodeListExt2.from(DictCode.交易方向, ps);
+        if (Objects.nonNull(dictCode)) {
+            return dictCode.getCodeName();
+        }
+        return ps;
     }
 
     public void setEntrustBsStr(String entrustBsStr) {
@@ -968,7 +981,11 @@ public class EntrustQueryBean implements Serializable {
         if (StringUtil.isEmpty(busiTypeTg)) {
             return null;
         }
-        return DictCodeListExt3.from(DictCode.投管业务类型, busiTypeTg).getCodeName();
+        DictCodeListExt3 dictCode = DictCodeListExt3.from(DictCode.投管业务类型, busiTypeTg);
+        if (Objects.nonNull(dictCode)) {
+            return dictCode.getCodeName();
+        }
+        return busiTypeTg;
     }
 
 
