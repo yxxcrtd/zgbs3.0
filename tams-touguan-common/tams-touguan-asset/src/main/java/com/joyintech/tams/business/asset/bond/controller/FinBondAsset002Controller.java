@@ -586,16 +586,17 @@ public class FinBondAsset002Controller extends BaseController{
             }
             //还本计划
             BussFinRepaymentDto bussFinRepaymentDto = new BussFinRepaymentDto();
-            BeanUtil.copyPropertiesIgnoreNull(bussFinRepaymentDto, finPayInterestStdInfoDto); 
+            BeanUtil.copyPropertiesIgnoreNull(bussFinRepaymentDto, finPayInterestStdInfoDto);
             finPayInterestStdInfoDto.setEndTdayRule(DictCodeList.营业日准则_不调整.getValue());
             bussFinRepaymentDto.setFinPayInterestStdInfoDto(finPayInterestStdInfoDto);
             List<FinCashPlanDto> finCashPlans = bussFinRepaymentService.createAssetRePaymentPlan(bussFinRepaymentDto);
             List<BondFinCashPlanDto> lirs = new ArrayList<>();
-            if (CollectionUtils.isNotEmpty(finCashPlanList)) {
+            if (CollectionUtils.isNotEmpty(finCashPlans)) {
                 for (FinCashPlanDto lirsEntity : finCashPlans) {
                     BondFinCashPlanDto lirsDto = new BondFinCashPlanDto();
                     BeanUtil.copyPropertiesIgnoreNull(lirsDto, lirsEntity);
                     lirsDto.setCashAmt(lirsEntity.getCashAmt());
+                    lirsDto.setLirs(null);
                     lirs.add(lirsDto);
                 }
             }

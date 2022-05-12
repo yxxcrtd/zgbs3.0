@@ -421,6 +421,9 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             //付息信息
             BondFinPayInterestStdInfoDto finPayInterestStdInfoDto = new BondFinPayInterestStdInfoDto();
             BeanUtil.copyPropertiesIgnoreNull(finPayInterestStdInfoDto,dto);
+            if(StringUtil.isNotEmpty(finPayInterestStdInfoDto)) {
+                finPayInterestStdInfoDto.setMaxTradeDate(this.getMaxTradeDate(dto.getFinprodId()));
+            }
             map.put("cashId",dto.getInterestCashId());
             if (StringUtil.isNotEmpty(dto.getInterestCashId())) {
                 List<BondFinCashPlanDto> invScheduleList = finBondAssetMapper.selectInvScheduleList(map);
