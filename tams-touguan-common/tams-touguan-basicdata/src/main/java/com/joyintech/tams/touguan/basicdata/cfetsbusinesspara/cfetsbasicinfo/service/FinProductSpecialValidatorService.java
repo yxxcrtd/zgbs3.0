@@ -42,16 +42,16 @@ public class FinProductSpecialValidatorService implements BeanValidator {
         List<ValidMessage> resultList = new ArrayList<>();
         FinProductSpecialSaveRequest dto = (FinProductSpecialSaveRequest) value;
         if (StringUtil.isBlank(dto.getFinprodMarketId())) {
-            resultList.add(new ValidMessage(getMessage("债券代码字段必填!")));
+            resultList.add(new ValidMessage(getMessage("【债券代码】必填!")));
         }
         if (StringUtil.isBlank(dto.getIsAbs())) {
-            resultList.add(new ValidMessage(getMessage("是否资产支持证券字段必填!")));
+            resultList.add(new ValidMessage(getMessage("【是否资产支持证券】必填!")));
         }
         if (StringUtil.isBlank(dto.getIsSpecialDebt())) {
-            resultList.add(new ValidMessage(getMessage("是否特殊债字段必填!")));
+            resultList.add(new ValidMessage(getMessage("【是否特殊债】必填!")));
         }
         if (StringUtil.isBlank(dto.getIsDefaultBondIndicator())) {
-            resultList.add(new ValidMessage(getMessage("是否到期违约债字段必填!")));
+            resultList.add(new ValidMessage(getMessage("【是否到期违约债】必填!")));
         }
         if (DictCodeList.是否_否.getValue().equals(dto.getIsDefaultBondIndicator())
                 && DictCodeList.是否_否.getValue().equals(dto.getIsAbs())
