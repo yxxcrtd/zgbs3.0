@@ -1,6 +1,8 @@
 package com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dto;
 
 
+import com.joyintech.framework.validation.annotation.Length;
+import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.util.SysDataUtil;
 import io.swagger.annotations.ApiModel;
@@ -98,6 +100,7 @@ public class TradeInfoProResponse {
         this.dealerPartyName = dealerPartyName;
     }
 
+    @Length(fieldName = "交易员名称", max = 15, groups = {ValidateGroupEdit.class})
     public String getTrader() {
         return trader;
     }

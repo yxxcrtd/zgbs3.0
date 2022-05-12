@@ -63,6 +63,7 @@ public class TradeInfoPro001Controller extends BaseController {
      * 日志
      */
     private Logger logger = LoggerFactory.getLogger(getClass());
+    private static String CONTAIN_DIGIT_REGEX = ".*[0-9].*";
 
     @ApiOperation(value = "交易商信息维护页面初始化参数", notes = "交易商信息维护查询页面初始化参数")
     @PostMapping("/getPageParams001")
@@ -199,6 +200,9 @@ public class TradeInfoPro001Controller extends BaseController {
 //        //根据页面上交易商名称查找客户代码
 //        String customerId = tradeInfoPro001Service.findCustomerIdByDealerName(dealerName);//客户代码，交易商代码不能改
         dto.setCustomerId(dto.getDealerName());
+        if (tradeInfoProSaveRequest.getDealerNo().getBytes().length>50){
+            return new Message().fail().setMessage("交易商输入的字符过长，请重新输入!");
+        }
         try{
             if(existsDealer(tradeInfoProSaveRequest)>0){
                 return new Message().fail().setMessage("交易商名称和交易商代码已存在，请勿重复插入！");
@@ -235,6 +239,20 @@ public class TradeInfoPro001Controller extends BaseController {
         BussinessCodeParameter param = new BussinessCodeParameter();
         String seqNo = bussGetBussinessIdService !=null ? bussGetBussinessIdService.buildBussinessCode(param): IDGenerator.generate();
         tradeInfoProSaveRequest.setSeqNo(seqNo);
+        if (tradeInfoProSaveRequest.getTrader().getBytes().length>50){
+            return new Message().fail().setMessage("交易员名称输入的字符过长，请重新输入!");
+        }
+        if (tradeInfoProSaveRequest.getTraderNo().getBytes().length>32){
+            return new Message().fail().setMessage("交易员代码输入的字符过长，请重新输入!");
+        }
+        if (StringUtil.equals(dto.getTradeMarket(),"04")){
+            if (tradeInfoProSaveRequest.getDealerPartyNo().getBytes().length>32){
+                return new Message().fail().setMessage("交易主体代码输入的字符过长，请重新输入!");
+            }
+            if (tradeInfoProSaveRequest.getDealerPartyName().getBytes().length>32){
+                return new Message().fail().setMessage("交易主体名称输入的字符过长，请重新输入!");
+            }
+        }
         try{
             //上交所新增交易主体时，同一交易商+交易场所下，交易员代码应不允许重复
                if(StringUtil.equals(dto.getTradeMarket(),"03")&& existsTrader(tradeInfoProSaveRequest)>0){
@@ -275,6 +293,9 @@ public class TradeInfoPro001Controller extends BaseController {
     @ResponseBody
     @PostMapping("editDealer")
     public Message editDealer (@RequestBody TradeInfoProSaveRequest dto){
+        if (dto.getDealerNo().getBytes().length>50){
+            return new Message().fail().setMessage("交易商代码输入的字符过长，无法修改，请重新输入!");
+        }
         String dealerName = dto.getDealerName();
         //根据页面上交易商名称查找客户代码
         String customerId = tradeInfoPro001Service.findCustomerIdByDealerName(dealerName);//客户代码，交易商代码不能改
@@ -306,9 +327,20 @@ public class TradeInfoPro001Controller extends BaseController {
     @ResponseBody
     @PostMapping("editDealerDetails")
     public Message editDealerDetails (@RequestBody TradeInfoProSaveRequest dto){
-//        String dealerName = dto.getDealerName();
-//        //根据页面上交易商名称查找客户代码
-//        String customerId = tradeInfoPro001Service.findCustomerIdByDealerName(dealerName);//客户代码，交易商代码不能改
+        if (dto.getTrader().getBytes().length>50){
+            return new Message().fail().setMessage("交易员名称输入的字符过长，请重新输入!");
+        }
+        if (dto.getTraderNo().getBytes().length>32){
+            return new Message().fail().setMessage("交易员代码输入的字符过长，请重新输入!");
+        }
+        if (StringUtil.equals(dto.getTradeMarket(),"04")){
+            if (dto.getDealerPartyNo().getBytes().length>32){
+                return new Message().fail().setMessage("交易主体代码输入的字符过长，请重新输入!");
+            }
+            if (dto.getDealerPartyName().getBytes().length>32){
+                return new Message().fail().setMessage("交易主体名称输入的字符过长，请重新输入!");
+            }
+        }
         try{
 //            deleteDealerDetails1(dealerName);
 //            TradeInfoProSaveRequest tradeInfoProSaveRequest = new TradeInfoProSaveRequest();

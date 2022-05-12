@@ -3,6 +3,7 @@ package com.joyintech.tams.exchange.basicdata.bussiness.traderinfo.dto;
 
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
+import com.joyintech.framework.validation.annotation.Length;
 import com.joyintech.framework.validation.annotation.ValidLogic;
 import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
@@ -131,6 +132,7 @@ public class TradeInfoProSaveRequest extends BaseEntity implements ProcessEntity
         this.dealerPartyName = dealerPartyName;
     }
 
+    @Length(fieldName = "交易员名称", max = 15, groups = {ValidateGroupEdit.class})
     public String getTrader() {
         return trader;
     }
