@@ -136,6 +136,12 @@
          inner join MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO AND MDI.CUSTOMER_ID = MDDI.CUSTOMER_ID
          where mdi.CUSTOMER_ID = #{customerId} AND MDI.DEALER_NO = #{dealerNo} and mddi.IS_OUR = 'Y'
     </select>
+    <select id="existsDealerParty" resultType="java.lang.Integer">
+           select count(1) from
+           (select DEALER_PARTY_NO from MST_DEALER_DETAIL_INFO mddi inner JOIN MST_DEALER_INFO mdi on mdi.DEALER_NO = MDDI.DEALER_NO
+           and MDDI.CUSTOMER_ID = mdi.CUSTOMER_ID where mdi.CUSTOMER_ID = #{customerId} AND MDI.DEALER_NO = #{dealerNo} and
+           mdi.TRADE_MARKET = '04' and mddi.DEALER_PARTY_TYPE in('03','04')) aa
+    </select>
 
 
     <delete id="deleteSelectedItem">
