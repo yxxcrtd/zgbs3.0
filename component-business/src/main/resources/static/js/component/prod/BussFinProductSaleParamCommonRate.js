@@ -85,6 +85,7 @@
                 $('#isFaceSingleInvestorDiv').show();//私募展示是否面向单一投资者字段
             }else{
                 $('#isFaceSingleInvestorDiv').hide();//公募隐藏是否面向单一投资者字段
+                $('#bussFinProductSaleParamDto_isFaceSingleInvestor').val('').trigger('change');
             }
         }else{
             $('#holdingMaxDiv').hide();
@@ -106,6 +107,7 @@
         $('#bussFinProductSaleParamDto_issueType').change(function(){
             if($('#bussFinProductSaleParamDto_issueType').val()=='1'){
                 $('#isFaceSingleInvestorDiv').hide();//公募隐藏是否面向单一投资者字段
+                $('#bussFinProductSaleParamDto_isFaceSingleInvestor').val('').trigger('change');
             }else{
                 $('#isFaceSingleInvestorDiv').show();//私募展示是否面向单一投资者字段
             }

@@ -7,6 +7,7 @@ import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.entity.SettleTransDataTotal;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.settle.batch.datadeal.service.StlDownDataDealService;
 import com.joyintech.tams.settle.batch.datagather.constant.StlDataGatherConstant;
@@ -81,6 +82,11 @@ public abstract class StlDataGatherReader extends BaseReader<InvestTradeReaderDt
             if(searchParam.containsKey("readerType") && StringUtil.equals(searchParam.get("readerType"),
                     StlDataGatherConstant.BOND_SHARES_MARKET_TRADE)){
                 return this.getBondSharesMarketTradeData(searchParam);
+            }
+            // 债券一级投标
+            if(searchParam.containsKey("readerType") && StringUtil.equals(searchParam.get("readerType"),
+                    StlDataGatherConstant.BOND_FIRST_BIDDING)){
+                return this.getBondFirstBiddingData(searchParam);
             }
         }
         return new ArrayList<InvestTradeReaderDto>();
@@ -244,6 +250,16 @@ public abstract class StlDataGatherReader extends BaseReader<InvestTradeReaderDt
             List<SettleTransDataDto> settleTransDataDtos = stlDataGatherService.listBoundSharesMarketTradeData(searchParam);
             investTradeReaderDto.setSettleTransDataList(settleTransDataDtos);
         }
+        List<InvestTradeReaderDto> result = new ArrayList<>();
+        result.add(investTradeReaderDto);
+        return result;
+    }
+
+    private List<InvestTradeReaderDto> getBondFirstBiddingData(Map<String, Object> searchParam){
+        InvestTradeReaderDto investTradeReaderDto = new InvestTradeReaderDto();
+        List<SettleTransDataTotal> settleTransDataTotals = new ArrayList<>();
+        // todo 处理逻辑
+        investTradeReaderDto.setSettleTransDataTotalList(settleTransDataTotals);
         List<InvestTradeReaderDto> result = new ArrayList<>();
         result.add(investTradeReaderDto);
         return result;

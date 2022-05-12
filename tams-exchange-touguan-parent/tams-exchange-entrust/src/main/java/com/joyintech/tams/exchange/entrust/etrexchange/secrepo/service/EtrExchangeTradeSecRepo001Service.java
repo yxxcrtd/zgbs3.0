@@ -1399,6 +1399,10 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                 etrSecRepoRepoDto.setFinprodType2(entity.getFinprodType2());// 金融产品类型（投管）
                 etrSecRepoRepoDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());// 资产大类
                 etrSecRepoRepoDto.setDealMode(DictCodeListExt3.指定交易方式_匹配成交.getValue());
+                if(StringUtil.equals(entity.getPriceModel(),DictCodeListExt2.价格模式_市价指令.getValue())){
+                    entity.setPrice(BigDecimal.ZERO);
+                    etrSecRepoRepoDto.setPrice(BigDecimal.ZERO);
+                }
                 EtrComponentFactory.getComponentService(EtrSecRepoRepoDto.class).updateSettings(paraDto);
                 EtrComponentFactory.getComponentService(EtrSecRepoRepoDto.class).entrustCheck(etrSecRepoRepoDto, result);
             }

@@ -4,11 +4,12 @@ import java.util.Date;
 
 /**
  * 描述:WFL_FIN_PRODUCT_SPECIAL表的实体类
- * @version
- * @author:  yushuangzhu
+ *
+ * @author: zhuys
  * @创建时间: 2022-05-09
  */
 public class WflFinProductSpecial {
+
     /**
      * 债券代码
      */
@@ -71,6 +72,7 @@ public class WflFinProductSpecial {
 
     /**
      * 债券代码
+     *
      * @return FINPROD_MARKET_ID 债券代码
      */
     public String getFinprodMarketId() {
@@ -79,6 +81,7 @@ public class WflFinProductSpecial {
 
     /**
      * 债券代码
+     *
      * @param finprodMarketId 债券代码
      */
     public void setFinprodMarketId(String finprodMarketId) {
@@ -87,6 +90,7 @@ public class WflFinProductSpecial {
 
     /**
      * 是否资产支持证券
+     *
      * @return IS_ABS 是否资产支持证券
      */
     public String getIsAbs() {
@@ -95,6 +99,7 @@ public class WflFinProductSpecial {
 
     /**
      * 是否资产支持证券
+     *
      * @param isAbs 是否资产支持证券
      */
     public void setIsAbs(String isAbs) {
@@ -103,6 +108,7 @@ public class WflFinProductSpecial {
 
     /**
      * 是否特殊债
+     *
      * @return IS_SPECIAL_DEBT 是否特殊债
      */
     public String getIsSpecialDebt() {
@@ -111,6 +117,7 @@ public class WflFinProductSpecial {
 
     /**
      * 是否特殊债
+     *
      * @param isSpecialDebt 是否特殊债
      */
     public void setIsSpecialDebt(String isSpecialDebt) {
@@ -119,6 +126,7 @@ public class WflFinProductSpecial {
 
     /**
      * 是否到期违约债
+     *
      * @return IS_DEFAULT_BOND_INDICATOR 是否到期违约债
      */
     public String getIsDefaultBondIndicator() {
@@ -127,6 +135,7 @@ public class WflFinProductSpecial {
 
     /**
      * 是否到期违约债
+     *
      * @param isDefaultBondIndicator 是否到期违约债
      */
     public void setIsDefaultBondIndicator(String isDefaultBondIndicator) {
@@ -135,6 +144,7 @@ public class WflFinProductSpecial {
 
     /**
      * 特殊债标识录入方式
+     *
      * @return INPUT_TYPE 特殊债标识录入方式
      */
     public String getInputType() {
@@ -143,6 +153,7 @@ public class WflFinProductSpecial {
 
     /**
      * 特殊债标识录入方式
+     *
      * @param inputType 特殊债标识录入方式
      */
     public void setInputType(String inputType) {
@@ -151,6 +162,7 @@ public class WflFinProductSpecial {
 
     /**
      * 创建人
+     *
      * @return CREATE_USER 创建人
      */
     public String getCreateUser() {
@@ -159,6 +171,7 @@ public class WflFinProductSpecial {
 
     /**
      * 创建人
+     *
      * @param createUser 创建人
      */
     public void setCreateUser(String createUser) {
@@ -167,6 +180,7 @@ public class WflFinProductSpecial {
 
     /**
      * 创建部门
+     *
      * @return CREATE_DEPT 创建部门
      */
     public String getCreateDept() {
@@ -175,6 +189,7 @@ public class WflFinProductSpecial {
 
     /**
      * 创建部门
+     *
      * @param createDept 创建部门
      */
     public void setCreateDept(String createDept) {
@@ -183,6 +198,7 @@ public class WflFinProductSpecial {
 
     /**
      * 创建时间
+     *
      * @return CREATE_TIME 创建时间
      */
     public Date getCreateTime() {
@@ -191,6 +207,7 @@ public class WflFinProductSpecial {
 
     /**
      * 创建时间
+     *
      * @param createTime 创建时间
      */
     public void setCreateTime(Date createTime) {
@@ -199,6 +216,7 @@ public class WflFinProductSpecial {
 
     /**
      * null
+     *
      * @return UPDATE_USER null
      */
     public String getUpdateUser() {
@@ -207,6 +225,7 @@ public class WflFinProductSpecial {
 
     /**
      * null
+     *
      * @param updateUser null
      */
     public void setUpdateUser(String updateUser) {
@@ -215,6 +234,7 @@ public class WflFinProductSpecial {
 
     /**
      * null
+     *
      * @return UPDATE_TIME null
      */
     public Date getUpdateTime() {
@@ -223,6 +243,7 @@ public class WflFinProductSpecial {
 
     /**
      * null
+     *
      * @param updateTime null
      */
     public void setUpdateTime(Date updateTime) {
@@ -231,6 +252,7 @@ public class WflFinProductSpecial {
 
     /**
      * 工作流代码
+     *
      * @return WORKFLOW_ID 工作流代码
      */
     public String getWorkflowId() {
@@ -239,6 +261,7 @@ public class WflFinProductSpecial {
 
     /**
      * 工作流代码
+     *
      * @param workflowId 工作流代码
      */
     public void setWorkflowId(String workflowId) {
@@ -247,6 +270,7 @@ public class WflFinProductSpecial {
 
     /**
      * 数据状态
+     *
      * @return WORKFLOW_STATUS 数据状态
      */
     public String getWorkflowStatus() {
@@ -255,6 +279,7 @@ public class WflFinProductSpecial {
 
     /**
      * 数据状态
+     *
      * @param workflowStatus 数据状态
      */
     public void setWorkflowStatus(String workflowStatus) {

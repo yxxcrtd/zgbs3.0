@@ -42,4 +42,9 @@ public interface StlDataGatherConstant {
      * 协议回购逆回购到期
      */
     String AGRE_ANTI_REPO_EXPIRED = "AgreAntiRepoExpired";
+
+    /**
+     * 一级投标债
+     */
+    String BOND_FIRST_BIDDING = "BondFirstBidding";
 }

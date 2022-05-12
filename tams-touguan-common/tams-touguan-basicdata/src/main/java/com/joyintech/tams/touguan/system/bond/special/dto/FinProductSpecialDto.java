@@ -44,9 +44,15 @@ public class FinProductSpecialDto extends BaseEntity implements ProcessEntity {
     private String finprodMarketId;
 
     /**
+     * 债券简称
+     */
+    @ApiModelProperty(name = "finprodAbbr", value = "债券简称")
+    private String finprodAbbr;
+
+    /**
      * 是否资产支持证券
      */
-    @ApiModelProperty(name = "是否资产支持证券", value = "是否资产支持证券")
+    @ApiModelProperty(name = "isAbs", value = "是否资产支持证券")
     private String isAbs;
 
     /**
@@ -146,5 +152,13 @@ public class FinProductSpecialDto extends BaseEntity implements ProcessEntity {
 
     public void setPageModel(PageModel pageModel) {
         this.pageModel = pageModel;
+    }
+
+    public String getFinprodAbbr() {
+        return finprodAbbr;
+    }
+
+    public void setFinprodAbbr(String finprodAbbr) {
+        this.finprodAbbr = finprodAbbr;
     }
 }
