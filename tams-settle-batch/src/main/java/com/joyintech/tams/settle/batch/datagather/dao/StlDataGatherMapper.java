@@ -264,4 +264,10 @@ public interface StlDataGatherMapper {
 
     int selectDzcjList(Map<String, Object> searchParam);
 
+    /**
+     * 查询一级投标债券对应信息
+     * @param searchParam
+     * @return
+     */
+    List<SettleTransDataDto> selectSettleTransData8(Map<String, Object> searchParam);
 }

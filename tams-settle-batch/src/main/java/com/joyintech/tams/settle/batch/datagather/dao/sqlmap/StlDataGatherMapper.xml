@@ -1638,4 +1638,17 @@
 			</foreach>
 		</where>
 	</select>
+
+	<select id="selectSettleTransData8" resultType="com.joyintech.tams.settle.batch.datagather.dto.SettleTransDataDto">
+		select
+		<include refid="settleTransDataSql"></include>
+		<where>
+			<![CDATA[std.DELIVERY_RESULT <> #{DELIVERY_RESULT_05}]]>
+			AND std.DEAL_DATE = #{dealDate,jdbcType=DATE}
+			AND std.PS = #{PS_T01}
+			AND std.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F32}
+			AND std.SETTLE_MODE = #{SETTLE_MODE_02}
+			AND std.SETTLE_SPEED = #{ACCOUNT_SPEED_01}
+		</where>
+	</select>
 </mapper>
