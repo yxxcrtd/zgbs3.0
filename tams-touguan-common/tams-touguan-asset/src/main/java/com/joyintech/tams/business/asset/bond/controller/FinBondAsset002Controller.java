@@ -616,6 +616,7 @@ public class FinBondAsset002Controller extends BaseController{
             BondFinPayInterestStdInfoResponse  response = new BondFinPayInterestStdInfoResponse();
             response.setInvScheduleList(invList);
             response.setInvRepayList(lirs);
+            response.setMaxTradeDate(maxTradeDate);
             return new Message<BondFinPayInterestStdInfoResponse>().success().setData(response);
         }catch (Exception e){
             e.printStackTrace();
