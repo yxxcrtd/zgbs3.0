@@ -329,4 +329,14 @@
         AND TRADE_MARKET IN (#{TRADE_PLACE_03},#{TRADE_PLACE_04})
         AND ROWNUM = 1
     </select>
+
+    <select id="checkAccountTypeInfo" resultType="java.lang.String">
+        SELECT
+            ACCT_NO
+        FROM
+            STD_BOND_MORE_CONVRATE_INFO
+        WHERE
+            BROKER_ID = #{brokerId,jdbcType=VARCHAR}
+        AND ROWNUM = 1
+    </select>
 </mapper>
