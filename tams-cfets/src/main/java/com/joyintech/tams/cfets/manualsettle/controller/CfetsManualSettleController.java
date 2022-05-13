@@ -73,8 +73,7 @@ public class CfetsManualSettleController extends BaseController {
     @ResponseBody
     @ApiOperation(value = "交收", notes = "交收")
     @PostMapping("doManualSettleCheck")
-    public Message<AjaxResult> doManualSettleCheck(@RequestBody CfetsManualSettleRequest cfetsRequest, BindingResult br)
-            throws Exception {
+    public Message<AjaxResult> doManualSettleCheck(@RequestBody CfetsManualSettleRequest cfetsRequest, BindingResult br) {
         //画面Check
         AjaxResult ajaxResult = cfetsManualSettleService.checkManualSettleSave(cfetsRequest, br);
         return new Message<AjaxResult>().success().setData(ajaxResult);

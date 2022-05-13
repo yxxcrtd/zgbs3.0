@@ -145,6 +145,13 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         FinProductAddDto finProductAddDto = new FinProductAddDto();
         BeanUtil.copyPropertiesIgnoreNull(finProductAddDto, finProductAdd);
         entity.setProductAddDto(finProductAddDto);
+        if(StringUtil.isNotEmpty(finProductAdd.getDealMode())) {
+            if(StringUtil.equals("01",finProductAdd.getDealMode())) {
+                entity.setCalModel("rate");
+            }else {
+                entity.setCalModel("price");
+            }
+        }
         //3.查金融产品标的附属表
         FinProductTypeKey typeKey = new FinProductTypeKey();
         typeKey.setBranch(0l);
@@ -195,6 +202,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
      */
     public FinTenderBondAsset002Dto getFromInterface(Map<String, String> param) {
         FinTenderBondAsset002Dto dto = finTenderBondAssetMapper.getProductFromInterface(param);
+        dto.setCalModel("price");//默认计算价格
         if(dto == null) return dto;
         FinProductTypeConfig config = new FinProductTypeConfig();
         config.setConfigType(DictCodeListExt2.配置类型_WIND分类.getValue());
@@ -252,6 +260,13 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         FinProductAdd productAdd = new FinProductAdd();
         BeanUtil.copyPropertiesIgnoreNull(productAdd, dto.getProductAddDto());
         productAdd.setFinprodId(dto.getFinprodId());
+        if(StringUtil.isNotEmpty(dto.getCalModel())) {
+            if(StringUtil.equals("rate",dto.getCalModel())) {
+                productAdd.setDealMode("01");
+            }else {
+                productAdd.setDealMode("02");
+            }
+        }
         finProductAddMapper.insert(productAdd);
         //3.保存标的类金融产品发行信息
         FinProductIssue productIssue = new FinProductIssue();
@@ -455,6 +470,16 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         return Boolean.FALSE;
     }
 
+
+    public List<ValidMessage> validFinprodMarketId(FinTenderBondAsset002Dto dto) {
+        List<ValidMessage> validList = new ArrayList<>();
+        Map<String, String> param = new HashMap<>();
+        param.put("finprodMarketId", dto.getFinprodMarketId());
+        if(StringUtil.isNotEmpty(finTenderBondAssetMapper.selectFinprodId(param))) {
+            validList.add(new ValidMessage("资产代码已存在"));
+        }
+        return validList;
+    }
 
     /**
      * 保存、修改提交校验

@@ -74,15 +74,13 @@ public class CfetsManualSettleQueryController extends BaseController {
      *
      * @param dto
      * @return Page<CfetsManualSettleTradeListRespond>
-     * @throws Exception Exception
      * @see
      * @since 1.0
      */
     @ApiOperation(value = "银行间手工交收分页查询", notes = "银行间手工交收分页查询")
     @PostMapping("/findPage")
     @ResponseBody
-    public Message<Page<CfetsManualSettleTradeListRespond>> findPage(@RequestBody CfetsManualSettleTradeListRequest dto)
-            throws Exception {
+    public Message<Page<CfetsManualSettleTradeListRespond>> findPage(@RequestBody CfetsManualSettleTradeListRequest dto) {
         try {
             Page<CfetsManualSettleTradeListRespond> page = cfetsManualSettleQueryService.findPage(dto);
             return new Message<Page<CfetsManualSettleTradeListRespond>>().success().setData(page);

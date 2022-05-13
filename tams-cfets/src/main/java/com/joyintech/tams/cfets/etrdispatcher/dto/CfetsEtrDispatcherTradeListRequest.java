@@ -24,6 +24,9 @@ public class CfetsEtrDispatcherTradeListRequest {
     @ApiModelProperty(name="ps",value="交易方向",example="A1")
     private String ps;
 
+    @ApiModelProperty(name="firstBidStatus",value="一级投标中标状态",example="A1")
+    private String firstBidStatus;
+
     @ApiModelProperty(name="finprodType2",value="资产类型",example="A1")
     private String finprodType2;
 
@@ -210,6 +213,14 @@ public class CfetsEtrDispatcherTradeListRequest {
 
     public void setEntrustStartDate(String entrustStartDate) {
         this.entrustStartDate = entrustStartDate;
+    }
+
+    public String getFirstBidStatus() {
+        return firstBidStatus;
+    }
+
+    public void setFirstBidStatus(String firstBidStatus) {
+        this.firstBidStatus = firstBidStatus;
     }
 }
 

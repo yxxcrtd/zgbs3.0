@@ -388,8 +388,9 @@ public class CfetsEtrDispatcherService extends BaseService {
                         response.setPs(response.getBusiPs());
                     }
                 }
+                //场外成交进度和成交额度特殊处理
                 //这里特殊处理成交进度和成交额度,如果场内和场外的资产类型重合了，考虑用业务类型或者交易场所进行区分，不能单纯的排除某一种类型
-                if(DictCodeUtil.equals(response.getFinprodType2(),BussinessDictCodeList.平安资产类型_一级投标债券,BussinessDictCodeList.平安资产类型_计划类资产_利率型,
+                if(DictCodeUtil.equals(response.getFinprodType2(),BussinessDictCodeList.金融产品类型_投管用_一级投标债券,BussinessDictCodeList.平安资产类型_计划类资产_利率型,
                         BussinessDictCodeList.平安资产类型_计划类资产_货币型,BussinessDictCodeList.平安资产类型_计划类资产_净值型,BussinessDictCodeList.平安资产类型_拆借,BussinessDictCodeList.平安资产类型_买断式回购,
                         BussinessDictCodeList.平安资产类型_存款,BussinessDictCodeList.平安资产类型_项目类资产)
                         || (DictCodeUtil.equals(response.getFinprodType2(),DictCodeList.平安资产类型_质押式回购)
@@ -401,20 +402,14 @@ public class CfetsEtrDispatcherService extends BaseService {
                     response.setTransRemainderAmt(new BigDecimal(df.format(ArithmeticUtil.divide(ArithmeticUtil.subtract(response.getEntrustAmt(), response.getFinishAmt()), new BigDecimal("10000"), 4))));
                     response.setTransFinishAmt(new BigDecimal(df.format(ArithmeticUtil.divide(response.getFinishAmt(), new BigDecimal("10000"), 4))));
                 }
-                if(StringUtil.equals(response.getFinprodType2(), BussinessDictCodeList.平安资产类型_一级投标债券.getValue())){
-                    response.setPs(null);
-                    CfetsEtrDispatcherTradeListResponse dto2 = cfetsEtrDispatcherMapper.getEtrBidInfo(response.getEntrustId());
-                    if(StringUtil.isNotEmpty(dto2)) {
-                        response.setIsWin(dto2.getIsWin());
-                        response.setEtrPrice(dto2.getEtrPrice());
-                       /* CfetsEtrDispatcherTradeListResponse deal =  cfetsEtrDispatcherMapper.getEtrDealInfo(response.getEntrustId());
-                        if(Objects.nonNull(deal)) {
-                            response.setDealProgress(deal.getDealProgress());
-                            response.setTransFinishAmt(deal.getTransFinishAmt());
-                            response.setTransRemainderAmt(deal.getTransRemainderAmt());
-                        }*/
-                    }
-                }
+//                if(StringUtil.equals(response.getFinprodType2(), BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue())){
+//                    response.setPs(null);
+//                    CfetsEtrDispatcherTradeListResponse dto2 = cfetsEtrDispatcherMapper.getEtrBidInfo(response.getEntrustId());
+//                    if(StringUtil.isNotEmpty(dto2)) {
+//                        response.setIsWin(dto2.getIsWin());
+//                        response.setEtrPrice(dto2.getEtrPrice());
+//                    }
+//                }
 
             }
         }
@@ -1150,13 +1145,6 @@ public class CfetsEtrDispatcherService extends BaseService {
                         baseEtrCashPositionCommService.entrustCloseExecute(entrustId, BussinessDictCodeListRds.是否_是.getValue());
                     }
                 }
-
-                //更新操作记录日志
-                CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
-                oprHisReq.setEntrustId(entrustId);
-                oprHisReq.setOperType(DictCodeListExt3.操作类型_退回.getValue());
-                oprHisReq.setBusiDes((String) pageParam.get("rekReason"));
-                joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
 
                 Map<String, Object> param = new HashMap<>();
                 param.put("entrustId", entrustId);

@@ -8,10 +8,7 @@ import com.joyintech.tams.exchange.common.bean.bond.StandardBondQryBean;
 import com.joyintech.tams.exchange.common.bean.investment.CapitalAccountBean;
 import com.joyintech.tams.exchange.common.bean.request.TradeInfoProRequest;
 import com.joyintech.tams.exchange.common.bean.response.TradeInfoProResponse;
-import com.joyintech.tams.exchange.common.constant.AgentType;
-import com.joyintech.tams.exchange.common.constant.ErrorCode;
-import com.joyintech.tams.exchange.common.constant.InstructionPs;
-import com.joyintech.tams.exchange.common.constant.Market;
+import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.utils.ConvertListUtils;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
@@ -616,7 +613,7 @@ public class TerminalHelper {
 
         final String side = negotiateQuoteQueryBean.getSide();
         if (StringUtil.isNotEmpty(side)) {
-            negotiateQuoteQueryBean.setSide(InstructionPs.getEntrustBs(side));
+            negotiateQuoteQueryBean.setSide(EntrustSide.getOpEntrustBs(side));
         }
 
         TradeInfoProRequest dto = new TradeInfoProRequest();

@@ -174,6 +174,13 @@ public interface CfetsTrdQueryMapper {
     int updateRegTotalByPrimaryKeySelective(RegFinProductDealTotal record);
 
     /**
+     * 根据主键更新一级申购登记数据
+     * @param bidId
+     * @return
+     */
+    int updateRegTotalByPrimaryKeySelective(@Param("bidId") String bidId);
+
+    /**
      * 根据更新报价数据
      * @param paramMap
      * @return

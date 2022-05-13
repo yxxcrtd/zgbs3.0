@@ -1,26 +1,15 @@
-package com.joyintech.tams.touguan.system.bond.special.dto;
+package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.req;
 
+import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.tams.component.business.riskrds.dto.PageModel;
-import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-
-/**
- * 特殊债券信息
- *
- * @author zhuys
- * @date 2022-05-06
- */
-@ApiModel(value = "特殊债券信息", description = "特殊债券信息")
-public class FinProductSpecialDto extends BaseEntity implements ProcessEntity {
-
-    /**
-     * <意义，目的和功能，以及可能被用到的地方>
-     */
-    private static final long serialVersionUID = 6888665039083565141L;
+@PageId("CfetsBasicInfo001")
+@ApiModel(value = "特殊债券信息画面表单", description = "特殊债券信息画面表单")
+public class FinProductSpecialSaveRequest extends BaseEntity implements ProcessEntity {
 
     @ApiModelProperty(name = "operateType", value = "操作类型", example = "submit/save", required = true)
     private String operateType;
@@ -44,12 +33,6 @@ public class FinProductSpecialDto extends BaseEntity implements ProcessEntity {
     private String finprodMarketId;
 
     /**
-     * 债券简称
-     */
-    @ApiModelProperty(name = "finprodAbbr", value = "债券简称")
-    private String finprodAbbr;
-
-    /**
      * 是否资产支持证券
      */
     @ApiModelProperty(name = "isAbs", value = "是否资产支持证券")
@@ -64,7 +47,7 @@ public class FinProductSpecialDto extends BaseEntity implements ProcessEntity {
     /**
      * 是否到期违约债
      */
-    @ApiModelProperty(name = "tenderType", value = "是否到期违约债")
+    @ApiModelProperty(name = "isDefaultBondIndicator", value = "是否到期违约债")
     private String isDefaultBondIndicator;
 
     /**
@@ -73,7 +56,6 @@ public class FinProductSpecialDto extends BaseEntity implements ProcessEntity {
     @ApiModelProperty(name = "inputType", value = "特殊债标识录入方式")
     private String inputType;
 
-    @PrimaryKey(PrimaryKey.Field.PK_1)
     public String getFinprodMarketId() {
         return finprodMarketId;
     }
@@ -152,13 +134,5 @@ public class FinProductSpecialDto extends BaseEntity implements ProcessEntity {
 
     public void setPageModel(PageModel pageModel) {
         this.pageModel = pageModel;
-    }
-
-    public String getFinprodAbbr() {
-        return finprodAbbr;
-    }
-
-    public void setFinprodAbbr(String finprodAbbr) {
-        this.finprodAbbr = finprodAbbr;
     }
 }

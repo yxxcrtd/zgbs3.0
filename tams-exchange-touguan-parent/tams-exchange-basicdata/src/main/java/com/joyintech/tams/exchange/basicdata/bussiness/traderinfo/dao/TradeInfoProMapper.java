@@ -55,4 +55,6 @@ public interface TradeInfoProMapper {
     int existsTrader(TradeInfoProSaveRequest dto);
 
     int existsOur(TradeInfoProSaveRequest dto);
+
+    int existsDealerParty(TradeInfoProSaveRequest dto);
 }

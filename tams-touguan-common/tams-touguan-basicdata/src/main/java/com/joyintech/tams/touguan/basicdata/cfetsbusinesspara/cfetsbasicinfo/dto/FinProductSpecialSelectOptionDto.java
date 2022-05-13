@@ -1,4 +1,4 @@
-package com.joyintech.tams.touguan.system.bond.special.dto;
+package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

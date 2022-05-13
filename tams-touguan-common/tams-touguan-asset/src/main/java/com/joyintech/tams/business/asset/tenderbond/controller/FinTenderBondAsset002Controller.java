@@ -115,6 +115,18 @@ public class FinTenderBondAsset002Controller extends BaseController {
     }
 
     @ResponseBody
+    @PostMapping("/checkFinprodMarketId")
+    @ApiOperation(value = "校验资产代码是否存在", notes = "校验资产代码是否存在")
+    public Message checkFinprodMarketId(@RequestBody FinTenderBondAsset002Dto dto) {
+        List<ValidMessage> validMessageList = finTenderBoundAssetService.validFinprodMarketId(dto);
+        if (CollectionUtils.isNotEmpty(validMessageList)) {
+            return Message.fail(ValidUtils.getValidMessage(validMessageList));
+        } else {
+            return Message.success("校验成功", null);
+        }
+    }
+
+    @ResponseBody
     @PostMapping("/modifyAndDeleteCheck")
     @ApiOperation(value = "列表中点击删除和修改时调用校验", notes = "列表中点击删除和修改时调用校验")
     public Message modifyAndDeleteCheck(@RequestBody FinTenderBondAsset001Dto dto) {

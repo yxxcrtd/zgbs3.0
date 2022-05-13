@@ -40,6 +40,13 @@
       and BID_PRICE = #{bidPrice,jdbcType=DECIMAL}
       and PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
   </select>
+
+  <select id="selectListByPrimaryKey" parameterType="java.lang.String" resultType="com.joyintech.tams.common.base.entity.BidOrderBidPriceKey">
+    select
+    <include refid="Base_Column_List" />
+    from BID_ORDER_BID_PRICE
+    where BID_ID = #{bidId,jdbcType=VARCHAR}
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.BidOrderBidPriceKey">
     delete from BID_ORDER_BID_PRICE
     where BID_ID = #{bidId,jdbcType=VARCHAR}

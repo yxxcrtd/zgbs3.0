@@ -869,7 +869,7 @@ public class CfetsTrdConfirm001Service extends BaseService{
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
 
         //发送头寸
-//        sendPositionMethod(entity);
+        this.sendBidPositionMethod(entity);
         //若指令完成需要发送指令完成头寸
         if (!StringUtil.isEmptyList(finishEtrList)) {
             for (String item : finishEtrList) {
@@ -2060,5 +2060,49 @@ public class CfetsTrdConfirm001Service extends BaseService{
                 baseEtrInvestInfoMapper.updatEetrDistribute(etrEntrust);
             }
         });
+    }
+    private  void sendBidPositionMethod(CfetsTrdFirstBondInvestTradeDto entity) {
+        List<CfetsEtrIbPosPortfolioRequest> ptlList = new ArrayList<>();
+        for (TrdProductDeal dto : entity.getTrdProductDeals()) {
+            //调用头寸
+            CfetsEtrIbPosPortfolioRequest posport = new CfetsEtrIbPosPortfolioRequest();
+            posport.setPortfolioId(dto.getPortfolioId());
+            posport.setTradeId(dto.getTradeId());
+            if (StringUtil.isNotEmpty(dto.getPortfolioId())) {
+                Map<String, Object> map = new HashMap<String, Object>();
+                map.put("portfolioId", dto.getPortfolioId());
+                map.put("acctType", BussinessDictCodeList.资金账户类型_托管账户.getValue());
+                String cashAcctId = cfetsEtribBondInfo003Service.qryPortfolioCashAcctId(map);
+                if (StringUtil.isNotEmpty(cashAcctId)) {
+                    posport.setCashAcctId(cashAcctId); // 托管户
+                }
+            }
+            posport.setSecAcctId(entity.getSecManageAcctId());
+            posport.setSecAmount(ArithmeticUtil.multiply(dto.getShareAmt() == null ? BigDecimal.ZERO : dto.getShareAmt(), new BigDecimal(100)));
+            posport.setOwnSecAmount(ArithmeticUtil.multiply(dto.getShareAmt() == null ? BigDecimal.ZERO : dto.getShareAmt(), new BigDecimal(100)));
+            posport.setCashAmount(dto.getTradeAmt() == null ? BigDecimal.ZERO : dto.getTradeAmt());
+            ptlList.add(posport);
+        }
+        //调用头寸
+        CfetsEtrIbPositionRequest req = new CfetsEtrIbPositionRequest();
+        req.setInterfaceType("Bond001");
+        req.setUserId(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
+        req.setTotalTradeId(entity.getTotleTradeId());
+        req.setWorkFlowId(null);
+        req.setFlowStatus(DictCodeListExt3.流程节点_审批生效.getValue());
+        req.setModelType(DictCodeListExt1.子系统代码_交易.getValue());
+        req.setBusiType(DictCodeListExt3.头寸业务类型_债券一级申购.getValue());
+        req.setCdate(entity.getTradeDate());
+        req.setTradePlace(BussinessDictCodeList.交易场所_银行间.getValue());
+        req.setBalanceCheck("N");
+        req.setBusiAct(DictCodeListExt3.业务动作_成交确认.getValue());
+        req.setPs(entity.getPs());
+        req.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
+        req.setDecisionAct(DictCodeListExt3.系统动作_新建.getValue());
+        req.setCcy(entity.getCcy());
+        req.setFinprodId(entity.getFinprodId());
+        req.setPtlList(ptlList);
+        req.setbTotalTradeId(entity.getRegIbuId());
+        PositionHttpRequest.send(req);
     }
 }
