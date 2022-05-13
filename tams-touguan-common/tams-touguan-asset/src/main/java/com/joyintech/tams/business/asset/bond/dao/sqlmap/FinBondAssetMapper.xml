@@ -26,7 +26,7 @@
         T4.TYPE_11 type11,
         T1.COUPON_SPECIES couponSpecies,
         T8.CALC_TYPE rateType,
-        T8.YIELD rate,
+        NVL(T8.YIELD,0)*100 rate,
         T6.BENCHMARK_ID basisRate,
         T6.COEFFICIENT basisRateRatio,
         T6.SPREAD_RATE*100 spreadRate,
@@ -977,6 +977,7 @@
                 </foreach>
             </if>
         </where>
+
     </select>
 
 
