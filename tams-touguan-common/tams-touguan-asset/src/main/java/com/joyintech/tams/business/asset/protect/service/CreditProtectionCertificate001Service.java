@@ -1,14 +1,19 @@
 package com.joyintech.tams.business.asset.protect.service;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.asset.protect.dao.CreditProtectionCertificateMapper;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateDto;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateRequest;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -70,29 +75,39 @@ public class CreditProtectionCertificate001Service extends BaseService implement
         return page;
     }
 
+    /**
+     * 资产代码/简称查询
+     *
+     * @param param
+     * @return
+     */
+    public Page<SelectOptionDto> getFinprodIdForSelect(Map<String, Object> param) {
+        param.put("finprodType2", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
+        param.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
+        param.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
+        PageHelper.startPage((Integer) param.get("pageNo"), (Integer) param.get("pageSize"));
+        List<SelectOptionDto> list = creditProtectionCertificateMapper.getFinprodIdForSelect(param);
+        return new Page<>(PageInfo.of(list));
+    }
+
+    /**
+     * 资产代码/简称查询
+     *
+     * @param param
+     * @return
+     */
+    public Page<SelectOptionDto> findForSelect(Map<String, Object> param) {
+        param.put("finprodType2", DictCodeListExt1.金融产品类型_债券.getValue());
+        param.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
+        param.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
+        PageHelper.startPage((Integer) param.get("pageNo"), (Integer) param.get("pageSize"));
+        List<SelectOptionDto> list = creditProtectionCertificateMapper.getFinprodIdForSelect(param);
+        return new Page<>(PageInfo.of(list));
+    }
+
     @Override
     public void doComplete(CreditProtectionCertificateDto entity, OperationType type) {
 
-    }
-
-    @Override
-    public String start(ProcessParameter<CreditProtectionCertificateDto> params, CreditProtectionCertificateDto... entities) throws WorkFlowException {
-        return null;
-    }
-
-    @Override
-    public CreditProtectionCertificateDto getBussinessEntity(ProcessMark processMark) {
-        return null;
-    }
-
-    @Override
-    public CreditProtectionCertificateDto getBussinessEntityByWorkflowId(String workflowId) {
-        return null;
-    }
-
-    @Override
-    public String start(WorkFlowParameter<CreditProtectionCertificateDto> params, CreditProtectionCertificateDto... entities) throws WorkFlowException {
-        return null;
     }
 
     @Override
@@ -112,56 +127,6 @@ public class CreditProtectionCertificate001Service extends BaseService implement
 
     @Override
     public void doBack(CreditProtectionCertificateDto entity) {
-
-    }
-
-    @Override
-    public ProcessMark getBusinessInfo(String workflowId) {
-        return null;
-    }
-
-    @Override
-    public Map<String, Object> getRuntimeVariables(ProcessMark entity, String taskId) throws WorkFlowException {
-        return null;
-    }
-
-    @Override
-    public BaseProcessService<CreditProtectionCertificateDto> getMyBusinessService() {
-        return null;
-    }
-
-    @Override
-    public String checkForSubmit(FlowEntity entity, boolean isMutiApproval) {
-        return null;
-    }
-
-    @Override
-    public String checkForSubmitMulti(List<FlowEntity> flowEntityList, boolean isMutiApproval) {
-        return null;
-    }
-
-    @Override
-    public String checkForSubmitMessage(FlowEntity entity, boolean isMutiApproval) {
-        return null;
-    }
-
-    @Override
-    public String generateTitle(CreditProtectionCertificateDto entity, OperationType type) {
-        return null;
-    }
-
-    @Override
-    public boolean checkBusinessDataInFlow(CreditProtectionCertificateDto dto) {
-        return false;
-    }
-
-    @Override
-    public CreditProtectionCertificateDto getBussinessEntityByPk(ProcessMark param) {
-        return null;
-    }
-
-    @Override
-    public void doRevoke(CreditProtectionCertificateDto entity) {
 
     }
 }

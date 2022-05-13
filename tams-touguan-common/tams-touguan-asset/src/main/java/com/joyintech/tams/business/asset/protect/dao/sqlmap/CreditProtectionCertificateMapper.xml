@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.joyintech.tams.business.asset.protect.dao.CreditProtectionCertificateMapper">
+    <resultMap id="finprodIdMap" type="com.joyintech.framework.select.SelectOptionDto">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="text" property="text" jdbcType="VARCHAR"/>
+        <association property="object" javaType="java.util.Map">
+            <result column="FINPROD_NAME" property="finprodName" jdbcType="VARCHAR" />
+            <result column="CALENDAR_ID" property="calendarId" jdbcType="VARCHAR" />
+            <result column="FINPROD_ID" property="finprodId" jdbcType="VARCHAR" />
+            <result column="TRADE_MARKET" property="tradeMarket" jdbcType="VARCHAR" />
+            <result column="IS_RIGHT" property="isRight" jdbcType="VARCHAR" />
+            <result column="TYPE_9" property="assetType1" jdbcType="VARCHAR" />
+            <result column="TYPE_10" property="assetType10" jdbcType="VARCHAR" />
+            <result column="TYPE_11" property="assetType11" jdbcType="VARCHAR" />
+            <result column="VDATE" property="finvdate" jdbcType="VARCHAR" />
+            <result column="MDATE" property="finmdate" jdbcType="VARCHAR" />
+            <result column="CCY" property="ccy" jdbcType="VARCHAR" />
+        </association>
+    </resultMap>
+
     <select id="queryForPage" resultType="com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateDto" parameterType="Map">
         SELECT
             fp.FINPROD_ID finprodId,
@@ -27,12 +45,14 @@
             fccr.BASIS ratebasic,									<!-- 计费年度天数	-->
             fpa.SETTLE_METHOD settleMethod,			<!-- 结算方式		-->
             sdl2.item_value settleMethodStr,
-            fpa.IS_ALLOW_OVERWRITE isOrNoStr			<!-- 是否允许wind覆盖	-->
+            fpa.IS_ALLOW_OVERWRITE isAllowOverwrite,			<!-- 是否允许wind覆盖	-->
+            sdl1.item_value isOrNoStr
         FROM
             FIN_PRODUCT fp
             LEFT JOIN FIN_PRODUCT_ADD fpa ON fp.FINPROD_ID = fpa.FINPROD_ID
             LEFT JOIN FIN_CASH_INFO fci ON fci.FINPROD_ID = fp.FINPROD_ID
             LEFT JOIN FIN_CASH_CALC_RULE fccr ON fccr.FINPROD_ID = fp.FINPROD_ID AND fccr.CASH_ID = fci.CASH_ID
+            LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='YES_OR_NO' and sdl1.item_code = fpa.IS_ALLOW_OVERWRITE
             LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='SETTLE_METHOD' and sdl2.item_code = fpa.SETTLE_METHOD
             LEFT JOIN SYS_DATADICT_LIST sdl3 on sdl3.dict_code ='TRADE_PLACE' and sdl3.item_code = fp.TRADE_MARKET
             LEFT JOIN SYS_DATADICT_LIST sdl4 on sdl4.dict_code ='PROTECT_OBJECT' and sdl4.item_code = fpa.PROTECT_OBJECT
@@ -76,6 +96,120 @@
         </where>
         ORDER BY
             fp.FINPROD_ID
+    </select>
+
+    <select id="getFinprodIdForSelect" resultMap="finprodIdMap">
+        SELECT
+        T1.FINPROD_MARKET_ID id,
+        T1.FINPROD_ABBR text,
+        T1.FINPROD_NAME,
+        T1.FINPROD_ID,
+        T1.CALENDAR_ID,
+        T1.TRADE_MARKET,
+        T1.IS_RIGHT,
+        to_char(T1.VDATE,'yyyy-MM-dd') VDATE,
+        to_char(T1.MDATE, 'yyyy-MM-dd') MDATE,
+        T1.CCY
+        FROM FIN_PRODUCT T1
+        <where>
+            AND T1.FINPROD_TYPE2 = #{finprodType2}
+            AND T1.TRADE_MARKET in(#{TRADE_PLACE_03},#{TRADE_PLACE_04})
+            <if test="initValue != null and !initValue.equals('')">
+                and T1.FINPROD_MARKET_ID = #{initValue}
+            </if>
+            <if test="search != null and !search.equals('')">
+                and (T1.FINPROD_MARKET_ID like concat('%',concat(#{search},'%'))
+                or T1.FINPROD_NAME like concat('%',concat(#{search},'%'))
+                or T1.FINPROD_ABBR like concat('%',concat(#{search},'%'))
+                or T1.FINPROD_ID like concat('%',concat(#{search},'%'))
+                )
+            </if>
+        </where>
+    </select>
+
+    <select id="selectFinprodId" resultType="java.lang.String">
+        select T1.FINPROD_ID from FIN_PRODUCT T1
+        where  1=1
+        <if test="finprodType2 !=null and finprodType2 !=''">
+            AND T1.FINPROD_TYPE2 = #{finprodType2}
+        </if>
+        <if test="TRADE_PLACE_01 != null and TRADE_PLACE_02 !=null">
+            AND T1.TRADE_MARKET in(#{TRADE_PLACE_03},#{TRADE_PLACE_04})
+        </if>
+        AND T1.FINPROD_MARKET_ID=#{finprodMarketId,jdbcType=VARCHAR} AND ROWNUM=1
+    </select>
+
+    <select id="getBusinessData" parameterType="com.joyintech.tams.component.business.core.dto.WflValidInputParameter" resultType="java.lang.String">
+        select pm.STATUS status
+        from SYS_DATA_PROCESS_MARK pm
+        inner join (
+        select
+        max(HIS_NO)	       HIS_NO,
+        WORKFLOW_ID
+        from SYS_DATA_PROCESS_MARK
+        <where>
+            <if test="pageId != null and pageId !=''">
+                PAGE_ID = #{pageId}
+            </if>
+        </where>
+        group by  WORKFLOW_ID
+        ) tempHis on  pm.HIS_NO = tempHis.HIS_NO and pm.WORKFLOW_ID = tempHis.WORKFLOW_ID
+        <where>
+            <if test="seachMode != null and seachMode !='' and seachMode == '01'.toString()">
+                pm.status in ('A','U','P')
+            </if>
+            <if test="pageId != null and pageId !=''">
+                and pm.PAGE_ID = #{pageId}
+            </if>
+            <if test="businessDataPk1 != null and businessDataPk1 !=''">
+                and pm.BUSINESS_DATA_PK1 = #{businessDataPk1}
+            </if>
+            <if test="businessDataPk2 != null and businessDataPk2 !=''">
+                and pm.BUSINESS_DATA_PK2 = #{businessDataPk2}
+            </if>
+            <if test="workflowId != null and workflowId !=''">
+                and pm.WORKFLOW_ID != #{workflowId}
+            </if>
+        </where>
+        order by pm.create_time desc
+    </select>
+
+    <select id="countFinprodIdUse" resultType="java.lang.Integer">
+        select sum(qty) from (
+        select count(1) as qty from ETR_ENTRUST where FINPROD_ID=#{finprodId}
+        <if test="isCancel !=null and isCancel !=''">
+            and ENTRUST_STATUS not in ('05','07') <!-- 撤销、退回 -->
+        </if>
+        union all
+        select count(1) as qty from WFL_ETR_ENTRUST where FINPROD_ID=#{finprodId}
+        union all
+        select count(1) as qty from TRD_FIN_PRODUCT_DEAL_TOTAL t where t.FINPROD_ID=#{finprodId}
+        <if test="isCancel !=null and isCancel !=''">
+            and t.IS_CANCEL ='N' <!-- 撤销 -->
+        </if>
+        <if test="ps !=null and ps !=''">
+            and t.ps not in ('T41')
+        </if>
+        union all
+        select count(1) as qty from WFL_TRD_FIN_PRODUCT_DEAL_TOTAL where FINPROD_ID=#{finprodId}
+        )
+    </select>
+
+    <select id="getWindType" resultType="com.joyintech.tams.common.base.entity.FinProductTypeConfig">
+        SELECT
+        OUTPUT_VALUE_1 outputValue1,
+        OUTPUT_VALUE_2 outputValue2
+        FROM FIN_PRODUCT_TYPE_CONFIG
+        WHERE CONFIG_TYPE = #{configType}
+        <if test="inputValue1 != null and inputValue1 != ''">
+            AND INPUT_VALUE_1 = #{inputValue1}
+        </if>
+        <if test="inputValue2 != null and inputValue2 != ''">
+            AND INPUT_VALUE_2 = #{inputValue2}
+        </if>
+        <if test="inputValue3 != null and inputValue3 != ''">
+            AND INPUT_VALUE_3 = #{inputValue3}
+        </if> and ROWNUM=1
     </select>
 
     <sql id="vagueQueryWhere">
