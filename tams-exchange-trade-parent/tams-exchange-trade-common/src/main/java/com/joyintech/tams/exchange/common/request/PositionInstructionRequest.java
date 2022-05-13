@@ -2,8 +2,11 @@ package com.joyintech.tams.exchange.common.request;
 
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 
+import com.joyintech.tams.exchange.common.response.PortfolioCalculateResponse;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
+import java.util.List;
 
 @ApiModel(value = "下单头寸请求对象", description = "下单头寸请求对象")
 public class PositionInstructionRequest extends Instruction {
@@ -17,6 +20,9 @@ public class PositionInstructionRequest extends Instruction {
     
     @ApiModelProperty(name="softSkipMode",value="软控是否继续？Y：继续",example="Y")
     private String softSkipMode;
+
+	@ApiModelProperty(name="portfolioCalculateResponses",value="组合分配明细")
+	private List<PortfolioCalculateResponse> portfolioCalculateResponses;
 
     public String getEntrustNo() {
         return entrustNo;
@@ -41,5 +47,12 @@ public class PositionInstructionRequest extends Instruction {
 	public void setEntrustProp(String entrustProp) {
 		this.entrustProp = entrustProp;
 	}
-    
+
+	public List<PortfolioCalculateResponse> getPortfolioCalculateResponses() {
+		return portfolioCalculateResponses;
+	}
+
+	public void setPortfolioCalculateResponses(List<PortfolioCalculateResponse> portfolioCalculateResponses) {
+		this.portfolioCalculateResponses = portfolioCalculateResponses;
+	}
 }

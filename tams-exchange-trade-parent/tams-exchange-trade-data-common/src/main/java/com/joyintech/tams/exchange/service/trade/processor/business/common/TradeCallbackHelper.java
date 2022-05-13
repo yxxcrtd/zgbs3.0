@@ -19,6 +19,7 @@ import com.joyintech.tams.exchange.service.trade.processor.account.AccountPositi
 import com.joyintech.tams.exchange.service.trade.processor.business.bond.BondHelper;
 import com.joyintech.tams.exchange.service.trade.processor.others.SplitOrderHelper;
 import com.joyintech.tams.exchange.service.trade.processor.portfolio.PortfolioAssignHelper;
+import com.joyintech.tams.exchange.service.trade.processor.portfolio.PortfolioTradeMessageHelper;
 import com.joyintech.tams.exchange.service.trade.transaction.TransactionHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.compress.utils.Lists;
@@ -68,6 +69,8 @@ public class TradeCallbackHelper {
     private InstrumentService instrumentService;
     @Autowired
     private MessageSenderManagement messageSenderManagement;
+    @Autowired
+    private PortfolioTradeMessageHelper portfolioTradeMessageHelper;
 
     public void onTrade(Trade tradeRecord) {
         logger.info("成交回报信息 {}", JsonUtils.getJsonFromObject(tradeRecord));
@@ -280,9 +283,10 @@ public class TradeCallbackHelper {
             updateInstructionStatus(instruction);
 
             //组装成交组合分配
-            List<PortfolioTradeMessage> portfolioTradeMessages = buildPortfolioTradeMessage(entrust, tradeRecord, instruction);
+            List<PortfolioTradeMessage> portfolioTradeMessages = portfolioTradeMessageHelper.buildPortfolioTradeMessage(entrust, tradeRecord, instruction);
             if (CollectionUtils.isEmpty(portfolioTradeMessages)) {
-                logger.error("成交组合分配，不推送成交数据");
+                logger.error("【未组装成交组合分配明】，不推送成交数据、不做手动交收：【instructionId={}】,【brokerTradeId={}】,【entrustId={}】",
+                        instruction.getEntrustId(), tradeRecord.getBrokerTradeId(), entrust.getId());
                 return;
             }
 
@@ -314,59 +318,6 @@ public class TradeCallbackHelper {
             entrustCancelProcessor.processCancelByTrade(entrust, tradeRecord, order, instruction);
         }
     }
-
-    @Autowired
-    private PortfolioAssignHelper portfolioAssignHelper;
-    @Autowired
-    private PortfolioDetailByManualMapper portfolioDetailByManualMapper;
-    @Autowired
-    private PortfolioDetailMapper portfolioDetailMapper;
-
-    /**
-     * 组装成交组合分配
-     */
-    private List<PortfolioTradeMessage> buildPortfolioTradeMessage(EntrustInterface entrust, Trade trade, Instruction instruction) {
-        List<PortfolioTradeMessage> portfolioTradeMessages = Lists.newArrayList();
-
-        //1、调用通用分配接口，构建成交组合分配
-        List<PortfolioDetail> list = Lists.newArrayList();
-        ResultBean resultBean = portfolioAssignHelper.queryPortfolioAssign(instruction.getEntrustId(), PortfolioDetailBusiTypeEnum.TRADE,
-                BigDecimal.valueOf(trade.getTradedVolume()), trade.getTradedPrice(), trade.getEntrustProp());
-        if (ErrorCode.SUCCESS.value() == resultBean.getErrorCode()) {
-            list.addAll((List<PortfolioDetail>) resultBean.getData());
-        } else {
-            logger.warn("构建成交组合分配失败：【instructionId={}】,【brokerTradeId={}】,【entrustId={}】",
-                    instruction.getEntrustId(), trade.getBrokerTradeId(), entrust.getId());
-            return portfolioTradeMessages;
-        }
-
-        //2、保存 成交组合分配
-        list.forEach(detail -> portfolioDetailMapper.insert(detail));
-
-        //3、查询成交对应委托下单的组合分配
-        List<PortfolioDetail> portfolioDetails = portfolioDetailByManualMapper.selectListByBusiIdAndBusiType(entrust.getId(), PortfolioDetailBusiTypeEnum.ORDER.getCode());
-        Map<String, PortfolioDetail> detailMap = portfolioDetails.stream().collect(Collectors.toMap(PortfolioDetail::getPortfolioId, o -> o));
-
-        //4、组装成交组合分配
-        for (PortfolioDetail detail : list) {
-            PortfolioTradeMessage portfolioTradeMessage = new PortfolioTradeMessage();
-            portfolioTradeMessage.setBusiId(trade.getId());
-            portfolioTradeMessage.setPortfolioId(detail.getPortfolioId());
-            portfolioTradeMessage.setPortfolioName(detail.getPortfolioName());
-            portfolioTradeMessage.setTradeNum(detail.getTargetNum());
-            portfolioTradeMessage.setTradeAmt(detail.getTargetAmt());
-            portfolioTradeMessage.setTargetType(detail.getTargetType());
-
-            PortfolioDetail portfolioDetail = detailMap.get(detail.getPortfolioId());
-            portfolioTradeMessage.setEntrustNum(portfolioDetail.getTargetNum());
-            portfolioTradeMessage.setEntrustAmt(portfolioDetail.getTargetAmt());
-
-            portfolioTradeMessages.add(portfolioTradeMessage);
-        }
-
-        return portfolioTradeMessages;
-    }
-
 
     private void updateInstructionStatus(Instruction instruction) {
         if (Objects.nonNull(instruction)) {
