@@ -601,7 +601,7 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 					dto.setEntrustNum(item.getEntrustNum());
 					dto.setEntrustAmt(item.getEntrustAmt());
 					dto.setSecAcctId(item.getSecAcctId()); // 证券账户
-					dto.setStockId(item.getSecAcctId());
+//					dto.setStockId(item.getStockId());
 					ajax = check(dto, br);
 					if (null != ajax) {
 						break;

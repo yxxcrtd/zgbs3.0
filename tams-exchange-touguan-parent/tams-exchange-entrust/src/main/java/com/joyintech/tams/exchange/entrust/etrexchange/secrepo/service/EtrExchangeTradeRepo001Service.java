@@ -336,6 +336,7 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
 
         if(StringUtil.isEmpty(entity.getPortfolioId()) && !CollectionUtils.isEmpty(entity.getPortfolioList())){
             entity.setPortfolioId(entity.getPortfolioList().get(0).getPortfolioId());
+            entity.setAcctNo(entity.getPortfolioList().get(0).getAcctNo());
         }
 
         // nothing to do just for aspect

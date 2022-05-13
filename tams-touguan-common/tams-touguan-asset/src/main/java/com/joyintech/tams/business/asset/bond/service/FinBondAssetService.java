@@ -503,7 +503,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         finProduct.setIssuePrice(dto.getIssuePrice());
         //期限
         finProduct.setTermDays(DateUtil.getBetweenDayNumber(dto.getVdate(), dto.getMdate()));
-        finProduct.setIssueAmt(ArithmeticUtil.multiply(dto.getIssueAmt(), new BigDecimal("100000000")));
+        finProduct.setIssueAmt(dto.getIssueAmt());
         finProduct.setCalendarId(this.getCalendarId(dto.getTradeMarket()));
         // 一体化对应etliu start
         // 债券新建画面，入库时，标的类金融产品表的含权债摊销日字段，当含权债时，登数据字典【含权债摊销日.最近行权日】
