@@ -657,7 +657,8 @@
         t.FACE_VALUE,
         t.IS_NETPRICE,
         t.IS_NO_GUARD,
-        t.termDays
+        t.termDays,
+        t.termType
         from (
         select a.finprod_market_id,
         a.finprod_market_id || '|' || a.finprod_abbr as finprod_name,
@@ -674,7 +675,8 @@
         b.FACE_VALUE FACE_VALUE,
         b.IS_NETPRICE IS_NETPRICE,
         b.IS_NO_GUARD IS_NO_GUARD,
-        a.TERM_DAYS termDays
+        a.TERM_DAYS termDays,
+        b.TERM_TYPE termType
         from fin_product a
         left join fin_product_add b
         on b.FINPROD_ID = a.FINPROD_ID
@@ -702,7 +704,8 @@
         null AS FACE_VALUE,
         null AS IS_NETPRICE,
         null AS IS_NO_GUARD,
-        null AS termDays
+        null AS termDays,
+        a.TERM_TYPE         AS  termType
         from MST_REPO_PRODUCT a
         ) t
         <where>
@@ -726,7 +729,7 @@
                 concat('%',concat(#{search},'%')))
             </if>
         </where>
-        ) aaa order by aaa.TRADE_MARKET,aaa.termDays asc
+        ) aaa order by aaa.TRADE_MARKET,aaa.termType asc
     </select>
 
     <select id="getFinprodListSecRepo" resultMap="secAcctInfo">
