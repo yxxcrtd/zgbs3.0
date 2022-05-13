@@ -820,6 +820,11 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 			Map<String,List<EtrExchangeTradePortfolioSecRepoRequest>> groupMap= dto.getPortfolioList().stream().collect(
 					Collectors.groupingBy(item->item.getAcctNo()));			//如果分组Map，key的数量>1,说明是多组合指令，key的数量=1,则为系列户指令
 			if(groupMap.keySet().size() == 1 && dto.getPortfolioList().size()>1) {
+				if (dto.getPs().equals(DictCodeListExt3.交易方向_正回购.getValue())) {
+					dto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue());
+				} else if (dto.getPs().equals(DictCodeListExt3.交易方向_逆回购.getValue())) {
+					dto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
+				}
 				EtrExchangeTradePortfolioSecRepoRequest item=dto.getPortfolioList().get(0);
 				//业务编号生成规则参数
 				if (!StringUtil.isNotEmpty(dto.getEntrustId())) {
