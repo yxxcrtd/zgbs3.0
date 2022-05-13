@@ -370,7 +370,7 @@ public class TradeInfoPro001Controller extends BaseController {
 //            insertDealerDetails1(tradeInfoProSaveRequest);
             int n = 0;
             if (StringUtil.equals(dto.getTradeMarket(),"03")){
-                if(existsTrader(dto)>0){
+                if(existsTrader(dto)>0 && !StringUtil.equals(dto.getTraderNo(),dto.getTraderNoPre())){
                     return new Message().fail().setMessage("交易员代码已经存在,不允许重复!");
                 }
                  n = tradeInfoPro001Service.updateDetailsSJ(dto);

@@ -62,11 +62,11 @@ comment on column FIN_PRODUCT_ADD.SETTLE_METHOD is  '结算方式';
 
 
 
--- 创建表格 - INTERF_CREDITPROTECTIONINFO
+-- 创建表格 - INTERF_CREDITINFO
 -- 删除表
-drop table INTERF_CREDITPROTECTIONINFO;
+drop table INTERF_CREDITINFO;
 
-CREATE table INTERF_CREDITPROTECTIONINFO(
+CREATE table INTERF_CREDITINFO(
 	SECID VARCHAR2(50) NOT NULL,
 	SECNAME VARCHAR2(200) NOT NULL,
 	MARKET CHAR(2) NOT NULL,
@@ -77,10 +77,11 @@ CREATE table INTERF_CREDITPROTECTIONINFO(
 	ISSUEPRICE NUMBER(20,4) NOT NULL,
 	ISSUERSHORT VARCHAR(50) NOT NULL,
 	ISSUEAMT NUMBER(20,4) NOT NULL,
+	PROTECT_OBJECT VARCHAR2(50) NOT NULL,
 	REF_ENTITY VARCHAR2(50) NOT NULL,
 	PROTECTED_BOND VARCHAR2(50) NOT NULL,
 	CREDIT_PROTECTION_PERIOD NUMBER(10,2) NOT NULL,
-	DELIVERY_METHOD VARCHAR2(50) NOT NULL,
+	SETTLE_METHOD VARCHAR2(50) NOT NULL,
 	INSTITUTION	VARCHAR2(50) NOT NULL,
 	INSTITUTIONTEXT	NVARCHAR2(400),
 	MARKETTEXT	NVARCHAR2(400),
@@ -101,36 +102,37 @@ CREATE table INTERF_CREDITPROTECTIONINFO(
 	PRIMARY KEY (SECID)
 );
 -- 设置表注释
-comment on table INTERF_CREDITPROTECTIONINFO is '信用保护凭证基本资料表';
+comment on table INTERF_CREDITINFO is '信用保护凭证基本资料表';
 
-comment on column INTERF_CREDITPROTECTIONINFO.SECID is '凭证代码';
-comment on column INTERF_CREDITPROTECTIONINFO.SECNAME is '凭证简称';
-comment on column INTERF_CREDITPROTECTIONINFO.MARKET is '市场';
-comment on column INTERF_CREDITPROTECTIONINFO.SECFULLNAME is '凭证全称';
-comment on column INTERF_CREDITPROTECTIONINFO.RATEBASIC is '计费年度天数';
-comment on column INTERF_CREDITPROTECTIONINFO.VDATE is '起始日';
-comment on column INTERF_CREDITPROTECTIONINFO.MDATE is '到期日';
-comment on column INTERF_CREDITPROTECTIONINFO.ISSUEPRICE is '凭证创设价格';
-comment on column INTERF_CREDITPROTECTIONINFO.ISSUERSHORT is '创设机构:机构信息表的ID,发行人相关信息在机构表';
-comment on column INTERF_CREDITPROTECTIONINFO.ISSUEAMT is '名义本金总额';
-comment on column INTERF_CREDITPROTECTIONINFO.REF_ENTITY is '参考实体';
-comment on column INTERF_CREDITPROTECTIONINFO.PROTECTED_BOND is '受保护债券';
-comment on column INTERF_CREDITPROTECTIONINFO.CREDIT_PROTECTION_PERIOD is '信用保护期限';
-comment on column INTERF_CREDITPROTECTIONINFO.DELIVERY_METHOD is '结算方式';
-comment on column INTERF_CREDITPROTECTIONINFO.INSTITUTION is '登记托管机构';
-comment on column INTERF_CREDITPROTECTIONINFO.INSTITUTIONTEXT is '登记托管机构说明';
-comment on column INTERF_CREDITPROTECTIONINFO.MARKETTEXT is '交易场所说明';
-comment on column INTERF_CREDITPROTECTIONINFO.MARKET2 is '交易流通场所：01 银行间市场、02 商业银行柜台市场、03 上海交易所、04 深圳交易所、99 其它';
-comment on column INTERF_CREDITPROTECTIONINFO.CCY is '币种CNY 人民币、HKD 港币、JPY 日元、USD 美元';
-comment on column INTERF_CREDITPROTECTIONINFO.issueType is '发行方式';
-comment on column INTERF_CREDITPROTECTIONINFO.BOOK_BUILDING_DATE is '簿记建档日';
-comment on column INTERF_CREDITPROTECTIONINFO.PLEDGE_DEADLINE_DATE is '可质押截止日';
-comment on column INTERF_CREDITPROTECTIONINFO.PLEDGE_RATE is '质押率（%）';
-comment on column INTERF_CREDITPROTECTIONINFO.CIRCULATION_DATE is '上市流通日';
-comment on column INTERF_CREDITPROTECTIONINFO.PAY_DATE is '缴款日';
-comment on column INTERF_CREDITPROTECTIONINFO.CREATE_USER is '创建人';
-comment on column INTERF_CREDITPROTECTIONINFO.CREATE_DEPT is '创建部门';
-comment on column INTERF_CREDITPROTECTIONINFO.CREATE_TIME is '创建时间';
-comment on column INTERF_CREDITPROTECTIONINFO.UPDATE_USER is '更新人';
-comment on column INTERF_CREDITPROTECTIONINFO.UPDATE_TIME is '更新时间';
-comment on column INTERF_CREDITPROTECTIONINFO.SOURCE is '数据来源';
+comment on column INTERF_CREDITINFO.SECID is '凭证代码';
+comment on column INTERF_CREDITINFO.SECNAME is '凭证简称';
+comment on column INTERF_CREDITINFO.MARKET is '市场';
+comment on column INTERF_CREDITINFO.SECFULLNAME is '凭证全称';
+comment on column INTERF_CREDITINFO.RATEBASIC is '计费年度天数';
+comment on column INTERF_CREDITINFO.VDATE is '起始日';
+comment on column INTERF_CREDITINFO.MDATE is '到期日';
+comment on column INTERF_CREDITINFO.ISSUEPRICE is '凭证创设价格';
+comment on column INTERF_CREDITINFO.ISSUERSHORT is '创设机构:机构信息表的ID,发行人相关信息在机构表';
+comment on column INTERF_CREDITINFO.ISSUEAMT is '名义本金总额';
+comment on column INTERF_CREDITINFO.PROTECT_OBJECT is '参考债项';
+comment on column INTERF_CREDITINFO.REF_ENTITY is '参考实体';
+comment on column INTERF_CREDITINFO.PROTECTED_BOND is '受保护债券';
+comment on column INTERF_CREDITINFO.CREDIT_PROTECTION_PERIOD is '信用保护期限';
+comment on column INTERF_CREDITINFO.SETTLE_METHOD is '结算方式';
+comment on column INTERF_CREDITINFO.INSTITUTION is '登记托管机构';
+comment on column INTERF_CREDITINFO.INSTITUTIONTEXT is '登记托管机构说明';
+comment on column INTERF_CREDITINFO.MARKETTEXT is '交易场所说明';
+comment on column INTERF_CREDITINFO.MARKET2 is '交易流通场所：01 银行间市场、02 商业银行柜台市场、03 上海交易所、04 深圳交易所、99 其它';
+comment on column INTERF_CREDITINFO.CCY is '币种CNY 人民币、HKD 港币、JPY 日元、USD 美元';
+comment on column INTERF_CREDITINFO.issueType is '发行方式';
+comment on column INTERF_CREDITINFO.BOOK_BUILDING_DATE is '簿记建档日';
+comment on column INTERF_CREDITINFO.PLEDGE_DEADLINE_DATE is '可质押截止日';
+comment on column INTERF_CREDITINFO.PLEDGE_RATE is '质押率（%）';
+comment on column INTERF_CREDITINFO.CIRCULATION_DATE is '上市流通日';
+comment on column INTERF_CREDITINFO.PAY_DATE is '缴款日';
+comment on column INTERF_CREDITINFO.CREATE_USER is '创建人';
+comment on column INTERF_CREDITINFO.CREATE_DEPT is '创建部门';
+comment on column INTERF_CREDITINFO.CREATE_TIME is '创建时间';
+comment on column INTERF_CREDITINFO.UPDATE_USER is '更新人';
+comment on column INTERF_CREDITINFO.UPDATE_TIME is '更新时间';
+comment on column INTERF_CREDITINFO.SOURCE is '数据来源';

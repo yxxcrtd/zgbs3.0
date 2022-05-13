@@ -12,7 +12,7 @@ import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.util.ExcelUtil;
 import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.req.FinProductSpecialSaveRequest;
 import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.FinProductSpecialImportDto;
-import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -85,7 +85,7 @@ public class FinProductSpecialValidatorService implements BeanValidator {
         List<List<String>> dataList = ExcelUtil.getDataList(fileName);
         AjaxResult result = new AjaxResult();
         if (!com.joyintech.framework.util.StringUtil.isEmptyList(dataList)) {
-            if (CollectionUtils.isNotEmpty(dataList)) {
+            if (!CollectionUtils.isEmpty(dataList)) {
                 if (dataList.size() > IMPORT_MAXIMUM_SIZE) {
                     result.setMessage("单次最多导入100条！", MessageType.错误消息);
                     return result;

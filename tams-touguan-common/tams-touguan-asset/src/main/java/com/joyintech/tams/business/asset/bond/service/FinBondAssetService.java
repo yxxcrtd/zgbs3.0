@@ -1481,6 +1481,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
     }
 
     public boolean isInWflProcess(WflValidInputParameter parameter) {
+            parameter.setSeachMode("01");
             List<String> result = finBondAssetMapper.getBusinessData(parameter);
             if (CollectionUtils.isNotEmpty(result)) {
                 return Boolean.TRUE;

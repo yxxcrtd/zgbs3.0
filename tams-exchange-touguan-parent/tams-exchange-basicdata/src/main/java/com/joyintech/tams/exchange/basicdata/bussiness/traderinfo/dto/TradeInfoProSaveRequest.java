@@ -65,7 +65,7 @@ public class TradeInfoProSaveRequest extends BaseEntity implements ProcessEntity
     private List<TradeInfoProSaveRequest> selectedItem;
     @ApiModelProperty(name="dealerPartyNoPre",value="修改前交易主体代码",example="A1")
     private String dealerPartyNoPre;
-    @ApiModelProperty(name="traderNoPre",value="修改前交易对手代码",example="A1")
+    @ApiModelProperty(name="traderNoPre",value="修改前交易员代码",example="A1")
     private String traderNoPre;
 
     public String getOperateType() {

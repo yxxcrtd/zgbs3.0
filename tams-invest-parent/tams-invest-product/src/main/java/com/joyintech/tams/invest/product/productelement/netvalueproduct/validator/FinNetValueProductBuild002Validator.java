@@ -812,24 +812,24 @@ public class FinNetValueProductBuild002Validator implements BeanValidator {
 
             if (DictCodeList.是否_否.getValue().equals(entity.getIsCashManage())
                     && (holdingMax != null && holdingMax.compareTo(BigDecimal.valueOf(50)) >= 0)) {
-                if(CommonUtil.isType(entity.getDealMode(),DictCodeList.处理模式_周期型) && CommonUtil.isType(entity.getPeriod(),DictCodeListExt2.期限类型_单一固定期限)){
-                    if(StringUtil.isNotEmpty(entity.getInvestmentCycle())){
-                        Integer investmentCycle = Integer.valueOf(entity.getInvestmentCycle());
-                        if(investmentCycle.compareTo(90) < 0){
-                            validList.add(new ValidMessage("bussFinProductOpenPlanRedDto.finOpenPlanList",
-                                    "允许单一投资者持有份额超过总份额50%的，定期开放周期不得低于90天，请检查！"));
-                        }
-                    }
-                }else if(CommonUtil.isType(entity.getDealMode(),DictCodeList.处理模式_周期型) && CommonUtil.isType(entity.getPeriod(),DictCodeListExt2.期限类型_多固定期限)){
-                    List<BussFinProductInvestPeriodDto> cycleList = entity.getBussFinProductInvestPeriodDto().getBussFinProductInvestPeriodDtoList();
-                    if(!StringUtil.isEmptyList(cycleList)){
-                        BussFinProductInvestPeriodDto cycle = cycleList.stream().min(Comparator.comparing(BussFinProductInvestPeriodDto::getInvestDays)).get();
-                        if(cycle.getInvestDays().compareTo(90) < 0){
-                            validList.add(new ValidMessage("bussFinProductOpenPlanRedDto.finOpenPlanList",
-                                    "允许单一投资者持有份额超过总份额50%的，定期开放周期不得低于90天，请检查！"));
-                        }
-                    }
-                }else{
+                //if(CommonUtil.isType(entity.getDealMode(),DictCodeList.处理模式_周期型) && CommonUtil.isType(entity.getPeriod(),DictCodeListExt2.期限类型_单一固定期限)){
+                //    if(StringUtil.isNotEmpty(entity.getInvestmentCycle())){
+                //        Integer investmentCycle = Integer.valueOf(entity.getInvestmentCycle());
+                //        if(investmentCycle.compareTo(90) < 0){
+                //            validList.add(new ValidMessage("bussFinProductOpenPlanRedDto.finOpenPlanList",
+                //                    "允许单一投资者持有份额超过总份额50%的，定期开放周期不得低于90天，请检查！"));
+                //        }
+                //    }
+                //}else if(CommonUtil.isType(entity.getDealMode(),DictCodeList.处理模式_周期型) && CommonUtil.isType(entity.getPeriod(),DictCodeListExt2.期限类型_多固定期限)){
+                //    List<BussFinProductInvestPeriodDto> cycleList = entity.getBussFinProductInvestPeriodDto().getBussFinProductInvestPeriodDtoList();
+                //    if(!StringUtil.isEmptyList(cycleList)){
+                //        BussFinProductInvestPeriodDto cycle = cycleList.stream().min(Comparator.comparing(BussFinProductInvestPeriodDto::getInvestDays)).get();
+                //        if(cycle.getInvestDays().compareTo(90) < 0){
+                //            validList.add(new ValidMessage("bussFinProductOpenPlanRedDto.finOpenPlanList",
+                //                    "允许单一投资者持有份额超过总份额50%的，定期开放周期不得低于90天，请检查！"));
+                //        }
+                //    }
+                //}else{
                     //申购计划
                     List<FinOpenPlan> openPlanList = entity.getBussFinProductOpenPlanDto().getFinOpenPlanList();
                     //赎回计划
@@ -845,7 +845,7 @@ public class FinNetValueProductBuild002Validator implements BeanValidator {
                         validList.add(new ValidMessage("bussFinProductOpenPlanRedDto.finOpenPlanList",
                                 "允许单一投资者持有份额超过总份额50%的，定期开放周期不得低于90天，请检查！"));
                     }
-                }
+                //}
             }
 
             if(!DictCodeListExt1.募集方式_公募.getValue().equals(entity.getIssueType())

@@ -3,6 +3,7 @@ package com.joyintech.tams.business.asset.protect.dto;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 
@@ -40,7 +41,11 @@ public class CreditProtectionCertificateDto extends BaseEntity implements Proces
     private String ratebasic;//		计费年度天数
     private String settleMethod;
     private String settleMethodStr;//		结算方式
-    private String isOrNoStr;//		是否允许wind覆盖
+    private String isAllowOverwrite;
+    private String isOrNoStr;//		是否允许wind覆盖/**
+    @ApiModelProperty(name="operateType",value="操作类型：NEW,MODIFY,DELETE,REVOKE")
+    private String operateType;
+
 
     public String getFinprodId() {
         return finprodId;
@@ -226,11 +231,27 @@ public class CreditProtectionCertificateDto extends BaseEntity implements Proces
         this.settleMethodStr = settleMethodStr;
     }
 
+    public String getIsAllowOverwrite() {
+        return isAllowOverwrite;
+    }
+
+    public void setIsAllowOverwrite(String isAllowOverwrite) {
+        this.isAllowOverwrite = isAllowOverwrite;
+    }
+
     public String getIsOrNoStr() {
         return isOrNoStr;
     }
 
     public void setIsOrNoStr(String isOrNoStr) {
         this.isOrNoStr = isOrNoStr;
+    }
+
+    public String getOperateType() {
+        return operateType;
+    }
+
+    public void setOperateType(String operateType) {
+        this.operateType = operateType;
     }
 }
