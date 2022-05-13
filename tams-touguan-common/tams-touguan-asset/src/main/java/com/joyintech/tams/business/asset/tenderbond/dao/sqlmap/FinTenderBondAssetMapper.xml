@@ -422,7 +422,9 @@
             union all
             select count(1) as qty from WFL_ETR_ENTRUST where FINPROD_ID=#{finprodId}
             union all
-            select count(1) as qty from TRD_FIN_PRODUCT_DEAL_TOTAL t where t.FINPROD_ID=#{finprodId}
+            select count(1) as qty from TRD_FIN_PRODUCT_DEAL_TOTAL t
+            inner join TRD_PRODUCT_DEAL d on t.TOTLE_TRADE_ID=d.TOTLE_TRADE_ID
+            where t.FINPROD_ID=#{finprodId}
             <if test="isCancel !=null and isCancel !=''">
                 and t.IS_CANCEL ='N' <!-- 撤销 -->
             </if>
@@ -542,6 +544,12 @@
             </if>
             <if test="initValue != null and !initValue.equals('')">
                 and t.secid = #{initValue}
+            </if>
+            <if test="initList != null and initList.size() > 0">
+                AND t.secid  in
+                <foreach collection="initList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
             </if>
             <if test="search != null and !search.equals('')">
                 and (t.secid like concat('%',concat(#{search},'%'))
