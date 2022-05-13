@@ -16,10 +16,12 @@ import com.joyintech.tams.exchange.common.cache.TradeTimeService;
 import com.joyintech.tams.exchange.common.constant.EntrustBs;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
+import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.enums.SwitcheEnum;
 import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
+import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import com.joyintech.tams.exchange.service.trade.processor.account.AccountPositionHelper;
 import com.joyintech.tams.exchange.service.trade.processor.business.price.PriceHelper;
 import com.joyintech.tams.exchange.service.trade.server.agent.AccountManager;
@@ -168,7 +170,7 @@ public class CommonCheckKit extends BaseCheckKit {
             StringBuilder builder = StrUtil.builder();
             tradePeriod.forEach(item -> builder.append(item.getOpenTime()).append("~").append(item.getCloseTime()).append(StrUtil.COMMA));
             throw new BusinessResultException(ErrorCode.CHECK_ERROR,
-                    StrUtil.format("当前时间[{}],不允许委托,允许委托时间段为：[{}]",
+                    StrUtil.format("当前时间[{}]，不允许委托，允许委托时间段为：[{}]",
                             localTime, StrUtil.removeSuffix(builder.toString(), StrUtil.COMMA)));
         }
     }
@@ -245,7 +247,7 @@ public class CommonCheckKit extends BaseCheckKit {
         BigDecimal lowerLimitPrice = NumberUtil.round(tick.getLowerLimitPrice(), 4, RoundingMode.UP);
         BigDecimal upperLimitPrice = NumberUtil.round(tick.getUpperLimitPrice(), 4, RoundingMode.DOWN);
 
-        if (isNoLimitPrice(tick)) {
+        if (isNoLimitPrice(tick) || EnumUtil.in(instruction.getAssetType(), InvestmentAssetType.BOND, InvestmentAssetType.PLEDGE_REPURCHASE)) {
             String errorMsg = priceHelper.checkPrice(order, instruction, instrument, tick);
             if (StrUtil.isNotEmpty(errorMsg)) {
                 addCheckResult("委托价格", entrustPrice, errorMsg);

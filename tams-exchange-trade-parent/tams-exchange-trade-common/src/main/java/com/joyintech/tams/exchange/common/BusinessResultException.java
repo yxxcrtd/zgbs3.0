@@ -72,7 +72,6 @@ public class BusinessResultException extends RuntimeException {
             return resultMessage;
         }
 
-        return new Message<>(String.valueOf(errorCode.getCode()), errorCode.getDescription(),
-                StrUtil.isNotEmpty(getMessage()) ? StrUtil.COLON + getMessage() : null);
+        return new Message<>(String.valueOf(errorCode.getCode()), StrUtil.isNotEmpty(getMessage()) ? errorCode.getDescription() + StrUtil.C_COLON + getMessage() : errorCode.getDescription());
     }
 }

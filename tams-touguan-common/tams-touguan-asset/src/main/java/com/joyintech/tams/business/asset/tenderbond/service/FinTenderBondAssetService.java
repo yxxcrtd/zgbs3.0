@@ -2,6 +2,7 @@ package com.joyintech.tams.business.asset.tenderbond.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Lists;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
@@ -387,6 +388,20 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         param.put("finprodType2", DictCodeList.平安资产类型_债券.getValue());
         param.put("platDate", DateUtil.platDateFromCache());
         PageHelper.startPage((Integer) param.get("pageNo"), (Integer) param.get("pageSize"));
+        if(Objects.nonNull(param.get("initValue"))) {
+            String initValue = (String) param.get("initValue");
+            if(StringUtil.isNotEmpty(initValue) && initValue.contains(",")) {
+                List<String> values = new ArrayList<>();
+                 String arr[] = initValue.split(",");
+                 for(String a : arr) {
+                     if(StringUtil.isNotEmpty(a)) {
+                         values.add(a);
+                     }
+                 }
+                 param.put("initList",values);
+                 param.remove("initValue");
+            }
+        }
         List<SelectOptionDto> list = finTenderBondAssetMapper.getCrossMarketCodeForSelect(param);
         return new Page<>(PageInfo.of(list));
     }

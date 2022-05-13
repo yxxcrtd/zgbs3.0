@@ -89,6 +89,8 @@ public class StlDataDealProcessConstant {
 	public static final String YWLX_616 = "616";
 	// SzdJsmx业务类型_债券质押式协议回购解除质押（不出凭证）
 	public static final String YWLX_618 = "618";
+	//  SzdJsmx业务类型_信用保护凭证转让
+	public static final String YWLX_690 = "690";
 	// SzdJsmx业务类型_封闭基金交易
 	public static final String YWLX_002 = "002";
 	// SzdJsmx业务类型_上证LOF（分级基金）交易

@@ -156,12 +156,10 @@ public class CfetsTrdConfirmCstpInfoListResponse {
     }
 
     public String getBusinesstypeName() {
-        if(StringUtil.equals("BOND",getBusinesstype())){
-            return "现券买卖";
-        }else{
-            return "质押式回购";
+        if (StringUtil.isEmpty(getBusinesstype())) {
+            return StringUtil.EMPTY;
         }
-      //  return SysDataUtil.getNameFromDataDict(DictCode.CSTP资产类型, getBusinesstype());
+        return SysDataUtil.getNameFromDataDict(DictCode.CSTP资产类型, getBusinesstype());
     }
 
     public void setBusinesstypeName(String businesstypeName) {
