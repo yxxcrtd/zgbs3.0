@@ -51,16 +51,13 @@ $(function() {
                                 item: itemSH,
                                 disabled: false
                             });
-                            $("#finprodId").val("")
-                            $("#finprodId").attr("disabled", false);
                         } else {
                             $('#accountType').updateChosenArr({
                                 item: [""],
                                 disabled: false
                             });
-                            $("#finprodId").val("")
-                            $("#finprodId").attr("disabled", false);
                         }
+                        setDisabled();
                     }
                 });
             }
@@ -76,7 +73,6 @@ $(function() {
             if(this.finprodIdType){
                 $("#accountType").attr("disabled", false);
             } else {
-                $("#accountType").val("");
                 $("#accountType").attr("disabled", "disabled");
             }
             this.finprodIdType = false
@@ -85,7 +81,6 @@ $(function() {
             if(this.accountTypes){
                 $("#finprodId").attr("disabled", false);
             } else {
-                $("#finprodId").val("")
                 $("#finprodId").attr("disabled", "disabled");
             }
             this.accountTypes = false
@@ -95,6 +90,13 @@ $(function() {
             $("#finprodId").attr("disabled", "disabled");
             $("#accountType").attr("disabled", "disabled");
         }
+    }
+
+    function setDisabled (){
+        $("#finprodId").val(null).trigger('change');
+        $("#accountType").val(null).trigger('change');
+        $("#finprodId").attr("disabled", false);
+        $("#accountType").attr("disabled", false);
     }
 
     $.fn.updateChosenArr = function updateChosenArr(obj){

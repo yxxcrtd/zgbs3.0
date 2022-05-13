@@ -7,6 +7,7 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.service.basicdata.standardcouponreconversionrate.dto.StandardCouponReConversionRateDto;
 import com.joyintech.service.basicdata.standardcouponreconversionrate.service.StandardCouponReConversionRateService;
+import com.joyintech.tams.component.base.core.dto.WflValidInputParameter;
 import com.joyintech.tams.invest.common.dto.common.ExcelValidDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,6 +73,17 @@ public class StandardCouponReConversionRateController {
     @PostMapping("/getList")
     public List<StandardCouponReConversionRateDto> getList(@RequestBody StandardCouponReConversionRateDto dto){
         return standardCouponReConversionRateService.getList(dto);
+    }
+
+    /**
+     * 详情、修改、查看、唯一性验证
+     *
+     * @param dto
+     * @return
+     */
+    @PostMapping("/getBusinessData")
+    public List<WflValidInputParameter> getBusinessData(@RequestBody WflValidInputParameter dto){
+        return standardCouponReConversionRateService.getBusinessData(dto);
     }
 
     /**

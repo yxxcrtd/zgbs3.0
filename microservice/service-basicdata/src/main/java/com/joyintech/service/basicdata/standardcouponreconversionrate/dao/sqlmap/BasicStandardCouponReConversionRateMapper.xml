@@ -3,6 +3,7 @@
 <mapper namespace="com.joyintech.service.basicdata.standardcouponreconversionrate.dao.BasicStandardCouponReConversionRateMapper">
     <select id="select" resultType="com.joyintech.service.basicdata.standardcouponreconversionrate.dto.StandardCouponReConversionRateDto">
         select
+        distinct
         sbmci.SEQ_NO seqNo,
         sbmci.BROKER_ID brokerId, /*券商代码*/
         mci.CUSTOMER_NAME brokerName, /*券商名称*/
@@ -42,6 +43,41 @@
             AND (t.customer_id like concat(concat('%',#{brokerId,jdbcType=VARCHAR}),'%') OR t.customer_name like concat(concat('%',#{brokerId,jdbcType=VARCHAR}),'%'))
         </if>
         order by t.customer_id
+    </select>
+
+    <select id="getBusinessData" parameterType="com.joyintech.tams.component.business.core.dto.WflValidInputParameter" resultType="java.lang.String">
+        select pm.STATUS status
+        from SYS_DATA_PROCESS_MARK pm
+        inner join (
+        select
+        max(HIS_NO)	       HIS_NO,
+        WORKFLOW_ID
+        from SYS_DATA_PROCESS_MARK
+        <where>
+            <if test="pageId != null and pageId !=''">
+                PAGE_ID = #{pageId}
+            </if>
+        </where>
+        group by  WORKFLOW_ID
+        ) tempHis on  pm.HIS_NO = tempHis.HIS_NO and pm.WORKFLOW_ID = tempHis.WORKFLOW_ID
+        <where>
+            <if test="seachMode != null and seachMode !='' and seachMode == '01'.toString()">
+                pm.status in ('A','U','P')
+            </if>
+            <if test="pageId != null and pageId !=''">
+                and pm.PAGE_ID = #{pageId}
+            </if>
+            <if test="businessDataPk1 != null and businessDataPk1 !=''">
+                and pm.BUSINESS_DATA_PK1 = #{businessDataPk1}
+            </if>
+            <if test="businessDataPk2 != null and businessDataPk2 !=''">
+                and pm.BUSINESS_DATA_PK2 = #{businessDataPk2}
+            </if>
+            <if test="workflowId != null and workflowId !=''">
+                and pm.WORKFLOW_ID != #{workflowId}
+            </if>
+        </where>
+        order by pm.create_time desc
     </select>
 
     <select id="selectByPrimaryKey" resultType="com.joyintech.service.basicdata.standardcouponreconversionrate.dto.StandardCouponReConversionRateDto"
@@ -85,6 +121,9 @@
         left join PTL_CAPACCT_INFO t on sbmci.ACCT_NO = t.ACCT_NO
         LEFT JOIN STL_CAPACCT_INFO R ON T.ACCT_NO = R.ACCT_NO AND T.CCY = R.CCY
         <where>
+<!--            <if test="startDate !=null and startDate != ''">-->
+<!--                and sbmci.START_DATE = #{startDate,jdbcType=VARCHAR}-->
+<!--            </if>-->
             <if test="brokerId !=null and brokerId != ''">
                 sbmci.BROKER_ID = #{brokerId,jdbcType=VARCHAR}
             </if>

@@ -2,6 +2,7 @@ package com.joyintech.service.basicdata.standardcouponreconversionrate.dao;
 
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.service.basicdata.standardcouponreconversionrate.dto.StandardCouponReConversionRateDto;
+import com.joyintech.tams.component.base.core.dto.WflValidInputParameter;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -32,6 +33,8 @@ public interface BasicStandardCouponReConversionRateMapper {
     StandardCouponReConversionRateDto selectByPrimaryKey(StandardCouponReConversionRateDto dto);
 
     List<StandardCouponReConversionRateDto> getList(StandardCouponReConversionRateDto dto);
+
+    List<String> getBusinessData(WflValidInputParameter dto);
 
     int deleteByPrimaryKey(StandardCouponReConversionRateDto dto);
 

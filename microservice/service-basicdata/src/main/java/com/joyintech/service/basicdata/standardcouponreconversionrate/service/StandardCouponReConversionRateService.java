@@ -13,6 +13,7 @@ import com.joyintech.service.basicdata.standardcouponreconversionrate.dao.BasicS
 import com.joyintech.service.basicdata.standardcouponreconversionrate.dto.StandardCouponReConversionRateDto;
 import com.joyintech.tams.common.base.dao.StdBondMoreConvrateInfoMapper;
 import com.joyintech.tams.common.base.entity.StdBondMoreConvrateInfo;
+import com.joyintech.tams.component.base.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.invest.common.dto.common.ExcelValidDto;
 import com.joyintech.tams.invest.common.util.ExcelUtil;
@@ -83,6 +84,16 @@ public class StandardCouponReConversionRateService extends BaseService<StandardC
 
     public List<StandardCouponReConversionRateDto> getList(StandardCouponReConversionRateDto dto){
         return basicStandardCouponReConversionRateMapper.getList(dto);
+    }
+
+    public List<WflValidInputParameter> getBusinessData(WflValidInputParameter dto){
+        List<String> list = basicStandardCouponReConversionRateMapper.getBusinessData(dto);
+        if (CollectionUtils.isNotEmpty(list)) {
+            List<WflValidInputParameter> result = new ArrayList<>();
+            result.add(new WflValidInputParameter());
+            return result;
+        }
+        return new ArrayList<>();
     }
 
     /**
@@ -214,7 +225,7 @@ public class StandardCouponReConversionRateService extends BaseService<StandardC
                     dto1.setStartDate(startDate);
                     StandardCouponReConversionRateDto checkdto = basicStandardCouponReConversionRateMapper.selectByPrimaryKey(dto1);
                     if(checkdto != null){
-                        ValidMessage validMessage = new ValidMessage((i+2)+"行记录已存在，请检查！");
+                        ValidMessage validMessage = new ValidMessage((i+2)+"记录已存在，是否覆盖！");
                         errorList.add(validMessage);
                     }
                 }
