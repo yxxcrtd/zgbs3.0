@@ -358,12 +358,16 @@ public class TradeInfoPro001Controller extends BaseController {
             return new Message().fail().setMessage("交易员代码输入的字符过长，请重新输入!");
         }
         if (StringUtil.equals(dto.getTradeMarket(),"04")){
-            if (dto.getDealerPartyNo().getBytes().length>32){
+            if (dto.getDealerPartyNo().getBytes().length>50){
                 return new Message().fail().setMessage("交易主体代码输入的字符过长，请重新输入!");
             }
-            if (dto.getDealerPartyName().getBytes().length>32){
+            if (dto.getDealerPartyName().getBytes().length>50){
                 return new Message().fail().setMessage("交易主体名称输入的字符过长，请重新输入!");
             }
+        }
+        //一个交易商只能维护一个 本方交易员
+        if (existsOur(dto)>0 && StringUtil.equals(dto.getIsOur(),"Y")){
+            return new Message().fail().setMessage("一个交易商只能维护一个本方交易员!");
         }
         try{
 //            deleteDealerDetails1(dealerName);
