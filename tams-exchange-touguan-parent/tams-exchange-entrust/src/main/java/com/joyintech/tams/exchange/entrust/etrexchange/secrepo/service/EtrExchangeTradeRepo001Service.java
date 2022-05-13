@@ -50,6 +50,7 @@ import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceM
 import com.joyintech.tams.component.base.entrust.BusiAutoEtrDispService;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.entrust.etrexchange.position.service.PositionRequestServiceEtrExchangeTradeSaveSecRepoRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dao.EtrExchangeTradeSecRepoMapper;
@@ -338,7 +339,14 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
             entity.setPortfolioId(entity.getPortfolioList().get(0).getPortfolioId());
             entity.setAcctNo(entity.getPortfolioList().get(0).getAcctNo());
         }
-
+        // 修正 金融产品类型_投管用
+        if (entity.getPs().equals(DictCodeListExt3.交易方向_正回购.getValue())) {
+            entity.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue());
+        } else if (entity.getPs().equals(DictCodeListExt3.交易方向_逆回购.getValue())) {
+            entity.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
+        }
+        entity.setMdate(DateUtil.parse(DateUtil.format(entity.getEntrustDate(), DateUtil.DEFAULT_DATE_FORMAT_EN)));
+        entity.setVdate(DateUtil.parse(DateUtil.format(entity.getEntrustDate(), DateUtil.DEFAULT_DATE_FORMAT_EN)));
         // nothing to do just for aspect
         Map<String, Object> map = new HashMap<>();
         calcAmt(entity);
@@ -402,7 +410,7 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
                         decisionAct = 系统动作_新建.getValue();
                     }
                 }
-                if (StringUtil.equals("1", RequestUtil.getParam("confirmOk"))) {
+                if (StringUtil.equals("1", entity.getConfirmOk())) {
                     entity.setSoftSkipMode("Y");
                 }
                 try {
