@@ -9,6 +9,7 @@ import com.joyintech.tams.common.base.dao.WflFinProductSpecialMapper;
 import com.joyintech.tams.common.base.entity.FinProductSpecial;
 import com.joyintech.tams.common.base.entity.WflFinProductSpecial;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.invest.common.dto.common.ExcelValidDto;
 import com.joyintech.tams.invest.common.util.ExcelUtil;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
@@ -130,6 +131,7 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
     private void insertWflData(FinProductSpecialDto entity) {
         WflFinProductSpecial wflFinProductSpecial = new WflFinProductSpecial();
         BeanUtil.copyPropertiesIgnoreNull(wflFinProductSpecial, entity);
+        wflFinProductSpecial.setInputType(DictCodeListExt1.录入方式_手工录入.getValue());
         wflFinProductSpecial.setWorkflowStatus(DictCodeList.数据状态_新建.getValue());
         wflFinProductSpecialMapper.insertSelective(wflFinProductSpecial);
     }
