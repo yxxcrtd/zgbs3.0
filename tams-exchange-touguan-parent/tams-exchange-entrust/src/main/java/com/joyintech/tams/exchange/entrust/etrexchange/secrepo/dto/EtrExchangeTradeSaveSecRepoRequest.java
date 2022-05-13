@@ -13,12 +13,15 @@ package com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.framework.validation.annotation.ValidLogic;
 import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.entrust.etrexchange.hqjj.validator.EtrExchangeTradeJj001Validator;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.validator.EtrExchangeTradeSecRepo001Validator;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
@@ -87,6 +90,15 @@ public class EtrExchangeTradeSaveSecRepoRequest extends EtrEntrust implements Pr
 
     @ApiModelProperty(name="entrustBussType",value="指令业务类型",example="")
     private String entrustBussType;
+
+    @ApiModelProperty(name="fpriceClone",value="市价时全价价格,前端默认隐藏传值",example="")
+    private BigDecimal fpriceClone;
+
+    @ApiModelProperty(name="priceClone",value="市价时净价,前端默认隐藏传值",example="")
+    private BigDecimal priceClone;
+
+    @ApiModelProperty(name="yieldClone",value="市价时收益率,前端默认隐藏传值",example="")
+    private BigDecimal yieldClone;
 
     /**
      * 可用金额
@@ -312,6 +324,11 @@ public class EtrExchangeTradeSaveSecRepoRequest extends EtrEntrust implements Pr
      * @return fprice.
      */
     public BigDecimal getFprice() {
+        // 现券市价指令模式时，全价取得前端隐藏传值
+        if (DictCodeListExt3.上农商_指令业务类型_债券现券交易指令.getValue().equals(getEntrustBussType())
+            && StringUtil.equals(getPriceModel(), DictCodeListExt2.价格模式_市价指令.getValue())){
+            return getFpriceClone();
+        }
         return fprice;
     }
 
@@ -449,6 +466,11 @@ public class EtrExchangeTradeSaveSecRepoRequest extends EtrEntrust implements Pr
      * @return yield.
      */
     public BigDecimal getYield() {
+        // 现券市价指令模式时，净价取得前端隐藏传值
+        if (DictCodeListExt3.上农商_指令业务类型_债券现券交易指令.getValue().equals(getEntrustBussType())
+                && StringUtil.equals(getPriceModel(), DictCodeListExt2.价格模式_市价指令.getValue())){
+            return getPriceClone();
+        }
         return yield;
     }
 
@@ -561,13 +583,24 @@ public class EtrExchangeTradeSaveSecRepoRequest extends EtrEntrust implements Pr
     }
 
 
-
-
-
-
-
-
-
+    public BigDecimal getFpriceClone() {
+        return fpriceClone;
+    }
+    public void setFpriceClone(BigDecimal fpriceClone) {
+        this.fpriceClone = fpriceClone;
+    }
+    public BigDecimal getPriceClone() {
+        return priceClone;
+    }
+    public void setPriceClone(BigDecimal priceClone) {
+        this.priceClone = priceClone;
+    }
+    public BigDecimal getYieldClone() {
+        return yieldClone;
+    }
+    public void setYieldClone(BigDecimal yieldClone) {
+        this.yieldClone = yieldClone;
+    }
 
 	public String getSoftSkipMode() {
 		return softSkipMode;
@@ -662,6 +695,11 @@ public class EtrExchangeTradeSaveSecRepoRequest extends EtrEntrust implements Pr
 
     @Override
     public BigDecimal getPrice() {
+        // 现券市价指令模式时，净价取得前端隐藏传值
+        if (DictCodeListExt3.上农商_指令业务类型_债券现券交易指令.getValue().equals(getEntrustBussType())
+                && StringUtil.equals(getPriceModel(), DictCodeListExt2.价格模式_市价指令.getValue())){
+            return getPriceClone();
+        }
         return price;
     }
 
