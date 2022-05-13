@@ -134,11 +134,11 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
      * @param resultMap
      */
     private void bond002(BaseTradeProductDealDto entity, Map<String, Object> resultMap) {
-        TrdFinProductDealTotal trdProductDealTotal = entity.getTrdFinProductDealTotal();
+        TrdProductDeal trdProductDeal = entity.getTrdProductDeal();
         resultMap.put(INTERFACE_TYPE, PositionConstant.INTERF_TYPE_BOND002);
         // 交易平台	见数据字典：交易平台
         resultMap.put(SHARES_TRADE_PLATFORM, this.getSharesTradePlatform(entity, PositionConstant.INTERF_TYPE_BOND002));
-        resultMap.put(BUSI_ACT, getBusiAct(trdProductDealTotal));
+        resultMap.put(BUSI_ACT, getBusiAct(trdProductDeal));
         resultMap.put(BID_RESULT, 是否_否.getValue());
         resultMap.put(PURCH_MODLE, null);
 
@@ -151,11 +151,11 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
         resultMap.put(TRADE_PLACE, dealEntity.getTradeMarket());
         resultMap.put(DELIVERY_TYPE, deliveryType);
         resultMap.put(WORK_FLOW_ID, dealEntity.getWorkflowId());
-        resultMap.put("payType", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(trdProductDealTotal.getFinprodType2()) ?
+        resultMap.put("payType", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(trdProductDeal.getFinprodType2()) ?
                 BussinessDictCodeList.缴款方式_一级分销.getValue() : null);
         resultMap.put("cdate", DateUtil.format(dealEntity.getTradeDate()));
         resultMap.put(FINPROD_ID, dealEntity.getFinprodId());
-        resultMap.put(B_TOTAL_TRADE_ID, trdProductDealTotal.getbTradeId());
+        resultMap.put(B_TOTAL_TRADE_ID, null);
 
         List<Map<String, Object>> ptlList = new ArrayList<>();
         Map<String, Object> pltMap = new HashMap<>();
@@ -184,10 +184,10 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
         resultMap.put("ptlList", ptlList);
     }
 
-    private Object getBusiAct(TrdFinProductDealTotal trdProductDealTotal) {
+    private Object getBusiAct(TrdProductDeal trdProductDeal) {
         String busiAct = DictCodeListExt3.业务动作_成交匹配.getValue();
-        if (DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(trdProductDealTotal.getFinprodType2())
-                && StringUtil.isNotEmpty(trdProductDealTotal.getbTradeId())) {
+        if (DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(trdProductDeal.getFinprodType2())
+                && StringUtil.isNotEmpty(trdProductDeal.getbTradeId())) {
             busiAct = DictCodeListExt3.业务动作_成交确认.getValue();
         }
         return busiAct;
