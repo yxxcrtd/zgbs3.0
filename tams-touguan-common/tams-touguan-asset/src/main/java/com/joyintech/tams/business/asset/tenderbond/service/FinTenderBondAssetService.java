@@ -123,6 +123,11 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
             search.setType10List(type10List);
             search.setType11List(type11List);
         }
+        if(StringUtil.isNotEmpty(search.getPageMode().getSort())) {
+            if(search.getPageMode().getSort().endsWith("Value")) {//特殊处理数据字典的排序问题
+                search.getPageMode().setSort(search.getPageMode().getSort().substring(0,search.getPageMode().getSort().length()-5));
+            }
+        }
         PageHelper.startPage(search.getPageMode().getPageNo(), search.getPageMode().getPageSize());
         List<FinTenderBondAsset001Dto> list = finTenderBondAssetMapper.selectForPage(search);
         return new Page<>(PageInfo.of(list));
@@ -202,8 +207,8 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
      */
     public FinTenderBondAsset002Dto getFromInterface(Map<String, String> param) {
         FinTenderBondAsset002Dto dto = finTenderBondAssetMapper.getProductFromInterface(param);
-        dto.setCalModel("price");//默认计算价格
         if(dto == null) return dto;
+        dto.setCalModel("price");//默认计算价格
         FinProductTypeConfig config = new FinProductTypeConfig();
         config.setConfigType(DictCodeListExt2.配置类型_WIND分类.getValue());
         config.setOutputValue1(dto.getType9());
@@ -623,7 +628,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
                 validList.add(new ValidMessage("参考收益率不能为空"));
             }
         }
-        if (StringUtil.isNotEmpty(dto.getIssueDto().getIssueStyle()) && StringUtil.equals(dto.getIssueDto().getIssueStyle(), DictCodeListExt4.发行类型_增发)) {
+        if (StringUtil.isNotEmpty(dto.getIssueDto().getIssueStyle()) && StringUtil.equals(dto.getIssueDto().getIssueStyle(), DictCodeListExt4.发行类型_增发.getValue())) {
             if (StringUtil.isNotEmpty(dto.getProductAddDto().getCrossMarket()) && StringUtil.equals(dto.getProductAddDto().getCrossMarket(), DictCodeList.是否_是.getValue())) {
                 if (StringUtil.isEmpty(dto.getProductAddDto().getCrossMarketCode())) {
                     validList.add(new ValidMessage("跨市场代码不能为空"));

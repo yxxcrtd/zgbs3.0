@@ -1697,7 +1697,7 @@ public class CfetsEtrDispatcherService extends BaseService {
                         if(StringUtil.isNotEmpty(fieldResponseDto.getStockSecId())){
                             Date sysDate = DateUtil.platDateFromCache();
                             BigDecimal faceValue = etrCommonService.select券面面值(fieldResponseDto.getStockSecId(), DateUtil.format(sysDate));
-                            fieldResponseDto.setPledgeStandardNumber(ArithmeticUtil.divide(ArithmeticUtil.multiply(fieldResponseDto.getPledgeRatio().divide(new BigDecimal("100")), fieldResponseDto.getEntrustNum(),faceValue),new BigDecimal(100),0, RoundingMode.DOWN));
+                            fieldResponseDto.setPledgeStandardNumber(ArithmeticUtil.divide(ArithmeticUtil.multiply(fieldResponseDto.getPledgeRatio().divide(new BigDecimal("100")), fieldResponseDto.getEntrustNum(),faceValue),new BigDecimal(100),4, RoundingMode.DOWN));
                         }else{
                             fieldResponseDto.setPledgeStandardNumber(ArithmeticUtil.multiply(fieldResponseDto.getPledgeRatio().divide(new BigDecimal("100")), fieldResponseDto.getEntrustNum()));
                         }
@@ -1705,7 +1705,7 @@ public class CfetsEtrDispatcherService extends BaseService {
                         if(StringUtil.isNotEmpty(fieldResponseDto.getStockSecId())){
                             Date sysDate = DateUtil.platDateFromCache();
                             BigDecimal faceValue = etrCommonService.select券面面值(fieldResponseDto.getStockSecId(), DateUtil.format(sysDate));
-                            fieldResponseDto.setPledgeStandardNumber(ArithmeticUtil.divide(ArithmeticUtil.multiply(fieldResponseDto.getPledgeRatio().divide(new BigDecimal("100")), fieldResponseDto.getEntrustNum(),faceValue),new BigDecimal(100),0, RoundingMode.DOWN));
+                            fieldResponseDto.setPledgeStandardNumber(ArithmeticUtil.divide(ArithmeticUtil.multiply(fieldResponseDto.getPledgeRatio().divide(new BigDecimal("100")), fieldResponseDto.getEntrustNum(),faceValue),new BigDecimal(100),4, RoundingMode.DOWN));
                         }
                     }
                 } else if (StringUtil.equals(dto.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_现券交易.getValue())) {
