@@ -308,7 +308,7 @@
             AND T1.FINPROD_MARKET_ID = #{secId,jdbcType=VARCHAR}
         </if>
         <if test="finprodMarketIds != null and finprodMarketIds.size() > 0">
-            AND T1.FINPRODMARKETID in
+            AND T1.finprodId in
             <foreach item="item" index="index" collection="finprodMarketIds" open="(" separator="," close=")">
                 #{item, jdbcType=VARCHAR}
             </foreach>
