@@ -106,4 +106,9 @@
       </if>
     </trim>
   </insert>
+
+  <delete id="deleteByWorkflowId" parameterType="java.lang.String" >
+    delete from WFL_FIN_PRODUCT_SPECIAL
+    where WORKFLOW_ID = #{workflowId, jdbcType=VARCHAR}
+  </delete>
 </mapper>

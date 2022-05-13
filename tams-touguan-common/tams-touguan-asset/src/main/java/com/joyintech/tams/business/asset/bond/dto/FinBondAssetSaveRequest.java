@@ -255,7 +255,6 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
 		this.tradePlat = tradePlat;
 	}
 
-	@NotEmpty(fieldName = "FinBondTargetAsset002.isPpb", groups = {ValidateGroupEdit.class})
 	public String getIsPPB() {
 		return isPPB;
 	}

@@ -1,4 +1,4 @@
-package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.service;
+package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.service;
 
 import com.google.common.collect.Lists;
 import com.joyintech.framework.base.BaseService;
@@ -9,14 +9,15 @@ import com.joyintech.tams.common.base.dao.WflFinProductSpecialMapper;
 import com.joyintech.tams.common.base.entity.FinProductSpecial;
 import com.joyintech.tams.common.base.entity.WflFinProductSpecial;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.invest.common.dto.common.ExcelValidDto;
 import com.joyintech.tams.invest.common.util.ExcelUtil;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
-import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dao.FinProductSpecialAssetMapper;
-import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.FinProductSpecialDto;
-import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.FinProductSpecialSelectOptionDto;
-import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.req.FinProductSpecialQueryRequest;
-import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.req.FinProductSpecialSelectOptionQueryRequest;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dao.FinProductSpecial001Mapper;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialDto;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialSelectOptionDto;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.req.FinProductSpecialQueryRequest;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.req.FinProductSpecialSelectOptionQueryRequest;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +35,10 @@ import java.util.Objects;
  * @date 2022-05-06
  */
 @Service
-public class FinProductSpecialService extends BaseService<FinProductSpecialDto> implements BaseProcessService<FinProductSpecialDto> {
+public class FinProductSpecial001Service extends BaseService<FinProductSpecialDto> implements BaseProcessService<FinProductSpecialDto> {
 
     @Autowired
-    private FinProductSpecialAssetMapper finProductSpecialAssetMapper;
+    private FinProductSpecial001Mapper finProductSpecial001Mapper;
     @Autowired
     private FinProductSpecialMapper finProductSpecialMapper;
     @Autowired
@@ -52,7 +53,8 @@ public class FinProductSpecialService extends BaseService<FinProductSpecialDto> 
      * @return
      */
     public Page<FinProductSpecialDto> queryForPage(FinProductSpecialQueryRequest request) {
-        Page<FinProductSpecialDto> pageList = super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> finProductSpecialAssetMapper.queryForPage(request));
+        Page<FinProductSpecialDto> pageList = super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(),
+                () -> finProductSpecial001Mapper.queryForPage(request));
         return pageList;
     }
 
@@ -63,7 +65,7 @@ public class FinProductSpecialService extends BaseService<FinProductSpecialDto> 
      * @return
      */
     public List<FinProductSpecialSelectOptionDto> querySelectOption(FinProductSpecialSelectOptionQueryRequest request) {
-        return finProductSpecialAssetMapper.querySelectOption(request);
+        return finProductSpecial001Mapper.querySelectOption(request);
     }
 
 
@@ -74,11 +76,15 @@ public class FinProductSpecialService extends BaseService<FinProductSpecialDto> 
      * @return
      */
     public Integer countFinprodIdProcessing(String finprodId) {
-        return finProductSpecialAssetMapper.countFinprodIdProcessing(finprodId, iPlatformDate.getSysDate());
+        return finProductSpecial001Mapper.countFinprodIdProcessing(finprodId, iPlatformDate.getSysDate());
     }
 
     @Override
     public void doComplete(FinProductSpecialDto entity, OperationType type) {
+        //删除流程表
+        if (Objects.nonNull(type)) {
+            delWflData(entity.getWorkflowId());
+        }
         //记录业务表
         insertData(entity);
     }
@@ -109,6 +115,15 @@ public class FinProductSpecialService extends BaseService<FinProductSpecialDto> 
 
 
     /**
+     * 删除流程表
+     *
+     * @param workflowId
+     */
+    private void delWflData(String workflowId) {
+        wflFinProductSpecialMapper.deleteByWorkflowId(workflowId);
+    }
+
+    /**
      * 流程表数据入库
      *
      * @param entity
@@ -116,6 +131,7 @@ public class FinProductSpecialService extends BaseService<FinProductSpecialDto> 
     private void insertWflData(FinProductSpecialDto entity) {
         WflFinProductSpecial wflFinProductSpecial = new WflFinProductSpecial();
         BeanUtil.copyPropertiesIgnoreNull(wflFinProductSpecial, entity);
+        wflFinProductSpecial.setInputType(DictCodeListExt1.录入方式_手工录入.getValue());
         wflFinProductSpecial.setWorkflowStatus(DictCodeList.数据状态_新建.getValue());
         wflFinProductSpecialMapper.insertSelective(wflFinProductSpecial);
     }
@@ -130,9 +146,7 @@ public class FinProductSpecialService extends BaseService<FinProductSpecialDto> 
     public List<ExcelValidDto> importData(String fileName) {
         List<List<String>> dataList = ExcelUtil.getDataList(fileName);
         List<FinProductSpecialDto> finProductSpecialDtos = convertToBean(dataList);
-        finProductSpecialDtos.stream().forEach(finProductSpecialDto -> {
-            doComplete(finProductSpecialDto, null);
-        });
+        finProductSpecialDtos.stream().forEach(finProductSpecialDto -> doComplete(finProductSpecialDto, null));
         List<ExcelValidDto> excelValidDtos = Lists.newArrayList();
         return excelValidDtos;
     }
@@ -156,26 +170,5 @@ public class FinProductSpecialService extends BaseService<FinProductSpecialDto> 
             entities.add(entity);
         }
         return entities;
-    }
-
-    /**
-     * 根据债券简称查询债券代码
-     *
-     * @param finProdAbbr
-     * @return
-     */
-    private String queryFinProdMarketIdByAbbr(String finProdAbbr) {
-        FinProductSpecialSelectOptionQueryRequest request = new FinProductSpecialSelectOptionQueryRequest();
-        request.setSearch(finProdAbbr);
-        FinProductSpecialSelectOptionDto finProductSpecialSelectOptionDto = finProductSpecialAssetMapper.querySampleFinProduct(request);
-        if (Objects.nonNull(finProductSpecialSelectOptionDto)) {
-            return finProductSpecialSelectOptionDto.getFinprodMarketId();
-        } else {
-            finProductSpecialSelectOptionDto = finProductSpecialAssetMapper.querySampleInterf(request);
-            if (Objects.nonNull(finProductSpecialSelectOptionDto)) {
-                return finProductSpecialSelectOptionDto.getFinprodMarketId();
-            }
-        }
-        return null;
     }
 }
