@@ -1,4 +1,4 @@
-package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.req;
+package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.req;
 
 import com.joyintech.tams.business.common.dto.PageMode;
 import io.swagger.annotations.ApiModel;
