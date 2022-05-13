@@ -729,4 +729,95 @@
         ) aaa order by aaa.TRADE_MARKET,aaa.termDays asc
     </select>
 
+    <select id="getFinprodListSecRepo" resultMap="secAcctInfo">
+        select * from(
+        select distinct t.finprod_market_id as id,
+        t.finprod_name as text,
+        '${acctTradeMarket}' as parentId,
+        t.oth_code_type,
+        t.finprod_type2,
+        t.finprod_id,
+        t.trade_market,
+        t.MARKET_ID,
+        t.BOARD,
+        t.TYPE_6,
+        t.TYPE_7,
+        t.IS_NET_SETT,
+        t.FACE_VALUE,
+        t.IS_NETPRICE,
+        t.IS_NO_GUARD,
+        t.termDays
+        from (
+        select a.finprod_market_id,
+        a.finprod_market_id || '|' || a.finprod_abbr as finprod_name,
+        null as oth_code_type,
+        a.finprod_type2,
+        a.finprod_id,
+        a.trade_market,
+        a.finprod_market_id AS MARKET_ID,
+        b.BOARD,
+        r.TYPE_6,
+        r.TYPE_7,
+        b.IS_NET_SETT,
+        a.mdate,
+        b.FACE_VALUE FACE_VALUE,
+        b.IS_NETPRICE IS_NETPRICE,
+        b.IS_NO_GUARD IS_NO_GUARD,
+        a.TERM_DAYS termDays
+        from fin_product a
+        left join fin_product_add b
+        on b.FINPROD_ID = a.FINPROD_ID
+        left join fin_product_type r
+        on a.FINPROD_ID = r.FINPROD_ID
+        where a.trade_market in (#{TRADE_PLACE_03}, #{TRADE_PLACE_04})<!-- 上海证券交易所、深圳证券交易所 -->
+        <if test="acctTradeMarket != null and acctTradeMarket != ''">
+            and a.trade_market = #{acctTradeMarket}
+        </if>
+        and a.finprod_type2 in (#{FINPROD_TYPE_TG_F01})<!--  债券 -->
+        and r.type_6 != #{type6_B14}
+        union
+        select distinct a.MARKET_ID as finprod_market_id,
+        concat(concat(a.MARKET_ID,'|'),a.TERM_TYPE) as finprod_name,
+        null as oth_code_type,
+        #{FINPROD_TYPE_TG_ZYSHG} as finprod_type2,
+        a.TERM_TYPE as finprod_id,
+        a.TRADE_MARKET as trade_market,
+        a.MARKET_ID AS MARKET_ID,
+        null AS BOARD,
+        null AS TYPE_6,
+        null AS TYPE_7,
+        null AS IS_NET_SETT,
+        null AS mdate,
+        null AS FACE_VALUE,
+        null AS IS_NETPRICE,
+        null AS IS_NO_GUARD,
+        null AS termDays
+        from MST_REPO_PRODUCT a
+        ) t
+        <where>
+            <if test="findprodList != null and findprodList.size()>0 ">
+                <foreach collection="findprodList" open="AND t.FINPROD_TYPE2 IN (" item="finprodType2" separator="," close=")">
+                    #{finprodType2,jdbcType=VARCHAR}
+                </foreach>
+            </if>
+            <if test="acctTradeMarket != null and acctTradeMarket != ''">
+                and t.TRADE_MARKET = #{acctTradeMarket}
+            </if>
+            <if test="secId != null and secId != ''">
+                and t.FINPROD_MARKET_ID = #{secId}
+            </if>
+            <if test="expireSettleDate != null and expireSettleDate != ''">
+                and (t.mdate &gt; to_date(#{expireSettleDate},'yyyy-mm-dd') or t.mdate is null)
+            </if>
+            <if test="initValue != null and initValue != ''">
+                and t.FINPROD_MARKET_ID = #{initValue}
+            </if>
+            <if test="search != null and !search.equals('')">
+                AND (t.finprod_market_id like concat('%',concat(#{search},'%')) OR t.finprod_name like
+                concat('%',concat(#{search},'%')))
+            </if>
+        </where>
+        ) aaa order by aaa.TRADE_MARKET,aaa.termDays asc
+    </select>
+
 </mapper>
