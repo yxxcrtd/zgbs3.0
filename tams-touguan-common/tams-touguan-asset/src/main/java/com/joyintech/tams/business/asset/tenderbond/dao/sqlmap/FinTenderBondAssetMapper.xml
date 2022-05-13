@@ -264,7 +264,12 @@
                 )
             </if>
         </where>
-        ORDER BY t.issueStage, t.issueStatus,t.issueDate, t.type9, t.type10, t.type11, t.issueClass
+        <if test="pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
+            order by ${pageMode.sort} ${pageMode.direction}
+        </if>
+        <if test="pageMode.sort == null or pageMode.sort == ''">
+            ORDER BY t.issueStage, t.issueStatus,t.issueDate, t.type9, t.type10, t.type11, t.issueClass
+        </if>
     </select>
 
     <select id="getByFinProductId" resultType="com.joyintech.tams.business.asset.tenderbond.dto.FinTenderBondAsset003Dto">

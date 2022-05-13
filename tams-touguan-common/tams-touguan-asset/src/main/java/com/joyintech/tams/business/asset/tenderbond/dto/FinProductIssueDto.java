@@ -2,6 +2,7 @@ package com.joyintech.tams.business.asset.tenderbond.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.joyintech.background.component.common.pack.common.json.CustomDateTimeDeserialize;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.json.CustomDateDeserialize;
 import io.swagger.annotations.ApiModel;
@@ -366,7 +367,7 @@ public class FinProductIssueDto {
         return issueSdate;
     }
 
-    @JsonDeserialize(using = CustomDateDeserialize.class)
+    @JsonDeserialize(using = CustomDateTimeDeserialize.class)
     public void setIssueSdate(Date issueSdate) {
         this.issueSdate = issueSdate;
     }
@@ -375,7 +376,7 @@ public class FinProductIssueDto {
         return issueEdate;
     }
 
-    @JsonDeserialize(using = CustomDateDeserialize.class)
+    @JsonDeserialize(using = CustomDateTimeDeserialize.class)
     public void setIssueEdate(Date issueEdate) {
         this.issueEdate = issueEdate;
     }
