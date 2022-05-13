@@ -82,6 +82,7 @@
         <module>../../tams-common-basicdata</module>
         <module>../../tams-exchange-touguan-parent/tams-exchange-entrust</module>
         <module>../../tams-exchange-touguan-parent/tams-exchange-basicdata</module>
+        <module>../../tams-exchange-touguan-parent/tams-exchange-period</module>
         <module>../../tams-exchange-touguan-system</module>
         <module>../../tams-svreport-common</module>
         <module>../../tams-svreport-parent/tams-svreport-interf</module>
