@@ -568,7 +568,6 @@
             <if test="tradePlat != null and tradePlat != '' and tradePlat==SHARES_TRADE_PLATFORM_02">
                 and  t.oth_type in (#{FINPROD_OTH_CODE_TYPE_06}, #{FINPROD_OTH_CODE_TYPE_07})
             </if>
-            and r.type_6 != #{FINPROD_TYPE_TG_F01_B14}
             union
         </if>
         select a.finprod_market_id,
@@ -634,7 +633,6 @@
             <if test="search != null and !search.equals('')">
                 AND (t.finprod_market_id like concat('%',concat(#{search},'%')) OR t.finprod_name like concat('%',concat(#{search},'%')))
             </if>
-            and t.type_6 != #{FINPROD_TYPE_TG_F01_B14}
         </where>
     </select>
 
