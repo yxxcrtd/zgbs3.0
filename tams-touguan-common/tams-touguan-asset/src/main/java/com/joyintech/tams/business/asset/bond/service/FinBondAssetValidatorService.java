@@ -140,7 +140,7 @@ public class FinBondAssetValidatorService implements BeanValidator{
                                     getMessage("COMMON_E_0057", getMessage("BussFinRepayment.mdate"))));
                             break;
                         }
-                        if(DateUtil.compareDate(finCashPlanEntity.getVdate(),finCashPlanEntity.getMdate())<0){
+                        if(DateUtil.compareDate(finCashPlanEntity.getVdate(),finCashPlanEntity.getMdate())>0){
                             resultList.add(new ValidMessage(
                                     "付息计划,计息开始日不可以大于计息结束日"));
                             break;
