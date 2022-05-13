@@ -125,31 +125,43 @@ public class InvestmentManagement extends BaseService {
      */
     public List<Instruction> queryInstructions(String instructionId, String portfolioId, String entrustStatus, String traderList, Double AMOUNT, String positionStr) {
         String param = null;
-        if (Objects.nonNull(instructionId)) param = "?entrustID=" + instructionId;
-        if (Objects.nonNull(portfolioId)) if (Objects.nonNull(param)) {
-            param += "&portfolioId=" + portfolioId;
-        } else {
-            param = "?portfolioId=" + portfolioId;
+        if (Objects.nonNull(instructionId)) {
+            param = "?entrustID=" + instructionId;
         }
-        if (Objects.nonNull(entrustStatus)) if (Objects.nonNull(param)) {
-            param += "&entrustStatus=" + entrustStatus;
-        } else {
-            param = "?entrustStatus=" + entrustStatus;
+        if (Objects.nonNull(portfolioId)) {
+            if (Objects.nonNull(param)) {
+                param += "&portfolioId=" + portfolioId;
+            } else {
+                param = "?portfolioId=" + portfolioId;
+            }
         }
-        if (Objects.nonNull(traderList)) if (Objects.nonNull(param)) {
-            param += "&traderList=" + traderList;
-        } else {
-            param = "?traderList=" + traderList;
+        if (Objects.nonNull(entrustStatus)) {
+            if (Objects.nonNull(param)) {
+                param += "&entrustStatus=" + entrustStatus;
+            } else {
+                param = "?entrustStatus=" + entrustStatus;
+            }
         }
-        if (Objects.nonNull(AMOUNT)) if (Objects.nonNull(param)) {
-            param += "&AMOUNT=" + AMOUNT;
-        } else {
-            param = "?AMOUNT=" + AMOUNT;
+        if (Objects.nonNull(traderList)) {
+            if (Objects.nonNull(param)) {
+                param += "&traderList=" + traderList;
+            } else {
+                param = "?traderList=" + traderList;
+            }
         }
-        if (Objects.nonNull(positionStr)) if (Objects.nonNull(param)) {
-            param += "&positionStr=" + positionStr;
-        } else {
-            param = "?positionStr=" + positionStr;
+        if (Objects.nonNull(AMOUNT)) {
+            if (Objects.nonNull(param)) {
+                param += "&AMOUNT=" + AMOUNT;
+            } else {
+                param = "?AMOUNT=" + AMOUNT;
+            }
+        }
+        if (Objects.nonNull(positionStr)) {
+            if (Objects.nonNull(param)) {
+                param += "&positionStr=" + positionStr;
+            } else {
+                param = "?positionStr=" + positionStr;
+            }
         }
         if (!Strings.isNullOrEmpty(ServiceApplication.INSTRUCTION_SERVICE)) {
             Instruction[] forObject = null;
@@ -202,21 +214,21 @@ public class InvestmentManagement extends BaseService {
      */
     public List<InstructionExportVo> queryExportPage(InstructionQueryRequest request) {
         Map<String, Object> pageParam = JsonUtils.getObjectFromJson(JsonUtils.getJsonFromObject(request), Map.class);
-        InstructionPage<Instruction, InstructionPledge, InstructionDetail> page = queryInstructions(pageParam);
-        List<Instruction> instructionList = page.getEtr_entrust_list();
+        InstructionPage<InstructionExportVo, InstructionPledge, InstructionDetail> page = queryInstructions(pageParam);
+        List<InstructionExportVo> instructionList = page.getEtr_entrust_list();
         return convertFieldValue(instructionList);
     }
 
     /**
      * 对指令状态、交易平台、委托方向、价格模式、资产类型字典值进行转换
      */
-    public List<InstructionExportVo> convertFieldValue(List<Instruction> instructionList) {
+    public List<InstructionExportVo> convertFieldValue(List<InstructionExportVo> instructionList) {
         if (Objects.isNull(instructionList) || instructionList.isEmpty()) {
             return Collections.emptyList();
         }
         List<InstructionExportVo> returnList = new ArrayList<>(instructionList.size());
         InstructionExportVo newInstruction = null;
-        for (Instruction instruction : instructionList) {
+        for (InstructionExportVo instruction : instructionList) {
             newInstruction = new InstructionExportVo();
             BeanUtil.copyProperties(instruction, newInstruction);
             if (Objects.nonNull(DictCodeList.from(DictCode.委托状态, newInstruction.getEntrustStatus()))) {
@@ -263,11 +275,11 @@ public class InvestmentManagement extends BaseService {
      * @param pageParam 查询参数
      * @return 指令列表
      */
-    public InstructionPage<Instruction, InstructionPledge, InstructionDetail> queryInstructions(Map<String, Object> pageParam) {
+    public InstructionPage<InstructionExportVo, InstructionPledge, InstructionDetail> queryInstructions(Map<String, Object> pageParam) {
         // 更新系统参数
         updateSysParam(pageParam);
 
-        InstructionPage<Instruction, InstructionPledge, InstructionDetail> instructionPage;
+        InstructionPage<InstructionExportVo, InstructionPledge, InstructionDetail> instructionPage;
         String dataType = (String) pageParam.get("dataType");
 
         if (CharSequenceUtil.isNotEmpty(dataType)) {
@@ -356,9 +368,9 @@ public class InvestmentManagement extends BaseService {
      * @param pageParam 查询参数
      * @return 指令列表
      */
-    private InstructionPage<Instruction, InstructionPledge, InstructionDetail> queryInstructionsFromTg(Map<String, Object> pageParam) {
+    private InstructionPage<InstructionExportVo, InstructionPledge, InstructionDetail> queryInstructionsFromTg(Map<String, Object> pageParam) {
 
-        InstructionPage<Instruction, InstructionPledge, InstructionDetail> bean = null;
+        InstructionPage<InstructionExportVo, InstructionPledge, InstructionDetail> bean = null;
         String url = ServiceApplication.INSTRUCTION_SERVICE + TradeServiceURL.queryInstructions;
 
         try {
@@ -377,8 +389,10 @@ public class InvestmentManagement extends BaseService {
 
         List<Instruction> instructions = ListConvertUtils.convertList(bean.getEtr_entrust_list(), Instruction.class);
         fillMinPriceAndTrdUnitLimit(instructions);
-        handlePriceWithZYCRK(instructions);
-        bean.setEtr_entrust_list(sortInstructionsByCreateTime(instructions));
+
+        List<InstructionExportVo> instructionCloneList = cloneInstructions(instructions);
+        handlePriceWithZYCRK(instructionCloneList);
+        bean.setEtr_entrust_list(sortInstructionsByCreateTime(instructionCloneList));
 
         List<InstructionPledge> instructionPledges = ListConvertUtils.convertList(bean.getEtr_pledge_list(), InstructionPledge.class);
         bean.setEtr_pledge_list(instructionPledges);
@@ -395,9 +409,9 @@ public class InvestmentManagement extends BaseService {
      * @param pageParam 查询参数
      * @return 指令列表
      */
-    public InstructionPage<Instruction, InstructionPledge, InstructionDetail> queryInstructionsFromCache(Map<String, Object> pageParam) {
+    public InstructionPage<InstructionExportVo, InstructionPledge, InstructionDetail> queryInstructionsFromCache(Map<String, Object> pageParam) {
 
-        InstructionPage<Instruction, InstructionPledge, InstructionDetail> bean = new InstructionPage<>();
+        InstructionPage<InstructionExportVo, InstructionPledge, InstructionDetail> bean = new InstructionPage<>();
 
         List<String> traderList = Convert.toList(String.class, pageParam.get("traderList"));
         if (CollUtil.isEmpty(traderList)) {
@@ -413,7 +427,7 @@ public class InvestmentManagement extends BaseService {
         fillMinPriceAndTrdUnitLimit(instructionList);
 
         // 价格修改仅限于前端展示，故使用拷贝的数据，而不使用内存数据
-        List<Instruction> instructionCloneList = cloneInstructions(instructionList);
+        List<InstructionExportVo> instructionCloneList = cloneInstructions(instructionList);
         handlePriceWithZYCRK(instructionCloneList);
         bean.setEtr_entrust_list(sortInstructionsByCreateTime(instructionCloneList));
 
@@ -424,19 +438,19 @@ public class InvestmentManagement extends BaseService {
         return bean;
     }
 
-    private List<Instruction> sortInstructionsByCreateTime(List<Instruction> instructions) {
+    private List<InstructionExportVo> sortInstructionsByCreateTime(List<InstructionExportVo> instructions) {
         return instructions.stream().sorted((o1, o2) -> DateUtil.compareDate(o2.getCreateTime(), o1.getCreateTime())).collect(Collectors.toList());
     }
 
-    private List<Instruction> cloneInstructions(List<Instruction> instructions) {
-        return instructions.stream().map(Instruction::cloneInstruction).collect(Collectors.toList());
+    private List<InstructionExportVo> cloneInstructions(List<Instruction> instructions) {
+        return instructions.stream().map(Instruction::cloneInstructionExportVo).collect(Collectors.toList());
     }
 
-    private void handlePriceWithZYCRK(List<Instruction> instructions) {
+    private void handlePriceWithZYCRK(List<InstructionExportVo> instructions) {
         if (CollUtil.isEmpty(instructions)) {
             return;
         }
-        for (Instruction instruction : instructions) {
+        for (InstructionExportVo instruction : instructions) {
             if (投管业务类型_质押券出入库.getValue().equals(instruction.getBusiTypeTg())) {
                 instruction.setEntrustPrice(NumberUtil.mul(instruction.getEntrustPrice(), 100));
             }
@@ -445,7 +459,7 @@ public class InvestmentManagement extends BaseService {
         }
     }
 
-    private void fillEntrustNumViewAndLeftVolumeView(Instruction instruction) {
+    private void fillEntrustNumViewAndLeftVolumeView(InstructionExportVo instruction) {
         if (instruction.volumeInstruction()) {
             long frozenQuantity = instruction.getFrozenQuantity() == null ? 0 : instruction.getFrozenQuantity().longValue();
             long entrustLeftAmt = instruction.getEntrustLeftAmt() == null ? 0 : instruction.getEntrustLeftAmt().longValue();
@@ -458,14 +472,14 @@ public class InvestmentManagement extends BaseService {
                 instruction.setEntrustNumView(BigDecimal.valueOf(entrustNum).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
                 instruction.setLeftVolume(leftVolume);
                 instruction.setLeftVolumeView(BigDecimal.valueOf(leftVolume).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
-            }else {
+            } else {
                 instruction.setEntrustNumView(BigDecimal.valueOf(entrustNum));
                 instruction.setLeftVolume(leftVolume);
                 instruction.setLeftVolumeView(BigDecimal.valueOf(leftVolume));
             }
         } else {
             instruction.setEntrustNumView(BigDecimal.ZERO);
-            instruction.setLeftVolume(0);
+            instruction.setLeftVolume(BigDecimal.ZERO.longValue());
             instruction.setLeftVolumeView(BigDecimal.ZERO);
         }
     }
@@ -770,10 +784,12 @@ public class InvestmentManagement extends BaseService {
         try {
             if (!Strings.isNullOrEmpty(ServiceApplication.BASIC_DATA_SERVICE)) {
                 Map<String, String> map = new HashMap<>();
-                if (!Strings.isNullOrEmpty(agentType))
+                if (!Strings.isNullOrEmpty(agentType)) {
                     map.put("acctType", agentType);
-                if (!Strings.isNullOrEmpty(accountId))
+                }
+                if (!Strings.isNullOrEmpty(accountId)) {
                     map.put("acctNo", accountId);
+                }
                 CapitalAccountBean[] capitalAccountBeans;
                 if (isSingle) {
                     capitalAccountBeans = simpleRestTemplate.postForObject(ServiceApplication.BASIC_DATA_SERVICE + TradeServiceURL.queryCapitalAccount, map, CapitalAccountBean[].class);
