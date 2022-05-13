@@ -639,6 +639,7 @@
     <!-- 证券代码 -->
     <select id="getFinprodMarketInfoSecRepo" resultMap="secAcctInfo">
         <!-- 质押式回购代码与期限品种映射关系 -->
+        select * from(
         select distinct t.finprod_market_id as id,
         t.finprod_name as text,
         '${acctTradeMarket}' as parentId,
@@ -653,7 +654,8 @@
         t.IS_NET_SETT,
         t.FACE_VALUE,
         t.IS_NETPRICE,
-        t.IS_NO_GUARD
+        t.IS_NO_GUARD,
+        t.termDays
         from (
         select a.finprod_market_id,
         a.finprod_market_id || '|' || a.finprod_abbr as finprod_name,
@@ -669,7 +671,8 @@
         a.mdate,
         b.FACE_VALUE FACE_VALUE,
         b.IS_NETPRICE IS_NETPRICE,
-        b.IS_NO_GUARD IS_NO_GUARD
+        b.IS_NO_GUARD IS_NO_GUARD,
+        a.TERM_DAYS termDays
         from fin_product a
         left join fin_product_add b
         on b.FINPROD_ID = a.FINPROD_ID
@@ -696,7 +699,8 @@
         null AS mdate,
         null AS FACE_VALUE,
         null AS IS_NETPRICE,
-        null AS IS_NO_GUARD
+        null AS IS_NO_GUARD,
+        null AS termDays
         from MST_REPO_PRODUCT a
         ) t
         <where>
@@ -716,9 +720,11 @@
                 and t.FINPROD_MARKET_ID = #{initValue}
             </if>
             <if test="search != null and !search.equals('')">
-                AND (t.finprod_market_id like concat('%',concat(#{search},'%')) OR t.finprod_name like concat('%',concat(#{search},'%')))
+                AND (t.finprod_market_id like concat('%',concat(#{search},'%')) OR t.finprod_name like
+                concat('%',concat(#{search},'%')))
             </if>
         </where>
+        ) aaa order by aaa.TRADE_MARKET,aaa.termDays asc
     </select>
 
 </mapper>
