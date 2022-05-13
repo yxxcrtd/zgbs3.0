@@ -82,7 +82,7 @@ public class StlDataGatherBond8Processor extends BaseProcessor<NeedOperateEntity
                 // 处理尾插用
                 Map<String, BigDecimal> amtInfoMap = new HashMap<>();
                 amtInfoDealMap(amtInfoMap);
-                // 循环查询出来的汇总交易，只包装交易表和费用表
+                // 循环查询出来的汇总交易
                 for (int i = 0; i < trdFinProductDealTotalList.size(); i++) {
                     // 最后一条数据
                     Boolean lastItem = i == trdFinProductDealTotalList.size() - 1;
@@ -387,20 +387,20 @@ public class StlDataGatherBond8Processor extends BaseProcessor<NeedOperateEntity
             commissionAmt.setFeeAmt(ArithmeticUtil.subtract(settleTransDataTotal.getCommissionAmt(), amtInfoMap.get("commissionAmt")));
             // 不是最后一条数据
         } else {
-            stampFee.setFeeAmt(ArithmeticUtil.multiply(ArithmeticUtil.divide(trdProductDeal.getShareAmt(), shareAmtTotal, 2), settleTransDataTotal.getSxfAmt()));
-            amtInfoMap.put("stampFee", amtInfoMap.get("stampFee").add(stampFee.getFeeAmt()));
-            jsfFee.setFeeAmt(ArithmeticUtil.multiply(ArithmeticUtil.divide(trdProductDeal.getShareAmt(), shareAmtTotal, 2), settleTransDataTotal.getJsfAmt()));
-            amtInfoMap.put("jsfFee", amtInfoMap.get("jsfFee").add(jsfFee.getFeeAmt()));
-            ghfFee.setFeeAmt(ArithmeticUtil.multiply(ArithmeticUtil.divide(trdProductDeal.getShareAmt(), shareAmtTotal, 2), settleTransDataTotal.getGhfAmt()));
-            amtInfoMap.put("ghfFee", amtInfoMap.get("ghfFee").add(ghfFee.getFeeAmt()));
-            zgfFee.setFeeAmt(ArithmeticUtil.multiply(ArithmeticUtil.divide(trdProductDeal.getShareAmt(), shareAmtTotal, 2), settleTransDataTotal.getZgfAmt()));
-            amtInfoMap.put("zgfFee", amtInfoMap.get("zgfFee").add(zgfFee.getFeeAmt()));
-            sxfFee.setFeeAmt(ArithmeticUtil.multiply(ArithmeticUtil.divide(trdProductDeal.getShareAmt(), shareAmtTotal, 2), settleTransDataTotal.getSxfAmt()));
-            amtInfoMap.put("sxfFee", amtInfoMap.get("sxfFee").add(sxfFee.getFeeAmt()));
-            settleFee.setFeeAmt(ArithmeticUtil.multiply(ArithmeticUtil.divide(trdProductDeal.getShareAmt(), shareAmtTotal, 2), settleTransDataTotal.getSettleFee()));
-            amtInfoMap.put("settleFee", amtInfoMap.get("settleFee").add(settleFee.getFeeAmt()));
-            commissionAmt.setFeeAmt(ArithmeticUtil.multiply(ArithmeticUtil.divide(trdProductDeal.getShareAmt(), shareAmtTotal, 2), settleTransDataTotal.getCommissionAmt()));
-            amtInfoMap.put("commissionAmt", amtInfoMap.get("commissionAmt").add(commissionAmt.getFeeAmt()));
+            stampFee.setFeeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransDataTotal.getSxfAmt(), trdProductDeal.getShareAmt()), shareAmtTotal, 2));
+            amtInfoMap.put("stampFee", ArithmeticUtil.doAdd(amtInfoMap.get("stampFee"), stampFee.getFeeAmt()));
+            jsfFee.setFeeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransDataTotal.getJsfAmt(), trdProductDeal.getShareAmt()), shareAmtTotal, 2));
+            amtInfoMap.put("jsfFee", ArithmeticUtil.doAdd(amtInfoMap.get("jsfFee"), jsfFee.getFeeAmt()));
+            ghfFee.setFeeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransDataTotal.getGhfAmt(), trdProductDeal.getShareAmt()), shareAmtTotal, 2));
+            amtInfoMap.put("ghfFee", ArithmeticUtil.doAdd(amtInfoMap.get("ghfFee"), ghfFee.getFeeAmt()));
+            zgfFee.setFeeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransDataTotal.getZgfAmt(), trdProductDeal.getShareAmt()), shareAmtTotal, 2));
+            amtInfoMap.put("zgfFee", ArithmeticUtil.doAdd(amtInfoMap.get("zgfFee"), zgfFee.getFeeAmt()));
+            sxfFee.setFeeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransDataTotal.getSxfAmt(), trdProductDeal.getShareAmt()), shareAmtTotal, 2));
+            amtInfoMap.put("sxfFee", ArithmeticUtil.doAdd(amtInfoMap.get("sxfFee"), sxfFee.getFeeAmt()));
+            settleFee.setFeeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransDataTotal.getSettleFee(), trdProductDeal.getShareAmt()), shareAmtTotal, 2));
+            amtInfoMap.put("settleFee", ArithmeticUtil.doAdd(amtInfoMap.get("settleFee"), settleFee.getFeeAmt()));
+            commissionAmt.setFeeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransDataTotal.getCommissionAmt(), trdProductDeal.getShareAmt()), shareAmtTotal, 2));
+            amtInfoMap.put("commissionAmt", ArithmeticUtil.doAdd(amtInfoMap.get("commissionAmt"), commissionAmt.getFeeAmt()));
         }
 
         trdTradeFeeDetailList.add(stampFee);
@@ -469,24 +469,24 @@ public class StlDataGatherBond8Processor extends BaseProcessor<NeedOperateEntity
             // 全价总额
             trdProductDeal.setFpriceAmt(ArithmeticUtil.subtract(settleTransDataTotal.getPrinAmt(), amtInfoMap.get("fpriceAmt")));
             // 交易金额
-            trdProductDeal.setTradeAmt(ArithmeticUtil.multiply(settleTransDataTotal.getPrinAmt(), amtInfoMap.get("tradeAmt")));
+            trdProductDeal.setTradeAmt(ArithmeticUtil.subtract(settleTransDataTotal.getPrinAmt(), amtInfoMap.get("tradeAmt")));
             // 不是最后一条数据
         } else {
             // 交易份额
-            trdProductDeal.setShareAmt(ArithmeticUtil.multiply(ArithmeticUtil.divide(trdFinTotal.getShareAmt(), shareAmtTotal, 2), settleTransDataTotal.getShareAmt()));
-            amtInfoMap.put("shareAmt", amtInfoMap.get("shareAmt").add(trdProductDeal.getShareAmt()));
+            trdProductDeal.setShareAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransDataTotal.getShareAmt(), trdFinTotal.getShareAmt()), shareAmtTotal, 2));
+            amtInfoMap.put("shareAmt", ArithmeticUtil.doAdd(amtInfoMap.get("shareAmt"), trdProductDeal.getShareAmt()));
             // 净价总额
-            trdProductDeal.setCpriceAmt(ArithmeticUtil.multiply(ArithmeticUtil.divide(trdFinTotal.getShareAmt(), shareAmtTotal, 2), settleTransDataTotal.getCpriceAmt()));
-            amtInfoMap.put("cpriceAmt", amtInfoMap.get("cpriceAmt").add(trdProductDeal.getCpriceAmt()));
+            trdProductDeal.setCpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransDataTotal.getCpriceAmt(), trdFinTotal.getShareAmt()), shareAmtTotal, 2));
+            amtInfoMap.put("cpriceAmt", ArithmeticUtil.doAdd(amtInfoMap.get("cpriceAmt"), trdProductDeal.getCpriceAmt()));
             // 交易本金
-            trdProductDeal.setPrinAmt(ArithmeticUtil.multiply(ArithmeticUtil.divide(trdFinTotal.getShareAmt(), shareAmtTotal, 2), settleTransDataTotal.getPrinAmt()));
-            amtInfoMap.put("prinAmt", amtInfoMap.get("prinAmt").add(trdProductDeal.getPrinAmt()));
+            trdProductDeal.setPrinAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransDataTotal.getPrinAmt(), trdFinTotal.getShareAmt()), shareAmtTotal, 2));
+            amtInfoMap.put("prinAmt", ArithmeticUtil.doAdd(amtInfoMap.get("prinAmt"), trdProductDeal.getPrinAmt()));
             // 全价总额
-            trdProductDeal.setFpriceAmt(ArithmeticUtil.multiply(ArithmeticUtil.divide(trdFinTotal.getShareAmt(), shareAmtTotal, 2), settleTransDataTotal.getPrinAmt()));
-            amtInfoMap.put("fpriceAmt", amtInfoMap.get("fpriceAmt").add(trdProductDeal.getFpriceAmt()));
+            trdProductDeal.setFpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransDataTotal.getPrinAmt(), trdFinTotal.getShareAmt()), shareAmtTotal, 2));
+            amtInfoMap.put("fpriceAmt", ArithmeticUtil.doAdd(amtInfoMap.get("fpriceAmt"), trdProductDeal.getFpriceAmt()));
             // 交易金额
-            trdProductDeal.setTradeAmt(ArithmeticUtil.multiply(ArithmeticUtil.divide(trdFinTotal.getShareAmt(), shareAmtTotal, 2), settleTransDataTotal.getPrinAmt()));
-            amtInfoMap.put("tradeAmt", amtInfoMap.get("tradeAmt").add(trdProductDeal.getTradeAmt()));
+            trdProductDeal.setTradeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(settleTransDataTotal.getPrinAmt(), trdFinTotal.getShareAmt()), shareAmtTotal, 2));
+            amtInfoMap.put("tradeAmt", ArithmeticUtil.doAdd(amtInfoMap.get("tradeAmt"), trdProductDeal.getTradeAmt()));
         }
         // 利息总额
         trdProductDeal.setIntAmt(BigDecimal.ZERO);
@@ -535,6 +535,6 @@ public class StlDataGatherBond8Processor extends BaseProcessor<NeedOperateEntity
         trdProductDeal.setSettlemenType(settleTransDataTotal.getSettleMode());
         // 席位号
         trdProductDeal.setSeatId(settleTransDataTotal.getSeatNumber());
-        return  trdProductDeal;
+        return trdProductDeal;
     }
 }
