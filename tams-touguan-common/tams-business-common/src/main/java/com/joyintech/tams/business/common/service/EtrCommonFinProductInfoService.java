@@ -6,6 +6,7 @@ import com.joyintech.tams.business.common.dao.EtrCommonFinProductInfoMapper;
 import com.joyintech.tams.business.common.dto.CfetsEtrFinProductInfoRequest;
 import com.joyintech.tams.business.common.dto.CfetsEtrFinProductInfoResponse;
 import com.joyintech.tams.business.common.entity.CfgDataTableShow;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt4;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,17 @@ public class EtrCommonFinProductInfoService extends BaseService {
                 List<String> spcdCodeList = new ArrayList<>(Arrays.asList(spcdCode.split(COMM)));
                 List<CfgDataTableShow> byPageCodeAndDtCodes = cfgDataTableService.getByPageCodeAndDtCodes(pageCode, dtCode, spcdCodeList);
                 if (CollectionUtils.isNotEmpty(byPageCodeAndDtCodes)) {
+                    //息票品种
+                    String couponSpecies = finProductInfo.getCouponSpecies();
+                    //利率类型
+                    String intType = finProductInfo.getIntType();
+                    if (couponSpecies.equals(DictCodeList.息票品种_零息.getValue()) || couponSpecies.equals(DictCodeList.息票品种_贴现.getValue())
+                            || (couponSpecies.equals(DictCodeList.息票品种_附息.getValue()) && intType.equals(DictCodeList.利率类型_浮动利率.getValue()))) {
+                        byPageCodeAndDtCodes.stream().forEach(cfgDataTableShow -> getColName(cfgDataTableShow.getColName(), Boolean.TRUE));
+                    } else if (couponSpecies.equals(DictCodeList.息票品种_利随本清.getValue())
+                            || (couponSpecies.equals(DictCodeList.息票品种_附息.getValue()) && intType.equals(DictCodeList.利率类型_固定利率.getValue()))) {
+                        byPageCodeAndDtCodes.stream().forEach(cfgDataTableShow -> getColName(cfgDataTableShow.getColName(), Boolean.FALSE));
+                    }
                     finProductInfo.setTableShows(byPageCodeAndDtCodes);
                 }
             }
@@ -109,6 +121,25 @@ public class EtrCommonFinProductInfoService extends BaseService {
         }
 
         return sb.toString();
+    }
+
+    /**
+     * 处理列名
+     *
+     * @param colName
+     * @param couponSpeciesFlag
+     * @return
+     */
+    private String getColName(String colName, Boolean couponSpeciesFlag) {
+        if (!colName.contains("/")) {
+            return colName;
+        }
+        String[] split = colName.split("/");
+        if (couponSpeciesFlag) {
+            return split[0];
+        } else {
+            return split[1];
+        }
     }
 
 }
