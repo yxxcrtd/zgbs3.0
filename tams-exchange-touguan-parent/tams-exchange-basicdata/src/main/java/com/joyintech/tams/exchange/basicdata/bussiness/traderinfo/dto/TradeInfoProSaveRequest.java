@@ -60,6 +60,8 @@ public class TradeInfoProSaveRequest extends BaseEntity implements ProcessEntity
 
     @ApiModelProperty(name="isOur",value="本方标识",example="A1", required = true)
     private String isOur;
+    @ApiModelProperty(name="isOurPre",value="本方标识修改前",example="A1", required = true)
+    private String isOurPre;
 
     @ApiModelProperty(name="selectedItem",value="选中数据",example="A1,A2..", required = true)
     private List<TradeInfoProSaveRequest> selectedItem;
@@ -219,5 +221,13 @@ public class TradeInfoProSaveRequest extends BaseEntity implements ProcessEntity
 
     public void setTraderNoPre(String traderNoPre) {
         this.traderNoPre = traderNoPre;
+    }
+
+    public String getIsOurPre() {
+        return isOurPre;
+    }
+
+    public void setIsOurPre(String isOurPre) {
+        this.isOurPre = isOurPre;
     }
 }
