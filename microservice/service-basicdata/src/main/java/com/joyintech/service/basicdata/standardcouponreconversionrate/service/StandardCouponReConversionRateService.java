@@ -323,6 +323,13 @@ public class StandardCouponReConversionRateService extends BaseService<StandardC
                 if(StringUtil.isEmpty(result)){
                     flag = false;
                     message.add("券商不存在");
+                } else {
+                    param.put("brokerId", result);
+                    String accountType = basicStandardCouponReConversionRateMapper.checkAccountTypeInfo(param);
+                    if(StringUtil.isNotEmpty(accountType)){
+                        flag = false;
+                        message.add("已维护整体再折算率，无法按单个资产维护");
+                    }
                 }
             }
             //资产代码
@@ -339,6 +346,8 @@ public class StandardCouponReConversionRateService extends BaseService<StandardC
                     flag = false;
                     message.add("资产代码有误");
                 }
+
+
             }
             if(list.get(3) == null || list.get(3).trim().equals("")){
                 flag = false;

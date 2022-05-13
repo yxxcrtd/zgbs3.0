@@ -57,5 +57,7 @@ public interface BasicStandardCouponReConversionRateMapper {
 
     String checkMstCustomerInfo(Map<String, Object> map);
 
+    String checkAccountTypeInfo(Map<String, Object> map);
+
     String checkFinprodIdInfo(Map<String, Object> map);
 }
