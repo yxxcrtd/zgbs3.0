@@ -11,6 +11,7 @@
 package com.joyintech.tams.cfets.trdconfirm.dto;
 
 
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
@@ -230,6 +231,9 @@ public class CfetsTrdConfirmTrdCstpMatchResponse {
     }
 
     public String getSettleSpeedName() {
+        if(StringUtil.isEmpty(this.getSettleSpeed())){
+            return StringUtil.EMPTY;
+        }
         return "T+" + this.getSettleSpeed();
         //return SysDataUtil.getNameFromDataDict(DictCode.清算速度, getSettleSpeed());
     }

@@ -75,7 +75,7 @@
         reg.yield*100 as yield,
         reg.exer_yield*100 as exerYield,
         reg.rate*100 as rate,
-        reg.m_trade_amt as mtradeAmt
+        reg.m_trade_amt as mtradeAmt,null ouPartyId
         from reg_fin_product_deal_total reg
         left join reg_fin_product_deal_total_add regAdd
         on reg.totle_trade_id=regAdd.Totle_Trade_Id
@@ -171,13 +171,13 @@
                 then fpi.REFER_YIELD end                                    tradeYield,
             case
                 when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02' then nvl(fpi.BP, 0)||'BP'
-                when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD || '%'
+                when fp.COUPON_SPECIES in ('02', '03') then to_char(fpi.REFER_YIELD,'FM990.9990') || '%'
                 when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
-                then fpi.REFER_YIELD || '%' end                                    tradeYieldStr,
+                then to_char(fpi.REFER_YIELD,'FM990.9990') || '%' end                tradeYieldStr,
             null                         termDays,
             bo.PAYABLE_AMOUNT            tradeAmt,
             bo.BID_ID                    busiCode,
-            bo.OUR_TRADER                trader,
+            nvl(mcct.TRADER_Name, bo.OUR_TRADER)               trader,
             bo.BID_DATE                  tradeDate,
             null                         counterId,
             null                         counterIdName,
@@ -202,7 +202,8 @@
             null                  as     yield,
             null                  as     exerYield,
             null                  as     rate,
-            null                  as     mtradeAmt
+            null                  as     mtradeAmt,
+            bo.OU_PARTY_ID               ouPartyId
             from BID_ORDER bo
             left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
             left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = fp.FINPROD_ID
@@ -230,6 +231,8 @@
             group by bobp.BID_ID, eed.SEC_ACCT_ID
             ) deal on deal.BID_ID = bo.BID_ID
             left join stl_sec_acct_info stlinfo on deal.SEC_ACCT_ID = stlinfo.sec_acct_id
+            /*left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID*/
+            left join MST_CFETS_CUSTOMER_TRADER mcct on mcct.TRADER_ID = bo.OUR_TRADER
             where bo.BID_DATE= #{sysDate,jdbcType=DATE} and bo.trade_status='01' and bo.is_cancel='N'
             AND NOT EXISTS (SELECT 1 FROM trdquto_match_info match where bo.BID_ID=match.pre_trade_id)
             <if test="userId != null and userId != ''">
@@ -268,7 +271,7 @@
                 AND ps=#{ps}
             </if>
             <if test="finprodType2List != null and finprodType2List.size() > 0">
-                AND finprod_type2 in
+                AND finprodType2 in
                 <foreach collection="finprodType2List" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
@@ -424,7 +427,7 @@
         ibd.yield*100 as yield,
         ibd.exer_yield*100 as exerYield,
         null as rate,
-        null as mtradeAmt
+        null as mtradeAmt,null ouPartyId
         from ibu_quote_bond ib
         inner join ibu_quote_bond_det ibd
         on ib.quote_id=ibd.quote_id
@@ -545,7 +548,7 @@
         null as yield,
         null as exerYield,
         ic.rate*100 as rate,
-        ic.M_TRADE_AMT as mtradeAmt
+        ic.M_TRADE_AMT as mtradeAmt,null ouPartyId
         from ibu_quote_crep ic
         left join (
         select I.quote_id,
@@ -1308,19 +1311,19 @@
                 null                            as                                   acctNoName,
                 icb.SUBSCRIPTION_AMOUNT * 10000 as                                   lastqty,
                 case
-                    when icb.ISSUE_PRICE is not null then icb.ISSUE_PRICE
+                    /*when icb.ISSUE_PRICE is not null then icb.ISSUE_PRICE*/
                     when icb.SPREAD is not null then icb.SPREAD
                     when icb.COUPON_RATE is not null then icb.COUPON_RATE  end tradeYield,
                 case
-                when icb.ISSUE_PRICE is not null then  '元'
-                when icb.SPREAD is not null then  'BP'
-                when icb.COUPON_RATE is not null then  '%' end tradeYieldStr,
+                /*when icb.ISSUE_PRICE is not null then  icb.ISSUE_PRICE || '元'*/
+                when icb.SPREAD is not null then  icb.SPREAD || 'BP'
+                when icb.COUPON_RATE is not null then to_char(icb.COUPON_RATE,'FM990.9990') ||'%' end tradeYieldStr,
                 null                                                                 termDays,
                 icb.ACTUAL_FEE                  as                                   tradeAmt,
                 null                            as                                   quoteid,
                 icb.SUBSCRIBE_INSTITUTION_ID    as                                   traderid,
-                mccit.PARTY_ABBR                as                                   traderidName,
-                icb.SUBMIT_USER                                                      trader,
+                nvl(mccit.PARTY_ABBR,icb.SUBSCRIBE_INSTITUTION_ID)                   traderidName,
+                nvl(mcct.TRADER_Name, icb.SUBMIT_USER)                               trader,
                 null                            as                                   counterId,
                 null                            as                                   counterIdName,
                 null                            as                                   clearType,
@@ -1336,12 +1339,11 @@
                 null                            as                                   pledgeFaceValues,
                 null                            as                                   mtradeAmt
         from INTERF_CSTP_BJFXJG icb
-                 left join fin_product fp
-                           on icb.INSTRUMENT_ID = fp.finprod_market_id
-                               and fp.finprod_type = 'F01'
+                 left join fin_product fp on icb.INSTRUMENT_ID = fp.finprod_market_id
                  LEFT JOIN SYS_USER_ADD sua ON icb.SUBMIT_USER = sua.IBU_TRADER
                  LEFT JOIN SYS_USER su ON sua.USER_ID = su.USER_ID
-                 LEFT JOIN MST_CFETS_CUSTOMER_INFO mccit ON icb.SUBSCRIBE_INSTITUTION_ID = mccit.party_customer_id
+                 LEFT JOIN MST_CFETS_CUSTOMER_INFO mccit ON icb.SUBSCRIBE_INSTITUTION_ID = mccit.PARTY_ID
+                 left join MST_CFETS_CUSTOMER_TRADER mcct on mcct.TRADER_ID = icb.SUBMIT_USER
         where NOT EXISTS(SELECT 1 FROM trdquto_match_info match where icb.TRD_ID = match.CSTP_TRADE_ID)
         and   to_date(substr(icb.SUBSCRIPTION_TIME,0,10),'yyyy-MM-dd')= #{sysDate,jdbcType=DATE}
         <if test="regAssetType != null  and regAssetType!='' ">
@@ -1745,7 +1747,7 @@
                 m.match_type          as matchType,
                 bo.BID_ID             as busiCode,
                 m.exe_id              as execid,
-                m.CSTP_TRADE_ID as cstpTradeId,
+                m.CSTP_TRADE_ID       as cstpTradeId,
                 'BID'                 as finprodType2,
                 '一级申购'              as finprodType2Name,
                 fp.finprod_id         as finprodId,
@@ -1755,7 +1757,7 @@
                 null                  as settleSpeed,
                 deal.SEC_ACCT_ID      as secManageAcctId,
                 stlinfo.sec_acct_name as secManageAcctIdName,
-                null                  as printAmt,
+                bo.SUBSCRIPTION_AMOUNT   printAmt,
                 null                  as tradeYield,
                 null                  as termDays,
                 bo.PAYABLE_AMOUNT     as tradeAmt,
@@ -1985,7 +1987,7 @@
                  , bo.SETT_FEE_AMT                  settFeeAmt
                  , portfolioId
                  , portfolioName
-                 , fp.ISSUE_PRICE                   issuePrice
+                 , fpi.ISSUE_PRICE                   issuePrice
                  , case
                        when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
                            then nvl(fpi.BP, 0)
@@ -1995,7 +1997,7 @@
                  , fpi.ISSUE_DATE                   issueDate
                  , fpi.PAY_DATE                     payDate
                  , fp.COUPON_SPECIES                couponRateType
-                 , fp.ISSUE_TYPE                    ratetype
+                 , fpi.INT_TYPE                     ratetype
                  , fp.CCY                           ccy
                  , bo.OU_PARTY_ID                   ouPartyId
                  , mcci.PARTY_ABBR                  ouPartyIdAbbr
@@ -2196,7 +2198,7 @@
              , fp.FINPROD_ID                                               finprodId
              , icb.INSTRUMENT_ID                                           finprodMarketId
              , icb.INSTRUMENT_SHORT_NAME                                   finprodAbbr
-             , icb.ISSUE_METHOD                                            issuetype
+             , decode(icb.ISSUE_METHOD,'6','01','01')                      issuetype
              , deal.SEC_ACCT_ID                                            secManageAcctId
              , stlinfo.SEC_ACCT_NAME                                       secManageAcctIdName
              , icb.SUBSCRIPTION_AMOUNT                                     subscriptionAmount
@@ -2205,7 +2207,7 @@
              , icb.ISSUE_PRICE                                             issuePrice
              , icb.SPREAD                                                  bp
              , icb.COUPON_RATE                                             rate
-             , icb.COUPON_RATE_TYPE                                        couponRateType
+             , decode(icb.COUPON_RATE_TYPE,'1','01','3','02','2','03','4','0','01')  couponRateType
              , fp.ccy                                                      ccy
              , icb.ISSUER                                                  issuer
              , mcci1.PARTY_ABBR                                            issuerName
@@ -2514,7 +2516,7 @@
     </select>
 
     <select id="selectBidDtoByPrimaryKey"  resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmRegInfoListResponse">
-        select bo.BID_ID
+        select bo.BID_ID totleTradeId
         from BID_ORDER bo
             left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
             left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = bo.FINPROD_ID

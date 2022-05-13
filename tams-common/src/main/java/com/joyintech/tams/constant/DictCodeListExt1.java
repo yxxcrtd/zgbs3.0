@@ -1930,6 +1930,7 @@ public enum DictCodeListExt1 implements BaseDictCodeList {
 	登记资产类型_质押式回购(DictCode.登记资产类型,"02","质押式回购"),
 	登记资产类型_一级申购(DictCode.登记资产类型,"03","一级申购"),
 	CSTP资产类型_债券(DictCode.CSTP资产类型,"BOND","债券"),
+	CSTP资产类型_一级申购(DictCode.CSTP资产类型,"BID","一级申购"),
 	;
 
     /**

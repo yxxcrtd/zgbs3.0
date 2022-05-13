@@ -1,12 +1,16 @@
 package com.joyintech.tams.cfets.common.servive;
 
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
+import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBid002Dto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.workflow.engine.constant.OperationType;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,18 +28,20 @@ public class CfetsCommonOprHisHandlerAopService extends BaseService {
      * @author jiangpeng
      * @date 2022/4/26 19:07
      */
-    public Map<String, Object> getCfetsOprHisInfo(Object object, OperationType operationType) {
+    public List<CfetsOprHisInfoRequest> getCfetsOprHisInfo(Object object, OperationType operationType) {
         Map<String, Object> resultMap = new HashMap<>();
+        List<CfetsOprHisInfoRequest> cfetsOprHisInfoRequests = new ArrayList<>();
         String trdId = null;
         String busiDes = null;
         String type = null;
         String workflowId = null;
         if (object != null) {
+            // 一级申购
             if (object instanceof CfetsTrdBondFirstSubInfoDto) {
-                CfetsTrdBondFirstSubInfoDto dto = (CfetsTrdBondFirstSubInfoDto) object;
-                trdId = dto.getBidId();
-                busiDes = dto.getRemark();
-                workflowId = dto.getWorkflowId();
+                CfetsTrdBondFirstSubInfoDto entity = (CfetsTrdBondFirstSubInfoDto) object;
+                trdId = entity.getBidId();
+                busiDes = entity.getRemark();
+                workflowId = entity.getWorkflowId();
                 if (operationType.equals(OperationType.NEW)) {
                     type = DictCodeListExt3.操作类型_新建.getValue();
                 } else if (operationType.equals(OperationType.REVOKE)) {
@@ -43,12 +49,36 @@ public class CfetsCommonOprHisHandlerAopService extends BaseService {
                 } else if (operationType.equals(OperationType.MODIFY)) {
                     type = DictCodeListExt3.操作类型_修改.getValue();
                 }
+                CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
+                oprHisReq.setEntrustId(trdId);
+                oprHisReq.setBusiDes(busiDes);
+                oprHisReq.setOperType(type);
+                oprHisReq.setWorkflowId(workflowId);
+                cfetsOprHisInfoRequests.add(oprHisReq);
+            }
+            // 一级投标指令
+            else if(object instanceof CfetsEtrBondFirstBid002Dto){
+                CfetsEtrBondFirstBid002Dto entity = (CfetsEtrBondFirstBid002Dto) object;
+                for (CfetsEtrBondFirstBid002Dto dto : entity.getEtrInvestBondFirstBidDtos()) {
+                    trdId = dto.getEntrustId();
+                    busiDes = entity.getRemark();
+                    workflowId = entity.getWorkflowId();
+                    if (operationType.equals(OperationType.NEW)) {
+                        type = DictCodeListExt3.操作类型_新建.getValue();
+                    } else if (operationType.equals(OperationType.REVOKE)) {
+                        type = DictCodeListExt3.操作类型_撤回.getValue();
+                    } else if (operationType.equals(OperationType.MODIFY)) {
+                        type = DictCodeListExt3.操作类型_修改.getValue();
+                    }
+                    CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
+                    oprHisReq.setEntrustId(trdId);
+                    oprHisReq.setBusiDes(busiDes);
+                    oprHisReq.setOperType(type);
+                    oprHisReq.setWorkflowId(workflowId);
+                    cfetsOprHisInfoRequests.add(oprHisReq);
+                }
             }
         }
-        resultMap.put("trdId", trdId);
-        resultMap.put("busiDes", busiDes);
-        resultMap.put("type", type);
-        resultMap.put("workflowId", workflowId);
-        return resultMap;
+        return cfetsOprHisInfoRequests;
     }
 }
