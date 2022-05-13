@@ -10,6 +10,7 @@
 
 package com.joyintech.service.bankuplink.common.dao;
 
+import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.common.base.entity.MstCounterParty;
 import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.invest.common.dto.cstp.EtrEntrustExt;
@@ -76,6 +77,13 @@ public interface CstpAutoTradeMapper {
 	 * @return
 	 */
 	TrdProductDeal isExistsTrade(@Param("fTradeId") String fTradeId);
+
+	/**
+	 * 根据市场代码查询债券信息
+	 * @param finprodMarketId
+	 * @return
+	 */
+	FinProduct selectSecByFinprodMarketId(@Param("finprodMarketId") String finprodMarketId);
 
 
 }

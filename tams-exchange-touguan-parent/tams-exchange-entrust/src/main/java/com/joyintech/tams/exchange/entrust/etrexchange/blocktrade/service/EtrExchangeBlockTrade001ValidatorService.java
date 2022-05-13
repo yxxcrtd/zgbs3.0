@@ -131,6 +131,9 @@ public class EtrExchangeBlockTrade001ValidatorService implements EtrExchangeComm
 				Map<String, Object> resultMap  = etrExchangeTrade001Service.findQuotations(map);
 				if (resultMap != null){
 					BigDecimal price = dto.getEntrustPrice();
+					if(price == null){
+						price = dto.getPrice();
+					}
 					if (dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_股票.getValue())
 							|| dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_基金.getValue())){
 						// 涨停

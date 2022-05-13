@@ -366,7 +366,7 @@ public class TradeInfoPro001Controller extends BaseController {
             }
         }
         //一个交易商只能维护一个 本方交易员
-        if (existsOur(dto)>0 && StringUtil.equals(dto.getIsOur(),"Y")){
+        if (existsOur(dto)>0 && StringUtil.equals(dto.getIsOur(),"Y")&&StringUtil.equals(dto.getIsOurPre(),"N")){
             return new Message().fail().setMessage("一个交易商只能维护一个本方交易员!");
         }
         try{

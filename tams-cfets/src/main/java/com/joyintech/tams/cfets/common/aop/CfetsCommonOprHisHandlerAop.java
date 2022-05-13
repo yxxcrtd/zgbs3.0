@@ -57,24 +57,22 @@ public class CfetsCommonOprHisHandlerAop {
     protected void entrustRefucePoint() {
     }
 
+    @Pointcut("execution(* com.joyintech.tams.cfets..*.*.doDispatcherDeal(..))")
+    protected void doDispatcherDealPoint() {
+    }
+
     /**
      * 提交及更新时更新细操作履历表
      */
-    @AfterReturning("insertPoint() || updatePoint()")
+    @AfterReturning("insertPoint() || updatePoint()||doDispatcherDealPoint()")
     public void updateCfetsOprHis(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
         OperationType operationType = OperationType.NEW;
         if (args.length > 1) {
             operationType = (OperationType) args[1];
         }
-        Map<String, Object> resultMap = cfetsCommonOprHisHandlerAopService.getCfetsOprHisInfo(args[0], operationType);
-        String trdId = (String) resultMap.get("trdId");
-        String busiDes = (String) resultMap.get("busiDes");
-        String type = (String) resultMap.get("type");
-        String workflowId = (String) resultMap.get("workflowId");
-        if (StringUtil.isNotEmpty(trdId) && StringUtil.isNotEmpty(busiDes) && StringUtil.isNotEmpty(type)) {
-            this.updateCfetsOprHis(busiDes, trdId, type, workflowId);
-        }
+        List<CfetsOprHisInfoRequest> list = cfetsCommonOprHisHandlerAopService.getCfetsOprHisInfo(args[0], operationType);
+        list.forEach(this::updateCfetsOprHis);
     }
 
     /**
@@ -137,6 +135,17 @@ public class CfetsCommonOprHisHandlerAop {
         oprHisReq.setBusiDes(busiDes);
         oprHisReq.setOperType(type);
         oprHisReq.setWorkflowId(workflowId);
+        joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
+    }
+
+    /**
+     * 更新操作履历
+     *
+     * @param oprHisReq 业务说明
+     * @author jiangpeng
+     * @date 2022/4/26 10:35
+     */
+    private void updateCfetsOprHis(CfetsOprHisInfoRequest oprHisReq) {
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
 

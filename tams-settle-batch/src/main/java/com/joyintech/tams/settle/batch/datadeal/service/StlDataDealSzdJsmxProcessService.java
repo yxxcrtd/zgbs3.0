@@ -475,7 +475,16 @@ public class StlDataDealSzdJsmxProcessService {
 						settleTransData.setIsPurchTypeYx(DictCodeList.是否_是.getValue());
 					}
 				}
-
+				if(DictCodeList.交易方向_买入.getValue().equals(settleTransData.getPs())
+						|| DictCodeList.交易方向_卖出.getValue().equals(settleTransData.getPs())
+						|| DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())){
+					// 交割日期
+					if(StringUtil.equals(DictCodeListStl.交收方式_非担保.getValue(), settleTransData.getSettleMode())){
+						settleTransData.setSettleDate(DateUtil.parse(szdJsmx.getJsrq()));
+					}else{
+						settleTransData.setSettleDate(DateUtil.parse(szdJsmx.getQsrq()));
+					}
+				}
 				// 日终过来的文件结算价格就是全价的，需要反算净价总额、应计利息总额
 				if (bondFinprodIdList.contains(DictCodeListExt1.金融产品类型_投管用_债券.getValue() + GlobalConstant.UNDER_LINE + szdJsmx.getZqdm1() + ".SH")
 						|| bondFinprodIdList.contains(DictCodeListExt1.金融产品类型_投管用_债券.getValue() + GlobalConstant.UNDER_LINE + szdJsmx.getZqdm2() + ".SH")) {
