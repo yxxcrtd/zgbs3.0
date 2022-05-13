@@ -573,6 +573,16 @@ public class StlDataDealSzdSjsjgProcessService {
             settleTransData.setFpriceAmt(ArithmeticUtil.multiply(settleTransData.getShareAmt(), settleTransData.getUnitFprice()));
             settleTransData.setTradeAmt(settleTransData.getFpriceAmt());
         }
+        if(DictCodeList.交易方向_买入.getValue().equals(settleTransData.getPs())
+                || DictCodeList.交易方向_卖出.getValue().equals(settleTransData.getPs())
+                || DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())){
+            // 交割日期
+            if(StringUtil.equals(DictCodeListStl.交收方式_非担保.getValue(), settleTransData.getSettleMode())){
+                settleTransData.setSettleDate(DateUtil.parse(szdSjsjg.getJgjsrq()));
+            }else{
+                settleTransData.setSettleDate(DateUtil.parse(szdSjsjg.getJgqsrq()));
+            }
+        }
     }
 
     /**

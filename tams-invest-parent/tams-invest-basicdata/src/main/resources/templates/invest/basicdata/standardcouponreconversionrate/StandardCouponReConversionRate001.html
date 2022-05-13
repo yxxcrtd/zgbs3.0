@@ -47,6 +47,18 @@
                             </select>
                         </div>
                     </div>
+
+                    <div class="layui-inline layui-col-xs4 layui-col-md4 layui-col-sm4 layui-col-lg4">
+                        <label class="layui-form-label form-lable" data-th-text="#{StandardCouponReConversionRate001.accountType}">资金账户</label>
+                        <div class="layui-input-inline input-inline">
+                            <select id="accountType" name="accountType"
+                                    class="layui-input form-input input-select" allowClear="true"
+                                    placeholder="请输入内容" formatoption="false"
+                                    data-th-data-result="${accountTypeList}" autosort="false"
+                                    data-th-placeholder="#{SysCommon.placeholder}">
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>

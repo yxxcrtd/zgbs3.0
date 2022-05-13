@@ -148,6 +148,9 @@ public class BondFinPayInterestStdInfoRequest extends FinCashPayRule {
     @ApiModelProperty(name="calcRule",value="推算方式",required=true)
     private String calcRule;
 
+    @ApiModelProperty(name="firstPayDate",value="首次支付日")
+    private Date firstPayDate;
+
     @ApiModelProperty(name="FinprodType2",value="产品类型",required=true)
     private String FinprodType2;
 

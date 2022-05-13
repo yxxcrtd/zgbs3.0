@@ -10,6 +10,7 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
+import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.invest.common.dto.InvAjaxResult;
 import com.joyintech.tams.invest.common.dto.common.ExcelValidDto;
 import com.joyintech.tams.invest.common.util.ExcelUtil;
@@ -97,6 +98,23 @@ public class StandardCouponReConversionRateService extends CommonExportService<S
         return restTemplate.postForList(
                 ServiceApplication.BASICDATA_SERVICE_NAME + "/StandardCouponReConversionRate/getList", dto,
                 StandardCouponReConversionRateDto.class);
+    }
+
+
+    /**
+     * 双击查看详细信息查询 修改页面信息查询
+     *
+     * @param
+     *
+     * @return MstSaleDepartmentDto
+     * @see
+     * @since 1.0
+     */
+    public List<WflValidInputParameter> getBusinessData (WflValidInputParameter dto) {
+        List<WflValidInputParameter> list = restTemplate.postForList(
+                ServiceApplication.BASICDATA_SERVICE_NAME + "/StandardCouponReConversionRate/getBusinessData", dto,
+                WflValidInputParameter.class);
+        return list;
     }
 
 

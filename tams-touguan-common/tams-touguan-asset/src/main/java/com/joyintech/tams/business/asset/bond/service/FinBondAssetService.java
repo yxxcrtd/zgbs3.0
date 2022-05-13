@@ -503,7 +503,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         finProduct.setIssuePrice(dto.getIssuePrice());
         //期限
         finProduct.setTermDays(DateUtil.getBetweenDayNumber(dto.getVdate(), dto.getMdate()));
-        finProduct.setIssueAmt(ArithmeticUtil.multiply(dto.getIssueAmt(), new BigDecimal("100000000")));
+        finProduct.setIssueAmt(dto.getIssueAmt());
         finProduct.setCalendarId(this.getCalendarId(dto.getTradeMarket()));
         // 一体化对应etliu start
         // 债券新建画面，入库时，标的类金融产品表的含权债摊销日字段，当含权债时，登数据字典【含权债摊销日.最近行权日】
@@ -1250,6 +1250,12 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                 if(StringUtil.isEmpty(dto.getCalcRule())){
                     resultList.add(new ValidMessage(
                             getMessage("COMMON_E_0057", getMessage("FinPayInterestStdInfo.calcRule"))));
+                }
+            }
+            if (StringUtil.isNotEmpty(dto.getCalcRule()) && StringUtil.equals(dto.getCalcRule(), DictCodeList.推算方式_首次支付日.getValue())){
+                if(StringUtil.isEmpty(dto.getCalcRule())){
+                    resultList.add(new ValidMessage(
+                            getMessage("COMMON_E_0057", getMessage("FinPayInterestStdInfo.firstPayDate"))));
                 }
             }
         }else if(StringUtil.equals(dto.getCouponSpecies(), DictCodeList.息票品种_利随本清.getValue())){
