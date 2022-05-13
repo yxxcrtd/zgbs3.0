@@ -5,13 +5,11 @@ import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.Date;
 
 /**
@@ -445,19 +443,7 @@ public class CfetsEtrIBondFirstBidFindIssueInfoDto {
     }
 
     public String getReferYieldStr() {
-        if (getReferYield() == null) {
-            return null;
-        }
-        if (StringUtil.equals(getCouponSpecies(), DictCodeList.息票品种_附息.getValue())
-                && StringUtil.equals(getIntType(), DictCodeList.利率类型_浮动利率.getValue())) {
-            DecimalFormat decimalFormat = new DecimalFormat("0.0000#");
-            return decimalFormat.format(getReferYield()) + " BP";
-        } else {
-            BigDecimal value = getReferYield().setScale(4, BigDecimal.ROUND_HALF_UP);
-            DecimalFormat decimalFormat = new DecimalFormat("0.0000#");
-            return decimalFormat.format(value) + " %";
-        }
-
+        return referYieldStr;
     }
 
     public void setReferYieldStr(String referYieldStr) {

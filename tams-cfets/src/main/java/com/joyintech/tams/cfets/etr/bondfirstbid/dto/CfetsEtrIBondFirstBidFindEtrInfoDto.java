@@ -7,125 +7,128 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 一级投标指令查询结果
+ *
  * @Author: kchen
  * @Date: 2022/4/20 11:22
  */
-@ApiModel(value="一级投标指令列表",description="一级投标指令列表")
+@ApiModel(value = "一级投标指令列表", description = "一级投标指令列表")
 public class CfetsEtrIBondFirstBidFindEtrInfoDto {
 
-    @ApiModelProperty(name="effectiveStatus",value="有效状态Code",example="A1")
+    @ApiModelProperty(name = "effectiveStatus", value = "有效状态Code", example = "A1")
     private String effectiveStatus;
 
-    @ApiModelProperty(name="effectiveStatusName",value="有效状态",example="A1")
+    @ApiModelProperty(name = "effectiveStatusName", value = "有效状态", example = "A1")
     private String effectiveStatusName;
 
-    @ApiModelProperty(name="entrustStatus",value="指令状态Code",example="A1")
+    @ApiModelProperty(name = "entrustStatus", value = "指令状态Code", example = "A1")
     private String entrustStatus;
 
-    @ApiModelProperty(name="entrustStatusName",value="指令状态",example="A1")
+    @ApiModelProperty(name = "entrustStatusName", value = "指令状态", example = "A1")
     private String entrustStatusName;
 
-    @ApiModelProperty(name="execProcess",value="执行进度%",example="A1")
+    @ApiModelProperty(name = "execProcess", value = "执行进度%", example = "A1")
     private BigDecimal execProcess;
 
-    @ApiModelProperty(name="transProcess",value="成交进度%",example="A1")
+    @ApiModelProperty(name = "transProcess", value = "成交进度%", example = "A1")
     private BigDecimal transProcess;
 
-    @ApiModelProperty(name="firstBidStatus",value="中标状态",example="A1")
+    @ApiModelProperty(name = "firstBidStatus", value = "中标状态", example = "A1")
     private String firstBidStatus;
 
-    @ApiModelProperty(name="firstBidStatusStr",value="中标状态名称",example="A1")
+    @ApiModelProperty(name = "firstBidStatusStr", value = "中标状态名称", example = "A1")
     private String firstBidStatusStr;
 
-    @ApiModelProperty(name="finprodId",value="资产代码Id",example="ZC1")
+    @ApiModelProperty(name = "finprodId", value = "资产代码Id", example = "ZC1")
     private String finprodId;
 
-    @ApiModelProperty(name="finprodMarketId",value="资产代码",example="ZC1")
+    @ApiModelProperty(name = "finprodMarketId", value = "资产代码", example = "ZC1")
     private String finprodMarketId;
 
-    @ApiModelProperty(name="finprodAbbr",value="资产简称",example="ZC名")
+    @ApiModelProperty(name = "finprodAbbr", value = "资产简称", example = "ZC名")
     private String finprodAbbr;
 
-    @ApiModelProperty(name="issueClass",value="发行方式",example="报价发行/招标发行/簿记建档")
+    @ApiModelProperty(name = "issueClass", value = "发行方式", example = "报价发行/招标发行/簿记建档")
     private String issueClass;
 
-    @ApiModelProperty(name="issueClassStr",value="发行方式名称")
+    @ApiModelProperty(name = "issueClassStr", value = "发行方式名称")
     private String issueClassStr;
 
-    @ApiModelProperty(name="issueDate",value="投标日/发行日")
+    @ApiModelProperty(name = "issueDate", value = "投标日/发行日")
     private Date issueDate;
 
-    @ApiModelProperty(name="issueDateStr",value="投标日/发行日字符串")
+    @ApiModelProperty(name = "issueDateStr", value = "投标日/发行日字符串")
     private String issueDateStr;
 
-    @ApiModelProperty(name="totalBiddingNum",value="汇总投标券面总额")
+    @ApiModelProperty(name = "totalBiddingNum", value = "汇总投标券面总额")
     private BigDecimal totalBiddingNum;
 
-    @ApiModelProperty(name="bidPrice",value="投标标位",example="1")
+    @ApiModelProperty(name = "bidPrice", value = "投标标位", example = "1")
     private BigDecimal bidPrice;
 
-    @ApiModelProperty(name="bidPriceStr",value="投标标位字符串",example="1")
+    @ApiModelProperty(name = "bidPriceStr", value = "投标标位字符串", example = "1")
     private String bidPriceStr;
 
-    @ApiModelProperty(name="payEdate",value="缴款截止日")
+    @ApiModelProperty(name = "payEdate", value = "缴款截止日")
     private Date payEdate;
 
-    @ApiModelProperty(name="payEdateStr",value="缴款截止日字符串")
+    @ApiModelProperty(name = "payEdateStr", value = "缴款截止日字符串")
     private String payEdateStr;
 
-    @ApiModelProperty(name="portfolioId",value="组合代码",example="A1")
+    @ApiModelProperty(name = "portfolioId", value = "组合代码", example = "A1")
     private String portfolioId;
 
-    @ApiModelProperty(name="portfolioName",value="组合名称",example="名称A1")
+    @ApiModelProperty(name = "portfolioName", value = "组合名称", example = "名称A1")
     private String portfolioName;
 
-    @ApiModelProperty(name="busiModel",value="业务模式Code",example="01")
+    @ApiModelProperty(name = "busiModel", value = "业务模式Code", example = "01")
     private String busiModel;
 
-    @ApiModelProperty(name="busiModelStr",value="业务模式",example="01")
+    @ApiModelProperty(name = "busiModelStr", value = "业务模式", example = "01")
     private String busiModelStr;
 
-    @ApiModelProperty(name="invManagerId",value="投资经理",example="A1")
+    @ApiModelProperty(name = "invManagerId", value = "投资经理", example = "A1")
     private String invManagerId;
 
-    @ApiModelProperty(name="etrDate",value="指令日期",example="2021-07-06")
+    @ApiModelProperty(name = "etrDate", value = "指令日期", example = "2021-07-06")
     private Date etrDate;
 
-    @ApiModelProperty(name="etrDateStr",value="指令日期字符串",example="2021-07-06")
+    @ApiModelProperty(name = "etrDateStr", value = "指令日期字符串", example = "2021-07-06")
     private String etrDateStr;
 
-    @ApiModelProperty(name="counterId",value="交易对手",example="A1")
+    @ApiModelProperty(name = "counterId", value = "交易对手", example = "A1")
     private String counterId;
 
-    @ApiModelProperty(name="counterName",value="交易对手名称",example="A1")
+    @ApiModelProperty(name = "counterName", value = "交易对手名称", example = "A1")
     private String counterName;
 
-    @ApiModelProperty(name="approver",value="审批人",example="1")
+    @ApiModelProperty(name = "approver", value = "审批人", example = "1")
     private String approver;
 
-    @ApiModelProperty(name="remark",value="备注",example="A1")
+    @ApiModelProperty(name = "remark", value = "备注", example = "A1")
     private String remark;
 
-    @ApiModelProperty(name="businessModel",value="业务模式",example="A1")
+    @ApiModelProperty(name = "businessModel", value = "业务模式", example = "A1")
     private String businessModel;
 
-    @ApiModelProperty(name="execFinishAmt",value="已完成指令额度",example="1")
+    @ApiModelProperty(name = "execFinishAmt", value = "已完成指令额度", example = "1")
     private BigDecimal execFinishAmt;
 
-    @ApiModelProperty(name="execRemainderAmt",value="剩余指令额度",example="1")
+    @ApiModelProperty(name = "execRemainderAmt", value = "剩余指令额度", example = "1")
     private BigDecimal execRemainderAmt;
 
-    @ApiModelProperty(name="transFinishAmt",value="已成交额度",example="1")
+    @ApiModelProperty(name = "transFinishAmt", value = "已成交额度", example = "1")
     private BigDecimal transFinishAmt;
 
-    @ApiModelProperty(name="transRemainderAmt",value="剩余成交额度",example="1")
+    @ApiModelProperty(name = "transRemainderAmt", value = "剩余成交额度", example = "1")
     private BigDecimal transRemainderAmt;
 
-    @ApiModelProperty(name="entrustId",value="指令编号",example="A1")
+    @ApiModelProperty(name = "entrustId", value = "指令编号", example = "A1")
     private String entrustId;
 
     public String getEffectiveStatus() {
@@ -398,7 +401,22 @@ public class CfetsEtrIBondFirstBidFindEtrInfoDto {
         if (StringUtil.isEmpty(getBusiModel())) {
             return null;
         }
-        return SysDataUtil.getNameFromDataDict(DictCode.业务模式, getBusiModel());
+        String[] arr = getBusiModel().split(",");
+        List<String> list = new ArrayList();
+        for (int i = 0; i < arr.length; i++) {
+            String s = arr[i].trim();
+            if (!list.contains(s)) {
+                list.add(s);
+            }
+        }
+        StringBuffer buffer = new StringBuffer();
+        for (int i = 0; i < list.size(); i++) {
+            buffer.append(SysDataUtil.getNameFromDataDict(DictCode.业务模式, list.get(i)));
+            if (i < list.size() - 1) {
+                buffer.append(",");
+            }
+        }
+        return buffer.toString();
     }
 
 

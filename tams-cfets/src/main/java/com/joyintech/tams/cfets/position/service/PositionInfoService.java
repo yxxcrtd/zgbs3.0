@@ -545,7 +545,7 @@ public class PositionInfoService {
         /*证券户可取现金*/
         resp.add(BaseMap.newMap()
                 .put("field", "ZQHKQXJ")
-                .put("name", "证券户可取现金（元）")
+                .put("name", "券商户可取现金（元）")
                 .put("amount", formatStr(cashMap.getBigDecimal("secDesirableCash")))
                 .put("type", "xj"));
         return resp;

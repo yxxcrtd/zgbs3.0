@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.business.asset.protect.dao.InterfCreditInfoMapper">
+    <select id="queryForPage" resultType="com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateDto" parameterType="Map">
+        SELECT
+            fp.SECID finprodMarketId, <!-- 资产代码-->
+            fp.SECNAME finprodAbbr,          <!-- 资产简称-->
+            fp.SECNAME finprodName,					<!-- 资产名称 -->
+            fp.MARKET tradeMarket,
+            sdl3.item_value tradeMarketStr,				<!-- 交易场所-->
+            fp.ISSUERSHORT issueRshortStr,				<!-- 创立机构-->
+            fp.ISSUEAMT issueAmt,								<!-- 名义本金总额-->
+            fp.PROTECT_OBJECT protectObject,			<!-- 保护对象-->
+            sdl4.item_value protectObjectStr,
+            null refSecFeatures,                    <!-- 参考债项特征-->
+            fp.PROTECTED_BOND refSec,				<!-- 参考债项-->
+            fp.REF_ENTITY refEntity,		        <!-- 参考实体-->
+            fp.MDATE mDate,												<!-- 到期日-->
+            fp.VDATE vDate,												<!-- 起始日-->
+            null gracePeriod,			            <!-- 宽限期（天）	-->
+            fp.BOOK_BUILDING_DATE pledgeDeadlineDate,<!-- 簿记建档日	-->
+            fp.PAY_DATE payDate,					 <!-- 缴款日	-->
+            fp.CIRCULATION_DATE listingDate,		 <!-- 上市流通日	-->
+            null calendarId,				 <!-- 交易日历		-->
+            fp.ISSUEPRICE issuePrice,				 <!-- 创设价格（元）-->
+            fp.RATEBASIC ratebasic,				 <!-- 计费年度天数	-->
+            fp.SETTLE_METHOD settleMethod,			 <!-- 结算方式		-->
+            sdl2.item_value settleMethodStr,
+            fp2.IS_ALLOW_OVERWRITE isAllowOverwrite, <!-- 是否允许wind覆盖	-->
+            sdl1.item_value isOrNoStr,
+            null remark
+        FROM
+            INTERF_CREDITINFO fp left join
+            FIN_PRODUCT fp2 on fp.SECID = fp2.FINPROD_MARKET_ID
+            LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='YES_OR_NO' and sdl1.item_code = fp2.IS_ALLOW_OVERWRITE
+            LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='SETTLE_METHOD' and sdl2.item_code = fp.SETTLE_METHOD
+            LEFT JOIN SYS_DATADICT_LIST sdl3 on sdl3.dict_code ='TRADE_PLACE' and sdl3.item_code = fp.MARKET
+            LEFT JOIN SYS_DATADICT_LIST sdl4 on sdl4.dict_code ='PROTECT_OBJECT' and sdl4.item_code = fp.PROTECT_OBJECT
+        <where>
+            <if test="finprodMarketId != null and finprodMarketId != ''">
+                AND fp.SECID = #{finprodMarketId}
+            </if>
+        </where>
+    </select>
+
+</mapper>

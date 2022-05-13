@@ -590,10 +590,10 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 entrustDetail.setPortfolioId(entry.getKey());
                 entrustDetail.setSecAcctId(entry.getValue().get(0).getSecAcctId());
                 entrustDetail.setInvAim(entry.getValue().get(0).getBusinessModel());
-                if (entry.getValue().get(0).getPortfolioTotalBidPrinAmt() != null) {
-                    entrustDetail.setEntrustNum(ArithmeticUtil.divide(entry.getValue().get(0).getPortfolioTotalBidPrinAmt(), 100, 4));
-                }else {
+                if (StringUtil.equals(dto.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
                     entrustDetail.setEntrustNum(ArithmeticUtil.divide(entry.getValue().get(0).getBidPrinAmt(), 100, 4));
+                }else {
+                    entrustDetail.setEntrustNum(ArithmeticUtil.divide(entry.getValue().get(0).getPortfolioTotalBidPrinAmt(), 100, 4));
                 }
 
                 etrEntrustDetailList.add(entrustDetail);

@@ -23,7 +23,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * 场外指令分发
@@ -116,6 +115,18 @@ public class CfetsEtrDispatcherTradeListResponse extends EtrEntrust {
 
     @ApiModelProperty(name = "assetType11", value = "中标状态字典值", example = "字符串1")
     private String isWinValue;
+
+    @ApiModelProperty(name="firstBidStatus",value="一级投标中标状态",example="A1")
+    private String firstBidStatus;
+
+    @ApiModelProperty(name="firstBidStatusStr",value="一级投标中标状态名称",example="A1")
+    private String firstBidStatusStr;
+
+    @ApiModelProperty(name="issueDate",value="投标日/发行日")
+    private String issueDate;
+
+    @ApiModelProperty(name="issueDateStr",value="投标日/发行日字符串")
+    private String issueDateStr;
 
     /**
      * 获取 otherEntrustStatus
@@ -405,5 +416,40 @@ public class CfetsEtrDispatcherTradeListResponse extends EtrEntrust {
 
     public void setIsWinValue(String isWinValue) {
         this.isWinValue = isWinValue;
+    }
+
+    public String getFirstBidStatus() {
+        return firstBidStatus;
+    }
+
+    public void setFirstBidStatus(String firstBidStatus) {
+        this.firstBidStatus = firstBidStatus;
+    }
+
+    public String getFirstBidStatusStr() {
+        if (StringUtil.isEmpty(getFirstBidStatus())) {
+            return null;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.一级投标中标状态, getFirstBidStatus());
+    }
+
+    public void setFirstBidStatusStr(String firstBidStatusStr) {
+        this.firstBidStatusStr = firstBidStatusStr;
+    }
+
+    public String getIssueDate() {
+        return issueDate;
+    }
+
+    public void setIssueDate(String issueDate) {
+        this.issueDate = issueDate;
+    }
+
+    public String getIssueDateStr() {
+        return issueDateStr;
+    }
+
+    public void setIssueDateStr(String issueDateStr) {
+        this.issueDateStr = issueDateStr;
     }
 }
