@@ -334,7 +334,13 @@
 		T2.CJBH = T1.MXZXBH AND T2.SEAT_NUMBER = T1.MXJYDY  AND T2.DEAL_DATE = #{dealDate,jdbcType=DATE}
 		LEFT JOIN SETTLE_TRANS_DATA_STATUS T3 ON
 		T3.TRADE_ID = T2.TRADE_ID
-        <where>
+		LEFT JOIN SZD_SJSJG
+		ON		SZD_SJSMX.MXZXBH = SZD_SJSJG.JGZXBH
+		AND		SZD_SJSMX.MXJYDY = SZD_SJSJG.JGJYDY
+		AND		SZD_SJSMX.MXCJRQ = SZD_SJSJG.JGCJRQ
+		AND		SZD_SJSMX.MXYWLB = SZD_SJSJG.JGYWLB
+		AND		SZD_SJSMX.IMPORT_DATE = SZD_SJSJG.IMPORT_DATE
+		<where>
 			T1.IMPORT_DATE = #{dealDate,jdbcType=DATE} AND (upper(T1.DATA_FILE) LIKE CONCAT(#{dataFile}, '%')) AND T1.IS_SETTLE_TARGET = 'Y'
 			and (T3.CHECK_RESULT is null or T3.CHECK_RESULT in ('0', '2'))
         	<foreach item="searchMapValue" index="searchMapKey" collection="searchMap">
@@ -343,6 +349,7 @@
         			#{searchMapValueData}
         		</foreach>
         	</foreach>
+			AND SZD_SJSJG.JGYWLB IS NULL
         </where>
     </select>
 
