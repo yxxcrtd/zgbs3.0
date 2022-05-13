@@ -1,4 +1,4 @@
-package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.controller;
+package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
@@ -9,15 +9,14 @@ import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.common.ExcelValidDto;
-import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.FinProductSpecialDto;
-import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.FinProductSpecialSelectOptionDto;
-import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.req.FinProductSpecialQueryRequest;
-import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.req.FinProductSpecialSelectOptionQueryRequest;
-import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.service.FinProductSpecialService;
-import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.service.FinProductSpecialValidatorService;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialDto;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialSelectOptionDto;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.req.FinProductSpecialQueryRequest;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.req.FinProductSpecialSelectOptionQueryRequest;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.service.FinProductSpecial001Service;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.service.FinProductSpecialValidatorService;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -44,15 +43,15 @@ import java.util.Map;
  * @date 2022-05-06
  */
 @Controller
-@PageId("CfetsBasicInfo001")
-@RequestMapping("/business/param/CfetsBasicInfo001")
+@PageId("FinProductSpecial001")
+@RequestMapping("/business/param/FinProductSpecial001")
 @Api(tags = "银行间基础信息-特殊债券信息")
-public class CfetsBasicInfo001Controller extends BaseController {
+public class FinProductSpecial001Controller extends BaseController {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    private FinProductSpecialService finProductSpecialService;
+    private FinProductSpecial001Service finProductSpecial001Service;
     @Autowired
     private FinProductSpecialValidatorService finProductSpecialValidatorService;
 
@@ -71,7 +70,7 @@ public class CfetsBasicInfo001Controller extends BaseController {
     @ApiOperation(value = "特殊债券信息分页查询", notes = "特殊债券信息分页查询")
     public Message<Page<FinProductSpecialDto>> findPage(@RequestBody FinProductSpecialQueryRequest request) {
         logger.info("特殊债券信息分页查询参数：{}", JsonUtils.object2Json(request));
-        return Message.success("success", finProductSpecialService.queryForPage(request));
+        return Message.success("success", finProductSpecial001Service.queryForPage(request));
     }
 
 
@@ -80,7 +79,7 @@ public class CfetsBasicInfo001Controller extends BaseController {
     @ApiOperation(value = "特殊债券信息下拉框信息查询", notes = "特殊债券信息下拉框信息查询")
     public Message<Page<FinProductSpecialSelectOptionDto>> selectOption(@RequestBody FinProductSpecialSelectOptionQueryRequest request) {
         logger.info("特殊债券信息简单查询参数：{}", JsonUtils.object2Json(request));
-        return Message.success("success", finProductSpecialService.querySelectOption(request));
+        return Message.success("success", finProductSpecial001Service.querySelectOption(request));
     }
 
 
@@ -104,7 +103,7 @@ public class CfetsBasicInfo001Controller extends BaseController {
         processParameter.setOperationType(OperationType.NEW);
         processParameter.setPageId(params.getPageId());
         try {
-            String msg = finProductSpecialService.start(processParameter, dto);
+            String msg = finProductSpecial001Service.start(processParameter, dto);
             return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
         } catch (Exception e) {
             logger.error("特殊债券信息提交失败", e);
@@ -153,7 +152,7 @@ public class CfetsBasicInfo001Controller extends BaseController {
     @ResponseBody
     @RequestMapping("/importFile")
     public List<ExcelValidDto> importData(String fileName) {
-        return finProductSpecialService.importData(fileName);
+        return finProductSpecial001Service.importData(fileName);
     }
 
 }
