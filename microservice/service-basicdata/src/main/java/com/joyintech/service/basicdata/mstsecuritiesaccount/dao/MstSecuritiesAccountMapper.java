@@ -217,4 +217,6 @@ public interface MstSecuritiesAccountMapper {
     List<SelectOptionDto> getFinprodMarketInfoNewUi(Map<String,Object> map);
 
     List<SelectOptionDto> getFinprodMarketInfoSecRepo(Map<String, Object> map);
+
+    List<SelectOptionDto> getFinprodListSecRepo(Map<String, Object> map);
 }

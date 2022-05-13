@@ -412,4 +412,19 @@ public class MstSecuritiesAccountController {
         Page<SelectOptionDto> asas=mstSecuritiesAccountService.getFinprodMarketInfoSecRepo(page, length, map);
         return asas;
     }
+
+    /**
+     * 现券列表查询获取资产代码
+     * @param map
+     * @param page
+     * @param length
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("getFinprodListSecRepo/{page}/{length}")
+    public Page<SelectOptionDto> getFinprodListSecRepo(@RequestBody Map<String, Object> map,
+                                                             @PathVariable("page") int page, @PathVariable("length") int length) throws Exception {
+        Page<SelectOptionDto> asas=mstSecuritiesAccountService.getFinprodListSecRepo(page, length, map);
+        return asas;
+    }
 }

@@ -561,12 +561,11 @@ public class PortfolioManager extends BaseService {
     }
 
     private void coverPrice(Instruction instruction, OrderPlaceBean order) {
-        String entrustProp = EntrustPropUtils.getEntrustProp(instruction, order.getEntrustProp());
         if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())
-                && !EntrustUtils.isNoTrade(entrustProp)) {
+                && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             BigDecimal fullPrice = order.getFullPrice();
             if (ObjectUtil.isNull(fullPrice) || fullPrice.compareTo(BigDecimal.ZERO) <= 0) {
-                throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, StrUtil.format("参数不正确 【fullPrice = {}】", fullPrice));
+                throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, StrUtil.format("全价不正确 =>【fullPrice = {}】", fullPrice));
             }
             order.setEntrustPrice(fullPrice);
         }

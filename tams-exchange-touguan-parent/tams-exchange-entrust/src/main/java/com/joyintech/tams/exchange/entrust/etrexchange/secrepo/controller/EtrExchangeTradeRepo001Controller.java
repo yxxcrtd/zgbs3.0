@@ -601,7 +601,7 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 					dto.setEntrustNum(item.getEntrustNum());
 					dto.setEntrustAmt(item.getEntrustAmt());
 					dto.setSecAcctId(item.getSecAcctId()); // 证券账户
-					dto.setStockId(item.getSecAcctId());
+//					dto.setStockId(item.getStockId());
 					ajax = check(dto, br);
 					if (null != ajax) {
 						break;
@@ -1183,6 +1183,26 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new Message<MinTrdUnitLimitDto>().fail().setMessage("查询失败");
+		}
+	}
+
+	@ResponseBody
+	@PostMapping("/getFinprodList")
+	@ApiOperation(value = "现券列表查询资产列表", notes = "现券列表资产列表")
+	public Message<Page<SelectOptionDto>> getFinprodList(@RequestBody FinprodMarketInfoRequest dto){
+		logger.debug("getFinprodList() called with parameters => 【dto = {}】",JsonUtils.object2Json(dto));
+		try {
+			Map<String, Object> map = BeanUtil.object2Map(dto);
+			map.put("acctTradeMarket", dto.getTradeMarket());
+			List<String> findprodList = new ArrayList<>();
+			findprodList.add("ZYSHG");
+			findprodList.add(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+			map.put("findprodList", findprodList);
+			Page<SelectOptionDto> tempList = etrExchangeTradeSecRepo001Service.getFinprodList(map);
+			return new Message<Page<SelectOptionDto>>().success().setData(tempList);
+		} catch (Exception e) {
+			logger.error("查询功能异常", e);
+			return new Message<Page<SelectOptionDto>>().fail().setMessage("查询异常");
 		}
 	}
 }

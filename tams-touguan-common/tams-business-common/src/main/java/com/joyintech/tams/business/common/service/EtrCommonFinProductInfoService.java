@@ -2,10 +2,12 @@ package com.joyintech.tams.business.common.service;
 
 
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.dao.EtrCommonFinProductInfoMapper;
 import com.joyintech.tams.business.common.dto.CfetsEtrFinProductInfoRequest;
 import com.joyintech.tams.business.common.dto.CfetsEtrFinProductInfoResponse;
 import com.joyintech.tams.business.common.entity.CfgDataTableShow;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt4;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 银行间债券信息查询
@@ -57,6 +60,21 @@ public class EtrCommonFinProductInfoService extends BaseService {
                 List<String> spcdCodeList = new ArrayList<>(Arrays.asList(spcdCode.split(COMM)));
                 List<CfgDataTableShow> byPageCodeAndDtCodes = cfgDataTableService.getByPageCodeAndDtCodes(pageCode, dtCode, spcdCodeList);
                 if (CollectionUtils.isNotEmpty(byPageCodeAndDtCodes)) {
+                    //息票品种
+                    String couponSpecies = finProductInfo.getCouponSpecies();
+                    //利率类型
+                    String intType = finProductInfo.getIntType();
+                    if (StringUtil.isBlank(couponSpecies) || StringUtil.isBlank(couponSpecies)) {
+                        byPageCodeAndDtCodes = byPageCodeAndDtCodes.stream().filter(cfgDataTableShow -> !cfgDataTableShow.getColName().contains("/")).collect(Collectors.toList());
+                    } else {
+                        if (DictCodeList.息票品种_零息.getValue().equals(couponSpecies) || DictCodeList.息票品种_贴现.getValue().equals(couponSpecies)
+                                || (DictCodeList.息票品种_附息.getValue().equals(couponSpecies) && DictCodeList.利率类型_浮动利率.getValue().equals(intType))) {
+                            byPageCodeAndDtCodes.stream().forEach(cfgDataTableShow -> getColName(cfgDataTableShow.getColName(), Boolean.TRUE));
+                        } else if (DictCodeList.息票品种_利随本清.getValue().equals(couponSpecies)
+                                || (DictCodeList.息票品种_附息.getValue().equals(couponSpecies) && DictCodeList.利率类型_固定利率.getValue().equals(intType))) {
+                            byPageCodeAndDtCodes.stream().forEach(cfgDataTableShow -> getColName(cfgDataTableShow.getColName(), Boolean.FALSE));
+                        }
+                    }
                     finProductInfo.setTableShows(byPageCodeAndDtCodes);
                 }
             }
@@ -78,6 +96,9 @@ public class EtrCommonFinProductInfoService extends BaseService {
         String tenderType = finProductInfo.getTenderType();
         //发行类型
         String issueStyle = finProductInfo.getIssueStyle();
+        if (StringUtil.isBlank(issueClass) && StringUtil.isBlank(tenderType) && StringUtil.isBlank(issueStyle)) {
+            return BASE_SPCD_CODE;
+        }
         if (DictCodeListExt4.新债_发行方式_报价发行.getValue().equals(issueClass)) {
             return sb.append(BASE_SPCD_CODE).append(COMM).append(DictCodeListExt4.新债_发行方式_报价发行.getValue()).toString();
         }
@@ -109,6 +130,25 @@ public class EtrCommonFinProductInfoService extends BaseService {
         }
 
         return sb.toString();
+    }
+
+    /**
+     * 处理列名
+     *
+     * @param colName
+     * @param couponSpeciesFlag
+     * @return
+     */
+    private String getColName(String colName, Boolean couponSpeciesFlag) {
+        if (!colName.contains("/")) {
+            return colName;
+        }
+        String[] split = colName.split("/");
+        if (couponSpeciesFlag) {
+            return split[0];
+        } else {
+            return split[1];
+        }
     }
 
 }

@@ -1,4 +1,4 @@
-package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.service;
+package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.service;
 
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.ajax.AjaxResult;
@@ -10,9 +10,9 @@ import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.util.ExcelUtil;
-import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.req.FinProductSpecialSaveRequest;
-import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto.FinProductSpecialImportDto;
-import org.apache.commons.collections4.CollectionUtils;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.req.FinProductSpecialSaveRequest;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialImportDto;
+import org.springframework.util.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +35,7 @@ public class FinProductSpecialValidatorService implements BeanValidator {
     @Autowired
     private MstWorkflowCommonService mstWorkflowCommonService;
     @Autowired
-    private FinProductSpecialService finProductSpecialService;
+    private FinProductSpecial001Service finProductSpecial001Service;
 
     @Override
     public List<ValidMessage> valid(Object value) {
@@ -67,7 +67,7 @@ public class FinProductSpecialValidatorService implements BeanValidator {
             resultList.add(new ValidMessage("", getMessage("资产存在流程中数据,不可删除!" + dataEntityFromProcessMark.getWorkflowId())));
         }
         //判断是否流程中的数据
-        Integer countFinProdIdProcessing = finProductSpecialService.countFinprodIdProcessing(dto.getFinprodMarketId());
+        Integer countFinProdIdProcessing = finProductSpecial001Service.countFinprodIdProcessing(dto.getFinprodMarketId());
         if (countFinProdIdProcessing > 0) {
             resultList.add(new ValidMessage(getMessage("存在有效或流程中的当日指令及交易数据，不允许修改!")));
         }
@@ -85,7 +85,7 @@ public class FinProductSpecialValidatorService implements BeanValidator {
         List<List<String>> dataList = ExcelUtil.getDataList(fileName);
         AjaxResult result = new AjaxResult();
         if (!com.joyintech.framework.util.StringUtil.isEmptyList(dataList)) {
-            if (CollectionUtils.isNotEmpty(dataList)) {
+            if (!CollectionUtils.isEmpty(dataList)) {
                 if (dataList.size() > IMPORT_MAXIMUM_SIZE) {
                     result.setMessage("单次最多导入100条！", MessageType.错误消息);
                     return result;

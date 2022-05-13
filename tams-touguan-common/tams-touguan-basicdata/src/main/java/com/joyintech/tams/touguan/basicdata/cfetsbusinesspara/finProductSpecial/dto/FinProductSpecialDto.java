@@ -1,4 +1,4 @@
-package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.cfetsbasicinfo.dto;
+package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto;
 
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;

@@ -2500,4 +2500,9 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         return minTrdUnitLimitDto;
     }
 
+    public Page<SelectOptionDto> getFinprodList(Map<String, Object> map) {
+        return restTemplate.postForPage(
+                ServiceApplication.BASICDATA_SERVICE_NAME + "/MstSecuritiesAccountInfo/getFinprodListSecRepo", map,
+                SelectOptionDto.class);
+    }
 }

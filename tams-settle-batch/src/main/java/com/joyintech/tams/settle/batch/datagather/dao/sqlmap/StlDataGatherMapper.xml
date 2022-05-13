@@ -1625,6 +1625,48 @@
 			ENTRUST_ID = #{entrustId, jdbcType=VARCHAR}
 		  AND FINPROD_ID = #{finProdId, jdbcType=VARCHAR}
 	</select>
+	<!--add 查询投管交易编号 by liujs 20220512 start-->
+	<select id="selectTradeIdTgs" resultType="java.lang.String">
+		SELECT
+		DISTINCT  sttm.TRADE_ID_TG
+		FROM SETTLE_TRANS_TG_MAPPING sttm
+		WHERE sttm.TRADE_ID in(
+			SELECT std.SEQ_NO
+			FROM SETTLE_TRANS_DATA std
+			WHERE std.APPLY_TRADE_ID = #{applyTradeId, jdbcType=VARCHAR}
+			AND  std.DEAL_DATE = #{dealDate,jdbcType=DATE}
+			AND std.SEC_ACCT_ID = #{secAcctId, jdbcType=VARCHAR}
+			AND std.SEAT_NUMBER = #{seatNumber, jdbcType=VARCHAR}
+		)
+	</select>
+	<!--add 查询投管交易编号 by liujs 20220512 end-->
+	<!--add 根据汇总交易编号查询出所有汇总交易 by liujs 20220512 start-->
+	<select id="selectTotalTradesBytotleTradeId" resultType="com.joyintech.tams.common.base.entity.TrdFinProductDealTotal">
+		SELECT *
+		FROM TRD_FIN_PRODUCT_DEAL_TOTAL t
+		where t.TOTLE_TRADE_ID IN
+		<foreach collection="tradeIdTgList" item="item" open="(" close=")" separator=",">
+			#{item,jdbcType=VARCHAR}
+		</foreach>
+	</select>
+	<!--add 根据汇总交易编号查询出所有汇总交易 by liujs 20220512 end-->
+	<!--add 根据汇总的成交明细查询出原成交明细列表 by liujs 20220512 start-->
+	<select id="selectSettleTransDatas" resultType="com.joyintech.tams.settle.batch.datagather.dto.SettleTransDataDto">
+		SELECT std.*
+		FROM SETTLE_TRANS_DATA std
+		WHERE std.APPLY_TRADE_ID = #{applyTradeId, jdbcType=VARCHAR}
+		AND  std.DEAL_DATE = #{dealDate,jdbcType=DATE}
+		AND std.SEC_ACCT_ID = #{secAcctId, jdbcType=VARCHAR}
+		AND std.SEAT_NUMBER = #{seatNumber, jdbcType=VARCHAR}
+	</select>
+	<!--add 根据汇总的成交明细查询出原成交明细列表 by liujs 20220512 end-->
+	<!--add 金融产品代码查询金融产品简称 by liujs 20220512 start-->
+	<select id="selectFinprodAbbr" resultType="java.lang.String">
+		SELECT FINPROD_ABBR
+		FROM TRD_BANK_MANUAL_SETTLE_FLOW
+		WHERE FINPROD_ID = #{finprodId, jdbcType=VARCHAR}
+	</select>
+	<!--add 金融产品代码查询金融产品简称 by liujs 20220512 end-->
 
 	<select id="selectDzcjList" resultType="int">
 		SELECT count(SEQ_NO)

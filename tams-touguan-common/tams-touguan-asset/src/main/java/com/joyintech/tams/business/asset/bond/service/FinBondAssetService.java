@@ -503,7 +503,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         finProduct.setIssuePrice(dto.getIssuePrice());
         //期限
         finProduct.setTermDays(DateUtil.getBetweenDayNumber(dto.getVdate(), dto.getMdate()));
-        finProduct.setIssueAmt(ArithmeticUtil.multiply(dto.getIssueAmt(), new BigDecimal("100000000")));
+        finProduct.setIssueAmt(dto.getIssueAmt());
         finProduct.setCalendarId(this.getCalendarId(dto.getTradeMarket()));
         // 一体化对应etliu start
         // 债券新建画面，入库时，标的类金融产品表的含权债摊销日字段，当含权债时，登数据字典【含权债摊销日.最近行权日】
@@ -1252,6 +1252,12 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                             getMessage("COMMON_E_0057", getMessage("FinPayInterestStdInfo.calcRule"))));
                 }
             }
+            if (StringUtil.isNotEmpty(dto.getCalcRule()) && StringUtil.equals(dto.getCalcRule(), DictCodeList.推算方式_首次支付日.getValue())){
+                if(StringUtil.isEmpty(dto.getCalcRule())){
+                    resultList.add(new ValidMessage(
+                            getMessage("COMMON_E_0057", getMessage("FinPayInterestStdInfo.firstPayDate"))));
+                }
+            }
         }else if(StringUtil.equals(dto.getCouponSpecies(), DictCodeList.息票品种_利随本清.getValue())){
             if(StringUtil.isEmpty(dto.getPayTdayRule())){
                 resultList.add(new ValidMessage(
@@ -1296,7 +1302,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                             }
                         }
                     }
-                    if(DateUtil.compareDate(finCashPlanEntity.getVdate(),finCashPlanEntity.getMdate())<0){
+                    if(DateUtil.compareDate(finCashPlanEntity.getVdate(),finCashPlanEntity.getMdate())>0){
                         resultList.add(new ValidMessage(
                                 "付息计划,计息开始日不可以大于计息结束日"));
                         return resultList;
@@ -1481,6 +1487,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
     }
 
     public boolean isInWflProcess(WflValidInputParameter parameter) {
+            parameter.setSeachMode("01");
             List<String> result = finBondAssetMapper.getBusinessData(parameter);
             if (CollectionUtils.isNotEmpty(result)) {
                 return Boolean.TRUE;
