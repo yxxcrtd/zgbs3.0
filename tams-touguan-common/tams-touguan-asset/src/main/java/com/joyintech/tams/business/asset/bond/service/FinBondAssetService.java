@@ -1252,6 +1252,12 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                             getMessage("COMMON_E_0057", getMessage("FinPayInterestStdInfo.calcRule"))));
                 }
             }
+            if (StringUtil.isNotEmpty(dto.getCalcRule()) && StringUtil.equals(dto.getCalcRule(), DictCodeList.推算方式_首次支付日.getValue())){
+                if(StringUtil.isEmpty(dto.getCalcRule())){
+                    resultList.add(new ValidMessage(
+                            getMessage("COMMON_E_0057", getMessage("FinPayInterestStdInfo.firstPayDate"))));
+                }
+            }
         }else if(StringUtil.equals(dto.getCouponSpecies(), DictCodeList.息票品种_利随本清.getValue())){
             if(StringUtil.isEmpty(dto.getPayTdayRule())){
                 resultList.add(new ValidMessage(
