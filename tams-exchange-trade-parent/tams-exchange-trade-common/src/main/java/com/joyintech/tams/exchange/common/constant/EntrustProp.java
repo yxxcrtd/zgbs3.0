@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.common.constant;
 
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.enums.IEnum;
 
 import java.util.HashSet;
@@ -161,6 +162,20 @@ public enum EntrustProp implements IEnum<String> {
     public static boolean isNewBondTrade(String entrustProp) {
         return EntrustProp.NORMAL.value.equals(entrustProp)
                 || EntrustProp.SH_FIXEDINCOME_BAOJIA_OPPOSITE.value.equals(entrustProp);
+    }
+
+    /**
+     * 是否协商成交交易
+     */
+    public static boolean isConsultingTrade(String entrustProp) {
+        if (StringUtil.equals(entrustProp, EntrustProp.SH_FIXEDINCOME_BAOJIA_OPPOSITE.value)
+                || StringUtil.equals(entrustProp, EntrustProp.SZ_XSCJ_XD.value)
+                || StringUtil.equals(entrustProp, EntrustProp.SZ_XSCJ_JS.value)
+                || StringUtil.equals(entrustProp, EntrustProp.SZ_XSCJ_JJ.value)) {
+            return true;
+        }
+
+        return false;
     }
 
     // 是否需要跳过风控

@@ -29,7 +29,7 @@
                to_char(eea.TRANSMIT_TIME, 'hh24:mi:ss') transmitTime,
                to_char(eea.TRANSMIT_TIME, 'hh24:mi')    transmitTimeSer,
                ee.ENTRUST_ID                            entrustId,
-               ee.REMARK                                remark
+               hisInfo.REMARK                                remark
         from ETR_ENTRUST ee
                  left join (select listagg(t0.PORTFOLIO_ID, ',') within group (order by t0.ENTRUST_ID)   AS PORTFOLIO_ID,
                                    listagg(pp.PORTFOLIO_NAME, ',') within group (order by t0.ENTRUST_ID) AS PORTFOLIO_NAME,
@@ -49,6 +49,8 @@
                              </where>
                             group by t0.ENTRUST_ID) eed
                            on ee.ENTRUST_ID = eed.ENTRUST_ID
+                 left join ( <include refid="com.joyintech.tams.common.base.dao.EtrEntrustOperHisMapper.selectHisInfo" />) hisInfo
+                            on ee.ENTRUST_ID = hisInfo.ENTRUST_ID
                  left join ETR_ENTRUST_ADD eea on ee.ENTRUST_ID = eea.ENTRUST_ID
                  left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eea.SEC_ACCT_ID
                  left join (select sum(ENT_FINISH_AMT) ENT_FINISH_AMT, sum(FINISH_AMT) FINISH_AMT, ENTRUST_ID
@@ -210,6 +212,7 @@
         <id property="payDate" column="payDate"/>
         <id property="issuePrice" column="issuePrice"/>
         <id property="referenceRate" column="referenceRate"/>
+        <id property="referenceRateStr" column="referenceRateStr"/>
         <id property="rate" column="rate"/>
         <id property="secManageAcctId" column="secManageAcctId"/>
         <id property="secAcctName" column="secAcctName"/>
@@ -234,8 +237,14 @@
              , fpi.ISSUE_DATE       issueDate
              , fpi.PAY_DATE         payDate
              , fpi.ISSUE_PRICE      issuePrice
-             , fpi.REFER_YIELD      referenceRate
-             , fpi.REFER_YIELD      rate
+             , case
+                   when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
+                       then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP, 0) end referenceRateStr/*,当带入资产的息票品种为附息-浮动利率时，显示字段参考收益率*/
+             , case
+                   when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD end referenceRate/*当带入资产的息票品种为零息/贴现时，显示字段参考收益率*/
+             , case
+                   when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
+                       then fpi.REFER_YIELD end                                    rate/*当带入资产的息票品种为利随本清/附息-固定利率时，显示字段票面利率*/
              , eea.SEC_ACCT_ID      secManageAcctId
              , ssai.SEC_ACCT_NAME   secAcctName
              , ee.INV_MANAGER_ID    invManagerName
@@ -251,6 +260,7 @@
                  LEFT JOIN STL_SEC_ACCT_INFO ssai ON eea.SEC_ACCT_ID = ssai.SEC_ACCT_ID
                  left join ETR_ENTRUST_DETAIL eed on eed.ENTRUST_ID = ee.ENTRUST_ID
                  left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = eed.PORTFOLIO_ID
+                 left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
         <where>
             <if test="entrustId != null and entrustId != '' ">
                 eed.ENTRUST_ID = #{entrustId}
