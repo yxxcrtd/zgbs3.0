@@ -14,7 +14,6 @@ import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
-import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
 import com.joyintech.tams.exchange.service.trade.management.service.CommonManagement;
 import com.joyintech.tams.exchange.service.trade.processor.check.IBusinessCheckStrategy;
 import org.apache.commons.collections.CollectionUtils;
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * 校验新债
@@ -50,37 +48,44 @@ public class NewBondCheckStrategy implements IBusinessCheckStrategy {
             throw new BusinessResultException(ErrorCode.SYSTEM_ERROR);
         }
         String entrustProp = order.getEntrustProp();
-        if (StringUtil.equals(entrustProp, EntrustProp.SZ_XSCJ_XD.value)
-                || StringUtil.equals(entrustProp, EntrustProp.SZ_XSCJ_JS.value)
-                || StringUtil.equals(entrustProp, EntrustProp.SZ_XSCJ_JJ.value)) {
-            TradeInfoProRequest dto = new TradeInfoProRequest();
-            dto.setTradePlace(instruction.getTradeMarket());
-            dto.setDealerNo(entrust.getPropDealerId());
-            List<TradeInfoProResponse> list = commonManagement.getCounterDealerTraderInfo(dto);
-            String errorMsg = "";
-            if (CollectionUtils.isEmpty(list)) {
-                errorMsg += StrUtil.format("对手方交易商[]未维护<br/>", entrust.getPropDealerId());
-            } else {
-                if (StringUtil.isNotEmpty(entrust.getPropInvestorId())) {
-                    Optional<TradeInfoProResponse> first = list.stream().filter(o -> StringUtil.equals(o.getTraderNo(), entrust.getPropInvestorId())).findFirst();
-                    if (!first.isPresent()) {
-                        errorMsg += StrUtil.format("对手方交易主体[{}]未维护<br/>", entrust.getPropInvestorId());
-                    }
-                }
-                Optional<TradeInfoProResponse> propTrade = list.stream().filter(o -> StringUtil.equals(o.getTraderNo(), entrust.getPropTradeId())).findFirst();
-                if (!propTrade.isPresent()) {
-                    errorMsg += StrUtil.format("对手方交易员[{}]未维护<br/>", entrust.getPropTradeId());
+        if (EntrustProp.isConsultingTrade(entrustProp)) {
+            return checkCounterDealerTraderInfo(entrust, instruction);
+        }
+        
+        return ResultBean.success();
+    }
+
+    /**
+     * 检查对手方交易商、交易主体、交易员
+     */
+    private ResultBean checkCounterDealerTraderInfo(IntegratedEntrust entrust, Instruction instruction) {
+        TradeInfoProRequest dto = new TradeInfoProRequest();
+        dto.setTradePlace(instruction.getTradeMarket());
+        dto.setDealerNo(entrust.getPropDealerId());
+        List<TradeInfoProResponse> list = commonManagement.getCounterDealerTraderInfo(dto);
+        String errorMsg = "";
+        if (CollectionUtils.isEmpty(list)) {
+            errorMsg += StrUtil.format("对手方交易商[]未维护<br/>", entrust.getPropDealerId());
+        } else {
+            if (StringUtil.isNotEmpty(entrust.getPropInvestorId())) {
+                Optional<TradeInfoProResponse> first = list.stream().filter(o -> StringUtil.equals(o.getTraderNo(), entrust.getPropInvestorId())).findFirst();
+                if (!first.isPresent()) {
+                    errorMsg += StrUtil.format("对手方交易主体[{}]未维护<br/>", entrust.getPropInvestorId());
                 }
             }
-
-            if (StringUtil.isNotEmpty(errorMsg)) {
-                ResultBean error = ResultBean.error(ErrorCode.TRIGGER_SOFT_CONTROL);
-                error.setErrorMsg(errorMsg);
-                return error;
+            Optional<TradeInfoProResponse> propTrade = list.stream().filter(o -> StringUtil.equals(o.getTraderNo(), entrust.getPropTradeId())).findFirst();
+            if (!propTrade.isPresent()) {
+                errorMsg += StrUtil.format("对手方交易员[{}]未维护<br/>", entrust.getPropTradeId());
             }
         }
 
+        if (StringUtil.isNotEmpty(errorMsg)) {
+            ResultBean error = ResultBean.error(ErrorCode.TRIGGER_SOFT_CONTROL);
+            error.setErrorMsg(errorMsg);
+            return error;
+        }
 
         return ResultBean.success();
     }
+
 }
