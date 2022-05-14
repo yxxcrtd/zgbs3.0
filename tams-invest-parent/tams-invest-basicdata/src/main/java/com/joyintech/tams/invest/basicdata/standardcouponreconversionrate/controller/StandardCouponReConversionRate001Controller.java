@@ -59,11 +59,14 @@ public class StandardCouponReConversionRate001Controller extends BaseController 
                 DictCode.柜台接口类型,DictCode.是或否});
         List<SelectOptionDto> brokerIds = new ArrayList<SelectOptionDto> ();
         List<SelectOptionDto> finprodIdList = new ArrayList<SelectOptionDto> ();
+        List<SelectOptionDto> accountTypeList = new ArrayList<SelectOptionDto>();
         try {
             brokerIds = getMstCustomerInfo();
             model.addAttribute("brokerIds", JsonUtils.objectArray2Json(brokerIds.toArray()));
             finprodIdList = getFinprodIdInfo();
             model.addAttribute("finprodIdList", JsonUtils.objectArray2Json(finprodIdList.toArray()));
+            accountTypeList = getPtlSecAcctInfo();
+            model.addAttribute("accountTypeList", JsonUtils.objectArray2Json(accountTypeList.toArray()));
         } catch (Exception e) {
             e.printStackTrace();
         }

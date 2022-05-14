@@ -5093,7 +5093,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
             // 计算公式：（所输净价-上一估值净价）/上一估值净价*100%
             BigDecimal result = ArithmeticUtil.subtract(所输净价, 上一估值日净价);
             result = ArithmeticUtil.multiply(result, new BigDecimal(100));
-            result = ArithmeticUtil.divide(result, 上一估值日净价, 0);
+            result = ArithmeticUtil.divide(result, 上一估值日净价, 2,RoundingMode.HALF_UP);
             return String.valueOf(result) + "%";
         } catch (Exception e) {
         }
@@ -5310,6 +5310,9 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         d.setRepPs(dto.getRepPs());
         d.setAssetType2(dto.getAssetType2());
         d.setTradeMarketMode(DictCodeListExt1.交易市场_二级市场.getValue());
+        if (StringUtil.isNotEmpty(dto.getYield())){
+            d.setMatureYield(dto.getYield().toString());
+        }
         Map<String, Object> dataMap = BeanUtil.object2Map(d);
         return dataMap;
     }
@@ -6076,6 +6079,16 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
     public List<RiskTrialRetDto> selectRiskList(String tradeId) {
         Map<String, Object> map = new HashMap<>();
         map.put("tradeId", tradeId);
+        ProcessMark processMark = new ProcessMark();
+        processMark.setBusinessDataPk1(tradeId);
+        String workflowId = WorkflowContext.getProcessMarkService().getLastWorkflowId(processMark);
+        EtrExchangeTradeSaveRequest  entity = etrExchangeTrade001CommonService.getBussinessEntityByWorkflowId(workflowId);
+        List<EtrExchangeTradePortfolioRequest> portlist=entity.getPortfolioList();
+        List portfolioIdList=new ArrayList();
+        for(EtrExchangeTradePortfolioRequest portfoli:portlist){
+            portfolioIdList.add(portfoli.getPortfolioId());
+        }
+        map.put("portfolioIdList",portfolioIdList);
         List<RiskTrialRetDto> list = etrExchangeTradeCommonMapper.selectRiskList(map);
         return list;
     }

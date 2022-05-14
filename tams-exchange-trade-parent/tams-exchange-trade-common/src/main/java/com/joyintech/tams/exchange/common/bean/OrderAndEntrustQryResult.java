@@ -3,6 +3,7 @@ package com.joyintech.tams.exchange.common.bean;
 import com.joyintech.tams.exchange.common.db.domain.Entrust;
 import com.joyintech.tams.exchange.common.db.domain.Order;
 
+import com.joyintech.tams.exchange.common.vo.EntrustVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -17,12 +18,12 @@ public class OrderAndEntrustQryResult implements Serializable {
     private List<Order> orderList;
 
     @ApiModelProperty(name = "entrustList", value = "委托列表")
-    private List<Entrust> entrustList;
+    private List<EntrustVo> entrustList;
 
     public OrderAndEntrustQryResult() {
     }
 
-    public OrderAndEntrustQryResult(List<Order> orderList, List<Entrust> entrustList) {
+    public OrderAndEntrustQryResult(List<Order> orderList, List<EntrustVo> entrustList) {
         this.orderList = orderList;
         this.entrustList = entrustList;
     }
@@ -35,11 +36,11 @@ public class OrderAndEntrustQryResult implements Serializable {
         this.orderList = orderList;
     }
 
-    public List<Entrust> getEntrustList() {
+    public List<EntrustVo> getEntrustList() {
         return entrustList;
     }
 
-    public void setEntrustList(List<Entrust> entrustList) {
+    public void setEntrustList(List<EntrustVo> entrustList) {
         this.entrustList = entrustList;
     }
 }

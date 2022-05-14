@@ -287,12 +287,6 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                 validMessages.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
             }
         } else {
-            if(Objects.isNull(dto.getListingDate())) {
-                validMessages.add(new ValidMessage("上市日不能为空"));
-            }
-            if (Objects.nonNull(dto.getListingDate()) && dto.getListingDate().compareTo(iPlatformDate.getSysDate()) < 0) {
-                validMessages.add(new ValidMessage("上市日需大于等于平台日"));
-            }
             if (Objects.nonNull(dto.getIssueStatus()) && StringUtil.equals(dto.getIssueStatus(), DictCodeListExt1.发行状态_发行失败.getValue())) {
                 validMessages.add(new ValidMessage("发行失败的不能进行上市流通"));
             }

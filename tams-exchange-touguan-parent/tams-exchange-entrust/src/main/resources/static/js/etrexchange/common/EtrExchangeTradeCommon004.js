@@ -2523,6 +2523,8 @@
                 if ((finprodType2 == FINPROD_TYPE_TG_F01 || finprodType2 == FINPROD_TYPE_TG_ZYSHG) && (ps == PS_T68 || ps == PS_T69)) {
                     // entrustAmt = Math.floor(new Number(entrustAmt));
                     $("#entrustAmt_" + currentTab).val(entrustAmt);
+                    $("#entrustAmt_" + currentTab).attr("data-textrange",4);
+                    $("#entrustNum_" + currentTab).attr("data-textrange",2);
                 } else {
                     $("#entrustAmt_" + currentTab).val(entrustAmt).trigger('blur');
                 }
@@ -3324,14 +3326,18 @@
             if (finprodType2 == FINPROD_TYPE_TG_F01 && (ps == PS_T68 || ps == PS_T69)) {
                 $("#entrustAmtUnit_" + currentTab).text("万元");
                 $("#entrustNumUnit_" + currentTab).text("万元");
-                var entrustAmt = $("#entrustAmt_" + currentTab).val();
                 $("#entrustPrice_" + currentTab).attr("data-textrange", 0);
-                if(entrustAmt){
-                    $("#entrustAmt_" + currentTab).val(entrustAmt/100);
-                }
                 var entrustNum = $("#entrustNum_" + currentTab).val();
                 if(entrustNum){
                     $("#entrustNum_" + currentTab).val(entrustNum/100);
+                }
+                var entrustPrice =  $("#entrustPrice_" + currentTab).val();
+                if(entrustNum && entrustPrice){
+                    entrustPrice = parseInt(entrustPrice);
+                    $("#entrustPrice_" + currentTab).val(entrustPrice);
+                    var amt = entrustNum*entrustPrice/10000;
+                    $("#entrustAmt_" + currentTab).attr("data-textrange", 4);
+                    $("#entrustAmt_" + currentTab).val(amt).blur().trigger('change');
                 }
             }
 
@@ -3507,6 +3513,13 @@
 
     function getBussCombDistribtTableParams() {
         var ebcd = entity_BussCombDistribtList || [];
+        for (var i = 0; i < ebcd.length; i++) {
+            var ebcdKey = ebcd[i];
+            if(ebcdKey.ps == PS_T68 || ebcdKey.ps == PS_T69){
+                ebcdKey.entrustNum = ebcdKey.entrustNum/100;
+                ebcdKey.entrustAmt = ebcdKey.entrustAmt/100;
+            }
+        }
         return ebcd;
     }
 
@@ -3548,7 +3561,7 @@
                 sortField: 'entrustNum',
                 width: 200,
                 type: 'number',
-                digit: 0,
+                digit:  ps != "T68" && ps != "T69" ? 0 : 2,
                 edit: true
             },
             {
@@ -4299,6 +4312,12 @@
             if(object.entrustAmt){
                 object.entrustAmt = object.entrustAmt * 100;
             }
+            for (let i = 0; i < object.portfolioList; i++) {
+                var item = object.portfolioList[i];
+                item.entrustNum = item.entrustNum * 100;
+                item.entrustAmt = item.entrustAmt * 100;
+            }
+            console.log(object);
         }
 
         //TODO 风险和授信

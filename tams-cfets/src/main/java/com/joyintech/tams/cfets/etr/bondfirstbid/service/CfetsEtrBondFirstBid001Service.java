@@ -1,7 +1,5 @@
 package com.joyintech.tams.cfets.etr.bondfirstbid.service;
 
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.joyintech.background.component.common.pack.common.util.ArithmeticUtil;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.base.BaseService;
@@ -251,9 +249,8 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
             pageParam.put("finprodIdList", StringUtil.splitToList(GlobalConstant.COMMA, finprodId));
         }
 
-        PageHelper.startPage(search.getPageMode().getPageNo(), search.getPageMode().getPageSize());
-        List<CfetsEtrIBondFirstBidFindIssueInfoDto> list = cfetsEtrBondFirstBid001Mapper.findIssueInfoPage(pageParam);
-        return new Page<>(PageInfo.of(list));
+        return super.queryForPage(search.getPageMode().getPageNo(), search.getPageMode().getPageSize(), () -> cfetsEtrBondFirstBid001Mapper.findIssueInfoPage(pageParam));
+
     }
 
     /**

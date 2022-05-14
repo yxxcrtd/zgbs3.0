@@ -18,6 +18,7 @@ import com.joyintech.tams.exchange.common.utils.DoubleSerializerUtils;
 import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.Digits;
@@ -192,14 +193,8 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
     @Digits(integer = 30, fraction = 4)
     private long entrustNum = 0;
 
-    @ApiModelProperty(name = "entrustNumView", value = "指令数量(展示)")
-    private BigDecimal entrustNumView;
-
     @ApiModelProperty(name = "leftVolume", value = "剩余数量")
     private long leftVolume;
-
-    @ApiModelProperty(name = "leftVolumeView", value = "剩余数量(展示)")
-    private BigDecimal leftVolumeView;
 
     @ApiModelProperty(required = false, name = "entrustStatus", value = "委托状态")
     @Size(max = 50)
@@ -1135,28 +1130,12 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
         this.isNetPrice = isNetPrice;
     }
 
-    public BigDecimal getEntrustNumView() {
-        return entrustNumView;
-    }
-
-    public void setEntrustNumView(BigDecimal entrustNumView) {
-        this.entrustNumView = entrustNumView;
-    }
-
     public long getLeftVolume() {
         return leftVolume;
     }
 
     public void setLeftVolume(long leftVolume) {
         this.leftVolume = leftVolume;
-    }
-
-    public BigDecimal getLeftVolumeView() {
-        return leftVolumeView;
-    }
-
-    public void setLeftVolumeView(BigDecimal leftVolumeView) {
-        this.leftVolumeView = leftVolumeView;
     }
 
     public String getTradeSide() {
@@ -1302,6 +1281,12 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
         } catch (CloneNotSupportedException e) {
             return null;
         }*/
+    }
+
+    public InstructionExportVo cloneInstructionExportVo() {
+        InstructionExportVo instructionExportVo = new InstructionExportVo();
+        BeanUtils.copyProperties(this, instructionExportVo);
+        return instructionExportVo;
     }
 
     @Override
