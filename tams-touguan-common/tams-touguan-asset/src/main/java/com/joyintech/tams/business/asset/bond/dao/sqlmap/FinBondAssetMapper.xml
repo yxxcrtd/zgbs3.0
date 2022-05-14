@@ -92,7 +92,7 @@
         where T1.FINPROD_TYPE2 = #{finprodType2}) T
         <where>
             <if test="finprodIdList != null and finprodIdList.size() > 0">
-                AND (T.finprodMarketId IN
+                AND T.finprodMarketId IN
                 <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>

@@ -28,6 +28,7 @@ import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.SysParamBean;
 import com.joyintech.tams.exchange.common.bean.investment.PtlAuthInfo;
+import com.joyintech.tams.exchange.common.bean.request.CheckTradeInfoRequest;
 import com.joyintech.tams.exchange.common.bean.request.DeviationDegreeRequest;
 import com.joyintech.tams.exchange.common.bean.request.EtrDispatcherInfoRequest;
 import com.joyintech.tams.exchange.common.bean.request.TradeInfoProRequest;
@@ -39,6 +40,7 @@ import com.joyintech.tams.exchange.common.cache.TradeTimeService;
 import com.joyintech.tams.exchange.common.cache.config.DataServiceConfig;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.constant.ExchangeConstant;
+import com.joyintech.tams.exchange.common.constant.Market;
 import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
 import com.joyintech.tams.exchange.common.db.domain.ServiceNode;
@@ -54,6 +56,7 @@ import com.joyintech.tams.exchange.service.trade.processor.account.AccountPositi
 import com.joyintech.tams.exchange.service.trade.processor.check.CommonCheckKit;
 import com.joyintech.tams.exchange.service.trade.scheduled.TokenJob;
 import com.joyintech.tams.invest.common.entrust.inter.EtrTradeOtherCommonService;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -583,6 +586,34 @@ public class CommonManagement extends BaseService {
         return new Message<>(faceValue);
     }
 
+    public Message checkSelfDealerTraderInfo(CheckTradeInfoRequest dto) {
+        TradeInfoProRequest request = new TradeInfoProRequest();
+        request.setAcctNo(dto.getAcctNo());
+        request.setTradePlace(dto.getTradePlace());
+        request.setIsOur("Y");
+        List<TradeInfoProResponse> list = getDealerTraderInfo(request);
+        if (CollectionUtils.isEmpty(list)) {
+            return new Message().fail().setMessage("资金账号维护交易商信息");
+        }
+
+        for (TradeInfoProResponse response : list) {
+            if (StringUtil.isEmpty(response.getDealerNo()) || StringUtil.isEmpty(response.getTraderNo())) {
+                return new Message().fail().setMessage("未维护交易商或交易员信息");
+            } else if (StringUtil.equals(dto.getTradePlace(), Market.SZSE.investValue) && StringUtil.isEmpty(response.getDealerPartyNo())) {
+                return new Message().fail().setMessage("未维护交易主体信息");
+            }
+        }
+
+        return new Message().success();
+    }
+
+    public List<TradeInfoProResponse> getCounterDealerTraderInfo(TradeInfoProRequest dto) {
+        dto.setIsOur(null);
+        List<TradeInfoProResponse> list = getDealerTraderInfo(dto);
+
+        return list.stream().filter(o -> StringUtil.isEmpty(o.getIsOur()) || StringUtil.equals(o.getIsOur(), "N")).collect(Collectors.toList());
+    }
+
     public List<TradeInfoProResponse> getDealerTraderInfo(TradeInfoProRequest dto) {
         logger.info("调用投管接口查询交易商交易员信息");
         Map<String, Object> params = BeanUtil.object2Map(dto);
@@ -598,7 +629,7 @@ public class CommonManagement extends BaseService {
         } catch (Exception e) {
             logger.error("doPost() called with exception => 【url = {}】, 【params = {}】", url, params, e);
         }
-        return JsonUtils.getObjectListFromJson(JsonUtils.getJsonFromObject(list),TradeInfoProResponse.class);
+        return JsonUtils.getObjectListFromJson(JsonUtils.getJsonFromObject(list), TradeInfoProResponse.class);
     }
 
     /**

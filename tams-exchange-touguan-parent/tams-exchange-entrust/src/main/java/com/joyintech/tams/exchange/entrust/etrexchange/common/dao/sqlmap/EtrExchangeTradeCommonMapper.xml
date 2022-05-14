@@ -1682,7 +1682,14 @@
         LEFT JOIN FIN_PRODUCT ON RSK_ISUP_TRIAL.ASSET_CODE=FIN_PRODUCT.FINPROD_ID
         WHERE RSK_ISUP_TRIAL.TRADE_ID  in (select TRADE_ID from temp) AND RSK_ISUP_TRIAL.SEQ_NO IN (
         SELECT  max(SEQ_NO) FROM RSK_ISUP_TRIAL
-        WHERE RSK_ISUP_TRIAL.TRADE_ID in (select TRADE_ID from temp) group by PORTFOLIO_ID
+        WHERE RSK_ISUP_TRIAL.TRADE_ID in (select TRADE_ID from temp)
+        <if test="portfolioIdList != null and portfolioIdList.size != 0">
+            AND PORTFOLIO_ID IN
+            <foreach collection="portfolioIdList" open="(" item="portfolioId" separator="," close=")">
+                #{portfolioId,jdbcType=VARCHAR}
+            </foreach>
+        </if>
+        group by PORTFOLIO_ID
         )
     </select>
 
