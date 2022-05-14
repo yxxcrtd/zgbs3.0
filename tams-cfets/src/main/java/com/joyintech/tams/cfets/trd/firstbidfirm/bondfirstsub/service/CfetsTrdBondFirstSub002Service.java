@@ -293,7 +293,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             if (CollectionUtils.isEmpty(listTmp)
                     || CollectionUtils.isEmpty(cfetsTrdBondFirstSubInfoDto.getProductDtos())
                     || (CollectionUtils.isNotEmpty(listTmp) && listTmp.size() > 1)) {
-                logger.debug("初始化申购页面,查询结果数:" + listTmp.size());
+                logger.debug("添加或删除申购产品列表数据,查询结果数:" + listTmp.size());
                 return null;
             }
             request.getProductDtos().addAll(cfetsTrdBondFirstSubInfoDto.getProductDtos());
@@ -418,7 +418,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         logger.debug("自动分配,入参:" + JsonUtils.object2Json(autoRequest));
         if (StringUtil.isEmpty(autoRequest.getDipType())) {
             logger.debug("自动分配,分配方式为空");
-            return new ArrayList<>();
+            return autoRequest.getProductDtos();
         }
         BigDecimal subscriptionAmount = autoRequest.getSubscriptionAmount();
         // 剩余指令额度不为0的数据
