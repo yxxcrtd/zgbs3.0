@@ -276,6 +276,9 @@ public class TradeMessage extends BasicMessage {
             if (!BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
                 tradeMessage.setFullPrice(trade.getTradedVolume() > 0 ? TradeUtils.divide(trade.getTradedBalance(), trade.getTradedVolume(), 4).doubleValue() : 0);
             }
+            if (Objects.nonNull(trade.getFullPrice()) && trade.getFullPrice().compareTo(BigDecimal.ZERO) > 0) {
+                tradeMessage.setFullPrice(trade.getFullPrice().doubleValue());
+            }
             //协议回购
             if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
                 //到期结算金额
