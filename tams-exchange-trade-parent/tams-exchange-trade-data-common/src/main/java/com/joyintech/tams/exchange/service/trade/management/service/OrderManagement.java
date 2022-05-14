@@ -9,6 +9,7 @@ import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
+import com.joyintech.tams.exchange.common.constant.InstructionPs;
 import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
 import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
 import com.joyintech.tams.exchange.common.db.domain.Algorithm;
@@ -16,12 +17,14 @@ import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
 import com.joyintech.tams.exchange.common.db.domain.Order;
 import com.joyintech.tams.exchange.common.exception.PositionExchangeException;
+import com.joyintech.tams.exchange.common.request.BidPriceConInfoRequest;
 import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
 import com.joyintech.tams.exchange.common.utils.CheckParamUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
 import com.joyintech.tams.exchange.datacommon.db.service.OrderService;
 import com.joyintech.tams.exchange.service.trade.position.service.PositionRequestServiceInstructionRequest;
+import com.joyintech.tams.exchange.service.trade.processor.InvestInterfaceHelper;
 import com.joyintech.tams.exchange.service.trade.processor.TradeHelper;
 import com.joyintech.tams.exchange.service.trade.processor.algorithm.AlgorithmHelper;
 import com.joyintech.tams.exchange.service.trade.processor.business.common.CommonCheckHelper;
@@ -54,6 +57,8 @@ public class OrderManagement extends BaseService {
     private InstructionService instructionService;
     @Autowired
     private PositionRequestServiceInstructionRequest positionRequestServiceInstructionRequest;
+    @Autowired
+    private InvestInterfaceHelper investInterfaceHelper;
 
     /**
      * 根据userId查询Order表中数据
@@ -82,6 +87,16 @@ public class OrderManagement extends BaseService {
         String uniqueCheck = commonCheckHelper.checkApplyEntrust(orderPlaceBean.getEntrustProp(), orderPlaceBean.getAccountId(), orderPlaceBean.getStockCode(), orderPlaceBean.getInstructionId());
         if (Objects.nonNull(uniqueCheck))
             return new ResultBean(ErrorCode.ACCOUNT_APPLY_NOT_UNIQUE.value, ErrorCode.ACCOUNT_APPLY_NOT_UNIQUE.errorMsg + ":" + uniqueCheck, orderPlaceBean);
+        // SPPI检查
+        ResultBean sppiResult = checkSPPI(orderPlaceBean);
+        if (sppiResult.isFail()) {
+            return sppiResult;
+        } else {
+            BidPriceConInfoResponse response = (BidPriceConInfoResponse) sppiResult.getData();
+            if (response.getStatus() != 0) {
+                return ResultBean.error(ErrorCode.CHECK_ERROR.value, "SPPI 校验失败：" + response.getMessage(), orderPlaceBean);
+            }
+        }
 
         try {
             checkPosition(orderPlaceBean);
@@ -95,6 +110,22 @@ public class OrderManagement extends BaseService {
             logger.warn("场内交易下单头寸检测异常", ex);
             return ResultBean.success(ex.getExceptionMessage());
         }
+    }
+
+    private ResultBean checkSPPI(OrderPlaceBean orderPlaceBean) {
+
+        Instruction instruction = instructionService.findById(orderPlaceBean.getInstructionId());
+        if (InvestmentAssetType.isBond(instruction.getAssetType()) && InstructionPs.BUY.codeEquals(instruction.getPs()))
+        {
+            BidPriceConInfoRequest request = new BidPriceConInfoRequest();
+            request.setPs(InstructionPs.BUY.getCode());
+            request.setFinprodId(instruction.getFinprodId());
+            request.setBusinessModel(instruction.getInvAim());
+            request.setPrice(orderPlaceBean.getEntrustPrice());
+
+            return investInterfaceHelper.getBidPriceConInfo(request);
+        }
+        return ResultBean.success();
     }
 
     //头寸引擎余额检查
