@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.service.trade.management.service;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.google.common.base.Strings;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.tams.business.common.pojo.Message;
@@ -94,7 +95,7 @@ public class OrderManagement extends BaseService {
             return sppiResult;
         } else {
             BidPriceConInfoResponse response = (BidPriceConInfoResponse) sppiResult.getData();
-            if (response.getStatus() != 0) {
+            if (ObjectUtil.isNotNull(response) && response.getStatus() != 0) {
                 return ResultBean.error(ErrorCode.CHECK_ERROR.value, "SPPI 校验失败：" + response.getMessage(), orderPlaceBean);
             }
         }
