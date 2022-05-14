@@ -418,15 +418,11 @@ public class EntrustQueryBean implements Serializable {
     }
 
     public long getEntrustVolume() {
-        return entrustVolume;
-    }
-
-    public String getEntrustVolumeStr() {
-        // 质押券出入库
+        // 质押券出入库 ZGCPCN-404
         if(StringUtils.equals(getEntrustBs(), "T68") || StringUtils.equals(getEntrustBs(), "T69")){
-            return ArithmeticUtil.divide(new BigDecimal(String.valueOf(entrustVolume)),new BigDecimal("100"),2) + "万元";
+            return ArithmeticUtil.divide(new BigDecimal(String.valueOf(entrustVolume)),new BigDecimal("100"),2).longValue();
         }
-        return String.valueOf(entrustVolume);
+        return entrustVolume;
     }
 
     public void setEntrustVolume(long entrustVolume) {
@@ -622,14 +618,11 @@ public class EntrustQueryBean implements Serializable {
     }
 
     public long getTradedVolume() {
-        return tradedVolume;
-    }
-    public String getTradedVolumeStr() {
-        // 质押券出入库
+        // 质押券出入库 ZGCPCN-404
         if(StringUtils.equals(getEntrustBs(), "T68") || StringUtils.equals(getEntrustBs(), "T69")){
-            return ArithmeticUtil.divide(new BigDecimal(String.valueOf(tradedVolume)),new BigDecimal("100"),2) + "万元";
+            return ArithmeticUtil.divide(new BigDecimal(String.valueOf(tradedVolume)),new BigDecimal("100"),2).longValue();
         }
-        return String.valueOf(tradedVolume);
+        return tradedVolume;
     }
     public void setTradedVolume(long tradedVolume) {
         this.tradedVolume = tradedVolume;
