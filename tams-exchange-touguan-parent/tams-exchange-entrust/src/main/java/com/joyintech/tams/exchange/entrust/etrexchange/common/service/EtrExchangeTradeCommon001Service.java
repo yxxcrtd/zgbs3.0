@@ -5310,6 +5310,9 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         d.setRepPs(dto.getRepPs());
         d.setAssetType2(dto.getAssetType2());
         d.setTradeMarketMode(DictCodeListExt1.交易市场_二级市场.getValue());
+        if (StringUtil.isNotEmpty(dto.getYield())){
+            d.setMatureYield(dto.getYield().toString());
+        }
         Map<String, Object> dataMap = BeanUtil.object2Map(d);
         return dataMap;
     }
