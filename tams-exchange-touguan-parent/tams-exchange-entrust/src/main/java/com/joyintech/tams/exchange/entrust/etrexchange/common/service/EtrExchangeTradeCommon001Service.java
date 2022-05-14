@@ -5093,7 +5093,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
             // 计算公式：（所输净价-上一估值净价）/上一估值净价*100%
             BigDecimal result = ArithmeticUtil.subtract(所输净价, 上一估值日净价);
             result = ArithmeticUtil.multiply(result, new BigDecimal(100));
-            result = ArithmeticUtil.divide(result, 上一估值日净价, 0);
+            result = ArithmeticUtil.divide(result, 上一估值日净价, 2,RoundingMode.HALF_UP);
             return String.valueOf(result) + "%";
         } catch (Exception e) {
         }
