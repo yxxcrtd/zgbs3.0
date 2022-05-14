@@ -238,17 +238,6 @@ public class Trade implements Serializable, KeyMethodInterface<String> {
     @ApiModelProperty(name = "extend2", value = "扩展信息2")
     private String extend2;
 
-    @Digits(integer = 20, fraction = 0)
-    @ApiModelProperty(value = "折合标准券(展示)")
-    private BigDecimal bondVolume;
-
-    @ApiModelProperty(name = "tradedVolumeView", value = "成交数量(展示)")
-    @Digits(integer = 20, fraction = 2)
-    private BigDecimal tradedVolumeView;
-
-    private String tradeDate;
-    private String dealTime;
-
     private String entrustClass;
 
     @ApiModelProperty(name = "isFullPrice", value = "是否全价（Y:是 ， N：否）")
@@ -687,38 +676,6 @@ public class Trade implements Serializable, KeyMethodInterface<String> {
 
     public void setExtend2(String extend2) {
         this.extend2 = extend2;
-    }
-
-    public BigDecimal getBondVolume() {
-        return bondVolume;
-    }
-
-    public void setBondVolume(BigDecimal bondVolume) {
-        this.bondVolume = bondVolume;
-    }
-
-    public BigDecimal getTradedVolumeView() {
-        return tradedVolumeView;
-    }
-
-    public void setTradedVolumeView(BigDecimal tradedVolumeView) {
-        this.tradedVolumeView = tradedVolumeView;
-    }
-
-    public String getTradeDate() {
-        return TradeUtils.formatDate(tradingDay);
-    }
-
-    public void setTradeDate(String tradeDate) {
-        this.tradeDate = tradeDate;
-    }
-
-    public String getDealTime() {
-        return DateUtil.format(createTime,"HH:mm:ss");
-    }
-
-    public void setDealTime(String dealTime) {
-        this.dealTime = dealTime;
     }
 
     public String getEntrustClass() {
