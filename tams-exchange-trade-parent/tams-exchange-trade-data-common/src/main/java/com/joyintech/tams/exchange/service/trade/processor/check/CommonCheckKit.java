@@ -6,6 +6,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.validation.BeanValidationResult;
 import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.BusinessResultException;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
@@ -230,6 +231,11 @@ public class CommonCheckKit extends BaseCheckKit {
             String errorMsg = StrUtil.format("获取的最小交易单位[{}]异常", minStep);
             log.error(errorMsg);
             throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
+        }
+
+        if (InvestmentAssetType.isPledgeRepurchase(minTrdUnitLimit.getAssetType())
+                && StringUtil.equals(minTrdUnitLimit.getMinStepUnit(), "05")) {
+            minStep = minStep / 100;
         }
 
         if (EntrustBs.isBuy(entrustBs)

@@ -140,6 +140,10 @@ public class OrderController {
                 return new Message<>(commonCheckResult);
             }
             ResultBean businessCheckResult = businessCheckKit.check(order);
+            if (ErrorCode.TRIGGER_SOFT_CONTROL.codeEquals(commonCheckResult.getErrorCode())) {
+                return new Message<>(Message.SUCCESS, null,
+                        new Message<>(String.valueOf(ErrorCode.TRIGGER_SOFT_CONTROL.getCode()), businessCheckResult.getErrorMsg()));
+            }
             if (ErrorCode.isFail(businessCheckResult.getErrorCode())) {
                 return new Message<>(businessCheckResult);
             }

@@ -10,6 +10,7 @@
 
 package com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto;
 
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
@@ -175,6 +176,9 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
      * @return priceModel.
      */
     public String getOtherPriceModel() {
+        if (StringUtil.equals(this.getBusiTypePosition(),DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
+            return null;
+        }
         return SysDataUtil.getNameFromDataDict(DictCode.价格模式, super.getPriceModel());
     }
 
@@ -234,6 +238,13 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
         return super.getEntrustAmt();
     }
 
+    public String getEntrustNumStr() {
+        // 指令数量入库时已经 除以 100了
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
+            return ArithmeticUtil.divide(super.getEntrustNum(),new BigDecimal("100"),2).toString() + "万元";
+        }
+        return String.valueOf(super.getEntrustNum());
+    }
     public void setOtherPs(String otherPs) {
         this.otherPs = otherPs;
     }
@@ -326,6 +337,9 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
         if(StringUtils.equals(DictCodeList.平安资产类型_基金.getValue(),this.getFinprodType2())
         && StringUtils.equals("PRM03",this.getPriceModel())){
             return new BigDecimal(0.00);
+        }
+        if (StringUtil.equals(this.getBusiTypePosition(),DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
+            return null;
         }
         return etrPrice;
     }

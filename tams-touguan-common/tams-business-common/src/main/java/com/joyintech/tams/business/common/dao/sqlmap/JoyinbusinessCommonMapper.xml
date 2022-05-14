@@ -649,6 +649,7 @@
             <foreach collection="acctType" open=" and ACCT_TYPE in (" close=")" item="item" separator=",">#{item}</foreach>
             )
         </if>
+        and (is_exist_new is null or is_exist_new != 'Y')
     </select>
 
     <select id="selectCashPositionMaxCdate" resultType="java.util.Date" >

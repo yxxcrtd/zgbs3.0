@@ -1133,7 +1133,7 @@ public class CfetsEtrDispatcherService extends BaseService {
                 // 更新委托表的委托状态
                 etrInvestInfoServiceImpl.updateDelegateStatus(entrustId, DictCodeList.委托状态_已退回.getValue());
 //                // 委托退回原因
-                etrInvestInfoServiceImpl.updateBackReason(entrustId, (String) pageParam.get("rekReason"));
+//                etrInvestInfoServiceImpl.updateBackReason(entrustId, (String) pageParam.get("rekReason"));
                 // 删除交易员的委托数据
                 for (EtrDistribute entity : etrDistributeList) {
                     entity.setRecStatus(DictCodeList.委托状态_已退回.getValue());

@@ -23,7 +23,6 @@ import com.joyintech.tams.business.common.dto.CfetsBondPortfolioCashRequest;
 import com.joyintech.tams.business.common.dto.CfetsBondPositionRequest;
 import com.joyintech.tams.business.common.dto.CfetsEtrFinProductInfoRequest;
 import com.joyintech.tams.business.common.dto.CfetsEtrFinProductInfoResponse;
-import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
@@ -33,6 +32,7 @@ import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.cfets.etr.bond.dao.CfetsEtrIbBondinfoMapper;
+import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dao.CfetsEtrBondFirstBid002Mapper;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsBiddingProductDto;
@@ -173,7 +173,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 }
                 if (!operationType.equals(OperationType.REVOKE) && !operationType.equals(OperationType.DELETE)) {
                     // 发送头寸
-                    this.sendPositionMethod(entity, StringUtil.equals(entity.getSystemAct(), DictCodeListExt3.系统动作_新建.getValue()), null);
+                   // this.sendPositionMethod(entity, StringUtil.equals(entity.getSystemAct(), DictCodeListExt3.系统动作_新建.getValue()), null);
                     if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))){
                         // 老头寸处理
                         this.dealOldPosition(entity, false);
@@ -302,7 +302,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             }
             //发送头寸
             try {
-                sendPositionMethod(entity, isSubmit, confirmOk);
+               // sendPositionMethod(entity, isSubmit, confirmOk);
             } catch (Exception e) {
                 Message message = PositionUtil.ajaxErrorReturn(e);
                 BaseMap bm = (BaseMap) message.getData();
@@ -701,6 +701,18 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 dd.setBiddingProductList(null);
                 dd.setBiddingProductList(entry.getValue());
                 dd.setSecAcctId(entry.getKey());
+                //针对退回指令，查询指令下达时间
+                if (StringUtil.isNotEmpty(cfetsDto.getEntrustId())) {
+                    //根据指令id查询出该资产是退回指令，且该指令的下达时间
+                    CfetsEtribBondInfo003Dto transmitTimeDto=cfetsetrIbBondinfoMapper.selectTransmitTimeByInfo(cfetsDto.getEntrustId());
+                    if(null!=transmitTimeDto && StringUtil.isNotEmpty(transmitTimeDto.getTransmitTime())){
+                        dd.setTransmitTime(transmitTimeDto.getTransmitTime());
+                    }
+                    dd.setSystemAct(DictCodeListExt3.系统动作_修改.getValue());
+                }else {
+                    dd.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
+                }
+
                 //投标日前下的指令，指令结束日为投标日;投标日后下的指令，指令结束日为指令日期
                 if (DateUtil.compareDate(cfetsDto.getEtrDate(), cfetsDto.getIssueDate()) >= 0) {
                     dd.setMdate(cfetsDto.getIssueDate());
@@ -714,6 +726,18 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
         } else {
             CfetsEtrBondFirstBid002Dto dd = new CfetsEtrBondFirstBid002Dto();
             BeanUtil.copyPropertiesIgnoreNull(dd, dto);
+            //针对退回指令，查询指令下达时间
+            if (StringUtil.isNotEmpty(cfetsDto.getEntrustId())) {
+                //根据指令id查询出该资产是退回指令，且该指令的下达时间
+                CfetsEtribBondInfo003Dto transmitTimeDto=cfetsetrIbBondinfoMapper.selectTransmitTimeByInfo(cfetsDto.getEntrustId());
+                if(null!=transmitTimeDto && StringUtil.isNotEmpty(transmitTimeDto.getTransmitTime())){
+                    dd.setTransmitTime(transmitTimeDto.getTransmitTime());
+                }
+                dd.setSystemAct(DictCodeListExt3.系统动作_修改.getValue());
+            }else {
+                dd.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
+            }
+
             dd.setMdate(cfetsDto.getTenderDate());
             etrInvestBondFirstBidList.add(dd);
         }
@@ -728,6 +752,10 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 t.setConclusion(riskDto.getRiskTrialSpan());
                 riskTrialRetDto.add(t);
             }
+        }
+        dto.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
+        if (StringUtil.isNotEmpty(cfetsDto.getEntrustId())) {
+            dto.setSystemAct(DictCodeListExt3.系统动作_修改.getValue());
         }
         dto.setRiskTrialRetDto(riskTrialRetDto);
         dto.setEtrInvestBondFirstBidDtos(etrInvestBondFirstBidList);

@@ -152,6 +152,7 @@ public class TradeServiceURL {
     public static String getMinPrice = "/InterfSysTrdConfig/getMinPrice";//最小价差数据查询
     public static String getMinTrdUnitLimit = "/InterfSysTrdConfig/getMinTrdUnitLimit";//最小交易单位、交易上下限数据查询
     public static String getDealerTraderInfo = "/InterfSysTrdConfig/getDealerTraderInfo";//交易商交易员信息查询
+    public static String getBidPriceConInfo = "/InterfSysTrdConfig/getBidPriceConInfo";//SPPI
 
     public static String getPtlAuthInfo = "/ptlmanagementinfo/getPtlAuthInfo";//组合权限查询
 
