@@ -3,13 +3,11 @@ package com.joyintech.tams.exchange.service.trade.controller;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.security.User;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.ResponseResultBody;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.SysParamBean;
-import com.joyintech.tams.exchange.common.bean.request.DeviationDegreeRequest;
-import com.joyintech.tams.exchange.common.bean.request.EtrDispatcherInfoRequest;
-import com.joyintech.tams.exchange.common.bean.request.FaceValueRequest;
-import com.joyintech.tams.exchange.common.bean.request.TradeInfoProRequest;
+import com.joyintech.tams.exchange.common.bean.request.*;
 import com.joyintech.tams.exchange.common.bean.response.ExchangeContextResponse;
 import com.joyintech.tams.exchange.common.bean.response.TradeInfoProResponse;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
@@ -21,6 +19,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -251,7 +250,16 @@ public class CommonController {
 
     @ApiOperation(value = "查询交易商交易员信息", notes = "查询交易商交易员信息")
     @PostMapping("/common/getDealerTraderInfo")
-    public List<TradeInfoProResponse> selectTraderInfo(@RequestBody TradeInfoProRequest dto) {
-        return commonManagement.getDealerTraderInfo(dto);
+    public List<TradeInfoProResponse> selectTraderInfo(@RequestBody @Validated TradeInfoProRequest dto) {
+        if (StringUtil.equals(dto.getIsOur(), "Y")) {
+            return commonManagement.getDealerTraderInfo(dto);
+        }
+        return commonManagement.getCounterDealerTraderInfo(dto);
+    }
+
+    @ApiOperation(value = "检查本方交易商交易员信息", notes = "检查交易商交易员信息")
+    @PostMapping("/common/checkSelfDealerTraderInfo")
+    public Message checkSelfDealerTraderInfo(@RequestBody @Validated CheckTradeInfoRequest dto) {
+        return commonManagement.checkSelfDealerTraderInfo(dto);
     }
 }

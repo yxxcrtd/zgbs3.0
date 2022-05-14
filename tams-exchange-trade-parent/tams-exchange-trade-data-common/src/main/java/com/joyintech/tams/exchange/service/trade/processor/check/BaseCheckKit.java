@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public abstract class BaseCheckKit {
 
-    protected BeanValidationResult checkResult = new BeanValidationResult(true);
+    protected BeanValidationResult checkResult;
     private InstructionService instructionService;
     private InstrumentService instrumentService;
     private QuoteService quoteService;
@@ -45,6 +45,7 @@ public abstract class BaseCheckKit {
     }
 
     public ResultBean check(BaseOrderRequest order) {
+        checkResult  = new BeanValidationResult(true);
         Instruction instruction = getInstruction(order);
         Instrument instrument = getInstrument(instruction);
         TickBean tickBean = getTickBean(instruction);

@@ -59,6 +59,7 @@ import com.joyintech.tams.invest.common.component.base.core.MstFileCommonService
 import com.joyintech.tams.invest.common.component.base.entrust.BaseEtrInvestInfoService;
 import com.joyintech.tams.invest.common.component.base.entrust.impl.dao.BaseEtrInvestInfoMapper;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.dto.BaseEtrInvestInfoDto;
 import com.joyintech.tams.invest.common.dto.MstFileInputParameter;
@@ -172,7 +173,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 }
                 if (!operationType.equals(OperationType.REVOKE) && !operationType.equals(OperationType.DELETE)) {
                     // 发送头寸
-                    this.sendPositionMethod(entity, true, null);
+                    this.sendPositionMethod(entity, StringUtil.equals(entity.getSystemAct(), DictCodeListExt3.系统动作_新建.getValue()), null);
                     if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))){
                         // 老头寸处理
                         this.dealOldPosition(entity, false);
@@ -201,9 +202,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
      * @param confirmOk
      */
     private void sendPositionMethod(CfetsEtrBondFirstBid002Dto entity, boolean isSubmit, String confirmOk) {
-        if (isSubmit) {
-            return;
-        }
+
         List<CfetsBondPortfolioCashRequest> ptlList = new ArrayList<>();
 
         for (CfetsBiddingProductDto productDto : entity.getBiddingProductList()) {
@@ -212,17 +211,29 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             posport.setPortfolioId(productDto.getPortfolioId());
             posport.setEtrId(entity.getEntrustId());
             posport.setTradeId(entity.getEntrustId());
-            posport.setCashAcctId(productDto.getSecAcctId()); // 证券户
+            posport.setCashAcctId(productDto.getSecAcctId());
+            if (StringUtil.isNotEmpty(productDto.getPortfolioId())) {
+                Map<String, Object> map = new HashMap<String, Object>();
+                map.put("portfolioId", productDto.getPortfolioId());
+                map.put("acctType", BussinessDictCodeList.资金账户类型_托管账户.getValue());
+                String cashAcctId = joyinbusinessCommonService.qryPortfolioCashAcctId(map);
+                if (StringUtil.isNotEmpty(cashAcctId)) {
+                    posport.setCashAcctId(cashAcctId); // 托管户
+                }
+            }
+            if (StringUtil.isNotEmpty(productDto.getSecAcctId())) {
+                posport.setSecAcctId(productDto.getSecAcctId()); // 证券户
+            }
             posport.setCashAmount(productDto.getBidPrinAmt());
             ptlList.add(posport);
         }
         //调用头寸
         CfetsBondPositionRequest req = new CfetsBondPositionRequest();
-        req.setInterfaceType("BOND001");//报文类型
+        req.setInterfaceType("Bond001");//报文类型
         req.setUserId(SecurityUtil.getLoginUser().getUserName());
         req.setTotalTradeId(entity.getTotalEtrustId());
         req.setFlowStatus(DictCodeListExt3.流程节点_流程提交.getValue());
-        req.setModelType(DictCodeListExt1.子系统代码_交易.getValue());
+        req.setModelType(DictCodeListExt1.子系统代码_委托.getValue());
         req.setWorkFlowId(entity.getWorkflowId());
         String balanceCheck = DictCodeList.是否_是.getValue();
         if ((StringUtil.isNotEmpty(entity.getSoftSkipMode())
@@ -231,7 +242,12 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             balanceCheck = DictCodeList.是否_否.getValue();
         }
         req.setBalanceCheck(balanceCheck);
-        req.setBusiType(DictCodeListExt3.头寸业务类型_债券一级投标.getValue());
+        if (StringUtil.equals(entity.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
+            req.setBusiType(DictCodeListExt3.头寸业务类型_债券一级申购.getValue());
+        }else {
+            req.setBusiType(DictCodeListExt3.头寸业务类型_债券一级投标.getValue());
+        }
+
         //兼容场内场外
         req.setTradePlace(entity.getTradeMarket());
         req.setBusiAct(DictCodeListExt3.业务动作_投资指令.getValue());
@@ -255,6 +271,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
         if ("save".equals(entity.getOperateType())) {
             return;
         }
+        //代办提交，头寸校验，点击确认传值参数
         String confirmOk = RequestUtil.getParam("confirmOk");
         if (!StringUtil.equals("revoke", entity.getOperateType()) && !StringUtil.equals("delete", entity.getOperateType())) {
             boolean isSubmit = true;
@@ -285,7 +302,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             }
             //发送头寸
             try {
-                //sendPositionMethod(entity, isSubmit,confirmOk);
+                sendPositionMethod(entity, isSubmit, confirmOk);
             } catch (Exception e) {
                 Message message = PositionUtil.ajaxErrorReturn(e);
                 BaseMap bm = (BaseMap) message.getData();
@@ -638,7 +655,6 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             dto.setTradeMarket(finProductInfo.getTradeMarket());
             //dto.setCalendarId(finProductInfo.getCalendarId());
             dto.setCcy("CNY");
-            dto.setEntrustDate(cfetsDto.getEtrDate());
             dto.setFinprodAbbr(finProductInfo.getFinprodAbbr());
             dto.setFinprodMarketId(finProductInfo.getFinprodMarketId());
             //审批时 流程数据初始化
@@ -671,7 +687,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
         dto.setEntrustNum(cfetsDto.getTotalBiddingNum());
         dto.setTradeMarketMode(DictCodeListExt1.交易市场_一级市场.getValue());
         dto.setElementId(cfetsDto.getElementId());
-        dto.setEntrustDate(cfetsDto.getEtrDate());
+        dto.setEntrustDate(cfetsDto.getEtrDate() != null? cfetsDto.getEtrDate():DateUtil.platDateFromCache());
         dto.setVdate(cfetsDto.getEtrDate());
 
         List<CfetsBiddingProductDto> biddingProductList = cfetsDto.getBiddingProductList();

@@ -167,12 +167,12 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         Date systemDate = iPlatformDate.getSysDate();
         logger.debug("自动分配,入参:" + JsonUtils.object2Json(request));
         if (StringUtil.isNotEmpty(request) && StringUtil.isNotEmpty(request.getEntrustDtos())) {
-            String finprodMarketId = null;
+            String finprodId = null;
             String secManageAcctId = null;
             for (CfetsTrdBondFirstSubEntrustDto entrustDto : request.getEntrustDtos()) {
                 ValidMessage error = new ValidMessage();
                 // 资产代码+证券账户必须一致提示信息
-                String msg = null;
+                String msg = "";
                 // 1.指令状态为已接收且该指令不存在指令流程中数据，不满足弹出提示
                 if (!StringUtil.equals(entrustDto.getEntrustStatus(), DictCodeList.委托状态_已接收.getValue())) {
                     errorList.add(new ValidMessage("只可对已接收的指令执行申购操作!"));
@@ -186,10 +186,10 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                     errorList.add(new ValidMessage("平台日为发行日才可进行申购!"));
                 }
                 // 3.选择多条指令时，资产代码+证券账户必须一致，如不满足则提示“所选指令不满足汇总条件：【债券标的OR证券账户】不同”，多个条件不满足则同时显示多个条件。
-                if (StringUtil.isEmpty(finprodMarketId)) {
-                    finprodMarketId = entrustDto.getFinprodMarketId();
+                if (StringUtil.isEmpty(finprodId)) {
+                    finprodId = entrustDto.getFinprodId();
                 }
-                if (!StringUtil.equals(finprodMarketId, entrustDto.getFinprodMarketId())) {
+                if (!StringUtil.equals(finprodId, entrustDto.getFinprodId())) {
                     msg = "债券标的";
                 }
                 if (StringUtil.isEmpty(secManageAcctId)) {
@@ -204,6 +204,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                 if (StringUtil.isNotEmpty(msg)) {
                     msg = "【" + msg + "】不同";
                     errorList.add(new ValidMessage(msg));
+                    break;
                 }
             }
         }
@@ -578,7 +579,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         if (settFeeAmt == null) {
             settFeeAmt = BigDecimal.ZERO;
         }
-        // 平均值计算
+        // 结算服务费平均值计算
         BigDecimal avg = ArithmeticUtil.divide(settFeeAmt, new BigDecimal(productDtos.size()), 2);
         // 应缴款金额剩余尾差
         BigDecimal payTailDifference = payableAmount;
@@ -587,10 +588,12 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         int index = 0;
         for (CfetsTrdBondFirstSubProductDto item : productDtos) {
             index++;
-            BigDecimal payableAmountDetail = ArithmeticUtil.multiply(ArithmeticUtil.divide(item.getSubscriptionAmount(), subAmt, 2, RoundingMode.DOWN), payableAmount);
+            //申购产品列表中认购量/基本信息中总的认购量*基本信息中应缴款金额
+            BigDecimal payableAmountDetail = ArithmeticUtil.divide(
+                    ArithmeticUtil.multiply(item.getSubscriptionAmount(), payableAmount), subAmt, 2, RoundingMode.DOWN);
             BigDecimal feeAmountDetail = avg;
             // 最后一笔且尾差小于计算出的分配值时,用倒减值
-            if (index == 0) {
+            if (index == productDtos.size()) {
                 if (BigDecimalUtil.ACompareToB(payableAmountDetail, payTailDifference, 3) >= 0) {
                     payableAmountDetail = payTailDifference;
                 }
