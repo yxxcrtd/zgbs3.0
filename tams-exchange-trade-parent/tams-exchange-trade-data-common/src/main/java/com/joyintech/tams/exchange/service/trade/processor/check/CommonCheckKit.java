@@ -115,11 +115,11 @@ public class CommonCheckKit extends BaseCheckKit {
 
         String trdPriceScopeControl = CacheUtil.getSysParam(TRD_PRICE_SCOPE_CONTROL);
         if (TRD_PRICE_SCOPE_CONTROL_FORBID.equals(trdPriceScopeControl)) {
-            throw new BusinessResultException(ErrorCode.INNER_RISK_ERROR,
+            throw new BusinessResultException(ErrorCode.CHECK_ERROR,
                     builder.toString());
         } else if (TRD_PRICE_SCOPE_CONTROL_PROMPT.equals(trdPriceScopeControl) || trdPriceScopeControl == null) {
             if (SwitcheEnum.OPEN.codeEquals(order.getSoftSkipMode())) {
-                return ResultBean.error(ErrorCode.INNER_RISK_ERROR, builder.toString());
+                return ResultBean.error(ErrorCode.TRIGGER_SOFT_CONTROL, builder.toString());
             }
         } else if (TRD_PRICE_SCOPE_CONTROL_ALLOW.equals(trdPriceScopeControl)) {
         }

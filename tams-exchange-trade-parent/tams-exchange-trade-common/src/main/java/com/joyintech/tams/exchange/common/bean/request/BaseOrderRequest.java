@@ -49,6 +49,9 @@ public class BaseOrderRequest implements Serializable {
     @ApiModelProperty(name="softSkipMode",value="软控是否继续？Y：继续",example="Y")
     protected String softSkipMode;
 
+    @ApiModelProperty(name="orderSoftControl",value="下单软控是否继续？Y：继续",example="Y")
+    protected String orderSoftControl;
+
     public String getInstructionId() {
         return instructionId;
     }
@@ -105,6 +108,14 @@ public class BaseOrderRequest implements Serializable {
         this.softSkipMode = softSkipMode;
     }
 
+    public String getOrderSoftControl() {
+        return orderSoftControl;
+    }
+
+    public void setOrderSoftControl(String orderSoftControl) {
+        this.orderSoftControl = orderSoftControl;
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -115,6 +126,7 @@ public class BaseOrderRequest implements Serializable {
                 .add("fullPrice", fullPrice)
                 .add("entrustBalance", entrustBalance)
                 .add("softSkipMode", softSkipMode)
+                .add("orderSoftControl", orderSoftControl)
                 .toString();
     }
 }
