@@ -258,31 +258,31 @@ public class RskSupervisionIndicator001Service extends CommonExportService<RskSu
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public List<TreeNode> getAllPortfolioBySort(String type,String indId,String portfName,String profitType,String issueMode,String raiseTypeCond,String investTypeCond) {
+	public List<TreeNode> getAllPortfolioBySort(String type,String indId,String portfName,String profitType,String issueMode,String raiseTypeCond,String investTypeCond,String isFaceSingleInvestor) {
 
 		List<DataDictItem> profitList = new ArrayList<DataDictItem>();
 		List<TreeNode> result = new ArrayList<TreeNode>();
 		List<TreeNode> treeProList = new ArrayList<TreeNode>();
 		if (BussinessDictCodeListRds.分类维度_收益类型.getValue().equals(type)) {
 			treeProList = restTemplate.getForList(
-					ServiceApplication.RISK_RDS_SERVICE_NAME + "/RskSupervisionIndicator/getAllPortfolioByProfit?indId=" + indId+"&portfName="+portfName+"&profitType="+profitType+"&issueMode="+issueMode+"&raiseTypeCond="+raiseTypeCond+"&investTypeCond="+investTypeCond,
+					ServiceApplication.RISK_RDS_SERVICE_NAME + "/RskSupervisionIndicator/getAllPortfolioByProfit?indId=" + indId+"&portfName="+portfName+"&profitType="+profitType+"&issueMode="+issueMode+"&raiseTypeCond="+raiseTypeCond+"&investTypeCond="+investTypeCond+"&isFaceSingleInvestor="+isFaceSingleInvestor,
 					TreeNode.class);
 			profitList = (List<DataDictItem>) SysDataUtil.getDataDictItem(BussinessDictCodeRds.收益类型.getValue());
 
 		} else {
 			if (BussinessDictCodeListRds.分类维度_开放类型.getValue().equals(type)) {
 				treeProList = restTemplate.getForList(ServiceApplication.RISK_RDS_SERVICE_NAME
-						+ "/RskSupervisionIndicator/getAllPortfolioByOther?fields=" + openType+"&indId=" + indId+"&portfName="+portfName+"&profitType="+profitType+"&issueMode="+issueMode+"&raiseTypeCond="+raiseTypeCond+"&investTypeCond="+investTypeCond, TreeNode.class);
+						+ "/RskSupervisionIndicator/getAllPortfolioByOther?fields=" + openType+"&indId=" + indId+"&portfName="+portfName+"&profitType="+profitType+"&issueMode="+issueMode+"&raiseTypeCond="+raiseTypeCond+"&investTypeCond="+investTypeCond+"&isFaceSingleInvestor="+isFaceSingleInvestor, TreeNode.class);
 				profitList = (List<DataDictItem>) SysDataUtil.getDataDictItem(BussinessDictCodeRds.开放类型.getValue());
 			}
 			if (BussinessDictCodeListRds.分类维度_募集方式.getValue().equals(type)) {
 				treeProList = restTemplate.getForList(ServiceApplication.RISK_RDS_SERVICE_NAME
-						+ "/RskSupervisionIndicator/getAllPortfolioByOther?fields=" + raiseType+"&indId=" + indId+"&portfName="+portfName+"&profitType="+profitType+"&issueMode="+issueMode+"&raiseTypeCond="+raiseTypeCond+"&investTypeCond="+investTypeCond, TreeNode.class);
+						+ "/RskSupervisionIndicator/getAllPortfolioByOther?fields=" + raiseType+"&indId=" + indId+"&portfName="+portfName+"&profitType="+profitType+"&issueMode="+issueMode+"&raiseTypeCond="+raiseTypeCond+"&investTypeCond="+investTypeCond+"&isFaceSingleInvestor="+isFaceSingleInvestor, TreeNode.class);
 				profitList = (List<DataDictItem>) SysDataUtil.getDataDictItem(BussinessDictCodeRds.募集方式.getValue());
 			}
 			if (BussinessDictCodeListRds.分类维度_投资性质.getValue().equals(type)) {
 				treeProList = restTemplate.getForList(ServiceApplication.RISK_RDS_SERVICE_NAME
-						+ "/RskSupervisionIndicator/getAllPortfolioByOther?fields=" + investType+"&indId=" + indId+"&portfName="+portfName+"&profitType="+profitType+"&issueMode="+issueMode+"&raiseTypeCond="+raiseTypeCond+"&investTypeCond="+investTypeCond, TreeNode.class);
+						+ "/RskSupervisionIndicator/getAllPortfolioByOther?fields=" + investType+"&indId=" + indId+"&portfName="+portfName+"&profitType="+profitType+"&issueMode="+issueMode+"&raiseTypeCond="+raiseTypeCond+"&investTypeCond="+investTypeCond+"&isFaceSingleInvestor="+isFaceSingleInvestor, TreeNode.class);
 				profitList = (List<DataDictItem>) SysDataUtil.getDataDictItem(BussinessDictCodeRds.投资性质.getValue());
 			}
 		}
