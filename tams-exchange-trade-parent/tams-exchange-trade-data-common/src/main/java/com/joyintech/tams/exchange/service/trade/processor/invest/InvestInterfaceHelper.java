@@ -1,4 +1,4 @@
-package com.joyintech.tams.exchange.service.trade.processor;
+package com.joyintech.tams.exchange.service.trade.processor.invest;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
