@@ -250,7 +250,7 @@ public class CommonController {
 
     @ApiOperation(value = "查询交易商交易员信息", notes = "查询交易商交易员信息")
     @PostMapping("/common/getDealerTraderInfo")
-    public List<TradeInfoProResponse> selectTraderInfo(@RequestBody @Validated TradeInfoProRequest dto) {
+    public List<TradeInfoProResponse> selectTraderInfo(@RequestBody TradeInfoProRequest dto) {
         if (StringUtil.equals(dto.getIsOur(), "Y")) {
             return commonManagement.getDealerTraderInfo(dto);
         }
