@@ -376,7 +376,7 @@ public class CfetsTrdConfirmExecFirstBondInfoResponse {
     }
 
     public String getIssuetypeStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.发行方式, getIssuetype());
+        return SysDataUtil.getNameFromDataDict(DictCode.新债_发行方式, getIssuetype());
     }
 
     public void setIssuetypeStr(String issuetypeStr) {

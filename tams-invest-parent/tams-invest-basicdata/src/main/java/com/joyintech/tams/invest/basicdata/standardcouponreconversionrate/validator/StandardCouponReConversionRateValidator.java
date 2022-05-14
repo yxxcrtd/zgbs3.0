@@ -5,18 +5,18 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.BeanValidator;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.invest.basicdata.standardcouponreconversionrate.dto.StandardCouponReConversionRateDto;
 import com.joyintech.tams.invest.basicdata.standardcouponreconversionrate.service.StandardCouponReConversionRateService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Component
 public class StandardCouponReConversionRateValidator implements BeanValidator {
@@ -31,6 +31,11 @@ public class StandardCouponReConversionRateValidator implements BeanValidator {
         if (StringUtil.equals(dto.getOperateType(), "new")){
             StandardCouponReConversionRateDto vo = new StandardCouponReConversionRateDto();
             vo.setBrokerId(dto.getBrokerId());
+            //是否存在流程中
+            if (isInProcess(dto.getBrokerId(), "StandardCouponReConversionRate002")) {
+                resultList.add(new ValidMessage(this.getMessage("存在流程中的数据，请维护相同模式的数据", dto.getTandardRate ())));
+                return resultList;
+            }
             if(StringUtils.isNotEmpty(vo.getFinprodId())&&StringUtils.isEmpty(vo.getAccountType())){
                 vo.setFinprodId("system");
                 List<StandardCouponReConversionRateDto> list = standardCouponReConversionRateService.getList(dto);
@@ -48,10 +53,6 @@ public class StandardCouponReConversionRateValidator implements BeanValidator {
                 }
             }
         }
-        if(StringUtils.isEmpty(dto.getFinprodId())&&StringUtils.isEmpty(dto.getAccountType())){
-            resultList.add(new ValidMessage(this.getMessage("资产代码、资金账户不可都为空", dto.getTandardRate ())));
-            return resultList;
-        }
         if(StringUtil.equals(dto.getOperateType(), "edit")){
             if(StringUtil.isNotEmpty(dto.getStartDate())){
                 String platDate = DateUtil.format(DateUtil.platDateFromCache());
@@ -61,6 +62,10 @@ public class StandardCouponReConversionRateValidator implements BeanValidator {
             }
         }
         if (StringUtil.equals(dto.getOperateType(), "new") || StringUtil.equals(dto.getOperateType(), "update")) {
+            if(StringUtils.isEmpty(dto.getFinprodId())&&StringUtils.isEmpty(dto.getAccountType())){
+                resultList.add(new ValidMessage(this.getMessage("资产代码、资金账户不可都为空", dto.getTandardRate ())));
+                return resultList;
+            }
             if(StringUtil.isNotEmpty(dto.getTandardRate ())){
                 if(!NumberUtils.isNumber(dto.getTandardRate ())) {
                     resultList.add(new ValidMessage(this.getMessage("输入的标准券再折算率不是数字", dto.getTandardRate ())));
@@ -93,5 +98,27 @@ public class StandardCouponReConversionRateValidator implements BeanValidator {
             }
         }
         return resultList;
+    }
+
+    /**
+     * 判断是否在流程中
+     *
+     * @param pk1
+     * @return
+     */
+    public Boolean isInProcess(String pk1, String... pageId) {
+        if (StringUtil.isEmpty(pk1)) return Boolean.FALSE;
+        WflValidInputParameter wflValidInputParameter = null;
+        for (String str : pageId) {
+            wflValidInputParameter = new WflValidInputParameter();
+            wflValidInputParameter.setPageId(str);
+            wflValidInputParameter.setBusinessDataPk1(pk1);
+            wflValidInputParameter.setSeachMode("01");
+            List<WflValidInputParameter> result = standardCouponReConversionRateService.getBusinessData(wflValidInputParameter);
+            if (CollectionUtils.isNotEmpty(result)) {
+                return Boolean.TRUE;
+            }
+        }
+        return Boolean.FALSE;
     }
 }

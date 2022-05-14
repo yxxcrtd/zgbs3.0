@@ -486,8 +486,7 @@ public class PositionRequestTradeRestService {
         TrdProductDeal trdProductDeal = entity.getTrdProductDeal();
         TrdProductDealAdd trdProductDealAdd = entity.getTrdProductDealAdd();
         String accountNo = baseAssetCashPositionCommMapper.queryAccountNo(trdProductDealTotal.getSecManageAcctId());
-        // 业务动作
-        resultMap.put("busiAct", DictCodeListExt3.业务动作_成交匹配.getValue());
+        resultMap.put("busiAct", getBusiAct(trdProductDeal));
         // ZGTFCP-1608:还本到账/收息到账交易方向转换 modify by fuyongsheng 20220322 start
         if(DictCodeList.交易方向_还本到账.getValue().equals(trdProductDeal.getPs())){
             resultMap.put("ps", DictCodeList.交易方向_还本.getValue());
@@ -507,6 +506,8 @@ public class PositionRequestTradeRestService {
         resultMap.put("decisionAct", DictCodeListExt3.系统动作_新建.getValue());
         resultMap.put("systemAct", DictCodeListExt3.系统动作_新建.getValue());
         resultMap.put("workFlowId", null);
+        resultMap.put("payType", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(trdProductDeal.getFinprodType2()) ?
+                BussinessDictCodeList.缴款方式_一级分销.getValue() : null);
         resultMap.put("cdate", trdProductDeal.getTradeDate());
         resultMap.put("ccy", trdProductDeal.getCcy());
         resultMap.put("finprodId", trdProductDeal.getFinprodId());
@@ -530,6 +531,15 @@ public class PositionRequestTradeRestService {
         pltMap.put("ownSecAmount", BigDecimal.ZERO);
         ptlList.add(pltMap);
         resultMap.put("ptlList", ptlList);
+    }
+
+    private Object getBusiAct(TrdProductDeal trdProductDeal) {
+        String busiAct = DictCodeListExt3.业务动作_成交匹配.getValue();
+        if (DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(trdProductDeal.getFinprodType2())
+                && StringUtil.isNotEmpty(trdProductDeal.getbTradeId())) {
+            busiAct = DictCodeListExt3.业务动作_成交确认.getValue();
+        }
+        return busiAct;
     }
 
     /**

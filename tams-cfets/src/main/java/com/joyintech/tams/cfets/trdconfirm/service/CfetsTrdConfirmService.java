@@ -179,12 +179,14 @@ public class CfetsTrdConfirmService extends BaseService{
         String regAssetType= (String)pageParam.get("regAssetType");
         if(StringUtil.isNotEmpty(regAssetType)){
             List<String> finprodType2List=new ArrayList<>();
-           if(StringUtil.equals(regAssetType,"01")){
-               finprodType2List.add(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
-           }else{
-               finprodType2List.add(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue());
-               finprodType2List.add(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
-           }
+            if (StringUtil.equals(regAssetType, "01")) {
+                finprodType2List.add(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+            } else if (StringUtil.equals(regAssetType, "02")) {
+                finprodType2List.add(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue());
+                finprodType2List.add(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
+            } else if (StringUtil.equals(regAssetType, "03")) {
+                finprodType2List.add(regAssetType);
+            }
             pageParam.put("finprodType2List",finprodType2List);
         }
         String secAcctId=(String)pageParam.get("secAcctId");
@@ -285,7 +287,8 @@ public class CfetsTrdConfirmService extends BaseService{
                             //成交确认提交方法
                             // ((CfetsTrdConfirmService) AopContext.currentProxy()).doCompleteMethod(entity,OperationType.NEW);
                             cfetsTrdConfirm001Service.doCompleteMethod(entity,OperationType.NEW);
-                        } else if (StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.登记资产类型_一级申购.getValue())) {
+                        } else if (StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.登记资产类型_一级申购.getValue())
+                                || StringUtil.equals(item.getFinprodType2(),DictCodeListExt1.CSTP资产类型_一级申购.getValue())) {
                             CfetsTrdFirstBondInvestTradeDto entity = this.prepareBidEntity(item.getTotleTradeId(), DictCodeListExt1.生成方式_画面录入.getValue());
                             cfetsTrdConfirm001Service.doCompleteBidMethod(entity, OperationType.NEW);
                         } else {
@@ -628,9 +631,9 @@ public class CfetsTrdConfirmService extends BaseService{
         entity.setPaTrdProductDeals(paTrdProductDeals);
         // 金融产品交易扩展Entity 构造结束----------------------------------------------------------
         //无下行时，插入下行成交匹配关系.有下行时，手工匹配或自动匹配插入下行成交匹配表
-        String support_cstp_flag_bond = CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BOND");
+        String support_cstp_flag_bondfirst = CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST");
         CfetsTrdConfirmMatchDto matchDto = new CfetsTrdConfirmMatchDto();
-        if (StringUtil.equals(support_cstp_flag_bond, DictCodeList.是否_否.getValue())) {
+        if (StringUtil.equals(support_cstp_flag_bondfirst, DictCodeList.是否_否.getValue())) {
             matchDto.setSeqno(IDGenerator.generate());
             matchDto.setPreTradeId(totleTradeId);
             matchDto.setTrdConfStatus(DictCodeList.确认状态_已确认.getValue());
@@ -3096,7 +3099,7 @@ public class CfetsTrdConfirmService extends BaseService{
                     cfetsTrdConfirm001Service.doCompleteRepoMethod(entity,OperationType.NEW,false);
                 } else {
                     //对dto进行封装
-                    CfetsTrdFirstBondInvestTradeDto entity = prepareBidEntity(regInfo.getTotleTradeId(), DictCodeListExt1.生成方式_接口接入.getValue());
+                    CfetsTrdFirstBondInvestTradeDto entity = this.prepareBidEntity(regInfo.getTotleTradeId(), DictCodeListExt1.生成方式_接口接入.getValue());
                     CfetsTrdConfirmMatchDto oldMatchDto = entity.getCfetsTrdConfirmMatchDto();
                     matchDto.setTrdId(oldMatchDto.getTrdId());
                     matchDto.setTrdConfStatus(oldMatchDto.getTrdConfStatus());
@@ -3302,7 +3305,7 @@ public class CfetsTrdConfirmService extends BaseService{
         //3.CSTP下行成交回报数据再与已生成的银行间交易品种（一级申购）交易登记数据进行匹配,查询所有的符合条件登记信息
         if (null != interfCstpBjfxjg) {
             Map<String, Object> param = new HashMap<>();
-            param.put("finprodType2", BussinessDictCodeList.共同业务类型_一级投标债券类资产管理.getValue());
+            param.put("finprodType2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
             param.put("tradeDate", DateUtil.format(DateUtil.parse(interfCstpBjfxjg.getSubscriptionTime()), "yyyy-MM-dd"));//成交日期?
             param.put("finprodMarketId", interfCstpBjfxjg.getInstrumentId());//资产代码
             param.put("ouPartyId", interfCstpBjfxjg.getSubscribeInstitutionId());//本方
@@ -3310,17 +3313,17 @@ public class CfetsTrdConfirmService extends BaseService{
             // 成交价
             param.put("couponRate", interfCstpBjfxjg.getCouponRate());//票面利率(%)
             param.put("spread", interfCstpBjfxjg.getSpread());//利差(BP)
-            param.put("issuePrice", interfCstpBjfxjg.getIssuePrice());//发行价格(元)
+//            param.put("issuePrice", interfCstpBjfxjg.getIssuePrice());//发行价格(元)
             // 一级申购 可选要素：本方交易员、应缴款金额
-            param.put("ourTrader", interfCstpBjfxjg.getSubmitUser());//本方交易员
-            param.put("payableAmount", interfCstpBjfxjg.getActualFee());//应缴款金额
+//            param.put("ourTrader", interfCstpBjfxjg.getSubmitUser());//本方交易员
+//            param.put("payableAmount", interfCstpBjfxjg.getActualFee());//应缴款金额
             //根据登记编号，查询登记信息
             List<CfetsTrdConfirmRegInfoListResponse> confirmDtoList = cfetsTrdConfirmMapper.selectBidDtoByPrimaryKey(param);
             if (StringUtil.isEmptyList(confirmDtoList)) {
                 return null;
             }
             confirmDto = confirmDtoList.get(0);
-            dealType = "BID";//报价
+            dealType = BussinessDictCodeList.报价方式_登记报价.getValue();
             logger.info("-----------自动匹配查询到一级申购登记数据-------------");
         }
         //将CSTP数据和已有的登记或报价数据进行比较

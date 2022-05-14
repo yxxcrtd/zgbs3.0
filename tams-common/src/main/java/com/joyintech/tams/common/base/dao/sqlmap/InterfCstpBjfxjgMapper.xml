@@ -55,12 +55,12 @@
     </sql>
   <sql id="Sql_All_Data" >
     select
-    <include refid="com.joyintech.tams.common.base.dao.AssetDailyInfoMapper.Base_Column_List" />
+    <include refid="com.joyintech.tams.common.base.dao.InterfCstpBjfxjgMapper.Base_Column_List" />
     from INTERF_CSTP_BJFXJG
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.joyintech.tams.common.base.entity.InterfCstpBjfxjg" >
     select
-    <include refid="com.joyintech.tams.common.base.dao.AssetDailyInfoMapper.Base_Column_List" />
+    <include refid="com.joyintech.tams.common.base.dao.InterfCstpBjfxjgMapper.Base_Column_List" />
     from INTERF_CSTP_BJFXJG
     where trd_id = #{trdId,jdbcType=VARCHAR}
   </select>

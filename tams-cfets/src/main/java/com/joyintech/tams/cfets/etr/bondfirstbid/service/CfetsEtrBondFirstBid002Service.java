@@ -184,19 +184,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             }
         }
 
-        for (CfetsEtrBondFirstBid002Dto dto : entity.getEtrInvestBondFirstBidDtos()) {
-            //更新操作记录日志
-            CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
-            oprHisReq.setEntrustId(dto.getEntrustId());
-            if (StringUtil.equals(operationType.name(), "NEW")) {
-                oprHisReq.setOperType(DictCodeListExt3.操作类型_新建.getValue());
-            } else {
-                oprHisReq.setOperType(DictCodeListExt3.操作类型_修改.getValue());
-            }
-            oprHisReq.setBusiDes(entity.getRemark());
-            joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
-        }
-
+        // 操作履历由切面实现
     }
 
     /**

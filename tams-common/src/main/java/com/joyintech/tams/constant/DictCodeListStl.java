@@ -252,6 +252,8 @@ public enum DictCodeListStl implements BaseDictCodeList {
 		业务场景分类明细_报价逆回购_到期(DictCode.业务场景分类明细,"0905RB02","报价逆回购_到期"),
 	    业务场景分类明细_质押券出库(DictCode.业务场景分类明细,"0906RB02","质押券出库"),
     	业务场景分类明细_质押券入库(DictCode.业务场景分类明细,"0906RB01","质押券入库"),
+		业务场景分类明细_信用保护凭证_买入(DictCode.业务场景分类明细,"080101","信用保护凭证_买入"),
+		业务场景分类明细_信用保护凭证_卖出(DictCode.业务场景分类明细,"080102","信用保护凭证_卖出"),
 		// 交易方向_换券到交易方向_换股
 		交易方向_换券(DictCode.交易方向,"T67","换券"),
 		交易方向_质押券入库(DictCode.交易方向,"T68","质押券入库"),
@@ -325,6 +327,10 @@ public enum DictCodeListStl implements BaseDictCodeList {
 
 	共通业务类型_券商对账参数设置(DictCode.共通业务类型, "STL06", "券商对账参数设置"),
 	//add by chenjiaxing 20211015 end
+	//add by likaitao 20220513 start
+	证券品种_信用保护凭证(DictCode.证券品种, "14", "信用保护凭证"),
+	共通业务类型_信用保护凭证交易(DictCode.共通业务类型, "TRD801", "信用保护凭证交易"),
+	//add by likiatao 20220513 end
 	广播类别_允许分红的基金(DictCode.广播类别, "ZT", "允许分红的基金"),
 	广播类别_权益分派方案(DictCode.广播类别, "QP", "权益分派方案")
 	;

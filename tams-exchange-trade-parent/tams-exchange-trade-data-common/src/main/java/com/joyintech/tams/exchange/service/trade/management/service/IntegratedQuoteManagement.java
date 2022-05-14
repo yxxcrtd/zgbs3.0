@@ -10,6 +10,7 @@ import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
 import com.joyintech.tams.exchange.common.request.EntrustQueryRequest;
 import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import com.joyintech.tams.exchange.common.utils.TickConverter;
+import com.joyintech.tams.exchange.common.vo.IntegratedEntrustVo;
 import com.joyintech.tams.exchange.datacommon.db.service.FuturesInstrumentService;
 import com.joyintech.tams.exchange.service.trade.processor.others.TerminalHelper;
 import com.joyintech.tams.exchange.service.trade.scheduled.quote.QuoteJob;
@@ -107,8 +108,8 @@ public class IntegratedQuoteManagement {
         ResultBean resultBean = entrustManagement.queryIntegratedEntrust(request.getUserId(), request.getInstructionId(), request.getAccountId(), request.getOrderId());
         if (null != resultBean && null != resultBean.getData()) {
             List<NegotiateQuoteSendBean> retList = new ArrayList<NegotiateQuoteSendBean>();
-            List<IntegratedEntrust> entrustList = (List<IntegratedEntrust>) resultBean.getData();
-            for (IntegratedEntrust integratedEntrust : entrustList) {
+            List<IntegratedEntrustVo> entrustList = (List<IntegratedEntrustVo>) resultBean.getData();
+            for (IntegratedEntrustVo integratedEntrust : entrustList) {
                 if (integratedEntrust.getEntrustStatus() == EntrustStatus.REPORTED.value
                         || integratedEntrust.getEntrustStatus() == EntrustStatus.REPORTED_TOBE_CANCEL.value) {
                     NegotiateQuoteSendBean negotiateQuoteSendBean = new NegotiateQuoteSendBean();
@@ -137,7 +138,7 @@ public class IntegratedQuoteManagement {
         return resultBean;
     }
 
-    private void setNegotiateQuoteSendBean(NegotiateQuoteSendBean negotiateQuoteSendBean, IntegratedEntrust integratedEntrust) {
+    private void setNegotiateQuoteSendBean(NegotiateQuoteSendBean negotiateQuoteSendBean, IntegratedEntrustVo integratedEntrust) {
         negotiateQuoteSendBean.setRequestNo(integratedEntrust.getId());
         negotiateQuoteSendBean.setRequestTime(DateUtil.formatDateTime(integratedEntrust.getCreateTime()));
         negotiateQuoteSendBean.setStockCode(integratedEntrust.getStockCode());

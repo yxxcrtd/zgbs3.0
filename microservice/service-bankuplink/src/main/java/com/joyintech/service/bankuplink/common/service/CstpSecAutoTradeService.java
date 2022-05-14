@@ -312,10 +312,10 @@ public class CstpSecAutoTradeService extends BaseService<TrdBondInvestTradeDto> 
 	public void secAutoBidTrade(InterfCstpBjfxjg interfCstpBjfxjg, ResultBaseDto resultBaseDto) {
 		String oritradeId = interfCstpBjfxjg.getTrdId();
 		// 判断债券标的是否存在
-		FinProduct finProduct = finProductMapper.selectByPrimaryKey(interfCstpBjfxjg.getInstrumentId());
+		FinProduct finProduct = autoTradeMapper.selectSecByFinprodMarketId(interfCstpBjfxjg.getInstrumentId());
 		if (null == finProduct) {
-			// 防止有些标的的finprodId没带前缀，因此这里进行第二次查询
-			finProduct = finProductMapper.selectByPrimaryKey("F32_" + interfCstpBjfxjg.getInstrumentId());
+			// 防止有些标的的finprodId没带后缀，因此这里进行第二次查询
+			finProduct = autoTradeMapper.selectSecByFinprodMarketId(interfCstpBjfxjg.getInstrumentId() + ".IB");
 		}
 		if (StringUtil.isNotEmpty(finProduct)) {
 			// 判断是否已经生成了交易
@@ -339,7 +339,7 @@ public class CstpSecAutoTradeService extends BaseService<TrdBondInvestTradeDto> 
 				logger.info(msg);
 			}
 		} else {
-			String msg = "无债券代码不存在！";
+			String msg = "债券代码不存在！";
 			resultBaseDto.setErrMsg(msg);
 			logger.info(msg);
 		}
