@@ -688,12 +688,12 @@ public class TradeHelper {
         String tradingDay = commonManagement.getTradingDay();
 
         BigDecimal orderPrice = order.getOrderPrice();
-        if (StringUtil.equals("Y", instruction.getIsNetPrice())) {
-            order.setIsFullPrice(FullPriceConst.NET_PRICE.value);
-        } else {
-            order.setIsFullPrice(FullPriceConst.FULL_PRICE.value);
-            if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())
-                    && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
+        if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())
+                && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
+            if (StringUtil.equals("Y", instruction.getIsNetPrice())) {
+                order.setIsFullPrice(FullPriceConst.NET_PRICE.value);
+            } else {
+                order.setIsFullPrice(FullPriceConst.FULL_PRICE.value);
                 orderPrice = order.getFullPrice();
             }
         }

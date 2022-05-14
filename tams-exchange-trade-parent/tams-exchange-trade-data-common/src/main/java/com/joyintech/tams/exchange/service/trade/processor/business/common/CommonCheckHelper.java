@@ -16,6 +16,7 @@ import com.joyintech.tams.exchange.common.constant.joyin.Switches;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.dto.EntrustPriceAndYieldDto;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
+import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.EntrustService;
 import com.joyintech.tams.exchange.datacommon.db.service.InstrumentService;
@@ -263,8 +264,11 @@ public class CommonCheckHelper {
             logger.error("指令的结束日[{}]小于平台日[{}]", INSTRUCTION_DATE_FORMAT.get().format(instruction.getMdate()), tradingDay);
             return ErrorCode.INSTRUCTION_END_DATE_ERROR;
         }
-        if (instruction.getPriceMode().equals(InstructionPriceMode.SPECIFIED.value) && !TradeUtils.equals(orderPrice, instruction.getEntrustPrice())
-                || (instruction.getPriceMode().equals(InstructionPriceMode.FIXED.value) && checkPriceFixed(order, instruction.getEntrustPrice(), orderPrice))) {
+//        if (instruction.getPriceMode().equals(InstructionPriceMode.SPECIFIED.value) && !TradeUtils.equals(orderPrice, instruction.getEntrustPrice())
+//                || (instruction.getPriceMode().equals(InstructionPriceMode.FIXED.value) && checkPriceFixed(order, instruction.getEntrustPrice(), orderPrice))) {
+//            return ErrorCode.INSTRUCTIONS_PRICE_ERROR;
+//        }
+        if (checkOrderPrice(instruction, order, orderPrice)) {
             return ErrorCode.INSTRUCTIONS_PRICE_ERROR;
         }
         if (InvestmentAssetType.FUTURES.value.equals(instruction.getAssetType())) {
@@ -286,6 +290,39 @@ public class CommonCheckHelper {
             }
         }
         return ErrorCode.SUCCESS;
+    }
+
+    /**
+     * 检查下单价格：返回true 检查失败
+     */
+    private boolean checkOrderPrice(Instruction instruction, OrderInterface order, BigDecimal orderPrice) {
+        //债券买卖
+        if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())
+                && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
+            String priceMode = instruction.getPriceMode();
+            String isNetPrice = instruction.getIsNetPrice();
+            if (StringUtil.equals(priceMode, InstructionPriceMode.SPECIFIED.value)) {
+                if (StringUtil.equals("Y", isNetPrice)) {
+                    return !TradeUtils.equals(orderPrice, instruction.getEntrustPrice());
+                } else {
+                    return !TradeUtils.equals(orderPrice, instruction.getFullPrice());
+                }
+            } else if (StringUtil.equals(priceMode, InstructionPriceMode.FIXED.value)) {
+                if (StringUtil.equals("Y", isNetPrice)) {
+                    return checkPriceFixed(order, instruction.getEntrustPrice(), orderPrice);
+                } else {
+                    return checkPriceFixed(order, instruction.getFullPrice(), orderPrice);
+                }
+            }
+        }
+
+        //其他交易
+        if (instruction.getPriceMode().equals(InstructionPriceMode.SPECIFIED.value) && !TradeUtils.equals(orderPrice, instruction.getEntrustPrice())
+                || (instruction.getPriceMode().equals(InstructionPriceMode.FIXED.value) && checkPriceFixed(order, instruction.getEntrustPrice(), orderPrice))) {
+            return true;
+        }
+
+        return false;
     }
 
     //超限返回true
