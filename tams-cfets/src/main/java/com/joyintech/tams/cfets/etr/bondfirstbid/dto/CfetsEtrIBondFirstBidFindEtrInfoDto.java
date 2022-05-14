@@ -56,6 +56,12 @@ public class CfetsEtrIBondFirstBidFindEtrInfoDto {
     @ApiModelProperty(name = "issueClass", value = "发行方式", example = "报价发行/招标发行/簿记建档")
     private String issueClass;
 
+    @ApiModelProperty(name = "tradeMarket", value = "交易场所")
+    private String tradeMarket;
+
+    @ApiModelProperty(name = "tradeMarketStr", value = "交易场所名称")
+    private String tradeMarketStr;
+
     @ApiModelProperty(name = "issueClassStr", value = "发行方式名称")
     private String issueClassStr;
 
@@ -454,5 +460,23 @@ public class CfetsEtrIBondFirstBidFindEtrInfoDto {
 
     public void setBidPriceStr(String bidPriceStr) {
         this.bidPriceStr = bidPriceStr;
+    }
+
+    public String getTradeMarket() {
+        return tradeMarket;
+    }
+
+    public void setTradeMarket(String tradeMarket) {
+        this.tradeMarket = tradeMarket;
+    }
+    public String getTradeMarketStr() {
+        if (StringUtil.isEmpty(getTradeMarket())) {
+            return null;
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.交易场所, getTradeMarket());
+    }
+
+    public void setTradeMarketStr(String tradeMarketStr) {
+        this.tradeMarketStr = tradeMarketStr;
     }
 }
