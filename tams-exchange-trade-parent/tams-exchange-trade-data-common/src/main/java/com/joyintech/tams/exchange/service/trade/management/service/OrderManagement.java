@@ -19,6 +19,7 @@ import com.joyintech.tams.exchange.common.db.domain.Order;
 import com.joyintech.tams.exchange.common.exception.PositionExchangeException;
 import com.joyintech.tams.exchange.common.request.BidPriceConInfoRequest;
 import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
+import com.joyintech.tams.exchange.common.response.BidPriceConInfoResponse;
 import com.joyintech.tams.exchange.common.utils.CheckParamUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
