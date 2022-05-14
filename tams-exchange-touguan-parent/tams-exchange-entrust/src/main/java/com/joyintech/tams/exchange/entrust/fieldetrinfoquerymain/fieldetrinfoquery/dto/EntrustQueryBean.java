@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
@@ -9,6 +10,7 @@ import com.joyintech.tams.constant.DictCodeListExt2;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.data.annotation.Id;
+import org.thymeleaf.util.StringUtils;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -419,11 +421,23 @@ public class EntrustQueryBean implements Serializable {
         return entrustVolume;
     }
 
+    public String getEntrustVolumeStr() {
+        // 质押券出入库
+        if(StringUtils.equals(getEntrustBs(), "T68") || StringUtils.equals(getEntrustBs(), "T69")){
+            return ArithmeticUtil.divide(new BigDecimal(String.valueOf(entrustVolume)),new BigDecimal("100"),2) + "万元";
+        }
+        return String.valueOf(entrustVolume);
+    }
+
     public void setEntrustVolume(long entrustVolume) {
         this.entrustVolume = entrustVolume;
     }
 
     public BigDecimal getEntrustPrice() {
+        // 质押券出入库
+        if(StringUtils.equals(getEntrustBs(), "T68") || StringUtils.equals(getEntrustBs(), "T69")){
+            return null;
+        }
         return entrustPrice;
     }
 
@@ -440,6 +454,10 @@ public class EntrustQueryBean implements Serializable {
     }
 
     public BigDecimal getEntrustBalance() {
+        // 质押券出入库
+        if(StringUtils.equals(getEntrustBs(), "T68") || StringUtils.equals(getEntrustBs(), "T69")){
+            return null;
+        }
         return entrustBalance;
     }
 
@@ -592,6 +610,10 @@ public class EntrustQueryBean implements Serializable {
     }
 
     public BigDecimal getTradedBalance() {
+        // 质押券出入库
+        if(StringUtils.equals(getEntrustBs(), "T68") || StringUtils.equals(getEntrustBs(), "T69")){
+            return null;
+        }
         return tradedBalance;
     }
 
@@ -602,12 +624,22 @@ public class EntrustQueryBean implements Serializable {
     public long getTradedVolume() {
         return tradedVolume;
     }
-
+    public String getTradedVolumeStr() {
+        // 质押券出入库
+        if(StringUtils.equals(getEntrustBs(), "T68") || StringUtils.equals(getEntrustBs(), "T69")){
+            return ArithmeticUtil.divide(new BigDecimal(String.valueOf(tradedVolume)),new BigDecimal("100"),2) + "万元";
+        }
+        return String.valueOf(tradedVolume);
+    }
     public void setTradedVolume(long tradedVolume) {
         this.tradedVolume = tradedVolume;
     }
 
     public BigDecimal getTradedPrice() {
+        // 质押券出入库
+        if(StringUtils.equals(getEntrustBs(), "T68") || StringUtils.equals(getEntrustBs(), "T69")){
+            return null;
+        }
         return tradedPrice;
     }
 
