@@ -29,7 +29,7 @@
                to_char(eea.TRANSMIT_TIME, 'hh24:mi:ss') transmitTime,
                to_char(eea.TRANSMIT_TIME, 'hh24:mi')    transmitTimeSer,
                ee.ENTRUST_ID                            entrustId,
-               ee.REMARK                                remark
+               hisInfo.REMARK                                remark
         from ETR_ENTRUST ee
                  left join (select listagg(t0.PORTFOLIO_ID, ',') within group (order by t0.ENTRUST_ID)   AS PORTFOLIO_ID,
                                    listagg(pp.PORTFOLIO_NAME, ',') within group (order by t0.ENTRUST_ID) AS PORTFOLIO_NAME,
@@ -49,6 +49,8 @@
                              </where>
                             group by t0.ENTRUST_ID) eed
                            on ee.ENTRUST_ID = eed.ENTRUST_ID
+                 left join ( <include refid="com.joyintech.tams.common.base.dao.EtrEntrustOperHisMapper.selectHisInfo" />) hisInfo
+                            on ee.ENTRUST_ID = hisInfo.ENTRUST_ID
                  left join ETR_ENTRUST_ADD eea on ee.ENTRUST_ID = eea.ENTRUST_ID
                  left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eea.SEC_ACCT_ID
                  left join (select sum(ENT_FINISH_AMT) ENT_FINISH_AMT, sum(FINISH_AMT) FINISH_AMT, ENTRUST_ID
