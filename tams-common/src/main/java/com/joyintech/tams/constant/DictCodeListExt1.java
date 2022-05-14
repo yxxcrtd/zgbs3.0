@@ -709,6 +709,12 @@ public enum DictCodeListExt1 implements BaseDictCodeList {
 	平安业务类型_子组合资金调配(DictCode.平安业务类型,"119","子组合资金调配"),
 	/*guyunfei 20191122 子组合资金调配码值跟设计文档不统一 end*/
 	平安业务类型_计划类资产_净值型_卖出(DictCode.平安业务类型,"200","计划类资产（净值型）卖出"),
+
+	平安业务类型_破产(DictCode.平安业务类型,"206","破产"),
+	平安业务类型_支付违约(DictCode.平安业务类型,"207","支付违约"),
+	平安业务类型_债务重组(DictCode.平安业务类型,"208","债务重组"),
+	平安业务类型_到期(DictCode.平安业务类型,"209","到期"),
+
 	交易场所_WIND_场外(DictCode.交易场所_WIND,"OF","场外"),
 	交易场所_WIND_银行间(DictCode.交易场所_WIND,"IB","银行间"),
 	交易场所_WIND_上交所(DictCode.交易场所_WIND,"SH","上交所"),
