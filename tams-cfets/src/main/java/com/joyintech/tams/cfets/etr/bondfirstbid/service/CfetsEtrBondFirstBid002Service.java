@@ -701,6 +701,10 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 dd.setBiddingProductList(null);
                 dd.setBiddingProductList(entry.getValue());
                 dd.setSecAcctId(entry.getKey());
+                //汇总投标券面总额 重新计算
+                BigDecimal totalNum = dd.getBiddingProductList().stream().map(CfetsBiddingProductDto::getBidPrinAmt)
+                        .reduce(BigDecimal.ZERO,BigDecimal::add);
+                dd.setTotalBiddingNum(totalNum);
                 //针对退回指令，查询指令下达时间
                 if (StringUtil.isNotEmpty(cfetsDto.getEntrustId())) {
                     //根据指令id查询出该资产是退回指令，且该指令的下达时间
