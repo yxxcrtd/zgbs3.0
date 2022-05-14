@@ -6079,6 +6079,16 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
     public List<RiskTrialRetDto> selectRiskList(String tradeId) {
         Map<String, Object> map = new HashMap<>();
         map.put("tradeId", tradeId);
+        ProcessMark processMark = new ProcessMark();
+        processMark.setBusinessDataPk1(tradeId);
+        String workflowId = WorkflowContext.getProcessMarkService().getLastWorkflowId(processMark);
+        EtrExchangeTradeSaveRequest  entity = etrExchangeTrade001CommonService.getBussinessEntityByWorkflowId(workflowId);
+        List<EtrExchangeTradePortfolioRequest> portlist=entity.getPortfolioList();
+        List portfolioIdList=new ArrayList();
+        for(EtrExchangeTradePortfolioRequest portfoli:portlist){
+            portfolioIdList.add(portfoli.getPortfolioId());
+        }
+        map.put("portfolioIdList",portfolioIdList);
         List<RiskTrialRetDto> list = etrExchangeTradeCommonMapper.selectRiskList(map);
         return list;
     }
