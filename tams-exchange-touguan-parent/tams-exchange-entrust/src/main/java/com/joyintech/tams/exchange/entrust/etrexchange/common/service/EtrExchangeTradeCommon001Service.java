@@ -2487,6 +2487,9 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
                         && StringUtils.equals(ps, DictCodeList.交易方向_卖出.getValue())
                         && isSalesOfSmallShares(availableNum, minNum, entrustNum)) {
                 } else {
+                    if(StringUtils.equals(ps,DictCodeListExt3.交易方向_质押券入库.getValue()) || StringUtils.equals(ps,DictCodeListExt3.交易方向_质押券出库.getValue())){
+                        minNum = new BigDecimal("0.01");
+                    }
                     entrustNum = ArithmeticUtil
                             .multiply(ArithmeticUtil.divide(entrustNum, minNum, 0, RoundingMode.DOWN), minNum);
                 }
