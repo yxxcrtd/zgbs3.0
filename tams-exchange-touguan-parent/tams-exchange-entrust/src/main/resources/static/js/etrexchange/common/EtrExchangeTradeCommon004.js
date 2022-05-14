@@ -2523,6 +2523,8 @@
                 if ((finprodType2 == FINPROD_TYPE_TG_F01 || finprodType2 == FINPROD_TYPE_TG_ZYSHG) && (ps == PS_T68 || ps == PS_T69)) {
                     // entrustAmt = Math.floor(new Number(entrustAmt));
                     $("#entrustAmt_" + currentTab).val(entrustAmt);
+                    $("#entrustAmt_" + currentTab).attr("data-textrange",4);
+                    $("#entrustNum_" + currentTab).attr("data-textrange",2);
                 } else {
                     $("#entrustAmt_" + currentTab).val(entrustAmt).trigger('blur');
                 }
@@ -3329,9 +3331,10 @@
                 if(entrustNum){
                     $("#entrustNum_" + currentTab).val(entrustNum/100);
                 }
-                var entrustAmt = $("#entrustAmt_" + currentTab).val();
                 var entrustPrice =  $("#entrustPrice_" + currentTab).val();
                 if(entrustNum && entrustPrice){
+                    entrustPrice = parseInt(entrustPrice);
+                    $("#entrustPrice_" + currentTab).val(entrustPrice);
                     var amt = entrustNum*entrustPrice/10000;
                     $("#entrustAmt_" + currentTab).attr("data-textrange", 4);
                     $("#entrustAmt_" + currentTab).val(amt).blur().trigger('change');
@@ -3558,7 +3561,7 @@
                 sortField: 'entrustNum',
                 width: 200,
                 type: 'number',
-                digit: 0,
+                digit:  ps != "T68" && ps != "T69" ? 0 : 2,
                 edit: true
             },
             {
