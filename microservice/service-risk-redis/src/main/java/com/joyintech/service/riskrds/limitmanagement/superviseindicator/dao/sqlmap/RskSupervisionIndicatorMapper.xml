@@ -65,8 +65,8 @@
 		from PTL_PORTFOLIO  -->
 		select distinct t.PORTFOLIO_ID id,m.PORTFOLIO_NAME name,m.PROFIT_TYPE pId,m.RISK_ENABLED object
 		 from PA_PTL_PORTFOLIO t
-		 inner join  PTL_PORTFOLIO m
-		 on t.PORTFOLIO_ID=m.PORTFOLIO_ID
+		 inner join  PTL_PORTFOLIO m on t.PORTFOLIO_ID=m.PORTFOLIO_ID
+		 left join prd_sale_param n on 'F16_'||m.PORTFOLIO_ID=n.FINPROD_ID
 		<!-- <where>
 		   <if test="indId != null and indId != ''">
 				PORTFOLIO_ID not in (select PORTFOLIO_ID from RSK_PORTFOLIO_INDICATOR where PORTFOLIO_LEVEL =#{portfLevel} and IND_ID =#{indId} )
@@ -92,14 +92,17 @@
 			<if test="investType != null and investType != ''">
 				and t.INVEST_NATURE = #{investType}
 			</if>
+			<if test="isFaceSingleInvestor != null and isFaceSingleInvestor != ''">
+				and n.IS_FACE_SINGLEINVESTOR = #{isFaceSingleInvestor}
+			</if>
 			and m.PORTFOLIO_TYPE in ('01','02') and  m.MDATE <![CDATA[ >= ]]> to_date(#{platDate},'yyyy-MM-dd')
 		</where>
 	</select>
 	 <select id="getAllPortfolioByOther" resultType="com.joyintech.framework.select.TreeNode">
 	 	select distinct t.PORTFOLIO_ID id,m.PORTFOLIO_NAME name,${fields} as pId,m.RISK_ENABLED object
 		 from PA_PTL_PORTFOLIO t
-		 inner join  PTL_PORTFOLIO m
-		 on t.PORTFOLIO_ID=m.PORTFOLIO_ID
+		 inner join  PTL_PORTFOLIO m on t.PORTFOLIO_ID=m.PORTFOLIO_ID
+		 left join prd_sale_param n on 'F16_'||m.PORTFOLIO_ID=n.FINPROD_ID
 		<where>
 			<if test="indId != null and indId != ''">
 				t.PORTFOLIO_ID not in (select PORTFOLIO_ID from RSK_PORTFOLIO_INDICATOR where PORTFOLIO_LEVEL =#{portfLevel} and IND_ID =#{indId} )
@@ -119,6 +122,9 @@
 			</if>
 			<if test="investType != null and investType != ''">
 				and t.INVEST_NATURE = #{investType}
+			</if>
+			<if test="isFaceSingleInvestor != null and isFaceSingleInvestor != ''">
+				and n.IS_FACE_SINGLEINVESTOR = #{isFaceSingleInvestor}
 			</if>
 			and m.PORTFOLIO_TYPE in ('01','02') and m.MDATE <![CDATA[ >= ]]> to_date(#{platDate},'yyyy-MM-dd')
 		</where>
