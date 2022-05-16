@@ -48,6 +48,8 @@ public enum ErrorCode implements IEnum<Integer> {
 
     API_ERROR(102, "接口调用失败"),
 
+    ATTRIBUTE_ERROR(103,  "有效申报价格校验失败"),
+
     INNER_RISK_ERROR(200, "内部风控检查错误"),
 
     MASTER_TOKEN_DISABLE(310, "主从模式关闭"),
