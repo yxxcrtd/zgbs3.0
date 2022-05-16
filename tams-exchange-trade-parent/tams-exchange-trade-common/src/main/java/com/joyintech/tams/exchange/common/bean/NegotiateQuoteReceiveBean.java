@@ -92,7 +92,7 @@ public class NegotiateQuoteReceiveBean {
     }
 
     public String getCpInvestorTypeStr() {
-        return InvestorType.getInvestorTypeName(investorType);
+        return InvestorType.getInvestorTypeName(cpInvestorType);
     }
 
     public void setCpInvestorTypeStr(String cpInvestorTypeStr) {

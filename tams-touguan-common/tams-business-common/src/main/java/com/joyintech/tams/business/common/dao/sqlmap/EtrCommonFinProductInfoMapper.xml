@@ -31,15 +31,11 @@
         PRODUCT.REMARK,
         ISSUE.INT_TYPE intType,
         ISSUE.PAY_CYCLE payCycle,
-        case
-        when PRODUCT.COUPON_SPECIES = '01' AND  ISSUE.INT_TYPE = '01' THEN
-        ISSUE.REFER_YIELD
-        when PRODUCT.COUPON_SPECIES = '01' AND  ISSUE.INT_TYPE = '02' THEN
-        (ISSUE.BP + RATE_INFO.INT_RATE)
-        when PRODUCT.COUPON_SPECIES IN ('02', '03', '04') THEN
-        ISSUE.REFER_YIELD
-        else ISSUE.REFER_YIELD
-        end as referYield,
+
+        case when (PRODUCT.COUPON_SPECIES='"01"'  or ISSUE.INT_TYPE='02' )
+        then SDL.ITEM_VALUE || '+' || to_char(ISSUE.bp * 10000 ,'FM9999999999999990.9000') || 'BP'
+        else to_char(ISSUE.REFER_YIELD * 100 ,'FM9999999999999990.9000') end as referYield,
+
         RATE_INFO.INT_RATE basicRate,
         ISSUE.RATE_GRADE rateGrade,
         ISSUE.BP bp,
@@ -85,6 +81,7 @@
         LEFT JOIN MST_CUSTOMER_INFO CUSTOMER_INFO ON PRODUCT.ISSUER = CUSTOMER_INFO.CUSTOMER_ID
         LEFT JOIN MST_INT_RATE_INFO RATE_INFO ON ISSUE.INT_RATE_ID = RATE_INFO.INT_RATE_ID
         LEFT JOIN FIN_PRODUCT PRODUCT2 ON PRODUCT.CIRCULATION_CODE = PRODUCT2.FINPROD_ID
+        LEFT JOIN (select * from  SYS_DATADICT_LIST where DICT_CODE='SECRATE_DATA') SDL on ISSUE.INT_RATE_ID = SDL.ITEM_CODE
         <where>
 
             <if test="finprodId != null and finprodId != ''">

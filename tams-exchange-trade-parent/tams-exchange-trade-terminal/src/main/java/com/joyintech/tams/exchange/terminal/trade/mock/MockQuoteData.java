@@ -273,7 +273,7 @@ public class MockQuoteData {
             buy.setMemberId(memberId);
             buy.setTraderCode(traderCode);
             buy.setInvestorId(investorId);
-            buy.setInvestorType("02");
+            buy.setInvestorType("03");
             buy.setCpMemberId("167");
             buy.setCpTraderCode("Z213612");
             buy.setCpInvestorId("131");

@@ -23,7 +23,7 @@ public class NegotiateQuoteSendBean {
     @ApiModelProperty(name = "bs", value = "对手方买卖方向（1：买入 2：卖出）")
     private String bs;
     @ApiModelProperty(name = "amount", value = "数量")
-    private long amount;
+    private BigDecimal amount;
     @ApiModelProperty(name = "fullPrice", value = "全价价格")
     private BigDecimal fullPrice;
     @ApiModelProperty(name = "entrustPrice", value = "净价价格")
@@ -111,11 +111,11 @@ public class NegotiateQuoteSendBean {
         this.bs = bs;
     }
 
-    public long getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(long amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
