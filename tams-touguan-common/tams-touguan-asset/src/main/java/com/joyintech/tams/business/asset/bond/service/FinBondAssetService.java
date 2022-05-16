@@ -629,6 +629,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             finRateInfo.setCashId(finCashInfoInterest.getCashId());
             finRateInfo.setEffDate(dto.getVdate());
             finRateInfo.setIntType(dto.getCalcType());
+            finRateInfo.setBranch(branch);
             finRateInfo.setBasis(getBasis(finInterestFactorDto.getBasis()));
             BeanUtil.copyPropertiesIgnoreNull(finRateInfo,finInterestFactorDto);
             finRateInfo.setFinprodId(dto.getFinprodId());
@@ -680,7 +681,12 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                 }else{
                     invRepay.setCashType(DictCodeList.现金流类型_中间还本.getValue());
                 }
-                Date vdate = bondFinCashPlanDto.getVdate();Date mdate = bondFinCashPlanDto.getMdate();
+                Date vdate = bondFinCashPlanDto.getVdate();
+                if (StringUtil.equals(dto.getFinPayInterestStdInfoDto().getCouponSpecies(),DictCodeList.息票品种_零息.getValue())
+                        ||StringUtil.equals(dto.getFinPayInterestStdInfoDto().getCouponSpecies(),DictCodeList.息票品种_贴现.getValue())){
+                    vdate = dto.getVdate();
+                }
+                Date mdate = bondFinCashPlanDto.getMdate();
                 long termdays  = DateUtil.getBetweenDayNumber(DateUtil.format(vdate),DateUtil.format(mdate));
                 invRepay.setTermdays(termdays);
                 invRepay.setFrequency((long)invSchedules.size());
