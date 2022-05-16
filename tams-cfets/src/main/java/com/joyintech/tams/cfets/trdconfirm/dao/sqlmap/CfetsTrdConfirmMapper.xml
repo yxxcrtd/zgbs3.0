@@ -61,7 +61,7 @@
         reg.totle_trade_id as totleTradeId,
         '01' effectiveStatus,
         '01' regStatus,
-        '04' as dealType,
+        null dealType,
         reg.settle_date as settleDate,
         reg.delivery_type as deliveryType,
         reg.v_settle_date as vsettleDate,
@@ -125,6 +125,9 @@
         </if>
         <if test="tradeMarket != null and !tradeMarket.equals('')">
             AND reg.trade_market=#{tradeMarket,jdbcType=VARCHAR}
+        </if>
+        <if test="assetType != null and !assetType.equals('')">
+            AND fpt.TYPE_9=#{assetType,jdbcType=VARCHAR}
         </if>
         <if test="settleSpeed != null and settleSpeed != ''">
             AND  decode(reg.settle_speed,0,'01',1,'02',2,'03')= #{settleSpeed,jdbcType=VARCHAR}
@@ -258,6 +261,9 @@
             </if>
             <if test="dealType != null and dealType != ''">
                 AND '04'= #{dealType,jdbcType=VARCHAR}
+            </if>
+            <if test="assetType != null and !assetType.equals('')">
+                AND fpt.TYPE_9=#{assetType,jdbcType=VARCHAR}
             </if>
             <if test="counterIdList!=null  and counterIdList.size() > 0 ">
                 AND bo.OU_PARTY_ID IN
@@ -472,6 +478,9 @@
         <if test="tradeMarket != null and !tradeMarket.equals('')">
             AND '01'=#{tradeMarket,jdbcType=VARCHAR}
         </if>
+        <if test="assetType != null and !assetType.equals('')">
+            AND fpt.TYPE_9=#{assetType,jdbcType=VARCHAR}
+        </if>
         <if test="settleSpeed != null and settleSpeed != ''">
             AND  decode(ib.settle_speed,0,'01',1,'02',2,'03') = #{settleSpeed,jdbcType=VARCHAR}
         </if>
@@ -611,6 +620,9 @@
         </if>
         <if test="quoteType != null and quoteType != ''">
             AND ic.quote_type= #{quoteType,jdbcType=VARCHAR}
+        </if>
+        <if test="assetType != null and !assetType.equals('')">
+            AND 1=2
         </if>
         <if test="counterIdList!=null  and counterIdList.size() > 0 ">
             AND t1.counter_id IN
