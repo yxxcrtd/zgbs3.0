@@ -190,6 +190,8 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         if (OperationType.DELETE.equals(type)) {
             action = ENTRUST_RECORD_DELETE;
             doCompleteDelete(entity);
+            //处理履历
+            finBondAssetMapper.deleteCfetsOprHis(entity.getFinprodMarketId());
         } else {
             entity = encapBaseFinProductBaseInfoList(entity);
             if (OperationType.NEW.equals(type)) {
@@ -209,6 +211,8 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                 action = ENTRUST_RECORD_UPDATE;
                 doCompleteUpdate(entity);
             }
+            //处理履历
+            updateCfetsOprHis(entity.getFinprodMarketId(), action);
         }
         try {
             // 推送数据到第三方接口
@@ -228,8 +232,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         } catch (Exception e) {
             //功能暂未测试
         }
-        //处理履历
-        updateCfetsOprHis(entity.getFinprodMarketId(), action);
+
     }
 
     private void doCompleteInsert(FinBondAssetSaveRequest entity) {
@@ -1169,7 +1172,10 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             oprHisReq.setOperType(DictCodeListExt3.操作类型_导出.getValue());
         }
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
+
     }
+
+
 
     /**
      * 计算初始利率

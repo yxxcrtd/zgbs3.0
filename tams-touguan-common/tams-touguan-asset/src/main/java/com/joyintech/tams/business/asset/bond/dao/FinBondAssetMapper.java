@@ -254,4 +254,6 @@ public interface FinBondAssetMapper {
     List<SelectOptionDto> getFinProdMarketIdList(Map<String, Object> param);
 
 	FinProductTypeConfig getWindType(Map<String, Object> paramCinfig);
+
+	int deleteCfetsOprHis(@Param("entrustId") String entrustId);
 }
