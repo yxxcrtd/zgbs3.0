@@ -588,6 +588,7 @@ public class CommonManagement extends BaseService {
 
     public Message checkSelfDealerTraderInfo(CheckTradeInfoRequest dto) {
         Map<String,String> map = Maps.newHashMap();
+        map.put("code", "200");
         TradeInfoProRequest request = new TradeInfoProRequest();
         request.setAcctNo(dto.getAcctNo());
         request.setTradePlace(dto.getTradePlace());
