@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.entrust.etrexchange.position.bean;
 
+import com.joyintech.background.component.common.pack.common.util.ArithmeticUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeTradePortfolioRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradePortfolioSecRepoRequest;
@@ -86,9 +87,9 @@ public class PositionRequestBaseBean {
         BigDecimal entrustAmt = request.getEntrustAmt();
         if (Objects.isNull(entrustAmt) || BigDecimal.ZERO.compareTo(entrustAmt) != -1) {
             BigDecimal entrustPrice= Objects.isNull(request.getEntrustPrice())?new BigDecimal(0):request.getEntrustPrice();
-            this.cashAmount = this.secAmount.multiply(entrustPrice);
+            this.cashAmount = ArithmeticUtil.divide(this.secAmount.multiply(entrustPrice),BigDecimal.ONE,4);
         } else {
-            this.cashAmount = entrustAmt;
+            this.cashAmount = ArithmeticUtil.divide(entrustAmt,BigDecimal.ONE,4);
         }
     }
 
