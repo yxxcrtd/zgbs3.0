@@ -276,8 +276,8 @@ public class CfetsEtrDispatcherController extends BaseController {
                 return new Message<AjaxResult>().success();
             }
         } catch (Exception e) {
-            logger.error("一级投标指令分发check异常", e);
-            return new Message<AjaxResult>().fail().setMessage("一级投标指令分发check异常");
+            logger.error("分发check异常", e);
+            return new Message<AjaxResult>().fail().setMessage("分发check异常");
         }
     }
 
