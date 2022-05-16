@@ -37,7 +37,7 @@
         SEC_INFO.EXPIRY_DATE expiryDate,
         SEC_INFO.PRIMARY_CLASSIFICATION primaryClassification,
         SEC_INFO.SECONDARY_CLASSIFICATION secondaryClassification,
-        SEC_INFO.VARIETY_OF_COUPONS varietyOfCoupons,
+        SEC_INFO.VARIETY_OF_COUPONS couponSpecies,
         SEC_INFO.INTEREST_PAYMENT_FREQUENCY interestPaymentFrequency,
         SEC_INFO.RATE_TYPE rateType,
         SEC_INFO.CURRENCY,
@@ -108,16 +108,16 @@
                 AND SEC_INFO.COUPONSPECIES = #{couponSpecies,jdbcType=VARCHAR}
             </if>
 
-            <if test="interestRate !=null and interestRate !=''">
-                AND SEC_INFO.INTERESTRATE = #{interestRate,jdbcType=VARCHAR}
+            <if test="rateType !=null and rateType !=''">
+                AND SEC_INFO.INTERESTRATE = #{rateType,jdbcType=VARCHAR}
             </if>
 
             <if test="payCycle !=null and payCycle !=''">
                 AND SEC_INFO.PAYCYCLE = #{payCycle,jdbcType=VARCHAR}
             </if>
 
-            <if test="ccy !=null and ccy !=''">
-                AND SEC_INFO.CCY = #{ccy,jdbcType=VARCHAR}
+            <if test="currency !=null and currency !=''">
+                AND SEC_INFO.CURRENCY = #{currency,jdbcType=VARCHAR}
             </if>
 
             <if test="isSus !=null and isSus !=''">
