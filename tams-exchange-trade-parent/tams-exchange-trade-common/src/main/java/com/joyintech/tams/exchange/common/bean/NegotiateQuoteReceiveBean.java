@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @ApiModel(value = "我收到的协商成交行情返回报文", description = "我收到的协商成交行情返回报文")
 public class NegotiateQuoteReceiveBean {
@@ -63,6 +64,9 @@ public class NegotiateQuoteReceiveBean {
     @ApiModelProperty(name = "cpInvestorTypeStr", value = "对手方交易主体类型(1.自营 2.资管 3.机构经纪 4.个人经纪)")
     private String cpInvestorTypeStr;
 
+    @ApiModelProperty(name = "amountView", value = "数量(展示)")
+    private BigDecimal amountView;
+
     public String getRequestStatusStr() {
         return RequestStatus.getRequestStatusName(requestStatus);
     }
@@ -88,7 +92,7 @@ public class NegotiateQuoteReceiveBean {
     }
 
     public String getCpInvestorTypeStr() {
-        return InvestorType.getInvestorTypeName(investorType);
+        return InvestorType.getInvestorTypeName(cpInvestorType);
     }
 
     public void setCpInvestorTypeStr(String cpInvestorTypeStr) {
@@ -255,4 +259,11 @@ public class NegotiateQuoteReceiveBean {
         this.remark = remark;
     }
 
+    public BigDecimal getAmountView() {
+        return BigDecimal.valueOf(amount).divide(BigDecimal.valueOf(100),2, RoundingMode.HALF_UP);
+    }
+
+    public void setAmountView(BigDecimal amountView) {
+        this.amountView = amountView;
+    }
 }

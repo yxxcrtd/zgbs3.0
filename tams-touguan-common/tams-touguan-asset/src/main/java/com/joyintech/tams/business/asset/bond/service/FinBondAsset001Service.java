@@ -198,6 +198,7 @@ public class FinBondAsset001Service extends BaseService{
             tradeMarkets.add(DictCodeListExt1.交易场所_商业银行柜台.getValue());
             param.put("tradeMarkets", tradeMarkets);
         }
+        param.put("finprodMarketIdList", StringUtil.splitToList(null,request.getFinprodMarketId()));
         Page<SelectOptionDto> page = super.queryForPage(request.getPageMode().getPageNo(),
                 request.getPageMode().getPageSize(),
                 () -> finBondAssetMapper.getCrossMarketCode(param));

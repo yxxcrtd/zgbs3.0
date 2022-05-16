@@ -43,6 +43,9 @@ public class SelectOptionCommonRequest {
     @ApiModelProperty(name="conFinprodId",value="正股代码",example="A1")
     private String conFinprodId;
 
+    @ApiModelProperty(name="finprodMarketId",value="资产代码",example="A1")
+    private String finprodMarketId;
+
     public String getSearch() {
         return search;
     }
@@ -123,5 +126,11 @@ public class SelectOptionCommonRequest {
         this.conFinprodId = conFinprodId;
     }
 
+    public String getFinprodMarketId() {
+        return finprodMarketId;
+    }
 
+    public void setFinprodMarketId(String finprodMarketId) {
+        this.finprodMarketId = finprodMarketId;
+    }
 }

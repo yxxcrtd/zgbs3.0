@@ -15,10 +15,10 @@ import java.util.Map;
  */
 public enum InvestorType implements IEnum<String> {
 
-    SELF_SUPPORT("自营", "1"),
-    ASSET_MANAGEMENT("资管", "2"),
-    PARTY_BROKERAGE("机构经纪", "3"),
-    PERSONAL_BROKERAGE("个人经纪", "4"),
+    SELF_SUPPORT("自营", "01"),
+    ASSET_MANAGEMENT("资管", "02"),
+    PARTY_BROKERAGE("机构经纪", "03"),
+    PERSONAL_BROKERAGE("个人经纪", "04"),
     ;
 
     private static Map<String, InvestorType> REQUEST_STATUS_MAP = new HashMap<>();

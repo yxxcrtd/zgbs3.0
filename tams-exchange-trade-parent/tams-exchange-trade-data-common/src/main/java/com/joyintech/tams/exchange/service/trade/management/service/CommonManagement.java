@@ -587,24 +587,28 @@ public class CommonManagement extends BaseService {
     }
 
     public Message checkSelfDealerTraderInfo(CheckTradeInfoRequest dto) {
+        Map<String,String> map = Maps.newHashMap();
         TradeInfoProRequest request = new TradeInfoProRequest();
         request.setAcctNo(dto.getAcctNo());
         request.setTradePlace(dto.getTradePlace());
         request.setIsOur("Y");
         List<TradeInfoProResponse> list = getDealerTraderInfo(request);
         if (CollectionUtils.isEmpty(list)) {
-            return new Message().fail().setMessage("资金账号维护交易商信息");
+            map.put("code", "201");
+            map.put("message", "资金账号未维护交易商信息");
         }
 
         for (TradeInfoProResponse response : list) {
             if (StringUtil.isEmpty(response.getDealerNo()) || StringUtil.isEmpty(response.getTraderNo())) {
-                return new Message().fail().setMessage("未维护交易商或交易员信息");
+                map.put("code", "202");
+                map.put("message", "未维护交易商或交易员信息");
             } else if (StringUtil.equals(dto.getTradePlace(), Market.SZSE.investValue) && StringUtil.isEmpty(response.getDealerPartyNo())) {
-                return new Message().fail().setMessage("未维护交易主体信息");
+                map.put("code", "203");
+                map.put("message", "未维护交易主体信息");
             }
         }
 
-        return new Message().success();
+        return new Message(map);
     }
 
     public List<TradeInfoProResponse> getCounterDealerTraderInfo(TradeInfoProRequest dto) {
