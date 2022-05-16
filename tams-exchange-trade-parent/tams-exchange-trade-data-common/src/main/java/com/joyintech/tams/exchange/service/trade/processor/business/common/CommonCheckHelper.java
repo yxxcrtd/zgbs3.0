@@ -355,7 +355,8 @@ public class CommonCheckHelper {
                 order.setOrderPrice(price);
 
                 //资产类型是债券
-                if (InvestmentAssetType.isBond(order.getAssetType())) {
+                if (InvestmentAssetType.isBond(order.getAssetType())
+                        && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
                     int round = bondHelper.getPriceRoundByPriceStep(instrument);
                     EntrustPriceAndYieldDto dto = new EntrustPriceAndYieldDto();
                     dto.setPrice(price);

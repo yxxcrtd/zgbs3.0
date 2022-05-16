@@ -238,7 +238,8 @@ public class TradeCallbackHelper {
         tradeRecord.setEntrustClass(instruction.getEntrustClass());
 
         //债券交易处理
-        if (InvestmentAssetType.BOND.value.equals(entrust.getAssetType())) {
+        if (InvestmentAssetType.isBond(entrust.getAssetType())
+                && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             //是否全价交易
             tradeRecord.setIsFullPrice(entrust.getIsFullPrice());
             //成交全价
