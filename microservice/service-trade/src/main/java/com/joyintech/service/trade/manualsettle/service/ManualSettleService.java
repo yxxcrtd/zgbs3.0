@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
@@ -112,28 +113,45 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
     }
 
     public void settleCash(ManualSettleDto dto){
-        //划款指令表
-        StlPayTempOrders stlPayTempOrders = manualSettleMapper.selectStlPayOrders(dto.getTradeId());
-        //交收、回溯处头寸逻辑
-        if(StringUtil.equals(dto.getPageModel(),DictCodeListExt3.交收操作类型_交收.getValue())||
-                StringUtil.equals(dto.getPageModel(),DictCodeListExt3.交收操作类型_回溯.getValue())){
+        EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(dto.getEntrustNo());
+        //临时交易表
+        List<TrdProductTempDeal> trdProductTempDeals = new ArrayList<>();
+        if(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue().equals(etrEntrust.getEntrustClass())){ // 多组合指令
+            trdProductTempDeals.addAll(manualSettleMapper.selectTrdProductTempDeals(dto.getTradeId()));
+        }else{
+            trdProductTempDeals.add(trdProductTempDealMapper.selectByPrimaryKey(dto.getTradeId()));
+        }
+        if(CollectionUtils.isEmpty(trdProductTempDeals)){
+            return;
+        }
+        for(TrdProductTempDeal trdProductTempDeal : trdProductTempDeals){
+            //交收、回溯处头寸逻辑
+            if(StringUtil.equals(dto.getPageModel(),DictCodeListExt3.交收操作类型_交收.getValue())||
+                    StringUtil.equals(dto.getPageModel(),DictCodeListExt3.交收操作类型_回溯.getValue())){
+                // 处理交收或者回溯数据
+                this.handleSettleSuccessOrRecall(dto, trdProductTempDeal);
+            }
+            else if(StringUtil.equals(dto.getPageModel(),DictCodeListExt3.交收操作类型_交收失败.getValue())){
+                this.handleSettleFailed(dto, trdProductTempDeal);
+            }
+        }
+    }
+
+    /**
+     * 处理交收或者回溯数据
+     * @param dto
+     */
+    private void handleSettleSuccessOrRecall(ManualSettleDto dto, TrdProductTempDeal trdProductTempDeal){
             //临时交易表
             TrdProductDeal trdProductDeal = new TrdProductDeal();
-            TrdProductTempDeal trdProductTempDeal = trdProductTempDealMapper.selectByPrimaryKey(dto.getTradeId());
-
-            // add by etliu 20220117 start
-            // GZYHTZJY-1128:到期续作日间手工交收报系统异常，报错日志见附件，委托编号WTREPO202107261907，日期：2021-07-26
-            if (trdProductTempDeal == null) {
-                return;
-            }
-            // add by etliu 20220117 end
-
             BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, trdProductTempDeal);
             //临时交易附属表
             TrdProductDealAdd trdProductDealAdd = new TrdProductDealAdd();
-            TrdProductTempDealAdd trdProductTempDealAdd = trdProductTempDealAddMapper.selectByPrimaryKey(dto.getTradeId());
+            TrdProductTempDealAdd trdProductTempDealAdd = trdProductTempDealAddMapper.selectByPrimaryKey(trdProductTempDeal.getTradeId());
             BeanUtil.copyPropertiesIgnoreNull(trdProductDealAdd, trdProductTempDealAdd);
             StlPayOrdersDto stlPayOrdersDto = new StlPayOrdersDto();
+            //划款指令表
+            StlPayTempOrders stlPayTempOrders = manualSettleMapper.selectStlPayOrders(trdProductTempDeal.getTradeId());
             if (null!=stlPayTempOrders) {
                 BeanUtil.copyPropertiesIgnoreNull(stlPayOrdersDto, stlPayTempOrders);
             }
@@ -169,11 +187,13 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                 if(StringUtil.equals(dto.getPageModel(),DictCodeListExt3.交收操作类型_交收.getValue())) {
                     InfContractDetailfile infContractDetailfile = manualSettleMapper.selectInfContractDetailfile(dto.getEntrustNo(), dto.getDealNo());
                     TrdTempDto trdTempDto = new TrdTempDto();
-                    trdTempDto.setTradeId(dto.getTradeId());
+                    trdTempDto.setTradeId(trdProductTempDeal.getTradeId());
                     if (stlPayOrdersDto != null) {
                         trdTempDto.setOrderId(stlPayOrdersDto.getOrderId());
                     }
-
+                    infContractDetailfile.setPortfolioId(trdProductTempDealAdd.getPortfolioId());
+                    infContractDetailfile.setShareAmt(trdProductTempDeal.getShareAmt());
+                    infContractDetailfile.setTradeAmt(trdProductTempDeal.getTradeAmt());
                     if (DictCodeList.回购拆借方向_正回购.getValue().equals(infContractDetailfile.getPs())
                             || DictCodeList.回购拆借方向_逆回购.getValue().equals(infContractDetailfile.getPs())) {
                         // 指令信息处理
@@ -215,7 +235,7 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                     parameter.setBusinessType(DictCodeList.回购类型_质押式协议回购.getValue().concat(trdTempDto.getFinprodType2()));
                     // 数据来源设置
                     if (StringUtil.equals(trdTempDto.getPs(), DictCodeListExt3.交易方向_解除质押.getValue())) {
-//                    InfContractDetailfile infContractDetailfile = (InfContractDetailfile)trdTempDto.getData();
+    //                    InfContractDetailfile infContractDetailfile = (InfContractDetailfile)trdTempDto.getData();
                         BigDecimal faceValue = trdCommonBaseService.getFaceValue(infContractDetailfile.getFinprodId(), infContractDetailfile.getTradeDate());
                         trdTempDto.setTradeAmt((faceValue == null ? BigDecimal.valueOf(100) : faceValue).multiply(infContractDetailfile.getShareAmt()));
                     }
@@ -309,9 +329,13 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                     // modify by etliu 20220226 end
                 }
             }
+    }
 
-        }
-        else if(StringUtil.equals(dto.getPageModel(),DictCodeListExt3.交收操作类型_交收失败.getValue())){
+    /**
+     * 处理交收失败数据
+     * @param dto
+     */
+    private void handleSettleFailed(ManualSettleDto dto, TrdProductTempDeal trdProductTempDeal){
             EtrPositionHoldDto etrPositionHoldDto = new EtrPositionHoldDto();
             //查询指令预占现金数据
             List<EtrCashPositionFlowDto> etrCashPositionFlows =manualSettleMapper.selectEtrCashPositionFlow(dto.getEntrustNo());
@@ -331,20 +355,21 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
 
             // modify by etliu 20220228 start
             // 广农商二阶段 GNS-973:【广农商场内清算】深交所协议回购 正/逆回购 提前/到期购回，点击交收失败后，头寸更新有误
-            TrdProductTempDeal trdProductTempDeal = trdProductTempDealMapper.selectByPrimaryKey(dto.getTradeId());
             // modify by etliu 20220228 end
             if(etrCashPositionFlows!=null&&!etrCashPositionFlows.isEmpty()){
-            	etrCashPositionFlowDto.setSeqno(IDGenerator.generate());
-            	etrCashPositionFlowDto.setCdate(DateUtil.platDateFromCache());
-            	etrCashPositionFlowDto.setOrderId(stlPayTempOrders.getOrderId());
-            	// modify by etliu 20220228 start
+                etrCashPositionFlowDto.setSeqno(IDGenerator.generate());
+                etrCashPositionFlowDto.setCdate(DateUtil.platDateFromCache());
+                //划款指令表
+                StlPayTempOrders stlPayTempOrders = manualSettleMapper.selectStlPayOrders(trdProductTempDeal.getTradeId());
+                etrCashPositionFlowDto.setOrderId(stlPayTempOrders.getOrderId());
+                // modify by etliu 20220228 start
                 // 广农商二阶段 GNS-973:【广农商场内清算】深交所协议回购 正/逆回购 提前/到期购回，点击交收失败后，头寸更新有误
                 if (trdProductTempDeal != null &&
                         !StringUtil.equals(DictCodeListExt3.交易方向_提前购回.getValue(), trdProductTempDeal.getPs())
                         && !StringUtil.equals(DictCodeListExt3.交易方向_到期购回.getValue(), trdProductTempDeal.getPs())) {
-                    etrCashPositionFlowDto.setAmount(dto.getSettleAmt());
+                    etrCashPositionFlowDto.setAmount(trdProductTempDeal.getTradeAmt());
                     if(etrCashPositionFlowDto.getAmount()==null){
-                        etrCashPositionFlowDto.setAmount(dto.getPrin());
+                        etrCashPositionFlowDto.setAmount(trdProductTempDeal.getPrinAmt());
                     }
                 } else {
                     etrCashPositionFlowDto.setAmount(etrCashPositionFlowDto.getAmount().negate());
@@ -353,16 +378,16 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
             	etrCashPositionFlowDtos.add(etrCashPositionFlowDto);
             }
             if(etrSecPositionFlows!=null&&!etrSecPositionFlows.isEmpty()){
-            	etrSecPositionFlowDto.setSeqno(IDGenerator.generate());
-            	etrSecPositionFlowDto.setCdate(DateUtil.platDateFromCache());
-            	etrSecPositionFlowDto.setTradeId(dto.getTradeId());
+                etrSecPositionFlowDto.setSeqno(IDGenerator.generate());
+                etrSecPositionFlowDto.setCdate(DateUtil.platDateFromCache());
+                etrSecPositionFlowDto.setTradeId(trdProductTempDeal.getTradeId());
 
                 // modify by etliu 20220228 start
                 // 广农商二阶段 GNS-973:【广农商场内清算】深交所协议回购 正/逆回购 提前/到期购回，点击交收失败后，头寸更新有误
                 if (trdProductTempDeal != null &&
                         !StringUtil.equals(DictCodeListExt3.交易方向_提前购回.getValue(), trdProductTempDeal.getPs())
                         && !StringUtil.equals(DictCodeListExt3.交易方向_到期购回.getValue(), trdProductTempDeal.getPs())) {
-                    etrSecPositionFlowDto.setAmount(dto.getSettleNum());
+                    etrSecPositionFlowDto.setAmount(trdProductTempDeal.getShareAmt());
                     if (etrSecPositionFlowDto.getAmount() == null) {
                         etrSecPositionFlowDto.setAmount(dto.getPledgeNumber());
                     }
@@ -373,13 +398,11 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
             	etrSecPositionFlowDtos.add(etrSecPositionFlowDto);
             }
            //update by yzg 20210528 end
-            
+
             etrPositionHoldDto.setPtlCashPositionFlows(etrCashPositionFlowDtos);
             etrPositionHoldDto.setPtlSecPositionFlows(etrSecPositionFlowDtos);
             etrPositionHoldDto.setDealEtr(true);
             EtrCommonCashPositionDealService.持久化流水Dto(etrPositionHoldDto);
-        }
-
     }
 
     public boolean recallDelegate(ManualSettleDto dto)

@@ -453,4 +453,11 @@
     <delete id="deleteEtrFinishStatus">
         DELETE FROM ETR_FINISH_STATUS WHERE TRADE_ID = #{tradeId}
     </delete>
+
+    <select id="selectTrdProductTempDeals" resultType="com.joyintech.tams.common.base.entity.TrdProductTempDeal" >
+        select
+        <include refid="com.joyintech.tams.common.base.dao.TrdProductTempDealMapper.Base_Column_List" />
+        from TRD_PRODUCT_TEMP_DEAL
+        where TOTLE_TRADE_ID = #{totleTradeId,jdbcType=VARCHAR}
+    </select>
 </mapper>

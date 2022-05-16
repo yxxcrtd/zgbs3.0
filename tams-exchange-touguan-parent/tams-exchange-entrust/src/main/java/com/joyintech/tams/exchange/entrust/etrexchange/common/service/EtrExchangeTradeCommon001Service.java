@@ -530,7 +530,8 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
             if (etrStandardBondInOutDto.getPs().equals(DictCodeListExt3.交易方向_质押券入库.getValue())) {
                 etrStandardBondInOutDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());// 资产大类
             } else if (etrStandardBondInOutDto.getPs().equals(DictCodeListExt3.交易方向_质押券出库.getValue())) {
-                etrStandardBondInOutDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());// 资产大类
+//                etrStandardBondInOutDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());// 资产大类
+                etrStandardBondInOutDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
             }
         }
 

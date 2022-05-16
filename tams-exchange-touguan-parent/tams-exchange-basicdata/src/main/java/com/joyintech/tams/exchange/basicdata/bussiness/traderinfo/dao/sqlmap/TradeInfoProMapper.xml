@@ -142,6 +142,17 @@
            and MDDI.CUSTOMER_ID = mdi.CUSTOMER_ID where mdi.CUSTOMER_ID = #{customerId} AND MDI.DEALER_NO = #{dealerNo} and
            mdi.TRADE_MARKET = '04' and mddi.DEALER_PARTY_TYPE = #{dealerPartyType}) aa
     </select>
+    <select id="hasDealerParty" resultType="java.lang.Integer">
+        select count(1) from MST_DEALER_INFO mdi
+         inner join MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO AND MDI.CUSTOMER_ID = MDDI.CUSTOMER_ID
+         where mdi.CUSTOMER_ID = #{customerId} AND MDI.DEALER_NO = #{dealerNo} and mddi.DEALER_PARTY_NO = #{dealerPartyNo}
+    </select>
+    <select id="hasSameTrader" resultType="java.lang.Integer">
+        select count(1) from MST_DEALER_INFO mdi
+         inner join MST_DEALER_DETAIL_INFO MDDI on mdi.DEALER_NO = MDDI.DEALER_NO AND MDI.CUSTOMER_ID = MDDI.CUSTOMER_ID
+         where mdi.CUSTOMER_ID = #{customerId} AND MDI.DEALER_NO = #{dealerNo} and mddi.DEALER_PARTY_NO = #{dealerPartyNo}
+         and mddi.TRADER_NO = #{traderNo}
+    </select>
 
 
     <delete id="deleteSelectedItem">

@@ -93,5 +93,7 @@ public interface ManualSettleMapper {
     int updateEtrCashPosition(EtrCashPosition etrCashPosition);
 
     int updateEtrSecPosition(EtrSecPosition etrSecPosition);
+
+    List<TrdProductTempDeal> selectTrdProductTempDeals(@Param("totleTradeId") String totleTradeId);
 } 
 

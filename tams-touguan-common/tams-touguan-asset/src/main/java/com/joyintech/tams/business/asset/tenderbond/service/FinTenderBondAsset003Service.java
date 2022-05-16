@@ -195,6 +195,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                         .put("interfaceType", "Bond001")
                         .put("tradePlace",product1.getTradeMarket())
                         .put("decisionAct",DictCodeListExt3.系统动作_新建.getValue())
+                        .put("flowStatus","02")
                         .put("isListingGenerate",DictCodeList.是否_是.getValue());
                 if(product1.getTradeMarket().equals(DictCodeListExt1.交易场所_银行间.getValue()) || product1.getTradeMarket().equals(DictCodeListExt1.交易场所_商业银行柜台.getValue())) {
                     param.put("interfaceType", "Bond001");
@@ -295,6 +296,9 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
             }
             if (Objects.nonNull(dto.getIssueStatus()) && StringUtil.equals(dto.getIssueStatus(), DictCodeListExt1.发行状态_发行成功.getValue())) {
                 validMessages.add(new ValidMessage("发行状态为发行成功的不能再次进行上市流通"));
+            }
+            if(Objects.nonNull(dto.getIssueDate()) && Objects.nonNull(dto.getListingDate()) && dto.getListingDate().compareTo(dto.getIssueDate()) < 0) {
+                validMessages.add(new ValidMessage("上市日需大于等于发行日"));
             }
         }
         return validMessages;

@@ -124,7 +124,7 @@ public class ResultBean {
     }
 
     public boolean isSuccess() {
-        return this.getErrorCode() == ErrorCode.SUCCESS.getCode();
+        return ErrorCode.isSuccess(this.getErrorCode());
     }
 
     public boolean isFail() {

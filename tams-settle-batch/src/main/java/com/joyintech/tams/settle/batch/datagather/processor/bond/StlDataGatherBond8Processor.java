@@ -6,11 +6,10 @@ import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.tams.common.base.entity.*;
-import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.*;
-import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.settle.batch.datagather.dao.StlDataGatherMapper;
 import com.joyintech.tams.settle.batch.datagather.dto.*;
+import com.joyintech.tams.settle.common.service.SettleCommonService;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -34,11 +33,8 @@ public class StlDataGatherBond8Processor extends BaseProcessor<NeedOperateEntity
     @Autowired
     private StlDataGatherMapper stlDataGatherMapper;
 
-    /**
-     * 业务编号
-     */
     @Autowired
-    private BaseGetBusinessId baseGetBusinessId;
+    private SettleCommonService settleCommonService;
 
 
     @Override
@@ -286,9 +282,7 @@ public class StlDataGatherBond8Processor extends BaseProcessor<NeedOperateEntity
         // 指令
         StlPayOrders stlPayOrders = new StlPayOrders();
         // 指令编号
-        BussinessCodeParameter bussinessCodeParameter = new BussinessCodeParameter();
-        bussinessCodeParameter.setSeqNo("9998");
-        stlPayOrders.setOrderId(baseGetBusinessId.buildBussinessCode(bussinessCodeParameter));
+        stlPayOrders.setOrderId(settleCommonService.buildBussinessIdBySeqno("9998"));
         // 结算日期
         stlPayOrders.setSettleDate(trdProductDeal.getSettleDate());
         // 本方资金账户
@@ -425,11 +419,9 @@ public class StlDataGatherBond8Processor extends BaseProcessor<NeedOperateEntity
     private TrdProductDealDto createTrdProductDeal(SettleTransDataTotal settleTransDataTotal, TrdFinProductDealTotal trdFinTotal, Map<String, BigDecimal> amtInfoMap, Boolean lastItem, BigDecimal shareAmtTotal) {
         TrdProductDealDto trdProductDeal = new TrdProductDealDto();
         // 汇总交易编号
-        BussinessCodeParameter codeParameter = new BussinessCodeParameter();
-        codeParameter.setCommonBusinessType(DictCodeList.共通业务类型_债券买入);
-        trdProductDeal.setTotleTradeId(baseGetBusinessId.buildBussinessCode(codeParameter));
+        trdProductDeal.setTotleTradeId(settleCommonService.buildBussinessCodeExt(DictCodeList.共通业务类型_债券买入));
         // 交易编号
-        trdProductDeal.setTradeId(baseGetBusinessId.buildBussinessCode(codeParameter));
+        trdProductDeal.setTradeId(settleCommonService.buildBussinessCodeExt(DictCodeList.共通业务类型_债券买入));
         // 业务类型
         trdProductDeal.setBusiType(DictCodeListExt3.业务类型_债券交易.getValue());
         // 金融产品代码
