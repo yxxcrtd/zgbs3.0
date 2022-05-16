@@ -28,10 +28,10 @@
             ISSUE.TENDER_EDATE >= TO_DATE(#{platformDate},'YYYY-MM-DD')  THEN '01'
             WHEN ((ISSUE.ISSUE_DATE < TO_DATE(#{platformDate},'YYYY-MM-DD') or
             ISSUE.TENDER_EDATE < TO_DATE(#{platformDate},'YYYY-MM-DD')) and PRODUCT.CIRCULATION_CODE is null) or
-            (PRODUCT.CIRCULATION_CODE is not null and PRODUCT_ADD.LISTING_DATE > TO_DATE(#{platformDate},'YYYY-MM-DD')) THEN '02'
+            (PRODUCT.CIRCULATION_CODE is not null and PRODUCT.CIRCULATION_DATE > TO_DATE(#{platformDate},'YYYY-MM-DD')) THEN '02'
             WHEN (ISSUE.ISSUE_DATE < TO_DATE(#{platformDate},'YYYY-MM-DD') or
             ISSUE.TENDER_EDATE < TO_DATE(#{platformDate},'YYYY-MM-DD')) and PRODUCT.CIRCULATION_CODE is not null
-            and  PRODUCT_ADD.LISTING_DATE <= TO_DATE(#{platformDate},'YYYY-MM-DD') THEN '03'
+            and  PRODUCT.CIRCULATION_DATE <= TO_DATE(#{platformDate},'YYYY-MM-DD') THEN '03'
             ]]>
             ELSE NULL END AS issueStage,
             PRODUCT_ADD.ISSUE_STATUS as issueStatus,
@@ -79,8 +79,8 @@
             PRODUCT.REMARK as remark,
             PRODUCT.FINPROD_ID as finprodId,
             case when (PRODUCT.COUPON_SPECIES='01' and ISSUE.INT_TYPE='02' )
-            then SDL.ITEM_VALUE || '+' || to_char(ISSUE.bp * 10000 ,'FM9999999999999990.9000') || 'BP'
-            else to_char(ISSUE.REFER_YIELD * 100 ,'FM9999999999999990.9000') end as rate
+            then case when SDL.ITEM_VALUE is null  then null else SDL.ITEM_VALUE || '+' || to_char(ISSUE.bp * 10000 ,'FM9999999999999990.90') || 'BP' end
+            else case when ISSUE.REFER_YIELD is not null then to_char(ISSUE.REFER_YIELD * 100 ,'FM9999999999999990.9000') || '%' else null end end as rate
         FROM FIN_PRODUCT PRODUCT
         LEFT JOIN FIN_PRODUCT_ADD PRODUCT_ADD ON PRODUCT.FINPROD_ID = PRODUCT_ADD.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ISSUE ISSUE ON PRODUCT.FINPROD_ID = ISSUE.FINPROD_ID

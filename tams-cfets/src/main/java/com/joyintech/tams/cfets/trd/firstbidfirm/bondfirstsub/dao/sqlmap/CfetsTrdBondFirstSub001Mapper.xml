@@ -9,8 +9,8 @@
                trunc(nvl(efs.ENT_FINISH_AMT, 0) /
                      case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
                100                                      transactioncom,
-               nvl(tpd.SHARE_AMT, 0)                    finishDealAmt,
-               trunc(nvl(tpd.SHARE_AMT, 0) /
+               nvl(tpd.SHARE_AMT * 100, 0)                    finishDealAmt,
+               trunc(nvl(tpd.SHARE_AMT * 100, 0) /
                      case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
                100                                      tradeFinishPercent,
                ee.ENTRUST_NUM*100                       entrustNum,

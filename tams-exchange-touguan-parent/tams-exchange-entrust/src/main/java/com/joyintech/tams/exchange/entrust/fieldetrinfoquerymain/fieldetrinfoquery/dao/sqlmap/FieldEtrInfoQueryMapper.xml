@@ -16,7 +16,8 @@
         su1.real_name invManagerName,
         nvl(detail.PORTFOLIO_ID,PTL_PORTFOLIO.PORTFOLIO_ID) portfolioId,
         nvl(detail.PORTFOLIO_NAME,PTL_PORTFOLIO.PORTFOLIO_NAME) portfolioName,
-        ETR_ENTRUST_ADD.ASSET_TYPE finprodType2,
+        ETR_ENTRUST_ADD.ASSET_TYPE assetType,
+        ETR_ENTRUST.FINPROD_TYPE2 finprodType2,
         CASE WHEN ETR_ENTRUST_ADD.ASSET_TYPE ='F07' AND ETR_ENTRUST.PS IN ('03', '04','T56','T93','T94','T95','T96')
         THEN ETR_ENTRUST.STOCK_ID else(case when FIN_PRODUCT.FINPROD_MARKET_ID is not null
         then FIN_PRODUCT.FINPROD_MARKET_ID
@@ -252,7 +253,8 @@
         su1.real_name invManagerName,
         nvl(detail.PORTFOLIO_ID,PTL_PORTFOLIO.PORTFOLIO_ID) portfolioId,
         nvl(detail.PORTFOLIO_NAME,PTL_PORTFOLIO.PORTFOLIO_NAME) portfolioName,
-        WFL_ETR_ENTRUST_ADD.ASSET_TYPE finprodType2,
+        WFL_ETR_ENTRUST_ADD.ASSET_TYPE assetType,
+        WFL_ETR_ENTRUST.FINPROD_TYPE2 finprodType2,
         CASE WHEN WFL_ETR_ENTRUST_ADD.ASSET_TYPE ='F07' AND WFL_ETR_ENTRUST.PS IN ('03',
         '04','T56','T93','T94','T95','T96') THEN WFL_ETR_ENTRUST.STOCK_ID else(case when FIN_PRODUCT.FINPROD_MARKET_ID
         is not null

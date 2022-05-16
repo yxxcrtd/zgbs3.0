@@ -120,8 +120,8 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "threearyClassification", value = "三级分类")
     private String threearyClassification;
 
-    @ApiModelProperty(name = "varietyOfCoupons", value = "息票品种")
-    private String varietyOfCoupons;
+    @ApiModelProperty(name = "couponSpecies", value = "息票品种")
+    private String couponSpecies;
 
     @ApiModelProperty(name = "interestPaymentFrequency", value = "付息频率")
     private String interestPaymentFrequency;
@@ -476,15 +476,6 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     public void setSecondaryClassification(String secondaryClassification) {
         this.secondaryClassification = secondaryClassification;
     }
-
-    public String getVarietyOfCoupons() {
-        return varietyOfCoupons;
-    }
-
-    public void setVarietyOfCoupons(String varietyOfCoupons) {
-        this.varietyOfCoupons = varietyOfCoupons;
-    }
-
     public String getInterestPaymentFrequency() {
         return interestPaymentFrequency;
     }
@@ -763,5 +754,13 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
 
     public void setDelistingDate(Date delistingDate) {
         this.delistingDate = delistingDate;
+    }
+
+    public String getCouponSpecies() {
+        return couponSpecies;
+    }
+
+    public void setCouponSpecies(String couponSpecies) {
+        this.couponSpecies = couponSpecies;
     }
 }
