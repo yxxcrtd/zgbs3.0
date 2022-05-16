@@ -165,6 +165,9 @@ public class MessageSenderHelper {
             tradeMessage.setFullPrice(trade.getTradedVolume() > 0 ?
                     TradeUtils.divide(trade.getTradedBalance(), trade.getTradedVolume(), BigDecimal.ROUND_HALF_UP).doubleValue() : 0);
         }
+        if (Objects.nonNull(trade.getFullPrice()) && trade.getFullPrice().compareTo(BigDecimal.ZERO) > 0) {
+            tradeMessage.setFullPrice(trade.getFullPrice().doubleValue());
+        }
 
         //协议回购
         if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {

@@ -3936,7 +3936,13 @@
                         } else {
                             num = parseFloat(datas[i].entrustNum);
                         }
-                        entrustNum += parseInt(num);
+                        var ps1 = $("#ps_" + currentTab).val();
+                        console.log( "3939 +++ " + num + ps + ":" + PS_T68);
+                        if(ps1 == PS_T68 || ps1 == PS_T69){
+                            entrustNum += num;
+                        }else{
+                            entrustNum += parseInt(num);
+                        }
                     }
                     $("#entrustNum_" + currentTab).val(entrustNum);
                     calcEntrustNumAndAmt();
@@ -3976,7 +3982,13 @@
                     if (array[0].ps == PS_T68 || array[0].ps == PS_T69) {
                         $("#entrustAmout_total_label").text("标准券数量");
                         var entrustAmt = $("#entrustAmt_" + currentTab).val();
-                        $("#entrustAmt_" + currentTab).val(Math.floor(new Number(entrustAmt)));
+                        console.log("3985" + ":" + entrustAmt);
+                        var ps = $("#ps_" + currentTab).val();
+                        if(ps == PS_T68 || ps == PS_T69){
+                            $("#entrustAmt_" + currentTab).val(entrustAmt);
+                        }else {
+                            $("#entrustAmt_" + currentTab).val(Math.floor(new Number(entrustAmt)));
+                        }
                     } else {
                         $("#entrustAmout_total_label").text("指令金额");
                     }
@@ -4057,12 +4069,21 @@
         var array = dateTable.getAllRows();
         var len = array.length;
         var entrustNumForOne = entrustNum / len;
+        var ps = $("#ps_" + currentTab).val();
         for (var i = 0; i < array.length; i++) {
             if (array[i].acctNo) {
                 if(i == 0){
-                    array[i].entrustNum = Math.ceil(entrustNumForOne);
+                    if(ps == PS_T68 || ps == PS_T69){
+                        array[i].entrustNum = Math.ceil(entrustNumForOne*100)/100;
+                    }else {
+                        array[i].entrustNum = Math.ceil(entrustNumForOne);
+                    }
                 }else {
-                    array[i].entrustNum = Math.floor(entrustNumForOne);
+                    if(ps == PS_T68 || ps == PS_T69){
+                        array[i].entrustNum = Math.floor(entrustNumForOne*100)/100;
+                    }else {
+                        array[i].entrustNum = Math.floor(entrustNumForOne);
+                    }
                 }
                 array[i].entrustAmt = entrustAmt / len;
             }

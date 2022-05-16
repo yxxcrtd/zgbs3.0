@@ -554,7 +554,7 @@ public class PortfolioManager extends BaseService {
             calculateResponse.setInstructionLeftNum(orderVolume.compareTo(BigDecimal.ZERO) == 0 ? 0 : NumberUtil.div(leftNum * item.getEntrustNum(), orderVolume).longValue());
         }
         // 债券交易类，使用全价进行计算后恢复订单价格
-//        recoverPrice(instruction, list, orginEntrustPrice, entrustProp);
+        recoverPrice(instruction, list, orginEntrustPrice, entrustProp);
 
         log.debug("queryPortfolioCalculate() called with result => 【list = {}】", JSONUtil.toJsonStr(list));
         return ResultBean.success(list);
@@ -573,7 +573,7 @@ public class PortfolioManager extends BaseService {
 
     private void recoverPrice(Instruction instruction, List<PortfolioCalculateResponse> list, BigDecimal price, String entrustProp) {
         if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())
-                && !EntrustUtils.isNoTrade(entrustProp)) {
+                && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             list.forEach(item -> item.setEntrustPrice(price));
         }
     }

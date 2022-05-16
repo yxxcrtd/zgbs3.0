@@ -56,6 +56,9 @@ public class CfetsTrdBondFirstSubEntrustDetailDto {
     @ApiModelProperty(required = false, name = "rate", value = "票面利率")
     private BigDecimal rate;
 
+    @ApiModelProperty(required = false, name = "referenceRateStr", value = "票面利率(附息-固定时显示 基准利率+BP))")
+    private String referenceRateStr;
+
     @ApiModelProperty(required = false, name = "secManageAcctId", value = "证券账户")
     private String secManageAcctId;
 
@@ -258,6 +261,14 @@ public class CfetsTrdBondFirstSubEntrustDetailDto {
 
     public void setProductDtos(List<CfetsTrdBondFirstSubEntrustProductDto> productDtos) {
         this.productDtos = productDtos;
+    }
+
+    public String getReferenceRateStr() {
+        return referenceRateStr;
+    }
+
+    public void setReferenceRateStr(String referenceRateStr) {
+        this.referenceRateStr = referenceRateStr;
     }
 }
 

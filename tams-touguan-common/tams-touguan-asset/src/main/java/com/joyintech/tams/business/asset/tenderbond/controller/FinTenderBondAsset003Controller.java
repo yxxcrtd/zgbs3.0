@@ -145,7 +145,6 @@ public class FinTenderBondAsset003Controller extends BaseController {
         try {
             finTenderBoundAsset003Service.start(processParameter, dto);
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error("新债标的流程发起失败", e);
             return Message.fail("流程发起失败");
         }

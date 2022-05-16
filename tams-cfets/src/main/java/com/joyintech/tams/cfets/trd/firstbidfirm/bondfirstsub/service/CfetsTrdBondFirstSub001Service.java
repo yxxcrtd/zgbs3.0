@@ -44,6 +44,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 /**
@@ -382,12 +383,26 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
         List<CfetsTrdBondFirstSubEntrustDetailDto> formData = cfetsTrdBondFirstSub001Mapper.getEntrustInfo(param);
         List<CfetsTrdBondFirstSubEntrustProductDto> productDtos = new ArrayList<>();
         logger.debug("获取指令详细信息,查询数据:" + JsonUtils.object2Json(formData));
-        // 表单格式
-        result.put("form", getReadonlyForms(new ArrayList<>()));
         if (StringUtil.isNotEmpty(formData)) {
             // 表单数据
-            result.put("formData", formData.get(0));
+            CfetsTrdBondFirstSubEntrustDetailDto data = formData.get(0);
+            result.put("formData", data);
             productDtos = formData.get(0).getProductDtos();
+            // 表单格式 当息票品种为零息、贴现、利随本清或附息-浮动利率时显示参考收益率(02) 当息票品种为附息-固定利率时显示票面利率(01)
+            List<String> spcdCodeList = new ArrayList<>();
+            if (StringUtil.isNotEmpty(data.getRate())) {//当息票品种为附息-固定利率时显示票面利率
+                spcdCodeList.add("01");
+                data.setReferenceRateStr(ArithmeticUtil.round(
+                        ArithmeticUtil.multiply(data.getRate(), new BigDecimal(100)), 4, RoundingMode.HALF_UP) + "%");
+            } else if (StringUtil.isNotEmpty(data.getReferenceRateStr())) {//当息票品种为附息-浮动利率时显示参考收益率
+                spcdCodeList.add("02");
+                data.setReferenceRateStr(data.getReferenceRateStr() + "BP");
+            } else {//当息票品种为零息、贴现、利随本清时显示参考收益率
+                spcdCodeList.add("02");
+                data.setReferenceRateStr(ArithmeticUtil.round(
+                        ArithmeticUtil.multiply(data.getReferenceRate(), new BigDecimal(100)), 4, RoundingMode.HALF_UP) + "%");
+            }
+            result.put("form", getReadonlyForms(spcdCodeList));
         }
         // 表格格式
         result.put("table", getBySpcdCodes(new ArrayList<>()));

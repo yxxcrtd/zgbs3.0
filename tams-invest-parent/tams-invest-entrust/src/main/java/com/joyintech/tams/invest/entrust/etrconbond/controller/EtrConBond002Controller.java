@@ -58,7 +58,8 @@ import java.util.Map;
 @PageId("EtrConBond002")
 @RequestMapping("/invest/entrust/etrconbond/EtrConBond002")
 public class EtrConBond002Controller extends BaseController {
-    
+
+
     /**
      * 业务编号组件
      */
@@ -76,7 +77,8 @@ public class EtrConBond002Controller extends BaseController {
     @Autowired
     private FinProductMapper finProductMapper;
 
-    private static PtlPortfolioMapper ptlPortfolioMapper;
+    @Autowired
+    private PtlPortfolioMapper ptlPortfolioMapper;
 
     @Override
     public String init(Model model) {
@@ -296,7 +298,7 @@ public class EtrConBond002Controller extends BaseController {
     }
 
 
-    public static Message ajaxErrorReturn(Exception e) {
+    public Message ajaxErrorReturn(Exception e) {
         String message = e.getMessage();
         if (StringUtil.isNotEmpty(message)){
             String[] arr = message.split("\\|");
@@ -305,7 +307,9 @@ public class EtrConBond002Controller extends BaseController {
                 if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, arr1[1].trim()) ||
                         StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, arr1[1].trim())) {
                     // 头寸返回对象
-                    BaseMap data = JsonUtils.json2Object(arr[1], BaseMap.class);
+                    String a=arr[1];
+                    String b=a.replaceAll("&quot;","\"");
+                    BaseMap data = JsonUtils.json2Object(b, BaseMap.class);
 
                     StringBuffer strb = null;
                     Map responseMap_data = (Map) data.get("data");
