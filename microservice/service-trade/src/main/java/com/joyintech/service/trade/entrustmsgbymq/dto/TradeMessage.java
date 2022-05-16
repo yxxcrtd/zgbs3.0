@@ -2,6 +2,7 @@ package com.joyintech.service.trade.entrustmsgbymq.dto;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
 public class TradeMessage implements Cloneable, Serializable {
     private String entrustId;       // 委托代码
@@ -30,6 +31,19 @@ public class TradeMessage implements Cloneable, Serializable {
     private BigDecimal dealMargin;      //交易保证金
     private BigDecimal pledgeRatio;      //折算比例
     private String counterId;       //交易对手
+
+    /**
+     * 下单组合明细数据消息
+     */
+    private List<PortfolioTradeMessage> portfolioTradeMessages;
+
+    public List<PortfolioTradeMessage> getPortfolioTradeMessages() {
+        return portfolioTradeMessages;
+    }
+
+    public void setPortfolioTradeMessages(List<PortfolioTradeMessage> portfolioTradeMessages) {
+        this.portfolioTradeMessages = portfolioTradeMessages;
+    }
 
     public String getEntrustId() {
         return entrustId;

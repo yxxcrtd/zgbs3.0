@@ -4,6 +4,7 @@ import com.joyintech.tams.exchange.common.enums.IEnum;
 
 /**
  * 担保/非担保枚举
+ *
  * @author swwan
  * @date 2022/4/26 - 16:33
  */
@@ -11,10 +12,10 @@ public enum GuaranteedEnum implements IEnum<String> {
 
     NON_GUARANTEED("Y", "非担保"),
     GUARANTEED("N", "担保"),
-            ;
+    ;
 
-    public final String code;
-    public final String description;
+    private final String code;
+    private final String description;
 
     GuaranteedEnum(String code, String description) {
         this.code = code;

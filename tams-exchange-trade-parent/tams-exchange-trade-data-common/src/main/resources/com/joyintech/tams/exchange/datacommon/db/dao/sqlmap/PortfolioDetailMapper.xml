@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailMapper">
+  <resultMap id="BaseResultMap" type="com.joyintech.tams.exchange.common.db.domain.PortfolioDetail">
+    <!--@mbg.generated-->
+    <!--@Table T_PORTFOLIO_DETAIL-->
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="BUSI_TYPE" jdbcType="VARCHAR" property="busiType" />
+    <result column="BUSI_ID" jdbcType="VARCHAR" property="busiId" />
+    <result column="BUSI_STATUS" jdbcType="VARCHAR" property="busiStatus" />
+    <result column="INSTRUCTION_ID" jdbcType="VARCHAR" property="instructionId" />
+    <result column="PORTFOLIO_ID" jdbcType="VARCHAR" property="portfolioId" />
+    <result column="PORTFOLIO_NAME" jdbcType="VARCHAR" property="portfolioName" />
+    <result column="TARGET_AMT" jdbcType="DECIMAL" property="targetAmt" />
+    <result column="TARGET_NUM" jdbcType="DECIMAL" property="targetNum" />
+    <result column="TARGET_TYPE" jdbcType="VARCHAR" property="targetType" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <!--@mbg.generated-->
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <!--@mbg.generated-->
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, BUSI_TYPE, BUSI_ID, BUSI_STATUS, INSTRUCTION_ID, PORTFOLIO_ID, PORTFOLIO_NAME, 
+    TARGET_AMT, TARGET_NUM, TARGET_TYPE
+  </sql>
+  <select id="selectByExample" parameterType="com.joyintech.tams.exchange.common.db.domain.PortfolioDetailExample" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from T_PORTFOLIO_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from T_PORTFOLIO_DETAIL
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    <!--@mbg.generated-->
+    delete from T_PORTFOLIO_DETAIL
+    where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.joyintech.tams.exchange.common.db.domain.PortfolioDetailExample">
+    <!--@mbg.generated-->
+    delete from T_PORTFOLIO_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.joyintech.tams.exchange.common.db.domain.PortfolioDetail">
+    <!--@mbg.generated-->
+    <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.String">
+      select T_PORTFOLIO_DETAIL_ID_SEQ.nextval from dual
+    </selectKey>
+    insert into T_PORTFOLIO_DETAIL (ID, BUSI_TYPE, BUSI_ID, 
+      BUSI_STATUS, INSTRUCTION_ID, PORTFOLIO_ID, 
+      PORTFOLIO_NAME, TARGET_AMT, TARGET_NUM, 
+      TARGET_TYPE)
+    values (#{id,jdbcType=VARCHAR}, #{busiType,jdbcType=VARCHAR}, #{busiId,jdbcType=VARCHAR}, 
+      #{busiStatus,jdbcType=VARCHAR}, #{instructionId,jdbcType=VARCHAR}, #{portfolioId,jdbcType=VARCHAR}, 
+      #{portfolioName,jdbcType=VARCHAR}, #{targetAmt,jdbcType=DECIMAL}, #{targetNum,jdbcType=DECIMAL}, 
+      #{targetType,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.joyintech.tams.exchange.common.db.domain.PortfolioDetail">
+    <!--@mbg.generated-->
+    <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.String">
+      select T_PORTFOLIO_DETAIL_ID_SEQ.nextval from dual
+    </selectKey>
+    insert into T_PORTFOLIO_DETAIL
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      ID,
+      <if test="busiType != null">
+        BUSI_TYPE,
+      </if>
+      <if test="busiId != null">
+        BUSI_ID,
+      </if>
+      <if test="busiStatus != null">
+        BUSI_STATUS,
+      </if>
+      <if test="instructionId != null">
+        INSTRUCTION_ID,
+      </if>
+      <if test="portfolioId != null">
+        PORTFOLIO_ID,
+      </if>
+      <if test="portfolioName != null">
+        PORTFOLIO_NAME,
+      </if>
+      <if test="targetAmt != null">
+        TARGET_AMT,
+      </if>
+      <if test="targetNum != null">
+        TARGET_NUM,
+      </if>
+      <if test="targetType != null">
+        TARGET_TYPE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      #{id,jdbcType=VARCHAR},
+      <if test="busiType != null">
+        #{busiType,jdbcType=VARCHAR},
+      </if>
+      <if test="busiId != null">
+        #{busiId,jdbcType=VARCHAR},
+      </if>
+      <if test="busiStatus != null">
+        #{busiStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="instructionId != null">
+        #{instructionId,jdbcType=VARCHAR},
+      </if>
+      <if test="portfolioId != null">
+        #{portfolioId,jdbcType=VARCHAR},
+      </if>
+      <if test="portfolioName != null">
+        #{portfolioName,jdbcType=VARCHAR},
+      </if>
+      <if test="targetAmt != null">
+        #{targetAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="targetNum != null">
+        #{targetNum,jdbcType=DECIMAL},
+      </if>
+      <if test="targetType != null">
+        #{targetType,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.joyintech.tams.exchange.common.db.domain.PortfolioDetailExample" resultType="java.lang.Long">
+    <!--@mbg.generated-->
+    select count(*) from T_PORTFOLIO_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    <!--@mbg.generated-->
+    update T_PORTFOLIO_DETAIL
+    <set>
+      <if test="record.id != null">
+        ID = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.busiType != null">
+        BUSI_TYPE = #{record.busiType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.busiId != null">
+        BUSI_ID = #{record.busiId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.busiStatus != null">
+        BUSI_STATUS = #{record.busiStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="record.instructionId != null">
+        INSTRUCTION_ID = #{record.instructionId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.portfolioId != null">
+        PORTFOLIO_ID = #{record.portfolioId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.portfolioName != null">
+        PORTFOLIO_NAME = #{record.portfolioName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.targetAmt != null">
+        TARGET_AMT = #{record.targetAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.targetNum != null">
+        TARGET_NUM = #{record.targetNum,jdbcType=DECIMAL},
+      </if>
+      <if test="record.targetType != null">
+        TARGET_TYPE = #{record.targetType,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    <!--@mbg.generated-->
+    update T_PORTFOLIO_DETAIL
+    set ID = #{record.id,jdbcType=VARCHAR},
+      BUSI_TYPE = #{record.busiType,jdbcType=VARCHAR},
+      BUSI_ID = #{record.busiId,jdbcType=VARCHAR},
+      BUSI_STATUS = #{record.busiStatus,jdbcType=VARCHAR},
+      INSTRUCTION_ID = #{record.instructionId,jdbcType=VARCHAR},
+      PORTFOLIO_ID = #{record.portfolioId,jdbcType=VARCHAR},
+      PORTFOLIO_NAME = #{record.portfolioName,jdbcType=VARCHAR},
+      TARGET_AMT = #{record.targetAmt,jdbcType=DECIMAL},
+      TARGET_NUM = #{record.targetNum,jdbcType=DECIMAL},
+      TARGET_TYPE = #{record.targetType,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.exchange.common.db.domain.PortfolioDetail">
+    <!--@mbg.generated-->
+    update T_PORTFOLIO_DETAIL
+    <set>
+      <if test="busiType != null">
+        BUSI_TYPE = #{busiType,jdbcType=VARCHAR},
+      </if>
+      <if test="busiId != null">
+        BUSI_ID = #{busiId,jdbcType=VARCHAR},
+      </if>
+      <if test="busiStatus != null">
+        BUSI_STATUS = #{busiStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="instructionId != null">
+        INSTRUCTION_ID = #{instructionId,jdbcType=VARCHAR},
+      </if>
+      <if test="portfolioId != null">
+        PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR},
+      </if>
+      <if test="portfolioName != null">
+        PORTFOLIO_NAME = #{portfolioName,jdbcType=VARCHAR},
+      </if>
+      <if test="targetAmt != null">
+        TARGET_AMT = #{targetAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="targetNum != null">
+        TARGET_NUM = #{targetNum,jdbcType=DECIMAL},
+      </if>
+      <if test="targetType != null">
+        TARGET_TYPE = #{targetType,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.joyintech.tams.exchange.common.db.domain.PortfolioDetail">
+    <!--@mbg.generated-->
+    update T_PORTFOLIO_DETAIL
+    set BUSI_TYPE = #{busiType,jdbcType=VARCHAR},
+      BUSI_ID = #{busiId,jdbcType=VARCHAR},
+      BUSI_STATUS = #{busiStatus,jdbcType=VARCHAR},
+      INSTRUCTION_ID = #{instructionId,jdbcType=VARCHAR},
+      PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR},
+      PORTFOLIO_NAME = #{portfolioName,jdbcType=VARCHAR},
+      TARGET_AMT = #{targetAmt,jdbcType=DECIMAL},
+      TARGET_NUM = #{targetNum,jdbcType=DECIMAL},
+      TARGET_TYPE = #{targetType,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateBatch" parameterType="java.util.List">
+    <!--@mbg.generated-->
+    update T_PORTFOLIO_DETAIL
+    <trim prefix="set" suffixOverrides=",">
+      <trim prefix="BUSI_TYPE = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          when ID = #{item.id,jdbcType=VARCHAR} then #{item.busiType,jdbcType=VARCHAR}
+        </foreach>
+      </trim>
+      <trim prefix="BUSI_ID = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          when ID = #{item.id,jdbcType=VARCHAR} then #{item.busiId,jdbcType=VARCHAR}
+        </foreach>
+      </trim>
+      <trim prefix="BUSI_STATUS = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          when ID = #{item.id,jdbcType=VARCHAR} then #{item.busiStatus,jdbcType=VARCHAR}
+        </foreach>
+      </trim>
+      <trim prefix="INSTRUCTION_ID = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          when ID = #{item.id,jdbcType=VARCHAR} then #{item.instructionId,jdbcType=VARCHAR}
+        </foreach>
+      </trim>
+      <trim prefix="PORTFOLIO_ID = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          when ID = #{item.id,jdbcType=VARCHAR} then #{item.portfolioId,jdbcType=VARCHAR}
+        </foreach>
+      </trim>
+      <trim prefix="PORTFOLIO_NAME = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          when ID = #{item.id,jdbcType=VARCHAR} then #{item.portfolioName,jdbcType=VARCHAR}
+        </foreach>
+      </trim>
+      <trim prefix="TARGET_AMT = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          when ID = #{item.id,jdbcType=VARCHAR} then #{item.targetAmt,jdbcType=DECIMAL}
+        </foreach>
+      </trim>
+      <trim prefix="TARGET_NUM = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          when ID = #{item.id,jdbcType=VARCHAR} then #{item.targetNum,jdbcType=DECIMAL}
+        </foreach>
+      </trim>
+      <trim prefix="TARGET_TYPE = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          when ID = #{item.id,jdbcType=VARCHAR} then #{item.targetType,jdbcType=VARCHAR}
+        </foreach>
+      </trim>
+    </trim>
+    where ID in
+    <foreach close=")" collection="list" item="item" open="(" separator=", ">
+      #{item.id,jdbcType=VARCHAR}
+    </foreach>
+  </update>
+</mapper>

@@ -264,13 +264,28 @@ public class TradeInfoPro001Controller extends BaseController {
             }
             //深交所交易主体类型为机构经济/个人经济时，交易主体代码应只允许维护一条
             if(StringUtil.equals(dto.getTradeMarket(),"04")&&(StringUtil.equals(dto.getDealerPartyType(),"03"))){
-                 if (existsDealerParty(dto)>0){
+                 if (hasDealerParty(dto)==0){
+                    if (existsDealerParty(dto)>0){
                      return new Message().fail().setMessage("深交所交易主体类型为机构经济时,交易主体代码应只允许维护一条!");
+                    }
+                }else {
+                     if (hasSameTrader(dto)>0){
+                         return new Message().fail().setMessage("同一个交易主体下，交易员代码不能重复!");
+                     }
                  }
             }
             if(StringUtil.equals(dto.getTradeMarket(),"04")&&(StringUtil.equals(dto.getDealerPartyType(),"04"))){
-                if (existsDealerParty(dto)>0){
-                    return new Message().fail().setMessage("深交所交易主体类型为个人经济时,交易主体代码应只允许维护一条!");
+//                if (existsDealerParty(dto)>0){
+//                    return new Message().fail().setMessage("深交所交易主体类型为个人经济时,交易主体代码应只允许维护一条!");
+//                }
+                if (hasDealerParty(dto)==0){
+                    if (existsDealerParty(dto)>0){
+                        return new Message().fail().setMessage("深交所交易主体类型为个人经济时,交易主体代码应只允许维护一条!");
+                    }
+                }else {
+                    if (hasSameTrader(dto)>0){
+                        return new Message().fail().setMessage("同一个交易主体下，交易员代码不能重复!");
+                    }
                 }
             }
 
@@ -283,6 +298,14 @@ public class TradeInfoPro001Controller extends BaseController {
             return new Message().fail().setMessage("新增异常");
 
         }
+    }
+
+    private int hasSameTrader(TradeInfoProSaveRequest dto) {
+        return tradeInfoPro001Service.hasSameTrader(dto);
+    }
+
+    private int hasDealerParty(TradeInfoProSaveRequest dto) {
+        return tradeInfoPro001Service.hasDealerParty(dto);
     }
 
     private int existsDealerParty(TradeInfoProSaveRequest dto) {

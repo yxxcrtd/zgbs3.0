@@ -356,10 +356,11 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
     }
 
     private void doCompleteDelete(FinBondAssetSaveRequest entity) {
+        Long branch = StringUtil.isEmpty(CacheUtil.getSysParam(BussinessConstant.NOBRANCHNOVALUE)) ? 0 : Long.parseLong(CacheUtil.getSysParam(BussinessConstant.NOBRANCHNOVALUE));
         finProductMapper.deleteByPrimaryKey(entity.getFinprodId());
         finProductAddMapper.deleteByPrimaryKey(entity.getFinprodId());
         FinProductTypeKey finProductTypeKey = new FinProductTypeKey();
-        finProductTypeKey.setBranch(entity.getBranch());
+        finProductTypeKey.setBranch(branch);
         finProductTypeKey.setFinprodId(entity.getFinprodId());
         finProductTypeMapper.deleteByPrimaryKey(finProductTypeKey);
         finProductConvertibleMapper.deleteByPrimaryKey(entity.getFinprodId());
@@ -628,6 +629,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             finRateInfo.setCashId(finCashInfoInterest.getCashId());
             finRateInfo.setEffDate(dto.getVdate());
             finRateInfo.setIntType(dto.getCalcType());
+            finRateInfo.setBranch(branch);
             finRateInfo.setBasis(getBasis(finInterestFactorDto.getBasis()));
             BeanUtil.copyPropertiesIgnoreNull(finRateInfo,finInterestFactorDto);
             finRateInfo.setFinprodId(dto.getFinprodId());
@@ -679,7 +681,12 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                 }else{
                     invRepay.setCashType(DictCodeList.现金流类型_中间还本.getValue());
                 }
-                Date vdate = bondFinCashPlanDto.getVdate();Date mdate = bondFinCashPlanDto.getMdate();
+                Date vdate = bondFinCashPlanDto.getVdate();
+                if (StringUtil.equals(dto.getFinPayInterestStdInfoDto().getCouponSpecies(),DictCodeList.息票品种_零息.getValue())
+                        ||StringUtil.equals(dto.getFinPayInterestStdInfoDto().getCouponSpecies(),DictCodeList.息票品种_贴现.getValue())){
+                    vdate = dto.getVdate();
+                }
+                Date mdate = bondFinCashPlanDto.getMdate();
                 long termdays  = DateUtil.getBetweenDayNumber(DateUtil.format(vdate),DateUtil.format(mdate));
                 invRepay.setTermdays(termdays);
                 invRepay.setFrequency((long)invSchedules.size());
@@ -1286,12 +1293,12 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                 for(FinCashPlan finCashPlanEntity:dto.getInvScheduleList()){
                     if(null==finCashPlanEntity.getVdate()){
                         resultList.add(new ValidMessage("",
-                                getMessage("COMMON_E_0057", getMessage("BussFinRepayment.vdate"))));
+                                getMessage("BUSS_COM_E_0069", getMessage("BussFinRepayment.vdate"))));
                         return resultList;
                     }
                     if(null==finCashPlanEntity.getMdate()){
                         resultList.add(new ValidMessage("",
-                                getMessage("COMMON_E_0057", getMessage("BussFinRepayment.mdate"))));
+                                getMessage("BUSS_COM_E_0069", getMessage("BussFinRepayment.mdate"))));
                         return resultList;
                     }else{
                         if(null!=dto.getVdate()){
@@ -1301,6 +1308,11 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                                         getMessage("FIN_ASSET_E_0016")));
                             }
                         }
+                    }
+                    if(null==finCashPlanEntity.getPayDate()){
+                        resultList.add(new ValidMessage("",
+                                getMessage("BUSS_COM_E_0069", getMessage("BussFinRepayment.payDate"))));
+                        return resultList;
                     }
                     if(DateUtil.compareDate(finCashPlanEntity.getVdate(),finCashPlanEntity.getMdate())>0){
                         resultList.add(new ValidMessage(
@@ -1323,6 +1335,13 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                         return o1.getVdate().compareTo(o2.getVdate());
                     }
                 });
+                for (int i = 0; i < dto.getInvScheduleList().size()-1; i++) {
+                    if (DateUtil.compareDate(dto.getInvScheduleList().get(i).getMdate(),dto.getInvScheduleList().get(i+1).getVdate())!=0){
+                        resultList.add(new ValidMessage(
+                                "付息计划不正确，上一条数据的计息截止日必须等于下一条数据的计息开始日"));
+                        return resultList;
+                    }
+                }
                 //第一条计息开始日==起息日
                 Date firstVdateUnadjust = dto.getInvScheduleList().get(0).getVdate();
                 //最后一条计息截止日==到期日
@@ -1343,6 +1362,10 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             }
             if(null!=dto.getInvRepayList()&&!dto.getInvRepayList().isEmpty()){
                 for(FinCashPlan finCashPlanEntity:dto.getInvRepayList()){
+                    if(null==finCashPlanEntity.getPayDate()){
+                        resultList.add(new ValidMessage("还本计划列表中支付日不能为空"));
+                        return resultList;
+                    }
                     if(null==finCashPlanEntity.getMdate()){
                         resultList.add(new ValidMessage("",
                                 getMessage("COMMON_E_0057", getMessage("BussFinRepayment.mdate"))));

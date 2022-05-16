@@ -140,4 +140,12 @@ public class TradeInfoPro001Service extends BaseService implements BaseProcessSe
     public int existsDealerParty(TradeInfoProSaveRequest dto) {
         return tradeInfoProMapper.existsDealerParty(dto);
     }
+
+    public int hasDealerParty(TradeInfoProSaveRequest dto) {
+        return tradeInfoProMapper.hasDealerParty(dto);
+    }
+
+    public int hasSameTrader(TradeInfoProSaveRequest dto) {
+        return tradeInfoProMapper.hasSameTrader(dto);
+    }
 }
