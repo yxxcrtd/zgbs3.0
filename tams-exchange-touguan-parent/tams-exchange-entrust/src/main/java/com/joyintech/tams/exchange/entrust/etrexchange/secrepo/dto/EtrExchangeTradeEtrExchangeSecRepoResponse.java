@@ -11,12 +11,17 @@
 package com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.entrust.etrexchange.hqjj.dto.EtrExchangeTradeJj003Dto;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.thymeleaf.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -729,6 +734,9 @@ public class EtrExchangeTradeEtrExchangeSecRepoResponse {
     }
 
     public String getFinishAmt() {
+        if (StringUtil.equals(getAssetType(), BussinessDictCodeList.平安资产类型_回购.getValue())) {
+            return ArithmeticUtil.divide(new BigDecimal(finishAmt),new BigDecimal("10000"),2).toString();
+        }
         return finishAmt;
     }
 
@@ -737,6 +745,9 @@ public class EtrExchangeTradeEtrExchangeSecRepoResponse {
     }
 
     public String getAvaNum() {
+        if (StringUtil.equals(getAssetType(), BussinessDictCodeList.平安资产类型_回购.getValue())) {
+            return ArithmeticUtil.divide(new BigDecimal(avaNum),new BigDecimal("10000"),2).toString();
+        }
         return avaNum;
     }
 
@@ -745,6 +756,9 @@ public class EtrExchangeTradeEtrExchangeSecRepoResponse {
     }
 
     public String getFinishDealAmt() {
+        if (StringUtil.equals(getAssetType(), BussinessDictCodeList.平安资产类型_回购.getValue())) {
+            return ArithmeticUtil.divide(new BigDecimal(finishDealAmt),new BigDecimal("10000"),2).toString();
+        }
         return finishDealAmt;
     }
 
@@ -753,6 +767,9 @@ public class EtrExchangeTradeEtrExchangeSecRepoResponse {
     }
 
     public String getAvaDealAmt() {
+        if (StringUtil.equals(getAssetType(), BussinessDictCodeList.平安资产类型_回购.getValue())) {
+            return ArithmeticUtil.divide(new BigDecimal(avaDealAmt),new BigDecimal("10000"),2).toString();
+        }
         return avaDealAmt;
     }
 

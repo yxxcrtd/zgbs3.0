@@ -173,7 +173,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 }
                 if (!operationType.equals(OperationType.REVOKE) && !operationType.equals(OperationType.DELETE)) {
                     // 发送头寸
-                   // this.sendPositionMethod(entity, StringUtil.equals(entity.getSystemAct(), DictCodeListExt3.系统动作_新建.getValue()), null);
+                    this.sendPositionMethod(entity, StringUtil.equals(entity.getSystemAct(), DictCodeListExt3.系统动作_新建.getValue()), null);
                     if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))){
                         // 老头寸处理
                         this.dealOldPosition(entity, false);
@@ -302,7 +302,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             }
             //发送头寸
             try {
-               // sendPositionMethod(entity, isSubmit, confirmOk);
+                sendPositionMethod(entity, isSubmit, confirmOk);
             } catch (Exception e) {
                 Message message = PositionUtil.ajaxErrorReturn(e);
                 BaseMap bm = (BaseMap) message.getData();
