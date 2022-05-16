@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiModelProperty;
 import org.thymeleaf.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * 场内指令分发
@@ -248,7 +249,7 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
         if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
             return null;
         }
-        return String.valueOf(super.getEntrustNum());
+        return String.valueOf(super.getEntrustNum() == null ? "" : super.getEntrustNum().setScale(2, RoundingMode.HALF_UP));
     }
     public void setOtherPs(String otherPs) {
         this.otherPs = otherPs;
@@ -356,7 +357,7 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
         if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
             return getEtrPrice() == null ? "" : getEtrPrice().setScale(3,BigDecimal.ROUND_HALF_UP) + " %";
         }
-        return getEtrPrice() == null ? "" : getEtrPrice().toString();
+        return getEtrPrice() == null ? "" : getEtrPrice().setScale(4, RoundingMode.HALF_UP).toString();
     }
 
     public void setEtrPrice(BigDecimal etrPrice) {
