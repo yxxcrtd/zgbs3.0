@@ -137,11 +137,11 @@ public class FinTenderBondAsset003Controller extends BaseController {
             processParameter.setOperationType(OperationType.REVOKE);
         }
         processParameter.setWorkFlowParameter(params);
-        FinTenderBondAsset003Dto asset003Dto = finTenderBoundAsset003Service.getById(dto.getFinprodId());
+       /* FinTenderBondAsset003Dto asset003Dto = finTenderBoundAsset003Service.getById(dto.getFinprodId());
         if(Objects.nonNull(asset003Dto)) {
             dto.setAppearMarketId(asset003Dto.getAppearMarketId());
             dto.setAppearMarketAbbr(asset003Dto.getAppearMarketAbbr());
-        }
+        }*/
         try {
             finTenderBoundAsset003Service.start(processParameter, dto);
         } catch (Exception e) {
