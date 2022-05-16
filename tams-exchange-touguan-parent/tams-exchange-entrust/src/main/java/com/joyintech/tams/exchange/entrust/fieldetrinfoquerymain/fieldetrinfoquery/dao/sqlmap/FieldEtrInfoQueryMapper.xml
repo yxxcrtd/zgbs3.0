@@ -83,22 +83,22 @@
         CASE
 
         WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-        ROUND( nvl( T5.ORDER_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( T5.ORDER_FINISH_AMT, 0 ), 4 )
+        decode(ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,'EX017',ROUND( nvl( T5.ORDER_FINISH_AMT/100, 0 ), 4 ),'EX018', ROUND( nvl( T5.ORDER_FINISH_AMT/100, 0 ), 4 ),ROUND( nvl( T5.ORDER_FINISH_AMT, 0 ), 4 )) ELSE ROUND( nvl( T5.ORDER_FINISH_AMT, 0 ), 4 )
         END AS execFinishAmt,
         CASE
 
         WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-        ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ), 4 )
+        decode(ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,'EX017',ROUND( (nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ))/100, 4 ),'EX018',ROUND( (nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ))/100, 4 ),ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ), 4 )) ELSE ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ), 4 )
         END AS execRemainderAmt,
         CASE
 
         WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-        ROUND( nvl( T5.ENT_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( T5.ENT_FINISH_AMT, 0 ), 4 )
+        decode(ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,'EX017',ROUND( nvl( T5.ENT_FINISH_AMT/100, 0 ), 4 ),'EX018',ROUND( nvl( T5.ENT_FINISH_AMT/100, 0 ), 4 ),ROUND( nvl( T5.ENT_FINISH_AMT, 0 ), 4 )) ELSE ROUND( nvl( T5.ENT_FINISH_AMT, 0 ), 4 )
         END AS transFinishAmt,
         CASE
 
         WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-        ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ), 4 )
+        decode(ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,'EX017',ROUND( (nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ))/100, 4 ),'EX018',ROUND( (nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ))/100, 4 ),ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ), 4 )) ELSE ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ), 4 )
         END AS transRemainderAmt,
         to_char(ETR_ENTRUST_ADD.TRANSMIT_TIME,'hh24:mi:ss') transmitTime,
         to_char(ETR_ENTRUST_ADD.TRANSMIT_TIME,'hh24:mi') transmitTimeSer,
