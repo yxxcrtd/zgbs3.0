@@ -119,7 +119,7 @@ public class CommonCheckKit extends BaseCheckKit {
             throw new BusinessResultException(ErrorCode.CHECK_ERROR,
                     builder.toString());
         } else if (TRD_PRICE_SCOPE_CONTROL_PROMPT.equals(trdPriceScopeControl) || trdPriceScopeControl == null) {
-            if (SwitcheEnum.OPEN.codeEquals(order.getSoftSkipMode())) {
+            if (!SwitcheEnum.OPEN.codeEquals(order.getOrderSoftControl())) {
                 return ResultBean.error(ErrorCode.TRIGGER_SOFT_CONTROL, builder.toString());
             }
         } else if (TRD_PRICE_SCOPE_CONTROL_ALLOW.equals(trdPriceScopeControl)) {

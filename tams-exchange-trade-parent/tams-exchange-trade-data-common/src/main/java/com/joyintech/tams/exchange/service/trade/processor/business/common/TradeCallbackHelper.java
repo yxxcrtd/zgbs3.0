@@ -1,18 +1,25 @@
 package com.joyintech.tams.exchange.service.trade.processor.business.common;
 
 import com.google.common.base.Strings;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.exchange.common.bean.ResultBean;
+import com.joyintech.tams.exchange.common.bean.investment.PortfolioTradeMessage;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
-import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt1;
 import com.joyintech.tams.exchange.common.db.domain.*;
+import com.joyintech.tams.exchange.common.enums.exchange.PortfolioDetailBusiTypeEnum;
 import com.joyintech.tams.exchange.common.utils.*;
+import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailByManualMapper;
+import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailMapper;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
 import com.joyintech.tams.exchange.service.trade.processor.MessageSenderManagement;
 import com.joyintech.tams.exchange.service.trade.processor.account.AccountPositionHelper;
 import com.joyintech.tams.exchange.service.trade.processor.business.bond.BondHelper;
 import com.joyintech.tams.exchange.service.trade.processor.others.SplitOrderHelper;
+import com.joyintech.tams.exchange.service.trade.processor.portfolio.PortfolioAssignHelper;
+import com.joyintech.tams.exchange.service.trade.processor.portfolio.PortfolioTradeMessageHelper;
 import com.joyintech.tams.exchange.service.trade.transaction.TransactionHelper;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +28,9 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.joyintech.tams.exchange.common.utils.TradeUtils.multiply;
 
@@ -57,6 +66,8 @@ public class TradeCallbackHelper {
     private InstrumentService instrumentService;
     @Autowired
     private MessageSenderManagement messageSenderManagement;
+    @Autowired
+    private PortfolioTradeMessageHelper portfolioTradeMessageHelper;
 
     public void onTrade(Trade tradeRecord) {
         logger.info("成交回报信息 {}", JsonUtils.getJsonFromObject(tradeRecord));
@@ -283,10 +294,19 @@ public class TradeCallbackHelper {
             }
             // 若指令全部完成，则更新指令状态为已完成
             updateInstructionStatus(instruction);
+
+            //组装成交组合分配
+            List<PortfolioTradeMessage> portfolioTradeMessages = portfolioTradeMessageHelper.buildPortfolioTradeMessage(entrust, tradeRecord, instruction);
+            if (CollectionUtils.isEmpty(portfolioTradeMessages)) {
+                logger.error("【未组装成交组合分配明】，不推送成交数据、不做手动交收：【instructionId={}】,【brokerTradeId={}】,【entrustId={}】",
+                        instruction.getEntrustId(), tradeRecord.getBrokerTradeId(), entrust.getId());
+                return;
+            }
+
             // 是否需要手工交收
             if (IntegratedEntrustUtils.isProtocolBack(tradeRecord.getEntrustProp())) {//协议回购
 //                messageSenderService.pushTradeToMQForFixedIncome(tradeRecord, instruction, entrust);
-                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust);
+                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust, portfolioTradeMessages);
                 return;
 //            } else if (InvestmentAssetType.isBond(instruction.getAssetType()) && TradePlat.needSettleTrade(instruction.getTradePlat())) {
                 //新债需求：判断债券哪些走手工交收，用标的是否非担保 =是 则走手工交收
@@ -295,13 +315,13 @@ public class TradeCallbackHelper {
 //                if (Objects.nonNull(instrument)) {
 //                    if (EntrustUtils.isSettleTrade(instrument.getTradePlat(), entrust.getEntrustProp())) {
 //                        messageSenderService.pushTradeToMQForFixedIncome(tradeRecord, instruction, entrust);
-                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust);
+                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust, portfolioTradeMessages);
                 return;
 //                    }
 //                }
             }
 //            messageSenderService.pushTradeToMQ(tradeRecord, instruction, entrust);
-            messageSenderManagement.pushTrade(tradeRecord, instruction, entrust);
+            messageSenderManagement.pushTrade(tradeRecord, instruction, entrust, portfolioTradeMessages);
         } else if (tradeRecord.getTradeType() == TradeType.INVALID.value) {
             if (entrust.getEntrustStatus() == EntrustStatus.INVALID.value) {
                 logger.info("委托已通过委托回报废单处理，忽略废单成交");

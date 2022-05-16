@@ -4,16 +4,18 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.google.common.base.Strings;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.exchange.common.bean.TerminalId;
-import com.joyintech.tams.exchange.common.bean.TrdExchangeEntrustDto;
-import com.joyintech.tams.exchange.common.bean.TrdExchangeIntegratedEntrustDto;
-import com.joyintech.tams.exchange.common.bean.WorkflowBean;
+import com.joyintech.tams.exchange.common.bean.*;
+import com.joyintech.tams.exchange.common.bean.investment.PortfolioTradeMessage;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
 import com.joyintech.tams.exchange.common.db.domain.*;
+import com.joyintech.tams.exchange.common.enums.exchange.PortfolioDetailBusiTypeEnum;
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
+import com.joyintech.tams.exchange.common.response.PortfolioCalculateResponse;
 import com.joyintech.tams.exchange.common.utils.*;
+import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailByManualMapper;
+import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailMapper;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
 import com.joyintech.tams.exchange.service.trade.management.service.InvestRiskManagement;
 import com.joyintech.tams.exchange.service.trade.management.service.ReviewManagement;
@@ -27,9 +29,13 @@ import com.joyintech.tams.exchange.service.trade.processor.delay.DelayController
 import com.joyintech.tams.exchange.service.trade.processor.delay.OrderRateController;
 import com.joyintech.tams.exchange.service.trade.processor.msg.MsgType;
 import com.joyintech.tams.exchange.service.trade.processor.others.SplitOrderHelper;
+import com.joyintech.tams.exchange.service.trade.processor.portfolio.PortfolioAssignHelper;
+import com.joyintech.tams.exchange.service.trade.processor.portfolio.PortfolioTradeMessageHelper;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgent;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgentManager;
 import com.joyintech.tams.exchange.service.trade.transaction.TransactionHelper;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,10 +45,8 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
 import static com.joyintech.tams.exchange.common.constant.EntrustStatus.*;
@@ -96,6 +100,8 @@ public class TradeMsgProcessor {
     private PositionRequestServiceInstructionRequest positionRequestServiceInstructionRequest;
     @Autowired
     private MessageSenderManagement messageSenderManagement;
+    @Autowired
+    private PortfolioTradeMessageHelper portfolioTradeMessageHelper;
 
     @Value("${yali.open:false}")
     private boolean yaliFlag;
@@ -809,6 +815,16 @@ public class TradeMsgProcessor {
                 instructionClone.setEntrustAmt(entrust.getEntrustPrice().multiply(BigDecimal.valueOf(entrust.getEntrustVolume() - entrust.getTradedVolume())));
             }
             instructionClone.setEntrustNum(entrust.getEntrustVolume() - entrust.getTradedVolume());
+
+            //组装撤单组合分配
+            List<PortfolioCalculateResponse> portfolioCalculateResponses = portfolioTradeMessageHelper.buildPortfolioCalculateResponse(entrust, instructionClone, PortfolioDetailBusiTypeEnum.CANCEL);
+            if (CollectionUtils.isEmpty(portfolioCalculateResponses)) {
+                logger.error("【未组装撤单组合分配明细】，不发送头寸：【instructionId={}】,【entrustId={}】",
+                        instruction.getEntrustId(), entrust.getId());
+                return;
+            }
+            instructionClone.setPortfolioCalculateResponses(portfolioCalculateResponses);
+
             positionRequestServiceInstructionRequest.sendRequest(instructionClone,
                     业务动作_撤委托.getValue(), 系统动作_新建.getValue(), 系统动作_新建.getValue());
             return;
@@ -817,6 +833,16 @@ public class TradeMsgProcessor {
         //下单生成委托，调用头寸引擎---start
         if (!(entrustStatus == INVALID.value
                 || entrustStatus == SYSTEM_INVALID.value)) {
+
+            //组装成交组合分配
+            List<PortfolioCalculateResponse> portfolioCalculateResponses = portfolioTradeMessageHelper.buildPortfolioCalculateResponse(entrust, instructionClone, PortfolioDetailBusiTypeEnum.ORDER);
+            if (CollectionUtils.isEmpty(portfolioCalculateResponses)) {
+                logger.error("【未组装下单组合分配明细】，不发送头寸：【instructionId={}】,【entrustId={}】",
+                        instruction.getEntrustId(), entrust.getId());
+                return;
+            }
+            instructionClone.setPortfolioCalculateResponses(portfolioCalculateResponses);
+
             positionRequestServiceInstructionRequest.sendRequest(instructionClone,
                     业务动作_交易下单.getValue(), 系统动作_新建.getValue(), 系统动作_新建.getValue());
         }

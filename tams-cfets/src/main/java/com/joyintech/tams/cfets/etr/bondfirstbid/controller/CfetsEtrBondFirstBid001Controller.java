@@ -27,6 +27,7 @@ import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIs
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.PtlSecAcctInfoRequest;
 import com.joyintech.tams.cfets.etr.bondfirstbid.service.CfetsEtrBondFirstBid001Service;
 import com.joyintech.tams.common.base.entity.SppiImportData;
+import com.joyintech.tams.component.business.common.service.DateCalService;
 import com.joyintech.tams.constant.DictCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -43,6 +44,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,9 +72,12 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
     @Autowired
     private EtrCommonFinProductInfoService etrCommonFinProductInfoService;
 
+    /**
+     * 日期相关
+     */
+    @Autowired
+    private DateCalService dateCalService;
 
-//    @Autowired
-//    private CommonManagement commonManagement;
 
     @ApiOperation(value = "查询页面初始化参数", notes = "查询页面初始化参数")
     @PostMapping("/getPageParams")
@@ -107,11 +112,14 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
         initPageParams.put("CUSTOM_ASSET_TYPE_FOUR", this.getSelectDataFromDataDic(DictCode.行内资产四级分类, null));
         initPageParams.put("TRADE_PLACE", this.getSelectDataFromDataDic(DictCode.交易场所, null));
 
-        //当前平台日
-        initPageParams.put("platDate", DateUtil.platDateFromCache());
+        // 获取平台日
+        Date tradeDate = DateUtil.platDateFromCache();
+        initPageParams.put("platDate", tradeDate);
         //平台日+5个交易日
-        //initPageParams.put("platDateBack", commonManagement.getTradeDate(tradeCalendarType, cDate, nDay));
-        initPageParams.put("platDateBack", DateUtil.platDateFromCache());
+        String calId = "01"; //中国法定节假日
+        List<String> holidayList = dateCalService.getDealCalendarHoliday(DateUtil.parse(DateUtil.format(tradeDate)), DateUtil.addDay(DateUtil.parse(DateUtil.format(tradeDate)), 15), calId);
+        Date tradeDateNext = dateCalService.calculationTradingDay(DateUtil.parse(DateUtil.format(tradeDate)), 5, holidayList, "1");
+        initPageParams.put("platDateBack", tradeDateNext);
         //当前用户
         initPageParams.put("userId", SecurityUtil.getLoginUser().getUserName());
         //pageId

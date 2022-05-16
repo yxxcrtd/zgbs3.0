@@ -83,7 +83,7 @@ public class OrderController {
             ResultBean commonCheckResult = commonCheckKit.check(order);
             if (ErrorCode.TRIGGER_SOFT_CONTROL.codeEquals(commonCheckResult.getErrorCode())) {
                 return new Message<>(Message.SUCCESS, null,
-                        new Message<>(String.valueOf(ErrorCode.TRIGGER_SOFT_CONTROL.getCode()), StrUtil.format("{}<br/>{}", commonCheckResult.getErrorMsg(), commonCheckResult.getData())));
+                        new Message<>(String.valueOf(ErrorCode.TRIGGER_SOFT_CONTROL.getCode()), (String) commonCheckResult.getData()));
             }
             if (ErrorCode.isFail(commonCheckResult.getErrorCode())) {
                 return new Message<>(commonCheckResult);

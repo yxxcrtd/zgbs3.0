@@ -440,4 +440,11 @@ public interface TrdCommonBaseMapper {
      * @return
      */
     TrdProductDeal getFirstRepoTrade(Map<String, Object> paraMap);
+
+    /**
+     * 查询下单组合明细数据
+     * @param seqNo
+     * @return
+     */
+    List<InfContractPortfolioDetail> getInfContractPortfolioDetails(String seqNo);
 }

@@ -103,6 +103,9 @@ public class FinTenderBondAsset001Dto extends BaseDto {
     @ApiModelProperty(name = "issueDate", value = "发行日")
     private Date issueDate;
 
+    @ApiModelProperty(name = "issueDate", value = "发行日")
+    private String issueDateStr;
+
     @ApiModelProperty(name = "payEdate", value = "缴款截止日")
     private Date payEdate;
 
@@ -731,5 +734,13 @@ public class FinTenderBondAsset001Dto extends BaseDto {
 
     public void setRate(String rate) {
         this.rate = rate;
+    }
+
+    public String getIssueDateStr() {
+        return issueDateStr;
+    }
+
+    public void setIssueDateStr(String issueDateStr) {
+        this.issueDateStr = issueDateStr;
     }
 }

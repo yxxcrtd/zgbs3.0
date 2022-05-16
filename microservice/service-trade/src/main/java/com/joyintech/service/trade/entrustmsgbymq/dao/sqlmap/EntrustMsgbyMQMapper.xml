@@ -198,4 +198,5 @@
 <!--		from TRD_PRODUCT_DEAL-->
 <!--		where F_TRADE_ID = #{fTradeId,jdbcType=VARCHAR}-->
 <!--	</select>-->
+
 </mapper>

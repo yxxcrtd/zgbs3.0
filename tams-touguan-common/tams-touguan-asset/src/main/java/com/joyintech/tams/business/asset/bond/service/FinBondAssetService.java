@@ -284,10 +284,10 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         MstFileInputParameter mstFileInputParameter = entity.getMstFileInputParameter();
         if (StringUtil.isNotEmpty(mstFileInputParameter)
                 && CollectionUtils.isNotEmpty(mstFileInputParameter.getFileList())){
-              for (SysUploadFileInfo fileInfo:mstFileInputParameter.getFileList()){
-                  fileInfo.setBusinessId(entity.getFinprodId());
-                  finBondAssetMapper.updateFileByPrimaryKey(fileInfo);
-              }
+            for (SysUploadFileInfo fileInfo:mstFileInputParameter.getFileList()){
+                fileInfo.setBusinessId(entity.getFinprodId());
+                finBondAssetMapper.updateFileByPrimaryKey(fileInfo);
+            }
         }
     }
 
@@ -556,7 +556,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         //----add by jjpei 20190727 添加投资性质----end----
         //转债信息
         if (StringUtil.isNotEmpty(dto.getFinProductConvertible()) &&
-        StringUtil.isNotEmpty(dto.getFinProductConvertible().getConPrice())) {
+                StringUtil.isNotEmpty(dto.getFinProductConvertible().getConPrice())) {
             FinProductConvertible finProductConvertible = new FinProductConvertible();
             finProductConvertible.setConFinprodId(dto.getFinprodId());
             BeanUtil.copyPropertiesIgnoreNull(finProductConvertible, dto.getFinProductConvertible());
@@ -643,11 +643,11 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         List<BondFinCashPlanDto> invSchedules = finPayInterestStdInfoDto.getInvScheduleList();
         if (CollectionUtils.isNotEmpty(invSchedules)){
             for (int i = 0; i < invSchedules.size(); i++) {
-               BondFinCashPlanDto bondFinCashPlanDto = invSchedules.get(i);
-               FinCashPlan invSchedule = new FinCashPlan();
-               BeanUtil.copyPropertiesIgnoreNull(invSchedule,bondFinCashPlanDto);
-               invSchedule.setCashId(finCashInfoInterest.getCashId());
-               invSchedule.setCashNum((long) (i + 1));
+                BondFinCashPlanDto bondFinCashPlanDto = invSchedules.get(i);
+                FinCashPlan invSchedule = new FinCashPlan();
+                BeanUtil.copyPropertiesIgnoreNull(invSchedule,bondFinCashPlanDto);
+                invSchedule.setCashId(finCashInfoInterest.getCashId());
+                invSchedule.setCashNum((long) (i + 1));
                 if(DateUtil.compareDate(bondFinCashPlanDto.getMdate(), dto.getMdate())==0){
                     invSchedule.setCashType(DictCodeList.现金流类型_到期收息.getValue());
                 }else{
@@ -665,7 +665,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                 invSchedule.setBranch(branch);
                 invSchedule.setBasis(getBasis(finInterestFactorDto.getBasis()));
                 finCashPlanList.add(invSchedule);
-           }
+            }
         }
         //还本信息DTO 现金流支付支付计划
         List<BondFinCashPlanDto> invRepays = dto.getInvRepayList();
@@ -682,8 +682,8 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                     invRepay.setCashType(DictCodeList.现金流类型_中间还本.getValue());
                 }
                 Date vdate = bondFinCashPlanDto.getVdate();
-                if (StringUtil.equals(dto.getFinPayInterestStdInfoDto().getCouponSpecies(),DictCodeList.息票品种_零息.getValue())
-                        ||StringUtil.equals(dto.getFinPayInterestStdInfoDto().getCouponSpecies(),DictCodeList.息票品种_贴现.getValue())){
+                if (StringUtil.equals(dto.getFinInterestFactorDto().getCouponSpecies(),DictCodeList.息票品种_零息.getValue())
+                        ||StringUtil.equals(dto.getFinInterestFactorDto().getCouponSpecies(),DictCodeList.息票品种_贴现.getValue())){
                     vdate = dto.getVdate();
                 }
                 Date mdate = bondFinCashPlanDto.getMdate();
@@ -971,7 +971,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         }
         if (null != fileAttachmentProcess && StringUtil.isNotEmpty(bondTargetDto.getFinprodId())) {
             List<UploadFile> files = fileAttachmentProcess.fetchByBusinessCode(
-                bondTargetDto.getFinprodId());
+                    bondTargetDto.getFinprodId());
             bondTargetDto.setFileArray(files);
         }
         //查询债项
@@ -987,8 +987,8 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         // 现金流计算规则
         // 根据主键获取业务实体--付息信息
         FinPayInterestStdInfoDto finPayInterestStdInfoDto = this.getFinPayInterestStdInfoByProductId(
-            bondTargetDto.getFinprodId(), bondTargetDto.getvdateStr(),
-            DictCodeListExt1.现金流二级类型_利息.getValue(), DictCodeListExt1.现金流业务类型_金融产品.getValue());
+                bondTargetDto.getFinprodId(), bondTargetDto.getvdateStr(),
+                DictCodeListExt1.现金流二级类型_利息.getValue(), DictCodeListExt1.现金流业务类型_金融产品.getValue());
         BondFinPayInterestStdInfoDto bondFinPayInterestStdInfoDto = new BondFinPayInterestStdInfoDto();
         if (StringUtil.isNotEmpty(finPayInterestStdInfoDto)) {
             BeanUtil.copyPropertiesIgnoreNull(bondFinPayInterestStdInfoDto, finPayInterestStdInfoDto);
@@ -997,8 +997,8 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         // 现金流支付规则
         BussFinRepaymentDto bussFinRepaymentDto = new BussFinRepaymentDto();
         finPayInterestStdInfoDto = this.getFinPayInterestStdInfoByProductId(
-            bondTargetDto.getFinprodId(), bondTargetDto.getvdateStr(),
-            DictCodeListExt1.现金流二级类型_本金.getValue(), DictCodeListExt1.现金流业务类型_金融产品.getValue());
+                bondTargetDto.getFinprodId(), bondTargetDto.getvdateStr(),
+                DictCodeListExt1.现金流二级类型_本金.getValue(), DictCodeListExt1.现金流业务类型_金融产品.getValue());
         if (null != finPayInterestStdInfoDto) {
             bussFinRepaymentDto.setPayCycle(finPayInterestStdInfoDto.getPayCycle());
             bussFinRepaymentDto.setRemark(finPayInterestStdInfoDto.getRemark());
@@ -1011,7 +1011,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         param.put("execType01", DictCodeList.行权状态_未行权.getValue());
         param.put("execType02", DictCodeList.行权状态_已行权.getValue());
         List<FinExercisePlan> finExercisePlanList = this.getfinExercisePlanByProductId(
-            param);
+                param);
         BusiFinExercisePlanDto busiFinExercisePlanDto = new BusiFinExercisePlanDto();
         busiFinExercisePlanDto.setFinExercisePlanList(finExercisePlanList);
         List<BondFinExercisePlanDto> finExercisePlans = new ArrayList<>();
@@ -1024,12 +1024,12 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         if (bondTargetDto != null && bondTargetDto.getFinInterestFactorDto() != null) {
             BondFinInterestFactorDto finInterestFactorDto = bondTargetDto.getFinInterestFactorDto();
             if (StringUtil.equals(finInterestFactorDto.getBasis(),
-                DictCodeList.计息基础_A_A_平均分配.getValue())) {
+                    DictCodeList.计息基础_A_A_平均分配.getValue())) {
                 finInterestFactorDto.setBasisStyle(DictCodeListExt1.利息分配方式_平均分配.getValue());
                 finInterestFactorDto.setBasis(DictCodeList.计息基础_A_A.getValue());
             }
             else if (StringUtil.equals(finInterestFactorDto.getBasis(),
-                DictCodeList.计息基础_A_A_按实际天数分配.getValue())) {
+                    DictCodeList.计息基础_A_A_按实际天数分配.getValue())) {
                 finInterestFactorDto.setBasisStyle(DictCodeListExt1.利息分配方式_按照实际天数分配.getValue());
                 finInterestFactorDto.setBasis(DictCodeList.计息基础_A_A.getValue());
             }
@@ -1040,7 +1040,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
 
     public List<FinExercisePlan> getfinExercisePlanByProductId(Map<String,Object> map){
         String psT39 = DictCodeList.交易方向_行权_赎回.getValue();
-         return finBondAssetMapper.getfinExercisePlanByProductId(map);
+        return finBondAssetMapper.getfinExercisePlanByProductId(map);
     }
 
     public FinPayInterestStdInfoDto getFinPayInterestStdInfoByProductId(String finprodId, String vdate, String cashType,
@@ -1069,9 +1069,9 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                 ()->finBondAssetMapper.getfinprodIdForAdd(param));
     }
 
-	public int isHqTrade(String finprodId) {
-		return finBondAssetMapper.isHqTrade(finprodId);
-	}
+    public int isHqTrade(String finprodId) {
+        return finBondAssetMapper.isHqTrade(finprodId);
+    }
 
     /**
      * 校验金融产品代码不重复
@@ -1200,7 +1200,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         input.setSecInfoModel(secInfoModel);
         YieldPriceOutParameter parameter = yieldByPriceCalculator.calculate(input);
         if(null != parameter){
-            yieldResult = parameter.getMatYield(); 
+            yieldResult = parameter.getMatYield();
             yieldResult =  yieldResult.setScale(4, BigDecimal.ROUND_HALF_UP);
         }
         return yieldResult;
@@ -1502,7 +1502,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
     }
 
     public int isTransInAsset(String finProdId) {
-       return finBondAssetMapper.isTransInAsset(finProdId);
+        return finBondAssetMapper.isTransInAsset(finProdId);
     }
 
     public Date getMaxTradeDate(String finprodId) {
@@ -1510,12 +1510,12 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
     }
 
     public boolean isInWflProcess(WflValidInputParameter parameter) {
-            parameter.setSeachMode("01");
-            List<String> result = finBondAssetMapper.getBusinessData(parameter);
-            if (CollectionUtils.isNotEmpty(result)) {
-                return Boolean.TRUE;
-            }
-            return Boolean.FALSE;
+        parameter.setSeachMode("01");
+        List<String> result = finBondAssetMapper.getBusinessData(parameter);
+        if (CollectionUtils.isNotEmpty(result)) {
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
     }
 
 }
