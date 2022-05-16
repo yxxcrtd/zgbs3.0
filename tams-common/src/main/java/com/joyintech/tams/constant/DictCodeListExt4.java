@@ -96,6 +96,9 @@ public enum DictCodeListExt4 implements BaseDictCodeList {
 
     结算方式_标的_实物结算(DictCode.结算方式_标的,"01","实物结算"),
     结算方式_标的_现金结算(DictCode.结算方式_标的,"02","现金结算"),
+
+    中标方式_单标位中标(DictCode.中标方式,"01","单标位中标"),
+    中标方式_多标位中标(DictCode.中标方式,"02","多标位中标"),
     ;
     /**
      * 对应于数据字典code
