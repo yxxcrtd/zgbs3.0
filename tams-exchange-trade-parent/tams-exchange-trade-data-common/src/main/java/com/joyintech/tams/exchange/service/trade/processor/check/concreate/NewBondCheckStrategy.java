@@ -65,7 +65,7 @@ public class NewBondCheckStrategy implements IBusinessCheckStrategy {
         List<TradeInfoProResponse> list = commonManagement.getCounterDealerTraderInfo(dto);
         String errorMsg = "";
         if (CollectionUtils.isEmpty(list)) {
-            errorMsg += StrUtil.format("对手方交易商[]未维护<br/>", entrust.getPropDealerId());
+            errorMsg += StrUtil.format("对手方交易商[{}]未维护<br/>", entrust.getPropDealerId());
         } else {
             if (StringUtil.isNotEmpty(entrust.getPropInvestorId())) {
                 Optional<TradeInfoProResponse> first = list.stream().filter(o -> StringUtil.equals(o.getTraderNo(), entrust.getPropInvestorId())).findFirst();
