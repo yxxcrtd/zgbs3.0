@@ -144,7 +144,7 @@ public class IntegratedQuoteManagement {
         negotiateQuoteSendBean.setStockCode(integratedEntrust.getStockCode());
         negotiateQuoteSendBean.setStockName(integratedEntrust.getStockName());
         negotiateQuoteSendBean.setBs(integratedEntrust.getEntrustBs());
-        negotiateQuoteSendBean.setAmount(integratedEntrust.getEntrustVolume());
+        negotiateQuoteSendBean.setAmount(integratedEntrust.getEntrustVolumeView());
         negotiateQuoteSendBean.setFullPrice(integratedEntrust.getFullPrice());
         negotiateQuoteSendBean.setEntrustPrice(integratedEntrust.getEntrustPrice());
         negotiateQuoteSendBean.setEntrustBalance(integratedEntrust.getEntrustBalance());
@@ -164,7 +164,8 @@ public class IntegratedQuoteManagement {
         negotiateQuoteSendBean.setBsStr(EntrustBs.isBuy(negotiateQuoteSendBean.getBs()) ? EntrustBs.BUY.name : EntrustBs.SELL.name);
         String investorTypeName = EnumUtil.getDescriptionByCode(InvestorType.class, negotiateQuoteSendBean.getInvestorType());
         negotiateQuoteSendBean.setInvestorTypeStr(investorTypeName);
-        negotiateQuoteSendBean.setCpInvestorTypeStr(investorTypeName);
+        String cpInvestorTypeName = EnumUtil.getDescriptionByCode(InvestorType.class, negotiateQuoteSendBean.getCpInvestorType());
+        negotiateQuoteSendBean.setCpInvestorTypeStr(cpInvestorTypeName);
     }
 }
 
