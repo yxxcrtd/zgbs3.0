@@ -21,6 +21,7 @@ import com.joyintech.tams.business.asset.bond.dto.BondFinCashPlanDto;
 import com.joyintech.tams.business.asset.bond.dto.BondFinExercisePlanDto;
 import com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest;
 import com.joyintech.tams.common.base.entity.FinCashPlan;
+import com.joyintech.tams.common.base.entity.FinExercisePlan;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
@@ -30,6 +31,7 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.invest.common.service.InvDataCheckService;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -189,8 +191,27 @@ public class FinBondAssetValidatorService implements BeanValidator{
                 if(StringUtil.isNotEmpty(dto.getRepAssetType())
                         &&StringUtil.equals(dto.getRepAssetType(), DictCodeListExt2.资产_负债二级类别_地方政府债.getValue())){
                     if(dto.getBussFinBondRepInfoDto()!=null && !StringUtil.isNotEmpty(dto.getBussFinBondRepInfoDto().getBankSecZxzq())){
-                        resultList.add(new ValidMessage("bussFinBondRepInfoDto.bankSecZxzq",
-                                getMessage("是否专项债券数据不能为空。")));
+                        resultList.add(new ValidMessage("bussFinBondRepInfoDto.bankSecZxzq","是否专项债券数据不能为空。"));
+                    }
+                }
+            }
+            if (StringUtil.equals(dto.getIsRight(),DictCodeList.是否_是.getValue())){
+                if (!CollectionUtils.isNotEmpty(dto.getFinExercisePlanList())){
+                    resultList.add(new ValidMessage("是否含权债为是时，行权计划列表不能为空"));
+                }
+                //行权计划列表中，行权方式、理论行权日、实际行权日没有填写时
+                for (BondFinExercisePlanDto finExercisePlan:dto.getFinExercisePlanList()){
+                    if (!StringUtil.isNotEmpty(finExercisePlan.getExerciseType())){
+                        resultList.add(new ValidMessage("行权计划列表中,行权方式不能为空"));
+                        break;
+                    }
+                    if (!StringUtil.isNotEmpty(finExercisePlan.getExerciseDate())){
+                        resultList.add(new ValidMessage("行权计划列表中,理论行权日不能为空"));
+                        break;
+                    }
+                    if (!StringUtil.isNotEmpty(finExercisePlan.getActExerciseDate())){
+                        resultList.add(new ValidMessage("行权计划列表中,实际行权日不能为空"));
+                        break;
                     }
                 }
             }

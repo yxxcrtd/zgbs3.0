@@ -1162,6 +1162,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
     public void updateCfetsOprHis(String entrustId, String optType) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(entrustId);
+        oprHisReq.setOperType(DictCodeListExt3.操作类型_利率调整.getValue());
         if (ENTRUST_RECORD_INSERT.equals(optType)) {
             oprHisReq.setOperType(DictCodeListExt3.操作类型_新建.getValue());
         } else if (ENTRUST_RECORD_UPDATE.equals(optType)) {
@@ -1283,6 +1284,32 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                         getMessage("BUSS_COM_E_0008",getMessage("FinPayInterestStdInfo.calcRule"),DictCodeList.推算方式_首次支付日.getCodeName(), getMessage("FinPayInterestStdInfo.firstPayDate"))));
             }
         }
+        if (null!=dto.getFinInterestFactorDto() && StringUtil.isNotEmpty(dto.getFinInterestFactorDto().getCalcType()) &&
+           StringUtil.equals(dto.getFinInterestFactorDto().getCalcType(),DictCodeList.利率类型_浮动利率.getValue())){
+            // 基准利率精度、基准利率、首次利率确定日
+            if (!StringUtil.isNotEmpty(dto.getFinInterestFactorDto().getBenchmarkIdAccuracy())){
+                resultList.add(new ValidMessage("",
+                        getMessage("BUSS_COM_E_0070", "基准利率精度")));
+            }
+            if (!StringUtil.isNotEmpty(dto.getFinInterestFactorDto().getBasicRate())){
+                resultList.add(new ValidMessage("",
+                        getMessage("BUSS_COM_E_0070", "基准利率")));
+            }
+            if (!StringUtil.isNotEmpty(dto.getFinInterestFactorDto().getHighestRate())){
+                resultList.add(new ValidMessage("",
+                        getMessage("BUSS_COM_E_0070", "利率上限")));
+                return resultList;
+            }
+            if (!StringUtil.isNotEmpty(dto.getFinInterestFactorDto().getLowestRate())){
+                resultList.add(new ValidMessage("",
+                        getMessage("BUSS_COM_E_0070", "利率下限")));
+                return resultList;
+            }
+            if (dto.getFinInterestFactorDto().getLowestRate().compareTo(dto.getFinInterestFactorDto().getHighestRate())>0){
+                resultList.add(new ValidMessage("利率下限必须小于利率上限"));
+                return resultList;
+            }
+        }
         return resultList;
     }
 
@@ -1358,13 +1385,6 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                 if(DateUtil.compareDate(lastMdateUnadjust,dto.getMdate())!=0){
                     resultList.add(new ValidMessage("",getMessage("FIN_ASSET_E_0011", getMessage("FinPayInterestStdInfo.asset.mdate"))));
                 }
-                //债券类资产(还本计划列表中的还本面额/百元之和必须==100)
-                if(StringUtil.equals(dto.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
-                    if(prinAmtSum.compareTo(new BigDecimal("100"))!=0){
-                        resultList.add(new ValidMessage("",
-                                getMessage("BUSS_COM_E_0048", getMessage("BussFinRepayment.cashAmt.sumCheck"),"100")));
-                    }
-                }
             }
             if(null!=dto.getInvRepayList()&&!dto.getInvRepayList().isEmpty()){
                 for(FinCashPlan finCashPlanEntity:dto.getInvRepayList()){
@@ -1396,11 +1416,14 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                                 getMessage("COMMON_E_0057", getMessage("BussFinRepayment.prinAmt"))));
                         return resultList;
                     }
+                    if(finCashPlanEntity.getPrinAmt().compareTo(new BigDecimal("0"))<0 ||
+                            finCashPlanEntity.getPrinAmt().compareTo(new BigDecimal("100"))>0){
+                        resultList.add(new ValidMessage("还本面值请输入0以上，100以下的数据"));
+                    }
                 }
                 //债券类资产(还本计划列表中的还本面额/百元之和必须==100)
                 if(prinAmtSum.compareTo(new BigDecimal("100"))!=0){
-                    resultList.add(new ValidMessage("",
-                            getMessage("BUSS_COM_E_0048", getMessage("BussFinRepayment.cashAmt.sumCheck"),"100")));
+                    resultList.add(new ValidMessage("还本计划中还本面值之和必须等于100"));
                 }
             }
         }
@@ -1524,4 +1547,21 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             return Boolean.FALSE;
     }
 
+    public Date getDealCalendarHoliday(SelectOptionCommonRequest request) {
+        String calendarId = this.getCalendarId(request.getTradeMarket());
+        Date date = null;
+        boolean dealCalendarHoliday = dateCalService.isDealCalendarHoliday(request.getSearchDate(), calendarId);
+        if (!dealCalendarHoliday){
+            date = request.getSearchDate();
+        }else{
+            while (true){
+                date =DateUtil.addDays(request.getSearchDate(),1);
+                dealCalendarHoliday = dateCalService.isDealCalendarHoliday(date, calendarId);
+                if (!dealCalendarHoliday){
+                    break;
+                }
+            }
+        }
+        return date;
+    }
 }
