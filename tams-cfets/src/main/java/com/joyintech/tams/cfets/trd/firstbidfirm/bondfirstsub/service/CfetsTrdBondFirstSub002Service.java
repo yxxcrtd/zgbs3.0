@@ -1411,7 +1411,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             params.put("entrustId", item.getEntrustId());
             params.put("protfolioId", item.getPortfolioId());
             BigDecimal etrAvaNum = cfetsTrdBondFirstSub002Mapper.selectEtrAvaNum(params);
-            if (BigDecimalUtil.ACompareToB(etrAvaNum, dto.getSubscriptionAmount(), 6) < 0) {
+            if (BigDecimalUtil.ACompareToB(etrAvaNum, item.getSubscriptionAmount(), 6) < 0) {
                 errorList.add(new ValidMessage("指令【" + item.getEntrustId() + "】中组合【" + item.getPortfolioName() + "】剩余指令额度不足!"));
             }
 
