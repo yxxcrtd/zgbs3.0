@@ -253,6 +253,7 @@ public class FinTenderBondAssetBatchService {
                 .put("interfaceType", "Bond001")
                 .put("tradePlace", dto.getTradeMarket())
                 .put("decisionAct", DictCodeListExt3.系统动作_新建.getValue())
+                .put("flowStatus","02")
                 .put("PositionSeqno", seqNo)
                 .put("isListingGenerate", DictCodeList.是否_是.getValue());
         if (dto.getTradeMarket().equals(DictCodeListExt1.交易场所_银行间.getValue()) || dto.getTradeMarket().equals(DictCodeListExt1.交易场所_商业银行柜台.getValue())) {
