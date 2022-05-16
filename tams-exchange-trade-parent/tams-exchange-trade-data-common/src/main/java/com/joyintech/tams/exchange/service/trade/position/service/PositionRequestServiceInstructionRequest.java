@@ -118,7 +118,10 @@ public class PositionRequestServiceInstructionRequest {
         resultMap.put(B_TOTAL_TRADE_ID, null);
         resultMap.put(SHARES_TRADE_PLATFORM, TradePlatUtils.trd2EtrTradePlat(entity));
 
-        List<PortfolioCalculateResponse> calculates = getCalculateList(entity);
+        List<PortfolioCalculateResponse> calculates = entity.getPortfolioCalculateResponses();
+        if (CollectionUtils.isEmpty(calculates)) {
+            calculates = getCalculateList(entity);
+        }
         int calculateSize = calculates.size();
 
         if (CollectionUtils.isNotEmpty(calculates)) {
@@ -162,7 +165,10 @@ public class PositionRequestServiceInstructionRequest {
         resultMap.put(PURCH_MODLE, null);
         resultMap.put(SHARES_TRADE_PLATFORM, TradePlatUtils.trd2EtrTradePlat(entity));
 
-        List<PortfolioCalculateResponse> calculates = getCalculateList(entity);
+        List<PortfolioCalculateResponse> calculates = entity.getPortfolioCalculateResponses();
+        if (CollectionUtils.isEmpty(calculates)) {
+            calculates = getCalculateList(entity);
+        }
         int calculateSize = calculates.size();
 
         if (CollectionUtils.isNotEmpty(calculates)) {
@@ -254,7 +260,10 @@ public class PositionRequestServiceInstructionRequest {
         // ETF申赎方式
         resultMap.put(ETFREDEMPTION_METHOD, null);
 
-        List<PortfolioCalculateResponse> calculates = getCalculateList(entity);
+        List<PortfolioCalculateResponse> calculates = entity.getPortfolioCalculateResponses();
+        if (CollectionUtils.isEmpty(calculates)) {
+            calculates = getCalculateList(entity);
+        }
         int calculateSize = calculates.size();
 
         if (CollectionUtils.isNotEmpty(calculates)) {
@@ -294,7 +303,10 @@ public class PositionRequestServiceInstructionRequest {
         resultMap.put(TOTAL_TRADE_ID, entity.getEntrustId());
 
         // 调用组合计算接口，获取分配信息
-        List<PortfolioCalculateResponse> calculates = getCalculateList(entity);
+        List<PortfolioCalculateResponse> calculates = entity.getPortfolioCalculateResponses();
+        if(CollectionUtils.isEmpty(calculates)){
+            calculates = getCalculateList(entity);
+        }
         int calculateSize = calculates.size();
 
         if (CollectionUtils.isNotEmpty(calculates)) {
@@ -324,7 +336,7 @@ public class PositionRequestServiceInstructionRequest {
                     BigDecimal faceValue = etrTradeOtherCommonService.selectFaceValue(params);
                     // 标准券总额=质押券数量*折算率*最新面值
                     BigDecimal standardSecAmount = item.getEntrustAmt().multiply(faceValue).divide(BigDecimal.valueOf(100));
-                    map.put(STANDARD_SEC_AMOUNT, standardSecAmount.setScale( 0, BigDecimal.ROUND_DOWN ).longValue()*100);//向下取整
+                    map.put(STANDARD_SEC_AMOUNT, standardSecAmount.setScale(0, BigDecimal.ROUND_DOWN).longValue() * 100);//向下取整
                 } else {
                     // 标准券总额=标准券数量*100
                     map.put(STANDARD_SEC_AMOUNT, item.getEntrustNum() * 100);
@@ -472,7 +484,7 @@ public class PositionRequestServiceInstructionRequest {
                 || 交易方向_提前购回.getValue().equals(ps)
                 || 交易方向_到期续做.getValue().equals(ps)
                 || 交易方向_中途换券.getValue().equals(ps))
-                /*&& 交易方向_正回购.getValue().equals(firstRepoPs)*/) {
+            /*&& 交易方向_正回购.getValue().equals(firstRepoPs)*/) {
             List<Map<String, Object>> list = new ArrayList<>(4);
             // 查询质押券集合
             InstructionPledge item = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(entity.getEntrustId(), entity.getFinprodMarketId());
@@ -519,7 +531,10 @@ public class PositionRequestServiceInstructionRequest {
         resultMap.put(SETTLE_SPEED, null);
 
         // 调用组合计算接口，获取分配信息
-        List<PortfolioCalculateResponse> calculates = getCalculateList(entity);
+        List<PortfolioCalculateResponse> calculates = entity.getPortfolioCalculateResponses();
+        if(CollectionUtils.isEmpty(calculates)){
+            calculates = getCalculateList(entity);
+        }
         int calculateSize = calculates.size();
 
         if (CollectionUtils.isNotEmpty(calculates)) {

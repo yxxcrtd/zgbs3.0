@@ -24,7 +24,9 @@ import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt1;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.InstructionDetail;
+import com.joyintech.tams.exchange.common.db.domain.PortfolioDetail;
 import com.joyintech.tams.exchange.common.dto.PortfolioInstructionContextDto;
+import com.joyintech.tams.exchange.common.enums.exchange.PortfolioDetailBusiTypeEnum;
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
 import com.joyintech.tams.exchange.common.request.PortfolioInfoRequest;
@@ -34,6 +36,7 @@ import com.joyintech.tams.exchange.common.response.PortfolioInfoResponse;
 import com.joyintech.tams.exchange.common.utils.*;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionDetailService;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
+import com.joyintech.tams.exchange.service.trade.processor.portfolio.PortfolioAssignHelper;
 import com.joyintech.tams.invest.common.dto.position.PositionCashSecDto;
 import com.joyintech.tams.invest.common.dto.position.PositionCashSecRequest;
 import com.joyintech.tams.invest.common.dto.position.PositionCashSecSingleResp;
@@ -71,18 +74,14 @@ public class PortfolioManager extends BaseService {
 
     @Autowired
     private EtrTradeCommonervice etrTradeCommonervice;
-
     @Autowired
     private InstructionService instructionService;
-
     @Autowired
     private InstructionDetailService instructionDetailService;
-
-//    @Autowired
-//    private QuoteTickService quoteTickService;
-
     @Autowired
     private QuoteService quoteService;
+    @Autowired
+    private PortfolioAssignHelper portfolioAssignHelper;
 
     public List<BaseMap> queryPortfolioInfo(PositionCashSecRequest bean) {
         bean.setFlowType(EtrTradeCommonervice.FLOW_TYPE_TRD);
@@ -145,8 +144,8 @@ public class PortfolioManager extends BaseService {
 
         // 2. 遍历查询组合信息
         try {
-            for (int i = 0, length = portfolioIdArray.length; i < length; i++) {
-                paramMap.put("portfolioId", portfolioIdArray[i]);
+            for (String s : portfolioIdArray) {
+                paramMap.put("portfolioId", s);
 
                 PortfolioInfoResponse portfolioInfoResponse = ((PortfolioInfoResponse) queryPortfolioCash(paramMap).getData());
                 PortfolioInfoResponse positionPortfolioInfoResponse = ((PortfolioInfoResponse) queryPortfolioPosition(paramMap).getData());
@@ -154,7 +153,7 @@ public class PortfolioManager extends BaseService {
                 portfolioInfoResponse.setProAvailablePositionT0(positionPortfolioInfoResponse.getProAvailablePositionT0());
                 portfolioInfoResponse.setProAvailablePositionT1(positionPortfolioInfoResponse.getProAvailablePositionT1());
 
-                result.put(portfolioIdArray[i], portfolioInfoResponse);
+                result.put(s, portfolioInfoResponse);
             }
         } catch (Exception e) {
             log.error("queryPortfolioInfo() called with exception => 【request = {}】", request);
@@ -187,10 +186,10 @@ public class PortfolioManager extends BaseService {
 
         // 2. 遍历查询组合现金
         try {
-            for (int i = 0, length = portfolioIdArray.length; i < length; i++) {
-                paramMap.put("portfolioId", portfolioIdArray[i]);
+            for (String s : portfolioIdArray) {
+                paramMap.put("portfolioId", s);
                 PortfolioInfoResponse portfolioInfoResponse = ((PortfolioInfoResponse) queryPortfolioCash(paramMap).getData());
-                result.put(portfolioIdArray[i], portfolioInfoResponse);
+                result.put(s, portfolioInfoResponse);
             }
         } catch (Exception e) {
             log.error("queryPortfolioCash() called with exception => 【portfolioIds = {}】, 【acctNo = {}】", portfolioIds, acctNo);
@@ -232,10 +231,10 @@ public class PortfolioManager extends BaseService {
 
         // 2. 遍历查询组合持仓
         try {
-            for (int i = 0; i < portfolioIdArray.length; i++) {
-                paramMap.put("portfolioId", portfolioIdArray[i]);
+            for (String s : portfolioIdArray) {
+                paramMap.put("portfolioId", s);
                 PortfolioInfoResponse portfolioInfoResponse = ((PortfolioInfoResponse) queryPortfolioPosition(paramMap).getData());
-                result.put(portfolioIdArray[i], portfolioInfoResponse);
+                result.put(s, portfolioInfoResponse);
             }
         } catch (Exception e) {
             log.error("queryPortfolioPosition() called with exception => 【portfolioIds = {}】, 【finprodId = {}】, 【secAcctId = {}】, 【tradeMarket = {}】",
@@ -352,7 +351,7 @@ public class PortfolioManager extends BaseService {
      * @param infoFlag 是否查询组合信息
      * @return 组合计算结果
      */
-    public ResultBean queryPortfolioCalculate(OrderPlaceBean bean, boolean infoFlag) {
+    /*public ResultBean queryPortfolioCalculateV1(OrderPlaceBean bean, boolean infoFlag) {
         log.info("queryPortfolioCalculate() called with parameters => 【bean = {}】", bean);
         // 获取指令
         String instructionId = bean.getInstructionId();
@@ -363,7 +362,7 @@ public class PortfolioManager extends BaseService {
         }
         BigDecimal orginEntrustPrice = bean.getEntrustPrice();
         // 债券交易类，使用全价进行计算
-        coverPrice(instruction, bean);
+//        coverPrice(instruction, order);
         // 获取委托属性
         String entrustProp = EntrustPropUtils.getEntrustProp(instruction, bean.getEntrustProp());
 
@@ -398,12 +397,12 @@ public class PortfolioManager extends BaseService {
 
                 infoResponse = new PortfolioInfoResponse();
                 infoResponse.setPortfolioId(item.getPortfolioId());
-                infoResponse.setProAvailablePositionT0((ObjectUtil.isNotNull(baseMapList.get(3).get(AMOUNT))) ? (BigDecimal) baseMapList.get(3).get(AMOUNT) : BigDecimal.ZERO);
-                infoResponse.setProAvailablePositionT1(BigDecimal.ZERO);
-                infoResponse.setProAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(0).get(AMOUNT))) ? (BigDecimal) baseMapList.get(0).get(AMOUNT) : BigDecimal.ZERO);
-                infoResponse.setProAvailableCashT1(BigDecimal.ZERO);
-                infoResponse.setSecManageAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(1).get(AMOUNT))) ? (BigDecimal) baseMapList.get(1).get(AMOUNT) : BigDecimal.ZERO);
-                infoResponse.setSecManageAvailableCashT1(BigDecimal.ZERO);
+                infoResponse.setProAvailablePositionT0((BigDecimal) baseMapList.get(3).get(AMOUNT));
+                infoResponse.setProAvailablePositionT1(null);
+                infoResponse.setProAvailableCashT0((BigDecimal) baseMapList.get(0).get(AMOUNT));
+                infoResponse.setProAvailableCashT1(null);
+                infoResponse.setSecManageAvailableCashT0((BigDecimal) baseMapList.get(1).get(AMOUNT));
+                infoResponse.setSecManageAvailableCashT1(null);
 
                 portfolioInfoResponseMap.put(infoResponse.getPortfolioId(), infoResponse);
             }
@@ -459,7 +458,7 @@ public class PortfolioManager extends BaseService {
         BigDecimal disRate = BigDecimal.ZERO;
 
         // 订单类型：数量单，指令单
-        boolean isVolume = instruction.volumeInstruction();
+        boolean isVolume = instruction.getEntrustNum() > 0L;
         // 订单数量
         BigDecimal orderVolume = BigDecimal.valueOf(bean.getEntrustVolume());
         // 订单金额
@@ -550,11 +549,116 @@ public class PortfolioManager extends BaseService {
         BigDecimal leftAmt = isVolume ? BigDecimal.ZERO : NumberUtil.sub(instruction.getEntrustAmt(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity());
         long leftNum = isVolume ? NumberUtil.sub(instruction.getEntrustNum(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity()).longValue() : 0L;
         for (PortfolioCalculateResponse item : list) {
-            calculateResponse.setInstructionLeftAmt(orderAmt.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : NumberUtil.div(NumberUtil.mul(leftAmt, item.getEntrustAmt()), orderAmt));
-            calculateResponse.setInstructionLeftNum(orderVolume.compareTo(BigDecimal.ZERO) == 0 ? 0 : NumberUtil.div(leftNum * item.getEntrustNum(), orderVolume).longValue());
+            calculateResponse.setInstructionLeftAmt(NumberUtil.div(NumberUtil.mul(leftAmt, item.getEntrustAmt()), orderAmt));
+            calculateResponse.setInstructionLeftNum(NumberUtil.div(leftNum * item.getEntrustNum(), orderVolume).longValue());
         }
         // 债券交易类，使用全价进行计算后恢复订单价格
-        recoverPrice(instruction, list, orginEntrustPrice, entrustProp);
+//        recoverPrice(instruction, list, orginEntrustPrice, entrustProp);
+
+        log.debug("queryPortfolioCalculate() called with result => 【list = {}】", JSONUtil.toJsonStr(list));
+        return ResultBean.success(list);
+    }*/
+
+
+    /**
+     * 组合计算
+     *
+     * @param order    下单对象
+     * @param infoFlag 是否查询组合信息
+     * @return 组合计算结果
+     */
+    public ResultBean queryPortfolioCalculate(OrderPlaceBean order, boolean infoFlag) {
+        log.info("queryPortfolioCalculate() called with parameters => 【order = {}】", order);
+
+        // 获取指令
+        String instructionId = order.getInstructionId();
+
+        ResultBean assignResult = portfolioAssignHelper.queryPortfolioAssign(order.getInstructionId(),
+                PortfolioDetailBusiTypeEnum.ORDER, BigDecimal.valueOf(order.getEntrustVolume()),
+                order.getEntrustPrice(), order.getEntrustProp());
+        if (assignResult.isFail()) {
+            return assignResult;
+        }
+        Map<String, PortfolioDetail> portfolioDetailMap = (Map<String, PortfolioDetail>) assignResult.getData();
+
+        Instruction instruction = instructionService.findById(instructionId);
+        List<InstructionDetail> instructionDetails = instructionDetailService.queryInstructionDetailsByInstructionId(instructionId);
+
+        Map<String, PortfolioInfoResponse> portfolioInfoResponseMap = Maps.newHashMap();
+        if (infoFlag) {
+            // modify by swwan 调用投管查询头寸方法 start
+            List<PositionCashSecSingleResp> positionCashSecSingleResps = this.queryPortfolioInfoByTg(instructionDetails, instruction);
+            PortfolioInfoResponse infoResponse;
+            for (PositionCashSecSingleResp item : positionCashSecSingleResps) {
+                List<BaseMap> baseMapList = item.getBaseMapList();
+
+                infoResponse = new PortfolioInfoResponse();
+                infoResponse.setPortfolioId(item.getPortfolioId());
+                infoResponse.setProAvailablePositionT0((ObjectUtil.isNotNull(baseMapList.get(3).get(AMOUNT))) ? (BigDecimal) baseMapList.get(3).get(AMOUNT) : BigDecimal.ZERO);
+                infoResponse.setProAvailablePositionT1(BigDecimal.ZERO);
+                infoResponse.setProAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(0).get(AMOUNT))) ? (BigDecimal) baseMapList.get(0).get(AMOUNT) : BigDecimal.ZERO);
+                infoResponse.setProAvailableCashT1(BigDecimal.ZERO);
+                infoResponse.setSecManageAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(1).get(AMOUNT))) ? (BigDecimal) baseMapList.get(1).get(AMOUNT) : BigDecimal.ZERO);
+                infoResponse.setSecManageAvailableCashT1(BigDecimal.ZERO);
+
+                portfolioInfoResponseMap.put(infoResponse.getPortfolioId(), infoResponse);
+            }
+        }
+
+        // 计算结果列表
+        List<PortfolioCalculateResponse> list = new ArrayList<>(8);
+        // 计算结果
+        PortfolioCalculateResponse calculateResponse = null;
+        for (InstructionDetail detail : instructionDetails) {
+            calculateResponse = new PortfolioCalculateResponse();
+
+            String portfolioId = detail.getPortfolioId();
+            calculateResponse.setPortfolioInfo(portfolioInfoResponseMap.get(portfolioId));
+            calculateResponse.setPortfolioId(portfolioId);
+            calculateResponse.setPortfolioName(detail.getPortfolioName());
+            calculateResponse.setFinprodMarketId(instruction.getFinprodMarketId());
+            calculateResponse.setFinprodName(instruction.getFinprodName());
+            calculateResponse.setDisRate(detail.getDisRate());
+            calculateResponse.setInstructionTotalNum(detail.getEntrustAmt().longValue());
+            calculateResponse.setInstructionTotalNum(detail.getEntrustNum().longValue());
+            if (Objects.nonNull(order.getFullPrice())) {
+                calculateResponse.setFullPrice(order.getFullPrice());
+            }
+            calculateResponse.setPriceMode(instruction.getPriceMode());
+            calculateResponse.setAcctNo(instruction.getAcctName());
+
+            PortfolioDetail portfolioDetail = portfolioDetailMap.get(portfolioId);
+            if (ObjectUtil.isNotNull(portfolioDetail)) {
+                calculateResponse.setEntrustNum(portfolioDetail.getTargetNum().longValue());
+                calculateResponse.setEntrustAmt(portfolioDetail.getTargetAmt());
+                calculateResponse.setEntrustPrice(NumberUtil.div(calculateResponse.getEntrustAmt(), calculateResponse.getEntrustNum()));
+            }
+
+            list.add(calculateResponse);
+        }
+
+        // 订单类型：数量单，指令单
+        boolean isVolume = instruction.volumeInstruction();
+        // 订单数量
+        BigDecimal orderVolume = BigDecimal.valueOf(order.getEntrustVolume());
+        // 订单金额
+        BigDecimal orderAmt = NumberUtil.mul(list.get(0).getEntrustPrice(), orderVolume);
+
+        if (isVolume && DictCodeListExt3.交易方向_债转股.getValue().equals(instruction.getPs())) {
+            long bondPaperValue = 100L;
+            long totalConNum = list.get(0).getInstructionLeftNum() * bondPaperValue / list.get(0).getEntrustPrice().longValue();
+            for (PortfolioCalculateResponse response : list) {
+                response.setConNum(totalConNum * response.getEntrustNum() / instruction.getEntrustNum());
+            }
+        }
+
+        // 处理指令剩余数量、指令剩余金额
+        BigDecimal leftAmt = isVolume ? BigDecimal.ZERO : NumberUtil.sub(instruction.getEntrustAmt(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity());
+        long leftNum = isVolume ? NumberUtil.sub(instruction.getEntrustNum(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity()).longValue() : 0L;
+        for (PortfolioCalculateResponse item : list) {
+            calculateResponse.setInstructionLeftAmt(NumberUtil.div(NumberUtil.mul(leftAmt, item.getEntrustAmt()), orderAmt));
+            calculateResponse.setInstructionLeftNum(NumberUtil.div(leftNum * item.getEntrustNum(), orderVolume).longValue());
+        }
 
         log.debug("queryPortfolioCalculate() called with result => 【list = {}】", JSONUtil.toJsonStr(list));
         return ResultBean.success(list);
