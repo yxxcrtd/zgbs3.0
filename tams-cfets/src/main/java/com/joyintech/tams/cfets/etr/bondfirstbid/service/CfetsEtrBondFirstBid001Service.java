@@ -344,7 +344,7 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
             dto.setIssueDate(finProductInfo.getIssueDate());
             dto.setPayDate(finProductInfo.getPayDate());
             dto.setIssuePrice(finProductInfo.getIssuePrice());
-            dto.setReferYield(finProductInfo.getReferYield());
+//            dto.setReferYield(finProductInfo.getReferYield());
 
         }else {
             //查询所有的对手方
