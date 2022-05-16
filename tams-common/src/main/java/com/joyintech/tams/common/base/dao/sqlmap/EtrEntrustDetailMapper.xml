@@ -96,6 +96,9 @@
             <if test="secAcctId != null" >
                 SEC_ACCT_ID,
             </if>
+            <if test="acctNo != null" >
+                ACCT_NO,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="entrustId != null" >
@@ -136,6 +139,9 @@
             </if>
             <if test="secAcctId != null" >
                 #{secAcctId,jdbcType=VARCHAR},
+            </if>
+            <if test="acctNo != null" >
+                #{acctNo,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>

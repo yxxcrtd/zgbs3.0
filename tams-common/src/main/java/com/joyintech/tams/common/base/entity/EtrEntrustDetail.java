@@ -40,6 +40,11 @@ public class EtrEntrustDetail extends EtrEntrustDetailKey {
     private String invAim;
 
     /**
+     * 资金账户
+     */
+    private String acctNo;
+
+    /**
      * 取得 分配比例
      * @return 分配比例
      */
@@ -117,5 +122,13 @@ public class EtrEntrustDetail extends EtrEntrustDetailKey {
 
     public void setInvAim(String invAim) {
         this.invAim = invAim;
+    }
+
+    public String getAcctNo() {
+        return acctNo;
+    }
+
+    public void setAcctNo(String acctNo) {
+        this.acctNo = acctNo;
     }
 }
