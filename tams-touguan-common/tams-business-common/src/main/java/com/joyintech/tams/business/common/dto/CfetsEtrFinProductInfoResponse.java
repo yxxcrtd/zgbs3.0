@@ -100,8 +100,7 @@ public class CfetsEtrFinProductInfoResponse {
      * 收益率，利息贴现为参考收益率，附息为票面利率
      */
     @ApiModelProperty(name = "referYield", value = "收益率，利息贴现为参考收益率，附息为票面利率")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal referYield;
+    private String referYield;
 
     /**
      * 基准利率
@@ -683,11 +682,11 @@ public class CfetsEtrFinProductInfoResponse {
         this.payCycle = payCycle;
     }
 
-    public BigDecimal getReferYield() {
+    public String getReferYield() {
         return referYield;
     }
 
-    public void setReferYield(BigDecimal referYield) {
+    public void setReferYield(String referYield) {
         this.referYield = referYield;
     }
 

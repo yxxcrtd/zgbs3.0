@@ -379,8 +379,8 @@
             or decode(T.subscriptionAmount,0,'0.00',to_char(T.subscriptionAmount,'FM999999999990.90'))=#{search} or to_char(T.subscriptionAmount)=#{search}
             or decode(T.payableAmount,0,'0.00',to_char(T.payableAmount,'FM999999999990.90'))=#{search} or to_char(T.payableAmount)=#{search}
             or decode(T.settFeeAmt,0,'0.00',to_char(T.settFeeAmt,'FM999999999990.90'))=#{search} or to_char(T.settFeeAmt)=#{search}
-            or decode(T.rate,0,'0.00',to_char(T.rate,'FM999999999990.9990'))=#{search} or to_char(T.rate)=#{search}
-            or replace(to_char(T.issueClass,'yyyy-MM-dd'),'-','/')=#{search}
+            or to_char(T.rate)=#{search}
+            or replace(to_char(T.issueDate,'yyyy-MM-dd'),'-','/')=#{search}
             or replace(to_char(T.payDate,'yyyy-MM-dd'),'-','/')=#{search}
             )
         </if>
