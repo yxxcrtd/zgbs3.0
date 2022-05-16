@@ -239,7 +239,7 @@
              , fpi.ISSUE_PRICE      issuePrice
              , case
                    when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
-                       then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP, 0) end referenceRateStr/*,当带入资产的息票品种为附息-浮动利率时，显示字段参考收益率*/
+                       then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP*10000, 0) end referenceRateStr/*,当带入资产的息票品种为附息-浮动利率时，显示字段参考收益率*/
              , case
                    when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD end referenceRate/*当带入资产的息票品种为零息/贴现时，显示字段参考收益率*/
              , case
@@ -302,8 +302,8 @@
                         bobp.SETT_FEE_AMT            settFeeAmt,
                         case
                             when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
-                                then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP, 0)
-                            else to_char(fpi.REFER_YIELD,'FM999999999990.9990') end rate,
+                                then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP*10000, 0)
+                            else to_char(fpi.REFER_YIELD*100,'FM999999999990.9990') end rate,
                         fpi.ISSUE_CLASS              issueClass,
                         fpi.ISSUE_DATE               issueDate,
                         fpi.PAY_DATE                 payDate,
@@ -338,8 +338,8 @@
                         0                            settFeeAmt,
                         case
                             when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
-                                then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP, 0)
-                            else to_char(fpi.REFER_YIELD,'FM999999999990.9990') end rate,
+                                then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP*10000, 0)
+                            else to_char(fpi.REFER_YIELD*100,'FM999999999990.9990') end rate,
                         fpi.ISSUE_CLASS             issueClass,
                         fpi.ISSUE_DATE               issueDate,
                         fpi.PAY_DATE                 payDate,
@@ -526,8 +526,8 @@
                    fpi.ISSUE_PRICE                                      issuePrice,
                     case
                         when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
-                            then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP, 0)
-                        else to_char(fpi.REFER_YIELD,'FM999999999990.9990') end rate,
+                            then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP*10000, 0)
+                        else to_char(fpi.REFER_YIELD*100,'FM999999999990.9990') end rate,
                    bobp.PORTFOLIO_ID                                    portfolioId,
                    bobp.PORTFOLIO_NAME                                  portfolioName,
                    fpi.ISSUE_DATE                                       issueDate,
@@ -589,8 +589,8 @@
                    fpi.ISSUE_PRICE              issuePrice,
                     case
                         when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
-                            then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP, 0)
-                        else to_char(fpi.REFER_YIELD,'FM999999999990.9990') end rate,
+                            then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP*10000, 0)
+                        else to_char(fpi.REFER_YIELD*100,'FM999999999990.9990') end rate,
                    bobp.PORTFOLIO_ID            portfolioId,
                    bobp.PORTFOLIO_NAME          portfolioName,
                    fpi.ISSUE_DATE               issueDate,

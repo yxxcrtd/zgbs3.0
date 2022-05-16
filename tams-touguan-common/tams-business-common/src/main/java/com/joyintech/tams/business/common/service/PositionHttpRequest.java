@@ -435,7 +435,39 @@ public class PositionHttpRequest {
 
     }
 
+    public static void sendBatch(Object req) throws PositionException{
+        Map<String,Object> params  =JsonUtils.stringToMap(JsonUtils.object2Json(req));
+        logger.info("发送头寸报文:"+JsonUtils.object2Json(params));
+        String res = sendBatchRequest(params);
+        logger.info("头寸返回数据:"+res);
+        Map msgMap = JsonUtils.json2Object(res, Map.class);
+        if(msgMap == null){
+            throw new PositionException("头寸返回数据为空！");
+        }else if(!StringUtil.equals("success", msgMap.get("code") + "")){
+            throw new PositionException(JsonUtils.object2Json(msgMap));
+        }
+    }
 
+    private static String sendBatchRequest(Object param) {
+        return httpPostRequest(positionUrl + "/position/batch/main/autoGenerationTask", param);
+    }
 
+    private static String getBatchLogRequest(Object param) {
+        return httpPostRequest(positionUrl + "/position/batch/main/getBatchLog", param);
+    }
+
+    public static Map<String,Object> getBatchLog(Object req) throws PositionException{
+        Map<String,Object> params  =JsonUtils.stringToMap(JsonUtils.object2Json(req));
+        logger.info("发送头寸报文:"+JsonUtils.object2Json(params));
+        String res = getBatchLogRequest(params);
+        logger.info("头寸返回数据:"+res);
+        Map<String,Object> msgMap = JsonUtils.json2Object(res, Map.class);
+        if(msgMap == null){
+            throw new PositionException("头寸返回数据为空！");
+        }else if(!StringUtil.equals("success", msgMap.get("code") + "")){
+            throw new PositionException(JsonUtils.object2Json(msgMap));
+        }
+        return msgMap;
+    }
 
 }

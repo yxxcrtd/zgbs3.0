@@ -336,8 +336,8 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
         if (CollectionUtils.isNotEmpty(cfetsTrdBondFirstSubEntrustDtos)) {
             cfetsTrdBondFirstSubEntrustDtos.forEach(item -> {
                 if (/*StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_待接收.getValue())
-                        ||*/ (StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已接收.getValue()) && item.getTransactioncom().compareTo(BigDecimal.ZERO) != 0)) {
-                    errorList.add(new ValidMessage("只可对待分发或者已接收执行进度为0的指令执行退回操作!"));
+                        ||*/ !(StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已接收.getValue()) && item.getTransactioncom().compareTo(BigDecimal.ZERO) != 0)) {
+                    errorList.add(new ValidMessage("只可对已接收执行进度为0的指令执行退回操作!"));
                 }
                 param.put("entrustId", item.getEntrustId());
                 if (cfetsTrdBondFirstSub001Mapper.checkDataStatus(param) > 0) {

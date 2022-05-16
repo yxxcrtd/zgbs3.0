@@ -968,6 +968,11 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         List<ValidMessage> errorList = new ArrayList<>();
         String msg = "";
         for (CfetsBondFirstSubCheckDetaileRequst item : requst.getCfetsBondFirstSubCheckDetaileRequsts()) {
+            // 存在已确认的数据
+            if (joyinbusinessCommonService.countMatchInfo(item.getBidId(), DictCodeList.确认状态_已确认.getValue()) > 0) {
+                errorList.add(
+                        new ValidMessage("所选对象存在已确认的数据!"));
+            }
             //如已有撤销数据在流程中，不允许进行再次进行撤销
             WflValidInputParameter wflValidInputParameter = new WflValidInputParameter();
             wflValidInputParameter.setPageId("TenderBondSub002");
@@ -975,7 +980,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             if (null != mstWorkflowCommonService &&
                     mstWorkflowCommonService.isInWflProcess(wflValidInputParameter)) {
                 errorList.add(
-                        new ValidMessage(this.getMessage("COMMON_0025")));
+                        new ValidMessage("所选对象存在流程中的数据!"));
             }
             if (joyinbusinessCommonService.countMatchInfo(item.getBidId(), DictCodeList.确认状态_未确认.getValue()) > 0
                     && (StringUtil.equals(DictCodeList.是否_否.getValue(), requst.getIsSure()) || StringUtil.isEmpty(requst.getIsSure()))) {
@@ -1411,7 +1416,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             params.put("entrustId", item.getEntrustId());
             params.put("protfolioId", item.getPortfolioId());
             BigDecimal etrAvaNum = cfetsTrdBondFirstSub002Mapper.selectEtrAvaNum(params);
-            if (BigDecimalUtil.ACompareToB(etrAvaNum, dto.getSubscriptionAmount(), 6) < 0) {
+            if (BigDecimalUtil.ACompareToB(etrAvaNum, item.getSubscriptionAmount(), 6) < 0) {
                 errorList.add(new ValidMessage("指令【" + item.getEntrustId() + "】中组合【" + item.getPortfolioName() + "】剩余指令额度不足!"));
             }
 

@@ -3513,13 +3513,18 @@
 
     function getBussCombDistribtTableParams() {
         var ebcd = entity_BussCombDistribtList || [];
-        for (var i = 0; i < ebcd.length; i++) {
-            var ebcdKey = ebcd[i];
-            if(ebcdKey.ps == PS_T68 || ebcdKey.ps == PS_T69){
-                ebcdKey.entrustNum = ebcdKey.entrustNum/100;
-                ebcdKey.entrustAmt = ebcdKey.entrustAmt/100;
+        if(ebcd.length > 0) {
+            var item = ebcd[0];
+            var isPs68OrPs69 = item.ps == PS_T68 || item.ps == PS_T69;
+            if (isPs68OrPs69) {
+            for (var i = 0; i < ebcd.length; i++) {
+                    var ebcdKey = ebcd[i];
+                    ebcdKey.entrustNum = ebcdKey.entrustNum / 100;
+                    ebcdKey.entrustAmt = ebcdKey.entrustAmt / 100;
+                }
             }
         }
+        console.log(ebcd);
         return ebcd;
     }
 
@@ -4333,8 +4338,8 @@
             if(object.entrustAmt){
                 object.entrustAmt = object.entrustAmt * 100;
             }
-            for (let i = 0; i < object.portfolioList; i++) {
-                var item = object.portfolioList[i];
+            for (var j = 0; j < object.portfolioList.length; j++) {
+                var item = object.portfolioList[j];
                 item.entrustNum = item.entrustNum * 100;
                 item.entrustAmt = item.entrustAmt * 100;
             }
