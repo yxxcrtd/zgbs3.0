@@ -682,8 +682,8 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                     invRepay.setCashType(DictCodeList.现金流类型_中间还本.getValue());
                 }
                 Date vdate = bondFinCashPlanDto.getVdate();
-                if (StringUtil.equals(dto.getFinPayInterestStdInfoDto().getCouponSpecies(),DictCodeList.息票品种_零息.getValue())
-                        ||StringUtil.equals(dto.getFinPayInterestStdInfoDto().getCouponSpecies(),DictCodeList.息票品种_贴现.getValue())){
+                if (StringUtil.equals(dto.getFinInterestFactorDto().getCouponSpecies(),DictCodeList.息票品种_零息.getValue())
+                        ||StringUtil.equals(dto.getFinInterestFactorDto().getCouponSpecies(),DictCodeList.息票品种_贴现.getValue())){
                     vdate = dto.getVdate();
                 }
                 Date mdate = bondFinCashPlanDto.getMdate();
