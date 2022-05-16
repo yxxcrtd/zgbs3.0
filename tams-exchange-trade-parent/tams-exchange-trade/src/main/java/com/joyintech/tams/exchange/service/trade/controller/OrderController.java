@@ -132,20 +132,24 @@ public class OrderController {
 
         try {
             ResultBean commonCheckResult = commonCheckKit.check(order);
-            if (ErrorCode.TRIGGER_SOFT_CONTROL.codeEquals(commonCheckResult.getErrorCode())) {
-                return new Message<>(Message.SUCCESS, null,
-                        new Message<>(String.valueOf(ErrorCode.TRIGGER_SOFT_CONTROL.getCode()), StrUtil.format("{}<br/>{}", commonCheckResult.getErrorMsg(), commonCheckResult.getData())));
-            }
-            if (ErrorCode.isFail(commonCheckResult.getErrorCode())) {
+            if (ErrorCode.isNotSoftControlFail(commonCheckResult.getErrorCode())) {
                 return new Message<>(commonCheckResult);
             }
             ResultBean businessCheckResult = businessCheckKit.check(order);
-            if (ErrorCode.TRIGGER_SOFT_CONTROL.codeEquals(commonCheckResult.getErrorCode())) {
-                return new Message<>(Message.SUCCESS, null,
-                        new Message<>(String.valueOf(ErrorCode.TRIGGER_SOFT_CONTROL.getCode()), businessCheckResult.getErrorMsg()));
-            }
-            if (ErrorCode.isFail(businessCheckResult.getErrorCode())) {
+            if (ErrorCode.isNotSoftControlFail(businessCheckResult.getErrorCode())) {
                 return new Message<>(businessCheckResult);
+            }
+
+            String softControlFailMsg = "";
+            if (ErrorCode.isSoftControlFail(commonCheckResult.getErrorCode())) {
+                softControlFailMsg += StrUtil.format("{}<br/>{}<br/>", commonCheckResult.getErrorMsg(), commonCheckResult.getData());
+            }
+            if (ErrorCode.isSoftControlFail(businessCheckResult.getErrorCode())) {
+                softControlFailMsg += businessCheckResult.getErrorMsg();
+            }
+            if (StringUtil.isNotEmpty(softControlFailMsg)) {
+                return new Message<>(Message.SUCCESS, null,
+                        new Message<>(String.valueOf(ErrorCode.TRIGGER_SOFT_CONTROL.getCode()), softControlFailMsg));
             }
         } catch (BusinessResultException e) {
             return e.toMessage();
