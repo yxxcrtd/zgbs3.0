@@ -46,7 +46,7 @@
            fpi.INT_TYPE,
            case
                when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
-                   then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP, 0) end referenceRateStr/*,当带入资产的息票品种为附息-浮动利率时，显示字段参考收益率*/,
+                   then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP*10000, 0) end referenceRateStr/*,当带入资产的息票品种为附息-浮动利率时，显示字段参考收益率*/,
            case
                when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD end referenceRate/*当带入资产的息票品种为零息/贴现时，显示字段参考收益率*/,
            case
@@ -105,7 +105,7 @@
                fpi.ISSUE_PRICE,
                case
                    when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
-                       then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP, 0) end referenceRateStr/*,当带入资产的息票品种为附息-浮动利率时，显示字段参考收益率*/,
+                       then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP*10000, 0) end referenceRateStr/*,当带入资产的息票品种为附息-浮动利率时，显示字段参考收益率*/,
                case
                    when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD end referenceRate/*当带入资产的息票品种为零息/贴现时，显示字段参考收益率*/,
                case
@@ -154,7 +154,7 @@
                fpi.ISSUE_PRICE,
                case
                    when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
-                       then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP, 0) end referenceRateStr/*,当带入资产的息票品种为附息-浮动利率时，显示字段参考收益率*/,
+                       then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP*10000, 0) end referenceRateStr/*,当带入资产的息票品种为附息-浮动利率时，显示字段参考收益率*/,
                case
                    when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD end referenceRate/*当带入资产的息票品种为零息/贴现时，显示字段参考收益率*/,
                case
