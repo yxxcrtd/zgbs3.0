@@ -372,7 +372,7 @@ public class PriceHelper {
         if ((Double.compare(lowerLimitPrice, 0.0) > 0 && Double.compare(lowerLimitPrice, entrustPrice.doubleValue()) > 0)
                 || (Double.compare(upperLimitPrice, 0.0) > 0 && Double.compare(upperLimitPrice, entrustPrice.doubleValue()) < 0)) {
             orderInterface.setErrorMsg(dealErrorMsgByMarket(lowerLimitPrice, upperLimitPrice, market));
-            orderInterface.setErrorCode(ErrorCode.INNER_RISK_ERROR.value);
+            orderInterface.setErrorCode(ErrorCode.ATTRIBUTE_ERROR.value);
             return false;
         }
         return true;
@@ -380,9 +380,9 @@ public class PriceHelper {
 
     private String dealErrorMsgByMarket(double lowerLimitPrice, double upperLimitPrice, String market) {
         String errorMsg = null;
-        if (Market.SHSE.codeEquals(market)) {
+        if (Market.SHSE.investValue.equals(market)) {
             errorMsg = StrUtil.format("委托价格在有效价格范围[{}，{}]范围之外，存在委托废单的风险，是否继续下达？", lowerLimitPrice, upperLimitPrice);
-        } else if (Market.SZSE.codeEquals(market)) {
+        } else if (Market.SZSE.investValue.equals(market)) {
             errorMsg = StrUtil.format("委托价格在有效价格范围[{}，{}]范围之外，存在委托无法成交的风险，是否继续下达？", lowerLimitPrice, upperLimitPrice);
         }
         return errorMsg;
