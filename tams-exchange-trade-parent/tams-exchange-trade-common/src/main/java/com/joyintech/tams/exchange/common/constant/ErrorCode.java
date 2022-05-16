@@ -54,7 +54,7 @@ public enum ErrorCode implements IEnum<Integer> {
 
     MASTER_TOKEN_DISABLE(310, "主从模式关闭"),
 
-    TRIGGER_SOFT_CONTROL(300, "触发软控"),
+    TRIGGER_SOFT_CONTROL(333, "触发软控"),
 
     SYSTEM_ERROR(500, "服务器内部错误"),
 
