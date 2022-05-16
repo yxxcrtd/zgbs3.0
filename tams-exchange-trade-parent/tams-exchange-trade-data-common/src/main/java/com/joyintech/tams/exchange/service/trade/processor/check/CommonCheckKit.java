@@ -289,7 +289,7 @@ public class CommonCheckKit extends BaseCheckKit {
         String entrustBs = EntrustPropUtils.getEntrustBs(instruction);
         String entrustProp = EntrustPropUtils.getEntrustProp(instruction, order.getEntrustProp());
         long entrustVolume = order.getEntrustVolume();
-        BigDecimal entrustBalance = order.getEntrustBalance();
+        BigDecimal entrustBalance = NumberUtil.mul(entrustVolume, order.getEntrustPrice());
 
         if (!EntrustBs.isBuy(entrustBs)) {
             return;
