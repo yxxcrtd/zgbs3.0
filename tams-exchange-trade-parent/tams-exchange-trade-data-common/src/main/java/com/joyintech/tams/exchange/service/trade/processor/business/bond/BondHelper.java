@@ -10,10 +10,7 @@ import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
 import com.joyintech.tams.exchange.common.db.domain.OrderInterface;
 import com.joyintech.tams.exchange.common.db.domain.Trade;
-import com.joyintech.tams.exchange.common.utils.CheckParamUtils;
-import com.joyintech.tams.exchange.common.utils.EntrustUtils;
-import com.joyintech.tams.exchange.common.utils.IntegratedEntrustUtils;
-import com.joyintech.tams.exchange.common.utils.TradeUtils;
+import com.joyintech.tams.exchange.common.utils.*;
 import com.joyintech.tams.exchange.datacommon.db.service.InstrumentService;
 import com.joyintech.tams.exchange.service.trade.management.service.InvestmentManagement;
 import com.joyintech.tams.exchange.service.trade.processor.business.price.PriceHelper;
@@ -177,7 +174,9 @@ public class BondHelper {
             return trade.getTradedBalance();
         }
 
-        if (!EntrustUtils.isFullPrice(instruction.getAssetType(), trade.getEntrustProp(), isFullPrice)) {
+        if (InvestmentAssetType.isBond(instruction.getAssetType())
+                && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)
+                && !EntrustUtils.isFullPrice(instruction.getAssetType(), trade.getEntrustProp(), isFullPrice)) {
             BigDecimal price = investmentManagement.queryFullPriceByEntrustPriceFromInvest(trade.getTradedPrice(), trade.getTradedVolume(), instruction, getPriceRoundByPriceStep(instrumentService.queryByInnerCode(instruction.getFinprodMarketId())));
             logger.info("handleTradePriceByFullPrice  trade fullPrice {}", price);
             return TradeUtils.multiply(price, trade.getTradedVolume(), 2);
@@ -224,7 +223,9 @@ public class BondHelper {
          * 委托记录中：委托价格（全价），买入冻结金额（全价），成交金额（全价）
          * 成交记录中：委托价格（全价），成交价格（全价），成交金额（全价），实时冻结解冻金额（全价）
          */
-        if (!EntrustUtils.isFullPrice(instruction.getAssetType(), trade.getEntrustProp(), isFullPrice)) {
+        if (InvestmentAssetType.isBond(instruction.getAssetType())
+                && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)
+                && !EntrustUtils.isFullPrice(instruction.getAssetType(), trade.getEntrustProp(), isFullPrice)) {
             BigDecimal minPrice = instruction.queryMinPrice(trade.getEntrustProp());
             int round = Objects.isNull(minPrice) ? 4 : minPrice.scale();
             BigDecimal price = investmentManagement.queryFullPriceByEntrustPriceFromInvest(trade.getTradedPrice(), trade.getTradedVolume(), instruction, round);

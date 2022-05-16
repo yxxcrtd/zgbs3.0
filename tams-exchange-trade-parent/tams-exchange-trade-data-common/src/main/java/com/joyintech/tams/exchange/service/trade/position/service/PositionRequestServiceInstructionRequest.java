@@ -14,6 +14,7 @@ import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.InstructionPledge;
 import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
 import com.joyintech.tams.exchange.common.response.PortfolioCalculateResponse;
+import com.joyintech.tams.exchange.common.utils.TradePlatUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionPledgeService;
 import com.joyintech.tams.exchange.service.trade.management.service.EntrustManagement;
 import com.joyintech.tams.exchange.service.trade.management.service.PortfolioManager;
@@ -115,6 +116,7 @@ public class PositionRequestServiceInstructionRequest {
         resultMap.put(PURCH_MODLE, null);
         resultMap.put(FINPROD_ID, entity.getFinprodId());
         resultMap.put(B_TOTAL_TRADE_ID, null);
+        resultMap.put(SHARES_TRADE_PLATFORM, TradePlatUtils.trd2EtrTradePlat(entity));
 
         List<PortfolioCalculateResponse> calculates = getCalculateList(entity);
         int calculateSize = calculates.size();
@@ -158,6 +160,7 @@ public class PositionRequestServiceInstructionRequest {
         resultMap.put(DELIVERY_TYPE, parseDeliveryType(entity));
         resultMap.put(SETTLE_SPEED, parseSettleSpreed(resultMap));
         resultMap.put(PURCH_MODLE, null);
+        resultMap.put(SHARES_TRADE_PLATFORM, TradePlatUtils.trd2EtrTradePlat(entity));
 
         List<PortfolioCalculateResponse> calculates = getCalculateList(entity);
         int calculateSize = calculates.size();

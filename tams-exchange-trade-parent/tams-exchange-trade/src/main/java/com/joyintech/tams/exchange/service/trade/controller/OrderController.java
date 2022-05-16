@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.service.trade.controller;
 
+import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Maps;
 import com.joyintech.framework.util.StringUtil;
 import cn.hutool.core.util.NumberUtil;
@@ -79,9 +80,13 @@ public class OrderController {
         }
 
         try {
-            ResultBean checkResult = commonCheckKit.check(order);
-            if (ErrorCode.isFail(checkResult.getErrorCode())) {
-                return new Message<>(checkResult);
+            ResultBean commonCheckResult = commonCheckKit.check(order);
+            if (ErrorCode.TRIGGER_SOFT_CONTROL.codeEquals(commonCheckResult.getErrorCode())) {
+                return new Message<>(Message.SUCCESS, null,
+                        new Message<>(String.valueOf(ErrorCode.TRIGGER_SOFT_CONTROL.getCode()), StrUtil.format("{}<br/>{}", commonCheckResult.getErrorMsg(), commonCheckResult.getData())));
+            }
+            if (ErrorCode.isFail(commonCheckResult.getErrorCode())) {
+                return new Message<>(commonCheckResult);
             }
             ResultBean businessCheckResult = businessCheckKit.check(order);
             if (ErrorCode.isFail(businessCheckResult.getErrorCode())) {
@@ -127,10 +132,18 @@ public class OrderController {
 
         try {
             ResultBean commonCheckResult = commonCheckKit.check(order);
+            if (ErrorCode.TRIGGER_SOFT_CONTROL.codeEquals(commonCheckResult.getErrorCode())) {
+                return new Message<>(Message.SUCCESS, null,
+                        new Message<>(String.valueOf(ErrorCode.TRIGGER_SOFT_CONTROL.getCode()), StrUtil.format("{}<br/>{}", commonCheckResult.getErrorMsg(), commonCheckResult.getData())));
+            }
             if (ErrorCode.isFail(commonCheckResult.getErrorCode())) {
                 return new Message<>(commonCheckResult);
             }
             ResultBean businessCheckResult = businessCheckKit.check(order);
+            if (ErrorCode.TRIGGER_SOFT_CONTROL.codeEquals(commonCheckResult.getErrorCode())) {
+                return new Message<>(Message.SUCCESS, null,
+                        new Message<>(String.valueOf(ErrorCode.TRIGGER_SOFT_CONTROL.getCode()), businessCheckResult.getErrorMsg()));
+            }
             if (ErrorCode.isFail(businessCheckResult.getErrorCode())) {
                 return new Message<>(businessCheckResult);
             }

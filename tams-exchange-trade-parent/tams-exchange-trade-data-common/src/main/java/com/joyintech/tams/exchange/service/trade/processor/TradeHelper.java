@@ -688,11 +688,14 @@ public class TradeHelper {
         String tradingDay = commonManagement.getTradingDay();
 
         BigDecimal orderPrice = order.getOrderPrice();
-        if (StringUtil.equals("Y", instruction.getIsNetPrice())) {
-            order.setIsFullPrice(FullPriceConst.NET_PRICE.value);
-        } else {
-            order.setIsFullPrice(FullPriceConst.FULL_PRICE.value);
-            orderPrice = order.getFullPrice();
+        if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())
+                && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
+            if (StringUtil.equals("Y", instruction.getIsNetPrice())) {
+                order.setIsFullPrice(FullPriceConst.NET_PRICE.value);
+            } else {
+                order.setIsFullPrice(FullPriceConst.FULL_PRICE.value);
+                orderPrice = order.getFullPrice();
+            }
         }
 
         // 指令检查(包括状态,日期,接收人) 价格限定

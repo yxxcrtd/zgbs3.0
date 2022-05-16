@@ -19,7 +19,7 @@ import java.util.Date;
  * 下行成交匹配关系Dto
  * @author 1
  * @version 1.0 2021年10月26日
- * @see CfetsTrdConfirmMatchDto
+ * @see TrdConfirmMatchDto
  * @since 1.0
  */
 public class TrdConfirmMatchDto {

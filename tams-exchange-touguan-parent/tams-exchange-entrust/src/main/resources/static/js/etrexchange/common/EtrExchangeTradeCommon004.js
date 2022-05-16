@@ -2523,6 +2523,8 @@
                 if ((finprodType2 == FINPROD_TYPE_TG_F01 || finprodType2 == FINPROD_TYPE_TG_ZYSHG) && (ps == PS_T68 || ps == PS_T69)) {
                     // entrustAmt = Math.floor(new Number(entrustAmt));
                     $("#entrustAmt_" + currentTab).val(entrustAmt);
+                    $("#entrustAmt_" + currentTab).attr("data-textrange",4);
+                    $("#entrustNum_" + currentTab).attr("data-textrange",2);
                 } else {
                     $("#entrustAmt_" + currentTab).val(entrustAmt).trigger('blur');
                 }
@@ -3324,14 +3326,18 @@
             if (finprodType2 == FINPROD_TYPE_TG_F01 && (ps == PS_T68 || ps == PS_T69)) {
                 $("#entrustAmtUnit_" + currentTab).text("万元");
                 $("#entrustNumUnit_" + currentTab).text("万元");
-                var entrustAmt = $("#entrustAmt_" + currentTab).val();
                 $("#entrustPrice_" + currentTab).attr("data-textrange", 0);
-                if(entrustAmt){
-                    $("#entrustAmt_" + currentTab).val(entrustAmt/100);
-                }
                 var entrustNum = $("#entrustNum_" + currentTab).val();
                 if(entrustNum){
                     $("#entrustNum_" + currentTab).val(entrustNum/100);
+                }
+                var entrustPrice =  $("#entrustPrice_" + currentTab).val();
+                if(entrustNum && entrustPrice){
+                    entrustPrice = parseInt(entrustPrice);
+                    $("#entrustPrice_" + currentTab).val(entrustPrice);
+                    var amt = entrustNum*entrustPrice/10000;
+                    $("#entrustAmt_" + currentTab).attr("data-textrange", 4);
+                    $("#entrustAmt_" + currentTab).val(amt).blur().trigger('change');
                 }
             }
 
@@ -3507,6 +3513,13 @@
 
     function getBussCombDistribtTableParams() {
         var ebcd = entity_BussCombDistribtList || [];
+        for (var i = 0; i < ebcd.length; i++) {
+            var ebcdKey = ebcd[i];
+            if(ebcdKey.ps == PS_T68 || ebcdKey.ps == PS_T69){
+                ebcdKey.entrustNum = ebcdKey.entrustNum/100;
+                ebcdKey.entrustAmt = ebcdKey.entrustAmt/100;
+            }
+        }
         return ebcd;
     }
 
@@ -3548,7 +3561,7 @@
                 sortField: 'entrustNum',
                 width: 200,
                 type: 'number',
-                digit: 0,
+                digit:  ps != "T68" && ps != "T69" ? 0 : 2,
                 edit: true
             },
             {
@@ -3923,7 +3936,13 @@
                         } else {
                             num = parseFloat(datas[i].entrustNum);
                         }
-                        entrustNum += parseInt(num);
+                        var ps1 = $("#ps_" + currentTab).val();
+                        console.log( "3939 +++ " + num + ps + ":" + PS_T68);
+                        if(ps1 == PS_T68 || ps1 == PS_T69){
+                            entrustNum += num;
+                        }else{
+                            entrustNum += parseInt(num);
+                        }
                     }
                     $("#entrustNum_" + currentTab).val(entrustNum);
                     calcEntrustNumAndAmt();
@@ -3963,7 +3982,13 @@
                     if (array[0].ps == PS_T68 || array[0].ps == PS_T69) {
                         $("#entrustAmout_total_label").text("标准券数量");
                         var entrustAmt = $("#entrustAmt_" + currentTab).val();
-                        $("#entrustAmt_" + currentTab).val(Math.floor(new Number(entrustAmt)));
+                        console.log("3985" + ":" + entrustAmt);
+                        var ps = $("#ps_" + currentTab).val();
+                        if(ps == PS_T68 || ps == PS_T69){
+                            $("#entrustAmt_" + currentTab).val(entrustAmt);
+                        }else {
+                            $("#entrustAmt_" + currentTab).val(Math.floor(new Number(entrustAmt)));
+                        }
                     } else {
                         $("#entrustAmout_total_label").text("指令金额");
                     }
@@ -4044,12 +4069,21 @@
         var array = dateTable.getAllRows();
         var len = array.length;
         var entrustNumForOne = entrustNum / len;
+        var ps = $("#ps_" + currentTab).val();
         for (var i = 0; i < array.length; i++) {
             if (array[i].acctNo) {
                 if(i == 0){
-                    array[i].entrustNum = Math.ceil(entrustNumForOne);
+                    if(ps == PS_T68 || ps == PS_T69){
+                        array[i].entrustNum = Math.ceil(entrustNumForOne*100)/100;
+                    }else {
+                        array[i].entrustNum = Math.ceil(entrustNumForOne);
+                    }
                 }else {
-                    array[i].entrustNum = Math.floor(entrustNumForOne);
+                    if(ps == PS_T68 || ps == PS_T69){
+                        array[i].entrustNum = Math.floor(entrustNumForOne*100)/100;
+                    }else {
+                        array[i].entrustNum = Math.floor(entrustNumForOne);
+                    }
                 }
                 array[i].entrustAmt = entrustAmt / len;
             }
@@ -4299,6 +4333,12 @@
             if(object.entrustAmt){
                 object.entrustAmt = object.entrustAmt * 100;
             }
+            for (let i = 0; i < object.portfolioList; i++) {
+                var item = object.portfolioList[i];
+                item.entrustNum = item.entrustNum * 100;
+                item.entrustAmt = item.entrustAmt * 100;
+            }
+            console.log(object);
         }
 
         //TODO 风险和授信

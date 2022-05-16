@@ -6,6 +6,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.validation.BeanValidationResult;
 import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.BusinessResultException;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
@@ -16,10 +17,12 @@ import com.joyintech.tams.exchange.common.cache.TradeTimeService;
 import com.joyintech.tams.exchange.common.constant.EntrustBs;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
+import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.enums.SwitcheEnum;
 import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
+import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import com.joyintech.tams.exchange.service.trade.processor.account.AccountPositionHelper;
 import com.joyintech.tams.exchange.service.trade.processor.business.price.PriceHelper;
 import com.joyintech.tams.exchange.service.trade.server.agent.AccountManager;
@@ -113,11 +116,11 @@ public class CommonCheckKit extends BaseCheckKit {
 
         String trdPriceScopeControl = CacheUtil.getSysParam(TRD_PRICE_SCOPE_CONTROL);
         if (TRD_PRICE_SCOPE_CONTROL_FORBID.equals(trdPriceScopeControl)) {
-            throw new BusinessResultException(ErrorCode.INNER_RISK_ERROR,
+            throw new BusinessResultException(ErrorCode.CHECK_ERROR,
                     builder.toString());
         } else if (TRD_PRICE_SCOPE_CONTROL_PROMPT.equals(trdPriceScopeControl) || trdPriceScopeControl == null) {
             if (SwitcheEnum.OPEN.codeEquals(order.getSoftSkipMode())) {
-                return ResultBean.error(ErrorCode.INNER_RISK_ERROR, builder.toString());
+                return ResultBean.error(ErrorCode.TRIGGER_SOFT_CONTROL, builder.toString());
             }
         } else if (TRD_PRICE_SCOPE_CONTROL_ALLOW.equals(trdPriceScopeControl)) {
         }
@@ -168,7 +171,7 @@ public class CommonCheckKit extends BaseCheckKit {
             StringBuilder builder = StrUtil.builder();
             tradePeriod.forEach(item -> builder.append(item.getOpenTime()).append("~").append(item.getCloseTime()).append(StrUtil.COMMA));
             throw new BusinessResultException(ErrorCode.CHECK_ERROR,
-                    StrUtil.format("当前时间[{}],不允许委托,允许委托时间段为：[{}]",
+                    StrUtil.format("当前时间[{}]，不允许委托，允许委托时间段为：[{}]",
                             localTime, StrUtil.removeSuffix(builder.toString(), StrUtil.COMMA)));
         }
     }
@@ -230,6 +233,11 @@ public class CommonCheckKit extends BaseCheckKit {
             throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
         }
 
+        if (InvestmentAssetType.isPledgeRepurchase(minTrdUnitLimit.getAssetType())
+                && StringUtil.equals(minTrdUnitLimit.getMinStepUnit(), "05")) {
+            minStep = minStep / 100;
+        }
+
         if (EntrustBs.isBuy(entrustBs)
                 && entrustVolume % minStep != 0) {
             String errorMsg = StrUtil.format("委托数量[{}]不符合最小买入单位[{}]整数倍", entrustVolume, minStep);
@@ -245,7 +253,7 @@ public class CommonCheckKit extends BaseCheckKit {
         BigDecimal lowerLimitPrice = NumberUtil.round(tick.getLowerLimitPrice(), 4, RoundingMode.UP);
         BigDecimal upperLimitPrice = NumberUtil.round(tick.getUpperLimitPrice(), 4, RoundingMode.DOWN);
 
-        if (isNoLimitPrice(tick)) {
+        if (isNoLimitPrice(tick) || EnumUtil.in(instruction.getAssetType(), InvestmentAssetType.BOND, InvestmentAssetType.PLEDGE_REPURCHASE)) {
             String errorMsg = priceHelper.checkPrice(order, instruction, instrument, tick);
             if (StrUtil.isNotEmpty(errorMsg)) {
                 addCheckResult("委托价格", entrustPrice, errorMsg);
@@ -281,7 +289,7 @@ public class CommonCheckKit extends BaseCheckKit {
         String entrustBs = EntrustPropUtils.getEntrustBs(instruction);
         String entrustProp = EntrustPropUtils.getEntrustProp(instruction, order.getEntrustProp());
         long entrustVolume = order.getEntrustVolume();
-        BigDecimal entrustBalance = order.getEntrustBalance();
+        BigDecimal entrustBalance = NumberUtil.mul(entrustVolume, order.getEntrustPrice());
 
         if (!EntrustBs.isBuy(entrustBs)) {
             return;

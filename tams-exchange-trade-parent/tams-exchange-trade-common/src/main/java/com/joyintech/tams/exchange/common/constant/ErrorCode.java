@@ -44,9 +44,13 @@ public enum ErrorCode implements IEnum<Integer> {
 
     CHECK_ERROR(101, "校验失败"),
 
+    API_ERROR(102, "接口调用失败"),
+
     INNER_RISK_ERROR(200, "内部风控检查错误"),
 
-    MASTER_TOKEN_DISABLE(300, "主从模式关闭"),
+    MASTER_TOKEN_DISABLE(310, "主从模式关闭"),
+
+    TRIGGER_SOFT_CONTROL(300, "触发软控"),
 
     SYSTEM_ERROR(500, "服务器内部错误"),
 

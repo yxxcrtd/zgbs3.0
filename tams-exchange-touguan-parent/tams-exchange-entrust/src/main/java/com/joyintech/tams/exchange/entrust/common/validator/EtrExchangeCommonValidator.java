@@ -26,6 +26,7 @@ import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepTrade001Dto;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.service.EtrExchangeAgreRepTrade001Service;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeTradeSaveRequest;
+import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradeSaveSecRepoRequest;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.tams.invest.common.risk.service.RiskNamListCommonValidatorService;
@@ -545,6 +546,15 @@ public interface EtrExchangeCommonValidator extends BeanValidator {
                     ps = inputDto.getPs();
                     trdProductDeal.setFinprodId(inputDto.getShareFinprodId());
                     finprodId = inputDto.getShareFinprodId();
+                }
+                else if(value instanceof EtrExchangeTradeSaveSecRepoRequest){
+                    EtrExchangeTradeSaveSecRepoRequest inputDto = (EtrExchangeTradeSaveSecRepoRequest)value;
+                    windtypeone = inputDto.getFinprodType2();
+                    tradeMarket = inputDto.getTradeMarket();
+                    trdProductDeal = new TrdProductDeal();
+                    BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, inputDto);
+                    ps = inputDto.getPs();
+                    finprodId = inputDto.getFinprodId();
                 }
                 
                 //场内交易指令 add by yzg 20201214 start

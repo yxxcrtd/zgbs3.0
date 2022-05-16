@@ -1542,7 +1542,7 @@
 --         ) entrustAmt,
         case
         when #{busiTypePosition} = 'EX018' then round(nvl(ete.ENTRUST_AMT,0)/10000,3)
-        when eted.ASSET_TYPE = 'F01' then NVL( ete.ENTRUST_NUM * eted.FULL_PRICE, 0 )
+        when eted.ASSET_TYPE = 'F01' then decode(eted.BUSI_TYPE_POSITION,'EX017',ete.ENTRUST_AMT,NVL( ete.ENTRUST_NUM * eted.FULL_PRICE, 0 ))
         when eted.ASSET_TYPE = 'F10' then NVL( ete.ENTRUST_NUM * 100, 0 )
         else NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
         end as entrustAmt,
@@ -1668,7 +1668,7 @@
 --         ) entrustAmt,
         case
         when #{busiTypePosition} = 'EX018' then round(nvl(ete.ENTRUST_AMT,0)/10000,3)
-        when eted.ASSET_TYPE = 'F01' then NVL( ete.ENTRUST_NUM * eted.FULL_PRICE, 0 )
+        when eted.ASSET_TYPE = 'F01' then decode(eted.BUSI_TYPE_POSITION,'EX017',ete.ENTRUST_AMT,NVL( ete.ENTRUST_NUM * eted.FULL_PRICE, 0 ))
         when eted.ASSET_TYPE = 'F10' then NVL( ete.ENTRUST_NUM * 100, 0 )
         else NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
         end as entrustAmt,

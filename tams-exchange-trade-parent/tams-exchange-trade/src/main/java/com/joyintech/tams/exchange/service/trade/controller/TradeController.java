@@ -8,6 +8,7 @@ import com.joyintech.tams.exchange.common.bean.TradeQueryBean;
 import com.joyintech.tams.exchange.common.db.domain.Trade;
 import com.joyintech.tams.exchange.common.domain.Message;
 import com.joyintech.tams.exchange.common.request.*;
+import com.joyintech.tams.exchange.common.vo.TradeVo;
 import com.joyintech.tams.exchange.service.trade.management.service.TradeManagement;
 import com.joyintech.tams.exchange.util.MasterUtil;
 
@@ -83,7 +84,7 @@ public class TradeController {
 
     @ApiOperation(value = "根据指令编号查询成交信息", notes = "根据指令编号查询成交信息")
     @RequestMapping(value = "/tradeByInstructionId", method = RequestMethod.POST)
-    public Message<List<Trade>> queryTradeByInstructionId(@RequestBody @Validated TradeInfoByIdRequest request) {
+    public Message<List<TradeVo>> queryTradeByInstructionId(@RequestBody @Validated TradeInfoByIdRequest request) {
     	if(!MasterUtil.isMaster()) {
     		return MasterUtil.postForObject(request);
     	}

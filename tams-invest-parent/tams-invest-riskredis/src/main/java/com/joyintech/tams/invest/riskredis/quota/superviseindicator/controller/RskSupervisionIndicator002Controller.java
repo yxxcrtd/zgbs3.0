@@ -223,9 +223,9 @@ public class RskSupervisionIndicator002Controller extends BaseController {
 	@ResponseBody
     @RequestMapping("/getAllPortfolioBySort")
     public List<TreeNode> getAllPortfolioBySort(@RequestParam(name="type", required=false) String type,@RequestParam(name="indId", required=false) String indId,@RequestParam(name="portfName", required=false) String portfName,@RequestParam(name="profitType", required=false) String profitType
-    		,@RequestParam(name="issueMode", required=false) String issueMode,@RequestParam(name="raiseType", required=false) String raiseType,@RequestParam(name="investType", required=false) String investType)
+    		,@RequestParam(name="issueMode", required=false) String issueMode,@RequestParam(name="raiseType", required=false) String raiseType,@RequestParam(name="investType", required=false) String investType,@RequestParam(name="isFaceSingleInvestor", required=false) String isFaceSingleInvestor)
          {
-        return rskSupervisionIndicator001Service.getAllPortfolioBySort(type,indId,portfName,profitType,issueMode,raiseType,investType);
+        return rskSupervisionIndicator001Service.getAllPortfolioBySort(type,indId,portfName,profitType,issueMode,raiseType,investType,isFaceSingleInvestor);
         
     }
     

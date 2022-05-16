@@ -518,6 +518,12 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         }
         if (StringUtil.equals(operateType, OperationType.NEW.name())) {
             this.emptyCheck(dto, validList);
+            if(StringUtil.isNotEmpty(dto.getFinprodMarketId()) && dto.getFinprodMarketId().length() > 20) {
+                validList.add(new ValidMessage("资产代码长度不能超过20"));
+            }
+            if(StringUtil.isNotEmpty(dto.getFinprodMarketId()) && !dto.getFinprodMarketId().matches("^[A-Za-z0-9]+.[A-Za-z0-9]+$")) {
+                validList.add(new ValidMessage("资产代码只能由数字和字母组成"));
+            }
             if (StringUtil.isNotEmpty(dto.getFinprodMarketId()) && StringUtil.isNotEmpty(dto.getTradeMarket())) {
                 Map<String, String> param = new HashMap<>();
                 param.put("finprodMarketId", dto.getFinprodMarketId());

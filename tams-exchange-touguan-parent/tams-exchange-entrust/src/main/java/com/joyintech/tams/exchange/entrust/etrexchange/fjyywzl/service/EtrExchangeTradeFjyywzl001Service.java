@@ -93,9 +93,9 @@ public class EtrExchangeTradeFjyywzl001Service extends CommonExportService<EtrEx
                         canRepoNum=ArithmeticUtil.divide(canRepoNum,new BigDecimal(100),2, RoundingMode.DOWN);
                         entity.setCanRepoNum(canRepoNum);
                         //过滤掉标准券和质押数量都等于0
-                        if(entity.getSecNum().compareTo(BigDecimal.ZERO)==0&&canRepoNum.compareTo(BigDecimal.ZERO)==0){
-                            continue;
-                        }
+//                        if(entity.getSecNum().compareTo(BigDecimal.ZERO)==0&&canRepoNum.compareTo(BigDecimal.ZERO)==0){
+//                            continue;
+//                        }
                         //持仓数量，取交易的净额结算可用持仓（交易），单位：万元
                         BigDecimal  positionsNum=selectActNum(DictCodeListExt3.资产类型_资产账户持仓.getValue(),secDto);
                         positionsNum=ArithmeticUtil.divide(positionsNum,new BigDecimal(100),2, RoundingMode.DOWN);

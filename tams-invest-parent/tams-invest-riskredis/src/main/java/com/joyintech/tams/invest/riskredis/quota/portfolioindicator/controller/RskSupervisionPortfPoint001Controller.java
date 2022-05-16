@@ -73,7 +73,7 @@ public class RskSupervisionPortfPoint001Controller extends BaseController {
 	        BussinessDictCodeRds.监督类型, BussinessDictCodeRds.运算符, BussinessDictCodeRds.连接符,BussinessDictCodeRds.操作符,
 	        BussinessDictCodeRds.单位, BussinessDictCodeRds.监督时分, BussinessDictCodeRds.监督频率, BussinessDictCodeRds.组合层次,
 	        BussinessDictCodeRds.分类维度,BussinessDictCodeRds.收益类型,BussinessDictCodeRds.开放类型,BussinessDictCodeRds.募集方式,
-            BussinessDictCodeRds.投资性质
+            BussinessDictCodeRds.投资性质,BussinessDictCodeRds.是否面向单一投资者
 	       };
 
     @Override

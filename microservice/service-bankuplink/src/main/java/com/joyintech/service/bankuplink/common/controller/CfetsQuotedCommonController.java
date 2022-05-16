@@ -509,12 +509,16 @@ public class CfetsQuotedCommonController {
     @PostMapping("receiveFirstBondCfetsTradeDialogueRequest")
     public ResultBaseDto receiveFirstBond(@RequestBody Map<String,Object> map) throws Exception {
         ResultBaseDto resultBaseDto = new ResultBaseDto(true);
-        logger.info("银行间一级申购下行成交处理业务数据线程开启" + map.toString());
+        logger.error("银行间一级申购下行成交处理业务数据线程开启,传入参数:" + JsonUtils.object2Json(map));
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    String trdId = (String) map.get("trdId");
+                    String trdId = (String) map.get("ID");
+                    if(StringUtil.isEmpty(trdId)){
+                        logger.error("接口平台调用接口入参不符合要求,传入参数:" + JsonUtils.object2Json(map));
+                        return ;
+                    }
                     cfetsQuotedTradeCommonService.insertBidCstpTrade(trdId);
                 } catch (Exception e) {
                     logger.error("CSTP下行匹配异常：", e);

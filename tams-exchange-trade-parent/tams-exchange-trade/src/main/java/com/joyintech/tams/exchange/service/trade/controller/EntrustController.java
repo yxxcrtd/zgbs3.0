@@ -14,6 +14,7 @@ import com.joyintech.tams.exchange.common.domain.Message;
 import com.joyintech.tams.exchange.common.request.EntrustExportRequest;
 import com.joyintech.tams.exchange.common.request.EntrustQueryRequest;
 import com.joyintech.tams.exchange.common.request.PageEntrustInfoRequest;
+import com.joyintech.tams.exchange.common.vo.IntegratedEntrustVo;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
 import com.joyintech.tams.exchange.service.trade.management.service.EntrustManagement;
 import com.joyintech.tams.exchange.util.MasterUtil;
@@ -53,7 +54,7 @@ public class EntrustController {
 
     @ApiOperation(value = "查询综合业务信息", notes = "查询综合业务信息")
     @PostMapping(value = {"/entrust/integrated"})
-    public Message<List<IntegratedEntrust>> queryIntegratedEntrustAll(@RequestBody @Validated EntrustQueryRequest request) {
+    public Message<List<IntegratedEntrustVo>> queryIntegratedEntrustAll(@RequestBody @Validated EntrustQueryRequest request) {
     	if(!MasterUtil.isMaster()) {
     		return MasterUtil.postForObject(request);
     	}

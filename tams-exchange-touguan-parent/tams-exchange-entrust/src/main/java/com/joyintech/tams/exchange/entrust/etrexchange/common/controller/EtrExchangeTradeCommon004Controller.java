@@ -235,7 +235,11 @@ public class EtrExchangeTradeCommon004Controller extends BaseController {
         }
         model.addAttribute(GlobalConstant.ENTITY, entity);
         if (null != entity && null != entity.getEntrustPrice()) {
-            model.addAttribute("BOND_SCALE", entity.getEntrustPrice().scale());
+            if(StringUtil.equals(entity.getPs(),DictCodeListExt3.交易方向_质押券入库.getValue()) || StringUtil.equals(entity.getPs(),DictCodeListExt3.交易方向_质押券出库.getValue())){
+                model.addAttribute("BOND_SCALE", 0);
+            }else {
+                model.addAttribute("BOND_SCALE", entity.getEntrustPrice().scale());
+            }
         } else {
             model.addAttribute("BOND_SCALE", 3);
         }

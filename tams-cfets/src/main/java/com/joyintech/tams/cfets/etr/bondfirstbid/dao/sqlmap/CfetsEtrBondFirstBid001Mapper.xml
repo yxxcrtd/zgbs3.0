@@ -43,8 +43,8 @@
 
         order by sdl.ORDER_NO, aaa.entrustId DESC)
         <!--前端传入排序字段-->
-        <if test="sort != null and sort != '' and direction != null and direction != ''">
-            order by ${sort} ${direction}
+        <if test="pageMode != null and pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
+            order by ${pageMode.sort} ${pageMode.direction}
         </if>
     </select>
     <sql id="keywordsWhereEtr">
@@ -85,6 +85,7 @@
             fp.FINPROD_MARKET_ID finprodMarketId,
             fp.FINPROD_ABBR finprodAbbr,
             fpi.ISSUE_CLASS issueClass,
+            ee.TRADE_MARKET tradeMarket,
             CASE
             WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
             fpa.BID_DATE
@@ -215,6 +216,7 @@
             fp.FINPROD_MARKET_ID finprodMarketId,
             fp.FINPROD_ABBR finprodAbbr,
             fpi.ISSUE_CLASS issueClass,
+            ee.TRADE_MARKET tradeMarket,
             CASE
                 WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
                     fpa.BID_DATE
@@ -415,6 +417,10 @@
             <include refid="keywordsWhereIssue"></include>
         </where>
         )
+        <!--前端传入排序字段-->
+        <if test="pageMode != null and pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
+            order by ${pageMode.sort} ${pageMode.direction}
+        </if>
     </select>
     <sql id="keywordsWhereIssue">
         <if test="search != null and search != '' ">

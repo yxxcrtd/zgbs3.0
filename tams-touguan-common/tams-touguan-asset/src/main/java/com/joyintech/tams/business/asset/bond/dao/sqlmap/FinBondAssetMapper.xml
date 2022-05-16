@@ -92,7 +92,7 @@
         where T1.FINPROD_TYPE2 = #{finprodType2}) T
         <where>
             <if test="finprodIdList != null and finprodIdList.size() > 0">
-                AND (T.finprodMarketId IN
+                AND T.finprodMarketId IN
                 <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
@@ -969,6 +969,12 @@
                 and (FINPROD_MARKET_ID like concat(concat('%',#{search}),'%')
                 or FINPROD_ABBR like concat(concat('%',#{search}),'%')
                 or FINPROD_NAME like concat(concat('%',#{search}),'%'))
+            </if>
+            <if test="finprodMarketIdList != null and finprodMarketIdList.size() > 0">
+                AND FINPROD_MARKET_ID IN
+                <foreach collection="finprodMarketIdList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
             </if>
             <if test="tradeMarkets != null and tradeMarkets.size() > 0">
                 AND TRADE_MARKET in

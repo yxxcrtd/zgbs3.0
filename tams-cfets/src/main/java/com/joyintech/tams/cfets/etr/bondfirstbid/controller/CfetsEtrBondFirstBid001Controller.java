@@ -71,6 +71,9 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
     private EtrCommonFinProductInfoService etrCommonFinProductInfoService;
 
 
+//    @Autowired
+//    private CommonManagement commonManagement;
+
     @ApiOperation(value = "查询页面初始化参数", notes = "查询页面初始化参数")
     @PostMapping("/getPageParams")
     @ResponseBody
@@ -106,6 +109,9 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
 
         //当前平台日
         initPageParams.put("platDate", DateUtil.platDateFromCache());
+        //平台日+5个交易日
+        //initPageParams.put("platDateBack", commonManagement.getTradeDate(tradeCalendarType, cDate, nDay));
+        initPageParams.put("platDateBack", DateUtil.platDateFromCache());
         //当前用户
         initPageParams.put("userId", SecurityUtil.getLoginUser().getUserName());
         //pageId
