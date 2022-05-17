@@ -6,11 +6,23 @@
 		FP.*,
 		FP.CCY,NVL(FPA.FACE_VALUE,100) AS faceValue,
 		FPT.TYPE_11 type11,
-		FPT.TYPE_12 type12
+		FPT.TYPE_12 type12,
+		FPA.DEAL_MODE dealMode,
+		FPA.INVESTMENT_CYCLE investmentCycle,
+		FPA.TERM_TYPE termType
+		/*FPA.PRODUCT_TYPE prodType,*/
+		/*FPA.MIN_PRODUCT_HOLD minProductHold*/
 		FROM FIN_PRODUCT FP
 		INNER JOIN FIN_PRODUCT_ADD FPA ON FP.FINPROD_ID=FPA.FINPROD_ID
 		LEFT JOIN FIN_PRODUCT_TYPE FPT ON FP.FINPROD_ID=FPT.FINPROD_ID AND FPT.BRANCH=0
-		WHERE  FP.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+		<where>
+			<if test="list != null  and list.size() > 0">
+				FP.FINPROD_ID in
+				<foreach collection="list" item="item" open="(" close=")" separator=",">
+					#{item}
+				</foreach>
+			</if>
+		</where>
 	</select>
 
 	<select id="getExchangeRate" resultType="java.math.BigDecimal">
@@ -116,7 +128,9 @@
 			</foreach>
 		</if> ORDER BY FIN_CASH_INFO.FINPROD_ID
 		)
-		SELECT DISTINCT cit.FINPROD_ID cashId,foor.CALC_RULE,foor.OPEN_MODE,foor.OPEN_TYPE
+		SELECT DISTINCT cit.FINPROD_ID cashId,
+		foor.CALC_RULE,foor.OPEN_MODE,foor.OPEN_TYPE,
+		foor.OPEN_CYCLE,foor.OPEN_CYCLE_UNIT
 		FROM CASH_INFO_TEMP cit
 		INNER JOIN FIN_OPEN_RULE foor ON cit.CASH_ID=FOOR.CASH_ID
 		/**根据开放类型倒序排，若有申赎不同频，则有两条记录，一个open_type为01,一个为02，则优先取赎回的**/

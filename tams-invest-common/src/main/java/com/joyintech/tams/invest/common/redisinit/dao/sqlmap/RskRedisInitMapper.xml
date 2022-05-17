@@ -58,7 +58,7 @@
             FROM
             FIN_CASH_PLAN fop
             WHERE
-            fop.FINPROD_TYPE2 IN ('F01','F18') AND EXISTS (
+            fop.FINPROD_TYPE2 IN ('F01','F07','F18') AND EXISTS (
             SELECT 1 FROM FIN_CASH_INFO fop2 WHERE fop2.CASH_TYPE_1 = '01' AND fop2.CASH_TYPE_2 ='C01' AND fop.CASH_ID =fop2.CASH_ID
             )
         )
@@ -69,7 +69,7 @@
             FROM
             FIN_CASH_PLAN fop
             WHERE
-            fop.FINPROD_TYPE2 IN ('F01','F18')  AND EXISTS (
+            fop.FINPROD_TYPE2 IN ('F01','F07','F18')  AND EXISTS (
             SELECT 1 FROM FIN_CASH_INFO fop2 WHERE fop2.CASH_TYPE_1 = '02' AND fop2.CASH_TYPE_2 ='C02' AND fop.CASH_ID =fop2.CASH_ID
             )
         )
@@ -91,46 +91,24 @@
             WHERE y.PAY_DATE &gt;=to_date('${valDate}','yyyy-MM-dd')  ORDER BY y.PAY_DATE ASC
             ) WHERE  rowno=1
         )
-        ,FIN_OPEN_PLAN_AST AS  (
-            /**申购开放(这里三个union是为了取的顺序赎回优先,无赎回则取申购)**/
-            SELECT
-            CASH_ID,FINPROD_ID , OPEN_VDATE
-            FROM
-            FIN_OPEN_PLAN fop
-            WHERE
-            fop.FINPROD_ID LIKE 'F17_%' AND fop.OPEN_TYPE = '01' AND NOT EXISTS (
-            SELECT 1 FROM FIN_OPEN_PLAN fop2 WHERE fop2.OPEN_TYPE = '02' AND fop.CASH_ID =fop2.CASH_ID
-            )
-            /**赎回开放**/
-            UNION ALL
-            SELECT
-            CASH_ID, FINPROD_ID ,OPEN_VDATE
-            FROM
-            FIN_OPEN_PLAN fop
-            WHERE
-            fop.FINPROD_ID LIKE 'F17_%' AND fop.OPEN_TYPE = '02'
-            /**申赎同频**/
-            UNION ALL
-            SELECT
-            CASH_ID,fop.FINPROD_ID , OPEN_VDATE
-            FROM
-            FIN_OPEN_PLAN fop
-            WHERE
-            fop.FINPROD_ID LIKE 'F17_%' AND fop.OPEN_TYPE = '03'
+        ,FIN_OPEN_RULE_TEMP AS  (
+            SELECT * FROM (SELECT CASH_ID,OPEN_TYPE,OPEN_MODE,ROW_NUMBER() OVER(PARTITION BY CASH_ID ORDER BY OPEN_TYPE DESC) rowno FROM FIN_OPEN_RULE) WHERE rowno=1
         )
         ,PLAN_AST_REPDATE AS (
-            /**距可赎回日在10个交易日以上计划类资产(高频开放)**/
-            select n.FINPROD_ID,MDATE AS OPEN_VDATE
+            /**距可赎回日在10个交易日以上计划类资产(高频开放，高频默认1)**/
+            select n.FINPROD_ID,DATE'${valDate}'+1 AS OPEN_VDATE
             from FIN_PRODUCT m
             INNER JOIN FIN_CASH_INFO n ON n.FINPROD_ID = m.FINPROD_ID and m.FINPROD_TYPE2='F17' AND n.CASH_TYPE_1 = '01' AND n.CASH_TYPE_2 = 'C01'
-            INNER JOIN FIN_OPEN_RULE r ON r.CASH_ID = n.CASH_ID AND r.OPEN_MODE = '02'
+            /**这里为了申赎不同频,规则表两条记录，优先取赎回的，申购有可能是高频的，赎回是定期的**/
+            INNER JOIN FIN_OPEN_RULE_TEMP r ON r.CASH_ID = n.CASH_ID AND r.OPEN_MODE = '02'
             /**距可赎回日在10个交易日以上计划类资产(非高频开放)**/
             UNION ALL
             SELECT FINPROD_ID,OPEN_VDATE FROM (
             SELECT m.FINPROD_ID,M.VDATE,y.OPEN_VDATE,NVL(M.CALENDAR_ID,'01') CALENDAR_ID ,rank() over(PARTITION BY m.FINPROD_ID ORDER BY y.OPEN_VDATE asc) AS rowno
             from FIN_PRODUCT m
             INNER JOIN  FIN_CASH_INFO n ON n.FINPROD_ID=m.FINPROD_ID  AND n.CASH_TYPE_1='01' AND n.CASH_TYPE_2='C01' AND M.FINPROD_TYPE2 ='F17'
-            INNER JOIN  FIN_OPEN_PLAN_AST y ON y.CASH_ID=n.CASH_ID
+            INNER JOIN FIN_OPEN_RULE_TEMP r ON r.CASH_ID = n.CASH_ID AND r.OPEN_MODE <![CDATA[ <> '02' ]]>
+            INNER JOIN  FIN_OPEN_PLAN y ON y.CASH_ID=r.CASH_ID AND r.OPEN_TYPE=y.OPEN_TYPE
             WHERE y.OPEN_VDATE &gt;=to_date('${valDate}','yyyy-MM-dd')  ORDER BY y.OPEN_VDATE ASC
             ) WHERE  rowno=1
         )
@@ -142,7 +120,7 @@
         <!-- add by jjpei 增加股票行情交易状态 end -->
         <!-- add by zhangrui1 增加资产属性:是否流动性受限 start -->
         , FLOW_LIMITED_ASSET AS (
-            -- 流动性受限资产
+            /**流动性受限资产**/
             SELECT FPT.FINPROD_ID, 'Y' IS_FLOW_LIMITED FROM FIN_PRODUCT_TYPE FPT
             WHERE EXISTS (
                 SELECT 1 FROM RSK_SPECIFIC_ASSET_TYPE RSAT WHERE RSAT.IS_FLOW_LIMITED = 'Y'
@@ -150,7 +128,7 @@
             ) AND FPT.TYPE_9||'_'||FPT.TYPE_10||'_'||FPT.TYPE_11||'_'||FPT.TYPE_12 != '___'
         )
         , IS_LIQUIDITY1_ASSET AS (
-        -- 是否无活跃交易市场
+        /**是否无活跃交易市场**/
         SELECT FPT.FINPROD_ID, 'Y' IS_LIQUIDITY1 FROM FIN_PRODUCT_TYPE FPT
         WHERE EXISTS (
         SELECT 1 FROM RSK_SPECIFIC_ASSET_TYPE RSAT WHERE RSAT.IS_LIQUIDITY1 = 'Y'
@@ -158,7 +136,7 @@
         ) AND FPT.TYPE_9||'_'||FPT.TYPE_10||'_'||FPT.TYPE_11||'_'||FPT.TYPE_12 != '___'
         )
         , IS_LIQUIDITY2_ASSET AS (
-        -- 是否不具备活跃交易市场
+        /**是否不具备活跃交易市场**/
         SELECT FPT.FINPROD_ID, 'Y' IS_LIQUIDITY2 FROM FIN_PRODUCT_TYPE FPT
         WHERE EXISTS (
         SELECT 1 FROM RSK_SPECIFIC_ASSET_TYPE RSAT WHERE RSAT.IS_LIQUIDITY2 = 'Y'
@@ -166,7 +144,7 @@
         ) AND FPT.TYPE_9||'_'||FPT.TYPE_10||'_'||FPT.TYPE_11||'_'||FPT.TYPE_12 != '___'
         )
         , IS_LIQUIDITY3_ASSET AS (
-        -- 是否7个工作日可变现资产
+        /**是否7个工作日可变现资产**/
         SELECT FPT.FINPROD_ID, 'Y' IS_LIQUIDITY3 FROM FIN_PRODUCT_TYPE FPT
         WHERE EXISTS (
         SELECT 1 FROM RSK_SPECIFIC_ASSET_TYPE RSAT WHERE RSAT.IS_LIQUIDITY3 = 'Y'
@@ -174,7 +152,7 @@
         ) AND FPT.TYPE_9||'_'||FPT.TYPE_10||'_'||FPT.TYPE_11||'_'||FPT.TYPE_12 != '___'
         )
         , IS_LIQUIDITY4_ASSET AS (
-        -- 是否不良资产
+        /**是否不良资产**/
         SELECT FPT.FINPROD_ID, 'Y' IS_BADASSET FROM FIN_PRODUCT_TYPE FPT
         WHERE EXISTS (
         SELECT 1 FROM RSK_SPECIFIC_ASSET_TYPE RSAT WHERE RSAT.IS_BADASSET = 'Y'
@@ -182,6 +160,24 @@
         ) AND FPT.TYPE_9||'_'||FPT.TYPE_10||'_'||FPT.TYPE_11||'_'||FPT.TYPE_12 != '___'
         )
         <!-- add by zhangrui1 增加资产属性:是否流动性受限 end -->
+        <!-- add by jjpei 增加资产是否存在应收款 start -->
+        , IS_EXIST_RECAST AS (
+        SELECT DISTINCT FP.FINPROD_ID, 'Y' IS_EXIST_REC_AST
+        FROM (
+        SELECT FINPROD_ID FROM (
+        SELECT
+        prp.FINPROD_ID,ROW_NUMBER() OVER(PARTITION BY FINPROD_ID ORDER BY  CDATE DESC) AS RANKNO
+        FROM
+        PTL_RECE_POSITION prp
+        INNER JOIN PTL_PORTFOLIO pp ON prp.PORTFOLIO_ID = pp.PORTFOLIO_ID
+        WHERE
+        prp.HODING_TYPE = '03' AND PRP.AMOUNT &gt; 0 AND cdate &lt;= date'${valDate}'
+        AND nvl(pp.PARENT_PORTFOLIO_ID, 'null') = 'null' AND PRP.FINPROD_ID LIKE 'F01_%'
+        ) WHERE RANKNO=1
+        ) RA
+        INNER JOIN FIN_PRODUCT FP ON FP.FINPROD_ID = RA.FINPROD_ID
+        )
+        <!-- add by jjpei 增加是否存在应收款 end -->
         select
         m.FINPROD_ID  finprodId,
         m.FINPROD_ABBR finprodAbbr,
@@ -196,6 +192,7 @@
         n.INVEST_NATURE investNature,
         n.IS_SEVEN_DAY_CASHABLE isSevenDayCashable,
         n.IS_OPEN_EVERYDAY isOpenEveryDay,
+        n.BOND_RISK_TYPE bondRiskType,
         y.TYPE_4 type4,
         y.TYPE_5 type5,
         y.TYPE_8 type6,
@@ -234,6 +231,7 @@
         , NVL(RSAT3.IS_LIQUIDITY3, 'N') isLiquidity3
         , NVL(RSAT4.IS_BADASSET, 'N') isBadAsset
         <!-- add by zhangrui1 增加资产属性:是否流动性受限 end -->
+        , NVL(IER.IS_EXIST_REC_AST, 'N') isExistRecAst
         <!-- add by zhangrui1 增加资产属性:机构主体类型 start -->
         , MCIA.CUSTOMER_OBJ_TYPE customerObjType
         , rsatt.IS_UNLISTEDEQUITY  isUnEquity
@@ -265,6 +263,7 @@
         left join IS_LIQUIDITY3_ASSET RSAT3 on m.FINPROD_ID = RSAT3.FINPROD_ID
         left join IS_LIQUIDITY4_ASSET RSAT4 on m.FINPROD_ID = RSAT4.FINPROD_ID
         <!-- add by zhangrui1 增加资产属性:是否流动性受限 end -->
+        left join IS_EXIST_RECAST IER on m.FINPROD_ID = IER.FINPROD_ID
         <!-- add by zhangrui1 增加资产属性:机构主体类型 start -->
         LEFT JOIN MST_CUSTOMER_INFO_ADD MCIA ON MCIA.CUSTOMER_ID = m.ISSUER_CODE
         <!-- add by zhangrui1 增加资产属性:机构主体类型 end -->
@@ -312,6 +311,7 @@
         decode(y.TYPE_8, 'F07', decode(y.TYPE_7, '04', '01', ''), 'F08', decode(y.TYPE_7, '02', '01', ''), '03') investNature,
         null isSevenDayCashable,
         null isOpenEveryDay,
+        null bondRiskType,
         y.TYPE_4 type4,
         y.TYPE_5 type5,
         y.TYPE_8 type6,
@@ -348,6 +348,7 @@
         , null isLiquidity3
         , null isBadAsset
         <!-- add by zhangrui1 增加资产属性:是否流动性受限 end -->
+        , null isExistRecAst
         <!-- add by zhangrui1 增加资产属性:机构主体类型 start -->
         , null customerObjType
         , null  isUnEquity

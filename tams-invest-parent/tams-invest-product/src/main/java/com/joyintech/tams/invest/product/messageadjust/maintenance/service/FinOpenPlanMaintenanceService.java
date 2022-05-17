@@ -16,9 +16,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.tams.invest.common.CommonUtil;
+import com.joyintech.tams.invest.common.asset.util.AssetCommonUtil;
+import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
+import com.joyintech.tams.invest.common.prodinfo.BussRuleService;
+import com.joyintech.tams.invest.common.redisinit.dto.ImplCond;
+import com.joyintech.tams.invest.common.redisinit.service.RiskRedisInitService;
+import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
+import com.joyintech.tams.invest.product.messageadjust.maintenance.dto.FinOpenPlanMaintenance002Dto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import com.joyintech.framework.export.CommonExportService;
@@ -51,6 +64,22 @@ import com.joyintech.workflow.engine.service.BaseProcessService;
 @Service
 public class FinOpenPlanMaintenanceService extends CommonExportService<FinOpenPlanMaintenanceDto> 
     implements BaseProcessService<FinOpenPlanMaintenanceDto>{
+
+    @Autowired
+    private BussRuleService bussRuleService;
+
+    /**
+     * redis数据初始化
+     */
+    @Autowired
+    private RiskRedisInitService<ImplCond> redisRriter;
+
+    /**
+     * 线程池
+     */
+    @Autowired
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+
     /**
      * 日志
      */
@@ -119,6 +148,34 @@ public class FinOpenPlanMaintenanceService extends CommonExportService<FinOpenPl
         restTemplate.postForObject(
             ServiceApplication.PRODUCT_SERVICE_NAME + "/FinOpenPlanMaintenance/" + action, dto,
             Integer.class);
+        //---add by 裴家俊 匹配风险规则包来关联指标且装载到redis 20220326 start---
+        assembleRedis(dto);
+        //---add by 裴家俊 匹配风险规则包来关联指标且装载到redis 20220326 end---
+    }
+
+    /**
+     * 装载到redis里
+     * @param entity
+     */
+    private void assembleRedis(FinOpenPlanMaintenanceDto entity){
+        if (CommonUtil.isType(CacheUtil.getSysParam(RiskUtil.PAGE_REDIS_FLAG), BussinessDictCodeListRds.是否_是)) {
+            String portfolioId=StringUtil.replace(entity.getFinprodId(),
+                    DictCodeListExt1.金融产品类型_投管用_理财产品.getValue()+ GlobalConstant.UNDER_LINE,StringUtil.EMPTY);
+            bussRuleService.matchRulePortByPort(AssetCommonUtil.getProdInfo(portfolioId, obj->obj));
+            threadPoolTaskExecutor.execute(()->{
+                try {
+                    Thread.sleep(RiskUtil.getRefreshTime());
+                    ImplCond cond = new ImplCond();
+                    cond.setDel(false);
+                    cond.setPortfIdArray(portfolioId);
+                    logger.info("----------->修改产品开放计划至组合关联指标进入redis开始--------------");
+                    redisRriter.dealRiskPtlIndicator(cond);
+                    logger.info("----------->修改产品开放计划至组合关联指标进入redis结束--------------");
+                } catch (InterruptedException e) {
+                    logger.error("===========修改产品开放计划至组合关联指标进入redis异常=============",e);
+                }
+            });
+        }
     }
 
     /**
