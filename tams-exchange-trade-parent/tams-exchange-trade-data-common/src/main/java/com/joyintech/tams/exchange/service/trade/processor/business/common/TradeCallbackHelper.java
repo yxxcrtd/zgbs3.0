@@ -99,6 +99,14 @@ public class TradeCallbackHelper {
                     tradeRecord.setPropSeatNo(integratedEntrust.getPropSeatNo());
                     tradeRecord.setPropSeatName(integratedEntrust.getPropSeatName());
                     tradeRecord.setDiscount(integratedEntrust.getDiscount());
+
+                    // 信用保护凭证使用 --start
+                    tradeRecord.setCounterId(integratedEntrust.getCounterId());
+                    tradeRecord.setCounterName(integratedEntrust.getCounterName());
+                    tradeRecord.setPropAcctNo(integratedEntrust.getPropAcctNo());
+                    tradeRecord.setPropAcctName(integratedEntrust.getPropAcctName());
+                    // 信用保护凭证使用 --end
+
                     transactionHelper.addIntegratedEntrust(integratedEntrust);
                     Instruction instruction = instructionService.findById(entrust.getInstructionId());
                     transactionHelper.setInstructionBean(instruction);
