@@ -24,6 +24,10 @@ public class CfetsEtrDispatcherResponse {
     @ApiModelProperty(name="readOnlyField",value="交易员字段是否可修改",example="Y/N")
     private String readOnlyField;
 
+    @ApiModelProperty(name="bidCode",value="条件code",example="01 已分发不通过；02 通过替换 03 直接分发")
+    private String bidCode;
+
+
     public String getFinprodId() {
         return finprodId;
     }
@@ -54,5 +58,13 @@ public class CfetsEtrDispatcherResponse {
 
     public void setReadOnlyField(String readOnlyField) {
         this.readOnlyField = readOnlyField;
+    }
+
+    public String getBidCode() {
+        return bidCode;
+    }
+
+    public void setBidCode(String bidCode) {
+        this.bidCode = bidCode;
     }
 }
