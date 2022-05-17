@@ -1,16 +1,26 @@
 package com.joyintech.tams.exchange.period.creditprotectioncertificate.dto;
 
+import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.framework.validation.annotation.NotEmpty;
+import com.joyintech.framework.validation.annotation.ValidLogic;
+import com.joyintech.framework.validation.groups.ValidateGroupDelete;
+import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.business.common.dto.PageMode;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.exchange.period.creditprotectioncertificate.validator.CreditProtectionCertificatePeriodSaveDtoValidator;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+@PageId("CreditProtectionCertificate002")
+@ValidLogic(targetClass = CreditProtectionCertificatePeriodSaveDtoValidator.class , groups = {ValidateGroupEdit.class})
+@ApiModel(value="信用凭证保护存续期",description="信用凭证保护存续期")
 public class CreditProtectionCertificatePeriodSaveDto extends BaseEntity implements ProcessEntity {
 
     @ApiModelProperty(name="operateType",value="操作类型",example="submit/save", required = true)
@@ -55,26 +65,30 @@ public class CreditProtectionCertificatePeriodSaveDto extends BaseEntity impleme
     /**
      * 资产代码
      */
+    @NotEmpty(fieldName = "资产代码", groups = {ValidateGroupEdit.class})
     @ApiModelProperty(name = "finprodMarketId",value = "资产代码")
     private String finprodMarketId;
 
     /**
      * 资产名称
      */
+    @NotEmpty(fieldName = "资产名称", groups = {ValidateGroupEdit.class})
     @ApiModelProperty(name = "finprodMarketName",value = "资产名称")
     private String finprodMarketName;
 
     /**
      * 产品起息日
      */
+    @NotEmpty(fieldName = "产品起息日", groups = {ValidateGroupEdit.class})
     @ApiModelProperty(name = "vDateWhole",value = "产品起息日")
-    private String vDateWhole;
+    private Date vDate;
 
     /**
      * 产品到期日
      */
+    @NotEmpty(fieldName = "产品到期日", groups = {ValidateGroupEdit.class})
     @ApiModelProperty(name = "mDateWhole",value = "产品到期日")
-    private String mDateWhole;
+    private Date mDate;
 
     /**
      * 名义本金
@@ -121,20 +135,67 @@ public class CreditProtectionCertificatePeriodSaveDto extends BaseEntity impleme
     /**
      * 交付债券
      */
+//    @NotEmpty(fieldName = "交付债券", groups = {ValidateGroupEdit.class})
     @ApiModelProperty(name = "deliverBond",value = "交付债券")
     private String deliverBond;
 
     /**
+     * 债券交付数量
+     */
+    @ApiModelProperty(name = "deliverBondAmount",value = "债券交付数量")
+    private BigDecimal deliverBondAmount;
+
+    /**
      * 交付时间
      */
+    @NotEmpty(fieldName = "交付时间", groups = {ValidateGroupEdit.class})
     @ApiModelProperty(name = "deliverDate",value = "交付时间")
-    private String deliverDate;
+    private Date deliverDate;
 
     /**
      * 结算明细
      */
-    @ApiModelProperty(name = "deliverDate",value = "结算明细")
+    @ApiModelProperty(name = "billingDetails",value = "结算明细")
     private List<BillingDetailsDto> billingDetails;
+
+    /**
+     * 证券托管户
+     */
+    @ApiModelProperty(name = "secManageAcctId",value = "证券托管户")
+    private String secManageAcctId;
+
+    /**
+     * 记录操作方式
+     */
+    @ApiModelProperty(name = "optType",value = "记录操作方式")
+    private String optType;
+
+    @ApiModelProperty(name="softSkipMode",value="软控是否继续？Y：继续",example="Y")
+    private String softSkipMode;
+
+    public String getSoftSkipMode() {
+        return softSkipMode;
+    }
+
+    public void setSoftSkipMode(String softSkipMode) {
+        this.softSkipMode = softSkipMode;
+    }
+
+    public String getOptType() {
+        return optType;
+    }
+
+    public void setOptType(String optType) {
+        this.optType = optType;
+    }
+
+    public String getSecManageAcctId() {
+        return secManageAcctId;
+    }
+
+    public void setSecManageAcctId(String secManageAcctId) {
+        this.secManageAcctId = secManageAcctId;
+    }
 
     public String getValidStatus() {
         return validStatus;
@@ -176,21 +237,6 @@ public class CreditProtectionCertificatePeriodSaveDto extends BaseEntity impleme
         this.finprodMarketName = finprodMarketName;
     }
 
-    public String getvDateWhole() {
-        return vDateWhole;
-    }
-
-    public void setvDateWhole(String vDateWhole) {
-        this.vDateWhole = vDateWhole;
-    }
-
-    public String getmDateWhole() {
-        return mDateWhole;
-    }
-
-    public void setmDateWhole(String mDateWhole) {
-        this.mDateWhole = mDateWhole;
-    }
 
     public BigDecimal getRepNomCapi() {
         return repNomCapi;
@@ -248,11 +294,11 @@ public class CreditProtectionCertificatePeriodSaveDto extends BaseEntity impleme
         this.deliverBond = deliverBond;
     }
 
-    public String getDeliverDate() {
+    public Date getDeliverDate() {
         return deliverDate;
     }
 
-    public void setDeliverDate(String deliverDate) {
+    public void setDeliverDate(Date deliverDate) {
         this.deliverDate = deliverDate;
     }
 
@@ -310,6 +356,30 @@ public class CreditProtectionCertificatePeriodSaveDto extends BaseEntity impleme
 
     public void setPageId(String pageId) {
         this.pageId = pageId;
+    }
+
+    public Date getvDate() {
+        return vDate;
+    }
+
+    public void setvDate(Date vDate) {
+        this.vDate = vDate;
+    }
+
+    public Date getmDate() {
+        return mDate;
+    }
+
+    public void setmDate(Date mDate) {
+        this.mDate = mDate;
+    }
+
+    public BigDecimal getDeliverBondAmount() {
+        return deliverBondAmount;
+    }
+
+    public void setDeliverBondAmount(BigDecimal deliverBondAmount) {
+        this.deliverBondAmount = deliverBondAmount;
     }
 }
 

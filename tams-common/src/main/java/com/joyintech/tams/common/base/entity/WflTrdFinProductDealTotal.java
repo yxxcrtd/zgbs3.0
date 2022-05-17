@@ -1484,5 +1484,71 @@ public class WflTrdFinProductDealTotal extends WflTrdFinProductDealTotalKey {
     public void setReplacePrice(BigDecimal replacePrice) {
         this.replacePrice = replacePrice;
     }
+
+
+    /**
+     * 信用事件发生时间
+     */
+    private Date creditEventHappenedDate;
+
+    /**
+     * 信用事件决定日
+     */
+    private Date creditEventResolveDate;
+
+    /**
+     * 结算方式
+     */
+    private String settleMethod;
+
+    /**
+     * 交付债券
+     */
+    private String deliverBond;
+
+    /**
+     * 债券交付数量
+     */
+    private BigDecimal deliverBondAmount;
+
+    public Date getCreditEventHappenedDate() {
+        return creditEventHappenedDate;
+    }
+
+    public void setCreditEventHappenedDate(Date creditEventHappenedDate) {
+        this.creditEventHappenedDate = creditEventHappenedDate;
+    }
+
+    public Date getCreditEventResolveDate() {
+        return creditEventResolveDate;
+    }
+
+    public void setCreditEventResolveDate(Date creditEventResolveDate) {
+        this.creditEventResolveDate = creditEventResolveDate;
+    }
+
+    public String getSettleMethod() {
+        return settleMethod;
+    }
+
+    public void setSettleMethod(String settleMethod) {
+        this.settleMethod = settleMethod;
+    }
+
+    public String getDeliverBond() {
+        return deliverBond;
+    }
+
+    public void setDeliverBond(String deliverBond) {
+        this.deliverBond = deliverBond;
+    }
+
+    public BigDecimal getDeliverBondAmount() {
+        return deliverBondAmount;
+    }
+
+    public void setDeliverBondAmount(BigDecimal deliverBondAmount) {
+        this.deliverBondAmount = deliverBondAmount;
+    }
 	
 }

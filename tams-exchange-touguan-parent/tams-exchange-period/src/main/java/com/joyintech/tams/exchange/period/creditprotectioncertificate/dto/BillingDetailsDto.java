@@ -1,5 +1,7 @@
 package com.joyintech.tams.exchange.period.creditprotectioncertificate.dto;
 
+import com.joyintech.framework.validation.annotation.NotEmpty;
+import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
@@ -20,35 +22,41 @@ public class BillingDetailsDto {
     /**
      * 组合代码
      */
+    @NotEmpty(fieldName = "组合代码", groups = {ValidateGroupEdit.class})
     @ApiModelProperty(name = "portfolioId", value = "组合代码")
     private String portfolioId;
     /**
      * 组合名称
      */
+    @NotEmpty(fieldName = "组合名称", groups = {ValidateGroupEdit.class})
     @ApiModelProperty(name = "portfolioName", value = "组合名称")
     private String portfolioName;
 
     /**
      * 资金账户
      */
+    @NotEmpty(fieldName = "资金账户", groups = {ValidateGroupEdit.class})
     @ApiModelProperty(name = "acctNo", value = "资金账户")
     private String acctNo;
 
     /**
      * 名义本金
      */
+    @NotEmpty(fieldName = "名义本金", groups = {ValidateGroupEdit.class})
     @ApiModelProperty(name = "repNomCapi", value = "名义本金")
     private BigDecimal repNomCapi;
 
     /**
      * 债券交付数量
      */
+//    @NotEmpty(fieldName = "债券交付数量", groups = {ValidateGroupEdit.class})
     @ApiModelProperty(name = "deliverBondAmount", value = "债券交付数量")
     private BigDecimal deliverBondAmount;
 
     /**
      * 交付金额
      */
+    @NotEmpty(fieldName = "交付金额", groups = {ValidateGroupEdit.class})
     @ApiModelProperty(name = "交付金额", value = "交付金额")
     private BigDecimal deliveryAmount;
 
@@ -57,6 +65,20 @@ public class BillingDetailsDto {
      */
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
+
+    /**
+     * 证券托管户
+     */
+    @ApiModelProperty(name = "secManageAcctId",value = "证券托管户")
+    private String secManageAcctId;
+
+    public String getSecManageAcctId() {
+        return secManageAcctId;
+    }
+
+    public void setSecManageAcctId(String secManageAcctId) {
+        this.secManageAcctId = secManageAcctId;
+    }
 
     public String getSeqNo() {
         return seqNo;
