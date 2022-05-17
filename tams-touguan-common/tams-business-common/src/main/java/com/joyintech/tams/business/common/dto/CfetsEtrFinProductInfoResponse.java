@@ -407,8 +407,15 @@ public class CfetsEtrFinProductInfoResponse {
     /**
      * 发行方式
      */
-    @ApiModelProperty(name = "issueType", value = "发行方式")
+    @ApiModelProperty(name = "issueType", value = "发行方式/募集方式")
     private String issueType;
+
+
+    /**
+     * 发行方式
+     */
+    @ApiModelProperty(name = "issueClass", value = "发行方式")
+    private String issueClass;
 
     /**
      * 息票品种
@@ -928,6 +935,10 @@ public class CfetsEtrFinProductInfoResponse {
         return SysDataUtil.getNameFromDataDict(DictCode.发行方式, this.getIssueType());
     }
 
+    public String getIssueClassStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.发行方式, this.getIssueClass());
+    }
+
 
     public String getTenderTypeStr() {
         return SysDataUtil.getNameFromDataDict(DictCode.招标方式, this.getTenderType());
@@ -968,5 +979,13 @@ public class CfetsEtrFinProductInfoResponse {
 
     public void setCcyStr(String ccyStr) {
         this.ccyStr = ccyStr;
+    }
+
+    public String getIssueClass() {
+        return issueClass;
+    }
+
+    public void setIssueClass(String issueClass) {
+        this.issueClass = issueClass;
     }
 }
