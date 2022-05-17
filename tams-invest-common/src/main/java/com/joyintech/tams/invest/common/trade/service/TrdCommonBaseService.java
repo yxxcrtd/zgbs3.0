@@ -22,6 +22,7 @@ import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
@@ -33,12 +34,14 @@ import com.joyintech.tams.invest.common.dto.mock.trade.MockTrdProductDealDto;
 import com.joyintech.tams.invest.common.dto.period.common.BaseTotalTradeInfoDto;
 import com.joyintech.tams.invest.common.dto.period.common.BaseTrade;
 import com.joyintech.tams.invest.common.dto.period.common.BaseTradeInfoDto;
+import com.joyintech.tams.invest.common.trade.dto.MinTrdUnitLimitDto;
 import com.joyintech.tams.invest.common.trade.dto.OrderInfoDto;
 import com.joyintech.tams.invest.common.trade.dto.PortfolioCalculateDto;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.dao.TrdCommonBaseMapper;
 import com.joyintech.tams.invest.common.trade.dto.AllTradeCommonInputDto;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -1499,5 +1502,61 @@ public class TrdCommonBaseService extends BaseService {
      */
     public List<InfContractPortfolioDetail> getInfContractPortfolioDetails(String seqNo){
         return trdCommonBaseMapper.getInfContractPortfolioDetails(seqNo);
+    }
+
+
+    /**
+     * 获取最小交易单元
+     * @param finprodId 金融产品代码
+     * @param tradePlat 交易平台
+     * @param assetType 资产大类
+     * @return 获取最小交易单元
+     */
+    public MinTrdUnitLimitDto getMinTrdUnitLimit(String finprodId, String tradePlat, String tradeMarket,
+                                                 String assetType, String ps) {
+        MinTrdUnitLimitDto minTrdUnitLimitDto = null;
+        String PINANAssetType = this.getPAAssetType(assetType);
+        // 质押式回购 没有资产代码，虚拟的资产代码
+        if (StringUtils.equals(PINANAssetType, DictCodeList.平安资产类型_质押式回购.getValue())) {
+            finprodId = null;
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("finprodId", finprodId);
+        map.put("tradeMarket", tradeMarket);
+        map.put("tradePlat", tradePlat);
+        map.put("assetType", PINANAssetType);
+        map.put("ps", ps);
+        Map<String, Object> res = restTemplate.postForObject(
+                ServiceApplication.BASICDATA_SERVICE_NAME + "/InterfSysTrdConfig/getMinTrdUnitLimit", map, Map.class);
+        if (res != null && res.get("data") != null) {
+            List<MinTrdUnitLimitDto> list = (List<MinTrdUnitLimitDto>) res.get("data");
+            if (list != null && list.size() > 0) {
+                minTrdUnitLimitDto = JSON.parseObject(JSON.toJSONString(list.get(0)), MinTrdUnitLimitDto.class);
+            }
+        }
+        return minTrdUnitLimitDto;
+    }
+
+    /**
+     *
+     * @param finprodType2
+     * @return
+     */
+    public String getPAAssetType(String finprodType2) {
+        String assetType = "";
+        if (StringUtils.isNotEmpty(finprodType2)) {
+            if (StringUtils.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
+                assetType = DictCodeList.平安资产类型_债券.getValue();
+            } else if (StringUtils.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_基金.getValue())) {
+                assetType = DictCodeList.平安资产类型_基金.getValue();
+            } else if (StringUtils.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_股票.getValue())) {
+                assetType = DictCodeListExt2.平安资产类型_股票.getValue();
+            } else if (StringUtils.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
+                    || StringUtils.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())
+                    || StringUtils.equals(finprodType2, "ZYSHG")) {
+                assetType = DictCodeList.平安资产类型_质押式回购.getValue();
+            }
+        }
+        return assetType;
     }
 }

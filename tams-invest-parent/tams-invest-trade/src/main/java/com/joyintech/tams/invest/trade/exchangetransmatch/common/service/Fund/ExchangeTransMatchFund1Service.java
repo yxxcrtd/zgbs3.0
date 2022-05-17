@@ -36,7 +36,9 @@ public class ExchangeTransMatchFund1Service extends BaseService {
         if(StringUtil.equals(commonEntrustDto.getEntrustClass(),DictCodeListExt3.投资指令类型_多组合单资产指令.getValue())) {
             TrdFinProductDealTotal trdFinProductDealTotal = this.genTrdFinProductDealTotal(dto,commonEntrustDto);
             for (ExchangeTransMatchCommonEntrustDetailDto detailDto:commonEntrustDto.getEntrustDetailDtoList()) {
-
+                if(detailDto.getMarchQty() == null || detailDto.getMarchQty().compareTo(BigDecimal.ZERO) <= 0){
+                    continue;
+                }
                 ExchangeTransMatchCommonEntrustDto entrustDtoTmp = new ExchangeTransMatchCommonEntrustDto();
                 BeanUtil.copyPropertiesIgnoreNull(entrustDtoTmp,commonEntrustDto);
                 entrustDtoTmp.setPortfolioId(detailDto.getPortfolioId());
