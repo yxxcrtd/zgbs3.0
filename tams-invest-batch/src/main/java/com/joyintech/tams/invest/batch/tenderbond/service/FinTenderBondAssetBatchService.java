@@ -131,6 +131,7 @@ public class FinTenderBondAssetBatchService {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             if (CollectionUtils.isNotEmpty(seqNoList)) {
                 String errorMsg = new String();
                 seqNoList.forEach(i -> {
