@@ -491,10 +491,9 @@ public class InvestmentManagement extends BaseService {
         MinPriceAndMinTrdUnitLimitBean minPriceAndMinTrdUnitLimitBean = null;
         for (Instruction instruction : instructions) {
             minPriceAndMinTrdUnitLimitBean = instruction.getMinPriceAndMinTrdUnitLimitBean();
-            // TODO: 方便测试
-            /*if (ObjectUtil.isNotNull(minPriceAndMinTrdUnitLimitBean)) {
+            if (ObjectUtil.isNotNull(minPriceAndMinTrdUnitLimitBean)) {
                 continue;
-            }*/
+            }
 
             /*if (InvestmentAssetType.FUTURES.value.equals(instruction.getAssetType())) {
                 minPriceAndMinTrdUnitLimitBean = futuresInstrumentService.queryMinPriceAndMinTrdUnitLimitByFuture(instruction);
@@ -560,6 +559,7 @@ public class InvestmentManagement extends BaseService {
 
             logger.info("填充最小价差等交易属性信息 => 【minPriceAndMinTrdUnitLimitBean = {}】", minPriceAndMinTrdUnitLimitBean);
             instruction.setMinPriceAndMinTrdUnitLimitBean(minPriceAndMinTrdUnitLimitBean);
+            instructionService.asyncUpdate(instruction);
         }
     }
 
