@@ -108,6 +108,9 @@ public class FinBondAssetResponse {
     @ApiModelProperty(name="basisRate",value="基准利率")
     private String basisRate;
 
+    @ApiModelProperty(name="basisRateStr",value="基准利率")
+    private String basisRateStr;
+
     @ApiModelProperty(name="basisRateRatio",value="基准利率系数")
     private BigDecimal basisRateRatio;
 
@@ -648,5 +651,9 @@ public class FinBondAssetResponse {
 
     public void setConceptTypeStr(String conceptTypeStr) {
         this.conceptTypeStr = conceptTypeStr;
+    }
+
+    public void setBasisRateStr(String basisRateStr) {
+        this.basisRateStr = basisRateStr;
     }
 }

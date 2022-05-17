@@ -29,7 +29,7 @@
         NVL(T8.YIELD,0)*100 rate,
         T6.BENCHMARK_ID basisRate,
         T6.COEFFICIENT basisRateRatio,
-        NVL(T6.SPREAD_RATE,0)/10000 spreadRate,
+        NVL(T6.SPREAD_RATE,0) spreadRate,
         T6.FIRST_CONFIRM_DATE firstRateFixDate,
         T8.BASIS basis,
         T8.MARKET_BASIS marketBasis,
