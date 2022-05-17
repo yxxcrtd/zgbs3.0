@@ -915,12 +915,12 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
 	SELECT DISTINCT A.*, EE.ENTRUST_TYPE, PP.PORTFOLIO_NAME, SCI.ACCT_NAME
 	  FROM (
 	  SELECT decode(TT.INSTRUCTION_ID, NULL, TTH.INSTRUCTION_ID)   INSTRUCTION_ID,
-			 STD.APPLY_TRADE_ID                                    BROKER_ENTRUST_ID,
+			 STD.APPLY_TRADE_ID                                    ENTRUST_ID,
 			 STD.CJBH                                              BROKER_TRADE_ID,
-			 STD.TRADE_MARKET                                      MARKET_STR,
+			 STD.TRADE_MARKET                                      MARKET,
 			 FP.FINPROD_MARKET_ID                                  STOCK_CODE,
 			 FP.FINPROD_ABBR                                       STOCK_NAME,
-			 DECODE(TT.PS, NULL, TTH.PS)                           ENTRUST_BS_STR,
+			 DECODE(TT.PS, NULL, TTH.PS)                           ENTRUST_BS,
 			 DECODE(TT.TRADED_VOLUME, NULL, TTH.TRADED_VOLUME)     TRADED_VOLUME,
 			 DECODE(TT.TRADED_PRICE, NULL, TTH.TRADED_PRICE)       TRADED_PRICE,
 			 DECODE(TT.CLEAR_BALANCE, NULL, TTH.CLEAR_BALANCE)     TRADED_BALANCE,
@@ -931,8 +931,9 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
 			   WHEN STD.DELIVERY_RESULT = '01'  THEN '正常交收'
 			   WHEN STD.DELIVERY_RESULT = '02'  THEN '部分交收'  
 			   WHEN STD.DELIVERY_RESULT = '03'  THEN '交收失败' 
-			   WHEN STD.DELIVERY_RESULT = '04'  THEN '未交收' 
-			 END                                                   DELIVERY_RESULT,
+			   WHEN STD.DELIVERY_RESULT = '04'  THEN '未交收'
+               WHEN STD.DELIVERY_RESULT = '05'  THEN '交收通知'
+             END                                                   DELIVERY_RESULT,
 			 CASE
 			   WHEN STD.DELIVERY_RESULT IS NULL THEN '0'
 			   WHEN STD.DELIVERY_RESULT = '04' THEN  '0'
@@ -943,21 +944,21 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
 		LEFT JOIN T_TRADE TT ON (TT.BROKER_TRADE_ID = STD.CJBH AND TT.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TT.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))
 		LEFT JOIN T_TRADEHISTORY TTH ON (TTH.BROKER_TRADE_ID = STD.CJBH AND TTH.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TTH.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))
 		LEFT JOIN FIN_PRODUCT FP ON STD.FINPROD_ID = FP.FINPROD_ID
-	   WHERE STD.DELIVERY_RESULT IN ('01', '02', '03')
+	   WHERE STD.DELIVERY_RESULT IN ('01', '02', '03', '05')
 		 AND ((STD.PS = 'T56' AND STD.TRADE_MARKET = '03' AND STD.BUSI_SCENE_CALSS NOT IN ('0902RB02', '0902RS03'))
                 OR (STD.PS = 'T56' AND STD.TRADE_MARKET = '04') OR (STD.PS != 'T56'))
 	  UNION
 	  SELECT TT.INSTRUCTION_ID                                     INSTRUCTION_ID,
-			 TT.BROKER_ENTRUST_ID                                  BROKER_ENTRUST_ID,
+			 TT.BROKER_ENTRUST_ID                                  ENTRUST_ID,
 			 TT.BROKER_TRADE_ID                                    BROKER_TRADE_ID,
 			 CASE
 			   WHEN TT.MARKET = 'SH' THEN '上海证券交易所'
 			   WHEN TT.MARKET = 'SZ' THEN '深圳证券交易所'
 			   ELSE NULL
-			 END                                                   MARKET_STR,
+			 END                                                   MARKET,
 			 TT.STOCK_CODE                                         STOCK_CODE,
 			 TT.STOCK_NAME                                         STOCK_NAME,
-			 TT.PS                                                 ENTRUST_BS_STR,
+			 TT.PS                                                 ENTRUST_BS,
 			 TT.TRADED_VOLUME                                      TRADED_VOLUME,
 			 TT.TRADED_PRICE                                       TRADED_PRICE,
 			 TT.CLEAR_BALANCE                                      CLEAR_BALANCE,
@@ -968,7 +969,8 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
 			   WHEN STD.DELIVERY_RESULT = '01'  THEN '正常交收'
 			   WHEN STD.DELIVERY_RESULT = '02'  THEN '部分交收'  
 			   WHEN STD.DELIVERY_RESULT = '03'  THEN '交收失败' 
-			   WHEN STD.DELIVERY_RESULT = '04'  THEN '未交收' 
+			   WHEN STD.DELIVERY_RESULT = '04'  THEN '未交收'
+               WHEN STD.DELIVERY_RESULT = '05'  THEN '交收通知'
 			 END                                                   DELIVERY_RESULT,
 			 CASE
 			   WHEN STD.DELIVERY_RESULT IS NULL THEN '0'
@@ -980,7 +982,7 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
 		LEFT JOIN SETTLE_TRANS_DATA STD
 		  ON TT.BROKER_TRADE_ID = STD.CJBH
 		 AND TT.SEC_ACCT_ID = STD.SEC_ACCT_ID
-		 AND STD.DELIVERY_RESULT IN ('02', '03')
+		 AND STD.DELIVERY_RESULT IN ('01', '02', '03')
 		 AND TT.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD')
 		 AND ((STD.PS = 'T56' AND STD.TRADE_MARKET = '03' AND STD.BUSI_SCENE_CALSS NOT IN ('0902RB02', '0902RS03'))
                 OR (STD.PS = 'T56' AND STD.TRADE_MARKET = '04') OR (STD.PS != 'T56'))
