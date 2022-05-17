@@ -338,6 +338,12 @@ public class FinTenderBondAsset002Dto extends BaseEntity implements ProcessEntit
     private String type11;
 
     /**
+     * 上市流通日
+     */
+    @ApiModelProperty(name = "circulationDate", value = "上市流通日")
+    private Date circulationDate;
+
+    /**
      * 标的扩展表字段
      */
     @ApiModelProperty(name="finProductAdd",value="扩展字段")
@@ -1249,5 +1255,13 @@ public class FinTenderBondAsset002Dto extends BaseEntity implements ProcessEntit
 
     public void setCalModel(String calModel) {
         this.calModel = calModel;
+    }
+
+    public Date getCirculationDate() {
+        return circulationDate;
+    }
+
+    public void setCirculationDate(Date circulationDate) {
+        this.circulationDate = circulationDate;
     }
 }
