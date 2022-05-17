@@ -910,13 +910,16 @@ public class CfetsEtrDispatcherService extends BaseService {
             CfetsEtrFinProductInfoRequest dto = new CfetsEtrFinProductInfoRequest();
             dto.setFinprodId(finprodId);
             CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoService.findFinProductInfo(null, null, dto);
-            if (StringUtil.equals(finProductInfo.getFinprodType2(), DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())
-                    && (StringUtil.equals(finProductInfo.getIssueClass(), DictCodeListExt4.新债_发行方式_招标发行.getValue()) ||
-                    StringUtil.equals(finProductInfo.getIssueClass(), DictCodeListExt4.新债_发行方式_簿记建档.getValue()))) {
-                finprodIdListBid.add(finprodId);
-            } else {
-                finprodIdListOthers.add(finprodId);
+            if (finProductInfo != null) {
+                if (StringUtil.equals(finProductInfo.getFinprodType2(), DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())
+                        && (StringUtil.equals(finProductInfo.getIssueClass(), DictCodeListExt4.新债_发行方式_招标发行.getValue()) ||
+                        StringUtil.equals(finProductInfo.getIssueClass(), DictCodeListExt4.新债_发行方式_簿记建档.getValue()))) {
+                    finprodIdListBid.add(finprodId);
+                } else {
+                    finprodIdListOthers.add(finprodId);
+                }
             }
+
         }
 
         if (CollectionUtils.isNotEmpty(finprodIdListOthers) && CollectionUtils.isNotEmpty(finprodIdListBid)) {
