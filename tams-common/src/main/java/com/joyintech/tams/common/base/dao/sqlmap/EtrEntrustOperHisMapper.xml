@@ -31,10 +31,11 @@
         select his.ENTRUST_ID,
                listagg(su.REAL_NAME || '(' || to_char(his.OPER_TIME, 'yyyy/MM/dd HH:MM:SS') || ')【' || sdl.ITEM_VALUE || '】:' ||
                        his.BUSI_DES, ';')
-                       within group (order by his.OPER_TIME) AS remark
+                       within group (order by his.OPER_TIME desc) AS remark
         from ETR_ENTRUST_OPER_HIS his
                  left join SYS_DATADICT_LIST sdl on sdl.ITEM_CODE = his.OPER_TYPE and sdl.DICT_CODE = 'OPR_TYPE'
                  left join SYS_USER su on su.USER_NAME = his.USER_ID
+         where his.BUSI_DES is not null
         group by his.ENTRUST_ID
     </sql>
     <sql id="Sql_All_Effective_Data" >
