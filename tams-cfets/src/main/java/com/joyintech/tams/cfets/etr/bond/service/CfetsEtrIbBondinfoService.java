@@ -2584,7 +2584,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
                                 recallEntrustIdList, DictCodeList.平安资产类型_质押式回购.getValue(),
                                 BussinessDictCodeListRds.接口系统ID_预占释放批量接口.getValue(),
                                 false, null);
-                    } else if (StringUtil.equals(dto.getAssetType(), DictCodeList.平安资产类型_一级市场债.getValue())) {
+                    } else if (StringUtil.equals(dtolist.get(0).getAssetType(), DictCodeList.平安资产类型_一级市场债.getValue())) {
                         EntrustRdsCommonAop.doListPreOccupy(
                                 recallEntrustIdList, DictCodeList.平安资产类型_一级市场债.getValue(),
                                 BussinessDictCodeListRds.接口系统ID_预占释放批量接口.getValue(),

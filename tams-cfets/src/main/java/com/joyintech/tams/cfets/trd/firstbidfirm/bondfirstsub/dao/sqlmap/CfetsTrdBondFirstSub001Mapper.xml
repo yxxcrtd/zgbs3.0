@@ -453,7 +453,7 @@
             ourTraderName,
             bidDate
         from (
-            select case when bo.IS_CANCEL = 'N' then '02' else '03' end      validStatus,
+            select distinct case when bo.IS_CANCEL = 'N' then '02' else '03' end      validStatus,
                    bo.BID_ID              bidId,
                    bo.SUBSCRIPTION_AMOUNT subscriptionAmount,
                    bo.PAYABLE_AMOUNT      payableAmount,
@@ -479,7 +479,7 @@
                     </foreach>
                 </if>
             union all
-            select '01'        validStatus,
+            select distinct '01'        validStatus,
                    wbo.BID_ID              bidId,
                    wbo.SUBSCRIPTION_AMOUNT subscriptionAmount,
                    wbo.PAYABLE_AMOUNT      payableAmount,
@@ -527,7 +527,7 @@
                     case
                         when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
                             then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP*10000, 0)
-                        else to_char(fpi.REFER_YIELD*100,'FM999999999990.9990') end rate,
+                        else to_char(fpi.REFER_YIELD*100,'FM999999999990.9990')||'%' end rate,
                    bobp.PORTFOLIO_ID                                    portfolioId,
                    bobp.PORTFOLIO_NAME                                  portfolioName,
                    fpi.ISSUE_DATE                                       issueDate,

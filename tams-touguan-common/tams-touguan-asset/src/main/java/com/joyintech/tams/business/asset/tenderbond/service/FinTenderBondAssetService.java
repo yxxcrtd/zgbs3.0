@@ -73,6 +73,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
     private JoyinbusinessCommonService joyinbusinessCommonService;
 
 
+
     @Override
     public String generateTitle(FinTenderBondAsset002Dto entity, OperationType operationType) {
         return String.format("资产代码(%s) 资产简称(%s)", StringUtil.isEmpty(entity.getFinprodMarketId()) ? "" : entity.getFinprodMarketId(),
@@ -191,6 +192,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
         param.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
         param.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
+        param.put("platformDate",iPlatformDate.getSysDateStr());
         param.put("finprodMarketId", finprodMarketId);
         String finprodId = finTenderBondAssetMapper.selectFinprodId(param);
         if (StringUtil.isNotEmpty(finprodId)) {

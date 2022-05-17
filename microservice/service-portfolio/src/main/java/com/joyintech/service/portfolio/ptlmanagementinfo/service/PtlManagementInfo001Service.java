@@ -26,6 +26,7 @@ import com.joyintech.tams.common.base.entity.FinOpenPlan;
 import com.joyintech.tams.common.base.entity.FinRateInfo;
 import com.joyintech.tams.common.base.entity.MstIntRateInfo;
 import com.joyintech.tams.invest.common.dto.mock.portfolio.MockPtlPortfolioDto;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -194,6 +195,9 @@ public class PtlManagementInfo001Service extends BaseService<PtlManagementInfoDt
     @Autowired
     private FinCashInfoMapper finCashInfoMapper;
 
+    @Autowired(required = false)
+    public IPlatformDate platformDate;
+
     /**
      * 插入操作
      *
@@ -340,7 +344,7 @@ public class PtlManagementInfo001Service extends BaseService<PtlManagementInfoDt
                 //---流动性风险改造过滤开放周期 end---
             }
             //查询符合规则的组合
-            if(!StringUtil.isEmptyList(ptlManagementInfo001Mapper.getMatchPortData(sqlWhere,entity.getPortfolioId()))){
+            if(!StringUtil.isEmptyList(rskRuleCommonMapper.getMatchPortData(sqlWhere,entity.getPortfolioId(),DateUtil.format(StringUtil.isNotEmpty(platformDate.getSysDate()) ? platformDate.getSysDate() : new Date())))){
                 ptlRuleIdList.add(key);//说明当前这个规则符合这个组合的属性
             }
         });

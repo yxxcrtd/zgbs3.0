@@ -137,6 +137,9 @@ public class CfetsEtrIBondFirstBidFindEtrInfoDto {
     @ApiModelProperty(name = "entrustId", value = "指令编号", example = "A1")
     private String entrustId;
 
+    @ApiModelProperty(name="ps",value="交易方向Code",example="T01")
+    private String ps;
+
     public String getEffectiveStatus() {
         return effectiveStatus;
     }
@@ -478,5 +481,13 @@ public class CfetsEtrIBondFirstBidFindEtrInfoDto {
 
     public void setTradeMarketStr(String tradeMarketStr) {
         this.tradeMarketStr = tradeMarketStr;
+    }
+
+    public String getPs() {
+        return ps;
+    }
+
+    public void setPs(String ps) {
+        this.ps = ps;
     }
 }
