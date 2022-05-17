@@ -81,7 +81,7 @@ public class PortfolioAssignHelper {
         log.info("queryPortfolioAssign() called with parameters => 【instructionId = {}】, 【busiType = {}】, 【orginVolume = {}】, 【orginPrice = {}】, 【orginProp = {}】", instructionId, busiType, orginVolume, orginPrice, orginProp);
 
         // 待分配数量
-        if (TradeUtils.lessThanZero(orginVolume)) {
+        if (TradeUtils.lessThanOrEqualsZero(orginVolume)) {
             log.warn("待分配数量 => 【orginVolume = {}】", orginVolume);
             return ResultBean.error(ErrorCode.REQ_PARAMETER_ERROR);
         }

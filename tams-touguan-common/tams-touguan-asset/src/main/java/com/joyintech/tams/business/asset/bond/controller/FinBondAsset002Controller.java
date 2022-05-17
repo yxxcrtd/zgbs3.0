@@ -271,13 +271,15 @@ public class FinBondAsset002Controller extends BaseController{
         ValidUtils.valid(dto.getFinInterestFactorDto(),validList);
         List<ValidMessage> valids = finBondAssetValidatorService.valid(dto);
         validList.addAll(valids);
-        String finProdId = commonBusinessService.getFinProdId(dto.getFinprodMarketId()+dto.getTradeMarketId(),DictCodeListExt1.金融产品类型_投管用_债券.getValue(),null);
-        if(finBondAssetService.selectCountByfinprodId(finProdId)>0){
-            validList.add(new ValidMessage("",
-                    getMessage("资产代码不能重复!")));
-            ajax.setErrorList(validList);
-            ajax.setMessageType(MessageType.错误消息);
-            return new Message<AjaxResult>().success().setData(ajax);
+        if (!StringUtil.equals(dto.getOperateStatus(), "MODIFY")) {
+            String finProdId = commonBusinessService.getFinProdId(dto.getFinprodMarketId() + dto.getTradeMarketId(), DictCodeListExt1.金融产品类型_投管用_债券.getValue(), null);
+            if (finBondAssetService.selectCountByfinprodId(finProdId) > 0) {
+                validList.add(new ValidMessage("",
+                        getMessage("资产代码不能重复!")));
+                ajax.setErrorList(validList);
+                ajax.setMessageType(MessageType.错误消息);
+                return new Message<AjaxResult>().success().setData(ajax);
+            }
         }
         if (CollectionUtils.isNotEmpty(validList)){
             ajax.setErrorList(validList);
