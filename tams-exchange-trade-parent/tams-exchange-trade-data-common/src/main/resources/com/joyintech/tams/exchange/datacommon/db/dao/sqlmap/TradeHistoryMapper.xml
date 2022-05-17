@@ -106,6 +106,7 @@
         <result column="EXTEND1" property="extend1" jdbcType="VARCHAR"/>
         <result column="EXTEND2" property="extend2" jdbcType="VARCHAR"/>
         <result column="ENTRUST_CLASS" property="entrustClass" jdbcType="VARCHAR"/>
+        <result column="BUSI_TYPE_TG_STR" property="busiTypeTgStr" jdbcType="VARCHAR"/>
         <result column="DELIVERY_RESULT" property="deliveryResult" jdbcType="VARCHAR"/>
         <result column="DELIVERY_SCHEDULE" property="deliverySchedule" jdbcType="VARCHAR"/>
         <result column="IS_FULL_PRICE" property="isFullPrice" jdbcType="VARCHAR"/>
@@ -267,7 +268,7 @@
         STD.TRADE_MARKET MARKET_STR,
         FP.FINPROD_MARKET_ID STOCK_CODE,
         FP.FINPROD_ABBR STOCK_NAME,
-        EE.ENTRUST_CLASS BUSI_TYPE_TGSTR,
+        EE.ENTRUST_CLASS BUSI_TYPE_TG_STR,
         DECODE(TT.PS, NULL, A.PS) ENTRUST_BSSTR,
         DECODE(TT.TRADED_VOLUME, NULL, A.TRADED_VOLUME) TRADED_VOLUME,
         DECODE(TT.TRADED_PRICE, NULL, A.TRADED_PRICE) TRADED_PRICE,
