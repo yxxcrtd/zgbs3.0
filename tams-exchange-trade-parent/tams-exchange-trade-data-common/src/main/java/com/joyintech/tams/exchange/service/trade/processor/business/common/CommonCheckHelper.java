@@ -15,6 +15,7 @@ import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
 import com.joyintech.tams.exchange.common.constant.joyin.Switches;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.dto.EntrustPriceAndYieldDto;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
 import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
@@ -271,7 +272,7 @@ public class CommonCheckHelper {
         if (checkOrderPrice(instruction, order, orderPrice)) {
             return ErrorCode.INSTRUCTIONS_PRICE_ERROR;
         }
-        if (InvestmentAssetType.FUTURES.value.equals(instruction.getAssetType())) {
+        if (InvestAssetTypeEnum.FUTURES.value.equals(instruction.getAssetType())) {
             if (Strings.isNullOrEmpty(instruction.getDerivativeBsDir()) || Strings.isNullOrEmpty(instruction.getDerivativeOcFlag())) {
                 return ErrorCode.INSTRUCTIONS_DERIVATIVE_BS_OC_ERROR;
             }
@@ -297,7 +298,7 @@ public class CommonCheckHelper {
      */
     private boolean checkOrderPrice(Instruction instruction, OrderInterface order, BigDecimal orderPrice) {
         //债券买卖
-        if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())
+        if (InvestAssetTypeEnum.BOND.codeEquals(instruction.getAssetType())
                 && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             String priceMode = instruction.getPriceMode();
             String isNetPrice = instruction.getIsNetPrice();
@@ -355,7 +356,7 @@ public class CommonCheckHelper {
                 order.setOrderPrice(price);
 
                 //资产类型是债券
-                if (InvestmentAssetType.isBond(order.getAssetType())
+                if (InvestAssetTypeEnum.isBond(order.getAssetType())
                         && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
                     int round = bondHelper.getPriceRoundByPriceStep(instrument);
                     EntrustPriceAndYieldDto dto = new EntrustPriceAndYieldDto();

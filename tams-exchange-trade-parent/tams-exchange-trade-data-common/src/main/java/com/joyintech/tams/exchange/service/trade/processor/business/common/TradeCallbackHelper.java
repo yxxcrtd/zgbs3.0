@@ -1,25 +1,20 @@
 package com.joyintech.tams.exchange.service.trade.processor.business.common;
 
 import com.google.common.base.Strings;
-import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.investment.PortfolioTradeMessage;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.db.domain.*;
-import com.joyintech.tams.exchange.common.enums.exchange.PortfolioDetailBusiTypeEnum;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.utils.*;
-import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailByManualMapper;
-import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailMapper;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
 import com.joyintech.tams.exchange.service.trade.processor.MessageSenderManagement;
 import com.joyintech.tams.exchange.service.trade.processor.account.AccountPositionHelper;
 import com.joyintech.tams.exchange.service.trade.processor.business.bond.BondHelper;
 import com.joyintech.tams.exchange.service.trade.processor.others.SplitOrderHelper;
-import com.joyintech.tams.exchange.service.trade.processor.portfolio.PortfolioAssignHelper;
 import com.joyintech.tams.exchange.service.trade.processor.portfolio.PortfolioTradeMessageHelper;
 import com.joyintech.tams.exchange.service.trade.transaction.TransactionHelper;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +23,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static com.joyintech.tams.exchange.common.utils.TradeUtils.multiply;
 
@@ -153,7 +146,7 @@ public class TradeCallbackHelper {
                 if (Objects.nonNull(entrust)) {
                     tradeRecord.setPortfolioId(entrust.getPortfolioId());
                     //期货计算成交金额
-                    if (InvestmentAssetType.FUTURES.value.equals(tradeRecord.getAssetType())) {
+                    if (InvestAssetTypeEnum.FUTURES.value.equals(tradeRecord.getAssetType())) {
                         FuturesInstrument futuresInstrument = futuresInstrumentService.queryByInnerCode(StockCodeUtils.formatStockCode(tradeRecord.getStockCode(), entrust.getMarket()));
                         tradeRecord.setTradedBalance(TradeUtils.calculateBalance(null, tradeRecord.getTradedPrice(), tradeRecord.getTradedVolume(), tradeRecord.getAssetType(), null, futuresInstrument));
                     }
@@ -249,7 +242,7 @@ public class TradeCallbackHelper {
         tradeRecord.setEntrustClass(instruction.getEntrustClass());
 
         //债券交易处理
-        if (InvestmentAssetType.isBond(entrust.getAssetType())
+        if (InvestAssetTypeEnum.isBond(entrust.getAssetType())
                 && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             //是否全价交易
             tradeRecord.setIsFullPrice(entrust.getIsFullPrice());
@@ -308,9 +301,9 @@ public class TradeCallbackHelper {
 //                messageSenderService.pushTradeToMQForFixedIncome(tradeRecord, instruction, entrust);
                 messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust, portfolioTradeMessages);
                 return;
-//            } else if (InvestmentAssetType.isBond(instruction.getAssetType()) && TradePlat.needSettleTrade(instruction.getTradePlat())) {
+//            } else if (InvestAssetTypeEnum.isBond(instruction.getAssetType()) && TradePlat.needSettleTrade(instruction.getTradePlat())) {
                 //新债需求：判断债券哪些走手工交收，用标的是否非担保 =是 则走手工交收
-            } else if (InvestmentAssetType.isBond(instruction.getAssetType()) && DictCodeList.是否_是.getValue().equals(instruction.getIsNoGuard())) {
+            } else if (InvestAssetTypeEnum.isBond(instruction.getAssetType()) && DictCodeList.是否_是.getValue().equals(instruction.getIsNoGuard())) {
 //                Instrument instrument = instrumentService.queryByInnerCode(entrust.getStockCode());
 //                if (Objects.nonNull(instrument)) {
 //                    if (EntrustUtils.isSettleTrade(instrument.getTradePlat(), entrust.getEntrustProp())) {

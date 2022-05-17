@@ -8,7 +8,7 @@ import com.joyintech.tams.exchange.common.bean.HistoryTrade;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.TradeQueryBean;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.constant.PresentOrHistoryQryType;
 import com.joyintech.tams.exchange.common.db.domain.Trade;
 import com.joyintech.tams.exchange.common.db.domain.TradeHistory;
@@ -28,10 +28,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.*;
@@ -187,7 +184,7 @@ public class TradeManagement {
 
     private void setFutureStockCode(List<Trade> list) {
         list.forEach(trade -> {
-            if (InvestmentAssetType.isFutures(trade.getAssetType())) {
+            if (InvestAssetTypeEnum.isFutures(trade.getAssetType())) {
                 trade.setStockCode(StockCodeUtils.getStockCode(trade.getStockCode()));
             }
         });

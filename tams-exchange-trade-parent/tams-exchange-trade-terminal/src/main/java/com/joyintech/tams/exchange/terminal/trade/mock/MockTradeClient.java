@@ -13,6 +13,7 @@ import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.bean.bond.StandardBondQryBean;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.db.domain.*;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.net.agent.Agent;
 import com.joyintech.tams.exchange.common.utils.*;
 import com.joyintech.tams.exchange.terminal.agent.ITerminalMsgNotify;
@@ -20,8 +21,6 @@ import com.joyintech.tams.exchange.terminal.agent.TerminalAgent;
 import com.joyintech.tams.exchange.terminal.constant.AccountLoginStatus;
 import com.joyintech.tams.exchange.terminal.trade.ITradeRequest;
 import com.joyintech.tams.exchange.terminal.trade.TradeResponseImpl;
-import com.joyintech.tams.exchange.terminal.trade.kcbp.KCBPAccount;
-import com.joyintech.tams.exchange.terminal.trade.kcbp.KCBPConverter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,7 +106,7 @@ public class MockTradeClient implements ITradeRequest {
      */
     @Override
     public void entrust(Entrust entrust, Long requestId) {
-        if (InvestmentAssetType.FUTURES.value.equals(entrust.getAssetType())) {
+        if (InvestAssetTypeEnum.FUTURES.value.equals(entrust.getAssetType())) {
             logger.info("期货交易mock 开始 {}", JsonUtils.getJsonFromObject(entrust));
             mockFuturesEntrust(entrust);
             logger.info("... 期货交易mock 结束 ...");
@@ -264,7 +263,7 @@ public class MockTradeClient implements ITradeRequest {
         trade.setBrokerEntrustId(entrust.getBrokerEntrustId());
         trade.setStockName(entrust.getStockName());
         trade.setEntrustProp(entrust.getEntrustProp());
-        if (InvestmentAssetType.FUTURES.value.equals(entrust.getAssetType())) {
+        if (InvestAssetTypeEnum.FUTURES.value.equals(entrust.getAssetType())) {
             trade.setOffsetFlag(entrust.getOffsetFlag());
             trade.setHedgeFlag(entrust.getHedgeFlag());
         }
@@ -286,19 +285,19 @@ public class MockTradeClient implements ITradeRequest {
     public void integratedEntrust(IntegratedEntrust integratedEntrust, Long requestId) {
         if (IntegratedEntrustUtils.isBulk(integratedEntrust.getEntrustProp())) {
             //            if (Market.SHSE.value.equals(integratedEntrust.getMarket())) {
-            //                if (integratedEntrust.getAssetType().equals(InvestmentAssetType.STOCK.value)) {
+            //                if (integratedEntrust.getAssetType().equals(InvestAssetTypeEnum.STOCK.value)) {
             //                    handleIntegratedEntrustByAssetType(integratedEntrust, 300000.00, 2000000.00);
-            //                } else if (integratedEntrust.getAssetType().equals(InvestmentAssetType.BOND.value)) {
+            //                } else if (integratedEntrust.getAssetType().equals(InvestAssetTypeEnum.BOND.value)) {
             //                    handleIntegratedEntrustByAssetType(integratedEntrust, 10000.00, 1000000.00);
-            //                } else if (integratedEntrust.getAssetType().equals(InvestmentAssetType.FUND.value)) {
+            //                } else if (integratedEntrust.getAssetType().equals(InvestAssetTypeEnum.FUND.value)) {
             //                    handleIntegratedEntrustByAssetType(integratedEntrust, 300000.00, 300000.00);
             //                }
             //            } else {
-            //                if (integratedEntrust.getAssetType().equals(InvestmentAssetType.STOCK.value)) {
+            //                if (integratedEntrust.getAssetType().equals(InvestAssetTypeEnum.STOCK.value)) {
             //                    handleIntegratedEntrustByAssetType(integratedEntrust, 300000.00, 2000000.00);
-            //                } else if (integratedEntrust.getAssetType().equals(InvestmentAssetType.BOND.value)) {
+            //                } else if (integratedEntrust.getAssetType().equals(InvestAssetTypeEnum.BOND.value)) {
             //                    handleIntegratedEntrustByAssetType(integratedEntrust, 5000.00, 500000.00);
-            //                } else if (integratedEntrust.getAssetType().equals(InvestmentAssetType.FUND.value)) {
+            //                } else if (integratedEntrust.getAssetType().equals(InvestAssetTypeEnum.FUND.value)) {
             //                    handleIntegratedEntrustByAssetType(integratedEntrust, 2000000.00, 2000000.00);
             //                }
             //            }
@@ -326,7 +325,7 @@ public class MockTradeClient implements ITradeRequest {
             }
         } else if (IntegratedEntrustUtils.isFixedIncome(integratedEntrust.getEntrustProp())) {
             //            if (!Market.SHSE.value.equals(integratedEntrust.getMarket())
-            //                    || !InvestmentAssetType.BOND.value.equals(integratedEntrust.getAssetType())) {
+            //                    || !InvestAssetTypeEnum.BOND.value.equals(integratedEntrust.getAssetType())) {
             //                logger.info("固收平台不支持该市场合约 {}", integratedEntrust.getStockCode());
             //                integratedEntrust.setEntrustStatus(EntrustStatus.INVALID.value);
             //                integratedEntrust.setErrorMsg("固收平台不支持该市场合约" + integratedEntrust.getStockCode());
@@ -763,7 +762,7 @@ public class MockTradeClient implements ITradeRequest {
 
     public void onTrade(Trade trade) {
         if (!(IntegratedEntrustUtils.isProtocolBack_SH(trade.getEntrustProp())
-                || IntegratedEntrustUtils.isProtocolBack_SZ(trade.getEntrustProp())) && !InvestmentAssetType.FUTURES.value.equals(trade.getAssetType())) {
+                || IntegratedEntrustUtils.isProtocolBack_SZ(trade.getEntrustProp())) && !InvestAssetTypeEnum.FUTURES.value.equals(trade.getAssetType())) {
             trade.setTradedBalance(TradeUtils.calculateBalanceForRisk(trade.getEntrustBs(), trade.getTradedPrice(), trade.getTradedVolume(), trade.getAssetType()));
         }
         if (Strings.isNullOrEmpty(trade.getBrokerTradeId())) {

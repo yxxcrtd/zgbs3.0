@@ -7,6 +7,7 @@ import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.db.domain.Account;
 import com.joyintech.tams.exchange.common.db.domain.Entrust;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.utils.*;
 import com.joyintech.tams.exchange.terminal.test.AccountConfig;
 import com.joyintech.tams.exchange.terminal.test.TerminalAgentTest;
@@ -15,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
@@ -270,7 +270,7 @@ public class TerminalClientTest {
                             }
                         }
                         Entrust entrust = new Entrust();
-                        entrust.setAssetType(InvestmentAssetType.STOCK.value);
+                        entrust.setAssetType(InvestAssetTypeEnum.STOCK.value);
                         if (stockCode_stock.equals(stockCodes.get(0))) {
                             entrust.setEntrustPrice(new BigDecimal(entrustPrice.get(0)));
                             entrust.setEntrustVolume(entrustVolume.get(0));
@@ -290,7 +290,7 @@ public class TerminalClientTest {
                     entrustProps_Bonds.forEach(s -> {
                         if (!EntrustProp.CHANGE_TO_STOCK.value.equals(s)) {
                             Entrust entrust = new Entrust();
-                            entrust.setAssetType(InvestmentAssetType.BOND.value);
+                            entrust.setAssetType(InvestAssetTypeEnum.BOND.value);
                             if (stockCode_stock.equals(stockCodes.get(2))) {
                                 entrust.setEntrustPrice(new BigDecimal(entrustPrice.get(2)));
                                 entrust.setEntrustVolume(entrustVolume.get(2));
@@ -309,7 +309,7 @@ public class TerminalClientTest {
                 for (String stockCode_stock : stockCode_Funds) {
                     entrustProps_Funds.forEach(s -> {
                         Entrust entrust = new Entrust();
-                        entrust.setAssetType(InvestmentAssetType.FUND.value);
+                        entrust.setAssetType(InvestAssetTypeEnum.FUND.value);
                         if (stockCode_stock.equals(stockCodes.get(4))) {
                             entrust.setEntrustPrice(new BigDecimal(entrustPrice.get(4)));
                             entrust.setEntrustVolume(entrustVolume.get(4));
@@ -328,7 +328,7 @@ public class TerminalClientTest {
                     entrustProps_Bonds.forEach(s -> {
                         if (EntrustProp.CHANGE_TO_STOCK.value.equals(s)) {
                             Entrust entrust = new Entrust();
-                            entrust.setAssetType(InvestmentAssetType.BOND.value);
+                            entrust.setAssetType(InvestAssetTypeEnum.BOND.value);
                             entrust.setEntrustVolume(100L);
                             if (stockCode_stock.equals(stockCode_ChangeBonds.get(0))) {
                                 entrust.setEntrustPrice(new BigDecimal(entrustPrice_ChangeBonds.get(0)));
@@ -382,7 +382,7 @@ public class TerminalClientTest {
                 for (String stockCode_stock : stockCode_Stocks) {
                     for (String entrustProps_stock : integratedEntrustProps) {
                         IntegratedEntrust integratedEntrust = new IntegratedEntrust();
-                        integratedEntrust.setAssetType(InvestmentAssetType.STOCK.value);
+                        integratedEntrust.setAssetType(InvestAssetTypeEnum.STOCK.value);
                         integratedEntrust.setEntrustVolume(300000L);
                         if (stockCode_stock.equals(stockCodes.get(0))) {
                             integratedEntrust.setEntrustPrice(new BigDecimal(entrustPrice.get(0)));
@@ -400,7 +400,7 @@ public class TerminalClientTest {
                 for (String stockCode_stock : stockCode_Bonds) {
                     integratedEntrustProps.forEach(s -> {
                         IntegratedEntrust integratedEntrust = new IntegratedEntrust();
-                        integratedEntrust.setAssetType(InvestmentAssetType.BOND.value);
+                        integratedEntrust.setAssetType(InvestAssetTypeEnum.BOND.value);
                         integratedEntrust.setEntrustVolume(300000L);
                         if (stockCode_stock.equals(stockCodes.get(2))) {
                             integratedEntrust.setEntrustPrice(new BigDecimal(entrustPrice.get(2)));
@@ -418,7 +418,7 @@ public class TerminalClientTest {
                 for (String stockCode_stock : stockCode_Funds) {
                     integratedEntrustProps.forEach(s -> {
                         IntegratedEntrust integratedEntrust = new IntegratedEntrust();
-                        integratedEntrust.setAssetType(InvestmentAssetType.FUND.value);
+                        integratedEntrust.setAssetType(InvestAssetTypeEnum.FUND.value);
                         integratedEntrust.setEntrustVolume(300000L);
                         if (stockCode_stock.equals(stockCodes.get(4))) {
                             integratedEntrust.setEntrustPrice(new BigDecimal(entrustPrice.get(4)));
@@ -437,7 +437,7 @@ public class TerminalClientTest {
                     int finalI = i;
                     integratedEntrustProps_FixedIncome.forEach(s -> {
                         IntegratedEntrust integratedEntrust = new IntegratedEntrust();
-                        integratedEntrust.setAssetType(InvestmentAssetType.FUND.value);
+                        integratedEntrust.setAssetType(InvestAssetTypeEnum.FUND.value);
                         integratedEntrust.setEntrustVolume(50000L);
                         integratedEntrust.setEntrustPrice(new BigDecimal(entrustPrice_FixedIncome.get(finalI)));
                         processIntegratedEntrust(tradeRequest, integratedEntrust, stockCode_Funds_FixedIncome.get(finalI), s, account);
@@ -452,7 +452,7 @@ public class TerminalClientTest {
                     int finalI = i;
                     integratedEntrustProps_ProtocolBack_SH.forEach(s -> {
                         IntegratedEntrust integratedEntrust = new IntegratedEntrust();
-                        integratedEntrust.setAssetType(InvestmentAssetType.FUND.value);
+                        integratedEntrust.setAssetType(InvestAssetTypeEnum.FUND.value);
                         integratedEntrust.setEntrustVolume(100L);
                         integratedEntrust.setEntrustPrice(new BigDecimal(entrustPrice_ProtocolBack_SH.get(finalI)));
                         processIntegratedEntrust(tradeRequest, integratedEntrust, stockCode_Funds_ProtocolBack_SH.get(finalI), s, account);
@@ -467,7 +467,7 @@ public class TerminalClientTest {
                     int finalI = i;
                     integratedEntrustProps_ProtocolBack_SZ.forEach(s -> {
                         IntegratedEntrust integratedEntrust = new IntegratedEntrust();
-                        integratedEntrust.setAssetType(InvestmentAssetType.FUND.value);
+                        integratedEntrust.setAssetType(InvestAssetTypeEnum.FUND.value);
                         integratedEntrust.setEntrustVolume(100L);
                         integratedEntrust.setEntrustPrice(new BigDecimal(entrustPrice_ProtocolBack_SZ.get(finalI)));
                         processIntegratedEntrust(tradeRequest, integratedEntrust, stockCode_Funds_ProtocolBack_SZ.get(finalI), s, account);

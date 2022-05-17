@@ -27,6 +27,7 @@ import com.joyintech.tams.exchange.common.db.domain.InstructionDetail;
 import com.joyintech.tams.exchange.common.db.domain.PortfolioDetail;
 import com.joyintech.tams.exchange.common.dto.PortfolioInstructionContextDto;
 import com.joyintech.tams.exchange.common.enums.exchange.PortfolioDetailBusiTypeEnum;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
 import com.joyintech.tams.exchange.common.request.PortfolioInfoRequest;
@@ -665,7 +666,7 @@ public class PortfolioManager extends BaseService {
     }
 
     private void coverPrice(Instruction instruction, OrderPlaceBean order) {
-        if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())
+        if (InvestAssetTypeEnum.BOND.codeEquals(instruction.getAssetType())
                 && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             BigDecimal fullPrice = order.getFullPrice();
             if (ObjectUtil.isNull(fullPrice) || fullPrice.compareTo(BigDecimal.ZERO) <= 0) {
@@ -676,7 +677,7 @@ public class PortfolioManager extends BaseService {
     }
 
     private void recoverPrice(Instruction instruction, List<PortfolioCalculateResponse> list, BigDecimal price, String entrustProp) {
-        if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())
+        if (InvestAssetTypeEnum.BOND.codeEquals(instruction.getAssetType())
                 && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             list.forEach(item -> item.setEntrustPrice(price));
         }

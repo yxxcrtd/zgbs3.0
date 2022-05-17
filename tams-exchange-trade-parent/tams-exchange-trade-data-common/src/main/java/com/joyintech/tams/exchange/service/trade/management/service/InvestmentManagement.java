@@ -62,8 +62,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
-import static com.joyintech.tams.exchange.common.constant.InvestmentAssetType.PLEDGE_REPURCHASE;
-import static com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1.BIDDING_REPO;
 import static com.joyintech.tams.exchange.common.enums.EntrustBussTypeEnum.*;
 import static java.util.stream.Collectors.groupingBy;
 
@@ -314,7 +312,7 @@ public class InvestmentManagement extends BaseService {
                     if (Objects.nonNull(instructionList)) {
                         instructionList.forEach(instruction -> {
                             MinPriceAndMinTrdUnitLimitBean minPriceAndMinTrdUnitLimitBean;
-                            if (InvestmentAssetType.FUTURES.value.equals(instruction.getAssetType())) {
+                            if (InvestAssetTypeEnum.FUTURES.value.equals(instruction.getAssetType())) {
                                 minPriceAndMinTrdUnitLimitBean = futuresInstrumentService.queryMinPriceAndMinTrdUnitLimitByFuture(instruction);
                                 instruction.setMinPriceAndMinTrdUnitLimitBean(minPriceAndMinTrdUnitLimitBean);
                                 Instruction instructionClone = instruction.cloneInstruction();
@@ -496,7 +494,7 @@ public class InvestmentManagement extends BaseService {
                 continue;
             }*/
 
-            /*if (InvestmentAssetType.FUTURES.value.equals(instruction.getAssetType())) {
+            /*if (InvestAssetTypeEnum.FUTURES.value.equals(instruction.getAssetType())) {
                 minPriceAndMinTrdUnitLimitBean = futuresInstrumentService.queryMinPriceAndMinTrdUnitLimitByFuture(instruction);
                 instruction.setMinPriceAndMinTrdUnitLimitBean(minPriceAndMinTrdUnitLimitBean);
                 Instruction instructionClone = instruction.cloneInstruction();

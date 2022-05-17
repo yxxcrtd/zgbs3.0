@@ -10,9 +10,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.joyintech.exchange.service.quote.service.QuoteService;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.business.common.exception.PositionException;
@@ -26,9 +24,8 @@ import com.joyintech.tams.exchange.common.bean.WorkflowBean;
 import com.joyintech.tams.exchange.common.bean.investment.ReqRiskTrigger;
 import com.joyintech.tams.exchange.common.bean.investment.RiskOccupyBean;
 import com.joyintech.tams.exchange.common.constant.*;
-import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
 import com.joyintech.tams.exchange.common.db.domain.*;
-import com.joyintech.tams.exchange.common.dto.PortfolioInstructionContextDto;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.exception.PositionExchangeException;
 import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
 import com.joyintech.tams.exchange.common.response.PortfolioAllocationResponse;
@@ -275,15 +272,15 @@ public class FairOrderHelper {
     private int dealEntrustVolume(Map<String, Double> volumeMap, double totalVolume, double totalOrderVolume, Entrust entrust) {
         double leftVolume = volumeMap.get(entrust.getInstructionId());
         int realVolume = 0;
-        if (InvestmentAssetType.BOND.value.equals(entrust.getAssetType())) {
+        if (InvestAssetTypeEnum.BOND.value.equals(entrust.getAssetType())) {
             realVolume = getRealVolume(totalVolume, totalOrderVolume, leftVolume, 1);
-        } else if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(entrust.getAssetType())) {
+        } else if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(entrust.getAssetType())) {
             if (Market.SZSE.value.equals(entrust.getMarket())) {
                 realVolume = getRealVolume(totalVolume, totalOrderVolume, leftVolume, 1);
             } else {
                 realVolume = getRealVolume(totalVolume, totalOrderVolume, leftVolume, 3);
             }
-        } else if (InvestmentAssetType.FUTURES.value.equals(entrust.getAssetType())) {
+        } else if (InvestAssetTypeEnum.FUTURES.value.equals(entrust.getAssetType())) {
             realVolume = getRealVolume(totalVolume, totalOrderVolume, leftVolume, 0);
         } else {
             realVolume = getRealVolume(totalVolume, totalOrderVolume, leftVolume, 2);
@@ -514,15 +511,15 @@ public class FairOrderHelper {
             fairEntrust.setParentOrderId(order.getId());
             double leftVolume = volumeMap.get(instruction.getEntrustId());
             int realVolume = 0;
-            if (InvestmentAssetType.BOND.value.equals(fairEntrust.getAssetType())) {
+            if (InvestAssetTypeEnum.BOND.value.equals(fairEntrust.getAssetType())) {
                 realVolume = getRealVolume(totalVolume, totalOrderVolume, leftVolume, 1);
-            } else if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(fairEntrust.getAssetType())) {
+            } else if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(fairEntrust.getAssetType())) {
                 if (Market.SZSE.value.equals(fairEntrust.getMarket())) {
                     realVolume = getRealVolume(totalVolume, totalOrderVolume, leftVolume, 1);
                 } else {
                     realVolume = getRealVolume(totalVolume, totalOrderVolume, leftVolume, 3);
                 }
-            } else if (InvestmentAssetType.FUTURES.value.equals(fairEntrust.getAssetType())) {
+            } else if (InvestAssetTypeEnum.FUTURES.value.equals(fairEntrust.getAssetType())) {
                 realVolume = getRealVolume(totalVolume, totalOrderVolume, leftVolume, 0);
             } else {
                 realVolume = getRealVolume(totalVolume, totalOrderVolume, leftVolume, 2);

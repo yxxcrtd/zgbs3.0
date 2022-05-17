@@ -9,7 +9,7 @@ import com.joyintech.tams.exchange.common.bean.MinPrice;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.bean.instrument.MinPriceAndMinTrdUnitLimitBean;
 import com.joyintech.tams.exchange.common.constant.InstructionPs;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.constant.TradePlat;
 import com.joyintech.tams.exchange.common.constant.instrument.SecondAssetType;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3;
@@ -1334,7 +1334,7 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
      * 新债-非可转债
      */
     public boolean newBond() {
-        return InvestmentAssetType.BOND.codeEquals(this.getAssetType())
+        return InvestAssetTypeEnum.BOND.codeEquals(this.getAssetType())
                 && SecondAssetType.KZZ.codeNotEquals(this.getAssetType1())
                 && TradePlat.NEW_BOND.codeEquals(this.getTradePlat());
     }
@@ -1343,7 +1343,7 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
      * 非新债-可转债
      */
     public boolean convertibleBond() {
-        return InvestmentAssetType.BOND.codeEquals(this.getAssetType())
+        return InvestAssetTypeEnum.BOND.codeEquals(this.getAssetType())
                 && SecondAssetType.KZZ.codeEquals(this.getAssetType1())
                 && TradePlat.NEW_BOND.codeNotEquals(this.getTradePlat());
     }

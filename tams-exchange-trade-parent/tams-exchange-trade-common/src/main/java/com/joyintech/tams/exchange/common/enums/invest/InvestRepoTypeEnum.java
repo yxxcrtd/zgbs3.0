@@ -3,26 +3,23 @@ package com.joyintech.tams.exchange.common.enums.invest;
 import com.joyintech.tams.exchange.common.enums.IEnum;
 
 /**
- * 金融产品类型_投管用枚举
+ * 回购类型枚举
  *
  * @author swwan
  * @date 2022/4/24 - 21:43
- * @see com.joyintech.tams.constant.DictCode#金融产品类型_投管用
+ * @see com.joyintech.tams.constant.DictCode#回购类型
  */
 @SuppressWarnings("all")
-public enum FinprodTypeTgEnum implements IEnum<String> {
+public enum InvestRepoTypeEnum implements IEnum<String> {
 
-    BOND("F01", "债券"),
-    BOND_PLEDGED_REPURCHASE("F02", "债券质押式正回购"),
-    BOND_PLEDGED_REVERSE_REPURCHASE("F03", "债券质押式逆回购"),
-    FUND("F06", "基金"),
-    STOCK("F10", "股票"),
+    NEGOTIATED_REPO("质押式协议回购", "H01"),
+    BIDDING_REPO("质押式竞价回购", "H02"),
     ;
 
     public String code;
     public String description;
 
-    FinprodTypeTgEnum(String description, String code) {
+    InvestRepoTypeEnum(String description, String code) {
         this.description = description;
         this.code = code;
     }

@@ -17,7 +17,7 @@ import com.joyintech.tams.exchange.common.cache.TradeTimeService;
 import com.joyintech.tams.exchange.common.constant.EntrustBs;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.enums.SwitcheEnum;
 import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
@@ -233,7 +233,7 @@ public class CommonCheckKit extends BaseCheckKit {
             throw new BusinessResultException(ErrorCode.CHECK_ERROR, errorMsg);
         }
 
-        if (InvestmentAssetType.isPledgeRepurchase(minTrdUnitLimit.getAssetType())
+        if (InvestAssetTypeEnum.isPledgeRepurchase(minTrdUnitLimit.getAssetType())
                 && StringUtil.equals(minTrdUnitLimit.getMinStepUnit(), "05")) {
             minStep = minStep / 100;
         }
@@ -253,7 +253,7 @@ public class CommonCheckKit extends BaseCheckKit {
         BigDecimal lowerLimitPrice = NumberUtil.round(tick.getLowerLimitPrice(), 4, RoundingMode.UP);
         BigDecimal upperLimitPrice = NumberUtil.round(tick.getUpperLimitPrice(), 4, RoundingMode.DOWN);
 
-        if (isNoLimitPrice(tick) || EnumUtil.in(instruction.getAssetType(), InvestmentAssetType.BOND, InvestmentAssetType.PLEDGE_REPURCHASE)) {
+        if (isNoLimitPrice(tick) || EnumUtil.in(instruction.getAssetType(), InvestAssetTypeEnum.BOND, InvestAssetTypeEnum.PLEDGE_REPURCHASE)) {
             String errorMsg = priceHelper.checkPrice(order, instruction, instrument, tick);
             if (StrUtil.isNotEmpty(errorMsg)) {
                 addCheckResult("委托价格", entrustPrice, errorMsg);

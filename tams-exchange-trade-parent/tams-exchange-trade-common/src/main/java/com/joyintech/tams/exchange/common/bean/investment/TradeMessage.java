@@ -2,7 +2,7 @@ package com.joyintech.tams.exchange.common.bean.investment;
 
 import com.joyintech.tams.exchange.common.constant.BusinessFlag;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
-import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.db.domain.EntrustInterface;
 import com.joyintech.tams.exchange.common.db.domain.Trade;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
@@ -297,7 +297,7 @@ public class TradeMessage extends BasicMessage {
             if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
                 //到期结算金额
                 tradeMessage.setDealBalance(entrust.getBackBalance());
-            } else if (InvestmentAssetType.isBond(trade.getAssetType())
+            } else if (InvestAssetTypeEnum.isBond(trade.getAssetType())
                     && EntrustProp.isTrade(entrust.getEntrustProp())
                     && Objects.nonNull(tradeMessage.getFullPrice())
                     && tradeMessage.getFullPrice() != 0) {

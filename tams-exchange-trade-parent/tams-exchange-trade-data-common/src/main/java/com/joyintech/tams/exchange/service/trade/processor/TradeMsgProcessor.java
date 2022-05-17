@@ -5,17 +5,15 @@ import cn.hutool.core.util.ObjectUtil;
 import com.google.common.base.Strings;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.exchange.common.bean.*;
-import com.joyintech.tams.exchange.common.bean.investment.PortfolioTradeMessage;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.enums.exchange.PortfolioDetailBusiTypeEnum;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
 import com.joyintech.tams.exchange.common.response.PortfolioCalculateResponse;
 import com.joyintech.tams.exchange.common.utils.*;
-import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailByManualMapper;
-import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailMapper;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
 import com.joyintech.tams.exchange.service.trade.management.service.InvestRiskManagement;
 import com.joyintech.tams.exchange.service.trade.management.service.ReviewManagement;
@@ -29,13 +27,11 @@ import com.joyintech.tams.exchange.service.trade.processor.delay.DelayController
 import com.joyintech.tams.exchange.service.trade.processor.delay.OrderRateController;
 import com.joyintech.tams.exchange.service.trade.processor.msg.MsgType;
 import com.joyintech.tams.exchange.service.trade.processor.others.SplitOrderHelper;
-import com.joyintech.tams.exchange.service.trade.processor.portfolio.PortfolioAssignHelper;
 import com.joyintech.tams.exchange.service.trade.processor.portfolio.PortfolioTradeMessageHelper;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgent;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgentManager;
 import com.joyintech.tams.exchange.service.trade.transaction.TransactionHelper;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +42,6 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
 import static com.joyintech.tams.exchange.common.constant.EntrustStatus.*;
@@ -322,7 +317,7 @@ public class TradeMsgProcessor {
         if (checkReview(integratedEntrust, instruction, processType))
             return;
         BigDecimal entrustBalance;
-        if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(instruction.getAssetType()) && InvestmentAssetType1.NEGOTIATED_REPO.value.equals(instruction.getAssetType1())) {
+        if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(instruction.getAssetType()) && InvestmentAssetType1.NEGOTIATED_REPO.value.equals(instruction.getAssetType1())) {
             entrustBalance = integratedEntrust.getEntrustBalance();
         } else {
             entrustBalance = TradeUtils.calculateBalance(integratedEntrust.getEntrustBs(), integratedEntrust.getEntrustPrice(), integratedEntrust.getEntrustVolume(), integratedEntrust.getAssetType(), integratedEntrust, null);
@@ -664,7 +659,7 @@ public class TradeMsgProcessor {
             entrustDb.setCancelVolume(entrustDb.getEntrustVolume());
             FuturesInstrument futuresInstrument = futuresInstrumentService.queryByInnerCode(entrustDb.getStockCode());
             BigDecimal entrustBalance;
-            if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(instruction.getAssetType()) && InvestmentAssetType1.NEGOTIATED_REPO.value.equals(instruction.getAssetType1())) {
+            if (InvestAssetTypeEnum.PLEDGE_REPURCHASE.value.equals(instruction.getAssetType()) && InvestmentAssetType1.NEGOTIATED_REPO.value.equals(instruction.getAssetType1())) {
                 entrustBalance = ((IntegratedEntrust) entrustDb).getEntrustBalance();
             } else {
                 entrustBalance = TradeUtils.calculateBalance(entrustDb.getEntrustBs(), entrustDb.getEntrustPrice(), entrustDb.getEntrustVolume(), entrustDb.getAssetType(), entrustDb, futuresInstrument);
@@ -782,7 +777,7 @@ public class TradeMsgProcessor {
         if (InvestmentAssetType1.NEGOTIATED_REPO.value.equals(instruction.getAssetType1())) {
             logger.info("场内协议回购交易下单头寸检查，指令编号：{}，回购金额：{}", entrust.getInstructionId(), entrust.getEntrustBalance());
             instructionClone.setEntrustAmt(entrust.getEntrustBalance());
-        } else if (InvestmentAssetType.isBond(entrust.getAssetType()) && Objects.nonNull(entrust.getFullPrice()) && entrust.getFullPrice().compareTo(BigDecimal.ZERO) != 0) {
+        } else if (InvestAssetTypeEnum.isBond(entrust.getAssetType()) && Objects.nonNull(entrust.getFullPrice()) && entrust.getFullPrice().compareTo(BigDecimal.ZERO) != 0) {
             //全价金额
             instructionClone.setEntrustAmt(TradeUtils.multiply(entrust.getFullPrice(), entrust.getEntrustVolume(), 2));
         } else if (Objects.isNull(entrust.getEntrustBalance()) || entrust.getEntrustBalance().compareTo(BigDecimal.ZERO) == 0) {
