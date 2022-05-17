@@ -118,8 +118,19 @@ public class TradeUtils {
         return false;
     }
 
+    public static boolean lessThanOrEquals(BigDecimal d, BigDecimal decimal) {
+        if (Objects.nonNull(d) && Objects.nonNull(decimal)) {
+            return d.compareTo(decimal) <= 0;
+        }
+        return false;
+    }
+
     public static boolean lessThanZero(BigDecimal value) {
         return lessThan(value, BigDecimal.ZERO);
+    }
+
+    public static boolean lessThanOrEqualsZero(BigDecimal value) {
+        return lessThanOrEquals(value, BigDecimal.ZERO);
     }
 
     public static BigDecimal subtractMod(BigDecimal value, BigDecimal dividend) {
