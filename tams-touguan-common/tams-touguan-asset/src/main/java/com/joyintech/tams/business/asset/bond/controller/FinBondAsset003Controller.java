@@ -108,6 +108,30 @@ public class FinBondAsset003Controller extends BaseController{
     }
 
     /**
+     *  获取流程中信息
+     * @param request
+     * @return
+     */
+    @ApiOperation(value = "获取流程中信息", notes = "获取流程中信息")
+    @ResponseBody
+    @PostMapping("/getApproveRateAdjEntity")
+    public Message<FinAssetRateAdjResponse> getApproveEntity(@RequestBody FinAssetRateAdjResponse request)
+    {
+        try{
+            String workflowId = request.getWorkflowId();
+            FinAssetRateAdjResponse entity = new FinAssetRateAdjResponse();
+            if (StringUtil.isNotEmpty(workflowId)) {
+                //流程代办checkImportData
+                entity = finBondAsset002Service.getBussinessEntityByWorkflowId(workflowId);
+            }
+            return new Message<FinAssetRateAdjResponse>().success().setData(entity);
+        } catch(Exception e){
+            e.printStackTrace();
+            return new Message<FinAssetRateAdjResponse>().fail().setMessage("查询异常");
+        }
+    }
+
+    /**
      * 初始化
      * <功能详细描述>
      * @param request
