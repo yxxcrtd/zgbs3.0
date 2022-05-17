@@ -1612,4 +1612,8 @@
             AND INPUT_VALUE_3 = #{inputValue3}
         </if> and ROWNUM=1
     </select>
+
+    <delete id="deleteCfetsOprHis">
+        delete ETR_ENTRUST_OPER_HIS where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+    </delete>
 </mapper>
