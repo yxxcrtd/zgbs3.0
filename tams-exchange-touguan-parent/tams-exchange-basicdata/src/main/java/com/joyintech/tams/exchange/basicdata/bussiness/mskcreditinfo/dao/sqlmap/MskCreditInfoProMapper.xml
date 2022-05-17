@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dao.MskCreditInfoProMapper">
+    <insert id="insert"></insert>
+    <delete id="deleteByPrimaryKey"></delete>
+
+
+    <select id="queryForPage"
+            resultType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoDto" parameterType="Map">
+         SELECT
+            m.SECID secid,
+            f.FINPROD_ABBR finprodAbbr,
+            m.VALUE_SOURCE,
+            m.CDATE cdate,
+            m.MDPRICE mdprice,
+            m.MCPRICE mcprice,
+            m.MINT mint,
+            m.MYIELD*100 myield,
+            m.M_MDURATION mMduration,
+            m.M_CNVXTY mCnvxty,
+            m.ISSUE_MARKET_NUM issueMarketNum,
+            m.CREDIT_TYPE creditType
+         FROM
+             MST_CREDIT_MARKET_INFO		m
+         LEFT JOIN
+             FIN_PRODUCT		f
+         ON	 f.FINPROD_ID=m.SECID
+         LEFT JOIN
+             INTERF_CREDITINFO	i
+         ON	 i.SECID = m.SECID
+        <where>
+            <if test="secIdList != null and secIdList.size() > 0">
+                AND (m.SECID IN
+                <foreach collection="secIdList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+                )
+            </if>
+            <if test="valueSourceStr != null and valueSourceStr != ''">
+                AND m.VALUE_SOURCE = #{valueSource}
+            </if>
+            <if test="cdateStart != null and cdateStart != ''">
+                <![CDATA[AND  m.cdate >= TO_DATE(#{cdateStart},'YYYY-MM-DD') ]]>
+            </if>
+            <if test="cdateEnd != null and cdateEnd != ''">
+                <![CDATA[AND  m.cdate <= TO_DATE(#{cdateEnd},'YYYY-MM-DD')]]>
+            </if>
+        </where>
+        ORDER BY
+          m.SECID
+    </select>
+    <select id="select"
+            resultType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest" parameterType="Map">
+        SELECT
+        m.SECID secid,
+        f.FINPROD_ABBR finprodAbbr,
+        m.VALUE_SOURCE,
+        m.CDATE cdate,
+        m.MDPRICE mdprice,
+        m.MCPRICE mcprice,
+        m.MINT mint,
+        m.MYIELD*100 myield,
+        m.M_MDURATION mMduration,
+        m.M_CNVXTY mCnvxty,
+        m.ISSUE_MARKET_NUM issueMarketNum,
+        m.CREDIT_TYPE creditType
+        FROM
+        MST_CREDIT_MARKET_INFO		m
+        LEFT JOIN
+        FIN_PRODUCT		f
+        ON	 f.FINPROD_ID=m.SECID
+        LEFT JOIN
+        INTERF_CREDITINFO	i
+        ON	 i.SECID = m.SECID
+        <where>
+            <if test="secIdList != null and secIdList.size() > 0">
+                AND (m.SECID IN
+                <foreach collection="secIdList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+                )
+            </if>
+            <if test="valueSourceStr != null and valueSourceStr != ''">
+                AND m.VALUE_SOURCE = #{valueSource}
+            </if>
+            <if test="cdateStart != null and cdateStart != ''">
+                <![CDATA[AND  m.cdate >= TO_DATE(#{cdateStart},'YYYY-MM-DD') ]]>
+            </if>
+            <if test="cdateEnd != null and cdateEnd != ''">
+                <![CDATA[AND  m.cdate <= TO_DATE(#{cdateEnd},'YYYY-MM-DD')]]>
+            </if>
+        </where>
+        ORDER BY
+        m.SECID
+    </select>
+    <select id="selectByKey"
+            resultType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest">
+         SELECT
+        m.SECID secid,
+        f.FINPROD_ABBR finprodAbbr,
+        m.VALUE_SOURCE,
+        m.CDATE cdate,
+        m.MDPRICE mdprice,
+        m.MCPRICE mcprice,
+        m.MINT mint,
+        m.MYIELD*100 myield,
+        m.M_MDURATION mMduration,
+        m.M_CNVXTY mCnvxty,
+        m.ISSUE_MARKET_NUM issueMarketNum,
+        m.CREDIT_TYPE creditType
+        FROM
+        MST_CREDIT_MARKET_INFO		m
+        LEFT JOIN
+        FIN_PRODUCT		f
+        ON	 f.FINPROD_ID=m.SECID
+        LEFT JOIN
+        INTERF_CREDITINFO	i
+        ON	 i.SECID = m.SECID
+        AND
+        m.SECID=#{secId,jdbcType=VARCHAR}
+        AND
+        m.CDATE=to_date(#{valueDate},'yyyy-mm-dd')
+        AND
+        m.VALUE_SOURCE=#{valueSource,jdbcType=DATE}
+    </select>
+</mapper>
