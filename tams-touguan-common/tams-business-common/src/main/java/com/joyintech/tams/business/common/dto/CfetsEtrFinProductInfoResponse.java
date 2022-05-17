@@ -335,7 +335,7 @@ public class CfetsEtrFinProductInfoResponse {
     /**
      * 币种
      */
-    @ApiModelProperty(name = "ccyStr", value = "币种code")
+    @ApiModelProperty(name = "ccyStr", value = "币种")
     private String ccyStr;
 
     /**
@@ -936,7 +936,7 @@ public class CfetsEtrFinProductInfoResponse {
     }
 
     public String getIssueClassStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.发行方式, this.getIssueClass());
+        return SysDataUtil.getNameFromDataDict(DictCode.新债_发行方式, this.getIssueClass());
     }
 
 
