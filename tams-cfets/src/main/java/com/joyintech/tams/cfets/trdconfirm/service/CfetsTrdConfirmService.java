@@ -153,6 +153,10 @@ public class CfetsTrdConfirmService extends BaseService{
 
     @Autowired
     private CfetsRepoQuotedPrice004Service cfetsRepoQuotedPrice004Service;
+
+    @Autowired
+    private FinProductAddMapper finProductAddMapper;
+
     // 交易份额小数保留位数
     private int decimalPlaces_4 = 4;
     String PAGE_FROM_TrdRepoTrade003 = "TrdRepoTrade003";
@@ -277,6 +281,8 @@ public class CfetsTrdConfirmService extends BaseService{
     /**
      * 交易执行-成交确认
      */
+    @Transactional(rollbackFor = Exception.class)
+    @DTXTransaction
     public AjaxResult trdConfirmSaveMethod(CfetsTrdConfirmRegInfoListResponse dto){
         List<CfetsTrdConfirmRegInfoListResponse> selectedItem = dto.getSelectedItem();
         List<ValidMessage> messages = new ArrayList<>();
@@ -295,6 +301,10 @@ public class CfetsTrdConfirmService extends BaseService{
                                 || StringUtil.equals(item.getFinprodType2(),DictCodeListExt1.CSTP资产类型_一级申购.getValue())) {
                             CfetsTrdFirstBondInvestTradeDto entity = this.prepareBidEntity(item.getTotleTradeId(), DictCodeListExt1.生成方式_画面录入.getValue());
                             cfetsTrdConfirm001Service.doCompleteBidMethod(entity, OperationType.NEW);
+                            FinProductAdd finProductAdd = new FinProductAdd();
+                            finProductAdd.setFinprodId(item.getFinprodId());
+                            finProductAdd.setIssueStatus(DictCodeListExt1.发行状态_发行失败.getValue());
+                            finProductAddMapper.updateByPrimaryKeySelective(finProductAdd);
                         } else {
                             CfetsTrdRepoTrade003Dto entity = packageRepoEquity(item, DictCodeListExt1.生成方式_画面录入.getValue());
                             //成交确认提交方法
