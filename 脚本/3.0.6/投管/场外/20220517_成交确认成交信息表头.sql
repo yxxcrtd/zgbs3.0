@@ -1,0 +1,1 @@
+update CFG_DATATABLE_SHOW set COLCODE = 'busiTypePositionStr' where PAGECODE = 'cfetsManualSettleQuery' and DTCODE = 'CfetsManualSettleInfo' and SPCDCODE = '06,P' and COLNAME = '业务模式';
