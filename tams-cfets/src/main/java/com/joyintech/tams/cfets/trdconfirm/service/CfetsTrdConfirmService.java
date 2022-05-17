@@ -303,7 +303,7 @@ public class CfetsTrdConfirmService extends BaseService{
                             cfetsTrdConfirm001Service.doCompleteBidMethod(entity, OperationType.NEW);
                             FinProductAdd finProductAdd = new FinProductAdd();
                             finProductAdd.setFinprodId(item.getFinprodId());
-                            finProductAdd.setIssueStatus(DictCodeListExt1.发行状态_发行失败.getValue());
+                            finProductAdd.setIssueStatus(DictCodeListExt1.发行状态_发行成功.getValue());
                             finProductAddMapper.updateByPrimaryKeySelective(finProductAdd);
                         } else {
                             CfetsTrdRepoTrade003Dto entity = packageRepoEquity(item, DictCodeListExt1.生成方式_画面录入.getValue());
