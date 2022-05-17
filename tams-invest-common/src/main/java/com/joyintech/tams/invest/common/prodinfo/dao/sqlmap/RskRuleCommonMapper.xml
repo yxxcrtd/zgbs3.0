@@ -8,6 +8,17 @@
 			 where m.RULE_ID=#{code} order by m.PARAM_NUM DESC
    </select>
 
+	<select id="selectPtlRuleAll" resultType="com.joyintech.tams.invest.common.prodinfo.dto.IRskRulePoolConfig">
+		SELECT
+			RULE_ID as ruleId,
+			LINK_SIGN as linkSign,
+			CLASSIFY_DIMENSION as classifyDimension,
+			CLASSIFY_DIMENSION_VAL as classifyDimensionVal,
+			PARAM_NUM as paramNum
+		FROM
+			RSK_RULE_POOL_CONFIG ORDER BY PARAM_NUM desc
+	</select>
+
 	<select id="getMatchPortData" parameterType="Map" resultType="java.lang.String">
 		select PTL_PORTFOLIO.PORTFOLIO_ID from PTL_PORTFOLIO
 		LEFT JOIN PA_PTL_PORTFOLIO  ON PTL_PORTFOLIO.PORTFOLIO_ID=PA_PTL_PORTFOLIO.PORTFOLIO_ID

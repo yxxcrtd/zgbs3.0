@@ -92,7 +92,7 @@
             }
         }else{
             $('#holdingMaxDiv').hide();
-            $('#isFaceSingleInvestorDiv').hide()
+            $('#isFaceSingleInvestorDiv').hide();
         }
     };
 	
