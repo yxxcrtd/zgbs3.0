@@ -572,16 +572,24 @@ public class PortfolioManager extends BaseService {
 
         // 获取指令
         String instructionId = order.getInstructionId();
+        Instruction instruction = instructionService.findById(instructionId);
+
+        BigDecimal price;
+        if (InvestmentAssetType.isBond(instruction.getAssetType())
+                && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
+            price = order.getFullPrice();
+        } else {
+            price = order.getEntrustPrice();
+        }
 
         ResultBean assignResult = portfolioAssignHelper.queryPortfolioAssign(order.getInstructionId(),
                 PortfolioDetailBusiTypeEnum.ORDER, BigDecimal.valueOf(order.getEntrustVolume()),
-                order.getEntrustPrice(), order.getEntrustProp());
+                price, order.getEntrustProp());
         if (assignResult.isFail()) {
             return assignResult;
         }
         Map<String, PortfolioDetail> portfolioDetailMap = (Map<String, PortfolioDetail>) assignResult.getData();
 
-        Instruction instruction = instructionService.findById(instructionId);
         List<InstructionDetail> instructionDetails = instructionDetailService.queryInstructionDetailsByInstructionId(instructionId);
 
         Map<String, PortfolioInfoResponse> portfolioInfoResponseMap = Maps.newHashMap();
@@ -619,7 +627,7 @@ public class PortfolioManager extends BaseService {
             calculateResponse.setFinprodMarketId(instruction.getFinprodMarketId());
             calculateResponse.setFinprodName(instruction.getFinprodName());
             calculateResponse.setDisRate(detail.getDisRate());
-            calculateResponse.setInstructionTotalNum(detail.getEntrustAmt().longValue());
+            calculateResponse.setInstructionTotalAmt(detail.getEntrustAmt());
             calculateResponse.setInstructionTotalNum(detail.getEntrustNum().longValue());
             if (Objects.nonNull(order.getFullPrice())) {
                 calculateResponse.setFullPrice(order.getFullPrice());
