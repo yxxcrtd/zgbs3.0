@@ -562,7 +562,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         if (StringUtil.isNotEmpty(dto.getFinProductConvertible()) &&
                 StringUtil.isNotEmpty(dto.getFinProductConvertible().getConPrice())) {
             FinProductConvertible finProductConvertible = new FinProductConvertible();
-            finProductConvertible.setConFinprodId(dto.getFinprodId());
+            finProductConvertible.setFinprodId(dto.getFinprodId());
             BeanUtil.copyPropertiesIgnoreNull(finProductConvertible, dto.getFinProductConvertible());
             dto.setProductConvertible(finProductConvertible);
         }
