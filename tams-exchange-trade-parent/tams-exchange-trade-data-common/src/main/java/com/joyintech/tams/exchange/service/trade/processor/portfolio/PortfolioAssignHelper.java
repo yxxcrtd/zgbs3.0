@@ -22,6 +22,7 @@ import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailByManualMapper;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionDetailService;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -228,7 +229,11 @@ public class PortfolioAssignHelper {
         Map<String, List<PortfolioDetail>> map = portfolioDetails.stream().collect(Collectors.groupingBy(PortfolioDetail::getPortfolioId));
         for (PortfolioDetail detail : list) {
             // 历史数量 根据组合代码求和
-            BigDecimal historyNum = map.get(detail.getPortfolioId()).stream().map(PortfolioDetail::getTargetNum).reduce(BigDecimal.ZERO, BigDecimal::add);
+            List<PortfolioDetail> detailList = map.get(detail.getPortfolioId());
+            BigDecimal historyNum = BigDecimal.ZERO;
+            if (CollectionUtils.isNotEmpty(detailList)) {
+                historyNum = historyNum.add(detailList.stream().map(PortfolioDetail::getTargetNum).reduce(BigDecimal.ZERO, BigDecimal::add));
+            }
             detail.setTargetNum(NumberUtil.sub(detail.getTargetNum(), historyNum));
             detail.setTargetAmt(NumberUtil.round(NumberUtil.mul(detail.getTargetNum(), price), AMT_SCALE));
         }

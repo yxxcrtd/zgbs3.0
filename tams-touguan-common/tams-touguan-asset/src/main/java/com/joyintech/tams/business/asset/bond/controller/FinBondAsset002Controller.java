@@ -1,6 +1,7 @@
 package com.joyintech.tams.business.asset.bond.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.base.dto.UploadFile;
@@ -270,6 +271,14 @@ public class FinBondAsset002Controller extends BaseController{
         ValidUtils.valid(dto.getFinInterestFactorDto(),validList);
         List<ValidMessage> valids = finBondAssetValidatorService.valid(dto);
         validList.addAll(valids);
+        String finProdId = commonBusinessService.getFinProdId(dto.getFinprodMarketId()+dto.getTradeMarketId(),DictCodeListExt1.金融产品类型_投管用_债券.getValue(),null);
+        if(finBondAssetService.selectCountByfinprodId(finProdId)>0){
+            validList.add(new ValidMessage("",
+                    getMessage("资产代码不能重复!")));
+            ajax.setErrorList(validList);
+            ajax.setMessageType(MessageType.错误消息);
+            return new Message<AjaxResult>().success().setData(ajax);
+        }
         if (CollectionUtils.isNotEmpty(validList)){
             ajax.setErrorList(validList);
             return new Message<AjaxResult>().success().setData(ajax);
@@ -682,6 +691,18 @@ public class FinBondAsset002Controller extends BaseController{
             return new Message<Page<SelectOptionDto>>().success().setData(page);
         }catch (Exception e) {
             return new Message<Page<SelectOptionDto>>().fail().setMessage("正股代码的联想下拉框异常");
+        }
+    }
+
+    @ApiOperation(value="节假日自动向后推算日期(参数：)",notes = "正股代码的联想下拉框")
+    @ResponseBody
+    @PostMapping("getDealCalendarHoliday")
+    public Message<Date> getDealCalendarHoliday(@RequestBody SelectOptionCommonRequest request){
+        try {
+            Date date = finBondAssetService.getDealCalendarHoliday(request);
+            return new Message<Date>().success().setData(date);
+        }catch (Exception e) {
+            return new Message<Date>().fail().setMessage("正股代码的联想下拉框异常");
         }
     }
 }

@@ -16,6 +16,7 @@ import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.business.asset.bond.dto.FinAssetRateAdjRequest;
 import com.joyintech.tams.business.asset.bond.dto.FinAssetRateAdjResponse;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.asset.dto.AssetCommonInfoDto;
 import com.joyintech.tams.invest.common.asset.dto.RateAdjDto;
 import com.joyintech.tams.invest.common.asset.service.RateAdjService;
@@ -68,6 +69,11 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
 
     @Autowired
     private FinCashPlanMapper finCashPlanMapper;
+
+    @Autowired
+    private FinBondAssetService finBondAssetService;
+
+
     /**
      * 初始化信息--前台分页 <功能详细描述>
      *
@@ -281,6 +287,11 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
         //针对还本不付息资产，还本时，计划应付利息应等于区间还本未付利息
         entity =encapFinCashPlanIntAmt(entity);
         insert(entity);
+        if (StringUtil.isNotEmpty(entity.getFinprodMarketId())) {
+            finBondAssetService.updateCfetsOprHis(entity.getFinprodMarketId(), DictCodeListExt3.操作类型_利率调整.getValue());
+        }else{
+            finBondAssetService.updateCfetsOprHis(entity.getSelectedItem().get(0).getFinprodMarketId(), DictCodeListExt3.操作类型_利率调整.getValue());
+        }
     }
 
     public void insert(FinAssetRateAdjResponse dto){
