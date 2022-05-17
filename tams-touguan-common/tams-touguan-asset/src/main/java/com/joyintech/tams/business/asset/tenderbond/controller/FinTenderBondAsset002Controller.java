@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Controller
 @PageId("FinTenderBondAsset002")
@@ -64,6 +65,10 @@ public class FinTenderBondAsset002Controller extends BaseController {
             String finprodId = getParam("finprodId");
             if (StringUtil.isNotEmpty(finprodId)) {//修改
                 entity = finTenderBoundAssetService.getById(finprodId);
+                if(Objects.nonNull(entity.getCirculationCode())) {
+                    entity.getProductAddDto().setAppearMarketId(entity.getCirculationCode());
+                    entity.getProductAddDto().setListingDate(entity.getCirculationDate());
+                }
                 params.put("businessId", entity.getFinprodMarketId());
             }
         }

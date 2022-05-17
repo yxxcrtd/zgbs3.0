@@ -941,20 +941,10 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      */
     @Override
     public void doBack(CfetsTrdBondFirstSubInfoDto entity) {
+        // 删除流程中表数据
+        this.deleteWflDataByWorkflowId(entity.getWorkflowId());
         // 老头寸处理
         this.dealOldPosition(entity, true);
-    }
-
-    /**
-     * 作废
-     *
-     * @param workflowId 流程id
-     * @author jiangpeng
-     * @date 2022/4/26 16:15
-     */
-    @Override
-    public void doDelete(String workflowId) {
-        this.deleteWflDataByWorkflowId(workflowId);
     }
 
     /**

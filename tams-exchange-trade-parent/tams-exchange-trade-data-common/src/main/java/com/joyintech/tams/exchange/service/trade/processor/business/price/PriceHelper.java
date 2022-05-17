@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Lists;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.exchange.common.bean.TickBean;
 import com.joyintech.tams.exchange.common.bean.dto.OpenCloseTime;
@@ -20,6 +21,7 @@ import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
 import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import com.joyintech.tams.exchange.common.utils.IntegratedEntrustUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
+import com.joyintech.tams.exchange.service.trade.processor.check.CommonCheckKit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -379,13 +381,13 @@ public class PriceHelper {
     }
 
     private String dealErrorMsgByMarket(double lowerLimitPrice, double upperLimitPrice, String market) {
-        String errorMsg = null;
+        String suffix = CommonCheckKit.TRD_PRICE_SCOPE_CONTROL_FORBID.equals(CacheUtil.getSysParam(CommonCheckKit.TRD_PRICE_SCOPE_CONTROL)) ? "无法下达！" : "是否继续下达？";
         if (Market.SHSE.investValue.equals(market)) {
-            errorMsg = StrUtil.format("委托价格在有效价格范围[{}，{}]范围之外，存在委托废单的风险，是否继续下达？", lowerLimitPrice, upperLimitPrice);
+            return StrUtil.format("委托价格在有效价格范围[{}，{}]范围之外，存在委托废单的风险，{}", lowerLimitPrice, upperLimitPrice, suffix);
         } else if (Market.SZSE.investValue.equals(market)) {
-            errorMsg = StrUtil.format("委托价格在有效价格范围[{}，{}]范围之外，存在委托无法成交的风险，是否继续下达？", lowerLimitPrice, upperLimitPrice);
+            return StrUtil.format("委托价格在有效价格范围[{}，{}]范围之外，存在委托无法成交的风险，{}", lowerLimitPrice, upperLimitPrice, suffix);
         }
-        return errorMsg;
+        return StrUtil.EMPTY;
     }
 
     private int getTradeTimeStage(Instruction instruction, BaseOrderRequest order, Instrument instrument) {

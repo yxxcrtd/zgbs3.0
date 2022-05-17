@@ -270,7 +270,7 @@
             order by t.${pageMode.sort} ${pageMode.direction}
         </if>
         <if test="pageMode.sort == null or pageMode.sort == ''">
-            ORDER BY t.issueStage, t.issueStatus,t.issueDateStr, t.type9, t.type10, t.type11, t.issueClass
+            ORDER BY t.issueStage, t.issueStatus desc,t.issueDateStr, t.type9, t.type10, t.type11, t.issueClass
         </if>
     </select>
 

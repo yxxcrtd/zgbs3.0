@@ -426,7 +426,7 @@ public class EtrTradeCommonervice extends BaseService {
         String usableSecText="持仓数量（";
         if (StringUtil.isNotEmpty(requestDto.getPtlList().get(0).getFinprodType2())) {
             if (StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
-                if(StringUtil.equals(ps, DictCodeListExt3.交易方向_质押券入库.getValue())||StringUtil.equals(ps, DictCodeListExt3.交易方向_质押券出库.getValue())){
+                if(StringUtil.equals(ps, DictCodeListExt3.交易方向_质押券入库.getValue())||StringUtil.equals(ps, DictCodeListExt3.交易方向_质押券出库.getValue())||StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())||StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())) {
                     unit = "万元";
                 }else{
                     unit = "张";

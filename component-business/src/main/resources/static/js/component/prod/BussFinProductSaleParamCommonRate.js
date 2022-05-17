@@ -83,6 +83,9 @@
             $('#holdingMaxDiv').show();
             if($('#bussFinProductSaleParamDto_issueType').val()=='2'){
                 $('#isFaceSingleInvestorDiv').show();//私募展示是否面向单一投资者字段
+                if($('#bussFinProductSaleParamDto_isFaceSingleInvestor').val() == null || $('#bussFinProductSaleParamDto_isFaceSingleInvestor').val() == ''){
+                    $('#bussFinProductSaleParamDto_isFaceSingleInvestor').val('N').trigger('change');
+                }
             }else{
                 $('#isFaceSingleInvestorDiv').hide();//公募隐藏是否面向单一投资者字段
                 $('#bussFinProductSaleParamDto_isFaceSingleInvestor').val('').trigger('change');
@@ -110,6 +113,9 @@
                 $('#bussFinProductSaleParamDto_isFaceSingleInvestor').val('').trigger('change');
             }else{
                 $('#isFaceSingleInvestorDiv').show();//私募展示是否面向单一投资者字段
+                if($('#bussFinProductSaleParamDto_isFaceSingleInvestor').val() == null || $('#bussFinProductSaleParamDto_isFaceSingleInvestor').val() == ''){
+                    $('#bussFinProductSaleParamDto_isFaceSingleInvestor').val('N').trigger('change');
+                }
             }
 
         });
