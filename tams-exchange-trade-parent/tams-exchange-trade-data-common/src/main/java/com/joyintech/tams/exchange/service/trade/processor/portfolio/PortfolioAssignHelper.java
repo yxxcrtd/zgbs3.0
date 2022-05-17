@@ -6,6 +6,7 @@ import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.joyintech.exchange.service.quote.service.QuoteService;
+import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.TickBean;
 import com.joyintech.tams.exchange.common.constant.EntrustBs;
@@ -108,11 +109,20 @@ public class PortfolioAssignHelper {
             log.warn("未找到委托属性: instructionId [{}], entrustProp = [{}]", instructionId, orginProp);
             return ResultBean.error(ErrorCode.REQ_PARAMETER_ENTRUST_PROP_ERROR);
         }
+        if (EntrustProp.isConsultingTrade(entrustProp)) {
+            entrustProp = EntrustProp.SH_FIXEDINCOME_BAOJIA_OPPOSITE.value;
+        }
+
+        MinTrdUnitLimit minTrdUnitLimit = instruction.queryMinTrdUnitLimit(entrustProp);
+        if (Objects.isNull(minTrdUnitLimit)) {
+            log.warn("未找到最小交易单元: instructionId [{}], entrustProp = [{}]", instructionId, entrustProp);
+            return ResultBean.error(ErrorCode.MIN_TRD_UNIT_LIMIT_ERROR);
+        }
 
         // 最小交易单元：整数倍
-        BigDecimal minStep = BigDecimal.valueOf(instruction.queryMinTrdUnitLimit(entrustProp).getMinStep());
+        BigDecimal minStep = BigDecimal.valueOf(minTrdUnitLimit.getMinStep());
         if (ObjectUtil.isNull(minStep) || minStep.intValue() <= 0) {
-            log.warn("未找到交易属性: instructionId [{}], entrustProp = [{}]", instructionId, entrustProp);
+            log.warn("未找到最小交易单元: instructionId [{}], entrustProp = [{}]", instructionId, entrustProp);
             return ResultBean.error(ErrorCode.MIN_TRD_UNIT_LIMIT_ERROR);
         }
 
