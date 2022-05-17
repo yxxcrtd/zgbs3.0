@@ -1,6 +1,10 @@
 package com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dao;
 
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubEntrustDto;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * 一级投标确认mapper
@@ -9,4 +13,17 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface CfetsTrdFirstBidFirm001Mapper {
+    /**
+     * 指令查询
+     * @param params 入参条件
+     * @return
+     */
+    List<CfetsTrdBondFirstSubEntrustDto> listEntrust(Map<String, Object> params);
+
+    /**
+     * 根据指令代码查询指令对应的交易流程中数据
+     * @param params
+     * @return
+     */
+    int checkDataStatus(Map<String, Object> params);
 }

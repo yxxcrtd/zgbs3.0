@@ -89,15 +89,15 @@ public class EtrCommonFinProductInfoService extends BaseService {
     private String getSpcdCodesByFinProduct(CfetsEtrFinProductInfoResponse finProductInfo) {
         StringBuilder sb = new StringBuilder();
         //发行方式
-        String issueType = finProductInfo.getIssueType();
+        String issueClass = finProductInfo.getIssueClass();
         //招标方式
         String tenderType = finProductInfo.getTenderType();
         //发行类型
         String issueStyle = finProductInfo.getIssueStyle();
-        if (StringUtil.isBlank(issueType) && StringUtil.isBlank(tenderType) && StringUtil.isBlank(issueStyle)) {
+        if (StringUtil.isBlank(issueClass) && StringUtil.isBlank(tenderType) && StringUtil.isBlank(issueStyle)) {
             return BASE_SPCD_CODE;
         }
-        if (DictCodeListExt4.新债_发行方式_报价发行.getValue().equals(issueType)) {
+        if (DictCodeListExt4.新债_发行方式_报价发行.getValue().equals(issueClass)) {
             return sb.append(BASE_SPCD_CODE).append(COMM).append(DictCodeListExt4.新债_发行方式_报价发行.getValue()).toString();
         }
 

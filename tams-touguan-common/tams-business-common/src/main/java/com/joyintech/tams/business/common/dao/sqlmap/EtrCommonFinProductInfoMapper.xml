@@ -24,7 +24,7 @@
         PRODUCT_TYPE.TYPE_11 assetTypeThree,
         PRODUCT_TYPE.TYPE_11 bondType,
         PRODUCT.COUPON_SPECIES couponSpecies,
-        PRODUCT.CCY cyy,
+        PRODUCT.CCY ccy,
         PRODUCT.CAPI_INCOME_FEATURE capiIncomeFeature,
         PRODUCT_ADD.IS_AUTO_UPDATE isAutoUpdate,
         ISSUE.ISSUE_PRICE issuePrice,

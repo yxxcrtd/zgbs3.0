@@ -666,8 +666,8 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             dto.setFinprodAbbr(finProductInfo.getFinprodAbbr());
             dto.setFinprodMarketId(finProductInfo.getFinprodMarketId());
             //审批时 流程数据初始化
-            dto.setIssueClass(finProductInfo.getIssueType());
-            if (StringUtil.equals(finProductInfo.getIssueType(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
+            dto.setIssueClass(finProductInfo.getIssueClass());
+            if (StringUtil.equals(finProductInfo.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
                 dto.setIssueDate(finProductInfo.getIssueDate());
                 dto.setPayDate(finProductInfo.getPayDate());
                 dto.setIssuePrice(finProductInfo.getIssuePrice());

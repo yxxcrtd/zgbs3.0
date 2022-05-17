@@ -20,6 +20,9 @@ public class FinBondMarketInfoQueryRequest {
     @ApiModelProperty(name = "pageMode", value = "分页对象", example = "{pageSize: 10,pageNo: 1, sort: 'name', direction: 'asc'}")
     private PageMode pageMode;
 
+    @ApiModelProperty(name = "secType", value = "债券分类")
+    private String secType;
+
     @ApiModelProperty(name = "secId", value = "债券ID/资产代码")
     private String secId;
 
@@ -302,5 +305,13 @@ public class FinBondMarketInfoQueryRequest {
 
     public void setSearch(String search) {
         this.search = search;
+    }
+
+    public String getSecType() {
+        return secType;
+    }
+
+    public void setSecType(String secType) {
+        this.secType = secType;
     }
 }
