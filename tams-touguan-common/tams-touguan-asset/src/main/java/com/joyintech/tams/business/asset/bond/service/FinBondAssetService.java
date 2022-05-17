@@ -423,6 +423,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             //计息要素
             BondFinInterestFactorDto finInterestFactorDto = new BondFinInterestFactorDto();
             BeanUtil.copyPropertiesIgnoreNull(finInterestFactorDto,dto);
+            finInterestFactorDto.setSpreadRate(dto.getSpreadRate());
             dto.setFinInterestFactorDto(finInterestFactorDto);
             //付息信息
             BondFinPayInterestStdInfoDto finPayInterestStdInfoDto = new BondFinPayInterestStdInfoDto();
@@ -1351,9 +1352,9 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                                 getMessage("BUSS_COM_E_0069", getMessage("BussFinRepayment.payDate"))));
                         return resultList;
                     }
-                    if(DateUtil.compareDate(finCashPlanEntity.getVdate(),finCashPlanEntity.getMdate())>0){
+                    if(DateUtil.compareDate(finCashPlanEntity.getVdate(),finCashPlanEntity.getMdate())>=0){
                         resultList.add(new ValidMessage(
-                                "付息计划,计息开始日不可以大于计息结束日"));
+                                "计息截止日不能小于等于计息开始日"));
                         return resultList;
                     }
                     if (StringUtil.isNotEmpty(dto.getMaxTradeDate())) {
