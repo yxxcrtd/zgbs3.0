@@ -34,7 +34,7 @@
             and  PRODUCT.CIRCULATION_DATE <= TO_DATE(#{platformDate},'YYYY-MM-DD') THEN '03'
             ]]>
             ELSE NULL END AS issueStage,
-            PRODUCT_ADD.ISSUE_STATUS as issueStatus,
+            nvl(PRODUCT_ADD.ISSUE_STATUS,'00') as issueStatus,
             PRODUCT.FINPROD_MARKET_ID as finprodMarketId,
             PRODUCT.FINPROD_ABBR as finprodAbbr,
             PRODUCT.TRADE_MARKET as tradeMarket,
@@ -272,7 +272,7 @@
             order by t.${pageMode.sort} ${pageMode.direction}
         </if>
         <if test="pageMode.sort == null or pageMode.sort == ''">
-            ORDER BY t.issueStage, t.issueStatus desc,t.issueDateStr, t.type9, t.type10, t.type11, t.issueClass
+            ORDER BY t.issueStage, t.issueStatus,t.issueDateStr, t.type9, t.type10, t.type11, t.issueClass
         </if>
     </select>
 

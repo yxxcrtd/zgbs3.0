@@ -530,10 +530,10 @@
             ISSUE.ISSUE_CLASS as issueClass,
             round(ISSUE.PLAN_ISSUE_AMT/100000000,2) as planIssueAmt,
             case
-                when ISSUE.ISSUE_CLASS IN ('02', '03')  THEN
-                    ISSUE.ISSUE_DATE
-                else PRODUCT_ADD.BID_DATE
-                end as issueDate,
+            when ISSUE.ISSUE_CLASS IN ('01')  THEN
+            TO_CHAR(ISSUE.ISSUE_DATE, 'yyyy-MM-dd')
+            else TO_CHAR(PRODUCT_ADD.BID_DATE, 'yyyy-MM-dd')
+            end as issueDate,
             ISSUE.PAY_EDATE as payEdate,
             PRODUCT.COUPON_SPECIES as couponSpecies,
             ISSUE.INT_TYPE as intType,

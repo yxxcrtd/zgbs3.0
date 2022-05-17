@@ -1616,4 +1616,46 @@
     <delete id="deleteCfetsOprHis">
         delete ETR_ENTRUST_OPER_HIS where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
     </delete>
+
+    <select id="selectFinProductIssue" resultMap="com.joyintech.tams.common.base.dao.FinProductIssueMapper.BaseResultMap" parameterType="java.lang.String" >
+        select
+            T1.FINPROD_ID         ,
+            T1.ISSUE_CLASS        ,
+            T1.TENDER_TYPE        ,
+            T1.TENDER_TARGET      ,
+            T1.PLAN_ISSUE_AMT     ,
+            T1.ISSUE_STYLE        ,
+            T1.ADD_BATCH          ,
+            T1.ISSUE_PRICE        ,
+            T1.REFER_YIELD        ,
+            T1.INT_RATE_ID        ,
+            T1.RATE_GRADE         ,
+            T1.BP                 ,
+            T1.ISSUE_DATE         ,
+            T1.PAY_DATE           ,
+            T1.FIRST_CONFIRM_DATE ,
+            T1.ISSUE_SDATE        ,
+            T1.ISSUE_EDATE        ,
+            T1.TENDER_SDATE       ,
+            T1.TENDER_EDATE       ,
+            T1.PAY_EDATE          ,
+            T1.ASSIGN_REGDATE     ,
+            T1.MIN_PAMT           ,
+            T1.MAX_PAMT           ,
+            T1.MAX_TOTALAMT       ,
+            T1.MIN_PER_TAMT       ,
+            T1.MAX_PER_UTAMT      ,
+            T1.MIN_TAMT           ,
+            T1.MAX_TAMT           ,
+            T1.TENDER_UNIT        ,
+            T1.MAX_TENDER_UNIT    ,
+            T1.MAX_TENDER_PLUS    ,
+            T1.SERI_Y_N           ,
+            T1.MAX_TOTAL_TENDER   ,
+            T1.PAY_CYCLE          ,
+            T1.INT_TYPE
+        from FIN_PRODUCT_ISSUE T1
+        LEFT JOIN FIN_PRODUCT T2 ON T2.FINPROD_ID = T1.FINPROD_ID
+        where T2.CIRCULATION_CODE = #{finprodMarketId,jdbcType=VARCHAR}
+    </select>
 </mapper>
