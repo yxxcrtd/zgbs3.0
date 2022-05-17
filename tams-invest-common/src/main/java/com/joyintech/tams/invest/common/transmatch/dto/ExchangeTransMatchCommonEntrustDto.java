@@ -199,4 +199,17 @@ public class ExchangeTransMatchCommonEntrustDto extends EtrEntrust {
     public void setOptType(String optType) {
         this.optType = optType;
     }
+
+    /**
+     * 交易方式
+     */
+    private String dealMode;
+
+    public String getDealMode() {
+        return dealMode;
+    }
+
+    public void setDealMode(String dealMode) {
+        this.dealMode = dealMode;
+    }
 }

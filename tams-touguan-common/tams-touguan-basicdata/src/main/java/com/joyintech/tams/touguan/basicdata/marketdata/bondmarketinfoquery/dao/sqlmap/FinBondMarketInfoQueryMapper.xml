@@ -474,6 +474,50 @@
         WHERE PAYHSRCSECINFO.SECID = #{secId, jdbcType = VARCHAR}
     </select>
 
+    <select id="queryFinProductForCoupons"
+            resultType="com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoDetailQueryDto">
+
+        SELECT
+            PRODUCT.FINPROD_ID secId,
+            PRODUCT.FINPROD_ABBR secName,
+            PRODUCT.FINPROD_NAME secFullName,
+            PRODUCT.FINPROD_MARKET_ID secCode,
+            PRODUCT.TRADE_MARKET market,
+            PRODUCT.REGIST_ORG institution,
+            PRODUCT.ISSUE_PRICE,
+            PRODUCT.IDATE pubendDate,
+            PRODUCT.VDATE,
+            PRODUCT.MDATE,
+            PRODUCT.ISSUE_AMT,
+            PRODUCT.DELISTING_DATE,
+            PRODUCT.ISSUER,
+            CUSTOMER_INFO.CUSTOMER_NAME issuerName,
+            PRODUCT_TYPE.TYPE_9 secType,
+            PRODUCT_TYPE.TYPE_10 secType2,
+            PRODUCT_TYPE.TYPE_11 secType3,
+            PRODUCT.ISSUE_TYPE,
+            PRODUCT.BLN_AREA,
+            PRODUCT.IS_SUS,
+            PRODUCT.IS_RIGHT,
+            PRODUCT_ADD.IS_ALLOW_OVERWRITE,
+            PRODUCT_ADD.IS_SEC_BOND,
+            PRODUCT.CCY,
+            PRODUCT.CAPI_INCOME_FEATURE,
+            PRODUCT_ADD.CONCEPT_TYPE,
+            PRODUCT_ADD.CROSS_MARKET_CODE crossMarketCode,
+            PRODUCT.COUPON_SPECIES,
+            ISSUE.INT_TYPE interestRate
+        FROM
+            FIN_PRODUCT PRODUCT
+                LEFT JOIN FIN_PRODUCT_ADD PRODUCT_ADD ON PRODUCT.FINPROD_ID = PRODUCT_ADD.FINPROD_ID
+                LEFT JOIN FIN_PRODUCT_ISSUE ISSUE ON PRODUCT.FINPROD_ID = ISSUE.FINPROD_ID
+                LEFT JOIN FIN_PRODUCT_TYPE PRODUCT_TYPE ON PRODUCT.FINPROD_ID = PRODUCT_TYPE.FINPROD_ID AND PRODUCT_TYPE.BRANCH = 0
+                LEFT JOIN MST_CUSTOMER_INFO CUSTOMER_INFO ON PRODUCT.ISSUER = CUSTOMER_INFO.CUSTOMER_ID
+        where PRODUCT.FINPROD_TYPE2 = 'F01'
+          AND PRODUCT.TRADE_MARKET in ('01','02')
+          AND PRODUCT.FINPROD_MARKET_ID = #{secId, jdbcType = VARCHAR}
+    </select>
+
     <select id="getAssetId" resultType="com.joyintech.framework.select.SelectOptionDto">
         SELECT
         SECID id,

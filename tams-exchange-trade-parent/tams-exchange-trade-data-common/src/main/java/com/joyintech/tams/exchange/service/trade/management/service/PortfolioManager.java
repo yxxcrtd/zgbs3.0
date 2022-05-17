@@ -572,6 +572,10 @@ public class PortfolioManager extends BaseService {
 
         // 获取指令
         String instructionId = order.getInstructionId();
+        Instruction instruction = instructionService.findById(instructionId);
+
+        //处理委托价格
+        coverPrice(instruction, order);
 
         ResultBean assignResult = portfolioAssignHelper.queryPortfolioAssign(order.getInstructionId(),
                 PortfolioDetailBusiTypeEnum.ORDER, BigDecimal.valueOf(order.getEntrustVolume()),
@@ -581,7 +585,6 @@ public class PortfolioManager extends BaseService {
         }
         Map<String, PortfolioDetail> portfolioDetailMap = (Map<String, PortfolioDetail>) assignResult.getData();
 
-        Instruction instruction = instructionService.findById(instructionId);
         List<InstructionDetail> instructionDetails = instructionDetailService.queryInstructionDetailsByInstructionId(instructionId);
 
         Map<String, PortfolioInfoResponse> portfolioInfoResponseMap = Maps.newHashMap();
@@ -619,7 +622,7 @@ public class PortfolioManager extends BaseService {
             calculateResponse.setFinprodMarketId(instruction.getFinprodMarketId());
             calculateResponse.setFinprodName(instruction.getFinprodName());
             calculateResponse.setDisRate(detail.getDisRate());
-            calculateResponse.setInstructionTotalNum(detail.getEntrustAmt().longValue());
+            calculateResponse.setInstructionTotalAmt(detail.getEntrustAmt());
             calculateResponse.setInstructionTotalNum(detail.getEntrustNum().longValue());
             if (Objects.nonNull(order.getFullPrice())) {
                 calculateResponse.setFullPrice(order.getFullPrice());
@@ -631,7 +634,11 @@ public class PortfolioManager extends BaseService {
             if (ObjectUtil.isNotNull(portfolioDetail)) {
                 calculateResponse.setEntrustNum(portfolioDetail.getTargetNum().longValue());
                 calculateResponse.setEntrustAmt(portfolioDetail.getTargetAmt());
-                calculateResponse.setEntrustPrice(NumberUtil.div(calculateResponse.getEntrustAmt(), calculateResponse.getEntrustNum()));
+                if (Objects.isNull(calculateResponse.getEntrustNum()) || calculateResponse.getEntrustNum() == 0) {
+                    calculateResponse.setEntrustPrice(order.getEntrustPrice());
+                }else {
+                    calculateResponse.setEntrustPrice(NumberUtil.div(calculateResponse.getEntrustAmt(), calculateResponse.getEntrustNum()));
+                }
             }
 
             list.add(calculateResponse);

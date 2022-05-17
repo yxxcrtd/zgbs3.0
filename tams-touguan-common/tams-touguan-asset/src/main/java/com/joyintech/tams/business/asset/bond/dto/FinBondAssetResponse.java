@@ -108,6 +108,9 @@ public class FinBondAssetResponse {
     @ApiModelProperty(name="basisRate",value="基准利率")
     private String basisRate;
 
+    @ApiModelProperty(name="basisRateStr",value="基准利率")
+    private String basisRateStr;
+
     @ApiModelProperty(name="basisRateRatio",value="基准利率系数")
     private BigDecimal basisRateRatio;
 
@@ -397,6 +400,10 @@ public class FinBondAssetResponse {
         return basisRate;
     }
 
+    public String getBasisRateStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.利率行情, this.getBasisRate());
+    }
+
     public void setBasisRate(String basisRate) {
         this.basisRate = basisRate;
     }
@@ -417,6 +424,7 @@ public class FinBondAssetResponse {
         this.spreadRate = spreadRate;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     public Date getFirstRateFixDate() {
         return firstRateFixDate;
     }
@@ -643,5 +651,9 @@ public class FinBondAssetResponse {
 
     public void setConceptTypeStr(String conceptTypeStr) {
         this.conceptTypeStr = conceptTypeStr;
+    }
+
+    public void setBasisRateStr(String basisRateStr) {
+        this.basisRateStr = basisRateStr;
     }
 }

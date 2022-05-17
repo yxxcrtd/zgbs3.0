@@ -333,12 +333,6 @@ public class CfetsEtrFinProductInfoResponse {
     private String ccy;
 
     /**
-     * 币种
-     */
-    @ApiModelProperty(name = "ccyStr", value = "币种code")
-    private String ccyStr;
-
-    /**
      * 保本标识
      */
     @ApiModelProperty(name = "capiIncomeFeature", value = "保本标识")
@@ -936,9 +930,8 @@ public class CfetsEtrFinProductInfoResponse {
     }
 
     public String getIssueClassStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.发行方式, this.getIssueClass());
+        return SysDataUtil.getNameFromDataDict(DictCode.新债_发行方式, this.getIssueClass());
     }
-
 
     public String getTenderTypeStr() {
         return SysDataUtil.getNameFromDataDict(DictCode.招标方式, this.getTenderType());
@@ -975,10 +968,6 @@ public class CfetsEtrFinProductInfoResponse {
 
     public String getCcyStr() {
         return SysDataUtil.getNameFromDataDict(DictCode.币种, this.getCcy());
-    }
-
-    public void setCcyStr(String ccyStr) {
-        this.ccyStr = ccyStr;
     }
 
     public String getIssueClass() {

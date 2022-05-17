@@ -1011,6 +1011,9 @@ public class CfetsTrdConfirmRegInfoListResponse{
     }
 
     public String getDealTypeName() {
+        if(StringUtil.equals(getFinprodType2(),"03")){//一级申购登记类型为空
+            return StringUtil.EMPTY;
+        }
         return SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式, getDealType());
     }
 

@@ -64,6 +64,9 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
     @ApiModelProperty(name = "rate", value = "票面利率", example = "99.0000")
     private BigDecimal rate;
 
+    @ApiModelProperty(name = "rateStr", value = "票面利率", example = "99.0000")
+    private String rateStr;
+
     @ApiModelProperty(name = "subscriptionAmount", value = "认购量", example = "1000.00")
     private BigDecimal subscriptionAmount;
 
@@ -215,6 +218,14 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
 
     public void setRate(BigDecimal rate) {
         this.rate = rate;
+    }
+
+    public String getRateStr() {
+        return rateStr;
+    }
+
+    public void setRateStr(String rateStr) {
+        this.rateStr = rateStr;
     }
 
     public BigDecimal getSubscriptionAmount() {

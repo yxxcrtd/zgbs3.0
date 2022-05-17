@@ -453,7 +453,7 @@
             ourTraderName,
             bidDate
         from (
-            select case when bo.IS_CANCEL = 'N' then '02' else '03' end      validStatus,
+            select distinct case when bo.IS_CANCEL = 'N' then '02' else '03' end      validStatus,
                    bo.BID_ID              bidId,
                    bo.SUBSCRIPTION_AMOUNT subscriptionAmount,
                    bo.PAYABLE_AMOUNT      payableAmount,
@@ -479,7 +479,7 @@
                     </foreach>
                 </if>
             union all
-            select '01'        validStatus,
+            select distinct '01'        validStatus,
                    wbo.BID_ID              bidId,
                    wbo.SUBSCRIPTION_AMOUNT subscriptionAmount,
                    wbo.PAYABLE_AMOUNT      payableAmount,

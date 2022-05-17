@@ -29,10 +29,7 @@ import com.joyintech.tams.component.business.asset.dto.FinInterestFactorDto;
 import com.joyintech.tams.component.business.asset.dto.FinPayInterestStdInfoDto;
 import com.joyintech.tams.component.business.bond.BusiFinBondRatingInfoService;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.business.asset.bond.service.FinBondAssetService;
 import com.joyintech.tams.business.asset.bond.service.FinBondAssetValidatorService;
 import com.joyintech.tams.invest.common.asset.dto.FinCashPlanDetailDto;
@@ -423,7 +420,7 @@ public class FinBondAsset002Controller extends BaseController{
                 }
             }
             //全额结算 : 私募债 || 139000-139999代码段债券、123000-123499代码段债券 || 资产支持证券
-            if(StringUtil.equals(isPpb, "Y") || settleFlag || StringUtil.equals(BussinessDictCodeList.WIND一级分类_含债券一级分类等_资产支持证券.getValue(), type9)){
+            if(StringUtil.equals(isPpb, "Y") || settleFlag || StringUtil.equals(DictCodeListExt3.行内资产三级分类_资产支持证券.getValue(), type9)){
                 isNetSett="N";
 //                tradePlat=DictCodeList.交易平台_固定收益平台.getValue();
             }else{
@@ -433,7 +430,7 @@ public class FinBondAsset002Controller extends BaseController{
             }
         }else if(StringUtil.equals(DictCodeListExt1.交易场所_深圳证券交易所.getValue(), tradeMarket)){
             //全额结算: 私募债 || 资产支持证券
-            if(StringUtil.equals(isPpb, "Y") || StringUtil.equals(BussinessDictCodeList.WIND一级分类_含债券一级分类等_资产支持证券.getValue(), type9)){
+            if(StringUtil.equals(isPpb, "Y") || StringUtil.equals(DictCodeListExt3.行内资产三级分类_资产支持证券.getValue(), type9)){
                 isNetSett="N";
 //                tradePlat=DictCodeList.交易平台_综合协议交易平台.getValue();
             }else{
