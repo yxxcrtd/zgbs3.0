@@ -398,10 +398,11 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 for(Map.Entry<String, BigDecimal> portfolioEntry : portfolioRemainQtyList){
                     if(ArithmeticUtil.subtract(remainMatchQty, minTrdUnitLimitDto.getMinNum()).compareTo(BigDecimal.ZERO) < 0){
                         portfolioMatchQtyMap.put(portfolioEntry.getKey(), remainMatchQty);
+                        remainMatchQty = BigDecimal.ZERO;
                         break;
                     }else{
-                        remainMatchQty = ArithmeticUtil.subtract(remainMatchQty, minTrdUnitLimitDto.getMinNum());
                         portfolioMatchQtyMap.put(portfolioEntry.getKey(), minTrdUnitLimitDto.getMinNum());
+                        remainMatchQty = ArithmeticUtil.subtract(remainMatchQty, minTrdUnitLimitDto.getMinNum());
                     }
                 }
                 // 3、如循环一轮后仍有剩余数量,则按照 各组合剩余分配数量比例 进行拆分,拆分结果需满足最小交易单元的整数倍
