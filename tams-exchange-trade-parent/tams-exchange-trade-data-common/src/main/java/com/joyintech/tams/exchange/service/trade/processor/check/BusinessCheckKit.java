@@ -43,11 +43,9 @@ public class BusinessCheckKit extends BaseCheckKit {
         if (ErrorCode.isSoftControlFail(resultBean.getErrorCode())) {
             if (!SwitcheEnum.OPEN.codeEquals(order.getOrderSoftControl())) {
                 return resultBean;
-            } else {
-                return ResultBean.success();
             }
-        } else {
-            return resultBean;
+            return ResultBean.success();
         }
+        return resultBean;
     }
 }
