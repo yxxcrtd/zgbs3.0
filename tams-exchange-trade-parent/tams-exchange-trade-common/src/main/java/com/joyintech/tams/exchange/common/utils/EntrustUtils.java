@@ -544,12 +544,12 @@ public class EntrustUtils {
 
     // 判断是否可以做公平交易
     public static boolean allowFairOrder(Instruction instruction) {
-        return TradePlat.NORMAL.value.equals(instruction.getTradePlat())
-                && (
-                DictCodeListExt2.交易方向_买入.getValue().equals(instruction.getPs())
-                        || DictCodeListExt2.交易方向_卖出.getValue().equals(instruction.getPs())
-                        || DictCodeListExt2.交易方向_正回购.getValue().equals(instruction.getPs())
-                        || DictCodeListExt2.交易方向_逆回购.getValue().equals(instruction.getPs())
+        return (TradePlat.NORMAL.value.equals(instruction.getTradePlat())
+                || TradePlat.NEW_BOND.value.equals(instruction.getTradePlat()))
+                && (DictCodeListExt2.交易方向_买入.getValue().equals(instruction.getPs())
+                || DictCodeListExt2.交易方向_卖出.getValue().equals(instruction.getPs())
+                || DictCodeListExt2.交易方向_正回购.getValue().equals(instruction.getPs())
+                || DictCodeListExt2.交易方向_逆回购.getValue().equals(instruction.getPs())
         );
     }
 

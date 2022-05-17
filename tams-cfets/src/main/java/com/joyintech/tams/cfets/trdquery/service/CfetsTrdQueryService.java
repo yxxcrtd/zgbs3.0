@@ -32,6 +32,7 @@ import com.joyintech.tams.cfets.trdquery.dto.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.apache.commons.lang3.StringUtils;
@@ -40,6 +41,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 
@@ -287,6 +290,16 @@ public class CfetsTrdQueryService extends BaseService{
         List<CfetsPledgeInfoResponse> pledgeInfoDtoList = cfetsTrdQueryMapper.selectRegTablePledgeInfoList(pageParam);
 
         if (StringUtil.equals("04", spcdCodeTemp)) {
+            if (StringUtil.isNotEmpty(dataformBid.getRate())) {//当息票品种为附息-固定利率时显示票面利率
+                dataformBid.setRateStr(ArithmeticUtil.round(
+                        ArithmeticUtil.multiply(dataformBid.getRate(), new BigDecimal(100)), 4, RoundingMode.HALF_UP) + "%");
+            } else if (StringUtil.isNotEmpty(dataformBid.getReferenceRateStr())) {//当息票品种为附息-浮动利率时显示参考收益率
+                dataformBid.setReferenceRateStr(dataformBid.getReferenceRateStr() + "BP");
+            } else {//当息票品种为零息、贴现、利随本清时显示参考收益率
+                dataformBid.setReferenceRateStr(ArithmeticUtil.round(
+                        ArithmeticUtil.multiply(dataformBid.getReferenceRate(), new BigDecimal(100)), 4, RoundingMode.HALF_UP) + "%");
+            }
+            dataformBid.setDipType(SysDataUtil.getNameFromDataDict(BussinessDictCode.分配方式, dataformBid.getDipType()));
             resultData.put(dtCode + "_dataform", dataformBid);
             resultData.put(dtCode + "_datatablep", dataformBid.getProductDtos());
         } else {

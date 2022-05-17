@@ -634,7 +634,11 @@ public class PortfolioManager extends BaseService {
             if (ObjectUtil.isNotNull(portfolioDetail)) {
                 calculateResponse.setEntrustNum(portfolioDetail.getTargetNum().longValue());
                 calculateResponse.setEntrustAmt(portfolioDetail.getTargetAmt());
-                calculateResponse.setEntrustPrice(NumberUtil.div(calculateResponse.getEntrustAmt(), calculateResponse.getEntrustNum()));
+                if (Objects.isNull(calculateResponse.getEntrustNum()) || calculateResponse.getEntrustNum() == 0) {
+                    calculateResponse.setEntrustPrice(order.getEntrustPrice());
+                }else {
+                    calculateResponse.setEntrustPrice(NumberUtil.div(calculateResponse.getEntrustAmt(), calculateResponse.getEntrustNum()));
+                }
             }
 
             list.add(calculateResponse);

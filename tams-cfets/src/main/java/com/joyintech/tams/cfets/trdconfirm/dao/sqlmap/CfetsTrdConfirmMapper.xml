@@ -191,7 +191,7 @@
             bo.BID_ID                    totleTradeId,
             '01'                         effectiveStatus,
             '01'                         regStatus,
-            null                  as     dealType,
+            '04'                  as     dealType,
             bo.BID_DATE                  settleDate,
             null                  as     deliveryType,
             null                  as     vsettleDate,
