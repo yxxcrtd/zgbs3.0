@@ -574,17 +574,12 @@ public class PortfolioManager extends BaseService {
         String instructionId = order.getInstructionId();
         Instruction instruction = instructionService.findById(instructionId);
 
-        BigDecimal price;
-        if (InvestmentAssetType.isBond(instruction.getAssetType())
-                && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
-            price = order.getFullPrice();
-        } else {
-            price = order.getEntrustPrice();
-        }
+        //处理委托价格
+        coverPrice(instruction, order);
 
         ResultBean assignResult = portfolioAssignHelper.queryPortfolioAssign(order.getInstructionId(),
                 PortfolioDetailBusiTypeEnum.ORDER, BigDecimal.valueOf(order.getEntrustVolume()),
-                price, order.getEntrustProp());
+                order.getEntrustPrice(), order.getEntrustProp());
         if (assignResult.isFail()) {
             return assignResult;
         }
