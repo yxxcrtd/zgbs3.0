@@ -176,6 +176,10 @@ public class CfetsTrdConfirmService extends BaseService{
         if(StringUtil.isNotEmpty(finprodId)){
             pageParam.put("finprodIdList", StringUtil.splitToList(GlobalConstant.COMMA,finprodId));
         }
+        // 资产类型
+        String assetType= (String)pageParam.get("finprodType2");
+        pageParam.put("assetType",assetType);
+        // 业务类型
         String regAssetType= (String)pageParam.get("regAssetType");
         if(StringUtil.isNotEmpty(regAssetType)){
             List<String> finprodType2List=new ArrayList<>();

@@ -163,7 +163,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finProduct.setFinprodAbbr(finListedBondInfoQuery001Dto.getBondAbbreviation());
         finProduct.setFinprodName(finListedBondInfoQuery001Dto.getBondName());
         finProduct.setProfitType(DictCodeList.收益类型_收益型.getValue());
-        finProduct.setCouponSpecies(finListedBondInfoQuery001Dto.getVarietyOfCoupons());
+        finProduct.setCouponSpecies(finListedBondInfoQuery001Dto.getCouponSpecies());
         /**--息票品种modify 2019-04-15 end--**/
         finProduct.setFinprodMarketId(secId);
         //发行金额除以万元

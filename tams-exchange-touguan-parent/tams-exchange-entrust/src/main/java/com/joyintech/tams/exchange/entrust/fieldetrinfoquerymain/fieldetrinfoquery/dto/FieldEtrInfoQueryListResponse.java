@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiModelProperty;
 import org.thymeleaf.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * 场内指令分发
@@ -109,6 +110,9 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     @ApiModelProperty(name="trdAcctId",value="资金账户",example="XXX资金账户")
     private String trdAcctId;
 
+    @ApiModelProperty(name="assetType",value="平安资产类型",example="债券,质押式回购")
+    private String assetType;
+
     @ApiModelProperty(name="assetType1",value="资产一级类型",example="质押式协议回购")
     private String assetType1;
 
@@ -140,11 +144,11 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
         if (StringUtil.equals(super.getFinprodType2(), BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue())){
             return SysDataUtil.getNameFromDataDict(DictCode.平安资产类型, BussinessDictCodeList.平安资产类型_一级投标债券.getValue());
         }
-        else if (StringUtil.equals(super.getFinprodType2(), BussinessDictCodeList.平安资产类型_回购.getValue())
+        else if (StringUtil.equals(getAssetType(), BussinessDictCodeList.平安资产类型_回购.getValue())
                 && StringUtil.equals(getAssetType1(), DictCodeList.回购类型_质押式协议回购.getValue())) {
             return BussinessConstant.NEGOTIATED_REPURCHASE_TEXT;
         }
-        return SysDataUtil.getNameFromDataDict(DictCode.平安资产类型, super.getFinprodType2());
+        return SysDataUtil.getNameFromDataDict(DictCode.平安资产类型, getAssetType());
     }
 
     /**
@@ -248,7 +252,7 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
         if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
             return null;
         }
-        return String.valueOf(super.getEntrustNum());
+        return String.valueOf(super.getEntrustNum() == null ? "" : super.getEntrustNum().setScale(2, RoundingMode.HALF_UP));
     }
     public void setOtherPs(String otherPs) {
         this.otherPs = otherPs;
@@ -356,7 +360,7 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
         if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
             return getEtrPrice() == null ? "" : getEtrPrice().setScale(3,BigDecimal.ROUND_HALF_UP) + " %";
         }
-        return getEtrPrice() == null ? "" : getEtrPrice().toString();
+        return getEtrPrice() == null ? "" : getEtrPrice().setScale(4, RoundingMode.HALF_UP).toString();
     }
 
     public void setEtrPrice(BigDecimal etrPrice) {
@@ -364,6 +368,12 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     }
 
     public BigDecimal getExecFinishAmt() {
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
+            return ArithmeticUtil.divide(execFinishAmt,new BigDecimal("100"),2);
+        }
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
+            return ArithmeticUtil.divide(execFinishAmt,new BigDecimal("10000"),2);
+        }
         return execFinishAmt;
     }
 
@@ -372,6 +382,12 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     }
 
     public BigDecimal getExecRemainderAmt() {
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
+            return ArithmeticUtil.divide(execRemainderAmt,new BigDecimal("100"),2);
+        }
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
+            return ArithmeticUtil.divide(execRemainderAmt,new BigDecimal("10000"),2);
+        }
         return execRemainderAmt;
     }
 
@@ -380,6 +396,12 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     }
 
     public BigDecimal getTransFinishAmt() {
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
+            return ArithmeticUtil.divide(transFinishAmt,new BigDecimal("100"),2);
+        }
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
+            return ArithmeticUtil.divide(transFinishAmt,new BigDecimal("10000"),2);
+        }
         return transFinishAmt;
     }
 
@@ -388,6 +410,12 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     }
 
     public BigDecimal getTransRemainderAmt() {
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
+            return ArithmeticUtil.divide(transRemainderAmt,new BigDecimal("100"),2);
+        }
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
+            return ArithmeticUtil.divide(transRemainderAmt,new BigDecimal("10000"),2);
+        }
         return transRemainderAmt;
     }
 
@@ -441,6 +469,14 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
 
     public void setAssetType1(String assetType1) {
         this.assetType1 = assetType1;
+    }
+
+    public String getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
     }
 
     /**

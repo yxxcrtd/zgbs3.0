@@ -134,7 +134,12 @@
             END ) <![CDATA[>=]]> #{platDate,jdbcType=DATE} )
             OR  (fpi.ISSUE_CLASS IN ('02', '03') AND T3.LISTING_DATE IS  NULL)
         )
-        AND T1.TRADE_MARKET in(#{TRADE_PLACE_01},#{TRADE_PLACE_02})
+        <if test="tradePlace != null and tradePlace.size() > 0">
+            AND T1.TRADE_MARKET in
+            <foreach collection="tradePlace" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
         <if test="search != null and !search.equals('')">
             and (T1.FINPROD_MARKET_ID like concat('%',concat(#{search},'%'))
             or T1.FINPROD_NAME like concat('%',concat(#{search},'%'))

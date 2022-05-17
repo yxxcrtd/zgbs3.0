@@ -161,7 +161,7 @@
 
         WHERE ee.ENTRUST_NUM != 0
 	    AND ee.ENTRUST_NUM IS NOT NULL
-        AND ee.TRADE_MARKET IN ( #{TRADE_MARKET_01},#{TRADE_MARKET_02})
+        AND ee.TRADE_MARKET IN ('01','02','03','04') <!-- 限制为银行间和商业柜台,上交所和深交所-->
         AND ee.FINPROD_TYPE2 = #{FINPROD_TYPE2}
         <if test="finprodIdList != null and finprodIdList.size() > 0">
             AND fp.FINPROD_ID in
@@ -313,7 +313,7 @@
             ) nextUser ON ee.Workflow_Id=nextUser.workFlowId
         WHERE ee.ENTRUST_NUM != 0
 	    AND ee.ENTRUST_NUM IS NOT NULL
-        AND ee.TRADE_MARKET IN ( #{TRADE_MARKET_01},#{TRADE_MARKET_02})
+        AND ee.TRADE_MARKET IN ('01','02','03','04') <!-- 限制为银行间和商业柜台,上交所和深交所-->
         AND ee.FINPROD_TYPE2 = #{FINPROD_TYPE2}
         <if test="finprodIdList != null and finprodIdList.size() > 0">
             AND fp.FINPROD_ID in
@@ -674,6 +674,54 @@
         from WFL_ETR_ENTRUST_ADD
         where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
     </select>
+
+    <!--组合资金账户表 -->
+    <resultMap type="com.joyintech.framework.select.SelectOptionDto" id="resultMap_getPtlSecAcctInfo">
+        <id column="ACCT_NO" property="id" jdbcType="VARCHAR"/>
+        <result column="ACCT_NAME" property="text" jdbcType="VARCHAR"/>
+        <result column="parentId" property="parentId" jdbcType="VARCHAR"/>
+        <collection property="object" javaType="java.util.ArrayList" ofType="java.util.Map">
+            <id column="SEC_ACCT_ID" property="secAcctId" jdbcType="VARCHAR"/>
+            <result column="TRADE_PLACE" property="tradeMarket" jdbcType="VARCHAR"/>
+            <result column="CCY" property="ccy" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+    <select id="getPtlSecAcctInfo" resultMap="resultMap_getPtlSecAcctInfo">
+        select t.ACCT_NO,
+        R.ACCT_NAME,
+        t.PORTFOLIO_ID as parentId,
+        v.SEC_ACCT_ID,
+        v.TRADE_PLACE,
+        t.CCY
+        from PTL_CAPACCT_INFO t
+        left join STL_SEC_ACCT_INFO v
+        on t.ACCT_NO = v.TRD_ACCT_ID
+        LEFT JOIN STL_CAPACCT_INFO R
+        ON T.ACCT_NO = R.ACCT_NO
+        AND T.CCY = R.CCY
+        LEFT JOIN PTL_SEC_ACCT PSA
+        ON v.SEC_ACCT_ID = PSA.ACCT_NO
+        <where>
+            t.ACCT_TYPE = 'A07'
+            <if test="portfolioId != null and portfolioId != ''">
+                and t.PORTFOLIO_ID = #{portfolioId} AND PSA.PORTFOLIO_ID = #{portfolioId}
+            </if>
+            <if test="tradeMarket != null and tradeMarket!= ''">
+                and v.TRADE_PLACE = #{tradeMarket}
+            </if>
+            <if test="acctNo != null and acctNo != ''">
+                and t.ACCT_NO = #{acctNo}
+            </if>
+            <if test="initValue != null and initValue != ''">
+                and t.ACCT_NO = #{initValue}
+            </if>
+            <if test="search != null and !search.equals('')">
+                AND t.ACCT_NO like concat('%',concat(#{search},'%'))
+            </if>
+        </where>
+        order by t.ACCT_NO
+    </select>
+
     <select id="selectBidPriceById" resultType="com.joyintech.tams.common.base.entity.EtrEntrustBidPrice" parameterType="java.lang.String" >
         SELECT ENTRUST_ID entrustId, BID_PRICE bidPrice, BID_PRIN_AMT bidPrinAmt, CREATE_USER createUser, CREATE_DEPT createDept,
                CREATE_TIME createTime, UPDATE_USER updateUser, UPDATE_TIME updateTime, PORTFOLIO_ID portfolioId

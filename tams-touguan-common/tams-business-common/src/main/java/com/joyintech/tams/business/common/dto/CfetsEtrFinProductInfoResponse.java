@@ -97,6 +97,11 @@ public class CfetsEtrFinProductInfoResponse {
     private String bondType;
 
     /**
+     * 金融产品类型（投管分类），债券、理财产品、基金、理财产品模板、理财产品分层
+     */
+    private String finprodType2;
+
+    /**
      * 收益率，利息贴现为参考收益率，附息为票面利率
      */
     @ApiModelProperty(name = "referYield", value = "收益率，利息贴现为参考收益率，附息为票面利率")
@@ -955,5 +960,11 @@ public class CfetsEtrFinProductInfoResponse {
         return SysDataUtil.getNameFromDataDict(DictCode.行内资产三级分类, this.getBondType());
     }
 
+    public String getFinprodType2() {
+        return finprodType2;
+    }
 
+    public void setFinprodType2(String finprodType2) {
+        this.finprodType2 = finprodType2;
+    }
 }

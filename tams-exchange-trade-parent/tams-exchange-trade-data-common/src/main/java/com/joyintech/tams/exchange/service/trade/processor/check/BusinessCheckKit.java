@@ -7,6 +7,7 @@ import com.joyintech.tams.exchange.common.bean.request.BaseOrderRequest;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
+import com.joyintech.tams.exchange.common.enums.SwitcheEnum;
 import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,10 +33,21 @@ public class BusinessCheckKit extends BaseCheckKit {
 
     @Override
     public ResultBean check(BaseOrderRequest order, Instruction instruction, Instrument instrument, TickBean tickBean) throws BusinessResultException {
-        return strategies.stream()
+        ResultBean resultBean = strategies.stream()
                 .filter(item -> item.support(instruction))
                 .findFirst()
                 .orElseThrow(() -> new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR))
                 .check(order, instruction, instrument, tickBean);
+
+        //软控
+        if (ErrorCode.isSoftControlFail(resultBean.getErrorCode())) {
+            if (!SwitcheEnum.OPEN.codeEquals(order.getOrderSoftControl())) {
+                return resultBean;
+            } else {
+                return ResultBean.success();
+            }
+        } else {
+            return resultBean;
+        }
     }
 }

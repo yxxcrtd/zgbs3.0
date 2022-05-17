@@ -455,6 +455,7 @@
         left join SYS_DATADICT_LIST sdl6 on sdl6.DICT_CODE='ACCOUNT_SPEED' and t.settleSpeed=sdl6.ITEM_CODE
         left join SYS_DATADICT_LIST sdl7 on sdl7.DICT_CODE='CCY' and t.ccy=sdl7.ITEM_CODE
         left join SYS_DATADICT_LIST sdl8 on sdl8.DICT_CODE='FIRST_BID_STATUS' and t.firstBidStatus=sdl8.ITEM_CODE
+        left join SYS_DATADICT_LIST sdl9 on sdl9.DICT_CODE='BUSI_TYPE_TG' and t.busiTypePosition=sdl9.ITEM_CODE
         <where>
             <if test="firstBidStatus != null and firstBidStatus!='' ">
                 AND t.firstBidStatus = #{firstBidStatus}
@@ -488,6 +489,7 @@
                 OR sdl6.ITEM_VALUE like '%' || #{search} || '%'
                 OR sdl7.ITEM_VALUE like '%' || #{search} || '%'
                 OR sdl8.ITEM_VALUE like '%' || #{search} || '%'
+                OR sdl9.ITEM_VALUE like '%' || #{search} || '%'
                 OR t.entrustId like '%' || #{search} || '%'
                 OR t.invManagerId like '%' || #{search} || '%'
                 OR t.invManagerName like '%' || #{search} || '%'
@@ -1141,7 +1143,6 @@
         ETR_ENTRUST ee
         LEFT JOIN ETR_DISTRIBUTE ed ON ed.ENTRUST_ID  = ee.ENTRUST_ID
         WHERE ee.FINPROD_ID  = #{finprodId,jdbcType=VARCHAR}
-        AND ee.ENTRUST_STATUS in
         <if test="statusList != null and statusList.size() > 0">
             AND
             <foreach collection="statusList" item="entrustStatus" open="ee.ENTRUST_STATUS IN (" close=")" separator=",">

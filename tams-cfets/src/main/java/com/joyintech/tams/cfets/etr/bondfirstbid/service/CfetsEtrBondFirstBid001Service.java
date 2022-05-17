@@ -44,7 +44,6 @@ import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
-import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -231,8 +230,9 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
         }
 
         Map<String, Object> pageParam = BeanUtil.object2Map(search);
-        pageParam.put("TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue());
-        pageParam.put("TRADE_MARKET_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
+//        pageParam.put("TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue());
+//        pageParam.put("TRADE_MARKET_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
+
 
         List<String> statusList = search.getIssueStage();
         if (!StringUtil.isEmptyList(statusList) && statusList.contains("all")) {
@@ -469,10 +469,13 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
      * @param map
      * @return
      */
+//    public List<SelectOptionDto> getPtlSecAcctInfo(Map<String, Object> map) {
+//        return restTemplate.postForList(
+//                ServiceApplication.BASICDATA_SERVICE_NAME + "/MstSecuritiesAccountInfo/getPtlSecAcctInfo", map,
+//                SelectOptionDto.class);
+//    }
     public List<SelectOptionDto> getPtlSecAcctInfo(Map<String, Object> map) {
-        return restTemplate.postForList(
-                ServiceApplication.BASICDATA_SERVICE_NAME + "/MstSecuritiesAccountInfo/getPtlSecAcctInfo", map,
-                SelectOptionDto.class);
+        return cfetsEtrBondFirstBid001Mapper.getPtlSecAcctInfo(map);
     }
 
 }

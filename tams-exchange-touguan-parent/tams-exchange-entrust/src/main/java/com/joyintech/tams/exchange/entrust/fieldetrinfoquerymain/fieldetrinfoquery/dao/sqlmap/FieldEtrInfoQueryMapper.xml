@@ -16,7 +16,8 @@
         su1.real_name invManagerName,
         nvl(detail.PORTFOLIO_ID,PTL_PORTFOLIO.PORTFOLIO_ID) portfolioId,
         nvl(detail.PORTFOLIO_NAME,PTL_PORTFOLIO.PORTFOLIO_NAME) portfolioName,
-        ETR_ENTRUST_ADD.ASSET_TYPE finprodType2,
+        ETR_ENTRUST_ADD.ASSET_TYPE assetType,
+        ETR_ENTRUST.FINPROD_TYPE2 finprodType2,
         CASE WHEN ETR_ENTRUST_ADD.ASSET_TYPE ='F07' AND ETR_ENTRUST.PS IN ('03', '04','T56','T93','T94','T95','T96')
         THEN ETR_ENTRUST.STOCK_ID else(case when FIN_PRODUCT.FINPROD_MARKET_ID is not null
         then FIN_PRODUCT.FINPROD_MARKET_ID
@@ -82,22 +83,22 @@
         CASE
 
         WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-        ROUND( nvl( T5.ORDER_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( T5.ORDER_FINISH_AMT, 0 ), 4 )
+        decode(ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,'EX017',ROUND( nvl( T5.ORDER_FINISH_AMT/100, 0 ), 4 ),'EX018', ROUND( nvl( T5.ORDER_FINISH_AMT/100, 0 ), 4 ),ROUND( nvl( T5.ORDER_FINISH_AMT, 0 ), 4 )) ELSE ROUND( nvl( T5.ORDER_FINISH_AMT, 0 ), 4 )
         END AS execFinishAmt,
         CASE
 
         WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-        ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ), 4 )
+        decode(ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,'EX017',ROUND( (nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ))/100, 4 ),'EX018',ROUND( (nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ))/100, 4 ),ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ), 4 )) ELSE ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ), 4 )
         END AS execRemainderAmt,
         CASE
 
         WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-        ROUND( nvl( T5.ENT_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( T5.ENT_FINISH_AMT, 0 ), 4 )
+        decode(ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,'EX017',ROUND( nvl( T5.ENT_FINISH_AMT/100, 0 ), 4 ),'EX018',ROUND( nvl( T5.ENT_FINISH_AMT/100, 0 ), 4 ),ROUND( nvl( T5.ENT_FINISH_AMT, 0 ), 4 )) ELSE ROUND( nvl( T5.ENT_FINISH_AMT, 0 ), 4 )
         END AS transFinishAmt,
         CASE
 
         WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-        ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ), 4 )
+        decode(ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,'EX017',ROUND( (nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ))/100, 4 ),'EX018',ROUND( (nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ))/100, 4 ),ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ), 4 )) ELSE ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ), 4 )
         END AS transRemainderAmt,
         to_char(ETR_ENTRUST_ADD.TRANSMIT_TIME,'hh24:mi:ss') transmitTime,
         to_char(ETR_ENTRUST_ADD.TRANSMIT_TIME,'hh24:mi') transmitTimeSer,
@@ -252,7 +253,8 @@
         su1.real_name invManagerName,
         nvl(detail.PORTFOLIO_ID,PTL_PORTFOLIO.PORTFOLIO_ID) portfolioId,
         nvl(detail.PORTFOLIO_NAME,PTL_PORTFOLIO.PORTFOLIO_NAME) portfolioName,
-        WFL_ETR_ENTRUST_ADD.ASSET_TYPE finprodType2,
+        WFL_ETR_ENTRUST_ADD.ASSET_TYPE assetType,
+        WFL_ETR_ENTRUST.FINPROD_TYPE2 finprodType2,
         CASE WHEN WFL_ETR_ENTRUST_ADD.ASSET_TYPE ='F07' AND WFL_ETR_ENTRUST.PS IN ('03',
         '04','T56','T93','T94','T95','T96') THEN WFL_ETR_ENTRUST.STOCK_ID else(case when FIN_PRODUCT.FINPROD_MARKET_ID
         is not null

@@ -48,13 +48,13 @@ public enum ErrorCode implements IEnum<Integer> {
 
     API_ERROR(102, "接口调用失败"),
 
-    ATTRIBUTE_ERROR(103,  "有效申报价格校验失败"),
+    ATTRIBUTE_ERROR(103, "有效申报价格校验失败"),
 
     INNER_RISK_ERROR(200, "内部风控检查错误"),
 
     MASTER_TOKEN_DISABLE(310, "主从模式关闭"),
 
-    TRIGGER_SOFT_CONTROL(300, "触发软控"),
+    TRIGGER_SOFT_CONTROL(333, "触发软控"),
 
     SYSTEM_ERROR(500, "服务器内部错误"),
 
@@ -250,6 +250,14 @@ public enum ErrorCode implements IEnum<Integer> {
 
     public static boolean isFail(int value) {
         return value != 0;
+    }
+
+    public static boolean isNotSoftControlFail(int value) {
+        return value != 0 && value != 333;
+    }
+
+    public static boolean isSoftControlFail(int value) {
+        return value == 333;
     }
 
     public static boolean isSuccess(int value) {

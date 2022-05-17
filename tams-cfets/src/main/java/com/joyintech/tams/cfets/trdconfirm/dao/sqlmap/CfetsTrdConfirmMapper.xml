@@ -126,6 +126,9 @@
         <if test="tradeMarket != null and !tradeMarket.equals('')">
             AND reg.trade_market=#{tradeMarket,jdbcType=VARCHAR}
         </if>
+        <if test="assetType != null and !assetType.equals('')">
+            AND fpt.TYPE_9=#{assetType,jdbcType=VARCHAR}
+        </if>
         <if test="settleSpeed != null and settleSpeed != ''">
             AND  decode(reg.settle_speed,0,'01',1,'02',2,'03')= #{settleSpeed,jdbcType=VARCHAR}
         </if>
@@ -165,15 +168,15 @@
             stlinfo.sec_acct_name as     secManageAcctIdName,
             bo.SUBSCRIPTION_AMOUNT       faceValue,
             case
-                when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02' then nvl(fpi.BP, 0)
-                when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD
+                when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02' then nvl(fpi.BP*10000, 0)
+                when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD*100
                 when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
-                then fpi.REFER_YIELD end                                    tradeYield,
+                then fpi.REFER_YIELD*100 end                                    tradeYield,
             case
-                when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02' then nvl(fpi.BP, 0)||'BP'
-                when fp.COUPON_SPECIES in ('02', '03') then to_char(fpi.REFER_YIELD,'FM990.9990') || '%'
+                when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02' then nvl(fpi.BP*10000, 0)||'BP'
+                when fp.COUPON_SPECIES in ('02', '03') then to_char(fpi.REFER_YIELD*100,'FM990.9990') || '%'
                 when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
-                then to_char(fpi.REFER_YIELD,'FM990.9990') || '%' end                tradeYieldStr,
+                then to_char(fpi.REFER_YIELD*100,'FM990.9990') || '%' end                tradeYieldStr,
             null                         termDays,
             bo.PAYABLE_AMOUNT            tradeAmt,
             bo.BID_ID                    busiCode,
@@ -188,7 +191,7 @@
             bo.BID_ID                    totleTradeId,
             '01'                         effectiveStatus,
             '01'                         regStatus,
-            '04'                  as     dealType,
+            null                  as     dealType,
             bo.BID_DATE                  settleDate,
             null                  as     deliveryType,
             null                  as     vsettleDate,
@@ -258,6 +261,9 @@
             </if>
             <if test="dealType != null and dealType != ''">
                 AND '04'= #{dealType,jdbcType=VARCHAR}
+            </if>
+            <if test="assetType != null and !assetType.equals('')">
+                AND fpt.TYPE_9=#{assetType,jdbcType=VARCHAR}
             </if>
             <if test="counterIdList!=null  and counterIdList.size() > 0 ">
                 AND bo.OU_PARTY_ID IN
@@ -472,6 +478,9 @@
         <if test="tradeMarket != null and !tradeMarket.equals('')">
             AND '01'=#{tradeMarket,jdbcType=VARCHAR}
         </if>
+        <if test="assetType != null and !assetType.equals('')">
+            AND fpt.TYPE_9=#{assetType,jdbcType=VARCHAR}
+        </if>
         <if test="settleSpeed != null and settleSpeed != ''">
             AND  decode(ib.settle_speed,0,'01',1,'02',2,'03') = #{settleSpeed,jdbcType=VARCHAR}
         </if>
@@ -611,6 +620,9 @@
         </if>
         <if test="quoteType != null and quoteType != ''">
             AND ic.quote_type= #{quoteType,jdbcType=VARCHAR}
+        </if>
+        <if test="assetType != null and !assetType.equals('')">
+            AND 1=2
         </if>
         <if test="counterIdList!=null  and counterIdList.size() > 0 ">
             AND t1.counter_id IN
@@ -1990,10 +2002,10 @@
                  , fpi.ISSUE_PRICE                   issuePrice
                  , case
                        when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
-                           then nvl(fpi.BP, 0)
-                       when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD
+                           then nvl(fpi.BP*10000, 0)
+                       when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD*100
                        when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
-                           then fpi.REFER_YIELD end rate
+                           then fpi.REFER_YIELD*100 end rate
                  , fpi.ISSUE_DATE                   issueDate
                  , fpi.PAY_DATE                     payDate
                  , fp.COUPON_SPECIES                couponRateType
@@ -2544,7 +2556,7 @@
                     and fpi.REFER_YIELD = #{couponRate,jdbcType=DECIMAL}
                 </if>
                 <if test="spread != null">
-                    and fpi.BP = #{spread,jdbcType=DECIMAL}
+                    and fpi.BP*10000 = #{spread,jdbcType=DECIMAL}
                 </if>
                 <if test="issuePrice != null">
                     and fp.ISSUE_PRICE = #{issuePrice,jdbcType=DECIMAL}

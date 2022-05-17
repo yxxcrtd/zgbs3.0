@@ -125,8 +125,8 @@ public class JoyinbusinessCommonService extends BaseService {
         Map<String, Object> param = new HashMap<>();
         param.put("search", dto.getSearch());
         param.put("assestType", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
-        param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
-        param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
+        param.put("tradePlace", Arrays.asList(DictCodeListExt1.交易场所_银行间.getValue(), DictCodeListExt1.交易场所_商业银行柜台.getValue()
+                , DictCodeListExt1.交易场所_上海证券交易所.getValue(), DictCodeListExt1.交易场所_深圳证券交易所.getValue()));
         param.put("platDate", DateUtil.platDateFromCache());
 
         return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> joyinbusinessCommonMapper.getfinprodIdForNewBond(param));

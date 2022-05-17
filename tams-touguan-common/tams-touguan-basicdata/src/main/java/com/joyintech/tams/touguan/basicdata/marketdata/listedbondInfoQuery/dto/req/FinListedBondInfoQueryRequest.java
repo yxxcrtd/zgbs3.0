@@ -29,6 +29,36 @@ public class FinListedBondInfoQueryRequest {
     @ApiModelProperty(name = "market", value = "市场")
     private String market;
 
+    @ApiModelProperty(name = "biddingMethod", value = "招标方式")
+    private String biddingMethod;
+
+    @ApiModelProperty(name = "raiseMode", value = "募集方式")
+    private String raiseMode;
+
+    @ApiModelProperty(name = "tenderTarget", value = "招标标的")
+    private String tenderTarget;
+
+    @ApiModelProperty(name = "issueMethod", value = "发行方式")
+    private String issueMethod;
+
+    @ApiModelProperty(name = "eventDateStart", value = "缴款截止日-开始")
+    private Date eventDateStart;
+
+    @ApiModelProperty(name = "eventDateEnd", value = "缴款截止日-结束")
+    private Date eventDateEnd;
+
+    @ApiModelProperty(name = "listingDate", value = "上市日-开始")
+    private Date listingDateStart;
+
+    @ApiModelProperty(name = "listingDate", value = "上市日-结束")
+    private Date listingDateEnd;
+
+    @ApiModelProperty(name = "listingCode", value = "上市代码")
+    private String listingCode;
+
+    @ApiModelProperty(name = "secType", value = "债券分类")
+    private String secType;
+
     @ApiModelProperty(name = "institution", value = "登记托管机构")
     private String institution;
 
@@ -56,14 +86,14 @@ public class FinListedBondInfoQueryRequest {
     @ApiModelProperty(name = "couponSpecies", value = "息票品种")
     private String couponSpecies;
 
-    @ApiModelProperty(name = "interestRate", value = "利率类型")
-    private String interestRate;
+    @ApiModelProperty(name = "rateType", value = "利率类型")
+    private String rateType;
 
     @ApiModelProperty(name = "payCycle", value = "付息频率")
     private String payCycle;
 
-    @ApiModelProperty(name = "ccy", value = "币种")
-    private String ccy;
+    @ApiModelProperty(name = "currency", value = "币种")
+    private String currency;
 
     @ApiModelProperty(name = "isRight", value = "是否含权债", example = "Y/N")
     private String isRight;
@@ -195,28 +225,12 @@ public class FinListedBondInfoQueryRequest {
         this.couponSpecies = couponSpecies;
     }
 
-    public String getInterestRate() {
-        return interestRate;
-    }
-
-    public void setInterestRate(String interestRate) {
-        this.interestRate = interestRate;
-    }
-
     public String getPayCycle() {
         return payCycle;
     }
 
     public void setPayCycle(String payCycle) {
         this.payCycle = payCycle;
-    }
-
-    public String getCcy() {
-        return ccy;
-    }
-
-    public void setCcy(String ccy) {
-        this.ccy = ccy;
     }
 
     public String getIsRight() {
@@ -313,5 +327,101 @@ public class FinListedBondInfoQueryRequest {
 
     public void setSecName(String secName) {
         this.secName = secName;
+    }
+
+    public String getBiddingMethod() {
+        return biddingMethod;
+    }
+
+    public void setBiddingMethod(String biddingMethod) {
+        this.biddingMethod = biddingMethod;
+    }
+
+    public String getRaiseMode() {
+        return raiseMode;
+    }
+
+    public void setRaiseMode(String raiseMode) {
+        this.raiseMode = raiseMode;
+    }
+
+    public String getTenderTarget() {
+        return tenderTarget;
+    }
+
+    public void setTenderTarget(String tenderTarget) {
+        this.tenderTarget = tenderTarget;
+    }
+
+    public Date getEventDateStart() {
+        return eventDateStart;
+    }
+
+    public void setEventDateStart(Date eventDateStart) {
+        this.eventDateStart = eventDateStart;
+    }
+
+    public Date getEventDateEnd() {
+        return eventDateEnd;
+    }
+
+    public void setEventDateEnd(Date eventDateEnd) {
+        this.eventDateEnd = eventDateEnd;
+    }
+
+    public String getListingCode() {
+        return listingCode;
+    }
+
+    public void setListingCode(String listingCode) {
+        this.listingCode = listingCode;
+    }
+
+    public String getSecType() {
+        return secType;
+    }
+
+    public void setSecType(String secType) {
+        this.secType = secType;
+    }
+
+    public String getIssueMethod() {
+        return issueMethod;
+    }
+
+    public void setIssueMethod(String issueMethod) {
+        this.issueMethod = issueMethod;
+    }
+
+    public Date getListingDateStart() {
+        return listingDateStart;
+    }
+
+    public void setListingDateStart(Date listingDateStart) {
+        this.listingDateStart = listingDateStart;
+    }
+
+    public Date getListingDateEnd() {
+        return listingDateEnd;
+    }
+
+    public void setListingDateEnd(Date listingDateEnd) {
+        this.listingDateEnd = listingDateEnd;
+    }
+
+    public String getRateType() {
+        return rateType;
+    }
+
+    public void setRateType(String rateType) {
+        this.rateType = rateType;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 }

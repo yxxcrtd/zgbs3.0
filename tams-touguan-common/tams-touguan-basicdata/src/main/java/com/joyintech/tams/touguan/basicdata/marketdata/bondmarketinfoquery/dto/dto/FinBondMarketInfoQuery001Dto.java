@@ -3,6 +3,8 @@ package com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.dto.BaseDto;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.tams.constant.DictCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -88,7 +90,7 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "ccy", value = "币种")
     private String ccy;
 
-    @ApiModelProperty(name = "faceValue", value = "面额")
+    @ApiModelProperty(name = "faceValue", value = "单位面值")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal faceValue;
 
@@ -170,10 +172,6 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "theOryOptionPayDay", value = "理论行权日")
     private Date theOryOptionPayDay;
 
-    @ApiModelProperty(name = "parValue", value = "单位面值")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal parValue;
-
     @ApiModelProperty(name = "crossMarketCode", value = "跨市场代码")
     private String crossMarketCode;
 
@@ -191,6 +189,12 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
 
     @ApiModelProperty(name = "zxGradeOrgId", value = "债项评级机构")
     private String zxGradeOrgId;
+
+    @ApiModelProperty(name = "isGreenBond", value = "是否绿色债")
+    private String isGreenBond;
+
+    @ApiModelProperty(name = "delistingDate", value = "摘牌日")
+    private String delistingDate;
 
     @ApiModelProperty(name = "finProductConvertibleDto", value = "债项市场转股信息")
     private FinProductConvertibleDto finProductConvertibleDto;
@@ -231,12 +235,21 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
         return market;
     }
 
+
+    public String getMarketStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.交易场所, this.getMarket());
+    }
+
     public void setMarket(String market) {
         this.market = market;
     }
 
     public String getInstitution() {
         return institution;
+    }
+
+    public String getInstitutionStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.登记托管机构, this.getInstitution());
     }
 
     public void setInstitution(String institution) {
@@ -295,8 +308,16 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
         return secType;
     }
 
+    public String getSecTypeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.WIND一级分类_含债券一级分类等, this.getSecType());
+    }
+
     public void setSecType(String secType) {
         this.secType = secType;
+    }
+
+    public String getSecType2Str() {
+        return SysDataUtil.getNameFromDataDict(DictCode.WIND二级分类_含债券二级分类等, this.getSecType2());
     }
 
     public String getSecType2() {
@@ -311,12 +332,21 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
         return issueType;
     }
 
+    public String getIssueTypeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.募集方式, this.getIssueType());
+    }
+
+
     public void setIssueType(String issueType) {
         this.issueType = issueType;
     }
 
     public String getBlnArea() {
         return blnArea;
+    }
+
+    public String getBlnAreaStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.境内外, this.getBlnArea());
     }
 
     public void setBlnArea(String blnArea) {
@@ -326,6 +356,15 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
     public String getIssus() {
         return issus;
     }
+
+    public String getIssusStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.是否, this.getIssus());
+    }
+
+    public String getIsSecBondStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.是否, this.getIsSecBond());
+    }
+
 
     public void setIssus(String issus) {
         this.issus = issus;
@@ -339,12 +378,21 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
         this.isSecBond = isSecBond;
     }
 
+
+    public String getCityInvestSecWindStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.是否, this.getCityInvestSecWind());
+    }
+
     public String getCityInvestSecWind() {
         return cityInvestSecWind;
     }
 
     public void setCityInvestSecWind(String cityInvestSecWind) {
         this.cityInvestSecWind = cityInvestSecWind;
+    }
+
+    public String getIsRightStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.是否, this.getIsRight());
     }
 
     public String getIsRight() {
@@ -361,6 +409,11 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
 
     public void setFaceValue(BigDecimal faceValue) {
         this.faceValue = faceValue;
+    }
+
+
+    public String getGuarTypeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.担保方式, this.getGuarType());
     }
 
     public String getGuarType() {
@@ -383,12 +436,20 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
         return couponSpecies;
     }
 
+    public String getCouponSpeciesStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.息票品种, this.getCouponSpecies());
+    }
+
     public void setCouponSpecies(String couponSpecies) {
         this.couponSpecies = couponSpecies;
     }
 
     public String getInterestRate() {
         return interestRate;
+    }
+
+    public String getInterestRateStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.利率类型, this.getInterestRate());
     }
 
     public void setInterestRate(String interestRate) {
@@ -487,6 +548,10 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
         return payCycle;
     }
 
+    public String getPayCycleStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.频率, this.getPayCycle());
+    }
+
     public void setPayCycle(String payCycle) {
         this.payCycle = payCycle;
     }
@@ -515,14 +580,6 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
         this.firstConfirmDate = firstConfirmDate;
     }
 
-    public BigDecimal getParValue() {
-        return parValue;
-    }
-
-    public void setParValue(BigDecimal parValue) {
-        this.parValue = parValue;
-    }
-
     public String getCrossMarketCode() {
         return crossMarketCode;
     }
@@ -533,6 +590,10 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
 
     public String getCalendarId() {
         return calendarId;
+    }
+
+    public String getCalendarIdStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.交易日历, this.getCalendarId());
     }
 
     public void setCalendarId(String calendarId) {
@@ -583,6 +644,11 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
         return optionType;
     }
 
+
+    public String getOptionTypeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.行权方式, this.getOptionType());
+    }
+
     public void setOptionType(String optionType) {
         this.optionType = optionType;
     }
@@ -597,6 +663,11 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
 
     public String getCcy() {
         return ccy;
+    }
+
+
+    public String getCcyStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.币种, this.getCcy());
     }
 
     public void setCcy(String ccy) {
@@ -633,5 +704,26 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
 
     public void setFinProductConvertibleDto(FinProductConvertibleDto finProductConvertibleDto) {
         this.finProductConvertibleDto = finProductConvertibleDto;
+    }
+
+    public String getIsGreenBond() {
+        return isGreenBond;
+    }
+
+
+    public String getIsGreenBondStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.是否, this.getIsGreenBond());
+    }
+
+    public void setIsGreenBond(String isGreenBond) {
+        this.isGreenBond = isGreenBond;
+    }
+
+    public String getDelistingDate() {
+        return delistingDate;
+    }
+
+    public void setDelistingDate(String delistingDate) {
+        this.delistingDate = delistingDate;
     }
 }

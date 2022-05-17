@@ -55,8 +55,8 @@ public class CfetsEtrBondFirstBid002Dto extends EtrEntrust implements ProcessEnt
      * 收益率，利息贴现为参考收益率，附息为票面利率
      */
     @ApiModelProperty(name = "referYield", value = "收益率，利息贴现为参考收益率，附息为票面利率")
-    @JsonSerialize(using = BigDecimalSerializer.class)
     private String referYield;
+
 
     /**
      *  招标标的

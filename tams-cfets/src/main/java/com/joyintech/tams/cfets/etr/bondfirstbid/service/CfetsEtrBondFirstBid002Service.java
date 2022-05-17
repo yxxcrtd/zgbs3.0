@@ -173,7 +173,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 }
                 if (!operationType.equals(OperationType.REVOKE) && !operationType.equals(OperationType.DELETE)) {
                     // 发送头寸
-                   // this.sendPositionMethod(entity, StringUtil.equals(entity.getSystemAct(), DictCodeListExt3.系统动作_新建.getValue()), null);
+                    this.sendPositionMethod(entity, StringUtil.equals(entity.getSystemAct(), DictCodeListExt3.系统动作_新建.getValue()), null);
                     if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))){
                         // 老头寸处理
                         this.dealOldPosition(entity, false);
@@ -302,7 +302,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             }
             //发送头寸
             try {
-               // sendPositionMethod(entity, isSubmit, confirmOk);
+                sendPositionMethod(entity, isSubmit, confirmOk);
             } catch (Exception e) {
                 Message message = PositionUtil.ajaxErrorReturn(e);
                 BaseMap bm = (BaseMap) message.getData();
@@ -508,6 +508,10 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 entrustDetail.setEntrustId(dto.getEntrustId());
                 entrustDetail.setPortfolioId(entry.getKey());
                 entrustDetail.setSecAcctId(entry.getValue().get(0).getSecAcctId());
+                if (StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())
+                        || StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())) {
+                    entrustDetail.setAcctNo(entry.getValue().get(0).getAcctNo());
+                }
                 if (StringUtil.equals(dto.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
                     entrustDetail.setEntrustNum(ArithmeticUtil.divide(entry.getValue().get(0).getBidPrinAmt(), 100, 4));
                 }else {
@@ -595,6 +599,10 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 entrustDetail.setPortfolioId(entry.getKey());
                 entrustDetail.setSecAcctId(entry.getValue().get(0).getSecAcctId());
                 entrustDetail.setInvAim(entry.getValue().get(0).getBusinessModel());
+                if (StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())
+                        || StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())) {
+                    entrustDetail.setAcctNo(entry.getValue().get(0).getAcctNo());
+                }
                 if (StringUtil.equals(dto.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
                     entrustDetail.setEntrustNum(ArithmeticUtil.divide(entry.getValue().get(0).getBidPrinAmt(), 100, 4));
                 }else {
@@ -663,7 +671,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 dto.setIssueDate(finProductInfo.getIssueDate());
                 dto.setPayDate(finProductInfo.getPayDate());
                 dto.setIssuePrice(finProductInfo.getIssuePrice());
-//                dto.setReferYield(finProductInfo.getReferYield());
+                dto.setReferYield(finProductInfo.getReferYield());
 
             }else {
                 //查询所有的对手方
@@ -692,19 +700,47 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
 
         List<CfetsBiddingProductDto> biddingProductList = cfetsDto.getBiddingProductList();
         List<CfetsEtrBondFirstBid002Dto> etrInvestBondFirstBidList = new ArrayList<>();
-        //报价发行时，按照证券账户维度拆分为多条指令信息
-        if (DictCodeListExt4.新债_发行方式_报价发行.getValue().equals(cfetsDto.getIssueClass())) {
-            Map<String, List<CfetsBiddingProductDto>> secAcctIdMap = biddingProductList.stream().collect(Collectors.groupingBy(CfetsBiddingProductDto::getSecAcctId));
-            for (Map.Entry<String, List<CfetsBiddingProductDto>> entry : secAcctIdMap.entrySet()) {
+        //场外
+        if (StringUtil.equals(cfetsDto.getTradeMarket(), DictCodeListExt1.交易场所_银行间.getValue())
+                || StringUtil.equals(cfetsDto.getTradeMarket(), DictCodeListExt1.交易场所_商业银行柜台.getValue())) {
+            //报价发行时，按照证券账户维度拆分为多条指令信息
+            if (DictCodeListExt4.新债_发行方式_报价发行.getValue().equals(cfetsDto.getIssueClass())) {
+                Map<String, List<CfetsBiddingProductDto>> secAcctIdMap = biddingProductList.stream().collect(Collectors.groupingBy(CfetsBiddingProductDto::getSecAcctId));
+                for (Map.Entry<String, List<CfetsBiddingProductDto>> entry : secAcctIdMap.entrySet()) {
+                    CfetsEtrBondFirstBid002Dto dd = new CfetsEtrBondFirstBid002Dto();
+                    BeanUtil.copyPropertiesIgnoreNull(dd, dto);
+                    dd.setBiddingProductList(null);
+                    dd.setBiddingProductList(entry.getValue());
+                    dd.setSecAcctId(entry.getKey());
+                    //汇总投标券面总额 重新计算
+                    BigDecimal totalNum = dd.getBiddingProductList().stream().map(CfetsBiddingProductDto::getBidPrinAmt)
+                            .reduce(BigDecimal.ZERO,BigDecimal::add);
+                    dd.setTotalBiddingNum(totalNum);
+                    //针对退回指令，查询指令下达时间
+                    if (StringUtil.isNotEmpty(cfetsDto.getEntrustId())) {
+                        //根据指令id查询出该资产是退回指令，且该指令的下达时间
+                        CfetsEtribBondInfo003Dto transmitTimeDto=cfetsetrIbBondinfoMapper.selectTransmitTimeByInfo(cfetsDto.getEntrustId());
+                        if(null!=transmitTimeDto && StringUtil.isNotEmpty(transmitTimeDto.getTransmitTime())){
+                            dd.setTransmitTime(transmitTimeDto.getTransmitTime());
+                        }
+                        dd.setSystemAct(DictCodeListExt3.系统动作_修改.getValue());
+                    }else {
+                        dd.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
+                    }
+
+                    //投标日前下的指令，指令结束日为投标日;投标日后下的指令，指令结束日为指令日期
+                    if (DateUtil.compareDate(cfetsDto.getEtrDate(), cfetsDto.getIssueDate()) >= 0) {
+                        dd.setMdate(cfetsDto.getIssueDate());
+                    } else {
+                        dd.setMdate(cfetsDto.getEtrDate());
+                    }
+
+                    etrInvestBondFirstBidList.add(dd);
+                }
+
+            } else {
                 CfetsEtrBondFirstBid002Dto dd = new CfetsEtrBondFirstBid002Dto();
                 BeanUtil.copyPropertiesIgnoreNull(dd, dto);
-                dd.setBiddingProductList(null);
-                dd.setBiddingProductList(entry.getValue());
-                dd.setSecAcctId(entry.getKey());
-                //汇总投标券面总额 重新计算
-                BigDecimal totalNum = dd.getBiddingProductList().stream().map(CfetsBiddingProductDto::getBidPrinAmt)
-                        .reduce(BigDecimal.ZERO,BigDecimal::add);
-                dd.setTotalBiddingNum(totalNum);
                 //针对退回指令，查询指令下达时间
                 if (StringUtil.isNotEmpty(cfetsDto.getEntrustId())) {
                     //根据指令id查询出该资产是退回指令，且该指令的下达时间
@@ -717,17 +753,17 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                     dd.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
                 }
 
-                //投标日前下的指令，指令结束日为投标日;投标日后下的指令，指令结束日为指令日期
-                if (DateUtil.compareDate(cfetsDto.getEtrDate(), cfetsDto.getIssueDate()) >= 0) {
-                    dd.setMdate(cfetsDto.getIssueDate());
-                } else {
-                    dd.setMdate(cfetsDto.getEtrDate());
-                }
-
+                dd.setMdate(cfetsDto.getTenderDate());
                 etrInvestBondFirstBidList.add(dd);
             }
 
-        } else {
+        }
+
+
+        //场内
+        if (StringUtil.equals(cfetsDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())
+                || StringUtil.equals(cfetsDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())) {
+
             CfetsEtrBondFirstBid002Dto dd = new CfetsEtrBondFirstBid002Dto();
             BeanUtil.copyPropertiesIgnoreNull(dd, dto);
             //针对退回指令，查询指令下达时间

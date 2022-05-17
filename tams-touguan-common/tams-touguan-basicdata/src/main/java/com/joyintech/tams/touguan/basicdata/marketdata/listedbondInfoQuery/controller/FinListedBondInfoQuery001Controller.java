@@ -54,12 +54,19 @@ public class FinListedBondInfoQuery001Controller extends BaseController {
         initPageParams.put("CYY", this.getSelectDataFromDataDic(DictCode.币种, null));
         initPageParams.put("MAIN_GRADE_RESULT", this.getSelectDataFromDataDic(DictCode.评级结果, null));
         initPageParams.put("BASE_RATE_ACCURACY", this.getSelectDataFromDataDic(DictCode.基准利率精度, null));
-        initPageParams.put("RESET_TYPE", this.getSelectDataFromDataDic(DictCode.重置类型, null));
+        initPageParams.put("RESET_TYPE", this.getSelectDataFromDataDic(DictCode.重置类型_基准利率调整规则, null));
         initPageParams.put("ADVANCE_OBSERV_UNIT", this.getSelectDataFromDataDic(DictCode.提前观察单位_延后时间单位, null));
         initPageParams.put("INTPAY_RULE", this.getSelectDataFromDataDic(DictCode.利息分配方式, null));
         initPageParams.put("TDAY_RULE", this.getSelectDataFromDataDic(DictCode.营业日准则, null));
         initPageParams.put("CALC_RULE", this.getSelectDataFromDataDic(DictCode.推算方式, null));
         initPageParams.put("CASH_CLASS_TYPE", this.getSelectDataFromDataDic(DictCode.现金流类型, null));
+        initPageParams.put("SVR_BASIS_TYPE", this.getSelectDataFromDataDic(DictCode.基准利率, null));
+        initPageParams.put("SVR_GUA_TYPE", this.getSelectDataFromDataDic(DictCode.担保方式, null));
+        initPageParams.put("CONCEPT_TYPE", this.getSelectDataFromDataDic(DictCode.概念标识, null));
+        initPageParams.put("TENDER_TARGET", this.getSelectDataFromDataDic(DictCode.招标标的, null));
+        initPageParams.put("ISSUE_STYLE", this.getSelectDataFromDataDic(DictCode.发行类型, null));
+        initPageParams.put("TENDER_TYPE", this.getSelectDataFromDataDic(DictCode.招标方式, null));
+
         //导出
         initPageParams.put("EXPORT_SHOW", CacheUtil.getSysParam("EXPORT_SHOW"));
         //刷新时间

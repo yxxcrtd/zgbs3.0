@@ -10,6 +10,7 @@
  
 package com.joyintech.tams.cfets.etr.bondfirstbid.dao;
 
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindEtrInfoDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrIBondFirstBidFindIssueInfoDto;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
@@ -76,4 +77,11 @@ public interface CfetsEtrBondFirstBid001Mapper {
      * @return
      */
     EtrEntrustAdd selectEntrustAddById(@Param("entrustId")String entrustId);
+
+    /**
+     * 组合资金账户
+     * @param map
+     * @return
+     */
+    List<SelectOptionDto> getPtlSecAcctInfo(Map<String, Object> map);
 }
