@@ -544,7 +544,7 @@
                 )
             </if>
             AND t.tradeMarket in ('03','04','12')
-            AND t.finprodType2 in ('F01','F02','F07','F11')
+            AND t.assetType in ('F01','F02','F07','F11')
         </where>
     </sql>
 
