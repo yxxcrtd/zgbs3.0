@@ -339,8 +339,8 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
         productInfoRequest.setFinprodId(etrEntrust.getFinprodId());
         CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoService.findFinProductInfo(null, null, productInfoRequest);
 
-        dto.setIssueClass(finProductInfo.getIssueClass());
-        if (StringUtil.equals(finProductInfo.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
+        dto.setIssueClass(finProductInfo.getIssueType());
+        if (StringUtil.equals(finProductInfo.getIssueType(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
             dto.setIssueDate(finProductInfo.getIssueDate());
             dto.setPayDate(finProductInfo.getPayDate());
             dto.setIssuePrice(finProductInfo.getIssuePrice());
@@ -369,7 +369,7 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
         //查询指令明细信息
         List<EtrEntrustDetail> etrEntrustDetails = cfetsEtrBondFirstBid001Mapper.selectEntrustDetailById(entrustId);
 
-        if (StringUtil.equals(finProductInfo.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
+        if (StringUtil.equals(finProductInfo.getIssueType(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
             dto.setIssueDate(finProductInfo.getIssueDate());
             dto.setPayDate(finProductInfo.getPayDate());
 

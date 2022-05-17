@@ -222,6 +222,13 @@ public class FinTenderBondAsset001Dto extends BaseDto {
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
 
+
+    /**
+     * 上市流通代码
+     */
+    @ApiModelProperty(name="circulationCode",value="上市流通代码")
+    private String circulationCode;
+
     /**
      * 操作类型：NEW,MODIFY,DELETE,REVOKE
      */
@@ -742,5 +749,13 @@ public class FinTenderBondAsset001Dto extends BaseDto {
 
     public void setIssueDateStr(String issueDateStr) {
         this.issueDateStr = issueDateStr;
+    }
+
+    public String getCirculationCode() {
+        return circulationCode;
+    }
+
+    public void setCirculationCode(String circulationCode) {
+        this.circulationCode = circulationCode;
     }
 }

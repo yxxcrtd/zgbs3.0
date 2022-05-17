@@ -51,8 +51,6 @@ public class EtrCommonFinProductInfoService extends BaseService {
     public CfetsEtrFinProductInfoResponse findFinProductInfo(String pageCode, String dtCode, CfetsEtrFinProductInfoRequest request) {
         CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoMapper.findFinProductInfo(request);
         if (Objects.nonNull(finProductInfo)) {
-            //标题
-            finProductInfo.setTitle(finProductInfo.getFinprodId() + finProductInfo.getFinprodAbbr());
             //评级信息
             if (Objects.nonNull(pageCode) && Objects.nonNull(dtCode)) {
                 //查询对于业务场景展示表头
@@ -91,15 +89,15 @@ public class EtrCommonFinProductInfoService extends BaseService {
     private String getSpcdCodesByFinProduct(CfetsEtrFinProductInfoResponse finProductInfo) {
         StringBuilder sb = new StringBuilder();
         //发行方式
-        String issueClass = finProductInfo.getIssueClass();
+        String issueType = finProductInfo.getIssueType();
         //招标方式
         String tenderType = finProductInfo.getTenderType();
         //发行类型
         String issueStyle = finProductInfo.getIssueStyle();
-        if (StringUtil.isBlank(issueClass) && StringUtil.isBlank(tenderType) && StringUtil.isBlank(issueStyle)) {
+        if (StringUtil.isBlank(issueType) && StringUtil.isBlank(tenderType) && StringUtil.isBlank(issueStyle)) {
             return BASE_SPCD_CODE;
         }
-        if (DictCodeListExt4.新债_发行方式_报价发行.getValue().equals(issueClass)) {
+        if (DictCodeListExt4.新债_发行方式_报价发行.getValue().equals(issueType)) {
             return sb.append(BASE_SPCD_CODE).append(COMM).append(DictCodeListExt4.新债_发行方式_报价发行.getValue()).toString();
         }
 

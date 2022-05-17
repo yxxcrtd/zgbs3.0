@@ -147,7 +147,7 @@
                 </foreach>
             </if>
             <if test="issueDateStart != null and !issueDateStart.isEmpty() ">
-                AND T.issueDate >= to_date(#{entrustDateStart}, 'yyyy-MM-dd')
+                AND T.issueDate >= to_date(#{issueDateStart}, 'yyyy-MM-dd')
             </if>
             <if test="issueDateEnd != null and !issueDateEnd.isEmpty() ">
                 AND T.issueDate <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd')
