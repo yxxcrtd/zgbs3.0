@@ -101,6 +101,7 @@
         <result column="INV_MANAGER_ID" property="invManagerId" jdbcType="VARCHAR"/>
         <result column="PS" property="ps" jdbcType="VARCHAR"/>
         <result column="BUSI_TYPE_TG" property="busiTypeTg" jdbcType="VARCHAR"/>
+        <result column="BUSI_TYPE_TG_STR" property="busiTypeTgStr" jdbcType="VARCHAR"/>
         <result column="EXTEND1" property="extend1" jdbcType="VARCHAR"/>
         <result column="EXTEND2" property="extend2" jdbcType="VARCHAR"/>
         <result column="ENTRUST_CLASS" property="entrustClass" jdbcType="VARCHAR"/>
@@ -242,6 +243,7 @@
         a.REPORT_NO, a.CREATE_TIME, a.UPDATE_TIME, a.OFFSET_FLAG, a.HEDGE_FLAG, a.PORTFOLIO_ID, a.FULL_PRICE,
         a.ENTRUST_BS,a.PORTFOLIO_NAME,a.SEC_ACCT_ID,a.SEC_ACCT_NAME, a.TRADE_PLAT,a.FINPROD_TYPE2,a.INV_MANAGER_ID,a.PS,
         a.BUSI_TYPE_TG,a.EXTEND1,a.EXTEND2, a.ENTRUST_CLASS,a.IS_FULL_PRICE,a.NET_PRICE,a.NET_BALANCE,
+        a.BUSI_TYPE_TG    BUSI_TYPE_TG_STR,
 		CASE
 		   WHEN STD.DELIVERY_RESULT IS NULL THEN '未交收'
 		   WHEN STD.DELIVERY_RESULT = '01'  THEN '正常交收'
