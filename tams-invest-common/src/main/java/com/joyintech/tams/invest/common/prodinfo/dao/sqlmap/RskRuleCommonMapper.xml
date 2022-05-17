@@ -25,8 +25,8 @@
 		LEFT JOIN PRD_SALE_PARAM ON 'F16_'||PTL_PORTFOLIO.PORTFOLIO_ID=PRD_SALE_PARAM.FINPROD_ID
 		LEFT JOIN FIN_PRODUCT_ADD ON 'F16_'||PTL_PORTFOLIO.PORTFOLIO_ID=FIN_PRODUCT_ADD.FINPROD_ID
 		where ${sqlWhere} and MDATE>to_date('${valDate}','yyyy-MM-dd') AND PORTFOLIO_TYPE IN ('01','02')
-		<if test='isHas =="Y"'>
-			 and PTL_PORTFOLIO.PORTFOLIO_ID not in (select distinct  PORTFOLIO_ID from RSK_PORTFOLIO_INDICATOR)
+		<if test='portfolioId != null and portfolioId != ""'>
+			and PTL_PORTFOLIO.PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
 		</if>
 	</select>
 

@@ -103,8 +103,8 @@ public class AssetCommonUtil {
      * @return
      */
     private static void getFaceValDb(String finProdId){
-        AssetGenerateEntry astEntry=assetGenerateMapper.qryFaceOrOtherInf(finProdId);
-        BigDecimal faceVal=StringUtil.isNotEmpty(astEntry)?convert(astEntry.getFaceValue(),BigDecimal.class,obj->new BigDecimal(obj.toString())):null;
+        List<AssetGenerateEntry> astEntryList=assetGenerateMapper.qryFaceOrOtherInf(Arrays.asList(finProdId));
+        BigDecimal faceVal= StringUtil.isEmptyList(astEntryList)?null:convert(astEntryList.get(0).getFaceValue(),BigDecimal.class, obj->new BigDecimal(obj.toString()));
         faceValMap.put(finProdId,StringUtil.isNotEmpty(faceVal)?faceVal:new BigDecimal(100));
     }
 
@@ -113,7 +113,8 @@ public class AssetCommonUtil {
      * @param finProdId
      */
     private static void isOverSeasBondDb(String finProdId){
-        AssetGenerateEntry astEntry=assetGenerateMapper.qryFaceOrOtherInf(finProdId);
+        List<AssetGenerateEntry> astEntryList=assetGenerateMapper.qryFaceOrOtherInf(Arrays.asList(finProdId));
+        AssetGenerateEntry astEntry=StringUtil.isEmptyList(astEntryList)?null:astEntryList.get(0);
         if(StringUtil.isNotEmpty(astEntry)){
             if(astTypeList.contains(astEntry.getFinprodType2())&&StringUtil.equals(astEntry.getBlnArea(),境外)){
                 isOverBondMap.put(finProdId,true);
@@ -173,7 +174,8 @@ public class AssetCommonUtil {
         if(StringUtil.isBlank(finProdId)){
             return null;
         }
-        AssetGenerateEntry astEntry=assetGenerateMapper.qryFaceOrOtherInf(finProdId);
+        List<AssetGenerateEntry> astEntryList=assetGenerateMapper.qryFaceOrOtherInf(Arrays.asList(finProdId));
+        AssetGenerateEntry astEntry=StringUtil.isEmptyList(astEntryList)?null:astEntryList.get(0);
         R r=null;
         if(StringUtil.isNotEmpty(astEntry)){
             r=func.apply(astEntry);

@@ -88,8 +88,8 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
     @ApiOperation(value = "新建/修改/查看页面初始化", notes = "新建/修改/查看页面初始化")
     public Message<Map<String, Object>> init() {
         Map<String, Object> params = new HashMap<>();
-        //String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
-        String workflowId = "00000000000000000000000000044663";
+        String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
+       // String workflowId = "00000000000000000000000000044663";
         boolean todoList = false;
         CfetsEtrBondFirstBid002Dto entity = new CfetsEtrBondFirstBid002Dto();
         // 待办中过来

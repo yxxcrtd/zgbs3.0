@@ -2678,7 +2678,8 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
             }
             // add by zhangrui1 增加券面总额（元） end
         }
-        if(StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_存款.getValue(),finDto.getFinprodType2())
+        if((StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_存款.getValue(),finDto.getFinprodType2())||
+                StringUtil.equals(DictCodeList.平安资产类型_存款.getValue(),v.getAssetType()))
                 &&StringUtil.equals(finDto.getPs(),DictCodeList.交易方向_中间付息.getValue())){
             infRiskRdsDto.setEventDate(DateUtil.format(finDto.getTradeDate()));
             String intSettType  = (String)dataMap.get("intSettType");
@@ -2691,7 +2692,8 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                 }
             }
         }
-        if(StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_存款.getValue(),finDto.getFinprodType2())
+        if((StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_存款.getValue(),finDto.getFinprodType2())||
+                StringUtil.equals(DictCodeList.平安资产类型_存款.getValue(),v.getAssetType()))
                 &&StringUtil.equals(finDto.getPs(),DictCodeList.交易方向_提前支取.getValue())){
             infRiskRdsDto.setEventDate(DateUtil.format(finDto.getTradeDate()));
             // add by zhangrui1 提前支取金额当作数量 start

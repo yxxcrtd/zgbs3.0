@@ -611,13 +611,13 @@
                pp.PORTFOLIO_NAME  portfolioName,
                TPD.SHARE_AMT      qtyd,
                ttft1.fee_amt      jsFeeAmt,
-               EE.BUSINESS_MODEL  busiTypePosition,
+               eed.INV_AIM  busiTypePosition,
                ssai.sec_acct_name secAcctId
         FROM TRD_PRODUCT_DEAL TPD
                  INNER JOIN TRD_PRODUCT_DEAL_ADD TPDA on TPD.TRADE_ID = TPDA.TRADE_ID
                  LEFT JOIN PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = TPDA.PORTFOLIO_ID
                  LEFT JOIN TRD_TRADE_FEE_DETAIL ttft1 ON tpd.trade_id = ttft1.trade_id AND ttft1.fee_type = #{feeType08}
-                 LEFT JOIN ETR_ENTRUST ee ON TPDA.Entrust_Id = ee.entrust_id
+                 LEFT JOIN ETR_ENTRUST_DETAIL eed ON TPDA.Entrust_Id = eed.entrust_id and TPDA.PORTFOLIO_ID = eed.PORTFOLIO_ID
                  LEFT JOIN STL_SEC_ACCT_INFO ssai ON tpd.sec_manage_acct_id = ssai.SEC_ACCT_ID
         where TPD.TOTLE_TRADE_ID = #{tradeId}
           and TPD.Trade_Status = '01'

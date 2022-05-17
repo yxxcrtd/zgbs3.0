@@ -450,15 +450,15 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                 dto.setFinExercisePlanList(finExercisePlanList);
             }
             //发行方式
-            FinProductIssue finProductIssue = finProductIssueMapper.selectByPrimaryKey(dto.getFinprodId());
+            List<FinProductIssue> finProductIssues = finBondAssetMapper.selectFinProductIssue(dto.getFinprodMarketId());
             List<BondFinProductIssueDto> finProductIssueList = new ArrayList<>();
             BondFinProductIssueDto bondFinProductIssueDto = new BondFinProductIssueDto();
             BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto,dto);
-            if (StringUtil.isNotEmpty(finProductIssue)) {
+            for (FinProductIssue finProductIssue:finProductIssues){
                 BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto, finProductIssue);
                 finProductIssueList.add(bondFinProductIssueDto);
-                dto.setFinProductIssueList(finProductIssueList);
             }
+            dto.setFinProductIssueList(finProductIssueList);
             List<SysUploadFileInfo> uploadInfo = joyinFSMapper.getUploadInfo(dto.getFinprodId());
             MstFileInputParameter mstFileInputParameter = new MstFileInputParameter();
             mstFileInputParameter.setFileList(uploadInfo);

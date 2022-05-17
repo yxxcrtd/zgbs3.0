@@ -101,7 +101,8 @@
 	        and n.MDATE > CURRENT_DATE
 	        <!-- add by wangshuang 剔除已到期组合 2019-12-05 end -->
 	  		<if test="portfolioName != null and portfolioName != ''">
-				and	n.PORTFOLIO_NAME LIKE CONCAT(CONCAT('%',#{portfolioName}),'%')
+				and	(n.PORTFOLIO_NAME LIKE CONCAT(CONCAT('%',#{portfolioName}),'%')
+				or	n.PORTFOLIO_ID LIKE CONCAT(CONCAT('%',#{portfolioName}),'%'))
 			</if>
 			<if test="profitType != null and profitType != ''">
 				and n.PROFIT_TYPE = #{profitType}
