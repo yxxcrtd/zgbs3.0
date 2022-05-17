@@ -28,10 +28,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.*;
@@ -160,7 +157,7 @@ public class TradeManagement {
                 trade.setTradedPrice(trade.getTradedPrice().multiply(BigDecimal.valueOf(100)));
             } else if (投管业务类型_现券交易.getValue().equals(trade.getBusiTypeTg())) {
                 trade.setTradedVolumeView(BigDecimal.valueOf(trade.getTradedVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
-            }else if (投管业务类型_通用式质押回购.getValue().equals(trade.getBusiTypeTg())) {
+            } else if (投管业务类型_通用式质押回购.getValue().equals(trade.getBusiTypeTg())) {
                 trade.setTradedBalance(trade.getTradedBalance().divide(BigDecimal.valueOf(10000), 2, RoundingMode.HALF_UP));
             }
             tradeVos.add(trade);
@@ -237,7 +234,7 @@ public class TradeManagement {
         } else if (historyType == PresentOrHistoryQryType.HISTORY.value) {
             if (!Strings.isNullOrEmpty(entrustId)) {
                 List<TradeQueryBean> tradeList = tradeHistoryService.queryTradeHistoryByEntrustId(entrustId);
-                tradeList = tradeList.stream().filter(trade -> ptlAuthList.contains(trade.getPortfolioId())).collect(Collectors.toList());
+//                tradeList = tradeList.stream().filter(trade -> ptlAuthList.contains(trade.getPortfolioId())).collect(Collectors.toList());
                 return new Message<PageInfo<TradeQueryBean>>(new PageInfo<TradeQueryBean>(tradeList));
             }
             return new Message<PageInfo<TradeQueryBean>>(tradeHistoryService.queryAllForPage(request, ptlAuthList));
