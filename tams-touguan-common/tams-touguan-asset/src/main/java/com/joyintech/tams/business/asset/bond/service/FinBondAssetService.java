@@ -423,6 +423,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             //计息要素
             BondFinInterestFactorDto finInterestFactorDto = new BondFinInterestFactorDto();
             BeanUtil.copyPropertiesIgnoreNull(finInterestFactorDto,dto);
+            finInterestFactorDto.setSpreadRate(dto.getSpreadRate());
             dto.setFinInterestFactorDto(finInterestFactorDto);
             //付息信息
             BondFinPayInterestStdInfoDto finPayInterestStdInfoDto = new BondFinPayInterestStdInfoDto();

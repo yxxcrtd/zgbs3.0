@@ -353,12 +353,12 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
     /***
      * 系数
      */
-    private String coefficient;
+    private BigDecimal coefficient;
     
     /**
      * 利差
      */
-    private String spreadRate;
+    private BigDecimal spreadRate;
     
     /**
      * 机构类型(企业性质)
@@ -989,7 +989,7 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
      * 获取 coefficient
      * @return coefficient.
      */
-    public String getCoefficient() {
+    public BigDecimal getCoefficient() {
         return coefficient;
     }
 
@@ -997,7 +997,7 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
      * 设置 coefficient
      * @param coefficient coefficient
      */
-    public void setCoefficient(String coefficient) {
+    public void setCoefficient(BigDecimal coefficient) {
         this.coefficient = coefficient;
     }
 
@@ -1007,7 +1007,7 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
      * 获取 spreadRate
      * @return spreadRate.
      */
-    public String getSpreadRate() {
+    public BigDecimal getSpreadRate() {
         return spreadRate;
     }
 
@@ -1015,7 +1015,7 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
      * 设置 spreadRate
      * @param spreadRate spreadRate
      */
-    public void setSpreadRate(String spreadRate) {
+    public void setSpreadRate(BigDecimal spreadRate) {
         this.spreadRate = spreadRate;
     }
 
@@ -1744,7 +1744,7 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
     /**
      * 基准利率
      */
-    private BigDecimal basicRate;
+    private String basicRate;
 
     /**
      * 利率上限
@@ -1886,11 +1886,11 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
         this.benchmarkIdAccuracy = benchmarkIdAccuracy;
     }
 
-    public BigDecimal getBasicRate() {
+    public String getBasicRate() {
         return basicRate;
     }
 
-    public void setBasicRate(BigDecimal basicRate) {
+    public void setBasicRate(String basicRate) {
         this.basicRate = basicRate;
     }
 
