@@ -1421,7 +1421,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                                 getMessage("COMMON_E_0057", getMessage("BussFinRepayment.prinAmt"))));
                         return resultList;
                     }
-                    if(finCashPlanEntity.getPrinAmt().compareTo(new BigDecimal("0"))<0 ||
+                    if(finCashPlanEntity.getPrinAmt().compareTo(new BigDecimal("0"))<=0 ||
                             finCashPlanEntity.getPrinAmt().compareTo(new BigDecimal("100"))>0){
                         resultList.add(new ValidMessage("还本面值请输入0以上，100以下的数据"));
                     }
