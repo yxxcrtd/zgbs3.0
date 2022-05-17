@@ -668,6 +668,9 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                 invSchedule.setBranch(branch);
                 invSchedule.setBasis(getBasis(finInterestFactorDto.getBasis()));
                 invSchedule.setVdateUnadjust(invSchedule.getVdate());
+                if (!StringUtil.isNotEmpty(invSchedule.getMdateUnadjust())){
+                    invSchedule.setMdateUnadjust(invSchedule.getMdate());
+                }
                 finCashPlanList.add(invSchedule);
             }
         }
