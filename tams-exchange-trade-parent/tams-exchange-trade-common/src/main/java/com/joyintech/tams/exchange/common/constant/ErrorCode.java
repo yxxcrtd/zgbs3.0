@@ -40,7 +40,7 @@ public enum ErrorCode implements IEnum<Integer> {
 
     INSTRUCTION_APPLY_NOT_UNIQUE(25, "只能进行一次该申报"),
 
-    MIN_TRD_UNIT_LIMIT_ERROR(26, "交易属性错误"),
+    MIN_TRD_UNIT_LIMIT_ERROR(26, "未找到最小交易单元"),
 
     DB_ERROR(100, "数据库返回错误"),
 
