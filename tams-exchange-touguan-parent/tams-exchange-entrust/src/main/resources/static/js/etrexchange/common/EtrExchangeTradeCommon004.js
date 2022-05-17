@@ -4075,28 +4075,75 @@
         var len = array.length;
         var entrustNumForOne = entrustNum / len;
         var ps = $("#ps_" + currentTab).val();
-        for (var i = 0; i < array.length; i++) {
-            if (array[i].acctNo) {
-                if(i == 0){
-                    if(ps == PS_T68 || ps == PS_T69){
-                        array[i].entrustNum = Math.ceil(entrustNumForOne*100)/100;
-                    }else {
-                        array[i].entrustNum = Math.ceil(entrustNumForOne);
-                    }
-                }else {
-                    if(ps == PS_T68 || ps == PS_T69){
-                        array[i].entrustNum = Math.floor(entrustNumForOne*100)/100;
-                    }else {
-                        array[i].entrustNum = Math.floor(entrustNumForOne);
-                    }
+        // for (var i = 0; i < array.length; i++) {
+        //     if (array[i].acctNo) {
+        //         if(i == 0){
+        //             if(ps == PS_T68 || ps == PS_T69){
+        //                 array[i].entrustNum = Math.ceil(entrustNumForOne*100)/100;
+        //             }else {
+        //                 array[i].entrustNum = Math.ceil(entrustNumForOne);
+        //             }
+        //         }else {
+        //             if(ps == PS_T68 || ps == PS_T69){
+        //                 array[i].entrustNum = Math.floor(entrustNumForOne*100)/100;
+        //             }else {
+        //                 array[i].entrustNum = Math.floor(entrustNumForOne);
+        //             }
+        //         }
+        //         array[i].entrustAmt = entrustAmt / len;
+        //     }
+        // }
+        //组合分配调整
+        var finprodId = $("#finprodId_" + currentTab).val();
+        var targetType = $("#targetType_" + currentTab).val();
+        var finprodType2 = $("#finprodType2_" + currentTab).val();
+        var tradeMarket = $("#tradeMarket_" + currentTab).val();
+        var ps = $("#ps_" + currentTab).val();
+        var minStep;
+        if (targetType) {
+            var step = 1;
+            var param = {
+                finprodId: finprodId,
+                targetType: targetType,
+                finprodType2: finprodType2,
+                tradeMarket: tradeMarket,
+                ps: ps,
+                currentTab: currentTab
+            };
+            Joyin.ajaxJson(basePath + 'invest/entrust/etrexchangetrade/EtrExchangeTrade001/getMinNumStep', param, function (result) {
+                if (result.minNum) {
+                    minStep=result.minNum;
                 }
-                array[i].entrustAmt = entrustAmt / len;
+            }, false);
+        }
+        var object=getSearchParams();
+        var entrustPrice=object.entrustPrice;
+        //券
+        if(object.entrustBussType == ENTRUST_BUSS_TYPE_07||object.entrustBussType == ENTRUST_BUSS_TYPE_06||object.entrustBussType == ENTRUST_BUSS_TYPE_08){
+            entrustPrice=object.fprice;
+        }else if (object.priceModel == PRICE_MODEL_PRM03) {
+            entrustPrice = $("#factPrice_" + currentTab).val();
+            if (!object.entrustPrice) {
+                entrustPrice = 0;
             }
         }
-        for (var i = 0; i < array.length; i++) {
-            dateTable.renderRow(i, array[i]);
+        var params = {
+            targetType: targetType,
+            // minNum
+            entrustPrice: entrustPrice,
+            minStep: minStep,
+            entrustNum: $("#entrustNum_" + currentTab).val(),
+            entrustAmt: $("#entrustAmt_" + currentTab).val(),
+            portfolioList: array
         }
-        ;
+        Joyin.ajaxJson(basePath + '/etrexchange/common/selectEtrPortfolioAllocationList', params, function (result) {
+            if(result.data){
+                array=result.data.portfolioList;
+                for (var i = 0; i < array.length; i++) {
+                    dateTable.renderRow(i, array[i]);
+                }
+            }
+        })
         // dateTable.reload();
     }
 

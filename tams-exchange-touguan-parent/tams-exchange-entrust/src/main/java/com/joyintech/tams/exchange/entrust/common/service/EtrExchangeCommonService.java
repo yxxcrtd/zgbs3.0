@@ -1761,32 +1761,36 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
             item.setEntrustAmt(BigDecimal.ZERO);
         });
         boolean flag=true;
-        while(flag){
-            List<EtrExchangeProtfolioDetailRequest> portfolioList=dto.getPortfolioList();
-            int sumSize=dto.getPortfolioList().size();
-            for(int i=0;i<sumSize;i++){
-                EtrExchangeProtfolioDetailRequest item=portfolioList.get(i);
-                if (StringUtil.equals(DictCodeListExt3.目标类型_数量.getValue(), dto.getTargetType())) {
-                    if(leftEntrustNum.compareTo(minStep)>=0) {
-                        item.setEntrustNum(ArithmeticUtil.doAdd(item.getEntrustNum(),minStep));
-                        item.setEntrustAmt(ArithmeticUtil.multiply(item.getEntrustNum(),entrustPrice));
-                        leftEntrustNum=ArithmeticUtil.subtract(leftEntrustNum,minStep);
-                    }else {
-                        item.setEntrustNum(ArithmeticUtil.doAdd(item.getEntrustNum(),leftEntrustNum));
-                        item.setEntrustAmt(ArithmeticUtil.multiply(item.getEntrustNum(),entrustPrice));
-                        flag=false;
-                        break;
-                    }
-                }else{
-                    if(i!=sumSize-1){
-                        item.setEntrustNum(ArithmeticUtil.divide(item.getEntrustNum(),sumSize,0));
-                        item.setEntrustAmt(ArithmeticUtil.divide(item.getEntrustAmt(),sumSize,2));
-                    }else{
-                        BigDecimal tempEntrustNum=dto.getPortfolioList().stream().map(EtrExchangeProtfolioDetailRequest::getEntrustNum).reduce(BigDecimal::add).get();
-                        BigDecimal tempEntrustAmt=dto.getPortfolioList().stream().map(EtrExchangeProtfolioDetailRequest::getEntrustAmt).reduce(BigDecimal::add).get();
-                        item.setEntrustNum(ArithmeticUtil.subtract(entrustNum,tempEntrustNum));
-                        item.setEntrustAmt(ArithmeticUtil.subtract(entrustAmt,tempEntrustAmt));
-                    }
+        //目标类型是数量安装步长分配
+        List<EtrExchangeProtfolioDetailRequest> portfolioList = dto.getPortfolioList();
+        int sumSize = dto.getPortfolioList().size();
+        if (StringUtil.equals(DictCodeListExt3.目标类型_数量.getValue(), dto.getTargetType())) {
+            while (flag) {
+                for (int i = 0; i < sumSize; i++) {
+                    EtrExchangeProtfolioDetailRequest item = portfolioList.get(i);
+                        if (leftEntrustNum.compareTo(minStep) > 0) {
+                            item.setEntrustNum(ArithmeticUtil.doAdd(item.getEntrustNum(), minStep));
+                            item.setEntrustAmt(ArithmeticUtil.multiply(item.getEntrustNum(), entrustPrice));
+                            leftEntrustNum = ArithmeticUtil.subtract(leftEntrustNum, minStep);
+                        } else {
+                            item.setEntrustNum(ArithmeticUtil.doAdd(item.getEntrustNum(), leftEntrustNum));
+                            item.setEntrustAmt(ArithmeticUtil.multiply(item.getEntrustNum(), entrustPrice));
+                            flag = false;
+                            break;
+                        }
+                }
+            }
+        }else{ //目标类型是金额还是平均分配
+            for (int i = 0; i < sumSize; i++) {
+                EtrExchangeProtfolioDetailRequest item = portfolioList.get(i);
+                if (i != sumSize - 1) {
+                    item.setEntrustNum(ArithmeticUtil.divide(entrustNum, sumSize, 0));
+                    item.setEntrustAmt(ArithmeticUtil.divide(entrustAmt, sumSize, 2));
+                } else {
+                    BigDecimal tempEntrustNum = dto.getPortfolioList().stream().map(EtrExchangeProtfolioDetailRequest::getEntrustNum).reduce(BigDecimal::add).get();
+                    BigDecimal tempEntrustAmt = dto.getPortfolioList().stream().map(EtrExchangeProtfolioDetailRequest::getEntrustAmt).reduce(BigDecimal::add).get();
+                    item.setEntrustNum(ArithmeticUtil.subtract(entrustNum, tempEntrustNum));
+                    item.setEntrustAmt(ArithmeticUtil.subtract(entrustAmt, tempEntrustAmt));
                 }
             }
         }
