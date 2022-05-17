@@ -25,7 +25,9 @@ public enum InvestmentAssetType implements IEnum<String> {
     RATE_EXCHANGE("利率互换", "F16"),
     PRIMARY_MARKET_DEBT("一级市场债", "F17"),
     SHARE_OPTION("期权", "F18"),
-    FUTURES("期货", "F20");
+    FUTURES("期货", "F20"),
+    CREDIT_PROTECTION_CERTIFICATE("信用保护凭证", "F36"),
+    ;
     public String name;
     public String value;
 
@@ -40,6 +42,10 @@ public enum InvestmentAssetType implements IEnum<String> {
 
     public static boolean isPledgeRepurchase(String assetType) {
         return InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(assetType);
+    }
+
+    public static boolean isCreditProtectionCertificate(String assetType) {
+        return InvestmentAssetType.CREDIT_PROTECTION_CERTIFICATE.value.equals(assetType);
     }
 
     public static boolean isFutures(String assetType) {
