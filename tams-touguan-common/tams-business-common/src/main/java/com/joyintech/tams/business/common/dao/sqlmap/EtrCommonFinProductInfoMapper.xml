@@ -32,9 +32,11 @@
         ISSUE.INT_TYPE intType,
         ISSUE.PAY_CYCLE payCycle,
 
-        case when (PRODUCT.COUPON_SPECIES='"01"'  or ISSUE.INT_TYPE='02' )
-        then SDL.ITEM_VALUE || '+' || to_char(ISSUE.bp * 10000 ,'FM9999999999999990.9000') || 'BP'
-        else to_char(ISSUE.REFER_YIELD * 100 ,'FM9999999999999990.9000') end as referYield,
+        case
+        when PRODUCT.COUPON_SPECIES = '01' AND  ISSUE.INT_TYPE = '02' THEN
+        SDL.ITEM_VALUE || '+' || to_char(ISSUE.bp * 10000 ,'FM9999999999999990.90') || ' BP'
+        else to_char(ISSUE.REFER_YIELD * 100 ,'FM9999999999999990.9000') || ' %'
+        end as referYield,
 
         RATE_INFO.INT_RATE basicRate,
         ISSUE.RATE_GRADE rateGrade,
