@@ -25,11 +25,11 @@ public interface AssetGenerateMapper {
 	/**
 	 * 查询债券的面值等其它信息
 	 * <功能详细描述>
-	 * @param finprodId
+	 * @param finprodIdList
 	 * @see
 	 * @since 1.0
 	 */
-	AssetGenerateEntry qryFaceOrOtherInf(String finprodId);
+	List<AssetGenerateEntry> qryFaceOrOtherInf(List<String> finprodIdList);
 
 	/**
      * 查询汇率

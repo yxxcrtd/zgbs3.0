@@ -39,6 +39,8 @@ public class ImplPortf extends PtlPortfolio implements IProdInfo {
      */
     private String raiseType;
 
+    private String openType;//开放类型，开放封闭
+
     @Override
     public String getProdId() {
         return this.getPortfolioId();//组合代码
@@ -59,9 +61,13 @@ public class ImplPortf extends PtlPortfolio implements IProdInfo {
         return this.openMode;//开放频率
     }
 
+    public void setOpenType(String openType) {
+        this.openType = openType;
+    }
+
     @Override
     public String getIssueMode() {
-        return this.getOpenType();//开放类型
+        return this.openType;//开放类型
     }
 
     @Override

@@ -158,7 +158,7 @@ public class BussRuleImplService extends BaseService implements BussRuleService<
             //---流动性风险改造过滤开放周期 start---
             if(CommonUtil.isType(dto.getClassifyDimension(),BussinessDictCodeListRds.分类维度_开放周期)){
                 portList= rskRuleCommonMapper.getMatchPortData(RiskUtil.getTableColumn(DictCodeListExt1.分类维度_开放类型.getValue())
-                        +"='"+ DictCodeList.开放类型_开放式.getValue()+"'",BussinessDictCodeListRds.是否_否.getValue(),DateUtil.format(StringUtil.isNotEmpty(platDate) ? platDate : new Date()));
+                        +"='"+ DictCodeList.开放类型_开放式.getValue()+"'",null,DateUtil.format(StringUtil.isNotEmpty(platDate) ? platDate : new Date()));
                 sqlWhere=dto.getPoolSql(portList,sqlWhere);
             }else {
                 sqlWhere=dto.getPoolSql(portList,sqlWhere);
@@ -166,7 +166,7 @@ public class BussRuleImplService extends BaseService implements BussRuleService<
             //---流动性风险改造过滤开放周期 end---
         }
         //查询符合规则的组合且在组合关联指标表中已有的组合排除，即之前已绑定的不用再管了(现改成不排除)
-        portList= rskRuleCommonMapper.getMatchPortData(sqlWhere,BussinessDictCodeListRds.是否_否.getValue(),DateUtil.format(StringUtil.isNotEmpty(platDate) ? platDate : new Date()));
+        portList= rskRuleCommonMapper.getMatchPortData(sqlWhere,null,DateUtil.format(StringUtil.isNotEmpty(platDate) ? platDate : new Date()));
         return portList;
     }
 

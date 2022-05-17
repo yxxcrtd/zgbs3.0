@@ -31,10 +31,10 @@ public interface BussRuleService<V extends IPtlRule>{
 
     /**
      * 匹配规则的组合
-     * @param ruleList
+     * @param rule
      * @return
      */
-    List<String> matchRulePort(V ruleList);
+    List<String> matchRulePort(V rule);
 
     /**
      * 匹配规则的组合
