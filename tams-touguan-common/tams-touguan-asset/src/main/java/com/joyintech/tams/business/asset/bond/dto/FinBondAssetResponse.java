@@ -399,11 +399,6 @@ public class FinBondAssetResponse {
     public String getBasisRate() {
         return basisRate;
     }
-
-    public String getBasisRateStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.利率行情, this.getBasisRate());
-    }
-
     public void setBasisRate(String basisRate) {
         this.basisRate = basisRate;
     }
@@ -655,5 +650,9 @@ public class FinBondAssetResponse {
 
     public void setBasisRateStr(String basisRateStr) {
         this.basisRateStr = basisRateStr;
+    }
+
+    public String getBasisRateStr() {
+       return SysDataUtil.getNameFromDataDict(DictCode.利率行情, this.getBasisRate());
     }
 }

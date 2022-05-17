@@ -18,7 +18,7 @@
         T1.MDATE mdate,
         T1.DELISTING_DATE delistingDate,
         T1.ISSUE_PRICE issuePrice,
-        NVL(T1.ISSUE_AMT,0) issueAmt,
+        NVL(T1.ISSUE_AMT,0)/100000000 issueAmt,
         MST_CUSTOMER_INFO.CUSTOMER_NAME issuerName,
         MST_CUSTOMER_INFO.CUSTOMER_ID issuer,
         T4.TYPE_9 type9,
