@@ -431,10 +431,12 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
                     r.setPositionUnitCost(dto.getUnitCost());
                 }
                 // 最新净价*组合持仓.数量 - 持仓成本 as 浮动盈亏
-                BigDecimal floatFd = ArithmeticUtil.multiply(r.getPrice(), r.getPositionsNum());
+                BigDecimal floatFd = ArithmeticUtil.multiply(r.getPrice(),
+                                    ArithmeticUtil.multiply(r.getPositionsNum(),new BigDecimal("10000")));
                 floatFd = ArithmeticUtil.subtract(floatFd, r.getPositionsAmt());
                 r.setFloating(floatFd);
-                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, ArithmeticUtil.multiply(r.getPrice(), r.getPositionsNum()), 2);
+                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, ArithmeticUtil.multiply(r.getPrice(),
+                                ArithmeticUtil.multiply(r.getPositionsNum(),new BigDecimal("10000"))), 2);
                 r.setFloatingPL(floatPL);
 
             });

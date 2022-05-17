@@ -350,6 +350,7 @@
             round(TEMP.AMOUNT/10000,2)     AS positionsNum,
             invaim.INV_AIM as invAim,
             invaim.BUSINESS_MODEL as businessModel,
+            invaim.TRADE_PLAT tradePlat,
             FP.FINPROD_TYPE2                          AS finprodType2,
             FP.TRADE_MARKET                           AS tradeMarket,
             c1.acctNo1                          AS acctNo,
@@ -446,14 +447,14 @@
         on SSAI.TRD_ACCT_ID = c1.acctNo1
         <!-- 业务模式查交易表 -->
         left join (
-            select FINPROD_ID, PORTFOLIO_ID,
+            select FINPROD_ID, PORTFOLIO_ID,TRADE_PLAT,
                    listagg(INV_AIM, ',') WITHIN GROUP (ORDER BY PORTFOLIO_ID, FINPROD_ID) as INV_AIM,
         listagg(BUSINESS_MODEL, ',') WITHIN GROUP (ORDER BY PORTFOLIO_ID, FINPROD_ID) as BUSINESS_MODEL
         from (
-            SELECT FINPROD_ID, PORTFOLIO_ID, INV_AIM,BUSINESS_MODEL
+            SELECT FINPROD_ID, PORTFOLIO_ID, TRADE_PLAT,INV_AIM,BUSINESS_MODEL
             FROM (
             select
-            a.INV_AIM ,a.BUSINESS_MODEL, a.TRADE_DATE ,a.FINPROD_ID,b.PORTFOLIO_ID,
+            a.INV_AIM ,a.BUSINESS_MODEL, a.TRADE_DATE ,a.FINPROD_ID,b.PORTFOLIO_ID,a.TRADE_PLAT,
             ROW_NUMBER () over(
             PARTITION BY a.TRADE_ID
             ORDER BY a.TRADE_DATE DESC
@@ -470,7 +471,7 @@
             AND a.TRADE_DATE &lt;= #{sysDate}
             ) WHERE rn = 1
             UNION
-            SELECT a.FINPROD_ID, b.PORTFOLIO_ID, a.INV_AIM,a.BUSINESS_MODEL
+            SELECT a.FINPROD_ID, b.PORTFOLIO_ID, a.TRADE_PLAT,a.INV_AIM,a.BUSINESS_MODEL
             from TRD_PRODUCT_TEMP_DEAL a
             LEFT JOIN TRD_PRODUCT_TEMP_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
             WHERE 1=1
@@ -481,7 +482,7 @@
                 </foreach>
             </if>
             AND a.TRADE_DATE = #{sysDate}
-            ) GROUP BY FINPROD_ID, PORTFOLIO_ID
+            ) GROUP BY FINPROD_ID, PORTFOLIO_ID,TRADE_PLAT
         ) invaim on invaim.FINPROD_ID=TEMP.FINPROD_ID and invaim.PORTFOLIO_ID=TEMP.PORTFOLIO_ID
         lEFT JOIN FIN_PRODUCT_TYPE FPT
         on FP.FINPROD_ID = FPT.FINPROD_ID

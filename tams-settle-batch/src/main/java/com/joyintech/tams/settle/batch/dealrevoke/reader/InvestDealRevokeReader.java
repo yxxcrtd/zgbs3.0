@@ -5,6 +5,7 @@ import com.joyintech.framework.base.entity.SysBatchExecInfo;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.SettleBatchPara;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListStl;
 import com.joyintech.tams.settle.batch.datadeal.service.StlDownDataDealReaderService;
 import com.joyintech.tams.settle.batch.dealrevoke.dto.DealRevokeParamDto;
 import com.joyintech.tams.settle.batch.dealrevoke.service.InvestDealRevokeService;
@@ -119,6 +120,18 @@ public class InvestDealRevokeReader extends BaseReader<DealRevokeParamDto> {
                 // modify by etliu 20220222 end
                 revokeParamDtos.add(new DealRevokeParamDto(DictCodeListExt1.证券品种_基金.getValue(), tradeDate, portfolioIdList, fundTradeIdList, fundTotalTradeIdList,fundTradeIdMap,fundTotalTradeIdMap));
             //}
+
+                // 信用保护凭证交易撤销 add by fuyongsheng 20220517 start
+                List<String> creditTotalTradeIdList = investDealRevokeService.selectTotalTradeIdForCredit(tradeDate, portfolioIdList);
+                Map<String,String> creditTotalTradeIdMap = investDealRevokeService.getTotalTradeIdPsMap(creditTotalTradeIdList);
+                for (String totalTradeId: creditTotalTradeIdList) {
+                    if (!creditTotalTradeIdMap.containsKey(totalTradeId)) {
+                        creditTotalTradeIdMap.put(totalTradeId, totalTradeId);
+                    }
+                }
+                revokeParamDtos.add(new DealRevokeParamDto(DictCodeListStl.证券品种_信用保护凭证.getValue(), tradeDate,
+                        portfolioIdList,null, creditTotalTradeIdList,null, creditTotalTradeIdMap));
+                // 信用保护凭证交易撤销 add by fuyongsheng 20220517 end
         return revokeParamDtos;
         //mody by   meifaxin  20211028 不从画面触发，改成文件解析后触发 end
     }

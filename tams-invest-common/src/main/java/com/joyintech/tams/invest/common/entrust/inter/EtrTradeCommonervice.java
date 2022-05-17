@@ -364,9 +364,9 @@ public class EtrTradeCommonervice extends BaseService {
 
     private List<BaseMap> assemble(BigDecimal portfolioCash, BigDecimal canCash, BigDecimal realCash, BigDecimal canSec, BigDecimal realSec, PositionCashSecRequest requestDto) {
         String porUsableCash = "porUsableCash", acctNoUsableCash = "acctNoUsableCash", acctNoCanCash = "acctNoCanCash", usableAmount = "usableAmount", usableSec = "usableSec";
-        String ps= requestDto.getPtlList().get(0).getPs();
         String finprodType2 = requestDto.getPtlList().get(0).getFinprodType2();
-        if(StringUtil.equals(ps, DictCodeListExt3.交易方向_质押券入库.getValue())||StringUtil.equals(ps, DictCodeListExt3.交易方向_质押券出库.getValue())||StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())||StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())) {
+        String tradePlat = requestDto.getPtlList().get(0).getTradePlat();
+        if(StringUtil.equals(tradePlat, TempConstant.NO_TRADE_BUSINESS_ETR)||StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())||StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())) {
             canSec=canSec!=null?BigDecimal.ZERO:ArithmeticUtil.divide(canSec,new BigDecimal(100),2);
             realSec=realSec!=null?BigDecimal.ZERO:ArithmeticUtil.divide(realSec,new BigDecimal(100),2);
         }
@@ -426,7 +426,7 @@ public class EtrTradeCommonervice extends BaseService {
         String usableSecText="持仓数量（";
         if (StringUtil.isNotEmpty(requestDto.getPtlList().get(0).getFinprodType2())) {
             if (StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
-                if(StringUtil.equals(ps, DictCodeListExt3.交易方向_质押券入库.getValue())||StringUtil.equals(ps, DictCodeListExt3.交易方向_质押券出库.getValue())||StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())||StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())) {
+                if(StringUtil.equals(tradePlat, TempConstant.NO_TRADE_BUSINESS_ETR)) {
                     unit = "万元";
                 }else{
                     unit = "张";
@@ -759,7 +759,14 @@ public class EtrTradeCommonervice extends BaseService {
                 String isNetSett = "";
                 FinProductAdd finProductAdd = finProductAddMapper.selectByPrimaryKey(dto.getFinprodId());
                 if (finProductAdd != null) {
-                    isNetSett = finProductAdd.getIsNetSett();
+                    //  是否非担保
+                    String isNoGuard = finProductAdd.getIsNoGuard();
+                    // 非担保交收 = 净额结算
+                    if (StringUtil.isNotEmpty(isNoGuard) && isNoGuard.contains(DictCodeList.是否_否.getValue())) {
+                        isNetSett = DictCodeList.是否_是.getValue();
+                    }else {
+                        isNetSett = DictCodeList.是否_否.getValue();
+                    }
                     //交易端接口没有tradePlat,通过ps区分
                     if (DictCodeListExt3.交易方向_债转股.getValue().equals(dto.getPs()) || DictCodeListExt3.交易方向_配债.getValue().equals(dto.getPs())
                             || DictCodeListExt3.交易方向_质押券入库.getValue().equals(dto.getPs()) || DictCodeListExt3.交易方向_质押券出库.getValue().equals(dto.getPs())
@@ -771,11 +778,13 @@ public class EtrTradeCommonervice extends BaseService {
                             && (StringUtil.equals(dto.getTradePlat(), DictCodeList.交易平台_竞价撮合平台.getValue())
                             || StringUtil.equals(dto.getTradePlat(), DictCodeList.交易平台_固定收益平台.getValue())
                             || StringUtil.equals(dto.getTradePlat(), DictCodeList.交易平台_大宗交易平台.getValue())
+                            || StringUtil.equals(dto.getTradePlat(), DictCodeList.交易平台_新债平台.getValue())
                             || StringUtil.equals(dto.getTradePlat(), TempConstant.NO_TRADE_BUSINESS_ETR))
                             && StringUtil.equals(DictCodeListExt1.估值交易市场_上交所.getValue(), dto.getTradeMarket())) {
                         holdingType = DictCodeListExt3.资产类型_债券本方券上交所净额结算可用持仓.getValue();
                     } else if (StringUtil.equals(DictCodeList.是否_是.getValue(), isNetSett)
                             && (StringUtil.equals(dto.getTradePlat(), DictCodeList.交易平台_竞价撮合平台.getValue())
+                            || StringUtil.equals(dto.getTradePlat(), DictCodeList.交易平台_新债平台.getValue())
                             || StringUtil.equals(dto.getTradePlat(), TempConstant.NO_TRADE_BUSINESS_ETR))
                             && StringUtil.equals(DictCodeListExt1.估值交易市场_深交所.getValue(), dto.getTradeMarket())) {
                         holdingType = DictCodeListExt3.资产类型_债券本方券深交所净额结算竞价可用持仓.getValue();
@@ -785,6 +794,7 @@ public class EtrTradeCommonervice extends BaseService {
                         holdingType = DictCodeListExt3.资产类型_债券本方券深交所净额结算大宗可用持仓.getValue();
                     } else if (StringUtil.equals(DictCodeList.是否_否.getValue(), isNetSett)
                             && (StringUtil.equals(dto.getTradePlat(), DictCodeList.交易平台_固定收益平台.getValue())
+                            || StringUtil.equals(dto.getTradePlat(), DictCodeList.交易平台_新债平台.getValue())
                             || StringUtil.equals(dto.getTradePlat(), DictCodeList.交易平台_大宗交易平台.getValue())
                             || StringUtil.equals(dto.getTradePlat(), TempConstant.NO_TRADE_BUSINESS_ETR)))
                         holdingType = DictCodeListExt3.资产类型_债券本方券非净额结算可用持仓.getValue();

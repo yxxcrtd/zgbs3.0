@@ -162,6 +162,8 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
             param.put("scheduTypeList", scheduTypeList);
             List<FinBondMarketCashPlanDto> bondMarketInvRepayDtos = finBondMarketInfoQueryMapper.queryFinBondMarketCashPlan(param);
             detailQueryDto.setBondMarketInvRepayDtos(bondMarketInvRepayDtos);
+        } else {
+            detailQueryDto = finBondMarketInfoQueryMapper.queryFinProductForCoupons(secId);
         }
         return detailQueryDto;
     }

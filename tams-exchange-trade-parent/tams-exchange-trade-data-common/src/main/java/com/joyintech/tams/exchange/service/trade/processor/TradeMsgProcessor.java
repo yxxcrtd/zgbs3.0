@@ -1,11 +1,15 @@
 package com.joyintech.tams.exchange.service.trade.processor;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Strings;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.exchange.common.bean.*;
-import com.joyintech.tams.exchange.common.bean.investment.PortfolioTradeMessage;
+import com.joyintech.tams.exchange.common.bean.TerminalId;
+import com.joyintech.tams.exchange.common.bean.TrdExchangeEntrustDto;
+import com.joyintech.tams.exchange.common.bean.TrdExchangeIntegratedEntrustDto;
+import com.joyintech.tams.exchange.common.bean.WorkflowBean;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
 import com.joyintech.tams.exchange.common.db.domain.*;
@@ -14,8 +18,6 @@ import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
 import com.joyintech.tams.exchange.common.response.PortfolioCalculateResponse;
 import com.joyintech.tams.exchange.common.utils.*;
-import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailByManualMapper;
-import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailMapper;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
 import com.joyintech.tams.exchange.service.trade.management.service.InvestRiskManagement;
 import com.joyintech.tams.exchange.service.trade.management.service.ReviewManagement;
@@ -29,13 +31,11 @@ import com.joyintech.tams.exchange.service.trade.processor.delay.DelayController
 import com.joyintech.tams.exchange.service.trade.processor.delay.OrderRateController;
 import com.joyintech.tams.exchange.service.trade.processor.msg.MsgType;
 import com.joyintech.tams.exchange.service.trade.processor.others.SplitOrderHelper;
-import com.joyintech.tams.exchange.service.trade.processor.portfolio.PortfolioAssignHelper;
 import com.joyintech.tams.exchange.service.trade.processor.portfolio.PortfolioTradeMessageHelper;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgent;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgentManager;
 import com.joyintech.tams.exchange.service.trade.transaction.TransactionHelper;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +45,10 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
 import static com.joyintech.tams.exchange.common.constant.EntrustStatus.*;
@@ -388,9 +390,17 @@ public class TradeMsgProcessor {
             }
             // 可用数量
             if (instruction.volumeInstruction()) {
-                if (instruction.getEntrustNum() < instruction.getEntrustLeftAmt().longValue() + instruction.getFrozenQuantity().longValue() + entrustVolume) {
+                long leftNum = instruction.getEntrustNum() - instruction.getEntrustLeftAmt().longValue() - instruction.getFrozenQuantity().longValue();
+                if (leftNum < entrustVolume) {
                     orderInterface.setErrorCode(ErrorCode.INSTRUCTIONS_NUMBER_ERROR.value);
-                    orderInterface.setErrorMsg(ErrorCode.INSTRUCTIONS_NUMBER_ERROR.errorMsg);
+//                    orderInterface.setErrorMsg(ErrorCode.INSTRUCTIONS_NUMBER_ERROR.errorMsg);
+                    String errorMsg;
+                    if (EntrustProp.isConsultingTrade(orderInterface.getEntrustProp())) {
+                        errorMsg = StrUtil.format("委托数量{}万元>指令剩余数量{}万元", NumberUtil.div(BigDecimal.valueOf(entrustVolume), 100, 2), NumberUtil.div(BigDecimal.valueOf(leftNum), 100, 2));
+                    } else {
+                        errorMsg = StrUtil.format("委托数量{}>指令剩余数量{}", entrustVolume, leftNum);
+                    }
+                    orderInterface.setErrorMsg(errorMsg);
                     return false;
                 }
                 instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() + entrustVolume));
@@ -416,9 +426,17 @@ public class TradeMsgProcessor {
             }
         } else if (!Strings.isNullOrEmpty(ServiceApplication.INSTRUCTION_SERVICE) && EntrustUtils.isIntentionEntrust(orderInterface.getEntrustProp())) {
             if (instruction.volumeInstruction()) {
-                if (instruction.getEntrustNum() < instruction.getEntrustLeftAmt().longValue() + instruction.getFrozenQuantity().longValue() + entrustVolume) {
+                long leftNum = instruction.getEntrustNum() - instruction.getEntrustLeftAmt().longValue() - instruction.getFrozenQuantity().longValue();
+                if (leftNum < entrustVolume) {
                     orderInterface.setErrorCode(ErrorCode.INSTRUCTIONS_NUMBER_ERROR.value);
-                    orderInterface.setErrorMsg(ErrorCode.INSTRUCTIONS_NUMBER_ERROR.errorMsg);
+//                    orderInterface.setErrorMsg(ErrorCode.INSTRUCTIONS_NUMBER_ERROR.errorMsg);
+                    String errorMsg;
+                    if (EntrustProp.isConsultingTrade(orderInterface.getEntrustProp())) {
+                        errorMsg = StrUtil.format("委托数量{}万元>指令剩余数量{}万元", NumberUtil.div(BigDecimal.valueOf(entrustVolume), 100, 2), NumberUtil.div(BigDecimal.valueOf(leftNum), 100, 2));
+                    } else {
+                        errorMsg = StrUtil.format("委托数量{}>指令剩余数量{}", entrustVolume, leftNum);
+                    }
+                    orderInterface.setErrorMsg(errorMsg);
                     return false;
                 }
                 instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() + entrustVolume));

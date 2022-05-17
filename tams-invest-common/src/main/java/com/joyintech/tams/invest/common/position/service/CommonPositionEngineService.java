@@ -348,6 +348,9 @@ public class CommonPositionEngineService {
                 busiType = DictCodeListExt3.头寸业务类型_协议回购中途换券.getValue();
             }
         }
+        if (DictCodeListExt1.金融产品类型_信用保护凭证.getValue().equals(finprodType2)) {
+            busiType = DictCodeListExt3.头寸业务类型_信用保护凭证交易.getValue();
+        }
         return busiType;
     }
 
