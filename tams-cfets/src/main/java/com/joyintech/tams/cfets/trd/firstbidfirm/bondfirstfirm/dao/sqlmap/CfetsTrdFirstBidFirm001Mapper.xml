@@ -2,5 +2,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dao.CfetsTrdFirstBidFirm001Mapper">
 
+    <select id="checkDataStatus" resultType="java.lang.Integer">
+        select count(1)  from  (
+        select ENTRUST_ID from WFL_BID_ORDER_BID_PRICE
+        <where>
+            <if test="entrustId != null and entrustId != '' ">
+                ENTRUST_ID = #{entrustId}
+                /*指令代码查询*/
+            </if>
+        </where>
+        )
+    </select>
 
 </mapper>
