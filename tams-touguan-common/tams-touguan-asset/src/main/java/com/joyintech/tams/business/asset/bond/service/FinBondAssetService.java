@@ -667,6 +667,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                 invSchedule.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
                 invSchedule.setBranch(branch);
                 invSchedule.setBasis(getBasis(finInterestFactorDto.getBasis()));
+                invSchedule.setVdateUnadjust(invSchedule.getVdate());
                 finCashPlanList.add(invSchedule);
             }
         }
