@@ -24,7 +24,9 @@ import com.joyintech.tams.invest.common.redisinit.service.RiskRedisInitService;
 import com.joyintech.tams.invest.common.riskinfrds.calendar.entity.ICalendar;
 import com.joyintech.tams.invest.common.riskinfrds.calendar.service.CalendarService;
 import com.joyintech.tams.invest.common.riskinfrds.info.entity.IAssetInfo;
+import com.joyintech.tams.invest.common.riskinfrds.info.entity.IProdInfo;
 import com.joyintech.tams.invest.common.riskinfrds.info.service.AssetInfoRedisService;
+import com.joyintech.tams.invest.common.riskinfrds.info.service.ProdInfoRedisService;
 import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
 import com.joyintech.tools.collectors.JoyinCollectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +57,8 @@ public class AssetCommonUtil {
     private static AssetGenerateMapper assetGenerateMapper;
 
     private static AssetInfoRedisService assetInfoSrc;
+
+    private static ProdInfoRedisService prodInfoSrc;
 
     private static CalendarService calendarSrc;
 
@@ -200,7 +204,7 @@ public class AssetCommonUtil {
     /**
      * 获取组合信息，可自定义获取标的里各字段
      * @param func
-     * @param finProdId
+     * @param portfolioId
      * @param <R>
      * @return
      */
@@ -239,6 +243,33 @@ public class AssetCommonUtil {
         R r=null;
         if(StringUtil.isNotEmpty(iCalendar)){
             r=func.apply(iCalendar);
+        }
+        return r;
+    }
+
+    /**
+     * 获取产品信息
+     * @param prodId
+     * @param <R>
+     * @return
+     */
+    public static <R> R getProdInfo(String prodId,Function<IProdInfo,R> func) {
+        if(StringUtil.isBlank(prodId)){
+            return null;
+        }
+        IProdInfo prod = prodInfoSrc.getProdInfo(prodId);
+        if(!StringUtil.isNotEmpty(prod)) {
+            //若redis取不到从数据库取
+            ImplCond cond = new ImplCond();
+            cond.setDel(false);
+            cond.setPlateDate(DateUtil.parse(DateUtil.getSysDate()));
+            cond.setPortfIdArray(prodId);
+            redisRriter.dealPortData(cond);
+            prod = prodInfoSrc.getProdInfo(prodId);
+        }
+        R r=null;
+        if(StringUtil.isNotEmpty(prod)){
+            r=func.apply(prod);
         }
         return r;
     }
@@ -711,5 +742,15 @@ public class AssetCommonUtil {
     @Autowired(required = false)
     public void setAssetInfoRedisService(AssetInfoRedisService assetInfoSrc) {
         AssetCommonUtil.assetInfoSrc = assetInfoSrc;
+    }
+
+    @Autowired(required = false)
+    public void setProdInfoRedisService(ProdInfoRedisService prodInfoSrc) {
+        AssetCommonUtil.prodInfoSrc = prodInfoSrc;
+    }
+
+    @Autowired(required = false)
+    public void setRedisRriter(RiskRedisInitService<ImplCond> redisRriter) {
+        this.redisRriter = redisRriter;
     }
 }
