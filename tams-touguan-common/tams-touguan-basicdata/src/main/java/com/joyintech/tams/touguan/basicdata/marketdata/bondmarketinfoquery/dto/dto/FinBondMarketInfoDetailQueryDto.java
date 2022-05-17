@@ -262,6 +262,9 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     @ApiModelProperty(name = "conceptTypeStr", value = "概念板块")
     private String conceptTypeStr;
 
+    @ApiModelProperty(name = "capiIncomeFeature", value = "保本标识")
+    private String capiIncomeFeature;
+
     @ApiModelProperty(name = "finBondPayHSrcSecOptionDto", value = "行权计划信息")
     private List<FinBondPayHSrcSecOptionDto> bondPayHSrcSecOptionDtos;
 
@@ -907,5 +910,13 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
 
     public void setConceptTypeStr(String conceptTypeStr) {
         this.conceptTypeStr = conceptTypeStr;
+    }
+
+    public String getCapiIncomeFeature() {
+        return capiIncomeFeature;
+    }
+
+    public void setCapiIncomeFeature(String capiIncomeFeature) {
+        this.capiIncomeFeature = capiIncomeFeature;
     }
 }

@@ -40,12 +40,20 @@ public interface FinBondMarketInfoQueryMapper {
     List<FinBondPayHSrcSecOptionDto> queryFinBondPayHSrcSecOption(@Param("secId") String secId);
 
     /**
-     * 债券信息查询
+     * 债券信息查询（接口表）
      *
      * @param param
      * @return
      */
     FinBondMarketInfoDetailQueryDto queryFinBondMarketForCoupons(Map<String, Object> param);
+
+    /**
+     * 债券信息查询
+     *
+     * @param secId
+     * @return
+     */
+    FinBondMarketInfoDetailQueryDto queryFinProductForCoupons(@Param("secId") String secId);
 
     /**
      * 债券信息下拉框查询
