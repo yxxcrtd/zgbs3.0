@@ -284,12 +284,6 @@ public class CfetsEtrFinProductInfoResponse {
     private BigDecimal issuePrice;
 
     /**
-     * 发行方式
-     */
-    @ApiModelProperty(name = "issueClass", value = "发行方式")
-    private String issueClass;
-
-    /**
      * 发行类型
      */
     @ApiModelProperty(name = "issueStyle", value = "发行类型")
@@ -335,8 +329,14 @@ public class CfetsEtrFinProductInfoResponse {
     /**
      * 币种
      */
-    @ApiModelProperty(name = "cyy", value = "币种")
-    private String cyy;
+    @ApiModelProperty(name = "ccy", value = "币种code")
+    private String ccy;
+
+    /**
+     * 币种
+     */
+    @ApiModelProperty(name = "ccyStr", value = "币种code")
+    private String ccyStr;
 
     /**
      * 保本标识
@@ -372,13 +372,13 @@ public class CfetsEtrFinProductInfoResponse {
      * 起息日
      */
     @ApiModelProperty(name = "vdate", value = "起息日")
-    private String vdate;
+    private Date vdate;
 
     /**
      * 到期日
      */
     @ApiModelProperty(name = "mdate", value = "到期日")
-    private String mdate;
+    private Date mdate;
 
     /**
      * 利率类型
@@ -407,8 +407,15 @@ public class CfetsEtrFinProductInfoResponse {
     /**
      * 发行方式
      */
-    @ApiModelProperty(name = "issueType", value = "发行方式")
+    @ApiModelProperty(name = "issueType", value = "发行方式/募集方式")
     private String issueType;
+
+
+    /**
+     * 发行方式
+     */
+    @ApiModelProperty(name = "issueClass", value = "发行方式")
+    private String issueClass;
 
     /**
      * 息票品种
@@ -417,7 +424,7 @@ public class CfetsEtrFinProductInfoResponse {
     private String couponSpecies;
 
     public String getTitle() {
-        return title;
+        return getFinprodMarketId() + getFinprodAbbr();
     }
 
     public void setTitle(String title) {
@@ -448,7 +455,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.finprodName = finprodName;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getIssueSdate() {
         return issueSdate;
     }
@@ -457,7 +464,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.issueSdate = issueSdate;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getIssueEdate() {
         return issueEdate;
     }
@@ -466,7 +473,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.issueEdate = issueEdate;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getAssignRegdate() {
         return assignRegdate;
     }
@@ -515,7 +522,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.maxPamt = maxPamt;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getSettleDate() {
         return settleDate;
     }
@@ -524,7 +531,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.settleDate = settleDate;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getPayEdate() {
         return payEdate;
     }
@@ -549,7 +556,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.issueStyle = issueStyle;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getIssueDate() {
         return issueDate;
     }
@@ -566,7 +573,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.tenderType = tenderType;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getOnmarketDate() {
         return onmarketDate;
     }
@@ -599,14 +606,6 @@ public class CfetsEtrFinProductInfoResponse {
         this.planIssueAmt = planIssueAmt;
     }
 
-    public String getCyy() {
-        return cyy;
-    }
-
-    public void setCyy(String cyy) {
-        this.cyy = cyy;
-    }
-
     public String getSecType() {
         return secType;
     }
@@ -631,19 +630,21 @@ public class CfetsEtrFinProductInfoResponse {
         this.issuerName = issuerName;
     }
 
-    public String getVdate() {
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    public Date getVdate() {
         return vdate;
     }
 
-    public void setVdate(String vdate) {
+    public void setVdate(Date vdate) {
         this.vdate = vdate;
     }
 
-    public String getMdate() {
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    public Date getMdate() {
         return mdate;
     }
 
-    public void setMdate(String mdate) {
+    public void setMdate(Date mdate) {
         this.mdate = mdate;
     }
 
@@ -721,14 +722,6 @@ public class CfetsEtrFinProductInfoResponse {
         this.tableShows = tableShows;
     }
 
-    public String getIssueClass() {
-        return issueClass;
-    }
-
-    public void setIssueClass(String issueClass) {
-        this.issueClass = issueClass;
-    }
-
     public String getTradeMarket() {
         return tradeMarket;
     }
@@ -793,7 +786,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.bp = bp;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getListingDate() {
         return listingDate;
     }
@@ -850,7 +843,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.maxTotalTender = maxTotalTender;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getTenderSdate() {
         return tenderSdate;
     }
@@ -859,7 +852,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.tenderSdate = tenderSdate;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getTenderEdate() {
         return tenderEdate;
     }
@@ -868,7 +861,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.tenderEdate = tenderEdate;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getPayDate() {
         return payDate;
     }
@@ -877,7 +870,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.payDate = payDate;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getFirstConfirmDate() {
         return firstConfirmDate;
     }
@@ -942,6 +935,10 @@ public class CfetsEtrFinProductInfoResponse {
         return SysDataUtil.getNameFromDataDict(DictCode.发行方式, this.getIssueType());
     }
 
+    public String getIssueClassStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.发行方式, this.getIssueClass());
+    }
+
 
     public String getTenderTypeStr() {
         return SysDataUtil.getNameFromDataDict(DictCode.招标方式, this.getTenderType());
@@ -956,8 +953,8 @@ public class CfetsEtrFinProductInfoResponse {
         return SysDataUtil.getNameFromDataDict(DictCode.发行类型, this.getIssueStyle());
     }
 
-    public String getBondTypeStr(){
-        return SysDataUtil.getNameFromDataDict(DictCode.行内资产三级分类, this.getBondType());
+    public String getBondTypeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.行内资产四级分类, this.getBondType());
     }
 
     public String getFinprodType2() {
@@ -966,5 +963,29 @@ public class CfetsEtrFinProductInfoResponse {
 
     public void setFinprodType2(String finprodType2) {
         this.finprodType2 = finprodType2;
+    }
+
+    public String getCcy() {
+        return ccy;
+    }
+
+    public void setCcy(String ccy) {
+        this.ccy = ccy;
+    }
+
+    public String getCcyStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.币种, this.getCcy());
+    }
+
+    public void setCcyStr(String ccyStr) {
+        this.ccyStr = ccyStr;
+    }
+
+    public String getIssueClass() {
+        return issueClass;
+    }
+
+    public void setIssueClass(String issueClass) {
+        this.issueClass = issueClass;
     }
 }

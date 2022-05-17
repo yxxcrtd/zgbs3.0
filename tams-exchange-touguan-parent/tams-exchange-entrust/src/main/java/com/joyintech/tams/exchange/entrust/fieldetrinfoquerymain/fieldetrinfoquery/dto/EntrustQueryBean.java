@@ -418,10 +418,6 @@ public class EntrustQueryBean implements Serializable {
     }
 
     public long getEntrustVolume() {
-        // 质押券出入库 ZGCPCN-404
-        if(StringUtils.equals(getEntrustBs(), "T68") || StringUtils.equals(getEntrustBs(), "T69")){
-            return ArithmeticUtil.divide(new BigDecimal(String.valueOf(entrustVolume)),new BigDecimal("100"),2).longValue();
-        }
         return entrustVolume;
     }
 

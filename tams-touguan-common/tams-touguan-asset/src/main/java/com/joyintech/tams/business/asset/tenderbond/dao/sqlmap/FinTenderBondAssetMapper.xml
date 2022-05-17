@@ -78,6 +78,7 @@
             MCIT.CUSTOMER_NAME as debRateOrg,
             PRODUCT.REMARK as remark,
             PRODUCT.FINPROD_ID as finprodId,
+            PRODUCT.CIRCULATION_CODE as circulationCode,
             case when (PRODUCT.COUPON_SPECIES='01' and ISSUE.INT_TYPE='02' )
             then case when SDL.ITEM_VALUE is null  then null else SDL.ITEM_VALUE || '+' || to_char(ISSUE.bp * 10000 ,'FM9999999999999990.90') || 'BP' end
             else case when ISSUE.REFER_YIELD is not null then to_char(ISSUE.REFER_YIELD * 100 ,'FM9999999999999990.9000') || '%' else null end end as rate
@@ -364,7 +365,7 @@
             nvl(pri.CONTINUOUS_TENDER_LIMIT,ri.CONTINUOUS_TENDER_LIMIT) as seriYN,
             nvl(pri.MAX_TOTAL_TENDER_AMT * 100000000,ri.MAX_TOTAL_TENDER_AMT) as maxTotalTender,
             sec.RATE_TYPE as intType,
-            pri.COUPON_PAYMENT_FREQUENCY as payCycle,
+            sec.INTEREST_PAYMENT_FREQUENCY as payCycle,
             ri.BID_DATE as  tenderSdate,
             ri.BID_DATE as tenderEdate
         FROM INTERF_WIND_RELEASE_INFO ri

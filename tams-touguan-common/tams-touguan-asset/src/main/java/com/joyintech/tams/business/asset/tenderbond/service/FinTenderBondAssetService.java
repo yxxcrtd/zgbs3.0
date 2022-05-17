@@ -212,8 +212,8 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         dto.setCalModel("price");//默认计算价格
         FinProductTypeConfig config = new FinProductTypeConfig();
         config.setConfigType(DictCodeListExt2.配置类型_WIND分类.getValue());
-        config.setOutputValue1(dto.getType9());
-        config.setOutputValue2(dto.getType10());
+        config.setInputValue2(dto.getType9());
+        config.setInputValue3(dto.getType10());
         List<FinProductTypeConfig> resultTypeList = assetCommonMapper.getAssetThreeType(config);
         if(CollectionUtils.isNotEmpty(resultTypeList)) {
             dto.setType9(resultTypeList.get(0).getInputValue2());
@@ -228,7 +228,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
             }
             dto.setProductAddDto(addDto);
         }
-        dto.setCapiIncomeFeature(DictCodeList.是否_否.getValue());
+        //dto.setCapiIncomeFeature(DictCodeList.是否_否.getValue());
         dto.setIssueDto(finTenderBondAssetMapper.getProductIssueFromInterface(param));
         return dto;
     }

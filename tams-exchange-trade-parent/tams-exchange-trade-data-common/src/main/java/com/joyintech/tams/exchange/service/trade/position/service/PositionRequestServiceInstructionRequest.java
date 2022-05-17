@@ -657,13 +657,14 @@ public class PositionRequestServiceInstructionRequest {
      * @param entity 下单对象
      * @return 组合计算信息
      */
-    private List<PortfolioCalculateResponse> getCalculateList(Instruction entity) {
+    private List<PortfolioCalculateResponse> getCalculateList(PositionInstructionRequest entity) {
         // 组装下单对象
         OrderPlaceBean orderPlaceBean = new OrderPlaceBean();
         orderPlaceBean.setEntrustPrice(entity.getEntrustPrice());
         orderPlaceBean.setEntrustVolume(entity.getEntrustNum());
         orderPlaceBean.setInstructionId(entity.getEntrustId());
         orderPlaceBean.setFullPrice(entity.getFullPrice());
+        orderPlaceBean.setEntrustProp(entity.getEntrustProp());
 
         // 调用组合计算接口，得出各组合分配到的数量金额
         ResultBean resultBean = portfolioManager.queryPortfolioCalculate(orderPlaceBean, false);

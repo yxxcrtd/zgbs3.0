@@ -22,6 +22,7 @@ import com.joyintech.tams.cfets.trdconfirm.dto.*;
 import com.joyintech.tams.cfets.trdconfirm.service.CfetsTrdConfirmService;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -48,6 +49,9 @@ public class CfetsTrdConfirmController extends BaseController {
 
     @Autowired
     private CfetsTrdConfirmService cfetsTrdConfirmService;
+
+    @Autowired
+    private IPlatformDate iPlatformDate;
 
     @ApiOperation(value = "查询页面初始化参数", notes = "查询页面初始化参数")
     @PostMapping("/getPageParams")
@@ -77,6 +81,8 @@ public class CfetsTrdConfirmController extends BaseController {
         initPageParams.put("CSTP_BUSINESS_TYPE", this.getSelectDataFromDataDic(DictCode.CSTP资产类型, null));
         initPageParams.put("QUOTE_STYLE", this.getSelectDataFromDataDic(BussinessDictCode.报价方式_登记, null));
         initPageParams.put("CUSTOM_ASSET_TYPE_TWO", this.getSelectDataFromDataDic(DictCode.行内资产二级分类, null));
+        // 系统日期
+        initPageParams.put("sysDate", iPlatformDate.getSysDateStr());
         //pageId
         initPageParams.put("pageId", "CfetsTrdConfirm");
         return new Message<Map<String, Object>>(initPageParams).success();

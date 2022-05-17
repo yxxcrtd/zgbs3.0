@@ -410,7 +410,7 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
         params.setElementId(dto.getElementId());
         params.setBusinessType(BussinessDictCodeList.共同业务类型_中标结果确认.getValue());
         params.setBusinessCode(dto.getBidId());
-        String finalStr = "交易日期:" + DateUtil.format(iPlatformDate.getSysDate());
+        String finalStr = "一级申购-交易日期:" + DateUtil.format(iPlatformDate.getSysDate());
         params.setComment(entity -> finalStr);
         processParameter.setWorkFlowParameter(params);
         processParameter.setOperationType(OperationType.NEW);
