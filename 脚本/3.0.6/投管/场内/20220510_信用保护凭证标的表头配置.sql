@@ -7,7 +7,7 @@ delete from SYS_PAGE where PAGE_ID = 'CreditProtectionCertificate001';
 INSERT INTO SYS_PAGE(PAGE_ID,SYSTEM_CODE,PAGE_URL,PAGE_FILE,MENU_ID,HEIGHT,WIDTH,IS_HP_SELECT,IS_NEED_WORKFLOW,REMARK,CREATE_USER,CREATE_DEPT,CREATE_TIME,UPDATE_USER,UPDATE_TIME) VALUES ('CreditProtectionCertificate001', 'FIN', '/home.html#/bondmaintain/reditmark?a=a', 'vue', 'ASSET_MANAGEMENT_001_002_001', NULL, NULL, '02', '01', '信用保护凭证标的', 'system', NULL, SYSDATE, 'system', SYSDATE);
 
 delete from SYS_PAGE where PAGE_ID = 'CreditProtectionCertificate002';
-INSERT INTO SYS_PAGE(PAGE_ID,SYSTEM_CODE,PAGE_URL,PAGE_FILE,MENU_ID,HEIGHT,WIDTH,IS_HP_SELECT,IS_NEED_WORKFLOW,REMARK,CREATE_USER,CREATE_DEPT,CREATE_TIME,UPDATE_USER,UPDATE_TIME) VALUES ('CreditProtectionCertificate002', 'FIN', '/home.html?a=a#/approve/reditmark?a=a', 'vue', NULL, NULL, NULL, '02', '01', '信用保护凭证标的新建', 'system', NULL, SYSDATE, 'system', SYSDATE);
+INSERT INTO SYS_PAGE(PAGE_ID,SYSTEM_CODE,PAGE_URL,PAGE_FILE,MENU_ID,HEIGHT,WIDTH,IS_HP_SELECT,IS_NEED_WORKFLOW,REMARK,CREATE_USER,CREATE_DEPT,CREATE_TIME,UPDATE_USER,UPDATE_TIME) VALUES ('CreditProtectionCertificate002', 'FIN', '/home.html?a=a#/approve/newCreditProject?a=a', 'vue', NULL, NULL, NULL, '02', '01', '信用保护凭证标的新建', 'system', NULL, SYSDATE, 'system', SYSDATE);
 
 -- 插入表头配置 - 按照设计的excel目前
 delete from CFG_DATATABLE_SHOW where PAGECODE = 'CreditProtectionCertificate001';

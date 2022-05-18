@@ -67,8 +67,12 @@
                 </foreach>
                 )
             </if>
-            <if test="refEntity != null and refEntity != ''">
-                AND fpa.REF_ENTITY = #{refEntity}
+            <if test="refEntity != null and refEntity.size() > 0">
+                AND (fp.REF_ENTITY IN
+                <foreach collection="refEntity" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+                )
             </if>
             <if test="refSec != null and refSec.size() > 0">
                 AND (fpa.REF_SEC IN
@@ -77,8 +81,12 @@
                 </foreach>
                 )
             </if>
-            <if test="issueRshortStr != null and issueRshortStr != ''">
-                AND fpa.ISSUERSHORT = #{issueRshortStr}
+            <if test="issueRshortStr != null and issueRshortStr.size() > 0">
+                AND (fpa.ISSUERSHORT IN
+                <foreach collection="issueRshortStr" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+                )
             </if>
             <if test="vdateStart != null and vdateStart != ''">
                 <![CDATA[AND  fp.vdate >= TO_DATE(#{vdateStart},'YYYY-MM-DD') ]]>

@@ -43,10 +43,10 @@ public class CreditProtectionCertificate001Service extends BaseService implement
     public Page<CreditProtectionCertificateDto> selectForPage(CreditProtectionCertificateRequest request){
         Map<String, Object> pageParam = BeanUtil.object2Map(request);
         pageParam.put("finprodType2", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
-        pageParam.put("issueRshortStr", request.getIssueRshortStr()); // 创立机构
-        pageParam.put("refEntity", request.getRefEntity()); //参考实体
+        pageParam.put("issueRshortStr",StringUtil.splitToList(null, request.getIssueRshortStr())); // 创立机构
+        pageParam.put("refEntity", StringUtil.splitToList(null, request.getRefEntity())); //参考实体
         pageParam.put("finprodType", DictCodeListExt1.金融产品类型_信用保护凭证.getValue());//现金流业务类型
-        pageParam.put("finprodIdList", StringUtil.splitToList(null, request.getFinprodId()));
+        pageParam.put("finprodIdList", StringUtil.splitToList(null, request.getFinprodIdAbrr()));
         pageParam.put("refSec", StringUtil.splitToList(null, request.getRefSec())); //参考债项
         if (CollectionUtils.isNotEmpty(request.getVdate())) {
             String vdateStart = request.getVdate().get(0);
@@ -78,31 +78,35 @@ public class CreditProtectionCertificate001Service extends BaseService implement
     /**
      * 资产代码/简称查询
      *
-     * @param param
+     * @param request
      * @return
      */
-    public Page<SelectOptionDto> getFinprodIdForSelect(Map<String, Object> param) {
+    public Page<SelectOptionDto> getFinprodIdForSelect(CreditProtectionCertificateRequest request) {
+        Map<String, Object> param = BeanUtil.object2Map(request);
         param.put("finprodType2", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
         param.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
         param.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
-        PageHelper.startPage((Integer) param.get("pageNo"), (Integer) param.get("pageSize"));
-        List<SelectOptionDto> list = creditProtectionCertificateMapper.getFinprodIdForSelect(param);
-        return new Page<>(PageInfo.of(list));
+        Page<SelectOptionDto> page = super.queryForPage(request.getPageMode().getPageNo(),
+                request.getPageMode().getPageSize(),
+                () -> creditProtectionCertificateMapper.getFinprodIdForSelect(param));
+        return page;
     }
 
     /**
      * 资产代码/简称查询
      *
-     * @param param
+     * @param request
      * @return
      */
-    public Page<SelectOptionDto> findForSelect(Map<String, Object> param) {
+    public Page<SelectOptionDto> findForSelect(CreditProtectionCertificateRequest request) {
+        Map<String, Object> param = BeanUtil.object2Map(request);
         param.put("finprodType2", DictCodeListExt1.金融产品类型_债券.getValue());
         param.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
         param.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
-        PageHelper.startPage((Integer) param.get("pageNo"), (Integer) param.get("pageSize"));
-        List<SelectOptionDto> list = creditProtectionCertificateMapper.getFinprodIdForSelect(param);
-        return new Page<>(PageInfo.of(list));
+        Page<SelectOptionDto> page = super.queryForPage(request.getPageMode().getPageNo(),
+                request.getPageMode().getPageSize(),
+                () -> creditProtectionCertificateMapper.getFinprodIdForSelect(param));
+        return page;
     }
 
     @Override
