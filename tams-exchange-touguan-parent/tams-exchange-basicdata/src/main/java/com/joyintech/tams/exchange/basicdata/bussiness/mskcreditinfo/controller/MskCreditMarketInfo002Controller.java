@@ -11,37 +11,39 @@
 package com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.IDGenerator;
-import com.joyintech.framework.util.RequestUtil;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
+import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
+import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.util.ValidUtils;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest;
 import com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.service.MskCreditMarketInfoPro001Service;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
+import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Controller
@@ -52,11 +54,14 @@ public class MskCreditMarketInfo002Controller extends BaseController {
     @Autowired
     private MskCreditMarketInfoPro001Service mskCreditMarketInfoPro001Service;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String init(Model model) {
+
+
+    @ApiOperation(value="新建页面初始化参数", notes = "新建页面初始化参数")
+    @PostMapping("/getInitPageParams")
+    @ResponseBody
+    public Message<Map<String,Object>> getInitPageParams() {
+        //初始化基本信息画面数据字典
+        Map<String,Object> model = new HashMap<>();
         String secId = getParam("secid");
         String valueDate = getParam("cate");
         String valueSource = getParam("valueSource");
@@ -64,19 +69,20 @@ public class MskCreditMarketInfo002Controller extends BaseController {
         if (!WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotEmpty(workflowId)) {
             MskCreditInfoProSaveRequest dto = mskCreditMarketInfoPro001Service.getBussinessEntityByWorkflowId(
                 workflowId);
-            model.addAttribute("pageModel",dto.getPageMode());
-            model.addAttribute(GlobalConstant.ENTITY, dto);
+            model.put(GlobalConstant.ENTITY, dto);
         }
         else if (WorkFlowUtil.isNotFromToDoList() && 
             StringUtil.isNotEmpty(secId) && StringUtil.isNotEmpty(valueDate)
             && StringUtil.isNotEmpty(valueSource)) {
             //通过主键查询数据
             MskCreditInfoProSaveRequest dto = mskCreditMarketInfoPro001Service.selectByKey(
-                secId, valueDate,valueSource);
-            model.addAttribute(GlobalConstant.ENTITY, dto);
+                    secId, valueDate, valueSource);
+            model.put(GlobalConstant.ENTITY, dto);
         }
-        this.setSelectOptionToModel(model, DictCode.估值来源);
-        return super.init(model);
+        model.put("VALUE_SOURCE",this.getSelectDataFromDataDic(DictCode.估值来源, null));
+        model.put("CREDIT_TYPE",this.getSelectDataFromDataDic(DictCode.信用类型, null));
+        model.put("ibuQuoteBond_etrTable_refresh_period", CacheUtil.getSysParam("ibuQuoteBond_etrTable_refresh_period"));
+        return new Message<Map<String, Object>>(model).success();
     }
 
     /**
@@ -86,11 +92,34 @@ public class MskCreditMarketInfo002Controller extends BaseController {
      * @param result 
      * @return check结果
      */
-    @ResponseBody
+   /* @ResponseBody
     @RequestMapping("check")
     public AjaxResult check(@RequestBody @Validated({
         ValidateGroupEdit.class}) MskCreditInfoProSaveRequest dto, BindingResult result) {
         return commonCheck(result, dto.getOperateType());
+    }*/
+
+
+    /**
+     * check--保存
+     * @param dto
+     * @param result
+     * @return
+     * @see
+     * @since 1.0
+     */
+    @ApiOperation(value = "提交保存check", notes = "提交保存check")
+    @PostMapping("/check")
+    @ResponseBody
+    public Message<AjaxResult> check(@RequestBody MskCreditInfoProSaveRequest dto, BindingResult result) {
+        AjaxResult ajax = new AjaxResult();
+        /*List<ValidMessage> validList = new ArrayList<>();
+        ValidUtils.valid(dto,validList);
+        if (CollectionUtils.isNotEmpty(validList)){
+            ajax.setErrorList(validList);
+            return new Message<AjaxResult>().success().setData(ajax);
+        }*/
+        return new Message<AjaxResult>().success().setData(commonCheck(result, dto.getOperateType()));
     }
     /**
      * 保存
@@ -101,11 +130,11 @@ public class MskCreditMarketInfo002Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("save")
-    public AjaxResult save(@RequestBody @Validated({
+    public Message<AjaxResult> save(@RequestBody @Validated({
         ValidateGroupEdit.class}) MskCreditInfoProSaveRequest dto, BindingResult br)
         throws Exception {
         if (br.hasErrors()) {
-            return new AjaxResult(br);
+            return new Message<AjaxResult>().fail().setData(new AjaxResult(br));
         }
         ProcessParameter<MskCreditInfoProSaveRequest> processParameter = new ProcessParameter<MskCreditInfoProSaveRequest>();
         WorkFlowParameter<MskCreditInfoProSaveRequest> params = new WorkFlowParameter<MskCreditInfoProSaveRequest>();
@@ -118,15 +147,15 @@ public class MskCreditMarketInfo002Controller extends BaseController {
         params.setBusinessType(DictCodeList.共通业务类型_信用保护凭证行情.getValue());
 
         // 设置流程业务说明, entity即传入的dto
-        params.setComment(entity -> this.getMessage("MstCreditMarketInfo001.secid") + "(" + entity.getSecid() + ")" + "-"
-            + this.getMessage("MstCreditMarketInfo001.valueDate") + "("
-            + DateUtil.format(entity.getCdate()) + ")"+ this.getMessage("MstCreditMarketInfo001.valueSource") + "("
+        params.setComment(entity -> this.getMessage("MstCreditMarketInfo002.secid") + "(" + entity.getSecid() + ")" + "-"
+            + this.getMessage("MstCreditMarketInfo002.cdate") + "("
+            + DateUtil.format(entity.getCdate()) + ")"+ this.getMessage("MstCreditMarketInfo002.valueSource") + "("
             + entity.getValueSourceStr() + ")");
         processParameter.setWorkFlowParameter(params);
         Date sysDate = DateUtil.platDateFromCache();// 获取平台日期
         dto.setCreateTime(sysDate);
         String msg = mskCreditMarketInfoPro001Service.start(processParameter, dto);
-        return new AjaxResult(msg);
+        return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
     }
     
 }

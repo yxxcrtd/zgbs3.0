@@ -15,6 +15,7 @@ import com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCred
 import com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProRequest;
 import com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest;
 import com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.service.MskCreditMarketInfoPro001Service;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import io.swagger.annotations.Api;
@@ -54,6 +55,9 @@ public class MskCreditMarketInfo001Controller extends BaseController {
     @Autowired
     private MskCreditMarketInfoPro001Service mskCreditMarketInfoPro001Service;
 
+    @Autowired
+    private IPlatformDate iPlatformDate;
+
     /**
      * 入口
      */
@@ -63,6 +67,10 @@ public class MskCreditMarketInfo001Controller extends BaseController {
     public Message<Map<String,Object>> init() {
         Map<String, Object> model = new HashMap<>();
         model.put("VALUE_SOURCE",this.getSelectDataFromDataDic(DictCode.估值来源, null));
+        model.put("CREDIT_TYPE",this.getSelectDataFromDataDic(DictCode.信用类型, null));
+        model.put("iPlatformDate", iPlatformDate.getSysDateStr());
+        //刷新时间
+        model.put("ibuQuoteBond_etrTable_refresh_period", CacheUtil.getSysParam("ibuQuoteBond_etrTable_refresh_period"));
         return new Message<Map<String, Object>>(model).success();
     }
 
@@ -146,11 +154,11 @@ public class MskCreditMarketInfo001Controller extends BaseController {
      * @see
      * @since 1.0
      */
-
+/*
     @RequestMapping("export")
     public ResponseEntity<byte[]> export()
             throws Exception {
-        String datas = this.getParam("datas");
+        *//*String datas = this.getParam("datas");
         Map<String, Object> params= RequestUtil.getPageParam();
         List<MskCreditInfoProSaveRequest> list = null;
         if (StringUtil.isNotEmpty(datas)) {
@@ -158,8 +166,8 @@ public class MskCreditMarketInfo001Controller extends BaseController {
         }
         else {
             list = mskCreditMarketInfoPro001Service.selectAllList(params);
-        }
-        File outFile = mskCreditMarketInfoPro001Service.makeFile(
+        }*//*
+       *//* File outFile = mskCreditMarketInfoPro001Service.makeFile(
                 "/com/joyintech/tams/common/basicdata/business/mskcreditinfo/conf/export_conf.xml",
                 list);
         return ExportUtil.export(
@@ -168,9 +176,10 @@ public class MskCreditMarketInfo001Controller extends BaseController {
                         + SystemGlobalConstant.CLOSE_PARENTHESIS
                         + SystemGlobalConstant.POINT
                         + FileNameUtil.getFileExtName(outFile),
-                outFile, true);
+                outFile, true);*//*
 
-    }
+        //}
+    }*/
 
 
 }

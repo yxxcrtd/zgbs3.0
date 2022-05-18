@@ -424,6 +424,18 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             BondFinInterestFactorDto finInterestFactorDto = new BondFinInterestFactorDto();
             BeanUtil.copyPropertiesIgnoreNull(finInterestFactorDto,dto);
             finInterestFactorDto.setSpreadRate(dto.getSpreadRate());
+            if (StringUtil.equals(finInterestFactorDto.getBasis(), DictCodeList.计息基础_A_A_平均分配.getValue())){
+                finInterestFactorDto.setBasis(DictCodeList.计息基础_A_A.getValue());
+                finInterestFactorDto.setIntpayRule(DictCodeListExt1.利息分配方式_平均分配.getValue());
+            }
+            if (StringUtil.equals(finInterestFactorDto.getBasis(), DictCodeList.计息基础_A_A_按实际天数分配.getValue())){
+                finInterestFactorDto.setBasis(DictCodeList.计息基础_A_A.getValue());
+                finInterestFactorDto.setIntpayRule(DictCodeListExt1.利息分配方式_按照实际天数分配.getValue());
+            }
+            if (StringUtil.equals(finInterestFactorDto.getMarketBasis(), DictCodeList.计息基础_A_A_平均分配.getValue())
+                    || StringUtil.equals(finInterestFactorDto.getMarketBasis(), DictCodeList.计息基础_A_A_按实际天数分配.getValue())) {
+                finInterestFactorDto.setMarketBasis(DictCodeList.计息基础_A_A.getValue());
+            }
             dto.setFinInterestFactorDto(finInterestFactorDto);
             //付息信息
             BondFinPayInterestStdInfoDto finPayInterestStdInfoDto = new BondFinPayInterestStdInfoDto();
@@ -434,6 +446,12 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             map.put("cashId",dto.getInterestCashId());
             if (StringUtil.isNotEmpty(dto.getInterestCashId())) {
                 List<BondFinCashPlanDto> invScheduleList = finBondAssetMapper.selectInvScheduleList(map);
+                for (BondFinCashPlanDto invRepay: invScheduleList) {
+                    if (StringUtil.equals(invRepay.getBasis(), DictCodeList.计息基础_A_A_平均分配.getValue())
+                            || StringUtil.equals(invRepay.getBasis(), DictCodeList.计息基础_A_A_按实际天数分配.getValue())) {
+                        invRepay.setBasis(DictCodeList.计息基础_A_A.getValue());
+                    }
+                }
                 finPayInterestStdInfoDto.setInvScheduleList(invScheduleList);
                 dto.setFinPayInterestStdInfoDto(finPayInterestStdInfoDto);
             }
@@ -583,8 +601,8 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         BondFinInterestFactorDto finInterestFactorDto = dto.getFinInterestFactorDto();
         finCashCalcRule.setCalcType(finInterestFactorDto.getCalcType());
         finProduct.setCouponSpecies(finInterestFactorDto.getCouponSpecies());
-        finCashCalcRule.setBasis(getBasis(finInterestFactorDto.getBasis()));
-        finCashCalcRule.setMarketBasis(getBasis(finInterestFactorDto.getMarketBasis()));
+        finCashCalcRule.setBasis(getBasis(finInterestFactorDto.getBasis(),finInterestFactorDto.getIntpayRule()));
+        finCashCalcRule.setMarketBasis(getBasis(finInterestFactorDto.getMarketBasis(),finInterestFactorDto.getIntpayRule()));
         //零息和贴现时为画面.参考收益率；附息和利随本清，浮动利率且首次利率确定日可以取到基准利率行情时，为区间利率，否则为画面.初始利率
         if (StringUtil.equals(finInterestFactorDto.getCouponSpecies(), DictCodeList.息票品种_零息.getValue())
                 || StringUtil.equals(finInterestFactorDto.getCouponSpecies(), DictCodeList.息票品种_贴现.getValue())) {
@@ -634,7 +652,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             finRateInfo.setEffDate(dto.getVdate());
             finRateInfo.setIntType(dto.getCalcType());
             finRateInfo.setBranch(branch);
-            finRateInfo.setBasis(getBasis(finInterestFactorDto.getBasis()));
+            finRateInfo.setBasis(getBasis(finInterestFactorDto.getBasis(),finInterestFactorDto.getIntpayRule()));
             BeanUtil.copyPropertiesIgnoreNull(finRateInfo,finInterestFactorDto);
             finRateInfo.setFinprodId(dto.getFinprodId());
             finRateInfo.setFinprodType(DictCodeListExt1.金融产品类型_债券.getValue());
@@ -667,7 +685,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                 invSchedule.setFinprodType(DictCodeListExt1.金融产品类型_债券.getValue());
                 invSchedule.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
                 invSchedule.setBranch(branch);
-                invSchedule.setBasis(getBasis(finInterestFactorDto.getBasis()));
+                invSchedule.setBasis(getBasis(bondFinCashPlanDto.getBasis(),finInterestFactorDto.getIntpayRule()));
                 invSchedule.setVdateUnadjust(invSchedule.getVdate());
                 if (!StringUtil.isNotEmpty(invSchedule.getMdateUnadjust())){
                     invSchedule.setMdateUnadjust(invSchedule.getMdate());
@@ -705,7 +723,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                 invRepay.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
                 invRepay.setBranch(branch);
                 invRepay.setCashBaseamt(BigDecimal.valueOf(100));
-                invRepay.setBasis(getBasis(finInterestFactorDto.getBasis()));
+                invRepay.setBasis(getBasis(bondFinCashPlanDto.getBasis(),finInterestFactorDto.getIntpayRule()));
                 finCashPlanList.add(invRepay);
             }
         }
@@ -746,15 +764,16 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         return dto;
     }
 
-    private String getBasis(String basis) {
+    private String getBasis(String basis,String intpayRule) {
         if (StringUtil.isNotEmpty(basis)) {
             if (StringUtil.equals(basis, DictCodeList.计息基础_A_A.getValue())) {
-                if (StringUtil.equals(basis, DictCodeListExt1.利息分配方式_平均分配.getValue())) {
+                if (StringUtil.equals(intpayRule, DictCodeListExt1.利息分配方式_平均分配.getValue())) {
                     return DictCodeList.计息基础_A_A_平均分配.getValue();
                 }
-                if (StringUtil.equals(basis, DictCodeListExt1.利息分配方式_按照实际天数分配.getValue())) {
+                if (StringUtil.equals(intpayRule, DictCodeListExt1.利息分配方式_按照实际天数分配.getValue())) {
                     return DictCodeList.计息基础_A_A_按实际天数分配.getValue();
                 }
+                return basis;
             } else {
                 return basis;
             }

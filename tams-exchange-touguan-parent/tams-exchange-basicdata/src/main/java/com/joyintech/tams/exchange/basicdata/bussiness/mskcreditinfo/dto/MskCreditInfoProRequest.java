@@ -57,6 +57,17 @@ public class MskCreditInfoProRequest {
     @ApiModelProperty(name="cdateEnd",value="起息日结束日",example="2021-01-01")
     private String cdateEnd;
 
+    @ApiModelProperty(name="search",value="模糊查询使用",example="xxx")
+    private String search;
+
+    public String getSearch() {
+        return search;
+    }
+
+    public void setSearch(String search) {
+        this.search = search;
+    }
+
     public String getCdateStart() {
         return cdateStart;
     }

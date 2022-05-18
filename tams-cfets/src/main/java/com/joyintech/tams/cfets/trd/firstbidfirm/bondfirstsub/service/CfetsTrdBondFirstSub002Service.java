@@ -21,6 +21,7 @@ import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.cfets.position.service.PositionInfoService;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondMapper;
 import com.joyintech.tams.cfets.trd.bond.dto.*;
 import com.joyintech.tams.cfets.trd.bond.service.IbuQuoteBondCalService;
@@ -134,6 +135,9 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
 
     @Autowired
     private CfetsIbuQuoteBondMapper cfetsIbuQuoteBondMapper;
+
+    @Autowired
+    private PositionInfoService positionInfoService;
 
     /**
      * 认购量最小变动单位
@@ -338,7 +342,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      */
     public CfetsTrdBondFirstSubInfoDto viewPage(CfetsTrdBondFirstSubInitRequest request) {
         logger.debug("初始化申购查看页面,入参:" + JsonUtils.object2Json(request));
-        if(StringUtil.isEmpty(request.getBidId())){
+        if (StringUtil.isEmpty(request.getBidId())) {
             logger.debug("初始化申购查看页面,交易编号为空");
             return null;
         }
@@ -433,8 +437,6 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                 list.add(dto);
             }
         }
-        // 降序
-        list.sort(Comparator.comparing(CfetsTrdBondFirstSubProductDto::getAvaNum));
         // 1.按比例分配
         //按比例分配
         if (StringUtil.equals(autoRequest.getDipType(), "143")) {
@@ -1117,7 +1119,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                     status.setFinishDate(dto.getTradeDate());
                     status.setEntFinishAmt(productDto.getSubscriptionAmount());
                     status.setTrader(dto.getOurTrader());
-                    etrFinishStatusDtoMap.put(productDto.getEntrustId(),status);
+                    etrFinishStatusDtoMap.put(productDto.getEntrustId(), status);
                 }
             }
             for (Map.Entry<String, EtrFinishStatusDto> map : etrFinishStatusDtoMap.entrySet()) {
@@ -1178,6 +1180,8 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      */
     private void handleTailDifferenceSubscriptionAmount(List<CfetsTrdBondFirstSubProductDto> productDtos, BigDecimal tailDifference, BigDecimal minChangeUnit) {
         // 最大循环次数
+        // 升序
+        productDtos.sort(Comparator.comparing(CfetsTrdBondFirstSubProductDto::getAvaNum));
         int maxCycle = productDtos.size() * 30;
         while (tailDifference.compareTo(BigDecimal.ZERO) > 0 && maxCycle != 0) {
             for (CfetsTrdBondFirstSubProductDto item : productDtos) {
@@ -1577,6 +1581,32 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                     baseTradeProductDealCommService.insertPosition(finProductTradeDto);
                 }
             }
+        }
+    }
+
+    /**
+     * 获取组合头寸信息
+     *
+     * @param dto
+     * @author jiangpeng
+     * @date 2022/5/18 19:10
+     */
+    public void selectCash(CfetsTrdBondFirstSubInfoDto dto) {
+        for(CfetsTrdBondFirstSubProductDto productDto :dto.getProductDtos()) {
+            BaseMap cashMap = positionInfoService.queryTrdAvailableCash(
+                    Arrays.asList(productDto.getPortfolioId()),
+                    dto.getTradeDateStr(),
+                    null,
+                    null,
+                    null,
+                    Arrays.asList(DictCodeListExt1.资金账户类型_产品托管户.getValue()),
+                    Arrays.asList(DictCodeListExt1.资金账户类型_产品托管户.getValue()),
+                    dto.getFinprodId()
+            );
+            productDto.setCashT(cashMap.getBigDecimal("cashT"));
+            productDto.setCashT1(cashMap.getBigDecimal("cashT1"));
+            productDto.setRealCash(cashMap.getBigDecimal("realCash"));
+            productDto.setSecDesirableCash(cashMap.getBigDecimal("secDesirableCash"));
         }
     }
 }

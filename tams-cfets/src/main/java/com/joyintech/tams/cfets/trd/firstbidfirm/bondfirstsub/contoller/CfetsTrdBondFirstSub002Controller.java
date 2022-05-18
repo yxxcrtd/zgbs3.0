@@ -132,6 +132,7 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
         if (StringUtil.isNotEmpty(workflowId)) {
             CfetsTrdBondFirstSubInfoDto entity = cfetsTrdBondFirstSub002Service.getBussinessEntityByWorkflowId(workflowId);
 //            test(entity);
+            cfetsTrdBondFirstSub002Service.selectCash(entity);
             initPageParams.put(GlobalConstant.WORKFLOW_ID, workflowId);
             initPageParams.put(GlobalConstant.ENTITY, entity);
         }

@@ -15,6 +15,7 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.base.intf.DataDictItem;
 import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.security.LoginUserUtil;
@@ -1144,13 +1145,13 @@ public class CfetsEtrDispatcherService extends BaseService {
         EntrCommandDispatcherTotalDto msgdto = entrCommandDispatcherService.pushCommandMsg(param);
 
         // modify by etliu 20210203 可转债网下申购不发送交易端 start
-//        if (msgdto != null && !StringUtil.isEmptyList(msgdto.getEtr_entrust_list())) {
-//            String message = restTemplate.postForObject(ServiceApplication.ENTRUST_SERVICE_NAME
-//                    + "/EtrCommandDispatcher/pushCommandMsg", msgdto, String.class);
-//            if(StringUtil.isNotEmpty(message)){
-//                throw new BusinessException(message);
-//            }
-//        }
+        if (msgdto != null && !StringUtil.isEmptyList(msgdto.getEtr_entrust_list())) {
+            String message = restTemplate.postForObject(ServiceApplication.ENTRUST_SERVICE_NAME
+                    + "/EtrCommandDispatcher/pushCommandMsg", msgdto, String.class);
+            if(StringUtil.isNotEmpty(message)){
+                throw new BusinessException(message);
+            }
+        }
         // modify by etliu 20210203 可转债网下申购不发送交易端 end
     }
 

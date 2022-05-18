@@ -428,6 +428,8 @@ public class EtrTradeCommonervice extends BaseService {
             if (StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
                 if(StringUtil.equals(tradePlat, TempConstant.NO_TRADE_BUSINESS_ETR)) {
                     unit = "万元";
+                }else if(StringUtil.equals(tradePlat, DictCodeList.交易平台_新债平台.getValue())){
+                    unit = "万元";
                 }else{
                     unit = "张";
                 }

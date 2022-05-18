@@ -71,7 +71,7 @@ public class TradeQueryBean implements Serializable {
     private String entrustBsStr;
 
     @ApiModelProperty(value = "成交数量")
-    private long tradedVolume;
+    private BigDecimal tradedVolume;
 
     @JsonSerialize(using = DoubleSerializerUtils.class)
     @ApiModelProperty(value = "成交价格")
@@ -344,10 +344,15 @@ public class TradeQueryBean implements Serializable {
         this.tradedBalance = tradedBalance;
     }
 
-    public long getTradedVolume() {
+    public BigDecimal getTradedVolume() {
+        // 质押券出入库 ZGCPCN-404
+        if(StringUtils.equals(getEntrustBs(), "T68") || StringUtils.equals(getEntrustBs(), "T69")){
+            return ArithmeticUtil.divide(new BigDecimal(String.valueOf(tradedVolume)),new BigDecimal("100"),2);
+        }
         return tradedVolume;
     }
-    public void setTradedVolume(long tradedVolume) {
+
+    public void setTradedVolume(BigDecimal tradedVolume) {
         this.tradedVolume = tradedVolume;
     }
 

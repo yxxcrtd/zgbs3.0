@@ -2,8 +2,10 @@ package com.joyintech.tams.invest.batch.tenderbond.service;
 
 import com.google.common.collect.Lists;
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
+import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.FinProductAddMapper;
@@ -20,6 +22,9 @@ import com.joyintech.tams.invest.common.autoperiod.common.AutoPeriodCommonServic
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.valuationusemerge.WflValidInputParameter;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -61,6 +66,22 @@ public class FinTenderBondAssetBatchService {
 
     @Resource
     private JoyinbusinessCommonService joyinbusinessCommonService;
+
+    /**
+     * 是否单体服务
+     */
+    @Value("${application.micorservice.contextPath.single:false}")
+    private boolean isSingle;
+
+    @Autowired(required = false)
+    private JoyinRestTemplate restTemplate;
+
+    @Autowired(required = false)
+    @Qualifier("simpleRestTemplate")
+    protected JoyinRestTemplate simpleRestTemplate;
+
+    @Value("${application.micorservice.contextPath.tamsServer:http://tams-server}")
+    private String tamsSerever;
 
     /**
      * 上市流通
@@ -276,11 +297,26 @@ public class FinTenderBondAssetBatchService {
     private boolean autoBondCoupon(InterfPayhsrcsecinfo payhsrcsecinfo) {
         InterfPayhsrcsecinfoDto dto = new InterfPayhsrcsecinfoDto();
         dto.setSecidList(Lists.newArrayList(payhsrcsecinfo.getSecid()));
-        InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = commonAutoCouponService.autoBondCoupon(dto);
-        if (Objects.nonNull(interfPayhsrcsecinfoDto) && CollectionUtils.isNotEmpty(interfPayhsrcsecinfoDto.getErrorBondList())) {
+        //先执行校验
+        Map<String,String> paramMap = new HashMap<>();
+        paramMap.put("appearMarketId",payhsrcsecinfo.getSecid());
+        Message message = null;
+        if(isSingle) {
+            message =  simpleRestTemplate.postForObject(tamsSerever + "/asset/tenderBondAsset003/checkAddCoupons", paramMap, Message.class);
+        }else {
+            message = restTemplate.postForObject(tamsSerever + "/asset/tenderBondAsset003/checkAddCoupons", paramMap, Message.class);
+        }
+        if(Objects.isNull(message)) {
             return false;
         }
-        return true;
+        if(Objects.nonNull(message) && message.getCode().equals("000")) {
+            InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = commonAutoCouponService.autoBondCoupon(dto);
+            if (Objects.nonNull(interfPayhsrcsecinfoDto) && CollectionUtils.isNotEmpty(interfPayhsrcsecinfoDto.getErrorBondList())) {
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
