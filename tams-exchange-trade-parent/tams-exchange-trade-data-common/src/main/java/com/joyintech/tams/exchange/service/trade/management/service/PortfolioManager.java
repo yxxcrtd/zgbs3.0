@@ -575,6 +575,10 @@ public class PortfolioManager extends BaseService {
         if (EntrustUtils.isMarketPrice(instruction) && TradeUtils.isZero(entrustPrice)) {
             adjustedPrice = this.getMarketPrice(tick, entrustBs);
         }
+        // 特殊处理 质押式回购交易，将委托价格设置为100
+        if (EntrustUtils.isPledgeRepurchase(instruction)) {
+            adjustedPrice = BigDecimal.valueOf(100L);
+        }
         result.setPrice(adjustedPrice);
 
         // 过滤公平相关指令
