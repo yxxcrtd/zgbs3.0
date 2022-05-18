@@ -300,6 +300,7 @@
             T2.CROSS_MARKET_CODE CROSS_MARKET_CODE,
             T1.SUSTAINABLE_REMARK sustainableRemark,
             T5.CON_FINPROD_ID CON_FINPROD_ID,
+            T6.FINPROD_ABBR conFinprodName,
             T5.CON_VDATE CON_VDATE,
             T5.CON_PRICE CON_PRICE,
             100/T5.CON_PRICE CON_PROPORTION,
