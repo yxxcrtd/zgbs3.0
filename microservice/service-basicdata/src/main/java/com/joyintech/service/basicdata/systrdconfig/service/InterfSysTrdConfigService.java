@@ -344,7 +344,9 @@ public class InterfSysTrdConfigService{
 
     public Map<String, Object> getBidPriceConInfo(Map<String, Object> params) {
         Map<String, Object> resultMap = new HashMap<>();
-        if (params.get("ps") == null || params.get("finprodId") == null  || params.get("businessModel") == null || params.get("price") == null){
+//        if (params.get("ps") == null || params.get("finprodId") == null  || params.get("businessModel") == null || params.get("price") == null){
+        if (params.get("ps") == null || params.get("finprodId") == null  || params.get("businessModel") == null || params.get("price") == null
+                || StringUtil.isEmpty(params.get("businessModel").toString())){
             resultMap.put("status",1);
             resultMap.put("message","参数缺失");
             return resultMap;
