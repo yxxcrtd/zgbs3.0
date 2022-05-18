@@ -62,9 +62,8 @@ public class FinListedBondInfoQuery001Controller extends BaseController {
         initPageParams.put("CONCEPT_TYPE", this.getSelectDataFromDataDic(DictCode.概念标识, null));
         initPageParams.put("TENDER_TARGET", this.getSelectDataFromDataDic(DictCode.招标标的, null));
         initPageParams.put("ISSUE_STYLE", this.getSelectDataFromDataDic(DictCode.发行类型, null));
-        initPageParams.put("ISSUE_TYPE", this.getSelectDataFromDataDic(DictCode.发行方式, null));
+        initPageParams.put("ISSUE_CLASS", this.getSelectDataFromDataDic(DictCode.新债_发行方式, null));
         initPageParams.put("TENDER_TYPE", this.getSelectDataFromDataDic(DictCode.招标方式, null));
-
         //导出
         initPageParams.put("EXPORT_SHOW", CacheUtil.getSysParam("EXPORT_SHOW"));
         //刷新时间

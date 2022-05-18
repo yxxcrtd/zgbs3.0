@@ -85,10 +85,10 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     private BigDecimal issueSize;
 
     @ApiModelProperty(name = "issueDate", value = "发行日")
-    private Date issueDate;
+    private String issueDate;
 
     @ApiModelProperty(name = "eventDate", value = "缴款截止日")
-    private Date eventDate;
+    private String eventDate;
 
     @ApiModelProperty(name = "payDate", value = "缴款日")
     private Date payDate;
@@ -103,7 +103,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     private String listingCode;
 
     @ApiModelProperty(name = "interestAccrualDate", value = "首次利率确定日")
-    private Date interestAccrualDate;
+    private String interestAccrualDate;
 
     @ApiModelProperty(name = "valueDate", value = "起息日")
     private Date valueDate;
@@ -397,19 +397,19 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.issueSize = issueSize;
     }
 
-    public Date getIssueDate() {
+    public String getIssueDate() {
         return issueDate;
     }
 
-    public void setIssueDate(Date issueDate) {
+    public void setIssueDate(String issueDate) {
         this.issueDate = issueDate;
     }
 
-    public Date getEventDate() {
+    public String getEventDate() {
         return eventDate;
     }
 
-    public void setEventDate(Date eventDate) {
+    public void setEventDate(String eventDate) {
         this.eventDate = eventDate;
     }
 
@@ -437,11 +437,11 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.listingCode = listingCode;
     }
 
-    public Date getInterestAccrualDate() {
+    public String getInterestAccrualDate() {
         return interestAccrualDate;
     }
 
-    public void setInterestAccrualDate(Date interestAccrualDate) {
+    public void setInterestAccrualDate(String interestAccrualDate) {
         this.interestAccrualDate = interestAccrualDate;
     }
 
