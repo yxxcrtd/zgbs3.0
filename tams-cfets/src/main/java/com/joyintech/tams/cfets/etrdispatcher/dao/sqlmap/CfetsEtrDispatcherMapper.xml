@@ -382,7 +382,7 @@
                 OR ETR_ENTRUST.PORTFOLIO_ID IS NULL)
             </if>
             <if test="ps != null and ps!='' ">
-                AND (case
+                <!--AND (case
                 <if test="IRSType_01.equals(IRSps) or IRSType_02.equals(IRSps) or PS_T01.equals(ps)">
                     when  ETR_ENTRUST_ADD.ASSET_TYPE IN (#{ASSET_TYPE_16})
                     then  ETR_ENTRUST_ADD.BUSI_PS
@@ -392,7 +392,18 @@
                     then  ETR_ENTRUST_ADD.BUSI_PS
                 </if>
                 else  ETR_ENTRUST.PS
-                end) =#{ps}
+                end) =#{ps}-->
+                AND (
+                case
+                WHEN ETR_ENTRUST_ADD.ASSET_TYPE IN (#{ASSET_TYPE_16})
+                THEN ETR_ENTRUST_ADD.BUSI_PS
+                WHEN ETR_ENTRUST_ADD.ASSET_TYPE IN (#{ASSET_TYPE_07}, #{ASSET_TYPE_10}, #{ASSET_TYPE_12},#{ASSET_TYPE_16})
+                THEN ETR_ENTRUST_ADD.BUSI_PS
+                WHEN ETR_ENTRUST.PS IN ('T56', 'T92', 'T93','T94','T95','T96')
+                THEN ETR_ENTRUST_ADD.BUSI_PS
+                ELSE  ETR_ENTRUST.PS
+                END
+                ) = #{ps}
             </if>
             <if test="finprodType2 != null and finprodType2!='' ">
                 AND ETR_ENTRUST_ADD.ASSET_TYPE  = #{finprodType2}
