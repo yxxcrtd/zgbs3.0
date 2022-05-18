@@ -23,6 +23,7 @@ import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -84,6 +85,9 @@ public class FinAssetRateAdjValidatorService implements BeanValidator{
                         resultList.add(new ValidMessage("yield",
                             getMessage("COMMON_E_0057", getMessage("FinAssetRateAdj001.loadRate"))));
                     }
+                }
+                if(entity.getYield().compareTo(BigDecimal.ZERO)<0){
+                    resultList.add(new ValidMessage("利率输入负数时，不可提交"));
                 }
                 if(StringUtil.equals(dto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_通道.getValue())){
                   //生效日不可重复
