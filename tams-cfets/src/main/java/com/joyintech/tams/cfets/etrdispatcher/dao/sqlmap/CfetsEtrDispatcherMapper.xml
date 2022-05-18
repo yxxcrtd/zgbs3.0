@@ -480,40 +480,47 @@
     <sql id="vagueQueryWhere">
         <if test="search != null and search != '' and search !='有效' ">
             <where>
-                (sdl.ITEM_VALUE like '%' || #{search} || '%'
-                OR sdl1.ITEM_VALUE like '%' || #{search} || '%'
-                OR sdl2.ITEM_VALUE like '%' || #{search} || '%'
-                OR sdl3.ITEM_VALUE like '%' || #{search} || '%'
-                OR sdl4.ITEM_VALUE like '%' || #{search} || '%'
-                OR sdl5.ITEM_VALUE like '%' || #{search} || '%'
-                OR sdl6.ITEM_VALUE like '%' || #{search} || '%'
-                OR sdl7.ITEM_VALUE like '%' || #{search} || '%'
-                OR sdl8.ITEM_VALUE like '%' || #{search} || '%'
-                OR sdl9.ITEM_VALUE like '%' || #{search} || '%'
-                OR t.entrustId like '%' || #{search} || '%'
-                OR t.invManagerId like '%' || #{search} || '%'
-                OR t.invManagerName like '%' || #{search} || '%'
-                OR t.realName like '%' || #{search} || '%'
-                OR t.trader like '%' || #{search} || '%'
-                OR t.portfolioId like '%' || #{search} || '%'
-                OR t.portfolioName like '%' || #{search} || '%'
-                OR t.finprodMarketId like '%' || #{search} || '%'
-                OR t.finprodAbbr like '%' || #{search} || '%'
-                OR t.remark like '%' || #{search} || '%'
-                OR t.secAcctId like '%' || #{search} || '%'
-                OR t.entrustAmt||'' = #{search}
-                OR t.etrPrice||'' = #{search}
-                OR t.termDays||'' = #{search}
-                OR t.exeProgress||'' = #{search}
-                OR t.dealProgress||'' = #{search}
-                OR TO_CHAR(t.issueDate,'yyyy-MM-dd') ||''= #{search}
-                OR TO_CHAR(t.entrustDate,'yyyy-MM-dd') ||''= #{search}
-                OR TO_CHAR(t.entrustDate,'yyyy-MM-dd') ||''= #{year}||'-'||#{search}
-                OR replace(TO_CHAR(t.entrustDate,'yyyy-MM-dd'),'-','/')=#{search}
-                OR replace(TO_CHAR(t.entrustDate,'yyyy-MM-dd'),'-','/')=#{year}||'/'||#{search}
-                OR t.transmitTime = #{search}
-                OR t.transmitTimeSer = #{search}
-                )
+            <choose>
+                <when test="search.length() > 10">
+                    t.entrustId like '%' || #{search} || '%'
+                </when>
+                <otherwise>
+                    (sdl.ITEM_VALUE like '%' || #{search} || '%'
+                    OR sdl1.ITEM_VALUE like '%' || #{search} || '%'
+                    OR sdl2.ITEM_VALUE like '%' || #{search} || '%'
+                    OR sdl3.ITEM_VALUE like '%' || #{search} || '%'
+                    OR sdl4.ITEM_VALUE like '%' || #{search} || '%'
+                    OR sdl5.ITEM_VALUE like '%' || #{search} || '%'
+                    OR sdl6.ITEM_VALUE like '%' || #{search} || '%'
+                    OR sdl7.ITEM_VALUE like '%' || #{search} || '%'
+                    OR sdl8.ITEM_VALUE like '%' || #{search} || '%'
+                    OR sdl9.ITEM_VALUE like '%' || #{search} || '%'
+                    OR t.entrustId like '%' || #{search} || '%'
+                    OR t.invManagerId like '%' || #{search} || '%'
+                    OR t.invManagerName like '%' || #{search} || '%'
+                    OR t.realName like '%' || #{search} || '%'
+                    OR t.trader like '%' || #{search} || '%'
+                    OR t.portfolioId like '%' || #{search} || '%'
+                    OR t.portfolioName like '%' || #{search} || '%'
+                    OR t.finprodMarketId like '%' || #{search} || '%'
+                    OR t.finprodAbbr like '%' || #{search} || '%'
+                    OR t.remark like '%' || #{search} || '%'
+                    OR t.secAcctId like '%' || #{search} || '%'
+                    OR t.entrustAmt||'' = #{search}
+                    OR t.etrPrice||'' = #{search}
+                    OR t.termDays||'' = #{search}
+                    OR t.exeProgress||'' = #{search}
+                    OR t.dealProgress||'' = #{search}
+                    OR TO_CHAR(t.issueDate,'yyyy-MM-dd') ||''= #{search}
+                    OR TO_CHAR(t.entrustDate,'yyyy-MM-dd') ||''= #{search}
+                    OR TO_CHAR(t.entrustDate,'yyyy-MM-dd') ||''= #{year}||'-'||#{search}
+                    OR replace(TO_CHAR(t.entrustDate,'yyyy-MM-dd'),'-','/')=#{search}
+                    OR replace(TO_CHAR(t.entrustDate,'yyyy-MM-dd'),'-','/')=#{year}||'/'||#{search}
+                    OR t.transmitTime = #{search}
+                    OR t.transmitTimeSer = #{search}
+                    )
+                </otherwise>
+            </choose>
             </where>
         </if>
     </sql>

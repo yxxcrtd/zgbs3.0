@@ -121,6 +121,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                 product.setFinprodId(dto.getFinprodId());
                 product.setCirculationCode(null);
                 product.setCirculationDate(null);
+                product.setRemark(dto.getRemark());
                 finProductMapper.updateForTenderBound(product);
                 FinProductAdd productAdd = new FinProductAdd();
                 productAdd.setFinprodId(dto.getFinprodId());
@@ -223,7 +224,14 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
         return finTenderBoundAssetMapper.getByFinProductId(finprodId);
     }
 
-
+    /**
+     * 加券
+     * @param dto
+     * @return
+     */
+    public List<ValidMessage>  addCoupons(FinTenderBondAsset003Dto dto) {
+        return finBondMarketInfoQuery001Service.addCoupons(dto.getAppearMarketId());
+    }
 
     /**
      * 上市流通时校验是否可以自动加券

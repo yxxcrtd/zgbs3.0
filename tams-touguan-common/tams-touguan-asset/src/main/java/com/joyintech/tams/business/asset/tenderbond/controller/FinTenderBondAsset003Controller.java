@@ -116,7 +116,19 @@ public class FinTenderBondAsset003Controller extends BaseController {
         if (Objects.isNull(request)) {
             return Message.success("校验成功", null);
         } else {
-            return Message.fail("校验失败", request);
+            return Message.success("校验成功", request);
+        }
+    }
+
+    @ResponseBody
+    @PostMapping("/addCoupons")
+    @ApiOperation(value = "上市流通自动加券", notes = "上市流通自动加券")
+    public Message addCoupons(@RequestBody FinTenderBondAsset003Dto dto) {
+        List<ValidMessage> messageList = finTenderBoundAsset003Service.addCoupons(dto);
+        if (CollectionUtils.isEmpty(messageList)) {
+            return Message.success("加券成功", null);
+        } else {
+            return Message.fail("加券失败", messageList);
         }
     }
 
