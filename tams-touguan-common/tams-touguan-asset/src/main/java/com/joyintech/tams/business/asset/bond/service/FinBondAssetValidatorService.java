@@ -240,19 +240,22 @@ public class FinBondAssetValidatorService implements BeanValidator{
                           break;
                       }
                 }
-                List<BondFinExercisePlanDto> finExercisePlanList = dto.getFinExercisePlanList().stream().filter(item->StringUtil.equals(item.getExerciseType(),DictCodeList.行权方式_赎回.getValue())||StringUtil.equals(item.getExerciseType(),DictCodeList.行权方式_赎回.getValue())).collect(Collectors.toList());
-                if (CollectionUtils.isNotEmpty(finExercisePlanList)){
-                   boolean exerciseFlag = true;
-                   for (BondFinExercisePlanDto planDto:dto.getFinExercisePlanList()){
-                       for (BondFinExercisePlanDto planDtoTwo:finExercisePlanList) {
-                           if (DateUtil.compareDate(planDto.getActExerciseDate(),planDtoTwo.getExerciseDate()) == 0){
-                               exerciseFlag = false;
-                           }
-                       }
-                   }
-                   if (exerciseFlag){
-                       resultList.add(new ValidMessage("行权赎回/行权回售的理论行权日必须为其中一个实际计息截止日"));
-                   }
+                if(null!=dto.getFinPayInterestStdInfoDto() && null!=dto.getFinPayInterestStdInfoDto().getInvScheduleList()
+                        &&!dto.getFinPayInterestStdInfoDto().getInvScheduleList().isEmpty()) {
+                    List<BondFinExercisePlanDto> finExercisePlanList = dto.getFinExercisePlanList().stream().filter(item -> StringUtil.equals(item.getExerciseType(), DictCodeList.行权方式_赎回.getValue()) || StringUtil.equals(item.getExerciseType(), DictCodeList.行权方式_赎回.getValue())).collect(Collectors.toList());
+                    if (CollectionUtils.isNotEmpty(finExercisePlanList)) {
+                        boolean exerciseFlag = true;
+                        for (BondFinCashPlanDto planDto : dto.getFinPayInterestStdInfoDto().getInvScheduleList()) {
+                            for (BondFinExercisePlanDto planDtoTwo : finExercisePlanList) {
+                                if (DateUtil.compareDate(planDto.getMdate(), planDtoTwo.getExerciseDate()) == 0) {
+                                    exerciseFlag = false;
+                                }
+                            }
+                        }
+                        if (exerciseFlag) {
+                            resultList.add(new ValidMessage("行权赎回/行权回售的理论行权日必须为其中一个实际计息截止日"));
+                        }
+                    }
                 }
             }
         }
