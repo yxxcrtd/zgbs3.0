@@ -16,10 +16,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
@@ -65,6 +62,7 @@ public class FinListedBondInfoQuery001Controller extends BaseController {
         initPageParams.put("CONCEPT_TYPE", this.getSelectDataFromDataDic(DictCode.概念标识, null));
         initPageParams.put("TENDER_TARGET", this.getSelectDataFromDataDic(DictCode.招标标的, null));
         initPageParams.put("ISSUE_STYLE", this.getSelectDataFromDataDic(DictCode.发行类型, null));
+        initPageParams.put("ISSUE_TYPE", this.getSelectDataFromDataDic(DictCode.发行方式, null));
         initPageParams.put("TENDER_TYPE", this.getSelectDataFromDataDic(DictCode.招标方式, null));
 
         //导出
@@ -94,7 +92,9 @@ public class FinListedBondInfoQuery001Controller extends BaseController {
     @ResponseBody
     @PostMapping("/detail")
     @ApiOperation(value = "待上市债券市场加券信息查询", notes = "待上市债券市场加券信息查询")
-    public Message<FinListedBondInfoQuery001Dto> detail(@RequestBody FinListedBondInfoQueryRequest request) {
+    public Message<FinListedBondInfoQuery001Dto> detail(@RequestParam("secId") String secId) {
+        FinListedBondInfoQueryRequest request = new FinListedBondInfoQueryRequest();
+        request.setSecId(secId);
         return Message.success("success", finListedBondInfoQuery001Service.queryFinWindMarketForCoupons(request));
     }
 
