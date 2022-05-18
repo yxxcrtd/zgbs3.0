@@ -214,24 +214,26 @@
             left join (select INT_RATE_ID,row_number() over(partition by INT_RATE_ID order by INT_RATE_ID,EFF_DATE desc) as rn
             from MST_INT_RATE_INFO
             where  EFF_DATE <![CDATA[<=]]> #{sysDate,jdbcType=DATE}) miri on miri.INT_RATE_ID = fpi.INT_RATE_ID and miri.rn = 1
-            inner join
-            (
-            select listagg(bobp.PORTFOLIO_ID, ',') within group (order by bobp.BID_ID) AS portfolioId,
-            listagg(pp.PORTFOLIO_NAME, ',') within group (order by bobp.BID_ID) AS portfolioName,
-            bobp.BID_ID,
-            eed.SEC_ACCT_ID
-            from BID_ORDER_BID_PRICE bobp
-            left join ptl_portfolio pp on bobp.portfolio_id = pp.portfolio_id
-            left join ETR_ENTRUST_DETAIL eed
-            on eed.ENTRUST_ID = bobp.ENTRUST_ID and bobp.PORTFOLIO_ID = eed.PORTFOLIO_ID
-            where 1=1
+           inner join (select listagg(TEMP.PORTFOLIO_ID, ',') within group (order by TEMP.BID_ID)   AS portfolioId,
+                              listagg(TEMP.PORTFOLIO_NAME, ',') within group (order by TEMP.BID_ID) AS portfolioName,
+                              TEMP.BID_ID,
+                              TEMP.SEC_ACCT_ID
+                       from (
+                                select distinct bobp.PORTFOLIO_ID, pp.PORTFOLIO_NAME, bobp.BID_ID, eed.SEC_ACCT_ID
+                                from BID_ORDER_BID_PRICE bobp
+                                         left join ptl_portfolio pp on bobp.portfolio_id = pp.portfolio_id
+                                         left join ETR_ENTRUST_DETAIL eed
+                                                   on eed.ENTRUST_ID = bobp.ENTRUST_ID and
+                                                      bobp.PORTFOLIO_ID = eed.PORTFOLIO_ID
+                            ) TEMP
+                       where 1 = 1
             <if test="portfolioIdList != null and portfolioIdList.size() > 0">
                 AND bobp.portfolio_id in
                 <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
             </if>
-            group by bobp.BID_ID, eed.SEC_ACCT_ID
+            group by TEMP.BID_ID, TEMP.SEC_ACCT_ID
             ) deal on deal.BID_ID = bo.BID_ID
             left join stl_sec_acct_info stlinfo on deal.SEC_ACCT_ID = stlinfo.sec_acct_id
             /*left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID*/
