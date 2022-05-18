@@ -12,14 +12,19 @@ import com.joyintech.tams.exchange.period.creditprotectioncertificate.dao.Credit
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.CreditProtectionCertificatePeriod001Request;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.CreditProtectionCertificatePeriod001Response;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodSaveDto;
+import com.joyintech.tams.invest.common.trade.dao.PreTrdCommonMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
 public class CreditProtectionCertificatePeriod001Service extends CommonExportService<CreditProtectionCertificatePeriod001Response> {
+
+    @Autowired
+    private PreTrdCommonMapper preTrdCommonMapper;
 
     @Autowired
     private CreditProtectionCertificatePeriodMapper creditProtectionCertificatePeriodMapper;
@@ -51,5 +56,13 @@ public class CreditProtectionCertificatePeriod001Service extends CommonExportSer
         paramsMap.put("finprodType2",DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
         return super.queryForPageForSelectReturn(params.getPageMode().getPageNo(), params.getPageMode().getPageSize(),
                 () -> creditProtectionCertificatePeriodMapper.findFinprodId(paramsMap));
+    }
+
+    public boolean isAlreadyRevoked(String busiCode) {
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("totleTradeId", busiCode);
+        paramMap.put("YES_NO_YES", DictCodeList.是否_是.getValue());
+        paramMap.put("TRADE_STATUS_03", DictCodeListExt1.交易流程状态_撤销.getValue());
+        return preTrdCommonMapper.selectRevokedDataCount(paramMap) > 0;
     }
 }

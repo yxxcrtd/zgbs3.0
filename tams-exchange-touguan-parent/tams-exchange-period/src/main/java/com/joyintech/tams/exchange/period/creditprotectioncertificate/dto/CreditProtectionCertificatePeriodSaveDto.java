@@ -173,6 +173,47 @@ public class CreditProtectionCertificatePeriodSaveDto extends BaseEntity impleme
     @ApiModelProperty(name="softSkipMode",value="软控是否继续？Y：继续",example="Y")
     private String softSkipMode;
 
+    /**
+     * 交易场所
+     */
+    @ApiModelProperty(name="tradeMarket",value="交易场所")
+    private String tradeMarket;
+
+
+    /**
+     * 汇总数据
+     */
+    private BaseBussinessDto baseBussinessDto;
+
+    /**
+     * 明细数据
+     */
+    private List<BaseBussinessDto> baseBussinessDtos;
+
+    public BaseBussinessDto getBaseBussinessDto() {
+        return baseBussinessDto;
+    }
+
+    public void setBaseBussinessDto(BaseBussinessDto baseBussinessDto) {
+        this.baseBussinessDto = baseBussinessDto;
+    }
+
+    public List<BaseBussinessDto> getBaseBussinessDtos() {
+        return baseBussinessDtos;
+    }
+
+    public void setBaseBussinessDtos(List<BaseBussinessDto> baseBussinessDtos) {
+        this.baseBussinessDtos = baseBussinessDtos;
+    }
+
+    public String getTradeMarket() {
+        return tradeMarket;
+    }
+
+    public void setTradeMarket(String tradeMarket) {
+        this.tradeMarket = tradeMarket;
+    }
+
     public String getSoftSkipMode() {
         return softSkipMode;
     }

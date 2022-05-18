@@ -4,6 +4,7 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
@@ -12,7 +13,9 @@ import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.CreditProtectionCertificatePeriod001Request;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodSaveDto;
+import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.FinprodLinkDto;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.service.CreditProtectionCertificatePeriod001Service;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.service.CreditProtectionCertificatePeriod002Service;
 import com.joyintech.tams.invest.common.dto.period.common.BaseTotalTradeInfoDto;
@@ -20,6 +23,8 @@ import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -40,6 +45,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/exchange/period/CreditProtectionCertificate002")
 @Api(tags = "信用凭证保护凭证存续期-新建画面")
 public class CreditProtectionCertificatePeriod002Controller extends BaseController {
+
+    private static final Logger logger = LoggerFactory.getLogger(CreditProtectionCertificatePeriod002Controller.class);
 
     private final List<String> PINAN_BUSINESS_TYPE_CODES = new ArrayList<String>(4) {{
         add(DictCodeListExt1.平安业务类型_破产.getValue());
@@ -78,10 +85,9 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
         initPageParams.put(DictCode.结算方式_标的.getValue(), settleMethodOptions);
 
         //流程id
-        String workflowId = "null".equals(getParam(GlobalConstant.WORKFLOW_ID)) ? null : getParam(GlobalConstant.WORKFLOW_ID);
-        initPageParams.put("workflowId", workflowId);
-        if (StringUtil.isNotEmpty(workflowId)) {
-            CreditProtectionCertificatePeriodSaveDto dto = creditProtectionCertificatePeriod002Service.getBussinessEntityByWorkflowId(workflowId);
+        String businessCode = "null".equals(getParam("businessCode")) ? null : getParam("businessCode");
+        if (StringUtil.isNotEmpty(businessCode)) {
+            CreditProtectionCertificatePeriodSaveDto dto = creditProtectionCertificatePeriod002Service.getEntityByBusinessCode(businessCode);
             if (null != dto) {
                 initPageParams.put(GlobalConstant.ENTITY, dto);
             }
@@ -119,6 +125,18 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
             return new Message<AjaxResult>().success();
         }
         return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
+    }
+
+    @ApiOperation(value = "资产信息联动", notes = "资产信息联动")
+    @ResponseBody
+    @PostMapping("finprodIdLink")
+    public Message<FinprodLinkDto> finprodIdLink(@RequestBody CreditProtectionCertificatePeriod001Request params) {
+        try {
+            return new Message<FinprodLinkDto>(creditProtectionCertificatePeriod002Service.finprodIdLink(params));
+        } catch (Exception e) {
+            logger.error("资产信息联动异常", e);
+            return new Message<FinprodLinkDto>().fail().setMessage("资产信息联动异常");
+        }
     }
 
 

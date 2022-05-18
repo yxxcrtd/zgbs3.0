@@ -1,7 +1,9 @@
 package com.joyintech.tams.exchange.period.creditprotectioncertificate.dao;
 
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.CreditProtectionCertificatePeriod001Response;
+import com.joyintech.tams.common.base.entity.FinProduct;
+import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.*;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -22,4 +24,10 @@ public interface CreditProtectionCertificatePeriodMapper {
     List<SelectOptionDto> findBusiCode(Map<String, Object> paramsMap);
 
     List<SelectOptionDto> findFinprodId(Map<String, Object> paramsMap);
+
+    FinprodLinkDto findFinprodDetail(CreditProtectionCertificatePeriod001Request params);
+
+    CreditProtectionCertificatePeriodSaveDto getEntityByBusinessCode(@Param("businessCode") String businessCode);
+
+    List<BillingDetailsDto> getBillingDetailByBusinessCode(@Param("businessCode") String businessCode);
 }

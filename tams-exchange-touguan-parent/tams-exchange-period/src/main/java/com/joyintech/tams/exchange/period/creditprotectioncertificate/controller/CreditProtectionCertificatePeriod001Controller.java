@@ -7,6 +7,7 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.BaseExportRequest;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
@@ -159,7 +160,15 @@ public class CreditProtectionCertificatePeriod001Controller extends BaseControll
             if (!StringUtil.equals(dto.getValidStatus(), DictCodeListExt1.有效状态_有效.getValue())) {
                 return new Message<AjaxResult>().fail().setMessage("有效状态为“有效”的数据，才允许撤销！");
             }
-            //选择存在流程中撤销交易的数据。
+            if (creditProtectionCertificatePeriod001Service.isAlreadyRevoked(dto.getBusiCode())) {
+                ValidMessage validMessage = new ValidMessage(getMessage("TRD_W_0001",
+                        getMessage("pingan.common.revoke"), getMessage("pingan.common.revoke")));
+                ArrayList<ValidMessage> errorList = new ArrayList<ValidMessage>();// 生成错误集合
+                errorList.add(validMessage);
+                AjaxResult ar = new AjaxResult();
+                ar.setErrorList(errorList);
+                return new Message<AjaxResult>().success().setData(ar);
+            }
             return new Message<AjaxResult>().success().setMessage("校验通过");
         } catch (Exception e) {
             logger.error("撤回check异常", e);
@@ -177,15 +186,15 @@ public class CreditProtectionCertificatePeriod001Controller extends BaseControll
             }
             ProcessParameter<CreditProtectionCertificatePeriodSaveDto> processParameter = new ProcessParameter<>();
             WorkFlowParameter<CreditProtectionCertificatePeriodSaveDto> params = new WorkFlowParameter<>();
-            CreditProtectionCertificatePeriodSaveDto entity = creditProtectionCertificatePeriod002Service.getCheckEntity(dto.getBusiCode());
+            CreditProtectionCertificatePeriodSaveDto entity = creditProtectionCertificatePeriod002Service.getEntityByBusinessCode(dto.getBusiCode());
             params.setPageId("CreditProtectionCertificate002");
             params.setElementId("CreditProtectionCertificate002_btn_revoke");
             params.setBusinessCode(dto.getBusiCode());
             params.setBusinessType(DictCodeList.共通业务类型_信用保护凭证存续期.getValue());
             params.setComment(comment -> "业务编号:(" + dto.getBusiCode() + ")-业务类型(" + dto.getPaBussTypeStr() + ")-平台日(" + DateUtil.format(iPlatformDate.getSysDate()) + ")");
             processParameter.setWorkFlowParameter(params);
-            String msg = creditProtectionCertificatePeriod002Service.start(processParameter,entity);
-            if(StringUtil.isBlank(msg)) {
+            String msg = creditProtectionCertificatePeriod002Service.start(processParameter, entity);
+            if (StringUtil.isBlank(msg)) {
                 return new Message<AjaxResult>().setData(new AjaxResult("撤回成功"));
             }
             return new Message<AjaxResult>().setData(new AjaxResult(msg));
