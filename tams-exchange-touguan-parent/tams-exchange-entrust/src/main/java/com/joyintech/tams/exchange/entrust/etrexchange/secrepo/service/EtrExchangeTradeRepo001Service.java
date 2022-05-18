@@ -410,6 +410,7 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
                         decisionAct = 系统动作_新建.getValue();
                     }
                 }
+                entity.setSoftSkipMode("N");
                 if (StringUtil.equals("1", entity.getConfirmOk())) {
                     entity.setSoftSkipMode("Y");
                 }
