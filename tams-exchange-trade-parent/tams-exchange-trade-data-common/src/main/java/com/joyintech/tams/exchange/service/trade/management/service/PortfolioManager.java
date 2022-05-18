@@ -386,9 +386,9 @@ public class PortfolioManager extends BaseService {
             calculateResponse.setDisRate(detail.getDisRate());
             calculateResponse.setInstructionTotalAmt(detail.getEntrustAmt());
             calculateResponse.setInstructionTotalNum(detail.getEntrustNum().longValue());
-            if (Objects.nonNull(order.getFullPrice())) {
-                calculateResponse.setFullPrice(order.getFullPrice());
-            }
+            calculateResponse.setFullPrice(order.getFullPrice());
+            calculateResponse.setInstructionEntrustPrice(instruction.getEntrustPrice());
+            calculateResponse.setInstructionFullPrice(instruction.getFullPrice());
             calculateResponse.setPriceMode(instruction.getPriceMode());
             calculateResponse.setAcctNo(instruction.getAcctName());
 

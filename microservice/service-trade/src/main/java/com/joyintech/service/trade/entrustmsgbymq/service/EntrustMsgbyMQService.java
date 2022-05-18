@@ -3,6 +3,7 @@ package com.joyintech.service.trade.entrustmsgbymq.service;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.service.trade.entrustmsgbymq.dto.PortfolioTradeMessage;
 import com.joyintech.tams.common.base.dao.InfContractPortfolioDetailMapper;
 import com.joyintech.tams.common.base.entity.InfContractPortfolioDetail;
@@ -169,6 +170,11 @@ public class EntrustMsgbyMQService extends BaseService<InfContractDetailfile>{
 				detail.setEntrustAmt(portfolioMessage.getEntrustAmt());
 				detail.setEntrustNum(portfolioMessage.getEntrustNum());
 				detail.setTargetType(portfolioMessage.getTargetType());
+				detail.setCreateUser("system");// 创建用户
+				detail.setCreateDept("dept");// 创建部门
+				detail.setCreateTime(new Date());// 创建时间
+				detail.setUpdateUser("system");// 更新用户
+				detail.setUpdateTime(new Date());// 更新时间
 				infContractPortfolioDetailMapper.insertSelective(detail);
 			}
 		}
