@@ -11,9 +11,9 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.cfets.etr.bondfirstbid.controller.CfetsEtrBondFirstBid001Controller;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmEntrustRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.service.CfetsTrdFirstBidFirm001Service;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubEntrustRequest;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import io.swagger.annotations.Api;
@@ -95,7 +95,7 @@ public class CfetsTrdFirstBidFirm001Controller extends BaseController {
     @ApiOperation(value = "查询指令列表分页数据", notes = "查询指令列表分页数据")
     @PostMapping("/pageEntrust")
     @ResponseBody
-    public Message<Page<CfetsTrdFirstBidFirmEntrustDto>> pageEntrust(@RequestBody CfetsTrdBondFirstSubEntrustRequest dto) {
+    public Message<Page<CfetsTrdFirstBidFirmEntrustDto>> pageEntrust(@RequestBody CfetsTrdBondFirstBidFirmEntrustRequest dto) {
         try {
             Page<CfetsTrdFirstBidFirmEntrustDto> list = cfetsTrdFirstBidFirm001Service.pageEntrust(dto);
             return new Message<Page<CfetsTrdFirstBidFirmEntrustDto>>().success().setData(list);

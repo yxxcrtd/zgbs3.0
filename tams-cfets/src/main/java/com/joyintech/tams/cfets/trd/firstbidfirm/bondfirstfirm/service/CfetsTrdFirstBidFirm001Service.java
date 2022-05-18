@@ -5,6 +5,7 @@ import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
+import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
@@ -14,9 +15,8 @@ import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.cfets.etrdispatcher.service.CfetsEtrDispatcherService;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dao.CfetsTrdFirstBidFirm001Mapper;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmEntrustRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubEntrustDto;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubEntrustRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBondFirstSub001Service;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.entity.EtrDistribute;
@@ -25,6 +25,7 @@ import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.invest.common.component.base.entrust.impl.BaseEtrInvestInfoServiceImpl;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -131,11 +132,11 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         params.put("entrustId", entrustId);
         setParam(params);
         // 2.查询指令状态及执行进度
-        List<CfetsTrdBondFirstSubEntrustDto> cfetsTrdBondFirstSubEntrustDtos = cfetsTrdFirstBidFirm001Mapper.listEntrust(params);
-        logger.debug("查询指令状态及执行进度,结果:" + JsonUtils.object2Json(cfetsTrdBondFirstSubEntrustDtos));
+        List<CfetsTrdFirstBidFirmEntrustDto> cfetsTrdFirstBidFirmEntrustDtoList = cfetsTrdFirstBidFirm001Mapper.listEntrust(params);
+        logger.debug("查询指令状态及执行进度,结果:" + JsonUtils.object2Json(cfetsTrdFirstBidFirmEntrustDtoList));
         // 已接收且执行进度<100%的指令可以选择【放弃】接收
-        if (CollectionUtils.isNotEmpty(cfetsTrdBondFirstSubEntrustDtos)) {
-            for (CfetsTrdBondFirstSubEntrustDto item : cfetsTrdBondFirstSubEntrustDtos) {
+        if (CollectionUtils.isNotEmpty(cfetsTrdFirstBidFirmEntrustDtoList)) {
+            for (CfetsTrdFirstBidFirmEntrustDto item : cfetsTrdFirstBidFirmEntrustDtoList) {
                 if (!StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已接收.getValue())
                         && BigDecimalUtil.ACompareToB(item.getTransactioncom(), new BigDecimal(100), 2) >= 0) {
                     return "已接收且执行进度<100%的指令,才能执行放弃操作！";
@@ -200,7 +201,14 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
      * @param dto
      * @return
      */
-    public Page<CfetsTrdFirstBidFirmEntrustDto> pageEntrust(CfetsTrdBondFirstSubEntrustRequest dto) {
-        return null;
+    public Page<CfetsTrdFirstBidFirmEntrustDto> pageEntrust(CfetsTrdBondFirstBidFirmEntrustRequest dto) {
+        Map<String, Object> param = BeanUtil.object2Map(dto);
+        param.put("ISSUE_CLASS_01", DictCodeListExt4.新债_发行方式_报价发行.getValue());
+        param.put("TRADE_STATUS03", DictCodeListExt1.交易状态_撤销.getValue());
+        param.put("YN_N", DictCodeListExt1.是否_否.getValue());
+        param.put("entrustIdList",param.get("entrustIds"));
+        String loginUserId = LoginUserUtil.getUserName();
+        param.put("loginUserId", loginUserId);
+        return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsTrdFirstBidFirm001Mapper.listEntrust(param));
     }
 }
