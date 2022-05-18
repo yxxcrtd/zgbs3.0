@@ -621,7 +621,7 @@
         SELECT ROWNUM             rowNums,
                TPDA.Entrust_Id    entrustId,
                pp.PORTFOLIO_NAME  portfolioName,
-               TPD.SHARE_AMT      qtyd,
+               TPD.SHARE_AMT*100      qtyd,
                ttft1.fee_amt      jsFeeAmt,
                eed.INV_AIM  busiTypePosition,
                ssai.sec_acct_name secAcctId
