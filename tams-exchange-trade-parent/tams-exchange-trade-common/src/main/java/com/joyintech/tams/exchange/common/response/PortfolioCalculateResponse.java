@@ -31,6 +31,9 @@ public class PortfolioCalculateResponse {
     @JsonProperty("fullPrice")
     private BigDecimal fullPrice;
 
+    @JsonProperty("instructionFullPrice")
+    private BigDecimal instructionFullPrice;
+
     @JsonProperty("priceMode")
     private String priceMode;
 
@@ -48,6 +51,9 @@ public class PortfolioCalculateResponse {
 
     @JsonProperty("entrustPrice")
     private BigDecimal entrustPrice;
+
+    @JsonProperty("instructionEntrustPrice")
+    private BigDecimal instructionEntrustPrice;
 
     @JsonProperty("entrustProp")
     private String entrustProp;
@@ -187,6 +193,26 @@ public class PortfolioCalculateResponse {
         this.fullPrice = fullPrice;
     }
 
+
+    public PortfolioCalculateResponse instructionFullPrice(BigDecimal instructionFullPrice) {
+        this.instructionFullPrice = instructionFullPrice;
+        return this;
+    }
+
+    /**
+     * 全价
+     *
+     * @return fullPrice
+     */
+    @ApiModelProperty(value = "指令全价")
+    public BigDecimal getInstructionFullPrice() {
+        return instructionFullPrice;
+    }
+
+    public void setInstructionFullPrice(BigDecimal instructionFullPrice) {
+        this.instructionFullPrice = instructionFullPrice;
+    }
+
     public PortfolioCalculateResponse priceMode(String priceMode) {
         this.priceMode = priceMode;
         return this;
@@ -297,6 +323,25 @@ public class PortfolioCalculateResponse {
 
     public void setEntrustPrice(BigDecimal entrustPrice) {
         this.entrustPrice = entrustPrice;
+    }
+
+    public PortfolioCalculateResponse instructionEntrustPrice(BigDecimal instructionEntrustPrice) {
+        this.instructionEntrustPrice = instructionEntrustPrice;
+        return this;
+    }
+
+    /**
+     * 委托价格
+     *
+     * @return entrustPrice
+     */
+    @ApiModelProperty(value = "指令价格")
+    public BigDecimal getInstructionEntrustPrice() {
+        return instructionEntrustPrice;
+    }
+
+    public void setInstructionEntrustPrice(BigDecimal instructionEntrustPrice) {
+        this.instructionEntrustPrice = instructionEntrustPrice;
     }
 
     public PortfolioCalculateResponse entrustProp(String entrustProp) {
