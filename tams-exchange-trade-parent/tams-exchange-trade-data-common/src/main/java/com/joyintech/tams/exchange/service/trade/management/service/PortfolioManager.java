@@ -580,6 +580,7 @@ public class PortfolioManager extends BaseService {
         // 获取指令
         String instructionId = order.getInstructionId();
         Instruction instruction = instructionService.findById(instructionId);
+        BigDecimal orginPrice = order.getEntrustPrice();
 
         //处理委托价格
         coverPrice(instruction, order);
@@ -677,6 +678,9 @@ public class PortfolioManager extends BaseService {
             item.setDisRate(BigDecimal.ZERO.compareTo(orderVolume) == 0 ? BigDecimal.ZERO : NumberUtil.div(item.getEntrustNum(), orderVolume));
         }
 
+        // 恢复委托价格
+        recoverPrice(instruction, list, orginPrice);
+
         log.debug("queryPortfolioCalculate() called with result => 【list = {}】", JSONUtil.toJsonStr(list));
         return ResultBean.success(list);
     }
@@ -692,7 +696,7 @@ public class PortfolioManager extends BaseService {
         }
     }
 
-    private void recoverPrice(Instruction instruction, List<PortfolioCalculateResponse> list, BigDecimal price, String entrustProp) {
+    private void recoverPrice(Instruction instruction, List<PortfolioCalculateResponse> list, BigDecimal price) {
         if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())
                 && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             list.forEach(item -> item.setEntrustPrice(price));
