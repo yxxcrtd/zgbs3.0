@@ -1,226 +1,223 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper
-        namespace="com.joyintech.service.trade.investtrade.commanddispatcher.dao.EntrCommandDispatcherMapper">
+    namespace="com.joyintech.service.trade.investtrade.commanddispatcher.dao.EntrCommandDispatcherMapper">
 
-    <select id="selectList"
-            resultType="com.joyintech.service.trade.investtrade.commanddispatcher.dto.EntrCommandDispatcherDto">
+    <select id="selectList" resultType="com.joyintech.service.trade.investtrade.commanddispatcher.dto.EntrCommandDispatcherDto">
         SELECT
-        A.REMARK remark, /** 补充协议 **/
-        A.Entrust_Id entrustId,/*委托代码*/
-        A.PORTFOLIO_ID portfolioId,/*组合代码*/
-        B.PORTFOLIO_NAME PORTFOLIONAME,/**组合名称*/
-        A.FINPROD_ID FINPRODID,/**金融产品代码*/
-        CASE WHEN A.PS IN ('03','04')
-        THEN nvl(C.FINPROD_ABBR,A.FINPROD_ID)
-        ELSE C.FINPROD_ABBR END
-        FINPRODABBR,/**金融产品简称*/
-        CASE WHEN A.PS IN ('03','04')
-        THEN nvl(C.FINPROD_NAME,A.FINPROD_ID)
-        ELSE C.FINPROD_NAME END
-        FINPRODNAME,/**金融产品全称*/
-        A.FINPROD_TYPE2 FINPRODTYPE2,/**资产类型*/
-        F.DEAL_CUR_ACCT ACCTNO,/*E.ACCT_NO ACCTNO,*/ /**网点账号*/
-        E.CCY ,/**币种*/
-        E.BUSI_ACCT_NO BUSIACCTNO,/**资金账号*/
-        E.ACCT_NAME ACCTNAME,/**户名*/
-        G.SEC_ACCT_ID SECACCTID,/**证券账户代码*/
-        G.SEC_ACCT_NAME SECACCTNAME,/**证券账户名称*/
-        G.BOND_ID stockHolderNo,/**股东代码*/
-        A.TRADE_MARKET TRADEMARKET,/*交易场所*/
-        A.TRADE_PLAT TRADEPLAT,/*交易平台*/
-        NVL(C.FINPROD_MARKET_ID,A.STOCK_ID) FINPRODMARKETID,/*市场代码*/
-        A.PS, /*交易方向*/
-        CASE WHEN A.TRADE_PLAT='03'/**交易平台 = 固定收益平台*/
-        THEN
-        CASE WHEN F.DEAL_MODE='PRM05' THEN '' /*** 交易方式 = 不指定*/
-        WHEN F.DEAL_MODE='PRM07' THEN 'FI1' /*** 交易方式 = 定价申报*/
-        WHEN F.DEAL_MODE='PRM08' THEN 'FI3' /*** 交易方式 = 点击成交申报*/
-        WHEN F.DEAL_MODE='PRM13' THEN 'FI100JY' /*** 交易方式 = 可转换成交申报*/
-        WHEN F.DEAL_MODE='PRM12' THEN 'FI101JY' /*** 交易方式 = 最优价成交申报*/
-        WHEN F.DEAL_MODE='PRM14' THEN 'FI9' /*** 交易方式 = 指定对手方成交申报*/
-        ELSE '' END
-        WHEN A.TRADE_PLAT='02' /**交易平台 = 竞价交易平台*/
-        THEN F.DEAL_MODE
-        when A.TRADE_PLAT = '06'
-        THEN F.DEAL_MODE
-        ELSE /**交易平台 = 大宗交易平台 OR 交易平台 = 综合协议平台*/
-        CASE WHEN F.DEAL_MODE='PRM05' THEN '' /*** 交易方式 = 不指定*/
-        WHEN F.DEAL_MODE='PRM06' THEN 'a' /*** 交易方式 = 意向申报*/
-        WHEN F.DEAL_MODE='PRM07' THEN 'b' /*** 交易方式 = 定价申报*/
-        WHEN F.DEAL_MODE='PRM08' THEN 'e' /*** 交易方式 = 点击成交申报*/
-        WHEN F.DEAL_MODE='PRM09' THEN 'c' /*** 交易方式 = 成交申报*/
-        WHEN F.DEAL_MODE='PRM10' THEN 'AFC' /*** 交易方式 = 收盘价固定价格申报*/
-        WHEN F.DEAL_MODE='PRM11' THEN 'AFW' /*** 交易方式 = 日均价固定价格申报*/
-        ELSE '' END
-        END
-        DEALMODE,/*交易方式*/
-        A.COUNTER_ID COUNTERID,/*交易对手*/
-        T6.COUNTER_NAME counterName, /*交易对手名称*/
-        F.COUNTER_SEAT counterSeat,/**对手席位*/
-        A.COUNTER_TRADER COUNTERTRADER,/**对手方交易员*/
-        A.CONTACT_INFO CONTACTINFO,/**对手方联系方式*/
-        F.counter_org counterDealerId,/**对手方交易商代码*/
-        F.COUNTER_CON_NO appointmentNumber,/**约定号*/
-        <!--modify by etliu 20220324 start-->
-        <!--DECODE(A.TRADE_MARKET,'03',F.trade_id,'') dealNo,/**成交编号*/
+          A.REMARK remark, /** 补充协议 **/
+		  A.Entrust_Id entrustId,/*委托代码*/
+		  A.PORTFOLIO_ID portfolioId,/*组合代码*/
+		  B.PORTFOLIO_NAME PORTFOLIONAME,/**组合名称*/
+		  A.FINPROD_ID FINPRODID,/**金融产品代码*/
+		  CASE WHEN A.PS IN ('03','04')
+			THEN nvl(C.FINPROD_ABBR,A.FINPROD_ID)
+			ELSE C.FINPROD_ABBR END
+		  FINPRODABBR,/**金融产品简称*/
+		  CASE WHEN A.PS IN ('03','04')
+			THEN nvl(C.FINPROD_NAME,A.FINPROD_ID)
+			ELSE C.FINPROD_NAME END
+		  FINPRODNAME,/**金融产品全称*/
+		  A.FINPROD_TYPE2 FINPRODTYPE2,/**资产类型*/
+		  F.DEAL_CUR_ACCT ACCTNO,/*E.ACCT_NO ACCTNO,*/ /**网点账号*/
+		  E.CCY ,/**币种*/
+		  E.BUSI_ACCT_NO BUSIACCTNO,/**资金账号*/
+		  E.ACCT_NAME ACCTNAME,/**户名*/
+		  G.SEC_ACCT_ID SECACCTID,/**证券账户代码*/
+		  G.SEC_ACCT_NAME SECACCTNAME,/**证券账户名称*/
+		  G.BOND_ID stockHolderNo,/**股东代码*/
+		  A.TRADE_MARKET TRADEMARKET,/*交易场所*/
+		  A.TRADE_PLAT TRADEPLAT,/*交易平台*/
+		  NVL(C.FINPROD_MARKET_ID,A.STOCK_ID) FINPRODMARKETID,/*市场代码*/
+		  A.PS, /*交易方向*/
+		  CASE WHEN A.TRADE_PLAT='03'/**交易平台 = 固定收益平台*/
+			THEN
+				CASE WHEN F.DEAL_MODE='PRM05' THEN '' /*** 交易方式 = 不指定*/
+					WHEN F.DEAL_MODE='PRM07' THEN 'FI1' /*** 交易方式 = 定价申报*/
+					WHEN F.DEAL_MODE='PRM08' THEN 'FI3' /*** 交易方式 = 点击成交申报*/
+					WHEN F.DEAL_MODE='PRM13' THEN 'FI100JY' /*** 交易方式 = 可转换成交申报*/
+					WHEN F.DEAL_MODE='PRM12' THEN 'FI101JY' /*** 交易方式 = 最优价成交申报*/
+					WHEN F.DEAL_MODE='PRM14' THEN 'FI9' /*** 交易方式 = 指定对手方成交申报*/
+				ELSE '' END
+			WHEN A.TRADE_PLAT='02'   /**交易平台 = 竞价交易平台*/
+				THEN  F.DEAL_MODE
+		    when A.TRADE_PLAT = '06'
+		      THEN F.DEAL_MODE
+			ELSE /**交易平台 = 大宗交易平台 OR 交易平台 = 综合协议平台*/
+				CASE WHEN F.DEAL_MODE='PRM05' THEN '' /*** 交易方式 = 不指定*/
+					WHEN F.DEAL_MODE='PRM06' THEN 'a' /*** 交易方式 = 意向申报*/
+					WHEN F.DEAL_MODE='PRM07' THEN 'b' /*** 交易方式 = 定价申报*/
+					WHEN F.DEAL_MODE='PRM08' THEN 'e' /*** 交易方式 = 点击成交申报*/
+					WHEN F.DEAL_MODE='PRM09' THEN 'c' /*** 交易方式 = 成交申报*/
+					WHEN F.DEAL_MODE='PRM10' THEN 'AFC' /*** 交易方式 = 收盘价固定价格申报*/
+					WHEN F.DEAL_MODE='PRM11' THEN 'AFW' /*** 交易方式 = 日均价固定价格申报*/
+				ELSE '' END
+			END
+		  DEALMODE,/*交易方式*/
+		  A.COUNTER_ID COUNTERID,/*交易对手*/
+		  T6.COUNTER_NAME counterName, /*交易对手名称*/
+		  F.COUNTER_SEAT counterSeat,/**对手席位*/
+		  A.COUNTER_TRADER COUNTERTRADER,/**对手方交易员*/
+		  A.CONTACT_INFO CONTACTINFO,/**对手方联系方式*/
+		  F.counter_org counterDealerId,/**对手方交易商代码*/
+		  F.COUNTER_CON_NO appointmentNumber,/**约定号*/
+		  <!--modify by etliu 20220324 start-->
+		<!--DECODE(A.TRADE_MARKET,'03',F.trade_id,'') dealNo,/**成交编号*/
         DECODE(A.TRADE_MARKET,'04',F.trade_id,'')  trdMatchId,/**初始交易编号*/-->
-        F.trade_id dealNo,/**成交编号*/
-        F.trade_id trdMatchId,/**初始交易编号*/
-        <!--modify by etliu 20220324 end-->
-        F.request_id quoterefId,/**交易所请求号*/
-        A.ENTRUST_DATE tradeDate,/**委托日期*/
-        A.VDATE,/**委托开始日*/
-        A.Mdate,/**委托结束日*/
-        CASE WHEN A.FINPROD_TYPE2 ='F36' THEN A.ENTRUST_AMT ELSE DECODE(F.TARGET_TYPE, '02', A.ENTRUST_AMT, 0) END
-        entrustAmt, /**委托额度*/
-        CASE WHEN A.FINPROD_TYPE2 ='F36' THEN A.ENTRUST_NUM ELSE DECODE(F.TARGET_TYPE, '01',case when A.PS in ('T93',
-        'T94') THEN FDP.PLEDGE_NUMBER ELSE A.ENTRUST_NUM END, 0) END entrustNum, /**委托数量*/
-        A.ENTRUST_STATUS entrustStatus,/**委托状态*/
-        <!--CASE WHEN A.PS IN ('03','04','T68','T69', 'T93', 'T94', 'T95', 'T96', 'T56')
-          THEN nvl(A.PRICE,FTP.INT_RATE)*100
-          ELSE A.PRICE END
-        entrustPrice,/**委托单价*/ -->
-        nvl(A.PRICE,FTP.INT_RATE) as entrustPrice,/**委托单价*/
-        A.INV_AIM invAim,/**投资目的*/
-        F.FULL_PRICE fullPrice,/**全价*/
-        A.PRICE_MODEL priceMode,/**限价模式 */
-        FS.finishamt entrustLeftAmt,/*已完成数量*/
-        F.SETTLE_SPREED settleSpeed,/**清算速度*/
-        F.VDATE valueDate,/**起息日*/
-        F.VDATE2 valueDate2,/**起息日2*/
-        F.MDATE maturityDate,/**到期日*/
-        F.MDATE2 maturityDate2,/**到期日2*/
-        NVL( F.TERM_DAYS ,FTP.TERM) termDays,/**期限天数*/
-        F.TERM_DAYS2 termDays2,/**期限天数2*/
-        F.PURCH_TYPE purchType,/**申购类型*/
-        F.Min_Amt minAmt,/**最低成交金额*/
-        C2.FINPROD_ID tarFinprodId,/**目标金融产品代码*/
-        C2.FINPROD_ABBR tarinprodAbbr,/**目标金融产品简称*/
-        C2.FINPROD_MARKET_ID tarinprodMarketId,/**目标金融产品市场代码*/
-        H.Trader tradeId,/**交易员编号 固定收益平台直接取交易员*/
-        I.Real_Name traderName,/**交易员姓名 固定收益平台直接取交易员*/
-        I2.Real_Name invManagerId,/**投资经理*/
-        F.ASSET_TYPE assetType,/**资产类型*/
-        F.ASSET_TYPE1 assetType1,/**资产二级分类*/
-        F.ASSET_TYPE_10 assetType10,/**资产三级分类*/
-        F.ASSET_TYPE_11 assetType11,/**资产四级分类*/
-        A.Sale_Code saleCode,/*配售代码*/
-        T5.FINPROD_MARKET_ID conShareId,/*转股代码*/
-        T4.CON_PRICE conPrice,/*转股价格*/
-        F.EXP_CON_NUM conNum,/*转股数量*/
-        DECODE(H.IS_APPROVAL,'Y','1','N','0','') approverFlage,/*审批标志*/
-        --'0' approverFlage,
-        F.TRADER ourTrader, /*本方交易员*/
-        nvl(F.vpay_DATE,FTP.VPAY_DATE) vPayDate,
-        NVL(F.mpay_date,FTP.mpay_date) mPayDate,
-        F.cap_days capDays,
-        F.m_int_amt mIntAmt,
-        F.m_Trade_amt mTradeAmt,
-        F.BUSI_PS firstRepoPs,
-        CASE
-        WHEN A.ps ='T56'
-        THEN
-        CASE
-        WHEN A.COUNTER_ID=FTP.COUNTER_ID
-        THEN '0'
-        ELSE '1'
-        END
-        ELSE ''
-        END pledgeeType,
-        F.DERIVATIVE_BS_DIR derivativeBsDir,
-        F.DERIVATIVE_OC_FLAG derivativeOcFlag,
-        A.ENTRUST_CLASS,
-        F.BUSI_TYPE_POSITION busiTypeTg,
-        A.BUSINESS_MODEL,
-        A.ENTRUST_TYPE entrustBussType,EtrCommandDispatcherMapper.xml
+		  F.trade_id dealNo,/**成交编号*/
+		  F.trade_id trdMatchId,/**初始交易编号*/
+		  <!--modify by etliu 20220324 end-->
+          F.request_id quoterefId,/**交易所请求号*/
+		  A.ENTRUST_DATE tradeDate,/**委托日期*/
+		  A.VDATE,/**委托开始日*/
+		  A.Mdate,/**委托结束日*/
+		  CASE WHEN A.FINPROD_TYPE2 ='F36' THEN A.ENTRUST_AMT ELSE DECODE(F.TARGET_TYPE, '02', A.ENTRUST_AMT, 0) END entrustAmt, /**委托额度*/
+          CASE WHEN A.FINPROD_TYPE2 ='F36' THEN A.ENTRUST_NUM ELSE DECODE(F.TARGET_TYPE, '01',case when A.PS in ('T93', 'T94') THEN FDP.PLEDGE_NUMBER ELSE A.ENTRUST_NUM END, 0) END entrustNum, /**委托数量*/
+		  A.ENTRUST_STATUS entrustStatus,/**委托状态*/
+			<!--CASE WHEN A.PS IN ('03','04','T68','T69', 'T93', 'T94', 'T95', 'T96', 'T56')
+			  THEN nvl(A.PRICE,FTP.INT_RATE)*100
+			  ELSE A.PRICE END
+			entrustPrice,/**委托单价*/ -->
+		  nvl(A.PRICE,FTP.INT_RATE) as entrustPrice,/**委托单价*/
+		  A.INV_AIM invAim,/**投资目的*/
+		  F.FULL_PRICE fullPrice,/**全价*/
+		  A.PRICE_MODEL   priceMode,/**限价模式 */
+		  FS.finishamt entrustLeftAmt,/*已完成数量*/
+		  F.SETTLE_SPREED settleSpeed,/**清算速度*/
+		  F.VDATE valueDate,/**起息日*/
+		  F.VDATE2 valueDate2,/**起息日2*/
+		  F.MDATE maturityDate,/**到期日*/
+		  F.MDATE2 maturityDate2,/**到期日2*/
+          NVL( F.TERM_DAYS ,FTP.TERM) termDays,/**期限天数*/
+		  F.TERM_DAYS2  termDays2,/**期限天数2*/
+		  F.PURCH_TYPE purchType,/**申购类型*/
+		  F.Min_Amt minAmt,/**最低成交金额*/
+		  C2.FINPROD_ID tarFinprodId,/**目标金融产品代码*/
+		  C2.FINPROD_ABBR tarinprodAbbr,/**目标金融产品简称*/
+		  C2.FINPROD_MARKET_ID tarinprodMarketId,/**目标金融产品市场代码*/
+		  H.Trader tradeId,/**交易员编号 固定收益平台直接取交易员*/
+		  I.Real_Name traderName,/**交易员姓名 固定收益平台直接取交易员*/
+          I2.Real_Name invManagerId,/**投资经理*/
+		  F.ASSET_TYPE assetType,/**资产类型*/
+		  F.ASSET_TYPE1 assetType1,/**资产二级分类*/
+		  F.ASSET_TYPE_10 assetType10,/**资产三级分类*/
+		  F.ASSET_TYPE_11 assetType11,/**资产四级分类*/
+		  A.Sale_Code saleCode,/*配售代码*/
+		  T5.FINPROD_MARKET_ID conShareId,/*转股代码*/
+		  T4.CON_PRICE conPrice,/*转股价格*/
+		  F.EXP_CON_NUM conNum,/*转股数量*/
+		  DECODE(H.IS_APPROVAL,'Y','1','N','0','') approverFlage,/*审批标志*/
+		  --'0' approverFlage,
+		  F.TRADER  ourTrader, /*本方交易员*/
+		  nvl(F.vpay_DATE,FTP.VPAY_DATE) vPayDate,
+          NVL(F.mpay_date,FTP.mpay_date) mPayDate,
+          F.cap_days capDays,
+          F.m_int_amt mIntAmt,
+          F.m_Trade_amt mTradeAmt,
+          F.BUSI_PS firstRepoPs,
+		CASE
+		    WHEN A.ps ='T56'
+		    THEN
+                CASE
+                    WHEN A.COUNTER_ID=FTP.COUNTER_ID
+                    THEN '0'
+                    ELSE '1'
+                END
+		    ELSE ''
+		END pledgeeType,
+		F.DERIVATIVE_BS_DIR derivativeBsDir,
+		F.DERIVATIVE_OC_FLAG derivativeOcFlag,
+		A.ENTRUST_CLASS,
+		F.BUSI_TYPE_POSITION busiTypeTg,
+		A.BUSINESS_MODEL,
+		A.ENTRUST_TYPE entrustBussType,
         F.PRICE_TYPE priceType,
         F.TARGET_TYPE targetType,
-        FRA.IS_NO_GUARD isNoGuard,
+		FRA.IS_NO_GUARD isNoGuard,
         decode(F.PRICE_TYPE,'01','Y','02','N','') isNetPrice,
-        nvl(A.BUSINESS_MODEL,A.INV_AIM) businessModel
-        FROM ETR_ENTRUST A
-        LEFT JOIN PTL_PORTFOLIO B ON A.PORTFOLIO_ID=B.PORTFOLIO_ID
-        LEFT JOIN FIN_PRODUCT C ON A.FINPROD_ID=C.FINPROD_ID
-        LEFT JOIN FIN_PRODUCT_ADD FRA ON FRA.FINPROD_ID = A.FINPROD_ID
-        LEFT JOIN ETR_ENTRUST_ADD F ON A.ENTRUST_ID = F.ENTRUST_ID
-        left join TRD_PRODUCT_DEAL tpd on tpd.F_TRADE_ID = F.TRADE_ID
-        LEFT JOIN FIN_DEAL_PLEDGE FDP ON tpd.FINPROD_ID = FDP.FINPROD_ID
-        LEFT JOIN FIN_TRADE_PRODUCT FTP ON tpd.FINPROD_ID = FTP.FINPROD_ID
-        LEFT JOIN STL_SEC_ACCT_INFO G ON F.SEC_ACCT_ID = G.SEC_ACCT_ID
-        LEFT JOIN STL_CAPACCT_INFO E ON F.DEAL_CUR_ACCT = E.ACCT_NO
-        LEFT JOIN ETR_DISTRIBUTE H ON A.ENTRUST_ID=H.ENTRUST_ID
-        LEFT JOIN Sys_User I ON H.TRADER=I.USER_NAME
+		nvl(A.BUSINESS_MODEL,A.INV_AIM) businessModel
+		FROM ETR_ENTRUST A
+		LEFT JOIN PTL_PORTFOLIO B ON A.PORTFOLIO_ID=B.PORTFOLIO_ID
+		LEFT JOIN FIN_PRODUCT C ON A.FINPROD_ID=C.FINPROD_ID
+		LEFT JOIN FIN_PRODUCT_ADD FRA ON FRA.FINPROD_ID = A.FINPROD_ID
+		LEFT JOIN ETR_ENTRUST_ADD F ON A.ENTRUST_ID = F.ENTRUST_ID
+		left join TRD_PRODUCT_DEAL tpd on tpd.F_TRADE_ID = F.TRADE_ID
+		LEFT JOIN FIN_DEAL_PLEDGE FDP ON tpd.FINPROD_ID = FDP.FINPROD_ID
+		LEFT JOIN FIN_TRADE_PRODUCT FTP ON tpd.FINPROD_ID = FTP.FINPROD_ID
+		LEFT JOIN STL_SEC_ACCT_INFO G ON F.SEC_ACCT_ID = G.SEC_ACCT_ID
+		LEFT JOIN STL_CAPACCT_INFO E ON F.DEAL_CUR_ACCT = E.ACCT_NO
+		LEFT JOIN ETR_DISTRIBUTE H ON A.ENTRUST_ID=H.ENTRUST_ID
+		LEFT JOIN Sys_User I ON H.TRADER=I.USER_NAME
         LEFT JOIN Sys_User I2 ON A.INV_MANAGER_ID=I2.USER_NAME
-        LEFT JOIN FIN_PRODUCT C2 ON F.R_FINPROD_ID=C2.FINPROD_ID
-        LEFT JOIN FIN_PRODUCT_CONVERTIBLE T4 ON A.FINPROD_ID = T4.FINPROD_ID
-        LEFT JOIN FIN_PRODUCT T5 ON T4.CON_FINPROD_ID = T5.FINPROD_ID
-        LEFT JOIN MST_COUNTER_PARTY T6 ON A.COUNTER_ID = T6.COUNTER_ID
-        -- LEFT JOIN FIN_PRODUCT_TYPE_CONFIG btm
-        -- ON ( A.FINPROD_TYPE2 = btm.INPUT_VALUE_2 OR btm.INPUT_VALUE_2 IS NULL)
-        -- AND ( A.Ps = btm.INPUT_VALUE_3 OR btm.INPUT_VALUE_3 IS NULL)
-        -- AND ( A.TRADE_PLAT = btm.INPUT_VALUE_1 OR btm.INPUT_VALUE_1 IS NULL)
-        LEFT JOIN (
-        select
-        entrust_id,
-        NVL(sum(finish_amt),0) finishamt
-        from etr_finish_status
-        group by entrust_id
-        )FS ON FS.entrust_id = A.ENTRUST_ID
+		LEFT JOIN FIN_PRODUCT C2 ON F.R_FINPROD_ID=C2.FINPROD_ID
+		LEFT JOIN FIN_PRODUCT_CONVERTIBLE T4 ON A.FINPROD_ID = T4.FINPROD_ID
+		LEFT JOIN FIN_PRODUCT T5 ON T4.CON_FINPROD_ID = T5.FINPROD_ID
+		LEFT JOIN MST_COUNTER_PARTY T6 ON A.COUNTER_ID = T6.COUNTER_ID
+-- 		LEFT JOIN FIN_PRODUCT_TYPE_CONFIG btm
+-- 		     ON ( A.FINPROD_TYPE2 = btm.INPUT_VALUE_2 OR  btm.INPUT_VALUE_2 IS NULL)
+-- 			AND ( A.Ps = btm.INPUT_VALUE_3 OR  btm.INPUT_VALUE_3 IS NULL)
+-- 			AND ( A.TRADE_PLAT = btm.INPUT_VALUE_1 OR  btm.INPUT_VALUE_1 IS NULL)
+		LEFT JOIN (
+		     select
+		          entrust_id,
+		          NVL(sum(finish_amt),0) finishamt
+		     from etr_finish_status
+		     group by entrust_id
+		)FS ON FS.entrust_id = A.ENTRUST_ID
         <where>
-            AND A.TRADE_MARKET in ('03','04','12')
-            <!-- add by etliu 20210203 可转债网下申购不发送交易端 start -->
-            and (F.PURCH_MODLE is null or F.PURCH_MODLE != '02')
-            <!-- add by etliu 20210203 可转债网下申购不发送交易端 end -->
+        	AND A.TRADE_MARKET in ('03','04','12')
+        	<!-- add by etliu 20210203 可转债网下申购不发送交易端 start -->
+        	and (F.PURCH_MODLE is null or F.PURCH_MODLE != '02')
+        	<!-- add by etliu 20210203 可转债网下申购不发送交易端 end -->
             <if test="entrustId !=null and entrustId !='' ">
                 AND A.Entrust_Id in
-                <foreach collection="entrustId.split(',')" item="item" open="(" separator="," close=")">
+ 				<foreach collection="entrustId.split(',')" item="item" open="(" separator="," close=")">
                     #{item}
                 </foreach>
             </if>
         </where>
     </select>
 
-    <select id="queryEtrPledgeListByEtrId"
-            resultType="com.joyintech.service.trade.investtrade.commanddispatcher.dto.EntrTradePledgeDto">
-        SELECT A.ENTRUST_ID         entrustId,/*委托代码*/
-               A.FINPROD_ID         finprodId,/*金融产品代码*/
-               C.FINPROD_ABBR       finprodAbbr,/*金融产品简称*/
-               C.TRADE_MARKET       tradeMarket,/*交易场所*/
-               C.FINPROD_MARKET_ID  finprodMarketId,/*市场代码*/
-               A.PLEDGE_FACE_VALUE  pledgeFaceValue,/*质押面值*/
-               A.Pledge_Number      pledgeNumber,/*质押数量*/
-               A.PLEDGE_RATIO       pledgeRatio,/*质押率*/
-               A.PLEDGE_AMT         pledgeAmt,/*质押金额*/
-               A1.FINPROD_ID        oldFinprodId,/*金融产品代码*/
-               C1.FINPROD_ABBR      oldFinprodAbbr,/*金融产品简称*/
-               C1.TRADE_MARKET      oldTradeMarket,/*交易场所*/
-               C1.FINPROD_MARKET_ID oldFinprodMarketId,/*市场代码*/
-               A1.PLEDGE_FACE_VALUE oldPledgeFaceValue,/*质押面值*/
-               A1.Pledge_Number     oldPledgeNumber,/*质押数量*/
-               A1.PLEDGE_RATIO      oldPledgeRatio,/*质押率*/
-               A1.PLEDGE_AMT        oldPledgeAmt/*质押金额*/
-        FROM ETR_PLEDGE A
-                 LEFT JOIN FIN_PRODUCT C ON A.FINPROD_ID = C.FINPROD_ID
-                 LEFT JOIN ETR_ENTRUST E ON E.ENTRUST_ID = A.ENTRUST_ID AND E.PS = 'T94'
-                 LEFT JOIN ETR_ENTRUST_ADD F ON F.ENTRUST_ID = E.ENTRUST_ID
-                 left join TRD_PRODUCT_DEAL tpd on tpd.F_TRADE_ID = F.trade_id
-                 LEFT JOIN FIN_DEAL_PLEDGE A1 ON A1.FINPROD_ID = tpd.FINPROD_ID AND A1.BRANCH = 0
-                 LEFT JOIN FIN_PRODUCT C1 ON A1.PLEDGE_FINPROD_ID = C1.FINPROD_ID
-        WHERE A.ENTRUST_ID = #{entrustId}
-    </select>
+   <select id="queryEtrPledgeListByEtrId" resultType="com.joyintech.service.trade.investtrade.commanddispatcher.dto.EntrTradePledgeDto">
+   		SELECT
+	        A.ENTRUST_ID entrustId,/*委托代码*/
+	        A.FINPROD_ID finprodId,/*金融产品代码*/
+	        C.FINPROD_ABBR finprodAbbr,/*金融产品简称*/
+	        C.TRADE_MARKET  tradeMarket,/*交易场所*/
+	        C.FINPROD_MARKET_ID finprodMarketId,/*市场代码*/
+	        A.PLEDGE_FACE_VALUE  pledgeFaceValue,/*质押面值*/
+	        A.Pledge_Number pledgeNumber,/*质押数量*/
+	        A.PLEDGE_RATIO  pledgeRatio,/*质押率*/
+	        A.PLEDGE_AMT pledgeAmt,/*质押金额*/
+	        A1.FINPROD_ID oldFinprodId,/*金融产品代码*/
+            C1.FINPROD_ABBR oldFinprodAbbr,/*金融产品简称*/
+            C1.TRADE_MARKET  oldTradeMarket,/*交易场所*/
+            C1.FINPROD_MARKET_ID oldFinprodMarketId,/*市场代码*/
+            A1.PLEDGE_FACE_VALUE  oldPledgeFaceValue,/*质押面值*/
+            A1.Pledge_Number oldPledgeNumber,/*质押数量*/
+            A1.PLEDGE_RATIO  oldPledgeRatio,/*质押率*/
+            A1.PLEDGE_AMT oldPledgeAmt/*质押金额*/
+	    FROM
+	    ETR_PLEDGE A
+	    LEFT JOIN FIN_PRODUCT C ON A.FINPROD_ID=C.FINPROD_ID
+        LEFT JOIN ETR_ENTRUST E ON E.ENTRUST_ID =  A.ENTRUST_ID AND E.PS = 'T94'
+        LEFT JOIN ETR_ENTRUST_ADD F ON F.ENTRUST_ID = E.ENTRUST_ID
+		left join TRD_PRODUCT_DEAL tpd on tpd.F_TRADE_ID = F.trade_id
+        LEFT JOIN FIN_DEAL_PLEDGE A1 ON A1.FINPROD_ID = tpd.FINPROD_ID AND A1.BRANCH = 0
+        LEFT JOIN FIN_PRODUCT C1 ON A1.PLEDGE_FINPROD_ID=C1.FINPROD_ID
+	    WHERE A.ENTRUST_ID = #{entrustId}
+   </select>
 
-    <select id="selectEtrDetailList"
-            resultType="com.joyintech.service.trade.investtrade.commanddispatcher.dto.EtrEntrustDetailDto">
-        SELECT
-        A.*,B.PORTFOLIO_NAME
-        FROM ETR_ENTRUST_DETAIL A
-        LEFT JOIN PTL_PORTFOLIO B ON A.PORTFOLIO_ID=B.PORTFOLIO_ID
-        WHERE
-        A.ENTRUST_ID in
-        <foreach collection="entrustId.split(',')" item="item" open="(" separator="," close=")">
-            #{item}
-        </foreach>
-    </select>
+	<select id="selectEtrDetailList" resultType="com.joyintech.service.trade.investtrade.commanddispatcher.dto.EtrEntrustDetailDto">
+		SELECT
+		A.*,B.PORTFOLIO_NAME
+		FROM ETR_ENTRUST_DETAIL A
+		LEFT JOIN PTL_PORTFOLIO B ON A.PORTFOLIO_ID=B.PORTFOLIO_ID
+		WHERE
+		A.ENTRUST_ID in
+		<foreach collection="entrustId.split(',')" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
 
 </mapper>
