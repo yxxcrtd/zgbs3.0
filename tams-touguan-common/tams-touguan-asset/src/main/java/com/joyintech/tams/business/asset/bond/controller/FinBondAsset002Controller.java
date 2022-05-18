@@ -415,7 +415,7 @@ public class FinBondAsset002Controller extends BaseController{
             //是否属于139000-139999代码段债券
             if(pattern.matcher(secid).matches()) {
                 Long l = Long.parseLong(secid);
-                if ((l > 139000 && l < 139999) || (l > 123000 && l < 123499)) {
+                if ((l >= 139000 && l <= 139999) || (l >= 123000 && l <= 123499)) {
                     settleFlag = true;
                 }
             }
