@@ -283,7 +283,7 @@
             T1.VDATE VDATE,
             T1.MDATE MDATE,
             T1.DELISTING_DATE delistingDate,
-            NVl(T1.ISSUE_AMT,0)/100000000 ISSUE_AMT,
+            NVl(T1.ISSUE_AMT,0) ISSUE_AMT,
             T1.ISSUER ISSUER,
             T3.TYPE_9 TYPE_9,
             T3.TYPE_10 TYPE_10,
