@@ -334,6 +334,7 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
         dto.setEntrustDate(etrEntrust.getEntrustDate());
         dto.setRemark(etrEntrust.getRemark());
         dto.setTotalBiddingNum(ArithmeticUtil.multiply(etrEntrust.getEntrustNum(), BigDecimal.valueOf(100)));
+        dto.setTradeMarket(etrEntrust.getTradeMarket());
 
         //查询资产信息
         CfetsEtrFinProductInfoRequest productInfoRequest = new CfetsEtrFinProductInfoRequest();

@@ -542,6 +542,19 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 if (StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())
                         || StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())) {
                     entrustDetail.setAcctNo(entry.getValue().get(0).getAcctNo());
+                    if (StringUtil.isEmpty(entry.getValue().get(0).getSecAcctId())) {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("acctNo", entrustDetail.getAcctNo());
+                        map.put("portfolioId", entrustDetail.getPortfolioId());
+                        map.put("tradeMarket", dto.getTradeMarket());
+                        List<SelectOptionDto> tempList = cfetsEtrBondFirstBid001Service.getPtlSecAcctInfo(map);
+                        SelectOptionDto temp = tempList.stream().filter(x -> Objects.equals(x.getId(), entrustDetail.getAcctNo())).findFirst().orElse(null);
+                        ArrayList secMap = (ArrayList) temp.getObject();
+                        entrustDetail.setSecAcctId(((HashMap) secMap.get(0)).get("secAcctId").toString()); // 证券户
+                    } else {
+                        entrustDetail.setSecAcctId(entry.getValue().get(0).getSecAcctId());
+                    }
+
                 }
                 if (StringUtil.equals(dto.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
                     entrustDetail.setEntrustNum(ArithmeticUtil.divide(entry.getValue().get(0).getBidPrinAmt(), 100, 4));
@@ -633,6 +646,18 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 if (StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())
                         || StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())) {
                     entrustDetail.setAcctNo(entry.getValue().get(0).getAcctNo());
+                    if (StringUtil.isEmpty(entry.getValue().get(0).getSecAcctId())) {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("acctNo", entrustDetail.getAcctNo());
+                        map.put("portfolioId", entrustDetail.getPortfolioId());
+                        map.put("tradeMarket", dto.getTradeMarket());
+                        List<SelectOptionDto> tempList = cfetsEtrBondFirstBid001Service.getPtlSecAcctInfo(map);
+                        SelectOptionDto temp = tempList.stream().filter(x -> Objects.equals(x.getId(), entrustDetail.getAcctNo())).findFirst().orElse(null);
+                        ArrayList secMap = (ArrayList) temp.getObject();
+                        entrustDetail.setSecAcctId(((HashMap) secMap.get(0)).get("secAcctId").toString()); // 证券户
+                    } else {
+                        entrustDetail.setSecAcctId(entry.getValue().get(0).getSecAcctId());
+                    }
                 }
                 if (StringUtil.equals(dto.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
                     entrustDetail.setEntrustNum(ArithmeticUtil.divide(entry.getValue().get(0).getBidPrinAmt(), 100, 4));
@@ -1002,6 +1027,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
 
                     Map<String, List<CfetsBiddingProductDto>> portfolioIdMap = cfetsDto.getBiddingProductList().stream()
                             .collect(Collectors.groupingBy(CfetsBiddingProductDto::getPortfolioId));
+                    Boolean errorFlag = Boolean.FALSE;
                     for (Map.Entry<String, List<CfetsBiddingProductDto>> entry : portfolioIdMap.entrySet()) {
                         List<BigDecimal> bidPriceSort = entry.getValue().stream().map(CfetsBiddingProductDto::getBidPrice).sorted().collect(Collectors.toList());
                         if (CollectionUtils.isNotEmpty(bidPriceSort)) {
@@ -1009,20 +1035,23 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                             //最低标位 最低标位的大于等于该字段值
                             if (finProductInfo.getMinTamt() != null) {
                                 if (bidPriceSort.get(0).compareTo(finProductInfo.getMinTamt()) == -1) {
-                                    messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
+                                   // messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
+                                    errorFlag = Boolean.TRUE;
                                 }
                             }
                             //最高标位 最高标位的小于等于该字段值
                             if (finProductInfo.getMaxTamt() != null) {
                                 if (finProductInfo.getMaxTamt().compareTo(bidPriceSort.get(bidPriceSort.size() - 1)) == -1) {
-                                    messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
+                                   // messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
+                                    errorFlag = Boolean.TRUE;
                                 }
                             }
 
                             //最大投标标位数 标位个数小于等于该字段值
                             if (finProductInfo.getMaxTenderUnit() != null) {
                                 if (finProductInfo.getMaxTenderUnit().compareTo(BigDecimal.valueOf(bidPriceSort.size())) == -1) {
-                                    messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
+                                    //messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
+                                    errorFlag = Boolean.TRUE;
                                 }
 
                             }
@@ -1031,7 +1060,8 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                             if (finProductInfo.getMaxTenderPlus() != null) {
                                 BigDecimal subNum = bidPriceSort.get(bidPriceSort.size() - 1).subtract(bidPriceSort.get(0));
                                 if (finProductInfo.getMaxTenderPlus().compareTo(subNum) == -1) {
-                                    messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
+                                   // messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
+                                    errorFlag = Boolean.TRUE;
                                 }
                             }
 
@@ -1039,7 +1069,8 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                             if (finProductInfo.getTenderUnit() != null && BigDecimal.ZERO.compareTo(finProductInfo.getTenderUnit()) != 0) {
                                 for (BigDecimal bidPrice : bidPriceSort) {
                                     if (!BigDecimalUtil.isIntegerMultiples(bidPrice, finProductInfo.getTenderUnit())) {
-                                        messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
+                                       // messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
+                                        errorFlag = Boolean.TRUE;
                                     }
                                 }
 
@@ -1052,13 +1083,17 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                         }
                     }
 
+                    if (errorFlag) {
+                        messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
+                    }
+
                 }
             }
 
         }
 
 
-        ajaxResult.setErrorList(messages.stream().distinct().collect(Collectors.toList()));
+        ajaxResult.setErrorList(messages);
         return ajaxResult;
     }
 

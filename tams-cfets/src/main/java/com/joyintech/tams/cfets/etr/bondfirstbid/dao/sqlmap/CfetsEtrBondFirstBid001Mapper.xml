@@ -729,13 +729,13 @@
     <select id="selectEntrustDetailById" resultType="com.joyintech.tams.common.base.entity.EtrEntrustDetail" parameterType="java.lang.String" >
         SELECT ENTRUST_ID entrustId, PORTFOLIO_ID portfolioId, DIS_RATE disRate, ENTRUST_AMT entrustAmt, ENTRUST_NUM entrustNum,
                TARGET_TYPE targetType, CREATE_USER createUser, CREATE_DEPT createDept, CREATE_TIME createTime, UPDATE_USER updateUser,
-               UPDATE_TIME updateTime, INV_AIM invAim, SEC_ACCT_ID secAcctId
+               UPDATE_TIME updateTime, INV_AIM invAim, SEC_ACCT_ID secAcctId, ACCT_NO acctNo
         FROM ETR_ENTRUST_DETAIL
         where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
         UNION
         SELECT ENTRUST_ID entrustId, PORTFOLIO_ID portfolioId, DIS_RATE disRate, ENTRUST_AMT entrustAmt, ENTRUST_NUM entrustNum,
                TARGET_TYPE targetType, CREATE_USER createUser, CREATE_DEPT createDept, CREATE_TIME createTime, UPDATE_USER updateUser,
-               UPDATE_TIME updateTime, INV_AIM invAim, SEC_ACCT_ID secAcctId
+               UPDATE_TIME updateTime, INV_AIM invAim, SEC_ACCT_ID secAcctId, ACCT_NO acctNo
         FROM WFL_ETR_ENTRUST_DETAIL
         where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
     </select>
