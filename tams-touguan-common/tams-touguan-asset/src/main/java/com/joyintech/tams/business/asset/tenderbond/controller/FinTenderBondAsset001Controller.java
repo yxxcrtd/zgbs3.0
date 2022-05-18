@@ -93,8 +93,8 @@ public class FinTenderBondAsset001Controller extends BaseController {
     @ResponseBody
     @PostMapping("/appearMarketIdForSelect")
     @ApiOperation(value = "上市代码下拉列表", notes = "上市代码下拉列表,参数:{search,initValue,pageNo,pageSize,includeInterface}")
-    public Message<Page<SelectOptionDto>> appearMarketIdForSelect(@RequestBody Map<String, Object> search) {
-        return Message.success("success", finTenderBondAssetService.getAppearMarketIdForSelect(search));
+    public Page<SelectOptionDto> appearMarketIdForSelect(@RequestBody Map<String, Object> search) {
+        return finTenderBondAssetService.getAppearMarketIdForSelect(search);
     }
 
 

@@ -65,6 +65,8 @@ public class CfetsManualSettleQueryController extends BaseController {
         // 平台日字符串格式
         initPageParams.put("SESSION_SYS_DATE", DateUtil.format(platformDateImpl.getSysDate()));
 
+        initPageParams.put("CUSTOM_ASSET_TYPE_TWO", this.getSelectDataFromDataDic(DictCode.行内资产二级分类, null));
+
         initPageParams.put("pageId", "cfetsManualSettleQuery");
         return new Message<Map<String, Object>>(initPageParams).success();
     }

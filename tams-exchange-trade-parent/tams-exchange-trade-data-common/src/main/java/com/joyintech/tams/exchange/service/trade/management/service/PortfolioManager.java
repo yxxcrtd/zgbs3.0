@@ -663,8 +663,11 @@ public class PortfolioManager extends BaseService {
         BigDecimal leftAmt = isVolume ? BigDecimal.ZERO : NumberUtil.sub(instruction.getEntrustAmt(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity());
         long leftNum = isVolume ? NumberUtil.sub(instruction.getEntrustNum(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity()).longValue() : 0L;
         for (PortfolioCalculateResponse item : list) {
-            calculateResponse.setInstructionLeftAmt(BigDecimal.ZERO.compareTo(orderAmt) == 0 ? NumberUtil.mul(leftAmt, item.getDisRate()) : NumberUtil.div(NumberUtil.mul(leftAmt, item.getEntrustAmt()), orderAmt));
-            calculateResponse.setInstructionLeftNum(BigDecimal.ZERO.compareTo(orderVolume) == 0 ? NumberUtil.mul(leftNum, item.getDisRate()).longValue() : NumberUtil.div(leftNum * item.getEntrustNum(), orderVolume).longValue());
+            item.setInstructionLeftAmt(BigDecimal.ZERO.compareTo(orderAmt) == 0 ? NumberUtil.mul(leftAmt, item.getDisRate()) : NumberUtil.div(NumberUtil.mul(leftAmt, item.getEntrustAmt()), orderAmt));
+            item.setInstructionLeftNum(BigDecimal.ZERO.compareTo(orderVolume) == 0 ? NumberUtil.mul(leftNum, item.getDisRate()).longValue() : NumberUtil.div(leftNum * item.getEntrustNum(), orderVolume).longValue());
+
+            // 处理分配比例
+            item.setDisRate(BigDecimal.ZERO.compareTo(orderVolume) == 0 ? BigDecimal.ZERO : NumberUtil.div(item.getEntrustNum(), orderVolume));
         }
 
         log.debug("queryPortfolioCalculate() called with result => 【list = {}】", JSONUtil.toJsonStr(list));
