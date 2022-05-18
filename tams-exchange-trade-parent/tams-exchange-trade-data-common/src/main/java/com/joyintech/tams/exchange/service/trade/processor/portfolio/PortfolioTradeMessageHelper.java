@@ -122,14 +122,14 @@ public class PortfolioTradeMessageHelper {
             return calculateResponses;
         }
 
-        //2、保存 成交组合分配
+        //2、保存 委托组合分配
         for (Map.Entry<String, PortfolioDetail> entry : portfolioDetailMap.entrySet()) {
             PortfolioDetail value = entry.getValue();
             value.setBusiId(entrust.getId());
             portfolioDetailMapper.insert(entry.getValue());
         }
 
-        //3、组装成交组合分配
+        //3、组装委托组合分配
         PortfolioCalculateResponse calculateResponse = null;
         for (Map.Entry<String, PortfolioDetail> entry : portfolioDetailMap.entrySet()) {
             calculateResponse = new PortfolioCalculateResponse();
