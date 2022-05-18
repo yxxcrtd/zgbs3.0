@@ -1287,9 +1287,11 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         if (StringUtil.isEmpty(dto.getFinprodId())) {
             errorList.add(new ValidMessage("资产代码不可为空!"));
         }
+        // 系统参数 【是否支持CSTP下行接口_一级申购】
+        String isSupportCstpFlagBondfirst = CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST");
         // 本方 - 条件必填
-        if (StringUtil.isEmpty(dto.getOuPartyId())) {
-            errorList.add(new ValidMessage("资产代码不可为空!"));
+        if (StringUtil.isEmpty(dto.getOuPartyId()) && StringUtil.equals(isSupportCstpFlagBondfirst, DictCodeList.是否_否.getValue())) {
+            errorList.add(new ValidMessage("所有组合关联的银行间机构数据必须一致!"));
         }
         // 本方交易员
         if (StringUtil.isEmpty(dto.getOurTrader())) {
