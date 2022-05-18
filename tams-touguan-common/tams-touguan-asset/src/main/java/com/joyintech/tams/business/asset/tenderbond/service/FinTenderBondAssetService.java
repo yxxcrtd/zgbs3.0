@@ -435,7 +435,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
     public Boolean editCheck(String finprodId) {
         // 同时需要判断该资产是否存在有效上市流通数据，如存在，则不允许修改上市日、上市代码
         Integer qty = finTenderBondAssetMapper.countListing(finprodId);
-        return qty == null ? true : qty > 1 ? false : true;
+        return qty == null ? true : qty > 0 ? false : true;
     }
 
 

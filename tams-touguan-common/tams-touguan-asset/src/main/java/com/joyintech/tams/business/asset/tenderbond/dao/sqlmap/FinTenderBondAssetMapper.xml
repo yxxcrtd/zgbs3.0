@@ -371,7 +371,7 @@
             ri.BID_DATE as tenderEdate
         FROM (select * from (select * from INTERF_WIND_RELEASE_INFO where 1=1
         <if test="flag != null and flag !=''">
-            nvl(ISSUE_DATE,nvl(BID_DATE,ADDITIONAL_TENDER_DATE)) >= TO_DATE(#{platformDate},'YYYY-MM-DD')
+            and nvl(ISSUE_DATE,nvl(BID_DATE,ADDITIONAL_TENDER_DATE)) >= TO_DATE(#{platformDate},'YYYY-MM-DD')
             and SEC_ID=#{finprodMarketId,jdbcType=VARCHAR} order by nvl(ISSUE_DATE,nvl(BID_DATE,ADDITIONAL_TENDER_DATE)) asc
         </if> ) where ROWNUM=1
         ) ri
