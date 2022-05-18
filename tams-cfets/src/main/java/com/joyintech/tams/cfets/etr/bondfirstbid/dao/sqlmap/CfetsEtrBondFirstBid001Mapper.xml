@@ -89,7 +89,7 @@
             ee.PS ps,
             CASE
             WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
-            fpa.BID_DATE
+            nvl(fpi.ISSUE_DATE,fpi.TENDER_EDATE)
             ELSE fpi.ISSUE_DATE
             END AS issueDate,
             ee.ENTRUST_NUM/100 totalBiddingNum,
@@ -116,11 +116,8 @@
             mcp.COUNTER_NAME counterName,
             NULL AS approver,
             ee.REMARK remark,
-            CASE
-            WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
-            TO_CHAR(fpa.BID_DATE, 'yyyy-MM-dd')
-            ELSE TO_CHAR(fpi.ISSUE_DATE, 'yyyy-MM-dd')
-            END AS issueDateStr,
+            case when fpi.ISSUE_DATE is null then to_char(fpi.TENDER_SDATE,'yyyy-mm-dd') || '~' || to_char(fpi.TENDER_EDATE,'yyyy-mm-dd')
+            else to_char(fpi.ISSUE_DATE,'yyyy-mm-dd') end as issueDateStr,
             CASE
             WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
             TO_CHAR(fpi.PAY_EDATE, 'yyyy-MM-dd')
@@ -220,10 +217,10 @@
             ee.TRADE_MARKET tradeMarket,
             ee.PS ps,
             CASE
-                WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
-                    fpa.BID_DATE
-                ELSE fpi.ISSUE_DATE
-                END AS issueDate,
+            WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
+            nvl(fpi.ISSUE_DATE,fpi.TENDER_EDATE)
+            ELSE fpi.ISSUE_DATE
+            END AS issueDate,
             ee.ENTRUST_NUM/100 totalBiddingNum,
             CASE WHEN  fpi.ISSUE_CLASS = '01' THEN
                 case
@@ -248,11 +245,8 @@
             mcp.COUNTER_NAME counterName,
             nextUser.userName AS approver,
             ee.REMARK remark,
-            CASE
-            WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
-            TO_CHAR(fpa.BID_DATE, 'yyyy-MM-dd')
-            ELSE TO_CHAR(fpi.ISSUE_DATE, 'yyyy-MM-dd')
-            END AS issueDateStr,
+            case when fpi.ISSUE_DATE is null then to_char(fpi.TENDER_SDATE,'yyyy-mm-dd') || '~' || to_char(fpi.TENDER_EDATE,'yyyy-mm-dd')
+            else to_char(fpi.ISSUE_DATE,'yyyy-mm-dd') end as issueDateStr,
             CASE
             WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
             TO_CHAR(fpi.PAY_EDATE, 'yyyy-MM-dd')
@@ -532,9 +526,9 @@
             case
             when ISSUE.ISSUE_CLASS IN ('01')  THEN
             ISSUE.ISSUE_DATE
-            else PRODUCT_ADD.BID_DATE
+            else nvl(ISSUE.ISSUE_DATE,ISSUE.TENDER_EDATE)
             end as issueDate,
-            ISSUE.PAY_EDATE as payEdate,
+            nvl(ISSUE.PAY_EDATE, ISSUE.PAY_DATE) AS payEdate,
             PRODUCT.COUPON_SPECIES as couponSpecies,
             ISSUE.INT_TYPE as intType,
             ISSUE.ISSUE_PRICE as issuePrice,
@@ -544,8 +538,8 @@
                 else to_char(ISSUE.REFER_YIELD * 100 ,'FM9999999999999990.9000') || ' %'
                 end as referYieldStr,
             ISSUE.FIRST_CONFIRM_DATE firstConfirmDate,
-            round(ISSUE.MIN_PER_TAMT/100000000,2) as minPamt,
-            round(ISSUE.MAX_PER_UTAMT/100000000,2) as maxPamt,
+            nvl(round(ISSUE.MIN_PER_TAMT / 100000000, 2), round(ISSUE.MIN_PAMT / 100000000, 2)) AS minPamt,
+            nvl(round(ISSUE.MAX_PER_UTAMT / 100000000, 2), round(ISSUE.MAX_PAMT / 100000000, 2)) AS maxPamt,
             PRODUCT.TRADE_MARKET as tradeMarket,
             PRODUCT.ISSUER as issuer,
             PRODUCT.CCY as ccy,
@@ -559,12 +553,9 @@
             PRODUCT.REMARK as remark,
             ISSUE.TENDER_TYPE as tenderType,
             ISSUE.ISSUE_STYLE as issueStyle,
-            case
-            when ISSUE.ISSUE_CLASS IN ('01')  THEN
-                TO_CHAR(ISSUE.ISSUE_DATE, 'yyyy-MM-dd')
-            else TO_CHAR(PRODUCT_ADD.BID_DATE, 'yyyy-MM-dd')
-            end as issueDateStr,
-            TO_CHAR(ISSUE.PAY_EDATE, 'yyyy-MM-dd') as payEdateStr,
+            case when ISSUE.ISSUE_DATE is null then to_char(ISSUE.TENDER_SDATE,'yyyy-mm-dd') || '~' || to_char(ISSUE.TENDER_EDATE,'yyyy-mm-dd')
+            else to_char(ISSUE.ISSUE_DATE,'yyyy-mm-dd') end as issueDateStr,
+            nvl(TO_CHAR(ISSUE.PAY_EDATE, 'yyyy-MM-dd'), TO_CHAR(ISSUE.PAY_DATE, 'yyyy-MM-dd')) AS payEdateStr,
             TO_CHAR(ISSUE.FIRST_CONFIRM_DATE, 'yyyy-MM-dd')  as firstConfirmDateStr
 
         FROM FIN_PRODUCT PRODUCT
