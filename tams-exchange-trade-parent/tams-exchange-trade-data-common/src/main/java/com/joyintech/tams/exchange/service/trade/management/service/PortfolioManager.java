@@ -20,6 +20,7 @@ import com.joyintech.tams.exchange.common.bean.OrderPlaceBean;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.TickBean;
 import com.joyintech.tams.exchange.common.constant.*;
+import com.joyintech.tams.exchange.common.constant.instruction.BusinessType;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt1;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
@@ -54,6 +55,8 @@ import java.util.stream.Collectors;
 
 import static com.joyintech.tams.exchange.common.constant.joyin.BussinessDictCodeList.币种_人民币;
 import static com.joyintech.tams.exchange.common.constant.joyin.BussinessDictCodeList.是否_否;
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_质押券出入库;
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_通用式质押回购;
 
 /**
  * 组合信息Service
@@ -549,6 +552,10 @@ public class PortfolioManager extends BaseService {
         BigDecimal leftAmt = isVolume ? BigDecimal.ZERO : NumberUtil.sub(instruction.getEntrustAmt(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity());
         long leftNum = isVolume ? NumberUtil.sub(instruction.getEntrustNum(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity()).longValue() : 0L;
         for (PortfolioCalculateResponse item : list) {
+            //质押式回购处理指令利率
+            if (StringUtil.equals(instruction.getBusiTypeTg(), 投管业务类型_通用式质押回购.getValue())) {
+                calculateResponse.setEntrustPrice(instruction.getEntrustPrice());
+            }
             calculateResponse.setInstructionLeftAmt(NumberUtil.div(NumberUtil.mul(leftAmt, item.getEntrustAmt()), orderAmt));
             calculateResponse.setInstructionLeftNum(NumberUtil.div(leftNum * item.getEntrustNum(), orderVolume).longValue());
         }
@@ -636,7 +643,7 @@ public class PortfolioManager extends BaseService {
                 calculateResponse.setEntrustAmt(portfolioDetail.getTargetAmt());
                 if (Objects.isNull(calculateResponse.getEntrustNum()) || calculateResponse.getEntrustNum() == 0) {
                     calculateResponse.setEntrustPrice(order.getEntrustPrice());
-                }else {
+                } else {
                     calculateResponse.setEntrustPrice(NumberUtil.div(calculateResponse.getEntrustAmt(), calculateResponse.getEntrustNum()));
                 }
             }
