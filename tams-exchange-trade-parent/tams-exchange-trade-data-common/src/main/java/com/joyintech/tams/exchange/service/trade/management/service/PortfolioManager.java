@@ -20,6 +20,7 @@ import com.joyintech.tams.exchange.common.bean.OrderPlaceBean;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.TickBean;
 import com.joyintech.tams.exchange.common.constant.*;
+import com.joyintech.tams.exchange.common.constant.instruction.BusinessType;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt1;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
@@ -54,6 +55,8 @@ import java.util.stream.Collectors;
 
 import static com.joyintech.tams.exchange.common.constant.joyin.BussinessDictCodeList.币种_人民币;
 import static com.joyintech.tams.exchange.common.constant.joyin.BussinessDictCodeList.是否_否;
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_质押券出入库;
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_通用式质押回购;
 
 /**
  * 组合信息Service
@@ -65,7 +68,14 @@ import static com.joyintech.tams.exchange.common.constant.joyin.BussinessDictCod
 public class PortfolioManager extends BaseService {
 
     public static final String AMOUNT = "amount";
+    /**
+     * 日志对象
+     */
     private static final Logger log = LoggerFactory.getLogger(PortfolioManager.class);
+    /**
+     * 非交易业务
+     */
+    private static final String NO_TRADE_BUSINESS_ETR = "noTradeBusinessEtr";
     /**
      * 是否单体服务
      */
@@ -83,259 +93,6 @@ public class PortfolioManager extends BaseService {
     @Autowired
     private PortfolioAssignHelper portfolioAssignHelper;
 
-    public List<BaseMap> queryPortfolioInfo(PositionCashSecRequest bean) {
-        bean.setFlowType(EtrTradeCommonervice.FLOW_TYPE_TRD);
-        return etrTradeCommonervice.queryPositionInfo(bean);
-    }
-
-    private List<PositionCashSecSingleResp> queryPortfolioInfoByTg(List<InstructionDetail> instructionDetails, Instruction instruction) {
-        List<PositionCashSecDto> positionCashSecDtos = new ArrayList<>(instructionDetails.size());
-        PositionCashSecDto dto;
-        // 组装组合信息查询请求对象
-        for (InstructionDetail detail : instructionDetails) {
-            dto = new PositionCashSecDto();
-
-            dto.setPortfolioId(detail.getPortfolioId());
-            dto.setAcctId(instruction.getAcctNo());
-            dto.setPs(instruction.getPs());
-            dto.setTradeMarket(instruction.getTradeMarket());
-            dto.setSecAcctId(instruction.getSecAcctId());
-            dto.setFinprodId(instruction.getFinprodId());
-            dto.setCcy(币种_人民币.getValue());
-            dto.setCdate(DateUtil.getSysDate());
-            dto.setDateType(null);
-            dto.setFinprodType2(instruction.getFinprodType2());
-            dto.setTradePlat(instruction.getTradePlat());
-
-            positionCashSecDtos.add(dto);
-        }
-
-        PositionCashSecRequest request = new PositionCashSecRequest();
-        request.setFlowType(EtrTradeCommonervice.FLOW_TYPE_TRD);
-        request.setPtlList(positionCashSecDtos);
-
-        List<PositionCashSecSingleResp> resps = etrTradeCommonervice.queryPositionInfoSingle(request);
-        log.debug("查询头寸信息：request = [{}], response = [{}]", JSONUtil.toJsonStr(request), JSONUtil.toJsonStr(resps));
-
-        return resps;
-    }
-
-    /**
-     * 查询组合信息
-     */
-    public ResultBean queryPortfolioInfo(PortfolioInfoRequest request) {
-        log.info("queryPortfolioInfo() called with parameters => 【request = {}】", request.toString());
-
-        // 1. 获取组合列表
-        String[] portfolioIdArray = StringUtil.split(request.getPortfolioId(), StrUtil.COMMA);
-
-        // 返回的map： key 组合代码； value 组合现金持仓
-        Map<String, PortfolioInfoResponse> result = new HashMap<>(8);
-
-        // 查询入参
-        Map<String, Object> paramMap = BeanUtil.beanToMap(request);
-        paramMap.put("ccy", DictCodeList.币种_人民币_CNY.getValue());
-        paramMap.put("acctId", request.getAcctNo());
-        String calId = this.getCalId(request.getTradeMarket());
-        if (StrUtil.isBlank(calId)) {
-            return ResultBean.error(ErrorCode.REQ_PARAMETER_ERROR);
-        }
-        paramMap.put("calId", calId);
-
-        // 2. 遍历查询组合信息
-        try {
-            for (String s : portfolioIdArray) {
-                paramMap.put("portfolioId", s);
-
-                PortfolioInfoResponse portfolioInfoResponse = ((PortfolioInfoResponse) queryPortfolioCash(paramMap).getData());
-                PortfolioInfoResponse positionPortfolioInfoResponse = ((PortfolioInfoResponse) queryPortfolioPosition(paramMap).getData());
-
-                portfolioInfoResponse.setProAvailablePositionT0(positionPortfolioInfoResponse.getProAvailablePositionT0());
-                portfolioInfoResponse.setProAvailablePositionT1(positionPortfolioInfoResponse.getProAvailablePositionT1());
-
-                result.put(s, portfolioInfoResponse);
-            }
-        } catch (Exception e) {
-            log.error("queryPortfolioInfo() called with exception => 【request = {}】", request);
-            log.error("exception info : ", e);
-            return ResultBean.error(ErrorCode.API_RETURN_ERROR);
-        }
-        return ResultBean.success(result);
-    }
-
-    /**
-     * 查询组合现金信息
-     *
-     * @param portfolioIds 组合代码
-     * @param acctNo       资金账户账号
-     * @return 组合现金信息
-     */
-    public ResultBean queryPortfolioCash(String portfolioIds, String acctNo) {
-        log.info("queryPortfolioCash() called with parameters => 【portfolioIds = {}】, 【acctNo = {}】", portfolioIds, acctNo);
-
-        // 1. 获取组合列表
-        String[] portfolioIdArray = StringUtil.split(portfolioIds, StrUtil.COMMA);
-
-        // 返回的map： key 组合代码； value 组合现金信息
-        Map<String, PortfolioInfoResponse> result = new HashMap<>(8);
-
-        // 查询入参
-        Map<String, Object> paramMap = new HashMap<>(4);
-        paramMap.put("ccy", DictCodeList.币种_人民币_CNY.getValue());
-        paramMap.put("acctId", acctNo);
-
-        // 2. 遍历查询组合现金
-        try {
-            for (String s : portfolioIdArray) {
-                paramMap.put("portfolioId", s);
-                PortfolioInfoResponse portfolioInfoResponse = ((PortfolioInfoResponse) queryPortfolioCash(paramMap).getData());
-                result.put(s, portfolioInfoResponse);
-            }
-        } catch (Exception e) {
-            log.error("queryPortfolioCash() called with exception => 【portfolioIds = {}】, 【acctNo = {}】", portfolioIds, acctNo);
-            log.error("exception info : ", e);
-            return new ResultBean(ErrorCode.API_RETURN_ERROR);
-        }
-
-        return ResultBean.success(result);
-    }
-
-    /**
-     * 查询组合持仓信息
-     *
-     * @param portfolioIds 组合代码
-     * @param finprodId    产品代码
-     * @param secAcctId    证券账户
-     * @param tradeMarket  交易场所
-     * @return 组合持仓信息
-     */
-    public ResultBean queryPortfolioPosition(String portfolioIds, String finprodId, String secAcctId, String tradeMarket) {
-        log.info("queryPortfolioPosition() called with parameters => 【portfolioIds = {}】, 【finprodId = {}】, 【secAcctId = {}】, 【tradeMarket = {}】",
-                portfolioIds, finprodId, secAcctId, tradeMarket);
-
-        // 1. 获取组合列表
-        String[] portfolioIdArray = StringUtil.split(portfolioIds, StrUtil.COMMA);
-
-        // 返回的map： key 组合代码； value 组合持仓
-        Map<String, PortfolioInfoResponse> result = new HashMap<>();
-
-        // 查询入参
-        Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("finprodId", finprodId);
-        paramMap.put("secAcctId", secAcctId);
-        String calId = this.getCalId(tradeMarket);
-        if (StrUtil.isBlank(calId)) {
-            return ResultBean.error(ErrorCode.REQ_PARAMETER_ERROR);
-        }
-        paramMap.put("calId", calId);
-
-        // 2. 遍历查询组合持仓
-        try {
-            for (String s : portfolioIdArray) {
-                paramMap.put("portfolioId", s);
-                PortfolioInfoResponse portfolioInfoResponse = ((PortfolioInfoResponse) queryPortfolioPosition(paramMap).getData());
-                result.put(s, portfolioInfoResponse);
-            }
-        } catch (Exception e) {
-            log.error("queryPortfolioPosition() called with exception => 【portfolioIds = {}】, 【finprodId = {}】, 【secAcctId = {}】, 【tradeMarket = {}】",
-                    portfolioIds, finprodId, secAcctId, tradeMarket);
-            log.error("exception info : ", e);
-            return new ResultBean(ErrorCode.API_RETURN_ERROR);
-        }
-
-        return ResultBean.success(result);
-    }
-
-    /**
-     * 微服务查询组合现金信息
-     *
-     * @param paramMap 入参
-     * @return 组合信息对象
-     */
-    private ResultBean queryPortfolioCash(Map<String, Object> paramMap) {
-        // 查询URL
-        String url = ServiceApplication.INSTRUCTION_SERVICE + TradeServiceURL.getPortfolioCash;
-
-        // 查询结果
-        Map<String, Object> resultMap = postForMap(url, paramMap);
-        if (Objects.isNull(resultMap) || resultMap.size() == 0) {
-            log.warn("调用投管接口失败: url = [{}], param = [{}]", url, JSONUtil.toJsonStr(paramMap));
-        }
-
-        // 封装结果
-        PortfolioInfoResponse portfolioInfoResponse = new PortfolioInfoResponse();
-        portfolioInfoResponse.setPortfolioId((String) paramMap.get("portfolioId"));
-        portfolioInfoResponse.setProAvailableCashT0(getValueFromMap(resultMap, "cashT"));
-        portfolioInfoResponse.setProAvailableCashT1(getValueFromMap(resultMap, "cashT1"));
-        portfolioInfoResponse.setSecManageAvailableCashT0(getValueFromMap(resultMap, "cashT3"));
-        portfolioInfoResponse.setSecManageAvailableCashT1(getValueFromMap(resultMap, "cashTT1"));
-
-        return ResultBean.success(portfolioInfoResponse);
-    }
-
-    /**
-     * 微服务查询组合持仓信息
-     *
-     * @param paramMap 入参
-     * @return 组合信息对象
-     */
-    public ResultBean queryPortfolioPosition(Map<String, Object> paramMap) {
-        log.info("queryPortfolioPosition() called with parameters => 【paramMap = {}】", paramMap);
-
-        // 查询URL
-        String url = ServiceApplication.INSTRUCTION_SERVICE + TradeServiceURL.getPortfolioPosition;
-
-        // 查询结果
-        Map<String, Object> resultMap = postForMap(url, paramMap);
-        if (Objects.isNull(resultMap) || resultMap.size() == 0) {
-            log.warn("调用投管接口失败: url = [{}], param = [{}]", url, JSONUtil.toJsonStr(paramMap));
-        }
-
-        // 封装结果
-        PortfolioInfoResponse portfolioInfoResponse = new PortfolioInfoResponse();
-        portfolioInfoResponse.setPortfolioId((String) paramMap.get("portfolioId"));
-        portfolioInfoResponse.setProAvailablePositionT0(getValueFromMap(resultMap, "position"));
-        portfolioInfoResponse.setProAvailablePositionT1(getValueFromMap(resultMap, "positionT1"));
-
-        return ResultBean.success(portfolioInfoResponse);
-    }
-
-    private BigDecimal getValueFromMap(Map<String, Object> resultMap, String code) {
-        if (resultMap == null) {
-            return BigDecimal.ZERO;
-        }
-        return Objects.isNull(resultMap.get(code)) ? BigDecimal.ZERO : new BigDecimal((String) resultMap.get(code));
-    }
-
-    /**
-     * 调用微服务
-     *
-     * @param url      接口url
-     * @param paramMap 入参
-     * @return 查询结果
-     */
-    private Map postForMap(String url, Map<String, Object> paramMap) {
-
-        if (isSingle) {
-            return simpleRestTemplate.postForObject(url, paramMap, Map.class);
-        }
-        return restTemplate.postForObject(url, paramMap, Map.class);
-    }
-
-    /**
-     * 根据交易场所获取交易日历
-     *
-     * @param tradeMarket 交易场所
-     * @return 交易日历
-     */
-    private String getCalId(String tradeMarket) {
-        if (DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(tradeMarket)) {
-            return "04";
-        } else if (DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(tradeMarket)) {
-            return "05";
-        }
-        return StrUtil.EMPTY;
-    }
 
     /**
      * 组合计算
@@ -549,6 +306,10 @@ public class PortfolioManager extends BaseService {
         BigDecimal leftAmt = isVolume ? BigDecimal.ZERO : NumberUtil.sub(instruction.getEntrustAmt(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity());
         long leftNum = isVolume ? NumberUtil.sub(instruction.getEntrustNum(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity()).longValue() : 0L;
         for (PortfolioCalculateResponse item : list) {
+            //质押式回购处理指令利率
+            if (StringUtil.equals(instruction.getBusiTypeTg(), 投管业务类型_通用式质押回购.getValue())) {
+                calculateResponse.setEntrustPrice(instruction.getEntrustPrice());
+            }
             calculateResponse.setInstructionLeftAmt(NumberUtil.div(NumberUtil.mul(leftAmt, item.getEntrustAmt()), orderAmt));
             calculateResponse.setInstructionLeftNum(NumberUtil.div(leftNum * item.getEntrustNum(), orderVolume).longValue());
         }
@@ -573,6 +334,7 @@ public class PortfolioManager extends BaseService {
         // 获取指令
         String instructionId = order.getInstructionId();
         Instruction instruction = instructionService.findById(instructionId);
+        BigDecimal orginPrice = order.getEntrustPrice();
 
         //处理委托价格
         coverPrice(instruction, order);
@@ -624,9 +386,9 @@ public class PortfolioManager extends BaseService {
             calculateResponse.setDisRate(detail.getDisRate());
             calculateResponse.setInstructionTotalAmt(detail.getEntrustAmt());
             calculateResponse.setInstructionTotalNum(detail.getEntrustNum().longValue());
-            if (Objects.nonNull(order.getFullPrice())) {
-                calculateResponse.setFullPrice(order.getFullPrice());
-            }
+            calculateResponse.setFullPrice(order.getFullPrice());
+            calculateResponse.setInstructionEntrustPrice(instruction.getEntrustPrice());
+            calculateResponse.setInstructionFullPrice(instruction.getFullPrice());
             calculateResponse.setPriceMode(instruction.getPriceMode());
             calculateResponse.setAcctNo(instruction.getAcctName());
 
@@ -636,7 +398,7 @@ public class PortfolioManager extends BaseService {
                 calculateResponse.setEntrustAmt(portfolioDetail.getTargetAmt());
                 if (Objects.isNull(calculateResponse.getEntrustNum()) || calculateResponse.getEntrustNum() == 0) {
                     calculateResponse.setEntrustPrice(order.getEntrustPrice());
-                }else {
+                } else {
                     calculateResponse.setEntrustPrice(NumberUtil.div(calculateResponse.getEntrustAmt(), calculateResponse.getEntrustNum()));
                 }
             }
@@ -663,9 +425,15 @@ public class PortfolioManager extends BaseService {
         BigDecimal leftAmt = isVolume ? BigDecimal.ZERO : NumberUtil.sub(instruction.getEntrustAmt(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity());
         long leftNum = isVolume ? NumberUtil.sub(instruction.getEntrustNum(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity()).longValue() : 0L;
         for (PortfolioCalculateResponse item : list) {
-            calculateResponse.setInstructionLeftAmt(NumberUtil.div(NumberUtil.mul(leftAmt, item.getEntrustAmt()), orderAmt));
-            calculateResponse.setInstructionLeftNum(NumberUtil.div(leftNum * item.getEntrustNum(), orderVolume).longValue());
+            item.setInstructionLeftAmt(BigDecimal.ZERO.compareTo(orderAmt) == 0 ? NumberUtil.mul(leftAmt, item.getDisRate()) : NumberUtil.div(NumberUtil.mul(leftAmt, item.getEntrustAmt()), orderAmt));
+            item.setInstructionLeftNum(BigDecimal.ZERO.compareTo(orderVolume) == 0 ? NumberUtil.mul(leftNum, item.getDisRate()).longValue() : NumberUtil.div(leftNum * item.getEntrustNum(), orderVolume).longValue());
+
+            // 处理分配比例
+            item.setDisRate(BigDecimal.ZERO.compareTo(orderVolume) == 0 ? BigDecimal.ZERO : NumberUtil.div(item.getEntrustNum(), orderVolume));
         }
+
+        // 恢复委托价格
+        recoverPrice(instruction, list, orginPrice);
 
         log.debug("queryPortfolioCalculate() called with result => 【list = {}】", JSONUtil.toJsonStr(list));
         return ResultBean.success(list);
@@ -682,7 +450,7 @@ public class PortfolioManager extends BaseService {
         }
     }
 
-    private void recoverPrice(Instruction instruction, List<PortfolioCalculateResponse> list, BigDecimal price, String entrustProp) {
+    private void recoverPrice(Instruction instruction, List<PortfolioCalculateResponse> list, BigDecimal price) {
         if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())
                 && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             list.forEach(item -> item.setEntrustPrice(price));
@@ -1244,6 +1012,267 @@ public class PortfolioManager extends BaseService {
             return (List<PortfolioCalculateResponse>) resultBean.getData();
         }
         return ListUtil.empty();
+    }
+
+    public List<BaseMap> queryPortfolioInfo(PositionCashSecRequest bean) {
+        bean.setFlowType(EtrTradeCommonervice.FLOW_TYPE_TRD);
+        return etrTradeCommonervice.queryPositionInfo(bean);
+    }
+
+    private List<PositionCashSecSingleResp> queryPortfolioInfoByTg(List<InstructionDetail> instructionDetails, Instruction instruction) {
+        List<PositionCashSecDto> positionCashSecDtos = new ArrayList<>(instructionDetails.size());
+        PositionCashSecDto dto;
+
+        String tradePlat = TradePlatUtils.trd2EtrTradePlat(instruction);
+        // 投管要求非交易类传入特殊标识
+        if (TradePlat.ETR_OTHER.codeEquals(tradePlat)) {
+            tradePlat = NO_TRADE_BUSINESS_ETR;
+        }
+
+        // 组装组合信息查询请求对象
+        for (InstructionDetail detail : instructionDetails) {
+            dto = new PositionCashSecDto();
+
+            dto.setPortfolioId(detail.getPortfolioId());
+            dto.setAcctId(instruction.getAcctNo());
+            dto.setPs(instruction.getPs());
+            dto.setTradeMarket(instruction.getTradeMarket());
+            dto.setSecAcctId(instruction.getSecAcctId());
+            dto.setFinprodId(instruction.getFinprodId());
+            dto.setCcy(币种_人民币.getValue());
+            dto.setCdate(DateUtil.getSysDate());
+            dto.setDateType(null);
+            dto.setFinprodType2(instruction.getFinprodType2());
+            dto.setTradePlat(tradePlat);
+
+            positionCashSecDtos.add(dto);
+        }
+
+        PositionCashSecRequest request = new PositionCashSecRequest();
+        request.setFlowType(EtrTradeCommonervice.FLOW_TYPE_TRD);
+        request.setPtlList(positionCashSecDtos);
+
+        List<PositionCashSecSingleResp> resps = etrTradeCommonervice.queryPositionInfoSingle(request);
+        log.debug("查询头寸信息：request = [{}], response = [{}]", JSONUtil.toJsonStr(request), JSONUtil.toJsonStr(resps));
+
+        return resps;
+    }
+
+    /**
+     * 查询组合信息
+     */
+    public ResultBean queryPortfolioInfo(PortfolioInfoRequest request) {
+        log.info("queryPortfolioInfo() called with parameters => 【request = {}】", request.toString());
+
+        // 1. 获取组合列表
+        String[] portfolioIdArray = StringUtil.split(request.getPortfolioId(), StrUtil.COMMA);
+
+        // 返回的map： key 组合代码； value 组合现金持仓
+        Map<String, PortfolioInfoResponse> result = new HashMap<>(8);
+
+        // 查询入参
+        Map<String, Object> paramMap = BeanUtil.beanToMap(request);
+        paramMap.put("ccy", DictCodeList.币种_人民币_CNY.getValue());
+        paramMap.put("acctId", request.getAcctNo());
+        String calId = this.getCalId(request.getTradeMarket());
+        if (StrUtil.isBlank(calId)) {
+            return ResultBean.error(ErrorCode.REQ_PARAMETER_ERROR);
+        }
+        paramMap.put("calId", calId);
+
+        // 2. 遍历查询组合信息
+        try {
+            for (String s : portfolioIdArray) {
+                paramMap.put("portfolioId", s);
+
+                PortfolioInfoResponse portfolioInfoResponse = ((PortfolioInfoResponse) queryPortfolioCash(paramMap).getData());
+                PortfolioInfoResponse positionPortfolioInfoResponse = ((PortfolioInfoResponse) queryPortfolioPosition(paramMap).getData());
+
+                portfolioInfoResponse.setProAvailablePositionT0(positionPortfolioInfoResponse.getProAvailablePositionT0());
+                portfolioInfoResponse.setProAvailablePositionT1(positionPortfolioInfoResponse.getProAvailablePositionT1());
+
+                result.put(s, portfolioInfoResponse);
+            }
+        } catch (Exception e) {
+            log.error("queryPortfolioInfo() called with exception => 【request = {}】", request);
+            log.error("exception info : ", e);
+            return ResultBean.error(ErrorCode.API_RETURN_ERROR);
+        }
+        return ResultBean.success(result);
+    }
+
+    /**
+     * 查询组合现金信息
+     *
+     * @param portfolioIds 组合代码
+     * @param acctNo       资金账户账号
+     * @return 组合现金信息
+     */
+    public ResultBean queryPortfolioCash(String portfolioIds, String acctNo) {
+        log.info("queryPortfolioCash() called with parameters => 【portfolioIds = {}】, 【acctNo = {}】", portfolioIds, acctNo);
+
+        // 1. 获取组合列表
+        String[] portfolioIdArray = StringUtil.split(portfolioIds, StrUtil.COMMA);
+
+        // 返回的map： key 组合代码； value 组合现金信息
+        Map<String, PortfolioInfoResponse> result = new HashMap<>(8);
+
+        // 查询入参
+        Map<String, Object> paramMap = new HashMap<>(4);
+        paramMap.put("ccy", DictCodeList.币种_人民币_CNY.getValue());
+        paramMap.put("acctId", acctNo);
+
+        // 2. 遍历查询组合现金
+        try {
+            for (String s : portfolioIdArray) {
+                paramMap.put("portfolioId", s);
+                PortfolioInfoResponse portfolioInfoResponse = ((PortfolioInfoResponse) queryPortfolioCash(paramMap).getData());
+                result.put(s, portfolioInfoResponse);
+            }
+        } catch (Exception e) {
+            log.error("queryPortfolioCash() called with exception => 【portfolioIds = {}】, 【acctNo = {}】", portfolioIds, acctNo);
+            log.error("exception info : ", e);
+            return new ResultBean(ErrorCode.API_RETURN_ERROR);
+        }
+
+        return ResultBean.success(result);
+    }
+
+    /**
+     * 查询组合持仓信息
+     *
+     * @param portfolioIds 组合代码
+     * @param finprodId    产品代码
+     * @param secAcctId    证券账户
+     * @param tradeMarket  交易场所
+     * @return 组合持仓信息
+     */
+    public ResultBean queryPortfolioPosition(String portfolioIds, String finprodId, String secAcctId, String tradeMarket) {
+        log.info("queryPortfolioPosition() called with parameters => 【portfolioIds = {}】, 【finprodId = {}】, 【secAcctId = {}】, 【tradeMarket = {}】",
+                portfolioIds, finprodId, secAcctId, tradeMarket);
+
+        // 1. 获取组合列表
+        String[] portfolioIdArray = StringUtil.split(portfolioIds, StrUtil.COMMA);
+
+        // 返回的map： key 组合代码； value 组合持仓
+        Map<String, PortfolioInfoResponse> result = new HashMap<>();
+
+        // 查询入参
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("finprodId", finprodId);
+        paramMap.put("secAcctId", secAcctId);
+        String calId = this.getCalId(tradeMarket);
+        if (StrUtil.isBlank(calId)) {
+            return ResultBean.error(ErrorCode.REQ_PARAMETER_ERROR);
+        }
+        paramMap.put("calId", calId);
+
+        // 2. 遍历查询组合持仓
+        try {
+            for (String s : portfolioIdArray) {
+                paramMap.put("portfolioId", s);
+                PortfolioInfoResponse portfolioInfoResponse = ((PortfolioInfoResponse) queryPortfolioPosition(paramMap).getData());
+                result.put(s, portfolioInfoResponse);
+            }
+        } catch (Exception e) {
+            log.error("queryPortfolioPosition() called with exception => 【portfolioIds = {}】, 【finprodId = {}】, 【secAcctId = {}】, 【tradeMarket = {}】",
+                    portfolioIds, finprodId, secAcctId, tradeMarket);
+            log.error("exception info : ", e);
+            return new ResultBean(ErrorCode.API_RETURN_ERROR);
+        }
+
+        return ResultBean.success(result);
+    }
+
+    /**
+     * 微服务查询组合现金信息
+     *
+     * @param paramMap 入参
+     * @return 组合信息对象
+     */
+    private ResultBean queryPortfolioCash(Map<String, Object> paramMap) {
+        // 查询URL
+        String url = ServiceApplication.INSTRUCTION_SERVICE + TradeServiceURL.getPortfolioCash;
+
+        // 查询结果
+        Map<String, Object> resultMap = postForMap(url, paramMap);
+        if (Objects.isNull(resultMap) || resultMap.size() == 0) {
+            log.warn("调用投管接口失败: url = [{}], param = [{}]", url, JSONUtil.toJsonStr(paramMap));
+        }
+
+        // 封装结果
+        PortfolioInfoResponse portfolioInfoResponse = new PortfolioInfoResponse();
+        portfolioInfoResponse.setPortfolioId((String) paramMap.get("portfolioId"));
+        portfolioInfoResponse.setProAvailableCashT0(getValueFromMap(resultMap, "cashT"));
+        portfolioInfoResponse.setProAvailableCashT1(getValueFromMap(resultMap, "cashT1"));
+        portfolioInfoResponse.setSecManageAvailableCashT0(getValueFromMap(resultMap, "cashT3"));
+        portfolioInfoResponse.setSecManageAvailableCashT1(getValueFromMap(resultMap, "cashTT1"));
+
+        return ResultBean.success(portfolioInfoResponse);
+    }
+
+    /**
+     * 微服务查询组合持仓信息
+     *
+     * @param paramMap 入参
+     * @return 组合信息对象
+     */
+    public ResultBean queryPortfolioPosition(Map<String, Object> paramMap) {
+        log.info("queryPortfolioPosition() called with parameters => 【paramMap = {}】", paramMap);
+
+        // 查询URL
+        String url = ServiceApplication.INSTRUCTION_SERVICE + TradeServiceURL.getPortfolioPosition;
+
+        // 查询结果
+        Map<String, Object> resultMap = postForMap(url, paramMap);
+        if (Objects.isNull(resultMap) || resultMap.size() == 0) {
+            log.warn("调用投管接口失败: url = [{}], param = [{}]", url, JSONUtil.toJsonStr(paramMap));
+        }
+
+        // 封装结果
+        PortfolioInfoResponse portfolioInfoResponse = new PortfolioInfoResponse();
+        portfolioInfoResponse.setPortfolioId((String) paramMap.get("portfolioId"));
+        portfolioInfoResponse.setProAvailablePositionT0(getValueFromMap(resultMap, "position"));
+        portfolioInfoResponse.setProAvailablePositionT1(getValueFromMap(resultMap, "positionT1"));
+
+        return ResultBean.success(portfolioInfoResponse);
+    }
+
+    private BigDecimal getValueFromMap(Map<String, Object> resultMap, String code) {
+        if (resultMap == null) {
+            return BigDecimal.ZERO;
+        }
+        return Objects.isNull(resultMap.get(code)) ? BigDecimal.ZERO : new BigDecimal((String) resultMap.get(code));
+    }
+
+    /**
+     * 调用微服务
+     *
+     * @param url      接口url
+     * @param paramMap 入参
+     * @return 查询结果
+     */
+    private Map postForMap(String url, Map<String, Object> paramMap) {
+
+        if (isSingle) {
+            return simpleRestTemplate.postForObject(url, paramMap, Map.class);
+        }
+        return restTemplate.postForObject(url, paramMap, Map.class);
+    }
+
+    /**
+     * 根据交易场所获取交易日历
+     *
+     * @param tradeMarket 交易场所
+     * @return 交易日历
+     */
+    private String getCalId(String tradeMarket) {
+        if (DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(tradeMarket)) {
+            return "04";
+        } else if (DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(tradeMarket)) {
+            return "05";
+        }
+        return StrUtil.EMPTY;
     }
 }
 

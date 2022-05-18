@@ -101,6 +101,7 @@ public class FinTenderBondAssetBatchService {
                     //根据 资产名称、资产简称、交易场所、登记托管机构、起息日、到期日、发行人、息票品种、利率类型、币种 进行去重
                     List<InterfPayhsrcsecinfo> interList = finTenderBoundAssetMapper.getBySecId(dto.getAppearMarketId());
                     if (CollectionUtils.isNotEmpty(interList) && interList.size() == 1) {
+                        interList.get(0).setSecid(dto.getAppearMarketId());
                         if (this.autoBondCoupon(interList.get(0))) {
                             dto.setCirculationCode(interList.get(0).getSecid());
                             dto.setCirculationDate(plateDate);

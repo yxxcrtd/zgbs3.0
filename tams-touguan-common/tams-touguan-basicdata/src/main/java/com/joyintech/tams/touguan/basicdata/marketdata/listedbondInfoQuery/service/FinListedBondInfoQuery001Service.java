@@ -199,7 +199,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finProduct.setVdate(finListedBondInfoQuery001Dto.getValueDate());
         finProduct.setMdate(finListedBondInfoQuery001Dto.getExpiryDate());
         /*---发行截止日 addby shenchen 2019-05-05----*/
-        finProduct.setIdate(finListedBondInfoQuery001Dto.getIssueDate());
+//        finProduct.setIdate(finListedBondInfoQuery001Dto.getIssueDate());
         /*---发行截止日 addby shenchen 2019-05-05----*/
         if (StringUtil.isNotEmpty(finListedBondInfoQuery001Dto.getValueDate()) && StringUtil.isNotEmpty(finListedBondInfoQuery001Dto.getExpiryDate())) {
             finProduct.setTermDays(DateUtil.getBetweenDayNumber(DateUtil.format(finListedBondInfoQuery001Dto.getValueDate()), DateUtil.format(finListedBondInfoQuery001Dto.getExpiryDate())));

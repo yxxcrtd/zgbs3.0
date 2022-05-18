@@ -191,13 +191,21 @@ public class FinBondAsset001Service extends BaseService{
         Map<String, Object> param = BeanUtil.object2Map(request);
         param.put("FINPROD_TYPE_TG_ZQ", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         //增加母资管计划筛选条件
+        List<String> tradeMarkets = new ArrayList<>();
         if (null!=request.getTradeMarket() && (StringUtil.equals(request.getTradeMarket(),DictCodeListExt1.交易场所_上海证券交易所.getValue())
         || StringUtil.equals(request.getTradeMarket(),DictCodeListExt1.交易场所_深圳证券交易所.getValue()))){
-            List<String> tradeMarkets = new ArrayList<>();
             tradeMarkets.add(DictCodeListExt1.交易场所_银行间.getValue());
             tradeMarkets.add(DictCodeListExt1.交易场所_商业银行柜台.getValue());
-            param.put("tradeMarkets", tradeMarkets);
+        }else if(null!=request.getTradeMarket() && (StringUtil.equals(request.getTradeMarket(),DictCodeListExt1.交易场所_银行间.getValue()))){
+            tradeMarkets.add(DictCodeListExt1.交易场所_上海证券交易所.getValue());
+            tradeMarkets.add(DictCodeListExt1.交易场所_深圳证券交易所.getValue());
+            tradeMarkets.add(DictCodeListExt1.交易场所_商业银行柜台.getValue());
+        }else if(null!=request.getTradeMarket() && (StringUtil.equals(request.getTradeMarket(),DictCodeListExt1.交易场所_商业银行柜台.getValue()))){
+            tradeMarkets.add(DictCodeListExt1.交易场所_上海证券交易所.getValue());
+            tradeMarkets.add(DictCodeListExt1.交易场所_深圳证券交易所.getValue());
+            tradeMarkets.add(DictCodeListExt1.交易场所_银行间.getValue());
         }
+        param.put("tradeMarkets", tradeMarkets);
         param.put("finprodMarketIdList", StringUtil.splitToList(null,request.getFinprodMarketId()));
         Page<SelectOptionDto> page = super.queryForPage(request.getPageMode().getPageNo(),
                 request.getPageMode().getPageSize(),

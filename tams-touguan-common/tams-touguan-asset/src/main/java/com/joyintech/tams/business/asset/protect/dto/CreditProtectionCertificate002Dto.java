@@ -3,14 +3,17 @@ package com.joyintech.tams.business.asset.protect.dto;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
+import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.json.BigDecimalSerializer;
-import com.joyintech.tams.business.asset.tenderbond.dto.FinProductAddDto;
+import com.joyintech.tams.component.business.core.dto.FileCommonDto;
+import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 信用保护凭证标的新增/修改/查看公用DTO
@@ -18,6 +21,9 @@ import java.util.Date;
 @PageId("CreditProtectionCertificate002")
 @ApiModel(value="CreditProtectionCertificate002Dto",description="新债标的(输入输出共用)")
 public class CreditProtectionCertificate002Dto extends BaseEntity implements ProcessEntity {
+
+    @ApiModelProperty(name="pageId",value="画面ID",example="CreditProtectionCertificate002")
+    private String pageId;
     /**
      * 金融产品代码
      */
@@ -49,10 +55,15 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
     @ApiModelProperty(name="tradeMarket",value="交易场所",required = true)
     private String tradeMarket;
     /**
+     * 交易场所
+     */
+    @ApiModelProperty(name="tradeMarketId",value="资产代码后缀",required = true)
+    private String tradeMarketId;
+    /**
      * 发行人 - 创设机构
      */
-    @ApiModelProperty(name="issuer",value="创设机构",required = true)
-    private String issuer;
+    @ApiModelProperty(name="issuerShort",value="创设机构",required = true)
+    private String issuerShort;
     /**
      * 名义本金总额
      */
@@ -158,12 +169,6 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
     private String remark;
 
     /**
-     * 标的扩展表字段
-     */
-    @ApiModelProperty(name="finProductAdd",value="扩展字段")
-    private FinProductAddDto productAddDto;
-
-    /**
      * 操作类型：NEW,MODIFY,DELETE,REVOKE
      */
     @ApiModelProperty(name="operateType",value="操作类型：NEW,MODIFY,DELETE,REVOKE")
@@ -174,6 +179,12 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
      */
     @ApiModelProperty(name="operateType2",value="操作类型：auto、cover")
     private String operateType2;
+
+    /**
+     * 操作类型：加券操作
+     */
+    @ApiModelProperty(name="operateStatus",value="操作类型",required = true)
+    private String operateStatus;
 
     /**
      * 页面模式
@@ -190,6 +201,16 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
     @ApiModelProperty(name = "calModel", value = "参考收益率:rate,发行价格:price")
     private String calModel;
 
+    /**
+     * 附件信息DTO
+     */
+    private List<FileCommonDto> fileCommonList;
+
+    /**
+     * 附件信息DTO
+     */
+    private List<UploadFile> fileArray;
+
 
     public String getFinprodId() {
         return finprodId;
@@ -197,6 +218,14 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
 
     public void setFinprodId(String finprodId) {
         this.finprodId = finprodId;
+    }
+
+    public String getPageId() {
+        return pageId;
+    }
+
+    public void setPageId(String pageId) {
+        this.pageId = pageId;
     }
 
     public String getFinprodType() {
@@ -231,6 +260,7 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
         this.finprodName = finprodName;
     }
 
+    @PrimaryKey(PrimaryKey.Field.PK_1)
     public String getFinprodMarketId() {
         return finprodMarketId;
     }
@@ -255,6 +285,14 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
         this.tradeMarket = tradeMarket;
     }
 
+    public String getTradeMarketId() {
+        return tradeMarketId;
+    }
+
+    public void setTradeMarketId(String tradeMarketId) {
+        this.tradeMarketId = tradeMarketId;
+    }
+
     public String getCalendarId() {
         return calendarId;
     }
@@ -263,12 +301,12 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
         this.calendarId = calendarId;
     }
 
-    public String getIssuer() {
-        return issuer;
+    public String getIssuerShort() {
+        return issuerShort;
     }
 
-    public void setIssuer(String issuer) {
-        this.issuer = issuer;
+    public void setIssuerShort(String issuerShort) {
+        this.issuerShort = issuerShort;
     }
 
     public Date getVdate() {
@@ -407,14 +445,6 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
         this.isAllowOverwrite = isAllowOverwrite;
     }
 
-    public FinProductAddDto getProductAddDto() {
-        return productAddDto;
-    }
-
-    public void setProductAddDto(FinProductAddDto productAddDto) {
-        this.productAddDto = productAddDto;
-    }
-
     public String getOperateType() {
         return operateType;
     }
@@ -429,6 +459,14 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
 
     public void setOperateType2(String operateType2) {
         this.operateType2 = operateType2;
+    }
+
+    public String getOperateStatus() {
+        return operateStatus;
+    }
+
+    public void setOperateStatus(String operateStatus) {
+        this.operateStatus = operateStatus;
     }
 
     public String getPageModel() {
@@ -455,4 +493,19 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
         this.calModel = calModel;
     }
 
+    public List<FileCommonDto> getFileCommonList() {
+        return fileCommonList;
+    }
+
+    public void setFileCommonList(List<FileCommonDto> fileCommonList) {
+        this.fileCommonList = fileCommonList;
+    }
+
+    public List<UploadFile> getFileArray() {
+        return fileArray;
+    }
+
+    public void setFileArray(List<UploadFile> fileArray) {
+        this.fileArray = fileArray;
+    }
 }

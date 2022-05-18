@@ -16,6 +16,9 @@ import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirst
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.service.CfetsTrdFirstBidFirm001Service;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.invest.common.constant.BussinessDictCode;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
@@ -74,6 +77,16 @@ public class CfetsTrdFirstBidFirm001Controller extends BaseController {
         initPageParams.put("FIRST_BID_STATUS", this.getSelectDataFromDataDic(DictCode.一级投标中标状态, null));
         initPageParams.put("TRADE_PLACE", this.getSelectDataFromDataDic(DictCode.交易场所, null));
         initPageParams.put("TENDER_TARGET", this.getSelectDataFromDataDic(DictCode.招标标的, null));
+        // 缴款方式
+        initPageParams.put("PAY_TYPE", this.getSelectDataFromDataDic(BussinessDictCode.缴款方式, null));
+        initPageParams.put("PAY_TYPE_01", BussinessDictCodeList.缴款方式_一级分销.getValue());
+        initPageParams.put("PAY_TYPE_02", BussinessDictCodeList.缴款方式_一级缴款.getValue());
+        initPageParams.put("PAY_TYPE_03", BussinessDictCodeList.缴款方式_二级交易.getValue());
+        // 投标方式
+        initPageParams.put("biddingMethod", this.getSelectDataFromDataDic(DictCode.投标方式, null));
+        initPageParams.put("biddingMethod_01", DictCodeListExt4.投标方式_自主投标.getValue());
+        initPageParams.put("biddingMethod_02", DictCodeListExt4.投标方式_代投代缴.getValue());
+        initPageParams.put("biddingMethod_03", DictCodeListExt4.投标方式_分销买入.getValue());
 
         // 获取平台日
         Date tradeDate = DateUtil.platDateFromCache();

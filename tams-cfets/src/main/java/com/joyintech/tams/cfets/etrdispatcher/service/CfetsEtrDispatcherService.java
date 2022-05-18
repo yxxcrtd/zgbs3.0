@@ -117,16 +117,7 @@ import org.springframework.validation.BindingResult;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -371,7 +362,10 @@ public class CfetsEtrDispatcherService extends BaseService {
         }
 
         //将交易员和投资经理转为真实姓名
-        List<CfetsEtrDispatcherTradeListResponse> list = pageLimit.getRoot();
+        List<CfetsEtrDispatcherTradeListResponse> list2 = pageLimit.getRoot();
+        List<CfetsEtrDispatcherTradeListResponse> list = list2.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(() ->
+                new TreeSet<>(Comparator.comparing(CfetsEtrDispatcherTradeListResponse::getEntrustId))), ArrayList::new));
+        pageLimit.setRoot(list);
         if (!list.isEmpty()) {
             for (CfetsEtrDispatcherTradeListResponse response : list) {
                 if (StringUtil.isNotEmpty(response.getTrader())) {

@@ -13,15 +13,13 @@ import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
 import com.joyintech.tams.cfets.trd.bond.dto.RiskCalRequest;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmInfoDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmInitRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.service.CfetsTrdFirstBidFirm002Service;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.contoller.CfetsTrdBondFirstSub002Controller;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.*;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBondFirstSub001Service;
 import com.joyintech.tams.cfets.trd.repo.service.CfetsRepoQuotedPrice004Service;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
-import com.joyintech.tams.component.business.riskrds.controller.InterfRiskRdsController;
-import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
@@ -62,9 +60,6 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
     private static final Logger logger = LoggerFactory.getLogger(CfetsTrdBondFirstSub002Controller.class);
 
     @Autowired
-    CfetsTrdBondFirstSub001Service cfetsTrdBondFirstSub001Service;
-
-    @Autowired
     CfetsTrdFirstBidFirm002Service cfetsTrdFirstBidFirm002Service;
 
     @Autowired
@@ -73,8 +68,8 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
     /**
      * 风险接口组件Controller
      */
-    @Autowired
-    private InterfRiskRdsController interfRiskRdsController;
+//    @Autowired
+//    private InterfRiskRdsController interfRiskRdsController;
 
     @Autowired
     private IPlatformDate iPlatformDate;
@@ -82,7 +77,7 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
     /**
      * 初始化页面
      *
-     * @param map
+     * @param map 入参 workflowId isFromToDoList
      * @return java.lang.String
      * @author jiangpeng
      * @date 2022/4/22 10:56
@@ -92,39 +87,25 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
     @ResponseBody
     public Message<Map<String, Object>> initPage(@RequestBody Map<String, Object> map) {
         Map<String, Object> initPageParams = new HashMap<>();
-        // 有效状态
-        initPageParams.put("ISSUE_STATUS", this.getSelectDataFromDataDic(DictCode.发行状态, null));
-        // 发行状态
-        initPageParams.put("STATUS_VALID", this.getSelectDataFromDataDic(DictCode.有效状态, null));
-        // 债券类型
-        initPageParams.put("BOND_TYPE", this.getSelectDataFromDataDic(DictCode.行内资产四级分类, null));
-        // 委托状态_待接收
-        initPageParams.put("ENTRUST_STATUS_02", DictCodeList.委托状态_待接收.getValue());
-        // 委托状态_已接收
-        initPageParams.put("ENTRUST_STATUS_03", DictCodeList.委托状态_已接收.getValue());
-        // 委托状态_已完成
-        initPageParams.put("ENTRUST_STATUS_04", DictCodeList.委托状态_已完成.getValue());
-        // 委托状态_已退回
-        initPageParams.put("ENTRUST_STATUS_05", DictCodeList.委托状态_已退回.getValue());
         // 资金账户类型_托管账户
         initPageParams.put("acctType_A01", BussinessDictCodeList.资金账户类型_托管账户.getValue());
         // 系统日期
         initPageParams.put("sysDate", iPlatformDate.getSysDateStr());
         // 币种_人民币
         initPageParams.put("CCY_CNY", DictCodeList.币种_人民币_CNY.getValue());
-        // 系统参数 【是否支持CSTP下行接口_一级申购】
-        initPageParams.put("IS_SUPPORT_CSTP_FLAG_BONDFIRST", CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST"));
+        // 是否进行指令汇总(Y:是，N:否)_一级投标
+        initPageParams.put("IS_ENTRUST_SUM_FLAG_BID", CacheUtil.getSysParam("IS_ENTRUST_SUM_FLAG_BID"));
         // 登记页面id 用于登记撤销
-        initPageParams.put("PAGE_ID_BOND_FIRST", "TenderBondSub002");
+        initPageParams.put("PAGE_ID_BOND_FIRST", "CfetsTrdFirstBidFirm002");
         //刷新时间
         initPageParams.put("ibuQuoteBondFirst_etrTable_refresh_period", CacheUtil.getSysParam("ibuQuoteBond_etrTable_refresh_period"));
         initPageParams.put("effDate", CacheUtil.getSysParam("ibuVar_quoteEffTime"));
 
         //流程id
         String workflowId = "null".equals(map.get(GlobalConstant.WORKFLOW_ID)) ? null : (String) map.get(GlobalConstant.WORKFLOW_ID);
-        String isFromToDoList = getParam("isFromToDoList");
+//        String isFromToDoList = getParam("isFromToDoList");
         if (StringUtil.isNotEmpty(workflowId)) {
-            CfetsTrdBondFirstSubInfoDto entity = cfetsTrdFirstBidFirm002Service.getBussinessEntityByWorkflowId(workflowId);
+            CfetsTrdFirstBidFirmInfoDto entity = cfetsTrdFirstBidFirm002Service.getBussinessEntityByWorkflowId(workflowId);
 //            test(entity);
             initPageParams.put(GlobalConstant.WORKFLOW_ID, workflowId);
             initPageParams.put(GlobalConstant.ENTITY, entity);
@@ -175,7 +156,7 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
 //    }
 
 
-    @ApiOperation(value = "一级投标确认初始化检查", notes = "点击【投标确认】按钮、<指令查询明细>页面点击【确认】调用")
+    @ApiOperation(value = "<投标确认>界面初始化检查", notes = "点击【投标确认】按钮、<指令查询明细>页面点击【确认】调用")
     @PostMapping("/dealexecutioncheck")
     @ResponseBody
     public Message<AjaxResult> dealexecutioncheck(@RequestBody CfetsTrdFirstBidFirmInitRequest request) {
@@ -184,37 +165,37 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
     }
 
 
-    @ApiOperation(value = "申购交易执行初始化", notes = "点击申购按钮、指令查询明细页面点击确认,申购初始化检查返回成功结果后调用,")
+    @ApiOperation(value = "<投标确认>界面初始化", notes = "点击【投标确认】按钮、<指令查询明细>页面点击【确认】调用,[<投标确认>界面初始化检查]返回成功结果后调用,")
     @PostMapping("/dealexecutioninit")
     @ResponseBody
-    public Message<CfetsTrdBondFirstSubInfoDto> dealexecutioninit(@RequestBody CfetsTrdBondFirstSubInitRequest request) {
-        CfetsTrdBondFirstSubInfoDto cfetsBondDealQuoteCommonDto = cfetsTrdFirstBidFirm002Service.queryEntrustInfoById(request);
-        if (StringUtil.isNotEmpty(cfetsBondDealQuoteCommonDto)) {
-            return new Message<CfetsTrdBondFirstSubInfoDto>().success().setData(cfetsBondDealQuoteCommonDto);
+    public Message<CfetsTrdFirstBidFirmInfoDto> dealexecutioninit(@RequestBody CfetsTrdFirstBidFirmInitRequest request) {
+        CfetsTrdFirstBidFirmInfoDto initData = cfetsTrdFirstBidFirm002Service.queryEntrustInfoById(request);
+        if (StringUtil.isNotEmpty(initData)) {
+            return new Message<CfetsTrdFirstBidFirmInfoDto>().success().setData(initData);
         } else {
-            return new Message<CfetsTrdBondFirstSubInfoDto>().fail().setMessage("申购交易执行初始化异常");
+            return new Message<CfetsTrdFirstBidFirmInfoDto>().fail().setMessage("<投标确认>界面初始化异常");
         }
     }
 
 
-    @ApiOperation(value = "申购交易查看", notes = "点击申购执行明细里的数据后,调用该结口 查看申购交易数据")
+    @ApiOperation(value = "<投标确认>查看界面初始化", notes = "点击<投标确认执行明细>里的数据后,调用该接口 查看<投标确认>数据")
     @PostMapping("/viewPage")
     @ResponseBody
-    public Message<CfetsTrdBondFirstSubInfoDto> viewPage(@RequestBody CfetsTrdBondFirstSubInitRequest request) {
-        CfetsTrdBondFirstSubInfoDto cfetsBondDealQuoteCommonDto = cfetsTrdFirstBidFirm002Service.viewPage(request);
-        if (StringUtil.isNotEmpty(cfetsBondDealQuoteCommonDto)) {
-            return new Message<CfetsTrdBondFirstSubInfoDto>().success().setData(cfetsBondDealQuoteCommonDto);
+    public Message<CfetsTrdFirstBidFirmInfoDto> viewPage(@RequestBody CfetsTrdFirstBidFirmInitRequest request) {
+        CfetsTrdFirstBidFirmInfoDto viewInfo = cfetsTrdFirstBidFirm002Service.viewPage(request);
+        if (StringUtil.isNotEmpty(viewInfo)) {
+            return new Message<CfetsTrdFirstBidFirmInfoDto>().success().setData(viewInfo);
         } else {
-            return new Message<CfetsTrdBondFirstSubInfoDto>().fail().setMessage("申购交易执行初始化异常");
+            return new Message<CfetsTrdFirstBidFirmInfoDto>().fail().setMessage("<投标确认>查看界面初始化异常");
         }
     }
 
-    @ApiOperation(value = "指令查询明细", notes = "添加-指令查询明细 入参 市场代码和证券账户必传,点击添加按钮、指令查询明细页面点击查询按钮时调用")
+    @ApiOperation(value = "<指令明细查询>查询", notes = "<指令明细查询>页面初始化或点击【查询】按钮调用 ")
     @PostMapping("/etrAddSearch")
     @ResponseBody
     public Message<Page<CfetsTrdBondFirstSubEntrustDto>> etrAddSearch(@RequestBody CfetsTrdBondFirstSubEntrustRequest request) {
         try {
-            Page<CfetsTrdBondFirstSubEntrustDto> list = cfetsTrdBondFirstSub001Service.etrAddSearch(request);
+            Page<CfetsTrdBondFirstSubEntrustDto> list = /*cfetsTrdFirstBidFirm001Service.etrAddSearch(request)*/null;
             return new Message<Page<CfetsTrdBondFirstSubEntrustDto>>().success().setData(list);
         } catch (Exception e) {
             logger.error("指令查询明细添加异常", e);
@@ -223,28 +204,28 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
     }
 
 
-    @ApiOperation(value = "申购列表新增或删除", notes = "申购列表新增或删除")
+    @ApiOperation(value = "<投标产品列表>新增或删除", notes = "分销买入时,<投标产品列表>新增或删除")
     @PostMapping("/addOrDelList")
     @ResponseBody
-    public Message<CfetsTrdBondFirstSubInfoDto> addOrDelList(@RequestBody CfetsTrdBondFirstSubInfoDto request) {
-        CfetsTrdBondFirstSubInfoDto cfetsBondDealQuoteCommonDto = cfetsTrdFirstBidFirm002Service.addOrDelList(request);
-        if (StringUtil.isNotEmpty(cfetsBondDealQuoteCommonDto)) {
-            return new Message<CfetsTrdBondFirstSubInfoDto>().success().setData(cfetsBondDealQuoteCommonDto);
+    public Message<CfetsTrdFirstBidFirmInfoDto> addOrDelList(@RequestBody CfetsTrdFirstBidFirmInfoDto request) {
+        CfetsTrdFirstBidFirmInfoDto dealData = cfetsTrdFirstBidFirm002Service.addOrDelList(request);
+        if (StringUtil.isNotEmpty(dealData)) {
+            return new Message<CfetsTrdFirstBidFirmInfoDto>().success().setData(dealData);
         } else {
-            return new Message<CfetsTrdBondFirstSubInfoDto>().fail().setMessage("申购交易执行初始化异常");
+            return new Message<CfetsTrdFirstBidFirmInfoDto>().fail().setMessage("<投标产品列表>查询异常");
         }
     }
 
-    @ApiOperation(value = "自动分配", notes = "点击自动分配按钮调用")
+    @ApiOperation(value = "自动分配", notes = "点击【自动分配】按钮调用")
     @PostMapping("/autoAllocation")
     @ResponseBody
-    public Message<List<CfetsTrdBondFirstSubProductDto>> autoAllocation(@RequestBody CfetsTrdBondFirstSubInfoDto request) {
+    public Message<CfetsTrdFirstBidFirmInfoDto> autoAllocation(@RequestBody CfetsTrdFirstBidFirmInfoDto request) {
         try {
-            List<CfetsTrdBondFirstSubProductDto> list = cfetsTrdFirstBidFirm002Service.autoAllocation(request);
-            return new Message<List<CfetsTrdBondFirstSubProductDto>>().success().setData(list);
+            CfetsTrdFirstBidFirmInfoDto dealData = cfetsTrdFirstBidFirm002Service.autoAllocation(request);
+            return new Message<CfetsTrdFirstBidFirmInfoDto>().success().setData(dealData);
         } catch (Exception e) {
             logger.error("自动分配异常", e);
-            return new Message<List<CfetsTrdBondFirstSubProductDto>>().fail().setMessage("自动分配异常");
+            return new Message<CfetsTrdFirstBidFirmInfoDto>().fail().setMessage("自动分配异常");
         }
     }
 
@@ -264,13 +245,13 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
     @ApiOperation(value = "计算", notes = "联动计算,编辑基本信息中认购量时调用")
     @PostMapping("/calData")
     @ResponseBody
-    public Message<CfetsTrdBondFirstSubInfoDto> calData(@RequestBody CfetsTrdBondFirstSubInfoDto request) {
+    public Message<CfetsTrdFirstBidFirmInfoDto> calData(@RequestBody CfetsTrdFirstBidFirmInfoDto request) {
         try {
-            CfetsTrdBondFirstSubInfoDto result = cfetsTrdFirstBidFirm002Service.calData(request);
-            return new Message<CfetsTrdBondFirstSubInfoDto>().success().setData(result);
+            CfetsTrdFirstBidFirmInfoDto result = cfetsTrdFirstBidFirm002Service.calData(request);
+            return new Message<CfetsTrdFirstBidFirmInfoDto>().success().setData(result);
         } catch (Exception e) {
             logger.error("计算数据异常", e);
-            return new Message<CfetsTrdBondFirstSubInfoDto>().fail().setMessage("计算数据异常");
+            return new Message<CfetsTrdFirstBidFirmInfoDto>().fail().setMessage("计算数据异常");
         }
     }
 
@@ -360,51 +341,51 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
     }
 
     /**
-     * 申购提交检查
+     * 投标确认提交检查
      *
      * @param dto 页面元素
      * @return com.joyintech.tams.business.common.pojo.Message<com.joyintech.framework.ajax.AjaxResult>
      * @author jiangpeng
-     * @date 2022/4/22 10:53
+     * @date 2022/5/16 16:07
      */
-    @ApiOperation(value = "申购提交检查", notes = "申购提交检查")
+    @ApiOperation(value = "投标确认提交检查", notes = "投标确认点击【提交】调用")
     @PostMapping("/check")
     @ResponseBody
-    public Message<AjaxResult> check(@RequestBody CfetsTrdBondFirstSubInfoDto dto) {
+    public Message<AjaxResult> check(@RequestBody CfetsTrdFirstBidFirmInfoDto dto) {
         try {
             AjaxResult ajaxResult = cfetsTrdFirstBidFirm002Service.check(dto);
             return new Message<AjaxResult>().success().setData(ajaxResult);
         } catch (Exception e) {
-            logger.error("申购提交检查异常", e);
-            return new Message<AjaxResult>().fail().setMessage("申购提交检查异常");
+            logger.error("投标确认提交检查异常", e);
+            return new Message<AjaxResult>().fail().setMessage("投标确认提交检查异常");
         }
     }
 
     /**
-     * 申购提交(保存)
+     * 投标确认提交(保存)
      *
      * @param dto 页面元素
      * @return com.joyintech.tams.business.common.pojo.Message<com.joyintech.framework.ajax.AjaxResult>
      * @author jiangpeng
      * @date 2022/4/22 10:54
      */
-    @ApiOperation(value = "申购提交(保存)", notes = "申购提交(保存)")
+    @ApiOperation(value = "投标确认提交", notes = "投标确认点击【提交】【保存】调用")
     @ResponseBody
     @PostMapping("save")
-    public Message save(@RequestBody CfetsTrdBondFirstSubInfoDto dto, BindingResult br) {
+    public Message save(@RequestBody CfetsTrdFirstBidFirmInfoDto dto, BindingResult br) {
         if (br.hasErrors()) {
             return new Message<AjaxResult>().success().setData(new AjaxResult(br));
         }
         dto.setBidId(cfetsTrdFirstBidFirm002Service.getBidId(null));
-        ProcessParameter<CfetsTrdBondFirstSubInfoDto> processParameter = new ProcessParameter<>();
-        WorkFlowParameter<CfetsTrdBondFirstSubInfoDto> params = new WorkFlowParameter<>();
+        ProcessParameter<CfetsTrdFirstBidFirmInfoDto> processParameter = new ProcessParameter<>();
+        WorkFlowParameter<CfetsTrdFirstBidFirmInfoDto> params = new WorkFlowParameter<>();
         // 页面id
-        params.setPageId("TenderBondSub002");
+        params.setPageId("CfetsTrdFirstBidFirm002");
         //
         params.setElementId(dto.getElementId());
         params.setBusinessType(BussinessDictCodeList.共同业务类型_中标结果确认.getValue());
         params.setBusinessCode(dto.getBidId());
-        String finalStr = "交易日期:" + DateUtil.format(iPlatformDate.getSysDate());
+        String finalStr = "一级投标确认-交易日期:" + DateUtil.format(iPlatformDate.getSysDate());
         params.setComment(entity -> finalStr);
         processParameter.setWorkFlowParameter(params);
         processParameter.setOperationType(OperationType.NEW);
@@ -435,30 +416,30 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
         if (CollectionUtils.isNotEmpty(ajaxResult.getErrorList())) {
             return new Message<AjaxResult>().success().setData(ajaxResult);
         }
-        List<CfetsTrdBondFirstSubInfoDto> cfetsTrdBondFirstSubInfoDtos = new ArrayList<>();
+        List<CfetsTrdFirstBidFirmInfoDto> dtos = new ArrayList<>();
         for (CfetsBondFirstSubCheckDetaileRequst cfetsBondFirstSubCheckDetaileRequst : requst.getCfetsBondFirstSubCheckDetaileRequsts()) {
             WflValidInputParameter wflValidInputParameter = new WflValidInputParameter();
-            wflValidInputParameter.setPageId("TenderBondSub002");
+            wflValidInputParameter.setPageId("CfetsTrdFirstBidFirm002");
             wflValidInputParameter.setBusinessDataPk1(cfetsBondFirstSubCheckDetaileRequst.getBidId());
             ProcessMark processMark = cfetsRepoQuotedPrice004Service.getBusinessInfoByPageIdAndPk(wflValidInputParameter);
-            CfetsTrdBondFirstSubInfoDto dto = cfetsTrdFirstBidFirm002Service.getBussinessEntity(processMark);
+            CfetsTrdFirstBidFirmInfoDto dto = cfetsTrdFirstBidFirm002Service.getBussinessEntity(processMark);
             dto.setBidId(cfetsBondFirstSubCheckDetaileRequst.getBidId());
             dto.setRemark(StringUtil.join("申购撤销原因：", requst.getRemark()));
             dto.setOperateType("revoke");
-            cfetsTrdBondFirstSubInfoDtos.add(dto);
+            dtos.add(dto);
         }
-        ProcessParameter<CfetsTrdBondFirstSubInfoDto> processParameter = new ProcessParameter<>();
-        WorkFlowParameter<CfetsTrdBondFirstSubInfoDto> workFlowParameter = new WorkFlowParameter<>();
-        workFlowParameter.setPageId("TenderBondSub002");
-        workFlowParameter.setElementId("TenderBondSub002_btn_revoke");
-        workFlowParameter.setBusinessCode(CfetsTrdBondFirstSubInfoDto::getBidId);
+        ProcessParameter<CfetsTrdFirstBidFirmInfoDto> processParameter = new ProcessParameter<>();
+        WorkFlowParameter<CfetsTrdFirstBidFirmInfoDto> workFlowParameter = new WorkFlowParameter<>();
+        workFlowParameter.setPageId("CfetsTrdFirstBidFirm002");
+        workFlowParameter.setElementId("CfetsTrdFirstBidFirm002_btn_revoke");
+        workFlowParameter.setBusinessCode(CfetsTrdFirstBidFirmInfoDto::getBidId);
         workFlowParameter.setBusinessType(BussinessDictCodeList.共同业务类型_中标结果确认.getValue());
         workFlowParameter.setComment(entity -> "申购编号 (" + entity.getBidId() + ")");
         processParameter.setPageId(workFlowParameter.getPageId());
         processParameter.setWorkFlowParameter(workFlowParameter);
         processParameter.setOperationType(OperationType.REVOKE);
         String msg = cfetsTrdFirstBidFirm002Service.start(processParameter,
-                cfetsTrdBondFirstSubInfoDtos.toArray(new CfetsTrdBondFirstSubInfoDto[cfetsTrdBondFirstSubInfoDtos.size()]));
+                dtos.toArray(new CfetsTrdFirstBidFirmInfoDto[dtos.size()]));
         return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
     }
 }

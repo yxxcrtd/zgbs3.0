@@ -130,7 +130,7 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         finProductMapper.insert(finProduct);
         //2.保存金融产品标的附属表
         FinProductAdd productAdd = new FinProductAdd();
-        BeanUtil.copyPropertiesIgnoreNull(productAdd, dto.getProductAddDto());
+        BeanUtil.copyPropertiesIgnoreNull(productAdd, dto);
         productAdd.setFinprodId(dto.getFinprodId());
         BigDecimal cash = StringUtil.isNotEmpty(dto.getNomCapi())? dto.getNomCapi().multiply(new BigDecimal(10000)):new BigDecimal(0.00);
         productAdd.setNomCapi(cash);
@@ -164,6 +164,7 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         finCashCalcRule.setBaseDateType(DictCodeList.基数日期类型_当日.getValue());
         finCashCalcRule.setBasis(dto.getBasis());
         finCashCalcRule.setFinprodId(dto.getFinprodId());
+        finCashCalcRule.setBranch(0l);
         finCashCalcRuleMapper.insert(finCashCalcRule);
         //添加资金流计划
         FinCashPlan finCashPlan = new FinCashPlan();
@@ -270,15 +271,16 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
      */
     public CreditProtectionCertificate002Dto getById(String finprodId) {
         //1.查金融产品标的表
+        CreditProtectionCertificate002Dto entity = new CreditProtectionCertificate002Dto();
+        entity.setFinprodMarketId(finprodId);
+        finprodId = getFinprodId(entity);
         FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
         if (Objects.isNull(finProduct)) return null;
-        CreditProtectionCertificate002Dto entity = new CreditProtectionCertificate002Dto();
         BeanUtil.copyPropertiesIgnoreNull(entity, finProduct);
         //2.查金融产品标的附属表
         FinProductAdd finProductAdd = finProductAddMapper.selectByPrimaryKey(finprodId);
         FinProductAddDto finProductAddDto = new FinProductAddDto();
         BeanUtil.copyPropertiesIgnoreNull(finProductAddDto, finProductAdd);
-        entity.setProductAddDto(finProductAddDto);
         //查询计费年度天数
         FinCashPlan finCashPlan = new FinCashPlan();
         String cashId = CommonUtil.generateCashFlowCode(finProduct.getFinprodId(),
@@ -288,6 +290,8 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         finCashPlan.setMdate(finProduct.getMdate());
         finCashPlan = finCashPlanMapper.selectByPrimaryKey(finCashPlan);
         entity.setBasis(finCashPlan.getBasis());
+        BigDecimal cash = StringUtil.isNotEmpty(entity.getNomCapi())? entity.getNomCapi().divide(new BigDecimal(10000)):new BigDecimal(0.00);
+        entity.setNomCapi(cash);
         return entity;
     }
 
@@ -329,6 +333,12 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         }
         if (StringUtil.equals(operateType, OperationType.NEW.name())) {
             this.emptyCheck(dto, validList);
+            if(StringUtil.isNotEmpty(dto.getFinprodMarketId()) && dto.getFinprodMarketId().length() > 20) {
+                validList.add(new ValidMessage("资产代码长度不能超过20"));
+            }
+            if(StringUtil.isNotEmpty(dto.getFinprodMarketId()) && !dto.getFinprodMarketId().matches("^[A-Za-z0-9]+.[A-Za-z0-9]+$")) {
+                validList.add(new ValidMessage("资产代码只能由数字和字母组成"));
+            }
             if (StringUtil.isNotEmpty(dto.getFinprodMarketId()) && StringUtil.isNotEmpty(dto.getTradeMarket())) {
                 Map<String, String> param = new HashMap<>();
                 param.put("finprodMarketId", dto.getFinprodMarketId());

@@ -172,7 +172,7 @@ shiro:
     /InterfSysTrdConfig/**,/interf/risk/**,/EtrTradeSysInterf/**,/MstCaptialAccount/**,/MstSaleDepartment/**,/TrdBondInvestTrade/**,/AssetDeclarationCodeMaintenance/**,/ptlmanagementinfo/**,/InterfSysPara/**,/MstMarketCalendarInfo/**,
     /TrdExchangeWorkflow/**,/invest/trade/bond/TrdBondInvestTrade002/**,/invest/trade/trdrepotrade/TrdRepoTrade002/**,/invest/trade/forwex/TrdForwexInvestTrade002/**,/invest/trade/api/**,
     /CfetsRepoDealQuotedPrice001/selectEtrReByQuoteId,/core/getAssetFiveType,/common/trdcommonbase/insertFinProductCashData,/common/entrustcommonbase/finishEntrust,/TrdRepoTrade/selectPreTradeId,/FinProjectTargetAsset/insert,/component/**,/FinProductRating/**,
-    /common/joyinbusinessCommon/**,/svreport/interf/file/CreateZHXPFile/createFile
+    /common/joyinbusinessCommon/**,/svreport/interf/file/CreateZHXPFile/createFile,/asset/tenderBondAsset003/*,/core/*,/AssetCommon/*
 specialsyspara:
   parakey: AUTHORIZE_LIMIT||PRICE_CAL_TYPE||portfolio_handle_userid||settle_acct_name||settle_acct_no||prod_tru_acct_no||prod_tru_acct_name||lending_acct_no||lending_acct_name
 #页面特殊参数取值
@@ -358,8 +358,8 @@ spring:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
 #    username: BS303INIT_EXCHANGE0106
-    username: BS303INIT_TEST1008_03
-    password: BS303INIT_TEST1008_03
+    username: BS304INIT_DEV20220314IB
+    password: BS304INIT_DEV20220314IB
     reportSqlldrDatabaseName: 192.168.70.245:1521/orcl
   rabbitmq:
     # 需求环境使用mq配置如下
@@ -369,8 +369,8 @@ spring:
 application:
   sqldirurl: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
   driverClassName: oracle.jdbc.driver.OracleDriver
-  sqldiruserName: BS303INIT_TEST1008_03
-  sqldirpassword: BS303INIT_TEST1008_03
+  sqldiruserName: BS304INIT_DEV20220314IB
+  sqldirpassword: BS304INIT_DEV20220314IB
 shiro:
   ssoEnable: false  #是否开启sso验证，可以和joyinsso 统一登录配套使用。如果没有统一登录，但为true的话，就不校验密码
   #  loginUrl: http://127.0.0.1:1667/joyinsso/login.html#/login    ##统一登录页面，当有统一登录时配置成统一登录的访问地址
@@ -387,31 +387,31 @@ shiro:
     /CfetsRepoDealQuotedPrice001/selectEtrReByQuoteId,/core/getAssetFiveType,/common/trdcommonbase/insertFinProductCashData,/common/entrustcommonbase/finishEntrust,/TrdRepoTrade/selectPreTradeId,/joyin/**,/trade/joyin/**,
     /interf/refreshCache,/interf/execute,/interf/ziguanSysUserInfo,/interf/xp,/interf/xp/**,/interf/zg,/interf/zg/**,/FinProjectTargetAsset/insert,/FinAssetRateAdj/getFinAssetRateAdjByCashId,
     /cfets/**,/common/workflow/**,/common/config/**,/component/**,/FinProductRating/**,/svreport/interf/file/CreateZHXPFile/createFile,
-    /EtrAgreRepTrade/getEntrustInfoByTradeId,/trade/joyin/**,/EntrustMsgbyMQ/**
+    /EtrAgreRepTrade/getEntrustInfoByTradeId,/trade/joyin/**,/EntrustMsgbyMQ/**,/asset/tenderBondAsset003/*,/core/*,/AssetCommon/*
 base:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008_03
-    password: BS303INIT_TEST1008_03
+    username: BS304INIT_DEV20220314IB
+    password: BS304INIT_DEV20220314IB
 interf:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008_03
-    password: BS303INIT_TEST1008_03
+    username: BS304INIT_DEV20220314IB
+    password: BS304INIT_DEV20220314IB
 stresstest:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008_03
-    password: BS303INIT_TEST1008_03
+    username: BS304INIT_DEV20220314IB
+    password: BS304INIT_DEV20220314IB
 wind:
   datasource:
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008_03
-    password: BS303INIT_TEST1008_03
+    username: BS304INIT_DEV20220314IB
+    password: BS304INIT_DEV20220314IB
 log:
   path: /home/tams/logs/tams/touguan
   level: debug

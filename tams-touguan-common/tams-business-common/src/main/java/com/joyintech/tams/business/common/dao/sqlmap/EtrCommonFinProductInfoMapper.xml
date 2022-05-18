@@ -55,7 +55,7 @@
         ISSUE.TENDER_SDATE tenderSdate,
         ISSUE.TENDER_EDATE tenderEdate,
         ISSUE.ISSUE_STYLE issueStyle,
-        ISSUE.PLAN_ISSUE_AMT/100000000 planIssueAmt,
+        TO_CHAR(ROUND(ISSUE.PLAN_ISSUE_AMT/100000000,2),'fm999999999999999999999990.00') || '亿元' planIssueAmt,
         ISSUE.ADD_BATCH addBatch,
         ISSUE.PAY_DATE payDate,
         ISSUE.PAY_EDATE payEdate,

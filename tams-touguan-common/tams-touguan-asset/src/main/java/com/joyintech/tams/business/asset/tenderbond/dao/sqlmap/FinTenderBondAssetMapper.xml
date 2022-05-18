@@ -317,7 +317,7 @@
             sec.IS_BONDS_WITH_RIGHTS as isRight,
             sec.TRADING_CALENDAR as calendarId
         FROM INTERF_WIND_UNRELEASE_SEC_INFO sec
-        where sec.SEC_ID=#{finprodMarketId,jdbcType=VARCHAR} and TRADING_PLACES in (#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04}) AND ROWNUM=1
+        where sec.SEC_ID=#{finprodMarketId,jdbcType=VARCHAR} and TRADING_PLACES in (#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04})
     </select>
 
     <!--从接口表中获取标的附属表数据-->
@@ -369,8 +369,12 @@
             sec.INTEREST_PAYMENT_FREQUENCY as payCycle,
             ri.BID_DATE as  tenderSdate,
             ri.BID_DATE as tenderEdate
-        FROM (select * from (select * from INTERF_WIND_RELEASE_INFO where (ISSUE_DATE >=TO_DATE(#{platformDate},'YYYY-MM-DD') or BID_DATE >= TO_DATE(#{platformDate},'YYYY-MM-DD') or ADDITIONAL_TENDER_DATE >=TO_DATE(#{platformDate},'YYYY-MM-DD'))
-        and SEC_ID=#{finprodMarketId,jdbcType=VARCHAR} order by nvl(ISSUE_DATE,nvl(BID_DATE,ADDITIONAL_TENDER_DATE)) asc) where ROWNUM=1) ri
+        FROM (select * from (select * from INTERF_WIND_RELEASE_INFO where 1=1
+        <if test="flag != null and flag !=''">
+            nvl(ISSUE_DATE,nvl(BID_DATE,ADDITIONAL_TENDER_DATE)) >= TO_DATE(#{platformDate},'YYYY-MM-DD')
+            and SEC_ID=#{finprodMarketId,jdbcType=VARCHAR} order by nvl(ISSUE_DATE,nvl(BID_DATE,ADDITIONAL_TENDER_DATE)) asc
+        </if> ) where ROWNUM=1
+        ) ri
         LEFT JOIN INTERF_WIND_UNRELEASE_SEC_INFO sec on ri.SEC_ID = sec.SEC_ID
         LEFT JOIN (select * from INTERF_RDI_RELEASE_INFO where SECURITY_TYPE in ('CD','14'))  pri ON pri.SECURITY_ID = ri.SEC_ID
         where ri.SEC_ID=#{finprodMarketId,jdbcType=VARCHAR}  and sec.TRADING_PLACES in (#{TRADE_PLACE_01},#{TRADE_PLACE_02},#{TRADE_PLACE_03},#{TRADE_PLACE_04}) AND ROWNUM=1
@@ -544,6 +548,7 @@
         <where>
            <!-- t.VDATE <![CDATA[<=]]> #{platDate,jdbcType=DATE}
             AND t.MDATE <![CDATA[>=]]> #{platDate,jdbcType=DATE}-->
+            t.MARKET2 is not null
             <if test="tradeMarket != null and !tradeMarket.equals('')">
                 AND t.MARKET2 not in(#{tradeMarket})
             </if>
@@ -574,6 +579,7 @@
         <where>
            <!-- AND t.VDATE <![CDATA[<=]]> #{platDate,jdbcType=DATE}
             AND t.MDATE <![CDATA[>=]]> #{platDate,jdbcType=DATE}-->
+            t.FINPROD_TYPE2='F01' and t.TRADE_MARKET is not null
             <if test="tradeMarket != null and !tradeMarket.equals('')">
                 AND t.TRADE_MARKET not in(#{tradeMarket})
             </if>
