@@ -1,10 +1,12 @@
 package com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto;
 
 
+import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.business.common.dto.PageMode;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -13,18 +15,21 @@ import java.util.Date;
 import java.util.List;
 
 
-
+@PageId("MstCreditMarketInfo002")
 public class MskCreditInfoProSaveRequest extends BaseEntity implements ProcessEntity{
 
     @ApiModelProperty(name="operateType",value="操作类型",example="submit/save", required = true)
     private String operateType;
     @ApiModelProperty(name="elementId",value="按钮id",example="MstCreditMarketInfo001_btn_submit/MstCreditMarketInfo001_btn_save")
     private String elementId;
-    @ApiModelProperty(name="pageId",value="d",example="MstCreditMarketInfo001")
+    @ApiModelProperty(name="pageId",value="d",example="MstCreditMarketInfo002")
     private String pageId;
     @ApiModelProperty(name="selectedItem",value="选中数据",example="A1,A2..", required = true)
     private List<MskCreditInfoProSaveRequest> selectedItem;
-
+    /**
+     * 指令编号
+     */
+    @PrimaryKey(PrimaryKey.Field.PK_1)
     @ApiModelProperty(name="secid",value="凭证代码",example="A1", required = true)
     private String secid;
 
