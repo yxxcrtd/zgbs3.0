@@ -116,7 +116,7 @@ public class FinTenderBondAsset003Controller extends BaseController {
         if (Objects.isNull(request)) {
             return Message.success("校验成功", null);
         } else {
-            return Message.fail("校验失败", request);
+            return Message.success("校验成功", request);
         }
     }
 
