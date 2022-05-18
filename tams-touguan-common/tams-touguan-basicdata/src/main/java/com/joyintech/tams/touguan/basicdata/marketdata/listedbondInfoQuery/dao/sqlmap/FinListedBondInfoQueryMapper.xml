@@ -173,8 +173,7 @@
 
 
     <select id="queryFinWindMarketForCoupons"
-            resultType="com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.dto.FinListedBondInfoQuery001Dto"
-            parameterType="com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.req.FinListedBondInfoQueryRequest">
+            resultType="com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.dto.FinListedBondInfoQuery001Dto">
         SELECT
         SEC_INFO.SEC_ID secId,
         SEC_INFO.BOND_NAME bondName,
@@ -198,15 +197,15 @@
         RELEASE_INFO.ADDITIONAL_BATCHES as additionalBatches,
 
         nvl(RDI_RELEASE_INFO.ISSUE_SIZE * 100000000, ROUND(RELEASE_INFO.ISSUE_SIZE, 2)) as issueSize,
-        nvl(TO_DATE(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd')) as issueDate,
-        nvl(TO_DATE(RDI_RELEASE_INFO.EVENT_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.PAYMENT_DEADLINE, 'yyyy-MM-dd')) as eventDate,
+        nvl(TO_CHAR(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd'), TO_CHAR(RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd')) as issueDate,
+        nvl(TO_CHAR(RDI_RELEASE_INFO.EVENT_DATE, 'yyyy-MM-dd'), TO_CHAR(RELEASE_INFO.PAYMENT_DEADLINE, 'yyyy-MM-dd')) as eventDate,
         RELEASE_INFO.DEBT_REGISTRATION_DATE AS debtRegistrationDate,
 
         RELEASE_INFO.LISTING_DATE AS listingDate,
         RELEASE_INFO.LISTING_CODE AS listingCode,
         SEC_INFO.CROSS_MARKET_CODE AS crossMarketCode,
 
-        nvl(TO_DATE(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd'), TO_DATE(RELEASE_INFO.INTEREST_ACCRUAL_DATE,
+        nvl(TO_CHAR(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd'), TO_CHAR(RELEASE_INFO.INTEREST_ACCRUAL_DATE,
         'yyyy-MM-dd')) as interestAccrualDate,
 
         SEC_INFO.VALUE_DATE valueDate,

@@ -143,7 +143,7 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
                         PositionCashSecDto secDto = new PositionCashSecDto();
                         BeanUtil.copyPropertiesIgnoreNull(secDto, entity);
                         BigDecimal sellNum = etrTradeCommonervice.selectAvailableNum(secDto);
-                        entity.setSellNum(sellNum);
+                        entity.setSellNum(ArithmeticUtil.divide(sellNum,new BigDecimal("100"),2));
                         //过滤掉实际持仓和可用持仓都等于0
                         if (entity.getPositionsNum().compareTo(BigDecimal.ZERO) == 0 && sellNum.compareTo(BigDecimal.ZERO) == 0) {
                             continue;

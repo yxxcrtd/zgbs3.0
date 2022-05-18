@@ -10,8 +10,8 @@ public class CreditProtectionCertificateRequest {
     @ApiModelProperty(name="pageId",value="画面ID",example="CreditProtectionCertificate001")
     private String pageId;
 
-    @ApiModelProperty(name="finprodId",value="资产代码")
-    private String finprodId;
+    @ApiModelProperty(name="finprodIdAbrr",value="资产代码")
+    private String finprodIdAbrr;
 
     @ApiModelProperty(name="issueRshortStr",value="创立机构")
     private String issueRshortStr;
@@ -24,6 +24,9 @@ public class CreditProtectionCertificateRequest {
 
     @ApiModelProperty(name="pageMode",value="分页对象")
     private PageMode pageMode;
+
+    @ApiModelProperty(name="initValue",value="初始值(方法：getfinprodIdForAdd(选填))")
+    private String initValue;
 
     @ApiModelProperty(name="search",value="查询对象")
     private String search;
@@ -54,12 +57,12 @@ public class CreditProtectionCertificateRequest {
         this.pageId = pageId;
     }
 
-    public String getFinprodId() {
-        return finprodId;
+    public String getFinprodIdAbrr() {
+        return finprodIdAbrr;
     }
 
-    public void setFinprodId(String finprodId) {
-        this.finprodId = finprodId;
+    public void setFinprodIdAbrr(String finprodIdAbrr) {
+        this.finprodIdAbrr = finprodIdAbrr;
     }
 
     public String getIssueRshortStr() {
@@ -92,6 +95,14 @@ public class CreditProtectionCertificateRequest {
 
     public void setPageMode(PageMode pageMode) {
         this.pageMode = pageMode;
+    }
+
+    public String getInitValue() {
+        return initValue;
+    }
+
+    public void setInitValue(String initValue) {
+        this.initValue = initValue;
     }
 
     public String getSearch() {

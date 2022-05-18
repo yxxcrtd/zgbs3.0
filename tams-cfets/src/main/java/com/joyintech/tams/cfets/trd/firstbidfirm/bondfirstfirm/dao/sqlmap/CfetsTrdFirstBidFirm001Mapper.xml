@@ -14,4 +14,184 @@
         )
     </select>
 
+    <sql id="keywordsWhere">
+        <if test="search != null and search != ''">
+            ( T.entrustStatus || '|' || sdl_es.item_value || '|' || T.finprodId || '|' || T.finprodMarketId || '|'
+            || '|' || T.finprodAbbr || '|' || T.portfolioName || '|' || T.portfolioId || '|' || T.secManageAcctId
+            || '|' || T.secAcctName || '|' || T.businessModel || '|' || sdl_bm.item_value
+            || '|' || T.invManagerName || '|' || T.entrustId || '|' || T.remark
+            like '%' || #{search} || '%'
+            or decode(T.transactioncom,0,'0.00',to_char(T.transactioncom,'FM90.90'))=#{search} or to_char(T.transactioncom)=#{search}
+            or decode(T.tradeFinishPercent,0,'0.00',to_char(T.tradeFinishPercent,'FM90.90'))=#{search} or to_char(T.tradeFinishPercent)=#{search}
+            or decode(T.entrustNum,0,'0.00',to_char(T.entrustNum/10000,'FM999999999990.90'))=#{search} or to_char(T.entrustNum)=#{search}
+            or replace(to_char(T.issueDate,'yyyy-MM-dd'),'-','/')=#{search}
+            or replace(to_char(T.payDate,'yyyy-MM-dd'),'-','/')=#{search}
+            or replace(to_char(T.entrustDate,'yyyy-MM-dd'),'-','/')=#{search}
+            or T.transmitTime=#{search}
+            )
+        </if>
+    </sql>
+
+    <!-- 指令查询SQL -->
+    <sql id="listEntrustSql">
+        select ee.ENTRUST_STATUS                        entrustStatus,
+        nvl(efs.ENT_FINISH_AMT, 0)               finishAmt,
+        trunc(nvl(efs.ENT_FINISH_AMT, 0) /
+        case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
+        100                                      transactioncom,
+        nvl(tpd.SHARE_AMT * 100, 0)                    finishDealAmt,
+        trunc(nvl(tpd.SHARE_AMT * 100, 0) /
+        case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
+        100                                      tradeFinishPercent,
+        ee.ENTRUST_NUM*100                       entrustNum,
+        ee.FINPROD_ID                            finprodId,
+        fp.FINPROD_MARKET_ID                     finprodMarketId,
+        fp.FINPROD_ABBR                          finprodAbbr,
+        fpi.ISSUE_DATE                           issueDate,
+        fpi.PAY_DATE                             payDate,
+        eed.PORTFOLIO_ID                         portfolioId,
+        eed.PORTFOLIO_NAME                       portfolioName,
+        eea.SEC_ACCT_ID                          secManageAcctId,
+        ssai.SEC_ACCT_NAME                       secAcctName,
+        eed.INV_AIM                              businessModel,
+        su.REAL_NAME                             invManagerName,
+        ee.ENTRUST_DATE                          entrustDate,
+        to_char(eea.TRANSMIT_TIME, 'hh24:mi:ss') transmitTime,
+        to_char(eea.TRANSMIT_TIME, 'hh24:mi')    transmitTimeSer,
+        ee.ENTRUST_ID                            entrustId,
+        hisInfo.REMARK                                remark
+        from ETR_ENTRUST ee
+        left join (select listagg(t0.PORTFOLIO_ID, ',') within group (order by t0.ENTRUST_ID)   AS PORTFOLIO_ID,
+        listagg(pp.PORTFOLIO_NAME, ',') within group (order by t0.ENTRUST_ID) AS PORTFOLIO_NAME,
+        listagg(t0.INV_AIM, ',') within group (order by t0.ENTRUST_ID)        AS INV_AIM,
+        listagg(sdl_bs.ITEM_VALUE, ',') within group (order by t0.ENTRUST_ID)   AS businessModelStr,
+        t0.ENTRUST_ID
+        from ETR_ENTRUST_DETAIL t0
+        left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = t0.PORTFOLIO_ID
+        left join SYS_DATADICT_LIST sdl_bs
+        on t0.INV_AIM = sdl_bs.ITEM_CODE and sdl_bs.DICT_CODE = 'BUSINESSMODEL'
+        <where>
+            <if test="portfolioIds != null and portfolioIds.size()>0">
+                <foreach collection="portfolioIds" open=" t0.PORTFOLIO_ID in(" close=") " separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        group by t0.ENTRUST_ID) eed
+        on ee.ENTRUST_ID = eed.ENTRUST_ID
+        left join ( <include refid="com.joyintech.tams.common.base.dao.EtrEntrustOperHisMapper.selectHisInfo" />) hisInfo
+        on ee.ENTRUST_ID = hisInfo.ENTRUST_ID
+        left join ETR_ENTRUST_ADD eea on ee.ENTRUST_ID = eea.ENTRUST_ID
+        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eea.SEC_ACCT_ID
+        left join (select sum(ENT_FINISH_AMT) ENT_FINISH_AMT, sum(FINISH_AMT) FINISH_AMT, ENTRUST_ID
+        from ETR_FINISH_STATUS
+        group by ENTRUST_ID) efs on ee.ENTRUST_ID = efs.ENTRUST_ID
+        left join (select sum(t1.SHARE_AMT) SHARE_AMT, t2.ENTRUST_ID
+        from TRD_PRODUCT_DEAL t1
+        left join TRD_PRODUCT_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
+        where t1.IS_CANCEL = #{YN_N}
+        and t1.TRADE_STATUS != #{TRADE_STATUS03}
+        group by t2.ENTRUST_ID) tpd on tpd.ENTRUST_ID = ee.ENTRUST_ID
+        left join FIN_PRODUCT fp on fp.FINPROD_ID = ee.FINPROD_ID
+        left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = ee.FINPROD_ID
+        left join SYS_USER su on su.USER_NAME = ee.INV_MANAGER_ID
+        where fpi.ISSUE_CLASS = #{ISSUE_CLASS_01}
+        order by decode(ee.ENTRUST_STATUS, '04', 2, '05', 3, '06', 4, 1) asc,fpi.ISSUE_DATE,ee.ENTRUST_DATE,eea.TRANSMIT_TIME
+    </sql>
+
+    <!-- 指令列表查询 -->
+    <select id="listEntrust" resultType="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto">
+        select
+        T.entrustStatus,
+        T.finishAmt,
+        T.transactioncom,
+        T.finishDealAmt,
+        T.tradeFinishPercent,
+        T.entrustNum,
+        T.finprodId,
+        T.finprodMarketId,
+        T.finprodAbbr,
+        T.issueDate,
+        T.payDate,
+        T.portfolioId,
+        T.portfolioName,
+        T.secManageAcctId,
+        T.secAcctName,
+        T.businessModel,
+        T.invManagerName,
+        T.entrustDate,
+        T.transmitTime,
+        T.transmitTimeSer,
+        T.entrustId,
+        T.remark,
+        (nvl(T.entrustNum,0) - nvl(T.finishAmt,0)) avaNum,
+        (nvl(T.entrustNum,0) - nvl(T.finishDealAmt,0)) avaDealAmt
+        from
+        (<include refid="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dao.CfetsTrdFirstBidFirm001Mapper.listEntrustSql" />) T
+        left join SYS_DATADICT_LIST sdl_es on T.entrustStatus=sdl_es.ITEM_CODE and sdl_es.DICT_CODE='ENTRUST_STATUS'
+        left join SYS_DATADICT_LIST sdl_bm on T.businessModel=sdl_bm.ITEM_CODE and sdl_bm.DICT_CODE='BUSINESS_MODEL'
+        LEFT JOIN ETR_DISTRIBUTE ed ON ed.ENTRUST_ID = T.entrustId
+        <where>
+            <!-- 关键字模糊查询 -->
+            <include refid="keywordsWhere"></include>
+            <if test="loginUserId != null and loginUserId != '' ">
+                AND ed.TRADER = #{loginUserId}
+            </if>
+            <if test="entrustStatus == null">
+                AND T.entrustStatus in ('02','03','04','05','06')
+            </if>
+            <if test="entrustStatus != null and entrustStatus.size()>0">
+                AND
+                <foreach collection="entrustStatus" open=" T.entrustStatus in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="finprodMarketIds != null and finprodMarketIds.size()>0">
+                AND
+                <foreach collection="finprodMarketIds" open=" T.finprodId in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="secManageAcctIds != null and secManageAcctIds.size()>0">
+                AND
+                <foreach collection="secManageAcctIds" open=" T.secManageAcctId in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="issueDateStart != null and !issueDateStart.isEmpty() ">
+                AND T.issueDate >= to_date(#{issueDateStart}, 'yyyy-MM-dd')
+            </if>
+            <if test="issueDateEnd != null and !issueDateEnd.isEmpty() ">
+                AND T.issueDate <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd')
+            </if>
+            <if test="entrustDateStart != null and !entrustDateStart.isEmpty() ">
+                AND T.entrustDate >= to_date(#{entrustDateStart}, 'yyyy-MM-dd')
+            </if>
+            <if test="entrustDateEnd != null and !entrustDateEnd.isEmpty() ">
+                AND T.entrustDate <![CDATA[<=]]> to_date(#{entrustDateEnd}, 'yyyy-MM-dd')
+            </if>
+            <if test="entrustId != null and entrustId != '' ">
+                AND T.entrustId = #{entrustId}
+                /*指令代码查询*/
+            </if>
+            <if test="entrustIdList != null and entrustIdList.size()>0">
+                AND
+                <foreach collection="entrustIdList" open=" T.entrustId in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+                /*指令代码查询*/
+            </if>
+            <if test="existEntrustIds != null and existEntrustIds.size()>0">
+                AND
+                <foreach collection="existEntrustIds" open=" T.entrustId not in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+                /*指令代码查询*/
+            </if>
+        </where>
+        <if test="pageMode != null and pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
+            order by ${pageMode.sort} ${pageMode.direction}
+        </if>
+    </select>
+
 </mapper>

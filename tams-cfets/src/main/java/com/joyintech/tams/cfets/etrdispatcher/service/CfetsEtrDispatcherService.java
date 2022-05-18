@@ -15,7 +15,6 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.base.intf.DataDictItem;
 import com.joyintech.framework.constant.GlobalConstant;
-import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.security.LoginUserUtil;
@@ -879,7 +878,7 @@ public class CfetsEtrDispatcherService extends BaseService {
         List<String> tradersList = StringUtil.splitToList(",", (String) pageParam.get("traders"));
         List<String> entrustIdList = StringUtil.splitToList(",", (String) pageParam.get("entrustId"));
         List<String> newTraders = StringUtil.splitToList(",", (String) pageParam.get("traders"));
-        CfetsEtrDispatcherResponse etrDispatcherDto = new CfetsEtrDispatcherResponse();
+        List<CfetsEtrDispatcherResponse> etrDispatcherList = new ArrayList<>();
         if (CollectionUtils.isEmpty(entrustIdList)) {
             errorList.add(new ValidMessage(getMessage("BUSS_COM_E_0026")));
         } else {
@@ -921,16 +920,19 @@ public class CfetsEtrDispatcherService extends BaseService {
                     + finprodIdListBid.toString() + "],其他业务类型资产[" + finprodIdListOthers.toString() + "]"));
 
             if (CollectionUtils.isNotEmpty(errorList)) {
+                CfetsEtrDispatcherResponse etrDispatcherDto = new CfetsEtrDispatcherResponse();
                 etrDispatcherDto.setBidCode("01");
-                ajaxResult.setErrorList(errorList);
-                ajaxResult.setData(etrDispatcherDto);
+                etrDispatcherDto.setErrorList(errorList);
+                etrDispatcherList.add(etrDispatcherDto);
+                ajaxResult.setData(etrDispatcherList);
                 return ajaxResult;
             }
         }
 
         if (CollectionUtils.isNotEmpty(finprodIdListBid)) {
             for (String finprodId : finprodIdListBid) {
-                List<String> traders = cfetsEtrDispatcherMapper.getDispatcherTraderList(finprodId, DictCodeList.委托状态_已接收.getValue());
+                List<String> traders = cfetsEtrDispatcherMapper.getDispatcherTraderList(finprodId, DictCodeList.委托状态_已接收.getValue())
+                        .stream().distinct().collect(Collectors.toList());
                 if (CollectionUtils.isNotEmpty(traders)) {
                     traders.stream().sorted();
                     tradersList.stream().sorted();
@@ -940,9 +942,11 @@ public class CfetsEtrDispatcherService extends BaseService {
                 }
             }
             if (CollectionUtils.isNotEmpty(errorList)) {
+                CfetsEtrDispatcherResponse etrDispatcherDto = new CfetsEtrDispatcherResponse();
                 etrDispatcherDto.setBidCode("01");
-                ajaxResult.setErrorList(errorList);
-                ajaxResult.setData(etrDispatcherDto);
+                etrDispatcherDto.setErrorList(errorList);
+                etrDispatcherList.add(etrDispatcherDto);
+                ajaxResult.setData(etrDispatcherList);
                 return ajaxResult;
             }
 
@@ -959,16 +963,19 @@ public class CfetsEtrDispatcherService extends BaseService {
             for (String finprodId : finprodIdListBid) {
                 List<String> statusList = new ArrayList<>();
                 statusList.add(DictCodeList.委托状态_待接收.getValue());
-                statusList.add(DictCodeList.委托状态_已接收.getValue());
-                List<String> entrustIdAlready = cfetsEtrDispatcherMapper.getDispatcherEntrustIdList(finprodId, statusList);
+                List<String> entrustIdAlready = cfetsEtrDispatcherMapper.getDispatcherEntrustIdList(finprodId, statusList)
+                        .stream().distinct().collect(Collectors.toList());
                 if (CollectionUtils.isNotEmpty(entrustIdAlready)) {
                     finprodIdListAlready.add(finprodId);
                 }
-
-                List<String> entrustIdFirst = cfetsEtrDispatcherMapper.getDispatcherEntrustIdList(finprodId, Arrays.asList(DictCodeListExt3.委托状态_待分发.getValue()));
-                if (CollectionUtils.isNotEmpty(entrustIdFirst)) {
-                    finprodIdListFirst.add(finprodId);
+                if (CollectionUtils.isEmpty(entrustIdAlready)) {
+                    List<String> entrustIdFirst = cfetsEtrDispatcherMapper.getDispatcherEntrustIdList(finprodId, Arrays.asList(DictCodeListExt3.委托状态_待分发.getValue()))
+                            .stream().distinct().collect(Collectors.toList());
+                    if (CollectionUtils.isNotEmpty(entrustIdFirst)) {
+                        finprodIdListFirst.add(finprodId);
+                    }
                 }
+
             }
 
             //校验未勾选指令
@@ -983,7 +990,8 @@ public class CfetsEtrDispatcherService extends BaseService {
                     List<String> unSelectEntrustIds = new ArrayList<>();
                     List<String> statusList = new ArrayList<>();
                     statusList.add(DictCodeListExt3.委托状态_待分发.getValue());
-                    List<String> entrustIds = cfetsEtrDispatcherMapper.getDispatcherEntrustIdList(finprodId, statusList);
+                    List<String> entrustIds = cfetsEtrDispatcherMapper.getDispatcherEntrustIdList(finprodId, statusList)
+                            .stream().distinct().collect(Collectors.toList());
                     for (String entrustId : entrustIds) {
                         if (!entrustIdList.contains(entrustId)) {
                             unSelectEntrustIds.add(entrustId);
@@ -993,36 +1001,57 @@ public class CfetsEtrDispatcherService extends BaseService {
                 }
 
                 if (CollectionUtils.isNotEmpty(newEntrustIdList)) {
+                    errorList.clear();
                     errorList.add(new ValidMessage("是否确认将该债券所有的投标指令均分发给此交易员？本次未选择的指令:"+newEntrustIdList.toString()));
+                    CfetsEtrDispatcherResponse etrDispatcherDto = new CfetsEtrDispatcherResponse();
+                    etrDispatcherDto.setBidCode("02");
+                    etrDispatcherDto.setErrorList(errorList);
+                    newEntrustIdList.addAll(entrustIdList);
+                    etrDispatcherDto.setEntrustIdList(newEntrustIdList.stream().distinct().collect(Collectors.toList()));
+                    etrDispatcherDto.setErrorList(errorList);
+                    etrDispatcherList.add(etrDispatcherDto);
+
                 }
+
             }
 
             //校验已分发交易员
             for (String finprodId : finprodIdListBid) {
-                List<String> traderList = cfetsEtrDispatcherMapper.getDispatcherTraderList(finprodId, DictCodeList.委托状态_待接收.getValue());
-                List<String> entrustIdListYet = cfetsEtrDispatcherMapper.getDispatcherEntrustIdList(finprodId, Arrays.asList(DictCodeList.委托状态_待接收.getValue()));
-                if (CollectionUtils.isNotEmpty(traderList)) {
+                List<String> traderList = cfetsEtrDispatcherMapper.getDispatcherTraderList(finprodId, DictCodeList.委托状态_待接收.getValue())
+                        .stream().distinct().collect(Collectors.toList());
+                List<String> entrustIdListYet = cfetsEtrDispatcherMapper.getDispatcherEntrustIdList(finprodId, Arrays.asList(DictCodeList.委托状态_待接收.getValue()))
+                        .stream().distinct().collect(Collectors.toList());
+                traderList.stream().sorted();
+                newTraders.stream().sorted();
+
+                if (CollectionUtils.isNotEmpty(traderList) && !StringUtil.equals(traderList.toString(),newTraders.toString())) {
                     newTraderList.addAll(traderList);
+                    errorList.clear();
                     errorList.add(new ValidMessage("同一投标日的债券一级投标已有分发记录，是否将已分发记录的交易员也调整为交易员"+newTraders.toString()));
                 }
                 if (CollectionUtils.isNotEmpty(entrustIdListYet)) {
+                    CfetsEtrDispatcherResponse etrDispatcherDto = new CfetsEtrDispatcherResponse();
                     newEntrustIdList.addAll(entrustIdListYet);
+                    etrDispatcherDto.setBidCode("04");
+                    etrDispatcherDto.setErrorList(errorList);
+                    etrDispatcherDto.setTraderList(newTraderList.stream().distinct().collect(Collectors.toList()));
+                    newEntrustIdList.addAll(entrustIdList);
+                    etrDispatcherDto.setEntrustIdList(newEntrustIdList.stream().distinct().collect(Collectors.toList()));
+                    etrDispatcherList.add(etrDispatcherDto);
+
                 }
             }
 
         }
 
-        if (CollectionUtils.isEmpty(errorList)) {
+        //校验通过
+        if(CollectionUtils.isEmpty(errorList)) {
+            CfetsEtrDispatcherResponse etrDispatcherDto = new CfetsEtrDispatcherResponse();
             etrDispatcherDto.setBidCode("03");
-        }else {
-            etrDispatcherDto.setBidCode("02");
-            etrDispatcherDto.setTraderList(newTraderList.stream().distinct().collect(Collectors.toList()));
-            newEntrustIdList.addAll(entrustIdList);
-            etrDispatcherDto.setEntrustIdList(newEntrustIdList.stream().distinct().collect(Collectors.toList()));
+            etrDispatcherList.add(etrDispatcherDto);
         }
 
-        ajaxResult.setErrorList(errorList);
-        ajaxResult.setData(etrDispatcherDto);
+        ajaxResult.setData(etrDispatcherList);
         return ajaxResult;
     }
 
@@ -1115,13 +1144,13 @@ public class CfetsEtrDispatcherService extends BaseService {
         EntrCommandDispatcherTotalDto msgdto = entrCommandDispatcherService.pushCommandMsg(param);
 
         // modify by etliu 20210203 可转债网下申购不发送交易端 start
-        if (msgdto != null && !StringUtil.isEmptyList(msgdto.getEtr_entrust_list())) {
-            String message = restTemplate.postForObject(ServiceApplication.ENTRUST_SERVICE_NAME
-                    + "/EtrCommandDispatcher/pushCommandMsg", msgdto, String.class);
-            if(StringUtil.isNotEmpty(message)){
-                throw new BusinessException(message);
-            }
-        }
+//        if (msgdto != null && !StringUtil.isEmptyList(msgdto.getEtr_entrust_list())) {
+//            String message = restTemplate.postForObject(ServiceApplication.ENTRUST_SERVICE_NAME
+//                    + "/EtrCommandDispatcher/pushCommandMsg", msgdto, String.class);
+//            if(StringUtil.isNotEmpty(message)){
+//                throw new BusinessException(message);
+//            }
+//        }
         // modify by etliu 20210203 可转债网下申购不发送交易端 end
     }
 

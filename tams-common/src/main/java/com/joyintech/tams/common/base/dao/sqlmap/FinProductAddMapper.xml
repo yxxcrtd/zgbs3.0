@@ -132,7 +132,8 @@
         DELIVERY_METHOD DELIVERY_METHOD, CONTRACT_MULTIPLIER CONTRACT_MULTIPLIER, IS_EFF_PLEDGE IS_EFF_PLEDGE, 
         IS_ISSUE_ASSET IS_ISSUE_ASSET, APPEAR_MARKET_ID APPEAR_MARKET_ID, WIND_CODE WIND_CODE,CROSS_MARKET CROSS_MARKET,
         CROSS_MARKET_CODE CROSS_MARKET_CODE, IS_NO_GUARD IS_NO_GUARD, CONCEPT_TYPE CONCEPT_TYPE,
-        IS_ALLOW_OVERWRITE IS_ALLOW_OVERWRITE,OLD_DELISTING_DATE OLD_DELISTING_DATE,LISTING_DATE_FROM_TRADE LISTING_DATE_FROM_TRADE,DIRECT_DISCLOSURE_RISK_FLAG,IS_OPEN_EVERYDAY,IS_SEVEN_DAY_CASHABLE,OPEN_TYPE
+        IS_ALLOW_OVERWRITE IS_ALLOW_OVERWRITE,OLD_DELISTING_DATE OLD_DELISTING_DATE,LISTING_DATE_FROM_TRADE LISTING_DATE_FROM_TRADE,DIRECT_DISCLOSURE_RISK_FLAG,IS_OPEN_EVERYDAY,IS_SEVEN_DAY_CASHABLE,OPEN_TYPE,
+        PROTECT_OBJECT,REF_ENTITY,REF_SEC,REF_SEC_FEATURES,GRACE_PERIOD,BOOK_BUILDING_DATE,PAY_DATE,NOM_CAPI,SETTLE_METHOD
     </sql>
     <sql id="Sql_All_Data" >
         select
@@ -186,7 +187,11 @@
                                      LAST_SETTLE_DATE, DELIVERY_METHOD, CONTRACT_MULTIPLIER,
                                      IS_EFF_PLEDGE, IS_ISSUE_ASSET, APPEAR_MARKET_ID,
                                      WIND_CODE,CROSS_MARKET,CROSS_MARKET_CODE, IS_NO_GUARD ,
-                                     CONCEPT_TYPE , IS_ALLOW_OVERWRITE ,OLD_DELISTING_DATE,LISTING_DATE_FROM_TRADE,DIRECT_DISCLOSURE_RISK_FLAG,IS_OPEN_EVERYDAY,IS_SEVEN_DAY_CASHABLE,OPEN_TYPE)
+                                     CONCEPT_TYPE , IS_ALLOW_OVERWRITE ,OLD_DELISTING_DATE,
+                                     LISTING_DATE_FROM_TRADE,DIRECT_DISCLOSURE_RISK_FLAG,IS_OPEN_EVERYDAY,
+                                     IS_SEVEN_DAY_CASHABLE,OPEN_TYPE,PROTECT_OBJECT,REF_ENTITY,
+                                     REF_SEC,REF_SEC_FEATURES,GRACE_PERIOD,BOOK_BUILDING_DATE,PAY_DATE,
+                                     NOM_CAPI,SETTLE_METHOD)
         values (#{finprodId,jdbcType=VARCHAR}, #{saleDepartment,jdbcType=VARCHAR}, #{saleLayer,jdbcType=VARCHAR},
                 #{salePeriod,jdbcType=DECIMAL}, #{purSpeed,jdbcType=DECIMAL}, #{redSpeed,jdbcType=DECIMAL},
                 #{isSecBond,jdbcType=VARCHAR}, #{windId,jdbcType=VARCHAR}, #{isAutoUpdate,jdbcType=VARCHAR},
@@ -219,7 +224,13 @@
                 #{isEffPledge,jdbcType=VARCHAR}, #{isIssueAsset,jdbcType=VARCHAR}, #{appearMarketId,jdbcType=VARCHAR},
                 #{windCode,jdbcType=VARCHAR},#{crossMarket,jdbcType=VARCHAR},#{crossMarketCode,jdbcType=VARCHAR},
                 #{isNoGuard,jdbcType=VARCHAR},#{conceptType,jdbcType=VARCHAR}
-                ,#{isAllowOverwrite,jdbcType=VARCHAR},#{oldDelistingDate,jdbcType=DATE},#{listingDateFromTrade,jdbcType=VARCHAR},#{directDisclosureRiskFlag,jdbcType=VARCHAR},#{isOpenEveryDay,jdbcType=VARCHAR},#{isSevenDayCashable,jdbcType=VARCHAR},#{openType,jdbcType=VARCHAR})
+                ,#{isAllowOverwrite,jdbcType=VARCHAR},#{oldDelistingDate,jdbcType=DATE},
+                #{listingDateFromTrade,jdbcType=VARCHAR},#{directDisclosureRiskFlag,jdbcType=VARCHAR},
+                #{isOpenEveryDay,jdbcType=VARCHAR},#{isSevenDayCashable,jdbcType=VARCHAR},#{openType,jdbcType=VARCHAR}，
+                #{protectObject,jdbcType=VARCHAR},#{refEntity,jdbcType=VARCHAR},#{refSec,jdbcType=VARCHAR},#{refSecFeatures,jdbcType=VARCHAR},
+                #{gracePeriod,jdbcType=DECIMAL},#{bookBuildingDate,jdbcType=DATE},#{payDate,jdbcType=DATE},#{nomCapi,jdbcType=DECIMAL},
+                #{settleMethod,jdbcType=VARCHAR}
+                )
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.FinProductAdd" >
         insert into FIN_PRODUCT_ADD

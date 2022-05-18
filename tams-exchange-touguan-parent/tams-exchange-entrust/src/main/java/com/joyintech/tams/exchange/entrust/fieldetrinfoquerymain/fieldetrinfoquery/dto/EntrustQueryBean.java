@@ -85,7 +85,7 @@ public class EntrustQueryBean implements Serializable {
     private BigDecimal entrustPrice;
 
     @ApiModelProperty(name = "entrustVolume", value = "委托数量")
-    private long entrustVolume;
+    private BigDecimal entrustVolume;
 
     @ApiModelProperty(name = "entrustBalance", value = "委托金额")
     @JsonSerialize(using = DoubleSerializerUtils.class)
@@ -98,7 +98,7 @@ public class EntrustQueryBean implements Serializable {
     private String entrustStatusStr;
 
     @ApiModelProperty(name = "tradedVolume", value = "已成交数量")
-    private long tradedVolume;
+    private BigDecimal tradedVolume;
 
     @ApiModelProperty(name = "tradedBalance", value = "已成交金额")
     @JsonSerialize(using = DoubleSerializerUtils.class)
@@ -417,11 +417,11 @@ public class EntrustQueryBean implements Serializable {
         this.bsFlag = bsFlag == null ? null : bsFlag.trim();
     }
 
-    public long getEntrustVolume() {
+    public BigDecimal getEntrustVolume() {
         return entrustVolume;
     }
 
-    public void setEntrustVolume(long entrustVolume) {
+    public void setEntrustVolume(BigDecimal entrustVolume) {
         this.entrustVolume = entrustVolume;
     }
 
@@ -613,14 +613,11 @@ public class EntrustQueryBean implements Serializable {
         this.tradedBalance = tradedBalance;
     }
 
-    public long getTradedVolume() {
-        // 质押券出入库 ZGCPCN-404
-        if(StringUtils.equals(getEntrustBs(), "T68") || StringUtils.equals(getEntrustBs(), "T69")){
-            return ArithmeticUtil.divide(new BigDecimal(String.valueOf(tradedVolume)),new BigDecimal("100"),2).longValue();
-        }
+    public BigDecimal getTradedVolume() {
         return tradedVolume;
     }
-    public void setTradedVolume(long tradedVolume) {
+
+    public void setTradedVolume(BigDecimal tradedVolume) {
         this.tradedVolume = tradedVolume;
     }
 

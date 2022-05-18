@@ -113,16 +113,30 @@ public class CreditProtectionCertificate001Controller extends BaseController {
 
     @ResponseBody
     @PostMapping("/finprodIdForSelect")
-    @ApiOperation(value = "资产代码下拉列表", notes = "资产代码列表,参数:{search,initValue,pageNo,pageSize}")
-    public Page<SelectOptionDto> finprodIdForSelect(@RequestBody Map<String, Object> search) {
-        return creditProtectionCertificate001Service.getFinprodIdForSelect(search);
+    @ApiOperation(value = "资产代码下拉列表", notes = "资产代码列表")
+    public Message<Page<SelectOptionDto>> finprodIdForSelect(@RequestBody CreditProtectionCertificateRequest request) {
+        try {
+
+            Page<SelectOptionDto> page = creditProtectionCertificate001Service.getFinprodIdForSelect(request);
+            return new Message<Page<SelectOptionDto>>().success().setData(page);
+        }catch (Exception e) {
+            logger.error("债券简称下拉框数据异常",e);
+            return new Message<Page<SelectOptionDto>>().fail().setMessage("资产代码下拉列表");
+        }
     }
 
     @ResponseBody
     @PostMapping("/findForSelect")
-    @ApiOperation(value = "参考债券下拉列表", notes = "参考债券下拉列表,参数:{search,initValue,pageNo,pageSize}")
-    public Page<SelectOptionDto> findForSelect(@RequestBody Map<String, Object> search) {
-        return creditProtectionCertificate001Service.findForSelect(search);
+    @ApiOperation(value = "参考债券下拉列表", notes = "参考债券下拉列表")
+    public Message<Page<SelectOptionDto>> findForSelect(@RequestBody CreditProtectionCertificateRequest request) {
+        try {
+
+            Page<SelectOptionDto> page = creditProtectionCertificate001Service.findForSelect(request);
+            return new Message<Page<SelectOptionDto>>().success().setData(page);
+        }catch (Exception e) {
+            logger.error("债券简称下拉框数据异常",e);
+            return new Message<Page<SelectOptionDto>>().fail().setMessage("参考债券下拉列表");
+        }
     }
 
     @ResponseBody
