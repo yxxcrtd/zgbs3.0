@@ -1301,7 +1301,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         }
         // 参考收益率
         if (!StringUtil.isNotEmpty(dto.getReferenceRateStr())
-                && StringUtil.isNotEmpty(dto.getReferenceRate())
+                && !StringUtil.isNotEmpty(dto.getReferenceRate())
                 && !StringUtil.isNotEmpty(dto.getRate())) {
             errorList.add(new ValidMessage("参考收益率/票面利率不可为空!"));
         }

@@ -134,7 +134,8 @@
         F.PRICE_TYPE priceType,
         F.TARGET_TYPE targetType,
 		FRA.IS_NO_GUARD isNoGuard,
-        decode(F.PRICE_TYPE,'01','Y','02','N','') isNetPrice
+        decode(F.PRICE_TYPE,'01','Y','02','N','') isNetPrice,
+		nvl(A.BUSINESS_MODEL,A.INV_AIM) businessModel
 		FROM ETR_ENTRUST A
 		LEFT JOIN PTL_PORTFOLIO B ON A.PORTFOLIO_ID=B.PORTFOLIO_ID
 		LEFT JOIN FIN_PRODUCT C ON A.FINPROD_ID=C.FINPROD_ID
@@ -176,9 +177,9 @@
             </if>
         </where>
     </select>
-   
+
    <select id="queryEtrPledgeListByEtrId" resultType="com.joyintech.service.trade.investtrade.commanddispatcher.dto.EntrTradePledgeDto">
-   		SELECT 
+   		SELECT
 	        A.ENTRUST_ID entrustId,/*委托代码*/
 	        A.FINPROD_ID finprodId,/*金融产品代码*/
 	        C.FINPROD_ABBR finprodAbbr,/*金融产品简称*/
@@ -196,7 +197,7 @@
             A1.Pledge_Number oldPledgeNumber,/*质押数量*/
             A1.PLEDGE_RATIO  oldPledgeRatio,/*质押率*/
             A1.PLEDGE_AMT oldPledgeAmt/*质押金额*/
-	    FROM 
+	    FROM
 	    ETR_PLEDGE A
 	    LEFT JOIN FIN_PRODUCT C ON A.FINPROD_ID=C.FINPROD_ID
         LEFT JOIN ETR_ENTRUST E ON E.ENTRUST_ID =  A.ENTRUST_ID AND E.PS = 'T94'
@@ -218,5 +219,5 @@
 			#{item}
 		</foreach>
 	</select>
-   
+
 </mapper>

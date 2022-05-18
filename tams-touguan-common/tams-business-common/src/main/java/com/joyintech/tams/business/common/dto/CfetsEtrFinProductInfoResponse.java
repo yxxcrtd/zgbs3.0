@@ -323,8 +323,7 @@ public class CfetsEtrFinProductInfoResponse {
      * 计划发行量
      */
     @ApiModelProperty(name = "planIssueAmt", value = "计划发行量")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal planIssueAmt;
+    private String planIssueAmt;
 
     /**
      * 币种
@@ -592,11 +591,11 @@ public class CfetsEtrFinProductInfoResponse {
         this.tenderTarget = tenderTarget;
     }
 
-    public BigDecimal getPlanIssueAmt() {
+    public String getPlanIssueAmt() {
         return planIssueAmt;
     }
 
-    public void setPlanIssueAmt(BigDecimal planIssueAmt) {
+    public void setPlanIssueAmt(String planIssueAmt) {
         this.planIssueAmt = planIssueAmt;
     }
 
@@ -624,7 +623,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.issuerName = issuerName;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getVdate() {
         return vdate;
     }
@@ -633,7 +632,7 @@ public class CfetsEtrFinProductInfoResponse {
         this.vdate = vdate;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getMdate() {
         return mdate;
     }

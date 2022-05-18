@@ -663,8 +663,8 @@ public class PortfolioManager extends BaseService {
         BigDecimal leftAmt = isVolume ? BigDecimal.ZERO : NumberUtil.sub(instruction.getEntrustAmt(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity());
         long leftNum = isVolume ? NumberUtil.sub(instruction.getEntrustNum(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity()).longValue() : 0L;
         for (PortfolioCalculateResponse item : list) {
-            calculateResponse.setInstructionLeftAmt(NumberUtil.div(NumberUtil.mul(leftAmt, item.getEntrustAmt()), orderAmt));
-            calculateResponse.setInstructionLeftNum(NumberUtil.div(leftNum * item.getEntrustNum(), orderVolume).longValue());
+            calculateResponse.setInstructionLeftAmt(BigDecimal.ZERO.compareTo(orderAmt) == 0 ? NumberUtil.mul(leftAmt, item.getDisRate()) : NumberUtil.div(NumberUtil.mul(leftAmt, item.getEntrustAmt()), orderAmt));
+            calculateResponse.setInstructionLeftNum(BigDecimal.ZERO.compareTo(orderVolume) == 0 ? NumberUtil.mul(leftNum, item.getDisRate()).longValue() : NumberUtil.div(leftNum * item.getEntrustNum(), orderVolume).longValue());
         }
 
         log.debug("queryPortfolioCalculate() called with result => 【list = {}】", JSONUtil.toJsonStr(list));

@@ -39,6 +39,7 @@ import com.joyintech.tams.common.base.entity.EtrEntrustBidPrice;
 import com.joyintech.tams.common.base.entity.EtrEntrustDetail;
 import com.joyintech.tams.common.base.entity.PtlPortfolio;
 import com.joyintech.tams.common.base.entity.SppiImportData;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
@@ -241,7 +242,7 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
         }
 
         //币种
-        pageParam.put("ccy", "CNY");
+        pageParam.put("ccy", DictCodeList.币种_人民币_CNY.getValue());
 
         //资产类型
         String finprodId = (String) pageParam.get("finprodId");
@@ -369,7 +370,7 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
         //查询指令明细信息
         List<EtrEntrustDetail> etrEntrustDetails = cfetsEtrBondFirstBid001Mapper.selectEntrustDetailById(entrustId);
 
-        if (StringUtil.equals(finProductInfo.getIssueType(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
+        if (StringUtil.equals(finProductInfo.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
             dto.setIssueDate(finProductInfo.getIssueDate());
             dto.setPayDate(finProductInfo.getPayDate());
 

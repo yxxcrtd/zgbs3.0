@@ -378,6 +378,7 @@ public enum DictCodeList implements BaseDictCodeList {
 	共通业务类型_复合基准(DictCode.共通业务类型,"MST19","复合基准"),
 	共通业务类型_银行间交易费用设置(DictCode.共通业务类型,"MST20","银行间交易费用设置"),
 	共通业务类型_佣金设置(DictCode.共通业务类型,"MST21","佣金设置"),
+	共通业务类型_信用保护凭证行情(DictCode.共通业务类型,"MST22","信用保护凭证行情"),
 	共通业务类型_组合管理(DictCode.共通业务类型,"PTL01","组合管理"),
 	共通业务类型_用户组合管理(DictCode.共通业务类型,"PTL02","用户组合管理"),
 	共通业务类型_活期结息(DictCode.共通业务类型,"PTL03","活期结息"),
