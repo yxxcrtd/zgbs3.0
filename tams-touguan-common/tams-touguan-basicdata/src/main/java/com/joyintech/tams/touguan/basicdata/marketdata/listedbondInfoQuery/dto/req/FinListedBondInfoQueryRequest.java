@@ -26,8 +26,8 @@ public class FinListedBondInfoQueryRequest {
     @ApiModelProperty(name = "secName", value = "资产简称")
     private String secName;
 
-    @ApiModelProperty(name = "market", value = "市场")
-    private String market;
+    @ApiModelProperty(name = "tradingPlaces", value = "交易场所/市场")
+    private String tradingPlaces;
 
     @ApiModelProperty(name = "biddingMethod", value = "招标方式")
     private String biddingMethod;
@@ -59,8 +59,8 @@ public class FinListedBondInfoQueryRequest {
     @ApiModelProperty(name = "secType", value = "债券分类")
     private String secType;
 
-    @ApiModelProperty(name = "institution", value = "登记托管机构")
-    private String institution;
+    @ApiModelProperty(name = "registeredCustodian", value = "登记托管机构")
+    private String registeredCustodian;
 
     @ApiModelProperty(name = "issuer", value = "发行人")
     private String issuer;
@@ -89,8 +89,8 @@ public class FinListedBondInfoQueryRequest {
     @ApiModelProperty(name = "rateType", value = "利率类型")
     private String rateType;
 
-    @ApiModelProperty(name = "payCycle", value = "付息频率")
-    private String payCycle;
+    @ApiModelProperty(name = "interestPaymentFrequency", value = "付息频率")
+    private String interestPaymentFrequency;
 
     @ApiModelProperty(name = "currency", value = "币种")
     private String currency;
@@ -143,22 +143,6 @@ public class FinListedBondInfoQueryRequest {
 
     public void setSecId(String secId) {
         this.secId = secId;
-    }
-
-    public String getMarket() {
-        return market;
-    }
-
-    public void setMarket(String market) {
-        this.market = market;
-    }
-
-    public String getInstitution() {
-        return institution;
-    }
-
-    public void setInstitution(String institution) {
-        this.institution = institution;
     }
 
     public String getIssuer() {
@@ -223,14 +207,6 @@ public class FinListedBondInfoQueryRequest {
 
     public void setCouponSpecies(String couponSpecies) {
         this.couponSpecies = couponSpecies;
-    }
-
-    public String getPayCycle() {
-        return payCycle;
-    }
-
-    public void setPayCycle(String payCycle) {
-        this.payCycle = payCycle;
     }
 
     public String getIsRight() {
@@ -423,5 +399,29 @@ public class FinListedBondInfoQueryRequest {
 
     public void setCurrency(String currency) {
         this.currency = currency;
+    }
+
+    public String getTradingPlaces() {
+        return tradingPlaces;
+    }
+
+    public void setTradingPlaces(String tradingPlaces) {
+        this.tradingPlaces = tradingPlaces;
+    }
+
+    public String getInterestPaymentFrequency() {
+        return interestPaymentFrequency;
+    }
+
+    public void setInterestPaymentFrequency(String interestPaymentFrequency) {
+        this.interestPaymentFrequency = interestPaymentFrequency;
+    }
+
+    public String getRegisteredCustodian() {
+        return registeredCustodian;
+    }
+
+    public void setRegisteredCustodian(String registeredCustodian) {
+        this.registeredCustodian = registeredCustodian;
     }
 }

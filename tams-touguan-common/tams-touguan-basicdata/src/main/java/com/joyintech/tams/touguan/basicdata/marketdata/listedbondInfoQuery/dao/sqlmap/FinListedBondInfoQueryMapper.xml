@@ -60,12 +60,12 @@
                 AND SEC_INFO.SECID = #{secId,jdbcType=VARCHAR}
             </if>
 
-            <if test="market !=null and market !=''">
-                AND SEC_INFO.MARKET = #{market,jdbcType=VARCHAR}
+            <if test="tradingPlaces !=null and tradingPlaces !=''">
+                AND SEC_INFO.MARKET = #{tradingPlaces,jdbcType=VARCHAR}
             </if>
 
-            <if test="institution !=null and institution !=''">
-                AND SEC_INFO.institution = #{institution,jdbcType=VARCHAR}
+            <if test="registeredCustodian !=null and registeredCustodian !=''">
+                AND SEC_INFO.institution = #{registeredCustodian,jdbcType=VARCHAR}
             </if>
 
             <if test="issuer !=null and issuer !=''">
@@ -112,8 +112,8 @@
                 AND SEC_INFO.INTERESTRATE = #{rateType,jdbcType=VARCHAR}
             </if>
 
-            <if test="payCycle !=null and payCycle !=''">
-                AND SEC_INFO.PAYCYCLE = #{payCycle,jdbcType=VARCHAR}
+            <if test="interestPaymentFrequency !=null and interestPaymentFrequency !=''">
+                AND SEC_INFO.PAYCYCLE = #{interestPaymentFrequency,jdbcType=VARCHAR}
             </if>
 
             <if test="currency !=null and currency !=''">

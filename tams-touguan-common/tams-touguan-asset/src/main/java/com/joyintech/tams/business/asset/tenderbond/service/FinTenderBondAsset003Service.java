@@ -121,7 +121,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                 product.setFinprodId(dto.getFinprodId());
                 product.setCirculationCode(null);
                 product.setCirculationDate(null);
-                product.setRemark(dto.getRemark());
+                product.setRemark("上市流通撤销原因：" + dto.getRemark());
                 finProductMapper.updateForTenderBound(product);
                 FinProductAdd productAdd = new FinProductAdd();
                 productAdd.setFinprodId(dto.getFinprodId());
@@ -136,7 +136,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                         throw new PositionException(e);
                     }
                 }
-                finTenderBoundAssetService.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_上市流通撤销);
+                finTenderBoundAssetService.saveOperate(dto.getFinprodMarketId(), "上市流通撤销原因：" + dto.getRemark(), DictCodeListExt3.操作类型_上市流通撤销);
             }
         } else {
             FinProduct product1 = finProductMapper.selectByPrimaryKey(dto.getFinprodId());
