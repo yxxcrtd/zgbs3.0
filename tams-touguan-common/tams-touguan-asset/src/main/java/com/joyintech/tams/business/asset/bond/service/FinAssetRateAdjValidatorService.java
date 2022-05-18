@@ -88,6 +88,7 @@ public class FinAssetRateAdjValidatorService implements BeanValidator{
                 }
                 if(entity.getYield().compareTo(BigDecimal.ZERO)<0){
                     resultList.add(new ValidMessage("利率输入负数时，不可提交"));
+                    break;
                 }
                 if(StringUtil.equals(dto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_通道.getValue())){
                   //生效日不可重复
