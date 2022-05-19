@@ -390,6 +390,8 @@ public class PortfolioManager extends BaseService {
             calculateResponse.setPriceMode(instruction.getPriceMode());
             calculateResponse.setAcctNo(instruction.getAcctName());
 
+            calculateResponse.setEtrSecAmount(instruction.getEntrustAmt());
+
             PortfolioDetail portfolioDetail = portfolioDetailMap.get(portfolioId);
             if (ObjectUtil.isNotNull(portfolioDetail)) {
                 calculateResponse.setEntrustNum(portfolioDetail.getTargetNum().longValue());
