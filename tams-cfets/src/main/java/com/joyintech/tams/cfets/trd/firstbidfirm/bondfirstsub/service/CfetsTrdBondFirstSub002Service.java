@@ -1203,10 +1203,17 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         // 最大循环次数
         // 降序
         productDtos.sort(Comparator.comparing(CfetsTrdBondFirstSubProductDto::getAvaNum).reversed());
-        int maxCycle = productDtos.size() * 30;
-        while (tailDifference.compareTo(BigDecimal.ZERO) > 0 && maxCycle != 0) {
+        //递增维度
+        BigDecimal addDimension = minChangeUnit;
+        int size = productDtos.size();
+        //委托维度 已经完全分配的集合
+        Set<String> set = new HashSet<>();
+        while (tailDifference.compareTo(BigDecimal.ZERO) > 0 && size > 0) {
+            if (tailDifference.compareTo(minChangeUnit) > 0) {
+                addDimension = ArithmeticUtil.divide(tailDifference, new BigDecimal(size), 2, RoundingMode.HALF_UP);
+                addDimension = ArithmeticUtil.multiply(ArithmeticUtil.divide(addDimension, minChangeUnit, 0, RoundingMode.DOWN), minChangeUnit);
+            }
             for (CfetsTrdBondFirstSubProductDto item : productDtos) {
-                maxCycle--;
                 // 分配值
                 BigDecimal assign = BigDecimal.ZERO;
                 // 尾差等于0,循环结束
@@ -1215,10 +1222,15 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                 }
                 //指令剩余额度为0时,处理下一条数据
                 if (BigDecimalUtil.isZero(item.getAvaNumTemp())) {
-                    continue;
+                    if (set.add(item.getEntrustId())) {
+                        size--;
+                        continue;
+                    }
                 }
                 // 处理尾差值的不同
-                if (BigDecimalUtil.ACompareToB(item.getAvaNumTemp(), minChangeUnit, 4) >= 0
+                if (BigDecimalUtil.ACompareToB(addDimension, minChangeUnit, 2) > 0) {
+                    assign = addDimension;
+                } else if (BigDecimalUtil.ACompareToB(item.getAvaNumTemp(), minChangeUnit, 4) >= 0
                         && BigDecimalUtil.ACompareToB(tailDifference, minChangeUnit, 4) >= 0) {
                     // 剩余指令额度大于等于最小分配单位 尾差大于等于最小变动单位 时,分配最小变动单位
                     assign = minChangeUnit;
@@ -1257,32 +1269,47 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      * @date 2022/4/24 9:49
      */
     private void handleTailDifferenceOhter(List<CfetsTrdBondFirstSubProductDto> productDtos, BigDecimal payTailDifference, BigDecimal feeTailDifference) {
-        // 最大循环次数
-        int maxCycle = productDtos.size() * 30;
-        while ((payTailDifference.compareTo(BigDecimal.ZERO) > 0 || feeTailDifference.compareTo(BigDecimal.ZERO) > 0) && maxCycle != 0) {
+        // 应缴款金额分配值
+        BigDecimal payAssign = payMinChangeUnit;
+        // 费用分配值
+        BigDecimal feeAssign = feeMinChangeUnit;
+        int size = productDtos.size();
+        //委托维度 已经完全分配的集合
+        Set<String> set = new HashSet<>();
+        while ((payTailDifference.compareTo(BigDecimal.ZERO) > 0 || feeTailDifference.compareTo(BigDecimal.ZERO) > 0) && size != 0) {
+            if (payTailDifference.compareTo(payMinChangeUnit) > 0) {
+                payAssign = ArithmeticUtil.divide(payTailDifference, new BigDecimal(size), 2, RoundingMode.HALF_UP);
+                payAssign = ArithmeticUtil.multiply(ArithmeticUtil.divide(payAssign, payMinChangeUnit, 0, RoundingMode.DOWN), payMinChangeUnit);
+            }
+            if (feeTailDifference.compareTo(feeMinChangeUnit) > 0) {
+                feeAssign = ArithmeticUtil.divide(feeTailDifference, new BigDecimal(size), 2, RoundingMode.HALF_UP);
+                feeAssign = ArithmeticUtil.multiply(ArithmeticUtil.divide(feeAssign, feeMinChangeUnit, 0, RoundingMode.DOWN), feeMinChangeUnit);
+            }
             for (CfetsTrdBondFirstSubProductDto item : productDtos) {
-                maxCycle--;
                 // 尾差等于0,循环结束
                 if (BigDecimalUtil.isZero(payTailDifference) && BigDecimalUtil.isZero(feeTailDifference)) {
                     break;
                 }
                 // 认购量为0时,不分配应缴款金额和结算服务费
                 if (item.getSubscriptionAmount() == null || BigDecimalUtil.isZero(item.getSubscriptionAmount())) {
-                    continue;
+                    if (set.add(item.getEntrustId())) {
+                        size--;
+                        continue;
+                    }
                 }
-                // 应缴款金额分配值
-                BigDecimal payAssign = BigDecimal.ZERO;
-                // 费用分配值
-                BigDecimal feeAssign = BigDecimal.ZERO;
-                if (BigDecimalUtil.ACompareToB(payTailDifference, payMinChangeUnit, 4) >= 0) {
+                if (BigDecimalUtil.ACompareToB(payAssign, payMinChangeUnit, 2) > 0) {
+                    //
+                } else if (BigDecimalUtil.ACompareToB(payTailDifference, payMinChangeUnit, 4) >= 0) {
                     // 尾差值大于等于最小分配单位
                     payAssign = payMinChangeUnit;
                 } else {
                     payAssign = payTailDifference;
                 }
-                if (BigDecimalUtil.ACompareToB(feeTailDifference, feeMinChangeUnit, 4) >= 0) {
+                if (BigDecimalUtil.ACompareToB(feeAssign, feeMinChangeUnit, 2) > 0) {
+                    //
+                } else if (BigDecimalUtil.ACompareToB(feeTailDifference, feeMinChangeUnit, 4) >= 0) {
                     // 尾差值大于等于最小分配单位
-                    feeAssign = payMinChangeUnit;
+                    feeAssign = feeMinChangeUnit;
                 } else {
                     feeAssign = feeTailDifference;
                 }
