@@ -153,10 +153,10 @@
                 AND m.VALUE_SOURCE = #{valueSource}
             </if>
             <if test="cdateStart != null and cdateStart != ''">
-                <![CDATA[AND  m.cdate >= TO_DATE(#{cdateStart},'YYYY-MM-DD') ]]>
+                <![CDATA[AND  m.cdate >= #{cdateStart,jdbcType=VARCHAR} ]]>
             </if>
             <if test="cdateEnd != null and cdateEnd != ''">
-                <![CDATA[AND  m.cdate <= TO_DATE(#{cdateEnd},'YYYY-MM-DD')]]>
+                <![CDATA[AND  m.cdate <= #{cdateEnd,jdbcType=VARCHAR}]]>
             </if>
             <include refid="vagueQueryWhere"></include>
         </where>
