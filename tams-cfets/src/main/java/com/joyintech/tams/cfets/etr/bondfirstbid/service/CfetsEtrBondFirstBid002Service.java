@@ -14,6 +14,7 @@ import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.service.entrust.common.service.WFlowCommonService;
 import com.joyintech.service.entrust.etrcommanddispatcher.service.EtrCommandDispatcherService;
@@ -51,6 +52,7 @@ import com.joyintech.tams.common.base.entity.EtrEntrustBidPrice;
 import com.joyintech.tams.common.base.entity.EtrEntrustDetail;
 import com.joyintech.tams.component.base.entrust.BusiAutoEtrDispService;
 import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
+import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
@@ -285,7 +287,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             } else {
                 req.setDecisionAct(DictCodeListExt3.系统动作_修改.getValue());
                 req.setSystemAct(entity.getSystemAct());
-                req.setbTotalTradeId(entity.getTotalEtrustId());
+                req.setbTotalTradeId(dto.getTotalEtrustId());
             }
             req.setCdate(entity.getEntrustDate());
             req.setFinprodId(entity.getFinprodId());
@@ -704,10 +706,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
      * @return
      */
     public CfetsEtrBondFirstBid002Dto packageEquity(CfetsEtrBondFirstBidSaveRequest cfetsDto) {
-       /* FinProduct fp = null;
-        if (StringUtil.isNotEmpty(cfetsDto.getFinprodId())) {
-            fp = cfetsetrIbBondinfoMapper.findAssetInfo(cfetsDto.getFinprodId());
-        }*/
+
         //查询资产信息
         CfetsEtrFinProductInfoRequest productInfoRequest = new CfetsEtrFinProductInfoRequest();
         productInfoRequest.setFinprodId(cfetsDto.getFinprodId());
@@ -1105,6 +1104,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
     public String generateTitle(CfetsEtrBondFirstBid002Dto entity, OperationType type) {
         return "指令日期" + ":" + DateUtil.format(entity.getEntrustDate()) + "-" +
                 "资产简称" + ":" + (entity.getFinprodAbbr() == null ? "" : entity.getFinprodAbbr()) + "-" +
+                "发行方式" + ":" + SysDataUtil.getNameFromDataDict(DictCode.新债_发行方式, entity.getIssueClass()) + "-" +
                 "汇总投标券面总额" + ":" + ArithmeticUtil.divide(entity.getTotalBiddingNum(), new BigDecimal(10000), 2) + "万元";
     }
 
