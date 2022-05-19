@@ -110,6 +110,9 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
     @ApiModelProperty(name = "systemAct", value = "头寸_系统动作,编辑页面/提交用", example = "Y")
     private String systemAct;
 
+    @ApiModelProperty(name = "confirmOk", value = "是否忽略头寸软控", example = "Y")
+    private String confirmOk;
+
     @ApiModelProperty(name = "riskcalResponse", value = "风险实体类")
     private CfetsEtribdoRiskcalResponse riskcalResponse;
 
@@ -349,6 +352,14 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
 
     public void setRiskcalResponse(CfetsEtribdoRiskcalResponse riskcalResponse) {
         this.riskcalResponse = riskcalResponse;
+    }
+
+    public String getConfirmOk() {
+        return confirmOk;
+    }
+
+    public void setConfirmOk(String confirmOk) {
+        this.confirmOk = confirmOk;
     }
 }
 

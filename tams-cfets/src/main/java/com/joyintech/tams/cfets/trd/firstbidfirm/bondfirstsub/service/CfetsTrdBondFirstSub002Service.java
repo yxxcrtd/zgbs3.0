@@ -822,7 +822,8 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             this.deleteWflData(entity.getBidId());
             //登录业务流程
             this.insertWflData(entity);
-            String confirmOk = RequestUtil.getParam("confirmOk");
+            String confirmOk = entity.getConfirmOk();
+            entity.setConfirmOk(null);
             ProcessMark newEntity;
             //处理指令执行进度
             this.insertEtrFinishStatus(entity, OperationType.NEW);
