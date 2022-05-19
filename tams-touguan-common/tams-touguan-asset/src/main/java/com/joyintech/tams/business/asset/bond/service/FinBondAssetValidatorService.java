@@ -221,11 +221,11 @@ public class FinBondAssetValidatorService implements BeanValidator{
 //                    6.理论行权日不大于到期日；---目前未实现
 //                    7.按理论行权日升序排序；---目前未实现
                     if (DateUtil.compareDate(finExercisePlan.getExerciseDate(),finExercisePlan.getMdate())<0){
-                        resultList.add(new ValidMessage("行权计划列表中,理论行权日大于等于行权申请结束日"));
+                        resultList.add(new ValidMessage("理论行权日数据必须大于等于行权申请终止日数据"));
                         break;
                     }
                     if (DateUtil.compareDate(finExercisePlan.getMdate(),finExercisePlan.getVdate())<0){
-                        resultList.add(new ValidMessage("行权计划列表中,行权申请结束日大于等于行权申请开始日"));
+                        resultList.add(new ValidMessage("行权申请终止日数据必须大于等于行权申请起始日数据"));
                         break;
                     }
                     if (DateUtil.compareDate(finExercisePlan.getExerciseDate(),dto.getMdate())>0){
