@@ -2077,6 +2077,7 @@ public class CfetsTrdConfirm001Service extends BaseService{
                     posport.setCashAcctId(cashAcctId); // 托管户
                 }
             }
+            posport.setEtrId(dto.getEntrustId());
             posport.setSecAcctId(entity.getSecManageAcctId());
             posport.setSecAmount(ArithmeticUtil.multiply(dto.getShareAmt() == null ? BigDecimal.ZERO : dto.getShareAmt(), new BigDecimal(100)));
             posport.setOwnSecAmount(ArithmeticUtil.multiply(dto.getShareAmt() == null ? BigDecimal.ZERO : dto.getShareAmt(), new BigDecimal(100)));
