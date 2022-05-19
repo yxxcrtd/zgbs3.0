@@ -104,15 +104,23 @@
             </if>
         </trim>
     </insert>
-    <delete id="deleteByPrimaryKey"></delete>
+    <delete id="deleteByPrimaryKey" parameterType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest">
+
+     delete from MST_CREDIT_MARKET_INFO
+        where SECID = #{secid,jdbcType=VARCHAR}
+          and CDATE = #{cdate,jdbcType=VARCHAR}
+          and VALUE_SOURCE = #{valueSource,jdbcType=VARCHAR}
+
+    </delete>
 
 
     <select id="queryForPage"
-            resultType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoDto" parameterType="Map">
+            resultType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest" parameterType="Map">
          SELECT
             m.SECID secid,
             f.FINPROD_ABBR finprodAbbr,
             m.VALUE_SOURCE,
+            sdl1.item_value valueSourceStr,
             m.CDATE cdate,
             m.MDPRICE mdprice,
             m.MCPRICE mcprice,
@@ -121,7 +129,8 @@
             m.M_MDURATION mMduration,
             m.M_CNVXTY mCnvxty,
             m.ISSUE_MARKET_NUM issueMarketNum,
-            m.CREDIT_TYPE creditType
+            m.CREDIT_TYPE creditType,
+            sdl2.item_value creditTypeStr
          FROM
              MST_CREDIT_MARKET_INFO		m
          LEFT JOIN
@@ -130,6 +139,8 @@
          LEFT JOIN
              INTERF_CREDITINFO	i
          ON	 i.SECID = m.SECID
+        LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='VALUATION_SOURCE' and sdl1.item_code = m.VALUE_SOURCE
+        LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='PROTECTION_CREDIT_TYPE' and sdl2.item_code = m.CREDIT_TYPE
         <where>
             <if test="secIdList != null and secIdList.size() > 0">
                 AND (m.SECID IN
@@ -167,7 +178,7 @@
         m.M_CNVXTY mCnvxty,
         m.ISSUE_MARKET_NUM issueMarketNum,
         m.CREDIT_TYPE creditType,
-        sdl2.item_value creditTypeStr,
+        sdl2.item_value creditTypeStr
         FROM
         MST_CREDIT_MARKET_INFO		m
         LEFT JOIN
@@ -243,12 +254,12 @@
         LEFT JOIN
         INTERF_CREDITINFO	i
         ON	 i.SECID = m.SECID
-        AND
+        where
         m.SECID=#{secId,jdbcType=VARCHAR}
         AND
-        m.CDATE=to_date(#{valueDate},'yyyy-mm-dd')
+        m.CDATE=#{valueDate,jdbcType=VARCHAR}
         AND
-        m.VALUE_SOURCE=#{valueSource,jdbcType=DATE}
+        m.VALUE_SOURCE=#{valueSource,jdbcType=VARCHAR}
     </select>
 
 
@@ -310,7 +321,7 @@
         LEFT JOIN
         INTERF_CREDITINFO	i
         ON	 i.SECID = m.SECID
-        AND
+        WHERE
         m.SECID=#{secid,jdbcType=VARCHAR}
     </select>
 

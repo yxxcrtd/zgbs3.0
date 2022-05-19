@@ -22,8 +22,8 @@ import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
@@ -188,7 +188,7 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
         for (CfetsEtrBondFirstBid002Dto dto : allDto.getEtrInvestBondFirstBidDtos()) {
             if (!StringUtil.isNotEmpty(dto.getEntrustId())) {
                 BussinessCodeParameter param = new BussinessCodeParameter();
-                param.setCommonBusinessType(DictCodeList.共同业务类型_债券一级投标委托);
+                param.setCommonBusinessType(DictCodeListExt3.共通业务类型_一级投标指令);
                 String code = bussGetBussinessIdService != null ? bussGetBussinessIdService.buildBussinessCode(param) : IDGenerator.generate();
                 dto.setEntrustId(code);
             }
@@ -219,7 +219,7 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
 
         // 临时主键
         BussinessCodeParameter param = new BussinessCodeParameter();
-        param.setCommonBusinessType(DictCodeList.共同业务类型_债券一级投标委托);
+        param.setCommonBusinessType(DictCodeListExt3.共通业务类型_一级投标指令);
         String generatedId = bussGetBussinessIdService != null ? bussGetBussinessIdService.buildBussinessCode(param) : IDGenerator.generate();
         allDto.setTotalEtrustId(generatedId);
 
@@ -229,7 +229,7 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
         params.setPageId(this.getPageId());
         params.setElementId(cfetsDto.getElementId());
         params.setBusinessCode(CfetsEtrBondFirstBid002Dto::getTotalEtrustId);
-        params.setBusinessType(DictCodeList.共同业务类型_债券一级投标委托.getValue());
+        params.setBusinessType(DictCodeListExt3.共通业务类型_一级投标指令.getValue());
         processParameter.setOperationType(OperationType.NEW);
         processParameter.setWorkFlowParameter(params);
 

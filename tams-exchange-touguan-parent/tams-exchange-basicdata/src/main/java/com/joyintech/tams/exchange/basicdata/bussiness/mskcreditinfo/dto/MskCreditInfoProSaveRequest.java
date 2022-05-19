@@ -196,6 +196,9 @@ public class MskCreditInfoProSaveRequest extends BaseEntity implements ProcessEn
         this.issueMarketNum = issueMarketNum;
     }
 
+    public String getCreditTypeStr(){
+        return SysDataUtil.getNameFromDataDict(DictCode.信用类型, this.getCreditType());
+    }
     public String getCreditType() {
         return creditType;
     }
