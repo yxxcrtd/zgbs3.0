@@ -334,6 +334,7 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
         dto.setEntrustDate(etrEntrust.getEntrustDate());
         dto.setRemark(etrEntrust.getRemark());
         dto.setTotalBiddingNum(ArithmeticUtil.multiply(etrEntrust.getEntrustNum(), BigDecimal.valueOf(100)));
+        dto.setTradeMarket(etrEntrust.getTradeMarket());
 
         //查询资产信息
         CfetsEtrFinProductInfoRequest productInfoRequest = new CfetsEtrFinProductInfoRequest();
@@ -369,57 +370,94 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
         List<CfetsBiddingProductDto> biddingProductList = new ArrayList<>();
         //查询指令明细信息
         List<EtrEntrustDetail> etrEntrustDetails = cfetsEtrBondFirstBid001Mapper.selectEntrustDetailById(entrustId);
+//        Map<String, String> acctNoMap = etrEntrustDetails.stream().collect(Collectors.toMap(EtrEntrustDetail::getPortfolioId, EtrEntrustDetail::getAcctNo));
+//        Map<String, String> secAcctIdMap = etrEntrustDetails.stream().collect(Collectors.toMap(EtrEntrustDetail::getPortfolioId, EtrEntrustDetail::getSecAcctId));
 
-        if (StringUtil.equals(finProductInfo.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
-            dto.setIssueDate(finProductInfo.getIssueDate());
-            dto.setPayDate(finProductInfo.getPayDate());
+        if (StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())
+                || StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())) {
+            if (!StringUtil.equals(finProductInfo.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
+                if (finProductInfo.getIssueDate() != null) {
+                    dto.setIssueDate(finProductInfo.getIssueDate());
+                } else {
+                    dto.setTenderSdate(finProductInfo.getTenderSdate());
+                    dto.setTenderEdate(finProductInfo.getTenderEdate());
+                }
+                dto.setPayEdate(finProductInfo.getPayEdate());
 
-            for (EtrEntrustDetail detail : etrEntrustDetails) {
-                CfetsBiddingProductDto productDto = new CfetsBiddingProductDto();
-                productDto.setPortfolioId(detail.getPortfolioId());
-                productDto.setPortfolioName(ptlPortfolioMap.get(detail.getPortfolioId()));
-                productDto.setBusinessModel(detail.getInvAim());
-                productDto.setBidPrinAmt(ArithmeticUtil.multiply(detail.getEntrustNum(), BigDecimal.valueOf(100)));
-                productDto.setSecAcctId(detail.getSecAcctId());
+                //查询指令标位信息
+                List<EtrEntrustBidPrice> bidPrices = cfetsEtrBondFirstBid001Mapper.selectBidPriceById(entrustId);
+                for (EtrEntrustBidPrice bidPrice : bidPrices) {
+                    CfetsBiddingProductDto productDto = new CfetsBiddingProductDto();
+                    productDto.setPortfolioId(bidPrice.getPortfolioId());
+                    productDto.setPortfolioName(ptlPortfolioMap.get(bidPrice.getPortfolioId()));
+                    productDto.setBidPrice(bidPrice.getBidPrice());
+                    productDto.setBidPrinAmt(ArithmeticUtil.multiply(bidPrice.getBidPrinAmt(), BigDecimal.valueOf(100)));
 
-                biddingProductList.add(productDto);
+                    EtrEntrustDetail etrEntrustDetail = etrEntrustDetails.stream()
+                            .filter(x -> Objects.equals(x.getPortfolioId(),bidPrice.getPortfolioId())).findFirst().orElse(null);
+                    if (etrEntrustDetail != null) {
+                        productDto.setAcctNo(etrEntrustDetail.getAcctNo());
+                        productDto.setSecAcctId(etrEntrustDetail.getSecAcctId());
+                        productDto.setBusinessModel(etrEntrustDetail.getInvAim());
+                        productDto.setPortfolioTotalBidPrinAmt(ArithmeticUtil.multiply(etrEntrustDetail.getEntrustNum(), BigDecimal.valueOf(100)));
+                    }
+
+                    biddingProductList.add(productDto);
+                }
             }
-        } else {
-            if (finProductInfo.getIssueDate() != null) {
+        }else {
+            if (StringUtil.equals(finProductInfo.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
                 dto.setIssueDate(finProductInfo.getIssueDate());
+                dto.setPayDate(finProductInfo.getPayDate());
+
+                for (EtrEntrustDetail detail : etrEntrustDetails) {
+                    CfetsBiddingProductDto productDto = new CfetsBiddingProductDto();
+                    productDto.setPortfolioId(detail.getPortfolioId());
+                    productDto.setPortfolioName(ptlPortfolioMap.get(detail.getPortfolioId()));
+                    productDto.setBusinessModel(detail.getInvAim());
+                    productDto.setBidPrinAmt(ArithmeticUtil.multiply(detail.getEntrustNum(), BigDecimal.valueOf(100)));
+                    productDto.setSecAcctId(detail.getSecAcctId());
+
+                    biddingProductList.add(productDto);
+                }
             } else {
-                dto.setTenderSdate(finProductInfo.getTenderSdate());
-                dto.setTenderEdate(finProductInfo.getTenderEdate());
-            }
-            dto.setPayEdate(finProductInfo.getPayEdate());
-
-            //查询指令标位信息
-            List<EtrEntrustBidPrice> bidPrices = cfetsEtrBondFirstBid001Mapper.selectBidPriceById(entrustId);
-            for (EtrEntrustBidPrice bidPrice : bidPrices) {
-                CfetsBiddingProductDto productDto = new CfetsBiddingProductDto();
-                productDto.setPortfolioId(bidPrice.getPortfolioId());
-                productDto.setPortfolioName(ptlPortfolioMap.get(bidPrice.getPortfolioId()));
-                productDto.setBidPrice(bidPrice.getBidPrice());
-                productDto.setBidPrinAmt(ArithmeticUtil.multiply(bidPrice.getBidPrinAmt(), BigDecimal.valueOf(100)));
-                Map<String, Object> map = new HashMap<String, Object>();
-                map.put("portfolioId", bidPrice.getPortfolioId());
-                map.put("finprodId", etrEntrust.getFinprodId());
-                // 证券账户
-                String secAcctId = cfetsEtrIbBondinfo002Service.qryPortfolioSecAcctId(map);
-                if (StringUtil.isNotEmpty(secAcctId)) {
-                    productDto.setSecAcctId(secAcctId);
+                if (finProductInfo.getIssueDate() != null) {
+                    dto.setIssueDate(finProductInfo.getIssueDate());
+                } else {
+                    dto.setTenderSdate(finProductInfo.getTenderSdate());
+                    dto.setTenderEdate(finProductInfo.getTenderEdate());
                 }
-                EtrEntrustDetail etrEntrustDetail = etrEntrustDetails.stream()
-                        .filter(x -> Objects.equals(x.getPortfolioId(),bidPrice.getPortfolioId())).findFirst().orElse(null);
-                if (etrEntrustDetail != null) {
-                    productDto.setBusinessModel(etrEntrustDetail.getInvAim());
-                    productDto.setPortfolioTotalBidPrinAmt(ArithmeticUtil.multiply(etrEntrustDetail.getEntrustNum(), BigDecimal.valueOf(100)));
+                dto.setPayEdate(finProductInfo.getPayEdate());
+
+                //查询指令标位信息
+                List<EtrEntrustBidPrice> bidPrices = cfetsEtrBondFirstBid001Mapper.selectBidPriceById(entrustId);
+                for (EtrEntrustBidPrice bidPrice : bidPrices) {
+                    CfetsBiddingProductDto productDto = new CfetsBiddingProductDto();
+                    productDto.setPortfolioId(bidPrice.getPortfolioId());
+                    productDto.setPortfolioName(ptlPortfolioMap.get(bidPrice.getPortfolioId()));
+                    productDto.setBidPrice(bidPrice.getBidPrice());
+                    productDto.setBidPrinAmt(ArithmeticUtil.multiply(bidPrice.getBidPrinAmt(), BigDecimal.valueOf(100)));
+                    Map<String, Object> map = new HashMap<String, Object>();
+                    map.put("portfolioId", bidPrice.getPortfolioId());
+                    map.put("finprodId", etrEntrust.getFinprodId());
+                    // 证券账户
+                    String secAcctId = cfetsEtrIbBondinfo002Service.qryPortfolioSecAcctId(map);
+                    if (StringUtil.isNotEmpty(secAcctId)) {
+                        productDto.setSecAcctId(secAcctId);
+                    }
+                    EtrEntrustDetail etrEntrustDetail = etrEntrustDetails.stream()
+                            .filter(x -> Objects.equals(x.getPortfolioId(),bidPrice.getPortfolioId())).findFirst().orElse(null);
+                    if (etrEntrustDetail != null) {
+                        productDto.setBusinessModel(etrEntrustDetail.getInvAim());
+                        productDto.setPortfolioTotalBidPrinAmt(ArithmeticUtil.multiply(etrEntrustDetail.getEntrustNum(), BigDecimal.valueOf(100)));
+                    }
+
+                    biddingProductList.add(productDto);
                 }
 
-                biddingProductList.add(productDto);
             }
-
         }
+
 
         dto.setBiddingProductList(biddingProductList);
 

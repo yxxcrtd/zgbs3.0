@@ -11,6 +11,7 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.asset.bond.dto.FinAssetRateAdjRequest;
+import com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificate002Dto;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificate004Dto;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateDto;
@@ -202,54 +203,54 @@ public class CreditProtectionCertificate002Controller extends BaseController {
     @PostMapping("/save")
     @ApiOperation(value = "新建/修改", notes = "新建/修改")
     public Message<AjaxResult> save(@RequestBody CreditProtectionCertificate002Dto dto, BindingResult br) {
-        dto.setFinprodMarketId(dto.getFinprodMarketId()+dto.getTradeMarketId());
-        creditProtectionCertificate002Service.insert(dto);
-        return new Message<AjaxResult>().success().setData(new AjaxResult("成功"));
-        //        if (br.hasErrors()) {
-//            return new Message<AjaxResult>().fail().setData(new AjaxResult(br));
-//        }
-//        //生成金融产品代码
 //        dto.setFinprodMarketId(dto.getFinprodMarketId()+dto.getTradeMarketId());
-//        if (StringUtil.equals(dto.getOperateStatus(), OperationType.NEW.name())) {
-//            dto.setFinprodId(creditProtectionCertificate002Service.getFinprodId(dto));
-//        }
-//        //文件信息
-//        if (CollectionUtils.isNotEmpty(dto.getFileArray())
-//                && StringUtil.isNotEmpty(dto.getFinprodId())) {
-//            // 将附件和当前业务对象绑定（更新附件的业务代码）
-//            fileAttachmentProcess.updateBussinessNo(
-//                    dto.getFileArray().stream().map(UploadFile::getFileNo).collect(
-//                            Collectors.toList()),
-//                    dto.getFinprodId());
-//        }
-//        ProcessParameter<CreditProtectionCertificate002Dto> processParameter = new ProcessParameter<>();
-//        WorkFlowParameter<CreditProtectionCertificate002Dto> params = new WorkFlowParameter<>();
-//        params.setPageId(this.getPageId());
-//        params.setElementId(dto.getElementId());
-//        params.setBusinessCode(CreditProtectionCertificate002Dto::getFinprodMarketId);
-//        params.setBusinessType(DictCodeList.共通业务类型_基金类资产信息.getValue());
-//        // 设置流程业务说明
-//        params.setComment(entity -> {
-//            return WorkFlowUtil.concatComment("资产代码"+
-//                    GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodMarketId(), GlobalConstant.CLOSE_PARENTHESIS+
-//                    "资产名称"+GlobalConstant.OPEN_PARENTHESIS+
-//                    entity.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS);
-//        });
-//        if (StringUtil.equals(dto.getOperateStatus(), OperationType.NEW.name())) {
-//            processParameter.setOperationType(OperationType.NEW);
-//        } else if (StringUtil.equals(dto.getOperateStatus(), OperationType.MODIFY.name())) {
-//            processParameter.setOperationType(OperationType.MODIFY);
-//        } else {
-//            processParameter.setOperationType(OperationType.DELETE);
-//        }
-//        processParameter.setWorkFlowParameter(params);
-//        try {
-//            String msg = creditProtectionCertificate002Service.start(processParameter, dto);
-//            return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
-//        } catch (Exception e) {
-//            logger.error("流程发起失败", e);
-//            return new Message<AjaxResult>().fail().setData(new AjaxResult("流程发起失败"));
-//        }
+//        creditProtectionCertificate002Service.insert(dto);
+//        return new Message<AjaxResult>().success().setData(new AjaxResult("成功"));
+        if (br.hasErrors()) {
+            return new Message<AjaxResult>().fail().setData(new AjaxResult(br));
+        }
+        //生成金融产品代码
+        dto.setFinprodMarketId(dto.getFinprodMarketId()+dto.getTradeMarketId());
+        if (StringUtil.equals(dto.getOperateStatus(), OperationType.NEW.name())) {
+            dto.setFinprodId(creditProtectionCertificate002Service.getFinprodId(dto));
+        }
+        //文件信息
+        if (CollectionUtils.isNotEmpty(dto.getFileArray())
+                && StringUtil.isNotEmpty(dto.getFinprodId())) {
+            // 将附件和当前业务对象绑定（更新附件的业务代码）
+            fileAttachmentProcess.updateBussinessNo(
+                    dto.getFileArray().stream().map(UploadFile::getFileNo).collect(
+                            Collectors.toList()),
+                    dto.getFinprodId());
+        }
+        ProcessParameter<CreditProtectionCertificate002Dto> processParameter = new ProcessParameter<>();
+        WorkFlowParameter<CreditProtectionCertificate002Dto> params = new WorkFlowParameter<>();
+        params.setPageId(this.getPageId());
+        params.setElementId(dto.getElementId());
+        params.setBusinessCode(CreditProtectionCertificate002Dto::getFinprodMarketId);
+        params.setBusinessType(DictCodeList.共通业务类型_基金类资产信息.getValue());
+        // 设置流程业务说明
+        params.setComment(entity -> {
+            return WorkFlowUtil.concatComment("资产代码"+
+                    GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodMarketId(), GlobalConstant.CLOSE_PARENTHESIS+
+                    "资产名称"+GlobalConstant.OPEN_PARENTHESIS+
+                    entity.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS);
+        });
+        if (StringUtil.equals(dto.getOperateStatus(), OperationType.NEW.name())) {
+            processParameter.setOperationType(OperationType.NEW);
+        } else if (StringUtil.equals(dto.getOperateStatus(), OperationType.MODIFY.name())) {
+            processParameter.setOperationType(OperationType.MODIFY);
+        } else {
+            processParameter.setOperationType(OperationType.DELETE);
+        }
+        processParameter.setWorkFlowParameter(params);
+        try {
+            String msg = creditProtectionCertificate002Service.start(processParameter, dto);
+            return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
+        } catch (Exception e) {
+            logger.error("流程发起失败", e);
+            return new Message<AjaxResult>().fail().setData(new AjaxResult("流程发起失败"));
+        }
     }
 
     @ResponseBody
@@ -258,22 +259,37 @@ public class CreditProtectionCertificate002Controller extends BaseController {
     public Message<AjaxResult> delete(@RequestBody CreditProtectionCertificate004Dto cpc004Dto) {
         ProcessParameter<CreditProtectionCertificate002Dto> processParameter = new ProcessParameter<>();
         WorkFlowParameter<CreditProtectionCertificate002Dto> params = new WorkFlowParameter<>();
+        List<CreditProtectionCertificate002Dto> selectedItem = new ArrayList<>();
+        for (CreditProtectionCertificate002Dto saveRequest:cpc004Dto.getSelectedItem()){
+            CreditProtectionCertificate002Dto request = creditProtectionCertificate002Service.getById(saveRequest.getFinprodMarketId());
+            request.setOperateType(OperationType.DELETE.name());
+            selectedItem.add(request);
+        }
+        cpc004Dto.setOperateType(OperationType.DELETE.name());
+        cpc004Dto.setSelectedItem(selectedItem);
+        cpc004Dto.setRemark(cpc004Dto.getRemark());
         params.setPageId(this.getPageId());
         params.setElementId(cpc004Dto.getElementId());
         params.setBusinessCode(CreditProtectionCertificate002Dto::getFinprodMarketId);
-        params.setBusinessType(DictCodeListExt2.平安资产类型_信用保护凭证.getValue());
-        CreditProtectionCertificate002Dto dto = creditProtectionCertificate002Service.getById(cpc004Dto.getFinprodId());
-        dto.setRemark(cpc004Dto.getRemark());
-        dto.setOperateType(OperationType.DELETE.name());
+        params.setBusinessType(DictCodeList.共通业务类型_基金类资产信息.getValue());
+
+        // 设置流程业务说明, entity即传入的dto
+        params.setComment(entity1 -> {
+            return WorkFlowUtil.concatComment("资产代码"+
+                    GlobalConstant.OPEN_PARENTHESIS+entity1.getFinprodMarketId()+GlobalConstant.CLOSE_PARENTHESIS
+                    +"资产名称"+GlobalConstant.OPEN_PARENTHESIS+entity1.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS);
+        });
         processParameter.setOperationType(OperationType.DELETE);
         processParameter.setWorkFlowParameter(params);
         try {
-            creditProtectionCertificate002Service.start(processParameter, dto);
+            String msg = creditProtectionCertificate002Service.start(processParameter,
+                    cpc004Dto.getSelectedItem().toArray(new CreditProtectionCertificate002Dto[cpc004Dto.getSelectedItem().size()]));
+            return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
         } catch (Exception e) {
             logger.error("流程发起失败", e);
-            return Message.fail("流程发起失败");
+            return new Message<AjaxResult>().fail().setData(new AjaxResult("流程发起失败"));
         }
-        return Message.success("处理成功", null);
+
     }
 
 }

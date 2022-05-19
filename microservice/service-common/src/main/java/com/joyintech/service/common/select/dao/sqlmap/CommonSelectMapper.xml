@@ -143,7 +143,7 @@
                     OR
                     i.CUSTOMER_ID LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
                     OR
-                    a.INSITITUTE_CODE LIKE CONCAT('%', CONCAT(#{search,jdbcType=VARCHAR}, '%'))
+                    a.INSITITUTE_CODE LIKE CONCAT('%', CONCAT(#{initValue,jdbcType=VARCHAR}, '%'))
                 )
             </if>
             <if test="IS_ASSTE_MANAGER != null and IS_ASSTE_MANAGER != ''">

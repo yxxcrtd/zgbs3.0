@@ -86,15 +86,18 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
     @ResponseBody
     @PostMapping("/initParam")
     @ApiOperation(value = "新建/修改/查看页面初始化", notes = "新建/修改/查看页面初始化")
-    public Message<Map<String, Object>> init() {
+    public Message<Map<String, Object>> init(@RequestBody Map<String, Object> map) {
         Map<String, Object> params = new HashMap<>();
-        String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
-       // String workflowId = "00000000000000000000000000044663";
+       // String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
+        //String workflowId = "00000000000000000000000000059700";
+        String workflowId = "null".equals(map.get(GlobalConstant.WORKFLOW_ID)) ? null : (String) map.get(GlobalConstant.WORKFLOW_ID);
         boolean todoList = false;
         CfetsEtrBondFirstBid002Dto entity = new CfetsEtrBondFirstBid002Dto();
         // 待办中过来
         if (StringUtil.isNotEmpty(workflowId)) {
             todoList = true;
+//            ProcessMark processMark = cfetsEtrBondFirstBid002Service.getFirstBidBusinessInfo(workflowId);
+//            entity = cfetsEtrBondFirstBid002Service.getBussinessEntity(processMark);
             entity = cfetsEtrBondFirstBid002Service.getBussinessEntityByWorkflowId(workflowId);
             if (CollectionUtils.isNotEmpty(entity.getBiddingProductList())) {
                 for (CfetsBiddingProductDto productDto : entity.getBiddingProductList()) {

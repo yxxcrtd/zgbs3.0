@@ -280,7 +280,7 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         //2.查金融产品标的附属表
         FinProductAdd finProductAdd = finProductAddMapper.selectByPrimaryKey(finprodId);
         FinProductAddDto finProductAddDto = new FinProductAddDto();
-        BeanUtil.copyPropertiesIgnoreNull(finProductAddDto, finProductAdd);
+        BeanUtil.copyPropertiesIgnoreNull(entity, finProductAdd);
         //查询计费年度天数
         FinCashPlan finCashPlan = new FinCashPlan();
         String cashId = CommonUtil.generateCashFlowCode(finProduct.getFinprodId(),

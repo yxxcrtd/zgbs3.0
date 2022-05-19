@@ -1,8 +1,11 @@
 package com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.dto.BaseDto;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketCashPlanDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondPayHSrcSecOptionDto;
 import io.swagger.annotations.ApiModel;
@@ -236,7 +239,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
 
     @ApiModelProperty(name = "bondMarketCashPlanDtos", value = "付息计划信息")
     private List<FinBondMarketCashPlanDto> bondMarketCashPlanDtos;
-    
+
     public String getSecId() {
         return secId;
     }
@@ -265,12 +268,22 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         return tradingPlaces;
     }
 
+
+    public String getTradingPlacesStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.交易场所, this.getTradingPlaces());
+    }
+
     public void setTradingPlaces(String tradingPlaces) {
         this.tradingPlaces = tradingPlaces;
     }
 
     public String getRegisteredCustodian() {
         return registeredCustodian;
+    }
+
+
+    public String getRegisteredCustodianStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.登记托管机构, this.getRegisteredCustodian());
     }
 
     public void setRegisteredCustodian(String registeredCustodian) {
@@ -337,12 +350,22 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         return raiseMode;
     }
 
+
+    public String getRaiseModeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.募集方式, this.getRaiseMode());
+    }
+
     public void setRaiseMode(String raiseMode) {
         this.raiseMode = raiseMode;
     }
 
     public String getDomesticAndForeign() {
         return domesticAndForeign;
+    }
+
+
+    public String getDomesticAndForeignStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.境内外, this.getDomesticAndForeign());
     }
 
     public void setDomesticAndForeign(String domesticAndForeign) {
@@ -445,6 +468,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.interestAccrualDate = interestAccrualDate;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getValueDate() {
         return valueDate;
     }
@@ -453,6 +477,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.valueDate = valueDate;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getExpiryDate() {
         return expiryDate;
     }
@@ -469,6 +494,14 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.primaryClassification = primaryClassification;
     }
 
+    public String getPrimaryClassificationStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.WIND一级分类_含债券一级分类等, this.getPrimaryClassification());
+    }
+
+    public String getSecondaryClassificationStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.WIND二级分类_含债券二级分类等, this.getSecondaryClassification());
+    }
+
     public String getSecondaryClassification() {
         return secondaryClassification;
     }
@@ -476,8 +509,14 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     public void setSecondaryClassification(String secondaryClassification) {
         this.secondaryClassification = secondaryClassification;
     }
+
     public String getInterestPaymentFrequency() {
         return interestPaymentFrequency;
+    }
+
+
+    public String getInterestPaymentFrequencyStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.频率, this.getInterestPaymentFrequency());
     }
 
     public void setInterestPaymentFrequency(String interestPaymentFrequency) {
@@ -494,6 +533,10 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
 
     public String getCurrency() {
         return currency;
+    }
+
+    public String getCurrencyStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.币种, this.getCurrency());
     }
 
     public void setCurrency(String currency) {
@@ -762,5 +805,13 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
 
     public void setCouponSpecies(String couponSpecies) {
         this.couponSpecies = couponSpecies;
+    }
+
+    public String getCouponSpeciesStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.息票品种, this.getCouponSpecies());
+    }
+
+    public String getRateTypeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.利率类型, this.getRateType());
     }
 }

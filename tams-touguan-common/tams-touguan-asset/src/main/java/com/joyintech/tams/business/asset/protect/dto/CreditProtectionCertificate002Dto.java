@@ -62,8 +62,8 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
     /**
      * 发行人 - 创设机构
      */
-    @ApiModelProperty(name="issuerShort",value="创设机构",required = true)
-    private String issuerShort;
+    @ApiModelProperty(name="issuershort",value="创设机构",required = true)
+    private String issuershort;
     /**
      * 名义本金总额
      */
@@ -301,12 +301,12 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
         this.calendarId = calendarId;
     }
 
-    public String getIssuerShort() {
-        return issuerShort;
+    public String getIssuershort() {
+        return issuershort;
     }
 
-    public void setIssuerShort(String issuerShort) {
-        this.issuerShort = issuerShort;
+    public void setIssuershort(String issuershort) {
+        this.issuershort = issuershort;
     }
 
     public Date getVdate() {

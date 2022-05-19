@@ -1,7 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dao.MskCreditInfoProMapper">
-    <insert id="insert"></insert>
+    <insert id="insertSelective" parameterType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest">
+        insert into MST_CREDIT_MARKET_INFO
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="secid != null" >
+                secid,
+            </if>
+            <if test="valueSource != null" >
+                VALUE_SOURCE,
+            </if>
+            <if test="cdate != null" >
+                cdate,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="secid != null" >
+                #{secid,jdbcType=VARCHAR},
+            </if>
+            <if test="valueSource != null" >
+                #{valueSource,jdbcType=VARCHAR},
+            </if>
+            <if test="cdate != null" >
+                cdate,
+            </if>
+        </trim>
+    </insert>
     <delete id="deleteByPrimaryKey"></delete>
 
 
@@ -54,7 +78,8 @@
         SELECT
         m.SECID secid,
         f.FINPROD_ABBR finprodAbbr,
-        m.VALUE_SOURCE,
+        m.VALUE_SOURCE valueSource,
+        sdl1.item_value valueSourceStr,
         m.CDATE cdate,
         m.MDPRICE mdprice,
         m.MCPRICE mcprice,
@@ -63,7 +88,8 @@
         m.M_MDURATION mMduration,
         m.M_CNVXTY mCnvxty,
         m.ISSUE_MARKET_NUM issueMarketNum,
-        m.CREDIT_TYPE creditType
+        m.CREDIT_TYPE creditType,
+        sdl2.item_value creditTypeStr,
         FROM
         MST_CREDIT_MARKET_INFO		m
         LEFT JOIN
@@ -72,6 +98,8 @@
         LEFT JOIN
         INTERF_CREDITINFO	i
         ON	 i.SECID = m.SECID
+        LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='VALUATION_SOURCE' and sdl1.item_code = m.VALUE_SOURCE
+        LEFT JOIN SYS_DATADICT_LIST sdl2 on sdl2.dict_code ='PROTECTION_CREDIT_TYPE' and sdl2.item_code = m.CREDIT_TYPE
         <where>
             <if test="secIdList != null and secIdList.size() > 0">
                 AND (m.SECID IN
@@ -89,10 +117,31 @@
             <if test="cdateEnd != null and cdateEnd != ''">
                 <![CDATA[AND  m.cdate <= TO_DATE(#{cdateEnd},'YYYY-MM-DD')]]>
             </if>
+            <include refid="vagueQueryWhere"></include>
         </where>
         ORDER BY
         m.SECID
     </select>
+
+    <sql id="vagueQueryWhere">
+        <if test="search != null and search != '' ">
+            AND  (
+            sdl1.ITEM_VALUE like '%' || #{search} || '%'
+            or sdl2.ITEM_VALUE like '%' || #{search} || '%'
+            OR m.SECID like '%' || #{search} || '%'
+            OR m.CREDIT_TYPE like '%' || #{search} || '%'
+            OR TO_CHAR(m.CDATE,'yyyy-MM-dd') ||''= #{search}
+            <if test="search_isNumberFlag != null and search_isNumberFlag == true">
+            or (m.MYIELD*100 = #{search})
+            or (m.MCPRICE = #{search})
+            or (m.MINT = #{search})
+            or (m.M_MDURATION = #{search})
+            or (m.M_CNVXTY = #{search})
+            </if>
+            )
+        </if>
+    </sql>
+
     <select id="selectByKey"
             resultType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest">
          SELECT

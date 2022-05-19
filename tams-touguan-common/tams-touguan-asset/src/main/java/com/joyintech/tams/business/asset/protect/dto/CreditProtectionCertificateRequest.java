@@ -49,6 +49,8 @@ public class CreditProtectionCertificateRequest {
     @ApiModelProperty(name="mdateStart",value="到期日开始日",example="2021-01-01")
     private String mdateStart;
 
+    private List<CreditProtectionCertificateInsertRequest> selectedItem;
+
     public String getPageId() {
         return pageId;
     }
@@ -159,5 +161,13 @@ public class CreditProtectionCertificateRequest {
 
     public void setMdateStart(String mdateStart) {
         this.mdateStart = mdateStart;
+    }
+
+    public List<CreditProtectionCertificateInsertRequest> getSelectedItem() {
+        return selectedItem;
+    }
+
+    public void setSelectedItem(List<CreditProtectionCertificateInsertRequest> selectedItem) {
+        this.selectedItem = selectedItem;
     }
 }

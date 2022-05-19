@@ -6,6 +6,7 @@ import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.joyintech.exchange.service.quote.service.QuoteService;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.TickBean;
@@ -35,6 +36,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_现券交易;
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_通用式质押回购;
 
 /**
  * 组合分配
@@ -105,12 +109,17 @@ public class PortfolioAssignHelper {
 
         // 获取委托属性
         String entrustProp = EntrustPropUtils.getEntrustProp(instruction, orginProp);
-        if (StrUtil.isEmpty(entrustProp)) {
-            log.warn("未找到委托属性: instructionId [{}], entrustProp = [{}]", instructionId, orginProp);
-            return ResultBean.error(ErrorCode.REQ_PARAMETER_ENTRUST_PROP_ERROR);
-        }
-        if (EntrustProp.isConsultingTrade(entrustProp)) {
-            entrustProp = EntrustProp.SH_FIXEDINCOME_BAOJIA_OPPOSITE.value;
+        //新债交易委托属性
+        if (StringUtil.equals(投管业务类型_现券交易.getValue(), instruction.getBusiTypeTg())) {
+            if (StrUtil.isEmpty(entrustProp)) {
+                log.warn("未找到委托属性: instructionId [{}], entrustProp = [{}]", instructionId, orginProp);
+                return ResultBean.error(ErrorCode.REQ_PARAMETER_ENTRUST_PROP_ERROR);
+            }
+            if (EntrustProp.isConsultingTrade(entrustProp)) {
+                entrustProp = EntrustProp.SH_FIXEDINCOME_BAOJIA_OPPOSITE.value;
+            }
+        }else if (StringUtil.equals(投管业务类型_通用式质押回购.getValue(), instruction.getBusiTypeTg())){
+            entrustProp = EntrustProp.NORMAL.value;
         }
 
         MinTrdUnitLimit minTrdUnitLimit = instruction.queryMinTrdUnitLimit(entrustProp);
