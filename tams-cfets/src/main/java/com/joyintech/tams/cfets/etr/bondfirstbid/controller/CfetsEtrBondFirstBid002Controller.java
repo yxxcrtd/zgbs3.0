@@ -123,8 +123,10 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
         }
         //数据字典初始化数据
         params.put("BUSINESS_MODEL", this.getSelectDataFromDataDic(DictCode.业务模式, null));
+        params.put("TENDER_TARGET", this.getSelectDataFromDataDic(DictCode.招标标的, null));
         // 加券按钮
         params.put("IS_ADDBOND_SHOW", CacheUtil.getSysParam("IS_ADDBOND_SHOW"));
+
 
         params.put(GlobalConstant.ENTITY, entity);
         //pageId

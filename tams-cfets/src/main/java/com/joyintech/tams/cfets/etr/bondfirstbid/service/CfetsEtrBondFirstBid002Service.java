@@ -713,9 +713,13 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
     public CfetsEtrBondFirstBid002Dto packageEquity(CfetsEtrBondFirstBidSaveRequest cfetsDto) {
 
         //查询资产信息
-        CfetsEtrFinProductInfoRequest productInfoRequest = new CfetsEtrFinProductInfoRequest();
-        productInfoRequest.setFinprodId(cfetsDto.getFinprodId());
-        CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoService.findFinProductInfo(null, null, productInfoRequest);
+        CfetsEtrFinProductInfoResponse finProductInfo = new CfetsEtrFinProductInfoResponse();
+        if (StringUtil.isNotEmpty(cfetsDto.getFinprodId())) {
+            CfetsEtrFinProductInfoRequest productInfoRequest = new CfetsEtrFinProductInfoRequest();
+            productInfoRequest.setFinprodId(cfetsDto.getFinprodId());
+            finProductInfo = etrCommonFinProductInfoService.findFinProductInfo(null, null, productInfoRequest);
+        }
+
 
         CfetsEtrBondFirstBid002Dto dto = new CfetsEtrBondFirstBid002Dto();
         BeanUtil.copyPropertiesIgnoreNull(dto, cfetsDto);
@@ -1117,7 +1121,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
     public String generateTitle(CfetsEtrBondFirstBid002Dto entity, OperationType type) {
         return "指令日期" + ":" + DateUtil.format(entity.getEntrustDate()) + "-" +
                 "资产简称" + ":" + (entity.getFinprodAbbr() == null ? "" : entity.getFinprodAbbr()) + "-" +
-                "发行方式" + ":" + SysDataUtil.getNameFromDataDict(DictCode.新债_发行方式, entity.getIssueClass()) + "-" +
+                "发行方式" + ":" + (SysDataUtil.getNameFromDataDict(DictCode.新债_发行方式, entity.getIssueClass())  == null ? "":SysDataUtil.getNameFromDataDict(DictCode.新债_发行方式, entity.getIssueClass()))+ "-" +
                 "汇总投标券面总额" + ":" + ArithmeticUtil.divide(entity.getTotalBiddingNum(), new BigDecimal(10000), 2) + "万元";
     }
 
