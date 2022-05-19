@@ -1233,6 +1233,9 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         }else{
             return null;
         }
+        if(!StringUtil.isNotEmpty(scai.getVdate())||!StringUtil.isNotEmpty(mdate) ||!StringUtil.isNotEmpty(scai.getIssuePrice())){
+            return null;
+        }
         input.setSecInfoModel(secInfoModel);
         YieldPriceOutParameter parameter = yieldByPriceCalculator.calculate(input);
         if(null != parameter){
@@ -1267,6 +1270,9 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         }else if(StringUtil.equals(scai.getCouponSpecies(), DictCodeList.息票品种_贴现.getValue())){
             secInfoModel.setBondsType(Variety.贴现);
         }else{
+            return null;
+        }
+        if(!StringUtil.isNotEmpty(scai.getVdate())||!StringUtil.isNotEmpty(mdate) ||!StringUtil.isNotEmpty(scai.getRate())){
             return null;
         }
         input.setSecInfoModel(secInfoModel);
