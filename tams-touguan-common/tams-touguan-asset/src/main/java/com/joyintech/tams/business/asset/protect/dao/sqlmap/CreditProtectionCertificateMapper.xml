@@ -48,7 +48,7 @@
             fpa.SETTLE_METHOD settleMethod,			<!-- 结算方式		-->
             sdl2.item_value settleMethodStr,
             fpa.IS_ALLOW_OVERWRITE isAllowOverwrite,			<!-- 是否允许wind覆盖	-->
-            sdl1.item_value ,
+            sdl1.item_value isOrNoStr,
             fp.REMARK
         FROM
             FIN_PRODUCT fp
@@ -367,10 +367,10 @@
                 OR fpa.REF_SEC_FEATURES like '%' || #{search} || '%'
                 OR fpa.REF_SEC like '%' || #{search} || '%'
                 OR fpa.REF_ENTITY like '%' || #{search} || '%'
-                OR fpa.GRACE_PERIOD like '%' || #{search} || '%'
+                OR fpa.GRACE_PERIOD||'' = #{search}
                 OR fp.CALENDAR_ID||'' like '%' || #{search} || '%'
                 OR fp.ISSUE_PRICE||'' like '%' || #{search} || '%'
-                OR fccr.BASIS||'' like '%' || #{search} || '%'
+                OR fccr.BASIS||'' =|| #{search}
                 OR sdl2.item_value||'' like '%' || #{search} || '%'
                 OR TO_CHAR(fp.MDATE,'yyyy-MM-dd') ||''= #{search}
                 OR TO_CHAR(fp.VDATE,'yyyy-MM-dd') ||''= #{search}
