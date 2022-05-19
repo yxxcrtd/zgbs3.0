@@ -551,6 +551,8 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         paramCinfig.put("inputValue4",dto.getType11());
         FinProductTypeConfig resultType = finBondAssetMapper.getWindType(paramCinfig);
         if(Objects.nonNull(resultType)) {
+            finProductType.setType4(resultType.getOutputValue1());
+            finProductType.setType5(resultType.getOutputValue2());
             finProductType.setType6(resultType.getOutputValue1());
             finProductType.setType7(resultType.getOutputValue2());
         }
