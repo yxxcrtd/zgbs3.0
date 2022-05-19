@@ -116,7 +116,7 @@ public class CreditProtectionCertificate001Controller extends BaseController {
             return new Message<Page<CreditProtectionCertificateDto>>().success().setData(page);
         }catch (Exception e) {
             logger.error("查询债券标的信息分页数据异常",e);
-            return new Message<Page<CreditProtectionCertificateDto>>().fail().setMessage("查询信用保护凭证标的信息");
+            return new Message<Page<CreditProtectionCertificateDto>>().fail().setMessage("查询信用保护凭证标的信息数据异常");
         }
     }
 
