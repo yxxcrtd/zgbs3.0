@@ -12,6 +12,7 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.asset.protect.dao.CreditProtectionCertificateMapper;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateDto;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateRequest;
+import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -107,6 +108,15 @@ public class CreditProtectionCertificate001Service extends BaseService implement
                 request.getPageMode().getPageSize(),
                 () -> creditProtectionCertificateMapper.getFinprodIdForSelect(param));
         return page;
+    }
+
+    public boolean isInWflProcess(WflValidInputParameter parameter) {
+        parameter.setSeachMode("01");
+        List<String> result = creditProtectionCertificateMapper.getBusinessData(parameter);
+        if (CollectionUtils.isNotEmpty(result)) {
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
     }
 
     @Override
