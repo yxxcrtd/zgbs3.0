@@ -67,12 +67,18 @@
                 AND SEC_INFO.MARKET = #{tradingPlaces,jdbcType=VARCHAR}
             </if>
 
-            <if test="primaryClassification !=null and primaryClassification !=''">
-                AND SEC_INFO.PRIMARY_CLASSIFICATION = #{primaryClassification,jdbcType=VARCHAR}
+            <if test="primaryClassifications != null and primaryClassifications.size() > 0">
+                AND SEC_INFO.PRIMARY_CLASSIFICATION in
+                <foreach collection="primaryClassifications" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
             </if>
 
-            <if test="secondaryClassification !=null and secondaryClassification !=''">
-                AND SEC_INFO.SECONDARY_CLASSIFICATION = #{secondaryClassification,jdbcType=VARCHAR}
+            <if test="secondaryClassifications != null and secondaryClassifications.size() > 0">
+                AND SEC_INFO.SECONDARY_CLASSIFICATION in
+                <foreach collection="secondaryClassification" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
             </if>
 
             <if test="registeredCustodian !=null and registeredCustodian !=''">
@@ -243,8 +249,10 @@
 
         RELEASE_INFO.ISSUE_START_TIME AS issueStartTime,
         RELEASE_INFO.ISSUE_END_TIME AS issueEndTime,
-        RELEASE_INFO.BID_DATE as bidDate,
-        RELEASE_INFO.ADDITIONAL_TENDER_DATE as additionalTenderDate,
+        RELEASE_INFO.BID_BEGIN_DATE as bidBeginDate,
+        RELEASE_INFO.BID_END_DATE as bidEndDate,
+        RELEASE_INFO.ADDITIONAL_TENDER_BEGIN_DATE as additionalTenderBeginDate,
+        RELEASE_INFO.ADDITIONAL_TENDER_END_DATE as additionalTenderEndDate,
 
         nvl(RDI_RELEASE_INFO.MAX_SUB_AMT * 100000000, RELEASE_INFO.MAX_SUB_AMT) as maxSubAmt,
         nvl(RDI_RELEASE_INFO.MIN_PER_TENDER_AMT * 100000000, RELEASE_INFO.MIN_PER_TENDER_AMT) as minPerTenderAmt,

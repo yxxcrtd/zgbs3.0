@@ -29,6 +29,7 @@ import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dao.FinListedBondInfoQueryMapper;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.dto.FinListedBondInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.req.FinListedBondInfoQueryRequest;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +83,22 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         logger.info("queryForPage >> 待上市债券市场信息分页查询参数：{}", JSON.toJSONString(request));
         request.setPlatformDate(iPlatformDate.getSysDateStr());
         PageHelper.startPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize());
+        List<String> primaryClassifications = new ArrayList<>();
+        List<String> secondaryClassifications = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(request.getCustomAssetType())) {
+            for (int i = 0; i < request.getCustomAssetType().size(); i++) {
+                if (request.getCustomAssetType().get(i).size() >= 1) {
+                    String type9 = request.getCustomAssetType().get(i).get(0);
+                    primaryClassifications.add(type9);
+                }
+                if (request.getCustomAssetType().get(i).size() >= 2) {
+                    String type10 = request.getCustomAssetType().get(i).get(1);
+                    secondaryClassifications.add(type10);
+                }
+            }
+            request.setPrimaryClassifications(primaryClassifications);
+            request.setSecondaryClassifications(secondaryClassifications);
+        }
         List<FinListedBondInfoQuery001Dto> finListedBondInfoQuery001Dtos = finListedBondInfoQueryMapper.queryForPage(request);
         return new Page<>(PageInfo.of(finListedBondInfoQuery001Dtos));
     }
