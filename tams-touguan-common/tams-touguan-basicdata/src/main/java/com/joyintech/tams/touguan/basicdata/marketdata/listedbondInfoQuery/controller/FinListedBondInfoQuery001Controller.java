@@ -9,6 +9,7 @@ import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.dto.FinListedBondInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.req.FinListedBondInfoQueryRequest;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.service.FinListedBondInfoQuery001Service;
@@ -30,6 +31,8 @@ public class FinListedBondInfoQuery001Controller extends BaseController {
 
     @Autowired
     private FinListedBondInfoQuery001Service finListedBondInfoQuery001Service;
+    @Autowired
+    private IPlatformDate iPlatformDate;
 
     @ApiOperation(value = "初始化参数", notes = "初始化参数")
     @PostMapping("/initParams")
@@ -64,6 +67,7 @@ public class FinListedBondInfoQuery001Controller extends BaseController {
         initPageParams.put("ISSUE_STYLE", this.getSelectDataFromDataDic(DictCode.发行类型, null));
         initPageParams.put("ISSUE_CLASS", this.getSelectDataFromDataDic(DictCode.新债_发行方式, null));
         initPageParams.put("TENDER_TYPE", this.getSelectDataFromDataDic(DictCode.招标方式, null));
+        initPageParams.put("iPlatformDate", iPlatformDate.getSysDateStr());
         //导出
         initPageParams.put("EXPORT_SHOW", CacheUtil.getSysParam("EXPORT_SHOW"));
         //刷新时间

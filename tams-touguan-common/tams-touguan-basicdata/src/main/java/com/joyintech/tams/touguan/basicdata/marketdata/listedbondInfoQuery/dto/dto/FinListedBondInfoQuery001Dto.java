@@ -308,12 +308,20 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         return biddingMethod;
     }
 
+    public String getBiddingMethodStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.招标方式, this.getBiddingMethod());
+    }
+
     public void setBiddingMethod(String biddingMethod) {
         this.biddingMethod = biddingMethod;
     }
 
     public String getTenderTarget() {
         return tenderTarget;
+    }
+
+    public String getTenderTargetStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.招标标的, this.getBiddingMethod());
     }
 
     public void setTenderTarget(String tenderTarget) {
@@ -420,6 +428,10 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
 
     public String getIssueMethod() {
         return issueMethod;
+    }
+
+    public String getIssueMethodStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.新债_发行方式, this.getIssueMethod());
     }
 
     public void setIssueMethod(String issueMethod) {

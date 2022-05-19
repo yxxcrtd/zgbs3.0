@@ -256,6 +256,14 @@ public class FinBondAsset001Controller extends BaseController{
                     res.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(res);
                 }
+                int count1 = finBondAssetService.isTransInAssetTwo(finprodId);
+                if (count1 > 0){
+                    ValidMessage validMessage = new ValidMessage("存在流程中/待执行指令交易数据，不可删除");
+                    errorList.add(validMessage);
+                    res.setErrorList(errorList);
+                    res.setMessageType(MessageType.错误消息);
+                    return new Message<AjaxResult>().success().setData(res);
+                }
             }    
         }
         //新增撤销校验，不允许删除上市债券  add by mashukai 20210425 end
@@ -289,6 +297,14 @@ public class FinBondAsset001Controller extends BaseController{
                 if(finBondAssetService.selectCountByfinprodId(finProdId)==0){
                     errorList.add(new ValidMessage("",
                             getMessage("该数据已被删除!")));
+                    wr.setErrorList(errorList);
+                    wr.setMessageType(MessageType.错误消息);
+                    return new Message<AjaxResult>().success().setData(wr);
+                }
+                int count1 = finBondAssetService.isTransInAssetTwo(finProdId);
+                if (count1 > 0){
+                    ValidMessage validMessage = new ValidMessage("存在流程中/待执行指令交易数据，不可修改");
+                    errorList.add(validMessage);
                     wr.setErrorList(errorList);
                     wr.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(wr);

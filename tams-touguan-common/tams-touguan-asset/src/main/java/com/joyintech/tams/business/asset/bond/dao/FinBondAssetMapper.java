@@ -258,4 +258,6 @@ public interface FinBondAssetMapper {
 	int deleteCfetsOprHis(@Param("entrustId") String entrustId);
 
 	List<FinProductIssue> selectFinProductIssue(@Param("finprodMarketId") String finprodMarketId);
+
+	int isTransInAssetTwo(@Param("finprodId") String finprodId);
 }

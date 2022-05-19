@@ -221,6 +221,7 @@ public class FinBondAsset002Controller extends BaseController{
                     entity.setType9(entity.getTypeTwo());
                     entity.setType10(entity.getTypeThree());
                     entity.setType11(entity.getTypeFour());
+                    entity.setFinprodMarketId(entity.getFinprodMarketId()+entity.getTradeMarketId());
                 }
             }
             return new Message<FinBondAssetSaveRequest>().success().setData(entity);
