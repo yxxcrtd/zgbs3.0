@@ -113,14 +113,14 @@ public class MskCreditMarketInfo002Controller extends BaseController {
     @PostMapping("/check")
     @ResponseBody
     public Message<AjaxResult> check(@RequestBody MskCreditInfoProSaveRequest dto, BindingResult result) {
-        AjaxResult ajax = new AjaxResult();
+        AjaxResult res= new AjaxResult();
         /*List<ValidMessage> validList = new ArrayList<>();
         ValidUtils.valid(dto,validList);
         if (CollectionUtils.isNotEmpty(validList)){
             ajax.setErrorList(validList);
             return new Message<AjaxResult>().success().setData(ajax);
         }*/
-        return new Message<AjaxResult>().success().setData(commonCheck(result, dto.getOperateType()));
+        return new Message<AjaxResult>().success().setData(res);
     }
     /**
      * 保存
