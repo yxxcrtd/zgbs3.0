@@ -1325,11 +1325,11 @@
                 null                            as                                   acctNoName,
                 icb.SUBSCRIPTION_AMOUNT * 10000 as                                   lastqty,
                 case
-                    /*when icb.ISSUE_PRICE is not null then icb.ISSUE_PRICE*/
+                    when icb.ISSUE_PRICE is not null then icb.ISSUE_PRICE
                     when icb.SPREAD is not null then icb.SPREAD
                     when icb.COUPON_RATE is not null then icb.COUPON_RATE  end tradeYield,
                 case
-                /*when icb.ISSUE_PRICE is not null then  icb.ISSUE_PRICE || '元'*/
+                when icb.ISSUE_PRICE is not null then icb.ISSUE_PRICE || '元'
                 when icb.SPREAD is not null then  icb.SPREAD || 'BP'
                 when icb.COUPON_RATE is not null then to_char(icb.COUPON_RATE,'FM990.9990') ||'%' end tradeYieldStr,
                 null                                                                 termDays,
