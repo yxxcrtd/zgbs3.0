@@ -114,12 +114,13 @@ public class MskCreditMarketInfo002Controller extends BaseController {
     @ResponseBody
     public Message<AjaxResult> check(@RequestBody MskCreditInfoProSaveRequest dto, BindingResult result) {
         AjaxResult res= new AjaxResult();
-        /*List<ValidMessage> validList = new ArrayList<>();
-        ValidUtils.valid(dto,validList);
-        if (CollectionUtils.isNotEmpty(validList)){
-            ajax.setErrorList(validList);
-            return new Message<AjaxResult>().success().setData(ajax);
-        }*/
+        List<ValidMessage> errorList = new ArrayList<>();
+        if(mskCreditMarketInfoPro001Service.selectByKey(dto.getSecid(), dto.getCdate(),dto.getValueSource()) != null){
+            errorList.add(new ValidMessage(this.getMessage("BUSS_COM_E_0006")));
+            res.setErrorList(errorList);
+            res.setMessageType(MessageType.错误消息);
+            return new Message<AjaxResult>().success().setData(res);
+        }
         return new Message<AjaxResult>().success().setData(res);
     }
     /**
@@ -204,6 +205,19 @@ public class MskCreditMarketInfo002Controller extends BaseController {
         } catch(Exception e){
             e.printStackTrace();
             return new Message<MskCreditInfoProSaveRequest>().fail().setMessage("查询异常");
+        }
+    }
+
+
+    @ResponseBody
+    @PostMapping("/getFinprodMarketInfo")
+    @ApiOperation(value = "信用保护查询资产列表", notes = "信用保护查询资产列表")
+    public Message<Page<SelectOptionDto>> getFinprodMarketInfo(@RequestBody MskCreditInfoProSaveRequest dto){
+        try {
+            Page<SelectOptionDto> tempList = mskCreditMarketInfoPro001Service.getFinprodMarketInfo(dto);
+            return new Message<Page<SelectOptionDto>>().success().setData(tempList);
+        } catch (Exception e) {
+            return new Message<Page<SelectOptionDto>>().fail().setMessage("查询异常");
         }
     }
     

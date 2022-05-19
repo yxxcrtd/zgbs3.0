@@ -255,12 +255,7 @@ public class CfetsTrdConfirmCstpInfoListResponse {
     }
 
     public String getTradeYieldStr() {
-        String unit = this.tradeYieldStr == null ? "" : this.tradeYieldStr;
-        String tradeYield = "";
-        if (getTradeYield() != null) {
-            tradeYield = getTradeYield().toPlainString();
-        }
-        return tradeYield + unit;
+        return tradeYieldStr;
     }
 
     public void setTradeYieldStr(String tradeYieldStr) {

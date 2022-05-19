@@ -135,7 +135,7 @@
             </if>
 
             <if test="currency !=null and currency !=''">
-                AND RELEASE_INFO.CURRENCY = #{currency,jdbcType=VARCHAR}
+                AND SEC_INFO.CURRENCY = #{currency,jdbcType=VARCHAR}
             </if>
 
             <if test="isSus !=null and isSus !=''">

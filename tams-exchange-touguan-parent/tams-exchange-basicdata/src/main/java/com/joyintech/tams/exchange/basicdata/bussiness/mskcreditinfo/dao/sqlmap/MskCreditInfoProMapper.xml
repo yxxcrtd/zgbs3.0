@@ -153,11 +153,12 @@
                 AND m.VALUE_SOURCE = #{valueSource}
             </if>
             <if test="cdateStart != null and cdateStart != ''">
-                <![CDATA[AND  m.cdate >= TO_DATE(#{cdateStart},'YYYY-MM-DD') ]]>
+                <![CDATA[AND  m.cdate >= #{cdateStart,jdbcType=VARCHAR} ]]>
             </if>
             <if test="cdateEnd != null and cdateEnd != ''">
-                <![CDATA[AND  m.cdate <= TO_DATE(#{cdateEnd},'YYYY-MM-DD')]]>
+                <![CDATA[AND  m.cdate <= #{cdateEnd,jdbcType=VARCHAR}]]>
             </if>
+            <include refid="vagueQueryWhere"></include>
         </where>
         ORDER BY
           m.SECID
@@ -206,7 +207,6 @@
             <if test="cdateEnd != null and cdateEnd != ''">
                 <![CDATA[AND  m.cdate <= TO_DATE(#{cdateEnd},'YYYY-MM-DD')]]>
             </if>
-            <include refid="vagueQueryWhere"></include>
         </where>
         ORDER BY
         m.SECID
@@ -219,7 +219,6 @@
             or sdl2.ITEM_VALUE like '%' || #{search} || '%'
             OR m.SECID like '%' || #{search} || '%'
             OR m.CREDIT_TYPE like '%' || #{search} || '%'
-            OR TO_CHAR(m.CDATE,'yyyy-MM-dd') ||''= #{search}
             <if test="search_isNumberFlag != null and search_isNumberFlag == true">
             or (m.MYIELD*100 = #{search})
             or (m.MCPRICE = #{search})
@@ -323,6 +322,28 @@
         ON	 i.SECID = m.SECID
         WHERE
         m.SECID=#{secid,jdbcType=VARCHAR}
+    </select>
+
+    <resultMap id="finprodIdMap" type="com.joyintech.framework.select.SelectOptionDto">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="text" property="text" jdbcType="VARCHAR"/>
+        <result column="object" property="object" jdbcType="VARCHAR"/>
+        <!-- 	        <association property="object" javaType="java.util.Map">
+                        <result column="FINPROD_ABBR" property="finprodAbbr" jdbcType="VARCHAR"/>
+                    </association> -->
+    </resultMap>
+
+    <select id="getFinprodMarketInfo" resultMap="finprodIdMap">
+    SELECT
+    distinct
+    FIN.FINPROD_MARKET_ID AS id,
+    FIN.FINPROD_MARKET_ID object,
+    FIN.FINPROD_ABBR AS text
+    FROM
+    FIN_PRODUCT  FIN
+    LEFT JOIN
+        INTERF_CREDITINFO	i
+        ON	 i.SECID = FIN.FINPROD_ID
     </select>
 
 </mapper>

@@ -300,6 +300,7 @@ public class CfetsTrdQueryService extends BaseService{
                         ArithmeticUtil.multiply(dataformBid.getReferenceRate(), new BigDecimal(100)), 4, RoundingMode.HALF_UP) + "%");
             }
             dataformBid.setDipType(SysDataUtil.getNameFromDataDict(BussinessDictCode.分配方式, dataformBid.getDipType()));
+            dataformBid.getProductDtos().forEach(item->item.setSubscriptionAmount(ArithmeticUtil.divide(item.getSubscriptionAmount(),new BigDecimal(10000),2)));
             resultData.put(dtCode + "_dataform", dataformBid);
             resultData.put(dtCode + "_datatablep", dataformBid.getProductDtos());
         } else {

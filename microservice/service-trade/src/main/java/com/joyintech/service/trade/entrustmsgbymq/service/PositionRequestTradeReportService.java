@@ -246,12 +246,9 @@ public class PositionRequestTradeReportService {
             plt.put("tradeId", entity.getTradeId());
             plt.put("etrId", entity.getEntrustId());
             // ZGTFCP-1250:新增字段赋值 modify by fuyongsheng 20220318 start
-            // TODO 指令券面金额   ZGCPCN-635 modify by huwei
             plt.put("etrSecAmount", dto.getEtrSecAmount());
             plt.put("ordId", dto.getOrderId());
-            // TODO 下单金额  ZGCPCN-635 modify by huwei
-            plt.put("ordSecAmount", entity.getEntrustAmt());
-            //plt.put("ordSecAmount", dto.getOrdSecAmount());
+            plt.put("ordSecAmount", dto.getOrdSecAmount());
             // ZGTFCP-1250:新增字段赋值 modify by fuyongsheng 20220318 end
             // ZGTFCP-1303:需要增加finprodId字段 modify by fuyongsheng 20220318 start
             plt.put("finprodId", entity.getFinprodId());
