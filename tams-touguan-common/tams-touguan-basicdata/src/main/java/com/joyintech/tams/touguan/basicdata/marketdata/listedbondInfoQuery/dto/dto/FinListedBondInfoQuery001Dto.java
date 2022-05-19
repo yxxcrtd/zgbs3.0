@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.dto.BaseDto;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketCashPlanDto;
@@ -180,19 +181,19 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     private Date issueEndTime;
 
     @ApiModelProperty(name = "bidBeginDate", value = "投标日开始时间")
-    private Date bidBeginDate;
+    private String bidBeginDate;
 
     @ApiModelProperty(name = "bidEndDate", value = "投标日结束时间")
-    private Date bidEndDate;
+    private String bidEndDate;
 
     @ApiModelProperty(name = "additionalTenderBeginDate", value = "增发投标日开始时间")
-    private Date additionalTenderBeginDate;
+    private String additionalTenderBeginDate;
 
     @ApiModelProperty(name = "additionalTenderEndDate", value = "增发投标日结束时间")
-    private Date additionalTenderEndDate;
+    private String additionalTenderEndDate;
 
     @ApiModelProperty(name = "additionalTenderDate", value = "增发投标日")
-    private Date additionalTenderDate;
+    private String additionalTenderDate;
 
     @ApiModelProperty(name = "maxSubAmt", value = "最高认购总量（亿元）")
     @JsonSerialize(using = BigDecimalSerializer.class)
@@ -636,11 +637,11 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.issueEndTime = issueEndTime;
     }
 
-    public Date getAdditionalTenderDate() {
+    public String getAdditionalTenderDate() {
         return additionalTenderDate;
     }
 
-    public void setAdditionalTenderDate(Date additionalTenderDate) {
+    public void setAdditionalTenderDate(String additionalTenderDate) {
         this.additionalTenderDate = additionalTenderDate;
     }
 
@@ -828,49 +829,53 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.finprodId = finprodId;
     }
 
-    public Date getBidBeginDate() {
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    public String getBidBeginDate() {
         return bidBeginDate;
     }
 
-    public void setBidBeginDate(Date bidBeginDate) {
+    public void setBidBeginDate(String bidBeginDate) {
         this.bidBeginDate = bidBeginDate;
     }
 
-    public Date getBidEndDate() {
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    public String getBidEndDate() {
         return bidEndDate;
     }
 
-    public List<Date> getBidDates() {
-        List<Date> bidDates = Lists.newArrayList();
-        bidDates.add(getBidBeginDate());
-        bidDates.add(getBidEndDate());
+    public List<String> getBidDates() {
+        List<String> bidDates = Lists.newArrayList();
+        bidDates.add(StringUtil.isBlank(getBidBeginDate()) ? "" : getBidBeginDate());
+        bidDates.add(StringUtil.isBlank(getBidEndDate()) ? "" : getBidEndDate());
         return bidDates;
     }
 
-    public void setBidEndDate(Date bidEndDate) {
+    public void setBidEndDate(String bidEndDate) {
         this.bidEndDate = bidEndDate;
     }
 
-    public List<Date> getAdditionalTenderDates() {
-        List<Date> additionalTenderDates = Lists.newArrayList();
-        additionalTenderDates.add(getAdditionalTenderBeginDate());
-        additionalTenderDates.add(getAdditionalTenderEndDate());
+    public List<String> getAdditionalTenderDates() {
+        List<String> additionalTenderDates = Lists.newArrayList();
+        additionalTenderDates.add(StringUtil.isBlank(getAdditionalTenderBeginDate()) ? "" : getAdditionalTenderBeginDate());
+        additionalTenderDates.add(StringUtil.isBlank(getAdditionalTenderEndDate()) ? "" : getAdditionalTenderEndDate());
         return additionalTenderDates;
     }
 
-    public Date getAdditionalTenderBeginDate() {
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    public String getAdditionalTenderBeginDate() {
         return additionalTenderBeginDate;
     }
 
-    public void setAdditionalTenderBeginDate(Date additionalTenderBeginDate) {
+    public void setAdditionalTenderBeginDate(String additionalTenderBeginDate) {
         this.additionalTenderBeginDate = additionalTenderBeginDate;
     }
 
-    public Date getAdditionalTenderEndDate() {
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    public String getAdditionalTenderEndDate() {
         return additionalTenderEndDate;
     }
 
-    public void setAdditionalTenderEndDate(Date additionalTenderEndDate) {
+    public void setAdditionalTenderEndDate(String additionalTenderEndDate) {
         this.additionalTenderEndDate = additionalTenderEndDate;
     }
 }
