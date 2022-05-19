@@ -12,6 +12,7 @@
         SEC_INFO.TRADING_PLACES tradingPlaces,
         SEC_INFO.REGISTERED_CUSTODIAN registeredCustodian,
         SEC_INFO.RAISE_MODE raiseMode,
+        SEC_INFO.issuer,
         <!-- 发行方式 -->
         nvl(RDI_RELEASE_INFO.ISSUE_METHOD ,RELEASE_INFO.ISSUING_METHOD) as issueMethod,
 
