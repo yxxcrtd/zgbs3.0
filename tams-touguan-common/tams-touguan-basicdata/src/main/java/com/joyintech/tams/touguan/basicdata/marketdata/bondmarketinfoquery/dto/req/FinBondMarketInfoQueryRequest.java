@@ -20,14 +20,17 @@ public class FinBondMarketInfoQueryRequest {
     @ApiModelProperty(name = "pageMode", value = "分页对象", example = "{pageSize: 10,pageNo: 1, sort: 'name', direction: 'asc'}")
     private PageMode pageMode;
 
-    @ApiModelProperty(name = "secType", value = "债券分类")
-    private String secType;
-
     @ApiModelProperty(name = "secId", value = "债券ID/资产代码")
     private String secId;
 
     @ApiModelProperty(name = "market", value = "市场")
     private String market;
+
+    @ApiModelProperty(name = "secType", value = "一级分类")
+    private String secType;
+
+    @ApiModelProperty(name = "secType2", value = "二级分类")
+    private String secType2;
 
     @ApiModelProperty(name = "institution", value = "登记托管机构")
     private String institution;
@@ -313,5 +316,13 @@ public class FinBondMarketInfoQueryRequest {
 
     public void setSecType(String secType) {
         this.secType = secType;
+    }
+
+    public String getSecType2() {
+        return secType2;
+    }
+
+    public void setSecType2(String secType2) {
+        this.secType2 = secType2;
     }
 }

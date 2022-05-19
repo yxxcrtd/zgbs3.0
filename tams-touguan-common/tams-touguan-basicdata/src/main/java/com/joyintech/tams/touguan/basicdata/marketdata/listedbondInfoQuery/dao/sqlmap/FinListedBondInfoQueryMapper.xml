@@ -67,6 +67,14 @@
                 AND SEC_INFO.MARKET = #{tradingPlaces,jdbcType=VARCHAR}
             </if>
 
+            <if test="primaryClassification !=null and primaryClassification !=''">
+                AND SEC_INFO.PRIMARY_CLASSIFICATION = #{primaryClassification,jdbcType=VARCHAR}
+            </if>
+
+            <if test="secondaryClassification !=null and secondaryClassification !=''">
+                AND SEC_INFO.SECONDARY_CLASSIFICATION = #{secondaryClassification,jdbcType=VARCHAR}
+            </if>
+
             <if test="registeredCustodian !=null and registeredCustodian !=''">
                 AND SEC_INFO.institution = #{registeredCustodian,jdbcType=VARCHAR}
             </if>

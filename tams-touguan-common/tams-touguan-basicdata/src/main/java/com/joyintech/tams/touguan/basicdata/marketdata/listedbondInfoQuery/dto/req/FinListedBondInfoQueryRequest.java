@@ -26,6 +26,12 @@ public class FinListedBondInfoQueryRequest {
     @ApiModelProperty(name = "secName", value = "资产简称")
     private String secName;
 
+    @ApiModelProperty(name = "primaryClassification", value = "一级分类")
+    private String primaryClassification;
+
+    @ApiModelProperty(name = "secondaryClassification", value = "二级分类")
+    private String secondaryClassification;
+
     @ApiModelProperty(name = "tradingPlaces", value = "交易场所/市场")
     private String tradingPlaces;
 
@@ -55,9 +61,6 @@ public class FinListedBondInfoQueryRequest {
 
     @ApiModelProperty(name = "listingCode", value = "上市代码")
     private String listingCode;
-
-    @ApiModelProperty(name = "secType", value = "债券分类")
-    private String secType;
 
     @ApiModelProperty(name = "registeredCustodian", value = "登记托管机构")
     private String registeredCustodian;
@@ -353,14 +356,6 @@ public class FinListedBondInfoQueryRequest {
         this.listingCode = listingCode;
     }
 
-    public String getSecType() {
-        return secType;
-    }
-
-    public void setSecType(String secType) {
-        this.secType = secType;
-    }
-
     public String getIssueMethod() {
         return issueMethod;
     }
@@ -423,5 +418,21 @@ public class FinListedBondInfoQueryRequest {
 
     public void setRegisteredCustodian(String registeredCustodian) {
         this.registeredCustodian = registeredCustodian;
+    }
+
+    public String getPrimaryClassification() {
+        return primaryClassification;
+    }
+
+    public void setPrimaryClassification(String primaryClassification) {
+        this.primaryClassification = primaryClassification;
+    }
+
+    public String getSecondaryClassification() {
+        return secondaryClassification;
+    }
+
+    public void setSecondaryClassification(String secondaryClassification) {
+        this.secondaryClassification = secondaryClassification;
     }
 }
