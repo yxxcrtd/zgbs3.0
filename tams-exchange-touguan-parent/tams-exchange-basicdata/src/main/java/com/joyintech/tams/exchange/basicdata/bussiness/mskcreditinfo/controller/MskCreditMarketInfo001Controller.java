@@ -132,6 +132,7 @@ public class MskCreditMarketInfo001Controller extends BaseController {
     public Message<AjaxResult> check(@RequestBody MskCreditInfoProSaveRequest dto, BindingResult result) {
         AjaxResult res= new AjaxResult();
         List<ValidMessage> errorList = new ArrayList<>();
+        Date platDate = DateUtil.platDateFromCache();
         if(null!=dto.getSelectedItem()&&!dto.getSelectedItem().isEmpty()) {
             for (MskCreditInfoProSaveRequest entity : dto.getSelectedItem()) {
                 WflValidInputParameter parameter = new WflValidInputParameter();
@@ -143,11 +144,21 @@ public class MskCreditMarketInfo001Controller extends BaseController {
                     res.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(res);
                 }
+                if (!(DateUtil.format(platDate)).equals(entity.getCdate())) {
+                    errorList.add(new ValidMessage(this.getMessage("只可删除估值日期等于平台日的数据")));
+                    res.setErrorList(errorList);
+                    res.setMessageType(MessageType.错误消息);
+                    return new Message<AjaxResult>().success().setData(res);
+                }
+                if(mskCreditMarketInfoPro001Service.selectByKey(entity.getSecid(), entity.getCdate(),entity.getValueSource()) == null){
+                    errorList.add(new ValidMessage(this.getMessage("BUSS_COM_E_0022")));
+                    res.setErrorList(errorList);
+                    res.setMessageType(MessageType.错误消息);
+                    return new Message<AjaxResult>().success().setData(res);
+                }
             }
         }
-        //新增撤销校验，不允许删除上市债券  add by mashukai 20210425 end
-        AjaxResult ajaxResult = commonCheck(result, dto.getOperateType());
-        return new Message<AjaxResult>().success().setData(ajaxResult);
+        return new Message<AjaxResult>().success().setData(res);
     }
 
     @ApiOperation(value = "修改按钮点击时的check", notes = "修改按钮点击时的check")
@@ -155,23 +166,34 @@ public class MskCreditMarketInfo001Controller extends BaseController {
     @PostMapping("editCheck")
     public Message<AjaxResult> editCheck(@RequestBody MskCreditInfoProSaveRequest request){
         Map<String,Object> param = BeanUtil.object2Map(request);
-        //判断是否存在交易
-        List<JoyinMessage> joyinMessages = new ArrayList<>();
         List<ValidMessage> errorList = new ArrayList<ValidMessage>();
         AjaxResult wr = new AjaxResult();
-        if(null!=request.getSelectedItem()&&!request.getSelectedItem().isEmpty()){
-            for(MskCreditInfoProSaveRequest entity : request.getSelectedItem()) {
+        Date platDate = DateUtil.platDateFromCache();
+//        if(null!=request.getSelectedItem()&&!request.getSelectedItem().isEmpty()){
+//            for(MskCreditInfoProSaveRequest entity : request.getSelectedItem()) {
                 WflValidInputParameter parameter = new WflValidInputParameter();
                 parameter.setPageId("MstCreditMarketInfo002");
-                parameter.setBusinessDataPk1(entity.getSecid());
+                parameter.setBusinessDataPk1((String) param.get("secid"));
                 if (mskCreditMarketInfoPro001Service.isInWflProcess(parameter)) {
                     errorList.add(new ValidMessage("", getMessage("所选信用保护凭证存在流程中的数据！,不可修改!")));
                     wr.setErrorList(errorList);
                     wr.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(wr);
                 }
-            }
-        }
+                if (!(DateUtil.format(platDate)).equals(param.get("cdate"))) {
+                    errorList.add(new ValidMessage(this.getMessage("只可修改估值日期等于平台日的数据")));
+                    wr.setErrorList(errorList);
+                    wr.setMessageType(MessageType.错误消息);
+                    return new Message<AjaxResult>().success().setData(wr);
+                }
+                if(mskCreditMarketInfoPro001Service.selectByKey((String) param.get("secid"), (String)param.get("cdate"),(String)param.get("valueSource")) == null){
+                    errorList.add(new ValidMessage(this.getMessage("BUSS_COM_E_0022")));
+                    wr.setErrorList(errorList);
+                    wr.setMessageType(MessageType.错误消息);
+                    return new Message<AjaxResult>().success().setData(wr);
+                }
+           // }
+       // }
         return new Message<AjaxResult>().success().setData(wr);
     }
 
