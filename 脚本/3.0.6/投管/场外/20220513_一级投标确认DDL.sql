@@ -1,6 +1,5 @@
 -- 金融产品临时交易汇总附属表
-create table TRD_TEMP_DEAL_TOTAL_ADD
-(
+create table TRD_TEMP_DEAL_TOTAL_ADD(
     TOTLE_TRADE_ID         VARCHAR2(32) not null constraint PK_TRD_TEMP_DEAL_TOTAL_ADD primary key,
     ENTRUST_ID             VARCHAR2(32),
     OUR_SHARE_AMT          NUMBER(30, 4),
@@ -43,9 +42,7 @@ create table TRD_TEMP_DEAL_TOTAL_ADD
     CLEAR_REC_AMT          NUMBER(30, 2),
     CLEAR_LOSS_AMT         NUMBER(30, 2),
     OU_PARTY_ID            VARCHAR2(32)
-    
 );
-
 comment on table TRD_TEMP_DEAL_TOTAL_ADD is '金融产品临时交易汇总附属表';
 comment on column TRD_TEMP_DEAL_TOTAL_ADD.TOTLE_TRADE_ID is '汇总交易编号';
 comment on column TRD_TEMP_DEAL_TOTAL_ADD.ENTRUST_ID is '委托代码';
@@ -89,10 +86,8 @@ comment on column TRD_TEMP_DEAL_TOTAL_ADD.INT_SETT_TYPE is '结息方式,适用�
 comment on column TRD_TEMP_DEAL_TOTAL_ADD.CLEAR_REC_AMT is '清理应收款';
 comment on column TRD_TEMP_DEAL_TOTAL_ADD.CLEAR_LOSS_AMT is '清理减值';
 comment on column TRD_TEMP_DEAL_TOTAL_ADD.OU_PARTY_ID is '本方';
-
 -- 汇总指令关系表
-create table TOTAL_ETR_ENTRUST_REL
-(
+create table TOTAL_ETR_ENTRUST_REL(
     TOTLE_ID           	     VARCHAR2(32) not null constraint PK_TOTAL_ETR_ENTRUST_REL primary key,
     ENTRUST_ID               VARCHAR2(32),
     TRADER                   VARCHAR2(32),
@@ -101,10 +96,7 @@ create table TOTAL_ETR_ENTRUST_REL
     CREATE_TIME              TIMESTAMP(6) not null,
     UPDATE_USER              VARCHAR2(20) not null,
     UPDATE_TIME              TIMESTAMP(6) not null
-    
-)
-;
-
+);
 comment on table TOTAL_ETR_ENTRUST_REL is '汇总指令关系表';
 comment on column TOTAL_ETR_ENTRUST_REL.TOTLE_ID is '汇总代码';
 comment on column TOTAL_ETR_ENTRUST_REL.ENTRUST_ID is '委托代码';
@@ -114,8 +106,6 @@ comment on column TOTAL_ETR_ENTRUST_REL.CREATE_DEPT is '创建部门';
 comment on column TOTAL_ETR_ENTRUST_REL.CREATE_TIME is '创建时间';
 comment on column TOTAL_ETR_ENTRUST_REL.UPDATE_USER is '更新人';
 comment on column TOTAL_ETR_ENTRUST_REL.UPDATE_TIME is '更新时间';
-
-
 -- 投标确认增加字段
 alter table BID_ORDER ADD COUNTER_ID VARCHAR(32) ;
 COMMENT ON COLUMN BID_ORDER.COUNTER_ID IS '交易对手';
@@ -133,7 +123,6 @@ alter table BID_ORDER ADD ASSIGN_REGDATE DATE ;
 COMMENT ON COLUMN BID_ORDER.ASSIGN_REGDATE IS '债权债务登记日';
 alter table BID_ORDER ADD ONMARKET_DATE DATE ;
 COMMENT ON COLUMN BID_ORDER.ONMARKET_DATE IS '上市日';
-
 -- 投标确认明细增加字段
 alter table BID_ORDER_BID_PRICE ADD INV_AIM VARCHAR(50) ;
 COMMENT ON COLUMN BID_ORDER_BID_PRICE.INV_AIM IS '投资目的';
