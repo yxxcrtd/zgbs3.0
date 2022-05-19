@@ -1666,4 +1666,28 @@
         LEFT JOIN FIN_PRODUCT T2 ON T2.FINPROD_ID = T1.FINPROD_ID
         where T2.CIRCULATION_CODE = #{finprodMarketId,jdbcType=VARCHAR}
     </select>
+
+    <select id = "isTransInAssetTwo" resultType="java.lang.Integer">
+        SELECT
+            SUM (num)
+        FROM(
+                SELECT COUNT(TRADE_ID) num
+                FROM TRD_PRODUCT_DEAL
+                WHERE FINPROD_ID = #{finprodId}
+                  AND PS NOT IN ('T09','T08','T07','T27','T30','T33')
+                UNION ALL
+                SELECT COUNT(TRADE_ID) num
+                FROM WFL_TRD_PRODUCT_DEAL
+                WHERE FINPROD_ID = #{finprodId}
+                  AND PS NOT IN ('T09','T08','T07','T27','T30','T33')
+                UNION ALL
+                SELECT COUNT(ENTRUST_ID) num
+                FROM ETR_ENTRUST
+                WHERE FINPROD_ID = #{finprodId}
+                UNION ALL
+                SELECT COUNT(ENTRUST_ID) num
+                FROM WFL_ETR_ENTRUST
+                WHERE FINPROD_ID = #{finprodId}
+            )
+    </select>
 </mapper>

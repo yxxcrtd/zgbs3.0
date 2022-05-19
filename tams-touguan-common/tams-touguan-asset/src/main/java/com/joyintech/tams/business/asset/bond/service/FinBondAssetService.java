@@ -1595,4 +1595,8 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         }
         return date;
     }
+
+    public int isTransInAssetTwo(String finprodId) {
+        return finBondAssetMapper.isTransInAssetTwo(finprodId);
+    }
 }
