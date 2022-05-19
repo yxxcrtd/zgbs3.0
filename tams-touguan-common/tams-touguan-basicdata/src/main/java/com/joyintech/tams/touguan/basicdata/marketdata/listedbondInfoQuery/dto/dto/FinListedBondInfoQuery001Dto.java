@@ -29,6 +29,9 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "secId", value = "债券ID/资产代码")
     private String secId;
 
+    @ApiModelProperty(name = "finprodId", value = "金融产品代码")
+    private String finprodId;
+
     @ApiModelProperty(name = "bondName", value = "债券名称")
     private String bondName;
 
@@ -813,5 +816,13 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
 
     public String getRateTypeStr() {
         return SysDataUtil.getNameFromDataDict(DictCode.利率类型, this.getRateType());
+    }
+
+    public String getFinprodId() {
+        return finprodId;
+    }
+
+    public void setFinprodId(String finprodId) {
+        this.finprodId = finprodId;
     }
 }
