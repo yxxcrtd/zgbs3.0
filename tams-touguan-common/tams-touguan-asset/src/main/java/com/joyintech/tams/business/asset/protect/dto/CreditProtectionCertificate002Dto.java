@@ -223,6 +223,7 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
     private String refEntityStr;
     private String issuershortStr;
     private String tradeMarketStr;
+    private String refSecList;
 
     public String getIsOrNoStr() {
         return isOrNoStr;
@@ -262,6 +263,14 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
 
     public void setTradeMarketStr(String tradeMarketStr) {
         this.tradeMarketStr = tradeMarketStr;
+    }
+
+    public String getRefSecList() {
+        return refSecList;
+    }
+
+    public void setRefSecList(String refSecList) {
+        this.refSecList = refSecList;
     }
 
     public String getFinprodId() {

@@ -25,6 +25,8 @@ public interface CreditProtectionCertificateMapper {
 
     CreditProtectionCertificate002Dto getByFinProdId(Map<String, Object> pageParam);
 
+    List<String> getRefList(Map<String, Object> pageParam);
+
     int insertFileSelective(SysUploadFileInfo var1);
 
     int updateFileByPrimaryKey(SysUploadFileInfo var1);

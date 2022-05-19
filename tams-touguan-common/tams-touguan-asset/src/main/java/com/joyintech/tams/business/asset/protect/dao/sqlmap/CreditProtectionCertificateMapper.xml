@@ -160,6 +160,52 @@
         </where>
     </select>
 
+    <select id="getRefList" resultType="java.lang.String">
+        SELECT
+        T1.FINPROD_ABBR text
+        FROM FIN_PRODUCT T1
+        <where>
+            AND T1.FINPROD_TYPE2 = #{finprodType2}
+            AND T1.TRADE_MARKET in(#{TRADE_PLACE_03},#{TRADE_PLACE_04})
+            <if test="refList != null and refList.size() > 0">
+                AND (T1.FINPROD_MARKET_ID IN
+                <foreach collection="refList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+                )
+            </if>
+        </where>
+    </select>
+
+    <select id="getFinprodIdForSelect" resultMap="finprodIdMap">
+        SELECT
+        T1.FINPROD_MARKET_ID id,
+        T1.FINPROD_ABBR text,
+        T1.FINPROD_NAME,
+        T1.FINPROD_ID,
+        T1.CALENDAR_ID,
+        T1.TRADE_MARKET,
+        T1.IS_RIGHT,
+        to_char(T1.VDATE,'yyyy-MM-dd') VDATE,
+        to_char(T1.MDATE, 'yyyy-MM-dd') MDATE,
+        T1.CCY
+        FROM FIN_PRODUCT T1
+        <where>
+            AND T1.FINPROD_TYPE2 = #{finprodType2}
+            AND T1.TRADE_MARKET in(#{TRADE_PLACE_03},#{TRADE_PLACE_04})
+            <if test="initValue != null and !initValue.equals('')">
+                and T1.FINPROD_MARKET_ID = #{initValue}
+            </if>
+            <if test="search != null and !search.equals('')">
+                and (T1.FINPROD_MARKET_ID like concat('%',concat(#{search},'%'))
+                or T1.FINPROD_NAME like concat('%',concat(#{search},'%'))
+                or T1.FINPROD_ABBR like concat('%',concat(#{search},'%'))
+                or T1.FINPROD_ID like concat('%',concat(#{search},'%'))
+                )
+            </if>
+        </where>
+    </select>
+
     <select id="getFinprodIdForSelect" resultMap="finprodIdMap">
         SELECT
         T1.FINPROD_MARKET_ID id,
