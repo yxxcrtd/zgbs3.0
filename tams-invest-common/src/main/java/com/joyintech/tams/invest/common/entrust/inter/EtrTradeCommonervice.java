@@ -366,7 +366,8 @@ public class EtrTradeCommonervice extends BaseService {
         String porUsableCash = "porUsableCash", acctNoUsableCash = "acctNoUsableCash", acctNoCanCash = "acctNoCanCash", usableAmount = "usableAmount", usableSec = "usableSec";
         String finprodType2 = requestDto.getPtlList().get(0).getFinprodType2();
         String tradePlat = requestDto.getPtlList().get(0).getTradePlat();
-        if(StringUtil.equals(tradePlat, TempConstant.NO_TRADE_BUSINESS_ETR)||StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())||StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())) {
+        if(StringUtil.equals(tradePlat, TempConstant.NO_TRADE_BUSINESS_ETR)||StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())||StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
+            || StringUtil.equals(tradePlat, DictCodeList.交易平台_新债平台.getValue())) {
             canSec=canSec!=null?BigDecimal.ZERO:ArithmeticUtil.divide(canSec,new BigDecimal(100),2);
             realSec=realSec!=null?BigDecimal.ZERO:ArithmeticUtil.divide(realSec,new BigDecimal(100),2);
         }
@@ -824,14 +825,14 @@ public class EtrTradeCommonervice extends BaseService {
                         holdingType = DictCodeListExt3.资产类型_封闭式基金深交所大宗可用持仓.getValue();
                     }
                 }
-            }else if (dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
-                    ||dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
-                    ||dto.getFinprodType2().equals("ZYSHG")) {
-                dto.setFinprodId("XN_PRODID999");
-                holdingType = DictCodeListExt3.资产类型_通用回购融资券可用持仓.getValue();
             }
-            dto.setHoldingType(holdingType);
+        }else if (dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
+                ||dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
+                ||dto.getFinprodType2().equals("ZYSHG")) {
+            dto.setFinprodId("XN_PRODID999");
+            holdingType = DictCodeListExt3.资产类型_通用回购融资券可用持仓.getValue();
         }
+        dto.setHoldingType(holdingType);
 
     }
     //持仓数量类型
@@ -986,7 +987,7 @@ public class EtrTradeCommonervice extends BaseService {
                     canSec = canSec.add(newSecAmount);
                 }
                 secList.stream().forEach(item -> {
-                    item.setHoldingType("");
+                    handleUableSecType(item);
                 });
                 BigDecimal newRealSecAmount = queryPosition(secList, "04", DictCodeListExt3.资产类型_资产账户持仓.getValue()); //交易持仓和从交易持仓表
                 if (newRealSecAmount != null) { //持仓数量

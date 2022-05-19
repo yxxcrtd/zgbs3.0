@@ -1,8 +1,11 @@
 package com.joyintech.tams.business.asset.protect.service;
 
 import com.joyintech.background.component.common.pack.common.util.DateUtil;
+import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.framework.file.SafelyFile;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.asset.protect.dao.CreditProtectionCertificateMapper;
@@ -21,13 +24,19 @@ import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.CommonUtil;
+import com.joyintech.tams.invest.common.dto.MstFileInputParameter;
+import com.joyintech.tams.systemtools.dao.JoyinFSMapper;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -70,6 +79,9 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
     private  FinCashPlanMapper finCashPlanMapper;
     @Resource
     private JoyinbusinessCommonService joyinbusinessCommonService;
+
+    @Autowired
+    private JoyinFSMapper joyinFSMapper;
 
     /**
      * 保存操作类型
@@ -191,6 +203,15 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         finCashPlan.setBranch(0l);
         finCashPlan.setBasis(dto.getBasis());
         finCashPlanMapper.insert(finCashPlan);
+        //附件
+        MstFileInputParameter mstFileInputParameter = dto.getMstFileInputParameter();
+        if (StringUtil.isNotEmpty(mstFileInputParameter)
+                && CollectionUtils.isNotEmpty(mstFileInputParameter.getFileList())){
+            for (SysUploadFileInfo fileInfo:mstFileInputParameter.getFileList()){
+                fileInfo.setBusinessId(dto.getFinprodId());
+                creditProtectionCertificateMapper.updateFileByPrimaryKey(fileInfo);
+            }
+        }
     }
 
     /**
@@ -236,6 +257,58 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         this.insert(dto);
     }
 
+    public SysUploadFileInfo getUploadFileInfo(MultipartFile file) throws IOException {
+        if (!StringUtil.isNotEmpty(file.getOriginalFilename())){
+            return null;
+        }
+        List<String> fileNameList = StringUtil.splitToList(".",file.getOriginalFilename());
+        String newfileName = fileNameList.get(0)+"_"+ com.joyintech.framework.util.DateUtil.format(com.joyintech.framework.util.DateUtil.now(), com.joyintech.framework.util.DateUtil.DATETIME_FORMAT_WITH_SSS_YEAR1)+"."+fileNameList.get(1);
+        // 本地路径
+        String localPath = CacheUtil.getSysParam("upload_file_path") + File.separator;
+        String nowDateStr = com.joyintech.framework.util.DateUtil.format(com.joyintech.framework.util.DateUtil.now(), com.joyintech.framework.util.DateUtil.DEFAULT_DATE_FORMAT_EN);
+        List<String> nowDateList = StringUtil.splitToList("-",nowDateStr);
+        String newPath = localPath + nowDateList.get(0) + File.separator
+                + nowDateList.get(1)  + File.separator + nowDateList.get(2)+ File.separator;
+        File newPathFile = new SafelyFile(newPath);
+        //  生成文件夹
+        if (!newPathFile.exists()){
+            newPathFile.mkdir();
+        }
+        File folder = new SafelyFile(newPathFile,newfileName);
+        folder.createNewFile();
+        FileUtils.copyInputStreamToFile(file.getInputStream(),folder);
+        SysUploadFileInfo fileInfo = new SysUploadFileInfo();
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+        fileInfo.setSeqNo(uuid);
+        fileInfo.setFileName(file.getOriginalFilename());
+        if (isWindows()){
+            newPath = newPath.replaceAll("/","\\\\");
+        }
+        fileInfo.setPath(newPath+newfileName);
+        creditProtectionCertificateMapper.insertFileSelective(fileInfo);
+        return fileInfo;
+    }
+
+    public boolean isWindows() {
+        return System.getProperties().getProperty("os.name").toUpperCase().indexOf("WINDOWS") != -1;
+    }
+
+    public AjaxResult delFileInfo(SysUploadFileInfo fileInfo) throws IOException {
+        AjaxResult ajaxResult = new AjaxResult();
+        if (!StringUtil.isNotEmpty(fileInfo.getSeqNo())){
+            return null;
+        }
+        SysUploadFileInfo file = joyinFSMapper.selectByPrimaryKey(fileInfo.getSeqNo());
+        File pathFile = new SafelyFile(file.getPath());
+        //  生成文件夹
+        if (pathFile.exists()){
+            pathFile.delete();
+        }
+        joyinFSMapper.deleteByPrimaryKey(fileInfo.getSeqNo());
+        ajaxResult.setMessage("删除成功");
+        return ajaxResult;
+    }
+
     /**
      * 加券
      *
@@ -272,26 +345,19 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
     public CreditProtectionCertificate002Dto getById(String finprodId) {
         //1.查金融产品标的表
         CreditProtectionCertificate002Dto entity = new CreditProtectionCertificate002Dto();
-        entity.setFinprodMarketId(finprodId);
-        finprodId = getFinprodId(entity);
-        FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
-        if (Objects.isNull(finProduct)) return null;
-        BeanUtil.copyPropertiesIgnoreNull(entity, finProduct);
-        //2.查金融产品标的附属表
-        FinProductAdd finProductAdd = finProductAddMapper.selectByPrimaryKey(finprodId);
-        FinProductAddDto finProductAddDto = new FinProductAddDto();
-        BeanUtil.copyPropertiesIgnoreNull(entity, finProductAdd);
-        //查询计费年度天数
-        FinCashPlan finCashPlan = new FinCashPlan();
-        String cashId = CommonUtil.generateCashFlowCode(finProduct.getFinprodId(),
-                DictCodeListExt1.现金流业务类型_金融产品.getValue(), 0L,
-                DictCodeListExt1.现金流二级类型_本金.getValue());
-        finCashPlan.setCashId(cashId);
-        finCashPlan.setMdate(finProduct.getMdate());
-        finCashPlan = finCashPlanMapper.selectByPrimaryKey(finCashPlan);
-        entity.setBasis(finCashPlan.getBasis());
+        Map<String,Object> param = new HashMap<>();
+        param.put("finprodType2", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
+        param.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
+        param.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
+        param.put("finprodMarketId", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue()+"_"+finprodId);
+        entity = creditProtectionCertificateMapper.getByFinProdId(param);
         BigDecimal cash = StringUtil.isNotEmpty(entity.getNomCapi())? entity.getNomCapi().divide(new BigDecimal(10000)):new BigDecimal(0.00);
         entity.setNomCapi(cash);
+        List<SysUploadFileInfo> uploadInfo = joyinFSMapper.getUploadInfo(entity.getFinprodId());
+        MstFileInputParameter mstFileInputParameter = new MstFileInputParameter();
+        mstFileInputParameter.setFileList(uploadInfo);
+        mstFileInputParameter.setBussinessId(entity.getFinprodId());
+        entity.setMstFileInputParameter(mstFileInputParameter);
         return entity;
     }
 

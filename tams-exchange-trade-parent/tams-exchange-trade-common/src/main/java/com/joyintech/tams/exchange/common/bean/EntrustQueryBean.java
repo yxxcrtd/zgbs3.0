@@ -172,6 +172,8 @@ public class EntrustQueryBean implements Serializable {
     private String propInvestorName;
     @ApiModelProperty(required = true, name = "tradeId", value = "本方交易员ID")
     private String tradeId;
+    @ApiModelProperty(required = true, name = "tradeName", value = "本方交易员")
+    private String tradeName;
     @ApiModelProperty(required = true, name = "dealerId", value = "本方交易商ID")
     private String dealerId;
     @ApiModelProperty(required = true, name = "dealerName", value = "本方交易商名称")
@@ -180,6 +182,8 @@ public class EntrustQueryBean implements Serializable {
     private String counterId;
     @ApiModelProperty(required = true, name = "propTradeId", value = "对手方交易员")
     private String propTradeId;
+    @ApiModelProperty(required = true, name = "propTradeName", value = "对手方交易员")
+    private String propTradeName;
     @ApiModelProperty(required = true, name = "propDealerId", value = "对手方交易商")
     private String propDealerId;
     @ApiModelProperty(required = true, name = "propDealerName", value = "对手方交易商名称")
@@ -1167,5 +1171,21 @@ public class EntrustQueryBean implements Serializable {
 
     public void setPropOwnerType(String propOwnerType) {
         this.propOwnerType = propOwnerType;
+    }
+
+    public String getTradeName() {
+        return tradeName;
+    }
+
+    public void setTradeName(String tradeName) {
+        this.tradeName = tradeName;
+    }
+
+    public String getPropTradeName() {
+        return propTradeName;
+    }
+
+    public void setPropTradeName(String propTradeName) {
+        this.propTradeName = propTradeName;
     }
 }

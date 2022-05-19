@@ -171,7 +171,7 @@ public class FinBondAssetValidatorService implements BeanValidator{
             	    for(BondFinExercisePlanDto finExercisePlan : dto.getFinExercisePlanList()){
                         if (finExercisePlan.getExercisePrice() == null) {
                             resultList.add(new ValidMessage(getMessage("行权计划中的行权价（净价）不能为空!")));
-                            continue;
+                            break;
                         }
                     }
                 }
@@ -221,11 +221,11 @@ public class FinBondAssetValidatorService implements BeanValidator{
 //                    6.理论行权日不大于到期日；---目前未实现
 //                    7.按理论行权日升序排序；---目前未实现
                     if (DateUtil.compareDate(finExercisePlan.getExerciseDate(),finExercisePlan.getMdate())<0){
-                        resultList.add(new ValidMessage("行权计划列表中,理论行权日大于等于行权申请结束日"));
+                        resultList.add(new ValidMessage("理论行权日数据必须大于等于行权申请终止日数据"));
                         break;
                     }
                     if (DateUtil.compareDate(finExercisePlan.getMdate(),finExercisePlan.getVdate())<0){
-                        resultList.add(new ValidMessage("行权计划列表中,行权申请结束日大于等于行权申请开始日"));
+                        resultList.add(new ValidMessage("行权申请终止日数据必须大于等于行权申请起始日数据"));
                         break;
                     }
                     if (DateUtil.compareDate(finExercisePlan.getExerciseDate(),dto.getMdate())>0){
@@ -242,7 +242,7 @@ public class FinBondAssetValidatorService implements BeanValidator{
                 }
                 if(null!=dto.getFinPayInterestStdInfoDto() && null!=dto.getFinPayInterestStdInfoDto().getInvScheduleList()
                         &&!dto.getFinPayInterestStdInfoDto().getInvScheduleList().isEmpty()) {
-                    List<BondFinExercisePlanDto> finExercisePlanList = dto.getFinExercisePlanList().stream().filter(item -> StringUtil.equals(item.getExerciseType(), DictCodeList.行权方式_赎回.getValue()) || StringUtil.equals(item.getExerciseType(), DictCodeList.行权方式_赎回.getValue())).collect(Collectors.toList());
+                    List<BondFinExercisePlanDto> finExercisePlanList = dto.getFinExercisePlanList().stream().filter(item -> StringUtil.equals(item.getExerciseType(), DictCodeList.行权方式_赎回.getValue()) || StringUtil.equals(item.getExerciseType(), DictCodeList.行权方式_回售.getValue())).collect(Collectors.toList());
                     if (CollectionUtils.isNotEmpty(finExercisePlanList)) {
                         boolean exerciseFlag = true;
                         for (BondFinCashPlanDto planDto : dto.getFinPayInterestStdInfoDto().getInvScheduleList()) {
