@@ -4,6 +4,7 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.pojo.BaseMap;
@@ -40,7 +41,7 @@ public class MskCreditMarketInfoPro001Service extends BaseService<MskCreditInfoP
     public Page<MskCreditInfoProSaveRequest> selectForPage(MskCreditInfoProRequest request) {
         Map<String, Object> pageParam = BeanUtil.object2Map(request);
         pageParam.put("secIdList", StringUtil.splitToList(null, request.getSecid()));
-        pageParam.put("valueSouceStr", request.getValueSource());
+        pageParam.put("valueSourceStr", request.getValueSource());
         pageParam.put("search_isNumberFlag", BaseMap.isNumeric(request.getSearch()));
         String cdateStart = request.getCdateStart();
         if (StringUtil.isNotEmpty(cdateStart)){
@@ -131,5 +132,10 @@ public class MskCreditMarketInfoPro001Service extends BaseService<MskCreditInfoP
         Map<String,Object> map= new HashMap<>();
         map.put("secid",secid);
         return mskCreditInfoProMapper.getBasicInfo(map);
+    }
+
+    public Page<SelectOptionDto> getFinprodMarketInfo(MskCreditInfoProSaveRequest request) {
+        Map<String, Object> pageParam = BeanUtil.object2Map(request);
+        return this.queryForPageForSelectReturn(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(),() -> mskCreditInfoProMapper.getFinprodMarketInfo(pageParam));
     }
 }
