@@ -29,10 +29,14 @@
         NVL(T8.YIELD,0)*100 rate,
         T6.BENCHMARK_ID basisRate,
         T6.COEFFICIENT basisRateRatio,
-        NVL(T6.SPREAD_RATE,0) spreadRate,
+        T6.SPREAD_RATE spreadRate,
         T6.FIRST_CONFIRM_DATE firstRateFixDate,
-        T8.BASIS basis,
-        T8.MARKET_BASIS marketBasis,
+        Case when T8.BASIS = 'A/A_B_COUP' THEN 'A/A'
+             when T8.BASIS = 'A/A_B_DAY' THEN 'A/A'
+             else T8.BASIS END  basis,
+        Case when T8.MARKET_BASIS = 'A/A_B_COUP' THEN 'A/A'
+        when T8.MARKET_BASIS = 'A/A_B_DAY' THEN 'A/A'
+        else T8.MARKET_BASIS END  marketBasis,
         T1.IS_RIGHT isRight,
         T1.IS_SUS isSus,
         T1.ISSUE_TYPE issueType,
