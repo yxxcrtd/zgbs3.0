@@ -79,17 +79,17 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
     /**
      * 参考实体
      */
-    @ApiModelProperty(name="refEntity",value="参考实体",required = true)
+    @ApiModelProperty(name="refEntity",value="参考实体")
     private String refEntity;
     /**
      * 参考债项
      */
-    @ApiModelProperty(name="refSec",value="参考债项",required = true)
+    @ApiModelProperty(name="refSec",value="参考债项")
     private String refSec;
     /**
      * 参考债项特征
      */
-    @ApiModelProperty(name="refSecFeatures",value="参考债项特征",required = true)
+    @ApiModelProperty(name="refSecFeatures",value="参考债项特征")
     private String refSecFeatures;
     /**
      * 起息日
