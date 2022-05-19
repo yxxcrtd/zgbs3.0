@@ -254,7 +254,7 @@
         LEFT JOIN (SELECT * FROM INTERF_RDI_RELEASE_INFO where SECURITY_TYPE in('CD','14')) RDI_RELEASE_INFO ON
         RDI_RELEASE_INFO.SECURITY_ID = SEC_INFO.SEC_ID --银行间债券再发行信息接口表
         <where>
-            SEC_INFO.VALUE_DATE  <![CDATA[ < ]]> to_date(#{platformDate}, 'yyyy-MM-dd')
+            SEC_INFO.VALUE_DATE  <![CDATA[ < ]]> to_date(#{platformDate}, 'yyyy-MM-dd') AND rownum = 1
 
             <if test="secId !=null and secId !=''">
                 AND SEC_INFO.SEC_ID = #{secId,jdbcType=VARCHAR}
