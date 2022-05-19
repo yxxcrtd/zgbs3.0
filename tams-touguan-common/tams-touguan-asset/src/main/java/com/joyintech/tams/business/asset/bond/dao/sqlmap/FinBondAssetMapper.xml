@@ -326,7 +326,6 @@
             T16.FIRST_CONFIRM_DATE firstConfirmDate,
             T12.BASIS BASIS,
             T12.MARKET_BASIS MARKET_BASIS,
-            T12.BASIS intpayRule,
             T1.REMARK REMARK,
             NVL(T4.CIRCULATION_DATE,T7.LISTING_DATE)  listingDate,
             T10.CASH_ID interestCashId,
