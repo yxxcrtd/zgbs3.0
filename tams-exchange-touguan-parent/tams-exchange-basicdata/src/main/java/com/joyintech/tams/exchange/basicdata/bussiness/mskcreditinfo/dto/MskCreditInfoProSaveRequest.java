@@ -33,8 +33,11 @@ public class MskCreditInfoProSaveRequest extends BaseEntity implements ProcessEn
     @ApiModelProperty(name="secid",value="凭证代码",example="A1", required = true)
     private String secid;
 
+    @ApiModelProperty(name="finprodAbbr",value="凭证简称",example="A1", required = true)
+    private String finprodAbbr;
+
     @ApiModelProperty(name="cdate",value="估值日",example="A1", required = true)
-    private Date cdate;
+    private String cdate;
 
     @ApiModelProperty(name="mdprice",value="估值全价",example="A1", required = true)
     private String mdprice;
@@ -71,6 +74,14 @@ public class MskCreditInfoProSaveRequest extends BaseEntity implements ProcessEn
 
     @ApiModelProperty(name="pageMode",value="分页对象",example="{pageSize: 10,pageNo: 1, sort: 'name', direction: 'asc'}")
     private PageMode pageMode;
+
+    public String getFinprodAbbr() {
+        return finprodAbbr;
+    }
+
+    public void setFinprodAbbr(String finprodAbbr) {
+        this.finprodAbbr = finprodAbbr;
+    }
 
     private String processState;
 
@@ -121,11 +132,11 @@ public class MskCreditInfoProSaveRequest extends BaseEntity implements ProcessEn
         this.secid = secid;
     }
 
-    public Date getCdate() {
+    public String getCdate() {
         return cdate;
     }
 
-    public void setCdate(Date cdate) {
+    public void setCdate(String cdate) {
         this.cdate = cdate;
     }
 

@@ -3,6 +3,7 @@ package com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dao;
 
 import com.joyintech.tams.common.base.entity.MstBondValuationInfo;
 import com.joyintech.tams.common.base.entity.MstBondValuationInfoKey;
+import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoDto;
 import com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest;
 import org.springframework.stereotype.Repository;
@@ -33,5 +34,7 @@ public interface MskCreditInfoProMapper {
 
     MskCreditInfoProSaveRequest selectByKey(Map<String, Object> map);
 
+    List<String> getBusinessData(WflValidInputParameter parameter);
 
+    MskCreditInfoProSaveRequest getBasicInfo(Map<String, Object> map);
 }

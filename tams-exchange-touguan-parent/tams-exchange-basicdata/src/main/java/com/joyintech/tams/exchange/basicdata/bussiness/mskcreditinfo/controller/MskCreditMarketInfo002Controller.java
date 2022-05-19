@@ -43,6 +43,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.text.ParseException;
 import java.util.*;
 
 
@@ -149,13 +150,61 @@ public class MskCreditMarketInfo002Controller extends BaseController {
         // 设置流程业务说明, entity即传入的dto
         params.setComment(entity -> this.getMessage("MstCreditMarketInfo002.secid") + "(" + entity.getSecid() + ")" + "-"
             + this.getMessage("MstCreditMarketInfo002.cdate") + "("
-            + DateUtil.format(entity.getCdate()) + ")"+ this.getMessage("MstCreditMarketInfo002.valueSource") + "("
+            + entity.getCdate() + ")"+ this.getMessage("MstCreditMarketInfo002.valueSource") + "("
             + entity.getValueSourceStr() + ")");
         processParameter.setWorkFlowParameter(params);
         Date sysDate = DateUtil.platDateFromCache();// 获取平台日期
         dto.setCreateTime(sysDate);
         String msg = mskCreditMarketInfoPro001Service.start(processParameter, dto);
         return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
+    }
+
+
+    /**
+     * 新建时根据市场代码查询wind接口债券信息
+     *
+     * @param request 市场代码
+     * @return
+     * @throws ParseException
+     * @see
+     * @since 1.0
+     */
+    @ApiOperation(value = "获取信用保护基本信息", notes = "获取信用保护基本信息")
+    @ResponseBody
+    @PostMapping("/getBasicInfo")
+    public Message<MskCreditInfoProSaveRequest> getBasicInfo(@RequestBody MskCreditInfoProSaveRequest request){
+        String secid = null;
+        if (StringUtil.isNotEmpty(request.getSecid())) {
+            secid = request.getSecid();
+        }
+        MskCreditInfoProSaveRequest resultDto = mskCreditMarketInfoPro001Service.getBasicInfos(
+                secid,null);
+        return new Message<MskCreditInfoProSaveRequest>().success().setData(resultDto);
+    }
+
+
+    /**
+     *  获取流程中信息
+     * @param request
+     * @return
+     */
+    @ApiOperation(value = "获取流程中信息", notes = "获取流程中信息")
+    @ResponseBody
+    @PostMapping("/getApproveEntity")
+    public Message<MskCreditInfoProSaveRequest> getApproveEntity(@RequestBody MskCreditInfoProSaveRequest request)
+    {
+        try{
+            String workflowId = request.getWorkflowId();
+            MskCreditInfoProSaveRequest entity = new MskCreditInfoProSaveRequest();
+            if (StringUtil.isNotEmpty(workflowId)) {
+                //流程代办checkImportData
+                entity = mskCreditMarketInfoPro001Service.getBussinessEntityByWorkflowId(workflowId);
+            }
+            return new Message<MskCreditInfoProSaveRequest>().success().setData(entity);
+        } catch(Exception e){
+            e.printStackTrace();
+            return new Message<MskCreditInfoProSaveRequest>().fail().setMessage("查询异常");
+        }
     }
     
 }
