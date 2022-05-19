@@ -121,6 +121,13 @@
             <if test="market !=null and market !=''">
                 AND PAYHSRCSECINFO.MARKET = #{market,jdbcType=VARCHAR}
             </if>
+            <if test="secType !=null and secType !=''">
+                AND PAYHSRCSECINFO.SECTYPE = #{secType,jdbcType=VARCHAR}
+            </if>
+
+            <if test="secType2 !=null and secType2 !=''">
+                AND PAYHSRCSECINFO.SECTYPE2 = #{secType2,jdbcType=VARCHAR}
+            </if>
 
             <if test="institution !=null and institution !=''">
                 AND PAYHSRCSECINFO.institution = #{institution,jdbcType=VARCHAR}

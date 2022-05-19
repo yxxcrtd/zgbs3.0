@@ -252,4 +252,11 @@
         where PRE_TRADE_ID = #{preTradeId,jdbcType=VARCHAR}
     </delete>
 
+    <select id="getIssuer" resultType="java.lang.String">
+        select mci.CUSTOMER_NAME
+        from FIN_PRODUCT fp
+                 left join MST_CUSTOMER_INFO mci on fp.ISSUER = mci.CUSTOMER_ID
+        where ROWNUM = 1 and fp.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+    </select>
+
 </mapper>

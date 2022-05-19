@@ -49,10 +49,13 @@
         singleMinSubAmt,
         nvl(RDI_RELEASE_INFO.SINGLE_MAX_SUB_AMT * 10000, ROUND(RELEASE_INFO.SINGLE_MAX_SUB_AMT / 10000, 2)) as
         singleMaxSubAmt,
-        RDI_RELEASE_INFO.REMARK as REMARK
+        RDI_RELEASE_INFO.REMARK as REMARK,
+        PRODUCT.FINPROD_ID FINPRODID
         FROM INTERF_WIND_UNRELEASE_SEC_INFO SEC_INFO
         LEFT JOIN INTERF_WIND_RELEASE_INFO RELEASE_INFO ON SEC_INFO.SEC_ID = RELEASE_INFO.SEC_ID
         LEFT JOIN INTERF_RDI_RELEASE_INFO RDI_RELEASE_INFO ON RDI_RELEASE_INFO.SECURITY_ID = SEC_INFO.SEC_ID
+        LEFT JOIN FIN_PRODUCT PRODUCT on SEC_INFO.SEC_ID = PRODUCT.FINPROD_MARKET_ID
+
         <where>
             SEC_INFO.VALUE_DATE  <![CDATA[ < ]]> to_date(#{platformDate}, 'yyyy-MM-dd')
 
@@ -62,6 +65,14 @@
 
             <if test="tradingPlaces !=null and tradingPlaces !=''">
                 AND SEC_INFO.MARKET = #{tradingPlaces,jdbcType=VARCHAR}
+            </if>
+
+            <if test="primaryClassification !=null and primaryClassification !=''">
+                AND SEC_INFO.PRIMARY_CLASSIFICATION = #{primaryClassification,jdbcType=VARCHAR}
+            </if>
+
+            <if test="secondaryClassification !=null and secondaryClassification !=''">
+                AND SEC_INFO.SECONDARY_CLASSIFICATION = #{secondaryClassification,jdbcType=VARCHAR}
             </if>
 
             <if test="registeredCustodian !=null and registeredCustodian !=''">
@@ -254,7 +265,7 @@
         LEFT JOIN (SELECT * FROM INTERF_RDI_RELEASE_INFO where SECURITY_TYPE in('CD','14')) RDI_RELEASE_INFO ON
         RDI_RELEASE_INFO.SECURITY_ID = SEC_INFO.SEC_ID --银行间债券再发行信息接口表
         <where>
-            SEC_INFO.VALUE_DATE  <![CDATA[ < ]]> to_date(#{platformDate}, 'yyyy-MM-dd')
+            SEC_INFO.VALUE_DATE  <![CDATA[ < ]]> to_date(#{platformDate}, 'yyyy-MM-dd') AND rownum = 1
 
             <if test="secId !=null and secId !=''">
                 AND SEC_INFO.SEC_ID = #{secId,jdbcType=VARCHAR}

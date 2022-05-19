@@ -414,7 +414,7 @@ public class CfetsTrdConfirmService extends BaseService{
             entity.setTotleTradeId(IDGenerator.generate());
         }
         // 业务类型
-        entity.setBusiType(BussinessDictCodeList.共同业务类型_中标结果确认.getValue());
+        entity.setBusiType(BussinessDictCodeList.共同业务类型_一级投标确认_申购_登记.getValue());
         // 金融产品类型（估值核算）
         // 分支序号
         String branch = CacheUtil.getSysParam(BussinessConstant.NOBRANCHNOVALUE);

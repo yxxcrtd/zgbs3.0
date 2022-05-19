@@ -1027,7 +1027,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
 
                     Map<String, List<CfetsBiddingProductDto>> portfolioIdMap = cfetsDto.getBiddingProductList().stream()
                             .collect(Collectors.groupingBy(CfetsBiddingProductDto::getPortfolioId));
-                    Boolean errorFlag = Boolean.FALSE;
+                    List<String> errorMessageList = new ArrayList<>();
                     for (Map.Entry<String, List<CfetsBiddingProductDto>> entry : portfolioIdMap.entrySet()) {
                         List<BigDecimal> bidPriceSort = entry.getValue().stream().map(CfetsBiddingProductDto::getBidPrice).sorted().collect(Collectors.toList());
                         if (CollectionUtils.isNotEmpty(bidPriceSort)) {
@@ -1036,14 +1036,14 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                             if (finProductInfo.getMinTamt() != null) {
                                 if (bidPriceSort.get(0).compareTo(finProductInfo.getMinTamt()) == -1) {
                                    // messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
-                                    errorFlag = Boolean.TRUE;
+                                    errorMessageList.add("最低标位");
                                 }
                             }
                             //最高标位 最高标位的小于等于该字段值
                             if (finProductInfo.getMaxTamt() != null) {
                                 if (finProductInfo.getMaxTamt().compareTo(bidPriceSort.get(bidPriceSort.size() - 1)) == -1) {
                                    // messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
-                                    errorFlag = Boolean.TRUE;
+                                    errorMessageList.add("最高标位");
                                 }
                             }
 
@@ -1051,7 +1051,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                             if (finProductInfo.getMaxTenderUnit() != null) {
                                 if (finProductInfo.getMaxTenderUnit().compareTo(BigDecimal.valueOf(bidPriceSort.size())) == -1) {
                                     //messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
-                                    errorFlag = Boolean.TRUE;
+                                    errorMessageList.add("最大投标标位数");
                                 }
 
                             }
@@ -1061,7 +1061,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                                 BigDecimal subNum = bidPriceSort.get(bidPriceSort.size() - 1).subtract(bidPriceSort.get(0));
                                 if (finProductInfo.getMaxTenderPlus().compareTo(subNum) == -1) {
                                    // messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
-                                    errorFlag = Boolean.TRUE;
+                                    errorMessageList.add("最大投标标位差");
                                 }
                             }
 
@@ -1070,7 +1070,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                                 for (BigDecimal bidPrice : bidPriceSort) {
                                     if (!BigDecimalUtil.isIntegerMultiples(bidPrice, finProductInfo.getTenderUnit())) {
                                        // messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
-                                        errorFlag = Boolean.TRUE;
+                                        errorMessageList.add("投标步长");
                                     }
                                 }
 
@@ -1083,8 +1083,9 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                         }
                     }
 
-                    if (errorFlag) {
-                        messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求，请重新填写！"));
+                    if (CollectionUtils.isNotEmpty(errorMessageList)) {
+                        String str = StringUtil.join(errorMessageList, "、");
+                        messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求："+str+"，请重新填写！"));
                     }
 
                 }
