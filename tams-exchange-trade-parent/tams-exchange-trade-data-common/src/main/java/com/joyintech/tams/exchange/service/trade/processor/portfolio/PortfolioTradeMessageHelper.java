@@ -150,6 +150,8 @@ public class PortfolioTradeMessageHelper {
             calculateResponse.setEntrustAmt(portfolioDetail.getTargetAmt());
             calculateResponse.setEntrustPrice(NumberUtil.div(calculateResponse.getEntrustAmt(), calculateResponse.getEntrustNum()));
 
+            calculateResponse.setEtrSecAmount(instructionClone.getEntrustAmt());
+
             calculateResponses.add(calculateResponse);
         }
 

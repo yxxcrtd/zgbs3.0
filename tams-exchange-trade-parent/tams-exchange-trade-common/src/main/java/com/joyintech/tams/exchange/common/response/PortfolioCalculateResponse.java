@@ -79,6 +79,9 @@ public class PortfolioCalculateResponse {
     @JsonProperty("instructionLeftNum")
     private Long instructionLeftNum;
 
+    @JsonProperty("etrSecAmount")
+    public BigDecimal etrSecAmount;
+
     public PortfolioCalculateResponse portfolioInfo(PortfolioInfoResponse portfolioInfo) {
         this.portfolioInfo = portfolioInfo;
         return this;
@@ -499,6 +502,14 @@ public class PortfolioCalculateResponse {
         this.instructionLeftNum = instructionLeftNum;
     }
 
+    public BigDecimal getEtrSecAmount() {
+        return etrSecAmount;
+    }
+
+    public void setEtrSecAmount(BigDecimal etrSecAmount) {
+        this.etrSecAmount = etrSecAmount;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -508,12 +519,12 @@ public class PortfolioCalculateResponse {
             return false;
         }
         PortfolioCalculateResponse that = (PortfolioCalculateResponse) o;
-        return Objects.equals(portfolioInfo, that.portfolioInfo) && Objects.equals(portfolioName, that.portfolioName) && Objects.equals(portfolioId, that.portfolioId) && Objects.equals(finprodName, that.finprodName) && Objects.equals(acctNo, that.acctNo) && Objects.equals(fullPrice, that.fullPrice) && Objects.equals(priceMode, that.priceMode) && Objects.equals(instructionId, that.instructionId) && Objects.equals(finprodMarketId, that.finprodMarketId) && Objects.equals(entrustAmt, that.entrustAmt) && Objects.equals(entrustPrice, that.entrustPrice) && Objects.equals(entrustProp, that.entrustProp) && Objects.equals(instructionTotalAmt, that.instructionTotalAmt) && Objects.equals(instructionTotalNum, that.instructionTotalNum) && Objects.equals(instructionLeftAmt, that.instructionLeftAmt) && Objects.equals(disRate, that.disRate) && Objects.equals(entrustNum, that.entrustNum) && Objects.equals(conNum, that.conNum) && Objects.equals(instructionLeftNum, that.instructionLeftNum);
+        return Objects.equals(portfolioInfo, that.portfolioInfo) && Objects.equals(portfolioName, that.portfolioName) && Objects.equals(portfolioId, that.portfolioId) && Objects.equals(finprodName, that.finprodName) && Objects.equals(acctNo, that.acctNo) && Objects.equals(fullPrice, that.fullPrice) && Objects.equals(priceMode, that.priceMode) && Objects.equals(instructionId, that.instructionId) && Objects.equals(finprodMarketId, that.finprodMarketId) && Objects.equals(entrustAmt, that.entrustAmt) && Objects.equals(entrustPrice, that.entrustPrice) && Objects.equals(entrustProp, that.entrustProp) && Objects.equals(instructionTotalAmt, that.instructionTotalAmt) && Objects.equals(instructionTotalNum, that.instructionTotalNum) && Objects.equals(instructionLeftAmt, that.instructionLeftAmt) && Objects.equals(disRate, that.disRate) && Objects.equals(entrustNum, that.entrustNum) && Objects.equals(conNum, that.conNum) && Objects.equals(instructionLeftNum, that.instructionLeftNum) && Objects.equals(etrSecAmount, that.etrSecAmount);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(portfolioInfo, portfolioName, portfolioId, finprodName, acctNo, fullPrice, priceMode, instructionId, finprodMarketId, entrustAmt, entrustPrice, entrustProp, instructionTotalAmt, instructionTotalNum, instructionLeftAmt, disRate, entrustNum, conNum, instructionLeftNum);
+        return Objects.hash(portfolioInfo, portfolioName, portfolioId, finprodName, acctNo, fullPrice, priceMode, instructionId, finprodMarketId, entrustAmt, entrustPrice, entrustProp, instructionTotalAmt, instructionTotalNum, instructionLeftAmt, disRate, entrustNum, conNum, instructionLeftNum, etrSecAmount);
     }
 
     @Override
@@ -540,6 +551,7 @@ public class PortfolioCalculateResponse {
         sb.append("    entrustNum: ").append(toIndentedString(entrustNum)).append("\n");
         sb.append("    conNum: ").append(toIndentedString(conNum)).append("\n");
         sb.append("    instructionLeftNum: ").append(toIndentedString(instructionLeftNum)).append("\n");
+        sb.append("    etrSecAmount: ").append(toIndentedString(etrSecAmount)).append("\n");
         sb.append("}");
         return sb.toString();
     }

@@ -327,7 +327,7 @@ public class PositionRequestServiceInstructionRequest {
                 // 标准券代码
                 map.put(STANDARD_SEC_ID, STANDAR_SEC_ID);
                 //指令券面总额
-                map.put(ETR_SEC_AMOUNT, item.getEntrustAmt());
+                map.put(ETR_SEC_AMOUNT, item.getEtrSecAmount());
                 if (交易方向_质押券入库.getValue().equals(entity.getPs())
                         || 交易方向_质押券出库.getValue().equals(entity.getPs())) {
                     map.put("cashAmount", null);//出入库时，可以为空
