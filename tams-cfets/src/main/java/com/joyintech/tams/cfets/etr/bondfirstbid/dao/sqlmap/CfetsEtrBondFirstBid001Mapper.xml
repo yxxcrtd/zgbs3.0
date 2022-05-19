@@ -74,8 +74,16 @@
         SELECT
             decode(ee.ENTRUST_STATUS,'08','流程中','有效') AS effectiveStatusName,
             ee.ENTRUST_STATUS entrustStatus,
-            trunc((NVL(efs.ENT_FINISH_AMT,0))/(ee.ENTRUST_NUM),4)*100 execProcess,
-            trunc((NVL(efs.FINISH_AMT,0))/(ee.ENTRUST_NUM*100),4)*100 transProcess,
+            nvl(efs.ENT_FINISH_AMT, 0)               execFinishAmt,
+            nvl(ee.ENTRUST_NUM*100,0) -  nvl(efs.ENT_FINISH_AMT, 0) execRemainderAmt,
+            trunc(nvl(efs.ENT_FINISH_AMT, 0) /
+            case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
+            100                                      execProcess,
+            nvl(tpd.SHARE_AMT * 100, 0)                    transFinishAmt,
+            nvl(ee.ENTRUST_NUM*100,0) -  nvl(tpd.SHARE_AMT * 100, 0) transRemainderAmt,
+            trunc(nvl(tpd.SHARE_AMT * 100, 0) /
+            case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
+            100                                      transProcess,
             CASE
             WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
             '01'
@@ -136,7 +144,15 @@
         LEFT JOIN FIN_PRODUCT_ADD fpa ON fpa.FINPROD_ID = ee.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ISSUE fpi ON fpi.FINPROD_ID = fp.FINPROD_ID
         LEFT JOIN (select * from  SYS_DATADICT_LIST where DICT_CODE='SECRATE_DATA') SDLDATA on fpi.INT_RATE_ID = SDLDATA.ITEM_CODE
-        LEFT JOIN ETR_FINISH_STATUS efs ON efs.ENTRUST_ID = ee.ENTRUST_ID
+        left join (select sum(ENT_FINISH_AMT) ENT_FINISH_AMT, sum(FINISH_AMT) FINISH_AMT, ENTRUST_ID
+        from ETR_FINISH_STATUS
+        group by ENTRUST_ID) efs on ee.ENTRUST_ID = efs.ENTRUST_ID
+        left join (select sum(t1.SHARE_AMT) SHARE_AMT, t2.ENTRUST_ID
+        from TRD_PRODUCT_DEAL t1
+        left join TRD_PRODUCT_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
+        where t1.IS_CANCEL = 'N'
+        and t1.TRADE_STATUS != '03'
+        group by t2.ENTRUST_ID) tpd on tpd.ENTRUST_ID = ee.ENTRUST_ID
         LEFT JOIN MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
         LEFT JOIN (
                     SELECT
@@ -203,8 +219,16 @@
         SELECT
             decode(ee.ENTRUST_STATUS,'08','流程中','有效') AS effectiveStatusName,
             ee.ENTRUST_STATUS entrustStatus,
-            trunc((NVL(efs.ENT_FINISH_AMT,0))/(ee.ENTRUST_NUM),4)*100 execProcess,
-            trunc((NVL(efs.FINISH_AMT,0))/(ee.ENTRUST_NUM*100),4)*100 transProcess,
+            nvl(efs.ENT_FINISH_AMT, 0)               execFinishAmt,
+            nvl(ee.ENTRUST_NUM*100,0) -  nvl(efs.ENT_FINISH_AMT, 0) execRemainderAmt,
+            trunc(nvl(efs.ENT_FINISH_AMT, 0) /
+            case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
+            100                                      execProcess,
+            nvl(tpd.SHARE_AMT * 100, 0)                    transFinishAmt,
+            nvl(ee.ENTRUST_NUM*100,0) -  nvl(tpd.SHARE_AMT * 100, 0) transRemainderAmt,
+            trunc(nvl(tpd.SHARE_AMT * 100, 0) /
+            case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
+            100                                      transProcess,
             CASE
             WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
             '01'
@@ -265,7 +289,15 @@
         LEFT JOIN FIN_PRODUCT_ADD fpa ON fpa.FINPROD_ID = ee.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ISSUE fpi ON fpi.FINPROD_ID = fp.FINPROD_ID
         LEFT JOIN (select * from  SYS_DATADICT_LIST where DICT_CODE='SECRATE_DATA') SDLDATA on fpi.INT_RATE_ID = SDLDATA.ITEM_CODE
-        LEFT JOIN ETR_FINISH_STATUS efs ON efs.ENTRUST_ID = ee.ENTRUST_ID
+        left join (select sum(ENT_FINISH_AMT) ENT_FINISH_AMT, sum(FINISH_AMT) FINISH_AMT, ENTRUST_ID
+        from ETR_FINISH_STATUS
+        group by ENTRUST_ID) efs on ee.ENTRUST_ID = efs.ENTRUST_ID
+        left join (select sum(t1.SHARE_AMT) SHARE_AMT, t2.ENTRUST_ID
+        from TRD_PRODUCT_DEAL t1
+        left join TRD_PRODUCT_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
+        where t1.IS_CANCEL = 'N'
+        and t1.TRADE_STATUS != '03'
+        group by t2.ENTRUST_ID) tpd on tpd.ENTRUST_ID = ee.ENTRUST_ID
         LEFT JOIN MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
         LEFT JOIN (
             SELECT
@@ -305,7 +337,7 @@
                             WHERE A.WORKFLOW_ID = B.WORKFLOW_ID)
                             AND T.SEQ_NO = A.SEQ_NO)
                             AND T.PROCESS_STATE IN ('ING')
-                            AND T.BUSINESS_TYPE='ETR52') nextApp
+                            AND T.BUSINESS_TYPE='ETR54') nextApp
             ) nextUser ON ee.Workflow_Id=nextUser.workFlowId
         WHERE ee.ENTRUST_NUM != 0
 	    AND ee.ENTRUST_NUM IS NOT NULL

@@ -378,7 +378,7 @@ public class CfetsEtrIBondFirstBidFindEtrInfoDto {
 
     public String getFirstBidStatusStr() {
         if (StringUtil.isEmpty(getFirstBidStatus())) {
-            return "-";
+            return "--";
         }
         return SysDataUtil.getNameFromDataDict(DictCode.一级投标中标状态, getFirstBidStatus());
     }

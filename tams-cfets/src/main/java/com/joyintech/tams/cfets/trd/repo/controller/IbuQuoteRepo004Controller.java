@@ -145,7 +145,7 @@ public class IbuQuoteRepo004Controller extends BaseController {
     }
 
     @ApiOperation(value = "登记提交(保存)", notes = "登记提交(保存)")
-    @RequestMapping("save")
+    @PostMapping("save")
     @ResponseBody
     public Message<AjaxResult> save(@RequestBody CfetsRepoDealQuoteCommonDto dto, BindingResult br) throws WorkFlowException {
         if (br.hasErrors()) {
@@ -214,7 +214,7 @@ public class IbuQuoteRepo004Controller extends BaseController {
 
     @ApiOperation(value = "当日登记撤销检查", notes = "当日登记撤销检查")
     @ResponseBody
-    @RequestMapping("/checkDayRegRevokeCheck")
+    @PostMapping("/checkDayRegRevokeCheck")
     public Message<AjaxResult> checkDayRegRevokeCheck(@RequestBody CfetsBondRegCheckRequst cfetsBondRegCheckRequst) {
         return new Message<AjaxResult>().success().setData(cfetsRepoQuotedPrice004Service.checkDayRegRevokeCheck(cfetsBondRegCheckRequst));
     }
@@ -222,7 +222,7 @@ public class IbuQuoteRepo004Controller extends BaseController {
 
     @ApiOperation(value = "当日登记撤销", notes = "当日登记撤销")
     @ResponseBody
-    @RequestMapping("regRevoke")
+    @PostMapping("regRevoke")
     public Message<AjaxResult> regRevoke(@RequestBody CfetsBondRegCheckRequst cfetsBondRegCheckRequst) throws WorkFlowException {
         //前后台转换
         AjaxResult ajaxResult = cfetsRepoQuotedPrice004Service.checkDayRegRevokeCheck(cfetsBondRegCheckRequst);
