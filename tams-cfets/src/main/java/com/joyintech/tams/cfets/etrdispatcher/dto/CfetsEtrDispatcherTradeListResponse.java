@@ -129,6 +129,22 @@ public class CfetsEtrDispatcherTradeListResponse extends EtrEntrust {
     private String issueDateStr;
 
     /**
+     * 交易平台
+     */
+    @ApiModelProperty(name="tradePlat",value="交易平台")
+    private String tradePlat;
+
+    @Override
+    public String getTradePlat() {
+        return tradePlat;
+    }
+
+    @Override
+    public void setTradePlat(String tradePlat) {
+        this.tradePlat = tradePlat;
+    }
+
+    /**
      * 获取 otherEntrustStatus
      * @return otherEntrustStatus.
      */
