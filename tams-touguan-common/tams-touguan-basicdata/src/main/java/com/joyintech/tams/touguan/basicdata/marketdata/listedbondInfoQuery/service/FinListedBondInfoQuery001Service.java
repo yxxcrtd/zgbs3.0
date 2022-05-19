@@ -9,6 +9,7 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.dao.MstCustomerInfoAddMapper;
 import com.joyintech.tams.common.base.dao.MstCustomerInfoMapper;
 import com.joyintech.tams.common.base.entity.*;
@@ -67,6 +68,8 @@ public class FinListedBondInfoQuery001Service extends BaseService {
     @Resource
     private MstCustomerInfoAddMapper mstCustomerInfoAddMapper;
     @Resource
+    private FinProductMapper finProductMapper;
+    @Resource
     private IPlatformDate iPlatformDate;
 
     /**
@@ -120,6 +123,11 @@ public class FinListedBondInfoQuery001Service extends BaseService {
     public List<ValidMessage> addCoupons(String secId) {
         logger.info("addCoupons >> 待上市债券信息加券参数：secId: [{}]", secId);
         List<ValidMessage> validMessages = new ArrayList<>();
+        FinProduct finProduct = finProductMapper.selectByFinprodMarketId(secId);
+        if (finProduct != null) {
+            validMessages.add(new ValidMessage("该债券信息在系统中已存在，无法加券！"));
+            return validMessages;
+        }
         //债券信息查询
         FinListedBondInfoQueryRequest request = new FinListedBondInfoQueryRequest();
         request.setSecId(secId);
@@ -128,6 +136,8 @@ public class FinListedBondInfoQuery001Service extends BaseService {
             validMessages.add(new ValidMessage("查询债券信息为空"));
             return validMessages;
         }
+        //该债券信息在系统中已存在，无法加券！
+
         //接口数据转换
         InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = convertInterfPayhsrcsecinfoDto(finListedBondInfoQuery001Dto);
         //公共加券操作
