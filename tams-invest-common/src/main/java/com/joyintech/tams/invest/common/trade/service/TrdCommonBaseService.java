@@ -1399,8 +1399,7 @@ public class TrdCommonBaseService extends BaseService {
             portfolioDto.setOwnSecAmount(ArithmeticUtil.multiply(infContractDetailfile.getShareAmt(), new BigDecimal(100)));
         }else{
             // 指令券面总额
-            // ZGCPCN-635 modify by huwei
-            portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrust.getEntrustAmt()));
+            portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrust.getEntrustNum()));
             // 下单券面总额
             portfolioDto.setOrdSecAmount(ArithmeticUtil.multiply(portfolioDetail.getEntrustNum()));
             // 券面总额
