@@ -225,14 +225,15 @@ public class IbuQuoteBondService extends BaseService {
         //无错误时，进行接收操作
         if(errorList.size() == 0){
             etrInvesInfo.receptionDelegate(list);
-            List<String> entrustIds = StringUtil.splitToList(",",(String)param.get("entrustIds"));
-            for(String entrustId:entrustIds){
-                //更新操作记录日志
-                CfetsOprHisInfoRequest oprHisReq=new CfetsOprHisInfoRequest();
-                oprHisReq.setEntrustId(entrustId);
-                oprHisReq.setOperType(DictCodeListExt3.操作类型_接收.getValue());
-                joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
-            }
+            // AOP处理
+//            List<String> entrustIds = StringUtil.splitToList(",",(String)param.get("entrustIds"));
+//            for(String entrustId:entrustIds){
+//                //更新操作记录日志
+//                CfetsOprHisInfoRequest oprHisReq=new CfetsOprHisInfoRequest();
+//                oprHisReq.setEntrustId(entrustId);
+//                oprHisReq.setOperType(DictCodeListExt3.操作类型_接收.getValue());
+//                joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
+//            }
         }
         return errorList;
     }
@@ -935,11 +936,6 @@ public class IbuQuoteBondService extends BaseService {
         }else{
             boolean status = etrInvestInfoServiceImpl.updateDelegateStatus(entrustId,com.joyintech.tams.constant.DictCodeListExt3.委托状态_待分发.getValue());
         }
-        //更新操作记录日志
-        CfetsOprHisInfoRequest oprHisReq=new CfetsOprHisInfoRequest();
-        oprHisReq.setEntrustId(entrustId);
-        oprHisReq.setOperType(DictCodeListExt3.操作类型_放弃.getValue());
-        joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
         return "3";
     }
 
