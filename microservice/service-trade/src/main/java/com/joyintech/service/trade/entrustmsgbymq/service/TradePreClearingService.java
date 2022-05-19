@@ -228,6 +228,8 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
                 for(InfContractPortfolioDetail detail : details){
                     TrdTempDto trdTempDto = new TrdTempDto();
                     trdTempDto.setTotleTradeId(totalTradeId);
+                    // ZGCPCN-635 modify by huwei
+                    trdTempDto.setEntrustAmt(detail.getEntrustAmt());
                     // 替换成各组合明细数据
                     infContractDetailfile.setPortfolioId(detail.getPortfolioId());
                     infContractDetailfile.setShareAmt(detail.getShareAmt());
