@@ -207,8 +207,8 @@ public class EtrExchangeTradeFjyywzl001Service extends CommonExportService<EtrEx
                 secNumSh=etrExchangeTradeCommon002Service.queryProPosition(DictCodeListExt3.资产类型_质押式通用回购已使用融资券总额度.getValue(),shProList);
                 if(secNumSh!=null&&secNumSh.compareTo(BigDecimal.ZERO) != 0){
                     BigDecimal sumNumSh=canNumSh.add(secNumSh);
-                    rateShTemp=ArithmeticUtil.divide(secNumSh,sumNumSh,2);
-                    rateShTemp=ArithmeticUtil.multiply(rateShTemp,new BigDecimal(100));
+                    rateShTemp=ArithmeticUtil.divide(secNumSh,sumNumSh,4);
+                    rateShTemp=ArithmeticUtil.multiply(rateShTemp,new BigDecimal(100)).setScale(2);
                     rateSh=rateShTemp+"%";
                 }else{
                     rateSh="0%";
@@ -217,8 +217,8 @@ public class EtrExchangeTradeFjyywzl001Service extends CommonExportService<EtrEx
                 secNumZh=etrExchangeTradeCommon002Service.queryProPosition(DictCodeListExt3.资产类型_质押式通用回购已使用融资券总额度.getValue(),szProList);
                 if(secNumZh!=null&&secNumZh.compareTo(BigDecimal.ZERO) != 0){
                     BigDecimal sumNumZh=canNumZh.add(secNumZh);
-                    rateSZhTemp=ArithmeticUtil.divide(secNumZh,sumNumZh,2);
-                    rateSZhTemp=ArithmeticUtil.multiply(rateSZhTemp,new BigDecimal(100));
+                    rateSZhTemp=ArithmeticUtil.divide(secNumZh,sumNumZh,4);
+                    rateSZhTemp=ArithmeticUtil.multiply(rateSZhTemp,new BigDecimal(100)).setScale(2);
                     rateZh=rateSZhTemp+"%";
                 }else{
                     rateZh="0%";
@@ -227,10 +227,10 @@ public class EtrExchangeTradeFjyywzl001Service extends CommonExportService<EtrEx
 
         }
         //单位修改万元
-        canNumSh=ArithmeticUtil.divide(canNumSh,new BigDecimal(100),2,RoundingMode.DOWN);
-        secNumSh=ArithmeticUtil.divide(secNumSh,new BigDecimal(100),2,RoundingMode.DOWN);
-        canNumZh=ArithmeticUtil.divide(canNumZh,new BigDecimal(100),2,RoundingMode.DOWN);
-        secNumZh=ArithmeticUtil.divide(secNumZh,new BigDecimal(100),2,RoundingMode.DOWN);
+        canNumSh=ArithmeticUtil.divide(canNumSh,new BigDecimal(10000),2,RoundingMode.DOWN);
+        secNumSh=ArithmeticUtil.divide(secNumSh,new BigDecimal(10000),2,RoundingMode.DOWN);
+        canNumZh=ArithmeticUtil.divide(canNumZh,new BigDecimal(10000),2,RoundingMode.DOWN);
+        secNumZh=ArithmeticUtil.divide(secNumZh,new BigDecimal(10000),2,RoundingMode.DOWN);
         if(canNumSh.compareTo(BigDecimal.ZERO)>0){
             canNumShColor="green";
         }else if(canNumSh.compareTo(BigDecimal.ZERO)<0){

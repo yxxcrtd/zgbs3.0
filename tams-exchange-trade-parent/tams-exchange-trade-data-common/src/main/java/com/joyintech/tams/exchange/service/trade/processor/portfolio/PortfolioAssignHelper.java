@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -118,7 +119,7 @@ public class PortfolioAssignHelper {
             if (EntrustProp.isConsultingTrade(entrustProp)) {
                 entrustProp = EntrustProp.SH_FIXEDINCOME_BAOJIA_OPPOSITE.value;
             }
-        }else if (StringUtil.equals(投管业务类型_通用式质押回购.getValue(), instruction.getBusiTypeTg())){
+        } else if (StringUtil.equals(投管业务类型_通用式质押回购.getValue(), instruction.getBusiTypeTg())) {
             entrustProp = EntrustProp.NORMAL.value;
         }
 
@@ -133,6 +134,11 @@ public class PortfolioAssignHelper {
         if (ObjectUtil.isNull(minStep) || minStep.intValue() <= 0) {
             log.warn("未找到最小交易单元: instructionId [{}], entrustProp = [{}]", instructionId, entrustProp);
             return ResultBean.error(ErrorCode.MIN_TRD_UNIT_LIMIT_ERROR);
+        }
+
+        //质押式回购的步长是对金额控制的，因此要转换成数量
+        if (StringUtil.equals(投管业务类型_通用式质押回购.getValue(), instruction.getBusiTypeTg())) {
+            minStep = minStep.divide(BigDecimal.valueOf(100), 0, RoundingMode.DOWN);
         }
 
         // 价格

@@ -4,6 +4,7 @@ import com.joyintech.background.component.common.pack.common.util.DateUtil;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.file.SafelyFile;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.StringUtil;
@@ -30,6 +31,7 @@ import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,6 +41,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 信用保护凭证标的
@@ -358,6 +361,16 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         mstFileInputParameter.setFileList(uploadInfo);
         mstFileInputParameter.setBussinessId(entity.getFinprodId());
         entity.setMstFileInputParameter(mstFileInputParameter);
+        //查询参考债券
+        if(StringUtils.isNotEmpty(entity.getRefSec())){
+            Map<String,Object> params = new HashMap<>();
+            params.put("finprodType2", DictCodeListExt1.金融产品类型_债券.getValue());
+            params.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
+            params.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
+            params.put("refList", StringUtil.splitToList(null, entity.getRefSec()));
+            List<String> refList = creditProtectionCertificateMapper.getRefList(params);
+            entity.setRefSecList(refList.stream().collect(Collectors.joining(",")));
+        }
         return entity;
     }
 
