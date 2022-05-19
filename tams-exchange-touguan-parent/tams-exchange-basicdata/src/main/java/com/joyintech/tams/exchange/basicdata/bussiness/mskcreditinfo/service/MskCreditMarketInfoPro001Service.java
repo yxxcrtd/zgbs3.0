@@ -7,6 +7,7 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dao.MskCreditInfoProMapper;
 import com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProRequest;
 import com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest;
@@ -16,12 +17,15 @@ import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.entity.FlowEntity;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -113,4 +117,19 @@ public class MskCreditMarketInfoPro001Service extends BaseService<MskCreditInfoP
 
     }
 
+    public boolean isInWflProcess(WflValidInputParameter parameter) {
+        parameter.setSeachMode("01");
+        List<String> result = mskCreditInfoProMapper.getBusinessData(parameter);
+        if (CollectionUtils.isNotEmpty(result)) {
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
+    }
+
+    public MskCreditInfoProSaveRequest getBasicInfos(String secid, Object o) {
+        MskCreditInfoProSaveRequest dto = new MskCreditInfoProSaveRequest();
+        Map<String,Object> map= new HashMap<>();
+        map.put("secid",secid);
+        return mskCreditInfoProMapper.getBasicInfo(map);
+    }
 }

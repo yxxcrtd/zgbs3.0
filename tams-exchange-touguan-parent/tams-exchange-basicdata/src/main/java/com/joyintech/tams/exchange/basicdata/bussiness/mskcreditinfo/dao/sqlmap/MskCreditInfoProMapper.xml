@@ -7,22 +7,100 @@
             <if test="secid != null" >
                 secid,
             </if>
+            <if test="cdate != null" >
+                cdate,
+            </if>
+            <if test="mdprice != null" >
+                MDPRICE,
+            </if>
+            <if test="mcprice != null" >
+                MCPRICE,
+            </if>
+            <if test="mint != null" >
+                MINT,
+            </if>
+            <if test="myield != null" >
+                MYIELD,
+            </if>
+            <if test="mMduration != null" >
+                M_MDURATION,
+            </if>
+            <if test="mCnvxty != null" >
+                M_CNVXTY,
+            </if>
+            <if test="issueMarketNum != null" >
+                ISSUE_MARKET_NUM,
+            </if>
+            <if test="creditType != null" >
+                CREDIT_TYPE,
+            </if>
             <if test="valueSource != null" >
                 VALUE_SOURCE,
             </if>
-            <if test="cdate != null" >
-                cdate,
+            <if test="createUser != null" >
+                CREATE_USER,
+            </if>
+            <if test="createDept != null" >
+                CREATE_DEPT,
+            </if>
+            <if test="createTime != null" >
+                CREATE_Time,
+            </if>
+            <if test="updateUser != null" >
+                UPDATE_USER,
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME,
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="secid != null" >
                 #{secid,jdbcType=VARCHAR},
             </if>
+            <if test="cdate != null" >
+                #{cdate,jdbcType=VARCHAR},
+            </if>
+            <if test="mdprice != null" >
+                #{mdprice,jdbcType=DECIMAL},
+            </if>
+            <if test="mcprice != null" >
+                #{mcprice,jdbcType=DECIMAL},
+            </if>
+            <if test="mint != null" >
+                #{mint,jdbcType=DECIMAL},
+            </if>
+            <if test="myield != null" >
+                #{myield,jdbcType=DECIMAL},
+            </if>
+            <if test="mMduration != null" >
+                #{mMduration,jdbcType=DECIMAL},
+            </if>
+            <if test="mCnvxty != null" >
+                #{mCnvxty,jdbcType=DECIMAL},
+            </if>
+            <if test="issueMarketNum != null" >
+                #{issueMarketNum,jdbcType=DECIMAL},
+            </if>
+            <if test="creditType != null" >
+                #{creditType,jdbcType=VARCHAR},
+            </if>
             <if test="valueSource != null" >
                 #{valueSource,jdbcType=VARCHAR},
             </if>
-            <if test="cdate != null" >
-                cdate,
+            <if test="createUser != null" >
+                #{createUser,jdbcType=VARCHAR},
+            </if>
+            <if test="createDept != null" >
+                #{createDept,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null" >
+                #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                #{updateTime,jdbcType=TIMESTAMP},
             </if>
         </trim>
     </insert>
@@ -172,4 +250,68 @@
         AND
         m.VALUE_SOURCE=#{valueSource,jdbcType=DATE}
     </select>
+
+
+    <select id="getBusinessData" parameterType="com.joyintech.tams.component.business.core.dto.WflValidInputParameter" resultType="java.lang.String">
+        select pm.STATUS status
+        from SYS_DATA_PROCESS_MARK pm
+        inner join (
+        select
+        max(HIS_NO)	       HIS_NO,
+        WORKFLOW_ID
+        from SYS_DATA_PROCESS_MARK
+        <where>
+            <if test="pageId != null and pageId !=''">
+                PAGE_ID = #{pageId}
+            </if>
+        </where>
+        group by  WORKFLOW_ID
+        ) tempHis on  pm.HIS_NO = tempHis.HIS_NO and pm.WORKFLOW_ID = tempHis.WORKFLOW_ID
+        <where>
+            <if test="seachMode != null and seachMode !='' and seachMode == '01'.toString()">
+                pm.status in ('A','U','P')
+            </if>
+            <if test="pageId != null and pageId !=''">
+                and pm.PAGE_ID = #{pageId}
+            </if>
+            <if test="businessDataPk1 != null and businessDataPk1 !=''">
+                and pm.BUSINESS_DATA_PK1 = #{businessDataPk1}
+            </if>
+            <if test="businessDataPk2 != null and businessDataPk2 !=''">
+                and pm.BUSINESS_DATA_PK2 = #{businessDataPk2}
+            </if>
+            <if test="workflowId != null and workflowId !=''">
+                and pm.WORKFLOW_ID != #{workflowId}
+            </if>
+        </where>
+        order by pm.create_time desc
+    </select>
+
+
+    <select id="getBasicInfo" parameterType="Map" resultType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest">
+             SELECT
+        m.SECID secid,
+        f.FINPROD_ABBR finprodAbbr,
+        m.VALUE_SOURCE,
+        m.CDATE cdate,
+        m.MDPRICE mdprice,
+        m.MCPRICE mcprice,
+        m.MINT mint,
+        m.MYIELD*100 myield,
+        m.M_MDURATION mMduration,
+        m.M_CNVXTY mCnvxty,
+        m.ISSUE_MARKET_NUM issueMarketNum,
+        m.CREDIT_TYPE creditType
+        FROM
+        MST_CREDIT_MARKET_INFO		m
+        LEFT JOIN
+        FIN_PRODUCT		f
+        ON	 f.FINPROD_ID=m.SECID
+        LEFT JOIN
+        INTERF_CREDITINFO	i
+        ON	 i.SECID = m.SECID
+        AND
+        m.SECID=#{secid,jdbcType=VARCHAR}
+    </select>
+
 </mapper>
