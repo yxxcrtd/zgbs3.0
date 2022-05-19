@@ -366,7 +366,8 @@ public class EtrTradeCommonervice extends BaseService {
         String porUsableCash = "porUsableCash", acctNoUsableCash = "acctNoUsableCash", acctNoCanCash = "acctNoCanCash", usableAmount = "usableAmount", usableSec = "usableSec";
         String finprodType2 = requestDto.getPtlList().get(0).getFinprodType2();
         String tradePlat = requestDto.getPtlList().get(0).getTradePlat();
-        if(StringUtil.equals(tradePlat, TempConstant.NO_TRADE_BUSINESS_ETR)||StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())||StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())) {
+        if(StringUtil.equals(tradePlat, TempConstant.NO_TRADE_BUSINESS_ETR)||StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())||StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
+            || StringUtil.equals(tradePlat, DictCodeList.交易平台_新债平台.getValue())) {
             canSec=canSec!=null?BigDecimal.ZERO:ArithmeticUtil.divide(canSec,new BigDecimal(100),2);
             realSec=realSec!=null?BigDecimal.ZERO:ArithmeticUtil.divide(realSec,new BigDecimal(100),2);
         }
