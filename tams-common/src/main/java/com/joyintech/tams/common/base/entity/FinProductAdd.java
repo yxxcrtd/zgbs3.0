@@ -536,6 +536,8 @@ public class FinProductAdd extends BaseEntity {
      */
     private String settleMethod;
 
+    private String issuershort;
+
 
     public String getDirectDisclosureRiskFlag() {
         return directDisclosureRiskFlag;
@@ -2117,5 +2119,13 @@ public class FinProductAdd extends BaseEntity {
 
     public void setSettleMethod(String settleMethod) {
         this.settleMethod = settleMethod;
+    }
+
+    public String getIssuershort() {
+        return issuershort;
+    }
+
+    public void setIssuershort(String issuershort) {
+        this.issuershort = issuershort;
     }
 }

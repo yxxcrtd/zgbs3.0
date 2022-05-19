@@ -7,12 +7,14 @@ import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.system.base.dao.SysWflBusinessListMapper;
 import com.joyintech.system.base.entity.SysWflBusinessList;
 import com.joyintech.tams.business.common.dto.CfetsBondPortfolioCashRequest;
 import com.joyintech.tams.business.common.dto.CfetsBondPositionRequest;
+import com.joyintech.tams.business.common.dto.CfetsSearchInfoRequest;
 import com.joyintech.tams.business.common.dto.PageMode;
 import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
@@ -28,6 +30,7 @@ import com.joyintech.tams.cfets.trd.bond.service.IbuQuoteBondCalService;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dao.CfetsTrdBondFirstSub001Mapper;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dao.CfetsTrdBondFirstSub002Mapper;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.*;
+import com.joyintech.tams.cfets.trd.repo.dto.CfetsRepoDealRegisterQuoteDto;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
@@ -58,6 +61,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -267,6 +271,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         }
         // 3.计算 【应缴款金额】=发行价格*认购量*10000/100 【结算服务费】，根据银行间债券交易费用规则计算
         this.calAmtAndFee(cfetsTrdBondFirstSubInfoDto);
+        cfetsTrdBondFirstSubInfoDto.getProductDtos().sort(Comparator.comparing(CfetsTrdBondFirstSubProductDto::getAvaNum).reversed());
         logger.debug("初始化申购页面,结果:" + JsonUtils.object2Json(cfetsTrdBondFirstSubInfoDto));
         return cfetsTrdBondFirstSubInfoDto;
     }
@@ -475,6 +480,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             index++;
             // 占比值 根据每条数据的“剩余指令额度/指令剩余额度汇总*基本信息中认购量”计算
             BigDecimal proportion = ArithmeticUtil.divide(ArithmeticUtil.multiply(item.getAvaNum(), subAmt), avaNumTotal, 4);
+            proportion = ArithmeticUtil.multiply(ArithmeticUtil.divide(proportion, minChangeUnit, 0, RoundingMode.HALF_DOWN), minChangeUnit);
             // 记录剩余指令额度
             item.setAvaNumTemp(item.getAvaNum());
             // 最后一位时
@@ -521,6 +527,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         BigDecimal minChangeUnit = subMinChangeUnit;
         // 平均值计算
         BigDecimal avg = ArithmeticUtil.divide(subAmt, productDtos.size(), 4);
+        avg = ArithmeticUtil.multiply(ArithmeticUtil.divide(avg, minChangeUnit, 0, RoundingMode.HALF_DOWN), minChangeUnit);
         // 剩余尾差
         BigDecimal tailDifference = subAmt;
         int index = 0;
@@ -646,7 +653,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             }
         }
         // 降序
-        list.sort(Comparator.comparing(CfetsTrdBondFirstSubProductDto::getAvaNum));
+        list.sort(Comparator.comparing(CfetsTrdBondFirstSubProductDto::getAvaNum).reversed());
         // 分配应缴款金额和结算服务费
         this.otherDistribution(autoRequest.getSubscriptionAmount(), autoRequest.getPayableAmount(), autoRequest.getSettFeeAmt(), list);
         list.addAll(listAumIsZero);
@@ -697,7 +704,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      */
     public String getBidId(BussinessDictCodeList ps) {
         if (!StringUtil.isNotEmpty(ps)) {
-            ps = BussinessDictCodeList.共同业务类型_中标结果确认;
+            ps = BussinessDictCodeList.共同业务类型_一级投标确认_申购_登记;
         }
         if (baseGetBusinessId != null) {
             BussinessCodeParameter codeParameter = new BussinessCodeParameter();
@@ -706,6 +713,19 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         } else {
             return IDGenerator.generate();
         }
+    }
+
+    /**
+     * 获取发行人名称
+     *
+     * @param finprodId
+     * @return java.lang.String
+     * @author jiangpeng
+     * @date 2022/5/18 19:33
+     */
+    public String getIssuer(String finprodId) {
+        String Issuer = cfetsTrdBondFirstSub002Mapper.getIssuer(finprodId);
+        return Issuer;
     }
 
     /**
@@ -802,7 +822,8 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             this.deleteWflData(entity.getBidId());
             //登录业务流程
             this.insertWflData(entity);
-            String confirmOk = RequestUtil.getParam("confirmOk");
+            String confirmOk = entity.getConfirmOk();
+            entity.setConfirmOk(null);
             ProcessMark newEntity;
             //处理指令执行进度
             this.insertEtrFinishStatus(entity, OperationType.NEW);
@@ -1180,8 +1201,8 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      */
     private void handleTailDifferenceSubscriptionAmount(List<CfetsTrdBondFirstSubProductDto> productDtos, BigDecimal tailDifference, BigDecimal minChangeUnit) {
         // 最大循环次数
-        // 升序
-        productDtos.sort(Comparator.comparing(CfetsTrdBondFirstSubProductDto::getAvaNum));
+        // 降序
+        productDtos.sort(Comparator.comparing(CfetsTrdBondFirstSubProductDto::getAvaNum).reversed());
         int maxCycle = productDtos.size() * 30;
         while (tailDifference.compareTo(BigDecimal.ZERO) > 0 && maxCycle != 0) {
             for (CfetsTrdBondFirstSubProductDto item : productDtos) {
@@ -1592,7 +1613,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      * @date 2022/5/18 19:10
      */
     public void selectCash(CfetsTrdBondFirstSubInfoDto dto) {
-        for(CfetsTrdBondFirstSubProductDto productDto :dto.getProductDtos()) {
+        for (CfetsTrdBondFirstSubProductDto productDto : dto.getProductDtos()) {
             BaseMap cashMap = positionInfoService.queryTrdAvailableCash(
                     Arrays.asList(productDto.getPortfolioId()),
                     dto.getTradeDateStr(),
@@ -1608,6 +1629,29 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             productDto.setRealCash(cashMap.getBigDecimal("realCash"));
             productDto.setSecDesirableCash(cashMap.getBigDecimal("secDesirableCash"));
         }
+    }
+
+
+    @Override
+    public String generateTitle(CfetsTrdBondFirstSubInfoDto dto, OperationType type) {
+        String issuer = null;
+        String finprodAbbr = null;
+        String SubscriptionAmount = null;
+        String str = null;
+        if (StringUtil.isNotEmpty(dto.getFinprodAbbr())) {
+            finprodAbbr = "资产简称:" + dto.getFinprodAbbr();
+        }
+        if (StringUtil.isNotEmpty(dto.getFinprodId())) {
+            issuer = "发行人:" + this.getIssuer(dto.getFinprodId());
+        }
+        if (StringUtil.isNotEmpty(dto.getSubscriptionAmount())) {
+            SubscriptionAmount = "认购量:" + ArithmeticUtil.divide(dto.getSubscriptionAmount(), new BigDecimal(10000), 2, RoundingMode.HALF_UP) + "万元";
+        }
+        str = "登记日期:" + DateUtil.format(iPlatformDate.getSysDate());
+        str += StringUtil.isNotEmpty(finprodAbbr) ? "-" + finprodAbbr : "";
+        str += StringUtil.isNotEmpty(issuer) ? "-" + issuer : "";
+        str += StringUtil.isNotEmpty(SubscriptionAmount) ? "-" + SubscriptionAmount : "";
+        return str;
     }
 }
 

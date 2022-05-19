@@ -48,6 +48,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -132,7 +133,7 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
         if (StringUtil.isNotEmpty(workflowId)) {
             CfetsTrdBondFirstSubInfoDto entity = cfetsTrdBondFirstSub002Service.getBussinessEntityByWorkflowId(workflowId);
 //            test(entity);
-            cfetsTrdBondFirstSub002Service.selectCash(entity);
+//            cfetsTrdBondFirstSub002Service.selectCash(entity);
             initPageParams.put(GlobalConstant.WORKFLOW_ID, workflowId);
             initPageParams.put(GlobalConstant.ENTITY, entity);
         }
@@ -141,9 +142,10 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
 
     /**
      * 风险试算测试
+     *
+     * @param entity
      * @author jiangpeng
      * @date 2022/5/9 10:42
-     * @param entity
      */
 //    private void test(CfetsTrdBondFirstSubInfoDto entity){
 //        CfetsEtribdoRiskcalResponse riskcalResponse = entity.getRiskcalResponse();
@@ -180,8 +182,6 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
 //        riskcalResponse.setRiskcalReturnList(riskcalReturnList);
 //        entity.setRiskcalResponse(riskcalResponse);
 //    }
-
-
     @ApiOperation(value = "申购初始化检查", notes = "点击申购按钮、指令查询明细页面点击确认调用")
     @PostMapping("/dealexecutioncheck")
     @ResponseBody
@@ -403,15 +403,34 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
             return new Message<AjaxResult>().success().setData(new AjaxResult(br));
         }
         dto.setBidId(cfetsTrdBondFirstSub002Service.getBidId(null));
+        cfetsTrdBondFirstSub002Service.selectCash(dto);
         ProcessParameter<CfetsTrdBondFirstSubInfoDto> processParameter = new ProcessParameter<>();
         WorkFlowParameter<CfetsTrdBondFirstSubInfoDto> params = new WorkFlowParameter<>();
         // 页面id
         params.setPageId("TenderBondSub002");
         //
         params.setElementId(dto.getElementId());
-        params.setBusinessType(BussinessDictCodeList.共同业务类型_中标结果确认.getValue());
+        params.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_申购_登记.getValue());
         params.setBusinessCode(dto.getBidId());
-        String finalStr = "一级申购-交易日期:" + DateUtil.format(iPlatformDate.getSysDate());
+        String issuer = null;
+        String finprodAbbr = null;
+        String SubscriptionAmount = null;
+        String str = null;
+        if (StringUtil.isNotEmpty(dto.getFinprodAbbr())) {
+            finprodAbbr = "资产简称:" + dto.getFinprodAbbr();
+        }
+        if (StringUtil.isNotEmpty(dto.getFinprodId())) {
+            issuer = "发行人:" + cfetsTrdBondFirstSub002Service.getIssuer(dto.getFinprodId());
+        }
+        if (StringUtil.isNotEmpty(dto.getSubscriptionAmount())) {
+            SubscriptionAmount = "认购量:" + ArithmeticUtil.divide(dto.getSubscriptionAmount(), new BigDecimal(10000), 2, RoundingMode.HALF_UP) + "万元";
+        }
+        str = "登记日期:" + DateUtil.format(iPlatformDate.getSysDate());
+        str += StringUtil.isNotEmpty(finprodAbbr) ? "-" + finprodAbbr : "";
+        str += StringUtil.isNotEmpty(issuer) ? "-" + issuer : "";
+        str += StringUtil.isNotEmpty(SubscriptionAmount) ? "-" + SubscriptionAmount : "";
+
+        String finalStr = str;
         params.setComment(entity -> finalStr);
         processParameter.setWorkFlowParameter(params);
         processParameter.setOperationType(OperationType.NEW);
@@ -459,7 +478,7 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
         workFlowParameter.setPageId("TenderBondSub002");
         workFlowParameter.setElementId("TenderBondSub002_btn_revoke");
         workFlowParameter.setBusinessCode(CfetsTrdBondFirstSubInfoDto::getBidId);
-        workFlowParameter.setBusinessType(BussinessDictCodeList.共同业务类型_中标结果确认.getValue());
+        workFlowParameter.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_申购_登记.getValue());
         workFlowParameter.setComment(entity -> "申购编号 (" + entity.getBidId() + ")");
         processParameter.setPageId(workFlowParameter.getPageId());
         processParameter.setWorkFlowParameter(workFlowParameter);

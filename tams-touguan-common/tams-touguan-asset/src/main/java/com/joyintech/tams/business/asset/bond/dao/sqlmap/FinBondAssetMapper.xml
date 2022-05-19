@@ -1611,7 +1611,10 @@
         </if>
         <if test="inputValue3 != null and inputValue3 != ''">
             AND INPUT_VALUE_3 = #{inputValue3}
-        </if> and ROWNUM=1
+        </if>
+        <if test="inputValue4 != null and inputValue4 != ''">
+            AND INPUT_VALUE_4 = #{inputValue4}
+        </if>and ROWNUM=1
     </select>
 
     <delete id="deleteCfetsOprHis">

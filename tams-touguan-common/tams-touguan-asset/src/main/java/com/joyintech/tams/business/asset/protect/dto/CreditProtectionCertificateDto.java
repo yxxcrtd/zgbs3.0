@@ -27,6 +27,7 @@ public class CreditProtectionCertificateDto extends BaseEntity implements Proces
     private String issueRshortStr;//		创设机构
     private BigDecimal issueAmt;//		名义本金总金额（万元）
     private String protectObject;//		保护对象
+    private String protectObjectStr;//		保护对象
     private String refEntity;//		参考实体
     private String refSec;//		参考债项
     private String refSecFeatures;//		参考债项特征
@@ -117,6 +118,14 @@ public class CreditProtectionCertificateDto extends BaseEntity implements Proces
 
     public void setProtectObject(String protectObject) {
         this.protectObject = protectObject;
+    }
+
+    public String getProtectObjectStr() {
+        return protectObjectStr;
+    }
+
+    public void setProtectObjectStr(String protectObjectStr) {
+        this.protectObjectStr = protectObjectStr;
     }
 
     public String getRefEntity() {
