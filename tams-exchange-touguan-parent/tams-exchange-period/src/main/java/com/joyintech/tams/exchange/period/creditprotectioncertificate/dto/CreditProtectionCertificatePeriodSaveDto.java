@@ -183,12 +183,26 @@ public class CreditProtectionCertificatePeriodSaveDto extends BaseEntity impleme
     /**
      * 汇总数据
      */
+    @ApiModelProperty(name="baseBussinessDto",value="汇总数据")
     private BaseBussinessDto baseBussinessDto;
 
     /**
      * 明细数据
      */
+    @ApiModelProperty(name="baseBussinessDtos",value="明细数据")
     private List<BaseBussinessDto> baseBussinessDtos;
+
+    @ApiModelProperty(name="tradeDate",value="交易日期")
+    private Date tradeDate;
+
+
+    public Date getTradeDate() {
+        return tradeDate;
+    }
+
+    public void setTradeDate(Date tradeDate) {
+        this.tradeDate = tradeDate;
+    }
 
     public BaseBussinessDto getBaseBussinessDto() {
         return baseBussinessDto;

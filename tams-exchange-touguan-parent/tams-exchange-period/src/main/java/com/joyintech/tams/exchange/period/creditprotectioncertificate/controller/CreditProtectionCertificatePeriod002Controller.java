@@ -41,8 +41,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
-@PageId("CreditProtectionCertificate002")
-@RequestMapping("/exchange/period/CreditProtectionCertificate002")
+@PageId("CreditProtectionCertificatePeriod002")
+@RequestMapping("/exchange/period/CreditProtectionCertificatePeriod002")
 @Api(tags = "信用凭证保护凭证存续期-新建画面")
 public class CreditProtectionCertificatePeriod002Controller extends BaseController {
 
@@ -132,7 +132,7 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
     @PostMapping("finprodIdLink")
     public Message<FinprodLinkDto> finprodIdLink(@RequestBody CreditProtectionCertificatePeriod001Request params) {
         try {
-            return new Message<FinprodLinkDto>(creditProtectionCertificatePeriod002Service.finprodIdLink(params));
+            return new Message<>(creditProtectionCertificatePeriod002Service.finprodIdLink(params));
         } catch (Exception e) {
             logger.error("资产信息联动异常", e);
             return new Message<FinprodLinkDto>().fail().setMessage("资产信息联动异常");

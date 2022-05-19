@@ -2,6 +2,8 @@ package com.joyintech.tams.exchange.period.creditprotectioncertificate.service;
 
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.security.LoginUserUtil;
+import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.dao.*;
@@ -27,6 +29,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_新建;
 
@@ -510,8 +513,33 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
 
     public FinprodLinkDto finprodIdLink(CreditProtectionCertificatePeriod001Request params) {
         //选择资产代码后，联动查询展示：资产名称、起始日、到期日、参考实体
+        params.setTradeDate(iPlatformDate.getSysDate());
         FinprodLinkDto finprodLinkDto = creditProtectionCertificatePeriodMapper.findFinprodDetail(params);
-        return null;
+
+        String newSecPositionSwitch = CacheUtil.getSysParam("NEW_SEC_POSITION_SWITCH");
+
+        List<BillingDetailsDto> details;
+        // 开关配置N查老头存
+        if (DictCodeList.是否_否.getValue().equals(newSecPositionSwitch)) {
+            details = creditProtectionCertificatePeriodMapper.getBillingDetailsByFinprodMarketIdOld(params);
+        } else { // 默认查新头寸
+            details = creditProtectionCertificatePeriodMapper.getBillingDetailsByFinprodMarketId(params);
+        }
+
+        finprodLinkDto.setBillingDetails(details);
+
+        List<String> refSecs = new ArrayList<>();
+
+        if (StringUtil.isEmpty(finprodLinkDto.getRefSec())) {
+            if (StringUtil.isNotEmpty(finprodLinkDto.getRefEntity())) {
+                refSecs = creditProtectionCertificatePeriodMapper.getRefSecsByRefEntity(finprodLinkDto.getRefEntity());
+            }
+        } else {
+            refSecs.add(finprodLinkDto.getRefSec());
+        }
+
+        finprodLinkDto.setRefSecs(refSecs);
+        return finprodLinkDto;
     }
 
     public CreditProtectionCertificatePeriodSaveDto getEntityByBusinessCode(String businessCode) {

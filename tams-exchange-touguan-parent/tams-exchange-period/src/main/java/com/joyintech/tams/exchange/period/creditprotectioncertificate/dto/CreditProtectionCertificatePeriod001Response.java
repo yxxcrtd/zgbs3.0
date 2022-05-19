@@ -11,6 +11,14 @@ import java.util.Date;
 
 public class CreditProtectionCertificatePeriod001Response extends BaseEntity {
 
+    @ApiModelProperty(name="operateType",value="操作类型",example="submit/save", required = true)
+    private String operateType;
+
+    @ApiModelProperty(name="elementId",value="按钮id",example="EtrExchangeTradeJj_btn_submit/EtrExchangeTradeJj_btn_save")
+    private String elementId;
+
+    @ApiModelProperty(name="pageId",value="d",example="EtrExchangeTradeJj")
+    private String pageId;
 
     /**
      * 有效状态
@@ -262,5 +270,29 @@ public class CreditProtectionCertificatePeriod001Response extends BaseEntity {
 
     public void setCreditEventStr(String creditEventStr) {
         this.creditEventStr = creditEventStr;
+    }
+
+    public String getOperateType() {
+        return operateType;
+    }
+
+    public void setOperateType(String operateType) {
+        this.operateType = operateType;
+    }
+
+    public String getElementId() {
+        return elementId;
+    }
+
+    public void setElementId(String elementId) {
+        this.elementId = elementId;
+    }
+
+    public String getPageId() {
+        return pageId;
+    }
+
+    public void setPageId(String pageId) {
+        this.pageId = pageId;
     }
 }

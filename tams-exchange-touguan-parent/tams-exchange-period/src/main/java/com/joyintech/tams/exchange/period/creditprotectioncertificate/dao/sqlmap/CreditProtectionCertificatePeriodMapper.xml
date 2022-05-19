@@ -202,7 +202,7 @@
     <select id="getBillingDetailByBusinessCode"
             resultType="com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.BillingDetailsDto">
         select tfpdl.PORTFOLIO_ID                        portfolioId,
-               fp.FINPROD_NAME                           portfolioName,
+               pp.PORTFOLIO_NAME                         portfolioName,
                tfpdl.SEC_MANAGE_ACCT_ID                  acctNo,
                tfpdl.SEC_MANAGE_ACCT_ID                  secManageAcctId,
                nvl(tfpdl.SHARE_AMT, 0) / 10000           repNomCapi,
@@ -212,10 +212,11 @@
         from TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
                  left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
                  left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
+                 left join PTL_PORTFOLIO pp on tfpdl.PORTFOLIO_ID = pp.PORTFOLIO_ID
         where tfpdl.P_TOTLE_TRADE_ID = #{businessCode,jdbcType=VARCHAR}
         union all
         select tfpdl.PORTFOLIO_ID                        portfolioId,
-               fp.FINPROD_NAME                           portfolioName,
+               pp.PORTFOLIO_NAME                         portfolioName,
                tfpdl.SEC_MANAGE_ACCT_ID                  acctNo,
                tfpdl.SEC_MANAGE_ACCT_ID                  secManageAcctId,
                nvl(tfpdl.SHARE_AMT, 0) / 10000           repNomCapi,
@@ -225,7 +226,47 @@
         from WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
                  left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
                  left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
+                 left join PTL_PORTFOLIO pp on tfpdl.PORTFOLIO_ID = pp.PORTFOLIO_ID
         where tfpdl.P_TOTLE_TRADE_ID = #{businessCode,jdbcType=VARCHAR}
+    </select>
+    <select id="getBillingDetailsByFinprodMarketId"
+            resultType="com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.BillingDetailsDto">
+        select p.PORTFOLIO_ID           portfolioId,
+               pp.PORTFOLIO_NAME        portfolioName,
+               sci.BUSI_ACCT_NO         acctNo,
+               nvl(p.AMOUNT, 0) / 10000 repNomCapi,
+               nvl(p.AMOUNT, 0) / 10000 deliverBondAmount
+        from PTL_SEC_POSITION_RULE p
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = p.FINPROD_ID
+                 left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = p.SEC_ACCT_ID
+                 left join STL_CAPACCT_INFO sci on ssai.REC_ACCT_ID = sci.ACCT_NO
+                 left join PTL_PORTFOLIO pp on p.PORTFOLIO_ID = pp.PORTFOLIO_ID
+        where fp.FINPROD_MARKET_ID = #{finprodId}
+          and p.CDATE = #{tradeDate}
+          and p.HODING_TYPE = 'A_001'
+    </select>
+    <select id="getBillingDetailsByFinprodMarketIdOld"
+            resultType="com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.BillingDetailsDto">
+        select p.PORTFOLIO_ID           portfolioId,
+               pp.PORTFOLIO_NAME        portfolioName,
+               sci.BUSI_ACCT_NO         acctNo,
+               nvl(p.AMOUNT, 0) / 10000 repNomCapi,
+               nvl(p.AMOUNT, 0) / 10000 deliverBondAmount
+        from PTL_SEC_POSITION p
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = p.FINPROD_ID
+                 left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = p.SEC_ACCT_ID
+                 left join STL_CAPACCT_INFO sci on ssai.REC_ACCT_ID = sci.ACCT_NO
+                 left join PTL_PORTFOLIO pp on p.PORTFOLIO_ID = pp.PORTFOLIO_ID
+        where fp.FINPROD_MARKET_ID = #{finprodId}
+          and p.CDATE = #{tradeDate}
+          and p.HODING_TYPE = '03'
+    </select>
+    <select id="getRefSecsByRefEntity" resultType="java.lang.String">
+        select distinct fa.REF_SEC
+        from FIN_PRODUCT f
+                 left join FIN_PRODUCT_ADD fa on fa.FINPROD_ID = f.FINPROD_ID
+        where f.ISSUER = #{refEntity,jdbcType=VARCHAR}
+          and fa.REF_SEC is not null
     </select>
 
 </mapper>

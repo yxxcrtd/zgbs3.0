@@ -1,6 +1,9 @@
 package com.joyintech.tams.exchange.period.creditprotectioncertificate.dto;
 
+import io.swagger.annotations.ApiModelProperty;
+
 import java.util.Date;
+import java.util.List;
 
 /**
  * 〈功能详细描述〉
@@ -58,6 +61,49 @@ public class FinprodLinkDto {
      * 参考债项
      */
     private String refSec;
+
+    /**
+     * 结算明细
+     */
+    @ApiModelProperty(name = "billingDetails",value = "结算明细")
+    private List<BillingDetailsDto> billingDetails;
+
+    /**
+     * 参考实体
+     */
+    @ApiModelProperty(name = "refEntity",value = "参考实体")
+    private String refEntity;
+
+
+    /**
+     * 参考债项选择列表
+     */
+    @ApiModelProperty(name = "refSecs",value = "参考债项选择列表")
+    private List<String> refSecs;
+
+    public List<String> getRefSecs() {
+        return refSecs;
+    }
+
+    public void setRefSecs(List<String> refSecs) {
+        this.refSecs = refSecs;
+    }
+
+    public String getRefEntity() {
+        return refEntity;
+    }
+
+    public void setRefEntity(String refEntity) {
+        this.refEntity = refEntity;
+    }
+
+    public List<BillingDetailsDto> getBillingDetails() {
+        return billingDetails;
+    }
+
+    public void setBillingDetails(List<BillingDetailsDto> billingDetails) {
+        this.billingDetails = billingDetails;
+    }
 
     public String getRefSec() {
         return refSec;

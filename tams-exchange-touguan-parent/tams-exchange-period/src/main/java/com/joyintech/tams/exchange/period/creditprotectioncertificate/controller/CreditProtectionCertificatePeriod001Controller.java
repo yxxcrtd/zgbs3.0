@@ -6,6 +6,7 @@ import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.BaseExportRequest;
@@ -42,8 +43,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
-@PageId("CreditProtectionCertificate001")
-@RequestMapping("/exchange/period/CreditProtectionCertificate001")
+@PageId("CreditProtectionCertificatePeriod001")
+@RequestMapping("/exchange/period/CreditProtectionCertificatePeriod001")
 @Api(tags = "信用凭证保护凭证存续期-查询画面")
 public class CreditProtectionCertificatePeriod001Controller extends BaseController {
 
@@ -187,8 +188,8 @@ public class CreditProtectionCertificatePeriod001Controller extends BaseControll
             ProcessParameter<CreditProtectionCertificatePeriodSaveDto> processParameter = new ProcessParameter<>();
             WorkFlowParameter<CreditProtectionCertificatePeriodSaveDto> params = new WorkFlowParameter<>();
             CreditProtectionCertificatePeriodSaveDto entity = creditProtectionCertificatePeriod002Service.getEntityByBusinessCode(dto.getBusiCode());
-            params.setPageId("CreditProtectionCertificate002");
-            params.setElementId("CreditProtectionCertificate002_btn_revoke");
+            params.setPageId(dto.getPageId());
+            params.setElementId(dto.getElementId());
             params.setBusinessCode(dto.getBusiCode());
             params.setBusinessType(DictCodeList.共通业务类型_信用保护凭证存续期.getValue());
             params.setComment(comment -> "业务编号:(" + dto.getBusiCode() + ")-业务类型(" + dto.getPaBussTypeStr() + ")-平台日(" + DateUtil.format(iPlatformDate.getSysDate()) + ")");

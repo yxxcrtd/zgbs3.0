@@ -30,4 +30,25 @@ public interface CreditProtectionCertificatePeriodMapper {
     CreditProtectionCertificatePeriodSaveDto getEntityByBusinessCode(@Param("businessCode") String businessCode);
 
     List<BillingDetailsDto> getBillingDetailByBusinessCode(@Param("businessCode") String businessCode);
+
+    /**
+     * 新头寸 查询新建明细
+     * @param params
+     * @return
+     */
+    List<BillingDetailsDto> getBillingDetailsByFinprodMarketId(CreditProtectionCertificatePeriod001Request params);
+
+    /**
+     * 老头寸 查询新建明细
+     * @param params
+     * @return
+     */
+    List<BillingDetailsDto> getBillingDetailsByFinprodMarketIdOld(CreditProtectionCertificatePeriod001Request params);
+
+    /**
+     * 发行人=参考实体的债券
+     * @param refEntity
+     * @return
+     */
+    List<String> getRefSecsByRefEntity(@Param("refEntity") String refEntity);
 }
