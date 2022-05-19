@@ -186,6 +186,7 @@ public class EtrTradeCommonervice extends BaseService {
                     realSec = realSec.add(newRealSecAmount);
                 }
             }
+            requestDto.setPtlList(secList);  //覆盖请求参数，非交易平台赋值了
 
         }
         return assemble(portfolioCash, canCash, realCash, canSec, realSec, requestDto);
@@ -293,6 +294,7 @@ public class EtrTradeCommonervice extends BaseService {
                     handleSecType(cashSecDto);
                     secList.add(cashSecDto);
                 }
+                requestDto.setPtlList(secList);  //覆盖请求参数，非交易平台赋值了
                 //资金可用金额
                 if (!CollectionUtils.isEmpty(secList) && secList.size() > 0) {
                     BigDecimal newSecAmount = queryPosition(secList, flowType, "");
@@ -804,6 +806,9 @@ public class EtrTradeCommonervice extends BaseService {
                 }
                 if (StringUtil.equals(dto.getTradePlat(), TempConstant.AGR_EREP_ETR)) {
                     holdingType = DictCodeListExt3.资产类型_质押式协议回购本方券非净额结算可用持仓.getValue();
+                }
+                if (StringUtil.equals(dto.getPs(), TempConstant.AGR_EREP_ETR)) {
+
                 }
             } else if (dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_股票.getValue())) {
                 if (StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.估值交易市场_上交所.getValue())) {
