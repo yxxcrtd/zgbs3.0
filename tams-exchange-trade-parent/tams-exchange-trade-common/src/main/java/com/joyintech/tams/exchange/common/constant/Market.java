@@ -3,10 +3,7 @@ package com.joyintech.tams.exchange.common.constant;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.enums.IEnum;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public enum Market implements IEnum<String> {
 
@@ -30,7 +27,7 @@ public enum Market implements IEnum<String> {
 
     private static Set<String> futuresMarket = new HashSet<>();
 
-    private static Map<String, String> marketMap = new HashMap<>();
+    private static Map<String, Market> marketMap = new HashMap<>();
 
     static {
         futuresMarket.add(SHFE.value);
@@ -39,13 +36,13 @@ public enum Market implements IEnum<String> {
         futuresMarket.add(CFFEX.value);
         futuresMarket.add(INE.value);
 
-        marketMap.put(SZSE.value, SZSE.name);
-        marketMap.put(SHSE.value, SHSE.name);
-        marketMap.put(SHFE.value, SHFE.name);
-        marketMap.put(DCE.value, DCE.name);
-        marketMap.put(CZCE.value, CZCE.name);
-        marketMap.put(CFFEX.value, CFFEX.name);
-        marketMap.put(INE.value, INE.name);
+        marketMap.put(SZSE.value, SZSE);
+        marketMap.put(SHSE.value, SHSE);
+        marketMap.put(SHFE.value, SHFE);
+        marketMap.put(DCE.value, DCE);
+        marketMap.put(CZCE.value, CZCE);
+        marketMap.put(CFFEX.value, CFFEX);
+        marketMap.put(INE.value, INE);
     }
 
     // 判断是否为为期货
@@ -71,9 +68,14 @@ public enum Market implements IEnum<String> {
         return StringUtil.equals(Market.SHSE.value, market);
     }
 
-    public static String getMarketName(String market) {
-        String name = marketMap.get(market);
-        return StringUtil.isNotEmpty(name) ? name : market;
+    public static String getMarketName(String value) {
+        Market market = marketMap.get(value);
+        return Objects.nonNull(market) ? market.name : value;
+    }
+
+    public static String getInvestValue(String value) {
+        Market market = marketMap.get(value);
+        return Objects.nonNull(market) ? market.investValue : value;
     }
 
     @Override
