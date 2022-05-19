@@ -64,53 +64,53 @@
             </if>
 
             <if test="tradingPlaces !=null and tradingPlaces !=''">
-                AND SEC_INFO.MARKET = #{tradingPlaces,jdbcType=VARCHAR}
+                AND RELEASE_INFO.TRADING_PLACES = #{tradingPlaces,jdbcType=VARCHAR}
             </if>
 
             <if test="primaryClassifications != null and primaryClassifications.size() > 0">
-                AND SEC_INFO.PRIMARY_CLASSIFICATION in
+                AND RELEASE_INFO.PRIMARY_CLASSIFICATION in
                 <foreach collection="primaryClassifications" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
             </if>
 
             <if test="secondaryClassifications != null and secondaryClassifications.size() > 0">
-                AND SEC_INFO.SECONDARY_CLASSIFICATION in
+                AND RELEASE_INFO.SECONDARY_CLASSIFICATION in
                 <foreach collection="secondaryClassification" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
             </if>
 
             <if test="registeredCustodian !=null and registeredCustodian !=''">
-                AND SEC_INFO.institution = #{registeredCustodian,jdbcType=VARCHAR}
+                AND RELEASE_INFO.REGISTERED_CUSTODIAN = #{registeredCustodian,jdbcType=VARCHAR}
             </if>
 
             <if test="issuer !=null and issuer !=''">
-                AND SEC_INFO.ISSUERSHORT = #{issuer,jdbcType=VARCHAR}
+                AND RELEASE_INFO.ISSUER = #{issuer,jdbcType=VARCHAR}
             </if>
 
             <if test="issueDateStart != null">
-                AND SEC_INFO.PUBENDDATE >= #{issueDateStart,jdbcType=DATE}
+                AND RELEASE_INFO.ISSUE_DATE >= #{issueDateStart,jdbcType=DATE}
             </if>
 
             <if test="issueDateEnd != null">
-                AND SEC_INFO.PUBENDDATE <![CDATA[ <= ]]> #{issueDateEnd,jdbcType=DATE}
+                AND RELEASE_INFO.ISSUE_DATE <![CDATA[ <= ]]> #{issueDateEnd,jdbcType=DATE}
             </if>
 
             <if test="vdateStart != null">
-                AND SEC_INFO.VDATE >= #{vdateStart,jdbcType=DATE}
+                AND RELEASE_INFO.VALUE_DATE >= #{vdateStart,jdbcType=DATE}
             </if>
 
             <if test="vdateEnd != null">
-                AND SEC_INFO.VDATE <![CDATA[ <= ]]>  #{vdateEnd,jdbcType=DATE}
+                AND RELEASE_INFO.VALUE_DATE <![CDATA[ <= ]]>  #{vdateEnd,jdbcType=DATE}
             </if>
 
             <if test="mdateStart != null">
-                AND SEC_INFO.MDATE >= #{mdateStart,jdbcType=DATE}
+                AND RELEASE_INFO.EXPIRY_DATE >= #{mdateStart,jdbcType=DATE}
             </if>
 
             <if test="mdateEnd != null">
-                AND SEC_INFO.MDATE <![CDATA[<=]]> #{mdateEnd,jdbcType=DATE}
+                AND RELEASE_INFO.EXPIRY_DATE <![CDATA[<=]]> #{mdateEnd,jdbcType=DATE}
             </if>
 
             <if test="theOryOptionPayDayStart != null">
@@ -122,19 +122,19 @@
             </if>
 
             <if test="couponSpecies !=null and couponSpecies !=''">
-                AND SEC_INFO.COUPONSPECIES = #{couponSpecies,jdbcType=VARCHAR}
+                AND RELEASE_INFO.VARIETY_OF_COUPONS = #{couponSpecies,jdbcType=VARCHAR}
             </if>
 
             <if test="rateType !=null and rateType !=''">
-                AND SEC_INFO.INTERESTRATE = #{rateType,jdbcType=VARCHAR}
+                AND RELEASE_INFO.RATE_TYPE = #{rateType,jdbcType=VARCHAR}
             </if>
 
             <if test="interestPaymentFrequency !=null and interestPaymentFrequency !=''">
-                AND SEC_INFO.PAYCYCLE = #{interestPaymentFrequency,jdbcType=VARCHAR}
+                AND RELEASE_INFO.INTEREST_PAYMENT_FREQUENCY = #{interestPaymentFrequency,jdbcType=VARCHAR}
             </if>
 
             <if test="currency !=null and currency !=''">
-                AND SEC_INFO.CURRENCY = #{currency,jdbcType=VARCHAR}
+                AND RELEASE_INFO.CURRENCY = #{currency,jdbcType=VARCHAR}
             </if>
 
             <if test="isSus !=null and isSus !=''">
@@ -164,20 +164,7 @@
             <if test="search !=null and search !=''">
                 AND (
                 SEC_INFO.SEC_ID like '%' || #{search} || '%' OR
-                SEC_INFO.MARKET like '%' || #{search} || '%' OR
-                SEC_INFO.ISSUERSHORT like '%' || #{search} || '%' OR
-                to_char(SEC_INFO.PUBENDDATE,'yyyy-MM-dd') = #{search} OR
-                to_char(SEC_INFO.VDATE,'yyyy-MM-dd') = #{search} OR
-                to_char(SEC_INFO.MDATE,'yyyy-MM-dd') = #{search} OR
-                to_char(SEC_INFO.THEORYOPTIONPAYDAY,'yyyy-MM-dd') = #{search} OR
-                SEC_INFO.COUPONSPECIES like '%' || #{search} || '%' OR
-                SEC_INFO.INTERESTRATE like '%' || #{search} || '%' OR
-                SEC_INFO.PAYCYCLE like '%' || #{search} || '%' OR
                 SEC_INFO.CCY like '%' || #{search} || '%' OR
-                SEC_INFO.ISSUS like '%' || #{search} || '%' OR
-                SEC_INFO.OPTIONTYPE like '%' || #{search} || '%' OR
-                SEC_INFO.RATING like '%' || #{search} || '%' OR
-                SEC_INFO.RATING like '%' || #{search} || '%'
                 )
             </if>
         </where>
