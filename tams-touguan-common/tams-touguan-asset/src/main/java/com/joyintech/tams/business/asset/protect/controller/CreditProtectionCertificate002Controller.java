@@ -176,8 +176,8 @@ public class CreditProtectionCertificate002Controller extends BaseController {
     @ResponseBody
     @PostMapping("/addCoupons")
     @ApiOperation(value = "加券按钮", notes = "加券按钮")
-    public Message<CreditProtectionCertificate002Dto> addCoupons(@RequestParam("finprodMarketId") String finprodMarketId) {
-        return Message.success("success", creditProtectionCertificate002Service.addCoupons(finprodMarketId));
+    public Message<CreditProtectionCertificate002Dto> addCoupons(@RequestParam("secId") String secId){
+        return Message.success("success", creditProtectionCertificate002Service.addCoupons(secId));
     }
     /**
      * 该资产是否有交易数据check
