@@ -1011,6 +1011,9 @@ public class EtrTradeCommonervice extends BaseService {
         // 初始化返回集合
         List<BaseMap> resp = new ArrayList<>();
         BaseMap bm = BaseMap.newMap(new HashMap());
+        //新债平台是万元
+        canSec=canSec!=null?BigDecimal.ZERO:ArithmeticUtil.divide(canSec,new BigDecimal(100),2);
+        realSec=realSec!=null?BigDecimal.ZERO:ArithmeticUtil.divide(realSec,new BigDecimal(100),2);
         /**
          * 若老投管现金存在需累计
          */
