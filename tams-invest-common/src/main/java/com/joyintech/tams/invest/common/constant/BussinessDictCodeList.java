@@ -5039,6 +5039,10 @@ public enum BussinessDictCodeList implements BaseDictCodeList {
      * 中标结果维护与确认
      */
     共同业务类型_中标结果确认(BussinessDictCode.共同业务类型, "TRD60", "中标结果确认"),
+    共同业务类型_一级投标确认_申购_登记(BussinessDictCode.共同业务类型, "TRD95", "一级投标确认-申购-登记"),
+    共同业务类型_一级投标确认_投标_自主投标(BussinessDictCode.共同业务类型, "TRD96", "一级投标确认-投标-自主投标"),
+    共同业务类型_一级投标确认_投标_分销买入(BussinessDictCode.共同业务类型, "TRD97", "一级投标确认-投标-分销买入"),
+    共同业务类型_一级投标确认_投标_代投代缴(BussinessDictCode.共同业务类型, "TRD98", "一级投标确认-投标-代投代缴"),
 
     共同业务类型_中标结果维护(BussinessDictCode.共同业务类型, "TRD61", "中标结果维护"),
 
