@@ -171,7 +171,7 @@ public class FinBondAssetValidatorService implements BeanValidator{
             	    for(BondFinExercisePlanDto finExercisePlan : dto.getFinExercisePlanList()){
                         if (finExercisePlan.getExercisePrice() == null) {
                             resultList.add(new ValidMessage(getMessage("行权计划中的行权价（净价）不能为空!")));
-                            continue;
+                            break;
                         }
                     }
                 }
@@ -242,7 +242,7 @@ public class FinBondAssetValidatorService implements BeanValidator{
                 }
                 if(null!=dto.getFinPayInterestStdInfoDto() && null!=dto.getFinPayInterestStdInfoDto().getInvScheduleList()
                         &&!dto.getFinPayInterestStdInfoDto().getInvScheduleList().isEmpty()) {
-                    List<BondFinExercisePlanDto> finExercisePlanList = dto.getFinExercisePlanList().stream().filter(item -> StringUtil.equals(item.getExerciseType(), DictCodeList.行权方式_赎回.getValue()) || StringUtil.equals(item.getExerciseType(), DictCodeList.行权方式_赎回.getValue())).collect(Collectors.toList());
+                    List<BondFinExercisePlanDto> finExercisePlanList = dto.getFinExercisePlanList().stream().filter(item -> StringUtil.equals(item.getExerciseType(), DictCodeList.行权方式_赎回.getValue()) || StringUtil.equals(item.getExerciseType(), DictCodeList.行权方式_回售.getValue())).collect(Collectors.toList());
                     if (CollectionUtils.isNotEmpty(finExercisePlanList)) {
                         boolean exerciseFlag = true;
                         for (BondFinCashPlanDto planDto : dto.getFinPayInterestStdInfoDto().getInvScheduleList()) {
