@@ -239,7 +239,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         for (BaseFinProductBaseInfoDto dto: entity.getBaseFinProductBaseInfoList()){
             //金融产品
             FinProduct finProduct = dto.getFinProduct();
-            finProductMapper.insertSelective(finProduct);
+            finProductMapper.insert(finProduct);
             //金融产品附属
             FinProductAdd finProductAdd = dto.getFinProductAdd();
             finProductAddMapper.insertSelective(finProductAdd);

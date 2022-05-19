@@ -45,11 +45,13 @@ import com.joyintech.tams.common.base.dao.EtrEntrustBackupMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustBidPriceMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustDetailMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
+import com.joyintech.tams.common.base.dao.WflEtrEntrustMapper;
 import com.joyintech.tams.common.base.entity.EtrDistribute;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.common.base.entity.EtrEntrustAdd;
 import com.joyintech.tams.common.base.entity.EtrEntrustBidPrice;
 import com.joyintech.tams.common.base.entity.EtrEntrustDetail;
+import com.joyintech.tams.common.base.entity.WflEtrEntrust;
 import com.joyintech.tams.component.base.entrust.BusiAutoEtrDispService;
 import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
 import com.joyintech.tams.constant.DictCode;
@@ -167,6 +169,9 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
     @Autowired
     private CfetsEtrBondFirstBid001Service cfetsEtrBondFirstBid001Service;
 
+    @Autowired
+    private WflEtrEntrustMapper wflEtrEntrustMapper;
+
     @Override
     public void doInsert(CfetsEtrBondFirstBid002Dto entity, OperationType operationType) {
         if ("submit".equals(entity.getOperateType())) {
@@ -249,10 +254,10 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                 }
 
 
-                posport.setSecAmount(ArithmeticUtil.multiply(productDto.getBidPrinAmt(), BigDecimal.valueOf(100)));
-                posport.setCashAmount(ArithmeticUtil.multiply(productDto.getBidPrinAmt(), BigDecimal.valueOf(100)));
+                posport.setSecAmount(productDto.getBidPrinAmt());
+                posport.setCashAmount(productDto.getBidPrinAmt());
                 posport.setIntegrateSecAmount(BigDecimal.ZERO.toString());
-                posport.setOwnSecAmount(ArithmeticUtil.multiply(productDto.getBidPrinAmt(), BigDecimal.valueOf(100)).toString());
+                posport.setOwnSecAmount(productDto.getBidPrinAmt().toString());
                 ptlList.add(posport);
             }
             //调用头寸
@@ -708,9 +713,13 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
     public CfetsEtrBondFirstBid002Dto packageEquity(CfetsEtrBondFirstBidSaveRequest cfetsDto) {
 
         //查询资产信息
-        CfetsEtrFinProductInfoRequest productInfoRequest = new CfetsEtrFinProductInfoRequest();
-        productInfoRequest.setFinprodId(cfetsDto.getFinprodId());
-        CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoService.findFinProductInfo(null, null, productInfoRequest);
+        CfetsEtrFinProductInfoResponse finProductInfo = new CfetsEtrFinProductInfoResponse();
+        if (StringUtil.isNotEmpty(cfetsDto.getFinprodId())) {
+            CfetsEtrFinProductInfoRequest productInfoRequest = new CfetsEtrFinProductInfoRequest();
+            productInfoRequest.setFinprodId(cfetsDto.getFinprodId());
+            finProductInfo = etrCommonFinProductInfoService.findFinProductInfo(null, null, productInfoRequest);
+        }
+
 
         CfetsEtrBondFirstBid002Dto dto = new CfetsEtrBondFirstBid002Dto();
         BeanUtil.copyPropertiesIgnoreNull(dto, cfetsDto);
@@ -943,6 +952,14 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
         AjaxResult ajaxResult = new AjaxResult();
         List<ValidMessage> messages = new ArrayList<>();
 
+        if (StringUtil.isNotEmpty(cfetsDto.getEntrustId())) {
+            WflEtrEntrust wflEtrEntrust =  wflEtrEntrustMapper.selectByEntrustId(cfetsDto.getEntrustId());
+            if (wflEtrEntrust != null) {
+                messages.add(new ValidMessage("正在流程中，不允许修改！"));
+                ajaxResult.setErrorList(messages);
+                return ajaxResult;
+            }
+        }
         if (StringUtil.isEmpty(cfetsDto.getFinprodId())) {
             messages.add(new ValidMessage("请输入资产代码！"));
         }
@@ -1083,7 +1100,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                     }
 
                     if (CollectionUtils.isNotEmpty(errorMessageList)) {
-                        String str = StringUtil.join(errorMessageList, "、");
+                        String str = StringUtil.join(errorMessageList.stream().distinct().collect(Collectors.toList()), "、");
                         messages.add(new ValidMessage("投标券面总额/投标标位不满足该资产发行要求："+str+"，请重新填写！"));
                     }
 
@@ -1104,7 +1121,7 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
     public String generateTitle(CfetsEtrBondFirstBid002Dto entity, OperationType type) {
         return "指令日期" + ":" + DateUtil.format(entity.getEntrustDate()) + "-" +
                 "资产简称" + ":" + (entity.getFinprodAbbr() == null ? "" : entity.getFinprodAbbr()) + "-" +
-                "发行方式" + ":" + SysDataUtil.getNameFromDataDict(DictCode.新债_发行方式, entity.getIssueClass()) + "-" +
+                "发行方式" + ":" + (SysDataUtil.getNameFromDataDict(DictCode.新债_发行方式, entity.getIssueClass())  == null ? "":SysDataUtil.getNameFromDataDict(DictCode.新债_发行方式, entity.getIssueClass()))+ "-" +
                 "汇总投标券面总额" + ":" + ArithmeticUtil.divide(entity.getTotalBiddingNum(), new BigDecimal(10000), 2) + "万元";
     }
 

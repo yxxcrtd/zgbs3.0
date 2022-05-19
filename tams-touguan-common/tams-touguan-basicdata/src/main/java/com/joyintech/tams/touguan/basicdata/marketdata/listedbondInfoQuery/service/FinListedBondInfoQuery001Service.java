@@ -141,6 +141,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         logger.info("addCoupons >> 待上市债券信息加券参数：secId: [{}]", secId);
         List<ValidMessage> validMessages = new ArrayList<>();
         FinProduct finProduct = finProductMapper.selectByFinprodMarketId(secId);
+        //该债券信息在系统中已存在，无法加券！
         if (finProduct != null) {
             validMessages.add(new ValidMessage("该债券信息在系统中已存在，无法加券！"));
             return validMessages;
@@ -153,7 +154,6 @@ public class FinListedBondInfoQuery001Service extends BaseService {
             validMessages.add(new ValidMessage("查询债券信息为空"));
             return validMessages;
         }
-        //该债券信息在系统中已存在，无法加券！
 
         //接口数据转换
         InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = convertInterfPayhsrcsecinfoDto(finListedBondInfoQuery001Dto);

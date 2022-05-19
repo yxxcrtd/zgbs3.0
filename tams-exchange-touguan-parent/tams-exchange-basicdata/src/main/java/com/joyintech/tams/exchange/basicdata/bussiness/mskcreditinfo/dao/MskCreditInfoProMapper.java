@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dao;
 
 
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.tams.common.base.entity.MstBondValuationInfo;
 import com.joyintech.tams.common.base.entity.MstBondValuationInfoKey;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
@@ -37,4 +38,6 @@ public interface MskCreditInfoProMapper {
     List<String> getBusinessData(WflValidInputParameter parameter);
 
     MskCreditInfoProSaveRequest getBasicInfo(Map<String, Object> map);
+
+    List<SelectOptionDto> getFinprodMarketInfo(Map<String, Object> pageParam);
 }
