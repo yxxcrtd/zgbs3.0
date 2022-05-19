@@ -1489,7 +1489,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             errorList.add(new ValidMessage("认购量需大于等于标的中单笔最低量!"));
         }
         if (StringUtil.isNotEmpty(finProductIssue.getMaxPamt())
-                && BigDecimalUtil.ACompareToB(dto.getSubscriptionAmount(), finProductIssue.getMaxPamt(), 6) >= 0) {
+                && BigDecimalUtil.ACompareToB(dto.getSubscriptionAmount(), finProductIssue.getMaxPamt(), 6) > 0) {
             errorList.add(new ValidMessage("认购量需小于等于单笔最高量!"));
         }
         // 校验当前资产+证券账户维度下流程中、有效的申购记录认购量之和需小于等于标的中最高认购总量，如标的中无数据则不用判断
@@ -1497,6 +1497,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         param.put("secManageAcctId", secManageAcctId);
         param.put("finprodId", dto.getFinprodId());
         BigDecimal sumSubAmt = cfetsTrdBondFirstSub002Mapper.selectSumSubAmtBySecAcctIdAndFin(param);
+        sumSubAmt = ArithmeticUtil.doAdd(sumSubAmt,dto.getSubscriptionAmount());
         logger.debug("数值校验,当前资产+证券账户维度下流程中、有效的申购记录认购量之和:" + sumSubAmt);
         if (StringUtil.isNotEmpty(finProductIssue.getMaxTotalamt())
                 && BigDecimalUtil.ACompareToB(sumSubAmt, finProductIssue.getMaxTotalamt(), 6) >= 0) {
