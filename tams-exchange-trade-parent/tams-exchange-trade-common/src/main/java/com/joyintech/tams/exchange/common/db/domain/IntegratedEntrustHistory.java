@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.exchange.common.utils.DoubleSerializerUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
+import io.swagger.annotations.ApiModelProperty;
 import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
@@ -152,18 +153,22 @@ public class IntegratedEntrustHistory implements Serializable {
     private String targetType;
     private String isNoGuard;
     private String isFullPrice;
+
+
+    private String tradeId;
+    private String tradeName;
+    private String dealerId;
+    private String dealerName;
     private String ownerType;
     private String investorId;
     private String investorName;
-    private String propInvestorId;
-    private String propInvestorName;
-    private String tradeId;
-    private String dealerId;
-    private String dealerName;
     private String counterId;
     private String propTradeId;
+    private String propTradeName;
     private String propDealerId;
     private String propDealerName;
+    private String propInvestorId;
+    private String propInvestorName;
     private String propOwnerType;
 
     @Id
@@ -877,5 +882,21 @@ public class IntegratedEntrustHistory implements Serializable {
 
     public void setPropOwnerType(String propOwnerType) {
         this.propOwnerType = propOwnerType;
+    }
+
+    public String getTradeName() {
+        return tradeName;
+    }
+
+    public void setTradeName(String tradeName) {
+        this.tradeName = tradeName;
+    }
+
+    public String getPropTradeName() {
+        return propTradeName;
+    }
+
+    public void setPropTradeName(String propTradeName) {
+        this.propTradeName = propTradeName;
     }
 }

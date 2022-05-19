@@ -122,6 +122,20 @@
                 AND PAYHSRCSECINFO.MARKET = #{market,jdbcType=VARCHAR}
             </if>
 
+            <if test="secTypes != null and secTypes.size() > 0">
+                AND PAYHSRCSECINFO.SECTYPE in
+                <foreach collection="secTypes" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="secType2s != null and secType2s.size() > 0">
+                AND PAYHSRCSECINFO.SECTYPE2 in
+                <foreach collection="secType2s" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+
             <if test="institution !=null and institution !=''">
                 AND PAYHSRCSECINFO.institution = #{institution,jdbcType=VARCHAR}
             </if>

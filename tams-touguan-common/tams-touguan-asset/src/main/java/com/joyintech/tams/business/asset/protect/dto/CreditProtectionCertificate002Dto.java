@@ -6,6 +6,7 @@ import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.tams.component.business.core.dto.FileCommonDto;
+import com.joyintech.tams.invest.common.dto.MstFileInputParameter;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
@@ -211,6 +212,57 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
      */
     private List<UploadFile> fileArray;
 
+    /**
+     * 附件
+     */
+    @ApiModelProperty(name="mstFileInputParameter",value="附件")
+    private MstFileInputParameter mstFileInputParameter;
+
+    private String isOrNoStr;
+    private String settleMethodStr;
+    private String refEntityStr;
+    private String issuershortStr;
+    private String tradeMarketStr;
+
+    public String getIsOrNoStr() {
+        return isOrNoStr;
+    }
+
+    public void setIsOrNoStr(String isOrNoStr) {
+        this.isOrNoStr = isOrNoStr;
+    }
+
+    public String getSettleMethodStr() {
+        return settleMethodStr;
+    }
+
+    public void setSettleMethodStr(String settleMethodStr) {
+        this.settleMethodStr = settleMethodStr;
+    }
+
+    public String getRefEntityStr() {
+        return refEntityStr;
+    }
+
+    public void setRefEntityStr(String refEntityStr) {
+        this.refEntityStr = refEntityStr;
+    }
+
+    public String getIssuershortStr() {
+        return issuershortStr;
+    }
+
+    public void setIssuershortStr(String issuershortStr) {
+        this.issuershortStr = issuershortStr;
+    }
+
+    public String getTradeMarketStr() {
+        return tradeMarketStr;
+    }
+
+    public void setTradeMarketStr(String tradeMarketStr) {
+        this.tradeMarketStr = tradeMarketStr;
+    }
 
     public String getFinprodId() {
         return finprodId;
@@ -507,5 +559,13 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
 
     public void setFileArray(List<UploadFile> fileArray) {
         this.fileArray = fileArray;
+    }
+
+    public MstFileInputParameter getMstFileInputParameter() {
+        return mstFileInputParameter;
+    }
+
+    public void setMstFileInputParameter(MstFileInputParameter mstFileInputParameter) {
+        this.mstFileInputParameter = mstFileInputParameter;
     }
 }

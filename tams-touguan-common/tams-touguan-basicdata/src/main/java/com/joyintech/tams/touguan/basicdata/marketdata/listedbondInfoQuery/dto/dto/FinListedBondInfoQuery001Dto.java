@@ -10,6 +10,7 @@ import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.d
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondPayHSrcSecOptionDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.apache.commons.compress.utils.Lists;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -178,8 +179,17 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     @ApiModelProperty(name = "issueEndTime", value = "发行结束时间")
     private Date issueEndTime;
 
-    @ApiModelProperty(name = "bidDate", value = "投标日")
-    private Date bidDate;
+    @ApiModelProperty(name = "bidBeginDate", value = "投标日开始时间")
+    private Date bidBeginDate;
+
+    @ApiModelProperty(name = "bidEndDate", value = "投标日结束时间")
+    private Date bidEndDate;
+
+    @ApiModelProperty(name = "additionalTenderBeginDate", value = "增发投标日开始时间")
+    private Date additionalTenderBeginDate;
+
+    @ApiModelProperty(name = "additionalTenderEndDate", value = "增发投标日结束时间")
+    private Date additionalTenderEndDate;
 
     @ApiModelProperty(name = "additionalTenderDate", value = "增发投标日")
     private Date additionalTenderDate;
@@ -626,14 +636,6 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.issueEndTime = issueEndTime;
     }
 
-    public Date getBidDate() {
-        return bidDate;
-    }
-
-    public void setBidDate(Date bidDate) {
-        this.bidDate = bidDate;
-    }
-
     public Date getAdditionalTenderDate() {
         return additionalTenderDate;
     }
@@ -824,5 +826,51 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
 
     public void setFinprodId(String finprodId) {
         this.finprodId = finprodId;
+    }
+
+    public Date getBidBeginDate() {
+        return bidBeginDate;
+    }
+
+    public void setBidBeginDate(Date bidBeginDate) {
+        this.bidBeginDate = bidBeginDate;
+    }
+
+    public Date getBidEndDate() {
+        return bidEndDate;
+    }
+
+    public List<Date> getBidDates() {
+        List<Date> bidDates = Lists.newArrayList();
+        bidDates.add(getBidBeginDate());
+        bidDates.add(getBidEndDate());
+        return bidDates;
+    }
+
+    public void setBidEndDate(Date bidEndDate) {
+        this.bidEndDate = bidEndDate;
+    }
+
+    public List<Date> getAdditionalTenderDates() {
+        List<Date> additionalTenderDates = Lists.newArrayList();
+        additionalTenderDates.add(getAdditionalTenderBeginDate());
+        additionalTenderDates.add(getAdditionalTenderEndDate());
+        return additionalTenderDates;
+    }
+
+    public Date getAdditionalTenderBeginDate() {
+        return additionalTenderBeginDate;
+    }
+
+    public void setAdditionalTenderBeginDate(Date additionalTenderBeginDate) {
+        this.additionalTenderBeginDate = additionalTenderBeginDate;
+    }
+
+    public Date getAdditionalTenderEndDate() {
+        return additionalTenderEndDate;
+    }
+
+    public void setAdditionalTenderEndDate(Date additionalTenderEndDate) {
+        this.additionalTenderEndDate = additionalTenderEndDate;
     }
 }

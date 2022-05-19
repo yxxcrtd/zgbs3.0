@@ -68,6 +68,22 @@ public class FinBondMarketInfoQuery001Service extends BaseService {
         logger.info("queryForPage >> 债券市场信息分页查询参数：{}", JSON.toJSONString(request));
         request.setPlatformDate(iPlatformDate.getSysDateStr());
         PageHelper.startPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize());
+        List<String> secTypes = new ArrayList<>();
+        List<String> secType2s = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(request.getCustomAssetType())) {
+            for (int i = 0; i < request.getCustomAssetType().size(); i++) {
+                if (request.getCustomAssetType().get(i).size() >= 1) {
+                    String type9 = request.getCustomAssetType().get(i).get(0);
+                    secTypes.add(type9);
+                }
+                if (request.getCustomAssetType().get(i).size() >= 2) {
+                    String type10 = request.getCustomAssetType().get(i).get(1);
+                    secType2s.add(type10);
+                }
+            }
+            request.setSecTypes(secTypes);
+            request.setSecType2s(secType2s);
+        }
         List<FinBondMarketInfoQuery001Dto> bondMarketInfoQuery004Dtos = finBondMarketInfoQueryMapper.queryForPage(request);
         return new Page<>(PageInfo.of(bondMarketInfoQuery004Dtos));
     }

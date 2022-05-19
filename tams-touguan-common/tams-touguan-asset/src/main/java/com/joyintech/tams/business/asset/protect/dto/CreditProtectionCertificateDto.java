@@ -24,10 +24,12 @@ public class CreditProtectionCertificateDto extends BaseEntity implements Proces
     private String finprodAbbr;//		资产简称
     private String tradeMarket;
     private String tradeMarketStr;//		交易场所
+    private String issueRshort;
     private String issueRshortStr;//		创设机构
     private BigDecimal issueAmt;//		名义本金总金额（万元）
     private String protectObject;//		保护对象
     private String protectObjectStr;//		保护对象
+    private String refEntityId;
     private String refEntity;//		参考实体
     private String refSec;//		参考债项
     private String refSecFeatures;//		参考债项特征
@@ -94,6 +96,22 @@ public class CreditProtectionCertificateDto extends BaseEntity implements Proces
 
     public void setTradeMarketStr(String tradeMarketStr) {
         this.tradeMarketStr = tradeMarketStr;
+    }
+
+    public String getIssueRshort() {
+        return issueRshort;
+    }
+
+    public void setIssueRshort(String issueRshort) {
+        this.issueRshort = issueRshort;
+    }
+
+    public String getRefEntityId() {
+        return refEntityId;
+    }
+
+    public void setRefEntityId(String refEntityId) {
+        this.refEntityId = refEntityId;
     }
 
     public String getIssueRshortStr() {

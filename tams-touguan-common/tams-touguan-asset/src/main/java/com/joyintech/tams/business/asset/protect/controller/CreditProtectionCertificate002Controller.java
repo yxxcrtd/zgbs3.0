@@ -11,19 +11,16 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.asset.bond.dto.FinAssetRateAdjRequest;
-import com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificate002Dto;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificate004Dto;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateDto;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateInsertRequest;
 import com.joyintech.tams.business.asset.protect.service.CreditProtectionCertificate002Service;
 import com.joyintech.tams.business.common.pojo.Message;
-import com.joyintech.tams.business.common.util.ValidUtils;
+import com.joyintech.tams.common.base.entity.SysUploadFileInfo;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -37,7 +34,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -196,6 +195,50 @@ public class CreditProtectionCertificate002Controller extends BaseController {
             return Message.success("该资产是否有交易数据check",true);
         }
         return  Message.success("该资产是否有交易数据check",false);
+    }
+
+    /**
+     * 附件上传
+     * @param file  入参
+     * @return 处理结果
+     * @throws IOException 异常信息
+     */
+    @ApiOperation(value = "附件上传", notes = "附件上传")
+    @ResponseBody
+    @PostMapping(value = "/UploadFile")
+    public Message<SysUploadFileInfo> UploadFile(MultipartFile file) {
+        try {
+            if (StringUtil.isNotEmpty(file)) {
+                SysUploadFileInfo fileInfo = creditProtectionCertificate002Service.getUploadFileInfo(file);
+                return new Message<SysUploadFileInfo>().success().setData(fileInfo);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return new Message<SysUploadFileInfo>().fail().setMessage("文件上传异常");
+        }
+        return null;
+    }
+
+    /**
+     * 附件删除
+     * @param file  入参
+     * @return 处理结果
+     * @throws IOException 异常信息
+     */
+    @ApiOperation(value = "附件删除", notes = "附件删除")
+    @ResponseBody
+    @PostMapping(value = "/deleteFile")
+    public Message<AjaxResult> UploadFile(SysUploadFileInfo file) {
+        try {
+            if (StringUtil.isNotEmpty(file)) {
+                AjaxResult ajaxResult = creditProtectionCertificate002Service.delFileInfo(file);
+                return new Message<AjaxResult>().success().setData(ajaxResult);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return new Message<AjaxResult>().fail().setMessage("文件删除异常");
+        }
+        return null;
     }
 
 

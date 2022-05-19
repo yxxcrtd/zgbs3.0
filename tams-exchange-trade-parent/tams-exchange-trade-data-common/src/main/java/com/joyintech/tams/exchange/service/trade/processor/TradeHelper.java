@@ -2,6 +2,7 @@ package com.joyintech.tams.exchange.service.trade.processor;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.joyintech.exchange.service.quote.service.QuoteService;
@@ -10,6 +11,8 @@ import com.joyintech.tams.exchange.common.BusinessResultException;
 import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.bean.investment.ReqRiskTrigger;
 import com.joyintech.tams.exchange.common.bean.investment.RiskOccupyBean;
+import com.joyintech.tams.exchange.common.bean.request.TradeInfoProRequest;
+import com.joyintech.tams.exchange.common.bean.response.TradeInfoProResponse;
 import com.joyintech.tams.exchange.common.bean.terminal.RTGSStatusBean;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.instrument.SubStockType;
@@ -59,6 +62,7 @@ import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_质押�
 import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_质押券出库;
 import static com.joyintech.tams.exchange.common.constant.EntrustProp.*;
 import static com.joyintech.tams.exchange.common.constant.OthCodeType.*;
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_现券交易;
 import static com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1.NEGOTIATED_REPO;
 
 @Service
@@ -1250,6 +1254,9 @@ public class TradeHelper {
             integratedEntrust.setEntrustClass(instruction.getEntrustClass());
             integratedEntrust.setAccountName(instruction.getAcctName());
 
+            fillSelfDealerTradeInfo(integratedEntrust);
+            fillPropDealerTradeInfo(integratedEntrust);
+
             integratedEntrustService.asyncUpdate(integratedEntrust);
             handleWorkflow(null, integratedEntrust, workflow);
             logger.info("start handle integratedEntrust {}", integratedEntrust.getId());
@@ -1260,6 +1267,62 @@ public class TradeHelper {
             integratedEntrust.setErrorMsg(errorCode.errorMsg);
         }
         return integratedEntrust;
+    }
+
+    private void fillSelfDealerTradeInfo(IntegratedEntrust integratedEntrust) {
+        if (!StringUtil.equals(投管业务类型_现券交易.getValue(), integratedEntrust.getBusiTypeTg())
+                || !EntrustProp.isConsultingTrade(integratedEntrust.getEntrustProp())) {
+            return;
+        }
+        TradeInfoProRequest dto = new TradeInfoProRequest();
+        dto.setAcctNo(integratedEntrust.getAccountId());
+        dto.setTradePlace(Market.SZSE.investValue);
+        dto.setIsOur("Y");
+        List<TradeInfoProResponse> dealerTraderList = commonManagement.getDealerTraderInfo(dto);
+
+        if (CollectionUtils.isEmpty(dealerTraderList)) {
+            logger.error("fillSelfDealerTradeInfo error: 本方交易商、交易主体、交易员信息不存在");
+            return;
+        }
+        TradeInfoProResponse tradeInfo = dealerTraderList.get(0);
+        integratedEntrust.setDealerId(tradeInfo.getDealerNo());
+        integratedEntrust.setDealerName(tradeInfo.getDealerName());
+        integratedEntrust.setInvestorId(tradeInfo.getDealerPartyNo());
+        integratedEntrust.setInvestorName(tradeInfo.getDealerPartyName());
+        integratedEntrust.setOwnerType(tradeInfo.getDealerPartyType());
+        integratedEntrust.setTradeId(tradeInfo.getTraderNo());
+        integratedEntrust.setTradeName(tradeInfo.getTraderName());
+    }
+
+    private void fillPropDealerTradeInfo(IntegratedEntrust integratedEntrust) {
+        if (!StringUtil.equals(投管业务类型_现券交易.getValue(), integratedEntrust.getBusiTypeTg())
+                || !EntrustProp.isConsultingTrade(integratedEntrust.getEntrustProp())) {
+            return;
+        }
+
+        integratedEntrust.setPropDealerName(integratedEntrust.getPropDealerId());
+        integratedEntrust.setPropInvestorName(integratedEntrust.getPropInvestorId());
+        integratedEntrust.setPropTradeName(integratedEntrust.getPropTradeId());
+
+        TradeInfoProRequest dto = new TradeInfoProRequest();
+        dto.setTradePlace(Market.getInvestValue(integratedEntrust.getMarket()));
+        dto.setDealerNo(integratedEntrust.getPropDealerId());
+        List<TradeInfoProResponse> list = commonManagement.getCounterDealerTraderInfo(dto);
+        if (CollectionUtils.isEmpty(list)) {
+            logger.error("fillPropDealerTradeInfo error: 对方交易商、交易主体、交易员信息不存在");
+            return;
+        }
+        TradeInfoProResponse proResponse = list.get(0);
+        integratedEntrust.setPropDealerName(proResponse.getDealerName());
+
+        if (StringUtil.isNotEmpty(integratedEntrust.getPropInvestorId())) {
+            Optional<TradeInfoProResponse> response = list.stream()
+                    .filter(o -> StringUtil.equals(o.getDealerPartyNo(), integratedEntrust.getPropInvestorId())).findFirst();
+            response.ifPresent(tradeInfoProResponse -> integratedEntrust.setPropInvestorName(tradeInfoProResponse.getDealerPartyName()));
+        }
+        Optional<TradeInfoProResponse> propTrade = list.stream()
+                .filter(o -> StringUtil.equals(o.getTraderNo(), integratedEntrust.getPropTradeId())).findFirst();
+        propTrade.ifPresent(response -> integratedEntrust.setPropTradeName(response.getTraderName()));
     }
 
     public String getEntrustId(Entrust entrust) {

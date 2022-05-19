@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 债券市场信息查询条件
@@ -20,14 +21,20 @@ public class FinBondMarketInfoQueryRequest {
     @ApiModelProperty(name = "pageMode", value = "分页对象", example = "{pageSize: 10,pageNo: 1, sort: 'name', direction: 'asc'}")
     private PageMode pageMode;
 
-    @ApiModelProperty(name = "secType", value = "债券分类")
-    private String secType;
-
     @ApiModelProperty(name = "secId", value = "债券ID/资产代码")
     private String secId;
 
     @ApiModelProperty(name = "market", value = "市场")
     private String market;
+
+    @ApiModelProperty(name = "secTypes", value = "一级分类")
+    private List<String> secTypes;
+
+    @ApiModelProperty(name = "secType2s", value = "二级分类")
+    private List<String> secType2s;
+
+    @ApiModelProperty(name = "customAssetType", value = "资产分类")
+    private List<List<String>> customAssetType;
 
     @ApiModelProperty(name = "institution", value = "登记托管机构")
     private String institution;
@@ -307,11 +314,27 @@ public class FinBondMarketInfoQueryRequest {
         this.search = search;
     }
 
-    public String getSecType() {
-        return secType;
+    public List<String> getSecTypes() {
+        return secTypes;
     }
 
-    public void setSecType(String secType) {
-        this.secType = secType;
+    public void setSecTypes(List<String> secTypes) {
+        this.secTypes = secTypes;
+    }
+
+    public List<String> getSecType2s() {
+        return secType2s;
+    }
+
+    public void setSecType2s(List<String> secType2s) {
+        this.secType2s = secType2s;
+    }
+
+    public List<List<String>> getCustomAssetType() {
+        return customAssetType;
+    }
+
+    public void setCustomAssetType(List<List<String>> customAssetType) {
+        this.customAssetType = customAssetType;
     }
 }

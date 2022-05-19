@@ -1,8 +1,10 @@
 package com.joyintech.tams.business.asset.protect.dao;
 
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificate002Dto;
 import com.joyintech.tams.business.asset.protect.dto.CreditProtectionCertificateDto;
 import com.joyintech.tams.common.base.entity.FinProductTypeConfig;
+import com.joyintech.tams.common.base.entity.SysUploadFileInfo;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -20,6 +22,12 @@ import java.util.Map;
 public interface CreditProtectionCertificateMapper {
 
     List<CreditProtectionCertificateDto> queryForPage(Map<String, Object> pageParam);
+
+    CreditProtectionCertificate002Dto getByFinProdId(Map<String, Object> pageParam);
+
+    int insertFileSelective(SysUploadFileInfo var1);
+
+    int updateFileByPrimaryKey(SysUploadFileInfo var1);
 
     /**
      * 查询资产代码列表

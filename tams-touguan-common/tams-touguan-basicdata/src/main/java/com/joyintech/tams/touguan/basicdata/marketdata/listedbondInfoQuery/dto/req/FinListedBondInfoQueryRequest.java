@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 待上市债券市场信息查询条件
@@ -25,6 +26,15 @@ public class FinListedBondInfoQueryRequest {
 
     @ApiModelProperty(name = "secName", value = "资产简称")
     private String secName;
+
+    @ApiModelProperty(name = "primaryClassifications", value = "一级分类")
+    private List<String> primaryClassifications;
+
+    @ApiModelProperty(name = "secondaryClassifications", value = "二级分类")
+    private List<String> secondaryClassifications;
+
+    @ApiModelProperty(name = "customAssetType", value = "资产分类")
+    private List<List<String>> customAssetType;
 
     @ApiModelProperty(name = "tradingPlaces", value = "交易场所/市场")
     private String tradingPlaces;
@@ -55,9 +65,6 @@ public class FinListedBondInfoQueryRequest {
 
     @ApiModelProperty(name = "listingCode", value = "上市代码")
     private String listingCode;
-
-    @ApiModelProperty(name = "secType", value = "债券分类")
-    private String secType;
 
     @ApiModelProperty(name = "registeredCustodian", value = "登记托管机构")
     private String registeredCustodian;
@@ -353,14 +360,6 @@ public class FinListedBondInfoQueryRequest {
         this.listingCode = listingCode;
     }
 
-    public String getSecType() {
-        return secType;
-    }
-
-    public void setSecType(String secType) {
-        this.secType = secType;
-    }
-
     public String getIssueMethod() {
         return issueMethod;
     }
@@ -423,5 +422,29 @@ public class FinListedBondInfoQueryRequest {
 
     public void setRegisteredCustodian(String registeredCustodian) {
         this.registeredCustodian = registeredCustodian;
+    }
+
+    public List<List<String>> getCustomAssetType() {
+        return customAssetType;
+    }
+
+    public void setCustomAssetType(List<List<String>> customAssetType) {
+        this.customAssetType = customAssetType;
+    }
+
+    public List<String> getPrimaryClassifications() {
+        return primaryClassifications;
+    }
+
+    public void setPrimaryClassifications(List<String> primaryClassifications) {
+        this.primaryClassifications = primaryClassifications;
+    }
+
+    public List<String> getSecondaryClassifications() {
+        return secondaryClassifications;
+    }
+
+    public void setSecondaryClassifications(List<String> secondaryClassifications) {
+        this.secondaryClassifications = secondaryClassifications;
     }
 }
