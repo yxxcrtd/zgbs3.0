@@ -546,6 +546,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         finProductType.setBranch(branch);
         Map<String,Object> paramCinfig = new HashMap<>();
         paramCinfig.put("configType",DictCodeListExt2.配置类型_WIND分类.getValue());
+        paramCinfig.put("inputValue1",DictCodeList.平安资产类型_债券.getValue());
         paramCinfig.put("inputValue2",dto.getType9());
         paramCinfig.put("inputValue3",dto.getType10());
         paramCinfig.put("inputValue4",dto.getType11());
