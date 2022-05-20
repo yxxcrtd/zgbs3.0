@@ -10,6 +10,7 @@ import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.system.constant.SystemGlobalConstant;
+import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
@@ -242,32 +243,13 @@ public class MskCreditMarketInfo001Controller extends BaseController {
      * @see
      * @since 1.0
      */
-/*
-    @RequestMapping("export")
-    public ResponseEntity<byte[]> export()
-            throws Exception {
-        *//*String datas = this.getParam("datas");
-        Map<String, Object> params= RequestUtil.getPageParam();
-        List<MskCreditInfoProSaveRequest> list = null;
-        if (StringUtil.isNotEmpty(datas)) {
-            list = JsonUtils.json2List(datas, MskCreditInfoProSaveRequest.class);
-        }
-        else {
-            list = mskCreditMarketInfoPro001Service.selectAllList(params);
-        }*//*
-       *//* File outFile = mskCreditMarketInfoPro001Service.makeFile(
-                "/com/joyintech/tams/common/basicdata/business/mskcreditinfo/conf/export_conf.xml",
-                list);
-        return ExportUtil.export(
-                this.getMessage(this.getPageId()) + SystemGlobalConstant.OPEN_PARENTHESIS
-                        + DateUtil.format(new Date())
-                        + SystemGlobalConstant.CLOSE_PARENTHESIS
-                        + SystemGlobalConstant.POINT
-                        + FileNameUtil.getFileExtName(outFile),
-                outFile, true);*//*
-
-        //}
-    }*/
-
+    @ResponseBody
+    @PostMapping(value = "/export")
+    @ApiOperation(value = "信用保护凭证行情的列表导出", notes = "信用保护凭证行情列表导出")
+    public void export(@RequestBody CfetsExportRequestDto req, HttpServletResponse response) {
+        ExcelUitl.doExport(req, response, "信用保护凭证行情信息", () ->
+                mskCreditMarketInfoPro001Service.selectForPage(req.getDto(MskCreditInfoProRequest.class)).getRoot()
+        );
+    }
 
 }
