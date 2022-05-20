@@ -408,11 +408,14 @@ public class CfetsEtrDispatcherService extends BaseService {
                         || (DictCodeUtil.equals(response.getFinprodType2(),DictCodeList.平安资产类型_质押式回购)
                             && (StringUtil.equals(response.getBusiTypePosition(),DictCodeListExt3.头寸业务类型_质押式回购首期.getValue()) || StringUtil.equals(response.getBusiTypePosition(),DictCodeListExt3.头寸业务类型_质押式回购到期.getValue())))
                         || StringUtil.equals(response.getBusiTypePosition(),DictCodeListExt3.头寸业务类型_现券交易.getValue())
+                        || StringUtil.equals(response.getBusiTypePosition(),DictCodeListExt3.投管业务类型_现券交易.getValue())
                         || (StringUtil.equals(response.getFinprodType2(),BussinessDictCodeList.平安资产类型_基金.getValue()) && StringUtil.isEmpty(response.getBusiTypePosition()))) {
                     DecimalFormat df = new DecimalFormat("0.##");
                     response.setDealProgress(ArithmeticUtil.divide(response.getFinishAmt(), response.getEntrustAmt(), 4).multiply(new BigDecimal("100")));
                     response.setTransRemainderAmt(new BigDecimal(df.format(ArithmeticUtil.divide(ArithmeticUtil.subtract(response.getEntrustAmt(), response.getFinishAmt()), new BigDecimal("10000"), 4))));
                     response.setTransFinishAmt(new BigDecimal(df.format(ArithmeticUtil.divide(response.getFinishAmt(), new BigDecimal("10000"), 4))));
+                    response.setExecFinishAmt(ArithmeticUtil.divide(response.getExecFinishAmt(),new BigDecimal("100"),2,RoundingMode.HALF_UP));
+                    response.setExecRemainderAmt(ArithmeticUtil.divide(response.getExecRemainderAmt(),new BigDecimal("100"),2,RoundingMode.HALF_UP));
                 }
 //                if(StringUtil.equals(response.getFinprodType2(), BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue())){
 //                    response.setPs(null);
