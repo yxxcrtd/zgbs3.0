@@ -156,7 +156,7 @@ public class MstMarketInstitutions002Controller extends BaseController {
             }
         } else {//增加债券/新债页面打开发行人新增页面
             Map<String, Object> map = mstMarketInstitutionsService.autoAddInstitutions(insitituteCode);
-            if (Objects.nonNull(map.get("data")) && Objects.nonNull(map.get("errorCode")) && StringUtil.equals("0", map.get("errorCode"))) {
+            if (Objects.nonNull(map.get("data")) && Objects.nonNull(map.get("errorCode")) && StringUtil.equals("0", map.get("errorCode").toString())) {
                 MstMarketInstitutionsDto dto = (MstMarketInstitutionsDto) map.get("data");
                 dto.setIsIssuer(DictCodeList.是否_是.getValue());
                 model.addAttribute("entity", map.get("data"));

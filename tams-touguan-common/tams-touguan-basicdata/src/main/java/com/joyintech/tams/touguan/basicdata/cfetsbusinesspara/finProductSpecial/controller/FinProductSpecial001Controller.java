@@ -3,8 +3,10 @@ package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.JsonUtils;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
@@ -43,7 +45,7 @@ import java.util.Map;
  * @date 2022-05-06
  */
 @Controller
-@PageId("FinProductSpecial001")
+@PageId("CfetsBasicInfo001")
 @RequestMapping("/business/param/FinProductSpecial001")
 @Api(tags = "银行间基础信息-特殊债券信息")
 public class FinProductSpecial001Controller extends BaseController {
@@ -61,7 +63,23 @@ public class FinProductSpecial001Controller extends BaseController {
     @ResponseBody
     public Message<Map<String, Object>> init() {
         Map<String, Object> model = new HashMap<>(1);
+        model.put("pageId", this.getPageId());
         model.put("YES_OR_NO", this.getSelectDataFromDataDic(DictCode.是否, null));
+
+        String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
+        FinProductSpecialDto entity = new FinProductSpecialDto();
+        if (StringUtil.isNotEmpty(workflowId)) {
+            entity = finProductSpecial001Service.getBussinessEntityByWorkflowId(workflowId);
+            model.put("businessId", entity.getFinprodMarketId());
+        } else {
+            String finprodId = getParam("finprodMarketId");
+            if (StringUtil.isNotEmpty(finprodId)) {
+                //修改
+                entity = finProductSpecial001Service.queryByFinprodMarketId(finprodId);
+                model.put("businessId", entity.getFinprodMarketId());
+            }
+        }
+        model.put(GlobalConstant.ENTITY, entity);
         return new Message<>(model).success();
     }
 
@@ -132,13 +150,28 @@ public class FinProductSpecial001Controller extends BaseController {
     }
 
     /**
+     * 特殊债券信息删除
+     *
+     * @param finProductSpecialDto
+     * @return
+     */
+    @ApiOperation(value = "特殊债券信息删除", notes = "特殊债券信息删除")
+    @PostMapping("/del")
+    @ResponseBody
+    public Message<AjaxResult> del(@RequestBody FinProductSpecialDto finProductSpecialDto) {
+        AjaxResult ajax = new AjaxResult();
+        return Message.success("处理成功", null);
+    }
+
+    /**
      * 导入数据文件之前检查数据
      *
      * @param fileName 导入的文件名
      * @return 处理结果
      */
     @ResponseBody
-    @RequestMapping(value = "checkConfirmMsgForImportData")
+    @PostMapping(value = "checkConfirmMsgForImportData")
+    @ApiOperation(value = "导入数据文件之前检查数据", notes = "导入数据文件之前检查数据")
     public AjaxResult checkConfirmMsgForImportData(String fileName) {
         return finProductSpecialValidatorService.checkConfirmMsgForImportData(fileName);
     }
@@ -150,7 +183,8 @@ public class FinProductSpecial001Controller extends BaseController {
      * @return 导入结果，包含验证内容，如果验证失败，返回message
      */
     @ResponseBody
-    @RequestMapping("/importFile")
+    @PostMapping("/importFile")
+    @ApiOperation(value = "导入数据文件", notes = "导入数据文件")
     public List<ExcelValidDto> importData(String fileName) {
         return finProductSpecial001Service.importData(fileName);
     }

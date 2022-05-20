@@ -253,6 +253,9 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                 ValidUtils.valid(request,validMessages);
                 ValidUtils.valid(request.getFinProductConvertible(),validMessages);
                 ValidUtils.valid(request.getFinInterestFactorDto(),validMessages);
+                if(StringUtil.isEmpty(request.getType9()) || StringUtil.isEmpty(request.getType10()) && StringUtil.isEmpty(request.getType11())) {
+                    validMessages.add(new ValidMessage("资产类型不能为空"));
+                }
                 validMessages.addAll(finBondAssetValidatorService.valid(request));
                 if(CollectionUtils.isNotEmpty(validMessages)) {
                     return request;

@@ -36,7 +36,7 @@ public class StandardCouponReConversionRateValidator implements BeanValidator {
                 resultList.add(new ValidMessage(this.getMessage("存在流程中的数据，请维护相同模式的数据", dto.getTandardRate ())));
                 return resultList;
             }
-            if(StringUtils.isNotEmpty(vo.getFinprodId())&&StringUtils.isEmpty(vo.getAccountType())){
+            if(StringUtils.isNotEmpty(dto.getFinprodId())&&StringUtils.isEmpty(dto.getAccountType())){
                 vo.setFinprodId("system");
                 List<StandardCouponReConversionRateDto> list = standardCouponReConversionRateService.getList(dto);
                 if(!list.isEmpty()&&list.size()>0){
@@ -44,7 +44,7 @@ public class StandardCouponReConversionRateValidator implements BeanValidator {
                     return resultList;
                 }
             }
-            if(StringUtils.isEmpty(vo.getFinprodId())&&StringUtils.isNotEmpty(vo.getAccountType())){
+            if(StringUtils.isEmpty(dto.getFinprodId())&&StringUtils.isNotEmpty(dto.getAccountType())){
                 vo.setAccountType("system");
                 List<StandardCouponReConversionRateDto> list = standardCouponReConversionRateService.getList(dto);
                 if(!list.isEmpty()&&list.size()>0){

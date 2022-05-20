@@ -8,6 +8,8 @@ import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.List;
+
 
 @ApiModel(value="信用保护凭证行情信息请求参数",description="信用保护凭证行情信息请求参数")
 public class MskCreditInfoProRequest {
@@ -20,6 +22,17 @@ public class MskCreditInfoProRequest {
 
     @ApiModelProperty(name="secid",value="凭证代码",example="A1", required = true)
     private String secid;
+
+    @ApiModelProperty(name="date",value="估值日",example="A1", required = true)
+    private List<String> date;
+
+    public List<String> getDate() {
+        return date;
+    }
+
+    public void setDate(List<String> date) {
+        this.date = date;
+    }
 
     @ApiModelProperty(name="cdate",value="估值日",example="A1", required = true)
     private String cdate;

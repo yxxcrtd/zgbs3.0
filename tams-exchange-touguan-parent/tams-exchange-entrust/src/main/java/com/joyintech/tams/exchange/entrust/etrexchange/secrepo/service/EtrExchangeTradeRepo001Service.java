@@ -335,7 +335,7 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
     @Override
     public void doUpdate(EtrExchangeTradeSecRepoSaveRepoRequest entity) {
 
-        if(StringUtil.isEmpty(entity.getPortfolioId()) && !CollectionUtils.isEmpty(entity.getPortfolioList())){
+        if(!CollectionUtils.isEmpty(entity.getPortfolioList())){
             entity.setPortfolioId(entity.getPortfolioList().get(0).getPortfolioId());
             entity.setAcctNo(entity.getPortfolioList().get(0).getAcctNo());
         }
@@ -504,6 +504,7 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
         if (StringUtil.isNotEmpty(processMark)
                 && StringUtil.equals(processMark.getStatus(), DictCodeList.数据状态_修改中.getValue())) {
             EtrExchangeTradeSecRepoSaveRepoRequest entity = getBussinessEntityByWorkflowId(workflowId);
+            etrExchangeTradeSecRepo001Service.backReRoll(entity.getEntrustId());
             positionRequestService.sendDelete(entity);
         }
         //增加调用头寸引擎代码end

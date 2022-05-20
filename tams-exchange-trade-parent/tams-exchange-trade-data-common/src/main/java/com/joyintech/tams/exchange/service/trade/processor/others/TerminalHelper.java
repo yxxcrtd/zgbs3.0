@@ -8,7 +8,10 @@ import com.joyintech.tams.exchange.common.bean.bond.StandardBondQryBean;
 import com.joyintech.tams.exchange.common.bean.investment.CapitalAccountBean;
 import com.joyintech.tams.exchange.common.bean.request.TradeInfoProRequest;
 import com.joyintech.tams.exchange.common.bean.response.TradeInfoProResponse;
-import com.joyintech.tams.exchange.common.constant.*;
+import com.joyintech.tams.exchange.common.constant.AgentType;
+import com.joyintech.tams.exchange.common.constant.EntrustSide;
+import com.joyintech.tams.exchange.common.constant.ErrorCode;
+import com.joyintech.tams.exchange.common.constant.Market;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.utils.ConvertListUtils;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
@@ -626,13 +629,13 @@ public class TerminalHelper {
             return list;
         }
         TradeInfoProResponse tradeInfoProResponse = dealerTraderList.get(0);
-        if(StringUtil.isEmpty(negotiateQuoteQueryBean.getMemberId())){
+        if (StringUtil.isEmpty(negotiateQuoteQueryBean.getMemberId())) {
             negotiateQuoteQueryBean.setMemberId(tradeInfoProResponse.getDealerNo());
         }
-        if(StringUtil.isEmpty(negotiateQuoteQueryBean.getInvestorId())){
+        if (StringUtil.isEmpty(negotiateQuoteQueryBean.getInvestorId())) {
             negotiateQuoteQueryBean.setInvestorId(tradeInfoProResponse.getDealerPartyNo());
         }
-        if(StringUtil.isEmpty(negotiateQuoteQueryBean.getTraderCode())){
+        if (StringUtil.isEmpty(negotiateQuoteQueryBean.getTraderCode())) {
             negotiateQuoteQueryBean.setTraderCode(tradeInfoProResponse.getTraderNo());
         }
 
@@ -648,6 +651,12 @@ public class TerminalHelper {
                                 }
                                 return true;
                             }).collect(Collectors.toList()));
+
+                    list.forEach(o -> {
+                        o.setMemberName(tradeInfoProResponse.getDealerName());
+                        o.setInvestorName(tradeInfoProResponse.getDealerPartyName());
+                        o.setTraderName(tradeInfoProResponse.getTraderName());
+                    });
                 }
             } catch (Exception e) {
                 logger.error("reqIntegratedFixedIncomeQuote error {}", "\r\n" + e);

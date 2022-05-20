@@ -5,11 +5,13 @@ import com.joyintech.framework.ajax.JoyinMessage;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.system.constant.SystemGlobalConstant;
+import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
@@ -24,6 +26,7 @@ import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
+import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
@@ -219,12 +222,12 @@ public class MskCreditMarketInfo001Controller extends BaseController {
         params.setElementId(dto.getElementId());
         params.setBusinessCode(item -> item.getSecid());
         params.setBusinessType(DictCodeList.共通业务类型_信用保护凭证行情.getValue());
-        // 设置流程业务说明, entity即传入的dto
-        // 业务说明：债券代码 + "(" + 债券代码 + ")" + "-" + "估值日" + "-" + "估值日"
-        params.setComment(entity -> SpringContextUtil.getTextValue("MstCreditMarketInfo001.secid") + "(" + entity.getSecid() + ")" + "-"
-                + SpringContextUtil.getTextValue("MstCreditMarketInfo001.cdate") + "("
-                + entity.getCdate() + ")"+ this.getMessage("MstCreditMarketInfo001.valueSource") + "("
-                + entity.getValueSourceStr() + ")");
+        params.setComment(entity1 -> {
+            return WorkFlowUtil.concatComment("资产代码"+
+                    GlobalConstant.OPEN_PARENTHESIS+entity1.getSecid()+GlobalConstant.CLOSE_PARENTHESIS
+                    +"估值日期"+GlobalConstant.OPEN_PARENTHESIS+entity1.getCdate()+GlobalConstant.CLOSE_PARENTHESIS
+                     +"估值来源"+GlobalConstant.OPEN_PARENTHESIS+entity1.getValueSourceStr()+GlobalConstant.CLOSE_PARENTHESIS);
+        });
         processParameter.setWorkFlowParameter(params);
         processParameter.setOperationType(OperationType.DELETE);
         String msg = mskCreditMarketInfoPro001Service.start(processParameter,
@@ -242,32 +245,13 @@ public class MskCreditMarketInfo001Controller extends BaseController {
      * @see
      * @since 1.0
      */
-/*
-    @RequestMapping("export")
-    public ResponseEntity<byte[]> export()
-            throws Exception {
-        *//*String datas = this.getParam("datas");
-        Map<String, Object> params= RequestUtil.getPageParam();
-        List<MskCreditInfoProSaveRequest> list = null;
-        if (StringUtil.isNotEmpty(datas)) {
-            list = JsonUtils.json2List(datas, MskCreditInfoProSaveRequest.class);
-        }
-        else {
-            list = mskCreditMarketInfoPro001Service.selectAllList(params);
-        }*//*
-       *//* File outFile = mskCreditMarketInfoPro001Service.makeFile(
-                "/com/joyintech/tams/common/basicdata/business/mskcreditinfo/conf/export_conf.xml",
-                list);
-        return ExportUtil.export(
-                this.getMessage(this.getPageId()) + SystemGlobalConstant.OPEN_PARENTHESIS
-                        + DateUtil.format(new Date())
-                        + SystemGlobalConstant.CLOSE_PARENTHESIS
-                        + SystemGlobalConstant.POINT
-                        + FileNameUtil.getFileExtName(outFile),
-                outFile, true);*//*
-
-        //}
-    }*/
-
+    @ResponseBody
+    @PostMapping(value = "/export")
+    @ApiOperation(value = "信用保护凭证行情的列表导出", notes = "信用保护凭证行情列表导出")
+    public void export(@RequestBody CfetsExportRequestDto req, HttpServletResponse response) {
+        ExcelUitl.doExport(req, response, "信用保护凭证行情信息", () ->
+                mskCreditMarketInfoPro001Service.selectForPage(req.getDto(MskCreditInfoProRequest.class)).getRoot()
+        );
+    }
 
 }

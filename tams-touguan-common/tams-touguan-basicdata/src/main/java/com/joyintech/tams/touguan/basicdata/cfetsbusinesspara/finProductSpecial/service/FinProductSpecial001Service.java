@@ -64,8 +64,11 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
      * @param request
      * @return
      */
-    public List<FinProductSpecialSelectOptionDto> querySelectOption(FinProductSpecialSelectOptionQueryRequest request) {
-        return finProductSpecial001Mapper.querySelectOption(request);
+    public Page<FinProductSpecialSelectOptionDto> querySelectOption(FinProductSpecialSelectOptionQueryRequest request) {
+        Page<FinProductSpecialSelectOptionDto> page = super.queryForPageForSelectReturn(request.getPageNo(),
+                request.getPageSize(),
+                () -> finProductSpecial001Mapper.querySelectOption(request));
+        return page;
     }
 
 
@@ -152,6 +155,16 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
     }
 
     /**
+     * 查询
+     *
+     * @param finprodMarketId
+     * @return
+     */
+    public FinProductSpecialDto queryByFinprodMarketId(String finprodMarketId) {
+        return finProductSpecial001Mapper.queryByFinprodMarketId(finprodMarketId);
+    }
+
+    /**
      * 导入数据转换
      *
      * @param dataList
@@ -171,4 +184,6 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
         }
         return entities;
     }
+
+
 }

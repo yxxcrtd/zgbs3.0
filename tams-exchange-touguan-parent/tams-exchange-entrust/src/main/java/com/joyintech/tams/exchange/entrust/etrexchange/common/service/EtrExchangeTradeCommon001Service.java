@@ -5357,23 +5357,21 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
      * @date 2021/12/25 0013
      */
     public List<EtrExchangeTradeSaveRequest> selectEtrPortfolioList(EtrExchangeTradeSaveRequest dto) {
-        List<EtrExchangeTradeSaveRequest> list= etrExchangeTradeCommonMapper.selectEntrustDetail(dto);
-        if(!CollectionUtils.isEmpty(list)){
-            return list;
-        }else{
-            ProcessMark processMark = new ProcessMark();
-            processMark.setBusinessDataPk1(dto.getEntrustId());
-            String workflowId = WorkflowContext.getProcessMarkService().getLastWorkflowId(processMark);
-            EtrExchangeTradeSaveRequest  entity = etrExchangeTrade001CommonService.getBussinessEntityByWorkflowId(workflowId);
-            List<EtrExchangeTradePortfolioRequest> portlist=entity.getPortfolioList();
-            List<EtrExchangeTradeSaveRequest> tradeList=new ArrayList<>();
-            for(EtrExchangeTradePortfolioRequest port:portlist){
-                EtrExchangeTradeSaveRequest etrExchangeTrade001Dto = new EtrExchangeTradeSaveRequest();
-                BeanUtil.copyPropertiesIgnoreNull(etrExchangeTrade001Dto, port);
-                tradeList.add(etrExchangeTrade001Dto);
-            }
-            return tradeList;
+        List<EtrExchangeTradeSaveRequest> tradeList = new ArrayList<>();
+        ProcessMark processMark = new ProcessMark();
+        processMark.setBusinessDataPk1(dto.getEntrustId());
+        String workflowId = WorkflowContext.getProcessMarkService().getLastWorkflowId(processMark);
+        EtrExchangeTradeSaveRequest entity = etrExchangeTrade001CommonService.getBussinessEntityByWorkflowId(workflowId);
+        List<EtrExchangeTradePortfolioRequest> portlist = entity.getPortfolioList();
+        for (EtrExchangeTradePortfolioRequest port : portlist) {
+            EtrExchangeTradeSaveRequest etrExchangeTrade001Dto = new EtrExchangeTradeSaveRequest();
+            BeanUtil.copyPropertiesIgnoreNull(etrExchangeTrade001Dto, port);
+            tradeList.add(etrExchangeTrade001Dto);
         }
+        if (CollectionUtils.isEmpty(tradeList)) {
+            tradeList = etrExchangeTradeCommonMapper.selectEntrustDetail(dto);
+        }
+        return tradeList;
     }
 
     /**

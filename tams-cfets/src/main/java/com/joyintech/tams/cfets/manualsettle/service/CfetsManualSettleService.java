@@ -595,10 +595,11 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                         positionRulePtlData.setSecAcctId(secAcctId); // 证券账户
                     }
                 }
-                positionRulePtlData.setSecAmount(dto.getShareAmt());
+                positionRulePtlData.setSecAmount(ArithmeticUtil.multiply(dto.getShareAmt(),new BigDecimal(100)));
                 positionRulePtlData.setCashAmount(dto.getTradeAmt());
-                positionRulePtlData.setOwnSecAmount(dto.getShareAmt().toPlainString());
+                positionRulePtlData.setOwnSecAmount(ArithmeticUtil.multiply(dto.getShareAmt(),new BigDecimal(100)).toPlainString());
                 positionRulePtlData.setInvAim(dto.getInvAim());
+                positionRulePtlData.setEtrId(dto.getEntrustId());
                 ptlList.add(positionRulePtlData);
             }
 

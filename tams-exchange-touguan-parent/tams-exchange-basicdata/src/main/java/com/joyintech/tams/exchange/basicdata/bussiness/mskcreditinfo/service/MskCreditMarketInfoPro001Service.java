@@ -43,13 +43,15 @@ public class MskCreditMarketInfoPro001Service extends BaseService<MskCreditInfoP
         pageParam.put("secIdList", StringUtil.splitToList(null, request.getSecid()));
         pageParam.put("valueSourceStr", request.getValueSource());
         pageParam.put("search_isNumberFlag", BaseMap.isNumeric(request.getSearch()));
-        String cdateStart = request.getCdateStart();
-        if (StringUtil.isNotEmpty(cdateStart)){
-            pageParam.put("cdateStart",cdateStart);
-        }
-        String cdateEnd = request.getCdateEnd();
-        if (StringUtil.isNotEmpty(cdateEnd)){
-            pageParam.put("cdateEnd",cdateEnd);
+        if (CollectionUtils.isNotEmpty(request.getDate())) {
+            String cdateStart = request.getDate().get(0);
+            if (StringUtil.isNotEmpty(cdateStart)){
+                pageParam.put("cdateStart",cdateStart);
+            }
+            String cdateEnd = request.getDate().get(1);
+            if (StringUtil.isNotEmpty(cdateEnd)){
+                pageParam.put("cdateEnd",cdateEnd);
+            }
         }
         Page<MskCreditInfoProSaveRequest> page
                 =  super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(),

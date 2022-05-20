@@ -381,7 +381,7 @@
 			   COMPANY_NATURE as companyNature,
 			   REMARK as remark,
 			   HS_TYPE as hsType
-		FROM INTERF_CUSTOMER_INFO where (INSITITUTE_CODE=#{insitituteCode} or CUSTOMER_ID=#{insitituteCode}) and ROWNUM=1
+		FROM INTERF_CUSTOMER_INFO where (INSITITUTE_CODE=#{insitituteCode} or CUSTOMER_ID=#{insitituteCode} or CUSTOMER_NAME=#{insitituteCode}) and ROWNUM=1
 	</select>
 
 </mapper>

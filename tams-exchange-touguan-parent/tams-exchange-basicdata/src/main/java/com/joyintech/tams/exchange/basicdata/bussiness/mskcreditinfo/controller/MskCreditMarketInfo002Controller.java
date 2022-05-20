@@ -148,11 +148,12 @@ public class MskCreditMarketInfo002Controller extends BaseController {
         params.setBusinessCode(dto.getSecid());
         params.setBusinessType(DictCodeList.共通业务类型_信用保护凭证行情.getValue());
 
-        // 设置流程业务说明, entity即传入的dto
-        params.setComment(entity -> this.getMessage("MstCreditMarketInfo002.secid") + "(" + entity.getSecid() + ")" + "-"
-            + this.getMessage("MstCreditMarketInfo002.cdate") + "("
-            + entity.getCdate() + ")"+ this.getMessage("MstCreditMarketInfo002.valueSource") + "("
-            + entity.getValueSourceStr() + ")");
+        params.setComment(entity1 -> {
+            return WorkFlowUtil.concatComment("资产代码"+
+                    GlobalConstant.OPEN_PARENTHESIS+entity1.getSecid()+GlobalConstant.CLOSE_PARENTHESIS
+                    +"估值日期"+GlobalConstant.OPEN_PARENTHESIS+entity1.getCdate()+GlobalConstant.CLOSE_PARENTHESIS
+                    +"估值来源"+GlobalConstant.OPEN_PARENTHESIS+entity1.getValueSourceStr()+GlobalConstant.CLOSE_PARENTHESIS);
+        });
         processParameter.setWorkFlowParameter(params);
         Date sysDate = DateUtil.platDateFromCache();// 获取平台日期
         dto.setCreateTime(sysDate);
