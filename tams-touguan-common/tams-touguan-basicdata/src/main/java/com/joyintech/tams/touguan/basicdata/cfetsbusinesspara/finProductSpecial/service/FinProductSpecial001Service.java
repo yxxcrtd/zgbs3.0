@@ -3,6 +3,7 @@ package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial
 import com.google.common.collect.Lists;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.tams.common.base.dao.FinProductSpecialMapper;
 import com.joyintech.tams.common.base.dao.WflFinProductSpecialMapper;
@@ -64,8 +65,11 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
      * @param request
      * @return
      */
-    public List<FinProductSpecialSelectOptionDto> querySelectOption(FinProductSpecialSelectOptionQueryRequest request) {
-        return finProductSpecial001Mapper.querySelectOption(request);
+    public Page<FinProductSpecialSelectOptionDto> querySelectOption(FinProductSpecialSelectOptionQueryRequest request) {
+        Page<FinProductSpecialSelectOptionDto> page = super.queryForPageForSelectReturn(request.getPageNo(),
+                request.getPageSize(),
+                () -> finProductSpecial001Mapper.querySelectOption(request));
+        return page;
     }
 
 

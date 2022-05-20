@@ -27,10 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +40,7 @@ import java.util.Map;
  * @date 2022-05-06
  */
 @Controller
-@PageId("FinProductSpecial001")
+@PageId("CfetsBasicInfo001")
 @RequestMapping("/business/param/FinProductSpecial001")
 @Api(tags = "银行间基础信息-特殊债券信息")
 public class FinProductSpecial001Controller extends BaseController {
@@ -61,6 +58,7 @@ public class FinProductSpecial001Controller extends BaseController {
     @ResponseBody
     public Message<Map<String, Object>> init() {
         Map<String, Object> model = new HashMap<>(1);
+        model.put("pageId", this.getPageId());
         model.put("YES_OR_NO", this.getSelectDataFromDataDic(DictCode.是否, null));
         return new Message<>(model).success();
     }
@@ -132,13 +130,30 @@ public class FinProductSpecial001Controller extends BaseController {
     }
 
     /**
+     * 特殊债券信息删除
+     *
+     * @param finprodMarketId
+     * @return
+     */
+    @ApiOperation(value = "特殊债券信息删除", notes = "特殊债券信息删除")
+    @PostMapping("/del/{finprodMarketId:.+}")
+    @ResponseBody
+    public Message<AjaxResult> del(@RequestParam("finprodMarketId") String finprodMarketId) {
+        AjaxResult ajax = new AjaxResult();
+        List<ValidMessage> valid = finProductSpecialValidatorService.valid(null);
+        ajax.setErrorList(valid);
+        return new Message<AjaxResult>().success().setData(ajax);
+    }
+
+    /**
      * 导入数据文件之前检查数据
      *
      * @param fileName 导入的文件名
      * @return 处理结果
      */
     @ResponseBody
-    @RequestMapping(value = "checkConfirmMsgForImportData")
+    @PostMapping(value = "checkConfirmMsgForImportData")
+    @ApiOperation(value = "导入数据文件之前检查数据", notes = "导入数据文件之前检查数据")
     public AjaxResult checkConfirmMsgForImportData(String fileName) {
         return finProductSpecialValidatorService.checkConfirmMsgForImportData(fileName);
     }
@@ -150,7 +165,8 @@ public class FinProductSpecial001Controller extends BaseController {
      * @return 导入结果，包含验证内容，如果验证失败，返回message
      */
     @ResponseBody
-    @RequestMapping("/importFile")
+    @PostMapping("/importFile")
+    @ApiOperation(value = "导入数据文件", notes = "导入数据文件")
     public List<ExcelValidDto> importData(String fileName) {
         return finProductSpecial001Service.importData(fileName);
     }
