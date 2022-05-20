@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 import static com.joyintech.tams.constant.DictCodeList.*;
@@ -169,10 +170,10 @@ public class PositionRequestServiceEtrExchangeTradeSaveSecRepoRequest {
 //                    bean.setCashAmount(item.getEntrustAmt());
 //                } else {
                 BigDecimal fprice = Objects.isNull(entity.getFprice()) ? new BigDecimal(0) : entity.getFprice();
-                bean.setCashAmount(fprice.multiply(item.getEntrustNum()));
+                bean.setCashAmount(fprice.multiply(item.getEntrustNum()).setScale(2, RoundingMode.HALF_UP));
 //                }
                 BigDecimal secAmount = commonPositionEngineService.getSecAmountByBondUnit(item.getEntrustNum());
-                bean.setSecAmount(secAmount);
+                bean.setSecAmount(secAmount.setScale(2, RoundingMode.HALF_UP));
 
                 Map<String, Object> map = BeanUtil.object2Map(bean);
                 map.put(ORD_ENTRUST_ID, null);
