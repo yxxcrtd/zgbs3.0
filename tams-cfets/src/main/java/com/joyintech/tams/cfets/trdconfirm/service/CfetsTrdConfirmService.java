@@ -2758,8 +2758,8 @@ public class CfetsTrdConfirmService extends BaseService{
                         }
                         str.append("本方");
                     }
-                    if (StringUtil.isNotEmpty(regInfo.getTradeAmt()) && StringUtil.isNotEmpty(cstpInfo.getTradeAmt())
-                            && regInfo.getTradeAmt().compareTo(cstpInfo.getTradeAmt()) != 0) {
+                    if (StringUtil.isNotEmpty(regInfo.getFaceValue()) && StringUtil.isNotEmpty(cstpInfo.getLastqty())
+                            && regInfo.getFaceValue().compareTo(cstpInfo.getLastqty()) != 0) {
                         if (str != null) {
                             str.append(",");
                         }

@@ -2558,7 +2558,7 @@
                     and fpi.REFER_YIELD = #{couponRate,jdbcType=DECIMAL}
                 </if>
                 <if test="spread != null">
-                    and fpi.BP*10000 = #{spread,jdbcType=DECIMAL}
+                    and fpi.BP = #{spread,jdbcType=DECIMAL}
                 </if>
                 <if test="issuePrice != null">
                     and fp.ISSUE_PRICE = #{issuePrice,jdbcType=DECIMAL}
