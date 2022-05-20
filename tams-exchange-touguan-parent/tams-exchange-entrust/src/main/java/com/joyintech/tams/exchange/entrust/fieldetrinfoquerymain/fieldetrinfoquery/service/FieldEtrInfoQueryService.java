@@ -32,30 +32,33 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 
 /**
  * 场内指令查询
+ *
  * @author sjj
  * @version 1.0 2021年11月26日
  * @see FieldEtrInfoQueryService
  * @since 1.0
  */
 @Service("FieldEtrInfoQueryService")
-public class FieldEtrInfoQueryService extends BaseService{
+public class FieldEtrInfoQueryService extends BaseService {
 
     @Autowired
     private FieldEtrInfoQueryMapper fieldEtrInfoQueryMapper;
 
     /**
      * 指令列表分页查询
+     *
      * @param dto 入数
      * @return Page<FieldEtrInfoQueryListResponse>
      */
     public Page<FieldEtrInfoQueryListResponse> findAllData(FieldEtrInfoQueryListRequest dto) {
 
-        Map<String,Object> pageParam = BeanUtil.object2Map(dto);
+        Map<String, Object> pageParam = BeanUtil.object2Map(dto);
         pageParam.put("entrustAwait", DictCodeList.委托状态_待接收.getValue());
         pageParam.put("entrustDistribute", DictCodeListExt3.委托状态_待分发.getValue());
         pageParam.put("entrustReceive", DictCodeList.委托状态_已接收.getValue());
@@ -69,36 +72,36 @@ public class FieldEtrInfoQueryService extends BaseService{
         pageParam.put("busiTypePosition03", DictCodeListExt3.头寸业务类型_债券行权交易.getValue());
 
         List<String> listTemp = Arrays.asList(dto.getEntrustStatus());
-        if(!listTemp.contains("all")){
+        if (!listTemp.contains("all")) {
             pageParam.put("entrustStatusList", listTemp);
         }
-        String portfolioId = (String)pageParam.get("portfolioId");
-        if(StringUtil.isNotEmpty(pageParam.get("portfolioId"))){
-            List<String> portfolioIdList = StringUtil.splitToList(",",(String)pageParam.get("portfolioId"));
+        String portfolioId = (String) pageParam.get("portfolioId");
+        if (StringUtil.isNotEmpty(pageParam.get("portfolioId"))) {
+            List<String> portfolioIdList = StringUtil.splitToList(",", (String) pageParam.get("portfolioId"));
             pageParam.put("portfolioIdList", portfolioIdList);
         }
 
-        String finprodMarketId = (String)pageParam.get("finprodMarketId");
-        if(StringUtil.isNotEmpty(pageParam.get("finprodMarketId"))){
-            List<String> finprodMarketIdList = StringUtil.splitToList(",",(String)pageParam.get("finprodMarketId"));
+        String finprodMarketId = (String) pageParam.get("finprodMarketId");
+        if (StringUtil.isNotEmpty(pageParam.get("finprodMarketId"))) {
+            List<String> finprodMarketIdList = StringUtil.splitToList(",", (String) pageParam.get("finprodMarketId"));
             pageParam.put("finprodMarketIdList", finprodMarketIdList);
         }
 
-        String secAcctId = (String)pageParam.get("secAcctId");
-        if(StringUtil.isNotEmpty(pageParam.get("secAcctId"))){
-            List<String> secAcctIdList = StringUtil.splitToList(",",(String)pageParam.get("secAcctId"));
+        String secAcctId = (String) pageParam.get("secAcctId");
+        if (StringUtil.isNotEmpty(pageParam.get("secAcctId"))) {
+            List<String> secAcctIdList = StringUtil.splitToList(",", (String) pageParam.get("secAcctId"));
             pageParam.put("secAcctIdList", secAcctIdList);
         }
 
-        String invManagerId = (String)pageParam.get("invManagerId");
-        if(StringUtil.isNotEmpty(pageParam.get("invManagerId"))){
-            List<String> invManagerIdList = StringUtil.splitToList(",",(String)pageParam.get("invManagerId"));
+        String invManagerId = (String) pageParam.get("invManagerId");
+        if (StringUtil.isNotEmpty(pageParam.get("invManagerId"))) {
+            List<String> invManagerIdList = StringUtil.splitToList(",", (String) pageParam.get("invManagerId"));
             pageParam.put("invManagerIdList", invManagerIdList);
         }
 
-        String finprodType2Old = (String)pageParam.get("finprodType2");
+        String finprodType2Old = (String) pageParam.get("finprodType2");
         if (StringUtil.isNotEmpty(finprodType2Old) || StringUtil.isNotEmpty(pageParam.get("ps"))) {
-            if(StringUtil.isNotEmpty((String)pageParam.get("ps"))){
+            if (StringUtil.isNotEmpty((String) pageParam.get("ps"))) {
                 pageParam.put("PS_T01", DictCodeList.交易方向_买入.getValue());
             }
         }
@@ -109,44 +112,44 @@ public class FieldEtrInfoQueryService extends BaseService{
         pageParam.put("ASSET_TYPE_16", DictCodeListExt2.平安资产类型_利率互换.getValue());
         pageParam.put("BACK_LEND_DIRECTION", DictCode.回购拆借方向.getValue());
         pageParam.put("PS", DictCode.交易方向.getValue());
-        pageParam.put("effectFlag",DictCodeListExt1.有效状态_有效.getValue());
-        pageParam.put("effectFlag04",DictCodeListExt1.有效状态_流程中.getValue());
+        pageParam.put("effectFlag", DictCodeListExt1.有效状态_有效.getValue());
+        pageParam.put("effectFlag04", DictCodeListExt1.有效状态_流程中.getValue());
         pageParam.put("finType_zq", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         pageParam.put("ps_49", DictCodeListExt3.交易方向_债转股.getValue());
         pageParam.put("search_isNumberFlag", BaseMap.isNumeric(dto.getSearch()));
 
-        pageParam.put("PRICE_CLASS_01",DictCodeListExt3.计价方式_净价.getValue());
-        pageParam.put("PRICE_CLASS_02",DictCodeListExt3.计价方式_全价.getValue());
-        pageParam.put("PRICE_MODEL_PRM03",DictCodeListExt2.价格模式_市价指令.getValue());
+        pageParam.put("PRICE_CLASS_01", DictCodeListExt3.计价方式_净价.getValue());
+        pageParam.put("PRICE_CLASS_02", DictCodeListExt3.计价方式_全价.getValue());
+        pageParam.put("PRICE_MODEL_PRM03", DictCodeListExt2.价格模式_市价指令.getValue());
 
 
         if (StringUtil.equals(dto.getSettleSpeed(),
                 DictCodeList.清算速度_T_0.getValue())) {
-            pageParam.put("settleSpeed","0");
-        }else if (StringUtil.equals(dto.getSettleSpeed(),
+            pageParam.put("settleSpeed", "0");
+        } else if (StringUtil.equals(dto.getSettleSpeed(),
                 DictCodeList.清算速度_T_1.getValue())) {
-            pageParam.put("settleSpeed","1");
-        }else if(StringUtil.equals(dto.getSettleSpeed(),
-                DictCodeList.清算速度_T_2.getValue())){
-            pageParam.put("settleSpeed","2");
+            pageParam.put("settleSpeed", "1");
+        } else if (StringUtil.equals(dto.getSettleSpeed(),
+                DictCodeList.清算速度_T_2.getValue())) {
+            pageParam.put("settleSpeed", "2");
         }
-        pageParam.put("sort",dto.getPageMode().getSort());
-        pageParam.put("direction",dto.getPageMode().getDirection());
+        pageParam.put("sort", dto.getPageMode().getSort());
+        pageParam.put("direction", dto.getPageMode().getDirection());
 
         Calendar c = Calendar.getInstance();
         c.setTime(new Date());
         int year = c.get(Calendar.YEAR);
-        pageParam.put("year",year);
+        pageParam.put("year", year);
 
         //价格模式
-        if(StringUtils.isNotEmpty((String)pageParam.get("search"))){
+        if (StringUtils.isNotEmpty((String) pageParam.get("search"))) {
             List<String> declaTypeList = new ArrayList<>();
             List<? extends DataDictItem> list = SysDataUtil.getDataDictItem(DictCode.价格模式.getValue());
-            if(!list.isEmpty()&&list.size()>0){
-                for (DataDictItem t:
+            if (!list.isEmpty() && list.size() > 0) {
+                for (DataDictItem t :
                         list) {
                     String typeValue = t.getItemValue();
-                    if(typeValue.indexOf((String)pageParam.get("search"))!=-1){
+                    if (typeValue.indexOf((String) pageParam.get("search")) != -1) {
                         declaTypeList.add(t.getItemCode());
                     }
                 }
@@ -157,26 +160,26 @@ public class FieldEtrInfoQueryService extends BaseService{
         }
         //根据组合权限表添加检索权限
         Page<FieldEtrInfoQueryListResponse> pageLimit = new Page<FieldEtrInfoQueryListResponse>();
-        if(StringUtil.isNotEmpty(SecurityUtil.getLoginUser())) {
+        if (StringUtil.isNotEmpty(SecurityUtil.getLoginUser())) {
             //查询登录用户是否是领导、交易处长岗位
-            Map<String,Object> map = new HashMap<>();
+            Map<String, Object> map = new HashMap<>();
             map.put("rolepos01", DictCodeListExt2.角色岗位_领导.getValue());
             map.put("rolepos03", DictCodeListExt2.角色岗位_交易处长.getValue());
             map.put("userName", SecurityUtil.getLoginUser().getUserName());
             int count = fieldEtrInfoQueryMapper.queryRolePosByLoginUser(map);
-            if(count==0){
+            if (count == 0) {
                 pageParam.put("userId", SecurityUtil.getLoginUser().getUserName());
             }
             pageLimit = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(),
                     () -> fieldEtrInfoQueryMapper.findAllData(pageParam));
-        }else{
+        } else {
             return pageLimit;
         }
         return pageLimit;
     }
 
     public Page<FinProdResponse> findFinProdMarketIdList(FieldEtrInfoQueryListRequest dto) {
-        Map<String,Object> pageParam = BeanUtil.object2Map(dto);
+        Map<String, Object> pageParam = BeanUtil.object2Map(dto);
         return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(),
                 () -> fieldEtrInfoQueryMapper.findFinProdMarketIdList(pageParam));
     }
@@ -198,19 +201,19 @@ public class FieldEtrInfoQueryService extends BaseService{
     }
 
     public Page<EntrustQueryBean> getEtrDispatcherExeListInfoByExe(CommonSearchInfoRequest dto) {
-        Map<String,Object> pageParam = BeanUtil.object2Map(dto);
-        pageParam.put("instructionId",dto.getEntrustId());
+        Map<String, Object> pageParam = BeanUtil.object2Map(dto);
+        pageParam.put("instructionId", dto.getEntrustId());
         Page<EntrustQueryBean> page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(),
                 () -> fieldEtrInfoQueryMapper.queryEntrust2Touguan(pageParam));
         if (!CollectionUtils.isEmpty(page.getRoot())) {
             for (EntrustQueryBean response : page.getRoot()) {
-                if (StringUtils.equals(response.getEntrustBs(),DictCodeListExt3.交易方向_质押券出库.getValue())
-                        || StringUtils.equals(response.getEntrustBs(),DictCodeListExt3.交易方向_质押券入库.getValue())) {
-                    response.setEntrustPrice(StringUtil.isNotEmpty(response.getEntrustPrice())?ArithmeticUtil.multiply(response.getEntrustPrice(), BigDecimal.valueOf(100)):null);
-                    response.setTradedPrice(StringUtil.isNotEmpty(response.getTradedPrice())?ArithmeticUtil.multiply(response.getTradedPrice(),BigDecimal.valueOf(100)):null);
+                if (StringUtils.equals(response.getEntrustBs(), DictCodeListExt3.交易方向_质押券出库.getValue())
+                        || StringUtils.equals(response.getEntrustBs(), DictCodeListExt3.交易方向_质押券入库.getValue())) {
+                    response.setEntrustPrice(StringUtil.isNotEmpty(response.getEntrustPrice()) ? ArithmeticUtil.multiply(response.getEntrustPrice(), BigDecimal.valueOf(100)) : null);
+                    response.setTradedPrice(StringUtil.isNotEmpty(response.getTradedPrice()) ? ArithmeticUtil.multiply(response.getTradedPrice(), BigDecimal.valueOf(100)) : null);
                 }
-                response.setTradingDay(StringUtil.isNotEmpty(response.getTradingDay())?DateUtil.format(DateUtil.parse(response.getTradingDay()),DateUtil.DEFAULT_DATE_FORMAT_EN):null);
-             }
+                response.setTradingDay(StringUtil.isNotEmpty(response.getTradingDay()) ? DateUtil.format(DateUtil.parse(response.getTradingDay()), DateUtil.DEFAULT_DATE_FORMAT_EN) : null);
+            }
         }
         return page;
     }
@@ -228,23 +231,26 @@ public class FieldEtrInfoQueryService extends BaseService{
             return new Page<TradeQueryBean>();
         }
         Page<TradeQueryBean>
-            page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> fieldEtrInfoQueryMapper.getEtrDispatcherDealListInfo(pageParam));
+                page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> fieldEtrInfoQueryMapper.getEtrDispatcherDealListInfo(pageParam));
         return page;
     }
 
     public Page<TradeQueryBean> getEtrDispatcherDealListInfoByExe(CommonSearchInfoRequest dto) {
-        Map<String,Object> pageParam = BeanUtil.object2Map(dto);
-        pageParam.put("instructionId",dto.getEntrustId());
+        Map<String, Object> pageParam = BeanUtil.object2Map(dto);
+        pageParam.put("instructionId", dto.getEntrustId());
         Page<TradeQueryBean> page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(),
                 () -> fieldEtrInfoQueryMapper.queryTrade2Touguan(pageParam));
         if (!CollectionUtils.isEmpty(page.getRoot())) {
             for (TradeQueryBean response : page.getRoot()) {
-                if (StringUtils.equals(response.getEntrustBs(),DictCodeListExt3.交易方向_质押券出库.getValue())
-                        || StringUtils.equals(response.getEntrustBs(),DictCodeListExt3.交易方向_质押券入库.getValue())) {
-                    response.setTradedPrice(StringUtil.isNotEmpty(response.getTradedPrice())?ArithmeticUtil.multiply(response.getTradedPrice(),BigDecimal.valueOf(100)):null);
+                if (StringUtils.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_现券交易.getValue())) {
+                    response.setTradedVolume(ArithmeticUtil.divide(response.getTradedVolume(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
                 }
-                response.setTradingDay(StringUtil.isNotEmpty(response.getTradingDay())?DateUtil.format(DateUtil.parse(response.getTradingDay()),DateUtil.DEFAULT_DATE_FORMAT_EN):null);
-             }
+                if (StringUtils.equals(response.getEntrustBs(), DictCodeListExt3.交易方向_质押券出库.getValue())
+                        || StringUtils.equals(response.getEntrustBs(), DictCodeListExt3.交易方向_质押券入库.getValue())) {
+                    response.setTradedPrice(StringUtil.isNotEmpty(response.getTradedPrice()) ? ArithmeticUtil.multiply(response.getTradedPrice(), BigDecimal.valueOf(100)) : null);
+                }
+                response.setTradingDay(StringUtil.isNotEmpty(response.getTradingDay()) ? DateUtil.format(DateUtil.parse(response.getTradingDay()), DateUtil.DEFAULT_DATE_FORMAT_EN) : null);
+            }
         }
         return page;
     }

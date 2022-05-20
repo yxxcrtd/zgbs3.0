@@ -159,7 +159,7 @@ public class CfetsEtrDispatcherController extends BaseController {
             return new Message<Page<CfetsEtrDispatcherExeListInfoResponse>>().success().setData(returnDto);
         } catch (Exception e) {
             logger.error("查询指令管理分页数据异常", e);
-            return new Message<Page<CfetsEtrDispatcherExeListInfoResponse>>().fail().setMessage("查询指令成交异常");
+            return new Message<Page<CfetsEtrDispatcherExeListInfoResponse>>().fail().setMessage("指令执行查询异常");
         }
     }
 
