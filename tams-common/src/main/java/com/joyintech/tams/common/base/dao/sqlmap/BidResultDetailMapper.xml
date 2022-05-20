@@ -2,7 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.joyintech.tams.common.base.dao.BidResultDetailMapper" >
     <resultMap id="BaseResultMap" type="com.joyintech.tams.common.base.entity.BidResultDetail" >
-        <id column="TOTAL_WIN_ID" property="totalWinId" jdbcType="VARCHAR" />
+        <id column="DETAIL_WIN_ID" property="detailWinId" jdbcType="VARCHAR" />
+        <result column="TOTAL_WIN_ID" property="totalWinId" jdbcType="VARCHAR" />
         <result column="WIN_ID" property="winId" jdbcType="VARCHAR" />
         <result column="BID_ID" property="bidId" jdbcType="VARCHAR" />
         <result column="ENTRUST_ID" property="entrustId" jdbcType="VARCHAR" />
@@ -25,7 +26,7 @@
         <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
     </resultMap>
     <sql id="Base_Column_List" >
-        TOTAL_WIN_ID TOTAL_WIN_ID, WIN_ID WIN_ID, BID_ID BID_ID, ENTRUST_ID ENTRUST_ID, PORTFOLIO_ID PORTFOLIO_ID,
+        DETAIL_WIN_ID DETAIL_WIN_ID,TOTAL_WIN_ID TOTAL_WIN_ID, WIN_ID WIN_ID, BID_ID BID_ID, ENTRUST_ID ENTRUST_ID, PORTFOLIO_ID PORTFOLIO_ID,
         TOTAL_BID_PRINAMT TOTAL_BID_PRINAMT, THE_WIN_PRINAMT THE_WIN_PRINAMT, ACT_WIN_PRINAMT ACT_WIN_PRINAMT, BID_PRICE BID_PRICE,
         WIN_PRICE WIN_PRICE, WIN_CPRICE WIN_CPRICE, INT_AMT INT_AMT, PAY_AMT PAY_AMT , SETT_FEE_AMT SETT_FEE_AMT, INV_AIM INV_AIM,
         SEC_ACCT_ID SEC_ACCT_ID, CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME
@@ -51,12 +52,12 @@
         where TOTAL_WIN_ID = #{totalWinId,jdbcType=VARCHAR}
     </delete>
     <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.BidResultDetail" >
-        insert into BID_RESULT_DETAIL (TOTAL_WIN_ID, WIN_ID, BID_ID, ENTRUST_ID, PORTFOLIO_ID,
+        insert into BID_RESULT_DETAIL (DETAIL_WIN_ID,TOTAL_WIN_ID, WIN_ID, BID_ID, ENTRUST_ID, PORTFOLIO_ID,
             TOTAL_BID_PRINAMT, THE_WIN_PRINAMT, ACT_WIN_PRINAMT, BID_PRICE, WIN_PRICE, WIN_CPRICE,
             INT_AMT, PAY_AMT, SETT_FEE_AMT, INV_AIM, SEC_ACCT_ID, WORKFLOW_ID, WORKFLOW_STATUS,
             CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME
             )
-        values (#{totalWinId,jdbcType=VARCHAR}, #{winId,jdbcType=VARCHAR}, #{bidId,jdbcType=VARCHAR}, #{entrustId,jdbcType=VARCHAR},
+        values (#{detailWinId,jdbcType=VARCHAR}, #{totalWinId,jdbcType=VARCHAR}, #{winId,jdbcType=VARCHAR}, #{bidId,jdbcType=VARCHAR}, #{entrustId,jdbcType=VARCHAR},
             #{portfolioId,jdbcType=VARCHAR}, #{totalBidPrinamt,jdbcType=DECIMAL}, #{theWinPrinamt,jdbcType=DECIMAL},
             #{actWinPrinamt,jdbcType=DECIMAL}, #{bidPrice,jdbcType=DECIMAL}, #{winPrice,jdbcType=DECIMAL}, #{winCprice,jdbcType=DECIMAL},
             #{intAmt,jdbcType=DECIMAL}, #{payAmt,jdbcType=DECIMAL}, #{settFeeAmt,jdbcType=DECIMAL}, #{invAim,jdbcType=VARCHAR},
@@ -68,6 +69,9 @@
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.BidResultDetail" >
         insert into BID_RESULT_DETAIL
         <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="detailWinId != null" >
+                DETAIL_WIN_ID,
+            </if>
             <if test="totalWinId != null" >
                 TOTAL_WIN_ID,
             </if>
@@ -139,6 +143,9 @@
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="detailWinId != null" >
+                #{detailWinId,jdbcType=VARCHAR},
+            </if>
             <if test="totalWinId != null" >
                 #{totalWinId,jdbcType=VARCHAR},
             </if>
@@ -211,20 +218,23 @@
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.BidResultDetail" >
-        insert into BID_RESULT_DETAIL(TOTAL_WIN_ID, WIN_ID, BID_ID, ENTRUST_ID, PORTFOLIO_ID,
+        insert into BID_RESULT_DETAIL(DETAIL_WIN_ID,TOTAL_WIN_ID, WIN_ID, BID_ID, ENTRUST_ID, PORTFOLIO_ID,
         TOTAL_BID_PRINAMT, THE_WIN_PRINAMT, ACT_WIN_PRINAMT, BID_PRICE, WIN_PRICE, WIN_CPRICE,
         INT_AMT, PAY_AMT, SETT_FEE_AMT, INV_AIM, SEC_ACCT_ID, WORKFLOW_ID, WORKFLOW_STATUS,
         CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-        select TOTAL_WIN_ID, WIN_ID, BID_ID, ENTRUST_ID, PORTFOLIO_ID,
+        select DETAIL_WIN_ID,TOTAL_WIN_ID, WIN_ID, BID_ID, ENTRUST_ID, PORTFOLIO_ID,
                TOTAL_BID_PRINAMT, THE_WIN_PRINAMT, ACT_WIN_PRINAMT, BID_PRICE, WIN_PRICE, WIN_CPRICE,
                INT_AMT, PAY_AMT, SETT_FEE_AMT, INV_AIM, SEC_ACCT_ID, WORKFLOW_ID, WORKFLOW_STATUS,
                CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME
              from BID_RESULT_DETAIL
-             where TOTAL_WIN_ID = #{totalWinId,jdbcType=VARCHAR}
+             where DETAIL_WIN_ID = #{detailWinId,jdbcType=VARCHAR}
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.common.base.entity.BidResultDetail" >
         update BID_RESULT_DETAIL
         <set >
+            <if test="totalWinId != null" >
+                TOTAL_WIN_ID = #{totalWinId,jdbcType=VARCHAR},
+            </if>
             <if test="winId != null" >
                 WIN_ID = #{winId,jdbcType=VARCHAR},
             </if>
@@ -283,11 +293,12 @@
                 UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
             </if>
         </set>
-        where TOTAL_WIN_ID = #{totalWinId,jdbcType=VARCHAR}
+        where DETAIL_WIN_ID= #{detailWinId,jdbcType=VARCHAR}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.BidResultDetail" >
         update BID_RESULT_DETAIL
-        set WIN_ID = #{winId,jdbcType=VARCHAR},
+        set TOTAL_WIN_ID = #{totalWinId,jdbcType=VARCHAR},
+            WIN_ID = #{winId,jdbcType=VARCHAR},
             BID_ID = #{bidId,jdbcType=VARCHAR},
             ENTRUST_ID = #{entrustId,jdbcType=VARCHAR},
             PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR},
@@ -306,6 +317,6 @@
             WORKFLOW_STATUS = #{workflowStatus,jdbcType=VARCHAR},
             UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
             UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
-        where TOTAL_WIN_ID = #{totalWinId,jdbcType=VARCHAR}
+        where DETAIL_WIN_ID= #{detailWinId,jdbcType=VARCHAR}
     </update>
 </mapper>

@@ -192,11 +192,36 @@ public class EtrTradeCommonervice extends BaseService {
         return assemble(portfolioCash, canCash, realCash, canSec, realSec, requestDto);
     }
 
-    /**
-     * 场内指令，头寸信息
-     *
-     * @return
-     */
+    public List<PositionCashSecSingleResp> queryAllPositionInfoSingle(PositionCashSecRequest requestDto) {
+        List<PositionCashSecSingleResp> returnList=new ArrayList<>();
+        //每个组合分开查询
+        if(!CollectionUtils.isEmpty(requestDto.getPtlList())){
+            requestDto.getPtlList().stream().forEach(item->{
+                PositionCashSecRequest request=new PositionCashSecRequest();
+                request.setFlowType(requestDto.getFlowType());
+                List<PositionCashSecDto> subList=new ArrayList<>();
+                subList.add(item);
+                request.setPtlList(subList);
+                if(!CollectionUtils.isEmpty(queryPositionInfoSingle(request))){
+                    PositionCashSecSingleResp resp=queryPositionInfoSingle(request).get(0);
+                    returnList.add(resp);
+                }
+            });
+        }else{
+            PositionCashSecSingleResp positionCashSecSingleResp=new PositionCashSecSingleResp();
+            positionCashSecSingleResp.setBaseMapList(nullData());
+            returnList.add(positionCashSecSingleResp);
+        }
+        return returnList;
+
+    }
+
+
+        /**
+         * 场内指令，头寸信息
+         *
+         * @return
+         */
     public List<PositionCashSecSingleResp> queryPositionInfoSingle(PositionCashSecRequest requestDto) {
 
         List<PositionCashSecSingleResp> respList = new ArrayList<>();

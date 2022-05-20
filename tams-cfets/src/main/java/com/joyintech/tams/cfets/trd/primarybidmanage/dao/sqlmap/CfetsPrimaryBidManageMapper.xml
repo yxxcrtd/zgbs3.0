@@ -1,0 +1,767 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.cfets.trd.primarybidmanage.dao.CfetsPrimaryBidManageMapper">
+    <!--画面一分页查询-->
+    <select id="selectCfmForPage" resultType="com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageCfmResponse" parameterType="Map">
+        SELECT * FROM (
+        SELECT ss.* FROM (
+        SELECT s.* FROM (
+        SELECT
+        ${otherEffectFlag_01} otherEffectFlag,
+        CASE WHEN BO.IS_WIN = 'Y' THEN '03'
+        WHEN BO.IS_WIN = 'N' THEN '04'
+        ELSE '02' END isWin,
+        BO.BID_ID bidId,
+        BO.FINPROD_ID finprodId,
+        FP.FINPROD_ABBR finprodAbbr,
+        FPI.TENDER_TARGET tenderTarget,
+        BO.BID_DATE bidDate,
+        BOBP.ENTRUST_NUM/100 bidPrinAmt,
+        BO.WIN_PRIN_AMT/10000 totalBiddingNum,
+        BOBP.BID_PRICE bidPrice,
+        BO.WIN_TYPE winType,
+        BO.PAY_TYPE payType,
+        BO.BID_DATE bidCfmDate,
+        FP.TRADE_MARKET tradeMarket,
+        BO.COUNTER_ID counterId,
+        MCP.COUNTER_NAME counterName,
+        BO.REMARK remark
+        FROM BID_ORDER BO
+        LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN (
+        SELECT BID_ID,wm_concat(BID_PRICE) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        from BID_ORDER_BID_PRICE BOBP
+        LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
+        group by BID_ID
+        ) BOBP ON BO.BID_ID = BOBP.BID_ID
+        LEFT JOIN MST_COUNTER_PARTY MCP ON MCP.COUNTER_ID = BO.COUNTER_ID
+        WHERE
+        BO.BID_ID not in (select B_TRADE_ID from TRD_FIN_PRODUCT_DEAL_TOTAL where TG_BUSI_TYPE ='01' and
+        TRADE_STATUS='03' and IS_CANCEL='Y')
+        <if test="finprodIdList != null and finprodIdList.size() > 0">AND BO.FINPROD_ID IN
+            <foreach
+                    collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="tradeMarketList != null and tradeMarketList.size() > 0">
+                AND FP.TRADE_MARKET IN
+                <foreach collection="tradeMarketList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="tenderTargetList != null and tenderTargetList.size() > 0">
+                 AND FPI.TENDER_TARGET in
+                <foreach collection="tenderTargetList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="winTypeList != null and winTypeList.size() > 0">
+                AND BO.WIN_TYPE in
+                <foreach collection="winTypeList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="bidDateStart != null and bidDateStart != ''">
+                <![CDATA[AND  BO.BID_DATE >= TO_DATE(#{bidDateStart},'YYYY-MM-DD') ]]>
+            </if>
+            <if test="bidDateEnd != null and bidDateEnd != ''">
+                <![CDATA[AND  BO.BID_DATE <= TO_DATE(#{bidDateEnd},'YYYY-MM-DD')]]>
+            </if>
+            <if test="bidCfmDateStart != null and bidCfmDateStart != ''">
+                <![CDATA[AND  BO.BID_DATE >= TO_DATE(#{bidCfmDateStart},'YYYY-MM-DD') ]]>
+            </if>
+            <if test="bidCfmDateEnd != null and bidCfmDateEnd != ''">
+                <![CDATA[AND  BO.BID_DATE <= TO_DATE(#{bidCfmDateEnd},'YYYY-MM-DD')]]>
+            </if>
+            <if test="payTypeList != null and payTypeList.size() > 0">
+                AND BO.PAY_TYPE in
+                <foreach collection="payTypeList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="counterIdList != null and counterIdList.size() > 0">
+                AND BO.COUNTER_ID in
+                <foreach collection="counterIdList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="bidId != null and bidId != ''">
+                AND BO.BID_ID = #{bidId}
+            </if>
+            ) s  WHERE 1=1
+            <if test="isWinList != null and isWinList.size() > 0">
+                AND s.isWin in
+                <foreach collection="isWinList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        ) ss
+        left join SYS_DATADICT_LIST sdl_tp on ss.tradeMarket=sdl_tp.ITEM_CODE and sdl_tp.DICT_CODE='TRADE_PLACE'
+        left join SYS_DATADICT_LIST sdl_tt on ss.tenderTarget=sdl_tt.ITEM_CODE and sdl_tt.DICT_CODE='TENDER_TARGET'
+        left join SYS_DATADICT_LIST sdl_wt on ss.winType=sdl_wt.ITEM_CODE and sdl_wt.DICT_CODE='WIN_TYPE'
+        left join SYS_DATADICT_LIST sdl_ept on ss.payType=sdl_ept.ITEM_CODE and sdl_ept.DICT_CODE='ETR_PAY_TYPE'
+        <!-- 关键字模糊查询 -->
+        <include refid="keywordsCfmWhere"></include>)
+        <!--前端传入排序字段-->
+        <if test="sort != null and sort != '' and direction != null and direction != ''">
+            order by ${sort} ${direction}
+        </if>
+    </select>
+    <sql id="keywordsCfmWhere">
+        <if test="search != null and search != ''">
+            <where>( ss.otherEffectFlag || '|' || ss.isWin || '|' || ss.finprodAbbr || '|' || ss.finprodId || '|'
+                || '|' || ss.bidId || '|' || sdl_tp.ITEM_VALUE || '|' || sdl_tt.ITEM_VALUE || '|' || sdl_wt.ITEM_VALUE
+                || '|' || sdl_ept.ITEM_VALUE || '|' || ss.bidPrice || '|' || ss.counterName
+                || '|' || ss.remark
+                like '%' || #{search} || '%'
+                or to_char(ss.bidPrinAmt)=#{search}
+                or to_char(ss.totalBiddingNum)=#{search}
+                or to_char(ss.bidDate,'YYYY-MM-DD')=#{search}
+                or to_char(ss.bidCfmDate,'YYYY-MM-DD')=#{search}
+                )
+            </where>
+        </if>
+    </sql>
+    <select id="getBidManageCfmInfo" resultType="com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageCfmResponse" parameterType="Map">
+    SELECT
+        CASE WHEN BO.IS_WIN = 'Y' THEN '03'
+             WHEN BO.IS_WIN = 'N' THEN '04'
+             ELSE '02' END isWin,
+        BO.BID_ID  bidId,
+        BO.FINPROD_ID  finprodId,
+        FP.FINPROD_ABBR finprodAbbr,
+        FPI.TENDER_TARGET tenderTarget,
+        BO.BID_DATE       bidDate,
+        BOBP.ENTRUST_NUM/100  bidPrinAmt,
+        BO.WIN_PRIN_AMT/10000 totalBiddingNum,
+        BOBP.BID_PRICE    bidPrice,
+        BO.WIN_TYPE      winType,
+        BO.PAY_TYPE      payType,
+        BO.BID_DATE      bidCfmDate,
+        FP.TRADE_MARKET  tradeMarket,
+        BO.PAY_DATE      payDate,
+        FP.TRADE_MARKET  trader,
+        BO.REMARK        remark,
+        BO.COUNTER_ID    counterId,
+        MCP.COUNTER_NAME   counterName,
+        FP.CCY           ccy
+        FROM BID_ORDER	BO
+        LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN (
+        SELECT BID_ID,wm_concat(BID_PRICE) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        from BID_ORDER_BID_PRICE BOBP ON BO.BID_ID = BOBP.BID_ID
+        LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
+        group by BID_ID
+        ) BOBP ON BO.BID_ID = BOBP.BID_ID
+        LEFT JOIN MST_COUNTER_PARTY MCP ON MCP.COUNTER_ID = BO.COUNTER_ID
+        WHERE BO.BID_ID = #{bidId}
+     </select>
+    <select id="getBidProductList" resultType="com.joyintech.tams.cfets.trd.primarybidmanage.dto.BidProductDto" parameterType="Map">
+        SELECT
+            BOBP.BID_ID       bidId,
+            BOBP.ENTRUST_ID   entrustId,
+            BOBP.PORTFOLIO_ID   portfolioId,
+            NVL(BOBP.THE_WIN_PRIN_AMT,0)/10000   totalBidPrinamt,
+            BOBP.WIN_PRIN_AMT     winPrinAmt,
+            BOBP.WIN_PRICE        winPrice
+        from BID_ORDER_BID_PRICE BOBP
+        LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BOBP.BID_ID
+        WHERE BOBP.BID_ID = #{bidId}
+    </select>
+
+    <!-- 检索本方交易员 -->
+    <select id="selectTrader" resultType="com.joyintech.framework.select.SelectOptionDto">
+        SELECT
+        t.TRADER id,
+        t.TRADER text
+        FROM
+        (
+        SELECT DISTINCT
+        etr_add.TRADER
+        FROM
+        ETR_ENTRUST_ADD etr_add
+        INNER JOIN
+        ETR_ENTRUST etr
+        ON etr.ENTRUST_ID = etr_add.ENTRUST_ID
+        ) t
+        <where>
+            <if test="search != null and !search.equals('')">
+                t.TRADER like concat('%',concat(#{search},'%'))
+            </if>
+            <if test="param != null and !param.equals('')">
+                t.TRADER like concat('%',concat(#{param},'%'))
+            </if>
+            and t.TRADER is not null
+        </where>
+    </select>
+
+    <select id="getCounterId" resultType="com.joyintech.framework.select.SelectOptionDto">
+        SELECT
+        COUNTER_ID id,
+        COUNTER_NAME text,
+        CASE WHEN COUNTER_TYPE=#{COUNTER_TYPE} THEN #{YES_NO_N}
+        ELSE #{YES_NO_Y} END object
+        FROM MST_COUNTER_PARTY
+        LEFT JOIN MST_CFETS_CUSTOMER_INFO
+        ON MST_COUNTER_PARTY.COUNTER_NAME = MST_CFETS_CUSTOMER_INFO.PARTY_NAME
+        where 1=1
+        <if test="innerTrade != null and !innerTrade">
+            AND not exists (select 1 from PTL_PORTFOLIO p where p.PORTFOLIO_ID = MST_COUNTER_PARTY.COUNTER_ID)
+            and NOT EXISTS (SELECT 1 FROM fin_product p WHERE p.FINPROD_MARKET_ID = MST_COUNTER_PARTY.COUNTER_ID)
+        </if>
+        <if test="innerTrade != null and innerTrade">
+            AND exists (select 1 from PTL_PORTFOLIO p where p.PORTFOLIO_ID = MST_COUNTER_PARTY.COUNTER_ID)
+        </if>
+        <if test="search != null and search != ''">
+            AND	(
+            MST_COUNTER_PARTY.COUNTER_ID LIKE CONCAT('%', CONCAT(#{search}, '%'))
+            OR
+            MST_COUNTER_PARTY.COUNTER_NAME LIKE CONCAT('%', CONCAT(#{search}, '%'))
+            )
+        </if>
+        <if test="initValue != null and initValue != ''">
+            AND (MST_COUNTER_PARTY.COUNTER_ID = #{initValue} OR MST_COUNTER_PARTY.COUNTER_NAME = #{initValue})
+        </if>
+        <if test="counterTypeList != null and counterTypeList != '' and counterType != 'null'">
+            AND  MST_COUNTER_PARTY.COUNTER_TYPE IN
+            <foreach collection="counterTypeList" item="item" index= "index" open="(" close=")" separator="," >
+                #{item}
+            </foreach>
+        </if>
+        <if test="counterIdList == null or counterIdList.size() == 0">
+            <if test="counterType != null and counterType != '' and counterType != 'null'">
+                AND MST_COUNTER_PARTY.COUNTER_TYPE = #{counterType}
+            </if>
+        </if>
+    </select>
+
+    <select id="selectForPage" resultType="com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageResponse" parameterType="Map">
+        SELECT * FROM (
+        SELECT ss.* FROM (
+        SELECT
+            BRT.STATUS  status,
+            CASE WHEN BRT.IS_WIN = 'Y' THEN '03'
+            WHEN BRT.IS_WIN = 'N' THEN '04'
+            ELSE '02' END isWin,
+            BO.BID_ID   bidId,
+            BRT.FINPROD_ID  finprodId,
+            FP.FINPROD_ABBR  finprodAbbr,
+            FPI.TENDER_TARGET  tenderTarget,
+            BO.BID_DATE        bidDate,
+            BO.WIN_PRIN_AMT/10000   totalBiddingNum,
+            BOBP.BID_PRICE          bidPrice,
+            BO.WIN_TYPE             winType,
+            BO.PAY_TYPE             payType,
+            BRT.WIN_TYPE            bidType,
+            BRT.WIN_PRINAMT/10000   winPrinamt,
+            BRT.WIN_PRICE           winPrice,
+            BRD.PAY_AMT             payAmt,
+            BRT.SETT_FEE_AMT        settFeeAmt,
+            BRT.PAY_DATE            payDate,
+            BRT.CREDITOR_DEBT_DATE  creditorDebtDate,
+            FPA.LISTING_DATE        listingDate,
+            BRT.WIN_DATE            winDate,
+            TFPDT.TRADE_DATE        tradeDate,
+            FP.TRADE_MARKET         tradeMarket,
+            BRT.COUNTER_ID          counterId,
+            BRT.REMARK              remark
+        FROM BID_ORDER BO
+        LEFT JOIN (SELECT * FROM (SELECT BRT.*
+            ,ROW_NUMBER() OVER(PARTITION BY BRT.BID_ID ORDER BY BRT.WIN_DATE DESC) RANK
+            FROM BID_RESULT_TOTAL BRT
+            ) WHERE RANK=1
+        ) BRT ON BO.BID_ID = BRT.BID_ID
+        LEFT JOIN FIN_PRODUCT FP ON BRT.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ADD FPA ON FP.FINPROD_ID = FPA.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN (
+        SELECT BID_ID,wm_concat(BID_PRICE) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        from BID_ORDER_BID_PRICE BOBP
+        LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
+        group by BID_ID
+        ) BOBP ON BO.BID_ID = BOBP.BID_ID
+        LEFT JOIN (SELECT TFPDT.B_TRADE_ID, SUM(TFPDT.SHARE_AMT) SHARE_AMT,MAX(TFPDT.TRADE_DATE) TRADE_DATE
+          FROM TRD_FIN_PRODUCT_DEAL_TOTAL TFPDT GROUP BY B_TRADE_ID
+        )TFPDT ON BO.BID_ID = TFPDT.B_TRADE_ID
+        AND TFPDT.SHARE_AMT = BRT.WIN_PRINAMT
+        LEFT JOIN (
+        SELECT TOTAL_WIN_ID,SUM(BRD.PAY_AMT) PAY_AMT
+        from BID_RESULT_DETAIL BRD
+        group by TOTAL_WIN_ID
+        ) BRD ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
+        WHERE 1=1
+         <if test="finprodIdList != null and finprodIdList.size() > 0">
+            AND BO.FINPROD_ID IN
+            <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="tradeMarketList != null and tradeMarketList.size() > 0">
+            AND FP.TRADE_MARKET IN
+            <foreach collection="tradeMarketList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="tenderTargetList != null and tenderTargetList.size() > 0">
+            AND FPI.TENDER_TARGET in
+            <foreach collection="tenderTargetList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="winTypeList != null and winTypeList.size() > 0">
+            AND BO.WIN_TYPE in
+            <foreach collection="winTypeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="bidDateStart != null and bidDateStart != ''">
+            <![CDATA[AND  BO.BID_DATE >= TO_DATE(#{bidDateStart},'YYYY-MM-DD') ]]>
+        </if>
+        <if test="bidDateEnd != null and bidDateEnd != ''">
+            <![CDATA[AND  BO.BID_DATE <= TO_DATE(#{bidDateEnd},'YYYY-MM-DD')]]>
+        </if>
+        <if test="winDateStart != null and winDateStart != ''">
+            <![CDATA[AND  BRT.WIN_DATE  >= TO_DATE(#{winDateStart},'YYYY-MM-DD') ]]>
+        </if>
+        <if test="winDateEnd != null and winDateEnd != ''">
+            <![CDATA[AND  BRT.WIN_DATE  <= TO_DATE(#{winDateEnd},'YYYY-MM-DD')]]>
+        </if>
+        <if test="payDateStart != null and payDateStart != ''">
+            <![CDATA[AND  BRT.PAY_DATE  >= TO_DATE(#{payDateStart},'YYYY-MM-DD') ]]>
+        </if>
+        <if test="payDateEnd != null and payDateEnd != ''">
+            <![CDATA[AND  BRT.PAY_DATE  <= TO_DATE(#{payDateEnd},'YYYY-MM-DD')]]>
+        </if>
+        <if test="listingDateStart != null and listingDateStart != ''">
+            <![CDATA[AND  FPA.LISTING_DATE  >= TO_DATE(#{listingDateStart},'YYYY-MM-DD') ]]>
+        </if>
+        <if test="listingDateEnd != null and listingDateEnd != ''">
+            <![CDATA[AND  FPA.LISTING_DATE  <= TO_DATE(#{listingDateEnd},'YYYY-MM-DD')]]>
+        </if>
+        <if test="payTypeList != null and payTypeList.size() > 0">
+            AND BO.PAY_TYPE in
+            <foreach collection="payTypeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="bidTypeList != null and bidTypeList.size() > 0">
+            AND BRT.WIN_TYPE in
+            <foreach collection="bidTypeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="bidId != null and bidId != ''">
+            AND BO.BID_ID = #{bidId}
+        </if>
+        <if test="isWin != null and isWin != ''">
+            AND BO.IS_WIN = #{isWin}
+        </if>
+        ) ss
+        left join SYS_DATADICT_LIST sdl_tp on ss.tradeMarket=sdl_tp.ITEM_CODE and sdl_tp.DICT_CODE='TRADE_PLACE'
+        left join SYS_DATADICT_LIST sdl_tt on ss.tenderTarget=sdl_tt.ITEM_CODE and sdl_tt.DICT_CODE='TENDER_TARGET'
+        left join SYS_DATADICT_LIST sdl_wt on ss.winType=sdl_wt.ITEM_CODE and sdl_wt.DICT_CODE='WIN_TYPE'
+        left join SYS_DATADICT_LIST sdl_ept on ss.payType=sdl_ept.ITEM_CODE and sdl_ept.DICT_CODE='ETR_PAY_TYPE'
+        left join SYS_DATADICT_LIST sdl_bt on ss.bidType=sdl_bt.ITEM_CODE and sdl_bt.DICT_CODE='BID_TYPE'
+        <!-- 关键字模糊查询 -->
+        <include refid="keywordsWhere"></include>)
+        <!--前端传入排序字段-->
+        <if test="sort != null and sort != '' and direction != null and direction != ''">
+            order by ${sort} ${direction}
+        </if>
+    </select>
+
+    <sql id="keywordsWhere">
+        <if test="search != null and search != ''">
+            <where>( ss.struts || '|' || ss.isWin || '|' || ss.finprodAbbr || '|' || ss.finprodId || '|'
+                || '|' || ss.bidId || '|' || sdl_tp.ITEM_VALUE || '|'  sdl_tt.ITEM_VALUE || '|' || sdl_wt.ITEM_VALUE
+                || '|' || sdl_ept.ITEM_VALUE ||'|' || sdl_bt.ITEM_VALUE || '|' || ss.bidPrice || '|' || ss.winPrice
+                || '|' || ss.remark  like '%' || #{search} || '%'
+                or to_char(ss.winPrinamt)=#{search}
+                or to_char(ss.payAmt)=#{search}
+                or to_char(ss.settFeeAmt)=#{search}
+                or to_char(ss.totalBiddingNum)=#{search}
+                or to_char(ss.spreadRate)=#{search}
+                or to_char(ss.bidDate,'YYYY-MM-DD')=#{search}
+                or to_char(ss.payDate,'YYYY-MM-DD')=#{search}
+                or to_char(ss.creditorDebtDate,'YYYY-MM-DD')=#{search}
+                or to_char(ss.listingDate,'YYYY-MM-DD')=#{search}
+                or to_char(ss.winDate,'YYYY-MM-DD')=#{search}
+                or to_char(ss.tradeDate,'YYYY-MM-DD')=#{search}
+                )
+            </where>
+        </if>
+    </sql>
+
+    <select id="selectDetailForPage" resultType="com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageResponse" parameterType="Map">
+        SELECT
+            BRT.STATUS  status,
+            BRT.IS_WIN  isWin,
+            BO.BID_ID   bidId,
+            BRT.FINPROD_ID  finprodId,
+            FP.FINPROD_ABBR  finprodAbbr,
+            FPI.TENDER_TARGET  tenderTarget,
+            BO.BID_DATE        bidDate,
+            BO.WIN_PRIN_AMT/10000   totalBiddingNum,
+            BOBP.BID_PRICE          bidPrice,
+            BO.WIN_TYPE             winType,
+            BO.PAY_TYPE             payType,
+            BRT.WIN_TYPE            bidType,
+            BRT.WIN_PRINAMT/10000   winPrinamt,
+            BRT.WIN_PRICE           winPrice,
+            BRD.PAY_AMT             payAmt,
+            BRT.SETT_FEE_AMT        settFeeAmt,
+            BRT.PAY_DATE            payDate,
+            BRT.CREDITOR_DEBT_DATE  creditorDebtDate,
+            FPA.LISTING_DATE        listingDate,
+            BRT.WIN_DATE            winDate,
+            TFPDT.TRADE_DATE        tradeDate,
+            FP.TRADE_MARKET         tradeMarket,
+            BRT.COUNTER_ID          counterId,
+            BRT.REMARK              remark
+        FROM BID_RESULT_TOTAL BRT
+        LEFT JOIN BID_ORDER BO ON BO.BID_ID = BRT.BID_ID
+        LEFT JOIN FIN_PRODUCT FP ON BRT.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ADD FPA ON FP.FINPROD_ID = FPA.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN (
+        SELECT BID_ID,wm_concat(BID_PRICE) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        from BID_ORDER_BID_PRICE BOBP
+        LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
+        group by BID_ID
+        ) BOBP ON BO.BID_ID = BOBP.BID_ID
+        LEFT JOIN (SELECT TFPDT.B_TRADE_ID, SUM(TFPDT.SHARE_AMT) SHARE_AMT,MAX(TFPDT.TRADE_DATE) TRADE_DATE
+        FROM TRD_FIN_PRODUCT_DEAL_TOTAL TFPDT GROUP BY B_TRADE_ID
+        )TFPDT ON BO.BID_ID = TFPDT.B_TRADE_ID
+        LEFT JOIN (
+        SELECT TOTAL_WIN_ID,SUM(BRD.PAY_AMT) PAY_AMT
+        from BID_RESULT_DETAIL BRD
+        group by TOTAL_WIN_ID
+        ) BRD ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
+        WHERE 1=1
+        <if test="bidId != null and bidId != ''">
+            AND BO.BID_ID = #{bidId}
+        </if>
+        UNION ALL
+        SELECT
+            BRT.STATUS       status,
+            BRT.IS_WIN       isWin,
+            BO.BID_ID        bidId,
+            BRT.FINPROD_ID   finprodId,
+            FP.FINPROD_ABBR  finprodAbbr,
+            FPI.TENDER_TARGET  tenderTarget,
+            BO.BID_DATE        bidDate,
+            BO.WIN_PRIN_AMT/10000   totalBiddingNum,
+            BOBP.BID_PRICE          bidPrice,
+            BO.WIN_TYPE             winType,
+            BO.PAY_TYPE             payType,
+            BRT.WIN_TYPE            bidType,
+            BRT.WIN_PRINAMT/10000   winPrinamt,
+            BRT.WIN_PRICE           winPrice,
+            BRD.PAY_AMT             payAmt,
+            BRT.SETT_FEE_AMT        settFeeAmt,
+            BRT.PAY_DATE            payDate,
+            BRT.CREDITOR_DEBT_DATE  creditorDebtDate,
+            FPA.LISTING_DATE        listingDate,
+            BRT.WIN_DATE            winDate,
+            TFPDT.TRADE_DATE        tradeDate,
+            FP.TRADE_MARKET         tradeMarket,
+            BRT.COUNTER_ID          counterId,
+            BRT.REMARK              remark
+        FROM WFL_BID_RESULT_TOTAL BRT
+        LEFT JOIN BID_ORDER BO ON BO.BID_ID = BRT.BID_ID
+        LEFT JOIN FIN_PRODUCT FP ON BRT.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ADD FPA ON FP.FINPROD_ID = FPA.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN (
+        SELECT BID_ID,wm_concat(BID_PRICE) BID_PRICE,SUM(EE.ENTRUST_NUM) ENTRUST_NUM
+        from BID_ORDER_BID_PRICE BOBP
+        LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
+        group by BID_ID
+        ) BOBP ON BO.BID_ID = BOBP.BID_ID
+        LEFT JOIN (SELECT TFPDT.B_TRADE_ID, SUM(TFPDT.SHARE_AMT) SHARE_AMT,MAX(TFPDT.TRADE_DATE) TRADE_DATE
+                FROM TRD_FIN_PRODUCT_DEAL_TOTAL TFPDT GROUP BY B_TRADE_ID
+                )TFPDT ON BO.BID_ID = TFPDT.B_TRADE_ID
+        LEFT JOIN (
+        SELECT TOTAL_WIN_ID,SUM(BRD.PAY_AMT) PAY_AMT
+        from WFL_BID_RESULT_DETAIL BRD
+        group by TOTAL_WIN_ID
+        ) BRD ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
+        WHERE 1=1
+        <if test="bidId != null and bidId != ''">
+           AND BO.BID_ID = #{bidId}
+        </if>
+    </select>
+
+    <select id="selectBidOrderInfo" resultType="com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest" parameterType="Map">
+        SELECT
+            BO.FINPROD_ID finprodId,
+            FP.FINPROD_ABBR finprodAbbr,
+            BO.OUR_TRADER   ouTraderId,
+            BO.COUNTER_ID     counterId,
+            FPI.TENDER_TARGET tenderTarget,
+            FP.CCY            ccy,
+            FPI.PAY_DATE      payDate,
+            FPI.ISSUE_SDATE   bidDateStart,
+            FPI.ISSUE_EDATE   bidDateEnd,
+            BO.PAY_DATE   creditorDebtDate,
+            FPA.LISTING_DATE listingDate,
+            BO.WIN_TYPE   winType,
+            BO.PAY_TYPE   payType,
+            BO.WIN_PRIN_AMT   winPrinAmt
+        FROM BID_ORDER	BO
+        LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ADD FPA ON FPA.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
+        WHERE BO.BID_ID = #{bidId}
+    </select>
+
+    <select id="selectBidOrderDtail" resultType="com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveDetailDto" parameterType="Map">
+        SELECT
+            BOBP.ENTRUST_ID  entrustId,
+            BOBP.PORTFOLIO_ID portfolioId,
+            BOBP.THE_WIN_PRIN_AMT theWinPrinAmt,
+            BOBP.BID_PRICE   bidPrice,
+            BOBP.INV_AIM   invAim,
+            BOBP.SEC_ACCT_ID secAcctId,
+            BOBP.ACCT_NO  acctNo,
+            EE.INV_MANAGER_ID invManagerId
+        FROM BID_ORDER_BID_PRICE BOBP
+        LEFT JOIN BID_ORDER BO ON BOBP.BID_ID = BO.BID_ID
+        LEFT JOIN ETR_ENTRUST EE ON EE.ENTRUST_ID = BOBP.ENTRUST_ID
+        WHERE BO.BID_ID = #{bidId}
+    </select>
+
+    <select id="selectBasicInfo" resultType="com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest" parameterType="Map">
+        SELECT
+            BRT.TOTAL_WIN_ID totalWinId,
+            BRT.FINPROD_ID finprodId,
+            FP.FINPROD_ABBR finprodAbbr,
+            BO.OUR_TRADER   ouTraderId,
+            BO.COUNTER_ID   counterId,
+            FPI.TENDER_TARGET tenderTarget,
+            FP.CCY                   ccy,
+            BRT.BID_DATE             bidDate,
+            BRT.PAY_DATE             payDate,
+            BRT.CREDITOR_DEBT_DATE   creditorDebtDate,
+            FPA.LISTING_DATE listingDate,
+            BRT.WIN_TYPE   winType,
+            BRT.PAY_TYPE   payType,
+            BO.WIN_PRIN_AMT/10000 totalBiddingNum,
+            BRT.WIN_PRIN_AMT   winPrinAmt,
+            BRT.WIN_PRICE       winPrice,
+            BRT.SETT_FEE_AMT     settFeeAmt,
+            BRT.REMARK  remark,
+            FP.TRADE_MARKET  tradeMarket
+        FROM BID_RESULT_TOTAL BRT
+        LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BRT.BID_ID
+        LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ADD FPA ON FPA.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
+        WHERE BRT.TOTAL_WIN_ID = #{totalWinId}
+    </select>
+
+    <select id="selectBasicDtail" resultType="com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveDetailDto" parameterType="Map">
+        SELECT
+            BRD.TOTAL_WIN_ID totalWinId,
+            BRT.BID_TYPE      bidType,
+            BRD.ENTRUST_ID  entrustId,
+            BRD.PORTFOLIO_ID portfolioId,
+            BRD.TOTAL_BID_PRINAMT totalBidPrinamt,
+            BRD.THE_WIN_PRIN_AMT theWinPrinAmt,
+            BRD.ACT_WIN_PRIN_AMT actWinPrinamt,
+            BRD.BID_PRICE   bidPrice,
+            BRD.WIN_PRICE   winPrice,
+            BRD.WIN_CPRICE   winCprice,
+            BRD.INT_AMT   intAmt,
+            BRD.PAY_AMT   payAmt,
+            BRD.SETT_FEE_AMT     settFeeAmt,
+            BRD.INV_AIM   invAim,
+            BRD.SEC_ACCT_ID secAcctId,
+            EE.INV_MANAGER_ID invManagerId,
+            BRD.ACCT_NO  acctNo,
+            EE.UNIT_CPRICE unitCprice,
+            EE.TRADE_AMT  tradeAmt
+        FROM BID_RESULT_DETAIL BRD
+        LEFT JOIN BID_RESULT_TOTAL BRT ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
+        LEFT JOIN ETR_ENTRUST EE ON EE.ENTRUST_ID = BRD.ENTRUST_ID
+        WHERE BRT.TOTAL_WIN_ID = #{totalWinId}
+    </select>
+
+
+
+    <select id="getBusinessData" parameterType="com.joyintech.tams.component.business.core.dto.WflValidInputParameter" resultType="java.lang.String">
+        select pm.STATUS status
+        from SYS_DATA_PROCESS_MARK pm
+        inner join (
+        select
+        max(HIS_NO)	       HIS_NO,
+        WORKFLOW_ID
+        from SYS_DATA_PROCESS_MARK
+        <where>
+            <if test="pageId != null and pageId !=''">
+                PAGE_ID = #{pageId}
+            </if>
+        </where>
+        group by  WORKFLOW_ID
+        ) tempHis on  pm.HIS_NO = tempHis.HIS_NO and pm.WORKFLOW_ID = tempHis.WORKFLOW_ID
+        <where>
+            <if test="seachMode != null and seachMode !='' and seachMode == '01'.toString()">
+                pm.status in ('A','U','P')
+            </if>
+            <if test="pageId != null and pageId !=''">
+                and pm.PAGE_ID = #{pageId}
+            </if>
+            <if test="businessDataPk1 != null and businessDataPk1 !=''">
+                and pm.BUSINESS_DATA_PK1 = #{businessDataPk1}
+            </if>
+            <if test="businessDataPk2 != null and businessDataPk2 !=''">
+                and pm.BUSINESS_DATA_PK2 = #{businessDataPk2}
+            </if>
+            <if test="workflowId != null and workflowId !=''">
+                and pm.WORKFLOW_ID != #{workflowId}
+            </if>
+        </where>
+        order by pm.create_time desc
+    </select>
+    <select id="selectCounterCapacctInfoList" resultType="com.joyintech.tams.common.base.entity.StlCapacctInfo">
+        SELECT
+        DISTINCT
+        B.ACCT_NO as acctNo,
+        B.ACCT_NAME as acctName
+        FROM
+        MST_COUNTER_ACCT A, STL_CAPACCT_INFO B
+        WHERE
+        A.COUNTER_ID = #{counterId}
+        <if test="acctType != null and !acctType.isEmpty()">
+          AND A.ACCT_TYPE = #{acctType}
+        </if>
+        AND A.ACCT_NO = B.ACCT_NO
+        AND A.IS_OPEN = '01'
+        AND A.CCY = B.CCY
+        <if test="ccy != null and !ccy.isEmpty()">
+            AND A.CCY = #{ccy}
+        </if>
+    </select>
+    <select id="selectBondsIntResetList" resultMap="com.joyintech.tams.common.base.dao.FinCashCalcRuleMapper.BaseResultMap">
+        <include refid="com.joyintech.tams.common.base.dao.FinCashCalcRuleMapper.Sql_All_Data"></include>
+        where
+        FINPROD_ID = #{finprodId}
+        and FINPROD_TYPE2 = #{finprodType}
+        order by EFF_DATE
+    </select>
+    <select id="getFinCashPlan" resultType="com.joyintech.tams.invest.common.asset.dto.FinCashPlanDto">
+        SELECT
+            A.CASH_TYPE_1 cashType1,
+            B.VDATE vdate,
+            B.MDATE mdate,
+            B.VDATE_UNADJUST vdateUnadjust,
+            B.MDATE_UNADJUST mdateUnadjust,
+            B.PRIN_AMT prinAmt,
+            B.INT_AMT intAmt,
+            B.IS_PAY_INT isPayInt
+        FROM FIN_CASH_INFO A
+                 LEFT JOIN FIN_CASH_PLAN B
+                           ON A.CASH_ID = B.CASH_ID
+        WHERE A.FINPROD_ID = #{finprodId}
+          AND A.FINPROD_TYPE = #{finprodType}
+    </select>
+
+    <select id="getSecInfoModel" resultType="com.joyintech.tams.invest.common.trade.dto.SecInfoModelDto">
+        SELECT
+        A.VDATE startDate,
+        A.MDATE endDate,
+        (
+        SELECT MIN(C.VDATE) FROM FIN_CASH_PLAN C WHERE C.CASH_ID = B.CASH_ID
+        ) firstPayDate,
+        A.ISSUE_PRICE issuePrice,
+        A.COUPON_SPECIES bondsType,
+        E.BASIS basis,
+        F.INT_TYPE intRateType,
+        G.PAY_CYCLE yearIntRate,
+        G.CALC_RULE calMethod,
+        H.EXERCISE_DATE nextExeDate,
+        H.EXERCISE_PRICE nextExercisePrice
+        FROM FIN_PRODUCT A
+        LEFT JOIN FIN_CASH_INFO B
+        ON A.FINPROD_ID = B.FINPROD_ID
+        AND B.FINPROD_TYPE = #{finprodType}
+        AND B.CASH_TYPE_1 = #{cashType1}
+        LEFT JOIN FIN_PRODUCT_TYPE D
+        ON D.FINPROD_ID = A.FINPROD_ID
+        LEFT JOIN FIN_CASH_INFO T1
+        ON A.FINPROD_ID = T1.FINPROD_ID
+        AND T1.CASH_TYPE_2 = 'C02'
+        AND T1.FINPROD_TYPE = '01'
+        left join (select FINPROD_ID, max(eff_date) as EFF_DATE
+        from FIN_CASH_CALC_RULE
+        group by FINPROD_ID) T2
+        on T2.FINPROD_ID = A.FINPROD_ID
+        LEFT JOIN FIN_CASH_CALC_RULE E
+        ON E.FINPROD_ID = A.FINPROD_ID
+        and E.EFF_DATE = T2.EFF_DATE
+        AND E.CASH_ID = T1.CASH_ID
+        AND E.FINPROD_TYPE2 = 'F01'
+        and E.IS_INITIAL = 'Y'
+        LEFT JOIN FIN_RATE_INFO F
+        ON F.CASH_ID = B.CASH_ID
+        AND F.FINPROD_TYPE2 = #{finprodType2}
+        LEFT JOIN FIN_CASH_PAY_RULE G
+        ON G.CASH_ID = B.CASH_ID
+        AND G.FINPROD_TYPE2 = #{finprodType2}
+        LEFT JOIN (
+        SELECT *
+        FROM FIN_EXERCISE_PLAN
+        WHERE
+        EXERCISE_DATE IN (
+        SELECT MIN(EXERCISE_DATE) FROM FIN_EXERCISE_PLAN WHERE FINPROD_ID = #{finprodId} AND FINPROD_TYPE2 = #{finprodType2} AND EXERCISE_DATE &gt;= #{sysDate}
+        )
+        AND FINPROD_ID = #{finprodId} AND FINPROD_TYPE2 = #{finprodType2}
+        <if test="ps == psT03">AND EXERCISE_TYPE = #{EXEC_MODE02}</if>
+        <if test="ps == psT39">AND EXERCISE_TYPE = #{EXEC_MODE01}</if>
+        and rownum = 1
+        ) H ON 1=1
+        WHERE
+        A.FINPROD_ID = #{finprodId}
+    </select>
+    <select id="getCurSecAmt" resultType="java.math.BigDecimal">
+        SELECT
+        100 - NVL(sum(fcp.PRIN_AMT), 0)
+        FROM
+        FIN_CASH_PLAN fcp
+        inner join FIN_CASH_INFO fci
+        on fcp.CASH_ID = fci.CASH_ID
+        WHERE
+        fcp.FINPROD_ID = #{finprodId}
+        <!-- AND fcp.FINPROD_TYPE = #{finprodType} -->
+        AND fcp.MDATE &lt; #{settleDate}
+        and fci.CASH_TYPE_1 = #{cashType1}
+    </select>
+
+    <select id="getTrdFinProductDealTotal" resultType="com.joyintech.tams.common.base.entity.TrdFinProductDealTotal">
+        SELECT TOTLE_TRADE_ID totleTradeId
+        FROM TRD_FIN_PRODUCT_DEAL_TOTAL
+        WHERE B_TRADE_ID = #{bTradeId}
+    </select>
+
+    <!-- 根据汇总交易编号查询交易信息 -->
+    <select id="queryTrdProductDealByTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.TrdProductDealMapper.BaseResultMap">
+        select <include refid="com.joyintech.tams.common.base.dao.TrdProductDealMapper.Base_Column_List" />
+        from TRD_PRODUCT_DEAL where TOTLE_TRADE_ID = #{tradeId}
+    </select>
+
+    <!-- 根据划款指令信息 -->
+    <select id="queryStlOrdersByTradeId" resultMap="com.joyintech.tams.common.base.dao.StlOrdersMapper.BaseResultMap">
+        select <include refid="com.joyintech.tams.common.base.dao.StlOrdersMapper.Base_Column_List" />
+        from STL_RDERS where TRADE_ID = #{tradeId}
+    </select>
+
+    <select id="queryPtlTradeByTradeId" resultMap="com.joyintech.tams.common.base.dao.PtlTradeMapper.BaseResultMap">
+        select <include refid="com.joyintech.tams.common.base.dao.PtlTradeMapper.Base_Column_List" />
+        from PTL_TRADE
+        where BUSI_NO = #{tradeId}
+    </select>
+
+</mapper>
