@@ -10,11 +10,11 @@ import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.util.ExcelUtil;
-import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.req.FinProductSpecialSaveRequest;
+import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialDto;
 import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialImportDto;
-import org.springframework.util.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,7 @@ public class FinProductSpecialValidatorService implements BeanValidator {
     @Override
     public List<ValidMessage> valid(Object value) {
         List<ValidMessage> resultList = new ArrayList<>();
-        FinProductSpecialSaveRequest dto = (FinProductSpecialSaveRequest) value;
+        FinProductSpecialDto dto = (FinProductSpecialDto) value;
         if (StringUtil.isBlank(dto.getFinprodMarketId())) {
             resultList.add(new ValidMessage(getMessage("【债券代码】必填!")));
         }

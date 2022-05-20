@@ -1276,7 +1276,7 @@ public class TradeHelper {
         }
         TradeInfoProRequest dto = new TradeInfoProRequest();
         dto.setAcctNo(integratedEntrust.getAccountId());
-        dto.setTradePlace(Market.SZSE.investValue);
+        dto.setTradePlace(Market.getInvestValue(integratedEntrust.getMarket()));
         dto.setIsOur("Y");
         List<TradeInfoProResponse> dealerTraderList = commonManagement.getDealerTraderInfo(dto);
 
