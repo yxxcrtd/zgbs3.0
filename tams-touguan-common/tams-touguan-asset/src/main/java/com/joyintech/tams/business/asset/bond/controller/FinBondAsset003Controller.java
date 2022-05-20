@@ -228,12 +228,12 @@ public class FinBondAsset003Controller extends BaseController{
         WorkFlowParameter<FinAssetRateAdjResponse> params = new WorkFlowParameter<FinAssetRateAdjResponse>();
         params.setPageId("FinBondAsset003");
         params.setElementId(dto.getElementId());
-        params.setBusinessCode(FinAssetRateAdjResponse::getFinprodId);
+        params.setBusinessCode(FinAssetRateAdjResponse::getFinprodMarketId);
         params.setBusinessType(DictCodeList.共通业务类型_债券类资产利率调整.getValue());
         // 设置流程业务说明
         params.setComment(entity -> {
             return WorkFlowUtil.concatComment("利率调整，债券代码"+
-                GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodId()+GlobalConstant.CLOSE_PARENTHESIS,
+                GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodMarketId()+GlobalConstant.CLOSE_PARENTHESIS,
                 "债券简称"+GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS);
         });
         // 给参数变成ProcessParameter而非WorkFlowParameter

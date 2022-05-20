@@ -1400,8 +1400,8 @@ public class TrdCommonBaseService extends BaseService {
         }else{
             // 指令券面总额
             portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrust.getEntrustNum()));
-            // 下单券面总额
-            portfolioDto.setOrdSecAmount(ArithmeticUtil.multiply(portfolioDetail.getEntrustNum()));
+            // 下单券面总额  ZGCPCN-635   2022-5-20  entrustNum 这个是数量 单位是张，entrustAmt是金额 单位元
+            portfolioDto.setOrdSecAmount(ArithmeticUtil.multiply(portfolioDetail.getEntrustAmt()));
             // 券面总额
             portfolioDto.setSecAmount(ArithmeticUtil.multiply(infContractDetailfile.getShareAmt()));
             // 本方券面总额

@@ -222,8 +222,10 @@ public class FinPayInterestStdInfoImplService extends BaseService<FinPayInterest
             scheList = dto.getInvScheduleList();
             //计算支付日
             for(FinCashPlanDto FinCashPlanDto : scheList){
-                String payDate = AdjustedTradeDayCal.getAdjustedTradeDay(DateUtil.format(FinCashPlanDto.getMdate()), is.getPayTdayRule(), holidayList);
-                FinCashPlanDto.setPayDate(DateUtil.parse(payDate));
+                if (!StringUtil.isNotEmpty(FinCashPlanDto.getPayDate())) {
+                    String payDate = AdjustedTradeDayCal.getAdjustedTradeDay(DateUtil.format(FinCashPlanDto.getMdate()), is.getPayTdayRule(), holidayList);
+                    FinCashPlanDto.setPayDate(DateUtil.parse(payDate));
+                }
             }
             rateList = commonRateAdjustService.escapRateAdjust(scai,is,scheList,holidayList);
              // 仅计算付息区间利息
