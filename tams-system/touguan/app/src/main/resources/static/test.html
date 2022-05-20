@@ -6,11 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <style>
-    #iframe {
+    html, body, iframe {
       margin: 0;
       padding: 0;
+    }
+    #iframe {
       width: 100%;
-      height: 100%;
       border: none;
     }
   </style>
@@ -23,9 +24,26 @@
   <script>
     (function() {
       const iframe = document.getElementById('iframe')
-      const doc = iframe.contentDocument
-      console.log(doc.body.offsetHeight)
-    })();
+
+      if (iframe && iframe.contentWindow) {
+        iframe.onload = () => {
+          setTimeout(() => {
+            const iDoc = iframe.contentDocument || iframe.contentWindow.document
+            const height = calcPageHeight(iDoc)
+
+            iframe.style.height = `${height}px`
+          }, 500)
+        }
+      }
+
+      function calcPageHeight(doc) {
+        const cHeight = Math.max(doc.body.clientHeight, doc.documentElement.clientHeight)
+        const sHeight = Math.max(doc.body.scrollHeight, doc.documentElement.scrollHeight)
+        const height = Math.max(cHeight, sHeight)
+
+        return height
+      }
+  })();
   </script>
 </body>
 </html>
