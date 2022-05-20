@@ -152,7 +152,7 @@ public class FinTenderBondAsset002Controller extends BaseController {
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
         params.setBusinessCode(FinTenderBondAsset002Dto::getFinprodMarketId);
-        params.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标债券类资产管理.getValue());
+        params.setBusinessType(BussinessDictCodeList.共同业务类型_新债标的.getValue());
         if (StringUtil.equals(dto.getOperateType(), OperationType.NEW.name())) {
             processParameter.setOperationType(OperationType.NEW);
         } else if (StringUtil.equals(dto.getOperateType(), OperationType.MODIFY.name())) {
@@ -179,7 +179,7 @@ public class FinTenderBondAsset002Controller extends BaseController {
         params.setPageId(this.getPageId());
         params.setElementId(asset004Dto.getElementId());
         params.setBusinessCode(FinTenderBondAsset002Dto::getFinprodMarketId);
-        params.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标债券类资产管理.getValue());
+        params.setBusinessType(BussinessDictCodeList.共同业务类型_新债标的.getValue());
         FinTenderBondAsset002Dto dto = finTenderBoundAssetService.getById(asset004Dto.getFinprodId());
         dto.setRemark(asset004Dto.getRemark());
         dto.setOperateType(OperationType.DELETE.name());

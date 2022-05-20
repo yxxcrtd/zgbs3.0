@@ -84,6 +84,7 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
        initPageParams.put("TRADE_PLACE", this.getSelectDataFromDataDic(DictCode.交易场所, null));
        initPageParams.put("CCY", this.getSelectDataFromDataDic(DictCode.币种, null));
        initPageParams.put("BID_TYPE", this.getSelectDataFromDataDic(DictCode.中标方式, null));
+       initPageParams.put("BUSINESS_MODEL", this.getSelectDataFromDataDic(DictCode.业务模式, null));
        initPageParams.put("YES_OR_NO_Y", DictCodeList.是否_是.getValue());
        initPageParams.put("pageModel",this.getPageModel());
         initPageParams.put("BID_TYPE_01", DictCodeListExt4.中标方式_单标位中标.getValue());

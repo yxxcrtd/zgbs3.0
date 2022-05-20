@@ -195,6 +195,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 BidResultDetail bidResultDetail = new BidResultDetail();
                 BeanUtil.copyPropertiesIgnoreNull(bidResultDetail,response);
                 BeanUtil.copyPropertiesIgnoreNull(bidResultDetail,detailDto);
+                bidResultDetail.setDetailWinId(IDGenerator.generate());
                 bidResultDetailMapper.insertSelective(bidResultDetail);
             }
             ajax.setMessage("未中标信息保存成功！");
@@ -310,7 +311,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         //中标结果汇总表
         BidResultTotal bidResultTotal = dto.getBidResultTotal();
         wflBidResultTotalMapper.deleteByPrimaryKey(bidResultTotal.getTotalWinId());
-        wflBidResultDetailMapper.deleteByPrimaryKey(bidResultTotal.getTotalWinId());
+        wflBidResultDetailMapper.deleteByTotalWinId(bidResultTotal.getTotalWinId());
 
         bidResultTotalMapper.insertSelective(bidResultTotal);
         //中标结果明细表
@@ -377,6 +378,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         for (CfetsPrimaryBidManageSaveDetailDto detailDto:dto.getAllocationDetails()) {
             BidResultDetail bidResultDetail = new BidResultDetail();
             BeanUtil.copyPropertiesIgnoreNull(bidResultDetail,detailDto);
+            bidResultDetail.setDetailWinId(IDGenerator.generate());
             bidResultDetailList.add(bidResultDetail);
         }
         baseBidManageBaseInfoDto.setBidResultDetailList(bidResultDetailList);
@@ -671,6 +673,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     for (CfetsPrimaryBidManageSaveDetailDto detail : dto.getAllocationDetails()) {
                         WflBidResultDetail wflBidResultDetail = new WflBidResultDetail();
                         BeanUtil.copyPropertiesIgnoreNull(wflBidResultDetail, detail);
+                        wflBidResultDetail.setDetailWinId(IDGenerator.generate());
                         wflBidResultDetail.setWorkflowId(dto.getWorkflowId());
                         wflBidResultDetail.setWorkflowStatus(DictCodeListExt1.交易流程状态_撤销.getValue());
                         wflBidResultDetail.setTotalWinId(dto.getTotalWinId() + "R");

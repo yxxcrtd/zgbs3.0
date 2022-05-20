@@ -76,8 +76,12 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
 
     @Override
     public String generateTitle(FinTenderBondAsset002Dto entity, OperationType operationType) {
-        return String.format("资产代码(%s) 资产简称(%s)", StringUtil.isEmpty(entity.getFinprodMarketId()) ? "" : entity.getFinprodMarketId(),
-                StringUtil.isEmpty(entity.getFinprodAbbr()) ? "" : entity.getFinprodAbbr());
+        String isssueClass = "";
+        if(Objects.nonNull(entity.getIssueDto()) && StringUtil.isNotEmpty(entity.getIssueDto().getIssueClass())) {
+            isssueClass = entity.getIssueDto().getIssueClass();
+        }
+        return String.format("资产代码(%s) 资产简称(%s) 发行方式(%s)", StringUtil.isEmpty(entity.getFinprodMarketId()) ? "" : entity.getFinprodMarketId(),
+                StringUtil.isEmpty(entity.getFinprodAbbr()) ? "" : entity.getFinprodAbbr(),isssueClass);
     }
 
     @Override

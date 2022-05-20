@@ -273,20 +273,4 @@ public interface CfetsTrdQueryMapper {
     List<CfetsPledgeInfoResponse> findRepoPledgeInfo(Map<String, Object> pageParam);
 
     List<String> findEtrEntrustIsForcedFinish(Map<String, Object> pageParam);
-
-    CfetsTrdBidInfoResponse findFxmrManualSettleInfo(Map<String, Object> pageParam);
-
-    List<BidPortIntFenPeiInfoDto> findFxmrPortIntFenPeiInfoList(Map<String, Object> pageParam);
-
-    CfetsTrdBidInfoResponse findZztbManualSettleInfo(Map<String, Object> pageParam);
-
-    List<BidPortIntFenPeiInfoDto> findZztbPortIntFenPeiInfoList(Map<String, Object> pageParam);
-
-    CfetsTrdBidInfoResponse findYjsgManualSettleInfo(Map<String, Object> pageParam);
-
-    List<BidPortIntFenPeiInfoDto> findYjsgPortIntFenPeiInfoList(Map<String, Object> pageParam);
-
-
-
-
 }
