@@ -163,6 +163,21 @@ public class FinProductSpecial001Controller extends BaseController {
         return Message.success("处理成功", null);
     }
 
+
+    /**
+     * 特殊债券信息编辑
+     *
+     * @param finProductSpecialDto
+     * @return
+     */
+    @ApiOperation(value = "特殊债券信息编辑", notes = "特殊债券信息编辑")
+    @PostMapping("/edit")
+    @ResponseBody
+    public Message<AjaxResult> edit(@RequestBody FinProductSpecialDto finProductSpecialDto) {
+        AjaxResult ajax = new AjaxResult();
+        return Message.success("处理成功", null);
+    }
+
     /**
      * 导入数据文件之前检查数据
      *
