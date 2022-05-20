@@ -49,7 +49,8 @@
         ,c1.acctName as dealCurAcctName
         ,T1.PRICE_MODEL priceModel
         ,T2.DEAL_MODE as declaType
-        ,CASE WHEN T1.PS IN ( #{PS_03}, #{PS_04}) THEN T1.PRICE * 100 ELSE
+        ,CASE WHEN T1.PS IN ( #{PS_03}, #{PS_04}) and T1.PRICE_MODEL = #{PRICE_MODEL_PRM03} THEN NULL
+            WHEN T1.PS IN ( #{PS_03}, #{PS_04}) THEN T1.PRICE * 100 ELSE
         T1.PRICE END price
         /* ,T1.ENTRUST_AMT*NVL(T1.PRICE,1) ENTRUST_AMT*/
         ,T1.ENTRUST_AMT entrustAmt
@@ -192,7 +193,8 @@
         ,c1.acctName as dealCurAcctName
         ,T1.PRICE_MODEL priceModel
         ,T2.DEAL_MODE as declaType
-        ,CASE WHEN T1.PS IN ( #{PS_03}, #{PS_04}) THEN T1.PRICE * 100 ELSE
+        ,CASE WHEN T1.PS IN ( #{PS_03}, #{PS_04}) and T1.PRICE_MODEL = #{PRICE_MODEL_PRM03} THEN NULL
+        WHEN T1.PS IN ( #{PS_03}, #{PS_04}) THEN T1.PRICE * 100 ELSE
         T1.PRICE END price
         /* ,T1.ENTRUST_AMT*NVL(T1.PRICE,1) ENTRUST_AMT*/
         ,T1.ENTRUST_AMT entrustAmt

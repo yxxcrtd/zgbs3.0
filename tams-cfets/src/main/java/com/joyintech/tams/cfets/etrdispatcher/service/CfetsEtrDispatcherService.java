@@ -1860,6 +1860,10 @@ public class CfetsEtrDispatcherService extends BaseService {
                         && StringUtil.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_竞价交易.getValue())) {
                     fieldResponseDto.setUnitPrice(ArithmeticUtil.multiply(fieldResponseDto.getUnitPrice(), BigDecimal.valueOf(100)));
                 }
+                if(StringUtil.equals(DictCodeListExt3.投管业务类型_通用式质押回购.getValue(), dto.getBusiTypePosition()) &&
+                        StringUtil.equals(DictCodeListExt2.价格模式_市价指令.getValue(), fieldResponseDto.getPriceModel())){
+                    fieldResponseDto.setUnitPrice(null);
+                }
                 ////将投资经理转为真实姓名
                 if (StringUtil.isNotEmpty(fieldResponseDto.getInvManagerId())) {
                     User user1 = cfetsEtrDispatcherMapper.getRealNameByUserName(fieldResponseDto.getInvManagerId());
