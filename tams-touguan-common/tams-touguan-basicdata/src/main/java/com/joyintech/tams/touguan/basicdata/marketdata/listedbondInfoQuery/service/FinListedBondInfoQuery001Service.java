@@ -160,7 +160,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         request.setSecId(secId);
         FinListedBondInfoQuery001Dto finListedBondInfoQuery001Dto = queryFinWindMarketForCoupons(request);
         if (Objects.isNull(finListedBondInfoQuery001Dto)) {
-            validMessages.add(new ValidMessage("查询债券信息为空"));
+            validMessages.add(new ValidMessage("未查询到该待上市债券信息，无法加券，请手工维护"));
             return validMessages;
         }
 
