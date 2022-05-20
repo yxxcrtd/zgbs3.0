@@ -65,29 +65,33 @@
             </if>
 
             <if test="tradingPlaces !=null and tradingPlaces !=''">
-                AND RELEASE_INFO.TRADING_PLACES = #{tradingPlaces,jdbcType=VARCHAR}
+                AND SEC_INFO.TRADING_PLACES = #{tradingPlaces,jdbcType=VARCHAR}
             </if>
 
             <if test="primaryClassifications != null and primaryClassifications.size() > 0">
-                AND RELEASE_INFO.PRIMARY_CLASSIFICATION in
+                AND SEC_INFO.PRIMARY_CLASSIFICATION in
                 <foreach collection="primaryClassifications" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
             </if>
 
             <if test="secondaryClassifications != null and secondaryClassifications.size() > 0">
-                AND RELEASE_INFO.SECONDARY_CLASSIFICATION in
+                AND SEC_INFO.SECONDARY_CLASSIFICATION in
                 <foreach collection="secondaryClassification" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
             </if>
 
             <if test="registeredCustodian !=null and registeredCustodian !=''">
-                AND RELEASE_INFO.REGISTERED_CUSTODIAN = #{registeredCustodian,jdbcType=VARCHAR}
+                AND SEC_INFO.REGISTERED_CUSTODIAN = #{registeredCustodian,jdbcType=VARCHAR}
+            </if>
+
+            <if test="raiseMode !=null and raiseMode !=''">
+                AND SEC_INFO.RAISE_MODE = #{raiseMode,jdbcType=VARCHAR}
             </if>
 
             <if test="issuer !=null and issuer !=''">
-                AND RELEASE_INFO.ISSUER = #{issuer,jdbcType=VARCHAR}
+                AND SEC_INFO.ISSUER = #{issuer,jdbcType=VARCHAR}
             </if>
 
             <if test="issueDateStart != null">
@@ -99,60 +103,69 @@
             </if>
 
             <if test="vdateStart != null">
-                AND RELEASE_INFO.VALUE_DATE >= #{vdateStart,jdbcType=DATE}
+                AND SEC_INFO.VALUE_DATE >= #{vdateStart,jdbcType=DATE}
             </if>
 
             <if test="vdateEnd != null">
-                AND RELEASE_INFO.VALUE_DATE <![CDATA[ <= ]]>  #{vdateEnd,jdbcType=DATE}
+                AND SEC_INFO.VALUE_DATE <![CDATA[ <= ]]>  #{vdateEnd,jdbcType=DATE}
             </if>
 
             <if test="mdateStart != null">
-                AND RELEASE_INFO.EXPIRY_DATE >= #{mdateStart,jdbcType=DATE}
+                AND SEC_INFO.EXPIRY_DATE >= #{mdateStart,jdbcType=DATE}
             </if>
 
             <if test="mdateEnd != null">
-                AND RELEASE_INFO.EXPIRY_DATE <![CDATA[<=]]> #{mdateEnd,jdbcType=DATE}
+                AND SEC_INFO.EXPIRY_DATE <![CDATA[<=]]> #{mdateEnd,jdbcType=DATE}
             </if>
 
-            <if test="theOryOptionPayDayStart != null">
-                AND SEC_INFO.THEORYOPTIONPAYDAY >= #{theOryOptionPayDayStart,jdbcType=DATE}
+            <if test="listingDateStart != null">
+                AND RELEASE_INFO.LISTING_DATE >= #{listingDateStart,jdbcType=DATE}
             </if>
 
-            <if test="theOryOptionPayDayEnd != null">
-                AND SEC_INFO.THEORYOPTIONPAYDAY <![CDATA[ <=]]> #{theOryOptionPayDayEnd,jdbcType=DATE}
+            <if test="listingDateEnd != null">
+                AND RELEASE_INFO.LISTING_DATE <![CDATA[ <=]]> #{listingDateEnd,jdbcType=DATE}
+            </if>
+
+            <if test="listingCode !=null and listingCode !=''">
+                AND RELEASE_INFO.LISTING_CODE = #{listingCode,jdbcType=VARCHAR}
+            </if>
+
+            <if test="issueMethod !=null and issueMethod !=''">
+                AND RELEASE_INFO.ISSUING_METHOD = #{issueMethod,jdbcType=VARCHAR}
+            </if>
+
+            <if test="biddingMethod !=null and biddingMethod !=''">
+                AND RELEASE_INFO.BIDDING_METHOD = #{biddingMethod,jdbcType=VARCHAR}
+            </if>
+
+            <if test="tenderTarget !=null and tenderTarget !=''">
+                AND RELEASE_INFO.TENDER_TARGET = #{tenderTarget,jdbcType=VARCHAR}
             </if>
 
             <if test="couponSpecies !=null and couponSpecies !=''">
-                AND RELEASE_INFO.VARIETY_OF_COUPONS = #{couponSpecies,jdbcType=VARCHAR}
+                AND SEC_INFO.VARIETY_OF_COUPONS = #{couponSpecies,jdbcType=VARCHAR}
             </if>
 
             <if test="rateType !=null and rateType !=''">
-                AND RELEASE_INFO.RATE_TYPE = #{rateType,jdbcType=VARCHAR}
+                AND SEC_INFO.RATE_TYPE = #{rateType,jdbcType=VARCHAR}
             </if>
 
             <if test="interestPaymentFrequency !=null and interestPaymentFrequency !=''">
-                AND RELEASE_INFO.INTEREST_PAYMENT_FREQUENCY = #{interestPaymentFrequency,jdbcType=VARCHAR}
+                AND SEC_INFO.INTEREST_PAYMENT_FREQUENCY = #{interestPaymentFrequency,jdbcType=VARCHAR}
             </if>
 
             <if test="currency !=null and currency !=''">
                 AND SEC_INFO.CURRENCY = #{currency,jdbcType=VARCHAR}
             </if>
 
-            <if test="isSus !=null and isSus !=''">
-                AND SEC_INFO.ISSUS = #{isSus,jdbcType=VARCHAR}
+            <if test="eventDateStart != null">
+                AND RELEASE_INFO.PAYMENT_DEADLINE >= #{eventDateStart,jdbcType=DATE}
             </if>
 
-            <if test="isRight !=null and isRight !='' and isRight == Y">
-                AND ( SEC_INFO.CALLOPTION = 'Y' OR SEC_INFO.PUTOPTION = 'Y')
+            <if test="eventDateEnd != null">
+                AND RELEASE_INFO.PAYMENT_DEADLINE <![CDATA[ <=]]> #{eventDateEnd,jdbcType=DATE}
             </if>
 
-            <if test="isRight !=null and isRight !='' and isRight == N">
-                AND ( SEC_INFO.CALLOPTION = 'N' AND SEC_INFO.PUTOPTION = 'N')
-            </if>
-
-            <if test="optionType !=null and optionType !=''">
-                AND SEC_INFO.OPTIONTYPE = #{optionType,jdbcType=VARCHAR}
-            </if>
 
             <if test="zxGrade !=null and zxGrade !=''">
                 AND SEC_INFO.RATING in (#{zxGrade,jdbcType=VARCHAR})
