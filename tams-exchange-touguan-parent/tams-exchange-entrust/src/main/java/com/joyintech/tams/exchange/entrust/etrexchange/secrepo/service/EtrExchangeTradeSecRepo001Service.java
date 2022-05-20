@@ -1516,14 +1516,14 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                 if(quotation!=null&&quotation.getPreClosePrice()!=null
                         &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(1.3),quotation.getPreClosePrice()))>0
                             ||checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(0.7),quotation.getPreClosePrice()))<0)){
-                    validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
+                    validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ArithmeticUtil.multiply(new BigDecimal(0.7),quotation.getPreClosePrice())+","+ArithmeticUtil.multiply(new BigDecimal(1.3),quotation.getPreClosePrice())+"]之外"));
                 }
             }
             else if(StringUtil.equals(finprodType,DictCodeList.回购类型_质押式竞价回购.getValue())){
                 if(quotation!=null&&quotation.getPreClosePrice()!=null
                         &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(2),quotation.getPreClosePrice()))>0
                         ||checkPrice.compareTo(BigDecimal.ZERO)<0)){
-                    validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
+                    validMessageList.add(new ValidMessage("指令价格在有效价格范围["+BigDecimal.ZERO+","+ArithmeticUtil.multiply(new BigDecimal(2),quotation.getPreClosePrice())+"]之外"));
                 }
             }
         }
@@ -1538,13 +1538,13 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                     if(quotation!=null&&quotation.getLastPrice()!=null
                             &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(1.1),quotation.getLastPrice()))>0
                             ||checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(0.9),quotation.getLastPrice()))<0)){
-                        validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
+                        validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ArithmeticUtil.multiply(new BigDecimal(0.9),quotation.getLastPrice())+","+ArithmeticUtil.multiply(new BigDecimal(1.1),quotation.getLastPrice())+"]之外"));
                     }
                 }else{
                     if(quotation!=null&&quotation.getLastPrice()!=null
                             &&(checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(1.2),quotation.getLastPrice()))>0
                             ||checkPrice.compareTo(ArithmeticUtil.multiply(new BigDecimal(0.8),quotation.getLastPrice()))<0)){
-                        validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
+                        validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ArithmeticUtil.multiply(new BigDecimal(0.8),quotation.getLastPrice())+","+ArithmeticUtil.multiply(new BigDecimal(1.2),quotation.getLastPrice())+"]之外"));
                     }
                 }
             }
@@ -1552,7 +1552,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                 if(quotation!=null&&quotation.getLastPrice()!=null
                         &&(checkPrice.compareTo(ArithmeticUtil.doAdd(new BigDecimal(0.01),quotation.getLastPrice()))>0
                         ||checkPrice.compareTo(BigDecimal.ZERO)<0)){
-                    validMessageList.add(new ValidMessage("指令价格超过有效价格申报限制范围!"));
+                    validMessageList.add(new ValidMessage("指令价格在有效价格范围["+BigDecimal.ZERO+","+ArithmeticUtil.doAdd(new BigDecimal(0.01),quotation.getLastPrice())+"]之外"));
                 }
             }
         }
