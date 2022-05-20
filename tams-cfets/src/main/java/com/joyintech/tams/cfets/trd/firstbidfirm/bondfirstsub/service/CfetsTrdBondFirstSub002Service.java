@@ -1455,13 +1455,17 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                 errorType = 1;
             }
             partyId = item.getPartyId();
+            if (BigDecimalUtil.ACompareToB(item.getAvaNum(), item.getSubscriptionAmount(), 6) < 0) {
+                errorList.add(new ValidMessage("指令【" + item.getEntrustId() + "】中组合【" + item.getPortfolioName() + "】剩余指令额度不足!"));
+                continue;
+            }
             // 申购产品列表中认购量要小于等于（剩余指令额度-流程中申购额度），不满足时提示到组合维度
             Map<String, Object> params = new HashMap<>();
             params.put("entrustId", item.getEntrustId());
             params.put("protfolioId", item.getPortfolioId());
             BigDecimal etrAvaNum = cfetsTrdBondFirstSub002Mapper.selectEtrAvaNum(params);
             if (BigDecimalUtil.ACompareToB(etrAvaNum, item.getSubscriptionAmount(), 6) < 0) {
-                errorList.add(new ValidMessage("指令【" + item.getEntrustId() + "】中组合【" + item.getPortfolioName() + "】剩余指令额度不足!"));
+                errorList.add(new ValidMessage("指令【" + item.getEntrustId() + "】中组合【" + item.getPortfolioName() + "】剩余指令额度不足(存在流程中数据)!"));
             }
 
         }
