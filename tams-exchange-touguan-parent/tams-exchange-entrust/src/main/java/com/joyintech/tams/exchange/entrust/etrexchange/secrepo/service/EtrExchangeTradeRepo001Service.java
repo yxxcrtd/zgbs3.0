@@ -335,7 +335,7 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
     @Override
     public void doUpdate(EtrExchangeTradeSecRepoSaveRepoRequest entity) {
 
-        if(StringUtil.isEmpty(entity.getPortfolioId()) && !CollectionUtils.isEmpty(entity.getPortfolioList())){
+        if(!CollectionUtils.isEmpty(entity.getPortfolioList())){
             entity.setPortfolioId(entity.getPortfolioList().get(0).getPortfolioId());
             entity.setAcctNo(entity.getPortfolioList().get(0).getAcctNo());
         }
