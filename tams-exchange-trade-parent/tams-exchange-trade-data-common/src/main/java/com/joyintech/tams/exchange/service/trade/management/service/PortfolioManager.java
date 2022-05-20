@@ -577,12 +577,36 @@ public class PortfolioManager extends BaseService {
                 o.setInstructionLeftAmt(entrustAmt.subtract(frozenQuantity).subtract(entrustLeftAmt));
                 o.setInstructionLeftNum(0L);
             }
+
+            fillPortfolioInfo(o);
         });
 
         result.setList(instructionList);
 
         return ResultBean.success(result);
 
+    }
+
+    private void fillPortfolioInfo(FairPortfolioResponse response) {
+        Map<String, PortfolioInfoResponse> portfolioInfoResponseMap = Maps.newHashMap();
+        List<InstructionDetail> instructionDetails = instructionDetailService.queryInstructionDetailsByInstructionId(response.getEntrustId());
+        List<PositionCashSecSingleResp> positionCashSecSingleResps = this.queryPortfolioInfoByTg(instructionDetails, response.getInstruction());
+        PortfolioInfoResponse infoResponse;
+        for (PositionCashSecSingleResp item : positionCashSecSingleResps) {
+            List<BaseMap> baseMapList = item.getBaseMapList();
+            infoResponse = new PortfolioInfoResponse();
+            infoResponse.setPortfolioId(item.getPortfolioId());
+            infoResponse.setProAvailablePositionT0((ObjectUtil.isNotNull(baseMapList.get(3).get(AMOUNT))) ? (BigDecimal) baseMapList.get(3).get(AMOUNT) : BigDecimal.ZERO);
+            infoResponse.setProAvailablePositionT1(BigDecimal.ZERO);
+            infoResponse.setProAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(0).get(AMOUNT))) ? (BigDecimal) baseMapList.get(0).get(AMOUNT) : BigDecimal.ZERO);
+            infoResponse.setProAvailableCashT1(BigDecimal.ZERO);
+            infoResponse.setSecManageAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(1).get(AMOUNT))) ? (BigDecimal) baseMapList.get(1).get(AMOUNT) : BigDecimal.ZERO);
+            infoResponse.setSecManageAvailableCashT1(BigDecimal.ZERO);
+
+            portfolioInfoResponseMap.put(infoResponse.getPortfolioId(), infoResponse);
+        }
+
+        response.setPortfolioInfo(portfolioInfoResponseMap.get(response.getPortfolioId()));
     }
 
     /**
@@ -871,6 +895,8 @@ public class PortfolioManager extends BaseService {
 
                 FairPortfolioResponse response = new FairPortfolioResponse();
                 BeanUtils.copyProperties(ins, response);
+
+                response.setInstruction(ins);
                 list.add(response);
                 continue;
             }
@@ -891,6 +917,7 @@ public class PortfolioManager extends BaseService {
                 // 生成多条指令，替换组合信息，将分配比例存入转股价格（conPrice字段）
                 FairPortfolioResponse copyInstruction = new FairPortfolioResponse();
                 BeanUtil.copyProperties(ins, copyInstruction);
+                copyInstruction.setInstruction(ins);
                 copyInstruction.setPortfolioId(detail.getPortfolioId());
                 copyInstruction.setPortfolioName(detail.getPortfolioName());
 

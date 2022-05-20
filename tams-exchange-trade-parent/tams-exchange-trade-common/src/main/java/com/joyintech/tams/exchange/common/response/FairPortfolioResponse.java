@@ -39,6 +39,8 @@ public class FairPortfolioResponse extends Instruction {
     @JsonProperty("priceModeStr")
     private String priceModeStr;
 
+    private Instruction instruction;
+
     public PortfolioInfoResponse getPortfolioInfo() {
         return portfolioInfo;
     }
@@ -104,5 +106,13 @@ public class FairPortfolioResponse extends Instruction {
 
     public void setPriceModeStr(String priceModeStr) {
         this.priceModeStr = priceModeStr;
+    }
+
+    public Instruction getInstruction() {
+        return instruction;
+    }
+
+    public void setInstruction(Instruction instruction) {
+        this.instruction = instruction;
     }
 }
