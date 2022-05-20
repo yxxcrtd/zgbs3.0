@@ -3,6 +3,7 @@ package com.joyintech.tams.business.asset.tenderbond.service;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.security.SecurityUtil;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest;
@@ -84,8 +85,8 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
 
     @Override
     public String generateTitle(FinTenderBondAsset003Dto entity, OperationType operationType) {
-        return String.format("资产代码(%s) 资产简称(%s) 上市流通", StringUtil.isEmpty(entity.getFinprodMarketId()) ? "" : entity.getFinprodMarketId(),
-                StringUtil.isEmpty(entity.getFinprodAbbr()) ? "" : entity.getFinprodAbbr());
+        return String.format("新债标的资产简称(%s) 上市日(%s) 债券标的资产简称",entity.getFinprodAbbr() ,
+               DateUtil.format(entity.getListingDate(),"yyyy-MM-dd"), entity.getAppearMarketAbbr());
     }
 
     @Override
@@ -247,6 +248,11 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
         String finproductId = finTenderBoundAssetMapper.selectFinprodId(param);
         if(StringUtil.isEmpty(finproductId)) {
             FinBondAssetSaveRequest request = finBondAssetService.getInterfBondDto(dto.getAppearMarketId());
+            if(Objects.isNull(request)) {
+                request = new FinBondAssetSaveRequest();
+                request.setFinprodMarketId(dto.getAppearMarketId());
+                return request;
+            }
             if (StringUtil.isNotEmpty(dto)) {
                 request.setCreditFlag("");
                 request.setFinprodMarketId(dto.getAppearMarketId());

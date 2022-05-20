@@ -309,7 +309,7 @@ public class FinTenderBondAssetBatchService {
         if(Objects.isNull(message)) {
             return false;
         }
-        if(Objects.nonNull(message) && message.getCode().equals("000")) {
+        if(Objects.nonNull(message) && message.getCode().equals("000") && Objects.isNull(message.getData())) {
             InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = commonAutoCouponService.autoBondCoupon(dto);
             if (Objects.nonNull(interfPayhsrcsecinfoDto) && CollectionUtils.isNotEmpty(interfPayhsrcsecinfoDto.getErrorBondList())) {
                 return false;
