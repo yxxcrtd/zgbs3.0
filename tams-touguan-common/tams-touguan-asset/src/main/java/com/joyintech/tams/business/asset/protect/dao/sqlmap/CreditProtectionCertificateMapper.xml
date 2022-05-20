@@ -73,7 +73,7 @@
                 )
             </if>
             <if test="refEntity != null and refEntity.size() > 0">
-                AND (fp.REF_ENTITY IN
+                AND (fpa.REF_ENTITY IN
                 <foreach collection="refEntity" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
