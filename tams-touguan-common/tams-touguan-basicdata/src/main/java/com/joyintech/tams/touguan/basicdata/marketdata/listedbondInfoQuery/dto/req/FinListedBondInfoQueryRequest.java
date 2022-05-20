@@ -102,21 +102,6 @@ public class FinListedBondInfoQueryRequest {
     @ApiModelProperty(name = "currency", value = "币种")
     private String currency;
 
-    @ApiModelProperty(name = "isRight", value = "是否含权债", example = "Y/N")
-    private String isRight;
-
-    @ApiModelProperty(name = "optionType", value = "行权方式")
-    private String optionType;
-
-    @ApiModelProperty(name = "theOryOptionPayDayStart", value = "理论行权日开始")
-    private Date theOryOptionPayDayStart;
-
-    @ApiModelProperty(name = "theOryOptionPayDayEnd", value = "理论行权日结束")
-    private Date theOryOptionPayDayEnd;
-
-    @ApiModelProperty(name = "isSus", value = "是否永续")
-    private String isSus;
-
     @ApiModelProperty(name = "zxGrade", value = "债项评级")
     private String zxGrade;
 
@@ -214,46 +199,6 @@ public class FinListedBondInfoQueryRequest {
 
     public void setCouponSpecies(String couponSpecies) {
         this.couponSpecies = couponSpecies;
-    }
-
-    public String getIsRight() {
-        return isRight;
-    }
-
-    public void setIsRight(String isRight) {
-        this.isRight = isRight;
-    }
-
-    public String getOptionType() {
-        return optionType;
-    }
-
-    public void setOptionType(String optionType) {
-        this.optionType = optionType;
-    }
-
-    public Date getTheOryOptionPayDayStart() {
-        return theOryOptionPayDayStart;
-    }
-
-    public void setTheOryOptionPayDayStart(Date theOryOptionPayDayStart) {
-        this.theOryOptionPayDayStart = theOryOptionPayDayStart;
-    }
-
-    public Date getTheOryOptionPayDayEnd() {
-        return theOryOptionPayDayEnd;
-    }
-
-    public void setTheOryOptionPayDayEnd(Date theOryOptionPayDayEnd) {
-        this.theOryOptionPayDayEnd = theOryOptionPayDayEnd;
-    }
-
-    public String getIsSus() {
-        return isSus;
-    }
-
-    public void setIsSus(String isSus) {
-        this.isSus = isSus;
     }
 
     public String getZxGrade() {
