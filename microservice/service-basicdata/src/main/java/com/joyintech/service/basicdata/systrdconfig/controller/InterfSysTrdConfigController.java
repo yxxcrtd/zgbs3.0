@@ -213,7 +213,7 @@ public class InterfSysTrdConfigController{
     @PostMapping("/queryPositionInfoSingle")
     @ResponseBody
     public List<PositionCashSecSingleResp>  queryPositionInfoSingle(@RequestBody PositionCashSecRequest requestDto) {
-        List<PositionCashSecSingleResp>  m = etrTradeCommonervice.queryPositionInfoSingle(requestDto);
+        List<PositionCashSecSingleResp>  m = etrTradeCommonervice.queryAllPositionInfoSingle(requestDto);
         return m;
     }
 
