@@ -117,6 +117,8 @@ public class FieldEtrInfoQueryService extends BaseService{
 
         pageParam.put("PRICE_CLASS_01",DictCodeListExt3.计价方式_净价.getValue());
         pageParam.put("PRICE_CLASS_02",DictCodeListExt3.计价方式_全价.getValue());
+        pageParam.put("PRICE_MODEL_PRM03",DictCodeListExt2.价格模式_市价指令.getValue());
+
 
         if (StringUtil.equals(dto.getSettleSpeed(),
                 DictCodeList.清算速度_T_0.getValue())) {
