@@ -807,6 +807,11 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
             // 写入金融产品临时汇总交易表
             TrdFinProductDealTotal trdFinProductDealTotal = new TrdFinProductDealTotal();
             BeanUtil.copyPropertiesIgnoreNull(trdFinProductDealTotal, trdTempDto.getTrdProductTempDeal());
+            // ZGCPCN-652: busiType不能为null   2022/5/20 start
+            if (StringUtil.isEmpty(trdFinProductDealTotal.getBusiType())) {
+                trdFinProductDealTotal.setBusiType("   ");
+            }
+            // ZGCPCN-652: busiType不能为null   2022/5/20 end
             trdProductTempDealTotalMapper.insertSelective(trdFinProductDealTotal);
         }
         // 多组合系列户指令需要登录临时汇总交易表 add by fuyongsheng 20220511 end

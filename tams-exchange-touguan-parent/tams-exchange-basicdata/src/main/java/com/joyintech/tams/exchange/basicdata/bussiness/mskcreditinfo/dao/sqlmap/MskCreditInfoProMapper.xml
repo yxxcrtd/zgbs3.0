@@ -346,4 +346,43 @@
         ON	 i.SECID = FIN.FINPROD_ID
     </select>
 
+    <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.exchange.basicdata.bussiness.mskcreditinfo.dto.MskCreditInfoProSaveRequest" >
+        update MST_CREDIT_MARKET_INFO
+        <set >
+            <if test="mint != null" >
+                MINT = #{mint,jdbcType=DECIMAL},
+            </if>
+            <if test="mdprice != null" >
+                MDPRICE = #{mdprice,jdbcType=DECIMAL},
+            </if>
+            <if test="mcprice != null" >
+                MCPRICE = #{mcprice,jdbcType=DECIMAL},
+            </if>
+            <if test="myield != null" >
+                MYIELD = #{myield,jdbcType=DECIMAL},
+            </if>
+            <if test="mMduration != null" >
+                M_MDURATION = #{mMduration,jdbcType=DECIMAL},
+            </if>
+            <if test="mCnvxty != null" >
+                M_CNVXTY = #{mCnvxty,jdbcType=DECIMAL},
+            </if>
+            <if test="issueMarketNum != null" >
+                ISSUE_MARKET_NUM = #{issueMarketNum,jdbcType=DECIMAL},
+            </if>
+            <if test="creditType != null" >
+                CREDIT_TYPE = #{creditType,jdbcType=VARCHAR},
+            </if>
+            <if test="updateUser != null" >
+                UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where SECID = #{secid,jdbcType=VARCHAR}
+        and CDATE = #{cdate,jdbcType=VARCHAR}
+        and VALUE_SOURCE = #{valueSource,jdbcType=VARCHAR}
+    </update>
+
 </mapper>

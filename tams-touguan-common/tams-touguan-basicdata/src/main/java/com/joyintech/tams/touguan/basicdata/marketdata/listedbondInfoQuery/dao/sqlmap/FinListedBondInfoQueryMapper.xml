@@ -178,7 +178,7 @@
             <if test="search !=null and search !=''">
                 AND (
                 SEC_INFO.SEC_ID like '%' || #{search} || '%' OR
-                SEC_INFO.CCY like '%' || #{search} || '%' OR
+                SEC_INFO.CURRENCY like '%' || #{search} || '%' OR
                 )
             </if>
         </where>

@@ -5,6 +5,7 @@ import com.joyintech.framework.ajax.JoyinMessage;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
@@ -25,6 +26,7 @@ import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
+import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
@@ -220,12 +222,12 @@ public class MskCreditMarketInfo001Controller extends BaseController {
         params.setElementId(dto.getElementId());
         params.setBusinessCode(item -> item.getSecid());
         params.setBusinessType(DictCodeList.共通业务类型_信用保护凭证行情.getValue());
-        // 设置流程业务说明, entity即传入的dto
-        // 业务说明：债券代码 + "(" + 债券代码 + ")" + "-" + "估值日" + "-" + "估值日"
-        params.setComment(entity -> SpringContextUtil.getTextValue("MstCreditMarketInfo001.secid") + "(" + entity.getSecid() + ")" + "-"
-                + SpringContextUtil.getTextValue("MstCreditMarketInfo001.cdate") + "("
-                + entity.getCdate() + ")"+ this.getMessage("MstCreditMarketInfo001.valueSource") + "("
-                + entity.getValueSourceStr() + ")");
+        params.setComment(entity1 -> {
+            return WorkFlowUtil.concatComment("资产代码"+
+                    GlobalConstant.OPEN_PARENTHESIS+entity1.getSecid()+GlobalConstant.CLOSE_PARENTHESIS
+                    +"估值日期"+GlobalConstant.OPEN_PARENTHESIS+entity1.getCdate()+GlobalConstant.CLOSE_PARENTHESIS
+                     +"估值来源"+GlobalConstant.OPEN_PARENTHESIS+entity1.getValueSourceStr()+GlobalConstant.CLOSE_PARENTHESIS);
+        });
         processParameter.setWorkFlowParameter(params);
         processParameter.setOperationType(OperationType.DELETE);
         String msg = mskCreditMarketInfoPro001Service.start(processParameter,

@@ -38,6 +38,8 @@ import java.math.RoundingMode;
 import java.time.LocalTime;
 import java.util.List;
 
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_质押券出入库;
+
 /**
  * 报单通用检查
  * <p/>
@@ -196,6 +198,10 @@ public class CommonCheckKit extends BaseCheckKit {
         String entrustProp = EntrustPropUtils.getEntrustProp(instruction, order.getEntrustProp());
         // 申报类不需要check最小价差和涨跌停
         if (EntrustUtils.isNoTrade(entrustProp)) {
+            return;
+        }
+        //质押券出入库不需要check折算率
+        if (StringUtil.equals(instruction.getBusiTypeTg(), 投管业务类型_质押券出入库.getValue())) {
             return;
         }
         checkLimitPrice(order, instruction, instrument, tickBean);
