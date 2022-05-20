@@ -504,6 +504,7 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
         if (StringUtil.isNotEmpty(processMark)
                 && StringUtil.equals(processMark.getStatus(), DictCodeList.数据状态_修改中.getValue())) {
             EtrExchangeTradeSecRepoSaveRepoRequest entity = getBussinessEntityByWorkflowId(workflowId);
+            etrExchangeTradeSecRepo001Service.backReRoll(entity.getEntrustId());
             positionRequestService.sendDelete(entity);
         }
         //增加调用头寸引擎代码end
