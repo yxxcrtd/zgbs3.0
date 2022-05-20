@@ -31,6 +31,7 @@ import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.dto.PortfolioInstructionContextDto;
 import com.joyintech.tams.exchange.common.exception.PositionExchangeException;
 import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
+import com.joyintech.tams.exchange.common.response.FairPortfolioResponse;
 import com.joyintech.tams.exchange.common.response.PortfolioAllocationResponse;
 import com.joyintech.tams.exchange.common.utils.*;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
@@ -175,7 +176,7 @@ public class FairOrderHelper {
             return true;
         }
 
-        List<Instruction> instructions = portfolioAllocationResponse.getList();
+        List<FairPortfolioResponse> instructions = portfolioAllocationResponse.getList();
         if (instructions.size() <= 1) {
             // 走普通委托
             return false;
@@ -186,7 +187,7 @@ public class FairOrderHelper {
         return true;
     }
 
-    private List<Instruction> getFairInstructions(Order order) {
+    private List<FairPortfolioResponse> getFairInstructions(Order order) {
         OrderPlaceBean orderPlaceBean = convertOrder2OrderPlaceBean(order);
         ResultBean resultBean = portfolioManager.queryPortfolioCalculateWithFair(orderPlaceBean);
 
@@ -222,7 +223,7 @@ public class FairOrderHelper {
     //下委托及风险审批
     public void handleFairOrder(Order order, WorkflowBean workflow) {
 
-        List<Instruction> fairInstructions = getFairInstructions(order);
+        List<FairPortfolioResponse> fairInstructions = getFairInstructions(order);
         // fairInstructions是根据组合维度的生成的，需要根据指令代码重新聚合，注意字段借用
         Map<String, List<Instruction>> instructionMap = fairInstructions.stream().collect(Collectors.groupingBy(Instruction::getEntrustId));
 
