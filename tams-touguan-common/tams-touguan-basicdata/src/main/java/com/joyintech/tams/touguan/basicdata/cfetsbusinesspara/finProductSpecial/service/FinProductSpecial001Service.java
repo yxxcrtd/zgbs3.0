@@ -3,7 +3,6 @@ package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial
 import com.google.common.collect.Lists;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
-import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.tams.common.base.dao.FinProductSpecialMapper;
 import com.joyintech.tams.common.base.dao.WflFinProductSpecialMapper;
@@ -156,6 +155,16 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
     }
 
     /**
+     * 查询
+     *
+     * @param finprodMarketId
+     * @return
+     */
+    public FinProductSpecialDto queryByFinprodMarketId(String finprodMarketId) {
+        return finProductSpecial001Mapper.queryByFinprodMarketId(finprodMarketId);
+    }
+
+    /**
      * 导入数据转换
      *
      * @param dataList
@@ -175,4 +184,6 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
         }
         return entities;
     }
+
+
 }

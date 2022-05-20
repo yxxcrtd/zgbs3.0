@@ -44,6 +44,33 @@
         ORDER BY FINPRODMARKETID, ISSPECIALDEBT, ISDEFAULTBONDINDICATOR, ISABS
     </select>
 
+    <select id="queryByFinprodMarketId"
+            resultType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialDto">
+        SELECT *
+        FROM (
+                 SELECT SPECIAL.FINPROD_MARKET_ID         finprodMarketId,
+                        SPECIAL.IS_ABS                    isAbs,
+                        SPECIAL.IS_SPECIAL_DEBT           isSpecialDebt,
+                        SPECIAL.IS_DEFAULT_BOND_INDICATOR isDefaultBondIndicator,
+                        SPECIAL.INPUT_TYPE                inputType,
+                        PRODUCT.FINPROD_ABBR              finprodAbbr
+                 FROM FIN_PRODUCT_SPECIAL SPECIAL
+                          INNER JOIN FIN_PRODUCT PRODUCT ON SPECIAL.FINPROD_MARKET_ID = PRODUCT.FINPROD_MARKET_ID
+                 UNION
+                 SELECT SPECIAL.FINPROD_MARKET_ID         finprodMarketId,
+                        SPECIAL.IS_ABS                    isAbs,
+                        SPECIAL.IS_SPECIAL_DEBT           isSpecialDebt,
+                        SPECIAL.IS_DEFAULT_BOND_INDICATOR isDefaultBondIndicator,
+                        SPECIAL.INPUT_TYPE                inputType,
+                        INTERF.SECNAME                    finprodAbbr
+                 FROM FIN_PRODUCT_SPECIAL SPECIAL
+                          INNER JOIN INTERF_PAYHSRCSECINFO INTERF ON SPECIAL.FINPROD_MARKET_ID = INTERF.SECID
+                 WHERE INTERF.SECID NOT IN
+                       (SELECT FINPROD_MARKET_ID FROM FIN_PRODUCT WHERE FINPROD_TYPE2 = 'F01' AND TRADE_MARKET = '01')
+             )
+        where FINPRODMARKETID = #{finprodMarketId}
+    </select>
+
     <select id="querySelectOption"
             resultType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialSelectOptionDto"
             parameterType="com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.req.FinProductSpecialSelectOptionQueryRequest">

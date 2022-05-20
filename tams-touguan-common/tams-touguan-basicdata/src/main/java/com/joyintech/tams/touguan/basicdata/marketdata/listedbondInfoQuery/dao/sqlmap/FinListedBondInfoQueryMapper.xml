@@ -183,10 +183,17 @@
             </if>
         </where>
         )
-        ORDER BY PRIMARYCLASSIFICATION,
-        SECONDARYCLASSIFICATION,
-        ISSUEDATE,
-        SECID
+        <choose>
+            <when test="pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
+                order by ${pageMode.sort}  ${pageMode.direction}
+            </when>
+            <otherwise>
+                ORDER BY PRIMARYCLASSIFICATION,
+                SECONDARYCLASSIFICATION,
+                ISSUEDATE,
+                SECID
+            </otherwise>
+        </choose>
     </select>
 
 
