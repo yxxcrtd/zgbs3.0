@@ -33,6 +33,7 @@ import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.*;
 import com.joyintech.tams.cfets.trd.repo.dto.CfetsRepoDealRegisterQuoteDto;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
@@ -160,6 +161,9 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
 
     @Autowired(required = false)
     private BaseGetBusinessId baseGetBusinessId;
+
+    @Autowired
+    private MstWorkflowCommonServiceMapperImpl mstWorkflowCommonServiceMapperImpl;
 
     /**
      * 申购点击check
@@ -971,6 +975,18 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         this.dealOldPosition(entity, true);
     }
 
+
+    @Override
+    public void doDelete(String workflowId) {
+        ProcessMark processMark = mstWorkflowCommonServiceMapperImpl.getBusinessInfo(workflowId);
+        CfetsTrdBondFirstSubInfoDto entity = getBussinessEntityByWorkflowId(workflowId);
+        if (StringUtil.isNotEmpty(processMark)
+                && StringUtil.equals(processMark.getStatus(), DictCodeList.数据状态_修改中.getValue())) {
+            PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(), DictCodeListExt1.子系统代码_交易.getValue(),
+                    DictCodeListExt3.头寸业务类型_债券一级申购.getValue(), DictCodeList.交易方向_买入.getValue());
+        }
+    }
+
     /**
      * @param requst
      * @return com.joyintech.framework.ajax.AjaxResult
@@ -1274,16 +1290,18 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         BigDecimal payAssign = payMinChangeUnit;
         // 费用分配值
         BigDecimal feeAssign = feeMinChangeUnit;
-        int size = productDtos.size();
+        int paySize = productDtos.size();
+        int feeSize = productDtos.size();
         //委托维度 已经完全分配的集合
-        Set<String> set = new HashSet<>();
-        while ((payTailDifference.compareTo(BigDecimal.ZERO) > 0 || feeTailDifference.compareTo(BigDecimal.ZERO) > 0) && size != 0) {
+        Set<String> paySet = new HashSet<>();
+        Set<String> feeSet = new HashSet<>();
+        while ((payTailDifference.compareTo(BigDecimal.ZERO) > 0 || feeTailDifference.compareTo(BigDecimal.ZERO) > 0) && (paySize != 0 || feeSize != 0)) {
             if (payTailDifference.compareTo(payMinChangeUnit) > 0) {
-                payAssign = ArithmeticUtil.divide(payTailDifference, new BigDecimal(size), 2, RoundingMode.HALF_UP);
+                payAssign = ArithmeticUtil.divide(payTailDifference, new BigDecimal(paySize), 2, RoundingMode.HALF_UP);
                 payAssign = ArithmeticUtil.multiply(ArithmeticUtil.divide(payAssign, payMinChangeUnit, 0, RoundingMode.DOWN), payMinChangeUnit);
             }
             if (feeTailDifference.compareTo(feeMinChangeUnit) > 0) {
-                feeAssign = ArithmeticUtil.divide(feeTailDifference, new BigDecimal(size), 2, RoundingMode.HALF_UP);
+                feeAssign = ArithmeticUtil.divide(feeTailDifference, new BigDecimal(feeSize), 2, RoundingMode.HALF_UP);
                 feeAssign = ArithmeticUtil.multiply(ArithmeticUtil.divide(feeAssign, feeMinChangeUnit, 0, RoundingMode.DOWN), feeMinChangeUnit);
             }
             for (CfetsTrdBondFirstSubProductDto item : productDtos) {
@@ -1293,9 +1311,11 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                 }
                 // 认购量为0时,不分配应缴款金额和结算服务费
                 if (item.getSubscriptionAmount() == null || BigDecimalUtil.isZero(item.getSubscriptionAmount())) {
-                    if (set.add(item.getEntrustId())) {
-                        size--;
-                        continue;
+                    if (paySet.add(item.getEntrustId())) {
+                        paySize--;
+                    }
+                    if (feeSet.add(item.getEntrustId())) {
+                        feeSize--;
                     }
                 }
                 if (BigDecimalUtil.ACompareToB(payAssign, payMinChangeUnit, 2) > 0) {
@@ -1305,6 +1325,9 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                     payAssign = payMinChangeUnit;
                 } else {
                     payAssign = payTailDifference;
+                    if (paySet.add(item.getEntrustId())) {
+                        paySize--;
+                    }
                 }
                 if (BigDecimalUtil.ACompareToB(feeAssign, feeMinChangeUnit, 2) > 0) {
                     //
@@ -1313,6 +1336,9 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                     feeAssign = feeMinChangeUnit;
                 } else {
                     feeAssign = feeTailDifference;
+                    if (feeSet.add(item.getEntrustId())) {
+                        feeSize--;
+                    }
                 }
                 // 认购量加上分配值
                 item.setPayableAmount(ArithmeticUtil.doAdd(item.getPayableAmount(), payAssign));

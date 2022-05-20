@@ -115,6 +115,7 @@ public class FinAssetRateAdjResponse  extends FinCashCalcRule implements ITableR
         this.operateType = operateType;
     }
 
+    @PrimaryKey(PrimaryKey.Field.PK_1)
     public String getFinprodMarketId() {
         return finprodMarketId;
     }
@@ -163,7 +164,6 @@ public class FinAssetRateAdjResponse  extends FinCashCalcRule implements ITableR
         this.isInitial = isInitial;
     }
 
-    @PrimaryKey(PrimaryKey.Field.PK_1)
     public String getFinprodId() {
         return finprodId;
     }

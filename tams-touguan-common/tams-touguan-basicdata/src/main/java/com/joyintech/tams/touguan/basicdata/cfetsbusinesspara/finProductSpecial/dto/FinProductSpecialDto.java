@@ -1,6 +1,8 @@
 package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto;
 
 import com.joyintech.framework.base.BaseEntity;
+import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.tams.constant.DictCode;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
@@ -82,6 +84,10 @@ public class FinProductSpecialDto extends BaseEntity implements ProcessEntity {
         return isAbs;
     }
 
+    public String getIsAbsStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.是否, this.getIsAbs());
+    }
+
     public void setIsAbs(String isAbs) {
         this.isAbs = isAbs;
     }
@@ -90,12 +96,21 @@ public class FinProductSpecialDto extends BaseEntity implements ProcessEntity {
         return isSpecialDebt;
     }
 
+
+    public String getIsSpecialDebtStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.是否, this.getIsSpecialDebt());
+    }
+
     public void setIsSpecialDebt(String isSpecialDebt) {
         this.isSpecialDebt = isSpecialDebt;
     }
 
     public String getIsDefaultBondIndicator() {
         return isDefaultBondIndicator;
+    }
+
+    public String getIsDefaultBondIndicatorStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.是否, this.getIsDefaultBondIndicator());
     }
 
     public void setIsDefaultBondIndicator(String isDefaultBondIndicator) {

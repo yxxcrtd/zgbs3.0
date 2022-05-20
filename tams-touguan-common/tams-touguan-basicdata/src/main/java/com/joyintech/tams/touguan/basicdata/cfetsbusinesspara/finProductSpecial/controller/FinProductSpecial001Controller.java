@@ -3,8 +3,10 @@ package com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.JsonUtils;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
@@ -27,7 +29,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.HashMap;
 import java.util.List;
@@ -60,6 +65,21 @@ public class FinProductSpecial001Controller extends BaseController {
         Map<String, Object> model = new HashMap<>(1);
         model.put("pageId", this.getPageId());
         model.put("YES_OR_NO", this.getSelectDataFromDataDic(DictCode.是否, null));
+
+        String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
+        FinProductSpecialDto entity = new FinProductSpecialDto();
+        if (StringUtil.isNotEmpty(workflowId)) {
+            entity = finProductSpecial001Service.getBussinessEntityByWorkflowId(workflowId);
+            model.put("businessId", entity.getFinprodMarketId());
+        } else {
+            String finprodId = getParam("finprodMarketId");
+            if (StringUtil.isNotEmpty(finprodId)) {
+                //修改
+                entity = finProductSpecial001Service.queryByFinprodMarketId(finprodId);
+                model.put("businessId", entity.getFinprodMarketId());
+            }
+        }
+        model.put(GlobalConstant.ENTITY, entity);
         return new Message<>(model).success();
     }
 
@@ -132,17 +152,30 @@ public class FinProductSpecial001Controller extends BaseController {
     /**
      * 特殊债券信息删除
      *
-     * @param finprodMarketId
+     * @param finProductSpecialDto
      * @return
      */
     @ApiOperation(value = "特殊债券信息删除", notes = "特殊债券信息删除")
-    @PostMapping("/del/{finprodMarketId:.+}")
+    @PostMapping("/del")
     @ResponseBody
-    public Message<AjaxResult> del(@RequestParam("finprodMarketId") String finprodMarketId) {
+    public Message<AjaxResult> del(@RequestBody FinProductSpecialDto finProductSpecialDto) {
         AjaxResult ajax = new AjaxResult();
-        List<ValidMessage> valid = finProductSpecialValidatorService.valid(null);
-        ajax.setErrorList(valid);
-        return new Message<AjaxResult>().success().setData(ajax);
+        return Message.success("处理成功", null);
+    }
+
+
+    /**
+     * 特殊债券信息编辑
+     *
+     * @param finProductSpecialDto
+     * @return
+     */
+    @ApiOperation(value = "特殊债券信息编辑", notes = "特殊债券信息编辑")
+    @PostMapping("/edit")
+    @ResponseBody
+    public Message<AjaxResult> edit(@RequestBody FinProductSpecialDto finProductSpecialDto) {
+        AjaxResult ajax = new AjaxResult();
+        return Message.success("处理成功", null);
     }
 
     /**

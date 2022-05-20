@@ -17,6 +17,7 @@ import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
@@ -350,6 +351,10 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     }
 
     public String getEtrPriceStr() {
+        if(StringUtil.equals(DictCodeListExt3.投管业务类型_通用式质押回购.getValue(), this.getBusiTypePosition()) &&
+                StringUtil.equals(DictCodeListExt2.价格模式_市价指令.getValue(), this.getPriceModel())){
+            return null;
+        }
         if(StringUtils.equals(DictCodeList.平安资产类型_基金.getValue(),this.getFinprodType2())
                 && StringUtils.equals("PRM03",this.getPriceModel())){
             return "0.00";

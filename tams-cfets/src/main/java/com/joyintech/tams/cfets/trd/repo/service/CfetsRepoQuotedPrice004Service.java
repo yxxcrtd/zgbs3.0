@@ -787,9 +787,6 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
             PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(), DictCodeListExt1.子系统代码_交易.getValue(),
                     DictCodeListExt3.头寸业务类型_质押式回购首期.getValue(), entity.getPs());
         }
-//        if(StringUtil.isNotEmpty(workflowId)){
-//            throw new RuntimeException("jp");
-//        }
     }
 
     @Override

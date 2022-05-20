@@ -28,6 +28,14 @@ public interface FinProductSpecial001Mapper {
     List<FinProductSpecialDto> queryForPage(FinProductSpecialQueryRequest request);
 
     /**
+     * 查询
+     *
+     * @param finprodMarketId
+     * @return
+     */
+    FinProductSpecialDto queryByFinprodMarketId(@Param("finprodMarketId") String finprodMarketId);
+
+    /**
      * 查询下拉框
      *
      * @param request

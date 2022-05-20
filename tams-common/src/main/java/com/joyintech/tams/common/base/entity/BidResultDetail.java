@@ -12,6 +12,11 @@ public class BidResultDetail extends BaseEntity {
     private static final long serialVersionUID = -111997507690103328L;
 
     /**
+     * 中标明细编号
+     */
+    private String detailWinId;
+
+    /**
      * 汇总中标编号
      */
     private String totalWinId;
@@ -388,5 +393,24 @@ public class BidResultDetail extends BaseEntity {
      */
     public void setInvAim(String invAim) {
         this.invAim = invAim;
+    }
+
+
+    /**
+     * 获取 中标明细编号
+     *
+     * @return detailWinId 中标明细编号
+     */
+    public String getDetailWinId() {
+        return this.detailWinId;
+    }
+
+    /**
+     * 设置 中标明细编号
+     *
+     * @param detailWinId 中标明细编号
+     */
+    public void setDetailWinId(String detailWinId) {
+        this.detailWinId = detailWinId;
     }
 }

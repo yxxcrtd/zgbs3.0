@@ -809,7 +809,7 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
             BeanUtil.copyPropertiesIgnoreNull(trdFinProductDealTotal, trdTempDto.getTrdProductTempDeal());
             // ZGCPCN-652: busiType不能为null   2022/5/20 start
             if (StringUtil.isEmpty(trdFinProductDealTotal.getBusiType())) {
-                trdFinProductDealTotal.setBusiType("   ");
+                trdFinProductDealTotal.setBusiType("busiType");
             }
             // ZGCPCN-652: busiType不能为null   2022/5/20 end
             trdProductTempDealTotalMapper.insertSelective(trdFinProductDealTotal);

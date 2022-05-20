@@ -9,6 +9,7 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.common.dto.PageMode;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.dao.MstCustomerInfoAddMapper;
 import com.joyintech.tams.common.base.dao.MstCustomerInfoMapper;
@@ -99,6 +100,14 @@ public class FinListedBondInfoQuery001Service extends BaseService {
             request.setPrimaryClassifications(primaryClassifications);
             request.setSecondaryClassifications(secondaryClassifications);
         }
+        if (Objects.nonNull(request.getPageMode())) {
+            PageMode pageMode = request.getPageMode();
+            String sort = pageMode.getSort();
+            if (StringUtil.isNotBlank(sort) && sort.contains("Str")) {
+                pageMode.setSort(sort.replaceAll("Str", ""));
+                request.setPageMode(pageMode);
+            }
+        }
         List<FinListedBondInfoQuery001Dto> finListedBondInfoQuery001Dtos = finListedBondInfoQueryMapper.queryForPage(request);
         return new Page<>(PageInfo.of(finListedBondInfoQuery001Dtos));
     }
@@ -151,7 +160,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         request.setSecId(secId);
         FinListedBondInfoQuery001Dto finListedBondInfoQuery001Dto = queryFinWindMarketForCoupons(request);
         if (Objects.isNull(finListedBondInfoQuery001Dto)) {
-            validMessages.add(new ValidMessage("查询债券信息为空"));
+            validMessages.add(new ValidMessage("未查询到该待上市债券信息，无法加券，请手工维护"));
             return validMessages;
         }
 

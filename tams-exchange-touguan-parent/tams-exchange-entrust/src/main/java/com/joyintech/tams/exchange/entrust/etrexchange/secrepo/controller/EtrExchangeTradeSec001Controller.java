@@ -933,12 +933,6 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 						BeanUtil.copyPropertiesIgnoreNull(preRiskEtrExchangeTrade001Dto,etrExchangeTrade001Dto);
 						riskPreEtrExchangeTrade001DtoList.add(preRiskEtrExchangeTrade001Dto);
 					}
-					riskPreEtrExchangeTrade001DtoList.stream().forEach(itemTemp->{
-						itemTemp.setEntrustId(itemTemp.getEntrustId()+"-"+itemTemp.getPortfolioId());  //风险预占不能是相同的编号
-						itemTemp.getPortfolioList().stream().forEach(subItem->{
-							subItem.setEntrustId(subItem.getEntrustId()+"-"+subItem.getPortfolioId());  //风险预占不能是相同的编号
-						});
-					});
 					riskEtrExchangeTrade001DtoList=riskPreEtrExchangeTrade001DtoList;
 
 					String infCode= BussinessDictCodeListRds.接口系统ID_预占批量接口.getValue();
@@ -1012,12 +1006,6 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 
 				// ----------预占功能 start----------
 				if (StringUtil.equals(BussinessConstant.SUBMIT, dto.getOperateType())) {
-					riskPreEtrExchangeTrade001DtoList.stream().forEach(item->{
-						item.setEntrustId(item.getEntrustId()+"-"+item.getPortfolioId());  //风险预占不能是相同的编号
-                        item.getPortfolioList().stream().forEach(subItem->{
-							subItem.setEntrustId(subItem.getEntrustId()+"-"+subItem.getPortfolioId());  //风险预占不能是相同的编号
-						});
-					});
 					riskEtrExchangeTrade001DtoList=riskPreEtrExchangeTrade001DtoList;
 					String infCode = BussinessDictCodeListRds.接口系统ID_预占批量接口.getValue();
 					//风险用新的list
