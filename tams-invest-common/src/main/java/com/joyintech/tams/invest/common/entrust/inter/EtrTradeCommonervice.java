@@ -365,6 +365,9 @@ public class EtrTradeCommonervice extends BaseService {
     }
 
     private List<BaseMap> assemble(BigDecimal portfolioCash, BigDecimal canCash, BigDecimal realCash, BigDecimal canSec, BigDecimal realSec, PositionCashSecRequest requestDto) {
+        if(CollectionUtils.isEmpty(requestDto.getPtlList())){
+            return nullData();
+        }
         String porUsableCash = "porUsableCash", acctNoUsableCash = "acctNoUsableCash", acctNoCanCash = "acctNoCanCash", usableAmount = "usableAmount", usableSec = "usableSec";
         String finprodType2 = requestDto.getPtlList().get(0).getFinprodType2();
         String tradePlat = requestDto.getPtlList().get(0).getTradePlat();
@@ -834,7 +837,8 @@ public class EtrTradeCommonervice extends BaseService {
                     }
                 }
             }
-        }else if (dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
+        }
+        if (dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
                 ||dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
                 ||dto.getFinprodType2().equals("ZYSHG")) {
             dto.setFinprodId("XN_PRODID999");
