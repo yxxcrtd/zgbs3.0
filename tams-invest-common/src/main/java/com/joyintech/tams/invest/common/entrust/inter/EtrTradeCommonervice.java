@@ -1022,7 +1022,6 @@ public class EtrTradeCommonervice extends BaseService {
             if (!CollectionUtils.isEmpty(secList) && secList.size() > 0) {
                 BigDecimal newSecAmount = queryPosition(secList, flowType, "");
                 if (newSecAmount != null) { //可用持仓
-                    newSecAmount = newSecAmount.divide(new BigDecimal(100),2, RoundingMode.HALF_UP);
                     canSec = canSec.add(newSecAmount);
                 }
                 secList.stream().forEach(item -> {
@@ -1030,7 +1029,6 @@ public class EtrTradeCommonervice extends BaseService {
                 });
                 BigDecimal newRealSecAmount = queryPosition(secList, "04", DictCodeListExt3.资产类型_资产账户持仓.getValue()); //交易持仓和从交易持仓表
                 if (newRealSecAmount != null) { //持仓数量
-                    newRealSecAmount = newRealSecAmount.divide(new BigDecimal(100),2, RoundingMode.HALF_UP);
                     realSec = realSec.add(newRealSecAmount);
                 }
             }
