@@ -210,6 +210,15 @@ public class CfetsQuotedTradeCommonService{
         try {
             getLogger().info("银行间下行成交处理业务数据线程开启");
             InterfCstpBjfxjg interfCstpBjfxjg = interfCstpBjfxjgMapper.selectByPrimaryKey(trdId);
+            //单位转化
+            if(StringUtil.isNotEmpty(interfCstpBjfxjg.getSpread())) {
+                interfCstpBjfxjg.setSpread(ArithmeticUtil.divide(interfCstpBjfxjg.getSpread(), new BigDecimal(10000), 12, RoundingMode.HALF_UP));
+            }
+            if(StringUtil.isNotEmpty(interfCstpBjfxjg.getCouponRate())) {
+                interfCstpBjfxjg.setCouponRate(ArithmeticUtil.divide(interfCstpBjfxjg.getCouponRate(), new BigDecimal(100), 12, RoundingMode.HALF_UP));
+            }
+            interfCstpBjfxjg.setRealIssuesize(ArithmeticUtil.multiply(interfCstpBjfxjg.getRealIssuesize(),new BigDecimal(100000000)));
+            interfCstpBjfxjg.setSubscriptionAmount(ArithmeticUtil.multiply(interfCstpBjfxjg.getSubscriptionAmount(),new BigDecimal(100000000)));
             InterfCstpBjfxjg finalInterfCstpBjfxjg = interfCstpBjfxjg;
             Thread thread = new Thread(new Runnable() {
                 @Override

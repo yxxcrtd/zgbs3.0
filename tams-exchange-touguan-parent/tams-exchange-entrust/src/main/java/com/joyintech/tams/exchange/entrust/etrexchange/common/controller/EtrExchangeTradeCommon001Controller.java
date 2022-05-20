@@ -1442,12 +1442,6 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 						BeanUtil.copyPropertiesIgnoreNull(preRiskEtrExchangeTrade001Dto,etrExchangeTrade001Dto);
 						riskPreEtrExchangeTrade001DtoList.add(preRiskEtrExchangeTrade001Dto);
 					}
-					riskPreEtrExchangeTrade001DtoList.stream().forEach(itemTemp->{
-						itemTemp.setEntrustId(itemTemp.getEntrustId()+"-"+itemTemp.getPortfolioId());  //风险预占不能是相同的编号
-						itemTemp.getPortfolioList().stream().forEach(subItem->{
-							subItem.setEntrustId(subItem.getEntrustId()+"-"+subItem.getPortfolioId());  //风险预占不能是相同的编号
-						});
-					});
 					riskEtrExchangeTrade001DtoList=riskPreEtrExchangeTrade001DtoList;
 					String finprodType2 = "";
 					if (dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
@@ -1552,12 +1546,6 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 				// ----------预占功能 start----------
 				if (StringUtil.equals(BussinessConstant.SUBMIT, dto.getOperateType())) {
 					String infCode;
-					riskPreEtrExchangeTrade001DtoList.stream().forEach(item->{
-						item.setEntrustId(item.getEntrustId()+"-"+item.getPortfolioId());  //风险预占不能是相同的编号
-						item.getPortfolioList().stream().forEach(subItem->{
-							subItem.setEntrustId(subItem.getEntrustId()+"-"+subItem.getPortfolioId());  //风险预占不能是相同的编号
-						});
-					});
 					riskEtrExchangeTrade001DtoList=riskPreEtrExchangeTrade001DtoList;
 					if(StringUtils.equals(dto.getPs(), DictCodeListExt3.交易方向_债转股.getValue())
 					|| StringUtils.equals(dto.getPs(), DictCodeList.交易方向_行权_回售.getValue())) {
