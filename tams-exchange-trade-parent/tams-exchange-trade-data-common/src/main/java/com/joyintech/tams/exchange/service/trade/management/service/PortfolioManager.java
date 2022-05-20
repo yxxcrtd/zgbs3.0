@@ -6,6 +6,8 @@ import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.google.common.base.MoreObjects;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.joyintech.exchange.service.quote.service.QuoteService;
 import com.joyintech.framework.base.BaseService;
@@ -30,6 +32,7 @@ import com.joyintech.tams.exchange.common.enums.exchange.PortfolioDetailBusiType
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
 import com.joyintech.tams.exchange.common.request.PortfolioInfoRequest;
+import com.joyintech.tams.exchange.common.response.FairPortfolioResponse;
 import com.joyintech.tams.exchange.common.response.PortfolioAllocationResponse;
 import com.joyintech.tams.exchange.common.response.PortfolioCalculateResponse;
 import com.joyintech.tams.exchange.common.response.PortfolioInfoResponse;
@@ -43,6 +46,7 @@ import com.joyintech.tams.invest.common.dto.position.PositionCashSecSingleResp;
 import com.joyintech.tams.invest.common.entrust.inter.EtrTradeCommonervice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -491,7 +495,15 @@ public class PortfolioManager extends BaseService {
                                 && !InvestmentUtils.isInstructionProcessComplete(item))
                 .collect(Collectors.toList());
         log.debug("初步过滤出公平相关指令：{}", JSONUtil.toJsonStr(simpleFiltingList));
-        result.setList(simpleFiltingList);
+
+        List<FairPortfolioResponse> list = Lists.newArrayList();
+        simpleFiltingList.forEach(o -> {
+            FairPortfolioResponse response = new FairPortfolioResponse();
+            BeanUtils.copyProperties(o, response);
+
+            list.add(response);
+        });
+        result.setList(list);
 
         // 判断进入公平交易
         if (!EntrustUtils.isFairOrder(bean, instruction)) {
@@ -541,10 +553,32 @@ public class PortfolioManager extends BaseService {
         // 获取公平交易相关指令
         TickBean tick = (TickBean) tickBean.getData();
         List<PortfolioInstructionContextDto> fairList = getFairList(bean, instruction, tick, result);
-        log.debug(JSONUtil.toJsonStr(fairList));
+        log.debug("获取公平交易相关指令：{}", JSONUtil.toJsonStr(fairList));
 
         // 获取多组合的指令
-        List<Instruction> instructionList = getFairInstructionList(fairList, result);
+        List<FairPortfolioResponse> instructionList = getFairInstructionList(fairList, result);
+
+        instructionList.forEach(o -> {
+            o.setInstructionEntrustPrice(o.getEntrustPrice());
+            o.setInstructionTotalNum(o.getEntrustNum());
+            o.setInstructionTotalAmt(o.getEntrustAmt());
+
+            BigDecimal frozenQuantity = MoreObjects.firstNonNull(o.getFrozenQuantity(), BigDecimal.ZERO);
+            BigDecimal entrustLeftAmt = MoreObjects.firstNonNull(o.getEntrustLeftAmt(), BigDecimal.ZERO);
+            if (o.volumeInstruction()) {
+                long entrustNum = o.getEntrustNum();
+                //计算剩余数量=指令数量-冻结数量-成交数量
+                long instructionLeftNum = entrustNum - frozenQuantity.longValue() - entrustLeftAmt.longValue();
+                o.setInstructionLeftNum(instructionLeftNum);
+                o.setInstructionLeftAmt(BigDecimal.ZERO);
+            } else {
+                BigDecimal entrustAmt = o.getEntrustAmt();
+                //计算剩余金额=指令金额-冻结金额-成交金额
+                o.setInstructionLeftAmt(entrustAmt.subtract(frozenQuantity).subtract(entrustLeftAmt));
+                o.setInstructionLeftNum(0L);
+            }
+        });
+
         result.setList(instructionList);
 
         return ResultBean.success(result);
@@ -665,9 +699,12 @@ public class PortfolioManager extends BaseService {
                 }
                 result.setPrice(adjustedPrice);
             }
-        } else {
+        } else if (!EntrustUtils.isfairModeEntrustPriceBestThanInstructionForbid()) {
             // 02时，剔除该指令并继续时
             BigDecimal orderPrice = adjustedPrice;
+            if (EntrustUtils.isPledgeRepurchase(instruction)) {
+                orderPrice = bean.getEntrustPrice();
+            }
             for (Instruction ins : tempList) {
                 if (EntrustBs.isBuy(entrustBs)) {
                     // 买入，过滤价格小于指令价格的指令
@@ -820,9 +857,8 @@ public class PortfolioManager extends BaseService {
     }
 
 
-    private List<Instruction> getFairInstructionList(List<PortfolioInstructionContextDto> fairList, PortfolioAllocationResponse result) {
-
-        List<Instruction> list = new ArrayList<>();
+    private List<FairPortfolioResponse> getFairInstructionList(List<PortfolioInstructionContextDto> fairList, PortfolioAllocationResponse result) {
+        List<FairPortfolioResponse> list = new ArrayList<>();
 
         // 获取多组合
         for (PortfolioInstructionContextDto context : fairList) {
@@ -832,7 +868,10 @@ public class PortfolioManager extends BaseService {
             if (Objects.isNull(instructionDetails) || instructionDetails.size() == 0 || instructionDetails.size() == 1) {
                 // 处理单组合
                 handleFields(result, ins);
-                list.add(ins);
+
+                FairPortfolioResponse response = new FairPortfolioResponse();
+                BeanUtils.copyProperties(ins, response);
+                list.add(response);
                 continue;
             }
 
@@ -847,10 +886,10 @@ public class PortfolioManager extends BaseService {
             // 最小步长
             BigDecimal minStep = this.getMinStep(ins);
             // 单指令多组合扩展列表
-            List<Instruction> singleList = new ArrayList<>();
+            List<FairPortfolioResponse> singleList = new ArrayList<>();
             for (InstructionDetail detail : instructionDetails) {
                 // 生成多条指令，替换组合信息，将分配比例存入转股价格（conPrice字段）
-                Instruction copyInstruction = new Instruction();
+                FairPortfolioResponse copyInstruction = new FairPortfolioResponse();
                 BeanUtil.copyProperties(ins, copyInstruction);
                 copyInstruction.setPortfolioId(detail.getPortfolioId());
                 copyInstruction.setPortfolioName(detail.getPortfolioName());
@@ -895,7 +934,7 @@ public class PortfolioManager extends BaseService {
             }
 
             // 尾插处理
-            Instruction maxInstruction = singleList.stream().max(Comparator.comparing(Instruction::getConPrice)).get();
+            FairPortfolioResponse maxInstruction = singleList.stream().max(Comparator.comparing(FairPortfolioResponse::getConPrice)).get();
             long totalExceptMaxVolume = singleList.stream().filter(item -> !item.getPortfolioId().equals(maxInstruction.getPortfolioId()))
                     .mapToLong(item -> item.getConNum().longValue()).sum();
             Long tailVolume = ins.getConNum().longValue() - totalExceptMaxVolume;
@@ -908,7 +947,7 @@ public class PortfolioManager extends BaseService {
                     tailAmt);
             maxInstruction.setConNum(BigDecimal.valueOf(tailVolume));
             // 重新计算占比；赋值委托数量，委托金额
-            for (Instruction item : singleList) {
+            for (FairPortfolioResponse item : singleList) {
                 item.setConPrice(ArithmeticUtil.divide(item.getConNum(), BigDecimal.valueOf(result.getTotalEntrustVolume()), 4));
                 handleFields(result, item);
             }
