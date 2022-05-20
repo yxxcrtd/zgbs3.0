@@ -89,6 +89,10 @@
         <result column="PROP_DEALER_ID" property="propDealerId" jdbcType="VARCHAR"/>
         <result column="PROP_DEALER_NAME" property="propDealerName" jdbcType="VARCHAR"/>
         <result column="PROP_OWNER_TYPE" property="propOwnerType" jdbcType="VARCHAR"/>
+
+        <result column="COUNTER_NAME" property="counterName" jdbcType="VARCHAR"/>
+        <result column="PROP_ACCT_NO" property="propAcctNo" jdbcType="VARCHAR"/>
+        <result column="PROP_ACCT_NAME" property="propAcctName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <resultMap id="QueryResultMap" type="com.joyintech.tams.exchange.common.bean.EntrustQueryBean">
@@ -179,6 +183,10 @@
         <result column="PROP_DEALER_ID" property="propDealerId" jdbcType="VARCHAR"/>
         <result column="PROP_DEALER_NAME" property="propDealerName" jdbcType="VARCHAR"/>
         <result column="PROP_OWNER_TYPE" property="propOwnerType" jdbcType="VARCHAR"/>
+
+        <result column="COUNTER_NAME" property="counterName" jdbcType="VARCHAR"/>
+        <result column="PROP_ACCT_NO" property="propAcctNo" jdbcType="VARCHAR"/>
+        <result column="PROP_ACCT_NAME" property="propAcctName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Example_Where_Clause">
@@ -254,7 +262,8 @@
     PORTFOLIO_NAME,SEC_ACCT_ID,SEC_ACCT_NAME,TRADE_PLAT,FINPROD_TYPE2, INV_MANAGER_ID,PS,BUSI_TYPE_TG,
     EXTEND1,EXTEND2,ENTRUST_CLASS,TARGET_TYPE,IS_NO_GUARD,IS_FULL_PRICE,OWNER_TYPE,INVESTOR_ID,INVESTOR_NAME,
     PROP_INVESTOR_ID,PROP_INVESTOR_NAME,TRADE_ID,DEALER_ID,DEALER_NAME,COUNTER_ID,PROP_TRADE_ID,PROP_DEALER_ID,
-    PROP_DEALER_NAME,PROP_OWNER_TYPE
+    PROP_DEALER_NAME,PROP_OWNER_TYPE,
+        COUNTER_NAME,PROP_ACCT_NO,PROP_ACCT_NAME
     </sql>
 
     <sql id="entrust">
@@ -272,7 +281,8 @@
         EXTEND1,EXTEND2,ENTRUST_CLASS,TARGET_TYPE,IS_NO_GUARD,IS_FULL_PRICE,NULL AS OWNER_TYPE,NULL AS INVESTOR_ID,
         NULL AS INVESTOR_NAME, NULL AS PROP_INVESTOR_ID,NULL AS PROP_INVESTOR_NAME,NULL AS TRADE_ID,NULL AS DEALER_ID,
         NULL AS DEALER_NAME,NULL AS COUNTER_ID,NULL AS PROP_TRADE_ID,NULL AS PROP_DEALER_ID,NULL AS PROP_DEALER_NAME,
-        NULL AS PROP_OWNER_TYPE
+        NULL AS PROP_OWNER_TYPE,
+        NULL AS COUNTER_NAME,NULL AS PROP_ACCT_NO,NULL AS PROP_ACCT_NAME
     </sql>
 
     <sql id="Query_Column_List">
@@ -288,7 +298,8 @@
     a.ENTRUST_BS,a.PORTFOLIO_NAME,a.SEC_ACCT_ID,a.SEC_ACCT_NAME, a.TRADE_PLAT,a.FINPROD_TYPE2,a.INV_MANAGER_ID,a.PS,
     a.BUSI_TYPE_TG,a.EXTEND1,a.EXTEND2,a.ENTRUST_CLASS,a.TARGET_TYPE,a.IS_NO_GUARD,a.IS_FULL_PRICE,a.OWNER_TYPE,
     a.INVESTOR_ID,a.INVESTOR_NAME, a.PROP_INVESTOR_ID,a.PROP_INVESTOR_NAME,a.TRADE_ID,a.DEALER_ID,a.DEALER_NAME,
-    a.COUNTER_ID,a.PROP_TRADE_ID,a.PROP_DEALER_ID,a.PROP_DEALER_NAME,a.PROP_OWNER_TYPE
+    a.COUNTER_ID,a.PROP_TRADE_ID,a.PROP_DEALER_ID,a.PROP_DEALER_NAME,a.PROP_OWNER_TYPE,
+    a.COUNTER_NAME,a.PROP_ACCT_NO,a.PROP_ACCT_NAME
     </sql>
     <sql id="query_entrust">
         a.ID, a.PARENT_ORDER_ID, a.INSTRUCTION_ID, a.PORTFOLIO_ID, a.USER_ID, a.USERNAME, a.ACCOUNT_ID,
@@ -305,7 +316,8 @@
         a.BUSI_TYPE_TG,a.EXTEND1,a.EXTEND2,a.ENTRUST_CLASS,a.TARGET_TYPE,a.IS_NO_GUARD,a.IS_FULL_PRICE,NULL AS OWNER_TYPE,
         NULL AS INVESTOR_ID,NULL AS INVESTOR_NAME, NULL AS PROP_INVESTOR_ID,NULL AS PROP_INVESTOR_NAME,
         NULL AS TRADE_ID,NULL AS DEALER_ID, NULL AS DEALER_NAME,NULL AS COUNTER_ID,NULL AS PROP_TRADE_ID,
-        NULL AS PROP_DEALER_ID,NULL AS PROP_DEALER_NAME,NULL AS PROP_OWNER_TYPE
+        NULL AS PROP_DEALER_ID,NULL AS PROP_DEALER_NAME,NULL AS PROP_OWNER_TYPE,
+        NULL AS COUNTER_NAME,NULL AS PROP_ACCT_NO,NULL AS PROP_ACCT_NAME
     </sql>
 
     <select id="selectByExample" resultMap="BaseResultMap"
@@ -507,7 +519,8 @@
                                           ENTRUST_CLASS, TARGET_TYPE, IS_NO_GUARD, IS_FULL_PRICE, OWNER_TYPE,
                                           INVESTOR_ID, INVESTOR_NAME, PROP_INVESTOR_ID, PROP_INVESTOR_NAME,
                                           TRADE_ID, DEALER_ID, DEALER_NAME, COUNTER_ID, PROP_TRADE_ID, PROP_DEALER_ID,
-                                          PROP_DEALER_NAME, PROP_OWNER_TYPE)
+                                          PROP_DEALER_NAME, PROP_OWNER_TYPE,
+                                          COUNTER_NAME, PROP_ACCT_NO, PROP_ACCT_NAME)
         values (#{id,jdbcType=VARCHAR}, #{parentOrderId,jdbcType=VARCHAR}, #{instructionId,jdbcType=VARCHAR},
                 #{portfolioId,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR},
                 #{accountId,jdbcType=VARCHAR}, #{financeAccount,jdbcType=VARCHAR}, #{accountName,jdbcType=VARCHAR},
@@ -537,7 +550,8 @@
                 #{investorName,jdbcType=VARCHAR}, #{propInvestorId,jdbcType=VARCHAR},
                 #{propInvestorName,jdbcType=VARCHAR}, #{tradeId,jdbcType=VARCHAR}, #{dealerId,jdbcType=VARCHAR},
                 #{dealerName,jdbcType=VARCHAR}, #{counterId,jdbcType=VARCHAR}, #{propTradeId,jdbcType=VARCHAR},
-                #{propDealerId,jdbcType=VARCHAR}, #{propDealerName,jdbcType=VARCHAR}, #{propOwnerType,jdbcType=VARCHAR})
+                #{propDealerId,jdbcType=VARCHAR}, #{propDealerName,jdbcType=VARCHAR}, #{propOwnerType,jdbcType=VARCHAR},
+                #{counterName,jdbcType=VARCHAR}, #{propAcctNo,jdbcType=VARCHAR}, #{propAcctName,jdbcType=VARCHAR})
     </insert>
     <sql id="insert">
         insert into T_INTEGRATED_ENTRUST
@@ -767,6 +781,15 @@
             <if test="propOwnerType != null">
                 PROP_OWNER_TYPE,
             </if>
+            <if test="counterName != null">
+                COUNTER_NAME,
+            </if>
+            <if test="propAcctNo != null">
+                PROP_ACCT_NO,
+            </if>
+            <if test="propAcctName != null">
+                PROP_ACCT_NAME,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -992,6 +1015,15 @@
             </if>
             <if test="propOwnerType != null">
                 #{propOwnerType,jdbcType=VARCHAR},
+            </if>
+            <if test="counterName != null">
+                #{counterName,jdbcType=VARCHAR},
+            </if>
+            <if test="propAcctNo != null">
+                #{propAcctNo,jdbcType=VARCHAR},
+            </if>
+            <if test="propAcctName != null">
+                #{propAcctName,jdbcType=VARCHAR},
             </if>
         </trim>
     </sql>
@@ -1252,6 +1284,15 @@
             </if>
             <if test="propOwnerType != null">
                 PROP_OWNER_TYPE = #{propOwnerType,jdbcType=VARCHAR},
+            </if>
+            <if test="counterName != null">
+                COUNTER_NAME = #{counterName,jdbcType=VARCHAR},
+            </if>
+            <if test="propAcctNo != null">
+                PROP_ACCT_NO = #{propAcctNo,jdbcType=VARCHAR},
+            </if>
+            <if test="propAcctName != null">
+                PROP_ACCT_NAME = #{propAcctName,jdbcType=VARCHAR},
             </if>
         </set>
         where ID = #{id,jdbcType=VARCHAR}
@@ -1540,6 +1581,15 @@
             <if test="record.propOwnerType != null">
                 PROP_OWNER_TYPE = #{record.propOwnerType,jdbcType=VARCHAR},
             </if>
+            <if test="record.counterName != null">
+                COUNTER_NAME = #{record.counterName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.propAcctNo != null">
+                PROP_ACCT_NO = #{record.propAcctNo,jdbcType=VARCHAR},
+            </if>
+            <if test="record.propAcctName != null">
+                PROP_ACCT_NAME = #{record.propAcctName,jdbcType=VARCHAR},
+            </if>
         </set>
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
@@ -1632,7 +1682,10 @@
         PROP_TRADE_ID = #{record.propTradeId,jdbcType=VARCHAR},
         PROP_DEALER_ID = #{record.propDealerId,jdbcType=VARCHAR},
         PROP_DEALER_NAME = #{record.propDealerName,jdbcType=VARCHAR},
-        PROP_OWNER_TYPE = #{record.propOwnerType,jdbcType=VARCHAR}
+        PROP_OWNER_TYPE = #{record.propOwnerType,jdbcType=VARCHAR},
+        COUNTER_NAME = #{record.counterName,jdbcType=VARCHAR},
+        PROP_ACCT_NO = #{record.propAcctNo,jdbcType=VARCHAR},
+        PROP_ACCT_NAME = #{record.propAcctName,jdbcType=VARCHAR}
         <include refid="Update_By_Example_Where_Clause"/>
     </update>
     <update id="updateByPrimaryKeySelective"
@@ -1725,7 +1778,10 @@
             PROP_TRADE_ID      = #{propTradeId,jdbcType=VARCHAR},
             PROP_DEALER_ID     = #{propDealerId,jdbcType=VARCHAR},
             PROP_DEALER_NAME   = #{propDealerName,jdbcType=VARCHAR},
-            PROP_OWNER_TYPE    = #{propOwnerType,jdbcType=VARCHAR}
+            PROP_OWNER_TYPE    = #{propOwnerType,jdbcType=VARCHAR},
+            COUNTER_NAME       = #{counterName,jdbcType=VARCHAR},
+            PROP_ACCT_NO       = #{propAcctNo,jdbcType=VARCHAR},
+            PROP_ACCT_NAME     = #{propAcctName,jdbcType=VARCHAR}
         where ID = #{id,jdbcType=VARCHAR}
     </update>
 </mapper>
