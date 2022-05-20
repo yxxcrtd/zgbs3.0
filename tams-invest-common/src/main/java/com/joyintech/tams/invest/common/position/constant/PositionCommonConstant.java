@@ -75,6 +75,11 @@ public class PositionCommonConstant {
      */
     public static final String INTERF_TYPE_STOCK001 = "Stock001";
     /**
+     * 信用保护凭证
+     */
+    public static final String INTERF_TYPE_CERTIFICATE001 = "Certificate001";
+    
+    /**
      * 业务类型
      */
     public static final String BUSI_TYPE = "busiType";
