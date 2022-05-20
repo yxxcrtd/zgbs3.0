@@ -12,25 +12,25 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(value = "特殊债券信息", description = "特殊债券信息")
 public class FinProductSpecialSelectOptionDto {
 
-    @ApiModelProperty(name = "finprodMarketId", value = "债券代码")
-    private String finprodMarketId;
+    @ApiModelProperty(name = "id", value = "债券代码")
+    private String id;
 
-    @ApiModelProperty(name = "finprodAbbr", value = "债券简称")
-    private String finprodAbbr;
+    @ApiModelProperty(name = "text", value = "债券简称")
+    private String text;
 
-    public String getFinprodMarketId() {
-        return finprodMarketId;
+    public String getId() {
+        return id;
     }
 
-    public void setFinprodMarketId(String finprodMarketId) {
-        this.finprodMarketId = finprodMarketId;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getFinprodAbbr() {
-        return finprodAbbr;
+    public String getText() {
+        return text;
     }
 
-    public void setFinprodAbbr(String finprodAbbr) {
-        this.finprodAbbr = finprodAbbr;
+    public void setText(String text) {
+        this.text = text;
     }
 }

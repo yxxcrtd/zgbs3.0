@@ -196,15 +196,11 @@
                 AND PAYHSRCSECINFO.ISSUS = #{isSus,jdbcType=VARCHAR}
             </if>
 
-            <if test="isSus !=null and isSus !=''">
-                AND PAYHSRCSECINFO.ISSUS = #{isSus,jdbcType=VARCHAR}
-            </if>
-
-            <if test="isRight !=null and isRight !='' and isRight == Y">
+            <if test='isRight !=null and isRight !="" and isRight == "Y"'>
                 AND ( PAYHSRCSECINFO.CALLOPTION = 'Y' OR PAYHSRCSECINFO.PUTOPTION = 'Y')
             </if>
 
-            <if test="isRight !=null and isRight !='' and isRight == N">
+            <if test='isRight !=null and isRight !="" and isRight == "N"'>
                 AND ( PAYHSRCSECINFO.CALLOPTION = 'N' AND PAYHSRCSECINFO.PUTOPTION = 'N')
             </if>
 

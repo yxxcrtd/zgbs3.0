@@ -52,8 +52,8 @@
         FROM
         (
         SELECT
-        FINPROD_MARKET_ID finprodMarketId,
-        FINPROD_ABBR finprodAbbr
+        FINPROD_MARKET_ID id,
+        FINPROD_ABBR text
         FROM
         FIN_PRODUCT
         WHERE
@@ -62,8 +62,8 @@
         AND TRADE_MARKET = '01'
         UNION
         SELECT
-        SECID FINPROD_MARKET_ID,
-        SECNAME FINPROD_ABBR
+        SECID id,
+        SECNAME text
         FROM
         INTERF_PAYHSRCSECINFO PAYHSRCSECINFO
         LEFT JOIN FIN_PRODUCT_SPECIAL SPECIAL ON PAYHSRCSECINFO.SECID = SPECIAL.FINPROD_MARKET_ID
@@ -77,9 +77,9 @@
             <if test="search !=null and search !=''">
                 AND
                 (
-                finprodMarketId LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                id LIKE CONCAT('%', CONCAT(#{search}, '%'))
                 OR
-                finprodAbbr LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                text LIKE CONCAT('%', CONCAT(#{search}, '%'))
                 )
             </if>
         </where>
