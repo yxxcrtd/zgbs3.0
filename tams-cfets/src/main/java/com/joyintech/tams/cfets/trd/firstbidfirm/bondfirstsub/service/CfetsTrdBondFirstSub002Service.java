@@ -795,6 +795,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         logger.debug("处理发起流程逻辑,入参:" + JsonUtils.object2Json(entity));
         if (!type.equals(OperationType.REVOKE) && !type.equals(OperationType.DELETE)) {
             this.insertWflData(entity);
+            entity.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
             // 发送头寸
             this.sendPositionMethod(entity, true, null);
             // 老头寸处理
@@ -1541,6 +1542,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                 }
             }
             posport.setCashAmount(productDto.getSubscriptionAmount());
+            posport.setSecAmount(productDto.getSubscriptionAmount());
             ptlList.add(posport);
         }
         //调用头寸
@@ -1562,6 +1564,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         req.setTradePlace(BussinessDictCodeList.交易场所_银行间.getValue());
         req.setBusiAct(DictCodeListExt3.业务动作_交易登记.getValue());
         req.setPs(DictCodeList.交易方向_买入.getValue());
+        req.setFinprodId(entity.getFinprodId());
         if (isSubmit) {
             req.setDecisionAct(DictCodeListExt3.系统动作_新建.getValue());
             req.setSystemAct(entity.getSystemAct());
