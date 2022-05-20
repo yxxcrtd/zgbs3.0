@@ -599,6 +599,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                 positionRulePtlData.setCashAmount(dto.getTradeAmt());
                 positionRulePtlData.setOwnSecAmount(dto.getShareAmt().toPlainString());
                 positionRulePtlData.setInvAim(dto.getInvAim());
+                positionRulePtlData.setEtrId(dto.getEntrustId());
                 ptlList.add(positionRulePtlData);
             }
 
