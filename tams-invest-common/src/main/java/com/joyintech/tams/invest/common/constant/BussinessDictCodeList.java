@@ -5048,7 +5048,12 @@ public enum BussinessDictCodeList implements BaseDictCodeList {
 
     特殊债券信息业务类型(BussinessDictCode.共同业务类型, "TRD62", "特殊债券信息"),
 
-
+    /**
+     * 新债标的
+     */
+    共同业务类型_新债标的(BussinessDictCode.共同业务类型, "TRD99", "新债标的"),
+    共同业务类型_上市流通(BussinessDictCode.共同业务类型, "TRD100", "上市流通"),
+    共同业务类型_上市流通撤销(BussinessDictCode.共同业务类型, "TRD101", "上市流通撤销"),
 
     缴款状态_流程中(BussinessDictCode.缴款状态, "01", "流程中"),
     缴款状态_待二级交易(BussinessDictCode.缴款状态, "02", "待二级交易"),
