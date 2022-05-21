@@ -807,8 +807,15 @@
         	}
         //应计利息change
         $('#intAmt').change(intAmtChange);
-        //禁用选项
-        $('#businessModel').attr("disabled",true);
+
+        // modify by etliu 20220521 start
+        // 3.0.6场内 ZGCPCN-688:项目类资产交易新建画面，提交时提示【请输入投资目的】，但是画面上只有业务模式，并且业务模式只读
+        // 修改为初始值有值的时候不可改，为空的时候可改
+        if ($('#businessModel').val()) {
+            //禁用选项
+            $('#businessModel').attr("disabled",true);
+        }
+        // modify by etliu 20220521 end
     }
     ()
 )

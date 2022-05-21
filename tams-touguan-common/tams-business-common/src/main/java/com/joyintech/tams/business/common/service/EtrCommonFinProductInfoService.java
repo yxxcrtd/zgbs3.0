@@ -67,10 +67,18 @@ public class EtrCommonFinProductInfoService extends BaseService {
                     } else {
                         if (DictCodeList.息票品种_零息.getValue().equals(couponSpecies) || DictCodeList.息票品种_贴现.getValue().equals(couponSpecies)
                                 || (DictCodeList.息票品种_附息.getValue().equals(couponSpecies) && DictCodeList.利率类型_浮动利率.getValue().equals(intType))) {
-                            byPageCodeAndDtCodes.stream().forEach(cfgDataTableShow -> cfgDataTableShow.setColName("参考收益率"));
+                            byPageCodeAndDtCodes.stream().forEach(cfgDataTableShow -> {
+                                if ("referYield".equals(cfgDataTableShow.getColCode())) {
+                                    cfgDataTableShow.setColName("参考收益率");
+                                }
+                            });
                         } else if (DictCodeList.息票品种_利随本清.getValue().equals(couponSpecies)
                                 || (DictCodeList.息票品种_附息.getValue().equals(couponSpecies) && DictCodeList.利率类型_固定利率.getValue().equals(intType))) {
-                            byPageCodeAndDtCodes.stream().forEach(cfgDataTableShow -> cfgDataTableShow.setColName("票面利率"));
+                            byPageCodeAndDtCodes.stream().forEach(cfgDataTableShow -> {
+                                if ("referYield".equals(cfgDataTableShow.getColCode())) {
+                                    cfgDataTableShow.setColName("票面利率");
+                                }
+                            });
                         }
                     }
                     finProductInfo.setTableShows(byPageCodeAndDtCodes);
