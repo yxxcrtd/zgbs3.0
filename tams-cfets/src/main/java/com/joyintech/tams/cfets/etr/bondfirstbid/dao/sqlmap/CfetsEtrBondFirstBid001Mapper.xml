@@ -544,7 +544,7 @@
             CASE WHEN <![CDATA[
                 ISSUE.ISSUE_DATE >= TO_DATE(#{platformDate},'YYYY-MM-DD') or
                              ISSUE.TENDER_EDATE >= TO_DATE(#{platformDate},'YYYY-MM-DD')  THEN '01'
-                     WHEN PRODUCT_ADD.LISTING_DATE >= TO_DATE(#{platformDate},'YYYY-MM-DD') THEN '02'
+                     WHEN PRODUCT_ADD.LISTING_DATE > TO_DATE(#{platformDate},'YYYY-MM-DD') THEN '02'
                 ]]>
             ELSE NULL END AS issueStage,
             CASE
