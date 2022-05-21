@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface WflBidResultDetailMapper {
-    int deleteByPrimaryKey(String totalWinId);
+    int deleteByPrimaryKey(String detailWinId);
 
     int insert(WflBidResultDetail record);
 
@@ -13,11 +13,13 @@ public interface WflBidResultDetailMapper {
 
     int insertBasicByBasicInfo(WflBidResultDetail record);
 
-    WflBidResultDetail selectByPrimaryKey(String totalWinId);
+    WflBidResultDetail selectByPrimaryKey(String detailWinId);
 
     int updateByPrimaryKeySelective(WflBidResultDetail record);
 
     int updateByPrimaryKey(WflBidResultDetail record);
 
     int deleteByWorkflowId(String workflowId);
+
+    int deleteByTotalWinId(String totalWinId);
 }
