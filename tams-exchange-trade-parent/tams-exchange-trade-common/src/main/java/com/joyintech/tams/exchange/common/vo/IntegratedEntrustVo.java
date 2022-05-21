@@ -322,6 +322,10 @@ public class IntegratedEntrustVo extends BaseEntity implements Serializable, Ent
     @Digits(integer = 20, fraction = 2)
     private BigDecimal cancelVolumeView;
 
+    @ApiModelProperty(name = "entrustPriceView", value = "委托价格(展示)")
+    @Digits(integer = 20, fraction = 2)
+    private BigDecimal entrustPriceView;
+
     public String getSoftSkipMode() {
         return softSkipMode;
     }
@@ -1147,5 +1151,13 @@ public class IntegratedEntrustVo extends BaseEntity implements Serializable, Ent
 
     public void setPropTradeName(String propTradeName) {
         this.propTradeName = propTradeName;
+    }
+
+    public BigDecimal getEntrustPriceView() {
+        return entrustPriceView;
+    }
+
+    public void setEntrustPriceView(BigDecimal entrustPriceView) {
+        this.entrustPriceView = entrustPriceView;
     }
 }

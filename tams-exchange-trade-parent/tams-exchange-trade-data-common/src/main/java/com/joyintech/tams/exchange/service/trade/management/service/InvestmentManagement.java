@@ -460,6 +460,11 @@ public class InvestmentManagement extends BaseService {
     }
 
     private void fillEntrustNumViewAndLeftVolumeView(InstructionExportVo instruction) {
+        if (StringUtil.isNotEmpty(instruction.getIsNetPrice()) && StringUtil.equals(instruction.getIsNetPrice(), "N")) {
+            instruction.setEntrustPriceView(instruction.getFullPrice());
+        } else {
+            instruction.setEntrustPriceView(instruction.getEntrustPrice());
+        }
         if (instruction.volumeInstruction()) {
             long frozenQuantity = instruction.getFrozenQuantity() == null ? 0 : instruction.getFrozenQuantity().longValue();
             long entrustLeftAmt = instruction.getEntrustLeftAmt() == null ? 0 : instruction.getEntrustLeftAmt().longValue();
