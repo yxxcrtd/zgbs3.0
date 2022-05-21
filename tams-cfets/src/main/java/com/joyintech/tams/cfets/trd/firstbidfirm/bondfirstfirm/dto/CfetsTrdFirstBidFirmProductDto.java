@@ -36,6 +36,11 @@ public class CfetsTrdFirstBidFirmProductDto {
     @ApiModelProperty(name = "avaNum", value = "剩余指令额度(万元) 需前端转化", example = "10000.00")
     private BigDecimal avaNum;
 
+    /**
+     * 计算中间值
+     */
+    private BigDecimal avaNumTemp;
+
     @ApiModelProperty(name = "entrustNum", value = "委托券面总额 不显示", example = "10000.00")
     private BigDecimal entrustNum;
 
@@ -51,8 +56,11 @@ public class CfetsTrdFirstBidFirmProductDto {
     @ApiModelProperty(name = "tradeAmt", value = "交易金额（元）", example = "1200")
     private BigDecimal tradeAmt;
 
-    @ApiModelProperty(name = "intAmt", value = "应计利息总额（元）", example = "1200")
+    @ApiModelProperty(name = "intAmt", value = "应计利息", example = "1200")
     private BigDecimal intAmt;
+
+    @ApiModelProperty(name = "intAmtTatol", value = "应计利息总额（元）", example = "1200")
+    private BigDecimal intAmtTatol;
 
     @ApiModelProperty(name = "payAmt", value = "缴款金额（元）", example = "1200")
     private BigDecimal payAmt;
@@ -114,14 +122,35 @@ public class CfetsTrdFirstBidFirmProductDto {
         this.portfolioName = portfolioName;
     }
 
+    /**
+     * 汇总投标券面总额
+     *
+     * @return java.math.BigDecimal
+     * @author jiangpeng
+     * @date 2022/5/19 15:26
+     */
     public BigDecimal getTotalBiddingNum() {
         return totalBiddingNum;
     }
 
+    /**
+     * 汇总投标券面总额
+     *
+     * @param totalBiddingNum
+     * @author jiangpeng
+     * @date 2022/5/19 16:14
+     */
     public void setTotalBiddingNum(BigDecimal totalBiddingNum) {
         this.totalBiddingNum = totalBiddingNum;
     }
 
+    /**
+     * 指令投标券面总额
+     *
+     * @return java.math.BigDecimal
+     * @author jiangpeng
+     * @date 2022/5/19 15:27
+     */
     public BigDecimal getEtrBidPriceTotal() {
         return etrBidPriceTotal;
     }
@@ -130,12 +159,41 @@ public class CfetsTrdFirstBidFirmProductDto {
         this.etrBidPriceTotal = etrBidPriceTotal;
     }
 
+    /**
+     * 剩余指令额度
+     *
+     * @return java.math.BigDecimal
+     * @author jiangpeng
+     * @date 2022/5/19 11:33
+     */
     public BigDecimal getAvaNum() {
         return avaNum;
     }
 
     public void setAvaNum(BigDecimal avaNum) {
         this.avaNum = avaNum;
+    }
+
+    /**
+     * 获取计算中间值
+     *
+     * @return java.math.BigDecimal
+     * @author jiangpeng
+     * @date 2022/5/19 11:33
+     */
+    public BigDecimal getAvaNumTemp() {
+        return avaNumTemp;
+    }
+
+    /**
+     * 记录计算中间值
+     *
+     * @param avaNumTemp
+     * @author jiangpeng
+     * @date 2022/5/19 11:34
+     */
+    public void setAvaNumTemp(BigDecimal avaNumTemp) {
+        this.avaNumTemp = avaNumTemp;
     }
 
     public BigDecimal getEntrustNum() {
@@ -184,6 +242,14 @@ public class CfetsTrdFirstBidFirmProductDto {
 
     public void setIntAmt(BigDecimal intAmt) {
         this.intAmt = intAmt;
+    }
+
+    public BigDecimal getIntAmtTatol() {
+        return intAmtTatol;
+    }
+
+    public void setIntAmtTatol(BigDecimal intAmtTatol) {
+        this.intAmtTatol = intAmtTatol;
     }
 
     public BigDecimal getPayAmt() {

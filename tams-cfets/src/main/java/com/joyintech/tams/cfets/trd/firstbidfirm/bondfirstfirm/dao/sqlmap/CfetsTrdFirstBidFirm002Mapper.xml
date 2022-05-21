@@ -194,4 +194,12 @@
         )
     </select>
 
+    <update id="updateBidOrder">
+        UPDATE BID_ORDER SET IS_CANCEL = 'Y',REMARK = #{remark} WHERE BID_ID = #{bidId}
+    </update>
+
+    <update id="updateBidOrderBidPrice">
+        UPDATE BID_ORDER_BID_PRICE SET IS_CANCEL  = 'Y' WHERE BID_ID  = #{bidId}
+    </update>
+
 </mapper>

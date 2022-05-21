@@ -134,11 +134,23 @@ public class CfetsTrdFirstBidFirmInfoDto extends BaseEntity implements ProcessEn
     @ApiModelProperty(name = "price", value = "净价", example = "1")
     private BigDecimal price;
 
+    @ApiModelProperty(name = "fullPrice", value = "全价", example = "1")
+    private BigDecimal fullPrice;
+
     @ApiModelProperty(name = "intAmt", value = "应计利息")
     private BigDecimal intAmt;
 
+    @ApiModelProperty(name = "intAmtTatol", value = "应计利息总额")
+    private BigDecimal intAmtTatol;
+
     @ApiModelProperty(name = "settFeeAmt", value = "结算服务费", example = "1000.00")
     private BigDecimal settFeeAmt;
+
+    @ApiModelProperty(name = "payableAmount", value = "缴款金额", example = "1000.00")
+    private BigDecimal payableAmount;
+
+    @ApiModelProperty(name = "tradeAmt", value = "交易金额", example = "1000.00")
+    private BigDecimal tradeAmt;
 
     @ApiModelProperty(name = "remark", value = "备注", example = "XXX")
     private String remark;
@@ -174,6 +186,9 @@ public class CfetsTrdFirstBidFirmInfoDto extends BaseEntity implements ProcessEn
     @ApiModelProperty(name = "bidTotalList", value = "汇总投标列表")
     private List<CfetsTrdFirstBidFirmTotalDto> bidTotalList;
 
+    @ApiModelProperty(name = "entrustDtos", value = "指令列表")
+    private List<CfetsTrdFirstBidFirmEntrustDto> entrustDtos;
+
     @ApiModelProperty(name = "tradeMarket", value = "交易场所", example = "01")
     private String tradeMarket;
 
@@ -182,6 +197,9 @@ public class CfetsTrdFirstBidFirmInfoDto extends BaseEntity implements ProcessEn
 
     @ApiModelProperty(name = "tradeDate", value = "交易日期 默认平台日")
     private Date tradeDate;
+
+    @ApiModelProperty(name = "editFeild", value = "编辑字段", example = "1 基本信息的汇总投标券面总额联动 2 汇总投标列表的投标标位联动")
+    private String editFeild;
 
     public String getValidStatus() {
         return validStatus;
@@ -457,6 +475,12 @@ public class CfetsTrdFirstBidFirmInfoDto extends BaseEntity implements ProcessEn
         this.totalBiddingNum = totalBiddingNum;
     }
 
+    /**
+     * 券面总额
+     * @author jiangpeng
+     * @date 2022/5/19 11:30
+     * @return java.math.BigDecimal
+     */
     public BigDecimal getBidPriceTotal() {
         return bidPriceTotal;
     }
@@ -481,6 +505,14 @@ public class CfetsTrdFirstBidFirmInfoDto extends BaseEntity implements ProcessEn
         this.price = price;
     }
 
+    public BigDecimal getFullPrice() {
+        return fullPrice;
+    }
+
+    public void setFullPrice(BigDecimal fullPrice) {
+        this.fullPrice = fullPrice;
+    }
+
     public BigDecimal getIntAmt() {
         return intAmt;
     }
@@ -489,12 +521,36 @@ public class CfetsTrdFirstBidFirmInfoDto extends BaseEntity implements ProcessEn
         this.intAmt = intAmt;
     }
 
+    public BigDecimal getIntAmtTatol() {
+        return intAmtTatol;
+    }
+
+    public void setIntAmtTatol(BigDecimal intAmtTatol) {
+        this.intAmtTatol = intAmtTatol;
+    }
+
     public BigDecimal getSettFeeAmt() {
         return settFeeAmt;
     }
 
     public void setSettFeeAmt(BigDecimal settFeeAmt) {
         this.settFeeAmt = settFeeAmt;
+    }
+
+    public BigDecimal getPayableAmount() {
+        return payableAmount;
+    }
+
+    public void setPayableAmount(BigDecimal payableAmount) {
+        this.payableAmount = payableAmount;
+    }
+
+    public BigDecimal getTradeAmt() {
+        return tradeAmt;
+    }
+
+    public void setTradeAmt(BigDecimal tradeAmt) {
+        this.tradeAmt = tradeAmt;
     }
 
     public String getRemark() {
@@ -631,6 +687,22 @@ public class CfetsTrdFirstBidFirmInfoDto extends BaseEntity implements ProcessEn
 
     public void setCouponSpecies(String couponSpecies) {
         this.couponSpecies = couponSpecies;
+    }
+
+    public List<CfetsTrdFirstBidFirmEntrustDto> getEntrustDtos() {
+        return entrustDtos;
+    }
+
+    public void setEntrustDtos(List<CfetsTrdFirstBidFirmEntrustDto> entrustDtos) {
+        this.entrustDtos = entrustDtos;
+    }
+
+    public String getEditFeild() {
+        return editFeild;
+    }
+
+    public void setEditFeild(String editFeild) {
+        this.editFeild = editFeild;
     }
 }
 

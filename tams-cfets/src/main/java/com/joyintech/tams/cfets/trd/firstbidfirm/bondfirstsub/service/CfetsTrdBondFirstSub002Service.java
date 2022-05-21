@@ -825,6 +825,9 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      */
     @Override
     public void doUpdate(CfetsTrdBondFirstSubInfoDto entity) {
+        if ("save".equals(entity.getOperateType())) {
+            return;
+        }
         Map<String, Object> map = new HashMap<>();
         if (!StringUtil.isNotEmpty(entity.getTradeDate())) {
             entity.setTradeDate(DateUtil.parse(iPlatformDate.getSysDateStr()));
