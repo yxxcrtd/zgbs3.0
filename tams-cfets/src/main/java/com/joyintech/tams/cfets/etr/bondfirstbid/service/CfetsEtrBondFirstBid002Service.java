@@ -52,6 +52,7 @@ import com.joyintech.tams.common.base.entity.EtrEntrustAdd;
 import com.joyintech.tams.common.base.entity.EtrEntrustBidPrice;
 import com.joyintech.tams.common.base.entity.EtrEntrustDetail;
 import com.joyintech.tams.common.base.entity.WflEtrEntrust;
+import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.base.entrust.BusiAutoEtrDispService;
 import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
 import com.joyintech.tams.constant.DictCode;
@@ -171,6 +172,9 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
 
     @Autowired
     private WflEtrEntrustMapper wflEtrEntrustMapper;
+
+    @Autowired
+    private MstWorkflowCommonServiceMapperImpl mstWorkflowCommonServiceMapperImpl;
 
     @Override
     public void doInsert(CfetsEtrBondFirstBid002Dto entity, OperationType operationType) {
@@ -409,6 +413,17 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             }
         }
         //发送头寸
+        String busiType = "";
+        if (StringUtil.equals(entity.getIssueClass(), DictCodeListExt4.新债_发行方式_报价发行.getValue())) {
+            busiType=DictCodeListExt3.头寸业务类型_债券一级申购.getValue();
+        } else {
+            busiType=DictCodeListExt3.头寸业务类型_债券一级投标.getValue();
+        }
+        ProcessMark processMark = mstWorkflowCommonServiceMapperImpl.getBusinessInfo(workflowId);
+        if (StringUtil.isNotEmpty(processMark)
+                && StringUtil.equals(processMark.getStatus(), DictCodeList.数据状态_修改中.getValue())) {
+            PositionHttpRequest.doDeleteByWorkFlowId(workflowId,DictCodeListExt1.子系统代码_委托.getValue(),busiType,DictCodeList.交易方向_买入.getValue());
+        }
     }
 
     /**
