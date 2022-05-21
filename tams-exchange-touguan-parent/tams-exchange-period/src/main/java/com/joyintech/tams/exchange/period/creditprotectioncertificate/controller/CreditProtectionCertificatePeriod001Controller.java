@@ -186,7 +186,7 @@ public class CreditProtectionCertificatePeriod001Controller extends BaseControll
             params.setElementId(dto.getElementId());
             params.setBusinessCode(dto.getBusiCode());
             params.setBusinessType(DictCodeList.共通业务类型_信用保护凭证存续期.getValue());
-            params.setComment(comment -> "业务编号:(" + dto.getBusiCode() + ")-业务类型(" + dto.getPaBussTypeStr() + ")-平台日(" + DateUtil.format(iPlatformDate.getSysDate()) + ")");
+            params.setComment(creditProtectionCertificatePeriod002Service.generateComment(entity));
             processParameter.setWorkFlowParameter(params);
             String msg = creditProtectionCertificatePeriod002Service.start(processParameter, entity);
             if (StringUtil.isBlank(msg)) {

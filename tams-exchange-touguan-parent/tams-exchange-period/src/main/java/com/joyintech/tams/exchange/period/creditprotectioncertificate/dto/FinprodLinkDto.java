@@ -16,69 +16,79 @@ public class FinprodLinkDto {
     /**
      * 金融产品代码
      */
+    @ApiModelProperty(name = "finprodId", value = "金融产品代码")
     private String finprodId;
 
     /**
      * 金融产品类型（估值核算）
      */
+    @ApiModelProperty(name = "finprodType", value = "     * 金融产品类型（估值核算）")
     private String finprodType;
 
     /**
      * 金融产品类型（投管分类）
      */
+    @ApiModelProperty(name = "finprodType2", value = "     * 金融产品类型（投管分类）")
     private String finprodType2;
 
     /**
      * 金融产品简称
      */
+    @ApiModelProperty(name = "finprodAbbr", value = "金融产品简称")
     private String finprodAbbr;
 
     /**
      * 金融产品全称
      */
+    @ApiModelProperty(name = "finprodName", value = "金融产品全称")
     private String finprodName;
     /**
      * 市场代码
      */
+    @ApiModelProperty(name = "finprodMarketId", value = "市场代码")
     private String finprodMarketId;
 
     /**
      * 交易场所
      */
+    @ApiModelProperty(name = "tradeMarket", value = "交易场所")
     private String tradeMarket;
 
     /**
      * 起息日
      */
+    @ApiModelProperty(name = "vdate", value = "起息日")
     private Date vdate;
 
     /**
      * 到期日
      */
+    @ApiModelProperty(name = "mdate", value = "到期日")
     private Date mdate;
 
     /**
      * 参考债项
      */
+    @ApiModelProperty(name = "refSec", value = "参考债项")
     private String refSec;
 
     /**
      * 结算明细
      */
-    @ApiModelProperty(name = "billingDetails",value = "结算明细")
+    @ApiModelProperty(name = "billingDetails", value = "结算明细")
     private List<BillingDetailsDto> billingDetails;
 
     /**
      * 参考实体
      */
-    @ApiModelProperty(name = "refEntity",value = "参考实体")
+    @ApiModelProperty(name = "refEntity", value = "参考实体")
     private String refEntity;
 
 
     /**
      * 参考债项选择列表
      */
-    @ApiModelProperty(name = "refSecs",value = "参考债项选择列表")
+    @ApiModelProperty(name = "refSecs", value = "参考债项选择列表")
     private List<String> refSecs;
 
     public List<String> getRefSecs() {

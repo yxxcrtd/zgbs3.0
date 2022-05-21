@@ -30,19 +30,19 @@ public class CreditProtectionCertificatePeriodSaveDtoValidator implements BeanVa
             if (dto.getDeliverBond() == null) {
                 ValidMessage validMessage = new ValidMessage();
                 validMessage.setField("settleMethod");
-                validMessage.setMessage("结算方式为实物结时，交付债券不能为空");
+                validMessage.setMessage("结算方式为实物结算时，交付债券不能为空");
             }
             if (CollectionUtils.isEmpty(dto.getBillingDetails())) {
                 ValidMessage validMessage = new ValidMessage();
                 validMessage.setField("deliverBondAmount");
-                validMessage.setMessage("结算方式为实物结时，债券交付数量不能为空");
+                validMessage.setMessage("结算方式为实物结算时，债券交付数量不能为空");
             } else {
                 List<BillingDetailsDto> billingDetails = dto.getBillingDetails();
                 for (BillingDetailsDto billingDetail : billingDetails) {
                     if (null == billingDetail.getDeliverBondAmount()) {
                         ValidMessage validMessage = new ValidMessage();
                         validMessage.setField("deliverBondAmount");
-                        validMessage.setMessage("结算方式为实物结时，债券交付数量不能为空");
+                        validMessage.setMessage("结算方式为实物结算时，债券交付数量不能为空");
                         break;
                     }
                 }

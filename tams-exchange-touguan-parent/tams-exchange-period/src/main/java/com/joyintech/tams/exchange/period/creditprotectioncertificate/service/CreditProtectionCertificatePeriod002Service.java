@@ -2,12 +2,12 @@ package com.joyintech.tams.exchange.period.creditprotectioncertificate.service;
 
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.security.LoginUserUtil;
-import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.component.business.common.service.DateCalService;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommService;
 import com.joyintech.tams.constant.DictCodeList;
@@ -17,7 +17,6 @@ import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.*;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
-import com.joyintech.tams.invest.common.trade.service.TradeProductDealCommService;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.entity.CommentFunction;
@@ -28,8 +27,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_新建;
 
@@ -40,16 +39,10 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
     private CreditProtectionCertificatePeriodMapper creditProtectionCertificatePeriodMapper;
 
     @Autowired
-    private CreditProtectionCertificatePeriod001Service creditProtectionCertificatePeriod001Service;
-
-    @Autowired
     private BaseGetBusinessId baseGetBusinessIdImpl;
 
     @Autowired
     private IPlatformDate iPlatformDate;
-
-    @Autowired
-    private TradeProductDealCommService tradeProductDealCommService;
 
     @Autowired
     private WflTrdFinProductDealTotalMapper wflTrdFinProductDealTotalMapper;
@@ -89,6 +82,9 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
 
     @Autowired
     private BaseTradeProductDealCommService baseTradeProductDealCommServiceImpl;
+
+    @Autowired
+    private DateCalService dateCalService;
 
 
     @Override
@@ -274,10 +270,6 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         }
     }
 
-    public CreditProtectionCertificatePeriodSaveDto getCheckEntity(CreditProtectionCertificatePeriod001Response dto) {
-        return null;
-    }
-
     public String generateBusiCode(CreditProtectionCertificatePeriodSaveDto dto) {
         BussinessCodeParameter parameter = new BussinessCodeParameter();
         parameter.setCommonBusinessType(DictCodeList.共通业务类型_信用保护凭证存续期);
@@ -285,7 +277,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
     }
 
     public CommentFunction<CreditProtectionCertificatePeriodSaveDto, String> generateComment(CreditProtectionCertificatePeriodSaveDto dto) {
-        return null;
+        return comment -> "业务编号:(" + dto.getBusiCode() + ")-业务类型(" + dto.getPaBussTypeStr() + ")-平台日(" + DateUtil.format(iPlatformDate.getSysDate()) + ")";
     }
 
     private BaseBussinessDto genBaseBussinessDto(CreditProtectionCertificatePeriodSaveDto dto) {
@@ -307,6 +299,19 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         BaseBussinessDto result = new BaseBussinessDto();
         String totleTradeId = generateBusiCode(dto);
 
+        //平台日
+        Date platDate = iPlatformDate.getSysDate();
+
+        String calendarId;
+
+        if (DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(dto.getTradeMarket())) {
+            calendarId = CacheUtil.getSysParam("STL_DOWNDATA_DEAL_SHJYS_CALID");
+        } else {
+            calendarId = CacheUtil.getSysParam("STL_DOWNDATA_DEAL_SZJYS_CALID");
+        }
+        // 下一个交易日
+        Date nextWorkDate = getNextWorkDay(iPlatformDate.getSysDate(), calendarId);
+
         //金融产品交易汇总表
         TrdFinProductDealTotal trdFinProductDealTotal = new TrdFinProductDealTotal();
         trdFinProductDealTotal.setTotleTradeId(dto.getBusiCode());
@@ -314,11 +319,11 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         trdFinProductDealTotal.setFinprodId(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue() + "_" + dto.getFinprodMarketId());
         trdFinProductDealTotal.setFinprodType(DictCodeListExt1.金融产品类型_信用保护凭证.getValue());
         trdFinProductDealTotal.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
-        trdFinProductDealTotal.setTradeDate(iPlatformDate.getSysDate());
+        trdFinProductDealTotal.setTradeDate(platDate);
         trdFinProductDealTotal.setVdate(dto.getvDate());
         trdFinProductDealTotal.setMdate(dto.getmDate());
         //交割日期
-        trdFinProductDealTotal.setSettleDate(dto.getDeliverDate());
+        trdFinProductDealTotal.setSettleDate(nextWorkDate);
 
         trdFinProductDealTotal.setCcy(DictCodeList.币种_人民币_CNY.getValue());
         BigDecimal tradeAmt = billingDetail.getDeliveryAmount().multiply(new BigDecimal("10000"));
@@ -378,7 +383,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         trdProductDeal.setTradeDate(iPlatformDate.getSysDate());
         trdProductDeal.setVdate(dto.getvDate());
         trdProductDeal.setMdate(dto.getmDate());
-        trdProductDeal.setSettleDate(iPlatformDate.getSysDate());
+        trdProductDeal.setSettleDate(nextWorkDate);
         trdProductDeal.setCcy(DictCodeList.币种_人民币_CNY.getValue());
         trdProductDeal.setShareAmt(billingDetail.getRepNomCapi().multiply(new BigDecimal("10000")));
         trdProductDeal.setTradeAmt(billingDetail.getDeliveryAmount().multiply(new BigDecimal("10000")));
@@ -418,6 +423,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         stlPayOrders.setIsTotalTrade(DictCodeList.是否_是.getValue());
         stlPayOrders.setTradeId(totleTradeId);
         stlPayOrders.setPortfolioId(billingDetail.getPortfolioId());
+        stlPayOrders.setSettleDate(nextWorkDate);
 
         stlPayOrders.setCreateUser(LoginUserUtil.getUserName());
         stlPayOrders.setCreateDept(LoginUserUtil.getDeptCode());
@@ -433,7 +439,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             ptlTrade.setBusiId(totleTradeId);
             ptlTrade.setBusiType(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
             ptlTrade.setSecManageAcctId(billingDetail.getSecManageAcctId());
-            ptlTrade.setSettleDate(iPlatformDate.getSysDate());
+            ptlTrade.setSettleDate(nextWorkDate);
             ptlTrade.setCreateUser(LoginUserUtil.getUserName());
             ptlTrade.setCreateDept(LoginUserUtil.getDeptCode());
             ptlTrade.setUpdateUser(LoginUserUtil.getUserName());
@@ -445,17 +451,32 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
     }
 
     private TrdFinProductDealTotal genTrdProductDealTotal(CreditProtectionCertificatePeriodSaveDto dto) {
+
+        //平台日
+        Date platDate = iPlatformDate.getSysDate();
+
+        String calendarId;
+
+        if (DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(dto.getTradeMarket())) {
+            calendarId = CacheUtil.getSysParam("STL_DOWNDATA_DEAL_SHJYS_CALID");
+        } else {
+            calendarId = CacheUtil.getSysParam("STL_DOWNDATA_DEAL_SZJYS_CALID");
+        }
+        // 下一个交易日
+        Date nextWorkDate = getNextWorkDay(iPlatformDate.getSysDate(), calendarId);
+
         TrdFinProductDealTotal trdFinProductDealTotal = new TrdFinProductDealTotal();
         trdFinProductDealTotal.setTotleTradeId(dto.getBusiCode());
         trdFinProductDealTotal.setBusiType(DictCodeList.共通业务类型_信用保护凭证存续期.getValue());
         trdFinProductDealTotal.setFinprodId(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue() + "_" + dto.getFinprodMarketId());
         trdFinProductDealTotal.setFinprodType(DictCodeListExt1.金融产品类型_信用保护凭证.getValue());
         trdFinProductDealTotal.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
-        trdFinProductDealTotal.setTradeDate(iPlatformDate.getSysDate());
+
+        trdFinProductDealTotal.setTradeDate(platDate);
         trdFinProductDealTotal.setVdate(dto.getvDate());
         trdFinProductDealTotal.setMdate(dto.getmDate());
         //交割日期
-        trdFinProductDealTotal.setSettleDate(dto.getDeliverDate());
+        trdFinProductDealTotal.setSettleDate(nextWorkDate);
 
         trdFinProductDealTotal.setCcy(DictCodeList.币种_人民币_CNY.getValue());
         BigDecimal tradeAmt = BigDecimal.ZERO;
@@ -484,7 +505,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         trdFinProductDealTotal.setCreateUser(LoginUserUtil.getUserName());
         trdFinProductDealTotal.setCreateDept(LoginUserUtil.getDeptCode());
         trdFinProductDealTotal.setUpdateUser(LoginUserUtil.getUserName());
-        trdFinProductDealTotal.setCreateTime(iPlatformDate.getSysDate());
+        trdFinProductDealTotal.setCreateTime(platDate);
         trdFinProductDealTotal.setUpdateTime(DateUtil.now());
         trdFinProductDealTotal.setTgBusiType(dto.getCreditEvent());
 
@@ -546,5 +567,16 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         CreditProtectionCertificatePeriodSaveDto entity = creditProtectionCertificatePeriodMapper.getEntityByBusinessCode(businessCode);
         entity.setBillingDetails(creditProtectionCertificatePeriodMapper.getBillingDetailByBusinessCode(businessCode));
         return entity;
+    }
+
+    /**
+     * 获取下一个工作日
+     */
+    public Date getNextWorkDay(Date tradeDate, String calendarId) {
+        if (dateCalService != null) {
+            List<String> holiday = dateCalService.getDealCalendarHoliday(tradeDate, DateUtil.addDays(tradeDate, 31), calendarId);
+            return dateCalService.calculationTradingDay(tradeDate, 1, holiday, "1");
+        }
+        return null;
     }
 }

@@ -6,6 +6,7 @@ import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.business.common.pojo.Message;
@@ -34,10 +35,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -61,9 +59,6 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
     }};
 
     @Autowired
-    private CreditProtectionCertificatePeriod001Service creditProtectionCertificatePeriod001Service;
-
-    @Autowired
     private CreditProtectionCertificatePeriod002Service creditProtectionCertificatePeriod002Service;
 
 
@@ -83,6 +78,9 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
 
         initPageParams.put(DictCode.平安业务类型.getValue(), pinanBusinessTypeOption);
         initPageParams.put(DictCode.结算方式_标的.getValue(), settleMethodOptions);
+
+        Date platformDate = DateUtil.platDateFromCache();
+        initPageParams.put("iPlatformDate", DateUtil.format(platformDate));
 
         //流程id
         String businessCode = "null".equals(getParam("businessCode")) ? null : getParam("businessCode");
@@ -108,6 +106,9 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
     @ResponseBody
     public Message<AjaxResult> save(@RequestBody CreditProtectionCertificatePeriodSaveDto dto, BindingResult br)
             throws Exception {
+
+        dto.setPaBussType(dto.getSettleMethod());
+
         ProcessParameter<CreditProtectionCertificatePeriodSaveDto> processParameter = new ProcessParameter<>();
         WorkFlowParameter<CreditProtectionCertificatePeriodSaveDto> params = new WorkFlowParameter<>();
         params.setPageId(this.getPageId());
