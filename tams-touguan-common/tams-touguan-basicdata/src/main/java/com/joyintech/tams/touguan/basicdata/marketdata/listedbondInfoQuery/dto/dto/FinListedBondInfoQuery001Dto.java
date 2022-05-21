@@ -638,6 +638,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.spread = spread;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getIssueStartTime() {
         return issueStartTime;
     }
@@ -646,6 +647,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.issueStartTime = issueStartTime;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getIssueEndTime() {
         return issueEndTime;
     }
