@@ -48,6 +48,7 @@ import com.joyintech.tams.common.base.entity.FinProductType;
 import com.joyintech.tams.common.base.entity.FinProductTypeKey;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.base.entrust.BusiAutoEtrDispService;
+import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -162,6 +163,9 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
 
     @Autowired
     private EtrExchangeTradeSecRepo001Service etrExchangeTradeSecRepo001Service;
+
+    @Autowired
+    private BasRiskMathCommService basRiskMathCommService;
 
     /**
      * {@inheritDoc}
@@ -320,6 +324,7 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
         }
         //处理履历
         etrExchangeTradeSecRepo001Service.updateCfetsOprHis(dto.getEntrustId(), dto.getOptType());
+        basRiskMathCommService.insert(dto.getRiskTrialRetDto(), dto.getEntrustId());
     }
 
     @Override

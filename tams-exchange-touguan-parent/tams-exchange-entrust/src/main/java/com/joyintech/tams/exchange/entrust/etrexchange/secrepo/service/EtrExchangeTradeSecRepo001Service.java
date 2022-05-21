@@ -57,6 +57,7 @@ import com.joyintech.tams.component.base.core.MstWorkflowCommonService;
 import com.joyintech.tams.component.base.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.base.entrust.BusiAutoEtrDispService;
+import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.*;
@@ -221,6 +222,9 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
      */
     @Autowired
     private MstWorkflowCommonService mstWorkflowCommonService;
+
+    @Autowired
+    private BasRiskMathCommService basRiskMathCommService;
 
 
     /**
@@ -397,6 +401,8 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         }
         //处理履历
         updateCfetsOprHis(dto.getEntrustId(), dto.getOptType());
+
+        basRiskMathCommService.insert(dto.getRiskTrialRetDto(), dto.getEntrustId());
     }
 
     /**
