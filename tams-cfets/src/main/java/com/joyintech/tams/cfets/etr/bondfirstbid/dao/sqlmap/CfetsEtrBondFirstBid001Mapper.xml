@@ -196,7 +196,8 @@
             </foreach>
         </if>
         <if test="entrustId != null and entrustId != ''">
-            AND ee.ENTRUST_ID = #{entrustId}
+            AND (ee.ENTRUST_ID = #{entrustId} OR
+            ee.ENTRUST_ID  LIKE concat('%',concat(#{entrustId,jdbcType=VARCHAR},'%')) )
         </if>
         <if test="entrustStatus != null and entrustStatus.size() > 0">
             AND ee.ENTRUST_STATUS in
@@ -362,7 +363,8 @@
             </foreach>
         </if>
         <if test="entrustId != null and entrustId != ''">
-            AND ee.ENTRUST_ID = #{entrustId}
+            AND (ee.ENTRUST_ID = #{entrustId} OR
+            ee.ENTRUST_ID  LIKE concat('%',concat(#{entrustId,jdbcType=VARCHAR},'%')) )
         </if>
         <if test="entrustStatus != null and entrustStatus.size() > 0">
             AND ee.ENTRUST_STATUS in
