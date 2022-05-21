@@ -1591,12 +1591,11 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         if (!dealCalendarHoliday){
             date = request.getSearchDate();
         }else{
-            while (true){
-                date =DateUtil.addDays(request.getSearchDate(),1);
-                dealCalendarHoliday = dateCalService.isDealCalendarHoliday(date, calendarId);
-                if (!dealCalendarHoliday){
-                    break;
-                }
+            //获取节假日
+            List<String> holidayList = dateCalService.getDealCalendarHoliday(request.getVdate(),request.getMdate(),calendarId);
+            if (CollectionUtils.isNotEmpty(holidayList)) {
+               String dateStr = AdjustedTradeDayCal.getAdjustedTradeDay(DateUtil.format(request.getSearchDate()), DictCodeList.营业日准则_向后调整.getValue(), holidayList);
+               date = DateUtil.parse(dateStr);
             }
         }
         return date;
