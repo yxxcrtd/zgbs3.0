@@ -96,12 +96,16 @@
             and tfpdl.SETTLE_METHOD = #{settleMethod,jdbcType=VARCHAR}
         </if>
         ) T
-        <if test="validStatusList.size() > 0">
-            and T.validStatus in
-            <foreach collection="validStatusList" item="validStatus" open="(" close=")" separator=",">
-                #{validStatus,jdbcType=VARCHAR}
-            </foreach>
-        </if>
+        <where>
+            <if test="validStatusList.size() > 0">
+                and T.validStatus in
+                <foreach collection="validStatusList" item="validStatus" open="(" close=")" separator=",">
+                    #{validStatus,jdbcType=VARCHAR}
+                </foreach>
+            </if>
+            <!-- 关键字 -->
+            <include refid="findPageQueryConditions"/>
+        </where>
         order by T.FINPROD_MARKET_ID
     </select>
     <select id="findBusiCode" resultType="com.joyintech.framework.select.SelectOptionDto">
@@ -268,5 +272,15 @@
         where f.ISSUER = #{refEntity,jdbcType=VARCHAR}
           and fa.REF_SEC is not null
     </select>
-
+    <sql id="findPageQueryConditions">
+        <if test="search != null and search != ''">
+            and (
+            T.validStatus|| '|' ||T.busiCode|| '|' ||T.paBussType|| '|' ||T.finprodMarketId|| '|'
+            ||T.finprodMarketName|| '|' ||T.vDateWhole|| '|' ||T.mDateWhole|| '|' ||
+            T.repNomCapi|| '|' ||T.refEntity|| '|' || T.creditEvent|| '|'|| T.creditEventHappenedDate|| '|'||
+            T.creditEventResolveDate|| '|' || T.settleMethod|| '|' || T.deliverBond|| '|' || T.deliverDate
+            like '%' || #{search} || '%'
+            )
+        </if>
+    </sql>
 </mapper>

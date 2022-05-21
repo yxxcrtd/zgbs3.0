@@ -6,9 +6,7 @@ import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.BaseExportRequest;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
@@ -162,13 +160,9 @@ public class CreditProtectionCertificatePeriod001Controller extends BaseControll
                 return new Message<AjaxResult>().fail().setMessage("有效状态为“有效”的数据，才允许撤销！");
             }
             if (creditProtectionCertificatePeriod001Service.isAlreadyRevoked(dto.getBusiCode())) {
-                ValidMessage validMessage = new ValidMessage(getMessage("TRD_W_0001",
-                        getMessage("pingan.common.revoke"), getMessage("pingan.common.revoke")));
-                ArrayList<ValidMessage> errorList = new ArrayList<ValidMessage>();// 生成错误集合
-                errorList.add(validMessage);
-                AjaxResult ar = new AjaxResult();
-                ar.setErrorList(errorList);
-                return new Message<AjaxResult>().success().setData(ar);
+                String message = getMessage("TRD_W_0001",
+                        getMessage("pingan.common.revoke"), getMessage("pingan.common.revoke"));
+                return new Message<AjaxResult>().fail().setMessage(message);
             }
             return new Message<AjaxResult>().success().setMessage("校验通过");
         } catch (Exception e) {

@@ -117,6 +117,12 @@ public class CreditProtectionCertificatePeriod001Response extends BaseEntity {
     private String settleMethod;
 
     /**
+     * 结算方式
+     */
+    @ApiModelProperty(name = "settleMethod",value = "结算方式")
+    private String settleMethodStr;
+
+    /**
      * 交付债券
      */
     @ApiModelProperty(name = "deliverBond",value = "交付债券")
@@ -126,7 +132,7 @@ public class CreditProtectionCertificatePeriod001Response extends BaseEntity {
      * 交付时间
      */
     @ApiModelProperty(name = "deliverDate",value = "交付时间")
-    private String deliverDate;
+    private Date deliverDate;
 
     public String getValidStatus() {
         return validStatus;
@@ -240,11 +246,11 @@ public class CreditProtectionCertificatePeriod001Response extends BaseEntity {
         this.deliverBond = deliverBond;
     }
 
-    public String getDeliverDate() {
+    public Date getDeliverDate() {
         return deliverDate;
     }
 
-    public void setDeliverDate(String deliverDate) {
+    public void setDeliverDate(Date deliverDate) {
         this.deliverDate = deliverDate;
     }
 
@@ -294,5 +300,13 @@ public class CreditProtectionCertificatePeriod001Response extends BaseEntity {
 
     public void setPageId(String pageId) {
         this.pageId = pageId;
+    }
+
+    public String getSettleMethodStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.结算方式_标的, this.settleMethod);
+    }
+
+    public void setSettleMethodStr(String settleMethodStr) {
+        this.settleMethodStr = settleMethodStr;
     }
 }
