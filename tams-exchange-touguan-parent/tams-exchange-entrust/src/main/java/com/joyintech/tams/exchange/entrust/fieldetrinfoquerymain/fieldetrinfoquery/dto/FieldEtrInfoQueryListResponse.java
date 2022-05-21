@@ -27,6 +27,8 @@ import org.thymeleaf.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 /**
  * 场内指令分发
@@ -241,9 +243,17 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
             return null;
         }
         if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
-            return ArithmeticUtil.divide(getEntrustAmt(),new BigDecimal(10000),2) + " 万元";
+            NumberFormat numberInstance = NumberFormat.getNumberInstance(Locale.getDefault());
+            numberInstance.setMinimumFractionDigits(2);
+            return numberInstance.format(ArithmeticUtil.divide(getEntrustAmt(),new BigDecimal(10000),2)) + " 万元";
         }
-        return getEntrustAmt() == null ? "" : getEntrustAmt().setScale(2,BigDecimal.ROUND_HALF_UP) + " 元";
+        if (getEntrustAmt() == null) {
+            return "";
+        } else {
+            NumberFormat numberInstance = NumberFormat.getNumberInstance(Locale.getDefault());
+            numberInstance.setMinimumFractionDigits(2);
+            return numberInstance.format(getEntrustAmt().setScale(2,BigDecimal.ROUND_HALF_UP)) + " 元";
+        }
     }
     public String getEntrustNumStr() {
         // 指令数量入库时已经 除以 100了
@@ -253,7 +263,7 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
         if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
             return null;
         }
-        return String.valueOf(super.getEntrustNum() == null ? "" : super.getEntrustNum().setScale(2, RoundingMode.HALF_UP));
+        return String.valueOf(super.getEntrustNum() == null ? "" : super.getEntrustNum().setScale(0, RoundingMode.HALF_UP));
     }
     public void setOtherPs(String otherPs) {
         this.otherPs = otherPs;

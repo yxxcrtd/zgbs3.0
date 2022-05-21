@@ -6,10 +6,7 @@ import com.google.common.collect.Lists;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
@@ -78,7 +75,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
     public String generateTitle(FinTenderBondAsset002Dto entity, OperationType operationType) {
         String isssueClass = "";
         if(Objects.nonNull(entity.getIssueDto()) && StringUtil.isNotEmpty(entity.getIssueDto().getIssueClass())) {
-            isssueClass = entity.getIssueDto().getIssueClass();
+            isssueClass = SysDataUtil.getNameFromDataDict(DictCode.新债_发行方式,entity.getIssueDto().getIssueClass());
         }
         return String.format("资产代码(%s) 资产简称(%s) 发行方式(%s)", StringUtil.isEmpty(entity.getFinprodMarketId()) ? "" : entity.getFinprodMarketId(),
                 StringUtil.isEmpty(entity.getFinprodAbbr()) ? "" : entity.getFinprodAbbr(),isssueClass);

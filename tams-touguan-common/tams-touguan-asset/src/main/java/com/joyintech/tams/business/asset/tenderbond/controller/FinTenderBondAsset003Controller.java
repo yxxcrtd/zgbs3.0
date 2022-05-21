@@ -147,7 +147,7 @@ public class FinTenderBondAsset003Controller extends BaseController {
             processParameter.setOperationType(OperationType.NEW);
             params.setBusinessType(BussinessDictCodeList.共同业务类型_上市流通.getValue());
         } else if (StringUtil.equals(dto.getOperateType(), OperationType.REVOKE.name())) {
-            processParameter.setOperationType(OperationType.REVOKE);
+            //processParameter.setOperationType(OperationType.REVOKE);
             params.setBusinessType(BussinessDictCodeList.共同业务类型_上市流通撤销.getValue());
         }
         processParameter.setWorkFlowParameter(params);

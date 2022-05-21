@@ -96,7 +96,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     private String issueDate;
 
     @ApiModelProperty(name = "eventDate", value = "缴款截止日")
-    private String eventDate;
+    private Date eventDate;
 
     @ApiModelProperty(name = "payDate", value = "缴款日")
     private Date payDate;
@@ -111,7 +111,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     private String listingCode;
 
     @ApiModelProperty(name = "interestAccrualDate", value = "首次利率确定日")
-    private String interestAccrualDate;
+    private Date interestAccrualDate;
 
     @ApiModelProperty(name = "valueDate", value = "起息日")
     private Date valueDate;
@@ -454,14 +454,16 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.issueDate = issueDate;
     }
 
-    public String getEventDate() {
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    public Date getEventDate() {
         return eventDate;
     }
 
-    public void setEventDate(String eventDate) {
+    public void setEventDate(Date eventDate) {
         this.eventDate = eventDate;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getDebtRegistrationDate() {
         return debtRegistrationDate;
     }
@@ -470,6 +472,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.debtRegistrationDate = debtRegistrationDate;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getListingDate() {
         return listingDate;
     }
@@ -486,11 +489,12 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.listingCode = listingCode;
     }
 
-    public String getInterestAccrualDate() {
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    public Date getInterestAccrualDate() {
         return interestAccrualDate;
     }
 
-    public void setInterestAccrualDate(String interestAccrualDate) {
+    public void setInterestAccrualDate(Date interestAccrualDate) {
         this.interestAccrualDate = interestAccrualDate;
     }
 

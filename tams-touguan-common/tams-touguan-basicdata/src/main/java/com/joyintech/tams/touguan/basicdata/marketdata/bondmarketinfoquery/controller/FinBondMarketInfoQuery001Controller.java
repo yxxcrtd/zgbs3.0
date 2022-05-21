@@ -117,7 +117,7 @@ public class FinBondMarketInfoQuery001Controller extends BaseController {
         if (StringUtil.isNotEmpty(dto)) {
             return Message.success("success", dto);
         } else {
-            return Message.fail("资产代码不存在.");
+            return Message.fail("未查询到该债券信息，无法加券，请手工维护");
         }
     }
 
