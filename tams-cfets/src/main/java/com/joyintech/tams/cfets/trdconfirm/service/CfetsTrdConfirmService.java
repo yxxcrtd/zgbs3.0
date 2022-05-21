@@ -2897,14 +2897,15 @@ public class CfetsTrdConfirmService extends BaseService{
             pageParam.put("finprodIdList", StringUtil.splitToList(GlobalConstant.COMMA,finprodId));
         }
 
+        pageParam.put("assetType", pageParam.get("finprodType2"));
         String regAssetType= (String)pageParam.get("regAssetType");
         if(StringUtil.isNotEmpty(regAssetType)) {
             if (StringUtil.equals(regAssetType, "01")) {
-                pageParam.put("regAssetType", "BOND");
+                pageParam.put("finprodType2", "BOND");
             } else if (StringUtil.equals(regAssetType, "02")) {
-                pageParam.put("regAssetType", "REPO");
+                pageParam.put("finprodType2", "REPO");
             } else if (StringUtil.equals(regAssetType, "03")) {
-                pageParam.put("regAssetType", "BID");
+                pageParam.put("finprodType2", "BID");
             }
         }
         if (StringUtil.equals(dto.getSettleSpeed(),
