@@ -222,16 +222,16 @@
         RELEASE_INFO.ADDITIONAL_BATCHES as additionalBatches,
 
         nvl(RDI_RELEASE_INFO.ISSUE_SIZE * 100000000, ROUND(RELEASE_INFO.ISSUE_SIZE, 2)) as issueSize,
-        nvl(TO_CHAR(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd'), TO_CHAR(RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd')) as issueDate,
-        nvl(TO_CHAR(RDI_RELEASE_INFO.EVENT_DATE, 'yyyy-MM-dd'), TO_CHAR(RELEASE_INFO.PAYMENT_DEADLINE, 'yyyy-MM-dd')) as eventDate,
+        nvl(TO_CHAR(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-mm-dd hh:mm:ss'), TO_CHAR(RELEASE_INFO.ISSUE_DATE, 'yyyy-mm-dd hh:mm:ss')) as issueDate,
+        nvl(TO_CHAR(RDI_RELEASE_INFO.EVENT_DATE, 'yyyy-mm-dd hh:mm:ss'), TO_CHAR(RELEASE_INFO.PAYMENT_DEADLINE, 'yyyy-mm-dd hh:mm:ss')) as eventDate,
         RELEASE_INFO.DEBT_REGISTRATION_DATE AS debtRegistrationDate,
 
         RELEASE_INFO.LISTING_DATE AS listingDate,
         RELEASE_INFO.LISTING_CODE AS listingCode,
         SEC_INFO.CROSS_MARKET_CODE AS crossMarketCode,
 
-        nvl(TO_CHAR(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd'), TO_CHAR(RELEASE_INFO.INTEREST_ACCRUAL_DATE,
-        'yyyy-MM-dd')) as interestAccrualDate,
+        nvl(TO_CHAR(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-mm-dd hh:mm:ss'), TO_CHAR(RELEASE_INFO.INTEREST_ACCRUAL_DATE,
+        'yyyy-mm-dd hh:mm:ss')) as interestAccrualDate,
 
         SEC_INFO.VALUE_DATE valueDate,
         SEC_INFO.EXPIRY_DATE expiryDate,
