@@ -87,6 +87,8 @@ public class CfetsTrdFirstBidFirm001Controller extends BaseController {
         initPageParams.put("biddingMethod_01", DictCodeListExt4.投标方式_自主投标.getValue());
         initPageParams.put("biddingMethod_02", DictCodeListExt4.投标方式_代投代缴.getValue());
         initPageParams.put("biddingMethod_03", DictCodeListExt4.投标方式_分销买入.getValue());
+        // 调整策略
+        initPageParams.put("ADJUST_STRATEGY", this.getSelectDataFromDataDic(DictCode.调整策略, null));
 
         // 获取平台日
         Date tradeDate = DateUtil.platDateFromCache();
