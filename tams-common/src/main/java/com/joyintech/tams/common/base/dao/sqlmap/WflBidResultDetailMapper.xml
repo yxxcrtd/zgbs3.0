@@ -48,17 +48,20 @@
         select 
         <include refid="com.joyintech.tams.common.base.dao.WflBidResultDetailMapper.Base_Column_List" />
         from WFL_BID_RESULT_DETAIL
-        where TOTAL_WIN_ID = #{totalWinId,jdbcType=VARCHAR}
+        where DETAIL_WIN_ID = #{detailWinId,jdbcType=VARCHAR}
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
         delete from WFL_BID_RESULT_DETAIL
-        where TOTAL_WIN_ID = #{totalWinId,jdbcType=VARCHAR}
+        where DETAIL_WIN_ID = #{detailWinId,jdbcType=VARCHAR}
     </delete>
     <delete id="deleteByWorkflowId" parameterType="java.lang.String" >
         delete from WFL_BID_RESULT_DETAIL
         where WORKFLOW_ID = #{WorkflowId,jdbcType=VARCHAR}
     </delete>
-
+    <delete id="deleteByTotalWinId" parameterType="java.lang.String" >
+        delete from WFL_BID_RESULT_DETAIL
+        where TOTAL_WIN_ID = #{totalWinId,jdbcType=VARCHAR}
+    </delete>
     <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.WflBidResultDetail" >
         insert into WFL_BID_RESULT_DETAIL (DETAIL_WIN_ID,TOTAL_WIN_ID, WIN_ID, BID_ID, ENTRUST_ID, PORTFOLIO_ID,
             TOTAL_BID_PRINAMT, THE_WIN_PRINAMT, ACT_WIN_PRINAMT, BID_PRICE, WIN_PRICE, WIN_CPRICE,

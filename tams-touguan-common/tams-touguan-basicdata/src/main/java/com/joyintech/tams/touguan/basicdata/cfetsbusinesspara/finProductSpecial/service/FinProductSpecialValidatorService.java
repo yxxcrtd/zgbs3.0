@@ -12,6 +12,7 @@ import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.util.ExcelUtil;
 import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialDto;
 import com.joyintech.tams.touguan.basicdata.cfetsbusinesspara.finProductSpecial.dto.FinProductSpecialImportDto;
+import com.joyintech.workflow.engine.constant.OperationType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -41,35 +42,43 @@ public class FinProductSpecialValidatorService implements BeanValidator {
     public List<ValidMessage> valid(Object value) {
         List<ValidMessage> resultList = new ArrayList<>();
         FinProductSpecialDto dto = (FinProductSpecialDto) value;
-        if (StringUtil.isBlank(dto.getFinprodMarketId())) {
-            resultList.add(new ValidMessage(getMessage("【债券代码】必填!")));
+        if (!dto.getOperateType().equals(OperationType.DELETE.name())) {
+            if (StringUtil.isBlank(dto.getFinprodMarketId())) {
+                resultList.add(new ValidMessage(getMessage("【债券代码】必填!")));
+            }
+            if (StringUtil.isBlank(dto.getIsAbs())) {
+                resultList.add(new ValidMessage(getMessage("【是否资产支持证券】必填!")));
+            }
+            if (StringUtil.isBlank(dto.getIsSpecialDebt())) {
+                resultList.add(new ValidMessage(getMessage("【是否特殊债】必填!")));
+            }
+            if (StringUtil.isBlank(dto.getIsDefaultBondIndicator())) {
+                resultList.add(new ValidMessage(getMessage("【是否到期违约债】必填!")));
+            }
+            if (DictCodeList.是否_否.getValue().equals(dto.getIsDefaultBondIndicator())
+                    && DictCodeList.是否_否.getValue().equals(dto.getIsAbs())
+                    && DictCodeList.是否_否.getValue().equals(dto.getIsSpecialDebt())) {
+                resultList.add(new ValidMessage(getMessage("特殊债券标识至少其中一个为是!")));
+            }
         }
-        if (StringUtil.isBlank(dto.getIsAbs())) {
-            resultList.add(new ValidMessage(getMessage("【是否资产支持证券】必填!")));
-        }
-        if (StringUtil.isBlank(dto.getIsSpecialDebt())) {
-            resultList.add(new ValidMessage(getMessage("【是否特殊债】必填!")));
-        }
-        if (StringUtil.isBlank(dto.getIsDefaultBondIndicator())) {
-            resultList.add(new ValidMessage(getMessage("【是否到期违约债】必填!")));
-        }
-        if (DictCodeList.是否_否.getValue().equals(dto.getIsDefaultBondIndicator())
-                && DictCodeList.是否_否.getValue().equals(dto.getIsAbs())
-                && DictCodeList.是否_否.getValue().equals(dto.getIsSpecialDebt())) {
-            resultList.add(new ValidMessage(getMessage("特殊债券标识至少其中一个为是!")));
-        }
+
         //判断特殊资产维护是否存在流程中数据
-        WflValidInputParameter parameter = new WflValidInputParameter();
-        parameter.setPageId("CfetsBasicInfo001");
-        parameter.setBusinessDataPk1(dto.getFinprodMarketId());
-        ProcessMark dataEntityFromProcessMark = mstWorkflowCommonService.getDataEntityFromProcessMark(parameter);
-        if (Objects.nonNull(dataEntityFromProcessMark)) {
-            resultList.add(new ValidMessage("", getMessage("资产存在流程中数据,不可删除!" + dataEntityFromProcessMark.getWorkflowId())));
+        if (dto.getOperateType().equals(OperationType.DELETE.name())) {
+            WflValidInputParameter parameter = new WflValidInputParameter();
+            parameter.setPageId("CfetsBasicInfo001");
+            parameter.setBusinessDataPk1(dto.getFinprodMarketId());
+            ProcessMark dataEntityFromProcessMark = mstWorkflowCommonService.getDataEntityFromProcessMark(parameter);
+            if (Objects.nonNull(dataEntityFromProcessMark)) {
+                resultList.add(new ValidMessage("", getMessage("资产存在流程中数据,不可删除!" + dataEntityFromProcessMark.getWorkflowId())));
+            }
         }
-        //判断是否流程中的数据
-        Integer countFinProdIdProcessing = finProductSpecial001Service.countFinprodIdProcessing(dto.getFinprodMarketId());
-        if (countFinProdIdProcessing > 0) {
-            resultList.add(new ValidMessage(getMessage("存在有效或流程中的当日指令及交易数据，不允许修改!")));
+
+        if (dto.getOperateType().equals(OperationType.MODIFY.name())) {
+            //判断是否流程中的数据
+            Integer countFinProdIdProcessing = finProductSpecial001Service.countFinprodIdProcessing(dto.getFinprodMarketId());
+            if (countFinProdIdProcessing > 0) {
+                resultList.add(new ValidMessage(getMessage("存在有效或流程中的当日指令及交易数据，不允许修改!")));
+            }
         }
         return resultList;
     }
@@ -84,6 +93,7 @@ public class FinProductSpecialValidatorService implements BeanValidator {
     public AjaxResult checkConfirmMsgForImportData(String fileName) {
         List<List<String>> dataList = ExcelUtil.getDataList(fileName);
         AjaxResult result = new AjaxResult();
+        result.setData(dataList);
         if (!com.joyintech.framework.util.StringUtil.isEmptyList(dataList)) {
             if (!CollectionUtils.isEmpty(dataList)) {
                 if (dataList.size() > IMPORT_MAXIMUM_SIZE) {

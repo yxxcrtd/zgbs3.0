@@ -179,7 +179,7 @@ public class PositionRequestServiceEtrExchangeTradeSaveSecRepoRequest {
                 map.put(ORD_ENTRUST_ID, null);
                 map.put(INV_AIM, entity.getInvAim());
                 map.put(INTEGRATE_SEC_AMOUNT, 0);
-                map.put(OWN_SEC_AMOUNT, secAmount);
+                map.put(OWN_SEC_AMOUNT, bean.getSecAmount());
 
                 ptlList.add(map);
             }

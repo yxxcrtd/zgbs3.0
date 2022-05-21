@@ -473,6 +473,10 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      * @date 2022/4/21 13:52
      */
     private List<CfetsTrdBondFirstSubProductDto> propDistribution(BigDecimal subAmt, List<CfetsTrdBondFirstSubProductDto> productDtos) {
+        if (!StringUtil.isNotEmpty(subAmt)) {
+            logger.info("比例分配:认购量为空");
+            return productDtos;
+        }
         // 自动计算的计算结果需要为最小变动单位1000的整数倍，且每条数据的认购量须小于等于剩余指令额度
         BigDecimal minChangeUnit = subMinChangeUnit;
         //指令剩余额度汇总
@@ -527,6 +531,10 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      * @date 2022/4/21 13:52
      */
     private List<CfetsTrdBondFirstSubProductDto> aveDistribution(BigDecimal subAmt, List<CfetsTrdBondFirstSubProductDto> productDtos) {
+        if (!StringUtil.isNotEmpty(subAmt)) {
+            logger.info("比例分配:认购量为空");
+            return productDtos;
+        }
         // 自动计算的计算结果需要为最小变动单位1000的整数倍，且每条数据的认购量须小于等于剩余指令额度
         BigDecimal minChangeUnit = subMinChangeUnit;
         // 平均值计算
@@ -817,6 +825,9 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      */
     @Override
     public void doUpdate(CfetsTrdBondFirstSubInfoDto entity) {
+        if ("save".equals(entity.getOperateType())) {
+            return;
+        }
         Map<String, Object> map = new HashMap<>();
         if (!StringUtil.isNotEmpty(entity.getTradeDate())) {
             entity.setTradeDate(DateUtil.parse(iPlatformDate.getSysDateStr()));
@@ -1317,6 +1328,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                     if (feeSet.add(item.getEntrustId())) {
                         feeSize--;
                     }
+                    continue;
                 }
                 if (BigDecimalUtil.ACompareToB(payAssign, payMinChangeUnit, 2) > 0) {
                     //
@@ -1428,6 +1440,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         String isSupportCstpFlagBondfirst = CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST");
         // 本方校验错误类型 0 符合要求 1 存在不同机构 2 存在机构为空
         int errorType = 0;
+        boolean flag = true;
         // 产品申购列表
         for (CfetsTrdBondFirstSubProductDto item : dto.getProductDtos()) {
             // 剩余指令额度
@@ -1435,6 +1448,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             if (BigDecimalUtil.isZero(item.getAvaNum())) {
                 continue;
             } else {
+                flag = false;
                 avaNum = ArithmeticUtil.doAdd(avaNum, item.getAvaNum());
             }
             // 指令代码
@@ -1496,6 +1510,10 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             }
 
         }
+        if (flag) {
+            errorList.add(new ValidMessage("申购产品列表中至少存在一条有效数据!"));
+            return errorList;
+        }
         // 当参数为是时，本方必填，带入组合关联的银行间机构简称；
         //  申购产品列表中已添加的组合必须关联银行间机构数据，及所有组合关联的银行间机构数据必须一致，不满足时弹出提示且不可提交
         if (StringUtil.equals(DictCodeList.是否_是.getValue(), isSupportCstpFlagBondfirst) && errorType != 0) {
@@ -1528,7 +1546,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         param.put("secManageAcctId", secManageAcctId);
         param.put("finprodId", dto.getFinprodId());
         BigDecimal sumSubAmt = cfetsTrdBondFirstSub002Mapper.selectSumSubAmtBySecAcctIdAndFin(param);
-        sumSubAmt = ArithmeticUtil.doAdd(sumSubAmt,dto.getSubscriptionAmount());
+        sumSubAmt = ArithmeticUtil.doAdd(sumSubAmt, dto.getSubscriptionAmount());
         logger.debug("数值校验,当前资产+证券账户维度下流程中、有效的申购记录认购量之和:" + sumSubAmt);
         if (StringUtil.isNotEmpty(finProductIssue.getMaxTotalamt())
                 && BigDecimalUtil.ACompareToB(sumSubAmt, finProductIssue.getMaxTotalamt(), 6) >= 0) {

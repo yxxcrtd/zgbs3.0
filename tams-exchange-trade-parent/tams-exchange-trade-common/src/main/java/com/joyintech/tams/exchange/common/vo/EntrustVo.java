@@ -242,6 +242,10 @@ public class EntrustVo extends BaseEntity implements Serializable, EntrustInterf
     @Digits(integer = 20, fraction = 4)
     private BigDecimal bondVolume;
 
+    @ApiModelProperty(name = "entrustPirceView", value = "委托价格(展示)")
+    @Digits(integer = 20, fraction = 2)
+    private BigDecimal entrustPriceView;
+
     @Override
     public boolean isNoCancelEntrust() {
         return noCancelEntrust;
@@ -810,6 +814,14 @@ public class EntrustVo extends BaseEntity implements Serializable, EntrustInterf
 
     public void setBondVolume(BigDecimal bondVolume) {
         this.bondVolume = bondVolume;
+    }
+
+    public BigDecimal getEntrustPriceView() {
+        return entrustPriceView;
+    }
+
+    public void setEntrustPriceView(BigDecimal entrustPriceView) {
+        this.entrustPriceView = entrustPriceView;
     }
 
     public static EntrustVo getTemplateEntrust() {

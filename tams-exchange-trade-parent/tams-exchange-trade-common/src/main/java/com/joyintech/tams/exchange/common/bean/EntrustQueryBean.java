@@ -318,6 +318,9 @@ public class EntrustQueryBean implements Serializable {
     @ApiModelProperty(name = "operateUser", value = "操作人员ID 执行撤销异常委托操作人员ID", hidden = true)
     private String operateUser;
 
+    @ApiModelProperty(name = "entrustPriceView", value = "委托价格(展示)")
+    private BigDecimal entrustPriceView;
+
     public boolean isNoCancelEntrust() {
         return noCancelEntrust;
     }
@@ -1187,5 +1190,17 @@ public class EntrustQueryBean implements Serializable {
 
     public void setPropTradeName(String propTradeName) {
         this.propTradeName = propTradeName;
+    }
+
+    public BigDecimal getEntrustPriceView() {
+        if (StringUtil.isNotEmpty(isFullPrice) && StringUtil.equals(isFullPrice, "N")) {
+            return fullPrice;
+        } else {
+            return entrustPrice;
+        }
+    }
+
+    public void setEntrustPriceView(BigDecimal entrustPriceView) {
+        this.entrustPriceView = entrustPriceView;
     }
 }

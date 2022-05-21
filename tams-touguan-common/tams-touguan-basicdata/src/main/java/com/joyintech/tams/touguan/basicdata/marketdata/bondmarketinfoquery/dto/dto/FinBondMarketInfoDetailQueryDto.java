@@ -463,7 +463,7 @@ public class FinBondMarketInfoDetailQueryDto extends BaseDto {
     }
 
     public void setCouponSpecies(String couponSpecies) {
-        this.couponSpecies = couponSpecies;
+        this.couponSpecies = couponSpecies == null ? null : couponSpecies.trim();
     }
 
     public String getInterestRate() {

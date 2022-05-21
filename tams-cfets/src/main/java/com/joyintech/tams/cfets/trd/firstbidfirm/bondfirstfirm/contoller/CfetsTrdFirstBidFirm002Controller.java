@@ -7,6 +7,7 @@ import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.business.common.pojo.Message;
@@ -15,12 +16,17 @@ import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
 import com.joyintech.tams.cfets.trd.bond.dto.RiskCalRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmInfoDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmInitRequest;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmProductDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.service.CfetsTrdFirstBidFirm002Service;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.contoller.CfetsTrdBondFirstSub002Controller;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.*;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsBondFirstSubCheckDetaileRequst;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsBondFirstSubCheckRequst;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubEntrustDto;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubEntrustRequest;
 import com.joyintech.tams.cfets.trd.repo.service.CfetsRepoQuotedPrice004Service;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -40,6 +46,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -203,7 +211,6 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
         }
     }
 
-
     @ApiOperation(value = "<投标产品列表>新增或删除", notes = "分销买入时,<投标产品列表>新增或删除")
     @PostMapping("/addOrDelList")
     @ResponseBody
@@ -229,29 +236,68 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
         }
     }
 
-    @ApiOperation(value = "其他金额分配", notes = "分配应缴款金额和结算服务费,编辑 基本信息中应缴款金额、结算服务费或申购列表里的认购量 时调用")
-    @PostMapping("/otherAllocation")
+    @ApiOperation(value = "中标标位联动", notes = "分销买入 修改【中标标位】时调用")
+    @PostMapping("/winPriceLink")
     @ResponseBody
-    public Message<List<CfetsTrdBondFirstSubProductDto>> otherAllocation(@RequestBody CfetsTrdBondFirstSubInfoDto request) {
+    public Message<CfetsTrdFirstBidFirmInfoDto> winPriceLink(@RequestBody CfetsTrdFirstBidFirmInfoDto request) {
         try {
-            List<CfetsTrdBondFirstSubProductDto> list = cfetsTrdFirstBidFirm002Service.otherAllocation(request);
-            return new Message<List<CfetsTrdBondFirstSubProductDto>>().success().setData(list);
+            CfetsTrdFirstBidFirmInfoDto result = cfetsTrdFirstBidFirm002Service.winPriceLink(request);
+            return new Message<CfetsTrdFirstBidFirmInfoDto>().success().setData(result);
         } catch (Exception e) {
-            logger.error("其他金额分配异常", e);
-            return new Message<List<CfetsTrdBondFirstSubProductDto>>().fail().setMessage("其他金额分配异常");
+            logger.error("中标标位联动异常", e);
+            return new Message<CfetsTrdFirstBidFirmInfoDto>().fail().setMessage("中标标位联动异常");
         }
     }
 
-    @ApiOperation(value = "计算", notes = "联动计算,编辑基本信息中认购量时调用")
-    @PostMapping("/calData")
+    @ApiOperation(value = "券面总额 应计利息 联动", notes = "分销买入 修改【券面总额】或【应计利息】时 调用 联动金额信息，投标产品列表的金额信息。券面总额需点分配计算")
+    @PostMapping("/bidPriceTotalLink")
     @ResponseBody
-    public Message<CfetsTrdFirstBidFirmInfoDto> calData(@RequestBody CfetsTrdFirstBidFirmInfoDto request) {
+    public Message<CfetsTrdFirstBidFirmInfoDto> bidPriceTotalLink(@RequestBody CfetsTrdFirstBidFirmInfoDto request) {
         try {
-            CfetsTrdFirstBidFirmInfoDto result = cfetsTrdFirstBidFirm002Service.calData(request);
+            CfetsTrdFirstBidFirmInfoDto result = cfetsTrdFirstBidFirm002Service.calAmtAndAutoAllocation(request, null);
             return new Message<CfetsTrdFirstBidFirmInfoDto>().success().setData(result);
         } catch (Exception e) {
-            logger.error("计算数据异常", e);
-            return new Message<CfetsTrdFirstBidFirmInfoDto>().fail().setMessage("计算数据异常");
+            logger.error("券面总额联动异常", e);
+            return new Message<CfetsTrdFirstBidFirmInfoDto>().fail().setMessage("券面总额联动异常");
+        }
+    }
+
+    @ApiOperation(value = "净价联动", notes = "分销买入 修改【净价】时调用")
+    @PostMapping("/priceLink")
+    @ResponseBody
+    public Message<CfetsTrdFirstBidFirmInfoDto> priceLink(@RequestBody CfetsTrdFirstBidFirmInfoDto request) {
+        try {
+            CfetsTrdFirstBidFirmInfoDto result = cfetsTrdFirstBidFirm002Service.calAmtAndAutoAllocation(request, request.getPrice());
+            return new Message<CfetsTrdFirstBidFirmInfoDto>().success().setData(result);
+        } catch (Exception e) {
+            logger.error("券面总额联动异常", e);
+            return new Message<CfetsTrdFirstBidFirmInfoDto>().fail().setMessage("券面总额联动异常");
+        }
+    }
+
+    @ApiOperation(value = "结算服务费联动", notes = "分销买入 修改【结算服务费】或修改<投标产品列表>的【券面总额】时调用 重新分配<投标产品列表>的交易金额/应计利息总额/缴款金额和结算服务费")
+    @PostMapping("/settFeeAmtLink")
+    @ResponseBody
+    public Message<List<CfetsTrdFirstBidFirmProductDto>> settFeeAmtLink(@RequestBody CfetsTrdFirstBidFirmInfoDto request) {
+        try {
+            List<CfetsTrdFirstBidFirmProductDto> result = cfetsTrdFirstBidFirm002Service.otherDistribution(request);
+            return new Message<List<CfetsTrdFirstBidFirmProductDto>>().success().setData(result);
+        } catch (Exception e) {
+            logger.error("结算服务费联动异常", e);
+            return new Message<List<CfetsTrdFirstBidFirmProductDto>>().fail().setMessage("结算服务费联动异常");
+        }
+    }
+
+    @ApiOperation(value = "标的校验", notes = "自主投标 修改 基本信息中【汇总投标券面总额】和汇总投标列表中【投标标位】 调用")
+    @PostMapping("/checkFinInfo")
+    @ResponseBody
+    public Message<AjaxResult> checkFinInfo(@RequestBody CfetsTrdFirstBidFirmInfoDto request) {
+        try {
+            AjaxResult result = cfetsTrdFirstBidFirm002Service.checkFinInfo(request);
+            return new Message<AjaxResult>().success().setData(result);
+        } catch (Exception e) {
+            logger.error("标的校验异常", e);
+            return new Message<AjaxResult>().fail().setMessage("标的校验异常");
         }
     }
 
@@ -269,69 +315,6 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
     public Message<AjaxResult> doRiskcal(@RequestBody RiskCalRequest riskCalRequest) {
         CfetsEtribdoRiskcalResponse result = new CfetsEtribdoRiskcalResponse();
         try {
-//            AjaxResult ajaxResult = cfetsTrdBondFirstSub002Service.riskCheckNotEmpty(riskCalRequest);
-//            if (CollectionUtils.isNotEmpty(ajaxResult.getErrorList())) {
-//                return new Message<AjaxResult>().success().setData(ajaxResult);
-//            }
-//            Map<String, Object> dataMap = cfetsTrdBondFirstSub002Service.doRiskcalPackage(riskCalRequest);
-//            List<String> resultArrList = interfRiskRdsController.doInfBatchData(dataMap, "0", "RSK002", "F01");
-//            result.setRiskMathFlag("02");
-//            boolean forbidFlag = false;
-//            boolean cluflag = true;
-//            //是否全部正常
-//            boolean allNormalFlag = true;
-//            List<CfetsEtribdoRiskcalResponse> resultlist = new ArrayList<>();
-//            if (!StringUtil.isEmptyList(resultArrList)) {
-//                for (String row : resultArrList) {
-//                    ClientData resultArr = JsonUtils.json2Object(row, ClientData.class);
-//                    if (StringUtil.isNotEmpty(resultArr) && StringUtil.isNotEmpty(resultArr.getHead())
-//                            && StringUtil.isNotEmpty(resultArr.getHead().get("std400msgt"))
-//                    ) {
-//                        if (StringUtil.equals(resultArr.getHead().get("std400msgt"), "E")) {
-//                            return new Message<AjaxResult>().fail().setMessage(resultArr.getHead().get("stdrtninfo").toString());
-//                        }
-//                    }
-//                    if (!StringUtil.isNotEmpty(resultArr) || !StringUtil.isNotEmpty(resultArr.getBody())
-//                            || !StringUtil.isNotEmpty(resultArr.getBody().get("RSK_LIST"))
-//                            || !StringUtil.isNotEmpty(resultArr.getBody().get("rskStatus"))) {
-//                        return new Message<AjaxResult>().success().setMessage("无");
-//                    }
-//                    List<Map<String, Object>> riskList = (List<Map<String, Object>>) resultArr.getBody().get("RSK_LIST");
-//                    for (Map<String, Object> map : riskList) {
-//                        if (allNormalFlag && !StringUtil.equals(map.get("kriStatus"), "0")) {
-//                            allNormalFlag = false;
-//                        }
-//                        if (StringUtil.equals(map.get("kriStatus"), "0") && !StringUtil.equals(map.get("kriTrend"), "向好")) {
-//                            forbidFlag = true;
-//                        }
-////                        map.put("kriStatusCn", cfetsEtrIbBondinfoService.getKriStatusCnByKriStatus(map.get("kriStatus").toString()));
-//                        resultlist.add(BeanUtil.mapToObject(map, CfetsEtribdoRiskcalResponse.class));
-//                    }
-//                    if (!allNormalFlag) {
-//                        result.setRiskcalReturnList(resultlist);
-//                    }
-//                    result.setStdrtninfo(resultArr.getHead().get("stdrtninfo").toString());
-//                    //当置为不通过时就不再进来了
-//                    if (cluflag) {
-//                        if (!StringUtil.equals(resultArr.getBody().get("rskStatus"), "3")) {
-//                            if (StringUtil.equals(resultArr.getBody().get("rskStatus"), "4") && forbidFlag) {
-//                                cluflag = false;
-//                                resultArr.getBody().put("rskStatus", "3");
-//                                result.setRskStatus("3");
-//                            }
-//                        } else {
-//                            cluflag = false;
-//                        }
-//                        if (!cluflag) {
-//                            result.setRiskTrialSpan("试算不通过");
-//                        } else {
-//                            result.setRiskTrialSpan("试算通过");
-//                        }
-//                    }
-//
-//                }
-//
-//            }
             AjaxResult m = new AjaxResult();
             m.setData(result);
             return new Message<AjaxResult>().success().setData(m);
@@ -343,10 +326,10 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
     /**
      * 投标确认提交检查
      *
-     * @param dto 页面元素
+     * @param dto
      * @return com.joyintech.tams.business.common.pojo.Message<com.joyintech.framework.ajax.AjaxResult>
      * @author jiangpeng
-     * @date 2022/5/16 16:07
+     * @date 2022/5/21 11:16
      */
     @ApiOperation(value = "投标确认提交检查", notes = "投标确认点击【提交】调用")
     @PostMapping("/check")
@@ -376,16 +359,46 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
         if (br.hasErrors()) {
             return new Message<AjaxResult>().success().setData(new AjaxResult(br));
         }
-        dto.setBidId(cfetsTrdFirstBidFirm002Service.getBidId(null));
         ProcessParameter<CfetsTrdFirstBidFirmInfoDto> processParameter = new ProcessParameter<>();
         WorkFlowParameter<CfetsTrdFirstBidFirmInfoDto> params = new WorkFlowParameter<>();
         // 页面id
         params.setPageId("CfetsTrdFirstBidFirm002");
-        //
+        // 代办事项中显示名称拼接
+        String str = "投标日期:" + DateUtil.format(iPlatformDate.getSysDate());
+        String finprodAbbr = null;
+        String counterName = null;
+        String tradeAmt = null;
+        if (StringUtil.isNotEmpty(dto.getFinprodAbbr())) {
+            finprodAbbr = "资产简称:" + dto.getFinprodAbbr();
+        }
+        if (StringUtil.isNotEmpty(dto.getCounterName())) {
+            counterName = "对手方:" + dto.getCounterName();
+        }
+        if (StringUtil.isNotEmpty(dto.getTotalBiddingNum())) {
+            tradeAmt = "汇总投标券面总额:" + ArithmeticUtil.divide(dto.getTotalBiddingNum(), new BigDecimal(10000), 2, RoundingMode.HALF_UP) + "万元";
+        }
         params.setElementId(dto.getElementId());
-        params.setBusinessType(BussinessDictCodeList.共同业务类型_中标结果确认.getValue());
+        if (StringUtil.equals(DictCodeListExt4.投标方式_自主投标.getValue(), dto.getBiddingMethod())) {
+            //  自主投标
+            params.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_投标_自主投标.getValue());
+            dto.setBidId(cfetsTrdFirstBidFirm002Service.getBidId(BussinessDictCodeList.共同业务类型_一级投标确认_投标_自主投标));
+        } else if (StringUtil.equals(DictCodeListExt4.投标方式_代投代缴.getValue(), dto.getBiddingMethod())) {
+            //代投代缴
+            params.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_投标_代投代缴.getValue());
+            dto.setBidId(cfetsTrdFirstBidFirm002Service.getBidId(BussinessDictCodeList.共同业务类型_一级投标确认_投标_代投代缴));
+        } else if (StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), dto.getBiddingMethod())) {
+            // 分销买入
+            params.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入.getValue());
+            dto.setBidId(cfetsTrdFirstBidFirm002Service.getBidId(BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入));
+            str = "交易日期:" + DateUtil.format(iPlatformDate.getSysDate());
+            tradeAmt = "分销买入券面总额:" +
+                    ArithmeticUtil.divide(dto.getBidPriceTotal(), new BigDecimal(10000), 2, RoundingMode.HALF_UP).toPlainString() + "万元";
+        }
+        str += StringUtil.isNotEmpty(finprodAbbr) ? "-" + finprodAbbr : "";
+        str += StringUtil.isNotEmpty(counterName) ? "-" + counterName : "";
+        str += StringUtil.isNotEmpty(tradeAmt) ? "-" + tradeAmt : "";
         params.setBusinessCode(dto.getBidId());
-        String finalStr = "一级投标确认-交易日期:" + DateUtil.format(iPlatformDate.getSysDate());
+        String finalStr = str;
         params.setComment(entity -> finalStr);
         processParameter.setWorkFlowParameter(params);
         processParameter.setOperationType(OperationType.NEW);
@@ -394,7 +407,7 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
             String msg = cfetsTrdFirstBidFirm002Service.start(processParameter, dto);
             return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
         } catch (Exception e) {
-            logger.error("保存申购新建失败", e);
+            logger.error("保存一级投标确认新建失败", e);
             return PositionUtil.ajaxErrorReturn(e);
         }
     }

@@ -220,10 +220,14 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
                 (dto, list) -> dto.setRiskTrialRetDto(list));
 
         // 临时主键
-        BussinessCodeParameter param = new BussinessCodeParameter();
-        param.setCommonBusinessType(DictCodeListExt3.共通业务类型_一级投标指令);
-        String generatedId = bussGetBussinessIdService != null ? bussGetBussinessIdService.buildBussinessCode(param) : IDGenerator.generate();
-        allDto.setTotalEtrustId(generatedId);
+        if(StringUtil.isNotEmpty(cfetsDto.getEntrustId())){
+            allDto.setTotalEtrustId(cfetsDto.getEntrustId());
+        }else{
+            BussinessCodeParameter param = new BussinessCodeParameter();
+            param.setCommonBusinessType(DictCodeListExt3.共通业务类型_一级投标指令);
+            String generatedId = bussGetBussinessIdService != null ? bussGetBussinessIdService.buildBussinessCode(param) : IDGenerator.generate();
+            allDto.setTotalEtrustId(generatedId);
+        }
 
         ProcessParameter<CfetsEtrBondFirstBid002Dto> processParameter = new ProcessParameter<>();
         WorkFlowParameter<CfetsEtrBondFirstBid002Dto> params = new WorkFlowParameter<>();

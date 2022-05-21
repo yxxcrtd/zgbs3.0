@@ -1722,7 +1722,15 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
             Object repoTerm=CommonUtil.findValue(dataMap, "repoTerm");
             if(StringUtil.isNotEmpty(repoTerm)) {
                 infRiskRdsDto.setRepoTerm(new BigDecimal(repoTerm.toString()));
-                infRiskRdsDto.setMdate(DateUtil.parse(DateUtil.addDay(StringUtil.isNotEmpty(CommonUtil.findValue(dataMap, "vdate"))?CommonUtil.findValue(dataMap, "vdate").toString():infRiskRdsDto.getEventDate(),Integer.valueOf(repoTerm.toString()))));
+                Date vdate = null;
+                if(Objects.nonNull(CommonUtil.findValue(dataMap, "vdate"))) {
+                    if (dataMap.get("vdate") instanceof Long){
+                        vdate = new Date(Long.parseLong(dataMap.get("vdate").toString()));
+                    }else{
+                        vdate = DateUtil.parse(dataMap.get("vdate").toString());
+                    }
+                }
+                infRiskRdsDto.setMdate(DateUtil.parse(DateUtil.addDay(Objects.nonNull(vdate)?DateUtil.format(vdate):infRiskRdsDto.getEventDate(),Integer.valueOf(repoTerm.toString()))));
             }
             //----add by 裴家俊 组合资产剩余期限 20201125 end-----
 
@@ -1769,7 +1777,15 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                     CommonUtil.findValue(dataMap, "repoTerm2"):CommonUtil.findValue(dataMap, "repoTerm");//从严控制
             if(StringUtil.isNotEmpty(repoTerm)) {
                 infRiskRdsDto.setRepoTerm(new BigDecimal(repoTerm.toString()));
-                infRiskRdsDto.setMdate(DateUtil.parse(DateUtil.addDay(StringUtil.isNotEmpty(CommonUtil.findValue(dataMap, "vdate"))?CommonUtil.findValue(dataMap, "vdate").toString():infRiskRdsDto.getEventDate(),Integer.valueOf(repoTerm.toString()))));
+                Date vdate = null;
+                if(Objects.nonNull(CommonUtil.findValue(dataMap, "vdate"))) {
+                    if (dataMap.get("vdate") instanceof Long){
+                        vdate = new Date(Long.parseLong(dataMap.get("vdate").toString()));
+                    }else{
+                        vdate = DateUtil.parse(dataMap.get("vdate").toString());
+                    }
+                }
+                infRiskRdsDto.setMdate(DateUtil.parse(DateUtil.addDay(Objects.nonNull(vdate)?DateUtil.format(vdate):infRiskRdsDto.getEventDate(),Integer.valueOf(repoTerm.toString()))));
             }
             //----add by 裴家俊 组合资产剩余期限 20201125 end-----
 

@@ -51,6 +51,12 @@ public class SelectOptionCommonRequest {
     @ApiModelProperty(name="searchDate",value="查询日期",example="A1")
     private Date searchDate;
 
+    @ApiModelProperty(name="vdate",value="起息日",example="A1")
+    private Date vdate;
+
+    @ApiModelProperty(name="mdate",value="到期日",example="A1")
+    private Date mdate;
+
     public String getSearch() {
         return search;
     }
@@ -145,5 +151,21 @@ public class SelectOptionCommonRequest {
 
     public void setSearchDate(Date searchDate) {
         this.searchDate = searchDate;
+    }
+
+    public Date getVdate() {
+        return vdate;
+    }
+
+    public void setVdate(Date vdate) {
+        this.vdate = vdate;
+    }
+
+    public Date getMdate() {
+        return mdate;
+    }
+
+    public void setMdate(Date mdate) {
+        this.mdate = mdate;
     }
 }

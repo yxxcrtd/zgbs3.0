@@ -311,7 +311,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         //中标结果汇总表
         BidResultTotal bidResultTotal = dto.getBidResultTotal();
         wflBidResultTotalMapper.deleteByPrimaryKey(bidResultTotal.getTotalWinId());
-        wflBidResultDetailMapper.deleteByTotalWinId(bidResultTotal.getTotalWinId());
+//        wflBidResultDetailMapper.deleteByTotalWinId(bidResultTotal.getTotalWinId());
 
         bidResultTotalMapper.insertSelective(bidResultTotal);
         //中标结果明细表
