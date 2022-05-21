@@ -1325,6 +1325,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                     if (feeSet.add(item.getEntrustId())) {
                         feeSize--;
                     }
+                    continue;
                 }
                 if (BigDecimalUtil.ACompareToB(payAssign, payMinChangeUnit, 2) > 0) {
                     //
@@ -1436,13 +1437,12 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         String isSupportCstpFlagBondfirst = CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST");
         // 本方校验错误类型 0 符合要求 1 存在不同机构 2 存在机构为空
         int errorType = 0;
-        boolean flag = false;
+        boolean flag = true;
         // 产品申购列表
         for (CfetsTrdBondFirstSubProductDto item : dto.getProductDtos()) {
             // 剩余指令额度
             // 需求:当存在剩余指令额度为0的数据时，认购量为空，且整条数据置灰不可修改并放置列表最底部
             if (BigDecimalUtil.isZero(item.getAvaNum())) {
-                flag = true;
                 continue;
             } else {
                 flag = false;
@@ -1507,7 +1507,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             }
 
         }
-        if(flag){
+        if (flag) {
             errorList.add(new ValidMessage("申购产品列表中至少存在一条有效数据!"));
             return errorList;
         }
