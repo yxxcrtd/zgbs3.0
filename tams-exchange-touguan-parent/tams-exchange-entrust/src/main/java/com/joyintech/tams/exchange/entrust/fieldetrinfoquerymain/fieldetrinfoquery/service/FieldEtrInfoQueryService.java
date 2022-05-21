@@ -236,6 +236,7 @@ public class FieldEtrInfoQueryService extends BaseService {
     }
 
     public Page<TradeQueryBean> getEtrDispatcherDealListInfoByExe(CommonSearchInfoRequest dto) {
+        String busiTypePosition = dto.getBusiTypePosition();
         Map<String, Object> pageParam = BeanUtil.object2Map(dto);
         pageParam.put("instructionId", dto.getEntrustId());
         Page<TradeQueryBean> page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(),
@@ -250,8 +251,27 @@ public class FieldEtrInfoQueryService extends BaseService {
                     response.setTradedPrice(StringUtil.isNotEmpty(response.getTradedPrice()) ? ArithmeticUtil.multiply(response.getTradedPrice(), BigDecimal.valueOf(100)) : null);
                 }
                 response.setTradingDay(StringUtil.isNotEmpty(response.getTradingDay()) ? DateUtil.format(DateUtil.parse(response.getTradingDay()), DateUtil.DEFAULT_DATE_FORMAT_EN) : null);
+                setSuspendParams(response, busiTypePosition);
             }
         }
         return page;
+    }
+
+    private void setSuspendParams(TradeQueryBean response, String busiTypePosition) {
+        if (busiTypePosition.equals(DictCodeListExt3.投管业务类型_质押券出入库.getValue())) {
+            response.setTradedVolumeStr(response.getTradedVolume() + "(万元)");
+            response.setTradedPriceStr("");
+            response.setTradedBalanceStr("");
+        }
+        if (busiTypePosition.equals(DictCodeListExt3.投管业务类型_现券交易.getValue())) {
+            response.setTradedVolumeStr(response.getTradedVolume() + "(万元)");
+            response.setTradedPriceStr(response.getTradedPrice() + "(元)");
+            response.setTradedBalanceStr(response.getTradedBalance() + "(元)");
+        }
+        if (busiTypePosition.equals(DictCodeListExt3.投管业务类型_通用式质押回购.getValue())) {
+            response.setTradedVolumeStr("");
+            response.setTradedPriceStr(response.getTradedPrice() + "%");
+            response.setTradedBalanceStr(ArithmeticUtil.divide(response.getTradedPrice(), new BigDecimal(100), 2) + "(万元)");
+        }
     }
 }

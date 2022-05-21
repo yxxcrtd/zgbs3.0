@@ -621,4 +621,35 @@ public class TradeQueryBean implements Serializable {
     public void setDeliverySchedule(String deliverySchedule) {
         this.deliverySchedule = deliverySchedule;
     }
+
+    /**
+     * 页面悬浮窗提示使用字段
+     */
+    private String tradedVolumeStr;
+    private String tradedPriceStr;
+    private String tradedBalanceStr;
+
+    public String getTradedVolumeStr() {
+        return tradedVolumeStr;
+    }
+
+    public void setTradedVolumeStr(String tradedVolumeStr) {
+        this.tradedVolumeStr = tradedVolumeStr;
+    }
+
+    public String getTradedPriceStr() {
+        return tradedPriceStr;
+    }
+
+    public void setTradedPriceStr(String tradedPriceStr) {
+        this.tradedPriceStr = tradedPriceStr;
+    }
+
+    public String getTradedBalanceStr() {
+        return tradedBalanceStr;
+    }
+
+    public void setTradedBalanceStr(String tradedBalanceStr) {
+        this.tradedBalanceStr = tradedBalanceStr;
+    }
 }
