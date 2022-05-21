@@ -4,8 +4,10 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.BeanValidator;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.exchange.period.creditprotectioncertificate.dao.CreditProtectionCertificatePeriodMapper;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.BillingDetailsDto;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodSaveDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -31,11 +33,13 @@ public class CreditProtectionCertificatePeriodSaveDtoValidator implements BeanVa
                 ValidMessage validMessage = new ValidMessage();
                 validMessage.setField("settleMethod");
                 validMessage.setMessage("结算方式为实物结算时，交付债券不能为空");
+                errorList.add(validMessage);
             }
             if (CollectionUtils.isEmpty(dto.getBillingDetails())) {
                 ValidMessage validMessage = new ValidMessage();
                 validMessage.setField("deliverBondAmount");
                 validMessage.setMessage("结算方式为实物结算时，债券交付数量不能为空");
+                errorList.add(validMessage);
             } else {
                 List<BillingDetailsDto> billingDetails = dto.getBillingDetails();
                 for (BillingDetailsDto billingDetail : billingDetails) {
@@ -43,12 +47,11 @@ public class CreditProtectionCertificatePeriodSaveDtoValidator implements BeanVa
                         ValidMessage validMessage = new ValidMessage();
                         validMessage.setField("deliverBondAmount");
                         validMessage.setMessage("结算方式为实物结算时，债券交付数量不能为空");
+                        errorList.add(validMessage);
                         break;
                     }
                 }
             }
-            //保护凭证的名义本金数量超过组合下可用数量
-            //债券交付数量不超过组合下的债券可用数量
         }
         return errorList;
     }

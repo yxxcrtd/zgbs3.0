@@ -6,6 +6,8 @@ import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -51,4 +53,12 @@ public interface CreditProtectionCertificatePeriodMapper {
      * @return
      */
     List<String> getRefSecsByRefEntity(@Param("refEntity") String refEntity);
+
+    /**
+     * 通过组合代码查询可用数量
+     * @param portfolioId
+     * @param iplatDate
+     * @return
+     */
+    BigDecimal getAmountByPortfolioId(@Param("finprodMarketId") String finprodMarketId, @Param("portfolioId") String portfolioId, @Param("tradeDate") Date tradeDate);
 }

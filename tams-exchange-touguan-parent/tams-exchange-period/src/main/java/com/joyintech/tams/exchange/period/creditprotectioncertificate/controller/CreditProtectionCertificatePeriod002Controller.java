@@ -1,25 +1,28 @@
 package com.joyintech.tams.exchange.period.creditprotectioncertificate.controller;
 
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
-import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.exchange.period.creditprotectioncertificate.dao.CreditProtectionCertificatePeriodMapper;
+import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.BillingDetailsDto;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.CreditProtectionCertificatePeriod001Request;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodSaveDto;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.FinprodLinkDto;
-import com.joyintech.tams.exchange.period.creditprotectioncertificate.service.CreditProtectionCertificatePeriod001Service;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.service.CreditProtectionCertificatePeriod002Service;
-import com.joyintech.tams.invest.common.dto.period.common.BaseTotalTradeInfoDto;
+import com.joyintech.tams.exchange.period.creditprotectioncertificate.validator.CreditProtectionCertificatePeriodSaveDtoValidator;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import io.swagger.annotations.Api;
@@ -35,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -60,6 +64,12 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
 
     @Autowired
     private CreditProtectionCertificatePeriod002Service creditProtectionCertificatePeriod002Service;
+
+    @Autowired
+    private CreditProtectionCertificatePeriodSaveDtoValidator creditProtectionCertificatePeriodSaveDtoValidator;
+
+    @Autowired
+    private CreditProtectionCertificatePeriodMapper creditProtectionCertificatePeriodMapper;
 
 
     @ApiOperation(value = "查询画面初始化参数", notes = "查询画面初始化参数")
@@ -98,7 +108,53 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
     @ResponseBody
     public Message<AjaxResult> check(@RequestBody @Validated({ValidateGroupEdit.class}) CreditProtectionCertificatePeriodSaveDto dto, BindingResult br)
             throws Exception {
-        return new Message<>(commonCheck(br, dto.getOperateType()));
+        AjaxResult ajaxResult = new AjaxResult();
+        List<ValidMessage> validMessages = creditProtectionCertificatePeriodSaveDtoValidator.valid(dto);
+        if (!validMessages.isEmpty()) {
+            ajaxResult.setErrorList(validMessages);
+            return new Message<AjaxResult>().success().setData(ajaxResult);
+        }
+        //保护凭证的名义本金数量超过组合下可用数量
+        //债券交付数量不超过组合下的债券可用数量
+        boolean isError = StringUtil.equals(CacheUtil.getSysParam("AMOUNT_CONTROL_STL"), "01");
+        List<BillingDetailsDto> billingDetails = dto.getBillingDetails();
+        StringBuilder confirmMessage = new StringBuilder();
+        for (BillingDetailsDto billingDetail : billingDetails) {
+            BigDecimal amount = creditProtectionCertificatePeriodMapper.getAmountByPortfolioId(dto.getFinprodMarketId(), billingDetail.getPortfolioId(), dto.getTradeDate());
+            if (billingDetail.getRepNomCapi().compareTo(amount) > 0) {
+                if (isError) {
+                    ValidMessage validMessage = new ValidMessage();
+                    validMessage.setField("repNomCapi");
+                    validMessage.setMessage("保护凭证的名义本金数量不可超过组合下可用数量");
+                    validMessages.add(validMessage);
+                } else {
+                    confirmMessage.append("保护凭证的名义本金数量不可超过组合下可用数量;");
+                }
+            }
+            if (billingDetail.getDeliverBondAmount() != null && billingDetail.getDeliveryAmount().compareTo(amount) > 0) {
+                if (isError) {
+                    ValidMessage validMessage = new ValidMessage();
+                    validMessage.setField("deliverBondAmount");
+                    validMessage.setMessage("债券交付数量不超过该组合下的债券可用数量");
+                    validMessages.add(validMessage);
+                } else {
+                    confirmMessage.append("债券交付数量不超过该组合下的债券可用数量;");
+                }
+            }
+            if (confirmMessage.length() > 0 || !validMessages.isEmpty()) {
+                break;
+            }
+        }
+
+        if (confirmMessage.length() > 0) {
+            ajaxResult.setMessageType(MessageType.确认消息);
+            ajaxResult.setData(confirmMessage);
+        } else if (!validMessages.isEmpty()) {
+            ajaxResult.setErrorList(validMessages);
+        } else {
+            ajaxResult.setMessage("校验成功");
+        }
+        return new Message<AjaxResult>().success().setData(ajaxResult);
     }
 
     @ApiOperation(value = "保存提交", notes = "保存提交")
