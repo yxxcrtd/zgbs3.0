@@ -113,6 +113,9 @@ public class FinTenderBondAsset003Dto extends BaseEntity implements ProcessEntit
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
 
+    @ApiModelProperty(name = "revokeReason", value = "撤销原因")
+    private String revokeReason;
+
     /**
      * 操作类型：NEW,MODIFY,DELETE,REVOKE
      */
@@ -308,6 +311,14 @@ public class FinTenderBondAsset003Dto extends BaseEntity implements ProcessEntit
 
     public void setRegistOrgValue(String registOrgValue) {
         this.registOrgValue = registOrgValue;
+    }
+
+    public String getRevokeReason() {
+        return revokeReason;
+    }
+
+    public void setRevokeReason(String revokeReason) {
+        this.revokeReason = revokeReason;
     }
 
     /**
