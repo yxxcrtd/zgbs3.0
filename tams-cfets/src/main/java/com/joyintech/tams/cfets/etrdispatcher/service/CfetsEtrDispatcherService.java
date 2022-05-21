@@ -417,14 +417,14 @@ public class CfetsEtrDispatcherService extends BaseService {
                     response.setExecFinishAmt(ArithmeticUtil.divide(response.getExecFinishAmt(),new BigDecimal("100"),2,RoundingMode.HALF_UP));
                     response.setExecRemainderAmt(ArithmeticUtil.divide(response.getExecRemainderAmt(),new BigDecimal("100"),2,RoundingMode.HALF_UP));
                 }
-//                if(StringUtil.equals(response.getFinprodType2(), BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue())){
-//                    response.setPs(null);
-//                    CfetsEtrDispatcherTradeListResponse dto2 = cfetsEtrDispatcherMapper.getEtrBidInfo(response.getEntrustId());
-//                    if(StringUtil.isNotEmpty(dto2)) {
-//                        response.setIsWin(dto2.getIsWin());
-//                        response.setEtrPrice(dto2.getEtrPrice());
-//                    }
-//                }
+                if(StringUtil.equals(response.getFinprodType2(), BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue())){
+
+                    CfetsEtrDispatcherTradeListResponse dto2 = cfetsEtrDispatcherMapper.getEtrFirstBidInfo(response.getEntrustId());
+                    if(StringUtil.isNotEmpty(dto2)) {
+                        response.setIsWin(dto2.getIsWin());
+                        response.setEtrPrice(dto2.getEtrPrice());
+                    }
+                }
 
             }
         }

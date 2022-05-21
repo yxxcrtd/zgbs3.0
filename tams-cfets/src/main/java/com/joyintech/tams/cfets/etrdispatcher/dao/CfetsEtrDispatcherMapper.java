@@ -233,4 +233,11 @@ public interface CfetsEtrDispatcherMapper {
      * @return
      */
     List<String> getDispatcherEntrustIdList(@Param("finprodId") String finprodId, @Param("statusList") List<String> statusList);
+
+    /**
+     * 查询指令执行、成交进度信息
+     * @param entrustId
+     * @return
+     */
+    CfetsEtrDispatcherTradeListResponse getEtrFirstBidInfo(String entrustId);
 }
