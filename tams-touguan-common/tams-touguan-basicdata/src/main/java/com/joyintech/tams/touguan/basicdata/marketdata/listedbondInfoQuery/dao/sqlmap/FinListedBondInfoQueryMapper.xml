@@ -20,11 +20,11 @@
         RELEASE_INFO.TENDER_TARGET as tenderTarget,
         RELEASE_INFO.ADDITIONAL_BATCHES as additionalBatches,
 
-        nvl(RDI_RELEASE_INFO.ISSUE_SIZE * 10000 , ROUND(RELEASE_INFO.ISSUE_SIZE / 10000, 2)) as issueSize,
+        nvl( to_char(RDI_RELEASE_INFO.ISSUE_SIZE * 10000, 'fm99999999999990.00') , to_char(RELEASE_INFO.ISSUE_SIZE / 10000, 'fm99999999999990.00')) as issueSize,
 
         nvl( to_char(RDI_RELEASE_INFO.ISSUE_DATE,'yyyy-mm-dd hh:mm:ss'), to_char(RELEASE_INFO.ISSUE_DATE,'yyyy-mm-dd hh:mm:ss')) AS issueDate,
 
-        nvl( to_char(RDI_RELEASE_INFO.EVENT_DATE,'yyyy-mm-dd hh:mm:ss'), to_char(RELEASE_INFO.PAYMENT_DEADLINE,'yyyy-mm-dd hh:mm:ss')) AS eventDate,
+        nvl( to_char(RDI_RELEASE_INFO.EVENT_DATE,'yyyy-mm-dd hh:mm:ss'), to_char(RELEASE_INFO.EVENT_DATE,'yyyy-mm-dd hh:mm:ss')) AS eventDate,
 
         RELEASE_INFO.DEBT_REGISTRATION_DATE as debtRegistrationDate,
 
@@ -50,6 +50,8 @@
         singleMinSubAmt,
         nvl(RDI_RELEASE_INFO.SINGLE_MAX_SUB_AMT * 10000, ROUND(RELEASE_INFO.SINGLE_MAX_SUB_AMT / 10000, 2)) as
         singleMaxSubAmt,
+        nvl(RDI_RELEASE_INFO.MIN_PER_TENDER_AMT * 100000000, RELEASE_INFO.MIN_PER_TENDER_AMT) as minPerTenderAmt,
+        nvl(RDI_RELEASE_INFO.MAX_PER_TENDER_AMT * 100000000, RELEASE_INFO.MAX_PER_TENDER_AMT) as maxPerTenderAmt,
         RDI_RELEASE_INFO.REMARK as REMARK,
         PRODUCT.FINPROD_ID FINPRODID
         FROM INTERF_WIND_UNRELEASE_SEC_INFO SEC_INFO
@@ -221,23 +223,25 @@
         RELEASE_INFO.TENDER_TARGET as tenderTarget,
         RELEASE_INFO.ADDITIONAL_BATCHES as additionalBatches,
 
-        nvl(RDI_RELEASE_INFO.ISSUE_SIZE * 100000000, ROUND(RELEASE_INFO.ISSUE_SIZE, 2)) as issueSize,
-        nvl(TO_CHAR(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd'), TO_CHAR(RELEASE_INFO.ISSUE_DATE, 'yyyy-MM-dd')) as issueDate,
-        nvl(TO_CHAR(RDI_RELEASE_INFO.EVENT_DATE, 'yyyy-MM-dd'), TO_CHAR(RELEASE_INFO.PAYMENT_DEADLINE, 'yyyy-MM-dd')) as eventDate,
+        nvl( to_char(RDI_RELEASE_INFO.ISSUE_SIZE * 10000, 'fm99999999999990.00') , to_char(RELEASE_INFO.ISSUE_SIZE / 10000, 'fm99999999999990.00')) as issueSize,
+        nvl(TO_CHAR(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-mm-dd hh:mm:ss'), TO_CHAR(RELEASE_INFO.ISSUE_DATE, 'yyyy-mm-dd hh:mm:ss')) as issueDate,
+        TO_CHAR(RELEASE_INFO.PAYMENT_DEADLINE, 'yyyy-mm-dd hh:mm:ss') as eventDate,
+        nvl(TO_CHAR(RDI_RELEASE_INFO.EVENT_DATE, 'yyyy-mm-dd hh:mm:ss'), TO_CHAR(RELEASE_INFO.EVENT_DATE, 'yyyy-mm-dd hh:mm:ss')) as payDate,
+
         RELEASE_INFO.DEBT_REGISTRATION_DATE AS debtRegistrationDate,
 
         RELEASE_INFO.LISTING_DATE AS listingDate,
         RELEASE_INFO.LISTING_CODE AS listingCode,
         SEC_INFO.CROSS_MARKET_CODE AS crossMarketCode,
 
-        nvl(TO_CHAR(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-MM-dd'), TO_CHAR(RELEASE_INFO.INTEREST_ACCRUAL_DATE,
-        'yyyy-MM-dd')) as interestAccrualDate,
+        nvl(TO_CHAR(RDI_RELEASE_INFO.INTEREST_ACCRUAL_DATE, 'yyyy-mm-dd hh:mm:ss'), TO_CHAR(RELEASE_INFO.INTEREST_ACCRUAL_DATE,
+        'yyyy-mm-dd hh:mm:ss')) as interestAccrualDate,
 
         SEC_INFO.VALUE_DATE valueDate,
         SEC_INFO.EXPIRY_DATE expiryDate,
         SEC_INFO.PRIMARY_CLASSIFICATION primaryClassification,
         SEC_INFO.SECONDARY_CLASSIFICATION secondaryClassification,
-        SEC_INFO.VARIETY_OF_COUPONS varietyOfCoupons,
+        SEC_INFO.VARIETY_OF_COUPONS couponSpecies,
         SEC_INFO.INTEREST_PAYMENT_FREQUENCY interestPaymentFrequency,
         SEC_INFO.RATE_TYPE rateType,
         SEC_INFO.CURRENCY,

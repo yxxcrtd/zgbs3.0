@@ -149,13 +149,10 @@ public class FinTenderBondAsset003Controller extends BaseController {
         } else if (StringUtil.equals(dto.getOperateType(), OperationType.REVOKE.name())) {
             //processParameter.setOperationType(OperationType.REVOKE);
             params.setBusinessType(BussinessDictCodeList.共同业务类型_上市流通撤销.getValue());
+            dto.setRevokeReason(dto.getRemark());
+            dto.setRemark(null);
         }
         processParameter.setWorkFlowParameter(params);
-       /* FinTenderBondAsset003Dto asset003Dto = finTenderBoundAsset003Service.getById(dto.getFinprodId());
-        if(Objects.nonNull(asset003Dto)) {
-            dto.setAppearMarketId(asset003Dto.getAppearMarketId());
-            dto.setAppearMarketAbbr(asset003Dto.getAppearMarketAbbr());
-        }*/
         try {
             finTenderBoundAsset003Service.start(processParameter, dto);
         } catch (Exception e) {

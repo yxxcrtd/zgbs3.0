@@ -860,7 +860,9 @@
         update FIN_PRODUCT
         set CIRCULATION_CODE = #{circulationCode,jdbcType=VARCHAR},
             CIRCULATION_DATE = #{circulationDate,jdbcType=DATE},
-            REMARK = #{remark,jdbcType=VARCHAR},
+            <if test="remark !=null and remark !=''">
+                REMARK = #{remark,jdbcType=VARCHAR} || ';' || REMARK,
+            </if>
             UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
             UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
         where FINPROD_ID=#{finprodId,jdbcType=VARCHAR}

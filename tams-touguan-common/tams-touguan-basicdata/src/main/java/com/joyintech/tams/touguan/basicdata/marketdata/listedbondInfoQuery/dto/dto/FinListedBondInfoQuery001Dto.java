@@ -93,7 +93,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     private BigDecimal issueSize;
 
     @ApiModelProperty(name = "issueDate", value = "发行日")
-    private String issueDate;
+    private Date issueDate;
 
     @ApiModelProperty(name = "eventDate", value = "缴款截止日")
     private Date eventDate;
@@ -446,11 +446,12 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.issueSize = issueSize;
     }
 
-    public String getIssueDate() {
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    public Date getIssueDate() {
         return issueDate;
     }
 
-    public void setIssueDate(String issueDate) {
+    public void setIssueDate(Date issueDate) {
         this.issueDate = issueDate;
     }
 
@@ -637,6 +638,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.spread = spread;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getIssueStartTime() {
         return issueStartTime;
     }
@@ -645,6 +647,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.issueStartTime = issueStartTime;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getIssueEndTime() {
         return issueEndTime;
     }

@@ -407,6 +407,9 @@ public class InstructionExportVo {
     @ApiModelProperty(name = "leftVolumeView", value = "剩余数量(展示)")
     private BigDecimal leftVolumeView;
 
+    @ApiModelProperty(name = "entrustPriceView", value = "指令价格(展示)")
+    private BigDecimal entrustPriceView;
+
     @ApiModelProperty(name = "minPriceAndMinTrdUnitLimitBean", value = "最小价差、买卖单位及交易上下限控制")
     private MinPriceAndMinTrdUnitLimitBean minPriceAndMinTrdUnitLimitBean;
 
@@ -1258,5 +1261,13 @@ public class InstructionExportVo {
      */
     public BigDecimal executeAmt() {
         return NumberUtil.add(this.getEntrustLeftAmt(), this.getFrozenQuantity());
+    }
+
+    public BigDecimal getEntrustPriceView() {
+        return entrustPriceView;
+    }
+
+    public void setEntrustPriceView(BigDecimal entrustPriceView) {
+        this.entrustPriceView = entrustPriceView;
     }
 }
