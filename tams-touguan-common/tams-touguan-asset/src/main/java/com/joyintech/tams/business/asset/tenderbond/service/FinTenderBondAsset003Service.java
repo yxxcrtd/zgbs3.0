@@ -85,7 +85,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
 
     @Override
     public String generateTitle(FinTenderBondAsset003Dto entity, OperationType operationType) {
-        return String.format("新债标的资产简称(%s) 上市日(%s) 债券标的资产简称",entity.getFinprodAbbr() ,
+        return String.format("新债标的资产简称(%s) 上市日(%s) 债券标的资产简称(%s)",entity.getFinprodAbbr() ,
                DateUtil.format(entity.getListingDate(),"yyyy-MM-dd"), entity.getAppearMarketAbbr());
     }
 
