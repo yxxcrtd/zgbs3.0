@@ -367,8 +367,8 @@
             nvl(pri.MAX_TOTAL_TENDER_AMT * 100000000,ri.MAX_TOTAL_TENDER_AMT) as maxTotalTender,
             sec.RATE_TYPE as intType,
             sec.INTEREST_PAYMENT_FREQUENCY as payCycle,
-            ri.BID_DATE as  tenderSdate,
-            ri.BID_DATE as tenderEdate
+            nvl(ri.BID_BEGIN_DATE,ri.ADDITIONAL_TENDER_BEGIN_DATE) as  tenderSdate,
+            nvl(ri.BID_END_DATE,ri.ADDITIONAL_TENDER_END_DATE)  as tenderEdate
         FROM (select * from (select * from INTERF_WIND_RELEASE_INFO where 1=1
         <if test="flag != null and flag !=''">
             and nvl(ISSUE_DATE,nvl(BID_DATE,ADDITIONAL_TENDER_DATE)) >= TO_DATE(#{platformDate},'YYYY-MM-DD')
