@@ -75,6 +75,9 @@ public class NegotiateQuoteReceiveBean {
     private String traderName;
 
     public String getRequestStatusStr() {
+        if (RequestStatus.WAIT_CONFIRM.getCode() == requestStatus) {
+            return "待本方确认";
+        }
         return RequestStatus.getRequestStatusName(requestStatus);
     }
 
@@ -267,7 +270,7 @@ public class NegotiateQuoteReceiveBean {
     }
 
     public BigDecimal getAmountView() {
-        return BigDecimal.valueOf(amount).divide(BigDecimal.valueOf(100),2, RoundingMode.HALF_UP);
+        return BigDecimal.valueOf(amount).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
     }
 
     public void setAmountView(BigDecimal amountView) {
