@@ -628,7 +628,12 @@ public class PortfolioManager extends BaseService {
         // 获取委托属性
 //        String entrustProp = EntrustPropUtils.getEntrustProp(instruction, bean.getEntrustProp());
         // 获取委托价格
-        BigDecimal entrustPrice = bean.getEntrustPrice();
+        BigDecimal entrustPrice;
+        if (StringUtil.isNotEmpty(instruction.getIsNetPrice()) && StringUtil.equals(instruction.getIsNetPrice(), "N")) {
+            entrustPrice = bean.getFullPrice();
+        } else {
+            entrustPrice = bean.getEntrustPrice();
+        }
         // 调整后的价格
         BigDecimal adjustedPrice = entrustPrice;
         // 市价订单
