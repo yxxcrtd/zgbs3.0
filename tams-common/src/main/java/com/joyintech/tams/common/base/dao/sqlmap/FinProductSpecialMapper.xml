@@ -90,4 +90,10 @@
       </if>
     </trim>
   </insert>
+
+
+    <delete id="deleteByFinprodMarketId" parameterType="java.lang.String" >
+        delete from FIN_PRODUCT_SPECIAL
+        where FINPROD_MARKET_ID = #{finprodMarketId, jdbcType=VARCHAR}
+    </delete>
 </mapper>
