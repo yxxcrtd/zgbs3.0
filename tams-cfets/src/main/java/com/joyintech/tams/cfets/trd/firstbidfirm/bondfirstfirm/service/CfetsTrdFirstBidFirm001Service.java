@@ -5,6 +5,7 @@ import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
@@ -16,6 +17,7 @@ import com.joyintech.tams.cfets.etrdispatcher.service.CfetsEtrDispatcherService;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dao.CfetsTrdFirstBidFirm001Mapper;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmEntrustRequest;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmUndoSumRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBondFirstSub001Service;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
@@ -39,8 +41,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.joyintech.tams.invest.trade.bondtostock.service.TrdBondToStock001Service.setParam;
+import java.util.stream.Collectors;
 
 /**
  * 一级投标确认
@@ -114,6 +115,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
 
     /**
      * 指令放弃
+     *
      * @param entrustId
      * @return
      */
@@ -171,6 +173,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
 
     /**
      * 退回指令 check
+     *
      * @param param
      * @return
      */
@@ -186,6 +189,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
 
     /**
      * 退回指令
+     *
      * @param param
      */
     @Transactional(rollbackFor = Exception.class)
@@ -203,12 +207,136 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
      */
     public Page<CfetsTrdFirstBidFirmEntrustDto> pageEntrust(CfetsTrdBondFirstBidFirmEntrustRequest dto) {
         Map<String, Object> param = BeanUtil.object2Map(dto);
-        param.put("ISSUE_CLASS_01", DictCodeListExt4.新债_发行方式_报价发行.getValue());
+        this.setParam(param);
+        return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsTrdFirstBidFirm001Mapper.listEntrust(param));
+    }
+
+    /**
+     * 指令查询参数初始化
+     *
+     * @param param
+     */
+    private void setParam(Map<String, Object> param) {
+        param.put("ISSUE_CLASS_02", DictCodeListExt4.新债_发行方式_招标发行.getValue());
+        param.put("ISSUE_CLASS_03", DictCodeListExt4.新债_发行方式_簿记建档.getValue());
         param.put("TRADE_STATUS03", DictCodeListExt1.交易状态_撤销.getValue());
         param.put("YN_N", DictCodeListExt1.是否_否.getValue());
-        param.put("entrustIdList",param.get("entrustIds"));
         String loginUserId = LoginUserUtil.getUserName();
-        param.put("loginUserId", loginUserId);
-        return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsTrdFirstBidFirm001Mapper.listEntrust(param));
+        // param.put("loginUserId", loginUserId);
+        param.put("loginUserId", "li02");
+    }
+
+
+    /**
+     * 查询指令汇总信息
+     *
+     * @param dto
+     * @return
+     */
+    public List<CfetsTrdFirstBidFirmEntrustDto> pageSumEntrust(CfetsTrdBondFirstBidFirmEntrustRequest dto) {
+        Map<String, Object> param = BeanUtil.object2Map(dto);
+        this.setParam(param);
+        List<CfetsTrdFirstBidFirmEntrustDto> bidFirmSumDtoList = new ArrayList<>();
+        List<CfetsTrdFirstBidFirmEntrustDto> bidFirmDtos = cfetsTrdFirstBidFirm001Mapper.listEntrust(param);
+        bidFirmDtos.stream().forEach(x -> {
+            x.setIsSumFlag(DictCodeListExt1.是否_否.getValue());
+        });
+        //查询汇总关系表数据  汇总关系表数据单独汇总
+
+        //交易对手为空
+        List<CfetsTrdFirstBidFirmEntrustDto> bidFirmCounterIsNull = bidFirmDtos.stream()
+                .filter(x -> StringUtil.isEmpty(x.getCounterId())).collect(Collectors.toList());
+
+        //交易对手不为空
+        List<CfetsTrdFirstBidFirmEntrustDto> bidFirmCounterIsNotNull = bidFirmDtos.stream()
+                .filter(x -> StringUtil.isNotEmpty(x.getCounterId())).collect(Collectors.toList());
+
+        //汇总数据维度（新债标的OR投标日OR交易对手or指令状态）
+        Map<String, List<CfetsTrdFirstBidFirmEntrustDto>> counterIsNullMap = bidFirmCounterIsNull.stream()
+                .collect(Collectors.groupingBy(o -> o.getFinprodId() + "_" + o.getIssueDateStr() + "_" + o.getEntrustStatus()));
+
+        Map<String, List<CfetsTrdFirstBidFirmEntrustDto>> counterIsNotNullMap = bidFirmCounterIsNotNull.stream()
+                .collect(Collectors.groupingBy(o -> o.getFinprodId() + "_" + o.getIssueDateStr() + "_" + o.getCounterId() + "_" + o.getEntrustStatus()));
+
+        List<CfetsTrdFirstBidFirmEntrustDto> bidFirmSumIsNullList = getSumListInfo(counterIsNullMap);
+        List<CfetsTrdFirstBidFirmEntrustDto> bidFirmSumIsNotNullList = getSumListInfo(counterIsNotNullMap);
+        bidFirmSumDtoList.addAll(bidFirmSumIsNullList);
+        bidFirmSumDtoList.addAll(bidFirmSumIsNotNullList);
+
+        return bidFirmSumDtoList;
+    }
+
+    /**
+     * 明细信息进行汇总
+     *
+     * @param counterIsNullMap
+     * @return
+     */
+    private List<CfetsTrdFirstBidFirmEntrustDto> getSumListInfo(Map<String, List<CfetsTrdFirstBidFirmEntrustDto>> counterIsNullMap) {
+        List<CfetsTrdFirstBidFirmEntrustDto> bidFirmSumDtoList = new ArrayList<>();
+        for (Map.Entry<String, List<CfetsTrdFirstBidFirmEntrustDto>> entry : counterIsNullMap.entrySet()) {
+            CfetsTrdFirstBidFirmEntrustDto bidFirmSum = new CfetsTrdFirstBidFirmEntrustDto();
+            List<CfetsTrdFirstBidFirmEntrustDto> bidFirmDetail = entry.getValue();
+            bidFirmSum.setCfetsTrdFirstBidFirmEntrustDtos(bidFirmDetail);
+            bidFirmSum.setEntrustStatus(bidFirmDetail.get(0).getEntrustStatus());
+            bidFirmSum.setFirstBidStatus(bidFirmDetail.get(0).getFirstBidStatus());
+            //重新计算执行进度和成交进度
+            //已完成额度
+            BigDecimal sumFinishAmt = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getFinishAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+            //已成交额度
+            BigDecimal sumFinishDealAmt = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getFinishDealAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+            //剩余指令额度
+            BigDecimal sumAvaNum = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getAvaNum).reduce(BigDecimal.ZERO, BigDecimal::add);
+            //剩余成交额度
+            BigDecimal sumAvaDealAmt = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getAvaDealAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal sumEntrustNum = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getEntrustNum).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            bidFirmSum.setFinishAmt(sumFinishAmt);
+            bidFirmSum.setFinishDealAmt(sumFinishDealAmt);
+            bidFirmSum.setAvaNum(sumAvaNum);
+            bidFirmSum.setAvaDealAmt(sumAvaDealAmt);
+            bidFirmSum.setTransactioncom(ArithmeticUtil.divide(sumFinishAmt, sumEntrustNum, 2).multiply(new BigDecimal("100")));
+            bidFirmSum.setTradeFinishPercent(ArithmeticUtil.divide(sumFinishDealAmt, sumEntrustNum, 2).multiply(new BigDecimal("100")));
+            bidFirmSum.setFinprodId(bidFirmDetail.get(0).getFinprodId());
+            bidFirmSum.setFinprodMarketId(bidFirmDetail.get(0).getFinprodMarketId());
+            bidFirmSum.setFinprodAbbr(bidFirmDetail.get(0).getFinprodAbbr());
+            bidFirmSum.setTenderTarget(bidFirmDetail.get(0).getTenderTarget());
+            bidFirmSum.setTenderTargetStr(bidFirmDetail.get(0).getTenderTargetStr());
+
+            bidFirmSum.setEntrustNum(sumEntrustNum);
+            //投标标位去重
+            List<String> bidPriceList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getBidPrice).collect(Collectors.toList());
+            bidFirmSum.setBidPrice(bidPriceList.toString());
+            List<String> portfolioIdList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getPortfolioId).collect(Collectors.toList());
+            List<String> portfolioNameList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getPortfolioName).collect(Collectors.toList());
+            bidFirmSum.setPortfolioId(StringUtil.join(portfolioIdList, ","));
+            bidFirmSum.setPortfolioName(StringUtil.join(portfolioNameList, ","));
+            bidFirmSum.setTradeMarket(bidFirmDetail.get(0).getTradeMarket());
+            bidFirmSum.setTradeMarketStr(bidFirmDetail.get(0).getTradeMarketStr());
+
+            List<String> invManagerIdList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getInvManagerId).collect(Collectors.toList());
+            List<String> invManagerNameList = bidFirmDetail.stream().map(CfetsTrdFirstBidFirmEntrustDto::getInvManagerName).collect(Collectors.toList());
+            bidFirmSum.setInvManagerId(StringUtil.join(invManagerIdList, ","));
+            bidFirmSum.setInvManagerName(StringUtil.join(invManagerNameList, ","));
+
+            bidFirmSum.setIsSumFlag(DictCodeListExt1.是否_是.getValue());
+
+            bidFirmSumDtoList.add(bidFirmSum);
+
+        }
+        return bidFirmSumDtoList;
+    }
+
+    /**
+     * 指令取消汇总
+     * @param cfetsDto
+     * @return
+     */
+    public AjaxResult undoSumSave(CfetsTrdBondFirstBidFirmUndoSumRequest cfetsDto) {
+        return null;
+    }
+
+    public Map<String, Object> getEntrustInfo(String entrustId) {
+        return null;
     }
 }

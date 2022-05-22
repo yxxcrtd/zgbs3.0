@@ -18,11 +18,8 @@ public class CfetsTrdBondFirstBidFirmEntrustRequest {
     @ApiModelProperty(name = "portfolioIds", value = "组合名称,列表", example = "[A,B]")
     private List<String> portfolioIds;
 
-    @ApiModelProperty(name = "finprodMarketIds", value = "市场代码,列表 etrAddSearch接口必传", example = "[A,B]")
-    private List<String> finprodMarketIds;
-
-    @ApiModelProperty(name = "secManageAcctIds ", value = "证券账户,列表 etrAddSearch接口必传", example = "[A,B]")
-    private List<String> secManageAcctIds;
+    @ApiModelProperty(name = "finprodIds", value = "资产代码,列表 etrAddSearch接口必传", example = "[A,B]")
+    private List<String> finprodIds;
 
     @ApiModelProperty(name="firstBidStatus",value="中标状态",example="A1")
     private String firstBidStatus;
@@ -57,8 +54,11 @@ public class CfetsTrdBondFirstBidFirmEntrustRequest {
     @ApiModelProperty(name = "search", value = "关键词")
     private String search;
 
-    @ApiModelProperty(name = "existEntrustIds", value = "etrAddSearch接口,已存在的指令代码,用于过滤申购产品列表中已添加的指令", example = "[WTBOND2022041801,WTBOND2022041802]")
-    private List<String> existEntrustIds;
+    @ApiModelProperty(name="counterId",value="交易对手",example="A1")
+    private String counterId;
+
+    @ApiModelProperty(name="counterName",value="交易对手名称",example="A1")
+    private String counterName;
 
     public PageMode getPageMode() {
         return pageMode;
@@ -101,15 +101,13 @@ public class CfetsTrdBondFirstBidFirmEntrustRequest {
         this.invManagerIds = invManagerIds;
     }
 
-
-    public List<String> getFinprodMarketIds() {
-        return finprodMarketIds;
+    public List<String> getFinprodIds() {
+        return finprodIds;
     }
 
-    public void setFinprodMarketIds(List<String> finprodMarketIds) {
-        this.finprodMarketIds = finprodMarketIds;
+    public void setFinprodIds(List<String> finprodIds) {
+        this.finprodIds = finprodIds;
     }
-
 
     public String getEntrustDateStart() {
         return entrustDateStart;
@@ -145,14 +143,6 @@ public class CfetsTrdBondFirstBidFirmEntrustRequest {
         this.search = search;
     }
 
-    public List<String> getSecManageAcctIds() {
-        return secManageAcctIds;
-    }
-
-    public void setSecManageAcctIds(List<String> secManageAcctIds) {
-        this.secManageAcctIds = secManageAcctIds;
-    }
-
     public String getIssueDateStart() {
         return issueDateStart;
     }
@@ -167,14 +157,6 @@ public class CfetsTrdBondFirstBidFirmEntrustRequest {
 
     public void setIssueDateEnd(String issueDateEnd) {
         this.issueDateEnd = issueDateEnd;
-    }
-
-    public List<String> getExistEntrustIds() {
-        return existEntrustIds;
-    }
-
-    public void setExistEntrustIds(List<String> existEntrustIds) {
-        this.existEntrustIds = existEntrustIds;
     }
 
     public String getFirstBidStatus() {
@@ -199,5 +181,21 @@ public class CfetsTrdBondFirstBidFirmEntrustRequest {
 
     public void setTenderTarget(String tenderTarget) {
         this.tenderTarget = tenderTarget;
+    }
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+
+    public String getCounterName() {
+        return counterName;
+    }
+
+    public void setCounterName(String counterName) {
+        this.counterName = counterName;
     }
 }

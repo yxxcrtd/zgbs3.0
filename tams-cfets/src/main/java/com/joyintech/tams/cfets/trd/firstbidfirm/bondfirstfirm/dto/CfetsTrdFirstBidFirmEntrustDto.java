@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author jiangpeng
@@ -67,6 +68,12 @@ public class CfetsTrdFirstBidFirmEntrustDto {
     private String tenderTarget;
 
     /**
+     *  招标标的字典值
+     */
+    @ApiModelProperty(name="tenderTargetStr",value="招标标的字典值")
+    private String tenderTargetStr;
+
+    /**
      *  投标日
      */
     @ApiModelProperty(name = "issueDate", value = "投标日")
@@ -80,10 +87,11 @@ public class CfetsTrdFirstBidFirmEntrustDto {
     private String issueDateStr;
 
     /**
-     *  汇总投标券面总额
+     *  指令额度、券面总额（汇总投标券面总额）
      */
-    @ApiModelProperty(name="totalBiddingNum",value="汇总投标券面总额")
-    private BigDecimal totalBiddingNum;
+    @ApiModelProperty(name = "entrustNum", value = "指令额度、券面总额", example = "1000.00")
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal entrustNum;
 
     /**
      *  投标标位
@@ -108,6 +116,12 @@ public class CfetsTrdFirstBidFirmEntrustDto {
      */
     @ApiModelProperty(name = "invManagerId", value = "投资经理", example = "A1")
     private String invManagerId;
+
+    /**
+     *  投资经理名称
+     */
+    @ApiModelProperty(name = "invManagerName", value = "投资经理名称", example = "A1")
+    private String invManagerName;
 
     /**
      *  交易场所
@@ -158,6 +172,17 @@ public class CfetsTrdFirstBidFirmEntrustDto {
     @ApiModelProperty(name = "LastModifiedTimeStr", value = "最近修改时间格式化,展示用")
     private String LastModifiedTimeStr;
 
+    @ApiModelProperty(name = "firstBidStatus", value = "中标状态", example = "A1")
+    private String firstBidStatus;
+
+    @ApiModelProperty(name = "firstBidStatusStr", value = "中标状态名称", example = "A1")
+    private String firstBidStatusStr;
+
+    @ApiModelProperty(name = "isSumFlag", value = "汇总标识", example = "Y/N")
+    private String isSumFlag;
+
+    @ApiModelProperty(name = "cfetsTrdFirstBidFirmEntrustDtos", value = "指令明细信息")
+    private List<CfetsTrdFirstBidFirmEntrustDto> cfetsTrdFirstBidFirmEntrustDtos;
 
     public String getEntrustStatus() {
         return entrustStatus;
@@ -316,12 +341,12 @@ public class CfetsTrdFirstBidFirmEntrustDto {
         this.issueDateStr = issueDateStr;
     }
 
-    public BigDecimal getTotalBiddingNum() {
-        return totalBiddingNum;
+    public BigDecimal getEntrustNum() {
+        return entrustNum;
     }
 
-    public void setTotalBiddingNum(BigDecimal totalBiddingNum) {
-        this.totalBiddingNum = totalBiddingNum;
+    public void setEntrustNum(BigDecimal entrustNum) {
+        this.entrustNum = entrustNum;
     }
 
     public String getBidPrice() {
@@ -418,5 +443,59 @@ public class CfetsTrdFirstBidFirmEntrustDto {
 
     public void setLastModifiedTimeStr(String lastModifiedTimeStr) {
         LastModifiedTimeStr = lastModifiedTimeStr;
+    }
+
+    public String getFirstBidStatus() {
+        return firstBidStatus;
+    }
+
+    public void setFirstBidStatus(String firstBidStatus) {
+        this.firstBidStatus = firstBidStatus;
+    }
+
+    public String getFirstBidStatusStr() {
+        if (StringUtil.isEmpty(getFirstBidStatus())) {
+            return "--";
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.一级投标中标状态, getFirstBidStatus());
+    }
+
+    public void setFirstBidStatusStr(String firstBidStatusStr) {
+        this.firstBidStatusStr = firstBidStatusStr;
+    }
+
+    public String getTenderTargetStr() {
+        if (StringUtil.isEmpty(getTenderTarget())) {
+            return "";
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.招标标的, getTenderTarget());
+    }
+
+    public void setTenderTargetStr(String tenderTargetStr) {
+        this.tenderTargetStr = tenderTargetStr;
+    }
+
+    public String getIsSumFlag() {
+        return isSumFlag;
+    }
+
+    public void setIsSumFlag(String isSumFlag) {
+        this.isSumFlag = isSumFlag;
+    }
+
+    public List<CfetsTrdFirstBidFirmEntrustDto> getCfetsTrdFirstBidFirmEntrustDtos() {
+        return cfetsTrdFirstBidFirmEntrustDtos;
+    }
+
+    public void setCfetsTrdFirstBidFirmEntrustDtos(List<CfetsTrdFirstBidFirmEntrustDto> cfetsTrdFirstBidFirmEntrustDtos) {
+        this.cfetsTrdFirstBidFirmEntrustDtos = cfetsTrdFirstBidFirmEntrustDtos;
+    }
+
+    public String getInvManagerName() {
+        return invManagerName;
+    }
+
+    public void setInvManagerName(String invManagerName) {
+        this.invManagerName = invManagerName;
     }
 }
