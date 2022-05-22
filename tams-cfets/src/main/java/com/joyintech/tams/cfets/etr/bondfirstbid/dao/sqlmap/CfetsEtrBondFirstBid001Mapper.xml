@@ -74,13 +74,13 @@
         SELECT
             decode(ee.ENTRUST_STATUS,'08','流程中','有效') AS effectiveStatusName,
             ee.ENTRUST_STATUS entrustStatus,
-            nvl(efs.ENT_FINISH_AMT, 0)               execFinishAmt,
-            nvl(ee.ENTRUST_NUM*100,0) -  nvl(efs.ENT_FINISH_AMT, 0) execRemainderAmt,
+            trunc(nvl(efs.ENT_FINISH_AMT, 0)/10000, 2)               execFinishAmt,
+            trunc((nvl(ee.ENTRUST_NUM*100,0) -  nvl(efs.ENT_FINISH_AMT, 0))/10000,2) execRemainderAmt,
             trunc(nvl(efs.ENT_FINISH_AMT, 0) /
             case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
             100                                      execProcess,
-            nvl(tpd.SHARE_AMT * 100, 0)                    transFinishAmt,
-            nvl(ee.ENTRUST_NUM*100,0) -  nvl(tpd.SHARE_AMT * 100, 0) transRemainderAmt,
+            trunc(nvl(tpd.SHARE_AMT * 100, 0)/10000,2)                   transFinishAmt,
+            trunc((nvl(ee.ENTRUST_NUM*100,0) -  nvl(tpd.SHARE_AMT * 100, 0))/10000,2) transRemainderAmt,
             trunc(nvl(tpd.SHARE_AMT * 100, 0) /
             case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
             100                                      transProcess,
@@ -220,13 +220,13 @@
         SELECT
             decode(ee.ENTRUST_STATUS,'08','流程中','有效') AS effectiveStatusName,
             ee.ENTRUST_STATUS entrustStatus,
-            nvl(efs.ENT_FINISH_AMT, 0)               execFinishAmt,
-            nvl(ee.ENTRUST_NUM*100,0) -  nvl(efs.ENT_FINISH_AMT, 0) execRemainderAmt,
+            trunc(nvl(efs.ENT_FINISH_AMT, 0)/10000, 2)               execFinishAmt,
+            trunc((nvl(ee.ENTRUST_NUM*100,0) -  nvl(efs.ENT_FINISH_AMT, 0))/10000,2) execRemainderAmt,
             trunc(nvl(efs.ENT_FINISH_AMT, 0) /
             case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
             100                                      execProcess,
-            nvl(tpd.SHARE_AMT * 100, 0)                    transFinishAmt,
-            nvl(ee.ENTRUST_NUM*100,0) -  nvl(tpd.SHARE_AMT * 100, 0) transRemainderAmt,
+            trunc(nvl(tpd.SHARE_AMT * 100, 0)/10000,2)                   transFinishAmt,
+            trunc((nvl(ee.ENTRUST_NUM*100,0) -  nvl(tpd.SHARE_AMT * 100, 0))/10000,2) transRemainderAmt,
             trunc(nvl(tpd.SHARE_AMT * 100, 0) /
             case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
             100                                      transProcess,
