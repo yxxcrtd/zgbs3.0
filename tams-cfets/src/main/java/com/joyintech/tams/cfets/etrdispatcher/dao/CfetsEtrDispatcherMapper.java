@@ -239,5 +239,5 @@ public interface CfetsEtrDispatcherMapper {
      * @param entrustId
      * @return
      */
-    CfetsEtrDispatcherTradeListResponse getEtrFirstBidInfo(String entrustId);
+    CfetsEtrDispatcherTradeListResponse getEtrFirstBidInfo(@Param("entrustId") String entrustId);
 }

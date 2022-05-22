@@ -402,7 +402,7 @@ public class CfetsEtrDispatcherService extends BaseService {
                 }
                 //场外成交进度和成交额度特殊处理
                 //这里特殊处理成交进度和成交额度,如果场内和场外的资产类型重合了，考虑用业务类型或者交易场所进行区分，不能单纯的排除某一种类型
-                if(DictCodeUtil.equals(response.getFinprodType2(),BussinessDictCodeList.金融产品类型_投管用_一级投标债券,BussinessDictCodeList.平安资产类型_计划类资产_利率型,
+                if(DictCodeUtil.equals(response.getFinprodType2(),BussinessDictCodeList.平安资产类型_一级投标债券,BussinessDictCodeList.平安资产类型_计划类资产_利率型,
                         BussinessDictCodeList.平安资产类型_计划类资产_货币型,BussinessDictCodeList.平安资产类型_计划类资产_净值型,BussinessDictCodeList.平安资产类型_拆借,BussinessDictCodeList.平安资产类型_买断式回购,
                         BussinessDictCodeList.平安资产类型_存款,BussinessDictCodeList.平安资产类型_项目类资产)
                         || (DictCodeUtil.equals(response.getFinprodType2(),DictCodeList.平安资产类型_质押式回购)
@@ -417,12 +417,16 @@ public class CfetsEtrDispatcherService extends BaseService {
                     response.setExecFinishAmt(ArithmeticUtil.divide(response.getExecFinishAmt(),new BigDecimal("100"),2,RoundingMode.HALF_UP));
                     response.setExecRemainderAmt(ArithmeticUtil.divide(response.getExecRemainderAmt(),new BigDecimal("100"),2,RoundingMode.HALF_UP));
                 }
-                if(StringUtil.equals(response.getFinprodType2(), BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue())){
+                if(StringUtil.equals(response.getFinprodType2(), BussinessDictCodeList.平安资产类型_一级投标债券.getValue())){
 
                     CfetsEtrDispatcherTradeListResponse dto2 = cfetsEtrDispatcherMapper.getEtrFirstBidInfo(response.getEntrustId());
-                    if(StringUtil.isNotEmpty(dto2)) {
-                        response.setIsWin(dto2.getIsWin());
-                        response.setEtrPrice(dto2.getEtrPrice());
+                    if(dto2 != null) {
+                        response.setExecFinishAmt(dto2.getExecFinishAmt());
+                        response.setExecRemainderAmt(dto2.getExecRemainderAmt());
+                        response.setExeProgress(dto2.getExeProgress());
+                        response.setTransFinishAmt(dto2.getTransFinishAmt());
+                        response.setTransRemainderAmt(dto2.getTransRemainderAmt());
+                        response.setDealProgress(dto2.getDealProgress());
                     }
                 }
 
