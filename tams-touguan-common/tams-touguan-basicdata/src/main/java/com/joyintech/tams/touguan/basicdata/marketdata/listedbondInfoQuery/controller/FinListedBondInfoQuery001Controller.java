@@ -4,12 +4,14 @@ package com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.cont
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.SelectOptionCommonRequest;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.dto.FinListedBondInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.req.FinListedBondInfoQueryRequest;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.service.FinListedBondInfoQuery001Service;
@@ -91,6 +93,18 @@ public class FinListedBondInfoQuery001Controller extends BaseController {
         ExcelUitl.doExport(req, response, "待上市债券市场信息", () -> finListedBondInfoQuery001Service.queryForPage(req.getDto(FinListedBondInfoQueryRequest.class)).getRoot());
     }
 
+
+    @ApiOperation(value = "待上市债券简称的联想下拉框", notes = "待上市债券简称的联想下拉框")
+    @ResponseBody
+    @PostMapping("getAssetId")
+    public Message<Page<SelectOptionDto>> getAssetId(@RequestBody SelectOptionCommonRequest request) {
+        try {
+            Page<SelectOptionDto> page = finListedBondInfoQuery001Service.getAssetId(request);
+            return new Message<Page<SelectOptionDto>>().success().setData(page);
+        } catch (Exception e) {
+            return new Message<Page<SelectOptionDto>>().fail().setMessage("待上市债券简称的联想下拉框异常");
+        }
+    }
 
     @ResponseBody
     @PostMapping("/detail")
