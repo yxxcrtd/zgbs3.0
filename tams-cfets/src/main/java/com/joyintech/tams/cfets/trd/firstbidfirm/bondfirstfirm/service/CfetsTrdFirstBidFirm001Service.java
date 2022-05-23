@@ -7,23 +7,33 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
+import com.joyintech.tams.business.common.entity.CfgDataTableShow;
+import com.joyintech.tams.business.common.entity.CfgReadonlyFormShow;
+import com.joyintech.tams.business.common.service.CfgDataTableService;
+import com.joyintech.tams.business.common.service.CfgReadonlyFormService;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.cfets.etrdispatcher.service.CfetsEtrDispatcherService;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dao.CfetsTrdFirstBidFirm001Mapper;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirsBidFirmBidOrderDetailDto;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirsBidFirmDetailDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmEntrustRequest;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmProductDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmUndoSumRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBondFirstSub001Service;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
+import com.joyintech.tams.common.base.dao.TotalEtrEntrustRelMapper;
 import com.joyintech.tams.common.base.entity.EtrDistribute;
 import com.joyintech.tams.common.base.entity.EtrDistributeInterfTmp;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
+import com.joyintech.tams.common.base.entity.TotalEtrEntrustRel;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
@@ -79,6 +89,41 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
 
     @Autowired
     private CfetsEtrDispatcherService cfetsEtrDispatcherService;
+
+    @Autowired
+    private TotalEtrEntrustRelMapper totalEtrEntrustRelMapper;
+
+    /**
+     * 页面只读表单展示配置service
+     */
+    @Autowired
+    private CfgReadonlyFormService cfgReadonlyFormService;
+
+    /**
+     * 页面展示设置service
+     */
+    @Autowired
+    private CfgDataTableService cfgDataTableService;
+
+    /**
+     * 页面设置pageid
+     */
+    private static final String pageCode = "TenderBondFirm";
+
+    /**
+     * 页面设置区域id-表格
+     */
+    private static final String dtCode = "ETRDETINFOLIST";
+
+    /**
+     * 页面设置区域id-表单
+     */
+    private static final String formDtCode = "ETRDETINFO";
+
+    /**
+     * 通用设置 默认999999
+     */
+    private static final String COMM = "999999";
 
     /**
      * 接收指令
@@ -238,6 +283,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         this.setParam(param);
         List<CfetsTrdFirstBidFirmEntrustDto> bidFirmSumDtoList = new ArrayList<>();
         List<CfetsTrdFirstBidFirmEntrustDto> bidFirmDtos = cfetsTrdFirstBidFirm001Mapper.listEntrust(param);
+       // List<TotalEtrEntrustRel> totalEtrEntrustRelList = cfetsTrdFirstBidFirm001Mapper.query
         bidFirmDtos.stream().forEach(x -> {
             x.setIsSumFlag(DictCodeListExt1.是否_否.getValue());
         });
@@ -328,15 +374,106 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
     }
 
     /**
-     * 指令取消汇总
+     * 指令取消汇总保存
      * @param cfetsDto
      * @return
      */
-    public AjaxResult undoSumSave(CfetsTrdBondFirstBidFirmUndoSumRequest cfetsDto) {
-        return null;
+    public int undoSumSave(CfetsTrdBondFirstBidFirmUndoSumRequest cfetsDto) {
+        TotalEtrEntrustRel totalEtrEntrustRel = new TotalEtrEntrustRel();
+        String uuid = IDGenerator.generate();
+        totalEtrEntrustRel.setTotleId(uuid);
+        totalEtrEntrustRel.setEntrustId(cfetsDto.getEntrustId());
+        String loginUserId = LoginUserUtil.getUserName();
+        // param.put("loginUserId", loginUserId);
+        totalEtrEntrustRel.setTrader(loginUserId);
+        return totalEtrEntrustRelMapper.insertSelective(totalEtrEntrustRel);
     }
 
+    /**
+     * 获取指令详细信息
+     * @param entrustId
+     * @return
+     */
     public Map<String, Object> getEntrustInfo(String entrustId) {
-        return null;
+        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> param = new HashMap<>();
+        param.put("entrustId", entrustId);
+        //查询指令详细信息
+        CfetsTrdBondFirsBidFirmDetailDto formData = cfetsTrdFirstBidFirm001Mapper.getEntrustInfo(param);
+        //查询投标产品列表
+        List<CfetsTrdBondFirstBidFirmProductDto> productDtos = cfetsTrdFirstBidFirm001Mapper.getEntrustProductInfo(param);
+        List<String> spcdCodeList = new ArrayList<>();
+        result.put("form", getReadonlyForms(spcdCodeList));
+        if (StringUtil.isNotEmpty(formData)) {
+            result.put("formData", formData);
+        }
+
+        // 表格格式
+        result.put("table", getBySpcdCodes(new ArrayList<>()));
+        if (CollectionUtils.isNotEmpty(productDtos)) {
+            // 表单数据
+            result.put("tableData", productDtos);
+            BigDecimal sumAmt = productDtos.stream().map(CfetsTrdBondFirstBidFirmProductDto::getBidPrinAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+            // 汇总投标券面总额
+            result.put("sumAmt", sumAmt);
+        }
+
+        return result;
+    }
+
+    /**
+     * 查询投标确认执行明细
+     * @param entrustId
+     * @return
+     */
+    public Map<String, Object> getBidOrderTransactionDetails(String entrustId) {
+        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> param = new HashMap<>();
+        param.put("entrustId", entrustId);
+        //查询投标确认执行明细
+        List<CfetsTrdBondFirsBidFirmBidOrderDetailDto> tableData = cfetsTrdFirstBidFirm001Mapper.getBidOrderTransactionDetails(param);
+        if (CollectionUtils.isNotEmpty(tableData)) {
+            // 表单数据
+            result.put("tableData", tableData);
+        }
+        // 表格格式
+        List<String> spcdCodeList = new ArrayList<>();
+        result.put("table", getBySpcdCodes(spcdCodeList));
+
+        return result;
+    }
+
+    /**
+     * 查询表单表头 (私有方法 pageCode,dtCode,spcdCodeList仅组装该页面的数据)
+     *
+     */
+    private List<CfgReadonlyFormShow> getReadonlyForms(List<String> spcdCodeList) {
+        //页面id
+        String pageCode = this.pageCode;
+        //区域id
+        String dtCode = this.formDtCode;
+        if (CollectionUtils.isEmpty(spcdCodeList)) {
+            spcdCodeList = new ArrayList<>();
+        }
+        spcdCodeList.add(COMM);
+        List<CfgReadonlyFormShow> cfgReadonlyFormShows = cfgReadonlyFormService.getReadonlyForms(pageCode, dtCode, spcdCodeList);
+        return cfgReadonlyFormShows;
+    }
+
+    /**
+     * 查询表单表头 (私有方法 pageCode,dtCode,spcdCodeList仅组装该页面的数据)
+     *
+     */
+    private List<CfgDataTableShow> getBySpcdCodes(List<String> spcdCodeList) {
+        //页面id
+        String pageCode = this.pageCode;
+        //区域id
+        String dtCode = this.dtCode;
+        if (spcdCodeList == null) {
+            spcdCodeList = new ArrayList<>();
+        }
+        spcdCodeList.add(COMM);//通用配置
+        List<CfgDataTableShow> infoForm = cfgDataTableService.getByPageCodeAndDtCodes(pageCode, dtCode, spcdCodeList);
+        return infoForm;
     }
 }

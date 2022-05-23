@@ -61,90 +61,52 @@ public class CfetsTrdFirstBidFirmEntrustDto {
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal tradeFinishPercent;
 
-    /**
-     *  招标标的
-     */
     @ApiModelProperty(name="tenderTarget",value="招标标的")
     private String tenderTarget;
 
-    /**
-     *  招标标的字典值
-     */
     @ApiModelProperty(name="tenderTargetStr",value="招标标的字典值")
     private String tenderTargetStr;
 
-    /**
-     *  投标日
-     */
     @ApiModelProperty(name = "issueDate", value = "投标日")
     private Date issueDate;
 
+    @ApiModelProperty(name = "issueDateStart", value = "投标日开始日期,字符串", example = "2021-12-21")
+    private String issueDateStart;
 
-    /**
-     *  投标日字符串
-     */
+    @ApiModelProperty(name = "issueDateEnd", value = "投标日结束日期,字符串", example = "2021-12-21")
+    private String issueDateEnd;
+
     @ApiModelProperty(name = "issueDateStr", value = "投标日字符串")
     private String issueDateStr;
 
-    /**
-     *  指令额度、券面总额（汇总投标券面总额）
-     */
     @ApiModelProperty(name = "entrustNum", value = "指令额度、券面总额", example = "1000.00")
     @JsonSerialize(using = BigDecimalSerializer.class)
     private BigDecimal entrustNum;
 
-    /**
-     *  投标标位
-     */
     @ApiModelProperty(name = "bidPrice", value = "投标标位", example = "1")
     private String bidPrice;
 
-    /**
-     *  组合代码
-     */
     @ApiModelProperty(name = "portfolioId", value = "组合代码", example = "A1")
     private String portfolioId;
 
-    /**
-     *  组合代码
-     */
     @ApiModelProperty(name = "portfolioName", value = "组合名称", example = "名称A1")
     private String portfolioName;
 
-    /**
-     *  投资经理
-     */
     @ApiModelProperty(name = "invManagerId", value = "投资经理", example = "A1")
     private String invManagerId;
 
-    /**
-     *  投资经理名称
-     */
     @ApiModelProperty(name = "invManagerName", value = "投资经理名称", example = "A1")
     private String invManagerName;
 
-    /**
-     *  交易场所
-     */
     @ApiModelProperty(name = "tradeMarket", value = "交易场所")
     private String tradeMarket;
 
-    /**
-     *  交易场所名称
-     */
     @ApiModelProperty(name = "tradeMarketStr", value = "交易场所名称")
     private String tradeMarketStr;
 
-    /**
-     *  交易对手
-     */
     @ApiModelProperty(name = "counterId", value = "交易对手", example = "A1")
     private String counterId;
 
-
-    /**
-     *  交易对手名称
-     */
     @ApiModelProperty(name = "counterName", value = "交易对手名称", example = "A1")
     private String counterName;
 
@@ -497,5 +459,21 @@ public class CfetsTrdFirstBidFirmEntrustDto {
 
     public void setInvManagerName(String invManagerName) {
         this.invManagerName = invManagerName;
+    }
+
+    public String getIssueDateStart() {
+        return issueDateStart;
+    }
+
+    public void setIssueDateStart(String issueDateStart) {
+        this.issueDateStart = issueDateStart;
+    }
+
+    public String getIssueDateEnd() {
+        return issueDateEnd;
+    }
+
+    public void setIssueDateEnd(String issueDateEnd) {
+        this.issueDateEnd = issueDateEnd;
     }
 }

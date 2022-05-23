@@ -197,5 +197,39 @@
             order by ${pageMode.sort} ${pageMode.direction}
         </if>
     </select>
+    <select id="getEntrustInfo" resultType="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirsBidFirmDetailDto">
+        SELECT
+            ee.FINPROD_ID                            finprodId,
+            fp.FINPROD_MARKET_ID                     finprodMarketId,
+            fp.FINPROD_ABBR                          finprodAbbr,
+            fpi.ISSUE_CLASS                          issueClass,
+            fpi.TENDER_TARGET                        tenderTarget,
+            nvl(fpi.ISSUE_DATE,fpi.TENDER_SDATE)     issueDate,
+            fpi.PAY_EDATE                            payEdate,
+            ee.ENTRUST_DATE                          entrustDate,
+            ee.COUNTER_ID                            counterId,
+            mcp.COUNTER_NAME                         counterName,
+            ee.REMARK            remark
+        FROM ETR_ENTRUST ee
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = ee.FINPROD_ID
+                 left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = ee.FINPROD_ID
+                 LEFT JOIN MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
+        WHERE ee.ENTRUST_ID  = #{entrustId}
+    </select>
 
+    <select id="getEntrustProductInfo" resultType="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmProductDto">
+        SELECT
+            eebp.PORTFOLIO_ID portfolioId,
+            pp.PORTFOLIO_NAME  portfolioName,
+            eebp.BID_PRICE bidPrice,
+            eebp.BID_PRIN_AMT  bidPrinAmt,
+            eed.INV_AIM  businessModel,
+            eed.ENTRUST_NUM/100 portfolioTotalBidPrinAmt
+        FROM ETR_ENTRUST ee
+                 left join ETR_ENTRUST_BID_PRICE eebp ON eebp.ENTRUST_ID  = ee.ENTRUST_ID
+                 LEFT JOIN ETR_ENTRUST_DETAIL eed ON eed.ENTRUST_ID  = eebp.ENTRUST_ID AND eed.PORTFOLIO_ID  = eebp.PORTFOLIO_ID
+                 left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = eebp.PORTFOLIO_ID
+
+        WHERE ee.ENTRUST_ID = #{entrustId}
+    </select>
 </mapper>
