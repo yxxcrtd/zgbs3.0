@@ -10,5 +10,7 @@ public interface FinProductSpecialMapper {
 
     int insertSelective(FinProductSpecial record);
 
+    int updateByPrimaryKey(FinProductSpecial record);
+
     int deleteByFinprodMarketId(String finprodMarketId);
 }

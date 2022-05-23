@@ -121,6 +121,13 @@ public class FinBondAssetValidatorService implements BeanValidator{
 
                 if((dto.getInvRepayList() ==null)) {
                     resultList.add(new ValidMessage("息票品种为附息或利随本清时，还本计划不能为空!"));
+                }else{
+                    for (BondFinCashPlanDto bondFinCashPlanDto:dto.getInvRepayList()){
+                        if (DateUtil.compareDate(bondFinCashPlanDto.getPayDate(),iPlatformDate.getSysDate())<0){
+                            resultList.add(new ValidMessage("还本计划支付日不能小于平台日"));
+                            break;
+                        }
+                    }
                 }
                 if (DictCodeList.息票品种_附息.getValue().equals(dto.getFinInterestFactorDto().getCouponSpecies())){
                     if (dto.getFinInterestFactorDto().getMarketBasis()== null){

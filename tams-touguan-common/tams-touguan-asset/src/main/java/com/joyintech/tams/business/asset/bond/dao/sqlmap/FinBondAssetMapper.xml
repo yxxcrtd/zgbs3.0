@@ -332,7 +332,8 @@
             T11.CASH_ID principalCashId,
             T13.PAY_CYCLE  payCycle,
             T13.PAY_TDAY_RULE  payTdayRule,
-            T13.CALC_RULE  calcRule
+            T13.CALC_RULE  calcRule,
+            T13.FIRST_PAY_DATE firstPayDate
         FROM FIN_PRODUCT T1
         LEFT JOIN FIN_PRODUCT_ADD T2
         ON		T2.FINPROD_ID = T1.FINPROD_ID

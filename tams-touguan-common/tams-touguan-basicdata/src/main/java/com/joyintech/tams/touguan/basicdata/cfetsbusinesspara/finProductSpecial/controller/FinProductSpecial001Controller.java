@@ -12,6 +12,7 @@ import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.business.common.util.ValidUtils;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.common.ExcelValidDto;
@@ -26,6 +27,7 @@ import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -157,10 +159,12 @@ public class FinProductSpecial001Controller extends BaseController {
         if (result != null && result.hasErrors()) {
             return new Message<AjaxResult>().success().setData(new AjaxResult(result));
         }
-        AjaxResult ajax = new AjaxResult();
         List<ValidMessage> valid = finProductSpecialValidatorService.valid(dto);
-        ajax.setErrorList(valid);
-        return new Message<AjaxResult>().success().setData(ajax);
+        if (CollectionUtils.isNotEmpty(valid)) {
+            return Message.fail(ValidUtils.getValidMessage(valid));
+        } else {
+            return Message.success("校验成功", null);
+        }
     }
 
     /**
@@ -203,7 +207,7 @@ public class FinProductSpecial001Controller extends BaseController {
     @ApiOperation(value = "特殊债券信息列表导出", notes = "特殊债券信息列表导出")
     public void export(@RequestBody CfetsExportRequestDto req, HttpServletResponse response) {
         ExcelUitl.doExport(req, response, "特殊债券信息", () ->
-                finProductSpecial001Service.queryForPage(req.getDto(FinProductSpecialDto.class)).getRoot()
+                finProductSpecial001Service.queryForPage(req.getDto(FinProductSpecialQueryRequest.class)).getRoot()
         );
     }
 

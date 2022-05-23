@@ -565,7 +565,7 @@
                 mdi.TRADE_MARKET = #{tradePlace}
             </if>
             <if test="acctNo != null and acctNo != ''">
-                and  SSAI.TRD_ACCT_ID = #{acctNo}
+                and  SCI.ACCT_NO = #{acctNo}
             </if>
             <if test="isOur != null and isOur != ''">
                 and MDDI.IS_OUR = #{isOur}
