@@ -1785,8 +1785,8 @@
                 stlinfo.sec_acct_name           as secManageAcctIdName,
                 bo.SUBSCRIPTION_AMOUNT/10000    as printAmt,
                 case
-                    when icb.ISSUE_PRICE is not null then icb.ISSUE_PRICE || '元'
-                    when icb.SPREAD is not null then  icb.SPREAD || 'BP'
+                    when icb.ISSUE_PRICE is not null then TO_CHAR(icb.ISSUE_PRICE,'FM99990.9990') || '元'
+                    when icb.SPREAD is not null then TO_CHAR(icb.SPREAD,'FM99990.90') || 'BP'
                     when icb.COUPON_RATE is not null then to_char(icb.COUPON_RATE,'FM990.9990') ||'%' end tradeYield,
                 null                            as termDays,
                 bo.PAYABLE_AMOUNT               as tradeAmt,
@@ -2031,6 +2031,12 @@
                        when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD*100
                        when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
                            then fpi.REFER_YIELD*100 end rate
+                , case
+                        when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
+                            then SDL.ITEM_VALUE || '+' || to_Char(nvl(fpi.BP*10000, 0),'FM999990.90')||'BP'
+                        when fp.COUPON_SPECIES in ('02', '03') then to_Char(fpi.REFER_YIELD*100,'FM999990.9990')||'%'
+                        when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
+                         then to_Char(fpi.REFER_YIELD*100,'FM999990.9990')||'%' end rateStr
                  , fpi.ISSUE_DATE                   issueDate
                  , fpi.PAY_DATE                     payDate
                  , fp.COUPON_SPECIES                couponRateType
@@ -2043,22 +2049,23 @@
                  , bo.REMARK                        remark
                  ,'BID'                           as finprodType2
             from BID_ORDER bo
-                     left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
-                     left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = bo.FINPROD_ID
-                     left join (select bobp.BID_ID,
-                                       eed.SEC_ACCT_ID,
-                                       wm_concat(bobp.portfolio_id) as portfolioId,
-                                       wm_concat(pp.portfolio_name)    portfolioName
-                                from BID_ORDER_BID_PRICE bobp
-                                         left join ETR_ENTRUST_DETAIL eed
-                                                   on eed.ENTRUST_ID = bobp.ENTRUST_ID and bobp.PORTFOLIO_ID = eed.PORTFOLIO_ID
-                                         left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = bobp.PORTFOLIO_ID
-                                group by bobp.BID_ID, eed.SEC_ACCT_ID
-                                ) deal on deal.BID_ID = bo.BID_ID
-                     left join stl_sec_acct_info stlinfo
-                               on deal.SEC_ACCT_ID = stlinfo.sec_acct_id
-                     left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
-                     left join MST_CFETS_CUSTOMER_TRADER mcct on mcct.TRADER_ID = bo.OUR_TRADER
+             left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
+             left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = bo.FINPROD_ID
+             LEFT JOIN SYS_DATADICT_LIST SDL on fpi.INT_RATE_ID = SDL.ITEM_CODE and DICT_CODE='SECRATE_DATA'
+             left join (select bobp.BID_ID,
+                               eed.SEC_ACCT_ID,
+                               wm_concat(bobp.portfolio_id) as portfolioId,
+                               wm_concat(pp.portfolio_name)    portfolioName
+                        from BID_ORDER_BID_PRICE bobp
+                                 left join ETR_ENTRUST_DETAIL eed
+                                           on eed.ENTRUST_ID = bobp.ENTRUST_ID and bobp.PORTFOLIO_ID = eed.PORTFOLIO_ID
+                                 left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = bobp.PORTFOLIO_ID
+                        group by bobp.BID_ID, eed.SEC_ACCT_ID
+                        ) deal on deal.BID_ID = bo.BID_ID
+             left join stl_sec_acct_info stlinfo
+                       on deal.SEC_ACCT_ID = stlinfo.sec_acct_id
+             left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
+             left join MST_CFETS_CUSTOMER_TRADER mcct on mcct.TRADER_ID = bo.OUR_TRADER
             where bo.BID_ID=#{busiCode,jdbcType=VARCHAR}
         )
         <!--前端传入排序字段-->
