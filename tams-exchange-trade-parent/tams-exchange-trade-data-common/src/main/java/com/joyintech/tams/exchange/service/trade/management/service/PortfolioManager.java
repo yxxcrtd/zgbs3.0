@@ -1076,13 +1076,14 @@ public class PortfolioManager extends BaseService {
      * @return 组合计算信息
      */
     public List<PortfolioCalculateResponse> getCalculateList(String instructionId, BigDecimal
-            entrustPrice, BigDecimal fullPrice, Long entrustNum) {
+            entrustPrice, BigDecimal fullPrice, Long entrustNum,String entrustProp) {
         // 组装下单对象
         OrderPlaceBean orderPlaceBean = new OrderPlaceBean();
         orderPlaceBean.setInstructionId(instructionId);
         orderPlaceBean.setEntrustPrice(entrustPrice);
         orderPlaceBean.setFullPrice(fullPrice);
         orderPlaceBean.setEntrustVolume(entrustNum);
+        orderPlaceBean.setEntrustProp(entrustProp);
 
         // 调用组合计算接口，得出各组合分配到的数量金额
         ResultBean resultBean = this.queryPortfolioCalculate(orderPlaceBean, false);
