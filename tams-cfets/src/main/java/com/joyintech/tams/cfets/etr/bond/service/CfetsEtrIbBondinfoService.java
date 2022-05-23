@@ -1797,6 +1797,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
                 }
                 dd.setSystemAct(DictCodeListExt3.系统动作_修改.getValue());
                 dto.setSystemAct(DictCodeListExt3.系统动作_修改.getValue());
+                dto.setEntrustId(cfetsDto.getEntrustId());
             }else{
                 dd.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
                 dto.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());

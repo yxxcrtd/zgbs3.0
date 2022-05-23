@@ -266,11 +266,15 @@ public class CfetsEtrIbBondinfoController  extends BaseController{
             EntrustRdsCommonAop.riskListToChildren(allDto.getRiskTrialRetDto(), allDto.getEtrInvestBondInfoDtos(),
                     (dto, list) -> dto.setRiskTrialRetDto(list));
 
-            // 临时主键
-            BussinessCodeParameter param = new BussinessCodeParameter();
-            param.setCommonBusinessType(DictCodeList.共通业务类型_债券投资委托);
-            String generatedId = bussGetBussinessIdService != null ? bussGetBussinessIdService.buildBussinessCode(param) : IDGenerator.generate();
-            allDto.setTotalEtrustId(generatedId);
+            if(StringUtil.isNotEmpty(allDto.getEntrustId())){
+                allDto.setTotalEtrustId(allDto.getEntrustId());
+            }else{
+                // 临时主键
+                BussinessCodeParameter param = new BussinessCodeParameter();
+                param.setCommonBusinessType(DictCodeList.共通业务类型_债券投资委托);
+                String generatedId = bussGetBussinessIdService != null ? bussGetBussinessIdService.buildBussinessCode(param) : IDGenerator.generate();
+                allDto.setTotalEtrustId(generatedId);
+            }
             for (int i = 0; i < allDto.getBussCombDistribtList().size(); i++) {
                 allDto.getBussCombDistribtList().get(i).setEntrustId(allDto.getEtrInvestBondInfoDtos().get(i).getEntrustId());
             }
