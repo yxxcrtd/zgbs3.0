@@ -88,10 +88,10 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
             this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_放弃);
         } else if (OperationType.NEW == type) {
             this.insert(dto);
-            this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_新建);
+            this.saveOperate(dto.getFinprodMarketId(), "", DictCodeListExt3.操作类型_新建);
         } else if (OperationType.MODIFY == type) {
             this.update(dto);
-            this.saveOperate(dto.getFinprodMarketId(), dto.getRemark(), DictCodeListExt3.操作类型_修改);
+            this.saveOperate(dto.getFinprodMarketId(), "", DictCodeListExt3.操作类型_修改);
         }
     }
 
@@ -311,6 +311,10 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
      */
     public void update(FinTenderBondAsset002Dto dto) {
         //采用先删除在插入的方式处理
+        FinProduct product = finProductMapper.selectByPrimaryKey(dto.getFinprodId());
+        if(Objects.nonNull(product)) {
+            dto.setRemark(product.getRemark());
+        }
         this.delete(dto);
         this.insert(dto);
     }
