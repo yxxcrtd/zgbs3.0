@@ -288,7 +288,13 @@ public class TradeInfoPro001Controller extends BaseController {
                     }
                 }
             }
-
+            if(StringUtil.equals(dto.getTradeMarket(),"04")) {
+                if (tradeInfoPro001Service.hasSameDealerPartyNoDiffType(dto)>0){
+                    return new Message().fail().setMessage("一条交易商信息下，不同交易主体类型之间，交易主体代码不允许重复!");
+                }else if (StringUtil.isNotEmpty(tradeInfoPro001Service.hasSameDealerPartyNoTraderNo(dto))){
+                    return new Message().fail().setMessage("一条交易商信息下，交易主体代码+交易员代码应是唯一的!");
+                }
+            }
                //新增交易商详情信息
             insertDealerDetails1(tradeInfoProSaveRequest);
             return new Message().success();
@@ -352,6 +358,13 @@ public class TradeInfoPro001Controller extends BaseController {
                 return new Message().fail().setMessage("交易商名称和交易商代码不能重复！");
             }else if (existsDealerAndTradeMarket(dto)>0){
                 return new Message().fail().setMessage("交易商和交易场所不能重复！");
+            }
+            if(StringUtil.equals(dto.getTradeMarket(),"04")) {
+                if (tradeInfoPro001Service.hasSameDealerPartyNoDiffType(dto)>0){
+                    return new Message().fail().setMessage("一条交易商信息下，不同交易主体类型之间，交易主体代码不允许重复!");
+                }else if (StringUtil.isNotEmpty(tradeInfoPro001Service.hasSameDealerPartyNoTraderNo(dto))&&!StringUtil.equals(tradeInfoPro001Service.hasSameDealerPartyNoTraderNo(dto),dto.getSeqNo())){
+                    return new Message().fail().setMessage("一条交易商信息下，交易主体代码+交易员代码应是唯一的!");
+                }
             }
 //              deleteDealer1(dto);
 //              TradeInfoProSaveRequest tradeInfoProSaveRequest = new TradeInfoProSaveRequest();
