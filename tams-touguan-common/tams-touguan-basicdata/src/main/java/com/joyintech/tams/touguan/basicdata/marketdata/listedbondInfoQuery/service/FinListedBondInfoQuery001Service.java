@@ -5,6 +5,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
@@ -27,6 +29,7 @@ import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.req.SelectOptionCommonRequest;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dao.FinListedBondInfoQueryMapper;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.dto.FinListedBondInfoQuery001Dto;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.dto.req.FinListedBondInfoQueryRequest;
@@ -39,6 +42,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -137,6 +141,24 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         request.setPlatformDate(iPlatformDate.getSysDateStr());
         FinListedBondInfoQuery001Dto finListedBondInfoQuery001Dto = finListedBondInfoQueryMapper.queryFinProductForCoupons(request);
         return finListedBondInfoQuery001Dto;
+    }
+
+    /**
+     * 查询债券资产代码
+     * <p>
+     * <功能详细描述>
+     *
+     * @param request
+     * @return
+     * @see
+     * @since 1.0
+     */
+    public Page<SelectOptionDto> getAssetId(SelectOptionCommonRequest request) {
+        Map<String, Object> param = BeanUtil.object2Map(request);
+        Page<SelectOptionDto> page = super.queryForPage(request.getPageMode().getPageNo(),
+                request.getPageMode().getPageSize(),
+                () -> finListedBondInfoQueryMapper.getAssetId(param));
+        return page;
     }
 
 
