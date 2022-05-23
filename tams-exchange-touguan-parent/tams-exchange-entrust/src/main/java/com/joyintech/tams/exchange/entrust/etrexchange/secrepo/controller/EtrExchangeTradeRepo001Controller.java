@@ -631,7 +631,7 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 			ajax.setErrorList(validList);
 		}
 
-		String confirmMsg = "";
+		String confirmMsg = etrExchangeTradeSecRepoValidatorService.isNameSoftControl(dto);
 		// 有效价格申报范围控制参数
 		String priceScopeControllEtr = CacheUtil.getSysParam("PRICE_SCOPE_CONTROLL_ETR");
 		if (!CollectionUtils.isEmpty(validListPriceRange)){
