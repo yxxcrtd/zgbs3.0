@@ -1988,6 +1988,8 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
             dto.setTradeAmt(ArithmeticUtil.doAdd(infContractDetailfile.getTradeAmt(), dto.getFeeAmtPay()));
         } else if (DictCodeList.交易方向_卖出.getValue().equals(infContractDetailfile.getPs())) {
             dto.setTradeAmt(ArithmeticUtil.subtract(infContractDetailfile.getTradeAmt(), dto.getFeeAmtPay()));
+        } else if (DictCodeList.交易方向_申购.getValue().equals(infContractDetailfile.getPs())) {
+            infContractDetailfile.setSettleDay(null);
         }
 
         dto.setFpriceAmt(dto.getTradeAmt());
