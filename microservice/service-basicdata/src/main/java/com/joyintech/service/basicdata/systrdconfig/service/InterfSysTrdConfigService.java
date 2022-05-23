@@ -370,7 +370,10 @@ public class InterfSysTrdConfigService{
                             SppiImportData sppiImportData = sppiImportDataMapper.selectByPrimaryKey(finprodId);
                             if (null != sppiImportData && com.joyintech.framework.util.StringUtil.isNotEmpty(sppiImportData.getBidPriceCon())) {
                                 String[] split = sppiImportData.getBidPriceCon().split(",");
-                                if ((!(new BigDecimal(price).compareTo(new BigDecimal(split[0]))==0))&&(new BigDecimal(price).compareTo(new BigDecimal(split[1])) <= 0)){
+//                                if ((!(new BigDecimal(price).compareTo(new BigDecimal(split[0]))==0))&&(new BigDecimal(price).compareTo(new BigDecimal(split[1])) <= 0)){
+                                // modify by fxmei 2022-05-23 需求变更 start
+                                if ((new BigDecimal(price).compareTo(new BigDecimal(split[1])) < 0)){
+                                // modify by fxmei 2022-05-23 需求变更 end
                                     resultMap.put("status",1);
                                     resultMap.put("message","净价不满足使权不重大购入价条件，若继续提交，业务模式会发生变更");
                                     return resultMap;

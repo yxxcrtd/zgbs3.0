@@ -235,6 +235,7 @@ public class PositionRequestTradeReportService {
 
         Map<String,Object> paraMap = new HashMap<>();
         paraMap.put("fTradeId", entity.getfTradeId());
+        paraMap.put("interfaceType", INTERF_TYPE_REPO003);
         List<PortfolioCalculateDto> list = trdCommonBaseService.queryPortfolioCalculate(paraMap);
         List<Map<String, Object>> ptlList = new ArrayList<>(4);
         List<Map<String, Object>> ptlSecList = new ArrayList<>(4);
