@@ -18,32 +18,7 @@
 </head>
 <body>
   <div style="width: 100%;">
-    <iframe id="iframe" src="http://localhost:8300/?processInstanceId=c94cddad-d1e0-11ec-8112-5254009c7c87&taskId=c94d2bdf-d1e0-11ec-8112-5254009c7c87&workflowId=00000000000000000000000000057365&pageModel=1&editable=true&isTodoList=true#/approve/newbonetargets"></iframe>
+    <iframe id="iframe" style="height: 200px" src="http://localhost:8300/?processInstanceId=c94cddad-d1e0-11ec-8112-5254009c7c87&taskId=c94d2bdf-d1e0-11ec-8112-5254009c7c87&workflowId=00000000000000000000000000057365&pageModel=1&editable=true&isTodoList=true#/approve/newbonetargets"></iframe>
   </div>
-
-  <script>
-    (function() {
-      const iframe = document.getElementById('iframe')
-
-      if (iframe && iframe.contentWindow) {
-        iframe.onload = () => {
-          setTimeout(() => {
-            const iDoc = iframe.contentDocument || iframe.contentWindow.document
-            const height = calcPageHeight(iDoc)
-
-            iframe.style.height = `${height}px`
-          }, 500)
-        }
-      }
-
-      function calcPageHeight(doc) {
-        const cHeight = Math.max(doc.body.clientHeight, doc.documentElement.clientHeight)
-        const sHeight = Math.max(doc.body.scrollHeight, doc.documentElement.scrollHeight)
-        const height = Math.max(cHeight, sHeight)
-
-        return height
-      }
-  })();
-  </script>
 </body>
 </html>

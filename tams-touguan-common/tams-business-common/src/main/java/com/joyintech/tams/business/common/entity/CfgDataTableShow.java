@@ -63,6 +63,9 @@ public class CfgDataTableShow {
     @ApiModelProperty(name = "iskey", value = "是否表格主键(0:否,1:是)")
     private Integer iskey;
 
+    @ApiModelProperty(name = "isHide", value = "是否隐藏域(N:否,Y:是)")
+    private String isHide;
+
     public String getPageCode() {
         return pageCode;
     }
@@ -213,5 +216,13 @@ public class CfgDataTableShow {
 
     public void setIskey(Integer iskey) {
         this.iskey = iskey;
+    }
+
+    public String getIsHide() {
+        return isHide;
+    }
+
+    public void setIsHide(String isHide) {
+        this.isHide = isHide;
     }
 }

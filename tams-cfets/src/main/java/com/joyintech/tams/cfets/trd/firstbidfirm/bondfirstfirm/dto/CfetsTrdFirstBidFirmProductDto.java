@@ -13,7 +13,7 @@ import java.math.BigDecimal;
  * @author jiangpeng
  * @date 2022年05月16日 11:45
  */
-@ApiModel(value = "交易信息-投标产品列表", description = "一级投标确认信息-投标产品列表")
+@ApiModel(value = "一级投标确认-交易信息-投标产品列表", description = "一级投标确认信息-投标产品列表")
 public class CfetsTrdFirstBidFirmProductDto {
     /**
      * 投资经理

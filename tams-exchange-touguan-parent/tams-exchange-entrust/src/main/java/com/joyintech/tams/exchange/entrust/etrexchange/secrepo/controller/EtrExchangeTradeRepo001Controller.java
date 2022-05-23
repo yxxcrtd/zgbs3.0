@@ -471,8 +471,10 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 			BigDecimal availableNum = etrTradeCommonervice.selectAvailableNum(dto);
 			if(availableNum == null) {
 				availableNum= BigDecimal.ZERO;
+			}else{
+				availableNum=ArithmeticUtil.divide(availableNum,new BigDecimal(100),2);
 			}
-			String availableNumStr=availableNum.setScale(2,RoundingMode.HALF_UP).toString();
+			String availableNumStr=availableNum.toString();
 			return new Message<>(availableNumStr);
 		} catch (Exception e) {
 			logger.error("查询功能异常", e);
@@ -627,11 +629,24 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 		AjaxResult ajax= etrExchangeTradeSecRepo001Service.checkSave(dto,br);
 		List<ValidMessage> validList = etrExchangeTradeSecRepoValidatorService.valid(dto);
 		List<ValidMessage> validListPriceRange = etrExchangeTradeSecRepo001Service.checkSavePriceRange(dto,br);
+		if(dto.getRepoRate() != null && StringUtil.equals(dto.getPriceModel(),DictCodeListExt2.价格模式_限价指令.getValue())){
+			EtrExchangeTradeQuotationHqSecRepoResponse quotations = etrExchangeTradeSecRepo001Service.findQuotations(dto.getStockId());
+			if(quotations != null && quotations.getUpperLimitPrice() != null && null != quotations.getLowerLimitPrice()){
+				BigDecimal upperLimitPrice = quotations.getUpperLimitPrice();
+				BigDecimal lowerLimitPrice = quotations.getLowerLimitPrice();
+				if(upperLimitPrice.compareTo(dto.getRepoRate()) < 0 || lowerLimitPrice.compareTo(dto.getRepoRate()) > 0){
+					ValidMessage validMessage = new ValidMessage();
+					validMessage.setMessage("价格超过涨跌停价格");
+					validList.add(validMessage);
+				}
+			}
+		}
+
 		if (!CollectionUtils.isEmpty(validList)){
 			ajax.setErrorList(validList);
 		}
 
-		String confirmMsg = "";
+		String confirmMsg = etrExchangeTradeSecRepoValidatorService.isNameSoftControl(dto);
 		// 有效价格申报范围控制参数
 		String priceScopeControllEtr = CacheUtil.getSysParam("PRICE_SCOPE_CONTROLL_ETR");
 		if (!CollectionUtils.isEmpty(validListPriceRange)){

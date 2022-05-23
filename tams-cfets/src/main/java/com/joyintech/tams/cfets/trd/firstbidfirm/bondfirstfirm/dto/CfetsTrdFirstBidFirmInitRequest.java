@@ -9,7 +9,7 @@ import java.util.List;
  * @author jiangpeng
  * @date 2022年04月19日 18:49
  */
-@ApiModel(value = "指令信息", description = "投标确认指令信息输入")
+@ApiModel(value = "一级投标确认-指令信息", description = "投标确认指令信息输入")
 public class CfetsTrdFirstBidFirmInitRequest {
 
     @ApiModelProperty(name = "entrustDtos", value = "指令列表")

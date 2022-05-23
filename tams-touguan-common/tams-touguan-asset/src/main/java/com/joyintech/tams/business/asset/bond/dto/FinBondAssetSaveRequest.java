@@ -424,6 +424,10 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
     private Date exerciseDate;
 
     /**
+     * 行权日
+     */
+    private Date firstPayDate;
+    /**
      * 债券评级信息list add by shenchen 2019-04-25
      */
     private List<BusiFinProductRatingDto> mstBondCreditRatingList;
@@ -2056,5 +2060,13 @@ public class FinBondAssetSaveRequest extends BaseEntity implements ProcessEntity
 
     public void setPayTdayRule(String payTdayRule) {
         this.payTdayRule = payTdayRule;
+    }
+
+    public Date getFirstPayDate() {
+        return firstPayDate;
+    }
+
+    public void setFirstPayDate(Date firstPayDate) {
+        this.firstPayDate = firstPayDate;
     }
 }

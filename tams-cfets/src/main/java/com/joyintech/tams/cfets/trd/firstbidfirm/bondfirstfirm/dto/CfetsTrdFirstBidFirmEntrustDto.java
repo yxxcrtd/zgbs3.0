@@ -18,7 +18,7 @@ import java.util.List;
  * @author jiangpeng
  * @date 2022年05月14日 16:45
  */
-@ApiModel(value = "指令信息", description = "指令列表信息")
+@ApiModel(value = "一级投标确认-指令信息", description = "指令列表信息")
 public class CfetsTrdFirstBidFirmEntrustDto {
 
     @ApiModelProperty(name = "entrustStatus", value = "指令状态", example = "04")

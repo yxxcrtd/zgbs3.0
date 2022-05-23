@@ -501,7 +501,7 @@
             PRODUCT.ISSUE_AMT,
             PRODUCT.DELISTING_DATE,
             PRODUCT.ISSUER,
-            CUSTOMER_INFO.CUSTOMER_NAME issuerName,
+            PRODUCT.ISSUER issuerName,
             PRODUCT_TYPE.TYPE_9 secType,
             PRODUCT_TYPE.TYPE_10 secType2,
             PRODUCT_TYPE.TYPE_11 secType3,

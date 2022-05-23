@@ -7,13 +7,10 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
-import com.joyintech.tams.business.common.entity.CfgDataTableShow;
-import com.joyintech.tams.business.common.entity.CfgReadonlyFormShow;
 import com.joyintech.tams.business.common.service.CfgDataTableService;
 import com.joyintech.tams.business.common.service.CfgReadonlyFormService;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
@@ -21,10 +18,7 @@ import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.cfets.etrdispatcher.service.CfetsEtrDispatcherService;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dao.CfetsTrdFirstBidFirm001Mapper;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirsBidFirmBidOrderDetailDto;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirsBidFirmDetailDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmEntrustRequest;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmProductDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmUndoSumRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBondFirstSub001Service;
@@ -33,7 +27,6 @@ import com.joyintech.tams.common.base.dao.TotalEtrEntrustRelMapper;
 import com.joyintech.tams.common.base.entity.EtrDistribute;
 import com.joyintech.tams.common.base.entity.EtrDistributeInterfTmp;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
-import com.joyintech.tams.common.base.entity.TotalEtrEntrustRel;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
@@ -475,5 +468,33 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         spcdCodeList.add(COMM);//通用配置
         List<CfgDataTableShow> infoForm = cfgDataTableService.getByPageCodeAndDtCodes(pageCode, dtCode, spcdCodeList);
         return infoForm;
+    }
+
+    /**
+     * 投标查询
+     *
+     * @param request 查询条件
+     * @return java.util.List<com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmTenderInfoDto>
+     * @author jiangpeng
+     * @date 2022/5/23 16:58
+     */
+    public Page<CfetsTrdFirstBidFirmTenderInfoDto> tenderSearch(CfetsTrdFirstBidFirmTenderInfoRequest request) {
+        Map<String, Object> param = BeanUtil.object2Map(request);
+        this.setParam(param);
+        return super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> cfetsTrdFirstBidFirm001Mapper.tenderSearch(param));
+    }
+
+    /**
+     * 分销买入查询
+     *
+     * @param request 查询条件
+     * @return com.joyintech.framework.grid.Page<com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmDistributionInfoDto>
+     * @author jiangpeng
+     * @date 2022/5/23 16:58
+     */
+    public Page<CfetsTrdFirstBidFirmDistributionInfoDto> distributionSearch(CfetsTrdFirstBidFirmDistributionInfoRequest request) {
+        Map<String, Object> param = BeanUtil.object2Map(request);
+        this.setParam(param);
+        return super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> cfetsTrdFirstBidFirm001Mapper.distributionSearch(param));
     }
 }

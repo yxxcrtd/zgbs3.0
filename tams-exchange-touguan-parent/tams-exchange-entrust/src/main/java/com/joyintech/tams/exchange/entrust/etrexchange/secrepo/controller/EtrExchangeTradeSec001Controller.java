@@ -495,8 +495,10 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 			BigDecimal availableNum = etrTradeCommonervice.selectAvailableNum(dto);
 			if(availableNum == null) {
 				availableNum= BigDecimal.ZERO;
+			}else{
+				availableNum=ArithmeticUtil.divide(availableNum,new BigDecimal(100),2);
 			}
-			String availableNumStr=availableNum.setScale(2,RoundingMode.HALF_UP).toString();
+			String availableNumStr=availableNum.toString();
 			return new Message<>(availableNumStr);
 		} catch (Exception e) {
 			logger.error("查询功能异常", e);
@@ -655,7 +657,7 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 			ajax.setErrorList(validList);
 		}
 
-		String confirmMsg = "";
+		String confirmMsg = etrExchangeTradeSecRepoValidatorService.isNameSoftControl(dto);
 		// 有效价格申报范围控制参数
 		String priceScopeControllEtr = CacheUtil.getSysParam("PRICE_SCOPE_CONTROLL_ETR");
 		if (!CollectionUtils.isEmpty(validListPriceRange)){

@@ -13,9 +13,7 @@ import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.cfets.etr.bondfirstbid.controller.CfetsEtrBondFirstBid001Controller;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmEntrustRequest;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmUndoSumRequest;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.*;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.service.CfetsTrdFirstBidFirm001Service;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
@@ -29,11 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
@@ -129,13 +123,13 @@ public class CfetsTrdFirstBidFirm001Controller extends BaseController {
     @ApiOperation(value = "查询指令列表汇总数据", notes = "查询指令列表汇总数据")
     @PostMapping("/pageSumEntrust")
     @ResponseBody
-    public Message< List<CfetsTrdFirstBidFirmEntrustDto> > pageSumEntrust(@RequestBody CfetsTrdBondFirstBidFirmEntrustRequest dto) {
+    public Message<List<CfetsTrdFirstBidFirmEntrustDto>> pageSumEntrust(@RequestBody CfetsTrdBondFirstBidFirmEntrustRequest dto) {
         try {
-            List<CfetsTrdFirstBidFirmEntrustDto>  list = cfetsTrdFirstBidFirm001Service.pageSumEntrust(dto);
-            return new Message< List<CfetsTrdFirstBidFirmEntrustDto> >().success().setData(list);
+            List<CfetsTrdFirstBidFirmEntrustDto> list = cfetsTrdFirstBidFirm001Service.pageSumEntrust(dto);
+            return new Message<List<CfetsTrdFirstBidFirmEntrustDto>>().success().setData(list);
         } catch (Exception e) {
             logger.error("查询指令列表汇总数据异常", e);
-            return new Message< List<CfetsTrdFirstBidFirmEntrustDto> >().fail().setMessage("查询指令列表汇总数据异常");
+            return new Message<List<CfetsTrdFirstBidFirmEntrustDto>>().fail().setMessage("查询指令列表汇总数据异常");
         }
     }
 
@@ -247,6 +241,32 @@ public class CfetsTrdFirstBidFirm001Controller extends BaseController {
         } catch (Exception e) {
             logger.error("指令退回异常", e);
             return new Message<AjaxResult>().fail().setMessage("指令退回异常");
+        }
+    }
+
+    @ApiOperation(value = "投标", notes = "投标查询")
+    @PostMapping("/tenderSearch")
+    @ResponseBody
+    public Message<Page<CfetsTrdFirstBidFirmTenderInfoDto>> tenderSearch(@RequestBody CfetsTrdFirstBidFirmTenderInfoRequest request) {
+        try {
+            Page<CfetsTrdFirstBidFirmTenderInfoDto> list = cfetsTrdFirstBidFirm001Service.tenderSearch(request);
+            return new Message<Page<CfetsTrdFirstBidFirmTenderInfoDto>>().success().setData(list);
+        } catch (Exception e) {
+            logger.error("投标查询异常", e);
+            return new Message<Page<CfetsTrdFirstBidFirmTenderInfoDto>>().fail().setMessage("投标查询异常");
+        }
+    }
+
+    @ApiOperation(value = "分销买入", notes = "分销买入查询")
+    @PostMapping("/distributionSearch")
+    @ResponseBody
+    public Message<Page<CfetsTrdFirstBidFirmDistributionInfoDto>> distributionSearch(@RequestBody CfetsTrdFirstBidFirmDistributionInfoRequest request) {
+        try {
+            Page<CfetsTrdFirstBidFirmDistributionInfoDto> list = cfetsTrdFirstBidFirm001Service.distributionSearch(request);
+            return new Message<Page<CfetsTrdFirstBidFirmDistributionInfoDto>>().success().setData(list);
+        } catch (Exception e) {
+            logger.error("分销买入查询异常", e);
+            return new Message<Page<CfetsTrdFirstBidFirmDistributionInfoDto>>().fail().setMessage("分销买入查询异常");
         }
     }
 

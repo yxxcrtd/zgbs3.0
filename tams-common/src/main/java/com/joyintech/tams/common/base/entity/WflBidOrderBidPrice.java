@@ -94,6 +94,28 @@ public class WflBidOrderBidPrice extends WflBidOrderBidPriceKey {
      * 数据状态
      */
     private String workflowStatus;
+    /**
+     * 投资目的
+     **/
+    private String invAim;
+    /**
+     * 证券账户
+     **/
+    private String secAcctId;
+    /**
+     * 资金账户
+     **/
+    private String acctNo;
+
+    /**
+     * 交易金额
+     */
+    private BigDecimal tradeAmt;
+
+    /**
+     * 应计利息总额
+     */
+    private BigDecimal intAmt;
 
     /**
      * 是否中标
@@ -401,5 +423,45 @@ public class WflBidOrderBidPrice extends WflBidOrderBidPriceKey {
      */
     public void setWorkflowStatus(String workflowStatus) {
         this.workflowStatus = workflowStatus == null ? null : workflowStatus.trim();
+    }
+
+    public String getInvAim() {
+        return invAim;
+    }
+
+    public void setInvAim(String invAim) {
+        this.invAim = invAim;
+    }
+
+    public String getSecAcctId() {
+        return secAcctId;
+    }
+
+    public void setSecAcctId(String secAcctId) {
+        this.secAcctId = secAcctId;
+    }
+
+    public String getAcctNo() {
+        return acctNo;
+    }
+
+    public void setAcctNo(String acctNo) {
+        this.acctNo = acctNo;
+    }
+
+    public BigDecimal getTradeAmt() {
+        return tradeAmt;
+    }
+
+    public void setTradeAmt(BigDecimal tradeAmt) {
+        this.tradeAmt = tradeAmt;
+    }
+
+    public BigDecimal getIntAmt() {
+        return intAmt;
+    }
+
+    public void setIntAmt(BigDecimal intAmt) {
+        this.intAmt = intAmt;
     }
 }

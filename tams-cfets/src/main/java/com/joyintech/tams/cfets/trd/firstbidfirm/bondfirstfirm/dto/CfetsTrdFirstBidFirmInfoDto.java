@@ -23,7 +23,7 @@ import java.util.List;
  * @author jiangpeng
  * @date 2022/5/16 10:12
  */
-@ApiModel(value = "交易信息", description = "一级投标确认信息")
+@ApiModel(value = "一级投标确认-交易信息", description = "一级投标确认信息")
 public class CfetsTrdFirstBidFirmInfoDto extends BaseEntity implements ProcessEntity {
 
     @ApiModelProperty(name = "validStatus", value = "有效状态", example = "01")
@@ -50,7 +50,7 @@ public class CfetsTrdFirstBidFirmInfoDto extends BaseEntity implements ProcessEn
     @ApiModelProperty(name = "counterName", value = "交易对手名", example = "广发银行")
     private String counterName;
 
-    @ApiModelProperty(name = "ourTrader", value = "本方交易员id(申购人)", example = "001")
+    @ApiModelProperty(name = "ourTrader", value = "本方交易员id", example = "001")
     private String ourTrader;
 
     @ApiModelProperty(name = "ourTraderName", value = "本方交易员名称", example = "交易员1")
@@ -244,7 +244,13 @@ public class CfetsTrdFirstBidFirmInfoDto extends BaseEntity implements ProcessEn
         this.finprodAbbr = finprodAbbr;
     }
 
-
+    /**
+     * 本方交易员id
+     *
+     * @return java.lang.String
+     * @author jiangpeng
+     * @date 2022/5/23 9:27
+     */
     public String getOurTrader() {
         return ourTrader;
     }
@@ -311,7 +317,7 @@ public class CfetsTrdFirstBidFirmInfoDto extends BaseEntity implements ProcessEn
         if (StringUtil.isEmpty(getTenderTarget())) {
             return StringUtil.EMPTY;
         }
-        return SysDataUtil.getNameFromDataDict(DictCode.招标标的, getCcy());
+        return SysDataUtil.getNameFromDataDict(DictCode.招标标的, getTenderTarget());
     }
 
     public void setTenderTargetStr(String tenderTargetStr) {
@@ -467,6 +473,13 @@ public class CfetsTrdFirstBidFirmInfoDto extends BaseEntity implements ProcessEn
         this.etrBidPriceTotal = etrBidPriceTotal;
     }
 
+    /**
+     * 汇总投标券面总额
+     *
+     * @return java.math.BigDecimal
+     * @author jiangpeng
+     * @date 2022/5/23 9:48
+     */
     public BigDecimal getTotalBiddingNum() {
         return totalBiddingNum;
     }
@@ -477,9 +490,10 @@ public class CfetsTrdFirstBidFirmInfoDto extends BaseEntity implements ProcessEn
 
     /**
      * 券面总额
+     *
+     * @return java.math.BigDecimal
      * @author jiangpeng
      * @date 2022/5/19 11:30
-     * @return java.math.BigDecimal
      */
     public BigDecimal getBidPriceTotal() {
         return bidPriceTotal;
