@@ -6,6 +6,7 @@ import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.util.ValidUtils;
 import com.joyintech.tams.touguan.basicdata.marketdata.listedbondInfoQuery.service.FinListedBondInfoQuery001Service;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,7 +35,7 @@ public class FinListedBondInfoQuery003Controller extends BaseController {
     public Message<AjaxResult> addCoupons(@RequestParam("secId") String secId) {
         List<ValidMessage> validMessageList = finListedBondInfoQuery001Service.addCoupons(secId);
         if (CollectionUtils.isNotEmpty(validMessageList)) {
-            return Message.fail("加券失败", validMessageList);
+            return Message.fail(ValidUtils.getValidMessage(validMessageList));
         } else {
             return Message.success("加券成功", null);
         }

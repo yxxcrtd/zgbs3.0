@@ -229,7 +229,7 @@ public class FinBondAssetValidatorService implements BeanValidator{
                         break;
                     }
                     if (DateUtil.compareDate(finExercisePlan.getExerciseDate(),dto.getMdate())>0){
-                        resultList.add(new ValidMessage("理论行权日不大于到期日"));
+                        resultList.add(new ValidMessage("理论行权日不能大于到期日"));
                         break;
                     }
                 }
