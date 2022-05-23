@@ -57,8 +57,9 @@ public class TerminalLoginJob implements LoginJob {
         // 获取账号
         List<CapitalAccountBean> capitalAccountBeanList = investmentManagement.queryCapitalAccountAll()
                 .stream().filter(o -> accountIdSet.contains(o.getAcctNo())).collect(Collectors.toList());
-        if (CollectionUtils.isNotEmpty(capitalAccountBeanList)) {
+        if (CollectionUtils.isEmpty(capitalAccountBeanList)) {
             logger.info("no accountId, please wait...");
+            return;
         }
         for (CapitalAccountBean capitalAccountBean : capitalAccountBeanList) {
             // 筛选账号
