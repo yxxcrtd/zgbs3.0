@@ -154,6 +154,8 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         FinProductType finProductType = new FinProductType();
         BeanUtil.copyPropertiesIgnoreNull(finProductType, dto);
         finProductType.setBranch(0l);
+        finProductType.setType6(DictCodeList.信用保护凭证类型_信用保护凭证.getValue());
+        finProductType.setType7(DictCodeList.信用保护凭证类型_信用保护凭证.getValue());
         finProductType.setType8(DictCodeList.平安资产类型_信用保护凭证.getValue());
         finProductTypeMapper.insert(finProductType);
         //新增现金流信息

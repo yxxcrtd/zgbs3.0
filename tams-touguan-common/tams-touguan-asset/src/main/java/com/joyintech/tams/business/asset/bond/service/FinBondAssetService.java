@@ -6,10 +6,13 @@ import com.joyintech.calculation.shell.PriceByYieldCalculator;
 import com.joyintech.calculation.shell.YieldByPriceCalculator;
 import com.joyintech.calculation.shell.param.*;
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.file.SafelyFile;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.jdbc.datasource.DataSource;
+import com.joyintech.framework.jdbc.enums.DataSourceType;
 import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
@@ -18,6 +21,7 @@ import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.asset.bond.dao.FinBondAssetMapper;
 import com.joyintech.tams.business.asset.bond.dto.*;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
+import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
@@ -49,11 +53,14 @@ import com.joyintech.tams.invest.common.service.InvestInterfCommService;
 import com.joyintech.tams.systemtools.dao.JoyinFSMapper;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
+import com.joyintech.workflow.engine.entity.FlowEntity;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -179,6 +186,23 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
 
     public static final String ENTRUST_RECORD_DELETE = "delete";
 
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @DataSource(DataSourceType.MASERT)
+    public String checkForSubmit(FlowEntity entity, boolean isMutiApproval) {
+        if (isMutiApproval) {
+            // 业务编号
+            String workflowId = entity.getWorkflowId();
+            FinBondAssetSaveRequest finBondAssetSaveRequest = this.getBussinessEntityByWorkflowId(workflowId);
+            if(StringUtil.isNotEmpty(finBondAssetSaveRequest)){
+                int count1 = this.isTransInAssetTwo(finBondAssetSaveRequest.getFinprodId());
+                if (count1 > 0){
+                    return "存在流程中/待执行指令交易数据，不可修改";
+                }
+            }
+        }
+        return null;
+    }
 
     /**
      * 工作流（留痕操作结束的时候执行的方法）
@@ -343,9 +367,14 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             }
         }
         //转债信息（FIN_PRODUCT_CONVERTIBLE）
-        FinProductConvertible FinProductConvertible = entity.getProductConvertible();
-        if (StringUtil.isNotEmpty(FinProductConvertible)) {
-            finProductConvertibleMapper.updateByPrimaryKey(FinProductConvertible);
+        FinProductConvertible finProductConvertible = entity.getProductConvertible();
+        if (StringUtil.isNotEmpty(finProductConvertible)) {
+           FinProductConvertible finProductConvert = finProductConvertibleMapper.selectByPrimaryKey(entity.getFinprodId());
+            if (StringUtil.isNotEmpty(finProductConvert)) {
+                finProductConvertibleMapper.updateByPrimaryKey(finProductConvertible);
+            }else{
+                finProductConvertibleMapper.insertSelective(finProductConvertible);
+            }
         }
         //附件
         MstFileInputParameter mstFileInputParameter = entity.getMstFileInputParameter();
@@ -1374,8 +1403,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                         if(null!=dto.getVdate()){
                             if(DateUtil.compareTo(finCashPlanEntity.getMdate(), dto.getVdate())==-1
                                     ||DateUtil.compareTo(finCashPlanEntity.getMdate(), dto.getMdate())==1){
-                                resultList.add(new ValidMessage("",
-                                        getMessage("FIN_ASSET_E_0016")));
+                                resultList.add(new ValidMessage("付息计划的计息截止日必须在起息日与到期日之间"));
                             }
                         }
                     }
