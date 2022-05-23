@@ -2528,7 +2528,7 @@ public class CfetsTrdConfirmService extends BaseService{
         //分品种区别是否支持CSTP下行接口
         pageParam.put("bondSupportFlag",CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BOND"));
         pageParam.put("repoSupportFlag",CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_REPO"));
-        pageParam.put("repoSupportFlag",CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST"));
+        pageParam.put("bidSupportFlag",CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST"));
         return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsTrdConfirmMapper.findAllCstpInfoList(pageParam));
     }
     /**
