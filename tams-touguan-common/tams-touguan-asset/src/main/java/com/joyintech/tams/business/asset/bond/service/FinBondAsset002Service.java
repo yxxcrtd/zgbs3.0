@@ -12,6 +12,7 @@ import com.joyintech.tams.business.asset.bond.dao.FinBondAssetMapper;
 import com.joyintech.tams.common.base.dao.FinCashCalcRuleMapper;
 import com.joyintech.tams.common.base.dao.FinCashPlanMapper;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.business.asset.bond.dto.FinAssetRateAdjRequest;
@@ -73,6 +74,8 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
     @Autowired
     private FinBondAssetService finBondAssetService;
 
+    @Autowired
+    private CommonBusinessService commonBusinessService;
 
     /**
      * 初始化信息--前台分页 <功能详细描述>
@@ -87,10 +90,8 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
         List<FinAssetRateAdjResponse> finAssetRateAdjList = finBondAssetMapper.getfinAssetRateAdjByProductId(paramMap);
         for (FinAssetRateAdjResponse entity : finAssetRateAdjList) {
             String updateFlg = StringUtil.EMPTY;
-            if (StringUtil.equals(entity.getIsInitial(), DictCodeList.是否_是.getValue())) {
-                updateFlg = "02";
-            }
-            else if (DateUtil.compareDate(entity.getEffDate(), iPlatformDate.getSysDate()) == -1) {
+            if (commonBusinessService.isTransInAsset(entity.getFinprodId())!=0 &&
+                    DateUtil.compareDate(entity.getEffDate(), iPlatformDate.getSysDate()) == -1) {
                 updateFlg = "02";
             }
             else {
