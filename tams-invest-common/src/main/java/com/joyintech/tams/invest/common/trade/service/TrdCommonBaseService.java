@@ -1263,7 +1263,7 @@ public class TrdCommonBaseService extends BaseService {
         // 关联交易编号
         String fTradeId = (String) paraMap.get("fTradeId");
 
-        String interfaceType = MapUtils.getString(paraMap, "interfaceType");
+        String interfaceType = MapUtils.getString(paraMap, "interfaceType", "");
 
         if(!StringUtil.isEmpty(dealNo)){
             // 查询关联交易编号
