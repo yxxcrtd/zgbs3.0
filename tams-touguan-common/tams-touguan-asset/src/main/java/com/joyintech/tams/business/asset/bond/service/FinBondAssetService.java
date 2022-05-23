@@ -1374,8 +1374,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                         if(null!=dto.getVdate()){
                             if(DateUtil.compareTo(finCashPlanEntity.getMdate(), dto.getVdate())==-1
                                     ||DateUtil.compareTo(finCashPlanEntity.getMdate(), dto.getMdate())==1){
-                                resultList.add(new ValidMessage("",
-                                        getMessage("FIN_ASSET_E_0016")));
+                                resultList.add(new ValidMessage("付息计划的计息截止日必须在起息日与到期日之间"));
                             }
                         }
                     }
