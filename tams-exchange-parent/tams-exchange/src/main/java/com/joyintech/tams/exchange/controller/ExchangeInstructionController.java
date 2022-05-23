@@ -84,7 +84,9 @@ public class ExchangeInstructionController {
         }
         String fairCode = CacheUtil.getSysParam(ExchangeConstant.FAIR_CODE_IN_PARA);
         String platDate = DateUtil.getSysDate();
-        String approveCode = CacheUtil.getSysParam(ExchangeConstant.RISK_APPROVAL_IN_PARA);
+        // 写死02防止场内下单时调用tams-customer-interf 进行风险占用，根本原因考虑修改场内下单风险代码，不需要调用外部风险
+        // String approveCode = CacheUtil.getSysParam(ExchangeConstant.RISK_APPROVAL_IN_PARA);
+        String approveCode = "02";
         String tradeTimeSwitch = CacheUtil.getSysParam(ExchangeConstant.ETR_TRADE_TIME_SWITCH);
         String fairModeEntrustPriceBestThanInstruction = CacheUtil.getSysParam(ExchangeConstant.FAIR_MODE_ENTRUST_PRICE_BEST_THAN_INSTRUCTION_IN_PARA);
         String fairModeWithUnacceptInstruction = CacheUtil.getSysParam(ExchangeConstant.FAIR_MODE_WITH_UNACCEPT_INSTRUCTION_IN_PARA);
