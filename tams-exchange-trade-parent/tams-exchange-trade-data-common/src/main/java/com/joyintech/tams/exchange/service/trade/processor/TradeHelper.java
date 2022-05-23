@@ -1213,12 +1213,14 @@ public class TradeHelper {
         Instruction instruction = instructionService.findById(integratedEntrust.getInstructionId());
 
         BigDecimal entrustPrice = integratedEntrust.getEntrustPrice();
-        if (StringUtil.equals("Y", instruction.getIsNetPrice())) {
-            integratedEntrust.setIsFullPrice(FullPriceConst.NET_PRICE.value);
-        } else {
-            integratedEntrust.setIsFullPrice(FullPriceConst.FULL_PRICE.value);
-
-            entrustPrice = integratedEntrust.getFullPrice();
+        if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())
+                && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
+            if (StringUtil.equals("Y", instruction.getIsNetPrice())) {
+                integratedEntrust.setIsFullPrice(FullPriceConst.NET_PRICE.value);
+            } else {
+                integratedEntrust.setIsFullPrice(FullPriceConst.FULL_PRICE.value);
+                entrustPrice = integratedEntrust.getFullPrice();
+            }
         }
 
         ErrorCode errorCode = commonCheckHelper.instructionCheck(instruction, integratedEntrust, entrustPrice, tradingDay);
