@@ -471,8 +471,10 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 			BigDecimal availableNum = etrTradeCommonervice.selectAvailableNum(dto);
 			if(availableNum == null) {
 				availableNum= BigDecimal.ZERO;
+			}else{
+				availableNum=ArithmeticUtil.divide(availableNum,new BigDecimal(100),2);
 			}
-			String availableNumStr=availableNum.setScale(2,RoundingMode.HALF_UP).toString();
+			String availableNumStr=availableNum.toString();
 			return new Message<>(availableNumStr);
 		} catch (Exception e) {
 			logger.error("查询功能异常", e);
