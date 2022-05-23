@@ -338,7 +338,7 @@
                             WHERE A.WORKFLOW_ID = B.WORKFLOW_ID)
                             AND T.SEQ_NO = A.SEQ_NO)
                             AND T.PROCESS_STATE IN ('ING')
-                            AND T.BUSINESS_TYPE='ETR54') nextApp
+                            AND T.BUSINESS_TYPE='ETR18') nextApp
             ) nextUser ON ee.Workflow_Id=nextUser.workFlowId
         WHERE ee.ENTRUST_NUM != 0
 	    AND ee.ENTRUST_NUM IS NOT NULL
