@@ -232,6 +232,21 @@
 
         WHERE ee.ENTRUST_ID = #{entrustId}
     </select>
+    <select id="getBidOrderTransactionDetails" resultType="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirsBidFirmBidOrderDetailDto">
+        SELECT
+            eebp.PORTFOLIO_ID portfolioId,
+            pp.PORTFOLIO_NAME  portfolioName,
+            eebp.BID_PRICE bidPrice,
+            eebp.BID_PRIN_AMT  bidPrinAmt,
+            eed.INV_AIM  businessModel,
+            eed.ENTRUST_NUM/100 portfolioTotalBidPrinAmt
+        FROM ETR_ENTRUST ee
+                 left join ETR_ENTRUST_BID_PRICE eebp ON eebp.ENTRUST_ID  = ee.ENTRUST_ID
+                 LEFT JOIN ETR_ENTRUST_DETAIL eed ON eed.ENTRUST_ID  = eebp.ENTRUST_ID AND eed.PORTFOLIO_ID  = eebp.PORTFOLIO_ID
+                 left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = eebp.PORTFOLIO_ID
+
+        WHERE ee.ENTRUST_ID = #{entrustId}
+    </select>
     <select id="tenderSearch" resultType="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmTenderInfoDto">
 
     select T.validStatus,
