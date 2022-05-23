@@ -311,15 +311,15 @@ public class CommonCheckHelper {
         if (InvestmentAssetType.BOND.codeEquals(instruction.getAssetType())
                 && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
             String priceMode = instruction.getPriceMode();
-            String isNetPrice = instruction.getIsNetPrice();
+            String isFullPrice = order.getIsFullPrice();
             if (StringUtil.equals(priceMode, InstructionPriceMode.SPECIFIED.value)) {
-                if (StringUtil.equals("Y", isNetPrice)) {
+                if (StringUtil.equals(FullPriceConst.NET_PRICE.value, isFullPrice)) {
                     return !TradeUtils.equals(orderPrice, instruction.getEntrustPrice());
                 } else {
                     return !TradeUtils.equals(orderPrice, instruction.getFullPrice());
                 }
             } else if (StringUtil.equals(priceMode, InstructionPriceMode.FIXED.value)) {
-                if (StringUtil.equals("Y", isNetPrice)) {
+                if (StringUtil.equals(FullPriceConst.NET_PRICE.value, isFullPrice)) {
                     return checkPriceFixed(order, instruction.getEntrustPrice(), orderPrice);
                 } else {
                     return checkPriceFixed(order, instruction.getFullPrice(), orderPrice);
