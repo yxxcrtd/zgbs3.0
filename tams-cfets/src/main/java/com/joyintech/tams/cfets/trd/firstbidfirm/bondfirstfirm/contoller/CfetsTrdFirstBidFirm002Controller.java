@@ -413,14 +413,14 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
     }
 
 
-    @ApiOperation(value = "当日申购撤销检查", notes = "当日申购撤销检查")
+    //    @ApiOperation(value = "当日申购撤销检查", notes = "当日申购撤销检查")
     @ResponseBody
     @PostMapping("/checkDaySubRevokeCheck")
     public Message<AjaxResult> checkDaySubRevokeCheck(@RequestBody CfetsBondFirstSubCheckRequst requst) {
         return new Message<AjaxResult>().success().setData(cfetsTrdFirstBidFirm002Service.checkDayRegRevokeCheck(requst));
     }
 
-    @ApiOperation(value = "当日申购撤销", notes = "当日申购撤销")
+    //    @ApiOperation(value = "当日申购撤销", notes = "当日申购撤销")
     @ResponseBody
     @PostMapping("subRevoke")
     public Message<AjaxResult> subRevoke(@RequestBody CfetsBondFirstSubCheckRequst requst) throws WorkFlowException {

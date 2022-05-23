@@ -16,9 +16,7 @@ import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.cfets.etrdispatcher.service.CfetsEtrDispatcherService;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dao.CfetsTrdFirstBidFirm001Mapper;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmEntrustRequest;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmUndoSumRequest;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.*;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBondFirstSub001Service;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.entity.EtrDistribute;
@@ -329,6 +327,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
 
     /**
      * 指令取消汇总
+     *
      * @param cfetsDto
      * @return
      */
@@ -338,5 +337,33 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
 
     public Map<String, Object> getEntrustInfo(String entrustId) {
         return null;
+    }
+
+    /**
+     * 投标查询
+     *
+     * @param request 查询条件
+     * @return java.util.List<com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmTenderInfoDto>
+     * @author jiangpeng
+     * @date 2022/5/23 16:58
+     */
+    public Page<CfetsTrdFirstBidFirmTenderInfoDto> tenderSearch(CfetsTrdFirstBidFirmTenderInfoRequest request) {
+        Map<String, Object> param = BeanUtil.object2Map(request);
+        this.setParam(param);
+        return super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> cfetsTrdFirstBidFirm001Mapper.tenderSearch(param));
+    }
+
+    /**
+     * 分销买入查询
+     *
+     * @param request 查询条件
+     * @return com.joyintech.framework.grid.Page<com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmDistributionInfoDto>
+     * @author jiangpeng
+     * @date 2022/5/23 16:58
+     */
+    public Page<CfetsTrdFirstBidFirmDistributionInfoDto> distributionSearch(CfetsTrdFirstBidFirmDistributionInfoRequest request) {
+        Map<String, Object> param = BeanUtil.object2Map(request);
+        this.setParam(param);
+        return super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> cfetsTrdFirstBidFirm001Mapper.distributionSearch(param));
     }
 }
