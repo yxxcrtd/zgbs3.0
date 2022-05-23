@@ -1387,6 +1387,9 @@
         <if test="quoteid != null and !''.equals(quoteid)">
             and 1 = 2
         </if>
+        <if test="bidSupportFlag != null and bidSupportFlag!=''">
+            and 'Y'= #{bidSupportFlag,jdbcType=VARCHAR}
+        </if>
         <if test="traderidList!=null and traderidList.size() > 0">
             AND icb.SUBSCRIBE_INSTITUTION_ID IN
             <foreach collection="traderidList" item="item" separator="," open="(" close=")">
