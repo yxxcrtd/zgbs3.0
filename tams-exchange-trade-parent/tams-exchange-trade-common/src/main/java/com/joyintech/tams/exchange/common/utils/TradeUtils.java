@@ -3,6 +3,7 @@ package com.joyintech.tams.exchange.common.utils;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.exchange.common.constant.EntrustBs;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
+import com.joyintech.tams.exchange.common.constant.InstructionPs;
 import com.joyintech.tams.exchange.common.constant.InvestmentAssetType;
 import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
@@ -15,7 +16,7 @@ import java.util.Date;
 import java.util.Objects;
 
 public class TradeUtils {
-    
+
     private TradeUtils() {
         throw new IllegalStateException("Utility class");
     }
@@ -250,6 +251,19 @@ public class TradeUtils {
         if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(assetType)) {
             return new BigDecimal(entrustVolume * 100).setScale(2, RoundingMode.HALF_UP);
         }
+        return multiply(entrustPrice, entrustVolume, 2);
+    }
+
+    public static BigDecimal calculateBalanceForRisk(BigDecimal fullPrice, BigDecimal entrustPrice, long entrustVolume, String assetType, String ps) {
+        // 质押式竞价回购，金额计算
+        if (InvestmentAssetType.PLEDGE_REPURCHASE.value.equals(assetType)) {
+            return new BigDecimal(entrustVolume * 100).setScale(2, RoundingMode.HALF_UP);
+        }
+        if (InvestmentAssetType.BOND.value.equals(assetType)
+                && EnumUtil.in(ps, InstructionPs.BUY, InstructionPs.SELL)) {
+            return multiply(fullPrice, entrustVolume, 2);
+        }
+
         return multiply(entrustPrice, entrustVolume, 2);
     }
 

@@ -61,6 +61,16 @@ public class WflBidOrderBidPrice extends WflBidOrderBidPriceKey {
     private BigDecimal subscriptionAmount;
 
     /**
+     * 应缴款金额
+     */
+    private BigDecimal payableAmount;
+
+    /**
+     * 结算服务费
+     */
+    private BigDecimal settFeeAmt;
+
+    /**
      * 前置投标编
      */
     private String pBidId;
@@ -264,6 +274,43 @@ public class WflBidOrderBidPrice extends WflBidOrderBidPriceKey {
      */
     public void setSubscriptionAmount(BigDecimal subscriptionAmount) {
         this.subscriptionAmount = subscriptionAmount;
+    }
+
+    /**
+     * 应缴款金额
+     *
+     * @return PAYABLE_AMOUNT 应缴款金额
+     */
+    public BigDecimal getPayableAmount() {
+        return payableAmount;
+    }
+
+
+    /**
+     * 应缴款金额
+     *
+     * @param payableAmount 应缴款金额
+     */
+    public void setPayableAmount(BigDecimal payableAmount) {
+        this.payableAmount = payableAmount;
+    }
+
+    /**
+     * 结算服务费
+     *
+     * @return SETT_FEE_AMT 结算服务费
+     */
+    public BigDecimal getSettFeeAmt() {
+        return settFeeAmt;
+    }
+
+    /**
+     * 结算服务费
+     *
+     * @param settFeeAmt 结算服务费
+     */
+    public void setSettFeeAmt(BigDecimal settFeeAmt) {
+        this.settFeeAmt = settFeeAmt;
     }
 
     /**

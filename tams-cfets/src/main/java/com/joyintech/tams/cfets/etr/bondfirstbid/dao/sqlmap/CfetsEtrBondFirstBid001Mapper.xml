@@ -74,13 +74,13 @@
         SELECT
             decode(ee.ENTRUST_STATUS,'08','流程中','有效') AS effectiveStatusName,
             ee.ENTRUST_STATUS entrustStatus,
-            nvl(efs.ENT_FINISH_AMT, 0)               execFinishAmt,
-            nvl(ee.ENTRUST_NUM*100,0) -  nvl(efs.ENT_FINISH_AMT, 0) execRemainderAmt,
+            trunc(nvl(efs.ENT_FINISH_AMT, 0)/10000, 2)               execFinishAmt,
+            trunc((nvl(ee.ENTRUST_NUM*100,0) -  nvl(efs.ENT_FINISH_AMT, 0))/10000,2) execRemainderAmt,
             trunc(nvl(efs.ENT_FINISH_AMT, 0) /
             case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
             100                                      execProcess,
-            nvl(tpd.SHARE_AMT * 100, 0)                    transFinishAmt,
-            nvl(ee.ENTRUST_NUM*100,0) -  nvl(tpd.SHARE_AMT * 100, 0) transRemainderAmt,
+            trunc(nvl(tpd.SHARE_AMT * 100, 0)/10000,2)                   transFinishAmt,
+            trunc((nvl(ee.ENTRUST_NUM*100,0) -  nvl(tpd.SHARE_AMT * 100, 0))/10000,2) transRemainderAmt,
             trunc(nvl(tpd.SHARE_AMT * 100, 0) /
             case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
             100                                      transProcess,
@@ -196,7 +196,8 @@
             </foreach>
         </if>
         <if test="entrustId != null and entrustId != ''">
-            AND ee.ENTRUST_ID = #{entrustId}
+            AND (ee.ENTRUST_ID = #{entrustId} OR
+            ee.ENTRUST_ID  LIKE concat('%',concat(#{entrustId,jdbcType=VARCHAR},'%')) )
         </if>
         <if test="entrustStatus != null and entrustStatus.size() > 0">
             AND ee.ENTRUST_STATUS in
@@ -219,13 +220,13 @@
         SELECT
             decode(ee.ENTRUST_STATUS,'08','流程中','有效') AS effectiveStatusName,
             ee.ENTRUST_STATUS entrustStatus,
-            nvl(efs.ENT_FINISH_AMT, 0)               execFinishAmt,
-            nvl(ee.ENTRUST_NUM*100,0) -  nvl(efs.ENT_FINISH_AMT, 0) execRemainderAmt,
+            trunc(nvl(efs.ENT_FINISH_AMT, 0)/10000, 2)               execFinishAmt,
+            trunc((nvl(ee.ENTRUST_NUM*100,0) -  nvl(efs.ENT_FINISH_AMT, 0))/10000,2) execRemainderAmt,
             trunc(nvl(efs.ENT_FINISH_AMT, 0) /
             case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
             100                                      execProcess,
-            nvl(tpd.SHARE_AMT * 100, 0)                    transFinishAmt,
-            nvl(ee.ENTRUST_NUM*100,0) -  nvl(tpd.SHARE_AMT * 100, 0) transRemainderAmt,
+            trunc(nvl(tpd.SHARE_AMT * 100, 0)/10000,2)                   transFinishAmt,
+            trunc((nvl(ee.ENTRUST_NUM*100,0) -  nvl(tpd.SHARE_AMT * 100, 0))/10000,2) transRemainderAmt,
             trunc(nvl(tpd.SHARE_AMT * 100, 0) /
             case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
             100                                      transProcess,
@@ -337,7 +338,7 @@
                             WHERE A.WORKFLOW_ID = B.WORKFLOW_ID)
                             AND T.SEQ_NO = A.SEQ_NO)
                             AND T.PROCESS_STATE IN ('ING')
-                            AND T.BUSINESS_TYPE='ETR54') nextApp
+                            AND T.BUSINESS_TYPE='ETR18') nextApp
             ) nextUser ON ee.Workflow_Id=nextUser.workFlowId
         WHERE ee.ENTRUST_NUM != 0
 	    AND ee.ENTRUST_NUM IS NOT NULL
@@ -362,7 +363,8 @@
             </foreach>
         </if>
         <if test="entrustId != null and entrustId != ''">
-            AND ee.ENTRUST_ID = #{entrustId}
+            AND (ee.ENTRUST_ID = #{entrustId} OR
+            ee.ENTRUST_ID  LIKE concat('%',concat(#{entrustId,jdbcType=VARCHAR},'%')) )
         </if>
         <if test="entrustStatus != null and entrustStatus.size() > 0">
             AND ee.ENTRUST_STATUS in
@@ -542,7 +544,7 @@
             CASE WHEN <![CDATA[
                 ISSUE.ISSUE_DATE >= TO_DATE(#{platformDate},'YYYY-MM-DD') or
                              ISSUE.TENDER_EDATE >= TO_DATE(#{platformDate},'YYYY-MM-DD')  THEN '01'
-                     WHEN PRODUCT_ADD.LISTING_DATE >= TO_DATE(#{platformDate},'YYYY-MM-DD') THEN '02'
+                     WHEN PRODUCT_ADD.LISTING_DATE > TO_DATE(#{platformDate},'YYYY-MM-DD') THEN '02'
                 ]]>
             ELSE NULL END AS issueStage,
             CASE

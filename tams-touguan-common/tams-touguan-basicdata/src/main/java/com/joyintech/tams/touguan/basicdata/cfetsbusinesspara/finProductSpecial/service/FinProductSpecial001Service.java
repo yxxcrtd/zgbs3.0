@@ -4,10 +4,14 @@ import com.google.common.collect.Lists;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.common.base.dao.FinProductSpecialMapper;
 import com.joyintech.tams.common.base.dao.WflFinProductSpecialMapper;
 import com.joyintech.tams.common.base.entity.FinProductSpecial;
 import com.joyintech.tams.common.base.entity.WflFinProductSpecial;
+import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
+import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.invest.common.dto.common.ExcelValidDto;
@@ -37,6 +41,8 @@ import java.util.Objects;
 @Service
 public class FinProductSpecial001Service extends BaseService<FinProductSpecialDto> implements BaseProcessService<FinProductSpecialDto> {
 
+    @Autowired
+    private MstWorkflowCommonService mstWorkflowCommonServie;
     @Autowired
     private FinProductSpecial001Mapper finProductSpecial001Mapper;
     @Autowired
@@ -84,12 +90,18 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
 
     @Override
     public void doComplete(FinProductSpecialDto entity, OperationType type) {
-        //删除流程表
-        if (Objects.nonNull(type)) {
-            delWflData(entity.getWorkflowId());
+        if (OperationType.DELETE == type) {
+            this.delWflData(entity.getWorkflowId());
+            this.delData(entity.getFinprodMarketId());
+        } else if (OperationType.NEW == type) {
+            if (Objects.nonNull(type)) {
+                delWflData(entity.getWorkflowId());
+            }
+            //记录业务表
+            insertData(entity);
+        } else if (OperationType.MODIFY == type) {
+//            this.update(dto);
         }
-        //记录业务表
-        insertData(entity);
     }
 
     /**
@@ -124,6 +136,15 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
      */
     private void delWflData(String workflowId) {
         wflFinProductSpecialMapper.deleteByWorkflowId(workflowId);
+    }
+
+    /**
+     * 删除业务表
+     *
+     * @param finprodMarketId
+     */
+    private void delData(String finprodMarketId) {
+        finProductSpecialMapper.deleteByFinprodMarketId(finprodMarketId);
     }
 
     /**
@@ -183,6 +204,25 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
             entities.add(entity);
         }
         return entities;
+    }
+
+    /**
+     * 校验流程中数据
+     *
+     * @param businessId
+     * @param pageId
+     * @return
+     */
+    public List<ValidMessage> isInWflProcess(String businessId, String pageId) {
+        //check流程中
+        List<ValidMessage> validList = new ArrayList<>();
+        WflValidInputParameter wflValidInputParameter = new WflValidInputParameter();
+        wflValidInputParameter.setPageId(pageId);
+        wflValidInputParameter.setBusinessDataPk1(businessId);
+        if (StringUtil.isNotEmpty(mstWorkflowCommonServie) && mstWorkflowCommonServie.isInWflProcess(wflValidInputParameter)) {
+            validList.add(new ValidMessage(getMessage("BUSS_COM_E_0023")));
+        }
+        return validList;
     }
 
 

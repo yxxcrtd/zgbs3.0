@@ -2528,7 +2528,7 @@ public class CfetsTrdConfirmService extends BaseService{
         //分品种区别是否支持CSTP下行接口
         pageParam.put("bondSupportFlag",CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BOND"));
         pageParam.put("repoSupportFlag",CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_REPO"));
-        pageParam.put("repoSupportFlag",CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST"));
+        pageParam.put("bidSupportFlag",CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST"));
         return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsTrdConfirmMapper.findAllCstpInfoList(pageParam));
     }
     /**
@@ -2897,14 +2897,15 @@ public class CfetsTrdConfirmService extends BaseService{
             pageParam.put("finprodIdList", StringUtil.splitToList(GlobalConstant.COMMA,finprodId));
         }
 
+        pageParam.put("assetType", pageParam.get("finprodType2"));
         String regAssetType= (String)pageParam.get("regAssetType");
         if(StringUtil.isNotEmpty(regAssetType)) {
             if (StringUtil.equals(regAssetType, "01")) {
-                pageParam.put("regAssetType", "BOND");
+                pageParam.put("finprodType2", "BOND");
             } else if (StringUtil.equals(regAssetType, "02")) {
-                pageParam.put("regAssetType", "REPO");
+                pageParam.put("finprodType2", "REPO");
             } else if (StringUtil.equals(regAssetType, "03")) {
-                pageParam.put("regAssetType", "BID");
+                pageParam.put("finprodType2", "BID");
             }
         }
         if (StringUtil.equals(dto.getSettleSpeed(),
@@ -3061,15 +3062,21 @@ public class CfetsTrdConfirmService extends BaseService{
         CfetsTrdConfirmMatchDto matchDto=new CfetsTrdConfirmMatchDto();
         //是否支持CSTP下行接口_现券买卖
         String support_cstp_flag_bond=CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BOND");
+        logger.info("是否支持CSTP下行接口_现券买卖:" + support_cstp_flag_bond);
         //是否支持CSTP下行接口_质押式回购
-        String support_cstp_flag_repo=CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_REPO");
+        String support_cstp_flag_repo = CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_REPO");
+        logger.info("是否支持CSTP下行接口_质押式回购:" + support_cstp_flag_repo);
         //是否支持CSTP下行接口_一级申购
         String isSupportCstpFlagBondfirst = CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST");
+        logger.info("是否支持CSTP下行接口_一级申购:" + isSupportCstpFlagBondfirst);
         if (StringUtil.isNotEmpty(interfTradSecdeal) && StringUtil.equals(support_cstp_flag_bond, DictCodeList.是否_是.getValue())) {
+            logger.info("银行间CSTP成交回报-现券买卖匹配报文:" + JsonUtils.object2Json(interfTradSecdeal));
             matchDto = cstpSecTradeAutoMatch(interfTradSecdeal, iCstpTrade);
         } else if (StringUtil.isNotEmpty(interfOpicsTradRepo) && StringUtil.equals(support_cstp_flag_repo, DictCodeList.是否_是.getValue())) {
+            logger.info("银行间CSTP成交回报-质押式回购匹配报文:" + JsonUtils.object2Json(interfOpicsTradRepo));
             matchDto = cstpRepoTradeAutoMatch(interfOpicsTradRepo, iCstpTrade);
         } else if (StringUtil.isNotEmpty(interfCstpBjfxjg) && StringUtil.equals(isSupportCstpFlagBondfirst, DictCodeList.是否_是.getValue())) {
+            logger.info("银行间CSTP成交回报-一级申购匹配报文:" + JsonUtils.object2Json(interfCstpBjfxjg));
             matchDto = cstpBidTradeAutoMatch(interfCstpBjfxjg);
         }
         if(!StringUtil.isNotEmpty(matchDto)){
@@ -3112,7 +3119,7 @@ public class CfetsTrdConfirmService extends BaseService{
                     entity.setOprType(DictCodeListExt3.操作类型_自动匹配确认.getValue());
                     //成交确认提交方法
                     cfetsTrdConfirm001Service.doCompleteRepoMethod(entity,OperationType.NEW,false);
-                } else {
+                } else if(StringUtil.isNotEmpty(regInfo.getTotleTradeId())){
                     //对dto进行封装
                     CfetsTrdFirstBondInvestTradeDto entity = this.prepareBidEntity(regInfo.getTotleTradeId(), DictCodeListExt1.生成方式_接口接入.getValue());
                     CfetsTrdConfirmMatchDto oldMatchDto = entity.getCfetsTrdConfirmMatchDto();

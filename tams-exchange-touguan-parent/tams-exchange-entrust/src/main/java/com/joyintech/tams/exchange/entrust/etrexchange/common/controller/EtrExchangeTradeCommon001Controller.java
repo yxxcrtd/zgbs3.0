@@ -1078,7 +1078,7 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 			return ajax;
 		}
 
-		String confirmMsg = "";
+		String confirmMsg = etrExchangeTradeCommonValidatorService.isNameSoftControl(dto);
 		if (StringUtils.equals(dto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
 			Map<String, Object> pageParam = new HashMap<String, Object>();
 			Date sysDate = DateUtil.platDateFromCache();

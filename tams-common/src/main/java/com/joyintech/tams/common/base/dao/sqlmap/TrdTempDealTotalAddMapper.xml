@@ -1,0 +1,532 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.joyintech.tams.common.base.dao.TrdTempDealTotalAddMapper">
+  <resultMap id="BaseResultMap" type="com.joyintech.tams.common.base.entity.TrdTempDealTotalAdd">
+    <id column="TOTLE_TRADE_ID" jdbcType="VARCHAR" property="totleTradeId" />
+    <result column="ENTRUST_ID" jdbcType="VARCHAR" property="entrustId" />
+    <result column="OUR_SHARE_AMT" jdbcType="DECIMAL" property="ourShareAmt" />
+    <result column="LENDIN_SHARE_AMT" jdbcType="DECIMAL" property="lendinShareAmt" />
+    <result column="OUR_CPRICE_AMT" jdbcType="DECIMAL" property="ourCpriceAmt" />
+    <result column="LENDIN_CPRICE_AMT" jdbcType="DECIMAL" property="lendinCpriceAmt" />
+    <result column="OUR_FPRICE_AMT" jdbcType="DECIMAL" property="ourFpriceAmt" />
+    <result column="LENDIN_FPRICE_AMT" jdbcType="DECIMAL" property="lendinFpriceAmt" />
+    <result column="OUR_FPRICE_AMT2" jdbcType="DECIMAL" property="ourFpriceAmt2" />
+    <result column="LENDIN_FPRICE_AMT2" jdbcType="DECIMAL" property="lendinFpriceAmt2" />
+    <result column="PURCH_MODLE" jdbcType="VARCHAR" property="purchModle" />
+    <result column="PURCH_TYPE" jdbcType="VARCHAR" property="purchType" />
+    <result column="PURCH_DATE" jdbcType="TIMESTAMP" property="purchDate" />
+    <result column="PUR_PAY_DATE" jdbcType="TIMESTAMP" property="purPayDate" />
+    <result column="PUR_CFM_DATE" jdbcType="TIMESTAMP" property="purCfmDate" />
+    <result column="PUR_AMT" jdbcType="DECIMAL" property="purAmt" />
+    <result column="DEPOSIT_AMT" jdbcType="DECIMAL" property="depositAmt" />
+    <result column="FIRST_UNIT_CPRICE3" jdbcType="DECIMAL" property="firstUnitCprice3" />
+    <result column="EXP_CON_VALUE" jdbcType="DECIMAL" property="expConValue" />
+    <result column="PREB" jdbcType="DECIMAL" property="preb" />
+    <result column="PREC" jdbcType="DECIMAL" property="prec" />
+    <result column="SPO_SHARE_NUM" jdbcType="DECIMAL" property="spoShareNum" />
+    <result column="DEVIATION" jdbcType="DECIMAL" property="deviation" />
+    <result column="CONVERSION_RAT" jdbcType="DECIMAL" property="conversionRat" />
+    <result column="BCON_UNIT_CPRICE2" jdbcType="DECIMAL" property="bconUnitCprice2" />
+    <result column="CONVERSION_TYPE" jdbcType="VARCHAR" property="conversionType" />
+    <result column="ASSET_RECOMMAND_ORG" jdbcType="VARCHAR" property="assetRecommandOrg" />
+    <result column="TERMINATE_RATE" jdbcType="DECIMAL" property="terminateRate" />
+    <result column="MP_FINPROD_ID" jdbcType="VARCHAR" property="mpFinprodId" />
+    <result column="MP_BRANCH" jdbcType="DECIMAL" property="mpBranch" />
+    <result column="IS_CASHSET" jdbcType="VARCHAR" property="isCashset" />
+    <result column="GEN_TYPE" jdbcType="VARCHAR" property="genType" />
+    <result column="CREATE_USER" jdbcType="VARCHAR" property="createUser" />
+    <result column="CREATE_DEPT" jdbcType="VARCHAR" property="createDept" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="UPDATE_USER" jdbcType="VARCHAR" property="updateUser" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="PENALTY_INTAMT" jdbcType="DECIMAL" property="penaltyIntamt" />
+    <result column="INT_SETT_TYPE" jdbcType="VARCHAR" property="intSettType" />
+    <result column="CLEAR_REC_AMT" jdbcType="DECIMAL" property="clearRecAmt" />
+    <result column="CLEAR_LOSS_AMT" jdbcType="DECIMAL" property="clearLossAmt" />
+    <result column="OU_PARTY_ID" jdbcType="VARCHAR" property="ouPartyId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    TOTLE_TRADE_ID, ENTRUST_ID, OUR_SHARE_AMT, LENDIN_SHARE_AMT, OUR_CPRICE_AMT, LENDIN_CPRICE_AMT, 
+    OUR_FPRICE_AMT, LENDIN_FPRICE_AMT, OUR_FPRICE_AMT2, LENDIN_FPRICE_AMT2, PURCH_MODLE, 
+    PURCH_TYPE, PURCH_DATE, PUR_PAY_DATE, PUR_CFM_DATE, PUR_AMT, DEPOSIT_AMT, FIRST_UNIT_CPRICE3, 
+    EXP_CON_VALUE, PREB, PREC, SPO_SHARE_NUM, DEVIATION, CONVERSION_RAT, BCON_UNIT_CPRICE2, 
+    CONVERSION_TYPE, ASSET_RECOMMAND_ORG, TERMINATE_RATE, MP_FINPROD_ID, MP_BRANCH, IS_CASHSET, 
+    GEN_TYPE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, PENALTY_INTAMT, 
+    INT_SETT_TYPE, CLEAR_REC_AMT, CLEAR_LOSS_AMT, OU_PARTY_ID
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from TRD_TEMP_DEAL_TOTAL_ADD
+    where TOTLE_TRADE_ID = #{totleTradeId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from TRD_TEMP_DEAL_TOTAL_ADD
+    where TOTLE_TRADE_ID = #{totleTradeId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.TrdTempDealTotalAdd">
+    insert into TRD_TEMP_DEAL_TOTAL_ADD (TOTLE_TRADE_ID, ENTRUST_ID, OUR_SHARE_AMT, 
+      LENDIN_SHARE_AMT, OUR_CPRICE_AMT, LENDIN_CPRICE_AMT, 
+      OUR_FPRICE_AMT, LENDIN_FPRICE_AMT, OUR_FPRICE_AMT2, 
+      LENDIN_FPRICE_AMT2, PURCH_MODLE, PURCH_TYPE, 
+      PURCH_DATE, PUR_PAY_DATE, PUR_CFM_DATE, 
+      PUR_AMT, DEPOSIT_AMT, FIRST_UNIT_CPRICE3, 
+      EXP_CON_VALUE, PREB, PREC, 
+      SPO_SHARE_NUM, DEVIATION, CONVERSION_RAT, 
+      BCON_UNIT_CPRICE2, CONVERSION_TYPE, ASSET_RECOMMAND_ORG, 
+      TERMINATE_RATE, MP_FINPROD_ID, MP_BRANCH, 
+      IS_CASHSET, GEN_TYPE, CREATE_USER, 
+      CREATE_DEPT, CREATE_TIME, UPDATE_USER, 
+      UPDATE_TIME, PENALTY_INTAMT, INT_SETT_TYPE, 
+      CLEAR_REC_AMT, CLEAR_LOSS_AMT, OU_PARTY_ID
+      )
+    values (#{totleTradeId,jdbcType=VARCHAR}, #{entrustId,jdbcType=VARCHAR}, #{ourShareAmt,jdbcType=DECIMAL}, 
+      #{lendinShareAmt,jdbcType=DECIMAL}, #{ourCpriceAmt,jdbcType=DECIMAL}, #{lendinCpriceAmt,jdbcType=DECIMAL}, 
+      #{ourFpriceAmt,jdbcType=DECIMAL}, #{lendinFpriceAmt,jdbcType=DECIMAL}, #{ourFpriceAmt2,jdbcType=DECIMAL}, 
+      #{lendinFpriceAmt2,jdbcType=DECIMAL}, #{purchModle,jdbcType=VARCHAR}, #{purchType,jdbcType=VARCHAR}, 
+      #{purchDate,jdbcType=TIMESTAMP}, #{purPayDate,jdbcType=TIMESTAMP}, #{purCfmDate,jdbcType=TIMESTAMP}, 
+      #{purAmt,jdbcType=DECIMAL}, #{depositAmt,jdbcType=DECIMAL}, #{firstUnitCprice3,jdbcType=DECIMAL}, 
+      #{expConValue,jdbcType=DECIMAL}, #{preb,jdbcType=DECIMAL}, #{prec,jdbcType=DECIMAL}, 
+      #{spoShareNum,jdbcType=DECIMAL}, #{deviation,jdbcType=DECIMAL}, #{conversionRat,jdbcType=DECIMAL}, 
+      #{bconUnitCprice2,jdbcType=DECIMAL}, #{conversionType,jdbcType=VARCHAR}, #{assetRecommandOrg,jdbcType=VARCHAR}, 
+      #{terminateRate,jdbcType=DECIMAL}, #{mpFinprodId,jdbcType=VARCHAR}, #{mpBranch,jdbcType=DECIMAL}, 
+      #{isCashset,jdbcType=VARCHAR}, #{genType,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, 
+      #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{penaltyIntamt,jdbcType=DECIMAL}, #{intSettType,jdbcType=VARCHAR}, 
+      #{clearRecAmt,jdbcType=DECIMAL}, #{clearLossAmt,jdbcType=DECIMAL}, #{ouPartyId,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.TrdTempDealTotalAdd">
+    insert into TRD_TEMP_DEAL_TOTAL_ADD
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="totleTradeId != null">
+        TOTLE_TRADE_ID,
+      </if>
+      <if test="entrustId != null">
+        ENTRUST_ID,
+      </if>
+      <if test="ourShareAmt != null">
+        OUR_SHARE_AMT,
+      </if>
+      <if test="lendinShareAmt != null">
+        LENDIN_SHARE_AMT,
+      </if>
+      <if test="ourCpriceAmt != null">
+        OUR_CPRICE_AMT,
+      </if>
+      <if test="lendinCpriceAmt != null">
+        LENDIN_CPRICE_AMT,
+      </if>
+      <if test="ourFpriceAmt != null">
+        OUR_FPRICE_AMT,
+      </if>
+      <if test="lendinFpriceAmt != null">
+        LENDIN_FPRICE_AMT,
+      </if>
+      <if test="ourFpriceAmt2 != null">
+        OUR_FPRICE_AMT2,
+      </if>
+      <if test="lendinFpriceAmt2 != null">
+        LENDIN_FPRICE_AMT2,
+      </if>
+      <if test="purchModle != null">
+        PURCH_MODLE,
+      </if>
+      <if test="purchType != null">
+        PURCH_TYPE,
+      </if>
+      <if test="purchDate != null">
+        PURCH_DATE,
+      </if>
+      <if test="purPayDate != null">
+        PUR_PAY_DATE,
+      </if>
+      <if test="purCfmDate != null">
+        PUR_CFM_DATE,
+      </if>
+      <if test="purAmt != null">
+        PUR_AMT,
+      </if>
+      <if test="depositAmt != null">
+        DEPOSIT_AMT,
+      </if>
+      <if test="firstUnitCprice3 != null">
+        FIRST_UNIT_CPRICE3,
+      </if>
+      <if test="expConValue != null">
+        EXP_CON_VALUE,
+      </if>
+      <if test="preb != null">
+        PREB,
+      </if>
+      <if test="prec != null">
+        PREC,
+      </if>
+      <if test="spoShareNum != null">
+        SPO_SHARE_NUM,
+      </if>
+      <if test="deviation != null">
+        DEVIATION,
+      </if>
+      <if test="conversionRat != null">
+        CONVERSION_RAT,
+      </if>
+      <if test="bconUnitCprice2 != null">
+        BCON_UNIT_CPRICE2,
+      </if>
+      <if test="conversionType != null">
+        CONVERSION_TYPE,
+      </if>
+      <if test="assetRecommandOrg != null">
+        ASSET_RECOMMAND_ORG,
+      </if>
+      <if test="terminateRate != null">
+        TERMINATE_RATE,
+      </if>
+      <if test="mpFinprodId != null">
+        MP_FINPROD_ID,
+      </if>
+      <if test="mpBranch != null">
+        MP_BRANCH,
+      </if>
+      <if test="isCashset != null">
+        IS_CASHSET,
+      </if>
+      <if test="genType != null">
+        GEN_TYPE,
+      </if>
+      <if test="createUser != null">
+        CREATE_USER,
+      </if>
+      <if test="createDept != null">
+        CREATE_DEPT,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+      <if test="updateUser != null">
+        UPDATE_USER,
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME,
+      </if>
+      <if test="penaltyIntamt != null">
+        PENALTY_INTAMT,
+      </if>
+      <if test="intSettType != null">
+        INT_SETT_TYPE,
+      </if>
+      <if test="clearRecAmt != null">
+        CLEAR_REC_AMT,
+      </if>
+      <if test="clearLossAmt != null">
+        CLEAR_LOSS_AMT,
+      </if>
+      <if test="ouPartyId != null">
+        OU_PARTY_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="totleTradeId != null">
+        #{totleTradeId,jdbcType=VARCHAR},
+      </if>
+      <if test="entrustId != null">
+        #{entrustId,jdbcType=VARCHAR},
+      </if>
+      <if test="ourShareAmt != null">
+        #{ourShareAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="lendinShareAmt != null">
+        #{lendinShareAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="ourCpriceAmt != null">
+        #{ourCpriceAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="lendinCpriceAmt != null">
+        #{lendinCpriceAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="ourFpriceAmt != null">
+        #{ourFpriceAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="lendinFpriceAmt != null">
+        #{lendinFpriceAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="ourFpriceAmt2 != null">
+        #{ourFpriceAmt2,jdbcType=DECIMAL},
+      </if>
+      <if test="lendinFpriceAmt2 != null">
+        #{lendinFpriceAmt2,jdbcType=DECIMAL},
+      </if>
+      <if test="purchModle != null">
+        #{purchModle,jdbcType=VARCHAR},
+      </if>
+      <if test="purchType != null">
+        #{purchType,jdbcType=VARCHAR},
+      </if>
+      <if test="purchDate != null">
+        #{purchDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="purPayDate != null">
+        #{purPayDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="purCfmDate != null">
+        #{purCfmDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="purAmt != null">
+        #{purAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="depositAmt != null">
+        #{depositAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="firstUnitCprice3 != null">
+        #{firstUnitCprice3,jdbcType=DECIMAL},
+      </if>
+      <if test="expConValue != null">
+        #{expConValue,jdbcType=DECIMAL},
+      </if>
+      <if test="preb != null">
+        #{preb,jdbcType=DECIMAL},
+      </if>
+      <if test="prec != null">
+        #{prec,jdbcType=DECIMAL},
+      </if>
+      <if test="spoShareNum != null">
+        #{spoShareNum,jdbcType=DECIMAL},
+      </if>
+      <if test="deviation != null">
+        #{deviation,jdbcType=DECIMAL},
+      </if>
+      <if test="conversionRat != null">
+        #{conversionRat,jdbcType=DECIMAL},
+      </if>
+      <if test="bconUnitCprice2 != null">
+        #{bconUnitCprice2,jdbcType=DECIMAL},
+      </if>
+      <if test="conversionType != null">
+        #{conversionType,jdbcType=VARCHAR},
+      </if>
+      <if test="assetRecommandOrg != null">
+        #{assetRecommandOrg,jdbcType=VARCHAR},
+      </if>
+      <if test="terminateRate != null">
+        #{terminateRate,jdbcType=DECIMAL},
+      </if>
+      <if test="mpFinprodId != null">
+        #{mpFinprodId,jdbcType=VARCHAR},
+      </if>
+      <if test="mpBranch != null">
+        #{mpBranch,jdbcType=DECIMAL},
+      </if>
+      <if test="isCashset != null">
+        #{isCashset,jdbcType=VARCHAR},
+      </if>
+      <if test="genType != null">
+        #{genType,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createDept != null">
+        #{createDept,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="penaltyIntamt != null">
+        #{penaltyIntamt,jdbcType=DECIMAL},
+      </if>
+      <if test="intSettType != null">
+        #{intSettType,jdbcType=VARCHAR},
+      </if>
+      <if test="clearRecAmt != null">
+        #{clearRecAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="clearLossAmt != null">
+        #{clearLossAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="ouPartyId != null">
+        #{ouPartyId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.common.base.entity.TrdTempDealTotalAdd">
+    update TRD_TEMP_DEAL_TOTAL_ADD
+    <set>
+      <if test="entrustId != null">
+        ENTRUST_ID = #{entrustId,jdbcType=VARCHAR},
+      </if>
+      <if test="ourShareAmt != null">
+        OUR_SHARE_AMT = #{ourShareAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="lendinShareAmt != null">
+        LENDIN_SHARE_AMT = #{lendinShareAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="ourCpriceAmt != null">
+        OUR_CPRICE_AMT = #{ourCpriceAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="lendinCpriceAmt != null">
+        LENDIN_CPRICE_AMT = #{lendinCpriceAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="ourFpriceAmt != null">
+        OUR_FPRICE_AMT = #{ourFpriceAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="lendinFpriceAmt != null">
+        LENDIN_FPRICE_AMT = #{lendinFpriceAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="ourFpriceAmt2 != null">
+        OUR_FPRICE_AMT2 = #{ourFpriceAmt2,jdbcType=DECIMAL},
+      </if>
+      <if test="lendinFpriceAmt2 != null">
+        LENDIN_FPRICE_AMT2 = #{lendinFpriceAmt2,jdbcType=DECIMAL},
+      </if>
+      <if test="purchModle != null">
+        PURCH_MODLE = #{purchModle,jdbcType=VARCHAR},
+      </if>
+      <if test="purchType != null">
+        PURCH_TYPE = #{purchType,jdbcType=VARCHAR},
+      </if>
+      <if test="purchDate != null">
+        PURCH_DATE = #{purchDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="purPayDate != null">
+        PUR_PAY_DATE = #{purPayDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="purCfmDate != null">
+        PUR_CFM_DATE = #{purCfmDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="purAmt != null">
+        PUR_AMT = #{purAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="depositAmt != null">
+        DEPOSIT_AMT = #{depositAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="firstUnitCprice3 != null">
+        FIRST_UNIT_CPRICE3 = #{firstUnitCprice3,jdbcType=DECIMAL},
+      </if>
+      <if test="expConValue != null">
+        EXP_CON_VALUE = #{expConValue,jdbcType=DECIMAL},
+      </if>
+      <if test="preb != null">
+        PREB = #{preb,jdbcType=DECIMAL},
+      </if>
+      <if test="prec != null">
+        PREC = #{prec,jdbcType=DECIMAL},
+      </if>
+      <if test="spoShareNum != null">
+        SPO_SHARE_NUM = #{spoShareNum,jdbcType=DECIMAL},
+      </if>
+      <if test="deviation != null">
+        DEVIATION = #{deviation,jdbcType=DECIMAL},
+      </if>
+      <if test="conversionRat != null">
+        CONVERSION_RAT = #{conversionRat,jdbcType=DECIMAL},
+      </if>
+      <if test="bconUnitCprice2 != null">
+        BCON_UNIT_CPRICE2 = #{bconUnitCprice2,jdbcType=DECIMAL},
+      </if>
+      <if test="conversionType != null">
+        CONVERSION_TYPE = #{conversionType,jdbcType=VARCHAR},
+      </if>
+      <if test="assetRecommandOrg != null">
+        ASSET_RECOMMAND_ORG = #{assetRecommandOrg,jdbcType=VARCHAR},
+      </if>
+      <if test="terminateRate != null">
+        TERMINATE_RATE = #{terminateRate,jdbcType=DECIMAL},
+      </if>
+      <if test="mpFinprodId != null">
+        MP_FINPROD_ID = #{mpFinprodId,jdbcType=VARCHAR},
+      </if>
+      <if test="mpBranch != null">
+        MP_BRANCH = #{mpBranch,jdbcType=DECIMAL},
+      </if>
+      <if test="isCashset != null">
+        IS_CASHSET = #{isCashset,jdbcType=VARCHAR},
+      </if>
+      <if test="genType != null">
+        GEN_TYPE = #{genType,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        CREATE_USER = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createDept != null">
+        CREATE_DEPT = #{createDept,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="penaltyIntamt != null">
+        PENALTY_INTAMT = #{penaltyIntamt,jdbcType=DECIMAL},
+      </if>
+      <if test="intSettType != null">
+        INT_SETT_TYPE = #{intSettType,jdbcType=VARCHAR},
+      </if>
+      <if test="clearRecAmt != null">
+        CLEAR_REC_AMT = #{clearRecAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="clearLossAmt != null">
+        CLEAR_LOSS_AMT = #{clearLossAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="ouPartyId != null">
+        OU_PARTY_ID = #{ouPartyId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where TOTLE_TRADE_ID = #{totleTradeId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.TrdTempDealTotalAdd">
+    update TRD_TEMP_DEAL_TOTAL_ADD
+    set ENTRUST_ID = #{entrustId,jdbcType=VARCHAR},
+      OUR_SHARE_AMT = #{ourShareAmt,jdbcType=DECIMAL},
+      LENDIN_SHARE_AMT = #{lendinShareAmt,jdbcType=DECIMAL},
+      OUR_CPRICE_AMT = #{ourCpriceAmt,jdbcType=DECIMAL},
+      LENDIN_CPRICE_AMT = #{lendinCpriceAmt,jdbcType=DECIMAL},
+      OUR_FPRICE_AMT = #{ourFpriceAmt,jdbcType=DECIMAL},
+      LENDIN_FPRICE_AMT = #{lendinFpriceAmt,jdbcType=DECIMAL},
+      OUR_FPRICE_AMT2 = #{ourFpriceAmt2,jdbcType=DECIMAL},
+      LENDIN_FPRICE_AMT2 = #{lendinFpriceAmt2,jdbcType=DECIMAL},
+      PURCH_MODLE = #{purchModle,jdbcType=VARCHAR},
+      PURCH_TYPE = #{purchType,jdbcType=VARCHAR},
+      PURCH_DATE = #{purchDate,jdbcType=TIMESTAMP},
+      PUR_PAY_DATE = #{purPayDate,jdbcType=TIMESTAMP},
+      PUR_CFM_DATE = #{purCfmDate,jdbcType=TIMESTAMP},
+      PUR_AMT = #{purAmt,jdbcType=DECIMAL},
+      DEPOSIT_AMT = #{depositAmt,jdbcType=DECIMAL},
+      FIRST_UNIT_CPRICE3 = #{firstUnitCprice3,jdbcType=DECIMAL},
+      EXP_CON_VALUE = #{expConValue,jdbcType=DECIMAL},
+      PREB = #{preb,jdbcType=DECIMAL},
+      PREC = #{prec,jdbcType=DECIMAL},
+      SPO_SHARE_NUM = #{spoShareNum,jdbcType=DECIMAL},
+      DEVIATION = #{deviation,jdbcType=DECIMAL},
+      CONVERSION_RAT = #{conversionRat,jdbcType=DECIMAL},
+      BCON_UNIT_CPRICE2 = #{bconUnitCprice2,jdbcType=DECIMAL},
+      CONVERSION_TYPE = #{conversionType,jdbcType=VARCHAR},
+      ASSET_RECOMMAND_ORG = #{assetRecommandOrg,jdbcType=VARCHAR},
+      TERMINATE_RATE = #{terminateRate,jdbcType=DECIMAL},
+      MP_FINPROD_ID = #{mpFinprodId,jdbcType=VARCHAR},
+      MP_BRANCH = #{mpBranch,jdbcType=DECIMAL},
+      IS_CASHSET = #{isCashset,jdbcType=VARCHAR},
+      GEN_TYPE = #{genType,jdbcType=VARCHAR},
+      CREATE_USER = #{createUser,jdbcType=VARCHAR},
+      CREATE_DEPT = #{createDept,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+      UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      PENALTY_INTAMT = #{penaltyIntamt,jdbcType=DECIMAL},
+      INT_SETT_TYPE = #{intSettType,jdbcType=VARCHAR},
+      CLEAR_REC_AMT = #{clearRecAmt,jdbcType=DECIMAL},
+      CLEAR_LOSS_AMT = #{clearLossAmt,jdbcType=DECIMAL},
+      OU_PARTY_ID = #{ouPartyId,jdbcType=VARCHAR}
+    where TOTLE_TRADE_ID = #{totleTradeId,jdbcType=VARCHAR}
+  </update>
+</mapper>

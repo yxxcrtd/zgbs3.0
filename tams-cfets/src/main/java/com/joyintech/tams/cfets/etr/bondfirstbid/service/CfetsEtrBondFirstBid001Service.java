@@ -238,7 +238,8 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
         List<String> statusList = search.getIssueStage();
         if (!StringUtil.isEmptyList(statusList) && statusList.contains("all")) {
             search.setIssueStage(null);
-            pageParam.put("issueStage", null);
+            List<String> issueStageList = Arrays.asList("01", "02");
+            pageParam.put("issueStage", issueStageList);
         }
 
         //币种
@@ -278,14 +279,21 @@ public class CfetsEtrBondFirstBid001Service extends BaseService {
      * @return
      */
     public AjaxResult finprodIdCheck(String finprodId) {
+        CfetsEtrFinProductInfoRequest dto = new CfetsEtrFinProductInfoRequest();
+        dto.setFinprodId(finprodId);
+        CfetsEtrFinProductInfoResponse finProductInfo = etrCommonFinProductInfoService.findFinProductInfo(null, null, dto);
         //查询投标日截止日/增发投标日截止日是否小于平台日
         AjaxResult ajaxResult = new AjaxResult();
         List<ValidMessage> validList = new ArrayList<>();
-        Date platDate = DateUtil.platDateFromCache();
-        //查询新债标的信息
-        if (StringUtil.isEmpty(platDate.toString())) {
-            validList.add(new ValidMessage("资产投标日截止日/增发投标日截止日小于平台日"));
+        if (finProductInfo != null && finProductInfo.getTenderEdate() != null) {
+            Date platDate = DateUtil.platDateFromCache();
+            //查询新债标的信息
+            if (DateUtil.compareDate(finProductInfo.getTenderEdate(),platDate) < 0) {
+                validList.add(new ValidMessage("资产投标日截止日/增发投标日截止日小于平台日"));
+            }
         }
+
+
         ajaxResult.setErrorList(validList);
 
         return ajaxResult;

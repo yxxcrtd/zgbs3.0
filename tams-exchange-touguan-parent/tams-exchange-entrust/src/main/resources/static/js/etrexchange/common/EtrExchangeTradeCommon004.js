@@ -4301,6 +4301,10 @@
             Joyin.error("请先完成风险试算")
             return false;
         }
+        if ("02" === isRiskMathSoftcontrol && $('#riskTrialSpan').text() && $('#riskTrialSpan').text().trim() == '试算不通过') {
+            Joyin.error("风险试算未通过")
+            return false;
+        }
         if ("01" === isRiskMathSoftcontrol && $('#riskTrialSpan').text() && $('#riskTrialSpan').text().trim() == '试算不通过') {
             console.log(123);
             Joyin.confirm("风险试算未通过,是否继续提交？", function () {
@@ -4349,11 +4353,7 @@
             });
         }
 
-        if(ps == PS_T68 || ps == PS_T69){
-            saveOrSubmit('submit');
-        }
-
-
+        saveOrSubmit('submit');
     }
 
     /**

@@ -119,6 +119,7 @@ public class PortfolioAssignHelper {
             if (EntrustProp.isConsultingTrade(entrustProp)) {
                 entrustProp = EntrustProp.SH_FIXEDINCOME_BAOJIA_OPPOSITE.value;
             }
+//            entrustProp = EntrustProp.SH_FIXEDINCOME_BAOJIA_OPPOSITE.value;
         } else if (StringUtil.equals(投管业务类型_通用式质押回购.getValue(), instruction.getBusiTypeTg())) {
             entrustProp = EntrustProp.NORMAL.value;
         }

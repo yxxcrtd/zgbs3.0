@@ -194,5 +194,5 @@ public interface EntrustInterface extends OrderInterface {
         return null;
     }
 
-
+    String getPs();
 }

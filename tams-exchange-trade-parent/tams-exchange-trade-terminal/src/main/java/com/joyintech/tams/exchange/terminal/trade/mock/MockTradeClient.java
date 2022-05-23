@@ -258,6 +258,7 @@ public class MockTradeClient implements ITradeRequest {
         } else {
             trade.setTradedPrice(entrust.getEntrustPrice());
         }
+        trade.setFullPrice(entrust.getFullPrice());
         trade.setBsFlag(entrust.getBsFlag());
         trade.setAssetType(entrust.getAssetType());
         trade.setTradeType(tradeType);
@@ -272,6 +273,7 @@ public class MockTradeClient implements ITradeRequest {
         trade.setEntrustId(entrust.getId());
         trade.setTradeTime(now.get(Calendar.HOUR_OF_DAY) + "" + now.get(Calendar.MINUTE) + "" + now.get(Calendar.SECOND));
         trade.setBrokerTradeId(trade.getTradeTime() + brokerTradeId.incrementAndGet());
+        trade.setPs(entrust.getPs());
         return trade;
     }
 
@@ -764,7 +766,7 @@ public class MockTradeClient implements ITradeRequest {
     public void onTrade(Trade trade) {
         if (!(IntegratedEntrustUtils.isProtocolBack_SH(trade.getEntrustProp())
                 || IntegratedEntrustUtils.isProtocolBack_SZ(trade.getEntrustProp())) && !InvestmentAssetType.FUTURES.value.equals(trade.getAssetType())) {
-            trade.setTradedBalance(TradeUtils.calculateBalanceForRisk(trade.getEntrustBs(), trade.getTradedPrice(), trade.getTradedVolume(), trade.getAssetType()));
+            trade.setTradedBalance(TradeUtils.calculateBalanceForRisk(trade.getFullPrice(), trade.getTradedPrice(), trade.getTradedVolume(), trade.getAssetType(), trade.getPs()));
         }
         if (Strings.isNullOrEmpty(trade.getBrokerTradeId())) {
             trade.setBrokerTradeId(trade.getEntrustId());

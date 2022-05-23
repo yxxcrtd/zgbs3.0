@@ -41,6 +41,7 @@ import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.dao.TrdCommonBaseMapper;
 import com.joyintech.tams.invest.common.trade.dto.AllTradeCommonInputDto;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.INTERF_TYPE_REPO003;
 
 /**
  * 交易基础组件调用Service
@@ -1259,6 +1262,9 @@ public class TrdCommonBaseService extends BaseService {
         String dealNo = (String) paraMap.get("dealNo");
         // 关联交易编号
         String fTradeId = (String) paraMap.get("fTradeId");
+
+        String interfaceType = MapUtils.getString(paraMap, "interfaceType");
+
         if(!StringUtil.isEmpty(dealNo)){
             // 查询关联交易编号
             fTradeId = trdCommonBaseMapper.selectFTradeId(dealNo);
@@ -1291,7 +1297,7 @@ public class TrdCommonBaseService extends BaseService {
         if(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue().equals(etrEntrust.getEntrustClass())){ // 多组合指令
             portfolioDtos = this.handleMultiPortfolioEntrust(infContractDetailfile, portfolioDetails, etrEntrust, converseRadio, 百元券面);
         }else{ // 单组合指令
-            portfolioDtos = this.handleSinglePortfolioEntrust(infContractDetailfile, portfolioDetails, etrEntrust, converseRadio, 百元券面);
+            portfolioDtos = this.handleSinglePortfolioEntrust(infContractDetailfile, portfolioDetails, etrEntrust, converseRadio, 百元券面, interfaceType);
         }
         logger.debug("【组合计算分配结果】portfolioDtos: {}", JSON.toJSONString(portfolioDtos));
         return portfolioDtos;
@@ -1374,7 +1380,8 @@ public class TrdCommonBaseService extends BaseService {
      */
     private List<PortfolioCalculateDto> handleSinglePortfolioEntrust(InfContractDetailfile infContractDetailfile,
                                                                     List<InfContractPortfolioDetail> portfolioDetails,
-                                                                    EtrEntrust etrEntrust, BigDecimal converseRadio, BigDecimal 百元券面){
+                                                                    EtrEntrust etrEntrust, BigDecimal converseRadio, BigDecimal 百元券面,
+                                                                    String interfaceType){
         List<PortfolioCalculateDto> portfolioDtos = new ArrayList<>();
         InfContractPortfolioDetail portfolioDetail = portfolioDetails.get(0);
         PortfolioCalculateDto portfolioDto = new PortfolioCalculateDto();
@@ -1398,10 +1405,18 @@ public class TrdCommonBaseService extends BaseService {
             // 本方券面总额
             portfolioDto.setOwnSecAmount(ArithmeticUtil.multiply(infContractDetailfile.getShareAmt(), new BigDecimal(100)));
         }else{
-            // 指令券面总额
-            portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrust.getEntrustNum()));
-            // 下单券面总额  ZGCPCN-635   2022-5-20  entrustNum 这个是数量 单位是张，entrustAmt是金额 单位元
-            portfolioDto.setOrdSecAmount(ArithmeticUtil.multiply(portfolioDetail.getEntrustAmt()));
+            // ZGCPCN-635 : 质押式通用回购,指令的委托数量应为金额的概念，现在数据库落地的ETR_ENTRUST.entrustNum还是张的概念。修改取值字段。
+            if (interfaceType.equals(INTERF_TYPE_REPO003)) {
+                // 指令券面总额
+                portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrust.getEntrustAmt()));
+                // 下单券面总额
+                portfolioDto.setOrdSecAmount(ArithmeticUtil.multiply(portfolioDetail.getEntrustAmt()));
+            } else {
+                // 指令券面总额
+                portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrust.getEntrustNum()));
+                // 下单券面总额
+                portfolioDto.setOrdSecAmount(ArithmeticUtil.multiply(portfolioDetail.getEntrustNum()));
+            }
             // 券面总额
             portfolioDto.setSecAmount(ArithmeticUtil.multiply(infContractDetailfile.getShareAmt()));
             // 本方券面总额

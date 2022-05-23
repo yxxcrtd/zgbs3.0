@@ -12,6 +12,7 @@ import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.cfets.etr.bondfirstbid.controller.CfetsEtrBondFirstBid001Controller;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmEntrustRequest;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmUndoSumRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.service.CfetsTrdFirstBidFirm001Service;
 import com.joyintech.tams.constant.DictCode;
@@ -26,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -87,6 +89,8 @@ public class CfetsTrdFirstBidFirm001Controller extends BaseController {
         initPageParams.put("biddingMethod_01", DictCodeListExt4.投标方式_自主投标.getValue());
         initPageParams.put("biddingMethod_02", DictCodeListExt4.投标方式_代投代缴.getValue());
         initPageParams.put("biddingMethod_03", DictCodeListExt4.投标方式_分销买入.getValue());
+        // 调整策略
+        initPageParams.put("ADJUST_STRATEGY", this.getSelectDataFromDataDic(DictCode.调整策略, null));
 
         // 获取平台日
         Date tradeDate = DateUtil.platDateFromCache();
@@ -115,6 +119,49 @@ public class CfetsTrdFirstBidFirm001Controller extends BaseController {
         } catch (Exception e) {
             logger.error("查询指令列表分页数据异常", e);
             return new Message<Page<CfetsTrdFirstBidFirmEntrustDto>>().fail().setMessage("查询指令列表分页数据异常");
+        }
+    }
+
+    @ApiOperation(value = "查询指令列表汇总数据", notes = "查询指令列表汇总数据")
+    @PostMapping("/pageSumEntrust")
+    @ResponseBody
+    public Message< List<CfetsTrdFirstBidFirmEntrustDto> > pageSumEntrust(@RequestBody CfetsTrdBondFirstBidFirmEntrustRequest dto) {
+        try {
+            List<CfetsTrdFirstBidFirmEntrustDto>  list = cfetsTrdFirstBidFirm001Service.pageSumEntrust(dto);
+            return new Message< List<CfetsTrdFirstBidFirmEntrustDto> >().success().setData(list);
+        } catch (Exception e) {
+            logger.error("查询指令列表汇总数据异常", e);
+            return new Message< List<CfetsTrdFirstBidFirmEntrustDto> >().fail().setMessage("查询指令列表汇总数据异常");
+        }
+    }
+
+    @ResponseBody
+    @PostMapping("/undoSumSave")
+    @ApiOperation(value = "指令取消汇总", notes = "指令取消汇总")
+    public Message<AjaxResult> undoSumSave(@RequestBody CfetsTrdBondFirstBidFirmUndoSumRequest cfetsDto) {
+        try {
+            AjaxResult ajax= cfetsTrdFirstBidFirm001Service.undoSumSave(cfetsDto);
+            if(null!=ajax){
+                return new Message<AjaxResult>().success().setData(ajax);
+            }else{
+                return new Message<AjaxResult>().success();
+            }
+        }catch (Exception e) {
+            logger.error("指令取消汇总保存异常",e);
+            return new Message<AjaxResult>().fail().setMessage("指令取消汇总保存失败");
+        }
+    }
+
+    @ApiOperation(value = "查询指令详细信息", notes = "查询指令详细信息")
+    @PostMapping("/getEntrust/{entrustId}")
+    @ResponseBody
+    public Message<Map<String, Object>> getEntrust(@PathVariable("entrustId") String entrustId) {
+        try {
+            Map<String, Object> result = cfetsTrdFirstBidFirm001Service.getEntrustInfo(entrustId);
+            return new Message<Map<String, Object>>().success().setData(result);
+        } catch (Exception e) {
+            logger.error("查询指令详细信息异常", e);
+            return new Message<Map<String, Object>>().fail().setMessage("查询指令详细信息异常");
         }
     }
 

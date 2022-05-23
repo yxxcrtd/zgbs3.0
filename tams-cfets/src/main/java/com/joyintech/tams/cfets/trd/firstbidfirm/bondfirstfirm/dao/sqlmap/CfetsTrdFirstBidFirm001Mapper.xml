@@ -18,8 +18,7 @@
         <if test="search != null and search != ''">
             ( T.entrustStatus || '|' || sdl_es.item_value || '|' || T.finprodId || '|' || T.finprodMarketId || '|'
             || '|' || T.finprodAbbr || '|' || T.portfolioName || '|' || T.portfolioId || '|' || T.secManageAcctId
-            || '|' || T.secAcctName || '|' || T.businessModel || '|' || sdl_bm.item_value
-            || '|' || T.invManagerName || '|' || T.entrustId || '|' || T.remark
+            || '|' || T.secAcctName || '|' || T.invManagerName || '|' || T.entrustId || '|' || T.remark
             like '%' || #{search} || '%'
             or decode(T.transactioncom,0,'0.00',to_char(T.transactioncom,'FM90.90'))=#{search} or to_char(T.transactioncom)=#{search}
             or decode(T.tradeFinishPercent,0,'0.00',to_char(T.tradeFinishPercent,'FM90.90'))=#{search} or to_char(T.tradeFinishPercent)=#{search}
@@ -35,6 +34,7 @@
     <!-- 指令查询SQL -->
     <sql id="listEntrustSql">
         select ee.ENTRUST_STATUS                        entrustStatus,
+        NULL                                     firstBidStatus,
         nvl(efs.ENT_FINISH_AMT, 0)               finishAmt,
         trunc(nvl(efs.ENT_FINISH_AMT, 0) /
         case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
@@ -43,18 +43,20 @@
         trunc(nvl(tpd.SHARE_AMT * 100, 0) /
         case when ee.ENTRUST_NUM is null or ee.ENTRUST_NUM = 0 then 1 else ee.ENTRUST_NUM*100 end, 4) *
         100                                      tradeFinishPercent,
-        ee.ENTRUST_NUM*100                       entrustNum,
         ee.FINPROD_ID                            finprodId,
         fp.FINPROD_MARKET_ID                     finprodMarketId,
         fp.FINPROD_ABBR                          finprodAbbr,
-        fpi.ISSUE_DATE                           issueDate,
-        fpi.PAY_DATE                             payDate,
+        fpi.TENDER_TARGET                        tenderTarget,
+        nvl(fpi.ISSUE_DATE,fpi.TENDER_EDATE)     issueDate,
+        ee.ENTRUST_NUM*100                       entrustNum,
+        NULL                                     bidPrice,
         eed.PORTFOLIO_ID                         portfolioId,
         eed.PORTFOLIO_NAME                       portfolioName,
-        eea.SEC_ACCT_ID                          secManageAcctId,
-        ssai.SEC_ACCT_NAME                       secAcctName,
-        eed.INV_AIM                              businessModel,
+        ee.TRADE_MARKET                          tradeMarket,
+        ee.INV_MANAGER_ID                        invManagerId,
         su.REAL_NAME                             invManagerName,
+        ee.COUNTER_ID                            counterId,
+        mcp.COUNTER_NAME                         counterName,
         ee.ENTRUST_DATE                          entrustDate,
         to_char(eea.TRANSMIT_TIME, 'hh24:mi:ss') transmitTime,
         to_char(eea.TRANSMIT_TIME, 'hh24:mi')    transmitTimeSer,
@@ -63,13 +65,9 @@
         from ETR_ENTRUST ee
         left join (select listagg(t0.PORTFOLIO_ID, ',') within group (order by t0.ENTRUST_ID)   AS PORTFOLIO_ID,
         listagg(pp.PORTFOLIO_NAME, ',') within group (order by t0.ENTRUST_ID) AS PORTFOLIO_NAME,
-        listagg(t0.INV_AIM, ',') within group (order by t0.ENTRUST_ID)        AS INV_AIM,
-        listagg(sdl_bs.ITEM_VALUE, ',') within group (order by t0.ENTRUST_ID)   AS businessModelStr,
         t0.ENTRUST_ID
         from ETR_ENTRUST_DETAIL t0
         left join PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = t0.PORTFOLIO_ID
-        left join SYS_DATADICT_LIST sdl_bs
-        on t0.INV_AIM = sdl_bs.ITEM_CODE and sdl_bs.DICT_CODE = 'BUSINESSMODEL'
         <where>
             <if test="portfolioIds != null and portfolioIds.size()>0">
                 <foreach collection="portfolioIds" open=" t0.PORTFOLIO_ID in(" close=") " separator="," item="item">
@@ -95,7 +93,8 @@
         left join FIN_PRODUCT fp on fp.FINPROD_ID = ee.FINPROD_ID
         left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = ee.FINPROD_ID
         left join SYS_USER su on su.USER_NAME = ee.INV_MANAGER_ID
-        where fpi.ISSUE_CLASS = #{ISSUE_CLASS_01}
+        left join MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
+        where fpi.ISSUE_CLASS in (#{ISSUE_CLASS_02}, #{ISSUE_CLASS_03})
         order by decode(ee.ENTRUST_STATUS, '04', 2, '05', 3, '06', 4, 1) asc,fpi.ISSUE_DATE,ee.ENTRUST_DATE,eea.TRANSMIT_TIME
     </sql>
 
@@ -103,6 +102,7 @@
     <select id="listEntrust" resultType="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto">
         select
         T.entrustStatus,
+        T.firstBidStatus,
         T.finishAmt,
         T.transactioncom,
         T.finishDealAmt,
@@ -111,14 +111,16 @@
         T.finprodId,
         T.finprodMarketId,
         T.finprodAbbr,
+        T.tenderTarget,
         T.issueDate,
-        T.payDate,
+        T.bidPrice,
         T.portfolioId,
         T.portfolioName,
-        T.secManageAcctId,
-        T.secAcctName,
-        T.businessModel,
+        T.tradeMarket,
+        T.invManagerId,
         T.invManagerName,
+        T.counterId,
+        T.counterName,
         T.entrustDate,
         T.transmitTime,
         T.transmitTimeSer,
@@ -129,7 +131,6 @@
         from
         (<include refid="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dao.CfetsTrdFirstBidFirm001Mapper.listEntrustSql" />) T
         left join SYS_DATADICT_LIST sdl_es on T.entrustStatus=sdl_es.ITEM_CODE and sdl_es.DICT_CODE='ENTRUST_STATUS'
-        left join SYS_DATADICT_LIST sdl_bm on T.businessModel=sdl_bm.ITEM_CODE and sdl_bm.DICT_CODE='BUSINESS_MODEL'
         LEFT JOIN ETR_DISTRIBUTE ed ON ed.ENTRUST_ID = T.entrustId
         <where>
             <!-- 关键字模糊查询 -->
@@ -146,17 +147,20 @@
                     #{item}
                 </foreach>
             </if>
-            <if test="finprodMarketIds != null and finprodMarketIds.size()>0">
+            <if test="finprodIds != null and finprodIds.size()>0">
                 AND
-                <foreach collection="finprodMarketIds" open=" T.finprodId in(" close=")" separator="," item="item">
+                <foreach collection="finprodIds" open=" T.finprodId in(" close=")" separator="," item="item">
                     #{item}
                 </foreach>
             </if>
-            <if test="secManageAcctIds != null and secManageAcctIds.size()>0">
+            <if test="invManagerIds != null and invManagerIds.size()>0">
                 AND
-                <foreach collection="secManageAcctIds" open=" T.secManageAcctId in(" close=")" separator="," item="item">
+                <foreach collection="invManagerIds" open=" T.invManagerId in(" close=")" separator="," item="item">
                     #{item}
                 </foreach>
+            </if>
+            <if test="counterId != null and counterId != '' ">
+                AND T.counterId = #{counterId}
             </if>
             <if test="issueDateStart != null and !issueDateStart.isEmpty() ">
                 AND T.issueDate >= to_date(#{issueDateStart}, 'yyyy-MM-dd')
@@ -170,20 +174,20 @@
             <if test="entrustDateEnd != null and !entrustDateEnd.isEmpty() ">
                 AND T.entrustDate <![CDATA[<=]]> to_date(#{entrustDateEnd}, 'yyyy-MM-dd')
             </if>
+            <if test="tenderTarget != null and tenderTarget != '' ">
+                AND T.tenderTarget = #{tenderTarget}
+            </if>
+            <if test="firstBidStatus != null and firstBidStatus != '' ">
+                AND T.firstBidStatus = #{firstBidStatus}
+            </if>
             <if test="entrustId != null and entrustId != '' ">
-                AND T.entrustId = #{entrustId}
+                AND (T.entrustId = #{entrustId} OR
+                T.entrustId  LIKE concat('%',concat(#{entrustId,jdbcType=VARCHAR},'%')) )
                 /*指令代码查询*/
             </if>
             <if test="entrustIdList != null and entrustIdList.size()>0">
                 AND
                 <foreach collection="entrustIdList" open=" T.entrustId in(" close=")" separator="," item="item">
-                    #{item}
-                </foreach>
-                /*指令代码查询*/
-            </if>
-            <if test="existEntrustIds != null and existEntrustIds.size()>0">
-                AND
-                <foreach collection="existEntrustIds" open=" T.entrustId not in(" close=")" separator="," item="item">
                     #{item}
                 </foreach>
                 /*指令代码查询*/

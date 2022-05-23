@@ -553,7 +553,7 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
             }
             etrEntrustMapper.insertSelective(dto.getEtrEntrust());
             // 保存委托指令附属表
-            if (dto.getEtrEntrustAdd() != null) {
+            if (dto.getEtrEntrustAdd() != null&& dto.getEtrEntrustAdd().getTransmitTime()==null) {
                 dto.getEtrEntrustAdd().setTransmitTime(new Date());
             }
             etrEntrustAddMapper.insertSelective(dto.getEtrEntrustAdd());

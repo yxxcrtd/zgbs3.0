@@ -24,6 +24,9 @@ public class CfetsTrdConfirmTrdCstpMatchRequest {
     @ApiModelProperty(name="regAssetType",value="资产类型",example="01")
     private String regAssetType;
 
+    @ApiModelProperty(name="finprodType2",value="业务类型",example="01")
+    private String finprodType2;
+
     @ApiModelProperty(name="finprodId",value="资产代码",example="字符串1,字符串2,...")
     private String finprodId;
 
@@ -82,6 +85,14 @@ public class CfetsTrdConfirmTrdCstpMatchRequest {
 
     public void setRegAssetType(String regAssetType) {
         this.regAssetType = regAssetType;
+    }
+
+    public String getFinprodType2() {
+        return finprodType2;
+    }
+
+    public void setFinprodType2(String finprodType2) {
+        this.finprodType2 = finprodType2;
     }
 
     public String getFinprodId() {
