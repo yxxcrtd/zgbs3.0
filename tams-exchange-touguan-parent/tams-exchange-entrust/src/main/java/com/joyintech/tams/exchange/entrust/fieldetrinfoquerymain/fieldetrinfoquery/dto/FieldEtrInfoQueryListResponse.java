@@ -15,10 +15,7 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import io.swagger.annotations.ApiModel;
@@ -238,32 +235,70 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
         this.targetType = targetType;
     }
 
-    public String getEntrustAmtStr() {
+    /**
+     * 取得 委托额度，交易金额
+     * @return 委托额度，交易金额
+     */
+    public BigDecimal getEntrustAmt() {
         if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
             return null;
         }
-        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
-            NumberFormat numberInstance = NumberFormat.getNumberInstance(Locale.getDefault());
-            numberInstance.setMinimumFractionDigits(2);
-            return numberInstance.format(ArithmeticUtil.divide(getEntrustAmt(),new BigDecimal(10000),2)) + " 万元";
-        }
+        return super.getEntrustAmt();
+    }
+
+    public String getEntrustAmtStr() {
         if (getEntrustAmt() == null) {
             return "";
-        } else {
-            NumberFormat numberInstance = NumberFormat.getNumberInstance(Locale.getDefault());
-            numberInstance.setMinimumFractionDigits(2);
-            return numberInstance.format(getEntrustAmt().setScale(2,BigDecimal.ROUND_HALF_UP)) + " 元";
+        }
+        String tips = "指令金额:";
+        NumberFormat numberInstance = NumberFormat.getNumberInstance(Locale.getDefault());
+        numberInstance.setMinimumFractionDigits(2);
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
+            return null;
+        }
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
+            return tips + numberInstance.format(ArithmeticUtil.divide(getEntrustAmt(),new BigDecimal(10000),2)) + "(万元)";
+        }
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_现券交易.getValue())){
+            return tips + numberInstance.format(getEntrustAmt().setScale(2,BigDecimal.ROUND_HALF_UP)) + "(元)";
+        }else {
+            return tips + numberInstance.format(getEntrustAmt().setScale(2,BigDecimal.ROUND_HALF_UP)) + "(元)";
         }
     }
+    public BigDecimal getEntrustNum() {
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
+            return null;
+        }
+        return super.getEntrustNum();
+    }
     public String getEntrustNumStr() {
-        // 指令数量入库时已经 除以 100了
-        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
-            return ArithmeticUtil.divide(super.getEntrustNum(),new BigDecimal("100"),2).toString() + " 万元";
+        if (getEntrustNum() == null) {
+            return "";
         }
         if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
             return null;
         }
-        return String.valueOf(super.getEntrustNum() == null ? "" : super.getEntrustNum().setScale(0, RoundingMode.HALF_UP));
+        String tips = "指令数量:";
+        NumberFormat numberInstance = NumberFormat.getNumberInstance(Locale.getDefault());
+        numberInstance.setMinimumFractionDigits(2);
+        // 指令数量入库时已经 除以 100了
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
+            return tips + numberInstance.format(ArithmeticUtil.divide(super.getEntrustNum(),new BigDecimal("100"),2)) + "(万元)";
+        }
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_现券交易.getValue())){
+            return tips + numberInstance.format(getEntrustNum().setScale(2, RoundingMode.HALF_UP)) + "(万元)";
+        }
+        if (StringUtil.equals(getAssetType(),DictCodeList.平安资产类型_债券.getValue())
+            || StringUtil.equals(getAssetType(),DictCodeList.平安资产类型_质押式回购.getValue())){
+            return tips + numberInstance.format(super.getEntrustNum().setScale(0, RoundingMode.HALF_UP)) + "(张)";
+        }
+        if (StringUtil.equals(getAssetType(),DictCodeList.平安资产类型_基金.getValue())){
+            return tips + numberInstance.format(super.getEntrustNum().setScale(0, RoundingMode.HALF_UP)) + "(份)";
+        }
+        if (StringUtil.equals(getAssetType(), DictCodeListExt2.平安资产类型_股票.getValue())){
+            return tips + numberInstance.format(super.getEntrustNum().setScale(0, RoundingMode.HALF_UP)) + "(股)";
+        }
+        return tips + numberInstance.format(super.getEntrustNum().setScale(0, RoundingMode.HALF_UP));
     }
     public void setOtherPs(String otherPs) {
         this.otherPs = otherPs;
@@ -357,25 +392,39 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     }
 
     public BigDecimal getEtrPrice() {
-        return etrPrice;
-    }
-
-    public String getEtrPriceStr() {
+        if (etrPrice == null){
+            return null;
+        }
         if(StringUtil.equals(DictCodeListExt3.投管业务类型_通用式质押回购.getValue(), this.getBusiTypePosition()) &&
                 StringUtil.equals(DictCodeListExt2.价格模式_市价指令.getValue(), this.getPriceModel())){
             return null;
         }
-        if(StringUtils.equals(DictCodeList.平安资产类型_基金.getValue(),this.getFinprodType2())
-                && StringUtils.equals("PRM03",this.getPriceModel())){
-            return "0.00";
-        }
         if (StringUtil.equals(this.getBusiTypePosition(),DictCodeListExt3.投管业务类型_质押券出入库.getValue())){
             return null;
         }
-        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
-            return getEtrPrice() == null ? "" : getEtrPrice().setScale(3,BigDecimal.ROUND_HALF_UP) + " %";
+        if(StringUtils.equals(DictCodeList.平安资产类型_基金.getValue(),this.getFinprodType2())
+            && StringUtils.equals("PRM03",this.getPriceModel())){
+            return new BigDecimal("0.00");
         }
-        return getEtrPrice() == null ? "" : getEtrPrice().setScale(4, RoundingMode.HALF_UP).toString();
+        if(StringUtils.equals(getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
+            return etrPrice.setScale(3,BigDecimal.ROUND_HALF_UP);
+        }
+        return etrPrice.setScale(4, RoundingMode.HALF_UP);
+    }
+
+    public String getEtrPriceStr() {
+        if (getEtrPrice() == null){
+            return null;
+        }
+        String tips = "指令价格:";
+        if(StringUtils.equals(DictCodeList.平安资产类型_基金.getValue(),this.getFinprodType2())
+                && StringUtils.equals("PRM03",this.getPriceModel())){
+            return tips + "0.00";
+        }
+        if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
+            return tips + getEtrPrice() + "%";
+        }
+        return tips + getEtrPrice();
     }
 
     public void setEtrPrice(BigDecimal etrPrice) {
