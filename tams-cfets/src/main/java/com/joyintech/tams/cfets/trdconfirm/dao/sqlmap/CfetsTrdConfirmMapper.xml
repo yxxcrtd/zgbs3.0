@@ -2037,6 +2037,7 @@
                  , bo.OUR_TRADER                    ourTrader
                  , mcct.TRADER_NAME                 ourTraderName
                  , bo.REMARK                        remark
+                 ,'BID'                           as finprodType2
             from BID_ORDER bo
                      left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
                      left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = bo.FINPROD_ID
@@ -2250,6 +2251,7 @@
              , mcct.TRADER_NAME                                            ourTraderName
              , to_date(substr(icb.SUBSCRIPTION_TIME, 0, 10), 'yyyy-MM-dd') tradeDate
              , null                                                        remark
+             ,'BID'                           as finprodType2
         from INTERF_CSTP_BJFXJG icb
                  left join FIN_PRODUCT fp on icb.INSTRUMENT_ID = fp.FINPROD_MARKET_ID
                  left join TRDQUTO_MATCH_INFO tmi on tmi.CSTP_TRADE_ID = icb.TRD_ID

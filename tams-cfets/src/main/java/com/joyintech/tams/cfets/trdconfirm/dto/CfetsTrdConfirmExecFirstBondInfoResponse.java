@@ -141,6 +141,9 @@ public class CfetsTrdConfirmExecFirstBondInfoResponse {
     @ApiModelProperty(name = "busiType", value = "业务类型 04 登记", example = "04")
     private String busiType;
 
+    @ApiModelProperty(name = "finprodType2", value = "资产类型 BID一级申购", example = "04")
+    private String finprodType2;
+
 
     public String getBusiCode() {
         return busiCode;
@@ -445,5 +448,13 @@ public class CfetsTrdConfirmExecFirstBondInfoResponse {
 
     public void setBusiType(String busiType) {
         this.busiType = busiType;
+    }
+
+    public String getFinprodType2() {
+        return finprodType2;
+    }
+
+    public void setFinprodType2(String finprodType2) {
+        this.finprodType2 = finprodType2;
     }
 }
