@@ -269,6 +269,17 @@ public class CommonCheckHelper {
 //            return ErrorCode.INSTRUCTIONS_PRICE_ERROR;
 //        }
         if (checkOrderPrice(instruction, order, orderPrice)) {
+            String ps = instruction.getPs();
+            if (StringUtil.equals(ps, InstructionPs.BUY.value)) {
+                return ErrorCode.INSTRUCTIONS_BUY_PRICE_ERROR;
+            } else if (StringUtil.equals(ps, InstructionPs.SELL.value)) {
+                return ErrorCode.INSTRUCTIONS_SELL_PRICE_ERROR;
+            } else if (StringUtil.equals(ps, InstructionPs.POSITIVEREPO.value)) {
+                return ErrorCode.INSTRUCTIONS_POSITIVEREPO_PRICE_ERROR;
+            } else if (StringUtil.equals(ps, InstructionPs.REVERSEDREPO.value)) {
+                return ErrorCode.INSTRUCTIONS_REVERSEDREPO_PRICE_ERROR;
+            }
+
             return ErrorCode.INSTRUCTIONS_PRICE_ERROR;
         }
         if (InvestmentAssetType.FUTURES.value.equals(instruction.getAssetType())) {
@@ -327,7 +338,8 @@ public class CommonCheckHelper {
 
     //超限返回true
     private boolean checkPriceFixed(OrderInterface order, BigDecimal fixedPrice, BigDecimal orderPrice) {
-        return order.getEntrustBs().equals(EntrustBs.SELL.value) && TradeUtils.bigThan(fixedPrice, orderPrice) || order.getEntrustBs().equals(EntrustBs.BUY.value) && TradeUtils.lessThan(fixedPrice, orderPrice);
+        return order.getEntrustBs().equals(EntrustBs.SELL.value) && TradeUtils.bigThan(fixedPrice, orderPrice)
+                || order.getEntrustBs().equals(EntrustBs.BUY.value) && TradeUtils.lessThan(fixedPrice, orderPrice);
     }
 
     public void marketPriceCheck(Order order, Instrument instrument, Instruction instruction) {
