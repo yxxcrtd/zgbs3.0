@@ -168,7 +168,8 @@ public class TradeHelper {
         List<Entrust> entrustList = entrustService.findAll();
         if (Objects.nonNull(entrustList)) {
             entrustList.forEach(entrust -> {
-                if (EntrustStatus.isUnCompleteCancelEntrust(entrust.getEntrustStatus())) {
+                if (EntrustStatus.isUnCompleteCancelEntrust(entrust.getEntrustStatus())
+                        || entrust.getEntrustStatus() == EntrustStatus.SUCCEEDED.value) {
                     String key = entrust.getAccountId() + "_" + entrust.getBrokerEntrustId();
                     entrustMap.put(key, entrust.getId());
                 }
@@ -177,7 +178,8 @@ public class TradeHelper {
         List<IntegratedEntrust> integratedEntrustList = integratedEntrustService.findAll();
         if (Objects.nonNull(integratedEntrustList)) {
             integratedEntrustList.forEach(integratedEntrust -> {
-                if (EntrustStatus.isUnCompleteCancelEntrust(integratedEntrust.getEntrustStatus())) {
+                if (EntrustStatus.isUnCompleteCancelEntrust(integratedEntrust.getEntrustStatus())
+                        || integratedEntrust.getEntrustStatus() == EntrustStatus.SUCCEEDED.value) {
                     String key = integratedEntrust.getAccountId() + "_" + integratedEntrust.getBrokerEntrustId();
                     entrustMap.put(key, integratedEntrust.getId());
                 }
