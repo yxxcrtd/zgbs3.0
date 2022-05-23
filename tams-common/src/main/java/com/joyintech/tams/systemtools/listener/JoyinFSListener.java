@@ -192,6 +192,6 @@ public class JoyinFSListener implements FileUploadListener, FileAttachmentProces
         StringBuilder builder = new StringBuilder(FileNameUtil.createUploadFilePath(prexFileName));
         builder.append(GlobalConstant.UNDER_LINE).append(
                 FileNameUtil.createFileName(FileNameUtil.getExtension(fileName)));
-        return "/Users/yushuangzhu/Desktop/"+fileName;
+        return builder.toString();
     }
 }
