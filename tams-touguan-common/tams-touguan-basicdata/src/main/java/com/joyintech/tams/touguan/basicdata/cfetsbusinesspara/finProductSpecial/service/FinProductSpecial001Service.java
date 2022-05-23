@@ -100,7 +100,7 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
             //记录业务表
             insertData(entity);
         } else if (OperationType.MODIFY == type) {
-//            this.update(dto);
+            this.updateData(entity);
         }
     }
 
@@ -128,6 +128,17 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
         finProductSpecialMapper.insertSelective(finProductSpecial);
     }
 
+
+    /**
+     * 业务表表数据更新入库
+     *
+     * @param entity
+     */
+    private void updateData(FinProductSpecialDto entity) {
+        FinProductSpecial finProductSpecial = new FinProductSpecial();
+        BeanUtil.copyPropertiesIgnoreNull(finProductSpecial, entity);
+        finProductSpecialMapper.updateByPrimaryKey(finProductSpecial);
+    }
 
     /**
      * 删除流程表
@@ -170,7 +181,7 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
     public List<ExcelValidDto> importData(String fileName) {
         List<List<String>> dataList = ExcelUtil.getDataList(fileName);
         List<FinProductSpecialDto> finProductSpecialDtos = convertToBean(dataList);
-        finProductSpecialDtos.stream().forEach(finProductSpecialDto -> doComplete(finProductSpecialDto, null));
+        finProductSpecialDtos.stream().forEach(finProductSpecialDto -> doComplete(finProductSpecialDto, OperationType.NEW));
         List<ExcelValidDto> excelValidDtos = Lists.newArrayList();
         return excelValidDtos;
     }
