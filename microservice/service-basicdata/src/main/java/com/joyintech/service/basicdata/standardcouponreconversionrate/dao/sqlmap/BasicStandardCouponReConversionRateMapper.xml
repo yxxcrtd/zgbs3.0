@@ -128,10 +128,10 @@
                 sbmci.BROKER_ID = #{brokerId,jdbcType=VARCHAR}
             </if>
             <if test="finprodId != null and finprodId != ''">
-                AND sbmci.FINPROD_ID is not null
+                AND (sbmci.FINPROD_ID is not null or sbmci.ACCT_NO is not null)
             </if>
             <if test="accountType != null and accountType != ''">
-                AND sbmci.ACCT_NO is not null
+                AND (sbmci.FINPROD_ID is not null or sbmci.ACCT_NO is not null)
             </if>
         </where>
     </select>
