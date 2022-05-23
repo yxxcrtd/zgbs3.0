@@ -213,7 +213,7 @@ public class CfetsTrdConfirmService extends BaseService{
                 DictCodeList.清算速度_T_1.getValue())) {
             pageParam.put("settleSpeed","1");
         }*/
-        pageParam.put("sysDate",DateUtil.parse("2021-12-21"));
+        pageParam.put("sysDate",iPlatformDate.getSysDate());
         Calendar c = Calendar.getInstance();
         c.setTime(DateUtil.parse(DateUtil.getSysDate()));
         int year = c.get(Calendar.YEAR);
