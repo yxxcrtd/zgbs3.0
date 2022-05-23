@@ -98,6 +98,9 @@ public class EtrExchangeTradeFjyywzl001Service extends CommonExportService<EtrEx
 //                        }
                         //持仓数量，取交易的净额结算可用持仓（交易），单位：万元
                         BigDecimal  positionsNum=selectActNum(DictCodeListExt3.资产类型_资产账户持仓.getValue(),secDto);
+                        if(positionsNum.compareTo(BigDecimal.ZERO) == 0){
+                            continue;
+                        }
                         positionsNum=ArithmeticUtil.divide(positionsNum,new BigDecimal(100),2, RoundingMode.DOWN);
                         entity.setPositionsNum(positionsNum);
                         //质押数量，取交易的T日质押券入库持仓（交易），单位：万元

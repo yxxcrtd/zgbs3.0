@@ -4,8 +4,10 @@ import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.entity.ProcessMark;
+import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.validation.BeanValidator;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
 import com.joyintech.tams.constant.DictCodeList;
@@ -69,7 +71,9 @@ public class FinProductSpecialValidatorService implements BeanValidator {
             parameter.setBusinessDataPk1(dto.getFinprodMarketId());
             ProcessMark dataEntityFromProcessMark = mstWorkflowCommonService.getDataEntityFromProcessMark(parameter);
             if (Objects.nonNull(dataEntityFromProcessMark)) {
-                resultList.add(new ValidMessage("", getMessage("资产存在流程中数据,不可删除!" + dataEntityFromProcessMark.getWorkflowId())));
+                String businessData = dataEntityFromProcessMark.getBusinessData();
+                BaseMap responseMap = JsonUtils.json2Object(businessData, BaseMap.class);
+                resultList.add(new ValidMessage("", getMessage("资产存在流程中数据,不可删除!<br/>流程编号：【" + responseMap.getString("workflowId")+"】")));
             }
         }
 
@@ -91,7 +95,7 @@ public class FinProductSpecialValidatorService implements BeanValidator {
      * @return
      */
     public AjaxResult checkConfirmMsgForImportData(String fileName) {
-        List<List<String>> dataList = ExcelUtil.getDataList(fileName);
+        List<List<String>> dataList = ExcelUtil.getDataList("/Users/yushuangzhu/Desktop/0_ABN应计利息问题改造需求规格说明书（增量）.docx_105553275259904.xlsx");
         AjaxResult result = new AjaxResult();
         result.setData(dataList);
         if (!com.joyintech.framework.util.StringUtil.isEmptyList(dataList)) {

@@ -13,6 +13,7 @@
     <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
     <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
+
   <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.FinProductSpecial" >
     insert into FIN_PRODUCT_SPECIAL (FINPROD_MARKET_ID, IS_ABS, IS_SPECIAL_DEBT, 
       IS_DEFAULT_BOND_INDICATOR, INPUT_TYPE, CREATE_USER, 
@@ -23,6 +24,7 @@
       #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, 
       #{updateTime,jdbcType=TIMESTAMP})
   </insert>
+
   <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.FinProductSpecial" >
     insert into FIN_PRODUCT_SPECIAL
     <trim prefix="(" suffix=")" suffixOverrides="," >
@@ -96,4 +98,15 @@
         delete from FIN_PRODUCT_SPECIAL
         where FINPROD_MARKET_ID = #{finprodMarketId, jdbcType=VARCHAR}
     </delete>
+
+
+    <update id="updateByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.FinProductSpecial" >
+        update FIN_PRODUCT_SPECIAL
+        set FINPROD_MARKET_ID = #{finprodMarketId,jdbcType=VARCHAR},
+            IS_ABS = #{isAbs,jdbcType=VARCHAR},
+            IS_SPECIAL_DEBT = #{isSpecialDebt,jdbcType=VARCHAR},
+            IS_DEFAULT_BOND_INDICATOR = #{isDefaultBondIndicator,jdbcType=VARCHAR},
+            INPUT_TYPE = #{inputType,jdbcType=VARCHAR}
+        where FINPROD_MARKET_ID = #{finprodMarketId, jdbcType=VARCHAR}
+    </update>
 </mapper>
