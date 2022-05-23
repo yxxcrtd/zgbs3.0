@@ -12,6 +12,7 @@ import com.joyintech.tams.exchange.datacommon.db.service.TerminalMappingService;
 import com.joyintech.tams.exchange.service.trade.management.service.InvestmentManagement;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgent;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgentManager;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +22,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -55,21 +53,25 @@ public class TerminalLoginJob implements LoginJob {
             return;
         }
         List<TerminalMapping> terminalMappingList = terminalMappingService.findAll();
+        Set<String> accountIdSet = terminalMappingList.stream().map(TerminalMapping::getAccountId).collect(Collectors.toSet());
         // 获取账号
-        List<CapitalAccountBean> capitalAccountBeanList = investmentManagement.queryCapitalAccountAll();
-        if (Objects.nonNull(capitalAccountBeanList) && capitalAccountBeanList.size() > 0) {
-            for (CapitalAccountBean capitalAccountBean : capitalAccountBeanList) {
-                // 筛选账号
-                Account account = capitalAccountBean.createAccount();
-                if (Objects.nonNull(account)) {
-                    // 若账号已经登录到终端，则不用重复登录
-                    TradeAgent agentByAccountId = tradeAgentManager.findAgentByAccountId(account.getId());
-                    if (Objects.nonNull(agentByAccountId)) {
-                        //logger.info("账号{}已登录，不必重复登录",account.getId());
-                        continue;
-                    }
-                    loginAccount(tradingAgents, terminalMappingList, account);
+        List<CapitalAccountBean> capitalAccountBeanList = investmentManagement.queryCapitalAccountAll()
+                .stream().filter(o -> accountIdSet.contains(o.getAcctNo())).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(capitalAccountBeanList)) {
+            logger.info("no accountId, please wait...");
+            return;
+        }
+        for (CapitalAccountBean capitalAccountBean : capitalAccountBeanList) {
+            // 筛选账号
+            Account account = capitalAccountBean.createAccount();
+            if (Objects.nonNull(account)) {
+                // 若账号已经登录到终端，则不用重复登录
+                TradeAgent agentByAccountId = tradeAgentManager.findAgentByAccountId(account.getId());
+                if (Objects.nonNull(agentByAccountId)) {
+                    //logger.info("账号{}已登录，不必重复登录",account.getId());
+                    continue;
                 }
+                loginAccount(tradingAgents, terminalMappingList, account);
             }
         }
     }

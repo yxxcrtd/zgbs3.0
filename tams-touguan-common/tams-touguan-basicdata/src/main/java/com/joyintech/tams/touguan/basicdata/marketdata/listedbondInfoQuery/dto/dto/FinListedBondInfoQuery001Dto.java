@@ -89,8 +89,7 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
     private String issueMethod;
 
     @ApiModelProperty(name = "issueSize", value = "计划发行量")
-    @JsonSerialize(using = BigDecimalSerializer.class)
-    private BigDecimal issueSize;
+    private String issueSize;
 
     @ApiModelProperty(name = "issueDate", value = "发行日")
     private Date issueDate;
@@ -438,11 +437,11 @@ public class FinListedBondInfoQuery001Dto extends BaseDto {
         this.issueMethod = issueMethod;
     }
 
-    public BigDecimal getIssueSize() {
+    public String getIssueSize() {
         return issueSize;
     }
 
-    public void setIssueSize(BigDecimal issueSize) {
+    public void setIssueSize(String issueSize) {
         this.issueSize = issueSize;
     }
 
