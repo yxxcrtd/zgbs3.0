@@ -1037,7 +1037,7 @@ public class EtrExchangeTrade001Service extends CommonExportService<EtrExchangeT
 		List<EtrExchangeTradeQuotation001Dto> list = new ArrayList<EtrExchangeTradeQuotation001Dto>();
 		String secId= (String)map.get("secId");
 
-		String param = "?quote_type=5&stockId="+secId;
+		String param = "?quote_type=5&stock_code="+secId;
 
 		Map quoteMap = restTemplate.getForObject(ServiceApplication.EXCHANGE_SERVICE_NAME + queryIntegratedQuote + param, Map.class);
 
