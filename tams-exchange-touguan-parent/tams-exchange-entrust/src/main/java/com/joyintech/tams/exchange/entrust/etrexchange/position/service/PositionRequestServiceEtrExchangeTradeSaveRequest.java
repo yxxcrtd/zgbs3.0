@@ -43,6 +43,7 @@ import static com.joyintech.tams.invest.common.position.constant.PositionCommonC
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.WORK_FLOW_ID;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -419,7 +420,7 @@ public class PositionRequestServiceEtrExchangeTradeSaveRequest {
                     BigDecimal faceValue = etrTradeOtherCommonService.selectFaceValue(params);
                     // 标准券总额 =质押券数量*折算率*最新面值
                     BigDecimal standardSecAmount = item.getEntrustNum().multiply(entity.getEntrustPrice()).divide(BigDecimal.valueOf(10000)).multiply(faceValue);
-                    map.put(STANDARD_SEC_AMOUNT, standardSecAmount.setScale( 0, BigDecimal.ROUND_DOWN ).longValue()*100);//向下取整
+                    map.put(STANDARD_SEC_AMOUNT, standardSecAmount.multiply(BigDecimal.valueOf(100)).setScale(0, RoundingMode.HALF_DOWN));//向下取整
                 	map.put("cashAmount", null);//出入库时，可以为空
                 }else {
                     // 标准券总额 = 标准券数量*100
