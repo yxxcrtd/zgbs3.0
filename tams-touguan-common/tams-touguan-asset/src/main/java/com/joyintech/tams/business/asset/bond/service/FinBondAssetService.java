@@ -190,7 +190,6 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @DataSource(DataSourceType.MASERT)
     public String checkForSubmit(FlowEntity entity, boolean isMutiApproval) {
-        if (isMutiApproval) {
             // 业务编号
             String workflowId = entity.getWorkflowId();
             FinBondAssetSaveRequest finBondAssetSaveRequest = this.getBussinessEntityByWorkflowId(workflowId);
@@ -200,7 +199,6 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                     return "存在流程中/待执行指令交易数据，不可修改";
                 }
             }
-        }
         return null;
     }
 
