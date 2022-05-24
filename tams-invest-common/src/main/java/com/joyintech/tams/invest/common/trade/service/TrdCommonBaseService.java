@@ -1356,9 +1356,10 @@ public class TrdCommonBaseService extends BaseService {
                 if (interfaceType.equals(INTERF_TYPE_REPO003)) {
                     // 下单券面总额
                     portfolioDto.setOrdSecAmount(ArithmeticUtil.multiply(portfolioDetail.getEntrustAmt()));
+                } else {
+                    // 下单券面总额
+                    portfolioDto.setOrdSecAmount(portfolioDetail.getEntrustNum());
                 }
-                // 下单券面总额
-                portfolioDto.setOrdSecAmount(portfolioDetail.getEntrustNum());
             }
             // ZGCPCN-126:更改本方券总额赋值 modify by fuyongsheng 20220420 start
             // 本方券面总额

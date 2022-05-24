@@ -14,13 +14,18 @@ import com.joyintech.calculation.util.BasicUtil;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.common.dao.CfgReadonlyFormShowMapper;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
+import com.joyintech.tams.business.common.entity.CfgDataTableShow;
+import com.joyintech.tams.business.common.entity.CfgDataTableShowFlag;
 import com.joyintech.tams.business.common.entity.CfgReadonlyFormShow;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dao.CfetsPrimaryBidManageMapper;
+import com.joyintech.tams.business.common.dao.CfgDataTableFlagMapper;
+import com.joyintech.tams.business.common.dao.CfgDataTableMapper;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.*;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
@@ -125,6 +130,27 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
     @Autowired(required=false)
     private CfgReadonlyFormShowMapper cfgReadonlyFormShowMapper;
 
+    @Autowired(required=false)
+    private CfgDataTableFlagMapper cfgDataTableFlagMapper;
+
+    @Autowired(required=false)
+    private CfgDataTableMapper cfgDataTableMapper;
+
+    /**
+     * 默认设置
+     */
+    private static final int EFFERANGE_NO = 0;
+
+
+    /**
+     * 默认设置用户ID
+     */
+    private static final String USER_ID = "COMM";
+
+    /**
+     * 用户自定义设置
+     */
+    private static final int EFFERANGE_IS = 1;
 
     public Map<String,Object> getBidManageCfmInfo(CfetsPrimaryBidManageCfmRequest request) {
         if (StringUtil.isNotEmpty(request.getBidId())) {
@@ -141,6 +167,21 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     return o1.getSeqno().compareTo(o2.getSeqno());
                 }
             });
+            String userId = SecurityUtil.getLoginUser().getUserName();
+            CfgDataTableShowFlag flag = cfgDataTableFlagMapper.getByPageCodeAndDtCode(pageCode, "BidProductInfo", spcdCode, userId);
+            List<CfgDataTableShow> detailTable = null;
+            if (null == flag) {
+                detailTable = cfgDataTableMapper.getByPageCode(pageCode, "BidProductInfo", spcdCode, EFFERANGE_NO, USER_ID);
+            } else {
+                detailTable = cfgDataTableMapper.getByPageCode(pageCode, "BidProductInfo", spcdCode, EFFERANGE_IS, userId);
+            }
+            flag = cfgDataTableFlagMapper.getByPageCodeAndDtCode(pageCode, "SummaryBidInfo", spcdCode, userId);
+            List<CfgDataTableShow> listTable = null;
+            if (null == flag) {
+                listTable = cfgDataTableMapper.getByPageCode(pageCode, "SummaryBidInfo", spcdCode, EFFERANGE_NO, USER_ID);
+            } else {
+                listTable = cfgDataTableMapper.getByPageCode(pageCode, "SummaryBidInfo", spcdCode, EFFERANGE_IS, userId);
+            }
             CfetsPrimaryBidManageCfmResponse response = cfetsPrimaryBidManageMapper.getBidManageCfmInfo(param);
             List<BidProductDto> bidProductList = cfetsPrimaryBidManageMapper.getBidProductList(param);
             Map<BigDecimal, List<BidProductDto>> summaryBidMap = bidProductList.stream().collect(JoyinCollectors.groupingBy(item -> item.getWinPrice()));
@@ -158,6 +199,8 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             }
 //            response.setSummaryBidList(summaryBidList);
             resultData.put(dtCode + "_form", infoForm);
+            resultData.put(dtCode + "_formDetail", detailTable);
+            resultData.put(dtCode + "_formList", listTable);
             resultData.put(dtCode + "_data", response);
             resultData.put(dtCode + "_detail", bidProductList);
             resultData.put(dtCode + "_list", summaryBidList);
@@ -1313,5 +1356,24 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         return result;
     }
 
-
+    public BigDecimal getYield(CfetsYieldRequest request){
+        if (StringUtil.equals(request.getTenderTarget(),DictCodeListExt4.招标标的_利率.getValue())){
+            return request.getWinPrice();
+        }else  if (StringUtil.equals(request.getTenderTarget(),DictCodeListExt4.招标标的_利差.getValue())){
+            FinRateInfo finRateInfo = cfetsPrimaryBidManageMapper.getFinRateInfoByFinprodId(request.getFinprodId());
+            if (StringUtil.isNotEmpty(finRateInfo) && StringUtil.isNotEmpty(finRateInfo.getRate()) && StringUtil.isNotEmpty(finRateInfo.getCoefficient())){
+                BigDecimal rate =null;
+                if (StringUtil.isNotEmpty(finRateInfo.getBenchmarkIdAccuracy())){
+                    rate = finRateInfo.getRate().setScale(finRateInfo.getBenchmarkIdAccuracy().intValue(), RoundingMode.HALF_UP);
+                 }else{
+                    rate = finRateInfo.getRate();
+                }
+                BigDecimal yield = ArithmeticUtil.doAdd(ArithmeticUtil.multiply(rate, finRateInfo.getCoefficient()), request.getWinPrice());
+                return yield;
+            }else{
+                return request.getWinPrice();
+            }
+        }
+        return null;
+    }
 }
