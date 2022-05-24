@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 投标列表查询条件
@@ -15,23 +16,23 @@ import java.util.Date;
 @ApiModel(value = "一级投标确认-投标列表查询条件", description = "一级投标 自主投标及代投代缴 查询条件DTO")
 public class CfetsTrdFirstBidFirmTenderInfoRequest {
 
-    @ApiModelProperty(name = "firstBidStatus", value = "中标状态", example = "A1")
-    private String firstBidStatus;
+    @ApiModelProperty(name = "firstBidStatus", value = "中标状态,列表", example = "[A1]")
+    private List<String> firstBidStatus;
 
-    @ApiModelProperty(name = "tradeMarket", value = "交易场所", example = "01")
-    private String tradeMarket;
+    @ApiModelProperty(name = "tradeMarkets", value = "交易场所,列表", example = "[01]")
+    private List<String> tradeMarkets;
 
-    @ApiModelProperty(name = "finprodId", value = "资产代码", example = "F01_001.IB")
-    private String finprodId;
+    @ApiModelProperty(name = "finprodIds", value = "资产代码,列表", example = "[F01_001.IB]")
+    private List<String> finprodIds;
 
-    @ApiModelProperty(name = "finprodMarketId", value = "市场代码", example = "001.IB")
-    private String finprodMarketId;
+//    @ApiModelProperty(name = "finprodMarketIds", value = "市场代码,列表", example = "[001.IB]")
+    private List<String> finprodMarketIds;
 
-    @ApiModelProperty(name = "finprodAbbr", value = "资产简称", example = "001债券")
-    private String finprodAbbr;
+//    @ApiModelProperty(name = "finprodAbbrs", value = "资产简称,列表", example = "[001债券]")
+    private List<String> finprodAbbrs;
 
-    @ApiModelProperty(name = "tenderTarget", value = "招标标的")
-    private String tenderTarget;
+    @ApiModelProperty(name = "tenderTargets", value = "招标标的,列表")
+    private List<String> tenderTargets;
 
     @ApiModelProperty(name = "bidDateStart", value = "投标日开始")
     private Date bidDateStart;
@@ -45,20 +46,20 @@ public class CfetsTrdFirstBidFirmTenderInfoRequest {
     @ApiModelProperty(name = "bidCfmDateEnd", value = "投标确认日结束日")
     private Date bidCfmDateEnd;
 
-    @ApiModelProperty(name = "biddingMethod", value = "投标方式", example = "01")
-    private String biddingMethod;
+    @ApiModelProperty(name = "biddingMethods", value = "投标方式,列表", example = "[01]")
+    private List<String> biddingMethods;
 
-    @ApiModelProperty(name = "payType", value = "缴款方式", example = "01")
-    private String payType;
+    @ApiModelProperty(name = "payTypes", value = "缴款方式,列表", example = "[01]")
+    private List<String> payTypes;
 
-    @ApiModelProperty(name = "counterId", value = "交易对手id", example = "114912384")
-    private String counterId;
+    @ApiModelProperty(name = "counterIds", value = "交易对手id,列表", example = "[114912384]")
+    private List<String> counterIds;
 
     @ApiModelProperty(name = "bidId", value = "投标编号", example = "111")
     private String bidId;
 
-    @ApiModelProperty(name = "validStatus", value = "有效状态", example = "01")
-    private String validStatus;
+    @ApiModelProperty(name = "validStatus", value = "有效状态,列表", example = "[01]")
+    private List<String> validStatus;
 
     @ApiModelProperty(name = "pageMode", value = "分页对象", example = "{pageSize: 10,pageNo: 1, sort: 'name', direction: 'asc'}")
     private PageMode pageMode;
@@ -66,46 +67,53 @@ public class CfetsTrdFirstBidFirmTenderInfoRequest {
     @ApiModelProperty(name = "search", value = "关键词")
     private String search;
 
-    public String getValidStatus() {
-        return validStatus;
-    }
-
-    public void setValidStatus(String validStatus) {
-        this.validStatus = validStatus;
-    }
-
-    public String getFirstBidStatus() {
+    public List<String> getFirstBidStatus() {
         return firstBidStatus;
     }
 
-    public void setFirstBidStatus(String firstBidStatus) {
+    public void setFirstBidStatus(List<String> firstBidStatus) {
         this.firstBidStatus = firstBidStatus;
     }
 
-    public String getFinprodId() {
-        return finprodId;
+    public List<String> getTradeMarkets() {
+        return tradeMarkets;
     }
 
-    public void setFinprodId(String finprodId) {
-        this.finprodId = finprodId;
+    public void setTradeMarkets(List<String> tradeMarkets) {
+        this.tradeMarkets = tradeMarkets;
     }
 
-    public String getFinprodMarketId() {
-        return finprodMarketId;
+    public List<String> getFinprodIds() {
+        return finprodIds;
     }
 
-    public void setFinprodMarketId(String finprodMarketId) {
-        this.finprodMarketId = finprodMarketId;
+    public void setFinprodIds(List<String> finprodIds) {
+        this.finprodIds = finprodIds;
     }
 
-    public String getFinprodAbbr() {
-        return finprodAbbr;
+    public List<String> getFinprodMarketIds() {
+        return finprodMarketIds;
     }
 
-    public void setFinprodAbbr(String finprodAbbr) {
-        this.finprodAbbr = finprodAbbr;
+    public void setFinprodMarketIds(List<String> finprodMarketIds) {
+        this.finprodMarketIds = finprodMarketIds;
     }
 
+    public List<String> getFinprodAbbrs() {
+        return finprodAbbrs;
+    }
+
+    public void setFinprodAbbrs(List<String> finprodAbbrs) {
+        this.finprodAbbrs = finprodAbbrs;
+    }
+
+    public List<String> getTenderTargets() {
+        return tenderTargets;
+    }
+
+    public void setTenderTargets(List<String> tenderTargets) {
+        this.tenderTargets = tenderTargets;
+    }
 
     public Date getBidDateStart() {
         return bidDateStart;
@@ -123,56 +131,6 @@ public class CfetsTrdFirstBidFirmTenderInfoRequest {
         this.bidDateEnd = bidDateEnd;
     }
 
-    public String getTenderTarget() {
-        return tenderTarget;
-    }
-
-    public void setTenderTarget(String tenderTarget) {
-        this.tenderTarget = tenderTarget;
-    }
-
-    public String getBiddingMethod() {
-        return biddingMethod;
-    }
-
-    public void setBiddingMethod(String biddingMethod) {
-        this.biddingMethod = biddingMethod;
-    }
-
-    public String getPayType() {
-        return payType;
-    }
-
-    public void setPayType(String payType) {
-        this.payType = payType;
-    }
-
-
-    public String getBidId() {
-        return bidId;
-    }
-
-    public void setBidId(String bidId) {
-        this.bidId = bidId;
-    }
-
-
-    public String getTradeMarket() {
-        return tradeMarket;
-    }
-
-    public void setTradeMarket(String tradeMarket) {
-        this.tradeMarket = tradeMarket;
-    }
-
-    public String getCounterId() {
-        return counterId;
-    }
-
-    public void setCounterId(String counterId) {
-        this.counterId = counterId;
-    }
-
     public Date getBidCfmDateStart() {
         return bidCfmDateStart;
     }
@@ -187,6 +145,46 @@ public class CfetsTrdFirstBidFirmTenderInfoRequest {
 
     public void setBidCfmDateEnd(Date bidCfmDateEnd) {
         this.bidCfmDateEnd = bidCfmDateEnd;
+    }
+
+    public List<String> getBiddingMethods() {
+        return biddingMethods;
+    }
+
+    public void setBiddingMethods(List<String> biddingMethods) {
+        this.biddingMethods = biddingMethods;
+    }
+
+    public List<String> getPayTypes() {
+        return payTypes;
+    }
+
+    public void setPayTypes(List<String> payTypes) {
+        this.payTypes = payTypes;
+    }
+
+    public List<String> getCounterIds() {
+        return counterIds;
+    }
+
+    public void setCounterIds(List<String> counterIds) {
+        this.counterIds = counterIds;
+    }
+
+    public String getBidId() {
+        return bidId;
+    }
+
+    public void setBidId(String bidId) {
+        this.bidId = bidId;
+    }
+
+    public List<String> getValidStatus() {
+        return validStatus;
+    }
+
+    public void setValidStatus(List<String> validStatus) {
+        this.validStatus = validStatus;
     }
 
     public PageMode getPageMode() {
