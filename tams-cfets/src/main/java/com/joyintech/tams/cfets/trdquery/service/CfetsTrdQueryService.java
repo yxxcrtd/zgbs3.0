@@ -229,7 +229,6 @@ public class CfetsTrdQueryService extends BaseService{
             infoTablePledge = cfgDataTableMapper.getByPageCode(pageCode, dtCodeTemp, spcdCodeTemp, EFFERANGE_NO, USER_ID);
         } else {
             infoTablePledge = cfgDataTableMapper.getByPageCode(pageCode, dtCodeTemp, spcdCodeTemp, EFFERANGE_IS, userId);
-            ;
         }
         resultData.put(dtCode + "_formb", infoFormb);
         resultData.put(dtCode + "_formm", infoFormm);
