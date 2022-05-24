@@ -694,7 +694,7 @@ public class FinBondAsset002Controller extends BaseController{
         }
     }
 
-    @ApiOperation(value="节假日自动向后推算日期(参数：)",notes = "正股代码的联想下拉框")
+    @ApiOperation(value="节假日自动向后推算日期(参数：)",notes = "节假日自动向后推算日期")
     @ResponseBody
     @PostMapping("getDealCalendarHoliday")
     public Message<Date> getDealCalendarHoliday(@RequestBody SelectOptionCommonRequest request){
@@ -704,5 +704,80 @@ public class FinBondAsset002Controller extends BaseController{
         }catch (Exception e) {
             return new Message<Date>().fail().setMessage("正股代码的联想下拉框异常");
         }
+    }
+
+    /**
+     * 查看区间付息计划
+     * <功能详细描述>
+     * @param dto
+     * @return
+     * @throws ParseException
+     * @see
+     * @since 1.0
+     */
+    @ApiOperation(value="查看区间付息计划",notes = "查看区间付息计划")
+    @ResponseBody
+    @PostMapping("generationSubPlan")
+    public Message<List<BondFinCashPlanDto>> generationSubPlan(@RequestBody BondFinPayInterestStdInfoRequest dto) {
+        try {
+            String finprodId = dto.getFinprodId();
+            if(!StringUtil.isNotEmpty(finprodId) && StringUtil.isNotEmpty(dto.getFinprodMarketId())) {
+                finprodId = commonBusinessService.getFinProdId(dto.getFinprodMarketId(),DictCodeListExt1.金融产品类型_投管用_债券.getValue(),null);
+            }
+            if (StringUtil.isNotEmpty(dto.getFinInterestFactorDto()) &&
+                    StringUtil.isNotEmpty(dto.getFinInterestFactorDto().getYield()) ){
+                dto.getFinInterestFactorDto().setYield(ArithmeticUtil.multiply(dto.getFinInterestFactorDto().getYield(),BigDecimal.valueOf(100)));
+            }
+            // 付息计划
+            List<BondFinCashPlanDto> invList = new ArrayList<>();
+            Date maxTradeDate = null;
+            if(StringUtil.isNotEmpty(finprodId)) {
+                maxTradeDate = finBondAssetService.getMaxTradeDate(finprodId);
+                // 生付息成计划
+                dto.setMaxTradeDate(maxTradeDate);
+            }
+            dto.setCalendarId(finBondAssetService.getCalendarId(dto.getTradeMarket()));
+            dto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+            if(StringUtil.equals(dto.getAdjPlanFlag(), DictCodeList.共通业务类型_付息计划调整.getValue())){
+                dto.setFinprodType2(dto.getAdjPlanFlag());
+            }
+            FinPayInterestStdInfoDto finPayInterestStdInfoDto= new FinPayInterestStdInfoDto();
+            BeanUtil.copyPropertiesIgnoreNull(finPayInterestStdInfoDto,dto);
+            BondFinInterestFactorDto bondFinInterestFactorDto = dto.getFinInterestFactorDto();
+            FinInterestFactorDto finInterestFactorDto = new FinInterestFactorDto();
+            finInterestFactorDto.setRate(bondFinInterestFactorDto.getYield());
+            BeanUtil.copyPropertiesIgnoreNull(finInterestFactorDto,bondFinInterestFactorDto);
+            finPayInterestStdInfoDto.setFinInterestFactorDto(finInterestFactorDto);
+            if (CollectionUtils.isNotEmpty(dto.getInvScheduleList())) {
+                List<FinCashPlanDto> invScheduleList = new ArrayList<>();
+                dto.getInvScheduleList().forEach(bondInvSchedule -> {
+                    FinCashPlanDto finCashPlanDto = new FinCashPlanDto();
+                    BeanUtil.copyPropertiesIgnoreNull(finCashPlanDto, bondInvSchedule);
+                    invScheduleList.add(finCashPlanDto);
+                });
+                finPayInterestStdInfoDto.setInvScheduleList(invScheduleList);
+            }
+            if (CollectionUtils.isNotEmpty(dto.getInvRepayList())) {
+                List<FinCashPlanDto> invRepayList = new ArrayList<>();
+                dto.getInvRepayList().forEach(item -> {
+                    FinCashPlanDto finCashPlanDto = new FinCashPlanDto();
+                    BeanUtil.copyPropertiesIgnoreNull(finCashPlanDto, item);
+                    invRepayList.add(finCashPlanDto);
+                });
+                finPayInterestStdInfoDto.setInvRepayList(invRepayList);
+            }
+            List<FinCashPlanDto> finCashPlanList = finPayInterestStdInfoService.createAssetPayInteresPlan(finPayInterestStdInfoDto);
+            for (FinCashPlanDto finCashPlan:finCashPlanList){
+                BondFinCashPlanDto bondFinCashPlanDto = new BondFinCashPlanDto();
+                BeanUtil.copyPropertiesIgnoreNull(bondFinCashPlanDto,finCashPlan);
+                bondFinCashPlanDto.setRangeYield(ArithmeticUtil.divide(bondFinCashPlanDto.getRangeYield(),BigDecimal.valueOf(100),4));
+                bondFinCashPlanDto.setLirs(null);
+                invList.add(bondFinCashPlanDto);
+            }
+            return new Message<List<BondFinCashPlanDto>>().success().setData(invList);
+        }catch (Exception e) {
+            return new Message<List<BondFinCashPlanDto>>().fail().setMessage("查看区间付息计划异常");
+        }
+
     }
 }
