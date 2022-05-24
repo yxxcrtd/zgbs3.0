@@ -443,6 +443,7 @@ public class EtrExchangeTradeRepo001Service extends CommonExportService<EtrExcha
                 //增加调用头寸引擎代码end
             }
         }
+        entity.setConfirmOk(null);
     }
 
     public void calcAmt(EtrExchangeTradeSecRepoSaveRepoRequest entity) {
