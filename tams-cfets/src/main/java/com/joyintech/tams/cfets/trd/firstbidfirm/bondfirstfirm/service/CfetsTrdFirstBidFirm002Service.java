@@ -534,10 +534,11 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         }
         CfetsTrdFirstBidFirmInfoDto viewInfo = new CfetsTrdFirstBidFirmInfoDto();
         Map<String, Object> pageParam = BeanUtil.object2Map(request);
-//        List<CfetsTrdFirstBidFirmInfoDto> listTmp = cfetsTrdBondFirstSub002Mapper.viewPage(pageParam);
-//        if (StringUtil.isNotEmpty(listTmp)) {
-//            viewInfo = listTmp.get(0);
-//        }
+        List<CfetsTrdFirstBidFirmInfoDto> listTmp = cfetsTrdFirstBidFirm002Mapper.viewPage(pageParam);
+        if (StringUtil.isNotEmpty(listTmp)) {
+            viewInfo = listTmp.get(0);
+            viewInfo.setBidTotalList(this.createBidTotalList(viewInfo));
+        }
         logger.debug("初始化一级投标确认交易查看页面,结果:" + JsonUtils.object2Json(viewInfo));
         return viewInfo;
     }

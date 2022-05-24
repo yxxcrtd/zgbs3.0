@@ -201,5 +201,148 @@
     <update id="updateBidOrderBidPrice">
         UPDATE BID_ORDER_BID_PRICE SET IS_CANCEL  = 'Y' WHERE BID_ID  = #{bidId}
     </update>
-
+    <!--根据投标编号查看一级投标确认交易信息-->
+    <select id="viewPage" resultMap="BaseResultMap">
+        select bo.FINPROD_ID,
+               fp.FINPROD_MARKET_ID,
+               fp.FINPROD_ABBR,
+               bo.OU_PARTY_ID,
+               bo.OUR_TRADER,
+               mcct.TRADER_NAME                                                    ourTraderName,
+               fpi.TENDER_TARGET    tenderTarget/*招标标的*/,
+               fp.CCY  ccy,
+               CASE
+                   WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
+                       THEN fpi.ISSUE_DATE
+                   WHEN (fpi.ISSUE_CLASS = '02' AND (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
+                       OR fpi.ISSUE_CLASS = '03'
+                       THEN fpi.TENDER_SDATE
+                   END           AS bidDateStart/*投标日 开始*/,
+               CASE
+                   WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
+                       THEN fpi.ISSUE_DATE
+                   WHEN (fpi.ISSUE_CLASS = '02' AND (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
+                       OR fpi.ISSUE_CLASS = '03'
+                       THEN fpi.TENDER_SDATE
+                   END           AS bidDateEnd/*投标日 结束*/,
+               bo.PAY_DATE          payDate/*缴款日*/,
+               fpi.PAY_EDATE          payEdate/*缴款截止日*/,
+               bo.ASSIGN_REGDATE    assignRegdate/*债权债务登记日*/,
+               bo.ONMARKET_DATE     listingDate/*上市日*/,
+               bo.BID_MODLE      AS biddingMethod/*投标方式*/,
+               bo.PAY_TYPE       AS payType/*缴款方式*/,
+               ee.ENTRUST_NUM    AS etrBidPriceTotal/*指令投标券面总额*/,
+               bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额*/,
+               bo.WIN_PRIN_AMT   AS bidPriceTotal/*券面总额*/,
+               case
+                   when fpi.TENDER_TARGET = '01' then to_char(bo.WIN_PRICE * 100, 'FM99990.9990') || '%'
+                   when fpi.TENDER_TARGET = '02' then to_char(bo.WIN_PRICE, 'FM99990.9990') || '元'
+                   when fpi.TENDER_TARGET = '03' then to_char(bo.WIN_PRICE * 10000, 'FM99990.90') || 'BP'
+                   end              winPrice/*中标标位*/,
+               bo.UNIT_INT   AS intAmt/*应计利息*/,
+               bo.SETT_FEE_AMT    settFeeAmt/*结算服务费*/,
+               bo.REMARK       AS remark/*备注*/,
+               bobp.ENTRUST_ID,
+               bobp.PORTFOLIO_ID,
+               pp.PORTFOLIO_NAME,
+               bobp.THE_WIN_PRIN_AMT totalBiddingNum /*汇总投标券面总额*/,
+               bobp.TRADE_AMT bidPriceTotal /*券面总额*/,
+               bobp.SETT_FEE_AMT/*结算服务费*/,
+               bobp.TRADE_AMT/*交易金额*/,
+               bobp.INT_AMT/*应计利息总额*/,
+               bobp.PAYABLE_AMOUNT/*缴款金额*/,
+               bobp.BID_PRICE/*标位*/,
+               eed.INV_AIM/*业务模式*/,
+               eed.SEC_ACCT_ID,
+               ssai.SEC_ACCT_NAME,
+               bo.dip_Type dipType/*分配方式*/,
+               bo.dip_Type adjustStrategy/*调整策略*/,
+               ee.INV_MANAGER_ID invManagerId,
+               su.REAL_NAME     invManagerName,
+               ROWNUM rn
+        from BID_ORDER bo
+                 left join BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
+                 left join PTL_PORTFOLIO pp on bobp.PORTFOLIO_ID = pp.PORTFOLIO_ID
+                 LEFT JOIN ETR_ENTRUST ee ON ee.ENTRUST_ID  = bobp.ENTRUST_ID
+                 left join ETR_ENTRUST_DETAIL eed on bobp.ENTRUST_ID = eed.ENTRUST_ID and bobp.PORTFOLIO_ID = eed.PORTFOLIO_ID
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
+                 left join FIN_PRODUCT_ISSUE fpi on fp.FINPROD_ID = fpi.FINPROD_ID
+                 left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
+                 left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
+                 left join MST_CFETS_CUSTOMER_TRADER mcct on mcct.TRADER_ID = bo.OUR_TRADER
+                 left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
+                 left join SYS_USER su on su.USER_NAME = ee.INV_MANAGER_ID
+        where bo.BID_ID = #{bidId}
+        union all
+        select bo.FINPROD_ID,
+               fp.FINPROD_MARKET_ID,
+               fp.FINPROD_ABBR,
+               bo.OU_PARTY_ID,
+               bo.OUR_TRADER,
+               mcct.TRADER_NAME                                                    ourTraderName,
+               fpi.TENDER_TARGET    tenderTarget/*招标标的*/,
+               fp.CCY  ccy,
+               CASE
+                   WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
+                       THEN fpi.ISSUE_DATE
+                   WHEN (fpi.ISSUE_CLASS = '02' AND (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
+                       OR fpi.ISSUE_CLASS = '03'
+                       THEN fpi.TENDER_SDATE
+                   END           AS bidDateStart/*投标日 开始*/,
+               CASE
+                   WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
+                       THEN fpi.ISSUE_DATE
+                   WHEN (fpi.ISSUE_CLASS = '02' AND (fpi.TENDER_TYPE IS NULL OR fpi.TENDER_TYPE IN ('03', '04')))
+                       OR fpi.ISSUE_CLASS = '03'
+                       THEN fpi.TENDER_SDATE
+                   END           AS bidDateEnd/*投标日 结束*/,
+               bo.PAY_DATE          payDate/*缴款日*/,
+               fpi.PAY_EDATE          payEdate/*缴款截止日*/,
+               bo.ASSIGN_REGDATE    assignRegdate/*债权债务登记日*/,
+               bo.ONMARKET_DATE     listingDate/*上市日*/,
+               bo.BID_MODLE      AS biddingMethod/*投标方式*/,
+               bo.PAY_TYPE       AS payType/*缴款方式*/,
+               ee.ENTRUST_NUM    AS etrBidPriceTotal/*指令投标券面总额*/,
+               bo.WIN_PRIN_AMT   AS totalBiddingNum/*汇总投标券面总额*/,
+               bo.WIN_PRIN_AMT   AS bidPriceTotal/*券面总额*/,
+               case
+                   when fpi.TENDER_TARGET = '01' then to_char(bo.WIN_PRICE * 100, 'FM99990.9990') || '%'
+                   when fpi.TENDER_TARGET = '02' then to_char(bo.WIN_PRICE, 'FM99990.9990') || '元'
+                   when fpi.TENDER_TARGET = '03' then to_char(bo.WIN_PRICE * 10000, 'FM99990.90') || 'BP'
+                   end              winPrice/*中标标位*/,
+               bo.UNIT_INT   AS intAmt/*应计利息*/,
+               bo.SETT_FEE_AMT    settFeeAmt/*结算服务费*/,
+               bo.REMARK       AS remark/*备注*/,
+               bobp.ENTRUST_ID,
+               bobp.PORTFOLIO_ID,
+               pp.PORTFOLIO_NAME,
+               bobp.THE_WIN_PRIN_AMT totalBiddingNum /*汇总投标券面总额*/,
+               bobp.TRADE_AMT bidPriceTotal /*券面总额*/,
+               bobp.SETT_FEE_AMT/*结算服务费*/,
+               bobp.TRADE_AMT/*交易金额*/,
+               bobp.INT_AMT/*应计利息总额*/,
+               bobp.PAYABLE_AMOUNT/*缴款金额*/,
+               bobp.BID_PRICE/*标位*/,
+               eed.INV_AIM/*业务模式*/,
+               eed.SEC_ACCT_ID,
+               ssai.SEC_ACCT_NAME,
+               bo.dip_Type dipType/*分配方式*/,
+               bo.dip_Type adjustStrategy/*调整策略*/,
+               ee.INV_MANAGER_ID invManagerId,
+               su.REAL_NAME     invManagerName,
+               ROWNUM rn
+        from WFL_BID_ORDER bo
+                 left join WFL_BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
+                 left join PTL_PORTFOLIO pp on bobp.PORTFOLIO_ID = pp.PORTFOLIO_ID
+                 LEFT JOIN ETR_ENTRUST ee ON ee.ENTRUST_ID  = bobp.ENTRUST_ID
+                 left join ETR_ENTRUST_DETAIL eed on bobp.ENTRUST_ID = eed.ENTRUST_ID and bobp.PORTFOLIO_ID = eed.PORTFOLIO_ID
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
+                 left join FIN_PRODUCT_ISSUE fpi on fp.FINPROD_ID = fpi.FINPROD_ID
+                 left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
+                 left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = bo.OU_PARTY_ID
+                 left join MST_CFETS_CUSTOMER_TRADER mcct on mcct.TRADER_ID = bo.OUR_TRADER
+                 left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
+                 left join SYS_USER su on su.USER_NAME = ee.INV_MANAGER_ID
+        where bo.BID_ID = #{bidId}
+    </select>
 </mapper>
