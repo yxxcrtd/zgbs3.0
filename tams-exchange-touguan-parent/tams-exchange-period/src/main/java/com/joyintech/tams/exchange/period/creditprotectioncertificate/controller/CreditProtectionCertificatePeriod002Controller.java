@@ -146,11 +146,11 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
             }
         }
 
-        if (confirmMessage.length() > 0) {
+        if (!validMessages.isEmpty()) {
+            ajaxResult.setErrorList(validMessages);
+        } else if (confirmMessage.length() > 0) {
             ajaxResult.setMessageType(MessageType.确认消息);
             ajaxResult.setData(confirmMessage);
-        } else if (!validMessages.isEmpty()) {
-            ajaxResult.setErrorList(validMessages);
         } else {
             ajaxResult.setMessage("校验成功");
         }
