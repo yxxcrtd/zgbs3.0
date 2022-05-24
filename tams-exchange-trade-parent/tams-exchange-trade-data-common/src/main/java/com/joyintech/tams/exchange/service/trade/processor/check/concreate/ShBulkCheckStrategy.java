@@ -29,7 +29,7 @@ public class ShBulkCheckStrategy implements IBusinessCheckStrategy {
     @Override
     public boolean support(Instruction instruction) {
         return TradePlat.SH_SCALE.codeEquals(instruction.getTradePlat())
-                && EnumUtil.in(instruction.getAssetType(), InvestmentAssetType.FUND, InvestmentAssetType.STOCK);
+                && EnumUtil.in(instruction.getAssetType(), InvestmentAssetType.FUND, InvestmentAssetType.STOCK, InvestmentAssetType.BOND);
     }
 
     @Override
