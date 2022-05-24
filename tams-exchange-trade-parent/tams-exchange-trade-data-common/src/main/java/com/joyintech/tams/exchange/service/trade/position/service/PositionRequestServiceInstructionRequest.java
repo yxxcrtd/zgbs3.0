@@ -130,6 +130,7 @@ public class PositionRequestServiceInstructionRequest {
             List<Map<String, Object>> ptlList = new ArrayList<>(calculateSize);
             for (PortfolioCalculateResponse item : calculates) {
                 bean = new PositionRequestBaseBean(entity);
+                bean.setPortfolioId(item.getPortfolioId());
                 BigDecimal secAmount = commonPositionEngineService.getSecAmountByBondUnit(item.getEntrustNum());
                 bean.setSecAmount(secAmount);
                 BigDecimal price = Objects.isNull(entity.getFullPrice()) ? BigDecimal.ZERO : entity.getFullPrice();
