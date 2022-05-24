@@ -175,7 +175,7 @@ public class CfetsTrdFirstBidFirm001Controller extends BaseController {
     }
 
     @ApiOperation(value = "查询投标确认执行明细", notes = "查询投标确认执行明细")
-    @PostMapping("/getEntrust/{entrustId}")
+    @PostMapping("/getBidOrderTransactionDetails/{entrustId}")
     @ResponseBody
     public Message<Map<String, Object>> getBidOrderTransactionDetails(@PathVariable("entrustId") String entrustId) {
         try {
