@@ -248,11 +248,10 @@
         WHERE ee.ENTRUST_ID = #{entrustId}
     </select>
     <select id="tenderSearch" resultType="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmTenderInfoDto">
-
     select T.validStatus,
            T.firstBidStatus,
            T.bidId,
-           T.FINPROD_ID,
+           T.finprodId,
            T.finprodMarketId,
            T.finprodAbbr,
            T.tenderTarget,
@@ -265,7 +264,7 @@
            T.payType,
            T.bidDate,
            T.tradeMarket,
-           T.COUNTER_ID,
+           T.counterId,
            T.counterName,
            T.remark
     from (SELECT CASE
@@ -277,7 +276,7 @@
                      WHEN brt.TOTAL_WIN_ID IS NULL THEN '02'
                      END           AS firstBidStatus/*中标状态*/,
                  bo.BID_ID         AS bidId/*投标编号*/,
-                 fp.FINPROD_ID,
+                 fp.FINPROD_ID finprodId,
                  fp.FINPROD_MARKET_ID finprodMarketId/*资产代码*/,
                  fp.FINPROD_ABBR      finprodAbbr/*资产简称*/,
                  fpi.TENDER_TARGET    tenderTarget/*招标标的*/,
@@ -302,7 +301,7 @@
                  bo.PAY_TYPE       AS payType/*缴款方式*/,
                  bo.BID_DATE       AS bidDate/*投标确认日*/,
                  fp.TRADE_MARKET      tradeMarket/*交易场所*/,
-                 bo.COUNTER_ID /*交易对手*/,
+                 bo.COUNTER_ID counterId/*交易对手*/,
                  mci.CUSTOMER_NAME AS counterName/*交易对手*/,
                  bo.REMARK         AS remark/*备注*/
           FROM BID_ORDER bo
@@ -344,6 +343,39 @@
                              ON mci.CUSTOMER_ID = bo.COUNTER_ID
           WHERE bo.BID_MODLE IN ('01', '02')
             AND bo.TRADE_STATUS = '01'
+            <if test="tradeMarkets != null and tradeMarkets.size()>0">
+                AND
+                <foreach collection="tradeMarkets" open=" fp.TRADE_MARKET in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="finprodIds != null and finprodIds.size()>0">
+                AND
+                <foreach collection="finprodIds" open=" fp.FINPROD_ID in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="tenderTargets != null and tenderTargets.size()>0">
+                AND
+                <foreach collection="tenderTargets" open=" fpi.TENDER_TARGET in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="payTypes != null and payTypes.size()>0">
+                AND
+                <foreach collection="payTypes" open=" bo.PAY_TYPE in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="counterIds != null and counterIds.size()>0">
+                AND
+                <foreach collection="counterIds" open=" bo.COUNTER_ID in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="bidId != null and bidId!='' ">
+                AND bo.BID_ID LIKE CONCAT('%',CONCAT(#{bidId},'%'))
+            </if>
           union all
           SELECT '04' AS validStatus/*有效状态*/,
                  CASE
@@ -352,7 +384,7 @@
                      WHEN brt.TOTAL_WIN_ID IS NULL THEN '02'
                      END           AS firstBidStatus/*中标状态*/,
                  bo.BID_ID         AS bidId/*投标编号*/,
-                 fp.FINPROD_ID,
+                 fp.FINPROD_ID finprodId,
                  fp.FINPROD_MARKET_ID finprodMarketId/*资产代码*/,
                  fp.FINPROD_ABBR      finprodAbbr/*资产简称*/,
                  fpi.TENDER_TARGET    tenderTarget/*招标标的*/,
@@ -377,7 +409,7 @@
                  bo.PAY_TYPE       AS payType/*缴款方式*/,
                  bo.BID_DATE       AS bidDate/*投标确认日*/,
                  fp.TRADE_MARKET      tradeMarket/*交易场所*/,
-                 bo.COUNTER_ID /*交易对手*/,
+                 bo.COUNTER_ID counterId/*交易对手*/,
                  mci.CUSTOMER_NAME AS counterName/*交易对手*/,
                  bo.REMARK         AS remark/*备注*/
           FROM WFL_BID_ORDER bo
@@ -418,16 +450,99 @@
                    LEFT JOIN MST_CUSTOMER_INFO mci
                              ON mci.CUSTOMER_ID = bo.COUNTER_ID
           WHERE bo.BID_MODLE IN ('01', '02')
+            <if test="tradeMarkets != null and tradeMarkets.size()>0">
+                AND
+                <foreach collection="tradeMarkets" open=" fp.TRADE_MARKET in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="finprodIds != null and finprodIds.size()>0">
+                AND
+                <foreach collection="finprodIds" open=" fp.FINPROD_ID in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="tenderTargets != null and tenderTargets.size()>0">
+                AND
+                <foreach collection="tenderTargets" open=" fpi.TENDER_TARGET in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="payTypes != null and payTypes.size()>0">
+                AND
+                <foreach collection="payTypes" open=" bo.PAY_TYPE in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="counterIds != null and counterIds.size()>0">
+                AND
+                <foreach collection="counterIds" open=" bo.COUNTER_ID in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="bidId != null and bidId!='' ">
+                AND bo.BID_ID LIKE CONCAT('%',CONCAT(#{bidId},'%'))
+            </if>
          ) T
-    group by T.validStatus, T.firstBidStatus, T.bidId, T.FINPROD_ID, T.finprodMarketId, T.finprodAbbr, T.tenderTarget, T.bidDateStart,
+        left join SYS_DATADICT_LIST sdl_sv on T.validStatus=sdl_sv.ITEM_CODE and sdl_sv.DICT_CODE='STATUS_VALID'
+        left join SYS_DATADICT_LIST sdl_fbs on T.firstBidStatus=sdl_fbs.ITEM_CODE and sdl_fbs.DICT_CODE='FIRST_BID_STATUS'
+        left join SYS_DATADICT_LIST sdl_tt on T.tenderTarget=sdl_tt.ITEM_CODE and sdl_tt.DICT_CODE='TENDER_TARGET'
+        left join SYS_DATADICT_LIST sdl_wt on T.biddingMethod=sdl_wt.ITEM_CODE and sdl_wt.DICT_CODE='WIN_TYPE'
+        left join SYS_DATADICT_LIST sdl_ept on T.payType=sdl_ept.ITEM_CODE and sdl_ept.DICT_CODE='ETR_PAY_TYPE'
+        left join SYS_DATADICT_LIST sdl_tp on T.tradeMarket=sdl_tp.ITEM_CODE and sdl_tp.DICT_CODE='TRADE_PLACE'
+     <where>
+         <!-- 关键字模糊查询 -->
+         <include refid="keywordsTenderSearchWhere"></include>
+         <if test="firstBidStatus != null and firstBidStatus.size()>0">
+             AND
+             <foreach collection="firstBidStatus" open=" T.firstBidStatus in(" close=")" separator="," item="item">
+                 #{item}
+             </foreach>
+         </if>
+         <if test="bidDateStart != null">
+             AND T.bidDateStart = TO_DATE(#{bidDateStart},'yyyy-MM-dd')
+         </if>
+         <if test="bidDateEnd != null">
+             AND T.bidDateEnd = TO_DATE(#{bidDateEnd},'yyyy-MM-dd')
+         </if>
+         <if test="validStatus != null and validStatus.size()>0">
+             AND
+             <foreach collection="validStatus" open=" T.validStatus in(" close=")" separator="," item="item">
+                 #{item}
+             </foreach>
+         </if>
+     </where>
+    group by T.validStatus, T.firstBidStatus, T.bidId, T.finprodId, T.finprodMarketId, T.finprodAbbr, T.tenderTarget, T.bidDateStart,
              T.bidDateEnd, T.etrBidPriceTotal, T.totalBiddingNum, T.bidprice, T.biddingMethod, T.payType, T.bidDate, T.tradeMarket,
-             T.COUNTER_ID, T.counterName, T.remark
+             T.counterId, T.counterName, T.remark
     </select>
+
+    <!-- 投标 关键字 -->
+    <sql id="keywordsTenderSearchWhere">
+        <if test="search != null and search != ''">
+            ( T.validStatus || '|' || sdl_sv.item_value || '|' || T.firstBidStatus || '|' || sdl_fbs.item_value
+            || '|' || T.tenderTarget || '|' || sdl_tt.item_value || '|' || T.biddingMethod || '|' || sdl_wt.item_value
+            || '|' || T.payType || '|' || sdl_ept.item_value || '|' || T.tradeMarket || '|' || sdl_tp.item_value
+            || '|' || T.bidId  || '|' || T.finprodId || '|' || T.finprodMarketId || '|'
+            || '|' || T.finprodAbbr || '|' || T.counterId || '|' || T.counterName || '|' || T.remark
+            like '%' || #{search} || '%'
+            or decode(T.etrBidPriceTotal,0,'0.00',to_char(T.etrBidPriceTotal/10000,'FM99999999999990.90'))=#{search} or to_char(T.etrBidPriceTotal)=#{search}
+            or decode(T.totalBiddingNum,0,'0.00',to_char(T.totalBiddingNum/10000,'FM9999999999990.90'))=#{search} or to_char(T.totalBiddingNum)=#{search}
+            or decode(T.bidprice,0,'0.00',to_char(T.bidprice,'FM999999999990.9990'))=#{search} or to_char(T.bidprice)=#{search}
+            or replace(to_char(T.bidDateStart,'yyyy-MM-dd'),'-','/')=#{search}
+            or replace(to_char(T.bidDateEnd,'yyyy-MM-dd'),'-','/')=#{search}
+            or replace(to_char(T.bidDate,'yyyy-MM-dd'),'-','/')=#{search}
+            )
+        </if>
+    </sql>
 
     <select id="distributionSearch" resultType="com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmDistributionInfoDto">
     select T.validStatus,
            T.firstBidStatus,
            T.bidId,
+           T.finprodId,
+           T.finprodMarketId,
+           T.finprodAbbr,
            T.bidDateStart,
            T.bidDateEnd,
            SUM(T.etrBidPriceTotal) etrBidPriceTotal,
@@ -443,6 +558,7 @@
            T.assignRegdate,
            T.listingDate,
            T.bidDate,
+           T.counterId,
            T.counterName,
            T.remark,
            T.dealDate
@@ -456,6 +572,9 @@
                         WHEN brt.TOTAL_WIN_ID IS NULL THEN '02'
                         END           AS firstBidStatus/*中标状态*/,
                     bo.BID_ID         AS bidId/*投标编号*/,
+                     fp.FINPROD_ID finprodId,
+                     fp.FINPROD_MARKET_ID finprodMarketId/*资产代码*/,
+                     fp.FINPROD_ABBR      finprodAbbr/*资产简称*/,
                     CASE
                         WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
                             THEN fpi.ISSUE_DATE
@@ -489,7 +608,8 @@
                     bo.ASSIGN_REGDATE    assignRegdate/*债权债务登记日*/,
                     bo.ONMARKET_DATE     listingDate/*上市日*/,
                     bo.BID_DATE       AS bidDate/*投标确认日*/,
-                    bo.COUNTER_ID     AS counterName/*交易对手*/,
+                    bo.COUNTER_ID counterId/*交易对手*/,
+                    mci.CUSTOMER_NAME AS counterName/*交易对手*/,
                     bo.REMARK         AS remark/*备注*/,
                     null                 dealDate/*成交日期*/
              FROM BID_ORDER bo
@@ -528,8 +648,43 @@
                       LEFT JOIN
                   ETR_ENTRUST ee
                   ON ee.ENTRUST_ID = bobp1.ENTRUST_ID
+                   LEFT JOIN MST_CUSTOMER_INFO mci
+                             ON mci.CUSTOMER_ID = bo.COUNTER_ID
              WHERE bo.BID_MODLE IN ('03')
                AND bo.TRADE_STATUS = '01'
+                <if test="tradeMarkets != null and tradeMarkets.size()>0">
+                    AND
+                    <foreach collection="tradeMarkets" open=" fp.TRADE_MARKET in(" close=")" separator="," item="item">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="finprodIds != null and finprodIds.size()>0">
+                    AND
+                    <foreach collection="finprodIds" open=" fp.FINPROD_ID in(" close=")" separator="," item="item">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="tenderTargets != null and tenderTargets.size()>0">
+                    AND
+                    <foreach collection="tenderTargets" open=" fpi.TENDER_TARGET in(" close=")" separator="," item="item">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="payTypes != null and payTypes.size()>0">
+                    AND
+                    <foreach collection="payTypes" open=" bo.PAY_TYPE in(" close=")" separator="," item="item">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="counterIds != null and counterIds.size()>0">
+                    AND
+                    <foreach collection="counterIds" open=" bo.COUNTER_ID in(" close=")" separator="," item="item">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="bidId != null and bidId!='' ">
+                    AND bo.BID_ID LIKE CONCAT('%',CONCAT(#{bidId},'%'))
+                </if>
              union all
              SELECT '04'            AS validStatus/*有效状态*/,
                     CASE
@@ -538,6 +693,9 @@
                         WHEN brt.TOTAL_WIN_ID IS NULL THEN '02'
                         END         AS firstBidStatus/*中标状态*/,
                     bo.BID_ID       AS bidId/*投标编号*/,
+                     fp.FINPROD_ID finprodId,
+                     fp.FINPROD_MARKET_ID finprodMarketId/*资产代码*/,
+                     fp.FINPROD_ABBR      finprodAbbr/*资产简称*/,
                     CASE
                         WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
                             THEN fpi.ISSUE_DATE
@@ -571,7 +729,8 @@
                     bo.ASSIGN_REGDATE  assignRegdate/*债权债务登记日*/,
                     bo.ONMARKET_DATE   listingDate/*上市日*/,
                     bo.BID_DATE     AS bidDate/*投标确认日*/,
-                    bo.COUNTER_ID   AS counterName/*交易对手*/,
+                    bo.COUNTER_ID counterId/*交易对手*/,
+                    mci.CUSTOMER_NAME AS counterName/*交易对手*/,
                     bo.REMARK       AS remark/*备注*/,
                     null               dealDate/*成交日期*/
              FROM WFL_BID_ORDER bo
@@ -610,13 +769,94 @@
                       LEFT JOIN
                   ETR_ENTRUST ee
                   ON ee.ENTRUST_ID = bobp1.ENTRUST_ID
+                   LEFT JOIN MST_CUSTOMER_INFO mci
+                             ON mci.CUSTOMER_ID = bo.COUNTER_ID
              WHERE bo.BID_MODLE IN ('03')
+                <if test="tradeMarkets != null and tradeMarkets.size()>0">
+                    AND
+                    <foreach collection="tradeMarkets" open=" fp.TRADE_MARKET in(" close=")" separator="," item="item">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="finprodIds != null and finprodIds.size()>0">
+                    AND
+                    <foreach collection="finprodIds" open=" fp.FINPROD_ID in(" close=")" separator="," item="item">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="tenderTargets != null and tenderTargets.size()>0">
+                    AND
+                    <foreach collection="tenderTargets" open=" fpi.TENDER_TARGET in(" close=")" separator="," item="item">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="payTypes != null and payTypes.size()>0">
+                    AND
+                    <foreach collection="payTypes" open=" bo.PAY_TYPE in(" close=")" separator="," item="item">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="counterIds != null and counterIds.size()>0">
+                    AND
+                    <foreach collection="counterIds" open=" bo.COUNTER_ID in(" close=")" separator="," item="item">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="bidId != null and bidId!='' ">
+                    AND bo.BID_ID LIKE CONCAT('%',CONCAT(#{bidId},'%'))
+                </if>
          ) T
-    group by T.validStatus, T.firstBidStatus, T.bidId, T.bidDateStart, T.bidDateEnd, T.bidPriceTotal, T.bidprice,
-             T.biddingMethod,
+        left join SYS_DATADICT_LIST sdl_sv on T.validStatus=sdl_sv.ITEM_CODE and sdl_sv.DICT_CODE='STATUS_VALID'
+        left join SYS_DATADICT_LIST sdl_fbs on T.firstBidStatus=sdl_fbs.ITEM_CODE and sdl_fbs.DICT_CODE='FIRST_BID_STATUS'
+        left join SYS_DATADICT_LIST sdl_tt on T.tenderTarget=sdl_tt.ITEM_CODE and sdl_tt.DICT_CODE='TENDER_TARGET'
+        left join SYS_DATADICT_LIST sdl_wt on T.biddingMethod=sdl_wt.ITEM_CODE and sdl_wt.DICT_CODE='WIN_TYPE'
+        left join SYS_DATADICT_LIST sdl_ept on T.payType=sdl_ept.ITEM_CODE and sdl_ept.DICT_CODE='ETR_PAY_TYPE'
+        left join SYS_DATADICT_LIST sdl_tp on T.tradeMarket=sdl_tp.ITEM_CODE and sdl_tp.DICT_CODE='TRADE_PLACE'
+        <where>
+            <!-- 关键字模糊查询 -->
+            <include refid="keywordsDistributionWhere"></include>
+            <if test="firstBidStatus != null and firstBidStatus.size()>0">
+                AND
+                <foreach collection="firstBidStatus" open=" T.firstBidStatus in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="bidDateStart != null">
+                AND T.bidDateStart = TO_DATE(#{bidDateStart},'yyyy-MM-dd')
+            </if>
+            <if test="bidDateEnd != null">
+                AND T.bidDateEnd = TO_DATE(#{bidDateEnd},'yyyy-MM-dd')
+            </if>
+            <if test="validStatus != null and validStatus.size()>0">
+                AND
+                <foreach collection="validStatus" open=" T.validStatus in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    group by T.validStatus, T.firstBidStatus, T.bidId, T.finprodId, T.finprodMarketId,
+             T.finprodAbbr, T.bidDateStart, T.bidDateEnd, T.bidPriceTotal, T.bidprice, T.biddingMethod,
              T.payType, T.winPrice, T.price, T.payableAmount, T.settFeeAmt, T.payDate, T.assignRegdate, T.listingDate,
-             T.bidDate, T.counterName,
-             T.remark, T.dealDate
+             T.bidDate, T.counterName,T.remark, T.dealDate
     </select>
+
+    <!-- 分销买入 关键字 -->
+    <sql id="keywordsDistributionWhere">
+        <if test="search != null and search != ''">
+            ( T.validStatus || '|' || sdl_sv.item_value || '|' || T.firstBidStatus || '|' || sdl_fbs.item_value
+            || '|' || T.tenderTarget || '|' || sdl_tt.item_value || '|' || T.biddingMethod || '|' || sdl_wt.item_value
+            || '|' || T.payType || '|' || sdl_ept.item_value || '|' || T.tradeMarket || '|' || sdl_tp.item_value
+            || '|' || T.bidId  || '|' || T.finprodId || '|' || T.finprodMarketId || '|'
+            || '|' || T.finprodAbbr || '|' || T.counterId || '|' || T.counterName || '|' || T.remark
+            like '%' || #{search} || '%'
+            or decode(T.etrBidPriceTotal,0,'0.00',to_char(T.etrBidPriceTotal/10000,'FM99999999999990.90'))=#{search} or to_char(T.etrBidPriceTotal)=#{search}
+            or decode(T.totalBiddingNum,0,'0.00',to_char(T.totalBiddingNum/10000,'FM9999999999990.90'))=#{search} or to_char(T.totalBiddingNum)=#{search}
+            or decode(T.bidprice,0,'0.00',to_char(T.bidprice,'FM999999999990.9990'))=#{search} or to_char(T.bidprice)=#{search}
+            or replace(to_char(T.bidDateStart,'yyyy-MM-dd'),'-','/')=#{search}
+            or replace(to_char(T.bidDateEnd,'yyyy-MM-dd'),'-','/')=#{search}
+            or replace(to_char(T.bidDate,'yyyy-MM-dd'),'-','/')=#{search}
+            )
+        </if>
+    </sql>
 
 </mapper>
