@@ -181,7 +181,7 @@
             <if test="search !=null and search !=''">
                 AND (
                 SEC_INFO.SEC_ID like '%' || #{search} || '%' OR
-                SEC_INFO.CURRENCY like '%' || #{search} || '%' OR
+                SEC_INFO.CURRENCY like '%' || #{search} || '%'
                 )
             </if>
         </where>
@@ -224,7 +224,8 @@
         RELEASE_INFO.TENDER_TARGET as tenderTarget,
         RELEASE_INFO.ADDITIONAL_BATCHES as additionalBatches,
 
-        nvl( to_char(RDI_RELEASE_INFO.ISSUE_SIZE * 10000, 'fm99999999999990.00') , to_char(RELEASE_INFO.ISSUE_SIZE / 10000, 'fm99999999999990.00')) as issueSize,
+        nvl( to_char(RDI_RELEASE_INFO.ISSUE_SIZE, 'fm99999999999990.0000') , to_char(RELEASE_INFO.ISSUE_SIZE, 'fm99999999999990.0000')) as issueSize,
+
         nvl(TO_CHAR(RDI_RELEASE_INFO.ISSUE_DATE, 'yyyy-mm-dd hh:mm:ss'), TO_CHAR(RELEASE_INFO.ISSUE_DATE, 'yyyy-mm-dd hh:mm:ss')) as issueDate,
         TO_CHAR(RELEASE_INFO.PAYMENT_DEADLINE, 'yyyy-mm-dd hh:mm:ss') as eventDate,
         nvl(TO_CHAR(RDI_RELEASE_INFO.EVENT_DATE, 'yyyy-mm-dd hh:mm:ss'), TO_CHAR(RELEASE_INFO.EVENT_DATE, 'yyyy-mm-dd hh:mm:ss')) as payDate,
@@ -248,15 +249,15 @@
         SEC_INFO.CURRENCY,
 
         nvl(RDI_RELEASE_INFO.ISSUE_PX, RELEASE_INFO.ISSUE_PX) as issuePx,
-        nvl(RDI_RELEASE_INFO.STIPULATION_VALUE, RELEASE_INFO.STIPULATION_VALUE) as stipulationValue,
+        nvl(RDI_RELEASE_INFO.STIPULATION_VALUE * 100, RELEASE_INFO.STIPULATION_VALUE * 100) as stipulationValue,
 
-        nvl(RDI_RELEASE_INFO.SINGLE_MIN_SUB_AMT * 100000000, RELEASE_INFO.MIN_PER_TENDER_AMT) as singleMinSubAmt,
-        nvl(RDI_RELEASE_INFO.SINGLE_MAX_SUB_AMT * 100000000, RELEASE_INFO.MAX_PER_TENDER_AMT) as singleMaxSubAmt,
+        nvl(RDI_RELEASE_INFO.SINGLE_MIN_SUB_AMT, RELEASE_INFO.SINGLE_MIN_SUB_AMT) as singleMinSubAmt,
+        nvl(RDI_RELEASE_INFO.SINGLE_MAX_SUB_AMT, RELEASE_INFO.SINGLE_MAX_SUB_AMT) as singleMaxSubAmt,
 
         RDI_RELEASE_INFO.REMARK AS remark,
 
         nvl(RDI_RELEASE_INFO.COUPON_RATE, RELEASE_INFO.COUPON_RATE) as couponRate,
-        nvl(RDI_RELEASE_INFO.BENCHMARK_CURVE_NAME, RELEASE_INFO.BENCHMARK_CURVE_NAME) as benchmarkCurveName,
+        nvl(RDI_RELEASE_INFO.BENCHMARK_CURVE_NAME * 100, RELEASE_INFO.BENCHMARK_CURVE_NAME * 100) as benchmarkCurveName,
         nvl(RDI_RELEASE_INFO.DECIMAL_PLACES, RELEASE_INFO.DECIMAL_PLACES) as decimalPlaces,
         nvl(RDI_RELEASE_INFO.SPREAD, RELEASE_INFO.SPREAD) as spread,
 
@@ -405,5 +406,23 @@
             AND OUTPUT_VALUE_3 = #{outputValue3}
         </if>
         and ROWNUM = 1
+    </select>
+
+
+    <select id="getAssetId" resultType="com.joyintech.framework.select.SelectOptionDto">
+        SELECT
+        SEC_ID id,
+        BOND_ABBREVIATION text,
+        BOND_ABBREVIATION object,
+        SEC_ID parentId
+        FROM INTERF_WIND_UNRELEASE_SEC_INFO
+        <where>
+            <if test="search != null and search != ''">
+                and (SEC_ID like concat(concat('%',#{search}),'%')
+                or BOND_ABBREVIATION like concat(concat('%',#{search}),'%')
+                or BOND_NAME like concat(concat('%',#{search}),'%')
+                )
+            </if>
+        </where>
     </select>
 </mapper>

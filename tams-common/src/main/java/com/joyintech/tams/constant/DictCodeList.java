@@ -1332,6 +1332,7 @@ public enum DictCodeList implements BaseDictCodeList {
 	平安资产类型_现金资产(DictCode.平安资产类型,"F20","现金资产"),
 	平安资产类型_同业存单(DictCode.平安资产类型,"F21","同业存单"),
 	平安资产类型_信用保护凭证(DictCode.平安资产类型,"F22","信用保护凭证"),
+	信用保护凭证类型_信用保护凭证(DictCode.信用保护凭证类型,"F22","信用保护凭证"),
 	处理状态_已处理(DictCode.处理状态,"01","已处理"),
 	处理状态_未处理(DictCode.处理状态,"02","未处理"),
 	费用品种类型_托管费(DictCode.费用品种类型,"01","托管费"),

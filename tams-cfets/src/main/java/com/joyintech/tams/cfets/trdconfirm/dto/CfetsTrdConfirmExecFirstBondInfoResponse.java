@@ -66,6 +66,9 @@ public class CfetsTrdConfirmExecFirstBondInfoResponse {
     @ApiModelProperty(name = "rate", value = "参考收益率/票面利率 需转化为百分数保留四位小数", example = "0.3")
     private BigDecimal rate;
 
+    @ApiModelProperty(name = "rateStr", value = "参考收益率/票面利率 需转化为百分数保留四位小数", example = "0.3")
+    private String rateStr;
+
     @ApiModelProperty(name = "portfolioId", value = "组合代码")
     private String portfolioId;
 
@@ -242,6 +245,14 @@ public class CfetsTrdConfirmExecFirstBondInfoResponse {
 
     public void setRate(BigDecimal rate) {
         this.rate = rate;
+    }
+
+    public String getRateStr() {
+        return rateStr;
+    }
+
+    public void setRateStr(String rateStr) {
+        this.rateStr = rateStr;
     }
 
     public String getPortfolioId() {

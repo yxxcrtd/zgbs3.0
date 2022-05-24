@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.util.List;
 
-@ApiModel(value = "指令查询条件", description = "一级投标确认指令查询条件")
+@ApiModel(value = "一级投标确认指令查询条件", description = "一级投标确认指令查询条件")
 public class CfetsTrdBondFirstBidFirmEntrustRequest {
 
     @ApiModelProperty(name = "pageMode", value = "分页对象", example = "{pageSize: 10,pageNo: 1, sort: 'name', direction: 'asc'}")

@@ -192,29 +192,6 @@ public class EtrTradeCommonervice extends BaseService {
         return assemble(portfolioCash, canCash, realCash, canSec, realSec, requestDto);
     }
 
-    public List<PositionCashSecSingleResp> queryAllPositionInfoSingle(PositionCashSecRequest requestDto) {
-        List<PositionCashSecSingleResp> returnList=new ArrayList<>();
-        //每个组合分开查询
-        if(!CollectionUtils.isEmpty(requestDto.getPtlList())){
-            requestDto.getPtlList().stream().forEach(item->{
-                PositionCashSecRequest request=new PositionCashSecRequest();
-                request.setFlowType(requestDto.getFlowType());
-                List<PositionCashSecDto> subList=new ArrayList<>();
-                subList.add(item);
-                request.setPtlList(subList);
-                if(!CollectionUtils.isEmpty(queryPositionInfoSingle(request))){
-                    PositionCashSecSingleResp resp=queryPositionInfoSingle(request).get(0);
-                    returnList.add(resp);
-                }
-            });
-        }else{
-            PositionCashSecSingleResp positionCashSecSingleResp=new PositionCashSecSingleResp();
-            positionCashSecSingleResp.setBaseMapList(nullData());
-            returnList.add(positionCashSecSingleResp);
-        }
-        return returnList;
-
-    }
 
 
         /**
@@ -235,11 +212,12 @@ public class EtrTradeCommonervice extends BaseService {
         if (list != null) {
 
             String flowTypeParm = requestDto.getFlowType();
-            String flowType = StringUtil.equals(FLOW_TYPE_TRD, flowTypeParm) ? "03" : "01";// 01 指令现金 02 指令持仓 03 交易现金 04 交易持仓
+            String flowType = "";
             for (PositionCashSecDto dto : list) {
                 if (StringUtil.isEmpty(dto.getPortfolioId())) {
                     continue;
                 }
+                flowType = StringUtil.equals(FLOW_TYPE_TRD, flowTypeParm) ? "03" : "01";// 01 指令现金 02 指令持仓 03 交易现金 04 交易持仓
                 // 从原投管系统取
                 BigDecimal portfolioCash = BigDecimal.ZERO; // 组合现金可用
                 BigDecimal canCash = BigDecimal.ZERO; // 现金可用
