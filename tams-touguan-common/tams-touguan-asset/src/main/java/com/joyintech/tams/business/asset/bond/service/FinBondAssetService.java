@@ -500,7 +500,10 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             BondFinProductIssueDto bondFinProductIssueDto = new BondFinProductIssueDto();
             BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto,dto);
             for (FinProductIssue finProductIssue:finProductIssues){
+                FinProduct finProduct = finProductMapper.selectByPrimaryKey(finProductIssue.getFinprodId());
                 BeanUtil.copyPropertiesIgnoreNull(bondFinProductIssueDto, finProductIssue);
+                bondFinProductIssueDto.setListingDate(finProduct.getCirculationDate());
+                bondFinProductIssueDto.setFinprodMarketId(finProduct.getFinprodMarketId());
                 finProductIssueList.add(bondFinProductIssueDto);
             }
             dto.setFinProductIssueList(finProductIssueList);
