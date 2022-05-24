@@ -6,6 +6,7 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.common.dto.PageMode;
 import com.joyintech.tams.common.base.dao.FinProductSpecialMapper;
 import com.joyintech.tams.common.base.dao.WflFinProductSpecialMapper;
 import com.joyintech.tams.common.base.entity.FinProductSpecial;
@@ -59,6 +60,14 @@ public class FinProductSpecial001Service extends BaseService<FinProductSpecialDt
      * @return
      */
     public Page<FinProductSpecialDto> queryForPage(FinProductSpecialQueryRequest request) {
+        if (Objects.nonNull(request.getPageMode())) {
+            PageMode pageMode = request.getPageMode();
+            String sort = pageMode.getSort();
+            if (StringUtil.isNotBlank(sort) && sort.contains("Str")) {
+                pageMode.setSort(sort.replaceAll("Str", ""));
+                request.setPageMode(pageMode);
+            }
+        }
         Page<FinProductSpecialDto> pageList = super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(),
                 () -> finProductSpecial001Mapper.queryForPage(request));
         return pageList;
