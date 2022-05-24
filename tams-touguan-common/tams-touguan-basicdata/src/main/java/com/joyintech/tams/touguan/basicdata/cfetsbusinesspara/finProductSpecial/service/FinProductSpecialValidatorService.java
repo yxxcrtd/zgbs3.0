@@ -95,7 +95,7 @@ public class FinProductSpecialValidatorService implements BeanValidator {
      * @return
      */
     public AjaxResult checkConfirmMsgForImportData(String fileName) {
-        List<List<String>> dataList = ExcelUtil.getDataList("/Users/yushuangzhu/Desktop/0_ABN应计利息问题改造需求规格说明书（增量）.docx_105553275259904.xlsx");
+        List<List<String>> dataList = ExcelUtil.getDataList(fileName);
         AjaxResult result = new AjaxResult();
         result.setData(dataList);
         if (!com.joyintech.framework.util.StringUtil.isEmptyList(dataList)) {
