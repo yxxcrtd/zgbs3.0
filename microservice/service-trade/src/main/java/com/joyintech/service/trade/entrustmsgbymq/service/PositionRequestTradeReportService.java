@@ -97,6 +97,8 @@ public class PositionRequestTradeReportService {
             this.fund002(trdTempDto, resultMap);
         } else if (INTERF_TYPE_STOCK001.equals(interType)) {
             this.stock001(trdTempDto, resultMap);
+        }else if (INTERF_TYPE_CERTIFICATE001.equals(interType)) {
+            this.certificate001(trdTempDto, resultMap);
         }
         if(StringUtil.isNotEmpty(resultMap.get(INTERFACE_TYPE))){
             PositionHttpRequest.send(resultMap);
@@ -566,6 +568,69 @@ public class PositionRequestTradeReportService {
         }
         resultMap.put("ptlList", ptlList);
         resultMap.put("ptlRoList", ptlRoList);
+    }
+
+
+    /**
+     * 信用保护凭证
+     *
+     * @param entity
+     * @param resultMap
+     */
+    private void certificate001(TrdTempDto entity, Map<String, Object> resultMap) {
+        resultMap.put("interfaceType", INTERF_TYPE_CERTIFICATE001);
+        // 交易平台
+        resultMap.put("sharesTradePlatform", this.getSharesTradePlatform(entity, INTERF_TYPE_CERTIFICATE001));
+        //交易方向
+        resultMap.put("ps", entity.getPs());
+        //交易场所
+        resultMap.put("tradePlace", entity.getTradeMarket());
+        //决策动作
+        resultMap.put("decisionAct", DictCodeListExt3.系统动作_新建.getValue());
+        //系统动作
+        resultMap.put("systemAct", DictCodeListExt3.系统动作_新建.getValue());
+        //流程编号
+        resultMap.put("workFlowId", null);
+        //信用事件结算方式
+        resultMap.put("ceSettleType", null);
+        //日期
+        resultMap.put("cdate", entity.getTradeDate());
+        //币种
+        resultMap.put("ccy", entity.getCcy());
+        //前次交易编号
+        resultMap.put("bTotalTradeId", null);
+
+        Map<String,Object> paraMap = new HashMap<>();
+        paraMap.put("fTradeId", entity.getfTradeId());
+        List<PortfolioCalculateDto> list = trdCommonBaseService.queryPortfolioCalculate(paraMap);
+        //组合数据集
+        List<Map<String, Object>> ptlList = new ArrayList<>(4);
+        //组合附属数据集（交付物债券）
+        List<Map<String, Object>> ptlRoList = new ArrayList<>(4);
+        for (PortfolioCalculateDto dto : list){
+            Map<String, Object> plt = new HashMap<>(8);
+            plt.put("portfolioId", dto.getPortfolioId());
+            plt.put("finprodId", entity.getFinprodId());
+            plt.put("tradeId", entity.getTradeId());
+            plt.put("etrId", entity.getEntrustId());
+            plt.put("etrSecAmount", dto.getEtrSecAmount());
+            plt.put("cashAcctId", dto.getCashAcctId());
+            plt.put("secAcctId", dto.getSecAcctId());
+            plt.put("secAmount", dto.getSecAmount());
+            plt.put("cashAmount", dto.getCashAmount());
+            ptlList.add(plt);
+            //组合附属数据
+//            Map<String, Object> ptlRo = new HashMap<>();
+//            ptlRo.put("portfolioId", dto.getPortfolioId());
+//            ptlRo.put("finprodId", entity.getFinprodId());
+//            ptlRo.put("tradeId", entity.getTradeId());
+//            ptlRo.put("secAcctId", dto.getSecAcctId());
+//            ptlRo.put("secAmount", dto.getSecAmount());
+//            ptlRoList.add(ptlRo);
+
+        }
+        resultMap.put("ptlList", ptlList);
+//        resultMap.put("ptlRoList", ptlRoList);
     }
 
     /**
