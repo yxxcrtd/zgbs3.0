@@ -79,6 +79,8 @@ public class FinAssetRateAdjResponse  extends FinCashCalcRule implements ITableR
 
     private String basis;
 
+    private String marketBasis;
+
     private String couponSpecies;
 
     @ApiModelProperty(name="paFinCashCalcRuleList",value="计算规则扩展")
@@ -250,6 +252,16 @@ public class FinAssetRateAdjResponse  extends FinCashCalcRule implements ITableR
 
     public void setFinCashPlanList(List<FinCashPlan> finCashPlanList) {
         this.finCashPlanList = finCashPlanList;
+    }
+
+    @Override
+    public String getMarketBasis() {
+        return marketBasis;
+    }
+
+    @Override
+    public void setMarketBasis(String marketBasis) {
+        this.marketBasis = marketBasis;
     }
 
     /**

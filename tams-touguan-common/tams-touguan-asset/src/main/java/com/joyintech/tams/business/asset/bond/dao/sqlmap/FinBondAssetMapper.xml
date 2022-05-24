@@ -1274,6 +1274,7 @@
             T1.BASE_TYPE,
             T1.BASE_DATE_TYPE,
             T1.BASIS,
+            T1.MARKET_BASIS MARKET_BASIS,
             T1.YIELD*100 YIELD,
             T1.IS_INITIAL,
             T1.BRANCH,
