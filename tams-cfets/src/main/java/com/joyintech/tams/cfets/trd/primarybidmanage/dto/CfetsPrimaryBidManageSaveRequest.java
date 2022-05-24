@@ -150,6 +150,16 @@ public class CfetsPrimaryBidManageSaveRequest extends BaseEntity implements Proc
      @ApiModelProperty(name="status",value="数据状态")
      private String status;
 
+     @ApiModelProperty(name="circulationCode",value="上市流通代码")
+     private String circulationCode;
+
+     @ApiModelProperty(name="seriYN",value="连续投标限制")
+     private String seriYN;
+
+     @ApiModelProperty(name="couponSpecies",value="息票品种")
+     private String couponSpecies;
+
+
      private BaseBidManageBaseInfoDto baseBidManageBaseInfoDto;
 
      public String getOperateType() {
@@ -427,5 +437,21 @@ public class CfetsPrimaryBidManageSaveRequest extends BaseEntity implements Proc
 
      public void setBidDateEnd(Date bidDateEnd) {
          this.bidDateEnd = bidDateEnd;
+     }
+
+     public String getCirculationCode() {
+         return circulationCode;
+     }
+
+     public void setCirculationCode(String circulationCode) {
+         this.circulationCode = circulationCode;
+     }
+
+     public String getSeriYN() {
+         return seriYN;
+     }
+
+     public void setSeriYN(String seriYN) {
+         this.seriYN = seriYN;
      }
  }

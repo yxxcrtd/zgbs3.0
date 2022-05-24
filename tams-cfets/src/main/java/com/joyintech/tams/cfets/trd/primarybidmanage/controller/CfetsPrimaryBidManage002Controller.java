@@ -87,8 +87,12 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
        initPageParams.put("BUSINESS_MODEL", this.getSelectDataFromDataDic(DictCode.业务模式, null));
        initPageParams.put("YES_OR_NO_Y", DictCodeList.是否_是.getValue());
        initPageParams.put("pageModel",this.getPageModel());
-        initPageParams.put("BID_TYPE_01", DictCodeListExt4.中标方式_单标位中标.getValue());
+       initPageParams.put("BID_TYPE_01", DictCodeListExt4.中标方式_单标位中标.getValue());
+       String isModifiedIntamt = CacheUtil.getSysParam("IS_MODIFIED_INTAMT");
+       initPageParams.put("IS_MODIFIED_INTAMT",isModifiedIntamt);
        initPageParams.put("iPlatformDate",iPlatformDate.getSysDateStr());
+       initPageParams.put("COUPON_SPECIES_01",DictCodeList.息票品种_附息.getValue());
+       initPageParams.put("COUPON_SPECIES_04",DictCodeList.息票品种_利随本清.getValue());
        //取系统参数
        initPageParams.put("BID_MIN_UNIT", CacheUtil.getSysParam("BID_MIN_UNIT"));
        return new Message<Map<String, Object>>(initPageParams).success();
@@ -314,6 +318,19 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
         }catch (Exception e){
             e.printStackTrace();
             return new Message<CalcPriceAndYieldResponse>().fail().setData(null);
+        }
+    }
+
+    @ApiOperation(value = "获取到期收益率", notes = "获取到期收益率")
+    @ResponseBody
+    @PostMapping("/getYield")
+    public Message<BigDecimal> getYield(@RequestBody CfetsYieldRequest dto ){
+        try{
+            BigDecimal response=cfetsPrimaryBidManageService.getYield(dto);
+            return new Message<BigDecimal>().success().setData(response);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new Message<BigDecimal>().fail().setData(null);
         }
     }
 }

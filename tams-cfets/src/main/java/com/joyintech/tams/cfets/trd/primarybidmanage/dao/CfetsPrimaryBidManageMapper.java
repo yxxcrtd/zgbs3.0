@@ -77,4 +77,6 @@ public interface CfetsPrimaryBidManageMapper {
 	List<PtlTrade> queryPtlTradeByTradeId(@Param("tradeId") String tradeId);
 
 	List<SelectOptionDto>  selectTrader(Map<String, Object> map);
+
+	FinRateInfo getFinRateInfoByFinprodId(@Param("finprodId") String finprodId);
 }
