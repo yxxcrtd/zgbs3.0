@@ -10,12 +10,24 @@
 
 package com.joyintech.tams.invest.batch.riskparamcalc.runner;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.joyintech.batch.batchbase.baseclass.*;
+import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
+import com.joyintech.batch.batchbase.baseclass.entity.NeedToWriteEntity;
+import com.joyintech.framework.base.entity.SysBatchExecInfo;
+import com.joyintech.framework.constant.BatchDictCodeList;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.web.PlatformDate;
 import com.joyintech.tams.invest.batch.common.util.BatchConstant;
+import com.joyintech.tams.invest.batch.ocphistory.service.RskOccupyHistoryService;
+import com.joyintech.tams.invest.batch.riskparamcalc.processor.RskParamCalcProcessor;
 import com.joyintech.tams.invest.batch.riskparamcalc.processor.RskParamReCalcProcessor;
+import com.joyintech.tams.invest.batch.riskparamcalc.reader.RskParamCalcReader;
 import com.joyintech.tams.invest.batch.riskparamcalc.reader.RskParamReCalcReader;
+import com.joyintech.tams.invest.batch.riskparamcalc.writer.RskParamCalcWriter;
 import com.joyintech.tams.invest.batch.riskparamcalc.writer.RskParamReCalcWriter;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.slf4j.Logger;
@@ -25,8 +37,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.joyintech.batch.batchbase.baseclass.BatchBaseService;
-import com.joyintech.batch.batchbase.baseclass.BatchBuilder;
 import com.joyintech.batch.batchbase.exception.BatchException;
 
 
@@ -51,7 +61,7 @@ public class RskParamReCalcTask extends BatchBaseService {
      * BatchBuilder
      */
     @Autowired
-    private BatchBuilder<RskParamReCalcReader, RskParamReCalcProcessor, RskParamReCalcWriter> batchBuilder;
+    private BatchBuilder<BaseReader<NeedOperateEntity>, BaseProcessor<NeedOperateEntity, NeedToWriteEntity>, BaseWriter<NeedToWriteEntity>> batchBuilder;
 
     /**
      * RskParamReCalcReader
@@ -71,24 +81,65 @@ public class RskParamReCalcTask extends BatchBaseService {
     @Autowired
     private RskParamReCalcWriter step1Writer;
 
+    /**
+     * RskParamReCalcReader
+     */
     @Autowired
-    private IPlatformDate iPlatformDate;
+    private RskParamCalcReader step2Reader;
 
+    /**
+     * RskParamReCalcProcessor
+     */
+    @Autowired
+    private RskParamCalcProcessor step2Processor;
+
+    /**
+     * RskParamReCalcWriter
+     */
+    @Autowired
+    private RskParamCalcWriter step2Writer;
+
+    @Autowired(required = false)
+    private PlatformDate platformDateService;
+    @Autowired(required = false)
+    private RskOccupyHistoryService rskPreOccupyInfoProService;
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public JobExecution execute()
         throws BatchException {
         logger.info("批处理-预占重计算开始");
         Map<String, Object> params = new HashMap<>();
+        SysBatchExecInfo batchExecuteInfo = this.getBatchExecuteInfo();
+        if (batchExecuteInfo == null) {
+            logger.info("无启动参数，批处理退出。");
+            return null;
+        }
+        if(null!=batchExecuteInfo.getExecuteDate()
+            && !StringUtil.equals(BatchDictCodeList.批处理启动模式_自动.getValue(),batchExecuteInfo.getStartMode())){
+            params.put(BatchConstant.PLATE_DATE, batchExecuteInfo.getExecuteDate());
+            params.put("sysDate", batchExecuteInfo.getExecuteDate());
+        }
+        else{
+            Date sysDate = platformDateService.getSysDate(batchExecuteInfo.getCreateUser());
+            params.put(BatchConstant.PLATE_DATE, sysDate);
+            params.put("sysDate", sysDate);
+        }
+        params.put(BatchConstant.BATCH_INFO, batchExecuteInfo);
+        rskPreOccupyInfoProService.execute(params);
+
         params.put(BatchConstant.KEY_PRODID_LIST, this.getProductIdList());
-        params.put("sysDate", iPlatformDate.getSysDate());
         step1Reader.setParams(params);
         step1Processor.setParams(params);
         step1Writer.setParams(params);
+        step2Reader.setParams(params);
+        step2Processor.setParams(params);
+        step2Writer.setParams(params);
         return batchBuilder.init(this)
-            .batch("step1", step1Reader, step1Processor, step1Writer)
+            .batch("step1", (BaseReader)step1Reader, (BaseProcessor)step1Processor, step1Writer)
+            .batch("step2",step2Reader,step2Processor,step2Writer)
             .builder(this.getBatchTask().getBeanName() + this.getBatchTask().getTaskId())
             .run();
     }

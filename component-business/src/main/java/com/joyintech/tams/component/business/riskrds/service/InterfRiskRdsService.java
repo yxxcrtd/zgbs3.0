@@ -503,7 +503,8 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
         if (CommonUtil.isType(infCode, BussinessDictCodeListRds.接口系统ID_预占接口)
             || CommonUtil.isType(infCode, BussinessDictCodeListRds.接口系统ID_预占批量接口)) {
             map.put(PageFieldToInterfFactory.INF_OCCUPYDATE,
-                map.get(PageFieldToInterfFactory.INF_EVENTDATE));
+//                map.get(PageFieldToInterfFactory.INF_EVENTDATE));
+                StringUtil.isNotEmpty(map.get(PageFieldToInterfFactory.INF_MDATE))?map.get(PageFieldToInterfFactory.INF_MDATE):map.get(PageFieldToInterfFactory.INF_EVENTDATE));//update zhangweiqi 2021-1-6 支持跨日指令
         }
         else if ((CommonUtil.isType(infCode, BussinessDictCodeListRds.接口系统ID_实占接口)
                   || CommonUtil.isType(infCode, BussinessDictCodeListRds.接口系统ID_实占批量接口))
