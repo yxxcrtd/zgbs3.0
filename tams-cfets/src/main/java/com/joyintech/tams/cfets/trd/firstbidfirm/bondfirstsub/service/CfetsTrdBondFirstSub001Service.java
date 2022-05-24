@@ -289,11 +289,11 @@ public class CfetsTrdBondFirstSub001Service extends BaseService {
                 }
             }
         }
-        //是否存在流程中或者有效且数据状态不为 已撤回 已终止
-        int i = cfetsTrdBondFirstSub001Mapper.checkDataStatus(params);
-        if (i > 0) {
-            return "存在流程中的申购，不可放弃！";
-        }
+//        //是否存在流程中或者有效且数据状态不为 已撤回 已终止
+//        int i = cfetsTrdBondFirstSub001Mapper.checkDataStatus(params);
+//        if (i > 0) {
+//            return "存在流程中的申购，不可放弃！";
+//        }
         //2.查询指令分发的临时表数据  插入  指令分发表，并将状态改为  待接收。
         List<EtrDistributeInterfTmp> distmpList = cfetsIbuQuoteBondEtrMapper.listEtrDistributeInterfTmp(params);
         if (!StringUtil.isEmptyList(distmpList)) {
