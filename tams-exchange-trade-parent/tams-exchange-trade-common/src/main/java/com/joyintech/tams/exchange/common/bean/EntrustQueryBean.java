@@ -1193,7 +1193,7 @@ public class EntrustQueryBean implements Serializable {
     }
 
     public BigDecimal getEntrustPriceView() {
-        if (StringUtil.isNotEmpty(isFullPrice) && StringUtil.equals(isFullPrice, "N")) {
+        if (StringUtil.isNotEmpty(isFullPrice) && StringUtil.equals(isFullPrice, "Y")) {
             return fullPrice;
         } else {
             return entrustPrice;
