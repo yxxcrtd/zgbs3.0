@@ -252,11 +252,15 @@ public class CfetsTrdBondFirstSubEntrustDto {
         }
         String businessModel = getBusinessModel();
         String[] businessModels = businessModel.split(GlobalConstant.COMMA);
-        String businessModelStr = "";
+        StringBuilder businessModelStr = new StringBuilder();
         for (String str : businessModels) {
-            businessModelStr += SysDataUtil.getNameFromDataDict(DictCode.业务模式, str);
+            if (StringUtil.isNotEmpty(businessModelStr)) {
+                businessModelStr.append(GlobalConstant.COMMA).append(SysDataUtil.getNameFromDataDict(DictCode.业务模式, str));
+            } else {
+                businessModelStr.append(SysDataUtil.getNameFromDataDict(DictCode.业务模式, str));
+            }
         }
-        return businessModelStr;
+        return businessModelStr.toString();
     }
 
     public void setBusinessModelStr(String businessModelStr) {
