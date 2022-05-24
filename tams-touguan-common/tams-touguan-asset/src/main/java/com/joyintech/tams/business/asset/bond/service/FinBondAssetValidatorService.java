@@ -156,6 +156,10 @@ public class FinBondAssetValidatorService implements BeanValidator{
                                     "付息计划,计息开始日不可以大于计息结束日"));
                             break;
                         }
+                        if (DateUtil.compareDate(finCashPlanEntity.getPayDate(),iPlatformDate.getSysDate())<0){
+                            resultList.add(new ValidMessage("附息计划支付日不能小于平台日"));
+                            break;
+                        }
                     }
                 }
             }
