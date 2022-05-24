@@ -495,8 +495,6 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 			BigDecimal availableNum = etrTradeCommonervice.selectAvailableNum(dto);
 			if(availableNum == null) {
 				availableNum= BigDecimal.ZERO;
-			}else{
-				availableNum=ArithmeticUtil.divide(availableNum,new BigDecimal(100),2);
 			}
 			String availableNumStr=availableNum.toString();
 			return new Message<>(availableNumStr);

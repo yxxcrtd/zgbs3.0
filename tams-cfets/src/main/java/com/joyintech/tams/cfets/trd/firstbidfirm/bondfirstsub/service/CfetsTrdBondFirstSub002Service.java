@@ -1585,7 +1585,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                     posport.setCashAcctId(cashAcctId); // 托管户
                 }
             }
-            posport.setCashAmount(productDto.getSubscriptionAmount());
+            posport.setCashAmount(productDto.getPayableAmount());
             posport.setSecAmount(productDto.getSubscriptionAmount());
             ptlList.add(posport);
         }

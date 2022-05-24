@@ -622,7 +622,7 @@
                TPDA.Entrust_Id    entrustId,
                pp.PORTFOLIO_NAME  portfolioName,
                TPD.SHARE_AMT*100      qtyd,
-               ttft1.fee_amt      jsFeeAmt,
+               TPD.fee_amt      jsFeeAmt,
                eed.INV_AIM  busiTypePosition,
                ssai.sec_acct_name secAcctId
         FROM TRD_PRODUCT_DEAL TPD
