@@ -69,8 +69,8 @@
 		  <!--modify by etliu 20220324 end-->
           F.request_id quoterefId,/**交易所请求号*/
 		  A.ENTRUST_DATE tradeDate,/**委托日期*/
-		  A.VDATE,/**委托开始日*/
-		  A.Mdate,/**委托结束日*/
+		  A.VDATE VDATE,/**委托开始日*/
+		  A.Mdate MDATE,/**委托结束日*/
 		  CASE WHEN A.FINPROD_TYPE2 ='F36' THEN A.ENTRUST_AMT ELSE DECODE(F.TARGET_TYPE, '02', A.ENTRUST_AMT, 0) END entrustAmt, /**委托额度*/
           CASE WHEN A.FINPROD_TYPE2 ='F36' THEN A.ENTRUST_NUM ELSE DECODE(F.TARGET_TYPE, '01',case when A.PS in ('T93', 'T94') THEN FDP.PLEDGE_NUMBER ELSE A.ENTRUST_NUM END, 0) END entrustNum, /**委托数量*/
 		  A.ENTRUST_STATUS entrustStatus,/**委托状态*/
@@ -127,9 +127,8 @@
 		END pledgeeType,
 		F.DERIVATIVE_BS_DIR derivativeBsDir,
 		F.DERIVATIVE_OC_FLAG derivativeOcFlag,
-		A.ENTRUST_CLASS,
+		A.ENTRUST_CLASS entrustClass,
 		F.BUSI_TYPE_POSITION busiTypeTg,
-		A.BUSINESS_MODEL,
 		A.ENTRUST_TYPE entrustBussType,
         F.PRICE_TYPE priceType,
         F.TARGET_TYPE targetType,
