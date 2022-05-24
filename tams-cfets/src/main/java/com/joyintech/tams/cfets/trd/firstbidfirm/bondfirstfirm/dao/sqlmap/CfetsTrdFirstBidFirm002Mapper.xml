@@ -72,6 +72,7 @@
                 fp.COUPON_SPECIES                couponSpecies/*息票品种*/,
                 fp.TRADE_MARKET                  tradeMarket/*交易场所*/,
                 fp.REGIST_ORG                    registOrg,
+                #{loginUserId} ourTrader/*本方交易员*/,
                 ee.COUNTER_ID counterId/*交易对手*/,
                 MCP.COUNTER_NAME counterName/*交易对手*/,
                 fpi.TENDER_TARGET tenderTarget/*招标标的*/,

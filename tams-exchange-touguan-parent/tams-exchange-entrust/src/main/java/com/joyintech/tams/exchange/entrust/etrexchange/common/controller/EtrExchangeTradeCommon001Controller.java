@@ -1088,7 +1088,7 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 			if (StringUtils.isNotEmpty(price)) {
 				BigDecimal bigPrice = new BigDecimal(price);
 				if (dto.getPrice().compareTo(bigPrice.multiply(new BigDecimal(1.02))) > 0) {
-					confirmMsg = "当前价格超过上一日平均价的2%，是否继续？";
+					confirmMsg += "当前价格超过上一日平均价的2%，是否继续？";
 				}
 			}
 		}

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.invest.batch.ocphistory.dao.RskOccupyHistoryMapper">
+    <delete id="deletePreOccupy">
+        DELETE FROM RSK_PRE_OCCUPY_INFO T1
+        WHERE EXISTS (SELECT EVENT_ID FROM RSK_PRE_OCCUPY_INFO WHERE (OCCUPY_DATE &lt; #{sysDate} or OCCUPY_DATE is null) AND EVENT_ID = T1.EVENT_ID and uuid=T1.uuid)
+    </delete>
+
+    <insert id="historyPreOccupy">
+        INSERT INTO RSK_PRE_OCCUPY_INFO_HIS
+        SELECT 
+            UUID,
+            EVENT_DATE,
+            EVENT_ID,
+            EVENT_TYPE,
+            OCCUPY_DATE,
+            ENTRUST_CODE,
+            PROD_ID,
+            ASSET_CODE,
+            ASSET_TYPE,
+            ASSET_TYPE2,
+            PS,
+            AMOUNT,
+            PRICE_AMT,
+            TRADE_NUM,
+            NET_PRICE,
+            ALL_PRICE,
+            UNIT_NET,
+            ASSET_RATE,
+            TRADER,
+            MANAGER,
+            DELIVERY_DATE,
+            START_DATE,
+            END_DATE,
+            OCP_STATUS,
+            WFL_STATUS,
+            CREATE_USER,
+            CREATE_DEPT,
+            CREATE_TIME,
+            UPDATE_USER,
+            UPDATE_TIME,
+            SEQ_NO
+        FROM RSK_PRE_OCCUPY_INFO T1
+        WHERE EXISTS (SELECT EVENT_ID FROM RSK_PRE_OCCUPY_INFO WHERE (OCCUPY_DATE &lt; #{sysDate} or OCCUPY_DATE is null) AND EVENT_ID = T1.EVENT_ID and uuid=T1.uuid)
+    </insert>
+
+    <delete id="deleteOccupy">
+        DELETE FROM RSK_OCCUPY_INFO T
+        --删除平台日(跑批日)之前的实占数据（剔除实占记录对应预占数据生效的那部分实占数据）
+        WHERE T.EVENT_DATE &lt; #{sysDate}
+        AND EVENT_ID NOT IN (
+            SELECT t1.EVENT_ID FROM RSK_OCCUPY_INFO t1
+            INNER JOIN RSK_PRE_OCCUPY_INFO t2 ON t1.OCCUPY_CODE = t2.EVENT_ID
+            WHERE t2.OCCUPY_DATE >= #{sysDate}
+            AND t2.OCP_STATUS = '0'
+        )
+    </delete>
+
+    <insert id="historyOccupy">
+        INSERT INTO RSK_OCCUPY_INFO_HIS
+        SELECT
+            UUID,
+            EVENT_DATE,
+            EVENT_ID,
+            EVENT_TYPE,
+            ENTRUST_CODE,
+            OCCUPY_CODE,
+            PROD_ID,
+            ASSET_CODE,
+            ASSET_TYPE,
+            ASSET_TYPE2,
+            PS,
+            AMOUNT,
+            PRICE_AMT,
+            TRADE_NUM,
+            NET_PRICE,
+            ALL_PRICE,
+            UNIT_NET,
+            ASSET_RATE,
+            TRADER,
+            MANAGER,
+            DELIVERY_DATE,
+            START_DATE,
+            END_DATE,
+            OCP_STATUS,
+            WFL_STATUS,
+            CREATE_USER,
+            CREATE_DEPT,
+            CREATE_TIME,
+            UPDATE_USER,
+            UPDATE_TIME,
+            SEQ_NO
+        FROM RSK_OCCUPY_INFO T
+        --将平台日(跑批日)之前的实占数据备份到历史表中（剔除实占记录对应预占数据生效的那部分实占数据）
+        WHERE T.EVENT_DATE &lt; #{sysDate}
+        AND T.EVENT_ID NOT IN (
+            SELECT t1.EVENT_ID FROM RSK_OCCUPY_INFO t1
+            INNER JOIN RSK_PRE_OCCUPY_INFO t2 ON t1.OCCUPY_CODE = t2.EVENT_ID
+            WHERE t2.OCCUPY_DATE >= #{sysDate}
+            AND t2.OCP_STATUS = '0'
+        )
+    </insert>
+</mapper>

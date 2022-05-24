@@ -121,6 +121,33 @@ public class CreditProtectionCertificate002Controller extends BaseController {
         return Message.success("校验成功", initPageParams);
     }
 
+    /**
+     *  获取流程中信息
+     * @param request
+     * @return
+     */
+    @ApiOperation(value = "获取流程中信息", notes = "获取流程中信息")
+    @ResponseBody
+    @PostMapping("/getApproveEntity")
+    public Message<CreditProtectionCertificate002Dto> getApproveEntity(@RequestBody CreditProtectionCertificateInsertRequest request)
+    {
+        try{
+            String workflowId = request.getWorkflowId();
+            CreditProtectionCertificate002Dto entity = new CreditProtectionCertificate002Dto();
+            if (StringUtil.isNotEmpty(workflowId)) {
+                //流程代办checkImportData
+                entity = creditProtectionCertificate002Service.getBussinessEntityByWorkflowId(workflowId);
+                if (StringUtil.isNotEmpty(entity)){
+                    entity.setFinprodMarketId(entity.getFinprodMarketId()+entity.getTradeMarketId());
+                }
+            }
+            return new Message<CreditProtectionCertificate002Dto>().success().setData(entity);
+        } catch(Exception e){
+            e.printStackTrace();
+            return new Message<CreditProtectionCertificate002Dto>().fail().setMessage("查询异常");
+        }
+    }
+
 
     @ResponseBody
     @PostMapping("/modifyAndDeleteCheck")

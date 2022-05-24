@@ -510,7 +510,10 @@
             FPA.LISTING_DATE listingDate,
             BO.WIN_TYPE   winType,
             BO.PAY_TYPE   payType,
-            BO.WIN_PRIN_AMT   winPrinAmt
+            BO.WIN_PRIN_AMT   winPrinAmt,
+            FP.CIRCULATION_CODE circulationCode,
+            FPI.SERI_Y_N seriYN,
+            FP.COUPON_SPECIES  couponSpecies
         FROM BID_ORDER	BO
         LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ADD FPA ON FPA.FINPROD_ID = FP.FINPROD_ID
@@ -764,4 +767,12 @@
         where BUSI_NO = #{tradeId}
     </select>
 
+    <select id="getFinRateInfoByFinprodId" resultType="com.joyintech.tams.common.base.entity.FinRateInfo">
+        SELECT RATE  rate,
+               BENCHMARK_ID_ACCURACY benchmarkIdAccuracy,
+               COEFFICIENT  coefficient
+        FROM FIN_RATE_INFO
+        WHERE FINPROD_ID = #{finprodId}
+         AND ROWNUM = 1
+    </select>
 </mapper>

@@ -8,6 +8,8 @@ import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.validation.BeanValidator;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.common.base.dao.FinProductMapper;
+import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
 import com.joyintech.tams.constant.DictCodeList;
@@ -19,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -39,6 +42,8 @@ public class FinProductSpecialValidatorService implements BeanValidator {
     private MstWorkflowCommonService mstWorkflowCommonService;
     @Autowired
     private FinProductSpecial001Service finProductSpecial001Service;
+    @Resource
+    private FinProductMapper finProductMapper;
 
     @Override
     public List<ValidMessage> valid(Object value) {
@@ -63,7 +68,15 @@ public class FinProductSpecialValidatorService implements BeanValidator {
                 resultList.add(new ValidMessage(getMessage("特殊债券标识至少其中一个为是!")));
             }
         }
-
+        if (dto.getOperateType().equals(OperationType.NEW.name())) {
+            WflValidInputParameter parameter = new WflValidInputParameter();
+            parameter.setPageId("CfetsBasicInfo001");
+            parameter.setBusinessDataPk1(dto.getFinprodMarketId());
+            ProcessMark dataEntityFromProcessMark = mstWorkflowCommonService.getDataEntityFromProcessMark(parameter);
+            if (Objects.nonNull(dataEntityFromProcessMark)) {
+                resultList.add(new ValidMessage("", getMessage("资产存在流程中数据,不可新建")));
+            }
+        }
         //判断特殊资产维护是否存在流程中数据
         if (dto.getOperateType().equals(OperationType.DELETE.name())) {
             WflValidInputParameter parameter = new WflValidInputParameter();
@@ -73,13 +86,18 @@ public class FinProductSpecialValidatorService implements BeanValidator {
             if (Objects.nonNull(dataEntityFromProcessMark)) {
                 String businessData = dataEntityFromProcessMark.getBusinessData();
                 BaseMap responseMap = JsonUtils.json2Object(businessData, BaseMap.class);
-                resultList.add(new ValidMessage("", getMessage("资产存在流程中数据,不可删除!<br/>流程编号：【" + responseMap.getString("workflowId")+"】")));
+                resultList.add(new ValidMessage("", getMessage("资产存在流程中数据,不可删除! 流程编号：【" + responseMap.getString("workflowId") + "】")));
             }
         }
 
-        if (dto.getOperateType().equals(OperationType.MODIFY.name())) {
+        if (dto.getOperateType().equals(OperationType.MODIFY.name()) || dto.getOperateType().equals(OperationType.DELETE.name())) {
+            String finprodMarketId = dto.getFinprodMarketId();
+            FinProduct finProduct = finProductMapper.selectByFinprodMarketId(finprodMarketId);
+            if (Objects.nonNull(finProduct) && Objects.nonNull(finProduct.getFinprodId())) {
+                finprodMarketId = finProduct.getFinprodId();
+            }
             //判断是否流程中的数据
-            Integer countFinProdIdProcessing = finProductSpecial001Service.countFinprodIdProcessing(dto.getFinprodMarketId());
+            Integer countFinProdIdProcessing = finProductSpecial001Service.countFinprodIdProcessing(finprodMarketId);
             if (countFinProdIdProcessing > 0) {
                 resultList.add(new ValidMessage(getMessage("存在有效或流程中的当日指令及交易数据，不允许修改!")));
             }
@@ -95,7 +113,7 @@ public class FinProductSpecialValidatorService implements BeanValidator {
      * @return
      */
     public AjaxResult checkConfirmMsgForImportData(String fileName) {
-        List<List<String>> dataList = ExcelUtil.getDataList("/Users/yushuangzhu/Desktop/0_ABN应计利息问题改造需求规格说明书（增量）.docx_105553275259904.xlsx");
+        List<List<String>> dataList = ExcelUtil.getDataList(fileName);
         AjaxResult result = new AjaxResult();
         result.setData(dataList);
         if (!com.joyintech.framework.util.StringUtil.isEmptyList(dataList)) {

@@ -142,6 +142,7 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
         String baseType = finAssetRateAdjList.get(0).getBaseType();
         String baseDateType = finAssetRateAdjList.get(0).getBaseDateType();
         String basis = finAssetRateAdjList.get(0).getBasis();
+        String marketBasis = finAssetRateAdjList.get(0).getMarketBasis();
         BigDecimal issueAmt = finAssetRateAdjList.get(0).getIssueAmt();
         Long branch = finAssetRateAdjList.get(0).getBranch();
         String finprodType2 =  finAssetRateAdjList.get(0).getFinprodType2();
@@ -160,6 +161,7 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
             finCashCalcRule.setBaseType(baseType);
             finCashCalcRule.setBaseDateType(baseDateType);
             finCashCalcRule.setBasis(basis);
+            finCashCalcRule.setMarketBasis(marketBasis);
             if (!StringUtil.isNotEmpty(entity.getIsInitial())){
                 entity.setIsInitial(DictCodeList.是否_否.getValue());
             }
@@ -206,6 +208,7 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
         String baseType = finAssetRateAdjList.get(0).getBaseType();
         String baseDateType = finAssetRateAdjList.get(0).getBaseDateType();
         String basis = finAssetRateAdjList.get(0).getBasis();
+        String marketBasis = finAssetRateAdjList.get(0).getMarketBasis();
         BigDecimal issueAmt = finAssetRateAdjList.get(0).getIssueAmt();
         String finprodType2 =  finAssetRateAdjList.get(0).getFinprodType2();
         BigDecimal investRate = finAssetRateAdjList.get(0).getInvestRate();
@@ -235,6 +238,7 @@ public class FinBondAsset002Service extends BaseService<FinAssetRateAdjResponse>
             finCashCalcRule.setBaseType(baseType);
             finCashCalcRule.setBaseDateType(baseDateType);
             finCashCalcRule.setBasis(basis);
+            finCashCalcRule.setMarketBasis(marketBasis);
             if (!StringUtil.isNotEmpty(entity.getIsInitial())){
                 entity.setIsInitial(DictCodeList.是否_否.getValue());
             }
