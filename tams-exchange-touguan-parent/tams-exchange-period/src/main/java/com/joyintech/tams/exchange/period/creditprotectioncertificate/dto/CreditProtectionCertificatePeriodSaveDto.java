@@ -5,11 +5,10 @@ import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.framework.validation.annotation.NotEmpty;
 import com.joyintech.framework.validation.annotation.ValidLogic;
-import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
-import com.joyintech.tams.business.common.dto.PageMode;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.validator.CreditProtectionCertificatePeriodSaveDtoValidator;
+import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -47,6 +46,7 @@ public class CreditProtectionCertificatePeriodSaveDto extends BaseEntity impleme
     /**
      * 业务编号
      */
+    @PrimaryKey(value = PrimaryKey.Field.PK_1)
     @ApiModelProperty(name = "busiCode",value = "业务编号")
     private String busiCode;
 
@@ -195,6 +195,16 @@ public class CreditProtectionCertificatePeriodSaveDto extends BaseEntity impleme
     @ApiModelProperty(name="tradeDate",value="交易日期")
     private Date tradeDate;
 
+    @ApiModelProperty(name="revokeReason",value="撤销原因")
+    private String revokeReason;
+
+    public String getRevokeReason() {
+        return revokeReason;
+    }
+
+    public void setRevokeReason(String revokeReason) {
+        this.revokeReason = revokeReason;
+    }
 
     public Date getTradeDate() {
         return tradeDate;

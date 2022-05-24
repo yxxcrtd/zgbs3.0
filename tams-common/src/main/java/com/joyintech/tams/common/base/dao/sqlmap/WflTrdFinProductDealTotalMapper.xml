@@ -78,11 +78,6 @@
         <result column="DIVID_CCY" property="dividCcy" jdbcType="VARCHAR" />
         <result column="EXCHANGE_RATE" property="exchangeRate" jdbcType="DECIMAL" />
         <result column="REPLACE_PRICE" property="replacePrice" jdbcType="DECIMAL" />
-        <result column="CREDIT_EVENT_HAPPENED_DATE" property="creditEventHappenedDate" jdbcType="TIMESTAMP"/>
-        <result column="CREDIT_EVENT_RESOLVE_DATE" property="creditEventResolveDate" jdbcType="TIMESTAMP"/>
-        <result column="SETTLE_METHOD" property="settleMethod" jdbcType="VARCHAR"/>
-        <result column="DELIVER_BOND" property="deliverBond" jdbcType="VARCHAR"/>
-        <result column="DELIVER_BOND_AMOUNT" property="deliverBondAmount" jdbcType="DECIMAL"/>
     </resultMap>
     <sql id="Base_Column_List" >
         TOTLE_TRADE_ID TOTLE_TRADE_ID, WORKFLOW_STATUS WORKFLOW_STATUS, BUSI_TYPE BUSI_TYPE, 
@@ -103,9 +98,7 @@
         M_DELIVERY_TYPE M_DELIVERY_TYPE, RATE RATE, REPO_TERM REPO_TERM, TERM_TYPE TERM_TYPE, 
         IS_OVERDUE_DEAL IS_OVERDUE_DEAL, PAY_UNPAIDINT_AMT PAY_UNPAIDINT_AMT, ISPAY_UNPAIDINT ISPAY_UNPAIDINT,
         YESTERDAY_POSITION YESTERDAY_POSITION, TRADE_AMT_HK TRADE_AMT_HK, SELL_SETTLE_RATE SELL_SETTLE_RATE,
-        IF_DIVIDEND IF_DIVIDEND, DIVID_CCY DIVID_CCY, EXCHANGE_RATE EXCHANGE_RATE, REPLACE_PRICE REPLACE_PRICE,
-        CREDIT_EVENT_HAPPENED_DATE CREDIT_EVENT_HAPPENED_DATE,CREDIT_EVENT_RESOLVE_DATE CREDIT_EVENT_RESOLVE_DATE,
-        SETTLE_METHOD SETTLE_METHOD,DELIVER_BOND DELIVER_BOND,DELIVER_BOND_AMOUNT DELIVER_BOND_AMOUNT
+        IF_DIVIDEND IF_DIVIDEND, DIVID_CCY DIVID_CCY, EXCHANGE_RATE EXCHANGE_RATE, REPLACE_PRICE REPLACE_PRICE
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -378,21 +371,6 @@
             <if test="replacePrice != null" >
                 REPLACE_PRICE = #{replacePrice,jdbcType=DECIMAL},
             </if>
-            <if test="creditEventHappenedDate != null" >
-                CREDIT_EVENT_HAPPENED_DATE = #{creditEventHappenedDate,jdbcType=TIMESTAMP},
-            </if>
-            <if test="creditEventResolveDate != null" >
-                CREDIT_EVENT_RESOLVE_DATE = #{creditEventResolveDate,jdbcType=TIMESTAMP},
-            </if>
-            <if test="settleMethod != null" >
-                SETTLE_METHOD = #{settleMethod,jdbcType=VARCHAR},
-            </if>
-            <if test="deliverBond != null" >
-                DELIVER_BOND = #{deliverBond,jdbcType=VARCHAR},
-            </if>
-            <if test="deliverBondAmount != null" >
-                DELIVER_BOND_AMOUNT = #{deliverBondAmount,jdbcType=DECIMAL},
-            </if>
         </set>
         where WORKFLOW_ID = #{workflowId, jdbcType=VARCHAR}
     </update>
@@ -470,12 +448,7 @@
         IF_DIVIDEND = #{ifDividend,jdbcType=VARCHAR},
         DIVID_CCY = #{dividCcy,jdbcType=VARCHAR},
         EXCHANGE_RATE = #{exchangeRate,jdbcType=DECIMAL},
-        REPLACE_PRICE = #{replacePrice,jdbcType=DECIMAL},
-        CREDIT_EVENT_HAPPENED_DATE = #{creditEventHappenedDate,jdbcType=TIMESTAMP},
-        CREDIT_EVENT_RESOLVE_DATE = #{creditEventResolveDate,jdbcType=TIMESTAMP},
-        SETTLE_METHOD = #{settleMethod,jdbcType=VARCHAR},
-        DELIVER_BOND = #{deliverBond,jdbcType=VARCHAR},
-        DELIVER_BOND_AMOUNT = #{deliverBondAmount,jdbcType=DECIMAL}
+        REPLACE_PRICE = #{replacePrice,jdbcType=DECIMAL}
         where WORKFLOW_ID = #{workflowId, jdbcType=VARCHAR}
     </update>
     <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.WflTrdFinProductDealTotal" >
@@ -506,9 +479,7 @@
             ,INSTITUTION_CODE
             <!-- 多级法人改造 add by caiqun 20200615 -->
             ,YESTERDAY_POSITION, TRADE_AMT_HK, SELL_SETTLE_RATE
-            , IF_DIVIDEND, DIVID_CCY, EXCHANGE_RATE, REPLACE_PRICE,
-            CREDIT_EVENT_HAPPENED_DATE, CREDIT_EVENT_RESOLVE_DATE,
-            SETTLE_METHOD,DELIVER_BOND, DELIVER_BOND_AMOUNT
+            , IF_DIVIDEND, DIVID_CCY, EXCHANGE_RATE, REPLACE_PRICE
             )
         values (#{totleTradeId,jdbcType=VARCHAR}, #{workflowStatus,jdbcType=VARCHAR}, #{busiType,jdbcType=VARCHAR}, 
             #{finprodId,jdbcType=VARCHAR}, #{finprodType,jdbcType=VARCHAR}, #{finprodType2,jdbcType=VARCHAR}, 
@@ -537,9 +508,7 @@
             ,#{institutionCode,jdbcType=VARCHAR}
             <!-- 多级法人改造 add by caiqun 20200615 -->
             ,#{yesterdayPosition,jdbcType=DECIMAL}, #{tradeAmtHk,jdbcType=DECIMAL}, #{sellSettleRate,jdbcType=DECIMAL}
-            ,#{ifDividend,jdbcType=VARCHAR}, #{dividCcy,jdbcType=VARCHAR},#{exchangeRate,jdbcType=DECIMAL}, #{replacePrice,jdbcType=DECIMAL},
-            #{creditEventHappenedDate,jdbcType=TIMESTAMP},#{creditEventResolveDate,jdbcType=TIMESTAMP},
-            #{settleMethod,jdbcType=VARCHAR},#{deliverBond,jdbcType=VARCHAR},#{deliverBondAmount,jdbcType=DECIMAL}
+            ,#{ifDividend,jdbcType=VARCHAR}, #{dividCcy,jdbcType=VARCHAR},#{exchangeRate,jdbcType=DECIMAL}, #{replacePrice,jdbcType=DECIMAL}
             )
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.WflTrdFinProductDealTotal" >
@@ -776,21 +745,6 @@
             <if test="replacePrice != null" >
                 REPLACE_PRICE,
             </if>
-            <if test="creditEventHappenedDate != null" >
-                CREDIT_EVENT_HAPPENED_DATE,
-            </if>
-            <if test="creditEventResolveDate != null" >
-                CREDIT_EVENT_RESOLVE_DATE,
-            </if>
-            <if test="settleMethod != null" >
-                SETTLE_METHOD,
-            </if>
-            <if test="deliverBond != null" >
-                DELIVER_BOND,
-            </if>
-            <if test="deliverBondAmount != null" >
-                DELIVER_BOND_AMOUNT,
-            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="totleTradeId != null" >
@@ -1023,21 +977,6 @@
             </if>
             <if test="replacePrice != null" >
                 #{replacePrice,jdbcType=DECIMAL},
-            </if>
-            <if test="creditEventHappenedDate != null" >
-                #{creditEventHappenedDate,jdbcType=TIMESTAMP},
-            </if>
-            <if test="creditEventResolveDate != null" >
-                #{creditEventResolveDate,jdbcType=TIMESTAMP},
-            </if>
-            <if test="settleMethod != null" >
-                #{settleMethod,jdbcType=VARCHAR},
-            </if>
-            <if test="deliverBond != null" >
-                #{deliverBond,jdbcType=VARCHAR},
-            </if>
-            <if test="deliverBondAmount != null" >
-                #{deliverBondAmount,jdbcType=DECIMAL},
             </if>
         </trim>
     </insert>
@@ -1283,21 +1222,6 @@
             <if test="replacePrice != null" >
                 REPLACE_PRICE = #{replacePrice,jdbcType=DECIMAL},
             </if>
-            <if test="creditEventHappenedDate != null" >
-                CREDIT_EVENT_HAPPENED_DATE = #{creditEventHappenedDate,jdbcType=TIMESTAMP},
-            </if>
-            <if test="creditEventResolveDate != null" >
-                CREDIT_EVENT_RESOLVE_DATE = #{creditEventResolveDate,jdbcType=TIMESTAMP},
-            </if>
-            <if test="settleMethod != null" >
-                SETTLE_METHOD = #{settleMethod,jdbcType=VARCHAR},
-            </if>
-            <if test="deliverBond != null" >
-                DELIVER_BOND = #{deliverBond,jdbcType=VARCHAR},
-            </if>
-            <if test="deliverBondAmount != null" >
-                DELIVER_BOND_AMOUNT = #{deliverBondAmount,jdbcType=DECIMAL},
-            </if>
         </set>
         where TOTLE_TRADE_ID = #{totleTradeId,jdbcType=VARCHAR}
           and WORKFLOW_STATUS = #{workflowStatus,jdbcType=VARCHAR}
@@ -1374,12 +1298,7 @@
             IF_DIVIDEND = #{ifDividend,jdbcType=VARCHAR},
             DIVID_CCY = #{dividCcy,jdbcType=VARCHAR},
             EXCHANGE_RATE = #{exchangeRate,jdbcType=DECIMAL},
-            REPLACE_PRICE = #{replacePrice,jdbcType=DECIMAL},
-            CREDIT_EVENT_HAPPENED_DATE = #{creditEventHappenedDate,jdbcType=TIMESTAMP},
-            CREDIT_EVENT_RESOLVE_DATE = #{creditEventResolveDate,jdbcType=TIMESTAMP},
-            SETTLE_METHOD = #{settleMethod,jdbcType=VARCHAR},
-            DELIVER_BOND = #{deliverBond,jdbcType=VARCHAR},
-            DELIVER_BOND_AMOUNT = #{deliverBondAmount,jdbcType=DECIMAL}
+            REPLACE_PRICE = #{replacePrice,jdbcType=DECIMAL}
         where TOTLE_TRADE_ID = #{totleTradeId,jdbcType=VARCHAR}
           and WORKFLOW_STATUS = #{workflowStatus,jdbcType=VARCHAR}
     </update>

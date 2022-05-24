@@ -2,6 +2,7 @@ package com.joyintech.tams.exchange.period.creditprotectioncertificate.dto;
 
 import com.joyintech.framework.validation.annotation.NotEmpty;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
+import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
@@ -14,6 +15,13 @@ import java.math.BigDecimal;
  * @since 1.0
  */
 public class BillingDetailsDto {
+
+    /**
+     * 业务编号
+     */
+    @ApiModelProperty(name = "busiCode",value = "业务编号")
+    private String busiCode;
+
     /**
      * 序号
      */
@@ -156,5 +164,13 @@ public class BillingDetailsDto {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getBusiCode() {
+        return busiCode;
+    }
+
+    public void setBusiCode(String busiCode) {
+        this.busiCode = busiCode;
     }
 }

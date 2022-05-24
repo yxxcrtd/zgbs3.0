@@ -18,15 +18,16 @@
         nvl(tfpdl.SHARE_AMT/10000,0) repNomCapi,
         fpd.REF_ENTITY refEntity,
         tfpdl.TG_BUSI_TYPE creditEvent,
-        tfpdl.CREDIT_EVENT_HAPPENED_DATE creditEventHappenedDate,
-        tfpdl.CREDIT_EVENT_RESOLVE_DATE creditEventResolveDate,
-        tfpdl.SETTLE_METHOD settleMethod,
-        tfpdl.DELIVER_BOND deliverBond,
+        TDTA.CREDIT_EVENT_HAPPENED_DATE creditEventHappenedDate,
+        TDTA.CREDIT_EVENT_RESOLVE_DATE creditEventResolveDate,
+        tfpdl.M_DELIVERY_TYPE settleMethod,
+        TDTA.DELIVER_BOND deliverBond,
         tfpdl.TRADE_DATE deliverDate
         from TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
+        left join TRD_DEAL_TOTAL_ADD TDTA ON tfpdl.TOTLE_TRADE_ID = TDTA.TOTLE_TRADE_ID
         left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
         left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
-        where tfpdl.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F36}
+        where tfpdl.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F37}
         and tfpdl.IS_CANCEL = #{YES_OR_NO_N}
         and tfpdl.P_TOTLE_TRADE_ID is null
         <if test="busiCodeList.size() > 0">
@@ -62,15 +63,16 @@
         nvl(tfpdl.SHARE_AMT/10000,0) repNomCapi,
         fpd.REF_ENTITY refEntity,
         tfpdl.TG_BUSI_TYPE creditEvent,
-        tfpdl.CREDIT_EVENT_HAPPENED_DATE creditEventHappenedDate,
-        tfpdl.CREDIT_EVENT_RESOLVE_DATE creditEventResolveDate,
-        tfpdl.SETTLE_METHOD settleMethod,
-        tfpdl.DELIVER_BOND deliverBond,
+        TDTA.CREDIT_EVENT_HAPPENED_DATE creditEventHappenedDate,
+        TDTA.CREDIT_EVENT_RESOLVE_DATE creditEventResolveDate,
+        tfpdl.M_DELIVERY_TYPE settleMethod,
+        TDTA.DELIVER_BOND deliverBond,
         tfpdl.TRADE_DATE deliverDate
         from WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
+        left join WFL_TRD_DEAL_TOTAL_ADD TDTA ON tfpdl.TOTLE_TRADE_ID = TDTA.TOTLE_TRADE_ID
         left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
         left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
-        where tfpdl.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F36}
+        where tfpdl.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F37}
         and tfpdl.IS_CANCEL = #{YES_OR_NO_N}
         and tfpdl.TRADE_STATUS = '01'
         and tfpdl.P_TOTLE_TRADE_ID is null
@@ -112,7 +114,7 @@
         select tfpdl.TOTLE_TRADE_ID id,
         tfpdl.TOTLE_TRADE_ID text
         from TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
-        where tfpdl.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F36}
+        where tfpdl.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F37}
         and tfpdl.IS_CANCEL = #{YES_OR_NO_N}
         and tfpdl.P_TOTLE_TRADE_ID is null
         <if test="businessCode != null and businessCode != ''">
@@ -124,7 +126,7 @@
         from WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
         left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
         left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
-        where tfpdl.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F36}
+        where tfpdl.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F37}
         and tfpdl.IS_CANCEL = #{YES_OR_NO_N}
         and tfpdl.TRADE_STATUS = '01'
         and tfpdl.P_TOTLE_TRADE_ID is null
@@ -165,69 +167,95 @@
     </select>
     <select id="getEntityByBusinessCode"
             resultType="com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodSaveDto">
-        select fp.FINPROD_MARKET_ID             finprodMarketId,
-               fp.FINPROD_NAME                  finprodMarketName,
-               fp.VDATE                         vDate,
-               fp.MDATE                         mDate,
-               fpd.REF_ENTITY                   refEntity,
-               tfpdl.TG_BUSI_TYPE               creditEvent,
-               tfpdl.TG_BUSI_TYPE               paBussType,
-               tfpdl.CREDIT_EVENT_HAPPENED_DATE creditEventHappenedDate,
-               tfpdl.CREDIT_EVENT_RESOLVE_DATE  creditEventResolveDate,
-               tfpdl.SETTLE_METHOD              settleMethod,
-               tfpdl.DELIVER_BOND               deliverBond,
-               tfpdl.DEVIDENT_DATE              deliverDate,
-               tfpdl.TOTLE_TRADE_ID             busiCode,
-               fp.TRADE_MARKET                  tradeMarket
+        select fp.FINPROD_MARKET_ID            finprodMarketId,
+               fp.FINPROD_NAME                 finprodMarketName,
+               fp.VDATE                        vDate,
+               fp.MDATE                        mDate,
+               fpd.REF_ENTITY                  refEntity,
+               tfpdl.TG_BUSI_TYPE              creditEvent,
+               tfpdl.TG_BUSI_TYPE              paBussType,
+               TDTA.CREDIT_EVENT_HAPPENED_DATE creditEventHappenedDate,
+               TDTA.CREDIT_EVENT_RESOLVE_DATE  creditEventResolveDate,
+               tfpdl.M_DELIVERY_TYPE           settleMethod,
+               TDTA.DELIVER_BOND               deliverBond,
+               tfpdl.TRADE_DATE                deliverDate,
+               tfpdl.TOTLE_TRADE_ID            busiCode,
+               fp.TRADE_MARKET                 tradeMarket
         from TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
+                 left join TRD_DEAL_TOTAL_ADD TDTA ON tfpdl.TOTLE_TRADE_ID = TDTA.TOTLE_TRADE_ID
                  left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
                  left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
         where tfpdl.TOTLE_TRADE_ID = #{businessCode,jdbcType=VARCHAR}
         union all
-        select fp.FINPROD_MARKET_ID             finprodMarketId,
-               fp.FINPROD_NAME                  finprodMarketName,
-               fp.VDATE                         vDate,
-               fp.MDATE                         mDate,
-               fpd.REF_ENTITY                   refEntity,
-               tfpdl.TG_BUSI_TYPE               creditEvent,
-               tfpdl.TG_BUSI_TYPE               paBussType,
-               tfpdl.CREDIT_EVENT_HAPPENED_DATE creditEventHappenedDate,
-               tfpdl.CREDIT_EVENT_RESOLVE_DATE  creditEventResolveDate,
-               tfpdl.SETTLE_METHOD              settleMethod,
-               tfpdl.DELIVER_BOND               deliverBond,
-               tfpdl.DEVIDENT_DATE              deliverDate,
-               tfpdl.TOTLE_TRADE_ID             busiCode,
-               fp.TRADE_MARKET                  tradeMarket
+        select fp.FINPROD_MARKET_ID            finprodMarketId,
+               fp.FINPROD_NAME                 finprodMarketName,
+               fp.VDATE                        vDate,
+               fp.MDATE                        mDate,
+               fpd.REF_ENTITY                  refEntity,
+               tfpdl.TG_BUSI_TYPE              creditEvent,
+               tfpdl.TG_BUSI_TYPE              paBussType,
+               TDTA.CREDIT_EVENT_HAPPENED_DATE creditEventHappenedDate,
+               TDTA.CREDIT_EVENT_RESOLVE_DATE  creditEventResolveDate,
+               tfpdl.M_DELIVERY_TYPE           settleMethod,
+               TDTA.DELIVER_BOND               deliverBond,
+               tfpdl.TRADE_DATE                deliverDate,
+               tfpdl.TOTLE_TRADE_ID            busiCode,
+               fp.TRADE_MARKET                 tradeMarket
         from WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
+                 left join WFL_TRD_DEAL_TOTAL_ADD TDTA ON tfpdl.TOTLE_TRADE_ID = TDTA.TOTLE_TRADE_ID
                  left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
                  left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
         where tfpdl.TOTLE_TRADE_ID = #{businessCode,jdbcType=VARCHAR}
     </select>
     <select id="getBillingDetailByBusinessCode"
             resultType="com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.BillingDetailsDto">
-        select tfpdl.PORTFOLIO_ID                        portfolioId,
-               pp.PORTFOLIO_NAME                         portfolioName,
-               tfpdl.SEC_MANAGE_ACCT_ID                  acctNo,
-               tfpdl.SEC_MANAGE_ACCT_ID                  secManageAcctId,
-               nvl(tfpdl.SHARE_AMT, 0) / 10000           repNomCapi,
-               nvl(tfpdl.DELIVER_BOND_AMOUNT, 0) / 10000 deliverBondAmount,
-               nvl(tfpdl.TRADE_AMT, 0) / 10000           deliveryAmount,
-               tfpdl.REMARK                              remark
+        select tfpdl.PORTFOLIO_ID                  portfolioId,
+               pp.PORTFOLIO_NAME                   portfolioName,
+               tfpdl.SEC_MANAGE_ACCT_ID            acctNo,
+               tfpdl.SEC_MANAGE_ACCT_ID            secManageAcctId,
+               nvl(tfpdl.SHARE_AMT, 0) / 10000     repNomCapi,
+               nvl(T.SHARE_AMT, 0) / 10000         deliverBondAmount,
+               DECODE(tfpdl.M_DELIVERY_TYPE, '02', nvl(tfpdl.TRADE_AMT, 0) / 10000,
+                      NVL(T.TRADE_AMT, 0) / 10000) deliveryAmount,
+               tfpdl.REMARK                        remark
         from TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
+                 LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA ON TPDA.TRADE_ID = tfpdl.TOTLE_TRADE_ID
+                 LEFT JOIN (SELECT T1.TOTLE_TRADE_ID,
+                                   T1.FINPROD_ID,
+                                   T1.SHARE_AMT,
+                                   T1.TRADE_AMT,
+                                   T1.SEC_MANAGE_ACCT_ID,
+                                   T2.PORTFOLIO_ID
+                            FROM TRD_FIN_PRODUCT_DEAL_TOTAL T1
+                                     LEFT JOIN TRD_PRODUCT_DEAL_ADD T2 ON T1.TOTLE_TRADE_ID = T2.TRADE_ID
+                            WHERE T1.FINPROD_TYPE2 = 'F01') T ON T.TOTLE_TRADE_ID = tfpdl.TOTLE_TRADE_ID
+            AND TFPDL.SEC_MANAGE_ACCT_ID = T.SEC_MANAGE_ACCT_ID AND TPDA.PORTFOLIO_ID = T.PORTFOLIO_ID
                  left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
                  left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
                  left join PTL_PORTFOLIO pp on tfpdl.PORTFOLIO_ID = pp.PORTFOLIO_ID
         where tfpdl.P_TOTLE_TRADE_ID = #{businessCode,jdbcType=VARCHAR}
         union all
-        select tfpdl.PORTFOLIO_ID                        portfolioId,
-               pp.PORTFOLIO_NAME                         portfolioName,
-               tfpdl.SEC_MANAGE_ACCT_ID                  acctNo,
-               tfpdl.SEC_MANAGE_ACCT_ID                  secManageAcctId,
-               nvl(tfpdl.SHARE_AMT, 0) / 10000           repNomCapi,
-               nvl(tfpdl.DELIVER_BOND_AMOUNT, 0) / 10000 deliverBondAmount,
-               nvl(tfpdl.TRADE_AMT, 0) / 10000           deliveryAmount,
-               tfpdl.REMARK                              remark
+        select tfpdl.PORTFOLIO_ID                  portfolioId,
+               pp.PORTFOLIO_NAME                   portfolioName,
+               tfpdl.SEC_MANAGE_ACCT_ID            acctNo,
+               tfpdl.SEC_MANAGE_ACCT_ID            secManageAcctId,
+               nvl(tfpdl.SHARE_AMT, 0) / 10000     repNomCapi,
+               nvl(T.SHARE_AMT, 0) / 10000         deliverBondAmount,
+               DECODE(tfpdl.M_DELIVERY_TYPE, '02', nvl(tfpdl.TRADE_AMT, 0) / 10000,
+                      NVL(T.TRADE_AMT, 0) / 10000) deliveryAmount,
+               tfpdl.REMARK                        remark
         from WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
+                 LEFT JOIN WFL_TRD_PRODUCT_DEAL_ADD TPDA ON TPDA.TRADE_ID = tfpdl.TOTLE_TRADE_ID
+                 LEFT JOIN (SELECT T1.TOTLE_TRADE_ID,
+                                   T1.FINPROD_ID,
+                                   T1.SHARE_AMT,
+                                   T1.TRADE_AMT,
+                                   T1.SEC_MANAGE_ACCT_ID,
+                                   T2.PORTFOLIO_ID
+                            FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL T1
+                                     LEFT JOIN WFL_TRD_PRODUCT_DEAL_ADD T2 ON T1.TOTLE_TRADE_ID = T2.TRADE_ID
+                            WHERE T1.FINPROD_TYPE2 = 'F01') T ON T.TOTLE_TRADE_ID = tfpdl.TOTLE_TRADE_ID
+            AND TFPDL.SEC_MANAGE_ACCT_ID = T.SEC_MANAGE_ACCT_ID AND TPDA.PORTFOLIO_ID = T.PORTFOLIO_ID
                  left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
                  left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
                  left join PTL_PORTFOLIO pp on tfpdl.PORTFOLIO_ID = pp.PORTFOLIO_ID

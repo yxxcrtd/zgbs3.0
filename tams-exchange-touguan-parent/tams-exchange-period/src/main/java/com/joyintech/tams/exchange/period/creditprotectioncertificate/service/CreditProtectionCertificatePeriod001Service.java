@@ -31,7 +31,7 @@ public class CreditProtectionCertificatePeriod001Service extends CommonExportSer
 
     public Page<CreditProtectionCertificatePeriod001Response> findPage(CreditProtectionCertificatePeriod001Request params) {
         Map<String, Object> paramsMap = BeanUtil.object2Map(params);
-        paramsMap.put("FINPROD_TYPE_TG_F36", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
+        paramsMap.put("FINPROD_TYPE_TG_F37", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
         paramsMap.put("YES_OR_NO_N", DictCodeList.是否_否.getValue());
 
         paramsMap.put("finprodIdList", StringUtil.splitToList(params.getFinprodId(), ","));
@@ -45,7 +45,7 @@ public class CreditProtectionCertificatePeriod001Service extends CommonExportSer
 
     public Page<SelectOptionDto> findBusiCode(CreditProtectionCertificatePeriod001Request params) {
         Map<String, Object> paramsMap = BeanUtil.object2Map(params);
-        paramsMap.put("FINPROD_TYPE_TG_F36", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
+        paramsMap.put("FINPROD_TYPE_TG_F37", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
         paramsMap.put("YES_OR_NO_N", DictCodeList.是否_否.getValue());
         return super.queryForPageForSelectReturn(params.getPageMode().getPageNo(), params.getPageMode().getPageSize(),
                 () -> creditProtectionCertificatePeriodMapper.findBusiCode(paramsMap));

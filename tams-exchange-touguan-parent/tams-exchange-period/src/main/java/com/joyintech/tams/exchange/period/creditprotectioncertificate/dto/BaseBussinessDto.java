@@ -32,6 +32,16 @@ public class BaseBussinessDto extends BaseEntity {
     private TrdProductDealAdd trdProductDealAdd;
 
     /**
+     * 金融产品交易2 债券
+     */
+    private TrdProductDeal trdProductDeal2;
+
+    /**
+     * 金融产品交易附属表2 债券
+     */
+    private TrdProductDealAdd trdProductDealAdd2;
+
+    /**
      * 划款指令
      */
     private StlPayOrders stlPayOrders;
@@ -88,5 +98,21 @@ public class BaseBussinessDto extends BaseEntity {
 
     public void setPtlTrade(PtlTrade ptlTrade) {
         this.ptlTrade = ptlTrade;
+    }
+
+    public TrdProductDealAdd getTrdProductDealAdd2() {
+        return trdProductDealAdd2;
+    }
+
+    public void setTrdProductDealAdd2(TrdProductDealAdd trdProductDealAdd2) {
+        this.trdProductDealAdd2 = trdProductDealAdd2;
+    }
+
+    public TrdProductDeal getTrdProductDeal2() {
+        return trdProductDeal2;
+    }
+
+    public void setTrdProductDeal2(TrdProductDeal trdProductDeal2) {
+        this.trdProductDeal2 = trdProductDeal2;
     }
 }

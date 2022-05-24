@@ -4,6 +4,7 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.CacheUtil;
@@ -95,7 +96,11 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
         //流程id
         String businessCode = "null".equals(getParam("businessCode")) ? null : getParam("businessCode");
         if (StringUtil.isNotEmpty(businessCode)) {
-            CreditProtectionCertificatePeriodSaveDto dto = creditProtectionCertificatePeriod002Service.getEntityByBusinessCode(businessCode);
+            ProcessMark processMark = new ProcessMark();
+            processMark.setPageId(this.getPageId());
+            processMark.setBusinessDataPk1(businessCode);
+            CreditProtectionCertificatePeriodSaveDto dto = creditProtectionCertificatePeriod002Service.getBussinessEntityByPk(processMark);
+//            CreditProtectionCertificatePeriodSaveDto dto = creditProtectionCertificatePeriod002Service.getEntityByBusinessCode(businessCode);
             if (null != dto) {
                 initPageParams.put(GlobalConstant.ENTITY, dto);
             }
