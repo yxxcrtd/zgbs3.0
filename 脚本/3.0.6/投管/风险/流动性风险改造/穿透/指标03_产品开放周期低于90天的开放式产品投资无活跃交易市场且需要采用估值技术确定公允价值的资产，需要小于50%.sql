@@ -156,6 +156,31 @@ SELECT SUM(TRADE_AMT) AS RVALUE FROM (
     WHERE M.PORTFOLIO_ID IN ${portfolioCode} AND N.TRADE_DATE=DATE''${valDate}''
     AND N.PS IN (''T01'',''T02'',''T03'',''T04'',''T19'',''T07'',''T08'',''T09'',''T11'',''T46'',''T47'',''T48'',''T52'',''T22'',''T23'',''T39'',''T54'',''T100'')
   UNION ALL
+      SELECT
+          NVL(SUM(DECODE(N.PS,''T01'',N.TRADE_AMT)),0)
+        + NVL(SUM(DECODE(N.PS,''T04'',N.TRADE_AMT)),0)
+        + NVL(SUM(DECODE(N.PS,''T46'',N.TRADE_AMT)),0)
+        + NVL(SUM(DECODE(N.PS,''T47'',N.TRADE_AMT)),0)
+        + NVL(SUM(DECODE(N.PS,''T48'',N.TRADE_AMT)),0)
+        + NVL(SUM(DECODE(N.PS,''T52'',N.TRADE_AMT)),0)
+        - NVL(SUM(DECODE(N.PS,''T02'',N.TRADE_AMT)),0)
+        - NVL(SUM(DECODE(N.PS,''T03'',N.TRADE_AMT)),0)
+  	    - NVL(SUM(DECODE(N.PS,''T100'',N.TRADE_AMT)),0)
+        - NVL(SUM(DECODE(N.PS,''T19'',N.TRADE_AMT)),0)
+        - NVL(SUM(DECODE(N.PS,''T07'',N.TRADE_AMT)),0)
+        - NVL(SUM(DECODE(N.PS,''T08'',N.TRADE_AMT)),0)
+        - NVL(SUM(DECODE(N.PS,''T09'',N.TRADE_AMT)),0)
+  	    - NVL(SUM(DECODE(N.PS,''T11'',N.TRADE_AMT)),0)
+        - NVL(SUM(DECODE(N.PS,''T22'',N.TRADE_AMT)),0)
+        - NVL(SUM(DECODE(N.PS,''T23'',N.TRADE_AMT)),0)
+  	    - NVL(SUM(DECODE(N.PS,''T39'',N.TRADE_AMT)),0)
+  	    - NVL(SUM(DECODE(N.PS,''T54'',N.TRADE_AMT)),0) TRADE_AMT
+      FROM TRD_PRODUCT_TEMP_DEAL_ADD M
+      INNER JOIN TRD_PRODUCT_TEMP_DEAL N ON M.TRADE_ID = N.TRADE_ID and (n.TRADE_STATUS = ''01'' OR n.TRADE_STATUS IS NULL) and NVL(n.IS_CANCEL,''N'') =''N''
+      INNER JOIN PROD_SM t2 ON t2.FINPROD_ID = n.FINPROD_ID
+      WHERE M.PORTFOLIO_ID IN ${portfolioCode} AND N.TRADE_DATE=DATE''${valDate}''
+      AND N.PS IN (''T01'',''T02'',''T03'',''T04'',''T19'',''T07'',''T08'',''T09'',''T11'',''T46'',''T47'',''T48'',''T52'',''T22'',''T23'',''T39'',''T54'',''T100'')
+  UNION ALL
     SELECT
         NVL(SUM(DECODE(N.PS,''T01'',N.TRADE_AMT)),0)
       + NVL(SUM(DECODE(N.PS,''T04'',N.TRADE_AMT)),0)
